@@ -1,225 +1,182 @@
-Return-Path: <netdev+bounces-276128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276129-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YMtUIFlJ1Wk44AcAu9opvQ
-	(envelope-from <netdev+bounces-276128-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 20:13:45 +0200
+	id IN45Me5J1Wlg4QcAu9opvQ
+	(envelope-from <netdev+bounces-276129-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 20:16:14 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9E0F3B2D41
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 20:13:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E9DD3B2DA9
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 20:16:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0751130AABF7
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 18:10:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9771C300DE3C
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 18:16:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BEF63C457A;
-	Tue,  7 Apr 2026 18:10:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 235742135C5;
+	Tue,  7 Apr 2026 18:16:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BRyzBbe6"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="FZ71mDza"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FA2F34751F
-	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 18:10:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0D3518AE3
+	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 18:16:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775585421; cv=none; b=JIDb8ZXE7t1hGOYHJ0kOiHQjzvxNRJFpkgFnGGmFJDMVIVMyQprxhoZ48nmgWyc7UjUpUB5Cu3mft67zpQsG8wrCt+konSnhnPeg5p13yxuKFxJsBGCE682Y+bgTsoly5vNhs7fDdAHz47A5a5aAJM7qwoK9LcWdnLiR+7HSOYc=
+	t=1775585772; cv=none; b=YTC72RTi7kJNc8nAKOdQ60S34opR/JHuWK7N2LBzFz/Vzj9IDRc05ALv9SBgTMVrwfXOkUgDTiGP4C+fzOs1jdJu1D9zWf4o9ea/keSbeGKNgsY1EMsYHYP7vd3ExLO1BSCtPfkFRgZ7Xq2JTiRZcjHLCnQNz+o93hM1uXUT7kk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775585421; c=relaxed/simple;
-	bh=tcl1qfLwMS19L3mzncct5CqtESe0HXvGG66E6xJupqM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cncG3heshY7WayH7xaduQufb798bVHElXGoAB0XK1At9l7p+8O+pqUd8rB9rXsEWQakittrL0t5tql07tJetF94YI//JE1A6akyPLibKeHmMq07Pwk4VH0gxHm36VEJoGoUgZPjO8th3DqsG5YnhDI2rBbSz8eWr6Q90oFMawEQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BRyzBbe6; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1775585419;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UbtzswuJRThoMSkK1uWOBU5lGKQH4eolmDAlpqc4rxU=;
-	b=BRyzBbe6cVGjMaAdmXOYQ+qIu2nVQNAHEwPaEaG3Pf+/We4ymwYb+6eMFTtj084bXll5FB
-	qeke97M8nrm1v4GDbpD9lEv3q6mFBRAvidWp+tkapNPUvXeBcmq3z1Tw4fFLOMm3EnwFcZ
-	uGx6bbdKDOQK94gOikzt//4uTgZBHxs=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-400-0YH3eheZMEKUe9f5o6VV7w-1; Tue,
- 07 Apr 2026 14:10:12 -0400
-X-MC-Unique: 0YH3eheZMEKUe9f5o6VV7w-1
-X-Mimecast-MFC-AGG-ID: 0YH3eheZMEKUe9f5o6VV7w_1775585411
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9EC13180049D;
-	Tue,  7 Apr 2026 18:10:10 +0000 (UTC)
-Received: from thinkpad (unknown [10.44.50.90])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1EBAD300019F;
-	Tue,  7 Apr 2026 18:10:07 +0000 (UTC)
-Date: Tue, 7 Apr 2026 20:10:04 +0200
-From: Felix Maurer <fmaurer@redhat.com>
-To: Luka Gejak <luka.gejak@linux.dev>
-Cc: Fernando Fernandez Mancera <fmancera@suse.de>, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, horms@kernel.org
-Subject: Re: [PATCH net-next v4 1/2] net: hsr: require valid EOT supervision
- TLV
-Message-ID: <adVIfNgLCvhxr7UU@thinkpad>
-References: <20260401092324.52266-1-luka.gejak@linux.dev>
- <20260401092324.52266-2-luka.gejak@linux.dev>
- <4549f521-6395-4c26-921e-eaead7248a36@suse.de>
- <DHHZD2L18VZT.2TLAQO4JAD79Y@linux.dev>
- <78c9c953-1aaa-4d44-9c1d-b4e52a5cead3@suse.de>
- <811E5B8F-85E7-47E2-BEA1-25E62C68929C@linux.dev>
+	s=arc-20240116; t=1775585772; c=relaxed/simple;
+	bh=7yzR7MN+zWima1/1USiTtVXatpKFc/V4vVvptG/tFHo=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iMK/GBzeitCsewi/HdDQCFT7LhvFH6iAq7tbuNE3XwoWr/EYqywTiwRUTJzr5oztjyshf0EGhNY0fJ5emtHX9uM+lXtK78rwB/8GEamWQTS8EMkeclSsoQXFE1y4wYCQrAg336+e52/jazlZovFALZLoTPPKjTwhDv7HzrWTv0U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=FZ71mDza; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1775585770; x=1807121770;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=7yzR7MN+zWima1/1USiTtVXatpKFc/V4vVvptG/tFHo=;
+  b=FZ71mDza0n3qWlcjiWhPkhjXbU/J2sO9MVJiDMuBRLHJWNkr4XwVpwxj
+   jQHWABro/8mqkeX5O6L2H8JQYKK6A5xHKckCJse83Zzl04x/TRTV468wq
+   BbV/8uuik54cWCC4R3FmCGgxcNKAtWcSf9yniz/eEI/0dk/1B5LVPjp0S
+   3dh2SGinrRoG5YxpFs8EOGMUFYj78r2Ds1mPWHKunv2kP7qgZuJhSECPH
+   Q7y/FN1xdTvwPBASLuRlS0JMANGpUEY3uXi5whZgfWYvyXPFBPMtNasAc
+   SF01wbFxS5TOWEUxXlYLpyMQ3Qf5TqahzexwCAcDQCbkzLKDIKs7Amzdf
+   A==;
+X-CSE-ConnectionGUID: A4fTM7iVSYqrwUzPcITd8A==
+X-CSE-MsgGUID: pTLBd2eCRnm+FD3Y2mjBEA==
+X-IronPort-AV: E=Sophos;i="6.23,166,1770620400"; 
+   d="scan'208";a="63638843"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Apr 2026 11:16:03 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.87.152) by
+ chn-vm-ex4.mchp-main.com (10.10.87.33) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.35; Tue, 7 Apr 2026 11:15:52 -0700
+Received: from bby-cbu-swbuild03.eng.microchip.com (10.10.85.11) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.58 via Frontend Transport; Tue, 7 Apr 2026 11:15:51 -0700
+Date: Tue, 7 Apr 2026 11:15:49 -0700
+From: Charles Perry <charles.perry@microchip.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+	<linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
+	<olteanv@gmail.com>, <netdev@vger.kernel.org>, Tim Menninger
+	<tmenninger@purestorage.com>, Florian Fainelli
+	<florian.fainelli@broadcom.com>, <charles.perry@microchip.com>
+Subject: Re: [PATCH net-next v2 1/2] net: phy: c45 scanning: Don't consider
+ -ENODEV fatal
+Message-ID: <adVJ1YpHv1bWCxKL@bby-cbu-swbuild03.eng.microchip.com>
+References: <20240204-unify-c22-c45-scan-error-handling-v2-0-0273623f9c57@lunn.ch>
+ <20240204-unify-c22-c45-scan-error-handling-v2-1-0273623f9c57@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <811E5B8F-85E7-47E2-BEA1-25E62C68929C@linux.dev>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
-X-Spamd-Result: default: False [-1.66 / 15.00];
+In-Reply-To: <20240204-unify-c22-c45-scan-error-handling-v2-1-0273623f9c57@lunn.ch>
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-276128-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,purestorage.com,broadcom.com,microchip.com];
+	TAGGED_FROM(0.00)[bounces-276129-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmaurer@redhat.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[microchip.com:+];
 	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[charles.perry@microchip.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D9E0F3B2D41
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bby-cbu-swbuild03.eng.microchip.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,microchip.com:dkim]
+X-Rspamd-Queue-Id: 2E9DD3B2DA9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Apr 02, 2026 at 08:34:47AM +0200, Luka Gejak wrote:
-> On April 2, 2026 1:30:57 AM GMT+02:00, Fernando Fernandez Mancera <fmancera@suse.de> wrote:
-> >On 4/1/26 7:05 PM, Luka Gejak wrote:
-> >> On Wed Apr 1, 2026 at 11:52 AM CEST, Fernando Fernandez Mancera wrote:
-> >>> On 4/1/26 11:23 AM, luka.gejak@linux.dev wrote:
-> >>>> From: Luka Gejak <luka.gejak@linux.dev>
-> >>>>
-> >>>> Supervision frames are only valid if terminated with a zero-length EOT
-> >>>> TLV. The current check fails to reject non-EOT entries as the terminal
-> >>>> TLV, potentially allowing malformed supervision traffic.
-> >>>>
-> >>>> Fix this by strictly requiring the terminal TLV to be HSR_TLV_EOT
-> >>>> with a length of zero.
-> >>>>
-> >>>> Reviewed-by: Felix Maurer <fmaurer@redhat.com>
-> >>>> Signed-off-by: Luka Gejak <luka.gejak@linux.dev>
-> >>>> ---
-> >>>
-> >>> Hi,
-> >>>
-> >>> This has not been reviewed by Felix. Felix provided his Reviewed-by tag
-> >>> for the v1 which was completely different than this.
-> >>>
-> >>> Revisions of this patch:
-> >>>
-> >>> v3: https://lore.kernel.org/all/20260329112313.17164-4-luka.gejak@linux.dev/
-> >>>
-> >>> v2: https://lore.kernel.org/all/20260326154715.38405-4-luka.gejak@linux.dev/
-> >>>
-> >>> v1:
-> >>> https://lore.kernel.org/all/20260324143503.187642-4-luka.gejak@linux.dev/
-> >>>
-> >>> Are these contributions LLM/AI generated? I believe so based on the
-> >>> email history.
-> >>>
-> >>> AI generated review on rtl8723bs:
-> >>> https://lore.kernel.org/all/B2394A3C-25FD-4CEA-8557-3E68F1F60357@linux.dev/
-> >>>
-> >>> Another AI generated review on rtl8723bs:
-> >>> https://lore.kernel.org/all/3831D599-655E-40B2-9E5D-9DF956013088@linux.dev/
-> >>>
-> >>> Likely an AI generated review on a 1 year old HSR patch:
-> >>> https://lore.kernel.org/all/DHFG26KI6L23.1YCOVQ5SSYMO5@linux.dev/
-> >>>
-> >>> If these are indeed, AI generated contributions or reviews they should
-> >>> be disclosed beforehand. Also there is the Assisted-by: tag. Also note
-> >>> that developer must take full responsibility for the contribution which
-> >>> means understanding it completely.
-> >>>
-> >>> https://docs.kernel.org/process/coding-assistants.html#signed-off-by-and-developer-certificate-of-origin
-> >>>
-> >>> Thanks,
-> >>> Fernando.
-> >>
-> >> HI Fernando,
-> >> One more question, should I include Assisted-by tag in v5 if AI was not
-> >> used for writing code but only for formating and translation of the
-> >> emails to English as I previously mentioned.
-> >>
-> >
-> >I think yes, you should. I also think that AI was actually used for the generated code and also for spotting the valid and invalid issues. If you don't have a real environment for HSR, why would you look into it?
-> >
-> >Sorry, it is not my intention to be harsh but there are some things that don't add up for me. Maybe I am being too careful here and you just coincidentally found these problems.
-> >
-> >> Best regards,
-> >> Luka Gejak
-> >>
-> >
->
-> Hi Fernando,
-> I understand the concern. To clarify, I am a student, and I discovered
-> these issues while reading the HSR source to learn about network
-> redundancy. Since I lack industrial hardware, I verified the logic
-> using network namespaces and veth pairs on my Arch laptop. The code
-> and logic are entirely my. As previously mentioned, I only use AI for
-> English translation and formatting to ensure my communication is
-> clear.
+On Sun, Feb 04, 2024 at 05:14:14PM -0600, Andrew Lunn wrote:
+> When scanning the MDIO bus for C22 devices, the driver returning
+> -ENODEV is not considered fatal, it just indicates the MDIO bus master
+> knows there is no device at that address, maybe because of hardware
+> limitation.
+> 
+> Make the C45 scan code act on -ENODEV the same way, to make C22 and
+> C45 more uniform.
+> 
+> It is expected all reads for a given address will return -ENODEV, so
+> within get_phy_c45_ids() only the first place a read occurs has been
+> changed.
+> 
+> Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+> Signed-off-by: Andrew Lunn <andrew@lunn.ch>
+> ---
+>  drivers/net/phy/phy_device.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+> index 52828d1c64f7..962ab53c23ff 100644
+> --- a/drivers/net/phy/phy_device.c
+> +++ b/drivers/net/phy/phy_device.c
+> @@ -780,7 +780,7 @@ static int get_phy_c45_devs_in_pkg(struct mii_bus *bus, int addr, int dev_addr,
+>   * and identifiers in @c45_ids.
+>   *
+>   * Returns zero on success, %-EIO on bus access error, or %-ENODEV if
+> - * the "devices in package" is invalid.
+> + * the "devices in package" is invalid or no device responds.
+>   */
+>  static int get_phy_c45_ids(struct mii_bus *bus, int addr,
+>  			   struct phy_c45_device_ids *c45_ids)
+> @@ -803,7 +803,11 @@ static int get_phy_c45_ids(struct mii_bus *bus, int addr,
+>  			 */
+>  			ret = phy_c45_probe_present(bus, addr, i);
+>  			if (ret < 0)
+> -				return -EIO;
+> +				/* returning -ENODEV doesn't stop bus
+> +				 * scanning
+> +				 */
+> +				return (phy_reg == -EIO ||
+> +					phy_reg == -ENODEV) ? -ENODEV : -EIO;
 
-Hi Luka,
+Hello Andrew,
 
-I honestly appreciate that you are learning about networking
-technologies and the kernel and that you are posting patches to improve
-the kernel!
+Did you meant "ret" instead of "phy_reg" here?
 
-I do, however, share some of Fernando's concerns. I especially doubt
-that AI tools were not used for the code here. This isn't forbidden or
-even a problem in and of itself, but we'd like to have proper disclosure
-of the fact and attribution of the tool, as the policy linked to by
-Fernando states.
-
-Let me add a few words for why I (personally) think this is important.
-When you submit patches to the mailing lists, there are real humans
-taking real time to review the changes. The reviews are much more easy
-if the reviewers have all the relevant context available to them. The
-information that the code was developed with assistance of an AI tool is
-relevant because reviewers pay attention to different types of issues
-depending on whether AI wrote the code or a human wrote the code, simply
-because they make different mistakes. Additionally, by not disclosing AI
-tool usage, you add one more step to a review (determining if the code
-is AI generated) which takes away capacity from the review itself.
-
-With that said: I don't want to express blame here for anyone. It's just
-a reminder to be helpful and considerate towards the community and the
-reviewers, so they can be helpful to you with your submissions.
+"phy_reg" doesn't make sense here because you would have already returned
+in the previous iteration of the loop.
 
 Thanks,
-   Felix
+Charles
 
+>  
+>  			if (!ret)
+>  				continue;
+> 
+> -- 
+> 2.43.0
+> 
+> 
 
