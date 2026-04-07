@@ -1,244 +1,174 @@
-Return-Path: <netdev+bounces-275943-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275954-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QDJZAiHi1GnbyQcAu9opvQ
-	(envelope-from <netdev+bounces-275943-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 12:53:21 +0200
+	id 0GlYO3Pn1GmeygcAu9opvQ
+	(envelope-from <netdev+bounces-275954-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 13:16:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F5AF3AD47C
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 12:53:20 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E28D3AD900
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 13:16:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 44456307CA2B
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 10:48:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BA34830A85CC
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 11:11:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 152513A4511;
-	Tue,  7 Apr 2026 10:48:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACEB33AC0CB;
+	Tue,  7 Apr 2026 11:11:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="RgqdcjwJ"
+	dkim=pass (2048-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="GBXC6V0+"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
+Received: from www537.your-server.de (www537.your-server.de [188.40.3.216])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35D1739D6F9;
-	Tue,  7 Apr 2026 10:48:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F8763ACF05;
+	Tue,  7 Apr 2026 11:11:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.40.3.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775558891; cv=none; b=s0au/STxh0x4Qogu4IUgntQBZucTuEZRZ7tFqq9xnDQiFnLx1BV619t8AeFmk1vPVuf1sktdgFZwvUwqlIbAeNCrSzVVZaALEtNYFckLKWEwBBP85jLbykK8nkHjvC12uiNWvb0KvJLTcSweZL5Do1kNdsDHqAwTRqIDEGDCJuk=
+	t=1775560285; cv=none; b=fYUuhUQGTlEg3k9+nlcDf/L1oNe6hKZ5Ad/YI9+I2Sljy65t1SoQ7FArEZsgr9bRZt8rM527O+U956nopyXfrNr7ftQsoCQJ2+5QtABybmCkBBfN38VkVhO00mj4dLA1MW/gunXPvKVptomqGrC/gjOfQDDZpKczuw5JoEs+u0M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775558891; c=relaxed/simple;
-	bh=gVhTUKcV2HyCwzuwdCv7ovFUANZVS2PUTsAzv9DxF2w=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=r1MP/D3Cip5J+UmKUU73QJGAWg6d+hBNTVKKhlZwgXbVVfXDczOQ4bq2HSbLavN/9aXEZOBxZwIp10hJAshrrUnESiao/hId4XNFoorQ4p5BhDKQXq2s9F9YNRuoousOma1DtS/pLBHU1SYXhbj34PNMWnAYeU+ULa/h1BE5//E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=RgqdcjwJ; arc=none smtp.client-ip=115.124.30.113
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1775558885; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=kG9JEWxldphoXtIw2ELvbQq3BEYOe+NSKsmq+c/NWB4=;
-	b=RgqdcjwJ6wUBdeqSISRMOwiCaWLzxC7KlyhR86ITw/dfqobSnmztm74x8m5Q3dS/i0QhvJh+0qDxJUwlLMZ4Q1iZZX+nsVckiqoiGQFt0QstaAXOFAIOKsPbGHGrjGNWcy9dZUXWBvlbyiYr9pzckqCznb+3XqU4Eb3JpBr40OE=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R171e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045133197;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=34;SR=0;TI=SMTPD_---0X0bZhWU_1775558882;
-Received: from localhost(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0X0bZhWU_1775558882 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Tue, 07 Apr 2026 18:48:04 +0800
-From: Wen Gu <guwen@linux.alibaba.com>
-To: tglx@kernel.org,
-	richardcochran@gmail.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-kernel@vger.kernel.org,
+	s=arc-20240116; t=1775560285; c=relaxed/simple;
+	bh=TUx+zOkdIbgwvwJUIpQjeajGd8DR9V8Z0LlAjIsoAuk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=pKNumkanAWTIDjJVXB7FNrVEiT8eLqy7SO8Xh5yBNo8JguHobV2k5ASCbyVszNr/jQxInvD83Cd6tqB9Lz2tGlTVQE8kLZBY0BoFi9QPphoO6ZymLDphlPNAVbwOioMHTQfHmrVgglC3lBnuBAIFmcnLh2sEdFj9OXq/xA8ubiU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=GBXC6V0+; arc=none smtp.client-ip=188.40.3.216
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ew.tq-group.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=ew.tq-group.com; s=default2602; h=Content-Transfer-Encoding:Content-Type:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=QAAMci2a2IFoW4AUViSFOjWysthteAkqh5wfGRrvW6A=; b=GBXC6V0+dFiTvQA6IXOTnWtp+Z
+	HMDBgGe1y5PJ5yZivjW0OtO/7KJE9esMQ3jgtDAS7CUj86Fi+sPYX++NhGpvRTxcKhIVmYpLvs3Yu
+	66Yh5yRbo6Tm4QhZkRxdZYvHoLH+ncScWPC+Mqp8R2qwpl9uLMHH2lyKj3jdYw8VA/TMSvpSW1iih
+	n1KxTRS9eXtaGVNqf0BdI7baneLs1qlBqWSu2t4P8vc325bMOmWFUwRxSWUkm04Xm67lnAfyfHvPb
+	2tGbXaCDr5XmOmlzepdDWHXbnzDjUSPc/yjksF0f/fLj9vYJAmxq6KDuNabzatbMRj9W4cPxmO31e
+	50jitKVA==;
+Received: from sslproxy04.your-server.de ([78.46.152.42])
+	by www537.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <nora.schiffer@ew.tq-group.com>)
+	id 1wA3z1-0006oo-2R;
+	Tue, 07 Apr 2026 12:48:35 +0200
+Received: from localhost ([127.0.0.1])
+	by sslproxy04.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <nora.schiffer@ew.tq-group.com>)
+	id 1wA3z0-0007uJ-2M;
+	Tue, 07 Apr 2026 12:48:35 +0200
+From: Nora Schiffer <nora.schiffer@ew.tq-group.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Nishanth Menon <nm@ti.com>,
+	Vignesh Raghavendra <vigneshr@ti.com>,
+	Tero Kristo <kristo@kernel.org>,
+	Siddharth Vadapalli <s-vadapalli@ti.com>,
+	Roger Quadros <rogerq@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
 	netdev@vger.kernel.org,
-	jstultz@google.com,
-	anna-maria@linutronix.de,
-	frederic@kernel.org,
-	daniel.lezcano@kernel.org,
-	sboyd@kernel.org,
-	dwmw2@infradead.org
-Cc: vladimir.oltean@nxp.com,
-	wei.fang@nxp.com,
-	xiaoning.wang@nxp.com,
-	jonathan.lemon@gmail.com,
-	vadim.fedorenko@linux.dev,
-	yangbo.lu@nxp.com,
-	svens@linux.ibm.com,
-	nick.shi@broadcom.com,
-	ajay.kaher@broadcom.com,
-	alexey.makhalov@broadcom.com,
-	bcm-kernel-feedback-list@broadcom.com,
-	linux-fpga@vger.kernel.org,
-	imx@lists.linux.dev,
-	linux-s390@vger.kernel.org,
-	dust.li@linux.alibaba.com,
-	xuanzhuo@linux.alibaba.com,
-	mani@kernel.org,
-	imran.shaik@oss.qualcomm.com,
-	taniya.das@oss.qualcomm.com
-Subject: [PATCH v2 0/2] ptp: split non-NIC PHC drivers into the clock/timekeeping maintenance domain
-Date: Tue,  7 Apr 2026 18:48:00 +0800
-Message-Id: <20260407104802.34429-1-guwen@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux@ew.tq-group.com,
+	Nora Schiffer <nora.schiffer@ew.tq-group.com>
+Subject: [PATCH net-next v4 1/2] dt-bindings: net: ti: k3-am654-cpsw-nuss: Add ti,j722s-cpsw-nuss compatible
+Date: Tue,  7 Apr 2026 12:48:01 +0200
+Message-ID: <191e9f7e3a6c14eabe891a98c5fb646766479c0a.1775558273.git.nora.schiffer@ew.tq-group.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-6.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
+X-Virus-Scanned: Clear (ClamAV 1.4.3/27964/Tue Apr  7 08:24:40 2026)
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[ew.tq-group.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[ew.tq-group.com:s=default2602];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[nxp.com,gmail.com,linux.dev,linux.ibm.com,broadcom.com,vger.kernel.org,lists.linux.dev,linux.alibaba.com,kernel.org,oss.qualcomm.com];
-	TAGGED_FROM(0.00)[bounces-275943-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-275954-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[kernel.org,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,vger.kernel.org,linutronix.de,infradead.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[34];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[guwen@linux.alibaba.com,netdev@vger.kernel.org];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.alibaba.com:dkim,linux.alibaba.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8F5AF3AD47C
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nora.schiffer@ew.tq-group.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[ew.tq-group.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ew.tq-group.com:dkim,ew.tq-group.com:mid,tq-group.com:email,tq-group.com:url]
+X-Rspamd-Queue-Id: 6E28D3AD900
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi all,
+The J722S CPSW3G is mostly identical to the AM64's, but additionally
+supports SGMII. The AM64 compatible ti,am642-cpsw-nuss is used as a
+fallback.
 
-This series follows the discussion in RFC [1-2] and v1 [3].
+Signed-off-by: Nora Schiffer <nora.schiffer@ew.tq-group.com>
+---
 
+v2: keep ti,am642-cpsw-nuss as a fallback
+v3: resubmission for net-next, no changes
+v4: remove redundant items: level
 
-# Background
+ .../bindings/net/ti,k3-am654-cpsw-nuss.yaml   | 19 ++++++++++++-------
+ 1 file changed, 12 insertions(+), 7 deletions(-)
 
-The PTP Hardware Clock (PHC) interface (/dev/ptpX and the standard PTP_*
-ioctls) was originally introduced for IEEE 1588 / network oriented clock
-drivers. Over time, it has also become a userspace API for many non-NIC
-high-precision clock implementations (virtualization/platform/architecture
-provided clocks) [4-8], and more are expected to appear [9-10].
-
-During the review of these incoming non IEEE 1588 based PHC drivers, concerns
-were raised that such "non-NIC" clocks may not be a good fit for the netdev
-maintainership model [11], where PTP/PHC drivers are currently maintained.
-This leaves an unclear upstream home and maintainership model for this class
-of drivers.
-
-
-# Proposal
-
-This series proposes moving PHC drivers that expose a high-precision clock to
-userspace via the existing PTP interface but are not tied to the traditional
-NIC/IEEE 1588 packet timestamping pipeline, out of the netdev maintenance
-domain and into the clock/timekeeping maintenance domain.
-
-As discussed in [3], this series makes the separation explicit by reorganizing
-the drivers/ptp/ layout into the following groups. This provides clearer
-ownership and long-term maintenance boundaries:
-
-  - drivers/ptp/          : PTP core infrastructure and
-                            network / IEEE 1588 oriented PTP drivers.
-
-  - drivers/ptp/emulated/ : emulated/virtual PTP drivers. They are typically
-                            platform/architecture/virtualization/special
-                            hardware provided high-precision time sources.
-
-Patch 1 performs the refactor: move drivers and split Kconfig/Makefiles
-accordingly, without intended functional changes.
-
-Patch 2 updates MAINTAINERS to match the new layout and adds a dedicated entry
-for drivers/ptp/emulated/, moving review and ownership routing for this class
-of drivers away from the netdev maintainership.
-
-No userspace ABI changes are intended; this is a refactor and maintenance
-metadata update only.
-
-
-# Changes since Patch v1:
-
-- List David Woodhouse as the maintainer of emulated PTP drivers.
-
-- Adjust the directory layout: instead of creating both ieee1588/ and
-  emulated/ subdirectories, keep the network-oriented drivers in the
-  main drivers/ptp/ directory and only split out the emulated drivers.
-
-
-# Changes since RFC v2:
-
-- Keep ptp_ocp under the IEEE1588/network-oriented PTP drivers as suggested
-  by Jakub.
-
-- Following the model used by NTP related code, this series lists tip.git
-  (timers/core) as the integration tree for emulated PTP clocks in the
-  MAINTAINERS entry. Guidance from clock/timekeeping maintainers
-  (Thomas Gleixner, John Stultz, Anna-Maria Behnsen, Frederic Weisbecker,
-  Daniel Lezcano, Stephen Boyd) on whether this is the appropriate workflow
-  for this class of drivers would be appreciated.
-
-- Continue listing ourselves as maintainers for now as a fallback contact
-  point. In the long term it would be preferable for this area to be
-  maintained by clock/timekeeping experts, and suggestions are welcome.
-
-
-Thanks for any input.
-
-Regards.
-
-[1] https://lore.kernel.org/all/0afe19db-9c7f-4228-9fc2-f7b34c4bc227@linux.alibaba.com/
-[2] https://lore.kernel.org/all/20260227081934.96865-1-guwen@linux.alibaba.com/
-[3] https://lore.kernel.org/all/20260318073330.115808-1-guwen@linux.alibaba.com/
-[4] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=a0e136d436ded817c0aade72efdefa56a00b4e5e
-[5] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=7d10001e20e46ad6ad95622164686bc2cbfc9802
-[6] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=2d7de7a3010d713fb89b7ba99e6fdc14475ad106
-[7] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=3716a49a81ba19dda7202633a68b28564ba95eb5
-[8] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=9a17125a18f9ae1e1233a8e2d919059445b9d6fd
-[9] https://lore.kernel.org/netdev/20251030121314.56729-1-guwen@linux.alibaba.com/
-[10] https://lore.kernel.org/mhi/20250818-tsc_time_sync-v1-0-2747710693ba@oss.qualcomm.com/
-[11] https://lore.kernel.org/netdev/20251127083610.6b66a728@kernel.org/
-
-Wen Gu (2):
-  ptp: move emulated/virtual clock drivers into a dedicated subdirectory
-  MAINTAINERS: update PTP maintainer entries after directory split
-
- MAINTAINERS                                 | 21 +++++--
- drivers/ptp/Kconfig                         | 68 ++++-----------------
- drivers/ptp/Makefile                        | 11 ++--
- drivers/ptp/emulated/Kconfig                | 61 ++++++++++++++++++
- drivers/ptp/emulated/Makefile               | 11 ++++
- drivers/ptp/{ => emulated}/ptp_kvm_arm.c    |  0
- drivers/ptp/{ => emulated}/ptp_kvm_common.c |  0
- drivers/ptp/{ => emulated}/ptp_kvm_x86.c    |  0
- drivers/ptp/{ => emulated}/ptp_s390.c       |  0
- drivers/ptp/{ => emulated}/ptp_vmclock.c    |  0
- drivers/ptp/{ => emulated}/ptp_vmw.c        |  0
- 11 files changed, 103 insertions(+), 69 deletions(-)
- create mode 100644 drivers/ptp/emulated/Kconfig
- create mode 100644 drivers/ptp/emulated/Makefile
- rename drivers/ptp/{ => emulated}/ptp_kvm_arm.c (100%)
- rename drivers/ptp/{ => emulated}/ptp_kvm_common.c (100%)
- rename drivers/ptp/{ => emulated}/ptp_kvm_x86.c (100%)
- rename drivers/ptp/{ => emulated}/ptp_s390.c (100%)
- rename drivers/ptp/{ => emulated}/ptp_vmclock.c (100%)
- rename drivers/ptp/{ => emulated}/ptp_vmw.c (100%)
-
+diff --git a/Documentation/devicetree/bindings/net/ti,k3-am654-cpsw-nuss.yaml b/Documentation/devicetree/bindings/net/ti,k3-am654-cpsw-nuss.yaml
+index a959c1d7e643a..c409c6310ed40 100644
+--- a/Documentation/devicetree/bindings/net/ti,k3-am654-cpsw-nuss.yaml
++++ b/Documentation/devicetree/bindings/net/ti,k3-am654-cpsw-nuss.yaml
+@@ -53,13 +53,18 @@ properties:
+   "#size-cells": true
+ 
+   compatible:
+-    enum:
+-      - ti,am642-cpsw-nuss
+-      - ti,am654-cpsw-nuss
+-      - ti,j7200-cpswxg-nuss
+-      - ti,j721e-cpsw-nuss
+-      - ti,j721e-cpswxg-nuss
+-      - ti,j784s4-cpswxg-nuss
++    oneOf:
++      - enum:
++          - ti,am642-cpsw-nuss
++          - ti,am654-cpsw-nuss
++          - ti,j7200-cpswxg-nuss
++          - ti,j721e-cpsw-nuss
++          - ti,j721e-cpswxg-nuss
++          - ti,j784s4-cpswxg-nuss
++      - items:
++          - enum:
++              - ti,j722s-cpsw-nuss
++          - const: ti,am642-cpsw-nuss
+ 
+   reg:
+     maxItems: 1
 -- 
-2.43.5
+TQ-Systems GmbH | Mühlstraße 2, Gut Delling | 82229 Seefeld, Germany
+Amtsgericht München, HRB 105018
+Geschäftsführer: Detlef Schneider, Rüdiger Stahl, Stefan Schneider
+https://www.tq-group.com/
 
 
