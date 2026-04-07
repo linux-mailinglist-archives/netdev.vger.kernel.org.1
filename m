@@ -1,340 +1,208 @@
-Return-Path: <netdev+bounces-276007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276008-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yL3rEFoR1Wm30AcAu9opvQ
-	(envelope-from <netdev+bounces-276007-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 16:14:50 +0200
+	id eN7POJkR1Wm30AcAu9opvQ
+	(envelope-from <netdev+bounces-276008-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 16:15:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7E923AFD82
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 16:14:49 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 571EF3AFDC4
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 16:15:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9248A3030D6B
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 14:09:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 158FE30D3EE4
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 14:09:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83F643B47E8;
-	Tue,  7 Apr 2026 14:09:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6E5A3B388D;
+	Tue,  7 Apr 2026 14:09:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="Lz0XTPWe"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="TWW+DFii"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9328A3B6374
-	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 14:09:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96B8539A05E;
+	Tue,  7 Apr 2026 14:09:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775570948; cv=none; b=F73jeyaL2dRmi25xjpkSNcLiO+rpQrMy95ShWAOw+FHH655RogYRe/jZbT64tNthXpZDuZv/7Hp9NN9YDvJJBDsQc82xhH8V5eKa9JIZcvRHpXX1dGd6iZCM+jU2DdaawddB+gLW35+yNAndc0ikZa37fDPLemR1bPAgNy7ZWyM=
+	t=1775570998; cv=none; b=hR1lfD/zcPMX5oeFayhU54O56GR3jtK8QD0IdNGuvp+LgFM3L7Zd8IFuURTkHT6IUBVlVCII0uU+olAoN5kpSkaWz0R11HUebcSke308RoD2G4rUinN8yTJIy9Cn3nvQ0nmRIqDFqc1PAlgcoiUO0WChP6K2W/pJ6ZFcsGnVLOw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775570948; c=relaxed/simple;
-	bh=Qmf5Akm/+PIKJUxp5O0m5hND0XiK/nwoPMyX6/BX/ik=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kDiAge9nzYvR7gGs8ORC8Ugx4q3ez4+mPt/XSWQUdXaKY/ngQeLbqQBSxZqk7h1ejatsXHgkC9fmdI/yiILZsIhX1P7Oo6PDx6RvAAVY6vKLzIL+MDsYp8j6TClcf7BKpE4S2Jr0w7C7Rw1AoihXA/5LtFpiPWjKMktA4w7KF1I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=Lz0XTPWe; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-488b0046078so22032185e9.1
-        for <netdev@vger.kernel.org>; Tue, 07 Apr 2026 07:09:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall.org; s=google; t=1775570945; x=1776175745; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=MmAj4YJ//rsMhkWTLV/KvMBbE03h9w2Yg3fkPov2U0c=;
-        b=Lz0XTPWe1BVrENcL8mhKY7F/lfvqtEtPWNQA0/3QU+M4X1AIpSPIlbBvYlAH+sGpXS
-         w+/KBtCIDAQ/WCoqP3nZiFH4MFoXXVwCQYzyM6G2REjKroCTwkhNUO3fhzi5T/QrV811
-         WR6mn55wBulAayrC6XLe66OBw9t+GuTq6omqmrIreBevXxw3qlFEtu9/VM3bZEHq1SAC
-         KydgK/wmEs2/jkDXqkVNyywRu+EgQJeyvtqOrBmv4/LUaY/lV0TFeMkJzv8tftlWWfVk
-         0cBYtirBCY4myImSef+svy4k3uG1DWja5CeJTYTYNc7kdamhbDL7X/+xbFQgBi51UKz/
-         yzLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775570945; x=1776175745;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=MmAj4YJ//rsMhkWTLV/KvMBbE03h9w2Yg3fkPov2U0c=;
-        b=ahUyMZ8kGlZE0g8SUqnQ5dp0RAzIGM72XLYCpPlLOuT9S5rMmzNPmbSGri9j/kdgpJ
-         hCa9FUdNTEw4J1AuC6i1TkUsCCz0l/GxODxOuqFdSbFiF8o00GV7tItxL7hJTW/APS7C
-         t4GZSHFOjlhviUcZbewvF1xcIoSrd98GbYpKfq7rjS9U0OnyrOpK6xuXBC1du8TAtVhQ
-         3gM+gqotSSnrY97O33vPyIKi0WLX4QiYuuNSkJSAp/0/CJcu27tKAUa15uzhl8/5zEeR
-         VzHVrAV0dyr7xP+ZA+h+3JWeBhr1ZHgFGCEVcfnZxnQcMWiL9ovppw6OTrysY/cxDdu3
-         YwGg==
-X-Forwarded-Encrypted: i=1; AJvYcCWSmcnP+4YOAla5IDsNF6SdFKaZa1bsNd+rCr3P/73TKCzsjSwqm4Z4Y3q/hW9AWIurYBoczXM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzndkkOygcN8SS6roiAswI/1SnRV80792QSMGn/0y5wa3elohgk
-	qvSBxLONSc+nXRBnKHofO62IZ8AZD82hCF5FnTd9dwpoQ7Vzerz3FcxiwtL6Q2/wYIU=
-X-Gm-Gg: AeBDievqhBUT0bvunxHgXBrTwbIjlDCcnCtAQ+KUNw3HbdHF+kmvnXJfQ5mMd/MAvMp
-	BiCTmHT1eY8X6gtzf9ZFTiLkz2D0bFpCihoAF5xEcxbvE4PlwL0XZpnDLCtU9BDUdUQqQxSVlOK
-	QVTKfeJLzWJbkKgC724fEyrf8Ij6mp835ofkJxdyGHhEgLea7DLV9MXPSVwolEpj07KGHA01Wxh
-	pH8/kQWqDXGjqgChNcO5AzFOhcHJFjC121oTt5HvETk/8I5hE2CkJJ8gw34nOwGKFsXnyKiIW1+
-	PbXWCBCWWGPlQF1xyw1yI4MXVcEBRe1zz47NGAtWJkrix6FU4POQFy6tqqZM043vr46gtT2szBa
-	m0w2r+F9TkjttAJteBIL5LGa+PeLFFfINHVczL/2Os8MoqVUF8xI+izqAI28kZUF8fW9nH8MiSw
-	sOStbOLjMNXCxXD/+hlDyc9Nk2JeTHvOlZkHQgjUVeEkKCtLdmrN0sBQ==
-X-Received: by 2002:a05:600c:628e:b0:485:4bd1:4c64 with SMTP id 5b1f17b1804b1-488997d94e0mr228019135e9.31.1775570944594;
-        Tue, 07 Apr 2026 07:09:04 -0700 (PDT)
-Received: from [192.168.0.161] (78-154-15-182.ip.btc-net.bg. [78.154.15.182])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4887e9630ddsm567249205e9.13.2026.04.07.07.09.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Apr 2026 07:09:03 -0700 (PDT)
-Message-ID: <b10f5928-ebec-4313-b04b-22ff7ab76c96@blackwall.org>
-Date: Tue, 7 Apr 2026 17:09:01 +0300
+	s=arc-20240116; t=1775570998; c=relaxed/simple;
+	bh=xMtCdr7WJHpOJDQDwTSSF/AZKyKCLw08CI+TTdGi1r0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FYQYBWfeRWZOT75OHuWxyX4PsT0TBHy9/z28uZBIxCmETU/XVmErKdXuWrMxCP3jhwhc4ZbJDnC+wkl1ERlYfb6tZACzDkhTGNYrmNGH++y6zeKY60cB6OXdNbXCKTI1DPclOKGOmeTN6lGD9hAcDSwAWTF+4f39Pr4X8AjS9M4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=TWW+DFii; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=MN6qzqxRs/zqrPwuVs2/6X79CviG+I8DWPs5lk/Ay2c=; b=TWW+DFiilpedgYEvtVyq7aTK32
+	O3BaEiUrFW1cKLzlvwnM8nb50GigIkogLZuJXkkCF0KkWw6k4YhEkMzSNRfhgRZ8AMZ8Shwam0edR
+	pWSEcMgEplZ7851y63OAhIgW3Unkzw0Ou8ZIWTzXZ59MnxmqFXbMt9h+suaD1LRDNLq2/DhwZRRDR
+	rWbqm+UTVyVUYtXuyK4cZmHgdSWSXe3Vu3WujAKjftI7mK2VTOHxaYr+Kp75Q9tkNYh1E/mkBi3AD
+	Zze+0VwODVD2NvONOkTLv91I3qahyeX7LH9AMPR1vxf5X/ODgy06Xn65DxLY6IqJ89NqCla1w3Hme
+	ERjpF/Nw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50812)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1wA77h-0000000010S-2pf6;
+	Tue, 07 Apr 2026 15:09:45 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1wA77U-000000002KF-1WoV;
+	Tue, 07 Apr 2026 15:09:32 +0100
+Date: Tue, 7 Apr 2026 15:09:32 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
+Cc: netdev@vger.kernel.org, alexandre.torgue@foss.st.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, mcoquelin.stm32@gmail.com,
+	bcm-kernel-feedback-list@broadcom.com, richardcochran@gmail.com,
+	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
+	john.fastabend@gmail.com, rohan.g.thomas@altera.com,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org,
+	andrew+netdev@lunn.ch, horms@kernel.org, sdf@fomichev.me,
+	me@ziyao.cc, siyanteng@cqsoftware.com.cn,
+	prabhakar.mahadev-lad.rj@bp.renesas.com,
+	weishangjuan@eswincomputing.com, wens@kernel.org,
+	vladimir.oltean@nxp.com, lizhi2@eswincomputing.com,
+	boon.khai.ng@altera.com, maxime.chevallier@bootlin.com,
+	chenchuangyu@xiaomi.com, yangtiezhu@loongson.cn,
+	ovidiu.panait.rb@renesas.com, chenhuacai@kernel.org,
+	florian.fainelli@broadcom.com, quic_abchauha@quicinc.com
+Subject: Re: [PATCH net-next v9 1/4] net: stmmac: Add DW25GMAC support in
+ stmmac core driver
+Message-ID: <adUQHHBD0d3p1OSI@shell.armlinux.org.uk>
+References: <20260402213629.1996133-1-jitendra.vegiraju@broadcom.com>
+ <20260402213629.1996133-2-jitendra.vegiraju@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 4/5] ipv6: mld: encode multicast exponential
- fields
-To: Ujjal Roy <royujjal@gmail.com>, "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Ido Schimmel <idosch@nvidia.com>, David Ahern <dsahern@kernel.org>,
- Shuah Khan <shuah@kernel.org>, Andy Roulin <aroulin@nvidia.com>,
- Yong Wang <yongwang@nvidia.com>, Petr Machata <petrm@nvidia.com>
-Cc: Ujjal Roy <ujjal@alumnux.com>, bridge@lists.linux.dev,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-References: <20260403150050.1235-1-royujjal@gmail.com>
- <20260403150050.1235-5-royujjal@gmail.com>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20260403150050.1235-5-royujjal@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260402213629.1996133-2-jitendra.vegiraju@broadcom.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spamd-Result: default: False [1.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[blackwall.org:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-276007-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[blackwall.org];
-	FREEMAIL_TO(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,nvidia.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[blackwall.org:+];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-276008-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,foss.st.com,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,broadcom.com,iogearbox.net,altera.com,st-md-mailman.stormreply.com,lists.infradead.org,lunn.ch,fomichev.me,ziyao.cc,cqsoftware.com.cn,bp.renesas.com,eswincomputing.com,nxp.com,bootlin.com,xiaomi.com,loongson.cn,renesas.com,quicinc.com];
+	RCPT_COUNT_TWELVE(0.00)[37];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_SPAM(0.00)[0.245];
 	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[razor@blackwall.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A7E923AFD82
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[shell.armlinux.org.uk:mid,mii.data:url,armlinux.org.uk:url,broadcom.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 571EF3AFDC4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 03/04/2026 18:00, Ujjal Roy wrote:
-> In MLD, QQIC and MRC fields are not correctly encoded when
-> generating query packets. Since the receiver of the query
-> interprets these fields using the MLDv2 floating-point
-> decoding logic, any value that exceeds the linear threshold
-> is incorrectly parsed as an exponential value, leading to
-> an incorrect interval calculation.
-> 
-> Encode and assign the corresponding protocol fields during
-> query generation. Introduce the logic to dynamically
-> calculate the exponent and mantissa using bit-scan (fls).
-> This ensures QQIC (8-bit) and MRC (16-bit) fields are
-> properly encoded when transmitting query packets with
-> intervals that exceed their respective linear thresholds
-> (128 for QQI; 32768 for MRD).
-> 
-> RFC3810: If QQIC >= 128, the QQIC field represents a
-> floating-point value as follows:
->       0 1 2 3 4 5 6 7
->      +-+-+-+-+-+-+-+-+
->      |1| exp | mant  |
->      +-+-+-+-+-+-+-+-+
-> 
-> RFC3810: If Maximum Response Code >= 32768, the Maximum
-> Response Code field represents a floating-point value as
-> follows:
->       0 1 2 3 4 5 6 7 8 9 A B C D E F
->      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
->      |1| exp |          mant         |
->      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-> 
-> Signed-off-by: Ujjal Roy <royujjal@gmail.com>
-> ---
->   include/net/mld.h         | 122 ++++++++++++++++++++++++++++++++++++++
->   net/bridge/br_multicast.c |   4 +-
->   2 files changed, 124 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/net/mld.h b/include/net/mld.h
-> index da3299545ebd..147e8c44eb28 100644
-> --- a/include/net/mld.h
-> +++ b/include/net/mld.h
-> @@ -90,12 +90,134 @@ struct mld2_query {
->   #define MLDV2_QQIC_MAN(value)	((value) & 0x0f)
->   
->   #define MLD_QQIC_MIN_THRESHOLD	128
-> +/* Max representable (mant = 0xF, exp = 7) -> 31744 */
-> +#define MLD_QQIC_MAX_THRESHOLD	31744
->   #define MLD_MRC_MIN_THRESHOLD	32768UL
-> +/* Max representable (mant = 0xFFF, exp = 7) -> 8387584 */
-> +#define MLD_MRC_MAX_THRESHOLD	8387584
->   #define MLDV1_MRD_MAX_COMPAT	(MLD_MRC_MIN_THRESHOLD - 1)
->   
->   #define MLD_MAX_QUEUE		8
->   #define MLD_MAX_SKBS		32
->   
-> +/* V2 exponential field encoding */
-> +
-> +/*
-> + * Calculate Maximum Response Code from Maximum Response Delay
-> + *
-> + * MRC represents the 16-bit encoded form of Maximum Response
-> + * Delay (MRD); once decoded, the resulting value is in
-> + * milliseconds.
-> + *
-> + * RFC3810 defines only the decoding formula:
-> + * Maximum Response Delay = (mant | 0x1000) << (exp + 3)
-> + *
-> + * but does NOT define the encoding procedure. To derive exponent:
-> + *
-> + * For the 16-bit MRC, the "hidden bit" (0x1000) is left shifted by 12
-> + * to sit above the 12-bit mantissa. The RFC then shifts this entire
-> + * block left by (exp + 3) to reconstruct the value.
-> + * So, 'hidden bit' is the MSB which is shifted by (12 + exp + 3).
-> + *
-> + * Total left shift of the hidden bit = 12 + (exp + 3) = exp + 15.
-> + * This is the MSB at the 0-based bit position: (exp + 15).
-> + * Since fls() is 1-based, fls(value) - 1 = exp + 15.
-> + *
-> + * Therefore:
-> + *     exp  = fls(value) - 16
-> + *     mant = (value >> (exp + 3)) & 0x0FFF
-> + *
-> + * Final encoding formula:
-> + *     0x8000 | (exp << 12) | mant
-> + *
-> + * Example (value = 1311744):
-> + *  0               1               2               3
-> + *  0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7
-> + * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-> + * |0 0 0 0 0 0 0 0 0 0 0 1 0 1 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0| 1311744
-> + * |                      ^-^--------mant---------^ ^...(exp+3)...^| exp=5
-> + * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-> + *
-> + * Encoded:
-> + *   0x8000 | (5 << 12) | 0x404 = 0xD404
-> + */
-> +static inline u16 mldv2_mrc(unsigned long mrd)
-> +{
-> +	u16 mc_man, mc_exp;
-> +
-> +	/* RFC3810: MRC < 32768 is literal */
-> +	if (mrd < MLD_MRC_MIN_THRESHOLD)
-> +		return mrd;
-> +
-> +	/* Saturate at max representable (mant = 0xFFF, exp = 7) -> 8387584 */
-> +	if (mrd >= MLD_MRC_MAX_THRESHOLD)
-> +		return 0xFFFF;
-> +
-> +	mc_exp = fls(mrd) - 16;
-> +	mc_man = (mrd >> (mc_exp + 3)) & 0x0FFF;
-> +
-> +	return 0x8000 | (mc_exp << 12) | mc_man;
-> +}
-> +
-> +/*
-> + * Calculate Querier's Query Interval Code from Query Interval
-> + *
-> + * QQIC represents the 8-bit encoded form of Query Interval (QQI);
-> + * once decoded, the resulting value is in seconds.
-> + *
-> + * MLDv2 QQIC 8-bit floating-point encoding (RFC3810).
-> + *
-> + * RFC3810 defines only the decoding formula:
-> + * QQI = (mant | 0x10) << (exp + 3)
-> + *
-> + * but does NOT define the encoding procedure. To derive exponent:
-> + *
-> + * For any value of mantissa and exponent, the decoding formula
-> + * indicates that the "hidden bit" (0x10) is shifted 4 bits left
-> + * to sit above the 4-bit mantissa. The RFC again shifts this
-> + * entire block left by (exp + 3) to reconstruct the value.
-> + * So, 'hidden bit' is the MSB which is shifted by (4 + exp + 3).
-> + *
-> + * Total left shift of the 'hidden bit' = 4 + (exp + 3) = exp + 7.
-> + * This is the MSB at the 0-based bit position: (exp + 7).
-> + * Since fls() is 1-based, fls(value) - 1 = exp + 7.
-> + *
-> + * Therefore:
-> + *     exp  = fls(value) - 8
-> + *     mant = (value >> (exp + 3)) & 0x0F
-> + *
-> + * Final encoding formula:
-> + *     0x80 | (exp << 4) | mant
-> + *
-> + * Example (value = 3200):
-> + *  0               1
-> + *  0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7
-> + * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-> + * |0 0 0 0 1 1 0 0 1 0 0 0 0 0 0 0| (value = 3200)
-> + * |        ^-^-mant^ ^..(exp+3)..^| exp = 4, mant = 9
-> + * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-> + *
-> + * Encoded:
-> + *   0x80 | (4 << 4) | 9 = 0xC9
-> + */
-> +static inline u8 mldv2_qqic(unsigned long value)
-> +{
-> +	u8 mc_man, mc_exp;
-> +
-> +	/* RFC3810: QQIC < 128 is literal */
-> +	if (value < MLD_QQIC_MIN_THRESHOLD)
-> +		return value;
-> +
-> +	/* Saturate at max representable (mant = 0xF, exp = 7) -> 31744 */
-> +	if (value >= MLD_QQIC_MAX_THRESHOLD)
-> +		return 0xFF;
-> +
-> +	mc_exp  = fls(value) - 8;
-> +	mc_man = (value >> (mc_exp + 3)) & 0x0F;
-> +
-> +	return 0x80 | (mc_exp << 4) | mc_man;
-> +}
-> +
->   /* V2 exponential field decoding */
->   
->   /* Calculate Maximum Response Delay from Maximum Response Code
-> diff --git a/net/bridge/br_multicast.c b/net/bridge/br_multicast.c
-> index 27010744d7ae..a22e44c4fa48 100644
-> --- a/net/bridge/br_multicast.c
-> +++ b/net/bridge/br_multicast.c
-> @@ -1181,7 +1181,7 @@ static struct sk_buff *br_ip6_multicast_alloc_query(struct net_bridge_mcast *brm
->   		break;
->   	case 2:
->   		mld2q = (struct mld2_query *)icmp6_hdr(skb);
-> -		mld2q->mld2q_mrc = htons((u16)jiffies_to_msecs(interval));
-> +		mld2q->mld2q_mrc = htons((u16)mldv2_mrc(jiffies_to_msecs(interval)));
+Not withstanding my comment about the other Synopsys xlgmac driver that
+we have in the kernel...
 
-you've defined mldv2_mrc as u16, no need to cast it again here
+On Thu, Apr 02, 2026 at 02:36:26PM -0700, Jitendra Vegiraju wrote:
+> From: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
+> 
+> The DW25GMAC introduced a new DMA architecture called Hyper-DMA (HDMA) for
+> virtualization scalability. This is realized by decoupling physical DMA
+> channels(PDMA) from potentially large number of virtual DMA channels(VDMA).
+> The VDMAs provide software abstraction to driver that map to PDMAs for
+> frame transmission and reception.
+> Since 25GMAC is a derivative of XGMAC, majority of IP is common to both.
+> 
+> To add support for the HDMA in 25GMAC, a new instance of dma_ops,
+> dw25gmac400_dma_ops is introduced.
+> To support the current needs, a simple one-to-one mapping of dw25gmac's
+> logical VDMA (channel) to TC to PDMAs is used. Most of the other dma
+> operation functions in existing dwxgamc2_dma.c file are reused whereever
 
->   		mld2q->mld2q_type = ICMPV6_MGM_QUERY;
->   		mld2q->mld2q_code = 0;
->   		mld2q->mld2q_cksum = 0;
-> @@ -1190,7 +1190,7 @@ static struct sk_buff *br_ip6_multicast_alloc_query(struct net_bridge_mcast *brm
->   		mld2q->mld2q_suppress = sflag;
->   		mld2q->mld2q_qrv = 2;
->   		mld2q->mld2q_nsrcs = htons(llqt_srcs);
-> -		mld2q->mld2q_qqic = brmctx->multicast_query_interval / HZ;
-> +		mld2q->mld2q_qqic = mldv2_qqic(brmctx->multicast_query_interval / HZ);
->   		mld2q->mld2q_mca = *group;
->   		csum = &mld2q->mld2q_cksum;
->   		csum_start = (void *)mld2q;
+Typo: dwxgmac2_dma.c
 
+> applicable.
+> Added setup function for DW25GMAC's stmmac_hwif_entry in stmmac core.
+
+In a previous review, I questioned the use of DWMAC_CORE_25GMAC and
+asked about its version numberspace. I believe you indicated that the
+version numberspace is the same as the existing XGMAC core.
+
+I'm going to question the value of adding DWMAC_CORE_25GMAC.
+
+1. What is the value of splitting DWMAC_CORE_25GMAC from
+   DWMAC_CORE_XGMAC given that it's in the same versioning numberspace
+   as XGMAC, and most tests (via dwmac_is_xgmac()) test for XGMAC or
+   25GMAC?
+
+2. Have you reviewed all the places that explicitly test for
+   DWMAC_CORE_XGMAC, looking at their "false" paths (for non-XGMAC
+   cores) to determine whether they are suitable? For example:
+
+        if (priv->plat->core_type == DWMAC_CORE_XGMAC)
+                ndev->max_mtu = XGMAC_JUMBO_LEN;
+        else if (priv->plat->enh_desc || priv->synopsys_id >= DWMAC_CORE_4_00)
+                ndev->max_mtu = JUMBO_LEN;
+        else
+                ndev->max_mtu = SKB_MAX_HEAD(NET_SKB_PAD + NET_IP_ALIGN);
+
+   XGMAC can handle a max MTU of 16368, but with your code using
+   DWMAC_CORE_25GMAC, we fall back to the next test, which tests the
+   IP version against 0x40, and uses a max MTU of 9000. Given that
+   DWMAC_CORE_4_00 is a different "version number space" this seems
+   wrong.
+
+3. Looking at the MDIO code, this looks very wrong if you're
+   introducing DWMAC_CORE_25GMAC. Have you tested MDIO accesses?
+
+   dwxgmac2_setup() is called for DWMAC_CORE_XGMAC core-type. In
+   stmmac_mdio_register(), DWMAC_CORE_XGMAC uses different functions
+   for MDIO bus access for C22 and C45 from other cores - it uses the
+   stmmac_xgmac2_mdio_* functions.
+
+   These use stmmac_xgmac2_c45_format() and stmmac_xgmac2_c22_format()
+   to format the register values which do not depend on mii.*_mask, but
+   do use mii.address and mii.data for the register offsets. Thus, is
+   there any point to setting mii.addr_mask and mii.reg_mask ?
+
+   For non-DWMAC_CORE_XGMAC cores, we fall back to the stmmac_mdio_*()
+   functions, which for non-DWMAC_CORE_GMAC4 will only support Clause
+   22 access, not Clause 45 - which would be very strange for a 25G
+   core.
+
+4. What about the feature printing in
+   stmmac_main.c::stmmac_dma_cap_show() ?
+
+5. What about similar tests in stmmac_est.c and stmmac_ethtool.c ?
+
+
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
