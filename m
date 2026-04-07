@@ -1,258 +1,206 @@
-Return-Path: <netdev+bounces-276032-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276033-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +BLmBLEe1Wnr0wcAu9opvQ
-	(envelope-from <netdev+bounces-276032-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 17:11:45 +0200
+	id SC7pHSIf1Wnr0wcAu9opvQ
+	(envelope-from <netdev+bounces-276033-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 17:13:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B3E93B0B49
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 17:11:44 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF76E3B0BB6
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 17:13:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3B2193022F8F
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 15:05:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6D5C1301F314
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 15:07:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF01335AC35;
-	Tue,  7 Apr 2026 15:05:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8E1535B64B;
+	Tue,  7 Apr 2026 15:07:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GcF3yEeS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tpZiy1Xi"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFFD333D505
-	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 15:05:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E4B335B136
+	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 15:07:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775574305; cv=none; b=EGVZYoiSHmFuKZ2v04uBvQAaEZ+XyFDlnrYbkZKqBlm8vodJTeURWGLPkplb3xB91SIcYywCK5vMUVFdpmbdqgrf/BaTj8PIcaceSJNQG1tv1TnCISfLgwwC0ItZmcO7Pugm2mbqaqRrq5T+jEUZfJiDxWyUVW9lU+CkLFYmpOg=
+	t=1775574434; cv=none; b=ABQ53pcCmXzdfbQxcagcykPaP3M++OATRfBWHjv9duVPkpoSUU9ZMyn59TO25vnzcfVnQX51Cs04L2g4whKzNJJL7Q215whRjjRS3zFRjgyJ0Ak9q19ITJCEHKVHiZcUDDcSVmqirfU7PkrWyiW46CD3+Xh+xVl3wqLBlwwdHvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775574305; c=relaxed/simple;
-	bh=CrHC1vD81873jVQYixK/Cr+dwWyTeJpHEOcDeR5UeO0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QoB10xef0sfHm7RysIeZJMlUuDh88jxGbaLrilgexFLHGdn9fhnKoCjR0hJiMJVoUTIAy23IHXYBhOX+gnC2ZbhdrpDc53o7YmJLsm+dj17JJ4EVBgryorUbY3L+3YY0n0aLTfYnrkqRvSmyAIWI3EZuSQrFL7nNsXFaJ95OuO8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GcF3yEeS; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1775574302;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Djh8MbEYjD06cLgWg4zobo1Zy061MpN/vRaKzdCUstg=;
-	b=GcF3yEeSXtYECnQfJ3SihD8YzCWvZ2/dIua0/bRZwSdhx3oEiUsF1a8JVYIiUuThYIPoxq
-	kC8ZGQJ1nEfekFtGKqWMbgrdRFmxpzDPYLM+fjTaAzzhES8Rcaroc6REv2q10QbtFYVcHA
-	dDgfOcNbzVlu7GcFkfQSNhGJ/s2qM8c=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-248-PQ-dHuJOMduQilzCCKtqPg-1; Tue,
- 07 Apr 2026 11:05:01 -0400
-X-MC-Unique: PQ-dHuJOMduQilzCCKtqPg-1
-X-Mimecast-MFC-AGG-ID: PQ-dHuJOMduQilzCCKtqPg_1775574300
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A7B101956068;
-	Tue,  7 Apr 2026 15:04:59 +0000 (UTC)
-Received: from thinkpad (unknown [10.44.50.90])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1C821300019F;
-	Tue,  7 Apr 2026 15:04:56 +0000 (UTC)
-Date: Tue, 7 Apr 2026 17:04:53 +0200
-From: Felix Maurer <fmaurer@redhat.com>
-To: Fernando Fernandez Mancera <fmancera@suse.de>,
-	Luka Gejak <luka.gejak@linux.dev>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org, horms@kernel.org
-Subject: Re: [PATCH net-next v4 1/2] net: hsr: require valid EOT supervision
- TLV
-Message-ID: <adUdFTckCG7ELIra@thinkpad>
-References: <20260401092324.52266-1-luka.gejak@linux.dev>
- <20260401092324.52266-2-luka.gejak@linux.dev>
- <2d94a1a6-e6c5-427c-b10f-63377cb10407@suse.de>
- <DHHZ8POWJINS.1CRKQT33EM1WW@linux.dev>
- <4cce92eb-61a0-4869-8a30-b86d65e8a675@suse.de>
+	s=arc-20240116; t=1775574434; c=relaxed/simple;
+	bh=gdER/6OULvsHn8TjbdvmJd78aZW+yw6qSfBk0jPd4Ek=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Iq5YNzG20psUuQOuISkPEbrZ8NJytRLUVh8hx3eC9MPa0zOiA0njZXuJu7bKwLjNFET8El2pO8HMD4MVVkSuf/Jz1fmTgwwN1ccfL+IvfRPkmnii2gJjOSO5VwhFhiR8SDdWZRqzzqxo6CqD5/zm3Mr/72IRKzqgT4WFwgcQthQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tpZiy1Xi; arc=none smtp.client-ip=209.85.222.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-8d654ade33aso605895185a.1
+        for <netdev@vger.kernel.org>; Tue, 07 Apr 2026 08:07:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1775574432; x=1776179232; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=CvMBNPwZyqJfkJ+zvD6khbqwEeZoD6/qBzLltGAppBk=;
+        b=tpZiy1XiX9Z6jHDNydZWutiMhEQZJWtzjwtHfZHMK+XWLYeYhrmqCjgqqSntL8y9GA
+         bBgpsrfcZc69exp/GUu9zP6IYPLpICiGOVPSoptfhTu5rNq3lCRafh6IKOK9rh+2CtOx
+         Rs6qWISY4gY6dVC6W+4xyPrcYwrG6oIaaXRUt9pxFBdOYpjHxIIKAUaKmpg6JSbVtMzZ
+         RwCSZ/k5uq1+9H0sLxWTe+JOEnTojFcLemsX+7BUT37+/q7HWHJZ5mF3tcILZynUJk50
+         AQKoZ8TY2HaThzua13qZE1ggEXQXHfBDZZwb8zwaZzLLtVh+Qs/MWkr+dWCHd6vI0wrt
+         N36Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775574432; x=1776179232;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=CvMBNPwZyqJfkJ+zvD6khbqwEeZoD6/qBzLltGAppBk=;
+        b=B5V/kIgoZEkMs0VFMUdyjwIoiNBPmz9VtG0eHYmPDMb1jCjqEXkeW+qDQJsvLJzJwF
+         kqD+i9mPnO74ZPnOd2S08z609zMIQ2Ckt2s8M+IiwIhakHb/kFDqVz6/z4QcMvdKe511
+         AUty5YR2BkezUV+GklhRSpvq1jz8D2cuvaNvWs58P51esKmj/2BmTPE1doNRcuHKzS8n
+         UWUpNzeHigaXpfbHgVEPspDTDkmrR3RJzwqvE8mBH0lkx5J5sp0ls7j9oPqaOiyEtJ6K
+         p1jPEiExjQUt+RowqGa4yNL5kvLwGPHxFDcvCS+Tgh7KTii+18W3BO+hJ421DnslFHwg
+         BaBA==
+X-Forwarded-Encrypted: i=1; AJvYcCVjHdTVRkzj+eQutF2DT0i7MfJvV9sIQMrFhMKYjaGMbHSuyVBetOIeX9W1nAiJ4aqMqSTSUb4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyXdiwuqBMe9lVKF9pm3FV31stdwez8l+z5Bj9j/0nyJfZFRs4B
+	MpHbug2/innsbAjdHOgu+/mX6sbmEWAeUzd8NzP0Ha8IE/8JYCdGGHxqo5blhUZsStouxK3Ng80
+	5zsr+qAd+nChgVg==
+X-Received: from qkll4.prod.google.com ([2002:a05:620a:2104:b0:8d3:a833:677f])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:459f:b0:8d8:ed00:5a91 with SMTP id af79cd13be357-8d8ed006106mr753830985a.22.1775574432006;
+ Tue, 07 Apr 2026 08:07:12 -0700 (PDT)
+Date: Tue,  7 Apr 2026 15:07:10 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4cce92eb-61a0-4869-8a30-b86d65e8a675@suse.de>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.1213.gd9a14994de-goog
+Message-ID: <20260407150710.1640747-1-edumazet@google.com>
+Subject: [PATCH v2 net-next] net: dropreason: add MACVLAN_BROADCAST_BACKLOG
+ and IPVLAN_MULTICAST_BACKLOG
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Joe Damato <joe@dama.to>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-276032-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,dama.to,vger.kernel.org,gmail.com,google.com];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-276033-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmaurer@redhat.com,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
 	RCPT_COUNT_SEVEN(0.00)[8];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:email]
-X-Rspamd-Queue-Id: 6B3E93B0B49
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: CF76E3B0BB6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Apr 02, 2026 at 01:53:14AM +0200, Fernando Fernandez Mancera wrote:
-> On 4/1/26 6:59 PM, Luka Gejak wrote:
-> > On Wed Apr 1, 2026 at 4:47 PM CEST, Fernando Fernandez Mancera wrote:
-> > > On 4/1/26 11:23 AM, luka.gejak@linux.dev wrote:
-> > > > From: Luka Gejak <luka.gejak@linux.dev>
-> > > >
-> > > > Supervision frames are only valid if terminated with a zero-length EOT
-> > > > TLV. The current check fails to reject non-EOT entries as the terminal
-> > > > TLV, potentially allowing malformed supervision traffic.
-> > > >
-> > > > Fix this by strictly requiring the terminal TLV to be HSR_TLV_EOT
-> > > > with a length of zero.
-> > > >
-> > > > Reviewed-by: Felix Maurer <fmaurer@redhat.com>
-> > > > Signed-off-by: Luka Gejak <luka.gejak@linux.dev>
-> > > > ---
-> > > >    net/hsr/hsr_forward.c | 41 ++++++++++++++++++++++-------------------
-> > > >    1 file changed, 22 insertions(+), 19 deletions(-)
-> > > >
-> > > > diff --git a/net/hsr/hsr_forward.c b/net/hsr/hsr_forward.c
-> > > > index 0aca859c88cb..17b705235c4a 100644
-> > > > --- a/net/hsr/hsr_forward.c
-> > > > +++ b/net/hsr/hsr_forward.c
-> > > > @@ -82,39 +82,42 @@ static bool is_supervision_frame(struct hsr_priv *hsr, struct sk_buff *skb)
-> > > >    	    hsr_sup_tag->tlv.HSR_TLV_length != sizeof(struct hsr_sup_payload))
-> > > >    		return false;
-> > > > -	/* Get next tlv */
-> > > > +	/* Advance past the first TLV payload to reach next TLV header */
-> > > >    	total_length += hsr_sup_tag->tlv.HSR_TLV_length;
-> > > > -	if (!pskb_may_pull(skb, total_length))
-> > > > +	/* Linearize next TLV header before access */
-> > > > +	if (!pskb_may_pull(skb, total_length + sizeof(struct hsr_sup_tlv)))
-> > > >    		return false;
-> > > >    	skb_pull(skb, total_length);
-> > > >    	hsr_sup_tlv = (struct hsr_sup_tlv *)skb->data;
-> > > >    	skb_push(skb, total_length);
-> > > > -	/* if this is a redbox supervision frame we need to verify
-> > > > -	 * that more data is available
-> > > > +	/* Walk through TLVs to find end-of-TLV marker, skipping any unknown
-> > > > +	 * extension TLVs to maintain forward compatibility.
-> > > >    	 */
-> > > > -	if (hsr_sup_tlv->HSR_TLV_type == PRP_TLV_REDBOX_MAC) {
-> > > > -		/* tlv length must be a length of a mac address */
-> > > > -		if (hsr_sup_tlv->HSR_TLV_length != sizeof(struct hsr_sup_payload))
-> > > > -			return false;
-> > > > +	for (;;) {
-> > > > +		if (hsr_sup_tlv->HSR_TLV_type == HSR_TLV_EOT &&
-> > > > +		    hsr_sup_tlv->HSR_TLV_length == 0)
-> > > > +			return true;
-> > >
-> > > I do not follow this approach, why a loop? From IEC 62439-3, I do not
-> > > understand that supervision frames could have multiple
-> > > PRP_TLV_REDBOX_MAC TLVs. The current code handles the TLVs correctly.
-> > >
-> > > Which makes me wonder, how are you testing this? Do you have some
-> > > hardware with HSR/PRP support that is sending these frames? If so, which
-> > > one? Are you testing this using a HSR/PRP environment with purely Linux
-> > > devices?
-> > >
-> > > Thanks,
-> > > Fernando.
-> > >
-> > > > -		/* make sure another tlv follows */
-> > > > -		total_length += sizeof(struct hsr_sup_tlv) + hsr_sup_tlv->HSR_TLV_length;
-> > > > -		if (!pskb_may_pull(skb, total_length))
-> > > > +		/* Validate known TLV types */
-> > > > +		if (hsr_sup_tlv->HSR_TLV_type == PRP_TLV_REDBOX_MAC) {
-> > > > +			if (hsr_sup_tlv->HSR_TLV_length !=
-> > > > +			    sizeof(struct hsr_sup_payload))
-> > > > +				return false;
-> > > > +		}
-> > > > +
-> > > > +		/* Advance past current TLV: header + payload */
-> > > > +		total_length += sizeof(struct hsr_sup_tlv) +
-> > > > +				hsr_sup_tlv->HSR_TLV_length;
-> > > > +		/* Linearize next TLV header before access */
-> > > > +		if (!pskb_may_pull(skb,
-> > > > +				   total_length + sizeof(struct hsr_sup_tlv)))
-> > > >    			return false;
-> > > > -		/* get next tlv */
-> > > >    		skb_pull(skb, total_length);
-> > > >    		hsr_sup_tlv = (struct hsr_sup_tlv *)skb->data;
-> > > >    		skb_push(skb, total_length);
-> > > >    	}
-> >
-> > Hi Fernando,
-> >
-> > You are right that IEC 62439-3 does not specify multiple
-> > PRP_TLV_REDBOX_MAC TLVs. My intention with the loop was not to handle
-> > multiple RedBox MACs, but rather to make the parser robust against
-> > unknown TLV types. If a future revision of the standard or a vendor
-> > extension introduces a new TLV, the loop allows the kernel to safely
-> > skip over unrecognized TLVs by reading their length, ensuring it can
-> > still validate the HSR_TLV_EOT marker at the end.
+ipvlan and macvlan use queues to process broadcast/multicast packets
+from a work queue.
 
-Hi Fernando, Luka,
+Under attack these queues can drop packets.
 
-> AFAIU, the TLVs must be in the right order. I don't know, it doesn't sound
-> very convincing to me that we are anticipating to new TLVs. HSR/PRP isn't a
-> very active protocol and it has few users in Kernel probably compare to
-> other protocols because it is used in a very specific industry domain.
+Add MACVLAN_BROADCAST_BACKLOG drop_reason for macvlan broadcast queue.
 
-I agree with this. IMHO, the supervision frames should look the way they
-are described in the standard, i.e., the TLVs ordered as the current
-code expects them.
+Add IPVLAN_MULTICAST_BACKLOG drop_reason for ipvlan multicast queue.
 
-Luka, I'm not sure what your stance is to that? On one hand, you are
-proposing a patch making the checks more strict (TLV_END && length ==
-0), on the other hand you are proposing a patch accepting supervision
-frames with random new or proprietary TLVs.
+Use different reasons as some deployments use both ipvlan and macvlan.
 
-> If a new revision of the protocol specs is released we can always update our
-> implementation.
+Also change ipvlan_rcv_frame() to use SKB_DROP_REASON_DEV_READY
+when the device is not UP.
 
-This, especially because the supervision frames have an explicit version
-number field (something we don't check at the moment, but probably
-should in the future).
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ drivers/net/ipvlan/ipvlan_core.c |  4 ++--
+ drivers/net/macvlan.c            |  2 +-
+ include/net/dropreason-core.h    | 12 ++++++++++++
+ 3 files changed, 15 insertions(+), 3 deletions(-)
 
-> Anyway, since Felix reviewed the initial patch let's wait for his review.
-
-I'll add more notes in another reply, directly to the patch.
-
-> > However, if the preference for the HSR subsystem is strict adherence to
-> > only currently defined TLVs over forward compatibility, I completely
-> > understand.
-> >
-> > Furthermore, I am testing this using a purely Linux environment by
-> > using a virtual HSR environment on Arch Linux. I set up two network
-> > namespaces connected via veth pairs and instantiated HSR interfaces.
-> >
-> > The nodes successfully synchronized and maintained the connection. I
-> > confirmed this by observing the expected duplicate packets (DUP!)
-> > during ping tests between namespaces and by verifying that supervision
-> > frames were correctly parsed, allowing the nodes to populate their
-> > remote node tables.
-
-Side note: hsr exposes the node table through debugfs, that's maybe a
-better way to test/verify such things.
-
-Thanks,
-   Felix
+diff --git a/drivers/net/ipvlan/ipvlan_core.c b/drivers/net/ipvlan/ipvlan_core.c
+index 68fdb42068d0060c67d751b869a059e8cb1b6bd1..5131d722c476eaa6149c114bcfc7267ea31d7242 100644
+--- a/drivers/net/ipvlan/ipvlan_core.c
++++ b/drivers/net/ipvlan/ipvlan_core.c
+@@ -337,7 +337,7 @@ static int ipvlan_rcv_frame(struct ipvl_addr *addr, struct sk_buff **pskb,
+ 	 */
+ 	if (local) {
+ 		if (unlikely(!(dev->flags & IFF_UP))) {
+-			kfree_skb(skb);
++			kfree_skb_reason(skb, SKB_DROP_REASON_DEV_READY);
+ 			goto out;
+ 		}
+ 
+@@ -596,7 +596,7 @@ static void ipvlan_multicast_enqueue(struct ipvl_port *port,
+ 	} else {
+ 		spin_unlock(&port->backlog.lock);
+ 		dev_core_stats_rx_dropped_inc(skb->dev);
+-		kfree_skb(skb);
++		kfree_skb_reason(skb, SKB_DROP_REASON_IPVLAN_MULTICAST_BACKLOG);
+ 	}
+ }
+ 
+diff --git a/drivers/net/macvlan.c b/drivers/net/macvlan.c
+index 54c514acacc5e24fcdb88904f41fd1d29b1e34d0..9f90c598649d548ee12b0a9806c825f96a4a4d63 100644
+--- a/drivers/net/macvlan.c
++++ b/drivers/net/macvlan.c
+@@ -386,7 +386,7 @@ static void macvlan_broadcast_enqueue(struct macvlan_port *port,
+ 	return;
+ 
+ free_nskb:
+-	kfree_skb(nskb);
++	kfree_skb_reason(nskb, SKB_DROP_REASON_MACVLAN_BROADCAST_BACKLOG);
+ err:
+ 	dev_core_stats_rx_dropped_inc(skb->dev);
+ }
+diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
+index de61dd5dbfd9dc7d91d22d79a510d42fb69eb60a..5ad4a34b527486d3302238634f5a1a0af26db3db 100644
+--- a/include/net/dropreason-core.h
++++ b/include/net/dropreason-core.h
+@@ -69,6 +69,8 @@
+ 	FN(QDISC_DROP)			\
+ 	FN(QDISC_BURST_DROP)		\
+ 	FN(CPU_BACKLOG)			\
++	FN(MACVLAN_BROADCAST_BACKLOG)		\
++	FN(IPVLAN_MULTICAST_BACKLOG)		\
+ 	FN(XDP)				\
+ 	FN(TC_INGRESS)			\
+ 	FN(UNHANDLED_PROTO)		\
+@@ -382,6 +384,16 @@ enum skb_drop_reason {
+ 	 * netdev_max_backlog in net.rst) or RPS flow limit
+ 	 */
+ 	SKB_DROP_REASON_CPU_BACKLOG,
++	/**
++	 * @SKB_DROP_REASON_MACVLAN_BROADCAST_BACKLOG: failed to enqueue the skb
++	 * to macvlan broadcast queue.
++	 */
++	SKB_DROP_REASON_MACVLAN_BROADCAST_BACKLOG,
++	/**
++	 * @SKB_DROP_REASON_IPVLAN_MULTICAST_BACKLOG: failed to enqueue the skb
++	 * to ipvlan multicast queue.
++	 */
++	SKB_DROP_REASON_IPVLAN_MULTICAST_BACKLOG,
+ 	/** @SKB_DROP_REASON_XDP: dropped by XDP in input path */
+ 	SKB_DROP_REASON_XDP,
+ 	/** @SKB_DROP_REASON_TC_INGRESS: dropped in TC ingress HOOK */
+-- 
+2.53.0.1213.gd9a14994de-goog
 
 
