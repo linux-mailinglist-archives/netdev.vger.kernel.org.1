@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-276066-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276067-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CL3RMQ0s1Wli1wcAu9opvQ
-	(envelope-from <netdev+bounces-276066-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 18:08:45 +0200
+	id yIDPBSYs1Wli1wcAu9opvQ
+	(envelope-from <netdev+bounces-276067-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 18:09:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A937F3B1836
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 18:08:45 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id F084D3B1845
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 18:09:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id DFC8030498DB
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 16:06:21 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A8E13304C8A9
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 16:06:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08A413D1CD1;
-	Tue,  7 Apr 2026 16:04:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 939683AB275;
+	Tue,  7 Apr 2026 16:04:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="1uUaBP75"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="d29tw00A"
 X-Original-To: netdev@vger.kernel.org
 Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FBD13D1CA0;
-	Tue,  7 Apr 2026 16:03:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7ED13D1CB6;
+	Tue,  7 Apr 2026 16:03:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775577842; cv=none; b=BGLx+X0xHSYqJamEsk/qrf36pieE13/m1UgcdsPEzlL7RDyxmBGyHtMZ8n6FU1rU3jvyseQViGLaJ0VtbEdoL5OvRGkLWWkiPds72Sy0I8kXBELBi5Lb9VJ7oHq5KcioLB0UsBwjFApYr5LttQ0ZMAS41Fwvxg8l+5oMcrRAQXg=
+	t=1775577845; cv=none; b=t6wt8dqfvEsKvrS7YHdm34mD4WpvyPwqHz1a7wJ+Sswiq1LO6wwwyty0OQuhHLP1s1s9V518/8T4JOymVh1geJxGMpJDBMLI4/CSx8Vt+52otWHcgCKgq8mLI5Xs9wcMkbZCL6GKTomhRAc8NWkDQmRjbIwLWVpwj1cqZdr+Rj8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775577842; c=relaxed/simple;
-	bh=FWMfd4yEZoHIlu5luv1+ztRX+2BUPIE7X09RroYvLzY=;
+	s=arc-20240116; t=1775577845; c=relaxed/simple;
+	bh=wHapa6bYWvJzvpoBm8/tnoueHb8aD9aXe9o4B9DjhoQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oB1LcydSGRWY/M/EBZSiVvWXtda7Q+tEuPvxowxi0zFmrSH/mSJXDW4AnOvcmmniEqhhv/A8DPVd3h8lezJN4YQDobLjLoLEX/1hCIa+lp7j1Xg1ZKgGWwF+78QNkfkSnDhZ4Q5kfXn73TYRLCKHsCm+TjnfCRpYZccbIpZkNNw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=1uUaBP75; arc=none smtp.client-ip=144.76.82.148
+	 MIME-Version; b=C8JECfXb9ZpXjeacT7I5VbdhPrrYqi0LNEEUC5e3hwtvPut3oqlKAYAHdO1DMiGLw0z7nqPyzvWeJZp8Sb4uYdolcGGUQAq6a4a1l5o+XpqpQc5SaeNf42GNuwJ/+2s/Oa7nJamNvifEPFzghhvEu6vqCgu+zbEagmA6laYnIL8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=d29tw00A; arc=none smtp.client-ip=144.76.82.148
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
 	s=42; h=Message-ID:Date:Cc:To:From;
-	bh=QCAv72jbBIAtTDnzhZIyAqvyUFhGw6j7cPQDLw9NObA=; b=1uUaBP75Ys14D6HcBWqrdyGS0g
-	mBbWVgPvTGWnAJgaHv3k736UUiqAETp273iQ2hWevvyRzfSkrSfM/dOowzDCUN5ILbJDj58G5Xnoc
-	3tfUEpWFs0BnFzp8wRdPYcB6Npg1rRNboC8Zhj7DTT6dw28HdN53j/7NQHPsYxDIcIkFnbZUwTjGD
-	yY3oo8xmbkqGkSxtQaKINztYOoLOvgBsBueZpsJ65X2exPtGJGTE1iXxqDbb46b9UlIW7SuMfkHdG
-	REYfK+evCYf0W5cLBxN8G6iRlKZCmBxSdyrrTiBBCLV/bFz58fYbyM3uE28GWExHkSKB1e6x4yLJx
-	VZMeu24fFstazA4dyHkt6UOB3mQhSr1TgPfApyS5ZvGGB9cXTGCYr19uFcyokmpGoec4uB8PG7wOb
-	NuuduNmOzQbqvoZtHp8eEBCOU+mZiVqFvUyNhozZn7dD89OkAb5EglxXpSQqcWzYthYBo0hrEgNTl
-	MkCiYhhprowhTP/I25xR8/fL;
+	bh=TbrjwGo14PmyvPU5IuDe4577IkjzAwCCxvuZ9TVYC1s=; b=d29tw00A1K/qlUbkw3/tldt/0+
+	T5BRYVIH9OjG2rCTK7MAGPK0ECcWTdXrA9EM7SOAB9prk/bmwWsizRvrOOzbitJtjG2Gwm3WFeRL/
+	4iZdVq6g7ew51RTmVyebzqq113yoLmOtUlBF48AYEygkhAYn6SR7nn3gu/avFK9LBxN99Mvl9WLOl
+	8ieGv4jApxY9oKqEh1TF36KY28RASNSSjyp8L7P43Sa3p/ToOeeMWztWrESq7KQULkAZmkqZy7yry
+	r6dBqNg8wF9otrPINe+ykFoE68ZZRK2AA2W1Wf66eNmDHTkLRKv2uB1y+iFn9HLG/Qm99wB1y7qDV
+	CzXS5begpBL8ZHbqD7MdnTpOE+WbkEDxImMVl5TjV0X1TaaGS7spQb1YTO0bFFRabGMcSGChQuNcL
+	LMwGFPWNdhe3/PV5GDer27EARLhK/I5qaJUOvlmIOY0hH2BLoYRdzbuBZBfrZtbsmsE9D3k6G92PL
+	K/uLP90F8QDUYa/ct5cW+81u;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
 	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
 	(Exim)
-	id 1wA8u0-00000007Xjb-3ZOC;
-	Tue, 07 Apr 2026 16:03:44 +0000
+	id 1wA8u6-00000007XkD-2WGJ;
+	Tue, 07 Apr 2026 16:03:50 +0000
 From: Stefan Metzmacher <metze@samba.org>
 To: linux-kernel@vger.kernel.org
 Cc: metze@samba.org,
@@ -76,9 +76,9 @@ Cc: metze@samba.org,
 	Kees Cook <keescook@chromium.org>,
 	netdev@vger.kernel.org,
 	linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/5] uaccess: add copy_struct_{from,to}_bounce_buffer() helpers
-Date: Tue,  7 Apr 2026 18:03:15 +0200
-Message-ID: <f29570914590c50b9b6f451eb3a38d0fe1d954df.1775576651.git.metze@samba.org>
+Subject: [PATCH 4/5] sockptr: let copy_struct_from_sockptr() use copy_struct_from_bounce_buffer()
+Date: Tue,  7 Apr 2026 18:03:16 +0200
+Message-ID: <b9b7e22664a53251d7ad099b12aead8b599c1257.1775576651.git.metze@samba.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <cover.1775576651.git.metze@samba.org>
 References: <cover.1775576651.git.metze@samba.org>
@@ -96,14 +96,14 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[samba.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[samba.org:s=42];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[samba.org,gmail.com,arista.com,kernel.org,davemloft.net,rbox.co,davidwei.uk,intel.com,holtmann.org,google.com,redhat.com,cyphar.com,chromium.org,vger.kernel.org];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCPT_COUNT_TWELVE(0.00)[26];
-	TAGGED_FROM(0.00)[bounces-276066-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-276067-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -116,28 +116,16 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	NEURAL_HAM(-0.00)[-0.997];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A937F3B1836
+X-Rspamd-Queue-Id: F084D3B1845
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-These are similar to copy_struct_{from,to}_user() but operate
-on kernel buffers instead of user buffers.
-
-They can be used when there is a temporary bounce buffer used,
-e.g. in msg_control or similar places.
-
-It allows us to have the same logic to handle old vs. current
-and current vs. new structures in the same compatible way.
-
-copy_struct_from_sockptr() will also be able to
-use copy_struct_from_bounce_buffer() for the kernel
-case as follow us patch.
-
-I'll use this in my IPPROTO_SMBDIRECT work,
-but maybe it will also be useful for others...
-IPPROTO_QUIC will likely also use it.
+The world would be better without sockptr_t, but this at least
+simplifies copy_struct_from_sockptr() to be just a dispatcher for
+copy_struct_from_user() or copy_struct_from_bounce_buffer() without any
+special logic on its own.
 
 Cc: Dmitry Safonov <0x7f454c46@gmail.com>
 Cc: Dmitry Safonov <dima@arista.com>
@@ -166,83 +154,39 @@ Cc: linux-bluetooth@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
 Signed-off-by: Stefan Metzmacher <metze@samba.org>
 ---
- include/linux/uaccess.h | 63 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 63 insertions(+)
+ include/linux/sockptr.h | 16 +---------------
+ 1 file changed, 1 insertion(+), 15 deletions(-)
 
-diff --git a/include/linux/uaccess.h b/include/linux/uaccess.h
-index 1234b5fa4761..a6cd4f48bb99 100644
---- a/include/linux/uaccess.h
-+++ b/include/linux/uaccess.h
-@@ -513,6 +513,69 @@ copy_struct_to_user(void __user *dst, size_t usize, const void *src,
- 	return 0;
+diff --git a/include/linux/sockptr.h b/include/linux/sockptr.h
+index ba88f4d78c1b..706a8526cf3c 100644
+--- a/include/linux/sockptr.h
++++ b/include/linux/sockptr.h
+@@ -87,24 +87,10 @@ static inline int copy_safe_from_sockptr(void *dst, size_t ksize,
+ static inline int copy_struct_from_sockptr(void *dst, size_t ksize,
+ 		sockptr_t src, size_t usize)
+ {
+-	size_t size = min(ksize, usize);
+-	size_t rest = max(ksize, usize) - size;
+-
+ 	if (!sockptr_is_kernel(src))
+ 		return copy_struct_from_user(dst, ksize, src.user, usize);
+ 
+-	if (usize < ksize) {
+-		memset(dst + size, 0, rest);
+-	} else if (usize > ksize) {
+-		char *p = src.kernel;
+-
+-		while (rest--) {
+-			if (*p++)
+-				return -E2BIG;
+-		}
+-	}
+-	memcpy(dst, src.kernel, size);
+-	return 0;
++	return copy_struct_from_bounce_buffer(dst, ksize, src.kernel, usize);
  }
  
-+static __always_inline void
-+__copy_struct_generic_bounce_buffer(void *dst, size_t dstsize,
-+				    const void *src, size_t srcsize,
-+				    bool *ignored_trailing)
-+{
-+	size_t size = min(dstsize, srcsize);
-+	size_t rest = max(dstsize, srcsize) - size;
-+
-+	/* Deal with trailing bytes. */
-+	if (dstsize > srcsize)
-+		memset(dst + size, 0, rest);
-+	if (ignored_trailing)
-+		*ignored_trailing = dstsize < srcsize &&
-+			memchr_inv(src + size, 0, rest) != NULL;
-+	/* Copy the interoperable parts of the struct. */
-+	memcpy(dst, src, size);
-+}
-+
-+/**
-+ * This is like copy_struct_from_user(), but the
-+ * src buffer was already copied into a kernel
-+ * bounce buffer, so it will never return -EFAULT.
-+ */
-+static __always_inline __must_check int
-+copy_struct_from_bounce_buffer(void *dst, size_t dstsize,
-+			       const void *src, size_t srcsize)
-+{
-+	bool ignored_trailing;
-+
-+	/* Double check if ksize is larger than a known object size. */
-+	if (WARN_ON_ONCE(dstsize > __builtin_object_size(dst, 1)))
-+		return -E2BIG;
-+
-+	__copy_struct_generic_bounce_buffer(dst, dstsize,
-+					    src, srcsize,
-+					    &ignored_trailing);
-+	if (unlikely(ignored_trailing))
-+		return -E2BIG;
-+
-+	return 0;
-+}
-+
-+/**
-+ * This is like copy_struct_to_user(), but the
-+ * dst buffer is a kernel bounce buffer instead
-+ * of a direct userspace buffer, so it will never return -EFAULT.
-+ */
-+static __always_inline __must_check int
-+copy_struct_to_bounce_buffer(void *dst, size_t dstsize,
-+			     const void *src,
-+			     size_t srcsize,
-+			     bool *ignored_trailing)
-+{
-+	/* Double check if srcsize is larger than a known object size. */
-+	if (WARN_ON_ONCE(srcsize > __builtin_object_size(src, 1)))
-+		return -E2BIG;
-+
-+	__copy_struct_generic_bounce_buffer(dst, dstsize,
-+					    src, srcsize,
-+					    ignored_trailing);
-+	return 0;
-+}
-+
- bool copy_from_kernel_nofault_allowed(const void *unsafe_src, size_t size);
- 
- long copy_from_kernel_nofault(void *dst, const void *src, size_t size);
+ static inline int copy_to_sockptr_offset(sockptr_t dst, size_t offset,
 -- 
 2.43.0
 
