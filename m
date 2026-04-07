@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-275950-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275948-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iNrbEe3h1GnbyQcAu9opvQ
-	(envelope-from <netdev+bounces-275950-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 12:52:29 +0200
+	id QBNfL67h1GmZyQcAu9opvQ
+	(envelope-from <netdev+bounces-275948-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 12:51:26 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4E243AD429
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 12:52:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B9463AD3E7
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 12:51:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4701D305328A
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 10:51:12 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4F3ED303766A
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 10:50:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20B653AD502;
-	Tue,  7 Apr 2026 10:50:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77E093AB28C;
+	Tue,  7 Apr 2026 10:50:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=akamai.com header.i=@akamai.com header.b="hySYx7jM"
+	dkim=pass (2048-bit key) header.d=akamai.com header.i=@akamai.com header.b="m828f8fD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00190b01.pphosted.com (mx0a-00190b01.pphosted.com [67.231.149.131])
+Received: from mx0b-00190b01.pphosted.com (mx0b-00190b01.pphosted.com [67.231.157.127])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6778A3ACEFE;
-	Tue,  7 Apr 2026 10:50:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.149.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65E493AA516;
+	Tue,  7 Apr 2026 10:50:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.157.127
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775559053; cv=none; b=LTxGcQORvXKJq6rIbZhszteaUzBKKmJegLHqqeBSJZY34LrwwQR7ShD31huslPE3niGyi7z2D/aRkjLe0BoJ7r1LqZHxzIRCWmecaJEMvN5mlzST0Z+Vmhzljh3huVGRWlr6bpA4nOlvQJUdOeGWEMDDyJdW0qeHerBt0j2pQ40=
+	t=1775559049; cv=none; b=SGX7I2TUOrBQPWSloQIExEBlBMOd8tStqLMqs1qAWVWh9VS8FD7L8JXNfJsxUN6lQMnNQZQkSYIWuAK6q6eB2B7LEljGzHFE0qi0g0Lr8iqNLuuCxTER6FXQkBAFG6e57mHIiw5ZE634otwXUcxnewieEslfZb0eJkAsrjWu6tw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775559053; c=relaxed/simple;
-	bh=AOrgGm18RpXJx6dzbMiEiZQi+s36OnXKGXf1n/IitNQ=;
+	s=arc-20240116; t=1775559049; c=relaxed/simple;
+	bh=iw3pkpi0rpWv34W0Zy1IDNbxE46IPAKhAcqKQwIkudY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ZJrYI8Xca2E06qpI/zAJ823lBv5ecvqi/65uRv0Z04Fi7knFBxDRLXnqi5+wStFpQn0pBYQESCkWyS9ELlJ+3T4JoXiNNog/VbenXYOMLygeiPXlal9P7LqDRdccdnZBDQ2M1s46/cWU7m025cIlJdKK+NG1of23xn+rDPZPftQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=akamai.com; spf=pass smtp.mailfrom=akamai.com; dkim=pass (2048-bit key) header.d=akamai.com header.i=@akamai.com header.b=hySYx7jM; arc=none smtp.client-ip=67.231.149.131
+	 MIME-Version; b=O+WB+iuay69ASnywoN2B32ehFJcBeDKZQ6leQ+3jV441bF0OW9uxo6Q/5+9daFjIxG4HHkaFIrxvp3RMVzDfxtM1v+Fa6zyCLGBV7MFd+v+8wNrFW/Ho2L+vE774moai1QjHtVK3NJBXvQdWqo9zk/08kvywvjSrQxklq9NXW4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=akamai.com; spf=fail smtp.mailfrom=akamai.com; dkim=pass (2048-bit key) header.d=akamai.com header.i=@akamai.com header.b=m828f8fD; arc=none smtp.client-ip=67.231.157.127
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=akamai.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=akamai.com
-Received: from pps.filterd (m0122332.ppops.net [127.0.0.1])
-	by mx0a-00190b01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6379X39U353899;
-	Tue, 7 Apr 2026 11:50:15 +0100
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=akamai.com
+Received: from pps.filterd (m0122331.ppops.net [127.0.0.1])
+	by mx0b-00190b01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 637AoGt01700621;
+	Tue, 7 Apr 2026 11:50:16 +0100
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=akamai.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=jan2016.eng; bh=ebf5Q0PaD
-	nQoiYyhcMGVsZMGw3fN+UO6cglPFawnc8Q=; b=hySYx7jMpJz2XrlWUP4yV3Ade
-	p18hc34WR2vBXcmaTODQHDWocY+hvuB+al5PbsXz1ZlYeDJwgujh84W/FIj1lrzQ
-	ByEv8mQ84s+ayOvZXX9OtYy+FMzDseZ1hZdVnGbFOcuSqTrc5QAWO4X5QuhFrmvE
-	H/0hhXwRfYjiLlL042ix+8+YZrTyYLzZviIRUFNydwx4tidTKa0nqV+LOrmizQn0
-	PfRf8jIWQahABwJgArnKryuSK6PjpKP8p9A3oXEgE6jmzzk2rBck7Iz/0mRV5fpp
-	v3g0hi2/0jCQ7UqLBLxX8exjOBC3eyIBi6Z6sRRHxegpxTJPIjIA+C8IkIMcg==
-Received: from prod-mail-ppoint6 (prod-mail-ppoint6.akamai.com [184.51.33.61])
-	by mx0a-00190b01.pphosted.com (PPS) with ESMTPS id 4datpggaja-1
+	:mime-version:references:subject:to; s=jan2016.eng; bh=tvzeqXY17
+	UbphjoJsIOIquKsB7eKxzv9kuXvY8AZYjc=; b=m828f8fDvqS0K9D8P8wfXvrvE
+	NnBSuKJezgsbYd1hKZuDl6b8h4Jzc1la2AfrwbJvqPZkAcs2tieGJVmMpljxkepe
+	mKfX+TOwBHyM4Ngrx+Ue8sCwvxBHAhnnZ3itLGjgGtCIc6b42b1gINP3Z782iK8U
+	4mtAoVJBXNQtRg+hdIneqVEKwatMpNeS8eqCCK1ofZCsM9OizG/+QN5UvsX2GUTx
+	t4e5zPgA0MDLDHhQefS5bXvO8tAQnhX9l6dad1uIpw1xi5WpbqbJzGc5WbEGteEh
+	lvs9EXqe4SY3iL88+CedETzWEBqFdqwE8tIfHMTJUqtZwtVxY//QdG+Fh34VQ==
+Received: from prod-mail-ppoint2 (prod-mail-ppoint2.akamai.com [184.51.33.19])
+	by mx0b-00190b01.pphosted.com (PPS) with ESMTPS id 4daqgt6y6e-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 07 Apr 2026 11:50:14 +0100 (BST)
-Received: from pps.filterd (prod-mail-ppoint6.akamai.com [127.0.0.1])
-	by prod-mail-ppoint6.akamai.com (8.18.1.7/8.18.1.7) with ESMTP id 637Anuxp001030;
-	Tue, 7 Apr 2026 06:50:13 -0400
+	Tue, 07 Apr 2026 11:50:16 +0100 (BST)
+Received: from pps.filterd (prod-mail-ppoint2.akamai.com [127.0.0.1])
+	by prod-mail-ppoint2.akamai.com (8.18.1.7/8.18.1.7) with ESMTP id 637AnvCd002325;
+	Tue, 7 Apr 2026 06:50:15 -0400
 Received: from prod-mail-relay01.akamai.com ([172.27.118.31])
-	by prod-mail-ppoint6.akamai.com (PPS) with ESMTP id 4dcmejac6t-1;
-	Tue, 07 Apr 2026 06:50:13 -0400 (EDT)
+	by prod-mail-ppoint2.akamai.com (PPS) with ESMTP id 4dcmejabgy-1;
+	Tue, 07 Apr 2026 06:50:15 -0400 (EDT)
 Received: from muc-lhvdhd.munich.corp.akamai.com (muc-lhvdhd.munich.corp.akamai.com [172.29.0.147])
-	by prod-mail-relay01.akamai.com (Postfix) with ESMTP id B6E9884;
-	Tue,  7 Apr 2026 10:50:11 +0000 (UTC)
+	by prod-mail-relay01.akamai.com (Postfix) with ESMTP id 0246680;
+	Tue,  7 Apr 2026 10:50:13 +0000 (UTC)
 From: Nick Hudson <nhudson@akamai.com>
 To: bpf@vger.kernel.org, netdev@vger.kernel.org,
         Willem de Bruijn <willemb@google.com>,
@@ -70,12 +70,10 @@ Cc: Nick Hudson <nhudson@akamai.com>, Max Tottenham <mtottenh@akamai.com>,
         Andrii Nakryiko <andrii@kernel.org>,
         Eduard Zingerman <eddyz87@gmail.com>,
         Kumar Kartikeya Dwivedi <memxor@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org
-Subject: [PATCH bpf-next v3 2/6] bpf: refactor masks for ADJ_ROOM flags and encap validation
-Date: Tue,  7 Apr 2026 11:50:01 +0100
-Message-Id: <20260407105005.1639815-3-nhudson@akamai.com>
+        linux-kernel@vger.kernel.org
+Subject: [PATCH bpf-next v3 3/6] bpf: add BPF_F_ADJ_ROOM_DECAP_* flags for tunnel decapsulation
+Date: Tue,  7 Apr 2026 11:50:02 +0100
+Message-Id: <20260407105005.1639815-4-nhudson@akamai.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260407105005.1639815-1-nhudson@akamai.com>
 References: <20260407105005.1639815-1-nhudson@akamai.com>
@@ -89,30 +87,30 @@ Content-Transfer-Encoding: 8bit
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
  definitions=2026-04-07_02,2026-04-07_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999
- lowpriorityscore=0 mlxscore=0 bulkscore=0 malwarescore=0 suspectscore=0
- spamscore=0 phishscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+ bulkscore=0 mlxlogscore=594 adultscore=0 lowpriorityscore=0 phishscore=0
+ malwarescore=0 mlxscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx
  scancount=1 engine=8.19.0-2604010000 definitions=main-2604070101
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDA3MDA5OSBTYWx0ZWRfX9079TLd4F2db
- logdyIE50rV5J9XEaE6GzfGF4iR3v4IOYijZQ68LSLgdBoH7JqpOAQg2BQiV0jXmVNMy3CgeJv8
- xfthn/nn5zbZxoBT+iJq3RpUfIU2yLzTXm9Is96cbMCgCrQvblSA5jVCbvmnRWJz2BrxDV4ebpG
- CHOaL5hg1/ur9RL9JO/L9+vV+nNxewJdLizA4RSpn7nCnP4Xqyhx7Oxo1Lgs2QCMiGwMOQQsP4W
- z7dxC4TXJfjxPTaF91iVI86jbfdEyJsXZ+OvA2Nb96caiKxzU+KBQkyPl11GtmXexktqnooYrBJ
- vnfgb61iZI+JB7CyN+4CVdDHF9HzaynJikKdJnFenBlvdbxcs5e6KtkEutKvGsbQtb3j+RQoiwg
- 5uy4WNVwDsv2uMuziXKfCCvu5afUn3X5PP4GVcoZnY9gKGg7PtEp38R/FEUwavbz7mrriNM+4cF
- JdFaxvD8NaR5j3UgT0g==
-X-Proofpoint-GUID: heXkUef39-R1NqMIfEDxbG2aQ8o94HOC
-X-Proofpoint-ORIG-GUID: heXkUef39-R1NqMIfEDxbG2aQ8o94HOC
-X-Authority-Analysis: v=2.4 cv=BNaDalQG c=1 sm=1 tr=0 ts=69d4e167 cx=c_pps
- a=WPLAOKU3JHlOa4eSsQmUFQ==:117 a=WPLAOKU3JHlOa4eSsQmUFQ==:17
+X-Proofpoint-GUID: mQ3nx_MFexVmZMWmwVoJk0BfpcjYVY3m
+X-Authority-Analysis: v=2.4 cv=T+C8ifKQ c=1 sm=1 tr=0 ts=69d4e168 cx=c_pps
+ a=BpD+HMUBsFIkYY1OQe22Yw==:117 a=BpD+HMUBsFIkYY1OQe22Yw==:17
  a=A5OVakUREuEA:10 a=VkNPw1HP01LnGYTKEx00:22 a=Ifg-1AOnLHOf1gn6spyb:22
- a=4OENtXgxWbduB0e82o7S:22 a=X7Ea-ya5AAAA:8 a=XTcGtYan5i681LpXN6wA:9
+ a=VcQvXEo1OZcA_IiPcy3B:22 a=X7Ea-ya5AAAA:8 a=KfGVUnEDJfcTcdlxACkA:9
+X-Proofpoint-ORIG-GUID: mQ3nx_MFexVmZMWmwVoJk0BfpcjYVY3m
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDA3MDA5OSBTYWx0ZWRfX5NmtxCDe+rxI
+ VZZc4Epd2DcbeH40df6egQRzy9IJPMo8+AER/NoLlVgqwEnTnhLf6jDCn32S/LUvZ8s94xnlT7Z
+ hY8lCcT0DNOcCiMPubDyK9oHgTlxlbGkSFwsVh+orUrZcPPgF+52LIpoKmFZEq2THJ2Ua/4v0Bh
+ 4HsJQA1ml+tYCYl0h0Ky8Pmf3E60makhr2cQac/nxGx5NkUZ56ph3c9OKmhqAcXKWyIxtb2VJvo
+ xmpSPBHWYnwwx87sEiVFk8vAnAnmKrEKfzNpb2WTh0ezoKAqIh5ZTz276Fv9b5Z4o0+wq1N66pF
+ U9Gc6/HTXMyL/UMiEqatfnSVSWZYQmATrVGOR/Hshbv0mlHH9XA1ld1AX76XjhQubbnevA2GS1G
+ E0T7xo22yHZbhF26oyZXtIL2mKqScwmFPRjNzeZG+gVjq9WxojNUGld68bogY6AtdAtn5/bj4HJ
+ cZ+Dn9kD7FZxls3I49w==
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
  definitions=2026-04-07_02,2026-04-07_02,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
- bulkscore=0 priorityscore=1501 spamscore=0 lowpriorityscore=0 suspectscore=0
- adultscore=0 malwarescore=0 impostorscore=0 clxscore=1015
+ impostorscore=0 adultscore=0 priorityscore=1501 clxscore=1015 spamscore=0
+ suspectscore=0 malwarescore=0 lowpriorityscore=0 bulkscore=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
  reason=mlx scancount=1 engine=8.22.0-2604010000 definitions=main-2604070099
 X-Spamd-Result: default: False [-0.66 / 15.00];
@@ -125,12 +123,12 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	FREEMAIL_CC(0.00)[akamai.com,kernel.org,iogearbox.net,gmail.com,davemloft.net,google.com,redhat.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FREEMAIL_CC(0.00)[akamai.com,kernel.org,iogearbox.net,gmail.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275950-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-275948-lists,netdev=lfdr.de];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
@@ -142,20 +140,23 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: B4E243AD429
+X-Rspamd-Queue-Id: 2B9463AD3E7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Refactor the helper masks for bpf_skb_adjust_room() flags to simplify
-validation logic and introduce:
+Add new bpf_skb_adjust_room() decapsulation flags:
 
-- BPF_F_ADJ_ROOM_ENCAP_MASK
-- BPF_F_ADJ_ROOM_DECAP_MASK
+- BPF_F_ADJ_ROOM_DECAP_L4_GRE
+- BPF_F_ADJ_ROOM_DECAP_L4_UDP
+- BPF_F_ADJ_ROOM_DECAP_IPXIP4
+- BPF_F_ADJ_ROOM_DECAP_IPXIP6
 
-Refactor existing validation checks in bpf_skb_net_shrink()
-and bpf_skb_adjust_room() to use the new masks (no behavior change).
+These flags let BPF programs describe which tunnel layer is being
+removed, so later changes can update tunnel-related GSO state
+accordingly during decapsulation.
 
-This is in preparation for supporting the new decap flags.
+This patch only introduces the UAPI flag definitions and helper
+documentation.
 
 Co-developed-by: Max Tottenham <mtottenh@akamai.com>
 Signed-off-by: Max Tottenham <mtottenh@akamai.com>
@@ -163,89 +164,114 @@ Co-developed-by: Anna Glasgall <aglasgal@akamai.com>
 Signed-off-by: Anna Glasgall <aglasgal@akamai.com>
 Signed-off-by: Nick Hudson <nhudson@akamai.com>
 ---
----
- net/core/filter.c | 38 +++++++++++++++++++++-----------------
- 1 file changed, 21 insertions(+), 17 deletions(-)
+ include/uapi/linux/bpf.h       | 34 ++++++++++++++++++++++++++++++++--
+ tools/include/uapi/linux/bpf.h | 34 ++++++++++++++++++++++++++++++++--
+ 2 files changed, 64 insertions(+), 4 deletions(-)
 
-diff --git a/net/core/filter.c b/net/core/filter.c
-index 78b548158fb0..4e860da4381d 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -3490,14 +3490,19 @@ static u32 bpf_skb_net_base_len(const struct sk_buff *skb)
- #define BPF_F_ADJ_ROOM_DECAP_L3_MASK	(BPF_F_ADJ_ROOM_DECAP_L3_IPV4 | \
- 					 BPF_F_ADJ_ROOM_DECAP_L3_IPV6)
+diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
+index c021ed8d7b44..4a53e731c554 100644
+--- a/include/uapi/linux/bpf.h
++++ b/include/uapi/linux/bpf.h
+@@ -3010,8 +3010,34 @@ union bpf_attr {
+  *
+  *		* **BPF_F_ADJ_ROOM_DECAP_L3_IPV4**,
+  *		  **BPF_F_ADJ_ROOM_DECAP_L3_IPV6**:
+- *		  Indicate the new IP header version after decapsulating the outer
+- *		  IP header. Used when the inner and outer IP versions are different.
++ *		  Indicate the new IP header version after decapsulating the
++ *		  outer IP header. Used when the inner and outer IP versions
++ *		  are different. These flags only trigger a protocol change
++ *		  without clearing any tunnel-specific GSO flags.
++ *
++ *		* **BPF_F_ADJ_ROOM_DECAP_L4_GRE**:
++ *		  Clear GRE tunnel GSO flags (SKB_GSO_GRE and SKB_GSO_GRE_CSUM)
++ *		  when decapsulating a GRE tunnel.
++ *
++ *		* **BPF_F_ADJ_ROOM_DECAP_L4_UDP**:
++ *		  Clear UDP tunnel GSO flags (SKB_GSO_UDP_TUNNEL and
++ *		  SKB_GSO_UDP_TUNNEL_CSUM) when decapsulating a UDP tunnel.
++ *
++ *		* **BPF_F_ADJ_ROOM_DECAP_IPXIP4**:
++ *		  Clear IPIP/SIT tunnel GSO flag (SKB_GSO_IPXIP4) when decapsulating
++ *		  a tunnel with an outer IPv4 header (IPv4-in-IPv4 or IPv6-in-IPv4).
++ *
++ *		* **BPF_F_ADJ_ROOM_DECAP_IPXIP6**:
++ *		  Clear IPv6 encapsulation tunnel GSO flag (SKB_GSO_IPXIP6) when
++ *		  decapsulating a tunnel with an outer IPv6 header (IPv6-in-IPv6
++ *		  or IPv4-in-IPv6).
++ *
++ *		When using the decapsulation flags above, the skb->encapsulation
++ *		flag is automatically cleared if all tunnel-specific GSO flags
++ *		(SKB_GSO_UDP_TUNNEL, SKB_GSO_UDP_TUNNEL_CSUM, SKB_GSO_GRE,
++ *		SKB_GSO_GRE_CSUM, SKB_GSO_IPXIP4, SKB_GSO_IPXIP6) have been
++ *		removed from the packet. This handles cases where all tunnel
++ *		layers have been decapsulated.
+  *
+  * 		A call to this helper is susceptible to change the underlying
+  * 		packet buffer. Therefore, at load time, all checks on pointers
+@@ -6221,6 +6247,10 @@ enum bpf_adj_room_flags {
+ 	BPF_F_ADJ_ROOM_ENCAP_L2_ETH	= (1ULL << 6),
+ 	BPF_F_ADJ_ROOM_DECAP_L3_IPV4	= (1ULL << 7),
+ 	BPF_F_ADJ_ROOM_DECAP_L3_IPV6	= (1ULL << 8),
++	BPF_F_ADJ_ROOM_DECAP_L4_GRE	= (1ULL << 9),
++	BPF_F_ADJ_ROOM_DECAP_L4_UDP	= (1ULL << 10),
++	BPF_F_ADJ_ROOM_DECAP_IPXIP4	= (1ULL << 11),
++	BPF_F_ADJ_ROOM_DECAP_IPXIP6	= (1ULL << 12),
+ };
  
--#define BPF_F_ADJ_ROOM_MASK		(BPF_F_ADJ_ROOM_FIXED_GSO | \
--					 BPF_F_ADJ_ROOM_ENCAP_L3_MASK | \
-+#define BPF_F_ADJ_ROOM_ENCAP_MASK	(BPF_F_ADJ_ROOM_ENCAP_L3_MASK | \
- 					 BPF_F_ADJ_ROOM_ENCAP_L4_GRE | \
- 					 BPF_F_ADJ_ROOM_ENCAP_L4_UDP | \
- 					 BPF_F_ADJ_ROOM_ENCAP_L2_ETH | \
- 					 BPF_F_ADJ_ROOM_ENCAP_L2( \
--					  BPF_ADJ_ROOM_ENCAP_L2_MASK) | \
--					 BPF_F_ADJ_ROOM_DECAP_L3_MASK)
-+					  BPF_ADJ_ROOM_ENCAP_L2_MASK))
-+
-+#define BPF_F_ADJ_ROOM_DECAP_MASK	(BPF_F_ADJ_ROOM_DECAP_L3_MASK)
-+
-+#define BPF_F_ADJ_ROOM_MASK		(BPF_F_ADJ_ROOM_FIXED_GSO | \
-+					 BPF_F_ADJ_ROOM_ENCAP_MASK | \
-+					 BPF_F_ADJ_ROOM_DECAP_MASK | \
-+					 BPF_F_ADJ_ROOM_NO_CSUM_RESET)
+ enum {
+diff --git a/tools/include/uapi/linux/bpf.h b/tools/include/uapi/linux/bpf.h
+index ca35ed622ed5..f4c2fbd8fe68 100644
+--- a/tools/include/uapi/linux/bpf.h
++++ b/tools/include/uapi/linux/bpf.h
+@@ -3010,8 +3010,34 @@ union bpf_attr {
+  *
+  *		* **BPF_F_ADJ_ROOM_DECAP_L3_IPV4**,
+  *		  **BPF_F_ADJ_ROOM_DECAP_L3_IPV6**:
+- *		  Indicate the new IP header version after decapsulating the outer
+- *		  IP header. Used when the inner and outer IP versions are different.
++ *		  Indicate the new IP header version after decapsulating the
++ *		  outer IP header. Used when the inner and outer IP versions
++ *		  are different. These flags only trigger a protocol change
++ *		  without clearing any tunnel-specific GSO flags.
++ *
++ *		* **BPF_F_ADJ_ROOM_DECAP_L4_GRE**:
++ *		  Clear GRE tunnel GSO flags (SKB_GSO_GRE and SKB_GSO_GRE_CSUM)
++ *		  when decapsulating a GRE tunnel.
++ *
++ *		* **BPF_F_ADJ_ROOM_DECAP_L4_UDP**:
++ *		  Clear UDP tunnel GSO flags (SKB_GSO_UDP_TUNNEL and
++ *		  SKB_GSO_UDP_TUNNEL_CSUM) when decapsulating a UDP tunnel.
++ *
++ *		* **BPF_F_ADJ_ROOM_DECAP_IPXIP4**:
++ *		  Clear IPIP/SIT tunnel GSO flag (SKB_GSO_IPXIP4) when decapsulating
++ *		  a tunnel with an outer IPv4 header (IPv4-in-IPv4 or IPv6-in-IPv4).
++ *
++ *		* **BPF_F_ADJ_ROOM_DECAP_IPXIP6**:
++ *		  Clear IPv6 encapsulation tunnel GSO flag (SKB_GSO_IPXIP6) when
++ *		  decapsulating a tunnel with an outer IPv6 header (IPv6-in-IPv6
++ *		  or IPv4-in-IPv6).
++ *
++ *		When using the decapsulation flags above, the skb->encapsulation
++ *		flag is automatically cleared if all tunnel-specific GSO flags
++ *		(SKB_GSO_UDP_TUNNEL, SKB_GSO_UDP_TUNNEL_CSUM, SKB_GSO_GRE,
++ *		SKB_GSO_GRE_CSUM, SKB_GSO_IPXIP4, SKB_GSO_IPXIP6) have been
++ *		removed from the packet. This handles cases where all tunnel
++ *		layers have been decapsulated.
+  *
+  * 		A call to this helper is susceptible to change the underlying
+  * 		packet buffer. Therefore, at load time, all checks on pointers
+@@ -6221,6 +6247,10 @@ enum bpf_adj_room_flags {
+ 	BPF_F_ADJ_ROOM_ENCAP_L2_ETH	= (1ULL << 6),
+ 	BPF_F_ADJ_ROOM_DECAP_L3_IPV4	= (1ULL << 7),
+ 	BPF_F_ADJ_ROOM_DECAP_L3_IPV6	= (1ULL << 8),
++	BPF_F_ADJ_ROOM_DECAP_L4_GRE	= (1ULL << 9),
++	BPF_F_ADJ_ROOM_DECAP_L4_UDP	= (1ULL << 10),
++	BPF_F_ADJ_ROOM_DECAP_IPXIP4	= (1ULL << 11),
++	BPF_F_ADJ_ROOM_DECAP_IPXIP6	= (1ULL << 12),
+ };
  
- static int bpf_skb_net_grow(struct sk_buff *skb, u32 off, u32 len_diff,
- 			    u64 flags)
-@@ -3618,8 +3623,8 @@ static int bpf_skb_net_shrink(struct sk_buff *skb, u32 off, u32 len_diff,
- {
- 	int ret;
- 
--	if (unlikely(flags & ~(BPF_F_ADJ_ROOM_FIXED_GSO |
--			       BPF_F_ADJ_ROOM_DECAP_L3_MASK |
-+	if (unlikely(flags & ~(BPF_F_ADJ_ROOM_DECAP_MASK |
-+			       BPF_F_ADJ_ROOM_FIXED_GSO |
- 			       BPF_F_ADJ_ROOM_NO_CSUM_RESET)))
- 		return -EINVAL;
- 
-@@ -3715,8 +3720,7 @@ BPF_CALL_4(bpf_skb_adjust_room, struct sk_buff *, skb, s32, len_diff,
- 	u32 off;
- 	int ret;
- 
--	if (unlikely(flags & ~(BPF_F_ADJ_ROOM_MASK |
--			       BPF_F_ADJ_ROOM_NO_CSUM_RESET)))
-+	if (unlikely(flags & ~BPF_F_ADJ_ROOM_MASK))
- 		return -EINVAL;
- 	if (unlikely(len_diff_abs > 0xfffU))
- 		return -EFAULT;
-@@ -3735,20 +3739,20 @@ BPF_CALL_4(bpf_skb_adjust_room, struct sk_buff *, skb, s32, len_diff,
- 		return -ENOTSUPP;
- 	}
- 
--	if (flags & BPF_F_ADJ_ROOM_DECAP_L3_MASK) {
-+	if (flags & BPF_F_ADJ_ROOM_DECAP_MASK) {
- 		if (!shrink)
- 			return -EINVAL;
- 
--		switch (flags & BPF_F_ADJ_ROOM_DECAP_L3_MASK) {
--		case BPF_F_ADJ_ROOM_DECAP_L3_IPV4:
-+		/* Reject mutually exclusive decap flag pairs. */
-+		if ((flags & BPF_F_ADJ_ROOM_DECAP_L3_MASK) ==
-+		    BPF_F_ADJ_ROOM_DECAP_L3_MASK)
-+			return -EINVAL;
-+
-+		if (flags & BPF_F_ADJ_ROOM_DECAP_L3_IPV4)
- 			len_min = sizeof(struct iphdr);
--			break;
--		case BPF_F_ADJ_ROOM_DECAP_L3_IPV6:
-+
-+		if (flags & BPF_F_ADJ_ROOM_DECAP_L3_IPV6)
- 			len_min = sizeof(struct ipv6hdr);
--			break;
--		default:
--			return -EINVAL;
--		}
- 	}
- 
- 	len_cur = skb->len - skb_network_offset(skb);
+ enum {
 -- 
 2.34.1
 
