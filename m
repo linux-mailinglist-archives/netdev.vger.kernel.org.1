@@ -1,149 +1,153 @@
-Return-Path: <netdev+bounces-275837-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275838-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eGeTLZVq1GletwcAu9opvQ
-	(envelope-from <netdev+bounces-275837-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 04:23:17 +0200
+	id SG0dHqZr1GletwcAu9opvQ
+	(envelope-from <netdev+bounces-275838-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 04:27:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 216713A8FDF
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 04:23:17 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFC823A905C
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 04:27:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C6EF03013D51
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 02:23:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 228E4301039A
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 02:27:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF51B2DECDF;
-	Tue,  7 Apr 2026 02:23:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E95F2727F3;
+	Tue,  7 Apr 2026 02:27:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dd8dQAQc"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pRlteTRF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC9B61F91E3;
-	Tue,  7 Apr 2026 02:23:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E87D238178
+	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 02:27:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775528594; cv=none; b=QDkBN45dqdwwtnuzwo7bHILPFOv2R8MWGJEEWp8bvlKwOuAT9Gs6lf/cWhRZ+CN1u7JIoaqVjXVWxx57J3kSrfJrsEzcUINGYtNMip2NQclw1/jUVltaHHoQ5SiCodT8Iugk3WVll3LAu8/RZ5Tw/fzAoi1daZmfQ40+7XLEyK4=
+	t=1775528867; cv=none; b=sw8XcJHlyd8MNk262GqLSIPrighCdAd5Ps+SH7j5eVPKOcicAAhbBf0TIduimuEsMnT2syZeT93nLQKI3XKwUiYFN3fFmU0IxahRzoOLMVxvLmptaTDMDhjPxsu3mExhLe9YVPvG7qRJ0QYpoNhuJmAExnkJbuBQTzwt3tKDqsk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775528594; c=relaxed/simple;
-	bh=J3G58NtGbvUyzKFU/bUdQFTxP5xxRhZEkzXFIq5Rduc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=llXZXZACa+xkSDoBpasOTzUgLL9ksylGAn9Sr7+om2jwr2GcUaD7FjmnRCLMR8vncYbYk1xtiqjL5n6KdTcfyzzsNF55HPgxtd2MknOIDL42DnKJ/M+AKdRorVIOCqXbW4x/vzR5IRvDzdCAGHj4tHrN2BTSUr1rf++GkQXLho0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dd8dQAQc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94A46C4CEF7;
-	Tue,  7 Apr 2026 02:23:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775528594;
-	bh=J3G58NtGbvUyzKFU/bUdQFTxP5xxRhZEkzXFIq5Rduc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=dd8dQAQcF0Pgr/mecx4sBWjNfNCim71nTp5J6mUHfx4MMbJgGpzdZ06ftrKs0GcaR
-	 e5vkwdJYQTahgggjKrwUSpoiiUU7N0tA67vfupAkvOIFowI9gKSu1Kir4qaxQ2rc5s
-	 Hk4MzvSziczHaw5PdZgjIiF9CbdD7LCgeyKaymJpskj+eqVKr6j7c0evit3/pH6gGo
-	 rZ1OmuF1jyOaBbAyW7tB8BIup5AQ+p0k60zm0uuT0PXnyldxiaEoOc9gwnXRdjQ1/e
-	 FcZ/0sm2fz0gIx83zdOlxj2nlQr2HopHpYMonRay88uUzpt3qcj8uZNNwrcsj0WtM2
-	 6Rk85JDS7vG0A==
-Date: Mon, 6 Apr 2026 19:23:12 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Grzegorz Nitka <grzegorz.nitka@intel.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- intel-wired-lan@lists.osuosl.org, poros@redhat.com,
- richardcochran@gmail.com, andrew+netdev@lunn.ch,
- przemyslaw.kitszel@intel.com, anthony.l.nguyen@intel.com,
- Prathosh.Satish@microchip.com, ivecera@redhat.com, jiri@resnulli.us,
- arkadiusz.kubalewski@intel.com, vadim.fedorenko@linux.dev,
- donald.hunter@gmail.com, horms@kernel.org, pabeni@redhat.com,
- davem@davemloft.net, edumazet@google.com
-Subject: Re: [PATCH v5 net-next 0/8] dpll/ice: Add TXC DPLL type and full TX
- reference clock control for E825
-Message-ID: <20260406192312.0f7a2760@kernel.org>
-In-Reply-To: <20260402230626.3826719-1-grzegorz.nitka@intel.com>
-References: <20260402230626.3826719-1-grzegorz.nitka@intel.com>
+	s=arc-20240116; t=1775528867; c=relaxed/simple;
+	bh=xr116ENgh6GConTk+CrKHjqqli2+OmQT78h7tAHpoFo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=a9kMyyg+v9gvGbh9BYuRjH8jsuISd3ZWWlQ34k4oKzjwmRKh8Xj/ZGkYPQ9HJUXmQUN2cue+uLbSLkcmQZ0W99+aLOWDzfkBFhPnbsqp57bM080BtSmEQaUxuL+RMmktVJnTeKdl3M0Hv8XVQjBs9vzwN3S2Cg3cvF8VsVMebgM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pRlteTRF; arc=none smtp.client-ip=91.218.175.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1775528862;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=/BTSRSfR0uEztwllvIBtGt3uj4LQXe+9g40tIFFHvFA=;
+	b=pRlteTRFCngwuqCfB/JPjTWBX+W/RnoxhfZoknK1Mz5RfmhefF+5ylpwY6KKZSsIYGwvV2
+	ZPFBxVFOoExV/l0+Kisefx27Vx26fjtBxsSp4Gjie32VCqGcq2m1+3DCPMXTggiMfKqBlA
+	E9WnvR1wIxK+1jb/NZvvrzMI4xL0XoU=
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+To: bpf@vger.kernel.org
+Cc: werner@verivus.ai,
+	Jiayuan Chen <jiayuan.chen@linux.dev>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	Jiri Olsa <jolsa@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Sun Jian <sun.jian.kdev@gmail.com>,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH bpf v3 0/2] bpf: Fix SOCK_OPS_GET_SK same-register OOB read in sock_ops and add selftest
+Date: Tue,  7 Apr 2026 10:26:26 +0800
+Message-ID: <20260407022720.162151-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-275837-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.osuosl.org,redhat.com,gmail.com,lunn.ch,intel.com,microchip.com,resnulli.us,linux.dev,kernel.org,davemloft.net,google.com];
-	RCPT_COUNT_TWELVE(0.00)[19];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCPT_COUNT_TWELVE(0.00)[24];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-275838-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[verivus.ai,linux.dev,iogearbox.net,gmail.com,fomichev.me,kernel.org,davemloft.net,google.com,redhat.com,vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 216713A8FDF
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: BFC823A905C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri,  3 Apr 2026 01:06:18 +0200 Grzegorz Nitka wrote:
-> This series adds TX reference clock support for E825 devices and exposes
-> TX clock selection and synchronization status via the Linux DPLL
-> subsystem.
-> E825 hardware contains a dedicated Tx clock (TXC) domain that is
-> distinct
-> from PPS and EEC. TX reference clock selection is device=E2=80=91wide, sh=
-ared
-> across ports, and mediated by firmware as part of the link bring=E2=80=91=
-up
-> process. As a result, TX clock selection intent may differ from the
-> effective hardware configuration, and software must verify the outcome
-> after link=E2=80=91up.
-> To support this, the series introduces TXC support incrementally across
-> the DPLL core and the ice driver:
->=20
-> - add a new DPLL type (TXC) to represent transmit clock generators;
+When a BPF sock_ops program accesses ctx fields with dst_reg == src_reg,
+the SOCK_OPS_GET_SK() and SOCK_OPS_GET_FIELD() macros fail to zero the
+destination register in the !fullsock / !locked_tcp_sock path, leading to
+OOB read (GET_SK) and kernel pointer leak (GET_FIELD).
 
-I'm not grasping why this is needed, isn't it part of any EEC system
-that the DPLL can drive the TXC? Is your system going to expose multiple
-DPLLs now for one NIC?
+Patch 1: Fix both macros by adding BPF_MOV64_IMM(si->dst_reg, 0) in the
+!fullsock landing pad.
+Patch 2: Add selftests covering same-register and different-register cases
+for both GET_SK and GET_FIELD.
 
-> - relax DPLL pin registration rules for firmware=E2=80=91described shared=
- pins
->   and extend pin notifications with a source identifier;
-> - allow dynamic state control of SyncE reference pins where hardware
->   supports it;
-> - add CPI infrastructure for PHY=E2=80=91side TX clock control on E825C;
-> - introduce a TXC DPLL device and TX reference clock pins (EXT_EREF0 and
->   SYNCE) in the ice driver;
-> - extend the Restart Auto=E2=80=91Negotiation command to carry a TX refer=
-ence
->   clock index;
-> - implement hardware=E2=80=91backed TX reference clock switching, post=E2=
-=80=91link
-> - verification, and TX synchronization reporting.
->=20
-> TXCLK pins report TX reference topology only. Actual synchronization
-> success is reported via the TXC DPLL lock status, which is updated after
-> hardware verification: external Tx references report LOCKED, while the
-> internal ENET/TXCO source reports UNLOCKED.
-> This provides reliable TX reference selection and observability on E825
-> devices using standard DPLL interfaces, without conflating user intent
-> with effective hardware behavior.
+[1] https://lore.kernel.org/bpf/6fe1243e-149b-4d3b-99c7-fcc9e2f75787@std.uestc.edu.cn/T/#u
+
+Changes since v2:
+https://lore.kernel.org/bpf/20260406031330.187630-1-jiayuan.chen@linux.dev/
+- Addressed selftest review from Martin KaFai Lau: removed unused skel
+  parameter, renamed to test_ns_ for automatic netns, ASSERT_GE -> ASSERT_OK_FD
+- Add reviewed-by tags.
+
+Changes since v1:
+https://lore.kernel.org/bpf/20260404141010.247536-1-jiayuan.chen@linux.dev/
+- Fixed the same bug in SOCK_OPS_GET_FIELD() (pointed out by AI review)
+- Added SOCK_OPS_GET_FIELD same-register and GET_SK different-register
+  subtests
+
+Jiayuan Chen (2):
+  bpf: Fix same-register dst/src OOB read and pointer leak in sock_ops
+  selftests/bpf: Add tests for sock_ops ctx access with same src/dst
+    register
+
+ net/core/filter.c                             |   6 +-
+ .../bpf/prog_tests/sock_ops_get_sk.c          |  76 ++++++++++++
+ .../selftests/bpf/progs/sock_ops_get_sk.c     | 117 ++++++++++++++++++
+ 3 files changed, 197 insertions(+), 2 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/sock_ops_get_sk.c
+ create mode 100644 tools/testing/selftests/bpf/progs/sock_ops_get_sk.c
+
+-- 
+2.43.0
 
 
