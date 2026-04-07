@@ -1,64 +1,53 @@
-Return-Path: <netdev+bounces-276040-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276041-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OCkBIBUh1Wnr0wcAu9opvQ
-	(envelope-from <netdev+bounces-276040-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 17:21:57 +0200
+	id sOIuOcMg1Wnr0wcAu9opvQ
+	(envelope-from <netdev+bounces-276041-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 17:20:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05C293B0DDD
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 17:21:56 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9080C3B0D7E
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 17:20:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7F41230BE7AF
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 15:17:18 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1E9E0301FCD6
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 15:20:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CED036402C;
-	Tue,  7 Apr 2026 15:17:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D4BA364E8E;
+	Tue,  7 Apr 2026 15:20:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YgTOJOjb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IiAmks13"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39F52363C7E;
-	Tue,  7 Apr 2026 15:17:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1294136495D;
+	Tue,  7 Apr 2026 15:20:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775575037; cv=none; b=MTZmhMOMJknkCl5StHG8KW2Wre622XVtWegvOMMIt9L3JYdObV0wNj7fiXnpkRTsnKAQIHL1sGBsAJiSDIEa9FeJElgEtSDtM7mN2uGA0q+fALijMIV0uYvJjP7qxss8oE9+sVRM3pQbpqOn7wWWJxyGM0sAISgTVeDi+Jy3Ueo=
+	t=1775575227; cv=none; b=WKjOoTfIWz9IUtltAfPJJ7fqSxQ7iilmceaL331+h2FtGWpZACkjd4ER78AvUf8MQLk4jStZho37KL6rNcMKP06bWvb4Bl3nMQgcmQH+wqV/uZlPFKE8ek8Y+cix2gbdgJC6yI3dSja4Wflvc/wvFnsMXnefYnx8NDodx/1njPI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775575037; c=relaxed/simple;
-	bh=TzZy2QRNVKVyji7zJM1j5GT5yE90CNpk1xMdl92uhTk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AIlC9qQ9DMl1mg5UGRZNttyyZm9hopp0oGEAtX3npBHGF19zBGONfLrCw6c3suvb0dQ9iQsnBDJTR8qRGHJA77ZMdBMqckadk4X4YMgHbOeI3DdphayocOyzVzff5yb4qeaL5xGzzjxjgbgdPPnCVrF/Lgjbp+Wb3OiaIqVCzVM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YgTOJOjb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 658DFC19424;
-	Tue,  7 Apr 2026 15:17:16 +0000 (UTC)
+	s=arc-20240116; t=1775575227; c=relaxed/simple;
+	bh=yC1TqO1IE6Cf2sou7vpezeLWVXSDs9FIvXQhm4VF3B8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=jf3m+MAVJ0lK4w5Z/9WxQ5/7DScm11xL7iHlgOWrt1qtrA5Wq4qI6iBk+9vbwfl6Sl33RJYvbBZxsNJd/wdktPYeZLAZiqR3nDXjEoJK2jMKy44EjblLZCmQ2n6Cvaa/OZb7N/RJjqmkOXtLDv29lwoBrnwqKplSxtGaIDUzWYI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IiAmks13; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C76F3C2BC9E;
+	Tue,  7 Apr 2026 15:20:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775575036;
-	bh=TzZy2QRNVKVyji7zJM1j5GT5yE90CNpk1xMdl92uhTk=;
-	h=From:To:Cc:Subject:Date:From;
-	b=YgTOJOjbtfZsqyJGWPPN4muFLhEbq6DlZ+vR61VoyGyO3260gpe9Rsa7fLfhbdlHw
-	 XQ2DV1ZyoyR5ZOPlB3uoT0ZbuwouyoipOuvmW0KUIZ4+xrH3a6jxAILP7vJ/w/r0Oz
-	 9fYo3yIeyaW8QU+rju5XxcYdUtKRRmOvJx2ujPxoYq6MzRMT45proi6ACw2/j3bKCx
-	 knYVxc4CZ9MXjIo3xfxYo8fsyKDvMBQmV5a/CX0wqYOBTrrL8jBovu3neOEdRBhxCB
-	 uzJCkRIcKsD7U6TVHa0JX183vw7PCJVzMngEMOFEpwCn3pFKSbmVicFhpJ2gYSWi0d
-	 EHxq2pFkOQt/g==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	shuah@kernel.org,
-	petrm@nvidia.com,
-	willemb@google.com,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net-next] selftests: net: py: add test case filtering and listing
-Date: Tue,  7 Apr 2026 08:17:15 -0700
-Message-ID: <20260407151715.3800579-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.53.0
+	s=k20201202; t=1775575226;
+	bh=yC1TqO1IE6Cf2sou7vpezeLWVXSDs9FIvXQhm4VF3B8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=IiAmks139gI4xiHXHlM5LmBjzOiooKJpBsw3auRH51WIvq0daA+A/akQ9WzJCwRr2
+	 4Xju8kFyD+VWPFpziayoM8iMWXs+fJJfQrkeQ+nl5qyZoe7en1TQmbCmFeQhbUss+e
+	 UUX4Nbcijl4b2bgnLB9apRR9VkU5q8fiulMKosVoUbt2sEJGz1HoesVd5JHeFJgLId
+	 QmWwHYHqsqwhVnFNJL6+2TAWdZ0ynMzNFpiHgkWrJR1LyILuAwRIqiRIs1HvXXgbQc
+	 ZMQ/FpHJI6lcGZB1aWJmKhDk6fMryjnse6QZghOmWLT2pRZ7rfxFsYYpFVhVtg2rtE
+	 P2kXeqhfpr3RQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B9E753809A2A;
+	Tue,  7 Apr 2026 15:20:05 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,174 +55,81 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+Subject: Re: [PATCH] net/tls: fix use-after-free in -EBUSY error path of
+ tls_do_encryption
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177557520455.4033778.1596414160190743186.git-patchwork-notify@kernel.org>
+Date: Tue, 07 Apr 2026 15:20:04 +0000
+References: <20260403013617.2838875-1-ramdhan@starlabs.sg>
+In-Reply-To: <20260403013617.2838875-1-ramdhan@starlabs.sg>
+To: Muhammad Alifa Ramdhan <ramdhan@starlabs.sg>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, sd@queasysnail.net,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ john.fastabend@gmail.com, info@starlabs.sg, stable@vger.kernel.org
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,queasysnail.net,davemloft.net,google.com,redhat.com,gmail.com,starlabs.sg];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-276041-lists,netdev=lfdr.de,netdevbpf];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-276040-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FROM_NO_DN(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:email]
-X-Rspamd-Queue-Id: 05C293B0DDD
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9080C3B0D7E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-When developing new test cases and reproducing failures in
-existing ones we currently have to run the entire test which
-can take minutes to finish.
+Hello:
 
-Add command line options for test selection, modeled after
-kselftest_harness.h:
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-  -l       list tests (all or filtered)
-  -t name  include test
-  -T name  exclude test
+On Fri,  3 Apr 2026 09:36:17 +0800 you wrote:
+> The -EBUSY handling in tls_do_encryption(), introduced by commit
+> 859054147318 ("net: tls: handle backlogging of crypto requests"), has
+> a use-after-free due to double cleanup of encrypt_pending and the
+> scatterlist entry.
+> 
+> When crypto_aead_encrypt() returns -EBUSY, the request is enqueued to
+> the cryptd backlog and the async callback tls_encrypt_done() will be
+> invoked upon completion. That callback unconditionally restores the
+> scatterlist entry (sge->offset, sge->length) and decrements
+> ctx->encrypt_pending. However, if tls_encrypt_async_wait() returns an
+> error, the synchronous error path in tls_do_encryption() performs the
+> same cleanup again, double-decrementing encrypt_pending and
+> double-restoring the scatterlist.
+> 
+> [...]
 
-Since we don't have as clean separation into fixture / variant /
-test as kselftest_harness this is not really a 1 to 1 match.
-We have to lean on glob patterns instead.
+Here is the summary with links:
+  - net/tls: fix use-after-free in -EBUSY error path of tls_do_encryption
+    https://git.kernel.org/netdev/net/c/a9b8b18364ff
 
-Like in kselftest_harness filters are evaluated in order, first
-match wins. If only exclusions are specified everything else is
-included and vice versa.
-
-Glob patterns (*, ?, [) are supported in addition to exact
-matching.
-
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-Building on the support for colored output.. :)
-
-CC: shuah@kernel.org
-CC: petrm@nvidia.com
-CC: willemb@google.com
-CC: linux-kselftest@vger.kernel.org
----
- tools/testing/selftests/net/lib/py/ksft.py | 65 +++++++++++++++++++++-
- 1 file changed, 62 insertions(+), 3 deletions(-)
-
-diff --git a/tools/testing/selftests/net/lib/py/ksft.py b/tools/testing/selftests/net/lib/py/ksft.py
-index 7b8af463e35d..abde32874c17 100644
---- a/tools/testing/selftests/net/lib/py/ksft.py
-+++ b/tools/testing/selftests/net/lib/py/ksft.py
-@@ -1,6 +1,8 @@
- # SPDX-License-Identifier: GPL-2.0
- 
-+import fnmatch
- import functools
-+import getopt
- import inspect
- import os
- import signal
-@@ -32,6 +34,34 @@ KSFT_DISRUPTIVE = True
-     pass
- 
- 
-+class _KsftArgs:
-+    def __init__(self):
-+        self.list_tests = False
-+        self.filters = []
-+
-+        try:
-+            opts, _ = getopt.getopt(sys.argv[1:], 'hlt:T:')
-+        except getopt.GetoptError as e:
-+            print(e, file=sys.stderr)
-+            sys.exit(1)
-+
-+        for opt, val in opts:
-+            if opt == '-h':
-+                print(f"Usage: {sys.argv[0]} [-h|-l] [-t|-T name]\n"
-+                      f"\t-h       print help\n"
-+                      f"\t-l       list all tests\n"
-+                      f"\t-t name  include test\n"
-+                      f"\t-T name  exclude test",
-+                      file=sys.stderr)
-+                sys.exit(0)
-+            elif opt == '-l':
-+                self.list_tests = True
-+            elif opt == '-t':
-+                self.filters.append((True, val))
-+            elif opt == '-T':
-+                self.filters.append((False, val))
-+
-+
- @functools.lru_cache()
- def _ksft_supports_color():
-     if os.environ.get("NO_COLOR") is not None:
-@@ -298,8 +328,26 @@ KsftCaseFunction = namedtuple("KsftCaseFunction",
-         ksft_pr(f"Ignoring SIGTERM (cnt: {term_cnt}), already exiting...")
- 
- 
--def _ksft_generate_test_cases(cases, globs, case_pfx, args):
--    """Generate a flat list of (func, args, name) tuples"""
-+def _ksft_name_matches(name, pattern):
-+    if '*' in pattern or '?' in pattern or '[' in pattern:
-+        return fnmatch.fnmatchcase(name, pattern)
-+    return name == pattern
-+
-+
-+def _ksft_test_enabled(name, filters):
-+    has_positive = False
-+    for include, pattern in filters:
-+        has_positive |= include
-+        if _ksft_name_matches(name, pattern):
-+            return include
-+    return not has_positive
-+
-+
-+def _ksft_generate_test_cases(cases, globs, case_pfx, args, cli_args):
-+    """Generate a filtered list of (func, args, name) tuples.
-+
-+    If -l is given, prints matching test names and exits.
-+    """
- 
-     cases = cases or []
-     test_cases = []
-@@ -329,11 +377,22 @@ KsftCaseFunction = namedtuple("KsftCaseFunction",
-         else:
-             test_cases.append((func, args, func.__name__))
- 
-+    if cli_args.filters:
-+        test_cases = [tc for tc in test_cases
-+                      if _ksft_test_enabled(tc[2], cli_args.filters)]
-+
-+    if cli_args.list_tests:
-+        for _, _, name in test_cases:
-+            print(name)
-+        sys.exit(0)
-+
-     return test_cases
- 
- 
- def ksft_run(cases=None, globs=None, case_pfx=None, args=()):
--    test_cases = _ksft_generate_test_cases(cases, globs, case_pfx, args)
-+    cli_args = _KsftArgs()
-+    test_cases = _ksft_generate_test_cases(cases, globs, case_pfx, args,
-+                                           cli_args)
- 
-     global term_cnt
-     term_cnt = 0
+You are awesome, thank you!
 -- 
-2.53.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
