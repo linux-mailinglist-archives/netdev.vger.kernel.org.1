@@ -1,162 +1,148 @@
-Return-Path: <netdev+bounces-276706-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276707-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wP/6Oh7D1mlDIAgAu9opvQ
-	(envelope-from <netdev+bounces-276706-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 23:05:34 +0200
+	id YDnRK57D1mlDIAgAu9opvQ
+	(envelope-from <netdev+bounces-276707-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 23:07:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6767D3C3F2F
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 23:05:34 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AE7A3C3F7B
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 23:07:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0BC753006F39
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 21:05:33 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id CFF783014C6E
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 21:07:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78321379988;
-	Wed,  8 Apr 2026 21:05:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A062337996C;
+	Wed,  8 Apr 2026 21:07:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yaina.de header.i=@yaina.de header.b="N2j4UfeW"
+	dkim=temperror (0-bit key) header.d=szelinsky.de header.i=@szelinsky.de header.b="cnF0c+Zp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.yaina.de (yaina.de [95.216.117.176])
+Received: from szelinsky.de (szelinsky.de [85.214.127.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C2462F7478;
-	Wed,  8 Apr 2026 21:05:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.216.117.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08A29339B3D;
+	Wed,  8 Apr 2026 21:07:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.127.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775682330; cv=none; b=C+1x46jkfZLJp4gzRDSgQ82QD8pDOrxbVJ63v+P16/V9QsrDDDBV0ol71svy3B3PWBaPONjGIvnRD1ADYviJAA2YiQFC5dp3dnuzbQN4oHqDOpSqRZl2Hdc7QO0Q6Q4gw/KjIuGNBRxD9UikuaFF4SdhtmbK/EzbKqRU67KELGA=
+	t=1775682457; cv=none; b=JRX5QzcGOKuqZbUweBik+QevBTtW0LeZNJKn1ULA9aMJvTH1CfZ6C2BvIJB0DbOJfrFnERvGtryoRbnIIbAM/bVAtfu6l0iF8HEJ+1vW/316c70OVj0YjBrXcID3cTEhaFVhro1rAFlmC/b9fND0wHKSAfvt7qctITAdST/gfM0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775682330; c=relaxed/simple;
-	bh=4WCg/ETMuwIk9WQula/mVorQiRkH0nGmB+WjIV8Frq0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lVNq3Z/lQKBVfZmNOCkEehcQ6hoX6IJDEf+uIPcnyEdR00k5y24Chw33qDPbuLya/goM7l/9J7bss1eopaWTgo96VL/SNNR+7kGKjHGGy0vOOJsg+xHJeXSIdQhWE2ANOpPgPR0Z9msCocqyO+qtW2GHhwUQILf8BpQnBd7N+rs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yaina.de; spf=pass smtp.mailfrom=yaina.de; dkim=pass (1024-bit key) header.d=yaina.de header.i=@yaina.de header.b=N2j4UfeW; arc=none smtp.client-ip=95.216.117.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yaina.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yaina.de
-Received: from lycaon.yaina.de (ip1f118239.dynamic.kabel-deutschland.de [31.17.130.57])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature ECDSA (prime256v1) server-digest SHA256
-	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
-	(Client CN "lykos.yaina.de", Issuer "CAcert Class 3 Root" (not verified))
-	by mail.yaina.de (Postfix) with ESMTPSA id B93077CDEF0A;
-	Wed, 08 Apr 2026 23:05:25 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yaina.de; s=mail;
-	t=1775682325;
+	s=arc-20240116; t=1775682457; c=relaxed/simple;
+	bh=p375EVvCBiVMUT283BZgLjGqOXk2ZUOC0JJGv9cIjzY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=KdCSXSsh+LMQooEuohnwE+hmng16n9hfCtIx/28fVdeCcUO4fur36227GIrkqjj+ggBKQ41tJvk8fFgyOTwvPPuAOwPiGvvVibkcSPk8nrcajrLogHwfJrc8TzNmKDvejWyT9J1A3pYhVjDNpET+JE3vJmy0z1YY0zIaYG2hRyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szelinsky.de; spf=pass smtp.mailfrom=szelinsky.de; dkim=temperror (0-bit key) header.d=szelinsky.de header.i=@szelinsky.de header.b=cnF0c+Zp; arc=none smtp.client-ip=85.214.127.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szelinsky.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=szelinsky.de
+Received: from localhost (localhost [127.0.0.1])
+	by szelinsky.de (Postfix) with ESMTP id 395B4E83FB8;
+	Wed,  8 Apr 2026 23:07:27 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=szelinsky.de;
+	s=mail; t=1775682447;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=zefjOB7yqJPmfzvG2WtGAjKoz/HAkvcpX+jjgaaV4RU=;
-	b=N2j4UfeWLTPuDjzJ0Ast94dRIX58RHKQztp4F0AEB568mqMKrENfFaTIe8PRMEDRjnXZR3
-	1999n2CU3eJwts/SpHjuwq3G/UQ+c3bocrtMMoDCWQMJgkmzULPfGr2CWIqdRxZnlyj+a0
-	/ZI0aXs7ItI1pYjmTla/LK27WrZQ95U=
-Received: by lycaon.yaina.de (Postfix, from userid 500)
-	id 0DF82300E49; Wed, 08 Apr 2026 23:05:25 +0200 (CEST)
-Date: Wed, 8 Apr 2026 23:05:25 +0200
-From: Joerg Reuter <jreuter@yaina.de>
-To: Mashiro Chen <mashiro.chen@mailbox.org>
-Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	linux-hams@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH net 1/2] net: hamradio: bpqether: validate frame length
- in bpq_rcv()
-Message-ID: <adbDFVlrqnldyBXz@yaina.de>
-References: <20260408172358.281186-1-mashiro.chen@mailbox.org>
- <20260408172358.281186-2-mashiro.chen@mailbox.org>
+	bh=DBFooOrPqy11+ivnIBAcisekxyJXWHOaheUWIkk4FJg=;
+	b=cnF0c+ZpMyFvch7j9UCkHoKMdYamOhwyWFfV53jB1jwKQWSJdUPctOFaPObFrDCGfbzUud
+	PL6LghneoLMCHlim2cy8pOE4HF3Dt/0MS2cQ6ZyF3IdBHA4DVoTS+hch9NYH+AkkEM2N6Y
+	1R6xLIJSM3ZXhJfhlRyNefWLS7uJDiluZ0/fjfcyh6VlNaxY5FgrH3sYxzSxpm+s5IUzaL
+	Et609d8oJMGI6xgfLpuPvoRvq3a5Iv+jnZ+qeFBhWzuvIguvISbw6iHeDc8eEXG/9zHesG
+	0Qf9tLIHc/OufcHPOjyOK0GWBKCi0ojr0e/V11nkjxN7lGzG0PW5uU6Kyar/eA==
+X-Virus-Scanned: Debian amavisd-new at szelinsky.de
+Received: from szelinsky.de ([127.0.0.1])
+	by localhost (szelinsky.de [127.0.0.1]) (amavisd-new, port 10025)
+	with ESMTP id iHDJ7hKURNct; Wed,  8 Apr 2026 23:07:27 +0200 (CEST)
+Received: from p14sgen5.fritz.box (dslb-002-205-089-102.002.205.pools.vodafone-ip.de [2.205.89.102])
+	by szelinsky.de (Postfix) with ESMTPSA;
+	Wed,  8 Apr 2026 23:07:26 +0200 (CEST)
+From: Carlo Szelinsky <github@szelinsky.de>
+To: andrew@lunn.ch
+Cc: o.rempel@pengutronix.de,
+	kory.maincent@bootlin.com,
+	andrew+netdev@lunn.ch,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	kuba@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 3/3] net: mdio: treat PSE EPROBE_DEFER as non-fatal during PHY registration
+Date: Wed,  8 Apr 2026 23:07:11 +0200
+Message-ID: <20260408210711.439068-1-github@szelinsky.de>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <8e12f0ac-be0d-4664-a533-df3bd1efb34a@lunn.ch>
+References: <8e12f0ac-be0d-4664-a533-df3bd1efb34a@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260408172358.281186-2-mashiro.chen@mailbox.org>
-X-Face: #DGJ)DCeau/h"w7G~n9r|/jxvQQrtU)nat27v-><7':==-=.mfnXc+8&qOj`*R|qPr14[|4
- E_BUo5T*NT\(+fE7wr3}QoN*!c7\.Z.DiA{ko;01^TCi$K}1TIV|bNO.$jm;i<A,|
-X-Spamd-Result: default: False [-0.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[yaina.de:s=mail];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[szelinsky.de,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[szelinsky.de:s=mail];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[yaina.de:+];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-276706-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[pengutronix.de,bootlin.com,lunn.ch,gmail.com,armlinux.org.uk,kernel.org,davemloft.net,google.com,redhat.com,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[yaina.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-276707-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[szelinsky.de:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jreuter@yaina.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[github@szelinsky.de,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	NEURAL_HAM(-0.00)[-0.997];
+	TO_DN_NONE(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,yaina.de:dkim,yaina.de:mid,yaina.de:email,yaina.de:url,mailbox.org:email]
-X-Rspamd-Queue-Id: 6767D3C3F2F
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,szelinsky.de:dkim,szelinsky.de:mid]
+X-Rspamd-Queue-Id: 2AE7A3C3F7B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Am Thu, Apr 09, 2026 at 01:23:57AM +0800 schrieb Mashiro Chen:
-> The BPQ length field is decoded as:
-> 
->   len = skb->data[0] + skb->data[1] * 256 - 5;
-> 
-> If the sender sets bytes [0..1] to values whose combined value is
-> less than 5, len becomes negative.  Passing a negative int to
-> skb_trim() silently converts to a huge unsigned value, causing the
-> function to be a no-op.  The frame is then passed up to AX.25 with
-> its original (untrimmed) payload, delivering garbage beyond the
-> declared frame boundary.
+So I went ahead and tested the phy_probe() approach on my setup (RTL930x
+DSA switch with an I2C Hasivo HS104 PSE controller as module).
 
-I don't even know why there is a length field in the first place, and John
-G8BPQ doesn't seem to remember either. 
+PoE itself works fine, but phydev->psec never gets set - ethtool just
+says "No PSE is attached" on all ports.
 
-There is nothing supposed to come after the payload, and there should be no
-need to skb_trim() at all. 
+Took me a while to figure out what's going on. The problem is how DSA
+handles PHYs: when phy_probe() returns -EPROBE_DEFER because the PSE
+controller hasn't probed yet, the PHY device is registered but sits
+there unprobed. Then the DSA switch comes along, sets up its ports, and
+phy_attach_direct() force-binds the generic PHY driver with
+device_bind_driver(). Now the device already has a driver, so when the
+deferred probe retry kicks in it just skips it. phy_probe() never runs
+again and psec stays NULL.
 
-However, since an obviously wrong length field indicates that something is
-indeed wrong with that frame, I'm in favor of dropping those frames.
+What I'm seeing timing-wise:
+  - MDIO scan registers PHYs, phy_probe() defers (no PSE yet)
+  - DSA probes, phy_attach_direct() binds genphy
+  - t=17s: HS104 finally probes
+  - deferred retry: nope, driver already bound
+  - t=35s: regulator_late_cleanup (caught by admin_state_synced)
 
-Acked-by: Joerg Reuter <jreuter@yaina.de>
+Not sure what the best path forward is here. Should we look at fixing
+phy_attach_direct() to handle this case, or go back to the non-fatal
+EPROBE_DEFER approach from v2 for now?
 
-> Cc: stable@vger.kernel.org
-> Cc: linux-hams@vger.kernel.org
-> Signed-off-by: Mashiro Chen <mashiro.chen@mailbox.org>
-> ---
->  drivers/net/hamradio/bpqether.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/drivers/net/hamradio/bpqether.c b/drivers/net/hamradio/bpqether.c
-> index 045c5177262eaf..214fd1f819a1bb 100644
-> --- a/drivers/net/hamradio/bpqether.c
-> +++ b/drivers/net/hamradio/bpqether.c
-> @@ -187,6 +187,9 @@ static int bpq_rcv(struct sk_buff *skb, struct net_device *dev, struct packet_ty
->  
->  	len = skb->data[0] + skb->data[1] * 256 - 5;
->  
-> +	if (len < 0 || len > skb->len - 2)
-> +		goto drop_unlock;
-> +
->  	skb_pull(skb, 2);	/* Remove the length bytes */
->  	skb_trim(skb, len);	/* Set the length of the data */
->  
-> -- 
-> 2.53.0
-> 
-
--- 
-Joerg Reuter                                    http://yaina.de/jreuter
-And I make my way to where the warm scent of soil fills the evening air. 
-Everything is waiting quietly out there....                 (Anne Clark)
+Cheers,
+Carlo
 
