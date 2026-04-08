@@ -1,83 +1,83 @@
-Return-Path: <netdev+bounces-276315-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276316-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KJcaMEAA1mk7AAgAu9opvQ
-	(envelope-from <netdev+bounces-276315-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 09:14:08 +0200
+	id cI2FLB//1Wn4/gcAu9opvQ
+	(envelope-from <netdev+bounces-276316-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 09:09:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 378123B7FC4
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 09:14:07 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31DD43B7E7C
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 09:09:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A00DE30416DD
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 07:09:02 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D7159300B997
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 07:09:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A5DF37700F;
-	Wed,  8 Apr 2026 07:09:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63744377015;
+	Wed,  8 Apr 2026 07:09:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EJ8w5ImT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q/gp3Rac"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4040B371CF5
-	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 07:08:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50E50376483
+	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 07:09:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775632141; cv=none; b=UXzhBXW294abFExHztpZ9OinZomdgL8bil4TTPr+h4qbBpMsaHn78j5b0BZtEQK/4r7CF5bURV3zIuKy0C8fJq3DFMZ7n06uiszAn3BBN6mPJt45dI8N3bAclPpQH5ax+VV6XKA/WxyJYSuHUg3xbuSKCmud/E4zPexMFcc9pNw=
+	t=1775632146; cv=none; b=pJ4amI9Uxs5Q5rIUDcrpmaik6cxELjZGYzljJct6HYth5n8mXiEMsQwoPGkUFuugjw2uF1iADDHTdBz8qSVWup/0s+2hzIN0XEo4FucNIqFzjxgA4f+rgE81ksAd11qsGfL+e+a+kGk5rgSOXgaXcYzcy3vtZ0prx9CTK9aN0Yk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775632141; c=relaxed/simple;
-	bh=feFw6IVXve1DpkDo+M0LX1fTZEw1YMZ6SfqXev0Btu4=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=lLdTcXkauXSvevOtv4yK6vihOdIQEA28W3LxKmnycaIBM48Yj+wHvXILgwv4MStogwsvXy5Z4la67AXF4cIRIhRmcvOhHenG2iF46LpUFtNDFA/yUbFBC3hRQucq9IrbHxW2C4+YXjsyoULKi4ObCUy/8ObiLGEXZLdUCY6ajrk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EJ8w5ImT; arc=none smtp.client-ip=209.85.214.173
+	s=arc-20240116; t=1775632146; c=relaxed/simple;
+	bh=VWRVAtFJu4VciOy0IrY8WqRDMCzC0pdtaBc6B4XdvM8=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=g7V6u1F1Ox5OgcyHZRG8YEjvx/+P4Q7e95tuDEgq1PosDRupzvCUDAeVJS+encxT033QOew7/bKJzlWxlL1PHJ+qfOm2yqSbLX0h0mDiLxRkNIVv9p3KPl2V+7SlUDJVBmjtA46K0anAqqNn8S2HcCuu30AA4KLHz/0Yvo9zoy0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=q/gp3Rac; arc=none smtp.client-ip=209.85.214.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2b258576d8cso37117325ad.0
-        for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 00:08:59 -0700 (PDT)
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2b24fdac394so57671665ad.3
+        for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 00:09:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775632139; x=1776236939; darn=vger.kernel.org;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=sHpHGFAFr6N1nLJ0rv6fDETZjOTMbNtpx03EFXi5Mtw=;
-        b=EJ8w5ImTygiOqh+5M70ntHc2uTUyRikWRvfv0W+gYEX1EBe7vQ7XkUmUz4oAPGJm9B
-         ryao50xXAdjvUrSvP6AUTHlduPRYpY0+AloXOgFfztO27QbOg7waj4ydAQlxDGWE8Txb
-         JSsT8nF+Rm1GQQ+P0Pf66B64b1Vm6VzVL/nnGthoTEWzskNWDtnII47rQIF1OQ+H80L3
-         eJvmiAybswdOx0kM3bY8mNGlj0yJh2fq4xox8aGDO6Agdv2mkm1nexRyBcUw5gwBiQN+
-         EK8B7bW2QHpYs9eIdITtZS7KxSiycdPssZCoFgU2rZBt6TgTjpmbaiNujpaE2ZNJy2Gs
-         /KBA==
+        d=gmail.com; s=20251104; t=1775632143; x=1776236943; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=I0UuIfmemJrB2tpt/LluMWQs7qTsCKBTwZAZqA177Vg=;
+        b=q/gp3RacFQdEo/v+ctzr3SscfVFxtLtCtVyHH9l1KeDpP8yOY43B0MZY4J6XrM1LGj
+         JAz1BSCcS94b+u1agjtnMTykCbwRmpfgwiC5vz10y+52R6pxPhxUMVT0Bn5nYABf10Ch
+         8NhTQNHzC3VFKOMpm+C6tvmxRkWYM0xcSdGTqtzbrjiVBERqcTD46xaV7c841A7Lkdl8
+         WOGPTSaSXcDwnFvIAokIGDHgBm2jgHADxbg5JCRn0Mdk3VyVQYC3BLrvGtq+1rUjwMky
+         r6/34Obe6nhf1oNpuD2cvne4oPS3fSsfUPN6fKA2o9q+XwCzjGQXPbVS3P95BlCuQxSM
+         JIwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775632139; x=1776236939;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sHpHGFAFr6N1nLJ0rv6fDETZjOTMbNtpx03EFXi5Mtw=;
-        b=RI0HaXTT7oxaSPR4w2wAqJngbOi7bhiItscguU1ZSsMwC66FeQ1AHr56xhrLS4pnir
-         LPSRBYOoMN7j2k4e9VThUJ00KLdqpqBZ7abXBFImvJAMhJLXzOzoHtL6mpvI4t8ycx0f
-         dW/b3HzE3xLXvRPZb/3e8lEr4P4qI7HOKKty91P73magICsGNyWVGdEQsf1rAwcVcWGZ
-         0pXZd3Liot3DIB4aniswx5BLrKUzFHnW6sX7q+2WhgBfRCyTMqnwUNLyZOe+qpRe18vi
-         pbTPsyX+l02Q9aT9Q7aAZ/w4tAfhlfGMKVhLKvHn6EHCX82hZNeNWsqAHBlotq0jI69b
-         Fv1w==
-X-Gm-Message-State: AOJu0Yxb7F4SAkEfFmFuuTAp0rkrCYcALiOINocq4s9LaApK11cNq7WO
-	PrYQAZuD06IhoiMsEPi5d4gRAUcmGkIkzWI+STpfV3xJq/os0btYU2EJ
-X-Gm-Gg: AeBDiesgJ2hyMpsVk3BcFxHH7sSHOgp2EIiThFT6qllizhQtVImgJ1CGOQK/u9IDQZT
-	6p7thhEIh6+M/lAB1YS0orpIpVJOWIzWAWpEhF2/X0FmKN958mCuj90EUrRu5LraKXe1fWfyxew
-	NUnBiMKRDJfvfE42Uh5qe7k88mu6NVZG33wL/aT08oNXizkgXsJ+WNhtRVDBdX0R3MKrf5580ZH
-	Oihp27W6gl9Ykpba0w0YfP/KHc9B5Xhvyl2RRjCHxBnaeggJlvnvMEXH0Wtp5mW6+7UGQcjq+Pv
-	tfZCJp9TFRFGXOY4ACUmvEHvJjkTXd75SNYV7kWs/cHkRWBCnyMKcq3Ka+xyDauW0zgmwUNTqCe
-	R5Y8o3vMYlRwaqG3RhmDrTzMDeCvOX2PFIPraJVJlhdFzFW6m/1CBJlkb5/JQ4YrycjAyp1qnow
-	plUWTV0ZiZUPGIr40a+HiGa6cEii6/mABvlgu2tYeLclwsjgqn
-X-Received: by 2002:a17:902:ef4f:b0:2b0:663f:6b53 with SMTP id d9443c01a7336-2b28180e4cfmr197581305ad.13.1775632138533;
-        Wed, 08 Apr 2026 00:08:58 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1775632143; x=1776236943;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=I0UuIfmemJrB2tpt/LluMWQs7qTsCKBTwZAZqA177Vg=;
+        b=iBunv/0HyNCxc0I0VXMkCDznXQ8GG/sW/Yyopxpxwmg9RvoDSpGkYL7UXxYrJW3sWX
+         XZA7SsD5JyPXpXqujZakm9XKFwLKkRuVbrllYo0OQN3bTrsZmhKqDac/UtMe2PK1/r8J
+         Hr4PgTZc9rTPoyyf9b3O5/nKDio8PTsdB8wWUQCA7ujSIguQBBO7beRNJeA8Q/iQTRGW
+         QkBvybB87rF5HD+55AvokxTGiebROJ3/RbzM2/Aici0zpgIQ00fM3glYbKkGkomYk6iA
+         p0L2rRW4wDLvu/YO1ybot8+zioXFVscci8NU3YsXqaydjqlnbRsr62UBi/CExI6Bgrvl
+         d0pA==
+X-Gm-Message-State: AOJu0YxGItfyFK44N/pTQE3uIAHZToHCA2GgPbSz8ypSE5DG7XfsIPhr
+	P7jbimdJnXyc2YXWTQCtXSc2Gx6ZL1yzTqCfjgCBA6qy8qAZe/vaIGRU
+X-Gm-Gg: AeBDievlJ3C0YQX3LYTYYwaOIS5L6rkNY0QT90bd9O8Gtc8gVfOalF/pFZbfLcVnUSq
+	hhoAJ9GfcNyN5RdCb9RlE6lrCw0AtcjSm98IZB5g2TLIGX7Sp2526EpAUylMwfEmAFpROUYrOFe
+	uINLAH/hd+zVoK+VSGf2L8ybyXwqgAxmEJYq87MhwmR8poZ4g+KSJHfBGH9YEoLEnzUPWf8/IPC
+	tQOzGH4yNOvC8FZ0M0ZKyOn6CyNa5hKMfejqREx4wz1uZUqKYfl6LaByy8WZvVagAN2VZe6hOyz
+	umNCdNRm4lSblpKhEHpEkxi7kSH1RnY8afN40fGvy3Wl9oTrzzT6TwRwmA8C70Vv8VVvFrRp4Dt
+	HsxaCyGJdYud2FXWh5XBLUzhoo2J05QNFTFlLS/m5DMwJg5iUCL0nFFjgn/rW3j+SuRfnnURTZv
+	HR5+SohSBE6yqNFS5ZJZRTtY3QA9cEfzn8j9Z/blhocEphbEgo
+X-Received: by 2002:a17:902:ef12:b0:2b2:4bf9:1766 with SMTP id d9443c01a7336-2b2817c061fmr220093605ad.33.1775632143494;
+        Wed, 08 Apr 2026 00:09:03 -0700 (PDT)
 Received: from 1.0.0.127.in-addr.arpa ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b2749b66aasm202917785ad.68.2026.04.08.00.08.53
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b2749b66aasm202917785ad.68.2026.04.08.00.08.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Apr 2026 00:08:57 -0700 (PDT)
+        Wed, 08 Apr 2026 00:09:02 -0700 (PDT)
 From: Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCH net-next v2 0/5] ynl/ethtool/netlink: fix nla_len overflow
- for large string sets
-Date: Wed, 08 Apr 2026 15:08:48 +0800
-Message-Id: <20260408-b4-ynl_ethtool-v2-0-7623a5e8f70b@gmail.com>
+Date: Wed, 08 Apr 2026 15:08:49 +0800
+Subject: [PATCH net-next v2 1/5] tools: ynl: move ethtool.py to selftest
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,11 +86,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/12NQQqDMBBFryKz7hQdtdqueo8iJSYTDWhSkiCKe
- PcGu+vy8fjv7xDYGw7wyHbwvJhgnE1AlwzkKOzAaFRioJxueUkV9hVudnpzHKNzE+q2kaoiXTc
- kIY0+nrVZz+ALLEe0vEbokhlNiM5v59NSnP4XLYv/6FJgjkoJEve+rpVun8MszHSVbobuOI4vr
- Y8XvbYAAAA=
-X-Change-ID: 20260324-b4-ynl_ethtool-f87cd42f572c
+Message-Id: <20260408-b4-ynl_ethtool-v2-1-7623a5e8f70b@gmail.com>
+References: <20260408-b4-ynl_ethtool-v2-0-7623a5e8f70b@gmail.com>
+In-Reply-To: <20260408-b4-ynl_ethtool-v2-0-7623a5e8f70b@gmail.com>
 To: Donald Hunter <donald.hunter@gmail.com>, 
  Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
  Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
@@ -103,12 +101,12 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-276315-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-276316-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FREEMAIL_TO(0.00)[gmail.com,kernel.org,davemloft.net,google.com,redhat.com,lunn.ch];
 	TO_DN_SOME(0.00)[];
@@ -116,74 +114,80 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[liuhangbin@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.996];
+	NEURAL_HAM(-0.00)[-0.997];
 	RCPT_COUNT_SEVEN(0.00)[10];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ethtool.py:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 378123B7FC4
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 31DD43B7E7C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This series addresses a silent data corruption issue triggered when ynl
-retrieves string sets from NICs with a large number of statistics entries
-(e.g. mlx5_core with thousands of ETH_SS_STATS strings).
+We have converted all the samples to selftests. This script is
+the last piece of random "PoC" code we still have lying around.
+Let's move it to tests.
 
-The root cause is that struct nlattr.nla_len is a __u16 (max 65535
-bytes). When a NIC exports enough statistics strings, the
-ETHTOOL_A_STRINGSET_STRINGS nest built by strset_fill_set() exceeds
-this limit. nla_nest_end() silently truncates the length on assignment,
-producing a corrupted netlink message.
-
-Patch 1 moves ethtool.py to selftest.
-
-Patch 2 improves the ethtool tool: rename the doit/dumpit helpers
-to do_set/do_get and convert do_get to use ynl.do() with an
-explicit device header instead of a full dump with client-side filtering.
-
-Patch 3 adds a --dbg-small-recv option to the YNL ethtool tool,
-matching the same option already present in cli.py, to help debug netlink
-message size issues
-
-Patch 4 adds a new helper nla_nest_end_safe() to check whether the nla_len
-is overflow and return -EMSGSIZE early if so.
-
-Patch 5 uses the new helper in ethtool to make sure the ethtool doesn't
-reply a corrupted netlink message.
-
+Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 ---
-Changes in v2:
-- move ethtool.py to selftest (Jakub Kicinski)
-- add a new helper nla_nest_end_safe (Jakub Kicinski)
-- Link to v1: https://lore.kernel.org/r/20260331-b4-ynl_ethtool-v1-0-dda2a9b55df8@gmail.com
+ tools/net/ynl/tests/Makefile              | 5 ++++-
+ tools/net/ynl/{pyynl => tests}/ethtool.py | 2 +-
+ tools/net/ynl/tests/test_ynl_ethtool.sh   | 2 +-
+ 3 files changed, 6 insertions(+), 3 deletions(-)
 
----
-Hangbin Liu (5):
-      tools: ynl: move ethtool.py to selftest
-      tools: ynl: ethtool: use doit instead of dumpit for per-device GET
-      tools: ynl: ethtool: add --dbg-small-recv option
-      netlink: add a nla_nest_end_safe() helper
-      ethtool: strset: check nla_len overflow
+diff --git a/tools/net/ynl/tests/Makefile b/tools/net/ynl/tests/Makefile
+index 2a02958c7039..94bf0346b54d 100644
+--- a/tools/net/ynl/tests/Makefile
++++ b/tools/net/ynl/tests/Makefile
+@@ -36,7 +36,10 @@ TEST_GEN_FILES := \
+ 	rt-route \
+ # end of TEST_GEN_FILES
+ 
+-TEST_FILES := ynl_nsim_lib.sh
++TEST_FILES := \
++	ethtool.py \
++	ynl_nsim_lib.sh \
++# end of TEST_FILES
+ 
+ CFLAGS_netdev:=$(CFLAGS_netdev) $(CFLAGS_rt-link)
+ CFLAGS_ovs:=$(CFLAGS_ovs_datapath)
+diff --git a/tools/net/ynl/pyynl/ethtool.py b/tools/net/ynl/tests/ethtool.py
+similarity index 99%
+rename from tools/net/ynl/pyynl/ethtool.py
+rename to tools/net/ynl/tests/ethtool.py
+index f1a2a2a89985..6eeeb867edcf 100755
+--- a/tools/net/ynl/pyynl/ethtool.py
++++ b/tools/net/ynl/tests/ethtool.py
+@@ -14,7 +14,7 @@ import re
+ import os
+ 
+ # pylint: disable=no-name-in-module,wrong-import-position
+-sys.path.append(pathlib.Path(__file__).resolve().parent.as_posix())
++sys.path.append(pathlib.Path(__file__).resolve().parent.parent.joinpath('pyynl').as_posix())
+ # pylint: disable=import-error
+ from cli import schema_dir, spec_dir
+ from lib import YnlFamily
+diff --git a/tools/net/ynl/tests/test_ynl_ethtool.sh b/tools/net/ynl/tests/test_ynl_ethtool.sh
+index b826269017f4..b4480e9be7b7 100755
+--- a/tools/net/ynl/tests/test_ynl_ethtool.sh
++++ b/tools/net/ynl/tests/test_ynl_ethtool.sh
+@@ -8,7 +8,7 @@ KSELFTEST_KTAP_HELPERS="$(dirname "$(realpath "$0")")/../../../testing/selftests
+ source "$KSELFTEST_KTAP_HELPERS"
+ 
+ # Default ynl-ethtool path for direct execution, can be overridden by make install
+-ynl_ethtool="../pyynl/ethtool.py"
++ynl_ethtool="./ethtool.py"
+ 
+ readonly NSIM_ID="1337"
+ readonly NSIM_DEV_NAME="nsim${NSIM_ID}"
 
- include/net/netlink.h                     | 19 ++++++++
- net/ethtool/strset.c                      |  3 +-
- tools/net/ynl/tests/Makefile              |  5 +-
- tools/net/ynl/{pyynl => tests}/ethtool.py | 79 ++++++++++++++++---------------
- tools/net/ynl/tests/test_ynl_ethtool.sh   |  2 +-
- 5 files changed, 68 insertions(+), 40 deletions(-)
----
-base-commit: e65d8b6f3092398efd7c74e722cb7a516d9a0d6d
-change-id: 20260324-b4-ynl_ethtool-f87cd42f572c
-
-Best regards,
 -- 
-Hangbin Liu <liuhangbin@gmail.com>
+Git-155)
 
 
