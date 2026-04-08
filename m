@@ -1,182 +1,196 @@
-Return-Path: <netdev+bounces-276514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276515-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wHlMOPVQ1mm8DQgAu9opvQ
-	(envelope-from <netdev+bounces-276514-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 14:58:29 +0200
+	id aA4fH8ZR1mm8DQgAu9opvQ
+	(envelope-from <netdev+bounces-276515-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 15:01:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4ABE63BC7C3
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 14:58:29 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2D6C3BC876
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 15:01:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 89C1930053E4
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 12:54:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A7E2430469A8
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 12:56:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA4593AE6F4;
-	Wed,  8 Apr 2026 12:54:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 739423C4540;
+	Wed,  8 Apr 2026 12:56:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="b7svNVQA"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pwsc40hJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F84E2EC0A4
-	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 12:54:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02A1718A6A7
+	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 12:56:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775652862; cv=none; b=rD1BXVzb63S+dNwr93LgUB4/5/Smpz1GHOCkDV/w8rrq9xloAg4fkdvkP/zMmSZsiy0n60TpBruM5WBbUgkzx6MQvEsJRr1kToYYz7nDkhuA0JoDrDuXMqzTFH/9Z9AN7lbml4fl9srIXycMtUgs4IbGQXF2erpQn8ORSCQ+uKM=
+	t=1775652976; cv=none; b=tydJ+W3Cdf7nEB+d5h8Xpvgp7NtMwX5qp4psTVHTv2INFV2+S7Q/RWRgZMO0n2qQf1USBW6EndvZEtbI2ZbsgLp16yIGxJ9+7f/0zvyRMSPTxxPsF2EQmKqJorg1Iv4DcjbEWX6snZrV6HsRyxLe0sc8xn2T3xxmuN5SzwqGF/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775652862; c=relaxed/simple;
-	bh=YV/Yor/rq2jIgRl3HRiIG9WvBjXmctxJ8UEBfcCNCaM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tZ/8PJZvR+DaH+fLh9Y40LmJhxzcdZ6zODyUyNLYDzpLlDN/870gumjRne+Gt5eRz6h6dqnmR34Jf41nYJOqjNDCliXHCe7OWb91PoglGD5kq/wonzoodwhxLiqLVIDabs2YKCY5dNlP7uBUJ/uuR2wUrhj7KtpqD+2Datyo2B8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=b7svNVQA; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-48897fd88ebso48767445e9.2
-        for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 05:54:21 -0700 (PDT)
+	s=arc-20240116; t=1775652976; c=relaxed/simple;
+	bh=OkOs324D5UFGeJx9j0kaz1JeVe0CAsi1sQn3snBHMQ4=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=exym/tb6xD4SAt63+2lWm9Ecvf4xDrBesx8db2foMScDwq4T37IvCLds88Tyj3NAVDMJTdTeWe+slkm4XW0/OPwvQCzD0KmY0CXZxlOBWyMvGSK8F3WM4gRnN+Q/IsSwOO3KnSZU/kShJHbVFCxdep0BxaAe0tyHzOZb4fyJIic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pwsc40hJ; arc=none smtp.client-ip=209.85.160.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-50d8ed08aa4so103053181cf.3
+        for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 05:56:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1775652860; x=1776257660; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YV/Yor/rq2jIgRl3HRiIG9WvBjXmctxJ8UEBfcCNCaM=;
-        b=b7svNVQAuH0I2MF2lnlZ95vqA7m/5C8MX5WZ+sNkxMZRDbXArwiGJSm6zfoop/4h5a
-         5qxf2RzlBEWViY3DZS+X7arzhkn3JfCqCz1twVe9JHmIUFzXc8NjKiEeh+UQkvgT39Ji
-         XTUeASxiGFcmPUxwtVVYHpt4uZzW0Cpf929O6eFkr/Plhh3qmP17whqdXuZi938dcyI0
-         qnl/AanbWt0MhxkJRM2hmqRYBIx1K8bYxpngCbtQUja0XYfbYbf9Hl/DZX8x3ACyHRR3
-         bdP/YHMI/nrLKxsTBnOYQnlUuoXx8JvMhHBg1MSmcJI5LM/kFbxycfIP7EI4/vmiz5li
-         Z2eA==
+        d=google.com; s=20251104; t=1775652974; x=1776257774; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=X3HRUBvBx+t3OSy4POcT0Q2jtaq5wPw/+bi/QpUoUKc=;
+        b=pwsc40hJK8QxmOI5YQJU4b5tCHMI0RYu9j6qCMANZc1+Of02O1d3Jsb2h86hNVdaaD
+         tz/t2WT9U1hFvPjiK1CSb3OAaiEBPLxEyBaGHST+B8aLJFYXe3kCtTJA+SGB1gxwlExN
+         2P6eva4nsI9GV2EOBGZyJ4v3OJQXOTgbW74fLeNhMXr8ic5ttjqcxdYnIVvdHciWjHrC
+         I5PXDr+CSDO1toakzYfNoVEMCEBCiOgqpzbVmTL1q4K4X7kygHN2/aEH1jbEciqllrHr
+         YLCc8C98MrNQa32l/sJpyh1y8JlVjpPsRqaeue8CYqFFPYD9ZCguoNhgAmJjQasTdNKn
+         q7jQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775652860; x=1776257660;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YV/Yor/rq2jIgRl3HRiIG9WvBjXmctxJ8UEBfcCNCaM=;
-        b=p1Ys1fgYcT9yfrQDFtD9HNxIrwaCpxYUfyAXCn7cNXaldkyAToqL9Y0FGQNPl41icc
-         3unfaMZzcQrxtyEDEa1S/NRUZhf8Jza6xpdDTJxYKL+MQDraW0W8nY7Vn89gySEPkay/
-         A44gvTWb+exNubJKAc50uB9gewgqsttcQnqUAVlIa9UPvCB1Tl7LbwyMkY5BpZC+IUQM
-         I9ItHLO9RdsmXQykL3+LMZOll4Yop/EXKZt+LyL5ks08HXOF/QMtGrqa/3F+WppCSOEK
-         tyMsmicrvSJYSYPFjU8jMw+v3XQVJAiqsmSXxgjjvjJ3btiKs94xbGcinQe+/uRLx6r+
-         PRtQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX9xhW/NFAYEmQ2ryuzgASD3MaJZvQPWJyGHIfh1XWGYRXFvlSz4y6PyFCoXjRp+AK+dIn9VBU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywrszd30Jogcm2bRw2unaU749Q5E9eqiU12VmtlaWU84/cIrScS
-	QYXtxPeU81yZzdHLZ9m/+V5Bvs0pm90YE8JrSgF0Px4VTBobbQFcmt0lkqHcfgV0ZN0=
-X-Gm-Gg: AeBDievgJRPP2b2Rb8lJgpUNXpBtjAm6F24k1QKqfswARN5P7R8USQrDNER6Xh5jB10
-	RsQvODq0niQ3ztzppqeoYpm2x6rGmahIAIgjCjN7E3IFzDmhYbz6r6P+/40KjYP+VMxp4u5RVw2
-	mYLqVQdtoU26btOORnGSeqzDMnA+jPMmOXdRAVXuxLtoDytXaNaGSvC/os6KJ/TuecipBwLh25q
-	/s3gvLcSSE8H5DCTrJjLNT0n0MWOYuAqWUc7E1cKq0AaN9aNsqI15yQpe49TytQlMl+qbKQ1RLX
-	qB4/xGLcaH+rb2D0ZkLwRxBOf0+lFUQpufOf/N6CdCd/U+kveUsJdJTULkEqRXXisGwoWEYCy+P
-	YC5IFplwtYLmn1FnWgkkR5bO/I9l0cMqZtQ5v8/jY+MKNI++ZshQ9TbG9p6eIqguQEPtwUr0Itx
-	hztouL3Ec6HekJDZVu8kL0u2avBHY5oj+BqGJKLcwiPZY=
-X-Received: by 2002:a05:600c:638e:b0:487:575:5e1 with SMTP id 5b1f17b1804b1-488997adbbcmr298382215e9.24.1775652859878;
-        Wed, 08 Apr 2026 05:54:19 -0700 (PDT)
-Received: from blackdock.suse.cz (nat2.prg.suse.com. [195.250.132.146])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488b64f03afsm199949905e9.0.2026.04.08.05.54.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Apr 2026 05:54:19 -0700 (PDT)
-Date: Wed, 8 Apr 2026 14:54:17 +0200
-From: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
-To: Prakash Sangappa <prakash.sangappa@oracle.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	cgroups@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, edumazet@google.com, 
-	tj@kernel.org, hannes@cmpxchg.org, tom.hromatka@oracle.com, 
-	kamalesh.babulal@oracle.com, Christian Brauner <brauner@kernel.org>
-Subject: Re: [RFC PATCH 0/1] netlink: Netlink process event for cgroup
- migration
-Message-ID: <pd3vkzvgr233tkuocyvpgxc4kttsi5nlggcxuskvwi3mocoqkm@cfefi6hh74s6>
-References: <20260407172339.2017158-1-prakash.sangappa@oracle.com>
+        d=1e100.net; s=20251104; t=1775652974; x=1776257774;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=X3HRUBvBx+t3OSy4POcT0Q2jtaq5wPw/+bi/QpUoUKc=;
+        b=da4L9j4HQLOI9w1gaajyH87vPtks7aN5LhQijTJOA7Ll/OMJnFXZWWKmPSwAWbCjIv
+         QJxHV7wsVxu6uJQXMFvW4JtrGURpS6lnNwZW/Yd61pgpisdsS7t6+A8exi2/a3R/4okl
+         H02LVEg6Xnjsv1ZeinE+2Td1m89HgcZWyFREjU/xwu67qCeAePz2g0EWr1otIUHU/J2D
+         h7BnibP+CHKlwuiTn3xbkrztLXLMUDANyU/ugWPIgQHW9DiXafNeo/QPrVjgR7O3JQQK
+         q0DFKZ4P9tuBA2e+GAC6O+Pijnmg5Ygxu5cfMPDoQEwObjkifnzLVTonv7Oh2Cam85L3
+         qPYA==
+X-Forwarded-Encrypted: i=1; AJvYcCVz9MfoPEtpoVvTN0snAVpU8N7BGibSUP9z6XJC6bHOv/4uf7igZBBL/GuCEw8Erxt77msmWts=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyJoxuOHcREjW7ygUqBNWTs6+PsTg18kvdd0vNUAJ+yrVKZaw7b
+	8D7HATpGApI79PZV+0t9Ouq+tl2FY4rP1BJw+wXxAIjcUK16OMTUaIwuvIS1PvUSefGZl8sMAmJ
+	Xk7z7AcbxZsZ5og==
+X-Received: from qttt19-n1.prod.google.com ([2002:a05:622a:aa13:10b0:50d:bd90:b3e2])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:622a:986:b0:50b:3c78:de09 with SMTP id d75a77b69052e-50d62a3dd40mr309509101cf.34.1775652973671;
+ Wed, 08 Apr 2026 05:56:13 -0700 (PDT)
+Date: Wed,  8 Apr 2026 12:55:56 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="w6njgpe33rkj2elt"
-Content-Disposition: inline
-In-Reply-To: <20260407172339.2017158-1-prakash.sangappa@oracle.com>
-X-Spamd-Result: default: False [-3.76 / 15.00];
-	SIGNED_PGP(-2.00)[];
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.1213.gd9a14994de-goog
+Message-ID: <20260408125611.3592751-1-edumazet@google.com>
+Subject: [PATCH net-next 00/15] net/sched: no longer acquire RTNL in qdisc dumps
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-276514-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FREEMAIL_CC(0.00)[kernel.org,mojatatu.com,resnulli.us,google.com,vger.kernel.org,gmail.com];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	DKIM_TRACE(0.00)[suse.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mkoutny@suse.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-276515-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[oracle.com:email]
-X-Rspamd-Queue-Id: 4ABE63BC7C3
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D2D6C3BC876
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+This (large) series bring RTNL avoidance to qdisc dumps.
 
---w6njgpe33rkj2elt
-Content-Type: text/plain; protected-headers=v1; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [RFC PATCH 0/1] netlink: Netlink process event for cgroup
- migration
-MIME-Version: 1.0
+We first add annotations for data-races, so that most dump methods
+can run in parallel with data path.
 
-Hi Prakash.
+Then change mq and mqprio to no longer acquire each children
+qdisc spinlock.
 
-On Tue, Apr 07, 2026 at 05:23:38PM +0000, Prakash Sangappa <prakash.sangapp=
-a@oracle.com> wrote:
-> With cgroup based resource management, it becomes useful for
-> userspace to be notified when a task changes cgroup membership.
-> Unexpected migrations can lead to incorrect resource accounting
-> and enforcement resulting in undesirable behavior or failures.
-> Applications/userspace have to poll /proc to detect changes to=20
-> cgroup membership, which is inefficient when dealing with a large
-> number of tasks.
+Last patch replaces RTNL with RCU for tc_dump_qdisc() and the
+qdisc ops->dump() methods.
 
-You may want to check [1] (and followup discussion).
+Series was too big, RTNL avoidance for class dumps will be done later.
 
-> Add a new netlink proc connector event that gets generated when
-> a task migrates between cgroups. This allows applications/tools
-> to monitor cgroup membership changes without periodic polling.=20
+Eric Dumazet (15):
+  net/sched: rename qstats_overlimit_inc() to qstats_cpu_overlimit_inc()
+  net/sched: add qstats_cpu_drop_inc() helper
+  net/sched: add READ_ONCE() in gnet_stats_add_queue[_cpu]
+  net/sched: add qdisc_qlen_inc() and qdisc_qlen_dec()
+  net/sched: annotate data-races around sch->qstats.backlog
+  net/sched: sch_sfb: annotate data-races in sfb_dump_stats()
+  net/sched: sch_red: annotate data-races in red_dump_stats()
+  net/sched: sch_fq_codel: remove data-races from fq_codel_dump_stats()
+  net/sched: sch_pie: annotate data-races in pie_dump_stats()
+  net/sched: sch_fq_pie: annotate data-races in fq_pie_dump_stats()
+  net_sched: sch_hhf: annotate data-races in hhf_dump_stats()
+  net/sched: sch_choke: annotate data-races in choke_dump_stats()
+  net/sched: sch_cake: annotate data-races in cake_dump_stats()
+  net/sched: mq: no longer acquire qdisc spinlocks in dump operations
+  net/sched: convert tc_dump_qdisc() to RCU
 
-This CN_IDX_PROC netlink API haunts me at night.
-The hook(s) proposed above are IMO more future proof and robust approach
-to the process migration that comes as a surprise (and possibly
-interferes with intended resource management).
+ include/net/act_api.h     |   4 +-
+ include/net/gen_stats.h   |   9 +-
+ include/net/pie.h         |   2 +-
+ include/net/sch_generic.h |  75 ++++++--
+ net/core/gen_estimator.c  |  24 ++-
+ net/core/gen_stats.c      |  42 ++---
+ net/sched/act_api.c       |   2 +-
+ net/sched/act_bpf.c       |   2 +-
+ net/sched/act_ife.c       |  12 +-
+ net/sched/act_mpls.c      |   2 +-
+ net/sched/act_police.c    |   4 +-
+ net/sched/act_skbedit.c   |   2 +-
+ net/sched/act_skbmod.c    |   2 +-
+ net/sched/sch_api.c       |  25 ++-
+ net/sched/sch_cake.c      | 353 +++++++++++++++++++++-----------------
+ net/sched/sch_cbs.c       |   6 +-
+ net/sched/sch_choke.c     |  34 ++--
+ net/sched/sch_codel.c     |   2 +-
+ net/sched/sch_drr.c       |   6 +-
+ net/sched/sch_dualpi2.c   |   4 +-
+ net/sched/sch_etf.c       |   8 +-
+ net/sched/sch_ets.c       |   6 +-
+ net/sched/sch_fq.c        |   8 +-
+ net/sched/sch_fq_codel.c  |  16 +-
+ net/sched/sch_fq_pie.c    |  31 ++--
+ net/sched/sch_generic.c   |   8 +-
+ net/sched/sch_gred.c      |   4 +-
+ net/sched/sch_hfsc.c      |   6 +-
+ net/sched/sch_hhf.c       |  26 +--
+ net/sched/sch_htb.c       |   6 +-
+ net/sched/sch_mq.c        |  30 ++--
+ net/sched/sch_mqprio.c    |  69 ++++----
+ net/sched/sch_multiq.c    |   4 +-
+ net/sched/sch_netem.c     |  12 +-
+ net/sched/sch_pie.c       |  38 ++--
+ net/sched/sch_prio.c      |   6 +-
+ net/sched/sch_qfq.c       |   8 +-
+ net/sched/sch_red.c       |  37 ++--
+ net/sched/sch_sfb.c       |  54 +++---
+ net/sched/sch_sfq.c       |   9 +-
+ net/sched/sch_skbprio.c   |   4 +-
+ net/sched/sch_taprio.c    |  20 +--
+ net/sched/sch_tbf.c       |  10 +-
+ net/sched/sch_teql.c      |   2 +-
+ 44 files changed, 571 insertions(+), 463 deletions(-)
 
-Thanks,
-Michal
+-- 
+2.53.0.1213.gd9a14994de-goog
 
-[1] https://lore.kernel.org/all/20260220-work-bpf-namespace-v1-2-866207db7b=
-83@kernel.org/
-
---w6njgpe33rkj2elt
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iJEEABYKADkWIQRCE24Fn/AcRjnLivR+PQLnlNv4CAUCadZP9RsUgAAAAAAEAA5t
-YW51MiwyLjUrMS4xMiwyLDIACgkQfj0C55Tb+AgU8AD+Lq0FLDIQZHhgVC785HWW
-Qtb/ox0BmHLvlzH01RNT41cBALaawoqwRapWkOJoqX1g4Ia3MSSB4aQTvSOvvwmO
-NrUD
-=eVcv
------END PGP SIGNATURE-----
-
---w6njgpe33rkj2elt--
 
