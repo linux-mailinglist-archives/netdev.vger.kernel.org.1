@@ -1,114 +1,170 @@
-Return-Path: <netdev+bounces-276323-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276324-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EOuvDhQC1mlsAAgAu9opvQ
-	(envelope-from <netdev+bounces-276323-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 09:21:56 +0200
+	id aPmJLYYB1mlsAAgAu9opvQ
+	(envelope-from <netdev+bounces-276324-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 09:19:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 318903B80BE
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 09:21:54 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3017F3B8075
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 09:19:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D78BE3012EAE
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 07:17:03 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 00A83300B3F9
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 07:19:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 611DA37F8A2;
-	Wed,  8 Apr 2026 07:17:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC0073803C6;
+	Wed,  8 Apr 2026 07:19:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="TQWsSb4f"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UNJmFyJV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-05.mail-europe.com (mail-05.mail-europe.com [85.9.206.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EA9B37883D
-	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 07:17:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.9.206.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E8B9377EBC
+	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 07:19:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775632623; cv=none; b=aKuRAqj+e5e1sscr3nJhWMShHyFLsoQVsTFXNC+rU5dxm3iOAs9ZNL1UU4kD9nTLFBSxa+SI9Cbk5DSrGGYh7xZEdwIe8TII0J9Rsc6wdq83/DBPC47Fo9pi+GSAUTZVk0g32doZlDFmT+LbBwHRwCLNF1vtGjDJgIfdHiGdPiw=
+	t=1775632755; cv=none; b=XZhdLgF3+nVp0ovCjIrL61UWRVcoQUYciFFWsc4RHLgtvOsyktnCZ+k43flPjjF1Hnt23K907NQQnbS3kCYUmHonppOLNL17Hoj+toPJfjL6nkEEl9Loh5AElZVcGG0qh3mi96Jyyn3jQ728APp/my98M49qwOF1RGo1XZezGVU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775632623; c=relaxed/simple;
-	bh=n4Edos1iFDf/N7bitwT+Paf9vJ3CRZC1B9LCOXtd8Qg=;
-	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=GTZrcBVFFUnM1EPiVAO89aFpwe5JCYsvci9NuI6tXZ2vukmFZ0lwhRuWvRVMZo0tnhmwTIUosV6C2/fRNZA9jm/07/YU8gF9SooacuHFa4k/kGeS09VUnvfmOJ6D37DwnfVYj8zBcZwhwAIfZLHnx4DK+Gj4f8rXIsWeVFJm6mY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com; spf=pass smtp.mailfrom=protonmail.com; dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b=TQWsSb4f; arc=none smtp.client-ip=85.9.206.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-	s=protonmail3; t=1775632611; x=1775891811;
-	bh=n4Edos1iFDf/N7bitwT+Paf9vJ3CRZC1B9LCOXtd8Qg=;
-	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=TQWsSb4fYAyJqj+zKvIPtyqpHsDl2+uN0e+fGuZEbxqsFt7ZMnUPZFZnGZAn41n8I
-	 sllGN74+DNdgRXhLuIDnilt8HblMoD1MkG8xN74qO2Do9gc0e7owKJnhKtqxzL6qB+
-	 mCdPy0f45PhQ0ng3gzA8H3d9zRPOV+Fm1lDdW5V2BqmlgHeZ7bjHBOyOxXCWsrY0fr
-	 mz3Lr08ryCv3fuiCniU7JP6+mIlp8LVGdqE7BeOdFv3S2572SOoA8leklvZg2UTGpY
-	 V41K+wRJCFaGXILxf1p7yr70uu3+M6k5zfkY3aCrRvFq6+pIYH0j9B/dEvzbegPnf0
-	 johU4ScKHdxDw==
-Date: Wed, 08 Apr 2026 07:16:47 +0000
-To: Linux Networking <netdev@vger.kernel.org>
-From: Turritopsis Dohrnii Teo En Ming <teo.en.ming@protonmail.com>
-Cc: "ceo@teo-en-ming-corp.com" <ceo@teo-en-ming-corp.com>
-Subject: nmap scan command in forever loop to trigger Snort IDS IPS to generate intrusion alerts
-Message-ID: <rMHbalrN3Ljnsq2TlMjGStV6UaZLiOQRTgfJBLQIw0Xq3ADERvNLCr1mtQ396ntLlBp9wJ4wHim5lIpVe0lxUhjVCnopiLh3fdZfb-PXktU=@protonmail.com>
-Feedback-ID: 39510961:user:proton
-X-Pm-Message-ID: 87b459fa794f09d21fb6e6887a76364449b39d6b
+	s=arc-20240116; t=1775632755; c=relaxed/simple;
+	bh=KXH5WS6Q40ibpj4kE0d1HhMaWRjL85bzTmnYQmsoq8Y=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=XYVgJ2R3Ec8o7n3hpG2bVYGGXpWaj7dbLm71G6Y8x8uGd1uA4jpqUCFkx8Xb9m7TB7IcnR33SNMya+WmEzPrVZ25Kz5/zc626b/W5PQD+ATCAgu183DVYsG8t+OZPAdW6j1IUS6CsCnpm9ZMKDJWsXMwv98pB48QLaa6yuLuIWk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UNJmFyJV; arc=none smtp.client-ip=209.85.216.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-35c238f1063so3610130a91.1
+        for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 00:19:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775632753; x=1776237553; darn=vger.kernel.org;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hjlYOd9XXvId1/7XLc+lCyUWcW3FTaMcLCVtuzeeaQQ=;
+        b=UNJmFyJVCLDf4wPkPBBMn/eDPxeolQOIwz4Fq70YmC9KSZHULG/6N0fU39ZSkpN9PO
+         Rgk9Q3pKhVQTg5aL8DGSesmucpkWMBPgQ8b/WeiBRUaQuwiIHfcr6CymlX/MxRfF/sQQ
+         XRdLGlF/l3vN6E+LvlW2KRQNqHFLZrf2nkfDGCdxT7j5nBC8O4GnGTG+lo/OwQIFW37P
+         KLb24izmXRAgWW7l2IW6IlIM0x1W/V9hnclL6P85bdd3QCezVeTgVrWyAMmg9N6LAqG3
+         K1aDXsdkSBt9z6RLL4DKOmG6P2l/GlI5KY0JexxuZKb9vhr9qU1IesrrElE1MSgvM0cN
+         U1AQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775632753; x=1776237553;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hjlYOd9XXvId1/7XLc+lCyUWcW3FTaMcLCVtuzeeaQQ=;
+        b=QSGBtFk0dn7fuoZZ1e+zNHQzpZ0URo0LuO8Y/cGC9PSubEzuXRS8+GIOLz+wPBbRWp
+         xWF2bEO1p7xUaBTdmMnbvL64fNULX8JXwxeK45WjKnd0jR4Bk/iP1X9AqcfXhWATHNrx
+         Q1hKvyrYfm/RdHfAiyY9TnewPLN2Cmalxnb9Yb7A/OKjQeZRfY4MWtINogvhKShUuiDK
+         JTIkhp8MSqrIhiD6apv0t53ReBVYcw2L1kEFdixLkwWka2EN6uIP+sZNQ4cWaXq7JH/x
+         2vDm9stVe/0X4r52m+zJ1GAS1exxfY+AKcC9ZLDtLI8X3xipA3URlj1Nx+/seS1JyGhM
+         4wlw==
+X-Gm-Message-State: AOJu0Yzuv0UPkbC/bDwccbc232f6dgt1YwWsdbD3vaxANTlydVyPXu02
+	1MmU3VBAZf9/BM5dzBlFyL08Xx4kQK05qCT1W/pbN6AlifkSE9kXGNIp
+X-Gm-Gg: AeBDietmJOf/Z9zpPvIDqWcHD0ahD7SGqy/XZ75UaF5CxcIu2wSrAvl/mNQboEYKk3V
+	+o0jyAKp7wEVHMga9bHVzU/Y9l1vdeLOu9HY1bSPDIKspjc+opJK+cEJaZLyD0/9+HbgjctRovW
+	FIhCP/ST2YZor8PFrfXIEfHbJm9s0o2DxMUz/kES8GQx3fMHW8Ie7Gs2g8OpfIvLV9PmSCiU1jC
+	sSkf2mySc6w/gFuFDkTmp1dOOHYlFkLCxl0hir3aycf+nmG+hsDnQkhWH8iw9rP3nRUudzUbJpE
+	YjaBes9bmxEppRALI9dMwY+NJ6sukl2+AM0Q6XFPUKxWJeU+X5E+Fgm3mw9mjidY8k+Mo9xtq/i
+	jolad5LTuksK5dSx9UfLJPolzTq/X3itum6hafd4yf0lnffTphi8U+Bc3cA9Az4vxQ2MEyRb1JY
+	0ckkS+WNAaxZs5xlvpKsODz1LtVW1q4UqluX3zxRJxC1jboPvj
+X-Received: by 2002:a17:90b:6cd:b0:35b:8d89:719a with SMTP id 98e67ed59e1d1-35de6970260mr18566223a91.15.1775632752601;
+        Wed, 08 Apr 2026 00:19:12 -0700 (PDT)
+Received: from 1.0.0.127.in-addr.arpa ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b2749a3af9sm183424555ad.63.2026.04.08.00.19.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Apr 2026 00:19:12 -0700 (PDT)
+From: Hangbin Liu <liuhangbin@gmail.com>
+Date: Wed, 08 Apr 2026 15:19:05 +0800
+Subject: [PATCH net-next] tools: ynl: tests: fix leading space on Makefile
+ target
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260408-ynl_makefile-v1-1-f9624acc2ad9@gmail.com>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x2M0QpAQBQFf0X32dYSkl+RtDi44dLuJpJ/t3mcq
+ ZmHHCzDURU9ZHGy410CJHFE/WxkguIhMKU6LXSmS3XL2m5mwcgrFJBn2nRlAhgKyWGDv/5dTQK
+ vBJen5n0/4zAYaWgAAAA=
+X-Change-ID: 20260408-ynl_makefile-ee540ab81eea
+To: Donald Hunter <donald.hunter@gmail.com>, 
+ Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Hangbin Liu <liuhangbin@gmail.com>
+X-Mailer: b4 0.14.3
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[protonmail.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[protonmail.com:s=protonmail3];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	RCVD_TLS_LAST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-276323-lists,netdev=lfdr.de];
-	FREEMAIL_FROM(0.00)[protonmail.com];
-	RCPT_COUNT_TWO(0.00)[2];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-276324-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,kernel.org,davemloft.net,google.com,redhat.com];
+	TO_DN_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[teo.en.ming@protonmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[protonmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[liuhangbin@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.997];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,protonmail.com:dkim,protonmail.com:mid]
-X-Rspamd-Queue-Id: 318903B80BE
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3017F3B8075
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Subject: nmap scan command in forever loop to trigger Snort IDS IPS to gene=
-rate intrusion alerts
+The ../generated/protos.a rule had a spurious leading space before the
+target name. In make, target rules must start at column 0; only recipe
+lines are indented with a tab. The extra space caused make to misparse
+the rule.
 
-Good day from Singapore,
+Remove the leading space to match the style of the adjacent
+../lib/ynl.a rule.
 
-Running the following nmap scan command in a forever loop will trigger Snor=
-t Intrusion Detection System (IDS) Intrusion Prevention System (IPS) to gen=
-erate lots of intrusion alerts.
+Fixes: e0aa0c61758f ("tools: ynl: move samples to tests")
+Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+---
+ tools/net/ynl/tests/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-# nohup sudo bash -c 'while true; do nmap -sS -O -p 22 tdtem.duckdns.org; s=
-leep 1; done' > nmap.log 2>&1 &
+diff --git a/tools/net/ynl/tests/Makefile b/tools/net/ynl/tests/Makefile
+index 2a02958c7039..9215e84cca05 100644
+--- a/tools/net/ynl/tests/Makefile
++++ b/tools/net/ynl/tests/Makefile
+@@ -50,7 +50,7 @@ all: $(TEST_GEN_PROGS) $(TEST_GEN_FILES)
+ ../lib/ynl.a:
+ 	@$(MAKE) -C ../lib
+ 
+- ../generated/protos.a:
++../generated/protos.a:
+ 	@$(MAKE) -C ../generated
+ 
+ $(TEST_GEN_PROGS) $(TEST_GEN_FILES): %: %.c ../lib/ynl.a ../generated/protos.a
 
-Regards,
+---
+base-commit: e65d8b6f3092398efd7c74e722cb7a516d9a0d6d
+change-id: 20260408-ynl_makefile-ee540ab81eea
 
-Mr. Turritopsis Dohrnii Teo En Ming
-Extremely Democratic People's Republic of Singapore
-8 Apr 2026 Wednesday 3.16 pm Singapore Time
-
+Best regards,
+-- 
+Hangbin Liu <liuhangbin@gmail.com>
 
 
