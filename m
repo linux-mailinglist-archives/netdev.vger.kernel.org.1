@@ -1,235 +1,299 @@
-Return-Path: <netdev+bounces-276438-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276439-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QPFqJ8Uu1mkUBggAu9opvQ
-	(envelope-from <netdev+bounces-276438-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 12:32:37 +0200
+	id WM/+JFYy1mlZBwgAu9opvQ
+	(envelope-from <netdev+bounces-276439-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 12:47:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 654C73BA929
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 12:32:37 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 146953BAE76
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 12:47:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8788F3028599
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 10:32:13 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5563231137C8
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 10:41:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 196B63BA246;
-	Wed,  8 Apr 2026 10:31:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AB253B9DA8;
+	Wed,  8 Apr 2026 10:40:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="LyZ4perh"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nn5EGrg0"
 X-Original-To: netdev@vger.kernel.org
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A32D37F018;
-	Wed,  8 Apr 2026 10:31:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C4483BB9F4
+	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 10:40:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775644271; cv=none; b=IkcbT+IIlHJc2GJInzSWbdDDqLNoDxJqcUBsq3CJuikhKWdilyi8Uz4COgmXwG7XtTLrcZ2kRFOE8blzeY9RbjpGiO2EPlEALFllUHYevXpCv4/yn7BiNoT5Dfj35BDCI9dNuqpMYbn1FnqV/BYRN11iIfyjWNgOgCw696tanGY=
+	t=1775644833; cv=none; b=GYniX+7TySCSDgbr3V/fS7e96GjDMG2KXwBbCAAu+FVIr9yt5Fg0WagYGXzZMoNb4egoTQqLO2vkYMfWivzWUDY17GhPrIwLF/6G9OCNZMubqbQ1U9tSX06RbBGrG9P1i/srpnSBrN/LTN2iLtgouj4XLx5+v13UNCWMJpklBIs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775644271; c=relaxed/simple;
-	bh=ob+hbsa5gaZ2FLIvbFGSmZclTDNKFYEONGlciwWTcrs=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=LrpCL7XlZQ+fi1wKpKbz2AAJU3Y0EHsOQuIbfoOyxMTuyt74Bow+hvHueheyGEi70FpwNo11DTAIOpvkoAb6bWHQEVk0SmfpBDKgm23O7y8T5yzrNoY6X72c53VmdnGX6WS5PetU9/DLV4b1DsHFbwwmuwklGDk7m3+PhouvLMs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=LyZ4perh; arc=none smtp.client-ip=82.195.75.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:Cc:To:In-Reply-To:References:
-	Message-Id:Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:
-	From:Reply-To:Content-ID:Content-Description;
-	bh=PNxblEMqB4KhPBmYKCSvHUph+B8wcGo1Xxvt6/jg+/Y=; b=LyZ4perhYBsBCH2dGqGUqhVW8e
-	92+aodKcuukx6WcViZboHFXjpjfi/pRXXVPq0uRgNvyX70zqhpzn3avmKKG1wYptu54XyLb4YedRF
-	chXr1R8FwbPWuqWWP7Pl5WMg/3zgl7+sUrj04/FgZX5vrj4i5EWHJXM7pAwSDInIuprSqoHpCyHxV
-	xT9TrXRhmpWO9aIs2z9P1PHeZzoNu5UBTuYIVyw2EG7QQ6IT7cmsVdLuyZns+9Sv9TO7cJS2gM47u
-	gCAaNqgU5mxzLuD5YP0cG1P7kUxpLtUuxgGPInQmdBgkRX2Sg0VA8sbg8TKxA4zwHTWWRJTz4ypBY
-	RhJLZgQA==;
-Received: from authenticated user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.96)
-	(envelope-from <leitao@debian.org>)
-	id 1wAQBa-008MEP-1M;
-	Wed, 08 Apr 2026 10:31:02 +0000
-From: Breno Leitao <leitao@debian.org>
-Date: Wed, 08 Apr 2026 03:30:32 -0700
-Subject: [PATCH net-next v3 4/4] can: raw: convert to getsockopt_iter
+	s=arc-20240116; t=1775644833; c=relaxed/simple;
+	bh=i8oa7nHtep9/cYT9xh7ivINGzJMGErjtu/4dPDsGG/A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kulCw2Onh38HlnJzh5kxa0QwusU025jTbe/eTCnPnBXGstIMkYxXRekQb5K8xnaGX+iZakuUD9eQjKt1QccXXw6tuQKOFjnOf6mtE+1l6QqwJsUdGwNKVE8Tz5dLoKPrglf/kMJ3KWqzfL+U1LQ/llgdDbayTJzWacedeqdrCEg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Nn5EGrg0; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1775644830;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ovq55xd1F5RaYA9qv9u/tPBbr7wYAvZIgWnEYMtnN1g=;
+	b=Nn5EGrg0C7e3tcnbCrrpOb6jvW5HaBF0GFyfkRCMITx1boccvvKLFGQNa7rMIogZ2WEYar
+	9+UjRWNduKyELwuvh2ZM55k35qJUePkQXmtJ09KmAeZsbFYAzq9Wj5XxofBDcvwljZyKKK
+	4QJj2cMLcfHXxvbRR/v6+5HAUTexhrw=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-346-PELxzbp1O2WELvyepaLcNw-1; Wed,
+ 08 Apr 2026 06:40:26 -0400
+X-MC-Unique: PELxzbp1O2WELvyepaLcNw-1
+X-Mimecast-MFC-AGG-ID: PELxzbp1O2WELvyepaLcNw_1775644824
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 74314180028B;
+	Wed,  8 Apr 2026 10:40:23 +0000 (UTC)
+Received: from thinkpad (unknown [10.44.33.70])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9644B195394A;
+	Wed,  8 Apr 2026 10:40:17 +0000 (UTC)
+Date: Wed, 8 Apr 2026 12:40:15 +0200
+From: Felix Maurer <fmaurer@redhat.com>
+To: Ao Zhou <n05ec@lzu.edu.cn>
+Cc: netdev@vger.kernel.org,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Murali Karicheri <m-karicheri2@ti.com>,
+	Shaurya Rane <ssrane_b23@ee.vjti.ac.in>,
+	Ingo Molnar <mingo@kernel.org>, Kees Cook <kees@kernel.org>,
+	Yifan Wu <yifanwucs@gmail.com>, Juefei Pu <tomapufckgml@gmail.com>,
+	Yuan Tan <yuantan098@gmail.com>, Xin Liu <bird@lzu.edu.cn>,
+	Yuqi Xu <xuyuqiabc@gmail.com>, Haoze Xie <royenheart@gmail.com>
+Subject: Re: [PATCH net v2 1/1] net: hsr: avoid learning unknown senders for
+ local delivery
+Message-ID: <adYwjxLBBaLY52Wb@thinkpad>
+References: <cover.1775056603.git.royenheart@outlook.com>
+ <b053e938014c9bac22f7f687ecc2970f23a2b74a.1775281843.git.royenheart@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260408-getsockopt-v3-4-061bb9cb355d@debian.org>
-References: <20260408-getsockopt-v3-0-061bb9cb355d@debian.org>
-In-Reply-To: <20260408-getsockopt-v3-0-061bb9cb355d@debian.org>
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- Kuniyuki Iwashima <kuniyu@google.com>, 
- Willem de Bruijn <willemb@google.com>, metze@samba.org, axboe@kernel.dk, 
- Stanislav Fomichev <sdf@fomichev.me>
-Cc: io-uring@vger.kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org, 
- Linus Torvalds <torvalds@linux-foundation.org>, 
- linux-kernel@vger.kernel.org, kernel-team@meta.com, 
- Breno Leitao <leitao@debian.org>
-X-Mailer: b4 0.16-dev-453a6
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3570; i=leitao@debian.org;
- h=from:subject:message-id; bh=ob+hbsa5gaZ2FLIvbFGSmZclTDNKFYEONGlciwWTcrs=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBp1i5NKMEdYHx3wGg7Qa4vX7iAivyNKvTyGmjC/
- 1MCC9Vd3omJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCadYuTQAKCRA1o5Of/Hh3
- bY5ID/0QQwWLPW/sgiLSkESx/sudB1CI0N5EBltNaZhMUyskNxF0k2Gw835et7QDMWgo2GzycUi
- +SQUpbBYztTxkQgLa56yuW16T41e5VaKKTB4bj8e9MtLyTWn2gETp5/nt4E2i3aZPe3CeMR84wZ
- kDgolqoOwr9qGyN26yEY+92W4E0XaOCI29AP2sxKOAIRBADKGIlaAfihBteN3lkg9i8iHIFltjF
- NY1Xs+p5uhIKYFD7R4Wuj6YzCvWiio6SE+Rkbm7Gdz3wmwbMmqGcNvsoBUXq7ICG/38hduHtfzn
- ZgfzPWuXsfLhi1N9/NGC8TKyl0OWADXgEjQFx++3KrHHGcv9ecY4DPB5lxFTf2sf1wGP8Zx0+lF
- eOBrHWnK2i+6QpMRARyFP0jQqw9AXrciDxie5dEps42klrnIx9zufvK9bhPR4lnd1sl2thGot6o
- Z0eafJOmoYBzZ/IixnFRGmAEp/K83CwUJit0k1AWMkDgnYHuKgJvW4IE22CHLT3Rz3omNbha1MW
- q18Gaitf3kf4SHx54NXTNK5TVjSdIVPlRpsdpm1b2LT0UH789u3hbXHA2cRhs2JF8SgS9gAv0gQ
- eVMrybya7ngENB/cSe1qhMu67Y/T55QRGwSakdtuIuc6E0DrovsSq3x7J9kbLKdT1NeHPuk773R
- 7yleGiMqVR8laYw==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
-X-Debian-User: leitao
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b053e938014c9bac22f7f687ecc2970f23a2b74a.1775281843.git.royenheart@gmail.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[debian.org];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	TAGGED_FROM(0.00)[bounces-276439-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-276438-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FREEMAIL_CC(0.00)[vger.kernel.org,linutronix.de,davemloft.net,google.com,kernel.org,redhat.com,ti.com,ee.vjti.ac.in,gmail.com,lzu.edu.cn];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[debian.org:+];
+	FROM_NEQ_ENVFROM(0.00)[fmaurer@redhat.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 654C73BA929
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lzu.edu.cn:email]
+X-Rspamd-Queue-Id: 146953BAE76
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Convert CAN raw socket's getsockopt implementation to use the new
-getsockopt_iter callback with sockopt_t.
+On Sat, Apr 04, 2026 at 07:30:47PM +0800, Ao Zhou wrote:
+> From: Haoze Xie <royenheart@gmail.com>
+>
+> Traffic that is directly addressed to the local HSR/PRP master can be
+> delivered locally without creating a persistent node entry. Learning one
+> node per previously unseen source MAC lets forged sender floods grow
+> node_db until the prune timer catches up.
+>
+> Determine whether a frame is locally exclusive before node lookup and
+> skip learning for unknown senders in that case. When no node state
+> exists, also skip duplicate discard checks that depend on it.
+>
+> This keeps locally-destined traffic reachable while avoiding node table
+> growth from source-MAC floods in both the PRP SAN path and the HSR/PRP
+> tagged sender paths.
 
-Key changes:
-- Replace (char __user *optval, int __user *optlen) with sockopt_t *opt
-- Use opt->optlen for buffer length (input) and returned size (output)
-- Use copy_to_iter() instead of copy_to_user()
-- For CAN_RAW_FILTER and CAN_RAW_XL_VCID_OPTS: on -ERANGE, set
-  opt->optlen to the required buffer size. The wrapper writes this
-  back to userspace even on error, preserving the existing API that
-  lets userspace discover the needed allocation size.
+I see the problem you are trying to solve here, but I don't think this
+patch provides a significant improvement over the current situation.
+Yes, this will disable learning of new nodes from regular traffic (and
+thereby completely prevent the duplicate discard algorithm from
+working). New nodes would only be learned from supervision frames. But
+nothing prevents a malicious host in the network from spoofing tons of
+supervision frames.
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- net/can/raw.c | 28 +++++++++++++---------------
- 1 file changed, 13 insertions(+), 15 deletions(-)
+HSR and PRP are supposed to be used in pretty restricted network
+environments, so the whole protocol design doesn't really expect
+malicious actors in the network and doesn't provide good options to
+safeguard against misuse.
 
-diff --git a/net/can/raw.c b/net/can/raw.c
-index eee244ffc31ec..6f9ef867a13f2 100644
---- a/net/can/raw.c
-+++ b/net/can/raw.c
-@@ -760,7 +760,7 @@ static int raw_setsockopt(struct socket *sock, int level, int optname,
- }
- 
- static int raw_getsockopt(struct socket *sock, int level, int optname,
--			  char __user *optval, int __user *optlen)
-+			  sockopt_t *opt)
- {
- 	struct sock *sk = sock->sk;
- 	struct raw_sock *ro = raw_sk(sk);
-@@ -770,8 +770,7 @@ static int raw_getsockopt(struct socket *sock, int level, int optname,
- 
- 	if (level != SOL_CAN_RAW)
- 		return -EINVAL;
--	if (get_user(len, optlen))
--		return -EFAULT;
-+	len = opt->optlen;
- 	if (len < 0)
- 		return -EINVAL;
- 
-@@ -787,12 +786,12 @@ static int raw_getsockopt(struct socket *sock, int level, int optname,
- 			if (len < fsize) {
- 				/* return -ERANGE and needed space in optlen */
- 				err = -ERANGE;
--				if (put_user(fsize, optlen))
--					err = -EFAULT;
-+				opt->optlen = fsize;
- 			} else {
- 				if (len > fsize)
- 					len = fsize;
--				if (copy_to_user(optval, ro->filter, len))
-+				if (copy_to_iter(ro->filter, len,
-+						 &opt->iter_out) != len)
- 					err = -EFAULT;
- 			}
- 		} else {
-@@ -801,7 +800,7 @@ static int raw_getsockopt(struct socket *sock, int level, int optname,
- 		release_sock(sk);
- 
- 		if (!err)
--			err = put_user(len, optlen);
-+			opt->optlen = len;
- 		return err;
- 	}
- 	case CAN_RAW_ERR_FILTER:
-@@ -845,16 +844,16 @@ static int raw_getsockopt(struct socket *sock, int level, int optname,
- 		if (len < sizeof(ro->raw_vcid_opts)) {
- 			/* return -ERANGE and needed space in optlen */
- 			err = -ERANGE;
--			if (put_user(sizeof(ro->raw_vcid_opts), optlen))
--				err = -EFAULT;
-+			opt->optlen = sizeof(ro->raw_vcid_opts);
- 		} else {
- 			if (len > sizeof(ro->raw_vcid_opts))
- 				len = sizeof(ro->raw_vcid_opts);
--			if (copy_to_user(optval, &ro->raw_vcid_opts, len))
-+			if (copy_to_iter(&ro->raw_vcid_opts, len,
-+					 &opt->iter_out) != len)
- 				err = -EFAULT;
- 		}
- 		if (!err)
--			err = put_user(len, optlen);
-+			opt->optlen = len;
- 		return err;
- 	}
- 	case CAN_RAW_JOIN_FILTERS:
-@@ -868,9 +867,8 @@ static int raw_getsockopt(struct socket *sock, int level, int optname,
- 		return -ENOPROTOOPT;
- 	}
- 
--	if (put_user(len, optlen))
--		return -EFAULT;
--	if (copy_to_user(optval, val, len))
-+	opt->optlen = len;
-+	if (copy_to_iter(val, len, &opt->iter_out) != len)
- 		return -EFAULT;
- 	return 0;
- }
-@@ -1077,7 +1075,7 @@ static const struct proto_ops raw_ops = {
- 	.listen        = sock_no_listen,
- 	.shutdown      = sock_no_shutdown,
- 	.setsockopt    = raw_setsockopt,
--	.getsockopt    = raw_getsockopt,
-+	.getsockopt_iter = raw_getsockopt,
- 	.sendmsg       = raw_sendmsg,
- 	.recvmsg       = raw_recvmsg,
- 	.mmap          = sock_no_mmap,
+IMHO, the only real way to prevent excessive resource use on our side is
+to put a limit on these resources. In this case, limit the size of the
+node table (bonus: make that limit configurable as Paolo suggested).
 
--- 
-2.52.0
+Thanks,
+   Felix
+
+
+> Fixes: f421436a591d ("net/hsr: Add support for the High-availability Seamless Redundancy protocol (HSRv0)")
+> Fixes: 451d8123f897 ("net: prp: add packet handling support")
+> Reported-by: Yifan Wu <yifanwucs@gmail.com>
+> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+> Co-developed-by: Yuan Tan <yuantan098@gmail.com>
+> Signed-off-by: Yuan Tan <yuantan098@gmail.com>
+> Suggested-by: Xin Liu <bird@lzu.edu.cn>
+> Tested-by: Yuqi Xu <xuyuqiabc@gmail.com>
+> Signed-off-by: Haoze Xie <royenheart@gmail.com>
+> Signed-off-by: Ao Zhou <n05ec@lzu.edu.cn>
+> ---
+> changes in v2:
+> - generalize the fix beyond PRP SAN traffic and cover HSR/PRP tagged sender floods
+> - decide whether learning is needed from local-exclusive delivery instead of protocol-specific SAN checks
+> - use the normal NULL return semantics from hsr_get_node() instead of ERR_PTR-based error plumbing
+> - skip duplicate-discard state checks when no node state exists
+>
+>  net/hsr/hsr_forward.c  | 23 +++++++++++++----------
+>  net/hsr/hsr_framereg.c |  5 ++++-
+>  net/hsr/hsr_framereg.h |  2 +-
+>  3 files changed, 18 insertions(+), 12 deletions(-)
+>
+> diff --git a/net/hsr/hsr_forward.c b/net/hsr/hsr_forward.c
+> index aefc9b6936ba..15bd17b4ee17 100644
+> --- a/net/hsr/hsr_forward.c
+> +++ b/net/hsr/hsr_forward.c
+> @@ -403,7 +403,8 @@ static void hsr_deliver_master(struct sk_buff *skb, struct net_device *dev,
+>  	int res, recv_len;
+>
+>  	was_multicast_frame = (skb->pkt_type == PACKET_MULTICAST);
+> -	hsr_addr_subst_source(node_src, skb);
+> +	if (node_src)
+> +		hsr_addr_subst_source(node_src, skb);
+>  	skb_pull(skb, ETH_HLEN);
+>  	recv_len = skb->len;
+>  	res = netif_rx(skb);
+> @@ -545,7 +546,7 @@ static void hsr_forward_do(struct hsr_frame_info *frame)
+>  		/* Don't send frame over port where it has been sent before.
+>  		 * Also for SAN, this shouldn't be done.
+>  		 */
+> -		if (!frame->is_from_san &&
+> +		if (frame->node_src && !frame->is_from_san &&
+>  		    hsr->proto_ops->register_frame_out &&
+>  		    hsr->proto_ops->register_frame_out(port, frame))
+>  			continue;
+> @@ -688,21 +689,25 @@ static int fill_frame_info(struct hsr_frame_info *frame,
+>  		return -EINVAL;
+>
+>  	memset(frame, 0, sizeof(*frame));
+> +	frame->port_rcv = port;
+>  	frame->is_supervision = is_supervision_frame(port->hsr, skb);
+>  	if (frame->is_supervision && hsr->redbox)
+>  		frame->is_proxy_supervision =
+>  			is_proxy_supervision_frame(port->hsr, skb);
+>
+> +	ethhdr = (struct ethhdr *)skb_mac_header(skb);
+> +	check_local_dest(port->hsr, skb, frame);
+> +
+>  	n_db = &hsr->node_db;
+>  	if (port->type == HSR_PT_INTERLINK)
+>  		n_db = &hsr->proxy_node_db;
+>
+>  	frame->node_src = hsr_get_node(port, n_db, skb,
+> -				       frame->is_supervision, port->type);
+> -	if (!frame->node_src)
+> -		return -1; /* Unknown node and !is_supervision, or no mem */
+> +				       frame->is_supervision, port->type,
+> +				       !frame->is_local_exclusive);
+> +	if (!frame->node_src && !frame->is_local_exclusive)
+> +		return -1;
+>
+> -	ethhdr = (struct ethhdr *)skb_mac_header(skb);
+>  	frame->is_vlan = false;
+>  	proto = ethhdr->h_proto;
+>
+> @@ -720,13 +725,10 @@ static int fill_frame_info(struct hsr_frame_info *frame,
+>  	}
+>
+>  	frame->is_from_san = false;
+> -	frame->port_rcv = port;
+>  	ret = hsr->proto_ops->fill_frame_info(proto, skb, frame);
+>  	if (ret)
+>  		return ret;
+>
+> -	check_local_dest(port->hsr, skb, frame);
+> -
+>  	return 0;
+>  }
+>
+> @@ -739,7 +741,8 @@ void hsr_forward_skb(struct sk_buff *skb, struct hsr_port *port)
+>  	if (fill_frame_info(&frame, skb, port) < 0)
+>  		goto out_drop;
+>
+> -	hsr_register_frame_in(frame.node_src, port, frame.sequence_nr);
+> +	if (frame.node_src)
+> +		hsr_register_frame_in(frame.node_src, port, frame.sequence_nr);
+>  	hsr_forward_do(&frame);
+>  	rcu_read_unlock();
+>  	/* Gets called for ingress frames as well as egress from master port.
+> diff --git a/net/hsr/hsr_framereg.c b/net/hsr/hsr_framereg.c
+> index 50996f4de7f9..2bc6f8f154c2 100644
+> --- a/net/hsr/hsr_framereg.c
+> +++ b/net/hsr/hsr_framereg.c
+> @@ -221,7 +221,7 @@ void prp_update_san_info(struct hsr_node *node, bool is_sup)
+>   */
+>  struct hsr_node *hsr_get_node(struct hsr_port *port, struct list_head *node_db,
+>  			      struct sk_buff *skb, bool is_sup,
+> -			      enum hsr_port_type rx_port)
+> +			      enum hsr_port_type rx_port, bool learn)
+>  {
+>  	struct hsr_priv *hsr = port->hsr;
+>  	struct hsr_node *node;
+> @@ -270,6 +270,9 @@ struct hsr_node *hsr_get_node(struct hsr_port *port, struct list_head *node_db,
+>  			san = true;
+>  	}
+>
+> +	if (!learn)
+> +		return NULL;
+> +
+>  	return hsr_add_node(hsr, node_db, ethhdr->h_source, san, rx_port);
+>  }
+>
+> diff --git a/net/hsr/hsr_framereg.h b/net/hsr/hsr_framereg.h
+> index c65ecb925734..3d9c88e83090 100644
+> --- a/net/hsr/hsr_framereg.h
+> +++ b/net/hsr/hsr_framereg.h
+> @@ -33,7 +33,7 @@ void hsr_del_self_node(struct hsr_priv *hsr);
+>  void hsr_del_nodes(struct list_head *node_db);
+>  struct hsr_node *hsr_get_node(struct hsr_port *port, struct list_head *node_db,
+>  			      struct sk_buff *skb, bool is_sup,
+> -			      enum hsr_port_type rx_port);
+> +			      enum hsr_port_type rx_port, bool learn);
+>  void hsr_handle_sup_frame(struct hsr_frame_info *frame);
+>  bool hsr_addr_is_self(struct hsr_priv *hsr, unsigned char *addr);
+>  bool hsr_addr_is_redbox(struct hsr_priv *hsr, unsigned char *addr);
+> --
+> 2.53.0
+>
 
 
