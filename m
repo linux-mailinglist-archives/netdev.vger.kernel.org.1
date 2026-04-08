@@ -1,183 +1,184 @@
-Return-Path: <netdev+bounces-276646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276647-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KCYYMLOF1mmwFwgAu9opvQ
-	(envelope-from <netdev+bounces-276646-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 18:43:31 +0200
+	id UFr2Dm+G1mmwFwgAu9opvQ
+	(envelope-from <netdev+bounces-276647-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 18:46:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A7B03BF010
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 18:43:31 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 841173BF0D0
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 18:46:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 137F93019151
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 16:40:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E69FC3034E0E
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 16:40:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12F683D1718;
-	Wed,  8 Apr 2026 16:40:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F6AD3D1CB4;
+	Wed,  8 Apr 2026 16:40:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CbZDXXJS"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="F849nA4U"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E21F2349B1F;
-	Wed,  8 Apr 2026 16:40:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B31D63CF02A;
+	Wed,  8 Apr 2026 16:40:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775666419; cv=none; b=mTAY/QMlh6FPTDY31E4IUUKo+uV35dZu1oBdALprg/7zm/fZXme99f+kyDfX33ky5qzmD14K53jbHInu9HJodz7SegvG2pyJGu7xGvYcpmk4UAbeCLzYJCIPHd33J8dJ/DlI23AGSnVxRX2Tk8HPJvFbWJJmE2E3qpNjs9mrT/0=
+	t=1775666453; cv=none; b=qW6C/iqfGS94etZXL+M7Lbr3Y4JhQrJc59WTOI6CI64l5qKwtUjIowvzPL4B2Ied8e/gq8IpK0eti5gmlx426u3wVdyD4JxO7/GKcu7lmAFQ49XP7zTA504gGqzZNsPA72Zf4bDUafPep8lqLPP7Hy2J5pXYN1gckedAyzuSV0k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775666419; c=relaxed/simple;
-	bh=kN1N5HiwbTc9gELWzJ4pnNv4U0PMd1J9f9+F/1Nk/Fg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UHnSogW4w3X2RUhMZGaHkNek3B9yjTL5D843KeuzT3EzAWDtz60NntSvr349IqyYjJnHAYJaykXT7QWFNx7+0nN296eMVcDm6p/eNMBocTawukhrNd8OqJrZmWomMwMU8RmIyXVNs4uvpwddcqdUsDa33KDW76wXj5Lm09Wt8w4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CbZDXXJS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BBF52C19421;
-	Wed,  8 Apr 2026 16:40:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775666418;
-	bh=kN1N5HiwbTc9gELWzJ4pnNv4U0PMd1J9f9+F/1Nk/Fg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=CbZDXXJSo4bLUwSeLwf6xoLPrYZDnx6Q7XbJcDVVhx1Mx9baYv0AfO30y5NlTMsWB
-	 phIipkR2NOMVNQy8AKczMQc75fCSbYq5X2Zx4Zp+I5JRm0BmyRrZVsK6iJbV9YI8PK
-	 Po4fdP6TKRGE0FYEfNUJ+M4urOqx9rHjA5LKIwP9nnfrSRy2Gw1uh5SDo97FDjqLOE
-	 57p3RbiAawqFfH3Q4d5Q1LL4+EhGQKiXsEYqX49+L0na47dONuOziZ64c2Aroth0X0
-	 riH6tAS2+1ZI5n6LpVcO6TnrK3PnfRDUOc/2CcDIOFD3066dYDeH6CIWmlmeOo2nI6
-	 Eo4BKZ8cw1kpQ==
-Date: Wed, 8 Apr 2026 09:40:15 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Marc Harvey <marcharvey@google.com>
-Cc: Jiri Pirko <jiri@resnulli.us>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
- <shuah@kernel.org>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v6 00/10] Decouple receive and transmit
- enablement in team driver
-Message-ID: <20260408094015.3b8359c1@kernel.org>
-In-Reply-To: <20260408-teaming-driver-internal-v6-0-e5bcdcf72504@google.com>
-References: <20260408-teaming-driver-internal-v6-0-e5bcdcf72504@google.com>
+	s=arc-20240116; t=1775666453; c=relaxed/simple;
+	bh=X7uwi1mTnlblHvnMF6Xvi2utMBucdMig04mZXn3jTOw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=arRaT6MF/SbKqOJ3Nh/71oV8YFibmMMZoczljNU5jUqPWDcHPSMFqwyDppSlKbH+zPV4V1j3pUish14Wb14LKAl4IJYV+vISdyf2usAZ0gTA0ZSst9oZ3QlGIJC+QiL31ZTh7dfrYobeiAm+rdwvdlr3dOeTv43uYPITBMRsk64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=F849nA4U; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0A6E62BC4;
+	Wed,  8 Apr 2026 09:40:45 -0700 (PDT)
+Received: from [10.57.85.157] (unknown [10.57.85.157])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 952A73F632;
+	Wed,  8 Apr 2026 09:40:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1775666450; bh=X7uwi1mTnlblHvnMF6Xvi2utMBucdMig04mZXn3jTOw=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=F849nA4URN+RFi4j0f5jgoLpZlywmk3Pu6hMnA0qQncicSUV1k8+YOOGBYJZSzaWa
+	 WMsa+sEqQWvwY50XlMrAdxLbQ+BeLEJsklz01UjQB01Siqe8pKdIb3MTS2FbTKw0vy
+	 rIz0XlbsMeH2E12h1gNYQj8sc9EisZyfYvo/NbKo=
+Message-ID: <3a1d0520-3402-47b2-9d7b-4e14a3cd07a4@arm.com>
+Date: Wed, 8 Apr 2026 17:40:48 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: BUG: net-next (7.0-rc6 based and later) fails to boot on Jetson
+ Xavier NX
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ iommu@lists.linux.dev, linux-ext4@vger.kernel.org,
+ Linus Torvalds <torvalds@linux-foundation.org>, dmaengine@vger.kernel.org
+Cc: Marek Szyprowski <m.szyprowski@samsung.com>, Theodore Ts'o
+ <tytso@mit.edu>, Andreas Dilger <adilger.kernel@dilger.ca>,
+ Vinod Koul <vkoul@kernel.org>, Frank Li <Frank.Li@kernel.org>
+References: <adZTGOjjJrVJOcT8@shell.armlinux.org.uk>
+ <adZfTi3R6jtsjXx-@shell.armlinux.org.uk>
+ <adZ9grUg71f518Fg@shell.armlinux.org.uk>
+ <adZ_ZmjcE8S22vR1@shell.armlinux.org.uk>
+From: Robin Murphy <robin.murphy@arm.com>
+Content-Language: en-GB
+In-Reply-To: <adZ_ZmjcE8S22vR1@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[arm.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[arm.com:s=foss];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-276646-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-276647-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[arm.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[robin.murphy@arm.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,teamd_activebackup.sh:url]
-X-Rspamd-Queue-Id: 7A7B03BF010
+	DBL_BLOCKED_OPENRESOLVER(0.00)[arm.com:dkim,arm.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 841173BF0D0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, 08 Apr 2026 02:52:19 +0000 Marc Harvey wrote:
-> Allow independent control over receive and transmit enablement states
-> for aggregated ports in the team driver.
+On 2026-04-08 5:16 pm, Russell King (Oracle) wrote:
+> On Wed, Apr 08, 2026 at 05:08:34PM +0100, Russell King (Oracle) wrote:
+>> The rebase is still progressing, but it's landed on:
+>>
+>> c7d812e33f3e dmaengine: xilinx: xilinx_dma: Fix unmasked residue subtraction
+
+FWIW I don't see a Tegra having the Xilinx IP in it anyway - judging by 
+the DT it has their own tegra-gpcdma engine...
+
+There's a fair chance this could be 90c5def10bea ("iommu: Do not call 
+drivers for empty gathers"), which JonH also reported causing boot 
+issues on Tegras - in short, SMMU TLB maintenance may not be completed 
+properly which could lead to recycled DMA addresses causing exactly this 
+kind of random memory corruption. I CC'd you on a patch:
+
+https://lore.kernel.org/linux-iommu/20260408162846.GE3357077@nvidia.com/T/#t
+
+Thanks,
+Robin.
+
+>>
+>> and while this boots to a login prompt, it spat out a BUG():
+>>
+>> BUG: sleeping function called from invalid context at kernel/locking/mutex.c:591
+>> in_atomic(): 0, irqs_disabled(): 1, non_block: 0, pid: 56, name: kworker/u24:3
+>> preempt_count: 0, expected: 0
+>> RCU nest depth: 0, expected: 0
+>> 3 locks held by kworker/u24:3/56:
+>>   #0: ffff000080042148 ((wq_completion)events_unbound#2){+.+.}-{0:0}, at: process_one_work+0x184/0x780
+>>   #1: ffff80008299bdf8 (deferred_probe_work){+.+.}-{0:0}, at: process_one_work+0x1ac/0x780
+>>   #2: ffff0000808b48f8 (&dev->mutex){....}-{4:4}, at: __device_attach+0x2c/0x188
+>> irq event stamp: 10872
+>> hardirqs last  enabled at (10871): [<ffff80008013a410>] ktime_get+0x130/0x180
+>> hardirqs last disabled at (10872): [<ffff800080d61ac8>] _raw_spin_lock_irqsave+0x84/0x88
+>> softirqs last  enabled at (9216): [<ffff80008002807c>] fpsimd_save_and_flush_current_state+0x3c/0x80
+>> softirqs last disabled at (9214): [<ffff800080028098>] fpsimd_save_and_flush_current_state+0x58/0x80
+>> CPU: 5 UID: 0 PID: 56 Comm: kworker/u24:3 Not tainted 7.0.0-rc1-bisect+ #654 PREEMPT
+>> Hardware name: NVIDIA NVIDIA Jetson Xavier NX Developer Kit/Jetson, BIOS 6.0-37391689 08/28/2024
+>> Workqueue: events_unbound deferred_probe_work_func
+>> Call trace:
+>>   show_stack+0x18/0x30 (C)
+>>   dump_stack_lvl+0x6c/0x94
+>>   dump_stack+0x18/0x24
+>>   __might_resched+0x154/0x220
+>>   __might_sleep+0x48/0x80
+>>   __mutex_lock+0x48/0x800
+>>   mutex_lock_nested+0x24/0x30
+>>   pinmux_disable_setting+0x9c/0x180
+>>   pinctrl_commit_state+0x5c/0x260
+>>   pinctrl_pm_select_idle_state+0x4c/0xa0
+>>   tegra_i2c_runtime_suspend+0x2c/0x3c
+>>   pm_generic_runtime_suspend+0x2c/0x44
+>>   __rpm_callback+0x48/0x1ec
+>>   rpm_callback+0x74/0x80
+>>   rpm_suspend+0xec/0x630
+>>   rpm_idle+0x2c0/0x420
+>>   __pm_runtime_idle+0x44/0x160
+>>   tegra_i2c_probe+0x2e4/0x640
+>>   platform_probe+0x5c/0xa4
+>>   really_probe+0xbc/0x2c0
+>>   __driver_probe_device+0x78/0x120
+>>   driver_probe_device+0x3c/0x160
+>>   __device_attach_driver+0xbc/0x160
+>>   bus_for_each_drv+0x70/0xb8
+>>   __device_attach+0xa4/0x188
+>>   device_initial_probe+0x50/0x54
+>>   bus_probe_device+0x38/0xa4
+>>   deferred_probe_work_func+0x90/0xcc
+>>   process_one_work+0x204/0x780
+>>   worker_thread+0x1c8/0x36c
+>>   kthread+0x138/0x144
+>>   ret_from_fork+0x10/0x20
+>>
+>> This is reproducible.
 > 
-> The motivation is that IEE 802.3ad LACP "independent control" can't
-> be implemented for the team driver currently. This was added to the
-> bonding driver in commit 240fd405528b ("bonding: Add independent
-> control state machine").
+> I've just realised that it's the Tegra I2C bug that is already known
+> about, but took ages to be fixed in mainline - it's unrelated to the
+> memory corruption, so can be ignored. Sorry for the noise.
 > 
-> This series also has a few patches that add tests to show that the old
-> coupled enablement still works and that the new decoupled enablement
-> works as intended (4, 5, and 10).
-> 
-> There are three patches with small fixes as well, with the goal of
-> making the final decoupling patch clearer (1, 2, and 3).
 
-It pains me to report on non-debug kernels:
-
-make: Entering directory '/srv/vmksft/testing/wt-9/tools/testing/selftests'
-make[1]: Nothing to be done for 'all'.
-TAP version 13
-1..1
-# timeout set to 45
-# selftests: drivers/net/team: teamd_activebackup.sh
-# Setting up two-link aggregation for runner activebackup
-# Teamd version is: teamd 1.32
-# Conf files are /tmp/tmp.ZeEAwlX4kB and /tmp/tmp.Q8XVmtXmXY
-# This program is not intended to be run as root.
-# This program is not intended to be run as root.
-# Created team devices
-# Teamd PIDs are 30274 and 30278
-# PING fd00::2 (fd00::2) 56 data bytes
-# 64 bytes from fd00::2: icmp_seq=1 ttl=64 time=0.037 ms
-# 
-# --- fd00::2 ping statistics ---
-# 1 packets transmitted, 1 received, 0% packet loss, time 0ms
-# rtt min/avg/max/mdev = 0.037/0.037/0.037/0.000 msPacket count for test_team2 was 121
-# Waiting for eth0 in ns2-yYZzD5 to stop receiving
-# Packet count for eth0 was 0Packet count for eth0 was 0
-# Packet count for eth1 was 243
-# Waiting for eth1 in ns2-yYZzD5 to stop receiving
-# Packet count for eth1 was 0Packet count for eth0 was 365
-# Packet count for eth1 was 0
-# TEST: teamd active backup runner test                               [ OK ]
-# Tearing down two-link aggregation
-# Failed to kill daemon: Timer expired
-#
-not ok 1 selftests: drivers/net/team: teamd_activebackup.sh # TIMEOUT 45 seconds
-
-
-Retry:
-
-make: Entering directory '/srv/vmksft/testing/wt-9/tools/testing/selftests'
-make[1]: Nothing to be done for 'all'.
-TAP version 13
-1..1
-# timeout set to 45
-# selftests: drivers/net/team: teamd_activebackup.sh
-# Setting up two-link aggregation for runner activebackup
-# Teamd version is: teamd 1.32
-# Conf files are /tmp/tmp.0pmbsXgdH5 and /tmp/tmp.ehbGB6jJTZ
-# This program is not intended to be run as root.
-# This program is not intended to be run as root.
-# Created team devices
-# Teamd PIDs are 1314 and 1318
-# PING fd00::2 (fd00::2) 56 data bytes
-# 64 bytes from fd00::2: icmp_seq=1 ttl=64 time=0.032 ms
-# 
-# --- fd00::2 ping statistics ---
-# 1 packets transmitted, 1 received, 0% packet loss, time 0ms
-# rtt min/avg/max/mdev = 0.032/0.032/0.032/0.000 msPacket count for test_team2 was 121
-# Waiting for eth0 in ns2-H0Yrq8 to stop receiving
-# Packet count for eth0 was 0Packet count for eth0 was 0
-# Packet count for eth1 was 243
-# Waiting for eth1 in ns2-H0Yrq8 to stop receiving
-# Packet count for eth1 was 0Packet count for eth0 was 366
-# Packet count for eth1 was 0
-# TEST: teamd active backup runner test                               [ OK ]
-# Tearing down two-link aggregation
-# Failed to kill daemon: Timer expired
-#
-not ok 1 selftests: drivers/net/team: teamd_activebackup.sh # TIMEOUT 45 seconds
 
