@@ -1,521 +1,215 @@
-Return-Path: <netdev+bounces-276307-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276308-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uAS8DtL91Wn4/gcAu9opvQ
-	(envelope-from <netdev+bounces-276307-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 09:03:46 +0200
+	id 8E1rH7P+1Wn4/gcAu9opvQ
+	(envelope-from <netdev+bounces-276308-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 09:07:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2BF83B7D69
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 09:03:45 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1542B3B7E49
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 09:07:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 21172301950E
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 07:00:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 596B0304023F
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 07:04:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A91A928FA91;
-	Wed,  8 Apr 2026 07:00:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6150370D73;
+	Wed,  8 Apr 2026 07:04:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="kAGNiGv2"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="Kl+d9im2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11011023.outbound.protection.outlook.com [52.101.65.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 723A73537DE
-	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 07:00:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.145.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78BEC36494E;
+	Wed,  8 Apr 2026 07:04:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.65.23
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775631635; cv=fail; b=I2z+xnXxca7btWhcvpxP5nsVyeGVqwXDoEXD+2eT0o3h++iz5kzvK5gs1BAjd4PDFKTGeyFdi7fJeHEM7TQUAHw7GrjuLesZBA6VjOhGlXoO3bDxKHzyY0dppeyiNe4A5qz4jR5XdTikV3+cyyApvHz9C55ZRfv3OWr7C9Y6oSQ=
+	t=1775631865; cv=fail; b=F0dWrHGhj7G4GdC6mKgWQy0KPFq7lXc++EB7MaDg4hrfTm0EKQET7HKtC7JZGhyOrjSn+MsO5NO6M8/7GpTN2j5WxT31pWVh/WmF4iGv8OQss3fWgnBqphal8kM5tNIQt8mgrUgwN1Iz+1GlGWKw4QtO7HcMKN3mR/ngcbEflwo=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775631635; c=relaxed/simple;
-	bh=1MdQSuI3nvNc/eDzyoUNjEXCFBFBmsJotRJYHXhbUB4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DD1yWltrdl7yI1WaJ0/VdRwQ4Suf0nEVDMMYOcQJRwobbYfYBkyvaEG0DcdO5kanFXxemKvHSgx1X1oQN/oHprsp5R78xqrY17ldrJhKNuRewQvqmkbEeoURmQkENm5asxa7/DrDQYinKtTywEYLq+j9njjit4Rr+4nEktaGln4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=kAGNiGv2; arc=fail smtp.client-ip=67.231.145.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0528009.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 637HMIsZ2395165
-	for <netdev@vger.kernel.org>; Wed, 8 Apr 2026 00:00:23 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
-	 bh=h0EamnadhOTpD/0Bd/G+aA8kqz1sRrXwxveYTUbSEto=; b=kAGNiGv2nh1U
-	DO/jKpyL1+1Thtj9B+kIhZS5rv3bug8qzR58yChytUNTo0j/hfmhiec3U+sdZ3+x
-	kvSKok+EVFPCX0FOQr2dJIA2KQoG4WiuPz5jghHKZDqmPvEZkQeejGumBNPJxGwx
-	WfsEk3AQ4j9w8BD3p/RlVLosqOTkOnAtYmrBgwX4EDme9P13rBDqLsSYvtvftd6x
-	l+KKLUCuaXBW8uiYV3UOtL6oIH969HB6O5HIf5JbEMAfgh4k6CwSZh2Gps+HVIP0
-	mVg0F7pRbg4NZLLggmwrPlXtPtDhnVCmu0JM/la8Xz3hr6qLrl51QakNpe8NygA/
-	9ypkFirqJg==
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com [209.85.208.69])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4dcnq6h0q4-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 00:00:19 -0700 (PDT)
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-66e375468a2so5686882a12.2
-        for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 00:00:18 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1775631618; cv=none;
-        d=google.com; s=arc-20240605;
-        b=FyG9TVsPmPpFumIOge6uo/8U3RH8nmiUx3bxjeKqxOIsn+7f4ue0o4OWfdX00SGet+
-         l0ZcQJzvg5kehJwrC1DWW9fOZ8pQTJIFFLIdjnuJx9b7jtYR79TfBAS4AF0SQFfJEU5G
-         B3CrVQH/v6d/yu7oiwdU0CABvoPPRINxzCBIR1RRNvYd+kzEFe1nzCJQpAN1qpeEHTPm
-         2xnYbbZq55E9QuKy56hqUIneYN21aGzwCGlJwlG9mxgznvpLA+quyFV0MAQPJ2+oLq1y
-         v2QCSmtCErRAf4/86hlJPows9B+WpMlawIjjyrno4uMmL1yA5jbrDC9ZgP9ojjbR/xZo
-         0NxQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version;
-        bh=3eMzaszELn0E8mw1f+wWiQKidENOH8YD54nKWgR4c6o=;
-        fh=LPhuWup6mBT5kLWzMSdxaQsH1M3aeSusOtXR2QBzYfI=;
-        b=HIRlKmZSqu+SaqDpM72Jw7qcuh+L84uA47rhJLkKd/lBUllRYEpr0+IuwK6BeYEhPW
-         6vlclV/4J5VFggG0B7rnPCYN0vrjyFqGB+5I0HXSQVFalXFX0zOyUEqhZOtIGdI4dIgx
-         nxts2L27/k2UWnNc6KZ/DT3nj1ElHYfljyqk7eNMjWstNfscQdzD7aDrGHcijAMz3ZTD
-         QtEAnrkqjCoPylRBwU4im0eONHF0eE+sszl4r/MzwiqCAjKsoz76HyDL5YQQNqeumtW9
-         1yTFkLiUgeACt7dPPTUH2Rw/WRRGiij0Df1LRoVHcmQxhlfsy2Fm4+Eg3niFjccH93y/
-         eZDA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775631618; x=1776236418;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=3eMzaszELn0E8mw1f+wWiQKidENOH8YD54nKWgR4c6o=;
-        b=kSWYDOx+Emjk210RY+lG64ohLYy15Cnjatvqy0e79CMXbf0JjZdXTV6XuaDBG0SJMW
-         UeOkAI7QjwL+Oe6yKtppK+biYutvCGyW1h5gPEYTvQwJQcrbNb/AYbEKel5KNxVdX3j2
-         QbIgQnb4MRR4FjVL5Pew2raq1C3qpE8OxBaTMdpIkmxC9Vbbmz2s8hk0pGDmAmpoStWr
-         jirhLkzzcpAaI85wuz2h0ko27QzlDCd5QX6BlJdW0UgcQ08D6s96OJQZry8GWlmcSVyQ
-         MOP44lRL5DIweGdIPafwt9Psve/qiO3qM7SDIOniuyDeu6XXc+QQJCjC/R6C0nGnRnYa
-         d3qQ==
-X-Gm-Message-State: AOJu0YymJ167oucm8leBuh8XXT5ZBk7fGOW6300yvIGXfxq8G/wpX5mq
-	XNWoRQkrdOop/j0etDelaTaf+AajjOgtRN9rOxWOSj/zc2TeAppHWFNw/nFdVoWW+vNogqv8m5E
-	SLgz5hjR4QrbgCSinKvzl/IOnNxqlvZ2BILlNYoMiLf/wPH4re1JXTEtKr5j83P6EV/Ms9q8TEL
-	6nQuh2Q0PVmkBaSLDWCYMPNR9Jk3EIJA==
-X-Gm-Gg: AeBDietIMA9aB9a6ybby5KhkYXNHCtL10SsP/q5gKCvpT0rNsvZ5AJskZxc5kVcm0Lo
-	NfOkpudPVb9O91ZEifQ+wwze9sNzBj13pfd5Ocbx9wDxCGdW+dTrlG3k+j4gUAy8SDBs4AgGV2z
-	eBZVBfjndH0pjumEA43UvJ2RWftGXcqVJ2G2jWzAzjRA1ixQWCVIg94dNgC+dtZylFElPPtfvtR
-	MZngTMsC9JNZlmfZ85E
-X-Received: by 2002:a17:906:2081:b0:b98:5b2:77f7 with SMTP id a640c23a62f3a-b9c672fc811mr608413966b.12.1775631617349;
-        Wed, 08 Apr 2026 00:00:17 -0700 (PDT)
-X-Received: by 2002:a17:906:2081:b0:b98:5b2:77f7 with SMTP id
- a640c23a62f3a-b9c672fc811mr608410266b.12.1775631616132; Wed, 08 Apr 2026
- 00:00:16 -0700 (PDT)
+	s=arc-20240116; t=1775631865; c=relaxed/simple;
+	bh=2xsTCjUCJA3LHq4GviEXhcSQ9rb5DewUKmwArK745Yo=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Laow7s7AChDhlGq57FeyZO8hrNwlUjolVsQ2F+bu7wWJcwj6icfV64fIDTmvWWMJ4vK+sbhIpXs96TvB4wC1H9amzXMCdR+4Q4iT5cO5DUhCkkpBLpG3yGZp/grDIjQIZa6Yy0OZ14uIFPl38kJQCD0SUfv7Fa87TLR9kyebuiE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=Kl+d9im2; arc=fail smtp.client-ip=52.101.65.23
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=jbk5nOJ7sgRd5U4bfrcz3WQs2D6i8wFJc+i6Zc409chZXXfqO5EFrqb4+ICmEJbOA0iue+xdcbEHkZXuDJ2fKfduMhG3TSCQYvj1IKxGvASduInzCanxLRsbcg8N0zVO1sjyJQPdb8nAmMWRdhUhDkax8YE5Nu8xPp8N6TbVXZ0vDHBwCcZJN/0Y82aR5vG5SLgwA1K/7Yv8+y8oGWFQK7ViZAk1o/We6J7Ijf7dtekO9TB/0i3Khdk2nM9avpzSQ8EBJ1nlHfcdFwLkpvo9a/N1Rym9UbagSpxOqluV4wpVTG2a0COF6ujSicaKHQBuSPlQC+B9YG8k2MVvwr6GhQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=thl/VlRtRCAG8/l486DdbwYWOadfiLXeSMDKznREDG8=;
+ b=IZrI5loG3mvRvP7WblP9gP+6KTP5iBQC6/jcnnoXL6WDuoNsX0N2jMWSLOfPtCHIhjBsdkj+ImnKmFlMNcdsMnUUudy30EdG+Wor9xGCjuRIKA5lMUgFbq9JfRx5sebVcQdFZM8Ip0L310Ojzzmcv/Mh9iqb9x23Zw2Jljhx42yBncggIQUOh/vRY7ma5/KFFJjHTHS4GbIn6EnJbxDJwIcpQ2qE4bSIUudbaV8N1h4Qqb7QNsjQ8x/irUczz02GPdDk14VHIFI2i+L254hCa9KqRAEym3r80jcZnJnJszkAJWd5uoZPHX2b4ZvpRtr9+I9/gHU5snZMySB2QXwB/Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=thl/VlRtRCAG8/l486DdbwYWOadfiLXeSMDKznREDG8=;
+ b=Kl+d9im2Nh0PsFFqg6Quxdld5y89XMqmqyHtNU9OdGh6iiND8edEWL+npGHlHUwCJRpls0FMcA4xa/F5MPdp46icVR5A81jOLuIAQBmcP9h7g1ThIOH4YC7eW+5maCRU57k2ihfRXh2lNhK+DV0lvaybRIXf+2DZnHNrrUfxKmUCKZ1vOxnEfhZdSkNOFSjmi+BzKRInS+FUb06ewUT6Pnm18BZtmVLjPeKJavjyze1kHZPGwnVGm+UVG4MiQEclcyJ/7QfJC1JypSxMSYkcnPcJyoSdzAw0G1nal4bzQYkHTCvqGkVfWT+Y5IHCX0CaFuM6OeIFLou7subSn1Nu0g==
+Received: from AM8PR04MB7284.eurprd04.prod.outlook.com (2603:10a6:20b:1dc::8)
+ by GVXPR04MB10611.eurprd04.prod.outlook.com (2603:10a6:150:21c::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.19; Wed, 8 Apr
+ 2026 07:04:20 +0000
+Received: from AM8PR04MB7284.eurprd04.prod.outlook.com
+ ([fe80::9cd6:51bd:82b:98dc]) by AM8PR04MB7284.eurprd04.prod.outlook.com
+ ([fe80::9cd6:51bd:82b:98dc%5]) with mapi id 15.20.9769.014; Wed, 8 Apr 2026
+ 07:04:19 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: Claudiu Manoil <claudiu.manoil@nxp.com>, Vladimir Oltean
+	<vladimir.oltean@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
+	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "robh@kernel.org" <robh@kernel.org>,
+	"krzk+dt@kernel.org" <krzk+dt@kernel.org>, "conor+dt@kernel.org"
+	<conor+dt@kernel.org>, "f.fainelli@gmail.com" <f.fainelli@gmail.com>, Frank
+ Li <frank.li@nxp.com>, "chleroy@kernel.org" <chleroy@kernel.org>,
+	"horms@kernel.org" <horms@kernel.org>, "linux@armlinux.org.uk"
+	<linux@armlinux.org.uk>, "andrew@lunn.ch" <andrew@lunn.ch>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "imx@lists.linux.dev"
+	<imx@lists.linux.dev>
+Subject: RE: [PATCH v4 net-next 04/14] net: enetc: add basic operations to the
+ FDB table
+Thread-Topic: [PATCH v4 net-next 04/14] net: enetc: add basic operations to
+ the FDB table
+Thread-Index: AQHcwQGRdpZmLUMUwkGdnLHx3d+rArXMjUAAgAg7X0A=
+Date: Wed, 8 Apr 2026 07:04:19 +0000
+Message-ID:
+ <AM8PR04MB728494A137BF1BF72B39070A885BA@AM8PR04MB7284.eurprd04.prod.outlook.com>
+References: <20260331113025.1566878-5-wei.fang@nxp.com>
+ <20260403011727.1795379-1-kuba@kernel.org>
+In-Reply-To: <20260403011727.1795379-1-kuba@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: AM8PR04MB7284:EE_|GVXPR04MB10611:EE_
+x-ms-office365-filtering-correlation-id: f7a9daf8-c38a-4715-41e4-08de953d0e50
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|366016|376014|19092799006|7416014|38070700021|18002099003|56012099003|22082099003;
+x-microsoft-antispam-message-info:
+ ueXBzHzvQ1mR2ouX/KAFfKi51ph0waxXll0UWJi0hhMcbTGK7aSSa+QnfXFQO2TH5pG/dthDsy7AzrA+U+iwnTROQEI5HTdKd5zU0CQOVeB48BImoNWiYs3bcfseivNrJU3P2TmbF867Z5scTZxzVmAGSeJCA/7bw8YfadBR9BpXfxlCdwfk+a2qE0vjE5biIE1ITh4KXQB6ayvVrcA3Z+f6DkBzpYg1349Zu626jrv46ILbEShkI/4dHedrRSc/xJ0io28+n7JZmRFANZltCm/gMXg8mY6MD1/4Ch7uPBMul/w3MH4ZY20Sz+B3tGaUZIOANKRFB5Pyur+PDNe+96but8b0hjSCBk93aUkvyTmbVUr1bZ1ep4CUnfq3RdS+1TK1Gw7z6vFyw3+AjR6n2+z0H8KZzlj//+Sq0bfVlMEcw16nj8arH6sjscdL/Rm+YEQpEopukpXEyt3lkyUrLKHBrKaNEgoi03MyPWJl4zVsGrMxjpbd4J5M8DET+b7uPjP2uwjWAMSzn04IvzorQ4boHiWvPmdVVOY08i2Yji75+yevepiQX4QhwPl3FGqiR8hJXAcHbVfx1ot++R90kMhDr8jIRJFgWOHPXI2Rr9rICTZP1jE7kkH6DJ2vetXQtzcd5DAyPP6F8RuhxGx38bTaaFbMS0tJoyn58MkE/9S13u63j4VD3J3N+RCqq4LL1HFiQoPCBcVzff0CjKCAV/Aiw0bAnvqWzwYq5geEdwr1yZxnTDUejD86h5khru1QZ/NvO2xGZEuRrZ4VWa3fVe0kUZyXGjabBsfRP7THAoo=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7284.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(19092799006)(7416014)(38070700021)(18002099003)(56012099003)(22082099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?o+107Qtb5q5DJ1Uyry6l66oz+Bg9jEBckt3KHfIN09FZqINPR+q3BfhNhNhf?=
+ =?us-ascii?Q?sVbbiV7GBa1zLpA+QZv2SydLzxkW/znru74uZ02kaCQ2mbnnQaYHQDjNmzPh?=
+ =?us-ascii?Q?Mv9L2DW9ujkNqvkgC8/lQsX+2RT76er3SomJvyodCFzbt8+FvpDf+zSXziYp?=
+ =?us-ascii?Q?esI/D0lHn0SR8DgNyBAjmORgFR2SoCN/hW+6qYief/euZfevoVG5s3plQ969?=
+ =?us-ascii?Q?z2Tt2ngbJIE78KczkSDShVqSzWBlTaVx8X1a0jZwT5LzFZWmgeqWIA1zwol2?=
+ =?us-ascii?Q?ZAW1QISNVkxLkSV7I/oUKYoalnhGWD0T9EglU+vHe/HgndZZb24kaLkD+oYg?=
+ =?us-ascii?Q?rRfAfg4Rqxm3Wccwux2ZFdog6agWBqq1pyREQsoy6WeZcegx2jDeZQv8SN6W?=
+ =?us-ascii?Q?/onhmKG83qge/+Qn7gkq+1fEqn4V+FDuj924EmfXoITqANghjNDcPe2GcIF1?=
+ =?us-ascii?Q?A4mWQXkRbTzAQjWa2VQwNGUh3RpNpwtY91AH0VKBwDHVxOHAeIe4W6Tc80NB?=
+ =?us-ascii?Q?Ur/Z3ARcDSywZqIuYMvuz4J3T8fo6IOLqrbTM437LIvAGeZwW0QDRT0e2rGL?=
+ =?us-ascii?Q?B5dV2ZFgwEBx2OOL80CquiWb3LIh9UtScEsVfhjVyzh9i0032osJeG9NDHya?=
+ =?us-ascii?Q?75t8Y3dk057Q15fIqjLC4xrfcsEVMEKR9dk0gHLma7ky42ufC0Yy5m5a90m7?=
+ =?us-ascii?Q?p9JqDP7wFjuO+0nLkdFKmbmroNHK428jA8dC/qkqPxI1r5le5yoHGRqpPVve?=
+ =?us-ascii?Q?hNYxza8LTQpEPEpUs+BkgfDfVCPbkKI8/MNyO4deu9RZr2idBAOJUcYTsZ2f?=
+ =?us-ascii?Q?Ci6BX+SyOS9n66Bsx2BRfe1JR2jIyHTfNr25s6pA+iPsiHEGckH2LAztjp20?=
+ =?us-ascii?Q?vlTfavXhyZ6khPY28ih8W9UFTBZ8deDy1/BsMcuO5PGtdQzm690UWffV9Buh?=
+ =?us-ascii?Q?TUDsH+86h3FkxE0BOM9Py4Eam+YCgkPPZvrN1yS6EXd8EG/IscNPfzp6tfcu?=
+ =?us-ascii?Q?WLfII7c2geF1GTYXAjkz4r5WR/CqZzHmodEdmpsAEH+tdXl9gr2atuEIWW5y?=
+ =?us-ascii?Q?psGKcf3+rJUn/3Lb8uoSd6w7NckoBuQ/FaA3fUt1zPEu5fR/qZasC3C0nOXp?=
+ =?us-ascii?Q?LbdTrnhvk4vBTcMk1rBsD04lo4hapCZyer2vAvgpTzKx8iOwKSBKBtD3yfcb?=
+ =?us-ascii?Q?YjQa2WzVYTNIhkssPNwFt/nIqCQ0iIvfNgpEZ7y0cObXN/9hKTipbKo/N+Oi?=
+ =?us-ascii?Q?BF9rmisHphai/tNobqRz8Nfiufqn03vBVO6/Wz/LSFFz/7JAnffaA4bLKLFD?=
+ =?us-ascii?Q?65q2i9c1cr+mlEIUtvwhKOS7I4WTy9JyvpVeuVJEa6lCLkJEtVB2ZwUyPjHY?=
+ =?us-ascii?Q?fMlprXdSZEjfi/iMYDcVJ/HWMrPGYyQ4ymRzOpxBIpjE5ueshXLA/4/K8Llo?=
+ =?us-ascii?Q?Mi4IUWpxNpMJdFz26qckUgq8rYEuNzmA5N2NX7lrqUGznqPgbFkZvcZc5LFw?=
+ =?us-ascii?Q?FI/qBimjU9AKxvDfiwj6YgAVS70Aa+LHna/nOl7kIlZ4f+lHjFWdWNFz/23H?=
+ =?us-ascii?Q?BTT/arnAuqjjRMGzLh+6Txz+VFrU0jINw9F3R3/ouo9iKIMNyTgfGFz/PcpV?=
+ =?us-ascii?Q?YuYjEuRl+HrNb6YQJtz8mi4pHgM8TqpBZFnA8Mg+zIOWwo7HbR8sGhWfSknS?=
+ =?us-ascii?Q?z8U8f+hLX2A2hk6RpzEHRiYKS4hepDHHbFlsM8/TIOWMp2HW?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260408002802.2448424-1-ntspring@meta.com> <20260408002802.2448424-2-ntspring@meta.com>
- <CANn89iKEgkbS=FEssas9upr4kTpAuH2PRehthBC4Oc4bBfW8hQ@mail.gmail.com>
-In-Reply-To: <CANn89iKEgkbS=FEssas9upr4kTpAuH2PRehthBC4Oc4bBfW8hQ@mail.gmail.com>
-From: Neil Spring <ntspring@meta.com>
-Date: Tue, 7 Apr 2026 23:59:50 -0700
-X-Gm-Features: AQROBzCc3z2TzBzLUH87d8G6LUS3qCJYYgcvgfsOpGzjtAwX0tHc5xN1dfvW6_I
-Message-ID: <CAGy2EQbzLLV5WfrrnoNn1ocuE1oojQ1HB6xfQ8FH1Mgp5iR-Gw@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/2] tcp: rehash onto different ECMP path on
- retransmit timeout
-To: Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, ncardwell@google.com, kuniyu@google.com,
-        davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org,
-        pabeni@redhat.com, horms@kernel.org, shuah@kernel.org,
-        linux-kselftest@vger.kernel.org, Ido Schimmel <idosch@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Authority-Analysis: v=2.4 cv=LoSiDHdc c=1 sm=1 tr=0 ts=69d5fd03 cx=c_pps
- a=Tczdrg5if7+wQeIJmxD/XA==:117 a=IkcTkHD0fZMA:10 a=A5OVakUREuEA:10
- a=f7IdgyKtn90A:10 a=VkNPw1HP01LnGYTKEx00:22 a=7x6HtfJdh03M6CCDgxCd:22
- a=U_y8lYiYyhHBU5rMqhb2:22 a=1XWaLZrsAAAA:8 a=VabnemYjAAAA:8
- a=N6M6QLLqE6vfnKd7XjcA:9 a=QEXdDO2ut3YA:10 a=1oAhN8tkTtOBK6_UvoHx:22
- a=gKebqoRLp9LExxC7YDUY:22
-X-Proofpoint-ORIG-GUID: wHt080c8fcNE2kCsrQiXbGnsIBrKqBfQ
-X-Proofpoint-GUID: wHt080c8fcNE2kCsrQiXbGnsIBrKqBfQ
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDA4MDA2MCBTYWx0ZWRfX+yYltfOIjIfX
- rBhIt2+oaktuYaTOxngOH4rFl4K5seKsH0Sg74HRggyS9pCqr7KAk+L7NhC/Nk46FYwudeeuxjX
- 5p5iyMchAoHYBkVb8GlPx+uMM3Lo8vHMWP7BfymHFlxV2anR1csJwI140ejBZ6wYQAdGawBPmST
- GHAH9LW0pLX5GTbsRFqWVnNzxA4/ZR4sXCv524m/NcWut6kefELmwZe5hNEh3nM/nS+TLFIE+hS
- SdwXJPU7K16eB7/3+TZBE7m93YSckogzm+DcFSMXpWum24B7VPP4/VPg3TJdxVUevkaAR0utr77
- V4dzi65Ef8bgF9xhoi+m7c3GTn3ZOjNDeWh/kvWck09XE9o2zaOr9Z6q/dsSVlEzYyJcpjbqD4k
- BVIXXNLYiPFj7fEI6QU4TDRfy8SY+NXzQ8Kbt6y2bP0u0t5qhsVMhfnSRthHEjMEl6jVFtOCv7X
- a3wbT+wMH9wUIwPg/Qg==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-04-08_02,2026-04-07_05,2025-10-01_01
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7284.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f7a9daf8-c38a-4715-41e4-08de953d0e50
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Apr 2026 07:04:19.8716
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: WFX7Zy9+OoCQHNj7cPKTIDf0UPQ6V5GTDlQGX334hGrUjpkC5At9DFPsVFBnX4/NX5UwAEpNgHoLdsys+/dTkA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: GVXPR04MB10611
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[meta.com,reject];
-	R_DKIM_ALLOW(-0.20)[meta.com:s=s2048-2025-q2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-276307-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-276308-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[nxp.com,lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,gmail.com,armlinux.org.uk,vger.kernel.org,lists.ozlabs.org,lists.infradead.org,lists.linux.dev];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	DKIM_TRACE(0.00)[meta.com:+];
-	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ntspring@meta.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[meta.com:dkim,meta.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: C2BF83B7D69
+	FROM_NEQ_ENVFROM(0.00)[wei.fang@nxp.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[nxp.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	NEURAL_HAM(-0.00)[-0.999];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nxp.com:dkim,AM8PR04MB7284.eurprd04.prod.outlook.com:mid]
+X-Rspamd-Queue-Id: 1542B3B7E49
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Thanks Eric for looking at this; sorry for the duplicate email as I
-failed to reply all; comments below.
+> > @@ -116,6 +158,31 @@ static inline int ntmp_rsst_query_entry(struct
+> ntmp_user *user,
+> >  	return 0;
+> >  }
+> >
+> > +static inline int ntmp_fdbt_add_entry(struct ntmp_user *user, u32 *ent=
+ry_id,
+> > +				      const struct fdbt_keye_data *keye,
+> > +				      const struct fdbt_cfge_data *data)
+> > +{
+> > +	return 0;
+> > +}
+>=20
+> If CONFIG_NXP_NETC_LIB is disabled, will returning 0 here cause callers t=
+o
+> falsely assume the operation succeeded and proceed to use an uninitialize=
+d
+> entry_id pointer? Would it be safer to return an error code such as
+> -EOPNOTSUPP for stubs that have output parameters?
+>=20
 
-On Tue, Apr 7, 2026 at 6:09=3DE2=3D80=3DAFPM Eric Dumazet <edumazet@google.=
-com> w=3D
-rote:
-> On Tue, Apr 7, 2026 at 5:28=3DE2=3D80=3DAFPM Neil Spring <ntspring@meta.c=
-om> wr=3D
-ote:
-> >
-> > Add sk_dst_reset() alongside sk_rethink_txhash() in the RTO, PLB,
-> > and spurious-retrans paths so that the next transmit triggers a fresh
-> > route lookup.  Propagate sk_txhash into fl6->mp_hash in
-> > inet6_csk_route_req() and inet6_csk_route_socket() so
-> > fib6_select_path() uses the socket's current hash for ECMP selection.
-> >
-> > The ir_iif update in tcp_check_req() covers both IPv4 and IPv6
-> > because it was cleaner than gating on address family; IPv4 is
-> > otherwise unaltered, and not having autoflowlabel in IPv4 means
-> > I wouldn't expect a new path on timeout.
-> >
-> > It is possible that PLB does not need this (that there are other
-> > methods of reacting to local congestion); I added the sk_dst_reset
-> > for consistency.
-> >
-> > Signed-off-by: Neil Spring <ntspring@meta.com>
-> > ---
-> >  net/ipv4/tcp_input.c             | 4 +++-
-> >  net/ipv4/tcp_minisocks.c         | 9 +++++++++
-> >  net/ipv4/tcp_plb.c               | 1 +
-> >  net/ipv4/tcp_timer.c             | 1 +
-> >  net/ipv6/inet6_connection_sock.c | 8 ++++++++
-> >  5 files changed, 22 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-> > index 7171442c3ed7..3d42ab45066c 100644
-> > --- a/net/ipv4/tcp_input.c
-> > +++ b/net/ipv4/tcp_input.c
-> > @@ -5014,8 +5014,10 @@ static void tcp_rcv_spurious_retrans(struct sock=
-=3D
- *sk,
-> >             skb->protocol =3D3D=3D3D htons(ETH_P_IPV6) &&
-> >             (tcp_sk(sk)->inet_conn.icsk_ack.lrcv_flowlabel !=3D3D
-> >              ntohl(ip6_flowlabel(ipv6_hdr(skb)))) &&
-> > -           sk_rethink_txhash(sk))
-> > +           sk_rethink_txhash(sk)) {
-> >                 NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPDUPLICATEDATAR=
-=3D
-EHASH);
-> > +               sk_dst_reset(sk);
-> > +       }
-> >
-> >         /* Save last flowlabel after a spurious retrans. */
-> >         tcp_save_lrcv_flowlabel(sk, skb);
-> > diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
-> > index 199f0b579e89..ef4b3771e9d8 100644
-> > --- a/net/ipv4/tcp_minisocks.c
-> > +++ b/net/ipv4/tcp_minisocks.c
-> > @@ -750,6 +750,15 @@ struct sock *tcp_check_req(struct sock *sk, struct=
-=3D
- sk_buff *skb,
-> >                  * Reset timer after retransmitting SYNACK, similar to
-> >                  * the idea of fast retransmit in recovery.
-> >                  */
-> > +
->
-> What is the following part doing?
-> tcp_v6_init_req() uses something quite different before setting ir_iif
-> A comment explaining the rationale would be nice.
+The ntmp_fdbt_add_entry() is only called by the netc switch driver,
+and the driver will select CONFIG_NXP_NETC_LIB option, so actually
+this inline function is not used by any drivers. I suppose such inline
+functions could be removed. Thanks.
 
-Comment added in v2.  The behavior I thought I observed was that the
-ir_iif goes into fl6->flowi6_oif in inet6_csk_route_req(), limiting options
-to any next hop on that interface, so if we received a retransmitted syn
-on a new interface, we should try to use the new interface for the
-response.
-
->
-> > +#if IS_ENABLED(CONFIG_IPV6)
-> > +               if (sk->sk_family =3D3D=3D3D AF_INET6)
-> > +                       inet_rsk(req)->ir_iif =3D3D tcp_v6_iif(skb);
-> > +               else
-> > +#endif
-> > +                       inet_rsk(req)->ir_iif =3D3D
-> > +                               inet_request_bound_dev_if(sk, skb);
-> > +
-> >                 if (!tcp_oow_rate_limited(sock_net(sk), skb,
-> >                                           LINUX_MIB_TCPACKSKIPPEDSYNREC=
-=3D
-V,
-> >                                           &tcp_rsk(req)->last_oow_ack_t=
-=3D
-ime)) {
-> > diff --git a/net/ipv4/tcp_plb.c b/net/ipv4/tcp_plb.c
-> > index 68ccdb9a5412..d7cc00a58e53 100644
-> > --- a/net/ipv4/tcp_plb.c
-> > +++ b/net/ipv4/tcp_plb.c
-> > @@ -79,6 +79,7 @@ void tcp_plb_check_rehash(struct sock *sk, struct tcp=
-=3D
-_plb_state *plb)
-> >                 return;
-> >
-> >         sk_rethink_txhash(sk);
-> > +       sk_dst_reset(sk);
-> >         plb->consec_cong_rounds =3D3D 0;
-> >         tcp_sk(sk)->plb_rehash++;
-> >         NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPPLBREHASH);
-> > diff --git a/net/ipv4/tcp_timer.c b/net/ipv4/tcp_timer.c
-> > index ea99988795e7..acc22fc532c2 100644
-> > --- a/net/ipv4/tcp_timer.c
-> > +++ b/net/ipv4/tcp_timer.c
-> > @@ -299,6 +299,7 @@ static int tcp_write_timeout(struct sock *sk)
-> >         if (sk_rethink_txhash(sk)) {
-> >                 tp->timeout_rehash++;
-> >                 __NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPTIMEOUTREHAS=
-=3D
-H);
-> > +               sk_dst_reset(sk);
-> >         }
-> >
-> >         return 0;
-> > diff --git a/net/ipv6/inet6_connection_sock.c b/net/ipv6/inet6_connecti=
-=3D
-on_sock.c
-> > index 37534e116899..2fe753bb38b4 100644
-> > --- a/net/ipv6/inet6_connection_sock.c
-> > +++ b/net/ipv6/inet6_connection_sock.c
-> > @@ -48,6 +48,11 @@ struct dst_entry *inet6_csk_route_req(const struct s=
-=3D
-ock *sk,
-> >         fl6->flowi6_uid =3D3D sk_uid(sk);
-> >         security_req_classify_flow(req, flowi6_to_flowi_common(fl6));
-> >
-> > +       if (req->num_retrans)
-> > +               fl6->mp_hash =3D3D jhash_1word(req->num_retrans,
-> > +                                          (__force u32)ireq->ir_rmt_po=
-=3D
-rt)
-> > +                               >> 1;
->
-> Why not setting mp_hash to sk_txhash ?
-
-To be honest, I was trying to avoid adding #include <tcp.h> to the top of
-inet6_connection_sock.c, which is needed to get tcp_rsk(req)->txhash, but
-that does make better code, using that in v2.
-
-> Why are you using ">> 1" ?
-
-The >> 1 is due to rt6_multipath_hash returning its computed
-value shifted right one before going into mp_hash in route.c sites.
-I understood mp_hash can't have the high bit set and still work
-due to fib6_select_path treating it as a signed integer when comparing
-to fib_nh_upper_bound.
-
-> rt6_multipath_hash() seems to be bypassed, it might be time to add a
-> comment there
-> explaining that mp_hash needs to be 31-bit only...
->
-> Perhaps use rt6_multipath_hash() and expand it to use a socket pointer
-> to retrieve sk->sk_txhash when/if possible
-> instead of yet another flow dissection.
-
-I think thyour comment above (grabbing txhash) avoids the dissection.
-
->
-> > +
-> >         if (!dst) {
-> >                 dst =3D3D ip6_dst_lookup_flow(sock_net(sk), sk, fl6, fi=
-na=3D
-l_p);
-> >                 if (IS_ERR(dst))
-> > @@ -70,6 +75,9 @@ struct dst_entry *inet6_csk_route_socket(struct sock =
-=3D
-*sk,
-> >         fl6->saddr =3D3D np->saddr;
-> >         fl6->flowlabel =3D3D np->flow_label;
-> >         IP6_ECN_flow_xmit(sk, fl6->flowlabel);
-> > +
-> > +       if (sk->sk_txhash)
-> > +               fl6->mp_hash =3D3D sk->sk_txhash >> 1;
->
-> Seems inconsistent, and same question about the right shift.
-
-Adding comment and standardizing on
-* tcp_rsk(req)->txhash >> 1 for request sockets,
-* sk->sk_txhash >> 1 for established sockets.
-
->
->
-> >         fl6->flowi6_oif =3D3D sk->sk_bound_dev_if;
-> >         fl6->flowi6_mark =3D3D sk->sk_mark;
-> >         fl6->fl6_sport =3D3D inet->inet_sport;
-> > --
-> > 2.52.0
-> >
-
-On Tue, Apr 7, 2026 at 6:09=E2=80=AFPM Eric Dumazet <edumazet@google.com> w=
-rote:
->
-> >
-> On Tue, Apr 7, 2026 at 5:28=E2=80=AFPM Neil Spring <ntspring@meta.com> wr=
-ote:
-> >
-> > Add sk_dst_reset() alongside sk_rethink_txhash() in the RTO, PLB,
-> > and spurious-retrans paths so that the next transmit triggers a fresh
-> > route lookup.  Propagate sk_txhash into fl6->mp_hash in
-> > inet6_csk_route_req() and inet6_csk_route_socket() so
-> > fib6_select_path() uses the socket's current hash for ECMP selection.
-> >
-> > The ir_iif update in tcp_check_req() covers both IPv4 and IPv6
-> > because it was cleaner than gating on address family; IPv4 is
-> > otherwise unaltered, and not having autoflowlabel in IPv4 means
-> > I wouldn't expect a new path on timeout.
-> >
-> > It is possible that PLB does not need this (that there are other
-> > methods of reacting to local congestion); I added the sk_dst_reset
-> > for consistency.
-> >
-> > Signed-off-by: Neil Spring <ntspring@meta.com>
-> > ---
-> >  net/ipv4/tcp_input.c             | 4 +++-
-> >  net/ipv4/tcp_minisocks.c         | 9 +++++++++
-> >  net/ipv4/tcp_plb.c               | 1 +
-> >  net/ipv4/tcp_timer.c             | 1 +
-> >  net/ipv6/inet6_connection_sock.c | 8 ++++++++
-> >  5 files changed, 22 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-> > index 7171442c3ed7..3d42ab45066c 100644
-> > --- a/net/ipv4/tcp_input.c
-> > +++ b/net/ipv4/tcp_input.c
-> > @@ -5014,8 +5014,10 @@ static void tcp_rcv_spurious_retrans(struct sock=
- *sk,
-> >             skb->protocol =3D=3D htons(ETH_P_IPV6) &&
-> >             (tcp_sk(sk)->inet_conn.icsk_ack.lrcv_flowlabel !=3D
-> >              ntohl(ip6_flowlabel(ipv6_hdr(skb)))) &&
-> > -           sk_rethink_txhash(sk))
-> > +           sk_rethink_txhash(sk)) {
-> >                 NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPDUPLICATEDATAR=
-EHASH);
-> > +               sk_dst_reset(sk);
-> > +       }
-> >
-> >         /* Save last flowlabel after a spurious retrans. */
-> >         tcp_save_lrcv_flowlabel(sk, skb);
-> > diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
-> > index 199f0b579e89..ef4b3771e9d8 100644
-> > --- a/net/ipv4/tcp_minisocks.c
-> > +++ b/net/ipv4/tcp_minisocks.c
-> > @@ -750,6 +750,15 @@ struct sock *tcp_check_req(struct sock *sk, struct=
- sk_buff *skb,
-> >                  * Reset timer after retransmitting SYNACK, similar to
-> >                  * the idea of fast retransmit in recovery.
-> >                  */
-> > +
->
-> What is the following part doing?
-> tcp_v6_init_req() uses something quite different before setting ir_iif
-> A comment explaining the rationale would be nice.
->
-> > +#if IS_ENABLED(CONFIG_IPV6)
-> > +               if (sk->sk_family =3D=3D AF_INET6)
-> > +                       inet_rsk(req)->ir_iif =3D tcp_v6_iif(skb);
-> > +               else
-> > +#endif
-> > +                       inet_rsk(req)->ir_iif =3D
-> > +                               inet_request_bound_dev_if(sk, skb);
-> > +
-> >                 if (!tcp_oow_rate_limited(sock_net(sk), skb,
-> >                                           LINUX_MIB_TCPACKSKIPPEDSYNREC=
-V,
-> >                                           &tcp_rsk(req)->last_oow_ack_t=
-ime)) {
-> > diff --git a/net/ipv4/tcp_plb.c b/net/ipv4/tcp_plb.c
-> > index 68ccdb9a5412..d7cc00a58e53 100644
-> > --- a/net/ipv4/tcp_plb.c
-> > +++ b/net/ipv4/tcp_plb.c
-> > @@ -79,6 +79,7 @@ void tcp_plb_check_rehash(struct sock *sk, struct tcp=
-_plb_state *plb)
-> >                 return;
-> >
-> >         sk_rethink_txhash(sk);
-> > +       sk_dst_reset(sk);
-> >         plb->consec_cong_rounds =3D 0;
-> >         tcp_sk(sk)->plb_rehash++;
-> >         NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPPLBREHASH);
-> > diff --git a/net/ipv4/tcp_timer.c b/net/ipv4/tcp_timer.c
-> > index ea99988795e7..acc22fc532c2 100644
-> > --- a/net/ipv4/tcp_timer.c
-> > +++ b/net/ipv4/tcp_timer.c
-> > @@ -299,6 +299,7 @@ static int tcp_write_timeout(struct sock *sk)
-> >         if (sk_rethink_txhash(sk)) {
-> >                 tp->timeout_rehash++;
-> >                 __NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPTIMEOUTREHAS=
-H);
-> > +               sk_dst_reset(sk);
-> >         }
-> >
-> >         return 0;
-> > diff --git a/net/ipv6/inet6_connection_sock.c b/net/ipv6/inet6_connecti=
-on_sock.c
-> > index 37534e116899..2fe753bb38b4 100644
-> > --- a/net/ipv6/inet6_connection_sock.c
-> > +++ b/net/ipv6/inet6_connection_sock.c
-> > @@ -48,6 +48,11 @@ struct dst_entry *inet6_csk_route_req(const struct s=
-ock *sk,
-> >         fl6->flowi6_uid =3D sk_uid(sk);
-> >         security_req_classify_flow(req, flowi6_to_flowi_common(fl6));
-> >
-> > +       if (req->num_retrans)
-> > +               fl6->mp_hash =3D jhash_1word(req->num_retrans,
-> > +                                          (__force u32)ireq->ir_rmt_po=
-rt)
-> > +                               >> 1;
->
-> Why not setting mp_hash to sk_txhash ?
->
-> Why are you using ">> 1" ?
->
-> rt6_multipath_hash() seems to be bypassed, it might be time to add a
-> comment there
-> explaining that mp_hash needs to be 31-bit only...
->
-> Perhaps use rt6_multipath_hash() and expand it to use a socket pointer
-> to retrieve sk->sk_txhash when/if possible
-> instead of yet another flow dissection.
->
-> > +
-> >         if (!dst) {
-> >                 dst =3D ip6_dst_lookup_flow(sock_net(sk), sk, fl6, fina=
-l_p);
-> >                 if (IS_ERR(dst))
-> > @@ -70,6 +75,9 @@ struct dst_entry *inet6_csk_route_socket(struct sock =
-*sk,
-> >         fl6->saddr =3D np->saddr;
-> >         fl6->flowlabel =3D np->flow_label;
-> >         IP6_ECN_flow_xmit(sk, fl6->flowlabel);
-> > +
-> > +       if (sk->sk_txhash)
-> > +               fl6->mp_hash =3D sk->sk_txhash >> 1;
->
-> Seems inconsistent, and same question about the right shift.
->
->
-> >         fl6->flowi6_oif =3D sk->sk_bound_dev_if;
-> >         fl6->flowi6_mark =3D sk->sk_mark;
-> >         fl6->fl6_sport =3D inet->inet_sport;
-> > --
-> > 2.52.0
-> >
 
