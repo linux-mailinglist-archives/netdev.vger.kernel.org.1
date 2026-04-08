@@ -1,196 +1,170 @@
-Return-Path: <netdev+bounces-276299-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276300-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SLfJIo/51Wn4/gcAu9opvQ
-	(envelope-from <netdev+bounces-276299-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 08:45:35 +0200
+	id 2ELdAhv71Wn4/gcAu9opvQ
+	(envelope-from <netdev+bounces-276300-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 08:52:11 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF9973B7B19
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 08:45:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AABC3B7BF3
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 08:52:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F40B63010145
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 06:45:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1CCBA301174F
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 06:52:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5732A1F4CB3;
-	Wed,  8 Apr 2026 06:45:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE90835F5E7;
+	Wed,  8 Apr 2026 06:52:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iLB1ZoSv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com [209.85.210.72])
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20D1A3537FB
-	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 06:45:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC96B2222AC
+	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 06:52:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775630732; cv=none; b=TjgEcoXqa7OxaUEUNi69t+IJrBRWieKCb1eMEPmPcMl0FCQVlzhbhf3daMTBtzcqBi/aoYlGx613wxhrRFlkGSlcP7XEgN0XlfeDf11fqE1ay6AOhTVIBVk+1PR2jS6gVBjkh84FyDF4sKgSEHgm1XqTtOMOOpiXYqqjGWsaU4Q=
+	t=1775631124; cv=none; b=cEyYZqtUnDjPSrZskCiVMubM1j0ngrdUmLfVVtpXM2kZPwoBfnRecsLyByqKkx7sizGt5meQ5e42+GtqlzCFMLm2JT9P4UoQkI/aFm7J6ykCTdbzzXCWihSQGgM6q237cBIyM9ZoOSh8ZfmdmkaYd6XK1WPfwZ9dMg+WnhU4duo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775630732; c=relaxed/simple;
-	bh=xgEC+WfL2idF4NX3OWD/q4qLDceolgtCSjaHyw0T6To=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=HWAdIi5v96NTW97YszbkP2YEDz5cRIFnMGwbIr8+PR0wp6jFwojbnK/wRFDePVj7PoOujOUDyypJK7CSlZGOzHFIG29/8VsZj2LRNsxf64lH8P4acUfnCGfl9ESF0OcejQhzFkRzVVQ3pHt3kbS7NO1IhvVxQEL9zIutg0ZqOO8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-ot1-f72.google.com with SMTP id 46e09a7af769-7dbb4f8b314so12786089a34.3
-        for <netdev@vger.kernel.org>; Tue, 07 Apr 2026 23:45:29 -0700 (PDT)
+	s=arc-20240116; t=1775631124; c=relaxed/simple;
+	bh=ZhJ2C4i05VJJKYKlWpoOsC5SBwrL02o4l4S63ok/n4I=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Gnuk4UzCzEruFx5aRCHBK1AqZlGFrE5i6Oj4lQczCE84nwrgTOKzIe6cr6dupi6gCK7kJRIMnfktz029Z9MZmDPGp4vwpLrvbERqj5Fhzkhpg17rG3rko1PjNVvruDw/osYX0wFMNn4v0lUTm2sVToqS6jhAmZP6CKaKTvrY9cc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iLB1ZoSv; arc=none smtp.client-ip=209.85.215.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-c76b9efc299so2440456a12.0
+        for <netdev@vger.kernel.org>; Tue, 07 Apr 2026 23:52:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775631123; x=1776235923; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=oEuFyu9HReY6kQnHy14CWxk4PsZgUkyDSOCBp7sb1MQ=;
+        b=iLB1ZoSvGUy07wclc6dYXGHXd+v5m+VLF0lkiZuq3V55FZzn8sLidpYwfHqaVpZuQa
+         LyrDdEhw6paYotoJFCxgpUWi87YLE6TxDg1lkw7BE/QhwDpzE4sm5/2q33rs93xG9otd
+         MWjL4HGaVvJmlhUzRtmNhRpMxTHmesML3JVR70vOYz0xY3ofouwDqX8u/6HFwvlX6zSq
+         pOpUSI6nubTBlY9DciSo3BJ9M8RaC4fWtRcRWZqVOFArenIfv9YXtx09pvv50IYMz+cK
+         88DXyQ+FgvGP9OJZSBKEdsRwm1M1ZuBgOsM2e6sh+ndTVHTeA9mKAyunXyyJk8zKa6B7
+         txwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775630729; x=1776235529;
-        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7rEQTDJ7oEJhY7ymkpvRH1m82lHz0+1l7ZXL1EKQeIg=;
-        b=YK9RuOOwYRSC8oDsjRCMGWuZQT0jKa5yTcutDPYNhhf9zehlRtRUlj8/bUum4oJjgF
-         XowBbuHf6M+mQfPziHL0mf/v8TJd0RLnNwVmM+jSvq6dny6qC9s1gsbyWYWj/A69B2wL
-         BDBZ9B0yMjqdJTVuMiTJ+d0EtbqG4SJpFFWmyndmpcY/DHh+oA881TjHkBNfEVhlIKfV
-         /8nTZLmz8EEnz9jKUZYCcGOUUzyTYhcZC7vqWkgn8uw/PmczY7ma/SfmCzmvOtOf6Vjv
-         5uI530r/XF0g0iRHX3KTAOeMUro3KUbHm62GwZN3LlmO9lQfkhghawBk3opSXYpsbNP2
-         fYcg==
-X-Forwarded-Encrypted: i=1; AJvYcCV6AQDKj8PV36UcHB4GObm3LeVg4uEDh/AfoW3aVhI2rV477ROT3bN2qUIZYOcfDrDXwvrps5E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzrYj3ikYQyjFXEDhgduuV1Klv+NVCf5/nWQ1lpvP+2pP/HJkYz
-	y0qTfdEzV7VAHOtyF7jDQ5ArL7xn5NkhssGZYjHTjX9m2+DOaDVB+Whkh5nt7vlYhtiSOaN3OYU
-	faK4Qq7kkip5JjyP1YXvY32okqRtmQD9q0ExEdkcn1hju/8O5RyfflQzDmvU=
+        d=1e100.net; s=20251104; t=1775631123; x=1776235923;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oEuFyu9HReY6kQnHy14CWxk4PsZgUkyDSOCBp7sb1MQ=;
+        b=iNi2CK+nWVh7uWKOwfbrxhry4OcNuDer9ivBfHPtGfisG5SCpJhkI6xI98EsVqeZ8a
+         5lFwcE0BF7EYPLRoDMkjUBgmCicqe8FhMQ5eisS7eKifqyjBG242TlPkdMttEttPwjgq
+         0ZkCVp2a8rziGlXncRzYzVdNtHr87/WcWNcv+ZYoSfW/BqTNxS/4yGTaSYSXcrVQAiqN
+         zQunZaa1Zs0I145O8CCE/hL4GYFzkJtexGEn7njuP5j6u67fVyGGnp0/HfyTK7+80b0W
+         HT5EX65PJfTtM4uzqurIqg3bqYn6j7DfkPistZOyyCeIbpG1g4NP6GvzreJ20GPcmV3w
+         F3mA==
+X-Gm-Message-State: AOJu0YxtUfhlGhl7C46wV5kIEofLcV1ArbzFrJRGGsPGIGwBzcNA8kOE
+	eBZ7DHRmD5e7akYRBbj8v+Bw0hx8H4iZnRVEHBP/6mMIi8q0mru0ut7RsXzWhc14
+X-Gm-Gg: AeBDiesDIggennboeUE3jUq0fbByexTrYAQAuvFlMoTkuZuAha19Rs+l0GgZoGEHhNt
+	KDg1sTKMvO0c/02YVu93jCRouyfh4ZihqzS6EB3O8sDw+lrGm2C8OcE5ylyvNILjbz5Piiy7q5L
+	CQeuyQ3kym99mWCn2g7/eATQRzd6bysO8K2+ZmKMSlopSG40u3yeZOc58NF11aSkRZib7eBjxwu
+	9GNMJcp5Z28eoBI8RDr0XNkKVuR9OXfgdLo+yDraBEr0GJm57gYFxkOD3H4qJwKYIFfZ4GkdgPZ
+	1yhvWiQbZFNkET19dBr4U3euTP+Ix/pKVNHXe2jKflJmZsYT0lx+jshpGANu7X3mG+W6SzgeoPS
+	G2Z5n4BdFHhUyJgew6+agkwEZrphpHpAH1EqfXWDG/ZDtUcnI0FA+v3GLZ2waQCv4jbN++s5i7M
+	qsMFJ8k1+TlhD6Jxu+xCqquAeFipD6/Fjd0NRq6tZuWdFLeFJd
+X-Received: by 2002:a05:6a20:7346:b0:35d:5d40:6d79 with SMTP id adf61e73a8af0-39f2edaaa55mr22041288637.12.1775631122694;
+        Tue, 07 Apr 2026 23:52:02 -0700 (PDT)
+Received: from dbdd95a60758.tailf10b76.ts.net ([220.83.29.221])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c76c6563aacsm18076671a12.19.2026.04.07.23.51.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Apr 2026 23:52:01 -0700 (PDT)
+From: Taegu Ha <hataegu0826@gmail.com>
+To: netdev@vger.kernel.org
+Cc: linux-ppp@vger.kernel.org,
+	qingfang.deng@linux.dev,
+	gnault@redhat.com,
+	jaco@uls.co.za,
+	richardbgobert@gmail.com,
+	ericwouds@gmail.com,
+	Taegu Ha <hataegu0826@gmail.com>
+Subject: [PATCH net v2] ppp: require CAP_NET_ADMIN in target netns for unattached ioctls
+Date: Wed,  8 Apr 2026 15:51:09 +0900
+Message-ID: <20260408065109.2171-1-hataegu0826@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:4b84:b0:67e:366b:53b7 with SMTP id
- 006d021491bc7-68220741a9dmr12203235eaf.53.1775630729067; Tue, 07 Apr 2026
- 23:45:29 -0700 (PDT)
-Date: Tue, 07 Apr 2026 23:45:29 -0700
-In-Reply-To: <20260407170214.4157-2-fmancera@suse.de>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69d5f989.a00a0220.468cb.0009.GAE@google.com>
-Subject: [syzbot ci] Re: net_sched: fix skb memory leak in deferred qdisc drops
-From: syzbot ci <syzbot+ci2b150416153fb292@syzkaller.appspotmail.com>
-To: damilola@aterlo.com, davem@davemloft.net, edumazet@google.com, 
-	fmancera@suse.de, horms@kernel.org, kuba@kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com
-Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [-1.36 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,googlegroups.com:email,appspotmail.com:email,syzbot.org:url,googlesource.com:url];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.982];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_COUNT_THREE(0.00)[4];
-	R_DKIM_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-276299-lists,netdev=lfdr.de,ci2b150416153fb292];
-	TO_DN_NONE(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[]
-X-Rspamd-Queue-Id: CF9973B7B19
+	FREEMAIL_CC(0.00)[vger.kernel.org,linux.dev,redhat.com,uls.co.za,gmail.com];
+	TAGGED_FROM(0.00)[bounces-276300-lists,netdev=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hataegu0826@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	NEURAL_HAM(-0.00)[-0.999];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 7AABC3B7BF3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-syzbot ci has tested the following series
+/dev/ppp open is currently authorized against file->f_cred->user_ns,
+while unattached administrative ioctls operate on current->nsproxy->net_ns.
 
-[v1] net_sched: fix skb memory leak in deferred qdisc drops
-https://lore.kernel.org/all/20260407170214.4157-2-fmancera@suse.de
-* [PATCH net] net_sched: fix skb memory leak in deferred qdisc drops
+As a result, a local unprivileged user can create a new user namespace
+with CLONE_NEWUSER, gain CAP_NET_ADMIN only in that new user namespace,
+and still issue PPPIOCNEWUNIT, PPPIOCATTACH, or PPPIOCATTCHAN against
+an inherited network namespace.
 
-and found the following issue:
-WARNING: suspicious RCU usage in cake_dequeue
+Require CAP_NET_ADMIN in the user namespace that owns the target network
+namespace before handling these unattached PPP administrative ioctls.
 
-Full report is available here:
-https://ci.syzbot.org/series/90acbb62-3e93-4bb7-af7a-51d555f5956b
+This preserves normal pppd operation in the network namespace it is
+actually privileged in, while rejecting the userns-only inherited-netns
+case.
 
-***
-
-WARNING: suspicious RCU usage in cake_dequeue
-
-tree:      net
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net.git
-base:      a9b8b18364fffce4c451e6f6fd218fa4ab646705
-arch:      amd64
-compiler:  Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
-config:    https://ci.syzbot.org/builds/a5e0fad0-c9c8-4102-b2af-b4d1c7947ee3/config
-syz repro: https://ci.syzbot.org/findings/b1dd239a-f59f-414f-8bde-578258899e94/syz_repro
-
-=============================
-WARNING: suspicious RCU usage
-syzkaller #0 Not tainted
------------------------------
-./include/net/sch_generic.h:581 suspicious rcu_dereference_check() usage!
-
-other info that might help us debug this:
-
-
-rcu_scheduler_active = 2, debug_locks = 1
-2 locks held by syz.0.51/6016:
- #0: ffffffff8e75e640 (rcu_read_lock_bh){....}-{1:3}, at: local_bh_disable include/linux/bottom_half.h:20 [inline]
- #0: ffffffff8e75e640 (rcu_read_lock_bh){....}-{1:3}, at: rcu_read_lock_bh include/linux/rcupdate.h:903 [inline]
- #0: ffffffff8e75e640 (rcu_read_lock_bh){....}-{1:3}, at: __dev_queue_xmit+0x277/0x3890 net/core/dev.c:4778
- #1: ffff8881ad9e8170 (&sch->root_lock_key#31){+...}-{3:3}, at: spin_lock include/linux/spinlock.h:341 [inline]
- #1: ffff8881ad9e8170 (&sch->root_lock_key#31){+...}-{3:3}, at: __dev_xmit_skb net/core/dev.c:4241 [inline]
- #1: ffff8881ad9e8170 (&sch->root_lock_key#31){+...}-{3:3}, at: __dev_queue_xmit+0xbf2/0x3890 net/core/dev.c:4819
-
-stack backtrace:
-CPU: 1 UID: 0 PID: 6016 Comm: syz.0.51 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-Call Trace:
- <TASK>
- dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
- lockdep_rcu_suspicious+0x13f/0x1d0 kernel/locking/lockdep.c:6876
- qdisc_root_sleeping include/net/sch_generic.h:581 [inline]
- qdisc_dequeue_drop include/net/sch_generic.h:1173 [inline]
- cake_dequeue+0x23a7/0x4e50 net/sched/sch_cake.c:2240
- dequeue_skb net/sched/sch_generic.c:297 [inline]
- qdisc_restart net/sched/sch_generic.c:402 [inline]
- __qdisc_run+0x26c/0x15d0 net/sched/sch_generic.c:420
- qdisc_run include/net/pkt_sched.h:120 [inline]
- __dev_xmit_skb net/core/dev.c:4286 [inline]
- __dev_queue_xmit+0x1bad/0x3890 net/core/dev.c:4819
- packet_snd net/packet/af_packet.c:3076 [inline]
- packet_sendmsg+0x3eb6/0x50f0 net/packet/af_packet.c:3108
- sock_sendmsg_nosec net/socket.c:727 [inline]
- __sock_sendmsg net/socket.c:742 [inline]
- __sys_sendto+0x672/0x710 net/socket.c:2206
- __do_sys_sendto net/socket.c:2213 [inline]
- __se_sys_sendto net/socket.c:2209 [inline]
- __x64_sys_sendto+0xde/0x100 net/socket.c:2209
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f077b39c819
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f077c28c028 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
-RAX: ffffffffffffffda RBX: 00007f077b615fa0 RCX: 00007f077b39c819
-RDX: 000000000000fc13 RSI: 0000200000000800 RDI: 0000000000000003
-RBP: 00007f077b432c91 R08: 0000000000000000 R09: fffffffffffffef0
-R10: 0000000000000880 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f077b616038 R14: 00007f077b615fa0 R15: 00007fffceb20038
- </TASK>
-
-
-***
-
-If these findings have caused you to resend the series or submit a
-separate fix, please add the following tag to your commit message:
-  Tested-by: syzbot@syzkaller.appspotmail.com
-
+Fixes: 273ec51dd7ce ("net: ppp_generic - introduce net-namespace functionality v2")
+Signed-off-by: Taegu Ha <hataegu0826@gmail.com>
 ---
-This report is generated by a bot. It may contain errors.
-syzbot ci engineers can be reached at syzkaller@googlegroups.com.
+ drivers/net/ppp/ppp_generic.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-To test a patch for this bug, please reply with `#syz test`
-(should be on a separate line).
+diff --git a/drivers/net/ppp/ppp_generic.c b/drivers/net/ppp/ppp_generic.c
+index e9b41777be80..4435c594f587 100644
+--- a/drivers/net/ppp/ppp_generic.c
++++ b/drivers/net/ppp/ppp_generic.c
+@@ -1057,6 +1057,12 @@ static int ppp_unattached_ioctl(struct net *net, struct ppp_file *pf,
+ 	struct ppp_net *pn;
+ 	int __user *p = (int __user *)arg;
+ 
++	if ((cmd == PPPIOCNEWUNIT ||
++	     cmd == PPPIOCATTACH ||
++	     cmd == PPPIOCATTCHAN) &&
++	    !ns_capable(net->user_ns, CAP_NET_ADMIN))
++		return -EPERM;
++
+ 	switch (cmd) {
+ 	case PPPIOCNEWUNIT:
+ 		/* Create a new ppp unit */
+-- 
+2.43.0
 
-The patch should be attached to the email.
-Note: arguments like custom git repos and branches are not supported.
 
