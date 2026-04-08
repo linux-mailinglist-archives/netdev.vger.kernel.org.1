@@ -1,128 +1,166 @@
-Return-Path: <netdev+bounces-276341-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276342-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wJIoJXwN1mmfAwgAu9opvQ
-	(envelope-from <netdev+bounces-276341-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 10:10:36 +0200
+	id UEimB1wO1mmfAwgAu9opvQ
+	(envelope-from <netdev+bounces-276342-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 10:14:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 330D23B8CAE
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 10:10:31 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64DB23B8D58
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 10:14:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 25DA93033D18
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 08:09:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B0554302DF5F
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 08:10:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8953C39D6C3;
-	Wed,  8 Apr 2026 08:09:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C83839BFE3;
+	Wed,  8 Apr 2026 08:10:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ae8CUc5g"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S8pq8H+5"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A25939BFE6
-	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 08:09:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2515C39B958
+	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 08:10:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775635746; cv=none; b=SSZJ8Vk1ZDDG98p5xIo8Bo3yvSZ28RvwaPIF37yCVbXE9J57nFwhfboIhROn1hvrseNpc32zil0cZ6o+MbOmyHqMewTSlA3InZvdSAKpMxD2oz/ZTCANlO83bNCZKtHGCv6ImpcYMDB3uMU+kfNRAdGWV/8eBA4ozKP0VGgo0uw=
+	t=1775635814; cv=none; b=f0ZSMUF2flFuE7fGkeRGUF7ItQFN4B66zb6nFFI+iV9mgOGaIq4RC2Yl3NkhAYSqpHiZMqS2N+hXkjqHqXZETzHvM3oFMYoRWGxNSL2AbPnI7u6ul4g0hXJnffZ0kFfOuSfzBBkfOvIid57KpVMbKLrMFduj91JEtbGXtq7oqLc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775635746; c=relaxed/simple;
-	bh=mLt2C0s2KyAsNwVLTTv7BbRoRfLCKUrwFZgp0QRxVEE=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=i2knntKkg2IBI/obUE2Dupz61kaAsRLH364DAKH4W0+orhaECQbK9MCQXXcXhiMTeGYEljiSQv/7hQ7Wio8QHNRs/Zuj39hBHk/THfaPgVxac5tSczTxNh8MtdbgXg5q1kEuqsXJ6kc+bYB3dfde31bdTP5FwrZnTowrhRC7oR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ae8CUc5g; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1775635743;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zeEBLfMWwRXn7LjfjGZoPqN0AzwNh8KR8qE3RA3PjVM=;
-	b=ae8CUc5gdcpd06yTfN3jSEnfeqpK6/Yjk+Iw5bieVeUM7a5qCdB2QLeumXcsKRaDA7Q3Rn
-	N6kVMFzdqEgVUTRgtpHs+VRI16iKITSOUwTwXeVyKL7wGxGbBUkbbMLcmsqHqYGcNXfCwt
-	P44406PSXsoe7o4kpkQBqJIVKnRUCgE=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-398-dSMkaXfsNCe2IJmji36-Dw-1; Wed,
- 08 Apr 2026 04:08:59 -0400
-X-MC-Unique: dSMkaXfsNCe2IJmji36-Dw-1
-X-Mimecast-MFC-AGG-ID: dSMkaXfsNCe2IJmji36-Dw_1775635738
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8574E1956056;
-	Wed,  8 Apr 2026 08:08:57 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.44.32.94])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E11FE1800768;
-	Wed,  8 Apr 2026 08:08:53 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20260406170001.2-rxrpc-proc-v2-pengpeng@iscas.ac.cn>
-References: <20260406170001.2-rxrpc-proc-v2-pengpeng@iscas.ac.cn> <20260404190004.4-rxrpc-proc-pengpeng@iscas.ac.cn>
-To: Pengpeng Hou <pengpeng@iscas.ac.cn>
-Cc: dhowells@redhat.com, Marc Dionne <marc.dionne@auristor.com>,
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-    Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-    linux-afs@lists.infradead.org, netdev@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] rxrpc/proc: size address buffers for %pISpc output
+	s=arc-20240116; t=1775635814; c=relaxed/simple;
+	bh=8RvzoVcB6Zt/BgetcFZrinBZBPZ1Bk7IELss8ULC1Sg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=L3+MeCWxtaxtoBDfAKVx6fFhmwRpK8Kgf9xIcl8iHYZuIuoJkOM6Gra50w5AaV7PXdPD0QGNqPtY1z/I32g0tsvS8bPpiQG7AwK4Ut+9WLi9IFo6n58hyJIZYkjoCwis6KWl7eT5foFp3t2bfeJMK8tSNq5liCF0CD9VlVeppEk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S8pq8H+5; arc=none smtp.client-ip=209.85.216.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-358ed696623so2605252a91.0
+        for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 01:10:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775635812; x=1776240612; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ltBM8UmKdiKmSJncXBXuq9PCJZyjGT4jg7mXF5Aup5w=;
+        b=S8pq8H+5dg0Kt/Tib3oKrZCRjABR3zOBcP5T+PScyW/5X8RUfflz0Wu7rwUemAskyS
+         zqaT/v7ttajh44WmgQhCQNYPnTtWRaEg1Vu5FVGBH/eHLbGAgN7vhtjSTQmZ94iwL2vK
+         mXba70OeNo1LAfzKmx5Owu1ST5ymH807g6ambSdBY0Oex7DVBlIFRVvWtVhPDAVDI8Ms
+         4ssYHeQq59dePWIlPUbTULdHS3iBGgP4mcUhi1218/Ad/Wv7gqnZnKqL20QD26Jm4YZd
+         U1FD6L/bxNnY9C61opS7T9PuVd6meHj9HmHj9Ff1sDiOOfyUSskm/sMp3bz7/D8n5b+P
+         J67A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775635812; x=1776240612;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ltBM8UmKdiKmSJncXBXuq9PCJZyjGT4jg7mXF5Aup5w=;
+        b=pMitIDd3eshY0ZmYRkYc1T/TT0jQMBFG/RdgANPLUPVfsVeQgUJBVtDfZVHrdrih1A
+         JcdjrJ8a3QRZ7vPcPGsinpmpvOgoEPlsCvZen3ZAW6wAMsqrcojvUYFBi0+x1AqDvJ71
+         5ZCLcmo4h1qRnjJLT3fgGYUCO6Ra1EMTiioN8oP9YHHOKt10vN+X2GqJM/kwWbDm0VZT
+         pr9T/dROol1GoxZp0uhcSl17/LPBBsUyBnW9qSLHjoT0vYZqw06qYmH9ZczNSRK8ihGT
+         omwLZaI7pIANOpO/5DngZR7U9ala7QDX+qBCzFDOdkCVElZd1ErGY+4X9dnjk2KQby/L
+         Xaag==
+X-Gm-Message-State: AOJu0YyiE8t+Ruqg7IXtaMXixOCUCCvEfsAqJkuzIgJi7QRW5CO5+TUn
+	WSrA20gc0fGDtEgv/DH90KLfqagQcNsFREK4SYtGJ8lFS1+RT5c3PCuQd+GvVcdhmyQ=
+X-Gm-Gg: AeBDieuzU0heLXji2WFHVe1J1hsI+TZQ7rq2dObSVz8y5YKPEbEHu5FeiVtjhb26OYb
+	24XL85zeUqk9Az3CMoC+u79irEFHJ3FnMXRlJfFdZu/iuny7O6+GGyz1tCrz899o4IArfk8CGRW
+	28K/LTE7NvQAhzlCqA4wYjMWr3DfHrDEQwk3jiEBILhFacMFxZhdOc/zpktILl9PiiuxoBC+mjv
+	Dl7RE5FQTtyQsoBDfq9+8z1Xo6Q4DCHsDhY7bhn22e0ZOVvqmPgNlA8hW2tjQp4KGL/r9lL1JQR
+	69Uuonm5nOEu90Tc+N5LawB2HN3qF+iXrxSDEZ9/Eq+YAYyVCNEt2RtutAs01EmsNLa2p/9pyn1
+	SOP6CUFljpEGnbcfbu1Rui3SuNLjoGHB9ldENBXJS4yOhix8h7dU2Im2peOQ+PMdeNjJYnIViS2
+	+9kXe7+WzMrhUSPijN7Q40YN3FtJ/eTZAEfh9DjDE=
+X-Received: by 2002:a17:90b:2e46:b0:35b:96bb:47b9 with SMTP id 98e67ed59e1d1-35de68d5e83mr18655320a91.19.1775635811950;
+        Wed, 08 Apr 2026 01:10:11 -0700 (PDT)
+Received: from localhost.localdomain ([2001:250:3007:3:9ce2:e058:5819:7b4f])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-35e288bf78fsm856974a91.4.2026.04.08.01.10.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Apr 2026 01:10:11 -0700 (PDT)
+From: Junxi Qian <qjx1298677004@gmail.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org
+Subject: [PATCH net] nfc: llcp: add missing return after LLCP_CLOSED checks
+Date: Wed,  8 Apr 2026 16:10:06 +0800
+Message-Id: <20260408081006.3723-1-qjx1298677004@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2207315.1775635732.1@warthog.procyon.org.uk>
-Date: Wed, 08 Apr 2026 09:08:52 +0100
-Message-ID: <2207316.1775635732@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-276341-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-276342-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	HAS_ORG_HEADER(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	SEM_URIBL_UNKNOWN_FAIL(0.00)[iscas.ac.cn:query timed out];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dhowells@redhat.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_FIVE(0.00)[6];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FROM_NEQ_ENVFROM(0.00)[qjx1298677004@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_NONE(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[iscas.ac.cn:email,warthog.procyon.org.uk:mid]
-X-Rspamd-Queue-Id: 330D23B8CAE
+	RCPT_COUNT_FIVE(0.00)[6];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 64DB23B8D58
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Pengpeng Hou <pengpeng@iscas.ac.cn> wrote:
+In nfc_llcp_recv_hdlc() and nfc_llcp_recv_disc(), when the socket
+state is LLCP_CLOSED, the code correctly calls release_sock() and
+nfc_llcp_sock_put() but fails to return. Execution falls through to
+the remainder of the function, which calls release_sock() and
+nfc_llcp_sock_put() again. This results in a double release_sock()
+and a refcount underflow via double nfc_llcp_sock_put(), leading to
+a use-after-free.
 
-> -	char lbuff[50], rbuff[50];
-> +	char lbuff[RXRPC_PROC_ADDRBUF_SIZE], rbuff[RXRPC_PROC_ADDRBUF_SIZE];
+Add the missing return statements after the LLCP_CLOSED branches
+in both functions to prevent the fall-through.
 
-This might be saved upstream by the compiler padding the buffers out to
-sizeof(long) because they're on the stack.
+Fixes: d646960f7986 ("NFC: Initial LLCP support")
+Signed-off-by: Junxi Qian <qjx1298677004@gmail.com>
+---
+ net/nfc/llcp_core.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-David
+diff --git a/net/nfc/llcp_core.c b/net/nfc/llcp_core.c
+index 366d75663..db5bc6a87 100644
+--- a/net/nfc/llcp_core.c
++++ b/net/nfc/llcp_core.c
+@@ -1091,6 +1091,7 @@ static void nfc_llcp_recv_hdlc(struct nfc_llcp_local *local,
+ 	if (sk->sk_state == LLCP_CLOSED) {
+ 		release_sock(sk);
+ 		nfc_llcp_sock_put(llcp_sock);
++		return;
+ 	}
+ 
+ 	/* Pass the payload upstream */
+@@ -1182,6 +1183,7 @@ static void nfc_llcp_recv_disc(struct nfc_llcp_local *local,
+ 	if (sk->sk_state == LLCP_CLOSED) {
+ 		release_sock(sk);
+ 		nfc_llcp_sock_put(llcp_sock);
++		return;
+ 	}
+ 
+ 	if (sk->sk_state == LLCP_CONNECTED) {
+-- 
+2.25.1
 
 
