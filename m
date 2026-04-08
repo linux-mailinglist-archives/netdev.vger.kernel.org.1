@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-276273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276275-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KOYpEw7U1WmX+QcAu9opvQ
-	(envelope-from <netdev+bounces-276273-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 06:05:34 +0200
+	id 0D6fHy3U1WmX+QcAu9opvQ
+	(envelope-from <netdev+bounces-276275-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 06:06:05 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC51C3B6B14
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 06:05:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D2BC83B6B3A
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 06:06:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 01AA63054F5B
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 04:03:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 32CA3305E9E6
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 04:03:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B310134D922;
-	Wed,  8 Apr 2026 04:03:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D14234FF62;
+	Wed,  8 Apr 2026 04:03:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="pH/huACQ"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="Qu7U6NJj"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout08.his.huawei.com (canpmsgout08.his.huawei.com [113.46.200.223])
+Received: from canpmsgout03.his.huawei.com (canpmsgout03.his.huawei.com [113.46.200.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB68B34EEEE;
-	Wed,  8 Apr 2026 04:03:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.223
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B47833987;
+	Wed,  8 Apr 2026 04:03:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775621010; cv=none; b=GZaobYIiOBF3LTugBs2NMJ/4m8tftessc2rorKiHm1snCFkdq56CHsuYkdCarSmJyWWwcSC5/N/7wZqyyirlJo5vDHejguu9qxtQ/QSgrPWBDxkanB417gw+7d8Ry1+QRU4KlpabIQPHWQfLsErQu8PnHDmkhi4W+2igqbKKyu4=
+	t=1775621011; cv=none; b=kFMIDDIdeVjOctaEQyORCS10ikEm6FcBLb/28MgIQQ35ZLBwkJ8gv6+AAVvFFZMO6zBwJ0MoN9sHjliUoNTaF9UERw2KEEC1cPzndea3WNEFq1aaxmDWGEMeA9F9kNUsdUv2MQHpgNxiilnlbGLldBGpEH6yHduXFoW6+dNbb2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775621010; c=relaxed/simple;
-	bh=mRsw4yg57Q6ywfOJ/40ogGktdOc2/LSEMVQVjf6srbs=;
+	s=arc-20240116; t=1775621011; c=relaxed/simple;
+	bh=mKawMrKCg/UwKxiowWPidaHSuJsWt4bFdt5fRdldDiA=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Mo0Y+Kjn2Q3xVT4ZAihmwKusAL1AlK6nG2fSrCorX7RIXQv0guIXhRVp2l96zrDfJK7o30UKj/C+8DETxdCOcceePpOBW0nwpyZ093i4u/8mcsM9KM1QDXBTA6CtpHdQBjcRUohZRyPp/8hZBWVyPX1HbS8qLZEJunGYzsOiZUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=pH/huACQ; arc=none smtp.client-ip=113.46.200.223
+	 MIME-Version:Content-Type; b=PXNBxt8mRAJ5BR8rKvYVsACFgNsuTI+BDqwUDhHUa+WeBBIkvVWhsnMjOIqjkpiF7noT6Qqm8vn1+cRDnnVfJMzKqORjyKjvbJA5PPUGj8egz4whZD4in3HXX+PcNmMYQGcoVrSaicQgYMjxJiMINaZvVfu7C0NoCatZy8IVCfk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=Qu7U6NJj; arc=none smtp.client-ip=113.46.200.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=zswjPgmHBAeT8X9mAqPt/DlL+9nCsIWBSzHJ+IOHRHQ=;
-	b=pH/huACQL3vJf6vHAagclEPRy3ceEyDh+9QvWWUe6W8DcDF7yOvftiVm4SFhMd3KlqamOq5ja
-	/ido0TTLuCyA6lxvyTOEteDa+TCnlfkv5ENYTuw41VHgEZ/+rN+h6IZ9FRuGsAC4HQSW9x8JTTf
-	lG0ofKCjE3cqq2mUgawGmmM=
-Received: from mail.maildlp.com (unknown [172.19.163.15])
-	by canpmsgout08.his.huawei.com (SkyGuard) with ESMTPS id 4fr8QW3DH6zmVW4;
-	Wed,  8 Apr 2026 11:57:07 +0800 (CST)
+	bh=KNedq11dPOVoLwDIDWh75oLajXuw/SCW/tKmT+iBFFw=;
+	b=Qu7U6NJjNytn5OWPjyVsN/HRn6zDtw0kFC1aEwS/7Yfylt495WwNnOum3WkNRpQ8g55kBRUG1
+	Ht3ROQMAS7sMdwJ8ccRBZXJ68J2U+qHe2BtyoG4a9GXAdTDVSxP1zs7E7Ud63KqQjavA9y8JFgt
+	0MXKAlDpjGE5dv2vd6orhzs=
+Received: from mail.maildlp.com (unknown [172.19.162.144])
+	by canpmsgout03.his.huawei.com (SkyGuard) with ESMTPS id 4fr8Qs24mdzpSxF;
+	Wed,  8 Apr 2026 11:57:25 +0800 (CST)
 Received: from kwepemf100013.china.huawei.com (unknown [7.202.181.12])
-	by mail.maildlp.com (Postfix) with ESMTPS id CF61B40573;
-	Wed,  8 Apr 2026 12:03:22 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 1939D4056D;
+	Wed,  8 Apr 2026 12:03:25 +0800 (CST)
 Received: from DESKTOP-62GVMTR.china.huawei.com (10.174.189.124) by
  kwepemf100013.china.huawei.com (7.202.181.12) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Wed, 8 Apr 2026 12:03:21 +0800
+ 15.2.1544.36; Wed, 8 Apr 2026 12:03:23 +0800
 From: Fan Gong <gongfan1@huawei.com>
 To: Fan Gong <gongfan1@huawei.com>, Zhu Yikai <zhuyikai1@h-partners.com>,
 	<netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
@@ -63,9 +63,9 @@ CC: <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>, luosifu
 	<zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>, Shi Jing
 	<shijing34@huawei.com>, Zheng Jiezhen <zhengjiezhen@h-partners.com>, Maxime
  Chevallier <maxime.chevallier@bootlin.com>
-Subject: [PATCH net-next v04 5/6] hinic3: Configure netdev->watchdog_timeo to set nic tx timeout
-Date: Wed, 8 Apr 2026 12:03:05 +0800
-Message-ID: <332a7807d306785c5685a1ce071d36f7feebfc9d.1775618798.git.zhuyikai1@h-partners.com>
+Subject: [PATCH net-next v04 6/6] hinic3: Remove unneeded coalesce parameters
+Date: Wed, 8 Apr 2026 12:03:06 +0800
+Message-ID: <fb2af5d93ae5ccd96290ad4a27377cf99024073d.1775618798.git.zhuyikai1@h-partners.com>
 X-Mailer: git-send-email 2.51.0.windows.1
 In-Reply-To: <cover.1775618797.git.zhuyikai1@h-partners.com>
 References: <cover.1775618797.git.zhuyikai1@h-partners.com>
@@ -90,7 +90,7 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCPT_COUNT_TWELVE(0.00)[20];
-	TAGGED_FROM(0.00)[bounces-276273-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-276275-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -106,41 +106,53 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,h-partners.com:email,h-partners.com:mid,huawei.com:dkim,huawei.com:email]
-X-Rspamd-Queue-Id: BC51C3B6B14
+X-Rspamd-Queue-Id: D2BC83B6B3A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-  Configure netdev watchdog timeout to improve transmission reliability.
+  Remove unneeded coalesce parameters in irq handling.
 
 Co-developed-by: Zhu Yikai <zhuyikai1@h-partners.com>
 Signed-off-by: Zhu Yikai <zhuyikai1@h-partners.com>
 Signed-off-by: Fan Gong <gongfan1@huawei.com>
 ---
- drivers/net/ethernet/huawei/hinic3/hinic3_main.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ drivers/net/ethernet/huawei/hinic3/hinic3_irq.c | 6 +-----
+ drivers/net/ethernet/huawei/hinic3/hinic3_rx.h  | 3 ---
+ 2 files changed, 1 insertion(+), 8 deletions(-)
 
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_main.c b/drivers/net/ethernet/huawei/hinic3/hinic3_main.c
-index 3b470978714a..7e09b4b2da9f 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_main.c
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_main.c
-@@ -33,6 +33,8 @@
- #define HINIC3_RX_PENDING_LIMIT_LOW   2
- #define HINIC3_RX_PENDING_LIMIT_HIGH  8
+diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_irq.c b/drivers/net/ethernet/huawei/hinic3/hinic3_irq.c
+index d3b3927b5408..42464c007174 100644
+--- a/drivers/net/ethernet/huawei/hinic3/hinic3_irq.c
++++ b/drivers/net/ethernet/huawei/hinic3/hinic3_irq.c
+@@ -156,13 +156,9 @@ static int hinic3_set_interrupt_moder(struct net_device *netdev, u16 q_id,
+ 	spin_unlock_irqrestore(&nic_dev->channel_res_lock, flags);
  
-+#define HINIC3_WATCHDOG_TIMEOUT       5
-+
- static void init_intr_coal_param(struct net_device *netdev)
- {
- 	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-@@ -246,6 +248,8 @@ static void hinic3_assign_netdev_ops(struct net_device *netdev)
- {
- 	hinic3_set_netdev_ops(netdev);
- 	hinic3_set_ethtool_ops(netdev);
-+
-+	netdev->watchdog_timeo = HINIC3_WATCHDOG_TIMEOUT * HZ;
+ 	err = hinic3_set_interrupt_cfg(nic_dev->hwdev, info);
+-	if (err) {
++	if (err)
+ 		netdev_err(netdev,
+ 			   "Failed to modify moderation for Queue: %u\n", q_id);
+-	} else {
+-		nic_dev->rxqs[q_id].last_coalesc_timer_cfg = coalesc_timer_cfg;
+-		nic_dev->rxqs[q_id].last_pending_limit = pending_limit;
+-	}
+ 
+ 	return err;
  }
+diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_rx.h b/drivers/net/ethernet/huawei/hinic3/hinic3_rx.h
+index c11d080408a7..2ab691ed11a9 100644
+--- a/drivers/net/ethernet/huawei/hinic3/hinic3_rx.h
++++ b/drivers/net/ethernet/huawei/hinic3/hinic3_rx.h
+@@ -111,9 +111,6 @@ struct hinic3_rxq {
+ 	dma_addr_t             cqe_start_paddr;
  
- static void netdev_feature_init(struct net_device *netdev)
+ 	struct dim             dim;
+-
+-	u8                     last_coalesc_timer_cfg;
+-	u8                     last_pending_limit;
+ } ____cacheline_aligned;
+ 
+ struct hinic3_dyna_rxq_res {
 -- 
 2.43.0
 
