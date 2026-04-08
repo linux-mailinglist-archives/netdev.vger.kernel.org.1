@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-276682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276685-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +ABGNJul1ml9GwgAu9opvQ
-	(envelope-from <netdev+bounces-276682-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 20:59:39 +0200
+	id cArmHB6j1mlqGwgAu9opvQ
+	(envelope-from <netdev+bounces-276685-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 20:49:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A52C3C2255
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 20:59:39 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54B0D3C1A1F
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 20:49:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3FDC6320F560
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 18:47:30 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 214D93046FF5
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 18:47:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 065A03AEF5F;
-	Wed,  8 Apr 2026 18:47:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7A0A3D904F;
+	Wed,  8 Apr 2026 18:47:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dnNFVpDG"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CA57XmDS"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DAEF2641FC
-	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 18:47:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 517DB3624B9
+	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 18:47:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775674049; cv=none; b=Bk7La0Pg711LvBIlupqgyDRbNfjKj0hsP19BjpepsCu0IHq1f/osraIp9oNclESTfXR9O76vI4yQXa9RenLrODPs2Del/4aDiNAWz1QneSomFU03WhTy1TZj6c0hRjNAu4Eng0yzrKTld+zHwrsJ1SSlbbesrp8NWFCZcPmjc6g=
+	t=1775674053; cv=none; b=scZcDflL6MQGSalmtw6IIDrz8sDDzlJUclaDM1yOtTP5+dySStv21qdbqdHhp6IsW2k9jOxnrhamaBK6BNsxXNt4GzPgGoQzos5j8HbRfh+1JzPR+5nrUfLMRjmJljjtNg/91x4FRHm5XIOjsmg96Y3qdC8S/ARxvhCrOgWF6bU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775674049; c=relaxed/simple;
-	bh=DmanvA9tHclxyhu+ESIggN6Ege+JBj0Mde5bEHp/2x4=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=XsfGmgrHoIt5hENWkNcEagOU68nDIZNTnrATOHwdHR+DsKdCab+7GPxLXPrgNgukVn1VNKnaqCElzOrOx9oZRoMdZCVgZqaQpd2GoIqtQxHemY0xYrxtmNlMMBPc96nHY9YCm1Y4La4Xobq/jKmVnp0deOEigVebgO2kV0h5r8Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dnNFVpDG; arc=none smtp.client-ip=192.198.163.18
+	s=arc-20240116; t=1775674053; c=relaxed/simple;
+	bh=K3UN4pf9JPW3ZpduY02DTj0XVgO7vI4d+ii+qU3c24E=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=VSxFWiQbj0oHyyQXwVxg5xevGkMasGwRcBAWlGLfobIiCtY6FM4+EKU02Lt+vXBiOFSL8P0PsUP5ihLM4OIItmdJ9Uo0sgzo1Sy/BVzKj4wi4X2JrcWO/J24bluhpGlLkcMuM39iUurrjvktAj4gKTiProCwxt9ehSl2SqWpZBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CA57XmDS; arc=none smtp.client-ip=192.198.163.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1775674048; x=1807210048;
-  h=from:subject:date:message-id:mime-version:
-   content-transfer-encoding:to:cc;
-  bh=DmanvA9tHclxyhu+ESIggN6Ege+JBj0Mde5bEHp/2x4=;
-  b=dnNFVpDGQxWyStU46fIMsG5aB/yjiwCWM6Y2m+FbqRWsYnoiZao/rC8D
-   zjvUaGaK8tF3s1j06iztpsK1lmgb03vc0rYGnHAe2CIN1CzDjCZXZdi/4
-   0WdrkXKRZMxJrET5KZto9vhxW4WvGIP9dtcRyrYnlMo3LI1rMNtx91Dcn
-   N+CRfX8hpEYHsBRxjMTLrP8F0ISoeNHiZCTxGZ2bNAVpxSw49/mvhZHUn
-   EOxL7bJo7474wV4RIYAWp4IK88NmN9gNpNWG1pYiRbZgKpf0NviwCRRqq
-   MziXdUsSMTELnHr6HnBM2YUXVmjsOxUZqX+PcfXtYvT3ZswuNuLwr5yJN
+  t=1775674052; x=1807210052;
+  h=from:date:subject:mime-version:content-transfer-encoding:
+   message-id:references:in-reply-to:to:cc;
+  bh=K3UN4pf9JPW3ZpduY02DTj0XVgO7vI4d+ii+qU3c24E=;
+  b=CA57XmDSozTQxwJMZ6VzY7oXgBZr9OqXfR2V2ldtPhgbG68KY06h5gKq
+   vr9mrrBsJnl0HvTrscPjeDOvgt9BPb6C7OI3DuhZLPIgRDIMhyYQKbO+e
+   /3Nwp37KGhR5hVOwfRPPprNXuHHaiULRz/e5H3Hbzudf+0j4AP90cnNXY
+   ZHg+a9Iw7YamAsaHKnat3WRnhFNqzjPxbF4nbqtuw/pkMxUk+ljTDq3MK
+   NrlueFFIRc3iYxMCjqM6rIMXIZjnHjM0XI4yjQH5T5ZPsFrrp0jqCiDfh
+   k/wZf58ktQBypRodXk4rmx27lnbYYI5VhVXKWfl9u1Iqcm3UOIAFUz4bb
    A==;
-X-CSE-ConnectionGUID: KiK7EuFmQDKt5I50mqbpuA==
-X-CSE-MsgGUID: spVNKoa4STKDWDSJIlXOxw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11753"; a="75841379"
+X-CSE-ConnectionGUID: qBb65mKqT2m471BOHlbjnA==
+X-CSE-MsgGUID: uaypXznuQ2mUbO/jQTD/pg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11753"; a="75841385"
 X-IronPort-AV: E=Sophos;i="6.23,168,1770624000"; 
-   d="scan'208";a="75841379"
+   d="scan'208";a="75841385"
 Received: from fmviesa004.fm.intel.com ([10.60.135.144])
   by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Apr 2026 11:47:28 -0700
-X-CSE-ConnectionGUID: ADitm5EzSh2dIfByfIqpTw==
-X-CSE-MsgGUID: w1xbCf5STdaCnn9GT/g1+w==
+X-CSE-ConnectionGUID: QBP765/BQXmy6Y3irzVc5w==
+X-CSE-MsgGUID: 8BBOg8TlRqK92yagsDYzpA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,168,1770624000"; 
-   d="scan'208";a="230217556"
+   d="scan'208";a="230217560"
 Received: from orcnseosdtjek.jf.intel.com (HELO [10.166.28.109]) ([10.166.28.109])
   by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Apr 2026 11:47:26 -0700
 From: Jacob Keller <jacob.e.keller@intel.com>
-Subject: [PATCH iwl-net 0/4] ice: E825C missing PHY timestamp interrupt
- fixes
-Date: Wed, 08 Apr 2026 11:46:30 -0700
-Message-Id: <20260408-jk-even-more-e825c-fixes-v1-0-b959da91a81f@intel.com>
+Date: Wed, 08 Apr 2026 11:46:31 -0700
+Subject: [PATCH iwl-net 1/4] ice: fix timestamp interrupt configuration for
+ E825C
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,10 +73,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yWMwQ6CMBAFf4Xs2U3aqhX9FeMB2qcuaiFdRBPCv
- 1v1OJnMzKTIAqVDNVPGJCp9KmBXFYVrky5giYXJGefNxtTc3RgTEj/6DEbttoHP8obyvvEx7tb
- WttFTyYeMnyj1keR154SRTn+hz7ZDGL9jWpYPd7f0hYUAAAA=
-X-Change-ID: 20260408-jk-even-more-e825c-fixes-9a6dd7311bd6
+Message-Id: <20260408-jk-even-more-e825c-fixes-v1-1-b959da91a81f@intel.com>
+References: <20260408-jk-even-more-e825c-fixes-v1-0-b959da91a81f@intel.com>
+In-Reply-To: <20260408-jk-even-more-e825c-fixes-v1-0-b959da91a81f@intel.com>
 To: Anthony Nguyen <anthony.l.nguyen@intel.com>, 
  Intel Wired LAN <intel-wired-lan@lists.osuosl.org>, netdev@vger.kernel.org
 Cc: Grzegorz Nitka <grzegorz.nitka@intel.com>, 
@@ -84,19 +83,19 @@ Cc: Grzegorz Nitka <grzegorz.nitka@intel.com>,
  Aleksandr Loktionov <aleksandr.loktionov@intel.com>, 
  Jacob Keller <jacob.e.keller@intel.com>
 X-Mailer: b4 0.16-dev-306a9
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5658;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=5492;
  i=jacob.e.keller@intel.com; h=from:subject:message-id;
- bh=DmanvA9tHclxyhu+ESIggN6Ege+JBj0Mde5bEHp/2x4=;
- b=owGbwMvMwCWWNS3WLp9f4wXjabUkhsxri9Y2zNOprTy0fNsH8WWHGr5d2lfzKzEqbdL8A4cXv
- 9Oy/7m9rqOUhUGMi0FWTJFFwSFk5XXjCWFab5zlYOawMoEMYeDiFICJtDxhZFj3nL9eqvp45pY7
- 04rfzf5RWT910+u0k6zLO1xe15w+r7qS4X9AtWrVQlnp2zlyiX5s3pE8h4VePQnpVtMoeiCrqHh
- vDzcA
+ bh=RfOBce6ZBKcXPiiqDoqjeTQe/2/0bz7nXMgcDDG6AGY=;
+ b=owGbwMvMwCWWNS3WLp9f4wXjabUkhsxri/bwJU5UC2bVt2Y99Vgl1PBVnsPk86mCnybF/k6c2
+ +ZQJHa7o5SFQYyLQVZMkUXBIWTldeMJYVpvnOVg5rAygQxh4OIUgImw/Gb4p1/9vEdJ8wrDvR2m
+ 28OvxCo6bzr5aY/De+eHoveNp2msvsjwVzRWRuuFz9tFe/mK9N1ef1r0um0PZz9rzesC14RvB3Z
+ E8QIA
 X-Developer-Key: i=jacob.e.keller@intel.com; a=openpgp;
  fpr=204054A9D73390562AEC431E6A965D3E6F0F28E8
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -105,9 +104,9 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-276682-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-276685-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FROM_HAS_DN(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	PRECEDENCE_BULK(0.00)[];
@@ -117,114 +116,141 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCPT_COUNT_SEVEN(0.00)[7];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:dkim,intel.com:email,intel.com:mid]
-X-Rspamd-Queue-Id: 7A52C3C2255
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 54B0D3C1A1F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-We recently ran into a nasty corner case issue with a customer operating
-E825C cards seeing some strange behavior with missing Tx timestamps. During
-the course of debugging. This series contains a few fixes found during this
-debugging process.
+From: Grzegorz Nitka <grzegorz.nitka@intel.com>
 
-The primary issue discovered in the investigation is a misconfiguration of
-the E825C PHY timestamp interrupt register, PHY_REG_TS_INT_CONFIG. This
-register is responsible for programming the Tx timestamp behavior of a PHY
-port. The driver programs two values here: a threshold for when to
-interrupt and whether the interrupt is enabled.
+The E825C ice_phy_cfg_intr_eth56g() function is responsible for programming
+the PHY interrupt for a given port. This function writes to the
+PHY_REG_TS_INT_CONFIG register of the port. The register is responsible for
+configuring whether the port interrupt logic is enabled, as well as
+programming the threshold of waiting timestamps that will trigger an
+interrupt from this port.
 
-The threshold value is used by hardware to determine when to trigger a Tx
-timestamp interrupt. The interrupt cause for the port is raised when the
-number of outstanding timestamps in the PHY port timestamp memory meets the
-threshold. The interrupt cause is not cleared until the number of
-outstanding timestamps drops *below* the threshold.
+This threshold value must not be programmed to zero while the interrupt is
+enabled. Doing so puts the port in a misconfigured state where the PHY
+timestamp interrupt for the quad of connected ports will become stuck.
 
-It is considered a misconfiguration if the threshold is programmed to 0. If
-the interrupt is enabled while the threshold is zero, hardware will raise
-the interrupt cause at the next time it checks. Once raised, the interrupt
-cause for the port will never lower, since you cannot have fewer than zero
-outstanding timestamps.
+This occurs, because a threshold of zero results in the timestamp interrupt
+status for the port becoming stuck high. The four ports in the connected
+quad have their timestamp status indicators muxed together. A new interrupt
+cannot be generated until the timestamp status indicators return low for
+all four ports.
 
-Worse, the timestamp status for the port will remain high even if the
-PHY_REG_TS_INT_CONFIG is reprogrammed with a new threshold. The PHY is a
-separate hardware block from the MAC, and thus the interrupt status for the
-port will remain high even if you reset the device MAC with a PF reset,
-CORE reset, or GLOBAL reset.
+Normally, the timestamp status for a port will clear once there are fewer
+timestamps in that ports timestamp memory bank than the threshold. A
+threshold of zero makes this impossible, so the timestamp status for the
+port does not clear.
 
-PHY ports are connected together into quads. Each quad muxes the PHY
-interrupt status for the 4 ports on the quad together before connecting
-that to the MACs miscellaneous interrupt vector. As a result, if a single
-PHY port in the quad is stuck, no timestamp interrupts will be generated
-for any timestamp on any port on that quad.
+The ice driver never intentionally programs the threshold to zero, indeed
+the driver always programs it to a value of 1, intending to get an
+interrupt immediately as soon as even a single packet is waiting for a
+timestamp.
 
-The ice driver never directly writes a value of 0 for the threshold.
-Indeed, the desired behavior is to set the threshold to 1, so that
-interrupts are generated as soon as a single timestamp is captured.
-Unfortunately, it turns out that for the E825C PHY, programming the
-threshold and enable bit in the same write may cause a race in the PHY
-timestamp block. The PHY may "see" the interrupt as enabled first before it
-sees the threshold value. If the previous threshold value is zero (such as
-when the register is initialized to zero at a cold power on), the hardware
-may race with programming the threshold and set the PHY interrupt status to
-high as described above.
+However, there is a subtle flaw in the programming logic in the
+ice_phy_cfg_intr_eth56g() function. Due to the way that the hardware
+handles enabling the PHY interrupt. If the threshold value is modified at
+the same time as the interrupt is enabled, the HW PHY state machine might
+enable the interrupt before the new threshold value is actually updated.
+This leaves a potential race condition caused by the hardware logic where
+a PHY timestamp interrupt might be triggered before the non-zero threshold
+is written, resulting in the PHY timestamp logic becoming stuck.
 
-The first patch in this series corrects that programming order, ensuring
-that the threshold is always written first in a separate transaction from
-enabling the interrupt bit. Additionally, an explicit check against writing
-a 0 is added to make it clear to future readers that writing 0 to the
-threshold while enabling the interrupt is not safe.
+Once the PHY timestamp status is stuck high, it will remain stuck even
+after attempting to reprogram the PHY block by changing its threshold or
+disabling the interrupt. Even a typical PF or CORE reset will not reset the
+particular block of the PHY that becomes stuck. Even a warm power cycle is
+not guaranteed to cause the PHY block to reset, and a cold power cycle is
+required.
 
-The PHY timestamp block does not reset with the MAC, and seems to only
-reset during cold power on. This makes recovery from the faulty
-configuration difficult. To address this, perform an explicit reset of the
-PHY PTP block during initialization. This is achieved by writing the
-PHY_REG_GLOBAL register. This performs a PHY soft reset, which completely
-resets the timestamp block. This includes clearing the timestamp memory,
-the PHY timestamp interrupt status, and the PHY PTP counter. A soft reset
-of all ports on the device is done as part of ice_ptp_init_phc() during
-early initialization of the PTP functionality by the PTP clock owner, prior
-to programming each PHY. The ice_ptp_init_phc() function is called at
-driver init and during reinitialization after all forms of device reset.
-This ensures that the driver begins operation at a clean slate, rather than
-carrying over the stale and potentially buggy configuration of a previous
-driver.
+Prevent this by always writing the PHY_REG_TS_INT_CONFIG in two stages.
+First write the threshold value with the interrupt disabled, and only write
+the enable bit after the threshold has been programmed. When disabling the
+interrupt, leave the threshold unchanged. Additionally, re-read the
+register after writing it to guarantee that the write to the PHY has been
+flushed upon exit of the function.
 
-While attempting to root cause the issue with the PHY timestamp interrupt,
-we also discovered that the driver incorrectly assumes that it is operating
-on E822 hardware when reading the PHY timestamp memory status registers in
-a few places. This includes the check at the end of the interrupt handler,
-as well as the check done inside the PTP auxiliary function. This prevented
-the driver from detecting waiting timestamps on ports other than the first
-two.
+While we're modifying this function implementation, explicitly reject
+programming a threshold of 0 when enabling the interrupt. No caller does
+this today, but the consequences of doing so are significant. An explicit
+rejection in the code makes this clear.
 
-Finally, the ice_ptp_read_tx_hwstamp_status_eth56g() function was
-discovered to only read the timestamp interrupt status value from the first
-quad due to mistaking the port index for a PHY quad index. This resulted in
-reporting the timestamp status for the second quad as identical to the
-first quad instead of properly reporting its value. This is a minor fix
-since the function currently is only used for diagnostic purposes and does
-not impact driver decision logic.
-
+Fixes: 7cab44f1c35f ("ice: Introduce ETH56G PHY model for E825C products")
+Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
 Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 ---
-Grzegorz Nitka (2):
-      ice: fix timestamp interrupt configuration for E825C
-      ice: perform PHY soft reset for E825C ports at initialization
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 36 +++++++++++++++++++++++++----
+ 1 file changed, 32 insertions(+), 4 deletions(-)
 
-Jacob Keller (2):
-      ice: fix ready bitmap check for non-E822 devices
-      ice: fix ice_ptp_read_tx_hwtstamp_status_eth56g
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
+index e3db252c3918..67775beb9449 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
++++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
+@@ -1847,6 +1847,8 @@ static int ice_phy_cfg_mac_eth56g(struct ice_hw *hw, u8 port)
+  * @ena: enable or disable interrupt
+  * @threshold: interrupt threshold
+  *
++ * The threshold cannot be 0 while the interrupt is enabled.
++ *
+  * Configure TX timestamp interrupt for the specified port
+  *
+  * Return:
+@@ -1858,19 +1860,45 @@ int ice_phy_cfg_intr_eth56g(struct ice_hw *hw, u8 port, bool ena, u8 threshold)
+ 	int err;
+ 	u32 val;
+ 
++	if (ena && !threshold)
++		return -EINVAL;
++
+ 	err = ice_read_ptp_reg_eth56g(hw, port, PHY_REG_TS_INT_CONFIG, &val);
+ 	if (err)
+ 		return err;
+ 
++	val &= ~PHY_TS_INT_CONFIG_ENA_M;
+ 	if (ena) {
+-		val |= PHY_TS_INT_CONFIG_ENA_M;
+ 		val &= ~PHY_TS_INT_CONFIG_THRESHOLD_M;
+ 		val |= FIELD_PREP(PHY_TS_INT_CONFIG_THRESHOLD_M, threshold);
+-	} else {
+-		val &= ~PHY_TS_INT_CONFIG_ENA_M;
++		err = ice_write_ptp_reg_eth56g(hw, port, PHY_REG_TS_INT_CONFIG,
++					       val);
++		if (err) {
++			ice_debug(hw, ICE_DBG_PTP,
++				  "Failed to update 'threshold' PHY_REG_TS_INT_CONFIG port=%u ena=%u threshold=%u\n",
++				  port, !!ena, threshold);
++			return err;
++		}
++		val |= PHY_TS_INT_CONFIG_ENA_M;
+ 	}
+ 
+-	return ice_write_ptp_reg_eth56g(hw, port, PHY_REG_TS_INT_CONFIG, val);
++	err = ice_write_ptp_reg_eth56g(hw, port, PHY_REG_TS_INT_CONFIG, val);
++	if (err) {
++		ice_debug(hw, ICE_DBG_PTP,
++			  "Failed to update 'ena' PHY_REG_TS_INT_CONFIG port=%u ena=%u threshold=%u\n",
++			  port, !!ena, threshold);
++		return err;
++	}
++
++	err = ice_read_ptp_reg_eth56g(hw, port, PHY_REG_TS_INT_CONFIG, &val);
++	if (err) {
++		ice_debug(hw, ICE_DBG_PTP,
++			  "Failed to read PHY_REG_TS_INT_CONFIG port=%u ena=%u threshold=%u\n",
++			  port, !!ena, threshold);
++		return err;
++	}
++
++	return 0;
+ }
+ 
+ /**
 
- drivers/net/ethernet/intel/ice/ice_ptp_hw.h |   5 +
- drivers/net/ethernet/intel/ice/ice_ptp.c    |  40 ++---
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 253 +++++++++++++++++++++++++++-
- 3 files changed, 265 insertions(+), 33 deletions(-)
----
-base-commit: e3b6e4778608889866917014b7dfe88425073fe5
-change-id: 20260408-jk-even-more-e825c-fixes-9a6dd7311bd6
-
-Best regards,
---  
-Jacob Keller <jacob.e.keller@intel.com>
+-- 
+2.53.0.1066.g1eceb487f285
 
 
