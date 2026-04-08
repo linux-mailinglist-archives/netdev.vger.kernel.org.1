@@ -1,202 +1,227 @@
-Return-Path: <netdev+bounces-276332-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276333-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UEV0BQwI1mnbAQgAu9opvQ
-	(envelope-from <netdev+bounces-276332-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 09:47:24 +0200
+	id SDTXC0UI1mnbAQgAu9opvQ
+	(envelope-from <netdev+bounces-276333-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 09:48:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DF533B8869
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 09:47:23 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3B423B8880
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 09:48:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 93547300B3F7
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 07:44:51 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id DE2C53002F41
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 07:48:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8946F38F94A;
-	Wed,  8 Apr 2026 07:44:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4234221CA03;
+	Wed,  8 Apr 2026 07:48:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Mj1+EbjK";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="QPno/2j7";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="1kKIZ/O+";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="2lxl02zH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f170.google.com (mail-vk1-f170.google.com [209.85.221.170])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD72438F926
-	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 07:44:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3BEC1F09AD
+	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 07:48:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775634290; cv=none; b=LC25CylFPFF+OAeY1oTb9L5hzkQKqMl/+f3Esz7TpH2UAbfPRcQo47BVC9JdLN6s1CAoQwTSG9iKstza7szIfDHUerzEGlhxyaxQpPLHv355UopUbq+k3H2HR4me3lVbkRzr4YbJv/f2PQXddMUBzCVY4vZFRnPixrWjkjX+fX4=
+	t=1775634494; cv=none; b=JGSL4hvnJUD85yzqhxoAAxLwJ6zMEQs/uBIiOOV3hYWpuJQb+H7UFPI8ki6SgAhP2+vC/E7vMNPKZG3amf560auR321jBRG1tut7w+gQmCd5Yg/TmGbKQIb5zqN7cIxhijrv6LPrzym18vXuuVql8sioFs/bYU5C41pdCRWVJCI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775634290; c=relaxed/simple;
-	bh=Sedntlj+MRpt/fUUQE+k3MFmNCo9DsPGibGC+cz8uNs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fCFvXcWXz6V7OjFVIEeHLLeMATxaqaBQoL2ndVv9MK2TEGc7lMAVEi3DXUoesg8W0jwuyfhbTTaMgIX7E1PkQj1ZpEXKa55O2ekXPFbtJ9mJU6QM3W4qp1tWt+XKJ3CmcHMJgVID/GGyoZK6KnlWJxqNHhlXEBD9y893PC2f0cI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f170.google.com with SMTP id 71dfb90a1353d-56a9076813bso2770463e0c.3
-        for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 00:44:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775634286; x=1776239086;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=NEDWencaHGoC92/VXbD1rMBTxJckYQ0xVO4rQnCJYhI=;
-        b=b5vJKMC6pTUBofTVz/MFXVa0GQKjyW8bdm/875ZfchHgBbvSq0o2ce9cpfWv6qdGxz
-         0TB5KkVo8joZS73KemcnqzzFZIkIEdIxRswAu4VbaMbbBIXwrv7m7tVvcxNjKtqFfl3N
-         a7wZeq8B+krhH8PAK6/bZBAtfNqilE1rTtxARG7TCPPQPUXL48bXxSPuIampbzpGCztY
-         efcjeT5Ny9c0HwoUT8RjRy7OKFVQl5hpsx38inpUZXtTzEJSup+LLZwoELHLkhgYrwT+
-         qL2JAK2Y3wV0R1TVlyPO4mIrLq2/k3Glhd6zWSB9m4LNngsOChRLeT30KZl+ZgsGTUWS
-         SZgw==
-X-Forwarded-Encrypted: i=1; AJvYcCVRF4CESLeBBpRT2i/boxtDpv+R0HlXkuQ4tkVNE1LVDv4ifgwVSh1mbMx52YMDVr6w8wd44xo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz+BQw47F/MJa8M9tJcVYmzARe0EWkHFBcGIvnRjNIPoE6kzVXz
-	iT4phR0Vx1XU7d1tF/gkDTFgKy8kLqg9KAnOnN5+j/cRkJQa1DugvTWJ9SxHVXGK
-X-Gm-Gg: AeBDieuWgg88I9iREHfCB3GRA2v109xN/eKk+UTZOwLPj17bAzNVeHsqVdz+TqO6bSQ
-	A9QM68pPKItarmk8yK94aJuC19Bw0bDoZIHYBTdVcPygK/EKy0D3cGOwPfWHP+V7KCmxM6PvYNF
-	c08lDeki7yGzhI+uCtE0M+fKdddhz+fjyH9Xk+E5SlZ1/DWnUrsALx47A7sRyhl8L9V11gF1jWy
-	/8lsAWMVMETqZJmn6yiR60uvX76sjp0YBvWxW7HSOVBn3ZxXjuvxE/1SR8U6IeKesdQ0z+rgBti
-	t1mKTyQc6DlclEvBXvrrzd11MY1pLHPxuqTei4UTs28To9ESm9rwAO6jwc/xw9inpbUT5PRUDBF
-	R9M2kDeaY0IV8+KAziYK87U+/q8LJRaMPyU9Pb0u17OZIALKbkwhAdcSISV8CYYxlqVfCvfL10B
-	NMLuF7BjVi76evawXvkLVP+M/EURkij2tH4MRZ9YRZX3xjq36yGrBTgiPes9tO83i4
-X-Received: by 2002:a05:6122:1817:b0:56e:f262:910f with SMTP id 71dfb90a1353d-56ef26293e6mr5097234e0c.3.1775634286193;
-        Wed, 08 Apr 2026 00:44:46 -0700 (PDT)
-Received: from mail-vk1-f176.google.com (mail-vk1-f176.google.com. [209.85.221.176])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-953fba6abbcsm15890533241.9.2026.04.08.00.44.45
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 Apr 2026 00:44:45 -0700 (PDT)
-Received: by mail-vk1-f176.google.com with SMTP id 71dfb90a1353d-56d8d479149so2139717e0c.2
-        for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 00:44:45 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVP9+fNA7Y1LjXRLMJpQSblFqhlDAP0lD1V9kz6HQZhBW9F5YK94CLF1grtpiLe89uBY2MZk5o=@vger.kernel.org
-X-Received: by 2002:a05:6122:d1e:b0:56c:da22:6921 with SMTP id
- 71dfb90a1353d-56dab89ee50mr7759922e0c.5.1775634285014; Wed, 08 Apr 2026
- 00:44:45 -0700 (PDT)
+	s=arc-20240116; t=1775634494; c=relaxed/simple;
+	bh=oxU73agG/K/GsQVHTfPXm5aBMeYayhs45e5gLHSlfx8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=aI95wjl+Wz9yjdiip27YqG4ga5cdqVQQRYU9RV97vGqPq2FFxRC60kWrODmA3ygoUGnn3sFJ1yd5SY/7VWSJbBjVY5aGNB0bp2y3+2vv0PwD7KmPNfpSO15T6ZwYQa53SedvdLjXmuBy0g2Md5jI2DXXB0wmoC6uPlPZBkacD58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Mj1+EbjK; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=QPno/2j7; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=1kKIZ/O+; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=2lxl02zH; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id DB7B24E8B2;
+	Wed,  8 Apr 2026 07:48:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1775634491; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=q0+Iq505/Ifb4Fg4GmNo62XpGFRZrl4gwNyQQ25vOYk=;
+	b=Mj1+EbjKI0gB0PZZrLELSNyxCCTYqYOQkC+W1proiXbXhs5dQSzD8L5pARE8GWWIRn4nGJ
+	6h5LFN+PFf2tzcDgNfCtsaQ5rT0qoKFglfjlp2I9KRLa9dAwL/5WifqoKAPFqcuQeElOsR
+	2v/RdJKE0M0DyBGR55JAqsvfBezy+nc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1775634491;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=q0+Iq505/Ifb4Fg4GmNo62XpGFRZrl4gwNyQQ25vOYk=;
+	b=QPno/2j7JbtC76bCGPjzx1aMpa73L437Mq3iqTu5qk+3jdRF42SLEai+txmepFYh7lJUm1
+	B6te2kT4QMb3loBQ==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b="1kKIZ/O+";
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=2lxl02zH
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1775634490; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=q0+Iq505/Ifb4Fg4GmNo62XpGFRZrl4gwNyQQ25vOYk=;
+	b=1kKIZ/O+mGSYY74IiN8vH+U/TcFYTNWac6QVeQonlY+LVk3xR/Ez6cI1qHm2LIYsKD0BvT
+	zWfV4IEHhq9qF0fF9KKLTsDl3bw85QNb0bNvryBYBzJKP68FA3pX09KABJ1JbsuoQFCkhA
+	zZWvOyOfzE6syAyj3FjMlmX6barUoe4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1775634490;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=q0+Iq505/Ifb4Fg4GmNo62XpGFRZrl4gwNyQQ25vOYk=;
+	b=2lxl02zHvXJbCWvYwSihcOworszAeWqBgp27OkfRwbvfOmaaT+iO0tQKcPUGc3Dk1Mtztf
+	qks+rUBuaQqcneDA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 5CFF34A0B3;
+	Wed,  8 Apr 2026 07:48:10 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id mdVtEzoI1mmXSQAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Wed, 08 Apr 2026 07:48:10 +0000
+Message-ID: <e29b7837-70ab-4db2-b9e5-abb59d8721d7@suse.de>
+Date: Wed, 8 Apr 2026 09:48:04 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260401183608.1852225-1-niklas.soderlund+renesas@ragnatech.se>
- <CAMuHMdWnjV=HGE1o08zLhUfTgOSene5fYx1J5GG10mB+Toq8qg@mail.gmail.com> <20260407185443.GC2551274@ragnatech.se>
-In-Reply-To: <20260407185443.GC2551274@ragnatech.se>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Wed, 8 Apr 2026 09:44:33 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdULBf3fBZU62F3YgBtJGzyTQgM-S-c9rhtX=cUCkqDQbA@mail.gmail.com>
-X-Gm-Features: AQROBzBzKJdNv4YGImgP7NuYcmguQh7usD6WewdHOw4ygij9zBJGnfG3HJWNFS4
-Message-ID: <CAMuHMdULBf3fBZU62F3YgBtJGzyTQgM-S-c9rhtX=cUCkqDQbA@mail.gmail.com>
-Subject: Re: [net-next] net: ethernet: ravb: Suspend and resume the
- transmission flow
-To: =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, Paul Barker <paul@pbarker.dev>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [0.04 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5 1/2] net: hsr: require valid EOT supervision
+ TLV
+To: luka.gejak@linux.dev, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com
+Cc: netdev@vger.kernel.org, fmaurer@redhat.com, horms@kernel.org
+References: <20260407162502.19462-1-luka.gejak@linux.dev>
+ <20260407162502.19462-2-luka.gejak@linux.dev>
+Content-Language: en-US
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+In-Reply-To: <20260407162502.19462-2-luka.gejak@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Flag: NO
+X-Spam-Score: -4.51
+X-Spam-Level: 
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TAGGED_FROM(0.00)[bounces-276333-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[suse.de:+];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[linux-m68k.org];
-	TAGGED_FROM(0.00)[bounces-276332-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,renesas];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[geert@linux-m68k.org,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	RCVD_COUNT_FIVE(0.00)[6];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.329];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux-m68k.org:email,renesas.com:email,ragnatech.se:email]
-X-Rspamd-Queue-Id: 6DF533B8869
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_NONE(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,suse.de:dkim,suse.de:mid]
+X-Rspamd-Queue-Id: F3B423B8880
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Niklas,
+On 4/7/26 6:25 PM, luka.gejak@linux.dev wrote:
+> From: Luka Gejak <luka.gejak@linux.dev>
+> 
+> Supervision frames are only valid if terminated with a zero-length EOT
+> TLV. The current check fails to reject non-EOT entries as the terminal
+> TLV, potentially allowing malformed supervision traffic.
+> 
+> Fix this by strictly requiring the terminal TLV to be HSR_TLV_EOT
+> with a length of zero, and properly linearizing the TLV header before
+> access.
+> 
+> Assisted-by: Gemini:Gemini-3.1-flash
+> Signed-off-by: Luka Gejak <luka.gejak@linux.dev>
+> ---
+>   net/hsr/hsr_forward.c | 20 +++++++++-----------
+>   1 file changed, 9 insertions(+), 11 deletions(-)
+> 
+> diff --git a/net/hsr/hsr_forward.c b/net/hsr/hsr_forward.c
+> index 0aca859c88cb..eb89cc44eac0 100644
+> --- a/net/hsr/hsr_forward.c
+> +++ b/net/hsr/hsr_forward.c
+> @@ -82,35 +82,33 @@ static bool is_supervision_frame(struct hsr_priv *hsr, struct sk_buff *skb)
+>   	    hsr_sup_tag->tlv.HSR_TLV_length != sizeof(struct hsr_sup_payload))
+>   		return false;
+>   
+> -	/* Get next tlv */
+> +	/* Get next TLV */
+>   	total_length += hsr_sup_tag->tlv.HSR_TLV_length;
+> -	if (!pskb_may_pull(skb, total_length))
+> +	if (!pskb_may_pull(skb, total_length + sizeof(struct hsr_sup_tlv)))
+>   		return false;
+>   	skb_pull(skb, total_length);
+>   	hsr_sup_tlv = (struct hsr_sup_tlv *)skb->data;
+>   	skb_push(skb, total_length);
+>   
+> -	/* if this is a redbox supervision frame we need to verify
+> -	 * that more data is available
+> -	 */
+> +	/* If this is a RedBox supervision frame, verify additional data */
+>   	if (hsr_sup_tlv->HSR_TLV_type == PRP_TLV_REDBOX_MAC) {
+> -		/* tlv length must be a length of a mac address */
+> +		/* TLV length must be the size of a MAC address */
+>   		if (hsr_sup_tlv->HSR_TLV_length != sizeof(struct hsr_sup_payload))
+>   			return false;
+>   
+> -		/* make sure another tlv follows */
+> +		/* Make sure another TLV follows */
+>   		total_length += sizeof(struct hsr_sup_tlv) + hsr_sup_tlv->HSR_TLV_length;
+> -		if (!pskb_may_pull(skb, total_length))
+> +		if (!pskb_may_pull(skb, total_length + sizeof(struct hsr_sup_tlv)))
 
-On Tue, 7 Apr 2026 at 20:54, Niklas S=C3=B6derlund
-<niklas.soderlund+renesas@ragnatech.se> wrote:
-> On 2026-04-07 11:03:38 +0200, Geert Uytterhoeven wrote:
-> > On Wed, 1 Apr 2026 at 20:39, Niklas S=C3=B6derlund
-> > <niklas.soderlund+renesas@ragnatech.se> wrote:
-> > >
-> > > From: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-> > >
-> > > The current driver does not follow the latest datasheet and does not
-> > > suspend the flow when stopping DMA and resume it when starting. Updat=
-e
-> > > the driver to do so.
-> > >
-> > > Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-> > > [Niklas: Rebase from BSP and reword commit message]
-> > > Signed-off-by: Niklas S=C3=B6derlund <niklas.soderlund+renesas@ragnat=
-ech.se>
-> >
-> > Thanks for your patch, which is now commit 353d8e7989b6babe ("net:
-> > ethernet: ravb: Suspend and resume the transmission flow") in
-> > linux-next/master net-next.
-> >
-> > > --- a/drivers/net/ethernet/renesas/ravb_main.c
-> > > +++ b/drivers/net/ethernet/renesas/ravb_main.c
-> > > @@ -694,6 +694,9 @@ static int ravb_dmac_init(struct net_device *ndev=
-)
-> > >         const struct ravb_hw_info *info =3D priv->info;
-> > >         int error;
-> > >
-> > > +       /* Clear transmission suspension */
-> > > +       ravb_modify(ndev, CCC, CCC_DTSR, 0);
-> > > +
-> > >         /* Set CONFIG mode */
-> > >         error =3D ravb_set_opmode(ndev, CCC_OPC_CONFIG);
-> > >         if (error)
-> > > @@ -1103,6 +1106,12 @@ static int ravb_stop_dma(struct net_device *nd=
-ev)
-> > >         if (error)
-> > >                 return error;
-> > >
-> > > +       /* Request for transmission suspension */
-> > > +       ravb_modify(ndev, CCC, CCC_DTSR, CCC_DTSR);
-> > > +       error =3D ravb_wait(ndev, CSR, CSR_DTS, CSR_DTS);
-> > > +       if (error)
-> > > +               netdev_err(ndev, "failed to stop AXI BUS\n");
-> >
-> > This error message is printed during resume from s2idle or s2ram on
-> > e.g. Salvator-XS and Gray Hawk Single.  Ethernet (nfsroot) still works
-> > fine, though.
->
-> I was not able to reproduce this on M3N (r8a77965-salvator-xs.dts) nor
-> Sparrow Hawk (r8a779g3-sparrow-hawk.dts). I'm using the following to
-> test, is your test-case different?
->
->   # echo enabled > /sys/class/tty/ttySC0/power/wakeup
->   # echo s2idle > /sys/power/mem_sleep
->   # echo 0 > /sys/module/printk/parameters/console_suspend
->   # echo mem > /sys/power/state
+Hi Luka,
 
-Looks good. Major difference seems to be that I use either Wake-on-LAN
-or gpio-keys wake-up, and I always have WoL enabled for ravb.
+why is the length adjusted here? The current total length was adjusted 
+correctly above see:
 
-Gr{oetje,eeting}s,
+total_length += sizeof(struct hsr_sup_tlv) + hsr_sup_tlv->HSR_TLV_length;
 
-                        Geert
+Thanks,
+Fernando.
 
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
+>   			return false;
+>   
+> -		/* get next tlv */
+> +		/* Get next TLV */
+>   		skb_pull(skb, total_length);
+>   		hsr_sup_tlv = (struct hsr_sup_tlv *)skb->data;
+>   		skb_push(skb, total_length);
+>   	}
+>   
+> -	/* end of tlvs must follow at the end */
+> -	if (hsr_sup_tlv->HSR_TLV_type == HSR_TLV_EOT &&
+> +	/* Supervision frame must end with EOT TLV */
+> +	if (hsr_sup_tlv->HSR_TLV_type != HSR_TLV_EOT ||
+>   	    hsr_sup_tlv->HSR_TLV_length != 0)
+>   		return false;
+>   
 
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
 
