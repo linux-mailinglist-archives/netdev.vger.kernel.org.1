@@ -1,263 +1,457 @@
-Return-Path: <netdev+bounces-276650-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276651-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kDiSHfeG1mmwFwgAu9opvQ
-	(envelope-from <netdev+bounces-276650-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 18:48:55 +0200
+	id 4KXWG2GG1mmwFwgAu9opvQ
+	(envelope-from <netdev+bounces-276651-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 18:46:25 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C801A3BF131
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 18:48:54 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB40F3BF0C1
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 18:46:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 254DF3085D87
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 16:43:44 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 22F3E300D921
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 16:46:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69E4C3D1CD1;
-	Wed,  8 Apr 2026 16:43:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78F483D1CB4;
+	Wed,  8 Apr 2026 16:46:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fi6Y+dCZ"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="fQ+trrHC";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ClADOPbr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fhigh-a5-smtp.messagingengine.com (fhigh-a5-smtp.messagingengine.com [103.168.172.156])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 446DD3BAD8F;
-	Wed,  8 Apr 2026 16:43:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE03E2C0285
+	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 16:45:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775666622; cv=none; b=CRx4uIdebpY06TX12TdTS7TsJw/WWbCsOcM/Vj0rbB44CMg9J/JUsKf8pwwauPF+nGUIkEJjYz/L8VdQDq5qcBKR6caPSd4vk4Q4xP/HP13ZO7a6GCO4ERKsJdCHG+QW1P3Je8nG4BLFJ/Z/QVltv3ev1iOJak0UUBOh0DemGwY=
+	t=1775666760; cv=none; b=jw2VlmTftrqTuNToI1yVALtEHPvN4VY9adQNY27xIk7Z7E3BUOHq9lhg66fdQK0DjWnO1uLNAOoBPwFteTWiEhqFSJBH2BNiGvJF5K+Nkobf3OwevJzEF9qYNCs7TbHrTcne23zYzEcxYgfjoDx4aveCqUy01F8gGHFe2oIv+xs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775666622; c=relaxed/simple;
-	bh=eNSN/V9iAtKNk8c2W5CzcVUiXUpEq+bFtvJet1Q0okg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ga0W1lRe6Il6d9BlkjxElIJFvx9Y7ASjMEIKg9J7dRdOjYMNVGfU8BrvkYc8oYQiusYcqnKLD7RqkASQfOnZVrZhupclIWmzrTr7aJlgOfAg4C1cb8poJhlIs8hvFFFAPL8c0OTaGPhRO6khmnKqsh3ArAxIwCoGfX6yqB2YV3o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fi6Y+dCZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9739C2BC87;
-	Wed,  8 Apr 2026 16:43:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775666621;
-	bh=eNSN/V9iAtKNk8c2W5CzcVUiXUpEq+bFtvJet1Q0okg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=fi6Y+dCZw7beSP7hoLO4/f+j/kmY2B4HKmpTOIl1qVd4Yo4Unft05aUKJ8RZCIp3X
-	 TUcgAb7xY9k1kHb6BdsLemkvVAUgFWhTFl1NWNq43Gmot65D8TCAlJNX8f3V5+RDWQ
-	 vdGwODiPd0ZVHZTvDKdyJeGUntz1d9MzNqwb8lfsigtyODnJ8Z28f6tDkpBsf5ZXlF
-	 7KBz72qbQs7VGhqheouTTo0xL3MD61EPDCJlNZq2hAxglULRUhhWRnBTcaktmj+hri
-	 rQCovgqsoZuPtPRHZ1E6Y0yBVF/H9Ke68tflwCP2F4XVXNZ/wOaxTAbe70G8Vqdrxp
-	 zSrWtriiEh5Dg==
-Message-ID: <8d216893-1e0b-4e3c-8609-eb3de5da02cf@kernel.org>
-Date: Wed, 8 Apr 2026 18:43:36 +0200
+	s=arc-20240116; t=1775666760; c=relaxed/simple;
+	bh=o6hQLxGINIJWQmOwHJp1wrTvq8AkCxA5/7vNkUro9vM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Zz4cpWe6Dj+DJ8C5eGvKca5GwBUpkcVuE7cRP9juiMcCmj271dA2h73l8rH+L0oJ9LIV6m0KfdFfWXIsba/v/w3FuzCIUqk1cGmP8qAJ2Y62m/3rYxOEPen9KtoHtCQ+vrca6eqSAJ2pzstDcLaQFjI+OPh+uoGZXYDEkOqVni8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=fQ+trrHC; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ClADOPbr; arc=none smtp.client-ip=103.168.172.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id F3FE514001F0;
+	Wed,  8 Apr 2026 12:45:55 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-06.internal (MEProxy); Wed, 08 Apr 2026 12:45:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm3; t=1775666755; x=
+	1775753155; bh=4IP8uDhWseAbvSmCO6OndS1adKHMIb/bGpe8jjSwMgs=; b=f
+	Q+trrHC3nltjk1l9n33k3Bn8QZpIUtVGQfnybFRxdbn5p67fFAMqf/NnsCNRG1HP
+	mi5NKL1BmBN223YOG5R9hD0G1ag2gNFsYykBcIleZrSrIzJWJPMJVOslb+1SbRvL
+	L7AXO5AFI2aaA0TiBCJk19JGqusiOGH80SJzXzgQTrQqMDxSabwPnCxMtWD/7fPf
+	l5iDOI36hP0Ug+B5h5i7/qEP2w98EAwPYRvZiyow8rXATNEkRltJ4l8Hf/bmiQ9K
+	8LTGgrDxy4JRpYv3KvxRWLWLrMVBaEgRjow+3eGU54woGar6WeRkvGYDAhBwCdiq
+	UXlNFtTOOFqh6F5tByvVw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1775666755; x=1775753155; bh=4IP8uDhWseAbvSmCO6OndS1adKHMIb/bGpe
+	8jjSwMgs=; b=ClADOPbrWMHHXZ6QibmOmp88HBCg3XGO9wXg0Wxhn1bv1qDQLeN
+	7/0WQRyIsS3yFwMcsnD5d5+MGbDoSFTJC18ZqcdKKPblXvW/MKQEKGIol9/4qtrn
+	HX2sJbFqL4B+wkRH1JVRFKiie5o/0V4AeKFOf3IgYLEWbmXYRovHJMvnCuFW1aHN
+	Z1LXfWaqBf6hUpjQoioG5xMA1/UFBty1pHlYwQNQczWHnn/6vg6FV0IwsSWMJqkC
+	H/WPYQUByaJIs3QQTReTP9Yy+zJ50PuB7lLaTd3LKbzK0MzXqNW0Je507CwODidH
+	zYBPW0g8Kx4hm7rDOws7RvskD7akiuhdvbw==
+X-ME-Sender: <xms:Q4bWaUBzE5DFt0VEAmVCuyRIoIDMkJgUtGXQMD3YNZ8g12y_zhxmRQ>
+    <xme:Q4bWaSX9BE6Oia4drWbiYIy-YaK-Frx-DzP_5W32p_Q0lARTrUt5TXK6egy6EDI5O
+    SwvOqnI37zWadJQCp7udubr85bKQy3C5ryYU5jYp866-JDrRKpoRI0>
+X-ME-Received: <xmr:Q4bWaS9A_O8ISBm1QH6ocX8feQC_D2goXBFlJDIDEi1T8iDfGQmC5QofAXTE>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgddvgedtlecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpeffhffvvefukfhfgggtuggjsehttdortddttdejnecuhfhrohhmpefurggsrhhinhgr
+    ucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrihhlrdhnvghtqeenucggtffrrg
+    htthgvrhhnpeejkeelveelkeefgfeuheevjeeukedvhedvueegvdekleeghfelgeeiveff
+    tdeuudenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
+    hsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghrtghpthhtohepuddvpdhmohgu
+    vgepshhmthhpohhuthdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtg
+    hpthhtoheprhhjvghthhifrghnihesphhurhgvshhtohhrrghgvgdrtghomhdprhgtphht
+    thhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehsrg
+    gvvggumhesnhhvihguihgrrdgtohhmpdhrtghpthhtohepthgrrhhiqhhtsehnvhhiughi
+    rgdrtghomhdprhgtphhtthhopehmsghlohgthhesnhhvihguihgrrdgtohhmpdhrtghpth
+    htohepsghorhhishhpsehnvhhiughirgdrtghomhdprhgtphhtthhopehjohhhnhdrfhgr
+    shhtrggsvghnugesghhmrghilhdrtghomhdprhgtphhtthhopegurghvvghmsegurghvvg
+    hmlhhofhhtrdhnvght
+X-ME-Proxy: <xmx:Q4bWaUTLE_B9-BIXeZo_aO_NwwHC5DyCTA58-D1BOr2duX3M7yfcUg>
+    <xmx:Q4bWaXQ6R6LTAJ-NtjfFiGoOXLvqUEbFsaXreZP1uwgrCB_oGVJV4w>
+    <xmx:Q4bWaQ7txrxEDmQ1P3GwnIhXtSgH-3VC_GyFCkCC1htLX_RO5A5nYw>
+    <xmx:Q4bWacWQLpB2ZYY20BA40olLIYaMK6s8HDuzbJnREQJE1ZjLW5QKUA>
+    <xmx:Q4bWaZjn0BfORaTFACfc5dDHTxVog6-duHwcLqdCEX1HkPm9Lxgl7oQg>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 8 Apr 2026 12:45:55 -0400 (EDT)
+Date: Wed, 8 Apr 2026 18:45:53 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: kuba@kernel.org, Rishikesh Jethwani <rjethwani@purestorage.com>
+Cc: netdev@vger.kernel.org, saeedm@nvidia.com, tariqt@nvidia.com,
+	mbloch@nvidia.com, borisp@nvidia.com, john.fastabend@gmail.com,
+	davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
+	leon@kernel.org
+Subject: Re: [PATCH v12 6/6] selftests: net: add TLS hardware offload test
+Message-ID: <adaGQRUUNbXWXNgP@krikkit>
+References: <20260402235511.664801-1-rjethwani@purestorage.com>
+ <20260402235511.664801-7-rjethwani@purestorage.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: linux-next: manual merge of the net-next tree with the netfilter
- tree
-Content-Language: fr
-To: Mark Brown <broonie@kernel.org>, David Miller <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Networking <netdev@vger.kernel.org>
-Cc: Andrea Mayer <andrea.mayer@uniroma2.it>,
- Justin Iurman <justin.iurman@6wind.com>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux Next Mailing List <linux-next@vger.kernel.org>
-References: <adZhwtOYfo-0ImSa@sirena.org.uk>
- <729b748b-e00b-475e-81e0-a666eab24fc6@sirena.org.uk>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <729b748b-e00b-475e-81e0-a666eab24fc6@sirena.org.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260402235511.664801-7-rjethwani@purestorage.com>
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm3,messagingengine.com:s=fm2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-276650-lists,netdev=lfdr.de];
-	HAS_ORG_HEADER(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_ALL(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-276651-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[queasysnail.net];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FREEMAIL_CC(0.00)[vger.kernel.org,nvidia.com,gmail.com,davemloft.net,redhat.com,google.com,kernel.org];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
+	NEURAL_HAM(-0.00)[-0.998];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C801A3BF131
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,messagingengine.com:dkim,queasysnail.net:dkim]
+X-Rspamd-Queue-Id: AB40F3BF0C1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello,
+@Jakub [top-posting so you don't have to scroll through the rest of my
+comments to find some global questions about this patch]
 
-On 08/04/2026 17:08, Mark Brown wrote:
-> On Wed, Apr 08, 2026 at 03:10:10PM +0100, Mark Brown wrote:
->> Hi all,
->>
->> Today's linux-next merge of the net-next tree got a conflict in:
->>
->>   net/ipv6/seg6_iptunnel.c
->>
->> between commit:
->>
->>   c3812651b522f ("seg6: separate dst_cache for input and output paths in seg6 lwtunnel")
->>
->> from the netfilter tree and commit:
->>
->>   78723a62b969a ("seg6: add per-route tunnel source address")
->>
->> from the net-next tree.
->>
->> I fixed it up (see below) and can carry the fix as necessary. This
->> is now fixed as far as linux-next is concerned, but any non trivial
->> conflicts should be mentioned to your upstream maintainer when your tree
->> is submitted for merging.  You may also want to consider cooperating
->> with the maintainer of the conflicting tree to minimise any particularly
->> complex conflicts.
+tools/testing/selftests/drivers/net/README.rst mentions "Local
+host is the DUT", but this test does rekeys on both sides and sends a
+bit of traffic back and forth. Is that acceptable?
 
-Thank you for having fixed the conflict on linux-next!
+Another thought: is there a "standard" for stdout vs stderr, as well as
+verbosity of "test progress"/"debug" type messages ("sent
+keyupdate"/"received keyupdate"/"server listening"/"setup complete"
+etc) for those test programs? Any expectation for a --{debug,verbose}
+option to only display all this stuff on request?
 
->> diff --cc net/ipv6/seg6_iptunnel.c
->> index d6a0f7df90807,e76cc0cc481ec..0000000000000
->> --- a/net/ipv6/seg6_iptunnel.c
->> +++ b/net/ipv6/seg6_iptunnel.c
->> @@@ -48,8 -48,8 +48,9 @@@ static size_t seg6_lwt_headroom(struct 
->>   }
->>   
->>   struct seg6_lwt {
->>  -	struct dst_cache cache;
->>  +	struct dst_cache cache_input;
->>  +	struct dst_cache cache_output;
->> + 	struct in6_addr tunsrc;
->>   	struct seg6_iptunnel_encap tuninfo[];
->>   };
->>   
-> 
-> This also needs a fixup for a new jump to the error handling paths that
-> was added in seg6_build_state().
+Output for 1 test:
+-------- 8< --------
+TLS Version: TLS 1.3
+Cipher: AES-GCM-128
+Buffer size: 16384
+Connecting to 192.168.13.1:4433...
+Connected!
+Installing TLS_TX AES-GCM-128 gen 0...
+TLS_TX AES-GCM-128 gen 0 installed
+Installing TLS_RX AES-GCM-128 gen 0...
+TLS_RX AES-GCM-128 gen 0 installed
+TLS setup complete.
+Sending 100 messages of 16384 bytes...
+Sent 16384 bytes (iteration 1)
+Received echo 16384 bytes (ok)
+[...repeated]
+Sent 16384 bytes (iteration 100)
+Received echo 16384 bytes (ok)
+-------- 8< --------
 
-I also had this other conflict there, and I did this when resolving it
-in MPTCP tree:
+With some rekeys I get 300L of output on each side.
 
---------------------- 8< ---------------------
-diff --cc net/ipv6/seg6_iptunnel.c
-index e76cc0cc481e,d6a0f7df9080..97b50d9b1365
---- a/net/ipv6/seg6_iptunnel.c
-+++ b/net/ipv6/seg6_iptunnel.c
-@@@ -48,8 -48,8 +48,9 @@@ static size_t seg6_lwt_headroom(struct 
-  }
-  
-  struct seg6_lwt {
-- 	struct dst_cache cache;
-+ 	struct dst_cache cache_input;
-+ 	struct dst_cache cache_output;
- +	struct in6_addr tunsrc;
-  	struct seg6_iptunnel_encap tuninfo[];
-  };
-  
-@@@ -726,18 -712,6 +731,18 @@@ static int seg6_build_state(struct net 
-  
-  	memcpy(&slwt->tuninfo, tuninfo, tuninfo_len);
-  
- +	if (tb[SEG6_IPTUNNEL_SRC]) {
- +		slwt->tunsrc = nla_get_in6_addr(tb[SEG6_IPTUNNEL_SRC]);
- +
- +		if (ipv6_addr_any(&slwt->tunsrc) ||
- +		    ipv6_addr_is_multicast(&slwt->tunsrc) ||
- +		    ipv6_addr_loopback(&slwt->tunsrc)) {
- +			NL_SET_ERR_MSG(extack, "invalid tunsrc address");
- +			err = -EINVAL;
-- 			goto free_dst_cache;
-++			goto err_destroy_output;
- +		}
- +	}
- +
-  	newts->type = LWTUNNEL_ENCAP_SEG6;
-  	newts->flags |= LWTUNNEL_STATE_INPUT_REDIRECT;
-  
-@@@ -750,9 -724,9 +755,11 @@@
-  
-  	return 0;
-  
-- free_dst_cache:
-- 	dst_cache_destroy(&slwt->cache);
-- free_lwt_state:
-++err_destroy_output:
-++	dst_cache_destroy(&slwt->cache_output);
-+ err_destroy_input:
-+ 	dst_cache_destroy(&slwt->cache_input);
-+ err_free_newts:
-  	kfree(newts);
-  	return err;
-  }
---------------------- 8< ---------------------
 
-I took the liberty to add the err_destroy_output label, similar to the
-new err_destroy_input one.
+If not, I guess we can fall back to what makes the most sense for
+NIPA?
 
-Just in case, rerere cache file is available there:
 
- https://github.com/multipath-tcp/mptcp-upstream-rr-cache/commit/dbb6675
 
-Cheers,
-Matt
+2026-04-02, 17:55:11 -0600, Rishikesh Jethwani wrote:
+> diff --git a/tools/testing/selftests/drivers/net/hw/tls_hw_offload.c b/tools/testing/selftests/drivers/net/hw/tls_hw_offload.c
+> new file mode 100644
+> index 000000000000..788891890ec8
+> --- /dev/null
+> +++ b/tools/testing/selftests/drivers/net/hw/tls_hw_offload.c
+
+I think it would make sense to add the new files to the
+"NETWORKING [TLS]" entry in MAINTAINERS. We already have the existing
+selftest listed.
+
+[...]
+> +#define TEST_ITERATIONS	100
+> +#define MAX_REKEYS	99
+
+Making TEST_ITERATIONS a test argument would allow a test that lasts
+more than half a second. Then MAX_REKEYS can be removed and the
+argument validation switched to num_rekeys < num_iterations. (doing
+rekeys without a send() in between [other than the send_keyupdate]
+should be fine, but it makes the logic for "do we send a rekey and/or
+application_data this round?" more complex, so let's keep the check on
+num_rekeys)
+
+In general, this test is a good start, but it doesn't cover enough
+(see my reply to 5/6). How did you test the "unacked records" part of
+the rekey patch? It's the most complex part of the series.
+
+
+[...]
+> +static void derive_key_fields(unsigned char *key, int key_size,
+> +			      unsigned char *iv, int iv_size,
+> +			      unsigned char *salt, int salt_size,
+> +			      unsigned char *rec_seq, int rec_seq_size,
+> +			      int generation)
+> +{
+> +	unsigned char pattern;
+> +	int i;
+> +
+> +	if (generation == 0)
+> +		return;
+> +
+> +	pattern = (unsigned char)((generation * 0x1B) ^ 0x63);
+> +	for (i = 0; i < key_size; i++) {
+> +		key[i] ^= pattern;
+> +		pattern = (pattern << 1) | (pattern >> 7);
+> +	}
+> +
+> +	pattern = (unsigned char)((generation * 0x2D) ^ 0x7C);
+> +	for (i = 0; i < iv_size; i++) {
+> +		iv[i] ^= pattern;
+> +		pattern = (pattern << 1) | (pattern >> 7);
+> +	}
+> +
+> +	for (i = 0; i < salt_size; i++)
+> +		salt[i] ^= (unsigned char)(generation & 0xFF);
+> +
+> +	memset(rec_seq, 0, rec_seq_size);
+> +}
+
+This isn't wrong (so I'm not requesting to change it), but it seems
+way overkill for "we want to fill tls12_crypto_info_aes_gcm_* with
+some predictable data based only on key_generation".
+
+
+> +/* Send TLS 1.3 KeyUpdate handshake message */
+> +static int send_tls_key_update(int fd, int request_update)
+> +{
+> +	char cmsg_buf[CMSG_SPACE(sizeof(unsigned char))];
+> +	unsigned char key_update_msg[5];
+> +	struct msghdr msg = {0};
+> +	struct cmsghdr *cmsg;
+> +	struct iovec iov;
+> +
+> +	key_update_msg[0] = TLS_HANDSHAKE_KEY_UPDATE;
+> +	key_update_msg[1] = 0;
+> +	key_update_msg[2] = 0;
+> +	key_update_msg[3] = 1;
+> +	key_update_msg[4] = request_update ? KEY_UPDATE_REQUESTED
+> +					   : KEY_UPDATE_NOT_REQUESTED;
+
+I'm still really not convinced we need to bother with things that
+would only affect a "proper" userspace.
+
+[...]
+> +static int validate_keyupdate(const char *buf, int len)
+> +{
+> +	if (len != 5) {
+> +		printf("KeyUpdate: expected 5 bytes, got %d\n", len);
+> +		return -1;
+> +	}
+> +
+> +	if ((unsigned char)buf[0] != TLS_HANDSHAKE_KEY_UPDATE) {
+> +		printf("Expected KeyUpdate (0x%02x), got 0x%02x\n",
+> +		       TLS_HANDSHAKE_KEY_UPDATE, (unsigned char)buf[0]);
+> +		return -1;
+> +	}
+> +
+> +	if (buf[1] != 0 || buf[2] != 0 || buf[3] != 1) {
+> +		printf("KeyUpdate: bad length field %02x%02x%02x\n",
+> +		       (unsigned char)buf[1], (unsigned char)buf[2],
+> +		       (unsigned char)buf[3]);
+> +		return -1;
+> +	}
+
+And same here.
+
+> +	if ((unsigned char)buf[4] != KEY_UPDATE_NOT_REQUESTED &&
+> +	    (unsigned char)buf[4] != KEY_UPDATE_REQUESTED) {
+> +		printf("KeyUpdate: invalid request_update value %u\n",
+> +		       (unsigned char)buf[4]);
+> +		return -1;
+> +	}
+
+And here.
+
+What type of issue do you expect to identify by validating the
+contents of the key update message that your test program is sending
+to itself?
+
+
+> +	printf("Received TLS KeyUpdate (request_update=%u)\n",
+> +	       (unsigned char)buf[4]);
+> +	return 0;
+> +}
+> +
+
+...
+> +static int do_client(void)
+> +{
+> +	char *buf = NULL, *echo_buf = NULL;
+> +	int max_size, rekey_interval;
+> +	ssize_t echo_total, echo_n;
+> +	int csk = -1, ret, i, j;
+> +	struct sockaddr_in sa;
+> +	int test_result = -1;
+> +	int current_gen = 0;
+> +	int next_rekey_at;
+> +	ssize_t n;
+> +
+> +	if (!server_ip) {
+> +		printf("ERROR: Client requires -s <ip> option\n");
+> +		return -1;
+> +	}
+> +
+> +	max_size = random_size_max > 0 ? random_size_max : send_size;
+> +	if (max_size < MIN_BUF_SIZE)
+> +		max_size = MIN_BUF_SIZE;
+> +	buf = malloc(max_size);
+> +	echo_buf = malloc(max_size);
+> +	if (!buf || !echo_buf) {
+> +		printf("failed to allocate buffers\n");
+> +		goto out;
+> +	}
+> +
+> +	csk = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+> +	if (csk < 0) {
+> +		printf("failed to create socket: %s\n", strerror(errno));
+
+Those failures (malloc, socket, connect, maybe also initial key setup)
+could use a common prefix (maybe "SETUP ERROR") to differentate them
+from "invalid arguments" and "actual test failure".
+
+
+[...]
+> +	rekey_interval = TEST_ITERATIONS / (num_rekeys + 1);
+> +	if (rekey_interval < 1)
+> +		rekey_interval = 1;
+
+nit: should never happen since num_rekeys < TEST_ITERATIONS
+
+> +	next_rekey_at = rekey_interval;
+> +
+> +	for (i = 0; i < TEST_ITERATIONS; i++) {
+
+nit: i itself is never used, only i+1, so iterating from 1 up to
+i <= TEST_ITERATIONS would be a tiny bit more readable.
+
+> +		int this_size;
+> +
+> +		if (random_size_max > 0)
+> +			this_size = (rand() % random_size_max) + 1;
+> +		else
+> +			this_size = send_size;
+> +
+> +		for (j = 0; j < this_size; j++)
+> +			buf[j] = rand() & 0xFF;
+> +
+> +		n = send(csk, buf, this_size, 0);
+> +		if (n != this_size) {
+> +			printf("FAIL: send failed: %s\n", strerror(errno));
+
+The test failures messages in the client consistently use "FAIL:" as a
+prefix...
+
+[...]
+> +static int do_server(void)
+> +{
+[...]
+> +	/* Main receive loop */
+> +	while (1) {
+[...]
+> +			printf("recv failed: %s\n", strerror(errno));
+[...]
+> +				printf("Failed to send KeyUpdate\n");
+[...]
+> +				printf("Echo send failed: %s\n",
+> +				       strerror(errno));
+
+...but not in the server.
+
+
+[...]
+> +int main(int argc, char *argv[])
+> +{
+[...]
+> +	if (tls_version == TLS_1_2_VERSION && num_rekeys) {
+> +		printf("ERROR: TLS 1.2 does not support rekey\n");
+> +		return -1;
+> +	}
+
+Maybe also a check to make setting random_size_max incompatible with
+setting send_size. And probably at least a warning when client-only
+options (server_ip, random_size, num_rekeys) are passed to the server
+and will be ignored.
+
+The "Client requires -s <ip> option" check would also fit better here,
+with the rest of the options checking.
+
+
+
+> diff --git a/tools/testing/selftests/drivers/net/hw/tls_hw_offload.py b/tools/testing/selftests/drivers/net/hw/tls_hw_offload.py
+> new file mode 100755
+> index 000000000000..66c5ddfd8125
+> --- /dev/null
+> +++ b/tools/testing/selftests/drivers/net/hw/tls_hw_offload.py
+[...]
+> +def verify_tls_counters(stats_before, stats_after, expected_rekeys, is_server):
+
+This is much cleaner now, thanks.
+
+
+> +def run_tls_test(cfg, cipher="128", tls_version="1.3", rekey=0, buffer_size=None, random_max=None):
+> +    port = rand_port()
+> +    send_size = random_max or buffer_size
+> +
+> +    server_args = f"{cfg.bin_remote} server -p {port} -c {cipher} -v {tls_version}"
+
+These variables were called {server,client}_cmd in the previous
+version, I wonder why you renamed them to something less accurate
+(since it's actually the full command, not just the arguments).
+
+> +    if send_size:
+> +        server_args += f" -b {send_size}"
+> +
+> +    client_args = (f"{cfg.bin_local} client -s {cfg.remote_addr_v['4']} "
+> +                   f"-p {port} -c {cipher} -v {tls_version}")
+> +    if rekey:
+> +        client_args += f" -k {rekey}"
+> +    if random_max:
+> +        client_args += f" -r {random_max}"
+> +    elif send_size:
+> +        client_args += f" -b {send_size}"
+
+nit: I find the use of send_size here (instead of directly
+buffer_size) slightly confusing, since we just took care of
+"random_max was set".
+
 -- 
-Sponsored by the NGI0 Core fund.
-
+Sabrina
 
