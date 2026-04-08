@@ -1,165 +1,210 @@
-Return-Path: <netdev+bounces-276243-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276244-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MCusFvi81WlB9QcAu9opvQ
-	(envelope-from <netdev+bounces-276243-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 04:27:04 +0200
+	id aFU1CMLA1WnT9QcAu9opvQ
+	(envelope-from <netdev+bounces-276244-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 04:43:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F10F53B63AF
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 04:27:03 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id E94A43B647E
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 04:43:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B26D4302E93C
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 02:26:26 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id AC025301A536
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 02:43:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4316A36A004;
-	Wed,  8 Apr 2026 02:26:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05F10347FE1;
+	Wed,  8 Apr 2026 02:43:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="JBIGfc1K"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xapIOMIZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f227.google.com (mail-pl1-f227.google.com [209.85.214.227])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA24B36492C
-	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 02:26:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.227
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A1272C21D0
+	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 02:43:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775615186; cv=none; b=YtMI93liK9zAjAmxkXR0NbB/sUa7KsPYbBTHnmcSxB2RCnaWRTaD1JpcZMpJH30/RjzZliBtYtNizd3US1NA7uyvBhsutD/f/a6AsiEj0cF61q5L8EWKnOiW9spa4UnLgSXqnxyg6CX4Ufi9Xbpz7GxwMTYyOJZx3SQWSMdBw6E=
+	t=1775616190; cv=none; b=EZlCD1q1UbRpClF/OEbLox7a4bTWfJxUYRCmstoqeZpP2FRulPOeAI7wx/8UfjJ0Lmyhl+suCbgHl/5Hiv6qhhhX0Dr5Se4h3XpGGzbvgt7EUrVJEChXCm+BGjAwmXQ6B0N4IM3akVNc9/yZYWNsNd7XlyKDlftTlt4PsO0JaO0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775615186; c=relaxed/simple;
-	bh=uIkqoIN48bXlUgQZNzCZZ3q2QkJhJ5wbb/d/trec/NU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Q/ukqJ99TaeOTgRPA0QqW2gePv18QbmrTPa5ZBNtZsvZGiT0BfBEzMRteyGIiAC6HAOK7N1Oyj1A1vRCbiQ9aFpFfetOwxTqiZWbNpNw1xKU/L7Ii8g82x90iG1gTsGH8zNjIk+zQnMWTmctLBl5e0FwBPXrzLBw6J5QCm6mkDw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=JBIGfc1K; arc=none smtp.client-ip=209.85.214.227
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f227.google.com with SMTP id d9443c01a7336-2b2429f98d0so37071415ad.2
-        for <netdev@vger.kernel.org>; Tue, 07 Apr 2026 19:26:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775615184; x=1776219984;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=t33OUnu4MPOI2bM9pPdhoQTKf54aeDCB0I51DZlIlds=;
-        b=HkX2k3OR3b2ZPbRdiB4o4rZhRsICoTh50eQeeCh2zr9PC5xOqqWrZWscOwRt7iUXrl
-         oAhFONzhmgMAkINKiR/KyECyvgs8IBRT8pHy2TEqWZDMLGrFFaB+0EDzVM3E2qNse2xp
-         QuuB7MfDfeS/EWgBT0Jr/kgmT6HErfA9scfDXBBQKMuw9DwYzwhPBWSLFZGGbnrLSXEo
-         aF8lPCg2hyAx9vsXttUr8ccjLCljHFVovIGMgqiCH5KfaLvGrjw9YzIMbjvyt5HuZ91E
-         L/nUwrrU71iJWwAvzfabtQXsvzQv0li6rOIu+RVMBUvuT587FTBwaGsO3QbgEokS+NwJ
-         uzFw==
-X-Forwarded-Encrypted: i=1; AJvYcCWdrg0nd+ufWrFVG3dcbIVhQY4nc6JKl22UQ29QHvOvjvE9IIG+lP2pQRxmUn3ct9fpbCYCaCU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyp2GsRGm8hOD1aAksK5sjOsY1L375iQajfjUxX1nuTZ/+F3sc7
-	OwJzRTUSbj2buLUJu3qF8iWk5UqAbsqdtX+cnljcZFKqmSd2SbFQ7YMOz0l8593pR2CtBVxJVHI
-	NtPvl94j8uAEItrQpZxayGPAfvXA97R5rtnZAEGzFufgXQ848abe9Bj7tbh2q0moo/2pIW+m4ze
-	HT5jwWasWQwdFeQchWOg9JsVw3xtCi3whgV3jGzkiSLri62nodVU/CbgDTxFxuiXqpb2r9gd+ml
-	MM8Hn3mFQ==
-X-Gm-Gg: AeBDietULAjE9MRslOUeiFn17LyBXe7iy+zQqhNfWMxTjriucQPxclSjg3vrPZfcwil
-	Xwr2H1XPG4MiKU2r0xqgTrRU1irMnf2Rc3lCHjpC6C9Mwuv3LXhU6sDNoPamWCb8bPXcT2N82GL
-	nPx4kcuI+Jho+iHeasylRGcb24IIkRjDA0lzVjiEA2BGffYbc53+y8qtqF/hVMJDYwxg2Q/Oakw
-	b0bZN6gUuD6lOpwP1v9XYxmJmW7vNhbIfFv0xdKES9sjsai1aPssapZ9tozp3fQzSg4ASqM1IZd
-	VFd45vDVTksl+IfFOHVGscb61vk2vRilWpf8mxSeofd5HQuEJdOcxI6RnOsIWj4Pi8cit869LUD
-	KoFMVjp/w9qBtH9nQryijyVQP2UmrZjyfpFuleE5jx+QT1obLzdm2nxX1R1NTMBFAYOrz9F3Vus
-	dL4URlujuI7a61v1KR4Nl4AIcYo+BTJiSkMectTjGm99ZuRbl+c6WvsBs=
-X-Received: by 2002:a17:903:2ec7:b0:2b2:454f:b951 with SMTP id d9443c01a7336-2b28176a3cemr200431125ad.29.1775615184252;
-        Tue, 07 Apr 2026 19:26:24 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-24.dlp.protect.broadcom.com. [144.49.247.24])
-        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-2b2748a1524sm12471545ad.28.2026.04.07.19.26.23
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 07 Apr 2026 19:26:24 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-yw1-f198.google.com with SMTP id 00721157ae682-79895ffb315so140486397b3.2
-        for <netdev@vger.kernel.org>; Tue, 07 Apr 2026 19:26:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1775615182; x=1776219982; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=t33OUnu4MPOI2bM9pPdhoQTKf54aeDCB0I51DZlIlds=;
-        b=JBIGfc1KP0u2cf8fFj4/U7ti7rhIv/XNpqqkLeng5kJQS1xD5z/TQatSqVBPlsbqVY
-         3GJW+12ADqYRipVYl1OvaqvXcwM2BFpsOqQYnIZeNFAdZAYEtmk6K8OXdgwmdPGV4yL0
-         Jzo+B83pYPZuVYyBU+fsd7iCSTAPaOTOOUzZQ=
-X-Forwarded-Encrypted: i=1; AJvYcCW4Wp28gjOGv28+WknNWrV3PYJxbDZN9Op3hAUEH7DER014NqV2WQ/ylU6UvnxUZr5CrCgSWz4=@vger.kernel.org
-X-Received: by 2002:a05:690c:14:b0:79b:cfcd:ad79 with SMTP id 00721157ae682-7a4d89b66b5mr200425447b3.40.1775615182515;
-        Tue, 07 Apr 2026 19:26:22 -0700 (PDT)
-X-Received: by 2002:a05:690c:14:b0:79b:cfcd:ad79 with SMTP id 00721157ae682-7a4d89b66b5mr200425277b3.40.1775615182114;
-        Tue, 07 Apr 2026 19:26:22 -0700 (PDT)
-Received: from ?IPV6:2600:1700:3f50:2990:30b8:b2ae:bed4:118d? ([2600:1700:3f50:2990:30b8:b2ae:bed4:118d])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-7a36e229135sm79047637b3.3.2026.04.07.19.26.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Apr 2026 19:26:21 -0700 (PDT)
-Message-ID: <6c5d81f6-db20-4f64-b054-e346c22b1a35@broadcom.com>
-Date: Tue, 7 Apr 2026 19:26:20 -0700
+	s=arc-20240116; t=1775616190; c=relaxed/simple;
+	bh=wc8ebE65UOu1ysogv3ZDcnkX89LztJOefOmPbTNJMjM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gHqqBrSjZSjUyJsJMKRlo2B14Uagdp3c8M/DasfTdhqFnXnfI8rz2OFGV0ufpZ8UYW3R0qbJ4jnXwd3lEBGwD/o2KhOCdtVZE18mLYTNnYao7VklvuibeCmSz+77M3xayV4yQVrIZ4jdlaAzfVSQ2nyjeUDG130ugbVbeCxf0xY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xapIOMIZ; arc=none smtp.client-ip=95.215.58.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1775616186;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=33eXA0SOhVw75BGKPw1R2kGeIPnZ2JkRRsLUeSlZmUo=;
+	b=xapIOMIZk4e7lMBCgcYMriHiENqeJAhP8uQd+H+AUKoYG8k+TVFEgQ5EEvaEipnTkAJmf+
+	ifi/tG3wafn1351xGoueKxXPHWoA9pNbW90gLoPegDDkxYpwRU5xuPOEi2ad5VEOeWe1BE
+	/9l1ktPhKJDdjioI/um1tYBa5jqklrQ=
+From: Qingfang Deng <qingfang.deng@linux.dev>
+To: linux-ppp@vger.kernel.org,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Michal Ostrowski <mostrows@gmail.com>,
+	Qingfang Deng <qingfang.deng@linux.dev>,
+	Yue Haibing <yuehaibing@huawei.com>,
+	Breno Leitao <leitao@debian.org>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Kees Cook <kees@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Paul Mackerras <paulus@ozlabs.org>,
+	Jaco Kroon <jaco@uls.co.za>,
+	James Carlson <carlsonj@workingcode.com>,
+	Wojciech Drewek <wojciech.drewek@intel.com>,
+	Guillaume Nault <gnault@redhat.com>
+Subject: [PATCH net v2] pppoe: drop PFC frames
+Date: Wed,  8 Apr 2026 10:42:39 +0800
+Message-ID: <20260408024245.312732-1-qingfang.deng@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2] net: bcmasp: Switch to page pool for RX path
-To: Florian Fainelli <florian.fainelli@broadcom.com>, netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Vikas Gupta <vikas.gupta@broadcom.com>,
- Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>,
- Bhargava Marreddy <bhargava.marreddy@broadcom.com>,
- Arnd Bergmann <arnd@arndb.de>, =?UTF-8?Q?Markus_Bl=C3=B6chl?=
- <markus@blochl.de>, Heiner Kallweit <hkallweit1@gmail.com>,
- Fernando Fernandez Mancera <fmancera@suse.de>,
- open list <linux-kernel@vger.kernel.org>,
- "open list:BROADCOM ASP 2.0 ETHERNET DRIVER"
- <bcm-kernel-feedback-list@broadcom.com>, Nicolai Buchwitz <nb@tipi-net.de>
-References: <20260408001813.635679-1-florian.fainelli@broadcom.com>
-Content-Language: en-US
-From: Justin Chen <justin.chen@broadcom.com>
-In-Reply-To: <20260408001813.635679-1-florian.fainelli@broadcom.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,broadcom.com,arndb.de,blochl.de,gmail.com,suse.de,vger.kernel.org,tipi-net.de];
-	TAGGED_FROM(0.00)[bounces-276243-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-276244-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[20];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[broadcom.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FREEMAIL_TO(0.00)[vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,linux.dev,huawei.com,debian.org,linutronix.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[justin.chen@broadcom.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[qingfang.deng@linux.dev,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: F10F53B63AF
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:dkim,linux.dev:email,linux.dev:mid]
+X-Rspamd-Queue-Id: E94A43B647E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+RFC 2516 Section 7 states that Protocol Field Compression (PFC) is NOT
+RECOMMENDED for PPPoE. In practice, pppd does not support negotiating
+PFC for PPPoE sessions, and the current PPPoE driver assumes an
+uncompressed (2-byte) protocol field. However, the generic PPP layer
+function ppp_input() is not aware of the negotiation result, and still
+accepts PFC frames.
 
+If a peer with a broken implementation or an attacker sends a frame with
+a compressed (1-byte) protocol field, the subsequent PPP payload is
+shifted by one byte. This causes the network header to be 4-byte
+misaligned, which may trigger unaligned access exceptions on some
+architectures.
 
-On 4/7/2026 5:18 PM, Florian Fainelli wrote:
-> This shows an improvement of 1.9% in reducing the CPU cycles and data
-> cache misses.
-> 
-> Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
+To reduce the attack surface, drop PPPoE PFC frames. Introduce
+ppp_skb_is_compressed_proto() helper function to be used in both
+ppp_generic.c and pppoe.c to avoid open-coding.
 
-Reviewed-by: Justin Chen <justin.chen@broadcom.com>
+Fixes: 224cf5ad14c0 ("ppp: Move the PPP drivers")
+Signed-off-by: Qingfang Deng <qingfang.deng@linux.dev>
+---
+v2: retarget to net, and add a helper function
+ https://lore.kernel.org/netdev/20260403083926.68320-1-qingfang.deng@linux.dev/
+
+ drivers/net/ppp/ppp_generic.c |  2 +-
+ drivers/net/ppp/pppoe.c       |  8 +++++++-
+ include/linux/ppp_defs.h      | 14 ++++++++++++++
+ 3 files changed, 22 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ppp/ppp_generic.c b/drivers/net/ppp/ppp_generic.c
+index cb29a6968c63..eb1503b389ef 100644
+--- a/drivers/net/ppp/ppp_generic.c
++++ b/drivers/net/ppp/ppp_generic.c
+@@ -2251,7 +2251,7 @@ ppp_do_recv(struct ppp *ppp, struct sk_buff *skb, struct channel *pch)
+  */
+ static void __ppp_decompress_proto(struct sk_buff *skb)
+ {
+-	if (skb->data[0] & 0x01)
++	if (ppp_skb_is_compressed_proto(skb))
+ 		*(u8 *)skb_push(skb, 1) = 0x00;
+ }
+ 
+diff --git a/drivers/net/ppp/pppoe.c b/drivers/net/ppp/pppoe.c
+index 1ac61c273b28..4cd10c908711 100644
+--- a/drivers/net/ppp/pppoe.c
++++ b/drivers/net/ppp/pppoe.c
+@@ -393,7 +393,7 @@ static int pppoe_rcv(struct sk_buff *skb, struct net_device *dev,
+ 	if (skb_mac_header_len(skb) < ETH_HLEN)
+ 		goto drop;
+ 
+-	if (!pskb_may_pull(skb, sizeof(struct pppoe_hdr)))
++	if (!pskb_may_pull(skb, PPPOE_SES_HLEN))
+ 		goto drop;
+ 
+ 	ph = pppoe_hdr(skb);
+@@ -403,6 +403,12 @@ static int pppoe_rcv(struct sk_buff *skb, struct net_device *dev,
+ 	if (skb->len < len)
+ 		goto drop;
+ 
++	/* skb->data points to the PPP protocol header after skb_pull_rcsum.
++	 * Drop PFC frames.
++	 */
++	if (ppp_skb_is_compressed_proto(skb))
++		goto drop;
++
+ 	if (pskb_trim_rcsum(skb, len))
+ 		goto drop;
+ 
+diff --git a/include/linux/ppp_defs.h b/include/linux/ppp_defs.h
+index b74209e5a11e..ba6e53655b93 100644
+--- a/include/linux/ppp_defs.h
++++ b/include/linux/ppp_defs.h
+@@ -8,10 +8,24 @@
+ #define _PPP_DEFS_H_
+ 
+ #include <linux/crc-ccitt.h>
++#include <linux/skbuff.h>
+ #include <uapi/linux/ppp_defs.h>
+ 
+ #define PPP_FCS(fcs, c) crc_ccitt_byte(fcs, c)
+ 
++/**
++ * ppp_skb_is_compressed_proto - checks if PPP protocol in a skb is compressed
++ * @skb: skb to check
++ *
++ * Returns true iff the PPP protocol field is compressed (the least significant
++ * bit of the most significant octet is 1).
++ * skb->data must point to the PPP protocol header.
++ */
++static inline bool ppp_skb_is_compressed_proto(const struct sk_buff *skb)
++{
++	return unlikely(skb->data[0] & 0x01);
++}
++
+ /**
+  * ppp_proto_is_valid - checks if PPP protocol is valid
+  * @proto: PPP protocol
+-- 
+2.43.0
+
 
