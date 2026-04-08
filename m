@@ -1,167 +1,125 @@
-Return-Path: <netdev+bounces-276695-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276696-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CNDpKeGs1mmZHAgAu9opvQ
-	(envelope-from <netdev+bounces-276695-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 21:30:41 +0200
+	id OPuELsCs1mmZHAgAu9opvQ
+	(envelope-from <netdev+bounces-276696-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 21:30:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E3163C31A4
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 21:30:41 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 426C03C3157
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 21:30:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 853193066BEE
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 19:22:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AAE543091C9B
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 19:22:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C32A73DA7CA;
-	Wed,  8 Apr 2026 19:22:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E02C3D523F;
+	Wed,  8 Apr 2026 19:22:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="j/N/2nXJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ql6grjlV"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 382383446CA
-	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 19:22:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BFF334D3A9
+	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 19:22:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775676148; cv=none; b=LtN5qGLQKG8szFGmb3jeEHs4LYw3VatwcIY0scZLKWo9jTowynnf8DdA0ydVPM6mqE/WVtV9nRL8BKleQm0uhCrmGwvelrciKzagYjCgnEth8ApxsIgqrCv/P0L/XMQs5Fw51eKONaPGcqTL2Pzz67aQ9OcjtjXm9aCe2rWeJm4=
+	t=1775676167; cv=none; b=n57anVHgCtCA5ZsLYWJqQ3ETc1njV4sWs16vsslJD75+CJqdBnDwhHYtsqoVGDr1v8nLLfdmPJEL0I+Y91XGLbNB7OoQHE6Lc3Zh2TEgvOF75e7ecYKpRG+YKliv065oVgzAEAujPHwi+esKThnsnmUxHYoTLsn8PEZ7cYU0jcc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775676148; c=relaxed/simple;
-	bh=xeU+CpDbjuqTRy7NHM9S1q/5feA7r1UJohNuP6FPUFY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZQ2JX5MOT7PZXeOS6Zak4+ky0+WsPmkIsa4lc9JMDSp8Wr7xX2PeyyhLUTlN+xXlx7A4kqG0PTK+PhNsr7FDhqgNe7k1/xKPqJ45B0Inh8kyWfAE5waARe1xHCt2ErHIWWuIgiT+iwSyZhl3l90rnBF/Z45zMwSew2CNI26DLH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=j/N/2nXJ; arc=none smtp.client-ip=91.218.175.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Wed, 8 Apr 2026 12:22:06 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1775676135;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=r06+65cH0yTHLeV6B/4VEG9UgecJFocJ5Fv7CVecJZ8=;
-	b=j/N/2nXJ6G/XzxA/pZ7oHUMlkEaXecPiuV/MvK4oy24x+6smZSOqY/2JVzR45w8g6cpV/C
-	7WWB3gIXOZd4TOUeNgt724+fOogHzDpb2nVnNOZNEG4/+hblxfXW+bRP51bVkM+DgmhLlh
-	u7EH+taxjWUhaz0Ec7A0i5B1NssR0fw=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-To: Jiayuan Chen <jiayuan.chen@linux.dev>, 
-	Kuniyuki Iwashima <kuniyu@google.com>
-Cc: Eric Dumazet <edumazet@google.com>, bpf@vger.kernel.org, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, Jiri Olsa <jolsa@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH bpf v6 1/2] bpf: tcp: Reject non-TCP skb in
- bpf_sk_assign_tcp_reqsk()
-Message-ID: <202648182730.i4ki.martin.lau@linux.dev>
-References: <20260403015851.148209-1-jiayuan.chen@linux.dev>
- <20260403015851.148209-2-jiayuan.chen@linux.dev>
- <20264619471.he8Q.martin.lau@linux.dev>
- <4820d99b-f2c4-4b24-b90f-87e6444284c4@linux.dev>
- <CAAVpQUDz_rUFF1A8XDyE13fLTsgdP5k0XWGtdB1V3r=Z_mJW+g@mail.gmail.com>
+	s=arc-20240116; t=1775676167; c=relaxed/simple;
+	bh=FOGDadXlBxdlXCoO3c6S0SumyHhWL9dtjdG9AXbZ6uI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tq9aDVw3hRaIjjN5cfvhCQLfMoBe2I/BXsdTdIOsdbEd+teRCSwBNDreqGgRbTYYXT2Lv9QrZJewbY36n3M4VS3G5KbUZSeTw8bsxRDhW27+Yynt6Bupm+1T0eoClSVipNeCtgmEOA4RWpleG38tWAG1Rv6kA0KoYWM4CbU5m0M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ql6grjlV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D08CC19421;
+	Wed,  8 Apr 2026 19:22:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775676166;
+	bh=FOGDadXlBxdlXCoO3c6S0SumyHhWL9dtjdG9AXbZ6uI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ql6grjlVa/4olc1mRkeAy2QJZrG/Q6ehdCvbcVmGw1Lw8Jyz3PITerQOGNTNQaB9X
+	 Ict/6IGztowjdxG4oGShA7tGPE8t3C+ZQoVER3TM5JD4/gyBvUySnIG39dqZ6oTw1F
+	 oGQyqNYHNiFv517QjZdwRXx89tPm/SvNfi0WjZc3lBfukNH0EQ9fFB/7ccLQKDDcv+
+	 F5IX9RJkXC9nUXXPylzkJJIm0iYAxg8Qa7Dn/uon5PvLJ3FBYaBYNQq0FPNUIQd8+h
+	 lzu7dCxK0j6fffhPZJOTydai7mbQN1yYH1XyMMd/fr6V+iNKckGZt51FROe1p2nf5E
+	 DcYF+IJonCrsA==
+Message-ID: <36618554-367d-4b01-a4f5-6a183abaf918@kernel.org>
+Date: Wed, 8 Apr 2026 13:22:45 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAAVpQUDz_rUFF1A8XDyE13fLTsgdP5k0XWGtdB1V3r=Z_mJW+g@mail.gmail.com>
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] ipv4: nexthop: update has_v4 flag for any family
+ change in replace_nexthop_single()
+Content-Language: en-US
+To: Xiang Mei <xmei5@asu.edu>, netdev@vger.kernel.org
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, idosch@nvidia.com, bestswngs@gmail.com
+References: <20260408182850.2618488-1-xmei5@asu.edu>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20260408182850.2618488-1-xmei5@asu.edu>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-276695-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,nvidia.com,gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	RCPT_COUNT_TWELVE(0.00)[22];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[google.com,vger.kernel.org,kernel.org,iogearbox.net,gmail.com,linux.dev,fomichev.me,davemloft.net,redhat.com];
-	DKIM_TRACE(0.00)[linux.dev:+];
+	TAGGED_FROM(0.00)[bounces-276696-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[martin.lau@linux.dev,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dsahern@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:mid,sashiko.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 2E3163C31A4
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 426C03C3157
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Apr 07, 2026 at 09:25:06PM -0700, Kuniyuki Iwashima wrote:
-> > > sashiko has flagged a similar issue with larger scope.
-> > > Please take a look. Thanks.
-> > >
-> > > https://sashiko.dev/#/patchset/20260403015851.148209-1-jiayuan.chen%40linux.dev
-> >
-> >
-> > Thanks a lot Martin, sashiko actually dug into a deeper issue here.
-> >
-> > Eric and Kuniyuki,
-> >
-> > I think the AI review has a point. Since BPF can modify skb fields, the
-> > following sequence still bypasses the protocol check in
-> > bpf_sk_assign_tcp_reqsk():
-> >
-> >     // for a UDP skb
-> >     iph->protocol = TCP
-> >     bpf_sk_assign_tcp_reqsk()
-> >     iph->protocol = UDP
-> >
-> > On top of that, bpf_sk_assign() already has the same problem — it doesn't
-> > validate L4 protocol at all.
+On 4/8/26 12:28 PM, Xiang Mei wrote:
+> When a nexthop within a group is replaced, nh_group_v4_update() is only
+> called when the old nexthop is AF_INET and the new one is AF_INET6. The
+> reverse direction (AF_INET6 to AF_INET) is not handled, leaving the
+> group's has_v4 flag stale at false.
 > 
-> Sigh... honestly it does not make sense to me to add changes
-> in the common fast path to protect someone with bpf capability
-> shooting oneself in the foot.
+> This causes fib6_check_nexthop() to incorrectly accept an IPv6 route
+> referencing a group that now contains an AF_INET nexthop. During route
+> lookup, nexthop_fib6_nh() returns NULL for the AF_INET nexthop and the
+> subsequent dereference in rt6_find_cached_rt() crashes with a general
+> protection fault:
 > 
-> On top of L4 validation in bpf_sk_assign() and bpf_sk_assign_tcp_reqsk(),
-> can't we mark such an skb immutable after the helpers and catch
-> subsequent writes to skb->data on the verifier ?
 
-Clearing the skb->sk in a helper like bpf_skb_store_bytes or
-rejecting direct writes to skb->data could break existing
-bpf program.
-
-I suspect adding a simple iph->protocol/ip6h->nexthdr check to
-the helper (e.g. bpf_sk_assign) could also break some
-tunneling use cases (e.g. ipip) also.
+...
 
 > 
+> Fix by calling nh_group_v4_update() whenever the old and new nexthops
+> have different address families, not just for AF_INET to AF_INET6.
+> Using a general inequality is safe here: individual nexthops can only
+> be AF_INET or AF_INET6 (enforced at parse time), so the only family
+> transitions possible are between these two, and nh_group_v4_update()
+> is a full rescan that always produces the correct has_v4 value.
 > 
-> >
-> > So I think we should add a check matching skb against sk in
-> > skb_steal_sock() instead of adding check in bpf helper.
 
-Maybe limit the check to the '*prefetched' case in skb_steal_sock().
+please add a test to tools/testing/selftests/net/fib_nexthops.sh
+covering this use case.
 
-FWIW, in the early days of bpf_sk_assign, a tc bpf program could only
-get hold of a tcp_sock. Later, bpf_map_lookup_elem(&sock_map) was
-allowed in tc, and then udp/unix sock support was also added to sock_map.
-
-There have been discussions on tc bpf programs being able to do
-bpf_map_lookup_elem(&sock_map) to get a unix_sock. AFAIK, this
-looked-up unix_sock can be used in bpf_sk_assign. It probably
-makes sense for bpf_sk_assign to reject all non-tcp/non-udp sk.
 
