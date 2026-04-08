@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-276517-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276518-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mMt9N/dR1mm8DQgAu9opvQ
-	(envelope-from <netdev+bounces-276517-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 15:02:47 +0200
+	id 6OAxCvlR1mm8DQgAu9opvQ
+	(envelope-from <netdev+bounces-276518-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 15:02:49 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D9AE3BC88D
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 15:02:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C329A3BC895
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 15:02:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 795123047BEA
+	by sea.lore.kernel.org (Postfix) with ESMTP id B4113304A6C5
 	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 12:56:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F5B62580CF;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DEAF3C1401;
 	Wed,  8 Apr 2026 12:56:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="X3Puuv0u"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="t6YTXZ80"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
+Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EDD83BBA01
-	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 12:56:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F41053C73FF
+	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 12:56:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775652981; cv=none; b=KiroBJ6S/LSrAiStK28ADwbQqJlL1dyqDwjz6KKmbkyZka5bgXrHjbarcTRIsTaQQM/yg1lgrmnmzfas9zOmLnr2n/pxfByd67Oa4i0x4GQ/NyopDJInQcRgtaPqJGx3jdF2GVMNiyejFUKCkYPjb9HIEQ/lBUL2wPF7gk8Xp9U=
+	t=1775652981; cv=none; b=O2yJyKi0yf9c7Qzj3ZSlo64Y+YQbjiBYab1SGLILgmFtetGceIVXDayAdKXIW9yOyQKr5S7MVmWNaVWq9Uk7KHcscL2F85j2KmcY46sWH8/MXM2F+2K0Az05iACV5CYqOwKiGhtWLGCczscJRzmnOzuDglgaWd5ABe1Ye8QBU/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1775652981; c=relaxed/simple;
-	bh=jCzxdPNaUnv9o46FN/mKOAc0zxuYDB3V9EWci72LjMk=;
+	bh=C3lB+1f0qaR30gLOF4c1HLoWdHCA1gdjUjWrDfHvPAQ=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=PrfX768yuFpQ+gHV5CXp5hJyLyu//PxcpXgUpwQ7k4cQqEMIC7JWdB1s/4H4JaeJIjoYJKJZnfplYf7llhxEZy/r5Jyr6D3rH04+B7/arPnCzA4Xq0qIjxQyFl4L4fL3dpeg+KMcRUWxfiSn+ScJf7DewEix5GZXnYVG+YKf4/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=X3Puuv0u; arc=none smtp.client-ip=209.85.222.201
+	 To:Cc:Content-Type; b=lGmvdwxN6CSARYGyYNavyZl/butmHCjigS+wkJcBOVpUcWZAUsHN4dlPHXPLPKv/Aq2dlioqcSmqEMKya3VwaXG+fX25rf3ZCpuKA5CQOyPibJhBogKfzXrRAL6bGtAaG5i8Jy2J7DoWPFlVnNi2JA8Ukk/Xt7hfqQ4gBBL6nrs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=t6YTXZ80; arc=none smtp.client-ip=209.85.160.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-8d65190e52fso773708685a.1
-        for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 05:56:18 -0700 (PDT)
+Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-50d84b5f73bso97613151cf.0
+        for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 05:56:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1775652977; x=1776257777; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1775652979; x=1776257779; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qlzUICpVdu6TV97+eCW3nbLFAoBPRoZImGmA2PvfJ3w=;
-        b=X3Puuv0uLm7PYqAV3845GLhM+WNUHQ2PpwOSyxgYKMifIl+HhJCrCQ/8oRhSbV6Lz4
-         +0uZ+KICwhTWldNPjNVh4T20DU8EsttuOnEvEWKQY5UHE9w8/hA2VWJS/mwCChY0eLZh
-         yf4J12+uQJ6Ije2OYzm3/JjCrYqluYs8dqQ2CQZu2cgR3DB26ijb+C9rhiB8NjFqNRSd
-         sEMg1DoTiqpA36cwmAMP6s4WdbfrPepNVzDFRg0cjht/q/ZSQjpYIPZf3HLVbJXJEu0j
-         tuAJHdzO2pCZhBm/T1Z4qBNLr5MvD/7KzG6eLP4xiqvFiCxUI1UHUV1KLElDbTtKIv7E
-         24fw==
+        bh=8lRHl8je5D2ZkoXYt/ZWfeFEvt0P0M+HOlaF2F0zd1Y=;
+        b=t6YTXZ80ZiCWGwYkxnGZDMVslhFej2JlZcjZzdbED4utaNoOwcPQDtT8EbHJ1Ijft2
+         nJe1nFc5jEfa/RNbcCySwojmxiJrHB34ZRpZqDEutaAByAkESbCh6ORAxYC/KK8KSHQY
+         uI/nTuFVQdqBwMW3OwnW3eSX+0nXG8Tk6SWM9IZMoGzx1qVe4kd1n++hPOPZKx1XgG4K
+         MDjjM0zxjjJwfzCV1tE13nzSKdez3S8uArhGjgRrX24A9ODZHzF27rfctSDErRvGQGxV
+         Tbeg3dBp7ej+YZIDPvpKtUVcT1BKWowu2bLcVWucrqghKe3cSsypyWLZebN7DKgRxVza
+         ePrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775652977; x=1776257777;
+        d=1e100.net; s=20251104; t=1775652979; x=1776257779;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qlzUICpVdu6TV97+eCW3nbLFAoBPRoZImGmA2PvfJ3w=;
-        b=IMWuHkkTUpGZHEzBaxoRr16OGtbDGNwFkqiYZvHVAR0qNRyCeRLqt0WOfm36Hlhg6V
-         AYiTL6V9os1y0QDNx9C10Ff0S52Wd7vcRRiiznBgn5koBSzYLx0FpG5jC0bXqRIPLi4O
-         mROQoFRGFIKbxRenzNCDArG3aJKeFoQKIuCOP9laImMyeFillkC46s5ZaX+sH/stXCP9
-         Kh5YMkffxL1yxPaDQJv56pzLFQ3fjMHa8FxpLvJ7Xa5h/GDTjAdDeev7Zd62bMUalFFM
-         fSZIXX94IwLBGBl2OjmLWNieAEnCyrpEYCg1UwAlhubqXXoCkF7hLgiElNpWW+vPGT1+
-         4X6A==
-X-Forwarded-Encrypted: i=1; AJvYcCW7oW+NGJn4mMeuSqucf2gJGhZfesm125eX2Ui8Yyp/rcI/p3x8JEEyBL5yGOLiIR5pNcCWSC4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxtIbmjBiUGRw61tFfcgCl73WkVmaKxfMy5sKsX9qcID1EMmDs/
-	C7X2u6EI9g3qpEm+KRGuQ3o+2ERB3UoSEORXKXKxYNv8oRTTQtEelvMFSl2dIXY5aQkcz+b51ny
-	21QPw26W9bIXB1w==
-X-Received: from qvbob15.prod.google.com ([2002:a05:6214:2f8f:b0:89c:5e8c:2343])
+        bh=8lRHl8je5D2ZkoXYt/ZWfeFEvt0P0M+HOlaF2F0zd1Y=;
+        b=h2bee3neSjAoEzchqGl3tLeOQ42xQFVw7ZjN9NdvahIMIGHeC89Lj0B+zl9j2r+QOM
+         As1AQRjonvX+FlUfvkpaVkL+fv/ZOeWXdv3F+PnQfHwaBcuiWgjZ+u9Qh+2xA2TFtExZ
+         e9Pk3vdF026jzjkVFvN2eo3gaw4bvuz9d3JSqiAdgtRPqiRPRIWjmOS1N7mzu0AJJ5C3
+         HokLRn1nG1r+NYE9VyGqPd8+xjVO7CZzEtbtzBhRiYNRPCnNQI+iQ32UfaTVDBDgg6A4
+         MREL1eFQ96ZoiJp3oPUCO8C2CRV/MdcXUt31nGisevvjFWoJSge7kK+SRuvpSzkcWpp+
+         fqKw==
+X-Forwarded-Encrypted: i=1; AJvYcCXs36oZTuf7kM6KoH6OqrGb8scYzVTinUUP56cYuU/LEFAA6wFqaV3TyGlh7eINNHUlhg6+cok=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz7OydDfcXHXlSjnz2uuda2PC2wEmpoFL5oNS039HHYi1pjRUTD
+	TL9rA3rNqP5LcdW3jRdXpNO2n0UY22Crvo6UXY+WM9hSj/iXWXfzBMnwM5aDf6Qew86ABSD60iZ
+	JXHv/jrNWXscM2A==
+X-Received: from qtwq16.prod.google.com ([2002:a05:622a:310:b0:506:bc2d:8fb2])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:3189:b0:8cb:3e7c:a4a4 with SMTP id af79cd13be357-8d41df4aae8mr3070046785a.46.1775652977100;
- Wed, 08 Apr 2026 05:56:17 -0700 (PDT)
-Date: Wed,  8 Apr 2026 12:55:58 +0000
+ 2002:a05:622a:15ca:b0:50d:b6dc:e4e0 with SMTP id d75a77b69052e-50db6dcea51mr25401741cf.29.1775652978731;
+ Wed, 08 Apr 2026 05:56:18 -0700 (PDT)
+Date: Wed,  8 Apr 2026 12:55:59 +0000
 In-Reply-To: <20260408125611.3592751-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,8 +76,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260408125611.3592751-1-edumazet@google.com>
 X-Mailer: git-send-email 2.53.0.1213.gd9a14994de-goog
-Message-ID: <20260408125611.3592751-3-edumazet@google.com>
-Subject: [PATCH net-next 02/15] net/sched: add qstats_cpu_drop_inc() helper
+Message-ID: <20260408125611.3592751-4-edumazet@google.com>
+Subject: [PATCH net-next 03/15] net/sched: add READ_ONCE() in gnet_stats_add_queue[_cpu]
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -101,7 +101,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-276517-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-276518-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -113,189 +113,57 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 4D9AE3BC88D
+X-Rspamd-Queue-Id: C329A3BC895
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-1) Using this_cpu_inc() is better than going through this_cpu_ptr():
+Stats are read locklessly, add READ_ONCE() to prevent load-stearing.
 
-- Single instruction on x86.
-- Store tearing prevention.
-
-2) Change tcf_action_update_stats() to use this_cpu_add().
-
-3) Add WRITE_ONCE() to __qdisc_qstats_drop() and qstats_drop_inc().
-
-$ scripts/bloat-o-meter -t vmlinux.1 vmlinux.2
-add/remove: 0/0 grow/shrink: 1/10 up/down: 16/-97 (-81)
-Function                                     old     new   delta
-tcf_ife_act                                 1061    1077     +16
-tcf_vlan_act                                 684     676      -8
-tcf_skbedit_act                              626     618      -8
-tcf_police_act                               725     717      -8
-tcf_mpls_act                                1297    1289      -8
-tcf_gate_act                                 310     302      -8
-tcf_gact_act                                 195     187      -8
-tcf_csum_act                                2905    2897      -8
-tcf_bpf_act                                  749     741      -8
-tcf_action_update_stats                      124     115      -9
-tcf_ct_act                                  2154    2130     -24
-Total: Before=29739602, After=29739521, chg -0.00%
+Write side will be handled in separate patches.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- include/net/act_api.h     | 2 +-
- include/net/sch_generic.h | 9 +++++++--
- net/sched/act_api.c       | 2 +-
- net/sched/act_bpf.c       | 2 +-
- net/sched/act_ife.c       | 8 ++++----
- net/sched/act_mpls.c      | 2 +-
- net/sched/act_police.c    | 2 +-
- net/sched/act_skbedit.c   | 2 +-
- 8 files changed, 17 insertions(+), 12 deletions(-)
+ net/core/gen_stats.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/include/net/act_api.h b/include/net/act_api.h
-index 2ec4ef9a5d0c8e9110f92f135cc3c31a38af0479..167435c5615e09f491a05d01ec86b0c9f9f4fd5b 100644
---- a/include/net/act_api.h
-+++ b/include/net/act_api.h
-@@ -241,7 +241,7 @@ static inline void tcf_action_update_bstats(struct tc_action *a,
- static inline void tcf_action_inc_drop_qstats(struct tc_action *a)
- {
- 	if (likely(a->cpu_qstats)) {
--		qstats_drop_inc(this_cpu_ptr(a->cpu_qstats));
-+		qstats_cpu_drop_inc(a->cpu_qstats);
- 		return;
- 	}
- 	atomic_inc(&a->tcfa_drops);
-diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
-index 3ee383c6fc3f66f1aecd9ebc675fbd143852c150..b22579671e4b4dd04c5dfa810b714daaac74af2a 100644
---- a/include/net/sch_generic.h
-+++ b/include/net/sch_generic.h
-@@ -996,12 +996,17 @@ static inline void qdisc_qstats_cpu_requeues_inc(struct Qdisc *sch)
+diff --git a/net/core/gen_stats.c b/net/core/gen_stats.c
+index b71ccaec0991461333dbe465ee619bca4a06e75b..1a2380e74272de8eaf3d4ef453e56105a31e9edf 100644
+--- a/net/core/gen_stats.c
++++ b/net/core/gen_stats.c
+@@ -345,11 +345,11 @@ static void gnet_stats_add_queue_cpu(struct gnet_stats_queue *qstats,
+ 	for_each_possible_cpu(i) {
+ 		const struct gnet_stats_queue *qcpu = per_cpu_ptr(q, i);
  
- static inline void __qdisc_qstats_drop(struct Qdisc *sch, int count)
- {
--	sch->qstats.drops += count;
-+	WRITE_ONCE(sch->qstats.drops, sch->qstats.drops + count);
+-		qstats->qlen += qcpu->qlen;
+-		qstats->backlog += qcpu->backlog;
+-		qstats->drops += qcpu->drops;
+-		qstats->requeues += qcpu->requeues;
+-		qstats->overlimits += qcpu->overlimits;
++		qstats->qlen += READ_ONCE(qcpu->qlen);
++		qstats->backlog += READ_ONCE(qcpu->backlog);
++		qstats->drops += READ_ONCE(qcpu->drops);
++		qstats->requeues += READ_ONCE(qcpu->requeues);
++		qstats->overlimits += READ_ONCE(qcpu->overlimits);
+ 	}
  }
  
- static inline void qstats_drop_inc(struct gnet_stats_queue *qstats)
- {
--	qstats->drops++;
-+	WRITE_ONCE(qstats->drops, qstats->drops + 1);
-+}
-+
-+static inline void qstats_cpu_drop_inc(struct gnet_stats_queue __percpu *qstats)
-+{
-+	this_cpu_inc(qstats->drops);
- }
- 
- static inline void qstats_cpu_overlimit_inc(struct gnet_stats_queue __percpu *qstats)
-diff --git a/net/sched/act_api.c b/net/sched/act_api.c
-index 332fd9695e54a1fc63bb869c28cacf5f2ed14971..551992683d9e69c247b8d9c613a69e2a897a1e79 100644
---- a/net/sched/act_api.c
-+++ b/net/sched/act_api.c
-@@ -1578,7 +1578,7 @@ void tcf_action_update_stats(struct tc_action *a, u64 bytes, u64 packets,
- 	if (a->cpu_bstats) {
- 		_bstats_update(this_cpu_ptr(a->cpu_bstats), bytes, packets);
- 
--		this_cpu_ptr(a->cpu_qstats)->drops += drops;
-+		this_cpu_add(a->cpu_qstats->drops, drops);
- 
- 		if (hw)
- 			_bstats_update(this_cpu_ptr(a->cpu_bstats_hw),
-diff --git a/net/sched/act_bpf.c b/net/sched/act_bpf.c
-index c2b5bc19e09118857d1ef3c4aed566b8225f2e9a..58a074651176730fd1bd370ba8420dfbed0d4e9c 100644
---- a/net/sched/act_bpf.c
-+++ b/net/sched/act_bpf.c
-@@ -76,7 +76,7 @@ TC_INDIRECT_SCOPE int tcf_bpf_act(struct sk_buff *skb,
- 		break;
- 	case TC_ACT_SHOT:
- 		action = filter_res;
--		qstats_drop_inc(this_cpu_ptr(prog->common.cpu_qstats));
-+		qstats_cpu_drop_inc(prog->common.cpu_qstats);
- 		break;
- 	case TC_ACT_UNSPEC:
- 		action = prog->tcf_action;
-diff --git a/net/sched/act_ife.c b/net/sched/act_ife.c
-index e1b825e14900d6f46bbfd1b7f72ab6cd554d8a73..065228026c58eb0f8ff3b3a08758e4ef0d6ea708 100644
---- a/net/sched/act_ife.c
-+++ b/net/sched/act_ife.c
-@@ -727,7 +727,7 @@ static int tcf_ife_decode(struct sk_buff *skb, const struct tc_action *a,
- 
- 	tlv_data = ife_decode(skb, &metalen);
- 	if (unlikely(!tlv_data)) {
--		qstats_drop_inc(this_cpu_ptr(ife->common.cpu_qstats));
-+		qstats_cpu_drop_inc(ife->common.cpu_qstats);
- 		return TC_ACT_SHOT;
+@@ -360,11 +360,11 @@ void gnet_stats_add_queue(struct gnet_stats_queue *qstats,
+ 	if (cpu) {
+ 		gnet_stats_add_queue_cpu(qstats, cpu);
+ 	} else {
+-		qstats->qlen += q->qlen;
+-		qstats->backlog += q->backlog;
+-		qstats->drops += q->drops;
+-		qstats->requeues += q->requeues;
+-		qstats->overlimits += q->overlimits;
++		qstats->qlen += READ_ONCE(q->qlen);
++		qstats->backlog += READ_ONCE(q->backlog);
++		qstats->drops += READ_ONCE(q->drops);
++		qstats->requeues += READ_ONCE(q->requeues);
++		qstats->overlimits += READ_ONCE(q->overlimits);
  	}
- 
-@@ -740,7 +740,7 @@ static int tcf_ife_decode(struct sk_buff *skb, const struct tc_action *a,
- 		curr_data = ife_tlv_meta_decode(tlv_data, ifehdr_end, &mtype,
- 						&dlen, NULL);
- 		if (!curr_data) {
--			qstats_drop_inc(this_cpu_ptr(ife->common.cpu_qstats));
-+			qstats_cpu_drop_inc(ife->common.cpu_qstats);
- 			return TC_ACT_SHOT;
- 		}
- 
-@@ -755,7 +755,7 @@ static int tcf_ife_decode(struct sk_buff *skb, const struct tc_action *a,
- 	}
- 
- 	if (WARN_ON(tlv_data != ifehdr_end)) {
--		qstats_drop_inc(this_cpu_ptr(ife->common.cpu_qstats));
-+		qstats_cpu_drop_inc(ife->common.cpu_qstats);
- 		return TC_ACT_SHOT;
- 	}
- 
-@@ -821,7 +821,7 @@ static int tcf_ife_encode(struct sk_buff *skb, const struct tc_action *a,
- 	 * so lets be conservative.. */
- 	if ((action == TC_ACT_SHOT) || exceed_mtu) {
- drop:
--		qstats_drop_inc(this_cpu_ptr(ife->common.cpu_qstats));
-+		qstats_cpu_drop_inc(ife->common.cpu_qstats);
- 		return TC_ACT_SHOT;
- 	}
- 
-diff --git a/net/sched/act_mpls.c b/net/sched/act_mpls.c
-index 1abfaf9d99f1fce0fe7cafa2a9e35c80a3969ce7..4ea8b2e08c3a4dddfe1670af72a5d487a5219f5e 100644
---- a/net/sched/act_mpls.c
-+++ b/net/sched/act_mpls.c
-@@ -123,7 +123,7 @@ TC_INDIRECT_SCOPE int tcf_mpls_act(struct sk_buff *skb,
- 	return p->action;
- 
- drop:
--	qstats_drop_inc(this_cpu_ptr(m->common.cpu_qstats));
-+	qstats_cpu_drop_inc(m->common.cpu_qstats);
- 	return TC_ACT_SHOT;
  }
- 
-diff --git a/net/sched/act_police.c b/net/sched/act_police.c
-index 8060f43e4d11c0a26e1475db06b76426f50c5975..b16468a98c55e32260e8d4cb1fe3d771fca65120 100644
---- a/net/sched/act_police.c
-+++ b/net/sched/act_police.c
-@@ -310,7 +310,7 @@ TC_INDIRECT_SCOPE int tcf_police_act(struct sk_buff *skb,
- 	qstats_cpu_overlimit_inc(police->common.cpu_qstats);
- inc_drops:
- 	if (ret == TC_ACT_SHOT)
--		qstats_drop_inc(this_cpu_ptr(police->common.cpu_qstats));
-+		qstats_cpu_drop_inc(police->common.cpu_qstats);
- end:
- 	return ret;
- }
-diff --git a/net/sched/act_skbedit.c b/net/sched/act_skbedit.c
-index a778cdba9258c2c776ee5ba0751cca1b73c984df..bfec6b66841031cd566d0c2bdc3d120cec41e3e4 100644
---- a/net/sched/act_skbedit.c
-+++ b/net/sched/act_skbedit.c
-@@ -86,7 +86,7 @@ TC_INDIRECT_SCOPE int tcf_skbedit_act(struct sk_buff *skb,
- 	return params->action;
- 
- err:
--	qstats_drop_inc(this_cpu_ptr(d->common.cpu_qstats));
-+	qstats_cpu_drop_inc(d->common.cpu_qstats);
- 	return TC_ACT_SHOT;
- }
- 
+ EXPORT_SYMBOL(gnet_stats_add_queue);
 -- 
 2.53.0.1213.gd9a14994de-goog
 
