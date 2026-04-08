@@ -1,177 +1,157 @@
-Return-Path: <netdev+bounces-276693-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276694-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iNjQBaus1mmZHAgAu9opvQ
-	(envelope-from <netdev+bounces-276693-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 21:29:47 +0200
+	id cGDvJvGs1mmZHAgAu9opvQ
+	(envelope-from <netdev+bounces-276694-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 21:30:57 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 780F53C3139
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 21:29:46 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DCD93C31E6
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 21:30:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2F7CF30530C2
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 19:11:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DC6FA30432D6
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 19:15:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A425A3D6CB9;
-	Wed,  8 Apr 2026 19:11:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 702893DA5D6;
+	Wed,  8 Apr 2026 19:15:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="LMZm0HzU"
+	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="BdtkQo49"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B4E83290C7
-	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 19:11:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3FD53B2FCD;
+	Wed,  8 Apr 2026 19:15:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775675483; cv=none; b=K6fQI/GNmSDc6i/OFlnKvDs5G+YQHwJ5E15bLfkDwdOn8lR91Up/ZjEIjeDY/YPGJlSvgQ2nqMao2Xya3AQZXGs+Q9jwqhTfm2OkKHMXIxHCB1+8WBI2l+K+CWGaHhZ8ll6TJvKpXyUYj2rAUqeE594iyW3TolUYp+lWGbyZ2AU=
+	t=1775675734; cv=none; b=r6tVwq6QhqdPwEpTBv6wG+z7kZfsBrmQE97dQQ+sVCWqEsVQxPYb2Jm633Rs1k8FzKGFQ97uwPP4Z6jQtKML3l72uF3kwGCvxVQ07wYJmuY9rvi3Hkfr48IcGae7qm+LsyLa3XTazgrVHEPpNyjVo8QbOMXZFWFwJRHCdZYxnYE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775675483; c=relaxed/simple;
-	bh=QywkMKt9HfbdvydAmCDLA/mewW0A3C9JQlo+MYVYw00=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qLxEFyLMWe2bkJiXQGC1QbCKbD3GzHUqBpp4WRaTEDUF8VDuAS3gxOI1t4SsiIawnr69yKyu/sD/HscG9zS9YNAJiPQfnsDoQ9+cFWvAYBI/ullKg3TU26stS/dS6aj4kKnHpv7LNHx+sZvYE0vaaPSqRtLtZ/SbtLy6FuDF6Hs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=LMZm0HzU; arc=none smtp.client-ip=209.85.210.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-7dbce74e537so85107a34.1
-        for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 12:11:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1775675481; x=1776280281; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=NWlPCpaM6YJiK7lQXjNJIiFwkV0uyI0s2T5X9GR48qE=;
-        b=LMZm0HzU/Z9SjWgXYja7mHAMOwVclB5jDfApGeJ+EmAA1/4et5n3Gdsnepy3LhVAa4
-         8NIMgRmIcfmQJ65eVT0VdqawlOKRxNKsZ9Mi5jbsX1C+BnL4DCkpnB7RJY0oOd6H8UCi
-         mtY4aivM6iNdMeLZ+IEAzxeaAvx/SArWJWXyMRttgb9U5n1buDepbwmZWzRlg1FXQkPZ
-         K86JN+JCLdn5L3hC/ZP3ukMl+UXSweRxMrmSh9QAmKKfd0KBnRDfg86zRfWBGfYI+mRJ
-         f6XzoQzxZluXmrPBK6pltuLe35BuWoZ47ndnLxUzu1nXyM2YmYgMNnmBbAgOJONy6FOs
-         8O2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775675481; x=1776280281;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NWlPCpaM6YJiK7lQXjNJIiFwkV0uyI0s2T5X9GR48qE=;
-        b=Y43vpPb4ZgR8ZdzyI5wTn0mwjjHNRARkeCyDqNtJFY8Ev50MbbzzvaQjxBcPguY2/r
-         HhTByC/lNGkIUoAkf0d2IcPd8ESFg/MbTucGToZW/0xW3+SyHj+ztFMoXs8NN8/xiuId
-         KygA4XYKOsCBxUxjVJrAEtkpxJtXd5pAv78yGnv1NwXdLJh8x7B3eVGTQ3ornUnVWU6F
-         Yeb5ysFVDed2ygIVeFPhdlxJdnhkTiGgQgkGzvz0pypIki1pjmk+MbxLWO67/5Exd4d5
-         8s/5ssqyw8kxhdNTxuEei77Glfmc1fCOUeXmrXRwmAigFxh3G8A/5FwuMmJvU5ZjaAGv
-         VBvg==
-X-Forwarded-Encrypted: i=1; AJvYcCVG1pUkfVs7hxL7RrtRHIChciyBaUpPmbiYvdasuFlK9r5ennjfvNX+gklAV8l2S05uflod0sg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw1VOCWV4713gP6wfIKrLgLd6Obet5HnTakk/h7DO7KLbNL1Efe
-	gLncb7hW9gY7nXmaRdXuMuDk/Jl6MwXtS5jzZvor1qQhliGzKMTbfN373y31BtCtpu0=
-X-Gm-Gg: AeBDies1d+V4MLcsO6wy1popqCJ1qSrflt0EN+wHJIlkCNbCfcCqWNstt7BILnFTxMI
-	8tcb41qG+UWWV3LAMH+BnwEBJggk98peZXbE2YfJ33LUEErFNzNwVuCBJl8hljoToNTQCK0uq4M
-	xBL3s40qVeh3WELVuAQtRF1jOqUSe7ISDwna784JiMZQfoqa+Ut71L9Z+cCQjth8PVw7DzEzhr6
-	GEm8UBfL9vzWHrYfue6EzF44r1Wa2CIATuQel2eYqiRnbZNPcj6l9cPijpIM7GPRD0FXyC3lcik
-	vMSEXFgkU9J8vxSipukgsFztneKawDbzDF9XKK72D/IL5UeSkpI0NwpFCsY6haw1h6Y/tZX9cFC
-	nk1jqF6Iipac3Jq3tij6BhgNVL5gqiiAtuSxcbuPSF4hcvc/VzhPlt2T6n0CPsS3IvdmHaxgqFr
-	uQYHb4d6jdmA==
-X-Received: by 2002:a05:6830:2aa5:b0:7d7:cc2f:babb with SMTP id 46e09a7af769-7dbb72f9c3fmr16664921a34.2.1775675481129;
-        Wed, 08 Apr 2026 12:11:21 -0700 (PDT)
-Received: from 20HS2G4.. ([2a09:bac6:bf21:2e28::499:49])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7dc098578c3sm1979035a34.25.2026.04.08.12.11.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Apr 2026 12:11:20 -0700 (PDT)
-From: Chris J Arges <carges@cloudflare.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	David Ahern <dsahern@kernel.org>
-Cc: kernel-team@cloudflare.com,
-	Chris J Arges <carges@cloudflare.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2] net: Add net_cookie to Dead loop messages
-Date: Wed,  8 Apr 2026 14:10:47 -0500
-Message-ID: <20260408191056.1036330-1-carges@cloudflare.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1775675734; c=relaxed/simple;
+	bh=JZpipuTa8f2r1rEwJmj1883sExcXgeGBZCPAzmjBpb0=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=IreVhHAGlV8z+17GWZQKj3VrnfchIANFCESRG2RejnC+21cJRFohaoxuK++1A128TVhxES65V9wgTgX9wHPqbvIyn1yRv1OQ0Bppt9AsjzByHb6ZGmtM2W3KiMz7oW70XNeFKjB+I2O3qNEKiteJF/gGGLDsrtsnOxRaCLX/HKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=BdtkQo49; arc=none smtp.client-ip=194.13.80.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id BA1FBA588E;
+	Wed,  8 Apr 2026 21:15:22 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
+	t=1775675725; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=t1sBfATotgNvvEO2UQbvxW1BDDWsBRhyG+y/VKIZseU=;
+	b=BdtkQo49Comz61CfOwiLZoWJ1NgI5L+PAbCuET6kfzX0ybqeNm7Z6rQhII6rsvH7TwbVb5
+	hRwAeEmtB4BIv9TYwLZcDCEapMs1WiqJTasO+VLrlCc6LffoAkFiQzZ7+uUp8GsLwAPsif
+	50b82FP+sgBX5qPaNovgXOgQxVlJDCQFKEz/aKz9EQcFvJ398pMEfcZ519xFjAFUbkATx7
+	wYzl+IXATMVqcl2rREmsGVcB4jB+BFCxM5Rr0C4lyrqljdGjq3LEk3qaTCT50TPuWenfl7
+	bwJWUNmmr6N61mojsqt5Vk3OLCYtmoaPjnBFRy5PQyZC/NSeAz8krEFBDwXwnw==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Date: Wed, 08 Apr 2026 21:15:22 +0200
+From: Nicolai Buchwitz <nb@tipi-net.de>
+To: Marek Vasut <marex@nabladev.com>
+Cc: netdev@vger.kernel.org, stable@vger.kernel.org, "David S. Miller"
+ <davem@davemloft.net>, Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Ronald Wahl <ronald.wahl@raritan.com>, Yicong Hui
+ <yiconghui@gmail.com>, linux-kernel@vger.kernel.org
+Subject: Re: [net,PATCH] net: ks8851: Reinstate disabling of BHs around IRQ
+ handler
+In-Reply-To: <a9845b8e-5d3f-472b-8f03-bba699ba3882@nabladev.com>
+References: <20260407212344.80265-1-marex@nabladev.com>
+ <f4010cedaa49afc1648a73775a987ee5@tipi-net.de>
+ <a9845b8e-5d3f-472b-8f03-bba699ba3882@nabladev.com>
+Message-ID: <215ad1cc5db3f352ac2a130c07dbd830@tipi-net.de>
+X-Sender: nb@tipi-net.de
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-7.66 / 15.00];
-	WHITELIST_DMARC(-7.00)[cloudflare.com:D:+];
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[cloudflare.com,reject];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[cloudflare.com:s=google09082023];
+	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-276693-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[cloudflare.com:+];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-276694-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[carges@cloudflare.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_THREE(0.00)[4];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,lunn.ch,google.com,kernel.org,redhat.com,raritan.com,gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[tipi-net.de];
+	DKIM_TRACE(0.00)[tipi-net.de:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,cloudflare.com:dkim,cloudflare.com:email,cloudflare.com:mid]
-X-Rspamd-Queue-Id: 780F53C3139
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,tipi-net.de:dkim,tipi-net.de:email,tipi-net.de:mid]
+X-Rspamd-Queue-Id: 2DCD93C31E6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Network devices can have the same name within different network namespaces.
-To help distinguish these devices, add the net_cookie value which can be
-used to identify the netns.
+On 8.4.2026 17:41, Marek Vasut wrote:
+> On 4/8/26 12:54 PM, Nicolai Buchwitz wrote:
+> 
+> Hello Nicolai,
+> 
+> thank you for testing on the SPI variant, that helped a lot.
+> 
+>> In order to make this work I would propose something like this (which 
+>> works in my SPI setup):
+>> 
+>> --- a/drivers/net/ethernet/micrel/ks8851_par.c
+>> +++ b/drivers/net/ethernet/micrel/ks8851_par.c
+>> @@ -60,12 +60,14 @@ static void ks8851_lock_par(struct ks8851_net *ks, 
+>> unsigned long *flags)
+>>   {
+>>       struct ks8851_net_par *ksp = to_ks8851_par(ks);
+>> 
+>> +    local_bh_disable();
+>>       spin_lock_irqsave(&ksp->lock, *flags);
+>>   }
+>> 
+>>   static void ks8851_unlock_par(struct ks8851_net *ks, unsigned long 
+>> *flags)
+>>   {
+>>       struct ks8851_net_par *ksp = to_ks8851_par(ks);
+>> 
+>>       spin_unlock_irqrestore(&ksp->lock, *flags);
+>> +    local_bh_enable();
+>>   }
+>> 
+>> Tested-by: Nicolai Buchwitz <nb@tipi-net.de>  # KS8851 SPI, non-RT 
+>> (regression + proposed fix)
+> 
+> Are you also able to test the KS8851 driver with PREEMPT_RT enabled and 
+> heavy iperf3 traffic on the SPI variant ? Does that trigger any issues 
+> ? I ran 'iperf3 -s' on the KS8851 end and 'iperf3 -c 192.168.1.300 -t 0 
+> --bidir' on the host PC side.
 
-Signed-off-by: Chris J Arges <carges@cloudflare.com>
----
-v2: rebased on net-next
----
- net/core/dev.c            | 5 +++--
- net/ipv4/ip_tunnel_core.c | 4 ++--
- 2 files changed, 5 insertions(+), 4 deletions(-)
+Successfully tested with both PREEMPT_RT and non-RT kernels using the 
+iperf3 command above - no issues observed. Both builds included the fix 
+from my previous message.
+If there is anything else worth testing on the KS8851 SPI variant, 
+please let me know.
 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 5a31f9d2128c..3c752ba3aa29 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -4886,8 +4886,9 @@ int __dev_queue_xmit(struct sk_buff *skb, struct net_device *sb_dev)
- 	} else {
- 		/* Recursion is detected! It is possible unfortunately. */
- recursion_alert:
--		net_crit_ratelimited("Dead loop on virtual device %s, fix it urgently!\n",
--				     dev->name);
-+		net_crit_ratelimited("Dead loop on virtual device %s (net %llu), fix it urgently!\n",
-+				     dev->name, dev_net(dev)->net_cookie);
-+
- 		rc = -ENETDOWN;
- 	}
- 
-diff --git a/net/ipv4/ip_tunnel_core.c b/net/ipv4/ip_tunnel_core.c
-index f430d6f0463e..2667f53482bd 100644
---- a/net/ipv4/ip_tunnel_core.c
-+++ b/net/ipv4/ip_tunnel_core.c
-@@ -60,8 +60,8 @@ void iptunnel_xmit(struct sock *sk, struct rtable *rt, struct sk_buff *skb,
- 
- 	if (unlikely(dev_recursion_level() > IP_TUNNEL_RECURSION_LIMIT)) {
- 		if (dev) {
--			net_crit_ratelimited("Dead loop on virtual device %s, fix it urgently!\n",
--					     dev->name);
-+			net_crit_ratelimited("Dead loop on virtual device %s (net %llu), fix it urgently!\n",
-+					     dev->name, dev_net(dev)->net_cookie);
- 			DEV_STATS_INC(dev, tx_errors);
- 		}
- 		ip_rt_put(rt);
--- 
-2.43.0
+> 
+> Let me prepare a slightly updated fix and send a V2.
 
+Regards
+Nicolai
 
