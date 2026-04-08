@@ -1,90 +1,82 @@
-Return-Path: <netdev+bounces-276665-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276666-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aMjLEseP1mmEGQgAu9opvQ
-	(envelope-from <netdev+bounces-276665-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 19:26:31 +0200
+	id 2CTOL2GQ1mmiGQgAu9opvQ
+	(envelope-from <netdev+bounces-276666-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 19:29:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F6813BF820
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 19:26:30 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 394B93BF8DC
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 19:29:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id DCB1D301961E
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 17:24:56 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 347E2305F803
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 17:25:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A4733D6462;
-	Wed,  8 Apr 2026 17:24:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF4D93D75AF;
+	Wed,  8 Apr 2026 17:25:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="pnRliNSf";
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="RwALqI/1"
+	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="JZxKBpxI";
+	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="gSwTV38M"
 X-Original-To: netdev@vger.kernel.org
 Received: from mout-y-209.mailbox.org (mout-y-209.mailbox.org [91.198.250.237])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 151233537FC;
-	Wed,  8 Apr 2026 17:24:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 169D23A8744;
+	Wed,  8 Apr 2026 17:25:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.198.250.237
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775669095; cv=none; b=duDK6a7btAaytZ7s7I+BLF1P3W7z/58n+VqciANhHIDZJRUJbIwZFD8dPp+dzpJjaBWDXCZTcDew+ar6q4mJgcMEdPgFFMOwEljVyrrtsias4RBZqCgSYf+Qf3vVhIWR+XvirSxxoNep4xVVo1gaqz7q7z1TojCSjsGq6hDcXWc=
+	t=1775669145; cv=none; b=KUluTBqzxhaYV0QI9fR+cJNp7402YQ8XBQYhM4bAnxDQ0PlRyhTrIdmHKcEV850IDG/oCOvPt3qa3c+4FvvBKkrEQkip97zVaGsAlzrm6ABJfenMekpAvbJAL5fVO59HggMlxg9GxVAsqCvUw0yO+Jmuam4CfNExhU9xgQ4meQA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775669095; c=relaxed/simple;
-	bh=bz6DeQbiP7xoXyOE9h5UCwgEAp8Gh8vLP0VgCf2MbRE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Nu/uOMlDQPr9Xo3mwwNCrVGbEWwm6+zWa/zUlYo43uCLfGAKNEy2UVd4u9olbdYZ6Pnbn/mV4NYFiA9KQagPdeHwzJ+fyBLTh8J/KPaQDLoXYsx12Lo647sDKceWV9EWVr97i14W9hd5vssu5xM6KXLfzQPiw5iUgt53yEnf6oU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=pnRliNSf; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=RwALqI/1; arc=none smtp.client-ip=91.198.250.237
+	s=arc-20240116; t=1775669145; c=relaxed/simple;
+	bh=ot1KVTZnXZcUxJIpol/i2ytidhgDKLb91yaFFYtzrSM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rNnCCQU5KKOyoH8Diddwr56zIeAhs2/ybwOffx5xls63JxUb68S3YPuSoqvuEBNucguJ5wmSkuRVCBMYABskho4tyCmRwKXg3y9I3KjPJPDk7cMZJGtXNSawX/IwA6o6ueDu7j1yG6403eoouapM4z54EoY+84J4CRMzYncLGjg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=JZxKBpxI; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=gSwTV38M; arc=none smtp.client-ip=91.198.250.237
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
-Received: from smtp1.mailbox.org (smtp1.mailbox.org [IPv6:2001:67c:2050:b231:465::1])
+Received: from smtp202.mailbox.org (smtp202.mailbox.org [10.196.197.202])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mout-y-209.mailbox.org (Postfix) with ESMTPS id 4frVLX26PdzB151;
-	Wed,  8 Apr 2026 19:24:52 +0200 (CEST)
+	by mout-y-209.mailbox.org (Postfix) with ESMTPS id 4frVMV20WbzB11w;
+	Wed,  8 Apr 2026 19:25:42 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1775669092;
+	t=1775669142;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7CucOw+3o0ShETswcg1eFTVDQgnIGwB/8Mftn1DdDHE=;
-	b=pnRliNSfEyOp/DOwaTPiiOGmDQwuRS4xDACZ/kIIr6CbaDCjPJARHztl9xCsPmznRXcism
-	8cbZimUtQUlPUxVBYFUtCH6fTGKJEvEo18hQUbtrL01O9G5wt4q7PWR3+J4JW8XAATWpEC
-	yvfmocU3YB8MY75uBolnFEElirDrw/yENjeBEeC8lK2OW1OtS4c4+LtzgICnTHzkzaz1pH
-	XiKq0qGrx4q2hvGlUByIOa0qXii0K0csuLlTyskO7WcgxCeHnvQM14QuUxz1PexN2uLz9b
-	a8irHW3D6Y0B94w3mPSdmjf3jdwDzVbIjIzKAb8MGj2VB9ZLw0G//NZHW1Qrew==
-Authentication-Results: outgoing_mbo_mout;
-	dkim=pass header.d=mailbox.org header.s=mail20150812 header.b="RwALqI/1";
-	spf=pass (outgoing_mbo_mout: domain of mashiro.chen@mailbox.org designates 2001:67c:2050:b231:465::1 as permitted sender) smtp.mailfrom=mashiro.chen@mailbox.org
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=kT13ZUtTLZv4hnmBJjWl4jvqjMLTj/qnsK+u4sO+FDo=;
+	b=JZxKBpxIYXw4GFSbXeNM2/dx0ZhyMwqV6Ew5swpwqq8AOCghVEEoP3OjZlw647ZqDn7COA
+	EyN6nWtaKDFc8w/BNnwW07bDs/AIefvbEnLcKxLaBYRE3t8nzr8GvsukzKawcRb8DF46ro
+	1YX61AtEQhTSko0dbg6oKgl8o8dgbXwrSI84IaJUWH157TooMPfD02hJ5wMLZRZF85isTs
+	uXsSQZc1v9NUAW4kDAV6M1ECL73j9uJnQRjsxCFEZve6LO/Szl0U4azdad8FnBe5uzHP6b
+	GjCAxMgTlda7wwT12xrJQEK2HRQg/ir5qNMjhaDAt1l3eZZdYHBNflWG4tx0EQ==
 From: Mashiro Chen <mashiro.chen@mailbox.org>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1775669090;
+	t=1775669140;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7CucOw+3o0ShETswcg1eFTVDQgnIGwB/8Mftn1DdDHE=;
-	b=RwALqI/14CCu85sz1xVtVyM3VM5w8lP6eqiht6G5cuJO0r4XKo4BaVq/kVM1bF9XykQENR
-	1i9ZQADdq3WopDOAqO59ORNWI1NxpzxSjbGjyckEsuFVQ5hvOCVXcuuF2kzXTERlk7xfT1
-	R9EZPnYhDVHjhyidLUIxqtoPVqa8yQBxDDZQsh4GDXT5gg9xkcdJZW+RwYsbgGzukUjgZV
-	0rJL1CM1dMWQq44O9mSHm6eH5N7NZv6+9W7CJ3DPd/kNo46zjmqgtwS5CWbwiIrvZ+xqN1
-	EjWwfSm5qVBkF6XgDj2nadYKQcyvM3/2cVDgnXN6JH4rUNOuiZuySsApWe/bZQ==
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=kT13ZUtTLZv4hnmBJjWl4jvqjMLTj/qnsK+u4sO+FDo=;
+	b=gSwTV38MH9GJJJHzK18+KV42orqZJH2G27KvzVDh0Yenc0wICroJ/A9SpyAkZBjEvQkuhI
+	hHqMygSUwIt+rEkCK1+VMLBFy+ttwxCJGtAIbQsGaP/bLHNI+fOr3f+yxTeZU+sVQX6who
+	zs5ndcnJQFVY73EGPHMBFgykchFNEN++T8l38vrAOG3I7SrYfkSJ88gFXrpoA3XqOtvpZW
+	vSXIBisCSR4z60ya2o5ZdQbx9DW5Lr7itLMy+UVrF69k1n0fD6sf9/3wGfb+NNZfeSMzJq
+	ui2mH/LaiXKkOTB8FTTAQ0hgHUeRTiqe5KZUQIy+AJw+HCEwJ63Y/SfxpIEajA==
 To: netdev@vger.kernel.org
-Cc: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
+Cc: davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
+	horms@kernel.org,
 	jreuter@yaina.de,
 	linux-hams@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Mashiro Chen <mashiro.chen@mailbox.org>,
 	stable@vger.kernel.org
-Subject: [PATCH net 2/2] net: hamradio: scc: validate bufsize in SIOCSCCSMEM ioctl
-Date: Thu,  9 Apr 2026 01:23:58 +0800
-Message-ID: <20260408172358.281186-3-mashiro.chen@mailbox.org>
-In-Reply-To: <20260408172358.281186-1-mashiro.chen@mailbox.org>
-References: <20260408172358.281186-1-mashiro.chen@mailbox.org>
+Subject: [PATCH net] net: ax25: fix integer overflow in ax25_rx_fragment()
+Date: Thu,  9 Apr 2026 01:25:21 +0800
+Message-ID: <20260408172521.281365-1-mashiro.chen@mailbox.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -92,76 +84,90 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-MBO-RS-ID: 16c0321e162ddce80c2
-X-MBO-RS-META: ks1jgtkanugppeu46kqs3zddtnpm51yh
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-MBO-RS-META: ob97oaxaox1sbha7g397ai6mgwyxh754
+X-MBO-RS-ID: 5f10e2ebca1b331472e
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[mailbox.org,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
 	R_DKIM_ALLOW(-0.20)[mailbox.org:s=mail20150812];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-276665-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-276666-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[mailbox.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[mashiro.chen@mailbox.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 4F6813BF820
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mailbox.org:dkim,mailbox.org:email,mailbox.org:mid]
+X-Rspamd-Queue-Id: 394B93BF8DC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The SIOCSCCSMEM ioctl copies a scc_mem_config from user space and
-assigns its bufsize field directly to scc->stat.bufsize without any
-range validation:
+The ax25_cb fragmentation reassembly accumulator:
 
-  scc->stat.bufsize = memcfg.bufsize;
+  ax25->fraglen += skb->len;
 
-If a privileged user (CAP_SYS_RAWIO) sets bufsize to 0, the receive
-interrupt handler later calls dev_alloc_skb(0) and immediately writes
-a KISS type byte via skb_put_u8() into a zero-capacity socket buffer,
-corrupting the adjacent skb_shared_info region.
+operates on the unsigned short field 'fraglen' declared in ax25_cb:
 
-The scc.c comment already states the buffer must not exceed 4096 bytes,
-but this limit is never enforced.  Add a bounds check that rejects values
-outside the range [16, 4096], consistent with the documented constraint
-and large enough to hold at least one KISS header byte plus useful data.
+  unsigned short  paclen, fragno, fraglen;
+
+When fragments accumulate with a combined payload exceeding 65535
+bytes, fraglen wraps to near zero.  The subsequent allocation:
+
+  skb = alloc_skb(AX25_MAX_HEADER_LEN + ax25->fraglen, GFP_ATOMIC);
+
+then allocates a tiny buffer.  Every skb_put() call in the copy loop
+that follows writes far beyond the allocated headroom, corrupting
+the kernel heap.
+
+An attacker on an AX.25 link that supports multi-fragment I-frames
+(AX25_SEG_FIRST / AX25_SEG_REM mechanism) can trigger this by
+sending enough continuation fragments to wrap the 16-bit counter.
+With AX.25 segment numbers limited to 6 bits (max 63 continuation
+fragments), a fragment payload of ~1040 bytes per fragment is
+sufficient to overflow.
+
+Fix mirrors the identical bug fixed in NET/ROM (nr_in.c): check for
+overflow before adding skb->len to fraglen, and abort fragment
+reassembly cleanly if the limit would be exceeded.
 
 Cc: stable@vger.kernel.org
 Cc: linux-hams@vger.kernel.org
 Signed-off-by: Mashiro Chen <mashiro.chen@mailbox.org>
 ---
- drivers/net/hamradio/scc.c | 2 ++
- 1 file changed, 2 insertions(+)
+ net/ax25/ax25_in.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/drivers/net/hamradio/scc.c b/drivers/net/hamradio/scc.c
-index ae5048efde686a..fd3ff3f4311df2 100644
---- a/drivers/net/hamradio/scc.c
-+++ b/drivers/net/hamradio/scc.c
-@@ -1909,6 +1909,8 @@ static int scc_net_siocdevprivate(struct net_device *dev,
- 			if (!capable(CAP_SYS_RAWIO)) return -EPERM;
- 			if (!arg || copy_from_user(&memcfg, arg, sizeof(memcfg)))
- 				return -EINVAL;
-+			if (memcfg.bufsize < 16 || memcfg.bufsize > 4096)
-+				return -EINVAL;
- 			scc->stat.bufsize   = memcfg.bufsize;
- 			return 0;
- 		
+diff --git a/net/ax25/ax25_in.c b/net/ax25/ax25_in.c
+index d75b3e9ed93de8..68202c19b19e3f 100644
+--- a/net/ax25/ax25_in.c
++++ b/net/ax25/ax25_in.c
+@@ -41,6 +41,11 @@ static int ax25_rx_fragment(ax25_cb *ax25, struct sk_buff *skb)
+ 				/* Enqueue fragment */
+ 				ax25->fragno = *skb->data & AX25_SEG_REM;
+ 				skb_pull(skb, 1);	/* skip fragno */
++				if ((unsigned int)ax25->fraglen + skb->len > USHRT_MAX) {
++					skb_queue_purge(&ax25->frag_queue);
++					ax25->fragno = 0;
++					return 1;
++				}
+ 				ax25->fraglen += skb->len;
+ 				skb_queue_tail(&ax25->frag_queue, skb);
+ 
 -- 
 2.53.0
 
