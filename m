@@ -1,178 +1,147 @@
-Return-Path: <netdev+bounces-276357-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276358-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6J0hEkcU1mnwAwgAu9opvQ
-	(envelope-from <netdev+bounces-276357-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 10:39:35 +0200
+	id EKISBFIT1mngAwgAu9opvQ
+	(envelope-from <netdev+bounces-276358-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 10:35:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A27983B934A
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 10:39:34 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB3873B91FF
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 10:35:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E4C4830851E0
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 08:35:02 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E8EEC3006138
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 08:35:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CC523A6B9D;
-	Wed,  8 Apr 2026 08:35:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C56B3A63EF;
+	Wed,  8 Apr 2026 08:35:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dFm4+muh"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Zi9U7WU8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3FAE3A6B70
-	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 08:34:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9ED0364EB2
+	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 08:35:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775637301; cv=none; b=UWWEU3xfI1nm06u+DAi/mOs5as6dSp3RNo9RZAgd6yTo10lahoqLm5Jo0Cf6WxC499BFrIqoC0xt85n0EpbyxrHVzPZ6CWvw05hwDM3MIOiDXKme2f5ZofEhyLQbsrhXFS9hmyMwGEJ4C5KnurXs3AMcymc2d0QGniIduwkOjY4=
+	t=1775637326; cv=none; b=BeH5p9irLQlgSwtBdueWhVqwonnXMTbxP4GnBKevIIxzrIvPJUZ81yzwQzwfAgieP1reITBg13UvBD33nuC+bsVBul6w2ToffjlRHHRBK1cONsDzoXO71UotzJDFr1LRSIUyvmEccpsCmQkf2GXeO32WPQtkAlAlxM76ubdzh8U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775637301; c=relaxed/simple;
-	bh=Yv9rp1wgQY/Ainn0b6NPeknaayPrGIJ+iW91Cs0GLmM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=I6LW+hu2Mp9Msf/rSnhfqAWY639QF4GJ4VK5+DWERTPziJGcn5a56jkVHTt23hJLvkpkLZjqCQSnXDdKyoYYYITdT7P9HD8iBqWxSKH1Pe0AWABrbETNqTh1hdO8VUEHml+LEJj5Q8O9lmAbWGFR7O9xL/Uzac7upOABU730mXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dFm4+muh; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-488aa77a06eso50702355e9.0
-        for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 01:34:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775637298; x=1776242098; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=CQaeOFXbxNsQ6d5NOWsIIq7eCw+qyUnj2mDKEGGArjM=;
-        b=dFm4+muhY1VOt4KhNS/fpE6DxxIAiZmKWKsbfOUKFcQu+QN5tpQVIx/knA6AVLNlka
-         9eHJ1XcKmaI2HLjwsWjSCydCdv6I/cX2Nu/gq/Zqa1P8NXmZYcB4JHAO8lEjoLd20K7F
-         +pGQ3BNA8QLQzXQ/FKWCWwGljV6JBrIaQ7A2UmXb57sLD8PO1h1Dqf0hlrOEie/im4As
-         7gQTNafumAD6d+bGeBBdsx1TAsmfdYwIzJGJWgmhEM2x0rRsc9g5lElgbVfOOVkt8qIX
-         xACWKhAg7msuQUDUNWDhEKyzCs6gUppyeD+OJfUI602Qw46LmTb7BlwJgHI45S5AIAXs
-         iwlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775637298; x=1776242098;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=CQaeOFXbxNsQ6d5NOWsIIq7eCw+qyUnj2mDKEGGArjM=;
-        b=OPxLjfkP7ade2K3oBOfw0uB1ml0aFtuZVmg80czM3PiXO62i9EYiN0B6M7h1iSYuNa
-         6fLbgiHm6HN8tHMxLL7R+puLmSUL/Oz2pDGbdmFeQY8f9k/8fnIaMnUyIHx5znTRr33R
-         yqjsrqCUz13lRckq11XhO6fIBdTJiaoxIp2G7nsnA+0CbT9r4rGzeRbCpc6qUxPRK819
-         nEelRjgD46cRnUg0bNyRqBUz/pofOQXsbLWEqtyDQqnS37FUjbwJUJ0th9VlCWylRPET
-         dwA0z/8UxIvYVqp7/wJtZ/uyxEdjivzVhIVP0Strl4/UptvauN473d40yiF5ceCCXRWm
-         wnmQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWiAXhoCPJrz95MML+ell62+I0yFEAGawga2yPo0axT2l932Co1FA52Abz9MmeMdA8cLuKsUJU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxM3ko6giGNpexr0QSQjDO/eqabU8ud3xHe4x9SadKCgWcrahQo
-	HUgjLsYu52L6X/EHtxRXr3caZIan4+VgCjg2boJ6thWtHukWZwwVIN5W
-X-Gm-Gg: AeBDievfyoYP/wjCrp/iqhMeHlWwB3uMVevXHm2jYuVTYBiMmbt0JpxPyOIBtHy+xPn
-	SmRaqvAB4Fehi1cDfiRcy4jesQw0WgppYrgY5z9pIlYAJdROAtwWViu3m95jN0rl0QEOSLqIR8Z
-	hrPKl4mFhMCiT8GccZzL8gUH8gTpQxj6Kn/VdROW9s7E2MY3G57W1n+m/W8Kz9s+BlIsCvGA4P/
-	MlzKVhL5PbRq0DjLP8tEJHSGaQnldiufBd3VRM1Mo5cKdT3r0gj+NSOr6U8Skbt4F38r/jXi0UI
-	RDvWVSVCdUPlTLJwwF0iiW1fosLq/cKd5pDK8MWmZwAfJBueslPhJsqQ8HzeGiyEAQ7gtI0fQBJ
-	nX4IH3DvlPOgJ36dggUBMDjlolhJF1VYFryUdPqdI8nCYAYb834GsR9k6r3MDE9snvjiNlhQSTv
-	oz3GnWd5+XcyFjWYpUWHaBGypNWE7+pSR1lb402+ffYQQcAfOX+vrdmbeppq9e2LJEDdflNmtQy
-	mjotUixQFSJ0l0g6LY7vL4EJ6XVZlgS4xDnfp6Ajj+T1tNC/n+dqdOTa48=
-X-Received: by 2002:a05:600c:1f96:b0:487:4eb:d125 with SMTP id 5b1f17b1804b1-48899753e5fmr279347815e9.9.1775637297978;
-        Wed, 08 Apr 2026 01:34:57 -0700 (PDT)
-Received: from ?IPV6:2620:10d:c096:325:77fd:1068:74c8:af87? ([2620:10d:c092:600::1:eaba])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488c1c5291esm150797065e9.15.2026.04.08.01.34.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 Apr 2026 01:34:56 -0700 (PDT)
-Message-ID: <336062ec-5fcd-46ad-a839-6ddbff7f9fb9@gmail.com>
-Date: Wed, 8 Apr 2026 09:34:59 +0100
+	s=arc-20240116; t=1775637326; c=relaxed/simple;
+	bh=RrMvobtANsk93uCs04DRCxo131qBQlIpolPmcHmOfk4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cpVu9XaFsM9gfSJ1FEGwZDPztUmu9eT2fXEDyBE659TR6qEIjCYVQw6g4LkwxEy68peTV4aWBKEyuyumD2QOTzB1Jgp3/VA8c4ExlPmPaGj4uV1Tk668zaK7Lt7t9wLSrYpQ8mm0zIktbNjVZnwZC2CohBx6DorOyQQi9sOdEaQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Zi9U7WU8; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1775637325; x=1807173325;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=RrMvobtANsk93uCs04DRCxo131qBQlIpolPmcHmOfk4=;
+  b=Zi9U7WU8t2SlGXHyHllxjmzdH/P/SB5mUkYNx8THzw0hGy4y1E3xjnLS
+   CrXZrSkYdigcHmfbu/3OCU5WYTd21D+wVJXLGvwh0IqQO7ST/A3Cwh2ds
+   d1ffjG22FuUK3F5zDFfqSzV/w/rc4kVwO6LG2C5kH4VDvWbZLcbNLTH8A
+   Y0t7WioRo22kfBNABmIT94+PbqVI4lgmGVPepSaCat8ucyRtggHswtn92
+   kMXlDr1ZGgCFrrX10rJuLtVrve33gSYh2Z4pnuJ3zhe+1KUQh//AU2Cp5
+   cbi22cW9kEBhkJFCR9F6Pm8yJjg1RVR1pgD5jPoIiNBMUJXWa9LZbFMNo
+   A==;
+X-CSE-ConnectionGUID: RMv7qi0PRH26D3AN3HC0Ng==
+X-CSE-MsgGUID: N+MQeDpNQ+eIxXuCMmMSqA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11752"; a="99239332"
+X-IronPort-AV: E=Sophos;i="6.23,167,1770624000"; 
+   d="scan'208";a="99239332"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Apr 2026 01:35:25 -0700
+X-CSE-ConnectionGUID: 005DSDcsSPKRJqtYppLh1g==
+X-CSE-MsgGUID: HxHaPNh/RPaU+5n2cqbusg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,167,1770624000"; 
+   d="scan'208";a="233286750"
+Received: from amlin-019-225.igk.intel.com ([10.102.19.225])
+  by fmviesa005.fm.intel.com with ESMTP; 08 Apr 2026 01:35:23 -0700
+From: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+To: intel-wired-lan@lists.osuosl.org,
+	anthony.l.nguyen@intel.com,
+	aleksandr.loktionov@intel.com
+Cc: netdev@vger.kernel.org,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Simon Horman <horms@kernel.org>
+Subject: [PATCH iwl-next] igb: use ktime_get_real helpers in igb_ptp_reset()
+Date: Wed,  8 Apr 2026 10:35:21 +0200
+Message-ID: <20260408083521.1620447-1-aleksandr.loktionov@intel.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/3] io_uring: fix pinned pages and pages array leak in
- io_region_pin_pages()
-To: KobaK <kobak@nvidia.com>, Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <kbusch@kernel.org>, Ming Lei <ming.lei@redhat.com>,
- io-uring@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260408065408.2017967-1-kobak@nvidia.com>
- <20260408065408.2017967-2-kobak@nvidia.com>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20260408065408.2017967-2-kobak@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TAGGED_FROM(0.00)[bounces-276357-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-276358-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[intel.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCPT_COUNT_FIVE(0.00)[6];
+	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[asmlsilence@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:email]
-X-Rspamd-Queue-Id: A27983B934A
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,intel.com:dkim,intel.com:email,intel.com:mid]
+X-Rspamd-Queue-Id: AB3873B91FF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 4/8/26 07:54, KobaK wrote:
-> From: Koba Ko <kobak@nvidia.com>
-> 
-> When io_pin_pages() succeeds but the subsequent nr_pages sanity check
-> fires (WARN_ON_ONCE), the function returns -EFAULT without unpinning the
-> user pages or freeing the kvmalloc'd pages array. The caller's cleanup
-> via io_free_region() won't help either, because mr->pages was never
-> assigned — so the entire cleanup block is skipped.
-> 
-> Add unpin_user_pages() and kvfree() before the error return to prevent
-> the leak.
-> 
-> Fixes: a90558b36ccee ("io_uring/memmap: helper for pinning region pages")
-> Signed-off-by: Koba Ko <kobak@nvidia.com>
+Replace ktime_to_ns(ktime_get_real()) with the direct equivalent
+ktime_get_real_ns() and ktime_to_timespec64(ktime_get_real()) with
+ktime_get_real_ts64() in igb_ptp_reset().  Using the combined helpers
+avoids the unnecessary intermediate ktime_t variable and makes the
+intent clearer.
 
-It's a WARN path, it should never happen, but if it does, that means
-io_pin_pages() is buggy, and it's better to leak rather than risk
-something nastier.
+Suggested-by: Jacob Keller <jacob.e.keller@intel.com>
+Suggested-by: Simon Horman <horms@kernel.org>
+Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+---
+ drivers/net/ethernet/intel/igb/igb_ptp.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-> ---
->   io_uring/memmap.c | 5 ++++-
->   1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/io_uring/memmap.c b/io_uring/memmap.c
-> index e6958968975a8..9f0d3750ce3bc 100644
-> --- a/io_uring/memmap.c
-> +++ b/io_uring/memmap.c
-> @@ -141,8 +141,11 @@ static int io_region_pin_pages(struct io_mapped_region *mr,
->   	pages = io_pin_pages(reg->user_addr, size, &nr_pages);
->   	if (IS_ERR(pages))
->   		return PTR_ERR(pages);
-> -	if (WARN_ON_ONCE(nr_pages != mr->nr_pages))
-> +	if (WARN_ON_ONCE(nr_pages != mr->nr_pages)) {
-> +		unpin_user_pages(pages, nr_pages);
-> +		kvfree(pages);
->   		return -EFAULT;
-> +	}
->   
->   	mr->pages = pages;
->   	mr->flags |= IO_REGION_F_USER_PROVIDED;
-
+diff --git a/drivers/net/ethernet/intel/igb/igb_ptp.c b/drivers/net/ethernet/intel/igb/igb_ptp.c
+index bd85d02..638d824 100644
+--- a/drivers/net/ethernet/intel/igb/igb_ptp.c
++++ b/drivers/net/ethernet/intel/igb/igb_ptp.c
+@@ -1500,12 +1500,13 @@ void igb_ptp_reset(struct igb_adapter *adapter)
+ 
+ 	/* Re-initialize the timer. */
+ 	if ((hw->mac.type == e1000_i210) || (hw->mac.type == e1000_i211)) {
+-		struct timespec64 ts = ktime_to_timespec64(ktime_get_real());
++		struct timespec64 ts;
+ 
++		ktime_get_real_ts64(&ts);
+ 		igb_ptp_write_i210(adapter, &ts);
+ 	} else {
+ 		timecounter_init(&adapter->tc, &adapter->cc,
+-				 ktime_to_ns(ktime_get_real()));
++				 ktime_get_real_ns());
+ 	}
+ out:
+ 	spin_unlock_irqrestore(&adapter->tmreg_lock, flags);
 -- 
-Pavel Begunkov
+2.52.0
 
 
