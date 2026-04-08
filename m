@@ -1,210 +1,214 @@
-Return-Path: <netdev+bounces-276244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276245-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aFU1CMLA1WnT9QcAu9opvQ
-	(envelope-from <netdev+bounces-276244-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 04:43:14 +0200
+	id kEnmEhLD1Wkx9gcAu9opvQ
+	(envelope-from <netdev+bounces-276245-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 04:53:06 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id E94A43B647E
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 04:43:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BF3533B6521
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 04:53:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id AC025301A536
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 02:43:11 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1352E303A3C6
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 02:52:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05F10347FE1;
-	Wed,  8 Apr 2026 02:43:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6358336606A;
+	Wed,  8 Apr 2026 02:52:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xapIOMIZ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="n++Xug9R"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f202.google.com (mail-dy1-f202.google.com [74.125.82.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A1272C21D0
-	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 02:43:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FD4B1A239A
+	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 02:52:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775616190; cv=none; b=EZlCD1q1UbRpClF/OEbLox7a4bTWfJxUYRCmstoqeZpP2FRulPOeAI7wx/8UfjJ0Lmyhl+suCbgHl/5Hiv6qhhhX0Dr5Se4h3XpGGzbvgt7EUrVJEChXCm+BGjAwmXQ6B0N4IM3akVNc9/yZYWNsNd7XlyKDlftTlt4PsO0JaO0=
+	t=1775616752; cv=none; b=BG2+xJvutj1af443q7BgJ6g29EggXZNwU5G3Gb93YcpG2aYaJbG0E6hJjLCRmaXTyZGuOTgvmQ5j7BYjtzjAi2M2o1X5xyCuIVRE3O4yR/iKB3+meExcXuECUWCKfXiQ5T/6FbmxmlbKqzx46m0Hk5706hBRvLrTfg1IqmtVxMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775616190; c=relaxed/simple;
-	bh=wc8ebE65UOu1ysogv3ZDcnkX89LztJOefOmPbTNJMjM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gHqqBrSjZSjUyJsJMKRlo2B14Uagdp3c8M/DasfTdhqFnXnfI8rz2OFGV0ufpZ8UYW3R0qbJ4jnXwd3lEBGwD/o2KhOCdtVZE18mLYTNnYao7VklvuibeCmSz+77M3xayV4yQVrIZ4jdlaAzfVSQ2nyjeUDG130ugbVbeCxf0xY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xapIOMIZ; arc=none smtp.client-ip=95.215.58.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1775616186;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=33eXA0SOhVw75BGKPw1R2kGeIPnZ2JkRRsLUeSlZmUo=;
-	b=xapIOMIZk4e7lMBCgcYMriHiENqeJAhP8uQd+H+AUKoYG8k+TVFEgQ5EEvaEipnTkAJmf+
-	ifi/tG3wafn1351xGoueKxXPHWoA9pNbW90gLoPegDDkxYpwRU5xuPOEi2ad5VEOeWe1BE
-	/9l1ktPhKJDdjioI/um1tYBa5jqklrQ=
-From: Qingfang Deng <qingfang.deng@linux.dev>
-To: linux-ppp@vger.kernel.org,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Michal Ostrowski <mostrows@gmail.com>,
-	Qingfang Deng <qingfang.deng@linux.dev>,
-	Yue Haibing <yuehaibing@huawei.com>,
-	Breno Leitao <leitao@debian.org>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Kees Cook <kees@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Paul Mackerras <paulus@ozlabs.org>,
-	Jaco Kroon <jaco@uls.co.za>,
-	James Carlson <carlsonj@workingcode.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>,
-	Guillaume Nault <gnault@redhat.com>
-Subject: [PATCH net v2] pppoe: drop PFC frames
-Date: Wed,  8 Apr 2026 10:42:39 +0800
-Message-ID: <20260408024245.312732-1-qingfang.deng@linux.dev>
+	s=arc-20240116; t=1775616752; c=relaxed/simple;
+	bh=lnkHt0LcGp7r0bgQPA+nYiHe7Bo6MDonp2asKzbl2pY=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=NKM4dzfkLrXiiofMFt8vEMs9A2L9TXEd0pzbKtQE8Jl2gQC3oyOixbk21Z82m4VmjKEEYUuyEwUE72aRxbINc2N1XgPipNOMVNlBuyhh9JqToF3xi4sU+bAzkXdXro5TVnT96AqwF9UL8dSY8sPnTS48kbvSuw99doFOLWT7doo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--marcharvey.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=n++Xug9R; arc=none smtp.client-ip=74.125.82.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--marcharvey.bounces.google.com
+Received: by mail-dy1-f202.google.com with SMTP id 5a478bee46e88-2ceef8e793fso10244027eec.0
+        for <netdev@vger.kernel.org>; Tue, 07 Apr 2026 19:52:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1775616749; x=1776221549; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=41nlgVSog5fOkOax/2zDhaWi/Izx635JwzvhBcYRItg=;
+        b=n++Xug9RSVrngeBYlVqkPwX0tDNaHOAb8tebTesfxKwmLR0ZkFTL/vQx8jufC41ipr
+         qxp9+k6NsrYV2clzdS7Z8seObzSr6ZOE1odhzE718mLCreIllFiX2AfZx+yaNuttdv78
+         hcBb34loUwrh4CgpyMTQyisAKIt+LYBbVXGMYg6N+ZWSu8GJcNQ2eTObWnDAAwvfu0t0
+         KAZC3qUDAvNDsliXF2cgeoD2J3SMoH3/lGYiC5fsmxD5c5JN4J/3h7jyJ9PJtK9XlAY+
+         Fg2WAzJJ/X8TMchGfoBapSLXVTm/CYJJLmfymIYPD71Rvx/4JbEEiL2IT/CvQjoyUVpt
+         Qg8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775616749; x=1776221549;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=41nlgVSog5fOkOax/2zDhaWi/Izx635JwzvhBcYRItg=;
+        b=ARYqvtd1krmeKCL0yAv2UGUgsXSfwwaiNh+p2blr1H0ZZ/5v1nMqZ6rhTTO4SgjWJA
+         +pysx8HNhGeQuy4DfAUVWygxxtsT1iZ2x0+VTiYQ7nDQ9YIYktGfKFy55MljebRojLKh
+         JdMcr0aOPwICyC9sO+GPTwcfJPv4YHj7ia/ZUBC6PXUX9ZzIX1EdPoZ96cK0AtzRuqlm
+         qUz3o4xD5+Rj3aZKytl7r+ZDs1IgmosnAmVH3+1wqpkrP0oVqk/Si+dTEAzKx6KFng6u
+         J6dncyVV+6XtiylneaD51NQAjJg0FS1w/r2LuLdIIx2HeoHO86RLQSsb2TZWF//itx2I
+         nd5A==
+X-Gm-Message-State: AOJu0Yz/fiXj4+vs0bFPaGObE5RHtjx7tyc2/11Ij5sa9WFFJ8JHl/yS
+	PVi95tgvWitDXJ1HTY1EVoGckBZk4fCMEf5tgsSrrrzrhXDKLo1qcmMRZN/oj+SrZKE0lZm7QsN
+	LbZiAk8oBU6MgIutPD3Jubg==
+X-Received: from dyclw17.prod.google.com ([2002:a05:693c:2111:b0:2cc:9943:d1b2])
+ (user=marcharvey job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:7301:3c9b:b0:2d3:d3f:2429 with SMTP id 5a478bee46e88-2d30d3f2ce0mr394234eec.0.1775616749091;
+ Tue, 07 Apr 2026 19:52:29 -0700 (PDT)
+Date: Wed, 08 Apr 2026 02:52:19 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [0.84 / 15.00];
+Mime-Version: 1.0
+X-B4-Tracking: v=1; b=H4sIAOPC1WkC/4XOwWrEIBAG4FdZPNdiZkxie+p7lB5cHbMDu1qMy
+ JYl717xlLKEHn9+5vvnIVbKTKt4Pz1Epsorp9jC9HIS7mLjQpJ9ywIUTEqrQRayN46L9JkrZcm
+ xUI72Kg0GCErN2k9GtOvvTIHvXf4UkYqMdC/iqzUXXkvKP32yQu//1StIJYNRboC3YYb5/LGkt
+ Fzp1aVbRyvuITiGsEFkXPDk8Dw6eIL0HsJjSDfIo0IIiM7C+ASNe2g6hsb+kcWA2tjB/YW2bfs FQpzIn6QBAAA=
+X-Change-Id: 20260401-teaming-driver-internal-83f2f0074d68
+X-Developer-Key: i=marcharvey@google.com; a=ed25519; pk=OzOeciadbfF5Bug/4/hyEAwfrruSY4tn0Q0LocyYUL0=
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1775616747; l=4135;
+ i=marcharvey@google.com; s=20260401; h=from:subject:message-id;
+ bh=lnkHt0LcGp7r0bgQPA+nYiHe7Bo6MDonp2asKzbl2pY=; b=Qt4jVSAfS2f+ouFRqKGmtw1U2nCWBzh16Xipav3rRx17/cTy59G8vS6FV3nGNEXPUmpSrYL8l
+ oMlGqLEDX3GBBCYtFOEgpVvIqEraWjWmOm95bS3ejDTng42vqut15se
+X-Mailer: b4 0.14.3
+Message-ID: <20260408-teaming-driver-internal-v6-0-e5bcdcf72504@google.com>
+Subject: [PATCH net-next v6 00/10] Decouple receive and transmit enablement in
+ team driver
+From: Marc Harvey <marcharvey@google.com>
+To: Jiri Pirko <jiri@resnulli.us>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, Marc Harvey <marcharvey@google.com>, 
+	Jiri Pirko <jiri@resnulli.us>
+Content-Type: text/plain; charset="utf-8"
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_MISSING_CHARSET(0.50)[];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-276244-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[20];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,linux.dev,huawei.com,debian.org,linutronix.de];
+	TAGGED_FROM(0.00)[bounces-276245-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[qingfang.deng@linux.dev,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	NEURAL_HAM(-0.00)[-1.000];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[marcharvey@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:dkim,linux.dev:email,linux.dev:mid]
-X-Rspamd-Queue-Id: E94A43B647E
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: BF3533B6521
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-RFC 2516 Section 7 states that Protocol Field Compression (PFC) is NOT
-RECOMMENDED for PPPoE. In practice, pppd does not support negotiating
-PFC for PPPoE sessions, and the current PPPoE driver assumes an
-uncompressed (2-byte) protocol field. However, the generic PPP layer
-function ppp_input() is not aware of the negotiation result, and still
-accepts PFC frames.
+Allow independent control over receive and transmit enablement states
+for aggregated ports in the team driver.
 
-If a peer with a broken implementation or an attacker sends a frame with
-a compressed (1-byte) protocol field, the subsequent PPP payload is
-shifted by one byte. This causes the network header to be 4-byte
-misaligned, which may trigger unaligned access exceptions on some
-architectures.
+The motivation is that IEE 802.3ad LACP "independent control" can't
+be implemented for the team driver currently. This was added to the
+bonding driver in commit 240fd405528b ("bonding: Add independent
+control state machine").
 
-To reduce the attack surface, drop PPPoE PFC frames. Introduce
-ppp_skb_is_compressed_proto() helper function to be used in both
-ppp_generic.c and pppoe.c to avoid open-coding.
+This series also has a few patches that add tests to show that the old
+coupled enablement still works and that the new decoupled enablement
+works as intended (4, 5, and 10).
 
-Fixes: 224cf5ad14c0 ("ppp: Move the PPP drivers")
-Signed-off-by: Qingfang Deng <qingfang.deng@linux.dev>
+There are three patches with small fixes as well, with the goal of
+making the final decoupling patch clearer (1, 2, and 3).
+
+Signed-off-by: Marc Harvey <marcharvey@google.com>
 ---
-v2: retarget to net, and add a helper function
- https://lore.kernel.org/netdev/20260403083926.68320-1-qingfang.deng@linux.dev/
+Changes in v6:
+- Make selftests use a TCP port with no associate service.
+- Make selftests pass -nn flag to tcpdump, which will make it not
+  convert port numbers to service names.
+- Link to v5: https://lore.kernel.org/r/20260406-teaming-driver-internal-v5-0-e8a3f348a1c5@google.com
 
- drivers/net/ppp/ppp_generic.c |  2 +-
- drivers/net/ppp/pppoe.c       |  8 +++++++-
- include/linux/ppp_defs.h      | 14 ++++++++++++++
- 3 files changed, 22 insertions(+), 2 deletions(-)
+Changes in v5:
+- Change teamd activebackup selftest in patch 5 to try graceful teamd
+  teardown before using sigkill.
+- Make the teamd activebackup selftest in patch 5 delete leftover
+  teamd files during teardown.
+- Reorder function calls in team_port_enable function in patch 7,
+  since the enablement behavior shouldn't change.
+- Make selftests use tcpdump instead of checking rx counters.
+- Fix minor typos in patch 10.
+- Link to v4: https://lore.kernel.org/r/20260403-teaming-driver-internal-v4-0-d3032f33ca25@google.com
 
-diff --git a/drivers/net/ppp/ppp_generic.c b/drivers/net/ppp/ppp_generic.c
-index cb29a6968c63..eb1503b389ef 100644
---- a/drivers/net/ppp/ppp_generic.c
-+++ b/drivers/net/ppp/ppp_generic.c
-@@ -2251,7 +2251,7 @@ ppp_do_recv(struct ppp *ppp, struct sk_buff *skb, struct channel *pch)
-  */
- static void __ppp_decompress_proto(struct sk_buff *skb)
- {
--	if (skb->data[0] & 0x01)
-+	if (ppp_skb_is_compressed_proto(skb))
- 		*(u8 *)skb_push(skb, 1) = 0x00;
- }
- 
-diff --git a/drivers/net/ppp/pppoe.c b/drivers/net/ppp/pppoe.c
-index 1ac61c273b28..4cd10c908711 100644
---- a/drivers/net/ppp/pppoe.c
-+++ b/drivers/net/ppp/pppoe.c
-@@ -393,7 +393,7 @@ static int pppoe_rcv(struct sk_buff *skb, struct net_device *dev,
- 	if (skb_mac_header_len(skb) < ETH_HLEN)
- 		goto drop;
- 
--	if (!pskb_may_pull(skb, sizeof(struct pppoe_hdr)))
-+	if (!pskb_may_pull(skb, PPPOE_SES_HLEN))
- 		goto drop;
- 
- 	ph = pppoe_hdr(skb);
-@@ -403,6 +403,12 @@ static int pppoe_rcv(struct sk_buff *skb, struct net_device *dev,
- 	if (skb->len < len)
- 		goto drop;
- 
-+	/* skb->data points to the PPP protocol header after skb_pull_rcsum.
-+	 * Drop PFC frames.
-+	 */
-+	if (ppp_skb_is_compressed_proto(skb))
-+		goto drop;
-+
- 	if (pskb_trim_rcsum(skb, len))
- 		goto drop;
- 
-diff --git a/include/linux/ppp_defs.h b/include/linux/ppp_defs.h
-index b74209e5a11e..ba6e53655b93 100644
---- a/include/linux/ppp_defs.h
-+++ b/include/linux/ppp_defs.h
-@@ -8,10 +8,24 @@
- #define _PPP_DEFS_H_
- 
- #include <linux/crc-ccitt.h>
-+#include <linux/skbuff.h>
- #include <uapi/linux/ppp_defs.h>
- 
- #define PPP_FCS(fcs, c) crc_ccitt_byte(fcs, c)
- 
-+/**
-+ * ppp_skb_is_compressed_proto - checks if PPP protocol in a skb is compressed
-+ * @skb: skb to check
-+ *
-+ * Returns true iff the PPP protocol field is compressed (the least significant
-+ * bit of the most significant octet is 1).
-+ * skb->data must point to the PPP protocol header.
-+ */
-+static inline bool ppp_skb_is_compressed_proto(const struct sk_buff *skb)
-+{
-+	return unlikely(skb->data[0] & 0x01);
-+}
-+
- /**
-  * ppp_proto_is_valid - checks if PPP protocol is valid
-  * @proto: PPP protocol
+Changes in v4:
+- Split the large v3 patch "net: team: Decouple rx and tx enablement
+  in the team driver" into 4 smaller patches.
+- Link to v3: https://lore.kernel.org/r/20260402-teaming-driver-internal-v3-0-e8cfdec3b5c2@google.com
+
+Changes in v3:
+- Patch 5: In test cleanup, kill teamd to fix timeout.
+- Link to v2: https://lore.kernel.org/r/20260401-teaming-driver-internal-v2-0-f80c1291727b@google.com
+
+Changes in v2:
+- Patch 4 and 5: Fix shellcheck errors and warnings, use iperf3
+  instead of netcat+pv, fix dependency checking.
+- Patch 7: Fix shellcheck errors and warnings, fix dependency
+  checking.
+- Link to v1: https://lore.kernel.org/all/20260331053353.2504254-1-marcharvey@google.com/
+
+---
+Marc Harvey (10):
+      net: team: Annotate reads and writes for mixed lock accessed values
+      net: team: Remove unused team_mode_op, port_enabled
+      net: team: Rename port_disabled team mode op to port_tx_disabled
+      selftests: net: Add tests for failover of team-aggregated ports
+      selftests: net: Add test for enablement of ports with teamd
+      net: team: Rename enablement functions and struct members to tx
+      net: team: Track rx enablement separately from tx enablement
+      net: team: Add new rx_enabled team port option
+      net: team: Add new tx_enabled team port option
+      selftests: net: Add tests for team driver decoupled tx and rx control
+
+ drivers/net/team/team_core.c                       | 237 ++++++++++++++++----
+ drivers/net/team/team_mode_loadbalance.c           |   8 +-
+ drivers/net/team/team_mode_random.c                |   4 +-
+ drivers/net/team/team_mode_roundrobin.c            |   2 +-
+ include/linux/if_team.h                            |  63 +++---
+ tools/testing/selftests/drivers/net/team/Makefile  |   4 +
+ tools/testing/selftests/drivers/net/team/config    |   4 +
+ .../drivers/net/team/decoupled_enablement.sh       | 249 +++++++++++++++++++++
+ .../testing/selftests/drivers/net/team/options.sh  |  99 +++++++-
+ .../testing/selftests/drivers/net/team/team_lib.sh | 174 ++++++++++++++
+ .../drivers/net/team/teamd_activebackup.sh         | 246 ++++++++++++++++++++
+ .../drivers/net/team/transmit_failover.sh          | 158 +++++++++++++
+ tools/testing/selftests/net/forwarding/lib.sh      |   9 +-
+ tools/testing/selftests/net/lib.sh                 |  13 ++
+ 14 files changed, 1197 insertions(+), 73 deletions(-)
+---
+base-commit: 2ce8a41113eda1adddc1e6dc43cf89383ec6dc22
+change-id: 20260401-teaming-driver-internal-83f2f0074d68
+
+Best regards,
 -- 
-2.43.0
+Marc Harvey <marcharvey@google.com>
 
 
