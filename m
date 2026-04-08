@@ -1,192 +1,183 @@
-Return-Path: <netdev+bounces-276612-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276613-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CN2QNOSA1mmwFwgAu9opvQ
-	(envelope-from <netdev+bounces-276612-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 18:23:00 +0200
+	id mCQmHQSB1mmwFwgAu9opvQ
+	(envelope-from <netdev+bounces-276613-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 18:23:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BF0F3BEC81
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 18:23:00 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD3903BEC92
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 18:23:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8828E3017C10
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 16:22:50 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 94E29300F179
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 16:23:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EF983A1E67;
-	Wed,  8 Apr 2026 16:22:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7336A33AD8C;
+	Wed,  8 Apr 2026 16:23:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="fRrx/4uX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V2Wrpp3B"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1376534AB06
-	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 16:22:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4915127EFE9;
+	Wed,  8 Apr 2026 16:23:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775665369; cv=none; b=BZvMoYI7ZpytKArdRdY0/EP6uTTi8w9yAEzk/iegcLUjmCv3zin1MjUpyFDo/ueusGzw2wU5M2/CJcczZApIizTTkRSThoM6Rwe8Cbtl+czTXB8L6stz2t8CHfJc8ge60BZCwK2md5h0/qe6G1fo4XaqIy7LZOxkOlBkQB01gIM=
+	t=1775665409; cv=none; b=BO6guYLZGmw9j0eTyOTUd0c92tpyUDbcYgEFmPnlUKEUMk6wKcuRqFvpzrnPZaEgJYnaZ5BhXhFdbC6CaVuBeroP5ji4PxmYEG0q6fdmfLTeihiykh2fk45OoMAa5k1r9tyw43ACmxa1Omp+iBEjnLGfeaIgt5HUeMYVGcGa+Sw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775665369; c=relaxed/simple;
-	bh=MbK2EhOyylLAxU2Q/eHjdaz1ad4dnrnqpmOeagl6cGE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IXcKTKzicFt8Tj8Q0ha/1S47wvKktYmB+p9k0HbsxqeBW5a2xAjntSUtaPL/VmzNvXLyzR2LFbtwiBzFUYQnBFHg03i1Z02aU1uy8B57IA+oq5sMdLreD3ojJzuCn6ePynKOZUS3b7Vtxpi9bsizmcvu6FXRyFYteDeLHJBR84U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=fRrx/4uX; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-66c304dbfd2so73582a12.0
-        for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 09:22:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1775665366; x=1776270166; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=FrJr1968WuvXLCx5E+q3h8WCNbUNL7Em2uQzgCx18+c=;
-        b=fRrx/4uXqqu8FVs+LcB5+I88dBlbYd8KacXUkYaa0Va2hEsXqTy3goqfpBY3fJh9Tc
-         fWLfDWTTAbpW4h4KhUuq98O0GWVfXP4mtkz84YLszyBxoDZuDhWVs01lVCiiz6fT+bsd
-         wk++HSaQWQLzrNf7GJCzQan7iGqEmJhg6mkCs=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775665366; x=1776270166;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FrJr1968WuvXLCx5E+q3h8WCNbUNL7Em2uQzgCx18+c=;
-        b=LiYmlPmwqdqOWnANRXllW1/+waUuUrJUGzszKsjFRmBfw674xLDp94tBcK9LrcILAl
-         bfHGy8sqz7Bhk/qTPj3MdFDOQ538Ucyi5i81sKp8FCR3p3X1i4RScpH8sG7p34wpeBnS
-         PuklFj3IeCX96vJiqX2baryQa8i/bC4FzBrgjmaKlanN+GKQKllHqdcAsZDXHz1QG/OU
-         M6VMejOzdJ3htJel0mcLFQ3z8TjLbcTMKKNEeewmYFqIihDKlC6yTOVTGehIj1cSPTZw
-         KY5XSoubqlRovjIue369+jctCC8x/xwJf9WuS7JlNqcP24ofaAm25ElOeYSnAmhY/ms0
-         P0Mw==
-X-Gm-Message-State: AOJu0Yzho64zF3U/dxkelltDucZgBsz1LKoq5FHOAiyuXCNGqoeEqxQb
-	NZ119d2J6qMPWIXzRSd21Bu2ZACkMyFm7ggDPoSdt7GYpDdV31crcSrPbqw8d+2HXu1qcb8azf6
-	T6SW21Jg=
-X-Gm-Gg: AeBDievKRqxmSYZQdiodVMEPWuHgPNg7GrELEfkjqcb4Sl+38b7CgTfEetmVJlbBDIZ
-	XuTZ75HcEfkCOh0vlJi394nyDfYu2AeaIajDBW8V/Mk1c5rSUmMRGS4udu9+CecN9nAvPKys0g3
-	cO2STjn3VuJDuSoQFqiVVnmBPfcs+Rc+33uDIr7XM4WLADG/2kab6ii4FB0fd/UF+1HOUQ5q5+1
-	gEfuRCbGOfJKYMcKMcYD9Qh6vIujHpLc+21Vwcc/0Nto5ZpaSTEe799Gkjs4L9MsMJ1ldoUWxag
-	Pi7gxOahNlnP053B/R/IItH9kNpclOnd2VOAMJl6heUT/h/rnb0x9HDAbb2VBjZyrgonWTdwF3d
-	3SxEkKRRafTO3p44BD8X1BjA4sjvV0SP23MSJAL4s7LML8Z4ypI6s2Ib0elU3pLeR6jeMwzTt4y
-	7BUy72av4daeuhJ+FE4YOuu0lf5WFNcL/1aPVJFr3Rqm6IZkeoBcz3GA2Akq6BVk1wQGjJ/CV5
-X-Received: by 2002:a05:6402:5174:b0:66b:bc47:8ce3 with SMTP id 4fb4d7f45d1cf-6700a77d5e9mr52385a12.8.1775665366327;
-        Wed, 08 Apr 2026 09:22:46 -0700 (PDT)
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com. [209.85.208.47])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-66e033ba245sm5106165a12.20.2026.04.08.09.22.44
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 Apr 2026 09:22:45 -0700 (PDT)
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-66c304dbfd2so73508a12.0
-        for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 09:22:44 -0700 (PDT)
-X-Received: by 2002:aa7:da5a:0:b0:669:cbc5:db7e with SMTP id
- 4fb4d7f45d1cf-6700a57ee26mr52955a12.6.1775665364063; Wed, 08 Apr 2026
- 09:22:44 -0700 (PDT)
+	s=arc-20240116; t=1775665409; c=relaxed/simple;
+	bh=d7s3hrpf1KIsN/M7lWyW01HXZUuo6L5BdYFQrNspxtw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=So4UFhWxT8v341M7bf4+HGyVfFQGtf9mYUj/tkPH79EbcJ6yCHAXLupAB3Kh4vtoCNTlsXfo/HRK7OxO1mN3FvuyuAIE1XdfoYyFMxaltopu/kYEVjBt7VN6Hf03KD+Blj4iTCGl57CnTEtsz/i9zBk5mmeHsg48x88g4qnhbT0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V2Wrpp3B; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77FDCC19421;
+	Wed,  8 Apr 2026 16:23:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775665408;
+	bh=d7s3hrpf1KIsN/M7lWyW01HXZUuo6L5BdYFQrNspxtw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=V2Wrpp3BA3tWZ7wm6j/wz7KbPt/s8D8jiMocv1RxSGbKbvlwANn6Tkepqwu2ZC3P9
+	 SRCWyydWLJjw9J0O5TyhZIgnlKtva49GLD57dYLGjGL3osRiDcPx3g0tHmg/VvyjaO
+	 Xv07sl/1ABb7Ix48yT2cunHUl9UJ9NVPHBmPXwVpGBxDHeg2lO1epgrhfRNMDPIOyw
+	 AOt2CxRdDqfmNfPIEdJ8rLwDl7Gfmxi0PplbVbgUFGQ4moZRgFYA1q4V7IHJOS1p6/
+	 GK1+tb/2sP66cl3gcb/uPuZ77yxvMY3aBix2RmlcundvWMbzRo5LgnKmXs5Kis4Aoe
+	 blAJW6ZBqSL6g==
+Date: Wed, 8 Apr 2026 21:53:21 +0530
+From: Manivannan Sadhasivam <mani@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: manivannan.sadhasivam@oss.qualcomm.com, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, linux-arm-msm@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH v2 5/5] net: qrtr: ns: Fix use-after-free in driver
+ remove()
+Message-ID: <ygxq427xqsewzqz5ub62v4v2r4mt2rclilwfg3apynemew3m4k@oefumgql46nl>
+References: <20260403-qrtr-fix-v2-0-f88a14859c63@oss.qualcomm.com>
+ <20260403-qrtr-fix-v2-5-f88a14859c63@oss.qualcomm.com>
+ <0ab00cb4-8335-472d-b43e-3bbd99b41480@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <adZTGOjjJrVJOcT8@shell.armlinux.org.uk> <adZfTi3R6jtsjXx-@shell.armlinux.org.uk>
- <adZ9grUg71f518Fg@shell.armlinux.org.uk>
-In-Reply-To: <adZ9grUg71f518Fg@shell.armlinux.org.uk>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Wed, 8 Apr 2026 09:22:27 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wgvBPt8b204E49qUfK5F3otKzV==4t8Z=6_wXO6vgWqHw@mail.gmail.com>
-X-Gm-Features: AQROBzAZ_qhfjZYeQTD5IRVziYmZuTFOofH8RWcCNS0y3LUoXT4zBJ_T9EYFJb0
-Message-ID: <CAHk-=wgvBPt8b204E49qUfK5F3otKzV==4t8Z=6_wXO6vgWqHw@mail.gmail.com>
-Subject: Re: BUG: net-next (7.0-rc6 based and later) fails to boot on Jetson
- Xavier NX
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, iommu@lists.linux.dev, 
-	linux-ext4@vger.kernel.org, dmaengine@vger.kernel.org, 
-	Marek Szyprowski <m.szyprowski@samsung.com>, Robin Murphy <robin.murphy@arm.com>, 
-	"Theodore Ts'o" <tytso@mit.edu>, Andreas Dilger <adilger.kernel@dilger.ca>, Vinod Koul <vkoul@kernel.org>, 
-	Frank Li <Frank.Li@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <0ab00cb4-8335-472d-b43e-3bbd99b41480@redhat.com>
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[linux-foundation.org:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-276612-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-276613-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[linux-foundation.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[linux-foundation.org:+];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[torvalds@linux-foundation.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mani@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,linux-foundation.org:dkim,armlinux.org.uk:email]
-X-Rspamd-Queue-Id: 7BF0F3BEC81
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: DD3903BEC92
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, 8 Apr 2026 at 09:08, Russell King (Oracle)
-<linux@armlinux.org.uk> wrote:
->
-> The rebase is still progressing, but it's landed on:
->
-> c7d812e33f3e dmaengine: xilinx: xilinx_dma: Fix unmasked residue subtraction
+On Tue, Apr 07, 2026 at 05:33:55PM +0200, Paolo Abeni wrote:
+> On 4/3/26 6:06 PM, Manivannan Sadhasivam via B4 Relay wrote:
+> > From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+> > 
+> > In the remove callback, if a packet arrives after destroy_workqueue() is
+> > called, but before sock_release(), the qrtr_ns_data_ready() callback will
+> > try to queue the work, causing use-after-free issue.
+> > 
+> > Fix this issue by saving the default 'sk_data_ready' callback during
+> > qrtr_ns_init() and use it to replace the qrtr_ns_data_ready() callback at
+> > the start of remove(). This ensures that even if a packet arrives after
+> > destroy_workqueue(), the work struct will not be dereferenced.
+> > 
+> > Cc: stable@vger.kernel.org
+> > Fixes: 0c2204a4ad71 ("net: qrtr: Migrate nameservice to kernel from userspace")
+> > Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+> > ---
+> >  net/qrtr/ns.c | 6 ++++++
+> >  1 file changed, 6 insertions(+)
+> > 
+> > diff --git a/net/qrtr/ns.c b/net/qrtr/ns.c
+> > index dfb5dad9473c..c62d79e03d64 100644
+> > --- a/net/qrtr/ns.c
+> > +++ b/net/qrtr/ns.c
+> > @@ -25,6 +25,7 @@ static struct {
+> >  	u32 lookup_count;
+> >  	struct workqueue_struct *workqueue;
+> >  	struct work_struct work;
+> > +	void (*saved_data_ready)(struct sock *sk);
+> >  	int local_node;
+> >  } qrtr_ns;
+> >  
+> > @@ -754,6 +755,7 @@ int qrtr_ns_init(void)
+> >  		goto err_sock;
+> >  	}
+> >  
+> > +	qrtr_ns.saved_data_ready = qrtr_ns.sock->sk->sk_data_ready;
+> >  	qrtr_ns.sock->sk->sk_data_ready = qrtr_ns_data_ready;
+> >  
+> >  	sq.sq_port = QRTR_PORT_CTRL;
+> > @@ -803,6 +805,10 @@ EXPORT_SYMBOL_GPL(qrtr_ns_init);
+> >  
+> >  void qrtr_ns_remove(void)
+> >  {
+> > +	write_lock_bh(&qrtr_ns.sock->sk->sk_callback_lock);
+> > +	qrtr_ns.sock->sk->sk_data_ready = qrtr_ns.saved_data_ready;
+> > +	write_unlock_bh(&qrtr_ns.sock->sk->sk_callback_lock);
+> 
+> Sashiko says:
+> 
+> ---
+> Does this lock adequately protect against concurrent callback execution?
+> In the network receive path, __sock_queue_rcv_skb() typically evaluates
+> !sock_flag(sk, SOCK_DEAD) and invokes sk->sk_data_ready() locklessly,
+> without acquiring sk_callback_lock or being in an RCU read-side
+> critical section.
+> If a thread processing a packet fetches the qrtr_ns_data_ready pointer
+> and is preempted, could it resume and execute the callback after
+> qrtr_ns_remove() has already finished destroying the workqueue?
+> ---
+> 
 
-Well, that commit looks completely bogus.
+This is a legitimate concern. I believe adding synchronize_net() before
+destroy_workqueue() will ensure that all the RX packets are flushed before
+destroying the workqueue.
 
-The explanation is just garbage: when subtracting two values that may
-have random crud in the top bits, it's actually likely *better* to do
-the masking *after* the subtraction.
+> There are more remarks from sashiko:
+> 
+> https://sashiko.dev/#/patchset/20260403-qrtr-fix-v2-0-f88a14859c63%40oss.qualcomm.com
+> 
+> AFAICS they are pre-existing issues or false positive, but please have a
+> look.
+> 
 
-The subtract of bogus upper bits will only affect upper bits. The
-carry-chain only works upwards, not downwards.
+There are a couple of worth fixing issues mentioned there in the error path that
+I'll incorporate in the next revision. But for the issues not related to this
+series, I will defer them to follow up series.
 
-So the old code that did
+- Mani
 
-                       residue += (cdma_hw->control - cdma_hw->status) &
-                                  chan->xdev->max_buffer_len;
-
-would correctly mask out the upper bits, and the result of the
-subtraction would be done "modulo mac_buffer_len". Which is rather
-reasonable.
-
-The code was changed to
-
-                       residue += (cdma_hw->control &
-chan->xdev->max_buffer_len) -
-                                  (cdma_hw->status &
-chan->xdev->max_buffer_len);
-
-and now it does obviously still mask out the upper bits on each of the
-values), but then the subtraction is done "modulo the arithmetic C
-type" (which is 'u32')
-
-In particular, if the status bits are bigger than the control bits,
-that residue addition will now add a *huge* 32-bit number. It used to
-add a number that was limited by the  max_buffer_len mask.
-
-So the "interference from those top bits" stated in the commit message
-is simply NOT TRUE. It's just complete rambling garbage.
-
-Instead, the commit purely changes the final modulus of the
-subtraction - which has nothing to do with any upper bits, and
-everything to do with what kind of answer you want.
-
-I think that commit is just very very wrong. At least the commit
-message is wrong. And see above why I think the changed arithmetic is
-likely wrong too.
-
-It's very possible that the 'residue' is now a random 32-bit number
-with the high bits set, and you get DMA corruption.
-
-That would explain why this happens on Jetson but I haven't seen other reports.
-
-                    Linus
+-- 
+மணிவண்ணன் சதாசிவம்
 
