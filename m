@@ -1,139 +1,176 @@
-Return-Path: <netdev+bounces-276373-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276374-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2B85Bk8a1mkxBAgAu9opvQ
-	(envelope-from <netdev+bounces-276373-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 11:05:19 +0200
+	id oL4CIaQb1mluBAgAu9opvQ
+	(envelope-from <netdev+bounces-276374-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 11:11:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 646F73B9942
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 11:05:18 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9166B3B9A66
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 11:10:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E99BC302417E
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 09:03:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5F45C3015E2A
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 09:06:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60F8A39F18A;
-	Wed,  8 Apr 2026 09:03:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A65A4244661;
+	Wed,  8 Apr 2026 09:06:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b="gt//kcau"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="feoWZSg5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55B0F3AD510
-	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 09:02:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7EAC3AB27C
+	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 09:06:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775638980; cv=none; b=r5vZy20ku4DTBCDkVJhnuOMIKd31jm4My8ejdLGQ0f9qyzRzwaGMGSQ+sGer12aFw2XjggJLsTd4QZVpn589ZztgqJjFpgywpHi5EE+TLx30nbUBhZ1I/+MWnKB6VlAoMT68kekDtFWD6Rzp7sxNcx2chrezf30L2dCmGBUkgB4=
+	t=1775639184; cv=none; b=Vi7MvWyoFhS8buGaCMNDQqjxOEkaOGXNlRwdVIvQggCHLbT4Fu7lVyF+jEDNwkFtzH/49YEIIuyF4H9yezyUSyYYKZvGnx8+MQPV6hHnYn6oeww8kXEwsynEui+wY0RhOk5u/hi3YkO5SaSj4+FrtrOkcUv2+35slTsUJRu/I0Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775638980; c=relaxed/simple;
-	bh=5Wfzx0JvV5+lRKYwOJCGvqO/Gl5pYo/UtDK9cUzJ7/M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L4x4b9K1AIHYLeSkjrGxOGniMP20Ttnfz08mMT9x2IIgZP4BzG+LTI+OaE14vBdZK0w+WJzQNGskEUgYzY4LFMibZ/BXQOsEeGXvbThVj8xTRoTAznejP09M6a+WTHCUxNGZxPpTOl4syI7K4/FS4RiS52sgQpQG1n6maerR8zw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b=gt//kcau; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-488b8bc6bc9so16259295e9.3
-        for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 02:02:55 -0700 (PDT)
+	s=arc-20240116; t=1775639184; c=relaxed/simple;
+	bh=mdm06uitMSIygZ2FFukfM08Ps+ox3D4Zv39fmrbxrNY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=i+opw3/l7geoMwlYVUCwE4qNlwsvV0b7Q4axX8ER1f6+ncdkUMSMx2Hy6M4hKqbmXNB/WlvexbMxE+fp9j5c/tNUEhZWosEja3+L8McVHuHX3GxNtDtmg8DEDY63yFPrnpw1zRl6ucU5wauKVsY5WnxvTr9TahNPJMxhkf2oeqM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=feoWZSg5; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-488b0046078so31201715e9.1
+        for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 02:06:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20251104.gappssmtp.com; s=20251104; t=1775638974; x=1776243774; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5Wfzx0JvV5+lRKYwOJCGvqO/Gl5pYo/UtDK9cUzJ7/M=;
-        b=gt//kcauhKw2s1EKOxKxq2VyaPN4u4GwCIj2H55QO7N5/zBkYHu2+rYp/sln4GhD7l
-         DVr3Y854XD+k0H0MACpUOVlRqOso46HfSxnYpKPeJ8U1FpTey01lwXrgWBjmEv5tS2+Z
-         I4cr3qYXqAcde+pClFgmTpmzufrzejdbYdnbtEVOhnLH6TMkfT0Y7hdP5yXyBrJ9mme1
-         0iwLNYjXA4V+YHuECBhgGvJEEtP8ejTA58wqtk4TQLsW4lbNU1IQS7JOCnkZdgX4TWmr
-         dcml+VWqrIO7ghkq0NgKg5uE+WeslivrwNvWu+JQt+TjT/BQrM01b18AWVNMpkmkTPTw
-         cqHw==
+        d=gmail.com; s=20251104; t=1775639178; x=1776243978; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=NIhuu56MjNTiGSChY1cvm3H2MZijRdRaDUQH6s036E4=;
+        b=feoWZSg5P7kF6fv47qFKXPWQBO0DaaIXa0DCjqrqzw9KVM27JVjM7cHPTMTcFWpuUU
+         iNGwJFRxRMOUV3gyZhNyV8qBzXB61duaqBegKxlsdh+LeUSfMaKik0HyxiPCx3CEus8s
+         swh1/M0Q3BkAtyVp/4wH4knQe0sNB5qv4SZRqy2X9h64GHipaypAVd/YZn5oVjDoW6BN
+         LzG6BEoI0oWsGqzIR3AbM7SYC5QqVNLkbmVR4TdXA3S2QJfcxunwUH6lQZ0s2nDf8x0d
+         BrbpaD2svigGW7vHnpJkII3F4tz2ytDE13z1RU9Zo52suMdWNB3lsUwgeNLdSOuLCPoF
+         Ih0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775638974; x=1776243774;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5Wfzx0JvV5+lRKYwOJCGvqO/Gl5pYo/UtDK9cUzJ7/M=;
-        b=Cnt58QJtrqTlvGqvGN7m9p+7NTpyuJYxlzVfXeftyMoo+XJhhQxpuKkDtC60gbcQHe
-         XBSaHhYeTCvnyGfKXwvkl1pY6Zo+Fn3Ysge26E0k2ccXfITbRBnko70gWN9N7YF/NiOa
-         zDI6p0OdxuZpkkyjkkFn4NPoq8YoKmwZoFFp8p7PBWE8fowdyUBcA3feCROtYwgDSdm+
-         5InsgkPNIqtmIH6kVwJd9HRKyLGR6YZFw5H2J45PCCjHU1jhYHaYvXZSQ6QocslwFX4z
-         TEjJvqUezCI7IGVNj4Yd+Gs/kVoUBAYkMrzR3xrCXXnI/XEirxj8Pszwb7OBW7Wj5RxU
-         jR8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCW1REokipKK5KYneTq2y+LxkhtrQMewUuPAQz2JD7cju/JVW1iSrKZLAFW7BUgaYjQ+3nz/t+4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+ak+l1rD9Fj8nlg01/RGGFBaZiNJIMgDL5DMOc73NKhnIx7n+
-	UBPs7JgiRqODhNLEP47KTYxef2LfvXjDp1RXPL6S8HX3Dy/Hu87oZoq1GkhF1/Rv/pg=
-X-Gm-Gg: AeBDievWnjopUS1ZCZo6VeibQqElGRsSYpYj0xYQn6/uNnJ0KYRIkM0ipuGm5MzLVr/
-	iSTEM+i7xhzTSuSXeNVgzssftUw1LPS/R4FO/5Fvm1aUHQ74hn6q5ZlFQyhMnQeBiexG6LtIdLX
-	2HvlHyUSe1fcaTHauHCDAfmjzXFzwVpvSwcI7ITHn3alibSfnRoAtKOE4KdhDjMuFjNs5uGPK5a
-	DsMuTm+ZcFMGO5RhALHIneKf0ie8uNaZXIpZVWnSDtzs/DsFMxWIa/lof/roNy2ujVNJs+SSo76
-	92bDos673ugI6WXu5jELt8YUVSlvWNGbLj8j2ZUukIpxkI0u1s0k0rFl6n64qCqP/lXwBQfUtY/
-	JrCnMtCgqeVc0el++c0f/SHfcB0mKkatG6SRx5MX29bU7vFcrsOnzZ1eMDRnI9GWmD9ppKpPmyP
-	dCUOmLU9XgakyuZ4lr1nLko7ZwY8y8d+k=
-X-Received: by 2002:a05:600c:64cd:b0:487:1fbf:e0bb with SMTP id 5b1f17b1804b1-488996a1c9dmr293324265e9.6.1775638973594;
-        Wed, 08 Apr 2026 02:02:53 -0700 (PDT)
-Received: from FV6GYCPJ69 ([85.163.81.98])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4887e83e906sm700342285e9.8.2026.04.08.02.02.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Apr 2026 02:02:52 -0700 (PDT)
-Date: Wed, 8 Apr 2026 11:02:50 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Marc Harvey <marcharvey@google.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v6 03/10] net: team: Rename port_disabled team
- mode op to port_tx_disabled
-Message-ID: <6imn7whkj7rjg7ql57rlm6u2wv5bdt6a7oxihmyphfhtubht2u@yu7dubtqxy2a>
-References: <20260408-teaming-driver-internal-v6-0-e5bcdcf72504@google.com>
- <20260408-teaming-driver-internal-v6-3-e5bcdcf72504@google.com>
+        d=1e100.net; s=20251104; t=1775639178; x=1776243978;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=NIhuu56MjNTiGSChY1cvm3H2MZijRdRaDUQH6s036E4=;
+        b=P3uwPsQjh56lFsiZOCKTs0UdEuWQdJ2pPaCB0OGM+tlcKkFgjnan+/wXEQtfEOhpTF
+         BDc0r8ArGTUB/O6b/JMXe1B7GTETAMMGtGt4M6adNjfqi1LFwa10gNBgQFm5ZwaFrXVU
+         RUE9Wit+Ijv8EoTGpmTBZRsu820pzPW/rPb3P3flVS46KlDDmbL3hMAxtmCvJTeZ2axC
+         gxui5yPVRkDdU6TVEEeF+toUmcKXzXbOSA2ua8nlmfNoem9nD7oif1ns2mVz229Bt3/f
+         63b6ecm/lHa3pYHYNr6CG8yMXJ7ju9IScBMwKWhN+wUgc3LkoD5yh/XuEmFVRAMSLvGc
+         3R+w==
+X-Forwarded-Encrypted: i=1; AJvYcCWy2M6xw52fuV0cd42opY07rrUfBE/1j+JKmi35kFJLN/yrJZnp8a+BSjTAWlRpWX1Vt9U9TA8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx3alcy6vmjVgOIZH18H8wY7e7wJwhHyk1q5yAHlYkW1amYeOo3
+	Wnh+pWn7qdRz5FersHVBuyVXisX22NJEDY140VHjnEoFhWNEiiXQC5C5
+X-Gm-Gg: AeBDieuQM3JyK+mCk/m3+nV04gi4u6Z0Y2l8FPMy8HO9XzODDLXWrIonAsDv0EfcLft
+	r8JRL8jTZUStgRCz2BDfTREvqKMtsfuKMCM6JCU1lSwr3djE8oA4bwGwQqMzIyOtjKtdzPpRY92
+	8M3LdlCMcxv+aa20pLCX/tmfVeGWp1yvfMUeD/MVRg+yGD/C/O276rW9hfuP7yY/4TEle9P/2bD
+	Tc973bUdvLf++BD1wYrzsYU94urWZFEQAh+qD/UVMma6Zj/K8JPGJyNX8cDlmDzkLss0ieT9/lr
+	LOLLnY7lvlSO/5toa4MtI/9yHyDfD8bsnTDE6d5R5m9Ar8zjuqO0Et889HS246E9CwN3Qxl5aeB
+	xCBSXWnR7LJgIfpko1w4U3lf5ZTo8IFj1EuEL2dM8eX7WoPfMQw4VFHZKRabFKas0sbpbKrj0B5
+	ZyLiP1nypnhQGd9LNhfcLdnHc2uKUvIIkj8n+XjzydC7h9Dv6Fc1930CrWaztTJ8aCrBsMTNbHq
+	caEbMnD5UuvAmTDzbMqT/uYRFaipq1c2u+b6imVJTjtJiu0KJ8987Df1fE=
+X-Received: by 2002:a05:600c:4f4e:b0:488:a98b:b891 with SMTP id 5b1f17b1804b1-488a98bbd04mr227789945e9.3.1775639178483;
+        Wed, 08 Apr 2026 02:06:18 -0700 (PDT)
+Received: from ?IPV6:2620:10d:c096:325:77fd:1068:74c8:af87? ([2620:10d:c092:600::1:eaba])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488a952a03asm293928175e9.0.2026.04.08.02.06.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 08 Apr 2026 02:06:17 -0700 (PDT)
+Message-ID: <b340d088-a221-43db-b524-1f181152db3d@gmail.com>
+Date: Wed, 8 Apr 2026 10:06:23 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260408-teaming-driver-internal-v6-3-e5bcdcf72504@google.com>
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/3] io_uring/zcrx: fix resource leak and double-free
+ hazard in io_import_umem
+To: KobaK <kobak@nvidia.com>, Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <kbusch@kernel.org>, Ming Lei <ming.lei@redhat.com>,
+ io-uring@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260408065408.2017967-1-kobak@nvidia.com>
+ <20260408065408.2017967-4-kobak@nvidia.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20260408065408.2017967-4-kobak@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[resnulli-us.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-276373-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TAGGED_FROM(0.00)[bounces-276374-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[resnulli.us];
-	DKIM_TRACE(0.00)[resnulli-us.20251104.gappssmtp.com:+];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[asmlsilence@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:email,resnulli-us.20251104.gappssmtp.com:dkim]
-X-Rspamd-Queue-Id: 646F73B9942
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:email]
+X-Rspamd-Queue-Id: 9166B3B9A66
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Wed, Apr 08, 2026 at 04:52:22AM +0200, marcharvey@google.com wrote:
->This team mode op is only used by the load balance mode, and it only
->uses it in the tx path.
->
->Signed-off-by: Marc Harvey <marcharvey@google.com>
+On 4/8/26 07:54, KobaK wrote:
+> From: Koba Ko <kobak@nvidia.com>
+> 
+> io_import_umem() has two problems:
+> 
+> 1. When io_account_mem() fails, the function returns an error but leaves
+>     live pinned pages and sg_table in the mem struct without cleaning them
+>     up. The caller happens to handle this today via io_zcrx_free_area() ->
+>     io_release_area_mem(), but the contract is fragile.
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+That was the intention for the caller to clean it up, but in either
+case the function has already been rewritten. In general, it seems
+you based your patches on top of an outdated tree.
+
+> 2. io_release_area_mem() doesn't NULL out mem->pages after kvfree(),
+>     making it unsafe to call twice. Since io_zcrx_free_area() always
+>     calls it during teardown, any earlier cleanup call would cause a
+>     double-free.
+> 
+> Fix both: populate mem fields before io_account_mem() so
+> io_release_area_mem() can do a proper cleanup on failure, and add
+> mem->pages = NULL in io_release_area_mem() to make it idempotent.
+> 
+> Fixes: 262ab205180d2 ("io_uring/zcrx: account area memory")
+> Signed-off-by: Koba Ko <kobak@nvidia.com>
+> ---
+...
+>   
+>   static void io_release_area_mem(struct io_zcrx_mem *mem)
+> @@ -236,6 +242,7 @@ static void io_release_area_mem(struct io_zcrx_mem *mem)
+>   		sg_free_table(mem->sgt);
+>   		mem->sgt = NULL;
+>   		kvfree(mem->pages);
+> +		mem->pages = NULL;
+
+The entire struct io_zcrx_mem / area is freed right after,
+calling io_zcrx_free_area() multiple times for the same area
+is not allowed.
+
+-- 
+Pavel Begunkov
+
 
