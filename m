@@ -1,345 +1,161 @@
-Return-Path: <netdev+bounces-276369-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276372-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GM52JS8Z1mkxBAgAu9opvQ
-	(envelope-from <netdev+bounces-276369-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 11:00:31 +0200
+	id SNgzBlgZ1mkxBAgAu9opvQ
+	(envelope-from <netdev+bounces-276372-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 11:01:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id F11A63B985C
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 11:00:30 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id B44293B989E
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 11:01:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 86D173004C69
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 08:59:29 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 55ECF301910C
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 09:01:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2D2F38A703;
-	Wed,  8 Apr 2026 08:59:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F08F73AEF55;
+	Wed,  8 Apr 2026 09:00:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="iHWH5hbc"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b="XN0WAFx7"
 X-Original-To: netdev@vger.kernel.org
-Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11012002.outbound.protection.outlook.com [52.101.66.2])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D9D637883D;
-	Wed,  8 Apr 2026 08:59:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.66.2
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775638768; cv=fail; b=dkZd2TFdVCY5sN8yn3CRtAzwB9dno0P2GwsJf5wbOCIhM8wIt0g5s/4uQUi4NXHusUOsifUyc2ot+SFW3h8u+9vlIGKbt0kj7SDmbkJAHr2v3SrPMVyJ6ckq0r+wFK0LzFfiBR+ehPnyVTl45fY50jtaEv8uzWyYoWOby4Hyj7o=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775638768; c=relaxed/simple;
-	bh=C2Nc8PwvLNFAsL4DkRQ9WkuX41TbW0OdHI1bauC1Dy4=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=GpAZZnnEdJHOs0T/GqOH9mgkKib3XYrfTrYckaCykxPhG93Qw21HDSnD6xjo1R4+/D6WpfGor7dzcP2Pl8HH27rNzzUUg/lKo2HupV+ZhY7lJT/5GnpeRx3v50Ys4j08f2L8eu/rdGQr69h9eqfrRPQd56YdTg971SXtErIrXmI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=iHWH5hbc; arc=fail smtp.client-ip=52.101.66.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=rj9zBnmRgM6nhiH5ODMoYG6hvkZr6985JiuCEue8odSbrdIQsiYZQuR+0sl9mJszbwXrmtaz9041+dkUG5XWMVqV0tnw5oUiWDY8fSOPidHjyN0JbGkWBcJf1PQjY3kUQEMWO29TyCicqll4ZN8I6eRQDkOOkIW3qldaZlywzgDxL/wVgBIsubtTY41pzDgwVKXdiRzJ2FT8BMtMq/PZHFuLKgZXQ7S7FtlfkRNXiAbla2nlZPGydQqSvEXT9POy7HdjX2m6cskgOPhV4kXYShXssa7LnumNY94Qv2WzlqbRgOmYnbBCgDmCBjfWyXlDQ7sHT7we9OUGVMC/l8IxTw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Ht+rPhWyMe3UW5A+lG+keRfUcxvrk24jWY22nD6V3is=;
- b=QyQ8PrwnOLPFNgJCDuuq3TTJNrbfOJqVAU76MWUh5WaLUkj0M4J6lVVZmhh2f44lndUCaSrOLwOfoRS0g5R6D7NDYxb5H4WViZz2P+WXnVci1LLKc6QIsOM2x9QIIu8OxX9WuRXPrIslDbKSCijbbN/k8cQlQmJ1OULFMnJPWae7MQJlS68eZn0mYyaiftw+X7h8nkR7B/k2EUQkzA2QRmhAOO5aDKQeUBj0YD4yq9yxGqsAIGHLNMFFxne+q1erSFDU5oxrXJEj1BREk4vklj6Y1I7ewWTSAEFBaNq80zmVMSDnvPCjAiOpJHVQS60/SiAybzDNS6jl4+ngBgz5wA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ht+rPhWyMe3UW5A+lG+keRfUcxvrk24jWY22nD6V3is=;
- b=iHWH5hbcOLH6hYwe/qMaTjB5KM40+MH1/+qLwrKTO1btAJygHXhlCyDapIKBdu4eOsw+PV6mVpCc0Dq7NCcfDPXj7HsDFmU6+TK6vz1HFByovx98N61bFzwRelF/TmkHIUwQ3s3WRGyY8OBFV0tHRQAErPaJHfLpbl/5IaDcyg91DbxgfTNBf9oNI815HM3NnadGPgjnqmGPdCfuTcBUR+iRdDKR2/Zznyd0XzXsNdbeKB3FplAvFBI/iIPr2NwMlbg0aCU58R4ivmRbp63kFXYAOKr2vbTHi7DdaIXf6IcyJ6aRDsHMykaEv14pAgY7uGlQTOoVyTd7TUK3qB1l7A==
-Received: from AM8PR04MB7284.eurprd04.prod.outlook.com (2603:10a6:20b:1dc::8)
- by AM7PR04MB7157.eurprd04.prod.outlook.com (2603:10a6:20b:118::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.18; Wed, 8 Apr
- 2026 08:59:24 +0000
-Received: from AM8PR04MB7284.eurprd04.prod.outlook.com
- ([fe80::9cd6:51bd:82b:98dc]) by AM8PR04MB7284.eurprd04.prod.outlook.com
- ([fe80::9cd6:51bd:82b:98dc%5]) with mapi id 15.20.9769.014; Wed, 8 Apr 2026
- 08:59:24 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: Jakub Kicinski <kuba@kernel.org>, Vladimir Oltean
-	<vladimir.oltean@nxp.com>
-CC: Claudiu Manoil <claudiu.manoil@nxp.com>, Clark Wang
-	<xiaoning.wang@nxp.com>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"robh@kernel.org" <robh@kernel.org>, "krzk+dt@kernel.org"
-	<krzk+dt@kernel.org>, "conor+dt@kernel.org" <conor+dt@kernel.org>,
-	"f.fainelli@gmail.com" <f.fainelli@gmail.com>, Frank Li <frank.li@nxp.com>,
-	"chleroy@kernel.org" <chleroy@kernel.org>, "horms@kernel.org"
-	<horms@kernel.org>, "linux@armlinux.org.uk" <linux@armlinux.org.uk>,
-	"andrew@lunn.ch" <andrew@lunn.ch>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "devicetree@vger.kernel.org"
-	<devicetree@vger.kernel.org>, "linuxppc-dev@lists.ozlabs.org"
-	<linuxppc-dev@lists.ozlabs.org>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "imx@lists.linux.dev"
-	<imx@lists.linux.dev>
-Subject: RE: [PATCH v4 net-next 10/14] net: dsa: netc: introduce NXP NETC
- switch driver for i.MX94
-Thread-Topic: [PATCH v4 net-next 10/14] net: dsa: netc: introduce NXP NETC
- switch driver for i.MX94
-Thread-Index: AQHcwQGr6p6cQRIC50ifKdNlYVQM5LXMjU4AgAhWcVA=
-Date: Wed, 8 Apr 2026 08:59:24 +0000
-Message-ID:
- <AM8PR04MB72840DBFC7F3FD578DFF6AF8885BA@AM8PR04MB7284.eurprd04.prod.outlook.com>
-References: <20260331113025.1566878-11-wei.fang@nxp.com>
- <20260403011738.1795644-1-kuba@kernel.org>
-In-Reply-To: <20260403011738.1795644-1-kuba@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: AM8PR04MB7284:EE_|AM7PR04MB7157:EE_
-x-ms-office365-filtering-correlation-id: 5791bda8-1944-403c-b2a4-08de954d21c1
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|19092799006|376014|7416014|1800799024|56012099003|22082099003|18002099003|38070700021;
-x-microsoft-antispam-message-info:
- H3lByri3K01dHqYAJkes3Nceqs4YTmqCDt3PjB2y74tGOIYMl1170Ri5JOh2pJFAsAFhKwDlVMTYuULXrRDYpAbVl1/w0LwPwmzZW0hJTyCbKAKefh4NjFsM9SINlpEksJy1HepZRtld0wTmJDZF0M+lK8yWMV3NlkPwGChJlFLzDtUGdCteEX34xs+qXYMSjiY6Ylqynb/XeA6WAaBMQVBkxaVkx2AEKYETXYQdQimKsrFK1y/ZYY3IiqQrhKS+KpVluOd7etcSP2wrNIM7ss9hozVa5V4ZFzPNbFiGsCmcV07+dARm7R03M3WJ5IN8GwpMQoYz6x1OnC8R41moCYp+apAnOoqc9t2rLhKd0FkUj6SCGbhQ+QoiMYcpqH8dpBzYCIbAWuktlbbhlaIGKRixYM1SxK+7eGcM863H/KCaXlN9BB/iQ1vJ08jnO017mHypwupGh/1tkLbVgcyPIdkP7wXJiCBR+cO8nj9GqcLqmmQ7zdUvE/MiFlmR7krleu2lUs02at2qyIpLkNzY8BOng9XJd646ruF7lQVsS2clu+OJKn5rFntFw/Fq3Cvp2MssRsia2cAqF+7p/x6hx65cD2Yo8lFhmbM097VPg3KLAunzMffMoLF7Kz2H0VCIm1FE9/KATslv0PAjwXZms/IibhVSzLR5HLcLV9kuetWKlPn8AR9QXKKmJNaetB4/SBG+Yyl77CvrNUczeJ3xxny44nV/YOE0ygDFoyLm3a4vzsYnxP/Q6IVvy0L9ZCxVhexuwoAigDrP6Voe51ZyMLu5IdnInDI5RXGWqRUBwpc=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7284.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(19092799006)(376014)(7416014)(1800799024)(56012099003)(22082099003)(18002099003)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?gVqnNiy8ekPLW97cOSz16ZHD8BjO5aLP8VB5V+1Obe5mNRKi7lIMHQpg5X7S?=
- =?us-ascii?Q?bpoturLjD26QB503g+AjxCMbsrzhf6PsuqO7Y7cLqEWN0jotIlKLCxANMg++?=
- =?us-ascii?Q?vdPzDhfZuRIxml4HTpIp89ARLR9phsnhQIj52zmjjHpKnP119uMCMwwAnMjp?=
- =?us-ascii?Q?SYHaLxJLH7tW9NtLxz/9jCgaKKcfTWC0j2LtHfZiBNwdw7rG6JyAvdLgToAW?=
- =?us-ascii?Q?rvVdd+mwTWCFOR8wqTvNYNl5QhBstBH0DBQ4ye6F7JoaPLpg3+0eHWk8i1lR?=
- =?us-ascii?Q?Id1oE5rMmZL4gbgdPe+jTlb1V+7eD8mb7UqJ/UPJ72Oeb0456E1uYHAnBROR?=
- =?us-ascii?Q?oaTvSZ3Nagq0Gi/LAbnAcAXjQc7Noo/h+RE948jahsVxTZZVMXVA5Yet/jR1?=
- =?us-ascii?Q?xSc86Ia/aYvQpTIsk/zALM+/RiP2QWElN+3w4OWEeLbVZ9aHhgofMOSZWP2K?=
- =?us-ascii?Q?7T6mRCf/Sr9usqpgc9yzuJVQDaTrOsVpKJZLGfprpMeiyj8e6YrkoW2aWEnl?=
- =?us-ascii?Q?Cm1hbJ/a43XsNH/TyGa7Rx5wbdkcdTp7QlWnxJRh9h3eGe53zikncrT38GeU?=
- =?us-ascii?Q?QgDLwwzchhqU/XKyGd0xfI5U3JoaF/goTketzP/2XrucEBTFW/7Xbbvt1PNS?=
- =?us-ascii?Q?wnIMVFUheS1TxCgnwNjfEJp/VNd3Kz4So+oDDd65JxxdgyMmW3z78IWHLB9a?=
- =?us-ascii?Q?Byf0lQoaX9EnUxzIohBONo+FK5ENdb5WQ7r32EM5Y//aOMMzgMkZmwLSkIjv?=
- =?us-ascii?Q?eQiNW81ulh6nHq1uLYOY6aTICNFsXkXjKTZ5wixpcKbRoPx+n0/5Mq6I/pau?=
- =?us-ascii?Q?q6DQ0AsxBaeGQH4Y+ZRLq3mTZqBNjHOs+xgs0Nbubqlj8n3zq0mVJshWSetN?=
- =?us-ascii?Q?XJG65DbR5yc9AEcDvucrxf4w9uZdSIs9Uf4mDSHbgUVlk9iKbk1lRMZpMEGL?=
- =?us-ascii?Q?CaamZYmq9OwbKAgCu/cU6KGcLgTmpGrirEtfTh5Vxov/s1ymE9BGLAMDoDYQ?=
- =?us-ascii?Q?niNDfj608jn+P4ODXNNwo/DrAfk0OdlkLBsaEZY9wovW3Vioj8igfWo1Mcrb?=
- =?us-ascii?Q?vivwe+HUHUcpmnSC8ULlcenaSkEh8YdEFu0yadJ3IXueHAeeeY/2rYJF59po?=
- =?us-ascii?Q?SuD1BUORF9PEAkAHaw+5ZMWojeiQjz+WgbRgT+ZwrGT9ZhXNqLC28egxMaMH?=
- =?us-ascii?Q?3jrIclUAHU0QRx+G8NNfINwJLYdhc3apPqzADVQY9Ft37LYe2Rk274+vkpQj?=
- =?us-ascii?Q?rQxVaRfZfuJ3RKWB4s0fHoxXE/BjjMxAyx1H3m7eMMNNKtxndwJOldbQzODi?=
- =?us-ascii?Q?rO1u4My2ZGApIW+Jh7YDWryLoAf1mI0xeJhDjJRiYh1zrzHOrDfmUnApZwTT?=
- =?us-ascii?Q?lVtqE2rV5JhHJe/7wSh0sbKSdNb0slAXH8fKaLxB6zuCdi9p5rVW3sbsdSDI?=
- =?us-ascii?Q?WHAyg0+1bi02UyvTVL2H8AebmHrTwpX13U6zxH2xzlpNj8r+g3mOI5vAD0A9?=
- =?us-ascii?Q?nN9BGuEVzkqjogpL7c66IeJVWILkSszs7voayg+OJnlDvZ6Mw9duT9DV07J/?=
- =?us-ascii?Q?A8/5N5fTXZzHqW6dT1DZGHkWrKRnT00lkVTJiMeyVJPZHzPFc0ULxSPhaDvT?=
- =?us-ascii?Q?R5/fZgBzyHwYGUKqChsOTiCTOyTMvUa0A23/XF5qNWOBWi2uSduGvu0srGG8?=
- =?us-ascii?Q?1GzdXa4FytF+YlVFbRyGgGxS57m1vl/oZ1HRH+qnsEvmL9DU?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04B0E3ACF06
+	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 09:00:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775638856; cv=none; b=L/pqU0TfnTSySV7Q8omz0hBy9nfg25tyqxPjSX7zH5vOad2Z6lERrkzpXjCFkpwDQ6kcVD6ThGNatt4LhJVOoJjuWLZS3aPMZp95TUN2anDJKgYsbdPbyIoAtJeIkAsrEE2bnIb2pzJJdoWHFwAcoh6ybb0CT1j0qSW7AIL8yTU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775638856; c=relaxed/simple;
+	bh=ELi/SO9fCpI1hT2A641r7hbEx4I3MBwqp1WHI9r62rw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=p4w29sa0OrEur+LFPXo97ybNkR3T+FJa2DJCoyphC67ORihbesoE+TjYYvtyNQpGrWGg5S6tw3bKZJ3Ru+ExLj9mrzqbIZsS0t0pRBxPNi2SSEqOsauCBzSG/dVL6mZfpXo04mhnbN7NuzwgKUZtwL4SqenPAXH7F4qK0cFfo0A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b=XN0WAFx7; arc=none smtp.client-ip=209.85.221.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-43ccda008cdso386170f8f.0
+        for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 02:00:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20251104.gappssmtp.com; s=20251104; t=1775638850; x=1776243650; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=ELi/SO9fCpI1hT2A641r7hbEx4I3MBwqp1WHI9r62rw=;
+        b=XN0WAFx7iG2ftBhZlqE8YxdKg5MkMfcXVGxvTiQAZvedNftcT4gpsHai3OmsSWnqC6
+         oksBoua+/JA6huk1vAdcKfHnXxlrm7cR/RRY91thyWtBZ8WD3WIUW+CC2hH7k4pmbZ0W
+         QVLaElUTxH1QLJeH2TAs//CHuhlN5YZsA5Ffd2LLic9JhESvMlJLJ2PfvnHHYtdT8hq4
+         EWH39QXNg7WcP+YhBiI82SmNTJCbuxHUX01cWNORucglEV7VnOK5MYL0c2vTU0hPi8cc
+         D8cR6bRrA1g0AjI8Ucirtsp/I98dzAD4sPjv0K2Uf6+etneJVOML4BsawVcZYjXqlf1L
+         Veag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775638850; x=1776243650;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ELi/SO9fCpI1hT2A641r7hbEx4I3MBwqp1WHI9r62rw=;
+        b=M4KKZINhmDeFpGQfc3JnowSC/FQrq91+9KgAsz4gXlSdcR3NwkLLDxzlW8RN15QRjw
+         yTkHrDJNFwRBNxu3jIcLZhgC8mn9qQqJW+Fq4Zl5HLGdYhLP09uTU+z1G9wa+0wPkK+O
+         uJJFsCOo3pfM+WTe/L2NYmBnPSbJ+fKEhOPnXvqwArZZJfjQ+n9Nn1ORQ85gsi18cK8s
+         lTuaFLnIiA08mGmqPySafcZcnsdyRNHFvqRJrKOnAJLYH07Flw/zg+mNAw+VId4KwtZl
+         W4UQQCPZxuiUbTPYoEJD4GDEE0/bef3mGu8mJp7ZkKVkMq6iqJyBdNi4C7cTzY8fuFQQ
+         9kjA==
+X-Forwarded-Encrypted: i=1; AJvYcCUE5ZG1WtjXO2Ipy9GpnlU3BkqSLeBROyGvZ78JTVYYi+7PjmLgs8TX+7ouHj+MHv9BcwqT+Eo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzqrkF0JV/qRhNQcv6tSzMANa/PX8gXUS4xkPXAF8JJUzXl6icC
+	5ElX7Z4zyPWDmRh4gE0l9Xmm5ZFv/yfsKTxIS8DQmMBqVIv/VagizS0eXak20mjp6hDLCraMxax
+	+hlt9
+X-Gm-Gg: AeBDiesu5JemZxyAg03Zd/Ibby8tAGriFW7Ha2KxNo+rnVwxhVEI60gUulytWeTaDSx
+	XlGIjoCFSluqi34kVrSFnv1BgvSm24XoH5Iceu3rmjKJYYp54N5b2KEBcrS68urXnklbBhncGfR
+	lrw2iDowVO0/GWt7/9z6XcsgRixfRp3UIRbvFeyN0ki+uoCZ3FhUGOzg3wv2Sn517Oeo6SN9uSx
+	Yn838F9oq7G2gQHV5Lkse/PkkYqmVbQKCrdZG7lev6tv7e4bf6OH7lIWiBIKEY79smMrTONTs9X
+	GTA0rKw9EIDB+bAPDdYubDOsmW9yeIgmeAD5hHFjYx6EFnVxVrDSTC49MkHHdEsLO75jSzhsOZc
+	xM8GBAt3II9Bfaq8uOwvmQk+S9QT8wirw68ArHj7bwSl0bvHN5i+ytt3muDYfP4ztCuXnkkqF+v
+	I8iW2lUicF8ZIApoZy8ZrRyyzozTRvv7Q=
+X-Received: by 2002:a05:6000:2384:b0:43d:384a:9e96 with SMTP id ffacd0b85a97d-43d384a9f5amr19228181f8f.4.1775638850006;
+        Wed, 08 Apr 2026 02:00:50 -0700 (PDT)
+Received: from FV6GYCPJ69 ([85.163.81.98])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43d1e4d2738sm58262922f8f.24.2026.04.08.02.00.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Apr 2026 02:00:49 -0700 (PDT)
+Date: Wed, 8 Apr 2026 11:00:47 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Marc Harvey <marcharvey@google.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v5 00/10] Decouple receive and transmit
+ enablement in team driver
+Message-ID: <iuhx4kkkftjx52y5qo7w7p6rbxqakq2eu74r66xaepd2p2khjh@kdhljd2c2bpm>
+References: <20260406-teaming-driver-internal-v5-0-e8a3f348a1c5@google.com>
+ <utlz3oebjyd4lqp5pd4qdbth2kywxo4hrlrnwcxsx3br76fwfg@vy3tx5f3lv32>
+ <CANkEMgn80UM7+mymVm21Q8yszgVeh029tvO+kHqmLGmf-2MU5g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7284.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5791bda8-1944-403c-b2a4-08de954d21c1
-X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Apr 2026 08:59:24.3946
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: qyr/n6eqJphGwf+gh1rqMMdQhcf/yhx9r1wV2a2jtbKrmgD4Dx3maGjZKGDaTWyVh2aQhuTfZVf84i3uqRVRlQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR04MB7157
-X-Spamd-Result: default: False [1.34 / 15.00];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANkEMgn80UM7+mymVm21Q8yszgVeh029tvO+kHqmLGmf-2MU5g@mail.gmail.com>
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[resnulli-us.20251104.gappssmtp.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-276369-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[nxp.com,lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,gmail.com,armlinux.org.uk,vger.kernel.org,lists.ozlabs.org,lists.infradead.org,lists.linux.dev];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[wei.fang@nxp.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-276372-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[nxp.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	NEURAL_HAM(-0.00)[-0.998];
+	DMARC_NA(0.00)[resnulli.us];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RSPAMD_URIBL_FAIL(0.00)[resnulli.us:query timed out];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[resnulli-us.20251104.gappssmtp.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,AM8PR04MB7284.eurprd04.prod.outlook.com:mid,nxp.com:dkim]
-X-Rspamd-Queue-Id: F11A63B985C
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B44293B989E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-> > +static int netc_init_switch_id(struct netc_switch *priv)
-> > +{
-> > +	struct netc_switch_regs *regs =3D &priv->regs;
-> > +	struct dsa_switch *ds =3D priv->ds;
-> > +
-> > +	/* The value of 0 is reserved for the VEPA switch and cannot
-> > +	 * be used.
-> > +	 */
-> > +	if (ds->index > SWCR_SWID || !ds->index) {
-> > +		dev_err(priv->dev, "Switch index %d out of range\n",
-> > +			ds->index);
-> > +		return -ERANGE;
-> > +	}
->=20
-> Does this check cause the probe to fail unconditionally for standard
-> single-switch topologies?
->=20
-> The DSA core typically assigns ds->index =3D 0 by default for the first s=
-witch.
-> Because !ds->index evaluates to true for index 0, this setup function wil=
-l
-> always fail unless the dsa,member property is explicitly overridden in th=
-e
-> device tree.
+Wed, Apr 08, 2026 at 02:12:35AM +0200, marcharvey@google.com wrote:
+>On Tue, Apr 7, 2026 at 4:55 AM Jiri Pirko <jiri@resnulli.us> wrote:
+>>
+>> Mon, Apr 06, 2026 at 05:03:36AM +0200, marcharvey@google.com wrote:
+>> >Allow independent control over receive and transmit enablement states
+>> >for aggregated ports in the team driver.
+>> >
+>> >The motivation is that IEE 802.3ad LACP "independent control" can't
+>> >be implemented for the team driver currently. This was added to the
+>> >bonding driver in commit 240fd405528b ("bonding: Add independent
+>> >control state machine").
+>> >
+>> >This series also has a few patches that add tests to show that the old
+>> >coupled enablement still works and that the new decoupled enablement
+>> >works as intended (4, 5, and 10).
+>> >
+>> >There are three patches with small fixes as well, with the goal of
+>> >making the final decoupling patch clearer (1, 2, and 3).
+>>
+>> Looks fine to me now. Do you have libteam/teamd counterpart?
+>
+>I don't see a need for this to be used in any of the teamd runners.
 
-As I mentioned in another mail, we added the 'dsa,member' property to the
-netc switch DT-binding doc, specifying that the 'member' (switch index) val=
-ue
-cannot be 0. And 'dsa,member' is a required property for netc switch.
-
->=20
-> Could the driver translate the hardware ID internally, for example by wri=
-ting
-> ds->index + 1 to NETC_SWCR, rather than forcing this hardware-specific
-> restriction onto the software DSA index?
-
-The current approach is based on Vladimir's suggestion. I need to confirm w=
-ith
-Vladimir which approach is better.
-
-Hi Vladimir,
-
-What are your thoughts on this suggestion? Is this approach better?
-
->=20
-> [ ... ]
-> > +	for_each_available_child_of_node_scoped(ports, child) {
-> > +		/* If the node does not have phy-handle property, then
-> > +		 * the port does not connect to a PHY, so the port is
-> > +		 * not the EMDIO consumer.
-> > +		 */
-> > +		phy_node =3D of_parse_phandle(child, "phy-handle", 0);
-> > +		if (!phy_node)
-> > +			continue;
-> > +
-> > +		if (!netc_port_is_emdio_consumer(child)) {
-> > +			of_node_put(phy_node);
-> > +			continue;
-> > +		}
-> > +
-> > +		phydev =3D of_phy_find_device(phy_node);
-> > +		of_node_put(phy_node);
-> > +		if (!phydev) {
-> > +			err =3D -EPROBE_DEFER;
-> > +			goto out;
-> > +		}
->=20
-> Could this logic cause an infinite probe deferral loop for ports sharing =
-an
-> internal MDIO bus?
->=20
-> The netc_port_is_emdio_consumer() function assumes any port node without
-> an
-> mdio child is an EMDIO consumer waiting for an external controller. Howev=
-er,
-> if multiple sibling ports on the same switch share a single internal MDIO=
- bus
-> defined under one port, the other ports will lack an mdio child node.
->=20
-> This would cause those ports to be mistakenly treated as external EMDIO
-> consumers, calling of_phy_find_device(). Because the internal MDIO bus is=
- not
-> registered until later in netc_setup(), the PHY device cannot be found, a=
-nd
-> the driver returns -EPROBE_DEFER.
->=20
-> Since netc_setup() is never reached, the MDIO bus is never registered,
-> causing an infinite deferral loop. Could the driver more accurately ident=
-ify
-> whether the PHY belongs to its own switch before deferring?
-
-This case will not be true, from the hardware perspective, the switch ports
-do not support share a single internal MDIO bus defined under one port.
-The internal MDIO bus of a port can only access its own external PHY. So
-a switch port must either use EMDIO to access its PHY or its internal MDIO
-bus to access its PHY.
-
->=20
-> > +
-> > +		put_device(&phydev->mdio.dev);
-> > +	}
-> > +
-> > +out:
-> > +	of_node_put(ports);
-> > +
-> > +	return err;
-> > +}
-> > +
-> > +static int netc_switch_pci_init(struct pci_dev *pdev)
-> > +{
-> [ ... ]
-> > +	regs->base =3D pci_ioremap_bar(pdev, NETC_REGS_BAR);
-> > +	if (!regs->base) {
-> > +		err =3D -ENXIO;
-> > +		dev_err(dev, "pci_ioremap_bar() failed\n");
-> > +		goto release_mem_regions;
-> > +	}
-> [ ... ]
-> > +static void netc_switch_pci_destroy(struct pci_dev *pdev)
-> > +{
-> > +	struct netc_switch *priv =3D pci_get_drvdata(pdev);
-> > +
-> > +	iounmap(priv->regs.base);
-> > +	pci_release_mem_regions(pdev);
-> > +	pci_disable_device(pdev);
-> > +}
->=20
-> Does unmapping the memory here introduce a use-after-unmap issue when the
-> MDIO bus is unregistered?
->=20
-> The driver registers the MDIO bus using devm_of_mdiobus_register(), meani=
-ng
-> devres cleans it up asynchronously after the remove function returns or w=
-hen
-> probe fails.
->=20
-> However, in netc_switch_pci_destroy(), the driver explicitly unmaps the P=
-CI
-> I/O memory via iounmap(). Since netc_switch_pci_destroy() is called
-> synchronously inside the remove function and probe error paths, the memor=
-y is
-> unmapped before the MDIO bus is unregistered by devres.
->=20
-> When devres eventually unregisters the MDIO bus, it detaches PHY devices,
-> which often perform MDIO transactions during removal. Because the
-> underlying
-> memory priv->regs.base is already unmapped, these MDIO read/write callbac=
-ks
-> could trigger a synchronous external abort or kernel panic.
->=20
-> Would it be better to use pcim_iomap() to tie the memory mapping lifecycl=
-e to
-> devres, ensuring it outlives the MDIO bus?
-
-Great, I will pcim_iomap().
-
+Why do you need this then?
 
