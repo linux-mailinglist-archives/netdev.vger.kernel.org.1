@@ -1,263 +1,184 @@
-Return-Path: <netdev+bounces-276410-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276411-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aLuZMzgl1mklBQgAu9opvQ
-	(envelope-from <netdev+bounces-276410-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 11:51:52 +0200
+	id yMdDCVQn1mnqBQgAu9opvQ
+	(envelope-from <netdev+bounces-276411-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 12:00:52 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C9613BA246
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 11:51:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9965B3BA338
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 12:00:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 09324301E20A
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 09:51:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9220C303DABE
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 09:59:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCBD03B2FEE;
-	Wed,  8 Apr 2026 09:51:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1095E37B400;
+	Wed,  8 Apr 2026 09:59:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="2eHSP7u5"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="RI9k7CCA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1D983AE713
-	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 09:51:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E8E73AD51F
+	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 09:59:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775641909; cv=none; b=Xb3FM+TzM1YYhyFn13n478qETGAYyuvUfOzUGvlOYneNf19i/ciaGJPUyyZwSjGz2iBKAfwLhClMS+jqEF4iWR+50hCojOwX6oSwqWPYLababa1sbwGLTHWDqJMmo3Nt27wNi3REjGZQyCtuXAo37JGAA/d0ZQIWgycSL1CsZcw=
+	t=1775642379; cv=none; b=gt2NbHx55mV94ab7xeXwJWZwq/mWgt80myA1R9jXjfuwaHxRbmVtwxdNNGZFrsNGS0hp900fyB1mmuOuW7ju6NJ/LAWK4clHvlczB9rWoUQEEggt3QmPmWsMcQ9FxJXPv8NFwQLJ1rb09yryzLy8KPU1OJVpKZzyUJKqW/do08k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775641909; c=relaxed/simple;
-	bh=sIl9ADyswSdUdacRGGk2RRCj/IYAwfc16ampEM29o2c=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RTvIpjvM3dqrCc8jAjMbhN15MnyilllxK4O1NnmYrGGRNOaN1JnR8K4ku5JI6kFHnoYsDkGSO1+fuNPhvDUaRPjzWFb6uM4qrR4cB2c5q5x/hz7B4fcvDCYTiTssAjGsUXaqUSjXw7pQ1yP1Q+iI1jdcWbM1RjMRCkuq3Jj9MQk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=2eHSP7u5; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id A191DC5B1AF;
-	Wed,  8 Apr 2026 09:52:10 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 68095603CB;
-	Wed,  8 Apr 2026 09:51:36 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 3715210450D76;
-	Wed,  8 Apr 2026 11:51:28 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1775641895; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=AmTCxSUmYlr6lmCkhB/kE8XBo7O2sT9ZgNN/59oCM+0=;
-	b=2eHSP7u5yZSMunGqu1M9US2MEreqoTTZQnCKN2nSTw6tao6hEAuTzoV1MgTZIQfEevJlWL
-	bftxbi/JNX9X0KFjGMAk/qN2m8iN3UL+uErPLJQjCX9mT+o29aAeDhp9z2yV08WJkENtwv
-	IO/tQUDTic/6NurEgjP4aQOA5RSRQ/X0/N3dp1zks4BpGtSBmP+ZOO72UaSYV9m9OeWLbM
-	rYqxEMLLMTtCFvOlR2RLk5KcjLJ9hrr9u+SGBbxvzD8fNZ1+TuyUAg/A1/rsyn865Tt1B4
-	47HtusqBF4jxOZc8mnU7GZL1WU37lshuMd2GfRFmPFlpIiHemNOW+U6c5tcRBw==
-Date: Wed, 8 Apr 2026 11:51:26 +0200
-From: Herve Codina <herve.codina@bootlin.com>
-To: Daniel Machon <daniel.machon@microchip.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Horatiu Vultur
- <horatiu.vultur@microchip.com>, Steen Hegelund
- <steen.hegelund@microchip.com>, <UNGLinuxDriver@microchip.com>, "Alexei
- Starovoitov" <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- "Jesper Dangaard Brouer" <hawk@kernel.org>, John Fastabend
- <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, Arnd
- Bergmann <arnd@arndb.de>, "Greg Kroah-Hartman"
- <gregkh@linuxfoundation.org>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <bpf@vger.kernel.org>
-Subject: Re: [PATCH net-next 00/10] net: lan966x: add support for PCIe FDMA
-Message-ID: <20260408115126.5529c823@bootlin.com>
-In-Reply-To: <20260407132016.4cfivs24ljqneyu7@DEN-DL-M70577>
-References: <20260320-lan966x-pci-fdma-v1-0-ef54cb9b0c4b@microchip.com>
-	<20260323155204.0321db13@bootlin.com>
-	<20260323172640.2669232d@bootlin.com>
-	<20260323194059.jjphkep4teq5rzbc@DEN-DL-M70577.microsemi.net>
-	<20260324090752.0799acb1@bootlin.com>
-	<20260326154833.jp6rx5x2rlpmwrg3@DEN-DL-M70577>
-	<20260327113337.0368eea3@bootlin.com>
-	<20260407132016.4cfivs24ljqneyu7@DEN-DL-M70577>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1775642379; c=relaxed/simple;
+	bh=HwJsmwGt/9wej05p8C2A/lovpKEZ89SyajICcOLt5LM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=W1uZ7ZQNUMXjRbzoYtIPzsh8HcXhPAuTUSsOMqjhjGLX8jSZHLfoK3ksptmljl5w0x1Bbe3F098lgtEogAPITbnQusb057bROGYw3ycwMMAWkPQY+wHnxYsEQCn8JYb7zR2aAeCoybvfYh0GsGcItAB31QNO29ufiqdNHrH2Sao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=RI9k7CCA; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by mx1.secunet.com (Postfix) with ESMTP id 964FF207BB;
+	Wed,  8 Apr 2026 11:59:29 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from mx1.secunet.com ([127.0.0.1])
+ by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id BWmoPhqxZeHA; Wed,  8 Apr 2026 11:59:29 +0200 (CEST)
+Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.secunet.com (Postfix) with ESMTPS id 0C36D20660;
+	Wed,  8 Apr 2026 11:59:29 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 0C36D20660
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1775642369;
+	bh=wUq1GQIuyPsbmiJInVKHsGqLTvKrNmeZr1J9v17Pt4c=;
+	h=From:To:CC:Subject:Date:From;
+	b=RI9k7CCAGExOFelLjQXIYvCC3dANXh38mEEnWskqAVmhekeyLS+eS/zfnyy5r4MdC
+	 Yq+lWNbtFYgz0rMhmNXkYvOicG3g6iZKJBlUUrPWJq5sHAHTNHZs9qiAwS6WM9Qh8K
+	 827YNd1YM9Ey3VzNc3Yzjp94goJd2m1otF5Qv63+quqd8+lImeyhsgzKv8SyzF2KAm
+	 QNKWXxmjvfDkH7dFlFqcgYV3F2deWMSbUMDtl+khJvCH9aEiZHdSJK6kfZciDM2TWx
+	 vGXKE+zIS4gPOoQ9IPurpVXjk4eaSZ2+7XJeGmgRxgDLt6t3XMUsiqVfClYgXDQtyw
+	 LP0sOV2S99U7A==
+Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Wed, 8 Apr
+ 2026 11:59:28 +0200
+Received: (nullmailer pid 256594 invoked by uid 1000);
+	Wed, 08 Apr 2026 09:59:27 -0000
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
+CC: Herbert Xu <herbert@gondor.apana.org.au>, Steffen Klassert
+	<steffen.klassert@secunet.com>, <netdev@vger.kernel.org>
+Subject: [PATCH 0/8] pull request (net): ipsec 2026-04-08
+Date: Wed, 8 Apr 2026 11:58:56 +0200
+Message-ID: <20260408095925.253681-1-steffen.klassert@secunet.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain
+X-ClientProxiedBy: EXCH-02.secunet.de (10.32.0.172) To EXCH-01.secunet.de
+ (10.32.0.171)
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,microchip.com,iogearbox.net,gmail.com,fomichev.me,arndb.de,linuxfoundation.org,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-276410-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
+	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-276411-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	HAS_ORG_HEADER(0.00)[];
-	DKIM_TRACE(0.00)[bootlin.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[herve.codina@bootlin.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.927];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[secunet.com:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,secunet.com:dkim,secunet.com:mid];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 4C9613BA246
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 9965B3BA338
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Daniel,
+1) Clear trailing padding in build_polexpire() to prevent
+   leaking unititialized memory. From Yasuaki Torimaru.
 
-On Tue, 7 Apr 2026 15:20:16 +0200
-Daniel Machon <daniel.machon@microchip.com> wrote:
+2) Fix aevent size calculation when XFRMA_IF_ID is used.
+   From Keenan Dong.
 
-...
-> 
-> The following diff should fix the FDMA traffic issue, and the FDMA error splat,
-> when reloading the lan966x-pci driver, by:
-> 
-> 1. Resetting the FDMA engine on PCI init()
-> 
-> 2. Clearing any rogue FDMA errors that may latch due to the soft reset by the
-> reset driver.
-> 
->   diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_fdma_pci.c                                                   
->   b/drivers/net/ethernet/microchip/lan966x/lan966x_fdma_pci.c                                                              
->   --- a/drivers/net/ethernet/microchip/lan966x/lan966x_fdma_pci.c                                                          
->   +++ b/drivers/net/ethernet/microchip/lan966x/lan966x_fdma_pci.c                                                          
->   @@ -372,6 +372,9 @@ static int lan966x_fdma_pci_init(struct lan966x *lan966x)                                            
->         if (!lan966x->fdma)                                                                                                
->                 return 0;                                                                                                  
->                                                                                                                          
->   +     lan_wr(FDMA_CTRL_NRESET_SET(0), lan966x, FDMA_CTRL);                                                               
->   +     lan_wr(FDMA_CTRL_NRESET_SET(1), lan966x, FDMA_CTRL);                                                               
->   +                                                                                                                        
->         fdma_pci_atu_init(&lan966x->atu, lan966x->regs[TARGET_PCIE_DBI]);                                                  
->                                                             
->         lan966x->rx.lan966x = lan966x;                                                                                     
->   diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
->   b/drivers/net/ethernet/microchip/lan966x/lan966x_main.c                                                                  
->   --- a/drivers/net/ethernet/microchip/lan966x/lan966x_main.c                                                              
->   +++ b/drivers/net/ethernet/microchip/lan966x/lan966x_main.c                                                              
->   @@ -1071,6 +1071,15 @@ static int lan966x_reset_switch(struct lan966x *lan966x)                                          
->                                                             
->         reset_control_reset(switch_reset);                                                                                 
->                                                                                                                            
->   +     /* When in PCI mode, the GCB soft reset issued by the reset
->   +      * controller can latch spurious bits in the FDMA error stickies.                                                  
->   +      * Clear them before request_irq hooks up the FDMA IRQ line,
->   +      * otherwise the handler fires immediately on probe.                                                               
->   +      */                                                 
->   +     lan_wr(lan_rd(lan966x, FDMA_ERRORS),   lan966x, FDMA_ERRORS);                                                      
->   +     lan_wr(lan_rd(lan966x, FDMA_INTR_ERR), lan966x, FDMA_INTR_ERR);                                                    
->   +     lan_wr(lan_rd(lan966x, FDMA_INTR_DB),  lan966x, FDMA_INTR_DB);                                                     
->   +                                                                                                                        
->         /* Don't reinitialize the switch core, if it is already initialized. In                                            
->          * case it is initialized twice, some pointers inside the queue system                                             
->          * in HW will get corrupted and then after a while the queue system gets                                           
->   diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_regs.h                                                       
->   b/drivers/net/ethernet/microchip/lan966x/lan966x_regs.h                                                                  
->   --- a/drivers/net/ethernet/microchip/lan966x/lan966x_regs.h                                                              
->   +++ b/drivers/net/ethernet/microchip/lan966x/lan966x_regs.h                                                              
->   @@ -1010,6 +1010,15 @@ enum lan966x_target {                                                                             
->    #define FDMA_CH_CFG_CH_MEM_GET(x)\                                                                                      
->         FIELD_GET(FDMA_CH_CFG_CH_MEM, x)                                                                                   
->                                                             
->   +/*      FDMA:FDMA:FDMA_CTRL */                                                                                          
->   +#define FDMA_CTRL                 __REG(TARGET_FDMA, 0, 1, 8, 0, 1, 428, 424, 0, 1, 4)                                  
->   +                                                                                                                        
->   +#define FDMA_CTRL_NRESET                         BIT(0)                                                                 
->   +#define FDMA_CTRL_NRESET_SET(x)\                                                                                        
->   +     FIELD_PREP(FDMA_CTRL_NRESET, x)                                                                                    
->   +#define FDMA_CTRL_NRESET_GET(x)\                         
->   +     FIELD_GET(FDMA_CTRL_NRESET, x)                                                                                     
->   +                                                         
->    /*      FDMA:FDMA:FDMA_PORT_CTRL */                                                                                     
->    #define FDMA_PORT_CTRL(r)         __REG(TARGET_FDMA, 0, 1, 8, 0, 1, 428, 376, r, 2, 4)
-> 
-> Let me know if it works on your end.
-> 
-> (Btw. I have noticed another issue where TX stops working on lan966x-pci reload.
-> It happens more rarely, but is unrelated to this patch series, as it also
-> happens in register-based INJ/XTR mode. Whenever that happens, you will see
-> "Flush timeout chip port" in the logs. This should also be fixed, but sent as a
-> separate fix commit, I believe.)
-> 
+3) Wait for RCU readers during policy netns exit before
+   freeing the policy hash tables.
 
-I have tested your proposed modification.
+4) Fix dome too eaerly dropped references on the netdev
+   when uding transport mode. From Qi Tang.
 
-- From a cold boot, module unloading / re-loading:
-  Tested Ok
+5) Fix refcount leak in xfrm_migrate_policy_find().
+   From Kotlyarov Mihail.
 
-- From a cold boot, module loading / no interface configuration / reboot:
-  Tested Ok
+6) Fix two fix info leaks in build_report() and
+   in build_mapping(). From Greg Kroah-Hartman.
 
-- From a cold boot, module loading / interface configuration / reboot:
-  Issue present.
+7) Zero aligned sockaddr tail in PF_KEY exports.
+   From Zhengchuan Liang.
 
-- From a cold boot, module loading / interface configuration / module unloading / reboot:
-  Tested Ok.
+Please pull or let me know if there are problems.
 
-The interface configuration was the following command:
-  ip link set eth2 up && ip addr add 192.168.32.20/16 dev eth2
+Thanks!
 
-With the interface configured and without unloading the lan966x_pci module
-before the reboot, I have the already known FDMA error splat after the
-reboot:
-   [   18.908397] ------------[ cut here ]------------
-   [   18.913226] Unexpected error: 64, error_type: 1073741824
-   [   18.918704] WARNING: drivers/net/ethernet/microchip/lan966x/lan966x_fdma.c:558 at lan966x_fdma_irq_handler+0xe0/0x12c [lan966x_switch], CPU#0: kworker/u8:2/38
-   ...
+The following changes since commit c4ea7d8907cf72b259bf70bd8c2e791e1c4ff70f:
 
-The issue is not present if I unload the lan966x_pci module before the
-reboot. This let me think that something has been cleaned by the module
-unloading.
+  net: mana: fix use-after-free in add_adev() error path (2026-03-24 21:07:58 -0700)
 
-On top of your proposed modification, I use the shutdown() hook in the
-lan966x_driver:
+are available in the Git repository at:
 
-    --- a/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
-    +++ b/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
-    @@ -1326,9 +1326,18 @@ static void lan966x_remove(struct platform_device *pdev)
-            debugfs_remove_recursive(lan966x->debugfs_root);
-     }
-     
-    +static void lan966x_shutdown(struct platform_device *pdev)
-    +{
-    +       struct lan966x *lan966x = platform_get_drvdata(pdev);
-    +
-    +       lan966x->ops->fdma_deinit(lan966x);
-    +}
-    +
-    static struct platform_driver lan966x_driver = {
-            .probe = lan966x_probe,
-            .remove = lan966x_remove,
-    +       .shutdown = lan966x_shutdown,
-            .driver = {
-                    .name = "lan966x-switch",
-                    .of_match_table = lan966x_match,
+  git://git.kernel.org/pub/scm/linux/kernel/git/klassert/ipsec.git tags/ipsec-2026-04-08
 
-With that done, the issue is no more present.
+for you to fetch changes up to 426c355742f02cf743b347d9d7dbdc1bfbfa31ef:
 
-I am not sure that this is a correct fix but it can give some clues.
+  net: af_key: zero aligned sockaddr tail in PF_KEY exports (2026-04-07 11:08:24 +0200)
 
-Feel free to ask for more tests or more details if you need to.
+----------------------------------------------------------------
+ipsec-2026-04-08
 
-Best regards,
-Hervé
+----------------------------------------------------------------
+Greg Kroah-Hartman (2):
+      xfrm_user: fix info leak in build_mapping()
+      xfrm_user: fix info leak in build_report()
+
+Keenan Dong (1):
+      xfrm: account XFRMA_IF_ID in aevent size calculation
+
+Kotlyarov Mihail (1):
+      xfrm: fix refcount leak in xfrm_migrate_policy_find
+
+Qi Tang (1):
+      xfrm: hold dev ref until after transport_finish NF_HOOK
+
+Steffen Klassert (1):
+      xfrm: Wait for RCU readers during policy netns exit
+
+Yasuaki Torimaru (1):
+      xfrm: clear trailing padding in build_polexpire()
+
+Zhengchuan Liang (1):
+      net: af_key: zero aligned sockaddr tail in PF_KEY exports
+
+ net/ipv4/xfrm4_input.c |  5 ++++-
+ net/ipv6/xfrm6_input.c |  5 ++++-
+ net/key/af_key.c       | 52 +++++++++++++++++++++++++++++++++-----------------
+ net/xfrm/xfrm_input.c  | 18 +++++++++++++----
+ net/xfrm/xfrm_policy.c |  5 ++---
+ net/xfrm/xfrm_user.c   | 14 ++++++++++++--
+ 6 files changed, 70 insertions(+), 29 deletions(-)
 
