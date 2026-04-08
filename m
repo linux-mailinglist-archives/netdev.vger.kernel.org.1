@@ -1,262 +1,193 @@
-Return-Path: <netdev+bounces-276497-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276501-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wJXwDmVI1mkFCwgAu9opvQ
-	(envelope-from <netdev+bounces-276497-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 14:21:57 +0200
+	id qN5XMEhK1mkFDQgAu9opvQ
+	(envelope-from <netdev+bounces-276501-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 14:30:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3FCE3BBEBD
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 14:21:56 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 372E33BC10D
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 14:30:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B77C83053759
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 12:20:45 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8B83330E7522
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 12:20:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2ECDE38E5EB;
-	Wed,  8 Apr 2026 12:20:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE13C37F74B;
+	Wed,  8 Apr 2026 12:20:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="OCPA/e2S"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iNQ0//Mu"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68425389443
-	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 12:20:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.118
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48BEE3806DA
+	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 12:20:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775650845; cv=none; b=BST24v3L3dQzMEHEm8nbVQ/QeiGakeM+Mge9+yV7v6hxFgxUDMIkxjPtLygAiGmp7XVy0Rwt2c/m38f8VZ9TyCWevA3vb+zqHLpCyaoHVEmOCFMbvThhXF718CP431qJvrHacWjkYfEKrfS1HPrCBhTodNCHspy4YjYv6fvYF9k=
+	t=1775650856; cv=none; b=AfHQGsO0w1aGJbIWzKT2Fj/Btodm7xIFdAmoRpu6fpMIPZyTkVtbZEtPDXEcQckasEn/NewnzFcEmuMX+esax6ES/7LYZFD+p2zsVpPGXD62NhxJlEfczr8kXtiwtIppGyfAvFcIeSCyhgECXjkliN5oimBg0VaItmYuN8jH2Dg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775650845; c=relaxed/simple;
-	bh=preg1nBeFv0V7tlnHRWJgHmGbM4QarcGgQ6VmP3dW3w=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=EyKLZZeWmRMPnGNZMr92bNXX6SNt1sOVcnddyQ2ROCqiFsL9npir0EqQxtXe/KETZxThbwp4MrmPypMCViVj6DKxDjQJH8t0hywhVh48C3NwtcmqeTBTB9f9dGbMLqSMGYcaUe/fPoN3FAFO6vne6tUChuCWbAh4vuvYBwphe+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=OCPA/e2S; arc=none smtp.client-ip=115.124.30.118
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1775650836; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=B3+kITK++rACwH/xYvZye7OE9Xr33JaR1i7/s5eAia4=;
-	b=OCPA/e2SRzdHfVLx3eQ0qs30ftr8qmBxSIkdL/KU7JYwXwSbJUoBHdw5n5ZjftdWAHbLQWtidZSZuiwn1Pg7qX4Hf9LTmztNjgLsL5Ne7lUAqYHw7HzLupOnsj9wDt7rJZY8LfiFQgV5q4khqOu+Vgoh7J3VAwGC2Fl+k21rN70=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R581e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam011083073210;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0X0epEJj_1775650834;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0X0epEJj_1775650834 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Wed, 08 Apr 2026 20:20:34 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>,
-	Philo Lu <lulie@linux.alibaba.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Dong Yibo <dong100@mucse.com>,
-	Jes Sorensen <jes@trained-monkey.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Dust Li <dust.li@linux.alibaba.com>
-Subject: [PATCH net-next v39 8/8] eea: introduce callback for ndo_get_stats64
-Date: Wed,  8 Apr 2026 20:20:27 +0800
-Message-Id: <20260408122027.80303-9-xuanzhuo@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
-In-Reply-To: <20260408122027.80303-1-xuanzhuo@linux.alibaba.com>
-References: <20260408122027.80303-1-xuanzhuo@linux.alibaba.com>
+	s=arc-20240116; t=1775650856; c=relaxed/simple;
+	bh=/j2Ri30R3UVLJIjKWTRLhE4aI0iO01+XNfUHuzYN73E=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Y9A+LBmoB3XtG4fae7FAXF+JOPokmngylMoZaeiYj6dOf9ms+KcwSKfJyOF9lXe14W7fpGBEXp1RUga7L+rmQn34P0I5TEIFF0WjN9JPQASCfR27dhF5el8BHnq7mWmlkxWbJ0EtQIZ7y0zW/WqzpYlrPDUYiP+cjy5PihWjfQc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iNQ0//Mu; arc=none smtp.client-ip=209.85.221.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com
+Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-43cfb72377bso4112264f8f.2
+        for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 05:20:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1775650854; x=1776255654; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Tf7zvGdKL20aTK6IWM9ZuguGM2GoTZZWvgxCZM7A7Fo=;
+        b=iNQ0//MuKFjuHDPUQDLiHloYDPp0jjCpC4F8ZvK/u/+6nayBtk26iRVMSymOcvn17a
+         ZAlNa0N0Z0SqzrH1BDvEgblcPIPkOysFIBfZN3qLObnEZ6eVvNUuBVE1O/Tau5EgR1p3
+         IB79XoK0xytISoxaTb6xomqKAr1hyrqeldbd7ObDUTkH2Qh0sOdZuONq+0tTjgUMdcJe
+         RBcm+TfGTQcL7s+GqTaklQS7HZkAaju52xwDseUhX4UDUgDGYAFsA176bZlOv+NWoTGQ
+         cM2yahv6zBa24m1eP+O5u6lVzbbCqImeehQJP23q2DVrYIoDTBwFlHSxN2rpG6uY6qHq
+         YWhg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775650854; x=1776255654;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Tf7zvGdKL20aTK6IWM9ZuguGM2GoTZZWvgxCZM7A7Fo=;
+        b=ANPukzEQJMNu+jH3AEO6TE2kxS6Cx/VLeCeQq0OFGk75srWjh+paiaR0m1zmh9gkfJ
+         WxnJ1E0I/d/kaCYveWA/EVG8yPyiXUovkmPZ86uK/GPCTqB6HUhPicVqf21ReP1IkvHH
+         vaVko5PF14G1hvXD21Rafk+J5GugXR0Zefy8GvqKyz5NcGGZ5AuefsKgwJl9SMD3RmxD
+         JZ1jdh/LFStDzXzdtd+gpiCJ9QnFv8QC0Q7GS5PMlm31v8omJgS0GwUjTgVoHbp/fv15
+         TVp5fzQTssQtHuXAmWaspdcAUInLlyON1RZFW3QYpYvmn2VvR8antKWgks+//g8lObDr
+         GnEA==
+X-Forwarded-Encrypted: i=1; AJvYcCUdcL3M0eARSurhh3iA7DFDtdILwg6sLGP4jw0TMkhmKEtpQwI/hQolSS22nXHPPqRyHxJzU9E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyXxuxqehy5TpVnlMpWjqm0KWXJKjycFC1akfVMbfq7PCTGevNt
+	FdT8A7TBfMAhuaDvajKQqRVNOsrrn7K/kMZbh5pJ8kXaZaA3D6tPe+iW6KvFnfiz0wbD4UvMvMv
+	qEOP7cJxbg+0IpldKfw==
+X-Received: from wrbdu6.prod.google.com ([2002:a05:6000:d46:b0:43b:490d:df34])
+ (user=aliceryhl job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6000:1ac8:b0:43d:604:56d8 with SMTP id ffacd0b85a97d-43d2930fd69mr32444215f8f.49.1775650853570;
+ Wed, 08 Apr 2026 05:20:53 -0700 (PDT)
+Date: Wed, 08 Apr 2026 12:20:43 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Git-Hash: 07172ad8de0c
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-6.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
+Mime-Version: 1.0
+X-B4-Tracking: v=1; b=H4sIABxI1mkC/3WNQQ6CMBBFr0Jm7Zi2KBJX3sOwoGUoE7HVFhsN4
+ e5WXLhy+V7y358hUmCKcCxmCJQ4sncZ1KYAM7TOEnKXGZRQlShFhZpdRwEdTSO7C5paSSm06vV
+ hB3l0C9Tzcw2emy8Huj9yd/rJgePkw2s9TfJj//aTRIFda0jvtanLXp2s93akrfFXaJZleQN2T +9DwgAAAA==
+X-Change-Id: 20260306-binder-netlink-c82110b2fb74
+X-Developer-Key: i=aliceryhl@google.com; a=openpgp; fpr=49F6C1FAA74960F43A5B86A1EE7A392FDE96209F
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1959; i=aliceryhl@google.com;
+ h=from:subject:message-id; bh=/j2Ri30R3UVLJIjKWTRLhE4aI0iO01+XNfUHuzYN73E=;
+ b=owEBbQKS/ZANAwAKAQRYvu5YxjlGAcsmYgBp1kgf75NbJF+aQXk3HqxmyaU7yhcX09pLE/5jB
+ KoPepAvoxOJAjMEAAEKAB0WIQSDkqKUTWQHCvFIvbIEWL7uWMY5RgUCadZIHwAKCRAEWL7uWMY5
+ RnKsEACTIUHqmHNXr9Re4NG9KdJ3eejor5hPdME6+y5kfp9efZ3txg+8ax+vjPyCUqrzS4Adcz2
+ GhBYzk9WBzQR18q8Fe6C3MmsTf5yfE4OxTend715FAVnsTbUWYODiTZF/vFbL5mYmr2un7n1+D3
+ mfmL8B/JuBG7Omqc+Zk11erkZ/YtpjgnbgqY5j1i3EI1n88LrVt42ICXUSQqhGRspPxPoH352Gv
+ YUtmrIAqSxCjf+WRRq/brK6nRM1TdRUMSdWdBh2ourAOVoMAXO5beLRTmALZwx+6DifYBBUpCka
+ /72LLP2TwW+6Dhva3O+CH/QcMvQzCRKxQgaqEHlylHB4rasZKGbLKNkjM0+DbFKT927kUZLcrXf
+ khZEpKxzfFffezmasfpqOmAFqn5f0Z6LiBDpBdAEPTbVOhoKmjdNxF6048Xa80bCPC4vliAupcy
+ rsdjmS6U4bsejkYfe/k04eo0BMakZDsLaNBq3dND4w2obfxDG/zVMCbthgs2sivbijUJmANIRT0
+ /xlihcOGl5o4rOBY8L4Q1L0c1RgZ6ZQlX9T0I4AGG33pWK/+K82BV1Qu48CqW16qGTgdw8jQQZ0
+ pg0UX16QFDHzNQiupHkUSxAJo9dNiy2l+XKsKWNCyO/Ssu2LbW5ONquYab2+8TctneU1T9BEJPn ZVhy4MN3qzSmwKw==
+X-Mailer: b4 0.14.3
+Message-ID: <20260408-binder-netlink-v2-0-c0d327d15435@google.com>
+Subject: [PATCH v2 0/4] Rust netlink support + use in Rust Binder
+From: Alice Ryhl <aliceryhl@google.com>
+To: Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, 
+	"=?utf-8?q?Bj=C3=B6rn_Roy_Baron?=" <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, 
+	Andreas Hindborg <a.hindborg@kernel.org>, Trevor Gross <tmgross@umich.edu>, 
+	Danilo Krummrich <dakr@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, 
+	Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	"=?utf-8?q?Arve_Hj=C3=B8nnev=C3=A5g?=" <arve@android.com>, Todd Kjos <tkjos@android.com>, 
+	Christian Brauner <brauner@kernel.org>, Carlos Llamas <cmllamas@google.com>
+Cc: linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+	netdev@vger.kernel.org, Alice Ryhl <aliceryhl@google.com>
+Content-Type: text/plain; charset="utf-8"
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
-	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-276497-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-276501-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[kernel.org,garyguo.net,protonmail.com,umich.edu,gmail.com,davemloft.net,google.com,redhat.com,linuxfoundation.org,android.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,linux.alibaba.com,linux.dev,mucse.com,trained-monkey.org,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xuanzhuo@linux.alibaba.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[aliceryhl@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.997];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.alibaba.com:dkim,linux.alibaba.com:mid,alibaba.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C3FCE3BBEBD
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[netlink.rs:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 372E33BC10D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This commit introduces ndo_get_stats64 support.
+The C Binder driver exposes messages over netlink when transactions
+fail, so that a userpace daemon can respond to processes with many
+failing transactions.
 
-Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
-Reviewed-by: Philo Lu <lulie@linux.alibaba.com>
-Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
-Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+This patch series adds netlink support from Rust, then implements an
+equivalent API in Rust Binder.
+
+As Binder only uses broadcast messages, I did not add support for other
+kinds of messages.
+
+Based on char-misc-next.
+
+Signed-off-by: Alice Ryhl <aliceryhl@google.com>
 ---
- drivers/net/ethernet/alibaba/eea/eea_net.c | 63 ++++++++++++++++++++++
- drivers/net/ethernet/alibaba/eea/eea_net.h |  5 ++
- 2 files changed, 68 insertions(+)
+Changes in v2:
+- Make inclusion of to_pid conditional too.
+- Add note about file name in second patch.
+- Make it clear that the sk_buff wrapper is netlink-specific.
+- Better handle bitfield in patch 1.
+- Link to v1: https://lore.kernel.org/r/20260306-binder-netlink-v1-0-daceb5bc83f2@google.com
 
-diff --git a/drivers/net/ethernet/alibaba/eea/eea_net.c b/drivers/net/ethernet/alibaba/eea/eea_net.c
-index c70c0be7b1ea..8335131b8753 100644
---- a/drivers/net/ethernet/alibaba/eea/eea_net.c
-+++ b/drivers/net/ethernet/alibaba/eea/eea_net.c
-@@ -114,6 +114,11 @@ static void eea_bind_q_and_cfg(struct eea_net *enet,
- 	struct eea_net_tx *tx;
- 	int i;
- 
-+	/* Since 'ndo_get_stats64' is not called in softirq context, there is no
-+	 * need to use 'spin_lock_bh'.
-+	 */
-+	spin_lock(&enet->stats_lock);
-+
- 	enet->cfg = ctx->cfg;
- 	enet->rx = ctx->rx;
- 	enet->tx = ctx->tx;
-@@ -133,6 +138,8 @@ static void eea_bind_q_and_cfg(struct eea_net *enet,
- 
- 		blk->rx = rx;
- 	}
-+
-+	spin_unlock(&enet->stats_lock);
- }
- 
- static void eea_unbind_q_and_cfg(struct eea_net *enet,
-@@ -142,6 +149,8 @@ static void eea_unbind_q_and_cfg(struct eea_net *enet,
- 	struct eea_net_rx *rx;
- 	int i;
- 
-+	spin_lock(&enet->stats_lock);
-+
- 	ctx->cfg = enet->cfg;
- 	ctx->rx = enet->rx;
- 	ctx->tx = enet->tx;
-@@ -158,6 +167,8 @@ static void eea_unbind_q_and_cfg(struct eea_net *enet,
- 
- 		blk->rx = NULL;
- 	}
-+
-+	spin_unlock(&enet->stats_lock);
- }
- 
- static void eea_free_rxtx_q_mem(struct eea_net_init_ctx *ctx)
-@@ -343,6 +354,53 @@ static int eea_netdev_open(struct net_device *netdev)
- 	return err;
- }
- 
-+/* Statistics may be reset to zero upon device reset. This is expected behavior
-+ * for now and will be addressed in the future.
-+ */
-+static void eea_stats(struct net_device *netdev, struct rtnl_link_stats64 *tot)
-+{
-+	struct eea_net *enet = netdev_priv(netdev);
-+	u64 packets, bytes;
-+	u32 start;
-+	int i;
-+
-+	spin_lock(&enet->stats_lock);
-+
-+	if (enet->rx) {
-+		for (i = 0; i < enet->cfg.rx_ring_num; i++) {
-+			struct eea_net_rx *rx = enet->rx[i];
-+
-+			do {
-+				start = u64_stats_fetch_begin(&rx->stats.syncp);
-+				packets = u64_stats_read(&rx->stats.packets);
-+				bytes = u64_stats_read(&rx->stats.bytes);
-+			} while (u64_stats_fetch_retry(&rx->stats.syncp,
-+						       start));
-+
-+			tot->rx_packets += packets;
-+			tot->rx_bytes   += bytes;
-+		}
-+	}
-+
-+	if (enet->tx) {
-+		for (i = 0; i < enet->cfg.tx_ring_num; i++) {
-+			struct eea_net_tx *tx = &enet->tx[i];
-+
-+			do {
-+				start = u64_stats_fetch_begin(&tx->stats.syncp);
-+				packets = u64_stats_read(&tx->stats.packets);
-+				bytes = u64_stats_read(&tx->stats.bytes);
-+			} while (u64_stats_fetch_retry(&tx->stats.syncp,
-+						       start));
-+
-+			tot->tx_packets += packets;
-+			tot->tx_bytes   += bytes;
-+		}
-+	}
-+
-+	spin_unlock(&enet->stats_lock);
-+}
-+
- /* resources: ring, buffers, irq */
- int eea_reset_hw_resources(struct eea_net *enet, struct eea_net_init_ctx *ctx)
- {
-@@ -350,7 +408,9 @@ int eea_reset_hw_resources(struct eea_net *enet, struct eea_net_init_ctx *ctx)
- 	int err, error;
- 
- 	if (!netif_running(enet->netdev) || !enet->started) {
-+		spin_lock(&enet->stats_lock);
- 		enet->cfg = ctx->cfg;
-+		spin_unlock(&enet->stats_lock);
- 		return 0;
- 	}
- 
-@@ -600,6 +660,7 @@ static const struct net_device_ops eea_netdev = {
- 	.ndo_stop           = eea_netdev_stop,
- 	.ndo_start_xmit     = eea_tx_xmit,
- 	.ndo_validate_addr  = eth_validate_addr,
-+	.ndo_get_stats64    = eea_stats,
- 	.ndo_features_check = passthru_features_check,
- };
- 
-@@ -633,6 +694,8 @@ static struct eea_net *eea_netdev_alloc(struct eea_device *edev, u32 pairs)
- 		return NULL;
- 	}
- 
-+	spin_lock_init(&enet->stats_lock);
-+
- 	return enet;
- }
- 
-diff --git a/drivers/net/ethernet/alibaba/eea/eea_net.h b/drivers/net/ethernet/alibaba/eea/eea_net.h
-index 5124d112a046..6aeaad0193da 100644
---- a/drivers/net/ethernet/alibaba/eea/eea_net.h
-+++ b/drivers/net/ethernet/alibaba/eea/eea_net.h
-@@ -165,6 +165,11 @@ struct eea_net {
- 	u32 speed;
- 
- 	u64 hw_ts_offset;
-+
-+	/* Protect the tx and rx of struct eea_net, when eea_stats accesses the
-+	 * stats from rx and tx queues.
-+	 */
-+	spinlock_t stats_lock;
- };
- 
- int eea_net_probe(struct eea_device *edev);
+---
+Alice Ryhl (3):
+      rust: netlink: add raw netlink abstraction
+      ynl_gen: generate Rust files from yaml files
+      rust_binder: add generated netlink.rs file
+
+Carlos Llamas (1):
+      rust_binder: report netlink transactions
+
+ drivers/android/Kconfig                    |   2 +-
+ drivers/android/binder/netlink.rs          | 113 ++++++++++
+ drivers/android/binder/rust_binder_main.rs |   8 +-
+ drivers/android/binder/thread.rs           |   9 +
+ drivers/android/binder/transaction.rs      |  40 ++++
+ rust/bindings/bindings_helper.h            |   3 +
+ rust/helpers/genetlink.c                   |  46 ++++
+ rust/helpers/helpers.c                     |   1 +
+ rust/kernel/lib.rs                         |   1 +
+ rust/kernel/netlink.rs                     | 329 +++++++++++++++++++++++++++++
+ rust/uapi/uapi_helper.h                    |   1 +
+ tools/net/ynl/pyynl/ynl_gen_c.py           | 132 +++++++++++-
+ tools/net/ynl/ynl-regen.sh                 |   2 +-
+ 13 files changed, 682 insertions(+), 5 deletions(-)
+---
+base-commit: 0990a71f678aa0f045f2c126b39b6b581844d3b0
+change-id: 20260306-binder-netlink-c82110b2fb74
+
+Best regards,
 -- 
-2.32.0.3.g01195cf9f
+Alice Ryhl <aliceryhl@google.com>
 
 
