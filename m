@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-276251-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276250-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IMTHIU7E1Wkx9gcAu9opvQ
-	(envelope-from <netdev+bounces-276251-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 04:58:22 +0200
+	id EAQBJ2DD1Wkx9gcAu9opvQ
+	(envelope-from <netdev+bounces-276250-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 04:54:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2DC13B666E
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 04:58:21 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id E78B33B656B
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 04:54:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EEA233041796
+	by sin.lore.kernel.org (Postfix) with ESMTP id 6A3BA302B707
 	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 02:52:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64139377014;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 433F336C9CD;
 	Wed,  8 Apr 2026 02:52:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aZyJ7MD3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hIYJ4Gea"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-dy1-f201.google.com (mail-dy1-f201.google.com [74.125.82.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 976F837417D
-	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 02:52:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6ADB374180
+	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 02:52:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775616764; cv=none; b=JGfPdK2xTM+L+5joS9TT3CBnGe6Oc6hr6gTRl6Wfdmd2MPrg3oS0gKxtHNEjEq4yVCnSrP31Uko2iOBd46EJzrzwbAhfSYPUlnkLrqJ86ZASCFoAVOVjayoQrP/nDPe+TRsAFvQNkKsmjDYRdfFlPHfbhPyiVZpqau917YPggts=
+	t=1775616764; cv=none; b=E109GWhBAIy+EdHGansbGhapxJDBb/vWVYzmeMdapZq6oSvmLPS9UDaf3OM+l5t87gt56e6TBD9Z25ooX8G3tKLRlUsJ1yn+Hz1/W1v8n5c7DCE6eoWoydngN5M1DVb5zfLnpxmSGV+OaMKLTclKDnbAMbbUi1dFWzh9jMnT6f4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1775616764; c=relaxed/simple;
-	bh=54WhcsWEBv89XERrl7hjYMlOglMOUs/ISqhCHGqf+vQ=;
+	bh=oH22fdqSNJSpaqo3JGrJKQygV29uz4pTKSxAP7bGPfQ=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=QDFkX4HfCo9xSRhL4CIenoPyt39NGIOs3SKyyxXyjRrNrFw6kaRZKwt+7FMO9aKfFdVBh/ShY9a3xlLnchB5lOmGfX++lSoMgnkz2J6tS+8fqxA04aN7VJYF3nU3EorJ3ryjpvb4Z0BuyI7gxYiGpqEuj6DTnobuGn0VLtvKv4w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--marcharvey.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aZyJ7MD3; arc=none smtp.client-ip=74.125.82.201
+	 To:Cc:Content-Type; b=Uj42+d//VccRdRmZ1z0Zz5Zpe3kiBfEm5Gldmp1KpYrT5VSAgMMbU81vNta+XjZ5bwy0xn3YqW3S3zYp3LmTtbBqPgAhCoM+8JF3nZVrAjGXe/0jNfnYri/mjx35K8URpAeTZREhZjWz4HIRl1LeifHyGZC/lXWQMoo2RDq0G5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--marcharvey.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hIYJ4Gea; arc=none smtp.client-ip=74.125.82.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--marcharvey.bounces.google.com
-Received: by mail-dy1-f201.google.com with SMTP id 5a478bee46e88-2bdf6fe90a9so8297012eec.1
-        for <netdev@vger.kernel.org>; Tue, 07 Apr 2026 19:52:37 -0700 (PDT)
+Received: by mail-dy1-f201.google.com with SMTP id 5a478bee46e88-2c68a134df8so5450978eec.1
+        for <netdev@vger.kernel.org>; Tue, 07 Apr 2026 19:52:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1775616757; x=1776221557; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1775616759; x=1776221559; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VD9hHtRE4Dg4SjmFWUsIyf6/SlMtsUHiRb8Ol9lMtIc=;
-        b=aZyJ7MD3ukDrTFj07qkuitQpVgcGkBlkIC58cxFNfeuHVquiuvcfxZRn98HsYE3wZl
-         n5HsEgxjqlGl5jcEc7zQCH33WIT1ohs93lkbFPf3UZow0w6WZT9Ak8yDKl4PbR9+bs3k
-         xxnDFw6bsi5zFBhwj2BL7Tde1Xe/dzgDlpSe+wCMRqBx86llz/mYK+nY5aw0IUi9W9Qq
-         Y3+k1ovRX8jZW4cbsNbE4iqt6oIvIj3Am13QP0JBPsiJlCtPHFoqcQI1Tn+h3hFjGRRJ
-         MWA5SyPoJxPjGpCPPNgre0YrN+l/J7rA+fPg1X62/be5q86rKQ2fE8J8HA+PXLdtqf2X
-         pDXw==
+        bh=qJ4xpDhza9yvGUIAi+VUP5bjGD/EsXUsUZaTLZUbPU4=;
+        b=hIYJ4Geajq9V/7q4Zu+n9lcOEP6fOKqX1iYDSkh6C4MGFQBxZzJcr+aJ+531/gWLtJ
+         oWfX+lJFIUax1tsS78vRmVjymGGT46DTMHBp4oOgqkbDwxaNEWO5nlFImlYrozauNkjN
+         yBbrmf9feMmZIRYC331UjcmbPmSoWUdKcFZB+stiHPMlUNSVSYZuOkVgihzzwgAnhLMC
+         KuzpJkmPBxy6OsgehpJrJ1D11+DiAXv7fpXx+PZTVmOmpk8Ln5CpzJedTRWPQE48z7le
+         4s4k8YbYXh1kWd3FewdR6h/cUfEgVdC8J9Jv/GJBBaNSwI1YZHJRkft7IhNJxoel0AOv
+         BcNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775616757; x=1776221557;
+        d=1e100.net; s=20251104; t=1775616759; x=1776221559;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VD9hHtRE4Dg4SjmFWUsIyf6/SlMtsUHiRb8Ol9lMtIc=;
-        b=VgV+NU6GANNEcFw6lAvYeHkY/p3c8O+rTMxQLQXvnqM9UrWSf7MIdjzebs5hdq4j6z
-         jF5W6qn64o6krh/YABh3IJgrhTCuHMu0bLDWuZorLM2STeaF1p/YIBI1MsRErX98Dih+
-         3S8Ex0yg1kBSnmTD3VZ71e6GKHqfPfSZ925WQOVJ+EEJ4FxBHBELAbt10B6JCbf0byFS
-         cbzCt89JJBnbw8hdxJZqeL2xZq7y/9Zxv0n0fDwA6oFWR4vDLdy/IM8QX0DnRcwIIeO9
-         Hb6ic/wg+g5QgY/gU5uzYr0m8tTjo0jb3WJIXtvjbyhDUO8N/YzeK/chuXlBFsEBmabg
-         6IBQ==
-X-Gm-Message-State: AOJu0YyrBWXt+nnAjME2pAuekZyjbGyvgEDwVWHg5NYIuTkDz25xbWqt
-	w4+WqytZ/g+OJ8kLt4LsE3/97ysu1vkthVcntwrPntnkPntYp/+rmFs8Hl2lRizs/qOLIMNBFkW
-	T43Z17hwf3wzB/o8Ua3xoEw==
-X-Received: from dybfx18.prod.google.com ([2002:a05:7300:c392:b0:2c5:89d3:2645])
+        bh=qJ4xpDhza9yvGUIAi+VUP5bjGD/EsXUsUZaTLZUbPU4=;
+        b=AnjgjAPPDWHas+l1anY9WshAGzG7EjwHQ8tjEFr4j5/W6mGAuMpPYZp8jGp7hVmalE
+         OJ0ZfJ6d8ktNGoceO9aGw2O4I+Faav6dTJQEjmLZSRi7CyuFsqhFvNUicoHTE6ynfeFT
+         jw8C8P+b7QRQ/caVZdD/T22P9L2BnsmTlz3V3z3l/6F34/mwJUf3jV9ou1j9Kwx5i3Ne
+         kjVtNzwL4cOaxPbKWPvgneS320rcktdKOmWCef9fTw5fz/n7Q5U7fFjLcBuvizFOBnFS
+         WhivO2R8w2Py3rwX+MEP/ZwrZOurLl4iVFo5ZqDAG5lZNwS58UizGAC3OCYP4k7DXZhO
+         nlgw==
+X-Gm-Message-State: AOJu0YwV5OFwewoXS5Xkd7LDcKg0/YxWTJFZ15rZ64/Pmf/10tEsjTy0
+	JT+pjruin8NkWgxED5TKbGSrTtLav36GefpZy7NJQtrUMEUca9jWKaPrXQnV1bcm/52EGud+h9g
+	xepXLFrEqXPR2fZu6xLUt3Q==
+X-Received: from dlaj10.prod.google.com ([2002:a05:701b:280a:b0:12c:580:a828])
  (user=marcharvey job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:7301:d1b:b0:2c0:dc7e:ed17 with SMTP id 5a478bee46e88-2cbf9afb1edmr10454603eec.10.1775616756867;
- Tue, 07 Apr 2026 19:52:36 -0700 (PDT)
-Date: Wed, 08 Apr 2026 02:52:24 +0000
+ 2002:a05:7022:41a3:b0:12a:7181:2eff with SMTP id a92af1059eb24-12bfb6ec49emr8944307c88.4.1775616758530;
+ Tue, 07 Apr 2026 19:52:38 -0700 (PDT)
+Date: Wed, 08 Apr 2026 02:52:25 +0000
 In-Reply-To: <20260408-teaming-driver-internal-v6-0-e5bcdcf72504@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -75,21 +75,22 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260408-teaming-driver-internal-v6-0-e5bcdcf72504@google.com>
 X-Developer-Key: i=marcharvey@google.com; a=ed25519; pk=OzOeciadbfF5Bug/4/hyEAwfrruSY4tn0Q0LocyYUL0=
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1775616747; l=11242;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1775616747; l=10753;
  i=marcharvey@google.com; s=20260401; h=from:subject:message-id;
- bh=54WhcsWEBv89XERrl7hjYMlOglMOUs/ISqhCHGqf+vQ=; b=dx+Os/Rg4+dqFHxbQpYI2TSRISx21qmDs17FJqcEDGto/5X9vMCygR5+kCu/XJcCkal/kw5Z4
- ePMtJWbQdHiAA3uoySjpG9Folr6nXd/vynoNobl5+lZYMvxJIOq5/jp
+ bh=oH22fdqSNJSpaqo3JGrJKQygV29uz4pTKSxAP7bGPfQ=; b=2mr8LC0g5CNSv+yuDeTTAGFvkUuSrp7b6OA3/rT10RLlKxf3L9hoC6Yv+aYE2NWNZ+XBdRoiR
+ cW6Ls5OtyY2AGgrje0u896MaSZRVnqHN0NEaeR/udi17467fShE+MN+
 X-Mailer: b4 0.14.3
-Message-ID: <20260408-teaming-driver-internal-v6-5-e5bcdcf72504@google.com>
-Subject: [PATCH net-next v6 05/10] selftests: net: Add test for enablement of
- ports with teamd
+Message-ID: <20260408-teaming-driver-internal-v6-6-e5bcdcf72504@google.com>
+Subject: [PATCH net-next v6 06/10] net: team: Rename enablement functions and
+ struct members to tx
 From: Marc Harvey <marcharvey@google.com>
 To: Jiri Pirko <jiri@resnulli.us>, Andrew Lunn <andrew+netdev@lunn.ch>, 
 	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
 	Simon Horman <horms@kernel.org>
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, Marc Harvey <marcharvey@google.com>
+	linux-kselftest@vger.kernel.org, Marc Harvey <marcharvey@google.com>, 
+	Jiri Pirko <jiri@resnulli.us>
 Content-Type: text/plain; charset="utf-8"
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -97,18 +98,18 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-276251-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-276250-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[marcharvey@google.com,netdev@vger.kernel.org];
@@ -117,372 +118,285 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: F2DC13B666E
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,nvidia.com:email]
+X-Rspamd-Queue-Id: E78B33B656B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-There are no tests that verify enablement and disablement of team driver
-ports with teamd. This should work even with changes to the enablement
-option, so it is important to test.
+Add no functional changes, but rename enablement functions, variables
+etc. that are used in teaming driver transmit decisions.
 
-This test sets up an active-backup network configuration across two
-network namespaces, and tries to send traffic while changing which
-link is the active one.
+Since rx and tx enablement are still coupled, some of the variables
+renamed in this patch are still used for the rx path, but that will
+change in a follow-up patch.
 
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 Signed-off-by: Marc Harvey <marcharvey@google.com>
 ---
-Changes in v6:
-- Remove manual changing of member port states to UP, not needed.
-- Link to v5: https://lore.kernel.org/netdev/20260406-teaming-driver-internal-v5-5-e8a3f348a1c5@google.com/
-
-Changes in v5:
-- Make test wait for inactive link to stop receiving traffic after
-  setting it to inactive, since there was a race condition.
-- Change test teardown to try graceful shutdown first, then use
-  sigkill if needed.
-- Manually delete leftover teamd files during teardown.
-- Use tcpdump instead of checking rx counters.
-- Link to v4: https://lore.kernel.org/netdev/20260403-teaming-driver-internal-v4-5-d3032f33ca25@google.com/
-
-Changed in v3:
-- Make test cleanup kill teamd instead of terminate.
-- Link to v2: https://lore.kernel.org/netdev/20260401-teaming-driver-internal-v2-5-f80c1291727b@google.com/
-
-Changes in v2:
-- Fix shellcheck failures.
-- Remove dependency on net forwarding lib and pipe viewer tools.
-- Use iperf3 for tcp instead of netcat.
-- Link to v1: https://lore.kernel.org/all/20260331053353.2504254-6-marcharvey@google.com/
+Changes in v4:
+- New patch: split from the original monolithic v3 patch "net: team:
+  Decouple rx and tx enablement in the team driver".
+- Link to v3: https://lore.kernel.org/netdev/20260402-teaming-driver-internal-v3-6-e8cfdec3b5c2@google.com/
 ---
- tools/testing/selftests/drivers/net/team/Makefile  |   1 +
- .../testing/selftests/drivers/net/team/team_lib.sh |  26 +++
- .../drivers/net/team/teamd_activebackup.sh         | 246 +++++++++++++++++++++
- tools/testing/selftests/net/lib.sh                 |  13 ++
- 4 files changed, 286 insertions(+)
+ drivers/net/team/team_core.c             | 44 +++++++++++++++---------------
+ drivers/net/team/team_mode_loadbalance.c |  2 +-
+ drivers/net/team/team_mode_random.c      |  4 +--
+ drivers/net/team/team_mode_roundrobin.c  |  2 +-
+ include/linux/if_team.h                  | 46 +++++++++++++++++---------------
+ 5 files changed, 51 insertions(+), 47 deletions(-)
 
-diff --git a/tools/testing/selftests/drivers/net/team/Makefile b/tools/testing/selftests/drivers/net/team/Makefile
-index 777da2e0429e..dab922d7f83d 100644
---- a/tools/testing/selftests/drivers/net/team/Makefile
-+++ b/tools/testing/selftests/drivers/net/team/Makefile
-@@ -7,6 +7,7 @@ TEST_PROGS := \
- 	options.sh \
- 	propagation.sh \
- 	refleak.sh \
-+	teamd_activebackup.sh \
- 	transmit_failover.sh \
- # end of TEST_PROGS
+diff --git a/drivers/net/team/team_core.c b/drivers/net/team/team_core.c
+index 2ce31999c99f..826769473878 100644
+--- a/drivers/net/team/team_core.c
++++ b/drivers/net/team/team_core.c
+@@ -532,13 +532,13 @@ static void team_adjust_ops(struct team *team)
+ 	 * correct ops are always set.
+ 	 */
  
-diff --git a/tools/testing/selftests/drivers/net/team/team_lib.sh b/tools/testing/selftests/drivers/net/team/team_lib.sh
-index 2057f5edee79..02ef0ee02d6a 100644
---- a/tools/testing/selftests/drivers/net/team/team_lib.sh
-+++ b/tools/testing/selftests/drivers/net/team/team_lib.sh
-@@ -146,3 +146,29 @@ did_interface_receive()
- 		false
- 	fi
+-	if (!team->en_port_count || !team_is_mode_set(team) ||
++	if (!team->tx_en_port_count || !team_is_mode_set(team) ||
+ 	    !team->mode->ops->transmit)
+ 		team->ops.transmit = team_dummy_transmit;
+ 	else
+ 		team->ops.transmit = team->mode->ops->transmit;
+ 
+-	if (!team->en_port_count || !team_is_mode_set(team) ||
++	if (!team->tx_en_port_count || !team_is_mode_set(team) ||
+ 	    !team->mode->ops->receive)
+ 		team->ops.receive = team_dummy_receive;
+ 	else
+@@ -831,7 +831,7 @@ static bool team_queue_override_port_has_gt_prio_than(struct team_port *port,
+ 		return true;
+ 	if (port->priority > cur->priority)
+ 		return false;
+-	if (port->index < cur->index)
++	if (port->tx_index < cur->tx_index)
+ 		return true;
+ 	return false;
  }
-+
-+# Return true if the given interface in the given namespace does NOT receive
-+# traffic over a 1 second period.
-+# Arguments:
-+#   interface - The name of the interface.
-+#   ip_address - The destination IP address.
-+#   namespace - The name of the namespace that the interface is in.
-+check_no_traffic()
-+{
-+	local interface="$1"
-+	local ip_address="$2"
-+	local namespace="$3"
-+	local rc
-+
-+	save_tcpdump_outputs "${namespace}" "${interface}"
-+	did_interface_receive "${interface}" "${ip_address}"
-+	rc=$?
-+
-+	clear_tcpdump_outputs "${interface}"
-+
-+	if [[ "${rc}" -eq 0 ]]; then
-+		return 1
-+	else
-+		return 0
-+	fi
-+}
-diff --git a/tools/testing/selftests/drivers/net/team/teamd_activebackup.sh b/tools/testing/selftests/drivers/net/team/teamd_activebackup.sh
-new file mode 100755
-index 000000000000..f1a8639fd83c
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/team/teamd_activebackup.sh
-@@ -0,0 +1,246 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+
-+# These tests verify that teamd is able to enable and disable ports via the
-+# active backup runner.
-+#
-+# Topology:
-+#
-+#  +-------------------------+  NS1
-+#  |        test_team1       |
-+#  |            +            |
-+#  |      eth0  |  eth1      |
-+#  |        +---+---+        |
-+#  |        |       |        |
-+#  +-------------------------+
-+#           |       |
-+#  +-------------------------+  NS2
-+#  |        |       |        |
-+#  |        +-------+        |
-+#  |      eth0  |  eth1      |
-+#  |            +            |
-+#  |        test_team2       |
-+#  +-------------------------+
-+
-+export ALL_TESTS="teamd_test_active_backup"
-+
-+test_dir="$(dirname "$0")"
-+# shellcheck disable=SC1091
-+source "${test_dir}/../../../net/lib.sh"
-+# shellcheck disable=SC1091
-+source "${test_dir}/team_lib.sh"
-+
-+NS1=""
-+NS2=""
-+export NODAD="nodad"
-+PREFIX_LENGTH="64"
-+NS1_IP="fd00::1"
-+NS2_IP="fd00::2"
-+NS1_IP4="192.168.0.1"
-+NS2_IP4="192.168.0.2"
-+NS1_TEAMD_CONF=""
-+NS2_TEAMD_CONF=""
-+NS1_TEAMD_PID=""
-+NS2_TEAMD_PID=""
-+
-+while getopts "4" opt; do
-+	case $opt in
-+		4)
-+			echo "IPv4 mode selected."
-+			export NODAD=
-+			PREFIX_LENGTH="24"
-+			NS1_IP="${NS1_IP4}"
-+			NS2_IP="${NS2_IP4}"
-+			;;
-+		\?)
-+			echo "Invalid option: -${OPTARG}" >&2
-+			exit 1
-+			;;
-+	esac
-+done
-+
-+teamd_config_create()
-+{
-+	local runner=$1
-+	local dev=$2
-+	local conf
-+
-+	conf=$(mktemp)
-+
-+	cat > "${conf}" <<-EOF
-+	{
-+		"device": "${dev}",
-+		"runner": {"name": "${runner}"},
-+		"ports": {
-+			"eth0": {},
-+			"eth1": {}
-+		}
-+	}
-+	EOF
-+	echo "${conf}"
-+}
-+
-+# Create the network namespaces, veth pair, and team devices in the specified
-+# runner.
-+# Globals:
-+#   RET - Used by test infra, set by `check_err` functions.
-+# Arguments:
-+#   runner - The Teamd runner to use for the Team devices.
-+environment_create()
-+{
-+	local runner=$1
-+
-+	echo "Setting up two-link aggregation for runner ${runner}"
-+	echo "Teamd version is: $(teamd --version)"
-+	trap environment_destroy EXIT
-+
-+	setup_ns ns1 ns2
-+	NS1="${NS_LIST[0]}"
-+	NS2="${NS_LIST[1]}"
-+
-+	for link in $(seq 0 1); do
-+		ip -n "${NS1}" link add "eth${link}" type veth peer name \
-+				"eth${link}" netns "${NS2}"
-+		check_err $? "Failed to create veth pair"
-+	done
-+
-+	NS1_TEAMD_CONF=$(teamd_config_create "${runner}" "test_team1")
-+	NS2_TEAMD_CONF=$(teamd_config_create "${runner}" "test_team2")
-+	echo "Conf files are ${NS1_TEAMD_CONF} and ${NS2_TEAMD_CONF}"
-+
-+	ip netns exec "${NS1}" teamd -d -f "${NS1_TEAMD_CONF}"
-+	check_err $? "Failed to create team device in ${NS1}"
-+	NS1_TEAMD_PID=$(pgrep -f "teamd -d -f ${NS1_TEAMD_CONF}")
-+
-+	ip netns exec "${NS2}" teamd -d -f "${NS2_TEAMD_CONF}"
-+	check_err $? "Failed to create team device in ${NS2}"
-+	NS2_TEAMD_PID=$(pgrep -f "teamd -d -f ${NS2_TEAMD_CONF}")
-+
-+	echo "Created team devices"
-+	echo "Teamd PIDs are ${NS1_TEAMD_PID} and ${NS2_TEAMD_PID}"
-+
-+	ip -n "${NS1}" link set test_team1 up
-+	check_err $? "Failed to set test_team1 up in ${NS1}"
-+	ip -n "${NS2}" link set test_team2 up
-+	check_err $? "Failed to set test_team2 up in ${NS2}"
-+
-+	ip -n "${NS1}" addr add "${NS1_IP}/${PREFIX_LENGTH}" "${NODAD}" dev \
-+			test_team1
-+	check_err $? "Failed to add address to team device in ${NS1}"
-+	ip -n "${NS2}" addr add "${NS2_IP}/${PREFIX_LENGTH}" "${NODAD}" dev \
-+			test_team2
-+	check_err $? "Failed to add address to team device in ${NS2}"
-+
-+	slowwait 2 timeout 0.5 ip netns exec "${NS1}" ping -W 1 -c 1 "${NS2_IP}"
-+}
-+
-+# Tear down the environment: kill teamd and delete network namespaces.
-+environment_destroy()
-+{
-+	echo "Tearing down two-link aggregation"
-+
-+	rm "${NS1_TEAMD_CONF}"
-+	rm "${NS2_TEAMD_CONF}"
-+
-+	# First, try graceful teamd teardown.
-+	ip netns exec "${NS1}" teamd -k -t test_team1
-+	ip netns exec "${NS2}" teamd -k -t test_team2
-+
-+	# If teamd can't be killed gracefully, then sigkill.
-+	if kill -0 "${NS1_TEAMD_PID}" 2>/dev/null; then
-+		echo "Sending sigkill to teamd for test_team1"
-+		kill -9 "${NS1_TEAMD_PID}"
-+		rm /var/run/teamd/test_team1.{pid,sock}
-+	fi
-+	if kill -0 "${NS2_TEAMD_PID}" 2>/dev/null; then
-+		echo "Sending sigkill to teamd for test_team2"
-+		kill -9 "${NS2_TEAMD_PID}"
-+		rm /var/run/teamd/test_team2.{pid,sock}
-+	fi
-+	cleanup_all_ns
-+}
-+
-+# Change the active port for an active-backup mode team.
-+# Arguments:
-+#   namespace - The network namespace that the team is in.
-+#   team - The name of the team.
-+#   active_port - The port to make active.
-+set_active_port()
-+{
-+	local namespace=$1
-+	local team=$2
-+	local active_port=$3
-+
-+	ip netns exec "${namespace}" teamdctl "${team}" state item set \
-+			runner.active_port "${active_port}"
-+	slowwait 2 bash -c "ip netns exec ${namespace} teamdctl ${team} state \
-+			item get runner.active_port | grep -q ${active_port}"
-+}
-+
-+# Wait for an interface to stop receiving traffic. If it keeps receiving traffic
-+# for the duration of the timeout, then return an error.
-+# Arguments:
-+#   - namespace - The network namespace that the interface is in.
-+#   - interface - The name of the interface.
-+wait_to_stop_receiving()
-+{
-+	local namespace=$1
-+	local interface=$2
-+
-+	echo "Waiting for ${interface} in ${namespace} to stop receiving"
-+	slowwait 10 check_no_traffic "${interface}" "${NS2_IP}" \
-+			"${namespace}"
-+}
-+
-+# Test that active backup runner can change active ports.
-+# Globals:
-+#   RET - Used by test infra, set by `check_err` functions.
-+teamd_test_active_backup()
-+{
-+	export RET=0
-+
-+	start_listening_and_sending
-+
-+	### Scenario 1: Don't manually set active port, just make sure team
-+	# works.
-+	save_tcpdump_outputs "${NS2}" test_team2
-+	did_interface_receive test_team2 "${NS2_IP}"
-+	check_err $? "Traffic did not reach team interface in NS2."
-+	clear_tcpdump_outputs test_team2
-+
-+	### Scenario 2: Choose active port.
-+	set_active_port "${NS1}" test_team1 eth1
-+	set_active_port "${NS2}" test_team2 eth1
-+
-+	wait_to_stop_receiving "${NS2}" eth0
-+	save_tcpdump_outputs "${NS2}" eth0 eth1
-+	did_interface_receive eth0 "${NS2_IP}"
-+	check_fail $? "eth0 IS transmitting when inactive"
-+	did_interface_receive eth1 "${NS2_IP}"
-+	check_err $? "eth1 not transmitting when active"
-+	clear_tcpdump_outputs eth0 eth1
-+
-+	### Scenario 3: Change active port.
-+	set_active_port "${NS1}" test_team1 eth0
-+	set_active_port "${NS2}" test_team2 eth0
-+
-+	wait_to_stop_receiving "${NS2}" eth1
-+	save_tcpdump_outputs "${NS2}" eth0 eth1
-+	did_interface_receive eth0 "${NS2_IP}"
-+	check_err $? "eth0 not transmitting when active"
-+	did_interface_receive eth1 "${NS2_IP}"
-+	check_fail $? "eth1 IS transmitting when inactive"
-+	clear_tcpdump_outputs eth0 eth1
-+
-+	log_test "teamd active backup runner test"
-+
-+	stop_sending_and_listening
-+}
-+
-+require_command teamd
-+require_command teamdctl
-+require_command iperf3
-+require_command tcpdump
-+environment_create activebackup
-+tests_run
-+exit "${EXIT_STATUS}"
-diff --git a/tools/testing/selftests/net/lib.sh b/tools/testing/selftests/net/lib.sh
-index e915386daf1b..b3827b43782b 100644
---- a/tools/testing/selftests/net/lib.sh
-+++ b/tools/testing/selftests/net/lib.sh
-@@ -224,6 +224,19 @@ setup_ns()
- 	NS_LIST+=("${ns_list[@]}")
+@@ -929,7 +929,7 @@ static bool team_port_find(const struct team *team,
+ 
+ /*
+  * Enable/disable port by adding to enabled port hashlist and setting
+- * port->index (Might be racy so reader could see incorrect ifindex when
++ * port->tx_index (Might be racy so reader could see incorrect ifindex when
+  * processing a flying packet, but that is not a problem). Write guarded
+  * by RTNL.
+  */
+@@ -938,10 +938,10 @@ static void team_port_enable(struct team *team,
+ {
+ 	if (team_port_enabled(port))
+ 		return;
+-	WRITE_ONCE(port->index, team->en_port_count);
+-	WRITE_ONCE(team->en_port_count, team->en_port_count + 1);
+-	hlist_add_head_rcu(&port->hlist,
+-			   team_port_index_hash(team, port->index));
++	WRITE_ONCE(port->tx_index, team->tx_en_port_count);
++	WRITE_ONCE(team->tx_en_port_count, team->tx_en_port_count + 1);
++	hlist_add_head_rcu(&port->tx_hlist,
++			   team_tx_port_index_hash(team, port->tx_index));
+ 	team_adjust_ops(team);
+ 	team_queue_override_port_add(team, port);
+ 	team_notify_peers(team);
+@@ -951,15 +951,17 @@ static void team_port_enable(struct team *team,
+ 
+ static void __reconstruct_port_hlist(struct team *team, int rm_index)
+ {
+-	int i;
++	struct hlist_head *tx_port_index_hash;
+ 	struct team_port *port;
++	int i;
+ 
+-	for (i = rm_index + 1; i < team->en_port_count; i++) {
+-		port = team_get_port_by_index(team, i);
+-		hlist_del_rcu(&port->hlist);
+-		WRITE_ONCE(port->index, port->index - 1);
+-		hlist_add_head_rcu(&port->hlist,
+-				   team_port_index_hash(team, port->index));
++	for (i = rm_index + 1; i < team->tx_en_port_count; i++) {
++		port = team_get_port_by_tx_index(team, i);
++		hlist_del_rcu(&port->tx_hlist);
++		WRITE_ONCE(port->tx_index, port->tx_index - 1);
++		tx_port_index_hash = team_tx_port_index_hash(team,
++							     port->tx_index);
++		hlist_add_head_rcu(&port->tx_hlist, tx_port_index_hash);
+ 	}
  }
  
-+in_all_ns()
-+{
-+	local ret=0
-+	local ns_list=("${NS_LIST[@]}")
+@@ -970,10 +972,10 @@ static void team_port_disable(struct team *team,
+ 		return;
+ 	if (team->ops.port_tx_disabled)
+ 		team->ops.port_tx_disabled(team, port);
+-	hlist_del_rcu(&port->hlist);
+-	__reconstruct_port_hlist(team, port->index);
+-	WRITE_ONCE(port->index, -1);
+-	WRITE_ONCE(team->en_port_count, team->en_port_count - 1);
++	hlist_del_rcu(&port->tx_hlist);
++	__reconstruct_port_hlist(team, port->tx_index);
++	WRITE_ONCE(port->tx_index, -1);
++	WRITE_ONCE(team->tx_en_port_count, team->tx_en_port_count - 1);
+ 	team_queue_override_port_del(team, port);
+ 	team_adjust_ops(team);
+ 	team_lower_state_changed(port);
+@@ -1244,7 +1246,7 @@ static int team_port_add(struct team *team, struct net_device *port_dev,
+ 		netif_addr_unlock_bh(dev);
+ 	}
+ 
+-	WRITE_ONCE(port->index, -1);
++	WRITE_ONCE(port->tx_index, -1);
+ 	list_add_tail_rcu(&port->list, &team->port_list);
+ 	team_port_enable(team, port);
+ 	netdev_compute_master_upper_features(dev, true);
+@@ -1595,7 +1597,7 @@ static int team_init(struct net_device *dev)
+ 		return -ENOMEM;
+ 
+ 	for (i = 0; i < TEAM_PORT_HASHENTRIES; i++)
+-		INIT_HLIST_HEAD(&team->en_port_hlist[i]);
++		INIT_HLIST_HEAD(&team->tx_en_port_hlist[i]);
+ 	INIT_LIST_HEAD(&team->port_list);
+ 	err = team_queue_override_init(team);
+ 	if (err)
+diff --git a/drivers/net/team/team_mode_loadbalance.c b/drivers/net/team/team_mode_loadbalance.c
+index 840f409d250b..4833fbfe241e 100644
+--- a/drivers/net/team/team_mode_loadbalance.c
++++ b/drivers/net/team/team_mode_loadbalance.c
+@@ -120,7 +120,7 @@ static struct team_port *lb_hash_select_tx_port(struct team *team,
+ {
+ 	int port_index = team_num_to_port_index(team, hash);
+ 
+-	return team_get_port_by_index_rcu(team, port_index);
++	return team_get_port_by_tx_index_rcu(team, port_index);
+ }
+ 
+ /* Hash to port mapping select tx port */
+diff --git a/drivers/net/team/team_mode_random.c b/drivers/net/team/team_mode_random.c
+index 169a7bc865b2..370e974f3dca 100644
+--- a/drivers/net/team/team_mode_random.c
++++ b/drivers/net/team/team_mode_random.c
+@@ -16,8 +16,8 @@ static bool rnd_transmit(struct team *team, struct sk_buff *skb)
+ 	struct team_port *port;
+ 	int port_index;
+ 
+-	port_index = get_random_u32_below(READ_ONCE(team->en_port_count));
+-	port = team_get_port_by_index_rcu(team, port_index);
++	port_index = get_random_u32_below(READ_ONCE(team->tx_en_port_count));
++	port = team_get_port_by_tx_index_rcu(team, port_index);
+ 	if (unlikely(!port))
+ 		goto drop;
+ 	port = team_get_first_port_txable_rcu(team, port);
+diff --git a/drivers/net/team/team_mode_roundrobin.c b/drivers/net/team/team_mode_roundrobin.c
+index dd405d82c6ac..ecbeef28c221 100644
+--- a/drivers/net/team/team_mode_roundrobin.c
++++ b/drivers/net/team/team_mode_roundrobin.c
+@@ -27,7 +27,7 @@ static bool rr_transmit(struct team *team, struct sk_buff *skb)
+ 
+ 	port_index = team_num_to_port_index(team,
+ 					    rr_priv(team)->sent_packets++);
+-	port = team_get_port_by_index_rcu(team, port_index);
++	port = team_get_port_by_tx_index_rcu(team, port_index);
+ 	if (unlikely(!port))
+ 		goto drop;
+ 	port = team_get_first_port_txable_rcu(team, port);
+diff --git a/include/linux/if_team.h b/include/linux/if_team.h
+index 740cb3100dfc..c777170ef552 100644
+--- a/include/linux/if_team.h
++++ b/include/linux/if_team.h
+@@ -27,10 +27,10 @@ struct team;
+ 
+ struct team_port {
+ 	struct net_device *dev;
+-	struct hlist_node hlist; /* node in enabled ports hash list */
++	struct hlist_node tx_hlist; /* node in tx-enabled ports hash list */
+ 	struct list_head list; /* node in ordinary list */
+ 	struct team *team;
+-	int index; /* index of enabled port. If disabled, it's set to -1 */
++	int tx_index; /* index of tx enabled port. If disabled, -1 */
+ 
+ 	bool linkup; /* either state.linkup or user.linkup */
+ 
+@@ -77,7 +77,7 @@ static inline struct team_port *team_port_get_rcu(const struct net_device *dev)
+ 
+ static inline bool team_port_enabled(struct team_port *port)
+ {
+-	return READ_ONCE(port->index) != -1;
++	return READ_ONCE(port->tx_index) != -1;
+ }
+ 
+ static inline bool team_port_txable(struct team_port *port)
+@@ -190,10 +190,10 @@ struct team {
+ 	const struct header_ops *header_ops_cache;
+ 
+ 	/*
+-	 * List of enabled ports and their count
++	 * List of tx-enabled ports and counts of rx and tx-enabled ports.
+ 	 */
+-	int en_port_count;
+-	struct hlist_head en_port_hlist[TEAM_PORT_HASHENTRIES];
++	int tx_en_port_count;
++	struct hlist_head tx_en_port_hlist[TEAM_PORT_HASHENTRIES];
+ 
+ 	struct list_head port_list; /* list of all ports */
+ 
+@@ -237,41 +237,43 @@ static inline int team_dev_queue_xmit(struct team *team, struct team_port *port,
+ 	return dev_queue_xmit(skb);
+ }
+ 
+-static inline struct hlist_head *team_port_index_hash(struct team *team,
+-						      int port_index)
++static inline struct hlist_head *team_tx_port_index_hash(struct team *team,
++							 int tx_port_index)
+ {
+-	return &team->en_port_hlist[port_index & (TEAM_PORT_HASHENTRIES - 1)];
++	unsigned int list_entry = tx_port_index & (TEAM_PORT_HASHENTRIES - 1);
 +
-+	for ns in "${ns_list[@]}"; do
-+		ip netns exec "${ns}" "$@"
-+		(( ret = ret || $? ))
-+	done
-+
-+	return "${ret}"
-+}
-+
- # Create netdevsim with given id and net namespace.
- create_netdevsim() {
-     local id="$1"
++	return &team->tx_en_port_hlist[list_entry];
+ }
+ 
+-static inline struct team_port *team_get_port_by_index(struct team *team,
+-						       int port_index)
++static inline struct team_port *team_get_port_by_tx_index(struct team *team,
++							  int tx_port_index)
+ {
++	struct hlist_head *head = team_tx_port_index_hash(team, tx_port_index);
+ 	struct team_port *port;
+-	struct hlist_head *head = team_port_index_hash(team, port_index);
+ 
+-	hlist_for_each_entry(port, head, hlist)
+-		if (port->index == port_index)
++	hlist_for_each_entry(port, head, tx_hlist)
++		if (port->tx_index == tx_port_index)
+ 			return port;
+ 	return NULL;
+ }
+ 
+ static inline int team_num_to_port_index(struct team *team, unsigned int num)
+ {
+-	int en_port_count = READ_ONCE(team->en_port_count);
++	int tx_en_port_count = READ_ONCE(team->tx_en_port_count);
+ 
+-	if (unlikely(!en_port_count))
++	if (unlikely(!tx_en_port_count))
+ 		return 0;
+-	return num % en_port_count;
++	return num % tx_en_port_count;
+ }
+ 
+-static inline struct team_port *team_get_port_by_index_rcu(struct team *team,
+-							   int port_index)
++static inline struct team_port *team_get_port_by_tx_index_rcu(struct team *team,
++							      int tx_port_index)
+ {
++	struct hlist_head *head = team_tx_port_index_hash(team, tx_port_index);
+ 	struct team_port *port;
+-	struct hlist_head *head = team_port_index_hash(team, port_index);
+ 
+-	hlist_for_each_entry_rcu(port, head, hlist)
+-		if (READ_ONCE(port->index) == port_index)
++	hlist_for_each_entry_rcu(port, head, tx_hlist)
++		if (READ_ONCE(port->tx_index) == tx_port_index)
+ 			return port;
+ 	return NULL;
+ }
 
 -- 
 2.53.0.1213.gd9a14994de-goog
