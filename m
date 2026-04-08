@@ -1,155 +1,177 @@
-Return-Path: <netdev+bounces-276711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276713-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OEVQGdfG1mkLIQgAu9opvQ
-	(envelope-from <netdev+bounces-276711-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 23:21:27 +0200
+	id cK3VAnrI1mkLIQgAu9opvQ
+	(envelope-from <netdev+bounces-276713-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 23:28:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B76893C4051
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 23:21:26 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C28C3C413D
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 23:28:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9D87130238FA
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 21:21:23 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 99CB1301BEC4
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 21:28:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A93E34B194;
-	Wed,  8 Apr 2026 21:21:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2968139F164;
+	Wed,  8 Apr 2026 21:28:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b="Mb3dBzL7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="llybHSbR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.nabladev.com (mx.nabladev.com [178.251.229.89])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BE4234678E;
-	Wed,  8 Apr 2026 21:21:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.251.229.89
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0400439DBDF;
+	Wed,  8 Apr 2026 21:28:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775683282; cv=none; b=hobeABWCqwWjEIancos8Ssv3ORahLoEGEIQYWrFveAo5PQgh45GLEOQbt5Ra67DUyYNKyEA2a9o1FW1HPYn6OINpYJSe2/XZbAQiE5+1Yiwqa54sNU9rjjfO2WNC0LE+LxHiCfLP/KBr7AYXQNh7ZsFbojEXfBNkyWYZFphxg40=
+	t=1775683691; cv=none; b=sckh4MV9ud54V+o8wu98G3Qz/IdPBPdBotJFDe/HsvpjCxWafh+Ok/97Al+lqMrNzxkp2sDSR5VToQ72Lra6XJ2O4GmpHxkV2MrE+ZgMg2xVjymDaVRRDYAAWm3kd7QEArz8M7NEDNBCU9CgqQ885UhnHGOMUt6ycLq6hhneeWg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775683282; c=relaxed/simple;
-	bh=AEwBmXrl+P16SqUF2Qjge5a9ctCanzTapuzBGGZSjt8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SOG6yhkFqcCd6ab9LRTTTxSbG0dDKmZ9hTfNGmj4GoRjdndZuAX59heN7D8G8uJt6tNgbekfuSmqG7G3rMaTBIBDY+doMhcvzrF4MGtQALH8hzDIFngIE8HcBceiwPtQY0YZKT7lsS9DNNaHfGcFmR8ukFuoZ2jAFvgGCfrYxso=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com; spf=pass smtp.mailfrom=nabladev.com; dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b=Mb3dBzL7; arc=none smtp.client-ip=178.251.229.89
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nabladev.com
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id C5FB410CDF1;
-	Wed,  8 Apr 2026 23:21:15 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nabladev.com;
-	s=dkim; t=1775683278;
-	h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=uaQTp3lW1Nn3Bm18LOgfOavd2o3IuyanrZ2oFpQZfsw=;
-	b=Mb3dBzL7w3uZkoLxmIWweEmb+utEqksb4jBOPS0MMieVqc40Gezv7M4MEisumb46aXvUM6
-	L/R+nsCvBjImxWfxng5RC7db480d+L6o9wMwazpsAUohFSjnkW+XVxDus3Az4KaDE1itIy
-	vbbM/cH/+vVq/ArVl2LNmsj/YbiK1y//5cVE2LNSJgRGvk1phfzHvllyozNIMSZdQ/EQhV
-	pDfSh/TuaXTOTSO4Sbv0t7HNPGWeibP3rvzrC9V8mH7xnNeBvGAsDCxsymiYBhkwK2Va2I
-	PAdpXrw6JD6hPe/GDPvR+DSdT300+RyHcNmLIUrTXOUb+43RSX0CJaUkCRy+Lg==
-Message-ID: <a36f6c1a-85aa-4547-be29-daf56b438aaa@nabladev.com>
-Date: Wed, 8 Apr 2026 23:21:14 +0200
+	s=arc-20240116; t=1775683691; c=relaxed/simple;
+	bh=WpE0MYfaSpWNmYLrKupwzmNe/zhoMgBoUNCb8zcFtzM=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=X4E92H1KmgPzPRfFBBgFkhhracD/OIJpRRGwHQHklGmxhFWkC+CVU3u1zP8MKEdTxb0M4OGikoLqurZvRDiWjF4/t5X7E8ymLWblRlPpnqvwjwNf3WOcd9cug4VncqcuROCx1JpCbuEH4UvOa63hdeypBB6m8V8Dfbyi0u+dMfU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=llybHSbR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 255A7C19421;
+	Wed,  8 Apr 2026 21:28:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775683690;
+	bh=WpE0MYfaSpWNmYLrKupwzmNe/zhoMgBoUNCb8zcFtzM=;
+	h=Date:From:To:Cc:Subject:From;
+	b=llybHSbRhF0IyGzCiVkubRm6jznBYSJKm41Is2adPV68oSVITizRNvt4u0qfNvig0
+	 nGCGlPd2WKRsvxlirftnlfXF6UdpbKqg7y44STD3RFBepBvnQ/PmjXCbnr6J5wj+HG
+	 /T1IBIhUJA6MGraadSUCIbeGE90GXpC/ltH0Xz4atoobzu7QGhBIbTTyAAfHmiI/bH
+	 CE4V15DY/RgcqIAbqnyu3+e8Rq4JHHhF09KT6lRZKbCI2UtMH/IC64Vyi8cyuj+3nA
+	 8GO7gbEtUBA3d+4DiWzgxuiv+F6ppXJyaAoUr2ye2oMa9pIpLGFp7/w1TLEFCRODCI
+	 I2SLx2sXaWacA==
+Date: Wed, 8 Apr 2026 15:27:04 -0600
+From: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+To: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	linux-hardening@vger.kernel.org
+Subject: [PATCH][next] netfilter: x_tables: Avoid a couple
+ -Wflex-array-member-not-at-end warnings
+Message-ID: <adbIKC0cZcK7VcCF@kspp>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net,PATCH] net: ks8851: Reinstate disabling of BHs around IRQ
- handler
-To: Nicolai Buchwitz <nb@tipi-net.de>
-Cc: netdev@vger.kernel.org, stable@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Ronald Wahl <ronald.wahl@raritan.com>, Yicong Hui <yiconghui@gmail.com>,
- linux-kernel@vger.kernel.org
-References: <20260407212344.80265-1-marex@nabladev.com>
- <f4010cedaa49afc1648a73775a987ee5@tipi-net.de>
- <a9845b8e-5d3f-472b-8f03-bba699ba3882@nabladev.com>
- <215ad1cc5db3f352ac2a130c07dbd830@tipi-net.de>
-Content-Language: en-US
-From: Marek Vasut <marex@nabladev.com>
-In-Reply-To: <215ad1cc5db3f352ac2a130c07dbd830@tipi-net.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[nabladev.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[nabladev.com:s=dkim];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-276711-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,lunn.ch,google.com,kernel.org,redhat.com,raritan.com,gmail.com];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-276713-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[marex@nabladev.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[nabladev.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[gustavoars@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tipi-net.de:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B76893C4051
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 8C28C3C413D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 4/8/26 9:15 PM, Nicolai Buchwitz wrote:
-> On 8.4.2026 17:41, Marek Vasut wrote:
->> On 4/8/26 12:54 PM, Nicolai Buchwitz wrote:
->>
->> Hello Nicolai,
->>
->> thank you for testing on the SPI variant, that helped a lot.
->>
->>> In order to make this work I would propose something like this (which 
->>> works in my SPI setup):
->>>
->>> --- a/drivers/net/ethernet/micrel/ks8851_par.c
->>> +++ b/drivers/net/ethernet/micrel/ks8851_par.c
->>> @@ -60,12 +60,14 @@ static void ks8851_lock_par(struct ks8851_net 
->>> *ks, unsigned long *flags)
->>>   {
->>>       struct ks8851_net_par *ksp = to_ks8851_par(ks);
->>>
->>> +    local_bh_disable();
->>>       spin_lock_irqsave(&ksp->lock, *flags);
->>>   }
->>>
->>>   static void ks8851_unlock_par(struct ks8851_net *ks, unsigned long 
->>> *flags)
->>>   {
->>>       struct ks8851_net_par *ksp = to_ks8851_par(ks);
->>>
->>>       spin_unlock_irqrestore(&ksp->lock, *flags);
->>> +    local_bh_enable();
->>>   }
->>>
->>> Tested-by: Nicolai Buchwitz <nb@tipi-net.de>  # KS8851 SPI, non-RT 
->>> (regression + proposed fix)
->>
->> Are you also able to test the KS8851 driver with PREEMPT_RT enabled 
->> and heavy iperf3 traffic on the SPI variant ? Does that trigger any 
->> issues ? I ran 'iperf3 -s' on the KS8851 end and 'iperf3 -c 
->> 192.168.1.300 -t 0 --bidir' on the host PC side.
-> 
-> Successfully tested with both PREEMPT_RT and non-RT kernels using the 
-> iperf3 command above - no issues observed. Both builds included the fix 
-> from my previous message.
-> If there is anything else worth testing on the KS8851 SPI variant, 
-> please let me know.
-Thank you for that. Could you please add the TB to v2 too ?
+-Wflex-array-member-not-at-end was introduced in GCC-14, and we are
+getting ready to enable it, globally.
+
+struct compat_xt_standard_target and struct compat_xt_error_target are
+only used in xt_compat_check_entry_offsets(). Remove these structs and
+instead define the same memory layout on the stack via flexible struct
+compat_xt_entry_target and DEFINE_RAW_FLEX(). Adjust the rest of the
+code accordingly.
+
+With these changes, fix the following warnings:
+
+1 net/netfilter/x_tables.c:816:39: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+1 net/netfilter/x_tables.c:811:39: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+
+Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+---
+ net/netfilter/x_tables.c | 30 +++++++++++++-----------------
+ 1 file changed, 13 insertions(+), 17 deletions(-)
+
+diff --git a/net/netfilter/x_tables.c b/net/netfilter/x_tables.c
+index b39017c80548..a58107038a24 100644
+--- a/net/netfilter/x_tables.c
++++ b/net/netfilter/x_tables.c
+@@ -817,17 +817,6 @@ int xt_compat_match_to_user(const struct xt_entry_match *m,
+ }
+ EXPORT_SYMBOL_GPL(xt_compat_match_to_user);
+ 
+-/* non-compat version may have padding after verdict */
+-struct compat_xt_standard_target {
+-	struct compat_xt_entry_target t;
+-	compat_uint_t verdict;
+-};
+-
+-struct compat_xt_error_target {
+-	struct compat_xt_entry_target t;
+-	char errorname[XT_FUNCTION_MAXNAMELEN];
+-};
+-
+ int xt_compat_check_entry_offsets(const void *base, const char *elems,
+ 				  unsigned int target_offset,
+ 				  unsigned int next_offset)
+@@ -850,18 +839,25 @@ int xt_compat_check_entry_offsets(const void *base, const char *elems,
+ 		return -EINVAL;
+ 
+ 	if (strcmp(t->u.user.name, XT_STANDARD_TARGET) == 0) {
+-		const struct compat_xt_standard_target *st = (const void *)t;
++		DEFINE_RAW_FLEX(const struct compat_xt_entry_target, st, data,
++				sizeof(compat_uint_t));
++		compat_uint_t *verdict = (compat_uint_t *)st->data;
+ 
+-		if (COMPAT_XT_ALIGN(target_offset + sizeof(*st)) != next_offset)
++		st = (const void *)t;
++
++		if (COMPAT_XT_ALIGN(target_offset + __struct_size(st)) !=
++				next_offset)
+ 			return -EINVAL;
+ 
+-		if (!verdict_ok(st->verdict))
++		if (!verdict_ok(*verdict))
+ 			return -EINVAL;
+ 	} else if (strcmp(t->u.user.name, XT_ERROR_TARGET) == 0) {
+-		const struct compat_xt_error_target *et = (const void *)t;
++		DEFINE_RAW_FLEX(const struct compat_xt_entry_target, et, data,
++				XT_FUNCTION_MAXNAMELEN);
++		et = (const void *)t;
+ 
+-		if (!error_tg_ok(t->u.target_size, sizeof(*et),
+-				 et->errorname, sizeof(et->errorname)))
++		if (!error_tg_ok(t->u.target_size, __struct_size(et),
++				 et->data, __member_size(et->data)))
+ 			return -EINVAL;
+ 	}
+ 
+-- 
+2.43.0
+
 
