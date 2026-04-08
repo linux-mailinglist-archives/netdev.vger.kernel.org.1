@@ -1,83 +1,82 @@
-Return-Path: <netdev+bounces-276463-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276462-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qBBtOT9D1mkFCwgAu9opvQ
-	(envelope-from <netdev+bounces-276463-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 13:59:59 +0200
+	id QFcwLjRD1mkFCwgAu9opvQ
+	(envelope-from <netdev+bounces-276462-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 13:59:48 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 580063BB9E6
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 13:59:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CB133BB9B8
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 13:59:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id CEE763108E94
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 11:55:02 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E1448310587C
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 11:55:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F10D3BFE5A;
-	Wed,  8 Apr 2026 11:54:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF4453BB9FC;
+	Wed,  8 Apr 2026 11:54:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="JHLrZljG"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="faIb8cf4"
 X-Original-To: netdev@vger.kernel.org
-Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11010011.outbound.protection.outlook.com [52.101.61.11])
+Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010015.outbound.protection.outlook.com [52.101.85.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 770B13B8BBF;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 550E93BB9F2;
 	Wed,  8 Apr 2026 11:54:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.61.11
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.15
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775649260; cv=fail; b=YMcZ51r1Kue6v6Oo72ziLYQLzLgAgnIrm8Mwt8GOKXo4EIp0bBIHOqWlheObQyLUPQsLer440FlWMjZFM1d9EXqYd//GG2ekTD3JLBl70YmE/s5TfgaC7ok7FSarzpP8hlnZ6X7KiAAMu0gL9IKS5XsnxUfO6TmxXR8zMR1lDyw=
+	t=1775649259; cv=fail; b=dIJ+AOe6dZSIxhO4979M3Ef6XJFGEWxPSaKkWeabB9IoGlWvZojeMxBcJ2loIHny176RLIT+IoKWKWM0FPT8xAjmiR6qD1OxaeBQaIEtWgVYE55r5QLqIh6YRX4XUsOwBUnQ8wkQrZjIg5sDahtBxtdTe9rnkFLkbvldOr10Rhs=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775649260; c=relaxed/simple;
-	bh=t98NrpvfPvTUgFUOCns332XZgRQQ3r9QikNceKwYLcw=;
+	s=arc-20240116; t=1775649259; c=relaxed/simple;
+	bh=1WKwHCsN0wmHZhiRLiy04MSsIqEfUKZdCz0ONI7bN3M=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tcKHu4MwjuJLfaAlqSIaLal5IdflzKisBFl7hUh1HjWIf5/LpRLgOZz1cp3X4JOykaVmF4nEL2dZPxKol3CEijUTSaICRw/MahKQlMsL/qDVvWLGG4ELgDv3KztcpEj1hFug2bbv0ONgKQe3qVqqiorRu+xTlZ+L5gg3nSuZs20=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=JHLrZljG; arc=fail smtp.client-ip=52.101.61.11
+	 MIME-Version:Content-Type; b=Wf9baJUwZNP+9pLDN3gXm7D0+mi3ym4gN6ubj9/0EOkLO9xsndAGXFDfZZmXl6vOneqMTisQ7kPvtAzUyy6eepp1qXt2ryi0AfWhvcQuseV4Ie2WOM0un2QcjYNcb+Ft0Zz6PwoZgqzYrikt1pt5ejJvzZWLZg5+XI+7C9Cc5PI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=faIb8cf4; arc=fail smtp.client-ip=52.101.85.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=BxcD9A9+YzVKOGbwzzl+HUC6BebWRmCcdBIPboRfn/1U6PmUNRnJJyAgTNgc+2HvVUm0wZUXwdShGVfJZtZzCdNoRERLEWBxSH/HcDHczELnM7juYm2mvZbMNeUevB8PbT7ENBLuPbDtSh20aZtxW0rGedBLIEuOleOeamHxD5YsH4RjkenPRUM+jx3OQxRDMngF7PtTWf7/opOX7eFvgxexk2VCxoR2Wab5fwAoXiLwxIJ5Aw/WJ90OxSo0R0mtjXYnx4ZVheUtdnU3c7sviUwhiwUDWlL4n1UzmjhyA0PJBRmLPnk6/TUOiNfMvxxGNyrLK//3zYSDFZ0vlRmuoA==
+ b=q7rvufv3D4kpmygqxlWOyRbX7S22zE8sJ8CWJxfbOUpnlROLLOSs493saXn0ByN7e/LGOJ5xiPehWLQHgP7IWlbhguHQuC4Pt8Xh7d/WEQLvURbARQn+HvlzhN58TlHGonBGS3F4iVpGiEAZ4wryMZLItdXagzJtga176K8Z2rBH1WcD2zLLo/r/0USVHfu2vQ09JDp/aPkZbwRwgHrkmXf+m+Ff1Da4eiuPLIw7w2TdEHXAhbe/K37Y0QEt9K1JAMzNK3aOMah+XfUjEmzZ4jOBQS3KV/+5w5GfflMF2+/Gg/PbvmraWE6Zf8U/xvmezlb6dc1lzcBndg3BpXvz2Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=oPm+QtMuzpPOCa7QhnUErJbaTOuKlY92Ldf1QLG3Ldk=;
- b=auTtKUjO/Kf7dWRc97inVhPkA/Cd++ko2OIPbK2pWG0fphoPEhMdUz1umjCSrIZ/ibYUVqSd9NmgAUloGdjoEgRgWM3wqciRU/lGImh/PT30klgLkTLpJVjjaiR5cYSVDuNCFzMi9xVD3ttdXwtJe/oAp5EOYN2PhSdJA4fXQp+JWegG4681Z8TP0KoVw/f0PuOLzeE2NyHOcHH7DgHkg2315DFzUTdmtNRhmm2FxPofxGhpijpfKYchZGU58voBUd3qwQ3D92fGeacmRetx2kPdcsTNcWr39+EC8uohqXE4Ej9tLtyCTe9HZAA6KUlwWDF7S5MKEAGen+m+TdYYsw==
+ bh=yy8quJrq3c/xMwAeU6PVRAP0gnrlJEGxUvCpMLO9VUY=;
+ b=dkcY4qqrTYPc5tDy0MvYpebYKdsq6q2at8rZucXjkRd7CN0cJ6y75McmZm//dh9RkueuZ2q5qRAhC4yLU719zkOzyPU7ueoZONmyVYdONtoNkvPlQx0NRnVBUtp7YojXwTeEcC/Md72ZokB+ilkbSUtnm4/YK/5GLJYN/jQukXj8rpAYh463aUGxrUWr6Tnt59U8BJKKXaE9tfr3qLZf3NBSnx2wyZwC1WFonUEwnpgcyud5PyDkGLEJ6bwG+GK4eZKLd3irogjFPbmZ40CNCxc/r+YCnq153nBQ57QnaBhFpTbVwEq0kvGrLrYHquqZ5Lbqyg3JvOwyp3WAPGJbiw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=oPm+QtMuzpPOCa7QhnUErJbaTOuKlY92Ldf1QLG3Ldk=;
- b=JHLrZljGWoTUdajpX6jLatTn8tvJd50800JNLKf7vYyV0SYaMiOlYSQBM33+0jbeZJHp3t3iaeDSQ3HFv/cdbvKS53LBRQA4G9HV7saNMFaBN3fpC9NYuYzogkvOL5spdf5jBoeFgMmKZWpdym3ehR1Z3wLVyyGXXI+7Ovw5QeR5/d2atx4Y2yTUqqL0YO6ref5uzuVTjTpBBGN2iMV32V5hHXvtz+imUHxkLDxr2ITVBmzbPubMuzV8TRHderMxwnpjtjsyNDbONRv+JlbkvG6Z6Vk3bpA/EkHPwTEyZkiRiA1kKmGqICuGzG3Z7R/EnTkBw9jZsTv79a6atohpzg==
-Received: from SJ0PR03CA0155.namprd03.prod.outlook.com (2603:10b6:a03:338::10)
- by SA1PR12MB7317.namprd12.prod.outlook.com (2603:10b6:806:2ba::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.20; Wed, 8 Apr
- 2026 11:54:09 +0000
-Received: from SJ5PEPF000001F6.namprd05.prod.outlook.com
- (2603:10b6:a03:338:cafe::98) by SJ0PR03CA0155.outlook.office365.com
- (2603:10b6:a03:338::10) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9769.33 via Frontend Transport; Wed,
- 8 Apr 2026 11:54:09 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ bh=yy8quJrq3c/xMwAeU6PVRAP0gnrlJEGxUvCpMLO9VUY=;
+ b=faIb8cf4CM5CSajSUkCr5tR4YrGIMZDPxxZyeOZVjjylxyvPTHuXnU8Kh628LOE8U8sonPpJ5WedzCbdARaT60Jy7UL3kxqd/cQ24Leqybel4luVRHiSFt9UC04c2nD+v5AmybvoGIxCPUW0REX8iCb4HC7KJ5noq3fP/zzPFIpXJqv+DELLDzyk8CXpfdl88wqGPSZWhK3Uw1PA3AfHJQ3PARqJnhGXPP9I5umHc3Q+pYVwiJHOyAas96wZcJdRwNGwF19+2Nub8gfR9B7XMV8rTwWeJWwFkb6dFgghouT2qaiJdVqHogPPwQ9bupHktbTvIr4GmXCln+sES6dU0g==
+Received: from DM6PR03CA0005.namprd03.prod.outlook.com (2603:10b6:5:40::18) by
+ CY8PR12MB7362.namprd12.prod.outlook.com (2603:10b6:930:52::5) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9769.16; Wed, 8 Apr 2026 11:54:13 +0000
+Received: from DS1PEPF00017090.namprd03.prod.outlook.com
+ (2603:10b6:5:40:cafe::97) by DM6PR03CA0005.outlook.office365.com
+ (2603:10b6:5:40::18) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9769.32 via Frontend Transport; Wed,
+ 8 Apr 2026 11:54:13 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- SJ5PEPF000001F6.mail.protection.outlook.com (10.167.242.74) with Microsoft
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ DS1PEPF00017090.mail.protection.outlook.com (10.167.17.132) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9769.17 via Frontend Transport; Wed, 8 Apr 2026 11:54:09 +0000
+ 15.20.9769.17 via Frontend Transport; Wed, 8 Apr 2026 11:54:12 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 8 Apr
- 2026 04:53:55 -0700
+ 2026 04:53:59 -0700
 Received: from c-237-113-240-247.mtl.labs.mlnx (10.126.231.35) by
  rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.20; Wed, 8 Apr 2026 04:53:51 -0700
+ 15.2.2562.20; Wed, 8 Apr 2026 04:53:55 -0700
 From: Cosmin Ratiu <cratiu@nvidia.com>
 To: <netdev@vger.kernel.org>
 CC: Sabrina Dubroca <sd@queasysnail.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -87,9 +86,9 @@ CC: Sabrina Dubroca <sd@queasysnail.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
 	<dw@davidwei.uk>, Shuah Khan <shuah@kernel.org>,
 	<linux-kselftest@vger.kernel.org>, Cosmin Ratiu <cratiu@nvidia.com>, "Dragos
  Tatulea" <dtatulea@nvidia.com>
-Subject: [PATCH net v8 1/4] selftests: Migrate nsim-only MACsec tests to Python
-Date: Wed, 8 Apr 2026 14:52:37 +0300
-Message-ID: <20260408115240.1636047-2-cratiu@nvidia.com>
+Subject: [PATCH net v8 2/4] nsim: Add support for VLAN filters
+Date: Wed, 8 Apr 2026 14:52:38 +0300
+Message-ID: <20260408115240.1636047-3-cratiu@nvidia.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260408115240.1636047-1-cratiu@nvidia.com>
 References: <20260408115240.1636047-1-cratiu@nvidia.com>
@@ -105,30 +104,30 @@ X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ5PEPF000001F6:EE_|SA1PR12MB7317:EE_
-X-MS-Office365-Filtering-Correlation-Id: b94b1f90-4ebd-4c97-f124-08de95658b52
+X-MS-TrafficTypeDiagnostic: DS1PEPF00017090:EE_|CY8PR12MB7362:EE_
+X-MS-Office365-Filtering-Correlation-Id: 84b2f8e3-55b9-4dbb-ae47-08de95658d5d
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700016|7416014|376014|82310400026|1800799024|56012099003|18002099003|22082099003;
+	BCL:0;ARA:13230040|1800799024|36860700016|376014|7416014|82310400026|18002099003|56012099003|22082099003;
 X-Microsoft-Antispam-Message-Info:
-	8+8+AXivW0wKeFsfDV9oNxh+Nqvws41FaNNJRM70sVdcroIMn216kIvj7qIGRVpT5e5Sns5PiHqppPLCtmychyzcxd2q9pXsUMaVSZEuXwWvoGx87ShZoKnEb7izi57TOPLwoqGgSSGheiz/SgWtgJfns+SslWeQQBmH2XsWXSvGgyXWw2Jtr3GRh9pvuS+Vm3iU3O5sUVMfoVCsFA4ZyYN86zV6TXwWuEDkRFTXcDXfnY+u2waiaHhl4WYSxjS06CaHKurDQwuKXrTSHFb/tBEvF4M2cNd86x4TYAsKQ1suXSTHq3oScfCUIu9ZcN5Lck2jpPWq2uuRJCyJ3nH4D44ons37EVf3wHKUkHLXLVS9pRK5VPf5K9Ed8KYA67gXTApFxlPmdICBdU1S4S9EhEMxmQV5AsR6XpWG6IGy5SbZ7J8J5dT93NVVcw3vHDPnPckLOfEotHGkDsYG5CPaTuXXoSFQMo61ch8+/d/kIKVFgKNyLleDtgEKHMBJZbZHglz8taQYOdYYX+/yLX4oux4NPu6LdXodCXKepw+TZigSHHJNFkks3iMEzNFOD2waZFu2qe31Vem4HiG10SttOIXBm20lgvD6/dw+xcZCegrDcLadNjPlX1QNVzVpBr28k7qEIQET008IeTTfTRqjj4O+FF+2Rh4xYgdHp/uDjtDnqxrIDBRP8UuoiVEnJLtZgnnpDabAboNiXhepuo1OB+7zeArdiWQ2FUJu9eDwriZ3o9FRfD895SUVJHm41zKJIoOE0+cDouYoXW/Dbl6mWQ==
+	V9d7W8y9GizFs6fpRp/B4zUdqXTFcsMFG3V1rOdzw3hfA1VhnQYu8dIOuRrDJu1wWBIiFFKigCZIMSUHTskGnKTbC/GTy4e/vdRkIPdTmQ4ilCvhMGOaF7jg2zhJyJmv5xJY9AuYszuttjJcQn/kYgBq6/jXoTE0Y7UHJn0LCTSbqm3WoTF7hi9NyIQ2dCFvFMYJ4HsdUtKX73qImfMWdXy1wa4OMEBjMM/yQ0IGsM7D5P0infq3CU7Tku3e/eOtlvgm/lP90RGxHnqV8qVwH3r2RuwlJUzevXK1Odr6vH0iGL/N8Zo6yIYruaUy6bbUNXI+PMapACz7nKqwV3JoFKEM2GDPnBEU7kIDxgZy3tS1k0HkM0ziqDpQoFfWqxnJlKWkHIX0hhFYTv45eKQFvA9M89HCNILpswELbFAS3AZY/MEY/E4zC9BZjThNO/QqRMMUq/ZdcU/0l+5TbNGA6UEIKjxt+CvhO4RjDHk3nJ/K/7xkyW/vDvT6Wr6wU49VPjKqpbQ7DCEFHK17nxJD90iB2d6Mukv+ZI+2jMhKgNJnUR83wj/4hHnXfwVAL9fmpz1Gr0TIfjxnm5cOQavnYRXi2UZPCwAFp39psFS8JrDIfCgUvVEbtGM6a22TJ7V/32OUBdoQ5ghNqKGC8pc0iJZWTKx+RGjUXszfmRTA6F+KoYfBG1xzMu1CpA7qnns/oWevfKKIjl2hKL0Qc3LlkyUBzP1iLZRdbIVUToYlBNmuWj/Jb6FgnY/2GzE6voj9+i7bhopWy3+LlN6d9q4xqg==
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700016)(7416014)(376014)(82310400026)(1800799024)(56012099003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(36860700016)(376014)(7416014)(82310400026)(18002099003)(56012099003)(22082099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	jdwVylBNWYHyyVosBimHNygyCidpL4IKERgm6WfSHB6Ap76xFGOLBlZyyGxf7NfbPTjdR19hjhqfffv3ZMDEQexlNiepxTNJm4zfK2d6sDeWGxzZUoLSvtpKodGoEj7j3VQ1zAVWbrOs7KkcGqy80IWWqFtRGQfgCt8MJFzIGUgf9LYIzKWTql/0WPCvJvHPvmO1xt24utLEtwpDmETEBRPY8Hs2Et8RtOQcvdEdjGBjfkImqKRVTgvl9jD15YwbrybcR3stfX+RoXgcQzUB3rSbYm17Bh1l8VKtQbk/hMRtAXKu/BtkMZ8kKAOVsrXhwifyqrjRvtztgSjkXrHlLj2J3KMITcNvJOXoes4SGCBuEZdzMkmBjwCvEu3RG5EBrk7NlZBKUKExUejuKzuXCpcgBq7oW7fRjGrwJC/yjfPc8iO/DkoXJ7nWbHCCHkSg
+	DXn5exFMfYd8J8kziBoL0ccieSG4o49xBg99msUpMb+UpuMQ2QY6yIXzvWH8k09at0qXt5he4n6pZ0xcy4JBZ0odLqOTCUmgZ3IlivK9ICKeLUkH10pq7fsWfPgwoUykjPV3RpXvxlrStscG5ujUr4eZBsIkKTr2pj6LphwgcOkYLvWpm9SeCpM3HehyS1V4fhz7bvPZBHd83z5VpfsU6+AfFA3wSPeWaW9lRVLk10bmJ6aksDTsrAlQg0HDto0vpv4jnagIylq3s2sQuXtoRv7HDoxYO1xsAA6EyeMA+A4CnQGmTh0+6Xq0YcFMu2lV89BouZg8snJTj4AxblCWu3w+Yie8sqz3v5mKx4YIZ43ZWoqwI2PyiTeimCSOqSg3EoIpKZ0NLTgsLtl94HCbHgdfJ4OVddLA5X45fCYskOAT+gUaDA1zUOvdeab/WZnN
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Apr 2026 11:54:09.4524
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Apr 2026 11:54:12.7697
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: b94b1f90-4ebd-4c97-f124-08de95658b52
+X-MS-Exchange-CrossTenant-Network-Message-Id: 84b2f8e3-55b9-4dbb-ae47-08de95658d5d
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SJ5PEPF000001F6.namprd05.prod.outlook.com
+	DS1PEPF00017090.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7317
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7362
 X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_REJECT(1.00)[cv is fail on i=2];
@@ -144,410 +143,205 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	RCVD_TLS_LAST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-276463-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-276462-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[cratiu@nvidia.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[Nvidia.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,Nvidia.com:dkim,nvidia.com:email,nvidia.com:mid,macsec-offload.sh:url,macsec.py:url,ethtool-common.sh:url];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,Nvidia.com:dkim,nvidia.com:email,nvidia.com:mid];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-0.999];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: 580063BB9E6
+X-Rspamd-Queue-Id: 2CB133BB9B8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Move MACsec offload API and ethtool feature tests from
-tools/testing/selftests/drivers/net/netdevsim/macsec-offload.sh to
-tools/testing/selftests/drivers/net/macsec.py using the NetDrvEnv
-framework so tests can run against both netdevsim (default) and real
-hardware (NETIF=ethX). As some real hardware requires MACsec to use
-encryption, add that to the tests.
+Add support for storing the list of VLANs in nsim devices, together with
+ops for adding/removing them and a debug file to show them.
 
-Netdevsim-specific limit checks (max SecY, max RX SC) were moved into
-separate test cases to avoid failures on real hardware.
+This will be used in upcoming tests.
 
 Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
 ---
- tools/testing/selftests/drivers/net/Makefile  |   1 +
- tools/testing/selftests/drivers/net/config    |   1 +
- tools/testing/selftests/drivers/net/macsec.py | 202 ++++++++++++++++++
- .../selftests/drivers/net/netdevsim/Makefile  |   1 -
- .../drivers/net/netdevsim/macsec-offload.sh   | 117 ----------
- 5 files changed, 204 insertions(+), 118 deletions(-)
- create mode 100755 tools/testing/selftests/drivers/net/macsec.py
- delete mode 100755 tools/testing/selftests/drivers/net/netdevsim/macsec-offload.sh
+ drivers/net/netdevsim/netdev.c    | 65 ++++++++++++++++++++++++++++++-
+ drivers/net/netdevsim/netdevsim.h |  8 ++++
+ 2 files changed, 71 insertions(+), 2 deletions(-)
 
-diff --git a/tools/testing/selftests/drivers/net/Makefile b/tools/testing/selftests/drivers/net/Makefile
-index 8154d6d429d3..5e045dde0273 100644
---- a/tools/testing/selftests/drivers/net/Makefile
-+++ b/tools/testing/selftests/drivers/net/Makefile
-@@ -13,6 +13,7 @@ TEST_GEN_FILES := \
- TEST_PROGS := \
- 	gro.py \
- 	hds.py \
-+	macsec.py \
- 	napi_id.py \
- 	napi_threaded.py \
- 	netpoll_basic.py \
-diff --git a/tools/testing/selftests/drivers/net/config b/tools/testing/selftests/drivers/net/config
-index 77ccf83d87e0..d4b31a317c09 100644
---- a/tools/testing/selftests/drivers/net/config
-+++ b/tools/testing/selftests/drivers/net/config
-@@ -3,6 +3,7 @@ CONFIG_DEBUG_INFO_BTF=y
- CONFIG_DEBUG_INFO_BTF_MODULES=n
- CONFIG_INET_PSP=y
- CONFIG_IPV6=y
-+CONFIG_MACSEC=m
- CONFIG_NETCONSOLE=m
- CONFIG_NETCONSOLE_DYNAMIC=y
- CONFIG_NETCONSOLE_EXTENDED_LOG=y
-diff --git a/tools/testing/selftests/drivers/net/macsec.py b/tools/testing/selftests/drivers/net/macsec.py
-new file mode 100755
-index 000000000000..5220c0656c0c
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/macsec.py
-@@ -0,0 +1,202 @@
-+#!/usr/bin/env python3
-+# SPDX-License-Identifier: GPL-2.0
+diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
+index 3645ebde049a..19b0ff183c45 100644
+--- a/drivers/net/netdevsim/netdev.c
++++ b/drivers/net/netdevsim/netdev.c
+@@ -605,6 +605,36 @@ static int nsim_stop(struct net_device *dev)
+ 	return 0;
+ }
+ 
++static int nsim_vlan_rx_add_vid(struct net_device *dev, __be16 proto, u16 vid)
++{
++	struct netdevsim *ns = netdev_priv(dev);
 +
-+"""MACsec tests."""
++	if (vid >= VLAN_N_VID)
++		return -EINVAL;
 +
-+import os
++	if (proto == htons(ETH_P_8021Q))
++		WARN_ON_ONCE(test_and_set_bit(vid, ns->vlan.ctag));
++	else if (proto == htons(ETH_P_8021AD))
++		WARN_ON_ONCE(test_and_set_bit(vid, ns->vlan.stag));
 +
-+from lib.py import ksft_run, ksft_exit, ksft_eq, ksft_raises
-+from lib.py import CmdExitFailure, KsftSkipEx
-+from lib.py import NetDrvEpEnv
-+from lib.py import cmd, ip, defer, ethtool
++	return 0;
++}
 +
-+# Unique prefix per run to avoid collisions in the shared netns.
-+# Keep it short: IFNAMSIZ is 16 (incl. NUL), and VLAN names append ".<vid>".
-+MACSEC_PFX = f"ms{os.getpid()}_"
++static int nsim_vlan_rx_kill_vid(struct net_device *dev, __be16 proto, u16 vid)
++{
++	struct netdevsim *ns = netdev_priv(dev);
 +
++	if (vid >= VLAN_N_VID)
++		return -EINVAL;
 +
-+def _macsec_name(idx=0):
-+    return f"{MACSEC_PFX}{idx}"
++	if (proto == htons(ETH_P_8021Q))
++		WARN_ON_ONCE(!test_and_clear_bit(vid, ns->vlan.ctag));
++	else if (proto == htons(ETH_P_8021AD))
++		WARN_ON_ONCE(!test_and_clear_bit(vid, ns->vlan.stag));
 +
++	return 0;
++}
 +
-+def _get_macsec_offload(dev):
-+    """Returns macsec offload mode string from ip -d link show."""
-+    info = ip(f"-d link show dev {dev}", json=True)[0]
-+    return info.get("linkinfo", {}).get("info_data", {}).get("offload")
+ static int nsim_shaper_set(struct net_shaper_binding *binding,
+ 			   const struct net_shaper *shaper,
+ 			   struct netlink_ext_ack *extack)
+@@ -662,6 +692,8 @@ static const struct net_device_ops nsim_netdev_ops = {
+ 	.ndo_bpf		= nsim_bpf,
+ 	.ndo_open		= nsim_open,
+ 	.ndo_stop		= nsim_stop,
++	.ndo_vlan_rx_add_vid	= nsim_vlan_rx_add_vid,
++	.ndo_vlan_rx_kill_vid	= nsim_vlan_rx_kill_vid,
+ 	.net_shaper_ops		= &nsim_shaper_ops,
+ };
+ 
+@@ -673,6 +705,8 @@ static const struct net_device_ops nsim_vf_netdev_ops = {
+ 	.ndo_change_mtu		= nsim_change_mtu,
+ 	.ndo_setup_tc		= nsim_setup_tc,
+ 	.ndo_set_features	= nsim_set_features,
++	.ndo_vlan_rx_add_vid	= nsim_vlan_rx_add_vid,
++	.ndo_vlan_rx_kill_vid	= nsim_vlan_rx_kill_vid,
+ };
+ 
+ /* We don't have true per-queue stats, yet, so do some random fakery here.
+@@ -970,6 +1004,20 @@ static const struct file_operations nsim_pp_hold_fops = {
+ 	.owner = THIS_MODULE,
+ };
+ 
++static int nsim_vlan_show(struct seq_file *s, void *data)
++{
++	struct netdevsim *ns = s->private;
++	int vid;
 +
++	for_each_set_bit(vid, ns->vlan.ctag, VLAN_N_VID)
++		seq_printf(s, "ctag %d\n", vid);
++	for_each_set_bit(vid, ns->vlan.stag, VLAN_N_VID)
++		seq_printf(s, "stag %d\n", vid);
 +
-+def _get_features(dev):
-+    """Returns ethtool features dict for a device."""
-+    return ethtool(f"-k {dev}", json=True)[0]
++	return 0;
++}
++DEFINE_SHOW_ATTRIBUTE(nsim_vlan);
 +
+ static void nsim_setup(struct net_device *dev)
+ {
+ 	ether_setup(dev);
+@@ -982,14 +1030,18 @@ static void nsim_setup(struct net_device *dev)
+ 			 NETIF_F_FRAGLIST |
+ 			 NETIF_F_HW_CSUM |
+ 			 NETIF_F_LRO |
+-			 NETIF_F_TSO;
++			 NETIF_F_TSO |
++			 NETIF_F_HW_VLAN_CTAG_FILTER |
++			 NETIF_F_HW_VLAN_STAG_FILTER;
+ 	dev->hw_features |= NETIF_F_HW_TC |
+ 			    NETIF_F_SG |
+ 			    NETIF_F_FRAGLIST |
+ 			    NETIF_F_HW_CSUM |
+ 			    NETIF_F_LRO |
+ 			    NETIF_F_TSO |
+-			    NETIF_F_LOOPBACK;
++			    NETIF_F_LOOPBACK |
++			    NETIF_F_HW_VLAN_CTAG_FILTER |
++			    NETIF_F_HW_VLAN_STAG_FILTER;
+ 	dev->pcpu_stat_type = NETDEV_PCPU_STAT_DSTATS;
+ 	dev->max_mtu = ETH_MAX_MTU;
+ 	dev->xdp_features = NETDEV_XDP_ACT_BASIC | NETDEV_XDP_ACT_HW_OFFLOAD;
+@@ -1156,6 +1208,8 @@ struct netdevsim *nsim_create(struct nsim_dev *nsim_dev,
+ 	ns->qr_dfs = debugfs_create_file("queue_reset", 0200,
+ 					 nsim_dev_port->ddir, ns,
+ 					 &nsim_qreset_fops);
++	ns->vlan_dfs = debugfs_create_file("vlan", 0400, nsim_dev_port->ddir,
++					   ns, &nsim_vlan_fops);
+ 	return ns;
+ 
+ err_free_netdev:
+@@ -1167,7 +1221,9 @@ void nsim_destroy(struct netdevsim *ns)
+ {
+ 	struct net_device *dev = ns->netdev;
+ 	struct netdevsim *peer;
++	u16 vid;
+ 
++	debugfs_remove(ns->vlan_dfs);
+ 	debugfs_remove(ns->qr_dfs);
+ 	debugfs_remove(ns->pp_dfs);
+ 
+@@ -1193,6 +1249,11 @@ void nsim_destroy(struct netdevsim *ns)
+ 	if (nsim_dev_port_is_pf(ns->nsim_dev_port))
+ 		nsim_exit_netdevsim(ns);
+ 
++	for_each_set_bit(vid, ns->vlan.ctag, VLAN_N_VID)
++		WARN_ON_ONCE(1);
++	for_each_set_bit(vid, ns->vlan.stag, VLAN_N_VID)
++		WARN_ON_ONCE(1);
 +
-+def _require_ip_macsec(cfg):
-+    """SKIP if iproute2 on local or remote lacks 'ip macsec' support."""
-+    for host in [None, cfg.remote]:
-+        out = cmd("ip macsec help", fail=False, host=host)
-+        if "Usage" not in out.stdout + out.stderr:
-+            where = "remote" if host else "local"
-+            raise KsftSkipEx(f"iproute2 too old on {where},"
-+                             " missing macsec support")
+ 	/* Put this intentionally late to exercise the orphaning path */
+ 	if (ns->page) {
+ 		page_pool_put_full_page(pp_page_to_nmdesc(ns->page)->pp,
+diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
+index f767fc8a7505..f844c27ca78b 100644
+--- a/drivers/net/netdevsim/netdevsim.h
++++ b/drivers/net/netdevsim/netdevsim.h
+@@ -18,6 +18,7 @@
+ #include <linux/ethtool.h>
+ #include <linux/ethtool_netlink.h>
+ #include <linux/kernel.h>
++#include <linux/if_vlan.h>
+ #include <linux/list.h>
+ #include <linux/netdevice.h>
+ #include <linux/ptp_mock.h>
+@@ -75,6 +76,11 @@ struct nsim_macsec {
+ 	u8 nsim_secy_count;
+ };
+ 
++struct nsim_vlan {
++	DECLARE_BITMAP(ctag, VLAN_N_VID);
++	DECLARE_BITMAP(stag, VLAN_N_VID);
++};
 +
-+
-+def _require_ip_macsec_offload():
-+    """SKIP if local iproute2 doesn't understand 'ip macsec offload'."""
-+    out = cmd("ip macsec help", fail=False)
-+    if "offload" not in out.stdout + out.stderr:
-+        raise KsftSkipEx("iproute2 too old, missing macsec offload")
-+
-+
-+def _require_macsec_offload(cfg):
-+    """SKIP if local device doesn't support macsec-hw-offload."""
-+    _require_ip_macsec_offload()
-+    try:
-+        feat = ethtool(f"-k {cfg.ifname}", json=True)[0]
-+    except (CmdExitFailure, IndexError) as e:
-+        raise KsftSkipEx(
-+            f"can't query features: {e}") from e
-+    if not feat.get("macsec-hw-offload", {}).get("active"):
-+        raise KsftSkipEx("macsec-hw-offload not supported")
-+
-+
-+def test_offload_api(cfg) -> None:
-+    """MACsec offload API: create SecY, add SA/rx, toggle offload."""
-+
-+    _require_macsec_offload(cfg)
-+    ms0 = _macsec_name(0)
-+    ms1 = _macsec_name(1)
-+    ms2 = _macsec_name(2)
-+
-+    # Create 3 SecY with offload
-+    ip(f"link add link {cfg.ifname} {ms0} type macsec "
-+       f"port 4 encrypt on offload mac")
-+    defer(ip, f"link del {ms0}")
-+
-+    ip(f"link add link {cfg.ifname} {ms1} type macsec "
-+       f"address aa:bb:cc:dd:ee:ff port 5 encrypt on offload mac")
-+    defer(ip, f"link del {ms1}")
-+
-+    ip(f"link add link {cfg.ifname} {ms2} type macsec "
-+       f"sci abbacdde01020304 encrypt on offload mac")
-+    defer(ip, f"link del {ms2}")
-+
-+    # Add TX SA
-+    ip(f"macsec add {ms0} tx sa 0 pn 1024 on "
-+       "key 01 12345678901234567890123456789012")
-+
-+    # Add RX SC + SA
-+    ip(f"macsec add {ms0} rx port 1234 address 1c:ed:de:ad:be:ef")
-+    ip(f"macsec add {ms0} rx port 1234 address 1c:ed:de:ad:be:ef "
-+       "sa 0 pn 1 on key 00 0123456789abcdef0123456789abcdef")
-+
-+    # Can't disable offload when SAs are configured
-+    with ksft_raises(CmdExitFailure):
-+        ip(f"link set {ms0} type macsec offload off")
-+    with ksft_raises(CmdExitFailure):
-+        ip(f"macsec offload {ms0} off")
-+
-+    # Toggle offload via rtnetlink on SA-free device
-+    ip(f"link set {ms2} type macsec offload off")
-+    ip(f"link set {ms2} type macsec encrypt on offload mac")
-+
-+    # Toggle offload via genetlink
-+    ip(f"macsec offload {ms2} off")
-+    ip(f"macsec offload {ms2} mac")
-+
-+
-+def test_max_secy(cfg) -> None:
-+    """nsim-only test for max number of SecYs."""
-+
-+    cfg.require_nsim()
-+    _require_ip_macsec_offload()
-+    ms0 = _macsec_name(0)
-+    ms1 = _macsec_name(1)
-+    ms2 = _macsec_name(2)
-+    ms3 = _macsec_name(3)
-+
-+    ip(f"link add link {cfg.ifname} {ms0} type macsec "
-+       f"port 4 encrypt on offload mac")
-+    defer(ip, f"link del {ms0}")
-+
-+    ip(f"link add link {cfg.ifname} {ms1} type macsec "
-+       f"address aa:bb:cc:dd:ee:ff port 5 encrypt on offload mac")
-+    defer(ip, f"link del {ms1}")
-+
-+    ip(f"link add link {cfg.ifname} {ms2} type macsec "
-+       f"sci abbacdde01020304 encrypt on offload mac")
-+    defer(ip, f"link del {ms2}")
-+    with ksft_raises(CmdExitFailure):
-+        ip(f"link add link {cfg.ifname} {ms3} "
-+           f"type macsec port 8 encrypt on offload mac")
-+
-+
-+def test_max_sc(cfg) -> None:
-+    """nsim-only test for max number of SCs."""
-+
-+    cfg.require_nsim()
-+    _require_ip_macsec_offload()
-+    ms0 = _macsec_name(0)
-+
-+    ip(f"link add link {cfg.ifname} {ms0} type macsec "
-+       f"port 4 encrypt on offload mac")
-+    defer(ip, f"link del {ms0}")
-+    ip(f"macsec add {ms0} rx port 1234 address 1c:ed:de:ad:be:ef")
-+    with ksft_raises(CmdExitFailure):
-+        ip(f"macsec add {ms0} rx port 1235 address 1c:ed:de:ad:be:ef")
-+
-+
-+def test_offload_state(cfg) -> None:
-+    """Offload state reflects configuration changes."""
-+
-+    _require_macsec_offload(cfg)
-+    ms0 = _macsec_name(0)
-+
-+    # Create with offload on
-+    ip(f"link add link {cfg.ifname} {ms0} type macsec "
-+       f"encrypt on offload mac")
-+    cleanup = defer(ip, f"link del {ms0}")
-+
-+    ksft_eq(_get_macsec_offload(ms0), "mac",
-+            "created with offload: should be mac")
-+    feats_on_1 = _get_features(ms0)
-+
-+    ip(f"link set {ms0} type macsec offload off")
-+    ksft_eq(_get_macsec_offload(ms0), "off",
-+            "offload disabled: should be off")
-+    feats_off_1 = _get_features(ms0)
-+
-+    ip(f"link set {ms0} type macsec encrypt on offload mac")
-+    ksft_eq(_get_macsec_offload(ms0), "mac",
-+            "offload re-enabled: should be mac")
-+    ksft_eq(_get_features(ms0), feats_on_1,
-+            "features should match first offload-on snapshot")
-+
-+    # Delete and recreate without offload
-+    cleanup.exec()
-+    ip(f"link add link {cfg.ifname} {ms0} type macsec")
-+    defer(ip, f"link del {ms0}")
-+    ksft_eq(_get_macsec_offload(ms0), "off",
-+            "created without offload: should be off")
-+    ksft_eq(_get_features(ms0), feats_off_1,
-+            "features should match first offload-off snapshot")
-+
-+    ip(f"link set {ms0} type macsec encrypt on offload mac")
-+    ksft_eq(_get_macsec_offload(ms0), "mac",
-+            "offload enabled after create: should be mac")
-+    ksft_eq(_get_features(ms0), feats_on_1,
-+            "features should match first offload-on snapshot")
-+
-+
-+def main() -> None:
-+    """Main program."""
-+    with NetDrvEpEnv(__file__) as cfg:
-+        ksft_run([test_offload_api,
-+                  test_max_secy,
-+                  test_max_sc,
-+                  test_offload_state,
-+                  ], args=(cfg,))
-+    ksft_exit()
-+
-+
-+if __name__ == "__main__":
-+    main()
-diff --git a/tools/testing/selftests/drivers/net/netdevsim/Makefile b/tools/testing/selftests/drivers/net/netdevsim/Makefile
-index 1a228c5430f5..9808c2fbae9e 100644
---- a/tools/testing/selftests/drivers/net/netdevsim/Makefile
-+++ b/tools/testing/selftests/drivers/net/netdevsim/Makefile
-@@ -11,7 +11,6 @@ TEST_PROGS := \
- 	fib.sh \
- 	fib_notifications.sh \
- 	hw_stats_l3.sh \
--	macsec-offload.sh \
- 	nexthop.sh \
- 	peer.sh \
- 	psample.sh \
-diff --git a/tools/testing/selftests/drivers/net/netdevsim/macsec-offload.sh b/tools/testing/selftests/drivers/net/netdevsim/macsec-offload.sh
-deleted file mode 100755
-index 98033e6667d2..000000000000
---- a/tools/testing/selftests/drivers/net/netdevsim/macsec-offload.sh
-+++ /dev/null
-@@ -1,117 +0,0 @@
--#!/bin/bash
--# SPDX-License-Identifier: GPL-2.0-only
--
--source ethtool-common.sh
--
--NSIM_NETDEV=$(make_netdev)
--MACSEC_NETDEV=macsec_nsim
--
--set -o pipefail
--
--if ! ethtool -k $NSIM_NETDEV | grep -q 'macsec-hw-offload: on'; then
--    echo "SKIP: netdevsim doesn't support MACsec offload"
--    exit 4
--fi
--
--if ! ip link add link $NSIM_NETDEV $MACSEC_NETDEV type macsec offload mac 2>/dev/null; then
--    echo "SKIP: couldn't create macsec device"
--    exit 4
--fi
--ip link del $MACSEC_NETDEV
--
--#
--# test macsec offload API
--#
--
--ip link add link $NSIM_NETDEV "${MACSEC_NETDEV}" type macsec port 4 offload mac
--check $?
--
--ip link add link $NSIM_NETDEV "${MACSEC_NETDEV}2" type macsec address "aa:bb:cc:dd:ee:ff" port 5 offload mac
--check $?
--
--ip link add link $NSIM_NETDEV "${MACSEC_NETDEV}3" type macsec sci abbacdde01020304 offload mac
--check $?
--
--ip link add link $NSIM_NETDEV "${MACSEC_NETDEV}4" type macsec port 8 offload mac 2> /dev/null
--check $? '' '' 1
--
--ip macsec add "${MACSEC_NETDEV}" tx sa 0 pn 1024 on key 01 12345678901234567890123456789012
--check $?
--
--ip macsec add "${MACSEC_NETDEV}" rx port 1234 address "1c:ed:de:ad:be:ef"
--check $?
--
--ip macsec add "${MACSEC_NETDEV}" rx port 1234 address "1c:ed:de:ad:be:ef" sa 0 pn 1 on \
--    key 00 0123456789abcdef0123456789abcdef
--check $?
--
--ip macsec add "${MACSEC_NETDEV}" rx port 1235 address "1c:ed:de:ad:be:ef" 2> /dev/null
--check $? '' '' 1
--
--# can't disable macsec offload when SAs are configured
--ip link set "${MACSEC_NETDEV}" type macsec offload off 2> /dev/null
--check $? '' '' 1
--
--ip macsec offload "${MACSEC_NETDEV}" off 2> /dev/null
--check $? '' '' 1
--
--# toggle macsec offload via rtnetlink
--ip link set "${MACSEC_NETDEV}2" type macsec offload off
--check $?
--
--ip link set "${MACSEC_NETDEV}2" type macsec offload mac
--check $?
--
--# toggle macsec offload via genetlink
--ip macsec offload "${MACSEC_NETDEV}2" off
--check $?
--
--ip macsec offload "${MACSEC_NETDEV}2" mac
--check $?
--
--for dev in ${MACSEC_NETDEV}{,2,3} ; do
--    ip link del $dev
--    check $?
--done
--
--
--#
--# test ethtool features when toggling offload
--#
--
--ip link add link $NSIM_NETDEV $MACSEC_NETDEV type macsec offload mac
--TMP_FEATS_ON_1="$(ethtool -k $MACSEC_NETDEV)"
--
--ip link set $MACSEC_NETDEV type macsec offload off
--TMP_FEATS_OFF_1="$(ethtool -k $MACSEC_NETDEV)"
--
--ip link set $MACSEC_NETDEV type macsec offload mac
--TMP_FEATS_ON_2="$(ethtool -k $MACSEC_NETDEV)"
--
--[ "$TMP_FEATS_ON_1" = "$TMP_FEATS_ON_2" ]
--check $?
--
--ip link del $MACSEC_NETDEV
--
--ip link add link $NSIM_NETDEV $MACSEC_NETDEV type macsec
--check $?
--
--TMP_FEATS_OFF_2="$(ethtool -k $MACSEC_NETDEV)"
--[ "$TMP_FEATS_OFF_1" = "$TMP_FEATS_OFF_2" ]
--check $?
--
--ip link set $MACSEC_NETDEV type macsec offload mac
--check $?
--
--TMP_FEATS_ON_3="$(ethtool -k $MACSEC_NETDEV)"
--[ "$TMP_FEATS_ON_1" = "$TMP_FEATS_ON_3" ]
--check $?
--
--
--if [ $num_errors -eq 0 ]; then
--    echo "PASSED all $((num_passes)) checks"
--    exit 0
--else
--    echo "FAILED $num_errors/$((num_errors+num_passes)) checks"
--    exit 1
--fi
+ struct nsim_ethtool_pauseparam {
+ 	bool rx;
+ 	bool tx;
+@@ -135,6 +141,7 @@ struct netdevsim {
+ 	bool bpf_map_accept;
+ 	struct nsim_ipsec ipsec;
+ 	struct nsim_macsec macsec;
++	struct nsim_vlan vlan;
+ 	struct {
+ 		u32 inject_error;
+ 		u32 __ports[2][NSIM_UDP_TUNNEL_N_PORTS];
+@@ -146,6 +153,7 @@ struct netdevsim {
+ 	struct page *page;
+ 	struct dentry *pp_dfs;
+ 	struct dentry *qr_dfs;
++	struct dentry *vlan_dfs;
+ 
+ 	struct nsim_ethtool ethtool;
+ 	struct netdevsim __rcu *peer;
 -- 
 2.53.0
 
