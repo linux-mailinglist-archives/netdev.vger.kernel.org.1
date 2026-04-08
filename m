@@ -1,197 +1,152 @@
-Return-Path: <netdev+bounces-276590-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276591-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sKlaFNhy1ml2FQgAu9opvQ
-	(envelope-from <netdev+bounces-276590-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 17:23:04 +0200
+	id CDhoIA9z1ml2FQgAu9opvQ
+	(envelope-from <netdev+bounces-276591-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 17:23:59 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A24723BE217
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 17:23:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D79343BE22F
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 17:23:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 44862304046A
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 15:21:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3B90B300FC45
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 15:22:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E22C3D47B9;
-	Wed,  8 Apr 2026 15:21:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EF283D3CF6;
+	Wed,  8 Apr 2026 15:22:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HzIKz+QW";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="TJ1yLHIM"
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="Hy0bblT/"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 584A0386C3A
-	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 15:21:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00AD83AF670
+	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 15:22:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775661672; cv=none; b=swy6+xVudbyE9tjD8RiCfzSnVr33ElCt+0F0Ejd4jhLJDR/6yguqw2nVLFOLeD1q6C2PcMuJ/tncuiEqB2b4nso+lznkxsWoTbmcbzPASqsZHZx8Blp/PCZm0YONtRbShtZj04UOAu4A/9OwGETzXYc0i7oJdeXaWqElfE5GoXk=
+	t=1775661773; cv=none; b=VNn6jOIAibE/PtOS/ncvcRUqjqNZifOOjidP3FRyCo18ksJfbbipxxZ06ZLJmlrV8TZFhjq/X3O4J/aL1zUbZ9yZitcymhf0OXvMgezeFxCiLJaDCgqwuyJS6vHEuNMWeb4raicpMnUx8VzOwuCfgZqKYRZ8elR+dLX3tCAHp4M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775661672; c=relaxed/simple;
-	bh=JWryo19XSS+EbbXgCTnUDuve7zD+psGcWk4bJFoTzeQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=c3TgbP4SRakXlIramUxMx61ah9H3F9PdLXnFY/TSpHe/XSFUG5SP9FqgFxweeI2rK8az7joB8GzW4CpYL752ocIgxdCujRWGj6H5bnQurPnTak2f5CG8nsOGOg1bRfl5pEcAVnk+FuMUIz7CDokwpUyHh3WxW647PcO1X/jP93s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HzIKz+QW; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=TJ1yLHIM; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1775661669;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Bxgs/94flkc5gzjvGkdrpP39nvy7O6M4eR7c4f7iyik=;
-	b=HzIKz+QWBdxilopFnr1QrpaVCWSqPDa4MCap4iekECc5TMbIcU13B984iKn7mmqjO+xYl7
-	B0FpJHPCJcftVj8vk20OG7jbdJw6gJF6f4eXzcS2f3NN98FvCPidG3QSE0GBvQkC91i/zf
-	kl3dbhQZhF2ZjqxqwI10KKACg/v+zSA=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-529-Pg0-BpacN3ubPvqtBHqFWg-1; Wed, 08 Apr 2026 11:21:07 -0400
-X-MC-Unique: Pg0-BpacN3ubPvqtBHqFWg-1
-X-Mimecast-MFC-AGG-ID: Pg0-BpacN3ubPvqtBHqFWg_1775661667
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-43cfb72377bso4325553f8f.2
-        for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 08:21:07 -0700 (PDT)
+	s=arc-20240116; t=1775661773; c=relaxed/simple;
+	bh=vA240ToEZpV5ABu1bLZJGQn4hXI4cp2DDe6zTQg0jQY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NyAY4hjQClkFWo/13UiNNf1z1xfqjevxkENpp4WNn4st6yEoqttNk1KYwFpwBr1V0oNJH+4RPtgvWnY08ZlPaKJvdv3Pb/SXmtHkiZ6Dh/o6wLsb2H5b9aJZqMsfuwCGXj8qj4paXGB45SpCj1fVOJqzBLn7NHVV4EmnzUbdK1w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=Hy0bblT/; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-b9c755b2cdeso730668466b.2
+        for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 08:22:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1775661667; x=1776266467; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Bxgs/94flkc5gzjvGkdrpP39nvy7O6M4eR7c4f7iyik=;
-        b=TJ1yLHIMsDk1c48l1PvegTK7Jq3jTSgnOT9ssJdYUCXor1Kz6NDUcW8+0dHu6iCPJp
-         7uFOIR82ecfIHG5czVgLxNo/ub/cihg9pqVxnb0oZS9hdE5ft1mlbtNIIgrR31xrJgXc
-         zERdmheMC36wzhLBixaqrj6Hz7ov2auhCzEAj3u7eKh5SsWlkUg5rVFP1ouEnehJVPHp
-         FvMX6BiY6gIFfx5ETTywZrCvR+RlYDhAE8dTu3JDJqsFiQzKiK11jOtfCTrMjWGc7U6m
-         0x3yBCAyGrZH87XYfDpxBs3iVbU8cuscSAW9l+492/0OR+JT5hNz0pHRMnlt4jKio404
-         MHYg==
+        d=linux-foundation.org; s=google; t=1775661770; x=1776266570; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=6oB8sWft0bulZQQhndjF41bb2A55hZmeFDzZlsmEc5U=;
+        b=Hy0bblT/37r4nKgkD9qBANOwCscm7hFk837xxRFrtmwudZUzw7NW/YIpdSw6Eu5+xm
+         lTUlQnA0Y11vRoOQvlm7Ef48qE5OEFrSgi8kXIdFHcuNPIHC5Wtbm0t7Rz7X04YkN/2g
+         ie2JZovdDJztnJGoPE/1cx/AY7yl62ZkXU5tE=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775661667; x=1776266467;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20251104; t=1775661770; x=1776266570;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Bxgs/94flkc5gzjvGkdrpP39nvy7O6M4eR7c4f7iyik=;
-        b=XZx25lS0jMPlI1KsACeIQLHe8rSXO8cYxB82xjxKxyHoF6CLF5+hYG/ubKgX/RNKE+
-         Ha46sAqXk6Xa7x/zTIDiaDewsADqfFNtZ2bSCz369it9AIV6gPlj68QPKCwaVB8fw+Hg
-         WrDezZeKjAieZ29Z7cHN10EHz6gksaPhxB0cVflu9b804Zad/WrVKXLbp2Pp6yu+A+Ni
-         uQNpk8W+6u0xkXxynsgwtxF9ZE5DmYovwd3QnDm5kh3gYtRRx2HbVr1tKIH8Yz0jcFHi
-         hEGxaPc8BPt/mcgpP9OLA0NIt5gJhYrZw/EWCpb2HU/zOUXbGvasUNTb4viNGdVXGa3b
-         3m+Q==
-X-Forwarded-Encrypted: i=1; AJvYcCW1cbjD0frnpo5NWQbD6U7/jzlyp52lu1TouXjD+/npJcYju/12Z9U4R/vZZJMXaz58kdQMWm8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzsAESNlYdXaK5rOpgmDd9eFa6CgImW5EUFLadhs+NmJfr/2/rZ
-	Fzoim4GvqdapYR68R1YF19iKQMDBl3zlkOh8ZsFnxrwD1aCLWZg33NRdpq7GiozffONNedpAVuq
-	pclqMSTt76VXa1XFstrJW0QNk4zNIPfnRSIrcJD06MRaMFFEW9QoJQ6N8vg==
-X-Gm-Gg: AeBDietnbtFDgsxT9jkNZGn43+QTlGad3u87s/zyUvkLKbt/INeOqVfAd58DTD47xOX
-	43C22UbuDN4IsMEAGYbG7m3uQzCXtz/7NQxldfyh1C6vC7Qx2YbXA9RGzikZ1Mip4um7ZogdQVc
-	YoF5IOja3Jsiv8njpamg8wAlImSQBoLkKlIkE4GrsxPwmsge1Mjz+K3vWWBpDRkgWpyAsToHBBn
-	4ByjrcmtDyMVNmxhw8rVqi2g8Pt7PQ9x9/07hX3Rd78IPRQGRUHX0CbAhB/cNtYdBqmp9w/X6bQ
-	iYPd3zO2lOXnJcGT0SNQX6JQv8IaNvG0Sxcs4/EDNyWL5RW4mFez1QP3sBPUmjNzYhxnzIR7/6e
-	yhtf1kRLPvwr5bqI+DMygOMoS5Gf4vTv/3ef5JCqVxsr4cVifHhR8ZcLMpwbU
-X-Received: by 2002:a05:6000:1842:b0:43c:f3c9:3815 with SMTP id ffacd0b85a97d-43d29277055mr30965407f8f.3.1775661666589;
-        Wed, 08 Apr 2026 08:21:06 -0700 (PDT)
-X-Received: by 2002:a05:6000:1842:b0:43c:f3c9:3815 with SMTP id ffacd0b85a97d-43d29277055mr30965363f8f.3.1775661666078;
-        Wed, 08 Apr 2026 08:21:06 -0700 (PDT)
-Received: from lleonard-thinkpadx1carbongen13.rmtit.csb ([176.206.19.176])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43d1e4d29bbsm60446899f8f.21.2026.04.08.08.21.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Apr 2026 08:21:04 -0700 (PDT)
-From: Luigi Leonardi <leonardi@redhat.com>
-Date: Wed, 08 Apr 2026 17:21:02 +0200
-Subject: [PATCH net-next v2] vsock/virtio: remove unnecessary call to
- `virtio_transport_get_ops`
+        bh=6oB8sWft0bulZQQhndjF41bb2A55hZmeFDzZlsmEc5U=;
+        b=DjKu7bynXCJXSEyx7XYt8qAwUroetAbcYmH3MEC56uNdkoxLTdhva6kbt69+3S0dkH
+         rOElq8vxvnrhQqhogDyTj0/gUop+I8gEvaq9wv71lolvr2PLVlh8IEzqHk2zTU6oN3zi
+         0v79bhJAILAWU8CbrUIE8Y6fRxoQoz8t9nIYPxF8Mky5zxw8rfWeFbaNRxqZOT8mPZNP
+         mGAKp0C3WnKPvNAUifwYCielA8CKYcjL1fM67yJl/iKiv3GfippZfUkX/OwCVJ39tqL8
+         +AtPyoYngAn+sIy9Cqt4fBW6TIvF2s3DkGp9V90aw/u0vsmZYeF3+v3ng6xreWXQR17N
+         uEqw==
+X-Gm-Message-State: AOJu0Yy+y6EG7OCaTp9njgj66gyTobw58rqnCKyRfQE0oOdwZFDUKQzX
+	Q4CgGnA2UWRjluNMR4zNKWVOs9bo+uPUQRCOTsZ619whWcQCvYe5+69DUZ5jDcIUijFpuAB6IzV
+	ZKYLksd0=
+X-Gm-Gg: AeBDiesQ/LIbH5NlXUghA7/DnLxzXnDNRVGQezZ7oHCzL+ragIkKnzHxGe39IXR0WQr
+	7sj6zcB86h7M9vUK3xqKwz030QHA7fvrVRgHGH+3/Us0aM/OiISQ54WvglYmO7MARwWaObMFkaf
+	4kg7lb33HrAdlX0WqCeH9EowimXeVDgHVNKvkhbVLejDBxymp+/pPO/0FzDAY3gakGYJ7Rai9So
+	wxXCwN18YpvpPLxbl4K7kyZfPoDnYMMXX47n+UveS20qvVgUG3T6gqZJ1NXMt3aMi+9ylDm7Tc2
+	tIRpkFVlXbAiyByY7fyukRIf3/t7WsScBVoL3Rm8Q6tRcGTicDEXI1iaiTR/lCMxRjvqDEqFGRB
+	gfXeWwprEpkP5PR0QZEZdc8Y35R4zFL83PMctji6TdxHg9X8T1ycmjZNIgzUqfH4zfep4oJCeH6
+	tnF0qeS5NLaH3TzpLgk3erXo0xqhy+9/SjgUXmQCsYmM8VBGu0UEjqvXEPmlZLeNL6Yb+xy/3A
+X-Received: by 2002:a17:907:6d1b:b0:b98:d58:f75e with SMTP id a640c23a62f3a-b9c67421c4amr1115075966b.2.1775661770041;
+        Wed, 08 Apr 2026 08:22:50 -0700 (PDT)
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com. [209.85.208.50])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b9c3cff19c0sm650526066b.48.2026.04.08.08.22.47
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 08 Apr 2026 08:22:48 -0700 (PDT)
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-66bf15430ecso11802087a12.3
+        for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 08:22:47 -0700 (PDT)
+X-Received: by 2002:a05:6402:5305:b0:66e:aadc:2021 with SMTP id
+ 4fb4d7f45d1cf-670047bb29amr83427a12.17.1775661767544; Wed, 08 Apr 2026
+ 08:22:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260408-remove_parameter-v2-1-e00f31cf7a17@redhat.com>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/3WNQQqDMBQFryJ/3ZQkimJXvYdISfVZszCRnxAsk
- rs3uO9yGN68kwLYItCjOomRbLDeFdC3iqbVuA+EnQuTlrqVjewEY/MJr92w2RDBYmmVqdHIaek
- lldnOWOxxJQdyiMLhiDQWs9oQPX+vr6Qu/z+blFACfaf7upVGv/FkzKuJ98lvNOacfz4Fg2q7A
- AAA
-X-Change-ID: 20260407-remove_parameter-f61a3e40cf90
-To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
- =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
- Stefan Hajnoczi <stefanha@redhat.com>, 
- Stefano Garzarella <sgarzare@redhat.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, 
- Arseniy Krasnov <avkrasnov@salutedevices.com>
-Cc: kvm@vger.kernel.org, virtualization@lists.linux.dev, 
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Luigi Leonardi <leonardi@redhat.com>
-X-Mailer: b4 0.14.3
-X-Spamd-Result: default: False [-2.16 / 15.00];
+References: <adZTGOjjJrVJOcT8@shell.armlinux.org.uk> <adZfTi3R6jtsjXx-@shell.armlinux.org.uk>
+In-Reply-To: <adZfTi3R6jtsjXx-@shell.armlinux.org.uk>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Wed, 8 Apr 2026 08:22:30 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wi7+6Q5ptBNp6UGrNbgbk9jr1vsY9mJ5O3mH5RPjpBggQ@mail.gmail.com>
+X-Gm-Features: AQROBzDMX29dK6Ob4UI8k1Dcez-g32vHwaiLrL1sR7wyjWf7zr7a7LiEfyJC2DA
+Message-ID: <CAHk-=wi7+6Q5ptBNp6UGrNbgbk9jr1vsY9mJ5O3mH5RPjpBggQ@mail.gmail.com>
+Subject: Re: BUG: net-next (7.0-rc6 based and later) fails to boot on Jetson
+ Xavier NX
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, iommu@lists.linux.dev, 
+	linux-ext4@vger.kernel.org, Marek Szyprowski <m.szyprowski@samsung.com>, 
+	Robin Murphy <robin.murphy@arm.com>, "Theodore Ts'o" <tytso@mit.edu>, 
+	Andreas Dilger <adilger.kernel@dilger.ca>
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_DKIM_ALLOW(-0.20)[linux-foundation.org:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	TAGGED_FROM(0.00)[bounces-276590-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[linux-foundation.org:+];
+	TAGGED_FROM(0.00)[bounces-276591-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[linux-foundation.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leonardi@redhat.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[torvalds@linux-foundation.org,netdev@vger.kernel.org];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A24723BE217
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,armlinux.org.uk:email,mail.gmail.com:mid,linux-foundation.org:dkim]
+X-Rspamd-Queue-Id: D79343BE22F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-`virtio_transport_send_pkt_info` gets all the transport information
-from the parameter `t_ops`. There is no need to call
-`virtio_transport_get_ops()`.
+On Wed, 8 Apr 2026 at 06:59, Russell King (Oracle)
+<linux@armlinux.org.uk> wrote:
+>
+> > Now building straight -rc7. If that also fails, my plan is to start
+> > bisecting rc5..rc6, which will likely take most of the rest of the
+> > day. So, in the mean time I'm sending this as a heads-up that rc6
+> > and onwards has a problem.
+>
+> Plain -rc7 fails (another random oops):
+>
+> Now starting the bisect between 7.0-rc5 and 7.0-rc6.
 
-Remove it.
+Thanks. Not what I wanted to hear at this point, but a bisect should
+get the culprit if this is at least sufficiently repeatable.
 
-Acked-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Luigi Leonardi <leonardi@redhat.com>
----
-Changes in v2:
-- Removed Fixes tag.
-- Picked up RoBs
-- Rebased to latest net-next
-- Link to v1: https://lore.kernel.org/r/20260407-remove_parameter-v1-1-e9729360a2be@redhat.com
----
- net/vmw_vsock/virtio_transport_common.c | 2 --
- 1 file changed, 2 deletions(-)
+The exact symptoms and oops details may be random, but hopefully the
+"something bad happens" is reliable enough to bisect.
 
-diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-index 8a9fb23c6e85..a152a9e208d0 100644
---- a/net/vmw_vsock/virtio_transport_common.c
-+++ b/net/vmw_vsock/virtio_transport_common.c
-@@ -60,8 +60,6 @@ static bool virtio_transport_can_zcopy(const struct virtio_transport *t_ops,
- 		return false;
- 
- 	/* Check that transport can send data in zerocopy mode. */
--	t_ops = virtio_transport_get_ops(info->vsk);
--
- 	if (t_ops->can_msgzerocopy) {
- 		int pages_to_send = iov_iter_npages(iov_iter, MAX_SKB_FRAGS);
- 
-
----
-base-commit: 4c2ffb3ea8a601bb3730754cfaa433e673037cda
-change-id: 20260407-remove_parameter-f61a3e40cf90
-
-Best regards,
--- 
-Luigi Leonardi <leonardi@redhat.com>
-
+              Linus
 
