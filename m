@@ -1,169 +1,178 @@
-Return-Path: <netdev+bounces-276667-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276668-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IMaQOJuQ1mmiGQgAu9opvQ
-	(envelope-from <netdev+bounces-276667-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 19:30:03 +0200
+	id eB8vFoOS1mmiGQgAu9opvQ
+	(envelope-from <netdev+bounces-276668-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 19:38:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 627283BF920
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 19:30:03 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 032C63BFADA
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 19:38:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2C39C3083821
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 17:26:17 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 44A30300DCF6
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 17:36:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1A613D6CC1;
-	Wed,  8 Apr 2026 17:26:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDF0D3502A9;
+	Wed,  8 Apr 2026 17:36:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="QkD+sc7Z";
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="u9V63QLt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="njw4HuMx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-y-209.mailbox.org (mout-y-209.mailbox.org [91.198.250.237])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f48.google.com (mail-ot1-f48.google.com [209.85.210.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 313D63D75B4;
-	Wed,  8 Apr 2026 17:26:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.198.250.237
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775669171; cv=none; b=ZAkmHiD3olWZkZccSRq0m7EaI6JFvuIMfsHhbe3r0A/DaQdKlHQesRY/E+B09KJLMOvPjEUBa9e0OjuY8AKhoUUKz3RMj5A4xVlgrp4poSDOvHxK6e9Fx6eAGUXsbq1QVw/18IaZAn+ICtBoOqt0EcHhVg1cR8jDr1W9TS/kWv0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775669171; c=relaxed/simple;
-	bh=HXv6Qfyh/87ciXBdlWLxEEivSqZv3G8fmPWNM5DrNmk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DlkoEFXU0UvNbOypE+BIy8RPmZ94ik/geUD+Kl7LAe4a47394m93jCDgvsNFhD0Dxa36KTSb/ePZIEgV+7Xt4gpetLWF7qsJVtGbCY+x/5iqL/jXyX7oksA+ZumjLXZjUIsI4W5UW2iY3yIvTEpcpmaWfOIR9rZD+U6QAm+VeDo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=QkD+sc7Z; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=u9V63QLt; arc=none smtp.client-ip=91.198.250.237
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
-Received: from smtp102.mailbox.org (smtp102.mailbox.org [IPv6:2001:67c:2050:b231:465::102])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-y-209.mailbox.org (Postfix) with ESMTPS id 4frVN04DktzB11B;
-	Wed,  8 Apr 2026 19:26:08 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1775669168;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=kBwy39yOFjCmmlrsUB/j5yUVYN7ZkTMndF/TwEehldI=;
-	b=QkD+sc7ZPfXsS36W74FQWd9xekYqmT4AlQ4+57k2f+ajbhGKWKkW3jZH5pyEwC+U4SilR1
-	K4xkrrOq7xwN9+Qspk6KBn/nXPzOtYAOZOciXAvG4YZHa6ZiANkQkArika+Y1cEULUBIfh
-	hpasw8I0f56qnJAzbshWUQK85HQA3adANZqwegiERxUm6ZMcoyZhN9HtML3cUrXOQGln8n
-	H3KH3DDP1GKdtB0YOUCNxQJCMjpzG4TU3ap0EFnZZCBv4mYMrUhhuz3ifjWaGAYlaATrWu
-	iuTGCjOAI1/8+q0+uaUDsybcSZVA7lXyLhPcJKgxI2Zn/vkbMJ1KWP2+7knoyQ==
-Authentication-Results: outgoing_mbo_mout;
-	dkim=pass header.d=mailbox.org header.s=mail20150812 header.b=u9V63QLt;
-	spf=pass (outgoing_mbo_mout: domain of mashiro.chen@mailbox.org designates 2001:67c:2050:b231:465::102 as permitted sender) smtp.mailfrom=mashiro.chen@mailbox.org
-From: Mashiro Chen <mashiro.chen@mailbox.org>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1775669167;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=kBwy39yOFjCmmlrsUB/j5yUVYN7ZkTMndF/TwEehldI=;
-	b=u9V63QLtdxQwqYCy2NE0xeaUt2WxuDZalAFCnm1QY1k7XoBVfs+bYElhOLhEBnvq9EYLWT
-	wA5tkAUqmkb5AG083kBKYo6mssjiXak9FVlO3u+UB6NEBc3IjMq4tkXm1Qmw3/V9muUhLO
-	RKqdMYmmNAQT9oAgdA3jS/u8KpoAnfsdS65zpknG678Cazto37F9lxJc04d5U2i6Bz5Kze
-	2w5+Ro9T6YQxJO9yKsfwb3vJm9zGSey4AC5Di7ZRGdXKwvGp8pY03oxfGJxdx7MB5eV5PF
-	cMvdVTms8HbmobxqoYSl60G53OShdtE3l8LaWTnU02ucakcP+XJ4Kt1vkc6W3g==
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	linux-hams@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Mashiro Chen <mashiro.chen@mailbox.org>,
-	stable@vger.kernel.org
-Subject: [PATCH net] net: rose: reject truncated CLEAR_REQUEST frames in state machines
-Date: Thu,  9 Apr 2026 01:25:51 +0800
-Message-ID: <20260408172551.281486-1-mashiro.chen@mailbox.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FBB33D4134
+	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 17:36:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.48
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775669764; cv=pass; b=mD9Uf0F+zeYPz6sjs5WhvB7/V4owFFcsNnL9ZHs1lnAxkVtPAG3+ghpvjboeSkSQLtw+uH0dcIFvI3pgBurOWTHEsfb6g+7nFxSgTJSbTHcDicR3XlaqvQHmbRoWSQcyNzUZWZRC4e22lo4rv3Ohvd8jda8TuJlsAyJTEMkEZ1I=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775669764; c=relaxed/simple;
+	bh=kaJf5mzQGy70d85gRscVT43zgnA2ZshjO06oLmu9+Sg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=M63vUEh0mk9ky8lRF/pPPd21RGIwidCXaNfLuJ0pUW4DoDeAXzBYiku0NFsyKG9Ftq5mIdRU3Cy6znxWT+vdnPchBYlspTDbaS/sN4x1H5IKu8aB7qDI7AR5crEH8DZnpRhLck9jbWD/eG+zawoUq46UPC/y84Ibpqmk+WEr7/Q=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=njw4HuMx; arc=pass smtp.client-ip=209.85.210.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f48.google.com with SMTP id 46e09a7af769-7dbb6c072f1so11536a34.2
+        for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 10:36:03 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1775669762; cv=none;
+        d=google.com; s=arc-20240605;
+        b=FNMHBNdO90pX3jzuTOrSjLyaAZlAWwOMhv9gz3a9ACfEgVK4kK8ymuLdH4BEbqAuuM
+         OZoW02MsrvsqepJ+18LcD3CGLpNG6DwlsfQgpK528JenXJWXZbK9EJjM4If0pQIq6RMA
+         StwwDAcDazyRDRbi5V1AwAV/bUp6Ibq6lZLgWGObUqS48gTT3fSwGviDjQJKOqb0z8xo
+         yII1kWsab56LDMsYSNvRQD857NeDUkcc3eZ/+d4yfR2N7alHPtneRF/lZhJUgIWrtaNJ
+         VOnB5d6/eTvQG/UclUCbO7i1cJ5MPgWbEz8TwjoTPVMQ5nGjqgyy4igELMEyGtPF1NLO
+         9quA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=kaJf5mzQGy70d85gRscVT43zgnA2ZshjO06oLmu9+Sg=;
+        fh=5rTj0EBNEAGe16jmUrKiMGEwyt/4uLXcgSkOXZE9nzM=;
+        b=bP3U/qxPncXqtYsbXo0TZYX3WqwrTSMO0+9YqpcSMPWsTncEQnzr9UY08Oh02Dqsgr
+         i7pGxzDMi6gRDcOGSLAwgJ4H/g00Dj3Kgtlv6192xhKgqk6mJsDoYrjfiBVs3k23bVYx
+         R1ZJpZJKEojaP5BIIZvdNCl32CCsZ7kae0kXbNsOTC1WdUXorWoW3+RDsDwZHfIQKEWu
+         4zu+ZfElt3Z5DHtuWWZJKZtLzbZIA/8Z9uD3W2vRMeLfhXNpVdrN3j/yC25xD9rjgCmU
+         kLSzGvf8uDnUtgmcxNRybF0RNHYBvvj4HW/R7x94MjZCEU2wQShjqPbyyjbJXKIB9eJx
+         Yk6w==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775669762; x=1776274562; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=kaJf5mzQGy70d85gRscVT43zgnA2ZshjO06oLmu9+Sg=;
+        b=njw4HuMxtsv/QsfaK/hV+JlfmS/9Rxv7xSDZdRaRRV7MH3tHyzlIJYpOJMmsFpN2pR
+         93m4oHUNYzxUUL8jS1uaKr/aNp6DxYOZrC4LHJv5mNkiyU6B+34ItcB9RF+uz8xb9Qy9
+         EawUB5N0too7FanC9vc59CRHZWvBrLYXyyNmjLVkDYUbNeVGG9JkDxybi2YiO5/H98uz
+         KYezJoSQ9aB8VMX7Y7q5+4YFwNAECMXgYTGl6Ha4V+2jQcKZ608wl14TXqCpR99a+H2Z
+         18Mvi1IQQt5AuO4+gWbkc8U/WoXwYeXa/CWjaObCIOs3Yk9CsbKfb66XMxjpEX2Flgrw
+         yEGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775669762; x=1776274562;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kaJf5mzQGy70d85gRscVT43zgnA2ZshjO06oLmu9+Sg=;
+        b=q0b8YixpOM3tGEcqHCcZWpfGKypbHIwIoZctBWWRXOQjUmgwpcbjcuIN8oYqkLODui
+         en3IM7qx/RuVhbq2zPuE+azRqXGH2bnBC7VThXY+MLjdAtbBf2X+pPXzvW/AIDDIVa4+
+         2UPcFVWAvBV5zjoMxp4zdImCKaXTG7LHQuNfQly+7X8AJhuVfv5R2nb4B/BFxWgJavMx
+         xSPaBLkwT3ZHo0PKeOZVIpTGoTj1VAsqrszDd0Kc0CjSjdiokt3oit139jS9HjrWYWcV
+         cy4zvW4lMqp1eJcNL4TLCfBGJp5OGa8EUaf0JJmydN5+YXWGV+k1e3kzoSNioCZ0XYCh
+         UN2A==
+X-Forwarded-Encrypted: i=1; AJvYcCWV7nMEDX4JOIJOcm5d5uz3MKGzCFgC06ZMTRDLjC4qRnCBtIER5jm9TJR9ZsB+TtmRW708YGQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxhSGoKPfn+ComINjYHBEhNv1CCHYyVKYE/mpC4g3DWO0sy1WO5
+	kSuZKK3iEEBgRjlAtm81Fbyol6Mct8EPWf0xNagkcHYKxu1cxEzL7bQLIS8P9krBwPRzJxpaaIu
+	j8YYhxRfmlN1wAMRSU2WsT/RC0U18Mtw=
+X-Gm-Gg: AeBDietiWLTPt1GT+FJd78BUnbrRZtm2ZUE29j97f7kgAOiw3fTFAH899iLlVPhe8+O
+	Uuxos5ovEtgbQDeXwdijLPPDSUfXPg86kuKOmyyB9OBw/hAagvVRgSFCeOCGTnI7pchM0S+NnBA
+	paPiQ9ITWGkp2EwEN3yJRWq/L5qsxqweE4+G6v46CxPMUjRQ9aYAXgvrncxIPJ96az0VptPGz2k
+	dI00Afxyhuvw2p4mKpmkw6MG7BVmruR2g6OCkID1iuoqqChdzNUr15oD8jPRbkQl3gQAH5NqEgu
+	QrBZSdgoH0MVkfrE9+12qdopufUxmIDOkY/HZQ==
+X-Received: by 2002:a05:6820:993:b0:67e:d62:3d16 with SMTP id
+ 006d021491bc7-6821d237e42mr11887737eaf.12.1775669762076; Wed, 08 Apr 2026
+ 10:36:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-MBO-RS-META: p6d5zapacght43tfqwyp69uausasrq4s
-X-MBO-RS-ID: 46b22fe8c2e2875f4c0
+References: <20260403200732.497307-1-devnexen@gmail.com> <20260408170206.GI469338@kernel.org>
+In-Reply-To: <20260408170206.GI469338@kernel.org>
+From: David CARLIER <devnexen@gmail.com>
+Date: Wed, 8 Apr 2026 18:35:51 +0100
+X-Gm-Features: AQROBzA4BkTik_A3H5i7-wdhUsPm4frrCXgC-oXbnU0n_oa2ffPQRz-T3wexVIQ
+Message-ID: <CA+XhMqzdEUiG4RHf8FbTZnS+dKwT+-MjEcMEStD1kA5Dc+d6VQ@mail.gmail.com>
+Subject: Re: [PATCH] octeon_ep_vf: add NULL check for napi_build_skb()
+To: Simon Horman <horms@kernel.org>
+Cc: Veerasenareddy Burru <vburru@marvell.com>, Sathesh Edara <sedara@marvell.com>, 
+	Shinas Rasheed <srasheed@marvell.com>, Satananda Burla <sburla@marvell.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	netdev@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[mailbox.org,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[mailbox.org:s=mail20150812];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-276668-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-276667-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[mailbox.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mashiro.chen@mailbox.org,netdev@vger.kernel.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mailbox.org:dkim,mailbox.org:email,mailbox.org:mid]
-X-Rspamd-Queue-Id: 627283BF920
+	NEURAL_HAM(-0.00)[-0.997];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[devnexen@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 032C63BFADA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-All five ROSE state machines (states 1-5) handle ROSE_CLEAR_REQUEST
-by reading the cause and diagnostic bytes directly from skb->data[3]
-and skb->data[4] without verifying that the frame is long enough:
+Hi Simon,
 
-  rose_disconnect(sk, ..., skb->data[3], skb->data[4]);
+On Wed, 8 Apr 2026 at 18:02, Simon Horman <horms@kernel.org> wrote:
+>
+> On Fri, Apr 03, 2026 at 09:07:32PM +0100, David Carlier wrote:
+> > napi_build_skb() can return NULL on allocation failure. In
+> > __octep_vf_oq_process_rx(), the result is used directly without a NULL
+> > check in both the single-buffer and multi-fragment paths, leading to a
+> > NULL pointer dereference.
+> >
+> > Add NULL checks after both napi_build_skb() calls, properly advancing
+> > descriptors and consuming remaining fragments on failure.
+> >
+> > Fixes: 1cd3b407977c ("octeon_ep_vf: add Tx/Rx processing and interrupt support")
+> > Cc: stable@vger.kernel.org
+> > Signed-off-by: David Carlier <devnexen@gmail.com>
+>
+> Hi David,
+>
+> I appreciate that this is on the fast path, and thus I expect it
+> is performance critical. But this patch largely duplicates code
+> already present in the same function. Would it be possible
+> refactor things a bit - e.g. using helpers - to make the change
+> a bit cleaner while not hurting performance?
+>
+> If so, I'd suggest splitting patch(es) that refactor the code
+> from the patch that fixes the bug.
+>
+> ...
 
-The entry-point check in rose_route_frame() only enforces
-ROSE_MIN_LEN (3 bytes), so a remote peer on a ROSE network can
-send a syntactically valid but truncated CLEAR_REQUEST (3 or 4
-bytes) while a connection is open in any state.  Processing such a
-frame causes a one- or two-byte out-of-bounds read past the skb
-data, leaking uninitialized heap content as the cause/diagnostic
-values returned to user space via getsockopt(ROSE_GETCAUSE).
-
-Add a single length check at the rose_process_rx_frame() dispatch
-point, before any state machine is entered, to drop frames that
-carry the CLEAR_REQUEST type code but are too short to contain the
-required cause and diagnostic fields.
-
-Cc: stable@vger.kernel.org
-Cc: linux-hams@vger.kernel.org
-Signed-off-by: Mashiro Chen <mashiro.chen@mailbox.org>
----
- net/rose/rose_in.c | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/net/rose/rose_in.c b/net/rose/rose_in.c
-index 0276b393f0e530..e2680058196273 100644
---- a/net/rose/rose_in.c
-+++ b/net/rose/rose_in.c
-@@ -271,6 +271,13 @@ int rose_process_rx_frame(struct sock *sk, struct sk_buff *skb)
- 
- 	frametype = rose_decode(skb, &ns, &nr, &q, &d, &m);
- 
-+	/*
-+	 * ROSE_CLEAR_REQUEST carries cause and diagnostic in bytes 3..4.
-+	 * Reject a malformed frame that is too short to contain them.
-+	 */
-+	if (frametype == ROSE_CLEAR_REQUEST && skb->len < 5)
-+		return 0;
-+
- 	switch (rose->state) {
- 	case ROSE_STATE_1:
- 		queued = rose_state1_machine(sk, skb, frametype);
--- 
-2.53.0
-
+Yes, valid points, I'll submit the v2 tomorrow. Cheers !
 
