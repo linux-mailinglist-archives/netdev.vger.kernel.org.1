@@ -1,124 +1,162 @@
-Return-Path: <netdev+bounces-276562-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276563-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KNPhIvFi1mnIEwgAu9opvQ
-	(envelope-from <netdev+bounces-276562-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 16:15:13 +0200
+	id cIMDOxZi1mmDEwgAu9opvQ
+	(envelope-from <netdev+bounces-276563-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 16:11:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 154183BD7EE
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 16:15:12 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 965013BD726
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 16:11:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 767DD3022941
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 14:09:31 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 42F2F3060A2F
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 14:10:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C866B3D170B;
-	Wed,  8 Apr 2026 14:09:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE5233D2FE1;
+	Wed,  8 Apr 2026 14:10:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b="UvddOKBu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gOnEJHP+"
 X-Original-To: netdev@vger.kernel.org
-Received: from www2881.sakura.ne.jp (www2881.sakura.ne.jp [49.212.198.91])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3255D3D1CC3
-	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 14:09:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.198.91
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B1093C9440;
+	Wed,  8 Apr 2026 14:10:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775657370; cv=none; b=BcxFdfT7Tn7ezfgne6GS3wKQrLfi5iXBATgQ+45pjGVHZG41gDm9/mYtK1QUja+ms9Y7dIBqnj4KDnI4e6V+323mHQHvQ8enYDBjlCwCzxjXAbfvvhRG3uUrQ2HCxyoHTl2Xw9laQuub5kDVqXlGoTXEAb3l8JRkBETg55Kz+tY=
+	t=1775657415; cv=none; b=ZIDRmF/ltPfBqGc2GOTiRh+7So+9A5f94XfoDPrIvy2x6HiHPQH8WwzwUwV74isQIhsNNSeXH1SJf/lF3gKCWPb4mu83m7vxrqP4uI1rtVTAHiUFBCdZAt17d7RjlLi5dMmn9BnhZnRtlKxpCsQrO9Stl2jed07QzuZko9mMxkM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775657370; c=relaxed/simple;
-	bh=Gze7bOKjsZXnXsJqz7bzfq8c25jxj/BMOuElaqk2OFw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NrwPcWm6AQvl/kVBI1n7yLTG7E/+O19fOMtyGBcORs8chXnI0i5cMhNVo7Dk4dF2gkfCrm6KcfjkXINYo76Q9jDFivnKMzL2gXZ1xiMr+VP4g/a/yd21bHH7/Mo6AXdr9QdSU1toPSkiO7r+aSwRs9LASM+6NZugAyX7bR4RFco=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp; spf=pass smtp.mailfrom=enjuk.jp; dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b=UvddOKBu; arc=none smtp.client-ip=49.212.198.91
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enjuk.jp
-Received: from x1 (13.3.31.150.dy.iij4u.or.jp [150.31.3.13])
-	(authenticated bits=0)
-	by www2881.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 638E9I4t057284
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Wed, 8 Apr 2026 23:09:19 +0900 (JST)
-	(envelope-from kohei@enjuk.jp)
-DKIM-Signature: a=rsa-sha256; bh=bYzchrb2PJb1o1pVGTErHKK6Im21E7HDexP01h7Ldws=;
-        c=relaxed/relaxed; d=enjuk.jp;
-        h=From:Message-ID:To:Subject:Date;
-        s=rs20251215; t=1775657359; v=1;
-        b=UvddOKBuf42IdroTWJsyDyQKYzZRTfDkYThL6stQ0Ibpp1q4Ti9T/39mTlbzGiNb
-         E8q0Atfo1haypJpPBRofmN00JTS6tZx1Xh/xYhSb+JjnKkrRZ+L1kUB0iPa0v/NY
-         93LEx+F7LWre+wfz8oKiIr2qxcLOeDjI7Xn3PhqeYizDzz3RiHH+yGhZ7cFIomgb
-         3Eomxh4mnBr/OEpt7+KlDiRYD77cWAtMS5RMb9BkDgsg3NhxRUQVcy2VMkcOoOTd
-         q1vm8CcEBSURWi7igzCyHM1fL/KYyII11oFtrsZAXj7GeZ621Ga6sPrtrvhHTbhz
-         MEz1QjdnBIcK9jwqJ0dBoQ==
-Date: Wed, 8 Apr 2026 23:09:18 +0900
-From: Kohei Enju <kohei@enjuk.jp>
-To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
-        netdev@vger.kernel.org
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v2 7/8] ixgbe: use GFP_KERNEL
- in ixgbe_fcoe_ddp_setup()
-Message-ID: <adZd5ZtEzUL_4Oz0@x1>
-References: <20260408131216.2662245-1-aleksandr.loktionov@intel.com>
- <20260408131216.2662245-8-aleksandr.loktionov@intel.com>
+	s=arc-20240116; t=1775657415; c=relaxed/simple;
+	bh=dAXEW/i+Kbo6bb/B2w8p6zRHdD8CxxYy/Gv2arj5Tjk=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=K/FRblWpZP3OVgBSMoS/M0NTAkme3vK3Hu9E2j+iGdToRGtOV35MFZdnWTOmYvj01XcOzyf1rF2zIozDT7ygfFvOuDlsBSCbzZtQgFWAPdPrvtIJCwqN5xrMV9olAGvKJnwtegQXxvCpUJmO3sd0i7pVq/Gy0JodrDL3b9G6b+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gOnEJHP+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80892C2BCB0;
+	Wed,  8 Apr 2026 14:10:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775657415;
+	bh=dAXEW/i+Kbo6bb/B2w8p6zRHdD8CxxYy/Gv2arj5Tjk=;
+	h=Date:From:To:Cc:Subject:From;
+	b=gOnEJHP+goliqm7m06a2WYC6bXyZtt23KGsuvEGCAYDCs/pSoRytHybmQ3piO3/MT
+	 CX8NyGMx3yeZxWONKS/YsOjM71paJH0RVJmSArrwc4eCuQzd5MIfEvQsVhDHOg9blH
+	 /41sePEdfJLmYUM4UPVC6CsDFgLJNB4r+cmK95230dWygG0Wh45GIp440M2+bQjKbR
+	 P/azZbeuhUMeYOePvEqivrs2AolI9k+PQ2bBpWMEPIbci8LgoK0YHIKB6qPdGyG0x5
+	 YtoTHVoer7r+p9Bx/vU9OwBGTyJfEyqpLngyoi+lP3AqmIaObb4MP/1TSua9xN3QDr
+	 id9iKNulZ+aUw==
+Date: Wed, 8 Apr 2026 15:10:10 +0100
+From: Mark Brown <broonie@kernel.org>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Networking <netdev@vger.kernel.org>
+Cc: Andrea Mayer <andrea.mayer@uniroma2.it>,
+	Justin Iurman <justin.iurman@6wind.com>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: linux-next: manual merge of the net-next tree with the netfilter tree
+Message-ID: <adZhwtOYfo-0ImSa@sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="u4w8RTArVaw04ONj"
 Content-Disposition: inline
-In-Reply-To: <20260408131216.2662245-8-aleksandr.loktionov@intel.com>
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-4.26 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[enjuk.jp,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[enjuk.jp:s=rs20251215];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-276562-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-276563-lists,netdev=lfdr.de];
+	TO_DN_ALL(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[172.105.105.114:from];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kohei@enjuk.jp,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[enjuk.jp:+];
+	FROM_NEQ_ENVFROM(0.00)[broonie@kernel.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[100.90.174.1:received];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 154183BD7EE
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sirena.org.uk:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 965013BD726
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 04/08 15:12, Aleksandr Loktionov wrote:
-> ixgbe_fcoe_ddp_setup() is always called from process context (FCoE
-> offload setup paths) and never from an atomic context.  Using GFP_ATOMIC
 
-As I mentioned in v1, I don't think this path is non-atomic.
+--u4w8RTArVaw04ONj
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-fc_exch_seq_send()
-  fc_exch_alloc() # acquires ep->ex_lock (spinlock) internally
-  fc_fcp_ddp_setup()
-    lport->tt.ddp_setup() == fcoe_ddp_setup()
-      .ndo_fcoe_ddp_setup() == ixgbe_fcoe_ddp_get()
-        ixgbe_fcoe_ddp_setup()
-  ...
-  spin_unlock_bh(&ep->ex_lock);
+Hi all,
 
-So even if this runs in process context, it still appears to be in
-atomic context while ep->ex_lock is held and also bh is disabled.
-GFP_KERNEL still looks unsafe here for me.
+Today's linux-next merge of the net-next tree got a conflict in:
 
-If I'm misreading something, please let me know.
-Thanks.
+  net/ipv6/seg6_iptunnel.c
+
+between commit:
+
+  c3812651b522f ("seg6: separate dst_cache for input and output paths in se=
+g6 lwtunnel")
+
+=66rom the netfilter tree and commit:
+
+  78723a62b969a ("seg6: add per-route tunnel source address")
+
+=66rom the net-next tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+diff --cc net/ipv6/seg6_iptunnel.c
+index d6a0f7df90807,e76cc0cc481ec..0000000000000
+--- a/net/ipv6/seg6_iptunnel.c
++++ b/net/ipv6/seg6_iptunnel.c
+@@@ -48,8 -48,8 +48,9 @@@ static size_t seg6_lwt_headroom(struct=20
+  }
+ =20
+  struct seg6_lwt {
+ -	struct dst_cache cache;
+ +	struct dst_cache cache_input;
+ +	struct dst_cache cache_output;
++ 	struct in6_addr tunsrc;
+  	struct seg6_iptunnel_encap tuninfo[];
+  };
+ =20
+
+--u4w8RTArVaw04ONj
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmnWYcIACgkQJNaLcl1U
+h9B8dQf/f6aVI2wZkWNTd95iVGzaYY4dAIwcCgFdyJPBUneYdP7PJOZyZAGc8IIH
+5JyMCKHMVFqokIMWuLlcsOVCzthuHHNWB2Hwa89c76KF87cgXz3Gs5d98K1doPP8
+VoMcm3YGNQ1qARbCscf2HPOKiyKrU3mb90ncbMYti6w4D0E62K+5YZdQIRSNkgBE
+lIL/2Dl6pekFRXJVTPxWmQ1IyDHi9DngDuGZXX+toSbe2opsrozA2lFsBxjDzrJC
+FE6HLJhkyl4cGc/aPXnRa+XrBRKEHqnQQ9xUpUZlR1fFcGGWNRvxyrkdeVn388vr
+kluJ9ODserSet2bCmR3FDSQfEWEMRQ==
+=4Ego
+-----END PGP SIGNATURE-----
+
+--u4w8RTArVaw04ONj--
 
