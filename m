@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-276540-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276541-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4JORJ6pV1mm8DQgAu9opvQ
-	(envelope-from <netdev+bounces-276540-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 15:18:34 +0200
+	id aD4iMrlV1mm8DQgAu9opvQ
+	(envelope-from <netdev+bounces-276541-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 15:18:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00B133BCBA3
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 15:18:33 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 275383BCBAA
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 15:18:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F09BB30D5475
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 13:12:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C1E0230D9A7D
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 13:12:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B3703CD8C1;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7A3F3CD8BB;
 	Wed,  8 Apr 2026 13:12:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eUyHezAc"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NiK70kGW"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFA093C3C09
-	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 13:12:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 543043CCFB7
+	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 13:12:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775653926; cv=none; b=cB/jAWX0esNc4cgejUakz6wN2S6GlZOTgFVFfaQR1zcVwf6JQmfBDvdjc0Twv+rT4hjYXzXMoG49xNw84d8W5IhtUb+4YVGFhXwju6ekeidGfXXZnPVZp0xBuSzXr7/a6Tl8n55QImJvb/Nt/I5dEUpX9XvXJk+UourdCE8/UT8=
+	t=1775653927; cv=none; b=WDrbB8oJ2WWmxX3ZcN+ykwXjKw0MMt/siTQWT2qzQGfOaEV3iL/wooEwE2/+/S4qFlC05Ukf0ko4cfJPJ/0dy6hhlzz9ZnXpMALF+OmvmPRHv7RppuxUbNup528NF2bVDjxXaEaCTE/Ndj5a2Zj+7gC4KIHo8qs7kEcYzSrRWOs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775653926; c=relaxed/simple;
-	bh=yv/bdNXZH9c8rMWd2v5owZSXHg0dmXwqwGf4QRKCawI=;
+	s=arc-20240116; t=1775653927; c=relaxed/simple;
+	bh=LU06K51Gotx2bmJxCVz4VDn41OARIsR6jwdtt19pDGM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mjQa1j3VfgkpDanh+1wQ2+SRDT8XCDaXdwdNAfbmFrWblWqKtVebwpa94cOjWhvDgfFq7jMJ+RH/+biYYIlh3WZH/Ui7S5Zt4kCZ9v9pDEUwT8uqcXdGdzARSPTk2geffWgqCDt/6371BVRamsHdK8G2coDS/nx9rFiz7TGc4fM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eUyHezAc; arc=none smtp.client-ip=192.198.163.7
+	 MIME-Version; b=BKdO3Qv2KWuO8lN9meVrJG7FCl7KP0PIulutsYTh+okZQGQQV6c6Bhb7/a6BcvDBIpfRaVgExU+ODYPaVm2iFm6MhY15cObU5Wg3DN8wl8D7h+Kf4EHpZvyLgQdxemmjRZvlPy3Rh+R/awONmWk/V64aJFb12iRuRRoyCrWXhCQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NiK70kGW; arc=none smtp.client-ip=192.198.163.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
@@ -39,36 +39,36 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   t=1775653926; x=1807189926;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=yv/bdNXZH9c8rMWd2v5owZSXHg0dmXwqwGf4QRKCawI=;
-  b=eUyHezAc29t4mztzCpoobhVYXbDdc5xiHUb+oF5hqCon7Lbi/iBrDRg1
-   XXMD4sgstFuSjnV8N77pOG9ZQMIxqvmmmIU6vHJUmwkg8upLG9FJz2l26
-   LaPH9g3VNFyLnxUM3rmjWnkZphupRsaQVeb49VJ6/e/xxPUctIKqyRbh8
-   bOvsYORwcwwzfbgKUa0RVnczh3TNaMGWpnntApgJLHZYtcdJNQx14B27l
-   XKB3wFz+T4e0HP5yV3MHGh2hpNyuL3jwEAhfnN0OOi0RqXjLltSQVGR+Z
-   SG5jTCdHuOgN4KzaRlR5kI3U7aI/dkB4xC2R57JltVYXwjzWHtxMBDG5b
+  bh=LU06K51Gotx2bmJxCVz4VDn41OARIsR6jwdtt19pDGM=;
+  b=NiK70kGWmOI8RFJImbFKvRsbV+BNGhzxMGF9td/k/2ZxokXh5KhYszom
+   u4YnGjFoVgrhtPIz9Mf97DnKWeWfXEwvKP1gLeUOdFwgi3eq4EZhphfXO
+   EVYbNFX1bbramneOiE9kDAcXF3Av6jykxuw2IkcV7yrcCCg5/BEKiPjwL
+   FSYDJRVAEtwOKDzhjUucY9DgyLRj3BTCfA8/YzxHe45dGcbG30Kg+hnTQ
+   iag9xiCHUv5aCz+Ap/BfNwXOzKASUpG/GEIh8od+2iweb61OzQnmzbfxN
+   pRBmSUv54Readd7iv4SmCE3C2nnLrxbcWPmIxxz8yB+hKoSK96QHQSD8S
    A==;
-X-CSE-ConnectionGUID: y4LDhvnwSdeDBllMayBepg==
-X-CSE-MsgGUID: tamtvZyhSYeMOv3/aJkmvg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11752"; a="102087237"
+X-CSE-ConnectionGUID: O21oDTRJQf2ZSVEfa5O4gg==
+X-CSE-MsgGUID: gzH3unY1SAm4c0f47vciZA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11752"; a="102087240"
 X-IronPort-AV: E=Sophos;i="6.23,167,1770624000"; 
-   d="scan'208";a="102087237"
+   d="scan'208";a="102087240"
 Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Apr 2026 06:12:04 -0700
-X-CSE-ConnectionGUID: Bql28W+bQUuK12k1FUl8pw==
-X-CSE-MsgGUID: oDbuBW78SbCyMCnpNeUt9g==
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Apr 2026 06:12:06 -0700
+X-CSE-ConnectionGUID: UoruqNZeSIK/gIMoqZhRJw==
+X-CSE-MsgGUID: Ajq+f5wrTI+FO0oDjwlMYQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,167,1770624000"; 
-   d="scan'208";a="228714974"
+   d="scan'208";a="228714985"
 Received: from amlin-019-225.igk.intel.com ([10.102.19.225])
-  by orviesa007.jf.intel.com with ESMTP; 08 Apr 2026 06:12:03 -0700
+  by orviesa007.jf.intel.com with ESMTP; 08 Apr 2026 06:12:04 -0700
 From: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 To: intel-wired-lan@lists.osuosl.org,
 	anthony.l.nguyen@intel.com,
 	aleksandr.loktionov@intel.com
 Cc: netdev@vger.kernel.org
-Subject: [PATCH iwl-net v2 5/6] ixgbe: fix ITR value overflow in adaptive interrupt throttling
-Date: Wed,  8 Apr 2026 15:11:53 +0200
-Message-ID: <20260408131154.2661818-6-aleksandr.loktionov@intel.com>
+Subject: [PATCH iwl-net v2 6/6] ixgbe: fix integer overflow and wrong bit position in ixgbe_validate_rtr()
+Date: Wed,  8 Apr 2026 15:11:54 +0200
+Message-ID: <20260408131154.2661818-7-aleksandr.loktionov@intel.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260408131154.2661818-1-aleksandr.loktionov@intel.com>
 References: <20260408131154.2661818-1-aleksandr.loktionov@intel.com>
@@ -85,11 +85,11 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-276540-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-276541-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[intel.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
 	FROM_HAS_DN(0.00)[];
@@ -102,50 +102,65 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TO_DN_NONE(0.00)[];
 	RCPT_COUNT_THREE(0.00)[4];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MIME_TRACE(0.00)[0:+];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 00B133BCBA3
+X-Rspamd-Queue-Id: 275383BCBAA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-ixgbe_update_itr() packs a mode flag (IXGBE_ITR_ADAPTIVE_LATENCY,
-bit 7) and a usecs delay (bits [6:0]) into an unsigned int, then
-stores the combined value in ring_container->itr which is declared as
-u8.  Values above 0xFF wrap on truncation, corrupting both the delay
-and the mode flag on the next readback.
+Two bugs in the same loop in ixgbe_validate_rtr():
 
-Separate the mode bits from the usecs sub-field; clamp only the usecs
-portion to [0, IXGBE_ITR_ADAPTIVE_LATENCY - 1] (= 0x7F) using min_t()
-so overflow cannot bleed into bit 7.
+1. The 3-bit traffic-class field was extracted by shifting a u32 and
+   assigning the result directly to a u8.  For user priority 0 this is
+   harmless; for UP[5..7] the shift leaves bits [15..21] in the u32
+   which are then silently truncated when stored in u8.  Mask with
+   IXGBE_RTRUP2TC_UP_MASK before the assignment so only the intended
+   3 bits are kept.
 
-Fixes: b4ded8327fea ("ixgbe: Update adaptive ITR algorithm")
+2. When clearing an out-of-bounds entry the mask was always shifted by
+   the fixed constant IXGBE_RTRUP2TC_UP_SHIFT (== 3), regardless of
+   which loop iteration was being processed.  This means only UP1 (bit
+   position 3) was ever cleared; UP0,2..7 (positions 0, 6, 9, ..., 21)
+   were left unreset, so invalid TC mappings persisted in hardware and
+   could mis-steer received packets to the wrong traffic class.
+   Use i * IXGBE_RTRUP2TC_UP_SHIFT to target the correct 3-bit field
+   for each iteration.
+
+Swap the operand order in the mask expression to place the constant
+on the right per kernel coding style (noted by David Laight).
+
+Fixes: e7589eab9291 ("ixgbe: consolidate, setup for multiple traffic classes")
 Cc: stable@vger.kernel.org
 Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 ---
 v1 -> v2:
- - Add proper [N/M] numbering so patchwork tracks it as part of the set;
-   no code change.
+ - Add Fixes: tag; reroute to iwl-net (wrong bit positions cause packet
+   mis-steering); swap to (reg >> ...) & MASK operand order per David
+   Laight.
 
  drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 5 +++--
  1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-index 210c7b9..9f3ae21 100644
+index 210c7b9..c9e4f12 100644
 --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
 +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-@@ -2889,8 +2889,9 @@ static void ixgbe_update_itr(struct ixgbe_q_vector *q_vector,
+@@ -9772,11 +9772,12 @@ static void ixgbe_validate_rtr(struct ixgbe_adapter *adapter, u8 tc)
+ 	rsave = reg;
+ 
+ 	for (i = 0; i < MAX_TRAFFIC_CLASS; i++) {
+-		u8 up2tc = reg >> (i * IXGBE_RTRUP2TC_UP_SHIFT);
++		u8 up2tc = (reg >> (i * IXGBE_RTRUP2TC_UP_SHIFT)) &
++			   IXGBE_RTRUP2TC_UP_MASK;
+ 
+ 		/* If up2tc is out of bounds default to zero */
+ 		if (up2tc > tc)
+-			reg &= ~(0x7 << IXGBE_RTRUP2TC_UP_SHIFT);
++			reg &= ~(IXGBE_RTRUP2TC_UP_MASK << (i * IXGBE_RTRUP2TC_UP_SHIFT));
  	}
  
- clear_counts:
--	/* write back value */
--	ring_container->itr = itr;
-+	ring_container->itr = (itr & IXGBE_ITR_ADAPTIVE_LATENCY) |
-+		min_t(unsigned int, itr & ~IXGBE_ITR_ADAPTIVE_LATENCY,
-+		      IXGBE_ITR_ADAPTIVE_LATENCY - 1);
- 
- 	/* next update should occur within next jiffy */
- 	ring_container->next_update = next_update + 1;
+ 	if (reg != rsave)
 -- 
 2.52.0
 
