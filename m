@@ -1,227 +1,192 @@
-Return-Path: <netdev+bounces-276333-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276334-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SDTXC0UI1mnbAQgAu9opvQ
-	(envelope-from <netdev+bounces-276333-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 09:48:21 +0200
+	id GMMFC/gI1mnbAQgAu9opvQ
+	(envelope-from <netdev+bounces-276334-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 09:51:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3B423B8880
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 09:48:19 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A1513B88FE
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 09:51:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id DE2C53002F41
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 07:48:16 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1EB1330054EC
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 07:51:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4234221CA03;
-	Wed,  8 Apr 2026 07:48:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B95803976A9;
+	Wed,  8 Apr 2026 07:51:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Mj1+EbjK";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="QPno/2j7";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="1kKIZ/O+";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="2lxl02zH"
+	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="SELL1tTO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3BEC1F09AD
-	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 07:48:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1FE3396B91;
+	Wed,  8 Apr 2026 07:51:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775634494; cv=none; b=JGSL4hvnJUD85yzqhxoAAxLwJ6zMEQs/uBIiOOV3hYWpuJQb+H7UFPI8ki6SgAhP2+vC/E7vMNPKZG3amf560auR321jBRG1tut7w+gQmCd5Yg/TmGbKQIb5zqN7cIxhijrv6LPrzym18vXuuVql8sioFs/bYU5C41pdCRWVJCI=
+	t=1775634668; cv=none; b=oW8ANZ9/bzHHkSbw5LVBbmSd4BZfYHKw/6uPT/uaK1sBZfX9g7LVYa1dVnw6He9Yzzgap4aS/S4GM35wpdfabTmqam2rRjVQUJb/jOScXRgM1aY3z5wxM0LB5xhAsNwwECz48pq6SktQHHBUFQRoc1Ub0tbOp452CkM2yEi7q6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775634494; c=relaxed/simple;
-	bh=oxU73agG/K/GsQVHTfPXm5aBMeYayhs45e5gLHSlfx8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aI95wjl+Wz9yjdiip27YqG4ga5cdqVQQRYU9RV97vGqPq2FFxRC60kWrODmA3ygoUGnn3sFJ1yd5SY/7VWSJbBjVY5aGNB0bp2y3+2vv0PwD7KmPNfpSO15T6ZwYQa53SedvdLjXmuBy0g2Md5jI2DXXB0wmoC6uPlPZBkacD58=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Mj1+EbjK; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=QPno/2j7; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=1kKIZ/O+; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=2lxl02zH; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id DB7B24E8B2;
-	Wed,  8 Apr 2026 07:48:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1775634491; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=q0+Iq505/Ifb4Fg4GmNo62XpGFRZrl4gwNyQQ25vOYk=;
-	b=Mj1+EbjKI0gB0PZZrLELSNyxCCTYqYOQkC+W1proiXbXhs5dQSzD8L5pARE8GWWIRn4nGJ
-	6h5LFN+PFf2tzcDgNfCtsaQ5rT0qoKFglfjlp2I9KRLa9dAwL/5WifqoKAPFqcuQeElOsR
-	2v/RdJKE0M0DyBGR55JAqsvfBezy+nc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1775634491;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=q0+Iq505/Ifb4Fg4GmNo62XpGFRZrl4gwNyQQ25vOYk=;
-	b=QPno/2j7JbtC76bCGPjzx1aMpa73L437Mq3iqTu5qk+3jdRF42SLEai+txmepFYh7lJUm1
-	B6te2kT4QMb3loBQ==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b="1kKIZ/O+";
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=2lxl02zH
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1775634490; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=q0+Iq505/Ifb4Fg4GmNo62XpGFRZrl4gwNyQQ25vOYk=;
-	b=1kKIZ/O+mGSYY74IiN8vH+U/TcFYTNWac6QVeQonlY+LVk3xR/Ez6cI1qHm2LIYsKD0BvT
-	zWfV4IEHhq9qF0fF9KKLTsDl3bw85QNb0bNvryBYBzJKP68FA3pX09KABJ1JbsuoQFCkhA
-	zZWvOyOfzE6syAyj3FjMlmX6barUoe4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1775634490;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=q0+Iq505/Ifb4Fg4GmNo62XpGFRZrl4gwNyQQ25vOYk=;
-	b=2lxl02zHvXJbCWvYwSihcOworszAeWqBgp27OkfRwbvfOmaaT+iO0tQKcPUGc3Dk1Mtztf
-	qks+rUBuaQqcneDA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 5CFF34A0B3;
-	Wed,  8 Apr 2026 07:48:10 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id mdVtEzoI1mmXSQAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Wed, 08 Apr 2026 07:48:10 +0000
-Message-ID: <e29b7837-70ab-4db2-b9e5-abb59d8721d7@suse.de>
-Date: Wed, 8 Apr 2026 09:48:04 +0200
+	s=arc-20240116; t=1775634668; c=relaxed/simple;
+	bh=uMX7cTSquH9bxls2joBp2SY4uUxTFOoB48ikknbF4GM=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=qFdqqqYApRcVRI51I/m7muUAuXWAkf6zBe9+p7alqD9Rd9M7swhOMBD8rzShIMXSdBTLy2Y/hLRgVEXW+XVVCv3KGFuBuSstBhbNiyP8oVxCeG3eLigzLH/xuUvOR4iuvMrayCuzvHTC9DCm4+KQKcoxA6tlx5yUAonAyKZE4OM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=SELL1tTO; arc=none smtp.client-ip=194.13.80.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 8D4ABA5884;
+	Wed,  8 Apr 2026 09:51:02 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
+	t=1775634664; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=XKxP0eM+E8RMBq0MUnzOFAZbFCvAKCeCZ8ebWegyIKQ=;
+	b=SELL1tTO+klnMV/NGb0DQf4TI/mSjTSWVqdCeOKyxcoQrTN/Im72miPrvn/sABkS2jHivo
+	j1o6oAkGEQV4FpnH1UFlIEVV7XnZZQ3xODDf4H5//Vzs+wSFXCFMZn4cnbcjXnGrujtBx0
+	LARHwcS4zw0ELYRH/Upz5Jh+Td0soFwgqcGuqVEj+J3jud6tVL0sQzZEREdr4Cjx0K77FD
+	SGj2z6rdDrNhEsPf6wHSxfzkC43CFS/o0cUjQFNtUCJpDbaj8hrlyLDZt39ieTEvgkLmcy
+	1DAtWecUSgw4SdcdnDNGWi8W0lz/MUbS1hddUIcrBlU/VRx82wVJiRUmM7xp2Q==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 1/2] net: hsr: require valid EOT supervision
- TLV
-To: luka.gejak@linux.dev, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com
-Cc: netdev@vger.kernel.org, fmaurer@redhat.com, horms@kernel.org
-References: <20260407162502.19462-1-luka.gejak@linux.dev>
- <20260407162502.19462-2-luka.gejak@linux.dev>
-Content-Language: en-US
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-In-Reply-To: <20260407162502.19462-2-luka.gejak@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Date: Wed, 08 Apr 2026 09:51:02 +0200
+From: Nicolai Buchwitz <nb@tipi-net.de>
+To: Marek Vasut <marex@nabladev.com>
+Cc: netdev@vger.kernel.org, stable@vger.kernel.org, "David S. Miller"
+ <davem@davemloft.net>, Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Ronald Wahl <ronald.wahl@raritan.com>, Yicong Hui
+ <yiconghui@gmail.com>, linux-kernel@vger.kernel.org
+Subject: Re: [net,PATCH] net: ks8851: Reinstate disabling of BHs around IRQ
+ handler
+In-Reply-To: <20260407212344.80265-1-marex@nabladev.com>
+References: <20260407212344.80265-1-marex@nabladev.com>
+Message-ID: <fec257469a693e5df7f5739740c1764c@tipi-net.de>
+X-Sender: nb@tipi-net.de
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Flag: NO
-X-Spam-Score: -4.51
-X-Spam-Level: 
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TAGGED_FROM(0.00)[bounces-276333-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[suse.de:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,lunn.ch,google.com,kernel.org,redhat.com,raritan.com,gmail.com];
+	TAGGED_FROM(0.00)[bounces-276334-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_NONE(0.00)[];
+	DKIM_TRACE(0.00)[tipi-net.de:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DMARC_DNSFAIL(0.00)[tipi-net.de : query timed out];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	NEURAL_HAM(-0.00)[-0.999];
 	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,suse.de:dkim,suse.de:mid]
-X-Rspamd-Queue-Id: F3B423B8880
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,nabladev.com:email,tipi-net.de:dkim,tipi-net.de:mid,davemloft.net:email]
+X-Rspamd-Queue-Id: 1A1513B88FE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 4/7/26 6:25 PM, luka.gejak@linux.dev wrote:
-> From: Luka Gejak <luka.gejak@linux.dev>
+On 7.4.2026 23:23, Marek Vasut wrote:
+> If CONFIG_PREEMPT_RT=y is set AND the driver executes ks8851_irq() AND
+> KSZ_ISR register bit IRQ_RXI is set AND ks8851_rx_pkts() detects that
+> there are packets in the RX FIFO, then netdev_alloc_skb_ip_align() is
+> called to allocate SKBs. If netdev_alloc_skb_ip_align() is called with
+> BH enabled, local_bh_enable() at the end of netdev_alloc_skb_ip_align()
+> will call __local_bh_enable_ip(), which will call __do_softirq(), which
+> may trigger net_tx_action() softirq, which may ultimately call the xmit
+> callback ks8851_start_xmit_par(). The ks8851_start_xmit_par() will try
+> to lock struct ks8851_net_par .lock spinlock, which is already locked
+> by ks8851_irq() from which ks8851_start_xmit_par() was called. This
+> leads to a deadlock, which is reported by the kernel, including a trace
+> listed below.
 > 
-> Supervision frames are only valid if terminated with a zero-length EOT
-> TLV. The current check fails to reject non-EOT entries as the terminal
-> TLV, potentially allowing malformed supervision traffic.
+> Fix the problem by disabling BH around the IRQ handler, thus preventing
+> the net_tx_action() softirq from triggering during the IRQ handler. The
+> net_tx_action() softirq is now triggered at the end of the IRQ handler,
+> once all the other IRQ handler actions have been completed.
 > 
-> Fix this by strictly requiring the terminal TLV to be HSR_TLV_EOT
-> with a length of zero, and properly linearizing the TLV header before
-> access.
+>   __schedule from schedule_rtlock+0x1c/0x34
+>   schedule_rtlock from rtlock_slowlock_locked+0x538/0x894
+>   rtlock_slowlock_locked from rt_spin_lock+0x44/0x5c
+>   rt_spin_lock from ks8851_start_xmit_par+0x68/0x1a0
+>   ks8851_start_xmit_par from netdev_start_xmit+0x1c/0x40
+>   netdev_start_xmit from dev_hard_start_xmit+0xec/0x1b0
+>   dev_hard_start_xmit from sch_direct_xmit+0xb8/0x25c
+>   sch_direct_xmit from __qdisc_run+0x20c/0x4fc
+>   __qdisc_run from qdisc_run+0x1c/0x28
+>   qdisc_run from net_tx_action+0x1f4/0x244
+>   net_tx_action from handle_softirqs+0x1c0/0x29c
+>   handle_softirqs from __local_bh_enable_ip+0xdc/0xf4
+>   __local_bh_enable_ip from __netdev_alloc_skb+0x140/0x194
+>   __netdev_alloc_skb from ks8851_irq+0x348/0x4d8
+>   ks8851_irq from irq_thread_fn+0x24/0x64
+>   irq_thread_fn from irq_thread+0x110/0x1dc
+>   irq_thread from kthread+0x104/0x10c
+>   kthread from ret_from_fork+0x14/0x28
 > 
-> Assisted-by: Gemini:Gemini-3.1-flash
-> Signed-off-by: Luka Gejak <luka.gejak@linux.dev>
+> Fixes: e0863634bf9f ("net: ks8851: Queue RX packets in IRQ handler 
+> instead of disabling BHs")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Marek Vasut <marex@nabladev.com>
 > ---
->   net/hsr/hsr_forward.c | 20 +++++++++-----------
->   1 file changed, 9 insertions(+), 11 deletions(-)
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: Ronald Wahl <ronald.wahl@raritan.com>
+> Cc: Yicong Hui <yiconghui@gmail.com>
+> Cc: linux-kernel@vger.kernel.org
+> Cc: netdev@vger.kernel.org
+> ---
+>  drivers/net/ethernet/micrel/ks8851_common.c | 2 ++
+>  1 file changed, 2 insertions(+)
 > 
-> diff --git a/net/hsr/hsr_forward.c b/net/hsr/hsr_forward.c
-> index 0aca859c88cb..eb89cc44eac0 100644
-> --- a/net/hsr/hsr_forward.c
-> +++ b/net/hsr/hsr_forward.c
-> @@ -82,35 +82,33 @@ static bool is_supervision_frame(struct hsr_priv *hsr, struct sk_buff *skb)
->   	    hsr_sup_tag->tlv.HSR_TLV_length != sizeof(struct hsr_sup_payload))
->   		return false;
->   
-> -	/* Get next tlv */
-> +	/* Get next TLV */
->   	total_length += hsr_sup_tag->tlv.HSR_TLV_length;
-> -	if (!pskb_may_pull(skb, total_length))
-> +	if (!pskb_may_pull(skb, total_length + sizeof(struct hsr_sup_tlv)))
->   		return false;
->   	skb_pull(skb, total_length);
->   	hsr_sup_tlv = (struct hsr_sup_tlv *)skb->data;
->   	skb_push(skb, total_length);
->   
-> -	/* if this is a redbox supervision frame we need to verify
-> -	 * that more data is available
-> -	 */
-> +	/* If this is a RedBox supervision frame, verify additional data */
->   	if (hsr_sup_tlv->HSR_TLV_type == PRP_TLV_REDBOX_MAC) {
-> -		/* tlv length must be a length of a mac address */
-> +		/* TLV length must be the size of a MAC address */
->   		if (hsr_sup_tlv->HSR_TLV_length != sizeof(struct hsr_sup_payload))
->   			return false;
->   
-> -		/* make sure another tlv follows */
-> +		/* Make sure another TLV follows */
->   		total_length += sizeof(struct hsr_sup_tlv) + hsr_sup_tlv->HSR_TLV_length;
-> -		if (!pskb_may_pull(skb, total_length))
-> +		if (!pskb_may_pull(skb, total_length + sizeof(struct hsr_sup_tlv)))
+> diff --git a/drivers/net/ethernet/micrel/ks8851_common.c 
+> b/drivers/net/ethernet/micrel/ks8851_common.c
+> index 8048770958d60..dadedea016fac 100644
+> --- a/drivers/net/ethernet/micrel/ks8851_common.c
+> +++ b/drivers/net/ethernet/micrel/ks8851_common.c
+> @@ -316,6 +316,7 @@ static irqreturn_t ks8851_irq(int irq, void *_ks)
+>  	unsigned int status;
+>  	struct sk_buff *skb;
+> 
+> +	local_bh_disable();
+>  	ks8851_lock(ks, &flags);
 
-Hi Luka,
+I suspect this breaks the SPI variant on non-RT since
+ks8851_lock_spi() uses mutex_lock() which can't sleep with
+BH disabled. I have KS8851 SPI hardware and will test, will
+get back to you.
 
-why is the length adjusted here? The current total length was adjusted 
-correctly above see:
+> 
+>  	status = ks8851_rdreg16(ks, KS_ISR);
+> @@ -381,6 +382,7 @@ static irqreturn_t ks8851_irq(int irq, void *_ks)
+>  	if (status & IRQ_RXI)
+>  		while ((skb = __skb_dequeue(&rxq)))
+>  			netif_rx(skb);
+> +	local_bh_enable();
+> 
+>  	return IRQ_HANDLED;
+>  }
 
-total_length += sizeof(struct hsr_sup_tlv) + hsr_sup_tlv->HSR_TLV_length;
-
-Thanks,
-Fernando.
-
->   			return false;
->   
-> -		/* get next tlv */
-> +		/* Get next TLV */
->   		skb_pull(skb, total_length);
->   		hsr_sup_tlv = (struct hsr_sup_tlv *)skb->data;
->   		skb_push(skb, total_length);
->   	}
->   
-> -	/* end of tlvs must follow at the end */
-> -	if (hsr_sup_tlv->HSR_TLV_type == HSR_TLV_EOT &&
-> +	/* Supervision frame must end with EOT TLV */
-> +	if (hsr_sup_tlv->HSR_TLV_type != HSR_TLV_EOT ||
->   	    hsr_sup_tlv->HSR_TLV_length != 0)
->   		return false;
->   
-
+Thanks
+Nicolai
 
