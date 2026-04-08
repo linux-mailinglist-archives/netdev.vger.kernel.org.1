@@ -1,78 +1,98 @@
-Return-Path: <netdev+bounces-276212-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276213-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SOddCdGe1Wks8AcAu9opvQ
-	(envelope-from <netdev+bounces-276212-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 02:18:25 +0200
+	id 0Zg/Az2g1Wm/8AcAu9opvQ
+	(envelope-from <netdev+bounces-276213-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 02:24:29 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 931013B5AA7
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 02:18:24 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B4A53B5AE0
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 02:24:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4E78E3007950
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 00:18:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6021F3016915
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 00:24:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F192C17C220;
-	Wed,  8 Apr 2026 00:18:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47D4B23D283;
+	Wed,  8 Apr 2026 00:24:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="aVn/g33D"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rvhB1n3a"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay.smtp-ext.broadcom.com (lpdvsmtp12.broadcom.com [192.19.144.207])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65C5C22301;
-	Wed,  8 Apr 2026 00:18:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.19.144.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D51B32264D6
+	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 00:24:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775607500; cv=none; b=bFfPpwu8akrGW/5cPmmohit/xDexd/amaYVqCTSLm9BiE6vryIAGYKtjOpQ9qv9WBsw4er+jpZ0HPOh/yF8Quu9RtC9tMd4ptFr9AKHN3vRPs0xztwjwbL0343O9Xmc5ahTKH06xSvpqsCZwhVtvKkjb0BJ7ouetdMPcGMUQhhU=
+	t=1775607863; cv=none; b=cZhuxNoEoRdfXU4TD0LqVcICYFAUsR36gu/nCjnLZihex/NzXsYwI1dWpyLFhMPuVLTkD6KlE3SxxZz924AEpQPHPZNwlc5rxAldC4kfQH/udXzV/G2E8z62Gd1BKfG8q1aAh0EYsXNUUPjJXEQQ86aSk14FhUX7+godF+eL3Xg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775607500; c=relaxed/simple;
-	bh=I/3zrDuL4P/qG6D0+8Z2qamWffAvPYalcx8+qa/Xu68=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=FlJ6r5sEmqqnNgxzbMBo4T3AuAFaq8xYObJzuLVsqosFGdvCSVuEqc7b8SMCrTQOgQ5P/Ol42gCsY0XtRwW8rpjhtF26ZfloaUh7Z8sacck11tGaPKkZSZuWasP5YpOOb6+Vm/9U1AraMVaH/V3Zn5Vv+JitA0dRRiFcr0dZbEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=aVn/g33D; arc=none smtp.client-ip=192.19.144.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: from mail-acc-it-01.broadcom.com (mail-acc-it-01.acc.broadcom.net [10.35.36.83])
-	by relay.smtp-ext.broadcom.com (Postfix) with ESMTP id 3E8A8C054EE9;
-	Tue,  7 Apr 2026 17:18:18 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 relay.smtp-ext.broadcom.com 3E8A8C054EE9
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=broadcom.com;
-	s=dkimrelay; t=1775607498;
-	bh=I/3zrDuL4P/qG6D0+8Z2qamWffAvPYalcx8+qa/Xu68=;
-	h=From:To:Cc:Subject:Date:From;
-	b=aVn/g33Dq/I8vp9MrspstA8dUES66zvbPXNrUukuURzceBCy+NAk9hq3WCxujvNFD
-	 Dr+Ru5TomD5EKBhc1R3dzxnyRZ3UPD+N7HsoSkih+XtrNdrTPQ1+K1onjvOwVsipao
-	 Y7xw2WwAleWHMdKSqH5bsgFZmUjFc2cAp4DfTAj8=
-Received: from stbirv-lnx-1.igp.broadcom.net (stbirv-lnx-1.igp.broadcom.net [10.67.48.32])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail-acc-it-01.broadcom.com (Postfix) with ESMTPSA id ED127AE80;
-	Tue,  7 Apr 2026 20:18:16 -0400 (EDT)
-From: Florian Fainelli <florian.fainelli@broadcom.com>
+	s=arc-20240116; t=1775607863; c=relaxed/simple;
+	bh=AxroPpLSjwpx8EztrdBbF9QrEE1x6q8qr132pCWFUj0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=W/CIo99tHodV1UW7yaSe6b+xPGY3DGF84CSwUlkwnI6+6c3haZvAUi2iyb26lyboiezxrePTmC3RZtd1EvFgsRe6dzJtonBaRL1lauRpuVyPrKXzIuFMnDZSjkNoToYG0+YDAIN/387Y/AilLQiwmz6Gr3XfPXI1nzB7xLOTX/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rvhB1n3a; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-488b0046078so27493575e9.1
+        for <netdev@vger.kernel.org>; Tue, 07 Apr 2026 17:24:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775607860; x=1776212660; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=DjwT07ANeUUsPN08vT3gc8tVpgsxlShtx8gPYpFJmfg=;
+        b=rvhB1n3admCZ672bAeQgGBPmxwPTV6FFGcEI+kvL9mUq1HlQqVJwazSLMyNJRyP2MA
+         /64+gxF8kiwLcIdvNA5AVEzlx2JtERjKIH3We3svVaST84GY7L/czlQRIpCs5YHQ/tq/
+         IXB7xY6OlHqoXnatAJMCLXB8Hce9snmHgOSb9wN26T11U5R/b7XNWaSfGrczO/4DPgDz
+         nyZ4SYvmHS785jPFposj3QBwFRnWWiPaArPXhgRl3m44pIZFapgw7sW9g96g4ZUSNaMD
+         chS88F3EBF2zLjKZGvlicrvkY6qumw2INS82qcnQqdzJk7sbarzoLp4oiDXpGfMsGzLn
+         0sGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775607860; x=1776212660;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DjwT07ANeUUsPN08vT3gc8tVpgsxlShtx8gPYpFJmfg=;
+        b=Bj7miyuN4JL7UKjrJQy57FxSmDswWh+m/C2tmV2ymnTqkipLINC1m235+1jU/se9sb
+         dHAxg2q6S/zb3mHoUpfQScI764T2Y2hA4Vip5BqExQnhzm70ytOLBpNNlZn98DIYPdGY
+         tEquPX9KTVKEzhLQI8Vc9tNRxajW2qUWhtKr8sui7+yp653lvJPA25m6kg6EzdB4joBm
+         +l60jYZUK2kIMXN+3InVVZvx88lvl0cSrb1eQZhGnoCdQvgezic64ez0PmFKE3IcLaYH
+         0dvgJ+HSUa4xB6PXGxWatBob7alWD5QCcVLmCaCwyC4fMmylPTDe2oWJ3tHW7yO2PCfl
+         dyzQ==
+X-Gm-Message-State: AOJu0YyfOZcFso572FkS4nzQT93z7Y6F7h9ofl/dRsDNk0/nw3aG0xMh
+	zEXEXfnCQ6exyEQdikdy9aZY7X/VFV4xjG3RQHkQ/5bE3WETB9kCZXdEXoMTeg==
+X-Gm-Gg: AeBDiet4+qvKxq4lYvxQElqKDF/prZ//NbupnYcDh5OYpZHy9Wlf63hHQDrnf7JUg4F
+	9cIq/u0Nl3K1BaXqS8ZqEk6g0TzweItJP+Dq81RH2JLDWkLW5fTcQSSPwvN9z2vipiHt1KfHRsK
+	Tw2uoutxIGhoGMzNq0pi5hw7E/qCmzCi6pcTkOZXHdaNj/V4ZUcnRnuSUrQE564BlDREMLyIrRc
+	31BE6e9CXfcvtfcsV+DdnEaqI9tZ+7uAv2J3Qu4sxDOW71dXZPnWUzFIK8gUixmvxn7ZiSNgymW
+	wk3ZB+5ulQt222cVo1KB0FUpEyVqiaCzI5xp34freNjK68I6A6y0y4CwLCpEnh5cFvMp7AbCyxG
+	DX22sa7AsrOptJnjgJrqP1YixgxNqADKGx5e8zGc7HywQZ4jqubYg6mwHn7ZpdgygsuypD8Ftew
+	7K5SKxvmlAbTw/x5L5YD+a
+X-Received: by 2002:a05:600c:1d1d:b0:485:3ec6:e634 with SMTP id 5b1f17b1804b1-4889977600bmr255728995e9.15.1775607859630;
+        Tue, 07 Apr 2026 17:24:19 -0700 (PDT)
+Received: from localhost ([2a03:2880:31ff:38::])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4887e80a616sm1099700105e9.2.2026.04.07.17.24.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Apr 2026 17:24:18 -0700 (PDT)
+From: Mohsin Bashir <mohsin.bashr@gmail.com>
 To: netdev@vger.kernel.org
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Justin Chen <justin.chen@broadcom.com>,
-	Vikas Gupta <vikas.gupta@broadcom.com>,
-	Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>,
-	Bhargava Marreddy <bhargava.marreddy@broadcom.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	=?UTF-8?q?Markus=20Bl=C3=B6chl?= <markus@blochl.de>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Fernando Fernandez Mancera <fmancera@suse.de>,
-	linux-kernel@vger.kernel.org (open list),
-	bcm-kernel-feedback-list@broadcom.com (open list:BROADCOM ASP 2.0 ETHERNET DRIVER),
-	Nicolai Buchwitz <nb@tipi-net.de>
-Subject: [PATCH net-next v2] net: bcmasp: Switch to page pool for RX path
-Date: Tue,  7 Apr 2026 17:18:13 -0700
-Message-Id: <20260408001813.635679-1-florian.fainelli@broadcom.com>
-X-Mailer: git-send-email 2.34.1
+Cc: alexanderduyck@fb.com,
+	alok.a.tiwari@oracle.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	dg573847474@gmail.com,
+	edumazet@google.com,
+	horms@kernel.org,
+	jacob.e.keller@intel.com,
+	kernel-team@meta.com,
+	kuba@kernel.org,
+	lee@trager.us,
+	linux-kernel@vger.kernel.org,
+	mohsin.bashr@gmail.com,
+	pabeni@redhat.com
+Subject: [PATCH net] eth: fbnic: Use wake instead of start
+Date: Tue,  7 Apr 2026 17:24:15 -0700
+Message-ID: <20260408002415.2963915-1-mohsin.bashr@gmail.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,348 +100,74 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[broadcom.com:s=dkimrelay];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[broadcom.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,arndb.de,blochl.de,gmail.com,suse.de,vger.kernel.org,tipi-net.de];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-276212-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_FROM(0.00)[bounces-276213-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[fb.com,oracle.com,lunn.ch,davemloft.net,gmail.com,google.com,kernel.org,intel.com,meta.com,trager.us,vger.kernel.org,redhat.com];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
+	FROM_NEQ_ENVFROM(0.00)[mohsinbashr@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[florian.fainelli@broadcom.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[broadcom.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-0.986];
+	TO_DN_NONE(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.997];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,broadcom.com:dkim,broadcom.com:email,broadcom.com:mid]
-X-Rspamd-Queue-Id: 931013B5AA7
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,meta.com:email]
+X-Rspamd-Queue-Id: 4B4A53B5AE0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This shows an improvement of 1.9% in reducing the CPU cycles and data
-cache misses.
+From: Mohsin Bashir <hmohsin@meta.com>
 
-Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
+fbnic_up() calls netif_tx_start_all_queues(), which only clears
+__QUEUE_STATE_DRV_XOFF.  If qdisc backlog has accumulated on any TX
+queue before the reconfiguration (e.g. ring resize via ethtool -G),
+start does not call __netif_schedule() to kick the qdisc, so the
+pending backlog is never drained and the queue stalls.
+
+Switch to netif_tx_wake_all_queues(), which clears DRV_XOFF and also
+calls __netif_schedule() on every queue, ensuring any backlog that
+built up before the down/up cycle is promptly dequeued.
+
+Fixes: bc6107771bb4 ("eth: fbnic: Allocate a netdevice and napi vectors with queues")
+Signed-off-by: Mohsin Bashir <hmohsin@meta.com>
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-Changes in v2:
+ drivers/net/ethernet/meta/fbnic/fbnic_pci.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-- addressed Nicolai's comments by setting the .netdev and .napi members
-  and dropped the useless comment and .dma_dir initialization
-
- drivers/net/ethernet/broadcom/Kconfig         |   1 +
- drivers/net/ethernet/broadcom/asp2/bcmasp.h   |   8 +-
- .../net/ethernet/broadcom/asp2/bcmasp_intf.c  | 125 +++++++++++++++---
- .../ethernet/broadcom/asp2/bcmasp_intf_defs.h |   4 +
- 4 files changed, 115 insertions(+), 23 deletions(-)
-
-diff --git a/drivers/net/ethernet/broadcom/Kconfig b/drivers/net/ethernet/broadcom/Kconfig
-index dd164acafd01..4287edc7ddd6 100644
---- a/drivers/net/ethernet/broadcom/Kconfig
-+++ b/drivers/net/ethernet/broadcom/Kconfig
-@@ -272,6 +272,7 @@ config BCMASP
- 	depends on OF
- 	select PHYLIB
- 	select MDIO_BCM_UNIMAC
-+	select PAGE_POOL
- 	help
- 	  This configuration enables the Broadcom ASP 2.0 Ethernet controller
- 	  driver which is present in Broadcom STB SoCs such as 72165.
-diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp.h b/drivers/net/ethernet/broadcom/asp2/bcmasp.h
-index 29cd87335ec8..8c8ffaeadc79 100644
---- a/drivers/net/ethernet/broadcom/asp2/bcmasp.h
-+++ b/drivers/net/ethernet/broadcom/asp2/bcmasp.h
-@@ -6,6 +6,7 @@
- #include <linux/phy.h>
- #include <linux/io-64-nonatomic-hi-lo.h>
- #include <uapi/linux/ethtool.h>
-+#include <net/page_pool/helpers.h>
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_pci.c b/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
+index 3fa9d1910daa..8f331358c972 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
+@@ -139,7 +139,7 @@ void fbnic_up(struct fbnic_net *fbn)
  
- #define ASP_INTR2_OFFSET			0x1000
- #define  ASP_INTR2_STATUS			0x0
-@@ -298,16 +299,19 @@ struct bcmasp_intf {
- 	void __iomem			*rx_edpkt_cfg;
- 	void __iomem			*rx_edpkt_dma;
- 	int				rx_edpkt_index;
--	int				rx_buf_order;
- 	struct bcmasp_desc		*rx_edpkt_cpu;
- 	dma_addr_t			rx_edpkt_dma_addr;
- 	dma_addr_t			rx_edpkt_dma_read;
- 	dma_addr_t			rx_edpkt_dma_valid;
+ 	/* Enable Tx/Rx processing */
+ 	fbnic_napi_enable(fbn);
+-	netif_tx_start_all_queues(fbn->netdev);
++	netif_tx_wake_all_queues(fbn->netdev);
  
--	/* RX buffer prefetcher ring*/
-+	/* Streaming RX data ring (RBUF_4K mode) */
- 	void				*rx_ring_cpu;
- 	dma_addr_t			rx_ring_dma;
- 	dma_addr_t			rx_ring_dma_valid;
-+	int				rx_buf_order;
-+
-+	/* Page pool for recycling RX SKB data pages */
-+	struct page_pool		*rx_page_pool;
- 	struct napi_struct		rx_napi;
- 
- 	struct bcmasp_res		res;
-diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c b/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
-index b368ec2fea43..ec63f50a849e 100644
---- a/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
-+++ b/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
-@@ -15,6 +15,7 @@
- #include <linux/platform_device.h>
- #include <net/ip.h>
- #include <net/ipv6.h>
-+#include <net/page_pool/helpers.h>
- 
- #include "bcmasp.h"
- #include "bcmasp_intf_defs.h"
-@@ -482,10 +483,14 @@ static int bcmasp_rx_poll(struct napi_struct *napi, int budget)
- 	struct bcmasp_desc *desc;
- 	struct sk_buff *skb;
- 	dma_addr_t valid;
-+	struct page *page;
- 	void *data;
- 	u64 flags;
- 	u32 len;
- 
-+	/* Hardware advances DMA_VALID as it writes each descriptor
-+	 * (RBUF_4K streaming mode); software chases with rx_edpkt_dma_read.
-+	 */
- 	valid = rx_edpkt_dma_rq(intf, RX_EDPKT_DMA_VALID) + 1;
- 	if (valid == intf->rx_edpkt_dma_addr + DESC_RING_SIZE)
- 		valid = intf->rx_edpkt_dma_addr;
-@@ -493,12 +498,12 @@ static int bcmasp_rx_poll(struct napi_struct *napi, int budget)
- 	while ((processed < budget) && (valid != intf->rx_edpkt_dma_read)) {
- 		desc = &intf->rx_edpkt_cpu[intf->rx_edpkt_index];
- 
--		/* Ensure that descriptor has been fully written to DRAM by
--		 * hardware before reading by the CPU
-+		/* Ensure the descriptor has been fully written to DRAM by
-+		 * the hardware before the CPU reads it.
- 		 */
- 		rmb();
- 
--		/* Calculate virt addr by offsetting from physical addr */
-+		/* Locate the packet data inside the streaming ring buffer. */
- 		data = intf->rx_ring_cpu +
- 			(DESC_ADDR(desc->buf) - intf->rx_ring_dma);
- 
-@@ -524,19 +529,38 @@ static int bcmasp_rx_poll(struct napi_struct *napi, int budget)
- 
- 		len = desc->size;
- 
--		skb = napi_alloc_skb(napi, len);
--		if (!skb) {
-+		/* Allocate a page pool page as the SKB data area so the
-+		 * kernel can recycle it efficiently after the packet is
-+		 * consumed, avoiding repeated slab allocations.
-+		 */
-+		page = page_pool_dev_alloc_pages(intf->rx_page_pool);
-+		if (!page) {
- 			u64_stats_update_begin(&stats->syncp);
- 			u64_stats_inc(&stats->rx_dropped);
- 			u64_stats_update_end(&stats->syncp);
- 			intf->mib.alloc_rx_skb_failed++;
-+			goto next;
-+		}
- 
-+		skb = napi_build_skb(page_address(page), PAGE_SIZE);
-+		if (!skb) {
-+			u64_stats_update_begin(&stats->syncp);
-+			u64_stats_inc(&stats->rx_dropped);
-+			u64_stats_update_end(&stats->syncp);
-+			intf->mib.alloc_rx_skb_failed++;
-+			page_pool_recycle_direct(intf->rx_page_pool, page);
- 			goto next;
- 		}
- 
-+		/* Reserve headroom then copy the full descriptor payload
-+		 * (hardware prepends a 2-byte alignment pad at the start).
-+		 */
-+		skb_reserve(skb, NET_SKB_PAD);
- 		skb_put(skb, len);
- 		memcpy(skb->data, data, len);
-+		skb_mark_for_recycle(skb);
- 
-+		/* Skip the 2-byte hardware alignment pad. */
- 		skb_pull(skb, 2);
- 		len -= 2;
- 		if (likely(intf->crc_fwd)) {
-@@ -558,6 +582,7 @@ static int bcmasp_rx_poll(struct napi_struct *napi, int budget)
- 		u64_stats_update_end(&stats->syncp);
- 
- next:
-+		/* Return this portion of the streaming ring buffer to HW. */
- 		rx_edpkt_cfg_wq(intf, (DESC_ADDR(desc->buf) + desc->size),
- 				RX_EDPKT_RING_BUFFER_READ);
- 
-@@ -661,12 +686,31 @@ static void bcmasp_adj_link(struct net_device *dev)
- 		phy_print_status(phydev);
- }
- 
--static int bcmasp_alloc_buffers(struct bcmasp_intf *intf)
-+static struct page_pool *
-+bcmasp_rx_page_pool_create(struct bcmasp_intf *intf)
-+{
-+	struct page_pool_params pp_params = {
-+		.order		= 0,
-+		.flags		= 0,
-+		.pool_size	= NUM_4K_BUFFERS,
-+		.nid		= NUMA_NO_NODE,
-+		.dev		= &intf->parent->pdev->dev,
-+		.napi		= &intf->rx_napi,
-+		.netdev		= intf->ndev,
-+		.offset		= 0,
-+		.max_len	= PAGE_SIZE,
-+	};
-+
-+	return page_pool_create(&pp_params);
-+}
-+
-+static int bcmasp_alloc_rx_buffers(struct bcmasp_intf *intf)
- {
- 	struct device *kdev = &intf->parent->pdev->dev;
- 	struct page *buffer_pg;
-+	int ret;
- 
--	/* Alloc RX */
-+	/* Contiguous streaming ring that hardware writes packet data into. */
- 	intf->rx_buf_order = get_order(RING_BUFFER_SIZE);
- 	buffer_pg = alloc_pages(GFP_KERNEL, intf->rx_buf_order);
- 	if (!buffer_pg)
-@@ -675,13 +719,55 @@ static int bcmasp_alloc_buffers(struct bcmasp_intf *intf)
- 	intf->rx_ring_cpu = page_to_virt(buffer_pg);
- 	intf->rx_ring_dma = dma_map_page(kdev, buffer_pg, 0, RING_BUFFER_SIZE,
- 					 DMA_FROM_DEVICE);
--	if (dma_mapping_error(kdev, intf->rx_ring_dma))
--		goto free_rx_buffer;
-+	if (dma_mapping_error(kdev, intf->rx_ring_dma)) {
-+		ret = -ENOMEM;
-+		goto free_ring_pages;
-+	}
-+
-+	/* Page pool for SKB data areas (copy targets, not DMA buffers). */
-+	intf->rx_page_pool = bcmasp_rx_page_pool_create(intf);
-+	if (IS_ERR(intf->rx_page_pool)) {
-+		ret = PTR_ERR(intf->rx_page_pool);
-+		intf->rx_page_pool = NULL;
-+		goto free_ring_dma;
-+	}
-+
-+	return 0;
-+
-+free_ring_dma:
-+	dma_unmap_page(kdev, intf->rx_ring_dma, RING_BUFFER_SIZE,
-+		       DMA_FROM_DEVICE);
-+free_ring_pages:
-+	__free_pages(buffer_pg, intf->rx_buf_order);
-+	return ret;
-+}
-+
-+static void bcmasp_reclaim_rx_buffers(struct bcmasp_intf *intf)
-+{
-+	struct device *kdev = &intf->parent->pdev->dev;
-+
-+	page_pool_destroy(intf->rx_page_pool);
-+	intf->rx_page_pool = NULL;
-+	dma_unmap_page(kdev, intf->rx_ring_dma, RING_BUFFER_SIZE,
-+		       DMA_FROM_DEVICE);
-+	__free_pages(virt_to_page(intf->rx_ring_cpu), intf->rx_buf_order);
-+}
-+
-+static int bcmasp_alloc_buffers(struct bcmasp_intf *intf)
-+{
-+	struct device *kdev = &intf->parent->pdev->dev;
-+	int ret;
-+
-+	/* Alloc RX */
-+	ret = bcmasp_alloc_rx_buffers(intf);
-+	if (ret)
-+		return ret;
- 
- 	intf->rx_edpkt_cpu = dma_alloc_coherent(kdev, DESC_RING_SIZE,
--						&intf->rx_edpkt_dma_addr, GFP_KERNEL);
-+						&intf->rx_edpkt_dma_addr,
-+						GFP_KERNEL);
- 	if (!intf->rx_edpkt_cpu)
--		goto free_rx_buffer_dma;
-+		goto free_rx_buffers;
- 
- 	/* Alloc TX */
- 	intf->tx_spb_cpu = dma_alloc_coherent(kdev, DESC_RING_SIZE,
-@@ -701,11 +787,8 @@ static int bcmasp_alloc_buffers(struct bcmasp_intf *intf)
- free_rx_edpkt_dma:
- 	dma_free_coherent(kdev, DESC_RING_SIZE, intf->rx_edpkt_cpu,
- 			  intf->rx_edpkt_dma_addr);
--free_rx_buffer_dma:
--	dma_unmap_page(kdev, intf->rx_ring_dma, RING_BUFFER_SIZE,
--		       DMA_FROM_DEVICE);
--free_rx_buffer:
--	__free_pages(buffer_pg, intf->rx_buf_order);
-+free_rx_buffers:
-+	bcmasp_reclaim_rx_buffers(intf);
- 
- 	return -ENOMEM;
- }
-@@ -717,9 +800,7 @@ static void bcmasp_reclaim_free_buffers(struct bcmasp_intf *intf)
- 	/* RX buffers */
- 	dma_free_coherent(kdev, DESC_RING_SIZE, intf->rx_edpkt_cpu,
- 			  intf->rx_edpkt_dma_addr);
--	dma_unmap_page(kdev, intf->rx_ring_dma, RING_BUFFER_SIZE,
--		       DMA_FROM_DEVICE);
--	__free_pages(virt_to_page(intf->rx_ring_cpu), intf->rx_buf_order);
-+	bcmasp_reclaim_rx_buffers(intf);
- 
- 	/* TX buffers */
- 	dma_free_coherent(kdev, DESC_RING_SIZE, intf->tx_spb_cpu,
-@@ -738,7 +819,7 @@ static void bcmasp_init_rx(struct bcmasp_intf *intf)
- 	/* Make sure channels are disabled */
- 	rx_edpkt_cfg_wl(intf, 0x0, RX_EDPKT_CFG_ENABLE);
- 
--	/* Rx SPB */
-+	/* Streaming data ring: hardware writes raw packet bytes here. */
- 	rx_edpkt_cfg_wq(intf, intf->rx_ring_dma, RX_EDPKT_RING_BUFFER_READ);
- 	rx_edpkt_cfg_wq(intf, intf->rx_ring_dma, RX_EDPKT_RING_BUFFER_WRITE);
- 	rx_edpkt_cfg_wq(intf, intf->rx_ring_dma, RX_EDPKT_RING_BUFFER_BASE);
-@@ -747,7 +828,9 @@ static void bcmasp_init_rx(struct bcmasp_intf *intf)
- 	rx_edpkt_cfg_wq(intf, intf->rx_ring_dma_valid,
- 			RX_EDPKT_RING_BUFFER_VALID);
- 
--	/* EDPKT */
-+	/* EDPKT descriptor ring: hardware fills descriptors pointing into
-+	 * the streaming ring buffer above (RBUF_4K mode).
-+	 */
- 	rx_edpkt_cfg_wl(intf, (RX_EDPKT_CFG_CFG0_RBUF_4K <<
- 			RX_EDPKT_CFG_CFG0_DBUF_SHIFT) |
- 		       (RX_EDPKT_CFG_CFG0_64_ALN <<
-diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp_intf_defs.h b/drivers/net/ethernet/broadcom/asp2/bcmasp_intf_defs.h
-index af7418348e81..0318f257452a 100644
---- a/drivers/net/ethernet/broadcom/asp2/bcmasp_intf_defs.h
-+++ b/drivers/net/ethernet/broadcom/asp2/bcmasp_intf_defs.h
-@@ -246,6 +246,10 @@
- 	((((intf)->channel - 6) * 0x14) + 0xa2000)
- #define  RX_SPB_TOP_BLKOUT		0x00
- 
-+/*
-+ * Number of 4 KB pages that make up the contiguous RBUF_4K streaming ring
-+ * and the page pool used as copy-target SKB data areas.
-+ */
- #define NUM_4K_BUFFERS			32
- #define RING_BUFFER_SIZE		(PAGE_SIZE * NUM_4K_BUFFERS)
+ 	fbnic_service_task_start(fbn);
  
 -- 
-2.34.1
+2.52.0
 
 
