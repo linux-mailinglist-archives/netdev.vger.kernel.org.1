@@ -1,230 +1,179 @@
-Return-Path: <netdev+bounces-276232-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276233-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oOjRJ1yy1WlF8wcAu9opvQ
-	(envelope-from <netdev+bounces-276232-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 03:41:48 +0200
+	id UGA9A3Cy1WlF8wcAu9opvQ
+	(envelope-from <netdev+bounces-276233-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 03:42:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A09E43B6012
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 03:41:47 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76D8D3B6021
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 03:42:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 679EB3004D82
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 01:41:44 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 33237301BED1
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 01:42:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A69F344023;
-	Wed,  8 Apr 2026 01:41:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14E7A34403D;
+	Wed,  8 Apr 2026 01:42:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vGqFnd9b"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LqJYZ67D"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f47.google.com (mail-dl1-f47.google.com [74.125.82.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C75301448E0
-	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 01:41:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.47
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775612503; cv=pass; b=E0xteygqY/9agzq6afkZA+NKvmlHvnIvJw78lVvvOQcxsmfOUDxVGT9ydiVxo9TLm9rNYtOeioXlVvLoatkRqCualRh9ZkfIIZfrXO14xW4tMMERLLqSSx6a7mru5wurgKApgdo/hyNRLhBBjpkyX7fWsml/1gmf3GNr4cTnU5A=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775612503; c=relaxed/simple;
-	bh=5MlT58hfS4caY4q/4sk4eSUtC8qLMW6P9xHmoBbwENs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=j+aurjCg64SY73pLHL72fQM/STqwL/ROmm/oMy/HMJvz7y1ub9qBZEWHvlCS8/6Viy4bvD4aqJjuoiL61ekJakdkVArsoJ/ZnRTpKuPCxvsrc+uzpFfowQhsgOQ18sANUPed8Cg4cWa50LEckYqhheCjLpcHI8/4nPoMV8CV1SY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vGqFnd9b; arc=pass smtp.client-ip=74.125.82.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-dl1-f47.google.com with SMTP id a92af1059eb24-12c20010f10so1060007c88.0
-        for <netdev@vger.kernel.org>; Tue, 07 Apr 2026 18:41:41 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1775612501; cv=none;
-        d=google.com; s=arc-20240605;
-        b=lc/E2/TyhNb2HdKSuTOkeZMBk5xkiag5LbX/2jEW3zX5ex6Z0ZjRogYbkvd+ynFepP
-         v0FwXxnXbAoZj8UkfVg2gKyNWUYIymvDQhBFeNtqVM/wDmCcZza9lC2oNPCwQSFJINHR
-         yWOPFh8xBD8xWkv1mHM7B/rZKIThajR9l+kHA0Pp/G0QPzOn4baEGntPJbsgf6Ah8Rdx
-         JZ9iDF0MB/UfM0eMJN3MTNpWrys+11qy3cSNDPosgSN3lGviSAPJM/MFMyQdaN28AcDC
-         yQSC1RpwoiDTg8nKTKFc618apcdHs7sQVY69fR+iupijrDXrxQzHoBE/U/dA2gwPoNIc
-         l76g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=Wzk8OjbF0P4IbV3jecTkNRUesUvMPLzyGDTALY0f1NU=;
-        fh=7HfJqo4yIBpdTKM/B8vkXiFgqqNi5t65ByLUo5vMqiI=;
-        b=ESjn/yJsjokc45/ddhcA///G4Ne1PtCrWa6mRqlRCGNiG6BTbFl0BzNP/hn1LC8xMv
-         zgSrK9a8xDwOaJPnbBVaCHk8TgFTRqBvnNDnLQKXUhtH2imi0Nbo2BdH/iZ6+12s5BhU
-         chRfKzdzjYfKvDj+YGuNIjToi3L0j34FTMKU5LYe5ms816xOCZLg1NiJ5H2LmNk642Gz
-         4Ep7vFE0km+iH7nOBa2xfjRbSaAHRG9V5qotAQBxBq6A65WdX/wGBSwcGc5f6khFRCCZ
-         diU1UyFHcACIYFb22Gw+mKgG+TrRmSdK9Yy+W5tRAkY7wSv/805gaOESw+DvyibtgiDg
-         ttUg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1775612501; x=1776217301; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Wzk8OjbF0P4IbV3jecTkNRUesUvMPLzyGDTALY0f1NU=;
-        b=vGqFnd9bllxb76ODsF9H/AK03NouIrn2bWdK0/2FbCFO6yEp+tOSFy3rmzRVXYUyc0
-         rv1RIIfYWOfho6/CTGjdSQJbxESCKPCQHFKklFievEAbc4Y0Wrn9YRoERB/C9WbqOqzI
-         ZJqiCab7hf+qKEj3SVMZDYw53SkWXsCLPAa7URMPBtoJrXWGxCUTrqruep1PLChzYkr1
-         fn0Z4A2Cp12M1Ho6o9X2g0NQtS1ShcZfOq+27lI9+piLBMnZ1KZ6kT51j4vEPTzsmyCU
-         2rFpeBdnmvvZCTfgs4HeGlk6YI1ksbTX4mUIgDWjr0I+QKnwagWGzp642F4ib3N7nOi2
-         yFBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775612501; x=1776217301;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Wzk8OjbF0P4IbV3jecTkNRUesUvMPLzyGDTALY0f1NU=;
-        b=sb23849TEKLIGmwGcUztkQ7GcQjD17MIMVy7iMkSxiG4eLJFVSRQbLabj3qFwPaHG8
-         u30uXoXsCWhRCkVhJlfPBD8t2kUyJ/BWBpsMBDIReTSvUHErvgaNiT8+is4aLahnBPcV
-         3S2lndkR2KjBSQTxhbRejXjArPmW3nLwFG8Roe9dJLeidxNG6rdw4ViqjMh4LR708zrU
-         dkBHIBuhppM7iQCkA74GLF1iW0OB49kZVH3IFe+KSMX5s5ivWugpvafmxrRROz0+HpOu
-         jBiVhb9c/Pdk/m8xoqDDv9OQiD3XmgzWhGZoq3bRBcuUsR22smP9519uFIxpPQK6nqH7
-         aK1g==
-X-Gm-Message-State: AOJu0YzPimb6n7OnfUmqjUN/uNXM/sR+i/W+ynFeF89iyoQqioBCwqS8
-	bmj9judTtE8164fJOrFYIqULIjCbmumT1nunj8MPqZu6I2dh4Fpge3ZQzViqxALkt+Kbg5Dvwpf
-	97upQyw1mwoSCnbJw9Q6vvQS/quR/WiQYk6Jgv/E3
-X-Gm-Gg: AeBDiethuaA4mRJ13tDioXQzyTUwbHslD3aVtVDQO1mJQX2rFLJ5B0EBWyAOPPZxzTa
-	qJdH4ubm/oZV18kqChHJVpV3iqj2xQdbhqgikKM/KEew5xwFNou4Kht38oFGNbLT+pqlg2Kj0PY
-	IQ4mKG7R3CKnslIZVZvUaAUkmhKaUKPRykxDbL82FYrCSs6+akkXfXymZHztwDJtShxXZcjWWkd
-	2zRlGkF+1rgFUaGvcVx66F9i0o4iiaEeBzShcHJytcsJg0Vl0kVO7uWvSiIoo9c7DGgXbDA+tlS
-	9jnrqpnGEMLoAdRZA6ByrASB26bFu5o92y9gJmc0VpVMqsdDAaQEQhjWUkDDxI29Nla43q/i
-X-Received: by 2002:a05:7022:2221:b0:127:33e0:ea33 with SMTP id
- a92af1059eb24-12bfb74c9bcmr10411353c88.22.1775612500296; Tue, 07 Apr 2026
- 18:41:40 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E43111448E0
+	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 01:42:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775612524; cv=none; b=hEXfq690spaBe5Ry7j1fcf2JHeUdMzrEemiShiZ20T63CAqqYE2byP/gWrE2sINjxj1CzG/8PfB02Rmq08/h/qOuUJ2cAXP0RgRUn5UYrCcoQ/jXEEZcKk28/pwDzudAf7hquszF9EMSGQSRvPP7zq5MwaOS1XsXAHHSoFyzOdo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775612524; c=relaxed/simple;
+	bh=zYhaCYwc8i8xPwfbp6YhRW2YziF87VVMNZsRp6y9iWU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=fGYiDzGbOUVM+MbDJi2K54DLB9B3aa47+LXu66HBDdxQsKzkACAMuYjVyKj2meso5QELBtiLkZP/rcXTz6zuWsrITuA6KN97JWi2Jy4vYlWrchIF6Ae3SYjPmd5K4klhagpk+9HGVYb58zm8mYo1nEiiVh8xhQ9jPCBZbFA0re4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LqJYZ67D; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32E65C19421;
+	Wed,  8 Apr 2026 01:42:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775612523;
+	bh=zYhaCYwc8i8xPwfbp6YhRW2YziF87VVMNZsRp6y9iWU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=LqJYZ67D+JM/WlxnQq96JX9OQ7dYMr/ucp1tWGBDm4DEVi3BpdZ5aIK0QkjB8yCbX
+	 pNxQByq7kGoM16Azuu1x1fMv+Xam0EMiuxysuebSsfS0rmifG8a+raPLj7FJ7vb5yk
+	 w/E8iNjeKFhiOKa4Y7n9MwwQXEO3eEjeE5FryRYuT42VImdis69u7/DgYUAwYS/n96
+	 kmAngIWAzh6xm6SSaRlkxsD5Vo7VhLt2N9QIjbH/cSfMbO6FaTnaBD7DGNwEVxv2Sb
+	 0F45q9EbaN3X1l1SQfKJ2apkFxTTVLNuRKtotmSQtgS6MTeLPLrftKwNEVvq85p4K+
+	 RofqqntJ/9zMQ==
+Date: Tue, 7 Apr 2026 18:42:02 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, David Ahern
+ <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Kuniyuki Iwashima
+ <kuni1840@gmail.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH v3 net-next 00/15] ip6mr: No RTNL for RTNL_FAMILY_IP6MR
+ rtnetlink.
+Message-ID: <20260407184202.34cfe2d6@kernel.org>
+In-Reply-To: <20260407212001.2368593-1-kuniyu@google.com>
+References: <20260407212001.2368593-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1775207252.git.wangjiexun2025@gmail.com> <20260407080015.1744197-1-n05ec@lzu.edu.cn>
-In-Reply-To: <20260407080015.1744197-1-n05ec@lzu.edu.cn>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Tue, 7 Apr 2026 18:41:28 -0700
-X-Gm-Features: AQROBzChHTxrWH1mkvCH0vaCf0kZJrV-ZgG5oD7uEhiOXEgPkK0lHWR4AAfT0A0
-Message-ID: <CAAVpQUAGm-jSrt4mEP-58gfmNgOjW8fX2hHVdiOM6tE06KJGKg@mail.gmail.com>
-Subject: Re: [PATCH net v2 1/1] af_unix: read UNIX_DIAG_VFS data under unix_state_lock
-To: Ren Wei <n05ec@lzu.edu.cn>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, xemul@parallels.com, 
-	yifanwucs@gmail.com, tomapufckgml@gmail.com, yuantan098@gmail.com, 
-	bird@lzu.edu.cn, enjou1224z@gmail.com, wangjiexun2025@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-276232-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,parallels.com,gmail.com,lzu.edu.cn];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,google.com,redhat.com,gmail.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-276233-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,mail.gmail.com:mid,lzu.edu.cn:email]
-X-Rspamd-Queue-Id: A09E43B6012
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 76D8D3B6021
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Apr 7, 2026 at 1:00=E2=80=AFAM Ren Wei <n05ec@lzu.edu.cn> wrote:
->
-> From: Jiexun Wang <wangjiexun2025@gmail.com>
->
-> Exact UNIX diag lookups hold a reference to the socket, but not to
-> u->path. Meanwhile, unix_release_sock() clears u->path under
-> unix_state_lock() and drops the path reference after unlocking.
->
-> Read the inode and device numbers for UNIX_DIAG_VFS while holding
-> unix_state_lock(), then emit the netlink attribute after dropping the
-> lock.
->
-> This keeps the VFS data stable while the reply is being built.
->
-> Fixes: 5f7b0569460b ("unix_diag: Unix inode info NLA")
-> Reported-by: Yifan Wu <yifanwucs@gmail.com>
-> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-> Co-developed-by: Yuan Tan <yuantan098@gmail.com>
-> Signed-off-by: Yuan Tan <yuantan098@gmail.com>
-> Suggested-by: Xin Liu <bird@lzu.edu.cn>
-> Tested-by: Ren Wei <enjou1224z@gmail.com>
-> Signed-off-by: Jiexun Wang <wangjiexun2025@gmail.com>
-> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+On Tue,  7 Apr 2026 21:19:33 +0000 Kuniyuki Iwashima wrote:
+> This series is the IPv6 version of
+> 
+>   https://lore.kernel.org/netdev/20260228221800.1082070-1-kuniyu@google.com/
+> 
+> and removes RTNL from ip6mr rtnetlink handlers.
 
-Looks good, thanks !
+CI says:
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
-
-Next time your team post patches, please make sure
-to follow this guideline:
-
-Documentation/process/maintainer-netdev.rst
-
-(e.g. post a next revision as a separate thread, etc)
-
-
-
-> ---
-> Changes in v2:
-> - reorder local variables in reverse xmas tree order
->
->  net/unix/diag.c | 21 +++++++++++++--------
->  1 file changed, 13 insertions(+), 8 deletions(-)
->
-> diff --git a/net/unix/diag.c b/net/unix/diag.c
-> index ca3473026151..c9c1e51c4419 100644
-> --- a/net/unix/diag.c
-> +++ b/net/unix/diag.c
-> @@ -28,18 +28,23 @@ static int sk_diag_dump_name(struct sock *sk, struct =
-sk_buff *nlskb)
->
->  static int sk_diag_dump_vfs(struct sock *sk, struct sk_buff *nlskb)
->  {
-> -       struct dentry *dentry =3D unix_sk(sk)->path.dentry;
-> +       struct unix_diag_vfs uv;
-> +       struct dentry *dentry;
-> +       bool have_vfs =3D false;
->
-> +       unix_state_lock(sk);
-> +       dentry =3D unix_sk(sk)->path.dentry;
->         if (dentry) {
-> -               struct unix_diag_vfs uv =3D {
-> -                       .udiag_vfs_ino =3D d_backing_inode(dentry)->i_ino=
-,
-> -                       .udiag_vfs_dev =3D dentry->d_sb->s_dev,
-> -               };
-> -
-> -               return nla_put(nlskb, UNIX_DIAG_VFS, sizeof(uv), &uv);
-> +               uv.udiag_vfs_ino =3D d_backing_inode(dentry)->i_ino;
-> +               uv.udiag_vfs_dev =3D dentry->d_sb->s_dev;
-> +               have_vfs =3D true;
->         }
-> +       unix_state_unlock(sk);
->
-> -       return 0;
-> +       if (!have_vfs)
-> +               return 0;
-> +
-> +       return nla_put(nlskb, UNIX_DIAG_VFS, sizeof(uv), &uv);
->  }
->
->  static int sk_diag_dump_peer(struct sock *sk, struct sk_buff *nlskb)
-> --
-> 2.34.1
->
+[  857.648411][   T63] Oops: general protection fault, probably for non-canonical address 0xdffffc0000000006: 0000 [#1] SMP KASAN
+[  857.648639][   T63] KASAN: null-ptr-deref in range [0x0000000000000030-0x0000000000000037]
+[  857.648765][   T63] CPU: 2 UID: 0 PID: 63 Comm: kworker/2:2 Not tainted 7.0.0-rc6-virtme #1 PREEMPT(full) 
+[  857.648903][   T63] Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
+[  857.649006][   T63] Workqueue: mld mld_ifc_work
+[  857.649090][   T63] RIP: 0010:mroute6_is_socket+0x4a/0x80
+[  857.649172][   T63] Code: df 48 89 f9 48 c1 e9 03 80 3c 11 00 75 2f 48 8b 80 e8 10 00 00 48 ba 00 00 00 00 00 fc ff df 48 8d 78 30 48 89 f9 48 c1 e9 03 <80> 3c 11 00 75 1c 48 83 78 30 00 0f 95 c0 48 83 c4 08 c3 48 89 04
+[  857.649439][   T63] RSP: 0018:ffa00000004478b0 EFLAGS: 00010216
+[  857.649533][   T63] RAX: 0000000000000000 RBX: ff1100000e2ae200 RCX: 0000000000000006
+[  857.649645][   T63] RDX: dffffc0000000000 RSI: ff1100000e2ae200 RDI: 0000000000000030
+[  857.649755][   T63] RBP: ff110000077d0900 R08: ffffffffa63b8550 R09: 1fe2200002937e85
+[  857.649863][   T63] R10: ff11000010736898 R11: ff11000008ab40b0 R12: 1ff4000000088f20
+[  857.649974][   T63] R13: ff11000008ab4000 R14: ff11000008c78800 R15: ff11000010736880
+[  857.650083][   T63] FS:  0000000000000000(0000) GS:ff110000c2de4000(0000) knlGS:0000000000000000
+[  857.650213][   T63] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  857.650307][   T63] CR2: 00007f1dc25d2574 CR3: 000000001c74f002 CR4: 0000000000771ef0
+[  857.650421][   T63] PKRU: 55555554
+[  857.650480][   T63] Call Trace:
+[  857.650536][   T63]  <TASK>
+[  857.650575][   T63]  ip6_finish_output2+0xa7f/0x1310
+[  857.650653][   T63]  ? ip6_xmit+0x2000/0x2000
+[  857.650724][   T63]  ? find_held_lock+0x2b/0x80
+[  857.650800][   T63]  ? __lock_release.isra.0+0x6b/0x1a0
+[  857.650873][   T63]  ? ip6_mtu+0x174/0x410
+[  857.650929][   T63]  ip6_finish_output+0x701/0xe80
+[  857.651002][   T63]  ip6_output+0x23f/0x7f0
+[  857.651056][   T63]  ? ip6_finish_output+0xe80/0xe80
+[  857.651128][   T63]  ? __lock_release.isra.0+0x6b/0x1a0
+[  857.651201][   T63]  ? xfrm_bundle_lookup.constprop.0+0xba0/0xba0
+[  857.651296][   T63]  ? mark_held_locks+0x40/0x70
+[  857.651369][   T63]  ? __local_bh_enable_ip+0xa5/0x140
+[  857.651443][   T63]  ? __local_bh_enable_ip+0xa5/0x140
+[  857.651516][   T63]  ? icmp6_dst_alloc+0x317/0x4d0
+[  857.651589][   T63]  mld_sendpack+0x9d6/0xec0
+[  857.651661][   T63]  ? nf_hook.constprop.0+0x340/0x340
+[  857.651734][   T63]  ? mld_send_cr+0x50f/0x820
+[  857.651808][   T63]  mld_ifc_work+0x36/0x190
+[  857.651880][   T63]  ? process_one_work+0xdb4/0x1410
+[  857.651954][   T63]  process_one_work+0xdf5/0x1410
+[  857.652028][   T63]  ? pwq_dec_nr_in_flight+0x710/0x710
+[  857.652100][   T63]  ? lock_acquire.part.0+0xbc/0x260
+[  857.652172][   T63]  worker_thread+0x4f1/0xd60
+[  857.652244][   T63]  ? rescuer_thread+0x1320/0x1320
+[  857.652318][   T63]  ? __kthread_parkme+0xbd/0x210
+[  857.652391][   T63]  ? rescuer_thread+0x1320/0x1320
+[  857.652495][   T63]  kthread+0x364/0x460
+[  857.652550][   T63]  ? trace_irq_enable.constprop.0+0x9b/0x180
+[  857.652641][   T63]  ? kthread_affine_node+0x330/0x330
+[  857.652714][   T63]  ret_from_fork+0x474/0x6b0
+[  857.652787][   T63]  ? arch_exit_to_user_mode_prepare.isra.0+0x140/0x140
+[  857.652877][   T63]  ? __switch_to+0x540/0xd10
+[  857.652952][   T63]  ? kthread_affine_node+0x330/0x330
+[  857.653025][   T63]  ret_from_fork_asm+0x11/0x20
+[  857.653102][   T63]  </TASK>
+[  857.653157][   T63] Modules linked in: ip6_gre ip_gre gre act_gact cls_matchall sch_ingress ipt_REJECT nf_reject_ipv4 nft_compat nf_tables
+[  857.653387][   T63] ---[ end trace 0000000000000000 ]---
+[  857.653511][   T63] RIP: 0010:mroute6_is_socket+0x4a/0x80
+[  857.653630][   T63] Code: df 48 89 f9 48 c1 e9 03 80 3c 11 00 75 2f 48 8b 80 e8 10 00 00 48 ba 00 00 00 00 00 fc ff df 48 8d 78 30 48 89 f9 48 c1 e9 03 <80> 3c 11 00 75 1c 48 83 78 30 00 0f 95 c0 48 83 c4 08 c3 48 89 04
+[  857.653928][   T63] RSP: 0018:ffa00000004478b0 EFLAGS: 00010216
+[  857.654063][   T63] RAX: 0000000000000000 RBX: ff1100000e2ae200 RCX: 0000000000000006
+[  857.654267][   T63] RDX: dffffc0000000000 RSI: ff1100000e2ae200 RDI: 0000000000000030
+[  857.654422][   T63] RBP: ff110000077d0900 R08: ffffffffa63b8550 R09: 1fe2200002937e85
+[  857.654579][   T63] R10: ff11000010736898 R11: ff11000008ab40b0 R12: 1ff4000000088f20
+[  857.654728][   T63] R13: ff11000008ab4000 R14: ff11000008c78800 R15: ff11000010736880
+[  857.654876][   T63] FS:  0000000000000000(0000) GS:ff110000c2de4000(0000) knlGS:0000000000000000
+[  857.655046][   T63] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  857.655189][   T63] CR2: 00007f1dc25d2574 CR3: 000000001c74f002 CR4: 0000000000771ef0
+[  857.655340][   T63] PKRU: 55555554
+[  857.655470][   T63] Kernel panic - not syncing: Fatal exception
+[  857.655657][   T63] Kernel Offset: 0x23000000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
+[  857.655864][   T63] ---[ end Kernel panic - not syncing: Fatal exception ]---
 
