@@ -1,178 +1,171 @@
-Return-Path: <netdev+bounces-276668-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276669-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eB8vFoOS1mmiGQgAu9opvQ
-	(envelope-from <netdev+bounces-276668-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 19:38:11 +0200
+	id MJFaDISU1mmiGQgAu9opvQ
+	(envelope-from <netdev+bounces-276669-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 19:46:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 032C63BFADA
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 19:38:10 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 894303BFCD7
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 19:46:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 44A30300DCF6
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 17:36:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C628030166D1
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 17:44:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDF0D3502A9;
-	Wed,  8 Apr 2026 17:36:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44445329E7E;
+	Wed,  8 Apr 2026 17:44:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="njw4HuMx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TjTTyCex"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f48.google.com (mail-ot1-f48.google.com [209.85.210.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FBB33D4134
-	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 17:36:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.48
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775669764; cv=pass; b=mD9Uf0F+zeYPz6sjs5WhvB7/V4owFFcsNnL9ZHs1lnAxkVtPAG3+ghpvjboeSkSQLtw+uH0dcIFvI3pgBurOWTHEsfb6g+7nFxSgTJSbTHcDicR3XlaqvQHmbRoWSQcyNzUZWZRC4e22lo4rv3Ohvd8jda8TuJlsAyJTEMkEZ1I=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775669764; c=relaxed/simple;
-	bh=kaJf5mzQGy70d85gRscVT43zgnA2ZshjO06oLmu9+Sg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=M63vUEh0mk9ky8lRF/pPPd21RGIwidCXaNfLuJ0pUW4DoDeAXzBYiku0NFsyKG9Ftq5mIdRU3Cy6znxWT+vdnPchBYlspTDbaS/sN4x1H5IKu8aB7qDI7AR5crEH8DZnpRhLck9jbWD/eG+zawoUq46UPC/y84Ibpqmk+WEr7/Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=njw4HuMx; arc=pass smtp.client-ip=209.85.210.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f48.google.com with SMTP id 46e09a7af769-7dbb6c072f1so11536a34.2
-        for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 10:36:03 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1775669762; cv=none;
-        d=google.com; s=arc-20240605;
-        b=FNMHBNdO90pX3jzuTOrSjLyaAZlAWwOMhv9gz3a9ACfEgVK4kK8ymuLdH4BEbqAuuM
-         OZoW02MsrvsqepJ+18LcD3CGLpNG6DwlsfQgpK528JenXJWXZbK9EJjM4If0pQIq6RMA
-         StwwDAcDazyRDRbi5V1AwAV/bUp6Ibq6lZLgWGObUqS48gTT3fSwGviDjQJKOqb0z8xo
-         yII1kWsab56LDMsYSNvRQD857NeDUkcc3eZ/+d4yfR2N7alHPtneRF/lZhJUgIWrtaNJ
-         VOnB5d6/eTvQG/UclUCbO7i1cJ5MPgWbEz8TwjoTPVMQ5nGjqgyy4igELMEyGtPF1NLO
-         9quA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=kaJf5mzQGy70d85gRscVT43zgnA2ZshjO06oLmu9+Sg=;
-        fh=5rTj0EBNEAGe16jmUrKiMGEwyt/4uLXcgSkOXZE9nzM=;
-        b=bP3U/qxPncXqtYsbXo0TZYX3WqwrTSMO0+9YqpcSMPWsTncEQnzr9UY08Oh02Dqsgr
-         i7pGxzDMi6gRDcOGSLAwgJ4H/g00Dj3Kgtlv6192xhKgqk6mJsDoYrjfiBVs3k23bVYx
-         R1ZJpZJKEojaP5BIIZvdNCl32CCsZ7kae0kXbNsOTC1WdUXorWoW3+RDsDwZHfIQKEWu
-         4zu+ZfElt3Z5DHtuWWZJKZtLzbZIA/8Z9uD3W2vRMeLfhXNpVdrN3j/yC25xD9rjgCmU
-         kLSzGvf8uDnUtgmcxNRybF0RNHYBvvj4HW/R7x94MjZCEU2wQShjqPbyyjbJXKIB9eJx
-         Yk6w==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775669762; x=1776274562; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=kaJf5mzQGy70d85gRscVT43zgnA2ZshjO06oLmu9+Sg=;
-        b=njw4HuMxtsv/QsfaK/hV+JlfmS/9Rxv7xSDZdRaRRV7MH3tHyzlIJYpOJMmsFpN2pR
-         93m4oHUNYzxUUL8jS1uaKr/aNp6DxYOZrC4LHJv5mNkiyU6B+34ItcB9RF+uz8xb9Qy9
-         EawUB5N0too7FanC9vc59CRHZWvBrLYXyyNmjLVkDYUbNeVGG9JkDxybi2YiO5/H98uz
-         KYezJoSQ9aB8VMX7Y7q5+4YFwNAECMXgYTGl6Ha4V+2jQcKZ608wl14TXqCpR99a+H2Z
-         18Mvi1IQQt5AuO4+gWbkc8U/WoXwYeXa/CWjaObCIOs3Yk9CsbKfb66XMxjpEX2Flgrw
-         yEGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775669762; x=1776274562;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kaJf5mzQGy70d85gRscVT43zgnA2ZshjO06oLmu9+Sg=;
-        b=q0b8YixpOM3tGEcqHCcZWpfGKypbHIwIoZctBWWRXOQjUmgwpcbjcuIN8oYqkLODui
-         en3IM7qx/RuVhbq2zPuE+azRqXGH2bnBC7VThXY+MLjdAtbBf2X+pPXzvW/AIDDIVa4+
-         2UPcFVWAvBV5zjoMxp4zdImCKaXTG7LHQuNfQly+7X8AJhuVfv5R2nb4B/BFxWgJavMx
-         xSPaBLkwT3ZHo0PKeOZVIpTGoTj1VAsqrszDd0Kc0CjSjdiokt3oit139jS9HjrWYWcV
-         cy4zvW4lMqp1eJcNL4TLCfBGJp5OGa8EUaf0JJmydN5+YXWGV+k1e3kzoSNioCZ0XYCh
-         UN2A==
-X-Forwarded-Encrypted: i=1; AJvYcCWV7nMEDX4JOIJOcm5d5uz3MKGzCFgC06ZMTRDLjC4qRnCBtIER5jm9TJR9ZsB+TtmRW708YGQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxhSGoKPfn+ComINjYHBEhNv1CCHYyVKYE/mpC4g3DWO0sy1WO5
-	kSuZKK3iEEBgRjlAtm81Fbyol6Mct8EPWf0xNagkcHYKxu1cxEzL7bQLIS8P9krBwPRzJxpaaIu
-	j8YYhxRfmlN1wAMRSU2WsT/RC0U18Mtw=
-X-Gm-Gg: AeBDietiWLTPt1GT+FJd78BUnbrRZtm2ZUE29j97f7kgAOiw3fTFAH899iLlVPhe8+O
-	Uuxos5ovEtgbQDeXwdijLPPDSUfXPg86kuKOmyyB9OBw/hAagvVRgSFCeOCGTnI7pchM0S+NnBA
-	paPiQ9ITWGkp2EwEN3yJRWq/L5qsxqweE4+G6v46CxPMUjRQ9aYAXgvrncxIPJ96az0VptPGz2k
-	dI00Afxyhuvw2p4mKpmkw6MG7BVmruR2g6OCkID1iuoqqChdzNUr15oD8jPRbkQl3gQAH5NqEgu
-	QrBZSdgoH0MVkfrE9+12qdopufUxmIDOkY/HZQ==
-X-Received: by 2002:a05:6820:993:b0:67e:d62:3d16 with SMTP id
- 006d021491bc7-6821d237e42mr11887737eaf.12.1775669762076; Wed, 08 Apr 2026
- 10:36:02 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21BBFDDA9
+	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 17:44:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775670290; cv=none; b=FWf6kfYyI43fITQuC50qC2kBUcYQvLB9sIArC6BX+hjOiV5BQ/XoilbG/O5wViRb45Go6E6utiWfIof7gpoHCB5/EQFYSyOHKDnG3dtyXuTo6HwpZjyVkmrB0BqlwO+ARJJJ/D3+fBB2+dTuCRdx4m2ki/5YBAC3+hsYFI3ctRw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775670290; c=relaxed/simple;
+	bh=97qKwL0WGblAsNuUijYXbndOzdgjjTf+Mz3OmBdqK/A=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=c91xFmaHto4zLI2HQQacykNKKhSw6oD343dmxAXlpaEBF4KAiIAiCl52ryCNYR3tmupo9qVEDnfnwf5k+pWBVq22JzzXu3bkhMDapllWdEKzCHZzi5rJAMli655Ueg83hw+3UTJa/5GmsxJJuAXzg+wVsc2O0RcXBSSomBzUVZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TjTTyCex; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0427FC19421;
+	Wed,  8 Apr 2026 17:44:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775670289;
+	bh=97qKwL0WGblAsNuUijYXbndOzdgjjTf+Mz3OmBdqK/A=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=TjTTyCex+I8zfX59nrOXuAQHD6ldGSwTPQCp7/d6EcsOI3vBKV7KloME43Ffk7e/h
+	 Zw6Kwx3TULnalA7knY5ArX53kuZq1EZH1hzzTEZIt2Z4Wayq1Tlkdg1Iix5JAzpoJm
+	 WOU6t80lArnc+hXAnRMrs1PH53mIcKukEsGZLNoV4aN7u9hgIrKuqz4i3atu/VEs4r
+	 ZaS28zORzYUJF5J3I+68TpIiSls1evdaqpxEwtxe2hWz6y/UhGWwy5IorBC626NDwa
+	 fIjJtawVgEERZhgXQinRoWZfm4ciQpGN4C82+om0qVW6HYVyCCSJ+SmDKrRjDb4pGS
+	 OW8NPpAGx2FSw==
+Date: Wed, 8 Apr 2026 10:44:41 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: Rishikesh Jethwani <rjethwani@purestorage.com>, netdev@vger.kernel.org,
+ saeedm@nvidia.com, tariqt@nvidia.com, mbloch@nvidia.com, borisp@nvidia.com,
+ john.fastabend@gmail.com, davem@davemloft.net, pabeni@redhat.com,
+ edumazet@google.com, leon@kernel.org
+Subject: Re: [PATCH v12 6/6] selftests: net: add TLS hardware offload test
+Message-ID: <20260408104441.49ba8451@kernel.org>
+In-Reply-To: <adaGQRUUNbXWXNgP@krikkit>
+References: <20260402235511.664801-1-rjethwani@purestorage.com>
+	<20260402235511.664801-7-rjethwani@purestorage.com>
+	<adaGQRUUNbXWXNgP@krikkit>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260403200732.497307-1-devnexen@gmail.com> <20260408170206.GI469338@kernel.org>
-In-Reply-To: <20260408170206.GI469338@kernel.org>
-From: David CARLIER <devnexen@gmail.com>
-Date: Wed, 8 Apr 2026 18:35:51 +0100
-X-Gm-Features: AQROBzA4BkTik_A3H5i7-wdhUsPm4frrCXgC-oXbnU0n_oa2ffPQRz-T3wexVIQ
-Message-ID: <CA+XhMqzdEUiG4RHf8FbTZnS+dKwT+-MjEcMEStD1kA5Dc+d6VQ@mail.gmail.com>
-Subject: Re: [PATCH] octeon_ep_vf: add NULL check for napi_build_skb()
-To: Simon Horman <horms@kernel.org>
-Cc: Veerasenareddy Burru <vburru@marvell.com>, Sathesh Edara <sedara@marvell.com>, 
-	Shinas Rasheed <srasheed@marvell.com>, Satananda Burla <sburla@marvell.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	netdev@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-276669-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-276668-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[purestorage.com,vger.kernel.org,nvidia.com,gmail.com,davemloft.net,redhat.com,google.com,kernel.org];
 	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.997];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnexen@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 032C63BFADA
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.998];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 894303BFCD7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Simon,
+On Wed, 8 Apr 2026 18:45:53 +0200 Sabrina Dubroca wrote:
+> @Jakub [top-posting so you don't have to scroll through the rest of my
+> comments to find some global questions about this patch]
 
-On Wed, 8 Apr 2026 at 18:02, Simon Horman <horms@kernel.org> wrote:
->
-> On Fri, Apr 03, 2026 at 09:07:32PM +0100, David Carlier wrote:
-> > napi_build_skb() can return NULL on allocation failure. In
-> > __octep_vf_oq_process_rx(), the result is used directly without a NULL
-> > check in both the single-buffer and multi-fragment paths, leading to a
-> > NULL pointer dereference.
-> >
-> > Add NULL checks after both napi_build_skb() calls, properly advancing
-> > descriptors and consuming remaining fragments on failure.
-> >
-> > Fixes: 1cd3b407977c ("octeon_ep_vf: add Tx/Rx processing and interrupt support")
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: David Carlier <devnexen@gmail.com>
->
-> Hi David,
->
-> I appreciate that this is on the fast path, and thus I expect it
-> is performance critical. But this patch largely duplicates code
-> already present in the same function. Would it be possible
-> refactor things a bit - e.g. using helpers - to make the change
-> a bit cleaner while not hurting performance?
->
-> If so, I'd suggest splitting patch(es) that refactor the code
-> from the patch that fixes the bug.
->
-> ...
+:)
 
-Yes, valid points, I'll submit the v2 tomorrow. Cheers !
+> tools/testing/selftests/drivers/net/README.rst mentions "Local
+> host is the DUT", but this test does rekeys on both sides and sends a
+> bit of traffic back and forth. Is that acceptable?
+
+Yes, I think so. Quick scan thru the code doesn't real much about
+configuration and how the test ensure HW offload is engaged.
+But sending traffic is the intended use of the remote host.
+
+The statement is basically saying that if we have 2 hosts the local
+one is going to have the kernel to test installed. The remote host
+may have old kernel and no offloads available, it's just a traffic
+source/sink.
+
+> Another thought: is there a "standard" for stdout vs stderr, as well as
+> verbosity of "test progress"/"debug" type messages ("sent
+> keyupdate"/"received keyupdate"/"server listening"/"setup complete"
+> etc) for those test programs? Any expectation for a --{debug,verbose}
+> option to only display all this stuff on request?
+> 
+> Output for 1 test:
+> -------- 8< --------
+> TLS Version: TLS 1.3
+> Cipher: AES-GCM-128
+> Buffer size: 16384
+> Connecting to 192.168.13.1:4433...
+> Connected!
+> Installing TLS_TX AES-GCM-128 gen 0...
+> TLS_TX AES-GCM-128 gen 0 installed
+> Installing TLS_RX AES-GCM-128 gen 0...
+> TLS_RX AES-GCM-128 gen 0 installed
+> TLS setup complete.
+> Sending 100 messages of 16384 bytes...
+> Sent 16384 bytes (iteration 1)
+> Received echo 16384 bytes (ok)
+> [...repeated]
+> Sent 16384 bytes (iteration 100)
+> Received echo 16384 bytes (ok)
+> -------- 8< --------
+> 
+> With some rekeys I get 300L of output on each side.
+> 
+> 
+> If not, I guess we can fall back to what makes the most sense for
+> NIPA?
+
+Best practices for these "Python-wrapped" tests are.. evolving.
+The current thinking is to avoid the prints in the good case,
+unless there's actually something sketchy that we may want
+to double check (eg. the test is triggering some condition
+probabilistically and we want to see if / how many times it managed 
+to trigger it)
+
+IIRC the command failed exceptions already print the command + stdout +
+stderr. So having the C binary always print the debug output and exit(1)
+if something goes wrong is probably the way to go. Python should then
+simply do cmd(..), if the command succeeds there's no output.
+If the cmd() raises an exception we'll see the "debug" info.
+
+bkg() should hopefully behave the same, with the caveat that bkg()
+with no exit param (exit_wait, ksft_wait) should be avoided, cause
+without those we have to kill the process which makes the exit checking
+unreliable. I tried to make it a little better in commit d99aa5912
+so its not the end of the world if wait can be used. But good tests
+should be designed to wait.
 
