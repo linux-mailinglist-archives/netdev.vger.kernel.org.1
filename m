@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-276739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276740-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6EfcEYPg1mmsJQgAu9opvQ
-	(envelope-from <netdev+bounces-276739-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 01:10:59 +0200
+	id +EMhIJXf1mmsJQgAu9opvQ
+	(envelope-from <netdev+bounces-276740-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 01:07:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A53F53C4B20
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 01:10:58 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E7E33C4A52
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 01:07:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8F30030D32D3
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 23:06:38 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 7D65E302C1D8
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 23:06:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 623CA379ED7;
-	Wed,  8 Apr 2026 23:06:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A4353A543E;
+	Wed,  8 Apr 2026 23:06:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dama-to.20251104.gappssmtp.com header.i=@dama-to.20251104.gappssmtp.com header.b="eeA1a6jl"
+	dkim=pass (2048-bit key) header.d=dama-to.20251104.gappssmtp.com header.i=@dama-to.20251104.gappssmtp.com header.b="QPJhXZhT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A217A383C7E
-	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 23:06:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BECE0381B1C
+	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 23:06:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775689592; cv=none; b=kUjxudDsdhWClE+DXWCytTKdveCjRY0+GLJzEfmyCWXYnHlJwq/q4Es+mgrtNYU9Rb3o4u9KTTW3LpnpVldyDp08ctU7og8IBZac+76vxKFbXb/YxT8XBvW4NMSLjyxC3TWAlmBpZlvY2RqGDZWddgccYDM/ZGiB8Wgf9HsOqu0=
+	t=1775689595; cv=none; b=UfdSlf1LNxkkWkNA1qJAcJLMajKMObyAvC7kZ1WU/sb9OGis4KVGG0nQSEQZSw9OgENvuoZ7lxLk5JVxkSGQu1aMciAtABZJtmHFxxCvAy2/D7bIhz/oX9rv5p7JCPUntfu/oA4GP2amsV3vz5oqAb7bdkOe24EYu0B4kajV1rM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775689592; c=relaxed/simple;
-	bh=oxJ3LwxSwwc0LnddS9sQc1dmXDbXx5hORvtiE2/j/DA=;
+	s=arc-20240116; t=1775689595; c=relaxed/simple;
+	bh=r0znbPiRamQbWgnOeDNrPZwKEc4KFxR7p34H/kzdSl8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IKdSzsLUnvQmTaReGaG8ofhdSqik9XXInHH3TiwmTnWmv1lZvk1HRRKfNIbI7LfGifsOMXAnuljAgWOVpEbAmP6NtwvJRk2oq2Ro/vrJ1/pa6Ked66Ke2yBfdTx7SsRpAIlJSURIAf1yiaqNqDPCTMu4dk7/H34T3h9KNR8bP7I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20251104.gappssmtp.com header.i=@dama-to.20251104.gappssmtp.com header.b=eeA1a6jl; arc=none smtp.client-ip=209.85.214.170
+	 MIME-Version; b=HyN8/ivpZXoa05RPefj4GzjYh39aKuBQzW8mObHlQQ5kBdFqAQMjtrS2+7PEiRG8SxsBT6Q0df+HCl4bP4pooy9PRlQZsfIEtY1Kixvjn0/jBZErxylUgJVJjtsz8XZQk23vSPXwJVy/18A+CF+dl85xXJEDty0AOXTprgraQDc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20251104.gappssmtp.com header.i=@dama-to.20251104.gappssmtp.com header.b=QPJhXZhT; arc=none smtp.client-ip=209.85.214.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2ad9a9be502so2127475ad.0
-        for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 16:06:27 -0700 (PDT)
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2b23f90f53aso3338235ad.0
+        for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 16:06:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dama-to.20251104.gappssmtp.com; s=20251104; t=1775689587; x=1776294387; darn=vger.kernel.org;
+        d=dama-to.20251104.gappssmtp.com; s=20251104; t=1775689589; x=1776294389; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=t7bTsPTNXSPKGGJZeRPb0v0fjH1kEH3FFQpQ70Mka9c=;
-        b=eeA1a6jlLrwZvctAWLaRvCSWfbPfwZXqfe3fUYFS0fpz1ZmuQAK/aU1YYmul4Gg8Pl
-         zWfLtT/+xv0+AgmMXMbV6ZmzTQFsh4pdVCQTKhR61iB6uqmyJJk+LvzK+/lDt495OSMq
-         +LZ4qaTuScoicc5DAQsrd2GIehlGEMGvmEJhcAgyaTi4YqCO9AB1u+SUNSCXofUcfKKt
-         2WjFsVan27MKDYUNQhiZbAkl5VuByjoLaXpJZiKUK2VDN91UCwOC33yj+8NhaWuuGnQG
-         78YfdJTURBllFa60n4fxxXE25LytAGv7r0sUtU7TjrPJa12qgQaLTBOB4WtXlmgEgJSV
-         6yfw==
+        bh=ilY9w1UZiWm/ILI/BayVivC49jozyBguzBsmp+OC5C8=;
+        b=QPJhXZhTMkQRWPUOBwd3lU6ZKyD2JQ0nGDZ7nxhfh5XpxfOWideCVxEZAT5E5IJLpK
+         9n9HtY9nvHxb++LHwsQFDn5idkpVF/U67cR1CQUYuHlyNLwpizw4nYGtSWFX8m4ySHIs
+         pjvmSxLX5Basax2WPImq9hFoZv55LOTIpjB+rJ/OVS8LMVgYqiEktOqbldWs8xtxHpn7
+         SZLzJMMbuP8a9AoOynd29xiNkSkHMYDHVmvA3NE4pKU7u5bHn/lIYk4vqsy5MYf57lzY
+         jqnj1gmjWyQVPY5NnURaxsRCbgaKFAdezcfV5fJb5OBO5k+hS5Ta2zSUxpT5yNZA4YuC
+         2jBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775689587; x=1776294387;
+        d=1e100.net; s=20251104; t=1775689589; x=1776294389;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=t7bTsPTNXSPKGGJZeRPb0v0fjH1kEH3FFQpQ70Mka9c=;
-        b=Jp5d+dlJ1WF52a6Anr2LcXobyCAPqkBTEklfFh/BiZpnsXrNlwwnKLtUx5ojaLNTeW
-         gbBzVB5HrdDpbmo1D3TjuOKaOy7U2OYdmbklR9EGhAqxsxOF5oVv+90Zo+Vx7nlJICDN
-         ddg5sw3Bt1eNgG6EBOwBBvGwoBleBSHCdPLU3uwGQOVbe1P39IEbESMss9cfiTBPFrTh
-         AWln14uLKH0dIljgstKh3YSs4yEKCZFyODmKjKcFYi4K30+f8NQAF27WPctGr2RMZirH
-         OKxLMHvqzyWC9FrSt2DbG7yjvyMQ5cPvHiGkl4jc0+UszSqJK2dNxoPHKETPfK5ttxG6
-         3X/g==
-X-Gm-Message-State: AOJu0YzSZ3KBlW14CqX3Bytsn96+pYMEL3tyOc8UkftZsprIy7H5pu64
-	j6fxllylByB46RpYVQRG+xfO/caGKAxtR4by0k84QMQ3WBXwyMVteRKwG202hnO9zNq9O3WO7oT
-	gaa+NAKs=
-X-Gm-Gg: AeBDiesd+feEu++tlCCLd4p0decMAdTN4jUbjXxP6jSUSjtGIQL/3ew66XQeeO79Kxu
-	Z/3aH5IF3bJeFrHBBSam1eE/+uqMYp2B6iDbkpOv6jFRNS9RMt5FFITl7iK42ztvvxPuKh3WXiB
-	sul6D79Nm6roRJEWx+nw2oBFdvVc0+7T9o+C/cIgJy9Eg13bSiqz382NsBB2vSI0ptPH3xL2Gih
-	OAPMNzTnoRRdj0dtWENv3vwJ3BPVQwmcbQevfA88fuvBL5MsOXgzvz3LFz7XD6nw+7c1xrqJgpk
-	fB9kg1lMaewBb1N1IhgYwLvRMuV5YiQ5NrxdFUzUjcJpQy4fDKbOTL9zeCs34zS3E2RM9Z5pcbK
-	Kd/941Dy0l0WOM47GxdHNGAjTlFimQxnehtGghaVVLWZMVMRY9WcuaTQu5cX4HYyE1Zt/r6gOah
-	MRmAOn
-X-Received: by 2002:a17:903:1aab:b0:2b0:72c7:3ed8 with SMTP id d9443c01a7336-2b2c7340a5bmr13462005ad.25.1775689586629;
-        Wed, 08 Apr 2026 16:06:26 -0700 (PDT)
-Received: from localhost ([2a03:2880:2ff:53::])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b27475ff56sm213190855ad.22.2026.04.08.16.06.25
+        bh=ilY9w1UZiWm/ILI/BayVivC49jozyBguzBsmp+OC5C8=;
+        b=qvGJQ15eZ0V5rqR9q6V0cluVCjbnSbwP8DdzKGTBuJZb70U/sXvP12u+PIJWv71fy3
+         bkaw/QRZsxNvSTmTbR9IEOXG8olL2uAxxF0P9pQrSdsYsaAFV2hHjNUMwTizTA7JIzxc
+         4N/UAvaeABmFYY8KcsFu3rq0IIyfWvgPgvOl1wlB3kZ8ZwopAqPLCu66abqDaEc6u8RT
+         6QMjd82wK0WkfpZilo5KRfmIsb2+4f2TZA8xMgzGFVSk5XIO9kPtDbSNwncS6z8jtxpu
+         8Vp700lvAvtRR7Bux++ZlwEpQ5ymHJ+WYKeONfXEjRtc5iW1w9ddiz+C+5ir0Qa83zOo
+         bQzw==
+X-Gm-Message-State: AOJu0YzKLbKGETOqTYkOwvCHPecaYoO827DgcekxIZDebxT/xO/0KvDs
+	Z64JNax3B+PSs9owZAaZLlDPGLtNscEsUIhlzA6kEu9p3bDLnf9eAjpLYn2EZK1KsTtKeucNr2a
+	XFw+mQkQ=
+X-Gm-Gg: AeBDieumTvZEsgKLBNuyrTk9wUB4wHhRrgXa/g7c8/3DPslizkL8SIiZ3F53iiUU5Es
+	bKTayjyefTbTV4Ddt26r/hkth48Y1NPGkvj8uq9JhNI5HYcRJgI5k1ymFPALwkGPWLSPd4/pwyB
+	KqHHjXuRlsIzok7gvChxs3775xzRTt7oAAboLqYdLdFwsa2wfxlZoxqN37FQWNtq1LQ38qQDpiY
+	xeEG3ZIEX8avHGK+6OrWcpcgXLlPgBW5G6iY4mVfPetfTKQ87OqKRD+V6YMq/oJaAhUSZHMe/r0
+	bYpe5esb/05lMk6KGlv0DBCfka9cg67qR7PqbOpd7jALeQ/GAo0uG3ecYkyvWRJOUVZD0SGMGYA
+	LP4FGDhOg4cjQjqAaqJzIlG9nvI5qZ3JEWapSe0aLp9+33x7RRxdLaeYDn2WBZfXImhOXdup0ue
+	IBr9k=
+X-Received: by 2002:a17:902:ccc9:b0:2b2:42da:25c4 with SMTP id d9443c01a7336-2b2816ca44emr266936545ad.14.1775689588753;
+        Wed, 08 Apr 2026 16:06:28 -0700 (PDT)
+Received: from localhost ([2a03:2880:2ff:4::])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b2a488caa2sm127336085ad.14.2026.04.08.16.06.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Apr 2026 16:06:26 -0700 (PDT)
+        Wed, 08 Apr 2026 16:06:28 -0700 (PDT)
 From: Joe Damato <joe@dama.to>
 To: netdev@vger.kernel.org,
 	Michael Chan <michael.chan@broadcom.com>,
@@ -89,9 +89,9 @@ Cc: horms@kernel.org,
 	linux-kernel@vger.kernel.org,
 	leon@kernel.org,
 	Joe Damato <joe@dama.to>
-Subject: [net-next v10 07/10] net: bnxt: Implement software USO
-Date: Wed,  8 Apr 2026 16:05:56 -0700
-Message-ID: <20260408230607.2019402-8-joe@dama.to>
+Subject: [net-next v10 08/10] net: bnxt: Add SW GSO completion and teardown support
+Date: Wed,  8 Apr 2026 16:05:57 -0700
+Message-ID: <20260408230607.2019402-9-joe@dama.to>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260408230607.2019402-1-joe@dama.to>
 References: <20260408230607.2019402-1-joe@dama.to>
@@ -107,370 +107,326 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[dama-to.20251104.gappssmtp.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-276739-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[12];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-276740-lists,netdev=lfdr.de];
 	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	DMARC_NA(0.00)[dama.to];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[joe@dama.to,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[dama-to.20251104.gappssmtp.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: A53F53C4B20
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,dama.to:email,dama.to:mid,dama-to.20251104.gappssmtp.com:dkim,broadcom.com:email]
+X-Rspamd-Queue-Id: 5E7E33C4A52
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Implement bnxt_sw_udp_gso_xmit() using the core tso_dma_map API and
-the pre-allocated TX inline buffer for per-segment headers.
+Update __bnxt_tx_int and bnxt_free_one_tx_ring_skbs to handle SW GSO
+segments:
 
-The xmit path:
-1. Calls tso_start() to initialize TSO state
-2. Stack-allocates a tso_dma_map and calls tso_dma_map_init() to
-   DMA-map the linear payload and all frags upfront.
-3. For each segment:
-   - Copies and patches headers via tso_build_hdr() into the
-     pre-allocated tx_inline_buf (DMA-synced per segment)
-   - Counts payload BDs via tso_dma_map_count()
-   - Emits long BD (header) + ext BD + payload BDs
-   - Payload BDs use tso_dma_map_next() which yields (dma_addr,
-     chunk_len, mapping_len) tuples.
+- MID segments: adjust tx_pkts/tx_bytes accounting and skip skb free
+  (the skb is shared across all segments and freed only once)
 
-Header BDs set dma_unmap_len=0 since the inline buffer is pre-allocated
-and unmapped only at ring teardown.
+- LAST segments: call tso_dma_map_complete() to tear down the IOVA
+  mapping if one was used. On the fallback path, payload DMA unmapping
+  is handled by the existing per-BD dma_unmap_len walk.
 
-Completion state is updated by calling tso_dma_map_completion_save() for
-the last segment.
+Both MID and LAST completions advance tx_inline_cons to release the
+segment's inline header slot back to the ring.
+
+is_sw_gso is initialized to zero, so the new code paths are not run.
+
+Add logic for feature advertisement and guardrails for ring sizing.
 
 Suggested-by: Jakub Kicinski <kuba@kernel.org>
+Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
 Signed-off-by: Joe Damato <joe@dama.to>
 ---
  v10:
-   - Fixes the inline slot check added in the v9. Uses netif_txq_maybe_stop
-     and an inline helper.
+   - Wrap tx_inline_cons in WRITE_ONCE to pair with READ_ONCE in
+     bnxt_inline_avail.
 
  v9:
-   - Added inline slot check to prevent possible overwriting of in-flight
-     headers (suggested by AI).
-   - Set TX_BD_FLAGS_IP_CKSUM conditionally on !tso.ipv6 (suggested by AI).
-
- v8:
-   - Zero csum fields on per-segment header copy after tso_build_hdr()
-     instead of on the original skb, avoiding the need for skb_cow_head, as
-     suggested by Eric Dumazet.
+   - Always allocate header buffer for non-HW-USO NICs. Avoids a possible
+     NULL deref if USO is toggled off and the device is brought down, up,
+     and USO is re-enabled (suggested by AI).
+   - Adjust bnxt_min_tx_desc_cnt to take a feature parameter. This is needed
+     to prevent stale features from being examined (suggested by AI).
 
  v7:
-   - Dropped Pavan's Reviewed-by as some changes were made.
-   - Updated struct bnxt_sw_tx_bd to embed a tso_dma_map_completion_state
-     struct for tracking completion state.
-   - Dropped an unnecessary slot check.
-   - Eliminated an ugly looking ternary to simplify the code.
-   - Call tso_dma_map_completion_save to update completion state.
-
- v6:
-   - Addressed Paolo's feedback where the IOVA API could fail transiently,
-     leaving stale state in iova_state. Fix this by always copying the state,
-     noting that dma_iova_try_alloc is called unconditionally in the
-     tso_dma_map_init function (via tso_dma_iova_try), which zeroes the state
-     even if the API can't be used.
-   - Since this was a very minor change, I retained Pavan's Reviewed-by.
+   - Dropped Pavan's Reviewed-by because some changes were made.
+   - Added helper bnxt_min_tx_desc_cnt to avoid repeated code computing
+     descriptor counts.
+   - Updated to use tso_dma_map_complete helper instead of calling the DMA
+     IOVA API directly.
 
  v5:
-   - Added __maybe_unused to last_unmap_len and last_unmap_addr to silence a
-     build warning when CONFIG_NEED_DMA_MAP_STATE is disabled. No functional
-     changes.
-   - Added Pavan's Reviewed-by.
-
- v4:
-   - Fixed the early return issue Pavan pointed out when num_segs <= 1; use the
-     drop label instead of returning.
+   - Added Pavan's Reviewed-by. No functional changes.
 
  v3:
-   - Added iova_state and iova_total_len to struct bnxt_sw_tx_bd.
-   - Stores iova_state on the last segment's tx_buf during xmit.
+   - completion paths updated to use DMA IOVA APIs to teardown mappings.
 
  rfcv2:
-   - set the unmap len on the last descriptor, so that when completions fire
-     only the last completion unmaps the region.
+   - Update the shared header buffer consumer on TX completion.
 
- drivers/net/ethernet/broadcom/bnxt/bnxt.h     |   3 +
- drivers/net/ethernet/broadcom/bnxt/bnxt_gso.c | 210 ++++++++++++++++++
- drivers/net/ethernet/broadcom/bnxt/bnxt_gso.h |   6 +
- 3 files changed, 219 insertions(+)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 75 ++++++++++++++++---
+ .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 19 ++++-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_gso.h |  9 +++
+ 3 files changed, 92 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index 6b38b84924e0..fe50576ae525 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -11,6 +11,8 @@
- #ifndef BNXT_H
- #define BNXT_H
- 
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index bd93edb09ee0..26aae48a7d0e 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -74,6 +74,8 @@
+ #include "bnxt_debugfs.h"
+ #include "bnxt_coredump.h"
+ #include "bnxt_hwmon.h"
++#include "bnxt_gso.h"
 +#include <net/tso.h>
-+
- #define DRV_MODULE_NAME		"bnxt_en"
  
- /* DO NOT CHANGE DRV_VER_* defines
-@@ -899,6 +901,7 @@ struct bnxt_sw_tx_bd {
- 		u16			rx_prod;
- 		u16			txts_prod;
- 	};
-+	struct tso_dma_map_completion_state sw_gso_cstate;
- };
+ #define BNXT_TX_TIMEOUT		(5 * HZ)
+ #define BNXT_DEF_MSG_ENABLE	(NETIF_MSG_DRV | NETIF_MSG_HW | \
+@@ -817,12 +819,13 @@ static bool __bnxt_tx_int(struct bnxt *bp, struct bnxt_tx_ring_info *txr,
+ 	bool rc = false;
  
- #define BNXT_SW_GSO_MID		1
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_gso.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_gso.c
-index b296769ee4fe..f317f60414e8 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_gso.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_gso.c
-@@ -19,11 +19,221 @@
- #include "bnxt.h"
- #include "bnxt_gso.h"
+ 	while (RING_TX(bp, cons) != hw_cons) {
+-		struct bnxt_sw_tx_bd *tx_buf;
++		struct bnxt_sw_tx_bd *tx_buf, *head_buf;
+ 		struct sk_buff *skb;
+ 		bool is_ts_pkt;
+ 		int j, last;
  
-+static u32 bnxt_sw_gso_lhint(unsigned int len)
-+{
-+	if (len <= 512)
-+		return TX_BD_FLAGS_LHINT_512_AND_SMALLER;
-+	else if (len <= 1023)
-+		return TX_BD_FLAGS_LHINT_512_TO_1023;
-+	else if (len <= 2047)
-+		return TX_BD_FLAGS_LHINT_1024_TO_2047;
-+	else
-+		return TX_BD_FLAGS_LHINT_2048_AND_LARGER;
-+}
+ 		tx_buf = &txr->tx_buf_ring[RING_TX(bp, cons)];
++		head_buf = tx_buf;
+ 		skb = tx_buf->skb;
+ 
+ 		if (unlikely(!skb)) {
+@@ -869,6 +872,22 @@ static bool __bnxt_tx_int(struct bnxt *bp, struct bnxt_tx_ring_info *txr,
+ 							    DMA_TO_DEVICE, 0);
+ 			}
+ 		}
 +
- netdev_tx_t bnxt_sw_udp_gso_xmit(struct bnxt *bp,
- 				 struct bnxt_tx_ring_info *txr,
- 				 struct netdev_queue *txq,
- 				 struct sk_buff *skb)
- {
-+	unsigned int last_unmap_len __maybe_unused = 0;
-+	dma_addr_t last_unmap_addr __maybe_unused = 0;
-+	struct bnxt_sw_tx_bd *last_unmap_buf = NULL;
-+	unsigned int hdr_len, mss, num_segs;
-+	struct pci_dev *pdev = bp->pdev;
-+	unsigned int total_payload;
-+	struct tso_dma_map map;
-+	u32 vlan_tag_flags = 0;
-+	int i, bds_needed;
-+	struct tso_t tso;
-+	u16 cfa_action;
-+	__le32 csum;
-+	u16 prod;
++		if (unlikely(head_buf->is_sw_gso)) {
++			u16 inline_cons = txr->tx_inline_cons + 1;
 +
-+	hdr_len = tso_start(skb, &tso);
-+	mss = skb_shinfo(skb)->gso_size;
-+	total_payload = skb->len - hdr_len;
-+	num_segs = DIV_ROUND_UP(total_payload, mss);
-+
-+	if (unlikely(num_segs <= 1))
-+		goto drop;
-+
-+	/* Upper bound on the number of descriptors needed.
-+	 *
-+	 * Each segment uses 1 long BD + 1 ext BD + payload BDs, which is
-+	 * at most num_segs + nr_frags (each frag boundary crossing adds at
-+	 * most 1 extra BD).
-+	 */
-+	bds_needed = 3 * num_segs + skb_shinfo(skb)->nr_frags + 1;
-+
-+	if (unlikely(bnxt_tx_avail(bp, txr) < bds_needed)) {
-+		netif_txq_try_stop(txq, bnxt_tx_avail(bp, txr),
-+				   bp->tx_wake_thresh);
-+		return NETDEV_TX_BUSY;
-+	}
-+
-+	/* BD backpressure alone cannot prevent overwriting in-flight
-+	 * headers in the inline buffer. Check slot availability directly.
-+	 */
-+	if (!netif_txq_maybe_stop(txq, bnxt_inline_avail(txr),
-+				  num_segs, num_segs))
-+		return NETDEV_TX_BUSY;
-+
-+	if (unlikely(tso_dma_map_init(&map, &pdev->dev, skb, hdr_len)))
-+		goto drop;
-+
-+	cfa_action = bnxt_xmit_get_cfa_action(skb);
-+	if (skb_vlan_tag_present(skb)) {
-+		vlan_tag_flags = TX_BD_CFA_META_KEY_VLAN |
-+				 skb_vlan_tag_get(skb);
-+		if (skb->vlan_proto == htons(ETH_P_8021Q))
-+			vlan_tag_flags |= 1 << TX_BD_CFA_META_TPID_SHIFT;
-+	}
-+
-+	csum = cpu_to_le32(TX_BD_FLAGS_TCP_UDP_CHKSUM);
-+	if (!tso.ipv6)
-+		csum |= cpu_to_le32(TX_BD_FLAGS_IP_CKSUM);
-+
-+	prod = txr->tx_prod;
-+
-+	for (i = 0; i < num_segs; i++) {
-+		unsigned int seg_payload = min_t(unsigned int, mss,
-+						 total_payload - i * mss);
-+		u16 slot = (txr->tx_inline_prod + i) &
-+			   (BNXT_SW_USO_MAX_SEGS - 1);
-+		struct bnxt_sw_tx_bd *tx_buf;
-+		unsigned int mapping_len;
-+		dma_addr_t this_hdr_dma;
-+		unsigned int chunk_len;
-+		unsigned int offset;
-+		dma_addr_t dma_addr;
-+		struct tx_bd *txbd;
-+		struct udphdr *uh;
-+		void *this_hdr;
-+		int bd_count;
-+		bool last;
-+		u32 flags;
-+
-+		last = (i == num_segs - 1);
-+		offset = slot * TSO_HEADER_SIZE;
-+		this_hdr = txr->tx_inline_buf + offset;
-+		this_hdr_dma = txr->tx_inline_dma + offset;
-+
-+		tso_build_hdr(skb, this_hdr, &tso, seg_payload, last);
-+
-+		/* Zero stale csum fields copied from the original skb;
-+		 * HW offload recomputes from scratch.
-+		 */
-+		uh = this_hdr + skb_transport_offset(skb);
-+		uh->check = 0;
-+		if (!tso.ipv6) {
-+			struct iphdr *iph = this_hdr + skb_network_offset(skb);
-+
-+			iph->check = 0;
-+		}
-+
-+		dma_sync_single_for_device(&pdev->dev, this_hdr_dma,
-+					   hdr_len, DMA_TO_DEVICE);
-+
-+		bd_count = tso_dma_map_count(&map, seg_payload);
-+
-+		tx_buf = &txr->tx_buf_ring[RING_TX(bp, prod)];
-+		txbd = &txr->tx_desc_ring[TX_RING(bp, prod)][TX_IDX(prod)];
-+
-+		tx_buf->skb = skb;
-+		tx_buf->nr_frags = bd_count;
-+		tx_buf->is_push = 0;
-+		tx_buf->is_ts_pkt = 0;
-+
-+		dma_unmap_addr_set(tx_buf, mapping, this_hdr_dma);
-+		dma_unmap_len_set(tx_buf, len, 0);
-+
-+		if (last) {
-+			tx_buf->is_sw_gso = BNXT_SW_GSO_LAST;
-+			tso_dma_map_completion_save(&map, &tx_buf->sw_gso_cstate);
-+		} else {
-+			tx_buf->is_sw_gso = BNXT_SW_GSO_MID;
-+		}
-+
-+		flags = (hdr_len << TX_BD_LEN_SHIFT) |
-+			TX_BD_TYPE_LONG_TX_BD |
-+			TX_BD_CNT(2 + bd_count);
-+
-+		flags |= bnxt_sw_gso_lhint(hdr_len + seg_payload);
-+
-+		txbd->tx_bd_len_flags_type = cpu_to_le32(flags);
-+		txbd->tx_bd_haddr = cpu_to_le64(this_hdr_dma);
-+		txbd->tx_bd_opaque = SET_TX_OPAQUE(bp, txr, prod,
-+						   2 + bd_count);
-+
-+		prod = NEXT_TX(prod);
-+		bnxt_init_ext_bd(bp, txr, prod, csum,
-+				 vlan_tag_flags, cfa_action);
-+
-+		/* set dma_unmap_len on the LAST BD touching each
-+		 * region. Since completions are in-order, the last segment
-+		 * completes after all earlier ones, so the unmap is safe.
-+		 */
-+		while (tso_dma_map_next(&map, &dma_addr, &chunk_len,
-+					&mapping_len, seg_payload)) {
-+			prod = NEXT_TX(prod);
-+			txbd = &txr->tx_desc_ring[TX_RING(bp, prod)][TX_IDX(prod)];
-+			tx_buf = &txr->tx_buf_ring[RING_TX(bp, prod)];
-+
-+			txbd->tx_bd_haddr = cpu_to_le64(dma_addr);
-+			dma_unmap_addr_set(tx_buf, mapping, dma_addr);
-+			dma_unmap_len_set(tx_buf, len, 0);
-+			tx_buf->skb = NULL;
-+			tx_buf->is_sw_gso = 0;
-+
-+			if (mapping_len) {
-+				if (last_unmap_buf) {
-+					dma_unmap_addr_set(last_unmap_buf,
-+							   mapping,
-+							   last_unmap_addr);
-+					dma_unmap_len_set(last_unmap_buf,
-+							  len,
-+							  last_unmap_len);
-+				}
-+				last_unmap_addr = dma_addr;
-+				last_unmap_len = mapping_len;
++			WRITE_ONCE(txr->tx_inline_cons, inline_cons);
++			if (head_buf->is_sw_gso == BNXT_SW_GSO_LAST) {
++				tso_dma_map_complete(&pdev->dev,
++						     &head_buf->sw_gso_cstate);
++			} else {
++				tx_pkts--;
++				tx_bytes -= skb->len;
++				skb = NULL;
 +			}
-+			last_unmap_buf = tx_buf;
-+
-+			flags = chunk_len << TX_BD_LEN_SHIFT;
-+			txbd->tx_bd_len_flags_type = cpu_to_le32(flags);
-+			txbd->tx_bd_opaque = 0;
-+
-+			seg_payload -= chunk_len;
++			head_buf->is_sw_gso = 0;
 +		}
 +
-+		txbd->tx_bd_len_flags_type |=
-+			cpu_to_le32(TX_BD_FLAGS_PACKET_END);
+ 		if (unlikely(is_ts_pkt)) {
+ 			if (BNXT_CHIP_P5(bp)) {
+ 				/* PTP worker takes ownership of the skb */
+@@ -3412,6 +3431,7 @@ static void bnxt_free_one_tx_ring_skbs(struct bnxt *bp,
+ 
+ 	for (i = 0; i < max_idx;) {
+ 		struct bnxt_sw_tx_bd *tx_buf = &txr->tx_buf_ring[i];
++		struct bnxt_sw_tx_bd *head_buf = tx_buf;
+ 		struct sk_buff *skb;
+ 		int j, last;
+ 
+@@ -3466,7 +3486,20 @@ static void bnxt_free_one_tx_ring_skbs(struct bnxt *bp,
+ 							    DMA_TO_DEVICE, 0);
+ 			}
+ 		}
+-		dev_kfree_skb(skb);
++		if (head_buf->is_sw_gso) {
++			u16 inline_cons = txr->tx_inline_cons + 1;
 +
-+		prod = NEXT_TX(prod);
++			WRITE_ONCE(txr->tx_inline_cons, inline_cons);
++			if (head_buf->is_sw_gso == BNXT_SW_GSO_LAST) {
++				tso_dma_map_complete(&pdev->dev,
++						     &head_buf->sw_gso_cstate);
++			} else {
++				skb = NULL;
++			}
++			head_buf->is_sw_gso = 0;
++		}
++		if (skb)
++			dev_kfree_skb(skb);
+ 	}
+ 	netdev_tx_reset_queue(netdev_get_tx_queue(bp->dev, idx));
+ }
+@@ -3992,9 +4025,9 @@ static void bnxt_free_tx_inline_buf(struct bnxt_tx_ring_info *txr,
+ 	txr->tx_inline_size = 0;
+ }
+ 
+-static int __maybe_unused bnxt_alloc_tx_inline_buf(struct bnxt_tx_ring_info *txr,
+-						   struct pci_dev *pdev,
+-						   unsigned int size)
++static int bnxt_alloc_tx_inline_buf(struct bnxt_tx_ring_info *txr,
++				    struct pci_dev *pdev,
++				    unsigned int size)
+ {
+ 	txr->tx_inline_buf = kmalloc(size, GFP_KERNEL);
+ 	if (!txr->tx_inline_buf)
+@@ -4097,6 +4130,13 @@ static int bnxt_alloc_tx_rings(struct bnxt *bp)
+ 				sizeof(struct tx_push_bd);
+ 			txr->data_mapping = cpu_to_le64(mapping);
+ 		}
++		if (!(bp->flags & BNXT_FLAG_UDP_GSO_CAP)) {
++			rc = bnxt_alloc_tx_inline_buf(txr, pdev,
++						      BNXT_SW_USO_MAX_SEGS *
++						      TSO_HEADER_SIZE);
++			if (rc)
++				return rc;
++		}
+ 		qidx = bp->tc_to_qidx[j];
+ 		ring->queue_id = bp->q_info[qidx].queue_id;
+ 		spin_lock_init(&txr->xdp_tx_lock);
+@@ -4635,10 +4675,13 @@ static int bnxt_init_rx_rings(struct bnxt *bp)
+ 
+ static int bnxt_init_tx_rings(struct bnxt *bp)
+ {
++	netdev_features_t features;
+ 	u16 i;
+ 
++	features = bp->dev->features;
++
+ 	bp->tx_wake_thresh = max_t(int, bp->tx_ring_size / 2,
+-				   BNXT_MIN_TX_DESC_CNT);
++				   bnxt_min_tx_desc_cnt(bp, features));
+ 
+ 	for (i = 0; i < bp->tx_nr_rings; i++) {
+ 		struct bnxt_tx_ring_info *txr = &bp->tx_ring[i];
+@@ -13837,6 +13880,11 @@ static netdev_features_t bnxt_fix_features(struct net_device *dev,
+ 	if ((features & NETIF_F_NTUPLE) && !bnxt_rfs_capable(bp, false))
+ 		features &= ~NETIF_F_NTUPLE;
+ 
++	if ((features & NETIF_F_GSO_UDP_L4) &&
++	    !(bp->flags & BNXT_FLAG_UDP_GSO_CAP) &&
++	    bp->tx_ring_size < 2 * BNXT_SW_USO_MAX_DESCS)
++		features &= ~NETIF_F_GSO_UDP_L4;
++
+ 	if ((bp->flags & BNXT_FLAG_NO_AGG_RINGS) || bp->xdp_prog)
+ 		features &= ~(NETIF_F_LRO | NETIF_F_GRO_HW);
+ 
+@@ -13882,6 +13930,9 @@ static int bnxt_set_features(struct net_device *dev, netdev_features_t features)
+ 	int rc = 0;
+ 	bool re_init = false;
+ 
++	bp->tx_wake_thresh = max_t(int, bp->tx_ring_size / 2,
++				   bnxt_min_tx_desc_cnt(bp, features));
++
+ 	flags &= ~BNXT_FLAG_ALL_CONFIG_FEATS;
+ 	if (features & NETIF_F_GRO_HW)
+ 		flags |= BNXT_FLAG_GRO;
+@@ -16907,8 +16958,7 @@ static int bnxt_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 			   NETIF_F_GSO_UDP_TUNNEL_CSUM | NETIF_F_GSO_GRE_CSUM |
+ 			   NETIF_F_GSO_PARTIAL | NETIF_F_RXHASH |
+ 			   NETIF_F_RXCSUM | NETIF_F_GRO;
+-	if (bp->flags & BNXT_FLAG_UDP_GSO_CAP)
+-		dev->hw_features |= NETIF_F_GSO_UDP_L4;
++	dev->hw_features |= NETIF_F_GSO_UDP_L4;
+ 
+ 	if (BNXT_SUPPORTS_TPA(bp))
+ 		dev->hw_features |= NETIF_F_LRO;
+@@ -16941,8 +16991,15 @@ static int bnxt_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	dev->priv_flags |= IFF_UNICAST_FLT;
+ 
+ 	netif_set_tso_max_size(dev, GSO_MAX_SIZE);
+-	if (bp->tso_max_segs)
++	if (!(bp->flags & BNXT_FLAG_UDP_GSO_CAP)) {
++		u16 max_segs = BNXT_SW_USO_MAX_SEGS;
++
++		if (bp->tso_max_segs)
++			max_segs = min_t(u16, max_segs, bp->tso_max_segs);
++		netif_set_tso_max_segs(dev, max_segs);
++	} else if (bp->tso_max_segs) {
+ 		netif_set_tso_max_segs(dev, bp->tso_max_segs);
 +	}
+ 
+ 	dev->xdp_features = NETDEV_XDP_ACT_BASIC | NETDEV_XDP_ACT_REDIRECT |
+ 			    NETDEV_XDP_ACT_RX_SG;
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+index 6826bf762d26..9ded88196bb4 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+@@ -33,6 +33,7 @@
+ #include "bnxt_xdp.h"
+ #include "bnxt_ptp.h"
+ #include "bnxt_ethtool.h"
++#include "bnxt_gso.h"
+ #include "bnxt_nvm_defs.h"	/* NVRAM content constant and structure defs */
+ #include "bnxt_fw_hdr.h"	/* Firmware hdr constant and structure defs */
+ #include "bnxt_coredump.h"
+@@ -852,12 +853,18 @@ static int bnxt_set_ringparam(struct net_device *dev,
+ 	u8 tcp_data_split = kernel_ering->tcp_data_split;
+ 	struct bnxt *bp = netdev_priv(dev);
+ 	u8 hds_config_mod;
++	int rc;
+ 
+ 	if ((ering->rx_pending > BNXT_MAX_RX_DESC_CNT) ||
+ 	    (ering->tx_pending > BNXT_MAX_TX_DESC_CNT) ||
+ 	    (ering->tx_pending < BNXT_MIN_TX_DESC_CNT))
+ 		return -EINVAL;
+ 
++	if ((dev->features & NETIF_F_GSO_UDP_L4) &&
++	    !(bp->flags & BNXT_FLAG_UDP_GSO_CAP) &&
++	    ering->tx_pending < 2 * BNXT_SW_USO_MAX_DESCS)
++		return -EINVAL;
 +
-+	if (last_unmap_buf) {
-+		dma_unmap_addr_set(last_unmap_buf, mapping, last_unmap_addr);
-+		dma_unmap_len_set(last_unmap_buf, len, last_unmap_len);
+ 	hds_config_mod = tcp_data_split != dev->cfg->hds_config;
+ 	if (tcp_data_split == ETHTOOL_TCP_DATA_SPLIT_DISABLED && hds_config_mod)
+ 		return -EINVAL;
+@@ -882,9 +889,17 @@ static int bnxt_set_ringparam(struct net_device *dev,
+ 	bp->tx_ring_size = ering->tx_pending;
+ 	bnxt_set_ring_params(bp);
+ 
+-	if (netif_running(dev))
+-		return bnxt_open_nic(bp, false, false);
++	if (netif_running(dev)) {
++		rc = bnxt_open_nic(bp, false, false);
++		if (rc)
++			return rc;
 +	}
-+
-+	txr->tx_inline_prod += num_segs;
-+
-+	netdev_tx_sent_queue(txq, skb->len);
-+
-+	WRITE_ONCE(txr->tx_prod, prod);
-+	/* Sync BDs before doorbell */
-+	wmb();
-+	bnxt_db_write(bp, &txr->tx_db, prod);
-+
-+	if (unlikely(bnxt_tx_avail(bp, txr) <= bp->tx_wake_thresh))
-+		netif_txq_try_stop(txq, bnxt_tx_avail(bp, txr),
-+				   bp->tx_wake_thresh);
-+
-+	return NETDEV_TX_OK;
-+
-+drop:
- 	dev_kfree_skb_any(skb);
- 	dev_core_stats_tx_dropped_inc(bp->dev);
- 	return NETDEV_TX_OK;
+ 
++	/* ring size changes may affect features (SW USO requires a minimum
++	 * ring size), so recalculate features to ensure the correct features
++	 * are blocked/available.
++	 */
++	netdev_update_features(dev);
+ 	return 0;
+ }
+ 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_gso.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_gso.h
-index f01e8102dcd7..6ba8ccc451de 100644
+index 6ba8ccc451de..47528c20f311 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_gso.h
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_gso.h
-@@ -23,6 +23,12 @@
-  */
- #define BNXT_SW_USO_MAX_DESCS	(3 * BNXT_SW_USO_MAX_SEGS + MAX_SKB_FRAGS + 1)
+@@ -29,6 +29,15 @@ static inline u16 bnxt_inline_avail(struct bnxt_tx_ring_info *txr)
+ 	       (u16)(txr->tx_inline_prod - READ_ONCE(txr->tx_inline_cons));
+ }
  
-+static inline u16 bnxt_inline_avail(struct bnxt_tx_ring_info *txr)
++static inline int bnxt_min_tx_desc_cnt(struct bnxt *bp,
++				       netdev_features_t features)
 +{
-+	return BNXT_SW_USO_MAX_SEGS -
-+	       (u16)(txr->tx_inline_prod - READ_ONCE(txr->tx_inline_cons));
++	if (!(bp->flags & BNXT_FLAG_UDP_GSO_CAP) &&
++	    (features & NETIF_F_GSO_UDP_L4))
++		return BNXT_SW_USO_MAX_DESCS;
++	return BNXT_MIN_TX_DESC_CNT;
 +}
 +
  netdev_tx_t bnxt_sw_udp_gso_xmit(struct bnxt *bp,
