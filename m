@@ -1,174 +1,178 @@
-Return-Path: <netdev+bounces-276356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276357-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8M3wKAYT1mngAwgAu9opvQ
-	(envelope-from <netdev+bounces-276356-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 10:34:14 +0200
+	id 6J0hEkcU1mnwAwgAu9opvQ
+	(envelope-from <netdev+bounces-276357-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 10:39:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE09A3B91BC
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 10:34:13 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A27983B934A
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 10:39:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A7496300863C
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 08:33:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E4C4830851E0
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 08:35:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7629E3A6409;
-	Wed,  8 Apr 2026 08:33:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CC523A6B9D;
+	Wed,  8 Apr 2026 08:35:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="p77gfSBu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dFm4+muh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C7D33A2548
-	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 08:33:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3FAE3A6B70
+	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 08:34:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775637230; cv=none; b=BjKLJZ9Irqnr7UEQm97IanApymbvP3T/B4JhqfehdWZ/Og7rC6TmiL8X4nW+T08+bHUxu9/C/IIvBLZyJ6kFQoFBlJ2sZy0W7n1b5xsxatL7xjVIMFEzUq1a5uZHDLE0s1JPCM9FuMGZjHQEdAkzAwS9iP3dLVVlZJcCJhWK3dg=
+	t=1775637301; cv=none; b=UWWEU3xfI1nm06u+DAi/mOs5as6dSp3RNo9RZAgd6yTo10lahoqLm5Jo0Cf6WxC499BFrIqoC0xt85n0EpbyxrHVzPZ6CWvw05hwDM3MIOiDXKme2f5ZofEhyLQbsrhXFS9hmyMwGEJ4C5KnurXs3AMcymc2d0QGniIduwkOjY4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775637230; c=relaxed/simple;
-	bh=OKjKmjKCU62uaCjhibuDqhSE1AGMzLcspem2OqAtVYs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PXRB6QGYO+QLcXpXYFpMcuaWGRzlIfp7dUE161E1SB4oeeHNICWgcPsZ4l6RSvc/cRTMQKclYXbcvLZFKkph9W9l05X+eXyxWEieTpNSUR2mEmHylMWtGPQyUEuy/gSDF/AbjZPDmIAsk8YfKaTDWK3P0CBRbGnXyQYbM0UZKSA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=p77gfSBu; arc=none smtp.client-ip=209.85.128.48
+	s=arc-20240116; t=1775637301; c=relaxed/simple;
+	bh=Yv9rp1wgQY/Ainn0b6NPeknaayPrGIJ+iW91Cs0GLmM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=I6LW+hu2Mp9Msf/rSnhfqAWY639QF4GJ4VK5+DWERTPziJGcn5a56jkVHTt23hJLvkpkLZjqCQSnXDdKyoYYYITdT7P9HD8iBqWxSKH1Pe0AWABrbETNqTh1hdO8VUEHml+LEJj5Q8O9lmAbWGFR7O9xL/Uzac7upOABU730mXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dFm4+muh; arc=none smtp.client-ip=209.85.128.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-488971db0fdso48094515e9.0
-        for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 01:33:48 -0700 (PDT)
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-488aa77a06eso50702355e9.0
+        for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 01:34:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775637227; x=1776242027; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Pbj1pinyLCpTvRMDqb5wMltAGKRQ0z6dfcrCaaij6ks=;
-        b=p77gfSBuAxonX9liwZs+8/t5Mudz4WzeCGIoIxYvYIjpyA3tLkryVpFL4NFPypkswo
-         y2I+VVzgrjUd10ofAtxbWy3xVVEKHqt40qaZsvsUZrUFxhR+SJWWfeKZLncB6lu5M9z7
-         /+yfuyXJi4tdiDDIfAtiauxD6s2BzLDVxZOt3VB9BUohrKOIcuoxctCRQ2uky0cJ/5QH
-         S/4m8vwXpUVv1OmZmqFztiCNstj0LouYQEiQ3VihAskewy6QWq02TBIsXihwa/puJMRb
-         rhzyNRlSkyBQTp3xfIzWsSk9ZK+aCijcv+/iy3FjYDiO1qmk0cD8TX+KrngXTsIh4qxN
-         P5MQ==
+        d=gmail.com; s=20251104; t=1775637298; x=1776242098; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=CQaeOFXbxNsQ6d5NOWsIIq7eCw+qyUnj2mDKEGGArjM=;
+        b=dFm4+muhY1VOt4KhNS/fpE6DxxIAiZmKWKsbfOUKFcQu+QN5tpQVIx/knA6AVLNlka
+         9eHJ1XcKmaI2HLjwsWjSCydCdv6I/cX2Nu/gq/Zqa1P8NXmZYcB4JHAO8lEjoLd20K7F
+         +pGQ3BNA8QLQzXQ/FKWCWwGljV6JBrIaQ7A2UmXb57sLD8PO1h1Dqf0hlrOEie/im4As
+         7gQTNafumAD6d+bGeBBdsx1TAsmfdYwIzJGJWgmhEM2x0rRsc9g5lElgbVfOOVkt8qIX
+         xACWKhAg7msuQUDUNWDhEKyzCs6gUppyeD+OJfUI602Qw46LmTb7BlwJgHI45S5AIAXs
+         iwlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775637227; x=1776242027;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Pbj1pinyLCpTvRMDqb5wMltAGKRQ0z6dfcrCaaij6ks=;
-        b=suNrz+p6gfiKlpLlaEi7L5mcDXozm1hzS7UvSdzJEHRpFG/0l6kVlKWQZsqfOYE6CH
-         cRvis0selUDgHJgKAYeZPJs4nB/FS3YutouSD4HWKznMa/K6mHHlRcgH8cTp3Qun2UdP
-         sP57MGCNfKFIn+WRPM0hEPaPbaeRSCt3yMSgy0aS1z5aEbWJIJHjeuguH0t3gao/lW7x
-         YCbwmVySVbiI9EkX+56Zyxen8Dknj9alaI/AIRLaTfsmwilE+9lPqN5Uo5GDAa0mv71B
-         +rwdb1XrRG8w4owLebEdFd3dft4ghe0FIET1S4xJYagf1TVDHhxZnotTUQGBwF1hWWdn
-         VLkg==
-X-Forwarded-Encrypted: i=1; AJvYcCX09MbM9bbtmPllf0PMD4fEobsgdv0QZy3HTv0RJoAUV69hDy4NAvI77oz0OPXB10/uuogACJ8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz4XZCyf7HUWOQ/V+zmPC1zFZ6pVPmtZwmVqziI/S724+h8qOEd
-	kVk3kg30toIjoZCFYJa8RUaVhRk0RFm7x8LjVLrHE+1J0aD4VAAtJZGjYfBwLQ==
-X-Gm-Gg: AeBDietCKMJiBPQ7955zl5qGO9STJWIt0Df9R2hLJRC276AEMZ/DBAEYE9TCD0XCLsd
-	PU0JlEJYoInum3W90SxoFuthWOheqWQZPFzC/1N0pbXNEqiMAi2k+j+PuYfKhBvRHTj8HOPdAO9
-	g3fxH+xD8vSY4t+Dd0dg6hM8gFz8D76Ovb9+BAtFHs3H/O00AB6dnw6z4MJEvGX9JGFT79CfGIR
-	omxpuGyvmuQzm2BxDxDqWuroc7HS9Sd4wfPJCtrjQjxi7F+9AJQ0xtFS0kr09bYXBVNSwuE7wzx
-	o3p/45hQnGOYzikhBvMMsRNanOTuFRAuR2+L60Bznuzl5AR4+tHNx6lmYwqTx+mxgDf/OMD/TiO
-	CxMA3tcrGi01wrrrEQgcxVpcdz0BNKs8XYu+vN3lS6xd/m3zz1/EXoJ456BLRO7+GyKdnfMBwp9
-	CwRNq9TBdv3brH1Wc1jZ3oQBakXeOGCFMy
-X-Received: by 2002:a05:600c:3b1b:b0:488:8bdd:cfb9 with SMTP id 5b1f17b1804b1-488996b01c8mr283650655e9.1.1775637227307;
-        Wed, 08 Apr 2026 01:33:47 -0700 (PDT)
-Received: from foxbook (bfi53.neoplus.adsl.tpnet.pl. [83.28.46.53])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488c5db33b4sm17711325e9.6.2026.04.08.01.33.45
-        (version=TLS1_2 cipher=AES128-SHA bits=128/128);
-        Wed, 08 Apr 2026 01:33:46 -0700 (PDT)
-Date: Wed, 8 Apr 2026 10:33:43 +0200
-From: Michal Pecio <michal.pecio@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Petko Manolov <petkan@nucleusys.com>, Simon Horman <horms@kernel.org>,
- Morduan Zang <zhangdandan@uniontech.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, linux-usb@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- syzbot+9db6c624635564ad813c@syzkaller.appspotmail.com
-Subject: Re: [PATCH] usb: rtl8150: avoid using uninitialized CSCR value
-Message-ID: <20260408103343.19cf599a.michal.pecio@gmail.com>
-In-Reply-To: <76d6b341-27d5-44aa-92fb-3b8966d609df@lunn.ch>
-References: <93FF85BB9F33CD2B+20260402070743.20641-1-zhangdandan@uniontech.com>
-	<20260403154538.GA187715@horms.kernel.org>
-	<20260405085212.GA8491@cabron.k.g>
-	<76d6b341-27d5-44aa-92fb-3b8966d609df@lunn.ch>
+        d=1e100.net; s=20251104; t=1775637298; x=1776242098;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=CQaeOFXbxNsQ6d5NOWsIIq7eCw+qyUnj2mDKEGGArjM=;
+        b=OPxLjfkP7ade2K3oBOfw0uB1ml0aFtuZVmg80czM3PiXO62i9EYiN0B6M7h1iSYuNa
+         6fLbgiHm6HN8tHMxLL7R+puLmSUL/Oz2pDGbdmFeQY8f9k/8fnIaMnUyIHx5znTRr33R
+         yqjsrqCUz13lRckq11XhO6fIBdTJiaoxIp2G7nsnA+0CbT9r4rGzeRbCpc6qUxPRK819
+         nEelRjgD46cRnUg0bNyRqBUz/pofOQXsbLWEqtyDQqnS37FUjbwJUJ0th9VlCWylRPET
+         dwA0z/8UxIvYVqp7/wJtZ/uyxEdjivzVhIVP0Strl4/UptvauN473d40yiF5ceCCXRWm
+         wnmQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWiAXhoCPJrz95MML+ell62+I0yFEAGawga2yPo0axT2l932Co1FA52Abz9MmeMdA8cLuKsUJU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxM3ko6giGNpexr0QSQjDO/eqabU8ud3xHe4x9SadKCgWcrahQo
+	HUgjLsYu52L6X/EHtxRXr3caZIan4+VgCjg2boJ6thWtHukWZwwVIN5W
+X-Gm-Gg: AeBDievfyoYP/wjCrp/iqhMeHlWwB3uMVevXHm2jYuVTYBiMmbt0JpxPyOIBtHy+xPn
+	SmRaqvAB4Fehi1cDfiRcy4jesQw0WgppYrgY5z9pIlYAJdROAtwWViu3m95jN0rl0QEOSLqIR8Z
+	hrPKl4mFhMCiT8GccZzL8gUH8gTpQxj6Kn/VdROW9s7E2MY3G57W1n+m/W8Kz9s+BlIsCvGA4P/
+	MlzKVhL5PbRq0DjLP8tEJHSGaQnldiufBd3VRM1Mo5cKdT3r0gj+NSOr6U8Skbt4F38r/jXi0UI
+	RDvWVSVCdUPlTLJwwF0iiW1fosLq/cKd5pDK8MWmZwAfJBueslPhJsqQ8HzeGiyEAQ7gtI0fQBJ
+	nX4IH3DvlPOgJ36dggUBMDjlolhJF1VYFryUdPqdI8nCYAYb834GsR9k6r3MDE9snvjiNlhQSTv
+	oz3GnWd5+XcyFjWYpUWHaBGypNWE7+pSR1lb402+ffYQQcAfOX+vrdmbeppq9e2LJEDdflNmtQy
+	mjotUixQFSJ0l0g6LY7vL4EJ6XVZlgS4xDnfp6Ajj+T1tNC/n+dqdOTa48=
+X-Received: by 2002:a05:600c:1f96:b0:487:4eb:d125 with SMTP id 5b1f17b1804b1-48899753e5fmr279347815e9.9.1775637297978;
+        Wed, 08 Apr 2026 01:34:57 -0700 (PDT)
+Received: from ?IPV6:2620:10d:c096:325:77fd:1068:74c8:af87? ([2620:10d:c092:600::1:eaba])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488c1c5291esm150797065e9.15.2026.04.08.01.34.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 08 Apr 2026 01:34:56 -0700 (PDT)
+Message-ID: <336062ec-5fcd-46ad-a839-6ddbff7f9fb9@gmail.com>
+Date: Wed, 8 Apr 2026 09:34:59 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/3] io_uring: fix pinned pages and pages array leak in
+ io_region_pin_pages()
+To: KobaK <kobak@nvidia.com>, Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <kbusch@kernel.org>, Ming Lei <ming.lei@redhat.com>,
+ io-uring@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260408065408.2017967-1-kobak@nvidia.com>
+ <20260408065408.2017967-2-kobak@nvidia.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20260408065408.2017967-2-kobak@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-276356-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TAGGED_FROM(0.00)[bounces-276357-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[michalpecio@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.997];
-	TAGGED_RCPT(0.00)[netdev,9db6c624635564ad813c];
+	FROM_NEQ_ENVFROM(0.00)[asmlsilence@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[7];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: AE09A3B91BC
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:email]
+X-Rspamd-Queue-Id: A27983B934A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, 6 Apr 2026 01:38:06 +0200, Andrew Lunn wrote:
-> > > -	get_registers(dev, CSCR, 2, &tmp);
-> > > +	if (get_registers(dev, CSCR, 2, &tmp) < 0)
-> > > +		tmp = 0;
-> > >  	if (tmp & CSCR_LINK_STATUS)
-> > >  		netif_carrier_on(netdev);
-> > >  	else  
-> > 
-> > I was wondering if calling netif_carrier_off() is the right thing
-> > to do in case get_registers() fail.
-> > 
-> > There are multiple get_registers() calls that don't check the error
-> > and if we do this in set_carrier() maybe we should do the same
-> > thing across the whole driver?  
+On 4/8/26 07:54, KobaK wrote:
+> From: Koba Ko <kobak@nvidia.com>
 > 
-> What does it actually mean if get_registers() fails? The device is
-> gone? Hot unplugged? If so, you are going to get a cascade of errors,
-> and then hopefully the USB core code removes the device?
+> When io_pin_pages() succeeds but the subsequent nr_pages sanity check
+> fires (WARN_ON_ONCE), the function returns -EFAULT without unpinning the
+> user pages or freeing the kvmalloc'd pages array. The caller's cleanup
+> via io_free_region() won't help either, because mr->pages was never
+> assigned — so the entire cleanup block is skipped.
 > 
-> Are there any legitimate reasons for get_registers() to fail if the
-> device is still plugged in?
+> Add unpin_user_pages() and kvfree() before the error return to prevent
+> the leak.
+> 
+> Fixes: a90558b36ccee ("io_uring/memmap: helper for pinning region pages")
+> Signed-off-by: Koba Ko <kobak@nvidia.com>
 
-In principle it might be temporary EMI or a flaky cable. These errors
-rarely reach drivers due to retries in USB layer, but in extreme cases
-the device may be in unknown state and it may become functional later.
-IIRC net layer has some operations which are presumed trivial enough
-that they would never fail, so this could be annoying.
+It's a WARN path, it should never happen, but if it does, that means
+io_pin_pages() is buggy, and it's better to leak rather than risk
+something nastier.
 
-It does seem rare enough in practice that for 25 years nobody noticed
-carrier status being set to a random vaule by this driver.
+> ---
+>   io_uring/memmap.c | 5 ++++-
+>   1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/io_uring/memmap.c b/io_uring/memmap.c
+> index e6958968975a8..9f0d3750ce3bc 100644
+> --- a/io_uring/memmap.c
+> +++ b/io_uring/memmap.c
+> @@ -141,8 +141,11 @@ static int io_region_pin_pages(struct io_mapped_region *mr,
+>   	pages = io_pin_pages(reg->user_addr, size, &nr_pages);
+>   	if (IS_ERR(pages))
+>   		return PTR_ERR(pages);
+> -	if (WARN_ON_ONCE(nr_pages != mr->nr_pages))
+> +	if (WARN_ON_ONCE(nr_pages != mr->nr_pages)) {
+> +		unpin_user_pages(pages, nr_pages);
+> +		kvfree(pages);
+>   		return -EFAULT;
+> +	}
+>   
+>   	mr->pages = pages;
+>   	mr->flags |= IO_REGION_F_USER_PROVIDED;
 
-BTW, some functions like rtl8150_reset() pre-set data to a value which
-will be safe in case of get_register() failure. But here, unhandled
-set_register() error is dodgy - the 0x10 bit may never turn on.
+-- 
+Pavel Begunkov
 
-Regards,
-Michal
 
