@@ -1,273 +1,235 @@
-Return-Path: <netdev+bounces-276587-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276588-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CNANJGNw1ml2FQgAu9opvQ
-	(envelope-from <netdev+bounces-276587-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 17:12:35 +0200
+	id 4O4/BXRx1ml2FQgAu9opvQ
+	(envelope-from <netdev+bounces-276588-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 17:17:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB9033BE063
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 17:12:34 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7097D3BE106
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 17:17:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9F3303083FCF
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 15:08:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2BA82303D72A
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 15:10:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7C983D810D;
-	Wed,  8 Apr 2026 15:08:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF7003D525B;
+	Wed,  8 Apr 2026 15:10:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IuseYvDY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rtr5j7Yp"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D91913D6CA3;
-	Wed,  8 Apr 2026 15:08:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53E653D47DE
+	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 15:10:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775660897; cv=none; b=Ph4ZO+H9PSVkGtTctA/f3+wJOgYYQFDE0MzQLmvb79GgUsyo0NjoPaBKLF23ljM0Jrf22y1UY4kImufpfKXpCpb0qy0DbPkcA+gFXrUc8gSaHIVfI033CcaT1tNXzjEaBkQkB6OkKW5q2VOQ7YdYYme15PcXen/sG7b6lS60EXA=
+	t=1775661030; cv=none; b=tyFBi8L+W1JJMScn88G0ME8fcH2M8FqpE+lkxApBsz0TOZbQuAmAOmc3gO62Cd7MbfLpGI65ILkvpWMMEWj5VrLrcbYV/HSvkRJRiz2y9Nzxs17fypR00cHbBG7Q9QKpOkLmCMIANXzSu+DeFFa9J6Ds51RphNeRuineWPsz30A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775660897; c=relaxed/simple;
-	bh=c+t/mnujGeovYZsVYe8TcoUHreBnj3/1x8GOKt/Krj8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=UWjkt/JS16p+VITZ8SUWR1pGZouNyMsTmSXL8PpMUJefl1cN9fIEuxkl1XdaE/nL6QFdhnSJljr41LNkOBzeKOnqI1Nbr/j0Aw8v0txLAMXD5Ajn/VmJuGYuHI6mai6trfmMr2yD8zLlXjHHjeufcTDlkZ2hgJfJa1GQ60Nf+rw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IuseYvDY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B985DC2BCB3;
-	Wed,  8 Apr 2026 15:08:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775660897;
-	bh=c+t/mnujGeovYZsVYe8TcoUHreBnj3/1x8GOKt/Krj8=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=IuseYvDYsWOUrdTaiLdMLkj6qMgWy4bzlTKCdwNLEw+2+XqWOqnPeBhyOOcCCyTPA
-	 xRnuPSW/JTE9S/SS8t9nITJFjwnarEkIfo8GAer78fwj1IwuNW1uDKhqP2lZleWWFJ
-	 +xJBpO0TjCUlCrpz+3TuZUuKfcJa2DFSJOelB7WnWPlO3K+ImCd81eNTTWzSXsX3vo
-	 6Fc33UGRnQkRvtrt6VZdVSiC31koy/UlI4wbNjRrxBEYbfubaOd48ApyGLhisMYZHL
-	 Oeplfls0fFTzhkpPopt+IsdLtTcg6Eyw4bojIP23CJUAafMKj7l4Z+3Uu7fo9j9Ol+
-	 lrf63wjlWC0Qw==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFC2D10F9957;
-	Wed,  8 Apr 2026 15:08:17 +0000 (UTC)
-From: Satish Kharat via B4 Relay <devnull+satishkh.cisco.com@kernel.org>
-Date: Wed, 08 Apr 2026 08:08:20 -0700
-Subject: [PATCH net-next v2 10/10] enic: add V2 VF probe with admin channel
- and PF registration
+	s=arc-20240116; t=1775661030; c=relaxed/simple;
+	bh=vOpR3QprRCoCSUSNkfjF5VxENkiKE25FatWfq3c5xfI=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=jM3vmtd67Qz18FIDusnF2o08FEw4i5tsSSUgvTplxoHwHrbAKiF27OV6Ba9IHK8dzQ+Ed8TKZyLINKZtyAYlOjmbQJDD9tSMg7LgftfuhWlpPgnHYLKvCWdAzllbFvgAiBwCiHI+/M6/Z8K93YGMjhcrQtmu7lLmwFQtu8oaTMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Rtr5j7Yp; arc=none smtp.client-ip=209.85.128.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-79d991c7b6aso35897b3.2
+        for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 08:10:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775661028; x=1776265828; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JWIArzpyOOvfAEAf63T5ijzN/e9W9mTmg83yyPjlKNo=;
+        b=Rtr5j7Ypk51ub5o1xrBiGukwtti9l4BH0sKzRygdmBLfTjxc0PMxVjgVtCPzCoFT3Z
+         Ekw6YIabsynSFo4qw3+ijG63HzDmv8tvISZmUpmzhnWqqPqik5smnCYm1S7n2zCfY+Gr
+         XwRF/+g0EMCPlzGkajo0dgubWZBlAFgHV4TcVHtJw861Q3RuYQRjnuUECpbDFKBkLA7k
+         WRgUFMgGNQQBVOTR7jsDrC7cNRdaS61rZGs0u1E7meYlhzvqmbjz5q8MoymGHvphc+Af
+         ltmEWw39ldh59HfiR9RoCXtxhaeYGGW3bvU3eqd7hGjNLiWurnhqD9ar0sltWsoZHb0p
+         EuCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775661028; x=1776265828;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=JWIArzpyOOvfAEAf63T5ijzN/e9W9mTmg83yyPjlKNo=;
+        b=Ze2yEN1M/u1SPccXyjpSXzhrfeMx59CFkTZqN+nHAQMPNbtRZ4ut+TMVtk2afzWmtc
+         zWFb1mJZ2SekunyyrbhZSUUOL/isO/HZ7VKXfAcgqO60OaMYLf/AUDZhCjrYwFX4qE/P
+         DEJohvX4yOaJyrJKi09aSWXlUui6b24Gd7gehbUiMmrY0m8Ig4616MKfJHcUAS6zClpG
+         zOkB4WDhTOZihBajsN8zRjET2V1Azsw8z81UdEMah9JKCVJ6/rOJg0oSKr/slubVeVuY
+         B/BXRvuZo0qSI9458V6lUBs9ZFSLTlQve9DZEaVQTZHYl973AFao2UDu2LOPa7h9b3II
+         yW/w==
+X-Forwarded-Encrypted: i=1; AJvYcCWbJMnI8OnjfjI381z1FKuvKnSB71ngQNGJQb2ToIlqeTMCuzeSLDMkOokjyWx17E5MD1BVL1A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YysnCcCvU38hhD+PuYRhMrGiiV+C1CPQcUVLV7lb0W2B708+3JO
+	e8Ji+GfRfGzeNCqo6YroE/oDHlXipxG0T+DYqQMxhn5wo/uJPXAMa1tr
+X-Gm-Gg: AeBDievWrZ8IsbQco8URp6Y10muhS6geETluGoxd6J7851grQBBrCvaus62SlK+GGHS
+	uWfvHqD/HCA0CcVD0h3YZk7CmP+/Wq9bhMsfNuSYzVjSGsb/eLMaJ8z/++PNUIQJjubYHQtRsH/
+	KDGqJipYMXS/hlMhf64Vuaga66uUhPFMkW15dfGl216321TsOW9fkaKCRsm3erGpM9NkZwdy7Kg
+	QuHbzRLUsnUZLSuGFRd5ZrD3M9q+JRIY3JSPD2Q+pDzdSJavq5p/ezxXjQm3ZlIonPf9fVcQR4U
+	Cx5InEOzHsPq746uyAbg8XvrFQHnd8xWK5dC9Oyvo+BaRRebXoAYfBYJwEMf+wYfOMmL0eIpuLf
+	h5g2TE8wFtTeeagc+vfWpumxwdodBCd1lQV4R1bafJzV5c0ZvBKIel0v/E55Z14UsWyxvm1fIRS
+	cqkzJLtxUDMxMnNJU4C8Qdo+AxUSYRPV5QeZuNyKnGRDs0RpnUk0hClu/G9L8pvGv0BXAagvQb9
+	xsf
+X-Received: by 2002:a05:690c:88:b0:79f:d961:47d3 with SMTP id 00721157ae682-7a4d3ac7a52mr210788537b3.21.1775661028199;
+        Wed, 08 Apr 2026 08:10:28 -0700 (PDT)
+Received: from gmail.com (172.165.85.34.bc.googleusercontent.com. [34.85.165.172])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-7a36e42ff26sm89073237b3.9.2026.04.08.08.10.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Apr 2026 08:10:27 -0700 (PDT)
+Date: Wed, 08 Apr 2026 11:10:25 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Nick Hudson <nhudson@akamai.com>, 
+ bpf@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ Willem de Bruijn <willemb@google.com>, 
+ Martin KaFai Lau <martin.lau@linux.dev>
+Cc: Nick Hudson <nhudson@akamai.com>, 
+ Max Tottenham <mtottenh@akamai.com>, 
+ Anna Glasgall <aglasgal@akamai.com>, 
+ Alexei Starovoitov <ast@kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ Andrii Nakryiko <andrii@kernel.org>, 
+ Eduard Zingerman <eddyz87@gmail.com>, 
+ Kumar Kartikeya Dwivedi <memxor@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ linux-kernel@vger.kernel.org
+Message-ID: <willemdebruijn.kernel.245c592e6d270@gmail.com>
+In-Reply-To: <20260407105005.1639815-6-nhudson@akamai.com>
+References: <20260407105005.1639815-1-nhudson@akamai.com>
+ <20260407105005.1639815-6-nhudson@akamai.com>
+Subject: Re: [PATCH bpf-next v3 5/6] bpf: clear decap tunnel GSO state in
+ skb_adjust_room
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260408-enic-sriov-v2-admin-channel-v2-v2-10-d05dd3623fd3@cisco.com>
-References: <20260408-enic-sriov-v2-admin-channel-v2-v2-0-d05dd3623fd3@cisco.com>
-In-Reply-To: <20260408-enic-sriov-v2-admin-channel-v2-v2-0-d05dd3623fd3@cisco.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- 20260401-enic-sriov-v2-prep-v4-0-d5834b2ef1b9@cisco.com, 
- Satish Kharat <satishkh@cisco.com>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1775660895; l=5643;
- i=satishkh@cisco.com; h=from:subject:message-id;
- bh=Em8DhCCAW6c85DFkxK9t+0LtoELkjeiLlM4P2QqA/es=;
- b=iDuO7N7G3+jGXzByE0yN/6SE7ecNQsNCpfH6S1u1UXSNtOiQ/H3/bMYEbLA0A8Gg8nEN9CJyJ
- NXdwm0XQvG+CAe0wMOHFlGeTy1gbd/+r+aILU8tNonoX8QTUMJQcgTD
-X-Developer-Key: i=satishkh@cisco.com; a=ed25519;
- pk=4BxbLoCGvHeIMH/PbpiNVx8/2IcTjFvqcr0AD8K6WLY=
-X-Endpoint-Received: by B4 Relay for satishkh@cisco.com/default with
- auth_id=639
-X-Original-From: Satish Kharat <satishkh@cisco.com>
-Reply-To: satishkh@cisco.com
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-276587-lists,netdev=lfdr.de,satishkh.cisco.com];
+	TAGGED_FROM(0.00)[bounces-276588-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[akamai.com,kernel.org,iogearbox.net,gmail.com,davemloft.net,google.com,redhat.com,vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	HAS_REPLYTO(0.00)[satishkh@cisco.com];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[cisco.com:email,cisco.com:replyto,cisco.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: EB9033BE063
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,akamai.com:email]
+X-Rspamd-Queue-Id: 7097D3BE106
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Satish Kharat <satishkh@cisco.com>
+Nick Hudson wrote:
+> On shrink in bpf_skb_adjust_room(), clear tunnel-specific GSO flags
+> according to the decapsulation flags:
+> 
+> - BPF_F_ADJ_ROOM_DECAP_L4_UDP clears SKB_GSO_UDP_TUNNEL{,_CSUM}, and
+>                                      SKB_GSO_TUNNEL_REMCSUM
+> - BPF_F_ADJ_ROOM_DECAP_L4_GRE clears SKB_GSO_GRE{,_CSUM}
+> - BPF_F_ADJ_ROOM_DECAP_IPXIP4 clears SKB_GSO_IPXIP4
+> - BPF_F_ADJ_ROOM_DECAP_IPXIP6 clears SKB_GSO_IPXIP6
+> 
+> When all tunnel-related GSO bits are cleared, also clear
+> skb->encapsulation.
+> 
+> Handle the ESP inside a UDP tunnel case where encapsulation should remain
+> set.
+> 
+> If UDP decap is performed and GSO state removed then reset encap_hdr_csum, and
+> remcsum_offload.
+> 
+> Co-developed-by: Max Tottenham <mtottenh@akamai.com>
+> Signed-off-by: Max Tottenham <mtottenh@akamai.com>
+> Co-developed-by: Anna Glasgall <aglasgal@akamai.com>
+> Signed-off-by: Anna Glasgall <aglasgal@akamai.com>
+> Signed-off-by: Nick Hudson <nhudson@akamai.com>
+> ---
+>  net/core/filter.c | 40 ++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 40 insertions(+)
+> 
+> diff --git a/net/core/filter.c b/net/core/filter.c
+> index 7f8d43420afb..04059d07d368 100644
+> --- a/net/core/filter.c
+> +++ b/net/core/filter.c
+> @@ -3667,6 +3667,46 @@ static int bpf_skb_net_shrink(struct sk_buff *skb, u32 off, u32 len_diff,
+>  		if (!(flags & BPF_F_ADJ_ROOM_FIXED_GSO))
+>  			skb_increase_gso_size(shinfo, len_diff);
+>  
+> +		/* Selective GSO flag clearing based on decap type.
+> +		 * Only clear the flags for the tunnel layer being removed.
+> +		 */
+> +		if ((flags & BPF_F_ADJ_ROOM_DECAP_L4_UDP) &&
+> +		    (shinfo->gso_type & (SKB_GSO_UDP_TUNNEL |
+> +					 SKB_GSO_UDP_TUNNEL_CSUM |
+> +					 SKB_GSO_TUNNEL_REMCSUM)))
+> +			shinfo->gso_type &= ~(SKB_GSO_UDP_TUNNEL |
+> +					      SKB_GSO_UDP_TUNNEL_CSUM |
+> +					      SKB_GSO_TUNNEL_REMCSUM);
 
-When a V2 SR-IOV VF probes, open the admin channel, initialize the
-MBOX protocol, perform the capability check with the PF, and register
-with the PF. This establishes the PF-VF communication path that the PF
-uses to send link state notifications.
+REMCSUM was previously not included in the series.
 
-The admin channel and MBOX registration happen after enic_dev_init()
-(which discovers admin channel resources) and before register_netdev()
-so the VF is fully initialized before the interface is visible to
-userspace.
+It is a non-obvious and rare enough feature that I would exclude it,
+or move it to a separate patch.
 
-On remove, the VF unregisters from the PF and closes its admin channel
-before tearing down data path resources.
+> +		if ((flags & BPF_F_ADJ_ROOM_DECAP_L4_GRE) &&
+> +		    (shinfo->gso_type & (SKB_GSO_GRE | SKB_GSO_GRE_CSUM)))
+> +			shinfo->gso_type &= ~(SKB_GSO_GRE |
+> +					      SKB_GSO_GRE_CSUM);
+> +		if ((flags & BPF_F_ADJ_ROOM_DECAP_IPXIP4) &&
+> +		    (shinfo->gso_type & SKB_GSO_IPXIP4))
+> +			shinfo->gso_type &= ~SKB_GSO_IPXIP4;
+> +		if ((flags & BPF_F_ADJ_ROOM_DECAP_IPXIP6) &&
+> +		    (shinfo->gso_type & SKB_GSO_IPXIP6))
+> +			shinfo->gso_type &= ~SKB_GSO_IPXIP6;
+> +
+> +		/* Clear encapsulation flag only when no tunnel GSO flags remain */
+> +		if (flags & (BPF_F_ADJ_ROOM_DECAP_L4_MASK |
+> +			     BPF_F_ADJ_ROOM_DECAP_IPXIP_MASK)) {
+> +			if (!(shinfo->gso_type & (SKB_GSO_UDP_TUNNEL |
+> +						  SKB_GSO_UDP_TUNNEL_CSUM |
+> +						  SKB_GSO_GRE |
+> +						  SKB_GSO_GRE_CSUM |
+> +						  SKB_GSO_IPXIP4 |
+> +						  SKB_GSO_IPXIP6 |
+> +						  SKB_GSO_ESP)))
+> +				if (skb->encapsulation)
+> +					skb->encapsulation = 0;
+> +
+> +			if (flags & BPF_F_ADJ_ROOM_DECAP_L4_UDP) {
+> +				skb->encap_hdr_csum = !!(shinfo->gso_type & SKB_GSO_UDP_TUNNEL_CSUM);
 
-V2 VFs are not provisioned with an RES_TYPE_SRIOV_INTR resource by
-firmware, so bypass that check in the admin channel capability
-detection for V2 VFs. The PF still requires this resource.
+Since the flag is never set, only possibly cleared: just clear this field when clearing the flag?
 
-Signed-off-by: Satish Kharat <satishkh@cisco.com>
----
- drivers/net/ethernet/cisco/enic/enic.h      |  1 +
- drivers/net/ethernet/cisco/enic/enic_main.c | 58 ++++++++++++++++++++++++++++-
- drivers/net/ethernet/cisco/enic/enic_res.c  |  3 +-
- 3 files changed, 59 insertions(+), 3 deletions(-)
+It appears that this is only used for deprecated UFO anyway.
 
-diff --git a/drivers/net/ethernet/cisco/enic/enic.h b/drivers/net/ethernet/cisco/enic/enic.h
-index 29ce26284493..6301930903ee 100644
---- a/drivers/net/ethernet/cisco/enic/enic.h
-+++ b/drivers/net/ethernet/cisco/enic/enic.h
-@@ -441,6 +441,7 @@ void enic_reset_addr_lists(struct enic *enic);
- int enic_sriov_enabled(struct enic *enic);
- int enic_is_valid_vf(struct enic *enic, int vf);
- int enic_is_dynamic(struct enic *enic);
-+int enic_is_sriov_vf_v2(struct enic *enic);
- void enic_set_ethtool_ops(struct net_device *netdev);
- int __enic_set_rsskey(struct enic *enic);
- void enic_ext_cq(struct enic *enic);
-diff --git a/drivers/net/ethernet/cisco/enic/enic_main.c b/drivers/net/ethernet/cisco/enic/enic_main.c
-index 48c38347d6ce..c664ca43ab3a 100644
---- a/drivers/net/ethernet/cisco/enic/enic_main.c
-+++ b/drivers/net/ethernet/cisco/enic/enic_main.c
-@@ -316,6 +316,11 @@ static int enic_is_sriov_vf(struct enic *enic)
- 	       enic->pdev->device == PCI_DEVICE_ID_CISCO_VIC_ENET_VF_V2;
- }
- 
-+int enic_is_sriov_vf_v2(struct enic *enic)
-+{
-+	return enic->pdev->device == PCI_DEVICE_ID_CISCO_VIC_ENET_VF_V2;
-+}
-+
- int enic_is_valid_vf(struct enic *enic, int vf)
- {
- #ifdef CONFIG_PCI_IOV
-@@ -2989,6 +2994,32 @@ static int enic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 		goto err_out_dev_close;
- 	}
- 
-+	/* V2 VF: open admin channel and register with PF.
-+	 * Must happen before register_netdev so the VF is fully
-+	 * initialized before the interface is visible to userspace.
-+	 */
-+	if (enic_is_sriov_vf_v2(enic)) {
-+		err = enic_admin_channel_open(enic);
-+		if (err) {
-+			dev_err(dev,
-+				"Failed to open admin channel: %d\n", err);
-+			goto err_out_dev_deinit;
-+		}
-+		enic_mbox_init(enic);
-+		err = enic_mbox_vf_capability_check(enic);
-+		if (err) {
-+			dev_err(dev,
-+				"MBOX capability check failed: %d\n", err);
-+			goto err_out_admin_close;
-+		}
-+		err = enic_mbox_vf_register(enic);
-+		if (err) {
-+			dev_err(dev,
-+				"MBOX VF registration failed: %d\n", err);
-+			goto err_out_admin_close;
-+		}
-+	}
-+
- 	netif_set_real_num_tx_queues(netdev, enic->wq_count);
- 	netif_set_real_num_rx_queues(netdev, enic->rq_count);
- 
-@@ -3013,7 +3044,7 @@ static int enic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	err = enic_set_mac_addr(netdev, enic->mac_addr);
- 	if (err) {
- 		dev_err(dev, "Invalid MAC address, aborting\n");
--		goto err_out_dev_deinit;
-+		goto err_out_admin_close;
- 	}
- 
- 	enic->tx_coalesce_usecs = enic->config.intr_timer_usec;
-@@ -3111,11 +3142,23 @@ static int enic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	err = register_netdev(netdev);
- 	if (err) {
- 		dev_err(dev, "Cannot register net device, aborting\n");
--		goto err_out_dev_deinit;
-+		goto err_out_admin_close;
- 	}
- 
- 	return 0;
- 
-+err_out_admin_close:
-+	if (enic_is_sriov_vf_v2(enic)) {
-+		if (enic->vf_registered) {
-+			int unreg_err = enic_mbox_vf_unregister(enic);
-+
-+			if (unreg_err)
-+				netdev_warn(netdev,
-+					    "Failed to unregister from PF: %d\n",
-+					    unreg_err);
-+		}
-+		enic_admin_channel_close(enic);
-+	}
- err_out_dev_deinit:
- 	enic_dev_deinit(enic);
- err_out_dev_close:
-@@ -3153,6 +3196,17 @@ static void enic_remove(struct pci_dev *pdev)
- 		cancel_work_sync(&enic->reset);
- 		cancel_work_sync(&enic->change_mtu_work);
- 		unregister_netdev(netdev);
-+		if (enic_is_sriov_vf_v2(enic)) {
-+			if (enic->vf_registered) {
-+				int unreg_err = enic_mbox_vf_unregister(enic);
-+
-+				if (unreg_err)
-+					netdev_warn(netdev,
-+						    "Failed to unregister from PF: %d\n",
-+						    unreg_err);
-+			}
-+			enic_admin_channel_close(enic);
-+		}
- #ifdef CONFIG_PCI_IOV
- 		if (enic_sriov_enabled(enic)) {
- 			if (enic->vf_type == ENIC_VF_TYPE_V2)
-diff --git a/drivers/net/ethernet/cisco/enic/enic_res.c b/drivers/net/ethernet/cisco/enic/enic_res.c
-index 436326ace049..74cd2ee3af5c 100644
---- a/drivers/net/ethernet/cisco/enic/enic_res.c
-+++ b/drivers/net/ethernet/cisco/enic/enic_res.c
-@@ -211,7 +211,8 @@ void enic_get_res_counts(struct enic *enic)
- 		vnic_dev_get_res_count(enic->vdev, RES_TYPE_ADMIN_RQ) >= 1 &&
- 		vnic_dev_get_res_count(enic->vdev, RES_TYPE_ADMIN_CQ) >=
- 			ARRAY_SIZE(enic->admin_cq) &&
--		vnic_dev_get_res_count(enic->vdev, RES_TYPE_SRIOV_INTR) >= 1;
-+		(enic_is_sriov_vf_v2(enic) ||
-+		 vnic_dev_get_res_count(enic->vdev, RES_TYPE_SRIOV_INTR) >= 1);
- 
- 	dev_info(enic_get_dev(enic),
- 		"vNIC resources avail: wq %d rq %d cq %d intr %d admin %s\n",
+> +				skb->remcsum_offload = !!(shinfo->gso_type & SKB_GSO_TUNNEL_REMCSUM);
 
--- 
-2.43.0
-
-
+Always zero?
 
