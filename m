@@ -1,75 +1,61 @@
-Return-Path: <netdev+bounces-276346-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276349-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YFt5FhoO1mmfAwgAu9opvQ
-	(envelope-from <netdev+bounces-276346-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 10:13:14 +0200
+	id 4MEMLmgQ1mmxAwgAu9opvQ
+	(envelope-from <netdev+bounces-276349-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 10:23:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F2503B8D0D
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 10:13:13 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 178363B8F1D
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 10:23:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 991EF300E013
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 08:12:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0E8F2304D25B
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 08:18:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63A3239E197;
-	Wed,  8 Apr 2026 08:12:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5BB939E6FE;
+	Wed,  8 Apr 2026 08:18:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="S2KMUohG"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="Cmz4e1ys"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3556839DBD6;
-	Wed,  8 Apr 2026 08:12:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66C9439DBFE;
+	Wed,  8 Apr 2026 08:18:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775635950; cv=none; b=Jk6rFGoOIx6NFDuVoSSGv0/XlXFsdzzbWTveRh8fc6AErJe3neK6lA9COcALwitrji4FI176ndMs3vkZ6J/LqM5xhdmX3Y1TFE5yxLwVt+0Mkf75HUC0sR4MbYR6jvl0pHvhYFrS5nbkSu4tgF9H0jKVjfA6E37csYGt+7e/zh4=
+	t=1775636288; cv=none; b=Oa2auQSPc/li2di8jt8Bs9zmBzy4Xp/OaMZ6kQBPAXlWDZnDqrUobuOpKTBN4ZdRsIGlwDW3eBbu11rszyAwDnMMDTCxARHKPkZPGuUBTNCsBDdRVZLxfjI3Afkof7wEQMwexZ+lEqN9BwFSLmMpdGx1GunXGqxY3zw/P+btq18=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775635950; c=relaxed/simple;
-	bh=cAblTvQfwrotJoILLpnjbyoJmMO6glz2n0yN/cJtnZE=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=p24g0JofDtEuObeAz7K5UaHOsd3KWSkD9KWJirh28J2086Cn1yrT2lO1me/sI5RZ8fsQJHNmDFYIuACBnIOwwLZCrQytXD0MAcSBXekoYvGGifm+fs8V7hyRN221Gzo+oEVyHQOBx/B+D7/ClaH1yJFlZzP1ZYjABPvtQ3d9Ybg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=S2KMUohG; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1173)
-	id 157A620B6F0C; Wed,  8 Apr 2026 01:12:29 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 157A620B6F0C
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1775635949;
-	bh=7xleirn6TKgFbh1dpbQPh3EcS+3Dv0bVGkF4Fei2rj8=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=S2KMUohGQUxFJtNmEAdkooSWBwa+qgNuIg2btyITta5FyfOsbRiS37Qo1kTNnHSi+
-	 QxaP4U6ynsvnsfcDaICs+Ebg/d8hmVMiF0Ee3S7+jZpQjXu49JuzYi5iSpxX6gqU4G
-	 UwNB+hgEkZE0SXdE/AI152/XJNF0yxsbCQP9UOLI=
-From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-To: kys@microsoft.com,
-	haiyangz@microsoft.com,
-	wei.liu@kernel.org,
-	decui@microsoft.com,
-	longli@microsoft.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	ernis@linux.microsoft.com,
-	ssengar@linux.microsoft.com,
-	dipayanroy@linux.microsoft.com,
-	gargaditya@linux.microsoft.com,
-	shradhagupta@linux.microsoft.com,
-	kees@kernel.org,
-	kotaranov@microsoft.com,
-	yury.norov@gmail.com,
-	linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net 2/2] net: mana: Move current_speed debugfs file to mana_init_port()
-Date: Wed,  8 Apr 2026 01:12:20 -0700
-Message-ID: <20260408081224.302308-3-ernis@linux.microsoft.com>
-X-Mailer: git-send-email 2.43.7
-In-Reply-To: <20260408081224.302308-1-ernis@linux.microsoft.com>
-References: <20260408081224.302308-1-ernis@linux.microsoft.com>
+	s=arc-20240116; t=1775636288; c=relaxed/simple;
+	bh=DK2b0kacowsLuuoSHVuu4eiVQul1MLLSibd37kth9bA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=T6CbORK92oUloHo3AJIQqUdRrC2b8ZJyFlHz6SFZ0SdXlVCUPzGsXkwLZIAVjGcfWnlqVAus9o2Z+JdLuGBqezaPVDS+wqGRNOqgEXljfEMvygNBQRf40l3QQ0eAsw+GEPNSS3zt98Vz4UbT11+s5z6rt9Xe7kW94o8/C7v83DM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=Cmz4e1ys; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
+	Resent-Message-ID:In-Reply-To:References;
+	bh=SHqqadEHJrEyHEOAj4yPw2THkIgptJaY7D6Refxd3lE=; t=1775636287; x=1776845887; 
+	b=Cmz4e1ysg5Lps5VaZn/0+OZnjjhfrsloe7NBttQP1uf9qRnU3n/30EBbBhgUkCr+wgtuqSu54ZS
+	y6BXXoQ2D8YQufS2okHo2AKOaOowNG5DDleGSwPeYDtnsOckjF/FvYTtvrfLFkERWVmFAaeZQXvVa
+	F00RRsi3duJk/atPplYZxs9sNdPKNoAI/Mb45bQ/iJyGezuqoFUHyjv+uRzt0pqOTkIM15Sj5JcG1
+	PL0Rx4D/Y7+mZOrl08+IGh5uU0Mlqbf4cr8Xa6QRIxtxzYT+RW6xUvSrEjsI+D2h0G0XrRrkpPjWX
+	L6mKm3g9Jy7TD+Th+Beg98khijIlkWY6JeKQ==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98.2)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1wAO6v-0000000EAyC-07f8;
+	Wed, 08 Apr 2026 10:18:05 +0200
+From: Johannes Berg <johannes@sipsolutions.net>
+To: netdev@vger.kernel.org
+Cc: linux-wireless@vger.kernel.org
+Subject: [GIT PULL] wireless-2026-04-08
+Date: Wed,  8 Apr 2026 10:15:25 +0200
+Message-ID: <20260408081802.111623-3-johannes@sipsolutions.net>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,74 +63,86 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[sipsolutions.net,none];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[sipsolutions.net:s=mail];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-276346-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,gmail.com,vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ernis@linux.microsoft.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.microsoft.com:+];
+	TAGGED_FROM(0.00)[bounces-276349-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_TWO(0.00)[2];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[johannes@sipsolutions.net,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.microsoft.com:dkim,linux.microsoft.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 0F2503B8D0D
+	DKIM_TRACE(0.00)[sipsolutions.net:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 178363B8F1D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Move the current_speed debugfs file creation from mana_probe_port() to
-mana_init_port(). The file was previously created only during initial
-probe, but mana_cleanup_port_context() removes the entire vPort debugfs
-directory during detach/attach cycles. Since mana_init_port() recreates
-the directory on re-attach, moving current_speed here ensures it survives
-these cycles.
+Hi,
 
-Fixes: 75cabb46935b ("net: mana: Add support for net_shaper_ops")
-Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
----
- drivers/net/ethernet/microsoft/mana/mana_en.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+So in a way I'd hoped it wouldn't come to this, but while I
+was out last week a couple of things came in that seemed
+relevant enough to squeeze in now. I guess it wouldn't be
+much of an issue if not, but I figured I'd try anyway :)
 
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-index 07630322545f..6302432b9bf6 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-@@ -3154,6 +3154,8 @@ static int mana_init_port(struct net_device *ndev)
- 	eth_hw_addr_set(ndev, apc->mac_addr);
- 	sprintf(vport, "vport%d", port_idx);
- 	apc->mana_port_debugfs = debugfs_create_dir(vport, gc->mana_pci_debugfs);
-+	debugfs_create_u32("current_speed", 0400, apc->mana_port_debugfs,
-+			   &apc->speed);
- 	return 0;
- 
- reset_apc:
-@@ -3432,8 +3434,6 @@ static int mana_probe_port(struct mana_context *ac, int port_idx,
- 
- 	netif_carrier_on(ndev);
- 
--	debugfs_create_u32("current_speed", 0400, apc->mana_port_debugfs, &apc->speed);
--
- 	return 0;
- 
- free_indir:
--- 
-2.34.1
+Please pull and let us know if there's any problem.
 
+Thanks,
+johannes
+
+
+
+The following changes since commit f8f5627a8aeab15183eef8930bf75ba88a51622f:
+
+  Merge tag 'net-7.0-rc7' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2026-04-02 09:57:06 -0700)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless.git tags/wireless-2026-04-08
+
+for you to fetch changes up to ea245d78dec594372e27d8c79616baf49e98a4a1:
+
+  net: rfkill: prevent unlimited numbers of rfkill events from being created (2026-04-07 12:35:04 +0200)
+
+----------------------------------------------------------------
+A few last-minute fixes:
+ - rfkill: prevent boundless event list
+ - rt2x00: fix USB resource management
+ - brcmfmac: validate firmware IDs
+ - brcmsmac: fix DMA free size
+
+----------------------------------------------------------------
+Greg Kroah-Hartman (1):
+      net: rfkill: prevent unlimited numbers of rfkill events from being created
+
+Johan Hovold (1):
+      wifi: rt2x00usb: fix devres lifetime
+
+Pengpeng Hou (1):
+      wifi: brcmfmac: validate bsscfg indices in IF events
+
+Thomas Fourier (1):
+      wifi: brcmsmac: Fix dma_free_coherent() size
+
+ .../wireless/broadcom/brcm80211/brcmfmac/fweh.c    |  5 ++++
+ .../net/wireless/broadcom/brcm80211/brcmsmac/dma.c |  2 +-
+ drivers/net/wireless/ralink/rt2x00/rt2x00usb.c     |  2 +-
+ net/rfkill/core.c                                  | 35 +++++++++++++++-------
+ 4 files changed, 31 insertions(+), 13 deletions(-)
 
