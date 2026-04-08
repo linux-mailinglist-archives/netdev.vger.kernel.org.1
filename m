@@ -1,172 +1,184 @@
-Return-Path: <netdev+bounces-276512-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276513-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kI1YDCpQ1mm8DQgAu9opvQ
-	(envelope-from <netdev+bounces-276512-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 14:55:06 +0200
+	id UDXtFJBQ1mm8DQgAu9opvQ
+	(envelope-from <netdev+bounces-276513-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 14:56:48 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A324B3BC6F2
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 14:55:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B3E903BC767
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 14:56:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9F6153037E70
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 12:52:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C9836300578D
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 12:53:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43B3527F01E;
-	Wed,  8 Apr 2026 12:52:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 635943612F6;
+	Wed,  8 Apr 2026 12:53:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Y+AJugnT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ud3S6nIC"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EFC81A4F3C
-	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 12:51:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EB192459DC
+	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 12:53:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775652721; cv=none; b=Yx43xRf/b5oFKgW+Fx2/qASvnjEjD19LBEDay/obOUU6D4fZ3t093ZTKtWDXoC0DTA+K/H193Nfs+3ldZNyf3vUaeKo0ZQG6K4fT1NxFpsedu+8qdB2utyFB7fPJWCPuBBzcrbHel5qbaViHMoaLkAykmM/q9NaaU5OdbGAPAbg=
+	t=1775652829; cv=none; b=fYuZeUhA0fKmOXpnQaH5gnhxduIdwDjN5CpBBrqKmPw6snvckqQCOLce7RozAP6dB6jU+lQdswP96vhdBIrlLYtXmKAce9BS3f6I9iung18ZA1T5WpBRvA3396v1Cz1wZFdzxQwtPeFbflsIzWFtupWEgcI2tBORpnXSr0kUJco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775652721; c=relaxed/simple;
-	bh=H1yPARlG5H5Bd1CeZLd0DT7Xb0sEkMdL6KpOuDLFa2k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qK0tpbFRAHBFd9lY7niYdvh0rOrZ6EMAYXjDfyj6Tp5+PNGpCYiDTcE1byqinjkPl5TDJh/lFK7DJLcf3R4AJZE2lwSBHHOydWgDn+GLDvt5+6O8GTgbg8zZmI2dFWlwQGHzg1skJ4bqm0Va2bNu2jj3xlYl1cJm0s8Lm47QzA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Y+AJugnT; arc=none smtp.client-ip=91.218.175.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <3596a43d-8c8e-47ac-ae73-ee282f3be945@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1775652717;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gh4szFTSdIUFPVdAHWKhpExq2L0Ni/0kIZ6BEZHAE6E=;
-	b=Y+AJugnT+tEKCnRIU3ln/NYqlxqrtB2YnyK+TmrN6AwwNgyv7hzrwPCHTAXDv2LAsbxXKn
-	9TSSI4/kr61Vn5Hn0WkXsZWw+I0GzLIWUGwceKEHMqXZ9F9KpnWsjJdkMJj6ZYdJYG24U/
-	I8seIGUFjtveGOmiGJxh78O0ZXTQGMU=
-Date: Wed, 8 Apr 2026 13:51:53 +0100
+	s=arc-20240116; t=1775652829; c=relaxed/simple;
+	bh=i/jWbQdpaZ8b/0gnWJEOyZFwTq28t9QPbasnuRPj8Is=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ZCgMKhLm/82qBR9TwCHRhEnircTPt5FhEaJ6hyHBID5GIPbIUOxNrxHG7hk4VZKKNGsrF+g88AY4sx4M26Kb4tGtZs6V87+HpO93+shobzBVi7S2T2UpnCY/kl6b4NR/Pmc6RDznRt6chNlLdG6bNkbVetmz8GUmDPw3P+u1Aic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ud3S6nIC; arc=none smtp.client-ip=209.85.210.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-82ce09b61beso2752819b3a.0
+        for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 05:53:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775652828; x=1776257628; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vIlOs7q64Dx26nQmV8oPXsuS8EwxbCgpyhUA7vQTilE=;
+        b=Ud3S6nICIpB9oZMnQW20CzuPQNezltDZ3xtEJ7qeSVK4EinmzuEJTUhHQXkwJM2wFp
+         xTNpMTqKURsAvq1Otob59OOG064OlkJjSVvOyo6LJX2eBHdGRQgGCEmWEB8vMum+aMgi
+         TQCqmZ+vPOCjfd+kGV/iO6GlTlBDuShWDKdjMNFkyfAi67lAB3n7B4nSgY3JAsAvQjcZ
+         kUKuHDGvZnIV5rFaqPjAyzQ/deWNjjQME1+QnmHJHy78nArRzowXu09pRGVFQFo4vVr9
+         71BFdetafaDSN3w/sT76DE1cBLiu1Eg2T4QWGPiQrzMPJRVVFryd3IDQtipjc6ZALX7C
+         zVTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775652828; x=1776257628;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=vIlOs7q64Dx26nQmV8oPXsuS8EwxbCgpyhUA7vQTilE=;
+        b=Fej0Z2x4SkxjQii8XpOKdUAktfP6JtsAbfbdQzSEjPkzi29jFIEeTiy3EJgPnxHJg2
+         OFnXQ0aIfKI/d94WjEEE/ob+s2nP615XmADUVUB6C6lHF6mr9pxXX7IOPMu54q1L6JRc
+         SGKfP5gMNkFKQC6YZL9ffVK5vovAk/Gdct09PtzBF4nYXxPDjFYEEonmE+51UCGSJ5QP
+         NQ2hPhkrBBP4pstkI5RYZomHfpJXDy2WPcRVT+goy/6p8EvpKcPoqA9AlPf4bP83t9wu
+         vEKhRUzso4lzQkYL2GkQ/B+qz969Jw5dTSZAEUpTLkXoLrNZo9QHrWr21kxhScBqzECy
+         6dmA==
+X-Gm-Message-State: AOJu0YwOsuXYiSRDT19HdK1n4djbDGrGYsv7Eh6Tvv385yJrPtbFrE7F
+	Q6NAzbdrb8ENoCZKHONLbJ7S9J+LGeriETgBMeyy/lKB8DOJD9aSHg1q
+X-Gm-Gg: AeBDieuKxiUBvUU7Oe5dfyCl9k4JJ6y5yerMuWV4uRAZ39RDj53X95Qe4xekNnMYa29
+	vkDWJQbfhyDE5YCxTpmvSV9yjHFBenXhG4cVouyzzEO35oKzMpmnhsX/x5iqihm2V/XgYKuw3nz
+	tBq1unSip/3m2MfFFgqMLW1n7LMDLIPVF+ujePA5D54wAgqtzsEWi499P6IWZK6oEG8MPvIq5Lb
+	e+3LyZrZ/E5K+F030G+ZuIIAOVbT9g19X5laMEPh00coDcjPRXF+b/Sd+SMfzHjjGhXuIWLBiZd
+	dMDQzL0kPZ+C1HjpZO2nHXhzS8r8DS+ddEk9zIetQexpxpS69CAGfKf7xXZyHLnlTPD5ffMOhGG
+	CwthfmfrYn1SlwPBixSl73YxU01GoadDzf2MRMpfi3Gnldl5Bd7pS4ozRjwPDobaop3aydk+eps
+	UksZZ7uIAaEpOKn8jKqA==
+X-Received: by 2002:a05:6a00:6ca8:b0:82a:ea3:c16f with SMTP id d2e1a72fcca58-82d0dbe3dabmr20955636b3a.53.1775652827507;
+        Wed, 08 Apr 2026 05:53:47 -0700 (PDT)
+Received: from kfuzz ([202.120.234.33])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82cf9b21c92sm22331921b3a.11.2026.04.08.05.53.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Apr 2026 05:53:47 -0700 (PDT)
+From: Kangzheng Gu <xiaoguai0992@gmail.com>
+To: pabeni@redhat.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	horms@kernel.org,
+	kees@kernel.org,
+	thorsten.blum@linux.dev,
+	arnd@arndb.de,
+	sjur.brandeland@stericsson.com,
+	xiaoguai0992@gmail.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH v5] net: caif: fix stack out-of-bounds write in cfctrl_link_setup()
+Date: Wed,  8 Apr 2026 12:53:33 +0000
+Message-ID: <20260408125333.38489-1-xiaoguai0992@gmail.com>
+X-Mailer: git-send-email 2.50.1
+In-Reply-To: <0f9e9d4e-8083-4297-91d3-10d0f614c87c@redhat.com>
+References: <0f9e9d4e-8083-4297-91d3-10d0f614c87c@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v11 05/10] bng_en: add support for link async
- events
-To: Bhargava Marreddy <bhargava.marreddy@broadcom.com>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- andrew+netdev@lunn.ch, horms@kernel.org
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- michael.chan@broadcom.com, pavan.chebbi@broadcom.com,
- vsrama-krishna.nemani@broadcom.com, vikas.gupta@broadcom.com,
- Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>,
- Ajit Kumar Khaparde <ajit.khaparde@broadcom.com>
-References: <20260403073724.194360-1-bhargava.marreddy@broadcom.com>
- <20260403073724.194360-6-bhargava.marreddy@broadcom.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20260403073724.194360-6-bhargava.marreddy@broadcom.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-276512-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_FROM(0.00)[bounces-276513-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[redhat.com,davemloft.net,google.com,kernel.org,linux.dev,arndb.de,stericsson.com,gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FROM_NEQ_ENVFROM(0.00)[xiaoguai0992@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_NONE(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,broadcom.com:email]
-X-Rspamd-Queue-Id: A324B3BC6F2
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B3E903BC767
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 03/04/2026 08:37, Bhargava Marreddy wrote:
-> Register for firmware asynchronous events, including link-status,
-> link-speed, and PHY configuration changes. Upon event reception,
-> re-query the PHY and update ethtool settings accordingly.
-> 
-> Signed-off-by: Bhargava Marreddy <bhargava.marreddy@broadcom.com>
-> Reviewed-by: Vikas Gupta <vikas.gupta@broadcom.com>
-> Reviewed-by: Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
-> Reviewed-by: Ajit Kumar Khaparde <ajit.khaparde@broadcom.com>
-> ---
->   .../ethernet/broadcom/bnge/bnge_hwrm_lib.c    | 19 +++++++++-
->   .../net/ethernet/broadcom/bnge/bnge_link.c    | 18 ++++++++++
->   .../net/ethernet/broadcom/bnge/bnge_link.h    |  1 +
->   .../net/ethernet/broadcom/bnge/bnge_netdev.c  | 23 ++++++++++++
->   .../net/ethernet/broadcom/bnge/bnge_txrx.c    | 35 ++++++++++++++++---
->   5 files changed, 91 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c b/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c
-> index acb712ddbd7e..de51add96ac3 100644
-> --- a/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c
-> +++ b/drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c
-> @@ -15,6 +15,13 @@
->   #include "bnge_rmem.h"
->   #include "bnge_resc.h"
->   
-> +static const u16 bnge_async_events_arr[] = {
-> +	ASYNC_EVENT_CMPL_EVENT_ID_LINK_STATUS_CHANGE,
-> +	ASYNC_EVENT_CMPL_EVENT_ID_LINK_SPEED_CHANGE,
-> +	ASYNC_EVENT_CMPL_EVENT_ID_LINK_SPEED_CFG_CHANGE,
-> +	ASYNC_EVENT_CMPL_EVENT_ID_PORT_PHY_CFG_CHANGE,
-> +};
-> +
->   int bnge_hwrm_ver_get(struct bnge_dev *bd)
->   {
->   	u32 dev_caps_cfg, hwrm_ver, hwrm_spec_code;
-> @@ -166,10 +173,12 @@ int bnge_hwrm_fw_set_time(struct bnge_dev *bd)
->   
->   int bnge_hwrm_func_drv_rgtr(struct bnge_dev *bd)
->   {
-> +	DECLARE_BITMAP(async_events_bmap, 256);
->   	struct hwrm_func_drv_rgtr_output *resp;
->   	struct hwrm_func_drv_rgtr_input *req;
-> +	u32 events[8];
->   	u32 flags;
-> -	int rc;
-> +	int rc, i;
->   
->   	rc = bnge_hwrm_req_init(bd, req, HWRM_FUNC_DRV_RGTR);
->   	if (rc)
-> @@ -190,6 +199,14 @@ int bnge_hwrm_func_drv_rgtr(struct bnge_dev *bd)
->   	req->ver_min = cpu_to_le16(DRV_VER_MIN);
->   	req->ver_upd = cpu_to_le16(DRV_VER_UPD);
->   
-> +	memset(async_events_bmap, 0, sizeof(async_events_bmap));
+cfctrl_link_setup() copies the RFM volume name from a received control
+packet into linkparam.u.rfm.volume until a '\0' is found. A malformed
+packet can omit the terminator and make the copy run past the 20-byte
+stack buffer.
 
-bitmap API has bitmap_zero()
+Stop copying once the buffer is full and mark the frame as failed by
+setting CFCTRL_ERR_BIT so the link setup is rejected.
 
-> +	for (i = 0; i < ARRAY_SIZE(bnge_async_events_arr); i++)
-> +		__set_bit(bnge_async_events_arr[i], async_events_bmap);
-> +
-> +	bitmap_to_arr32(events, async_events_bmap, 256);
-> +	for (i = 0; i < ARRAY_SIZE(req->async_event_fwd); i++)
-> +		req->async_event_fwd[i] |= cpu_to_le32(events[i]);
-> +
->   	resp = bnge_hwrm_req_hold(bd, req);
->   	rc = bnge_hwrm_req_send(bd, req);
->   	if (!rc) {
+Fixes: b482cd2053e3 ("net-caif: add CAIF core protocol stack")
+Cc: stable@vger.kernel.org
+Signed-off-by: Kangzheng Gu <xiaoguai0992@gmail.com>
+---
+ v5:
+ - remove the Reported-by.
+ - print a warn message and reject link setup by setting CFCTRL_ERR_BIT.
+ - using %zu to adapt the compilation of 32-bit kernel.
+ - add rate limit to error message
+
+ net/caif/cfctrl.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/net/caif/cfctrl.c b/net/caif/cfctrl.c
+index c6cc2bfed65d..373ab1dc67a7 100644
+--- a/net/caif/cfctrl.c
++++ b/net/caif/cfctrl.c
+@@ -416,8 +416,16 @@ static int cfctrl_link_setup(struct cfctrl *cfctrl, struct cfpkt *pkt, u8 cmdrsp
+ 		cp = (u8 *) linkparam.u.rfm.volume;
+ 		for (tmp = cfpkt_extr_head_u8(pkt);
+ 		     cfpkt_more(pkt) && tmp != '\0';
+-		     tmp = cfpkt_extr_head_u8(pkt))
++		     tmp = cfpkt_extr_head_u8(pkt)) {
++			if (cp >= (u8 *)linkparam.u.rfm.volume +
++			    sizeof(linkparam.u.rfm.volume) - 1) {
++				pr_warn_ratelimited("Request reject, volume name length exceeds %zu\n",
++						    sizeof(linkparam.u.rfm.volume));
++				cmdrsp |= CFCTRL_ERR_BIT;
++				break;
++			}
+ 			*cp++ = tmp;
++		}
+ 		*cp = '\0';
+ 
+ 		if (CFCTRL_ERR_BIT & cmdrsp)
+-- 
+2.50.1
+
 
