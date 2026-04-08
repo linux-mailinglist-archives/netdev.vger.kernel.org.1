@@ -1,421 +1,242 @@
-Return-Path: <netdev+bounces-276530-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276531-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YGaHAptS1mm8DQgAu9opvQ
-	(envelope-from <netdev+bounces-276530-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 15:05:31 +0200
+	id 8O8PFZBR1mm8DQgAu9opvQ
+	(envelope-from <netdev+bounces-276531-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 15:01:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DF563BC8D4
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 15:05:30 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8853B3BC850
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 15:00:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AAD11300A613
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 12:56:48 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 37C073002925
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 13:00:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ADD33C6619;
-	Wed,  8 Apr 2026 12:56:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7316379ECC;
+	Wed,  8 Apr 2026 13:00:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Wll/AwlU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RrUKNJdI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A53753C9423
-	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 12:56:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4A9927A133;
+	Wed,  8 Apr 2026 13:00:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775653004; cv=none; b=MLlISJvyGZG8kpqOWHn642DNTLw3Vf2N7x/k1ClGjGV3/YQBVIG4/hvlqvNu79EnAyAra7q/a6oRVR4DEI46RM3Kn/NwB2LOaD/tVEXlNUdfh4ifzxnciRGCRdSixEJljCLKqlMKiPZRaKTcgBZvCmnzvSBy4VvjBNgDr9c3nkE=
+	t=1775653253; cv=none; b=oBoiVaMctOnkI73RqOfB+lfuCfJ0Tpp6cVBFnkmOCFExMe2qenjpbaEbh+VPkfxTXiu8B1Wn29607ihUtargz4d5fVgCFRN1QKvcWFkMLrd9K+++ktRPJE1DViOqyCu1OBDUIJateAmpboxH+9rlAdtu8cVS34hRiSiPSvxVWTg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775653004; c=relaxed/simple;
-	bh=6hRsfXlN89RRJiUiE9nMviLIk2NOhjItbK2aCgHe08c=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=BYIhwC+IUz9mUavmKaGsw7lQU8L95DSOKFyAlEDADg2kiCai4YYNjdmEQ3ySZ0g/BXb4akGqLmVoqa0+xKgwp3VNC0DKNQ3rwFjCS+9HL26gw6UIM1kcaV0ODc/5GbdA4U7vqGo57gos1BbCDFvXfIrnFxd4symzZctIp4tCXBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Wll/AwlU; arc=none smtp.client-ip=209.85.222.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-8cfbfac0e05so70550885a.1
-        for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 05:56:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1775653002; x=1776257802; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZZuGz0g/mPyGEy2y+edr0SWMm9AOn+0wjeVaZhi2hNk=;
-        b=Wll/AwlUDW/pl1EKvcUo0sLwEiCk1nztTOBb9+6JUW2GvrZfk+ubZRFCamYvDraeBq
-         8nuhmvQbq7HbrRSZ25jZm6SKVwsqNuB2hvLR5vH1KXwg+UGuSqtW4RAHLdo8iUruXT58
-         Kkyj4uXRwVz9O4oKwOA7ywvIV/Z1oxBkQ9XWlbywXNkvExt+TqfVpXHmQRv/N7TFCXBZ
-         GWs+z3QGqhW68SGUeSNzK3M4qj8/RVtuBQcmqwHZdZmQEuTh5puPfkl1s7AjYDsLnRkX
-         PFWju7Yo1re0ABHuaSNeKbZx6RxYTk8/+GnaWpOhjIgNdKELFlidfd0VAz1g7nQNz5VP
-         3Ywg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775653002; x=1776257802;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZZuGz0g/mPyGEy2y+edr0SWMm9AOn+0wjeVaZhi2hNk=;
-        b=pyjgXqk/AG+3lusSDhNVaoGSeef07xar30NEQGRYCja62NmtHBmZmQLl/tyFnYZ+Sx
-         /kNc/ZlKEsB41qhpGESwCHLmZ3+QT+wpBy3V27tG6i4csUCK/fwWxgMc9BXSpNKN5LmE
-         GY9+a3NDyqSlYfmOfz7cMFOI69tHRcIWZmuNgTdYlQ7HgmzQMIjZbcDp0JQ3qKTb2XVp
-         azseyZDsbeYmSQqrlaoLv0xlVsFGKPB+lSgppnqt9Jz8gG9BHZt7jI5tYAUycebbBK/M
-         sCY+xc8qGPaF9D3l9xXRsJMNQjb/iuB06B4J3j9+a0/J0G6SQC9RYnqfW8qLUQR3ih2T
-         1P0Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVgzHR0jGAa2OGGON+Bhqoc+Xc1swY1JRYUWkhFM1xBpCySg6apVVQVZSnDKv5OJXU7wXjPnhE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJImSX3N4/fO5BsEx7M5+o73pXiYKYdapoc8BAR9dCSgq9kSjg
-	2Sg7fo5I2Tu+fu0VLUn0/qfqvL4yLiqxJMn5OBCa9aVPcTKnCMNQOFeTgLfmmOOm2fQxuPfqmm8
-	XRVDuuANLejtV9w==
-X-Received: from qkntp21.prod.google.com ([2002:a05:620a:3c95:b0:8cd:8dfa:a7e])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:199d:b0:8cd:b024:114d with SMTP id af79cd13be357-8d3042cd918mr2715901085a.40.1775653001490;
- Wed, 08 Apr 2026 05:56:41 -0700 (PDT)
-Date: Wed,  8 Apr 2026 12:56:11 +0000
-In-Reply-To: <20260408125611.3592751-1-edumazet@google.com>
+	s=arc-20240116; t=1775653253; c=relaxed/simple;
+	bh=l+S6zaTMHhYUwW0ZmtulDL5Ipcm+rietWnAFHWCYVaY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z5Z4C4tK6HrpGapDIRKouegJF/jt6nFAmWLvQ2fVdvsnfsqWkE6InDsxqUC7My8jxff2hoX3nKMt3fudSB2Pzi1nFB4bAyGIdwZAak7hW4kpKK6nqwLCGhm7xyfHJwEnquWHO9nlLIXX8wPw4w+WYEijsEf81BejGimeuyC1d1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RrUKNJdI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B562C19421;
+	Wed,  8 Apr 2026 13:00:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775653253;
+	bh=l+S6zaTMHhYUwW0ZmtulDL5Ipcm+rietWnAFHWCYVaY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=RrUKNJdIC2sHvOEeeLQy4ZebvZEkBrtqNyAc649t6XR5o86pw9WVxPb0cI3PJCLoI
+	 nuPVaq8epBHPxn6Z1drKxZ/9Z2+McU/7xhrigXa+nxfH9vT13H8g+JyLK94Uxz7BsX
+	 2yz7zb96s7IxCNyseVCEyew+MJjroxIsX6DxbAsQdVcuuCySTPc0+gZs5bcogJgEi5
+	 SIQulv643nEr1hXcFq7w77TzrsexqXX9LuyLYUaT4HvCFb/Mx1XMIOHrhhIrkY3iQe
+	 g5KNgkLwgwFX6exlGZ/xDGYR3OASD6nEhfJPX91KXMqhEyCwH93zrvwjSoRlHVmrPG
+	 QtliB81fvnCIw==
+Date: Wed, 8 Apr 2026 08:00:51 -0500
+From: Rob Herring <robh@kernel.org>
+To: Joris Vaisvila <joey@tinyisr.com>
+Cc: netdev@vger.kernel.org, horms@kernel.org, pabeni@redhat.com,
+	kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
+	olteanv@gmail.com, Andrew Lunn <andrew@lunn.ch>,
+	devicetree@vger.kernel.org,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>
+Subject: Re: [PATCH net-next v2 1/4] dt-bindings: net: dsa: add MT7628 ESW
+Message-ID: <20260408130051.GA1895728-robh@kernel.org>
+References: <20260330184017.766200-1-joey@tinyisr.com>
+ <20260330184017.766200-2-joey@tinyisr.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260408125611.3592751-1-edumazet@google.com>
-X-Mailer: git-send-email 2.53.0.1213.gd9a14994de-goog
-Message-ID: <20260408125611.3592751-16-edumazet@google.com>
-Subject: [PATCH net-next 15/15] net/sched: convert tc_dump_qdisc() to RCU
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, Stanislav Fomichev <sdf@fomichev.me>
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [0.84 / 15.00];
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260330184017.766200-2-joey@tinyisr.com>
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,mojatatu.com,resnulli.us,google.com,vger.kernel.org,gmail.com,fomichev.me];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-276530-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,redhat.com,google.com,davemloft.net,gmail.com,lunn.ch];
+	TAGGED_FROM(0.00)[bounces-276531-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RSPAMD_URIBL_FAIL(0.00)[devicetree.org:query timed out,0.154.68.48:query timed out];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	DBL_PROHIBIT(0.00)[0.0.0.4:email];
+	NEURAL_HAM(-0.00)[-0.998];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,fomichev.me:email]
-X-Rspamd-Queue-Id: 5DF563BC8D4
+	FROM_NEQ_ENVFROM(0.00)[robh@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RSPAMD_EMAILBL_FAIL(0.00)[port.0.0.0.0:query timed out,port.0.0.0.6:query timed out];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[0.0.0.0:email,devicetree.org:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,0.0.0.2:email,0.0.0.3:email,0.154.68.48:email,0.0.0.6:email]
+X-Rspamd-Queue-Id: 8853B3BC850
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-No longer acquire RTNL in qdisc dumps (tc -s -d qdisc show ...)
+On Mon, Mar 30, 2026 at 09:40:14PM +0300, Joris Vaisvila wrote:
+> Add bindings for MT7628 SoC's Embedded Switch.
+> 
+> Signed-off-by: Joris Vaisvila <joey@tinyisr.com>
+> ---
+>  .../bindings/net/dsa/mediatek,mt7628-esw.yaml | 101 ++++++++++++++++++
+>  1 file changed, 101 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/dsa/mediatek,mt7628-esw.yaml
+> 
+> diff --git a/Documentation/devicetree/bindings/net/dsa/mediatek,mt7628-esw.yaml b/Documentation/devicetree/bindings/net/dsa/mediatek,mt7628-esw.yaml
+> new file mode 100644
+> index 000000000000..d6c66ab677d0
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/dsa/mediatek,mt7628-esw.yaml
+> @@ -0,0 +1,101 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/dsa/mediatek,mt7628-esw.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Mediatek MT7628 Embedded Ethernet Switch
+> +
+> +maintainers:
+> +  - Joris Vaisvila <joey@tinyisr.com>
+> +
+> +description:
+> +  The MT7628 SoC's built-in Ethernet Switch is a five port switch with
+> +  integrated 10/100 PHYs. The switch registers are directly mapped in the SoC's
+> +  memory. The switch has an internally connected 1G CPU port and 5 user ports
+> +  connected to the built-in Fast Ethernet PHYs.
+> +
+> +unevaluatedProperties: false
+> +
+> +allOf:
+> +  - $ref: dsa.yaml#/$defs/ethernet-ports
+> +
+> +properties:
+> +  compatible:
+> +    const: mediatek,mt7628-esw
+> +
+> +  reg:
+> +    maxItems: 1
+> +    description: MMIO address of the switch
 
-Notes:
+Drop the description.
 
-- Add sch_tree_lock_rcu()/sch_tree_unlock_rcu() for dump methods
-  which need to acquire qdisc spinlock (fq, fq_codel, fq_pie and gred).
+> +
+> +  resets:
+> +    items:
+> +      - description: Phandle of system reset controller with ESW reset index
+> +      - description: Phandle of system reset controller with EPHY reset index
 
-- Removed netdev_lock_ops()/netdev_unlock_ops() because dumps are read-only.
-  They were are added in commit a0527ee2df3f ("net: hold netdev instance
-  lock during qdisc ndo_setup_tc").
+Just describe these in terms of what they reset, not the provider.
 
-- for_each_netdev_rcu() can be changed later with
-  more scalable for_each_netdev_dump().
+> +
+> +  reset-names:
+> +    items:
+> +      - const: esw
+> +      - const: ephy
+> +
+> +  mdio:
+> +    $ref: /schemas/net/mdio.yaml#
+> +    unevaluatedProperties: false
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +  - resets
+> +  - reset-names
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Stanislav Fomichev <sdf@fomichev.me>
----
- include/net/sch_generic.h | 14 ++++++++++++++
- net/sched/sch_api.c       | 21 +++++++++------------
- net/sched/sch_fq.c        |  4 ++--
- net/sched/sch_fq_codel.c  |  4 ++--
- net/sched/sch_fq_pie.c    |  4 ++--
- net/sched/sch_gred.c      |  4 ++--
- net/sched/sch_mq.c        |  2 +-
- net/sched/sch_mqprio.c    |  2 +-
- net/sched/sch_taprio.c    | 16 +++++-----------
- 9 files changed, 38 insertions(+), 33 deletions(-)
+Surely 'ethernet-ports' is required?
 
-diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
-index f85aca5c1a445debd52a4e7b359141cf90cb7b55..82cb1e639dcc404bffe4b2669bb5aacef605cf6d 100644
---- a/include/net/sch_generic.h
-+++ b/include/net/sch_generic.h
-@@ -628,6 +628,20 @@ static inline void sch_tree_unlock(struct Qdisc *q)
- 		spin_unlock_bh(qdisc_root_sleeping_lock(q));
- }
- 
-+static inline void sch_tree_lock_rcu(struct Qdisc *q)
-+{
-+	if (!(q->flags & TCQ_F_MQROOT))
-+		q = qdisc_root_sleeping(q);
-+	spin_lock_bh(qdisc_lock(q));
-+}
-+
-+static inline void sch_tree_unlock_rcu(struct Qdisc *q)
-+{
-+	if (!(q->flags & TCQ_F_MQROOT))
-+		q = qdisc_root_sleeping(q);
-+	spin_unlock_bh(qdisc_lock(q));
-+}
-+
- extern struct Qdisc noop_qdisc;
- extern struct Qdisc_ops noop_qdisc_ops;
- extern struct Qdisc_ops pfifo_fast_ops;
-diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
-index 292bc8bb7a79922a83865ed54083c04ff72742ff..adc2d499a03d9fb4667dc87ba06aa3abfce30214 100644
---- a/net/sched/sch_api.c
-+++ b/net/sched/sch_api.c
-@@ -909,7 +909,6 @@ static int tc_fill_qdisc(struct sk_buff *skb, struct Qdisc *q, u32 clid,
- 	u32 block_index;
- 	__u32 qlen;
- 
--	cond_resched();
- 	nlh = nlmsg_put(skb, portid, seq, event, sizeof(*tcm), flags);
- 	if (!nlh)
- 		goto out_nlmsg_trim;
-@@ -941,7 +940,7 @@ static int tc_fill_qdisc(struct sk_buff *skb, struct Qdisc *q, u32 clid,
- 		goto nla_put_failure;
- 	qlen = qdisc_qlen_sum(q);
- 
--	stab = rtnl_dereference(q->stab);
-+	stab = rcu_dereference(q->stab);
- 	if (stab && qdisc_dump_stab(skb, stab) < 0)
- 		goto nla_put_failure;
- 
-@@ -1888,14 +1887,14 @@ static int tc_dump_qdisc(struct sk_buff *skb, struct netlink_callback *cb)
- 	s_q_idx = q_idx = cb->args[1];
- 
- 	idx = 0;
--	ASSERT_RTNL();
- 
- 	err = nlmsg_parse_deprecated(nlh, sizeof(struct tcmsg), tca, TCA_MAX,
- 				     rtm_tca_policy, cb->extack);
- 	if (err < 0)
- 		return err;
- 
--	for_each_netdev(net, dev) {
-+	rcu_read_lock();
-+	for_each_netdev_rcu(net, dev) {
- 		struct netdev_queue *dev_queue;
- 
- 		if (idx < s_idx)
-@@ -1904,29 +1903,26 @@ static int tc_dump_qdisc(struct sk_buff *skb, struct netlink_callback *cb)
- 			s_q_idx = 0;
- 		q_idx = 0;
- 
--		netdev_lock_ops(dev);
--		if (tc_dump_qdisc_root(rtnl_dereference(dev->qdisc),
-+		if (tc_dump_qdisc_root(rcu_dereference(dev->qdisc),
- 				       skb, cb, &q_idx, s_q_idx,
- 				       true, tca[TCA_DUMP_INVISIBLE]) < 0) {
--			netdev_unlock_ops(dev);
- 			goto done;
- 		}
- 
--		dev_queue = dev_ingress_queue(dev);
-+		dev_queue = dev_ingress_queue_rcu(dev);
- 		if (dev_queue &&
--		    tc_dump_qdisc_root(rtnl_dereference(dev_queue->qdisc_sleeping),
-+		    tc_dump_qdisc_root(rcu_dereference(dev_queue->qdisc_sleeping),
- 				       skb, cb, &q_idx, s_q_idx, false,
- 				       tca[TCA_DUMP_INVISIBLE]) < 0) {
--			netdev_unlock_ops(dev);
- 			goto done;
- 		}
--		netdev_unlock_ops(dev);
- 
- cont:
- 		idx++;
- 	}
- 
- done:
-+	rcu_read_unlock();
- 	cb->args[0] = idx;
- 	cb->args[1] = q_idx;
- 
-@@ -2487,7 +2483,8 @@ static const struct rtnl_msg_handler psched_rtnl_msg_handlers[] __initconst = {
- 	{.msgtype = RTM_NEWQDISC, .doit = tc_modify_qdisc},
- 	{.msgtype = RTM_DELQDISC, .doit = tc_get_qdisc},
- 	{.msgtype = RTM_GETQDISC, .doit = tc_get_qdisc,
--	 .dumpit = tc_dump_qdisc},
-+	 .dumpit = tc_dump_qdisc,
-+	 .flags = RTNL_FLAG_DUMP_UNLOCKED},
- 	{.msgtype = RTM_NEWTCLASS, .doit = tc_ctl_tclass},
- 	{.msgtype = RTM_DELTCLASS, .doit = tc_ctl_tclass},
- 	{.msgtype = RTM_GETTCLASS, .doit = tc_ctl_tclass,
-diff --git a/net/sched/sch_fq.c b/net/sched/sch_fq.c
-index dd553d6f3e8e911e161c1440eb6d9ce94f65385a..c13881a5c2b4ecb37b41b906ad96bb5de2653fe8 100644
---- a/net/sched/sch_fq.c
-+++ b/net/sched/sch_fq.c
-@@ -1286,7 +1286,7 @@ static int fq_dump_stats(struct Qdisc *sch, struct gnet_dump *d)
- 
- 	st.pad = 0;
- 
--	sch_tree_lock(sch);
-+	sch_tree_lock_rcu(sch);
- 
- 	st.gc_flows		  = q->stat_gc_flows;
- 	st.highprio_packets	  = 0;
-@@ -1310,7 +1310,7 @@ static int fq_dump_stats(struct Qdisc *sch, struct gnet_dump *d)
- 		st.band_drops[i]  = q->stat_band_drops[i];
- 		st.band_pkt_count[i] = q->band_pkt_count[i];
- 	}
--	sch_tree_unlock(sch);
-+	sch_tree_unlock_rcu(sch);
- 
- 	return gnet_stats_copy_app(d, &st, sizeof(st));
- }
-diff --git a/net/sched/sch_fq_codel.c b/net/sched/sch_fq_codel.c
-index db5cf578cbd63e842381cb147ced145fed4cca3e..e14d014041c2e33b344455f089ab69e93a13feca 100644
---- a/net/sched/sch_fq_codel.c
-+++ b/net/sched/sch_fq_codel.c
-@@ -586,7 +586,7 @@ static int fq_codel_dump_stats(struct Qdisc *sch, struct gnet_dump *d)
- 	};
- 	struct list_head *pos;
- 
--	sch_tree_lock(sch);
-+	sch_tree_lock_rcu(sch);
- 
- 	st.qdisc_stats.maxpacket = q->cstats.maxpacket;
- 	st.qdisc_stats.drop_overlimit = q->drop_overlimit;
-@@ -601,7 +601,7 @@ static int fq_codel_dump_stats(struct Qdisc *sch, struct gnet_dump *d)
- 
- 	list_for_each(pos, &q->old_flows)
- 		st.qdisc_stats.old_flows_len++;
--	sch_tree_unlock(sch);
-+	sch_tree_unlock_rcu(sch);
- 
- 	return gnet_stats_copy_app(d, &st, sizeof(st));
- }
-diff --git a/net/sched/sch_fq_pie.c b/net/sched/sch_fq_pie.c
-index 72f48fa4010bebbe6be212938b457db21ff3c5a0..93b2abdb6328f63e2dcbfbee463ddd689a9d733d 100644
---- a/net/sched/sch_fq_pie.c
-+++ b/net/sched/sch_fq_pie.c
-@@ -512,7 +512,7 @@ static int fq_pie_dump_stats(struct Qdisc *sch, struct gnet_dump *d)
- 	struct tc_fq_pie_xstats st = { 0 };
- 	struct list_head *pos;
- 
--	sch_tree_lock(sch);
-+	sch_tree_lock_rcu(sch);
- 
- 	st.packets_in	= q->stats.packets_in;
- 	st.overlimit	= q->stats.overlimit;
-@@ -527,7 +527,7 @@ static int fq_pie_dump_stats(struct Qdisc *sch, struct gnet_dump *d)
- 
- 	list_for_each(pos, &q->old_flows)
- 		st.old_flows_len++;
--	sch_tree_unlock(sch);
-+	sch_tree_unlock_rcu(sch);
- 
- 	return gnet_stats_copy_app(d, &st, sizeof(st));
- }
-diff --git a/net/sched/sch_gred.c b/net/sched/sch_gred.c
-index 36d0cafac2063f3ba1133ad9b8fab08ce4468550..28a99640da95a73117697cbf220109556a253343 100644
---- a/net/sched/sch_gred.c
-+++ b/net/sched/sch_gred.c
-@@ -377,7 +377,7 @@ static int gred_offload_dump_stats(struct Qdisc *sch)
- 	/* Even if driver returns failure adjust the stats - in case offload
- 	 * ended but driver still wants to adjust the values.
- 	 */
--	sch_tree_lock(sch);
-+	sch_tree_lock_rcu(sch);
- 	for (i = 0; i < MAX_DPs; i++) {
- 		if (!table->tab[i])
- 			continue;
-@@ -394,7 +394,7 @@ static int gred_offload_dump_stats(struct Qdisc *sch)
- 		sch->qstats.overlimits += hw_stats->stats.qstats[i].overlimits;
- 	}
- 	_bstats_update(&sch->bstats, bytes, packets);
--	sch_tree_unlock(sch);
-+	sch_tree_unlock_rcu(sch);
- 
- 	kfree(hw_stats);
- 	return ret;
-diff --git a/net/sched/sch_mq.c b/net/sched/sch_mq.c
-index 1e4522436620e5ee3a0417996476b37d9abca299..eaffac2453bbd81bcf2655804e22ab9167d0660a 100644
---- a/net/sched/sch_mq.c
-+++ b/net/sched/sch_mq.c
-@@ -155,7 +155,7 @@ void mq_dump_common(struct Qdisc *sch, struct sk_buff *skb)
- 	 * qdisc totals are added at end.
- 	 */
- 	for (ntx = 0; ntx < dev->num_tx_queues; ntx++) {
--		qdisc = rtnl_dereference(netdev_get_tx_queue(dev, ntx)->qdisc_sleeping);
-+		qdisc = rcu_dereference(netdev_get_tx_queue(dev, ntx)->qdisc_sleeping);
- 
- 		gnet_stats_add_basic(&bstats, qdisc->cpu_bstats,
- 				     &qdisc->bstats, false);
-diff --git a/net/sched/sch_mqprio.c b/net/sched/sch_mqprio.c
-index ac6d7d0a35309a5375425790f89f587601511cc7..b585b94d0cef8e13a416d3c2f969e421bc11cbf5 100644
---- a/net/sched/sch_mqprio.c
-+++ b/net/sched/sch_mqprio.c
-@@ -567,7 +567,7 @@ static int mqprio_dump(struct Qdisc *sch, struct sk_buff *skb)
- 	 * qdisc totals are added at end.
- 	 */
- 	for (ntx = 0; ntx < dev->num_tx_queues; ntx++) {
--		qdisc = rtnl_dereference(netdev_get_tx_queue(dev, ntx)->qdisc_sleeping);
-+		qdisc = rcu_dereference(netdev_get_tx_queue(dev, ntx)->qdisc_sleeping);
- 
- 		gnet_stats_add_basic(&bstats, qdisc->cpu_bstats,
- 				     &qdisc->bstats, false);
-diff --git a/net/sched/sch_taprio.c b/net/sched/sch_taprio.c
-index 885a9bc859166dfb6d20aa0dfbb8f11194e02ba9..93a366ba793bf92afe8359d2844b7673326ef79c 100644
---- a/net/sched/sch_taprio.c
-+++ b/net/sched/sch_taprio.c
-@@ -2404,23 +2404,21 @@ static int taprio_dump(struct Qdisc *sch, struct sk_buff *skb)
- 	    nla_put_u32(skb, TCA_TAPRIO_ATTR_TXTIME_DELAY, q->txtime_delay))
- 		goto options_error;
- 
--	rcu_read_lock();
--
--	oper = rtnl_dereference(q->oper_sched);
--	admin = rtnl_dereference(q->admin_sched);
-+	oper = rcu_dereference(q->oper_sched);
-+	admin = rcu_dereference(q->admin_sched);
- 
- 	if (oper && taprio_dump_tc_entries(skb, q, oper))
--		goto options_error_rcu;
-+		goto options_error;
- 
- 	if (oper && dump_schedule(skb, oper))
--		goto options_error_rcu;
-+		goto options_error;
- 
- 	if (!admin)
- 		goto done;
- 
- 	sched_nest = nla_nest_start_noflag(skb, TCA_TAPRIO_ATTR_ADMIN_SCHED);
- 	if (!sched_nest)
--		goto options_error_rcu;
-+		goto options_error;
- 
- 	if (dump_schedule(skb, admin))
- 		goto admin_error;
-@@ -2428,15 +2426,11 @@ static int taprio_dump(struct Qdisc *sch, struct sk_buff *skb)
- 	nla_nest_end(skb, sched_nest);
- 
- done:
--	rcu_read_unlock();
- 	return nla_nest_end(skb, nest);
- 
- admin_error:
- 	nla_nest_cancel(skb, sched_nest);
- 
--options_error_rcu:
--	rcu_read_unlock();
--
- options_error:
- 	nla_nest_cancel(skb, nest);
- 
--- 
-2.53.0.1213.gd9a14994de-goog
+> +
+> +examples:
+> +  - |
+> +    switch0: switch@10110000 {
+> +        reg = <0x10110000 0x8000>;
+> +
+> +        resets = <&sysc 23>, <&sysc 24>;
+> +        reset-names = "esw", "ephy";
+> +
+> +        compatible = "mediatek,mt7628-esw";
 
+compatible goes before reg.
+
+> +
+> +        ports {
+
+"ethernet-ports" for new bindings.
+
+> +            #address-cells = <1>;
+> +            #size-cells = <0>;
+> +
+> +            port@0 {
+
+And ethernet-port
+
+> +                reg = <0>;
+> +                phy-mode = "internal";
+> +            };
+> +
+> +            port@1 {
+> +                reg = <1>;
+> +                phy-mode = "internal";
+> +            };
+> +
+> +            port@2 {
+> +                reg = <2>;
+> +                phy-mode = "internal";
+> +            };
+> +
+> +            port@3 {
+> +                reg = <3>;
+> +                phy-mode = "internal";
+> +            };
+> +
+> +            port@4 {
+> +                reg = <4>;
+> +                phy-mode = "internal";
+> +            };
+> +
+> +            port@6 {
+> +                reg = <6>;
+> +                phy-mode = "internal";
+> +                ethernet = <&ethernet>;
+> +
+> +                fixed-link {
+> +                    speed = <1000>;
+> +                    full-duplex;
+> +                };
+> +            };
+> +        };
+> +    };
+> -- 
+> 2.53.0
+> 
 
