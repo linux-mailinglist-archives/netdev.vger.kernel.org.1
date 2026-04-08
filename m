@@ -1,115 +1,130 @@
-Return-Path: <netdev+bounces-276229-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276230-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CPr0Jteu1Wkj8wcAu9opvQ
-	(envelope-from <netdev+bounces-276229-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 03:26:47 +0200
+	id CNH3ONev1Wk08wcAu9opvQ
+	(envelope-from <netdev+bounces-276230-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 03:31:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D97453B5EC0
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 03:26:45 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6ED753B5F00
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 03:31:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id D86F0300721F
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 01:26:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CD601301ABAE
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 01:30:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47E9E342530;
-	Wed,  8 Apr 2026 01:26:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C8E9325483;
+	Wed,  8 Apr 2026 01:30:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="BiA6zpbd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MaNbCHkO"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout06.his.huawei.com (canpmsgout06.his.huawei.com [113.46.200.221])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 285E433D506;
-	Wed,  8 Apr 2026 01:26:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.221
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 288B91F4611;
+	Wed,  8 Apr 2026 01:30:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775611601; cv=none; b=pggWJkxZfRkLmwRaKkCv0bdMRr1EeY0k30un/yM3glx3t4AgArExXVV7Ak1emfrcgEMGguhTV7Dmh+/UmSrMAzb41+k0fTAZU+uYGtukLkkS0klitVDUZOhrAGtPLJODgqvCjG4UPgxgqdeR2ZywsXl4HfXd29sNkbrWKdpiQNw=
+	t=1775611858; cv=none; b=CAZy6ZkhIX8tuPFlUe66JuzvCGqoXXud34Xu9EP5muuN2kEoSN4MFjtOO/mUKOcLcud/emPqSgQBvZ/BEjKmKUpWWJPemMU3xnVMvK+F9iFB2XDNCtWvCuuRXj3TGLlJRynuY7BfjouFGIYdspFz6GIg3+oM/DlCSoedctOkLzU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775611601; c=relaxed/simple;
-	bh=Nyr4Y3hrqW0lsZpUYwgdlqSjdXbPzIuecRDVMwNRpzw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=CZ+NJHDKweqOnDM4Sj7derOqqyai8/l9VOVbPVqgcMliI0NCbOyB63WjT/EVGZNWDyxsJCSpXRsT5BiqCE65YyS4i/cIdyvqdJ/nhng7z/Pt+8txgdN3pnAn+x1old3MN5NWoB7YLRXbTClle9hP7FJRMlPR9g3lGx4Slq0j6UI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=BiA6zpbd; arc=none smtp.client-ip=113.46.200.221
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=FexY6FUOSc2W+INBh8iz7/U4FBYoyIaQIFaFQtwrhtQ=;
-	b=BiA6zpbdNo6mLOYPlnSJcnEXh5YnfkQLLLLUdUBz9dw3Ig4b7LB0AyuCP3JoPQzS0OiH+WZmL
-	Uw5GodWyDlxAj4sP/RUXc1feyHqia/HLLZdEdiXHQW/iyM6OquH3XRuRJyErrYoWkwNqeKVgfhS
-	8OqCmOGYHJt5PyarlcsjMzs=
-Received: from mail.maildlp.com (unknown [172.19.162.223])
-	by canpmsgout06.his.huawei.com (SkyGuard) with ESMTPS id 4fr4xf4ydfzRhSJ;
-	Wed,  8 Apr 2026 09:20:22 +0800 (CST)
-Received: from dggpemf500002.china.huawei.com (unknown [7.185.36.57])
-	by mail.maildlp.com (Postfix) with ESMTPS id 8A9DD40561;
-	Wed,  8 Apr 2026 09:26:36 +0800 (CST)
-Received: from [10.174.179.113] (10.174.179.113) by
- dggpemf500002.china.huawei.com (7.185.36.57) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 8 Apr 2026 09:26:35 +0800
-Message-ID: <377e560c-486e-499c-a7e9-19edf2a7cbdd@huawei.com>
-Date: Wed, 8 Apr 2026 09:26:35 +0800
+	s=arc-20240116; t=1775611858; c=relaxed/simple;
+	bh=qgo8I/wpNH6jeC0cNL5xsJZ46riNHlTNnZFYPV7CYJM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=uvI2AZW6qKNECubjJ5dGjuZEejL/jRiPSiuKzLWL3UbbugfeiTrR2ck7/IhEqb95szxuMMQg9aMvJUSVQkoBUJkgH+wMI/GBAKsUdhldydPMuHt3AP1yfZNwEB1P8RfPEuxRS8NqBqmgZ+EXWV/gx8SpR79yFSis528ZRjYFYKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MaNbCHkO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BABB7C116C6;
+	Wed,  8 Apr 2026 01:30:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775611857;
+	bh=qgo8I/wpNH6jeC0cNL5xsJZ46riNHlTNnZFYPV7CYJM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=MaNbCHkOaRbxQNYvIOKGkeM2NoYXsv72YCd0B+w0RSHlpZVlTvMYrl2RA+1mpKzoq
+	 0+3fifZM1YoFUtriE5mDUNNVCa+fUJHPNx0ZQkdMre8hhbR65yVubXcd8uGun6lyV0
+	 W9/UxiPhKhT+KJfjjR4NObIEpMtJN4K2Knrj3ZzlyPOxdtJxXlyPQhZudysdVA8xFq
+	 4+TVSUbwjIH9YP0MUaBucUvWSnQzGKpLlZa5U7yuAlqwF1nr1BdTd5nsTpo86AxzBH
+	 Jfv9EBsaj7v+aUOuJgDwF4mnBk6TgZpg4Kktfjvgtk0fzHVYDMrhK8SlOrN5EAt7mQ
+	 gOaRoSAZErcQw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FD2D3809A3D;
+	Wed,  8 Apr 2026 01:30:36 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] ipv6: sit: remove redundant ret = 0 assignment
-To: Jakub Kicinski <kuba@kernel.org>
-CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<pabeni@redhat.com>, <horms@kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-References: <20260403084402.4105936-1-yuehaibing@huawei.com>
- <20260406184313.5c446354@kernel.org>
-Content-Language: en-US
-From: Yue Haibing <yuehaibing@huawei.com>
-In-Reply-To: <20260406184313.5c446354@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
- dggpemf500002.china.huawei.com (7.185.36.57)
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Subject: Re: [PATCH net] net: stmmac: dwmac-motorcomm: fix eFUSE MAC address
+ read
+ failure
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177561183503.28494.18367414550123221005.git-patchwork-notify@kernel.org>
+Date: Wed, 08 Apr 2026 01:30:35 +0000
+References: <fc5992a4-9532-49c3-8ec1-c2f8c5b84ca1@smtp-relay.sendinblue.com>
+In-Reply-To: <fc5992a4-9532-49c3-8ec1-c2f8c5b84ca1@smtp-relay.sendinblue.com>
+To: Johan Alvarado <contact@c127.dev>
+Cc: me@ziyao.cc, davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, ggo@tuxedocomputers.com, andrew+netdev@lunn.ch,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[huawei.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-276229-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-276230-lists,netdev=lfdr.de,netdevbpf];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yuehaibing@huawei.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[huawei.com:dkim,huawei.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D97453B5EC0
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NO_DN(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6ED753B5F00
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 2026/4/7 9:43, Jakub Kicinski wrote:
-> On Fri, 3 Apr 2026 16:44:02 +0800 Yue Haibing wrote:
->> The variable ret is initialized to 0 when it is defined
->> and is not modified before copy_to_user().
-> 
-> Makes more sense to remove the init during definition IMO.
+Hello:
 
-OK，will do this in v2
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Mon,  6 Apr 2026 07:44:25 +0000 you wrote:
+> This patch fixes an issue where reading the MAC address from the eFUSE
+> fails due to a race condition.
+> 
+> The root cause was identified by comparing the driver's behavior with a
+> custom U-Boot port. In U-Boot, the MAC address was read successfully
+> every time because the driver was loaded later in the boot process, giving
+> the hardware ample time to initialize. In Linux, reading the eFUSE
+> immediately returns all zeros, resulting in a fallback to a random MAC address.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] net: stmmac: dwmac-motorcomm: fix eFUSE MAC address read failure
+    https://git.kernel.org/netdev/net/c/f2777d5cb5c0
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
