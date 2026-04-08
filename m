@@ -1,255 +1,238 @@
-Return-Path: <netdev+bounces-276569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276570-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yBtIBlNp1mnIEwgAu9opvQ
-	(envelope-from <netdev+bounces-276569-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 16:42:27 +0200
+	id cLdzGRJq1mnIEwgAu9opvQ
+	(envelope-from <netdev+bounces-276570-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 16:45:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DE3A3BDCD1
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 16:42:26 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEFA33BDD47
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 16:45:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 42F4530479C9
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 14:37:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 07B7A30221DB
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 14:44:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 742013D34BE;
-	Wed,  8 Apr 2026 14:37:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 797222F39B8;
+	Wed,  8 Apr 2026 14:44:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ICsoz/FS"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="apP1WAvt";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="gz0hnVkT"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DAD72EA75E
-	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 14:37:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01E083BD64B
+	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 14:44:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775659026; cv=none; b=b5UTIC7D3yO4Cx5ilqtDWmNnGwqymml8oGq9WmFwG+qcQUUSWfgOe/niV4jaIs1x7hPHd881mPx2zyYaEVMpRC5JXk5vibOKZQsskmS+D/7dBdrNVAW+/2q2tEyvZ7xeH7Z2L7vn65z3UpqoJJFfNd4ZYc1dhbZpfRZjATLhZgQ=
+	t=1775659460; cv=none; b=SONSX+CTY/eEYvcBOviUXSBrq5Oe3W7uyQhEF2LXitH3NUmShGQX36vpnQ345b7pmsEvb8c/3ye1OTs7u+eYX+G3MZI4w1AMULRy2u2RZI4HA66h+sYDjfm69FCu79kLd2rVsevoK+KhWXJy07+xFBOjskPMTP/rQGE7rfpuvGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775659026; c=relaxed/simple;
-	bh=IUhysZK4W2qXCMl1fW44oRGcs+sPTEL9NuvLc4gvx6g=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RlAaygJMVO7JUv2ZHPn54COl34LvDJMjktcrmD1EacXFLRyXY5UVX+naONb8pxnuFraPVNpgei7NYQSRhnCGkNZx4ltttSjRXZnqxpKtOuzqRE6REKcJ2sFFnv0Hy0IySbe3TU6vipGcHuWYk66RefgByRQ39TNCqOlqowpf01E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ICsoz/FS; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1775659460; c=relaxed/simple;
+	bh=JpwLaeGR+4CG8DxSsnhAqtc+mOf5z82prqz1dib3zi0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=haWN54W35plmXPEyNp7Rog0SGIox4Wxf89bOzsoa40lh4O2hB/Xm/M1tzxn0BBcvsmiKwQNmKNoJC+KpHRHfcO9oyiA6cBiIAlsG/BUzONzowMnio9dkbk3PxwehhdNs2DScz3vHUfiXt5Dw7o3i7uIHCCDYyHmn9OaL2S/c+qg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=apP1WAvt; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=gz0hnVkT; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1775659023;
+	s=mimecast20190719; t=1775659458;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=quwf7Xdw+1im6FDZ/s8Zy1e44QdwrwkRmkySuIICqEk=;
-	b=ICsoz/FSGFXSe47XZ8RxL4H40OiTlQuaUvlT50DfZvcRWB8fmB8cgAa+JtupIEJxBwQoQ1
-	E84lA2706zLOM2T1dKbgZ8YBEDadyf7twTCvaG5qRjaqL5h4ji4oAGfnlRXHIbrrRsvmd3
-	GPOgz73V9P0Jw41IALtfmkLASY47G0E=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-150-f_FcHofSNReC5oz66TnTrg-1; Wed,
- 08 Apr 2026 10:37:00 -0400
-X-MC-Unique: f_FcHofSNReC5oz66TnTrg-1
-X-Mimecast-MFC-AGG-ID: f_FcHofSNReC5oz66TnTrg_1775659019
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 29D2918005BE;
-	Wed,  8 Apr 2026 14:36:59 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.44.32.173])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id EC3BA300019F;
-	Wed,  8 Apr 2026 14:36:56 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH net-next v2] ipv6: move IFA_F_PERMANENT percpu allocation in process scope
-Date: Wed,  8 Apr 2026 16:36:49 +0200
-Message-ID: <46a7a030727e236af2dc7752994cd4f04f4a91d2.1775658924.git.pabeni@redhat.com>
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pezfrKC7eYGJMuBaqOOteFy8MQajQLtYRWeC0Y5aebs=;
+	b=apP1WAvtLZcmzr66ubZhS4undbd7I8FUATRf7mEhBy/Ii6/EFD+sqlGOQA0tECMFLOjOVK
+	blQBqY5EPTX4/APEI/CuTtcVHY+TDMIfHxHgd07R8JhiwkVl3EFA5ZvKX9jT3hm+lrjJP0
+	6YuJ67DqItvRsmMxOm3/XOH4FeYuKo4=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-589-Zd18p8buOtOKniW9yY-tYQ-1; Wed, 08 Apr 2026 10:44:15 -0400
+X-MC-Unique: Zd18p8buOtOKniW9yY-tYQ-1
+X-Mimecast-MFC-AGG-ID: Zd18p8buOtOKniW9yY-tYQ_1775659455
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-43d1bfbd219so5016866f8f.0
+        for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 07:44:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1775659454; x=1776264254; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=pezfrKC7eYGJMuBaqOOteFy8MQajQLtYRWeC0Y5aebs=;
+        b=gz0hnVkTt8WCp+PuqmCcc12iwOZai0nxAWDpx8BUqdTvqD0ZuWhVWeZnwutpqDqK4s
+         30cifoTPEdGdKx5H0/lUk04PICF/F72m7ExN+UVOs+BkT1ywo3cDr2nT1dxeDQY6z/YO
+         KbGFqYcA2Fdx+6L+VrDWSQBunbojP4JNLc/ldli86nCLKoXt1eNhEgFK/0J5ghl+uoiK
+         mWkpzOSZ7Yt6SVPQ4NrsGeMXRA60k8DFwrHg8ChvtHeDMVDsbXcpRcUk8Z95C1UF1skm
+         q2xPrlUlNXaFpwLq4NJzBu8J+4BteyMWR3N/VhuCKKn869nNkje6DtlbpV3Eoq3rPwH7
+         03hA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775659454; x=1776264254;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=pezfrKC7eYGJMuBaqOOteFy8MQajQLtYRWeC0Y5aebs=;
+        b=U/oM1gK69IllShNzMVrhUwrweekh/utgEIfmOJr2/4lzF5Mg3nITuytW80igrY7QN2
+         sp6l7Y1+U8NorvEZ1wR5TTCQDQZ0UppDIHpEbJProHX0+fvWGbfgMdO/fqM/XeSCKLLl
+         xhPBDEiK4YAoNEhI8tVVipYQXJJVEfSzjHzS6DBVlJVHg2tlet24VxBUa3NG0RyFIFv3
+         lvmcIFWkBdrTV/RoGk00edlnDVjQKDGQdU1gkCIlg+gTv0zsEy6naHQvvl4TAeHrY9LR
+         eURHDSzoLAO0sZsOxtMATSojV1/Eqex9JWAvpaFYuI2pMyFn27hCSzhZyQBEC5niVTyA
+         Uw0g==
+X-Forwarded-Encrypted: i=1; AJvYcCUpzyQBw2GBU7lIbb7vFTIgFGlK3SovJG9ydK6PZheF98kgZ9BDwsgA4/mOBiz/JUNOo1hJ7lQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz7BD027EgQtZ7xRBUmxCj7xY5hk/wL3k5BRuhYIVaWESlxaz9n
+	+YaMu5P466XuJYT146pfSRM0a8DGxFPGV7DGTY9RNkMUAfhvCvxkca0012nMQzgHSPxq7bXcShM
+	Tuu6BsIHjLpubOcDFQWB/f+ASXTx1TWC1spUebtHl7ssYpNKtUaA1uSgf0A==
+X-Gm-Gg: AeBDiev5L/pb2yqOjqpy9flZ4MxbGFytI7Tk/RD8zV/Mk20xTVgaDDgjAT+UCBMp5vs
+	pR24e3ctoPfXK0q8hlylMhMrkRzchon0yzwP1UZG9wxiK43C1UaPZVpTG8QR3ea7KYbREIgrESf
+	scKPlfZS/NaadU/Fu2EcJ/I2OrQyvyUDsw7ixZXD8KSQ1IMd8Ep07GTSxpLi4PY5y/9yMAutTpC
+	r3O/rTMNNGc2UycDyvELY4QQQeZuSOgX3y2mszxwpoxn1VITZsJ+KCkl0wv0dU7oEpZph8ysNyg
+	1ugTwoRNozoPTWNrwEaUhsSmGlOX91htABsVLgS/p5LrCFKSYahDkgmbZp4a3gIUSwwI+ntlC7w
+	HMccpqOSWyfRAT27tVpablPOKgj7Wo19KoqYj8sqzjMF6K8nIjUP5t5PH/Q==
+X-Received: by 2002:a5d:64e4:0:b0:43b:8fa4:194d with SMTP id ffacd0b85a97d-43d292855famr30342517f8f.6.1775659454544;
+        Wed, 08 Apr 2026 07:44:14 -0700 (PDT)
+X-Received: by 2002:a5d:64e4:0:b0:43b:8fa4:194d with SMTP id ffacd0b85a97d-43d292855famr30342478f8f.6.1775659453959;
+        Wed, 08 Apr 2026 07:44:13 -0700 (PDT)
+Received: from [192.168.88.32] ([212.105.153.231])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43d1e2a7223sm55239228f8f.5.2026.04.08.07.44.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 08 Apr 2026 07:44:13 -0700 (PDT)
+Message-ID: <2bae0dc2-4035-4fe2-a87e-dc5dae6c7df5@redhat.com>
+Date: Wed, 8 Apr 2026 16:44:11 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next 1/2] i40e: implement basic
+ per-queue stats
+To: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>,
+ "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+Cc: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+ "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <cover.1775648513.git.pabeni@redhat.com>
+ <0815f1eb4b60faa653ea703e420395b724d05216.1775648513.git.pabeni@redhat.com>
+ <IA3PR11MB89864FAAC7BCD8459A2BCD15E55BA@IA3PR11MB8986.namprd11.prod.outlook.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <IA3PR11MB89864FAAC7BCD8459A2BCD15E55BA@IA3PR11MB8986.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_CC(0.00)[intel.com,lunn.ch,davemloft.net,google.com,kernel.org,iogearbox.net,gmail.com,fomichev.me,vger.kernel.org];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-276569-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-276570-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-0.997];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_FIVE(0.00)[6];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6DE3A3BDCD1
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,davemloft.net:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,iogearbox.net:email]
+X-Rspamd-Queue-Id: BEFA33BDD47
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Observed at boot time:
+On 4/8/26 2:07 PM, Loktionov, Aleksandr wrote:
+>> -----Original Message-----
+>> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
+>> Of Paolo Abeni
+>> Sent: Wednesday, April 8, 2026 1:44 PM
+>> To: intel-wired-lan@lists.osuosl.org
+>> Cc: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitszel,
+>> Przemyslaw <przemyslaw.kitszel@intel.com>; Andrew Lunn
+>> <andrew+netdev@lunn.ch>; David S. Miller <davem@davemloft.net>; Eric
+>> Dumazet <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>;
+>> Alexei Starovoitov <ast@kernel.org>; Daniel Borkmann
+>> <daniel@iogearbox.net>; Jesper Dangaard Brouer <hawk@kernel.org>; John
+>> Fastabend <john.fastabend@gmail.com>; Stanislav Fomichev
+>> <sdf@fomichev.me>; netdev@vger.kernel.org
+>> Subject: [Intel-wired-lan] [PATCH iwl-next 1/2] i40e: implement basic
+>> per-queue stats
+>>
+>> Only expose the counters currently available (bytes, packets); add
+>> account for base stats to deal with ring clear.
+>>
+>> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+>> ---
+>>  drivers/net/ethernet/intel/i40e/i40e.h      |   7 ++
+>>  drivers/net/ethernet/intel/i40e/i40e_main.c | 133
+>> ++++++++++++++++++++
+>>  2 files changed, 140 insertions(+)
+>>
+>> diff --git a/drivers/net/ethernet/intel/i40e/i40e.h
+>> b/drivers/net/ethernet/intel/i40e/i40e.h
+>> index dcb50c2e1aa2..fe642c464e9c 100644
+>> --- a/drivers/net/ethernet/intel/i40e/i40e.h
+>> +++ b/drivers/net/ethernet/intel/i40e/i40e.h
+>> @@ -836,16 +836,23 @@ struct i40e_vsi {
+>>  	struct i40e_eth_stats eth_stats;
+>>  	struct i40e_eth_stats eth_stats_offsets;
+>>  	u64 tx_restart;
+> 
+> ...
+> 
+>> +static void i40e_zero_tx_ring_stats(struct netdev_queue_stats_tx *tx)
+>> {
+>> +	tx->bytes = 0;
+>> +	tx->packets = 0;
+>> +	tx->stop = 0;
+>> +	tx->wake = 0;
+>> +	tx->hw_drops = 0;
+>> +}
+>> +
+>> +static void i40e_add_tx_ring_stats(struct i40e_ring *tx_ring,
+>> +				   struct netdev_queue_stats_tx *tx) {
+>> +	u64 bytes, packets;
+>> +	unsigned int start;
+>> +
+>> +	do {
+>> +		start = u64_stats_fetch_begin(&tx_ring->syncp);
+>> +		bytes = tx_ring->stats.bytes;
+>> +		packets = tx_ring->stats.packets;
+>> +	} while (u64_stats_fetch_retry(&tx_ring->syncp, start));
+>> +
+>> +	tx->bytes += bytes;
+>> +	tx->packets += packets;
+>> +
+>> +	tx->stop += tx_ring->tx_stats.tx_stopped;
+>> +	tx->wake += tx_ring->tx_stats.restart_queue;
+>> +	tx->hw_drops += tx_ring->tx_stats.tx_busy; }
+> Why the reads are outside the seqlock region? 
+> On 32-bit kernels, unprotected u64 reads can tear IMHO
 
- CPU: 43 UID: 0 PID: 3595 Comm: (t-daemon) Not tainted 6.12.0 #1
- Call Trace:
-  <TASK>
-  dump_stack_lvl+0x4e/0x70
-  pcpu_alloc_noprof.cold+0x1f/0x4b
-  fib_nh_common_init+0x4c/0x110
-  fib6_nh_init+0x387/0x740
-  ip6_route_info_create+0x46d/0x640
-  addrconf_f6i_alloc+0x13b/0x180
-  addrconf_permanent_addr+0xd0/0x220
-  addrconf_notify+0x93/0x540
-  notifier_call_chain+0x5a/0xd0
-  __dev_notify_flags+0x5c/0xf0
-  dev_change_flags+0x54/0x70
-  do_setlink+0x36c/0xce0
-  rtnl_setlink+0x11f/0x1d0
-  rtnetlink_rcv_msg+0x142/0x3f0
-  netlink_rcv_skb+0x50/0x100
-  netlink_unicast+0x242/0x390
-  netlink_sendmsg+0x21b/0x470
-  __sys_sendto+0x1dc/0x1f0
-  __x64_sys_sendto+0x24/0x30
-  do_syscall_64+0x7d/0x160
-  entry_SYSCALL_64_after_hwframe+0x76/0x7e
- RIP: 0033:0x7f5c3852f127
- Code: 0c 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b8 0f 1f 00 f3 0f 1e fa 80 3d 85 ef 0c 00 00 41 89 ca 74 10 b8 2c 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 71 c3 55 48 83 ec 30 44 89 4c 24 2c 4c 89 44
- RSP: 002b:00007ffe86caf4c8 EFLAGS: 00000202 ORIG_RAX: 000000000000002c
- RAX: ffffffffffffffda RBX: 0000556c5cd93210 RCX: 00007f5c3852f127
- RDX: 0000000000000020 RSI: 0000556c5cd938b0 RDI: 0000000000000003
- RBP: 00007ffe86caf5a0 R08: 00007ffe86caf4e0 R09: 0000000000000080
- R10: 0000000000000000 R11: 0000000000000202 R12: 0000556c5cd932d0
- R13: 00000000021d05d1 R14: 00000000021d05d1 R15: 0000000000000001
+Currently there is no seqlock on the write side; to keep the series
+small I preferred avoid fixing the pre-existing issue. In any case I
+think moving stop, wake, hw_drops (and others) under seqlock protection
+is an orthogonal change.
 
-IFA_F_PERMANENT addresses require the allocation of a bunch of percpu
-pointers, currently in atomic scope.
-
-Similar to commit 51454ea42c1a ("ipv6: fix locking issues with loops
-over idev->addr_list"), move fixup_permanent_addr() outside the
-&idev->lock scope, and do the allocations with GFP_KERNEL. With such
-change fixup_permanent_addr() is invoked with the BH enabled, and the
-ifp lock acquired there needs the BH variant.
-
-Note that we don't need to acquire a reference to the permanent
-addresses before releasing the mentioned write lock, because
-addrconf_permanent_addr() runs under RTNL and ifa removal always happens
-under RTNL, too.
-
-Also the PERMANENT flag is constant in the relevant scope, as it can be
-cleared only by inet6_addr_modify() under the RTNL lock.
-
-Reviewed-by: David Ahern <dsahern@kernel.org>
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
----
-v1 -> v2:
-  - rebased on top of "ipv6: prevent possible UaF in
-    addrconf_permanent_addr()"
-v1: https://lore.kernel.org/netdev/d972e1e2-7090-47bd-988a-1ea854cbfb42@kernel.org/
-explicitly targeting net-next as this is IMHO an improvement more than a
-bug fix
----
- net/ipv6/addrconf.c | 31 +++++++++++++++++++------------
- 1 file changed, 19 insertions(+), 12 deletions(-)
-
-diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-index dd0b4d80e0f8..77c77e843c96 100644
---- a/net/ipv6/addrconf.c
-+++ b/net/ipv6/addrconf.c
-@@ -3585,15 +3585,15 @@ static int fixup_permanent_addr(struct net *net,
- 		struct fib6_info *f6i, *prev;
- 
- 		f6i = addrconf_f6i_alloc(net, idev, &ifp->addr, false,
--					 GFP_ATOMIC, NULL);
-+					 GFP_KERNEL, NULL);
- 		if (IS_ERR(f6i))
- 			return PTR_ERR(f6i);
- 
- 		/* ifp->rt can be accessed outside of rtnl */
--		spin_lock(&ifp->lock);
-+		spin_lock_bh(&ifp->lock);
- 		prev = ifp->rt;
- 		ifp->rt = f6i;
--		spin_unlock(&ifp->lock);
-+		spin_unlock_bh(&ifp->lock);
- 
- 		fib6_info_release(prev);
- 	}
-@@ -3601,7 +3601,7 @@ static int fixup_permanent_addr(struct net *net,
- 	if (!(ifp->flags & IFA_F_NOPREFIXROUTE)) {
- 		addrconf_prefix_route(&ifp->addr, ifp->prefix_len,
- 				      ifp->rt_priority, idev->dev, 0, 0,
--				      GFP_ATOMIC);
-+				      GFP_KERNEL);
- 	}
- 
- 	if (ifp->state == INET6_IFADDR_STATE_PREDAD)
-@@ -3612,29 +3612,36 @@ static int fixup_permanent_addr(struct net *net,
- 
- static void addrconf_permanent_addr(struct net *net, struct net_device *dev)
- {
--	struct inet6_ifaddr *ifp, *tmp;
-+	struct inet6_ifaddr *ifp;
-+	LIST_HEAD(tmp_addr_list);
- 	struct inet6_dev *idev;
- 
-+	/* Mutual exclusion with other if_list_aux users. */
-+	ASSERT_RTNL();
-+
- 	idev = __in6_dev_get(dev);
- 	if (!idev)
- 		return;
- 
- 	write_lock_bh(&idev->lock);
-+	list_for_each_entry(ifp, &idev->addr_list, if_list) {
-+		if (ifp->flags & IFA_F_PERMANENT)
-+			list_add_tail(&ifp->if_list_aux, &tmp_addr_list);
-+	}
-+	write_unlock_bh(&idev->lock);
- 
--	list_for_each_entry_safe(ifp, tmp, &idev->addr_list, if_list) {
--		if ((ifp->flags & IFA_F_PERMANENT) &&
--		    fixup_permanent_addr(net, idev, ifp) < 0) {
--			write_unlock_bh(&idev->lock);
-+	while (!list_empty(&tmp_addr_list)) {
-+		ifp = list_first_entry(&tmp_addr_list,
-+				       struct inet6_ifaddr, if_list_aux);
-+		list_del(&ifp->if_list_aux);
- 
-+		if (fixup_permanent_addr(net, idev, ifp) < 0) {
- 			net_info_ratelimited("%s: Failed to add prefix route for address %pI6c; dropping\n",
- 					     idev->dev->name, &ifp->addr);
- 			in6_ifa_hold(ifp);
- 			ipv6_del_addr(ifp);
--			write_lock_bh(&idev->lock);
- 		}
- 	}
--
--	write_unlock_bh(&idev->lock);
- }
- 
- static int addrconf_notify(struct notifier_block *this, unsigned long event,
--- 
-2.53.0
+/P
 
 
