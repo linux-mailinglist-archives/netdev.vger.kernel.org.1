@@ -1,203 +1,138 @@
-Return-Path: <netdev+bounces-276458-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276460-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sIBiOug/1mkFCwgAu9opvQ
-	(envelope-from <netdev+bounces-276458-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 13:45:44 +0200
+	id OOQnEVFB1mkFCwgAu9opvQ
+	(envelope-from <netdev+bounces-276460-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 13:51:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 621433BB6C8
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 13:45:44 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D349B3BB76F
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 13:51:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1FFC830364BE
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 11:45:43 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 37A343012BDD
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 11:51:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 853B83B583C;
-	Wed,  8 Apr 2026 11:45:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4B293803F0;
+	Wed,  8 Apr 2026 11:51:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f47.google.com (mail-ua1-f47.google.com [209.85.222.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 699F52FF17A
-	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 11:45:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F828335556
+	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 11:51:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775648742; cv=none; b=a+K3rtpNGetnVrwsIAj9PyjoQGzDPCq08FhhvDMlmKH6moum3ENMI/HWaZ+QdTFWqpaZAW2PHe9RydOoxLlllC0u8ViKfPV+ldQTXtdtPGZFFe03kUYNpGPsH1s/COJI/Mox02h0lA8sqydC1Sip6DYu5m4Upn6+lo2jZ0nA6Wk=
+	t=1775649101; cv=none; b=NifYTQh0vqd2H5jkm1C4mf1rL8Gvy0m8+WZn4MR9c4UBLUaGjSAXvOtgsQYm/IRjJZyZVhcciRvn6oG9avYBaVF7a/n23DvnNQC7aTjO96t1/BeVdUgPXVLFDp2479c4WhD/GMLoHeL/q3dGLB8HIy1kwBSTwlEvga1h9dLvM54=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775648742; c=relaxed/simple;
-	bh=tMoYbEmWbo19OX+Xq3VZmzh7ETPBDAACXNQrrg9Kxr0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=a23IhkHiCqr6eaJ3qE4uJpwPWK+fRffdCEjsjPpBc69voq/b2X8pPTMw96ZO+ibyy2VxQ+1RbRn7a/j+pWKpYSVjCFJf61aeJljeSKsCfk/iJfAQpY+G4TfncPnpuBNhp1UzQgvBsk1aXVOvUTqktxRc1+C8ggIYTib74SsiYVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.222.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f47.google.com with SMTP id a1e0cc1a2514c-953a2a4761cso3478203241.1
-        for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 04:45:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775648739; x=1776253539;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wsFx8UqI7O7MvtKnezUqmqXPysfihd7yNwHTW94peVE=;
-        b=e7juV4bwMvttOvxjp10d/1AMEil6ltjRg+miFDo+cFyRKq1phpASVKrapSc+uz9plV
-         6eC8d6wFZzB3IFSxR/gzUXOl1+AiQCYUQq2DOVjmmLR4EaK1WYlJcpoNzmTZlXgL1chz
-         NwzOL2xB/pzIeuBcACW3z7aeB2MregsAT4/+fZiIFMMUUOMYzlWM1xvL9FaQMWbbPwlt
-         WCVrAXp6ncx/EaLjwkJDqN/sDtviXW6MsgfkbzhnuFJz7lP8MY3ojlMaUUuUUCu0e6iJ
-         DZ/mX449ZjzK329bINdHjFpIdyXo3fbhdfkDz85LaPCF2JFNn+MKTu0sPSAvveIfuFoG
-         cbvg==
-X-Forwarded-Encrypted: i=1; AJvYcCVJW7gXPfifZX8WH9ApL8cXY7pmol6rvGSY2BQ4UTwG0fhKBsg7Fn/dljmXWNwvfOP3ofpDFzk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzzwihk+JCtGOWoXG1mTjHGsX306ellz83cx1swhXsVNQ5Lf7NI
-	ljuTSWJ2b1VFszujCKwBzLPsNCIWiGLDr05xE4Edkf2XiJIbMjrmEFZDvqBPu+JJ
-X-Gm-Gg: AeBDiev0KNAxyIqjcUB+G6g3kBRHuHg3SKgerXnPDKM3aE5WSHVCt9YMoX3ETTv/pQo
-	vDVzfgI70D1eoHCFpvuQKP/emAOqwy+ITdUKz6ji4eOo+qv7f6nGAlZh0T+CxSrkGmZCn3NcZxb
-	FowYV5RXaErv5PKLaMKABP2wDZTMbXcyJIe8cBjOkbVTjcvqfNl9FqKD55URLiMfM14tIk62f40
-	pIoXqEBFnkLVgJHOELrk/rgdqp+Iu2cCRMi9NJ8CqVR3GI04TUosC7u1XifgK5EbR87to4MaBur
-	P7E53+LcusHBrrP+H1MvF54IdTEVzR7JjijYEfObn4ckRbXIxCfKPNn5xme+Y3TJn/s0xfgXHMB
-	TB+MRLA6Q7g42h9ILmjRwybf9AmaeI7ufTxZQz1c596vMI6EGNAP0riIs5kmF+H4ysZ+RYGrA1m
-	xzYYnWODZX/ABvfWo6zpYcVRcT2sl2f5kd56EvspHOvRlrh03SVqkPet2WLPUz2E+K
-X-Received: by 2002:a05:6102:4190:b0:603:1a8a:c84a with SMTP id ada2fe7eead31-605a4d81af1mr8380152137.2.1775648739336;
-        Wed, 08 Apr 2026 04:45:39 -0700 (PDT)
-Received: from mail-vk1-f170.google.com (mail-vk1-f170.google.com. [209.85.221.170])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-60582b562bfsm20466049137.0.2026.04.08.04.45.38
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 Apr 2026 04:45:38 -0700 (PDT)
-Received: by mail-vk1-f170.google.com with SMTP id 71dfb90a1353d-56dfd007d31so3076363e0c.3
-        for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 04:45:38 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCXh6urHvkTYKzjZGfp8vBFcDdExHlA2jRspYHQeMZc4Euj1py0cN4FCUOCfkIYr0M/Mdi7pWtI=@vger.kernel.org
-X-Received: by 2002:a05:6122:1687:b0:56c:d582:42d3 with SMTP id
- 71dfb90a1353d-56dab9f0300mr8497547e0c.14.1775648738222; Wed, 08 Apr 2026
- 04:45:38 -0700 (PDT)
+	s=arc-20240116; t=1775649101; c=relaxed/simple;
+	bh=To0GYwzn1VLVHtmsnwqTcdG/AMFRUzmu+3hkxMxuKUA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qaxwtlMGIgpTHwJtWiZyxyDpp1vyDjxO76/ND1kY8CHadnZ1BML2aQ/BQ20+mofvISNTeA9SzzowppJm9J+PPnojLKdwu2nCvsar+oo/dRvFIsUdHkKtZJuV/vRRjtqaeJrMgNQIlWI9mvVMC45EICkIhLz849STKBUyF9zQ/nY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.2.229] (p5dc55707.dip0.t-ipconnect.de [93.197.87.7])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 95BCA4C2C37D4D;
+	Wed, 08 Apr 2026 13:50:38 +0200 (CEST)
+Message-ID: <3c7e8261-7528-431c-adb9-3b90124cef99@molgen.mpg.de>
+Date: Wed, 8 Apr 2026 13:50:37 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260403111738.37749-1-ovidiu.panait.rb@renesas.com>
-In-Reply-To: <20260403111738.37749-1-ovidiu.panait.rb@renesas.com>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Wed, 8 Apr 2026 13:45:25 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdWQiRpCVMuimOMo4Mz2EAG+gbnKyXY7oSXh7mL_fkdGSQ@mail.gmail.com>
-X-Gm-Features: AQROBzB8CD0KWn3WV3oznk3HkPNWE_QHm1fcpz8CRur8WDBn-SeBp0BUAOGU0qs
-Message-ID: <CAMuHMdWQiRpCVMuimOMo4Mz2EAG+gbnKyXY7oSXh7mL_fkdGSQ@mail.gmail.com>
-Subject: Re: [PATCH net] net: phy: micrel: Fix MMD register access during SPD
- in ksz9131_resume()
-To: Ovidiu Panait <ovidiu.panait.rb@renesas.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	biju.das.jz@bp.renesas.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-renesas-soc@vger.kernel.org, 
-	=?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next 0/2] i40e: implement per-queue
+ stats
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: intel-wired-lan@lists.osuosl.org, Tony Nguyen
+ <anthony.l.nguyen@intel.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org
+References: <cover.1775648513.git.pabeni@redhat.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <cover.1775648513.git.pabeni@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [0.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-276458-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-276460-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[linux-m68k.org];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,bp.renesas.com,vger.kernel.org,ragnatech.se];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	DMARC_NA(0.00)[mpg.de];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[geert@linux-m68k.org,netdev@vger.kernel.org];
-	NEURAL_SPAM(0.00)[0.180];
+	FREEMAIL_CC(0.00)[lists.osuosl.org,intel.com,lunn.ch,davemloft.net,google.com,kernel.org,iogearbox.net,gmail.com,fomichev.me,vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	NEURAL_SPAM(0.00)[0.262];
 	R_DKIM_NA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pmenzel@molgen.mpg.de,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,renesas];
+	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[renesas.com:email,mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 621433BB6C8
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D349B3BB76F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Ovidiu,
+Dear Paolo,
 
-On Fri, 3 Apr 2026 at 13:18, Ovidiu Panait <ovidiu.panait.rb@renesas.com> wrote:
-> During system suspend, phy_suspend() puts the PHY into Software Power-Down
-> (SPD) by setting the BMCR_PDOWN bit in MII_BMCR. According to the KSZ9131
-> datasheet, MMD register access is restricted during SPD:
->
->   - Only access to the standard registers (0 through 31) is supported.
->   - Access to MMD address spaces other than MMD address space 1 is
->     possible if the spd_clock_gate_override bit is set.
->   - Access to MMD address space 1 is not possible.
->
-> However, ksz9131_resume() calls ksz9131_config_rgmii_delay() before
-> kszphy_resume() clears BMCR_PDOWN. This means MMD registers are accessed
-> while the PHY is still in SPD, contrary to the datasheet.
->
-> Additionally, on platforms where the PHY loses power during suspend
-> (e.g. RZ/G3E), all settings from ksz9131_config_init(), not just the
-> RGMII delays, are lost and need to be restored. When the MAC driver
-> sets mac_managed_pm (e.g. stmmac), mdio_bus_phy_resume() is skipped,
-> so phy_init_hw() (which calls config_init to restore all PHY settings)
-> is never invoked during resume.
->
-> Fix this by replacing the RGMII delay restoration with a call to
-> phy_init_hw(), which takes the PHY out of SPD and performs full
-> reinitialization.
->
-> Fixes: f25a7eaa897f ("net: phy: micrel: Add ksz9131_resume()")
-> Signed-off-by: Ovidiu Panait <ovidiu.panait.rb@renesas.com>
 
-Thanks for your patch!
+Thank you for your patches.
 
-> --- a/drivers/net/phy/micrel.c
-> +++ b/drivers/net/phy/micrel.c
-> @@ -6016,8 +6016,13 @@ static int lan8841_suspend(struct phy_device *phydev)
->
->  static int ksz9131_resume(struct phy_device *phydev)
->  {
-> -       if (phydev->suspended && phy_interface_is_rgmii(phydev))
-> -               ksz9131_config_rgmii_delay(phydev);
-> +       int ret;
-> +
-> +       if (phydev->suspended) {
-> +               ret = phy_init_hw(phydev);
-> +               if (ret)
-> +                       return ret;
-> +       }
->
->         return kszphy_resume(phydev);
->  }
+Am 08.04.26 um 13:43 schrieb Paolo Abeni:
+> The i40e driver already collects some per queue statistics, but does
+> not expose them to the user-space using the standard interface.
+> 
+> Implement the stat_ops callbacks and extends the already collected info
 
-This function is now no longer KSZ9131-specific.
-I am wondering if this should be done for other Micrel PHYs, too,
-e.g. by moving the phy_init_hw() call into kszphy_resume()?
+s/extends/extend/
 
-Ethernet after resume has always been flaky on Salvator-X with KSZ9031
-and R-Car M3-W ES1.0 (this seems to be specific to R-Car M3-W, as
-boards with R-Car H3 or M3-N do not seem to suffer from this; don't
-ask me why).
+> with basic GSO counters. Overall this allows passing the kernel NIC
+> drivers TSO test cases.
 
-I have just tried:
+It’d be great, if you added the commands to show the stats, and to run 
+the test cases.
 
--       .resume         = kszphy_resume,
-+       .resume         = ksz9131_resume,
+> Paolo Abeni (2):
+>    i40e: implement basic per-queue stats
+>    i40e: keep track of per queue gso counters.
 
-in the KSZ9031 entry, and ... surprise! Ethernet on R-Car M3-W now
-works much better after resume!
+No period needed at the end of the summary/title.
 
-Gr{oetje,eeting}s,
+> 
+>   drivers/net/ethernet/intel/i40e/i40e.h        |   9 ++
+>   drivers/net/ethernet/intel/i40e/i40e_main.c   | 144 ++++++++++++++++++
+>   drivers/net/ethernet/intel/i40e/i40e_txrx.c   |   8 +-
+>   drivers/net/ethernet/intel/i40e/i40e_txrx.h   |   2 +
+>   .../ethernet/intel/i40e/i40e_txrx_common.h    |   6 +-
+>   drivers/net/ethernet/intel/i40e/i40e_xsk.c    |   2 +-
+>   6 files changed, 168 insertions(+), 3 deletions(-)
 
-                        Geert
 
--- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+Kind regards,
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+Paul
 
