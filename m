@@ -1,65 +1,53 @@
-Return-Path: <netdev+bounces-276235-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276237-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6KC3Ldq01Wmo8wcAu9opvQ
-	(envelope-from <netdev+bounces-276235-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 03:52:26 +0200
+	id CBD/AcK21WmU9AcAu9opvQ
+	(envelope-from <netdev+bounces-276237-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 04:00:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F33AB3B61EE
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 03:52:25 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BB343B6282
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 04:00:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 5DA48301A14C
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 01:51:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EC0703016C8F
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 02:00:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25F1D1E1C11;
-	Wed,  8 Apr 2026 01:51:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56E944317D;
+	Wed,  8 Apr 2026 02:00:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pmYOaKOu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jz6rWChH"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E15835E927
-	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 01:51:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31E1C9463;
+	Wed,  8 Apr 2026 02:00:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775613115; cv=none; b=kfDavnfoaD+USuWDKp8Wd6ENmHtz9Y8QoNT/tSYxGrsddvZchzQO40GmHXe1aynCBqXHUYfJXyQO6VUCRqw9Qb5PBItzn3zZoNX7uARJF/dmuUWQB77NaJkF3RAxP9AiKw8Jk+N3kbeFRawsLUjQhieKK7oWVgcTQAC0g28CnJY=
+	t=1775613631; cv=none; b=QI6n70Lay5TBvr3wBto53LdeIrxvAyucTW2b8UhgOkZImN0MWqItzaK9kFmFnj2lnsPvv0mckavjdsCykFvvMZg2mbn3o71SDKYoeI0jbIHt7wuSy7Zr26jzMJPOrZ711EAF0amrVS4fjOlM0TA8DYrc9Y9xKX2ixM+HSRwKHkc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775613115; c=relaxed/simple;
-	bh=y/3DO+ORwS5VbmuGQpenBxZoTjBDdKCHAGR259B6XoI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=aYUPAG77NKa01XD+iaDm13Z0vWeFr4a4itZWaK+1K4lh3eFN8WCCLlXQqDhGncVcTPjMxmW65eq+mPBbTSJt6bHS1B7mx78hUh804mQZHxl1LVs+5zVjZWg4x6E1aw7w8zyzlUtoDS6TE3/mS+BSurRlXMuAUxjMT1xsSsPupgg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pmYOaKOu; arc=none smtp.client-ip=91.218.175.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1775613111;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aIh3ARqFq/vGHnNpbOy4uDjZQT9ulz9JUvqqrKVvG9g=;
-	b=pmYOaKOuWVio+2g5SXSZBwPgoo2UpZiZ+T/LYffORRFfwfoeckC7Vvfsi6bgTWUR0Lg/wt
-	5liZKQ/2rJhtcl2hFnV4QqAr0PdTinNI84ZQydUyLDHYrldrUBFRvybZ2yFubYD4AzvTa7
-	TKWqqNMT330BH5wLj5dQsw8gDwQv7hg=
-From: Qingfang Deng <qingfang.deng@linux.dev>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: linux-ppp@vger.kernel.org,
-	Qingfang Deng <qingfang.deng@linux.dev>
-Subject: [PATCH net-next 2/2] pppox: convert pppox_sk() to use container_of()
-Date: Wed,  8 Apr 2026 09:51:34 +0800
-Message-ID: <20260408015138.280687-2-qingfang.deng@linux.dev>
-In-Reply-To: <20260408015138.280687-1-qingfang.deng@linux.dev>
-References: <20260408015138.280687-1-qingfang.deng@linux.dev>
+	s=arc-20240116; t=1775613631; c=relaxed/simple;
+	bh=xpV5ixxVNwIs1y77Krx9Aw0xFffIlWQdYpziGdQvjT0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Vy3IY+W9JHH1R7QX5k/j6sEGmqdkkrJpr2ljdKT7G25ItU/meWKmos7NXYVTEfoud9/r4lV1c7wMaEBivt/1Z5mS+QMAWu3kZzk79KA4obpkFD6gSNbhRWi196kFIazAD1thuAOG0obH5SGSn9jtF3LI034rvKbcLqgJjRgc4pk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jz6rWChH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3AF4C116C6;
+	Wed,  8 Apr 2026 02:00:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775613630;
+	bh=xpV5ixxVNwIs1y77Krx9Aw0xFffIlWQdYpziGdQvjT0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=jz6rWChHWltA5p5musO1I6Gf+5DZ/ZLP7T26s7WoOhoXESkDDK9gs5LQ3vI1se7A2
+	 d1T+7kgCuyRtUq5rR+Sc26k/I3Lmo08iKVWMHzn4xgTdkYevGz5nn2z92H8m8WZhV+
+	 Y+ViSkJ8w/jVHQgFDiDIBR2N6zyaX47PhD77Pt8hk7Y7nxzVev3y1ccdTZoJCYEGWg
+	 t4eQh4gugKplL3aeIULZ1Jau8snwcxvDzSzbbctc0HPZbuda8NQ9OT/xWFaPctHU+J
+	 MQiJnnI1/aE0hV4lpoPE3MUBPHIpLEjxjg01r3fNL6leYthDu83i0Cwc/jSA7BKNOx
+	 LFLFpPwpWia5w==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FCBB3809A3D;
+	Wed,  8 Apr 2026 02:00:09 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,70 +55,75 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [0.84 / 15.00];
+Subject: Re: [PATCH net-next] selftests: drv-net: adjust to socat changes
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177561360779.36273.6873126268378400690.git-patchwork-notify@kernel.org>
+Date: Wed, 08 Apr 2026 02:00:07 +0000
+References: <20260404230103.2719103-1-kuba@kernel.org>
+In-Reply-To: <20260404230103.2719103-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ leitao@debian.org, shuah@kernel.org, hawk@kernel.org,
+ john.fastabend@gmail.com, sdf@fomichev.me, linux-kselftest@vger.kernel.org
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-276237-lists,netdev=lfdr.de,netdevbpf];
+	FREEMAIL_CC(0.00)[davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,debian.org,gmail.com,fomichev.me];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-276235-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[linux.dev:+];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NO_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[qingfang.deng@linux.dev,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: F33AB3B61EE
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5BB343B6282
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Use container_of() macro instead of direct pointer casting to get the
-pppox_sock from a sock pointer. This improves type safety and removes
-the requirement that sk must be the first struct member.
+Hello:
 
-Signed-off-by: Qingfang Deng <qingfang.deng@linux.dev>
----
- include/linux/if_pppox.h | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-diff --git a/include/linux/if_pppox.h b/include/linux/if_pppox.h
-index 636772693f9a..4f8d9e02cd7f 100644
---- a/include/linux/if_pppox.h
-+++ b/include/linux/if_pppox.h
-@@ -38,7 +38,6 @@ struct pptp_opt {
- #include <net/sock.h>
- 
- struct pppox_sock {
--	/* struct sock must be the first member of pppox_sock */
- 	struct sock sk;
- 	struct ppp_channel chan;
- 	struct pppox_sock __rcu	*next;	  /* for hash table */
-@@ -54,7 +53,7 @@ struct pppox_sock {
- 
- static inline struct pppox_sock *pppox_sk(struct sock *sk)
- {
--	return (struct pppox_sock *)sk;
-+	return container_of(sk, struct pppox_sock, sk);
- }
- 
- struct module;
+On Sat,  4 Apr 2026 16:01:03 -0700 you wrote:
+> socat v1.8.1.0 now defaults to shut-null, it sends an extra
+> 0-length UDP packet when sender disconnects. This breaks
+> our tests which expect the exact packet sequence.
+> 
+> Add shut-none which was the old default where necessary.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next] selftests: drv-net: adjust to socat changes
+    https://git.kernel.org/netdev/net-next/c/e65d8b6f3092
+
+You are awesome, thank you!
 -- 
-2.43.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
