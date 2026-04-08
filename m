@@ -1,116 +1,113 @@
-Return-Path: <netdev+bounces-276353-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276354-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qBa2AwsR1mmxAwgAu9opvQ
-	(envelope-from <netdev+bounces-276353-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 10:25:47 +0200
+	id n7DUFKwS1mnnAwgAu9opvQ
+	(envelope-from <netdev+bounces-276354-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 10:32:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 477E43B8FA7
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 10:25:46 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4D9D3B9160
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 10:32:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id D905B3003831
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 08:25:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 008C03059319
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 08:28:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A63503A1E96;
-	Wed,  8 Apr 2026 08:25:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 957223A3812;
+	Wed,  8 Apr 2026 08:28:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="jC7gDana";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ngr0rp/b"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="idfZ0HeG";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="R7K2mlr3"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b5-smtp.messagingengine.com (fout-b5-smtp.messagingengine.com [202.12.124.148])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5881A3A1E67;
-	Wed,  8 Apr 2026 08:25:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B8693A4524
+	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 08:28:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775636710; cv=none; b=FhQCQP6drdBWfiRjlUV2L7zmPUZfvES6vZO8UwLHK060IeLeSmS7T6p9fCsSP5bh8YvNq/5Yrimf6w/2NhImxdgjkIbJf1QMTV2hva+7BAs28oCkpNPnEoBu+X5AtZBxjclokYH8wsPHaf+YPu/mAS9A79w818AaOFQip0PssVA=
+	t=1775636909; cv=none; b=ms606FOqGhf9XEEvnczRgZ/mPIXlDdMRKr5w73aWSj7JEjkuxp0+1jdBvbAosunDiLZYm6OgLcPNgCUV+uqZ9BIa3cCzc8l54YANoy66ghzCgThGto2xfdrs6m6fXebPkbNHAhZqroU3/vIfU+NzIm1nuUFBO6adBK/oHXFRkdU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775636710; c=relaxed/simple;
-	bh=MYsVuliKoeskedgLGX+ydNaCxpDmYE4muspSAQYsSHM=;
+	s=arc-20240116; t=1775636909; c=relaxed/simple;
+	bh=vlaONbgseMAZgWwparintGRzVwHOQi9Gyw4NSVS+ovY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IICZwnvo0wQYuv0B7rkT8MBGh5lnsGMxY9p+84idSjJKVaJMZ8MNPArltOmoAH4mb9xsga5p6TYDD4PdVElW7nQuEFm2/A6eiOGc99nC4+5X8bh/VCqiZ5sxscTFE56uncUU96WCeN8OptEQrcaaFCNSqsxAN3hCoVS04JdyF34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=jC7gDana; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ngr0rp/b; arc=none smtp.client-ip=202.12.124.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
-	by mailfout.stl.internal (Postfix) with ESMTP id E89E71D0003A;
-	Wed,  8 Apr 2026 04:25:05 -0400 (EDT)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-06.internal (MEProxy); Wed, 08 Apr 2026 04:25:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1775636705; x=
-	1775723105; bh=bLVRMkiIK8Nf8+Lr2yPv9kdpziO/G9ty43AaymTwsF4=; b=j
-	C7gDanaiLbLtQjX/EE7XqSVybZEaeyF8dbFJDPR6mFDlhenqbT4K9wIIeKq4rS1l
-	ek8Qlyddc7oX1asNmxEDyRIJ8Lzz+xMK+NQ9ptnA5r97xLqNbIZOUUGToZtSclKi
-	bECp7XHcMHP+UX5kWgBEfr/0Zqt+X/cm6PJkR1MFPFeyHA/WjlTPZ7+1JIPpW5Ts
-	YyKvMnZBz3t2PoJR1kqejfsOD3OgUA2rpv1yjxDp0nq0TUqvGvptAIXlosw6XhWZ
-	j2R56YHtOI+6YZ6oMBrv5VqpDIDdZwGj1CueSvVmnYazzY3ePGsmA8Ry1W1Erl4/
-	nw5xwAj+isOJMMNqS1tpQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1775636705; x=1775723105; bh=bLVRMkiIK8Nf8+Lr2yPv9kdpziO/G9ty43A
-	aymTwsF4=; b=ngr0rp/bYoNaDiyJSGMJW0YhlgkjL7nbYY2fVIekBbArY7oSJu6
-	eL9QoCosXNXimEZvzZ1OJ9FOJwq7kJR6lCneLgObxg5WOhnbHD5imkPkcSJkumzS
-	4C+uPVBnbiPMBW27WoaJ78VncQfVaV+aX4jFfiAWCiyjJOhhPs8sQPIAztG7t2bZ
-	ZA3+zkmXClE1sDxv/0KQH/jkrnyP6FcIWWog8JV2un4AS4EMxFfc3ocFi833u12U
-	EAduqke32bJVD3p3SvHXAJgPhkds1dMffdZ+4BgY6e7zoDpky3aq0Hk92gQDnHfU
-	eQhB5lDV9ymHokkjvHnyXRTsd4W1Y3vRmbw==
-X-ME-Sender: <xms:4BDWaUBoS-uOmRfjlRShhpVkll_8OFfnDOdanuNIzPSvDmXiH139aw>
-    <xme:4BDWaYEgc7zcFeRE7dwkEJrpvnjoA74IfLoycIELv5QGJfyS0Zf8bybPTpXpOYE4h
-    5GyLgSqVdm1Yb8zofLUHdbW4vYVFLZfNGA2Gr7EYvwuXOqvvHA4r9w>
-X-ME-Received: <xmr:4BDWaW1Tr8frlQmxrANLMpdEwx4jbuQEMEvDrTMxx43EIW_nf7wKsKhQHpif>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgddvfedtkecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpeffhffvvefukfhfgggtuggjsehttdertddttdejnecuhfhrohhmpefurggsrhhinhgr
-    ucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrihhlrdhnvghtqeenucggtffrrg
-    htthgvrhhnpeeuhffhfffgfffhfeeuiedugedtfefhkeegteehgeehieffgfeuvdeuffef
-    gfduffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    hsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghrtghpthhtohepuddvpdhmohgu
-    vgepshhmthhpohhuthdprhgtphhtthhopegtrhgrthhiuhesnhhvihguihgrrdgtohhmpd
-    hrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopegrnhgu
-    rhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggrvh
-    gvmhhlohhfthdrnhgvthdprhgtphhtthhopehlihhnuhigqdhkshgvlhhfthgvshhtsehv
-    ghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepughtrghtuhhlvggrsehnvhhiug
-    hirgdrtghomhdprhgtphhtthhopehshhhurghhsehkvghrnhgvlhdrohhrghdprhgtphht
-    thhopehsughfsehfohhmihgthhgvvhdrmhgvpdhrtghpthhtohepkhhusggrsehkvghrnh
-    gvlhdrohhrgh
-X-ME-Proxy: <xmx:4BDWaRNFFSRH7NskaXGn3J5HnsQeZFja3T-IFEp3yDY1gJ853l8dhQ>
-    <xmx:4BDWaeaIOmoBPNdmuNYbO8lua_hDawrl2e5WyU_rAT1UY4Y2JUZuaA>
-    <xmx:4BDWaXxsXczY_jJ1nsUgzwszbSHb0V3QRJzOO16M6e3naNyaGfvtYQ>
-    <xmx:4BDWaVO6fvqlEZyE3c4fabMwJMpG_3giBesmMiODzxnyUb2jxJxTlg>
-    <xmx:4RDWaTwuYFI4A2_i2tioIj7PPMUrMLCzuXgwiqJba6eKu-0WldLiTYoz>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 8 Apr 2026 04:25:03 -0400 (EDT)
-Date: Wed, 8 Apr 2026 10:25:00 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Cosmin Ratiu <cratiu@nvidia.com>
-Cc: "pabeni@redhat.com" <pabeni@redhat.com>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-	Dragos Tatulea <dtatulea@nvidia.com>,
-	"shuah@kernel.org" <shuah@kernel.org>,
-	"sdf@fomichev.me" <sdf@fomichev.me>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"horms@kernel.org" <horms@kernel.org>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH net v6 4/4] macsec: Support VLAN-filtering lower devices
-Message-ID: <adYQ3OMfEEWFTd7X@krikkit>
-References: <20260330130130.989236-1-cratiu@nvidia.com>
- <20260330130130.989236-5-cratiu@nvidia.com>
- <ac6BsG4IhAajip1s@krikkit>
- <e2eefeb7033caa859551834d3448a77b7af3c7d4.camel@nvidia.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ipzlrVPpVeKKI5jGVDPaJk4ZS6KFCG5TlxrpLZeqtcadRpEdvoGDotiu2lJiiGm7uW7qQbow9G8F3iYGTuIUwKX3HmxuXqCyRp6P4EOg5UB50JE9lqTqrJsqGytour4R8ykENJcM6xwu8R6CKFSBMe/8l3x02agaS6IAXq1ZllI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=idfZ0HeG; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=R7K2mlr3; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1775636907;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3ANYxXRPm7mcXJAwc8SfGf0BegLgl/O90UoI4kqmm5Q=;
+	b=idfZ0HeGdneUx2rtyWkFQCNZ40JUIyCyJK/JeF56xCMotsdd7tEC7I3o72/RqMkb6j4DDt
+	Pc/XVJNkXDbCc7YDSOs2yLtoOaJrHP4NIow5mQUiDGYLoXAAYtD89QOVteaiN5rm5PsNTx
+	7B0gBci+vJniFQROB86GCwsbiPhYBjE=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-664-ArhfzcyePf2gHvPgRlUMnA-1; Wed, 08 Apr 2026 04:28:25 -0400
+X-MC-Unique: ArhfzcyePf2gHvPgRlUMnA-1
+X-Mimecast-MFC-AGG-ID: ArhfzcyePf2gHvPgRlUMnA_1775636905
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-43d03bad787so6156686f8f.1
+        for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 01:28:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1775636904; x=1776241704; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=3ANYxXRPm7mcXJAwc8SfGf0BegLgl/O90UoI4kqmm5Q=;
+        b=R7K2mlr3fhjY9JrWDvBukW4sALgNe3ggKwerrhiF71bZQ6hUwNU9nkkLMCNG6PxZZl
+         mZtvIydpIlQYIJg83kcANR5J3++gdQEpdsXE6tSTt9c9jP60oKNG/ztMgMe/bl4P9q8c
+         CN8s6zjU/vCVCNelO2+v/JKKFpxrv/c0xcX7Wbmy28xai9a4n2EE/Vy7tBLkZpvX3cwf
+         MQcePhs2FL04xwxzijQ/Q8KSxFfzqJtGWx8vPsdPXFfneGjzyy5RBKA9l4tDXeVNmcKK
+         wAIAL1tcU4L9ks8NNbvlRDmmKNfxkLV4HMW59DhZnzUgtD2Lptjw72EaH1WA7/ARR8NO
+         CnwQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775636904; x=1776241704;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3ANYxXRPm7mcXJAwc8SfGf0BegLgl/O90UoI4kqmm5Q=;
+        b=G3AIMQhwJa1dB3qoVHbUO7p3dJMxZvnd/mGVWCHKIc+O4E8+mOz71hdck8SyWt8Uat
+         g0mYMc5PHYxOp5Ib3iJPGabAfSP5lqVnAGReAAT++uTcpD3GcXzrP9EwrCFmGtbHc3Z5
+         hqjYmz8dXNSmMAuyF5vfMKkIl047NeDoaoDlwROgkUvohg0LmSPMxs3uaYuEeK/Q359O
+         DFWwTwIv/BAjljAQ9Ag115vGNAlmgb03dt6eB0Gua3nmPbBrqbxXvcLw+8LsoQ3dhKHf
+         Q3khFRTqpRHLqM4h8yS3Xtz99R7Vx0z5HhgnSir5jqc/9+E894qG2y2JZZryxa8ghY5B
+         SqOw==
+X-Forwarded-Encrypted: i=1; AJvYcCX4A7Jo8u5DxEo74gLcq6ftrgcqpEMjAAV8q+YOwoR0XXG7eKO9nOp8i+6vkwAYoY70e6E44Uc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YywzSqRWXZWM8VRK9bkf5s4D4NdEYLftaY7t07LIcYaiZ/ZlWYi
+	o8R4GKskIfzWipm634pvXNDLdTT9puHsOh7cK5vm5bjbZpRANkdYHbnuSxadda0V3QSSoLkG/FN
+	uoIkDWnAR2NI6tcCdGG7WFfHKXMSBQcmzzdj2EDCp3M+2q0ZG3kWFzYD6yg==
+X-Gm-Gg: AeBDieu5zttOt+mlleqa2ZqcXY19vZMcqWRyfO1akLk4ysNFfdC5FCEUEcjtU64TkYx
+	L6Y0F01sSxtOI7Pj4534GqA8zmChGkUZo2HzNOpp0FLlpRBgN4NC5SO+AMidnuZpP2Dsk7yr4mD
+	aR01CLPScxNFiJAO3Gl0kXsXmEOCumS/NpM9MLn2LYJuC8zdNwyq8goSSuA/XBGxmsINDGC5bmo
+	4sYz/D+0K7ezFLOYZh6MUMDUVX8Pb65brbP1wUsIzgyj36SC4vmztDSmV34u6lTOeyoSYx2qtJL
+	MjBFYERELSoLHgNqKEK2KesS2YWjN2SouctN0YKicVQKYbY54auiIIEAGFNOnsDfmqabUeo+rxU
+	ie09ow458pM7Gs2yqqBwZ
+X-Received: by 2002:a05:6000:1789:b0:43d:1bf6:30f7 with SMTP id ffacd0b85a97d-43d2927716bmr28411489f8f.18.1775636904371;
+        Wed, 08 Apr 2026 01:28:24 -0700 (PDT)
+X-Received: by 2002:a05:6000:1789:b0:43d:1bf6:30f7 with SMTP id ffacd0b85a97d-43d2927716bmr28411443f8f.18.1775636903838;
+        Wed, 08 Apr 2026 01:28:23 -0700 (PDT)
+Received: from localhost ([2a01:e11:1007:ea0:8374:5c74:dd98:a7b2])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43d1e2c5419sm66685938f8f.11.2026.04.08.01.28.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Apr 2026 01:28:22 -0700 (PDT)
+Date: Wed, 8 Apr 2026 10:28:21 +0200
+From: Davide Caratti <dcaratti@redhat.com>
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Xiang Mei <xmei5@asu.edu>,
+	netdev@vger.kernel.org, Victor Nogueira <victor@mojatatu.com>
+Subject: Re: [PATCH net v2] net/sched: cls_fw: fix NULL dereference of "old"
+ filters before change()
+Message-ID: <adYRpRrnIdUnglAy@dcaratti.users.ipa.redhat.com>
+References: <dcd085bd504ec1d0698690e08e2e1c4d0edff8e4.1775232030.git.dcaratti@redhat.com>
+ <CAM0EoMm2MpiZ-Rn7PVE8rYq8bOkrqs+0PAjuLi23iLN6Eih2sg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -119,95 +116,81 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <e2eefeb7033caa859551834d3448a77b7af3c7d4.camel@nvidia.com>
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAM0EoMm2MpiZ-Rn7PVE8rYq8bOkrqs+0PAjuLi23iLN6Eih2sg@mail.gmail.com>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm3,messagingengine.com:s=fm2];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-276353-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	DMARC_NA(0.00)[queasysnail.net];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-276354-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.999];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dcaratti@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[queasysnail.net:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,messagingengine.com:dkim]
-X-Rspamd-Queue-Id: 477E43B8FA7
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,dcaratti.users.ipa.redhat.com:mid]
+X-Rspamd-Queue-Id: B4D9D3B9160
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-2026-04-07, 15:07:47 +0000, Cosmin Ratiu wrote:
-> On Thu, 2026-04-02 at 16:48 +0200, Sabrina Dubroca wrote:
-> > If this happens on a real device, the VLAN filters will be broken.
-> > I'm
-> > not sure what the right behavior would be:
-> > 
-> > 1. reject the request to enable offload
-> > 2. switch to promiscuous mode
+On Fri, Apr 03, 2026 at 02:59:22PM -0400, Jamal Hadi Salim wrote:
+> On Fri, Apr 3, 2026 at 12:04 PM Davide Caratti <dcaratti@redhat.com> wrote:
+> >
+> > Like pointed out by Sashiko [1],
 > 
-> I implemented and tested option 1. In the unlikely scenario adding VLAN
-> filters prevents offloading
+> Just found out about this ;-> So bye-bye old AI? ;->
+> I must say, finding this specific bug is impressive.
 
-How unlikely is it? Resource allocation, talking to HW, device limits,
-anything else that could fail?
+[...] 
 
-> , it's better for the driver to be explicit
-> and let the user turn on promisc mode themselves. Keeping track of
-> whether VLAN filters failed and promisc was used as a fallback adds
-> some extra complexity.
+> Observation on consistency pov:
+> You will always get a "q" when you invoke tcf_block_q() if there are
+> no shared blocks attached. But that doesnt mean the "create"
+> configuration is complete; it is only complete if step 3 above
+> completes. This is because we are not sure if change() will result in
+> "old" or "new" lookup setup. So the check you added for q may be
+> inconsistent from that perspective and fw should have returned -1 like
+> all classifiers...
 
-If it's indeed (very) unlikely, sure. There's still a bit of a
-regression/change of behavior for users compared to before the
-IFF_UNICAST_FLT patch, but I think we can wait until someone
-complains, and then add the tracking if that happens.
+"Hello Jamal, you are absolutely right! (emoji with fire) However, ..."  :)
 
-> What would be the point of IFF_UNICAST_FLT then?
+> I cant think of a simple solution to verify if the config is
+> "inconsistent" other than to add something that gets checked in the
+> datapath (and when absent, return -1)
 
-The point is that this would just be a fallback.
+^^ This. Specifically for cls_fw, that would mean converting fw_change() to
+allocate some control data also for the "old" uapi, and I think it's too
+much effort for the legacy.
 
-> Please let me know if you agree with this approach, so I can send v8
-> with it.
+IIUC the inconsistent behavior is: for a small amount of time, fwmark
+classifier used in the "old" way would classify also when the filter's
+'handle' is not zero.
 
-If you can confirm it's on the "very unlikely" side, yes, this
-approach sounds ok. Thanks.
+> From that perspective, your check is not catastrophic, so it may be ok.
+> At minimal the Fixes: needs to change to Vlads commit? Good news is
+> only fw _seems_ to suffer from this challenge...
 
-> > OTOH maybe we don't need to care, since __netdev_update_features also
-> > (kind of) ignores those errors:
-> > 
-[...]
-> 
-> Well, in this case we have the chance to do something nicer (even
-> proper error message back to the user via extack) for a small
-
-(That reminds me I have a branch of "macsec: add extack to X" patches
-I still need to polish and submit. I don't think I'll get to it before
-the merge window opens, I'll rebase on top of your changes.)
-
-> complexity cost. Perhaps the VLAN filter handling could be improved
-> separately.
-
-I'm not sure if this would be an "improvement to VLAN filter handling"
-or a "(breaking) change of user-visible behavior". Probably
-improvement. Or maybe it's "unlikely enough" that nobody has ever
-cared.
+This is also what I understood by reading the code. Sure, I will edit
+the Fixes: tag. Thanks for reading!
 
 -- 
-Sabrina
+davide
+
 
