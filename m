@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-276429-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276430-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qMAmORwu1mkUBggAu9opvQ
-	(envelope-from <netdev+bounces-276429-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 12:29:48 +0200
+	id 0LfyNPct1mkUBggAu9opvQ
+	(envelope-from <netdev+bounces-276430-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 12:29:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AB913BA877
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 12:29:48 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 590B63BA869
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 12:29:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9EFF530474FF
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 10:27:47 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B2192304D65F
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 10:28:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4809F33B95C;
-	Wed,  8 Apr 2026 10:27:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD1453B4E8C;
+	Wed,  8 Apr 2026 10:27:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BE/MhhMn"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PYknsaXV"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BD493ACF04
-	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 10:27:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDBA031355C
+	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 10:27:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775644056; cv=none; b=Dp0p9j5mh1LfsWeAvmsihe6dusrYbhzEgp5XOuslYHxrhCztoqBBw925NbdQPDH1j7wLNk3SnQH3hkVk9maCS5AjeXq5PuDsC5IjYVCjJ2+oOI8bcNH1Ax0lcoX2TteLHW3RaEIZoDMqXoui14v6oXkeyu3lOMyHQbiuhiTegn8=
+	t=1775644062; cv=none; b=F+GimVDSxRTYThQhQ1nmS/zP9HJ2s2FPX6Dqy3+ssIevUH16gU4uDzrZVom+G/pyNR1ktyoDGxZqlGNgOogmIXinIjh6KhtFbfFh1KBXTNANg6lJ+3lImZ8R4gNH3Sw8tfOKsXgS7vduBThb1MPpoyoN4+614++GlWZBwOHLHD0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775644056; c=relaxed/simple;
-	bh=/TMTBhvG+uzcotDbZuUIqJSoP17tR1a5rG62u4WRWN0=;
+	s=arc-20240116; t=1775644062; c=relaxed/simple;
+	bh=3HZRFMvUKEq+J3DdvK7cO6drfHZkWhOiTpuvEayoMKM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JTH/XxMFqqYKYSxVTHPa0hGWoxTd9Bas78j2Vm/5W0oXzwbrzS1oNyynw9dFacMITdLRaLFq9KEwMCKNENRvHuKVH/VUP/YSc0Nlcx9vuBcME6hj0Iqs4uvOYjtg3DwknX2C0TfCA160lTLI/aPFV1iJ+wTP0m8H9fPAq11zw98=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BE/MhhMn; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=V6aY4JFG/0ulHXCHKgDQ/v6k4jHqyZTlH7HcH/gt7z5AXEXPUZHfXephqtfR5EKnzJfdKOvhKVGlFQ+ZfJtId3TzT/zp8XDqWlQknrUkzrxcUR6DtluXRW9taSH3EL6YiGBXjhcnFzU22IafrgR6MP6iObtsWniaaa0UE8olOdg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PYknsaXV; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1775644052;
+	s=mimecast20190719; t=1775644058;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=izU+b/U24VNCz2praBIbmxPwGnkfEjYjxLN3nOBgzl0=;
-	b=BE/MhhMnxPxUVZFgu6/gwD9l5/SgL+O0iHFPcpcjuTnoFEpSquFLiMlhbebEHDz/ajlTGG
-	aD73S6F35QwHGxd/QGZLejNCZnL9KpfF5iKUNVeOY3qUqiQrCDosO20H+0rYEJnTFwRHue
-	feXBbGNtHgt72xk2Ak43r5wwLhtwg7I=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+	bh=3t6vOiGgKPHOQid3urPH1HJ7qKKbG2z5fOFum5AzWr0=;
+	b=PYknsaXVLd/VHH+weRwqCvX0yS61VuDdOUnefCMaHw5PJREjmRzd31Bu3r0rHvuTwjU2tI
+	d+LLKbWbjJyMpCVHgP1bJNxyZD/7D7e2neNaJVZSfKuahIXC2y0BzSlDK5vO8GcwguqlN9
+	z9gbhwT5kTxC8GF9t/zVVJIPr+jNeUk=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-7-ueD-H4YPN4GtliofmGM6KA-1; Wed,
- 08 Apr 2026 06:27:28 -0400
-X-MC-Unique: ueD-H4YPN4GtliofmGM6KA-1
-X-Mimecast-MFC-AGG-ID: ueD-H4YPN4GtliofmGM6KA_1775644046
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-532-BFWNI-JjMrOxuL4OwFzhfA-1; Wed,
+ 08 Apr 2026 06:27:33 -0400
+X-MC-Unique: BFWNI-JjMrOxuL4OwFzhfA-1
+X-Mimecast-MFC-AGG-ID: BFWNI-JjMrOxuL4OwFzhfA_1775644051
 Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6D92C1956094;
-	Wed,  8 Apr 2026 10:27:26 +0000 (UTC)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2010A1956068;
+	Wed,  8 Apr 2026 10:27:31 +0000 (UTC)
 Received: from p16v.redhat.com (unknown [10.44.48.188])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5C3DB300019F;
-	Wed,  8 Apr 2026 10:27:22 +0000 (UTC)
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id D4876300019F;
+	Wed,  8 Apr 2026 10:27:26 +0000 (UTC)
 From: Ivan Vecera <ivecera@redhat.com>
 To: netdev@vger.kernel.org
 Cc: Petr Oros <poros@redhat.com>,
@@ -75,9 +75,9 @@ Cc: Petr Oros <poros@redhat.com>,
 	Rob Herring <robh@kernel.org>,
 	devicetree@vger.kernel.org,
 	Pasi Vaananen <pvaanane@redhat.com>
-Subject: [PATCH net-next v3 1/5] dpll: zl3073x: clean up esync get/set and use zl3073x_out_is_ndiv()
-Date: Wed,  8 Apr 2026 12:27:12 +0200
-Message-ID: <20260408102716.443099-2-ivecera@redhat.com>
+Subject: [PATCH net-next v3 2/5] dpll: zl3073x: use FIELD_MODIFY() for clear-and-set patterns
+Date: Wed,  8 Apr 2026 12:27:13 +0200
+Message-ID: <20260408102716.443099-3-ivecera@redhat.com>
 In-Reply-To: <20260408102716.443099-1-ivecera@redhat.com>
 References: <20260408102716.443099-1-ivecera@redhat.com>
 Precedence: bulk
@@ -94,7 +94,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -103,7 +103,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-276429-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-276430-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[redhat.com:+];
 	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -113,174 +113,95 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev,dt];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,microchip.com:email]
-X-Rspamd-Queue-Id: 7AB913BA877
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,microchip.com:email]
+X-Rspamd-Queue-Id: 590B63BA869
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Return -EOPNOTSUPP early in esync_get callbacks when esync is not
-supported instead of conditionally populating the range at the end.
-This simplifies the control flow by removing the finish label/goto
-in the output variant and the conditional range assignment in both
-input and output variants.
-
-Replace open-coded N-div signal format switch statements with
-zl3073x_out_is_ndiv() helper in esync_get, esync_set and
-frequency_set callbacks.
+Replace open-coded clear-and-set bitfield operations with
+FIELD_MODIFY().
 
 Reviewed-by: Petr Oros <poros@redhat.com>
 Reviewed-by: Prathosh Satish <Prathosh.Satish@microchip.com>
 Signed-off-by: Ivan Vecera <ivecera@redhat.com>
 ---
- drivers/dpll/zl3073x/dpll.c | 64 ++++++++++++-------------------------
- 1 file changed, 20 insertions(+), 44 deletions(-)
+ drivers/dpll/zl3073x/chan.h  | 17 ++++++-----------
+ drivers/dpll/zl3073x/core.c  |  3 +--
+ drivers/dpll/zl3073x/flash.c |  3 +--
+ 3 files changed, 8 insertions(+), 15 deletions(-)
 
-diff --git a/drivers/dpll/zl3073x/dpll.c b/drivers/dpll/zl3073x/dpll.c
-index d788ca45a17e5..445f4bccb9aab 100644
---- a/drivers/dpll/zl3073x/dpll.c
-+++ b/drivers/dpll/zl3073x/dpll.c
-@@ -133,6 +133,12 @@ zl3073x_dpll_input_pin_esync_get(const struct dpll_pin *dpll_pin,
- 	ref_id = zl3073x_input_pin_ref_get(pin->id);
- 	ref = zl3073x_ref_state_get(zldev, ref_id);
- 
-+	if (!pin->esync_control || zl3073x_ref_freq_get(ref) <= 1)
-+		return -EOPNOTSUPP;
-+
-+	esync->range = esync_freq_ranges;
-+	esync->range_num = ARRAY_SIZE(esync_freq_ranges);
-+
- 	switch (FIELD_GET(ZL_REF_SYNC_CTRL_MODE, ref->sync_ctrl)) {
- 	case ZL_REF_SYNC_CTRL_MODE_50_50_ESYNC_25_75:
- 		esync->freq = ref->esync_n_div == ZL_REF_ESYNC_DIV_1HZ ? 1 : 0;
-@@ -144,17 +150,6 @@ zl3073x_dpll_input_pin_esync_get(const struct dpll_pin *dpll_pin,
- 		break;
- 	}
- 
--	/* If the pin supports esync control expose its range but only
--	 * if the current reference frequency is > 1 Hz.
--	 */
--	if (pin->esync_control && zl3073x_ref_freq_get(ref) > 1) {
--		esync->range = esync_freq_ranges;
--		esync->range_num = ARRAY_SIZE(esync_freq_ranges);
--	} else {
--		esync->range = NULL;
--		esync->range_num = 0;
--	}
--
- 	return 0;
+diff --git a/drivers/dpll/zl3073x/chan.h b/drivers/dpll/zl3073x/chan.h
+index e0f02d3432086..481da2133202b 100644
+--- a/drivers/dpll/zl3073x/chan.h
++++ b/drivers/dpll/zl3073x/chan.h
+@@ -66,8 +66,7 @@ static inline u8 zl3073x_chan_ref_get(const struct zl3073x_chan *chan)
+  */
+ static inline void zl3073x_chan_mode_set(struct zl3073x_chan *chan, u8 mode)
+ {
+-	chan->mode_refsel &= ~ZL_DPLL_MODE_REFSEL_MODE;
+-	chan->mode_refsel |= FIELD_PREP(ZL_DPLL_MODE_REFSEL_MODE, mode);
++	FIELD_MODIFY(ZL_DPLL_MODE_REFSEL_MODE, &chan->mode_refsel, mode);
  }
  
-@@ -599,8 +594,8 @@ zl3073x_dpll_output_pin_esync_get(const struct dpll_pin *dpll_pin,
- 	struct zl3073x_dpll_pin *pin = pin_priv;
- 	const struct zl3073x_synth *synth;
- 	const struct zl3073x_out *out;
-+	u32 synth_freq, out_freq;
- 	u8 clock_type, out_id;
--	u32 synth_freq;
- 
- 	out_id = zl3073x_output_pin_out_get(pin->id);
- 	out = zl3073x_out_state_get(zldev, out_id);
-@@ -609,17 +604,19 @@ zl3073x_dpll_output_pin_esync_get(const struct dpll_pin *dpll_pin,
- 	 * for N-division is also used for the esync divider so both cannot
- 	 * be used.
- 	 */
--	switch (zl3073x_out_signal_format_get(out)) {
--	case ZL_OUTPUT_MODE_SIGNAL_FORMAT_2_NDIV:
--	case ZL_OUTPUT_MODE_SIGNAL_FORMAT_2_NDIV_INV:
-+	if (zl3073x_out_is_ndiv(out))
- 		return -EOPNOTSUPP;
--	default:
--		break;
--	}
- 
- 	/* Get attached synth frequency */
- 	synth = zl3073x_synth_state_get(zldev, zl3073x_out_synth_get(out));
- 	synth_freq = zl3073x_synth_freq_get(synth);
-+	out_freq = synth_freq / out->div;
-+
-+	if (!pin->esync_control || out_freq <= 1)
-+		return -EOPNOTSUPP;
-+
-+	esync->range = esync_freq_ranges;
-+	esync->range_num = ARRAY_SIZE(esync_freq_ranges);
- 
- 	clock_type = FIELD_GET(ZL_OUTPUT_MODE_CLOCK_TYPE, out->mode);
- 	if (clock_type != ZL_OUTPUT_MODE_CLOCK_TYPE_ESYNC) {
-@@ -627,11 +624,11 @@ zl3073x_dpll_output_pin_esync_get(const struct dpll_pin *dpll_pin,
- 		esync->freq = 0;
- 		esync->pulse = 0;
- 
--		goto finish;
-+		return 0;
- 	}
- 
- 	/* Compute esync frequency */
--	esync->freq = synth_freq / out->div / out->esync_n_period;
-+	esync->freq = out_freq / out->esync_n_period;
- 
- 	/* By comparing the esync_pulse_width to the half of the pulse width
- 	 * the esync pulse percentage can be determined.
-@@ -640,18 +637,6 @@ zl3073x_dpll_output_pin_esync_get(const struct dpll_pin *dpll_pin,
- 	 */
- 	esync->pulse = (50 * out->esync_n_width) / out->div;
- 
--finish:
--	/* Set supported esync ranges if the pin supports esync control and
--	 * if the output frequency is > 1 Hz.
--	 */
--	if (pin->esync_control && (synth_freq / out->div) > 1) {
--		esync->range = esync_freq_ranges;
--		esync->range_num = ARRAY_SIZE(esync_freq_ranges);
--	} else {
--		esync->range = NULL;
--		esync->range_num = 0;
--	}
--
- 	return 0;
+ /**
+@@ -77,8 +76,7 @@ static inline void zl3073x_chan_mode_set(struct zl3073x_chan *chan, u8 mode)
+  */
+ static inline void zl3073x_chan_ref_set(struct zl3073x_chan *chan, u8 ref)
+ {
+-	chan->mode_refsel &= ~ZL_DPLL_MODE_REFSEL_REF;
+-	chan->mode_refsel |= FIELD_PREP(ZL_DPLL_MODE_REFSEL_REF, ref);
++	FIELD_MODIFY(ZL_DPLL_MODE_REFSEL_REF, &chan->mode_refsel, ref);
  }
  
-@@ -677,13 +662,8 @@ zl3073x_dpll_output_pin_esync_set(const struct dpll_pin *dpll_pin,
- 	 * for N-division is also used for the esync divider so both cannot
- 	 * be used.
- 	 */
--	switch (zl3073x_out_signal_format_get(&out)) {
--	case ZL_OUTPUT_MODE_SIGNAL_FORMAT_2_NDIV:
--	case ZL_OUTPUT_MODE_SIGNAL_FORMAT_2_NDIV_INV:
-+	if (zl3073x_out_is_ndiv(&out))
- 		return -EOPNOTSUPP;
--	default:
--		break;
+ /**
+@@ -110,13 +108,10 @@ zl3073x_chan_ref_prio_set(struct zl3073x_chan *chan, u8 ref, u8 prio)
+ {
+ 	u8 *val = &chan->ref_prio[ref / 2];
+ 
+-	if (!(ref & 1)) {
+-		*val &= ~ZL_DPLL_REF_PRIO_REF_P;
+-		*val |= FIELD_PREP(ZL_DPLL_REF_PRIO_REF_P, prio);
+-	} else {
+-		*val &= ~ZL_DPLL_REF_PRIO_REF_N;
+-		*val |= FIELD_PREP(ZL_DPLL_REF_PRIO_REF_N, prio);
 -	}
++	if (!(ref & 1))
++		FIELD_MODIFY(ZL_DPLL_REF_PRIO_REF_P, val, prio);
++	else
++		FIELD_MODIFY(ZL_DPLL_REF_PRIO_REF_N, val, prio);
+ }
  
- 	/* Select clock type */
- 	if (freq)
-@@ -745,9 +725,9 @@ zl3073x_dpll_output_pin_frequency_set(const struct dpll_pin *dpll_pin,
- 	struct zl3073x_dev *zldev = zldpll->dev;
- 	struct zl3073x_dpll_pin *pin = pin_priv;
- 	const struct zl3073x_synth *synth;
--	u8 out_id, signal_format;
- 	u32 new_div, synth_freq;
- 	struct zl3073x_out out;
-+	u8 out_id;
+ /**
+diff --git a/drivers/dpll/zl3073x/core.c b/drivers/dpll/zl3073x/core.c
+index cb47a5db061aa..5f1e70f3e40a0 100644
+--- a/drivers/dpll/zl3073x/core.c
++++ b/drivers/dpll/zl3073x/core.c
+@@ -805,8 +805,7 @@ int zl3073x_dev_phase_avg_factor_set(struct zl3073x_dev *zldev, u8 factor)
+ 	value = (factor + 1) & 0x0f;
  
- 	out_id = zl3073x_output_pin_out_get(pin->id);
- 	out = *zl3073x_out_state_get(zldev, out_id);
-@@ -757,12 +737,8 @@ zl3073x_dpll_output_pin_frequency_set(const struct dpll_pin *dpll_pin,
- 	synth_freq = zl3073x_synth_freq_get(synth);
- 	new_div = synth_freq / (u32)frequency;
+ 	/* Update phase measurement control register */
+-	dpll_meas_ctrl &= ~ZL_DPLL_MEAS_CTRL_AVG_FACTOR;
+-	dpll_meas_ctrl |= FIELD_PREP(ZL_DPLL_MEAS_CTRL_AVG_FACTOR, value);
++	FIELD_MODIFY(ZL_DPLL_MEAS_CTRL_AVG_FACTOR, &dpll_meas_ctrl, value);
+ 	rc = zl3073x_write_u8(zldev, ZL_REG_DPLL_MEAS_CTRL, dpll_meas_ctrl);
+ 	if (rc)
+ 		return rc;
+diff --git a/drivers/dpll/zl3073x/flash.c b/drivers/dpll/zl3073x/flash.c
+index 83452a77e3e98..f85535c8ad246 100644
+--- a/drivers/dpll/zl3073x/flash.c
++++ b/drivers/dpll/zl3073x/flash.c
+@@ -194,8 +194,7 @@ zl3073x_flash_cmd_wait(struct zl3073x_dev *zldev, u32 operation,
+ 	if (rc)
+ 		return rc;
  
--	/* Get used signal format for the given output */
--	signal_format = zl3073x_out_signal_format_get(&out);
--
- 	/* Check signal format */
--	if (signal_format != ZL_OUTPUT_MODE_SIGNAL_FORMAT_2_NDIV &&
--	    signal_format != ZL_OUTPUT_MODE_SIGNAL_FORMAT_2_NDIV_INV) {
-+	if (!zl3073x_out_is_ndiv(&out)) {
- 		/* For non N-divided signal formats the frequency is computed
- 		 * as division of synth frequency and output divisor.
- 		 */
+-	value &= ~ZL_WRITE_FLASH_OP;
+-	value |= FIELD_PREP(ZL_WRITE_FLASH_OP, operation);
++	FIELD_MODIFY(ZL_WRITE_FLASH_OP, &value, operation);
+ 
+ 	rc = zl3073x_write_u8(zldev, ZL_REG_WRITE_FLASH, value);
+ 	if (rc)
 -- 
 2.52.0
 
