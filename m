@@ -1,184 +1,255 @@
-Return-Path: <netdev+bounces-276568-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276569-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0OzbJXJn1mnIEwgAu9opvQ
-	(envelope-from <netdev+bounces-276568-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 16:34:26 +0200
+	id yBtIBlNp1mnIEwgAu9opvQ
+	(envelope-from <netdev+bounces-276569-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 16:42:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1F3E3BDB5D
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 16:34:25 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DE3A3BDCD1
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 16:42:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E50AC3041A41
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 14:30:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 42F4530479C9
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 14:37:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6036B3D3CEA;
-	Wed,  8 Apr 2026 14:30:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 742013D34BE;
+	Wed,  8 Apr 2026 14:37:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bynar.io header.i=@bynar.io header.b="mjeHsqKb"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ICsoz/FS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E199538C40D
-	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 14:30:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DAD72EA75E
+	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 14:37:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775658619; cv=none; b=mdEqlsfQdwK5rup3kArhstOGLzyAjWLn2eBDMk4EUp3U09MoHIFECSt/A73Nwv6TC3nmnGqD/sixQ9hfPzXLE8R8p5KwkkbzthOPmVn+NjnXm8Rmw2vzNETXGsze//ngc0WKzvxPufqzsl0YXOstGISrg5LbGBBlabDUrj96Vjs=
+	t=1775659026; cv=none; b=b5UTIC7D3yO4Cx5ilqtDWmNnGwqymml8oGq9WmFwG+qcQUUSWfgOe/niV4jaIs1x7hPHd881mPx2zyYaEVMpRC5JXk5vibOKZQsskmS+D/7dBdrNVAW+/2q2tEyvZ7xeH7Z2L7vn65z3UpqoJJFfNd4ZYc1dhbZpfRZjATLhZgQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775658619; c=relaxed/simple;
-	bh=Dst2DCgKMi9ug9DAPIQMYn4cHFxcuH3mfRheLIsl7gY=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=tg/LQExwSlVaeUVrPrKVWm8DCoOCV6tdiH5piIrLdqPv5EEfFWSeHhfmFVDgLXHb6RK31JqA3ZmYZJaH1OyVr6uvMVaRonA4m+WMtFz4JKlhIsX8+pBFDzXkRvj15WkQdVvkvN0FShTaCspsvqGGqOJ6/H0Ntla+8Jh3gQ38SE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bynar.io; spf=pass smtp.mailfrom=bynar.io; dkim=pass (2048-bit key) header.d=bynar.io header.i=@bynar.io header.b=mjeHsqKb; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bynar.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bynar.io
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-488a9033b2cso42449475e9.2
-        for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 07:30:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bynar.io; s=google; t=1775658616; x=1776263416; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kh5X8CvslI3qQg5feFgewpvEGHoeE9cEEW9PZC4zSTM=;
-        b=mjeHsqKbdymy5MFtoqLGSd9ngD1vnwXZcxAwsPzBIs5VVdJC3M3SSC//cqc2Y9i0kI
-         7k6R3egyKSMvR/5PkSQJWNJePGs7uTci0qJXLsY74sxzF/fyPwB7u0GM7b/TT1NUHA2X
-         0GWYAhe9WIzNzMBhFRhxMnnJRIQba3QpjAg3fB52xFmbbEPg6YWv2TSPT6XG92ykSwMe
-         sPuyex9IuTPciIPUysoZeplk+1L/jZjeX4Wm2aKPPqtdy+NrfrHwICk6uA5rwXXssy/M
-         A9vj2xBh2HKJ/jXgZpHY6Yk0dxNJVYUihWW7h6kFIUG4Y2xeQiq7ngxkH23VdWOMqJEa
-         2soA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775658616; x=1776263416;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=kh5X8CvslI3qQg5feFgewpvEGHoeE9cEEW9PZC4zSTM=;
-        b=dnn8s2UZIrIF3WSZ21xxIAfJWH9gR2lApRR45z0xMjy/5AMOf/NBi50KZNPp/rkXuo
-         TWkMsmsz4/mAlqUrZ5bb4zjiaG+IDgTPyWgBHBDxqaKdX6KIY5e3heE7aVPGYp48d1WN
-         /qTXJxhT7DtXYPy1HKQM/aif96JvZaF/sYefmROUsCWEwgUar3SYhbBJ1MHGF6JCfr+Y
-         9KlTXePN56Ln49ccN6cqUKyeqpxoT/kIa7Nt6b4v84BdVXnJb5EQ58iml1fcjxfkS9A5
-         YKgJW4DpTV52tgay+RbcwMX44PRLi7vIizdwIR4BDAvhjTt2HDJdq8uo27jet5yw3B11
-         q0Yg==
-X-Gm-Message-State: AOJu0YyFGr7CmbDdvCU99RBCpTcjle6VXQMpCFtl4cqZrHqCjRfHTKSR
-	gLYsrttDkuAUby1kyanVWWmJz52jDd1jKdp6gsCpq8qCwnGfzhP5bE49i7aKfS37BqzI8gOhe4Y
-	OZKOjsfBc
-X-Gm-Gg: AeBDiev4VJw9iRiYnugfRNO83s9iABU//MyCZqClG2QrLPkqai8ArN6GxX34FQqfOBn
-	3qEeHfeq01neButSXyDKN9His50ye6l1V2CdfTEDBRb996Y1wKb6Qr79QXFGRPebC2mS00SrHcG
-	LmzzW6LX38RczrBALbwJJ+VZAeao9UFewcmwl1PzzxPOe6K4pkHbk9ns4ghPxpPAMUaVDZHqGSe
-	g2iN9s0fj9GI+Pm5J42kfmDS0i2blhi5F/uLwwSts4O72TQBiz1WfvnqkP+3xgQJ+wcoRwGn/l1
-	sBxvTbqFGbe7n5P/EHxvaDZ4bmnbCQsVUmf+uREsNcIiYyGlKdAJ5yFjcXX7LpyssHxfxCm4pY2
-	wytGuMyjnWpZEOW9lCsac6C+DSIe3TgmCRKKApdP6Ulx989Pjr/7w/k2ObYFgRqKWiqgeYnKDAE
-	j9E33ZXTM7Q+4A9rNcdVH+nwz2T4Be6ZbRW25tFtC71OIIPQd233SEu4HH
-X-Received: by 2002:a05:600c:6216:b0:488:b9c6:11ba with SMTP id 5b1f17b1804b1-488b9c6139amr109175725e9.28.1775658615754;
-        Wed, 08 Apr 2026 07:30:15 -0700 (PDT)
-Received: from ?IPV6:2a06:61c2:d427:0:b321:1c7a:b072:326e? ([2a06:61c2:d427:0:b321:1c7a:b072:326e])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488c76c6205sm29691985e9.1.2026.04.08.07.30.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 Apr 2026 07:30:14 -0700 (PDT)
-Message-ID: <26ec626d-cae7-4418-9782-7198864d070c@bynar.io>
-Date: Wed, 8 Apr 2026 15:30:13 +0100
+	s=arc-20240116; t=1775659026; c=relaxed/simple;
+	bh=IUhysZK4W2qXCMl1fW44oRGcs+sPTEL9NuvLc4gvx6g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RlAaygJMVO7JUv2ZHPn54COl34LvDJMjktcrmD1EacXFLRyXY5UVX+naONb8pxnuFraPVNpgei7NYQSRhnCGkNZx4ltttSjRXZnqxpKtOuzqRE6REKcJ2sFFnv0Hy0IySbe3TU6vipGcHuWYk66RefgByRQ39TNCqOlqowpf01E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ICsoz/FS; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1775659023;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=quwf7Xdw+1im6FDZ/s8Zy1e44QdwrwkRmkySuIICqEk=;
+	b=ICsoz/FSGFXSe47XZ8RxL4H40OiTlQuaUvlT50DfZvcRWB8fmB8cgAa+JtupIEJxBwQoQ1
+	E84lA2706zLOM2T1dKbgZ8YBEDadyf7twTCvaG5qRjaqL5h4ji4oAGfnlRXHIbrrRsvmd3
+	GPOgz73V9P0Jw41IALtfmkLASY47G0E=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-150-f_FcHofSNReC5oz66TnTrg-1; Wed,
+ 08 Apr 2026 10:37:00 -0400
+X-MC-Unique: f_FcHofSNReC5oz66TnTrg-1
+X-Mimecast-MFC-AGG-ID: f_FcHofSNReC5oz66TnTrg_1775659019
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 29D2918005BE;
+	Wed,  8 Apr 2026 14:36:59 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.44.32.173])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id EC3BA300019F;
+	Wed,  8 Apr 2026 14:36:56 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Simon Horman <horms@kernel.org>
+Subject: [PATCH net-next v2] ipv6: move IFA_F_PERMANENT percpu allocation in process scope
+Date: Wed,  8 Apr 2026 16:36:49 +0200
+Message-ID: <46a7a030727e236af2dc7752994cd4f04f4a91d2.1775658924.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-GB
-To: netdev@vger.kernel.org
-Cc: socketcan@hartkopp.net, mkl@pengutronix.de, linux-kernel@vger.kernel.org,
- linux-can@vger.kernel.org
-From: Sam P <sam@bynar.io>
-Subject: [PATCH net] can: raw: fix ro->uniq use-after-free in raw_rcv()
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bynar.io,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[bynar.io:s=google];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[bynar.io:+];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-276568-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-276569-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sam@bynar.io,netdev@vger.kernel.org];
-	RCPT_COUNT_FIVE(0.00)[5];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,bynar.io:dkim,bynar.io:email,bynar.io:mid]
-X-Rspamd-Queue-Id: F1F3E3BDB5D
+	RCPT_COUNT_FIVE(0.00)[6];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6DE3A3BDCD1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-raw_release() unregisters raw CAN receive filters via can_rx_unregister(),
-but receiver deletion is deferred with call_rcu(). This leaves a window
-where raw_rcv() may still be running in an RCU read-side critical section
-after raw_release() frees ro->uniq, leading to a use-after-free of the
-percpu uniq storage.
+Observed at boot time:
 
-Move free_percpu(ro->uniq) out of raw_release() and into a raw-specific
-socket destructor. can_rx_unregister() takes an extra reference to the
-socket and only drops it from the RCU callback, so freeing uniq from
-sk_destruct ensures the percpu area is not released until the relevant
-callbacks have drained.
+ CPU: 43 UID: 0 PID: 3595 Comm: (t-daemon) Not tainted 6.12.0 #1
+ Call Trace:
+  <TASK>
+  dump_stack_lvl+0x4e/0x70
+  pcpu_alloc_noprof.cold+0x1f/0x4b
+  fib_nh_common_init+0x4c/0x110
+  fib6_nh_init+0x387/0x740
+  ip6_route_info_create+0x46d/0x640
+  addrconf_f6i_alloc+0x13b/0x180
+  addrconf_permanent_addr+0xd0/0x220
+  addrconf_notify+0x93/0x540
+  notifier_call_chain+0x5a/0xd0
+  __dev_notify_flags+0x5c/0xf0
+  dev_change_flags+0x54/0x70
+  do_setlink+0x36c/0xce0
+  rtnl_setlink+0x11f/0x1d0
+  rtnetlink_rcv_msg+0x142/0x3f0
+  netlink_rcv_skb+0x50/0x100
+  netlink_unicast+0x242/0x390
+  netlink_sendmsg+0x21b/0x470
+  __sys_sendto+0x1dc/0x1f0
+  __x64_sys_sendto+0x24/0x30
+  do_syscall_64+0x7d/0x160
+  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+ RIP: 0033:0x7f5c3852f127
+ Code: 0c 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b8 0f 1f 00 f3 0f 1e fa 80 3d 85 ef 0c 00 00 41 89 ca 74 10 b8 2c 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 71 c3 55 48 83 ec 30 44 89 4c 24 2c 4c 89 44
+ RSP: 002b:00007ffe86caf4c8 EFLAGS: 00000202 ORIG_RAX: 000000000000002c
+ RAX: ffffffffffffffda RBX: 0000556c5cd93210 RCX: 00007f5c3852f127
+ RDX: 0000000000000020 RSI: 0000556c5cd938b0 RDI: 0000000000000003
+ RBP: 00007ffe86caf5a0 R08: 00007ffe86caf4e0 R09: 0000000000000080
+ R10: 0000000000000000 R11: 0000000000000202 R12: 0000556c5cd932d0
+ R13: 00000000021d05d1 R14: 00000000021d05d1 R15: 0000000000000001
 
-Fixes: 514ac99c64b2 ("can: fix multiple delivery of a single CAN frame for overlapping CAN filters")
-Cc: stable@vger.kernel.org # v4.1+
-Assisted-by: Bynario AI
-Signed-off-by: Samuel Page <sam@bynar.io>
+IFA_F_PERMANENT addresses require the allocation of a bunch of percpu
+pointers, currently in atomic scope.
 
+Similar to commit 51454ea42c1a ("ipv6: fix locking issues with loops
+over idev->addr_list"), move fixup_permanent_addr() outside the
+&idev->lock scope, and do the allocations with GFP_KERNEL. With such
+change fixup_permanent_addr() is invoked with the BH enabled, and the
+ifp lock acquired there needs the BH variant.
+
+Note that we don't need to acquire a reference to the permanent
+addresses before releasing the mentioned write lock, because
+addrconf_permanent_addr() runs under RTNL and ifa removal always happens
+under RTNL, too.
+
+Also the PERMANENT flag is constant in the relevant scope, as it can be
+cleared only by inet6_addr_modify() under the RTNL lock.
+
+Reviewed-by: David Ahern <dsahern@kernel.org>
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 ---
-  net/can/raw.c | 11 ++++++++++-
-  1 file changed, 10 insertions(+), 1 deletion(-)
+v1 -> v2:
+  - rebased on top of "ipv6: prevent possible UaF in
+    addrconf_permanent_addr()"
+v1: https://lore.kernel.org/netdev/d972e1e2-7090-47bd-988a-1ea854cbfb42@kernel.org/
+explicitly targeting net-next as this is IMHO an improvement more than a
+bug fix
+---
+ net/ipv6/addrconf.c | 31 +++++++++++++++++++------------
+ 1 file changed, 19 insertions(+), 12 deletions(-)
 
-diff --git a/net/can/raw.c b/net/can/raw.c
-index eee244ffc31e..f042c4316890 100644
---- a/net/can/raw.c
-+++ b/net/can/raw.c
-@@ -361,6 +361,14 @@ static int raw_notifier(struct notifier_block *nb, unsigned long msg,
-  	return NOTIFY_DONE;
-  }
-  
-+static void raw_sock_destruct(struct sock *sk)
-+{
-+	struct raw_sock *ro = raw_sk(sk);
+diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+index dd0b4d80e0f8..77c77e843c96 100644
+--- a/net/ipv6/addrconf.c
++++ b/net/ipv6/addrconf.c
+@@ -3585,15 +3585,15 @@ static int fixup_permanent_addr(struct net *net,
+ 		struct fib6_info *f6i, *prev;
+ 
+ 		f6i = addrconf_f6i_alloc(net, idev, &ifp->addr, false,
+-					 GFP_ATOMIC, NULL);
++					 GFP_KERNEL, NULL);
+ 		if (IS_ERR(f6i))
+ 			return PTR_ERR(f6i);
+ 
+ 		/* ifp->rt can be accessed outside of rtnl */
+-		spin_lock(&ifp->lock);
++		spin_lock_bh(&ifp->lock);
+ 		prev = ifp->rt;
+ 		ifp->rt = f6i;
+-		spin_unlock(&ifp->lock);
++		spin_unlock_bh(&ifp->lock);
+ 
+ 		fib6_info_release(prev);
+ 	}
+@@ -3601,7 +3601,7 @@ static int fixup_permanent_addr(struct net *net,
+ 	if (!(ifp->flags & IFA_F_NOPREFIXROUTE)) {
+ 		addrconf_prefix_route(&ifp->addr, ifp->prefix_len,
+ 				      ifp->rt_priority, idev->dev, 0, 0,
+-				      GFP_ATOMIC);
++				      GFP_KERNEL);
+ 	}
+ 
+ 	if (ifp->state == INET6_IFADDR_STATE_PREDAD)
+@@ -3612,29 +3612,36 @@ static int fixup_permanent_addr(struct net *net,
+ 
+ static void addrconf_permanent_addr(struct net *net, struct net_device *dev)
+ {
+-	struct inet6_ifaddr *ifp, *tmp;
++	struct inet6_ifaddr *ifp;
++	LIST_HEAD(tmp_addr_list);
+ 	struct inet6_dev *idev;
+ 
++	/* Mutual exclusion with other if_list_aux users. */
++	ASSERT_RTNL();
 +
-+	free_percpu(ro->uniq);
-+	can_sock_destruct(sk);
-+}
-+
-  static int raw_init(struct sock *sk)
-  {
-  	struct raw_sock *ro = raw_sk(sk);
-@@ -387,6 +395,8 @@ static int raw_init(struct sock *sk)
-  	if (unlikely(!ro->uniq))
-  		return -ENOMEM;
-  
-+	sk->sk_destruct = raw_sock_destruct;
-+
-  	/* set notifier */
-  	spin_lock(&raw_notifier_lock);
-  	list_add_tail(&ro->notifier, &raw_notifier_list);
-@@ -436,7 +446,6 @@ static int raw_release(struct socket *sock)
-  	ro->bound = 0;
-  	ro->dev = NULL;
-  	ro->count = 0;
--	free_percpu(ro->uniq);
-  
-  	sock_orphan(sk);
-  	sock->sk = NULL;
+ 	idev = __in6_dev_get(dev);
+ 	if (!idev)
+ 		return;
+ 
+ 	write_lock_bh(&idev->lock);
++	list_for_each_entry(ifp, &idev->addr_list, if_list) {
++		if (ifp->flags & IFA_F_PERMANENT)
++			list_add_tail(&ifp->if_list_aux, &tmp_addr_list);
++	}
++	write_unlock_bh(&idev->lock);
+ 
+-	list_for_each_entry_safe(ifp, tmp, &idev->addr_list, if_list) {
+-		if ((ifp->flags & IFA_F_PERMANENT) &&
+-		    fixup_permanent_addr(net, idev, ifp) < 0) {
+-			write_unlock_bh(&idev->lock);
++	while (!list_empty(&tmp_addr_list)) {
++		ifp = list_first_entry(&tmp_addr_list,
++				       struct inet6_ifaddr, if_list_aux);
++		list_del(&ifp->if_list_aux);
+ 
++		if (fixup_permanent_addr(net, idev, ifp) < 0) {
+ 			net_info_ratelimited("%s: Failed to add prefix route for address %pI6c; dropping\n",
+ 					     idev->dev->name, &ifp->addr);
+ 			in6_ifa_hold(ifp);
+ 			ipv6_del_addr(ifp);
+-			write_lock_bh(&idev->lock);
+ 		}
+ 	}
+-
+-	write_unlock_bh(&idev->lock);
+ }
+ 
+ static int addrconf_notify(struct notifier_block *this, unsigned long event,
 -- 
-2.49.0
+2.53.0
+
 
