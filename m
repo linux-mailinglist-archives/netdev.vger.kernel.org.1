@@ -1,64 +1,53 @@
-Return-Path: <netdev+bounces-276257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276262-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +JvwAoTF1Wkx9gcAu9opvQ
-	(envelope-from <netdev+bounces-276257-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 05:03:32 +0200
+	id VIuaKODL1Wl9+AcAu9opvQ
+	(envelope-from <netdev+bounces-276262-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 05:30:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AC353B6740
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 05:03:31 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31C943B695C
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 05:30:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AB878308710C
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 02:58:02 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D186B3020FD7
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 03:30:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 712A636E482;
-	Wed,  8 Apr 2026 02:57:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA9B6342CB0;
+	Wed,  8 Apr 2026 03:30:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="rrdytvFu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eVpThKVR"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout05.his.huawei.com (canpmsgout05.his.huawei.com [113.46.200.220])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 728CB36CDF3;
-	Wed,  8 Apr 2026 02:57:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C664E34252C;
+	Wed,  8 Apr 2026 03:30:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775617079; cv=none; b=Olh4WH3QIGeyB+ZhdhNbAJvfKI6WEdmIXlxewzEOB1hwMgFBg2WeIoVrMhriiyU6EhitwfmqmJlXdIsOMUKici7/P2J+D2Y980y1AvUwFDSXzzgQYoWO7ll01RdxhXGVnJ9ARIS6u8+AGO4UzMx2OKl4yRrwvu8OR8tqCzOJBTM=
+	t=1775619032; cv=none; b=l8dxUbHTSp/uPgMT75et4ARDwfTrvvZaB0KA1/vr9NUu4wIsgC6S8o9GJ3X03p2frs2FociXssWgRNqGc1vtutCeydP57aGjUV2dcJ0qHHjPktir5ZoWFQeMRVqO/5/Q3J+4O2eGIE5B+LPLsh7VN8/auV1udynn6LNNJCYxbhE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775617079; c=relaxed/simple;
-	bh=p4i2QJPlni67Wht2BfsVNm5Qr0eJy+8CZ3lldvWBXso=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=f9CFeQX9X6qT/SUPW5/VT67ET/BvaoBI7BODwe/EJovG+B2jUsWYng1zcVs2NlcpV0YTgQLOp1JmkP2uuCjBJSccj8ZLpZGCZ0/l54PeMZQdqocRKjMPCK9hB7ce2sfkkZ50uL0oYl5OIo2wKmPnolalJtLDdaJtqwrvAT9wKZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=rrdytvFu; arc=none smtp.client-ip=113.46.200.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=kRTQx1v/zW6yoSKlcxN0BockCXbNYg1F0bgr8EIO/8s=;
-	b=rrdytvFuR5sr5uCusnI2GFI2ds0ekFjQu1NVJwgwhU7M7ryY9K0MYLPoNXCg+V+MCbcqGCO2r
-	VBm7y6f0Er+WP4BJlEA5Liiq0aXmacV3cBQWxSQVEOPBGDqrbzcXgxJZBi9hnH51EpoKK9ALhjz
-	LfQgYuFrTV2tkDAUywbkLcM=
-Received: from mail.maildlp.com (unknown [172.19.162.223])
-	by canpmsgout05.his.huawei.com (SkyGuard) with ESMTPS id 4fr6yq3pS2z12LKF;
-	Wed,  8 Apr 2026 10:51:31 +0800 (CST)
-Received: from dggpemf500002.china.huawei.com (unknown [7.185.36.57])
-	by mail.maildlp.com (Postfix) with ESMTPS id AEF0F40561;
-	Wed,  8 Apr 2026 10:57:53 +0800 (CST)
-Received: from huawei.com (10.50.85.128) by dggpemf500002.china.huawei.com
- (7.185.36.57) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Wed, 8 Apr
- 2026 10:57:52 +0800
-From: Yue Haibing <yuehaibing@huawei.com>
-To: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
-	<yuehaibing@huawei.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH v2 net-next] ipv6: sit: remove redundant ret = 0 assignment
-Date: Wed, 8 Apr 2026 11:20:51 +0800
-Message-ID: <20260408032051.3096449-1-yuehaibing@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1775619032; c=relaxed/simple;
+	bh=bPyXy4rJirF5xfF9/xYSxpI0Q/3vLeBBffEb348O8fg=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=G38oAsbwSdRGg95WCKDDuuBJEiaoM9IX9o5tHi6mfwN8iKqSXSxKqTumQjv4XsgEIKu7PO5uI0FgpMLLCKGnG7ltZdYOzvwOd3SeJAlNg5Fe0WQEYmEKPOvtds37XS3qDrBDf2Yhv2oTr2csSvKpBAsxsdKvzhgEhIMh8TSpxPU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eVpThKVR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56933C116C6;
+	Wed,  8 Apr 2026 03:30:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775619032;
+	bh=bPyXy4rJirF5xfF9/xYSxpI0Q/3vLeBBffEb348O8fg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=eVpThKVRcybpsD7ptGGeaonsaCTnfc3P2x17oIeGUxJD1TObdHzcY2pHOGEHUpeFS
+	 DPRkvBfOKbG7jnNwrx5SAepZPifYxK5Kp34EXSDGsEY9EDMoFrQfzzKz19hw17UjQ1
+	 uTjj0d9n89v1obAqSV3e/JptbbZlQw2VPJHw8dOh318fZCRnq2v4tgxW+LFpYZOnFr
+	 GXVPXLxt2/NA9bG35Txh/9ZNyCd3WCINiRTf61cXG60IUM8C99qEcD7wuqDtRSLrCd
+	 FNAhUMZXG66PyCOodSNHA//0WZP+1S/nfPDprXJH8HudcLyNgoZz89lhlIGDwP/+Om
+	 J+2M9aloQ5k3A==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B9EFD3809A29;
+	Wed,  8 Apr 2026 03:30:10 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,63 +55,76 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
- dggpemf500002.china.huawei.com (7.185.36.57)
+Subject: Re: [PATCH net v3 0/2] seg6: fix dst_cache sharing in seg6 lwtunnel
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177561900954.56280.12053503868401686.git-patchwork-notify@kernel.org>
+Date: Wed, 08 Apr 2026 03:30:09 +0000
+References: <20260404004405.4057-1-andrea.mayer@uniroma2.it>
+In-Reply-To: <20260404004405.4057-1-andrea.mayer@uniroma2.it>
+To: Andrea Mayer <andrea.mayer@uniroma2.it>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, dsahern@kernel.org,
+ david.lebrun@uclouvain.be, stefano.salsano@uniroma2.it,
+ paolo.lungaroni@uniroma2.it, nicolas.dichtel@6wind.com,
+ justin.iurman@gmail.com, linux-kernel@vger.kernel.org
 X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[yuehaibing@huawei.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-276257-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,uclouvain.be,uniroma2.it,6wind.com,gmail.com];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[huawei.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_FIVE(0.00)[6];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-276262-lists,netdev=lfdr.de,netdevbpf];
 	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,huawei.com:dkim,huawei.com:email,huawei.com:mid]
-X-Rspamd-Queue-Id: 9AC353B6740
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NO_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 31C943B695C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The variable ret is assigned a value at all places where it is used;
-There is no need to assign a value when it is initially defined.
+Hello:
 
-Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
----
-v2: Remove redundant init during definition instead of init before copy_to_user
----
- net/ipv6/sit.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-diff --git a/net/ipv6/sit.c b/net/ipv6/sit.c
-index ef2e5111fb3a..201347b4e127 100644
---- a/net/ipv6/sit.c
-+++ b/net/ipv6/sit.c
-@@ -309,7 +309,7 @@ static int ipip6_tunnel_get_prl(struct net_device *dev, struct ip_tunnel_prl __u
- 	struct ip_tunnel_prl kprl, *kp;
- 	struct ip_tunnel_prl_entry *prl;
- 	unsigned int cmax, c = 0, ca, len;
--	int ret = 0;
-+	int ret;
- 
- 	if (dev == dev_to_sit_net(dev)->fb_tunnel_dev)
- 		return -EINVAL;
+On Sat,  4 Apr 2026 02:44:03 +0200 you wrote:
+> The seg6 lwtunnel encap uses a single per-route dst_cache shared
+> between seg6_input_core() and seg6_output_core(). These two paths
+> can perform the post-encap SID lookup in different routing contexts
+> (e.g., ip rules matching on the ingress interface, or VRF table
+> separation). Whichever path runs first populates the cache, and the
+> other reuses it blindly, bypassing its own lookup.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v3,1/2] seg6: separate dst_cache for input and output paths in seg6 lwtunnel
+    https://git.kernel.org/netdev/net/c/c3812651b522
+  - [net,v3,2/2] selftests: seg6: add test for dst_cache isolation in seg6 lwtunnel
+    https://git.kernel.org/netdev/net/c/32dfd742f06a
+
+You are awesome, thank you!
 -- 
-2.34.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
