@@ -1,171 +1,231 @@
-Return-Path: <netdev+bounces-276210-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276211-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wJfeCu6d1Wks8AcAu9opvQ
-	(envelope-from <netdev+bounces-276210-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 02:14:38 +0200
+	id CAanCRKe1Wks8AcAu9opvQ
+	(envelope-from <netdev+bounces-276211-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 02:15:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3D903B5A51
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 02:14:33 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A13C13B5A62
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 02:15:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9B08C306971A
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 00:13:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D09FF303CEA3
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 00:14:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56E3213777E;
-	Wed,  8 Apr 2026 00:12:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 395D2824A3;
+	Wed,  8 Apr 2026 00:14:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pdVGUQkX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jXkLPgkI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C89BD72622
-	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 00:12:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.51
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775607171; cv=pass; b=CuN0geXgROrr5Q+NJKqdstV9Xv+/Sg4hDKPF4TVDTdeN8sx7HPEdYZjmKw6NfBctWj5Tw2YACPYvHjVJenXIlxKkGClvgMK6oNN167BSvhd3uW7t6YYSE0h/MYjGv2A9O5cs1Ddu/QvvlhC7qm6Q9I2jjH+husmPkdo4eUTN3Y8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775607171; c=relaxed/simple;
-	bh=Hq5a+9Z7xklW4vTTDEilr89dxjbEY3dhoQCa8Qpb0FY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aUp5cx6IpOuZbidlKLxAGTbtAy1kZNNDvrJ8qVc0hhX045tAa9N184qRqX++x+c91V93Jt5fAhlI1VhrIAMQLVY0Xzy+sr3CTk+pQ+XSYvvTmqN+fAXiMFUBErwq1ey5CY6xCpgdfDsjs1g0WCnde3Dlrl5wv5DSYngPs2ArBYs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pdVGUQkX; arc=pass smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-66b0dc690bcso2792a12.1
-        for <netdev@vger.kernel.org>; Tue, 07 Apr 2026 17:12:49 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1775607168; cv=none;
-        d=google.com; s=arc-20240605;
-        b=DGqA9LdgXfe1tyyoSb7LLpWm0yIkpSjJWGPy9z2F+cUEAs92EgEHYzAhQsgS6PGcKc
-         YGKF4FBkc3O3s624JmES8XwnTYUzS53aIj+hyN3GuDyJji470rstb0INitEJUSGlnUnX
-         5zLmfdYnfFM4cHPUgEsZ0P8MutjFuUNh88tvrsPH+cdvXEAhAK5DNVi3qXvCwodvguIW
-         QdLY2EJr4amJL8wc23AUJYDCFOo/2i74PUOvbXq8049Wd09zURESUmtmWmLl9qbf6k7z
-         LKdmida1+13AnIftGyozzDjWTxY2HWJHocGDvdX+g1+f5IpEq5InVnWSZ+iqtBUY5TEV
-         VOPA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=Hq5a+9Z7xklW4vTTDEilr89dxjbEY3dhoQCa8Qpb0FY=;
-        fh=whJ1M2Sd89HBEiP/kLTqFCYRoRdlU0ogyvWNIrlhwFg=;
-        b=dXV1/srhHQJaHmR63DRGRY2W6+ElxiYR9qG6SmbVZZzYo1eQI75zPCC5w7RUos7kZ0
-         YuBqGNEhwNRqgEc0ErLijTPerOvR7KpgWjJ8fVJvs5KmM11SU9UjEkTbbSK5wEoPj61q
-         m9RdqSs4VbstwP7mITPLjgunQMNOvkHY6Egu5QumpNP8xt9shaIRBvQa/i7Vglnb0NmD
-         ifL/XFNrO5vkRLP4jVXjDuQkXmDHA7n4DViq2f8kaQXpWtvPtODVsHxidkliod2oZht7
-         pwtmWo4aj6XjtauZnUbxxP4yjtvD1Nc2Y5TuJl/65ZcBqPJWwhngBG+qBpGWjvCU0G3o
-         D/EQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1775607168; x=1776211968; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Hq5a+9Z7xklW4vTTDEilr89dxjbEY3dhoQCa8Qpb0FY=;
-        b=pdVGUQkXDMlo1yGRpdb/bvNUZbVs/vtDUnnO3ETpz8E+rUYIWI2g7CioMICQovsd2g
-         HH0OwNEY072akA9bXKXb70za363CrdRKi71XPQ5kMajEx8DJv/Y6V5AQfqBrAfBTPFlC
-         FhwUgcLzJAalDQJc+4x8gKINq47KiKOT6KHPU+0f4pRsK1nrGyTEjfJzgzI7YbIfoqkb
-         0iTpv/6YXi1qIItHFW6wKVn1QnMONLdtgYls+AlldbRqCCxJbsauK7QwmeP3+XkpPaUe
-         TkirifTxX0sc/8GXAPMxP8fB1rI76NgHzqwl2CggngyCDNyiolgZ6EnJCsMo0gxV/gq/
-         /EzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775607168; x=1776211968;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Hq5a+9Z7xklW4vTTDEilr89dxjbEY3dhoQCa8Qpb0FY=;
-        b=hc0VYW0euF99ffys7vww/K4gauUA5W88uemgDcs0vW/Qhl5ZhQM+9wFL7kRClF5njV
-         jUdQnVsF6uP+FuoNzVTLG23c0lq5EC+WvKwewWHVSMVZVq7FHL8bYh6wfF+BQUaSdG69
-         BINZMUn1takHemNEIGrRMrkFTn9sSxXkA93hByuUgEahqwCiNvHEWDCtZ1JHG095LQld
-         ifUTlo8vnGSDwNFQycT1Njsq2m9ZyZofGH9zdsj8I82gmkrZ0Q6ha7rKPoXxpa0Tke60
-         pHAFVpglBt66UV7ociPPG+d74AJNyJr9p6abmYZSiHzQxk92dOlqIdySOxmwaBoAY1Hk
-         9LTA==
-X-Forwarded-Encrypted: i=1; AJvYcCWeDBJacw3P16NfyuIa2v1SufM90PVcY33cXGWD/jQSv1onWAikSpt4BYzEKWUOKZFIe01WU2Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzg2GXsxbV+w16w4CX/e3GJHIws4tKV4xtiFSXEvMvrP38Fs1Wa
-	9wGcUMpJ6+CLwfRQ3eeo4Yw/ZsfpP6xrWva5rLkSoU4PCKb+9Yakbpfv51ES84UkUp8ImQXDPkq
-	SizFhq75WQJC59aCQbM1Mq5QbPA8juAeF5GtPBVbK
-X-Gm-Gg: AeBDietPtKFYwnHeisBSXo9CYZqGZDFedDLYVIzX2653VWNM8PxjIcOtfB154+0oTIE
-	oqYt6m5+cqlhwRkG/2tF8G48DsruGyKrJVT0k0BQYvWDmZDjaqdUABwNAOgwoAsfQCxbxdtwvOi
-	LRXZTut+rK557BDSYtwPi3VIPaMhO2isvaOK1U20AJrLquZEWD4ZW3oh0uJxc4nivEdTVIaun6i
-	Z1+np97Z6Urnn209Tzt/3OBIsGeMmRL4qcJ2Tb8P8azJJJmjNBN4n7CN9l8THqxvT+HyqwUfXx+
-	3VPx7RJsMcgl3fjijCklDpF7sbybS8WQx6AKSXjvTvAkta88n3s5YZRZjpjE6fh8Og==
-X-Received: by 2002:a05:6402:400e:b0:66e:e3f9:ebb6 with SMTP id
- 4fb4d7f45d1cf-66f9eb0e641mr15274a12.4.1775607167874; Tue, 07 Apr 2026
- 17:12:47 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 172BC72622
+	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 00:14:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775607287; cv=none; b=SC1wO2eG3xU7IT70CVVeCFRqGjV6MBmp3XMo+PIdHhzn/rIedni9HbW3UFGbP50Y+aOZbSH/J8tIF+r420c/dpvkr8PAsVDylQIsl530lWs/njzmZ8ir07h5OOEwnbfEscdx927z/h++13tJJj+lQt5zgSqke07dVfMt+4Rm/qE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775607287; c=relaxed/simple;
+	bh=RlcBW6btoneoDWJyHfe5EPeMBgqYFr08yWwXe64+V3g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RrAR6VHV7rsDkOC/WCJcJE+WkVrUNa9nX/ryOoEan9m8xh56Z1ULPZBWtHTsy/bFonLV/TbcVbhnT/dw8QssHsoX0hYe+BtgFnSKvIgVqV6yY20mQGfBMseZHzR9sbUFSEvNqcnZpb8G8lQ+UZgOHQQ6VT2u1WjA+sqdh20UlN4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jXkLPgkI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2666EC2BC9E;
+	Wed,  8 Apr 2026 00:14:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775607286;
+	bh=RlcBW6btoneoDWJyHfe5EPeMBgqYFr08yWwXe64+V3g=;
+	h=From:To:Cc:Subject:Date:From;
+	b=jXkLPgkITwIavfJmFuOKo15RYUOTbKv9arjeBo/BEoQXZ8LRWFjldhjoBUI4uZz7h
+	 po4C+A0VbJgJXaNqYgDyxPufv1H8lfg3FIcs6vsKW8MgXcb12u+wz3yfv4hggRXZ1o
+	 12Pl/0XARtrpNqSdGhalTuPHlv0+xW0w9YJiwfvDfv+UFTqFq/Fd1XdiktoJWMgnWj
+	 FTRp/ohQ/bT18XH/hfXRioVPNOybB8Bi7Q7WdZZfnPA+N6+ZlvqvyBPbAjTnF8iSha
+	 WdXbHMBCL+d8SmTXD0gqeKeDeR2A87CKWsMoYYusk7x5uPsH4KYoD00/t0Zje27yWx
+	 z0PXbcA8EMCig==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	ncardwell@google.com,
+	kuniyu@google.com,
+	willemb@google.com,
+	dsahern@kernel.org,
+	quic_subashab@quicinc.com,
+	quic_stranche@quicinc.com
+Subject: [PATCH net] tcp: update window_clamp when SO_RCVBUF is set
+Date: Tue,  7 Apr 2026 17:14:38 -0700
+Message-ID: <20260408001438.129165-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260406-teaming-driver-internal-v5-0-e8a3f348a1c5@google.com> <utlz3oebjyd4lqp5pd4qdbth2kywxo4hrlrnwcxsx3br76fwfg@vy3tx5f3lv32>
-In-Reply-To: <utlz3oebjyd4lqp5pd4qdbth2kywxo4hrlrnwcxsx3br76fwfg@vy3tx5f3lv32>
-From: Marc Harvey <marcharvey@google.com>
-Date: Tue, 7 Apr 2026 17:12:35 -0700
-X-Gm-Features: AQROBzCE4KyLZl3QQoeKiTuqJ5qKwgmhvNqAUTtOXd9q7AJJ_ruBCFl-97d0z_g
-Message-ID: <CANkEMgn80UM7+mymVm21Q8yszgVeh029tvO+kHqmLGmf-2MU5g@mail.gmail.com>
-Subject: Re: [PATCH net-next v5 00/10] Decouple receive and transmit
- enablement in team driver
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-276210-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-276211-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[marcharvey@google.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-0.998];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,resnulli.us:email,options.sh:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B3D903B5A51
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A13C13B5A62
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Apr 7, 2026 at 4:55=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> wrote:
->
-> Mon, Apr 06, 2026 at 05:03:36AM +0200, marcharvey@google.com wrote:
-> >Allow independent control over receive and transmit enablement states
-> >for aggregated ports in the team driver.
-> >
-> >The motivation is that IEE 802.3ad LACP "independent control" can't
-> >be implemented for the team driver currently. This was added to the
-> >bonding driver in commit 240fd405528b ("bonding: Add independent
-> >control state machine").
-> >
-> >This series also has a few patches that add tests to show that the old
-> >coupled enablement still works and that the new decoupled enablement
-> >works as intended (4, 5, and 10).
-> >
-> >There are three patches with small fixes as well, with the goal of
-> >making the final decoupling patch clearer (1, 2, and 3).
->
-> Looks fine to me now. Do you have libteam/teamd counterpart?
+Commit under Fixes moved recomputing the window clamp to
+tcp_measure_rcv_mss() (when scaling_ratio changes).
+I suspect it missed the fact that we don't recompute the clamp
+when rcvbuf is set. Until scaling_ratio changes we are
+stuck with the old window clamp which may be based on
+the small initial buffer. scaling_ratio may never change.
 
-I don't see a need for this to be used in any of the teamd runners.
-Libteam should support this out of the box, since the options are
-identified over netlink by their string names. The options.sh test
-uses teamnl, which uses libteam, to set the new options.
+Inspired by Eric's recent commit d1361840f8c5 ("tcp: fix
+SO_RCVLOWAT and RCVBUF autotuning") plumb the user action
+thru to TCP and have it update the clamp.
+
+A smaller fix would be to just have tcp_rcvbuf_grow()
+adjust the clamp even if SOCK_RCVBUF_LOCK is set.
+But IIUC this is what we were trying to get away from
+in the first place.
+
+Fixes: a2cbb1603943 ("tcp: Update window clamping condition")
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: ncardwell@google.com
+CC: kuniyu@google.com
+CC: willemb@google.com
+CC: dsahern@kernel.org
+CC: quic_subashab@quicinc.com
+CC: quic_stranche@quicinc.com
+---
+ include/linux/net.h | 1 +
+ include/net/tcp.h   | 1 +
+ net/core/sock.c     | 9 +++++++++
+ net/ipv4/af_inet.c  | 1 +
+ net/ipv4/tcp.c      | 5 +++++
+ net/ipv6/af_inet6.c | 1 +
+ 6 files changed, 18 insertions(+)
+
+diff --git a/include/linux/net.h b/include/linux/net.h
+index a8e818de95b3..ca6a7bc5c9ae 100644
+--- a/include/linux/net.h
++++ b/include/linux/net.h
+@@ -223,6 +223,7 @@ struct proto_ops {
+ 	int		(*sendmsg_locked)(struct sock *sk, struct msghdr *msg,
+ 					  size_t size);
+ 	int		(*set_rcvlowat)(struct sock *sk, int val);
++	void		(*set_rcvbuf)(struct sock *sk, int val);
+ };
+ 
+ #define DECLARE_SOCKADDR(type, dst, src)	\
+diff --git a/include/net/tcp.h b/include/net/tcp.h
+index 6156d1d068e1..b9db447892dd 100644
+--- a/include/net/tcp.h
++++ b/include/net/tcp.h
+@@ -516,6 +516,7 @@ void tcp_syn_ack_timeout(const struct request_sock *req);
+ int tcp_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+ 		int flags);
+ int tcp_set_rcvlowat(struct sock *sk, int val);
++void tcp_set_rcvbuf(struct sock *sk, int val);
+ int tcp_set_window_clamp(struct sock *sk, int val);
+ 
+ static inline void
+diff --git a/net/core/sock.c b/net/core/sock.c
+index fdaf66e6dc18..f3a186376bc5 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -973,6 +973,8 @@ EXPORT_SYMBOL(sock_set_keepalive);
+ 
+ static void __sock_set_rcvbuf(struct sock *sk, int val)
+ {
++	struct socket *sock = sk->sk_socket;
++
+ 	/* Ensure val * 2 fits into an int, to prevent max_t() from treating it
+ 	 * as a negative value.
+ 	 */
+@@ -990,6 +992,13 @@ static void __sock_set_rcvbuf(struct sock *sk, int val)
+ 	 * we actually used in getsockopt is the most desirable behavior.
+ 	 */
+ 	WRITE_ONCE(sk->sk_rcvbuf, max_t(int, val * 2, SOCK_MIN_RCVBUF));
++
++	if (sock) {
++		const struct proto_ops *ops = READ_ONCE(sock->ops);
++
++		if (ops->set_rcvbuf)
++			ops->set_rcvbuf(sk, sk->sk_rcvbuf);
++	}
+ }
+ 
+ void sock_set_rcvbuf(struct sock *sk, int val)
+diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
+index f98e46ae3e30..0e62032e76b1 100644
+--- a/net/ipv4/af_inet.c
++++ b/net/ipv4/af_inet.c
+@@ -1091,6 +1091,7 @@ const struct proto_ops inet_stream_ops = {
+ 	.compat_ioctl	   = inet_compat_ioctl,
+ #endif
+ 	.set_rcvlowat	   = tcp_set_rcvlowat,
++	.set_rcvbuf	   = tcp_set_rcvbuf,
+ };
+ EXPORT_SYMBOL(inet_stream_ops);
+ 
+diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+index e57eaffc007a..1a494d18c5fd 100644
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@ -1858,6 +1858,11 @@ int tcp_set_rcvlowat(struct sock *sk, int val)
+ 	return 0;
+ }
+ 
++void tcp_set_rcvbuf(struct sock *sk, int val)
++{
++	tcp_set_window_clamp(sk, tcp_win_from_space(sk, val));
++}
++
+ #ifdef CONFIG_MMU
+ static const struct vm_operations_struct tcp_vm_ops = {
+ };
+diff --git a/net/ipv6/af_inet6.c b/net/ipv6/af_inet6.c
+index ee341a8254bf..0a88b376141d 100644
+--- a/net/ipv6/af_inet6.c
++++ b/net/ipv6/af_inet6.c
+@@ -690,6 +690,7 @@ const struct proto_ops inet6_stream_ops = {
+ 	.compat_ioctl	   = inet6_compat_ioctl,
+ #endif
+ 	.set_rcvlowat	   = tcp_set_rcvlowat,
++	.set_rcvbuf	   = tcp_set_rcvbuf,
+ };
+ EXPORT_SYMBOL_GPL(inet6_stream_ops);
+ 
+-- 
+2.53.0
+
 
