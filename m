@@ -1,189 +1,149 @@
-Return-Path: <netdev+bounces-276387-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276388-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QM4gHIQh1mklBQgAu9opvQ
-	(envelope-from <netdev+bounces-276387-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 11:36:04 +0200
+	id qBDOFNEh1mklBQgAu9opvQ
+	(envelope-from <netdev+bounces-276388-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 11:37:21 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 009873B9EF4
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 11:36:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C688E3B9F0E
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 11:37:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CD39D302B74E
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 09:32:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 70442303DD7B
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 09:34:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 564F2344020;
-	Wed,  8 Apr 2026 09:32:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD2FE378D98;
+	Wed,  8 Apr 2026 09:34:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nyi9lBvl"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="ymtEqxe6"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7191298CAF
-	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 09:32:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F0E4224B04;
+	Wed,  8 Apr 2026 09:34:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775640774; cv=none; b=txkfS1kGJzWog56fYeb6AE5MdGql3XzqmSkiWz7R/nlZwtDwkgpEJ4KkxUZUPZOfwmVoUnGelxk55WLOYU85d0QybVG40uqdVOohw8v2Vvjv3pHJYKncPRJ215He/9DhXALEWgBszOl85uSmEJvsi4YLWs2w5w8c0daWba54vno=
+	t=1775640889; cv=none; b=aaGLJzr91Y9N6AtAGwHCD1fZDIdWiiW87ge6+qAkM9a4805vx7/aPlFSHiJ1opC7K2aV2eAhTHFH0xvBQhWbq12MaBPbYe6YxBAaKE0eagh+FxcvpRp5f+r10JPdyZUP9b0yQ3W5vEGzghgmMwgqUBpiiVRxbIn5lLG2fIFevO0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775640774; c=relaxed/simple;
-	bh=ISBB0PVEaGBosAfINee5ozPon7KUFv8GrTIFmVu8XX8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZEZPPTmg1s7hFSUkWVp/89xLZlX796L4VSY1z0PwDpKZGH535M9lNeHappTNWLiCpvM7JyqVVjrVsH05sHdhpwCzlBl7TCqLtLJ+gDWHmDHcaSmFoSUNgjCw3VbGhZF2IwREX67tkTcfpI3KjW9wKhKmvuwJACeKO6AV8yvVJpg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Nyi9lBvl; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1775640771;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0WLLaDR4hBeJBSOXLWkUCGw0FfU9RJNtZTAtzZEXwZg=;
-	b=Nyi9lBvlR87Ww/CMLCWX2T3DZXkLaXxTZJnLU4axLWtUHETO6uE//2RXYhIKq/ERC+Yd3g
-	LNV8Y0jS0ZMQA0K8qQaDdFJQ5U6D/0qbvuNbEk3ihSq8wdyakqTQ8rx2EO+BehCTt7eES8
-	/sCSs0LvXT+Y+DA40m4GUHrx5LII4Eo=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-56-drptm72mPCKJcq05h3RU6g-1; Wed,
- 08 Apr 2026 05:32:50 -0400
-X-MC-Unique: drptm72mPCKJcq05h3RU6g-1
-X-Mimecast-MFC-AGG-ID: drptm72mPCKJcq05h3RU6g_1775640769
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	s=arc-20240116; t=1775640889; c=relaxed/simple;
+	bh=R/b1bc5OVvwE31LlF+wFK+5d+Ru91KTenrJH4/xCRr4=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jgaWfyFmY+wmBiYr8Rc8e8nhg2TO7Cl1MILyMTmRjovHRtpL760NuGuIUV4Z1Yt1gePOBrtM0SBysUKcMkOlA1ulUdFRxendN6mNdFJkFu1ghyds5Xteib+JBmJKSvlFHlw6jq1SNqgKmdyQbWqyohEsBOQ+WkIzl0PmInHt9do=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=ymtEqxe6; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by mx1.secunet.com (Postfix) with ESMTP id F2BF020728;
+	Wed,  8 Apr 2026 11:34:46 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from mx1.secunet.com ([127.0.0.1])
+ by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id AbnceWvLlMfr; Wed,  8 Apr 2026 11:34:46 +0200 (CEST)
+Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0532918002E7;
-	Wed,  8 Apr 2026 09:32:49 +0000 (UTC)
-Received: from thinkpad (unknown [10.44.33.70])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9056F300019F;
-	Wed,  8 Apr 2026 09:32:46 +0000 (UTC)
-Date: Wed, 8 Apr 2026 11:32:43 +0200
-From: Felix Maurer <fmaurer@redhat.com>
-To: luka.gejak@linux.dev
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org, horms@kernel.org,
-	fmancera@suse.de
-Subject: Re: [PATCH net-next v5 1/2] net: hsr: require valid EOT supervision
- TLV
-Message-ID: <adYgjqxUsX13Nabt@thinkpad>
-References: <20260407162502.19462-1-luka.gejak@linux.dev>
- <20260407162502.19462-2-luka.gejak@linux.dev>
+	by mx1.secunet.com (Postfix) with ESMTPS id 21BA2201D5;
+	Wed,  8 Apr 2026 11:34:46 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 21BA2201D5
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1775640886;
+	bh=zS79HN+MwePvO/pYvOblADFlSrM4jAhkaN0vzpnyOS8=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=ymtEqxe69DCmzevK5Ljizo2/qDSyJgxcb9M4EGhl2jM5po49jngpcItxeADk2mAd1
+	 GPdwysYdHLIeXsgjl8OVk8Rlf7zrZlmHwapuUKWRoEeoe2mJeTe0k7u8YnFG+PlpEn
+	 PrbZslM/YrlOghjS1u3Om/dtKhFA03FUG4pM8vnb7IO7foyQkZH1hC8AWH+hLdqYW+
+	 nkkKGCuoa2dVWzUMn7+TohzR+xZxFpMwRYHxn22bq7SK6Zv2yBeQAIYwWKS/7Noo+j
+	 Q5OTu6x0TUsGOgoei9FG2DlP5UM9RwLpsqg3RPcBO/JkpPShGtV/suoh+qE4ku+mcx
+	 5Ojrkn30wNGEg==
+Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Wed, 8 Apr
+ 2026 11:34:45 +0200
+Received: (nullmailer pid 95933 invoked by uid 1000);
+	Wed, 08 Apr 2026 09:34:44 -0000
+Date: Wed, 8 Apr 2026 11:34:44 +0200
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Eric Biggers <ebiggers@kernel.org>
+CC: <netdev@vger.kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, "David
+ S. Miller" <davem@davemloft.net>, <linux-crypto@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH ipsec-next] xfrm: Drop support for HMAC-RIPEMD-160
+Message-ID: <adYhND1MsLgR1ZLg@secunet.com>
+References: <20260405011513.64909-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20260407162502.19462-2-luka.gejak@linux.dev>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
-X-Spamd-Result: default: False [-1.66 / 15.00];
+In-Reply-To: <20260405011513.64909-1-ebiggers@kernel.org>
+X-ClientProxiedBy: EXCH-01.secunet.de (10.32.0.171) To EXCH-01.secunet.de
+ (10.32.0.171)
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	TAGGED_FROM(0.00)[bounces-276387-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,secunet.com:dkim,secunet.com:mid];
+	TAGGED_FROM(0.00)[bounces-276388-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmaurer@redhat.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[secunet.com:+];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	MISSING_XM_UA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:email]
-X-Rspamd-Queue-Id: 009873B9EF4
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: C688E3B9F0E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Apr 07, 2026 at 06:25:01PM +0200, luka.gejak@linux.dev wrote:
-> From: Luka Gejak <luka.gejak@linux.dev>
->
-> Supervision frames are only valid if terminated with a zero-length EOT
-> TLV. The current check fails to reject non-EOT entries as the terminal
-> TLV, potentially allowing malformed supervision traffic.
->
-> Fix this by strictly requiring the terminal TLV to be HSR_TLV_EOT
-> with a length of zero, and properly linearizing the TLV header before
-> access.
->
-> Assisted-by: Gemini:Gemini-3.1-flash
-> Signed-off-by: Luka Gejak <luka.gejak@linux.dev>
+On Sat, Apr 04, 2026 at 06:15:13PM -0700, Eric Biggers wrote:
+> Drop support for HMAC-RIPEMD-160 from IPsec to reduce the UAPI surface
+> and simplify future maintenance.  It's almost certainly unused.
+> 
+> RIPEMD-160 received some attention in the early 2000s when SHA-* weren't
+> quite as well established.  But it never received much adoption outside
+> of certain niches such as Bitcoin.
+> 
+> It's actually unclear that Linux + IPsec + HMAC-RIPEMD-160 has *ever*
+> been used, even historically.  When support for it was added in 2003, it
+> was done so in a "cleanup" commit without any justification [1].  It
+> didn't actually work until someone happened to fix it 5 years later [2].
+> That person didn't use or test it either [3].  Finally, also note that
+> "hmac(rmd160)" is by far the slowest of the algorithms in aalg_list[].
+> 
+> Of course, today IPsec is usually used with an AEAD, such as AES-GCM.
+> But even for IPsec users still using a dedicated auth algorithm, they
+> almost certainly aren't using, and shouldn't use, HMAC-RIPEMD-160.
+> 
+> Thus, let's just drop support for it.  Note: no kconfig update is
+> needed, since CRYPTO_RMD160 wasn't actually being selected anyway.
+> 
+> References:
+>   [1] linux-history commit d462985fc1941a47
+>       ("[IPSEC]: Clean up key manager algorithm handling.")
+>   [2] linux commit a13366c632132bb9
+>       ("xfrm: xfrm_algo: correct usage of RIPEMD-160")
+>   [3] https://lore.kernel.org/all/1212340578-15574-1-git-send-email-rueegsegger@swiss-it.ch
+> 
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 
-Thanks for the patch, including making sure that there is enough data
-available to read the next TLVs.
-
-Reviewed-by: Felix Maurer <fmaurer@redhat.com>
-
-> ---
->  net/hsr/hsr_forward.c | 20 +++++++++-----------
->  1 file changed, 9 insertions(+), 11 deletions(-)
->
-> diff --git a/net/hsr/hsr_forward.c b/net/hsr/hsr_forward.c
-> index 0aca859c88cb..eb89cc44eac0 100644
-> --- a/net/hsr/hsr_forward.c
-> +++ b/net/hsr/hsr_forward.c
-> @@ -82,35 +82,33 @@ static bool is_supervision_frame(struct hsr_priv *hsr, struct sk_buff *skb)
->  	    hsr_sup_tag->tlv.HSR_TLV_length != sizeof(struct hsr_sup_payload))
->  		return false;
->
-> -	/* Get next tlv */
-> +	/* Get next TLV */
->  	total_length += hsr_sup_tag->tlv.HSR_TLV_length;
-> -	if (!pskb_may_pull(skb, total_length))
-> +	if (!pskb_may_pull(skb, total_length + sizeof(struct hsr_sup_tlv)))
->  		return false;
->  	skb_pull(skb, total_length);
->  	hsr_sup_tlv = (struct hsr_sup_tlv *)skb->data;
->  	skb_push(skb, total_length);
->
-> -	/* if this is a redbox supervision frame we need to verify
-> -	 * that more data is available
-> -	 */
-> +	/* If this is a RedBox supervision frame, verify additional data */
->  	if (hsr_sup_tlv->HSR_TLV_type == PRP_TLV_REDBOX_MAC) {
-> -		/* tlv length must be a length of a mac address */
-> +		/* TLV length must be the size of a MAC address */
->  		if (hsr_sup_tlv->HSR_TLV_length != sizeof(struct hsr_sup_payload))
->  			return false;
->
-> -		/* make sure another tlv follows */
-> +		/* Make sure another TLV follows */
->  		total_length += sizeof(struct hsr_sup_tlv) + hsr_sup_tlv->HSR_TLV_length;
-> -		if (!pskb_may_pull(skb, total_length))
-> +		if (!pskb_may_pull(skb, total_length + sizeof(struct hsr_sup_tlv)))
->  			return false;
->
-> -		/* get next tlv */
-> +		/* Get next TLV */
->  		skb_pull(skb, total_length);
->  		hsr_sup_tlv = (struct hsr_sup_tlv *)skb->data;
->  		skb_push(skb, total_length);
->  	}
->
-> -	/* end of tlvs must follow at the end */
-> -	if (hsr_sup_tlv->HSR_TLV_type == HSR_TLV_EOT &&
-> +	/* Supervision frame must end with EOT TLV */
-> +	if (hsr_sup_tlv->HSR_TLV_type != HSR_TLV_EOT ||
->  	    hsr_sup_tlv->HSR_TLV_length != 0)
->  		return false;
->
-> --
-> 2.53.0
->
-
+Applied, thanks a lot Eric!
 
