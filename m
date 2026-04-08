@@ -1,546 +1,363 @@
-Return-Path: <netdev+bounces-276216-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276217-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cKUGAjqh1Wnk8AcAu9opvQ
-	(envelope-from <netdev+bounces-276216-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 02:28:42 +0200
+	id wFTkOAqj1Wkj8QcAu9opvQ
+	(envelope-from <netdev+bounces-276217-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 02:36:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61BC83B5B13
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 02:28:41 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CBA13B5B8D
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 02:36:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6DC623038A5C
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 00:28:11 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 0ACC330157BA
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 00:36:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 489FC254B18;
-	Wed,  8 Apr 2026 00:28:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AB442C3271;
+	Wed,  8 Apr 2026 00:36:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="iUoJnp4T"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C+JUawZu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C70E26CE39
-	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 00:28:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775608091; cv=none; b=fn4V6+BUYbTXzDScvPl4VgRzdCx6NwP5JSvQLPzHE8+TXWIKL7LABvLvEulAH8WYtg+pn9T9L7o7HyJPFQ96E4wgvP57tWBRxWHTuc2iMCS8rINkaE8YqTofWQp7kZ9mVuAaNgUtjd90U9XlFkQ1JVY/PZ+mHJGRZlH3aJrjbIg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775608091; c=relaxed/simple;
-	bh=Y70+fPsuc0UXd7zQ73x+NbwsVlNtd1MDZBIR5Q+5cS0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Xgs8T9z2MqV/hARfcq9O5TGnHVmjyGD+8QC13LOjaBI65RNiJeDHyd8h3obGAHB4lS6sgB4sU489QqEa3g/4kpEY7Lo7PiELEaEU/SEaqRjFazGrrNuxCvrvof/nkcDk4Q7z9TN10ymtkoeEbRTLukyIqwTuK/QaIVFzgJ333PU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=iUoJnp4T; arc=none smtp.client-ip=67.231.145.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0528007.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 637HNp3a2383249
-	for <netdev@vger.kernel.org>; Tue, 7 Apr 2026 17:28:08 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
-	 bh=fa9qlq+VljzY1OgVmkybZA6qJbFhBRrcw9iTNaPDNjo=; b=iUoJnp4Tf6iz
-	Z/fI0bqIMi1kw2/W0vbghyDTu6rz45CnSnl1DtQcJYttlsWHlZXLr2THDAgTawNp
-	B6mfQSqb3W8I23+YNXRQLy1H06HzYN+EyhR55s+6tNfHdjAoIEDkgdicBidhqbGP
-	Dwiz3DkmxvYTQwENLnlIcJekMWU+7zQBRLuAqoVHkRUOEb7DQP+zXz1y547ntY6A
-	xCywIPYpJGVx5gNkod8AhCm/1KaNa7ArgiHx0nb8xeJlBBv0ADzDKzTxO3lkJj9m
-	PGhvXBJE2WEEs/YukGBhA8w6vqbtrZDWG7KU70rrRjPoMJdMswDp5QZ7f2kOLd7I
-	hEtriHzKIQ==
-Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com [209.85.210.69])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4dcms2yw08-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Tue, 07 Apr 2026 17:28:08 -0700 (PDT)
-Received: by mail-ot1-f69.google.com with SMTP id 46e09a7af769-7d9e1866bf1so9083698a34.1
-        for <netdev@vger.kernel.org>; Tue, 07 Apr 2026 17:28:08 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8586922B8C5
+	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 00:36:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.52
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775608580; cv=pass; b=RO+ZyXIesFApHCX6zwRPUHVEAM54Azh/HSQBfimhuvWM8HewHyJDKWSK4JH0q3E71z8isWJ9RQBIVEOBJssrG7t1LHqcOME/feindSwXqkT/mDD7SlJLnfxasyVKRl8jAwyLBp1LO7b1+pIXMdZXeygvlqBm86a6zlxjAQiZvKQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775608580; c=relaxed/simple;
+	bh=yc04CXDJZIssiibVZiuD663knKh8kMXknZH9b823FCg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=n22znO0+c9BczfVNF7hV9YhQ0wqKdZSkfRxrBoKzSK4T3EZdps2/oJndjeW3C3fKgqjhDkaKLW6+Bluj53RY7PwbJcD77L4WT88WHy8QMUuGmKhDBMyI+lvdQjJ89Of8OsKWLPk7k0UWO+8tga1f6VTG7tqZ9ZGqBZpsJ53IIdo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C+JUawZu; arc=pass smtp.client-ip=209.85.167.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-5a3d2824e4bso4685300e87.3
+        for <netdev@vger.kernel.org>; Tue, 07 Apr 2026 17:36:18 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1775608577; cv=none;
+        d=google.com; s=arc-20240605;
+        b=iME2wBT4qzfKLtzUi8McmAeWV5fwvEXBZioNjp9NWt6yJr1txZR/rJTDnizuxfGU+A
+         dgT1nVz739y+wCY8QdLb5dGUXMdjnGuRp8TslaQzOze45ehWFvxamwTa6F8JMsRHB76l
+         r4mM9TK81QwQ9KWTHUElKMy43IE7vtiPbJ3LSGINeALjv5Z/xUWiXzB+YmCkiOgHdDKa
+         DymQqG0ml7xVA0097kzYnsnUF2zuAWjpHsPsQOdqPQYjwiU10xfTkobdfinACqzXUFKj
+         EDOw2lSwhSnOybZ8uKGcJAZmnmQ2JOZlVt+3NKJ5YntaELnFCVFADr6kic+fxVu16xmS
+         LuXQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=6n/7HQyrtMfTJW06twOyVYb1ZogrEoRjRGf+zORS6bw=;
+        fh=bwZICOvv+9mPAHQxdk9SBcNeYVVR3IKKUn4/QUMHxtc=;
+        b=D36k/V2LRRQ2y4GurJK2pUzzHUtrdCrrsbSsQB1g3+5YwyLorCeNWTnuJFjSl1EKnB
+         QZUCu4r+Pu2GTYgEcToueN6OrTY81RaulUpPQMImOUcD/tib+m/ia5gQdqoplsdNAfRV
+         7npC6L4Sv2ubDUs6vBfds58BNJOKxewgsq6QPnZPrFTt2u8dLy1oermnTF56vBtb48H9
+         W3kXj/FSEFjp8ieD0yjk6w4ICvrXupbUPYkJSc7CGLcXfkQLHOlVJZfvV6TNkU4cVJNU
+         ayNkQMFW/QBgp2kVPgVQHSQjohwDqGhRRUIuQc14hqsWVsMb1p9e9Wb9KeMZgWII2SYB
+         RXRw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775608577; x=1776213377; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6n/7HQyrtMfTJW06twOyVYb1ZogrEoRjRGf+zORS6bw=;
+        b=C+JUawZuGpJ+S/JC3+NwIKuvjzqT0kP5t1tTzp6xss1ly7PtsnDa5T6+TFVz3Ulka0
+         HkEfXFZPKxDaaEvfdSjmSUeSCQ7p/9qc604rPQJse8iot6ypAto4/2P0BfFS9haL/Rpf
+         HVbCCPXBq5jVHdXozjhK8ZC+/Kr2cf+pTOYZW8s2iFdr5TU15g1UyHz3i9mUgNYK7HTG
+         kiL803MtiEScAeIYh47lLganqZgJQfC6Z8JdDA3G5ShuwMMFy4x6L9dA5I4peoRhmX/9
+         gNexUL+qN2gHuRdLNiItEeou7XiL3cQ9entBn3HEbXXCn2QakJAzFEypLkaLmCCu38zD
+         mTtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775608087; x=1776212887;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20251104; t=1775608577; x=1776213377;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=fa9qlq+VljzY1OgVmkybZA6qJbFhBRrcw9iTNaPDNjo=;
-        b=WmTd3gKze5WCf5g58auxmceldTRx+Z2Q57K0VXyb+yR7C2u5UNUs1HlG3Yf/uRIhd3
-         7QB8U/86n3NBFjM7RJV34y84Fmhm/Yzf+ySJqyeS3dJOv476vehQBWL8AAv5HY+0JxY5
-         XufgrV6md/zd79jOs7756VW0/5wvHdKzkZlRO6K2Tk74JNt/0lx7pZaGFgKWtGEYKnFy
-         Insg+r54Yj4S0o5xGANLRU9Dk/zsXIb0j44vkgrS3NHBQ1B0kZ5R3hldLep3faK+y2u/
-         GYQ47GF3HHKKIWrUfk397n35mrYOlQn3JH4CH6ncTXa6S930Q9C7g7Yk0HWGFDup3f9X
-         vKPQ==
-X-Gm-Message-State: AOJu0YwEq5RLPGF+7zuz3kvcAHgrglyBxAjGxaYrSPD+meFkYHNqtL9+
-	s8KR5PO3IcD7goLXR5qayioXRr0V0ackI3IIy7oCGDCT7OgCXtQQCfvALwERkCYOrC2fod/xNbp
-	PA+1FwKTbX4Tgp3rMxOzjbc5j8hDUYjfFUcM7rWVaQarREUQhCDAtT4WAFq6L7mKXlA3LfpwSax
-	JevELp05mVB85TwtQalbQtg/mlHav5eS93Ww0+
-X-Gm-Gg: AeBDiesj4QyC504ZXx/vi74573junVVd2zR0gR2A4y0sMvx5aekH6bYt+wRG0AIrOw1
-	W9qIjymuoxauGsdVoYjQ/qCsAW1bmPIsekj/woe7IkfIGzailcCm4zialU8XbWRTRGgptvklNeo
-	GsXumLcheAlBarMoI/78TmmY/fB8jg6lzNbNebfUNSKSH3/9WexRtwGaeWK89AGy7ud77g+obVX
-	Z+MbI8O7z5sk//WJxeYS3Gb05VPriCBEuS/kz1Wb2psFlpmfFiGaaMdnQ4F6Q3CJPf+CSex5vSS
-	dNTIY+TEVGMx3q3w4mhkOqEIgxlEzObvPO3RaeHtCAxul5EXSORLqsQcq+0TwLpeS8B5RDTpzwf
-	dg1kyO2MChQ==
-X-Received: by 2002:a05:6820:a0c:b0:67f:c06c:a5e6 with SMTP id 006d021491bc7-68220b4a654mr9686233eaf.37.1775608087383;
-        Tue, 07 Apr 2026 17:28:07 -0700 (PDT)
-X-Received: by 2002:a05:6820:a0c:b0:67f:c06c:a5e6 with SMTP id 006d021491bc7-68220b4a654mr9686201eaf.37.1775608086588;
-        Tue, 07 Apr 2026 17:28:06 -0700 (PDT)
-Received: from localhost ([2a03:2880:12ff:9::])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-422eaed88dfsm15780770fac.3.2026.04.07.17.28.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Apr 2026 17:28:05 -0700 (PDT)
-From: Neil Spring <ntspring@meta.com>
-To: netdev@vger.kernel.org
-Cc: edumazet@google.com, ncardwell@google.com, kuniyu@google.com,
-        davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org,
-        pabeni@redhat.com, horms@kernel.org, shuah@kernel.org,
-        linux-kselftest@vger.kernel.org
-Subject: [PATCH net-next 2/2] selftests: net: add ECMP rehash test
-Date: Tue,  7 Apr 2026 17:28:02 -0700
-Message-ID: <20260408002802.2448424-3-ntspring@meta.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260408002802.2448424-1-ntspring@meta.com>
-References: <20260408002802.2448424-1-ntspring@meta.com>
+        bh=6n/7HQyrtMfTJW06twOyVYb1ZogrEoRjRGf+zORS6bw=;
+        b=Mogc/h02QDjs4roP+i9QVkAEXx1LzcNF6c868b4gvtVqZHAALAk/hu0GJ36cMkoLMT
+         L/1Ynlvpqm6LSfE+y4r64ot4rtGlrI/hpb1p4YC6moOogroTFtuQo+rbp4PohNsFOo6F
+         XZ6sNNoDz8TYT9M8f8rL5WC1txOA5XoIOQsEAYXcUIAJpR/9X0h2BcS934VEwfbwChJB
+         FY8eLMfNhM84cUIfLZ2wpy0Xm1Dgd3laGwA4OLYAL/EIVXzLj/yNYK1ZnBuZkrt6ciE7
+         XC3BuNtWgCkKXOO1qDqZj5CXuVLK8pyZdQU1gUNK7C0QDbSdaREvwfgtknH0iIG/gydU
+         ZZBg==
+X-Forwarded-Encrypted: i=1; AJvYcCUUG0xuG7TXt1raOk3qcKYzCxqPX4zk0PYmQQfNls5tjNX9cWSOO3uRDGCCSV4la+rRdUSunwA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyJvTzA3KMLt7ruI/3p3fPgM0oq3Nmy7h/u0LDYo6P4yHc3GJnk
+	TTXjztM2HkKpai7GcFLTL3VxPcI1qYIy7XRl2YjvBHxAvJuIz51/k0kb+QQbI/6TDwq+Nbsnof0
+	r98QwUoTlbY5WFxFM1kugXMJNs9LNMTc=
+X-Gm-Gg: AeBDietUPQEOxJ4TFKWjyvY3V59/J/N3aPGkyVdxUUOVC1cNlfFU7YknQU2Emf9/nDj
+	vkO18JGmv61iWn9Uxb0w9HBfrtJsSqltLanvZc0+VzIepzcxJKjzvIJKzETKAU9aAR/6U2gkwPr
+	Trqnmy0VZfIsg5/XBYMgmdkrrL3/rp4T65Wxy29ziVm6Dr+bofwYcR9WYUCmy9+NfOkV+OR7HBi
+	MluwyG3AVMDDCOA8OvPGvBsZIOmFRfO7OKzI8soc7vtUo+bSAfj1QEnLRYXPxBTL/xsNxG/0dUu
+	c8NHYj8=
+X-Received: by 2002:a05:6512:3b12:b0:5a1:1daf:f7b2 with SMTP id
+ 2adb3069b0e04-5a337514f67mr5768921e87.0.1775608576338; Tue, 07 Apr 2026
+ 17:36:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-GUID: EE5lGNNzGHUbDyDU2cNrembmVThx5B7J
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDA4MDAwMiBTYWx0ZWRfX8IxxG8XOAqoG
- dxfSFHboCKnsRVUsa6W9cu1ae+CsRYJv4hT2vPg+sTmwLtV/WP4NF4udsNMPKXzSQYHe4p93lrd
- 0oO66dyTpLwQLFDdmIYRlsf7M57OKfRK8+PGBIOslq/paLA82WaqpTsnSyP/Pm/JD39lpvtULqP
- 7QKKKrEUYTRMdsVYItdxxnqMHIFXIQXqHbJGaX4CcPcxgyNTo6ZlW6AY+eQkCYYK7BDsQU9cp2i
- m6IyiBSj3ozZgCTXuCx/kFRBVsijU7rOzRCdn3IEsVyHR+hEr89vsTwRRmThxpGXCNAPIt4m4dj
- z8duc0BG5rvEFC/ZaKOqWKmsVcrj88QGm3415YFwkb6c6faA7b6zVALqBPOhjGt44aOGmSu+wVT
- f+vZGOiKOSygC1NTEKD+FcCV+Q/F1qI5ykUvt2FPqMnF+lS4K4OEhOb+zMrrwCEiHtFnZxO8l/Y
- iPY3K0FDRyn7fHqKjwA==
-X-Authority-Analysis: v=2.4 cv=B+eJFutM c=1 sm=1 tr=0 ts=69d5a118 cx=c_pps
- a=z9lCQkyTxNhZyzAvolXo/A==:117 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
- a=A5OVakUREuEA:10 a=f7IdgyKtn90A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=7x6HtfJdh03M6CCDgxCd:22 a=4h92JMTCafKA-fb_NiOh:22 a=VabnemYjAAAA:8
- a=_tJXsZ62ISBIMLIKAhQA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=EyFUmsFV_t8cxB2kMr4A:22 a=gKebqoRLp9LExxC7YDUY:22
-X-Proofpoint-ORIG-GUID: EE5lGNNzGHUbDyDU2cNrembmVThx5B7J
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-04-07_05,2026-04-07_05,2025-10-01_01
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[meta.com,reject];
-	R_DKIM_ALLOW(-0.20)[meta.com:s=s2048-2025-q2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+References: <20260404150452.83904-1-kerneljasonxing@gmail.com>
+ <20260404150452.83904-4-kerneljasonxing@gmail.com> <willemdebruijn.kernel.2ff565d2f9e7f@gmail.com>
+ <CAL+tcoB94=ptFB-acU3nAK_MqW74DV0MQUVvvV3nbQ7Zc6zSZw@mail.gmail.com>
+ <willemdebruijn.kernel.27ec47b22b23c@gmail.com> <CAL+tcoAvVBN7juJEBt5-FYQ4eGTe7dYrFbR3CMOwguw=_X=btA@mail.gmail.com>
+ <CAL+tcoCctfs=d9zz5ei1S999S94HmUDSToriZ8NJiLT8MmpQTA@mail.gmail.com> <willemdebruijn.kernel.1b49845d3acc7@gmail.com>
+In-Reply-To: <willemdebruijn.kernel.1b49845d3acc7@gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Wed, 8 Apr 2026 08:35:37 +0800
+X-Gm-Features: AQROBzCRTd0x9BrsJHcoQc-2sCYrx--jI_bQa6YUl2OGCkGbIENnd0UvF44LYi8
+Message-ID: <CAL+tcoBt1A5GYFvimkcRFUtmy298y13AiF-XFF8b8E8Y6fg8Xw@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 3/4] bpf-timestamp: keep track of the skb when
+ wait_for_space occurs
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, horms@kernel.org, willemb@google.com, 
+	martin.lau@kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>, Yushan Zhou <katrinzhou@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[meta.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,meta.com:dkim,meta.com:email,meta.com:mid,ecmp_rehash.sh:url,lib.sh:url];
+	TAGGED_FROM(0.00)[bounces-276217-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-276216-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ntspring@meta.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kerneljasonxing@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 61BC83B5B13
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 5CBA13B5B8D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add ecmp_rehash.sh to exercise TCP ECMP path re-selection on
-retransmission timeout.  Three tests cover client SYN rehash, server
-SYN/ACK rehash, and midstream RTO rehash of an established connection
-over a two-path ECMP topology with one leg blocked by tc.
+On Wed, Apr 8, 2026 at 5:17=E2=80=AFAM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> Jason Xing wrote:
+> > On Tue, Apr 7, 2026 at 11:33=E2=80=AFAM Jason Xing <kerneljasonxing@gma=
+il.com> wrote:
+> > >
+> > > On Mon, Apr 6, 2026 at 10:37=E2=80=AFPM Willem de Bruijn
+> > > <willemdebruijn.kernel@gmail.com> wrote:
+> > > >
+> > > > Jason Xing wrote:
+> > > > > On Mon, Apr 6, 2026 at 10:28=E2=80=AFAM Willem de Bruijn
+> > > > > <willemdebruijn.kernel@gmail.com> wrote:
+> > > > > >
+> > > > > > Jason Xing wrote:
+> > > > > > > From: Jason Xing <kernelxing@tencent.com>
+> > > > > > >
+> > > > > > > The patch is the 1/2 part of push-level granularity feature.
+> > > > > > >
+> > > > > > > Tag the skb in tcp_sendmsg_locked() when wait_for_space occur=
+s even
+> > > > > > > though it might not carry the last byte of the sendmsg.
+> > > > > > >
+> > > > > > > Prior to the patch, BPF timestamping cannot cover this case:
+> > > > > > > The following steps reproduce this:
+> > > > > > > 1) skb A is the current last skb before entering wait_for_spa=
+ce process
+> > > > > > > 2) tcp_push() pushes A without any tag
+> > > > > > > 3) A is transmitted from TCP to driver without putting any sk=
+b carrying
+> > > > > > >    timestamps in the error queue, like SCHED, DRV/HARDWARE.
+> > > > > > > 4) sk_stream_wait_memory() sleeps for a while and then return=
+s with an
+> > > > > > >    error code. Note that the socket lock is released.
+> > > > > > > 5) skb A finally gets acked and removed from the rtx queue.
+> > > > > > > 6) continue with the rest of tcp_sendmsg_locked(): it will ju=
+mp to(goto)
+> > > > > > >    'do_error' label and then 'out' label.
+> > > > > > > 7) at this moment, skb A turns out to be the last one in this=
+ send
+> > > > > > >    syscall, and miss the following tcp_bpf_tx_timestamp() opp=
+ortunity
+> > > > > > >    before the final tcp_push()
+> > > > > > > 8) BPF script fails to see any timestamps this time
+> > > > > > >
+> > > > > > > Signed-off-by: Yushan Zhou <katrinzhou@tencent.com>
+> > > > > > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > > > > > > ---
+> > > > > > >  net/ipv4/tcp.c | 4 +++-
+> > > > > > >  1 file changed, 3 insertions(+), 1 deletion(-)
+> > > > > > >
+> > > > > > > diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+> > > > > > > index c603b90057f6..7d030a11d004 100644
+> > > > > > > --- a/net/ipv4/tcp.c
+> > > > > > > +++ b/net/ipv4/tcp.c
+> > > > > > > @@ -1400,9 +1400,11 @@ int tcp_sendmsg_locked(struct sock *sk=
+, struct msghdr *msg, size_t size)
+> > > > > > >  wait_for_space:
+> > > > > > >               set_bit(SOCK_NOSPACE, &sk->sk_socket->flags);
+> > > > > > >               tcp_remove_empty_skb(sk);
+> > > > > > > -             if (copied)
+> > > > > > > +             if (copied) {
+> > > > > > > +                     tcp_bpf_tx_timestamp(sk);
+> > > > > > >                       tcp_push(sk, flags & ~MSG_MORE, mss_now=
+,
+> > > > > > >                                TCP_NAGLE_PUSH, size_goal);
+> > > > > >
+> > > > > > Now the number of skbs that will be tracked will be unpredictab=
+le,
+> > > > > > varying based on memory pressure.
+> > > > >
+> > > > > Right, I put some effort into writing a selftests to check how ma=
+ny
+> > > > > push functions get called at one time and failed to do so.
+> > > > >
+> > > > > >
+> > > > > > That sounds hard to use to me. Especially if these extra pushes
+> > > > > > cannot be identified as such.
+> > > > > >
+> > > > > > Perhaps if all skbs from the same sendmsg call can be identifie=
+d,
+> > > > > > that would help explain pattern in data resulting from these
+> > > > > > uncommon extra data points.
+> > > > >
+> > > > > You meant move tcp_bpf_tx_timestamp before tcp_skb_entail()? That=
+ is
+> > > > > close to packet basis without considering fragmentation of skb :)
+> > > >
+> > > > No, I meant somehow in the notification having a way to identify al=
+l
+> > > > the skbs belonging to the same sendmsg call, to allow filtering on
+> > > > that. But I also don't immediately see how to do that (without addi=
+ng
+> > > > yet another counter say).
+> > >
+> > > If we don't build the relationship between skb and sendmsg (just like
+> > > the SENDMSG sock option), we will have no clue on how to calculate. I=
+f
+> > > we only take care of the skb from the view of the syscall layer, it's
+> > > fine by moving tcp_bpf_tx_timestamp() before tcp_skb_entail(). But in
+> > > terms of per skb even generated beneath TCP due to gso/tso, there is
+> > > only one way to correlate: adding an additional member in the skb
+> > > structure to store its sendmsg time. This discussion is only suitable
+> > > for use cases like net_timestamping.
+> > >
+> > > Well, my key point is that, I have to admit, the above (including
+> > > existing bpf script net_timestamping) is a less effective way which
+> > > definitely harms the performance because of the extremely frequent
+> > > look-up process. It's not suitable for 7x24 observability in
+> > > production. What we've done internally is make the kernel layer as
+> > > lightweight/easy as possible and let the timestamping feature throw
+> > > each record into a ring buffer that the application can read, sort an=
+d
+> > > calculate. This arch survives the performance. But that's simply what
+> > > the design of the kernel module is, given the fast deployment in
+> > > production. I suppose in the future we could build a userspace tool
+> > > like blktrace to monitor efficiently instead of the selftest sample.
+> > > Honestly I don't like look-up action.
+> > >
+> > > Since we're modifying the kernel, how about adding a new member to
+> > > record sendmsg time which bpf script is able to read. The whole
+> > > scenario looks like this:
+> > > 1) in tcp_sendmsg_locked(), record the sendmsg time for each skb
+> > > 2) in either tso_fragment() or tcp_gso_tstamp(), each new skb will ge=
+t
+> > > a copy of its original skb
+> > > 3) in each stage, bpf script reads the skb's sendmsg time and the
+> > > current time, and then effortlessly do the math.
+> > >
+> > > At this point, what I had in mind is we have two options:
+> > > 1) only handle the skb from the view of the send syscall layer, which
+> > > is, for sure, very simple but not thorough.
+> > > 2) stick to a pure authentic packet basis, then adding a new member
+> > > seems inevitable. so the question would be where to add? The space of
+> > > the skb structure is very precious :(
+> >
+> > Finding a suitable place to put this timestamp is really hard. IIRC,
+> > we can't expand the size of struct skb_shared_info so easily since
+> > it's a global effect.
+> >
+> > I'm wondering if we can turn the per-packet mode into a non-compatible
+> > feature by reusing 'u32 tskey' to store a microsecond timestamp of
+> > sendmsg.
+>
+> Agreed that an extra field is hard. We should avoid that.
 
-The SYN test retries 26 times, so has a false negative probability
-of ~(1/2)^25 ≈ 3e-8.
+Avoiding adding a new one makes the whole work extremely hard. I'm
+wondering since we have hwtstamp in shared info, why not add a
+software one for timestamping use? Then, we would support more
+different protocols in more different stages in a finer grain, which
+is a big coarse picture in my mind.
 
-Signed-off-by: Neil Spring <ntspring@meta.com>
----
- tools/testing/selftests/net/Makefile       |   1 +
- tools/testing/selftests/net/ecmp_rehash.sh | 354 +++++++++++++++++++++
- 2 files changed, 355 insertions(+)
- create mode 100755 tools/testing/selftests/net/ecmp_rehash.sh
+Adding a software bit will completely reduce the whole complexity and
+be very easy to use. Would you expect to see a draft by adding such a
+bit first?
 
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index 6bced3ed798b..acc61a51d7e2 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -25,6 +25,7 @@ TEST_PROGS := \
- 	cmsg_time.sh \
- 	double_udp_encap.sh \
- 	drop_monitor_tests.sh \
-+	ecmp_rehash.sh \
- 	fcnal-ipv4.sh \
- 	fcnal-ipv6.sh \
- 	fcnal-other.sh \
-diff --git a/tools/testing/selftests/net/ecmp_rehash.sh b/tools/testing/selftests/net/ecmp_rehash.sh
-new file mode 100755
-index 000000000000..a062c0b51fd6
---- /dev/null
-+++ b/tools/testing/selftests/net/ecmp_rehash.sh
-@@ -0,0 +1,354 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# Test ECMP path re-selection on TCP retransmission timeout.
-+#
-+# Two namespaces connected by two parallel veth pairs with a 2-way ECMP
-+# route.  When a TCP path is blocked (via tc drop), RTO triggers
-+# sk_rethink_txhash() + sk_dst_reset(), causing the next route lookup
-+# to select the other ECMP path.
-+#
-+# False negative: ~(1/2)^25 ≈ 3e-8.  With tcp_syn_retries=6 (~127 s
-+# timeout) and tcp_syn_linear_timeouts=20 there are roughly 26
-+# independent rehash attempts, each choosing one of 2 paths uniformly.
-+
-+source lib.sh
-+
-+SUBNETS=(a b)
-+PORT=9900
-+
-+ALL_TESTS="
-+	test_ecmp_rto_rehash
-+	test_ecmp_synack_rehash
-+	test_ecmp_midstream_rehash
-+"
-+
-+link_tx_packets_get()
-+{
-+	local ns=$1; shift
-+	local dev=$1; shift
-+
-+	ip netns exec "$ns" cat "/sys/class/net/$dev/statistics/tx_packets"
-+}
-+
-+# Return the number of packets matched by the tc filter action on a device.
-+# When tc drops packets via "action drop", the device's tx_packets is not
-+# incremented (packet never reaches veth_xmit), but the tc action maintains
-+# its own counter.
-+tc_filter_pkt_count()
-+{
-+	local ns=$1; shift
-+	local dev=$1; shift
-+
-+	ip netns exec "$ns" tc -s filter show dev "$dev" parent 1: 2>/dev/null |
-+		awk '/Sent .* pkt/ { for (i=1;i<=NF;i++) if ($i=="pkt") { print $(i-1); exit } }'
-+}
-+
-+# Read TcpTimeoutRehash counter from /proc/net/netstat in a namespace.
-+# This counter increments in tcp_write_timeout() on every RTO that triggers
-+# sk_rethink_txhash().
-+get_timeout_rehash_count()
-+{
-+	local ns=$1; shift
-+
-+	ip netns exec "$ns" awk '
-+		/^TcpExt:/ {
-+			if (!h) { split($0, n); h=1 }
-+			else {
-+				split($0, v)
-+				for (i in n)
-+					if (n[i] == "TcpTimeoutRehash") print v[i]
-+			}
-+		}
-+	' /proc/net/netstat
-+}
-+
-+# Block TCP (IPv6 next-header = 6) egress, allowing ICMPv6 through.
-+block_tcp()
-+{
-+	local ns=$1; shift
-+	local dev=$1; shift
-+
-+	ip netns exec "$ns" tc qdisc add dev "$dev" root handle 1: prio
-+	ip netns exec "$ns" tc filter add dev "$dev" parent 1: \
-+		protocol ipv6 prio 1 u32 match u8 0x06 0xff at 6 action drop
-+}
-+
-+unblock_tcp()
-+{
-+	local ns=$1; shift
-+	local dev=$1; shift
-+
-+	ip netns exec "$ns" tc qdisc del dev "$dev" root 2>/dev/null
-+}
-+
-+# Return success when both devices have dropped at least one TCP packet.
-+both_devs_attempted()
-+{
-+	local ns=$1; shift
-+	local dev0=$1; shift
-+	local dev1=$1; shift
-+
-+	local c0 c1
-+	c0=$(tc_filter_pkt_count "$ns" "$dev0")
-+	c1=$(tc_filter_pkt_count "$ns" "$dev1")
-+	[ "${c0:-0}" -ge 1 ] && [ "${c1:-0}" -ge 1 ]
-+}
-+
-+setup()
-+{
-+	setup_ns NS1 NS2
-+
-+	local ns
-+	for ns in "$NS1" "$NS2"; do
-+		ip netns exec "$ns" sysctl -qw net.ipv6.conf.all.accept_dad=0
-+		ip netns exec "$ns" sysctl -qw net.ipv6.conf.default.accept_dad=0
-+		ip netns exec "$ns" sysctl -qw net.ipv6.conf.all.forwarding=1
-+		ip netns exec "$ns" sysctl -qw net.core.txrehash=1
-+	done
-+
-+	local i sub
-+	for i in 0 1; do
-+		sub=${SUBNETS[$i]}
-+		ip link add "veth${i}a" type veth peer name "veth${i}b"
-+		ip link set "veth${i}a" netns "$NS1"
-+		ip link set "veth${i}b" netns "$NS2"
-+		ip -n "$NS1" addr add "fd00:${sub}::1/64" dev "veth${i}a"
-+		ip -n "$NS2" addr add "fd00:${sub}::2/64" dev "veth${i}b"
-+		ip -n "$NS1" link set "veth${i}a" up
-+		ip -n "$NS2" link set "veth${i}b" up
-+	done
-+
-+	ip -n "$NS1" addr add fd00:ff::1/128 dev lo
-+	ip -n "$NS2" addr add fd00:ff::2/128 dev lo
-+
-+	# Allow many SYN retries at 1-second intervals (linear, no
-+	# exponential backoff) so the rehash test has enough attempts
-+	# to exercise both ECMP paths deterministically.
-+	ip netns exec "$NS1" sysctl -qw net.ipv4.tcp_syn_retries=6
-+	ip netns exec "$NS1" sysctl -qw net.ipv4.tcp_syn_linear_timeouts=20
-+
-+	ip -n "$NS1" -6 route add fd00:ff::2/128 \
-+		nexthop via fd00:a::2 dev veth0a \
-+		nexthop via fd00:b::2 dev veth1a
-+
-+	ip -n "$NS2" -6 route add fd00:ff::1/128 \
-+		nexthop via fd00:a::1 dev veth0b \
-+		nexthop via fd00:b::1 dev veth1b
-+
-+	for i in 0 1; do
-+		sub=${SUBNETS[$i]}
-+		ip netns exec "$NS1" \
-+			ping -6 -c1 -W5 "fd00:${sub}::2" &>/dev/null
-+		ip netns exec "$NS2" \
-+			ping -6 -c1 -W5 "fd00:${sub}::1" &>/dev/null
-+	done
-+
-+	if ! ip netns exec "$NS1" ping -6 -c1 -W5 fd00:ff::2 &>/dev/null; then
-+		echo "Basic connectivity check failed"
-+		return $ksft_skip
-+	fi
-+}
-+
-+# Block ALL paths, start a connection, wait until SYNs have been dropped
-+# on both interfaces (proving rehash steered the SYN to a new path), then
-+# unblock so the connection completes.
-+test_ecmp_rto_rehash()
-+{
-+	RET=0
-+
-+	block_tcp "$NS1" veth0a
-+	defer unblock_tcp "$NS1" veth0a
-+	block_tcp "$NS1" veth1a
-+	defer unblock_tcp "$NS1" veth1a
-+
-+	ip netns exec "$NS2" socat \
-+		"TCP6-LISTEN:$PORT,bind=[fd00:ff::2],reuseaddr,fork" \
-+		EXEC:"echo ESTABLISH_OK" &
-+	defer kill_process $!
-+
-+	wait_local_port_listen "$NS2" $PORT tcp
-+
-+	local rehash_before
-+	rehash_before=$(get_timeout_rehash_count "$NS1")
-+
-+	# Start the connection in the background; it will retry SYNs at
-+	# 1-second intervals until an unblocked path is found.
-+	ip netns exec "$NS1" bash -c \
-+		"echo test | socat - \
-+		'TCP6:[fd00:ff::2]:$PORT,bind=[fd00:ff::1],connect-timeout=60'" \
-+		>"/tmp/ecmp_rto_$$" 2>&1 &
-+	local client_pid=$!
-+	defer kill_process $client_pid
-+
-+	# Wait until both paths have seen at least one dropped SYN.
-+	# This proves sk_rethink_txhash() rehashed the connection from
-+	# one ECMP path to the other.
-+	slowwait 30 both_devs_attempted "$NS1" veth0a veth1a
-+	check_err $? "SYNs did not appear on both paths (rehash not working)"
-+	if [ $RET -ne 0 ]; then
-+		log_test "ECMP RTO rehash: establish with blocked paths"
-+		return
-+	fi
-+
-+	# Unblock both paths and let the next SYN retransmit succeed.
-+	unblock_tcp "$NS1" veth0a
-+	unblock_tcp "$NS1" veth1a
-+
-+	local rc=0
-+	wait $client_pid || rc=$?
-+
-+	local result
-+	result=$(cat "/tmp/ecmp_rto_$$" 2>/dev/null)
-+	rm -f "/tmp/ecmp_rto_$$"
-+
-+	if [ $rc -ne 0 ] || [[ "$result" != *"ESTABLISH_OK"* ]]; then
-+		check_err 1 "connection failed after unblocking: $result"
-+	fi
-+
-+	local rehash_after
-+	rehash_after=$(get_timeout_rehash_count "$NS1")
-+	if [ "$rehash_after" -le "$rehash_before" ]; then
-+		check_err 1 "TcpTimeoutRehash counter did not increment"
-+	fi
-+
-+	log_test "ECMP RTO rehash: establish with blocked paths"
-+}
-+
-+# Block the server's return paths so SYN/ACKs are dropped.  The client
-+# retransmits SYNs at 1-second intervals; each duplicate SYN arriving at
-+# the server updates ir_iif to match the new arrival interface, so the
-+# retransmitted SYN/ACK routes back via the interface the SYN arrived on.
-+test_ecmp_synack_rehash()
-+{
-+	RET=0
-+	local port=$((PORT + 2))
-+
-+	block_tcp "$NS2" veth0b
-+	defer unblock_tcp "$NS2" veth0b
-+	block_tcp "$NS2" veth1b
-+	defer unblock_tcp "$NS2" veth1b
-+
-+	ip netns exec "$NS2" socat \
-+		"TCP6-LISTEN:$port,bind=[fd00:ff::2],reuseaddr,fork" \
-+		EXEC:"echo SYNACK_OK" &
-+	defer kill_process $!
-+
-+	wait_local_port_listen "$NS2" $port tcp
-+
-+	# Start the connection; SYNs reach the server (client egress is
-+	# open) but SYN/ACKs are dropped on the server's return path.
-+	ip netns exec "$NS1" bash -c \
-+		"echo test | socat - \
-+		'TCP6:[fd00:ff::2]:$port,bind=[fd00:ff::1],connect-timeout=60'" \
-+		>"/tmp/ecmp_synack_$$" 2>&1 &
-+	local client_pid=$!
-+	defer kill_process $client_pid
-+
-+	# Wait until both server-side interfaces have dropped at least
-+	# one SYN/ACK, proving the server rehashed its return path.
-+	slowwait 30 both_devs_attempted "$NS2" veth0b veth1b
-+	check_err $? "SYN/ACKs did not appear on both return paths"
-+	if [ $RET -ne 0 ]; then
-+		log_test "ECMP SYN/ACK rehash: blocked return path"
-+		return
-+	fi
-+
-+	# Unblock and let the connection complete.
-+	unblock_tcp "$NS2" veth0b
-+	unblock_tcp "$NS2" veth1b
-+
-+	local rc=0
-+	wait $client_pid || rc=$?
-+
-+	local result
-+	result=$(cat "/tmp/ecmp_synack_$$" 2>/dev/null)
-+	rm -f "/tmp/ecmp_synack_$$"
-+
-+	if [ $rc -ne 0 ] || [[ "$result" != *"SYNACK_OK"* ]]; then
-+		check_err 1 "connection failed after unblocking: $result"
-+	fi
-+
-+	log_test "ECMP SYN/ACK rehash: blocked return path"
-+}
-+
-+# Establish a data transfer with both paths open, then block the
-+# active path.  Verify the transfer continues via rehash and that
-+# TcpTimeoutRehash incremented.
-+test_ecmp_midstream_rehash()
-+{
-+	RET=0
-+	local port=$((PORT + 1))
-+
-+	ip netns exec "$NS2" socat -u \
-+		"TCP6-LISTEN:$port,bind=[fd00:ff::2],reuseaddr" - >/dev/null &
-+	defer kill_process $!
-+
-+	wait_local_port_listen "$NS2" $port tcp
-+
-+	local base_tx0 base_tx1
-+	base_tx0=$(link_tx_packets_get "$NS1" veth0a)
-+	base_tx1=$(link_tx_packets_get "$NS1" veth1a)
-+
-+	ip netns exec "$NS1" bash -c "
-+		for i in \$(seq 1 40); do
-+			dd if=/dev/zero bs=10k count=1 2>/dev/null
-+			sleep 0.25
-+		done | timeout 60 socat - 'TCP6:[fd00:ff::2]:$port,bind=[fd00:ff::1]'
-+	" &>/dev/null &
-+	local client_pid=$!
-+	defer kill_process $client_pid
-+
-+	busywait $BUSYWAIT_TIMEOUT until_counter_is \
-+			">= $((base_tx0 + base_tx1 + 20))" \
-+		link_tx_packets_total "$NS1"
-+	check_err $? "no TX activity detected"
-+	if [ $RET -ne 0 ]; then
-+		log_test "ECMP midstream rehash: block active path"
-+		return
-+	fi
-+
-+	# Find the active path and block it.
-+	local cur0 cur1 active_idx
-+	cur0=$(link_tx_packets_get "$NS1" veth0a)
-+	cur1=$(link_tx_packets_get "$NS1" veth1a)
-+	if [ $((cur0 - base_tx0)) -ge $((cur1 - base_tx1)) ]; then
-+		active_idx=0
-+	else
-+		active_idx=1
-+	fi
-+
-+	local rehash_before
-+	rehash_before=$(get_timeout_rehash_count "$NS1")
-+
-+	block_tcp "$NS1" "veth${active_idx}a"
-+	defer unblock_tcp "$NS1" "veth${active_idx}a"
-+
-+	local rc=0
-+	wait $client_pid || rc=$?
-+
-+	check_err $rc "data transfer failed after blocking veth${active_idx}a"
-+
-+	local rehash_after
-+	rehash_after=$(get_timeout_rehash_count "$NS1")
-+	if [ "$rehash_after" -le "$rehash_before" ]; then
-+		check_err 1 "TcpTimeoutRehash counter did not increment"
-+	fi
-+
-+	log_test "ECMP midstream rehash: block active path"
-+}
-+
-+link_tx_packets_total()
-+{
-+	local ns=$1; shift
-+
-+	echo $(( $(link_tx_packets_get "$ns" veth0a) +
-+		 $(link_tx_packets_get "$ns" veth1a) ))
-+}
-+
-+require_command socat
-+
-+trap cleanup_all_ns EXIT
-+setup || exit $?
-+tests_run
-+exit $EXIT_STATUS
--- 
-2.52.0
+Or just like I mentioned, repurposing tskey seems an alternative,
+which, however, makes the new feature incompatible.
 
+>
+> If the purpose is to group skbs by sendmsg call (e.g., to filter out
+> all but the last one), it is probably also unnecessary.
+>
+> From a process PoV, since the process knows the sendmsg len and each
+> skb has a tskey in byte offset, it can correlate the skb with a given
+> sendmsg buffer.
+>
+> The BPF program is under control of a third-party admin. So that does
+> not follow directly. But it can be passed additional metadata.
+>
+> I thought about passing the offset of the skb from the start of the
+> sendmsg buffer to identify all consecutive skbs for a sendmsg call,
+> as each new buffer will start with an skb with offset 0 ..
+>
+> .. but that won't work as there is no guarantee that a sendmsg call
+> will not append to an existing outstanding skb.
+
+Right. TCP is way too complex and we indeed see some tough issues when
+trying to deploy the feature. So my humble take is to make the design
+as simple as possible.
+
+>
+> Anyway, the general idea is to pass to the BPF program through
+> bpf_skops_tx_timestamping some relevant signal , without having to
+> expand either skb or sk itself.
+>
+> I hear you on that measuring every skb is too frequent. But is calling
+> the BPF program and letting it decide whether to measure too? BPF
+> program invocation itself should be cheap.
+
+Oh, I was clear enough. Sorry. I meant tracing per skb is definitely
+an awesome way to go. My ultimate goal is to do so. Instead of letting
+people implement various fine grained bpf progs, we can provide a very
+easy/understandable/efficient approach with more samples. It should be
+very beneficial.
+
+>
+> If per-push is preferable, with a filter ability like the above, it
+> seems more useful to me already.
+
+Push-level is a compromise plan. Packet-level is what I always pursue :)
+
+The current series has this ability: the bpf prog noticed it's a
+SENDMSG sock option and will selectively call
+bpf_sock_ops_enable_tx_tstamp() to do so. Only by calling
+bpf_sock_ops_enable_tx_tstamp() could the skb be tracked.
+
+Thanks,
+Jason
 
