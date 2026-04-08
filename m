@@ -1,233 +1,181 @@
-Return-Path: <netdev+bounces-276335-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276336-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YLtqAVgL1mlnAwgAu9opvQ
-	(envelope-from <netdev+bounces-276335-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 10:01:28 +0200
+	id KBWzKCIM1mlnAwgAu9opvQ
+	(envelope-from <netdev+bounces-276336-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 10:04:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AE333B8ABB
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 10:01:22 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1FE43B8B5A
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 10:04:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0B47B3005768
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 08:01:21 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 09BAC300BE0C
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 08:04:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89EC839B962;
-	Wed,  8 Apr 2026 08:01:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C45EE39C629;
+	Wed,  8 Apr 2026 08:04:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N4YhCt08";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ch0ViUVq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="narVIeIX"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 875C537F749
-	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 08:01:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F5A939C012;
+	Wed,  8 Apr 2026 08:04:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775635279; cv=none; b=QgAWt+igkGmbbLvQbS2qHLQcecpWYLo7YtsSSc8AGuu1VCBjPOxf7HQ8a/XV5ZPql/r8q27Vs8y4RS/oVFU8ORCj2Auxo0s4SGA2CFm6BvVgmTlRnDpJYwYlMi+N4V7gGYB6sFX4mSNGaEp7bta+J+3i+5ioxjibYQYMZEV7q1Y=
+	t=1775635462; cv=none; b=VdUbURN141phyVpG/s6ydsOxsK0sd3WaOv4BDHaWGDQuxSFFW7FPF8HXVRTi9Ffwuzr1j9WwCH394owzN6UngkI0Gv6EZ8Cx8fzI7G+vIfGpc0hN2/7k11yzK1ycOlDi1Bz/YiG4y9RMG6C3K+iHAn0LBc2TC0dAyma7vwalx/A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775635279; c=relaxed/simple;
-	bh=VNtmdeyD8ks5WGqCaRVQj9tbrSu1bGMKSPQMorgZx2A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aZB8YVXvYZoJUL5bMfukFLqKoUPfIbhfgSf4iaQcpHkwhWTsVWyBdV7mY6A4QoFc7FF5LcLrHts1IbBCS1zs68EshsS4MVXEy+ffEDecL/celaaR8x8ddrqWbvrSfcZEFH4zV9h3kgFEJPOh1jHmCWf4ysbUAb24i89HEutm+Z4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=N4YhCt08; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ch0ViUVq; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1775635276;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vv/PNE06UTD9uwqSDBv6GwqwhwLSI3Ze0AfZPOM3Rjw=;
-	b=N4YhCt08WxrtYpqJ+PGXGePVKFdrliycyP1IxZRFm+dw7kgeDsSpn18U4LuQnBWSkjWJbt
-	8aYL5ZhVpoWAhwEQLKa79BnR5GOeQM+A18VspsnUhjb5M919wwNHF3Q3lw/JeHlUxse4pi
-	DyyVt3chvkzdxRN7/QcJKeFQG1TX9hk=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-59-ZCGXpsinOFWHLA9B0cKQ5A-1; Wed, 08 Apr 2026 04:01:15 -0400
-X-MC-Unique: ZCGXpsinOFWHLA9B0cKQ5A-1
-X-Mimecast-MFC-AGG-ID: ZCGXpsinOFWHLA9B0cKQ5A_1775635274
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-488be6ab870so11473085e9.3
-        for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 01:01:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1775635274; x=1776240074; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vv/PNE06UTD9uwqSDBv6GwqwhwLSI3Ze0AfZPOM3Rjw=;
-        b=Ch0ViUVqviotazvWKXu1RmQ3E4r6JS7i8MgGCkHHl9qN69e/5oRiCDWnrKfWvwKowI
-         GqGd5x/3xvBCDz7Z+pxLfhMQ5HAnt2Ctr0j3r1opSdDgC3Flh1NnuevySwKbwG0LEHnG
-         HjMHISjAVfh7m3f7JQ+auREX9MqiuwwChEmAPmTk+e/pzcz0aYjpF11txbIasizWalmY
-         BhXTGYu0puBEge1ToQHfBNFNCueThfRdmxr29nloRbUBumiYWkNB34v45gWz89YdcWiU
-         9PFS+ujW1YNqKu1Uq5P6Hip3wVQf6zQGPzFp5wyY7iVzzADH7PpC10OnSh8yMyxDWa2A
-         VD+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775635274; x=1776240074;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vv/PNE06UTD9uwqSDBv6GwqwhwLSI3Ze0AfZPOM3Rjw=;
-        b=hEO6cZ22quHn7JfGYUvfYY7MdtX3gNhVHGoAnIox9mLNpf8CGYC3MDRY634fUj52tX
-         FcHy/8bqmFJDIhpNDQSZZz73RnAr+9TDEyK32AYxyb6ob/pJ1xz/JDazdxJ/F+2L3W2I
-         Z7RfYruoKyPXRtfUd0fBGW8kdUy1NHpCeA0Q1Bu5dQxYtHHal8gwcfyEh0xPn70jBg7P
-         PniAbJ9BIgZuz1DjkFJPZQ0M3NnT7qrbf1+Vgj6vRPOYdMteI89hgwtzO5XVQsUy8Anv
-         NqJCVnKqhbC0It1VXj2R1R+YISC39c8sa+entcroxjmC7p6Xzk6szHfAmnwIJYsD8M1g
-         6Skg==
-X-Forwarded-Encrypted: i=1; AJvYcCWvJu1qTY3dSa6Li+xyYYtnJ2t/mBNCTOaJ3gN8mS1xs/FC9tvVVS2sh+0bcectQj8bnqKNHpw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzG3f85gi8vx7t0SJRvsOCXIdbJSm9OB8NQ7bP8RDOUbJHzSGBq
-	FkCUoL2rmR5kSH/ZwT6ad/kw20+uh93mwKjW/QrSHYsNZKE0HEebx7y8//lWjVTGJPsGn4faucE
-	j8VhQ4HCwT88qD/12vy5+LWljdFWfUM0waYtThtx9jZl/UhfHjw03Em3gZw==
-X-Gm-Gg: AeBDiessWuwmimw7URSanHvoEJs5sHeXJH/Y8TvHKSVmw1iXVEYk/cSw3qaIFBQoZ7Q
-	li7j50mlda/3KQb25d7uAKOsptcl020XFr3//zNVZDgqqkbsJXCDdKfuigY2R9X6t95u4axkl5E
-	7kyogLr/GzHDRtcx2pcUcPOX/EAeeRO+zK5HglIX6WGUTKHX4Ql/i+34pRpyFVzwu0cT+5QgpRA
-	o+Z3Z2u34OpJmZAtLSLrLs5d4tqhOjWcFldRoYfqA4+PqgnJwWWsZngdurk+o2y85D1wXp+/cEl
-	ObFCow1hUjSgQ40GZUKzdm2dpLj81tFghMPU/QldXJAEOBRopJWWLGEeKqi5g2XymKWl/XOnlC6
-	iL8pgVNBVVyBPursxzouPeTkqx8dokCyYnO63xj/kmbczGpzANZ45O/VtXslNjvEbEjPn5R9OPQ
-	==
-X-Received: by 2002:a05:600c:5292:b0:485:ae14:8191 with SMTP id 5b1f17b1804b1-488996d2309mr295098745e9.5.1775635273738;
-        Wed, 08 Apr 2026 01:01:13 -0700 (PDT)
-X-Received: by 2002:a05:600c:5292:b0:485:ae14:8191 with SMTP id 5b1f17b1804b1-488996d2309mr295097975e9.5.1775635273101;
-        Wed, 08 Apr 2026 01:01:13 -0700 (PDT)
-Received: from sgarzare-redhat (host-79-45-205-236.retail.telecomitalia.it. [79.45.205.236])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488a91686f9sm352031205e9.10.2026.04.08.01.01.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Apr 2026 01:01:12 -0700 (PDT)
-Date: Wed, 8 Apr 2026 10:01:04 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Norbert Szetei <norbert@doyensec.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org, virtualization@lists.linux.dev, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, John Villamil <john@doyensec.com>
-Subject: Re: [BUG] vsock: refcount_t saturation and OOM via buffer size
- invariant inversion
-Message-ID: <adYKERRYwzMIhZAl@sgarzare-redhat>
-References: <523A8D3C-F4D9-43DD-A3A6-01C9EC335656@doyensec.com>
- <acuKUpZQq6z1DY_n@sgarzare-redhat>
- <C918071D-C036-4FD3-BD64-16C8E143479F@doyensec.com>
+	s=arc-20240116; t=1775635462; c=relaxed/simple;
+	bh=DqQn1QbgGalUlwfTeJD4OKWAxtEs1W9p9GDTr8KZMVM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=o1nngDb1sAhuC8IcD1i3JYyzMHZHeXwsLJQBbr3zGdHGa9yGk2ml6Mp7GVXyMkBNR50l/LDQWx96doav+rMW6YhmoHhtW8A3+Fxawhif9IpxxhGUZ63MdRYzLidWz5tO5i86vJwpAx3sROFL7j3Jec/N4k3x9Kq/lLilVVVKiM8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=narVIeIX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B17D8C19425;
+	Wed,  8 Apr 2026 08:04:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775635462;
+	bh=DqQn1QbgGalUlwfTeJD4OKWAxtEs1W9p9GDTr8KZMVM=;
+	h=From:To:Cc:Subject:Date:From;
+	b=narVIeIXKDPpGhVFsMJL2UNaDtJtuS2xIqCsnCPcuY+mppY4gZr90qH7Ysz3xOG6d
+	 xnce22VtIkHmQJeMcrkEa4vA/OZ3My42InPcoHhXXZXZYr/njEYMkgFbNi83XKf+Jk
+	 gMgDvf/QVH4wCQIKjhguD3spcuDRalIJP8tLY+sXP3k6YC3TfrJHQSG/I/selDugP8
+	 VI3eV5njIpVKGWRs9oI9lpIORwIZZYrsBWou70OzaevykKzm+iNndkc/GGizpjLwLt
+	 J3OTd3N8IJVu24kkRCUtq10BKwjS5ya4x4cNxscBgA+doWCtiPTmT7M1dLrl4WVpM7
+	 I0Qbx++IOW57w==
+From: Allison Henderson <achender@kernel.org>
+To: netdev@vger.kernel.org
+Cc: pabeni@redhat.com,
+	edumazet@google.com,
+	rds-devel@oss.oracle.com,
+	kuba@kernel.org,
+	horms@kernel.org,
+	linux-rdma@vger.kernel.org,
+	achender@kernel.org
+Subject: [PATCH net v2 0/2] net/rds: Fix use-after-free in RDS/IB for non-init namespaces
+Date: Wed,  8 Apr 2026 01:04:18 -0700
+Message-ID: <20260408080420.540032-1-achender@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <C918071D-C036-4FD3-BD64-16C8E143479F@doyensec.com>
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-276335-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RBL_SEM_FAIL(0.00)[104.64.211.4:query timed out];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RSPAMD_URIBL_FAIL(0.00)[doyensec.com:query timed out];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-276336-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sgarzare@redhat.com,netdev@vger.kernel.org];
-	RSPAMD_EMAILBL_FAIL(0.00)[norbert.doyensec.com:query timed out];
+	FROM_NEQ_ENVFROM(0.00)[achender@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7AE333B8ABB
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E1FE43B8B5A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Apr 06, 2026 at 08:36:16PM +0200, Norbert Szetei wrote:
->Hi Stefano,
->
->I like option 1 the most, as it is the most straightforward way to fix
->the issue. I am including the patch below. This fixes the clamping
->mismatch, but as you pointed out, it won't solve the root problem
->regarding the issue to arbitrarily set a maximum buffer value.
->
->Since VSOCK uses a unified buffer size rather than separating read and
->write buffers like the core stack, introducing a vsock-specific sysctl
->(e.g., net.vmw_vsock.buffer_max_size) seems the cleanest approach to me.
->I was also considering net.core.wmem_max/rmem_max, but mapping to those
->feels less natural.
+This series fixes syzbot bug da8e060735ae02c8f3d1
+https://syzkaller.appspot.com/bug?extid=da8e060735ae02c8f3d1
 
-I would prefer to stop to add custom sysctl/sockopt for vsock and start 
-to reuse the common ones, so if net.core.wmem_max/rmem_max can be used 
-in some way, maybe we can try that path first and fallback to a custom 
-one if we see it isn't doable.
+The report finds a use-after-free bug where ib connections access an
+invalid network namespace after it has been freed.  The stack is:
 
->
->If you agree with the vsock-specific sysctl, or have a different
->suggestion, let me know and I will send a follow-up patch for that.
->Thanks.
->
->Best, Norbert
->
->-- >8 --
->From f5d160167c862c7f2ad6e6a1d4181d01997b683a Mon Sep 17 00:00:00 2001
->From: Norbert Szetei <norbert@doyensec.com>
->Date: Mon, 6 Apr 2026 19:52:52 +0200
->Subject: [PATCH] vsock: fix buffer size clamping order
->
->In vsock_update_buffer_size(), the buffer size was being clamped to the
->maximum first, and then to the minimum. If a user sets a minimum buffer
->size larger than the maximum, the minimum check overrides the maximum
->check, inverting the constraint.
->
->This breaks the intended socket memory boundaries by allowing the
->vsk->buffer_size to grow beyond the configured vsk->buffer_max_size.
->
->Fix this by checking the minimum first, and then the maximum. This
->ensures the buffer size never exceeds the buffer_max_size.
+    rds_rdma_cm_event_handler_cmn
+      rds_conn_path_drop
+        rds_destroy_pending
+          check_net()  <-- use-after-free
 
-Please add a Fixes tag here, that should be:
+This is initially introduced in:
+d5a8ac28a7ff ("RDS-TCP: Make RDS-TCP work correctly when it is set up
+in a netns other than init_net").
 
-Fixes: b9f2b0ffde0c ("vsock: handle buffer_size sockopts in the core")
+Here, we made RDS aware of the namespace by storing a net pointer in
+each connection.  But it is not explicitly restricted to init_net in
+the case of ib. The RDS/TCP transport has its own pernet exit handler
+(rds_tcp_exit_net) that destroys connections when a namespace is torn
+down. But RDS/IB does not support more than the initial namespace and
+has no such handler. The initial namespace is statically allocated,
+and never torn down, so it always has at least one reference.
 
-For virtio transport it was pre-existing of that commit IIUC, but 
-doesn't metter since these changes will not apply without that commit, 
-so should be fine.
+Allowing non init namespaces that do not have a persistent reference
+means that when their refcounts drop to zero, they are released through
+cleanup_net(). Which would call any registered pernet clean up handlers
+if it had any, but since they don't in this case, the extra
+rds_connections remain with stale c_net pointers.  Which are then
+accessed later causing the use-after-free bug.
 
-Please add also a Suggested-by.
+So, the simple fix is to disallow more than the initial namespace
+to be created in the case of ib connections.
 
->
->Signed-off-by: Norbert Szetei <norbert@doyensec.com>
->---
-> net/vmw_vsock/af_vsock.c | 6 +++---
-> 1 file changed, 3 insertions(+), 3 deletions(-)
->
->diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->index d912ed2f012a..08f4dfb9782c 100644
->--- a/net/vmw_vsock/af_vsock.c
->+++ b/net/vmw_vsock/af_vsock.c
->@@ -1951,12 +1951,12 @@ static void vsock_update_buffer_size(struct vsock_sock *vsk,
-> 				    const struct vsock_transport *transport,
-> 				    u64 val)
-> {
->-	if (val > vsk->buffer_max_size)
->-		val = vsk->buffer_max_size;
->-
-> 	if (val < vsk->buffer_min_size)
-> 		val = vsk->buffer_min_size;
->
->+	if (val > vsk->buffer_max_size)
->+		val = vsk->buffer_max_size;
->+
+Fixes are ported from UEK patches found here:
 
-The patch itself LGTM!
+  https://github.com/oracle/linux-uek/commit/8ed9a82376b7
+  Patch 1 is a prerequisite optimization to rds_ib_laddr_check() that
+  avoids excessive rdma_bind_addr() calls during transport probing by
+  first checking rds_ib_get_device().  This is needed because patch 2
+  adds a namespace check at the top of the same function.
 
-Thanks,
-Stefano
+    UEK: 8ed9a82376b7 ("rds: ib: Optimize rds_ib_laddr_check")
+
+  https://github.com/oracle/linux-uek/commit/bd9489a08004
+  Patch 2 restricts RDS/IB to the initial network namespace.  It adds
+  checks in both rds_ib_laddr_check() and rds_set_transport() to reject
+  IB use from non-init namespaces with -EPROTOTYPE.  This prevents the
+  use-after-free by ensuring IB connections cannot exist in namespaces
+  that may be torn down.
+
+    UEK: bd9489a08004 ("net/rds: Restrict use of RDS/IB to the initial
+    network namespace")
+
+Questions, comments and feedback appreciated!
+
+Thank you!
+Allison
+
+Change Log:
+v2:
+   [PATCH net v2 1/2] net/rds: Optimize rds_ib_laddr_check
+        - Added missing author sob
+        - Added ipv6_addr_v4mapped check
+
+   [PATCH net v2 2/2] net/rds: Restrict use of RDS/IB to the initial
+        - Addressed comment consistency nits
+        - Addressed commit message nits
+
+Greg Jumper (1):
+  net/rds: Restrict use of RDS/IB to the initial network namespace
+
+Håkon Bugge (1):
+  net/rds: Optimize rds_ib_laddr_check
+
+ net/rds/af_rds.c  | 10 ++++++++--
+ net/rds/ib.c      | 24 ++++++++++++++++++++++--
+ net/rds/ib.h      |  1 +
+ net/rds/ib_rdma.c |  2 +-
+ 4 files changed, 32 insertions(+), 5 deletions(-)
+
+-- 
+2.43.0
 
 
