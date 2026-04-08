@@ -1,228 +1,317 @@
-Return-Path: <netdev+bounces-276403-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276408-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WFajOjYj1mklBQgAu9opvQ
-	(envelope-from <netdev+bounces-276403-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 11:43:18 +0200
+	id sCRJHiQk1mklBQgAu9opvQ
+	(envelope-from <netdev+bounces-276408-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 11:47:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71B523BA09D
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 11:43:18 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id E99FD3BA175
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 11:47:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B65CD301AF5E
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 09:43:14 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6CB4F308795E
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 09:44:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F18FE3B0ADD;
-	Wed,  8 Apr 2026 09:43:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAAB239F192;
+	Wed,  8 Apr 2026 09:44:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="BBm2cwq5"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="eSDclOdP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+Received: from AM0PR02CU008.outbound.protection.outlook.com (mail-westeuropeazon11013042.outbound.protection.outlook.com [52.101.72.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DC513AEF5D
-	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 09:43:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775641392; cv=none; b=nVf13f+ODusMm5Ik+Wk+vOV/i8AdTcT5U+z/NYVt/lm89bLEFVp7G9MGcSDWee8+9TzGsW/oDwU6RX2RCvVXh3JOcMYuHTQjPNgiTfEbpvigqX40nOWvl4yhRGiIo9WlRYTaVOhHjBt2O+cAYdadakivG9ZcMzV75EoKDS0AVJ0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775641392; c=relaxed/simple;
-	bh=Zl3KgDqLZubXIuE3pPY4Bw42hHBkOTDD1Ar6IXlXOIw=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=up4fpn4a+7JznpkZlM/fdp5/cccQkoOFpW2sq64k8JeoTCziIUrgnTNKtKjDsHDkr9n+Po8a0G8fBILFMNn6UFpcdg45hIx7tKIlFE0QvKgxYaY2bIZRdtgO8sevq6KBZI9XMIc5Fp5SM46ZH3pfJwg7bPW+XO9Bw6dmZpoyneg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=BBm2cwq5; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id 73B87207F4;
-	Wed,  8 Apr 2026 11:43:07 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from mx1.secunet.com ([127.0.0.1])
- by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1g7HLMtsvhQ2; Wed,  8 Apr 2026 11:43:06 +0200 (CEST)
-Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id 7A1172065A;
-	Wed,  8 Apr 2026 11:43:06 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 7A1172065A
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1775641386;
-	bh=MYNGsVgOGJKqUhNzFmpNsWUR5BIL9tKi5YLBoCOxVxY=;
-	h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-	b=BBm2cwq5bLK7QoXEk/GVxviiSxjeU8k6zxUrrjNy8F7np3diBQeV7Z5ELTiFkWb+h
-	 bzwSO/2N1Dzohj0i6Jqvhw12L4cZPwf/ISgIJGTRU7TJKrlVYgaicMl3vFGqTAzeJl
-	 JPe2EIIXxCBtdrzfjnnpB0mFIwnrH+cqrxKXp4Se8MrZwFsC7/qmrA7bixGag8D5y7
-	 6umGrDjl6u+4HyX1O1brkAr4uOuMo+L4qa1zldOkW9kBOlrkm2xPUPo8bB5p/dTLJg
-	 M73KlLh+Xw4glTfvG9U5oPc8A1nbiXqqr/Fx2VYeQFm+XMg0GGlpz5kERcb6CdikH+
-	 UNgM+HSRPeAkg==
-Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Wed, 8 Apr
- 2026 11:43:05 +0200
-Received: (nullmailer pid 150869 invoked by uid 1000);
-	Wed, 08 Apr 2026 09:43:03 -0000
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
-CC: Herbert Xu <herbert@gondor.apana.org.au>, Steffen Klassert
-	<steffen.klassert@secunet.com>, <netdev@vger.kernel.org>
-Subject: [PATCH 2/2] xfrm: Drop support for HMAC-RIPEMD-160
-Date: Wed, 8 Apr 2026 11:42:41 +0200
-Message-ID: <20260408094258.148555-3-steffen.klassert@secunet.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260408094258.148555-1-steffen.klassert@secunet.com>
-References: <20260408094258.148555-1-steffen.klassert@secunet.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16C4937C10F;
+	Wed,  8 Apr 2026 09:44:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.72.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775641492; cv=fail; b=R2w5ZUH6dtd6YpivFzu6yoAyiu8N3IvLbRnOBBVIG/DwEMYZmYePtChTJVYx3EgcM5q9VEpc2hF8LPlt8NVCrZUozMHiaiwdHXxKAVBZd1HpQ7qDBFHtPs9UAH3CivsZFPdGwWlCDVe1e6UdIAxi/OQBHs8YKWeCxQk1DtL7H2s=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775641492; c=relaxed/simple;
+	bh=wjoY0Xe6mBZu6lxOOgHezvnqkvTlfoVMhrYV8l+yA7c=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=r5WdIbUVVVlL7iEtHP8J1yN3jI+yXXObBOY5rGHKVWKhQZI4n68cFNSsk+oN3oPh0huFE7AdnPknq0UycVKmtqiEiJZisC56tGX7YocCHZQcu0d189BL4UoDJhCi24zbvmkWMfH5jHRdE85h5i3yQzHdPGJtHxNyM5LJbM72An4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=eSDclOdP; arc=fail smtp.client-ip=52.101.72.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=gBQcLHCvFtUN6WCiqY47uOkIesC5eP//HmYDexCNSc6ofZjdvUifTcsD4wkpc1vaw5aVTE4ZDlDzmVHIPBpuLPo57hcOPRjMIaGOHKd+ZjOATetXr87iW34CvNpqGNq619/mKkj293dnhr47X0XWv4MF0C0xW0fAEZyFZkgLgD0Vxoc6hOajOvPNCkMau++9gLSyva/OYn7en6UQtH7KF79hIvQH8uPXn3kF+z44XxepGbLD3N9stM9mSo73XUY9tSCdQw4p69hpf7RkwKnUvu1tjbkXdiFQAltOWcYbiws64Y3tb1JRx0A3XRilQxBmaF+UFwm0o3gTzlLeVuouhQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=cqkMj/z9YLf1xcoPo8qRCjJAL0AYkEHiBoA0k21NQak=;
+ b=Zk2a4LL4KGBUfYfPfiN7mfdu6ansT2aWGQbJoxSR38EVpj1a0Y7vb224Zwhk8gclJTJHrFSEzkudmMpsxR5ZzVYtoTasiSGHP0Az5kZe+IpiBGrYhLtYXXkL0OQ71TpmNes66kdKVNgV/dpRC7xi/K/2IJ1F3UM03dleuy33Ofad8NMSe15hWqxQrdmmruY8SvGQmygNkaTEp55DVZUZ0+ZMrVrDrKU/ul94baQqSDZbZT5P65Xecc2QbqL257qehEeurnciu83u4bq49BjicP7n5lOXhXYxtEP8wImgAuHYKXMpsACzTYc2+GrTon7QcJZdr1zz/OEOZIW5oIQVZQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=cqkMj/z9YLf1xcoPo8qRCjJAL0AYkEHiBoA0k21NQak=;
+ b=eSDclOdPWInOdvTuWF2UjUeEaoKP96fyWh1BBsi3QO+DV1pNKKLKQB8XAjSqHHEN8ieNmzpjhtjbtz/8qZ33y4sN0c8gzbnv5+jv3tO1N993C4Ml2sOZfk8WMyIhPf83WP6RMtiK6E+1pNf2e/HBy+IuP+Tpx2yqM0d+Rp5dCJ0xmBDTNvA9PCXiiFwwFbalW3QdGlObgs5nNUeeDWo9379/UHSv8IrcIu/yJXzxbp2IaQWJgXebSO+fOpgnwwbUcfm+C+9h5xVkgIgIKgWyuE/9ZoENHihvItbowgVPe7SwiEt5pk6YrPpE8C4ZmRV3cxIJVRdiFb6GCUHY/FKamg==
+Received: from AM8PR04MB7284.eurprd04.prod.outlook.com (2603:10a6:20b:1dc::8)
+ by VI0PR04MB10592.eurprd04.prod.outlook.com (2603:10a6:800:266::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.17; Wed, 8 Apr
+ 2026 09:44:44 +0000
+Received: from AM8PR04MB7284.eurprd04.prod.outlook.com
+ ([fe80::9cd6:51bd:82b:98dc]) by AM8PR04MB7284.eurprd04.prod.outlook.com
+ ([fe80::9cd6:51bd:82b:98dc%5]) with mapi id 15.20.9769.014; Wed, 8 Apr 2026
+ 09:44:44 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: Claudiu Manoil <claudiu.manoil@nxp.com>, Vladimir Oltean
+	<vladimir.oltean@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
+	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "robh@kernel.org" <robh@kernel.org>,
+	"krzk+dt@kernel.org" <krzk+dt@kernel.org>, "conor+dt@kernel.org"
+	<conor+dt@kernel.org>, "f.fainelli@gmail.com" <f.fainelli@gmail.com>, Frank
+ Li <frank.li@nxp.com>, "chleroy@kernel.org" <chleroy@kernel.org>,
+	"horms@kernel.org" <horms@kernel.org>, "linux@armlinux.org.uk"
+	<linux@armlinux.org.uk>, "andrew@lunn.ch" <andrew@lunn.ch>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "imx@lists.linux.dev"
+	<imx@lists.linux.dev>
+Subject: RE: [PATCH v4 net-next 11/14] net: dsa: netc: add phylink MAC
+ operations
+Thread-Topic: [PATCH v4 net-next 11/14] net: dsa: netc: add phylink MAC
+ operations
+Thread-Index: AQHcwQGvQKsKh1G3FkuUy4SjctygFrXMjVAAgAhdnYA=
+Date: Wed, 8 Apr 2026 09:44:44 +0000
+Message-ID:
+ <AM8PR04MB7284FECA252137F74F32EFFA885BA@AM8PR04MB7284.eurprd04.prod.outlook.com>
+References: <20260331113025.1566878-12-wei.fang@nxp.com>
+ <20260403011740.1795694-1-kuba@kernel.org>
+In-Reply-To: <20260403011740.1795694-1-kuba@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: AM8PR04MB7284:EE_|VI0PR04MB10592:EE_
+x-ms-office365-filtering-correlation-id: c5c7be12-23e2-4413-8bee-08de95537719
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|19092799006|1800799024|376014|7416014|18002099003|38070700021|22082099003|56012099003;
+x-microsoft-antispam-message-info:
+ OrkY3751x0BgL5hAYVjty9Cf1fNjsrig8gBJ9TiF/X7jayiG/BpmM6Y0XfXuuQuiJ18rriPxgBICjiLyWi52MvtwOfZhOnzqTi+tQPFecMUETpQZAmsFh76ho8a90GvlEkGY7aIXLIPDqCfNzNivoirZb0Hk7cR0QVSK0G6NFqo8nwPe4l86cLkFvu1lKlmidpjO8C56/QrIHs1YO4TX+EsQZCg9x6MleyZ8a8qiL0RBHaR36UJQuA/Ir0CHOv4gluKVg29HcXjjgW+Eg136zO9CUYfwlTKFMi0RsStVhZzOw1Yk1UQZJKkrdTtpDz3Z3fIr3TvVoE12B31cHHvO0PvIpcll9E+DrIL0AvoRavBEtn2E2NsneQo+gKNV/zJ4O7UhE/zQmX3SYhWblB4Oa9S8in//kOCZnv+MP+VLtY1EZwBHRWAmdrtN+ra/dm+fHGYWNB6/yHQnjGIQrbxgim9+U2CGi4k1H9YAUfG00/2zvJBegAJxnPy1+IPIAjdfHAX7/OJWNUhGwloAawsb38UOfj27Uk9hCT87pusau5nYewM5UnsAcq7TZkQpsksGZ5uYSGt7KxTiHU6crfcZSk49kKd/SEXacY+COydmg2Gox/8aGWXJJ3l8bDY3Ta6QKHY2OW3u7BkKMCCe+BB+U4dYEyLoKJoAfWysCY+5qLHXmMzUUEZXphZRP8xaCdmePEhfUX2UHGMAMB3GvKTGe+piqu2kqX7oGJsOrM7Hmo/GwKJCIBF3CZKhsOIoQxyhcCpX7PtfXkLFzq38eorVeUxL+m51KMxiNWrVVmWQn1I=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7284.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(19092799006)(1800799024)(376014)(7416014)(18002099003)(38070700021)(22082099003)(56012099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?1NwDr/0TM5CWrC8MTXqCTEBhbS/ysrYjibcyTIizswG9DlZJ/m3yfOO7/603?=
+ =?us-ascii?Q?uKHEaVn4znK3gJoByGz+zO39SQvV4A+QFaRQ2gMW7ycMHx+MqrDWNgR/8TYU?=
+ =?us-ascii?Q?Rjglsg7ueHa57z5FKrf/zjP3FHGqLt1dInmWjhfnvocMNevSRCV0ZZAhoahe?=
+ =?us-ascii?Q?a997+BJDFQqqaCWz6LqExbn1Hd7fiCTL2Rnlf13PZLpNnoOr6pdn2wnqfklJ?=
+ =?us-ascii?Q?lO590Vzr2X5EJHpezT/OuuK7PBjyg3XEvlUasjfOuHL1WhycrMnKW0TXkr9I?=
+ =?us-ascii?Q?xVrkdipqsIcyOcpKHBMH6X53f4SC+O4/zVAYBw7lxgwql9OhUcFoOsgwhX+s?=
+ =?us-ascii?Q?J2l/WyTs0eTy/wQ2UP1QaSqTMuq25cEiQ8G7HR/goBhsAu4XOtFEy0OLH07I?=
+ =?us-ascii?Q?SP7UrpS+rrV8lyG/uf6HgNpM/5fj3V1lncTGrcO39nJso8cijEgHo/ryPhGg?=
+ =?us-ascii?Q?OT0JSZ6jGLf2U6xOhkVTvHKkZulLuxbzH6oAdzGLwWTHwD+4hwnVQGh619AN?=
+ =?us-ascii?Q?xZp0Elg7jHEhI8cUEnfMYvIlFsc8EURNofLqZo2YCW9PNFlceTeHgPwRE7hx?=
+ =?us-ascii?Q?gxpW2HQGjpD3JvACUifjJjThr3XFrxb2YDBJB4onU1a+4vY2LdLAIPw4F69p?=
+ =?us-ascii?Q?zBSl/ZV5YdpA9GFUkKBlCIKNLGgyTTY/64TDV7lzZ3NQgGr4hOGY2v//jQeF?=
+ =?us-ascii?Q?o3iEHvpI8UqA6unD0Dh5qKj7ukzzp6SABq6o5/xDmp+GdzC+NfhMLApP9PUG?=
+ =?us-ascii?Q?crOvuVUZQkRkrNM65TTVG3WtBI6gFApqPSre9EOv9W4YlUlsw+cVmKF32igQ?=
+ =?us-ascii?Q?vjKIhdt9NnSIH+kkOTSA2VDj1c7vnJo/Fj6Yhcoss8bUxPWpZtSH+BPIrWNp?=
+ =?us-ascii?Q?bo1WluECA/qyOFmq6X6Q42zpMosBN4BufAdm8nxh7RnvtPzH66pdd5Z7DH33?=
+ =?us-ascii?Q?QQ+X1HzvwYnvdywzgce+gNHHVpZAiSN5HpoytfQE4UirG/eHkT15fBySh1Jl?=
+ =?us-ascii?Q?v7Ffb+/kJ3l7H/1P30adlMW05rkt+MufHj6xUihw5+phnlfMCzEC8BcVGeRt?=
+ =?us-ascii?Q?v28TRcZCuS663zUqhXhOc9ltEjw+4CfDNZLzj5lLk7aQqWyTbF49Z6Nt7zoU?=
+ =?us-ascii?Q?ivsGl0DkhGU2S3N+kkZAtJCXTTNrfqXvx0pp6td6kcjZUb7CCsvDKUQe1QJF?=
+ =?us-ascii?Q?jpPMM1bLCGKMxwADouPEgHDBtcFO4r8dwEy8Ls51LMGpGhMzW6cirzDoLFzr?=
+ =?us-ascii?Q?oAb9qEFt9edlm3QDZhvJyTPrA+xgfoPqwhibfoOtMtBU+97wIjezRrSCjGH1?=
+ =?us-ascii?Q?K5urx5Kb0rghst6BnEs/6qWYd0y9qfiGXLBf1hea0s1d7U7bZgz7HEXGg7yw?=
+ =?us-ascii?Q?YqvvUrDZ/GlGDxJKL0L8vks3zXtJotKsqvtvoK0G82SmyimjrBbXRP4m3/bl?=
+ =?us-ascii?Q?QTeajVQ1fhZ1BmGoSOIFQiGkBxq5S+SJTQgP1C8OyB/wwckydLhUs/jRbLC+?=
+ =?us-ascii?Q?MDB587Rmmdn1En2B+x4SU+ch7kDOU+swdEVktsjZtbbejrKk/revHtvH+nI9?=
+ =?us-ascii?Q?lrCBu3vL7nVDExHADPguaPvEXB+Gcnoy1/NVz5UWQDY090CdWxHt79sNM8WR?=
+ =?us-ascii?Q?GO888bPGfW9krLzPuW3MYEkmIXUpVSsHk6kycBJAv8I4ji5SZo+byejBiB7w?=
+ =?us-ascii?Q?7R6BtHtaS6upnszodg5nz8l4lLDJ/IYUBk1kPsHzFTMFvEAS?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EXCH-01.secunet.de (10.32.0.171) To EXCH-01.secunet.de
- (10.32.0.171)
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7284.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c5c7be12-23e2-4413-8bee-08de95537719
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Apr 2026 09:44:44.6101
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: hccfQUgPuG9+rYeHm4bAGxMGYeXS9/IJGMG0gZad8vnk5GcAKc+wIET8UV/ozDK510IJCL96XWc6Nv3X1BHo0g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI0PR04MB10592
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-276403-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-276408-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[nxp.com,lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,gmail.com,armlinux.org.uk,vger.kernel.org,lists.ozlabs.org,lists.infradead.org,lists.linux.dev];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[wei.fang@nxp.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[secunet.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[secunet.com:dkim,secunet.com:email,secunet.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_FIVE(0.00)[5];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 71B523BA09D
+	DKIM_TRACE(0.00)[nxp.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	NEURAL_HAM(-0.00)[-0.999];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,nxp.com:dkim,AM8PR04MB7284.eurprd04.prod.outlook.com:mid]
+X-Rspamd-Queue-Id: E99FD3BA175
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Eric Biggers <ebiggers@kernel.org>
+> > +static void netc_port_mac_rx_enable(struct netc_port *np)
+> > +{
+> > +	netc_port_rmw(np, NETC_POR, PCR_RXDIS, 0);
+> > +	netc_mac_port_rmw(np, NETC_PM_CMD_CFG(0), PM_CMD_CFG_RX_EN,
+> > +			  PM_CMD_CFG_RX_EN);
+> > +}
+>=20
+> Pseudo ports (like the CPU port) bypass PMAC register accesses during
+> graceful stop via is_netc_pseudo_port(). Should there be a similar check
+> here, and in netc_port_set_mac_mode(), to prevent accessing physical MAC
+> registers on pseudo ports?
 
-Drop support for HMAC-RIPEMD-160 from IPsec to reduce the UAPI surface
-and simplify future maintenance.  It's almost certainly unused.
+netc_mac_port_rmw() has checked whether the port is pseudo MAC. See
+below.
 
-RIPEMD-160 received some attention in the early 2000s when SHA-* weren't
-quite as well established.  But it never received much adoption outside
-of certain niches such as Bitcoin.
+static void netc_mac_port_rmw(struct netc_port *np, u32 reg,
+			      u32 mask, u32 val)
+{
+	u32 old, new;
 
-It's actually unclear that Linux + IPsec + HMAC-RIPEMD-160 has *ever*
-been used, even historically.  When support for it was added in 2003, it
-was done so in a "cleanup" commit without any justification [1].  It
-didn't actually work until someone happened to fix it 5 years later [2].
-That person didn't use or test it either [3].  Finally, also note that
-"hmac(rmd160)" is by far the slowest of the algorithms in aalg_list[].
+	if (is_netc_pseudo_port(np))
+		return;
 
-Of course, today IPsec is usually used with an AEAD, such as AES-GCM.
-But even for IPsec users still using a dedicated auth algorithm, they
-almost certainly aren't using, and shouldn't use, HMAC-RIPEMD-160.
+	[...]
+}
+>=20
+> Additionally, when np->caps.pmac is true, netc_port_mac_rx_graceful_stop(=
+)
+> disables the preemption MAC via NETC_PM_CMD_CFG(1). Should this function
+> re-enable it when bringing the link back up?
 
-Thus, let's just drop support for it.  Note: no kconfig update is
-needed, since CRYPTO_RMD160 wasn't actually being selected anyway.
+netc_mac_port_rmw() also set preemption MAC if the port supports preemtion.
 
-References:
-  [1] linux-history commit d462985fc1941a47
-      ("[IPSEC]: Clean up key manager algorithm handling.")
-  [2] linux commit a13366c632132bb9
-      ("xfrm: xfrm_algo: correct usage of RIPEMD-160")
-  [3] https://lore.kernel.org/all/1212340578-15574-1-git-send-email-rueegsegger@swiss-it.ch
+static void netc_mac_port_rmw(struct netc_port *np, u32 reg,
+			      u32 mask, u32 val)
+{
+	[...]
+	if (np->caps.pmac)
+		netc_port_wr(np, reg + NETC_PMAC_OFFSET, new);
+}
 
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
----
- net/xfrm/xfrm_algo.c                | 20 --------------------
- tools/testing/selftests/net/ipsec.c |  8 ++------
- 2 files changed, 2 insertions(+), 26 deletions(-)
+>=20
+> > +static void netc_port_wait_rx_empty(struct netc_port *np, int mac)
+> > +{
+> > +	u32 val;
+> > +
+> > +	if (read_poll_timeout(netc_port_rd, val, val & PM_IEVENT_RX_EMPTY,
+> > +			      100, 10000, false, np, NETC_PM_IEVENT(mac)))
+> > +		dev_warn(np->switch_priv->dev,
+> > +			 "MAC %d of swp%d RX is not empty\n", mac,
+> > +			 np->dp->index);
+> > +}
+>=20
+> Is NETC_PM_IEVENT a sticky write-1-to-clear register? If the RX FIFO had
+> previously emptied during normal operation, could this bit already be set=
+,
+> causing read_poll_timeout() to return immediately without waiting?
 
-diff --git a/net/xfrm/xfrm_algo.c b/net/xfrm/xfrm_algo.c
-index 749011e031c0..70434495f23f 100644
---- a/net/xfrm/xfrm_algo.c
-+++ b/net/xfrm/xfrm_algo.c
-@@ -290,26 +290,6 @@ static struct xfrm_algo_desc aalg_list[] = {
- 		.sadb_alg_maxbits = 512
- 	}
- },
--{
--	.name = "hmac(rmd160)",
--	.compat = "rmd160",
--
--	.uinfo = {
--		.auth = {
--			.icv_truncbits = 96,
--			.icv_fullbits = 160,
--		}
--	},
--
--	.pfkey_supported = 1,
--
--	.desc = {
--		.sadb_alg_id = SADB_X_AALG_RIPEMD160HMAC,
--		.sadb_alg_ivlen = 0,
--		.sadb_alg_minbits = 160,
--		.sadb_alg_maxbits = 160
--	}
--},
- {
- 	.name = "xcbc(aes)",
- 
-diff --git a/tools/testing/selftests/net/ipsec.c b/tools/testing/selftests/net/ipsec.c
-index f4afef51b930..89c32c354c00 100644
---- a/tools/testing/selftests/net/ipsec.c
-+++ b/tools/testing/selftests/net/ipsec.c
-@@ -62,8 +62,6 @@
- #define VETH_FMT	"ktst-%d"
- #define VETH_LEN	12
- 
--#define XFRM_ALGO_NR_KEYS 29
--
- static int nsfd_parent	= -1;
- static int nsfd_childa	= -1;
- static int nsfd_childb	= -1;
-@@ -96,7 +94,6 @@ struct xfrm_key_entry xfrm_key_entries[] = {
- 	{"cbc(cast5)", 128},
- 	{"cbc(serpent)", 128},
- 	{"hmac(sha1)", 160},
--	{"hmac(rmd160)", 160},
- 	{"cbc(des3_ede)", 192},
- 	{"hmac(sha256)", 256},
- 	{"cbc(aes)", 256},
-@@ -813,7 +810,7 @@ static int xfrm_fill_key(char *name, char *buf,
- {
- 	int i;
- 
--	for (i = 0; i < XFRM_ALGO_NR_KEYS; i++) {
-+	for (i = 0; i < ARRAY_SIZE(xfrm_key_entries); i++) {
- 		if (strncmp(name, xfrm_key_entries[i].algo_name, ALGO_LEN) == 0)
- 			*key_len = xfrm_key_entries[i].key_len;
- 	}
-@@ -2061,8 +2058,7 @@ static int write_desc(int proto, int test_desc_fd,
- int proto_list[] = { IPPROTO_AH, IPPROTO_COMP, IPPROTO_ESP };
- char *ah_list[] = {
- 	"digest_null", "hmac(md5)", "hmac(sha1)", "hmac(sha256)",
--	"hmac(sha384)", "hmac(sha512)", "hmac(rmd160)",
--	"xcbc(aes)", "cmac(aes)"
-+	"hmac(sha384)", "hmac(sha512)", "xcbc(aes)", "cmac(aes)"
- };
- char *comp_list[] = {
- 	"deflate",
--- 
-2.43.0
+NETC_PM_IEVENT[RX_EMPTY] is a read only bit. It will be cleared
+if Rx FIFO not empty or Rx packet receive in process. And it will be
+set if Rx FIFO is empty and no Rx packet receive in process.
+
+>=20
+> > +static void netc_port_mac_rx_graceful_stop(struct netc_port *np)
+> > +{
+> > +	u32 val;
+> > +
+> > +	if (is_netc_pseudo_port(np))
+> > +		goto check_rx_busy;
+> > +
+> > +	if (np->caps.pmac) {
+> > +		netc_port_rmw(np, NETC_PM_CMD_CFG(1), PM_CMD_CFG_RX_EN,
+> 0);
+> > +		netc_port_wait_rx_empty(np, 1);
+> > +	}
+> > +
+> > +	netc_port_rmw(np, NETC_PM_CMD_CFG(0), PM_CMD_CFG_RX_EN, 0);
+> > +	netc_port_wait_rx_empty(np, 0);
+> > +
+> > +check_rx_busy:
+> > +	if (read_poll_timeout(netc_port_rd, val, !(val & PSR_RX_BUSY),
+> > +			      100, 10000, false, np, NETC_PSR))
+> > +		dev_warn(np->switch_priv->dev, "swp%d RX is busy\n",
+> > +			 np->dp->index);
+> > +
+> > +	netc_port_rmw(np, NETC_POR, PCR_RXDIS, PCR_RXDIS);
+> > +}
+>=20
+> For pseudo ports, the code jumps directly to check_rx_busy and polls for
+> PSR_RX_BUSY to clear. Since PCR_RXDIS is only set after the polling
+> completes, will the RX pipeline continue accepting traffic and cause this
+> poll to always timeout on an active link?
+
+For the pseudo ports, no need to check the PSR_RX_BUSY bit, only need
+to set PCR_RXDIS bit to discard RX packets. I will improve it.
+
+>=20
+> > +static void netc_mac_link_up(struct phylink_config *config,
+> > +			     struct phy_device *phy, unsigned int mode,
+> > +			     phy_interface_t interface, int speed,
+> > +			     int duplex, bool tx_pause, bool rx_pause)
+> > +{
+> > +	struct dsa_port *dp =3D dsa_phylink_to_port(config);
+> > +	struct netc_port *np;
+> > +
+> > +	np =3D NETC_PORT(dp->ds, dp->index);
+> > +	netc_port_set_speed(np, speed);
+> > +
+> > +	if (phy_interface_mode_is_rgmii(interface))
+> > +		netc_port_set_rgmii_mac(np, speed, duplex);
+> > +
+> > +	if (interface =3D=3D PHY_INTERFACE_MODE_RMII ||
+> > +	    interface =3D=3D PHY_INTERFACE_MODE_REVMII ||
+> > +	    interface =3D=3D PHY_INTERFACE_MODE_MII)
+> > +		netc_port_set_rmii_mii_mac(np, speed, duplex);
+> > +
+> > +	netc_port_mac_rx_enable(np);
+> > +}
+>=20
+> The callback imx94_switch_phylink_get_caps() advertises MAC_ASYM_PAUSE
+> and
+> MAC_SYM_PAUSE capabilities. Is it expected that tx_pause and rx_pause are
+> ignored here? If flow control is implemented in a subsequent patch, shoul=
+d
+> the advertisement be deferred until then?
+
+Okay, I will move the advertisement to the subsequent patch.
 
 
