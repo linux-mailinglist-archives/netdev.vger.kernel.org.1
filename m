@@ -1,114 +1,164 @@
-Return-Path: <netdev+bounces-276534-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276535-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wOt8GBZV1mm8DQgAu9opvQ
-	(envelope-from <netdev+bounces-276534-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 15:16:06 +0200
+	id mLdXMDBV1mm8DQgAu9opvQ
+	(envelope-from <netdev+bounces-276535-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 15:16:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B22623BCB41
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 15:16:05 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A3643BCB6E
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 15:16:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A3B6E302F0EF
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 13:11:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BCE14304075C
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 13:11:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14E5A3CBE95;
-	Wed,  8 Apr 2026 13:11:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 649ED3AF65E;
+	Wed,  8 Apr 2026 13:11:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b="MFBfXvo1"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EOdgitGc"
 X-Original-To: netdev@vger.kernel.org
-Received: from www2881.sakura.ne.jp (www2881.sakura.ne.jp [49.212.198.91])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69D8138A715
-	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 13:11:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.198.91
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 224D134FF59
+	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 13:11:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775653911; cv=none; b=MxAOnh8qaKPMgD8IwO5uEQjnhmOz48Y6vIO5w0IFQz1E/FPjKwV/e17txwlnAtbm0/pAa8oH/TgfUT5HxJzJ7Lj8BjxgMiGj6v92lO/+8qyAZO0L8OdTtHFuTxzKuwLQiWS8/4y0BKLXBhizFkVJNkjzXW8lPey7AmXiz4fOzRU=
+	t=1775653919; cv=none; b=l+TpsHsd52BMtcUyML0JyA/U6i2rehnkzZdIjAkqpekeMcuejALGU/yh0mSi+vFmXTSA3ntjGe1ckSR8yorS6jEZuAZq24zYFQa1jeudi23qLS/AKkvwzTHxjyzbbMpCbIiA0ivvX/TYdWFP0Q2/J0CQMCxSDCl+5zgxe7FqiCE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775653911; c=relaxed/simple;
-	bh=9jBCa9jP/OgIb/Y7yCDe0H0NO7pg10EEJypKE0ioNGc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sPYeW81xd0mhR8Q7+Yd1C+2PgV/v1LGABEL6C88RyipP5FJZxP5bo1su9rXE0RAiOlp7w9NUBYwWuqK5HHUL+yn6Q9fOMJD1hSfT2a//LJ437DnhlDUvA5hUejkAie2mssevkQLHNv5Sv9w0MNpr7v7fGnkS9GyN9Nr1RZOLH4k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp; spf=pass smtp.mailfrom=enjuk.jp; dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b=MFBfXvo1; arc=none smtp.client-ip=49.212.198.91
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enjuk.jp
-Received: from x1 (13.3.31.150.dy.iij4u.or.jp [150.31.3.13])
-	(authenticated bits=0)
-	by www2881.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 638DBRAt012252
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Wed, 8 Apr 2026 22:11:29 +0900 (JST)
-	(envelope-from kohei@enjuk.jp)
-DKIM-Signature: a=rsa-sha256; bh=UGQ67r6USA+flx1FAnz9wCvHAQQncWp3Wxkm5JwYX7c=;
-        c=relaxed/relaxed; d=enjuk.jp;
-        h=From:Message-ID:To:Subject:Date;
-        s=rs20251215; t=1775653889; v=1;
-        b=MFBfXvo1t7b8sFwFAmdphOrfgZfVVvxSCb+4NfRpPw0uUdD9B8mhHefPp4bk36LQ
-         AWDyvUSSa1o5RAQA4IMCxMKdpnMHgZlm0Q3x8gEmJGQ+qbF04Pkgjz6wxm7jZOiC
-         NgF6847RmsRRT3YIJyBHjChsErS+tRaJv5XLX3lq4IMXwp6SyRO8N/H/0ajSZTR1
-         /prnGoiPyajVlHdg1nlgFnmxpLA9BSe/d6mccoDBNC66d+FzvqImqpMW9a+rhYt4
-         kFGlxlYBgHPzSY+KFmBpdbpH2QJFOZTneUZltkjDGD1ehDaVpySreYPd7r99pv4o
-         1C10Biq3nEmCQljEtIGWzA==
-Date: Wed, 8 Apr 2026 22:11:27 +0900
-From: Kohei Enju <kohei@enjuk.jp>
-To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
-        netdev@vger.kernel.org, Jacob Keller <jacob.e.keller@intel.com>,
-        Simon Horman <horms@kernel.org>
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next] e1000e: use
- ktime_get_real_ns() in e1000e_systim_reset()
-Message-ID: <adZRkBXUJKZqAiS9@x1>
-References: <20260408083644.1621317-1-aleksandr.loktionov@intel.com>
+	s=arc-20240116; t=1775653919; c=relaxed/simple;
+	bh=xHT//3FdP0pzi+J3JCTY+FWqu5wZN0PFM98U8ARD2xs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tmLi065Oo1JIdNy98CMI394WkrWe7h+Wj95B3aVPyfq5IiLeQDxiiFb1VqEAUutHGTVbsLx1ffg/jVuSt1xH3+w5ioyqgl0l+ZYU8YJ2jLjIjYor09ryK4AysNXVI7ER5EQfnZUWVUeplaCkvkVD2bHuC6JprE5WTvrZhu7zcg8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EOdgitGc; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1775653918; x=1807189918;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=xHT//3FdP0pzi+J3JCTY+FWqu5wZN0PFM98U8ARD2xs=;
+  b=EOdgitGcy9eWV40I4OW1O1E7VGJHysThShucfzhUIx5DbR/8Js2uHkeu
+   Hf/DEnKvW0sXBDdw2iwO4jYBk/n1nxJ0dM1K++B3J6J0ayAvcZk6dNW1p
+   hF/0ZGEpOj6YDEzA7ji21mNbz69SDXlQP96ziWcsarg5K3ERWlRMZQ5d1
+   +S51PDfH1eQ7jtweRkvEs3R1MUG7aZQmygiONPNiAxiMMXIBBq9Rq29/8
+   5XvPW5OmENhS7fJM15kPM1e8dGEktfvcRKg5Gw9WrVYqfTbV96UEWBrgQ
+   MWWkGQYEeXopcrsp/LWPt8vrYIz/UhYR3d01ZGl4gdwEMeTgHER2gMlbq
+   g==;
+X-CSE-ConnectionGUID: dEvPd4fuThKZ9q1sU20VdQ==
+X-CSE-MsgGUID: kvUrCWZOR5G9XQNfmAo/gg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11752"; a="102087224"
+X-IronPort-AV: E=Sophos;i="6.23,167,1770624000"; 
+   d="scan'208";a="102087224"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Apr 2026 06:11:57 -0700
+X-CSE-ConnectionGUID: 8xNg/nTORjGkvOQPG9kPaA==
+X-CSE-MsgGUID: RYZ4mSObT7myxSFQlZguuw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,167,1770624000"; 
+   d="scan'208";a="228714940"
+Received: from amlin-019-225.igk.intel.com ([10.102.19.225])
+  by orviesa007.jf.intel.com with ESMTP; 08 Apr 2026 06:11:56 -0700
+From: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+To: intel-wired-lan@lists.osuosl.org,
+	anthony.l.nguyen@intel.com,
+	aleksandr.loktionov@intel.com
+Cc: netdev@vger.kernel.org
+Subject: [PATCH iwl-net v2 0/6] ixgbe: six bug fixes
+Date: Wed,  8 Apr 2026 15:11:48 +0200
+Message-ID: <20260408131154.2661818-1-aleksandr.loktionov@intel.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260408083644.1621317-1-aleksandr.loktionov@intel.com>
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[enjuk.jp,none];
-	R_DKIM_ALLOW(-0.20)[enjuk.jp:s=rs20251215];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-276534-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-276535-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[intel.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kohei@enjuk.jp,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[enjuk.jp:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,enjuk.jp:dkim]
-X-Rspamd-Queue-Id: B22623BCB41
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:dkim,intel.com:mid]
+X-Rspamd-Queue-Id: 3A3643BCB6E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 04/08 10:36, Aleksandr Loktionov wrote:
-> Replace ktime_to_ns(ktime_get_real()) with the direct equivalent
-> ktime_get_real_ns() in e1000e_systim_reset().  Using the combined helper
-> avoids the unnecessary intermediate ktime_t variable and makes the
-> intent clearer.
+Six fixes for the ixgbe driver, covering a SWFW semaphore timeout
+miscalculation, a security-relevant debugfs out-of-bounds, a broken
+flow-control NVM-reset path, a false-success return in the cls_u32
+nexthdr path, an adaptive-ITR u8 overflow, and wrong bit positions in
+the UP-to-TC register normalisation.
 
-FYI, e1000e_xtal_tgp_workaround(), introduced in a recent commit, has
-the same pattern as well, though that commit only exists in Tony's tree.
+Patches 1-3 fix issues that could result in functional regressions
+(FW update failures, OOB MMIO, traffic stall after NVM update).
+Patches 4-6 fix correctness bugs with user-visible effects.
 
-Also, igc has the same pattern in igc_ptp_reset(). It may be worth
-sending a follow-up patch for that as well?
+Patch 1 is a squash of two previously independent submissions:
+  - "ixgbe: increase SWFW semaphore timeout for X550 FW updates"
+    (Soumen Karmakar)
+  - "ixgbe: extend 5 s SWFW semaphore timeout to all X550EM variants"
+    (Marta Plantykow)
+
+The commit message for patch 1 also fixes an error noted in review:
+the previous description stated "200 ms" but the actual default is
+1 s (200 iterations x 5 ms per poll).  Patch 1 also replaces the
+">= X550 && <= x550em_a" range check with three explicit mac.type
+comparisons per Tony Nguyen's request.
+
+Patch 3 additionally handles the setup_fc() failure path that was
+left unaddressed in the prior posting: fc_enable() is now skipped
+when setup_fc() fails so the MDD-triggering stale state is not
+committed to hardware.
+
+Changes in v2:
+ - 1/6: Squash two patches; fix commit msg ("200ms" -> "1s"); three
+        explicit mac.type == comparisons instead of range check.
+ - 2/6: Add Fixes: tag; reroute from iwl-next to iwl-net.
+ - 3/6: Add Fixes: tag; reroute to iwl-net; skip fc_enable() when
+        setup_fc() fails to avoid committing stale FC state.
+ - 4/6: Add Fixes: tag; reroute from iwl-next to iwl-net.
+ - 5/6: Add proper [N/M] patch numbering.
+ - 6/6: Reroute to iwl-net; swap to (expr >> ..) & MASK operand order.
+
+---
+
+Aleksandr Loktionov (5):
+  ixgbe: fix SWFW semaphore timeout for X550 family
+  ixgbe: call ixgbe_setup_fc() before fc_enable() after NVM update
+  ixgbe: fix cls_u32 nexthdr path returning success when no entry installed
+  ixgbe: fix ITR value overflow in adaptive interrupt throttling
+  ixgbe: fix integer overflow and wrong bit position in ixgbe_validate_rtr()
+
+Paul Greenwalt (1):
+  ixgbe: add bounds check for debugfs register access
+
+ drivers/net/ethernet/intel/ixgbe/ixgbe_debugfs.c |  4 ++--
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c    | 18 ++++++++++++------
+ drivers/net/ethernet/intel/ixgbe/ixgbe_x540.c    |  8 ++++++++
+ 3 files changed, 22 insertions(+), 8 deletions(-)
+-- 
+2.52.0
 
