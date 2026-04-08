@@ -1,167 +1,177 @@
-Return-Path: <netdev+bounces-276692-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276693-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kAqDBXSs1mmZHAgAu9opvQ
-	(envelope-from <netdev+bounces-276692-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 21:28:52 +0200
+	id iNjQBaus1mmZHAgAu9opvQ
+	(envelope-from <netdev+bounces-276693-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 21:29:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95D4F3C30DF
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 21:28:51 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 780F53C3139
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 21:29:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8F6B230E0541
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 19:05:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2F7CF30530C2
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 19:11:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5037F3D092A;
-	Wed,  8 Apr 2026 19:05:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A425A3D6CB9;
+	Wed,  8 Apr 2026 19:11:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M1O/Tnqc"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="LMZm0HzU"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D0D13D4134
-	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 19:05:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B4E83290C7
+	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 19:11:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775675110; cv=none; b=XS938AWyFZ8x5B4clR0rt4xAv/e9WxJvzgreo71WgOrGuEmj9NA+ugiY8UcLZDgSDXxbmDPzhZWf2nzIcuHOXE6VqX4pfI8cA+xd1vNmzTKAjUFKq0kO7oQnilvouTt8D66tVqL7Z5J9PeX8RdWnWkbqCFe6kF7F0bONCcwFwNA=
+	t=1775675483; cv=none; b=K6fQI/GNmSDc6i/OFlnKvDs5G+YQHwJ5E15bLfkDwdOn8lR91Up/ZjEIjeDY/YPGJlSvgQ2nqMao2Xya3AQZXGs+Q9jwqhTfm2OkKHMXIxHCB1+8WBI2l+K+CWGaHhZ8ll6TJvKpXyUYj2rAUqeE594iyW3TolUYp+lWGbyZ2AU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775675110; c=relaxed/simple;
-	bh=dnr1zORZcAqmCMKUEYcJrMmO4aiTN35DMRq8VPgOeiE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YPzsD72lavWm2ODFurNV4iqngytKcIC+BwAIhF2StUtzTz8xHJuJ2zKSd4DGhpYJSWnI6hwkL5XfU/lcBLp+O6M0L4gUKckbtrzahEWbmNjAIvciw7o86b39pbTorSpyqZ+tzaK2h5q04lrBM0EhlCwwvrf85/Jwh23q7u2sYww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M1O/Tnqc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25EF2C19421;
-	Wed,  8 Apr 2026 19:05:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775675109;
-	bh=dnr1zORZcAqmCMKUEYcJrMmO4aiTN35DMRq8VPgOeiE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=M1O/Tnqcm/LpX8p1YQaVQizNtyhpFn2wnj1tCkS0qwxarmONv6KEl21/m4uTscKcX
-	 uXdiSQ/inzBRqDU4XdJP0gE0IM/f3OoAnW87p40EyPwGsl4clxDLlrPaC8em8YFkD2
-	 fngovXm+qfHG5axArQnpFbkfEyt7h/wmc3LDVk6Bx3SrsU6zic3qMqfUzlUQT6bdbt
-	 7w/K7JDxXWCTO8U7Z8M++wwq+cVNelP93yD/PTw0M+0SVwqDx/MkuRbkmM60kSoFOS
-	 bwv7xZDuIdDrgMuFRMcZiyofLdEmwRBv7xziz33O0zU2gO3uTq81lSnMza2N+9LrfA
-	 a7lpM8AxzExIQ==
-Date: Wed, 8 Apr 2026 20:05:05 +0100
-From: Simon Horman <horms@kernel.org>
-To: =?utf-8?B?TGVrw6sgSGFww6dpdQ==?= <snowwlake@icloud.com>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, davem@davemloft.net,
-	edumazet@google.com, pabeni@redhat.com, security@kernel.org,
-	=?utf-8?B?TGVrw6sgSGFww6dpdQ==?= <framemain@outlook.com>
-Subject: Re: [PATCH] nfc: nci: fix OOB heap read in
- nci_core_init_rsp_packet_v1()
-Message-ID: <20260408190505.GK469338@kernel.org>
-References: <20260404103016.1292588-1-snowwlake@icloud.com>
+	s=arc-20240116; t=1775675483; c=relaxed/simple;
+	bh=QywkMKt9HfbdvydAmCDLA/mewW0A3C9JQlo+MYVYw00=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qLxEFyLMWe2bkJiXQGC1QbCKbD3GzHUqBpp4WRaTEDUF8VDuAS3gxOI1t4SsiIawnr69yKyu/sD/HscG9zS9YNAJiPQfnsDoQ9+cFWvAYBI/ullKg3TU26stS/dS6aj4kKnHpv7LNHx+sZvYE0vaaPSqRtLtZ/SbtLy6FuDF6Hs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=LMZm0HzU; arc=none smtp.client-ip=209.85.210.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-7dbce74e537so85107a34.1
+        for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 12:11:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1775675481; x=1776280281; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=NWlPCpaM6YJiK7lQXjNJIiFwkV0uyI0s2T5X9GR48qE=;
+        b=LMZm0HzU/Z9SjWgXYja7mHAMOwVclB5jDfApGeJ+EmAA1/4et5n3Gdsnepy3LhVAa4
+         8NIMgRmIcfmQJ65eVT0VdqawlOKRxNKsZ9Mi5jbsX1C+BnL4DCkpnB7RJY0oOd6H8UCi
+         mtY4aivM6iNdMeLZ+IEAzxeaAvx/SArWJWXyMRttgb9U5n1buDepbwmZWzRlg1FXQkPZ
+         K86JN+JCLdn5L3hC/ZP3ukMl+UXSweRxMrmSh9QAmKKfd0KBnRDfg86zRfWBGfYI+mRJ
+         f6XzoQzxZluXmrPBK6pltuLe35BuWoZ47ndnLxUzu1nXyM2YmYgMNnmBbAgOJONy6FOs
+         8O2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775675481; x=1776280281;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NWlPCpaM6YJiK7lQXjNJIiFwkV0uyI0s2T5X9GR48qE=;
+        b=Y43vpPb4ZgR8ZdzyI5wTn0mwjjHNRARkeCyDqNtJFY8Ev50MbbzzvaQjxBcPguY2/r
+         HhTByC/lNGkIUoAkf0d2IcPd8ESFg/MbTucGToZW/0xW3+SyHj+ztFMoXs8NN8/xiuId
+         KygA4XYKOsCBxUxjVJrAEtkpxJtXd5pAv78yGnv1NwXdLJh8x7B3eVGTQ3ornUnVWU6F
+         Yeb5ysFVDed2ygIVeFPhdlxJdnhkTiGgQgkGzvz0pypIki1pjmk+MbxLWO67/5Exd4d5
+         8s/5ssqyw8kxhdNTxuEei77Glfmc1fCOUeXmrXRwmAigFxh3G8A/5FwuMmJvU5ZjaAGv
+         VBvg==
+X-Forwarded-Encrypted: i=1; AJvYcCVG1pUkfVs7hxL7RrtRHIChciyBaUpPmbiYvdasuFlK9r5ennjfvNX+gklAV8l2S05uflod0sg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw1VOCWV4713gP6wfIKrLgLd6Obet5HnTakk/h7DO7KLbNL1Efe
+	gLncb7hW9gY7nXmaRdXuMuDk/Jl6MwXtS5jzZvor1qQhliGzKMTbfN373y31BtCtpu0=
+X-Gm-Gg: AeBDies1d+V4MLcsO6wy1popqCJ1qSrflt0EN+wHJIlkCNbCfcCqWNstt7BILnFTxMI
+	8tcb41qG+UWWV3LAMH+BnwEBJggk98peZXbE2YfJ33LUEErFNzNwVuCBJl8hljoToNTQCK0uq4M
+	xBL3s40qVeh3WELVuAQtRF1jOqUSe7ISDwna784JiMZQfoqa+Ut71L9Z+cCQjth8PVw7DzEzhr6
+	GEm8UBfL9vzWHrYfue6EzF44r1Wa2CIATuQel2eYqiRnbZNPcj6l9cPijpIM7GPRD0FXyC3lcik
+	vMSEXFgkU9J8vxSipukgsFztneKawDbzDF9XKK72D/IL5UeSkpI0NwpFCsY6haw1h6Y/tZX9cFC
+	nk1jqF6Iipac3Jq3tij6BhgNVL5gqiiAtuSxcbuPSF4hcvc/VzhPlt2T6n0CPsS3IvdmHaxgqFr
+	uQYHb4d6jdmA==
+X-Received: by 2002:a05:6830:2aa5:b0:7d7:cc2f:babb with SMTP id 46e09a7af769-7dbb72f9c3fmr16664921a34.2.1775675481129;
+        Wed, 08 Apr 2026 12:11:21 -0700 (PDT)
+Received: from 20HS2G4.. ([2a09:bac6:bf21:2e28::499:49])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7dc098578c3sm1979035a34.25.2026.04.08.12.11.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Apr 2026 12:11:20 -0700 (PDT)
+From: Chris J Arges <carges@cloudflare.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	David Ahern <dsahern@kernel.org>
+Cc: kernel-team@cloudflare.com,
+	Chris J Arges <carges@cloudflare.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v2] net: Add net_cookie to Dead loop messages
+Date: Wed,  8 Apr 2026 14:10:47 -0500
+Message-ID: <20260408191056.1036330-1-carges@cloudflare.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260404103016.1292588-1-snowwlake@icloud.com>
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-7.66 / 15.00];
+	WHITELIST_DMARC(-7.00)[cloudflare.com:D:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[cloudflare.com,reject];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[cloudflare.com:s=google09082023];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-276692-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,davemloft.net,google.com,redhat.com,outlook.com];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[icloud.com];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-276693-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[cloudflare.com:+];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,outlook.com:email]
-X-Rspamd-Queue-Id: 95D4F3C30DF
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[carges@cloudflare.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,cloudflare.com:dkim,cloudflare.com:email,cloudflare.com:mid]
+X-Rspamd-Queue-Id: 780F53C3139
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sat, Apr 04, 2026 at 12:30:16PM +0200, Lekë Hapçiu wrote:
-> From: Lekë Hapçiu <framemain@outlook.com>
-> 
-> nci_core_init_rsp_packet_v1() uses the raw chip-supplied
-> num_supported_rf_interfaces byte to compute the rsp_2 pointer, but
-> the preceding min() already stores the capped value in
-> ndev->num_supported_rf_interfaces.  When a hostile chip returns
-> num_supported_rf_interfaces > 4 the memcpy is safe (capped) but rsp_2
-> lands past the end of the skb, and the fields copied out of it corrupt
-> nci_dev with data from adjacent kernel heap.
-> 
-> Use the already-capped ndev->num_supported_rf_interfaces for both the
-> length check and the pointer, making the relationship between the two
-> explicit.
-> 
-> Fixes: e8c0dacd9836 ("NFC: Update names and structs to NCI spec 1.0 d18")
-> Signed-off-by: Lekë Hapçiu <framemain@outlook.com>
-> ---
-> v2: drop intermediate offset variable, check skb->len directly against
->     ndev->num_supported_rf_interfaces + sizeof(*rsp_2) (Jakub Kicinski)
+Network devices can have the same name within different network namespaces.
+To help distinguish these devices, add the net_cookie value which can be
+used to identify the netns.
 
-I'm unable to locate v1 and Jakub's review of it.
-Could you provide a link?
+Signed-off-by: Chris J Arges <carges@cloudflare.com>
+---
+v2: rebased on net-next
+---
+ net/core/dev.c            | 5 +++--
+ net/ipv4/ip_tunnel_core.c | 4 ++--
+ 2 files changed, 5 insertions(+), 4 deletions(-)
 
-> 
->  net/nfc/nci/rsp.c | 11 ++++++++++-
->  1 file changed, 10 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/nfc/nci/rsp.c b/net/nfc/nci/rsp.c
-> index 9eeb86282..4aaf362b9 100644
-> --- a/net/nfc/nci/rsp.c
-> +++ b/net/nfc/nci/rsp.c
-> @@ -66,7 +66,16 @@ static u8 nci_core_init_rsp_packet_v1(struct nci_dev *ndev,
->  	       rsp_1->supported_rf_interfaces,
->  	       ndev->num_supported_rf_interfaces);
->  
-> -	rsp_2 = (void *) (skb->data + 6 + rsp_1->num_supported_rf_interfaces);
-> +	if (skb->len < sizeof(*rsp_1) + ndev->num_supported_rf_interfaces +
-> +		       sizeof(*rsp_2)) {
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 5a31f9d2128c..3c752ba3aa29 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -4886,8 +4886,9 @@ int __dev_queue_xmit(struct sk_buff *skb, struct net_device *sb_dev)
+ 	} else {
+ 		/* Recursion is detected! It is possible unfortunately. */
+ recursion_alert:
+-		net_crit_ratelimited("Dead loop on virtual device %s, fix it urgently!\n",
+-				     dev->name);
++		net_crit_ratelimited("Dead loop on virtual device %s (net %llu), fix it urgently!\n",
++				     dev->name, dev_net(dev)->net_cookie);
++
+ 		rc = -ENETDOWN;
+ 	}
+ 
+diff --git a/net/ipv4/ip_tunnel_core.c b/net/ipv4/ip_tunnel_core.c
+index f430d6f0463e..2667f53482bd 100644
+--- a/net/ipv4/ip_tunnel_core.c
++++ b/net/ipv4/ip_tunnel_core.c
+@@ -60,8 +60,8 @@ void iptunnel_xmit(struct sock *sk, struct rtable *rt, struct sk_buff *skb,
+ 
+ 	if (unlikely(dev_recursion_level() > IP_TUNNEL_RECURSION_LIMIT)) {
+ 		if (dev) {
+-			net_crit_ratelimited("Dead loop on virtual device %s, fix it urgently!\n",
+-					     dev->name);
++			net_crit_ratelimited("Dead loop on virtual device %s (net %llu), fix it urgently!\n",
++					     dev->name, dev_net(dev)->net_cookie);
+ 			DEV_STATS_INC(dev, tx_errors);
+ 		}
+ 		ip_rt_put(rt);
+-- 
+2.43.0
 
-There are accesses to skb->data before this check.
-And it seems they could also overrun the length of the skb.
-So I think a check needs to be placed towards the beginning
-of this function. (Sashiko has something similar to say.)
-
-Also, I don't think that checking skb->len is sufficient,
-as data may be present in the non-linear portion of the skb.
-I suspect pskb_may_pull is needed.
-
-If so, I think the same problem exists in the call path.
-
-> +		pr_err("CORE_INIT_RSP too short: len=%u need=%zu\n",
-> +		       skb->len,
-> +		       sizeof(*rsp_1) + ndev->num_supported_rf_interfaces +
-> +		       sizeof(*rsp_2));
-> +		return NCI_STATUS_SYNTAX_ERROR;
-> +	}
-> +	rsp_2 = (void *)(skb->data + sizeof(*rsp_1) +
-> +			 ndev->num_supported_rf_interfaces);
->  
->  	ndev->max_logical_connections = rsp_2->max_logical_connections;
->  	ndev->max_routing_table_size =
-
-Sashiko also asks if it is valid to read the packet
-if num_supported_rf_interfaces is truncated. Won't the beginning
-of resp_2 lie in the trailing supported_rf_interfaces of the rsp1
-header?
 
