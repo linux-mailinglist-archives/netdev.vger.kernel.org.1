@@ -1,211 +1,183 @@
-Return-Path: <netdev+bounces-276656-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276657-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sMjxNdOK1mmwFwgAu9opvQ
-	(envelope-from <netdev+bounces-276656-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 19:05:23 +0200
+	id OEyNINqL1mnzGAgAu9opvQ
+	(envelope-from <netdev+bounces-276657-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 19:09:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DCBA3BF425
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 19:05:23 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88FF33BF504
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 19:09:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8E68E302D94E
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 17:05:01 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 0C540300939F
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 17:09:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 710773AC0F1;
-	Wed,  8 Apr 2026 17:04:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B990F328B75;
+	Wed,  8 Apr 2026 17:09:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dama-to.20251104.gappssmtp.com header.i=@dama-to.20251104.gappssmtp.com header.b="b6vbNUj4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LDW/Q7hy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CEDF33B6C4
-	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 17:04:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775667899; cv=none; b=qwnz05m0HPXk1xN9m8TvG3FwH/VptDWRN49XZqeuNODemJq0a9NnYDMaVWFN9+WwbFh10hw4LWkGXRy+7CpLBkJ9T6hP70BoGmCoGYBp9AbVvB59TEjPUDU/mLTIyWCYKEU7ZiMU7iisOooFg1gXF6fi7A7fN4cbC5dAcuamrGw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775667899; c=relaxed/simple;
-	bh=WzgMLR02aMIYU0eRFEH84rhz5dfSsyoujom26UzQZbQ=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E/bbb5ML7yb3E87MmJcrHr/y4X56QUZydqI/Ucxgau3v2l3APeK6e4XIlteSzZDQ4HOMY5M/Mm/BWTPChEKQoEOWKkGZ6TxqlESdrP7B5oifqzWjjKSrsYxkKDDYEDz3zceX2AnMHldmN0UpgCz/w7oZfhg7DTt/AP/W7k6o2Rw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20251104.gappssmtp.com header.i=@dama-to.20251104.gappssmtp.com header.b=b6vbNUj4; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2b23fcf90b2so458835ad.3
-        for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 10:04:57 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA8E0330315
+	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 17:09:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.44
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775668177; cv=pass; b=iFGMnpdt3HDL1TbrJPjBXiED+UX8ExZ9oMx+wio3561L4wol5dsdtWk+7qTTJm23KhrK1avQfkWam0tCsdt6zr4o6hzzK3pgHIi11BOBaNvhunEG/nYhene4LBTp4c/E4A/tOzcV8b1r8REECShfFkYd7U2I10dns5t3LxubEEg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775668177; c=relaxed/simple;
+	bh=Un7lDabhahPp6sdsLdTVXHnOZIFR6dwRmuqZi7BkEu0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=js9nFjRTwJEdTyZ00CqtKVdhSboyzbZmlAbfpdkv8Vh5GH9WvDO1fjnJufVl5ixgPghGSrTSJBbFTAS73V5K+MF/i9VCRNZ9d0rI9xeWphxNHqJb7eGTsje5R1jKDnLDT5vbjKGU6V6+txgKCxTdLUsyN8RqJjOVhZQanabCdkY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LDW/Q7hy; arc=pass smtp.client-ip=209.85.219.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-8a08fa355a1so562836d6.0
+        for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 10:09:35 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1775668174; cv=none;
+        d=google.com; s=arc-20240605;
+        b=iIpW/Nz3aczbR41+U4hfOEMyE8wE8J2RAgmLpFFeaTyMtCewG86qIKQVDzSr9kh0RD
+         6BvkYjqTw/3FNQjm/vlGTJcbWrkat2fkus0KvNmwyjaoOkzvhMMlcMdQ334O4NfqqI/X
+         jVUxNYEfwsr0SIs+ayw2BR/+CWbJBNAMi4X5kKF100OM7fY3IvxknghU+fGGUS9Uj0eu
+         8AKgfwWUrEgDcja+sOBtk3I6/9BXVm0GVKwLxr21FGVp0mlU6FkOit9jsWnAGPQEPVLn
+         xm1+WxvMviSlpKyhjuXb8SS0XUs6eauhtwjFemlE6IiJw+ELNwwtVQZv0PjXD2NyjqTu
+         j6pA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=TgbfzZ5OCrbiJRFkpAnhPw6zLJ56/O32cb8WtIU2nbU=;
+        fh=sQNjgiFgL5c6mXyt2DJkHlhyVQHTjYM4LdQl/K8SC+Q=;
+        b=ijVTNu9mHXr60wfh1HDnLiQ39ymtLI2neM5x05bze41Drw+1iUJUO9v6FhiGX5uaCp
+         IdeJispCtdW4N2wEiLwCwnYvPkSHA2beePhmPJSRlagQp3Lz5gDbLqT/zPyIurBztLaa
+         ru/QXZSedex0sRkSyTeoja3CdcidvuscY60nyQHjiDBNHsONXEsdxsx95Inf7A2C+jg4
+         601tPB8ac0BSxN9c18oxXGau67SkD0XK0h20XuG+G4QqwQUASmbd7ZBsTfPcVsK5Gcyc
+         DoaSFyzeJs9H7658dagV4BPkpzBeZvt1rbVkt3dejdzoIiXFI4ahr57k7Hb+S/KO48bv
+         GDwQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dama-to.20251104.gappssmtp.com; s=20251104; t=1775667897; x=1776272697; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=TXowYY0DVF1N96YYrGQNG2P8wtcdfXOfx1x2wUYN09w=;
-        b=b6vbNUj4/qSh0h2gd36t5f3/FV00aQJErEwRwb6m7JvUQXhU67OVYj8pp/t9mvxJIw
-         sXKtmc++5xkJiz2U85cIrs/VFGzs+veJn8deAZmKpZV5ZKaMxdjYHtP5nFG63uxSKAEd
-         N2VDXtdqXbH3lxbKgLv+N0wkh+zbY2c0lQH4BdL/WVUELyRsOY6aWI8I+vExLTklLt+O
-         Euc7jGNCzwP0c9EeAqrh2QUBaZDSRsXe+xtfmmJUrYOsg8xf91sOb5YB/Kuo0/ptE+TO
-         JQaFJIpkkRfQTmWO465xg9TRmzMBP2Mg/N5FSTMV7Q2VKce7XzCqF5CHBDfcTxDnMR/o
-         ItpQ==
+        d=google.com; s=20251104; t=1775668174; x=1776272974; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TgbfzZ5OCrbiJRFkpAnhPw6zLJ56/O32cb8WtIU2nbU=;
+        b=LDW/Q7hyyhI8lyI2HygTlvpVCFrD+AA+9vcKbY2Qy34aMmcWPjdwjxisFX0jY1cDZk
+         KxWZb32GfI/hi4gkINVPw83sWgAvtgbQ6OXGcbeLDPhRlqIzOYH598IjWL9/nLXHSCe4
+         D5BPGhKeE5HFym5ehvRhS4FNNwTB2Qx3mo42nAo1tVr+ig/h03AbQt41WPWQ5lEURn9N
+         Lf9CsVY7WKs330zbosXQKGVgV1nkNrhU3Wt9PCVU2+NB+BN4RF437HSG4H7hnSoQ5h+f
+         TBJyWlOFwi7coeDaUvCMucHJzKCdaMS9hCgpcAPjhEPwBTicaFKtSi5DxgZVheygo8ue
+         MCJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775667897; x=1776272697;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TXowYY0DVF1N96YYrGQNG2P8wtcdfXOfx1x2wUYN09w=;
-        b=dJuL52E1PYLZd1u6ay/4mhgcoUsGbO8Ow3ACQ304BBmZEBXjNBVe/CmizviO2EhFT6
-         VKv6rg90LjUEnryDcIlSKGp6iGBOGyH0bLx4VvUt1IPvkR4uVz3nBQfKA1Z2BmIQIBZU
-         TpUsQm1Kpy92fDR7OtWoh2eGpzshVRu4Dx4McjEnt5/HhpfSaY0wK5WyfyzD096gQkdA
-         3CGJwRrTF0r80OGbVCZxFAt71rDj5UO+SExjwN62VP8rOnL8B+UZo/JNfB6LtbYwU+Un
-         OgKTupCsQSr81DJbqOBi9TZWXAnpaSVhGIb//+arxUo7eK3B1ona9hgkAMrgaojT5Ym/
-         w8aw==
-X-Gm-Message-State: AOJu0YycDYbBhnheU6RZnraOQY9y5A/tc0Sxsm5kej2weEa31mtKEVBF
-	3gqblRdFEQ5A71iMKqqejrSH4EPSWMQz3hWvPCXfKq4sxQNvVE8+jkUClPdKhK7cWzQ9FO1psuk
-	H6DecNwE=
-X-Gm-Gg: AeBDievsD+b0EDo7lqjPLIbPVRoAZ7XklCz6SeXcPR6FSrWbsF4jDpffW3KNp3BLsDj
-	QoVZlHxF7QLOT5I/JMjHmJ0xz+tgKns7XDt+RWI5efLhLShDvHHpVHFziGuizGxnQMNnDyhDMhz
-	WuntrhTCf2QBkJ+R1ayStFf/gI3B+IK1jxoC/FudlzX89a41N7XnPb0bmiLMC2nXIl2XSQkBias
-	DJO1jBdEen8kwzdUHFA4XLaMWwwcQFNLWqaGTL3oHW8LJsvhBIdx64NmytmG3lmW7KrdGp2g0/3
-	v77T0hcErVfh6CSihpE6DJ5cCcKd21GuMhrf2WPfZRzHPQ6CgUIY5DvYm+GhNpvz9OZwzAdI6wN
-	n6R34dU0l7+SxZIzmCEkie010Xp4JnWVmQmEXYoFnljKIvziyUrRz26g/3ovZSrwvOW2rbsXJf7
-	3YKzNa
-X-Received: by 2002:a17:903:1a90:b0:2ae:8272:deb0 with SMTP id d9443c01a7336-2b2c726c892mr2613665ad.15.1775667896897;
-        Wed, 08 Apr 2026 10:04:56 -0700 (PDT)
-Received: from localhost ([2a03:2880:2ff:4c::])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b27478b84esm200556755ad.32.2026.04.08.10.04.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Apr 2026 10:04:56 -0700 (PDT)
-Date: Wed, 8 Apr 2026 10:04:55 -0700
-From: Joe Damato <joe@dama.to>
-To: netdev@vger.kernel.org, Michael Chan <michael.chan@broadcom.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	horms@kernel.org, linux-kernel@vger.kernel.org, leon@kernel.org
-Subject: Re: [net-next v9 07/10] net: bnxt: Implement software USO
-Message-ID: <adaKt/VwrajKraR8@devvm20253.cco0.facebook.com>
-Mail-Followup-To: Joe Damato <joe@dama.to>, netdev@vger.kernel.org,
-	Michael Chan <michael.chan@broadcom.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	horms@kernel.org, linux-kernel@vger.kernel.org, leon@kernel.org
-References: <20260407220313.3990909-1-joe@dama.to>
- <20260407220313.3990909-8-joe@dama.to>
- <adWR1OiPlQCJ8idj@devvm20253.cco0.facebook.com>
+        d=1e100.net; s=20251104; t=1775668174; x=1776272974;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=TgbfzZ5OCrbiJRFkpAnhPw6zLJ56/O32cb8WtIU2nbU=;
+        b=GoWfc7aFA+GtYjPU7IiEOcSFFz1wTk8H6elB8DFFkh4clMNCV100V04pn+nyfFWFuN
+         edZPGQRY6a1ghRVD3Kcl6G6D0D6VTorsLV38MdmCJrm0RsgHQ0En4Lpo53pWgHsfavT+
+         aLts4aKf3LGfFdJpJp5N+fF1qJvlQDwtr+2aCbPYyy69gcMBdDz94BcgZxf1d91Ia/eS
+         BZTtTfJLN4O21G+r0jn7oZPxhZVDOEd72plNzKjfmFuXPs21QfytXuxt6LvOT3tLvYr7
+         foTRi9/Mow9uz/a/+aznRZkjuXN4TAH6qV7G6tyeq/womIKGsG4U2vxFf3kExVdRqEtD
+         sk7A==
+X-Forwarded-Encrypted: i=1; AJvYcCU2A3zzhFKCQEqobaHY+Yix8g4/PJy0gwrkPQDGRM0NNVZ1PflXxEAZFEH0BEsc74qzU6o5ntE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyEUZ/VHDWug4O08zOGfuCOFBpU3RnKBWtt+ZSQO7GAuEmtEYfO
+	On6aWa0J+pq3+IMUP5BsfkCrJb67gcHf6IPs6hbG0yDXc1xWunS9mOow+C9rvQxBIctyJNe3n9O
+	iEudaAS+uiCR3WW9hpm94iHJmyPs+MBO1rQMfrMun
+X-Gm-Gg: AeBDiesrvFuf9PxaJ/65O/SMmZ0VvZZB0w3aHzJ06fqqYNSIajedzAg4kjosHmleZ6e
+	QTLgRSLQn0MG80g0AUGKPs7fZY4SYvoNeJcH7imaBlMrBvfwunqP99eqNQMJcd0Mq4excYdsbYf
+	/xov+YXOAOdIYvOBbfrogmystkoi/kFVXVrR4eqrhT22GE+kQdXbQFhfNHK0vK3kbGnf0JD45H+
+	2z+tta5QuVgUarQsyEn/p5ZpoZOrEzJV2dPF0V0aqRCElFWAQ3t6kkQMeWsHEcQ3S6W6UZhpB8P
+	gA7+7wA=
+X-Received: by 2002:a05:6214:8088:b0:89f:d316:2b01 with SMTP id
+ 6a1803df08f44-8ac743c929amr5729256d6.26.1775668173910; Wed, 08 Apr 2026
+ 10:09:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <adWR1OiPlQCJ8idj@devvm20253.cco0.facebook.com>
-X-Spamd-Result: default: False [-0.16 / 15.00];
+References: <20260408125611.3592751-1-edumazet@google.com>
+In-Reply-To: <20260408125611.3592751-1-edumazet@google.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 8 Apr 2026 10:09:21 -0700
+X-Gm-Features: AQROBzDPqbmqAh97CnZyaqvAsUXpsUeP_VNxYTzF1L3GFRpSyorw-z0J4XehHqo
+Message-ID: <CANn89iLe4jen+wQQ0JJ_z+OpEygP+Mpa5MOMMsV1pMmYLUD6SA@mail.gmail.com>
+Subject: Re: [PATCH net-next 00/15] net/sched: no longer acquire RTNL in qdisc dumps
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[dama-to.20251104.gappssmtp.com:s=20251104];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-276656-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[dama-to.20251104.gappssmtp.com:+];
 	MIME_TRACE(0.00)[0:+];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,mojatatu.com,resnulli.us,google.com,vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-276657-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[dama.to];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[joe@dama.to,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.998];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,dama-to.20251104.gappssmtp.com:dkim,devvm20253.cco0.facebook.com:mid]
-X-Rspamd-Queue-Id: 8DCBA3BF425
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 88FF33BF504
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Apr 07, 2026 at 04:23:00PM -0700, Joe Damato wrote:
-> On Tue, Apr 07, 2026 at 03:03:03PM -0700, Joe Damato wrote:
-> 
-> [...]
-> 
-> >  v9:
-> >    - Added inline slot check to prevent possible overwriting of in-flight
-> >      headers (suggested by AI).
-> 
-> [...]
-> 
-> >  netdev_tx_t bnxt_sw_udp_gso_xmit(struct bnxt *bp,
-> >  				 struct bnxt_tx_ring_info *txr,
-> >  				 struct netdev_queue *txq,
-> >  				 struct sk_buff *skb)
-> >  {
-> 
-> [...]
-> 
-> > +
-> > +	/* BD backpressure alone cannot prevent overwriting in-flight
-> > +	 * headers in the inline buffer. Check slot availability directly.
-> > +	 */
-> > +	slots = txr->tx_inline_prod - txr->tx_inline_cons;
-> > +	slots = BNXT_SW_USO_MAX_SEGS - slots;
-> > +
-> > +	if (unlikely(slots < num_segs)) {
-> > +		netif_txq_try_stop(txq, slots, num_segs);
-> > +		return NETDEV_TX_BUSY;
-> 
-> This is the check I added. AI says this is wrong and netdev_queues.h says:
-> 
->   * @get_desc must be a formula or a function call, it must always
->   * return up-to-date information when evaluated!
-> 
-> which I obviously failed to do, so I'm pretty sure I got this wrong.
+On Wed, Apr 8, 2026 at 5:56=E2=80=AFAM Eric Dumazet <edumazet@google.com> w=
+rote:
+>
+> This (large) series bring RTNL avoidance to qdisc dumps.
+>
+> We first add annotations for data-races, so that most dump methods
+> can run in parallel with data path.
+>
+> Then change mq and mqprio to no longer acquire each children
+> qdisc spinlock.
+>
+> Last patch replaces RTNL with RCU for tc_dump_qdisc() and the
+> qdisc ops->dump() methods.
+>
+> Series was too big, RTNL avoidance for class dumps will be done later.
+>
+> Eric Dumazet (15):
+>   net/sched: rename qstats_overlimit_inc() to qstats_cpu_overlimit_inc()
+>   net/sched: add qstats_cpu_drop_inc() helper
+>   net/sched: add READ_ONCE() in gnet_stats_add_queue[_cpu]
+>   net/sched: add qdisc_qlen_inc() and qdisc_qlen_dec()
+>   net/sched: annotate data-races around sch->qstats.backlog
+>   net/sched: sch_sfb: annotate data-races in sfb_dump_stats()
+>   net/sched: sch_red: annotate data-races in red_dump_stats()
+>   net/sched: sch_fq_codel: remove data-races from fq_codel_dump_stats()
+>   net/sched: sch_pie: annotate data-races in pie_dump_stats()
+>   net/sched: sch_fq_pie: annotate data-races in fq_pie_dump_stats()
+>   net_sched: sch_hhf: annotate data-races in hhf_dump_stats()
+>   net/sched: sch_choke: annotate data-races in choke_dump_stats()
+>   net/sched: sch_cake: annotate data-races in cake_dump_stats()
+>   net/sched: mq: no longer acquire qdisc spinlocks in dump operations
+>   net/sched: convert tc_dump_qdisc() to RCU
 
-So, there's two options to fix this that I can think of. I am leaning torward
-option 2, but if there are any strong opinions (or other options that I am
-missing) please let me know:
+Do not spend too much time on this V1, I will send a V2 tomorrow
+addressing some issues.
 
-  1. Allocate the maximum number of slots per ring and eliminate this check
-     entirely. I figured this would be disliked because it potentially wastes
-     memory. The driver would need ring_size / 3 slots, and if we assume the
-     maximum is 2048 and the slot size is 256b, that works out to 175kb per
-     ring. Of course, this only affects NICs with SW USO and the buffer isn't
-     allocated for NICS with HW USO.
-
-     This is probably simpler, but costs more memory than the existing design.
-
-   2. Or, keep the smaller buffer that we have now (BNXT_SW_USO_MAX_SEGS (64)
-      * 256b = 16kb per ring) and fix the try_stop like this:
-
-+static inline u16 bnxt_inline_avail(struct bnxt_tx_ring_info *txr)
-+{
-+       return BNXT_SW_USO_MAX_SEGS -
-+              (u16)(txr->tx_inline_prod - READ_ONCE(txr->tx_inline_cons));
-+}
-+
-
-[...]
-
--       slots = txr->tx_inline_prod - txr->tx_inline_cons;
--       slots = BNXT_SW_USO_MAX_SEGS - slots;
--
--       if (unlikely(slots < num_segs)) {
--               netif_txq_try_stop(txq, slots, num_segs);
-+       if (unlikely(bnxt_inline_avail(txr) < num_segs)) {
-+               netif_txq_try_stop(txq, bnxt_inline_avail(txr), num_segs);
+pw-bot: cr
 
