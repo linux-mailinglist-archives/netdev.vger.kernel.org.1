@@ -1,157 +1,167 @@
-Return-Path: <netdev+bounces-276694-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276695-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cGDvJvGs1mmZHAgAu9opvQ
-	(envelope-from <netdev+bounces-276694-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 21:30:57 +0200
+	id CNDpKeGs1mmZHAgAu9opvQ
+	(envelope-from <netdev+bounces-276695-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 21:30:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DCD93C31E6
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 21:30:57 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E3163C31A4
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 21:30:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DC6FA30432D6
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 19:15:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 853193066BEE
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 19:22:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 702893DA5D6;
-	Wed,  8 Apr 2026 19:15:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C32A73DA7CA;
+	Wed,  8 Apr 2026 19:22:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="BdtkQo49"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="j/N/2nXJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3FD53B2FCD;
-	Wed,  8 Apr 2026 19:15:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 382383446CA
+	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 19:22:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775675734; cv=none; b=r6tVwq6QhqdPwEpTBv6wG+z7kZfsBrmQE97dQQ+sVCWqEsVQxPYb2Jm633Rs1k8FzKGFQ97uwPP4Z6jQtKML3l72uF3kwGCvxVQ07wYJmuY9rvi3Hkfr48IcGae7qm+LsyLa3XTazgrVHEPpNyjVo8QbOMXZFWFwJRHCdZYxnYE=
+	t=1775676148; cv=none; b=LtN5qGLQKG8szFGmb3jeEHs4LYw3VatwcIY0scZLKWo9jTowynnf8DdA0ydVPM6mqE/WVtV9nRL8BKleQm0uhCrmGwvelrciKzagYjCgnEth8ApxsIgqrCv/P0L/XMQs5Fw51eKONaPGcqTL2Pzz67aQ9OcjtjXm9aCe2rWeJm4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775675734; c=relaxed/simple;
-	bh=JZpipuTa8f2r1rEwJmj1883sExcXgeGBZCPAzmjBpb0=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=IreVhHAGlV8z+17GWZQKj3VrnfchIANFCESRG2RejnC+21cJRFohaoxuK++1A128TVhxES65V9wgTgX9wHPqbvIyn1yRv1OQ0Bppt9AsjzByHb6ZGmtM2W3KiMz7oW70XNeFKjB+I2O3qNEKiteJF/gGGLDsrtsnOxRaCLX/HKk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=BdtkQo49; arc=none smtp.client-ip=194.13.80.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id BA1FBA588E;
-	Wed,  8 Apr 2026 21:15:22 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1775675725; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=t1sBfATotgNvvEO2UQbvxW1BDDWsBRhyG+y/VKIZseU=;
-	b=BdtkQo49Comz61CfOwiLZoWJ1NgI5L+PAbCuET6kfzX0ybqeNm7Z6rQhII6rsvH7TwbVb5
-	hRwAeEmtB4BIv9TYwLZcDCEapMs1WiqJTasO+VLrlCc6LffoAkFiQzZ7+uUp8GsLwAPsif
-	50b82FP+sgBX5qPaNovgXOgQxVlJDCQFKEz/aKz9EQcFvJ398pMEfcZ519xFjAFUbkATx7
-	wYzl+IXATMVqcl2rREmsGVcB4jB+BFCxM5Rr0C4lyrqljdGjq3LEk3qaTCT50TPuWenfl7
-	bwJWUNmmr6N61mojsqt5Vk3OLCYtmoaPjnBFRy5PQyZC/NSeAz8krEFBDwXwnw==
+	s=arc-20240116; t=1775676148; c=relaxed/simple;
+	bh=xeU+CpDbjuqTRy7NHM9S1q/5feA7r1UJohNuP6FPUFY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZQ2JX5MOT7PZXeOS6Zak4+ky0+WsPmkIsa4lc9JMDSp8Wr7xX2PeyyhLUTlN+xXlx7A4kqG0PTK+PhNsr7FDhqgNe7k1/xKPqJ45B0Inh8kyWfAE5waARe1xHCt2ErHIWWuIgiT+iwSyZhl3l90rnBF/Z45zMwSew2CNI26DLH8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=j/N/2nXJ; arc=none smtp.client-ip=91.218.175.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Wed, 8 Apr 2026 12:22:06 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1775676135;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=r06+65cH0yTHLeV6B/4VEG9UgecJFocJ5Fv7CVecJZ8=;
+	b=j/N/2nXJ6G/XzxA/pZ7oHUMlkEaXecPiuV/MvK4oy24x+6smZSOqY/2JVzR45w8g6cpV/C
+	7WWB3gIXOZd4TOUeNgt724+fOogHzDpb2nVnNOZNEG4/+hblxfXW+bRP51bVkM+DgmhLlh
+	u7EH+taxjWUhaz0Ec7A0i5B1NssR0fw=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+To: Jiayuan Chen <jiayuan.chen@linux.dev>, 
+	Kuniyuki Iwashima <kuniyu@google.com>
+Cc: Eric Dumazet <edumazet@google.com>, bpf@vger.kernel.org, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, Jiri Olsa <jolsa@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH bpf v6 1/2] bpf: tcp: Reject non-TCP skb in
+ bpf_sk_assign_tcp_reqsk()
+Message-ID: <202648182730.i4ki.martin.lau@linux.dev>
+References: <20260403015851.148209-1-jiayuan.chen@linux.dev>
+ <20260403015851.148209-2-jiayuan.chen@linux.dev>
+ <20264619471.he8Q.martin.lau@linux.dev>
+ <4820d99b-f2c4-4b24-b90f-87e6444284c4@linux.dev>
+ <CAAVpQUDz_rUFF1A8XDyE13fLTsgdP5k0XWGtdB1V3r=Z_mJW+g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Wed, 08 Apr 2026 21:15:22 +0200
-From: Nicolai Buchwitz <nb@tipi-net.de>
-To: Marek Vasut <marex@nabladev.com>
-Cc: netdev@vger.kernel.org, stable@vger.kernel.org, "David S. Miller"
- <davem@davemloft.net>, Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Ronald Wahl <ronald.wahl@raritan.com>, Yicong Hui
- <yiconghui@gmail.com>, linux-kernel@vger.kernel.org
-Subject: Re: [net,PATCH] net: ks8851: Reinstate disabling of BHs around IRQ
- handler
-In-Reply-To: <a9845b8e-5d3f-472b-8f03-bba699ba3882@nabladev.com>
-References: <20260407212344.80265-1-marex@nabladev.com>
- <f4010cedaa49afc1648a73775a987ee5@tipi-net.de>
- <a9845b8e-5d3f-472b-8f03-bba699ba3882@nabladev.com>
-Message-ID: <215ad1cc5db3f352ac2a130c07dbd830@tipi-net.de>
-X-Sender: nb@tipi-net.de
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-0.16 / 15.00];
+In-Reply-To: <CAAVpQUDz_rUFF1A8XDyE13fLTsgdP5k0XWGtdB1V3r=Z_mJW+g@mail.gmail.com>
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-276694-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-276695-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,lunn.ch,google.com,kernel.org,redhat.com,raritan.com,gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[tipi-net.de];
-	DKIM_TRACE(0.00)[tipi-net.de:+];
-	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[google.com,vger.kernel.org,kernel.org,iogearbox.net,gmail.com,linux.dev,fomichev.me,davemloft.net,redhat.com];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[martin.lau@linux.dev,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-0.999];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,tipi-net.de:dkim,tipi-net.de:email,tipi-net.de:mid]
-X-Rspamd-Queue-Id: 2DCD93C31E6
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:mid,sashiko.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 2E3163C31A4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 8.4.2026 17:41, Marek Vasut wrote:
-> On 4/8/26 12:54 PM, Nicolai Buchwitz wrote:
+On Tue, Apr 07, 2026 at 09:25:06PM -0700, Kuniyuki Iwashima wrote:
+> > > sashiko has flagged a similar issue with larger scope.
+> > > Please take a look. Thanks.
+> > >
+> > > https://sashiko.dev/#/patchset/20260403015851.148209-1-jiayuan.chen%40linux.dev
+> >
+> >
+> > Thanks a lot Martin, sashiko actually dug into a deeper issue here.
+> >
+> > Eric and Kuniyuki,
+> >
+> > I think the AI review has a point. Since BPF can modify skb fields, the
+> > following sequence still bypasses the protocol check in
+> > bpf_sk_assign_tcp_reqsk():
+> >
+> >     // for a UDP skb
+> >     iph->protocol = TCP
+> >     bpf_sk_assign_tcp_reqsk()
+> >     iph->protocol = UDP
+> >
+> > On top of that, bpf_sk_assign() already has the same problem — it doesn't
+> > validate L4 protocol at all.
 > 
-> Hello Nicolai,
+> Sigh... honestly it does not make sense to me to add changes
+> in the common fast path to protect someone with bpf capability
+> shooting oneself in the foot.
 > 
-> thank you for testing on the SPI variant, that helped a lot.
-> 
->> In order to make this work I would propose something like this (which 
->> works in my SPI setup):
->> 
->> --- a/drivers/net/ethernet/micrel/ks8851_par.c
->> +++ b/drivers/net/ethernet/micrel/ks8851_par.c
->> @@ -60,12 +60,14 @@ static void ks8851_lock_par(struct ks8851_net *ks, 
->> unsigned long *flags)
->>   {
->>       struct ks8851_net_par *ksp = to_ks8851_par(ks);
->> 
->> +    local_bh_disable();
->>       spin_lock_irqsave(&ksp->lock, *flags);
->>   }
->> 
->>   static void ks8851_unlock_par(struct ks8851_net *ks, unsigned long 
->> *flags)
->>   {
->>       struct ks8851_net_par *ksp = to_ks8851_par(ks);
->> 
->>       spin_unlock_irqrestore(&ksp->lock, *flags);
->> +    local_bh_enable();
->>   }
->> 
->> Tested-by: Nicolai Buchwitz <nb@tipi-net.de>  # KS8851 SPI, non-RT 
->> (regression + proposed fix)
-> 
-> Are you also able to test the KS8851 driver with PREEMPT_RT enabled and 
-> heavy iperf3 traffic on the SPI variant ? Does that trigger any issues 
-> ? I ran 'iperf3 -s' on the KS8851 end and 'iperf3 -c 192.168.1.300 -t 0 
-> --bidir' on the host PC side.
+> On top of L4 validation in bpf_sk_assign() and bpf_sk_assign_tcp_reqsk(),
+> can't we mark such an skb immutable after the helpers and catch
+> subsequent writes to skb->data on the verifier ?
 
-Successfully tested with both PREEMPT_RT and non-RT kernels using the 
-iperf3 command above - no issues observed. Both builds included the fix 
-from my previous message.
-If there is anything else worth testing on the KS8851 SPI variant, 
-please let me know.
+Clearing the skb->sk in a helper like bpf_skb_store_bytes or
+rejecting direct writes to skb->data could break existing
+bpf program.
+
+I suspect adding a simple iph->protocol/ip6h->nexthdr check to
+the helper (e.g. bpf_sk_assign) could also break some
+tunneling use cases (e.g. ipip) also.
 
 > 
-> Let me prepare a slightly updated fix and send a V2.
+> 
+> >
+> > So I think we should add a check matching skb against sk in
+> > skb_steal_sock() instead of adding check in bpf helper.
 
-Regards
-Nicolai
+Maybe limit the check to the '*prefetched' case in skb_steal_sock().
+
+FWIW, in the early days of bpf_sk_assign, a tc bpf program could only
+get hold of a tcp_sock. Later, bpf_map_lookup_elem(&sock_map) was
+allowed in tc, and then udp/unix sock support was also added to sock_map.
+
+There have been discussions on tc bpf programs being able to do
+bpf_map_lookup_elem(&sock_map) to get a unix_sock. AFAIK, this
+looked-up unix_sock can be used in bpf_sk_assign. It probably
+makes sense for bpf_sk_assign to reject all non-tcp/non-udp sk.
 
