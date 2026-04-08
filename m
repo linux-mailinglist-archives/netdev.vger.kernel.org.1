@@ -1,216 +1,161 @@
-Return-Path: <netdev+bounces-276289-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276296-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yIEfCvfv1Wlz/gcAu9opvQ
-	(envelope-from <netdev+bounces-276289-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 08:04:39 +0200
+	id GEZSE8X11Wn4/gcAu9opvQ
+	(envelope-from <netdev+bounces-276296-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 08:29:25 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id C35AE3B76B2
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 08:04:34 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D355C3B78F6
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 08:29:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 851A5301F783
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 06:04:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 193CA301A91A
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 06:25:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BDD434D39B;
-	Wed,  8 Apr 2026 06:04:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A27413630AE;
+	Wed,  8 Apr 2026 06:25:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94D56339B2D;
-	Wed,  8 Apr 2026 06:04:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13C9434677F;
+	Wed,  8 Apr 2026 06:25:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775628272; cv=none; b=iTtl0lEyenRW/OgdNyIFZEIE/m68qqZejejO7tfN+KYgSTAu7FhLcc9JsE60v+Ij1X8ACQBWUHDJzfqAdcMISHyhVmv1sGpcTZuOq9MtngappyfZi4eu4VaCDKHTcqO5YJNwDPkf/XHt85bKbEZOaV8bLm4Rqi8iD5eWE2ZAafs=
+	t=1775629549; cv=none; b=eIbpckben6g10iwttrmY/wHimQlozOa+3wdjDiXZd2E17+q3tcS1N8/QjA80VP3SyZe3VLupE+6tQJIZAyaWMGAAD38XKeTDmgev6252gjcOhArLzL00PAzSWDWHMXqD49dWHIP+ZFVKrHVzPWWolYH4V1iT9XA+LfaNZjy+AB4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775628272; c=relaxed/simple;
-	bh=3kLCuPE13cGBXk5qOEbHuockj0A+sW3WkOD5gRGrc74=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iyX84FXwqwWTXVFCILFrQeQUocqG59Dk7pue+1Y+MvPjoCMOhtQXrZHqh8Kb33odYMxYxOI6zvHmO9M2WyCPKWn8AXwIIsBPBtEqM3Vl9QvkKS5AQc9Ku84NLOyZjo7f3dvweYLhM3V7oVXUBDeGX2n+s4UTlkzIK01ZqGtriC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc
-Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
-	id 7E356604AA; Wed, 08 Apr 2026 08:04:28 +0200 (CEST)
-From: Florian Westphal <fw@strlen.de>
-To: <netdev@vger.kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	<netfilter-devel@vger.kernel.org>,
-	pablo@netfilter.org
-Subject: [GIT PULL v2 net-next] netfilter: updates for net-next
-Date: Wed,  8 Apr 2026 08:04:19 +0200
-Message-ID: <20260408060419.25258-1-fw@strlen.de>
-X-Mailer: git-send-email 2.52.0
+	s=arc-20240116; t=1775629549; c=relaxed/simple;
+	bh=CiemxFLK0FrFTeBc/H2ciQYSwVU6DVeQ/QRqF9l+Ea0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CWcAlHilaLmq3XfRfkeydNlSFBSZmw3O3rxCqpTNUdWMUmGzy7iAKsx9e9yOMNybKreXZJlzTv8rdGEeydCtLVfn2epTdXUHEuotBYyK/r779RvYzijUj1IQwzNfWhrxzU8Lad+sy9wXIrMKE1ncrfe0+Z0tQnxkaNuuRURwgLo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.2.229] (p5dc55707.dip0.t-ipconnect.de [93.197.87.7])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 1AC894C2C37F04;
+	Wed, 08 Apr 2026 08:24:36 +0200 (CEST)
+Message-ID: <22f2d325-fc2a-4801-91b5-b64fac4d86e9@molgen.mpg.de>
+Date: Wed, 8 Apr 2026 08:24:34 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH net] ice: fix VF queue configuration
+ with low MTU values
+To: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Jacob Keller <jacob.e.keller@intel.com>,
+ Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+ Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+ Dave Ertman <david.m.ertman@intel.com>,
+ Michal Kubiak <michal.kubiak@intel.com>, stable@vger.kernel.org
+References: <20260406145641.1020623-1-jtornosm@redhat.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20260406145641.1020623-1-jtornosm@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Spamd-Result: default: False [0.04 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-276289-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[strlen.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-276296-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[mpg.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.919];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.373];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pmenzel@molgen.mpg.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,strlen.de:mid]
-X-Rspamd-Queue-Id: C35AE3B76B2
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mpg.de:email,molgen.mpg.de:mid]
+X-Rspamd-Queue-Id: D355C3B78F6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-No changes since v1, I only dropped the last patch (13/13).  This is also
-why I am not resending the individual patches again.
+Dear Jose,
 
-The following PR contains Netfilter updates for *net-next*:
 
-1) Fix ancient sparse warnings in nf conntrack nat modules, from
-   Sun Jian.
-2) Fix typo in enum description, from Jelle van der Waa.
-3) remove redundant refetch of netns pointer in nf_conntrack_sip.
-4) add a deprecation warning for dccp match.
-   We can extend the deadline later if needed, but plan atm is to
-   remove the feature.
-5) remove nf_conntrack_h323 debug code that can read out-of-bounds
-   with malformed messages. This code was commented out, but better
-   remove this.
-6+7) add more netlink policy validations in netfilter.
-   This could theoretically cause issues when a client sends e.g.
-   unsupported feature flags that were previously ignored, so we
-   may have to relax some changes. For now, try to be stricter and
-   reject upfront.
-8+9) minor code cleanup in nft_set_pipapo (an nftables set backend).
-10) Add nftables matching support fro double-tagged vlan and pppoe
-    frames, from Pablo Neira Ayuso.
-11) Fix up indentation of debug messages in nf_conntrack_h323 conntrack
-    helper, from David Laight.
-12) Add a helper to iterate to next flow action and bail out if the
-    maximum number of actions is reached, also from Pablo.
+Thank you for the patch.
 
-Please, pull these changes from:
-The following changes since commit b3e69fc3196fc421e26196e7792f17b0463edc6f:
+Am 06.04.26 um 16:56 schrieb Jose Ignacio Tornos Martinez:
+> The ice driver's VF queue configuration validation rejects
+> databuffer_size values below 1024 bytes, which prevents VFs from
+> using MTU values below 871 bytes.
+> 
+> The iavf driver calculates databuffer_size based on the MTU using:
+>    databuffer_size = ALIGN(MTU + LIBETH_RX_LL_LEN, 128)
+> 
+> where LIBETH_RX_LL_LEN = 26 (ETH_HLEN + 2*VLAN_HLEN + ETH_FCS_LEN).
+> 
+> For MTU values below 871:
+>    MTU 870: 870 + 26 = 896, aligned to 128 = 896 (< 1024, rejected)
+>    MTU 871: 871 + 26 = 897, aligned to 128 = 1024 (>= 1024, accepted)
+> 
+> The 1024-byte minimum seems unnecessarily restrictive, because the hardware
+> supports databuffer_size as low as 128 bytes (the alignment boundary),
+> which should allow MTU values down to the standard minimum of 68 bytes.
+> 
+> I haven't found the reason why the limit was configured in the commit
+> 9c7dd7566d18 ("ice: add validation in OP_CONFIG_VSI_QUEUES VF message"), so
+> with no more information and since it is working, change the minimum
+> databuffer_size validation from 1024 to 128 bytes to allow standard low
+> MTU values while still preventing invalid configurations.
 
-  Merge branch 'net-pull-gso-packet-headers-in-core-stack' (2026-04-07 19:02:18 -0700)
+Should you resend, having the reproducer script would be nice to have.
 
-are available in the Git repository at:
+> Fixes: 9c7dd7566d18 ("ice: add validation in OP_CONFIG_VSI_QUEUES VF message")
+> cc: stable@vger.kernel.org
+> Signed-off-by: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+> ---
+>   drivers/net/ethernet/intel/ice/virt/queues.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/virt/queues.c b/drivers/net/ethernet/intel/ice/virt/queues.c
+> index f73d5a3e83d4..31be2f76181c 100644
+> --- a/drivers/net/ethernet/intel/ice/virt/queues.c
+> +++ b/drivers/net/ethernet/intel/ice/virt/queues.c
+> @@ -840,7 +840,7 @@ int ice_vc_cfg_qs_msg(struct ice_vf *vf, u8 *msg)
+>   
+>   			if (qpi->rxq.databuffer_size != 0 &&
+>   			    (qpi->rxq.databuffer_size > ((16 * 1024) - 128) ||
+> -			     qpi->rxq.databuffer_size < 1024))
+> +			     qpi->rxq.databuffer_size < 128))
+>   				goto error_param;
+>   
+>   			ring->rx_buf_len = qpi->rxq.databuffer_size;
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next.git tags/nf-next-26-04-08
+Either way:
 
-for you to fetch changes up to c6f85577584b5f8414141ae389e974b8ca6a698b:
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
 
-  netfilter: nf_tables_offload: add nft_flow_action_entry_next() and use it (2026-04-08 07:51:31 +0200)
 
-----------------------------------------------------------------
-netfilter pull request nf-next-26-04-08
+Kind regards,
 
-----------------------------------------------------------------
-
-David Laight (1):
-  netfilter: nf_conntrack_h323: Correct indentation when H323_TRACE defined
-
-Florian Westphal (7):
-  netfilter: nf_conntrack_sip: remove net variable shadowing
-  netfilter: add deprecation warning for dccp support
-  netfilter: nf_conntrack_h323: remove unreliable debug code in decode_octstr
-  netfilter: add more netlink-based policy range checks
-  netfilter: nf_tables: add netlink policy based cap on registers
-  netfilter: nft_set_pipapo: increment data in one step
-  netfilter: nft_set_pipapo_avx2: remove redundant loop in lookup_slow
-
-Jelle van der Waa (1):
-  netfilter: nf_tables: Fix typo in enum description
-
-Pablo Neira Ayuso (2):
-  netfilter: nft_meta: add double-tagged vlan and pppoe support
-  netfilter: nf_tables_offload: add nft_flow_action_entry_next() and use
-    it
-
-Sun Jian (1):
-  netfilter: use function typedefs for __rcu NAT helper hook pointers
-
- include/linux/netfilter/nf_conntrack_amanda.h | 15 +++--
- include/linux/netfilter/nf_conntrack_ftp.h    | 17 +++---
- include/linux/netfilter/nf_conntrack_irc.h    | 15 +++--
- include/linux/netfilter/nf_conntrack_snmp.h   | 11 ++--
- include/linux/netfilter/nf_conntrack_tftp.h   |  9 ++-
- include/net/netfilter/nf_tables.h             |  4 ++
- include/net/netfilter/nf_tables_ipv4.h        | 17 ++++--
- include/net/netfilter/nf_tables_ipv6.h        | 16 +++--
- include/net/netfilter/nf_tables_offload.h     | 10 ++++
- include/uapi/linux/netfilter/nf_tables.h      |  6 +-
- net/netfilter/ipset/ip_set_core.c             |  2 +-
- net/netfilter/nf_conntrack_amanda.c           | 10 +---
- net/netfilter/nf_conntrack_ftp.c              | 10 +---
- net/netfilter/nf_conntrack_h323_asn1.c        | 45 ++++++--------
- net/netfilter/nf_conntrack_irc.c              | 10 +---
- net/netfilter/nf_conntrack_sip.c              |  3 +-
- net/netfilter/nf_conntrack_snmp.c             |  7 +--
- net/netfilter/nf_conntrack_tftp.c             |  7 +--
- net/netfilter/nf_dup_netdev.c                 |  5 +-
- net/netfilter/nf_tables_api.c                 | 20 +++++--
- net/netfilter/nf_tables_core.c                |  2 +-
- net/netfilter/nfnetlink_acct.c                |  2 +-
- net/netfilter/nfnetlink_cthelper.c            |  2 +-
- net/netfilter/nfnetlink_hook.c                |  2 +-
- net/netfilter/nfnetlink_log.c                 |  4 +-
- net/netfilter/nfnetlink_osf.c                 |  2 +-
- net/netfilter/nfnetlink_queue.c               |  2 +-
- net/netfilter/nft_bitwise.c                   |  6 +-
- net/netfilter/nft_byteorder.c                 |  4 +-
- net/netfilter/nft_cmp.c                       |  2 +-
- net/netfilter/nft_compat.c                    |  2 +-
- net/netfilter/nft_connlimit.c                 |  2 +-
- net/netfilter/nft_ct.c                        |  6 +-
- net/netfilter/nft_dynset.c                    |  3 +-
- net/netfilter/nft_exthdr.c                    |  9 ++-
- net/netfilter/nft_fib.c                       |  2 +-
- net/netfilter/nft_hash.c                      |  4 +-
- net/netfilter/nft_immediate.c                 |  6 +-
- net/netfilter/nft_inner.c                     |  2 +-
- net/netfilter/nft_limit.c                     |  2 +-
- net/netfilter/nft_log.c                       |  2 +-
- net/netfilter/nft_lookup.c                    |  4 +-
- net/netfilter/nft_meta.c                      | 58 ++++++++++++++++++-
- net/netfilter/nft_numgen.c                    |  2 +-
- net/netfilter/nft_objref.c                    |  2 +-
- net/netfilter/nft_osf.c                       |  4 +-
- net/netfilter/nft_payload.c                   |  8 +--
- net/netfilter/nft_queue.c                     |  2 +-
- net/netfilter/nft_quota.c                     |  2 +-
- net/netfilter/nft_range.c                     |  2 +-
- net/netfilter/nft_rt.c                        |  2 +-
- net/netfilter/nft_set_pipapo.c                |  4 +-
- net/netfilter/nft_set_pipapo.h                |  3 -
- net/netfilter/nft_set_pipapo_avx2.c           | 32 +++-------
- net/netfilter/nft_socket.c                    |  2 +-
- net/netfilter/nft_synproxy.c                  |  4 +-
- net/netfilter/nft_tunnel.c                    |  6 +-
- net/netfilter/nft_xfrm.c                      |  6 +-
- net/netfilter/xt_dccp.c                       |  3 +
- 59 files changed, 262 insertions(+), 191 deletions(-)
-
--- 
-2.52.0
+Paul
 
