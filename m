@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-276379-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276380-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AL8eDqEf1mklBQgAu9opvQ
-	(envelope-from <netdev+bounces-276379-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 11:28:01 +0200
+	id KCBgObUf1mklBQgAu9opvQ
+	(envelope-from <netdev+bounces-276380-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 11:28:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BB2E3B9E25
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 11:28:00 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A80C3B9E2D
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 11:28:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2719F301AF7E
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 09:27:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 996A63008792
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 09:27:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B212033F370;
-	Wed,  8 Apr 2026 09:27:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FE8839F188;
+	Wed,  8 Apr 2026 09:27:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="CYoTgO5+"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="C8O2NmSY"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D0BB2DCF74
-	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 09:27:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62C0C351C05
+	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 09:27:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775640447; cv=none; b=Rso3NmFM+HN3TMUD9mbg1LfnzpEm4f88qMcYCPHZtQ1WfulFrYZVgHwOxP7Wb4fFuWul18LqDBcTir0BdN+x9ZpXITxjm+u3kX+yaYgloIBCvHEfZSoDIUibwP431hMRnepnQ8olTCu+ptSu3OfWj5RK2SSDgYSQOXSVZYV0Yzo=
+	t=1775640460; cv=none; b=g3KqbntdPuQ7GdEFHZWAPN/rePFZ7/70F/gRC789U/XnN/cWRgalxMhd88I7EEjppiopLqXgOwg6/iQ+8kyb3umeZt5wNztqdn6SbfB43qTeTdUV4cYlIn5MRvZ/jIzFU2jqrsfP5VjbVStb/3GBrhp+uYPH5i6DbBqi/svaZys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775640447; c=relaxed/simple;
-	bh=uTvfl5q8mXcuy4HH0QC8P2V3S6wd/UywonY2WnHQf/A=;
+	s=arc-20240116; t=1775640460; c=relaxed/simple;
+	bh=hl0uibg4BOewmLTlthEEI+J48Fn6/Kn7W+cNMYT/9tc=;
 	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=Sl7kaO45Zs2wh6903JuNnCaa6SPWbV4zYQKI9PAzQWymA0/raNyoiIw7r4Eanz2vkGO8iQSLohz1tljFy58WHn0p0XYY3GMaL3PDL+vEZPLKvXqDLDybm2uV4QxffmkCEQJvELzc3o1JLCBYDdCBJ4lo+lY+WYVPsXrPHr3UFYU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=CYoTgO5+; arc=none smtp.client-ip=78.32.30.218
+	 Content-Disposition:Content-Type:Message-Id:Date; b=CktMZr2vPwymMqZAoR4TianpbySaAtlwBDOnLg9QJcZC2dYBy5TciAKLNau4ISEITYj17FZS1LWZgRUrn1WZHvr0MFRo+DGQ5nW/q/4pSFAmWt7QVdMdqB/oE4Vj+GXE+4Sh/1sMM267NS6FRKFUAMSd/hgFTQvczoEge0eDrCs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=C8O2NmSY; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -40,22 +40,22 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=KZiSegeFsbX6rV73Xt8FKnLevjwV0lgeOtK47cPkIg0=; b=CYoTgO5+QDOiagpHtFAWN1UPNi
-	NMGcLgOokDZZJAwfqyECQs8M0fChSr1K9zLmqyrw+rdqBH2nS3bU4FfoPmO9d2NqovuwGEqdfFtL3
-	SZ7yT3LzdMEq7U/JYRa+zfD5B4n3NT/dS/V4+OjOfNjEPdxpWO8X80slDWvzmkyRh6DmkU79zgn/u
-	eWZc2lYVOaxP/js+TdShgmRdlTXfYlutJsKi3cmZptASLiEkHw/28RLM6yGVsGQU+U4ST5POBzc30
-	jP31Vu0ZPj+jh9ebjJq6Vks9q17RgabXWYVHBDmZap4QmrG6QLE7HwqMYkc4kkCQtkYPBySUQbB1M
-	noF8szBw==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:35130 helo=rmk-PC.armlinux.org.uk)
+	bh=NnhKaayKX2ym3axLouWbyDpq6J08FaMtPXyF8+AIVRQ=; b=C8O2NmSYhN3gcqt/4N8/XEsW4/
+	6LCi4AVhCwL+VBVW4gwYUj7fvUauUkWoYfqxGDbxBLMDaF57h4rqm+1+CN+5OPVdYa0LrLiaXYg/a
+	Zh/Rzp2NsVCy/qCU0GbjKtTumihSgCbkR2FA2DVXU7izrvjcbzAHc4yVqNTDAbsBU+wx8abvr1g9c
+	svIr2MjF+6UpTwuFCZkeUUj1wpxhNJ26N0HoCtRU1DLE0huxLLgpHYeVIu4f7s8JLhxvf2lkJ3jzX
+	+NVhjrfz1Sz9EQAPqrE8c9Bp4+zxHF8ndkUpEKQ56tlcNxVq/m/BE2ypKPrX5OvGhVfruBO+RQYVI
+	yz2fA7Ag==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:35142 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1wAPBV-0000000022y-1HGJ;
-	Wed, 08 Apr 2026 10:26:53 +0100
+	id 1wAPBd-0000000023B-0iEH;
+	Wed, 08 Apr 2026 10:27:01 +0100
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1wAPBR-0000000F7ju-1fD9;
-	Wed, 08 Apr 2026 10:26:49 +0100
+	id 1wAPBW-0000000F7k0-2Dr7;
+	Wed, 08 Apr 2026 10:26:54 +0100
 In-Reply-To: <adYfPBHsXxQUsMyr@shell.armlinux.org.uk>
 References: <adYfPBHsXxQUsMyr@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -73,7 +73,7 @@ Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>,
 	Samuel Holland <samuel@sholland.org>
-Subject: [PATCH RFC net-next 02/10] net: stmmac: rename dev_id to userver
+Subject: [PATCH RFC net-next 03/10] net: stmmac: always fill in ver->userver
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,19 +83,19 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1wAPBR-0000000F7ju-1fD9@rmk-PC.armlinux.org.uk>
+Message-Id: <E1wAPBW-0000000F7k0-2Dr7@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Wed, 08 Apr 2026 10:26:49 +0100
+Date: Wed, 08 Apr 2026 10:26:54 +0100
 X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-276379-lists,netdev=lfdr.de,kernel];
+	TAGGED_FROM(0.00)[bounces-276380-lists,netdev=lfdr.de,kernel];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[armlinux.org.uk:-];
 	RCPT_COUNT_TWELVE(0.00)[14];
@@ -103,116 +103,44 @@ X-Spamd-Result: default: False [1.14 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	FROM_NEQ_ENVFROM(0.00)[rmk@armlinux.org.uk,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.153];
+	NEURAL_HAM(-0.00)[-0.214];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,armlinux.org.uk:email]
-X-Rspamd-Queue-Id: 9BB2E3B9E25
+X-Rspamd-Queue-Id: 4A80C3B9E2D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The Synopsys Databook and several implementation TRMs identify bits
-15:8 of the version register in dwmac v3.xx and v4.xx as "userver".
-We even print its value with "User ID". Rather than using "dev_id",
-use "userver" instead.
+Always fill in ver->userver irrespective of the core type. This has no
+functional impact but tidies up the code by removing an unnecessary
+conditional.
 
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- drivers/net/ethernet/stmicro/stmmac/hwif.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ drivers/net/ethernet/stmicro/stmmac/hwif.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.c b/drivers/net/ethernet/stmicro/stmmac/hwif.c
-index 3774af66db48..830ff816ab4f 100644
+index 830ff816ab4f..aacf78d4a2ee 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/hwif.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/hwif.c
-@@ -15,7 +15,7 @@
- 
- struct stmmac_version {
- 	u8 snpsver;
--	u8 dev_id;
-+	u8 userver;
- };
- 
- static void stmmac_get_version(struct stmmac_priv *priv,
-@@ -26,7 +26,7 @@ static void stmmac_get_version(struct stmmac_priv *priv,
- 	u32 version;
- 
- 	ver->snpsver = 0;
--	ver->dev_id = 0;
-+	ver->userver = 0;
- 
- 	if (core_type == DWMAC_CORE_MAC100)
- 		return;
-@@ -48,7 +48,7 @@ static void stmmac_get_version(struct stmmac_priv *priv,
+@@ -47,8 +47,7 @@ static void stmmac_get_version(struct stmmac_priv *priv,
+ 		 FIELD_GET(DWMAC_SNPSVER, version));
  
  	ver->snpsver = FIELD_GET(DWMAC_SNPSVER, version);
- 	if (core_type == DWMAC_CORE_XGMAC)
--		ver->dev_id = FIELD_GET(DWMAC_USERVER, version);
-+		ver->userver = FIELD_GET(DWMAC_USERVER, version);
+-	if (core_type == DWMAC_CORE_XGMAC)
+-		ver->userver = FIELD_GET(DWMAC_USERVER, version);
++	ver->userver = FIELD_GET(DWMAC_USERVER, version);
  }
  
  static void stmmac_dwmac_mode_quirk(struct stmmac_priv *priv)
-@@ -111,7 +111,7 @@ int stmmac_reset(struct stmmac_priv *priv)
- static const struct stmmac_hwif_entry {
- 	enum dwmac_core_type core_type;
- 	u32 min_snpsver;
--	u32 dev_id;
-+	u32 userver;
- 	const struct stmmac_regs_off regs;
- 	const void *desc;
- 	const void *dma;
-@@ -247,7 +247,7 @@ static const struct stmmac_hwif_entry {
- 	}, {
- 		.core_type = DWMAC_CORE_XGMAC,
- 		.min_snpsver = DWXGMAC_CORE_2_10,
--		.dev_id = DWXGMAC_ID,
-+		.userver = DWXGMAC_ID,
- 		.regs = {
- 			.ptp_off = PTP_XGMAC_OFFSET,
- 			.mmc_off = MMC_XGMAC_OFFSET,
-@@ -269,7 +269,7 @@ static const struct stmmac_hwif_entry {
- 	}, {
- 		.core_type = DWMAC_CORE_XGMAC,
- 		.min_snpsver = DWXLGMAC_CORE_2_00,
--		.dev_id = DWXLGMAC_ID,
-+		.userver = DWXLGMAC_ID,
- 		.regs = {
- 			.ptp_off = PTP_XGMAC_OFFSET,
- 			.mmc_off = MMC_XGMAC_OFFSET,
-@@ -291,7 +291,7 @@ static const struct stmmac_hwif_entry {
- };
- 
- static const struct stmmac_hwif_entry *
--stmmac_hwif_find(enum dwmac_core_type core_type, u8 snpsver, u8 dev_id)
-+stmmac_hwif_find(enum dwmac_core_type core_type, u8 snpsver, u8 userver)
- {
- 	const struct stmmac_hwif_entry *entry;
- 	int i;
-@@ -305,7 +305,7 @@ stmmac_hwif_find(enum dwmac_core_type core_type, u8 snpsver, u8 dev_id)
- 		if (snpsver < entry->min_snpsver)
- 			continue;
- 		if (core_type == DWMAC_CORE_XGMAC &&
--		    dev_id != entry->dev_id)
-+		    userver != entry->userver)
- 			continue;
- 
- 		return entry;
-@@ -358,7 +358,7 @@ int stmmac_hwif_init(struct stmmac_priv *priv)
- 	/* Fallback to generic HW */
- 
- 	/* Use synopsys_id var because some setups can override this */
--	entry = stmmac_hwif_find(core_type, priv->synopsys_id, version.dev_id);
-+	entry = stmmac_hwif_find(core_type, priv->synopsys_id, version.userver);
- 	if (!entry) {
- 		dev_err(priv->device,
- 			"Failed to find HW IF (id=0x%x, gmac=%d/%d)\n",
 -- 
 2.47.3
 
