@@ -1,385 +1,255 @@
-Return-Path: <netdev+bounces-276327-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276328-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aA2kNkAE1mnbAQgAu9opvQ
-	(envelope-from <netdev+bounces-276327-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 09:31:12 +0200
+	id aLrIBcgF1mnbAQgAu9opvQ
+	(envelope-from <netdev+bounces-276328-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 09:37:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56B1E3B8397
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 09:31:12 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68E7C3B8663
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 09:37:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0BDE2300B609
-	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 07:31:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id ED919301651A
+	for <lists+netdev@lfdr.de>; Wed,  8 Apr 2026 07:32:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9E33352C5B;
-	Wed,  8 Apr 2026 07:31:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44985382382;
+	Wed,  8 Apr 2026 07:32:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nA3V4Y+7"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="nW+T356e";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="G8s2Gcfg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E826717A300
-	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 07:31:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.53
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775633466; cv=pass; b=k2cDmFTyzIWYY0zgD2/RWdTXegx0nPf/R0eSX+MBJJQL3ABn8E4dDfB5me5WwJW5ZJp17w8Qt99ahigKMXV2ZmbyQlhjZeGg0BPRwI0NRjkryxNfvXNCOeL6eBMERac+PD4VM/ZuMzlLrio7HEwyQETPGunirFQnTMHJy5Wg/os=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775633466; c=relaxed/simple;
-	bh=CeA6uYKOa9sqRJ+MQyCP23Joz9YR2D1UWj7MkNiwvrk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AVU8mEBd7PYrJ2ho/OMdlBqSeTKZ3HdbZMz9+PtvjMsmh/U1Qd6EggryaK6+29tiOUOV+tcS0Cc96ooMzu2JVaA0hsQhAQk2uneiDJUzHFgN6i8OZmht/c82WiC1ryZacPIKJagNg7fhXWWCRaD2mY7oe1bD16evBvonH3I+nBI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nA3V4Y+7; arc=pass smtp.client-ip=209.85.167.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-5a283c44478so6690537e87.3
-        for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 00:31:04 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1775633463; cv=none;
-        d=google.com; s=arc-20240605;
-        b=S+aONT2k4SxBLgYgZc+YKEf0MP0mlidSNS3EW53RT9vd/RB8V0kGySECFurc95woRP
-         K2h87zeHBRVl1FVhT8/O3EqAyH5gwnq1p2cx3PPy4SDG2F92wwIqg+AVcj8qGTUBPYTd
-         64mbqjs6Z5KbyrIZ+MAcO7hpNaOjuQ3HObFKqhs3csdsVFb+0FIanX53pwrZV6fNRrny
-         p0NwkA+6MSCLqVCmq04tzcKhoq7qu46TLBDq2dyO58IEZ3VmsCHhUnjacC9j54pQwgVF
-         CzX6FFx+w4VAW62QmlLkA9lfAN0728HngGq2+NgPECyQ0h95aOnZQS7M26wvoX8JlZPH
-         /WMw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=QHN/+v66yc0A89NHJH+2Y3ZhjzBVXfkm+kEWhWOJlLw=;
-        fh=OiWpZE0hr7Sp88qk4Wv4vjk5De32iyhIlKoPOs0gDPo=;
-        b=SKMpU8nFJvYXdkm93KBneKrgDzUIaf/CrhRnBZ+a06xI2fJ7743WRl6fku8r7yejMG
-         KJ7keoAaHr3Mzah8DlgJTx7T9NBDrRKfN9Ce+XXV/qpvxHYV+abpl07IGgkPZaFrvEG6
-         f8WgYeJffRmH4GU/l+MISpjGAu1PKERhxW0EyvlWlA3egUVq5Tkt2dPp4jCSkAuMbhcA
-         AJCnFiElzQAPjYPrhO0/Mj3ytMse7WlnBNhScDTSmeW4Doi7sYEpnlGQ41NSAEPKI5lD
-         1LzZiPb69wpwN3PdyGPrxLNrS3+jxG4ayUDdPNtD5lthRtnswGqeljQxGd/XSl3hOMrH
-         CF/g==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C51D336AB77
+	for <netdev@vger.kernel.org>; Wed,  8 Apr 2026 07:32:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775633567; cv=none; b=WBu5ZvbvCVXL78rOHyzobNImArURZc3tWRXDOdfyDwZXIjuqZoVpW60ayGdc/pvF2YYcMftAzwZXK3WGtEa3dnzohLHd3O/rYy9cj+jpGiw99ca1yU7vO9nHKXuWWHkoMjkFi/jczUdIQ84bpRnMuV9OsGXqs+SVrWNTSqpKSd4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775633567; c=relaxed/simple;
+	bh=OveXBMU2Rs8ereI1m9UptjRMaYvkzfBMcmK+hgcieTk=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uR/bdKEKFkZkcWFzgJBMZuH6RRUTrubKl3YDRC8u5yA4mn/YF5LkF0rgtF1UoKRS+o7WL7aaNie/EGi02oNLpeZwBhZgWlMATkBWxr81e7AgidBcLHiMQYPU9rg9yXrnmsLWKrvdsvdGb7FpxK/5pazJARVTS08oxEOUPyQUCBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=nW+T356e; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=G8s2Gcfg; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6385vmFM249536
+	for <netdev@vger.kernel.org>; Wed, 8 Apr 2026 07:32:45 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=qcppdkim1; bh=xckB8PPJx6+/vCorN26HvLDM
+	xAJX+r/dYxdwC1AmZgc=; b=nW+T356eFEiWlNV25OIPnYucbssv+TRN/QY2qRAf
+	QPRvHVVopBSmj/fSXs0NgBVDsJ9QE8h2ok+x0hvLsG6TiUlkCg3wObmLBv3a7kyl
+	m2nzw3uI4iNng+JA9e6cvv2Wr9/bVrWoP9AgCaOtYp8dKr0uxx8E/hlWlK1ZeVQ3
+	WEMSL+o4zXWOunDSRMY8navjM9E6q9a8BQsXTSnLcqh6IrTx2LaLgYKULpd1TeUY
+	/UDWZ7IRiI7V0ojXtEFPxFq2jCCBms5mBavoeF2GzEXNoWRAmbYzsK4rZpqtAOP2
+	9hwyvyzYAsDYq9cz/CCF+9umhTFAznHxI/Lr5T7DlLXzWQ==
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com [209.85.160.197])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4dd8x99v1a-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 07:32:45 +0000 (GMT)
+Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-50d831e8083so70745411cf.3
+        for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 00:32:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775633463; x=1776238263; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QHN/+v66yc0A89NHJH+2Y3ZhjzBVXfkm+kEWhWOJlLw=;
-        b=nA3V4Y+7NhmNK/hsfXPp/WrVVMuQEIIPJ9N3LQ5p8xUf5VFRqSvJ7ZTxT3uMJqkOxg
-         lFWkEE63E9VoAV/SbYZxb/IR3CscNrSCoFcqGetAWsndi7cFfNIQhfROj0gzVVVyB1ow
-         oGB+Bu4OSN6d8FnciSP+fa5tw2LWntsPRUZOBP7Z6LpRSNzHJUWl6m+JwthW8KDAHlwW
-         sxJEWMcL2BAFnhOAipzVY2gt7I9izxPaXl2o+0xzgVzyuUgQysuQEvm0IEDOnvYfjLt6
-         p0a9sGnpLbWi8mCTErZ30sLJnLXitc9jJ8UKs6wKT5eLkvovUfr98e34U9yxuwr4/HrY
-         jGNQ==
+        d=oss.qualcomm.com; s=google; t=1775633564; x=1776238364; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=xckB8PPJx6+/vCorN26HvLDMxAJX+r/dYxdwC1AmZgc=;
+        b=G8s2GcfgR3N3BRGa/eA7J3eg62OdrDfrV8Z8FYnzHmvDsJHPp6ajS31K8uMIrOIGra
+         ghHUiQA6pJWPLPo7+CsyDhb/fpMY6HyJoyPTo1Mw2qgGMPBUIf+Pow6o1DM50L5FQZnF
+         drpFKklQe/3g8Id7wbMpRbjIZyEt1CSQ1DqX0csM16Ve2Sq0NMebaepg77wGptc0fMc7
+         ZV4tj3RUuK2WNkfDGpbNpc/wmKlKDytILdEkdKGeSwzwgSt1a9+nIU9ToPl2ZyX8nxjN
+         Ff8EwCqWeUbcv6SMeIsOgya5U85eVwvpF2zr4uY1VqXI5IfSMiDp5Iw4affzIz36tXMe
+         79sg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775633463; x=1776238263;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=QHN/+v66yc0A89NHJH+2Y3ZhjzBVXfkm+kEWhWOJlLw=;
-        b=dWhbnZ0n7R3kqaQM+Z/pLVXwo0YTiD8eBT2HJL3M4oQnoGh54SHyrEtV6IO3Oenk3p
-         7YmkT3n3ZXNeXNQEN7rUpA6tvunoUpvbjp9a7RuE5c45/FKRYIUiDilM5AIDLGyeOtHz
-         oIUFTkERQh3TfogLLEpmC7Am9+/dm1OozWKpsFRMp8I3V0jkm7yR+L0s5yxQ+7joXBKo
-         AOHRvL5n2IE0L3KIgVzVdy+w6Ex3a+y0MC3VyKAJju016M8A07aOe8LDzcyv2dt1Vdpf
-         CG53gqOLgdeG4VWXmNGGGZ/Y6kLxlutxP7tvhEPOIwOBGZRjbjpJhK+dDNoBtpJbAKhF
-         9Jxg==
-X-Forwarded-Encrypted: i=1; AJvYcCV2/sLfb7fJ+TIDKqZzWmll84Zylyfe2O1hcBXmXXRxVyqHbJQW+CS2beXEaP1BDtXH2TenAD8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw4Jc1hP/JrsCOGBNvyYXqm+tYhahvIOoqSc6BiZ0cEOKpC8RDB
-	meP6dn0W9lBEiIPukxlP+uaRinp4mLheQkmUfhI42rSy0vs4BPffvNnhbnqaFUcLFygc+x3vZMS
-	1JmULqUOqRDm+w6c8gAkpJv/LeL1c9oU=
-X-Gm-Gg: AeBDievS6lsH7NupuKpTajAyn2OPMV0+3nzADcBZw/Vs44P07hgz20siRmERRr7LZzm
-	5HBFRMn58tCmu0r5j/84q3Fo+iqJLC4yVa6jCbTDKTNpqjtwByWUzWYMkOSZUZdodYklJK7/WnZ
-	7sN1NnyEv2xhLAkIlPQGJAL1SHNHZt4n4pM0sQOSpFjvNTq+qbIgbsw35UCpeOoSoSSfZ0k5uhp
-	mMsvuzIml60q0UX5IXyw3unxQmlmO1P2aYfyqk+z2GH+/RCvAWZbkNzAq2O9z7mUBubYlPy2g+y
-	Qx9cim93
-X-Received: by 2002:a05:6512:2251:b0:5a2:c406:a74a with SMTP id
- 2adb3069b0e04-5a33758d965mr5354978e87.35.1775633462669; Wed, 08 Apr 2026
- 00:31:02 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1775633564; x=1776238364;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xckB8PPJx6+/vCorN26HvLDMxAJX+r/dYxdwC1AmZgc=;
+        b=HSSl9vj8ktMO3j1AsptCxbY7ReOaVaruPIsjtK7Q4cFHHPa3xhbu/ysc9rqom1YqkB
+         EiJHOahKc1zv7pGutrkvmv18mWfOMYRJQB4hMP0psyJAFBGR6dBAQpMITerOlcY5+nBJ
+         wft4csdS3UU6iISO5GD+aMde5MHcg80IRy1EYutQtGf9KRBANVI0tzLUbKbrZWMt8DFO
+         IRxn/UEpuomOKjQzp+apd6QQ6oX2Gi+Bv4cs5eeoqCPQ8J2xuquV2fRud+Xb0cUAdlix
+         JcftILfL8hY/IRcevzPYNTRrfZrv9i5I+nkNV08N0fz8Og12rrRrWz3BMoQG/UzRj+zS
+         jRfA==
+X-Forwarded-Encrypted: i=1; AJvYcCU/5eEKvprfRe20kdelbdwCkFZaTKBVvrVM1oXDlO+YsmG9RXCtKgg6AbMpbta3V0Pda0id9rc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwCco4H7vyw25ZeFrG0Gg4/i0iof+kB1eiwD9pmWfdoxf8yl8O+
+	tA7/qAgMPaVj/WetgiiFfXnDkz6Jdx3jRe9u9seOcPqcGN5L4/+LHaTm2tgeFzRSNMd03B71gqv
+	ApRzdf2A7yQMA9zJqpa4RKzdZzffTC7vQGyo8ppuMPHPlktjmli6RaZZGrLI=
+X-Gm-Gg: AeBDietHAjJ3HuYUHCTY5RaW8dlT9OimRVGYZEm867cUs6tAjsA+bVvX5rvTh1RCsuK
+	6k266/a49E4U+w7QplLI7pWDkFug4kIJTzfgIPiIp4y+D/xtX2DmQ1EuVGRdNwbngE+b/q9QnA4
+	3UA7hYK2Pkpqg3V9O/JzNC1tpv4cEsi1UiSZ5qH0MPpITn4l461Evc8VS6kMSWqkCmjlVLRAbYH
+	pZXCSRmOqjObJGFA4C/LQsH6S56DPk2USlLUzl3W5zBN+bNvgg+Vur4O5VbuGQ6PW3PKPXnm4Qx
+	tJCBBljLMcad7vcUOOxU7TyTrdBWqPsHNQVHFRU00bi8gH9B5ud6vMTln3II74ORoEENu9enoK2
+	03h3zhsBp2qPwdx0YrUjHl4LRYlELZ+t4XpvcU5wF7CyEps0mfZeka9/P
+X-Received: by 2002:a05:622a:124b:b0:50d:83de:4933 with SMTP id d75a77b69052e-50d83de50cfmr202934071cf.20.1775633564111;
+        Wed, 08 Apr 2026 00:32:44 -0700 (PDT)
+X-Received: by 2002:a05:622a:124b:b0:50d:83de:4933 with SMTP id d75a77b69052e-50d83de50cfmr202933731cf.20.1775633563612;
+        Wed, 08 Apr 2026 00:32:43 -0700 (PDT)
+Received: from trex (187.red-79-144-197.dynamicip.rima-tde.net. [79.144.197.187])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4889cb46adcsm383692655e9.4.2026.04.08.00.32.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Apr 2026 00:32:42 -0700 (PDT)
+From: Jorge Ramirez <jorge.ramirez@oss.qualcomm.com>
+X-Google-Original-From: Jorge Ramirez <JorgeRamirez-Ortiz>
+Date: Wed, 8 Apr 2026 09:32:39 +0200
+To: Trilok Soni <trilokkumar.soni@oss.qualcomm.com>
+Cc: Sumit Garg <sumit.garg@kernel.org>,
+        Jorge Ramirez <jorge.ramirez@oss.qualcomm.com>,
+        vikash.garodia@oss.qualcomm.com, linux-arm-msm@vger.kernel.org,
+        devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        freedreno@lists.freedesktop.org, linux-media@vger.kernel.org,
+        netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+        ath12k@lists.infradead.org, linux-remoteproc@vger.kernel.org,
+        andersson@kernel.org, konradybcio@kernel.org, robh@kernel.org,
+        krzk+dt@kernel.org, conor+dt@kernel.org, robin.clark@oss.qualcomm.com,
+        sean@poorly.run, akhilpo@oss.qualcomm.com, lumag@kernel.org,
+        abhinav.kumar@linux.dev, jesszhan0024@gmail.com,
+        marijn.suijten@somainline.org, airlied@gmail.com, simona@ffwll.ch,
+        dikshita.agarwal@oss.qualcomm.com, bod@kernel.org, mchehab@kernel.org,
+        elder@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        jjohnson@kernel.org, mathieu.poirier@linaro.org,
+        mukesh.ojha@oss.qualcomm.com, pavan.kondeti@oss.qualcomm.com,
+        tonyh@qti.qualcomm.com, vignesh.viswanathan@oss.qualcomm.com,
+        srinivas.kandagatla@oss.qualcomm.com,
+        amirreza.zarrabi@oss.qualcomm.com, jens.wiklander@linaro.org,
+        op-tee@lists.trustedfirmware.org, apurupa@qti.qualcomm.com,
+        skare@qti.qualcomm.com, harshal.dev@oss.qualcomm.com,
+        linux-kernel@vger.kernel.org, Sumit Garg <sumit.garg@oss.qualcomm.com>
+Subject: Re: [PATCH v3 11/15] media: qcom: Switch to generic PAS TZ APIs
+Message-ID: <adYElwM6eT5T8hZM@trex>
+References: <20260327131043.627120-1-sumit.garg@kernel.org>
+ <20260327131043.627120-12-sumit.garg@kernel.org>
+ <ac-KQ7e8-syph1Zl@trex>
+ <adOcMsk8a_Clb4WZ@sumit-xelite>
+ <439f9bbf-1ba1-465f-b5af-01ba0ebb86d4@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260404150452.83904-1-kerneljasonxing@gmail.com>
- <20260404150452.83904-4-kerneljasonxing@gmail.com> <willemdebruijn.kernel.2ff565d2f9e7f@gmail.com>
- <CAL+tcoB94=ptFB-acU3nAK_MqW74DV0MQUVvvV3nbQ7Zc6zSZw@mail.gmail.com>
- <willemdebruijn.kernel.27ec47b22b23c@gmail.com> <CAL+tcoAvVBN7juJEBt5-FYQ4eGTe7dYrFbR3CMOwguw=_X=btA@mail.gmail.com>
- <CAL+tcoCctfs=d9zz5ei1S999S94HmUDSToriZ8NJiLT8MmpQTA@mail.gmail.com>
- <willemdebruijn.kernel.1b49845d3acc7@gmail.com> <CAL+tcoBt1A5GYFvimkcRFUtmy298y13AiF-XFF8b8E8Y6fg8Xw@mail.gmail.com>
-In-Reply-To: <CAL+tcoBt1A5GYFvimkcRFUtmy298y13AiF-XFF8b8E8Y6fg8Xw@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Wed, 8 Apr 2026 15:30:24 +0800
-X-Gm-Features: AQROBzCA_HI1mJ5iXTGiSj9KFSmyl8xFzPMd49B8ysVtzC6MO0xGXC6MCb7Q39U
-Message-ID: <CAL+tcoAa4FqSik8sGAzj6t8s_TpqBUDp95KkucCVDWBOQAkRiA@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 3/4] bpf-timestamp: keep track of the skb when
- wait_for_space occurs
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org, willemb@google.com, 
-	martin.lau@kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>, Yushan Zhou <katrinzhou@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <439f9bbf-1ba1-465f-b5af-01ba0ebb86d4@oss.qualcomm.com>
+X-Authority-Analysis: v=2.4 cv=Rr716imK c=1 sm=1 tr=0 ts=69d6049d cx=c_pps
+ a=EVbN6Ke/fEF3bsl7X48z0g==:117 a=VPdg2FrOqWfiVCzsz0q0YA==:17
+ a=kj9zAlcOel0A:10 a=A5OVakUREuEA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=eoimf2acIAo5FJnRuUoq:22
+ a=EUspDBNiAAAA:8 a=YTLieAA4xaQwPRX2avwA:9 a=CjuIK1q_8ugA:10
+ a=a_PwQJl-kcHnX1M80qC6:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDA4MDA2NyBTYWx0ZWRfX0PrVgZeSlDgD
+ y5ybtyEP58VwK7cEM1ZvLf6f89GXDyULVby9DtylBFDMQzrWlCojFwHl6d6MQGRu+StyaYRR4TJ
+ mEM+EwjUyODhxTZI/JGPtpkdgTr60MbYG5pERVD0PjxDp43BaG4sLGj8H7Kr8X+nx7rEldNmA0z
+ Fxc9BpWRR15htDKAWoYL0YrjMYU9MZkgIRC7Ze2+6Hf/YWGIQlM2bOdlPgmbyrcdUlrXVqYIaEx
+ 6JFnJxZ5YxvlTe462X+C0PWW7oGM/a2uR+PhUi/EKuNN2JCDos9Z3fOh7DJc5PqKrD6kCLC3aHv
+ GONf6pD2+ZYutLVtBFB77k8vKFcknWjmA78WWHMUlKc5qslNoAGz4EJg5b1d9O2P9aPPtawgt3y
+ Z/9mte3ID75zb7wNH6nGjV2B0jE/+0XKKP6tuhfwXol/pDlSJsLLzNg8z43+YewACJSEq0ObkyU
+ MC8vRnB3nOWaLC/ky+Q==
+X-Proofpoint-ORIG-GUID: hADthvyNJ5Gl_LNtPWs42zx61yEqXqYE
+X-Proofpoint-GUID: hADthvyNJ5Gl_LNtPWs42zx61yEqXqYE
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-04-08_03,2026-04-07_05,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 priorityscore=1501 suspectscore=0 malwarescore=0
+ clxscore=1015 bulkscore=0 phishscore=0 adultscore=0 spamscore=0
+ lowpriorityscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2604010000
+ definitions=main-2604080067
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
+	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-276327-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[kernel.org,oss.qualcomm.com,vger.kernel.org,lists.freedesktop.org,lists.infradead.org,poorly.run,linux.dev,gmail.com,somainline.org,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,qti.qualcomm.com,lists.trustedfirmware.org];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:dkim,qualcomm.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,oss.qualcomm.com:dkim];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-276328-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jorge.ramirez@oss.qualcomm.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[51];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	NEURAL_HAM(-0.00)[-0.998];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kerneljasonxing@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 56B1E3B8397
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 68E7C3B8663
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Apr 8, 2026 at 8:35=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.co=
-m> wrote:
->
-> On Wed, Apr 8, 2026 at 5:17=E2=80=AFAM Willem de Bruijn
-> <willemdebruijn.kernel@gmail.com> wrote:
-> >
-> > Jason Xing wrote:
-> > > On Tue, Apr 7, 2026 at 11:33=E2=80=AFAM Jason Xing <kerneljasonxing@g=
-mail.com> wrote:
-> > > >
-> > > > On Mon, Apr 6, 2026 at 10:37=E2=80=AFPM Willem de Bruijn
-> > > > <willemdebruijn.kernel@gmail.com> wrote:
-> > > > >
-> > > > > Jason Xing wrote:
-> > > > > > On Mon, Apr 6, 2026 at 10:28=E2=80=AFAM Willem de Bruijn
-> > > > > > <willemdebruijn.kernel@gmail.com> wrote:
-> > > > > > >
-> > > > > > > Jason Xing wrote:
-> > > > > > > > From: Jason Xing <kernelxing@tencent.com>
-> > > > > > > >
-> > > > > > > > The patch is the 1/2 part of push-level granularity feature=
-.
-> > > > > > > >
-> > > > > > > > Tag the skb in tcp_sendmsg_locked() when wait_for_space occ=
-urs even
-> > > > > > > > though it might not carry the last byte of the sendmsg.
-> > > > > > > >
-> > > > > > > > Prior to the patch, BPF timestamping cannot cover this case=
-:
-> > > > > > > > The following steps reproduce this:
-> > > > > > > > 1) skb A is the current last skb before entering wait_for_s=
-pace process
-> > > > > > > > 2) tcp_push() pushes A without any tag
-> > > > > > > > 3) A is transmitted from TCP to driver without putting any =
-skb carrying
-> > > > > > > >    timestamps in the error queue, like SCHED, DRV/HARDWARE.
-> > > > > > > > 4) sk_stream_wait_memory() sleeps for a while and then retu=
-rns with an
-> > > > > > > >    error code. Note that the socket lock is released.
-> > > > > > > > 5) skb A finally gets acked and removed from the rtx queue.
-> > > > > > > > 6) continue with the rest of tcp_sendmsg_locked(): it will =
-jump to(goto)
-> > > > > > > >    'do_error' label and then 'out' label.
-> > > > > > > > 7) at this moment, skb A turns out to be the last one in th=
-is send
-> > > > > > > >    syscall, and miss the following tcp_bpf_tx_timestamp() o=
-pportunity
-> > > > > > > >    before the final tcp_push()
-> > > > > > > > 8) BPF script fails to see any timestamps this time
-> > > > > > > >
-> > > > > > > > Signed-off-by: Yushan Zhou <katrinzhou@tencent.com>
-> > > > > > > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > > > > > > > ---
-> > > > > > > >  net/ipv4/tcp.c | 4 +++-
-> > > > > > > >  1 file changed, 3 insertions(+), 1 deletion(-)
-> > > > > > > >
-> > > > > > > > diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> > > > > > > > index c603b90057f6..7d030a11d004 100644
-> > > > > > > > --- a/net/ipv4/tcp.c
-> > > > > > > > +++ b/net/ipv4/tcp.c
-> > > > > > > > @@ -1400,9 +1400,11 @@ int tcp_sendmsg_locked(struct sock *=
-sk, struct msghdr *msg, size_t size)
-> > > > > > > >  wait_for_space:
-> > > > > > > >               set_bit(SOCK_NOSPACE, &sk->sk_socket->flags);
-> > > > > > > >               tcp_remove_empty_skb(sk);
-> > > > > > > > -             if (copied)
-> > > > > > > > +             if (copied) {
-> > > > > > > > +                     tcp_bpf_tx_timestamp(sk);
-> > > > > > > >                       tcp_push(sk, flags & ~MSG_MORE, mss_n=
-ow,
-> > > > > > > >                                TCP_NAGLE_PUSH, size_goal);
-> > > > > > >
-> > > > > > > Now the number of skbs that will be tracked will be unpredict=
-able,
-> > > > > > > varying based on memory pressure.
-> > > > > >
-> > > > > > Right, I put some effort into writing a selftests to check how =
-many
-> > > > > > push functions get called at one time and failed to do so.
-> > > > > >
-> > > > > > >
-> > > > > > > That sounds hard to use to me. Especially if these extra push=
-es
-> > > > > > > cannot be identified as such.
-> > > > > > >
-> > > > > > > Perhaps if all skbs from the same sendmsg call can be identif=
-ied,
-> > > > > > > that would help explain pattern in data resulting from these
-> > > > > > > uncommon extra data points.
-> > > > > >
-> > > > > > You meant move tcp_bpf_tx_timestamp before tcp_skb_entail()? Th=
-at is
-> > > > > > close to packet basis without considering fragmentation of skb =
-:)
-> > > > >
-> > > > > No, I meant somehow in the notification having a way to identify =
-all
-> > > > > the skbs belonging to the same sendmsg call, to allow filtering o=
-n
-> > > > > that. But I also don't immediately see how to do that (without ad=
-ding
-> > > > > yet another counter say).
-> > > >
-> > > > If we don't build the relationship between skb and sendmsg (just li=
-ke
-> > > > the SENDMSG sock option), we will have no clue on how to calculate.=
- If
-> > > > we only take care of the skb from the view of the syscall layer, it=
-'s
-> > > > fine by moving tcp_bpf_tx_timestamp() before tcp_skb_entail(). But =
-in
-> > > > terms of per skb even generated beneath TCP due to gso/tso, there i=
-s
-> > > > only one way to correlate: adding an additional member in the skb
-> > > > structure to store its sendmsg time. This discussion is only suitab=
-le
-> > > > for use cases like net_timestamping.
-> > > >
-> > > > Well, my key point is that, I have to admit, the above (including
-> > > > existing bpf script net_timestamping) is a less effective way which
-> > > > definitely harms the performance because of the extremely frequent
-> > > > look-up process. It's not suitable for 7x24 observability in
-> > > > production. What we've done internally is make the kernel layer as
-> > > > lightweight/easy as possible and let the timestamping feature throw
-> > > > each record into a ring buffer that the application can read, sort =
-and
-> > > > calculate. This arch survives the performance. But that's simply wh=
-at
-> > > > the design of the kernel module is, given the fast deployment in
-> > > > production. I suppose in the future we could build a userspace tool
-> > > > like blktrace to monitor efficiently instead of the selftest sample=
-.
-> > > > Honestly I don't like look-up action.
-> > > >
-> > > > Since we're modifying the kernel, how about adding a new member to
-> > > > record sendmsg time which bpf script is able to read. The whole
-> > > > scenario looks like this:
-> > > > 1) in tcp_sendmsg_locked(), record the sendmsg time for each skb
-> > > > 2) in either tso_fragment() or tcp_gso_tstamp(), each new skb will =
-get
-> > > > a copy of its original skb
-> > > > 3) in each stage, bpf script reads the skb's sendmsg time and the
-> > > > current time, and then effortlessly do the math.
-> > > >
-> > > > At this point, what I had in mind is we have two options:
-> > > > 1) only handle the skb from the view of the send syscall layer, whi=
-ch
-> > > > is, for sure, very simple but not thorough.
-> > > > 2) stick to a pure authentic packet basis, then adding a new member
-> > > > seems inevitable. so the question would be where to add? The space =
-of
-> > > > the skb structure is very precious :(
-> > >
-> > > Finding a suitable place to put this timestamp is really hard. IIRC,
-> > > we can't expand the size of struct skb_shared_info so easily since
-> > > it's a global effect.
-> > >
-> > > I'm wondering if we can turn the per-packet mode into a non-compatibl=
-e
-> > > feature by reusing 'u32 tskey' to store a microsecond timestamp of
-> > > sendmsg.
-> >
-> > Agreed that an extra field is hard. We should avoid that.
->
-> Avoiding adding a new one makes the whole work extremely hard. I'm
-> wondering since we have hwtstamp in shared info, why not add a
-> software one for timestamping use? Then, we would support more
-> different protocols in more different stages in a finer grain, which
-> is a big coarse picture in my mind.
->
-> Adding a software bit will completely reduce the whole complexity and
-> be very easy to use. Would you expect to see a draft by adding such a
-> bit first?
->
-> Or just like I mentioned, repurposing tskey seems an alternative,
-> which, however, makes the new feature incompatible.
->
-> >
-> > If the purpose is to group skbs by sendmsg call (e.g., to filter out
-> > all but the last one), it is probably also unnecessary.
-> >
-> > From a process PoV, since the process knows the sendmsg len and each
-> > skb has a tskey in byte offset, it can correlate the skb with a given
-> > sendmsg buffer.
-> >
-> > The BPF program is under control of a third-party admin. So that does
-> > not follow directly. But it can be passed additional metadata.
-> >
-> > I thought about passing the offset of the skb from the start of the
-> > sendmsg buffer to identify all consecutive skbs for a sendmsg call,
-> > as each new buffer will start with an skb with offset 0 ..
-> >
-> > .. but that won't work as there is no guarantee that a sendmsg call
-> > will not append to an existing outstanding skb.
->
-> Right. TCP is way too complex and we indeed see some tough issues when
-> trying to deploy the feature. So my humble take is to make the design
-> as simple as possible.
->
-> >
-> > Anyway, the general idea is to pass to the BPF program through
-> > bpf_skops_tx_timestamping some relevant signal , without having to
-> > expand either skb or sk itself.
-> >
-> > I hear you on that measuring every skb is too frequent. But is calling
-> > the BPF program and letting it decide whether to measure too? BPF
-> > program invocation itself should be cheap.
->
-> Oh, I was clear enough. Sorry. I meant tracing per skb is definitely
-> an awesome way to go. My ultimate goal is to do so. Instead of letting
-> people implement various fine grained bpf progs, we can provide a very
-> easy/understandable/efficient approach with more samples. It should be
-> very beneficial.
->
-> >
-> > If per-push is preferable, with a filter ability like the above, it
-> > seems more useful to me already.
->
-> Push-level is a compromise plan. Packet-level is what I always pursue :)
->
-> The current series has this ability: the bpf prog noticed it's a
-> SENDMSG sock option and will selectively call
-> bpf_sock_ops_enable_tx_tstamp() to do so. Only by calling
-> bpf_sock_ops_enable_tx_tstamp() could the skb be tracked.
+On 07/04/26 15:14:22, Trilok Soni wrote:
+> On 4/6/2026 4:42 AM, Sumit Garg wrote:
+> > Hi Jorge,
+> > 
+> > On Fri, Apr 03, 2026 at 11:37:07AM +0200, Jorge Ramirez wrote:
+> >> On 27/03/26 18:40:39, Sumit Garg wrote:
+> >>> From: Sumit Garg <sumit.garg@oss.qualcomm.com>
+> >>>
+> >>> Switch qcom media client drivers over to generic PAS TZ APIs. Generic PAS
+> >>> TZ service allows to support multiple TZ implementation backends like QTEE
+> >>> based SCM PAS service, OP-TEE based PAS service and any further future TZ
+> >>> backend service.
+> >>
+> >> OP-TEE based PAS service relies on the linux driver to configure the
+> >> iommu (just as it is done on the no_tz case). This generic patch does
+> >> not cover that requirement.
+> > 
+> > That's exactly the reason why the kodiak EL2 dtso disables venus by
+> > default in patch #1 due to missing IOMMU configuration.
+> > 
+> >>
+> >> Because of that, it is probably better if the commit message doesnt
+> >> mention OP-TEE and instead maybe indicate that PAS wll support TEEs that
+> >> implement the same restrictions that QTEE (ie, iommu configuration).
+> > 
+> > The scope for this patch is to just adopt the generic PAS layer without
+> > affecting the client functionality.
 
-FYI, bpf prog could call bpf_sock_ops_enable_tx_tstamp() to enable the
-skb track selectively.
+the patchset cover letter + the commit message + the OP-TEE pull request
+being referenced gives the ilusion to users that with the current set
+they will get something functional (they will get a broken video
+platform instead if they try to use OP-TEE).
 
-Thanks,
-Jason
+That was the point I was making: IMO the commit message walks on a thin
+line of "completeness"
+
+QTEE and OP-TEE at this time implement different use cases (Venus with
+QTEE runs with Linux on EL1 , OP-TEE runs with Linux on EL2). So maybe
+worth mentioning this divergence.
+
+> > 
+> >>
+> >> I can send an RFC for OP-TEE support based on the integration work being
+> >> carried out here [1]
+> > 
+> > @Vikash may know better details about support for IOMMU configuration
+> > for venus since it's a generic functionality missing when Linux runs in
+> > EL2 whether it's with QTEE or OP-TEE.
+> > 
+> > However, feel free to propose your work to initiate discussions again.
+> 
+> Vikas and team depends on some of the IOMMU patches to get accepted 
+> before they enable the EL2 venus support. Please reach out to him
+> and Prakash Gupta at Qualcomm.
+
+isn't Vikash in this thread, he can ping me too no :) ? but sure, we'll
+synch later 
 
