@@ -1,103 +1,56 @@
-Return-Path: <netdev+bounces-276898-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276899-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WK1WOs9p12myNggAu9opvQ
-	(envelope-from <netdev+bounces-276898-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 10:56:47 +0200
+	id ELGPDklr12myNggAu9opvQ
+	(envelope-from <netdev+bounces-276899-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 11:03:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id C63C03C8173
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 10:56:47 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83F553C8237
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 11:03:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id BED2C300D759
-	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 08:56:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6A7733010169
+	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 09:01:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C55F39281B;
-	Thu,  9 Apr 2026 08:56:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E72F83A8738;
+	Thu,  9 Apr 2026 09:01:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X2ANfS5S";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="qtuI8GAG"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="yiOWWhAc"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 546D93932F4
-	for <netdev@vger.kernel.org>; Thu,  9 Apr 2026 08:56:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1388E3A7F72;
+	Thu,  9 Apr 2026 09:01:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775724997; cv=none; b=TyPh2QwF7G6WulfB8GAdgN/stFEPJ0RJtw01ZugrX5uuo4r7QV/b11XCxUr8FcveMKNI5gCpSdATksWPdsrDlCad/Conq1aXlVRmsjngj8bAnmFVaHh2GmBkrVktWP6AgPAzBpixI2m6ACIeyLRruMbC47gbpn2QpHK278WY+v0=
+	t=1775725277; cv=none; b=ZVUi1RNEdkDcTU45UuG12idW0C6KuqSEWnAWnXU26WpzRlpD/B4Rb1wsz0Ez1LAcb3tnrJER+GehDqEUSUnZCfqrAUXdsbIuTFE4LOpdQ360uG8imcBREmK5vEqft86Wicc5/7gCm+rit8j7/XWYTpq7yjJejZMi50sojv6Xjqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775724997; c=relaxed/simple;
-	bh=WcwVq5/9fgi1xjKMepCQB56yilXqeTSjBbMxnY1af9o=;
+	s=arc-20240116; t=1775725277; c=relaxed/simple;
+	bh=GI7M3Sq4u2nZGi2pWSuuGV178v6wWu1SuhoP1DtLSSA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aOjzVspUeo5h5bSZuPYSFQwNKN8nh8xxszy48MO6V1U/ESIqU18s7JelJIiWljN2CFaLTCmHrUnbrLKX2UWxZnqO3BIKecA3pCCAlQJC2UdCAxyQau6JsK5RBo+9RUrlmaSMJqq6lVrR3w9IigfbyLajWRigmRnzNXlfdP7GVQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=X2ANfS5S; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=qtuI8GAG; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1775724992;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Zwk2fh7y+C0RrsYFO5wfxM8gZjDw/BYRnFc3e8tTqpc=;
-	b=X2ANfS5S+bXt6T8O/1aSQnx6PgSUoM+Nl6/1Ei+rp/RcD+9SUsR4LrkJsTaxUBu+EatFis
-	M62iSTaw23vo3CDmUboUklHzi8Zpi+8SI+jGc05T842P00EFttEwbNrmE6zS3oRc5HGNf0
-	WNn89Y1e8pJfJhkoOEkbWMlB24TpZ+4=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-537-1iXTdOHiPRG26b9Y1hktrw-1; Thu, 09 Apr 2026 04:56:31 -0400
-X-MC-Unique: 1iXTdOHiPRG26b9Y1hktrw-1
-X-Mimecast-MFC-AGG-ID: 1iXTdOHiPRG26b9Y1hktrw_1775724990
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-488c74405ecso4020225e9.1
-        for <netdev@vger.kernel.org>; Thu, 09 Apr 2026 01:56:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1775724990; x=1776329790; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Zwk2fh7y+C0RrsYFO5wfxM8gZjDw/BYRnFc3e8tTqpc=;
-        b=qtuI8GAGQ7UdYywZG8NRnAMt8A6hLwDwxFXdBbzlNjTa8Dm7QAiATssdm+YZAT8E2u
-         A544SkTh8bg4oW1nu/tyxym6LL3Kz1FM2FQbLbt6H/vKgV68m2F6TrWS1J2OwfVsQQsn
-         MHJhxWmZL+uF0Ujjt33xeX9mBCuboS6ITrffIu0t6nc63dq4LJG/EYBOSNsyP61Jnv9b
-         kr+X1qjMBKx73dOktljrBGK7+49ZFpSIFDU5cibH9lpDHWrhzzNhKW8wOdbsK4pNBSI4
-         MGVUvxYqASl9RbEjhgv7boQ3i6P9c0Zncrr2RHD4JjFRTHZmiou+EbG9ziHZR3l6LQWM
-         L6cg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775724990; x=1776329790;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Zwk2fh7y+C0RrsYFO5wfxM8gZjDw/BYRnFc3e8tTqpc=;
-        b=kzOcLDcjCS0VFueHQDb9DCIPXX+ZK8hqKr4RZxtyrzpOETGmV891naTk1fnlqL8NAN
-         x0+tBOZM/cAspCrnfRVY9PHXjjOOo+gi9qp0jmmI4dzddRBq9wff5/RW71I7iG91M54+
-         yfzKE3c/cCHZd7SEWnYs4I95CEA7XwPRjsUB2OAgnS2WQsp0u4e3dUVdBLP6SptdXFpa
-         oXKcKIgMlz+Sd6i6Ij2Ec6qI27QKDcQgxo8HFKwmixfOzFbrtu+x52ZwWhWlDODdOit4
-         YWvlmvDLSgEFwrjff9fmc/g5dXJy64lAW/53xHxTC/y75dI59bntEidSfm6kGNZ2jS2w
-         cN+Q==
-X-Forwarded-Encrypted: i=1; AJvYcCX/0j71lycZwhHZt+OZQ7xPPTv77I2G2Aw04yKtU50vR2/NpVkbbbRUp7Bzp/IK+NsWEB9q+QA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxG7A1jr99aQjMoZYiyVLpG7nAwO0D+IZ5K01PmaCn+tMv3vYKr
-	qXcRm02Vg8RkRW7Ms6a0JBRNCMFa2w262RBxgaKJc/Ns/u//TUzBD87XFNIpD8wh5ztK3U4JTfN
-	NVv31XKidrnbAtC7i+v3ohRUBUsQ+WU9QHoGw8h93ghXT2/BZhsV2sCLBFw==
-X-Gm-Gg: AeBDies0OPbpVJTtXdY9Tibbtd5BriucmVvnyJPGqXlUCrVMSlE3j3cvcmv9vjtDUJd
-	YM7OryrVeyYoZV+zQWpMY4hte4JKjtzXqjnBsLYXjPQ8u5OtEbWS+uq/PnRBeserIhAy5J1KEkt
-	LohlAsCyCbE+HGUT4HYbRoLtP124Ql2/QGYuXIMdpUnKVO6gqIaHS87ajrhFiI41z7gByR2PiD7
-	ZyNLwhpvfysPma2aJRgkybwvDVM7ZPzPmZG4IhBBnKxJvrKhqj0BCvctTbdQ44vaGmAaA3NKFeT
-	2qRqTEHB3+tZYewmnzdOTwNpqMIYrnWFCHGd6WOs48hteB/pMkW12/OBcJNqhFFV2SkKb5zhy08
-	UrA8+wlCLtWDRDh2iZBLYiHuy6KgFaj+Y41AYyUq+QssRQkCIXRPxnz2z
-X-Received: by 2002:a05:600c:6384:b0:488:c282:e78c with SMTP id 5b1f17b1804b1-488c282e8a7mr126336605e9.19.1775724990117;
-        Thu, 09 Apr 2026 01:56:30 -0700 (PDT)
-X-Received: by 2002:a05:600c:6384:b0:488:c282:e78c with SMTP id 5b1f17b1804b1-488c282e8a7mr126335955e9.19.1775724989664;
-        Thu, 09 Apr 2026 01:56:29 -0700 (PDT)
-Received: from [192.168.88.32] ([150.228.25.243])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488cd19ea26sm56602265e9.3.2026.04.09.01.56.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 Apr 2026 01:56:29 -0700 (PDT)
-Message-ID: <2e618260-2153-4c36-be61-d2329c9da13f@redhat.com>
-Date: Thu, 9 Apr 2026 10:56:26 +0200
+	 In-Reply-To:Content-Type; b=caFsmtd2WblG1jjPqw804/njOPx1gWo8vIs0MFAxOgJmUMAuC6eZdbiFO4KTq3etTiOPMW8UuMHDpAc06FOGLO9nuaaLO6UUQjqmD7LBdEoNFWoiTC254F9ERzQAWqqt2mNg9SL1l3U5KpeauKxZEff5Eo3znNN+v2XEHApGZGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=yiOWWhAc; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=Q2AEP7CMJD8PoBhyfTpJUOpR3duCs+Bk2ok596z3dOw=; b=yiOWWhAcKfdZ6X/A88xEF22KOy
+	jV9RPL4+S9HfuMLL8gqYsNa2FYEFqV51StGKNF0WKydTVbJ9ityniBgKPkK1A4WhGtLLwDSMLyu70
+	r6IygtetsO42w2gwJNq4YOFWUKMVnRhueBo1rBZWf/agnzoSBZ7q/fA9rbeR7gsBszd+TbeFQcL/j
+	p4EnT1aGXpwnitL36ab8LaA4LB6Azyyzr2ifuq+uNcZ03LcUdxOpFm8flWfZtNlw9YO9X9SE0aXlJ
+	Yt1IjUJgBWoa3WSbKU2aAVdPS+WZeWV1ZluSm/TbSRROI7QncFE7Im6FHHyiRDrplvbrEg873m4xn
+	Bg0lOfRwcn5VVeB5wdzrFB57jHdgLuEJPakKaZTLI8O1Ovsup4B9jssQ+y+NgvrKlfjZgetgomYui
+	KQ6kpEb6TOqmgL5Fz5tUp++yBFo0YPPHeHDBQBTT0NbmsTKHOnphOofSMegRtTGM+SA8G4hpbmkl4
+	KBBpTlQ08iyJ7AFzBaysDb1x;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1wAlGD-000000087wW-1UGt;
+	Thu, 09 Apr 2026 09:01:13 +0000
+Message-ID: <5405849b-ad9e-4c64-9259-2071f4e36c8a@samba.org>
+Date: Thu, 9 Apr 2026 11:01:12 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -105,83 +58,112 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 02/14] libie: add PCI device initialization
- helpers to libie
-To: Tony Nguyen <anthony.l.nguyen@intel.com>, davem@davemloft.net,
- kuba@kernel.org, edumazet@google.com, andrew+netdev@lunn.ch,
- netdev@vger.kernel.org
-Cc: Phani R Burra <phani.r.burra@intel.com>, larysa.zaremba@intel.com,
- przemyslaw.kitszel@intel.com, aleksander.lobakin@intel.com,
- sridhar.samudrala@intel.com, anjali.singhai@intel.com,
- michal.swiatkowski@linux.intel.com, maciej.fijalkowski@intel.com,
- emil.s.tantilov@intel.com, madhu.chittim@intel.com, joshua.a.hay@intel.com,
- jacob.e.keller@intel.com, jayaprakash.shanmugam@intel.com, jiri@resnulli.us,
- horms@kernel.org, corbet@lwn.net, richardcochran@gmail.com,
- linux-doc@vger.kernel.org, bhelgaas@google.com, linux-pci@vger.kernel.org,
- Bharath R <bharath.r@intel.com>, Samuel Salin <Samuel.salin@intel.com>,
- Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-References: <20260403194938.3577011-1-anthony.l.nguyen@intel.com>
- <20260403194938.3577011-3-anthony.l.nguyen@intel.com>
+Subject: Re: [PATCH 1/5] uaccess: fix ignored_trailing logic in
+ copy_struct_to_user()
+To: Aleksa Sarai <cyphar@cyphar.com>
+Cc: linux-kernel@vger.kernel.org, Dmitry Safonov <0x7f454c46@gmail.com>,
+ Dmitry Safonov <dima@arista.com>, Salam Noureddine <noureddine@arista.com>,
+ David Ahern <dsahern@kernel.org>, "David S . Miller" <davem@davemloft.net>,
+ Michal Luczaj <mhal@rbox.co>, David Wei <dw@davidwei.uk>,
+ Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Marcel Holtmann <marcel@holtmann.org>, Xin Long <lucien.xin@gmail.com>,
+ Eric Dumazet <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>,
+ Neal Cardwell <ncardwell@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, Christian Brauner <brauner@kernel.org>,
+ Kees Cook <keescook@chromium.org>, netdev@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org
+References: <cover.1775576651.git.metze@samba.org>
+ <71f69442410c1186ed8ce6d5b4b9d4a5a70edbad.1775576651.git.metze@samba.org>
+ <2026-04-08-ditzy-organic-yowl-croc-yWsgIE@cyphar.com>
 Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20260403194938.3577011-3-anthony.l.nguyen@intel.com>
-Content-Type: text/plain; charset=UTF-8
+From: Stefan Metzmacher <metze@samba.org>
+In-Reply-To: <2026-04-08-ditzy-organic-yowl-croc-yWsgIE@cyphar.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[samba.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[samba.org:s=42];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[intel.com,linux.intel.com,resnulli.us,kernel.org,lwn.net,gmail.com,vger.kernel.org,google.com];
-	TAGGED_FROM(0.00)[bounces-276898-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-276899-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[29];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,arista.com,kernel.org,davemloft.net,rbox.co,davidwei.uk,intel.com,holtmann.org,google.com,redhat.com,chromium.org];
+	RCPT_COUNT_TWELVE(0.00)[24];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.997];
-	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.998];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[metze@samba.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[samba.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C63C03C8173
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,samba.org:dkim,samba.org:mid,samba.org:email,samba.org:url,amutable.com:email]
+X-Rspamd-Queue-Id: 83F553C8237
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 4/3/26 9:49 PM, Tony Nguyen wrote:
-> +	mr = libie_find_mmio_region(&mmio_info->mmio_list, offset, size,
-> +				    bar_idx);
-> +	if (mr) {
-> +		pci_warn(pdev,
-> +			 "Mapping of BAR%u (offset=%llu, size=%llu) intersecting region (offset=%llu, size=%llu) already exists\n",
-> +			 bar_idx, (unsigned long long)mr->offset,
-> +			 (unsigned long long)mr->size,
-> +			 (unsigned long long)offset, (unsigned long long)size);
-> +		return mr->offset <= offset &&
-> +		       mr->offset + mr->size >= offset + size;
+Hi Aleksa,
 
-Sashiko says:
+> On 2026-04-07, Stefan Metzmacher <metze@samba.org> wrote:
+>> Currently all callers pass ignored_trailing=NULL, but I have
+>> code that will make use of.
+>>
+>> Now it actually behaves like documented:
+>>
+>> * If @usize < @ksize, then the kernel is trying to pass userspace a newer
+>>    struct than it supports. Thus we only copy the interoperable portions
+>>    (@usize) and ignore the rest (but @ignored_trailing is set to %true if
+>>    any of the trailing (@ksize - @usize) bytes are non-zero).
+> 
+> Good catch, though I want to mention that the current API design for
+> copy_struct_to_user() is a bit of a compromise -- I was trying to think
+> of a way of making it generic but what information you need really
+> depends on your API.
+> 
+> For request-flag APIs (like statx) then you can just unset the bits in
+> the response mask for fields past usize and so it is a non-fatal error,
+> but it requires knowing which field offsets map to which flags.
+> 
+> My initial idea for ignored_trailing was for it to return the offset
+> memchr_inv() gives you -- but unfortunately, this doesn't help in the
+> more generic case where you have multiple non-zero bits that need to
+> unset multiple flags.
 
----
-Does returning true here without creating a new tracking object leave
-the new mapping tied to the original mapping's lifetime?
-If the driver unmaps the original region, iounmap() is called and the
-tracking object is freed. Any cached virtual address pointers to the
-sub-region would then become a use-after-free, and subsequent queries
-for the sub-region would fail.
----
+I guess the caller could use if (ignored_trailing) { ... }
+to check more complex stuff and then decide ignore or return an error.
 
-/P
+> Out of interest, how did you plan on using it? It might be a good idea
+> to rethink this API before it starts getting used "in anger" in a way
+> that leaks to uAPIs we can't change.
+
+Currently I only use it with WARN_ON_ONCE(ignored_trailing);
+in order to catch internal errors. See
+https://git.samba.org/?p=metze/linux/wip.git;a=blob;f=fs/smb/common/smbdirect/smbdirect_proto.c;h=ce7c78eb6795041ba672da434ffb01db73269cb7;hb=37c61ef9758f3e113d4078220d8fc2aee366c955#l1625
+But I guess I will at least change it to
+if (WARN_ON_ONCE(ignored_trailing))
+     return...
+
+And in general I thought it would be good practice to
+check that case in new code in order to avoid unexpected
+behavior.
+
+> In any case, for this patch feel free to take my
+> 
+> Reviewed-by: Aleksa Sarai <aleksa@amutable.com>
+
+Thanks!
+metze
 
 
