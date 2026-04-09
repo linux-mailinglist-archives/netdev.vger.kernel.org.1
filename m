@@ -1,298 +1,356 @@
-Return-Path: <netdev+bounces-277099-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277100-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wHDQA2Ds12kbUwgAu9opvQ
-	(envelope-from <netdev+bounces-277099-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 20:13:52 +0200
+	id GIH+DQvu12kbUwgAu9opvQ
+	(envelope-from <netdev+bounces-277100-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 20:20:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A64A63CE93B
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 20:13:51 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F8D83CEA41
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 20:20:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 766B2302F7C4
-	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 18:13:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BDB3F3009B02
+	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 18:20:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7447A3E3C63;
-	Thu,  9 Apr 2026 18:13:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03EFD306D3F;
+	Thu,  9 Apr 2026 18:20:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="JJcsCEca"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="afcFUtFj"
 X-Original-To: netdev@vger.kernel.org
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
+Received: from DM5PR21CU001.outbound.protection.outlook.com (mail-centralusazon11011041.outbound.protection.outlook.com [52.101.62.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7156D3E314E;
-	Thu,  9 Apr 2026 18:12:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775758382; cv=none; b=jPBFkce5IdXM1oR73zp4d1LQl0Kwxcrj3NcvsS19vR4mmxL8wW/vH//PX2n7RpmzuRHzssvYEPhl5QPncuxqBy+krKZnaIm0reghk/4NWMmfYlJ8evh3v7iUEaEc0I+SF6w4e1Ha4sSEUxrh4xsoCtEMjb8aPXFlJblfS6a99es=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775758382; c=relaxed/simple;
-	bh=BoGW7oywgvm57yYmgFIJhKPYzBfyhEW/uN+KSu6heaU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Z1pkP+nYR0+2vauJLLzvKfLodZ7EBKfx8ohRzW6suEJnaHscQ4K//wJ7y+uvbvFBWGNcUG/+A0YIABFmqUyBZ8NS1VCLOEy6CEBGLnc7RZqBdLn9hWKo5XW/dWgWg1Fas/wZxp/gVYCP0n4sY3yf/wK+9LX+VXoeij5b9l9mkaI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=JJcsCEca; arc=none smtp.client-ip=62.89.141.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=BoGW7oywgvm57yYmgFIJhKPYzBfyhEW/uN+KSu6heaU=; b=JJcsCEcaKqyNrvJOUZ8XOnA1AS
-	yC//2gnLRa8FcBRiXofOYljopOoyt9r8CbkWaLEFmbUVfW5qK5utkUh3D77jxlkhKoZiYVbvdTEnm
-	X8jEr88bUddVEJ+24e8elVa7rPEDm9C+KeO3Yi+QSp+riwZi9Be8u3P2jnyNq7RhzU24dEi9YT5JB
-	9o5OjQL5vQk2h32ksN+l6XHB7LZbu7YtKRAMPXU1ZH+Yata0JOXemtl88QWI3UJ7mBXR7GCgddkg5
-	qrhpzNPrKwHYiMCapxKfC0E4ZwUatWZBULD1y88efyo7haqTewJrOOn317SRlKBwAg9TXV76h3bsC
-	A/eZOWQA==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1wAtvH-00000003xj6-26He;
-	Thu, 09 Apr 2026 18:16:11 +0000
-Date: Thu, 9 Apr 2026 19:16:11 +0100
-From: Al Viro <viro@zeniv.linux.org.uk>
-To: Philipp Hahn <phahn-oss@avm.de>
-Cc: amd-gfx@lists.freedesktop.org, apparmor@lists.ubuntu.com,
-	bpf@vger.kernel.org, ceph-devel@vger.kernel.org, cocci@inria.fr,
-	dm-devel@lists.linux.dev, dri-devel@lists.freedesktop.org,
-	gfs2@lists.linux.dev, intel-gfx@lists.freedesktop.org,
-	intel-wired-lan@lists.osuosl.org, iommu@lists.linux.dev,
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-	linux-clk@vger.kernel.org, linux-erofs@lists.ozlabs.org,
-	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-gpio@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-leds@vger.kernel.org, linux-media@vger.kernel.org,
-	linux-mips@vger.kernel.org, linux-mm@kvack.org,
-	linux-modules@vger.kernel.org, linux-mtd@lists.infradead.org,
-	linux-nfs@vger.kernel.org, linux-omap@vger.kernel.org,
-	linux-phy@lists.infradead.org, linux-pm@vger.kernel.org,
-	linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org,
-	linux-security-module@vger.kernel.org, linux-sh@vger.kernel.org,
-	linux-sound@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-trace-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-	ntfs3@lists.linux.dev, samba-technical@lists.samba.org,
-	sched-ext@lists.linux.dev, target-devel@vger.kernel.org,
-	tipc-discussion@lists.sourceforge.net, v9fs@lists.linux.dev,
-	Julia Lawall <Julia.Lawall@inria.fr>,
-	Nicolas Palix <nicolas.palix@imag.fr>, Chris Mason <clm@fb.com>,
-	David Sterba <dsterba@suse.com>, Ilya Dryomov <idryomov@gmail.com>,
-	Alex Markuze <amarkuze@redhat.com>,
-	Viacheslav Dubeyko <slava@dubeyko.com>,
-	Theodore Ts'o <tytso@mit.edu>,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Latchesar Ionkov <lucho@ionkov.net>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Christian Schoenebeck <linux_oss@crudebyte.com>,
-	Gao Xiang <xiang@kernel.org>, Chao Yu <chao@kernel.org>,
-	Yue Hu <zbestahu@gmail.com>, Jeffle Xu <jefflexu@linux.alibaba.com>,
-	Sandeep Dhavale <dhavale@google.com>,
-	Hongbo Li <lihongbo22@huawei.com>,
-	Chunhai Guo <guochunhai@vivo.com>,
-	Miklos Szeredi <miklos@szeredi.hu>,
-	Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
-	Andreas Gruenbacher <agruenba@redhat.com>,
-	Kees Cook <kees@kernel.org>, Tony Luck <tony.luck@intel.com>,
-	"Guilherme G. Piccoli" <gpiccoli@igalia.com>,
-	Jan Kara <jack@suse.com>, Phillip Lougher <phillip@squashfs.org.uk>,
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Tejun Heo <tj@kernel.org>, David Vernet <void@manifault.com>,
-	Andrea Righi <arighi@nvidia.com>,
-	Changwoo Min <changwoo@igalia.com>, Ingo Molnar <mingo@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Juri Lelli <juri.lelli@redhat.com>,
-	Vincent Guittot <vincent.guittot@linaro.org>,
-	Dietmar Eggemann <dietmar.eggemann@arm.com>,
-	Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
-	Valentin Schneider <vschneid@redhat.com>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Petr Pavlu <petr.pavlu@suse.com>,
-	Daniel Gomez <da.gomez@kernel.org>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	Aaron Tomlin <atomlin@atomlin.com>,
-	Sylwester Nawrocki <s.nawrocki@samsung.com>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
-	Takashi Iwai <tiwai@suse.com>, Max Filippov <jcmvbkbc@gmail.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	John Johansen <john.johansen@canonical.com>,
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
-	Mikulas Patocka <mpatocka@redhat.com>,
-	Benjamin Marzinski <bmarzins@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>,
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-	Xin Long <lucien.xin@gmail.com>,
-	Trond Myklebust <trondmy@kernel.org>,
-	Anna Schumaker <anna@kernel.org>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Jeff Layton <jlayton@kernel.org>, NeilBrown <neil@brown.name>,
-	Olga Kornievskaia <okorniev@redhat.com>,
-	Dai Ngo <Dai.Ngo@oracle.com>, Jon Maloy <jmaloy@redhat.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Russell King <linux@armlinux.org.uk>,
-	John Crispin <john@phrozen.org>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	Yoshinori Sato <ysato@users.sourceforge.jp>,
-	Rich Felker <dalias@libc.org>,
-	John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
-	Andrzej Hajda <andrzej.hajda@intel.com>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Robert Foss <rfoss@kernel.org>,
-	Laurent Pinchart <Laurent.pinchart@ideasonboard.com>,
-	Jonas Karlman <jonas@kwiboo.se>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Zhenyu Wang <zhenyuw.linux@gmail.com>,
-	Zhi Wang <zhi.wang.linux@gmail.com>,
-	Jani Nikula <jani.nikula@linux.intel.com>,
-	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Tvrtko Ursulin <tursulin@ursulin.net>,
-	Alex Deucher <alexander.deucher@amd.com>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	Sandy Huang <hjc@rock-chips.com>,
-	Heiko =?iso-8859-1?Q?St=FCbner?= <heiko@sntech.de>,
-	Andy Yan <andy.yan@rock-chips.com>,
-	Igor Russkikh <irusskikh@marvell.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Michael Chan <mchan@broadcom.com>,
-	Potnuri Bharat Teja <bharat@chelsio.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Taras Chornyi <taras.chornyi@plvision.eu>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Iyappan Subramanian <iyappan@os.amperecomputing.com>,
-	Keyur Chudgar <keyur@os.amperecomputing.com>,
-	Quan Nguyen <quan@os.amperecomputing.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Marc Zyngier <maz@kernel.org>, Thomas Gleixner <tglx@kernel.org>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Gregory Clement <gregory.clement@bootlin.com>,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	Vinod Koul <vkoul@kernel.org>, Linus Walleij <linusw@kernel.org>,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Eduardo Valentin <edubezval@gmail.com>, Keerthy <j-keerthy@ti.com>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Daniel Lezcano <daniel.lezcano@kernel.org>,
-	Zhang Rui <rui.zhang@intel.com>, Lukasz Luba <lukasz.luba@arm.com>,
-	Alex Williamson <alex@shazbot.org>,
-	Mark Greer <mgreer@animalcreek.com>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Richard Weinberger <richard@nod.at>,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Kieran Bingham <kieran.bingham@ideasonboard.com>,
-	Mauro Carvalho Chehab <mchehab@kernel.org>,
-	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-	Robin Murphy <robin.murphy@arm.com>, Lee Jones <lee@kernel.org>,
-	Pavel Machek <pavel@kernel.org>, Dave Penkler <dpenkler@gmail.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Long Li <longli@microsoft.com>, Justin Sanders <justin@coraid.com>,
-	Jens Axboe <axboe@kernel.dk>, Georgi Djakov <djakov@kernel.org>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Pali =?iso-8859-1?Q?Roh=E1r?= <pali@kernel.org>,
-	Dmitry Torokhov <dmitry.torokhov@gmail.com>
-Subject: Re: [PATCH 00/61] treewide: Use IS_ERR_OR_NULL over manual NULL
- check - refactor
-Message-ID: <20260409181611.GP3836593@ZenIV>
-References: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68563204C3B;
+	Thu,  9 Apr 2026 18:20:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.62.41
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775758855; cv=fail; b=tXJBcdMGocZA4aSIL9iUyq6DrKvoYDT9C8Hp4oM8+h/6P80q2cAHNQ8T/mOPn2FWFeLL7SCuW2EjiyROVxTNm2reyrAE0phbwumWXl/kounA5/6OYGgbGDst+n7F7gg5AuRbjGoAOHUwefUETldyprMaprVm7mI/qvMEI9IJUr8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775758855; c=relaxed/simple;
+	bh=w4ZfGkIvl1wl7Nvz09gdIRD3edH2YAKH8KGCm4EqdAk=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=sjmXhvBZNe1Qh51ai96Rv/46ibaHD8EgRDea5vZydTmVhZhIs8+hQOCb+FqvKENWEl5rQU40b+F7sD/yd7LgZiCzvYljPyhSSjEYBBuggQubN/H4QrhQafClMEKeDbWBTMM8wz1w5/uhKjMzcRyVOm5k0ZKIN+nAPeUGk1NcsJE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=afcFUtFj; arc=fail smtp.client-ip=52.101.62.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=TC5+a7HeH1uUl9T5uPo9xMjYOzwci11bG8Gsngvfru5WwdKRS3Bs44B42mzPpVwOFSNp7KpEN9S/0x4jRGa+IF7iMqRtJIU9gCqrZbCiemTNDPT6Eoi6WfPu48VUgTgyyz6Pb4m2S8KxmuahGNpfFKvE66zFOAhIKgwR9vhAK0vKoAYMiq3CcaJSXbZNFv7fESyhWSKyzhEO2ODcqtfMr3u05SPE4KXfcvCNTHfZ49wRXkxCvZwP81GH4Gp0ZxIHZYrhxxZY3LhHAsgdyWGmxYWfYSRbyb09YqNfxvGaLM7JiDQpcBTO79VtoIUHuTQp170sbZOy7WFGmP2/CxTgcA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=TbrJDvN1NnrYFKYsJ/AxsfAQAziBTbM8z+FaNjFkWpU=;
+ b=ABq7/MNl/iEdR49TPsxmtXc133m0dRLYbVCIAMMHK+fB3ExJakWd3dsQP0W8Y4XOPIuOwn4N6UqxeHOMZLOqG3cohrX4BBOFpgw+g7IFVj6TlD8KBAufT2Bd3I5hj7iV36nhIuLFewAv9HrGqKn6Ok1rZrCgxcyhjdVT/HrQ4AQb7RxrHcz4QcaSYKn0CVl1JP+9CSYg0y1hY+XGIwtOKOBc5I2PApL5YQphMltQ2iYLgylW677wQrNj9jIzRhME4iH80+6HOaqM84p4oTxjtsoeUr24jIVnndwrcotVGvuTmXYI6kQLN4LWV8z2kMPGPNviuadPvyTgvrHh7/2b+w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=TbrJDvN1NnrYFKYsJ/AxsfAQAziBTbM8z+FaNjFkWpU=;
+ b=afcFUtFjT1EJOdPLR0Gz/OlNVg1KKzVpdsXLD7+pjho/KBuo0wqnkzTqmypiHV6gQ3xV7NNJXUF2d89x46jsXEW4BpK9ski9OO69dVcbmEahcvAKrZDQ0BoGVDjgU0aufSrMawqf9MhO5LKaUmn4DZ6vangDStsAEF19XlrqbSvEMY45cb8P/J6LglAGVo2H/hPRytyGMSGjYQx9h/E3ihxdGdeH1YVB3jLvdX34mWjWeHdiTQvCfNY2rPL2uAsQvoa1yKI7uehZcjbRLQK831RBbCoYWoeqdzOzjKsnDVgJGgXR6fWeN7ApeJM7fj8h0vOK6NzcK18jRG7Xhg7iaw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from IA1PR12MB7541.namprd12.prod.outlook.com (2603:10b6:208:42f::13)
+ by SJ0PR12MB7457.namprd12.prod.outlook.com (2603:10b6:a03:48d::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.18; Thu, 9 Apr
+ 2026 18:20:49 +0000
+Received: from IA1PR12MB7541.namprd12.prod.outlook.com
+ ([fe80::4445:7716:8576:62c7]) by IA1PR12MB7541.namprd12.prod.outlook.com
+ ([fe80::4445:7716:8576:62c7%5]) with mapi id 15.20.9769.018; Thu, 9 Apr 2026
+ 18:20:49 +0000
+Message-ID: <e4708c37-ccd3-466f-b08c-653d241260dd@nvidia.com>
+Date: Thu, 9 Apr 2026 21:20:45 +0300
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 0/7] net/mlx5: Improve representor lifecycle and
+ fix work queue deadlock
+To: Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Shay Drory <shayd@nvidia.com>, Or Har-Toov <ohartoov@nvidia.com>,
+ Edward Srouji <edwards@nvidia.com>, Maher Sanalla <msanalla@nvidia.com>,
+ Simon Horman <horms@kernel.org>, Moshe Shemesh <moshe@nvidia.com>,
+ Kees Cook <kees@kernel.org>, Patrisious Haddad <phaddad@nvidia.com>,
+ Gerd Bayer <gbayer@linux.ibm.com>, Parav Pandit <parav@nvidia.com>,
+ Cosmin Ratiu <cratiu@nvidia.com>, Carolina Jubran <cjubran@nvidia.com>,
+ netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Gal Pressman <gal@nvidia.com>,
+ Dragos Tatulea <dtatulea@nvidia.com>
+References: <20260409115550.156419-1-tariqt@nvidia.com>
+Content-Language: en-US
+From: Mark Bloch <mbloch@nvidia.com>
+In-Reply-To: <20260409115550.156419-1-tariqt@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: TL0P290CA0003.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:5::18) To IA1PR12MB7541.namprd12.prod.outlook.com
+ (2603:10b6:208:42f::13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de>
-Sender: Al Viro <viro@ftp.linux.org.uk>
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: IA1PR12MB7541:EE_|SJ0PR12MB7457:EE_
+X-MS-Office365-Filtering-Correlation-Id: ebf0376e-e0d6-4e8b-1d9e-08de9664b9d9
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|1800799024|7416014|376014|56012099003|22082099003|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	39GJNWoAGpPkS8mjmqLAVG56Q8SeE9ClRNrUX5r1G3ECQiNbZq/Tu6p67UoABQ9HzRsVwd/BDuHNPa44uAMzH5B8HAgttquYcLsVtHtHLJtE+u0lEiL46/FF575W+9Vhs2ptmoH43iIuAkVwVOJeBEnOxkjAgXi1jfWauuNcZFa1LzkrcDHWDXS2ECX3JdGvFwXl1iR7MmrIrMdHFg5NUMrJ9Yjdgsyp6s1vxLFymcnddktTySzNKa8ZMTuY3NgmmGez/FN8cqn+w2qMNQCoWpz/AVpP8P+8FNCv+LFt10m99rHH3mJvPHoHQpJcwXz8T5H0+WwP5z/UGPfgV43BtLIHwbRgx2mtIid+4xkIvf54E5fPKRQ7KtnqN8zgzlcACREa3i2fcZiMzw53PsA9DlKm9nHL/BO71nf9tQQtTfjf7IgisKQhmaZXn0vjW4Ek04inpqwXYemRZd5xFkqfZNQwACqfOh0B8o3hvQ5f2RjJJT5AWZUBoSPEALg1VPokWJADHjbp5DcTzvwmHSX5KQZtpI0reUxMIBWQBrFdFk9f+NgwcXshoXCOpyd/AmwhE7g3PGoy9ZAfU/PqKMqA8rr4/q8GeQj8MysJ1wdJlKv5mcWg0Mrdoao1Nv31TEXAjSP0PtVBkeCAFgk3vGjGfaEjn/0ZnDuclWSyQTLnbnXIIGIWHXgRnZNFfl5seYePaq4ORUaClKeqc89VGCxeCRm+HAB5wUBK/HFcYSwc5rg=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR12MB7541.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?cDEvYnBBZEpLTlRBRCtqdjE5K2J4WVdZZ2ExQ2F5M0U4aXhlUmJrcjl2N3hR?=
+ =?utf-8?B?VU5oZ2pqTXBvZ01mRWhSWk9GU0JvdkM2bGNPM2kyR09GUzdzb0t4V2JPQ3c4?=
+ =?utf-8?B?SjZ0Y01zT3oybnJYVW8zT0h6NEd4enVHS3RrNWYyQ3ZydWZwUWx5Z0E5VkFD?=
+ =?utf-8?B?M3lkTVBBakhLam1BTUhwYllWOWpaZnFnQ0NsbHFqdURGdzBJbUlHRkpGeU41?=
+ =?utf-8?B?OWF4NGl1T0d5cFpzZkE3a3U3QU1XQnNrb0I5Qjg0MFBDTllhTEZ0WnF4MGZh?=
+ =?utf-8?B?TDBVOGZqWWVNbUkvZ3E1K0NDNnVhZEpRTDhib01DallpUlRJSXNmOGVndldZ?=
+ =?utf-8?B?ajA5OXFncHR3UmUxUzBVdXdWa3QzaHhlSWIwZjFaeVYwbXZPRkJqd1lJZzl3?=
+ =?utf-8?B?Y21KWCtCbk9YN1VDMHBuNFlZQkVVb1M4cStmWWpacFpBNTlCRkVNdEc1b3pB?=
+ =?utf-8?B?YmNyZVY5MnhvaElSL09LMGRPT2FvMFBEaUVHc2xka0YxMmdodUdhSFJDcmRo?=
+ =?utf-8?B?V2ROTkppdGVMKzB5VXNaU3RkZURtbzJ4ZjI3dUY3VVVnT2tUVnVsbFNSUHRm?=
+ =?utf-8?B?RjJYR1hkb0R2dmtVaHErUUxWV1BXTGRxTndoc2Q3L0JLQkJUL01FV1dkRTBx?=
+ =?utf-8?B?OFgxQVhBTC9wTGNMV3BGM3RXd2p0aGNkQ1dhOFZ5SERacUljOEZLNU5VVDdt?=
+ =?utf-8?B?ZXRTQ3BZQVhLbDd1MHNKNHBUcHdTL3M5VklBalVRSDZoQXZmMTV0eUJKRUhE?=
+ =?utf-8?B?U0U1RzR4NmRjZ2xiUnhmRzhhZjVFMERwZE12WHFMeEw0SHZaQmtnRldTZ0dh?=
+ =?utf-8?B?dFNUdHJrRTB3bCtqajZ1NzJGL0FRNHh4b2ZHZE5TOHM0M0t5aE93Q2xYWjND?=
+ =?utf-8?B?ME5EeStXcXhsTk0wQmhuUGdTSFY4c1dKa1ZrS1hLQUVYQVdGSVd5WnpkcXla?=
+ =?utf-8?B?aU5oQUFuQnVpZjkrRXF4MDh5WkdhS0lQbm8wWURGZ2l2YVJHRTRhd3JDcjRo?=
+ =?utf-8?B?azh5emV5ZzlWQStlM0w0RWJHTE8xU0R3V0tFUU9DelRLb2NxV2dlMldyRGlU?=
+ =?utf-8?B?TTgyK3pXaXNFNjRwOTVZZWc1VnV6bWxtd0dadzRaN1R5bzNMRldBNFM1cnpP?=
+ =?utf-8?B?QlFQSkg0NDJQMWU1eUZtNCtWWGJxZVdCOWQ3Nm9HNTB0U1ZZZEtONzZyRGE1?=
+ =?utf-8?B?dkcwVG9jUE9OV1U0TmdHVkxuSHY4SzRPR3ZYc0hPYmVjMGVzdEk4cjFzOG9Z?=
+ =?utf-8?B?RklDYWFhS3VHRDFYOVZwK2E4TVllKzdMWGZOWWlsMlYxa3dya2l6RStMQXIx?=
+ =?utf-8?B?MEVJcFFKVmRuUkFsK0M3Y0hVS016TkQ1ZHg0TFpDQWpzMGdZQUtocVZGTnlT?=
+ =?utf-8?B?NG55R3M5VjBRaDJNZUtwaDBSbFVGMkY3UStWdjJTbTNUZDJ1MHRGT095UHFK?=
+ =?utf-8?B?UE1CazRTTU9IY2lvME0rdlJqMlFKcmNEdkVNQnlqMVJYd0lIN2pPSzFuM0tM?=
+ =?utf-8?B?dEEwZlR5bm9Vd1dkSElreWcwMjFxUXFoMHl4MU5EQUg2Nnd0Z2IrVGp6K3l5?=
+ =?utf-8?B?NzVIWkZyQVZKY3IyV2NFNXJoNVBsL2Rqa3g2cFVuQjd0cVBzc0FIUEtNK2sz?=
+ =?utf-8?B?NnowN2tGMkQwZCtHN3YrTzZHWkZKaUUzMWl4OXVtWWJrUlZubkdWdWlremto?=
+ =?utf-8?B?WnZGRVM4eTg5T3gyS1N4NFNxLzBOcE9mdXRRMVhxQnFJUmtJL0pIaWZGN0hw?=
+ =?utf-8?B?dVMzWXZCaUlrYlVkelgvU044VTRCNUY1VW56Y1JYYVZ4R0NRVkxRUFJUVkFl?=
+ =?utf-8?B?Skptc0E0VWZKaVA4ejVoK1hZU3h6djM0SmNES29nUk9zaEg0N01qNFhpdzV4?=
+ =?utf-8?B?K0dTdGxZdFBZWW9YOUphQnFZSTIwTDFrcTJlREFXcUExbmFuR0lWMWlSQjZS?=
+ =?utf-8?B?d2ZZRFJRa2FjeStVNThPVm5KZWlXenRYaVYvb0l6dVNGSysySjZMeStDb1Bh?=
+ =?utf-8?B?UGtudDlTcHdlY1NaNGk2MHdpVWtYdVVqSk4yVjhzbmJVRHVzemNudmNZd1Uw?=
+ =?utf-8?B?Vm5vcGtUZER1S0xuekNmR0hVbTc2YklUVTdGSms4L0UyNEhWa2RzV2h6Sk9E?=
+ =?utf-8?B?S3RqTEVSN2FaWWtnZWgwSmpsbWtVTU5HWlcxRjBvZ0RPTHNzc1FyckZ0UzBp?=
+ =?utf-8?B?R3BwZzJDMDdrbTJ1WG80eUhiQ3N6VFVXNFdnTk0rOVRIZnQ1R0lrQlRYU3oy?=
+ =?utf-8?B?R21FTjdtbGF2RFNNU1ZXZ080OXFKYWtFU0g2RDFaVzZVMnRsLzkrcXRuRE4v?=
+ =?utf-8?B?bWdlQSswcTJTSGlOOEF3OE45ZENtc3FKa0Q3ODFaZ3A1SnJ6LzdRZz09?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ebf0376e-e0d6-4e8b-1d9e-08de9664b9d9
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR12MB7541.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Apr 2026 18:20:49.3777
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: +fgp5rIOt5mQCTM61sea+tfzOwJmqCrOJY+pqaKJqNyqmRZG/g1DAgZt4EiF+bVLGP69utQ0kWfzUEWsH5Gkdg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB7457
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[zeniv.linux.org.uk,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[linux.org.uk:s=zeniv-20220401];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[25];
+	TAGGED_FROM(0.00)[bounces-277100-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-277099-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_CC(0.00)[lists.freedesktop.org,lists.ubuntu.com,vger.kernel.org,inria.fr,lists.linux.dev,lists.osuosl.org,lists.infradead.org,lists.ozlabs.org,kvack.org,st-md-mailman.stormreply.com,lists.samba.org,lists.sourceforge.net,imag.fr,fb.com,suse.com,gmail.com,redhat.com,dubeyko.com,mit.edu,dilger.ca,samba.org,manguebit.org,microsoft.com,talpey.com,kernel.org,ionkov.net,codewreck.org,crudebyte.com,linux.alibaba.com,google.com,huawei.com,vivo.com,szeredi.hu,paragon-software.com,intel.com,igalia.com,squashfs.org.uk,suse.cz,goodmis.org,efficios.com,manifault.com,nvidia.com,infradead.org,linaro.org,arm.com,suse.de,atomlin.com,samsung.com,perex.cz,canonical.com,paul-moore.com,namei.org,hallyn.com,linux-foundation.org,davemloft.net,holtmann.org,iogearbox.net,fomichev.me,mojatatu.com,resnulli.us,oracle.com,brown.name,sipsolutions.net,armlinux.org.uk,phrozen.org,alpha.franken.de,users.sourceforge.jp,libc.org,physik.fu-berlin.de,ideasonboard.com,kwiboo.se,linux.intel.com,ffwll.ch,ursulin.n
- et,amd.com,rock-chips.com,sntech.de,marvell.com,lunn.ch,broadcom.com,chelsio.com,plvision.eu,foss.st.com,os.amperecomputing.com,bootlin.com,linux.ibm.com,ti.com,shazbot.org,animalcreek.com,nod.at,linuxfoundation.org,8bytes.org,coraid.com,kernel.dk,baylibre.com,pengutronix.de,alien8.de,zytor.com];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[247];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[viro@zeniv.linux.org.uk,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.org.uk:+];
+	FROM_NEQ_ENVFROM(0.00)[mbloch@nvidia.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: A64A63CE93B
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:mid]
+X-Rspamd-Queue-Id: 7F8D83CEA41
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Mar 10, 2026 at 12:48:26PM +0100, Philipp Hahn wrote:
-> While doing some static code analysis I stumbled over a common pattern,
-> where IS_ERR() is combined with a NULL check. For that there is
-> IS_ERR_OR_NULL().
 
-... and valid uses of IS_ERR_OR_NULL are rare as hen teeth.
-Most of those are "I'm not sure how this function returns an
-error, let's use that just in case".
 
-Please, do not introduce more of that crap.
+On 09/04/2026 14:55, Tariq Toukan wrote:
+> Hi,
+> 
+> See detailed description by Mark below [1].
+> 
+
+Sashiko flagged a few issues in the series. The main ones are in patch 4
+([PATCH net-next 4/7] net/mlx5: E-Switch, fix deadlock between devlink lock and esw->wq).
+These are known, and I currently consider them acceptable trade-offs rather than bugs.
+
+That said, reviewers/maintainers may reasonably see this differently.
+Before sending a v2 focused on patch 4, I’d appreciate feedback on the overall
+approach and direction of the series, please see sashiko's comments here:
+https://sashiko.dev/#/patchset/20260409115550.156419-1-tariqt%40nvidia.com
+
+I've provided my commetns on each patch on the mailing list and
+included what was found by sashiko.
+
+the patch series can be broken into 3:
+
+[patches 2/3/4] – workqueue deadlock:
+
+During teardown we must ensure all pending work is completed.
+However, since the teardown path already holds the devlink lock,
+we cannot have work items blocking on that same lock without
+risking a deadlock.
+
+[patches 5/6] – reps block/unblock state
+The interaction between mlx5_core and mlx5_ib (load/unload),
+eswitch mode transitions, and auxiliary device handling makes
+this particularly tricky.
+
+Several conventional locking/synchronization approaches were
+explored, but they either reintroduced deadlocks or created
+even more complex issues. The current approach is admittedly
+not the cleanest, but it has proven to behave correctly in practice.
+
+[patch 7] – switchdev by default
+The long-term goal is to have switchdev as the default mode
+for DPU environments. Flipping that behavior globally in one
+step is risky.
+
+This patch provides a controlled, incremental way to move in
+that direction, allowing validation in real deployments before
+making it the default.
+
+Mark
+
+> Regards,
+> Tariq
+> 
+> [1]
+> This series addresses three problems that have been present for years.
+> First, there is no coordination between E-Switch reconfiguration and
+> representor registration. The E-Switch can be mid-way through a mode
+> change or VF count update while mlx5_ib walks in and registers or
+> unregisters representors. Nothing stops them. The race window is small
+> and there is no field report, but it is clearly wrong.
+> 
+> A mutex is not the answer. The representor callbacks reach into RDMA,
+> netdev, and LAG layers that already hold their own locks, making a
+> new mutex in the E-Switch layer a deadlock waiting to happen.
+> 
+> Second, the E-Switch work queue has a deadlock of its own.
+> mlx5_eswitch_cleanup() drains the work queue while holding the devlink
+> lock. Workers on that queue acquire devlink lock before checking whether
+> their work is still relevant. They block. The cleanup path waits for
+> them to finish. Deadlock.
+> 
+> Third, loading mlx5_ib while the device is already in switchdev mode
+> does not bring up the IB representors. This has been broken for years.
+> mlx5_eswitch_register_vport_reps() only stores callbacks; nobody
+> triggers the actual load after registration.
+> 
+> For the work queue deadlock: introduce a generation counter in the
+> top-level mlx5_eswitch struct (moved from mlx5_esw_functions,
+> which only covered function-change events) and a generic dispatch helper
+> mlx5_esw_add_work(). The worker esw_wq_handler() checks the counter
+> before touching the devlink lock using devl_trylock() in a loop. Stale
+> work exits immediately without ever contending. The counter is
+> incremented at every E-Switch operation boundary: cleanup, disable,
+> mode-set, enable, disable_sriov.
+> 
+> For the registration race: a simple atomic block state guards all
+> reconfiguration paths. mlx5_esw_reps_block()/mlx5_esw_reps_unblock()
+> spin a cmpxchg between UNBLOCKED and BLOCKED. Every reconfiguration
+> path (mode set, enable, disable, VF/SF add/del, LAG reload, and the
+> register/unregister calls themselves) brackets its work with this guard.
+> No new locks, no deadlock risk.
+> 
+> For the missing IB representors: now that the work queue infrastructure
+> is in place, mlx5_eswitch_register_vport_reps() queues a work item that
+> acquires the devlink lock and loads all relevant representors. This is
+> the change that actually fixes the long-standing bug.
+> 
+> One thing worth calling out: the block guard is non-reentrant. A caller
+> that tries to transition UNBLOCKED->BLOCKED while the E-Switch is already
+> BLOCKED will spin forever. All call sites were audited:
+> 
+>  - mlx5_eswitch_enable/disable/disable_sriov hold BLOCKED only around
+>    low-level vport helpers that do not call register/unregister.
+> 
+>  - Inside mlx5_eswitch_unregister_vport_reps the unload callbacks run
+>    while BLOCKED is held. The one callback that calls unregister
+>    (mlx5_ib_vport_rep_unload in LAG shared-FDB mode) only does so on
+>    peer E-Switch instances, each with its own independent atomic.
+> 
+>  - mlx5_devlink_eswitch_mode_set acquires BLOCKED, then calls
+>    esw_offloads_start/stop -> esw_mode_change. esw_mode_change releases
+>    BLOCKED before calling rescan_drivers so that the probe/remove
+>    callbacks that trigger register/unregister see UNBLOCKED.
+>    esw_mode_change re-acquires before returning, and mode_set releases
+>    at the end. This is an explicit hand-off of the guard across the
+>    rescan window.
+> 
+>  - mlx5_eswitch_register_vport_reps holds BLOCKED only while storing
+>    callbacks and queuing the load work. The actual rep loading runs from
+>    the work queue after the guard is released.
+> 
+> Patch 1 is cleanup. LAG and MPESW had the same representor reload
+> sequence duplicated in several places and the copies had started to
+> drift. This consolidates them into one helper.
+> 
+> Patches 2-4 fix the work queue deadlock in three steps: first move the
+> generation counter from mlx5_esw_functions to mlx5_eswitch;
+> then introduce the generic esw_wq_handler/mlx5_esw_add_work dispatch
+> infrastructure; then apply the actual fix by switching to devl_trylock
+> and adding generation increments at all operation boundaries.
+> 
+> Patch 5 adds the atomic block guard for representor registration,
+> protecting all reconfiguration paths.
+> 
+> Patch 6 moves the representor load triggered by
+> mlx5_eswitch_register_vport_reps() onto the work queue. This is the
+> patch that fixes IB representors not coming up when mlx5_ib is loaded
+> while the device is already in switchdev mode.
+> 
+> Patch 7 adds a driver profile that auto-enables switchdev at device
+> init, for deployments that always operate in switchdev mode and want
+> to avoid a manual devlink command after every probe.
+> 
+> Mark Bloch (7):
+>   net/mlx5: Lag: refactor representor reload handling
+>   net/mlx5: E-Switch, move work queue generation counter
+>   net/mlx5: E-Switch, introduce generic work queue dispatch helper
+>   net/mlx5: E-Switch, fix deadlock between devlink lock and esw->wq
+>   net/mlx5: E-Switch, block representors during reconfiguration
+>   net/mlx5: E-switch, load reps via work queue after registration
+>   net/mlx5: Add profile to auto-enable switchdev mode at device init
+> 
+>  .../net/ethernet/mellanox/mlx5/core/eswitch.c |  25 ++-
+>  .../net/ethernet/mellanox/mlx5/core/eswitch.h |  15 +-
+>  .../mellanox/mlx5/core/eswitch_offloads.c     | 204 ++++++++++++++----
+>  .../net/ethernet/mellanox/mlx5/core/lag/lag.c |  46 ++--
+>  .../net/ethernet/mellanox/mlx5/core/lag/lag.h |   1 +
+>  .../ethernet/mellanox/mlx5/core/lag/mpesw.c   |  12 +-
+>  .../net/ethernet/mellanox/mlx5/core/main.c    |  26 ++-
+>  .../ethernet/mellanox/mlx5/core/sf/devlink.c  |   5 +
+>  include/linux/mlx5/driver.h                   |   1 +
+>  include/linux/mlx5/eswitch.h                  |   5 +
+>  10 files changed, 267 insertions(+), 73 deletions(-)
+> 
+> 
+> base-commit: 9700282a7ec721e285771d995ccfe33845e776dc
+
 
