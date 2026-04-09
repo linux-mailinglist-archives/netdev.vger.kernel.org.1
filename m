@@ -1,209 +1,197 @@
-Return-Path: <netdev+bounces-277105-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277106-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GFf+I8by12n6UwgAu9opvQ
-	(envelope-from <netdev+bounces-277105-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 20:41:10 +0200
+	id qOZRFV3312mrVAgAu9opvQ
+	(envelope-from <netdev+bounces-277106-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 21:00:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F6CD3CEC79
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 20:41:09 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0E083CEEB2
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 21:00:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C13E330172FD
-	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 18:40:45 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 981003013A5D
+	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 19:00:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28CAF3E3168;
-	Thu,  9 Apr 2026 18:40:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B58D12DF138;
+	Thu,  9 Apr 2026 19:00:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WhrvNbrl"
+	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="g0OXLDkP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from outbound.pv.icloud.com (pv-2002a-snip4-2.eps.apple.com [57.103.64.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A18983A5E9F
-	for <netdev@vger.kernel.org>; Thu,  9 Apr 2026 18:40:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF9A426FA5A
+	for <netdev@vger.kernel.org>; Thu,  9 Apr 2026 19:00:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.64.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775760037; cv=none; b=XFRhqHcoF+oumFjVpaAwYRYpEvv4bqn36cN0uNPCGhWTVOWECsaqXNH7EANcWMQBjKiybM1/olMr7khZdO205Uc6dZiNsyKj65AV5R4uyjFPU1uneX58NRt2DdxwxRkzH97YlVBeW6Qp/1fl0TGupWKz/aBjBWXmRXnEysEuRpM=
+	t=1775761240; cv=none; b=B/aNKo7JrHV9MsX0Svk6eQn93u9OzX/J0Vp7B+4W3Qvqq/ksBTPL3ZV1TpFcOZwfrWWXYGgf4G3NVLQy7OIjD87VYMZ/2NSd7ZRQA8gyYC6jyKteAhtwhrwyhtLUiNPyvCqABvPDT7ZVo9JeGfrDbf2t8GYxnchdtA5cfwMYSMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775760037; c=relaxed/simple;
-	bh=LVgn0vBdkVsmYtOJ2Mv8Tab1Z8bSNEKNjFGxlFR9yQ8=;
+	s=arc-20240116; t=1775761240; c=relaxed/simple;
+	bh=9j2+CSWGYfEdlRdVt5URx1MysjOO9HtzpJmsPQM0fLI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bKnDFrVBtTqd0Z/pBdsFh+8D3yczhYP1NiitOds4dO/lcrE2QFzcGMgJkh0ltbqnyfPKdyi+WW7RpWCPDkDipPgeqSnhdi0sYVqovj3SHT8/iUTCQQtB8gCnw+0UNr6jflvazI6KHePoXoSgbPG81DyHqyu4Mzb7BFGPtiNb8II=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WhrvNbrl; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-43b9d3ebed5so1003247f8f.1
-        for <netdev@vger.kernel.org>; Thu, 09 Apr 2026 11:40:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775760034; x=1776364834; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cbSeM7rVE+r24N6osWe4SerhDWF0/QD9ts6cYUU6inY=;
-        b=WhrvNbrly25+Togsaly3e4BXhhMpkO1Yt3BoLHXbHTjLF1r7DBhemt9VulCZIJesqc
-         QiMML/vmORrziXZQ+Wzyks3sa8icaSZdq7DKAQAveM3PcGPnfI4996aLTSKaSdFqU7+E
-         xRfiKn9Rr2IWbtJl5OQwA93lgP1DpDPwWyI++znrU7mgUcVFgPIguRkAhLtYL00brI/A
-         1IlYNXdCSyNSt0E58Q00PgAjiYtTl1HHub0RpdLJyOFMVklKZxHpybv1jGv5adBDDJAF
-         ApOmi0XLioQxMbd8FMdD+9L91fx/7T8xjNtMPFuQrwi2w5kbV2VP/jqbLldFajdwSts9
-         2srg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775760034; x=1776364834;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=cbSeM7rVE+r24N6osWe4SerhDWF0/QD9ts6cYUU6inY=;
-        b=d/CkXlGC8FiuLb3RoUBKXz4tXnBXnM6ht6Rrw5lzu2EFx9StsOL8f4/3sDLOg5wubx
-         14HtzSCKyF3CGKZvxEnZe+vltYFLr5G68YWsm+z7b25k0ODsAATAj06M/yp5kT9/goaC
-         Onfg4ZRzTY3vcmQgBbjvJJYleBb4CS1peKuG7G+GFEs7T6+tqJyOf2EH9imqWBweYyUo
-         ZbLLWQV8l9tjyuHi5j3cIlEJCESB/+0fGjeNNh6uq/4J5Sn967JbvgqteozQGYbQmVh5
-         f+heWvRsfcZw3+ZBImTu+tho+DKc9V0Yx9HqzREOw6JTpCSuXgvhr8pviv5NR0zTZJpb
-         o7IA==
-X-Gm-Message-State: AOJu0Yw0NQ7L6g5aDNX/ajx0tjf/mnWq7hOB6+5t7/3M3wCSu4tLGpzX
-	Rn0itAAI6POeuS5WnkL1ykqtOPPYykuciOI/oQXYm99FWs62izfW4J6rX9ZDzE2ddyLPQw==
-X-Gm-Gg: AeBDies1muj06IxP7xjxSwGNWs/nmuM1XmehDOXe3AO8/N22snRNcoych9OhgX0L3vX
-	a3tcIftIwi7yOB2+mEjrfUpyUnJdBJRavN9xP3o2EOLHIdvVTomUaPtH3HkR/78V+fcJjLk6S66
-	h6/BRZCvVE5wJm5W+S38JAE4zNE+TVw2q+wXYyxZ36VEBM8/BWxUvJd6bcnuPwXgmfiEX/Tuqvr
-	q23EdfWt0rDt/5XiNN7TvEBGm8Fr3iiPSEmjqsYLwEJMLpTHKim5W5DN2NPs+Y7gJ7IxqaO99WV
-	nyC8o/Q4a1enP6SzbtRqfvL4vhRzvD7UrSJ/X54Z6Wr4J6ZDAHt06/nx+nSH0DOTk9DBIIs5o2i
-	SbHXzZKa8FP0mCImZLCJp62U2wVY10DhnCE96E6piozoTy8ReMR5GMyZOXIfDv7FzXJ9iYqJx1r
-	1PApXC6RtnA0jAE1rPTENVC5yFLeGyYcqyI8AbB2saD2JFL3cd3dDkMdSL02co2+qfwcOXoFt0z
-	Ma9H5VeutKoUpoDlu/uX5s=
-X-Received: by 2002:a05:6000:40dc:b0:439:bd70:610f with SMTP id ffacd0b85a97d-43d642bac24mr244448f8f.44.1775760033721;
-        Thu, 09 Apr 2026 11:40:33 -0700 (PDT)
-Received: from dohko.chello.ie (188-141-5-72.dynamic.upc.ie. [188.141.5.72])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43d63e5d88bsm560563f8f.37.2026.04.09.11.40.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Apr 2026 11:40:33 -0700 (PDT)
-From: David Carlier <devnexen@gmail.com>
+	 MIME-Version:Content-Type; b=dUj+uo7VdadD8B18gjt5jvcscTLTjwllMBaiBH2lIynKtrkjHEXgCmJIO6aeARRWrTXU4NcS0ZtTZfY5vp7Mo2pHCmMJJEB2aVr6OUIvGTzzKGnsOUYdOvvQxoanodU0i2iELXUcqu32gdyIYr+q2p3A7C0nwF02zNQIJbRFIIw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=g0OXLDkP; arc=none smtp.client-ip=57.103.64.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
+Received: from outbound.pv.icloud.com (unknown [127.0.0.2])
+	by p00-icloudmta-asmtp-us-west-1a-60-percent-0 (Postfix) with ESMTPS id EC4E81800103;
+	Thu, 09 Apr 2026 19:00:35 +0000 (UTC)
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com; s=1a1hai; t=1775761238; x=1778353238; bh=Ikg3Nb4XMZrtOpv/HDmjHcsfW6ZiiVa0yKifuLisqBM=; h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:x-icloud-hme; b=g0OXLDkPaTYykAvcL7YCaWRA3p73dpMNlZpkw/3Je/3Q1DE6PWreL4wQ0lquZJdf+OvutJv+Z5okM0d5rkWkPnfcdiLdAMRW2FR74ZjmRXEtc9/j2mEV1TfcNk9uOsjmTSoVmSNVBCqLWOEyE8b97QlnDz963seAEaHZnYkNWgpbtYPhn5sC/uzrRNZ46bwNkBqV9jZVNyAqJCeUpENAzDUjMl0sREifhqhsMrGH/rhezPKuLRAlUU00ZB+VA5akx5HWOYsNZP5MZtmUEci0DqTsfcB4P71CoTCCL5oNh9gvu1GbSgO3QSREtAcpERQGzQXThwoaO312uLTW27JVbw==
+Received: from mainframe.tailfb0f7b.ts.net (unknown [17.56.9.36])
+	by p00-icloudmta-asmtp-us-west-1a-60-percent-0 (Postfix) with ESMTPSA id 5BA79180094D;
+	Thu, 09 Apr 2026 19:00:33 +0000 (UTC)
+From: =?UTF-8?q?Lek=C3=AB=20Hap=C3=A7iu?= <snowwlake@icloud.com>
 To: netdev@vger.kernel.org
-Cc: vburru@marvell.com,
-	sedara@marvell.com,
-	srasheed@marvell.com,
-	sburla@marvell.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
+Cc: davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	horms@kernel.org,
-	linux-kernel@vger.kernel.org,
+	linux-nfc@lists.01.org,
 	stable@vger.kernel.org,
-	David Carlier <devnexen@gmail.com>
-Subject: [PATCH net v2 2/2] octeon_ep_vf: add NULL check for napi_build_skb()
-Date: Thu,  9 Apr 2026 19:40:09 +0100
-Message-ID: <20260409184009.930359-3-devnexen@gmail.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260409184009.930359-1-devnexen@gmail.com>
-References: <20260409184009.930359-1-devnexen@gmail.com>
+	horms@kernel.org,
+	=?UTF-8?q?Lek=C3=AB=20Hap=C3=A7iu?= <framemain@outlook.com>
+Subject: [PATCH net v2 0/3] nfc: fix chained TLV parsing and integer underflow vulnerabilities
+Date: Thu,  9 Apr 2026 20:59:55 +0200
+Message-ID: <20260409185958.1821242-1-snowwlake@icloud.com>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20260409164129.GO469338@kernel.org>
+References: <20260409164129.GO469338@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDA5MDE3NSBTYWx0ZWRfX+PXn2pVmTg5K
+ lSP+IUmzxptFLT0omgY7HCNdWAPhYWwnZroKmf1RzUdBRz1ASzLTgUAiBFXh8NuNJxaBmNSoPIY
+ cjN417ohQuxLR359YrC+VT98lX1dJKWSXjQjcI7FEz4Sqt1u7eUAhuMHXVyoH0beuuzoNtz9X7z
+ 92IMDauWVo0SLygrwKaxhzOwB4fq8/8sRHzLWADgVJQPpaCDxdiZ0ThbXZxBKMxKUwM1Ev0TFTw
+ EvnAgfJ4Ah+kW353GRKRcsntXtqqGnAQhAy6cpRj9TfY7NYLS0dHB/qdCkRtf+OHQSGOvmBEFuP
+ dapSN+41P2vpWDRlIHtS960CtxgF0hBIsp3+QQ7izAFmeaZViPzPXPp1xuiBYg=
+X-Authority-Info-Out: v=2.4 cv=CZ8FJbrl c=1 sm=1 tr=0 ts=69d7f755
+ cx=c_apl:c_pps:t_out a=azHRBMxVc17uSn+fyuI/eg==:117
+ a=azHRBMxVc17uSn+fyuI/eg==:17 a=IkcTkHD0fZMA:10 a=A5OVakUREuEA:10
+ a=M51BFTxLslgA:10 a=x7bEGLp0ZPQA:10 a=LbuW6tbUWPcA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=UqCG9HQmAAAA:8 a=VwQbUJbxAAAA:8
+ a=htZpkJVHQczNRnQL7vMA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+ a=JKcXVnpmuwdQ7RL0mgk_:22 a=zesNzv29S0FE4YlguZl3:22
+X-Proofpoint-ORIG-GUID: uTnDW9Cg7ssq99_fbMeqEe0uQzGl3hNB
+X-Proofpoint-GUID: uTnDW9Cg7ssq99_fbMeqEe0uQzGl3hNB
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-04-09_04,2026-04-09_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+ mlxlogscore=930 phishscore=0 clxscore=1015 malwarescore=0 adultscore=0
+ bulkscore=0 spamscore=0 mlxscore=0 lowpriorityscore=0 classifier=spam
+ authscore=0 adjust=0 reason=mlx scancount=1 engine=8.22.0-2601150000
+ definitions=main-2604090175
+X-Spamd-Result: default: False [-0.57 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_MIXED_CHARSET(0.59)[subject];
+	DMARC_POLICY_ALLOW(-0.50)[icloud.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[icloud.com:s=1a1hai];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[marvell.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-277105-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,lists.01.org,vger.kernel.org,outlook.com];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnexen@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-277106-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[icloud.com:+];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	PRECEDENCE_BULK(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[snowwlake@icloud.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	FREEMAIL_FROM(0.00)[icloud.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6F6CD3CEC79
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,outlook.com:email,icloud.com:dkim,icloud.com:mid]
+X-Rspamd-Queue-Id: D0E083CEEB2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-napi_build_skb() can return NULL on allocation failure. In
-__octep_vf_oq_process_rx(), the result is used directly without a NULL
-check in both the single-buffer and multi-fragment paths, leading to a
-NULL pointer dereference.
+From: Lekë Hapçiu <framemain@outlook.com>
 
-Add NULL checks after both napi_build_skb() calls, properly advancing
-descriptors and consuming remaining fragments on failure.
+These three patches fix vulnerabilities in the NFC LLCP and NCI subsystems
+that form an exploit chain.  Each bug is independently reachable from an
+unauthenticated NFC peer at ~4 cm range; together they create a path from
+controlled heap disclosure to heap corruption.
 
-Fixes: 1cd3b407977c ("octeon_ep_vf: add Tx/Rx processing and interrupt support")
-Cc: stable@vger.kernel.org
-Signed-off-by: David Carlier <devnexen@gmail.com>
----
- .../marvell/octeon_ep_vf/octep_vf_rx.c        | 30 +++++++++++++++++--
- 1 file changed, 28 insertions(+), 2 deletions(-)
+--- Chain summary ---
 
-diff --git a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_rx.c b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_rx.c
-index 7bd1b9b8d7f5..d98247408242 100644
---- a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_rx.c
-+++ b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_rx.c
-@@ -414,10 +414,15 @@ static int __octep_vf_oq_process_rx(struct octep_vf_device *oct,
- 			data_offset = OCTEP_VF_OQ_RESP_HW_SIZE;
- 			rx_ol_flags = 0;
- 		}
--		rx_bytes += buff_info->len;
--
- 		if (buff_info->len <= oq->max_single_buffer_size) {
- 			skb = napi_build_skb((void *)resp_hw, PAGE_SIZE);
-+			if (!skb) {
-+				oq->stats->alloc_failures++;
-+				desc_used++;
-+				read_idx = octep_vf_oq_next_idx(oq, read_idx);
-+				continue;
-+			}
-+			rx_bytes += buff_info->len;
- 			skb_reserve(skb, data_offset);
- 			skb_put(skb, buff_info->len);
- 			desc_used++;
-@@ -427,6 +432,27 @@ static int __octep_vf_oq_process_rx(struct octep_vf_device *oct,
- 			u16 data_len;
- 
- 			skb = napi_build_skb((void *)resp_hw, PAGE_SIZE);
-+			if (!skb) {
-+				oq->stats->alloc_failures++;
-+				desc_used++;
-+				read_idx = octep_vf_oq_next_idx(oq, read_idx);
-+				data_len = buff_info->len - oq->max_single_buffer_size;
-+				while (data_len) {
-+					dma_unmap_page(oq->dev, oq->desc_ring[read_idx].buffer_ptr,
-+						       PAGE_SIZE, DMA_FROM_DEVICE);
-+					buff_info = (struct octep_vf_rx_buffer *)
-+						    &oq->buff_info[read_idx];
-+					buff_info->page = NULL;
-+					if (data_len < oq->buffer_size)
-+						data_len = 0;
-+					else
-+						data_len -= oq->buffer_size;
-+					desc_used++;
-+					read_idx = octep_vf_oq_next_idx(oq, read_idx);
-+				}
-+				continue;
-+			}
-+			rx_bytes += buff_info->len;
- 			skb_reserve(skb, data_offset);
- 			/* Head fragment includes response header(s);
- 			 * subsequent fragments contains only data.
+  [1/3]  nci/ntf.c — nci_store_general_bytes_nfc_dep()
+         u8 integer underflow: when the peer's ATR_RES/ATR_REQ length field
+         is smaller than NFC_ATR_RES_GT_OFFSET (15) or NFC_ATR_REQ_GT_OFFSET
+         (14), the subtraction wraps to a large u8 value.  min_t(__u8, ...)
+         clamps to NFC_ATR_RES_GB_MAXSIZE (47), and a 47-byte memcpy reads
+         out-of-bounds data into ndev->remote_gb[].  This corrupted buffer
+         is subsequently parsed by nfc_llcp_parse_gb_tlv().
+
+  [2/3]  llcp_commands.c — nfc_llcp_parse_gb_tlv() +
+                           nfc_llcp_parse_connection_tlv()
+         Two bugs in both TLV parsers.  The first, a u8 offset truncation
+         causing an infinite loop, was addressed in v1 of this series.
+         This version adds the fix identified during review by Simon Horman:
+         the `length` byte is read from peer-controlled data with no check
+         that the remainder of the array can accommodate `length` more bytes.
+         A crafted `length` advances the `tlv` pointer into adjacent kernel
+         memory; the next iteration reads tlv[0]/tlv[1] from that location.
+         When combined with [1/3], a crafted `length` in the garbage-filled
+         remote_gb[] can walk `tlv` past nfc_llcp_local.remote_gb[] and into
+         adjacent struct fields, including sdreq_timer.function at ~+176 bytes,
+         enabling a kernel pointer disclosure via sock->remote_miu/getsockopt.
+
+  [3/3]  llcp_core.c — nfc_llcp_recv_snl()
+         The SNL TLV parsing loop carries the same missing guards as [2/3].
+         Additionally: LLCP_TLV_SDREQ accesses tlv[2] and computes
+         `service_name_len = length - 1` (u8 underflow to 255 when length==0,
+         causing a 255-byte kernel memory scan via strncmp); and
+         LLCP_TLV_SDRES accesses tlv[2] and tlv[3] without verifying
+         length >= 2.  Unlike the parsers in [2/3], SDREQ/SDRES are processed
+         directly without the llcp_tlv_length[] table protection.  A missing
+         skb->len guard also allows tlv_len to underflow to ~65534 if
+         skb->len < LLCP_HEADER_SIZE.
+
+--- Individual CVSS (AV:A/AC:L/PR:N/UI:N/S:U) ---
+
+  [1/3]  C:H/I:N/A:L  — 6.5
+  [2/3]  C:H/I:N/A:L  — 6.5
+  [3/3]  C:H/I:N/A:L  — 6.5
+
+--- Chain CVSS ---
+
+  AV:A/AC:H/PR:N/UI:N/S:C/C:H/I:H/A:H — 8.3
+
+  KASLR bypass via [1/3]+[2/3] makes [3/3] reliably exploitable without
+  the race-condition timing required against the bugs in isolation.
+
+All patches carry Cc: stable@vger.kernel.org.
+
+
+Lekë Hapçiu (3):
+  nfc: nci: fix u8 underflow in nci_store_general_bytes_nfc_dep
+  nfc: llcp: add TLV length bounds checks in parse_gb_tlv and
+    parse_connection_tlv
+  nfc: llcp: fix TLV parsing OOB and length underflow in
+    nfc_llcp_recv_snl
+
+ net/nfc/llcp_commands.c | 22 ++++++++++++++++++++++
+ net/nfc/llcp_core.c     | 13 +++++++++++++
+ net/nfc/nci/ntf.c       | 22 ++++++++++++++--------
+ 3 files changed, 49 insertions(+), 8 deletions(-)
+
 -- 
-2.53.0
+2.51.0
 
 
