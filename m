@@ -1,163 +1,105 @@
-Return-Path: <netdev+bounces-276826-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276827-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qFFILBIY12k1KwgAu9opvQ
-	(envelope-from <netdev+bounces-276826-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 05:08:02 +0200
+	id cbFwE2IY12lXKwgAu9opvQ
+	(envelope-from <netdev+bounces-276827-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 05:09:22 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 171FA3C5EC1
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 05:08:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C18DA3C5F14
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 05:09:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 130A2300A8F1
-	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 03:07:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id ED02C3038170
+	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 03:07:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89207362151;
-	Thu,  9 Apr 2026 03:07:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CA1F36215B;
+	Thu,  9 Apr 2026 03:07:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="lUHZnTcY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OvZDOg8x"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F0FB2D8771;
-	Thu,  9 Apr 2026 03:07:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AAA62D8771
+	for <netdev@vger.kernel.org>; Thu,  9 Apr 2026 03:07:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775704023; cv=none; b=Ifhm52uxyl3HbUeg8+3HZO2AdurBTOdymHtq4ocv+0u+kHyxv6HoMLCogezGlmXS8dI8a5dLxuWTiMV+EUgktidYesnpuA5BlqIZX3hmlI/bzpPNd1/dw+8lLlHFzSIhftP89uDObsgnPcBEA1tHQ0jOkogACL9ISOPKUgs/lCg=
+	t=1775704062; cv=none; b=Yb+LlIND1qFv3tCIHGvcGADFNCHGTdxG4i0Nt6rBEZVdoOTQM+zFiUgy55xa7ecOK8bfhW515KIwEKoT3uRnD3iebP1OW6FTJrjIfbvzvU30o9mQy5op1PJN1S0tMlbyvw98/tRd20qTrM4hkMGQBmAiE+ad9ZmakxxLaJ4keQk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775704023; c=relaxed/simple;
-	bh=vgcs+s2hAEj0KOk55CwsWzOvcDv7IY47IEQLXA4ZjbA=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t4FwUmvrpG7lqGFftW8JQqE/ngYslixLdKucGXQYaGKZJoxU9qAkuEG9yCSmCbxlnoXk/NKi+6q1aS/7KQ8WMFPbM6mpk+f9OJqalWInV6P/ELujsToB74SuPFojVia6PNO6Jm8vQQQs26/sOfk8mm2fLoP5qkwMypfLCSJLKCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=lUHZnTcY; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 638NZmMc2130827;
-	Wed, 8 Apr 2026 20:06:57 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=+d9wGmw2K++XBVxY0LsPVfDGY
-	1UPJjiLMhPwIg5M2MI=; b=lUHZnTcYme/O7re5ca7So8Gh+PWUhz10TJFSnagQQ
-	UUqn72hbK0HuETzk/Uazan6W9j5tJG5p3v4TLW6PfupHh8tqdx8+pl1ZvRxOPNRA
-	h7Zl7j03nYVFmNvkqAqTz+fKFGrS3hjiAHKb3GYTzaCeP/pJSsPjC5tCjVZY2z71
-	MuEhvQ2a1wylTIf9djycZdLaW5aUkha6JooD4J2xYJKLojwQZzYWS6h2hJE/Ma5U
-	5xbf8MrOHdZsM1BLDZwArvgUWSbBO5lmoe+MUDo1zS78wjCe6qvAHb+osYgr5WKU
-	w3RSn/dhLssY6IG9FuiG3CGJ4JsP4617dLxD7u85yJgPw==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4de0u40c5d-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 08 Apr 2026 20:06:57 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Wed, 8 Apr 2026 20:06:56 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Wed, 8 Apr 2026 20:06:56 -0700
-Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with SMTP id 73EB93F7055;
-	Wed,  8 Apr 2026 20:06:54 -0700 (PDT)
-Date: Thu, 9 Apr 2026 08:36:53 +0530
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: Bjorn Helgaas <helgaas@kernel.org>
-CC: Vidya Sagar <vidyas@nvidia.com>, <bhelgaas@google.com>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-pci@vger.kernel.org>
-Subject: Re: clarification: PCI device not getting enumerated
-Message-ID: <adcXzcz2wWJFw4d7@rkannoth-OptiPlex-7090>
-References: <abojekUtFrMxM1RB@rkannoth-OptiPlex-7090>
- <20260401193215.GA229749@bhelgaas>
+	s=arc-20240116; t=1775704062; c=relaxed/simple;
+	bh=V4EWE4vaWr5fMS7gKJrRs+ClFeHCguu0D1SUYnOReAk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rqm5raHdVZ1D8Wn47ZDv0E1nzOz+fyGVLxMNXqv60Z4LYWzcAD1Uo5QDp4RiFIG8W1b98CJbv7eSx4IEsPJ1FLK7uXaq77Vv0a6F8oLqsN6qZAUhS1HSX/p4Op5Fjgl+6DNgy1LZns5Af9biJ16xXfT8xMd3KR7VMiNsnCtFLC0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OvZDOg8x; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9556C19421;
+	Thu,  9 Apr 2026 03:07:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775704062;
+	bh=V4EWE4vaWr5fMS7gKJrRs+ClFeHCguu0D1SUYnOReAk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=OvZDOg8xR6c+6IuMy3ajNXpYwhozYNVlapds29l6XqdQsE+yfHdiZtGsQjVyR/g2c
+	 x/aW1O6ULwRispYWbw5BrJGrAmPwMpinPkDVQ4onANEEUZt5z2XrRPLeJbhIk4JWUA
+	 mQBcp5GSgT4bJQHMtoQ9KT2krel1Q2GB23+X8aSNrmrVdqVorcl2W953bsgvb2jBo2
+	 Teqz9m53mGtg/LArQnznAk2MwgCUY/+M9T4QW5RXx54Xs50vXLrK7KTZ+cfHsHKx9H
+	 lNcgHtqQcCv7bVPhUwqsi9JfOzqD+BLJ5XapmsJiL53AQlPhXAOTExo+EzAZWdVShT
+	 Wr4x4Ei+zhbNQ==
+Date: Wed, 8 Apr 2026 20:07:40 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
+ andrew+netdev@lunn.ch, netdev@vger.kernel.org
+Subject: Re: [PATCH net 0/9][pull request] Intel Wired LAN Driver Updates
+ 2026-04-06 (idpf, ice, ixgbe, ixgbevf, igb, e1000)
+Message-ID: <20260408200740.56feb5a4@kernel.org>
+In-Reply-To: <20260406213038.444732-1-anthony.l.nguyen@intel.com>
+References: <20260406213038.444732-1-anthony.l.nguyen@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20260401193215.GA229749@bhelgaas>
-X-Authority-Analysis: v=2.4 cv=KpN9H2WN c=1 sm=1 tr=0 ts=69d717d1 cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=kj9zAlcOel0A:10 a=A5OVakUREuEA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=l0iWHRpgs5sLHlkKQ1IR:22 a=qit2iCtTFQkLgVSMPQTB:22 a=VwQbUJbxAAAA:8
- a=Mma5G_rpxiGzhrjlnXEA:9 a=CjuIK1q_8ugA:10 a=lhd_8Stf4_Oa5sg58ivl:22
-X-Proofpoint-ORIG-GUID: TPmHKYeuoo_oeydzfh12obX5npgvy9Aw
-X-Proofpoint-GUID: TPmHKYeuoo_oeydzfh12obX5npgvy9Aw
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDA5MDAyNCBTYWx0ZWRfX274VxwBUH/IY
- jkuNOWmcmFQeWqtbbLEIk0EevxwuHq+IcZzaN4sbD3yQC+Uxfa9MEYEDr+YVoP/TfzWgsLHX8A0
- SFw8aMQ1h32nhYj/S96CiDsl1voTe7nsQfOZmZqkvGD7gd9Ohq7aoRSQmr3jDlZOsObwL7iO3Dj
- SpJrE38MMPgdMh2sSKND5VmneT0DW1KQ3sNJji8cvznOckjmcqnld3TvxnwvRQfO2vekf+BiB3d
- ufRyXURHTfaI+8eqEjVoLSnDiVj5ypc1aAHxpsOFTx4LuLNQfyWd+2IOOGBAjC+hc+1F0HblKoT
- eNbh+ed7Fa8Svzil+tycdEH3vcq+w4M/s1l9qgMxO/yTdhIHghgDTJ02rCblf/nlteVBC2PawJ5
- qcm43S4rxOsdfFD7dUXO9gAgNMJIPDMwsMi1ut7ZVHKOoBpEZNeHWVEcnLcHPxqUdSJGGKVd3Gq
- hrk8JjKD1w47hSeiIvA==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-04-08_07,2026-04-08_01,2025-10-01_01
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-276827-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-276826-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,marvell.com:dkim];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[marvell.com:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MISSING_XM_UA(0.00)[];
 	RCPT_COUNT_FIVE(0.00)[6];
-	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: 171FA3C5EC1
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C18DA3C5F14
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 2026-04-02 at 01:02:15, Bjorn Helgaas (helgaas@kernel.org) wrote:
-> [+to Vidya, any thoughts on this?]
+On Mon,  6 Apr 2026 14:30:27 -0700 Tony Nguyen wrote:
+> Emil converts to use spinlock_t for virtchnl transactions to make
+> consistent use of the xn_bm_lock when accessing the free_xn_bm bitmap,
+> while also avoiding nested raw/bh spinlock issue on PREEMPT_RT kernels.
+> He also sets payload size before calling the async handler, to make sure
+> it doesn't error out prematurely due to invalid size check for idpf.
 
-Bjorn, Vidya,
-
-If i revert below 2 lines of code from commit 7246a4520b4bf1494d7d030166a11b5226f6d508,
-PCI device gets enumerated.
-
-diff --git a/drivers/pci/controller/pci-host-common.c b/drivers/pci/controller/pci-host-common.c
-index 45b71806182d..c96b2de163b5 100644
---- a/drivers/pci/controller/pci-host-common.c
-+++ b/drivers/pci/controller/pci-host-common.c
-@@ -73,10 +73,6 @@ int pci_host_common_probe(struct platform_device *pdev)
-        if (IS_ERR(cfg))
-                return PTR_ERR(cfg);
-
--       /* Do not reassign resources if probe only */
--       if (!pci_has_flag(PCI_PROBE_ONLY))
--               pci_add_flags(PCI_REASSIGN_ALL_BUS);
--
-        bridge->sysdata = cfg;
-        bridge->ops = (struct pci_ops *)&ops->pci_ops;
-        bridge->msi_domain = true;
-
-Commit message (7246a4520b4bf1494d7d030166a11b5226f6d508) says,
-
-   " This also obviates the use of adding PCI_REASSIGN_ALL_BUS flag if
-    !PCI_PROBE_ONLY, as pci_assign_unassigned_root_bus_resources() takes care
-    of reassigning the resources that are not already claimed."
-
-The statement says that PCI_REASSIGN_ALL_BUS is essentially redundant (unnecessary).
-Let me know if there is any other side effects, else i can push a patch with these
-two lines reverted.
+Sashiko has a bunch of comments but they all look orthogonal
 
