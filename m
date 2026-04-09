@@ -1,129 +1,177 @@
-Return-Path: <netdev+bounces-276890-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276891-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8CCBJ8pj12nvNQgAu9opvQ
-	(envelope-from <netdev+bounces-276890-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 10:31:06 +0200
+	id 6NlMHrZl12myNggAu9opvQ
+	(envelope-from <netdev+bounces-276891-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 10:39:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0949D3C7C85
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 10:31:05 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id B71D43C7D7B
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 10:39:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7970E301226E
-	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 08:30:30 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id ABB2730088B2
+	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 08:39:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6CBE3537C5;
-	Thu,  9 Apr 2026 08:30:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE60A3A5E89;
+	Thu,  9 Apr 2026 08:39:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dAY1eh/N"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="QboQ/g4f"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A29252F549F
-	for <netdev@vger.kernel.org>; Thu,  9 Apr 2026 08:30:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63E81389469;
+	Thu,  9 Apr 2026 08:39:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775723429; cv=none; b=Od03nIBmI9ktyE5pJUYQIkoV2f6kDhatTBX/p+jms2zH+aWwIciLEJtRzZpACTFsd8GdC0gXPVUKYdRPXEn+uk0OjRU2Kag4/ae+yrM44jHzxetHFPIxTkJHEuFxGByhAgi3FOiM1yVhHo+BLdH2tn00dBQ8XpTIc2Jn08pYZKo=
+	t=1775723955; cv=none; b=DIDsS6higKriHqbVUbWr4Ra7sSevbJxKVrnwzXPJ2kabwbCDR84ZuYy/scpSGQOS53BgaYPpjY5vkHa8BeIWC2CXScGxNlaJOA+Qu7kuzF5yueG4adng9Rq6km3YaMzaDjdhuC/z5oVMYHxhY0UPSLPe1cn5tfCdMED5C4wtoDY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775723429; c=relaxed/simple;
-	bh=kxUP5FRsQ8f2/OoTrKUv7qd7V+ZhKrNfkzqa1kUvFjY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=UbyiZ0bwTPbS2SRveIImwditJOC2C34r0zTkL5GNEeO8ZxgeH1ZvWdPK+ISOjeIqaWNAmrB4GKoQHrJTFAl/zoSnipR+0UI65FKFdN/ER0OoRQ3TbaNE2zmQyUPjajRnSgEcEZB1t8EQ+9HrDQbET/UNwOfYIT+VIxHys4ujJcY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dAY1eh/N; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 484DDC4CEF7;
-	Thu,  9 Apr 2026 08:30:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775723429;
-	bh=kxUP5FRsQ8f2/OoTrKUv7qd7V+ZhKrNfkzqa1kUvFjY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=dAY1eh/NHSTe58VxKQH6GL2KWfRlJK8pPTmyY6qjfo4V1LXrDi7sr2dmU7cdw1bbK
-	 6AjmkurLcOjDp6pa3bgvlIWtpTcLBz5IusJ9V+HiSj93gPStCfdA7x33ispcIuz4aK
-	 hJKLrTDo4BvX57D2gmKhETa4ZP6dtfUhq8Fvil3AegPFLjzpdCviT9DtByppgY3hFQ
-	 u8AreLo5AJ7zkf8QFX7ruRSnjaee9U0Lw1BtPCRk4OJrxx/JwLo+oyJ/gAYEe4apYD
-	 5gr5uGrfw3foHYfeGbi1fxDaQqAdF3rD7tDKGTIX6z6ISsTt9hE8jI9WS3nGD6qi/o
-	 P0g9w0Z+RUQeg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CD1B39307AD;
-	Thu,  9 Apr 2026 08:30:06 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1775723955; c=relaxed/simple;
+	bh=0t9GmcyonzRJZf/bXkI6+pYIeVWgLTtw4V3r+KD7b3Y=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=sP8epCO+YlhaTG3A2X6h1+Bpf9bHxiQupYjdLXytKU6BPOzZwsv6k17hqYo3AQ1njksLMc5kO3oocIINMqL4FHcvAriXhZdVPjoaztbIUYYZKKuvihdnfHb6N1zesmN5WBiiMf6ol2ociyPCvgctxts3oa2Vuqi4rtWwFq1oCc4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=QboQ/g4f; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=Cc:To:From:Date:Message-ID;
+	bh=V3satatu24/OV36rdGRBdBIyxrI0A4QOnJU8uiF2h9o=; b=QboQ/g4flDH0z4kuyalyqfbNAZ
+	ybWk00FTGAujWJXw5yawz3N8ywXaRYI5Zoi3pStmUqPgHC45wRhT/qJNzuD3y4WpDWt897moNYj1I
+	RPZZQ8fwlYtrBw9gBQlwxj9UU26/tb+aYl9fcZGydqcCd8wyEEYyf7SxaT/eTpdWtbXnZZ6liUpDm
+	1dmLmtBOhc3SArnb4wU2ApgxQrii9UqFgMLmbN+aI4hCsZQ1hnJYrOVPTlj7co/6wHTDICZVIrePR
+	9cf4qOzYKRzIQ/731ikq6C+32d2jxhEF0mz/5ebvZ8RiD9qUXKrU4TjOzdbQqN7mP//4axfVJrExt
+	PqNFqmcEuEWn/jlUeQoDozzq9kJslqxQBk31FkS+ij8Fi94Cd4jOyGJKU5jOxWbbTuMyxWTVLLF/h
+	AavGdgmGFE5WIOXdfQMDVa9K88/vCWXZxPZaBS9kgt76Ia9vKktvlFLGTrpmxfr4Mws+2u+okVa57
+	v3fMCvxUBZpckB57OQQuic7S;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1wAkup-000000087hC-3RTh;
+	Thu, 09 Apr 2026 08:39:07 +0000
+Message-ID: <9691238e-bcdd-4d0d-99e1-f77b191845f4@samba.org>
+Date: Thu, 9 Apr 2026 10:39:06 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 0/4] net: move .getsockopt away from __user
+ buffers
+From: Stefan Metzmacher <metze@samba.org>
+To: David Laight <david.laight.linux@gmail.com>,
+ Breno Leitao <leitao@debian.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn
+ <willemb@google.com>, axboe@kernel.dk, Stanislav Fomichev <sdf@fomichev.me>,
+ io-uring@vger.kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org,
+ Linus Torvalds <torvalds@linux-foundation.org>,
+ linux-kernel@vger.kernel.org, kernel-team@meta.com
+References: <20260408-getsockopt-v3-0-061bb9cb355d@debian.org>
+ <20260408122653.295953dd@pumpkin>
+ <3fd4bf27-344f-45fc-bca3-9e9676522972@samba.org>
+Content-Language: en-US
+In-Reply-To: <3fd4bf27-344f-45fc-bca3-9e9676522972@samba.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] l2tp: Drop large packets with UDP encap
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177572340530.1067582.789622967223201622.git-patchwork-notify@kernel.org>
-Date: Thu, 09 Apr 2026 08:30:05 +0000
-References: <20260403174949.843941-1-alice.kernel@fastmail.im>
-In-Reply-To: <20260403174949.843941-1-alice.kernel@fastmail.im>
-To: Alice Mikityanska <alice.kernel@fastmail.im>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, jchapman@katalix.com,
- netdev@vger.kernel.org, alice@isovalent.com,
- syzbot+ci3edea60a44225dec@syzkaller.appspotmail.com
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[samba.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[samba.org:s=42];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-276890-lists,netdev=lfdr.de,netdevbpf];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-276891-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com,debian.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[fastmail.im];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FROM_NO_DN(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,ci3edea60a44225dec];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[metze@samba.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[samba.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,isovalent.com:email]
-X-Rspamd-Queue-Id: 0949D3C7C85
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,samba.org:dkim,samba.org:mid]
+X-Rspamd-Queue-Id: B71D43C7D7B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Fri,  3 Apr 2026 20:49:49 +0300 you wrote:
-> From: Alice Mikityanska <alice@isovalent.com>
+Am 08.04.26 um 15:56 schrieb Stefan Metzmacher:
+> Am 08.04.26 um 13:26 schrieb David Laight:
+>> On Wed, 08 Apr 2026 03:30:28 -0700
+>> Breno Leitao <leitao@debian.org> wrote:
+>>
+>>> Currently, the .getsockopt callback requires __user pointers:
+>>>
+>>>    int (*getsockopt)(struct socket *sock, int level,
+>>>                      int optname, char __user *optval, int __user *optlen);
+>>>
+>>> This prevents kernel callers (io_uring, BPF) from using getsockopt on
+>>> levels other than SOL_SOCKET, since they pass kernel pointers.
+>>>
+>>> Following Linus' suggestion [0], this series introduces sockopt_t, a
+>>> type-safe wrapper around iov_iter, and a getsockopt_iter callback that
+>>> works with both user and kernel buffers. AF_PACKET and CAN raw are
+>>> converted as initial users, with selftests covering the trickiest
+>>> conversion patterns.
+>>
+>> What are you doing about the cases where 'optlen' is a complete lie?
+>> IIRC there is one related to some form of async io where it is just
+>> the length of the header, the actual buffer length depends on
+>> data in the header.
+>> This doesn't matter with the existing code for applications, when they
+>> get it wrong they just crash.
+>> But kernel users will need to pass the actual buffer length separately
+>> from optlen.
+>> It also affects any code that tries to cache the actual data and copy
+>> it back to userspace in the syscall wrapper - which makes sense for
+>> most short getsockopt.
+>>
+>> (This is different from historic code where the length might be
+>> assumed to be 4 regardless of what was passed.)
 > 
-> syzbot reported a WARN on my patch series [1]. The actual issue is an
-> overflow of 16-bit UDP length field, and it exists in the upstream code.
-> My series added a debug WARN with an overflow check that exposed the
-> issue, that's why syzbot tripped on my patches, rather than on upstream
-> code.
+> As the insane legacy cases can only happen for keeping
+> compatibility with existing userspace applications,
+> we could get the original optval and optlen __user pointers
+> out of sockopt_t again via something like:
 > 
-> [...]
+> char __user * __must_check sockopt_get_insame_legacy_optval(sockopt_t *sopt);
+> int __user * __must_check sockopt_get_insame_legacy_optlen(sockopt_t *sopt);
+> 
+> And for kernel callers they return NULL and the code should
+> turn that into -EINVAL or something similar.
 
-Here is the summary with links:
-  - [net-next] l2tp: Drop large packets with UDP encap
-    https://git.kernel.org/netdev/net/c/ebe560ea5f54
+Or better helper macros/inline functions to call the legacy implementations.
+something like this:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+int sockopt_call_legacy_sock_fn(struct socket *sock, int level, int optname, sockopt_t *sopt,
+                                 int kernel_errno,
+                                 int (*legacy_fn)(struct socket *sock, int level,
+                                                  int optname, char __user *optval, int __user *optlen))
+{
+      if (!sopt->legacy.optlen)
+           return kernel_errno;
 
+      return legacy_fn(sock, level, optname, sopt->legacy.optval, sopt->legacy.optlen);
+}
+
+And a similar sockopt_call_legacy_sk_fn() that takes struct sock instead of struct socket.
+
+That way it would be relatively easy to move the calls of sockopt_call_legacy_{sock,sk}_fn
+down the stack to the places where it's really needed in incremental steps.
 
 
