@@ -1,294 +1,181 @@
-Return-Path: <netdev+bounces-276946-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276947-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mCSwBs2L12k3PggAu9opvQ
-	(envelope-from <netdev+bounces-276946-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 13:21:49 +0200
+	id AFjpMd+N12mtPggAu9opvQ
+	(envelope-from <netdev+bounces-276947-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 13:30:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D64E3C99B0
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 13:21:48 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C19E3C9ACB
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 13:30:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 0959F3008686
-	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 11:21:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C3B443011870
+	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 11:30:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 270DE3C063B;
-	Thu,  9 Apr 2026 11:21:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D85C33D4E9;
+	Thu,  9 Apr 2026 11:30:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Fn0cCDPm"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="0jWD8M8t"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9DD53BFE23;
-	Thu,  9 Apr 2026 11:21:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.9
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775733703; cv=fail; b=qorqWbNX8xATQy+uZWHcMuCyPNMccJ4jMdyyN3ffNcepeO+7fgLzZWw4mblmva7K1MEXIspM8ZQVFcUmKzRGB6kct3c5zckZx/YSSgKqZYBHcB5j2anwdT190vxLb0CGycnmYQpZp/c/VOWbuYLz7EXk57H80jstCjI/QDF93JE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775733703; c=relaxed/simple;
-	bh=iBqLGhRVrS9u1XjDL8c7foLFFrzc6qTm9HEOlK5r2QI=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=lGf5ZON14MYUhvtYnuCDpwW2Gz6/ryGnYRfDg/rT2uKrm2rcwPR1imzjkVlGeNpi1PZ2XCU3k5GmstJnXQdofLyK7fKDS2eLAk38x7LJPsOye6EqytOCLoPUFP8MPfwoS1Uv0jWMD5J7VUrdgDo2ZZX7cCNCQC/NjGE2uEpKJe4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Fn0cCDPm; arc=fail smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1775733701; x=1807269701;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=iBqLGhRVrS9u1XjDL8c7foLFFrzc6qTm9HEOlK5r2QI=;
-  b=Fn0cCDPm1JxbEzJkiLtgKStsIoaeHClNlGSZ2YvBbJpJlJcDXYy3y6dL
-   HyLgrVooTZ/T88lxqMz7bqxPEYGr2yZaKGqgBNd/1/oks0/tGgaD+saHQ
-   KnxNhzHtA3K8Bsbi/CdCbzptbLRVyr20LPP9pJP0Y9B/CJruJTIr6BIR1
-   MPshGWSU9H9lbJWJ5j5kfoP3EEZzzi9LZFgte2LbggP450DjZ+8brrZBJ
-   iUeKU/wrIRekSRX5VEa/Ci02+qlwjOTmDYO8S0QS4noCrpQi5FgWUUQPn
-   CCprFUIvB7+ju/ZquFJYbQUH37em5BUMUWYlUHyoOdSi4QwnMDq13GeKp
-   g==;
-X-CSE-ConnectionGUID: GX/zPMptQf+lMN9SYxhvJw==
-X-CSE-MsgGUID: Ej4YkYvISp+K4mJBeCWZbQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11753"; a="99363299"
-X-IronPort-AV: E=Sophos;i="6.23,169,1770624000"; 
-   d="scan'208";a="99363299"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2026 04:21:40 -0700
-X-CSE-ConnectionGUID: ARFV1GnTQty3r6e0CTjGeQ==
-X-CSE-MsgGUID: s3Ri2Z17Qt+7mIyWL3Z4Sw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,169,1770624000"; 
-   d="scan'208";a="225582810"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by fmviesa007.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2026 04:21:39 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Thu, 9 Apr 2026 04:21:39 -0700
-Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Thu, 9 Apr 2026 04:21:39 -0700
-Received: from BN1PR04CU002.outbound.protection.outlook.com (52.101.56.66) by
- edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Thu, 9 Apr 2026 04:21:38 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=HWTc8iu3gSqZ6z+Wsg//nAit0ePcZa/oscxQt2oa0oGLGFDr8jgnB7hGVAbRtCqACI436nZdj6Jc5Mo5eMA2Rt9CoNPwA/9Bc7Xh8UedeB2/cL+Ph7Apdc7dAOjeNSR0GTOZX6SyDrfE3jID0rexjMwaCObMfisWVOlHzEkly9loKU1JsTXnDh+5aendVrHhKWhbev/TZaCNX99Exrcn5EK06PARx3wl9dS6Fscvj8Y2iyg9l1wbKGO3917DxZI4zgIU7Mryznk+YDDh3RXuyHGN6kK2zfd9FR96XSGbZgymvzJvcdx558GtuPZ9x/1LFT0K7yIEmU/2vsghFQJAxQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=iBqLGhRVrS9u1XjDL8c7foLFFrzc6qTm9HEOlK5r2QI=;
- b=jcCZCXfrIcMPCXv3fTn3o0wRd27n0ZIFq1rXrc5ErZZ5R0KAfQIu9V+2g50JXHjKExywkVLIvH8cC9ELPztn0iK1hIwNpiDgQKzDa3SRGNwhJVWtJrJoqa6e8nwCTSMtc+hzkZ+Cetick/UqvgFu30y4LA6Yy7UB9EzTnMEAZj2lZ7RWEChSI1g7X6GmIx6nA+L77Mkw5fLtM9SRNl/bdMPyi3mEVn+WxspXIM6x0UaZ6p1xgoG75WqwVLnug2fZ1W5YoLJLHN/olTmS2YsAVi9aUYb7WTpKlmRX6oTW4ZxabZ06JMn8U8B0M5KUDj0/I1KcLhCwlsEdb87Eeb3p+Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA1PR11MB6219.namprd11.prod.outlook.com (2603:10b6:208:3e9::15)
- by DS7PR11MB7932.namprd11.prod.outlook.com (2603:10b6:8:e5::6) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9769.11; Thu, 9 Apr 2026 11:21:35 +0000
-Received: from IA1PR11MB6219.namprd11.prod.outlook.com
- ([fe80::a2b9:8e8:c48b:ea31]) by IA1PR11MB6219.namprd11.prod.outlook.com
- ([fe80::a2b9:8e8:c48b:ea31%5]) with mapi id 15.20.9769.006; Thu, 9 Apr 2026
- 11:21:35 +0000
-From: "Nitka, Grzegorz" <grzegorz.nitka@intel.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C941514884C;
+	Thu,  9 Apr 2026 11:30:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775734237; cv=none; b=ILDaqREeiPM7uRlsqiZUxZHBzNtwq3M32lWZ6d2u3YGhrWz1PzW15nc36nNwtMBtU/+JGSeXdC/qiuu5ngdfvoHNkoYI/K+nXpbS7wMhfOXMMguEMhMaNagtpd1/1G5NvjgGQEV3cPgOLrnHjwAK6GeEfHW1loc1yWa/+MVZeJw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775734237; c=relaxed/simple;
+	bh=vhuisLaRfw6ZFKxyr2Y0SD7Tahg+UGmd5J6cWEsmiDg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=I1i9TfdmKhTTgjLR1kqipX7ICOum3GsMDWzectBlvgSuZQGQDfN+KoHdyQZuz02x+QlTmCAs0X9JbkmTUCVr0xkm52g5202i6uLe935qfigMuIz9YesdEich7Qb+HFNC75Jr9k4lZjXTjI92sxdspIs8pC5t6F5jB0VJyDE0f8A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=0jWD8M8t; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=MMqFkU5//Urq/UeDEnZBPBKa4A17+wq2oYSTTa9aaIg=; b=0jWD8M8trqDXX0zRrSxRSWg4su
+	pqRMH7Vuv48GG9CnyVgyJGAXMOYC34pFlI1Td06DqzU5AHEGyGtdgLWLeZr78TFq1njjO+jbNflFZ
+	w1+hZ0BK33fcHdVjPefOxtmB2a4Ch4ciHLiwbYvColz6Ho0Lwr09XuToPQTTxHYvZxsvkwE7QVqmH
+	nFx83g81qnO4oPvNsV2LSdN+Y3dl3e0NL2xCaw8c5B2EgNxOM9n/FRffANIWB++iEDKdl9iMNiIJq
+	zU7VdSfNLd7kKMw+z8T5GFCx6vTOVWpwAQwry/E2xtD5t0yPXqI0mXMYPuUuEMnzNvLrt758VEprq
+	vuGcjLFw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46956)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1wAnab-000000003TB-19Qg;
+	Thu, 09 Apr 2026 12:30:25 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1wAnaY-000000004Lx-2fSx;
+	Thu, 09 Apr 2026 12:30:22 +0100
+Date: Thu, 9 Apr 2026 12:30:22 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Biju Das <biju.das.jz@bp.renesas.com>
+Cc: Ovidiu Panait <ovidiu.panait.rb@renesas.com>,
+	"andrew@lunn.ch" <andrew@lunn.ch>,
+	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>, "Oros,
- Petr" <poros@redhat.com>, "richardcochran@gmail.com"
-	<richardcochran@gmail.com>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "Prathosh.Satish@microchip.com"
-	<Prathosh.Satish@microchip.com>, "Vecera, Ivan" <ivecera@redhat.com>,
-	"jiri@resnulli.us" <jiri@resnulli.us>, "Kubalewski, Arkadiusz"
-	<arkadiusz.kubalewski@intel.com>, "vadim.fedorenko@linux.dev"
-	<vadim.fedorenko@linux.dev>, "donald.hunter@gmail.com"
-	<donald.hunter@gmail.com>, "horms@kernel.org" <horms@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "davem@davemloft.net"
-	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>
-Subject: RE: [PATCH v5 net-next 0/8] dpll/ice: Add TXC DPLL type and full TX
- reference clock control for E825
-Thread-Topic: [PATCH v5 net-next 0/8] dpll/ice: Add TXC DPLL type and full TX
- reference clock control for E825
-Thread-Index: AQHcwvXi5hF918e07EGu/X9NQPzLLrXS5QsAgAO6hfA=
-Date: Thu, 9 Apr 2026 11:21:35 +0000
-Message-ID: <IA1PR11MB621925C1718B838147404DC492582@IA1PR11MB6219.namprd11.prod.outlook.com>
-References: <20260402230626.3826719-1-grzegorz.nitka@intel.com>
- <20260406192312.0f7a2760@kernel.org>
-In-Reply-To: <20260406192312.0f7a2760@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA1PR11MB6219:EE_|DS7PR11MB7932:EE_
-x-ms-office365-filtering-correlation-id: e0f71321-aa72-4c76-a2ce-08de962a28d3
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014|38070700021|22082099003|56012099003|18002099003;
-x-microsoft-antispam-message-info: gd1PyhAcrGREVzrmEa47NRqR+iATjs1dyxr6DSVvN0xNpruPqLJibHADLsXJCJ9qEjdmCAa6xbChSnN78AFFNZe74x3raQNlVxfYCoqtvXexO5tqB5oh8MISok2BycqayivdlYVq6hOTzJnWds5trLrwx8IJkDr2ZPGao0AFIukgNGKlWOSm7vCeu4XvBWO1cWfwyPbYsc4p+8fyIqYvQvVl26A+LSVtaYalRTKrARRitC1QwyPrElquVuTnHorHjrWnZa2JorXxEhEEojXfsdOFdmgF6gELZp+0GHpvKEvbpymgsdvZMoqwD9m7WJQsIzEAjK+w6Y3gTIszO38AcAWBadZ1LW8+sBWrHjCyjBtiA0eAdpaMsvGW9jLb1OyBk0H7Fl7xx1/Uf3gQqy5OgXpyB2WPzsEdXYBWwAqV2KL+HvB+1UqAsCD8z/rCSGeJzzTIdJV2Y1aM0YU0juNLlGtQ4r0f4gF6R76ZGKJ1ahVtXAwJn2U1rCnAzn2WQO5qeUnciuI4Pfz4l9JP+DBnFx2jim/oa6ydhyM7+vnyd1eqeC+alxjjr2TEcrJQjrgGJBkAbTXLFAPZovHTPwI25QJjF1Dq16m0xVMvzKcubbwtWJwKWuUDHr5OtF5mYas5dRsxSWJ7gU7H1oTOYOVYEyMVAjgZiAcPY7KYZjid9EcUoYpdK6BtMK8r/sgLDyZb1jBqtGHv1y12KaUwdiNAhLXrsOmSlShmBgJKLPc1mhcwlBu30XQwVVNco1nyLP3KfpNfiNPWKGZt/jARt0OqNuYc8NbZk3kgbHHrQzujBtI=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6219.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(38070700021)(22082099003)(56012099003)(18002099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?b1FSNlZ3aSt0NTR6bUhKWFA4elV3M0dzM2RZdmN4ak0rYVZiL20ydEovRDZx?=
- =?utf-8?B?cStYWDlESzJYdkpCNGRaVjNha0htTTJNWXMvN2VBZmxwVjVLQ0l6S3RubnVO?=
- =?utf-8?B?L1YxQ29ELzBuVlVtNjFNNUVpd09LQ29qQjUvekNDc2JpMHdLampaRGVkd3Q4?=
- =?utf-8?B?eG1BZ2k1WlJUNWg4dzdRRGJBdGNwWmFsQzk2R2NQc0VnZXNFaGRWTm9ZVThQ?=
- =?utf-8?B?b3hLMHR4MlNveWxvOExhdnRLa1J0RXAraERTVUxNd096anRSdGg1MWFlaUJr?=
- =?utf-8?B?U29UWW12NDNobGE1WGZBTWRTTHhXdCtrYlFOSWNSanVsa1lEUDMyZmVlNUJi?=
- =?utf-8?B?TnQwMW1EL3BCcDR4emFaY1pFdDVmaTkySWY4NjRLNXlibmxFV21RT2JjQitX?=
- =?utf-8?B?T3YrQWxxQUM4ZWZEc2ZaWTBMOGFWd1Erd25XL2x3bTl4UHAvU3lYSWR2eFVV?=
- =?utf-8?B?d001K2F5R1VvcW5nTm5ZVW5BcnhhbG1GL3hGaTgyTktLZFFwamdUKzIxK0J6?=
- =?utf-8?B?U25lUUh4VEFCbmFEZjh2WmRTaXJmYkoxL2w4OU1hUFg1dFZ4Tmo1TkN5VUVm?=
- =?utf-8?B?NzFJOUdXOExuakxUNzBBSVc5V0dNZysycEhZVkswYXl0c1JWbUdhelBNeHhC?=
- =?utf-8?B?MGZLbzJGMm44TmRHQllZS1JDTzdpUVZrSXd6dUkwQTdJWkhNd2tXSTdjd2xQ?=
- =?utf-8?B?ZGNRRFgyNXdrNFlITm9iQjc2Zk1sSDBRWlZENGhxRENwR25yajcwaTlWWHlE?=
- =?utf-8?B?aVlWQWN5STlIcjNwV0RVNlB5U1ppc0hMNVVWOVdEWlFjaFNGNFl0NzlZU3Fj?=
- =?utf-8?B?d1VsZ3RKb2tqYWF1ZVhiTWZua3Jzam5PRVNsV1RQUldxUTRVWm54OEFCditO?=
- =?utf-8?B?eTZsOXdHazg0M1BTUnB0YlRlbEd3ZXZPbkowWDlrN3VyRHFWbmlKeDZGZHVS?=
- =?utf-8?B?dXJ6RFhlbTNRcjdMSUsyak13TVQyWFRCd3B6RDNOa1ZiSW80VlVQMkFLalFG?=
- =?utf-8?B?b3JTWktxdXd4a2p6cmR1WUM1N3loRW54dlpWbDFHOS83SUhJSlBVZVM3bUpY?=
- =?utf-8?B?UEZtcUxWWmxtZDB3VFF0ZE9KVWlUc1lKUnZmeEJYNUFkZXFKS2NSc3FVcXNy?=
- =?utf-8?B?N29QTFp2RGY1TmUzV1RoOUNGc2diMGxpZENxWDBYSmk1dEE4akZHYWtveXdF?=
- =?utf-8?B?eEtORTk2c0dxSFc5NDQrUWs3aE95Z3pKN29ZT3dWb05PSTZvT1pnL0ZhMldW?=
- =?utf-8?B?em1aaTltY0hQZFZvcEJaL0VlTjc5UkF0M250MFpZQlI4SnZleDFBNTlJamVq?=
- =?utf-8?B?RUlMSzBXcWJHSEROV3ZXcDhwdWJKNU1LTWFFaERmZ1I4RTM5dVBuOC9OZHQ2?=
- =?utf-8?B?TUxHMWFlNXRveGxPdEtuUXl0SzUyS0RnNUlCZDJMOU1VaC9VWE1WVDdmWG5k?=
- =?utf-8?B?SlgwNmVtT2ptdGEwSmR5aVVqaFlKV2hzRVBZQWZlTGdaZ3VIY2h3dXBqOVlp?=
- =?utf-8?B?L2ozdWFxN0FHU3h3dVVYVEpnOEwxRXV6TlR3dkQ5Q2VHU3pyNys2dkhxVGVZ?=
- =?utf-8?B?UnVSbzMxU25MaHNGWGMzUWpackFzMjRZMDFlWDhERkxVZms2MG5mR3ZaOW5X?=
- =?utf-8?B?L2JzaFYya0ZlRGhvVVF6QjE1b2hjMmtnY0hhcnZUZVVKcGRMOXZUWWk0TGYr?=
- =?utf-8?B?ZVZnRllZdWh4M0RyUnBDZDdpQlMzbldqaERROWN1Z3QrK2czOTYxdzBaMXB6?=
- =?utf-8?B?b2FCZW1jRmh6U3EzRHlHajJyUlM3anpmZlF5aEs1ZzVEZCtaak56eFF0Q3I1?=
- =?utf-8?B?UGx2VDdWNzBWWFlHYlNoM3VKOUsyZXY0a3VLaDVIaDJCTTc0U3VuMmZPck5H?=
- =?utf-8?B?SEVadFJIWSsrMmdkVDErWnFUVGMraXQwRTVsVnZIaGZNRlp6VEdOdmlHdUtx?=
- =?utf-8?B?MzZMVGloMXFoczdjRjNNVzYzWXdsaXVhZ0srNmdqUlFrdnltTlMrNlVNWDV6?=
- =?utf-8?B?czFrMzc2SGFlMnFQZm8zV0t2U2p2cjIzank2ekFQNmtBUmQ4WlF1d244SHdm?=
- =?utf-8?B?ZUFUaVltMGExVVEzY0EwTU9kMU5tbWJENkswb0dWM1BGMyt2VkVzSHhLYUdm?=
- =?utf-8?B?SkRDU0tuUkxnNEhSR3BrUzd0bXVyQUdCd1Q3eFh1WVo4V3pnamhUQytEdDBZ?=
- =?utf-8?B?YUh0WkVQOTZ4TFFoRmh4dDVqT2FxMStRZTM2U2hrT1AxWVlJZFVHRi8yRGFX?=
- =?utf-8?B?N3NvWlRaZWRQRktVblhBUUdNZHRRVmh6dW40UVNSQzNTQ1lmNzNUWm0rbVd6?=
- =?utf-8?B?YVJXR0loamNvVDVEb3ZFcTRiQXF2cklHWmIxTHUvTDJNMVR5K3l4UT09?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	"linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>
+Subject: Re: [PATCH net v2 2/2] net: phy: micrel: remove ksz9131_resume()
+Message-ID: <adeNzh3eu9PSdEas@shell.armlinux.org.uk>
+References: <20260409095633.70973-1-ovidiu.panait.rb@renesas.com>
+ <20260409095633.70973-3-ovidiu.panait.rb@renesas.com>
+ <TY3PR01MB11346A0F047F1F7296B8F4FCA86582@TY3PR01MB11346.jpnprd01.prod.outlook.com>
+ <add_krK3MC1-SSsV@shell.armlinux.org.uk>
+ <TY3PR01MB113465B215559404D0FBD04AE86582@TY3PR01MB11346.jpnprd01.prod.outlook.com>
+ <adeH5y5TiZdaK94d@shell.armlinux.org.uk>
+ <TY3PR01MB11346732465160FFE9DCAADD686582@TY3PR01MB11346.jpnprd01.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: sbByyhi0WwhWFuI9BrLvVf84mrFanDVCVfki+IzoD7/w6PxdvAEj8GnPYHIrKqZc713iU6I9raAm9ru0e1997V2oCCTRPwrlHOwSMxdfS7jBhSG8B1zEpcz7kIvKiFRndWjT9WiM3+JyiExwHvnDNTM2NtMLvxwyT2nnaVY+tVGuA5KbOGdcTRPvfWjaJ2bayMEZNleSR84TVuAdHC5RUPWNH7aHV+lDD3G5Vy2diMWo7JfG5hIOZFj8EfIr72ntJ5Hg0FzYI1R0Bdo4DBv7ZYgrr+l7pc0PITM+tsQZTIdupHoSqhQ7ACXee7i3E0FhmKXTbH5MGeEdYdSDzCeWBw==
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6219.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e0f71321-aa72-4c76-a2ce-08de962a28d3
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Apr 2026 11:21:35.0499
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 2vedWUPzcGLdg68jvrpK1IYah7uK7ESnDEsVMq7TRrXEBWMPUtUsd/hRsmCrgcPuUPCYOypyoSVvURmixs4uMWwyo6V1T0NUpJX7Pwf98pE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR11MB7932
-X-OriginatorOrg: intel.com
-X-Spamd-Result: default: False [1.44 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <TY3PR01MB11346732465160FFE9DCAADD686582@TY3PR01MB11346.jpnprd01.prod.outlook.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spamd-Result: default: False [-0.36 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	MIME_BASE64_TEXT(0.10)[];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-276946-lists,netdev=lfdr.de];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.osuosl.org,redhat.com,gmail.com,lunn.ch,intel.com,microchip.com,resnulli.us,linux.dev,kernel.org,davemloft.net,google.com];
-	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[grzegorz.nitka@intel.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.999];
+	FREEMAIL_CC(0.00)[renesas.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-276947-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[10]
-X-Rspamd-Queue-Id: 1D64E3C99B0
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.871];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:email,armlinux.org.uk:url,shell.armlinux.org.uk:mid]
+X-Rspamd-Queue-Id: 2C19E3C9ACB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogSmFrdWIgS2ljaW5za2kg
-PGt1YmFAa2VybmVsLm9yZz4NCj4gU2VudDogVHVlc2RheSwgQXByaWwgNywgMjAyNiA0OjIzIEFN
-DQo+IFRvOiBOaXRrYSwgR3J6ZWdvcnogPGdyemVnb3J6Lm5pdGthQGludGVsLmNvbT4NCj4gQ2M6
-IG5ldGRldkB2Z2VyLmtlcm5lbC5vcmc7IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc7IGlu
-dGVsLXdpcmVkLQ0KPiBsYW5AbGlzdHMub3N1b3NsLm9yZzsgT3JvcywgUGV0ciA8cG9yb3NAcmVk
-aGF0LmNvbT47DQo+IHJpY2hhcmRjb2NocmFuQGdtYWlsLmNvbTsgYW5kcmV3K25ldGRldkBsdW5u
-LmNoOyBLaXRzemVsLCBQcnplbXlzbGF3DQo+IDxwcnplbXlzbGF3LmtpdHN6ZWxAaW50ZWwuY29t
-PjsgTmd1eWVuLCBBbnRob255IEwNCj4gPGFudGhvbnkubC5uZ3V5ZW5AaW50ZWwuY29tPjsgUHJh
-dGhvc2guU2F0aXNoQG1pY3JvY2hpcC5jb207IFZlY2VyYSwNCj4gSXZhbiA8aXZlY2VyYUByZWRo
-YXQuY29tPjsgamlyaUByZXNudWxsaS51czsgS3ViYWxld3NraSwgQXJrYWRpdXN6DQo+IDxhcmth
-ZGl1c3oua3ViYWxld3NraUBpbnRlbC5jb20+OyB2YWRpbS5mZWRvcmVua29AbGludXguZGV2Ow0K
-PiBkb25hbGQuaHVudGVyQGdtYWlsLmNvbTsgaG9ybXNAa2VybmVsLm9yZzsgcGFiZW5pQHJlZGhh
-dC5jb207DQo+IGRhdmVtQGRhdmVtbG9mdC5uZXQ7IGVkdW1hemV0QGdvb2dsZS5jb20NCj4gU3Vi
-amVjdDogUmU6IFtQQVRDSCB2NSBuZXQtbmV4dCAwLzhdIGRwbGwvaWNlOiBBZGQgVFhDIERQTEwg
-dHlwZSBhbmQgZnVsbCBUWA0KPiByZWZlcmVuY2UgY2xvY2sgY29udHJvbCBmb3IgRTgyNQ0KPiAN
-Cj4gT24gRnJpLCAgMyBBcHIgMjAyNiAwMTowNjoxOCArMDIwMCBHcnplZ29yeiBOaXRrYSB3cm90
-ZToNCj4gPiBUaGlzIHNlcmllcyBhZGRzIFRYIHJlZmVyZW5jZSBjbG9jayBzdXBwb3J0IGZvciBF
-ODI1IGRldmljZXMgYW5kIGV4cG9zZXMNCj4gPiBUWCBjbG9jayBzZWxlY3Rpb24gYW5kIHN5bmNo
-cm9uaXphdGlvbiBzdGF0dXMgdmlhIHRoZSBMaW51eCBEUExMDQo+ID4gc3Vic3lzdGVtLg0KPiA+
-IEU4MjUgaGFyZHdhcmUgY29udGFpbnMgYSBkZWRpY2F0ZWQgVHggY2xvY2sgKFRYQykgZG9tYWlu
-IHRoYXQgaXMNCj4gPiBkaXN0aW5jdA0KPiA+IGZyb20gUFBTIGFuZCBFRUMuIFRYIHJlZmVyZW5j
-ZSBjbG9jayBzZWxlY3Rpb24gaXMgZGV2aWNl4oCRd2lkZSwgc2hhcmVkDQo+ID4gYWNyb3NzIHBv
-cnRzLCBhbmQgbWVkaWF0ZWQgYnkgZmlybXdhcmUgYXMgcGFydCBvZiB0aGUgbGluayBicmluZ+KA
-kXVwDQo+ID4gcHJvY2Vzcy4gQXMgYSByZXN1bHQsIFRYIGNsb2NrIHNlbGVjdGlvbiBpbnRlbnQg
-bWF5IGRpZmZlciBmcm9tIHRoZQ0KPiA+IGVmZmVjdGl2ZSBoYXJkd2FyZSBjb25maWd1cmF0aW9u
-LCBhbmQgc29mdHdhcmUgbXVzdCB2ZXJpZnkgdGhlIG91dGNvbWUNCj4gPiBhZnRlciBsaW5r4oCR
-dXAuDQo+ID4gVG8gc3VwcG9ydCB0aGlzLCB0aGUgc2VyaWVzIGludHJvZHVjZXMgVFhDIHN1cHBv
-cnQgaW5jcmVtZW50YWxseSBhY3Jvc3MNCj4gPiB0aGUgRFBMTCBjb3JlIGFuZCB0aGUgaWNlIGRy
-aXZlcjoNCj4gPg0KPiA+IC0gYWRkIGEgbmV3IERQTEwgdHlwZSAoVFhDKSB0byByZXByZXNlbnQg
-dHJhbnNtaXQgY2xvY2sgZ2VuZXJhdG9yczsNCj4gDQo+IEknbSBub3QgZ3Jhc3Bpbmcgd2h5IHRo
-aXMgaXMgbmVlZGVkLCBpc24ndCBpdCBwYXJ0IG9mIGFueSBFRUMgc3lzdGVtDQo+IHRoYXQgdGhl
-IERQTEwgY2FuIGRyaXZlIHRoZSBUWEM/IElzIHlvdXIgc3lzdGVtIGdvaW5nIHRvIGV4cG9zZSBt
-dWx0aXBsZQ0KPiBEUExMcyBub3cgZm9yIG9uZSBOSUM/DQo+IA0KDQpIZWxsbyBKYWt1YiwNCkZv
-ciBFODI1IGRldmljZSwgdGhlIHNob3J0IGFuc3dlciBpcyB5ZXMuIFdlIGhhdmUgcGxhdGZvcm0g
-RUVDIG5vdyBhbmQNCndlIHdhbnQgdG8gYWRkOg0KLSBUWEMgRFBMTHMgcGVyIHBvcnQsIGFuZA0K
-LSBQUFMgRFBMTCBmb3IgVFNQTEwgY29uZmlnIHB1cnBvc2VzIChpbiB0aGUgbmVhciBmdXR1cmUp
-DQoNCkVFQyAoRXRoZXJuZXQgRXF1aXBtZW50IENsb2NrKSB0eXBlIERQTEwgaXMgZGVzaWduZWQg
-dG8gY29udHJvbCBtdWx0aXBsZQ0Kc291cmNlIHNpZ25hbHMgKGludGVybmFsLU5JQyBvciBleHRl
-cm5hbCksIHdoZXJlIG9uZSBkcml2ZXMgdGhlIGRwbGwgZGV2aWNlLA0Kd2hlcmUgbXVsdGlwbGUg
-b3V0cHV0cyBhcmUgcG9zc2libGUsIGVhY2ggY291bGQgZHJpdmUgdmFyaW91cyBjb21wb25lbnRz
-DQphcyB3ZWxsIGFzIHByb3BhZ2F0ZSBzaWduYWwgdG8gZXh0ZXJuYWwgZGV2aWNlcy4NClRYQyBp
-cyBzcGVjaWZpYyBkcGxsIGRldmljZSB0aGF0IGFzc29jaWF0ZWQgd2l0aCBzaW5nbGUgRVRIIHBv
-cnQgdG8gY29udHJvbCBpdCdzIHNvdXJjZSwNCnRoZXJlIGlzIG5vIG5lZWQgdG8gZGVjbGFyZSBh
-bnkgb3V0cHV0cyBhcyB0aGUgc2luZ2xlIG91dHB1dCBpcyBhbHJlYWR5IGRldGVybWluZWQuDQpC
-YXNpY2FsbHksIGhhdmluZyBUWEMgRFBMTCBpbmRpY2F0ZXMgcGVyIHBvcnQgY29udHJvbCBvdmVy
-IFN5bmNFIChvciBzb21lIGV4dGVybmFsKQ0KY2xvY2sgc291cmNlLsKgDQoNCj4gPiAtIHJlbGF4
-IERQTEwgcGluIHJlZ2lzdHJhdGlvbiBydWxlcyBmb3IgZmlybXdhcmXigJFkZXNjcmliZWQgc2hh
-cmVkIHBpbnMNCj4gPiAgIGFuZCBleHRlbmQgcGluIG5vdGlmaWNhdGlvbnMgd2l0aCBhIHNvdXJj
-ZSBpZGVudGlmaWVyOw0KPiA+IC0gYWxsb3cgZHluYW1pYyBzdGF0ZSBjb250cm9sIG9mIFN5bmNF
-IHJlZmVyZW5jZSBwaW5zIHdoZXJlIGhhcmR3YXJlDQo+ID4gICBzdXBwb3J0cyBpdDsNCj4gPiAt
-IGFkZCBDUEkgaW5mcmFzdHJ1Y3R1cmUgZm9yIFBIWeKAkXNpZGUgVFggY2xvY2sgY29udHJvbCBv
-biBFODI1QzsNCj4gPiAtIGludHJvZHVjZSBhIFRYQyBEUExMIGRldmljZSBhbmQgVFggcmVmZXJl
-bmNlIGNsb2NrIHBpbnMgKEVYVF9FUkVGMCBhbmQNCj4gPiAgIFNZTkNFKSBpbiB0aGUgaWNlIGRy
-aXZlcjsNCj4gPiAtIGV4dGVuZCB0aGUgUmVzdGFydCBBdXRv4oCRTmVnb3RpYXRpb24gY29tbWFu
-ZCB0byBjYXJyeSBhIFRYIHJlZmVyZW5jZQ0KPiA+ICAgY2xvY2sgaW5kZXg7DQo+ID4gLSBpbXBs
-ZW1lbnQgaGFyZHdhcmXigJFiYWNrZWQgVFggcmVmZXJlbmNlIGNsb2NrIHN3aXRjaGluZywgcG9z
-dOKAkWxpbmsNCj4gPiAtIHZlcmlmaWNhdGlvbiwgYW5kIFRYIHN5bmNocm9uaXphdGlvbiByZXBv
-cnRpbmcuDQo+ID4NCj4gPiBUWENMSyBwaW5zIHJlcG9ydCBUWCByZWZlcmVuY2UgdG9wb2xvZ3kg
-b25seS4gQWN0dWFsIHN5bmNocm9uaXphdGlvbg0KPiA+IHN1Y2Nlc3MgaXMgcmVwb3J0ZWQgdmlh
-IHRoZSBUWEMgRFBMTCBsb2NrIHN0YXR1cywgd2hpY2ggaXMgdXBkYXRlZCBhZnRlcg0KPiA+IGhh
-cmR3YXJlIHZlcmlmaWNhdGlvbjogZXh0ZXJuYWwgVHggcmVmZXJlbmNlcyByZXBvcnQgTE9DS0VE
-LCB3aGlsZSB0aGUNCj4gPiBpbnRlcm5hbCBFTkVUL1RYQ08gc291cmNlIHJlcG9ydHMgVU5MT0NL
-RUQuDQo+ID4gVGhpcyBwcm92aWRlcyByZWxpYWJsZSBUWCByZWZlcmVuY2Ugc2VsZWN0aW9uIGFu
-ZCBvYnNlcnZhYmlsaXR5IG9uIEU4MjUNCj4gPiBkZXZpY2VzIHVzaW5nIHN0YW5kYXJkIERQTEwg
-aW50ZXJmYWNlcywgd2l0aG91dCBjb25mbGF0aW5nIHVzZXIgaW50ZW50DQo+ID4gd2l0aCBlZmZl
-Y3RpdmUgaGFyZHdhcmUgYmVoYXZpb3IuDQoNCg==
+On Thu, Apr 09, 2026 at 11:19:43AM +0000, Biju Das wrote:
+> Hi Russell King,
+> 
+> > -----Original Message-----
+> > From: Russell King <linux@armlinux.org.uk>
+> > Sent: 09 April 2026 12:05
+> > Subject: Re: [PATCH net v2 2/2] net: phy: micrel: remove ksz9131_resume()
+> > 
+> > On Thu, Apr 09, 2026 at 10:52:35AM +0000, Biju Das wrote:
+> > > Hi Russell King,
+> > >
+> > > Thanks for the feedback.
+> > >
+> > > > -----Original Message-----
+> > > > From: Russell King <linux@armlinux.org.uk>
+> > > > Sent: 09 April 2026 11:30
+> > > > Subject: Re: [PATCH net v2 2/2] net: phy: micrel: remove
+> > > > ksz9131_resume()
+> > > >
+> > > > phy_init_hw() will also call drv->config_intr(), so that doesn't need to be done either.
+> > > >
+> > > > It will also call drv->config_init(), which will call kszphy_config_reset().
+> > > >
+> > > > So most of kszphy_resume() becomes unnecessary. I think the only
+> > > > thing that remains would be the call to kszphy_enable_clk() - and is it fine to call that after
+> > phy_init_hw() ?
+> > >
+> > > It just needs kszphy_enable_clk() and phydev->drv->config_intr() to
+> > > enable PHY interrupts for suspend-to-RAM to work on RZ/G3E SMARC EVK.
+> > 
+> > I think you mean WoL rather than suspend-to-RAM, although I don't see anything in micrel.c that hints
+> > that WoL is supported, so please explain why and how the PHY interrupt impacts suspend-to-RAM.
+> 
+> This is not WoL. During Suspend-to-RAM, the DDR goes into retention mode while
+> the CPU, SoC, and PHY power is cut off.
+> 
+> During resume, TF-A detects WARM_RESET, brings DDR out of retention, and jumps to
+> the PSCI resume path.
+> 
+> > 
+> > Note that a particular interrupt should not wake the system unless
+> > enable_irq_wake() has been called for that specific interrupt.
+> 
+> If PHY interrupts are not configured during resume, no link interrupt is received and the message:
+> "renesas-gbeth 11c30000.ethernet end0: Link is Up - 1Gbps/Full - flow control rx/tx"
+> is not seen, as shown in [1].
+
+... and why does that happen? Is it because the PHY has lost its
+interrupt configuration and that needs to be reprogrammed?
+
+If you don't disable the PHY interrupt in the suspend path, then
+will the call to drv->config_intr() via phy_init_hw() before
+phy_resume() be sufficient?
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
