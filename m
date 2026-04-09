@@ -1,184 +1,129 @@
-Return-Path: <netdev+bounces-277027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277028-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WCHZL9i712l0SAgAu9opvQ
-	(envelope-from <netdev+bounces-277027-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 16:46:48 +0200
+	id 6KoiDiK812l0SAgAu9opvQ
+	(envelope-from <netdev+bounces-277028-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 16:48:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id DABEC3CC2C8
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 16:46:47 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33BF03CC308
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 16:48:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id EE4543011539
-	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 14:46:10 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 9ECA230125BF
+	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 14:46:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E36512DF6E6;
-	Thu,  9 Apr 2026 14:46:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2FE62C0F81;
+	Thu,  9 Apr 2026 14:46:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D3MpEIG1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hct1Ub0c"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E1613D9DD8
-	for <netdev@vger.kernel.org>; Thu,  9 Apr 2026 14:46:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D8072E8B67;
+	Thu,  9 Apr 2026 14:46:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775745969; cv=none; b=THKnXeoTartuZi6G5blqomIb5mHUyKK8rrmP18VAIzXWfqCCdtBsiP9pJ01YYPoP2BSQWMmN1R5IlYrdNauUc9VfZJoUVaHCeFFB5s27FkqJq/385rQQjR5hRLNXh3aXCBWZcxPuMq3mOFlvkh2lZdloeqy5VO984DY29AjZnO4=
+	t=1775746014; cv=none; b=EEGM+VyBvf3ys2P16d793djWN5THC3/xnrKErzPVFtjxlvfJfvDm9I7mo8m61sxbgtrbsCx0LFkJIrH3s6btxEVN31ieqEqTOOl6dQvc27zoa8sgEO9pwxUsVaoYXccycO7TEi9DOM4sWP/ukJha9g2n5yI0EdCgY/qQOi78btc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775745969; c=relaxed/simple;
-	bh=Ck9x0AEIsBXVeWrdArtBGkWtubMxpneGNl7gdFnxyB0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uiAZ5jUMZX4aXEhaQXJCTcHPoYzQ3Wf1Zse5ls0WTv96ms4yeNhfB2VEJFt2u398dgt8ZMLQMMz6ntAurDriPIKHwiKrzP3zY1b3oc2Dpqng087JfjtxeL4BFJHR7NiuEuXP85+epnV5NwKWORCHaWU4rqXHVLufDTsyg3oprcg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D3MpEIG1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83B4BC4CEF7;
-	Thu,  9 Apr 2026 14:46:06 +0000 (UTC)
+	s=arc-20240116; t=1775746014; c=relaxed/simple;
+	bh=MWRPvqWJE3xA2jJ4RD9qh5JQEBLPLrluDPO+EOqmsyU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Sv3Pq+E+T2aVAzIdZ8KEOkPoKDDorcRuZ4SwGD9hB835I6Scm/I2ZRnLjTn519HNDQI+I1xJJ2lwOlT8wbT0GQdF+H9nxce/Ajw/Mn4uMTa8TuUicr6m1ifngIHkXmWp3/B9wC4i5K9iXzoCsX/LkVgiYR866/5nEXaKP8YXFSY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hct1Ub0c; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0620AC4CEF7;
+	Thu,  9 Apr 2026 14:46:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775745968;
-	bh=Ck9x0AEIsBXVeWrdArtBGkWtubMxpneGNl7gdFnxyB0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=D3MpEIG1tXzE1SVuxAvUTks3Cwt+rftajY4fGo9Cyk6dc2kE8q8x2Ss8f6Xz1XVMb
-	 WFB9ytzfTdJ3DL4HlFSL0/YG0YCjFNydOBg8h4ox1SbEB38blS6hBOUpImuzHhPOJV
-	 MWCFa1+nGveaOU188AyBHtAIAr7AG8186R2C3DweBVVhxiT98/2KTfnVaoipl6T2nI
-	 R6XVBh8Hg6vYUvYEgFYhkvjPAMEE/jjAZXP8y/ODptbd+RzlRDjdtIPDCcpuLX3pY5
-	 yYBvvZcFb+fUe05j10ZdmCv50yMIQtsevk3N07aYC1a3b0OzM8byo0wufRXt98jWcK
-	 02ooqvFhGLI7A==
-Date: Thu, 9 Apr 2026 15:46:03 +0100
-From: Simon Horman <horms@kernel.org>
-To: Yiqi Sun <sunyiqixm@gmail.com>
-Cc: jchapman@katalix.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org
-Subject: Re: [PATCH net] l2tp: take a session reference in pppol2tp_ioctl()
-Message-ID: <20260409144603.GN469338@kernel.org>
-References: <20260404133245.2391409-1-sunyiqixm@gmail.com>
+	s=k20201202; t=1775746012;
+	bh=MWRPvqWJE3xA2jJ4RD9qh5JQEBLPLrluDPO+EOqmsyU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=hct1Ub0cUqGtcoDmroWTiH9bQTyxS0NmRBoS9S2fQsDOfQVvVaOyoDBqKduJlkNLM
+	 PvP7ah94baRd9SYPjM042a/d9WZizYNn0YCxPhMxTfQ4II5pdefm4yM4hJkXSN81OT
+	 sploUQ5KcsitLKWIWqIKeaKXJTG5eUDcF57DNTVrF+S+4PBKomZUTGvUkpwkUgwlTE
+	 qA6LwFZkZxESWmMLike75gMvhkB0bbjXKL9eJTpsFh7SE3ATOqjFgWeaVMsvNcvO0H
+	 w1Oh8v8pnusJQoebbIxLSWD8fzVRQ7I+8+y4n9QXab8X6Q5/SN2poTWrF5b9MJwLTU
+	 TRK9DOM0udX2Q==
+Date: Thu, 9 Apr 2026 07:46:51 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, davem@davemloft.net,
+ razor@blackwall.org, pabeni@redhat.com, willemb@google.com,
+ sdf@fomichev.me, john.fastabend@gmail.com, martin.lau@kernel.org,
+ jordan@jrife.io, maciej.fijalkowski@intel.com, magnus.karlsson@intel.com,
+ dw@davidwei.uk, toke@redhat.com, yangzhenze@bytedance.com,
+ wangdongdong.6@bytedance.com
+Subject: Re: [PATCH net-next v11 03/14] net: Add lease info to queue-get
+ response
+Message-ID: <20260409074651.2e58b3dd@kernel.org>
+In-Reply-To: <5a5feea9-7675-4ccf-aa8e-3a2e476ce8f5@iogearbox.net>
+References: <20260402231031.447597-1-daniel@iogearbox.net>
+	<20260402231031.447597-4-daniel@iogearbox.net>
+	<20260407204017.3fc79d1b@kernel.org>
+	<b9a046f8-cb02-4d54-9a7e-e8213339d720@iogearbox.net>
+	<20260408151251.72bd2482@kernel.org>
+	<731d2749-abf6-403c-a1f4-ffe9c8d1e8ad@iogearbox.net>
+	<5a5feea9-7675-4ccf-aa8e-3a2e476ce8f5@iogearbox.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260404133245.2391409-1-sunyiqixm@gmail.com>
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_FROM(0.00)[bounces-277027-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-277028-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,blackwall.org,redhat.com,google.com,fomichev.me,gmail.com,kernel.org,jrife.io,intel.com,davidwei.uk,bytedance.com];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: DABEC3CC2C8
+X-Rspamd-Queue-Id: 33BF03CC308
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sat, Apr 04, 2026 at 09:32:45PM +0800, Yiqi Sun wrote:
-> pppol2tp_ioctl() reads sock->sk->sk_user_data and dereferences the
-> returned l2tp_session without taking a reference on it.
-> 
-> Since the ppp socket/session lifetime rework, session teardown runs
-> asynchronously and can clear sk_user_data and drop the last session
-> reference in parallel with ioctl(). This leaves ioctl() with a stale
-> session pointer and can trigger a use-after-free.
-> 
-> Fix this by using pppol2tp_sock_to_session() in pppol2tp_ioctl() and
-> dropping the session reference before returning. This matches the
-> existing getsockopt/setsockopt paths.
-> 
-> Fixes: c5cbaef992d64 ("l2tp: refactor ppp socket/session relationship")
-> Signed-off-by: Yiqi Sun <sunyiqixm@gmail.com>
-> ---
->  net/l2tp/l2tp_ppp.c | 88 +++++++++++++++++++++++++++------------------
->  1 file changed, 54 insertions(+), 34 deletions(-)
-> 
-> diff --git a/net/l2tp/l2tp_ppp.c b/net/l2tp/l2tp_ppp.c
-> index ae4543d5597b..e6d7d3537180 100644
-> --- a/net/l2tp/l2tp_ppp.c
-> +++ b/net/l2tp/l2tp_ppp.c
-> @@ -1042,66 +1042,79 @@ static int pppol2tp_tunnel_copy_stats(struct pppol2tp_ioc_stats *stats,
->  static int pppol2tp_ioctl(struct socket *sock, unsigned int cmd,
->  			  unsigned long arg)
->  {
-> +	struct sock *sk = sock->sk;
->  	struct pppol2tp_ioc_stats stats;
->  	struct l2tp_session *session;
-> +	int err;
-> +
-> +	err = -ENOTCONN;
-> +	if (!sk->sk_user_data)
-> +		goto end;
+On Thu, 9 Apr 2026 15:52:42 +0200 Daniel Borkmann wrote:
+> >> Signed-off-by: Jakub Kicinski <kuba@kernel.org>  
+> > Thanks for looking into it! That looks good to me. I've also retested that
+> > it still works.
+> > 
+> > Maybe small nits could be below to move the netif_is_queue_leasee into the
+> > netdev_rx_queue.h header since its used outside of core and it might be
+> > worth to also have the lock assertion in netdev_queue_get_dma_dev.
 
-I think it would be cleaner to simply:
+I suspected it may irk you :) No strong preference on the placement.
+We do include the ../core/dev.h in a couple of places but agreed that
+it is slightly ugly.
 
-		return -ENOTCONN;
+> > Do you want me to add your patch on top for a v12 of the series?
 
-> +
-> +	err = -EBADF;
-> +	session = pppol2tp_sock_to_session(sk);
-> +	if (!session)
-> +		goto end;
+Yes, please. Let's get it into 7.1. 
 
-And, similarly here.
+I think the test has to be reworked but of the available options seems
+like merging it as is and following up quickly is the best. I've only
+set up the container testing in our CI yesterday anyway so there may
+be more things that need changing in the test as we gain experience :S
 
-...
-
-> @@ -1111,15 +1124,22 @@ static int pppol2tp_ioctl(struct socket *sock, unsigned int cmd,
->  		stats.tunnel_id = session->tunnel->tunnel_id;
->  		stats.using_ipsec = l2tp_tunnel_uses_xfrm(session->tunnel);
->  
-> -		if (copy_to_user((void __user *)arg, &stats, sizeof(stats)))
-> -			return -EFAULT;
-> +		if (copy_to_user((void __user *)arg, &stats, sizeof(stats))) {
-> +			err = -EFAULT;
-> +			goto end_put_sess;
-> +		}
-> +		err = 0;
->  		break;
->  
->  	default:
-> -		return -ENOIOCTLCMD;
-> +		err = -ENOIOCTLCMD;
-
-I would suggest a goto here.
-
-> +		break;
->  	}
->  
-
-And setting err = 0 here, rather than in multiple places above.
-
-> -	return 0;
-> +end_put_sess:
-
-I think "out_put_session" would be a slightly better name for this label.
-
-> +	l2tp_session_put(session);
-> +end:
-> +	return err;
->  }
->  
->  /*****************************************************************************
-> -- 
-> 2.34.1
-> 
 
