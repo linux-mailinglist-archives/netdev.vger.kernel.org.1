@@ -1,185 +1,148 @@
-Return-Path: <netdev+bounces-276839-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276840-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cPjJNvci12ntKwgAu9opvQ
-	(envelope-from <netdev+bounces-276839-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 05:54:31 +0200
+	id cLMDEDkl12kiLAgAu9opvQ
+	(envelope-from <netdev+bounces-276840-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 06:04:09 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E7D33C61E6
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 05:54:31 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF5603C622F
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 06:04:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 65263300F5FE
-	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 03:54:28 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B76DF30173A8
+	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 04:04:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6D1A37104C;
-	Thu,  9 Apr 2026 03:54:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8FEC1FAC42;
+	Thu,  9 Apr 2026 04:04:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mhyKhlJG"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="el9z2OBb"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
+Received: from canpmsgout08.his.huawei.com (canpmsgout08.his.huawei.com [113.46.200.223])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C647E36EA9A
-	for <netdev@vger.kernel.org>; Thu,  9 Apr 2026 03:54:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06D354A35;
+	Thu,  9 Apr 2026 04:04:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.223
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775706867; cv=none; b=D11hekoL8/CTZOWItsMX0qUkcv3ci5LvRORX9y8+DfUck86ZCmfIe5bG9Zj9rO/yi4En4OysTaQsO0tojfazKHpUIgTBP2ZTriNi6HxWwBTElSktMRWIe307jXLLunr9pNkkjxDeR6/ppzicW8k0/InrkgLbi7Xe6Y2cF7pjAzc=
+	t=1775707445; cv=none; b=c4TBx8zT6z7BpFzRQtyo1REJNXlep00EqJevfkW8/RqwhHeWvkD5Ed5Z/BMQFSmwdOQdzGGIhsbfWoBkMnnouI7P/CWGGI1lfUO295f7A63t3AJmSo1kNpomikzegXtUByfeJsjgeC6MWDQMOt3jFO4yjzKKJpN5vXuC2demu+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775706867; c=relaxed/simple;
-	bh=Jbs4PD9pBuyZ/k04H6gAL9IMQftAAPsydvMFDezt3Mo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sEtsipsWypHjtUGIJro2Xd0yoKSAnNcVaF7OLyzTgzC5XbnClWH785INMDi0zVWflyXvl92E/7Uz46kVa5i6PmTwtdVbvPhJfiZ+RE0yRxtvWJ3Z1ul5hP1yBzhG/JqETWckuEzOTf2pRXF83xcC4L7xa/jAxEWgtWPjK7FNhaA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mhyKhlJG; arc=none smtp.client-ip=91.218.175.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1775706853;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=f+uIdvNv559zfYY9XiHAQzaBvGDZyQXDoiCkabS6QEI=;
-	b=mhyKhlJGsH9UhWxddZPQmF7Gsmp5xr+CIoGiOoUc2pdtC49dQpDURAFzOgHL6WNSmJGy3b
-	0M1wv8HFk5HN5gr54Qnn4dOcWuJFbxmYDD3eN4Itc7NCUA/V7LOkhsIgxoXUfiHLYK7GH3
-	Ue6N+PSgdFZLram9xRv21ltlZqvDHTg=
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-To: netdev@vger.kernel.org
-Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Clark Williams <clrkwllms@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Weiming Shi <bestswngs@gmail.com>,
-	linux-kernel@vger.kernel.org,
-	linux-rt-devel@lists.linux.dev
-Subject: [PATCH net] net: fix __this_cpu_add() in preemptible code in dev_xmit_recursion_inc/dec
-Date: Thu,  9 Apr 2026 11:53:43 +0800
-Message-ID: <20260409035344.214279-1-jiayuan.chen@linux.dev>
+	s=arc-20240116; t=1775707445; c=relaxed/simple;
+	bh=xkNRkKhYozl5VFDwEt/FsJv4EP98oP5zZC4JZ4maLnc=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=oYjWkuOK0rf297qyo49r03G5YqS6+ktXkt8eep6AUQLv0/UKVY9LLQ10KZEUVhhFhoB/nQgGIcg/M/A1iaeer5g1qcepR2+mTCfTcGQAJnrrhzk6IS3M+FSprvNkI9dAmyo+t/7xcx2Lc0yMlIYzNUI3T40V1feMJXgNmC494oQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=el9z2OBb; arc=none smtp.client-ip=113.46.200.223
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=XGowp3X4zGzDAYt5cRM9/V9fvsjxmXKIfFOYdzzA4TI=;
+	b=el9z2OBbyIbvH1r31HLTFkpsNPWttG7koMnjsy24DlQPZLKAAlD2hs826Mt0+pSd1pA2QM1nO
+	IlrE2lVlwJr25nSHMtIINZl6lKqcgztJkrqU3lrkTEm+Y7O2ga2foB3eR7JfRIysgO+ay+AUL2D
+	8UyLUy2xCai5lUEwvcYEi08=
+Received: from mail.maildlp.com (unknown [172.19.163.15])
+	by canpmsgout08.his.huawei.com (SkyGuard) with ESMTPS id 4frmNm48DgzmV8Q;
+	Thu,  9 Apr 2026 11:57:44 +0800 (CST)
+Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 9130440539;
+	Thu,  9 Apr 2026 12:04:00 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.36; Thu, 9 Apr 2026 12:03:59 +0800
+Message-ID: <18967454-0af4-44e5-98ba-11af95ef505f@huawei.com>
+Date: Thu, 9 Apr 2026 12:03:58 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, <davem@davemloft.net>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <shenjian15@huawei.com>,
+	"liuyonglong@huawei.com" <liuyonglong@huawei.com>, "chenhao (EZ)"
+	<chenhao418@h-partners.com>, yangshuaisong <yangshuaisong@h-partners.com>
+Subject: Re: [PATCH net-next 0/2] net: ethtool add VxLAN to the NFC API
+To: Jakub Kicinski <kuba@kernel.org>
+References: <20220817143538.43717-1-huangguangbin2@huawei.com>
+ <20220817111656.7f4afaf3@kernel.org>
+ <5062c7ae-3415-adf6-6488-f9a05177d2c2@huawei.com>
+ <20220822095327.00b4ebd5@kernel.org>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <20220822095327.00b4ebd5@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
+ kwepemk100013.china.huawei.com (7.202.194.61)
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[linux.dev,davemloft.net,google.com,kernel.org,redhat.com,lunn.ch,linutronix.de,goodmis.org,gmail.com,vger.kernel.org,lists.linux.dev];
-	RCVD_COUNT_THREE(0.00)[3];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-276839-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-276840-lists,netdev=lfdr.de];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[huawei.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	NEURAL_HAM(-0.00)[-0.998];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[shaojijie@huawei.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:dkim,linux.dev:email,linux.dev:mid]
-X-Rspamd-Queue-Id: 3E7D33C61E6
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,huawei.com:dkim,huawei.com:mid]
+X-Rspamd-Queue-Id: EF5603C622F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-dev_xmit_recursion_inc/dec() use __this_cpu_inc/dec() which requires
-migration to be disabled. However, some callers like SCTP's UDP
-encapsulation path invoke iptunnel_xmit() from process context without
-disabling BH or preemption:
 
-  sctp_inet_connect -> __sctp_connect -> sctp_do_sm ->
-  sctp_outq_flush -> sctp_packet_transmit -> sctp_v4_xmit ->
-  udp_tunnel_xmit_skb -> iptunnel_xmit -> dev_xmit_recursion_inc
+on 2022/8/23 0:53, Jakub Kicinski wrote:
+> On Mon, 22 Aug 2022 22:46:14 +0800 huangguangbin (A) wrote:
+>
+> I understand your motivation and these are very valid points.
+> However, we have to draw the line somewhere. We have at least
+> three ways of configuring flow offloads (ethtool, nft, tc).
+> Supporting all of them is a lot of work for the drivers, leading
+> to a situation where there's no "standard Linux API" because each
+> vendor picks a slightly different approach :(
+> TC seems the most popular because of the OVS offload, so my preference
+> is to pick it over the other APIs.
 
-This triggers the following warning on PREEMPT(full) kernels:
 
-  BUG: using __this_cpu_add() in preemptible [00000000]
-  caller is dev_xmit_recursion_inc include/linux/netdevice.h:3595 [inline]
-  caller is iptunnel_xmit+0x1cd/0xb80 net/ipv4/ip_tunnel_core.c:72
-  Tainted: [L]=SOFTLOCKUP
-  Call Trace:
-   <TASK>
-   __dump_stack lib/dump_stack.c:94 [inline]
-   dump_stack_lvl+0x100/0x190 lib/dump_stack.c:120
-   check_preemption_disabled+0xd8/0xe0 lib/smp_processor_id.c:47
-   dev_xmit_recursion_inc include/linux/netdevice.h:3595 [inline]
-   iptunnel_xmit+0x1cd/0xb80 net/ipv4/ip_tunnel_core.c:72
-   sctp_v4_xmit+0x75f/0x1060 net/sctp/protocol.c:1073
-   sctp_packet_transmit+0x22ec/0x3060 net/sctp/output.c:653
-   sctp_packet_singleton+0x19e/0x370 net/sctp/outqueue.c:783
-   sctp_outq_flush_ctrl net/sctp/outqueue.c:914 [inline]
-   sctp_outq_flush+0x315/0x3350 net/sctp/outqueue.c:1212
-   sctp_cmd_interpreter net/sctp/sm_sideeffect.c:1824 [inline]
-   sctp_side_effects net/sctp/sm_sideeffect.c:1204 [inline]
-   sctp_do_sm+0xce1/0x5be0 net/sctp/sm_sideeffect.c:1175
-   sctp_primitive_ASSOCIATE+0x9c/0xd0 net/sctp/primitive.c:73
-   __sctp_connect+0x9fc/0xc70 net/sctp/socket.c:1235
-   sctp_connect net/sctp/socket.c:4818 [inline]
-   sctp_inet_connect+0x15f/0x220 net/sctp/socket.c:4833
-   __sys_connect_file+0x141/0x1a0 net/socket.c:2089
-   __sys_connect+0x141/0x170 net/socket.c:2108
-   __do_sys_connect net/socket.c:2114 [inline]
-   __se_sys_connect net/socket.c:2111 [inline]
-   __x64_sys_connect+0x72/0xb0 net/socket.c:2111
-   do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-   do_syscall_64+0x106/0xf80 arch/x86/entry/syscall_64.c:94
-   entry_SYSCALL_64_after_hwframe+0x77/0x7f
+Hi, Jakub,
 
-Fix this by adding migrate_disable/enable() around the __this_cpu
-operations in dev_xmit_recursion_inc/dec() to ensure the per-cpu
-variable is accessed on the same CPU throughout the inc/dec pair.
+I have recently taken over this job and used tc flow to configure flow steering to a specific queue.
+Currently, the community already supports FLOW_ACTION_RX_QUEUE_MAPPING, so the previously discussed issue no longer exists.
 
-Fixes: 6f1a9140ecda ("net: add xmit recursion limit to tunnel xmit functions")
-Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
----
- include/linux/netdevice.h | 5 +++++
- 1 file changed, 5 insertions(+)
+However, we have encountered new problems:
+1. First, the driver does not support FLOW_ACTION_REDIRECT, and the NIC is not a switching device.
+     Therefore, I personally think that the driver does not need to implement switchdev.
+2. However, the VF itself supports flow rules, and its capabilities are the same as those of the PF.
+     The VF supports drop and select_queue, and the VF rules are configured through the PF.
+3. However, it seems that tc flow does not have a proper parameter to specify the vf_id to tell the PF
+     which VF to configure the rules for.
 
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 7ca01eb3f7d2..6b1cd5380d70 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -3591,14 +3591,19 @@ static inline bool dev_xmit_recursion(void)
- 			XMIT_RECURSION_LIMIT);
- }
- 
-+/* Non PREEMPT_RT version: inc and dec must run on the same CPU,
-+ * migrate_disable is sufficient.
-+ */
- static inline void dev_xmit_recursion_inc(void)
- {
-+	migrate_disable();
- 	__this_cpu_inc(softnet_data.xmit.recursion);
- }
- 
- static inline void dev_xmit_recursion_dec(void)
- {
- 	__this_cpu_dec(softnet_data.xmit.recursion);
-+	migrate_enable();
- }
- #else
- static inline int dev_recursion_level(void)
--- 
-2.43.0
+Therefore, we have encountered a problem in supporting tc flow for the VF.
+A feasible idea is to use chain_index to indicate the vf_id.
+However, this changes the original meaning of chain_index, which may cause confusion.
+Or perhaps I missed some feature about vf in TC Flow?
+
+I'd appreciate your insights on how to proceed.
+Are there existing mechanisms or planned extensions to address VF-specific rule configuration?
+
+Thanks,
+Jijie Shao
+
 
 
