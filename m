@@ -1,167 +1,170 @@
-Return-Path: <netdev+bounces-276868-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276871-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0JFaAttX12kFMggAu9opvQ
-	(envelope-from <netdev+bounces-276868-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 09:40:11 +0200
+	id 8I9+GrVZ12lqMwgAu9opvQ
+	(envelope-from <netdev+bounces-276871-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 09:48:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EE063C7242
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 09:40:10 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59EF93C73BA
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 09:48:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 678A6300BC8C
-	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 07:37:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B9ACB3047BD7
+	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 07:44:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06D062FFF81;
-	Thu,  9 Apr 2026 07:37:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5C42382291;
+	Thu,  9 Apr 2026 07:44:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CNamPitt"
+	dkim=pass (1024-bit key) header.d=sina.cn header.i=@sina.cn header.b="NWP66BLk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp134-31.sina.com.cn (smtp134-31.sina.com.cn [180.149.134.31])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB01E2F6596
-	for <netdev@vger.kernel.org>; Thu,  9 Apr 2026 07:37:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.171
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775720262; cv=pass; b=nRj8sV46blk/T9marOKU4yakLEDwkCavnIsyrXx4HqpkGUvH9WZnwQ+hR9G0x2CHmJC7PrANsgC6u3qrIEJiaQw/3uDlTRGau4+qcH7xVnqK3Nqt8n7BLZAlEBeWhZLe2a17ihD+WVjbLAIvYT7q009q0w5+SZPdrCP8Rj3a/iI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775720262; c=relaxed/simple;
-	bh=P5kE5PxQ4c70rwOzGc/tYdY0towP0QgFM2GF+sDzvu0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EO7es/Vu2Grt882tIfLj9bumhTnjrHAQEL/EuCby/ovLZYXrHSxqHphYESnd6YVgrtTEArerhGTDBbWJ4ufRa3PIyMGEeicjbYBE7K8zwFdN4WGE50730JydvY7YZGRIK/fZnxqQ+BpoMzu5iuWJ5MztoecafcHaJty/EPwfFJ0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CNamPitt; arc=pass smtp.client-ip=209.85.160.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-50d880e6fbbso5038191cf.0
-        for <netdev@vger.kernel.org>; Thu, 09 Apr 2026 00:37:41 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1775720260; cv=none;
-        d=google.com; s=arc-20240605;
-        b=M5MF8pd8R+m8eJXvk9TadKDpkU5lxJ6AxAVkW3mM8bsmnf/3+eUnadF8yJLaWtQnyD
-         uvSMQfqyoaer5ns2c5VLWVbOb4JyEdklFwsPwCBsRb/KiZvPnjo1LxEIu+C0+8wEZRwO
-         MVRpOg8Mamsl9OO5iP3X1rgn6HzFf5roOO0tcnrUYxv0HkEmAWhp186P9pXyIH4Frwl2
-         oh+eFVUessfGvIYK5Cv2XPJWWAd9HjJqxerfhGDGAY1DHbQ+k3snYUVdhCM6RwcneETn
-         lHDM0/u6NqhntI+TljT7ppiRVsbRFBsX0BAxFlsV9/6xWJz0W8Wfkj8GIrdOR2iRPSEp
-         XLjQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=P5kE5PxQ4c70rwOzGc/tYdY0towP0QgFM2GF+sDzvu0=;
-        fh=Hu20O8JJR57SGHtxYv9B3NgSiV5rHKRzGYPLSd7KKj0=;
-        b=SJjz6OJOZIgUOZCPJzoJTtyuF6aN0gL1q6/t/EWZ8mvA7tMDK6pmjxWqHH9vbr56RR
-         +vNCl3NsKe9ZeWJZO9fkIOyDm8qt+lIL7CBk05PGzya/Q0xQxJwTT4f/5pGMI/KL9wrs
-         ADsUBRJDJ0zXt7Cpx6DVBHlYPkoU9C2Y/8l0gwNMcpo88ZjyKCimvAyNIAfKPRiuRc28
-         HZHw+QPzlBfMFQrp5u4fwNWD5v1bF9sz1KCsgg4tT4C5KBWn9V0GDhXKDhyzbvoI6emT
-         5pD7hTUAC9+MM47Bv4ue/LsovELw+UV3HPKPdrVA1IjtfmEEXK4Hp23M8mVviuJn9Qaq
-         zr7g==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1775720260; x=1776325060; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=P5kE5PxQ4c70rwOzGc/tYdY0towP0QgFM2GF+sDzvu0=;
-        b=CNamPitt582jQiispQUSPTxUoqXUAuE6Fov8PkxMOlfAQGS/MSZ5JU3R8LtDhta6Wb
-         N6wBrfFqvOyvPcvJQm5FtPDP/cgmjHj0fQaMm+fsUteeEL4lSGSwPstOaF9gQe7aqka9
-         +tZzvULwbJRlsBK/a/lWT9rLz0Rfj+PfBCQYx515UEY5cNG9Cm5vRK25sRRvISgy0D9Z
-         hTnOJIbtB20RK63Q6kNNlo9dORcOXczbEGE2TcKL2P3Dp4l6jV0VjrXYfWqkT32PGejY
-         Gjffs9aW37A/JQxCVhx/eIzRcP/o2lYMH1BwB9qosULgPfabHM/D8U7KqZbrpU/IkagM
-         1edg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775720260; x=1776325060;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=P5kE5PxQ4c70rwOzGc/tYdY0towP0QgFM2GF+sDzvu0=;
-        b=WL0C82rCN87BqKzAuMtK5QqmrHKMKiTKqWF+O8qrBnmN/CRnKBSwYzDprR43MzKSMS
-         oaxRAG4Px2wQB8BvWWlubJCFdss0YLKoqyr9pqzuF6NRW/J4JZVR9CEWlk7iGLDXPHGj
-         V/CTMD+Zf3xYMd+8VIfXC1vNugjTaIGQEc6QGAIY8NHXsWZo0GjYODOGe0ms79zmQPTH
-         k/XPhA6BAJH/BIl4CiU2oly8fb52yP8inKBV6QBuBnDXO3/2IefHxtBcxwbZCBd9Eu42
-         ampL/Q3mP0R6lCu2KAOdt0Btu2x19+3q5tEc2BRfzY/j5jRogG1bz+poQb8INmBshkCO
-         /SLA==
-X-Gm-Message-State: AOJu0YwqfshQH7QY/ZKdhgx8LwM+G9hgE+c6dXX0rQoNFG8sO/6mnO4s
-	JQXREOqLltOEW0uQQrQ9QpSrkjoWNBobz2TCPd1FGqEhRBZRT+vmnT2tT8U9NrgymVoM6INYdbh
-	vWHgpzpBdcdsblgi6s5RPr2BSmlAcPCy1OhflDXFZ
-X-Gm-Gg: AeBDiet1T8JBu7MVpP4LZfGlJD23LJi8qmv7/pDNqE9+4H7hn0Sz5mmwp3aPkUSJGjF
-	njHpsFEb7wEI6IrCUKAawSDrp7MfKJ20gWg9XpJu91d3L300clH2oin0zO7uI6iDUAQxnN2dNmb
-	ZtOq8/fx6NeWZ3o3T4EpCsXBh2LOdHcuTOUw56wUjLcGlUWPxwRgyc3WrbJdXGyH4tsPKElhVtC
-	9E1r7rcQ+F9MQJfe002JtL4dvWOk0r2na13MGEVkiulasiGIu2RQOFoz0PZDNAsEHj7rDZ/i0fJ
-	E56TcZg=
-X-Received: by 2002:a05:622a:1494:b0:50d:3efd:bd93 with SMTP id
- d75a77b69052e-50dc1a19bdfmr32962161cf.11.1775720260108; Thu, 09 Apr 2026
- 00:37:40 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5023E37C939
+	for <netdev@vger.kernel.org>; Thu,  9 Apr 2026 07:44:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.149.134.31
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775720681; cv=none; b=j7hvCgGKIsaYegRUFoiJjd3oTjS+wi78KhndlmxwQD3vxGa6mXPfeMo1vw8SZkrqHQw8zA8GnNkmkWrdy2f1UfFYP1iacDLg1N3HpNknsAgcQmeahmYa3qn5V1P5ZS5ZO9Ii6bjmwR5G5Xi/ASuTziHQbB7IpC5ligPRXrzkCow=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775720681; c=relaxed/simple;
+	bh=f0DDryUDANCVJdeh2y1ARDxV4C4xuBi4Rc6Sb9agruM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=unbXQrxDSMzUJ56jgKgP/wmzJGyP6TkPdQYl80YQrh+PSj66w0lwug9b+XFWsp6xMwT0Z+rytaPrkN7jEkjdURvcsvNIZLZBcGKEkKLSRZuYHbd1GHafTsKDFOF0IbszC8j7QXlGR80AaeCcS/ivV+esa1EO3TaRktG8iGCPOjE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.cn; spf=pass smtp.mailfrom=sina.cn; dkim=pass (1024-bit key) header.d=sina.cn header.i=@sina.cn header.b=NWP66BLk; arc=none smtp.client-ip=180.149.134.31
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.cn
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.cn; s=201208; t=1775720674;
+	bh=N6N2PGq6dFDonMyCZBS+lQxmTRjyaDG+D6z3I54ANUk=;
+	h=From:Subject:Date:Message-Id;
+	b=NWP66BLkow3gCDFwmvzk0+7NWVQbHUsjNJTSeucOSjG8lPzfGM/eoi9xQ5fel0I/u
+	 8GG5SAOQKMYnFSSB+9z5npqyuVHab60tNz4of8ZJdQdV2Nh/tyeMCvUaAQfQ2Nuwgs
+	 Mg2jfBlA7UACCkQdoDrI4eZphU+Op7oGsYCgSoNI=
+X-SMAIL-HELO: NTT-kernel-dev
+Received: from unknown (HELO NTT-kernel-dev)([60.247.85.88])
+	by sina.cn (10.185.250.21) with ESMTP
+	id 69D758DD00006C49; Thu, 9 Apr 2026 15:44:31 +0800 (CST)
+X-Sender: jianqkang@sina.cn
+X-Auth-ID: jianqkang@sina.cn
+Authentication-Results: sina.cn;
+	 spf=none smtp.mailfrom=jianqkang@sina.cn;
+	 dkim=none header.i=none;
+	 dmarc=none action=none header.from=jianqkang@sina.cn
+X-SMAIL-MID: 6999273408359
+X-SMAIL-UIID: 7E8DE10F63EF47689E1EDF482DBA0A2B-20260409-154431-1
+From: Jianqiang kang <jianqkang@sina.cn>
+To: gregkh@linuxfoundation.org,
+	stable@vger.kernel.org,
+	imv4bel@gmail.com
+Cc: patches@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	marcel@holtmann.org,
+	johan.hedberg@gmail.com,
+	luiz.dentz@gmail.com,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	luiz.von.dentz@intel.com
+Subject: [PATCH 5.10.y] Bluetooth: SCO: Fix use-after-free in sco_recv_frame() due to missing sock_hold
+Date: Thu,  9 Apr 2026 15:44:29 +0800
+Message-Id: <20260409074429.740279-1-jianqkang@sina.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260408100044.4530-1-fmancera@suse.de>
-In-Reply-To: <20260408100044.4530-1-fmancera@suse.de>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 9 Apr 2026 00:37:28 -0700
-X-Gm-Features: AQROBzAv8HMMj4xFBXAnkQ3mvA6XxpyYG00DMzft7prExdsaTbsY-tCZhRA6cis
-Message-ID: <CANn89i+k8XDOYuY_8=CQJ-xSFQy9-5W4cf379NWw=e8tmu__SA@mail.gmail.com>
-Subject: Re: [PATCH net v2] net_sched: fix skb memory leak in deferred qdisc drops
-To: Fernando Fernandez Mancera <fmancera@suse.de>
-Cc: netdev@vger.kernel.org, horms@kernel.org, pabeni@redhat.com, 
-	kuba@kernel.org, davem@davemloft.net, Damilola Bello <damilola@aterlo.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[sina.cn,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[sina.cn:s=201208];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-276868-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-276871-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[linuxfoundation.org,vger.kernel.org,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[lists.linux.dev,vger.kernel.org,holtmann.org,gmail.com,davemloft.net,kernel.org,intel.com];
+	DKIM_TRACE(0.00)[sina.cn:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jianqkang@sina.cn,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[sina.cn];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,suse.de:email,aterlo.com:email]
-X-Rspamd-Queue-Id: 5EE063C7242
+	NEURAL_HAM(-0.00)[-0.995];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email,sina.cn:dkim,sina.cn:email,sina.cn:mid]
+X-Rspamd-Queue-Id: 59EF93C73BA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Apr 8, 2026 at 3:01=E2=80=AFAM Fernando Fernandez Mancera
-<fmancera@suse.de> wrote:
->
-> When the network stack cleans up the deferred list via qdisc_run_end(),
-> it operates on the root qdisc. If the root qdisc do not implement the
-> TCQ_F_DEQUEUE_DROPS flag the packets queue to free are never freed and
-> gets stranded on the child's local to_free list.
->
-> Fix this by making qdisc_dequeue_drop() aware of the root qdisc. It
-> fetches the root qdisc and check for the TCQ_F_DEQUEUE_DROPS flag. If
-> the flag is present, the packet is appended directly to the root's
-> to_free list. Otherwise, drop it directly as it was done before the
-> optimization was implemented.
->
-> Fixes: a6efc273ab82 ("net_sched: use qdisc_dequeue_drop() in cake, codel,=
- fq_codel")
-> Reported-by: Damilola Bello <damilola@aterlo.com>
-> Closes: https://lore.kernel.org/netdev/CAPgFtOLaedBMU0f_BxV2bXftTJSmJr018=
-Q5uozOo5vVo6b9tjw@mail.gmail.com/
-> Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
-> ---
+From: Hyunwoo Kim <imv4bel@gmail.com>
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+[ Upstream commit 598dbba9919c5e36c54fe1709b557d64120cb94b ]
 
-Thanks !
+sco_recv_frame() reads conn->sk under sco_conn_lock() but immediately
+releases the lock without holding a reference to the socket. A concurrent
+close() can free the socket between the lock release and the subsequent
+sk->sk_state access, resulting in a use-after-free.
+
+Other functions in the same file (sco_sock_timeout(), sco_conn_del())
+correctly use sco_sock_hold() to safely hold a reference under the lock.
+
+Fix by using sco_sock_hold() to take a reference before releasing the
+lock, and adding sock_put() on all exit paths.
+
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Signed-off-by: Jianqiang kang <jianqkang@sina.cn>
+---
+ net/bluetooth/sco.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index ce084a184a1c..c441e5225458 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -305,7 +305,7 @@ static void sco_recv_frame(struct sco_conn *conn, struct sk_buff *skb)
+ 	struct sock *sk;
+ 
+ 	sco_conn_lock(conn);
+-	sk = conn->sk;
++	sk = sco_sock_hold(conn);
+ 	sco_conn_unlock(conn);
+ 
+ 	if (!sk)
+@@ -314,11 +314,15 @@ static void sco_recv_frame(struct sco_conn *conn, struct sk_buff *skb)
+ 	BT_DBG("sk %p len %d", sk, skb->len);
+ 
+ 	if (sk->sk_state != BT_CONNECTED)
+-		goto drop;
++		goto drop_put;
+ 
+-	if (!sock_queue_rcv_skb(sk, skb))
++	if (!sock_queue_rcv_skb(sk, skb)) {
++		sock_put(sk);
+ 		return;
++	}
+ 
++drop_put:
++	sock_put(sk);
+ drop:
+ 	kfree_skb(skb);
+ }
+-- 
+2.34.1
+
 
