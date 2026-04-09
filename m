@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-276849-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276850-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YAPzEkZI12nDMAgAu9opvQ
-	(envelope-from <netdev+bounces-276849-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 08:33:42 +0200
+	id qNt0DIRJ12neMAgAu9opvQ
+	(envelope-from <netdev+bounces-276850-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 08:39:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 169D43C69CC
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 08:33:41 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE2683C6A23
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 08:38:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 27A30300E03F
-	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 06:33:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EA9763033A95
+	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 06:38:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56059339719;
-	Thu,  9 Apr 2026 06:33:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 809FB33F5B4;
+	Thu,  9 Apr 2026 06:38:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cyphar.com header.i=@cyphar.com header.b="mWkhiJrl"
+	dkim=pass (2048-bit key) header.d=cyphar.com header.i=@cyphar.com header.b="its3yjgm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
+Received: from mout-p-103.mailbox.org (mout-p-103.mailbox.org [80.241.56.161])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C54FA33F59B;
-	Thu,  9 Apr 2026 06:33:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C80B033F589;
+	Thu,  9 Apr 2026 06:38:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.161
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775716416; cv=none; b=oJeZJxyhGn+JqwWTi8SPUZ01lEo2YZjRzDq1JR38duKvW8pA7wcn0Hp0BSnDL5lcXT1P+isVDROZXd6C/FU6cYO+C8tfnmEff8o/FVSTllvtXP8NN580o9eKjHiD38+spKmCDKjSIdE80BAYNXBah2n3l1qsJFvzbYEni2kUjNk=
+	t=1775716702; cv=none; b=FIaWGLYgH+24M3uQAQgOTdYZC+dDN8vCEfUsbS/bJv72ZzeguC/9mAcUMqv80T7k4dDNX8D1FQzUa1ewPHk+r/yuH9uaOENNd6hR9swRT3oPLCEQIT5GYsHvCKd3/iDxS6YTEDyKsyVVw3z0CUH1oohkUtOhtQXiHtV0RO0UwSE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775716416; c=relaxed/simple;
-	bh=BndKMO1J0bsDgk/kZD08S1uS+ayoaxEG5ezN2FA+njY=;
+	s=arc-20240116; t=1775716702; c=relaxed/simple;
+	bh=UbtnkNkXhcu7zDaD2XSUnj7iooAkmSP+91mYLW03E50=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IBjBZi0fvJyzDVsxgGAlTf/zxYykTHHruG8aqQ8J9tAF9HKV50VjQQexFSQ0op3u/ZFd3yAU0o4SvXJwHEzvWrxWm0r+pP69XSYMBbI2DGzVBRj6r7/x8yXuYx3Brk8gepNdAc37r1t5x4lKpH3sZMSQH7jdObSqbEVuIXnPVwE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cyphar.com; spf=pass smtp.mailfrom=cyphar.com; dkim=pass (2048-bit key) header.d=cyphar.com header.i=@cyphar.com header.b=mWkhiJrl; arc=none smtp.client-ip=80.241.56.151
+	 Content-Type:Content-Disposition:In-Reply-To; b=Rr7jNiTudt0NdzI2xRVVJ1uxTyGxjezrsaox/zzfrq2kxzpTf0nuMTl1VRpjxoVVoHGZIborCRzso36XGH6yJAJUxkMzRDvUCdZF0xvki7Ca2LqxY264FSR2LPXA4XTFo2tFAbXMLIJpgC/G9dqlBZrS+XxvDNPxPTp+6IYBpTA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cyphar.com; spf=pass smtp.mailfrom=cyphar.com; dkim=pass (2048-bit key) header.d=cyphar.com header.i=@cyphar.com header.b=its3yjgm; arc=none smtp.client-ip=80.241.56.161
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cyphar.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cyphar.com
 Received: from smtp1.mailbox.org (smtp1.mailbox.org [IPv6:2001:67c:2050:b231:465::1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4frqrS6D7Cz9ssx;
-	Thu,  9 Apr 2026 08:33:28 +0200 (CEST)
+	by mout-p-103.mailbox.org (Postfix) with ESMTPS id 4frqxt0NXfz9srX;
+	Thu,  9 Apr 2026 08:38:10 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cyphar.com; s=MBO0001;
-	t=1775716408;
+	t=1775716690;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=9BlqEDad+MoIO9T2PduifHwk7xNYEDr7RnNQgh29XBM=;
-	b=mWkhiJrlcDJLIgHnb+0CK4IZxgXA06Noao8mIWfKw7r9pARQw49tcehqYmD1ZYBpqbewEm
-	i9AwbJ2AWOH9wcs+Lqa+688MNySM0iejQtFMbO++c2Uxa7kMuGEx0/Spg+9xOWVdDymZOO
-	C+7flyHL8SUYc+5WMOYmscN6rsBRL80s/2CRc64Ea8S7sPTQbpYy/FwwoXjIy+EVIDLuYC
-	fEss2/yB2sTOrNJT810vEgheR/x+03hj7Y3eiH4EV0RCUQf8g4xt8SD5R34ptdikJ9rGKd
-	BLT3n4MMV8Cp7furKPS8CTdvELRMnn6WYK7zXzbTNKfeQZY3lzZEHKZM8m0c5Q==
+	bh=UM2ed99lDXd37GBj/HnBXxqlnPM4a2QBb1Y+5uudOX0=;
+	b=its3yjgmXQJZqxehHhgYg9jOqxhWyuMaoe2kBAqPfe6PRbpxLP2tMJjka4zX1rncEO7WIF
+	cfudY0lClyPLPj0Jtpl+9QWMSzUz5NMC/utCYvCKR1n57WqBIZ6HiECIKUKclrcCKU/WR5
+	8y+edXTif3GzapMNYD5rN6D4/jwj6rl3vFeOvsT1XE1dEZcp0dcyD0GpazFf7L7sWpmeIB
+	uk0FBRJcSvYuJnfFqz5CiGOhaMUEAXv5suCxTMvNJa0OgqbW87hh3157bqINMFMEUUJ0MJ
+	EwZ2AsbRSuAGxf0PZNGxa9h8kcIR9WNUcdGrQ82UH5XimvxBMUu2lhLgoISfzw==
 Authentication-Results: outgoing_mbo_mout;
 	dkim=none;
 	spf=pass (outgoing_mbo_mout: domain of cyphar@cyphar.com designates 2001:67c:2050:b231:465::1 as permitted sender) smtp.mailfrom=cyphar@cyphar.com
-Date: Thu, 9 Apr 2026 16:33:03 +1000
+Date: Thu, 9 Apr 2026 16:37:51 +1000
 From: Aleksa Sarai <cyphar@cyphar.com>
 To: Stefan Metzmacher <metze@samba.org>
 Cc: linux-kernel@vger.kernel.org, Dmitry Safonov <0x7f454c46@gmail.com>, 
@@ -68,11 +68,11 @@ Cc: linux-kernel@vger.kernel.org, Dmitry Safonov <0x7f454c46@gmail.com>,
 	Neal Cardwell <ncardwell@google.com>, Jakub Kicinski <kuba@kernel.org>, 
 	Simon Horman <horms@kernel.org>, Christian Brauner <brauner@kernel.org>, 
 	Kees Cook <keescook@chromium.org>, netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/5] uaccess: fix ignored_trailing logic in
- copy_struct_to_user()
-Message-ID: <2026-04-08-ditzy-organic-yowl-croc-yWsgIE@cyphar.com>
+Subject: Re: [PATCH 2/5] sockptr: fix usize check in
+ copy_struct_from_sockptr() for user pointers
+Message-ID: <2026-04-09-carried-furtive-washer-brail-mNQ6oV@cyphar.com>
 References: <cover.1775576651.git.metze@samba.org>
- <71f69442410c1186ed8ce6d5b4b9d4a5a70edbad.1775576651.git.metze@samba.org>
+ <cfaedbc33ae9d36adaabf04fa79424f30ff1efdd.1775576651.git.metze@samba.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,9 +80,9 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="zzufnxb5jxfhelyx"
+	protocol="application/pgp-signature"; boundary="clmk73kctnv2nf4q"
 Content-Disposition: inline
-In-Reply-To: <71f69442410c1186ed8ce6d5b4b9d4a5a70edbad.1775576651.git.metze@samba.org>
+In-Reply-To: <cfaedbc33ae9d36adaabf04fa79424f30ff1efdd.1775576651.git.metze@samba.org>
 X-Spamd-Result: default: False [-2.76 / 15.00];
 	SIGNED_PGP(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -90,11 +90,11 @@ X-Spamd-Result: default: False [-2.76 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[cyphar.com,reject];
 	R_DKIM_ALLOW(-0.20)[cyphar.com:s=MBO0001];
 	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-276849-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-276850-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,arista.com,kernel.org,davemloft.net,rbox.co,davidwei.uk,intel.com,holtmann.org,google.com,redhat.com,chromium.org];
@@ -108,57 +108,42 @@ X-Spamd-Result: default: False [-2.76 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[cyphar@cyphar.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[cyphar.com:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 169D43C69CC
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: AE2683C6A23
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 
---zzufnxb5jxfhelyx
+--clmk73kctnv2nf4q
 Content-Type: text/plain; protected-headers=v1; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH 1/5] uaccess: fix ignored_trailing logic in
- copy_struct_to_user()
+Subject: Re: [PATCH 2/5] sockptr: fix usize check in
+ copy_struct_from_sockptr() for user pointers
 MIME-Version: 1.0
 
 On 2026-04-07, Stefan Metzmacher <metze@samba.org> wrote:
-> Currently all callers pass ignored_trailing=3DNULL, but I have
-> code that will make use of.
+> copy_struct_from_user will never hit the check_zeroed_user() call
+> and will never return -E2BIG if new userspace passed new bits in a
+> larger structure than the current kernel structure.
 >=20
-> Now it actually behaves like documented:
+> As far as I can there are no critical/related uapi changes in
 >=20
-> * If @usize < @ksize, then the kernel is trying to pass userspace a newer
->   struct than it supports. Thus we only copy the interoperable portions
->   (@usize) and ignore the rest (but @ignored_trailing is set to %true if
->   any of the trailing (@ksize - @usize) bytes are non-zero).
-
-Good catch, though I want to mention that the current API design for
-copy_struct_to_user() is a bit of a compromise -- I was trying to think
-of a way of making it generic but what information you need really
-depends on your API.
-
-For request-flag APIs (like statx) then you can just unset the bits in
-the response mask for fields past usize and so it is a non-fatal error,
-but it requires knowing which field offsets map to which flags.
-
-My initial idea for ignored_trailing was for it to return the offset
-memchr_inv() gives you -- but unfortunately, this doesn't help in the
-more generic case where you have multiple non-zero bits that need to
-unset multiple flags.
-
-Out of interest, how did you plan on using it? It might be a good idea
-to rethink this API before it starts getting used "in anger" in a way
-that leaks to uAPIs we can't change.
-
-In any case, for this patch feel free to take my
-
-Reviewed-by: Aleksa Sarai <aleksa@amutable.com>
-
-> Fixes: 424a55a4a908 ("uaccess: add copy_struct_to_user helper")
+> - include/net/bluetooth/bluetooth.h and net/bluetooth/sco.c
+>   after the use of copy_struct_from_sockptr in v6.13-rc3
+> - include/uapi/linux/tcp.h and net/ipv4/tcp_ao.c
+>   after the use of copy_struct_from_sockptr in v6.6-rc1
+>=20
+> So that new callers will get the correct behavior from the start.
+>=20
+> Fixes: 4954f17ddefc ("net/tcp: Introduce TCP_AO setsockopt()s")
+> Fixes: ef84703a911f ("net/tcp: Add TCP-AO getsockopt()s")
+> Fixes: faadfaba5e01 ("net/tcp: Add TCP_AO_REPAIR")
+> Fixes: 3e643e4efa1e ("Bluetooth: Improve setsockopt() handling of malform=
+ed user input")
 > Cc: Dmitry Safonov <0x7f454c46@gmail.com>
 > Cc: Dmitry Safonov <dima@arista.com>
 > Cc: Francesco Ruggeri <fruggeri@arista.com>
@@ -186,42 +171,47 @@ Reviewed-by: Aleksa Sarai <aleksa@amutable.com>
 > Cc: linux-kernel@vger.kernel.org
 > Signed-off-by: Stefan Metzmacher <metze@samba.org>
 > ---
->  include/linux/uaccess.h | 2 +-
+>  include/linux/sockptr.h | 2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
 >=20
-> diff --git a/include/linux/uaccess.h b/include/linux/uaccess.h
-> index 4fe63169d5a2..1234b5fa4761 100644
-> --- a/include/linux/uaccess.h
-> +++ b/include/linux/uaccess.h
-> @@ -505,7 +505,7 @@ copy_struct_to_user(void __user *dst, size_t usize, c=
-onst void *src,
->  			return -EFAULT;
->  	}
->  	if (ignored_trailing)
-> -		*ignored_trailing =3D ksize < usize &&
-> +		*ignored_trailing =3D usize < ksize &&
->  			memchr_inv(src + size, 0, rest) !=3D NULL;
->  	/* Copy the interoperable parts of the struct. */
->  	if (copy_to_user(dst, src, size))
-> --=20
-> 2.43.0
->=20
+> diff --git a/include/linux/sockptr.h b/include/linux/sockptr.h
+> index 3e6c8e9d67ae..ba88f4d78c1b 100644
+> --- a/include/linux/sockptr.h
+> +++ b/include/linux/sockptr.h
+> @@ -91,7 +91,7 @@ static inline int copy_struct_from_sockptr(void *dst, s=
+ize_t ksize,
+>  	size_t rest =3D max(ksize, usize) - size;
+> =20
+>  	if (!sockptr_is_kernel(src))
+> -		return copy_struct_from_user(dst, ksize, src.user, size);
+> +		return copy_struct_from_user(dst, ksize, src.user, usize);
+> =20
+>  	if (usize < ksize) {
+>  		memset(dst + size, 0, rest);
+
+It is a little weird that this function open-codes memchr_inv() --
+check_zeroed_sockptr() exists and does the right thing. Maybe it'd be
+nice to fix that too?
+
+In any case,
+
+Reviewed-by: Aleksa Sarai <aleksa@amutable.com>
 
 --=20
 Aleksa Sarai
 https://www.cyphar.com/
 
---zzufnxb5jxfhelyx
+--clmk73kctnv2nf4q
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iJEEABYKADkWIQS2TklVsp+j1GPyqQYol/rSt+lEbwUCaddIGxsUgAAAAAAEAA5t
-YW51MiwyLjUrMS4xMiwyLDIACgkQKJf60rfpRG8uYgEAoP6BSZvClRWbH9O0ai+X
-6ovNvDcTydf4aLirx20qXmEBALTldLxsgkSpGZU42zdQYgI2Ew0hoWw4iZq1ZgJl
-pQgO
-=jGIC
+iJEEABYKADkWIQS2TklVsp+j1GPyqQYol/rSt+lEbwUCaddJPxsUgAAAAAAEAA5t
+YW51MiwyLjUrMS4xMiwyLDIACgkQKJf60rfpRG9DigEAi2JzwlxQRoD0GuaHkvYo
+bKv3sBpGAak8jX/66eeL3DAA/1Hd9qHOBAv122dRbfwiP9YkGgNN8l+0B596N/oJ
+WZwL
+=0DvX
 -----END PGP SIGNATURE-----
 
---zzufnxb5jxfhelyx--
+--clmk73kctnv2nf4q--
 
