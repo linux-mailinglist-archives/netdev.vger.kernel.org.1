@@ -1,71 +1,74 @@
-Return-Path: <netdev+bounces-276794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276795-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wLg7BdcT12kSKwgAu9opvQ
-	(envelope-from <netdev+bounces-276794-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 04:49:59 +0200
+	id aLuDDeYT12kSKwgAu9opvQ
+	(envelope-from <netdev+bounces-276795-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 04:50:14 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEF783C5B20
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 04:49:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E10643C5B3F
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 04:50:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 14BE5300E2B1
-	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 02:49:58 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 35C7D3025429
+	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 02:50:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA5E736215B;
-	Thu,  9 Apr 2026 02:49:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 454DA36680C;
+	Thu,  9 Apr 2026 02:50:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="iq8fWhmz";
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="MvCZIK0y"
+	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="wl8qgk7H";
+	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="L31CVT8E"
 X-Original-To: netdev@vger.kernel.org
 Received: from mout-y-209.mailbox.org (mout-y-209.mailbox.org [91.198.250.237])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF35423AE62;
-	Thu,  9 Apr 2026 02:49:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21D7523AE62;
+	Thu,  9 Apr 2026 02:50:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.198.250.237
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775702994; cv=none; b=dtEkRYaudX7R8P+aiAvwzSBGjkRWCvxMcDOEVflmNbWQq/4vXiaqrUdmn5OIFvK/GQsIQSPNvTreMx2H8aKur1hmOhedGyogf/t7YEu2bNYvNYcRlVmqRwBMCoIj8TuNE3OYUbUhZ3af7M32S9Awu3jvczvPYLHow2KZKZv+Ipc=
+	t=1775703003; cv=none; b=LEcUUQTXqw/isheZKjxq7nGWUXxmMfIk9AjKEFP20zV2PwRuvRA6eF05ZWtKEYcnIPs7TgIz3tlw229K/pnb50glL/bGa5nlZL3yBdCWtRUs2Vkb+Y8ozU79EBgQbv7kg7DLHmUI/Q9MeKBqzPO3sPGGsB3OggGeEhkKnbDGdvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775702994; c=relaxed/simple;
-	bh=VDpg76iMCzf4+gMtwmFt572TNM9cHILHN8eYLf+KWc0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Jupg6iY30+hR4h1FFHLeUtFgsgTweA0D50qlGbAAYCx57404jYnM3xY1ZmS0GMoSKMo3PQz//s3Gr8batmVEfz1bsIEenmRK802e8W32cTQVFnI6ASfLR4z1/2A3R3MsiSDlzXgkjuIE6i04nsZylsot9rprUs9lki0+09POm+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=iq8fWhmz; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=MvCZIK0y; arc=none smtp.client-ip=91.198.250.237
+	s=arc-20240116; t=1775703003; c=relaxed/simple;
+	bh=0Pbj/t9PBA+V4Pfq4iqpUh+BvdT7LJ1OhIxqSu0zNZk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ciU4O9HueC3Upy6sL+y3+Lvs3kre+Y6wqPyNHTTRqZg1sQdmDJ8KMHKbqDUuD8hQfl5OI2AXG+h+WRzUf9ZwEb5tsr5xeqAEswXt7Wbbt5dSz1VnD/u1ej3xDw0qsXT1SUPEckc8/kUWMcnBWjNd7+24yB6XKyMkOwvX/I19KUo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=wl8qgk7H; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=L31CVT8E; arc=none smtp.client-ip=91.198.250.237
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
 Received: from smtp102.mailbox.org (smtp102.mailbox.org [IPv6:2001:67c:2050:b231:465::102])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mout-y-209.mailbox.org (Postfix) with ESMTPS id 4frktP41GVzB14V;
-	Thu,  9 Apr 2026 04:49:49 +0200 (CEST)
+	by mout-y-209.mailbox.org (Postfix) with ESMTPS id 4frktZ4bmqzB14V;
+	Thu,  9 Apr 2026 04:49:58 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1775702989;
+	t=1775702998;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=b1kwRhqJY6Ur/GoyreVcZna5Az/OPx7qJRntuWs9ETY=;
-	b=iq8fWhmzD4gCQir0nWRweA4iY4pWdtI2cwk4SjUx2wT2Yq7OP9S7YKWtnbAe25ltvybnsJ
-	u40Z8gjU7vmx0souqfHjpFUO3/twNhLdcivAsaiavWJnEv69BsJPpnH2GVWUkFBT7L6toR
-	itkiLOqNHimlKhG1072XuQk6J6hkxLySdcMNMiRm36y6Ryv8wHR8EXxbkLqRyAyo/xsvid
-	yGVJb0rfOT7HMZWB3hCu0WUH+pUUjw++Qn/QYB0yI7gNp0iVmE3ey8Ej+pWez2ldlXsMHm
-	6E1pJ8UsC7OF+fiMxldt6n7KOEW6P7H82tk1uYpZWCrsCd1lWqCilFgtY5Iu3A==
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GsidmfB0EwnTNO061hNze2h62VV8OIyujPFbtg3of64=;
+	b=wl8qgk7HJK8ClFdJmmlV5Ml3K9YwnztQS9upxm2OxqJjAmztHeNAyR0OJ5MC8dqWKLuohR
+	JwERnE9heEMtBxwZBGfVlLhyZOGWUPVFaEc3meXkESZzCKHqJo1G0Aggej81KqPzYuHpuA
+	/eprfRiZ3mH/LbLTc62ViQF1OCpdAP/NZv9/eySJz479J+Cal/QocLjfyjSQsdVx5ahH8l
+	4KXcGCZ/6Ps4K0AoMDLv+sAs0VartZWoO7sbGkFyqNhUYm15MToqyNIAC85Vfq64Wd7vv8
+	Wo48Q4qYBSKgOWaj8/KJJedgZTC44V+Wlh+HfW/t33Dy2NGcVSkrdnlO5B9gpg==
 Authentication-Results: outgoing_mbo_mout;
-	dkim=pass header.d=mailbox.org header.s=mail20150812 header.b=MvCZIK0y;
+	dkim=pass header.d=mailbox.org header.s=mail20150812 header.b=L31CVT8E;
 	spf=pass (outgoing_mbo_mout: domain of mashiro.chen@mailbox.org designates 2001:67c:2050:b231:465::102 as permitted sender) smtp.mailfrom=mashiro.chen@mailbox.org
 From: Mashiro Chen <mashiro.chen@mailbox.org>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1775702988;
+	t=1775702997;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=b1kwRhqJY6Ur/GoyreVcZna5Az/OPx7qJRntuWs9ETY=;
-	b=MvCZIK0ymvWQN5Q0zpUSZ2cKOQGtfJ2pi/J2UVfBTcc/S9BZT8U21SxwN+lEQL4Xr7yP31
-	kfjUTdbAT4ZrWN3kTUAmNHo2kXfy5ZxlO+ctQMPkhByNTgX98PUCqgYHjaC/7kWGhboh5A
-	aLcfzwGzYcYdeVe44cbYhlV3bJScZwykFauAAnpBJC1Hefb9rFnpQmPffwh3HzSLknV+p0
-	Vst+kqg+ckUglfzpUBmATqb+Aoj842ReIc5XiomI+o8nIZlrmzLNnMk8brVsbVehBMwqQZ
-	eM+bMdJj41VXTTJBvVRiLMfLkl+Q38IsrWHLRgrN/CB9zMQzaIGzXLdY8FgXeg==
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GsidmfB0EwnTNO061hNze2h62VV8OIyujPFbtg3of64=;
+	b=L31CVT8EQppmgQQoIEObaUH1PTbNAEPieZR+C6RVCXhEGqFyWPswcnsseuKC+5wgBLEIVK
+	3jpLTG3SnCI000X+m6IKMWxUoryCRgfvlHl+9mp4Hyn+DieNLNtHMOCs0uf6CyUyynasNZ
+	gf+9Bb5Q+X2/iyrFfuyPAkvHkz5l7jLwzgeoEiROqqKaF56JQsnTXYvGyHlL7BmfvfJS9S
+	9XI5U4WQIbX6u1EVDATbz/Jtdhlg6IjLxLNZ3/5KKyuW8psIPi3Ivzp68ffeyKgmvb0mic
+	JrUyBPiBC+xrfDiG3xS+cOqdBVgvndsLcGR4/2iK9Qu9hg3383wYEH9J2w6c0g==
 To: netdev@vger.kernel.org
 Cc: andrew+netdev@lunn.ch,
 	davem@davemloft.net,
@@ -75,10 +78,13 @@ Cc: andrew+netdev@lunn.ch,
 	jreuter@yaina.de,
 	linux-hams@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Mashiro Chen <mashiro.chen@mailbox.org>
-Subject: [PATCH v2 net 0/2] net: hamradio: fix missing input validation in bpqether and scc
-Date: Thu,  9 Apr 2026 10:49:25 +0800
-Message-ID: <20260409024927.24397-1-mashiro.chen@mailbox.org>
+	Mashiro Chen <mashiro.chen@mailbox.org>,
+	stable@vger.kernel.org
+Subject: [PATCH v2 net 1/2] net: hamradio: bpqether: validate frame length in bpq_rcv()
+Date: Thu,  9 Apr 2026 10:49:26 +0800
+Message-ID: <20260409024927.24397-2-mashiro.chen@mailbox.org>
+In-Reply-To: <20260409024927.24397-1-mashiro.chen@mailbox.org>
+References: <20260409024927.24397-1-mashiro.chen@mailbox.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,8 +92,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-MBO-RS-META: uodpcbght8arxobjmodwb7iisesdkh9e
-X-MBO-RS-ID: 8b14f452c988ab37bc4
+X-MBO-RS-META: pgimnr9g3bswf9q61zcp5it94phwbyo4
+X-MBO-RS-ID: f1c15c24337190e2404
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
@@ -103,7 +109,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-276794-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-276795-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[mailbox.org:+];
 	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -113,30 +119,52 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mailbox.org:dkim,mailbox.org:mid]
-X-Rspamd-Queue-Id: AEF783C5B20
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mailbox.org:dkim,mailbox.org:email,mailbox.org:mid]
+X-Rspamd-Queue-Id: E10643C5B3F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This series fixes two missing input validation bugs in the hamradio
-drivers. Both patches were reviewed by Joerg Reuter (hamradio
-maintainer).
+The BPQ length field is decoded as:
 
-v2 changes:
-- bpqether: no code change; add Acked-by: Joerg Reuter
-- scc: drop the upper bound of 4096 per reviewer feedback;
-  only enforce the minimum of 16
+  len = skb->data[0] + skb->data[1] * 256 - 5;
 
-Mashiro Chen (2):
-  net: hamradio: bpqether: validate frame length in bpq_rcv()
-  net: hamradio: scc: validate bufsize in SIOCSCCSMEM ioctl
+If the sender sets bytes [0..1] to values whose combined value is
+less than 5, len becomes negative.  Passing a negative int to
+skb_trim() silently converts to a huge unsigned value, causing the
+function to be a no-op.  The frame is then passed up to AX.25 with
+its original (untrimmed) payload, delivering garbage beyond the
+declared frame boundary.
 
+Additionally, a negative len corrupts the 64-bit rx_bytes counter
+through implicit sign-extension.
+
+Add a bounds check before pulling the length bytes: reject frames
+where len is negative or exceeds the remaining skb data.
+
+Cc: stable@vger.kernel.org
+Cc: linux-hams@vger.kernel.org
+Acked-by: Joerg Reuter <jreuter@yaina.de>
+Signed-off-by: Mashiro Chen <mashiro.chen@mailbox.org>
+---
  drivers/net/hamradio/bpqether.c | 3 +++
- drivers/net/hamradio/scc.c      | 2 ++
- 2 files changed, 5 insertions(+)
+ 1 file changed, 3 insertions(+)
 
+diff --git a/drivers/net/hamradio/bpqether.c b/drivers/net/hamradio/bpqether.c
+index 045c5177262eaf..214fd1f819a1bb 100644
+--- a/drivers/net/hamradio/bpqether.c
++++ b/drivers/net/hamradio/bpqether.c
+@@ -187,6 +187,9 @@ static int bpq_rcv(struct sk_buff *skb, struct net_device *dev, struct packet_ty
+ 
+ 	len = skb->data[0] + skb->data[1] * 256 - 5;
+ 
++	if (len < 0 || len > skb->len - 2)
++		goto drop_unlock;
++
+ 	skb_pull(skb, 2);	/* Remove the length bytes */
+ 	skb_trim(skb, len);	/* Set the length of the data */
+ 
 -- 
 2.53.0
 
