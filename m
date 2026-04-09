@@ -1,126 +1,125 @@
-Return-Path: <netdev+bounces-276859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276860-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WBE1L5ZR12kFMggAu9opvQ
-	(envelope-from <netdev+bounces-276859-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 09:13:26 +0200
+	id 0OY3AtxR12kFMggAu9opvQ
+	(envelope-from <netdev+bounces-276860-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 09:14:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BE833C6DDF
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 09:13:25 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76EDF3C6DF5
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 09:14:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id F156A300F96D
-	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 07:13:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4CBE2300766B
+	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 07:14:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E73FD37187B;
-	Thu,  9 Apr 2026 07:13:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50D8E371CE6;
+	Thu,  9 Apr 2026 07:14:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SoTC1w4P"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BTeZnJK4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B87B308F32
-	for <netdev@vger.kernel.org>; Thu,  9 Apr 2026 07:13:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0360D35F5F2
+	for <netdev@vger.kernel.org>; Thu,  9 Apr 2026 07:14:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.175
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775718803; cv=pass; b=O/Vofq8Nf13dfqA661Cr9ocK7dcu+T63OmFAvMjhAEDSn7HmtW6d0maQce28HhkGyDUPnSJsUG0haXyK4gUPsWk4pWFv3G15BttC34JIRlUQMt/I0HMJi0OXQwio7vJyUg/P94C5H1Jec6q4L5w3WzwLFZnXhGFjyq1GOPIQrwo=
+	t=1775718873; cv=pass; b=k+Bl45d2mkii8KTjQnbqBR4N16qEaj1NcGmzKM75c6suVf+GiQJPI+E4JP7yth+l0/HqGEL2TTGmtvafWANF0xDv0B5kWx/IU1s6uEvRVJ2PjyAK5Ouy4zwXXgAQ+boXaUYovsBAQ1qr/NALYZTSJmAqCFThBVlkuNvJNFeft/U=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775718803; c=relaxed/simple;
-	bh=9DFaHZMYaCMqRR6Rx4RrfAGPj2L+2hco6S/i/9VyJtY=;
+	s=arc-20240116; t=1775718873; c=relaxed/simple;
+	bh=O/rCGEdj6v7veKxo2TKTxPoU+xHM5u/di/Zn9g+TZc8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RuIyZXJzjhaeoczbrIbo4O2jw92zKoi5O/mx5xipqooxLWtb4Mu797ZduVnErkJWWObgxKNI4zKfM4OAmmxu8vlnJgEli5MARn1y9U7kIcHf/orRMDxLvt1yxTi0E6g6pmmG/9he8sE8xBPzsPAdYST+kMkjtXFpzEskxXBJiNw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SoTC1w4P; arc=pass smtp.client-ip=209.85.160.179
+	 To:Cc:Content-Type; b=B27k5DTK3CdEakQMPx9Nj5Z7ayrjXeMkFvsDsv+L9WZ2E5U17u+QynPTiLbfB3AA1GgBGzYVdeWu1RAPE6d7KryFvD9nUYpxhJIIXcG/iSHWlvDIeXZMmX7P+UtQRkqeDlsAThtWQPunH3ogYaW6EBHR/Lk20C4f2ROINYarqfU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BTeZnJK4; arc=pass smtp.client-ip=209.85.160.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-50b392f1846so9243841cf.3
-        for <netdev@vger.kernel.org>; Thu, 09 Apr 2026 00:13:22 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1775718801; cv=none;
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-50b3488fb31so6342671cf.1
+        for <netdev@vger.kernel.org>; Thu, 09 Apr 2026 00:14:31 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1775718871; cv=none;
         d=google.com; s=arc-20240605;
-        b=jOaUaTE/8DZoGbnRu8/0DxgVhhpkFfEnyAISn5H7ufE5CwrgQ+BZ/zEsr1LSVaEJmd
-         Xg/iF2zpqB6qCAFF6yl1/GFskDUhTBVnaaqWUuon5cU7PicyFFD36njTR4xOb9YZRFtk
-         +dmdIR+GxTGhAGg0la/qn+vzAMNz+e+bdW+lzzMZ6f+2xror7K4Kex4tRrXof5zIpfH+
-         n0VrXzW86jUFCsytd7ge11UiSeAeFUpRCkDhIa/DcmMsXFNHMSTqNTVbx10sy2VOfSGM
-         Uxlao0KZTsIEtUUGjQF6FQrTeqX5PHyf8drblbNI3//YacLpUc4xYZ41NC5N/AoGTPlp
-         BAnA==
+        b=T1J8peFm+xIvuRd7FwOSHPOOSZqiVgkjwl1B3lhFRmCE7Tf62BhXveuVal/eGHSm8U
+         uUj3AHL83Oa9OF4oe1SZTPCQlIw01HHmQsr0zL3mxXsaBDCEcCzpWYpd17wYQNzo4dmc
+         KmM2J3gSf75LLOk92XwZ9sinjwjwG/KKNqiEneCaKbxJn159CDfHsUELONxpROxZZFAL
+         Sau+K8Bb8i9+LKKJ8UIKFPqZt891mKQQ29auQcTQrSfO263L2SY+I0pOsiEGPEagFaWi
+         Mo/G97EnO8hkfS+iVmioFacOH2lzdVCM0MWgqMAyDpxqjFGQrExEaUO6sR4hzGKHPl5l
+         u8ug==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=N4t9qEuOwjjeNBEsJhxscNy9pF7gCA9F8HMy/E0F534=;
-        fh=f4E7HkNM2fQGXBmVy46i+QLVt0GmkH+V13fhpkTRjMA=;
-        b=PyVZqClm7Tff5Wit2Fvsh3cRMtaCscyXM0ihtIBE7eJ7nWkYXxcL5ZcrkSaRbBCjgj
-         IEs2kW+fqlSDNih07HRIg4SRFp7uhdbktUg0V1jJo3Y0t3pGuahvAmPKds9WL3/U2waC
-         /UrBLTGs0BtvLrcpx5hqUN4np0lDJDN5gFAqixJSPrZxh0QiuCEF6YAgNQjj/0nf27nx
-         1ztW2askctESxnfrJ0Nj2XDpz/xOlOmM5rdmh5+4cLy7EaXlm2SJHSVbCdYGiYJ0Cgyl
-         3pfvAM2JqJakWcn2BPcZzdfRvPwiBUvQXo+ZjeRU9AjYkQOAT++DWTmTUFYMN9YpjRv5
-         SdBA==;
+        bh=O/rCGEdj6v7veKxo2TKTxPoU+xHM5u/di/Zn9g+TZc8=;
+        fh=y41q9BIzSSo9G0LJxKRzDJWi3qm39XuL/zcHpUx56Eg=;
+        b=OfVubck6MG4+KFzxUDEPgBIE/yCdac4sWzxYdAZj+wj1SgevURuViwqgSMmAMBszjO
+         W90Tfi+m/7HvIUc0iClq75jQ1ivxEDZ6KhZXytasefGNm0GcYmeVFpsLyev+OpWqD2QH
+         POTiHHiySJGeUtMeNI6IHc6fqbOh7Z1vSHtmsQJn1lH+XLv8qdNr7tlLM3t8eZuPEBBP
+         bFMXqqPMdhkDcHFzDiSVjTwdTbmHdBu2qFcf+Nf7d2gWI6g7NsgXksleJYLXdp/EyOOZ
+         1V/qN0GaD8oKhj3Fr7FCAXO24akbgxZIy6+tHUxRzxTDyPngyOta43eV5M70J5KKIPXa
+         zsSw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1775718801; x=1776323601; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1775718871; x=1776323671; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=N4t9qEuOwjjeNBEsJhxscNy9pF7gCA9F8HMy/E0F534=;
-        b=SoTC1w4P4q/Z4E8T3s6sbx5wp8/sLsFladCaCgiSEmtmtS3d66ZdD9FwRIU5p3MGMl
-         RuS08dfJkOBzx2F3w/BWvy4gqsk9iTS0qhS0GNCqCvruykyD9sQqY/LbJUG0ke9BCt/p
-         leRIeTqIda4TdGvjMv/jr4szSLT9san/iPyVv15/kUojPl345dcRnB9wmqlo4+NgZRbK
-         wHO63UISkyz+/ei83PrY7Ja3qh1q+ZhU/C4Zr7P7A5heJKk8VMNAeL9F7SVU886FRVV5
-         XJeDCT7mBPp5JfGj4ejsCVzPkzUazTHJy1qX/Bbau+yDskjrTChvSYi5V9m2zLdS/EUK
-         K3sw==
+        bh=O/rCGEdj6v7veKxo2TKTxPoU+xHM5u/di/Zn9g+TZc8=;
+        b=BTeZnJK46ur4hLsUAWidIip6BN8630eoIxocK/CvzDV1kdohmRppEx8274eHQxRxEE
+         AXAnpyw38tDEMqGdpg/Et+2575YpGo9hGhPAl4wzhDlkWE2MPuGvML9BCyVZWxx6HDHe
+         3fxx9sZ/maEu2TlNPsLsF0P+gXtDUmRljqGoxhywmIdo61oBdwDWqjYdwk8xlRB6SWNg
+         pRQEv7C4UJXQB7YnjinTgYVseEUSK3IpSEFlGz0c3PiRl+PzcE/PdKhxTTOlXZsK+JXP
+         7QwS3RS9yhVMgncDYlxYEadVk9rZDbsWPkyFdLpF4o4Kol7RxVhvzOQ1FOnjmSaoGOlO
+         SyMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775718801; x=1776323601;
+        d=1e100.net; s=20251104; t=1775718871; x=1776323671;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=N4t9qEuOwjjeNBEsJhxscNy9pF7gCA9F8HMy/E0F534=;
-        b=S17QCL2YQNrV3Kc6YDz3PZ/q62N0ebP0xJklAXLSi090BHE7p8KSOqGAWoqkiqee4Y
-         zpaJkFneMcN8I1ZoAkpMH2mpsl1ljhPZg4DkpaarZyksN3J9ABo19fU3QgFvDVLcBo7V
-         RWNg5+4sPULP1H/G0V2T1tub1KhtjO2bPXcC0zBGWl/RgJmfoJKmtZ/1FLk+zgMH7swx
-         wjpVWI4c8Gyg1FnOwdjTIu8oSz1Acnq28xo/nFMX9WAqwB3DfMrN8oWR69hwXt/3epqY
-         I1+MFRRJMDuzkRhj8KKlS15GVqna8jb1MfmFSIeiOV6caSO/mt16ItrE2eS3GcvP5MMg
-         sRDA==
-X-Gm-Message-State: AOJu0YyehCae69nWaDNqm90PfWaq5WluhXwbO0uMfKB94+UVbCmHG0m2
-	GdJr7hJ6as3mcgLhEm4AzOovqVU1eMmAryz9aDEEN0ljo29IFs/wwt9BRecOhAa34bOZwKDkT1h
-	1nrGGt4KbrRjExeeUFWbN98mmRlhNkC6iiNnixrXkhX7Ydc62mn4O7Iyd
-X-Gm-Gg: AeBDiesIlre0vbITn//l4UOs8w+NHU01puu2bV+8Z2acqgY/TWINIIgqRh9CD1o9ewL
-	eGtLBnq776wWkcz8Kb7eudLU/wrkdPa7QhzkM0ACUWJ7vURKQpVFLEdyCYyklKU467wPUX4vCfq
-	eI3oHUU/5AifkSkqd/ienpDRYpN0HPYGlRk7vq335MvLoyIrC0+p7oTPEBQZgf+7ap2ZTcSC7rQ
-	afCFH3M3xbbrfJoLJP9VUGKM427NpJojKDCp81iJa+mJkBPV1buG72b8oUwSfZekSG/1/q97xp4
-	T9Ih2F8=
-X-Received: by 2002:a05:622a:1646:b0:50b:3a6d:db64 with SMTP id
- d75a77b69052e-50dc22a8b4dmr34916481cf.48.1775718801154; Thu, 09 Apr 2026
- 00:13:21 -0700 (PDT)
+        bh=O/rCGEdj6v7veKxo2TKTxPoU+xHM5u/di/Zn9g+TZc8=;
+        b=Dbmd+fEsIhPLzjKaz7VMwnXaQjV3bQSMjL9VBUvgt+hYSeWElBFlsz+W42/3E7cS3W
+         kfUYNZhPq4+zQLYI4pJ+zc323dNvXYZM0blNfm6NcHuMH0hIVYC7JbmlTLFYvNDrEGdm
+         UCEEq7HkxapiY2nF28FPTR5Cyz7KvLcvyeTuJxtolIlIvS21lki+86f6s2YDnJyXSIfn
+         mCfg/4ZufPKMeRJ6cwS9dY6bwRlLO0x7AqXjGjwpiTjXNT1KsbS9W66itsAGwZH3gP+U
+         QMHx2dAQVLEY3Bfh4o9A5tRjOxv9FIs8qxfrstkAgBL82zNqlaqgwAO/3rmwkKFoxSJC
+         n4Aw==
+X-Gm-Message-State: AOJu0Yx/j8XCD56gUresneu+wsgVFtfzVVG/bHq7bL16s6Xa7cRBL3aZ
+	pwPK8pk9Ei/dkOZBPT6Ab8cNLnpI0QQQ3a+x61ZPUrOUkNy/F8VfHHUN8iLFXV/EMfFwdYnwOCi
+	7i9A816vEDsHzskkJKPSHKtGujEyvD8wLsiq3LlusZJ2Nj86hU2mCrQ9E1D0=
+X-Gm-Gg: AeBDieueUr8jJFFoHhxgudHJB0oeCvd6sPCZvHkMF1CfQQci2jWTp4xg26JX9RCHiDh
+	aJihvGMd8ZJ1tvW9+xUa7nDLP/RlmtTwPIVkkGgi/l6ujZh0n76bnHuXUAb+ZAnDWpwL2ijXpnM
+	Gnq0S3h/2Z51CwBMWab5xcU1jvk2OOwEh7nCucgpF4el9L51UTz3c8f5QKjpu2wu5+nOM/xIhZQ
+	6cDGipBh+1ptcipbLHhvDCUwM4VkHyHwMCCiwFtr7MGCsBd00gZxgVn+VSnZVrT64orBpXnalgH
+	VqLpGe8=
+X-Received: by 2002:ac8:7f54:0:b0:50d:8afe:6424 with SMTP id
+ d75a77b69052e-50dc1aaca6fmr29332701cf.26.1775718870594; Thu, 09 Apr 2026
+ 00:14:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260409013246.2051746-1-ashutoshdesai993@gmail.com>
-In-Reply-To: <20260409013246.2051746-1-ashutoshdesai993@gmail.com>
+References: <20260408223113.2009304-1-ashutoshdesai993@gmail.com>
+In-Reply-To: <20260408223113.2009304-1-ashutoshdesai993@gmail.com>
 From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 9 Apr 2026 00:13:08 -0700
-X-Gm-Features: AQROBzBgm54MYQPAvx4xSHJ4oCxEzanS_DwtWNC9T2qlEb7Lk6iw4a95H8iRfTE
-Message-ID: <CANn89iJTzuhz4izn2rQvAXcm4QR64wwk=3D_Gieuq5Fr83o42Q@mail.gmail.com>
-Subject: Re: [PATCH] rose: fix OOB read on short CLEAR REQUEST frames.
+Date: Thu, 9 Apr 2026 00:14:17 -0700
+X-Gm-Features: AQROBzCSZjqC7WxLyd69mDFlcPaaFqG3Z0K7OPePW3_0TJSmqyIBxWCuQcM2DB8
+Message-ID: <CANn89i+ZrVZMZKeGHuxv1cMARUkYv2+nyrDfYAK_QAbqSBPz1w@mail.gmail.com>
+Subject: Re: [PATCH] nfc: hci: fix OOB heap read on short HCP frames.
 To: Ashutosh Desai <ashutoshdesai993@gmail.com>
-Cc: netdev@vger.kernel.org, linux-hams@vger.kernel.org, davem@davemloft.net, 
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	linux-kernel@vger.kernel.org
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
+	pabeni@redhat.com, horms@kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-276859-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-276860-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -134,51 +133,31 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 3BE833C6DDF
+X-Rspamd-Queue-Id: 76EDF3C6DF5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Apr 8, 2026 at 6:32=E2=80=AFPM Ashutosh Desai
+On Wed, Apr 8, 2026 at 3:31=E2=80=AFPM Ashutosh Desai
 <ashutoshdesai993@gmail.com> wrote:
 >
-> rose_process_rx_frame() dispatches to state machines after calling
-> rose_decode(), but does not verify the frame is long enough before
-> doing so. All five state machine handlers read skb->data[3] and
-> skb->data[4] (cause and diagnostic bytes) when handling a
-> ROSE_CLEAR_REQUEST frame, yet the only upstream length check is
-> ROSE_MIN_LEN (3 bytes) in rose_route_frame().
+> Both nfc_hci_recv_from_llc() and nfc_hci_msg_rx_work() read byte 1 of
+> an sk_buff (the HCP message header field) without first verifying the
+> buffer contains at least NFC_HCI_HCP_HEADER_LEN (2) bytes.
 >
-> A crafted 3-byte ROSE CLEAR REQUEST frame (bytes: GFI/LCI-high,
-> LCI-low, 0x13) passes the minimum length gate and reaches the state
-> machines, where skb->data[3] and skb->data[4] are read one and two
-> bytes past the valid buffer respectively.
+> The SHDLC LLC layer only filters zero-length frames; a single-byte
+> I-frame from a malicious NFC peer therefore reaches the HCI reassembly
+> path where packet->message.header is read one byte past the valid data.
+> The same issue is present in the NCI HCI implementation (nci/hci.c)
+> via nci_hci_data_received_cb() and nci_hci_msg_rx_work().
 >
-> Add a check in rose_process_rx_frame() that drops any CLEAR REQUEST
-> frame shorter than 5 bytes (3-byte header + cause + diagnostic),
-> covering all five state machines with a single guard.
+> Add an explicit length check before accessing the message header at
+> all four locations, freeing the skb on malformed input.
 >
 > Signed-off-by: Ashutosh Desai <ashutoshdesai993@gmail.com>
 > ---
->  net/rose/rose_in.c | 5 +++++
->  1 file changed, 5 insertions(+)
->
-> diff --git a/net/rose/rose_in.c b/net/rose/rose_in.c
-> index 0276b393f..1ac9a6aee 100644
-> --- a/net/rose/rose_in.c
-> +++ b/net/rose/rose_in.c
-> @@ -271,6 +271,11 @@ int rose_process_rx_frame(struct sock *sk, struct sk=
-_buff *skb)
->
->         frametype =3D rose_decode(skb, &ns, &nr, &q, &d, &m);
->
-> +       if (frametype =3D=3D ROSE_CLEAR_REQUEST && skb->len < 5) {
-> +               kfree_skb(skb);
-> +               return 0;
-> +       }
-> +
 
 Same answer: Testing skb->len alone is not enough.
 
