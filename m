@@ -1,179 +1,130 @@
-Return-Path: <netdev+bounces-276933-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276934-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EpvnBa9/12kLPAgAu9opvQ
-	(envelope-from <netdev+bounces-276933-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 12:30:07 +0200
+	id sA1VLs1/12kLPAgAu9opvQ
+	(envelope-from <netdev+bounces-276934-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 12:30:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 798BB3C928D
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 12:30:06 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FA693C92AB
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 12:30:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 43403300FB7C
-	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 10:30:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 64064300D940
+	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 10:30:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 125093ACF06;
-	Thu,  9 Apr 2026 10:30:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0517F3B4EB5;
+	Thu,  9 Apr 2026 10:30:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="NbrfauJk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bu/oHVKK"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26D4E369990;
-	Thu,  9 Apr 2026 10:29:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C37D63B2FC4;
+	Thu,  9 Apr 2026 10:30:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775730602; cv=none; b=mS5+FlPF1HGObvvcH1gYMnNnLuPeU+HjMRo6ZHFz2Wahahc6+OPvCt9edYpklWE+0lsoD7pO/NyUiDhRU8FeGKerQ30HTDaKVqCv9oN7W4EciwaKGX/SC73eOvbmnEm159vxcIuF7kDCplUAkS+Jy0X/FUvpX/ILyTn61IQFMcw=
+	t=1775730632; cv=none; b=uh8eR+ydUOR8zXiDx/D52Nf7w4qx09jFv1k09h2taX4ndl+xLGTh8qqnzqcNvnZb2ggSb6RPhkhHXklOWqjLmWapU8GvTycqZU3+xj5lCZwqwO7bIvMglZoaQv4WXHsATE2mhdiBSbk+Hj8zDE20C8YsZ9mzz21o2kXV1hRAh+w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775730602; c=relaxed/simple;
-	bh=XQMr0ep1TiA8hRGkP0LCpMOeww5KjSBVcBwbP5/s68g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tslyJJdgJOEJBtPrjIYkt6aDLKBQhNyDTwDRhyBfblRbgFCryIqsHOM4E6nFP35KDFhDnFfRJCjzKaIbjhCg/zEaA7zx6OUPh9b5BHvD6pwyYne0SxAL50gL5lmDL/iommeuka8e9wwS5GoBmOeil66ldEToVhkw9KSDXp3+WJk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=NbrfauJk; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ETzbm7sIzfzQBICo7m9TJCdf/K+1A84nGjCe7ZX0O1E=; b=NbrfauJkCdeUnOIrpcJAhD0c3K
-	NgXe/bjgyQjZYF68VGdkri1xNoXbe11riODHnBNG3B5YS9UHZ6dTDog9WbFSkg2+YomAFLXj7iF5X
-	Bgy62u9/Ma7FAWE4gmNcgUg2ym77Oxe5QhdtWVYRIiPL1ENW52bkuutavBtIYm99NMdelNXf0XWFh
-	i3F50tjeSrlsXuuklVX6mwCQRVw4fh6Ltdz/ntoT+Kg9M3WtJER78d2b8w/irtrcZncdz2csLH2s8
-	PzeykvlRaX/xAcD7Ks0caX/FOosVKqREW3q3/AkEnIwTzmnTETvqFuAfLv3IOVfXbDnxzSHBUvK1c
-	kQoGQHBQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46088)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1wAmdq-000000003PP-16y2;
-	Thu, 09 Apr 2026 11:29:42 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1wAmdn-000000004Ij-0Yco;
-	Thu, 09 Apr 2026 11:29:39 +0100
-Date: Thu, 9 Apr 2026 11:29:38 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Biju Das <biju.das.jz@bp.renesas.com>
-Cc: Ovidiu Panait <ovidiu.panait.rb@renesas.com>,
-	"andrew@lunn.ch" <andrew@lunn.ch>,
-	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>
-Subject: Re: [PATCH net v2 2/2] net: phy: micrel: remove ksz9131_resume()
-Message-ID: <add_krK3MC1-SSsV@shell.armlinux.org.uk>
-References: <20260409095633.70973-1-ovidiu.panait.rb@renesas.com>
- <20260409095633.70973-3-ovidiu.panait.rb@renesas.com>
- <TY3PR01MB11346A0F047F1F7296B8F4FCA86582@TY3PR01MB11346.jpnprd01.prod.outlook.com>
+	s=arc-20240116; t=1775730632; c=relaxed/simple;
+	bh=/+m5cHDh2SgATV0wc4VKWqSJKXseZ7fS0aRcXifm+gY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=cyoRQPpnMES5iSLgB8coDRmTXk7xzGdqvXaowtpMRreUokkEpQfar2ovWyZc/8hH27OLB+wogQ/Byj9uuYml7PSFRgPJridON7QS3QV9PkHQI2Lzk4RzPJArGwTln0DtGeavxX4ynuc/9OPOFssQ27k3Bza1BzrXKs0YRv8Je/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bu/oHVKK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6624CC4CEF7;
+	Thu,  9 Apr 2026 10:30:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775730632;
+	bh=/+m5cHDh2SgATV0wc4VKWqSJKXseZ7fS0aRcXifm+gY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Bu/oHVKK88nx8fAdr8FPznbkKClYGd1N6lXk9Xk2ZJXZfr7EBMuXVXEDpOYBJVzS9
+	 cVUPjJaZKqHwzHIZN1v5jtZHCaKxly8vKiPo/J2fnDf2dZ+8Y/YFJBwSU/wdsjvgXQ
+	 eXT1jUTyZsZYZnPs8tq/qtue0zRvCCpixMaa5zzJfpld3Op+FeaL1tSD4KDVKxlaT8
+	 OYCASdYi5i9qnbBYNHchnTTIdZ2DnUKh+NVWPdUJkLB7yayBqby9altvhlae9pHck8
+	 v+xU9rehzGU3Z3mFyF891q8SkmUKAI35KklXAYCDEkWg9s8MKPSG7JVysBD562v0yj
+	 ZaIBLaOuYpCRg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CE6C39307B8;
+	Thu,  9 Apr 2026 10:30:09 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <TY3PR01MB11346A0F047F1F7296B8F4FCA86582@TY3PR01MB11346.jpnprd01.prod.outlook.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spamd-Result: default: False [-0.36 / 15.00];
+Subject: Re: [PATCH net-next v7 0/2] r8152: Add support for the RTL8157 5Gbit
+ USB Ethernet chip
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177573060829.1113011.1073124687073176218.git-patchwork-notify@kernel.org>
+Date: Thu, 09 Apr 2026 10:30:08 +0000
+References: <20260404-rtl8157_next-v7-0-039121318f23@birger-koblitz.de>
+In-Reply-To: <20260404-rtl8157_next-v7-0-039121318f23@birger-koblitz.de>
+To: Birger Koblitz <mail@birger-koblitz.de>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, linux-usb@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ hsu.chih.kai@realtek.com
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[renesas.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-276933-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-276934-lists,netdev=lfdr.de,netdevbpf];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.865];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NO_DN(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,renesas.com:email,shell.armlinux.org.uk:mid]
-X-Rspamd-Queue-Id: 798BB3C928D
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 1FA693C92AB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Apr 09, 2026 at 10:13:10AM +0000, Biju Das wrote:
-> Hi Ovidu,
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Sat, 04 Apr 2026 09:57:41 +0200 you wrote:
+> Add support for the RTL8157, which is a 5GBit USB-Ethernet adapter
+> chip in the RTL815x family of chips.
 > 
-> Thanks for the patch.
+> The RTL8157 uses a different frame descriptor format, and different
+> SRAM/ADV access methods, plus offers 5GBit/s Ethernet, so support for these
+> features is added in addition to chip initialization and configuration.
 > 
-> > -----Original Message-----
-> > From: Ovidiu Panait <ovidiu.panait.rb@renesas.com>
-> > Sent: 09 April 2026 10:57
-> > Subject: [PATCH net v2 2/2] net: phy: micrel: remove ksz9131_resume()
-> > 
-> > ksz9131_resume() was added to restore RGMII delays on resume for platforms where the PHY loses power
-> > during suspend to RAM. However, for s2idle, the PHY stays in Software Power-Down (SPD) during resume.
-> > In that case,
-> > ksz9131_config_rgmii_delay() accesses MMD registers before kszphy_resume() clears BMCR_PDOWN. The
-> > KSZ9131 datasheet states that during SPD, access to the MMD registers is restricted:
-> > 
-> >   - Only access to the standard registers (0 through 31) is supported.
-> >   - Access to MMD address spaces other than MMD address space 1 is
-> >     possible if the spd_clock_gate_override bit is set.
-> >   - Access to MMD address space 1 is not possible.
-> > 
-> > Additionally, only RGMII delays were restored, while other settings from ksz9131_config_init() were
-> > not.
-> > 
-> > Now that the preceding commit ("net: phylink: call phy_init_hw() in phylink resume path") performs a
-> > phy_init_hw() during phylink resume,
-> > ksz9131_resume() is no longer needed.
-> > 
-> > Remove it and use kszphy_resume() directly.
-> 
-> How to avoid code duplication in this case?
-> 
-> For eg: phy_init_hw() makes the phy out of SPD state
-> 
-> and kszphy_resume() unconditionally makes the phy out of SPD state again.
->       ¬ kszphy_generic_resume
->          ¬ genphy_resume
+> [...]
 
-My question would be... if we mandate that phy_init_hw() must be called
-before phy_resume() by MAC drivers, then how much of kszphy_resume()
-becomes redundant?
+Here is the summary with links:
+  - [net-next,v7,1/2] r8152: Add support for 5Gbit Link Speeds and EEE
+    https://git.kernel.org/netdev/net-next/c/ebe5fd2ed20a
+  - [net-next,v7,2/2] r8152: Add support for the RTL8157 hardware
+    https://git.kernel.org/netdev/net-next/c/fd3c7d080df5
 
-Given that populating drv->soft_reset() with genphy_soft_reset() means
-the PDOWN bit will be cleared, genphy_resume() becomes redundant.
-
-phy_init_hw() will also call drv->config_intr(), so that doesn't need
-to be done either.
-
-It will also call drv->config_init(), which will call
-kszphy_config_reset().
-
-So most of kszphy_resume() becomes unnecessary. I think the only thing
-that remains would be the call to kszphy_enable_clk() - and is it fine
-to call that after phy_init_hw() ?
-
+You are awesome, thank you!
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
