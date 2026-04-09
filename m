@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-277147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277148-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +LKaKI4f2GlaYAgAu9opvQ
-	(envelope-from <netdev+bounces-277147-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 23:52:14 +0200
+	id yIm+EqAf2GlaYAgAu9opvQ
+	(envelope-from <netdev+bounces-277148-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 23:52:32 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 074FD3D007F
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 23:52:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AAB763D0086
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 23:52:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6A2BD304741D
-	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 21:49:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CF936304C961
+	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 21:49:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47E58341ADF;
-	Thu,  9 Apr 2026 21:49:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD14335B653;
+	Thu,  9 Apr 2026 21:49:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hUnIE/Dp"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="e9CDmw6G"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
+Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73ABD35B658
-	for <netdev@vger.kernel.org>; Thu,  9 Apr 2026 21:49:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47CA233A701
+	for <netdev@vger.kernel.org>; Thu,  9 Apr 2026 21:49:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775771384; cv=none; b=QsSipvz/PjMmQz7P2J0uQF2QZId71X6qrBcI4QEu9Fj56a+RgFdJIMskMSS6Xf15nnqRw+fBPr08fEBmClwagOf6kDmzCkcRhxNxW4iBDIQHmYdUiFvNjmYvty4OaZVs4DoJxKOpe9E9Wt8Ko2tDEs76nHhrLGr99jj1RbEHm7Y=
+	t=1775771385; cv=none; b=rP0L6Mz8/j9dHHVpjJPotPUPDRTPjpkz+skb91K5LZfj00GRENYTD8Gtyq7oYh7GT5ujymGfRIXDcP4bXcJPcHoX6PS4OIjXSmNi/FG67mZIAdjEVuwUGyc65dwXTLiT4UqZFsVdZG6EOIr7288brBkP/xuoSzF/s3FQbR3Y2QY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775771384; c=relaxed/simple;
-	bh=Ibd+bVMznU6as2P0bUTruvhcgxOit5tNiOZ+THfXXyU=;
+	s=arc-20240116; t=1775771385; c=relaxed/simple;
+	bh=nSo6aej+ukOVgv3jtn96voViCFdUZLg0a6AQV1Ez90M=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Ydtd5YO74WZXMpsbkwI8LW8lFN7CrDJDAED6oVsHEvrJy1A9UwFg5nI38MChneuZk6YaHYspZbHR6qUvYk1xBh1lJKwHU9Rt6L7cwaHmIP9UqIWoAD2pn9zlObNKMJnwr4B9t9+p3QXnjPstKKZO4Qh+E6qAa2jUxJziMUUncAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hUnIE/Dp; arc=none smtp.client-ip=209.85.222.201
+	 To:Cc:Content-Type; b=Z6B+td9tqhqycw118dJJgqTk2zMXW2WePFt1lJQFwOMmz+iykTcmLc93W4buddf3ZIAhF/CKf0gZUAWRk+KymHbNp9N60AyIVVd5vdHIHzFIMuYFNhWf51atPZH3/yAdPLsWqI/oKbQFn3zHkCuFzuK0K36qd4pBDmq/PxzTFC8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=e9CDmw6G; arc=none smtp.client-ip=209.85.160.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-8d4c2906fdfso153126885a.2
-        for <netdev@vger.kernel.org>; Thu, 09 Apr 2026 14:49:42 -0700 (PDT)
+Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-50b4ca7e7c2so28879601cf.3
+        for <netdev@vger.kernel.org>; Thu, 09 Apr 2026 14:49:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1775771381; x=1776376181; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1775771383; x=1776376183; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=MSulQTQdJdirKxiu9TknoP5BKm/Ss1K5UPdLfI/RuVA=;
-        b=hUnIE/DpWn/Sfn/xrZ5So07LfpBusnFm4pftJrBOtytOEnaWFiM1KpMuSOek7hIdOb
-         Ob5Op4rtBZ8pGSqf0JwNfHiOmMuYVRolVEuyMqgILOcLvtiQaXTwp9rKkU/IGZS85VxO
-         4VFqdTDQjwXFnoNQCNnbBSiB7eWQcAGAXDOU9IPImSWQvjQfw8ySH5avbTQXDgxfXT2z
-         udZlxJwLITad5Jfca6v2Vt/QKqMMAmasWSBeg3urcjTgQ7wnVdZ/183h686CD+mugOgY
-         dZTKs+loLZa8GzPC5kDv7Est7/m3Ggsz9chcxpA7IHqE21n5H6mObij+VohMotWf5xX8
-         bThA==
+        bh=0ARy47czAXI1fX/UiSwJx6KtZ1ahNEm57GRGQ4HfmRQ=;
+        b=e9CDmw6Gcaf+gSwrM5uztL6yBeCRgedzXXogF+Bo3ypzVRtrhg3sA4WS7Vb+wSx0Um
+         YzQrutwAdEnPXx/91MftHNFe6pwbHpha4q0gv/f9gFPXEuGU+5Vu0LLrsebautZ9UGkH
+         iS9m0dY4x6yEl7vW8wYHVinM5Za0iJJjaFn4ZGxiATSDMiJTc9TdFVHz3s5Kp+NoX8yh
+         Xkavd6DtDERJffcxVgKApMD02u2a+iqJlz5mvICL1GZNEZ8Hud7Vjsj5mfBQh6dZWCOF
+         LSd4zohq5mXHCK+/NzV7Sap/hFRsBwW0Jzi/WwcoAVFFRXSb/4qQxK61P4QeyFD4czNe
+         ktKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775771381; x=1776376181;
+        d=1e100.net; s=20251104; t=1775771383; x=1776376183;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MSulQTQdJdirKxiu9TknoP5BKm/Ss1K5UPdLfI/RuVA=;
-        b=UOuBYEk0x+ezT6Jhvt0kb3GASgyWlBdGdNPSc0Ub0vOVq5HpF2iHISEv978Yvyzxas
-         eC8CQxCk4O1ERdSUGTvdOKGA8o7KIfVU75OFdHk7lp+j48eL6+noTkDJLOJacaQKQx8V
-         1CcFjgIegNfMtPF79vgC6MjUAv7TIq6K98NgvnHJxyqJ05Vxzw1wt7vN3OX8y+W77NaA
-         iE2Lf6w/uj0dQ8uls0zms/lKdoDDb1hEVWvFyhL8wRdT7ftMZFX1kwi4x2plpWl66BY/
-         lkZBxvM9xsAqUl79IknGJ4YwCnC9UjMBH6Axc1XAhIkZt9jh/6WSifyZiRSMjNA1R8XO
-         pJYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX+H1iucq3MigzL2RMigFhVipBuNoVa8oug/wqwVj8CfiYDNo4qKtMpGmZFdqP8Fjnt9zkxfww=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw3EI2yaAjrXDb7erPohZLYe/iPrBUZ5hYeuYHN3CWrOUISshYg
-	Y2eJGx9UEWrIgMWPi/mCHMU0bV+MKdt/AOhiolFv7WXWJFQ4tjWItF/LQtoKzi6OBEZDQwy2yaQ
-	J1GFftWn+YDuCLA==
-X-Received: from qkfw26.prod.google.com ([2002:ae9:e51a:0:b0:8cf:c124:567c])
+        bh=0ARy47czAXI1fX/UiSwJx6KtZ1ahNEm57GRGQ4HfmRQ=;
+        b=CRgcJ7OXVqYGaITwlls5wrsrUyRGIRJkNITBQKSRvyPtQpGRM6HxpkmJmFZuoWOi4E
+         mWjGgUAOt/nYGjN37Sj2ZXyOZG8h2i6YG7/59oVZdkVtPKSNyVqqYVFylLbBOONzBdUj
+         W7iEEheT5LdtsZHZAj/2hGXWivyE2DxInmQc8gPq1vdxME0HmOkfjXnrubKPf5d4UnBu
+         kBd7Tt+Y+vhEJIujByY83EvhWWHNSXS4H6xOhxwGU9iCi/D99nAz14EvXgWEmw/OblJN
+         0HwMRFDaRAVM6kcOkRwoVzIvJnLLVWSfMzDX1dMmIqRqH1Dbc/yoAptE3YT3XDLg9vhx
+         QI4w==
+X-Forwarded-Encrypted: i=1; AJvYcCXA8nt5DA6nF0CgbGxkmbGwlPBFWc+N6l4p9posPctxrxcQB5gk5HcjBw6YU2vUckipANypt4o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyAA00pmjyb9i632TQG+sGwvGuGqRI5x0YsbRRtxZsf90WGw2Ji
+	49cszRMjFqnJ+jT6tZZQhMw2h8tK2FIrOK4KH3NpCIoivqs1MIefVjyXuIHpvxiTRRO832r7dUO
+	ago77Qdg2GS6QPw==
+X-Received: from qtvo19.prod.google.com ([2002:ac8:7c53:0:b0:503:34fa:ca78])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:6cc2:b0:8d7:4f7c:8736 with SMTP id af79cd13be357-8ddcd603230mr92806085a.13.1775771381297;
- Thu, 09 Apr 2026 14:49:41 -0700 (PDT)
-Date: Thu,  9 Apr 2026 21:49:13 +0000
+ 2002:a05:622a:2285:b0:50b:465f:706c with SMTP id d75a77b69052e-50dd5ccfd69mr14525371cf.60.1775771383180;
+ Thu, 09 Apr 2026 14:49:43 -0700 (PDT)
+Date: Thu,  9 Apr 2026 21:49:14 +0000
 In-Reply-To: <20260409214914.3072827-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,9 +76,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260409214914.3072827-1-edumazet@google.com>
 X-Mailer: git-send-email 2.53.0.1213.gd9a14994de-goog
-Message-ID: <20260409214914.3072827-15-edumazet@google.com>
-Subject: [PATCH v2 net-next 14/15] net/sched: mq: no longer acquire qdisc
- spinlocks in dump operations
+Message-ID: <20260409214914.3072827-16-edumazet@google.com>
+Subject: [PATCH v2 net-next 15/15] net/sched: taprio: prepare taprio_dump()
+ for RTNL removal
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -102,7 +102,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-277147-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-277148-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -114,372 +114,132 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 074FD3D007F
+X-Rspamd-Queue-Id: AAB763D0086
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Prepare mq_dump_common(), mqprio_dump() and mqprio_dump_class_stats()
-for RTNL avoidance.
+We soon will no longer hold RTNL in qdisc dumps.
 
-Use private variables instead of assuming sch->bstats and sch->qstats
-can be used when folding stats from children.
+Add READ_ONCE()/WRITE_ONCE() annoations.
 
-This means the children qdisc spinlocks no longer need to be acquired.
-
-Add qdisc_qlen_lockless() helper, and change gnet_stats_add_basic()
-prototype.
+Note taprio already uses RCU to protect most of its fields.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- include/net/gen_stats.h   |  9 ++++-
- include/net/sch_generic.h |  5 +++
- net/core/gen_estimator.c  | 24 ++++++------
- net/core/gen_stats.c      | 17 ++++-----
- net/sched/sch_mq.c        | 34 ++++++++++-------
- net/sched/sch_mqprio.c    | 77 +++++++++++++++++++--------------------
- 6 files changed, 89 insertions(+), 77 deletions(-)
+ net/sched/sch_taprio.c | 42 ++++++++++++++++++++++++------------------
+ 1 file changed, 24 insertions(+), 18 deletions(-)
 
-diff --git a/include/net/gen_stats.h b/include/net/gen_stats.h
-index 7aa2b8e1fb298c4f994a745b114fc4da785ddf4b..5484b67298e3fe94fe84f0e929799362d21499df 100644
---- a/include/net/gen_stats.h
-+++ b/include/net/gen_stats.h
-@@ -21,6 +21,11 @@ struct gnet_stats_basic_sync {
- 	struct u64_stats_sync syncp;
- } __aligned(2 * sizeof(u64));
+diff --git a/net/sched/sch_taprio.c b/net/sched/sch_taprio.c
+index 885a9bc859166dfb6d20aa0dfbb8f11194e02ba9..75030a834840cde3480722cc4214431625a7c7ee 100644
+--- a/net/sched/sch_taprio.c
++++ b/net/sched/sch_taprio.c
+@@ -308,10 +308,10 @@ static void taprio_update_queue_max_sdu(struct taprio_sched *q,
  
-+struct gnet_stats {
-+	u64	bytes;
-+	u64	packets;
-+};
-+
- struct net_rate_estimator;
- 
- struct gnet_dump {
-@@ -49,9 +54,9 @@ int gnet_stats_start_copy_compat(struct sk_buff *skb, int type,
- int gnet_stats_copy_basic(struct gnet_dump *d,
- 			  struct gnet_stats_basic_sync __percpu *cpu,
- 			  struct gnet_stats_basic_sync *b, bool running);
--void gnet_stats_add_basic(struct gnet_stats_basic_sync *bstats,
-+void gnet_stats_add_basic(struct gnet_stats *bstats,
- 			  struct gnet_stats_basic_sync __percpu *cpu,
--			  struct gnet_stats_basic_sync *b, bool running);
-+			  const struct gnet_stats_basic_sync *b, bool running);
- int gnet_stats_copy_basic_hw(struct gnet_dump *d,
- 			     struct gnet_stats_basic_sync __percpu *cpu,
- 			     struct gnet_stats_basic_sync *b, bool running);
-diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
-index 2a07f45e6e915a03389ac54328ba500ca0cbe309..dccaf758894f47e1d2cf8aea95813c517980981c 100644
---- a/include/net/sch_generic.h
-+++ b/include/net/sch_generic.h
-@@ -542,6 +542,11 @@ static inline int qdisc_qlen(const struct Qdisc *q)
- 	return q->q.qlen;
- }
- 
-+static inline int qdisc_qlen_lockless(const struct Qdisc *q)
-+{
-+	return READ_ONCE(q->q.qlen);
-+}
-+
- static inline void qdisc_qlen_inc(struct Qdisc *q)
- {
- 	WRITE_ONCE(q->q.qlen, q->q.qlen + 1);
-diff --git a/net/core/gen_estimator.c b/net/core/gen_estimator.c
-index c34e58c6c3e666743e72978f9a78cf7f95a360c3..40990aee45590f2c56c070b0d28f856fc82d1f55 100644
---- a/net/core/gen_estimator.c
-+++ b/net/core/gen_estimator.c
-@@ -60,9 +60,10 @@ struct net_rate_estimator {
- };
- 
- static void est_fetch_counters(struct net_rate_estimator *e,
--			       struct gnet_stats_basic_sync *b)
-+			       struct gnet_stats *b)
- {
--	gnet_stats_basic_sync_init(b);
-+	b->packets = 0;
-+	b->bytes = 0;
- 	if (e->stats_lock)
- 		spin_lock(e->stats_lock);
- 
-@@ -76,18 +77,15 @@ static void est_fetch_counters(struct net_rate_estimator *e,
- static void est_timer(struct timer_list *t)
- {
- 	struct net_rate_estimator *est = timer_container_of(est, t, timer);
--	struct gnet_stats_basic_sync b;
--	u64 b_bytes, b_packets;
-+	struct gnet_stats b;
- 	u64 rate, brate;
- 
- 	est_fetch_counters(est, &b);
--	b_bytes = u64_stats_read(&b.bytes);
--	b_packets = u64_stats_read(&b.packets);
- 
--	brate = (b_bytes - est->last_bytes) << (10 - est->intvl_log);
-+	brate = (b.bytes - est->last_bytes) << (10 - est->intvl_log);
- 	brate = (brate >> est->ewma_log) - (est->avbps >> est->ewma_log);
- 
--	rate = (b_packets - est->last_packets) << (10 - est->intvl_log);
-+	rate = (b.packets - est->last_packets) << (10 - est->intvl_log);
- 	rate = (rate >> est->ewma_log) - (est->avpps >> est->ewma_log);
- 
- 	preempt_disable_nested();
-@@ -97,8 +95,8 @@ static void est_timer(struct timer_list *t)
- 	write_seqcount_end(&est->seq);
- 	preempt_enable_nested();
- 
--	est->last_bytes = b_bytes;
--	est->last_packets = b_packets;
-+	est->last_bytes = b.bytes;
-+	est->last_packets = b.packets;
- 
- 	est->next_jiffies += ((HZ/4) << est->intvl_log);
- 
-@@ -138,7 +136,7 @@ int gen_new_estimator(struct gnet_stats_basic_sync *bstats,
- {
- 	struct gnet_estimator *parm = nla_data(opt);
- 	struct net_rate_estimator *old, *est;
--	struct gnet_stats_basic_sync b;
-+	struct gnet_stats b;
- 	int intvl_log;
- 
- 	if (nla_len(opt) < sizeof(*parm))
-@@ -172,8 +170,8 @@ int gen_new_estimator(struct gnet_stats_basic_sync *bstats,
- 	est_fetch_counters(est, &b);
- 	if (lock)
- 		local_bh_enable();
--	est->last_bytes = u64_stats_read(&b.bytes);
--	est->last_packets = u64_stats_read(&b.packets);
-+	est->last_bytes = b.bytes;
-+	est->last_packets = b.packets;
- 
- 	if (lock)
- 		spin_lock_bh(lock);
-diff --git a/net/core/gen_stats.c b/net/core/gen_stats.c
-index 1a2380e74272de8eaf3d4ef453e56105a31e9edf..14ee7a4e3709ad5c64a158d3c8d1177ada3a32b0 100644
---- a/net/core/gen_stats.c
-+++ b/net/core/gen_stats.c
-@@ -123,10 +123,9 @@ void gnet_stats_basic_sync_init(struct gnet_stats_basic_sync *b)
- }
- EXPORT_SYMBOL(gnet_stats_basic_sync_init);
- 
--static void gnet_stats_add_basic_cpu(struct gnet_stats_basic_sync *bstats,
-+static void gnet_stats_add_basic_cpu(struct gnet_stats *bstats,
- 				     struct gnet_stats_basic_sync __percpu *cpu)
- {
--	u64 t_bytes = 0, t_packets = 0;
- 	int i;
- 
- 	for_each_possible_cpu(i) {
-@@ -140,19 +139,18 @@ static void gnet_stats_add_basic_cpu(struct gnet_stats_basic_sync *bstats,
- 			packets = u64_stats_read(&bcpu->packets);
- 		} while (u64_stats_fetch_retry(&bcpu->syncp, start));
- 
--		t_bytes += bytes;
--		t_packets += packets;
-+		bstats->bytes += bytes;
-+		bstats->packets += packets;
+ 		if (max_sdu != U32_MAX) {
+ 			sched->max_frm_len[tc] = max_sdu + dev->hard_header_len;
+-			sched->max_sdu[tc] = max_sdu;
++			WRITE_ONCE(sched->max_sdu[tc], max_sdu);
+ 		} else {
+ 			sched->max_frm_len[tc] = U32_MAX; /* never oversized */
+-			sched->max_sdu[tc] = 0;
++			WRITE_ONCE(sched->max_sdu[tc], 0);
+ 		}
  	}
--	_bstats_update(bstats, t_bytes, t_packets);
  }
- 
--void gnet_stats_add_basic(struct gnet_stats_basic_sync *bstats,
-+void gnet_stats_add_basic(struct gnet_stats *bstats,
- 			  struct gnet_stats_basic_sync __percpu *cpu,
--			  struct gnet_stats_basic_sync *b, bool running)
-+			  const struct gnet_stats_basic_sync *b, bool running)
- {
- 	unsigned int start;
--	u64 bytes = 0;
- 	u64 packets = 0;
-+	u64 bytes = 0;
- 
- 	WARN_ON_ONCE((cpu || running) && in_hardirq());
- 
-@@ -167,7 +165,8 @@ void gnet_stats_add_basic(struct gnet_stats_basic_sync *bstats,
- 		packets = u64_stats_read(&b->packets);
- 	} while (running && u64_stats_fetch_retry(&b->syncp, start));
- 
--	_bstats_update(bstats, bytes, packets);
-+	bstats->bytes += bytes;
-+	bstats->packets += packets;
- }
- EXPORT_SYMBOL(gnet_stats_add_basic);
- 
-diff --git a/net/sched/sch_mq.c b/net/sched/sch_mq.c
-index a0133a7b9d3b09a0d2a6064234c8fdef60dbf955..290646e7574e582196357296c3fadb3a066ea577 100644
---- a/net/sched/sch_mq.c
-+++ b/net/sched/sch_mq.c
-@@ -143,30 +143,38 @@ EXPORT_SYMBOL_NS_GPL(mq_attach, "NET_SCHED_INTERNAL");
- void mq_dump_common(struct Qdisc *sch, struct sk_buff *skb)
- {
- 	struct net_device *dev = qdisc_dev(sch);
--	struct Qdisc *qdisc;
-+	struct gnet_stats_queue qstats = { 0 };
-+	struct gnet_stats bstats = { 0 };
-+	const struct Qdisc *qdisc;
-+	unsigned int qlen = 0;
- 	unsigned int ntx;
- 
--	sch->q.qlen = 0;
--	gnet_stats_basic_sync_init(&sch->bstats);
--	memset(&sch->qstats, 0, sizeof(sch->qstats));
--
- 	/* MQ supports lockless qdiscs. However, statistics accounting needs
- 	 * to account for all, none, or a mix of locked and unlocked child
- 	 * qdiscs. Percpu stats are added to counters in-band and locking
- 	 * qdisc totals are added at end.
- 	 */
-+	rcu_read_lock();
- 	for (ntx = 0; ntx < dev->num_tx_queues; ntx++) {
--		qdisc = rtnl_dereference(netdev_get_tx_queue(dev, ntx)->qdisc_sleeping);
--		spin_lock_bh(qdisc_lock(qdisc));
-+		qdisc = rcu_dereference(netdev_get_tx_queue(dev, ntx)->qdisc_sleeping);
- 
--		gnet_stats_add_basic(&sch->bstats, qdisc->cpu_bstats,
--				     &qdisc->bstats, false);
--		gnet_stats_add_queue(&sch->qstats, qdisc->cpu_qstats,
-+		gnet_stats_add_basic(&bstats, qdisc->cpu_bstats,
-+				     &qdisc->bstats, true);
-+		gnet_stats_add_queue(&qstats, qdisc->cpu_qstats,
- 				     &qdisc->qstats);
--		sch->q.qlen += qdisc_qlen(qdisc);
--
--		spin_unlock_bh(qdisc_lock(qdisc));
-+		qlen += qdisc_qlen_lockless(qdisc);
+@@ -1770,8 +1770,8 @@ static int taprio_parse_tc_entries(struct Qdisc *sch,
  	}
-+	rcu_read_unlock();
-+	u64_stats_set(&sch->bstats.bytes, bstats.bytes);
-+	u64_stats_set(&sch->bstats.packets, bstats.packets);
-+
-+	WRITE_ONCE(sch->qstats.qlen, qstats.qlen);
-+	WRITE_ONCE(sch->qstats.backlog, qstats.backlog);
-+	WRITE_ONCE(sch->qstats.drops, qstats.drops);
-+	WRITE_ONCE(sch->qstats.requeues, qstats.requeues);
-+	WRITE_ONCE(sch->qstats.overlimits, qstats.overlimits);
-+
-+	WRITE_ONCE(sch->q.qlen, qlen);
- }
- EXPORT_SYMBOL_NS_GPL(mq_dump_common, "NET_SCHED_INTERNAL");
  
-diff --git a/net/sched/sch_mqprio.c b/net/sched/sch_mqprio.c
-index d35624e5869a4a6a12612886b2cd9cdac7b0b471..e2512b7bb2f4769190da918de52da0d8d4a915ca 100644
---- a/net/sched/sch_mqprio.c
-+++ b/net/sched/sch_mqprio.c
-@@ -554,32 +554,42 @@ static int mqprio_dump(struct Qdisc *sch, struct sk_buff *skb)
- 	struct net_device *dev = qdisc_dev(sch);
- 	struct mqprio_sched *priv = qdisc_priv(sch);
- 	struct nlattr *nla = (struct nlattr *)skb_tail_pointer(skb);
-+	struct gnet_stats_queue qstats = { 0 };
+ 	for (tc = 0; tc < TC_QOPT_MAX_QUEUE; tc++) {
+-		q->max_sdu[tc] = max_sdu[tc];
+-		q->fp[tc] = fp[tc];
++		WRITE_ONCE(q->max_sdu[tc], max_sdu[tc]);
++		WRITE_ONCE(q->fp[tc], fp[tc]);
+ 		if (fp[tc] != TC_FP_EXPRESS)
+ 			have_preemption = true;
+ 	}
+@@ -1851,12 +1851,14 @@ static int taprio_change(struct Qdisc *sch, struct nlattr *opt,
+ 		return -EINVAL;
+ 	}
+ 
+-	if (q->flags != TAPRIO_FLAGS_INVALID && q->flags != taprio_flags) {
+-		NL_SET_ERR_MSG_MOD(extack,
+-				   "Changing 'flags' of a running schedule is not supported");
+-		return -EOPNOTSUPP;
++	if (q->flags != taprio_flags) {
++		if (q->flags != TAPRIO_FLAGS_INVALID) {
++			NL_SET_ERR_MSG_MOD(extack,
++					   "Changing 'flags' of a running schedule is not supported");
++			return -EOPNOTSUPP;
++		}
++		q->flags = taprio_flags;
+ 	}
+-	q->flags = taprio_flags;
+ 
+ 	/* Needed for length_to_duration() during netlink attribute parsing */
+ 	taprio_set_picos_per_byte(dev, q, extack);
+@@ -1939,7 +1941,8 @@ static int taprio_change(struct Qdisc *sch, struct nlattr *opt,
+ 			goto unlock;
+ 		}
+ 
+-		q->txtime_delay = nla_get_u32(tb[TCA_TAPRIO_ATTR_TXTIME_DELAY]);
++		WRITE_ONCE(q->txtime_delay,
++			   nla_get_u32(tb[TCA_TAPRIO_ATTR_TXTIME_DELAY]));
+ 	}
+ 
+ 	if (!TXTIME_ASSIST_IS_ENABLED(q->flags) &&
+@@ -2279,8 +2282,8 @@ static int dump_schedule(struct sk_buff *msg,
+ }
+ 
+ static int taprio_dump_tc_entries(struct sk_buff *skb,
+-				  struct taprio_sched *q,
+-				  struct sched_gate_list *sched)
++				  const struct taprio_sched *q,
++				  const struct sched_gate_list *sched)
+ {
+ 	struct nlattr *n;
+ 	int tc;
+@@ -2294,10 +2297,11 @@ static int taprio_dump_tc_entries(struct sk_buff *skb,
+ 			goto nla_put_failure;
+ 
+ 		if (nla_put_u32(skb, TCA_TAPRIO_TC_ENTRY_MAX_SDU,
+-				sched->max_sdu[tc]))
++				READ_ONCE(sched->max_sdu[tc])))
+ 			goto nla_put_failure;
+ 
+-		if (nla_put_u32(skb, TCA_TAPRIO_TC_ENTRY_FP, q->fp[tc]))
++		if (nla_put_u32(skb, TCA_TAPRIO_TC_ENTRY_FP,
++				READ_ONCE(q->fp[tc])))
+ 			goto nla_put_failure;
+ 
+ 		nla_nest_end(skb, n);
+@@ -2383,6 +2387,7 @@ static int taprio_dump(struct Qdisc *sch, struct sk_buff *skb)
+ 	struct sched_gate_list *oper, *admin;
  	struct tc_mqprio_qopt opt = { 0 };
-+	struct gnet_stats bstats = { 0 };
-+	const struct Qdisc *qdisc;
- 	unsigned int qlen = 0;
--	struct Qdisc *qdisc;
- 	unsigned int ntx;
- 
--	qlen = 0;
--	gnet_stats_basic_sync_init(&sch->bstats);
--	memset(&sch->qstats, 0, sizeof(sch->qstats));
--
- 	/* MQ supports lockless qdiscs. However, statistics accounting needs
- 	 * to account for all, none, or a mix of locked and unlocked child
- 	 * qdiscs. Percpu stats are added to counters in-band and locking
- 	 * qdisc totals are added at end.
- 	 */
-+	rcu_read_lock();
- 	for (ntx = 0; ntx < dev->num_tx_queues; ntx++) {
--		qdisc = rtnl_dereference(netdev_get_tx_queue(dev, ntx)->qdisc_sleeping);
--		spin_lock_bh(qdisc_lock(qdisc));
-+		qdisc = rcu_dereference(netdev_get_tx_queue(dev, ntx)->qdisc_sleeping);
- 
--		gnet_stats_add_basic(&sch->bstats, qdisc->cpu_bstats,
--				     &qdisc->bstats, false);
--		gnet_stats_add_queue(&sch->qstats, qdisc->cpu_qstats,
-+		gnet_stats_add_basic(&bstats, qdisc->cpu_bstats,
-+				     &qdisc->bstats, true);
-+		gnet_stats_add_queue(&qstats, qdisc->cpu_qstats,
- 				     &qdisc->qstats);
--		qlen += qdisc_qlen(qdisc);
--
--		spin_unlock_bh(qdisc_lock(qdisc));
-+		qlen += qdisc_qlen_lockless(qdisc);
- 	}
-+	rcu_read_unlock();
-+
-+	/* The following is probably racy on 32bit arches.
-+	 * Acquiring bstats.syncp would require a spinlock.
-+	 */
-+	u64_stats_set(&sch->bstats.bytes, bstats.bytes);
-+	u64_stats_set(&sch->bstats.packets, bstats.packets);
-+
-+	WRITE_ONCE(sch->qstats.qlen, qstats.qlen);
-+	WRITE_ONCE(sch->qstats.backlog, qstats.backlog);
-+	WRITE_ONCE(sch->qstats.drops, qstats.drops);
-+	WRITE_ONCE(sch->qstats.requeues, qstats.requeues);
-+	WRITE_ONCE(sch->qstats.overlimits, qstats.overlimits);
-+
- 	WRITE_ONCE(sch->q.qlen, qlen);
+ 	struct nlattr *nest, *sched_nest;
++	u32 txtime_delay;
  
  	mqprio_qopt_reconstruct(dev, &opt);
-@@ -661,45 +671,32 @@ static int mqprio_dump_class(struct Qdisc *sch, unsigned long cl,
  
- static int mqprio_dump_class_stats(struct Qdisc *sch, unsigned long cl,
- 				   struct gnet_dump *d)
--	__releases(d->lock)
--	__acquires(d->lock)
- {
- 	if (cl >= TC_H_MIN_PRIORITY) {
--		int i;
--		__u32 qlen;
--		struct gnet_stats_queue qstats = {0};
--		struct gnet_stats_basic_sync bstats;
- 		struct net_device *dev = qdisc_dev(sch);
- 		struct netdev_tc_txq tc = dev->tc_to_txq[cl & TC_BITMASK];
--
--		gnet_stats_basic_sync_init(&bstats);
--		/* Drop lock here it will be reclaimed before touching
--		 * statistics this is required because the d->lock we
--		 * hold here is the look on dev_queue->qdisc_sleeping
--		 * also acquired below.
--		 */
--		if (d->lock)
--			spin_unlock_bh(d->lock);
-+		struct gnet_stats_queue qstats = { 0 };
-+		struct gnet_stats_basic_sync bstats;
-+		struct gnet_stats _bstats = { 0 };
-+		u32 qlen = 0;
-+		int i;
+@@ -2400,14 +2405,15 @@ static int taprio_dump(struct Qdisc *sch, struct sk_buff *skb)
+ 	if (q->flags && nla_put_u32(skb, TCA_TAPRIO_ATTR_FLAGS, q->flags))
+ 		goto options_error;
  
- 		for (i = tc.offset; i < tc.offset + tc.count; i++) {
- 			struct netdev_queue *q = netdev_get_tx_queue(dev, i);
--			struct Qdisc *qdisc = rtnl_dereference(q->qdisc);
-+			const struct Qdisc *qdisc = rtnl_dereference(q->qdisc);
+-	if (q->txtime_delay &&
+-	    nla_put_u32(skb, TCA_TAPRIO_ATTR_TXTIME_DELAY, q->txtime_delay))
++	txtime_delay = READ_ONCE(q->txtime_delay);
++	if (txtime_delay &&
++	    nla_put_u32(skb, TCA_TAPRIO_ATTR_TXTIME_DELAY, txtime_delay))
+ 		goto options_error;
  
--			spin_lock_bh(qdisc_lock(qdisc));
--
--			gnet_stats_add_basic(&bstats, qdisc->cpu_bstats,
--					     &qdisc->bstats, false);
-+			gnet_stats_add_basic(&_bstats, qdisc->cpu_bstats,
-+					     &qdisc->bstats, true);
- 			gnet_stats_add_queue(&qstats, qdisc->cpu_qstats,
- 					     &qdisc->qstats);
--			sch->q.qlen += qdisc_qlen(qdisc);
--
--			spin_unlock_bh(qdisc_lock(qdisc));
-+			qlen += qdisc_qlen_lockless(qdisc);
- 		}
--		qlen = qdisc_qlen(sch) + qstats.qlen;
-+		u64_stats_init(&bstats.syncp);
-+		u64_stats_set(&bstats.bytes, _bstats.bytes);
-+		u64_stats_set(&bstats.packets, _bstats.packets);
-+
-+		qlen = qlen + qstats.qlen;
+ 	rcu_read_lock();
  
--		/* Reclaim root sleeping lock before completing stats */
--		if (d->lock)
--			spin_lock_bh(d->lock);
- 		if (gnet_stats_copy_basic(d, NULL, &bstats, false) < 0 ||
- 		    gnet_stats_copy_queue(d, NULL, &qstats, qlen) < 0)
- 			return -1;
+-	oper = rtnl_dereference(q->oper_sched);
+-	admin = rtnl_dereference(q->admin_sched);
++	oper = rcu_dereference(q->oper_sched);
++	admin = rcu_dereference(q->admin_sched);
+ 
+ 	if (oper && taprio_dump_tc_entries(skb, q, oper))
+ 		goto options_error_rcu;
 -- 
 2.53.0.1213.gd9a14994de-goog
 
