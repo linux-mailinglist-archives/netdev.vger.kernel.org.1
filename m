@@ -1,134 +1,161 @@
-Return-Path: <netdev+bounces-277114-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277115-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id TkzBEzIA2GktWAgAu9opvQ
-	(envelope-from <netdev+bounces-277114-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 21:38:26 +0200
+	id +sjUFwwE2Gk1WQgAu9opvQ
+	(envelope-from <netdev+bounces-277115-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 21:54:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9DDA3CF0FF
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 21:38:25 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2D013CF1ED
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 21:54:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 40F523006B38
-	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 19:38:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 93002300AC20
+	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 19:54:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DE6C306486;
-	Thu,  9 Apr 2026 19:38:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04D7633A9DB;
+	Thu,  9 Apr 2026 19:54:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="iynxBWZ+"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="rENiqqgG"
 X-Original-To: netdev@vger.kernel.org
-Received: from outbound.st.icloud.com (p-east2-cluster4-host3-snip4-10.eps.apple.com [57.103.78.141])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 405B41DC1AB
-	for <netdev@vger.kernel.org>; Thu,  9 Apr 2026 19:38:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.78.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A6FC336EC6;
+	Thu,  9 Apr 2026 19:54:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775763503; cv=none; b=hdQuBnSr+ugyX/xTcYuOeLvOnw+tt/WeeqiJ4CApCKFCqn32bgkZpRF2qzfGCHWXrtALxEpap6yUX3map6LSDofCz1AeYIqNONYuYY9Vkq4cJjFYFwOA6ksW4PiexaTLrSkux7sO0s+qfLnbLaTjRrxDFlL3c4QBzYjcxAl2bZU=
+	t=1775764489; cv=none; b=gS2sOA48lj8VviTtbF2E6l5tfw4Hr/CwdvmufWp5PKQA4r9YoQpPiYQ0IDd6mS6lftU8oJW1v/qdNRJmuoKABoMnZH+tb1HdvbCl7NgvTKviBZXB72wgKw9Hhs8WF2yzNWxB0DCUlSHqnLNfy3nCJrYtwkvczIZ0zXAOMJJLZWU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775763503; c=relaxed/simple;
-	bh=WF178AMDzQwkc2LObD6a5oKfbRWCItiTHlFKnpEOAk0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YuoFvqG/elkv+h9GtuolEX6cEbHPNBKzNULZJfHjgOwOmwGw0otGmbiAsLVEOEXO2TLPhU6G8IIC/N/U38vxEIzVQjcao3UoIa0iL0NOnP/Vw8DsClBebxmcKbiAyDr66SAIANkC4thSvA2c3xCPUoqwM5lvGbAxR99YDJVMzfY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=iynxBWZ+; arc=none smtp.client-ip=57.103.78.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
-Received: from outbound.st.icloud.com (unknown [127.0.0.2])
-	by p00-icloudmta-asmtp-us-east-1a-10-percent-2 (Postfix) with ESMTPS id E85C31800232;
-	Thu, 09 Apr 2026 19:38:18 +0000 (UTC)
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com; s=1a1hai; t=1775763501; x=1778355501; bh=YSU8lKJUWnXhaPAZOsKBjk/C13kNaE8zIGXjJRNqEIM=; h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:x-icloud-hme; b=iynxBWZ+20IDWHqlQxudqTyDuRQ2rhwozIqSWWLJIPR2RhAVqkBSyBZC7XdOOntr5+rjt4MODSdGXPHXqHbkv4fXn4sxUdm9vdKbGkikJ1+u8WBOG/2bMcXEmSDQMJWsnu8OI8N7Og/JqRvd9ioU9I6vyPL4vSb7cb7CCDMQFuP1c7sZTA7Cih9iOL9cuibfBaKpNPKvQshKLdayWX5zZwRIF5HWtVOedZk+7sH3DcNNp/MYPz0avmDdIQrCN9/eE/F5Vqm9qE+1qpn6jwKllQ+7ycyewIkg29mbv0ytwJbrfLqaVOe1mo/dgkK/qq9oFSdjMy95K8ZJXndtzJS5dg==
-Received: from mainframe.tailfb0f7b.ts.net (unknown [17.42.251.67])
-	by p00-icloudmta-asmtp-us-east-1a-10-percent-2 (Postfix) with ESMTPSA id B3BFC18000BD;
-	Thu, 09 Apr 2026 19:38:16 +0000 (UTC)
-From: =?UTF-8?q?Lek=C3=AB=20Hap=C3=A7iu?= <snowwlake@icloud.com>
-To: horms@kernel.org
-Cc: netdev@vger.kernel.org,
-	kuba@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	security@kernel.org,
-	framemain@outlook.com
-Subject: Re: [PATCH] nfc: nci: fix OOB heap read in nci_core_init_rsp_packet_v1()
-Date: Thu,  9 Apr 2026 21:37:41 +0200
-Message-ID: <20260409193801.1826509-1-snowwlake@icloud.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260408190505.GK469338@kernel.org>
-References: <20260408190505.GK469338@kernel.org>
+	s=arc-20240116; t=1775764489; c=relaxed/simple;
+	bh=YHbjw5Pi02GNmKksf99jT1mik4D/XDXbRuffw83653A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NjdOLpCR909cvLvHfwobPoEe7UOGbKWUIzSOaxn8D/QhTuS/+UwDzbP2/BVH7QvMjczDTUsbC+qq2ihntSlGOQr06+xZwvfNWFfU6MXYgZRpRgRysomHLg+FscLEXwp19gILQDNx6hQ+RCrNfGUuFWbkRe9DmsXV+/9QJ7TX8Hg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=rENiqqgG; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=4m3qEQXbBSLI1c3Dofa2Pc9DqVCUH9sM2mc1pfaBTy0=; b=rENiqqgGOleRFOrUlzIVL0zkYF
+	8WCpohMYTag4aFjJx19sfHY6HHrh6RwSDTUWGU8h/p529Hk1Y81AwSolAAUif3+N8hR5ezT09j6px
+	gU8giOGqIxuZVyWzz2VfGii31bhGDT3BN7ohZji2v/x2xHRE+tlA1svqSb5p6yadVReA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wAvST-00FTpF-Tu; Thu, 09 Apr 2026 21:54:33 +0200
+Date: Thu, 9 Apr 2026 21:54:33 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Kory Maincent <kory.maincent@bootlin.com>,
+	Carlo Szelinsky <github@szelinsky.de>, o.rempel@pengutronix.de,
+	andrew+netdev@lunn.ch, hkallweit1@gmail.com, kuba@kernel.org,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	horms@kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 3/3] net: mdio: treat PSE EPROBE_DEFER as
+ non-fatal during PHY registration
+Message-ID: <280018e9-4499-4a13-b692-6d6a4499477b@lunn.ch>
+References: <8e12f0ac-be0d-4664-a533-df3bd1efb34a@lunn.ch>
+ <20260408210711.439068-1-github@szelinsky.de>
+ <841e0a96-5e5c-4225-a426-24726163699f@lunn.ch>
+ <20260409150922.74d82c39@kmaincent-XPS-13-7390>
+ <908a84be-d403-4f59-8d8e-aa9de35bccbb@lunn.ch>
+ <adfPAQDiYX6eIjrT@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Authority-Info-Out: v=2.4 cv=OcmVzxTY c=1 sm=1 tr=0 ts=69d8002b
- cx=c_apl:c_pps:t_out a=YrL12D//S6tul8v/L+6tKg==:117
- a=YrL12D//S6tul8v/L+6tKg==:17 a=IkcTkHD0fZMA:10 a=A5OVakUREuEA:10
- a=M51BFTxLslgA:10 a=x7bEGLp0ZPQA:10 a=LbuW6tbUWPcA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=aYGnAectiCr-H4skEwIA:9 a=3ZKOabzyN94A:10
- a=QEXdDO2ut3YA:10 a=zZCYzV9kfG8A:10 a=JKcXVnpmuwdQ7RL0mgk_:22
- a=NDDgNl8OaFIu1Hag6_vS:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDA5MDE4MCBTYWx0ZWRfX+breHxK+5A/k
- FmzLjKj4ax3fP/c9WKM2JutzeMDReNp8U8Gu413WVtRglNmNDVWPDpkCWkusCPVXFHf3sR5jjKg
- cq78vxL7VLwP+oS2q2bE+r5xMNdu8Blc6juCMzP/hBqKNNW11XdDFt+/P+j9X1IjI6Z05q7mcLf
- g1Le1x/6KQ+P4XwucftoWh7Lw9jajQWkPhHGbq3Eu3p7PmdFbH7fFCvp04KanOc2V5DCtJx43Q2
- jjwVlZpC9i9r35H/YSSaKjzJf0z1iZWoeX5WTh1ppDru7TK2Be8Xin/nn+u5aeZE0YUCoSbsXxt
- VVLON0+IpkPkZtNUbyttUxlgG11qMVrKwvFPm/GBamqhkvGCZkQyvqNSczMgtw=
-X-Proofpoint-GUID: rppjbLLS3uLUWs6tCvzfcOD9VmFuDtPH
-X-Proofpoint-ORIG-GUID: rppjbLLS3uLUWs6tCvzfcOD9VmFuDtPH
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-04-09_04,2026-04-09_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
- spamscore=0 clxscore=1015 phishscore=0 mlxscore=0 adultscore=0 malwarescore=0
- mlxlogscore=891 suspectscore=0 lowpriorityscore=0 classifier=spam authscore=0
- adjust=0 reason=mlx scancount=1 engine=8.22.0-2601150000
- definitions=main-2604090180
-X-Spamd-Result: default: False [-1.16 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <adfPAQDiYX6eIjrT@shell.armlinux.org.uk>
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[icloud.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[icloud.com:s=1a1hai];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-277114-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,davemloft.net,google.com,redhat.com,outlook.com];
-	DKIM_TRACE(0.00)[icloud.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-277115-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[bootlin.com,szelinsky.de,pengutronix.de,lunn.ch,gmail.com,kernel.org,davemloft.net,google.com,redhat.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_FROM(0.00)[icloud.com];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[snowwlake@icloud.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,icloud.com:dkim,icloud.com:mid]
-X-Rspamd-Queue-Id: C9DDA3CF0FF
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lunn.ch:dkim,lunn.ch:mid]
+X-Rspamd-Queue-Id: C2D013CF1ED
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Thanks for the review. I will address all three points across both
-patches (v1 and v2) and send them together as a patchset:
+On Thu, Apr 09, 2026 at 05:08:33PM +0100, Russell King (Oracle) wrote:
+> On Thu, Apr 09, 2026 at 05:34:56PM +0200, Andrew Lunn wrote:
+> > I still think we should be deferring probe until we have all the parts
+> > available. The question is, how do we actually do that?
+> 
+> Indeed...
+> 
+> > We could insist that MACs being used with PSE need to call
+> > phylink_connect() in probe, so we can return EPROBE_DEFER. We might
+> > actually need a new API method, phylink_connect_probe(). That can call
+> > down into phylib, maybe again new API methods, which will not bind
+> > genphy, but return EPROBE_DEFER.
 
-  - add an early skb->len >= sizeof(*rsp_1) guard before any struct
-    field access
-  - compute the rsp_2 pointer using the raw chip-supplied
-    num_supported_rf_interfaces (validated against skb->len), not the
-    already-capped ndev value
-  - investigate whether pskb_may_pull is needed in the NCI receive path
-    before these handlers are called
+I did not say i would be easy...
+ 
+> How would MACs know whether they should call phylink_connect_probe()
+> or phylink_connect_phy() ?
 
-Lekë
+It would not. Anybody with a board using PSE would need to modify the
+MAC driver to use phylink_connect_probe(), if they have a slow to load
+PSE device.
+
+> What do we do about MAC drivers that are a single driver and device,
+> but are made up of several network devices (like Marvell PP2) ?
+
+It would need more care, but it should work. You might end up removing
+a perfectly good device because the other one is missing its PHY,
+which is not ideal, but hopefully you get there in the end.
+
+> We also have network drivers that provide a MDIO bus for a different
+> network device, which makes connecting the PHY harder in the probe
+> path.
+
+Yes, we would see such setup doing more deferred probing, but again,
+they should get there in the end. The most common systems doing this
+are using the FEC. Are there any board using the FEC and problematic
+PSE?
+
+> Lastly, what do we do where a PHY driver hasn't been configured or
+> doesn't exist for the PHY?
+
+I was wondering if we can get from the driver core some idea where we
+are in the deferred probing window. If we are 2/3 of the way through
+the window, fall back to genphy?
+
+I'm not saying we should change all MAC drivers, or recommend new MAC
+drivers connect to the PHY in probe. I just want to offer the option
+if you have a problematic PSE or PHY, change the MAC driver.
+
+What we have also said in the past, it is the bootloaders problem to
+download firmware into the PHY, or PSE, so that it is ready to go by
+the time Linux boots. That would also be the simpler solution here.
+
+    Andrew
 
