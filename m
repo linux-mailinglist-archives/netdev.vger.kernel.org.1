@@ -1,74 +1,63 @@
-Return-Path: <netdev+bounces-277023-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277024-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wODsF5a112lURwgAu9opvQ
-	(envelope-from <netdev+bounces-277023-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 16:20:06 +0200
+	id sPYxMU+312lURwgAu9opvQ
+	(envelope-from <netdev+bounces-277024-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 16:27:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B41FA3CBE3B
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 16:20:05 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 706753CC02F
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 16:27:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 49A123004F40
-	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 14:18:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CF297308CF5D
+	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 14:22:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2247E38F24D;
-	Thu,  9 Apr 2026 14:18:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="QeO4WRSC"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 863303DBD57;
+	Thu,  9 Apr 2026 14:22:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 424E52EC0A1;
-	Thu,  9 Apr 2026 14:18:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F8B03DA7E0;
+	Thu,  9 Apr 2026 14:21:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775744302; cv=none; b=CFVbVxE/xaAoufafeWBbO+/ylyIGMVwUjtYtfoJEycSO+1GSzYXEQRksmpgAGyGAeKtbmAF211jk7H3GvfriiIL51z+pcOjGCVPbfaCPFDUSQqBx5T2vlTU0CJN3ZQPvTCgHnWa4EWhRRDTcK1DvbEGkOfmxCP2CDqqmKE5JzuA=
+	t=1775744521; cv=none; b=oho68U9mmS/ouVeo47cq6zc71kdkd/oV+Z29xI2l1d0mq9IM1+XrH8Wa8pjIDmc8Xg09G16clUSSA63B93sI7PYqzPnMVwFEaHdt0F3xuFByfGexLLIzJELBAXmjbdsVaEvw1hVNNz/ZQIZFhmF+LKUsTRO6tI1LGkjn0mc+KA0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775744302; c=relaxed/simple;
-	bh=4A4ZuHU6Mfrc7kiPscqSplixiIxt4GUsIMH6c85gJqQ=;
+	s=arc-20240116; t=1775744521; c=relaxed/simple;
+	bh=hgBEqVyt53AXPKU+9AYIC3cphVx6joVQQ0wDtlqImKY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ijvSODmuOnvOhphL5/wpzkM3zN7gTl3cBV4id7On+8nfBvi0Q3dWprjMcLT52Ci1WB9i1hh0me4fFQkx0rNO7RIOa11xtVp7WeRFSxdFIpHI53P2+68JG/XBqj7RB8SYvfwOLNZRsamWjvaRzmeUMmNXmGTXnPK/ZgGtxERJHF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=QeO4WRSC; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=AWCmcAsUvdxFHWsEA6Yf2MTwRBpfB9ta9uOqjx83LSo=; b=QeO4WRSC259SUATPde7ZPqvUzK
-	AcnJvyz0avM5rEXwhAMMDCeVXhoi0O9ScfYU1rVHkrUIttFD2EVzMWQME1O4jpfh5hDHH9zy0/FDh
-	GuRi46j9nOV5aBZG+bB7L92PnUeCpiam0UNZJhivT4wr6xhkHwFjF3nJ7/mA4TYYa0E6q7N3TRjl5
-	JYBGvHarxHoBbEenky+rC/WLE7erlcUzeom25u6XCqBcZho9eopgtk34FcA/ecaDHgwzXvj6d+vzf
-	SjF80fr8Xsb5Y7GRJviV+EQ3KyWFnXsP4IbtAKVpsPeoiG0DREmh7x9IXO9RBuimh/yShuHPZXuBD
-	2RBwQfJw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:40162)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1wAqD1-000000003hU-18Ip;
-	Thu, 09 Apr 2026 15:18:15 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1wAqCy-000000004Sq-0dYN;
-	Thu, 09 Apr 2026 15:18:12 +0100
-Date: Thu, 9 Apr 2026 15:18:11 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Charles Perry <charles.perry@microchip.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=dV2gF+nP+RcWyNaNwDEqzustMRXzmK25hC09fYnAdI23030rRr9cTd+mio7tJ5afcWk0FVOoxnHW+qbXDn7k/TcvqjfMbbqKGt2I845Tf3+SvISxWd02IiIvYb1QPCBrhR2xL7X3aCmiLSxRILCxxJb1cgeXJXhZtzyrBnY4RrA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.99)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1wAqGT-000000002Iq-2EUP;
+	Thu, 09 Apr 2026 14:21:49 +0000
+Date: Thu, 9 Apr 2026 15:21:45 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2] net: phy: fix a return path in get_phy_c45_ids()
-Message-ID: <ade1I2o3lc-iH5w9@shell.armlinux.org.uk>
-References: <20260409133654.3203336-1-charles.perry@microchip.com>
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Simon Horman <horms@kernel.org>, Florian Westphal <fw@strlen.de>,
+	Phil Sutter <phil@nwl.cc>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org
+Subject: Re: [PATCH RFC net-next 0/4] improve hw flow offload byte accounting
+Message-ID: <ade1-dlugvWF7IzB@makrotopia.org>
+References: <cover.1775739840.git.daniel@makrotopia.org>
+ <adevKeasLkEB5zZ4@chamomile>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,58 +66,84 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260409133654.3203336-1-charles.perry@microchip.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spamd-Result: default: False [-0.36 / 15.00];
+In-Reply-To: <adevKeasLkEB5zZ4@chamomile>
+X-Spamd-Result: default: False [0.04 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,broadcom.com];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	TAGGED_FROM(0.00)[bounces-277024-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-277023-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[nbd.name,phrozen.org,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,collabora.com,strlen.de,nwl.cc,vger.kernel.org,lists.infradead.org,netfilter.org];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	DMARC_NA(0.00)[makrotopia.org];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-0.908];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[daniel@makrotopia.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,armlinux.org.uk:email,armlinux.org.uk:url,lunn.ch:email,shell.armlinux.org.uk:mid,microchip.com:email]
-X-Rspamd-Queue-Id: B41FA3CBE3B
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,makrotopia.org:mid]
+X-Rspamd-Queue-Id: 706753CC02F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Apr 09, 2026 at 06:36:54AM -0700, Charles Perry wrote:
-> The return value of phy_c45_probe_present() is stored in "ret", not
-> "phy_reg", fix this. "phy_reg" always has a positive value if we reach
-> this return path (since it would have returned earlier otherwise), which
-> means that the original goal of the patch of not considering -ENODEV
-> fatal wasn't achieved.
+On Thu, Apr 09, 2026 at 03:52:41PM +0200, Pablo Neira Ayuso wrote:
+> On Thu, Apr 09, 2026 at 02:07:22PM +0100, Daniel Golle wrote:
+> > Hardware flow counters report raw byte counts whose semantics
+> > vary by vendor -- some count ingress L2 frames, others egress
+> > L2, others L3. The nf_flow_table framework currently passes
+> > these bytes straight to conntrack without conversion, and
+> > sub-interfaces (VLAN, PPPoE) that are bypassed by hw offload
+> > never see any counter updates at all.
 > 
-> Fixes: 17b447539408 ("net: phy: c45 scanning: Don't consider -ENODEV fatal")
-> Signed-off-by: Charles Perry <charles.perry@microchip.com>
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> I see, but that is part of the feature itself? Why pretend that these
+> interface are really seeing traffic while they don't. This aspiration
+> of trying to do all hardware offload fully transparent (when it is not
+> the case, not mentioning semantic changes in how packet handling is
+> done compared to the software plane) does not sound convincing to me.
 
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Please explain what you mean by offloading not being fully
+transparent. If the MAC hardware offloads VLAN encap/decap, for
+example, we also maintain the counters correctly (it just so happens),
+just the flow-offloading case results in a weird overall picture:
+hardware interface counters keep increasing, encap interfaces (802.1Q,
+PPPoE) don't. That makes it confusing and hard to understand what's
+happening when only looking at the interface counters (ie. "what is
+all that traffic on my physical WAN interface which isn't PPPoE? Can't
+be that all of that is the modems management interface, SNMP, ...")
 
-Thanks!
+> 
+> On top of this, this issue also exists in the software plane: Devices
+> that are bypasses do not get their counters bumped.
+> 
+> Maybe if this is really a requirement, then this should address the
+> issue for software too, but is it worth the effort to add
+> infrastructure for this purpose?
 
-Note: you don't need to resend just because you've received another r-b.
+To me it would feel more correct to see counters increasing also
+for offloaded traffic on software interfaces such as PPPoE or VLAN.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+I honestly didn't think about the software fastpath, and yes, I think
+it should be addressed there too.
+
+> > This series lets drivers declare what their counters represent,
+> > so the framework can normalize to L3 for conntrack and
+> > propagate per-layer stats to encap sub-interfaces.
+
+This part could also been seen as an independent fix as currently
+conntrack stats for the same traffic differ in case of software
+offloading (pure L3 bytes) and hardware offloading (L2 ingress bytes
+in case of mtk_ppe).
 
