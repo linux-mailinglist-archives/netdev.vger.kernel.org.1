@@ -1,193 +1,287 @@
-Return-Path: <netdev+bounces-277089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277090-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MEVVCBTm12n8UQgAu9opvQ
-	(envelope-from <netdev+bounces-277089-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 19:47:00 +0200
+	id OJOJN7Tm12n8UQgAu9opvQ
+	(envelope-from <netdev+bounces-277090-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 19:49:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72DAF3CE44E
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 19:46:59 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 318BB3CE4C9
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 19:49:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6F37F3011BC1
-	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 17:46:57 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id CE685301492C
+	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 17:49:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2594334753A;
-	Thu,  9 Apr 2026 17:46:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC1D93CF039;
+	Thu,  9 Apr 2026 17:49:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="QQ/CBWLs"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cI24ftv4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f53.google.com (mail-vs1-f53.google.com [209.85.217.53])
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A74932417D1
-	for <netdev@vger.kernel.org>; Thu,  9 Apr 2026 17:46:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.217.53
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775756816; cv=pass; b=eNp3pyBJ7WHF34TzwncioB2dbdtQCb6FwBGHvPMnyhMjxsa2Yvrmb4dUN9PuSAoxDSyE/BvXmT+TO7luSdIvAQQfTuMkSf1P5Qb0s6V350kxZ2v6S16VAiK5VsMjXLWNUI+xCInEY/qE4v8R3UPguhx5ECeK/4CMl7utGUE0nWs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775756816; c=relaxed/simple;
-	bh=bNxbkmehiO10b5i1ezAZgDe15UroUE3Wic55cDdszxU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FAnHe6qEX2KN9feZVUkEk5UI91hI4sJvWFrxkZUMq1icQ1R0jVSnqhuFCtLmquVHWxMRtUELzQGAB2GLACiIcJUXrWgCOF9EDvmNV2NCPgXkWk4xQ9LQxFdTcM6ZLiu+EVaKPj/SZtvaGcFwTpxYcGQo6jTzQBvG3dwSt8QeveI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=QQ/CBWLs; arc=pass smtp.client-ip=209.85.217.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
-Received: by mail-vs1-f53.google.com with SMTP id ada2fe7eead31-60579b9c0ccso891260137.3
-        for <netdev@vger.kernel.org>; Thu, 09 Apr 2026 10:46:54 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1775756813; cv=none;
-        d=google.com; s=arc-20240605;
-        b=dQuXnc8sUtaEk1zhrvkzDvFzRwo8WBMB3QRMhq4czRLJKL8UBhW7JOW+cYOss3D52e
-         aOSnlbY/LzfvQDEI35f9RJrKODHdRoHa+hVgyBeIfnQJBGv2PoP4iZwiImVjCwJCm/KE
-         HlDNTF5FoHEWARyKQ4XF+fE/d3USc2c29PSZjR5nxR8w+kN743wWJxIwfdWlWir6x9tH
-         YpLKDLnqLmEWvNLNc003YXI1yiJO7fCK0B5dmu/FHIfY8ABheZT2v6hVa2KL3qtWar06
-         LB1Hlex312zanWuT4coxOAadwDlnQ6MT5tOPO8yBvi0PtbwJv7QCnAQc31nuEtJ8dIfH
-         7CVA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=bNxbkmehiO10b5i1ezAZgDe15UroUE3Wic55cDdszxU=;
-        fh=AncD0AS9UsLKDFSJyg9EIrmTarBUaKA1UHVIu3FeFWo=;
-        b=L9ETpCLM0o9QVgG+PoH3WvsbWAW41yz/nEUklL4lYn76mY0bBK12KggSoxsyQ/394O
-         skMeRr5hmfGAGbhTMXda+h2p5Ob6ofFpvII0oHn19TLL/bZHWlSc9CT2LMdQq8/XFnVX
-         V2RQTy6V2NctS1SEgn6enhUCcjO/tsbmrLv/GWKuvAzoPzhepZVfUAoVMXsZM3dzbTzi
-         X2vMo3pragAJg++9eeiVEHSTwiEyM1uD7fY9Ly1HEYViD14948swVRPX11cz4OWMzzw2
-         /bs6nNU8MzAHEmhzkBnWt16909kISLASoW0udEO9+kngY8lwkBxy9Dn9NYV5uql4ViYo
-         RqSA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63BB43B2FC0
+	for <netdev@vger.kernel.org>; Thu,  9 Apr 2026 17:49:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775756958; cv=none; b=GgUwIzYcGJsKcL1zxmN4BDNV+eQEPxUMBzXEPvzRkjNF3V6SqVCA329+7zCCrjiMqOmMvYa43VEqx1WD7mRr9/rSoypBu0dJSs2tx3yr0md5yqVZ23HT3kHkITbmk5FvoT9CKumLdN84BWP9iKRCWzn6hpYjVk8by4neJucqcYc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775756958; c=relaxed/simple;
+	bh=n8UC782heJc9nLqE4XafIFExJTAr+v3PqbB27s/DMpo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=oR+O8rQOeRnna59hrlcM6VbA898MKX5QU/4S7jfK/SExgMYt2dlbDPXw0iTj7TbVKGpmNCAavtLOHYc0iPH7mfhpc/GP0Aaevv1OdAHAw3AeMqXyFiwd6+x0cU+HlBfa2v7P4aogw35DVRcclbQ6arAVKGZimT2HmBttb1MLrHw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cI24ftv4; arc=none smtp.client-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-82cdb4ab547so652819b3a.2
+        for <netdev@vger.kernel.org>; Thu, 09 Apr 2026 10:49:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1775756813; x=1776361613; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1775756956; x=1776361756; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bNxbkmehiO10b5i1ezAZgDe15UroUE3Wic55cDdszxU=;
-        b=QQ/CBWLsQyyQWKMJaN67IstePXsf7JS1g0rx/RsA/L1YwyYBRamQhsUIDq7Z9wpo+a
-         /TTbcLCGNULAgB8qES37Ls9MjHq1Tk2kzJu7O5VdfxOuUquv2hL3jThEdn0/mKPuYPgL
-         4JfbKBJEHiMITl2DfcGQ65B+1OK1Bu3KB04G9C65El8PAe01XkM/E+L39qUuw+0rs36x
-         6TrXA+QKKwmfC885Ueb/9FW/Zs9tjvwzO8SaKx2H3D8r4mAEPulz4PiONj9gG217r+gc
-         7pmpN/9L9Hn7qDZZ4zCn8jp2igqj8snGmwQJva6oH+1AjoctSOod+Km7P/Tq0+dm65ZM
-         bULQ==
+        bh=c8mKYuAy6+k1yh1FJulOR+cbMMSykRFaR9tVDA+/KjQ=;
+        b=cI24ftv4+k7Usf7EId6bsB+aBgTUuQLkOljNiL4+0ZJ5AI/p5nHi5MxUvVbreAYF0K
+         gdI1SUZ58Ud4ST+lPzzmNJpSDFDkMw0hb9QropqgQ8XIAh3GroSlGbX+ODdohIA09wgl
+         rfl6MmLvRk9BtZ9gE86YjlJ8+BNgoaB79lc1iwuM5lim4z4+1lzm3h5m8djpw1rFjpp3
+         OfBAWSie1LxnveSkbU8JW3jmZshmhaM1Q3CK9qamN7dT7I/zo2zBNMK5Q9cb/lLP/4Lt
+         bgSVUmgPNcpxr3mtwsZPjLs9Z0/1AOXvZ+XJF5o0v/rHz+y17Wu5Qq4P9w4HFAgQiUJI
+         1SEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775756813; x=1776361613;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20251104; t=1775756956; x=1776361756;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=bNxbkmehiO10b5i1ezAZgDe15UroUE3Wic55cDdszxU=;
-        b=HhBeBh0Ea271xtcxlu4NplYgpEqeAJu7rYFDKKQ467FfKtbdbQ6z1qgCAGaSXd3/jz
-         eC/MZfrD4Rh5a9s5/gOZGXa8MKEY7Ecf4B3KiAhwTY6mSxKUFHMSeTYKCGSpuAi+fUye
-         GW5d9HyHK2BuZ3EiCAK9WZo6NoQQIG+WxFZU7LtJohH35xyRXxOOcj++PjCxVysym0pp
-         72JD8AkTmxyjWfESLsoMhSNWLMB/n7AmWXVnqFQdm2uDBw4DVJtiEWk3GzTwpA14qvBJ
-         4Ko1jpUc4YoodNvKdHB0qdRQX4McX3X4CqRbEtqERjUpy5X1LlHwouJ/GTAdevGsNiWB
-         78Fg==
-X-Gm-Message-State: AOJu0YzdX2WkuzEZQzEUXWRtRQUhb3BohHNOXkonO25itoF1AcnQezzg
-	bGfVcGvEkhoU7NK/C2N1aZ0GaxXz/UWQr4474enALwe+ccABr3/q6m3s/SFOfi2Btc/LtttgnBv
-	FSLwM1Yx3WXjZwuIudu8WjHRL6eCzKe9CAyCz+oz1Ew==
-X-Gm-Gg: AeBDietwSFmqllJotlGL00PxsV4QgrfdU52cWfUNInOJMn8RsMlg+KUelPk24KuaACA
-	t8NXPsac3sup0qjHd6KY/I9HhIy66o4uCM1BSjZ2yoRUPoXmrOjj1uhKsg2DjHF7PBhd6Az5z7z
-	ViIKfZfevcdKWVArNkEvPrHy5r5sX+2iHCq+prK2v16FJuLRLJ4fiElvnTO5DwGffyz5mCZg/xa
-	4ji6nTbhrs+HRAykDYr7oxZt4ncJecRXTD92won7Fp8QEojDlPq6IOMDkFpVDQBZh8ksYcUfQZ+
-	sx9OpmNxf8ko0aKkcg4=
-X-Received: by 2002:a05:6102:c4b:b0:602:7470:2428 with SMTP id
- ada2fe7eead31-605a4d69432mr12306785137.10.1775756813471; Thu, 09 Apr 2026
- 10:46:53 -0700 (PDT)
+        bh=c8mKYuAy6+k1yh1FJulOR+cbMMSykRFaR9tVDA+/KjQ=;
+        b=o5qPAvF3mLmQtoPSOanL5xj1luGirchC/27HiK7hexbHR7muuzHJisiVQLYO9i0UkX
+         /o0DqjSxsS/D8j4Svb/hIzZ8CMjy/bRr1TixWlUH+lNHmsYaWogN8aMxRbuyEjN0I9Cb
+         XH0QRzpVr4ApYX1X7s3bwSMBiyR3vifNiBd9US9QP0zMUOHiZOH6jf+bcz0WV6dTYNzo
+         iw1FYdkmqhN3EPlq5pnRwh58Cl8l1vrbXEmAdvIbWX3d21ymZRaMRLbxQEAaN1GZ6aeI
+         LYdMFyGMoyZXeAw+nLvBBoA5HRCYxC9rHGqN+S+/gBJIghzIXCcUEs0Z11OkLAQHIITS
+         CAgA==
+X-Gm-Message-State: AOJu0YxYn4csGnDRH8lOuI32bfm56ZUwWCUHUIx6Mn94Yyd9M7MaI8os
+	hCWIZbFNHiYrtYSvEyv39ieC6mz6kfrS2hx5yBayp5O5UHlXJKXD0LQTmy/h1sp1p+U=
+X-Gm-Gg: AeBDietmKlc6P4LR6p98zWo5MT9hq/OQEg+S9zg8Ur25E10WbyVnAwKVNNrMKWOagP4
+	petNYu0TJ80aXxA9BNrkzcAx+Q8qfHrovjFRIUgB3QFh85qsvCmdzsGM7m9P0NNNq17okXParfz
+	mmjlxCiGdji0VrMjw3dQP+L0fxy342ugAqaKrearg61AsqYk+tNFHwoXdMpPT2NqL/iTI78G2Ug
+	7vAIhuDPjXrQz05f2ydWdJ1Ga7sE+AdHLxrcyfrWOQBNyUO7hiclvr20NCRvwfcaCZn9AqN5BR0
+	ZdlCDmAGjKhEq64MareqkR0RanYgZktou3rqv/Y1uXE7w5KNLco5E+DfM7ar9w2zqROWFw0d4U+
+	qh70frAC52Zy0Cb7mroD8zes53ixZ4snm5xSqavxFebLHTXeDc/n6KHpcTpCXoDV8H1ssAeRanx
+	liK1x67RuzYi5hYvjaHff8oT0GmEVoGII8FzfA
+X-Received: by 2002:a05:6a00:3987:b0:82c:249d:d84f with SMTP id d2e1a72fcca58-82f0c38a1demr116982b3a.37.1775756956149;
+        Thu, 09 Apr 2026 10:49:16 -0700 (PDT)
+Received: from fedora ([2409:4061:4e14:5210:6a17:c456:bcba:6c11])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82f0c50d24bsm32725b3a.57.2026.04.09.10.49.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Apr 2026 10:49:15 -0700 (PDT)
+From: Shubham Chakraborty <chakrabortyshubham66@gmail.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	kuniyu@google.com,
+	corbet@lwn.net,
+	skhan@linuxfoundation.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Shubham Chakraborty <chakrabortyshubham66@gmail.com>
+Subject: [PATCH v2] Documentation: sysctl: document net core sysctls
+Date: Thu,  9 Apr 2026 23:18:59 +0530
+Message-ID: <20260409174859.11854-1-chakrabortyshubham66@gmail.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260407083213.27045-1-chakrabortyshubham66@gmail.com>
+References: <20260407083213.27045-1-chakrabortyshubham66@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260402235511.664801-1-rjethwani@purestorage.com>
- <20260402235511.664801-6-rjethwani@purestorage.com> <adQeoGH8qmhhCSal@krikkit>
-In-Reply-To: <adQeoGH8qmhhCSal@krikkit>
-From: Rishikesh Jethwani <rjethwani@purestorage.com>
-Date: Thu, 9 Apr 2026 10:46:40 -0700
-X-Gm-Features: AQROBzCN6UknnnQud_huE9C4C14de_U9Who3eX5c5ws_U5naDQQ-adgn_5JCt9g
-Message-ID: <CAKaoeS3pNe-DH2vA1E7t9NOn3H_ZUGk+cM0LgoYogkWEU0aqLQ@mail.gmail.com>
-Subject: Re: [PATCH v12 5/6] tls: add hardware offload key update support
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, saeedm@nvidia.com, tariqt@nvidia.com, 
-	mbloch@nvidia.com, borisp@nvidia.com, john.fastabend@gmail.com, 
-	kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, 
-	leon@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[purestorage.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[purestorage.com:s=google2022];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-277089-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_CC(0.00)[vger.kernel.org,nvidia.com,gmail.com,kernel.org,davemloft.net,redhat.com,google.com];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,vger.kernel.org,gmail.com];
 	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-277090-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rjethwani@purestorage.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[purestorage.com:+];
+	FROM_NEQ_ENVFROM(0.00)[chakrabortyshubham66@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 72DAF3CE44E
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: 318BB3CE4C9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Apr 6, 2026 at 1:59=E2=80=AFPM Sabrina Dubroca <sd@queasysnail.net>=
- wrote:
->
-> 2026-04-02, 17:55:10 -0600, Rishikesh Jethwani wrote:
-> > During a TLS 1.3 KeyUpdate the NIC key cannot be replaced immediately
-> > if previously encrypted HW records are awaiting ACK. start_rekey sets
-> > up a temporary SW context with the new key and redirects sendmsg throug=
-h
-> > tls_sw_sendmsg_locked. When no records are pending, complete_rekey runs
-> > inline during setsockopt. Otherwise, clean_acked sets REKEY_READY once
-> > all old-key records are ACKed, and the next sendmsg calls complete_reke=
-y.
-> > complete_rekey flushes remaining SW records, reinstalls HW offload at
-> > the current write_seq, and frees the temporary context.
-> >
-> > If another KeyUpdate arrives while a rekey is already pending,
-> > start_rekey just re-keys the existing SW AEAD in place.
-> >
-> > If complete_rekey fails (tls_dev_add or crypto_aead_setkey),
-> > we stay in SW mode (REKEY_FAILED) until a subsequent rekey
-> > succeeds, while maintaining TLS_HW configuration.
-> >
-> > Tested on Mellanox ConnectX-6 Dx (Crypto Enabled) with multiple
-> > TLS 1.3 key update cycles.
->
-> Something here doesn't seem to work. I have a very simple
-> client/server pair where one side just loops doing large send()s and
-> does a rekey (send keyupdate + change key) every N iterations (I've
-> set N large enough that it goes about 5 seconds between rekeys), and
-> the other receives all the data and changes its RX key when it sees a
-> keyupdate. If both sides are doing SW, it works. If I configure either
-> side to use offload, decrypt fails after the rekey unless I add a
-> small sleep() just after changing keys on the TX side.
->
+Document missing net.core and net.unix sysctl entries in
+admin-guide/sysctl/net.rst, and correct wording for defaults
+that are derived from PAGE_SIZE, HZ, or CONFIG_MAX_SKB_FRAGS.
 
-Found 2 issues with this test case:
+Also clarify that the RFS and flow-limit controls are only present
+when CONFIG_RPS or CONFIG_NET_FLOW_LIMIT is enabled, and describe
+rps_sock_flow_entries the way the handler implements it: non-zero
+values are rounded up to the nearest power of two.
 
-TX HW Rekey: The start_rekey function is missing the EOR (End of
-Record) marker. Fix will be included in the next code submission.
+Signed-off-by: Shubham Chakraborty <chakrabortyshubham66@gmail.com>
+---
+ Documentation/admin-guide/sysctl/net.rst | 66 +++++++++++++++++++++++-
+ 1 file changed, 64 insertions(+), 2 deletions(-)
 
-RX HW Rekey: When the receiver tries to rekey, multiple new records
-are already decrypted by the NIC with old key and present in receive
-queue. To handle these records, we need to store the old key to
-encrypt with the old key and decrypt with the new key. Also, we need
-to consider back-to-back rekeys if we store the old key.
+diff --git a/Documentation/admin-guide/sysctl/net.rst b/Documentation/admin-guide/sysctl/net.rst
+index 3b2ad61995d4..05d301b8752c 100644
+--- a/Documentation/admin-guide/sysctl/net.rst
++++ b/Documentation/admin-guide/sysctl/net.rst
+@@ -210,7 +210,9 @@ Default: 0 (off)
+ mem_pcpu_rsv
+ ------------
+ 
+-Per-cpu reserved forward alloc cache size in page units. Default 1MB per CPU.
++Per-cpu reserved forward alloc cache size in page units.
++
++Default: 1MB per CPU, expressed in page units
+ 
+ bypass_prot_mem
+ ---------------
+@@ -238,6 +240,37 @@ rps_default_mask
+ The default RPS CPU mask used on newly created network devices. An empty
+ mask means RPS disabled by default.
+ 
++rps_sock_flow_entries
++---------------------
++
++The total number of entries in the RPS flow table. This is used by
++RFS (Receive Flow Steering) to track which CPU is currently processing
++a flow in userspace. Non-zero values are rounded up to the nearest
++power of two.
++Available only when ``CONFIG_RPS`` is enabled.
++
++Default: 0
++
++flow_limit_cpu_bitmap
++---------------------
++
++Bitmap of CPUs for which RPS flow limiting is enabled. Flow limiting
++prioritizes small flows during CPU contention by dropping packets
++from large flows slightly ahead of those from small flows.
++Available only when ``CONFIG_NET_FLOW_LIMIT`` is enabled.
++
++Default: 0 (disabled)
++
++flow_limit_table_len
++--------------------
++
++The number of buckets in the flow limit hashtable. This value is
++only consulted when a new table is allocated. Modifying it does
++not update active tables. This value should be a power of two.
++Available only when ``CONFIG_NET_FLOW_LIMIT`` is enabled.
++
++Default: 4096
++
+ tstamp_allow_data
+ -----------------
+ Allow processes to receive tx timestamps looped together with the original
+@@ -290,6 +323,8 @@ probed in a round-robin manner. Also, a polling cycle may not exceed
+ netdev_budget_usecs microseconds, even if netdev_budget has not been
+ exhausted.
+ 
++Default: 300
++
+ netdev_budget_usecs
+ ---------------------
+ 
+@@ -297,12 +332,16 @@ Maximum number of microseconds in one NAPI polling cycle. Polling
+ will exit when either netdev_budget_usecs have elapsed during the
+ poll cycle or the number of packets processed reaches netdev_budget.
+ 
++Default: ``2 * USEC_PER_SEC / HZ`` (2000 when ``HZ`` is 1000)
++
+ netdev_max_backlog
+ ------------------
+ 
+ Maximum number of packets, queued on the INPUT side, when the interface
+ receives packets faster than kernel can process them.
+ 
++Default: 1000
++
+ qdisc_max_burst
+ ------------------
+ 
+@@ -368,6 +407,15 @@ by the cpu which allocated them.
+ 
+ Default: 128
+ 
++max_skb_frags
++-------------
++
++The maximum number of fragments allowed per skb (socket buffer).
++This is mostly used for performance tuning of GSO (Generic
++Segmentation Offload).
++
++Default: ``CONFIG_MAX_SKB_FRAGS`` (17 if not overridden)
++
+ optmem_max
+ ----------
+ 
+@@ -377,6 +425,16 @@ optmem_max as a limit for its internal structures.
+ 
+ Default : 128 KB
+ 
++somaxconn
++---------
++
++Limit of the socket listen() backlog, known in userspace as SOMAXCONN.
++The maximum number of established sockets waiting to be accepted by
++accept(). If the backlog is greater than this value, it will be
++silently truncated to this value.
++
++Default: 4096
++
+ fb_tunnels_only_for_init_net
+ ----------------------------
+ 
+@@ -449,6 +507,8 @@ GRO has decided not to coalesce, it is placed on a per-NAPI list. This
+ list is then passed to the stack when the number of segments reaches the
+ gro_normal_batch limit.
+ 
++Default: 8
++
+ high_order_alloc_disable
+ ------------------------
+ 
+@@ -465,9 +525,11 @@ Default: 0
+ ----------------------------------------------------------
+ 
+ There is only one file in this directory.
+-unix_dgram_qlen limits the max number of datagrams queued in Unix domain
++max_dgram_qlen limits the max number of datagrams queued in Unix domain
+ socket's buffer. It will not take effect unless PF_UNIX flag is specified.
+ 
++Default: 10
++
+ 
+ 3. /proc/sys/net/ipv4 - IPV4 settings
+ -------------------------------------
+-- 
+2.53.0
 
-Any suggestions on how to address this?
 
