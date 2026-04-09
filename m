@@ -1,458 +1,152 @@
-Return-Path: <netdev+bounces-277080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277082-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cFdqMmDf12klTwgAu9opvQ
-	(envelope-from <netdev+bounces-277080-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 19:18:24 +0200
+	id ALwCMj3j12kVUQgAu9opvQ
+	(envelope-from <netdev+bounces-277082-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 19:34:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B2EF3CE097
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 19:18:23 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55B083CE2E3
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 19:34:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8306A3010522
-	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 17:13:27 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2265A301DC0B
+	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 17:34:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09D023E2748;
-	Thu,  9 Apr 2026 17:13:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56CC91A682F;
+	Thu,  9 Apr 2026 17:34:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LwAnZbz7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f79.google.com (mail-oo1-f79.google.com [209.85.161.79])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E25C281525
-	for <netdev@vger.kernel.org>; Thu,  9 Apr 2026 17:13:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.79
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0EA63C8728;
+	Thu,  9 Apr 2026 17:34:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775754806; cv=none; b=SJvUwArWiSc4znxA1rE5NnQqWItRRA90ZDyTa4XS+5YqrAnBL6qtedyFSmkwm+MvhK27e52+v9sQGSIEVJUHJgA/MoiDc1X6P8Q+jLgHbglp08EKMDlkBWBzkf+JBT8vZfs98PNy9gGKmOxDlDEEykEn57LuKibS3jrIzK79OeY=
+	t=1775756056; cv=none; b=q3R+FKADF9Mvhz62DPQju+K0jHC3TnaZK9DbtMH+KZI3YO06SegqgUFrrTyDnWoBE4B43oreWlkw1TTmc16ggRcy6eh+KlaKsZPG42e1nM2++GmiVr5eLTDX22ZYLlWgzrAf/9bVx7Kj5hYbvSMpqQAv+vR6Q5IlxYhzyMRGGhE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775754806; c=relaxed/simple;
-	bh=nyWpomPwat/aPdJMaJ1JTwOxMGukjxe1KBPZP38Zht8=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=opIGxyyhSg+Kb1RIjsp9l3/UI4gKmgJVHVHcqPD6b1OCyxYKzDN30hOwd+I2R8QDYwjh4kXlWBdFjN2UP8NtIuv7GmE/M5bah5QlLXsv+mxzWXIQElPOc1oGlCWi6Et7DaL5Lu6lq2egpVh4I212Ii+BJQjsmYoAbwR1W2yrD1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.79
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f79.google.com with SMTP id 006d021491bc7-688c232dd72so2000424eaf.1
-        for <netdev@vger.kernel.org>; Thu, 09 Apr 2026 10:13:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775754804; x=1776359604;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Gh7chO9GvdQUnUzLCNNTv1QFWxpwUI0SpETGIovHTjY=;
-        b=nCBPeaL9zsu6a8e56NfaXR+uglDV//TlQAWA0C/SXachGgY2OuyLm2JbRVx0FW/epi
-         be6TJmGYkMpGNgSsHGvbUWeC+2Q5fjk1N3lu3ZAN5zFMtvT+EbxzdpntTN9ohZFYLdAM
-         lQetFBLw623IJ7IQPol8+OFHzdzzY7JXutY9xOt/L0WI6TThFfhCBPxJ4Jo4ufeSTpBV
-         NX8FHsI1yrweXBI7Ro4+4lvzkTaeFETmd5hyUP2499eJwRTtRgsrVMRd6ytX+L6DXOtu
-         WyyHi/GPKJrWWhSxazgAlpmOK0NCgYg0A6RTFmHD4/kQv7BvvJd6URC4JZRhDL+imxDU
-         yIjg==
-X-Forwarded-Encrypted: i=1; AJvYcCUy05y7RDO5rl1CFua6QQ83TW+QrnY5xJpBrvWHspKgxWgFSTKH4sbptFtucXA7ztQmRg3iy5o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzhRJK5cmxl3FYNNFDz5UFdYgODT9oR/xjRkvUxQyJl2PSICy4R
-	O2dWfv70KbquX/bfYKa6U9QaYAqHO7nv3S6NT8ZTPwgGmohZsmFqkn/5dE3TEeMxQusq3f6Y0FN
-	VYE+YXPlZxQNdik+3bNp9X5Ydwb0BtJ1lTU8OmYYVYqPie/5t8d8x4WhQ0dg=
+	s=arc-20240116; t=1775756056; c=relaxed/simple;
+	bh=Gj136g/kwa38w+/k4mfmIaV2zPHIHZSBmkO4GwE8mh0=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=gWGQPLVb83gRwNp9i7sNaIYDVFcoKlikDRiJlB08HXXytQkN6YJu3E19HAXJ+74pB4XnEP1METriGhpY5DAZVTTRjA4k1C86ZsWNe3Cc3N2eREZ5ErvEZe9YB8Kdsj9Trn2W/9rMYYARph3Pt30/q2vIdvFeCSCJRlRv+M16g5Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LwAnZbz7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7303AC4CEF7;
+	Thu,  9 Apr 2026 17:34:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775756055;
+	bh=Gj136g/kwa38w+/k4mfmIaV2zPHIHZSBmkO4GwE8mh0=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=LwAnZbz7kLjfhAYbCLyIhuPpnoma3Cg8ewiptOI8XjjNfII5XbnopoK5uE1lMjTDQ
+	 MwV56q2WIQyZERKL5RC+hllnY0CKnsKbxjKG+Ih4poNyism4K2eZogpS4uFYQWqmW0
+	 B43q38CsBBQGPF2ehaeSPWtKfvqIppgCxrc7wDrhAEimUJbovVpI2PEJXvwcKslzXi
+	 ggTBXzAi41+fL6RJUXMMH4GAOcsIjxppumSxzV6q7k7o30HCg0z5du76WCacC2c3An
+	 Ozoe4URuEuJfqPUl8GZ3Y138IebjGeZSQGmOB/VpuD+E+rYgvWaenYlOMtUaLvTL77
+	 ciSy6pIEjIY6Q==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60DC8F364A9;
+	Thu,  9 Apr 2026 17:34:15 +0000 (UTC)
+From: Manivannan Sadhasivam via B4 Relay <devnull+manivannan.sadhasivam.oss.qualcomm.com@kernel.org>
+Subject: [PATCH v3 0/5] net: qrtr: ns: A bunch of fixs
+Date: Thu, 09 Apr 2026 23:04:11 +0530
+Message-Id: <20260409-qrtr-fix-v3-0-00a8a5ff2b51@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a4a:e917:0:b0:689:7cd7:259e with SMTP id
- 006d021491bc7-68a63a9443dmr2348615eaf.57.1775754804065; Thu, 09 Apr 2026
- 10:13:24 -0700 (PDT)
-Date: Thu, 09 Apr 2026 10:13:24 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69d7de34.050a0220.3030df.0019.GAE@google.com>
-Subject: [syzbot] [mptcp?] possible deadlock in mptcp_pm_mp_prio_send_ack
-From: syzbot <syzbot+2204dbe6a049b3218db9@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, geliang@kernel.org, 
-	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	martineau@kernel.org, matttbe@kernel.org, mptcp@lists.linux.dev, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [-0.36 / 15.00];
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIABPj12kC/02OSw6CMBCGr2K6dkiZtqS68h7GRamDVIXqFIjGc
+ HeLLnQzyTf5Xy+RiAMlsV29BNMUUoh9BrVeCd+6/kQQjpkFSqykUiXceWBowgNqI9FjRabRlcj
+ yG1N+f6L2hy+nsT6THxb/omg4djC0TO4vEjeYc40u0JYGrYYSLmPtdhfinq5F5NNibUMaIj8/M
+ ydcKr52LdVv0YQgobHWldqaja/ULqZU3Ed39bHrinzEYZ7nNxs5c970AAAA
+X-Change-ID: 20260331-qrtr-fix-b502c26e5f46
+To: Manivannan Sadhasivam <mani@kernel.org>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>
+Cc: linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
+ Yiming Qian <yimingqian591@gmail.com>, 
+ Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+X-Mailer: b4 0.15.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=949;
+ i=manivannan.sadhasivam@oss.qualcomm.com; h=from:subject:message-id;
+ bh=Gj136g/kwa38w+/k4mfmIaV2zPHIHZSBmkO4GwE8mh0=;
+ b=owEBbQGS/pANAwAKAVWfEeb+kc71AcsmYgBp1+MUJAogw19JAzFEh47vDzrMQ1OW1lrxzap1O
+ SpdPxnd5bKJATMEAAEKAB0WIQRnpUMqgUjL2KRYJ5dVnxHm/pHO9QUCadfjFAAKCRBVnxHm/pHO
+ 9bAMB/9lerWH44bHX4s2xq30YdjVETr4NMjyYm+h7jlQDLvEUlhGRvDlkkAo/MesNCdkAHmS6n8
+ kmnCD+AgovjwjpP9rN23JQ7VH4/qCX/togkVa1lXKFe6Kr5L4zJrn63ns8EaniqsaLUO+pTliI3
+ SlhJ+y6+MXOoJfA0zYWf5xBw6FSvAeKic5luupbgYaXdiqJknM40BzmufTzyeaiXuRHVjRB6HQK
+ BWW+1wZh8oUFmMZc0fpAtBmmEgGYlC+PWBYZzOSjyK16fNSEm5rguhmwz+yvzaVAe1tKpw0TG2o
+ q5Xxpsq0jBj409/ihH6rDYvypeTVF7heOnJL6ao8tODvKMfP
+X-Developer-Key: i=manivannan.sadhasivam@oss.qualcomm.com; a=openpgp;
+ fpr=C668AEC3C3188E4C611465E7488550E901166008
+X-Endpoint-Received: by B4 Relay for
+ manivannan.sadhasivam@oss.qualcomm.com/default with auth_id=461
+X-Original-From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+Reply-To: manivannan.sadhasivam@oss.qualcomm.com
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=6754c86e8d9e4c91];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-277080-lists,netdev=lfdr.de,2204dbe6a049b3218db9];
+	TAGGED_FROM(0.00)[bounces-277082-lists,netdev=lfdr.de,manivannan.sadhasivam.oss.qualcomm.com];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	SUBJECT_HAS_QUESTION(0.00)[];
-	REDIRECTOR_URL(0.00)[goo.gl];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,oss.qualcomm.com];
+	TO_DN_SOME(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[12];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
+	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	HAS_REPLYTO(0.00)[manivannan.sadhasivam@oss.qualcomm.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,storage.googleapis.com:url,goo.gl:url,googlegroups.com:email,appspotmail.com:email]
-X-Rspamd-Queue-Id: 1B2EF3CE097
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,qualcomm.com:email]
+X-Rspamd-Queue-Id: 55B083CE2E3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello,
+Hi,
 
-syzbot found the following issue on:
-
-HEAD commit:    1caa871bb061 Merge branch 'net-stmmac-fix-tegra234-mgbe-cl..
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=11d74e06580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=6754c86e8d9e4c91
-dashboard link: https://syzkaller.appspot.com/bug?extid=2204dbe6a049b3218db9
-compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/014aae23b990/disk-1caa871b.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/c574a710638c/vmlinux-1caa871b.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/b29909f4efc4/bzImage-1caa871b.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+2204dbe6a049b3218db9@syzkaller.appspotmail.com
-
-netlink: 8 bytes leftover after parsing attributes in process `syz.2.2034'.
-netlink: 8 bytes leftover after parsing attributes in process `syz.2.2034'.
-======================================================
-WARNING: possible circular locking dependency detected
-syzkaller #0 Not tainted
-------------------------------------------------------
-syz.2.2034/13659 is trying to acquire lock:
-ffff888031173560 (k-sk_lock-AF_INET){+.+.}-{0:0}, at: mptcp_pm_mp_prio_send_ack+0xaf8/0xba0 net/mptcp/pm.c:296
-
-but task is already holding lock:
-ffff88807e300ea0 (sk_lock-AF_INET){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1709 [inline]
-ffff88807e300ea0 (sk_lock-AF_INET){+.+.}-{0:0}, at: mptcp_pm_nl_set_flags_all net/mptcp/pm_kernel.c:1482 [inline]
-ffff88807e300ea0 (sk_lock-AF_INET){+.+.}-{0:0}, at: mptcp_pm_nl_set_flags+0x795/0xc90 net/mptcp/pm_kernel.c:1551
-
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
-
--> #7 (sk_lock-AF_INET){+.+.}-{0:0}:
-       lock_sock_nested+0x48/0x100 net/core/sock.c:3780
-       lock_sock include/net/sock.h:1709 [inline]
-       inet_shutdown+0x6a/0x390 net/ipv4/af_inet.c:919
-       nbd_mark_nsock_dead+0x2e9/0x560 drivers/block/nbd.c:318
-       recv_work+0x1c7f/0x1d90 drivers/block/nbd.c:1021
-       process_one_work kernel/workqueue.c:3276 [inline]
-       process_scheduled_works+0xb6e/0x18c0 kernel/workqueue.c:3359
-       worker_thread+0xa53/0xfc0 kernel/workqueue.c:3440
-       kthread+0x388/0x470 kernel/kthread.c:436
-       ret_from_fork+0x51e/0xb90 arch/x86/kernel/process.c:158
-       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
--> #6 (&nsock->tx_lock){+.+.}-{4:4}:
-       __mutex_lock_common kernel/locking/mutex.c:614 [inline]
-       __mutex_lock+0x19f/0x1300 kernel/locking/mutex.c:776
-       nbd_handle_cmd drivers/block/nbd.c:1143 [inline]
-       nbd_queue_rq+0x37b/0x1100 drivers/block/nbd.c:1207
-       blk_mq_dispatch_rq_list+0xa70/0x1910 block/blk-mq.c:2148
-       __blk_mq_do_dispatch_sched block/blk-mq-sched.c:168 [inline]
-       blk_mq_do_dispatch_sched block/blk-mq-sched.c:182 [inline]
-       __blk_mq_sched_dispatch_requests+0xdcc/0x1600 block/blk-mq-sched.c:307
-       blk_mq_sched_dispatch_requests+0xd7/0x190 block/blk-mq-sched.c:329
-       blk_mq_run_hw_queue+0x348/0x4f0 block/blk-mq.c:2386
-       blk_mq_dispatch_list+0xd16/0xe10 include/linux/spinlock.h:-1
-       blk_mq_flush_plug_list+0x48d/0x570 block/blk-mq.c:2997
-       __blk_flush_plug+0x3ed/0x4d0 block/blk-core.c:1230
-       blk_finish_plug block/blk-core.c:1257 [inline]
-       __submit_bio+0x28d/0x580 block/blk-core.c:649
-       __submit_bio_noacct_mq block/blk-core.c:722 [inline]
-       submit_bio_noacct_nocheck+0x2f4/0xa70 block/blk-core.c:753
-       submit_bh fs/buffer.c:2826 [inline]
-       block_read_full_folio+0x599/0x830 fs/buffer.c:2444
-       filemap_read_folio+0x137/0x3b0 mm/filemap.c:2501
-       do_read_cache_folio+0x358/0x590 mm/filemap.c:4101
-       read_mapping_folio include/linux/pagemap.h:1017 [inline]
-       read_part_sector+0xb6/0x2b0 block/partitions/core.c:723
-       adfspart_check_ICS+0xa5/0xa40 block/partitions/acorn.c:360
-       check_partition block/partitions/core.c:142 [inline]
-       blk_add_partitions block/partitions/core.c:590 [inline]
-       bdev_disk_changed+0x7ba/0x1550 block/partitions/core.c:694
-       blkdev_get_whole+0x380/0x510 block/bdev.c:764
-       bdev_open+0x31e/0xd30 block/bdev.c:973
-       blkdev_open+0x470/0x610 block/fops.c:697
-       do_dentry_open+0x785/0x14e0 fs/open.c:949
-       vfs_open+0x3b/0x340 fs/open.c:1081
-       do_open fs/namei.c:4677 [inline]
-       path_openat+0x2e08/0x3860 fs/namei.c:4836
-       do_file_open+0x23e/0x4a0 fs/namei.c:4865
-       do_sys_openat2+0x113/0x200 fs/open.c:1366
-       do_sys_open fs/open.c:1372 [inline]
-       __do_sys_openat fs/open.c:1388 [inline]
-       __se_sys_openat fs/open.c:1383 [inline]
-       __x64_sys_openat+0x138/0x170 fs/open.c:1383
-       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-       do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #5 (&cmd->lock){+.+.}-{4:4}:
-       __mutex_lock_common kernel/locking/mutex.c:614 [inline]
-       __mutex_lock+0x19f/0x1300 kernel/locking/mutex.c:776
-       nbd_queue_rq+0xc6/0x1100 drivers/block/nbd.c:1199
-       blk_mq_dispatch_rq_list+0xa70/0x1910 block/blk-mq.c:2148
-       __blk_mq_do_dispatch_sched block/blk-mq-sched.c:168 [inline]
-       blk_mq_do_dispatch_sched block/blk-mq-sched.c:182 [inline]
-       __blk_mq_sched_dispatch_requests+0xdcc/0x1600 block/blk-mq-sched.c:307
-       blk_mq_sched_dispatch_requests+0xd7/0x190 block/blk-mq-sched.c:329
-       blk_mq_run_hw_queue+0x348/0x4f0 block/blk-mq.c:2386
-       blk_mq_dispatch_list+0xd16/0xe10 include/linux/spinlock.h:-1
-       blk_mq_flush_plug_list+0x48d/0x570 block/blk-mq.c:2997
-       __blk_flush_plug+0x3ed/0x4d0 block/blk-core.c:1230
-       blk_finish_plug block/blk-core.c:1257 [inline]
-       __submit_bio+0x28d/0x580 block/blk-core.c:649
-       __submit_bio_noacct_mq block/blk-core.c:722 [inline]
-       submit_bio_noacct_nocheck+0x2f4/0xa70 block/blk-core.c:753
-       submit_bh fs/buffer.c:2826 [inline]
-       block_read_full_folio+0x599/0x830 fs/buffer.c:2444
-       filemap_read_folio+0x137/0x3b0 mm/filemap.c:2501
-       do_read_cache_folio+0x358/0x590 mm/filemap.c:4101
-       read_mapping_folio include/linux/pagemap.h:1017 [inline]
-       read_part_sector+0xb6/0x2b0 block/partitions/core.c:723
-       adfspart_check_ICS+0xa5/0xa40 block/partitions/acorn.c:360
-       check_partition block/partitions/core.c:142 [inline]
-       blk_add_partitions block/partitions/core.c:590 [inline]
-       bdev_disk_changed+0x7ba/0x1550 block/partitions/core.c:694
-       blkdev_get_whole+0x380/0x510 block/bdev.c:764
-       bdev_open+0x31e/0xd30 block/bdev.c:973
-       blkdev_open+0x470/0x610 block/fops.c:697
-       do_dentry_open+0x785/0x14e0 fs/open.c:949
-       vfs_open+0x3b/0x340 fs/open.c:1081
-       do_open fs/namei.c:4677 [inline]
-       path_openat+0x2e08/0x3860 fs/namei.c:4836
-       do_file_open+0x23e/0x4a0 fs/namei.c:4865
-       do_sys_openat2+0x113/0x200 fs/open.c:1366
-       do_sys_open fs/open.c:1372 [inline]
-       __do_sys_openat fs/open.c:1388 [inline]
-       __se_sys_openat fs/open.c:1383 [inline]
-       __x64_sys_openat+0x138/0x170 fs/open.c:1383
-       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-       do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #4 (set->srcu){.+.+}-{0:0}:
-       srcu_lock_sync include/linux/srcu.h:199 [inline]
-       __synchronize_srcu+0xca/0x300 kernel/rcu/srcutree.c:1481
-       elevator_switch+0x1e8/0x7a0 block/elevator.c:576
-       elevator_change+0x2cc/0x450 block/elevator.c:681
-       elevator_set_default+0x36c/0x430 block/elevator.c:754
-       blk_register_queue+0x366/0x430 block/blk-sysfs.c:946
-       __add_disk+0x677/0xd50 block/genhd.c:528
-       add_disk_fwnode+0xfb/0x480 block/genhd.c:597
-       add_disk include/linux/blkdev.h:785 [inline]
-       nbd_dev_add+0x72c/0xb50 drivers/block/nbd.c:1984
-       nbd_init+0x168/0x1f0 drivers/block/nbd.c:2692
-       do_one_initcall+0x250/0x8d0 init/main.c:1382
-       do_initcall_level+0x104/0x190 init/main.c:1444
-       do_initcalls+0x59/0xa0 init/main.c:1460
-       kernel_init_freeable+0x2a6/0x3e0 init/main.c:1692
-       kernel_init+0x1d/0x1d0 init/main.c:1582
-       ret_from_fork+0x51e/0xb90 arch/x86/kernel/process.c:158
-       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
--> #3 (&q->elevator_lock){+.+.}-{4:4}:
-       __mutex_lock_common kernel/locking/mutex.c:614 [inline]
-       __mutex_lock+0x19f/0x1300 kernel/locking/mutex.c:776
-       elevator_change+0x1b3/0x450 block/elevator.c:679
-       elevator_set_none+0xb5/0x140 block/elevator.c:769
-       blk_mq_elv_switch_none block/blk-mq.c:5110 [inline]
-       __blk_mq_update_nr_hw_queues block/blk-mq.c:5155 [inline]
-       blk_mq_update_nr_hw_queues+0x5e7/0x1a60 block/blk-mq.c:5220
-       nbd_start_device+0x17f/0xb10 drivers/block/nbd.c:1489
-       nbd_genl_connect+0x165b/0x1cf0 drivers/block/nbd.c:2239
-       genl_family_rcv_msg_doit+0x22a/0x330 net/netlink/genetlink.c:1114
-       genl_family_rcv_msg net/netlink/genetlink.c:1194 [inline]
-       genl_rcv_msg+0x61c/0x7a0 net/netlink/genetlink.c:1209
-       netlink_rcv_skb+0x232/0x4b0 net/netlink/af_netlink.c:2550
-       genl_rcv+0x28/0x40 net/netlink/genetlink.c:1218
-       netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
-       netlink_unicast+0x80f/0x9b0 net/netlink/af_netlink.c:1344
-       netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1894
-       sock_sendmsg_nosec net/socket.c:727 [inline]
-       __sock_sendmsg net/socket.c:742 [inline]
-       ____sys_sendmsg+0x972/0x9f0 net/socket.c:2592
-       ___sys_sendmsg+0x2a5/0x360 net/socket.c:2646
-       __sys_sendmsg net/socket.c:2678 [inline]
-       __do_sys_sendmsg net/socket.c:2683 [inline]
-       __se_sys_sendmsg net/socket.c:2681 [inline]
-       __x64_sys_sendmsg+0x1bd/0x2a0 net/socket.c:2681
-       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-       do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #2 (&q->q_usage_counter(io)#49){++++}-{0:0}:
-       blk_alloc_queue+0x546/0x680 block/blk-core.c:461
-       blk_mq_alloc_queue block/blk-mq.c:4429 [inline]
-       __blk_mq_alloc_disk+0x197/0x390 block/blk-mq.c:4476
-       nbd_dev_add+0x499/0xb50 drivers/block/nbd.c:1954
-       nbd_init+0x168/0x1f0 drivers/block/nbd.c:2692
-       do_one_initcall+0x250/0x8d0 init/main.c:1382
-       do_initcall_level+0x104/0x190 init/main.c:1444
-       do_initcalls+0x59/0xa0 init/main.c:1460
-       kernel_init_freeable+0x2a6/0x3e0 init/main.c:1692
-       kernel_init+0x1d/0x1d0 init/main.c:1582
-       ret_from_fork+0x51e/0xb90 arch/x86/kernel/process.c:158
-       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
--> #1 (fs_reclaim){+.+.}-{0:0}:
-       __fs_reclaim_acquire mm/page_alloc.c:4348 [inline]
-       fs_reclaim_acquire+0x71/0x100 mm/page_alloc.c:4362
-       might_alloc include/linux/sched/mm.h:317 [inline]
-       slab_pre_alloc_hook mm/slub.c:4489 [inline]
-       slab_alloc_node mm/slub.c:4843 [inline]
-       __do_kmalloc_node mm/slub.c:5259 [inline]
-       __kmalloc_node_track_caller_noprof+0x9d/0x7b0 mm/slub.c:5368
-       memdup_sockptr_noprof include/linux/sockptr.h:126 [inline]
-       xfrm_user_policy+0x1c4/0x960 net/xfrm/xfrm_state.c:2975
-       do_ip_setsockopt+0x1aab/0x2ea0 net/ipv4/ip_sockglue.c:1347
-       ip_setsockopt+0x66/0x110 net/ipv4/ip_sockglue.c:1417
-       smc_setsockopt+0x249/0xac0 net/smc/af_smc.c:3110
-       do_sock_setsockopt+0x17c/0x1b0 net/socket.c:2322
-       __sys_setsockopt net/socket.c:2347 [inline]
-       __do_sys_setsockopt net/socket.c:2353 [inline]
-       __se_sys_setsockopt net/socket.c:2350 [inline]
-       __x64_sys_setsockopt+0x13d/0x1b0 net/socket.c:2350
-       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-       do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #0 (k-sk_lock-AF_INET){+.+.}-{0:0}:
-       check_prev_add kernel/locking/lockdep.c:3165 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3284 [inline]
-       validate_chain kernel/locking/lockdep.c:3908 [inline]
-       __lock_acquire+0x15a5/0x2cf0 kernel/locking/lockdep.c:5237
-       lock_acquire+0xf0/0x2e0 kernel/locking/lockdep.c:5868
-       lock_sock_fast include/net/sock.h:1741 [inline]
-       __mptcp_pm_send_ack+0x76/0x200 net/mptcp/pm.c:196
-       mptcp_pm_mp_prio_send_ack+0xaf8/0xba0 net/mptcp/pm.c:296
-       mptcp_pm_nl_set_flags_all net/mptcp/pm_kernel.c:1484 [inline]
-       mptcp_pm_nl_set_flags+0x893/0xc90 net/mptcp/pm_kernel.c:1551
-       mptcp_pm_set_flags net/mptcp/pm_netlink.c:277 [inline]
-       mptcp_pm_nl_set_flags_doit+0x364/0x450 net/mptcp/pm_netlink.c:282
-       genl_family_rcv_msg_doit+0x22a/0x330 net/netlink/genetlink.c:1114
-       genl_family_rcv_msg net/netlink/genetlink.c:1194 [inline]
-       genl_rcv_msg+0x61c/0x7a0 net/netlink/genetlink.c:1209
-       netlink_rcv_skb+0x232/0x4b0 net/netlink/af_netlink.c:2550
-       genl_rcv+0x28/0x40 net/netlink/genetlink.c:1218
-       netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
-       netlink_unicast+0x80f/0x9b0 net/netlink/af_netlink.c:1344
-       netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1894
-       sock_sendmsg_nosec net/socket.c:727 [inline]
-       __sock_sendmsg net/socket.c:742 [inline]
-       ____sys_sendmsg+0x972/0x9f0 net/socket.c:2592
-       ___sys_sendmsg+0x2a5/0x360 net/socket.c:2646
-       __sys_sendmsg net/socket.c:2678 [inline]
-       __do_sys_sendmsg net/socket.c:2683 [inline]
-       __se_sys_sendmsg net/socket.c:2681 [inline]
-       __x64_sys_sendmsg+0x1bd/0x2a0 net/socket.c:2681
-       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-       do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-other info that might help us debug this:
-
-Chain exists of:
-  k-sk_lock-AF_INET --> &nsock->tx_lock --> sk_lock-AF_INET
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(sk_lock-AF_INET);
-                               lock(&nsock->tx_lock);
-                               lock(sk_lock-AF_INET);
-  lock(k-sk_lock-AF_INET);
-
- *** DEADLOCK ***
-
-3 locks held by syz.2.2034/13659:
- #0: ffffffff8fc3de70 (cb_lock){++++}-{4:4}, at: genl_rcv+0x19/0x40 net/netlink/genetlink.c:1217
- #1: ffffffff8fc3dc88 (genl_mutex){+.+.}-{4:4}, at: genl_lock net/netlink/genetlink.c:35 [inline]
- #1: ffffffff8fc3dc88 (genl_mutex){+.+.}-{4:4}, at: genl_op_lock net/netlink/genetlink.c:60 [inline]
- #1: ffffffff8fc3dc88 (genl_mutex){+.+.}-{4:4}, at: genl_rcv_msg+0x10b/0x7a0 net/netlink/genetlink.c:1208
- #2: ffff88807e300ea0 (sk_lock-AF_INET){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1709 [inline]
- #2: ffff88807e300ea0 (sk_lock-AF_INET){+.+.}-{0:0}, at: mptcp_pm_nl_set_flags_all net/mptcp/pm_kernel.c:1482 [inline]
- #2: ffff88807e300ea0 (sk_lock-AF_INET){+.+.}-{0:0}, at: mptcp_pm_nl_set_flags+0x795/0xc90 net/mptcp/pm_kernel.c:1551
-
-stack backtrace:
-CPU: 1 UID: 0 PID: 13659 Comm: syz.2.2034 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/18/2026
-Call Trace:
- <TASK>
- dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
- print_circular_bug+0x2e1/0x300 kernel/locking/lockdep.c:2043
- check_noncircular+0x12e/0x150 kernel/locking/lockdep.c:2175
- check_prev_add kernel/locking/lockdep.c:3165 [inline]
- check_prevs_add kernel/locking/lockdep.c:3284 [inline]
- validate_chain kernel/locking/lockdep.c:3908 [inline]
- __lock_acquire+0x15a5/0x2cf0 kernel/locking/lockdep.c:5237
- lock_acquire+0xf0/0x2e0 kernel/locking/lockdep.c:5868
- lock_sock_fast include/net/sock.h:1741 [inline]
- __mptcp_pm_send_ack+0x76/0x200 net/mptcp/pm.c:196
- mptcp_pm_mp_prio_send_ack+0xaf8/0xba0 net/mptcp/pm.c:296
- mptcp_pm_nl_set_flags_all net/mptcp/pm_kernel.c:1484 [inline]
- mptcp_pm_nl_set_flags+0x893/0xc90 net/mptcp/pm_kernel.c:1551
- mptcp_pm_set_flags net/mptcp/pm_netlink.c:277 [inline]
- mptcp_pm_nl_set_flags_doit+0x364/0x450 net/mptcp/pm_netlink.c:282
- genl_family_rcv_msg_doit+0x22a/0x330 net/netlink/genetlink.c:1114
- genl_family_rcv_msg net/netlink/genetlink.c:1194 [inline]
- genl_rcv_msg+0x61c/0x7a0 net/netlink/genetlink.c:1209
- netlink_rcv_skb+0x232/0x4b0 net/netlink/af_netlink.c:2550
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1218
- netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
- netlink_unicast+0x80f/0x9b0 net/netlink/af_netlink.c:1344
- netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1894
- sock_sendmsg_nosec net/socket.c:727 [inline]
- __sock_sendmsg net/socket.c:742 [inline]
- ____sys_sendmsg+0x972/0x9f0 net/socket.c:2592
- ___sys_sendmsg+0x2a5/0x360 net/socket.c:2646
- __sys_sendmsg net/socket.c:2678 [inline]
- __do_sys_sendmsg net/socket.c:2683 [inline]
- __se_sys_sendmsg net/socket.c:2681 [inline]
- __x64_sys_sendmsg+0x1bd/0x2a0 net/socket.c:2681
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fb82ef9c819
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fb82fe60028 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007fb82f216090 RCX: 00007fb82ef9c819
-RDX: 0000000000000000 RSI: 0000200000000400 RDI: 0000000000000009
-RBP: 00007fb82f032c91 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007fb82f216128 R14: 00007fb82f216090 R15: 00007ffcfa510d88
- </TASK>
-
+This series fixes a bunch of possible memory exhaustion issues in the QRTR
+nameserver.
 
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Changes in v3:
+- Fixed the issues in remove() callback and other places reported by Sashiko
+- Link to v2: https://patch.msgid.link/20260403-qrtr-fix-v2-0-f88a14859c63@oss.qualcomm.com
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+---
+Manivannan Sadhasivam (5):
+      net: qrtr: ns: Limit the maximum server registration per node
+      net: qrtr: ns: Limit the maximum number of lookups
+      net: qrtr: ns: Free the node during ctrl_cmd_bye()
+      net: qrtr: ns: Limit the total number of nodes
+      net: qrtr: ns: Fix use-after-free in driver remove()
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+ net/qrtr/ns.c | 79 +++++++++++++++++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 69 insertions(+), 10 deletions(-)
+---
+base-commit: 6de23f81a5e08be8fbf5e8d7e9febc72a5b5f27f
+change-id: 20260331-qrtr-fix-b502c26e5f46
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+Best regards,
+--  
+Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
 
-If you want to undo deduplication, reply with:
-#syz undup
 
