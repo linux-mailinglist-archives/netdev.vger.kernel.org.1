@@ -1,279 +1,262 @@
-Return-Path: <netdev+bounces-276937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276938-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ULv7B/2E12mwPAgAu9opvQ
-	(envelope-from <netdev+bounces-276937-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 12:52:45 +0200
+	id sKRjJACF12mwPAgAu9opvQ
+	(envelope-from <netdev+bounces-276938-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 12:52:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80DA53C94AE
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 12:52:44 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 442E33C94C5
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 12:52:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8059F301D681
-	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 10:52:26 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6004B3017076
+	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 10:52:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF4FB3BED0D;
-	Thu,  9 Apr 2026 10:52:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68C5C3BED0D;
+	Thu,  9 Apr 2026 10:52:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="AQUm/J80"
+	dkim=pass (1024-bit key) header.d=bp.renesas.com header.i=@bp.renesas.com header.b="dh2JgoiZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011061.outbound.protection.outlook.com [40.93.194.61])
+Received: from TY3P286CU002.outbound.protection.outlook.com (mail-japaneastazon11010070.outbound.protection.outlook.com [52.101.229.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63FBF3B6371
-	for <netdev@vger.kernel.org>; Thu,  9 Apr 2026 10:52:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 036143A8FE7;
+	Thu,  9 Apr 2026 10:52:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.229.70
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775731945; cv=fail; b=TfDsStC3Gr9lrHjKaKJ8IBa9nob2iUL8tJr9sIHCowiR41dPyhDbD/t1daNY8gm/+Gg+452UcWZTc6aBuY19Gwaxg37vCmssHMXlUfoD18I4SBvnNn+AA5JegwnkTup0ghDcALSLR2GzKQuSH2WlPpjfVSYHMEx98gQJhMUnowY=
+	t=1775731961; cv=fail; b=gB6z80zpCjXyvdwmJbvnLfmUyUQikC+mNGRr/7T93QL4Bxfc2YU8DDMvEualMitbOMXwIIoeCp6ErkfNQO7MfgMquJLjklAeKA/2Jo4yzXm/55bFGkhgpibvtVd6twwc7GPf+R7+MTWitgK8oPqf9YskRIfzYOo9msFd+Nwrq30=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775731945; c=relaxed/simple;
-	bh=hNJLaU6eSEkghujCaNrbUZr1HYBbPuSNfqs8ffIs7E8=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=iHr0gEijR+Bp4FgjfoIm8N79sJMb0X/SCIQG0T2PrAtfZ5rp+URtUsLoBcRS6gWaX6wzQZ5EAbypkDuEiHNaqSklZRatiwDnHPzZLPwKWHSiIU/9+/kDGb41GBwR5s1acu6ieuZWAYPupZOFfhJX+u+R3wa+JjjQ++PSWLLvYW4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=AQUm/J80; arc=fail smtp.client-ip=40.93.194.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	s=arc-20240116; t=1775731961; c=relaxed/simple;
+	bh=WjmrTUqjp4I7eBL9D9T+LcmP8UjDVofvvntvIvlSuxk=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=fzTUCFyCXbAYSdchbRxm3+CP7avsn4P5Le+PBmYZVKDRsk5Co9oE5p57tvNZLlpVclMGG6RoGwyqsKNHm0xiVXBcwmhN9ITgQb01YMRtkcf58GRd1B0lx5o2Dp18DlBoRX2z1sa5FqcM/jwmW4lcGuWzXjex9rVGnbQ6dHkhyCk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com; spf=pass smtp.mailfrom=bp.renesas.com; dkim=pass (1024-bit key) header.d=bp.renesas.com header.i=@bp.renesas.com header.b=dh2JgoiZ; arc=fail smtp.client-ip=52.101.229.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bp.renesas.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=g8SYzxjWHRT9LdC+rLv2sdtydpAtzI8t7Orroe4uyYCk9EA617pG9jJxKnpHA4u9bPcN+Wuy9UHKrz18Aj1qXrarzogDp7IFQGKiVTvq2RO2I0q6YanAn+xVb1vLwqEIPjuxXo1+UwHTUVEbRjz+di59THILFLzEStsTEYDa11reRmKH+f9NVMneIpXm+uVsxKiVcWuzhChxoJR780iop6wyURN4aUWggTL9+bnB7pojk1/QTbrvO/JAHkb4cstLLfXijdpJaAFs9ueKTWHjaYpolzj2/wmbcIQQTeMOZkFJ/byGT8rsLKb37TYcuqjajMt3n1qwB27cz87gOgbddg==
+ b=YWtVQvj9SOpLxmZDjTkYmeeux1j1mtzIXno/5IufF+CbBZrEAlhhj9D3+E/vY55azo/z8IkWQlJX8d0wDuKN3Qw/6zlC8E6wfxZqIMwSq+qlgdUJ4GZoXsWzI+T+ZDIbDH0lFFTcWJW3LeyMQKH7LQ70BSue03sxLJud5oYWK3d2pJckMiOYORorcdHqEJbFzV9IuXTgYqfbYT7cX6q+v5uw9l+PT4BMZ3OqDSN2tpCvh5S8xLrab5uMbuoRXZDLdKx7OV1GaT9v1UEM+5TYhzVnWFe5YpUe8XkX8D0gMJfRaIVcF4kICR3Mxxax4qUZnHzr53dik7Ptq43SnLAmmA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=9kveNxWWiUNzK6rzu3W2DMKoMyBTV3tbrlqZikZutcA=;
- b=WIc8wRExU715upPM3hz9kZLRCLaaETlZUZclwLi9tOjI2421f2edGUtlG3VvoHw9l4bEM64kFpts0c38VyTJITiA414jE1huDF/qsTbgKozEz8ay294aLlNU0q9dpQg5rBwoF0NOEP4D0klBd9AkHfcswjaFoKjD7FH0kEzqUzb4qAxmZxsmE/j89K2I/xs2wxJAbUg3LWD7RnZ2h37y4uJzklkSA9SfEZjV48UaGAScyeaO04EpUI2gLXYIkRhmMmX7sznaJM1NtJBU0ePT2qJUbxhd9iq0wulwx8/frsqvOO6cL8EgRESEiKbtXEAZPW1/P1QhRmph0HrgRLriMg==
+ bh=q5Wk8MyEsZ/QNSwU7+WiIuLzCeDQSOP5wF2cTi5Um2k=;
+ b=oGyZoP5D0+hOBFbnqz6QEoPCdOCxwsPyASl+ayk46H2i0joMZF0mXXmYiw6clZ8fgIYxhU+wiRaW7G/xoI+CmWfx24b3YYOCZxIlQOokOtUPIC7ZqD2QHH6Sqe88XZ4gqhdmdKvsx99MjZIL2SmlvKClmB9/yQR6ms+uHlzCcoXuwFSP0+1U+xFyveXw5FxB9eWC6Q4ZmmyZCeDo9sBk8c7E7PAXxy+6CoO7fkVMUOqvNX8l2Mw2uQV+/oq5G7e8EFyprSQzE2L7geM2tDqFLFf4XSQjKaqHYxkPWsCoH11deDcDpVCHRpeiLkYiKLIZKCBuoShg3z7Fug6xKCzwVA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ smtp.mailfrom=bp.renesas.com; dmarc=pass action=none
+ header.from=bp.renesas.com; dkim=pass header.d=bp.renesas.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bp.renesas.com;
+ s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9kveNxWWiUNzK6rzu3W2DMKoMyBTV3tbrlqZikZutcA=;
- b=AQUm/J80SsHBHUHKMTNaY791bFE3VpzO3MiUGeHC1Q3RiiDMTUfFhWM63EFjNd98wioalWko8l0TLXaiA4DBuelGSINJprCfJLsLwlUp8JBKf8m6ly+ybJ6z84T0JrIxDn2CvTWvnmygsVZQ4HgZlRw8jhvyBeUjvRK+eQ/PcUNaK4KHY5TYINrkTwtLy1F0BJgi6uUCq0xlm711SkLXS0GbhpTtWqeBd4jMDn1ksQvwp+grTKaSWhji2YwMtuJ3JMVm7TNMGvZ+mW9VXXbVbF96K/62HUlLrXtf8OYJlb6eeG5p48gD7hTyqP8Wg8cUqNLc6O2AxxO5ug4fmtyd8A==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DM4PR12MB5248.namprd12.prod.outlook.com (2603:10b6:5:39c::15)
- by IA0PR12MB8715.namprd12.prod.outlook.com (2603:10b6:208:487::16) with
+ bh=q5Wk8MyEsZ/QNSwU7+WiIuLzCeDQSOP5wF2cTi5Um2k=;
+ b=dh2JgoiZgilgMd6xcO61Z4eL2LxH5W/LJpmJeKgHTfpY4t6Neq/qCOTTq48qSE/vPjCTmj8IqAaecEX7oe5H/fls+MbHLBM+ygXqj7b6EASAY6lRQFqRuEn9RMni63rBuj3DZd7qte2JvBg37o7AEA8bxaCVv26IP4diYFdZluc=
+Received: from TY3PR01MB11346.jpnprd01.prod.outlook.com (2603:1096:400:3d0::7)
+ by TYCPR01MB10975.jpnprd01.prod.outlook.com (2603:1096:400:3a4::7) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.17; Thu, 9 Apr
- 2026 10:52:20 +0000
-Received: from DM4PR12MB5248.namprd12.prod.outlook.com
- ([fe80::92d8:797b:4db0:d385]) by DM4PR12MB5248.namprd12.prod.outlook.com
- ([fe80::92d8:797b:4db0:d385%4]) with mapi id 15.20.9769.015; Thu, 9 Apr 2026
- 10:52:20 +0000
-Message-ID: <2fced6d4-f243-4434-b122-c97db422e531@nvidia.com>
-Date: Thu, 9 Apr 2026 13:52:13 +0300
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] gre: Count GRE packet drops
-To: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- netdev@vger.kernel.org
-Cc: David Ahern <dsahern@kernel.org>, Simon Horman <horms@kernel.org>,
- Dragos Tatulea <dtatulea@nvidia.com>, Nimrod Oren <noren@nvidia.com>
-References: <20260409090945.1542440-1-gal@nvidia.com>
-From: Gal Pressman <gal@nvidia.com>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.19; Thu, 9 Apr
+ 2026 10:52:36 +0000
+Received: from TY3PR01MB11346.jpnprd01.prod.outlook.com
+ ([fe80::87d1:4928:d55:97de]) by TY3PR01MB11346.jpnprd01.prod.outlook.com
+ ([fe80::87d1:4928:d55:97de%4]) with mapi id 15.20.9769.041; Thu, 9 Apr 2026
+ 10:52:36 +0000
+From: Biju Das <biju.das.jz@bp.renesas.com>
+To: Russell King <linux@armlinux.org.uk>
+CC: Ovidiu Panait <ovidiu.panait.rb@renesas.com>, "andrew@lunn.ch"
+	<andrew@lunn.ch>, "hkallweit1@gmail.com" <hkallweit1@gmail.com>,
+	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-renesas-soc@vger.kernel.org"
+	<linux-renesas-soc@vger.kernel.org>
+Subject: RE: [PATCH net v2 2/2] net: phy: micrel: remove ksz9131_resume()
+Thread-Topic: [PATCH net v2 2/2] net: phy: micrel: remove ksz9131_resume()
+Thread-Index: AQHcyAc7ZyEBHUmX/kuuIfqJuejTO7XWgYEQgAAF+QCAAAVdkA==
+Date: Thu, 9 Apr 2026 10:52:35 +0000
+Message-ID:
+ <TY3PR01MB113465B215559404D0FBD04AE86582@TY3PR01MB11346.jpnprd01.prod.outlook.com>
+References: <20260409095633.70973-1-ovidiu.panait.rb@renesas.com>
+ <20260409095633.70973-3-ovidiu.panait.rb@renesas.com>
+ <TY3PR01MB11346A0F047F1F7296B8F4FCA86582@TY3PR01MB11346.jpnprd01.prod.outlook.com>
+ <add_krK3MC1-SSsV@shell.armlinux.org.uk>
+In-Reply-To: <add_krK3MC1-SSsV@shell.armlinux.org.uk>
+Accept-Language: en-GB, en-US
 Content-Language: en-US
-In-Reply-To: <20260409090945.1542440-1-gal@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: TL0P290CA0014.ISRP290.PROD.OUTLOOK.COM (2603:1096:950:5::8)
- To DM4PR12MB5248.namprd12.prod.outlook.com (2603:10b6:5:39c::15)
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=bp.renesas.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: TY3PR01MB11346:EE_|TYCPR01MB10975:EE_
+x-ms-office365-filtering-correlation-id: 7caa3bd1-5528-4668-83a5-08de96261c58
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|376014|7416014|366016|1800799024|38070700021|22082099003|18002099003|56012099003;
+x-microsoft-antispam-message-info:
+ USzYgxXB3upPlihsRITGLS7+NPXw1vcHRr/GHocRneqzBy1pj59bZTU9EOwaDjqo4y6jHNGAep4n58j0Ly8y2qgli+MI7wzwuP8hYoviIkm2+PXLjQZDRmrNnRnzyX0UiL/2LEqhuoGoQQJXgFuuUDMAyV0MwuV8gaETIsqDKccrbgPtE/9+Kw/iWEp7yUv/PTT/873tSG1xnAexK41wMYJQaXDYWwFcYlW0Uk3bJymxAxWRPyrWWNAHBXyOZYHZvItg3BFBKyGmGNYgUK+6pddeHy9hZhxQxMMga1AOMCL0DtA2ubpOLbVU+7/l9yG8a+kbakCzJvVKZntXm22ia86u7HJTByzFbruf7e3WQThLWTbFwyhbxtvSw8XIEOe7FfOUaGxxb+zilceN2wKah0+bYokaRQp4xWKYsDnAEa//wnYH1MhkML7qi5uAx1uBnKsrhXuzNfwKIwt8XyU4n3RtUCVSKRQrmSLB2MtgAkra3f/URn/Hq+mmWm6z1Vp/FHVOHLnwF27PmYXqSmmSicU8GHFHVrKmQfyY/FrrS2BrVSx2LnlCJYBRKJsihhxHWCeI11nKD3az3JfZ+NuZDB5pX9D7Vu3zE57mkuM36qFVHRZnvMm98Ik3kt6Eo7bm0xcB4Pp1ynGHMIfRo6GDPwoIeSiI98p4dG0lHaGjMQWu4PfUiWsmGe7wslmdlkbXEYDit+Ta1t7wPclXh4Vm8VQ0IZRLkhixc2JMhcUGB8Ewu9IMHskzM4fGB7ykWSQbILyNgC8e5bzfNAUkFC35GgRF8/0SwbrJl0cbSbjuxwM=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TY3PR01MB11346.jpnprd01.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(38070700021)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?iso-8859-1?Q?KXrl4XleHFlM0Nh84EF/9bGLQ5bY6ydjgkYZCqY9bPfkN141/E/EMhS3jM?=
+ =?iso-8859-1?Q?GANQva3LdAtgdz4+BQdCD19i9vHq47C6Z0qimLahDS/JIN1mkJap+lLcIH?=
+ =?iso-8859-1?Q?pyI9EB9ZB6V/ktfncyErmsfYK9/jYSk7Pgy7jgRJurkBdLnvKR2AB77lCX?=
+ =?iso-8859-1?Q?ztEKZrUvJmoH2RJCKbWEASnGQDV98N2qy6ne9fgtjhc/zqG9WYGWqh+V56?=
+ =?iso-8859-1?Q?Q7y9FZRWIMjV4S2dfLRW81rkFjR4LieOYruJKZm7hooyDzfIrNg0BmGUnL?=
+ =?iso-8859-1?Q?r3QgNgAI4+IetW9IgbYuESNN7C7XFyBNuf5RQWPAlYLRrvLay2ApTrkRK5?=
+ =?iso-8859-1?Q?4FUm7w6Ue5/ndFqnCVHCRbQAA3rffZ3ODpArCwFZdHV8mt0yVkAdeR8nUk?=
+ =?iso-8859-1?Q?UCyFo65iH33PCETIIdc4Mk6shPR1GidhO+UgePmd9tN071ip5V/AHl6gUr?=
+ =?iso-8859-1?Q?sgA4aLwnSswjI8Gk3JpycI1L5bUEy9VVh20o2/nyvSJ0eN+v8dPKn7GLks?=
+ =?iso-8859-1?Q?YKjRLbqf7yr12npkudiCiAMySrt00/ao/jmmAzgoXYq/QIHNRuNd28biXO?=
+ =?iso-8859-1?Q?EtMDt/4sq/cgcy8sZbLLK/v0nDy9Xi56O6UueOgqfV4FUcGxx9KEdF8QJV?=
+ =?iso-8859-1?Q?zac8z9FuQO5Egjp+FTBwbBgoBnfg/aZplbJ7az5Qj4qDkf6SA3JCCS3JB2?=
+ =?iso-8859-1?Q?pPfgFhOOmr/QYsLWvS4ZHnzvbDLMcMJMEgQlwsZkgEo7PDaqwki9l4G0vr?=
+ =?iso-8859-1?Q?h5oOUIuw66iRrVqXH4CNfy4pLC98/64IkQ4JMGMOEllD3MUxeqo7aJLIsH?=
+ =?iso-8859-1?Q?FqnbDu2M8BZV+LrnrwoZEdxn2ooOXwrs0TYBgFOfhgE2OhGbLo809/ULM5?=
+ =?iso-8859-1?Q?Dlgw6C0cSvBbTGTMHOV9LTnFj3GQttedMT92zpEcE/6WGXl88IwKj0zIVo?=
+ =?iso-8859-1?Q?+5LwRiCX9/q0TQfZ9OnhBHh34ht52xeMmNFS3qOmrPWdYkv4sRR2V/GgOG?=
+ =?iso-8859-1?Q?j1A+kX+nT+2yIMblqazqGE4kopWjs8VXjKWJHrsWvYd4qu1QANhv76+3hC?=
+ =?iso-8859-1?Q?bm4Hg8YOI2+DXX+2XlVXx8fIXFKxIn0XsyaAPuXbV8D7l2t4HzerhXvW2d?=
+ =?iso-8859-1?Q?VyBtngK3yUIsQqu+KsJYTKVn4Befd+/Oxzr+UazbsFZO8sSdqPU/xoOQtU?=
+ =?iso-8859-1?Q?pDyJWqqvqlNBi7dZYW8bbi7HGlvVzTD/y2waA7oCqriMsMP3SXl9s7J/gZ?=
+ =?iso-8859-1?Q?E+vOW9tw7bvtBA5IQ6A8q96ahaAQuqXHqkgDUeExb8ur+0qQGL4kA/9osj?=
+ =?iso-8859-1?Q?ENRe6E6zA23SkqveC/Chgd1mOSGnkdPvg3owVa6dvu+hxBsmevVWS1g2mz?=
+ =?iso-8859-1?Q?dGQJGH1+mjNHOEEtTbltEpZ5A32BbsnFUowaesW7hACrR1IwBxbKrWOxd7?=
+ =?iso-8859-1?Q?Nrw/TDGje44ttRz8z9Vo6FyPi5IahRhCktSZTUARYcnVmfBuYV/uy4BZkT?=
+ =?iso-8859-1?Q?eJbVLVqplaSBMa/b/hHtb+vje8n3Ya2QqHbACRY2llySaAw4qkYcSwk78Y?=
+ =?iso-8859-1?Q?K8+7G6JeQRoOtTLcfdZCtG3l2LboU6YU70niRGe2alV01GxH64fH0RL572?=
+ =?iso-8859-1?Q?dhOalY8gFrXLWEMpFhXorkIx+GS/XbzyhChXP1Gj4njLmaUQWHRbSAeO8c?=
+ =?iso-8859-1?Q?NhibG6t7MO3kcljOtm5jPI3qu/Mhw9V4FD2CDgmFJhIbSllnhSsNbF3BgZ?=
+ =?iso-8859-1?Q?KZ/rePtbXia5q8yYkK8k+A+JJY9Seaf9aNhnxfXMnK1Vz5YiPZY5pVB0/8?=
+ =?iso-8859-1?Q?QXAD1/DEdQ=3D=3D?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5248:EE_|IA0PR12MB8715:EE_
-X-MS-Office365-Filtering-Correlation-Id: de294719-5363-450c-b769-08de962612a6
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|1800799024|366016|56012099003|22082099003|18002099003;
-X-Microsoft-Antispam-Message-Info:
-	LDty0Zjk+jXA0ktcWP3roJGeMlZu/zbwVkaCaR3bcHX/7TZJGFgx/++2liVn/MYUj/o68RIB/XjzKhm77MebMmIzH6aq5GauLKqcQ+Y9i1/roxwwpSmjvSP+4qY+rxTFQIBN/2q48YXHlfMGj9VwyRzNNLla8JtSwtsJT8tCL+jpZHUFw91KJG+BGlk3ScsPjF2GVxlWYgVMgMpxdOqVo6epiA1Ce/b24a43dVjUasSdbA4Ujy0VB2UUuQxD2+c4UfrevrM0fckaBBKkUM1RYekYoX5lV9fDwZIOUn+hn2MIKngaQP7dmAlH9IsrQLmtZGYjWpX34fAsEPqf9sHRZZBPQwU5G/lMkRBvePPrSyGM+0p//dNl8VtcRL5M9oRzRwUr3tS5z2538wokW/NYzTwvQ1BXzpxu05ozeR05wVvfaa3TTEDdizDmyyow7Hz1/aURB3gwEunSSER1g2SggjLkwRueuU2tA7nOxk7O0ZMNDcJ9zxgi1J9ljCzzurpXwbRFMQKqPbml2ZoDC+JPMqMskvpxw9pD8ZWJkSMp8lyFRM+R0hPQVezrbgMbvRSBkb1j49l5Kea4maRNwm2OgWxw654bB/Iy+Kl4hCENISFx+ifUK2840wALZj8VaYcLlZ0FwwgU+LyQPrV5ojs5fB+ogWzqnqcoq962VGsWM2iAzK3Cu7QiR1g3YhstgxiondZdaYuB/WM8w0nuN2TESnsQamiwOPWoJUosJNwlGw4=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5248.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?MTR4SmxLN1FJak45K2ZGQlBQWGRmeVFjRFl5U3YxcHNTalpMZlh3TlIzUGtK?=
- =?utf-8?B?M0JMNTIyL0FQeFVFWUpISkFFWTViQmNVMzUwcEtMam1vbkwzbEIyWG15NjNq?=
- =?utf-8?B?NHkxL3MyeENzVjEvaDlZZ2h3RkZ0M3R5b1JhTElQd2x0WXdtTUE1Ny9sNWtp?=
- =?utf-8?B?VXhMRTVGakZFMlIvbWR6eHNIWkVyUlBxSExLUVdyN1E3aUV6VGpqQ0MxK0Fi?=
- =?utf-8?B?NkRLZ2JleDNTdFpEd2cvdmx4QmZIeWw3cTVZblBzYnNxR0VnT2lHU1lSSHJo?=
- =?utf-8?B?NjFYQlh1eHFhblJZUStXdE9hbW1BK0JGenVWQ2xOMnRFbXcySmJiY28zTkwz?=
- =?utf-8?B?dk5ieC9UWXArWEZEYzdpekVsTHlNK25WWm5GcFVvSjQxWTg0UHNIcXRzSEZK?=
- =?utf-8?B?eFdaRmM4VDAzU1J6TEtqWGMwdDM1SE5NNEZsNkxmd2V4cGJzRVhtUzJkb2xu?=
- =?utf-8?B?ZEJCSUJIK2lzcmZQNGJYZWNMcUtPMkVHWHhwS1ViZzFLRzVnV2dONjhTa2dv?=
- =?utf-8?B?L3lHeGIxeWZMTnFiOTlmUk9kRFhLcml1Y1lHWFZEOGNlY1BmdDkvNTV2Mk9i?=
- =?utf-8?B?aG8wbWJzMTZYTTc5dDN2aFEyUU9HdFJGL0YyL0E2QmNUNnNxakRMQjJkS2xp?=
- =?utf-8?B?ZVlhUnRQUnRoN0gxa0wwTXRTSVVLZlhkNzFLYUZtNEtRVU1sQWpLb2gxckgz?=
- =?utf-8?B?Y3dxbkVZOFZLakJHMnRMdWRNSUhVU2hVY0s4VjZsU2RuMzN2ZFlXdGd4U2dO?=
- =?utf-8?B?S3hQOHZUMklTVncrY0JvRklEcnZBWWFtZ3FuWk5yaE5ra3hydmJVVGlIeHJ0?=
- =?utf-8?B?aHR4b0xBVHBvelZFb3lEWlhaT3VWaG5HTzVjMnIwQWJIdDdWdmZlcWwzdFZ5?=
- =?utf-8?B?WE9rd2ZreEdsdnVldy9KelNBMVg4eno4eGlMZlZ6dURNZTF4NWRscUN2QzBh?=
- =?utf-8?B?OHh5eERnK0RhaW5KdDFVY0ora0pYTlJCa2hYNk9CVUVmQzF2YmxLbEFzYzZE?=
- =?utf-8?B?WlBCWnJ5N1NWNnpIRmFqSG9tc1hwaUEvTkJXc0lvZE1BSS82OU1FUGpHdGln?=
- =?utf-8?B?a0lCZmlKaG5QWFRhVTRVZUdVa2dXL3lOejFOYUNRZGFRQXJtNlEzRVJTN00v?=
- =?utf-8?B?eHBEVFJ2ckQxZzlDOWNOYW45QkFNMTFKanhXaE9qQUtCSnJka3hmTmFMOU5K?=
- =?utf-8?B?eW8ySDlhWUhGQm9TWmNOdlIzOVh0OUJYZkQ3WWRVRHZKbUFCOEJHbXFHNFFv?=
- =?utf-8?B?TU5GTUdYb0E3aXF6MWNJMDBETTB2Sm4vTS9GakZLb2grMFVROC9tT05UVkNr?=
- =?utf-8?B?QmlVbllzaWdGMGZ0eGcyVTBsNFpTUGJYbGxNZ08xU3JZUUN4VUxqZEdwRHQ5?=
- =?utf-8?B?Sjd6RUdtVXB4L0h3NjFwOTI2dE4vdmttYytYZndodkppK3A0K0UvUmp4cytM?=
- =?utf-8?B?NWl6QmNXNXRPWHNkUnNuOGhWdG9QVldRVGF2RVl6Ulk4MG5HVnltVmtVaHpD?=
- =?utf-8?B?NTI3N3RLWWxzY1ByeC9HM2FNTG9KSlVWVnh4aDk5eWFOdlQ2S0tDWXZ3bmpv?=
- =?utf-8?B?SHNpY2dZUGJjdTlvNDNhb0diN05VOGJOOS9HWEVzN2hKOWRlZm9hTUdzajJB?=
- =?utf-8?B?N1lIa1pId0lhSjZSckhiRzRPUm51ZXJyT2V5ZFVUOTVWRDMwRUUrNDlwREZ6?=
- =?utf-8?B?ZWszamtWbnQ1OHpjSGE0RXJWSlJlL0RGb1VvSGIvc0I1aWRwb0pKMTdMUERG?=
- =?utf-8?B?ekpCWWF4ZEVDVkhRelZSMzBzYkk2SUNJVTVqZU9QRU8wUjdST01VVG5LalZ4?=
- =?utf-8?B?aEhlY29GWGhTTHFiV3lESkhUMTJWQWJnR3lNTTFTTng5SFdMZXlYNEg0OVd1?=
- =?utf-8?B?OXc4c3Z5UnNjMlc4UDJKODFPSGUxRUM2Tk5Zc2xXZnF4bFVYZEkzY3hMQll1?=
- =?utf-8?B?VStIMEVjZ3ZyeVp6M3lNQmw3aFg1SWVPRUhSVXhNbktiTVkxZFJrUURyMWZH?=
- =?utf-8?B?WGVxU2pKRys0dmdQYWFFZkJlUFhKUkQ4RmZ6VTZOUDBzUTJ0K2lUb3B5S3FY?=
- =?utf-8?B?ZnZlRkJzWSswRGg4S0RSNmE3UDlkN0pjbE1wZVhEMGVUdXY3NGp2L3FkU3h3?=
- =?utf-8?B?Wk8yY3lQeEV1aGpDV1hBTlZpWkZRRGFHck1pSmdueHVqMFBzVjZKWGk3c2Zk?=
- =?utf-8?B?TzNYVStKUmw4OWJiSVpabVJ6aFpJSWJNc2k2dWdsRTVCdmNBRTBTaGhTTzBt?=
- =?utf-8?B?Zlo5dWhOWW96QWsyNlJqNkVtV0Jna0htc2MzYVNFZFNRUnhtZXg3TXRMZ3Jw?=
- =?utf-8?Q?1keVu0K0ACEKs9tK9K?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: de294719-5363-450c-b769-08de962612a6
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5248.namprd12.prod.outlook.com
+X-OriginatorOrg: bp.renesas.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Apr 2026 10:52:20.0290
+X-MS-Exchange-CrossTenant-AuthSource: TY3PR01MB11346.jpnprd01.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7caa3bd1-5528-4668-83a5-08de96261c58
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Apr 2026 10:52:35.8623
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: WLnfYfP8qh4h2gkRWGuwuLIS0TIA6Ochg5TM47sKqqidXjubJuuxxwOSRQfJm+Bt
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8715
-X-Spamd-Result: default: False [1.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 53d82571-da19-47e4-9cb4-625a166a4a2a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: SilxiOttL3jpKuTRoIxyRpqfHR2hJmpG3B+RASafTjULso1Y6Yk2dcbm2mmj2UxB+/OQIz7svTuUvjuj4a7z+XSZBYQ/v/hGD4s+nzlCobA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYCPR01MB10975
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[renesas.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[bp.renesas.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-276937-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[renesas.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-276938-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[bp.renesas.com:+];
+	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[gal@nvidia.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[biju.das.jz@bp.renesas.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,nvidia.com:email,nvidia.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,Nvidia.com:dkim]
-X-Rspamd-Queue-Id: 80DA53C94AE
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:email,TY3PR01MB11346.jpnprd01.prod.outlook.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,renesas.com:email]
+X-Rspamd-Queue-Id: 442E33C94C5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Addressing Sashiko's comments:
-https://sashiko.dev/#/patchset/20260409090945.1542440-1-gal@nvidia.com
+Hi Russell King,
 
-On 09/04/2026 12:09, Gal Pressman wrote:
-> GRE is silently dropping packets without updating statistics.
-> 
-> In case of drop, increment rx_dropped counter to provide visibility into
-> packet loss. For the case where no GRE protocol handler is registered,
-> use rx_nohandler.
-> 
-> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
-> Reviewed-by: Nimrod Oren <noren@nvidia.com>
-> Signed-off-by: Gal Pressman <gal@nvidia.com>
-> ---
->  net/ipv4/gre_demux.c | 8 ++++++--
->  net/ipv4/ip_gre.c    | 1 +
->  net/ipv6/ip6_gre.c   | 1 +
->  3 files changed, 8 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/ipv4/gre_demux.c b/net/ipv4/gre_demux.c
-> index dafd68f3436a..96fd7dc6d82d 100644
-> --- a/net/ipv4/gre_demux.c
-> +++ b/net/ipv4/gre_demux.c
-> @@ -159,14 +159,18 @@ static int gre_rcv(struct sk_buff *skb)
->  	rcu_read_lock();
->  	proto = rcu_dereference(gre_proto[ver]);
->  	if (!proto || !proto->handler)
-> -		goto drop_unlock;
-> +		goto drop_nohandler;
->  	ret = proto->handler(skb);
->  	rcu_read_unlock();
->  	return ret;
->  
-> -drop_unlock:
-> +drop_nohandler:
->  	rcu_read_unlock();
-> +	dev_core_stats_rx_nohandler_inc(skb->dev);
-> +	kfree_skb(skb);
-> +	return NET_RX_DROP;
->  drop:
-> +	dev_core_stats_rx_dropped_inc(skb->dev);
+Thanks for the feedback.
 
----
-At this point in gre_rcv(), does skb->dev point to the underlying
-ingress physical interface (e.g., eth0) rather than a GRE tunnel device?
-If so, does incrementing the L2 physical device counters for an L4 protocol
-error case pollute the physical interface metrics? Unconfigured
-GRE traffic from the network might cause physical device drop counters to
-spike, which could be misdiagnosed as hardware issues.
-Would it be better to expose these via protocol-specific MIB counters or by
-passing a specific drop reason to kfree_skb_reason()?
----
+> -----Original Message-----
+> From: Russell King <linux@armlinux.org.uk>
+> Sent: 09 April 2026 11:30
+> Subject: Re: [PATCH net v2 2/2] net: phy: micrel: remove ksz9131_resume()
+>=20
+> On Thu, Apr 09, 2026 at 10:13:10AM +0000, Biju Das wrote:
+> > Hi Ovidu,
+> >
+> > Thanks for the patch.
+> >
+> > > -----Original Message-----
+> > > From: Ovidiu Panait <ovidiu.panait.rb@renesas.com>
+> > > Sent: 09 April 2026 10:57
+> > > Subject: [PATCH net v2 2/2] net: phy: micrel: remove
+> > > ksz9131_resume()
+> > >
+> > > ksz9131_resume() was added to restore RGMII delays on resume for
+> > > platforms where the PHY loses power during suspend to RAM. However, f=
+or s2idle, the PHY stays in
+> Software Power-Down (SPD) during resume.
+> > > In that case,
+> > > ksz9131_config_rgmii_delay() accesses MMD registers before
+> > > kszphy_resume() clears BMCR_PDOWN. The
+> > > KSZ9131 datasheet states that during SPD, access to the MMD registers=
+ is restricted:
+> > >
+> > >   - Only access to the standard registers (0 through 31) is supported=
+.
+> > >   - Access to MMD address spaces other than MMD address space 1 is
+> > >     possible if the spd_clock_gate_override bit is set.
+> > >   - Access to MMD address space 1 is not possible.
+> > >
+> > > Additionally, only RGMII delays were restored, while other settings
+> > > from ksz9131_config_init() were not.
+> > >
+> > > Now that the preceding commit ("net: phylink: call phy_init_hw() in
+> > > phylink resume path") performs a
+> > > phy_init_hw() during phylink resume,
+> > > ksz9131_resume() is no longer needed.
+> > >
+> > > Remove it and use kszphy_resume() directly.
+> >
+> > How to avoid code duplication in this case?
+> >
+> > For eg: phy_init_hw() makes the phy out of SPD state
+> >
+> > and kszphy_resume() unconditionally makes the phy out of SPD state agai=
+n.
+> >       =AC kszphy_generic_resume
+> >          =AC genphy_resume
+>=20
+> My question would be... if we mandate that phy_init_hw() must be called b=
+efore phy_resume() by MAC
+> drivers, then how much of kszphy_resume() becomes redundant?
+>=20
+> Given that populating drv->soft_reset() with genphy_soft_reset() means th=
+e PDOWN bit will be cleared,
+> genphy_resume() becomes redundant.
+>=20
+> phy_init_hw() will also call drv->config_intr(), so that doesn't need to =
+be done either.
+>=20
+> It will also call drv->config_init(), which will call kszphy_config_reset=
+().
+>=20
+> So most of kszphy_resume() becomes unnecessary. I think the only thing th=
+at remains would be the call
+> to kszphy_enable_clk() - and is it fine to call that after phy_init_hw() =
+?
 
-Yes, it points to the underlying device, and that makes sense IMO.
+It just needs kszphy_enable_clk() and phydev->drv->config_intr() to enable =
+PHY interrupts for
+suspend-to-RAM to work on RZ/G3E SMARC EVK.
 
-At this point, the packets are still not associated with any tunnel (it
-might not even exist).
-
->  	kfree_skb(skb);
->  	return NET_RX_DROP;
->  }
-> diff --git a/net/ipv6/ip6_gre.c b/net/ipv6/ip6_gre.c
-> index dafcc0dcd77a..63fc8556b475 100644
-> --- a/net/ipv6/ip6_gre.c
-> +++ b/net/ipv6/ip6_gre.c
-> @@ -593,6 +593,7 @@ static int gre_rcv(struct sk_buff *skb)
->  out:
->  	icmpv6_send(skb, ICMPV6_DEST_UNREACH, ICMPV6_PORT_UNREACH, 0);
->  drop:
-> +	dev_core_stats_rx_dropped_inc(skb->dev);
->  	kfree_skb(skb);
->  	return 0;
->  }
-
----
-Does this fully account for silent packet drops during decapsulation?
-
-Looking at erspan_rcv() and ipgre_rcv() which are called earlier in this
-function, if they fail internally (for example, if __iptunnel_pull_header()
-fails), they free the skb and return PACKET_RCVD:
-net/ipv4/ip_gre.c:erspan_rcv() {
-    ...
-    if (__iptunnel_pull_header(skb, len, htons(ETH_P_TEB), false, false)
-< 0)
-        goto drop;
-    ...
-drop:
-    kfree_skb(skb);
-    return PACKET_RCVD;
-}
-Since gre_rcv() checks for PACKET_RCVD and returns 0:
-    if (erspan_rcv(skb, &tpi, hdr_len) == PACKET_RCVD)
-        return 0;
-Does this bypass the newly added dev_core_stats_rx_dropped_inc() call under
-the drop label entirely, leaving these packets silently dropped?
----
-
-These are also silent drops, but these should be counted towards the
-tunnel device, maybe as a separate patch.
+Cheers,
+Biju
 
