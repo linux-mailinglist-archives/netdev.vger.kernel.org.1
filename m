@@ -1,216 +1,220 @@
-Return-Path: <netdev+bounces-276813-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276814-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6K/0GAgW12k1KwgAu9opvQ
-	(envelope-from <netdev+bounces-276813-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 04:59:20 +0200
+	id YMRrC2QW12k1KwgAu9opvQ
+	(envelope-from <netdev+bounces-276814-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 05:00:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D7393C5D14
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 04:59:19 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87BC13C5D5F
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 05:00:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E34D83020A5F
-	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 02:55:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AEDE93011C78
+	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 02:59:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0025A367F40;
-	Thu,  9 Apr 2026 02:55:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 819DC363C72;
+	Thu,  9 Apr 2026 02:59:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fr8YrZuU"
 X-Original-To: netdev@vger.kernel.org
-Received: from CHN02-BJS-obe.outbound.protection.partner.outlook.cn (mail-bjschn02on2106.outbound.protection.partner.outlook.cn [139.219.17.106])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f74.google.com (mail-dl1-f74.google.com [74.125.82.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBD3A2D0C97;
-	Thu,  9 Apr 2026 02:55:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=139.219.17.106
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775703337; cv=fail; b=Smfk/LKgvii0ZSvpg1/iGZRu9ONwdO9hJJja+5DPDV+v1usR1vR+kLMgpLMIOezLFrDAXKnlcalm6IqXr2Ou4yoS2kdqSjXAWZNZMi3dlHpyvZAbGlhIuQeUS2+iWGldUOHxbHHBisfGe2hiJ2L5f+W3K3NKpV23L6+Q0MOR9xw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775703337; c=relaxed/simple;
-	bh=0eqG4575sA8tZqlAuoq5sw94wJWjszmurAhkqC/mTLg=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=gdMncp0UvpdD0A92CGs+bGhSKKDwbxaKSbd3kEXqkgYai2EvHS7yB2NJR4oiZQKY1vURjEnV68knQuGj+f8UjTVmIQdFb37Uq58SCiQbuF+aV6/bvE0YMbnQ+32Ej+yJ1ZLfRyD2VyqxngA9XuA9S4IP4iLOYZ3A2dSOImkwRBw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=starfivetech.com; spf=pass smtp.mailfrom=starfivetech.com; arc=fail smtp.client-ip=139.219.17.106
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=starfivetech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=starfivetech.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=N4MTtHz2jb2mGv7yAj6z2CsSTSQu+R9a+bwsZEmsLk3mF9UlKprYnS4JT2ZqzepUrgZAn5tUZDlobV+XuoJlTbySYO5lKG5xRLQGdxuIs4cAjqiIS+AG0B7SyuuPmMqxR+LqAS/HkRlHn4v8HoRqDUq5Eyxl4iIv01jerAAzlnJU01PyLTHWGTkMOZDfApiGnAX4P+92S0aJjsjA59GFrtDxRLGpjKmL/9obEhgz0HrrKxwQZcfaSyjT/hbSVbamtfn6mlawiMrSWQluTMyddtQH+BKBon3h2hY4zPWLnHhwGM4xi1zxM72+gcQyLXesnFX8+nshqq3PMhwnzDaohg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qgwuI2Tx4/0Kz7DsiIk5d+EuVJrmuKO7tnJHXGQJ8jU=;
- b=MBeam2zGtedKYKtSYLaLfT5UjQH8ba40lnhJyIY9SI4q9p5Qy8RKArwG3vYsjMuuwdXy3JABYMfkIzPjCr9W0pnPLJv5NMatIFWp9aISUKxSO5Ph11gDv6N7xRdAMPdZrBmkocMLC4+1tdrnNO04m9Mv8Vw1yJP9spS32fxdfFLpBXdbBnj5iw98rs13kV+RZ0yr10N6bIdn7G/ujZ+9XHwOombNgrlOhyxOLuR/2wIKK+9VGpL2shCkBRbvMn1aM1v4PUCRL9KNC3Yb335z/oso2TmAihourTlrTPxhkVfChETFcfuwHXnhCr+PyD6ea0gz9huoQ8nz7EgCvSKVyQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=starfivetech.com; dmarc=pass action=none
- header.from=starfivetech.com; dkim=pass header.d=starfivetech.com; arc=none
-Received: from SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c311:25::15) by SHXPR01MB0735.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c311:27::17) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.17; Thu, 9 Apr
- 2026 02:55:22 +0000
-Received: from SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn
- ([fe80::9b99:12dc:a115:b90f]) by
- SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn ([fe80::9b99:12dc:a115:b90f%6])
- with mapi id 15.20.9723.018; Thu, 9 Apr 2026 02:55:22 +0000
-From: Minda Chen <minda.chen@starfivetech.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Alexandre Torgue <alexandre.torgue@foss.st.com>, Andrew Lunn
-	<andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, Emil Renner
- Berthing <emil.renner.berthing@canonical.com>, Rob Herring
-	<robh+dt@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
-	<conor@kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-stm32@st-md-mailman.stormreply.com"
-	<linux-stm32@st-md-mailman.stormreply.com>, "devicetree@vger.kernel.org"
-	<devicetree@vger.kernel.org>
-Subject: Re: [net-next v1 v1 4/5] net: stmmac: starfive: Add JHB100 SGMII
- interface
-Thread-Topic: [net-next v1 v1 4/5] net: stmmac: starfive: Add JHB100 SGMII
- interface
-Thread-Index: AQHcxzPqQrOYYRYKOE2TlrW8gU1Ob7XVTJkAgAC9nMA=
-Date: Thu, 9 Apr 2026 02:55:22 +0000
-Message-ID:
- <SHXPR01MB0863079ED69731F5ABBEB6A4E6582@SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn>
-References: <20260408084416.29753-1-minda.chen@starfivetech.com>
- <20260408084416.29753-5-minda.chen@starfivetech.com>
- <49407bd8-f20b-46f7-9b98-8c88fc45e0f0@lunn.ch>
-In-Reply-To: <49407bd8-f20b-46f7-9b98-8c88fc45e0f0@lunn.ch>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=starfivetech.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SHXPR01MB0863:EE_|SHXPR01MB0735:EE_
-x-ms-office365-filtering-correlation-id: b07cd339-f756-4bfa-b810-08de95e3718a
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|7416014|376014|1800799024|56012099003|22082099003|18002099003|38070700021;
-x-microsoft-antispam-message-info:
- CFBVPofAe8X/3KRKYkbE1qsBCeEwP3ykTYKlmrcI1mt5anb4mX+cTetTpl6WmkX+rwsmaL8KLAI7JdQt1kyPjv2A9EYchBTNlrrrIaj7ByY4gGrz4ccyEO+aD59hAcaGIBp6AmiXxXqjwsPAFXw4H0pI+O2xF+CiZhp9by+av9UvW/d6kp6aQQSP/U4/rbbViMlBJm8DaLkVzpwyQeRDoI4kI3F4PuPzkKBKvKRZxdN/nncPYScGEVPBucGeXGMw8wgO48koS6n346d52c2nU+r0bu/DrXUAogk7+14AJofqOnW6jkwsEPGyeLCLwkAal9dJEdJ3UTI0VC7Qh79YrMnGkKl15yrqVqeMx1dn/0rVRVCjLVsFoBGr5l5gBK3nvQlRc8hOK3IM1VxgqwlKXmymihcMGelk3/MxSF8l7TQRROt5lZsR6GvUD7xnZHqs5HKYz0/a4rHs22PHcKOxsHlyL5ODeweLtH+QpKVAFT4CaoGuCPNl1e2D1m6NxHgy8YkjnPpT642BpkGr/XcgG0sseoHQapBtd43lRYpWscqwudR5kMAMSVumq6QisxPA63ilz2o6bNjcur6w0HDoINEyfabU+glcSLtPNoGfJuU=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024)(56012099003)(22082099003)(18002099003)(38070700021);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?RiUaw2Wlg4nIrnTHYeNl6sFRuTmDTxeaxHwaqBbgWEyxS4TCGv8ahgFJNpLv?=
- =?us-ascii?Q?/goux9M/uQcZWp3wsqZvnL5D0BkD0Q7rTfv5Up7S8Pb4Bk1OCEyKGrrM7q9g?=
- =?us-ascii?Q?oT7t1oAcCJvUkVp/HKwXLkLWYn/uHLKb+DI8UUdWHdGNmp1u2j2d5WQVejDk?=
- =?us-ascii?Q?4amll6YW2uDsqyCK7zBz2T0oBO5O6dNhEtHLjSx38ba4eLCkcEJ1yC8thuCx?=
- =?us-ascii?Q?B/Nggm0x40w/vmOyqW2DTCZs9JU1Zxyv53clpxvvidLkueB9GkG6KXpRK+Yt?=
- =?us-ascii?Q?4KoU+X8N6BmvGPd4JDOQBGlUM0ADVszhL7ilcLJlAGyfyj6zsQ06x3e9f1s2?=
- =?us-ascii?Q?3vLNre7bWiWABfWgStkZJsbKg/LwCEaa8lbiuEmfoT7TjZANZZVEALr6ytGV?=
- =?us-ascii?Q?E954gNT69cXXc3QPEie0F46BEuTITcDpnrH5iXZz8katWOcZ20+oKVamDscP?=
- =?us-ascii?Q?7Y2DusKkO7knkNYq8bovs0x+/iO1xpcj0krjfCO2yAmefOS8obteIUgsUV3C?=
- =?us-ascii?Q?4qNWPxPj5Hpp+6J/qi3Xgn2yjxPpOJEGfTkttrInQe01zXt/Ecg9E7sn6SJO?=
- =?us-ascii?Q?NDwFIUQVQuWBk+PrDqc1eictpVLUxCTndnrm8SxEHFL+xbPSkTD/b4E4b6wR?=
- =?us-ascii?Q?0Weolv1C8U2tnVw06WASZNEvRDsTAYwzjGPk80xXfYOJQamwQq89+mLWWT3I?=
- =?us-ascii?Q?D8cHcwuEpkNgLCGeFLpAoMfCyaA3UGLdzGpIJzYli2mZ4Y4Pz7E9aM7ydmCD?=
- =?us-ascii?Q?5uZSji5E1lkKPyw4/lFLKMbRnhJEiEhFfQfVhijFg1iQdQImO6665x2MWMD2?=
- =?us-ascii?Q?AuR01GCuPFpEQkddlzxcBKCfm9u33JRAK9ECksO1e6OQaent/1cLtla/fKBJ?=
- =?us-ascii?Q?t205tfamwdb4tYXLbp/XKFJl5ZG0wE1VLs1GAwZolkALhiRTjl5la67dSDl/?=
- =?us-ascii?Q?hlFDY1bhCsUHtaOIH8SmqQA0yNd5FOhKRUdARYK3BFL48Mx8gWI+zRPOBWED?=
- =?us-ascii?Q?zLGwHDUmpUhZ4xpbDicFsVbDTpXmrchPUql3luqn04zxnE5GQBA1wJLpsyf9?=
- =?us-ascii?Q?368X7x9AbqSqKVXu75e+UihZboEYA8Va8C9pKpSxjRB+H6RuFo5rX3m+0sDw?=
- =?us-ascii?Q?H54yN+OMbdwwmEtDK1aBLLS5NgprTC+HiXqT+QTaOEJjjNcXsomdAHu8UDbB?=
- =?us-ascii?Q?9W1DFjYZMi0P5HwEq4p7IY80YDwKXKBh2uSZImYAASqyrckSVfqJ7d+s1T+I?=
- =?us-ascii?Q?30JiLWrYy9zlPgg+XmpvrJ0rjTD2Th42AfL1hQF9ccTFHWLe3DNk4rT2Z901?=
- =?us-ascii?Q?0/53qn4jBEe0hnf6tajacsWcsGY1/PhfGG4oE9VyvXjbbygPcRQYWtVjCQ0l?=
- =?us-ascii?Q?K9Y69txQQmiAWlbL1Ix3np4yslIF8xiKaU85O/AHNtxL45w1t9WBOuqN4+zV?=
- =?us-ascii?Q?m0J5RGY4nQYiO0O/BylabX7EbwP2sMbj8DpI2iq7x131DOBk15MQQgvxtMg8?=
- =?us-ascii?Q?LtUlFps+HIoaVnT2ixaDG+kzBmnDk++PBPnOeSoghPcD+S/Acp9hxchXHM3N?=
- =?us-ascii?Q?k0Im4d3Kc2sHoDJXewcJ5Th+bUdN1MFyDOTqra0v6nlo4XyxogwZq3yr/I70?=
- =?us-ascii?Q?hWNAvHVhVmU3ObyAeQZVnTaeqZBEPG7uK1F1XuowtPxzJti+U73qst1FpHmO?=
- =?us-ascii?Q?aQ+bPFW1ODCAoz1UjPtXjmhzM2iuRccVmQ8osdRyYdlSYlNYQDHdAEZx3FYP?=
- =?us-ascii?Q?1PdJjg+9ST/ILOAawBborTMTen8eQa4=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C082B245005
+	for <netdev@vger.kernel.org>; Thu,  9 Apr 2026 02:59:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.74
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775703583; cv=none; b=EQ9P8+CTAauQQhfeRRTF6DETHfKyXVS0EcxBopuyquyxDN2mIXVxQHhFfS6PueUSewuMGr6wereA2xHHA7GP9diah+FTtvTKAKCTrpTxeu5mEO23N+RszP99cwZF2zxnRZvqyPjfJCiSVopkGYEJ+rkqxGzKHkyFJFYmadczsuk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775703583; c=relaxed/simple;
+	bh=5mAyQvSaOL2LoLC2WNanmYBqAdqTpdMJR9Ynzl7Y5hQ=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=fCcfUGFUFkXODJEMZq2ZqEwXyWZ+Q8c8kGjKxZaREq+6df/F/6Rl0XxxnBx4yC/mnS97g5kP0DMsmbWCyDZT0h13LiDkZ2Ns7FJy2MEqgcXusE1p4hM+Ol0uO+igbNLAYUe6jLQRkX+IICLRCAdwUFxQM8atLMae1UiPFG3eQos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--marcharvey.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fr8YrZuU; arc=none smtp.client-ip=74.125.82.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--marcharvey.bounces.google.com
+Received: by mail-dl1-f74.google.com with SMTP id a92af1059eb24-12bf921cf49so8351536c88.1
+        for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 19:59:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1775703580; x=1776308380; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=/nwzMb669N5Zt3JV1uvWhd8BvB9PhfW85QQnH/tgbSk=;
+        b=fr8YrZuUepOlz96upC2++CgvBbYv5Rr9grgeOjbCUnvnvbo5pHeFPZCj04nslXwinD
+         6T/SS70YjjoSZ3cgxBGA3vSB8h26AOGkyE2Dhy+XzVDyzsHsiMB0b525xeS9OwYoEbf/
+         vdEumkrYFLugnxrCgcfbe/sVtyUObs8cQ47flV27M62IYvxFq4WVnr0vFNBSEYn+oLAN
+         ps0Uym3Oso5jRlpbRwTSIkOrCB027MCWIKYR6LCNZsA7SjZEs3wFzGGajDjUgjk/xfJe
+         nC4BQzvfa2JEGVaPzOCkEEBf3HVnz1wSVTaEJmmeJEKKN4t3O7BXE4iqEbBq6tqDFe4P
+         LYww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775703580; x=1776308380;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/nwzMb669N5Zt3JV1uvWhd8BvB9PhfW85QQnH/tgbSk=;
+        b=ApoCC7Ou8Fh+ZMWQ2bvJIHnGlcsuwO+IJFM3oSeDkJSPdfmp9JcA/156o5lb0ZRbEl
+         fbS4QSPxkYfPycr1oJHhOncYszKuYvpB5Wyjk6BblAgMvigxKDnch4QYuhGLraD5y/FW
+         2YbiS3/sPUGSOBB7OW2/vgoKFKjegvYdwfbOA1HUKWGms8Uk4RBk019FyhmaAP5paTdA
+         zCjiTKBEY6IlKYQQgR6HLZBf2By43LSPRRKsdv9nj3VXZCuorMejZcS5NhHIWzbxXyU7
+         zsA8rRUh0sX/Wa8z1zGomJb58/GjXtDlW6DaKBQtRo1gCLyCUIBaXlNStjn4nAAwvsOH
+         B7RA==
+X-Gm-Message-State: AOJu0YwzHwpscBhnEYbu8XXGBdGG+5MNS1vBalTlC0HDyTF7Uq6HwLNq
+	lujsSbOsPZk+ahSoI1vs66lUFsigUlVVPw8oXdY0JZN1sczbZXA5sWJBVULc8jIQhdNWrBQlGRx
+	6KkUl57F8pbtpyQFOxLtsCg==
+X-Received: from dldz16-n2.prod.google.com ([2002:a05:701b:4190:20b0:12a:adb8:138b])
+ (user=marcharvey job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:7022:229:b0:128:d23d:81aa with SMTP id a92af1059eb24-12c28c0814amr828945c88.27.1775703579637;
+ Wed, 08 Apr 2026 19:59:39 -0700 (PDT)
+Date: Thu, 09 Apr 2026 02:59:22 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-OriginatorOrg: starfivetech.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn
-X-MS-Exchange-CrossTenant-Network-Message-Id: b07cd339-f756-4bfa-b810-08de95e3718a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Apr 2026 02:55:22.7784
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 06fe3fa3-1221-43d3-861b-5a4ee687a85c
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 1l/rAuxcrFpp7PaGbbjy/np5l9C7gNFOjp4LFFnHa0b/7otPlGrGW3/diqRCyTE8stopfec4QH+cTTv4lz5z8HA/CDN3Er+dxN4SITKCoc8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SHXPR01MB0735
-X-Spamd-Result: default: False [3.54 / 15.00];
-	DMARC_POLICY_QUARANTINE(1.50)[starfivetech.com : SPF not aligned (relaxed), No valid DKIM,quarantine];
+Mime-Version: 1.0
+X-B4-Tracking: v=1; b=H4sIAAoW12kC/4XOQW7DIBAF0KtErEuFZwDTrnqPKgsMg4OUQIQtK
+ 1Xku4eycmVZXX59zfvzZBOVSBP7PD1ZoSVOMaca+rcTcxebRuLR18xAgBZSdHwme4tp5L7EhQq
+ PaaaS7JUbDBCE6KXXhtXre6EQH03+Zolmnugxs3NtLnGac/lpkwu0/l99AS54MMJ18NH10A9fY
+ 87jld5dvjV0wS0ExxBWiIwLnhwOysEOklsIjyFZIY8CISA6C2oHqS2kjyHVPrIYUBrbuT2kt5A 5hvQvpAbnXehBCfkHWtf1BavMsxDtAQAA
+X-Change-Id: 20260401-teaming-driver-internal-83f2f0074d68
+X-Developer-Key: i=marcharvey@google.com; a=ed25519; pk=OzOeciadbfF5Bug/4/hyEAwfrruSY4tn0Q0LocyYUL0=
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1775703578; l=4446;
+ i=marcharvey@google.com; s=20260401; h=from:subject:message-id;
+ bh=5mAyQvSaOL2LoLC2WNanmYBqAdqTpdMJR9Ynzl7Y5hQ=; b=OSUai0KexYfCxKfJZltwYsz8w8Ul22IpzSFUb8ivMSrPUs2ytRo8djOvYT6RcVDaI+m7JlGpb
+ z2NHp6csL7GBik40h4wSccaDMDQqKOJff4BGst44oY984ygmJZbt3fH
+X-Mailer: b4 0.14.3
+Message-ID: <20260409-teaming-driver-internal-v7-0-f47e7589685d@google.com>
+Subject: [PATCH net-next v7 00/10] Decouple receive and transmit enablement in
+ team driver
+From: Marc Harvey <marcharvey@google.com>
+To: Jiri Pirko <jiri@resnulli.us>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Marc Harvey <marcharvey@google.com>, Jiri Pirko <jiri@resnulli.us>
+Content-Type: text/plain; charset="utf-8"
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[foss.st.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,canonical.com,vger.kernel.org,st-md-mailman.stormreply.com];
-	TAGGED_FROM(0.00)[bounces-276813-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	TAGGED_FROM(0.00)[bounces-276814-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[minda.chen@starfivetech.com,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	FROM_HAS_DN(0.00)[];
-	NEURAL_SPAM(0.00)[0.069];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	R_DKIM_NA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn:mid]
-X-Rspamd-Queue-Id: 0D7393C5D14
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[marcharvey@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 87BC13C5D5F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+Allow independent control over receive and transmit enablement states
+for aggregated ports in the team driver.
 
+The motivation is that IEE 802.3ad LACP "independent control" can't
+be implemented for the team driver currently. This was added to the
+bonding driver in commit 240fd405528b ("bonding: Add independent
+control state machine").
 
->=20
-> > +	dwmac->sgmii_rx =3D devm_clk_get_optional(&pdev->dev, "rx");
-> > +	if (IS_ERR(dwmac->sgmii_rx))
-> > +		return dev_err_probe(&pdev->dev, PTR_ERR(dwmac->sgmii_rx),
-> > +				     "error getting sgmii rx clock\n");
-> > +
->=20
-> The SGMII clock is optional...
->=20
-Yes. RGMII do not have this clock.=20
+This series also has a few patches that add tests to show that the old
+coupled enablement still works and that the new decoupled enablement
+works as intended (4, 5, and 10).
 
-> >  	/* Generally, the rgmii_tx clock is provided by the internal clock,
-> >  	 * which needs to match the corresponding clock frequency according
-> >  	 * to different speeds. If the rgmii_tx clock is provided by the
-> >  	 * external rgmii_rxin, there is no need to configure the clock
-> >  	 * internally, because rgmii_rxin will be adaptively adjusted.
-> >  	 */
-> > -	if (!device_property_read_bool(&pdev->dev, "starfive,tx-use-rgmii-clk=
-"))
-> > -		plat_dat->set_clk_tx_rate =3D stmmac_set_clk_tx_rate;
-> > +	if (!device_property_read_bool(&pdev->dev, "starfive,tx-use-rgmii-clk=
-")) {
-> > +		if (plat_dat->phy_interface =3D=3D PHY_INTERFACE_MODE_SGMII)
-> > +			plat_dat->set_clk_tx_rate =3D
-> stmmac_starfive_sgmii_set_clk_rate;
->=20
-> So you probably want to return an error here if it is missing.
->=20
-No. RGMII still using stmmac_set_clk_tx_rate
+There are three patches with small fixes as well, with the goal of
+making the final decoupling patch clearer (1, 2, and 3).
 
-> Or you might want to look at the compatible, and make the clock mandatory=
- for
-> this device.
->=20
->    Andrew
+Signed-off-by: Marc Harvey <marcharvey@google.com>
+---
+Changes in v7:
+- Increase the timeout to 300 seconds for the team selftests, since
+  gracefully killing teamd can take 30 seconds to timeout.
+- Link to v6: https://lore.kernel.org/r/20260408-teaming-driver-internal-v6-0-e5bcdcf72504@google.com
 
-Okay I will check the rx clock whether exist .
+Changes in v6:
+- Make selftests use a TCP port with no associate service.
+- Make selftests pass -nn flag to tcpdump, which will make it not
+  convert port numbers to service names.
+- Link to v5: https://lore.kernel.org/r/20260406-teaming-driver-internal-v5-0-e8a3f348a1c5@google.com
+
+Changes in v5:
+- Change teamd activebackup selftest in patch 5 to try graceful teamd
+  teardown before using sigkill.
+- Make the teamd activebackup selftest in patch 5 delete leftover
+  teamd files during teardown.
+- Reorder function calls in team_port_enable function in patch 7,
+  since the enablement behavior shouldn't change.
+- Make selftests use tcpdump instead of checking rx counters.
+- Fix minor typos in patch 10.
+- Link to v4: https://lore.kernel.org/r/20260403-teaming-driver-internal-v4-0-d3032f33ca25@google.com
+
+Changes in v4:
+- Split the large v3 patch "net: team: Decouple rx and tx enablement
+  in the team driver" into 4 smaller patches.
+- Link to v3: https://lore.kernel.org/r/20260402-teaming-driver-internal-v3-0-e8cfdec3b5c2@google.com
+
+Changes in v3:
+- Patch 5: In test cleanup, kill teamd to fix timeout.
+- Link to v2: https://lore.kernel.org/r/20260401-teaming-driver-internal-v2-0-f80c1291727b@google.com
+
+Changes in v2:
+- Patch 4 and 5: Fix shellcheck errors and warnings, use iperf3
+  instead of netcat+pv, fix dependency checking.
+- Patch 7: Fix shellcheck errors and warnings, fix dependency
+  checking.
+- Link to v1: https://lore.kernel.org/all/20260331053353.2504254-1-marcharvey@google.com/
+
+---
+Marc Harvey (10):
+      net: team: Annotate reads and writes for mixed lock accessed values
+      net: team: Remove unused team_mode_op, port_enabled
+      net: team: Rename port_disabled team mode op to port_tx_disabled
+      selftests: net: Add tests for failover of team-aggregated ports
+      selftests: net: Add test for enablement of ports with teamd
+      net: team: Rename enablement functions and struct members to tx
+      net: team: Track rx enablement separately from tx enablement
+      net: team: Add new rx_enabled team port option
+      net: team: Add new tx_enabled team port option
+      selftests: net: Add tests for team driver decoupled tx and rx control
+
+ drivers/net/team/team_core.c                       | 237 ++++++++++++++++----
+ drivers/net/team/team_mode_loadbalance.c           |   8 +-
+ drivers/net/team/team_mode_random.c                |   4 +-
+ drivers/net/team/team_mode_roundrobin.c            |   2 +-
+ include/linux/if_team.h                            |  63 +++---
+ tools/testing/selftests/drivers/net/team/Makefile  |   4 +
+ tools/testing/selftests/drivers/net/team/config    |   4 +
+ .../drivers/net/team/decoupled_enablement.sh       | 249 +++++++++++++++++++++
+ .../testing/selftests/drivers/net/team/options.sh  |  99 +++++++-
+ tools/testing/selftests/drivers/net/team/settings  |   1 +
+ .../testing/selftests/drivers/net/team/team_lib.sh | 174 ++++++++++++++
+ .../drivers/net/team/teamd_activebackup.sh         | 246 ++++++++++++++++++++
+ .../drivers/net/team/transmit_failover.sh          | 158 +++++++++++++
+ tools/testing/selftests/net/forwarding/lib.sh      |   9 +-
+ tools/testing/selftests/net/lib.sh                 |  13 ++
+ 15 files changed, 1198 insertions(+), 73 deletions(-)
+---
+base-commit: b3e69fc3196fc421e26196e7792f17b0463edc6f
+change-id: 20260401-teaming-driver-internal-83f2f0074d68
+
+Best regards,
+-- 
+Marc Harvey <marcharvey@google.com>
+
 
