@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-277065-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277067-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id H5+3B8XW12mfTggAu9opvQ
-	(envelope-from <netdev+bounces-277065-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 18:41:41 +0200
+	id aKWHBq/X12mDTggAu9opvQ
+	(envelope-from <netdev+bounces-277067-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 18:45:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAB213CDBA2
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 18:41:39 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 742A43CDC47
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 18:45:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 87AFE3014915
-	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 16:41:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1BEA03007ADF
+	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 16:45:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C48034CFCF;
-	Thu,  9 Apr 2026 16:41:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66CF63D301A;
+	Thu,  9 Apr 2026 16:45:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u+4u6DaF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xm0ORjg9"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDF328BE9;
-	Thu,  9 Apr 2026 16:41:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D4B11A3154;
+	Thu,  9 Apr 2026 16:45:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775752894; cv=none; b=fhR1iGhzNTS2V3W2PkRNi+0zg7eOvCwCcOkL3D3V//NQ6zkTOnNtAusLWvORPqe7dC3WHLcXb099Vlcx9IiwdwAvnW6fzypj7b4t0Xfiyc2d2ftWM4c4rBhK6xX37G6hjrxj4DpwPFuO3L8TkeTtClekJhimyh0k3RZNLlyVX+8=
+	t=1775753132; cv=none; b=m6cgEeXnsE4RkO6kg7MA5ucuUHxT9JaViEi29DUPmUxjwtQm1uwtM/J9TgBryKvPfJJWTK3QnF6lxnY/HrrubtSnT1hjiFo2kdP7TJwggkpxg6IpS/EmhUqK4a17JuiHoDiiUomwPNVLOJs8phfpFQyUroNa9nhM5AYjtjdko1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775752894; c=relaxed/simple;
-	bh=6zXW+2vpDaE6dfJoCWrlfA9JjKulqRk76elU+i487DQ=;
+	s=arc-20240116; t=1775753132; c=relaxed/simple;
+	bh=dVXr03RoqzK0gwU6bzmF456fwdFwS/5nKDD/1hodd5A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sk+5pI0eoeCYV/hatSnind+KOGB8RxO1EPgwBS1+CQHfmSLobl3Ig4/JDPA6aANngnWRoS8Ps7EWlwdNjBvtB3mjFGXTtPBUSI1tJBaLTj1hkD8fSkN//jUcurEyywZ4XkczyHukwAaIZIIhEageGuobTcoKV4uxHdg5/HFVcf8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u+4u6DaF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9BB77C4CEF7;
-	Thu,  9 Apr 2026 16:41:32 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=pIAHftoqb0ciOl9llHAvhs9AtWt/kIitrnxUGDWmViVLaqAyBgG5ueHmPuM4W5ucgp6KTyHkYgYvLm/XSDfyz2iO0eVrz6Vvx423dbFIykxMb0pLTvYj/uIo4kZksQHQDcfmrsU/z45YV59SB49wny3qr62lDzSqZ1iSe4rFfoA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xm0ORjg9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66917C4CEF7;
+	Thu,  9 Apr 2026 16:45:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775752894;
-	bh=6zXW+2vpDaE6dfJoCWrlfA9JjKulqRk76elU+i487DQ=;
+	s=k20201202; t=1775753131;
+	bh=dVXr03RoqzK0gwU6bzmF456fwdFwS/5nKDD/1hodd5A=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=u+4u6DaFYCpzAqCDLI9SEyluDVB91upu7RsV0LOFyCY07e2cMR0gzlGn7a2YevSlX
-	 hO4CGlFY6EnEP+kERjeY29oLnAjYwACjlhZ72Q3UbzPs7W6SkYMsqAGIsI9vfkza3/
-	 jiCTto8ZhPWhZ/e8PhUR8ygVp6xstejMsAP9kQY3YyJzUuc9SvoEw7PIjAWu26oMxK
-	 Z/WnReJ5IJwcMnIbmUnym2LdZfC1vOuIe6tDGSIDswMyrsco8NzduTMOMSmUHc7Ie1
-	 y6kCFKmHBZgJB3GmnJVAS85NoSLJ/ckabVG6Puh01d1C2yayzvi72I814h/vsT5lt7
-	 tTiEUv+hnRbzQ==
-Date: Thu, 9 Apr 2026 17:41:29 +0100
+	b=Xm0ORjg9v241Bg2dH6v74j+EqROwVDJfRzUr0uqjUU9Ah2QXV2ut8YowwaLC7mMTG
+	 NlGvyS3iaU0oM5K84yZbfrXzkx6J6D0Y6Hl+uj104854yfsPfqTNdk/FCGsLetL9kK
+	 3UhQ8NjoPno0mZHId3+pZA4mo/5o0gOxiT3r5YABoq4JKwYSJjwJktHjgL08KY65sN
+	 aimgMdmn87LeBDMoZqBoYytLEMvjO2+Y/zorUnC1OO4YcG+tGU1t8/9BBu3BhC+6K9
+	 JnZXVMkue4cgM4+IlMtIarb1o2C/O92gtEjb67+ZBlCfGve5IaSqxY8gmiEDtwip1l
+	 Uy9M15tJtXeIA==
+Date: Thu, 9 Apr 2026 17:45:27 +0100
 From: Simon Horman <horms@kernel.org>
 To: =?utf-8?B?TGVrw6sgSGFww6dpdQ==?= <snowwlake@icloud.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, stable@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	=?utf-8?B?TGVrw6sgSGFww6dpdQ==?= <framemain@outlook.com>
-Subject: Re: [PATCH] nfc: llcp: fix u8 offset truncation in LLCP TLV parsers
-Message-ID: <20260409164129.GO469338@kernel.org>
-References: <20260405105938.1334488-1-snowwlake@icloud.com>
+Cc: netdev@vger.kernel.org, linux-nfc@lists.01.org, davem@davemloft.net,
+	kuba@kernel.org, krzysztof.kozlowski@linaro.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH] nfc: llcp: fix missing return after LLCP_CLOSED check in
+ recv_hdlc and recv_disc
+Message-ID: <20260409164527.GP469338@kernel.org>
+References: <20260405164158.1344049-1-snowwlake@icloud.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,107 +63,90 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260405105938.1334488-1-snowwlake@icloud.com>
+In-Reply-To: <20260405164158.1344049-1-snowwlake@icloud.com>
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,outlook.com];
-	TAGGED_FROM(0.00)[bounces-277065-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_TO(0.00)[icloud.com];
-	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-277067-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	NEURAL_HAM(-0.00)[-0.999];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	RCPT_COUNT_SEVEN(0.00)[7];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: EAB213CDBA2
+X-Rspamd-Queue-Id: 742A43CDC47
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun, Apr 05, 2026 at 12:59:38PM +0200, Lekë Hapçiu wrote:
+On Sun, Apr 05, 2026 at 06:41:58PM +0200, Lekë Hapçiu wrote:
 > From: Lekë Hapçiu <framemain@outlook.com>
 > 
-> nfc_llcp_parse_gb_tlv() and nfc_llcp_parse_connection_tlv() declare
-> 'offset' as u8, but compare it against a u16 tlv_array_len:
+> nfc_llcp_recv_hdlc() and nfc_llcp_recv_disc() both call
+> nfc_llcp_sock_get() (which increments the socket reference count) and
+> lock_sock() before processing incoming PDUs.  When the socket is found
+> to be in state LLCP_CLOSED both functions correctly call release_sock()
+> and nfc_llcp_sock_put() to undo those operations, but are missing a
+> return statement:
 > 
->     u8 type, length, offset = 0;
->     while (offset < tlv_array_len) {   /* tlv_array_len is u16 */
->         ...
->         offset += length + 2;          /* wraps at 256 */
->         tlv    += length + 2;
+>     lock_sock(sk);
+>     if (sk->sk_state == LLCP_CLOSED) {
+>         release_sock(sk);
+>         nfc_llcp_sock_put(llcp_sock);
+>         /* ← return missing */
 >     }
+>     /* Falls through with lock released and reference dropped */
+>     ...
+>     release_sock(sk);            /* double unlock */
+>     nfc_llcp_sock_put(llcp_sock); /* double put → refcount underflow */
 > 
-> When tlv_array_len > 255 -- possible in nfc_llcp_parse_connection_tlv()
-> when the peer has negotiated MIUX = 0x7FF (MIU = 2175 bytes), so that
-> a CONNECT PDU can carry a TLV array of up to 2173 bytes -- the u8
-> offset wraps back below tlv_array_len after every 128 zero-length TLV
-> entries and the loop never terminates.  The 'tlv' pointer meanwhile
-> advances without bound into adjacent kernel heap, causing:
+> The fall-through causes three independent bugs:
 > 
->   * an OOB read of kernel heap content past the skb end;
->   * a kernel page fault / oops once 'tlv' leaves mapped memory.
-
-Is the more general explanation of this problem that the length of packet
-data is used as the tlv_array_len parameter, and that length is not
-verified to be within the expected bound?
-
-I am also concerned that the packet data needs to be pulled
-before it can be safely accessed.
-
+>   1. Use-after-free: all llcp_sock field accesses after the LLCP_CLOSED
+>      block occur with the socket lock released and the reference dropped;
+>      another CPU may free the socket concurrently.
 > 
-> This is reachable from any NFC P2P peer device within ~4 cm without
-> requiring compromised NFCC firmware.
-
-I think some further explanation is warranted here if that is the case.
-
-> Fix: promote 'offset' from u8 to u16 in both parsers, matching the
-> type of their tlv_array_len parameter.
+>   2. Double release_sock: sk_lock.owned is already 0 — LOCKDEP reports
+>      "WARNING: suspicious unlock balance detected".
 > 
-> nfc_llcp_parse_gb_tlv() takes GB bytes from the ATR_RES (max 44 bytes),
-> so the wrap cannot occur in practice there.  Change it anyway for
-> correctness and to prevent copy-paste reintroduction.
-
-In the case of both nfc_llcp_parse_gb_tlv() it seems to me that wrap-around
-can occur because the value of length, which is used to increment the value
-of offset, is read from unverified packet data. Is the data validate
-somewhere, or known to be correct?
-
-If so, I expect this can also result in an overrun of tlv.
-
-And I think the same problem exists in nfc_llcp_parse_gb_tlv().
-
+>   3. Double nfc_llcp_sock_put: the refcount is decremented a second time
+>      at the end of the function, potentially driving it below zero
+>      (refcount_t underflow), corrupting the SLUB freelist and causing a
+>      subsequent use-after-free or double-free.
 > 
-> Cc: stable@vger.kernel.org
-
-A fixes tag is needed here.
-
+> Both functions are reachable from any NFC P2P peer within physical
+> proximity (~4 cm) without hostile NFCC firmware:
+>   - nfc_llcp_recv_hdlc: triggered by sending an LLCP I, RR, or RNR PDU
+>     to a SAP pair whose connection has been torn down.
+>   - nfc_llcp_recv_disc: triggered by sending an LLCP DISC PDU to a SAP
+>     pair that is already in LLCP_CLOSED state.
+> 
+> Fix: add the missing return statement in both functions so that the
+> LLCP_CLOSED branch exits after cleanup.
+> 
+> Fixes: Introduced with nfc_llcp_recv_hdlc / nfc_llcp_recv_disc
 > Signed-off-by: Lekë Hapçiu <framemain@outlook.com>
 
-The patch should be targeted at net-next like this:
+Curiously this seems to duplicate this patch:
 
-Subject: [PATCH net] ...
-
-And please group together related patches - I see several for nfc -
-in a patchset.
-
-More on the Netdev development process can be found here
-https://docs.kernel.org/process/maintainer-netdev.html
+- [PATCH net] nfc: llcp: add missing return after LLCP_CLOSED checks
+  https://lore.kernel.org/all/20260408081006.3723-1-qjx1298677004@gmail.com/
 
 -- 
 pw-bot: changes-requested
