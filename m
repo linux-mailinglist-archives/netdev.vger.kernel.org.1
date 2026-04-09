@@ -1,186 +1,147 @@
-Return-Path: <netdev+bounces-277157-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277158-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SGHjJ5gn2Gm9YggAu9opvQ
-	(envelope-from <netdev+bounces-277157-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 00:26:32 +0200
+	id MMACCKMp2GnIZAgAu9opvQ
+	(envelope-from <netdev+bounces-277158-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 00:35:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FB963D0440
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 00:26:32 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 762373D0483
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 00:35:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C8F753031F02
-	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 22:25:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 74A913012EA5
+	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 22:35:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA8B538F945;
-	Thu,  9 Apr 2026 22:25:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18135395D99;
+	Thu,  9 Apr 2026 22:35:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="w6MEW9XH"
+	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="bfS9DC6x"
 X-Original-To: netdev@vger.kernel.org
-Received: from omta040.useast.a.cloudfilter.net (omta040.useast.a.cloudfilter.net [44.202.169.39])
+Received: from outbound.st.icloud.com (p-east2-cluster2-host12-snip4-7.eps.apple.com [57.103.78.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AC9038F925
-	for <netdev@vger.kernel.org>; Thu,  9 Apr 2026 22:25:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.202.169.39
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5383A39525E
+	for <netdev@vger.kernel.org>; Thu,  9 Apr 2026 22:35:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.78.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775773527; cv=none; b=iBjKXEft2hc1R5XoLnh+5/3xhvnz39K0murGbxjsghObPymEon+GxBUjQguosAfehjVp2ohz8mO6OVoYng5XRshu4Zin/sxT0qGzdYeunQkNy8HiubG88fu5v1BJo+On7MbWiE3hxb1nBBESCrMDDdKcCZmh90DAxcHgGyaHlqM=
+	t=1775774106; cv=none; b=W2xk26v2imP4JYQD6LVlfWjG6YJ5EfKFeyDE9I5OIg4qKRXvoRglYkJR9p5MaOIj/KWdJvs2hHqlkX/eS0jqN8o5Az37NidhuO/QEsWM/iDJntLRF5DQJApuFEAtwwjlojtfHhp4bP/xaqVvUk2uBz+4WLgKgGA8goYk65/veB8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775773527; c=relaxed/simple;
-	bh=AbJbBW6X9LmrirWXz3KRksKCyyWsSci1hJLqJfBEgC8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sxEdVicXKFNuVun9OpPAi28tzwu2wDYkzkfqItkC9Ud6l0vD2PJyHAph7o+O2Oy4PyF5QRWd1ITZ1NgFP8YQRa9pSNx56PNZE4r3xTwdbSTm2UrAxU86JnsxHBAxjxYdVYTYsYQsiqGLxtgdVnoka4SVQEuiuCOd5oDxB0yjGvw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com; spf=pass smtp.mailfrom=embeddedor.com; dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b=w6MEW9XH; arc=none smtp.client-ip=44.202.169.39
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=embeddedor.com
-Received: from eig-obgw-6005b.ext.cloudfilter.net ([10.0.30.162])
-	by cmsmtp with ESMTPS
-	id ArnlwJj224RkpAxoTwjmQR; Thu, 09 Apr 2026 22:25:25 +0000
-Received: from gator4166.hostgator.com ([108.167.133.22])
-	by cmsmtp with ESMTPS
-	id AxoIwzlzwFeDMAxoNw78vy; Thu, 09 Apr 2026 22:25:20 +0000
-X-Authority-Analysis: v=2.4 cv=aq2yCTZV c=1 sm=1 tr=0 ts=69d82755
- a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=chC0KcwHAXg1M6QkddG+Hg==:17
- a=IkcTkHD0fZMA:10 a=A5OVakUREuEA:10 a=7T7KSl7uo7wA:10 a=_Wotqz80AAAA:8
- a=q7JyIVeMSE5i464zDnEA:9 a=QEXdDO2ut3YA:10 a=buJP51TR1BpY-zbLSsyS:22
- a=2aFnImwKRvkU0tJ3nQRT:22
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=4BBlkBrjrnSTWHBfnhpyKI7M2eVDU51iIMYacZS4Q/0=; b=w6MEW9XHtJeoU3e8FoHDHf8K3/
-	ivR3cFvN7s2LInyuaPqW9dcyLaYXkkDM5MpKvf3aEFCuMK2vFJf/2muGzJPrwuYm9GY7bfO/49a3z
-	cnBSWDCM47on+tX1INjqvFb14khL7P8XSgxUORsdk5RxpjYtWBd4RPWTOtCfKrq5n3T5uabX/pzIe
-	TrJDVueDCobFbUKfLcxProglFvYrYmSJNiwFtYDBklxwAPyJUsw8i8FfIUN4NIlXBv3/aZgF2w7ew
-	AqoX0SjMheEX1J+m1ZSmmm1WqPtmHIMaCMekzg1lNQAlZM5L+KnoWStWJcrAQQbfGG0Ucof8CutUS
-	JSdjFgKw==;
-Received: from [177.238.18.219] (port=45456 helo=[192.168.0.104])
-	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.99.1)
-	(envelope-from <gustavo@embeddedor.com>)
-	id 1wAxoG-00000003aQj-0zkt;
-	Thu, 09 Apr 2026 17:25:12 -0500
-Message-ID: <3d07eb02-1a18-4de1-9683-5c05b80600e2@embeddedor.com>
-Date: Thu, 9 Apr 2026 16:23:59 -0600
+	s=arc-20240116; t=1775774106; c=relaxed/simple;
+	bh=yucS9jHX1Vik1EyRXjxmNY7qHasrrVv9k2cTnPM4rZM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OltpgfdFfWHSo0H+fBoQCmKxPLq/P6qH5QF/nl0dNGVyxlK14drXLIjyYGaKK4/kXTnZ7alxL6YOiGRudlmsnJBlvWQK+weUQoCXx+CdvRZST1glBJ/y9oi/5FCSJXbAoOO55yi5c6F0ZRcsnmqgbGYiVHbdY5lTzOPHefYiBWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=bfS9DC6x; arc=none smtp.client-ip=57.103.78.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
+Received: from outbound.st.icloud.com (unknown [127.0.0.2])
+	by p00-icloudmta-asmtp-us-east-1a-100-percent-9 (Postfix) with ESMTPS id A6A761800172;
+	Thu, 09 Apr 2026 22:35:02 +0000 (UTC)
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com; s=1a1hai; t=1775774103; x=1778366103; bh=e6WpG4CMMLjhe1gNiuspc9ZHTLMZiFQggWMLI08Htto=; h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme; b=bfS9DC6xVa3iKgs/LlMilg1jwKX0PblDA9jWLWGvIn3WIeX+ag+ra2ai6lBFm3MfE4kUhzx5s98qN0BNqWfxaNsKQvjCYxGmGrj5tGUxKRbn1KrPFtxviwxKznQXQHdB7a9rmfCdcXTMapnVP2wWuDcFBxKy8BbJ+ug0CVjnLoULYx7nh3IlMKLyXVnHczI/Byg7qDqjhLupLMRBdHoYVdA9ny/iwlnJKa+B59o1gKB1VGASqb/rGwgVWfHw6aE9sxQM99JFPOLpN8QMrneZ0F2BHpJRv58pdFAex+HiAbn8eBlxKCT6hgs4AhHjZdOTJimysv5HY4o3laU7Tj6G/w==
+Received: from mainframe.tailfb0f7b.ts.net (unknown [17.42.251.67])
+	by p00-icloudmta-asmtp-us-east-1a-100-percent-9 (Postfix) with ESMTPSA id 0E1AA1800409;
+	Thu, 09 Apr 2026 22:35:00 +0000 (UTC)
+From: =?UTF-8?q?Lek=C3=AB=20Hap=C3=A7iu?= <snowwlake@icloud.com>
+To: netdev@vger.kernel.org
+Cc: linux-wireless@vger.kernel.org,
+	stable@vger.kernel.org,
+	krzysztof.kozlowski@linaro.org,
+	=?UTF-8?q?Lek=C3=AB=20Hap=C3=A7iu?= <snowwlake@icloud.com>
+Subject: [PATCH net 0/4] nfc: digital: Fix missing and misplaced length checks
+Date: Fri, 10 Apr 2026 00:34:30 +0200
+Message-ID: <20260409223436.1887988-1-snowwlake@icloud.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2][next] netfilter: x_tables: Avoid a couple
- -Wflex-array-member-not-at-end warnings
-To: Florian Westphal <fw@strlen.de>
-Cc: "Gustavo A. R. Silva" <gustavoars@kernel.org>,
- Pablo Neira Ayuso <pablo@netfilter.org>, Phil Sutter <phil@nwl.cc>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Kees Cook <kees@kernel.org>,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-hardening@vger.kernel.org
-References: <adgL5wPm9VpaV3MO@kspp>
- <96b116e4-d91d-456a-9a08-fb3de4822a62@embeddedor.com>
- <adglrthId0L5__9w@strlen.de>
-Content-Language: en-US
-From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-In-Reply-To: <adglrthId0L5__9w@strlen.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - embeddedor.com
-X-BWhitelist: no
-X-Source-IP: 177.238.18.219
-X-Source-L: No
-X-Exim-ID: 1wAxoG-00000003aQj-0zkt
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: ([192.168.0.104]) [177.238.18.219]:45456
-X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 18
-X-Org: HG=hgshared;ORG=hostgator;
-X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
-X-Local-Domain: yes
-X-CMAE-Envelope: MS4xfLGdj3U4FcuHzgYnkhrFnrfFEnmKhWkzAFOP//t5+l4ufab6nOiX8DXEDNOHe/8rnYw6t69jp8fIzvkr9bCRz+HCmpIg9FqWurngewHTEEZ7oCTG3U8b
- v3NiP+hbRxLeU7e9IyjvVZZxzyLVCZwbu0HPdI4DkcCXcgEqpzVKE9vv7TO4hHiTsFUkOaK1+skApUaUq+WN3a+QmJRVEcsUvyM=
-X-Spamd-Result: default: False [-0.46 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDA5MDIwOSBTYWx0ZWRfXxfSleY8kUUyv
+ ArEJwEKqdDZ+ENQMrnnbHwaKS0+tuZPQvKfYTR7oeB+nouo74Dcg7q+jvNJfGQTwhx8XOtPRgUw
+ zqLRsL4I9DyMS8YfgAR8fmRah0cewmlDI49oJ9fIPYThZtXBtZbonjxU8STJITzMAgwrROeFA3A
+ KvGWH1H2HGnu8SlzIsj0ZilYcBPqMHW5Mm4FfY6dKCCENPYBD4D+KAIFgo2KccSO+i2RTGP043o
+ iu8Ew1fzRtGFeutcmWdfDXbazQkxzJjM9r7b6IuZzhUNc5w98gL+oVFoRIgPErUCvHI3LlWbAtl
+ WzLIK5q1fRWbWJAJSotNwK7O4VTNM0v3g9pOeIAq01+HjkY2CmQrywNzV6VJn8=
+X-Proofpoint-GUID: tLKkQIn0-zJu-E-DOd_e7f0noylWfhRn
+X-Authority-Info-Out: v=2.4 cv=fsjRpV4f c=1 sm=1 tr=0 ts=69d82997
+ cx=c_apl:c_pps:t_out a=YrL12D//S6tul8v/L+6tKg==:117
+ a=YrL12D//S6tul8v/L+6tKg==:17 a=A5OVakUREuEA:10 a=M51BFTxLslgA:10
+ a=x7bEGLp0ZPQA:10 a=LbuW6tbUWPcA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=Sa2SXQg9nKkPhw_9Z44A:9 a=JKcXVnpmuwdQ7RL0mgk_:22 a=5Q-93EyGrU3sW_9myDOF:22
+X-Proofpoint-ORIG-GUID: tLKkQIn0-zJu-E-DOd_e7f0noylWfhRn
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-04-09_04,2026-04-09_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
+ phishscore=0 mlxlogscore=982 bulkscore=0 spamscore=0 malwarescore=0
+ lowpriorityscore=0 suspectscore=0 clxscore=1011 mlxscore=0 classifier=spam
+ authscore=0 adjust=0 reason=mlx scancount=1 engine=8.22.0-2601150000
+ definitions=main-2604090209
+X-Spamd-Result: default: False [0.01 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[embeddedor.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MIXED_CHARSET(0.67)[subject];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[icloud.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[icloud.com:s=1a1hai];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-277157-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[embeddedor.com];
-	HAS_X_SOURCE(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[embeddedor.com:-];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FREEMAIL_CC(0.00)[vger.kernel.org,linaro.org,icloud.com];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	FROM_NEQ_ENVFROM(0.00)[gustavo@embeddedor.com,netdev@vger.kernel.org];
+	FREEMAIL_FROM(0.00)[icloud.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-277158-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[snowwlake@icloud.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[icloud.com:+];
 	PRECEDENCE_BULK(0.00)[];
-	HAS_X_ANTIABUSE(0.00)[];
-	NEURAL_HAM(-0.00)[-0.965];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_FIVE(0.00)[5];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,embeddedor.com:email,embeddedor.com:mid]
-X-Rspamd-Queue-Id: 1FB963D0440
+	DBL_BLOCKED_OPENRESOLVER(0.00)[icloud.com:dkim,icloud.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 762373D0483
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+This series fixes four length-check bugs in the NFC Digital Protocol stack.
+All are reachable from RF without authentication:
 
+  - Patch 1: Missing upper-bound check before memcpy into target.sensf_res
+    in the NFC-F initiator polling path.  An oversized SENSF_RES overflows
+    an 18-byte stack buffer by up to 235 bytes.  CVSS 8.1.
 
-On 4/9/26 16:18, Florian Westphal wrote:
-> Gustavo A. R. Silva <gustavo@embeddedor.com> wrote:
->> diff --git a/net/netfilter/x_tables.c b/net/netfilter/x_tables.c
->> index b39017c80548..9dd5957d9ed4 100644
->> --- a/net/netfilter/x_tables.c
->> +++ b/net/netfilter/x_tables.c
->> @@ -819,13 +819,15 @@ EXPORT_SYMBOL_GPL(xt_compat_match_to_user);
->>
->>    /* non-compat version may have padding after verdict */
->>    struct compat_xt_standard_target {
->> -       struct compat_xt_entry_target t;
->> -       compat_uint_t verdict;
->> +       TRAILING_OVERLAP(struct compat_xt_entry_target, t, data,
->> +               compat_uint_t verdict;
->> +       );
->>    };
->>
->>    struct compat_xt_error_target {
->> -       struct compat_xt_entry_target t;
->> -       char errorname[XT_FUNCTION_MAXNAMELEN];
->> +       TRAILING_OVERLAP(struct compat_xt_entry_target, t, data,
->> +               char errorname[XT_FUNCTION_MAXNAMELEN];
->> +       );
->>    };
->>
->> You tell me what you prefer.
-> 
-> I have no strong opinion. This compat code is needed to run 32bit
-> iptables binaries on a 64 bit host, not many users these days I think.
-> I still hope we can remove this eventually.
-> 
-> But as the above diff is smaller I would prefer it.
+  - Patch 2: Check-after-read in the NFC-A target receive path.
+    resp->data[0] is read before the resp->len != 0 guard fires.
+    A zero-length frame triggers a 1-byte OOB read.
 
-Okay; I'll submit this as v3 then.
+  - Patch 3: Missing post-pull length check in the RTOX handler inside
+    digital_in_recv_dep_res().  After skb_pull strips the 3-byte DEP
+    header, resp->data[0] is read with no guarantee that any payload byte
+    remains.
 
-Thanks for the feedback,
--Gustavo
+  - Patch 4: DID byte accessed at resp->data[3] after only a
+    sizeof(struct digital_dep_req_res) == 3 byte guard in
+    digital_tg_recv_dep_req().  An attacker with DID bit set and a 3-byte
+    frame triggers a 1-byte OOB read.
 
+Patches 1-4 are independent and can be applied in any order.
+
+Security Research (4):
+  nfc: digital: Fix stack buffer overflow in digital_in_recv_sensf_res()
+  nfc: digital: Fix check-after-read in digital_tg_recv_sens_req()
+  nfc: digital: Fix OOB read of RTOX byte in digital_in_recv_dep_res()
+  nfc: digital: Fix OOB read of DID byte in digital_tg_recv_dep_req()
+
+ net/nfc/digital_dep.c        | 10 ++++++++--
+ net/nfc/digital_technology.c | 13 ++++++++-----
+ 2 files changed, 16 insertions(+), 7 deletions(-)
 
