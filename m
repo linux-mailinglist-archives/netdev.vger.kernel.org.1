@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-276896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276897-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +JH7OH9q12myNggAu9opvQ
-	(envelope-from <netdev+bounces-276896-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 10:59:43 +0200
+	id uMkJFT5p12mONwgAu9opvQ
+	(envelope-from <netdev+bounces-276897-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 10:54:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FC4B3C81FD
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 10:59:43 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 079553C8060
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 10:54:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F2F233055DEC
-	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 08:53:22 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B32EC301F2BB
+	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 08:53:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C0C538F240;
-	Thu,  9 Apr 2026 08:52:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0982538550A;
+	Thu,  9 Apr 2026 08:52:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vvGNdQOx"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ciVap5N4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
+Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com [209.85.219.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76B1538550A
-	for <netdev@vger.kernel.org>; Thu,  9 Apr 2026 08:52:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5106D38F62A
+	for <netdev@vger.kernel.org>; Thu,  9 Apr 2026 08:52:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775724767; cv=none; b=oAD9ktEItN4Q+TDOMWI4s8NffIc8ycUyM5d1OimxCIXcNX9+DTjyuyKLkbOYMq1qPZnYwBwJH3CCfvGd90CAT3b9LzsbglfLDf2eORu3ipB+8RssmkHVORh7hahWYIAxG+23wSQgXB9aKwQtAeaPBlyU/UW4ac+n5QpZdRzuSF8=
+	t=1775724768; cv=none; b=SQaw9nHjjb2GgYI7RRDtTINP7XSGirAytFOhEdF/kHRvzHV3YVBGoB/ixfW347W4JLR5mgdjaMQlBpbT2L8Rg+oZ9gP+ABydPdj42MBWVdTvPf9H01EhLgV+Kq0fLkf6sIILSFP5ynbSFxj99kzmzIHZh/S14p6OZp1mErZJRnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775724767; c=relaxed/simple;
-	bh=SnycINSvMrsTYN7o3VQ9VjfpCIM4CZoHt+uEsda1rkc=;
+	s=arc-20240116; t=1775724768; c=relaxed/simple;
+	bh=dxUAeF+9L+zZYh/MVW4v9s4gjmSBtvWgwM44ZUR37mU=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=obvW8jkWdGLQq05W3Z3wBWNFvipSeDkWAVLdR9WPrOwhg54gLg2dnC825lC4sW09rtWVnLyFXlRqU3tSnB4h7DNuRb0PInpPztGGcnbj1ZCm+ZMmPUBCD6YKQhY8IZ5eML9t7fRfyzMEv21TyVf6UoS2kqgvi9M/VrOQjwDR4h8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vvGNdQOx; arc=none smtp.client-ip=209.85.160.202
+	 To:Cc:Content-Type; b=iq/6VtIkS09rKdM/hcK2hSfum/7rsB+BMW9+8WsaEQKg6aiSdvcOLtknk4T1p+oAA4XTxJK9yVhiUBH9hKAggFQQMnK1veLZZK3CMR/iQj6YnkXZfpOxretj/5LjKg1VrANFk7l2qNp5PAzd/FoveKPFagbPKkUI/khiivSE3H4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ciVap5N4; arc=none smtp.client-ip=209.85.219.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-50d8c192b3fso35486971cf.1
-        for <netdev@vger.kernel.org>; Thu, 09 Apr 2026 01:52:45 -0700 (PDT)
+Received: by mail-qv1-f73.google.com with SMTP id 6a1803df08f44-8a4f18b1b5aso4203906d6.0
+        for <netdev@vger.kernel.org>; Thu, 09 Apr 2026 01:52:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1775724764; x=1776329564; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1775724766; x=1776329566; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=joGTEHnyC2gWFMculzj+p1s7d9jK2bjrOx0CVR84se0=;
-        b=vvGNdQOxzb3SRxwFjrLzxREG2jLr/Zfp8yK4l+MxMCK5/uwRzdnwWAt6V4clKJJtsN
-         IaSWa2Hv8lX/fREQuYMu1TpPbzcHcEjDd4yZZ8ap/PLiBv111nYzrZzjrmTs3Ir/3nJR
-         g4vp4YVFaKnYmEgd8clq2mpVe23X5fWhXxdW8fHNQvArU8ba+UXc1E/7XHVBddNCffFL
-         IVc0x8hlSCkCfsHmYqznY1HiefXBn6toOSv+mypAjZWTko4fYfge3AEOd9Zx5njUb996
-         vNmtbFNrpTI6gpcLStGV8dMkWO+cBefHAQEBm+EdI+Zaw8niSiFJOpSY5cHMMaM5Ac74
-         M8Gw==
+        bh=RhASBS+VhxeS6Kv/exRyy6Gp9xvYpZGnsWFz4lLYWDw=;
+        b=ciVap5N4IFjJcfvZwlPP4vL6yl88C8GQ0dzk1OUXl4islcXv1cilwkQPu3ZXjllf6d
+         nRdKbdBDP+YMMKt/fJrNgovY+L7vSQzxuVCGBQBjrP5cwbdHBJkoFWd7rKYdomjOOtec
+         j2jdcrezBAwc60LwxXou93uWM8QlqPXBhgOxoQsGKdrrKS09mdxa86RuCc9/eUiK/dsU
+         CelZzuJ4bE28fKm4TRfKZo/Fg9RTf/OUXhIX6k1kPfRy1wG771tdfTfQ6fKw/poizoYn
+         2grye2Xju0HWwplvRS/nN8VzrJ3AppNMU1k/l57+844rtTKEdlEkgzD04fARI65SMOwn
+         Hy6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775724764; x=1776329564;
+        d=1e100.net; s=20251104; t=1775724766; x=1776329566;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=joGTEHnyC2gWFMculzj+p1s7d9jK2bjrOx0CVR84se0=;
-        b=SOfEPtS9GBwYOp/r26QAPhGHbGeefkyR23C+gicvxNh9f4g/x9sCUwQa6gEljTBpsg
-         C9uRhz68Z9i2YAE8egaoPpDDUGNhYglBk3ED1UhgyiyzW8pMYCH5xVdhLyb2H0ZR7SgL
-         eFuJklMK76J4MHSUaeu+63BmIwMoQ0LlA/nsAWBOumBb6UnZinSexsvrivz9/c5fIu31
-         EVoLah9iQ3bWc4sB//4zMi9pTYKJnlf7JzzpodqTCnBzUEHMLKhvexe+e0T6/Cv5UIP5
-         nOprgAMmSEv+Y2Y6w9f6IaV5MqdWWJUXQItzrnRFmW5VB2dQXgeq10sVVpU8u3YdmfGg
-         2pVg==
-X-Forwarded-Encrypted: i=1; AJvYcCWCRxuXqea19vVVs28osKjHJnMrHxs1B50hBG+EELtiARZ9dwddq8oVxBBR6fFNGE2Rx6gedz8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyzVdYTuLJhSfLm7Uf43avOXh61T3BKQR8igwb4vaKQ3AvhzoLM
-	Gp2iB17IRCyL8R2SyZio8HePCmuz8U5WXZe1CijF8lcmjjzgU3CLR9lg+w4CeWag73kuj9cQlBB
-	wWdW6ar4lspVeOQ==
-X-Received: from qti20.prod.google.com ([2002:a05:622a:8354:b0:509:1e8e:d6c7])
+        bh=RhASBS+VhxeS6Kv/exRyy6Gp9xvYpZGnsWFz4lLYWDw=;
+        b=smfEEbUXrdIwarBt+jW3IcnyeqbMIRTvvF3fywWd/k8IxQRCTcRnfGwb887oQ4vqBI
+         FXWmhYruHBnOEwGbFHQBboPCLCbE9O9NtGyPFbT4ORcG9GIYW3ewjSIjisf1I9AzLdkx
+         +J2tYX92XhjkGSdrAOIj+v7nPDdeCY9LPEg7pZWEmA1wizHHfM3RC/k9Uwcnv6IiNh8R
+         vxhDtHIZO5kSsjmUhjcfy1q0m0oqiA6ORUi0FJGtVEsG4oR58b5CXjhInqbHkf2fSe9g
+         zp28Y62+IMso/vO85XgWoDutSjP6OE9XUQbZNFzbpwLPgBLCjfTXKadCjTFgCZGfpqrw
+         GDPg==
+X-Forwarded-Encrypted: i=1; AJvYcCXmT7X6LmBkhPtuUA79iADdub8i3mJZlRNsLZw7g4yAGLYqUQmPHx3wPwzae6JFlncSiBO+ceE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzFLFEkhJvCEYQamdYMBE5JT+zURZs0ky36nQSeW4LZR36xjOCj
+	ZBo5IiNYDfZspCvhh0gpokNwwULTfonvhAlDXznh6/n3k+64SjnGQcNWyBk1WTufYbzio/cl6rM
+	LiaUBY80Zdoo5HA==
+X-Received: from qvbqo17.prod.google.com ([2002:a05:6214:5911:b0:89f:6c59:9ea4])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:622a:a9d1:10b0:509:68c:634d with SMTP id d75a77b69052e-50dc210953emr29382611cf.10.1775724764265;
- Thu, 09 Apr 2026 01:52:44 -0700 (PDT)
-Date: Thu,  9 Apr 2026 08:52:37 +0000
+ 2002:ad4:5dc3:0:b0:8a1:34df:bbe3 with SMTP id 6a1803df08f44-8ac743c7f3amr44141486d6.28.1775724766066;
+ Thu, 09 Apr 2026 01:52:46 -0700 (PDT)
+Date: Thu,  9 Apr 2026 08:52:38 +0000
 In-Reply-To: <20260409085238.1122947-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,8 +76,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260409085238.1122947-1-edumazet@google.com>
 X-Mailer: git-send-email 2.53.0.1213.gd9a14994de-goog
-Message-ID: <20260409085238.1122947-2-edumazet@google.com>
-Subject: [PATCH net-next 1/2] ipvlan: ipvlan_handle_mode_l2() refactoring
+Message-ID: <20260409085238.1122947-3-edumazet@google.com>
+Subject: [PATCH net-next 2/2] ipvlan: avoid spinlock contention in ipvlan_multicast_enqueue()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -90,7 +90,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -100,7 +100,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-276896-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-276897-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -110,79 +110,47 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[7];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7FC4B3C81FD
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 079553C8060
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Reduce indentation level, and add a likely() clause
-as we expect to process more unicast packets than multicast ones.
+Under high stress, we spend a lot of time cloning skbs,
+then acquiring a spinlock, then freeing the clone because
+the queue is full.
 
-No functional change, this eases the following patch review.
+Add a shortcut to avoid these costs under pressure, as we did
+in macvlan with commit 0d5dc1d7aad1 ("macvlan: avoid spinlock
+contention in macvlan_broadcast_enqueue()")
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- drivers/net/ipvlan/ipvlan_core.c | 38 +++++++++++++++-----------------
- 1 file changed, 18 insertions(+), 20 deletions(-)
+ drivers/net/ipvlan/ipvlan_core.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/net/ipvlan/ipvlan_core.c b/drivers/net/ipvlan/ipvlan_core.c
-index 0b493a8aa33857d531329e8eaef6b25a5c6f572d..214fd299a5aa6e40579aa2dbcb178b5474b561a4 100644
+index 214fd299a5aa6e40579aa2dbcb178b5474b561a4..1be8620ad3971d281fb36fd0770efd67b566ae60 100644
 --- a/drivers/net/ipvlan/ipvlan_core.c
 +++ b/drivers/net/ipvlan/ipvlan_core.c
-@@ -744,34 +744,32 @@ static rx_handler_result_t ipvlan_handle_mode_l3(struct sk_buff **pskb,
- static rx_handler_result_t ipvlan_handle_mode_l2(struct sk_buff **pskb,
- 						 struct ipvl_port *port)
- {
--	struct sk_buff *skb = *pskb;
-+	struct sk_buff *nskb, *skb = *pskb;
- 	struct ethhdr *eth = eth_hdr(skb);
--	rx_handler_result_t ret = RX_HANDLER_PASS;
- 
- 	if (unlikely(skb->pkt_type == PACKET_LOOPBACK))
+@@ -763,10 +763,16 @@ static rx_handler_result_t ipvlan_handle_mode_l2(struct sk_buff **pskb,
+ 	if (!ipvlan_external_frame(skb, port))
  		return RX_HANDLER_PASS;
  
--	if (is_multicast_ether_addr(eth->h_dest)) {
--		if (ipvlan_external_frame(skb, port)) {
--			struct sk_buff *nskb = skb_clone(skb, GFP_ATOMIC);
-+	/* Perform like l3 mode for non-multicast packet */
-+	if (likely(!is_multicast_ether_addr(eth->h_dest)))
-+		return ipvlan_handle_mode_l3(pskb, port);
- 
--			/* External frames are queued for device local
--			 * distribution, but a copy is given to master
--			 * straight away to avoid sending duplicates later
--			 * when work-queue processes this frame. This is
--			 * achieved by returning RX_HANDLER_PASS.
--			 */
--			if (nskb) {
--				ipvlan_skb_crossing_ns(nskb, NULL);
--				ipvlan_multicast_enqueue(port, nskb, false);
--			}
--		}
--	} else {
--		/* Perform like l3 mode for non-multicast packet */
--		ret = ipvlan_handle_mode_l3(pskb, port);
-+	/* External frames are queued for device local
-+	 * distribution, but a copy is given to master
-+	 * straight away to avoid sending duplicates later
-+	 * when work-queue processes this frame.
-+	 * This is achieved by returning RX_HANDLER_PASS.
-+	 */
-+	if (!ipvlan_external_frame(skb, port))
-+		return RX_HANDLER_PASS;
+-	nskb = skb_clone(skb, GFP_ATOMIC);
++	if (skb_queue_len_lockless(&port->backlog) >= IPVLAN_QBACKLOG_LIMIT)
++		nskb = NULL;
++	else
++		nskb = skb_clone(skb, GFP_ATOMIC);
 +
-+	nskb = skb_clone(skb, GFP_ATOMIC);
-+	if (nskb) {
-+		ipvlan_skb_crossing_ns(nskb, NULL);
-+		ipvlan_multicast_enqueue(port, nskb, false);
+ 	if (nskb) {
+ 		ipvlan_skb_crossing_ns(nskb, NULL);
+ 		ipvlan_multicast_enqueue(port, nskb, false);
++	} else {
++		dev_core_stats_rx_dropped_inc(skb->dev);
  	}
  
--	return ret;
-+	return RX_HANDLER_PASS;
- }
- 
- rx_handler_result_t ipvlan_handle_frame(struct sk_buff **pskb)
+ 	return RX_HANDLER_PASS;
 -- 
 2.53.0.1213.gd9a14994de-goog
 
