@@ -1,153 +1,279 @@
-Return-Path: <netdev+bounces-277067-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277068-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aKWHBq/X12mDTggAu9opvQ
-	(envelope-from <netdev+bounces-277067-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 18:45:35 +0200
+	id MOkuA6nY12n4TggAu9opvQ
+	(envelope-from <netdev+bounces-277068-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 18:49:45 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 742A43CDC47
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 18:45:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 76DB03CDCA3
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 18:49:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1BEA03007ADF
-	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 16:45:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D7E433007CBA
+	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 16:49:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66CF63D301A;
-	Thu,  9 Apr 2026 16:45:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5738C3DFC87;
+	Thu,  9 Apr 2026 16:49:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xm0ORjg9"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NVHh3AgW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D4B11A3154;
-	Thu,  9 Apr 2026 16:45:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775753132; cv=none; b=m6cgEeXnsE4RkO6kg7MA5ucuUHxT9JaViEi29DUPmUxjwtQm1uwtM/J9TgBryKvPfJJWTK3QnF6lxnY/HrrubtSnT1hjiFo2kdP7TJwggkpxg6IpS/EmhUqK4a17JuiHoDiiUomwPNVLOJs8phfpFQyUroNa9nhM5AYjtjdko1c=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775753132; c=relaxed/simple;
-	bh=dVXr03RoqzK0gwU6bzmF456fwdFwS/5nKDD/1hodd5A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pIAHftoqb0ciOl9llHAvhs9AtWt/kIitrnxUGDWmViVLaqAyBgG5ueHmPuM4W5ucgp6KTyHkYgYvLm/XSDfyz2iO0eVrz6Vvx423dbFIykxMb0pLTvYj/uIo4kZksQHQDcfmrsU/z45YV59SB49wny3qr62lDzSqZ1iSe4rFfoA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xm0ORjg9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66917C4CEF7;
-	Thu,  9 Apr 2026 16:45:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775753131;
-	bh=dVXr03RoqzK0gwU6bzmF456fwdFwS/5nKDD/1hodd5A=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Xm0ORjg9v241Bg2dH6v74j+EqROwVDJfRzUr0uqjUU9Ah2QXV2ut8YowwaLC7mMTG
-	 NlGvyS3iaU0oM5K84yZbfrXzkx6J6D0Y6Hl+uj104854yfsPfqTNdk/FCGsLetL9kK
-	 3UhQ8NjoPno0mZHId3+pZA4mo/5o0gOxiT3r5YABoq4JKwYSJjwJktHjgL08KY65sN
-	 aimgMdmn87LeBDMoZqBoYytLEMvjO2+Y/zorUnC1OO4YcG+tGU1t8/9BBu3BhC+6K9
-	 JnZXVMkue4cgM4+IlMtIarb1o2C/O92gtEjb67+ZBlCfGve5IaSqxY8gmiEDtwip1l
-	 Uy9M15tJtXeIA==
-Date: Thu, 9 Apr 2026 17:45:27 +0100
-From: Simon Horman <horms@kernel.org>
-To: =?utf-8?B?TGVrw6sgSGFww6dpdQ==?= <snowwlake@icloud.com>
-Cc: netdev@vger.kernel.org, linux-nfc@lists.01.org, davem@davemloft.net,
-	kuba@kernel.org, krzysztof.kozlowski@linaro.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH] nfc: llcp: fix missing return after LLCP_CLOSED check in
- recv_hdlc and recv_disc
-Message-ID: <20260409164527.GP469338@kernel.org>
-References: <20260405164158.1344049-1-snowwlake@icloud.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E892345CAF;
+	Thu,  9 Apr 2026 16:49:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775753372; cv=fail; b=pKLiAqWnGqU9RkY+52s2xuuxqxbAotrNtVg6kUWZ2HL52g+PdddC9/P4nA6/EMKSpNZsrW6S3QIIgKuXofaiL6C1wjI5l2ShAWPmXeTMKK8n00SPdtAJ6lGWfJwT89bvI7LGhlrh2bpWSYVhmGIB3Q60jm2zoPcF/wTETVQ3T4w=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775753372; c=relaxed/simple;
+	bh=zduMe9ZMxJqB+y2JjOp/DCYke0nA4dqch3WvLP//lDs=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=oixLroUzwjkO3Jne/xc9WuoKuUSXWEGHRam5mjvNg9gui9F7zgec7Ini2InuihL5Rf7pCtKJLayQ91ndlgHCmxrgUuasjtACeOZXOxNMz0pg/D58tb+GBnQSBBwJChexXIGbfyG9vTyExUTibIfG7npxKoU9X18HC/dGvat40lk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NVHh3AgW; arc=fail smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1775753371; x=1807289371;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=zduMe9ZMxJqB+y2JjOp/DCYke0nA4dqch3WvLP//lDs=;
+  b=NVHh3AgW0LJiSnrOY4Z6VXCvjnqJZY3t5Yu0S5xWl2ayp8WGFNrR72Wy
+   tn20SSnWbLOlAd+nt4mVOU2Uz53CmyzlZOcE89lgEVfA2Tk8rhzlX9+Gr
+   CA5DY7eDPDzOPVAtN+IYWN+4s7vCtRQ2x7VcxwpcH7opi1m06hOnv8E/k
+   W9EO7E3ix7Bn1+OQ9/aopk4uYwxtZ3yTTpidsWfViuSnWfbpMwzikBa1W
+   dGo0VtEtKX397ZH2HR4eUPGT1ne3mtOsxeh4qufivlroJ2TlcCjv7ZjWL
+   /qnDzrBTMTsmPx1SPV8QuxcVCcnWSDQE87/qzB09sWKw21wrmOIBvAzEp
+   A==;
+X-CSE-ConnectionGUID: lNdFHEQrQfC720sOM5j12g==
+X-CSE-MsgGUID: oo/JHRUXTIizmlSmTJu4jw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11754"; a="88149942"
+X-IronPort-AV: E=Sophos;i="6.23,169,1770624000"; 
+   d="scan'208";a="88149942"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2026 09:49:23 -0700
+X-CSE-ConnectionGUID: CWhiHa9WTcKmBnM4ekhppA==
+X-CSE-MsgGUID: QvYpypPSTOG5J2uwhYFbRQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,169,1770624000"; 
+   d="scan'208";a="228749498"
+Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
+  by orviesa008.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2026 09:49:21 -0700
+Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Thu, 9 Apr 2026 09:49:20 -0700
+Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
+ FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Thu, 9 Apr 2026 09:49:20 -0700
+Received: from CO1PR03CU002.outbound.protection.outlook.com (52.101.46.31) by
+ edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Thu, 9 Apr 2026 09:49:19 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=bQie3EV5VpO4H0fXlywS/yDJdd6kzZqgcYez/V/vYgDusdOxxnF0064vsLUtBHZrtU6iOcQ/VlqD02tPvrnOEmsGy2k5dATZJN4IQsMnnggotjsQ+OgagroDb2C793ppwVwFPmh4ujXficiVir7ikj/XC6QbFLH3Jz7+OL5oTN5SB5YXhWGOCJULHFVmpFlMoKv0EqqoZQpUrl7lrLRlP8w/KFTjNeQIL78TU9I+4LTc1UFTjLD1NZWVpu58Zit3aUNNsekzz3phuu6ltf3QHtSIMC8157tUzm3uSj3YAJNzlsEBWIbIWUjFuRBDMPvUoFDCcEYc5uYUFDztm40sZw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=awxQvKcHWmADKxNAfP+gXUI3m1E8Rm4erYuH6kRp0E8=;
+ b=lQx62ZoZgvDJgpJi55zI3OC2cqLZYLcn89Gid+PK5t+43Qbwp4DnikLQyqWIk/mI16LFEucVRBQrZmRwfuc0Rkrwu18pDEqqkE7MZTXVRuP4xo1xXA4oLSXjXzoYt/BsBO63+2ptAdVaEBdRN5u5+F13ZUYF8aXwn9ZUcTmjzerIBEXO7CgIxg/fWUxNaAti78ACt/Ao57N7XxclleYo+2MdiP/XrxC1TJMcbs1y/XAjXpSQ/sJLMiw/TIfExNvXdKBYFff4pjGVYHPZN+BgaEUeey/nU0jnrWaqBZGz+F1gTKjwNWUtTJDbHNw8i3Jj+Y3+nCCoR170i+B2K++13A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA1PR11MB6241.namprd11.prod.outlook.com (2603:10b6:208:3e9::5)
+ by IA1PR11MB7318.namprd11.prod.outlook.com (2603:10b6:208:426::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.15; Thu, 9 Apr
+ 2026 16:49:17 +0000
+Received: from IA1PR11MB6241.namprd11.prod.outlook.com
+ ([fe80::7ac8:884c:5d56:9919]) by IA1PR11MB6241.namprd11.prod.outlook.com
+ ([fe80::7ac8:884c:5d56:9919%4]) with mapi id 15.20.9769.016; Thu, 9 Apr 2026
+ 16:49:17 +0000
+From: "Rinitha, SX" <sx.rinitha@intel.com>
+To: Keita Morisaki <kmta1236@gmail.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S
+ . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+CC: Alice Michael <alice.michael@intel.com>, "Loktionov, Aleksandr"
+	<aleksandr.loktionov@intel.com>, "Fijalkowski, Maciej"
+	<maciej.fijalkowski@intel.com>, "Greenwalt, Paul" <paul.greenwalt@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [Intel-wired-lan] [PATCH net v2 RESEND] ice: fix race condition
+ in TX timestamp ring cleanup
+Thread-Topic: [Intel-wired-lan] [PATCH net v2 RESEND] ice: fix race condition
+ in TX timestamp ring cleanup
+Thread-Index: AQHcpVD0SglIeSnto0evBJB46tQ6O7XWiszw
+Date: Thu, 9 Apr 2026 16:49:17 +0000
+Message-ID: <IA1PR11MB6241C5F786C07B83E6852A958B582@IA1PR11MB6241.namprd11.prod.outlook.com>
+References: <20260224054533.3372943-1-kmta1236@gmail.com>
+In-Reply-To: <20260224054533.3372943-1-kmta1236@gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA1PR11MB6241:EE_|IA1PR11MB7318:EE_
+x-ms-office365-filtering-correlation-id: 992ad8eb-e68c-4d53-5ff3-08de9657f063
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|38070700021|921020|56012099003|18002099003|22082099003;
+x-microsoft-antispam-message-info: PwPo7BcpDtb+f09t7d8X7DghNNwOHo0b38REkVkiKig95Ys2GIL312LIdhCioQPZn9Xbfdgzok2i5dCpl8B3x/vAdWteB0zZiLBGt39bGZfLE8qihX89B+ij/Y9cq0V3XFIqHfSaIilamdhV6Vsv72gaum/9emJx3cafw7Y0LaIcY52dARQnfYvJHV9NcsDzoBn8hRRrCSIbFylzWv7R7YBJo6AdCWgdbZvvotf5jkOxAQht8Gln85UTSH+3sV7k18K4rltZWWMVhYXuJU62xH1L7ZCwALor/IinfVsAcIwYrWjhTcbd3aQIAg5/XKNHAmfMQg0CrUEQb3P9YdYzNInKud2ibNQKeLR5H4fOTwbBh8hulp0bGBqDy8/Im6jMtL397x7o1kl8GFgfyaMGWBZyvmu4ZyqOBN3kbb5a7A9RebzrcE0MjcqNAF0ln/LEn9h11UCqHwTjeemQycjb081Pout8nNjzHfS884rqXnjBfJ5ytDGmD/KQe9sALhVqbm7yMAxM+SQyc1ImArK4SMar2hMHuYIs5ir53uOoMX0cLyIzf63mGUX3cGTCO+lKbcfm7Rqsigtr6bJuehnH8e+4tVSPBw2nKNnF667PYrAG5ZEuxuvy8PiOZ3+w4gbI+RaCUDUZGatUu/5wYnx2xUvs8Q/FhhY5PPtDKBqa5QpjzX1K0y8mX3SFJp3yCCUtWYARhnzAFLmjlUly+JzpkjVuqM5vGfNozxdJYZwhDKVbbGwjV/BWIrdii4Dz6LyIWrVJMjHma+mm4uM4XsBcF/4KFrkTLVQ3pogIj71eZYmqMmKQNPlhkQmkg2rBmdjR
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6241.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700021)(921020)(56012099003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?IOqF5oaxj8HO4cSNStqa5AbzD8bjZVLHdO/EcTu7U7v7zyoXp7qwKSwKQ5Ez?=
+ =?us-ascii?Q?MsXu698oCgknBNEMzcZ+Ee/3xmNK8FUNa2Iiiqyaow3c2RJBfYhr2DRZR/t7?=
+ =?us-ascii?Q?15ojt2A3+bNBWRcaH5x6eh2sjZEnmQHPBiLsXg0SCh3ZMdWDZhX/HQGkvApZ?=
+ =?us-ascii?Q?/c5kHVakisLyNsrFAztq2qt1u8eRkRklSOGKWme+s8Z7PNCLROeUlMRk7woJ?=
+ =?us-ascii?Q?i0fEEL/KXaCDlGgJfhCA8wY1BgArka/aX9wY67i3XagVG0LalUV9BmM9BVyV?=
+ =?us-ascii?Q?iUnfF9OkGBD/RxwvDh7rP4xLtWF2HL3W2jM6siIuCpJtXJa9pqIuzpQu/Vk4?=
+ =?us-ascii?Q?yXoTepzZ0Zn4KMfOZ02jOqxy26lA1mvuF9qADtP3+rslj3WTrAhdu4+AG3Jy?=
+ =?us-ascii?Q?LBUMDYJVc3l1fmHsyFhWBM9ttLH/4uv7GX4eOJekrNfhG8Ttzt5J6DbP+qbw?=
+ =?us-ascii?Q?O7MrNwCA3GT5AMVGcFDeFBUrW/DAEyYBksKSPKsQFtbtZQ8IKwf4eRkwUwZq?=
+ =?us-ascii?Q?Te0s/Wgqd/Yx3/QWbccwQy6SkeBmjx8vL4j+PcIAED9AYAyFPibVmQBpwxL9?=
+ =?us-ascii?Q?gAdgvAWbblSXOumw1SjtSTjMVD6Bvgjjc2kwlTuNkWJJ5AJFtYG5JgnY7jaC?=
+ =?us-ascii?Q?tIbpDW3SScEqIzQnwA9HToOg/RR7fCo2pB9iDKriefiTpE28/gmAsPcW9UaG?=
+ =?us-ascii?Q?M1Pw+UEnB3xBDOt/uq4kzd9Fo3tiGL3C2HyZ0WPUYtqL1KegY4QDxj2QzKYI?=
+ =?us-ascii?Q?WujVBtoZp+/o/oxW80TK4dQrI5jRjKXv/h1IVW9lXHvDPGQ/DqZiQyrCURRR?=
+ =?us-ascii?Q?Pb4gG0Gz9VMO9lfyCnoBcmgpn0dtsaf+j03NjI+hvxaOFf+PTz4WA0et7MvM?=
+ =?us-ascii?Q?CBoH81VFmb9HS1Mr2pCb41ER48Qy98Able+/M2nLSJGkLWY+h5qsvHUqJ54N?=
+ =?us-ascii?Q?VuPNz5FWkf0us/7eZB8z3L9wNJW+M+bW9xtL0aBwStwILw1ygaFTiLKWAM3c?=
+ =?us-ascii?Q?5qJoDlgS7w9+jyhiyGwBcAwc4PSJKuojFi/Q7OR+0wDhb7GcSdYAP7gBtudz?=
+ =?us-ascii?Q?W8oLX/Vtks5A2vdIt4J/h3pDaXl3920TNJIJtLOyzExt2g6Fkz/T6e3PdIKn?=
+ =?us-ascii?Q?z2emR/itaeB1vowKaRW59FqdDc7i5hZ88Gjn87BkUKMILuMGo6UtUSJBA7dy?=
+ =?us-ascii?Q?Sf8D60cK2cdbqGRo25SDGfAi2DEx7uHpcYkQaLAa6yYUIIpwETeNZFX1atE3?=
+ =?us-ascii?Q?DtlUONvzxhltQvPp8BS1jKR9m2GDd1v28EZhmM1YDzKQNA16pTuKmEt55XaL?=
+ =?us-ascii?Q?Ih8qSfjrZfNE98XEQhuTe+b5N2Od58XarnqRwsGn/N0etQcf2LyUEJGp8INK?=
+ =?us-ascii?Q?b+PBF+HTi1VpLDsE/Ca1MFVHiO76CMkj3pkvaNLVL4xoI9RfxdbRSYEyBhGx?=
+ =?us-ascii?Q?IEJUrOhAj//2QsUiS+yX1sfOV4nUMaZRpKEZVVgwR6EAKGgQKxacnGk/9wkn?=
+ =?us-ascii?Q?Zz3aERcgAj4dIChy+/ZRZdEoCzL74rZuRFu2wMEssGoXEIvghFHdX5hSreBC?=
+ =?us-ascii?Q?qFdQiaxQafsU47Xd9skWEBtvAO1nz4DEOnMI9NQRlQbu6fxfGu7+NMQaebAl?=
+ =?us-ascii?Q?qiYNyP2woT/hJKHZBUH5HvTustnVeyDrhjfYsROa6WA+Htiyn7C6nK+6C+UP?=
+ =?us-ascii?Q?oZQxQxlcY6fHOCHEqqJNjSf0DZburrDq32xb8QFxmGDjtf5d?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260405164158.1344049-1-snowwlake@icloud.com>
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+X-Exchange-RoutingPolicyChecked: FzSy7MTjaUuJoego4/EsqnxiU3NBT6n4QVX5E2/tYiDJwq4z5dY5w61SLxNpBF99vz7NZ2mhR9lOznbxnYNsB6dAMbANVyOlrLibFvL7prOyi9gQLjNciwH4pY/GxACUE/8sC1wrc4WFPYXI0HLoQFaTEiwLlxNT0yCi7sBwheQGKt7uR0dColqkYINBzCOLYdaUgyD88A1eMu9Gyat6HjZZXKQ8FHYmqBHhGG5gNfCX0WiVFWSXXLuI0YY9OLc52d6jd2l663rb2yVv2Y/9rdLdGPpdzJFSxBqEohhuNJgsVfVnaXYwzD01zRCzIBIk/Bnu58Sv5NEEMSmO66Ma5A==
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6241.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 992ad8eb-e68c-4d53-5ff3-08de9657f063
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Apr 2026 16:49:17.2349
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 5JcStliH4CoXkXeSvo9jnqoZGK45LrzN93TfPKug8khY3jMN/F1QIjeXwy+lfXxQmczYhPwBh6ww9wCPWOHzBA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB7318
+X-OriginatorOrg: intel.com
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[icloud.com];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_FROM(0.00)[bounces-277067-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-277068-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sx.rinitha@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 742A43CDC47
+	NEURAL_HAM(-0.00)[-1.000];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[10]
+X-Rspamd-Queue-Id: 76DB03CDCA3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun, Apr 05, 2026 at 06:41:58PM +0200, Lekë Hapçiu wrote:
-> From: Lekë Hapçiu <framemain@outlook.com>
-> 
-> nfc_llcp_recv_hdlc() and nfc_llcp_recv_disc() both call
-> nfc_llcp_sock_get() (which increments the socket reference count) and
-> lock_sock() before processing incoming PDUs.  When the socket is found
-> to be in state LLCP_CLOSED both functions correctly call release_sock()
-> and nfc_llcp_sock_put() to undo those operations, but are missing a
-> return statement:
-> 
->     lock_sock(sk);
->     if (sk->sk_state == LLCP_CLOSED) {
->         release_sock(sk);
->         nfc_llcp_sock_put(llcp_sock);
->         /* ← return missing */
->     }
->     /* Falls through with lock released and reference dropped */
->     ...
->     release_sock(sk);            /* double unlock */
->     nfc_llcp_sock_put(llcp_sock); /* double put → refcount underflow */
-> 
-> The fall-through causes three independent bugs:
-> 
->   1. Use-after-free: all llcp_sock field accesses after the LLCP_CLOSED
->      block occur with the socket lock released and the reference dropped;
->      another CPU may free the socket concurrently.
-> 
->   2. Double release_sock: sk_lock.owned is already 0 — LOCKDEP reports
->      "WARNING: suspicious unlock balance detected".
-> 
->   3. Double nfc_llcp_sock_put: the refcount is decremented a second time
->      at the end of the function, potentially driving it below zero
->      (refcount_t underflow), corrupting the SLUB freelist and causing a
->      subsequent use-after-free or double-free.
-> 
-> Both functions are reachable from any NFC P2P peer within physical
-> proximity (~4 cm) without hostile NFCC firmware:
->   - nfc_llcp_recv_hdlc: triggered by sending an LLCP I, RR, or RNR PDU
->     to a SAP pair whose connection has been torn down.
->   - nfc_llcp_recv_disc: triggered by sending an LLCP DISC PDU to a SAP
->     pair that is already in LLCP_CLOSED state.
-> 
-> Fix: add the missing return statement in both functions so that the
-> LLCP_CLOSED branch exits after cleanup.
-> 
-> Fixes: Introduced with nfc_llcp_recv_hdlc / nfc_llcp_recv_disc
-> Signed-off-by: Lekë Hapçiu <framemain@outlook.com>
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of K=
+eita Morisaki
+> Sent: 24 February 2026 11:16
+> To: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw <=
+przemyslaw.kitszel@intel.com>; Andrew Lunn <andrew+netdev@lunn.ch>; David S=
+ . Miller <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Jakub =
+Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>
+> Cc: Alice Michael <alice.michael@intel.com>; Loktionov, Aleksandr <aleksa=
+ndr.loktionov@intel.com>; Fijalkowski, Maciej <maciej.fijalkowski@intel.com=
+>; Greenwalt, Paul <paul.greenwalt@intel.com>; intel-wired-lan@lists.osuosl=
+.org; netdev@vger.kernel.org; linux-kernel@vger.kernel.org; Keita Morisaki =
+<kmta1236@gmail.com>
+> Subject: [Intel-wired-lan] [PATCH net v2 RESEND] ice: fix race condition =
+in TX timestamp ring cleanup
+>
+> Fix a race condition between ice_free_tx_tstamp_ring() and ice_tx_map() t=
+hat can cause a NULL pointer dereference.
+>
+> ice_free_tx_tstamp_ring currently clears the ICE_TX_FLAGS_TXTIME flag aft=
+er NULLing the tstamp_ring. This could allow a concurrent ice_tx_map call o=
+n another CPU to dereference the tstamp_ring, which could lead to a NULL po=
+inter dereference.
+>
+> CPU A:ice_free_tx_tstamp_ring() | CPU B:ice_tx_map()
+>  --------------------------------|---------------------------------
+>  tx_ring->tstamp_ring =3D NULL     |
+>                                  | ice_is_txtime_cfg() -> true
+>                                  | tstamp_ring =3D tx_ring->tstamp_ring
+>                                  | tstamp_ring->count  // NULL deref!
+>  flags &=3D ~ICE_TX_FLAGS_TXTIME   |
+>
+> Fix by:
+> 1. Reordering ice_free_tx_tstamp_ring() to clear the flag before
+>  NULLing the pointer, with smp_wmb() to ensure proper ordering.
+> 2. Adding smp_rmb() in ice_tx_map() after the flag check to order the
+>   flag read before the pointer read, using READ_ONCE() for the
+>   pointer, and adding a NULL check as a safety net.
+> 3. Converting tx_ring->flags from u8 to DECLARE_BITMAP() and using
+>   atomic bitops (set_bit(), clear_bit(), test_bit()) for all flag
+>   operations throughout the driver:
+>   - ICE_TX_RING_FLAGS_XDP
+>   - ICE_TX_RING_FLAGS_VLAN_L2TAG1
+>   - ICE_TX_RING_FLAGS_VLAN_L2TAG2
+>   - ICE_TX_RING_FLAGS_TXTIME
+>
+> Fixes: ccde82e909467 ("ice: add E830 Earliest TxTime First Offload suppor=
+t")
+> Signed-off-by: Keita Morisaki <kmta1236@gmail.com>
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> ---
+> Changes in v2:
+> - Convert tx_ring->flags from u8 to DECLARE_BITMAP() and use atomic
+>  bitops (set_bit(), clear_bit(), test_bit()) for all flag operations
+>  instead of WRITE_ONCE() for flag updates
+> - Rename flags from ICE_TX_FLAGS_RING_* to ICE_TX_RING_FLAGS_* to
+>  distinguish from per-packet flags (ICE_TX_FLAGS_*)
+>
+> drivers/net/ethernet/intel/ice/ice.h         |  4 ++--
+> drivers/net/ethernet/intel/ice/ice_dcb_lib.c |  2 +-
+> drivers/net/ethernet/intel/ice/ice_lib.c     |  4 ++--
+> drivers/net/ethernet/intel/ice/ice_txrx.c    | 23 ++++++++++++++------
+> drivers/net/ethernet/intel/ice/ice_txrx.h    | 16 +++++++++-----
+> 5 files changed, 31 insertions(+), 18 deletions(-)
+>
 
-Curiously this seems to duplicate this patch:
-
-- [PATCH net] nfc: llcp: add missing return after LLCP_CLOSED checks
-  https://lore.kernel.org/all/20260408081006.3723-1-qjx1298677004@gmail.com/
-
--- 
-pw-bot: changes-requested
+Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
 
