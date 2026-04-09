@@ -1,148 +1,123 @@
-Return-Path: <netdev+bounces-276840-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276841-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cLMDEDkl12kiLAgAu9opvQ
-	(envelope-from <netdev+bounces-276840-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 06:04:09 +0200
+	id lvFON7k012mPLggAu9opvQ
+	(envelope-from <netdev+bounces-276841-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 07:10:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF5603C622F
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 06:04:07 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 088DF3C63F8
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 07:10:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B76DF30173A8
-	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 04:04:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C95B93006941
+	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 05:09:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8FEC1FAC42;
-	Thu,  9 Apr 2026 04:04:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B6F92741B5;
+	Thu,  9 Apr 2026 05:09:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="el9z2OBb"
+	dkim=pass (2048-bit key) header.d=mail.toshiba header.i=nobuhiro.iwamatsu.x90@mail.toshiba header.b="tNRFGn2n"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout08.his.huawei.com (canpmsgout08.his.huawei.com [113.46.200.223])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mo-csw.securemx.jp (mo-csw1120.securemx.jp [210.130.202.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06D354A35;
-	Thu,  9 Apr 2026 04:04:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.223
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D94F322D781
+	for <netdev@vger.kernel.org>; Thu,  9 Apr 2026 05:09:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.130.202.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775707445; cv=none; b=c4TBx8zT6z7BpFzRQtyo1REJNXlep00EqJevfkW8/RqwhHeWvkD5Ed5Z/BMQFSmwdOQdzGGIhsbfWoBkMnnouI7P/CWGGI1lfUO295f7A63t3AJmSo1kNpomikzegXtUByfeJsjgeC6MWDQMOt3jFO4yjzKKJpN5vXuC2demu+A=
+	t=1775711351; cv=none; b=fdQ8GcCtFc4DTsVfSQcULbkrc8z2YPeHSNSPGAZnPRHnRWBQMy51ouKiHmlSCvU1SPA9rp8O7gkTG90RELVFbylHTBBcpTNWj7dRc6fY1XWeN4fQglo50tlKByYPWvD+nmDkmpxtY5m2qgKixI54LxNbpIlfYjf2RDfab25pdwY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775707445; c=relaxed/simple;
-	bh=xkNRkKhYozl5VFDwEt/FsJv4EP98oP5zZC4JZ4maLnc=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=oYjWkuOK0rf297qyo49r03G5YqS6+ktXkt8eep6AUQLv0/UKVY9LLQ10KZEUVhhFhoB/nQgGIcg/M/A1iaeer5g1qcepR2+mTCfTcGQAJnrrhzk6IS3M+FSprvNkI9dAmyo+t/7xcx2Lc0yMlIYzNUI3T40V1feMJXgNmC494oQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=el9z2OBb; arc=none smtp.client-ip=113.46.200.223
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=XGowp3X4zGzDAYt5cRM9/V9fvsjxmXKIfFOYdzzA4TI=;
-	b=el9z2OBbyIbvH1r31HLTFkpsNPWttG7koMnjsy24DlQPZLKAAlD2hs826Mt0+pSd1pA2QM1nO
-	IlrE2lVlwJr25nSHMtIINZl6lKqcgztJkrqU3lrkTEm+Y7O2ga2foB3eR7JfRIysgO+ay+AUL2D
-	8UyLUy2xCai5lUEwvcYEi08=
-Received: from mail.maildlp.com (unknown [172.19.163.15])
-	by canpmsgout08.his.huawei.com (SkyGuard) with ESMTPS id 4frmNm48DgzmV8Q;
-	Thu,  9 Apr 2026 11:57:44 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 9130440539;
-	Thu,  9 Apr 2026 12:04:00 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Thu, 9 Apr 2026 12:03:59 +0800
-Message-ID: <18967454-0af4-44e5-98ba-11af95ef505f@huawei.com>
-Date: Thu, 9 Apr 2026 12:03:58 +0800
+	s=arc-20240116; t=1775711351; c=relaxed/simple;
+	bh=UwEHBhDe90eJlsfgAymh+d6KqEQKQcSx/xKfUx/6ahI=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=ptXbV1xhVzebzv/S3I/YqAIFQFkH10vkhIotMfN8Kj7xY77AT7ip8WvQV/T/jYnjGVDsECNE5CCmHuutuQzpkM6T+CBvBqm6N7hiFd43te+b1WVO8aXBcdjqAtOzun6GS9XcTeP+f9OVPXDtaZyN+twjK+gNrcMEBZJIDXvyHr8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mail.toshiba; spf=pass smtp.mailfrom=mail.toshiba; dkim=pass (2048-bit key) header.d=mail.toshiba header.i=nobuhiro.iwamatsu.x90@mail.toshiba header.b=tNRFGn2n; arc=none smtp.client-ip=210.130.202.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mail.toshiba
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mail.toshiba
+DKIM-Signature: v=1;a=rsa-sha256;c=relaxed/simple;d=mail.toshiba;h=From:To:Cc:
+	Subject:Date:Message-Id;i=nobuhiro.iwamatsu.x90@mail.toshiba;s=key2.smx;t=
+	1775711312;x=1776920912;bh=UwEHBhDe90eJlsfgAymh+d6KqEQKQcSx/xKfUx/6ahI=;b=tNR
+	FGn2nwaUkbvETG3fhFt+f2OUW9EDihVqsaPvmIAsDxkAONO/zDh5c2He+PEiHtG/U1sBds8e3D3qa
+	4Q/DcuYBTqvpBR4C1Zo0Pc3vwdBQyYXYv1IsUttNqNHjx2bkUR0EKjPhnWzihW3GvpYyKs1CZK4ew
+	R23asDhDmfWG/QduMZFfAgC5vGTYeHQUQ3C8yde9DI9G9r3abntKDesTTMkL0EvX5I1uBBS1pYmTr
+	6sdQMcoWKHJPSnTNxbteH6Tl36ei10oiDMkhv7MVRpEE4zHiJ2l1DlpfBxc0XXu8GKtRThcAATS70
+	8oIjmUcEtlNw4cfliLYg2C9JaEH4mHQ==;
+Received: by mo-csw.securemx.jp (mx-mo-csw1120) id 63958WOm728952; Thu, 9 Apr 2026 14:08:32 +0900
+X-Iguazu-Qid: 2rWhra8uK9tl9pGJG9
+X-Iguazu-QSIG: v=2; s=0; t=1775711311; q=2rWhra8uK9tl9pGJG9; m=lFBCrxmdzSjl8WAEwUTSB7eyIbMfF5j4D0/HCpaCTgI=
+Received: from imx2-a.toshiba.co.jp (imx2-a.toshiba.co.jp [106.186.93.35])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	 id 4frnyR1SFXz4vyq; Thu,  9 Apr 2026 14:08:29 +0900 (JST)
+From: Nobuhiro Iwamatsu <nobuhiro.iwamatsu.x90@mail.toshiba>
+To: vburru@marvell.com, sedara@marvell.com, andrew+netdev@lunn.ch,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+        Nobuhiro Iwamatsu <nobuhiro.iwamatsu.x90@mail.toshiba>
+Subject: [PATCH] octeon_ep: Remove unnecessary semicolons in octep_oq_drop_rx()
+Date: Thu,  9 Apr 2026 14:08:11 +0900
+X-TSB-HOP2: ON
+Message-Id: <1775711291-13938-1-git-send-email-nobuhiro.iwamatsu.x90@mail.toshiba>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, <davem@davemloft.net>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <shenjian15@huawei.com>,
-	"liuyonglong@huawei.com" <liuyonglong@huawei.com>, "chenhao (EZ)"
-	<chenhao418@h-partners.com>, yangshuaisong <yangshuaisong@h-partners.com>
-Subject: Re: [PATCH net-next 0/2] net: ethtool add VxLAN to the NFC API
-To: Jakub Kicinski <kuba@kernel.org>
-References: <20220817143538.43717-1-huangguangbin2@huawei.com>
- <20220817111656.7f4afaf3@kernel.org>
- <5062c7ae-3415-adf6-6488-f9a05177d2c2@huawei.com>
- <20220822095327.00b4ebd5@kernel.org>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <20220822095327.00b4ebd5@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
- kwepemk100013.china.huawei.com (7.202.194.61)
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[mail.toshiba,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[mail.toshiba:s=key2.smx];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-276840-lists,netdev=lfdr.de];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[huawei.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nobuhiro.iwamatsu.x90@mail.toshiba,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_FROM(0.00)[bounces-276841-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shaojijie@huawei.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[mail.toshiba:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,huawei.com:dkim,huawei.com:mid]
-X-Rspamd-Queue-Id: EF5603C622F
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 088DF3C63F8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+Remove unnecessary semicolons in octep_oq_drop_rx().
 
-on 2022/8/23 0:53, Jakub Kicinski wrote:
-> On Mon, 22 Aug 2022 22:46:14 +0800 huangguangbin (A) wrote:
->
-> I understand your motivation and these are very valid points.
-> However, we have to draw the line somewhere. We have at least
-> three ways of configuring flow offloads (ethtool, nft, tc).
-> Supporting all of them is a lot of work for the drivers, leading
-> to a situation where there's no "standard Linux API" because each
-> vendor picks a slightly different approach :(
-> TC seems the most popular because of the OVS offload, so my preference
-> is to pick it over the other APIs.
+Signed-off-by: Nobuhiro Iwamatsu <nobuhiro.iwamatsu.x90@mail.toshiba>
+---
+ drivers/net/ethernet/marvell/octeon_ep/octep_rx.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-
-Hi, Jakub,
-
-I have recently taken over this job and used tc flow to configure flow steering to a specific queue.
-Currently, the community already supports FLOW_ACTION_RX_QUEUE_MAPPING, so the previously discussed issue no longer exists.
-
-However, we have encountered new problems:
-1. First, the driver does not support FLOW_ACTION_REDIRECT, and the NIC is not a switching device.
-     Therefore, I personally think that the driver does not need to implement switchdev.
-2. However, the VF itself supports flow rules, and its capabilities are the same as those of the PF.
-     The VF supports drop and select_queue, and the VF rules are configured through the PF.
-3. However, it seems that tc flow does not have a proper parameter to specify the vf_id to tell the PF
-     which VF to configure the rules for.
-
-Therefore, we have encountered a problem in supporting tc flow for the VF.
-A feasible idea is to use chain_index to indicate the vf_id.
-However, this changes the original meaning of chain_index, which may cause confusion.
-Or perhaps I missed some feature about vf in TC Flow?
-
-I'd appreciate your insights on how to proceed.
-Are there existing mechanisms or planned extensions to address VF-specific rule configuration?
-
-Thanks,
-Jijie Shao
+diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_rx.c b/drivers/net/ethernet/marvell/octeon_ep/octep_rx.c
+index 74de19166488f..e6ebc7e44a00c 100644
+--- a/drivers/net/ethernet/marvell/octeon_ep/octep_rx.c
++++ b/drivers/net/ethernet/marvell/octeon_ep/octep_rx.c
+@@ -392,7 +392,7 @@ static void octep_oq_drop_rx(struct octep_oq *oq,
+ 	while (data_len > 0) {
+ 		octep_oq_next_pkt(oq, buff_info, read_idx, desc_used);
+ 		data_len -= oq->buffer_size;
+-	};
++	}
+ }
+ 
+ /**
+-- 
+2.53.0
 
 
 
