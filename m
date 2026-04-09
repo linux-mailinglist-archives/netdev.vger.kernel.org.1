@@ -1,280 +1,257 @@
-Return-Path: <netdev+bounces-277013-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277014-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MLUBBcau12kMRQgAu9opvQ
-	(envelope-from <netdev+bounces-277013-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 15:51:02 +0200
+	id 8BVvEq+u12kMRQgAu9opvQ
+	(envelope-from <netdev+bounces-277014-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 15:50:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A4603CB903
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 15:51:01 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE8563CB8EE
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 15:50:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0BB45300DA71
-	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 13:43:47 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D77873033885
+	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 13:43:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53708385513;
-	Thu,  9 Apr 2026 13:43:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5FED3B9DA2;
+	Thu,  9 Apr 2026 13:43:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="LoERg2F6"
+	dkim=pass (1024-bit key) header.d=renesas.com header.i=@renesas.com header.b="pgt1KZ9b"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from TYVP286CU001.outbound.protection.outlook.com (mail-japaneastazon11011010.outbound.protection.outlook.com [52.101.125.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EB9633BBA2;
-	Thu,  9 Apr 2026 13:43:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775742226; cv=none; b=sSOFge/VNirAcvUJoP6Et8JxP9jqRR4XhAMU2hXAm6IWJUj2hsNVEygEJH4dJchHAovXL+AZDFXHLi0XvqP1qkon1EDEJqtwGs/lj2oBVqViYgJzECgY9teS1Tdwrxi4LUbDE8PN6lt6qGBcaDJSG7pqv+FMdx9DtEjKkaGK9FE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775742226; c=relaxed/simple;
-	bh=n3CpLk97LtDsZ0cI3+n3Ybw5XoyVOqFsSCOxiXAQZuA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eQheprpEanRl066ohn1b7La9mcS195hAYXRbwzR2YGJNICpOKH/VIm27E8uTENaBfEqfGpX0pRUULRIhKfaBD6FzMl9T67+pwWUgJOupnfm5S3sMUPSMJBb2g8K7ezmYkYRvtFZC+ijD3xQ+Z3v8rAmkepVCifxX2wZdYEW5br0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=LoERg2F6; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=mKUYgIaFNz8pbnf2XU9B3/tKrqrjJUecCZ/5IGn7BCg=; b=LoERg2F6vUZf7NGI+H67TxTMSP
-	JZ9UZ4p9vSXdVgAy0DZO946sSsg9au2fyT10dJRJEe0xlBcyGEv0Zg+IvKEnWezcM/osta7rQMGd/
-	YBU+KscerpFzmQcoUJP0BqfxI2IRTQiGEjWGxOMNc70A7JkSUG/+NDJCsYd3qEr+AwUhAw4TSkuG+
-	zQbFqF7xgGCmJh09rnmtkos6TF8J5bz8ciV7eHmGEsytOX6RE4Ys7n43jf1KFE1+HjItq56jVXBBr
-	5btXxATR7Nd3k6ovCXFf4lptobmlmpwRRw7GnzJmUayooA1qp/8pCmvHexwAZgih3EcwKC4l+mcy5
-	C9SzkGRA==;
-Received: from sslproxy01.your-server.de ([78.46.139.224])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1wApf9-000JxQ-1K;
-	Thu, 09 Apr 2026 15:43:15 +0200
-Received: from localhost ([127.0.0.1])
-	by sslproxy01.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1wApf8-0002p0-0y;
-	Thu, 09 Apr 2026 15:43:14 +0200
-Message-ID: <731d2749-abf6-403c-a1f4-ffe9c8d1e8ad@iogearbox.net>
-Date: Thu, 9 Apr 2026 15:43:13 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59E5339DBC0;
+	Thu,  9 Apr 2026 13:43:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.125.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775742227; cv=fail; b=eeETStwKhE4ERJqlT5rSz2tNm8G/dt3fmJa4fqgje6MJNrRlaE5cF/bPimHzOPYh+RIJ5C1ExatfxR+r38IYUFWkt9wDIXuJ9oVBBpWJbmSXKF2P/VvTwWHWxCFFbPhyt9GNZzf+jTkmSYjwsgDRWJPiCzs4T9e5J2wpYjcPBm0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775742227; c=relaxed/simple;
+	bh=WOBmIQZfo5OyA+/S+lwEy7Iajsbf8snYwgY3bLMquL0=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=DzhXOeGDzrm8GzfAqoYoOM1dgb0nGFPR049KgN+w50PhTF/jUp+RB6wIP8rPEohmbzJFRZoSplZDAFjy92ERG/vOtLOaXctzdqmJWBGWwh88bi+Aw5JiwosHsZEQE+Qu+M/E3OSatuiYW/HeJC+giFMMHIuAdpWwE6YXddawLeo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com; spf=pass smtp.mailfrom=renesas.com; dkim=pass (1024-bit key) header.d=renesas.com header.i=@renesas.com header.b=pgt1KZ9b; arc=fail smtp.client-ip=52.101.125.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=renesas.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=kQEyTa0YkF+/T8ZIdSUzKKT+IrCph4KfRX4MaHIY0blc3AXFP0EY5NShF2uRelQg44hiiJeYjU1UDAu5F4zX8bugb+ZpeRMIFuOMmX50/wxJ58rDQRR0QYxvjjl4bSm3VBl3AyhryxomLOUP0PYiYOGVRGWjO3erXOCch9WYbwBotes6CrbY0UjLbIkXMtd2qxAyzo6Lqm+fAMb1/AEqvSHwfJQtWOMyH7wiEsf54H19CDBzBxBsRaXqXywVVutD8sCty/s39vJpDcKi6xrQQ3uM2VzsOxwLY0fu+t9ORfQAPK4yYBRE7s3/y0yEP1t2vwxrb2QPL1C42dBvX01Ppg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=2v9SqCll8FDBmEdqCmGa5svvQGZzWdh+OBfnZObKVNE=;
+ b=eUQU2xn8JezgFki/UpGrM3aodtgjLdZhy0ezLfPO0vRMX9VFNU9uohbkvykA5Vtjodl7F/vRoZ70DPUwM3OmOY23PDpbe3rN5SmVbIF3VEQ0HLj8Z0/GdXe2LEkyhgIWLzmVqFIrukALX/nu6iwqGJXIIzE2uh8jPeP/6RK42GJkugcCX12ltqggmZ2/59X8+vZXbo27MfQd2P47EaSETlr4thlttR5wmCkGUXtUun9WCy2ZpVpDdYhlurcMKxFQ07AQNTbYcUwXEGuVhuBxh84VhG+OvNOtvzP9lgztzNAE54PLfewhpaI+GvHsrtXjCewmo7ltOKhzcwxCs51CIA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=renesas.com; dmarc=pass action=none header.from=renesas.com;
+ dkim=pass header.d=renesas.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=renesas.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=2v9SqCll8FDBmEdqCmGa5svvQGZzWdh+OBfnZObKVNE=;
+ b=pgt1KZ9blDiJKaZJoXrbRh/jmYWTB6yCMSngvQ8fJft0eBzspxpnHLjx7MHTmCOcg7ndhOpkZzx9GF1IMhDbs6ERk1LKX2LfA6knpKI29jHL2f/e/enu4oLiPuoyip6A0tIWdrj9E8BwAkJHEA/L8LPb5fQEMszp1kUr4HyxwB4=
+Received: from TY4PR01MB14282.jpnprd01.prod.outlook.com (2603:1096:405:20d::9)
+ by TY3PR01MB11840.jpnprd01.prod.outlook.com (2603:1096:400:407::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.20; Thu, 9 Apr
+ 2026 13:43:42 +0000
+Received: from TY4PR01MB14282.jpnprd01.prod.outlook.com
+ ([fe80::655d:9c47:4499:eb3a]) by TY4PR01MB14282.jpnprd01.prod.outlook.com
+ ([fe80::655d:9c47:4499:eb3a%5]) with mapi id 15.20.9769.041; Thu, 9 Apr 2026
+ 13:43:41 +0000
+From: Michael Dege <michael.dege@renesas.com>
+To: Paolo Abeni <pabeni@redhat.com>
+CC: "paul@pbarker.dev" <paul@pbarker.dev>, niklas.soderlund
+	<niklas.soderlund@ragnatech.se>, "kuba@kernel.org" <kuba@kernel.org>,
+	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
+	<davem@davemloft.net>
+Subject: RE: [net-next,v3,04/13] net: renesas: rswitch: add register
+ definitions for vlan support
+Thread-Topic: [net-next,v3,04/13] net: renesas: rswitch: add register
+ definitions for vlan support
+Thread-Index: AQHcwqCPHg/o4QpEGk++l3HLfVuIO7XWyCkA
+Date: Thu, 9 Apr 2026 13:43:41 +0000
+Message-ID:
+ <TY4PR01MB14282C1DD6A8CCCC6CDAF21C682582@TY4PR01MB14282.jpnprd01.prod.outlook.com>
+References: <20260331-rswitch_add_vlans-v3-4-c37f41b1c556@renesas.com>
+ <20260402125919.234448-1-pabeni@redhat.com>
+In-Reply-To: <20260402125919.234448-1-pabeni@redhat.com>
+Accept-Language: en-US, en-GB
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=renesas.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: TY4PR01MB14282:EE_|TY3PR01MB11840:EE_
+x-ms-office365-filtering-correlation-id: ef6ad6fd-174b-4a0f-1b69-08de963e032e
+x-ld-processed: 53d82571-da19-47e4-9cb4-625a166a4a2a,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|376014|1800799024|7416014|366016|22082099003|56012099003|18002099003|38070700021;
+x-microsoft-antispam-message-info:
+ M3jzSYLshtqG7LRS88hPZRvjhexfNFxhqF3TAnCP+h8aM9Pyn0qb/rZpre530ldcJanddP4DPGhSr1GKfyGfImLOAjIbCk5Y/QibFyMdrefqFFa25xXUhB2ZdDWG00kR6hMn8Nq4TAOr5Cf+aV59bd7deZ6hyyIyy4u96C9P5sw/Y+fJ0T5yFZQ3Wd0pi7JWtuX0G/xRnSuLXHwWbPMSKpREfTW3qNnTW81N939n7A/+txia5VYw2rIjpiB8UHDv+5tbJnLdgtds+kwxRKF09M4/iAA+lCc/aubM7QKoW2HTNRt4UmlcTe+0tIOkpKStix6ELNf/JTFwAUP53zO+SM62mJUL2R0L4ePuKjpG20TR6DC+Y5rbIUzGYy4M1dlfRRpwj6nqBrqVsKJy4IDttrSK1H7gXzB1VCOX/0zJE0sf0qf9ySz3qMgjDyA0nQ2JFNWQqlAHoL7ZLsrTTx/eBkPhDMp8MmtIUGI5zZ0sKMkFjoBfp7wldqpx9vvozqaoPdo04YN0JqbN3p1AjIMfJ1FQjxFc9jjo04XamqpzTB4Z+DuEYzQwmJ3aKAe2VOtHtuqLRsmlNN34rvCg11F0tHtTA7s0hkhz7N5gd5rvlqZHpSvITWSdoglMAF0u8nkobZ9aL6M7kqDNKjWnHCJ+Oc+Uv8Zpr2P2M+7ePrkSzZm3U8b2lYfREdQDM+Q9qz/0mm6fCzYKbJpUhgwy3mqwqZ9CqpINEGBanIz+uL8U3Jg=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TY4PR01MB14282.jpnprd01.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(7416014)(366016)(22082099003)(56012099003)(18002099003)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?1OXy35b6jobTEiEzDPh3LXxcmvbF5KWR2xZbPhfK1Fth499vRsgaq1CJT0Ti?=
+ =?us-ascii?Q?wjufeAkOOde8eAlwoUIKJWkc8v7ERKBQx5tYQtQb6Cnhc8TtB+NftzxZrczs?=
+ =?us-ascii?Q?eaURoCVzEg4ZGyYSH8xuR6SnQdn9d5j/tUKUZXnExrwS+dQkPxuG/aunDjmO?=
+ =?us-ascii?Q?59/9QG0vwguNZuGHD9VTJRflEDSivxZ51CtmnKCZeoBMfksbnRAVSpu04Vb8?=
+ =?us-ascii?Q?LX7rBorNOXRTEy0Xi1JiPFMF8oPauzRSiypqqN81HVpPef/8tNwFLQP0vCSZ?=
+ =?us-ascii?Q?cXmEG7JPh7MektcLsKsoOlgeogGUJeznemJQ388m5l2Ll9kaBZP/zYbFO1QY?=
+ =?us-ascii?Q?S5UgWIW2cLP1iIxrfdwNqT6P+SPTCQrVTqoGrbUL4mq9E3iE8Npfw1TO3IEo?=
+ =?us-ascii?Q?UFV14VeqhDk1LFxEwG+Db/2hT8gbT1KFeGDKCBEE5KGtKxAhtxuFia65FRYK?=
+ =?us-ascii?Q?k2/BFhCGJjgXnxBThrwU5xVS9ySk9UW+PuSr5zvXdMiTfAzkeQIF52Ob1qHg?=
+ =?us-ascii?Q?WaNe0a7+miV0Mzwoz3T2EX63flSRTn5mh7nSiqHHcJlcmowZtveMbnE0O9LV?=
+ =?us-ascii?Q?hh8XIENO7c09dYnaoIy9+87cqe8izldyJduzziwYltI4gbaqi7XwJzTxtTln?=
+ =?us-ascii?Q?1ZCaYg6YNGujK59gahZSzKcBJlDs8DUByBr0PcrX9CIZ/4aHfY6Ta0tlYG4p?=
+ =?us-ascii?Q?3tGa53Fo09XSxJJyKMdCGj6EAfObhHKXf98STe9tJsmqp91DhIUZ6lfHJter?=
+ =?us-ascii?Q?Y5ogp8iRgW3wCAjB3NYp2Duuf12EVa4dhvHFkwxkxf0/GgtFGkdDgijGhYV7?=
+ =?us-ascii?Q?M0L6IcDT9V8Lxy3Pr2KDVJjNfcr5n/Y2vy2wNryOHwFI1s306SSH/2GUQdzn?=
+ =?us-ascii?Q?UhQr2dUClJU5NS8p7DPwDvq3nyAI7fBGms12IrJcJCHQO1ETNfAPmTwrOUjC?=
+ =?us-ascii?Q?vU6MnaDQXVhTvlDzFJigo9Ka8nhjas1bPZMQzWsBkfFCV2DOC+0+7kt32+mr?=
+ =?us-ascii?Q?2+tUjFLkhtsKpvohgGCaE9gO6HV9c3ssIb7SEoKQAH4xIQgDSh3CaXWHngt5?=
+ =?us-ascii?Q?Tl4nC9dBpMsR22my8BM1mlf+KqT078D7ZFma4dGqwqsw1PM+ohBKjhp0Vb8f?=
+ =?us-ascii?Q?2NFBymgln/Kw81Ojp81cnhTTI79fOAx9yTm7M1/AFqmnERL6txLncqBAcTXa?=
+ =?us-ascii?Q?S2kzCyxURAUE3HRKs9jslv+KSS+dddDl6/6/ACUeAIUE0RgM30yJeW9kTfWu?=
+ =?us-ascii?Q?Zb0hSw0Eyzo7U7zqrqXzOhodq5xGxY9bN8GDA/cHJiU/Nv1aH9wY+RzU72Og?=
+ =?us-ascii?Q?QVJoLnbmiJHuO2meMSmFWuCqOuVx+HCAos48B4uDlS3MWDr0Aqn9/pfWLwp1?=
+ =?us-ascii?Q?mPPfBw4lpMWwj+gyQZMMuZQW8oZVJPEZckC42bgZEaJurcZDzgouP8WvS3PA?=
+ =?us-ascii?Q?n4FvjxBPsakaI3ALTM1NI8IsN6+txDPYI5OwJbTPKDaeQZcQ4MSZru2UaoS3?=
+ =?us-ascii?Q?gIlM8jkuBVWz6nHgzNeAd3Gj5NurEaFzmdorQl25VVOLk+0Ks8GaQ0yjGSoN?=
+ =?us-ascii?Q?SLFo7TM5shHgJJVT9uOvf3boy5xINQgJL1GQNAEMKKXTni/rb6rzvr1qlnyw?=
+ =?us-ascii?Q?7uG2Fovfjhr9P4GYUyROh+8c2zHHk10MSFFYYXO7mOI6b2DBaKLIjfJddNaN?=
+ =?us-ascii?Q?ePtuv7NMH8hNpuLS06z1ol+0fhL2L3N6vrBjJ8iiHGP9Bjy9pSaOgfXxZ878?=
+ =?us-ascii?Q?tXqdWqEiFQ=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v11 03/14] net: Add lease info to queue-get
- response
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, davem@davemloft.net,
- razor@blackwall.org, pabeni@redhat.com, willemb@google.com, sdf@fomichev.me,
- john.fastabend@gmail.com, martin.lau@kernel.org, jordan@jrife.io,
- maciej.fijalkowski@intel.com, magnus.karlsson@intel.com, dw@davidwei.uk,
- toke@redhat.com, yangzhenze@bytedance.com, wangdongdong.6@bytedance.com
-References: <20260402231031.447597-1-daniel@iogearbox.net>
- <20260402231031.447597-4-daniel@iogearbox.net>
- <20260407204017.3fc79d1b@kernel.org>
- <b9a046f8-cb02-4d54-9a7e-e8213339d720@iogearbox.net>
- <20260408151251.72bd2482@kernel.org>
-Content-Language: en-US
-From: Daniel Borkmann <daniel@iogearbox.net>
-Autocrypt: addr=daniel@iogearbox.net; keydata=
- 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
-In-Reply-To: <20260408151251.72bd2482@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Virus-Scanned: Clear (ClamAV 1.4.3/27966/Thu Apr  9 08:24:43 2026)
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-OriginatorOrg: renesas.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: TY4PR01MB14282.jpnprd01.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ef6ad6fd-174b-4a0f-1b69-08de963e032e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Apr 2026 13:43:41.8164
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 53d82571-da19-47e4-9cb4-625a166a4a2a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Lj5vCU3cZV10VxK8RD2JHF+mgVNUVhTDGMOPPppm7fdDRkjCHS/REd/4fHqlW8OrklBAtXDxh2JSdWKp7TWc2z1tzzdfFRTAY2tC1xr6pD4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: TY3PR01MB11840
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[iogearbox.net,reject];
-	R_DKIM_ALLOW(-0.20)[iogearbox.net:s=default2302];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[renesas.com,none];
+	R_DKIM_ALLOW(-0.20)[renesas.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-277013-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,blackwall.org,redhat.com,google.com,fomichev.me,gmail.com,kernel.org,jrife.io,intel.com,davidwei.uk,bytedance.com];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-277014-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[renesas.com:+];
+	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[iogearbox.net:+];
+	FROM_NEQ_ENVFROM(0.00)[michael.dege@renesas.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7A4603CB903
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,TY4PR01MB14282.jpnprd01.prod.outlook.com:mid,ragnatech.se:email,lunn.ch:email,davemloft.net:email,pbarker.dev:email,renesas.com:dkim,renesas.com:email]
+X-Rspamd-Queue-Id: AE8563CB8EE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 4/9/26 12:12 AM, Jakub Kicinski wrote:
-> On Wed, 8 Apr 2026 11:09:34 +0200 Daniel Borkmann wrote:
->>>> +void netif_put_rx_queue_lease_locked(struct net_device *orig_dev,
->>>> +				     struct net_device *dev)
->>>> +{
->>>> +	if (orig_dev != dev)
->>>> +		netdev_unlock(dev);
->>>> +}
->>>
->>> Pretty sure I already complained about these ugly helpers.
->>> I'll try to find the time tomorrow to come up with something better.
->>
->> Ok, sounds good. Happy to adapt if you find something better and then I'll
->> work this into the series, and also integrate the things mentioned in my
->> cover letter reply (netkit nl dump + additional tests).
-> 
-> Hi! How would you feel about something like the following on top?
-> 
-> --->8----------
-> 
-> net: remove the netif_get_rx_queue_lease_locked() helpers
-> 
-> The netif_get_rx_queue_lease_locked() API hides the locking
-> and the descend onto the leased queue. Making the code
-> harder to follow (at least to me). Remove the API and open
-> code the descend a bit. Most of the code now looks like:
-> 
->   if (!leased)
->       return __helper(x);
-> 
->   hw_rxq = ..
->   netdev_lock(hw_rxq->dev);
->   ret = __helper(x);
->   netdev_unlock(hw_rxq->dev);
-> 
->   return ret;
-> 
-> Of course if we have more code paths that need the wrapping
-> we may need to revisit. For now, IMHO, having to know what
-> netif_get_rx_queue_lease_locked() does is not worth the 20LoC
-> it saves.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Thanks for looking into it! That looks good to me. I've also retested that
-it still works.
+Hello Paolo,
 
-Maybe small nits could be below to move the netif_is_queue_leasee into the
-netdev_rx_queue.h header since its used outside of core and it might be
-worth to also have the lock assertion in netdev_queue_get_dma_dev.
+Thank you for the review comments.
 
-Do you want me to add your patch on top for a v12 of the series?
+> -----Original Message-----
+> From: Paolo Abeni <pabeni@redhat.com>
+> Sent: Thursday, April 2, 2026 2:59 PM
+> To: Michael Dege <michael.dege@renesas.com>
+> Cc: paul@pbarker.dev; niklas.soderlund <niklas.soderlund@ragnatech.se>; k=
+uba@kernel.org; Yoshihiro
+> Shimoda <yoshihiro.shimoda.uh@renesas.com>; netdev@vger.kernel.org; linux=
+-kernel@vger.kernel.org;
+> edumazet@google.com; pabeni@redhat.com; linux-renesas-soc@vger.kernel.org=
+; andrew+netdev@lunn.ch;
+> davem@davemloft.net
+> Subject: Re: [net-next,v3,04/13] net: renesas: rswitch: add register defi=
+nitions for vlan support
+>
+> This is an AI-generated review of your patch. The human sending this emai=
+l has considered the AI
+> review valid, or at least plausible.
+>
+> For local reproduction steps see
+> https://netdev-ai.bots.linux.dev/ai-
+> local.html&data=3D05%7C02%7Cmichael.dege%40renesas.com%7Caf9485ccd5524c5f=
+84e908de90b7afa0%7C53d82571da19
+> 47e49cb4625a166a4a2a%7C0%7C0%7C639107315768063102%7CUnknown%7CTWFpbGZsb3d=
+8eyJFbXB0eU1hcGkiOnRydWUsIlYi
+> OiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7=
+C%7C&sdata=3DK9VAYytiJjTcdyrv98
+> jVvkUrYLDTdRFL3HPzVLwEm1s%3D&reserved=3D0
+> ---
+> net: renesas: rswitch: add register definitions for vlan support
+>
+> This commit adds missing register and bit definitions for vlan support in=
+ the Renesas R-Switch driver.
+>
+> > diff --git a/drivers/net/ethernet/renesas/rswitch.h
+> > b/drivers/net/ethernet/renesas/rswitch.h
+> > index 340524d995ac..15d3fa48b0e3 100644
+> > --- a/drivers/net/ethernet/renesas/rswitch.h
+> > +++ b/drivers/net/ethernet/renesas/rswitch.h
+>
+> [ ... ]
+>
+> > @@ -847,6 +903,98 @@ enum rswitch_gwca_mode {
+> >  #define FWMACAGC_MACAGOG   BIT(28)
+> >  #define FWMACAGC_MACDESOG  BIT(29)
+> >
+> > +//FWMACTL0
+>
+> [ ... ]
+>
+> > +// FWVLANTEM
+> > +#define VLANTUEN           GENMASK(28, 16)
+> > +#define VLANTEN                    GENAMSK(12, 0)
+>                                 ^^^^^^^^
+>
+> Is GENAMSK a typo? The correct macro is GENMASK, as used on the line imme=
+diately above for VLANTUEN.
+> GENAMSK is not defined in the kernel and will cause compilation errors if=
+ VLANTEN is used.
 
-Thanks,
-Daniel
+Yes, this was a typo. Will be fixed in the next version
 
-  include/net/netdev_rx_queue.h | 2 ++
-  net/core/dev.h                | 1 -
-  net/core/netdev_queues.c      | 2 ++
-  net/xdp/xsk.c                 | 2 --
-  4 files changed, 4 insertions(+), 3 deletions(-)
+Best regards,
 
-diff --git a/include/net/netdev_rx_queue.h b/include/net/netdev_rx_queue.h
-index 9415a94d333d..e9f7f098609b 100644
---- a/include/net/netdev_rx_queue.h
-+++ b/include/net/netdev_rx_queue.h
-@@ -76,6 +76,8 @@ struct netdev_rx_queue *
-  __netif_get_rx_queue_lease(struct net_device **dev, unsigned int *rxq,
-  			   enum netif_lease_dir dir);
-  
-+bool netif_is_queue_leasee(const struct net_device *dev);
-+
-  int netdev_rx_queue_restart(struct net_device *dev, unsigned int rxq);
-  void netdev_rx_queue_lease(struct netdev_rx_queue *rxq_dst,
-  			   struct netdev_rx_queue *rxq_src);
-diff --git a/net/core/dev.h b/net/core/dev.h
-index 376bac4a82da..95edb2d4eff8 100644
---- a/net/core/dev.h
-+++ b/net/core/dev.h
-@@ -101,7 +101,6 @@ int netdev_queue_config_validate(struct net_device *dev, int rxq_idx,
-  
-  bool netif_rxq_has_mp(struct net_device *dev, unsigned int rxq_idx);
-  bool netif_rxq_is_leased(struct net_device *dev, unsigned int rxq_idx);
--bool netif_is_queue_leasee(const struct net_device *dev);
-  
-  void __netif_mp_uninstall_rxq(struct netdev_rx_queue *rxq,
-  			      const struct pp_memory_provider_params *p);
-diff --git a/net/core/netdev_queues.c b/net/core/netdev_queues.c
-index 5597af86591b..73fb28087a93 100644
---- a/net/core/netdev_queues.c
-+++ b/net/core/netdev_queues.c
-@@ -40,6 +40,8 @@ struct device *netdev_queue_get_dma_dev(struct net_device *dev,
-  	struct netdev_rx_queue *hw_rxq;
-  	struct device *dma_dev;
-  
-+	netdev_ops_assert_locked(dev);
-+
-  	/* Only RX side supports queue leasing today. */
-  	if (type != NETDEV_QUEUE_TYPE_RX || !netif_rxq_is_leased(dev, idx))
-  		return __netdev_queue_get_dma_dev(dev, idx);
-diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-index 616cd7b42502..7da620aa11d6 100644
---- a/net/xdp/xsk.c
-+++ b/net/xdp/xsk.c
-@@ -31,8 +31,6 @@
-  #include <net/netdev_rx_queue.h>
-  #include <net/xdp.h>
-  
--#include "../core/dev.h"
--
-  #include "xsk_queue.h"
-  #include "xdp_umem.h"
-  #include "xsk.h"
--- 
-2.43.0
-
+Michael
+>
+> > +
+> > +// FWVLANTS
+>
+> [ ... ]
 
 
