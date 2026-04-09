@@ -1,170 +1,165 @@
-Return-Path: <netdev+bounces-276767-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276768-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UOYPAMgB12l3KggAu9opvQ
-	(envelope-from <netdev+bounces-276767-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 03:32:56 +0200
+	id EBtyF9cF12mdKggAu9opvQ
+	(envelope-from <netdev+bounces-276768-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 03:50:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FD033C53F3
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 03:32:55 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 076FD3C5544
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 03:50:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1E4CE3011A50
-	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 01:32:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 75198300C00B
+	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 01:50:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D9C22E764D;
-	Thu,  9 Apr 2026 01:32:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BBEC34D916;
+	Thu,  9 Apr 2026 01:50:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YlhMBosz"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VY8M9GRs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 242C62E7635
-	for <netdev@vger.kernel.org>; Thu,  9 Apr 2026 01:32:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 199FE1D5ADE
+	for <netdev@vger.kernel.org>; Thu,  9 Apr 2026 01:50:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775698372; cv=none; b=FcdDQoUwhPz9Q2OJ12Du99Gy0ly5Byz6P6Om8v3vK1HDoVy2dXQmS6Tsd7Pealz9lsN/by3vlWeOOLV+ZJtu1yS7OMTzyHNEw4lHZNdvBw69LVWitTtiqdL7yE2UTjDP3PuDFKyrYfMKq4y3BP0BNzp2FqArR3ti8kyv52NkTgs=
+	t=1775699411; cv=none; b=ggUx6JB4x1Ct4majCm1nS45fUeFwq+0DFknbOt8+vU4JDu2p//E4Fcu/SRpxIXl3TZ9B/lyj1N+46DLL4RPujKJWrKlcAwcWSfg5dMdxTLl9avWh3liQ/bKNHPPVtAe0OiQDoBVt6zQKHYouHDWRfi+0/CyHC6APSVQxiyTcxkU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775698372; c=relaxed/simple;
-	bh=ceurvPD39uZmHE7ZYdMljcXED72ZrKuWYWfD67F9jN8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=UA9q/c2ycBQVS3JtweptkT6+hJVCkQrVmyJiChZhDBosOmOaii1gNNfM7EwkUkOpBpn6locvGMLGX+X2lukIIwptdzbixIt4ZkoY8O+6zbFBsmcQ+bCOUrgYq3NJ8JTk2LdATCzRufNxwkX3gNc0Z5gin+TUbpBMSGEFXKqgx+c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YlhMBosz; arc=none smtp.client-ip=209.85.219.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-89fc349b5ceso6067476d6.3
-        for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 18:32:49 -0700 (PDT)
+	s=arc-20240116; t=1775699411; c=relaxed/simple;
+	bh=GhfndPD4+OKCpF/SdEHNOJ9ZS7SHzh1F9MEHZdeuVuA=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=XQuts5Kzpn3RjFKBAN1hc6FJgHlMoz9Mrk+BNcf+stORJ/8YAbywGrJTikdV4+Ud8jCK2A/1MEw5XWIwGa3YAdR02xvKbwmTSyNTZ85vs9Na5ArRMcfjRLQVIzNFlgIb8LD54nQJ0I31b+gePYQwvNsOxrSK9ZUpdZ5TEWEzuMs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VY8M9GRs; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2b242b9359aso3810675ad.0
+        for <netdev@vger.kernel.org>; Wed, 08 Apr 2026 18:50:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775698369; x=1776303169; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=YmlLOlUfJ6gKKRXnCcVenCQOaaM3E2xjVjNERB+O5uE=;
-        b=YlhMBoszOyfNkLK8a0iUlX5ugTskv5BeK0APHX7+6hrgTU5NiKNJde1AJIFDzQ3dyd
-         w3nT83Igq5FfX8RQAF4yljdCwjEJYhY0NqZuMvsShpJVSTQzJvjAf6HGjDHWB5MJWAk2
-         jhXBzCPlJtmyv5cWr6igQTamlasatTKFntB0gHVhb3K2uPCW9/a5LAfPR3M6+E30zTGW
-         h/+Vun2E45OZ6+2R5ngZOa/kVZtrVloO5gObKoqUmi7/JBx1/fLvmsjqPcqo5Q14pAou
-         wc51sbLX/Rqa7eoCrSqUaDf76HtHy3Exg7IFfykhuer1gzAuHyrra5PIxP9eYzXlu60+
-         t60g==
+        d=google.com; s=20251104; t=1775699409; x=1776304209; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IjzeQXG7bo5x2g7969Mw9H4IWYa/nql9R5zj42Bkizk=;
+        b=VY8M9GRs7Io5RZqFoYkZz+8toiH9N9GQswxQTsvSAF6gObNlV/5tyIghwj5rPMqHOO
+         4REWq4ojnx0X7HHIrSGqVdeEJMvyKHJlO5ZMvCisReqVWCTBOM0zyr1nBC4or3HB8ElF
+         Rs91UhvOIEPt9R3+DVRFbG/rxYTQqEc9qJUpuuICDwyd10C1J/wXSUozgG5/vujfFPHt
+         OkMba0Yk7P/opfo8RYv8pEwz+IpdHKLImS0XhU8P/FlTc7ESYwoSZzGALXKb6YEkL/+z
+         KwgFnOetIAetzY6n6eHOW2kL36LUGW9jdPhFGPdGinhvHquZ35PPUb3fFnLJk9q7mUsS
+         776Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775698369; x=1776303169;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YmlLOlUfJ6gKKRXnCcVenCQOaaM3E2xjVjNERB+O5uE=;
-        b=Xm8PKOZNAve6qfkiTdG8bdrKQ8y6wO+EebupwLMgdGSUFg1bue7MHgYF0oe2h6Fz/q
-         PwXQdpkpv9Rq+pqQadpR13oXYwUenNfMwacKZ5Qg828JFO1NDUDYtRI9t+eQQrqSQQfA
-         ovPuaR3UBhmyujYd50VmFtIu4ZmSyxQoRqK11qs2E5N2jzqXYH2e0c3RYv5CL/eJAC0l
-         Nn1OxYEmT03612TuLjBQPLQjy5xZI2rGwgUUtE6vR1uCIwgTtko5wI9CdkY28s7gnS0E
-         umox6cQXtJFFH0NBbubGqU8Veegkbck8pHw4WnacmpYY1E2TAbyeGvNqjjps42fw7puY
-         +aqg==
-X-Gm-Message-State: AOJu0YwFXVEKqlR371n53fzDnMGv+JJD0dwhkxWtrv2B6vQU4m1oIYJ4
-	pp07Id6s1BuYIRyC3oAf9E8e4S5aAxkZfJY0+SaPx/S9XMvpER+LQy4KH65VTKGJ
-X-Gm-Gg: AeBDiet0zxxRcTH36T9Tk1KzJJN0T4uksnXuD5fjh+kJvsIvUerEvfItpkgERproFkV
-	K99Obvi+o/CX6TkAFd63DwrwA2cKBQCULW6Fz+cy38xuL1EFC0IvVUSjRWH5XNjYX+Y3ESNxn2O
-	Yr7xNjjmbxnOcwyOZ2TSD76tOwCiwrhl1pPUEV4SDr6eppO2myJFEIOBLeKPvB9w1GwCSoecB+2
-	oT2oDQXzkKV4+/BYQy/rsHo+XM2zQMxp8cMEgnZamBBM5lJuqHAF9V3rCkfIrQsiQbA0Bv078zv
-	967OLDkQtzfERrGiqxnsMEVvYqEgYxegDIa+J7uiZZK+mOVr6ek3XpnvmpSzS8CuoovS3fttzgL
-	SY/si238qhk0zIPoAxrz3Al/1nal6Qu/Qhmuax1Ve1rCJATIFNtXhPWQQ2V3Hf9zoAAn7r19nCz
-	Baerk3IeexXX4vMghmrxoEGSA2N4/FInvTOb1xcH/5+UCNS6EOBwo1Bbdru/c7LQBauPj2fsGKG
-	4Z+/jz9mi4UCql2+NDyaOK4Ka3dt6hG6RPWXKs=
-X-Received: by 2002:ad4:5c4c:0:b0:8a5:104b:e37b with SMTP id 6a1803df08f44-8ac7441cc2dmr30872916d6.42.1775698368709;
-        Wed, 08 Apr 2026 18:32:48 -0700 (PDT)
-Received: from TDC4045031631.e0cglfehwr0e5gttmepj3hi3hf.ux.internal.cloudapp.net ([20.63.37.123])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8a593cec807sm186681866d6.19.2026.04.08.18.32.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Apr 2026 18:32:48 -0700 (PDT)
-From: Ashutosh Desai <ashutoshdesai993@gmail.com>
-To: netdev@vger.kernel.org
-Cc: linux-hams@vger.kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	linux-kernel@vger.kernel.org,
-	Ashutosh Desai <ashutoshdesai993@gmail.com>
-Subject: [PATCH] rose: fix OOB read on short CLEAR REQUEST frames.
-Date: Thu,  9 Apr 2026 01:32:46 +0000
-Message-Id: <20260409013246.2051746-1-ashutoshdesai993@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20251104; t=1775699409; x=1776304209;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=IjzeQXG7bo5x2g7969Mw9H4IWYa/nql9R5zj42Bkizk=;
+        b=sgPgqpkhdd28sV+5E8kHeyDWfBgQZbvqUh2K/z4PSWVWk0NpD/MKW0uq3C+xf3ob1f
+         dnxHwmNTSb4f7u9+Ezw0hkknp3v/T78RXT9FF9FpMtNyBD/lwaJ8JXytUfZmTkk1RigI
+         M1ogIDrZAPOHg8TlBg5ZIQKA6sutEIu6dGiUZzomRW9O/ob3grj7YUyha+5RA/P3IeWR
+         seZoc09QF2FrsY4u7KID549Fh1x92rQM+/H0T7vehgCaOu4U71w2f7DT4D5xtADK+OBL
+         H545unAdj9+nDdMTeF4lKKS4jK8ouR+mlJLUYeF/vxhdxp7IR6ehWb43PU8j2XpjLNjD
+         r/QQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXlzKTHuCe6jiwgaJ+MhjXUKWRZ+HdZrywVTiESxWxROkQylUfsHPXCc4Hekk9/wKx1b6iAJww=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxaQVGCxrg7B8Kc7h/SQHX7GDWOyT4voWsE9zLNSildTBkWQR6/
+	fGIBuB5iQzuB+tUFFBY+CMmkuxWenhcr8yZfZ65oMYDbg5ix4HqexW2h6e+86m0Nh3uKqQUptx6
+	LjVpBrQ==
+X-Received: from pfop2.prod.google.com ([2002:a05:6a00:b42:b0:829:a228:6330])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:3946:b0:398:8f38:441a
+ with SMTP id adf61e73a8af0-39fc7ba75d7mr2248165637.0.1775699409147; Wed, 08
+ Apr 2026 18:50:09 -0700 (PDT)
+Date: Thu,  9 Apr 2026 01:48:59 +0000
+In-Reply-To: <CANkEMgk16j2xzQ85JGQ4OWqeiwiVO5Gy-UfkN3omKkKizpLxiQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Mime-Version: 1.0
+References: <CANkEMgk16j2xzQ85JGQ4OWqeiwiVO5Gy-UfkN3omKkKizpLxiQ@mail.gmail.com>
+X-Mailer: git-send-email 2.53.0.1213.gd9a14994de-goog
+Message-ID: <20260409015007.3741559-1-kuniyu@google.com>
+Subject: Re: [PATCH net-next v6 00/10] Decouple receive and transmit
+ enablement in team driver
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: marcharvey@google.com
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	horms@kernel.org, jiri@resnulli.us, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, shuah@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-276767-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ashutoshdesai993@gmail.com,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-276768-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 6FD033C53F3
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 076FD3C5544
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-rose_process_rx_frame() dispatches to state machines after calling
-rose_decode(), but does not verify the frame is long enough before
-doing so. All five state machine handlers read skb->data[3] and
-skb->data[4] (cause and diagnostic bytes) when handling a
-ROSE_CLEAR_REQUEST frame, yet the only upstream length check is
-ROSE_MIN_LEN (3 bytes) in rose_route_frame().
+From: Marc Harvey <marcharvey@google.com>
+Date: Wed, 8 Apr 2026 17:10:05 -0700
+> On Wed, Apr 8, 2026 at 9:40=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
+rote:
+> >
+> > It pains me to report on non-debug kernels:
+>=20
+> I'm sorry to have pained you. Despite my best efforts to run with the
+> exact same environment and conditions as your CI, my teamd can be
+> killed with "teamd -k" but yours hangs (both are version 1.32 on
+> Fedora with the same kernel config).
 
-A crafted 3-byte ROSE CLEAR REQUEST frame (bytes: GFI/LCI-high,
-LCI-low, 0x13) passes the minimum length gate and reaches the state
-machines, where skb->data[3] and skb->data[4] are read one and two
-bytes past the valid buffer respectively.
+Considering the subsequent "kill" works on the dbg instance (thanks
+to 2400s timeout), I guess teamd is somehow stuck at SIGTERM handling
+removing team devices in teamd_port_remove_all().  (SIGTERM being masked
+sounds unlikely)
 
-Add a check in rose_process_rx_frame() that drops any CLEAR REQUEST
-frame shorter than 5 bytes (3-byte header + cause + diagnostic),
-covering all five state machines with a single guard.
+https://netdev-ctrl.bots.linux.dev/logs/vmksft/bonding-dbg/results/593802/4=
+-teamd-activebackup-sh/stdout
+https://netdev-ctrl.bots.linux.dev/logs/vmksft/bonding-dbg/results/593802/4=
+-teamd-activebackup-sh/stderr
+---8<---
+[  759.819815][T21724] test_team1: Port device eth1 removed
+[  759.822323][T21724] test_team1: Port device eth0 removed
+[  790.615687][T21728] test_team2: Port device eth1 removed
+[  790.617445][T21728] test_team2: Port device eth0 removed
+---8<---
 
-Signed-off-by: Ashutosh Desai <ashutoshdesai993@gmail.com>
----
- net/rose/rose_in.c | 5 +++++
- 1 file changed, 5 insertions(+)
+Adding -N and letting "ip netns del" release the last netns refcnt
+and defer device destruction to cleanup_net() may help.
 
-diff --git a/net/rose/rose_in.c b/net/rose/rose_in.c
-index 0276b393f..1ac9a6aee 100644
---- a/net/rose/rose_in.c
-+++ b/net/rose/rose_in.c
-@@ -271,6 +271,11 @@ int rose_process_rx_frame(struct sock *sk, struct sk_buff *skb)
- 
- 	frametype = rose_decode(skb, &ns, &nr, &q, &d, &m);
- 
-+	if (frametype == ROSE_CLEAR_REQUEST && skb->len < 5) {
-+		kfree_skb(skb);
-+		return 0;
-+	}
-+
- 	switch (rose->state) {
- 	case ROSE_STATE_1:
- 		queued = rose_state1_machine(sk, skb, frametype);
--- 
-2.34.1
 
+> For v7, I=E2=80=99ll invoke "teamd -k"
+> using the timeout utility, or just increase the test timeout.
+
++1 for the latter, maybe set timeout=3D300.
+
+daemon_pid_file_kill_wait(SIGTERM, 30) * 2 =3D 120s, but just in case.
+
+See these files for howto:
+
+  $ find tools/testing/selftests/net/ -name settings
 
