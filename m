@@ -1,214 +1,110 @@
-Return-Path: <netdev+bounces-276831-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276833-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ELuYKOoY12ldKwgAu9opvQ
-	(envelope-from <netdev+bounces-276831-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 05:11:38 +0200
+	id oCzIC2oZ12ldKwgAu9opvQ
+	(envelope-from <netdev+bounces-276833-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 05:13:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82E8E3C5F86
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 05:11:38 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89A243C5FE0
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 05:13:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 427C9301A758
-	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 03:11:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3933E3010BAD
+	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 03:13:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 175A236F405;
-	Thu,  9 Apr 2026 03:11:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BC7F35F191;
+	Thu,  9 Apr 2026 03:13:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="t0MXfqE6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="thY2AZoL"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90F7A2BD030;
-	Thu,  9 Apr 2026 03:11:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 699AB30AABE
+	for <netdev@vger.kernel.org>; Thu,  9 Apr 2026 03:13:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775704290; cv=none; b=CaJ+AUHCf0WEkEQOwD+2L6P5O86pfUrOoQHN9ST3kQJDPMntKu4Lgd5kH6ei7FygfQ8zDk+lt4n+0iUgbZFGZjlMgupyo34AhqMo5FWbPhZN7o8dm1L4DaR9dh/PDVWpiRtsusnvX4tUI2xJyVm1H3YDq6W9uZ1z/EhrQz5rXN8=
+	t=1775704423; cv=none; b=GTU3wVN4iBhLArJpqv8RkdjGiu71fK5+aXUpL0G9/g5MXB8aByzNUPhS9H6bZ/Ebj63UfOparFBEHyiWrTxFDegCnSY8Vs1ze/aWhIF/VLPGJT9p0SJMFIWbwGDraemteuF1oTGCBzY9ybMO0/qZ7jwFuhxgl2dfk7zRrukWM/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775704290; c=relaxed/simple;
-	bh=u+ofVgFYlIIA4dK5MTz51iYII9YuqUbVQmVZ8NyRVdo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hNmMqfSB0jRnb2qHfm8ECfIyZAo3N4TjLzAxcWNifCpTeeL/jQoUNnD6hwRbs+/Ua+kbOpWCQHW6FjElE+MdJTYDzufggzXMbEPfy/99MpGQStfbMP0eBmIsg0q3Vx7PwDtU8o+8h7aShEywVUUSa/xo0oFztElOX5eo8dxcae4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=t0MXfqE6; arc=none smtp.client-ip=91.218.175.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1775704286;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IVxHTlgXIaRT3RCJ9lceVoj0EL96Eiqshlb13XnKKOI=;
-	b=t0MXfqE6DPvuAFDmNTAZYrZ+dGdbeddzNP/B5sNG1ijdwWwvJl0jjRkcNL7z+L1LWaF3oB
-	c0Vsj1xlfL6pWz6ojyprO3wGmqxYTjQNXvcI6xin945bgWk7mLwxoTRO5wtfEdOCrClBqY
-	KDryxb4zTnUz0LxPu8kET4j65TEd3kI=
-From: Qingfang Deng <qingfang.deng@linux.dev>
-To: linux-ppp@vger.kernel.org,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Michal Ostrowski <mostrows@gmail.com>,
-	Qingfang Deng <qingfang.deng@linux.dev>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Kees Cook <kees@kernel.org>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Paul Mackerras <paulus@ozlabs.org>,
-	Jaco Kroon <jaco@uls.co.za>,
-	James Carlson <carlsonj@workingcode.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>,
-	Marcin Szycik <marcin.szycik@linux.intel.com>,
-	Guillaume Nault <gnault@redhat.com>
-Subject: [PATCH net v3 2/2] pppoe: drop PFC frames
-Date: Thu,  9 Apr 2026 11:11:02 +0800
-Message-ID: <20260409031107.616630-2-qingfang.deng@linux.dev>
-In-Reply-To: <20260409031107.616630-1-qingfang.deng@linux.dev>
-References: <20260409031107.616630-1-qingfang.deng@linux.dev>
+	s=arc-20240116; t=1775704423; c=relaxed/simple;
+	bh=WdHbPodKdp11GGlUGgi0bX6m31nOEGTKa2NRrA4PuJw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=g0ndxzQ1jYHfpBeH+/Vkj55OvI98Y0orE643x3CYMxOtqh0PsVPrj/I6zst2M1DD6RhakrgYIZonKpvLy+0lYXQhsse7oRuhYbV6PwIOrthhSM/yzrs4OudCFZdmhocXLq3RpTEvsttzO4bmY2uMB9xf1Bw+c1yy/lJxjdWnzjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=thY2AZoL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E50BC2BC87;
+	Thu,  9 Apr 2026 03:13:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775704423;
+	bh=WdHbPodKdp11GGlUGgi0bX6m31nOEGTKa2NRrA4PuJw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=thY2AZoLbzVe3yfk2v20AUpxW1dYpLcr5x9tcWLBVe9mQo1D3doArgBjPTi/iG3PT
+	 +2eDji5Aufnh9yWhiQq8gl+XvVDJ3VwrgskYnFZLUj/1/j/HGIYBSNVztELXLRkGa7
+	 T2IKDJKc06fKqgOG2ryV8A/Lgw6aKKgPIHrf4NLLtO0digSTyGWWa422TK3WeuBt/4
+	 ngJ1lfJIhBEJJ56/aeycw+HS3QFVMJMB0Q2DtuDJA32mz5TWf1h5e2VBXd/71gjxVC
+	 dQb0KogwcPieb2w1+fMxiv5QyT8jKcatDh8tKtu5RibzEcv1+KpkAXm5fPP4rOW0DI
+	 NJ5bSEfYQhKug==
+Date: Wed, 8 Apr 2026 20:13:41 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Louis Scalbert <louis.scalbert@6wind.com>
+Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, jv@jvosburgh.net,
+ edumazet@google.com, pabeni@redhat.com, fbl@redhat.com, andy@greyhouse.net,
+ shemminger@vyatta.com, maheshb@google.com
+Subject: Re: [PATCH net v3 0/5] bonding: 3ad: fix carrier state with no
+ valid slaves
+Message-ID: <20260408201341.68f31247@kernel.org>
+In-Reply-To: <20260408152353.276204-1-louis.scalbert@6wind.com>
+References: <20260408152353.276204-1-louis.scalbert@6wind.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [0.84 / 15.00];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-276831-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,linux.dev,linutronix.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[qingfang.deng@linux.dev,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-276833-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux.dev:dkim,linux.dev:email,linux.dev:mid]
-X-Rspamd-Queue-Id: 82E8E3C5F86
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 89A243C5FE0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-RFC 2516 Section 7 states that Protocol Field Compression (PFC) is NOT
-RECOMMENDED for PPPoE. In practice, pppd does not support negotiating
-PFC for PPPoE sessions, and the current PPPoE driver assumes an
-uncompressed (2-byte) protocol field. However, the generic PPP layer
-function ppp_input() is not aware of the negotiation result, and still
-accepts PFC frames.
+On Wed,  8 Apr 2026 17:23:48 +0200 Louis Scalbert wrote:
+> The current behavior is not compliant with the LACP standard. This
+> patchset introduces a working behavior that is not strictly
+> standard-compliant either, but is widely adopted across the industry.
+> It consists of bringing the bonding master interface down to signal to
+> upper-layer processes that it is not usable.
 
-If a peer with a broken implementation or an attacker sends a frame with
-a compressed (1-byte) protocol field, the subsequent PPP payload is
-shifted by one byte. This causes the network header to be 4-byte
-misaligned, which may trigger unaligned access exceptions on some
-architectures.
-
-To reduce the attack surface, drop PPPoE PFC frames. Introduce
-ppp_skb_is_compressed_proto() helper function to be used in both
-ppp_generic.c and pppoe.c to avoid open-coding.
-
-Fixes: 224cf5ad14c0 ("ppp: Move the PPP drivers")
-Signed-off-by: Qingfang Deng <qingfang.deng@linux.dev>
----
-Changes in v3:
- Fix kdoc warning
- Link to v2: https://lore.kernel.org/netdev/20260408024245.312732-1-qingfang.deng@linux.dev/
-
- drivers/net/ppp/ppp_generic.c |  2 +-
- drivers/net/ppp/pppoe.c       |  8 +++++++-
- include/linux/ppp_defs.h      | 16 ++++++++++++++++
- 3 files changed, 24 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ppp/ppp_generic.c b/drivers/net/ppp/ppp_generic.c
-index cb29a6968c63..eb1503b389ef 100644
---- a/drivers/net/ppp/ppp_generic.c
-+++ b/drivers/net/ppp/ppp_generic.c
-@@ -2251,7 +2251,7 @@ ppp_do_recv(struct ppp *ppp, struct sk_buff *skb, struct channel *pch)
-  */
- static void __ppp_decompress_proto(struct sk_buff *skb)
- {
--	if (skb->data[0] & 0x01)
-+	if (ppp_skb_is_compressed_proto(skb))
- 		*(u8 *)skb_push(skb, 1) = 0x00;
- }
- 
-diff --git a/drivers/net/ppp/pppoe.c b/drivers/net/ppp/pppoe.c
-index 1ac61c273b28..4cd10c908711 100644
---- a/drivers/net/ppp/pppoe.c
-+++ b/drivers/net/ppp/pppoe.c
-@@ -393,7 +393,7 @@ static int pppoe_rcv(struct sk_buff *skb, struct net_device *dev,
- 	if (skb_mac_header_len(skb) < ETH_HLEN)
- 		goto drop;
- 
--	if (!pskb_may_pull(skb, sizeof(struct pppoe_hdr)))
-+	if (!pskb_may_pull(skb, PPPOE_SES_HLEN))
- 		goto drop;
- 
- 	ph = pppoe_hdr(skb);
-@@ -403,6 +403,12 @@ static int pppoe_rcv(struct sk_buff *skb, struct net_device *dev,
- 	if (skb->len < len)
- 		goto drop;
- 
-+	/* skb->data points to the PPP protocol header after skb_pull_rcsum.
-+	 * Drop PFC frames.
-+	 */
-+	if (ppp_skb_is_compressed_proto(skb))
-+		goto drop;
-+
- 	if (pskb_trim_rcsum(skb, len))
- 		goto drop;
- 
-diff --git a/include/linux/ppp_defs.h b/include/linux/ppp_defs.h
-index 45c0947fa404..6e9587ce651c 100644
---- a/include/linux/ppp_defs.h
-+++ b/include/linux/ppp_defs.h
-@@ -8,8 +8,24 @@
- #define _PPP_DEFS_H_
- 
- #include <linux/crc-ccitt.h>
-+#include <linux/skbuff.h>
- #include <uapi/linux/ppp_defs.h>
- 
- #define PPP_FCS(fcs, c) crc_ccitt_byte(fcs, c)
- 
-+/**
-+ * ppp_skb_is_compressed_proto - checks if PPP protocol in a skb is compressed
-+ * @skb: skb to check
-+ *
-+ * Check if the PPP protocol field is compressed (the least significant
-+ * bit of the most significant octet is 1). skb->data must point to the PPP
-+ * protocol header.
-+ *
-+ * Return: Whether the PPP protocol field is compressed.
-+ */
-+static inline bool ppp_skb_is_compressed_proto(const struct sk_buff *skb)
-+{
-+	return unlikely(skb->data[0] & 0x01);
-+}
-+
- #endif /* _PPP_DEFS_H_ */
--- 
-2.43.0
-
+Is the only problem the compliance? If so I don't think this qualifies
+as a fix. Please drop the Fixes tags and repost for net-next. Please
+keep in mind the 24h reposting period (also I need some time tomorrow
+to queue your patch to the CI so that the selftest passes when v4 is
+posted :()
 
