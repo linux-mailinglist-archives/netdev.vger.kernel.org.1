@@ -1,87 +1,53 @@
-Return-Path: <netdev+bounces-276807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276798-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MGumMRIV12k1KwgAu9opvQ
-	(envelope-from <netdev+bounces-276807-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 04:55:14 +0200
+	id 8AXiIsUU12kSKwgAu9opvQ
+	(envelope-from <netdev+bounces-276798-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 04:53:57 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6047D3C5C4B
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 04:55:14 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2B223C5C09
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 04:53:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 94D3E307B435
-	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 02:52:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E7B533032666
+	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 02:51:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 917D936E47E;
-	Thu,  9 Apr 2026 02:51:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EFCB36CDEB;
+	Thu,  9 Apr 2026 02:51:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="TzcZC6Li"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LO+zZ4Ew"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A6B0363C60;
-	Thu,  9 Apr 2026 02:51:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BD0E36AB5A;
+	Thu,  9 Apr 2026 02:51:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775703096; cv=none; b=L31tIvhYRWYoa4Ek4dx08aVjAHMcYm5gZNNakf8Iv5ZJSQh/snfbnQaH/T9kTkOCU0XXg5GRrxN8Cz5vHE8DmqgTOuwcCtJthq7DMZvNSqs9pvKgZRrS0qpJdwQaJomyqdy7bFOGyvOP8Zz4M88scd0e110OUb66dmo7yGgglhI=
+	t=1775703074; cv=none; b=pwbDMej5GQDvm2B83aDPzbz4S8twSVz8aQ23uMyEhZ0dDSBOoyUXE6bxU3IPKeGk8C3iPCZBa4d17KDMHJbtL4ggu1Ab6wnE0eJrcxJi+6CCaf3mqvnnn1jA6w5unGyLBLSwa8udQGFvSWvz3l78MJtgI+VZJKcYqXNFkJFJyoY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775703096; c=relaxed/simple;
-	bh=bku4H/UZEGyHFNNbB/622394p04bXiZq69x3ssX7pBE=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=K1wdNFE5w6UKcoyNpmdXsbsidd02ejR9SR1uhfbIdWjYC74T6DRMO1P+MspelzzAg0aLRsvtxzqK+SRqghpGSn13o0Dq/OcyL0T+4TM1pjUj/9YBh2CRFEMIF8Y2udFQUmK4IO5jEycDkQwFLbEamRB1iZ54PVxwBHWJ07WITQo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=TzcZC6Li; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 638NZmAJ2130824;
-	Wed, 8 Apr 2026 19:51:22 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=z
-	L9edTtQ+I8yjFW5xTW3OLUVfsJ015crBPbFIlBj9qU=; b=TzcZC6LirTV8phCqM
-	SNdnu5dvQAgO4xh5IPTbFnnpDk6dvjabE10Tj/2UAnVkGQb9dBf1FYVX8+w42cHa
-	jmBvtDXfHi6lGI9/lBj7vPH4XA9fWi/XzvjZRJ1hrFDW6PLOcNGzTJIk6gH8G+4t
-	vZxYw8UySmFMwitAuoGY0Cz2QxSt2/MrXbaeH4JQ3SlD5l/yK4Yc43SvdGQKwzMv
-	66M7Ld3oFB0x8uZf8ljpaXuOQUQoCy7pV40QkWirmKX12X5//9IaEXGA9e9kgncn
-	WbY/NQd/xDNmsaFi2LPtO6P8GBCfkhblAvFX/fksgFE00bPitTVB3typZPz26ytC
-	Yunmw==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4de0u40b65-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 08 Apr 2026 19:51:22 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Wed, 8 Apr 2026 19:51:21 -0700
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Wed, 8 Apr 2026 19:51:20 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Wed, 8 Apr 2026 19:51:20 -0700
-Received: from rkannoth-OptiPlex-7090.. (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with ESMTP id 628FA3F7055;
-	Wed,  8 Apr 2026 19:51:14 -0700 (PDT)
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-rdma@vger.kernel.org>
-CC: <sgoutham@marvell.com>, <andrew+netdev@lunn.ch>, <davem@davemloft.net>,
-        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-        <donald.hunter@gmail.com>, <horms@kernel.org>, <jiri@resnulli.us>,
-        <chuck.lever@oracle.com>, <matttbe@kernel.org>, <cjubran@nvidia.com>,
-        <saeedm@nvidia.com>, <leon@kernel.org>, <tariqt@nvidia.com>,
-        <mbloch@nvidia.com>, <dtatulea@nvidia.com>,
-        Ratheesh Kannoth
-	<rkannoth@marvell.com>
-Subject: [PATCH v11 net-next 2/7] net/mlx5e: heap-allocate devlink param values
-Date: Thu, 9 Apr 2026 08:20:50 +0530
-Message-ID: <20260409025055.1664053-3-rkannoth@marvell.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260409025055.1664053-1-rkannoth@marvell.com>
-References: <20260409025055.1664053-1-rkannoth@marvell.com>
+	s=arc-20240116; t=1775703074; c=relaxed/simple;
+	bh=uxreZopNNdkf+5l4WGyB8d1qFwXSiZYyfTnqUiaaRQ0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Y9+4cdJP5Qujb1UGP/IRAG6B+7oqMyNBLX0oEODc7BgMGvvqpK02l2qk44AN9ha2e6EElbCGIpjR7esDbKOrfkGRnyIye4PG3hhSg2wpTZkovTwQ0Ktnxe3NjzWO4K/0glnCBg2U6wXGWdPNN7PLVKaXuZJiGfxTqXUyjJQWhGQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LO+zZ4Ew; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C71EC19421;
+	Thu,  9 Apr 2026 02:51:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775703074;
+	bh=uxreZopNNdkf+5l4WGyB8d1qFwXSiZYyfTnqUiaaRQ0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=LO+zZ4Ew7hBkZhdDH4oyr1iYA6oHPH0xIsBdFrhMvAgH0y1UtL03hY5zlNlIIqpIk
+	 fJ4EM1lcV+t80V9gUCEjJsGVTdpDrXd7HfdOjMoqtlgYwAhNMmknV2RGGJTEwLTcsG
+	 YDqBb+H8jn6xvcrt9m85i9a6zbvsKTeFjl4nemuckIrTKQ/TKz/Wq1H2JPmyXZGfdk
+	 jReGBpmxNxFxoJXCp41eBTW3nL9lvknBwNFjaYRTTNAAR9K4oS0ydgU30APamsRSfg
+	 ZtlfSnPASBjZ7HwXiZt8gHMQNf12AP/ql8mQvXR703DGFphTCBjghAaQhkhWB0chUY
+	 jsmxZ4HoMAsGQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CF0B3930793;
+	Thu,  9 Apr 2026 02:50:51 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,106 +55,73 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=KpN9H2WN c=1 sm=1 tr=0 ts=69d7142a cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=A5OVakUREuEA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
- a=qit2iCtTFQkLgVSMPQTB:22 a=M5GUcnROAAAA:8 a=aWKQy79EXxaKdZR1qOkA:9
- a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-ORIG-GUID: 55a1UyUvQqd1LmMOeFFaEqMGAOA77sCq
-X-Proofpoint-GUID: 55a1UyUvQqd1LmMOeFFaEqMGAOA77sCq
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDA5MDAyNCBTYWx0ZWRfX0PNc0M5ZTOar
- B1sOPQ8JLU9lYgYlngK80i178NpuounK3Gu2l68KGTL4WEnGASsVK+0Ypdh+jQP9IVxEoZwrHFg
- ewGdKrdHc9F8XUHVCOON+NgETDYPIyU/n9FWdo1RsFhWX2l1k9zCTU4dHGSxcUBKlDp9/HDxsji
- NNEpkqZ9qpAeP3R8WeoIMExp/Wu+kfrTLdRSjirp8ZIIljdav0zzjcVs+S8bDWn+VVbUsWJcbOG
- f7PaFs4CHCUne6cIVzBcKKNonJO1cknK69UsVi4GjTvac7GnkyW2up59ag2uLTIYz7nAW/G3wub
- ZNysRiFgOGhKNfmWcglC0Xz+W/J9zgjGKVJ76gI+0YDGtgD8xk2Sdl30aw7SKj56onuGBefMeeq
- uXeG3mudcXiaqK8TUJG4JUrIUVnXs3UH4SaL0gLbQpXYF4N7FqyqH1xc1IafLTpgYcxA+JrPPXy
- lLCGKEIH5Bkqo1y5Mtg==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-04-08_07,2026-04-08_01,2025-10-01_01
-X-Spamd-Result: default: False [0.84 / 15.00];
+Subject: Re: [PATCH] MAINTAINERS: Add Prashanth as additional maintainer for
+ amd-xgbe driver
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177570305030.968772.14804179031968447185.git-patchwork-notify@kernel.org>
+Date: Thu, 09 Apr 2026 02:50:50 +0000
+References: <20260406073816.3218387-1-Raju.Rangoju@amd.com>
+In-Reply-To: <20260406073816.3218387-1-Raju.Rangoju@amd.com>
+To: Raju Rangoju <Raju.Rangoju@amd.com>
+Cc: linux-kernel@vger.kernel.org, pabeni@redhat.com, kuba@kernel.org,
+ edumazet@google.com, davem@davemloft.net, andrew+netdev@lunn.ch,
+ netdev@vger.kernel.org, PrashanthKumar.K.R@amd.com
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[marvell.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,resnulli.us,oracle.com,nvidia.com];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-276807-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-276798-lists,netdev=lfdr.de,netdevbpf];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[marvell.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[marvell.com:dkim,marvell.com:email,marvell.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
+	FROM_NO_DN(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.997];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[9]
-X-Rspamd-Queue-Id: 6047D3C5C4B
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,amd.com:email]
+X-Rspamd-Queue-Id: E2B223C5C09
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-union devlink_param_value grows when U64 array params
-are added to devlink. Keeping a four-element array of that
-union on the stack in mlx5e_pcie_cong_get_thresh_config()
-then trips -Wframe-larger-than=1280. Allocate the temporary
-values with kcalloc() and free them on success and
-error paths.
+Hello:
 
-Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
----
- .../ethernet/mellanox/mlx5/core/en/pcie_cong_event.c  | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/pcie_cong_event.c b/drivers/net/ethernet/mellanox/mlx5/core/en/pcie_cong_event.c
-index 2eb666a46f39..f02995552129 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/pcie_cong_event.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/pcie_cong_event.c
-@@ -259,15 +259,21 @@ mlx5e_pcie_cong_get_thresh_config(struct mlx5_core_dev *dev,
- 		MLX5_DEVLINK_PARAM_ID_PCIE_CONG_OUT_HIGH,
- 	};
- 	struct devlink *devlink = priv_to_devlink(dev);
--	union devlink_param_value val[4];
-+	union devlink_param_value *val;
-+
-+	val = kcalloc(4, sizeof(*val), GFP_KERNEL);
-+	if (!val)
-+		return -ENOMEM;
- 
- 	for (int i = 0; i < 4; i++) {
- 		u32 id = ids[i];
- 		int err;
- 
- 		err = devl_param_driverinit_value_get(devlink, id, &val[i]);
--		if (err)
-+		if (err) {
-+			kfree(val);
- 			return err;
-+		}
- 	}
- 
- 	config->inbound_low = val[0].vu16;
-@@ -275,6 +281,7 @@ mlx5e_pcie_cong_get_thresh_config(struct mlx5_core_dev *dev,
- 	config->outbound_low = val[2].vu16;
- 	config->outbound_high = val[3].vu16;
- 
-+	kfree(val);
- 	return 0;
- }
- 
+On Mon, 6 Apr 2026 13:08:16 +0530 you wrote:
+> Add Prashanth as an additional maintainer for the amd-xgbe Ethernet
+> driver to help with ongoing development and maintenance.
+> 
+> Cc: Prashanth Kumar K R <PrashanthKumar.K.R@amd.com>
+> Signed-off-by: Raju Rangoju <Raju.Rangoju@amd.com>
+> ---
+>  MAINTAINERS | 1 +
+>  1 file changed, 1 insertion(+)
+
+Here is the summary with links:
+  - MAINTAINERS: Add Prashanth as additional maintainer for amd-xgbe driver
+    https://git.kernel.org/netdev/net/c/30f3b767aed4
+
+You are awesome, thank you!
 -- 
-2.43.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
