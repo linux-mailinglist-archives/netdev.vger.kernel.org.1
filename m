@@ -1,182 +1,113 @@
-Return-Path: <netdev+bounces-277058-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277059-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4GFpNu/M12mrTAgAu9opvQ
-	(envelope-from <netdev+bounces-277058-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 17:59:43 +0200
+	id IIJJIyXN12mrTAgAu9opvQ
+	(envelope-from <netdev+bounces-277059-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 18:00:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BAFC3CD40F
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 17:59:43 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47F1F3CD435
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 18:00:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A8320307BBEF
-	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 15:52:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BD6B231550CA
+	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 15:52:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0A5D3BAD93;
-	Thu,  9 Apr 2026 15:51:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 350BF32D0DE;
+	Thu,  9 Apr 2026 15:52:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20251104.gappssmtp.com header.i=@davidwei-uk.20251104.gappssmtp.com header.b="dF23tueO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="riZz5TH4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f50.google.com (mail-dl1-f50.google.com [74.125.82.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A5F93DE44C
-	for <netdev@vger.kernel.org>; Thu,  9 Apr 2026 15:51:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 792EE2C027C;
+	Thu,  9 Apr 2026 15:52:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775749876; cv=none; b=XhMiF3v4N1uxeyTM6pNE3cWbr/H3yYLX3Znnk5ZVmYQnjqXSUsgn1jxlBc+9tV8UdlKP72Tt+8ThHetYDEN6D9i7STWEk7FVLH9LDStTwKr/uLRulh4Avv+L2Hh66tTGod8uIj6Qhcq/zFZJCCp2MpbUr6ROgbwf08xjQGy7cbU=
+	t=1775749928; cv=none; b=auf+v1XDLfCCU5en4imluXUH7GX/0OF1MhzpnMTxqrcJX4E4PFW8oKHTGxAbO4TaH05FymySc/YIfqmNqHdUpQjSKgR883RLSxYOGqaYHaB6IXEQoEbZv2Inzd8J9tbGWdPyD19uPFOkSSZGcbivOxsbshXxfElyuRLj7s4JxCM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775749876; c=relaxed/simple;
-	bh=mmJ06jy2TRAp9JHZtaaPZH8WfhjCq9loxOBon8M6vkY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=FHoDVDZCRmYp265+/Ewrf7HN8wiwk6vRYrvaFwXPgstrzXNQ3+abBWgvazouE3l+rI71/emJqBeuXDZoXkNJmWbaAoOK/7MbB4UZbDxgs9ovJqn9aiJrV8xDsyJtEPEOt58qSYjuN8dgJ9nBH4BAjA5VD4KfSWP1etsFqIgieKw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20251104.gappssmtp.com header.i=@davidwei-uk.20251104.gappssmtp.com header.b=dF23tueO; arc=none smtp.client-ip=74.125.82.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-dl1-f50.google.com with SMTP id a92af1059eb24-126ea4b77adso8868022c88.1
-        for <netdev@vger.kernel.org>; Thu, 09 Apr 2026 08:51:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20251104.gappssmtp.com; s=20251104; t=1775749873; x=1776354673; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=T7WsOe+EtDka5xrwHY8lzBfWh7cNZdwWw52ogv0Oxzc=;
-        b=dF23tueOID13zmpYbWd3K3IUQ1qljkVr7cwhBPd72Ix5XS0gCV+xVt/jVJNKM96vEg
-         cCzc4fLRdzoU2USsy6M8gArmtcmte6BTtMTT9QkESrflJfrUme1y4BEK7L//35mDrRq5
-         2+QhMGRNQSyVpiajvz33G6WeYOWk+yjQQE7CSYfW23bCdXxLruavBBe7rDfrHJtgoHlV
-         bK7MMQ9ZBEwMGGlnbljEVdwCxj6/y7HVJQ16e1KmWQM0BmrGowRRfZIn7E3bUew6Xu3b
-         N3cm/g1iiqka+Hicuzx9YumcphM7yA8gdzbeaO/Wi1XfZuWzDlYF69EUxcXIg/K0MNfG
-         nSOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775749873; x=1776354673;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=T7WsOe+EtDka5xrwHY8lzBfWh7cNZdwWw52ogv0Oxzc=;
-        b=au+9UKlT4rEbjZ2bQzRWYWjLudGwNVDQYxSpcjErDyZeeVYFko2GtVsx0csDglRhAM
-         zcTzI1aAyuOBONdSfzF9XEbyMsTHYxwddV6HqhY9DZJNXX7PP6wS89NPLv+/v2ItI8ME
-         SR1JrsB9+iKHqFKEq3rOYSKZHzyoUXsj7ll9V9Fv75ySdyNGS7OVV08VTBoPQMg0RtCs
-         BeYg5VspRT/VcpsZOnGKRjqqNl0FlY3sSadmPM8D+Rnrxz6neX7ByFNwc3uLzOHvGjs9
-         ClZ5WWyn4yC9pE27ZHf7DJCln1jUMuj4Mo/nT/CGQFtxRJ/syMH8W1S+7REOHKkKC4Wo
-         wJxA==
-X-Forwarded-Encrypted: i=1; AJvYcCVZ3g06bzrIcYWZlpJre6jRFKib5dFjj+QGgyE6W704nC5YICerUbGQ3l7Fun/H1zbr4OKiLlI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxBOJYzl7/VyPObjEgv0V69qqU694q5QfqHSDj99Ww9jRVU7V9Z
-	3nmohdR51wJzL5tkBEFmv0Jq/oD8LF4kBGEx+s4X/dfbZW6qrlVf+Wr7uiUfzCdrsMrhSUb1rAa
-	TyLwY
-X-Gm-Gg: AeBDieva1c1vrgarkxX0+a5gD5BG38MzY+JvUdCOBfss2hbN/jGXuwlud7cs8VPOnYR
-	DOJz93U4YrwTceep1AA1VtkZaQSB2ZixQbAU0K4hqzLxXZtjW+1mnuD+ccvCXnhv3mK/oNv1VgY
-	pnixoqNBtoLwzGGCPkcvhO7QfRuRhQHkSm2BqriRf/ExKZ0z8URja92nBOSmx70yagFkHrE+oXC
-	yeqZbuQ13Hm6xP9JID3nQJVpAryIa7F/z4+EYaqsJK/cJtj9PIxb+YYz+DZAy3oPOMyaxfvDNHl
-	xl3AYhjh/ehAheHrIna/5qHM8yFZpsnQMjxvm7iFxsr+J+AlC/BG85aolhKDRXdU8AvctfJIxFr
-	QKgRGSP09G928bsBDZMGqMCeLdotPrVdVfT6RkPr4Qp3uU6ZCrtavyGAhEVhrfIRGAai66/zhpP
-	hS0ayQvnUqtYfbW+X2z5XDyZr+r2JKRqhZsPFTUYC9Q2FZCqnaFgy0UhIwTTUWKFtwyyWJInR6t
-	bAqUaWkTBOeo7RkpaiM7cmZ
-X-Received: by 2002:a05:7022:62aa:b0:127:3f2a:af21 with SMTP id a92af1059eb24-12bfb70eae1mr12688196c88.15.1775749873001;
-        Thu, 09 Apr 2026 08:51:13 -0700 (PDT)
-Received: from ?IPV6:2a03:83e0:1156:1:c8f:b917:4342:fa09? ([2620:10d:c090:500::3:da93])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12c14a371b1sm12556215c88.13.2026.04.09.08.51.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 Apr 2026 08:51:12 -0700 (PDT)
-Message-ID: <8fa08d73-28a3-4521-bcfb-ec81869c24f3@davidwei.uk>
-Date: Thu, 9 Apr 2026 08:51:11 -0700
+	s=arc-20240116; t=1775749928; c=relaxed/simple;
+	bh=XUnp5KXSWx68sIpIEYzrg3KYEexlITMdS0Ff00KI95k=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=LpC2zLpi4JBteAEqgkklITMovvNqW9EWxg0BozkwT8/kVlKKEe3Hh8AqUOOt74Iuk7zlx7Sh+MXyaOWHeg8jAvEMRzdLpQOe0FJLDrkXDzrcz/S5MzhALcd5pCuQbpzyA/uybgl7rsS2xZV/F5FKioMJgU3kaJclrlRyKhzEMx8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=riZz5TH4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA183C4CEF7;
+	Thu,  9 Apr 2026 15:52:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775749927;
+	bh=XUnp5KXSWx68sIpIEYzrg3KYEexlITMdS0Ff00KI95k=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=riZz5TH4+WW/JDo7DSk1mc+dkIHjWZIM6CbBD+VChOKfxz/cKGPKVMldgC2RkD6Fn
+	 makr9yF+7lCLkuz7oDfUittdevGiqGXF39I6l17yZlL0Wg6kliQGsSVWcOX0eR7k75
+	 JfQCnQb+kBnPmxqwCAkqr6OsjljIN1z449qMcbRE1Np4s6TF865wmPd69vVcd2y+lw
+	 HIZMH7CENhI8wZ5J3TOyM1WBW5nP37/3WsX3oCHjW7VeB9lAns3KlXYy89BLWAckg7
+	 jETvqSguzj4Uf3h5IX9kf/X2/bKcLiXdeTsbTjTxrOCdjNVySh4UZ5hjp2itj+rKzd
+	 QfgpKYsd7Tscg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id BA0C439308AD;
+	Thu,  9 Apr 2026 15:51:44 +0000 (UTC)
+Subject: Re: [GIT PULL] Networking for v7.0-rc8
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20260409143217.456564-1-pabeni@redhat.com>
+References: <20260409143217.456564-1-pabeni@redhat.com>
+X-PR-Tracked-List-Id: <netdev.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20260409143217.456564-1-pabeni@redhat.com>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-7.0-rc8
+X-PR-Tracked-Commit-Id: b4afe3fa76a88ee7d3d8802b43fde89aa02f8e0d
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: a55f7f5f29b32c2c53cc291899cf9b0c25a07f7c
+Message-Id: <177574990336.1627667.183796140525083179.pr-tracker-bot@kernel.org>
+Date: Thu, 09 Apr 2026 15:51:43 +0000
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/5] selftests: net: add multithread client support to
- iou-zcrx
-To: Juanlu Herrero <juanlu@fastmail.com>, netdev@vger.kernel.org
-References: <20260408163816.2760-1-juanlu@fastmail.com>
- <20260408163816.2760-3-juanlu@fastmail.com>
-Content-Language: en-US
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <20260408163816.2760-3-juanlu@fastmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[davidwei-uk.20251104.gappssmtp.com:s=20251104];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-277058-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWO(0.00)[2];
-	FREEMAIL_TO(0.00)[fastmail.com,vger.kernel.org];
-	DMARC_NA(0.00)[davidwei.uk];
-	DKIM_TRACE(0.00)[davidwei-uk.20251104.gappssmtp.com:+];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-277059-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NO_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dw@davidwei.uk,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[pr-tracker-bot@kernel.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[davidwei-uk.20251104.gappssmtp.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 4BAFC3CD40F
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 47F1F3CD435
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 2026-04-08 09:38, Juanlu Herrero wrote:
-> Add pthreads to the iou-zcrx client so that multiple connections can be
-> established simultaneously. Each client thread connects to the server
-> and sends its payload independently.
-> 
-> Introduce struct thread_ctx and the -t option to control the number of
-> threads (default 1), preserving backwards compatibility with existing
-> tests.
-> 
-> Signed-off-by: Juanlu Herrero <juanlu@fastmail.com>
-> ---
->   .../testing/selftests/drivers/net/hw/Makefile |  2 +-
->   .../selftests/drivers/net/hw/iou-zcrx.c       | 46 +++++++++++++++++--
->   2 files changed, 44 insertions(+), 4 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/drivers/net/hw/Makefile b/tools/testing/selftests/drivers/net/hw/Makefile
-> index deeca3f8d080..227adfec706c 100644
-> --- a/tools/testing/selftests/drivers/net/hw/Makefile
-> +++ b/tools/testing/selftests/drivers/net/hw/Makefile
-> @@ -80,5 +80,5 @@ include ../../../net/ynl.mk
->   include ../../../net/bpf.mk
->   
->   ifeq ($(HAS_IOURING_ZCRX),y)
-> -$(OUTPUT)/iou-zcrx: LDLIBS += -luring
-> +$(OUTPUT)/iou-zcrx: LDLIBS += -luring -lpthread
->   endif
-> diff --git a/tools/testing/selftests/drivers/net/hw/iou-zcrx.c b/tools/testing/selftests/drivers/net/hw/iou-zcrx.c
-> index 334985083f61..de2eea78a5b6 100644
-> --- a/tools/testing/selftests/drivers/net/hw/iou-zcrx.c
-> +++ b/tools/testing/selftests/drivers/net/hw/iou-zcrx.c
-> @@ -4,6 +4,7 @@
->   #include <error.h>
->   #include <fcntl.h>
->   #include <limits.h>
-> +#include <pthread.h>
->   #include <stdbool.h>
->   #include <stdint.h>
->   #include <stdio.h>
-> @@ -85,8 +86,14 @@ static int cfg_send_size = SEND_SIZE;
->   static struct sockaddr_in6 cfg_addr;
->   static unsigned int cfg_rx_buf_len;
->   static bool cfg_dry_run;
-> +static int cfg_num_threads = 1;
->   
->   static char *payload;
-> +
-> +struct thread_ctx {
-> +	int			thread_id;
+The pull request you sent on Thu,  9 Apr 2026 16:32:17 +0200:
 
-This is set here and in patch 4 but I don't see it being used.
+> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-7.0-rc8
+
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/a55f7f5f29b32c2c53cc291899cf9b0c25a07f7c
+
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
 
