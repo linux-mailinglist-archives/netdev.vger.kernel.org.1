@@ -1,53 +1,68 @@
-Return-Path: <netdev+bounces-276830-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276832-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kIVMKtEY12lXKwgAu9opvQ
-	(envelope-from <netdev+bounces-276830-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 05:11:13 +0200
+	id EGC9ExwZ12ldKwgAu9opvQ
+	(envelope-from <netdev+bounces-276832-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 05:12:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 530F93C5F5B
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 05:11:13 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id C52393C5FBB
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 05:12:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id B3DC3300B5AC
-	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 03:11:12 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DB2D03037C0F
+	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 03:11:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E597836E494;
-	Thu,  9 Apr 2026 03:11:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0949371067;
+	Thu,  9 Apr 2026 03:11:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U52Z5gYZ"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fp3ci9Ta"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF7A5283C89;
-	Thu,  9 Apr 2026 03:11:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36B93371D11
+	for <netdev@vger.kernel.org>; Thu,  9 Apr 2026 03:11:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775704268; cv=none; b=dyfXBlnJwl0unJX/Y5UyQZ8H80/F7SzPnJDSYvOC+SCA5cP0myAFjXZrGMiKmFbNL2U7deJ8t0dFLn9MtnPXLTECPmME11GCTV567SfbobkpBMLcF8OMRsoRsqH86uJZCqHkJFQfUn8SSmlBhxx0nfvwPdtE7c+g92Fre6NvA8Y=
+	t=1775704292; cv=none; b=uKcQJ3KR1OnCtS4C1iQwbn2VtwjompH64QMw+idhkV41JlC9POPXQjk15iVLRcbB6XTH1+vFxPVitAWx3fTtqPVeFDL5HSyY+4BtojnWtyEsG02PhpC7p+RFCLVXY/yfEplY64lZXkvt9ynwDxk3JjGq/E7/JSdfPA8EAspwNa0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775704268; c=relaxed/simple;
-	bh=vhO89C65ftvx49gMiDTfTu64UlsVk0MtZwfzqWwu/SY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=NzmXT8ZPbm4FcegNCYvUDsRUX2cFw64b/YTb2g49bexQNnG6m8bKwZM2yEUTdi1P9mGENLehYebX7ukRHK5cwKg3YmDMMcUAw86dc/MYfFJF/y9+K9LCVqlBcIGiY1D9RntrB/oftM4xQrnm56XcCKxRicXGwfSE7LekWtchG/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U52Z5gYZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52281C19421;
-	Thu,  9 Apr 2026 03:11:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775704268;
-	bh=vhO89C65ftvx49gMiDTfTu64UlsVk0MtZwfzqWwu/SY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=U52Z5gYZLbQr3xZbqtBvdfG8lbDCtSkapzDqQ0KNfg2sXHcM+pdygFjz1edaxjrop
-	 y+FYpFl8C1vFI6GIMQH+UWPPnmuqTslMMeZnM1rFCaUi5xvDThZ1GI20fBtS2yaxvp
-	 dyXW5XJ97JfvU9HONqOr0woLDq6P9eZNbTa0AUjgaaGekWTxdjBlwK9zGSURMnGZ0K
-	 AVX5DemHpG1pbfjzT9YjKDZg11yutCOwmPI+pYL1hqDc5Co6Emh5IQi9TgBO3OM7mW
-	 kyxVLNM57K7/0GiaTXl0N+TpWdBxpvtaFSR7DUK+0bpN3HJkYrwUNk5ftatTwW3Z9d
-	 bg6xFi0gkQB8w==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B9FF2393079A;
-	Thu,  9 Apr 2026 03:10:45 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1775704292; c=relaxed/simple;
+	bh=1GI+9d6w9kCMMnw522osxQF8zM+1ix2WSToIN+kEM8g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aoz4sm9URFHAmnsju+fT6/81+9CiyURlUcSRoA5uMlk7AcG/yl2NXX3qbfv+hypm7SfUOWWUVb+daP3VB/HcvEzcLriwkhNonMa+svGiy71QEmH3ocZfEGNv+UrTmGQOLn+hRPi/67hJSJZH1bLIdRmWZWwlKE77gN2TYxTnPlY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fp3ci9Ta; arc=none smtp.client-ip=91.218.175.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1775704278;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Tv6vsULYE0pHAd8RGACfd9FryCGoTn/hw/neSKOVTiM=;
+	b=fp3ci9TaSz7TnO4LHZpSluouaJgddH1w3KOW2ilM0GzrasFC/MRI1PZz5Y/bMs0S1FE3nP
+	Ujn9SkGXtMuqSlVlvcWo/pg7IdrAl7e4rdKG4myBrkL+2PYlXRbvgznLWLQhe7bDqJYQ8e
+	gADSv9nCl5RVzbd21NDAvPqSh8BH2sw=
+From: Qingfang Deng <qingfang.deng@linux.dev>
+To: linux-ppp@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Qingfang Deng <qingfang.deng@linux.dev>,
+	Guillaume Nault <gnault@redhat.com>,
+	Wojciech Drewek <wojciech.drewek@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: Paul Mackerras <paulus@ozlabs.org>,
+	Jaco Kroon <jaco@uls.co.za>,
+	James Carlson <carlsonj@workingcode.com>,
+	Marcin Szycik <marcin.szycik@linux.intel.com>
+Subject: [PATCH net v3 1/2] flow_dissector: do not dissect PPPoE PFC frames
+Date: Thu,  9 Apr 2026 11:11:01 +0800
+Message-ID: <20260409031107.616630-1-qingfang.deng@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,105 +70,202 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next V5 00/12] devlink: add per-port resource support
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177570424453.975519.14430257685849148487.git-patchwork-notify@kernel.org>
-Date: Thu, 09 Apr 2026 03:10:44 +0000
-References: <20260407194107.148063-1-tariqt@nvidia.com>
-In-Reply-To: <20260407194107.148063-1-tariqt@nvidia.com>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, horms@kernel.org,
- donald.hunter@gmail.com, jiri@resnulli.us, corbet@lwn.net,
- skhan@linuxfoundation.org, saeedm@nvidia.com, leon@kernel.org,
- mbloch@nvidia.com, shuah@kernel.org, matttbe@kernel.org,
- chuck.lever@oracle.com, cjubran@nvidia.com, ohartoov@nvidia.com,
- moshe@nvidia.com, dtatulea@nvidia.com, daniel.zahka@gmail.com,
- shshitrit@nvidia.com, cratiu@nvidia.com, jacob.e.keller@intel.com,
- parav@nvidia.com, ajayachandra@nvidia.com, shayd@nvidia.com, kees@kernel.org,
- danielj@nvidia.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-kselftest@vger.kernel.org, gal@nvidia.com
+X-Migadu-Flow: FLOW_OUT
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-276830-lists,netdev=lfdr.de,netdevbpf];
-	FREEMAIL_CC(0.00)[google.com,kernel.org,redhat.com,lunn.ch,davemloft.net,gmail.com,resnulli.us,lwn.net,linuxfoundation.org,nvidia.com,oracle.com,intel.com,vger.kernel.org];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[36];
+	TAGGED_FROM(0.00)[bounces-276832-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NO_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	RCVD_COUNT_THREE(0.00)[3];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[qingfang.deng@linux.dev,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 530F93C5F5B
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:dkim,linux.dev:email,linux.dev:mid]
+X-Rspamd-Queue-Id: C52393C5FBB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello:
+RFC 2516 Section 7 states that Protocol Field Compression (PFC) is NOT
+RECOMMENDED for PPPoE. In practice, pppd does not support negotiating
+PFC for PPPoE sessions, and the flow dissector driver has assumed an
+uncompressed frame until the blamed commit.
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+During the review process of that commit [1], support for PFC is
+suggested. However, having a compressed (1-byte) protocol field means
+the subsequent PPP payload is shifted by one byte, causing 4-byte
+misalignment for the network header and an unaligned access exception
+on some architectures.
 
-On Tue, 7 Apr 2026 22:40:55 +0300 you wrote:
-> Hi,
-> 
-> This series by Or adds devlink per-port resource support.
-> See detailed description by Or below [1].
-> 
-> Regards,
-> Tariq
-> 
-> [...]
+The exception can be reproduced by sending a PPPoE PFC frame to an
+ethernet interface of a MIPS board, with RPS enabled, even if no PPPoE
+session is active on that interface:
 
-Here is the summary with links:
-  - [net-next,V5,01/12] devlink: Refactor resource functions to be generic
-    https://git.kernel.org/netdev/net-next/c/7be3163c49b2
-  - [net-next,V5,02/12] devlink: Add port-level resource registration infrastructure
-    https://git.kernel.org/netdev/net-next/c/6f38acfed5ed
-  - [net-next,V5,03/12] net/mlx5: Register SF resource on PF port representor
-    https://git.kernel.org/netdev/net-next/c/4be8326d817e
-  - [net-next,V5,04/12] netdevsim: Add devlink port resource registration
-    https://git.kernel.org/netdev/net-next/c/085b234b28cc
-  - [net-next,V5,05/12] devlink: Add dump support for device-level resources
-    https://git.kernel.org/netdev/net-next/c/11636b550eea
-  - [net-next,V5,06/12] devlink: Include port resources in resource dump dumpit
-    https://git.kernel.org/netdev/net-next/c/810b76394d69
-  - [net-next,V5,07/12] devlink: Add port-specific option to resource dump doit
-    https://git.kernel.org/netdev/net-next/c/7511ff14f30d
-  - [net-next,V5,08/12] selftest: netdevsim: Add devlink port resource doit test
-    https://git.kernel.org/netdev/net-next/c/396135377104
-  - [net-next,V5,09/12] devlink: Document port-level resources and full dump
-    https://git.kernel.org/netdev/net-next/c/170e160a0e7c
-  - [net-next,V5,10/12] devlink: Add resource scope filtering to resource dump
-    https://git.kernel.org/netdev/net-next/c/1bc45341a6ea
-  - [net-next,V5,11/12] selftest: netdevsim: Add resource dump and scope filter test
-    https://git.kernel.org/netdev/net-next/c/2a8e91235254
-  - [net-next,V5,12/12] devlink: Document resource scope filtering
-    https://git.kernel.org/netdev/net-next/c/78c327c1728d
+$ 0   : 00000000 80c40000 00000000 85144817
+$ 4   : 00000008 00000100 80a75758 81dc9bb8
+$ 8   : 00000010 8087ae2c 0000003d 00000000
+$12   : 000000e0 00000039 00000000 00000000
+$16   : 85043240 80a75758 81dc9bb8 00006488
+$20   : 0000002f 00000007 85144810 80a70000
+$24   : 81d1bda0 00000000
+$28   : 81dc8000 81dc9aa8 00000000 805ead08
+Hi    : 00009d51
+Lo    : 2163358a
+epc   : 805e91f0 __skb_flow_dissect+0x1b0/0x1b50
+ra    : 805ead08 __skb_get_hash_net+0x74/0x12c
+Status: 11000403        KERNEL EXL IE
+Cause : 40800010 (ExcCode 04)
+BadVA : 85144817
+PrId  : 0001992f (MIPS 1004Kc)
+Call Trace:
+[<805e91f0>] __skb_flow_dissect+0x1b0/0x1b50
+[<805ead08>] __skb_get_hash_net+0x74/0x12c
+[<805ef330>] get_rps_cpu+0x1b8/0x3fc
+[<805fca70>] netif_receive_skb_list_internal+0x324/0x364
+[<805fd120>] napi_complete_done+0x68/0x2a4
+[<8058de5c>] mtk_napi_rx+0x228/0xfec
+[<805fd398>] __napi_poll+0x3c/0x1c4
+[<805fd754>] napi_threaded_poll_loop+0x234/0x29c
+[<805fd848>] napi_threaded_poll+0x8c/0xb0
+[<80053544>] kthread+0x104/0x12c
+[<80002bd8>] ret_from_kernel_thread+0x14/0x1c
 
-You are awesome, thank you!
+Code: 02d51821  1060045b  00000000 <8c640000> 3084000f  2c820005  144001a2  00042080  8e220000
+
+To reduce the attack surface and maintain performance, do not process
+PPPoE PFC frames. While at it, avoid byte-swapping at runtime, restoring
+the original behavior.
+
+[1] https://patch.msgid.link/20220630231016.GA392@debian.home
+Fixes: 46126db9c861 ("flow_dissector: Add PPPoE dissectors")
+Signed-off-by: Qingfang Deng <qingfang.deng@linux.dev>
+---
+Changes in v3:
+ Make ppp_proto_is_valid() private and fix kdoc warning, avoiding
+ gotchas if some out-of-tree modules use this function.
+ Link to v1: https://lore.kernel.org/netdev/20260407045743.174446-1-qingfang.deng@linux.dev/
+
+ include/linux/ppp_defs.h  | 13 -------------
+ net/core/flow_dissector.c | 39 +++++++++++++++++++++++----------------
+ 2 files changed, 23 insertions(+), 29 deletions(-)
+
+diff --git a/include/linux/ppp_defs.h b/include/linux/ppp_defs.h
+index b7e57fdbd413..45c0947fa404 100644
+--- a/include/linux/ppp_defs.h
++++ b/include/linux/ppp_defs.h
+@@ -12,17 +12,4 @@
+ 
+ #define PPP_FCS(fcs, c) crc_ccitt_byte(fcs, c)
+ 
+-/**
+- * ppp_proto_is_valid - checks if PPP protocol is valid
+- * @proto: PPP protocol
+- *
+- * Assumes proto is not compressed.
+- * Protocol is valid if the value is odd and the least significant bit of the
+- * most significant octet is 0 (see RFC 1661, section 2).
+- */
+-static inline bool ppp_proto_is_valid(u16 proto)
+-{
+-	return !!((proto & 0x0101) == 0x0001);
+-}
+-
+ #endif /* _PPP_DEFS_H_ */
+diff --git a/net/core/flow_dissector.c b/net/core/flow_dissector.c
+index 1b61bb25ba0e..64b843800370 100644
+--- a/net/core/flow_dissector.c
++++ b/net/core/flow_dissector.c
+@@ -1035,6 +1035,21 @@ static bool is_pppoe_ses_hdr_valid(const struct pppoe_hdr *hdr)
+ 	return hdr->ver == 1 && hdr->type == 1 && hdr->code == 0;
+ }
+ 
++/**
++ * ppp_proto_is_valid - checks if PPP protocol is valid
++ * @proto: PPP protocol
++ *
++ * Assumes proto is not compressed.
++ * Protocol is valid if the value is odd and the least significant bit of the
++ * most significant octet is 0 (see RFC 1661, section 2).
++ *
++ * Return: Whether the PPP protocol is valid.
++ */
++static bool ppp_proto_is_valid(__be16 proto)
++{
++	return (proto & htons(0x0101)) == htons(0x0001);
++}
++
+ /**
+  * __skb_flow_dissect - extract the flow_keys struct and return it
+  * @net: associated network namespace, derived from @skb if NULL
+@@ -1361,7 +1376,7 @@ bool __skb_flow_dissect(const struct net *net,
+ 			struct pppoe_hdr hdr;
+ 			__be16 proto;
+ 		} *hdr, _hdr;
+-		u16 ppp_proto;
++		__be16 ppp_proto;
+ 
+ 		hdr = __skb_header_pointer(skb, nhoff, sizeof(_hdr), data, hlen, &_hdr);
+ 		if (!hdr) {
+@@ -1374,27 +1389,19 @@ bool __skb_flow_dissect(const struct net *net,
+ 			break;
+ 		}
+ 
+-		/* least significant bit of the most significant octet
+-		 * indicates if protocol field was compressed
+-		 */
+-		ppp_proto = ntohs(hdr->proto);
+-		if (ppp_proto & 0x0100) {
+-			ppp_proto = ppp_proto >> 8;
+-			nhoff += PPPOE_SES_HLEN - 1;
+-		} else {
+-			nhoff += PPPOE_SES_HLEN;
+-		}
++		ppp_proto = hdr->proto;
++		nhoff += PPPOE_SES_HLEN;
+ 
+-		if (ppp_proto == PPP_IP) {
++		if (ppp_proto == htons(PPP_IP)) {
+ 			proto = htons(ETH_P_IP);
+ 			fdret = FLOW_DISSECT_RET_PROTO_AGAIN;
+-		} else if (ppp_proto == PPP_IPV6) {
++		} else if (ppp_proto == htons(PPP_IPV6)) {
+ 			proto = htons(ETH_P_IPV6);
+ 			fdret = FLOW_DISSECT_RET_PROTO_AGAIN;
+-		} else if (ppp_proto == PPP_MPLS_UC) {
++		} else if (ppp_proto == htons(PPP_MPLS_UC)) {
+ 			proto = htons(ETH_P_MPLS_UC);
+ 			fdret = FLOW_DISSECT_RET_PROTO_AGAIN;
+-		} else if (ppp_proto == PPP_MPLS_MC) {
++		} else if (ppp_proto == htons(PPP_MPLS_MC)) {
+ 			proto = htons(ETH_P_MPLS_MC);
+ 			fdret = FLOW_DISSECT_RET_PROTO_AGAIN;
+ 		} else if (ppp_proto_is_valid(ppp_proto)) {
+@@ -1412,7 +1419,7 @@ bool __skb_flow_dissect(const struct net *net,
+ 							      FLOW_DISSECTOR_KEY_PPPOE,
+ 							      target_container);
+ 			key_pppoe->session_id = hdr->hdr.sid;
+-			key_pppoe->ppp_proto = htons(ppp_proto);
++			key_pppoe->ppp_proto = ppp_proto;
+ 			key_pppoe->type = htons(ETH_P_PPP_SES);
+ 		}
+ 		break;
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.43.0
 
 
