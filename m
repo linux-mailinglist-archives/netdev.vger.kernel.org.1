@@ -1,56 +1,58 @@
-Return-Path: <netdev+bounces-276891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276892-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6NlMHrZl12myNggAu9opvQ
-	(envelope-from <netdev+bounces-276891-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 10:39:18 +0200
+	id yNitJP1l12myNggAu9opvQ
+	(envelope-from <netdev+bounces-276892-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 10:40:29 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B71D43C7D7B
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 10:39:17 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 365C93C7DA8
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 10:40:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id ABB2730088B2
-	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 08:39:16 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 61FEC3008250
+	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 08:40:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE60A3A5E89;
-	Thu,  9 Apr 2026 08:39:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AA413A3E6B;
+	Thu,  9 Apr 2026 08:40:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="QboQ/g4f"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ulCKhMG/"
 X-Original-To: netdev@vger.kernel.org
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63E81389469;
-	Thu,  9 Apr 2026 08:39:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 789F12EAD1B
+	for <netdev@vger.kernel.org>; Thu,  9 Apr 2026 08:40:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775723955; cv=none; b=DIDsS6higKriHqbVUbWr4Ra7sSevbJxKVrnwzXPJ2kabwbCDR84ZuYy/scpSGQOS53BgaYPpjY5vkHa8BeIWC2CXScGxNlaJOA+Qu7kuzF5yueG4adng9Rq6km3YaMzaDjdhuC/z5oVMYHxhY0UPSLPe1cn5tfCdMED5C4wtoDY=
+	t=1775724026; cv=none; b=sgjIdShEu2B2yc/iaPPpYf6TqRyr3kfSErFeJkPA3M7m1IzwulJ3P2Ivuxd/3ssQ71Dr+HU3wKoNJ/DFvv81vkAHbyZnVxTCA8Hi5L5E5a6yG9GdRSxuVP1oKZd5syxp3YWogF1/KdP3opvHdWVR7zm9dM0sY4XyPdZU0GR8/xw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775723955; c=relaxed/simple;
-	bh=0t9GmcyonzRJZf/bXkI6+pYIeVWgLTtw4V3r+KD7b3Y=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=sP8epCO+YlhaTG3A2X6h1+Bpf9bHxiQupYjdLXytKU6BPOzZwsv6k17hqYo3AQ1njksLMc5kO3oocIINMqL4FHcvAriXhZdVPjoaztbIUYYZKKuvihdnfHb6N1zesmN5WBiiMf6ol2ociyPCvgctxts3oa2Vuqi4rtWwFq1oCc4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=QboQ/g4f; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=Cc:To:From:Date:Message-ID;
-	bh=V3satatu24/OV36rdGRBdBIyxrI0A4QOnJU8uiF2h9o=; b=QboQ/g4flDH0z4kuyalyqfbNAZ
-	ybWk00FTGAujWJXw5yawz3N8ywXaRYI5Zoi3pStmUqPgHC45wRhT/qJNzuD3y4WpDWt897moNYj1I
-	RPZZQ8fwlYtrBw9gBQlwxj9UU26/tb+aYl9fcZGydqcCd8wyEEYyf7SxaT/eTpdWtbXnZZ6liUpDm
-	1dmLmtBOhc3SArnb4wU2ApgxQrii9UqFgMLmbN+aI4hCsZQ1hnJYrOVPTlj7co/6wHTDICZVIrePR
-	9cf4qOzYKRzIQ/731ikq6C+32d2jxhEF0mz/5ebvZ8RiD9qUXKrU4TjOzdbQqN7mP//4axfVJrExt
-	PqNFqmcEuEWn/jlUeQoDozzq9kJslqxQBk31FkS+ij8Fi94Cd4jOyGJKU5jOxWbbTuMyxWTVLLF/h
-	AavGdgmGFE5WIOXdfQMDVa9K88/vCWXZxPZaBS9kgt76Ia9vKktvlFLGTrpmxfr4Mws+2u+okVa57
-	v3fMCvxUBZpckB57OQQuic7S;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1wAkup-000000087hC-3RTh;
-	Thu, 09 Apr 2026 08:39:07 +0000
-Message-ID: <9691238e-bcdd-4d0d-99e1-f77b191845f4@samba.org>
-Date: Thu, 9 Apr 2026 10:39:06 +0200
+	s=arc-20240116; t=1775724026; c=relaxed/simple;
+	bh=rtao9N9/Zr6M6atUlSC7Uf3NJjJsFhoS0cSwJqwdQGY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=p0f2qeoeNXCwEMFHm80PxfI+O8a9jpy7532FArvdGSR9upaSZwA/RzTcc+0wcEB32BbN3TovFJp0TBr0CpoW/+Aji6YtUCvlRlsM6qp97wEe7lNz+9YWb4OG3a33OzQi+VIV0w7KdW66h+MMPNVCym3GHpJpGmurq7TD4Mm/cnE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ulCKhMG/; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id C5A4A1A3230;
+	Thu,  9 Apr 2026 08:40:22 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 96E975FDEB;
+	Thu,  9 Apr 2026 08:40:22 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id CECEF104500A8;
+	Thu,  9 Apr 2026 10:40:14 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1775724021; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=uROhnwnHliOgM+Qmr3h9fZz3BgpvJO5hwrCBupSyy5s=;
+	b=ulCKhMG/xHNUs28wb39v3ofJV+4Ajt03BAUdcxoh0ZYwHCofP5ewtFtUnWSxdGIIOZHB6y
+	mufbilUuGFk8/gFpqVcpW4Azdr4c+S7hZfMlgQXU/WWtOZRiqlj4E3JgFYSwSlvH90mbCM
+	qf/fOk9PBRbXVuZ82ZZy/1BSK7JkhqdKfkH7tiPlFWERXBr0X+n64QWnnKGsBwQkB7kulK
+	2igavCR/4s1y66wcRrFoSOMqOA68/vz36sgRARItdJVXout+mIwS1aLkWpj8oUb9VmGQ2C
+	te4VPRYZatJxzbOAo5oiQaRt+a4LMFZ6NbH2cNX745+SKnyX6LTM5jTAfloYfw==
+Message-ID: <e6380e63-52b1-4d49-b639-ca638bf21225@bootlin.com>
+Date: Thu, 9 Apr 2026 10:40:13 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,120 +60,85 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 0/4] net: move .getsockopt away from __user
- buffers
-From: Stefan Metzmacher <metze@samba.org>
-To: David Laight <david.laight.linux@gmail.com>,
- Breno Leitao <leitao@debian.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn
- <willemb@google.com>, axboe@kernel.dk, Stanislav Fomichev <sdf@fomichev.me>,
- io-uring@vger.kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org,
- Linus Torvalds <torvalds@linux-foundation.org>,
- linux-kernel@vger.kernel.org, kernel-team@meta.com
-References: <20260408-getsockopt-v3-0-061bb9cb355d@debian.org>
- <20260408122653.295953dd@pumpkin>
- <3fd4bf27-344f-45fc-bca3-9e9676522972@samba.org>
+Subject: Re: [PATCH net-next v9 00/10] net: phy_port: SFP modules
+ representation and phy_port listing
+To: Paolo Abeni <pabeni@redhat.com>, davem@davemloft.net,
+ Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, Russell King <linux@armlinux.org.uk>,
+ Heiner Kallweit <hkallweit1@gmail.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, Christophe Leroy
+ <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>,
+ =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
+ =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>,
+ Oleksij Rempel <o.rempel@pengutronix.de>,
+ =?UTF-8?Q?Nicol=C3=B2_Veronese?= <nicveronese@gmail.com>,
+ Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
+ Romain Gantois <romain.gantois@bootlin.com>,
+ Daniel Golle <daniel@makrotopia.org>,
+ Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+References: <20260403123755.175742-1-maxime.chevallier@bootlin.com>
+ <76e290cd-22bd-4ed3-b2b3-036e1edff140@redhat.com>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
 Content-Language: en-US
-In-Reply-To: <3fd4bf27-344f-45fc-bca3-9e9676522972@samba.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <76e290cd-22bd-4ed3-b2b3-036e1edff140@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[samba.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[samba.org:s=42];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-276892-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-276891-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com,debian.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_TO(0.00)[redhat.com,davemloft.net,lunn.ch,kernel.org,google.com,armlinux.org.uk,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	FREEMAIL_CC(0.00)[vger.kernel.org,bootlin.com,csgroup.eu,gmail.com,nxp.com,kernel.org,pengutronix.de,chromium.org,makrotopia.org,liebherr.com];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[metze@samba.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[samba.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,samba.org:dkim,samba.org:mid]
-X-Rspamd-Queue-Id: B71D43C7D7B
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:dkim,bootlin.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 365C93C7DA8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Am 08.04.26 um 15:56 schrieb Stefan Metzmacher:
-> Am 08.04.26 um 13:26 schrieb David Laight:
->> On Wed, 08 Apr 2026 03:30:28 -0700
->> Breno Leitao <leitao@debian.org> wrote:
->>
->>> Currently, the .getsockopt callback requires __user pointers:
->>>
->>>    int (*getsockopt)(struct socket *sock, int level,
->>>                      int optname, char __user *optval, int __user *optlen);
->>>
->>> This prevents kernel callers (io_uring, BPF) from using getsockopt on
->>> levels other than SOL_SOCKET, since they pass kernel pointers.
->>>
->>> Following Linus' suggestion [0], this series introduces sockopt_t, a
->>> type-safe wrapper around iov_iter, and a getsockopt_iter callback that
->>> works with both user and kernel buffers. AF_PACKET and CAN raw are
->>> converted as initial users, with selftests covering the trickiest
->>> conversion patterns.
->>
->> What are you doing about the cases where 'optlen' is a complete lie?
->> IIRC there is one related to some form of async io where it is just
->> the length of the header, the actual buffer length depends on
->> data in the header.
->> This doesn't matter with the existing code for applications, when they
->> get it wrong they just crash.
->> But kernel users will need to pass the actual buffer length separately
->> from optlen.
->> It also affects any code that tries to cache the actual data and copy
->> it back to userspace in the syscall wrapper - which makes sense for
->> most short getsockopt.
->>
->> (This is different from historic code where the length might be
->> assumed to be 4 regardless of what was passed.)
+
+
+On 09/04/2026 09:35, Paolo Abeni wrote:
+> @Maxime: I went over sashiko feedback and I *think* it ranges from
+> orthogonal to wrong, but it would be useful if you could go over it.
+
+Yeah I've looked at its feedback, and indeed most of it is incorrect or
+irrelevant :(
+
+Let's see if the PHY crew have things to say on the overall approach :)
+
+Thanks for pinging on this,
+
+Maxime
+
 > 
-> As the insane legacy cases can only happen for keeping
-> compatibility with existing userspace applications,
-> we could get the original optval and optlen __user pointers
-> out of sockopt_t again via something like:
+> Thanks,
 > 
-> char __user * __must_check sockopt_get_insame_legacy_optval(sockopt_t *sopt);
-> int __user * __must_check sockopt_get_insame_legacy_optlen(sockopt_t *sopt);
-> 
-> And for kernel callers they return NULL and the code should
-> turn that into -EINVAL or something similar.
-
-Or better helper macros/inline functions to call the legacy implementations.
-something like this:
-
-int sockopt_call_legacy_sock_fn(struct socket *sock, int level, int optname, sockopt_t *sopt,
-                                 int kernel_errno,
-                                 int (*legacy_fn)(struct socket *sock, int level,
-                                                  int optname, char __user *optval, int __user *optlen))
-{
-      if (!sopt->legacy.optlen)
-           return kernel_errno;
-
-      return legacy_fn(sock, level, optname, sopt->legacy.optval, sopt->legacy.optlen);
-}
-
-And a similar sockopt_call_legacy_sk_fn() that takes struct sock instead of struct socket.
-
-That way it would be relatively easy to move the calls of sockopt_call_legacy_{sock,sk}_fn
-down the stack to the places where it's really needed in incremental steps.
+> Paolo
 
 
