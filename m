@@ -1,164 +1,159 @@
-Return-Path: <netdev+bounces-277162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277163-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aG4uBTUq2GnIZAgAu9opvQ
-	(envelope-from <netdev+bounces-277162-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 00:37:41 +0200
+	id iG8+Ac0p2GnIZAgAu9opvQ
+	(envelope-from <netdev+bounces-277163-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 00:35:57 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACD6E3D04F8
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 00:37:40 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16AB83D04B7
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 00:35:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8AD083019F06
-	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 22:35:21 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 134893012D43
+	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 22:35:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0A2039657E;
-	Thu,  9 Apr 2026 22:35:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D095C395DB9;
+	Thu,  9 Apr 2026 22:35:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="l0Wer/zk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sY6ukHw2"
 X-Original-To: netdev@vger.kernel.org
-Received: from outbound.st.icloud.com (p-east2-cluster3-host12-snip4-5.eps.apple.com [57.103.77.186])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83B89395D9F
-	for <netdev@vger.kernel.org>; Thu,  9 Apr 2026 22:35:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.77.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACEAB395DA9;
+	Thu,  9 Apr 2026 22:35:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775774119; cv=none; b=iJap4DkEFMj+GjV0HTeviqtwfMdSxTcTrZ0/SoYTPSAbd7iz6/BWZ8YshTCfqaXtuuVU1j8C/0bxMzRLhcI4rDME7w1QYMWHfew/fGWO8Ut6WHgckzOVA+2Ae451FEILxsihCaR4nW8nAmeqCNPBm9/CyOX1R4ClUSiulVotrHQ=
+	t=1775774150; cv=none; b=GpOJ52SINGT2aLNjMzWyJqCRdI2FW3gv82zfJkTmaihDSMrg2TFOEQidgCZgZRQ8EJSHQW8/fh5EL39jbT/x8emIEH7u2/UzOeupsNkzyq5Cg3x4C/pgzOXFozjYelLvCIo85eaxOrWcNUZYjX8goqmmsWxXeJoLgANmmyP5hGI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775774119; c=relaxed/simple;
-	bh=8S6RQt1olzPV8F2So5I1DbM61w/JWVH3wNVRvHPlEPk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cfK3RQ1xqKE2XeBG+m/kxq0sJQjubvuhw7xfKWG5SSUkP3ntF0+kWEkm6KrbM0gxaTpcevRKdTM82bKr0BrByIBU1gvLGxPbPzL8j1vYsSPQ4UyGaQVFlgvjvzUwcyEj8QX9qQH2/OhbQUS5IbFVObgwFtoCk1ktm9JlGeOY0Zk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=l0Wer/zk; arc=none smtp.client-ip=57.103.77.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
-Received: from outbound.st.icloud.com (unknown [127.0.0.2])
-	by p00-icloudmta-asmtp-us-east-1a-100-percent-9 (Postfix) with ESMTPS id 14DB418000AB;
-	Thu, 09 Apr 2026 22:35:15 +0000 (UTC)
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com; s=1a1hai; t=1775774117; x=1778366117; bh=ZXXDLB2PUJ6vUR0wUEhcQKOb3E/u++jkUsUBsK8oyrE=; h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:x-icloud-hme; b=l0Wer/zkI0xHQR2lsmdmxfkEmEWKac4wRBrMAcO9bpe5R0IeI9tZ+f7YkmzjNwuNcpuITSp5+H9/3oq0Iq6Pvn9YprxiqBIrquI+3tJzY4k+HcUR9MRDWQ7AKzN82bwxyZS/vpvAZ9JXxxyipkhMV/Hbd8wzFaqRoebkFbwADLrI4j6BdG5KBXq2zPbsv/+FlCtQDOofEttXm5hqvn33zzDT7hflUe8eujA6Uiz4xCdYu0ZsR3InOxrqaYKqe9ld1Xbbjmyi4apvlp9b8wYfNfFUFzpiFSCoU3gZg88YHhhVP6PFho7HdM6BsHz7vK4ehciZY4h4ZZD/+RulYcM3DA==
-Received: from mainframe.tailfb0f7b.ts.net (unknown [17.42.251.67])
-	by p00-icloudmta-asmtp-us-east-1a-100-percent-9 (Postfix) with ESMTPSA id 875771800145;
-	Thu, 09 Apr 2026 22:35:14 +0000 (UTC)
-From: =?UTF-8?q?Lek=C3=AB=20Hap=C3=A7iu?= <snowwlake@icloud.com>
-To: netdev@vger.kernel.org
-Cc: linux-wireless@vger.kernel.org,
-	stable@vger.kernel.org,
-	krzysztof.kozlowski@linaro.org,
-	=?UTF-8?q?Lek=C3=AB=20Hap=C3=A7iu?= <snowwlake@icloud.com>
-Subject: [PATCH net 4/4] nfc: digital: Fix OOB read of DID byte in digital_tg_recv_dep_req()
-Date: Fri, 10 Apr 2026 00:34:34 +0200
-Message-ID: <20260409223436.1887988-5-snowwlake@icloud.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260409223436.1887988-1-snowwlake@icloud.com>
-References: <20260409223436.1887988-1-snowwlake@icloud.com>
+	s=arc-20240116; t=1775774150; c=relaxed/simple;
+	bh=J/2ZuFqPndxjtk3a4BAUjbPeGRBmaU9iiJajKE46LAs=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=bdoc//029K4XH+KfkQfKozsUQJwTgQFMktbhkECPb5J/A9dEjSiTh1jSJN5INjh87Voa1h5Roif6/4m1nnrZZym+xWnlo9fHVA9wFzS8BME5M5rCq1u2+hdamKANWwgDy0559j+GKCU5a5pcWRFdn1KbeNcg40B/ahuZXKlXJ3E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sY6ukHw2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74285C2BC87;
+	Thu,  9 Apr 2026 22:35:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775774150;
+	bh=J/2ZuFqPndxjtk3a4BAUjbPeGRBmaU9iiJajKE46LAs=;
+	h=Date:From:To:Cc:Subject:From;
+	b=sY6ukHw2RK3yFOrsBaDr1fi35Wj3daX+cGyFXiJU+td55zqp7UTyrkyF8PwYUhnew
+	 CrHTtnESfl9Dh3msfXnkXgtK4hbayqmhK0xFnZSxfoYlQd1xDUQRLPelRZ/qHEEwY2
+	 DHjicNmXyRoxFeprGuK5ofhMbEXkPA8CVfgRE/XJu8pP8/5OAtAmVtCHzz5SN+Js4B
+	 4jnSj6jxWIWJ2MEMOB3lIRdqh5IF4ps6OAj6tTnK1iyv2F13et/hqvIbwDy3qPY7uS
+	 UUoSr6NUwZZ8YrfsYnGZjo+BYaTF9FcHc2SIhIeYS5HtXSM4QX09g0++LmTOdpumFb
+	 Cl1HgDSAcNadw==
+Date: Thu, 9 Apr 2026 16:34:43 -0600
+From: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+To: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	linux-hardening@vger.kernel.org, Kees Cook <kees@kernel.org>
+Subject: [PATCH v3][next] netfilter: x_tables: Avoid a couple
+ -Wflex-array-member-not-at-end warnings
+Message-ID: <adgpg3W5FiX9m49-@kspp>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-GUID: HdqTIsLjanfCzdreGKM4hW60-mkcGHO3
-X-Proofpoint-ORIG-GUID: HdqTIsLjanfCzdreGKM4hW60-mkcGHO3
-X-Authority-Info-Out: v=2.4 cv=BZ7VE7t2 c=1 sm=1 tr=0 ts=69d829a4
- cx=c_apl:c_pps:t_out a=YrL12D//S6tul8v/L+6tKg==:117
- a=YrL12D//S6tul8v/L+6tKg==:17 a=IkcTkHD0fZMA:10 a=A5OVakUREuEA:10
- a=M51BFTxLslgA:10 a=x7bEGLp0ZPQA:10 a=LbuW6tbUWPcA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=v3ZZPjhaAAAA:8
- a=_7PiEvq1_GSvmz9hKDsA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=JKcXVnpmuwdQ7RL0mgk_:22 a=5Q-93EyGrU3sW_9myDOF:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDA5MDIwOSBTYWx0ZWRfX4iUYDphLCofg
- 3jOpr/sy0Kyu78wIHHnO5jRq2385LdxloMaBz1uh4T9hwBWqiBDsFt1DKnnHAJuxt5uzFy2T5EH
- YCZlEGUcPqsrGsYdqcVT9goRJxJjN00LyCut5Zo3pf8OZdpk2JJSqkz1ZzFQLf+wPtwTndclfG2
- PJrJrXITmZmTJDBvIGg7PeGT7W8ZmTlJ8K2xg3YFdtUVu5VO6rscLQX0K+UJ8ESuzrRaH+BDQVY
- A+vsibnsze21LEG6JU45CKkKWcfcXDNOllVEVTaVDsiVJuXOVyFboSxPF8UnDGrUNZx0kG9HzhL
- Y3VUb/yC6kQLVE8tvB/IMkHw/655Gq3mrni48Z+Lv2N04mJJZK5TPn+kKQpgo8=
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-04-09_04,2026-04-09_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0
- phishscore=0 spamscore=0 suspectscore=0 mlxscore=0 adultscore=0 clxscore=1015
- mlxlogscore=999 bulkscore=0 lowpriorityscore=0 classifier=spam authscore=0
- adjust=0 reason=mlx scancount=1 engine=8.22.0-2601150000
- definitions=main-2604090209
-X-Spamd-Result: default: False [-0.57 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MIXED_CHARSET(0.59)[subject];
-	DMARC_POLICY_ALLOW(-0.50)[icloud.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[icloud.com:s=1a1hai];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-277162-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,linaro.org,icloud.com];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-277163-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_FROM(0.00)[icloud.com];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[snowwlake@icloud.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[icloud.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[gustavoars@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[icloud.com:dkim,icloud.com:email,icloud.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: ACD6E3D04F8
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 16AB83D04B7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-digital_tg_recv_dep_req() guards against short frames with:
+-Wflex-array-member-not-at-end was introduced in GCC-14, and we are
+getting ready to enable it, globally.
 
-  if (resp->len < size ...)   /* size = sizeof(struct digital_dep_req_res) = 3 */
+Use the TRAILING_OVERLAP() helper to fix the following warnings:
 
-This guarantees resp->len >= 3 (dir + cmd + pfb).  However, when the
-DID bit is set in pfb, the code immediately accesses resp->data[3] — the
-DID byte — which is one byte past the guaranteed minimum:
+1 net/netfilter/x_tables.c:816:39: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+1 net/netfilter/x_tables.c:811:39: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
 
-  if (DIGITAL_NFC_DEP_DID_BIT_SET(pfb)) {
-      if (ddev->did && (ddev->did == resp->data[3])) {
+This helper creates a union between a flexible-array member (FAM)
+and a set of members that would otherwise follow it. This overlays
+the trailing members onto the FAM while preserving the original
+memory layout.
 
-A remote NFC-DEP initiator can trigger this with a 3-byte DEP_REQ frame
-that has the DID bit set in the PFB field, causing a 1-byte
-out-of-bounds read of kernel heap memory.
-
-Increment the minimum required length to 4 when the DID bit is present
-before accessing resp->data[3], mirroring the pattern used for the
-size++ / check at the end of the DID block.
-
-Fixes: 7d0911c07b44 ("NFC Digital: Implement NFC-DEP target TX and RX")
-Cc: stable@vger.kernel.org
-Signed-off-by: Lekë Hapçiu <snowwlake@icloud.com>
+Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
 ---
- net/nfc/digital_dep.c | 5 +++++
- 1 file changed, 5 insertions(+)
+Changes in v3:
+ - Use the TRAILING_OVERLAP() helper.
+  - Update changelog text.
 
-diff --git a/net/nfc/digital_dep.c b/net/nfc/digital_dep.c
-index XXXXXXX..XXXXXXX 100644
---- a/net/nfc/digital_dep.c
-+++ b/net/nfc/digital_dep.c
-@@ -1117,6 +1117,11 @@ static int digital_tg_recv_dep_req(struct nfc_digital_dev *ddev, void *arg,
- 	pfb = dep_req->pfb;
+Changes in v2:
+ - Update verdict after (compat_uint_t *)st->data;
+ - Link: https://lore.kernel.org/linux-hardening/adgL5wPm9VpaV3MO@kspp/
 
- 	if (DIGITAL_NFC_DEP_DID_BIT_SET(pfb)) {
-+		if (resp->len < size + 1) {
-+			rc = -EIO;
-+			goto exit;
-+		}
-+
- 		if (ddev->did && (ddev->did == resp->data[3])) {
- 			size++;
- 		} else {
---
-2.34.1
+v1:
+ - Link: https://lore.kernel.org/linux-hardening/adbIKC0cZcK7VcCF@kspp/
+
+ net/netfilter/x_tables.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/net/netfilter/x_tables.c b/net/netfilter/x_tables.c
+index b39017c80548..9f837fb5ceb4 100644
+--- a/net/netfilter/x_tables.c
++++ b/net/netfilter/x_tables.c
+@@ -819,13 +819,17 @@ EXPORT_SYMBOL_GPL(xt_compat_match_to_user);
+ 
+ /* non-compat version may have padding after verdict */
+ struct compat_xt_standard_target {
+-	struct compat_xt_entry_target t;
+-	compat_uint_t verdict;
++	/* Must be last as it ends in a flexible-array member. */
++	TRAILING_OVERLAP(struct compat_xt_entry_target, t, data,
++		compat_uint_t verdict;
++	);
+ };
+ 
+ struct compat_xt_error_target {
+-	struct compat_xt_entry_target t;
+-	char errorname[XT_FUNCTION_MAXNAMELEN];
++	/* Must be last as it ends in a flexible-array member. */
++	TRAILING_OVERLAP(struct compat_xt_entry_target, t, data,
++		char errorname[XT_FUNCTION_MAXNAMELEN];
++	);
+ };
+ 
+ int xt_compat_check_entry_offsets(const void *base, const char *elems,
+-- 
+2.43.0
+
 
