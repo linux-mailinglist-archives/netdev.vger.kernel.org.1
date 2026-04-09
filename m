@@ -1,65 +1,75 @@
-Return-Path: <netdev+bounces-276983-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276985-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0GFOL6ae12kUQQgAu9opvQ
-	(envelope-from <netdev+bounces-276983-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 14:42:14 +0200
+	id sIhbNEuf12kUQQgAu9opvQ
+	(envelope-from <netdev+bounces-276985-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 14:44:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 503493CA8B2
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 14:42:14 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id C62F93CA90B
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 14:44:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id B3ABE3006694
-	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 12:42:13 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 2F4BE3003806
+	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 12:44:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89F763CCFC1;
-	Thu,  9 Apr 2026 12:42:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEE0A3CCFC1;
+	Thu,  9 Apr 2026 12:44:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="Dh9Npjqv"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="SBHN1yhP"
 X-Original-To: netdev@vger.kernel.org
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22D493CAE6C;
-	Thu,  9 Apr 2026 12:42:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BA0B3B4E9B;
+	Thu,  9 Apr 2026 12:44:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775738532; cv=none; b=dTOhv/BGSlGzakxa3uhBw+PITyiGy6WWY1e5rU1Edz+VdoT5D9Nrfp216Sq/3ib2Oy2M+rouTAEhTrmrHuoGS6kPYJB2cFpXaAUbfQRdBrvx3voo43pYqOoGssvB8moApEitM64YTqxLdPFwQJ9t3uwKs3THPwcNj9gRsPO4DB8=
+	t=1775738676; cv=none; b=p+NY/34QMjyQxIMIyCzRtKE42Q7eNR6/azVN1X9hqa6umIEzZ0raBLQK5j5sKa+mX9yWJKZ60hUKDaJe4MIwCTex5CRz+qRTV75Q7jJ5cN7NYVUJLARNQuC/H8KNJNgS0Oa26aIXyahla00xpLpu6kAF5yHlHh1gNAvybB68X3M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775738532; c=relaxed/simple;
-	bh=xnDepoYTxvRiogO1ADsVRmIinVDcmworTrvUdlFnPNA=;
+	s=arc-20240116; t=1775738676; c=relaxed/simple;
+	bh=+YDd/ZcR+DFc59WVVha47S0fuB4ft163BRwbGX2hwb0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GrSDMLkCOy0g8pdTsc6CdszdUBepPfuq/uUTOJ2+9OMy15DSvSdmLoxuYenr3wuWpGBWCoSvvzATcGjzp0RgzFf9Sgfy0N4ydoF/uCv1FnSouJHgAkfYG5o0TZ4x2Wy4ZJB1XKeY9GeAuicPt82pCrpfAnXJc6MDTEHL+eJjOVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=Dh9Npjqv; arc=none smtp.client-ip=82.195.75.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=AAaBFGub3bRoCO4XKF0ZLRIwiuhjsNw+rpCrrQQmH6I=; b=Dh9Npjqv9Yv/woc+IxwtxY0hn7
-	IDikFYVB+CRonRL5TLVPkhcrn2bdz01XjMBsa7qvP0a0AGT1KDj/K0y/drj9lyWGuqjpa3CK6X5DT
-	M6ZZD1Zxvt6tajc/WcUsfDfjlWWC0XUAvVYpAjSIOnj1rIvFUbl1uPhGFyJr4aYcjW5DlhawQePrP
-	TyksT+8OLz6EHMcqn/Tj/G3bwkwdY5OhI0fVt7cnZT9NHxqAngt6zGVCgWt+R2hXIM2JB2i+I46UU
-	ipjwp3Z69QnMQwRbiVCkWuidjGf/Gw2tEh6yTXn3vmD+gGmOPTBaGYqqdP5cqYqA5qayTc0hp0/x3
-	rXHzVR/Q==;
-Received: from authenticated user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.96)
-	(envelope-from <leitao@debian.org>)
-	id 1wAohv-009Cnv-2L;
-	Thu, 09 Apr 2026 12:42:04 +0000
-Date: Thu, 9 Apr 2026 05:41:59 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, shuah@kernel.org, 
-	petrm@nvidia.com, willemb@google.com, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next] selftests: net: py: add test case filtering and
- listing
-Message-ID: <adedNCKW0WE_FqZK@gmail.com>
-References: <20260407151715.3800579-1-kuba@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=szAAyrXa9dEA1emc0LwXVcgZsHSSl0wo23crcu55ctxdims6pzb7CSHQSleTXGHT7Z0xHhya7OUE1LbrMSMzwAWrAOQSlo4cMvKFcT9XMowJv6Ep+ZL+em1ircX/xUSBS7Wbxb/QxjPfMG6XtXLw6d37aH3R4xU7FU5a8w9Hng8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=SBHN1yhP; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=4tkg05FK+KN5xW90h91DFPG+L7R/7dOzZWR7SGTL71s=; b=SBHN1yhPWdN5/IfhJqFgduNlFS
+	PKNHPjTBdRnCRPXZ29xU9VBqKTBTqCBmROdeJCy9okrvLW3PiIeiACa6SuL3MOP6rTkxFbHd1tUp/
+	DMpb81x0VV9kHGQkzubOt0O/+ONxavc48wDkY5DjOb1bPLCstFpfEaYjukr64LBSezTs=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wAok5-00FQs0-5e; Thu, 09 Apr 2026 14:44:17 +0200
+Date: Thu, 9 Apr 2026 14:44:17 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Biju Das <biju.das.jz@bp.renesas.com>,
+	Ovidiu Panait <ovidiu.panait.rb@renesas.com>,
+	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>
+Subject: Re: [PATCH net v2 2/2] net: phy: micrel: remove ksz9131_resume()
+Message-ID: <31b1e474-4b87-4a75-93fa-1bcf3a41221a@lunn.ch>
+References: <20260409095633.70973-1-ovidiu.panait.rb@renesas.com>
+ <20260409095633.70973-3-ovidiu.panait.rb@renesas.com>
+ <TY3PR01MB11346A0F047F1F7296B8F4FCA86582@TY3PR01MB11346.jpnprd01.prod.outlook.com>
+ <add_krK3MC1-SSsV@shell.armlinux.org.uk>
+ <TY3PR01MB113465B215559404D0FBD04AE86582@TY3PR01MB11346.jpnprd01.prod.outlook.com>
+ <adeH5y5TiZdaK94d@shell.armlinux.org.uk>
+ <TY3PR01MB11346732465160FFE9DCAADD686582@TY3PR01MB11346.jpnprd01.prod.outlook.com>
+ <adeNzh3eu9PSdEas@shell.armlinux.org.uk>
+ <TY3PR01MB11346DC74FBC1043C9C0A27D186582@TY3PR01MB11346.jpnprd01.prod.outlook.com>
+ <adechY4Y6zUQkFwq@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,57 +78,48 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260407151715.3800579-1-kuba@kernel.org>
-X-Debian-User: leitao
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+In-Reply-To: <adechY4Y6zUQkFwq@shell.armlinux.org.uk>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-276983-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-276985-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[bp.renesas.com,renesas.com,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[debian.org];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[debian.org:+];
-	MISSING_XM_UA(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 503493CA8B2
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,lunn.ch:dkim,lunn.ch:mid]
+X-Rspamd-Queue-Id: C62F93CA90B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Apr 07, 2026 at 08:17:15AM -0700, Jakub Kicinski wrote:
-> When developing new test cases and reproducing failures in
-> existing ones we currently have to run the entire test which
-> can take minutes to finish.
->
-> Add command line options for test selection, modeled after
-> kselftest_harness.h:
->
->   -l       list tests (all or filtered)
+> I think we need a simple solution for 7.0, but subject to Andrew's
+> agreement, I think we should consider having phy_init_hw() inside
+> phy_resume(), and a series of cleanup patches that result from that
+> change, including getting rid of unnecessary code in micrel.c for
+> the next kernel cycle. As I say, subject to Andrew's agreement, please
+> can you look into this. Thanks.
 
-<snip>
+It does seem reasonable, and it would impose some uniformity on
+drivers.
 
-> +                print(f"Usage: {sys.argv[0]} [-h|-l] [-t|-T name]\n"
-> +                      f"\t-h       print help\n"
-> +                      f"\t-l       list all tests\n"
-
-I initially expected the help text to mention "(all or filtered)" based
-on the commit message, but since this option lists all tests
-unconditionally, the current wording is correct.
-
-Reviewed-by: Breno Leitao <leitao@debian.org>
+	Andrew
 
