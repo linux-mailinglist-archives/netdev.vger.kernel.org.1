@@ -1,273 +1,226 @@
-Return-Path: <netdev+bounces-276959-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276989-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kD5gOhmV12mGPwgAu9opvQ
-	(envelope-from <netdev+bounces-276959-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 14:01:29 +0200
+	id 6E0DNT6j12kUQQgAu9opvQ
+	(envelope-from <netdev+bounces-276989-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 15:01:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA7B23CA008
-	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 14:01:24 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A6D23CABC3
+	for <lists+netdev@lfdr.de>; Thu, 09 Apr 2026 15:01:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 583CE3035356
-	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 11:58:47 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0E5BF302AF32
+	for <lists+netdev@lfdr.de>; Thu,  9 Apr 2026 13:00:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 162EF3C3422;
-	Thu,  9 Apr 2026 11:58:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFD723A7F69;
+	Thu,  9 Apr 2026 13:00:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=bp.renesas.com header.i=@bp.renesas.com header.b="v9WZNM0R"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FA3CaX8r"
 X-Original-To: netdev@vger.kernel.org
-Received: from TYVP286CU001.outbound.protection.outlook.com (mail-japaneastazon11011054.outbound.protection.outlook.com [52.101.125.54])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8783C3C3442;
-	Thu,  9 Apr 2026 11:58:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.125.54
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775735891; cv=fail; b=WZ7x8ZK7cvb0qj94YiQIua0GS3xIT0ctEIXt+xckbc3Txur0Z0SoCvG8nCvn46b6ltjE+3Vny2XbjloeX0pwIPwKMoLjDbPev5G4/QT+5ZAM68M0ykWc/AS2Giq2xwC6UAje6TCYnIVDKS9gXkPvVI/cFaNrORuHSWCLIRm/Zxw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775735891; c=relaxed/simple;
-	bh=raEFdJUlspvyiHEpltFBs+8ntHqoeN9JIwRllCnMeUo=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=eBlX+gSYyrNY1R5mpdhdSJsqjcKrL8Uq4zoejN044fglTVULVE2G1rL7ILZktuOeggHZj251x0rbn0u23DJ4PYxqQgixWM8KmWaGHsvmv1i5c70G5kUg5+OIfgX/Noz8FpK7sPHlY7EbW+skpFJ6LJO6kf4WJ/K87HbFiKx/Do8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com; spf=pass smtp.mailfrom=bp.renesas.com; dkim=pass (1024-bit key) header.d=bp.renesas.com header.i=@bp.renesas.com header.b=v9WZNM0R; arc=fail smtp.client-ip=52.101.125.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bp.renesas.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=DYjcb6OjB9+U0n9H7JPc6kI67NYYQwAY3CjGxGjoqqHzSpYQJ+E2W+hwIej9irTtnbOaahdr6Bjzyv92Jhxn8zvodGAnJQv0vh5nQj49MmeRgRK990zPQcYKi/QVrkwf8yLBMe4/dX2tXxxVjrfOjkxGO1T93w+z0N9fK1+glXoKcn8TUblYimEIVDi1p23uy+W1ogBIHfblq+zssxBcd9gyAV8v6+xq0YLQ2KvAsRnfqgjTBarClyfITSnjsPvj3vuf1enVIdPxTl4QKUsQAksz5XNbIdzh/EWKEeLqcmpuZSYRj6x4E60jlJMcecGrU19QbfQiyTod0H9CDDgwGQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=raEFdJUlspvyiHEpltFBs+8ntHqoeN9JIwRllCnMeUo=;
- b=jtMF3iM8bEUjOCaCe1iDNOSMipFdprYFHT9sRDvRbFCN8q4cHCGdaySVloKvdVz0sKdg3l6oiBS4pcE3BsDeeOTCrBwMTRAJunC/ydfbtHdLbrZQ+PnasmIq80k2sHM0cvMit7nro+Y7pTBuoP/OFTkX4yDkugTVuw4m9lAaCGyz55oCafrBXhrI/YSZry6Z1mgGEEEz+3szK0haoD+m/Dic9s7OwLT07RuLRHzSJ8h1mG/jo5UBPXi2fR22M3QX1uwTfcr16xq3lIYaFy+g2vModatauv5T95NYwdWwgUd5Bkqu2JadDzfA4eWGHJUil1uOgYGc5axYv7mYn/W5SA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=bp.renesas.com; dmarc=pass action=none
- header.from=bp.renesas.com; dkim=pass header.d=bp.renesas.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bp.renesas.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=raEFdJUlspvyiHEpltFBs+8ntHqoeN9JIwRllCnMeUo=;
- b=v9WZNM0R7BBhiVEZCT305RrQ4IE4sfeMjzxGku/fAxZt1CFYGn2x5Th2dWwPw6LPkWTSFAh/fUXL6vYvFGJQ+TgGXCM3unPxwRApnwS+xGssnChdkENDFEmjMG7pmyKd2TlH46eO4cJrwhmMt752y6oyK4Ai3ipKfVfPAWAuQxk=
-Received: from TY3PR01MB11346.jpnprd01.prod.outlook.com (2603:1096:400:3d0::7)
- by TY3PR01MB10268.jpnprd01.prod.outlook.com (2603:1096:400:1dd::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.42; Thu, 9 Apr
- 2026 11:58:05 +0000
-Received: from TY3PR01MB11346.jpnprd01.prod.outlook.com
- ([fe80::87d1:4928:d55:97de]) by TY3PR01MB11346.jpnprd01.prod.outlook.com
- ([fe80::87d1:4928:d55:97de%4]) with mapi id 15.20.9769.041; Thu, 9 Apr 2026
- 11:58:04 +0000
-From: Biju Das <biju.das.jz@bp.renesas.com>
-To: Russell King <linux@armlinux.org.uk>
-CC: Ovidiu Panait <ovidiu.panait.rb@renesas.com>, "andrew@lunn.ch"
-	<andrew@lunn.ch>, "hkallweit1@gmail.com" <hkallweit1@gmail.com>,
-	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-renesas-soc@vger.kernel.org"
-	<linux-renesas-soc@vger.kernel.org>
-Subject: RE: [PATCH net v2 2/2] net: phy: micrel: remove ksz9131_resume()
-Thread-Topic: [PATCH net v2 2/2] net: phy: micrel: remove ksz9131_resume()
-Thread-Index:
- AQHcyAc7ZyEBHUmX/kuuIfqJuejTO7XWgYEQgAAF+QCAAAVdkIAABJKAgAAAOdCAAAbQAIAABkPw
-Date: Thu, 9 Apr 2026 11:58:04 +0000
-Message-ID:
- <TY3PR01MB11346DC74FBC1043C9C0A27D186582@TY3PR01MB11346.jpnprd01.prod.outlook.com>
-References: <20260409095633.70973-1-ovidiu.panait.rb@renesas.com>
- <20260409095633.70973-3-ovidiu.panait.rb@renesas.com>
- <TY3PR01MB11346A0F047F1F7296B8F4FCA86582@TY3PR01MB11346.jpnprd01.prod.outlook.com>
- <add_krK3MC1-SSsV@shell.armlinux.org.uk>
- <TY3PR01MB113465B215559404D0FBD04AE86582@TY3PR01MB11346.jpnprd01.prod.outlook.com>
- <adeH5y5TiZdaK94d@shell.armlinux.org.uk>
- <TY3PR01MB11346732465160FFE9DCAADD686582@TY3PR01MB11346.jpnprd01.prod.outlook.com>
- <adeNzh3eu9PSdEas@shell.armlinux.org.uk>
-In-Reply-To: <adeNzh3eu9PSdEas@shell.armlinux.org.uk>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=bp.renesas.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: TY3PR01MB11346:EE_|TY3PR01MB10268:EE_
-x-ms-office365-filtering-correlation-id: 4f9ba222-6357-46f2-97af-08de962f41e6
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|7416014|376014|1800799024|38070700021|22082099003|18002099003|56012099003;
-x-microsoft-antispam-message-info:
- yCM9jd5O6Ga3tMr0a0ztomFwn4HGIrwr/0QtB6VdZocg7niTl5zqEOii7c2dx2y4siq+niKtuL3NzPiOwCcy7mwqA7/3u878v50DdPF8ijKSsaPSPy5p/hS03bfzbZC7rBY6FSUg1XbJgR59qJlOSGFBu7Gij8y00FxCr92NLwoApIBuckp+AbnuGjIMhJqdKutnN8lFPPocrqPGzJ+bQ4VE326hOmPQ6Zp7+yOx6t0NCmwtmW8fOwH3DoGoB9U4L1itSQ8gVYTTnujCtU/XRyS6MAba47uGCh+D+rxYKGS3hKIoLqNXZLS9pmMaTm/XbrxzmWrfTtyp4oqIvRnQW2xMcEi/0cGsz4RQLRirOu5norfnvjY2Abl8J/AymOtiJT+kLpgotANC36BmChqnCLc6DdeXcGi8vcgtfSs0/Y9OyTO6g0SsZXn5WFcf/OgdLNuzRyd0bXZCugJJvrlutsYWiKx4PeVF7+3O508CPKKqCTKzfHyIj/IL97+L9k6wduSPyiZvpO44TlaCBsuDRZW9Kkyu8QuaOXejzWqbYmXFyf+gnkkboEGyIZMNJlLdgJE+NRspRLirtJqIv7ivZjuhQ8dWfcGNRKeUqtL52bhPpFGRbvehDx/Z3dsWfyhTG0FZTwum5zSQX5ZEzv3rDQfgICkZnorqSxxlRkAfoB5nlNO8JJgmHO7g0R7uvawEB+TLhtKeUiodzjom7mpIGlKOdQ5qtuwgkc0yVJaQe30+y0rDeA+b/8hzybVANQHUbCpluOY8wozEMVCgSAo09MYhCXtPs3S3LWDH24OEbx0=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TY3PR01MB11346.jpnprd01.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024)(38070700021)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?wZCV/Da0EBeRwi70yR8A8txZcsHhAd80YbtrDLZOYMs/Rrv9NxMN8K5MhA7y?=
- =?us-ascii?Q?fi4IEckIZ8S5+D4tl50nWB43QYkgkWb3XG1SiGIOEpQWHqLU9U271VkyjEL9?=
- =?us-ascii?Q?94nfjH4VrEqeyvIES2i0LJesLkdklIwXSTSdP/pzcu9J1QhYXkWq5wkb+il3?=
- =?us-ascii?Q?om6AxQqTUYczn5nCcxp3xuqVfAe5Q+AP6FbTEy/MFOgcfwY0xoUa4MT5JBYg?=
- =?us-ascii?Q?xk08lRZflV90+D3k/6x3r00scqBpsySyNLQzk2aRVZESKJPDRB7yYzKuWuQj?=
- =?us-ascii?Q?l7ayiJuAvjJowZaoLZJxO63QfDtIvIX7EqrQn++jbPtrkQ6KpOjQW29g0Cfl?=
- =?us-ascii?Q?3dt5KyDZLbpOlJtlwmD3oElJCFrXH3T95D1WiKQnLnK3Y3Q35/MUwjykkMfi?=
- =?us-ascii?Q?E3UiAbz+b48PfdQFtrWVgWarRlEphyai0pU/n5u6d/pSqV+CKVq/2ZvEouoL?=
- =?us-ascii?Q?qrKUd5W9KufTDtMdPrss6iLAOuinPUQiLdIf85tiV87H/InXzj86zzY0RFJo?=
- =?us-ascii?Q?K0ITRtchw9M/lg04hOM/b3An/knL0iUdpuiBE+nloxBHJuC0wD8qqmmyg1Up?=
- =?us-ascii?Q?MYtuYFqiRZik6heyx1NwWcyfgKDWAWRrvVIQzbzBryQcELki1rDlouZGnYHn?=
- =?us-ascii?Q?Np7kd6+snKtZ5jXkS4zLwc5xxjxmJbxSXBpDCSw2Ik45fF+A+PqkbeF0A8a+?=
- =?us-ascii?Q?R2H3W/PLc+Schl32URqP/O+yXjDuoYQUX+dGKMSGzlEeoTx5S7bH1nt4Rewz?=
- =?us-ascii?Q?h8ZbgtvCsTR5SclATpkPd/ZRitjfe7TXHnQisOer3z1zr9lkFYdMwy50bygB?=
- =?us-ascii?Q?b1ydClQA1keAq4hpncyzKwu3hdWnzJyUz7GgHDqzkANXs4b98HDvTOSSX2TM?=
- =?us-ascii?Q?ou1tA1XaSha6yWY3ICOu3cTvN5TpTUl/O0jSijakcTLtdEa5mQhQCFly7Y0R?=
- =?us-ascii?Q?vNUTIg8k05eaoI0gmCzmwt+Q1TLfgVCHBevZ7Jh8Evsk7Vvhq+zYARuKzkUz?=
- =?us-ascii?Q?SR1id/YlXhcHIddMxrUu8E2+MOX7SSPhFhtHHbzWjCcYUWclURWcHh29ieIS?=
- =?us-ascii?Q?eMD9Zeti+XuO2pRpqQVjgj/MN1xoFqF0HVlE2EHDj+9XCtXSDLD1O4p6/jV+?=
- =?us-ascii?Q?zR0dhcBR2jyvTelnsACKHA4HrZLC5TYhstoOX98O9m5r0u27R2Bmn0okX1Ga?=
- =?us-ascii?Q?Blcs91C7apwPWd/ftBpydgY9n2KMSDBcYbxTd/5oPSEuXpGXKc59R2bu7Wy3?=
- =?us-ascii?Q?jXmLnwG0QQ9QJ2Ur0nSvqRBmQR2uCepkS+JKd6DfoPsgZ47wp+gs96oIlI1P?=
- =?us-ascii?Q?IS9cXHmSvXT42fxuV90W3DNtB2vW1wyl2JwNqjpx/XkAmDLTdiHveOu+4A/M?=
- =?us-ascii?Q?w0guAKIEqHgKZMHIQPLl6gaia+BHf+Rk2UDmZKe2hNmsi4scXtk4Tf00j0fi?=
- =?us-ascii?Q?UkmzPiw9TjOxNdSAoxeDHMzPAEdDMqoi55mDyvRBBcFlDH+ymZB3dIjJxzbV?=
- =?us-ascii?Q?EyAuFZToHLjDzJOR8oYMJWIMAgLXbKI1MED39fsXKshLiiKpszoCsX9q0D0D?=
- =?us-ascii?Q?5GV6niXV1UlPqOxiB4b27HscSaYHS/ebQsYtm5DUtIfpAt6twXjAPexvLX+y?=
- =?us-ascii?Q?J8IgoLmyc72Q5fVc13dZI+YsuSXIOCymLDK3RdmHQNXq0x0/1qCQqeuKHZ5S?=
- =?us-ascii?Q?CY0yS+SEffo8K6CZ7bMOnGeiQKYjzjRNKpkWUOg6TIRmgrGM3zRlsP10CUJc?=
- =?us-ascii?Q?BuI6FnHoGg=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21A45149C7B
+	for <netdev@vger.kernel.org>; Thu,  9 Apr 2026 13:00:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775739627; cv=none; b=RyVyVl5z3Iz+pR6aT2RoQiqvYGStNmv7omiJKbj6a8Fesaj0f40B7inOhAiVWA9PkZFuC3LWND2qnR7hSwAXnAdVLLVVsqYiO463Q2hAwOJB2GCyCZCG+T0tJt3MOR2EE8SjR9fBdaxt7EZva2+UsgohrIki3j+aHlAJT4KG32Y=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775739627; c=relaxed/simple;
+	bh=VI0ZDfzHgiwnpIuAdeBY0OblRdeN+BOSmlc2ltdCi0o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KURVjjZp7Vp7cdz1AkTJ8qK/Dz/inr2vFYhojSaQ8mpKwNZlJMnbmR+DLD6b3jB9k1oDx153yW3F77IvKCLfyfvSL9JVXD9QsR6ayUyq6UMtQBfWqGbItxMQojTRCgHMnrIDYiC18GKtwq7RaqmI3q1sB4QCYoJ9YkLovSOFfak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FA3CaX8r; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1775739626; x=1807275626;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=VI0ZDfzHgiwnpIuAdeBY0OblRdeN+BOSmlc2ltdCi0o=;
+  b=FA3CaX8ru+ZdntQ9k3DSvw4lh8FFrfeC/InMb9uvG7LcqM2KsOhrELkh
+   bh/+UvS4xA2iWs5LUaQmnhY/2U2n/OXhk0cthhasnQOUilx7cC7zSM6AI
+   376cO0Ei8hL1Abdk5+jT2CYaNYwXpyd4u72zHRtKrszL5quSe+6J4dUVz
+   Oz8dta7uTg2Qb+1CjNozXhTsrCxLbpdcqWO4IE2czDisEFF4nvU7UqyoB
+   SlQH0gXObIAzTZEBWYE9IE7b7BZpqgzSoQ0hltXpE0Pe13AKD4skIyuz2
+   dtMy6nL1fgJEaV6Kg/Yua/UnWfgqwgPreJv41r1p9oeQf4CHGD+APGFdv
+   g==;
+X-CSE-ConnectionGUID: 8r9F91ATTjiIY4K1GXFDCw==
+X-CSE-MsgGUID: 3lWupnvOTuakumxCqAb94Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11753"; a="75777509"
+X-IronPort-AV: E=Sophos;i="6.23,169,1770624000"; 
+   d="scan'208";a="75777509"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2026 06:00:14 -0700
+X-CSE-ConnectionGUID: 8wv93W6YRNaPv+b/8xQJPQ==
+X-CSE-MsgGUID: hj2hNAosRf6DGP2BuA3UgA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,169,1770624000"; 
+   d="scan'208";a="259208076"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by orviesa002.jf.intel.com with ESMTP; 09 Apr 2026 06:00:12 -0700
+Received: from gond.igk.intel.com (gond.igk.intel.com [10.123.220.52])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id E0D982FC63;
+	Thu,  9 Apr 2026 14:00:10 +0100 (IST)
+From: Marcin Szycik <marcin.szycik@linux.intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	sandeep.penigalapati@intel.com,
+	ananth.s@intel.com,
+	alexander.duyck@gmail.com,
+	Marcin Szycik <marcin.szycik@linux.intel.com>
+Subject: [PATCH iwl-next v2 00/10] Add ACL support
+Date: Thu,  9 Apr 2026 13:59:53 +0200
+Message-ID: <20260409120003.2719-1-marcin.szycik@linux.intel.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: bp.renesas.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: TY3PR01MB11346.jpnprd01.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4f9ba222-6357-46f2-97af-08de962f41e6
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Apr 2026 11:58:04.6349
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 53d82571-da19-47e4-9cb4-625a166a4a2a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: R5RP/EGO3nUlLYvWh6IO1ZXWFgYWC1bJDrE4qE9JsqkwR1rZ1NfuNYzejSnVSw7W7NbnAHNiRBbfEwHJ+0E2f5VpKoZWCRj4bVOahGbLsqY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TY3PR01MB10268
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[renesas.com,none];
-	R_DKIM_ALLOW(-0.20)[bp.renesas.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[renesas.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-276959-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RSPAMD_URIBL_FAIL(0.00)[bp.renesas.com:query timed out];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,intel.com,gmail.com,linux.intel.com];
 	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[bp.renesas.com:+];
-	RSPAMD_EMAILBL_FAIL(0.00)[linux.armlinux.org.uk:query timed out];
+	TAGGED_FROM(0.00)[bounces-276989-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[biju.das.jz@bp.renesas.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[marcin.szycik@linux.intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,bp.renesas.com:dkim]
-X-Rspamd-Queue-Id: DA7B23CA008
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,linux.intel.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5A6D23CABC3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Russell King,
+E8xx hardware provides a Ternary Classifier block for implementing
+functions such as ACL (Access Control List). In this series it's simply
+referred to as "ACL".
 
-> -----Original Message-----
-> From: Russell King <linux@armlinux.org.uk>
-> Sent: 09 April 2026 12:30
-> Subject: Re: [PATCH net v2 2/2] net: phy: micrel: remove ksz9131_resume()
->=20
-> On Thu, Apr 09, 2026 at 11:19:43AM +0000, Biju Das wrote:
-> > Hi Russell King,
-> >
-> > > -----Original Message-----
-> > > From: Russell King <linux@armlinux.org.uk>
-> > > Sent: 09 April 2026 12:05
-> > > Subject: Re: [PATCH net v2 2/2] net: phy: micrel: remove
-> > > ksz9131_resume()
-> > >
-> > > On Thu, Apr 09, 2026 at 10:52:35AM +0000, Biju Das wrote:
-> > > > Hi Russell King,
-> > > >
-> > > > Thanks for the feedback.
-> > > >
-> > > > > -----Original Message-----
-> > > > > From: Russell King <linux@armlinux.org.uk>
-> > > > > Sent: 09 April 2026 11:30
-> > > > > Subject: Re: [PATCH net v2 2/2] net: phy: micrel: remove
-> > > > > ksz9131_resume()
-> > > > >
-> > > > > phy_init_hw() will also call drv->config_intr(), so that doesn't =
-need to be done either.
-> > > > >
-> > > > > It will also call drv->config_init(), which will call kszphy_conf=
-ig_reset().
-> > > > >
-> > > > > So most of kszphy_resume() becomes unnecessary. I think the only
-> > > > > thing that remains would be the call to kszphy_enable_clk() -
-> > > > > and is it fine to call that after
-> > > phy_init_hw() ?
-> > > >
-> > > > It just needs kszphy_enable_clk() and phydev->drv->config_intr()
-> > > > to enable PHY interrupts for suspend-to-RAM to work on RZ/G3E SMARC=
- EVK.
-> > >
-> > > I think you mean WoL rather than suspend-to-RAM, although I don't
-> > > see anything in micrel.c that hints that WoL is supported, so please =
-explain why and how the PHY
-> interrupt impacts suspend-to-RAM.
-> >
-> > This is not WoL. During Suspend-to-RAM, the DDR goes into retention
-> > mode while the CPU, SoC, and PHY power is cut off.
-> >
-> > During resume, TF-A detects WARM_RESET, brings DDR out of retention,
-> > and jumps to the PSCI resume path.
-> >
-> > >
-> > > Note that a particular interrupt should not wake the system unless
-> > > enable_irq_wake() has been called for that specific interrupt.
-> >
-> > If PHY interrupts are not configured during resume, no link interrupt i=
-s received and the message:
-> > "renesas-gbeth 11c30000.ethernet end0: Link is Up - 1Gbps/Full - flow c=
-ontrol rx/tx"
-> > is not seen, as shown in [1].
->=20
-> ... and why does that happen? Is it because the PHY has lost its interrup=
-t configuration and that needs
-> to be reprogrammed?
+Implement ACL filtering. This expands support of network flow classification
+rules for the ethtool ntuple command. ACL filtering allows for an ip or port
+field's optional mask to be specified.
 
-Yes, but phy_init_hw() reconfigures the PHY interrupt during resume.
-This is due to phydev->interrupts =3D PHY_INTERRUPT_DISABLED; in the suspen=
-d path, as you mentioned below.
+Example filters:
+  ethtool -N eth0 flow-type tcp4 dst-port 8880 m 0x00ff action 10
+  ethtool -N eth0 flow-type tcp4 src-ip 192.168.0.55 m 0.0.0.255 action -1
 
->=20
-> If you don't disable the PHY interrupt in the suspend path, then will the=
- call to drv->config_intr()
-> via phy_init_hw() before
-> phy_resume() be sufficient?
+This is a resurrection of an old series from 2020 [1] with several
+improvements, but the fundamental logic unchanged. v1 was almost pulled
+in, but ultimately it was decided to drop it [2] because of unresolved
+issues. One issue was too many defensive NULL checks. Second issue is
+about inconsistency when using multiple input sets. Both are addressed
+in this patchset.
 
-Yes, I confirm that if the PHY interrupt is not disabled in the suspend pat=
-h, the call to
-drv->config_intr() via phy_init_hw() before phy_resume() would be sufficien=
-t.
+More about the second issue:
 
-Cheers,
-Biju
+From [3]:
+>I would argue that you need to have some sort of logic that basically
+>checks to see if you are going to hit the input set issue and falls
+>back and applies the ACL rules. Otherwise you are significantly
+>hampering the usefulness of this filter type. It doesn't make sense
+>that dropping a field will cause a rule to fail to be added, but
+>masking a single bit in some field will make it valid. It would make
+>it a nightmare to use from the user point of view as the rules come
+>across as arbitrary.
+
+Flow Director (FD) has a hardware limitation where all filters for the same
+packet type must use identical input sets. Previously, attempting to add the
+second filter would fail.
+
+Patch 10 adds automatic fallback to ACL block when FD cannot accommodate a
+filter due to input set conflicts, which resolves this inconsistency.
+
+v2:
+* Rebase. Notable conflicts were the removal of ice_status and the addition of
+  libie (which affected AdminQ communication)
+* Reduce the number of defensive NULL checks
+* Use = {} instead of memset for definitions
+* Use kzalloc_obj() instead of plain kzalloc()
+* Move from devm_ to plain allocation for objects that don't require it
+* Move iterator declaration to loop start
+* Move some defines out of structs
+* Fix kdoc (except untouched ice_ethtool_fdir.c functions)
+* Adjust style (err for return variable, spacing, rewrite some comments,
+* commit messages)
+* Remove overly verbose comments
+* Add patches 5, 6, 9 and 10
+* More changes listed in patches (if applicable)
+
+[1] https://lore.kernel.org/intel-wired-lan/20200914153720.48498-1-anthony.l.nguyen@intel.com
+[2] https://lore.kernel.org/netdev/7192efe4d27c93148b3205e65f37203c89170316.camel@intel.com/#t
+[3] https://lore.kernel.org/netdev/CAKgT0Ucxd5-gvEwWAdbL04ER2o++RX_oekUV3E0rYquEgFKj1w@mail.gmail.com
+
+Lukasz Czapnik (1):
+  ice: use ACL for ntuple rules that conflict with FDir
+
+Marcin Szycik (3):
+  Revert "ice: remove unused ice_flow_entry fields"
+  ice: use plain alloc/dealloc for ice_ntuple_fltr
+  ice: re-introduce ice_dealloc_flow_entry() helper
+
+Real Valiquette (5):
+  ice: initialize ACL table
+  ice: initialize ACL scenario
+  ice: create flow profile
+  ice: create ACL entry
+  ice: program ACL entry
+
+Tony Nguyen (1):
+  ice: rename shared Flow Director functions and structs
+
+ drivers/net/ethernet/intel/ice/Makefile       |    5 +-
+ drivers/net/ethernet/intel/ice/ice.h          |   21 +-
+ drivers/net/ethernet/intel/ice/ice_acl.h      |  170 +++
+ drivers/net/ethernet/intel/ice/ice_acl_main.h |    9 +
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  391 +++++-
+ drivers/net/ethernet/intel/ice/ice_arfs.h     |    2 +-
+ drivers/net/ethernet/intel/ice/ice_fdir.h     |   18 +-
+ .../net/ethernet/intel/ice/ice_flex_pipe.h    |    2 +
+ drivers/net/ethernet/intel/ice/ice_flow.h     |   39 +-
+ .../net/ethernet/intel/ice/ice_lan_tx_rx.h    |    3 +
+ drivers/net/ethernet/intel/ice/ice_type.h     |    5 +
+ drivers/net/ethernet/intel/ice/ice_acl.c      |  486 +++++++
+ drivers/net/ethernet/intel/ice/ice_acl_ctrl.c | 1111 +++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_acl_main.c |  293 ++++
+ drivers/net/ethernet/intel/ice/ice_arfs.c     |    8 +-
+ drivers/net/ethernet/intel/ice/ice_ethtool.c  |    8 +-
+ ...ce_ethtool_fdir.c => ice_ethtool_ntuple.c} |  641 ++++++---
+ drivers/net/ethernet/intel/ice/ice_fdir.c     |   30 +-
+ .../net/ethernet/intel/ice/ice_flex_pipe.c    |   11 +-
+ drivers/net/ethernet/intel/ice/ice_flow.c     | 1208 ++++++++++++++++-
+ drivers/net/ethernet/intel/ice/ice_lib.c      |   10 +-
+ drivers/net/ethernet/intel/ice/ice_main.c     |   91 +-
+ drivers/net/ethernet/intel/ice/virt/fdir.c    |   32 +-
+ 23 files changed, 4344 insertions(+), 250 deletions(-)
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_acl.h
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_acl_main.h
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_acl.c
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_acl_ctrl.c
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_acl_main.c
+ rename drivers/net/ethernet/intel/ice/{ice_ethtool_fdir.c => ice_ethtool_ntuple.c} (79%)
+
+-- 
+2.49.0
 
 
