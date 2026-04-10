@@ -1,171 +1,168 @@
-Return-Path: <netdev+bounces-277301-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277302-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8PVWCdS32GnnhAgAu9opvQ
-	(envelope-from <netdev+bounces-277301-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 10:41:56 +0200
+	id oGNKG5W32GnnhAgAu9opvQ
+	(envelope-from <netdev+bounces-277302-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 10:40:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BEA13D441B
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 10:41:55 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1046E3D43E6
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 10:40:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3DD663039830
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 08:36:31 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 67F0F30065D0
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 08:40:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EEF33ACEFD;
-	Fri, 10 Apr 2026 08:36:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0B1A3ACEE1;
+	Fri, 10 Apr 2026 08:40:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H4dMTgia";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="GH2ig9nN"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="rqmqyPCM"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BB583A9D83
-	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 08:36:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D29EB306B1B
+	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 08:40:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775810190; cv=none; b=l3eYtukHf2kMuOKM0QBKhGn1MwmnPdMMO1AxxNRe/RZPgefvNHmyLBE/8VaifWJJovzLpmEaVdKAzz7ivGdizKmloIafDBMjnbdC0SDYBErz4ZyrhMKUcI6lbEUZpNOurEEPw38HKUY4kl3wr+3nJJ9CR49zZtTuhtGZoDSaijg=
+	t=1775810405; cv=none; b=h+JZ9raMUi/rOsg9kKxd66Kg0UDylVvaVHPN25SzhHYRD6qTxH/c2Fr3564YpLJcYBIYuplfjnJvLlH+gk1hjwCtPNHPuP9R69nC0m4BuZonufK2ABCSi9DLP3P9BZx6w8yU6fEc3qqmw5kFoJhFG8fUNGBttYp38/yPm6oPdYM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775810190; c=relaxed/simple;
-	bh=AxgP8c47gAUCi2wMx3yIR+EuLZ1MEOnbjNDACsoNfbg=;
+	s=arc-20240116; t=1775810405; c=relaxed/simple;
+	bh=TiLiBT6KTnhYXWpLCgTB1gPsKon+lMJReIv7vPRLxIg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Hlxr1UqWCDR0ZfGaTgrH0gJ7504J5DB5Thi7X8oTMw8mkIlhjbHI4IV9JdiGbyxZkVtjtzSlq2IARtn9h8emagEumLYd6m8VvpPrEHFHOFjjWQl/gAFbfv/iZ5kyiTC9/zGjCLrZyWhFZISTgTTW8eojaMD/K9BmL6dpZrMCHBc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H4dMTgia; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=GH2ig9nN; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1775810187;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=AxgP8c47gAUCi2wMx3yIR+EuLZ1MEOnbjNDACsoNfbg=;
-	b=H4dMTgiaaZ/0nGsemDGuSy5/XiJOFnKkFb2ghNoZzaBCF3FjgXI13Kmrv7HQ78hM4zeof9
-	REsstwXGrY1FFrk364iLdt2UgDCoL+7+EYNg3rogp+pI/DcXXKmZ4/pFwqFb1MPMk93iPl
-	vZhZ5X6kR/Ruc6qDQ7MeWTrHpNq9oOc=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-190-6yygPjUENZG7Zj4v87rEBw-1; Fri, 10 Apr 2026 04:36:26 -0400
-X-MC-Unique: 6yygPjUENZG7Zj4v87rEBw-1
-X-Mimecast-MFC-AGG-ID: 6yygPjUENZG7Zj4v87rEBw_1775810185
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-488be33b7a6so12138285e9.0
-        for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 01:36:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1775810185; x=1776414985; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=AxgP8c47gAUCi2wMx3yIR+EuLZ1MEOnbjNDACsoNfbg=;
-        b=GH2ig9nNf3p8jf3cmd9G4lIeJ6C/YCtrp8KzFbD3roG40QNT4/6FRkcoWsrobxU+hd
-         ZuawADGnaYTCs8CFGQ2KyR+k7QE2PY0bbp4yKah/xIovk2zVntq9C7ufk5xStcQqURum
-         sW7gWCNvv0SFS7oPslt99jo+qdKV3wA3zyx5h9rnH5q1xfhTcyhgFtWcDH1+jlypsfcd
-         54sjqp3aGECJshnFQpekytYQGx+4L8CeMmd3bWA9jA8Nd6NZ5moigi16kB5gT0fpdMq2
-         Mv2tmhlsf4xJvA69y5+eY4yG+snpPxz3Usnkv9a+5D8rRBjE4hrhb19xZegGbd9bIaRp
-         pGow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775810185; x=1776414985;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=AxgP8c47gAUCi2wMx3yIR+EuLZ1MEOnbjNDACsoNfbg=;
-        b=GyRVsBiLsWk5S+DY+EX7U1DKzC05SJ/6L2KXuqXK8eF+u/yUbc7W9C5EBcyZabnC52
-         fkffjhCS61vvl3xC4VjKhuW6y2XHRoENiAPAfrIIQqV+brO4M6FuPdcI2OD5EEEbkf5+
-         QzHdwxftp9Zrz04rJ5D52jab56CHbC3QM2FxXQlsxPTjWLx9mtbc4Ly1Ft+q2iR9ZOZ/
-         KziYnzUu0w1pFolyBEWKb4AxsbNFxAP5bgwBgoPzkCMgzuEM26daHq2Fz1lw/GtoY+6Y
-         AS7hvPCGSuH5kz+AMQkxWqbRGAl87Jp1pdZoPG3cTYZX5k/d9DI5R8SmxadSHw7cLhhb
-         y8Hw==
-X-Forwarded-Encrypted: i=1; AJvYcCVE05Gf11aV3QvPpx9hK6hB1APza3FBCpPxoRrcArKjTFAL2B10/4N4WQDkesfrCzC2CekNOH0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJOHUiz3IzjPz5rblR2qc/Y13VCgMeCjqoqCwbSjYrYs/Kygh6
-	Oc/mxT7losTpDkNo/kG8XhkQJjK2UXSiqwkv3Loy+gXwULF/eOoG/ctgovDFZOdcwVKKB60tuow
-	jirGd5M7vpmG2JghGhxTwohelWdtQWlo+NSlrRbby/z4NM/yyElZG5jiZ2A==
-X-Gm-Gg: AeBDieunWvJ3PKON8zPUufzP5RvFQHIoPxUTZZT+G7Cs/u9zUgJawvBtwp1jsg3G0uN
-	u5LJ5DCgHwFy/Ia43cjHC/jj0JJ5CV0+Tp43JXxAeMCELF2QK6LtnWwGTdX5/4ix3BBgMnh9XBq
-	W+DwZmhfxbtkHc7q06eVE8C+2zEx+V+0CmewDmI8CCxADg3zWLU/588cn7xJWc9HPLoUakMnoe8
-	TtHcS+giWRWhQc8tS8QZg2EasxKw3KsnzmPI79BXFx5eJEtBkYE0YKEyyiTY4snezz18eZ8i+EO
-	j4a7Ze9rtmhGaE7/sAFXsZZw9MPrbi5ClJOOY7pDaLKoAaJBLV9KjSB5/r2QHLFdPu8uPr01X1U
-	wwOg40LGuJRa/MnKLjGshYt921Bm1IDCOm9dbFOHW7u2m0Jymu/fzrX9yv9N8CEsD1BcUO58PYQ
-	==
-X-Received: by 2002:a05:600c:8209:b0:488:9ed3:148f with SMTP id 5b1f17b1804b1-488d684ba0emr25033295e9.21.1775810184725;
-        Fri, 10 Apr 2026 01:36:24 -0700 (PDT)
-X-Received: by 2002:a05:600c:8209:b0:488:9ed3:148f with SMTP id 5b1f17b1804b1-488d684ba0emr25032745e9.21.1775810184278;
-        Fri, 10 Apr 2026 01:36:24 -0700 (PDT)
-Received: from sgarzare-redhat (host-79-45-205-236.retail.telecomitalia.it. [79.45.205.236])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488d525c931sm56045695e9.0.2026.04.10.01.36.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Apr 2026 01:36:23 -0700 (PDT)
-Date: Fri, 10 Apr 2026 10:36:18 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Norbert Szetei <norbert@doyensec.com>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, virtualization@lists.linux.dev, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 net] vsock: fix buffer size clamping order
-Message-ID: <adi2chLOGW0pms1Y@sgarzare-redhat>
-References: <180118C5-8BCF-4A63-A305-4EE53A34AB9C@doyensec.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=m9Funev6gwWPVXWW/MTda65jsSmdR+B1Xed2EPBILZbXK8H893V/d6cDULHoPrTlVavVrN4LfGH7CwI8dOl4wptqtETjp1Dbf3A1GP+Im7vB264ws27H2reTsn+8yIEjo9FZn67DiQmdfw18QdRIIPsHJwMM9NWYnDkMKuANkbg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=rqmqyPCM; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=ZdOnR/1mCgonR7f2wP3H5JqrF/rCMapSujGWUMtD9/A=; b=rqmqyPCMlvW3KvDYDz3/ETNIAh
+	G+ESQPCwbBnKWQSJh+ewTI/voRE6d3Ofr1iTuT3bDkAk27P35fRCtsFZbsndaH/5R0K66REmgJSa9
+	6DVG3w9ciTeMT7N2D8gBgu388hIIZw6pNykZbUBWSDiL7IR0aL2hPrX8lB4FFeNyxkZ34crCfawWq
+	ET2uU1utHtMx1ISS5KHV4cXaCRdUmtsF7xMSq6W4rlj8YdqvT2Z4amTnf9HBxDn9tiMn2tvOV0lU9
+	fP2Wv8AVO7k6NoEkFKJOMMsTBV69KWgM7sywkLGQu709m6YCrVMKL6osnzUr1As2obFMhYf3OddEf
+	Nyrg83EA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:45482)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1wB7P7-000000004e2-341K;
+	Fri, 10 Apr 2026 09:39:53 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1wB7P4-000000005UF-3z5f;
+	Fri, 10 Apr 2026 09:39:50 +0100
+Date: Fri, 10 Apr 2026 09:39:50 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, Chen-Yu Tsai <wens@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-sunxi@lists.linux.dev, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Samuel Holland <samuel@sholland.org>
+Subject: Re: [PATCH RFC net-next 02/10] net: stmmac: rename dev_id to userver
+Message-ID: <adi3Vks-N0a83ylE@shell.armlinux.org.uk>
+References: <adYfPBHsXxQUsMyr@shell.armlinux.org.uk>
+ <E1wAPBR-0000000F7ju-1fD9@rmk-PC.armlinux.org.uk>
+ <CAMdnO-+TK65AxjTsDd017Mhop+VC3Xf8jtfaTXYpE6wBNZOt4g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <180118C5-8BCF-4A63-A305-4EE53A34AB9C@doyensec.com>
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAMdnO-+TK65AxjTsDd017Mhop+VC3Xf8jtfaTXYpE6wBNZOt4g@mail.gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spamd-Result: default: False [1.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-277301-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-277302-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sgarzare@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.997];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[doyensec.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7BEA13D441B
+	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:email,armlinux.org.uk:url,shell.armlinux.org.uk:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 1046E3D43E6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Apr 09, 2026 at 06:34:12PM +0200, Norbert Szetei wrote:
->In vsock_update_buffer_size(), the buffer size was being clamped to the
->maximum first, and then to the minimum. If a user sets a minimum buffer
->size larger than the maximum, the minimum check overrides the maximum
->check, inverting the constraint.
->
->This breaks the intended socket memory boundaries by allowing the
->vsk->buffer_size to grow beyond the configured vsk->buffer_max_size.
->
->Fix this by checking the minimum first, and then the maximum. This
->ensures the buffer size never exceeds the buffer_max_size.
->
->Fixes: b9f2b0ffde0c ("vsock: handle buffer_size sockopts in the core")
->Suggested-by: Stefano Garzarella <sgarzare@redhat.com>
->Signed-off-by: Norbert Szetei <norbert@doyensec.com>
->---
->v3:
-> - Added Fixes and Suggested-by tags.
->
-> net/vmw_vsock/af_vsock.c | 6 +++---
-> 1 file changed, 3 insertions(+), 3 deletions(-)
+On Thu, Apr 09, 2026 at 04:07:42PM -0700, Jitendra Vegiraju wrote:
+> Hi Russell,
+> 
+> On Wed, Apr 8, 2026 at 2:27 AM Russell King (Oracle)
+> <rmk+kernel@armlinux.org.uk> wrote:
+> >
+> > The Synopsys Databook and several implementation TRMs identify bits
+> > 15:8 of the version register in dwmac v3.xx and v4.xx as "userver".
+> > We even print its value with "User ID". Rather than using "dev_id",
+> > use "userver" instead.
+> >
+> > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> > ---
+> >  drivers/net/ethernet/stmicro/stmmac/hwif.c | 18 +++++++++---------
+> >  1 file changed, 9 insertions(+), 9 deletions(-)
+> >
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.c b/drivers/net/ethernet/stmicro/stmmac/hwif.c
+> > index 3774af66db48..830ff816ab4f 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/hwif.c
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/hwif.c
+> > @@ -15,7 +15,7 @@
+> >
+> >  struct stmmac_version {
+> >         u8 snpsver;
+> > -       u8 dev_id;
+> > +       u8 userver;
+> >  };
+> From the XGMAC databook that I have access to bits(15:8) identify the
+> DEVID field of MAC_version register.
+> The userver field is from bits(23:16) of the same register. This is a
+> customer defined field (configured with coreConsultant).
+> Currently stmmac doesn't care about bits(23:16).
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+Thanks for the additional information.
 
+I don't have any XGMAC documentation, but this indicates that it differs
+between XGMAC and previous cores - GMAC and GMAC4 cores, 15:8 are
+documented as userver, and 31:16 are marked as reserved.
+
+Note that the dev_info() also prints 15:8 as "User ID" not "Device ID".
+
+To confirm, is the XGMAC version register at offset 0x20 ? Later GMAC
+cores moved it to 0x110.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
