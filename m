@@ -1,74 +1,83 @@
-Return-Path: <netdev+bounces-277483-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277486-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kGKwAlIk2WmnmggAu9opvQ
-	(envelope-from <netdev+bounces-277483-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 18:24:50 +0200
+	id aN4bDFMn2WkPmwgAu9opvQ
+	(envelope-from <netdev+bounces-277486-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 18:37:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 914933DA5D9
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 18:24:49 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61ACF3DA79D
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 18:37:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 20B30305DD20
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 16:22:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0804E3006B17
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 16:25:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EEE53DB644;
-	Fri, 10 Apr 2026 16:22:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 618023D9DAA;
+	Fri, 10 Apr 2026 16:25:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="bDCUFlGk"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZUWY9QP5"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay.virtuozzo.com (relay.virtuozzo.com [130.117.225.111])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 649FF3DA5D1;
-	Fri, 10 Apr 2026 16:22:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=130.117.225.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D0C83BAD8F
+	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 16:25:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775838124; cv=none; b=fdUyIt19NNEPXXO5GfSftSFkL9/PBIOLumaiP3peBH1Of5dqTcT8of7J8gUZWVURpxjW+gwYUxtxFDjP7kSPwxv+tFmrHKCqBYsUFn8KAm9v177NKJdVM7hecrmwon4zdBQ85txT3ql9033y5ViHAMJo7AeezMrFu2BDQovFHSU=
+	t=1775838357; cv=none; b=Dg+dxe2cSVc016P4Wknz01F8GUkWrMVR3krKtTUlo9zoBzpZRMSaF79OIdhfBoB/1sX3yHepwzH+0YCVXjpltqsoqWS7ISyvtAQwgE4gfYJ8a+FpDzLCirX3uCdu5lwVjo54XGa+LkSJQ9LBKpxAlRVYP7i+F+7Y0DUgnEaEv1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775838124; c=relaxed/simple;
-	bh=gkbTTpomOFQo/PRcjGzCDH15wJLGopmMjVQHvuUkTE0=;
+	s=arc-20240116; t=1775838357; c=relaxed/simple;
+	bh=WIgf06YVrt3i8IDBeTEXTOVKt6Ma5XHOJR3hB7Q6upw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=R3XOQwsaC5z3ZfzvQJ2zBwOV/tUDBc5nKI7RGoeoowmBvpZKBcdETPcVca3WEAQHOMMNDYSLlyq85xuNmWzBHUDv0VKL/YR3ozgoFd0Ka8rEDUfOClhhhBLaE+ZTMiUJdMy+G94uxEn+FkVkn+mrco38BXlGT45DupoEvfChqQY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com; spf=pass smtp.mailfrom=virtuozzo.com; dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b=bDCUFlGk; arc=none smtp.client-ip=130.117.225.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=virtuozzo.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=virtuozzo.com; s=relay; h=MIME-Version:Message-ID:Date:Subject:From:
-	Content-Type; bh=vDQwbU4pA2tkOClsty9Cq8ODFRev4Jm+5mUhOrtRRvs=; b=bDCUFlGkTGuG
-	MKXtNrccLBBIprNtszTWyFUXfTg17ic/wvGAG2aCg9Ml9l3gQj5Uac6vIxSZBWb3NfdKsb75ccncH
-	/+tpAga2p1luJwFlTIw6R2MPO1Y4vJJUSm/s7geA0ULq8wCiAET3QT+O8waBP6CB3+1GyvCLwe7hK
-	9T6JI8IpESMkd/4EiHyutqoyQHVqCzACJbhTdEg12I4Uh3eC9mGqaPHMAyEtXme2kKfBXKu8yWaDF
-	a8LITqNyzi4WJgELq/1vaq1kh4ANpKwxzjARQrk8J/ddZ/TyjgCEceUkeAtpnEq/I+lUQs9tIgCWL
-	wFkvhv2wcxWTjsnBN+wQTQ==;
-Received: from [130.117.225.5] (helo=finist-alma9.vzint.dev)
-	by relay.virtuozzo.com with esmtp (Exim 4.96)
-	(envelope-from <khorenko@virtuozzo.com>)
-	id 1wBEZo-00FvwO-2X;
-	Fri, 10 Apr 2026 18:21:47 +0200
-From: Konstantin Khorenko <khorenko@virtuozzo.com>
-To: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>,
-	=?UTF-8?q?Thomas=20Wei=C3=9Fschuh?= <linux@weissschuh.net>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Peter Oberparleiter <oberpar@linux.ibm.com>,
-	Mikhail Zaslonko <zaslonko@linux.ibm.com>,
+	 MIME-Version; b=kFlndl1TCGKDlBlK/EjgMEeNlCehMU3Uc7GQPYB7pa8NaTaYf9z1e5DQ87nbVJwI5RZd1kk2rYDjisA1gBEAYJZ+EbUuSAJk2IDSqhVNXpGISWJribWyt7iui9NGpR5TseP3jAA9dc8AfZa+eA8CQvuPGKB/M6TuV0+UHsMYFSc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZUWY9QP5; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1775838355;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WIgf06YVrt3i8IDBeTEXTOVKt6Ma5XHOJR3hB7Q6upw=;
+	b=ZUWY9QP5sqAKGspnAAQah7D9Z83TIThQ3v1TOqqnunmxx8mDyNiPKnavfCjBOqH7zJH9pW
+	J0OB3sCE3SocIdlvZhtYdNDsUYP2+UYgjEoorEo5Zd/KfH+9vRvCJKw9FS6BwHgMPWPgRO
+	pgvwrIEhKpIQW6ju6WfKdXOStZ6NtDg=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-651-uRPQk7QlOeyjSGPY8gCZmA-1; Fri,
+ 10 Apr 2026 12:25:50 -0400
+X-MC-Unique: uRPQk7QlOeyjSGPY8gCZmA-1
+X-Mimecast-MFC-AGG-ID: uRPQk7QlOeyjSGPY8gCZmA_1775838348
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A82C3183EED1;
+	Fri, 10 Apr 2026 16:25:48 +0000 (UTC)
+Received: from fedora.redhat.com (unknown [10.44.32.88])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3F5B01800B7F;
+	Fri, 10 Apr 2026 16:25:43 +0000 (UTC)
+From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+To: przemyslaw.kitszel@intel.com
+Cc: anthony.l.nguyen@intel.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	intel-wired-lan@lists.osuosl.org,
+	jacob.e.keller@intel.com,
+	jtornosm@redhat.com,
+	kohei.enju@gmail.com,
+	kuba@kernel.org,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Pavel Tikhomirov <ptikhomirov@virtuozzo.com>,
-	Vasileios Almpanis <vasileios.almpanis@virtuozzo.com>,
-	Konstantin Khorenko <khorenko@virtuozzo.com>
-Subject: [PATCH v3 2/2] net: add noinline __init __no_profile to skb_extensions_init() for GCOV compatibility
-Date: Fri, 10 Apr 2026 19:21:50 +0300
-Message-ID: <20260410162150.3105738-3-khorenko@virtuozzo.com>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20260410162150.3105738-1-khorenko@virtuozzo.com>
-References: <20260409214736.2651198-1-khorenko@virtuozzo.com>
- <20260410162150.3105738-1-khorenko@virtuozzo.com>
+	pabeni@redhat.com,
+	stable@vger.kernel.org
+Subject: Re: [Intel-wired-lan] [PATCH net v2 3/4] iavf: send MAC change request synchronously
+Date: Fri, 10 Apr 2026 18:25:42 +0200
+Message-ID: <20260410162542.209743-1-jtornosm@redhat.com>
+In-Reply-To: <30d48647-8c1d-4683-ae9d-becb33cf8d4f@intel.com>
+References: <30d48647-8c1d-4683-ae9d-becb33cf8d4f@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,74 +85,49 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[virtuozzo.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[virtuozzo.com:s=relay];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-277483-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-277486-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[intel.com,davemloft.net,google.com,lists.osuosl.org,redhat.com,gmail.com,kernel.org,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[khorenko@virtuozzo.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[virtuozzo.com:+];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[jtornosm@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[virtuozzo.com:dkim,virtuozzo.com:email,virtuozzo.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 914933DA5D9
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 61ACF3DA79D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-With -fprofile-update=atomic in global CFLAGS_GCOV, GCC still cannot
-constant-fold the skb_ext_total_length() loop when it is inlined into a
-profiled caller.  The existing __no_profile on skb_ext_total_length()
-itself is insufficient because after __always_inline expansion the code
-resides in the caller's body, which still carries GCOV instrumentation.
+Hello Przemek,
 
-Mark skb_extensions_init() with __no_profile so the BUILD_BUG_ON checks
-can be evaluated at compile time.  Also mark it noinline to prevent the
-compiler from inlining it into skb_init() (which lacks __no_profile),
-which would re-expose the function body to GCOV instrumentation.
+Thank you again for your comments.
+I will try to include the new ones too in the next version.
+In addition, I will analyze the suggested integration with existing
+iavf_poll_virtchnl_msg() and possibly iavf_virtchnl_completion, but maybe
+better in a new patch of the series as a refactoring.
 
-Add __init since skb_extensions_init() is only called from __init
-skb_init().  Previously it was implicitly inlined into the .init.text
-section; with noinline it would otherwise remain in permanent .text,
-wasting memory after boot.
-
-Build-tested with both CONFIG_GCOV_PROFILE_ALL=y and
-CONFIG_KCOV_INSTRUMENT_ALL=y.
-
-Signed-off-by: Konstantin Khorenko <khorenko@virtuozzo.com>
----
- net/core/skbuff.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 59fb4b2bb821..0978f526acf4 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -5153,7 +5153,7 @@ static __always_inline __no_profile unsigned int skb_ext_total_length(void)
- 	return l;
- }
- 
--static void skb_extensions_init(void)
-+static noinline void __init __no_profile skb_extensions_init(void)
- {
- 	BUILD_BUG_ON(SKB_EXT_NUM > 8);
- 	BUILD_BUG_ON(skb_ext_total_length() > 255);
--- 
-2.43.5
+Best regards
+Jose Ignacio
 
 
