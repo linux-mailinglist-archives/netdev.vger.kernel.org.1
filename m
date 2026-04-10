@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-277556-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277557-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UBWHGKFX2WlGoggAu9opvQ
-	(envelope-from <netdev+bounces-277556-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 22:03:45 +0200
+	id ABrKKmFY2WlGoggAu9opvQ
+	(envelope-from <netdev+bounces-277557-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 22:06:57 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id F10243DC4B1
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 22:03:44 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 263B93DC567
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 22:06:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 4561F3018182
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6E12D3065587
 	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 20:03:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32FE0392825;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41C7538C416;
 	Fri, 10 Apr 2026 20:03:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="vIQUyZZG"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="bU1tug6+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E89F39280A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E441236C5BB
 	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 20:03:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775851420; cv=none; b=unJwRJXqE5KDN3z+gtG3Nz9MefPWlzl0USiXNI0PhedwM2a2X/ILOsh+0qhUQwiPk2iLi8dwbKlZMfULMylWXoAlpBwrGtBLk2DVITkIJLGUS9lXdhRUp3OEyR+ljrzLKtIy2me08D4gI7T3OiJq+Z/Kkx1jK+lO0aVVwXygyNU=
+	t=1775851420; cv=none; b=Cwf0Vj0BOKE5j/iTEsmU0wWYBkjq2q4F6fJK6ZiBNm56DXg08/LJVqMlx+LG6h8Tg+3TBWm3rGUCDB43M74dsW0OxLLWonBvl3apu4mQy9o3dDCy0Agw5sttk5rz0k1Dbf6dG0Z8r+N3v+iHNrXOXL0YskKctFmgrNcVzdHwTSo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1775851420; c=relaxed/simple;
-	bh=X4i/OoFaeM9VGRfRDXiH/9SXWflhrZWM2ZBAMA0g73M=;
+	bh=kLwAGzdnLwU7BhpcTHerDHEpLONZCiWVPt2kn4PovtA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jirboIsRNPh5brADB9VW75U6WlfiNPjQ3ABsn+ux8I9MNqah1Pjv48anHiTQ1VFa8vkjrSWwgKWMN4syFyZWLDfAqq9WEmE0frP/OzOxU70aeypvlmWdoIfklFMtqI0tFynNWcKZr2yOUfUUL2+IQB3mQxyk3qwCLlkLiXLL7xI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=vIQUyZZG; arc=none smtp.client-ip=171.64.64.25
+	 MIME-Version; b=MAw19p8Rn+sADwWEWY0qpbm9lfoPBKdXJIt7ix2Lar8uJQF72ya7IEhsxzYEljHpjdBHCWCQB5TMnlZQax371HCpLa3oxqjG1efM/L8HHOsyahWDF27j5I9dTlOV8j9toGcw61izilc95WtTjHRtsZ13kxTvBzzMEpxZkwyvvNY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=bU1tug6+; arc=none smtp.client-ip=171.64.64.25
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -40,17 +40,17 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=fFQEMNTdTG02cj3cnYb186SUrxITio/BHYAhQMXx/wo=; t=1775851418; x=1776715418; 
-	b=vIQUyZZGOZqD/IHpyEkNDmUnDvNG8worHkk3llu+vygODd5zl/TGZgbmrmice1Nwbd7UjXvFulv
-	WbZm+7b+SpwV9/pCTOqXYH5N8XGGEeQrNqrx7oYpgFNR9VjThiUNrrEgNdlPLqlFHq+0CgYWkQMBO
-	aEu3qChgZ6aQcP3lubCWmt42stDeK8TTE0sG5B12U81BfErd5l9yNue+YRTisZx64tNlVcWaNGbZq
-	BtUBhLCZTnyrehj5vQKEc1xYTIyRLBGbpnT4VDcrKiOodG9QgVgLYTPQi0WhOkRG0Rs3waZ9bgg6n
-	kYwz4rgAUvmpZrHkr9QkLrBYincnECYE96Fw==;
+	bh=jrLe7+SMjIPzFytFGWWvGZz8t4sgHoqeFGdIR+R/vTA=; t=1775851418; x=1776715418; 
+	b=bU1tug6+8+JZ0hi6ESJmnNgX9aHjtuaMc2VTefo6qFVnlQG9b3gsw0k2wi1n3umSSIjqotG1fj7
+	k+Tkx0UWnfCvurl/2etwJWmy3ZPEnR2+PoG78XGUE1qi/8gZOqKKSnv5Ef8EqLunHNwnFtta+O1H1
+	pf9C+zRAGOxhyH99Y4q2CldG+Bg9zZ7D3hbgEqypZMjcTr9KheZJK7Gr4HWw4denYAGwqEPxHyU/B
+	VtOombUJ9h+zSGLwYKMIlNihmI9TxLmcuXMGY3r8vZ+DI4mpCDsmvw995U0qkFpEq498kJVGHNEE/
+	XF/2FVOv0V1XgfPcI2UnWtUWvXMaF9rYBmVg==;
 Received: from ouster448.stanford.edu ([172.24.72.71]:51553 helo=ouster2022)
 	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <ouster@cs.stanford.edu>)
-	id 1wBI4m-0003MV-Tj; Fri, 10 Apr 2026 13:03:37 -0700
+	id 1wBI4n-0003MV-Vf; Fri, 10 Apr 2026 13:03:38 -0700
 From: John Ousterhout <ouster@cs.stanford.edu>
 To: netdev@vger.kernel.org
 Cc: pabeni@redhat.com,
@@ -58,9 +58,9 @@ Cc: pabeni@redhat.com,
 	horms@kernel.org,
 	kuba@kernel.org,
 	John Ousterhout <ouster@cs.stanford.edu>
-Subject: [PATCH net-next v18 10/15] net: homa: create homa_utils.c
-Date: Fri, 10 Apr 2026 13:03:04 -0700
-Message-ID: <20260410200310.1915-11-ouster@cs.stanford.edu>
+Subject: [PATCH net-next v18 11/15] net: homa: export skb_attempt_defer_free
+Date: Fri, 10 Apr 2026 13:03:05 -0700
+Message-ID: <20260410200310.1915-12-ouster@cs.stanford.edu>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260410200310.1915-1-ouster@cs.stanford.edu>
 References: <20260410200310.1915-1-ouster@cs.stanford.edu>
@@ -71,215 +71,58 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Score: -101.1
-X-Scan-Signature: d9e551a77958145a553edd5d6e40717d
+X-Spam-Score: -101.8
+X-Scan-Signature: 9dddbef7dbf47a29383c7a3c8e5dce6e
 X-Spamd-Result: default: False [1.14 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_DKIM_REJECT(1.00)[cs.stanford.edu:s=cs2308];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	DMARC_POLICY_SOFTFAIL(0.10)[cs.stanford.edu : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-277556-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-277557-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	TO_DN_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[ouster@cs.stanford.edu,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[cs.stanford.edu:-];
-	NEURAL_HAM(-0.00)[-0.873];
+	NEURAL_HAM(-0.00)[-0.913];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_FIVE(0.00)[6];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,stanford.edu:email,cs.stanford.edu:mid]
-X-Rspamd-Queue-Id: F10243DC4B1
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,stanford.edu:email,cs.stanford.edu:mid]
+X-Rspamd-Queue-Id: 263B93DC567
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This file contains functions for constructing and destructing
-homa structs.
+This function is now used by Homa.
 
 Signed-off-by: John Ousterhout <ouster@cs.stanford.edu>
-
 ---
-Changes for v16:
-* Use cpu_relax when spinning
+ net/core/skbuff.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Changes for v11:
-* Move link_mbps variable from struct homa_pacer back to struct homa
-
-Changes for v10:
-* Remove log messages after alloc errors
-
-Changes for v9:
-* Add support for homa_net objects
-* Use new homa_clock abstraction layer
-* Various name improvements (e.g. use "alloc" instead of "new" for functions
-  that allocate memory)
-
-Changes for v8:
-* Accommodate homa_pacer refactoring
-
-Changes for v7:
-* Make Homa a pernet subsystem
-* Add support for tx memory accounting
-* Remove "lock_slow" functions, which don't add functionality in this
-  patch series
-* Use u64 and __u64 properly
----
- net/homa/homa_impl.h  |   6 +++
- net/homa/homa_utils.c | 110 ++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 116 insertions(+)
- create mode 100644 net/homa/homa_utils.c
-
-diff --git a/net/homa/homa_impl.h b/net/homa/homa_impl.h
-index cf8a0b64cc6a..e997f1f6cb3b 100644
---- a/net/homa/homa_impl.h
-+++ b/net/homa/homa_impl.h
-@@ -359,13 +359,19 @@ static inline bool homa_make_header_avl(struct sk_buff *skb)
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index 4657d0245a84..a66209647732 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -7314,6 +7314,7 @@ nodefer:	kfree_skb_napi_cache(skb);
+ 	if (unlikely(kick))
+ 		kick_defer_list_purge(cpu);
+ }
++EXPORT_SYMBOL(skb_attempt_defer_free);
  
- extern unsigned int homa_net_id;
- 
-+void     homa_destroy(struct homa *homa);
- int      homa_fill_data_interleaved(struct homa_rpc *rpc,
- 				    struct sk_buff *skb, struct iov_iter *iter);
-+int      homa_init(struct homa *homa);
- int      homa_message_out_fill(struct homa_rpc *rpc,
- 			       struct iov_iter *iter, int xmit);
- void     homa_message_out_init(struct homa_rpc *rpc, int length);
-+void     homa_net_destroy(struct homa_net *hnet);
-+int      homa_net_init(struct homa_net *hnet, struct net *net,
-+		       struct homa *homa);
- void     homa_rpc_handoff(struct homa_rpc *rpc);
- int      homa_rpc_tx_end(struct homa_rpc *rpc);
-+void     homa_spin(int ns);
- struct sk_buff *homa_tx_data_pkt_alloc(struct homa_rpc *rpc,
- 				       struct iov_iter *iter, int offset,
- 				       int length, int max_seg_data);
-diff --git a/net/homa/homa_utils.c b/net/homa/homa_utils.c
-new file mode 100644
-index 000000000000..df3845fb9417
---- /dev/null
-+++ b/net/homa/homa_utils.c
-@@ -0,0 +1,110 @@
-+// SPDX-License-Identifier: BSD-2-Clause or GPL-2.0+
-+
-+/* This file contains miscellaneous utility functions for Homa, such
-+ * as initializing and destroying homa structs.
-+ */
-+
-+#include "homa_impl.h"
-+#include "homa_peer.h"
-+#include "homa_rpc.h"
-+
-+#include "homa_stub.h"
-+
-+/**
-+ * homa_init() - Constructor for homa objects.
-+ * @homa:   Object to initialize.
-+ *
-+ * Return:  0 on success, or a negative errno if there was an error. Even
-+ *          if an error occurs, it is safe (and necessary) to call
-+ *          homa_destroy at some point.
-+ */
-+int homa_init(struct homa *homa)
-+{
-+	int err;
-+
-+	memset(homa, 0, sizeof(*homa));
-+
-+	atomic64_set(&homa->next_outgoing_id, 2);
-+	homa->link_mbps = 25000;
-+	homa->peertab = homa_peer_alloc_peertab();
-+	if (IS_ERR(homa->peertab)) {
-+		err = PTR_ERR(homa->peertab);
-+		homa->peertab = NULL;
-+		return err;
-+	}
-+	homa->socktab = kmalloc(sizeof(*homa->socktab), GFP_KERNEL);
-+	if (!homa->socktab)
-+		return -ENOMEM;
-+	homa_socktab_init(homa->socktab);
-+
-+	/* Wild guesses to initialize configuration values... */
-+	homa->resend_ticks = 5;
-+	homa->resend_interval = 5;
-+	homa->timeout_ticks = 100;
-+	homa->timeout_resends = 5;
-+	homa->request_ack_ticks = 2;
-+	homa->reap_limit = 10;
-+	homa->dead_buffs_limit = 5000;
-+	homa->max_gso_size = 10000;
-+	homa->wmem_max = 100000000;
-+	homa->bpage_lease_usecs = 10000;
-+	return 0;
-+}
-+
-+/**
-+ * homa_destroy() -  Destructor for homa objects.
-+ * @homa:      Object to destroy. It is safe if this object has already
-+ *             been previously destroyed.
-+ */
-+void homa_destroy(struct homa *homa)
-+{
-+	/* The order of the following cleanups matters! */
-+	if (homa->socktab) {
-+		homa_socktab_destroy(homa->socktab, NULL);
-+		kfree(homa->socktab);
-+		homa->socktab = NULL;
-+	}
-+	if (homa->peertab) {
-+		homa_peer_free_peertab(homa->peertab);
-+		homa->peertab = NULL;
-+	}
-+}
-+
-+/**
-+ * homa_net_init() - Initialize a new struct homa_net as a per-net subsystem.
-+ * @hnet:    Struct to initialzie.
-+ * @net:     The network namespace the struct will be associated with.
-+ * @homa:    The main Homa data structure to use for the net.
-+ * Return:  0 on success, otherwise a negative errno.
-+ */
-+int homa_net_init(struct homa_net *hnet, struct net *net, struct homa *homa)
-+{
-+	memset(hnet, 0, sizeof(*hnet));
-+	hnet->homa = homa;
-+	hnet->prev_default_port = HOMA_MIN_DEFAULT_PORT - 1;
-+	return 0;
-+}
-+
-+/**
-+ * homa_net_destroy() - Release any resources associated with a homa_net.
-+ * @hnet:    Object to destroy; must not be used again after this function
-+ *           returns.
-+ */
-+void homa_net_destroy(struct homa_net *hnet)
-+{
-+	homa_socktab_destroy(hnet->homa->socktab, hnet);
-+	homa_peer_free_net(hnet);
-+}
-+
-+/**
-+ * homa_spin() - Delay (without sleeping) for a given time interval.
-+ * @ns:   How long to delay (in nanoseconds)
-+ */
-+void homa_spin(int ns)
-+{
-+	u64 end;
-+
-+	end = homa_clock() + homa_ns_to_cycles(ns);
-+	while (homa_clock() < end)
-+		cpu_relax();
-+}
+ static void skb_splice_csum_page(struct sk_buff *skb, struct page *page,
+ 				 size_t offset, size_t len)
 -- 
 2.43.0
 
