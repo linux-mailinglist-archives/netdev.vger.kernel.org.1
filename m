@@ -1,165 +1,135 @@
-Return-Path: <netdev+bounces-277259-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277260-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yLFuOnuU2GkgfggAu9opvQ
-	(envelope-from <netdev+bounces-277259-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 08:11:07 +0200
+	id YHZSO4iU2GkgfggAu9opvQ
+	(envelope-from <netdev+bounces-277260-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 08:11:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A6853D28E6
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 08:11:07 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97A9A3D28FD
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 08:11:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6E437301484E
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 06:11:01 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 24DA13015499
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 06:11:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA3E433F588;
-	Fri, 10 Apr 2026 06:10:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 814F133D4E9;
+	Fri, 10 Apr 2026 06:11:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b="ditGwF48"
+	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="BbjEunfA";
+	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="t/n5YiwY"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.126.com (m16.mail.126.com [220.197.31.9])
+Received: from bkemail.birger-koblitz.de (bkemail.birger-koblitz.de [23.88.97.239])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B98892AE68;
-	Fri, 10 Apr 2026 06:10:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6214E29AAEA;
+	Fri, 10 Apr 2026 06:11:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.88.97.239
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775801459; cv=none; b=i/+mOUipSFRca7mHO42fM6v3d9PE+UkjhpNBBW4tFI+NfQ5QRe/li+zpD0zy4xrleRhXyzIkQOTl5DrBLMcLFPjq11LelApuegGH7/DhS95pbIqmSPyy3SitTkSGiy76velYCSCHOdNLjD/eK5Yo+egUGFuP78m1bl74A8GICVU=
+	t=1775801474; cv=none; b=C5YV5jnWuG5txp5YscLHVvohnPEp5YDBxrs96lZphgxm0sI5xt98VDAhly7wZvTTZVX1kajGLSldVpfa/ZyRwZs5A9ktLGHmSBZdaHS7kPKKZpvie9xocUyjPo6E7NDDg8FB4WzUHuwvzgIy7Oj4oMSCZHZDdH0bgOCF5EFe5IQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775801459; c=relaxed/simple;
-	bh=k7Bl40ND0izrraTo2iqYR9VWnNM9qb0c1MGMEVehBv8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=SyVmRiboF0ZV6NK/cp145dHzaD8ex8ECOzbrw2Qz07jvh5wcTzxXb83ikAnbaYbYqGvFuwTq4fcfwHvtIFPkc5WEb1IAlwWssLW50sVK6eafo6YRGICm/1vN4MxIXFQZ/WSC4WRi2P5oC1nZJIe0blU3buWIYHNl/F5JCBzl2B0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com; spf=pass smtp.mailfrom=126.com; dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b=ditGwF48; arc=none smtp.client-ip=220.197.31.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=126.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=eP
-	lj0l3Pj4+bjFqZ6o5saRtTsk6tAaSXaEymjlhAFEA=; b=ditGwF48gdSPwNTG1+
-	2FUvO9udIUHg0IAmEITeN60x/ZAqx3F83dbarphyScA1mKSk+KERfIVbLgFBgt/S
-	uDiJw9y5N96LotcZaoTfQOw0Fn/RvCQCGlaYPOz6XbRg+WE3eL1CeUiFnyVutAK+
-	4TjlqRDzs4hA77trzitQPkDB4=
-Received: from YUANZM2-F4WK0J3.lenovo.com (unknown [])
-	by gzga-smtp-mtada-g1-1 (Coremail) with SMTP id _____wD3J_Y4lNhpI8IjBQ--.25708S3;
-	Fri, 10 Apr 2026 14:10:03 +0800 (CST)
-From: wit_yuan <yuanzhaoming901030@126.com>
-To: jk@codeconstruct.com.au
-Cc: yuanzhaoming901030@126.com,
-	yuanzm2@lenovo.com,
-	matt@codeconstruct.com.au,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH next-next v2] net:mctp: fix setting mctp hdr ver reserved field cause  data dropped
-Date: Fri, 10 Apr 2026 14:09:57 +0800
-Message-Id: <20260410060957.1336-2-yuanzhaoming901030@126.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260410060957.1336-1-yuanzhaoming901030@126.com>
-References: <ff147a3f0d27ef2aa6026cc86f9113d56a8c61ac.camel@codeconstruct.com.au/T/#rc39d8ae7e5ee7e74556d16fc836cc9f2bf745701>
- <20260410060957.1336-1-yuanzhaoming901030@126.com>
+	s=arc-20240116; t=1775801474; c=relaxed/simple;
+	bh=bHNbWMueZfUuYJdYPoX5RMXp1JV1ye+G1T6K+YUSiR4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qkAaLZG586sNC1sElOo69+QtnpWFtcKxyCpLiSa5wrSnFkNwmRqdWcWVmxWKs7r+pIISYqDg4uRQ6MDGRtjZqJactluG2i403IBF0EOIE3H6/H3NAyz+YiXXyR7UmcUZPHt6jd60k1BTDr203MOAJ2sWBL7XTfe25kzTWwOtoGM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de; spf=pass smtp.mailfrom=birger-koblitz.de; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=BbjEunfA; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=t/n5YiwY; arc=none smtp.client-ip=23.88.97.239
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=birger-koblitz.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
+	s=default; t=1775801470;
+	bh=bHNbWMueZfUuYJdYPoX5RMXp1JV1ye+G1T6K+YUSiR4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=BbjEunfA6wycr02x6Xlm1xIb/3ytIykKN8zFXBftLKglCIk5l6F2J6qVx6n6w2q0Z
+	 0Ty1R6Ehy6yCKkK5EcxGX2a6NXKa4wRdTeczqe/ATvjG+JkRWRV1b0geAztAW8M5iK
+	 SbYpyGbjucR2hJxRuypvqsrQEf+LfDqh/HqjgQzWPE6xFwfV6Ayti0o/MqfRp5qgfm
+	 OTKYLTCtCD2xT1IGYDYBQC0dJVNQtoVSIK3pjKqz5WyjF5/lNSorO6U8+ja9OlboFU
+	 SdtNGqkv94U0iirURCB89xsZFmnUPKg4IbQnSmhjoSQLWE6qNch4K1me+6Unqk6BXm
+	 8tF1msr0gMmPw==
+Received: by bkemail.birger-koblitz.de (Postfix, from userid 109)
+	id A029E4117A; Fri, 10 Apr 2026 06:11:10 +0000 (UTC)
+X-Spam-Level: 
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
+	s=default; t=1775801469;
+	bh=bHNbWMueZfUuYJdYPoX5RMXp1JV1ye+G1T6K+YUSiR4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=t/n5YiwYiBrYCd0n4QkXIUKaYA4zrlMgeqACi9VI2Ezy/wHeHcQpFxscrpr/b+HYq
+	 2a7ZC+Hr2JCHEbwTyonTuRhMRb7hcbC8QNpvXwTHeSFxCO5foR7V2faOXTdNxPVlXt
+	 Z5CmuRB9dsqGT0PshOJ6YSIqQ80fwIN8XBAiK53qb3b0/lDuF9YBDLjiKaoUh/z+pZ
+	 83VK+kw2cOKEPI3lrC+V9vuj0l2BF7s1BYwWuJge62E4hiTW7JZP2TJmLhTmbF5kVp
+	 DkG12C60MBWZ4mafWUsn+ARrwVf0XoWd/5ZiVgmYTzfN/iVYhn/Eo49/edDhS7jDre
+	 5PuMUTsabX5oA==
+Received: from [IPV6:2003:c6:9f04:eb00:d892:db88:9ecc:d39a] (p200300c69f04eb00d892db889eccd39a.dip0.t-ipconnect.de [IPv6:2003:c6:9f04:eb00:d892:db88:9ecc:d39a])
+	by bkemail.birger-koblitz.de (Postfix) with ESMTPSA id B3BD34116D;
+	Fri, 10 Apr 2026 06:11:09 +0000 (UTC)
+Message-ID: <2929dbc0-dd40-45de-908a-25f934738667@birger-koblitz.de>
+Date: Fri, 10 Apr 2026 08:11:08 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wD3J_Y4lNhpI8IjBQ--.25708S3
-X-Coremail-Antispam: 1Uf129KBjvJXoW7WFW8Gw1UKrW8XFWkGFyUWrg_yoW8Cw4UpF
-	1DKrW09rWkKFW2gr4kAaykXanYg3s8Ka4Uur4Sgw40qwnxXr18GFWIkr1UJw18urZ7KF93
-	JrWY9w1UJw47XF7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07U7xhLUUUUU=
-X-CM-SenderInfo: h1xd065kdrzxtqjziiqqtqqiyswou0bp/xtbBsRvDzmnYlDs1XQAA3R
-X-Spamd-Result: default: False [-0.66 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/9] r8152: Add support for RTL8157 SRAM access
+ and ADV indirect access
+To: kernel test robot <lkp@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+ netdev@vger.kernel.org, linux-usb@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260314-rtl8157_next-v1-2-9ba77b428afd@birger-koblitz.de>
+ <202604101309.B9mdviRN-lkp@intel.com>
+From: Birger Koblitz <mail@birger-koblitz.de>
+Content-Language: en-US
+In-Reply-To: <202604101309.B9mdviRN-lkp@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[126.com,none];
-	R_DKIM_ALLOW(-0.20)[126.com:s=s110527];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[birger-koblitz.de:s=default];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-277259-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[126.com,lenovo.com,codeconstruct.com.au,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[126.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FREEMAIL_FROM(0.00)[126.com];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yuanzhaoming901030@126.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[birger-koblitz.de:+];
+	TAGGED_FROM(0.00)[bounces-277260-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[birger-koblitz.de];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mail@birger-koblitz.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 2A6853D28E6
+X-Rspamd-Queue-Id: 97A9A3D28FD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Yuan Zhaoming <yuanzm2@lenovo.com>
+On 10/04/2026 07:17, kernel test robot wrote:
+> Hi Birger,
+> 
+> kernel test robot noticed the following build warnings:
+> 
+> [auto build test WARNING on 5c9e55fecf9365890c64f14761a80f9413a3b1d1]
+> 
+> url:    https://github.com/intel-lab-lkp/linux/commits/Birger-Koblitz/r8152-Add-support-for-RTL8157-RX-TX-descriptor-format/20260315-014044
+> base:   5c9e55fecf9365890c64f14761a80f9413a3b1d1
+> patch link:    https://lore.kernel.org/r/20260314-rtl8157_next-v1-2-9ba77b428afd%40birger-koblitz.de
+> patch subject: [PATCH net-next 2/9] r8152: Add support for RTL8157 SRAM access and ADV indirect access
 
-from spec dsp0236_1.2.1.pdf page 26, the mctp header contains the
-RSVD(4bit) and Hdr version(4 bit).
+This refers to the initial version of the patch, possibly v1, but v7 was applied, which did not even
+have this particular patch. This is probably a configuration issue of what the robot sees.
 
-mctp_pkttype_receive invoke mctp_hdr, and get mh->ver whole byte 
-compare the MCTP_VER_MIN, MCTP_VER_MAX. the reserver bits may be by 
-misleading used.
-
-one type hba card will set pcie vdm header Pad Len the same with RSVD
-bit, this will not work on mctp kernel solution.
-
-Signed-off-by: Yuan Zhaoming <yuanzm2@lenovo.com>
-
----
- include/net/mctp.h | 1 +
- net/mctp/route.c   | 4 ++--
- 2 files changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/include/net/mctp.h b/include/net/mctp.h
-index f481007a6..1392fafe7 100644
---- a/include/net/mctp.h
-+++ b/include/net/mctp.h
-@@ -35,6 +35,7 @@ struct mctp_hdr {
- #define MCTP_HDR_SEQ_MASK	GENMASK(1, 0)
- #define MCTP_HDR_TAG_SHIFT	0
- #define MCTP_HDR_TAG_MASK	GENMASK(2, 0)
-+#define MCTP_HDR_VER_MASK	GENMASK(3, 0)
- 
- #define MCTP_INITIAL_DEFAULT_NET	1
- 
-diff --git a/net/mctp/route.c b/net/mctp/route.c
-index 56c441e90..aa0e89d67 100644
---- a/net/mctp/route.c
-+++ b/net/mctp/route.c
-@@ -464,7 +464,7 @@ static int mctp_dst_input(struct mctp_dst *dst, struct sk_buff *skb)
- 	netid = mctp_cb(skb)->net;
- 	skb_pull(skb, sizeof(struct mctp_hdr));
- 
--	if (mh->ver != 1)
-+	if (((mh->ver & MCTP_HDR_VER_MASK)) < MCTP_VER_MIN || (mh->ver & MCTP_HDR_VER_MASK) > MCTP_VER_MAX)
- 		goto out;
- 
- 	flags = mh->flags_seq_tag & (MCTP_HDR_FLAG_SOM | MCTP_HDR_FLAG_EOM);
-@@ -1345,7 +1345,7 @@ static int mctp_pkttype_receive(struct sk_buff *skb, struct net_device *dev,
- 
- 	/* We have enough for a header; decode and route */
- 	mh = mctp_hdr(skb);
--	if (mh->ver < MCTP_VER_MIN || mh->ver > MCTP_VER_MAX)
-+	if (((mh->ver & MCTP_HDR_VER_MASK)) < MCTP_VER_MIN || (mh->ver & MCTP_HDR_VER_MASK) > MCTP_VER_MAX)
- 		goto err_drop;
- 
- 	/* source must be valid unicast or null; drop reserved ranges and
--- 
-2.43.0
-
+Birger
 
