@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-277578-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277579-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4LYpJv1o2Wn5pQgAu9opvQ
-	(envelope-from <netdev+bounces-277578-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 23:17:49 +0200
+	id +BJPMg9p2Wn5pQgAu9opvQ
+	(envelope-from <netdev+bounces-277579-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 23:18:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25F6A3DCCF8
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 23:17:49 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C77E23DCD06
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 23:18:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A8B5A301F3E3
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 21:17:41 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 1883430200F5
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 21:17:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2CC73AEF20;
-	Fri, 10 Apr 2026 21:17:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D5E43ACA52;
+	Fri, 10 Apr 2026 21:17:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Unt+tUxd"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="e5tCzm6y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72CB13B0AC2
-	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 21:17:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 344023AEF5C
+	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 21:17:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775855857; cv=none; b=LYjyeQCw8d1VDGFQly5+cwIHCdrYdTyVTkR0TimkVzAfQ5E8oMWxlt/APdlPGBjGkVmg8Lstf9PagTGTtBENTj6wi5jPyqmWFZLuv7Q/7dt5FS4RTkh4gmx8YoSfiLaMmCMDZ+bsDTn1CYQIGNNGC4Q4s5NBIOh1N0Q7KmAIS/E=
+	t=1775855859; cv=none; b=mM2LM0pr99cK0lficxzfqbWRkr8l39UWeeMib9N1JjCt4e7zN1EKmA3bRQ6T4IjVnpgUyIXclpXBsgF/wR3lheP2O3C1GlRTaUpGavO2bWNN2BeAxozVyLPft6uqzjHeD4d5lmZWDTYq1B1DtiqnPydM8tF1qJ9vvdr6CgHAuzs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775855857; c=relaxed/simple;
-	bh=ZHYAFwlvkUBswym/U2ZHJt8NB/sdlKfkuf9N1HxiqGg=;
+	s=arc-20240116; t=1775855859; c=relaxed/simple;
+	bh=PO0Y/SuKj9iyz7ZF0sVKroB7Oo6a53PHenZ0smsOvN8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=I794C8rNfdGeixnSA+I6m16vaJUlS/8b7S+PAK7xNbpDzlNzu1jg9fDm9+rwzAj4PR2pU0nR2BqYjSPzCAbDD7zjTB7kxRJReG8wM7jD6gJpa9nuZ5XdNh7C6qeIf3xet2ECXLB9VIiRyyWD35n66K2vGDW4kQuHbv5td5fKtZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Unt+tUxd; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=mfuxKPfuOjDa1c5sxTEf1FT+e2dvsFOjNhg+GB3hCSiF2og066AzuNjRAA8b81EKiweFOVF38XoQIx82z86RIH8rmw59K6O9RFDTNH7em94sJgroTys9RxQXCj5xHDKhf746YEqL+OZjMAcBaFs3sxy5rU+7qndhXAkclW0AHEY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=e5tCzm6y; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-35da86144daso3132333a91.3
-        for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 14:17:36 -0700 (PDT)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2b2e06219cbso3084605ad.3
+        for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 14:17:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1775855856; x=1776460656; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1775855857; x=1776460657; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pjVa9wGWD9b9YUtAi7A75dC1XWOBvY51pkpH5ygYeZs=;
-        b=Unt+tUxdSWoEl0vKjF5DXHJMphurSRN3je+4X4gOX7qfSIvsAjy/ECa5JSty2CZ0/C
-         9G+d1FzD9KWO9ULyD81Un6waejZNE5tI8BPceRaJyvbVZG7KJqBNvIHCKMcGtNw+DhrI
-         i6tX0vExPrFKsvgP9BTJN0pjjY1DSYiDfAZ68E3yIs4eci65D5+iw20xKcVwV9k53q4G
-         OZ+Y124QihhSgS9bOEadAXr8FnRZtyeUawy57FfSVC1xFbLJtjiuefFnug4V6muP3+Jd
-         6HOk8vCvP1j9+D42UOnUOTEgLhSevgmhLqsww4uCNdLgl1X9z6PyGwiAKIk+0R3Jj9UH
-         eSqg==
+        bh=OHERG14ojwzbzNR6OXZOZ+v7kYcok49yhfDoIjemt04=;
+        b=e5tCzm6yO3Gg3VlfgEfj99dT06xoZOXb235hrhFO6zVkmcLV673QIZqdI16wfBI8eN
+         pGGNI4SlZppBev2qN3ms3ym5Zqzm8Vl4th5em43b6phsgNJJbVhzJDI0DqLfufIZCSKg
+         0XQPOtmUFEkiN+ZJNDYdZQb2fzxMx0Vuv1WipCt9ip2FxI0PwfSRdto1GidWiTqPtOWj
+         oUQWjrDaYW1xKRb4PLcwA4MKAkEnaQ2kBIzVdn8uHxGy6+ESpspvwPmcQqDoSsAkd7Kv
+         lnbuIdWmRc/wbCIy8UE0owERrD5bnBH7fH4CdK+o4VoqTbw5Ul72T7CQMS6VGVtw0Cjj
+         4imQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775855856; x=1776460656;
+        d=1e100.net; s=20251104; t=1775855857; x=1776460657;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pjVa9wGWD9b9YUtAi7A75dC1XWOBvY51pkpH5ygYeZs=;
-        b=jyT1ThhtPzkXitjfUBPerJ+HO2/w9bPMIpSkw0NPYttFMBBIjiwaeS07TZSAf1/NOr
-         UelZO9rfTKz7VGsCCTYfVQG6gKDjWgwinfE4gNCWnFxFHu+QLl9nqxZ3vK0m9nWb97ae
-         KVa+xFYbw6+gTypGTXs3wybxRyO+1cml1VWfZHoKYDvhheS70C3bZ7bxX3RhHv/CcBOh
-         WMNr3Kdb+xCjtVwCSYO5gI6ikfF0X0Fv6BkbkvhKSYU6CHr1h0scbQX9DY43lsERVAzt
-         6KSCASbN3ajXyMMUpyH/W1LtZOuQUxMnFTKdmaY+yYP6CRlX9qW8UitIiVKOqPpNb14g
-         0rFg==
-X-Forwarded-Encrypted: i=1; AJvYcCUPz5HDW7dp8Xgu8/zg88T6ZFEM9lJSVRZ6oJ7txbrLEz8ikQRc7yYkbz8gHsuIkQ9/57i8+yY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxEUFJ9igEDPhuatH7e9E7+r7VEteGDg8QbPDrvLhn8CBKXU5a+
-	Co19ZDvtDjmO5/tCRONOKXzj8IQtnJ0Rbxw31olS8L8IMeZaiUN65Mvn2dRKZupE+l87ZdWrxiE
-	ztjfhKA==
-X-Received: from plpf16.prod.google.com ([2002:a17:903:3c50:b0:2b2:3f89:e9d2])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5343:b0:35d:9482:2233
- with SMTP id 98e67ed59e1d1-35e42845563mr4923251a91.24.1775855855636; Fri, 10
- Apr 2026 14:17:35 -0700 (PDT)
-Date: Fri, 10 Apr 2026 21:16:58 +0000
+        bh=OHERG14ojwzbzNR6OXZOZ+v7kYcok49yhfDoIjemt04=;
+        b=eALdUuzfkTha4BPIectFtUxmO4OAhhWDQixdC4zEXSRLq4HSBGEpPbMjNiSDV0/1Cd
+         MNBn9M3NmkTzj93b/WbEYt1FBudiaXUDkya/4157bwXRn7dRPzftiP7vQhHy7RCGnuML
+         Ep/S8pEujCsS19zieRIzq/o7QewoQkByG9ZAizF76J+gXhfbnICFMuB5Y7GYTq1tBxnv
+         TIxIkGQXHg76qEGN+7EdaIvc6qQxKpNZRgK0fCAGoee791g2SVDU/i4UUnJCiMVQxwZA
+         K2DruJlO4RbEyuYActp7+J/lxHY85+PPdcn3JBFpu30FmT8KR6ChQS0uB8qUWDTPIpeu
+         Ei0w==
+X-Forwarded-Encrypted: i=1; AJvYcCVK8SwuNqVGfst4/H7KQGXZ049xZ9/aCPMw3qnnqNwnJpePylKciFNx7mX5UnSMDDW8QMScmgM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxPVqqIVJbi2kw0S9WrXZ+kkYEi+HZ87XkPgi18oJyre211GUYb
+	dwCu5lMugn/aKoBb/2B4/dYyNVaz1dNMjagNTQs9mkaa6S5oz+otkOamMtuOKjKcAz9udoYT7ru
+	sB0uf1Q==
+X-Received: from plxb4.prod.google.com ([2002:a17:902:bd44:b0:2ae:cbbb:85fd])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:a506:b0:2b0:ba14:fc70
+ with SMTP id d9443c01a7336-2b2d5a8d6efmr33086975ad.42.1775855857264; Fri, 10
+ Apr 2026 14:17:37 -0700 (PDT)
+Date: Fri, 10 Apr 2026 21:16:59 +0000
 In-Reply-To: <20260410211726.1668756-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,8 +76,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260410211726.1668756-1-kuniyu@google.com>
 X-Mailer: git-send-email 2.53.0.1213.gd9a14994de-goog
-Message-ID: <20260410211726.1668756-3-kuniyu@google.com>
-Subject: [PATCH v2 net-next 02/15] ip6mr: Annotate access to mrt->mroute_do_{pim,assert,wrvifwhole}.
+Message-ID: <20260410211726.1668756-4-kuniyu@google.com>
+Subject: [PATCH v2 net-next 03/15] ip6mr: Use MAXMIFS in mr6_msgsize().
 From: Kuniyuki Iwashima <kuniyu@google.com>
 To: "David S . Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
@@ -90,18 +90,18 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-277578-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-277579-lists,netdev=lfdr.de];
 	FREEMAIL_CC(0.00)[kernel.org,google.com,gmail.com,vger.kernel.org];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
@@ -110,93 +110,70 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 25F6A3DCCF8
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C77E23DCD06
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-These fields in struct mr_table are updated in ip6_mroute_setsockopt()
-under RTNL:
+mr6_msgsize() calculates skb size needed for ip6mr_fill_mroute().
 
-  * mroute_do_pim
-  * mroute_do_assert (MRT6_PIM is under RTNL while MRT6_ASSERT is lockless)
-  * mroute_do_wrvifwhole
+The size differs based on mrt->maxvif.
 
-However, ip6_mroute_getsockopt() does not hold RTNL and read the first
-two fields locklessly, and ip6_mr_forward() reads all the three under
-RCU.
+We will drop RTNL for ip6mr_rtm_getroute() and mrt->maxvif may
+change under RCU.
 
-Let's use WRITE_ONCE() and READ_ONCE() for them.
+To avoid -EMSGSIZE, let's calculate the size with the maximum
+value of mrt->maxvif, MAXMIFS.
+
+struct rtnexthop is 8 bytes and MAXMIFS is 32, so the maximum delta
+is 256 bytes, which is small enough.
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
- net/ipv6/ip6mr.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ net/ipv6/ip6mr.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
 diff --git a/net/ipv6/ip6mr.c b/net/ipv6/ip6mr.c
-index 85010ff21c98..b263d3c69a5a 100644
+index b263d3c69a5a..7ea572db9075 100644
 --- a/net/ipv6/ip6mr.c
 +++ b/net/ipv6/ip6mr.c
-@@ -1780,7 +1780,7 @@ int ip6_mroute_setsockopt(struct sock *sk, int optname, sockptr_t optval,
- 			return -EINVAL;
- 		if (copy_from_sockptr(&v, optval, sizeof(v)))
- 			return -EFAULT;
--		mrt->mroute_do_assert = v;
-+		WRITE_ONCE(mrt->mroute_do_assert, v);
- 		return 0;
+@@ -2539,7 +2539,7 @@ static int _ip6mr_fill_mroute(struct mr_table *mrt, struct sk_buff *skb,
+ 				 cmd, flags);
+ }
+ 
+-static int mr6_msgsize(bool unresolved, int maxvif)
++static int mr6_msgsize(bool unresolved)
+ {
+ 	size_t len =
+ 		NLMSG_ALIGN(sizeof(struct rtmsg))
+@@ -2552,7 +2552,7 @@ static int mr6_msgsize(bool unresolved, int maxvif)
+ 		len = len
+ 		      + nla_total_size(4)	/* RTA_IIF */
+ 		      + nla_total_size(0)	/* RTA_MULTIPATH */
+-		      + maxvif * NLA_ALIGN(sizeof(struct rtnexthop))
++		      + MAXMIFS * NLA_ALIGN(sizeof(struct rtnexthop))
+ 						/* RTA_MFC_STATS */
+ 		      + nla_total_size_64bit(sizeof(struct rta_mfc_stats))
+ 		;
+@@ -2567,8 +2567,7 @@ static void mr6_netlink_event(struct mr_table *mrt, struct mfc6_cache *mfc,
+ 	struct sk_buff *skb;
+ 	int err = -ENOBUFS;
+ 
+-	skb = nlmsg_new(mr6_msgsize(mfc->_c.mfc_parent >= MAXMIFS, mrt->maxvif),
+-			GFP_ATOMIC);
++	skb = nlmsg_new(mr6_msgsize(mfc->_c.mfc_parent >= MAXMIFS), GFP_ATOMIC);
+ 	if (!skb)
+ 		goto errout;
+ 
+@@ -2724,7 +2723,7 @@ static int ip6mr_rtm_getroute(struct sk_buff *in_skb, struct nlmsghdr *nlh,
+ 		return -ENOENT;
  	}
  
-@@ -1800,9 +1800,9 @@ int ip6_mroute_setsockopt(struct sock *sk, int optname, sockptr_t optval,
- 		rtnl_lock();
- 		ret = 0;
- 		if (v != mrt->mroute_do_pim) {
--			mrt->mroute_do_pim = v;
--			mrt->mroute_do_assert = v;
--			mrt->mroute_do_wrvifwhole = do_wrmifwhole;
-+			WRITE_ONCE(mrt->mroute_do_pim, v);
-+			WRITE_ONCE(mrt->mroute_do_assert, v);
-+			WRITE_ONCE(mrt->mroute_do_wrvifwhole, do_wrmifwhole);
- 		}
- 		rtnl_unlock();
- 		return ret;
-@@ -1870,11 +1870,11 @@ int ip6_mroute_getsockopt(struct sock *sk, int optname, sockptr_t optval,
- 		break;
- #ifdef CONFIG_IPV6_PIMSM_V2
- 	case MRT6_PIM:
--		val = mrt->mroute_do_pim;
-+		val = READ_ONCE(mrt->mroute_do_pim);
- 		break;
- #endif
- 	case MRT6_ASSERT:
--		val = mrt->mroute_do_assert;
-+		val = READ_ONCE(mrt->mroute_do_assert);
- 		break;
- 	default:
- 		return -ENOPROTOOPT;
-@@ -2177,20 +2177,20 @@ static void ip6_mr_forward(struct net *net, struct mr_table *mrt,
- 	if (rcu_access_pointer(mrt->vif_table[vif].dev) != dev) {
- 		atomic_long_inc(&c->_c.mfc_un.res.wrong_if);
+-	skb = nlmsg_new(mr6_msgsize(false, mrt->maxvif), GFP_KERNEL);
++	skb = nlmsg_new(mr6_msgsize(false), GFP_KERNEL);
+ 	if (!skb)
+ 		return -ENOBUFS;
  
--		if (true_vifi >= 0 && mrt->mroute_do_assert &&
-+		if (true_vifi >= 0 && READ_ONCE(mrt->mroute_do_assert) &&
- 		    /* pimsm uses asserts, when switching from RPT to SPT,
- 		       so that we cannot check that packet arrived on an oif.
- 		       It is bad, but otherwise we would need to move pretty
- 		       large chunk of pimd to kernel. Ough... --ANK
- 		     */
--		    (mrt->mroute_do_pim ||
-+		    (READ_ONCE(mrt->mroute_do_pim) ||
- 		     c->_c.mfc_un.res.ttls[true_vifi] < 255) &&
- 		    time_after(jiffies,
- 			       c->_c.mfc_un.res.last_assert +
- 			       MFC_ASSERT_THRESH)) {
- 			c->_c.mfc_un.res.last_assert = jiffies;
- 			ip6mr_cache_report(mrt, skb, true_vifi, MRT6MSG_WRONGMIF);
--			if (mrt->mroute_do_wrvifwhole)
-+			if (READ_ONCE(mrt->mroute_do_wrvifwhole))
- 				ip6mr_cache_report(mrt, skb, true_vifi,
- 						   MRT6MSG_WRMIFWHOLE);
- 		}
 -- 
 2.53.0.1213.gd9a14994de-goog
 
