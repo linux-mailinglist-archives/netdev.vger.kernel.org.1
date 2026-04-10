@@ -1,323 +1,169 @@
-Return-Path: <netdev+bounces-277323-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277324-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uCfFD3HN2GktiQgAu9opvQ
-	(envelope-from <netdev+bounces-277323-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 12:14:09 +0200
+	id qIuZDxfQ2GngiQgAu9opvQ
+	(envelope-from <netdev+bounces-277324-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 12:25:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41B453D5802
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 12:14:08 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96E013D5A4B
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 12:25:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 3A0F73006099
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 10:14:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A508E3031800
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 10:16:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74B6E3A451E;
-	Fri, 10 Apr 2026 10:14:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 694E03590A9;
+	Fri, 10 Apr 2026 10:16:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ILEd90kr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WIb8/n3L"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12D1538228D
-	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 10:14:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D5EE3176E4
+	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 10:16:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775816043; cv=none; b=FVBflVkLJZbYTgH3dMn0AP1sewDGABvnlMZEtUlFFLx4+41rqhbV4EGLW2XaZFzWbtAAyu2SQDTMshUvZ5XAFVuL3r8WbwZs3XoVhQpXqv7Bw9aoefJ18AkM+doIFnMPz78lurVwvLi5i90hYG6akuNz0+VHnhpViuExwBHwPts=
+	t=1775816207; cv=none; b=g8pf6Bkgpiwq8FCR9ZalFoFZnBGC0IuegiHm9/jHVfb82zLN0u4mU4Bq4uRC6vFbtZBvCzS63Eq94c64AVaGxma8PX4N9R/1Wq74FiPSedyxYi6z50Wmex8NXUgBik+lUWpbgbO+LkZmAw6CbcTBKSJWdCTqbG+0DA4OMh6KTwQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775816043; c=relaxed/simple;
-	bh=+5JZ9xXoRUN85ru0donIjNuo+Waq/MzwyOIjJguYJz0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=emMDnC1IOivRPxf6TAy+NwmQKXX3zHM/jWYVnOUMaG3eMmA+wzMXIeNimC3SHqhSTXZqPEhvG6SSvYsBei+XiQtY8tczhtwcg25H/zFBaT/sYTVFWQW5Wte5500THEiwCVzNS97gWSDblAOAMHej/M6oJedpMId1+LMqO2rW1yQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ILEd90kr; arc=none smtp.client-ip=209.85.210.175
+	s=arc-20240116; t=1775816207; c=relaxed/simple;
+	bh=bTdNN7WD8kntYv71PIB4Ub29LjSLZkiKY6rDfVA+DbM=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=ky5HX739FYkLk1OCjJAjo2gINf7UHrOKb1M08s0jaiiPJ8I2bdVicD2XIyVo0v4hqrlxd9l4cGmNc78VqQ5bOSaOpe+IiC/kowy64WifORLWpGXhJtx6UCXoYH5bi3kxz+lMIz5MiUEOFXbFdvY6MEF9V5ddU95MrIgjrQhZ5Sw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WIb8/n3L; arc=none smtp.client-ip=209.85.128.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-8296d553142so1102667b3a.3
-        for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 03:14:01 -0700 (PDT)
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-488a9033b2cso21487495e9.2
+        for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 03:16:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775816041; x=1776420841; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=5P6xJCvneuwhXql1CKN1XhB39jxxN+O7rcFH8Ar99kQ=;
-        b=ILEd90krBc8fLzNvMpYMGxRSWS4Ejfm8Tafav2A49vFnVQWe+DjtRS6Ak8z6+BXt9x
-         5FkXaLqttn4Rd0+WLdUlELZfqUTIQgEaO4Dv9yg6navjKQuQly5a292kLEma184Ke/TD
-         JRzNUsXa8ENOHP77iSWpgHo6+/4pLXIgSzoyxouyzKVUtsa/p+Z6RU/L5sRcbZibB5D5
-         XyTt8Vxo/u3lIfzDvHxna2DWV4JCO0ioQFGe2T6NzejI0wJHA1X1YYH4IIdvGf8fMtK0
-         X9NQMnEUUa+9majKJ3RqCst1IBeKnXUHhBZwL/myhi8NcbqP4O/ZXp8gei5uNU74VRdU
-         lOcw==
+        d=gmail.com; s=20251104; t=1775816204; x=1776421004; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=txmLoGCoKgdrToFXN0Js/UfR4KtS11aCDlbGXLQF5Qc=;
+        b=WIb8/n3L52z1//XKP+5Mnn+B9Gsnm0zFipqpnM0UPbCDNAlgr16n4rlphuwp/sHFgT
+         W+xocDDTNTcaYGei5Gih/qvl7m1NHHZEOk3xbuezdgLNc0TzLd6FsFRRyOqy/O3CRRWE
+         haaNfiCSoE2xXTCMHWMNWmDsxLzXaXcc5lbmsNHcU33cyRty9cMyz4guruQDnj0Kq3Lm
+         I7BKvJ63wzz1UOxEsdQqNoD3CbVofofjJhuhC0LsQvANw6irwaF2Mu064au2BNJai6z9
+         3EK8S6SFg+XE9/RU6Wg3jqJv3L1MS+SozMe089Uyf3beimWlivwEoHCgM/CbIEsVqpQo
+         IaOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775816041; x=1776420841;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5P6xJCvneuwhXql1CKN1XhB39jxxN+O7rcFH8Ar99kQ=;
-        b=AkOJMKsxuNlV63Fd1yHkWK2nv8SzVQbbO4VX5nIn1giITDR8MRVew2htF8K1PtlIMF
-         gDVM0yAhDZR+WQtTWrSbwSxejIUS2JZZUbx7jUvKCVhGHQof4YZVp+eJCblkhVYkyAer
-         VNuLYrKr6UAb93Ghmhqv+DCzrXxhsBS0GFSLDgp4Jwa6yImrqDHWg/6cWMP+bSvuJ43x
-         DrPEk8S22NO4lEC6v8w9uEmLwmm67LbU1NKuAnSyJPhabe3IkvOlUhNyA3RnJ++XyVgs
-         MYv3TowRNRoRVEaEiez4+V3R/Wc8blUGK4UWIVY4aE9o6mteH/2tHFxhHHAeRbVWG+2v
-         QmZA==
-X-Forwarded-Encrypted: i=1; AJvYcCWRMfYfVb/EBxV/M8xUD7IfbYKz+rLtJEhtkwND0RN4dsI+XKmSvbPdU3E5cPTwxT3XWgutYFM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw/vBw+ryP7Xr6nWzd5JGMlJxRCVbFq7zEe9ZPkFB6LH1PWqqhs
-	TpUQRPBfaK5ozmVg/E4j+hULIWkLEQklRLPvcsImd9F+aI01ihg+ekCD
-X-Gm-Gg: AeBDiesdkoBft6wD2rPrkG/7WZCDYt3hHh+DAUnzZzhb/p4VTDSD4Y1pPDyK+34uTFe
-	6NVyfALs5HbRIPc9EZSqtKgixaEuQS9b6RJU/wnnvD/VLBuoXjBEnY/2ltTQkxzM9FA0KD2gfUy
-	8wE9zHaIhFwlDvlVVM8n+aE547AI//gocovGu4cgjHoB5JIElUogxA67ZtU58DX8Tc6sSbkfkL7
-	TuPXQ+48nfGmuoILyq+AZEP9Amua1zLiUePW/UeJWcY0CRlqC71E9A2qANQP0o6bAtjXQpD022K
-	q5x3kBnWNtTIu1XEOQqqTfmE2LrafWPsVTTJd8FsZYWWvrSDjPyXdPSXn1LIe7dirsDRR+j8j99
-	6vKe/M2yYI/yOe+pvxFSJpZ3DP4gS3bJOWVpMshqZiGUFYcNMRGAIh1wQ0+Es1EzyjSqhjs576S
-	QzBetey69EV2PptdqpX0DJmFKW8LnS9E+242mRxxrQMp7ol7b8PmfFMxZG0ZbbzrKBWmBj48jOQ
-	jFp65qAGW4b
-X-Received: by 2002:a05:6a00:12ca:b0:82f:5a4:aa46 with SMTP id d2e1a72fcca58-82f0c2b510cmr2621656b3a.44.1775816041376;
-        Fri, 10 Apr 2026 03:14:01 -0700 (PDT)
-Received: from SLSGDTSWING002.tail0ac356.ts.net ([129.126.109.177])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82f0c4d5413sm2206692b3a.40.2026.04.10.03.13.57
+        d=1e100.net; s=20251104; t=1775816204; x=1776421004;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=txmLoGCoKgdrToFXN0Js/UfR4KtS11aCDlbGXLQF5Qc=;
+        b=fyDtobPlIzz3qQrXmAjSJ2/95P5YtMbpcspkhCFj6vPuq97Yg7WDbvopzn9N6HogOa
+         6k++GOzVOAOjzoYn55wfAUy4u54QSuZlgnlbbiNwP2XfrCzp9qrOE8+hcFzWN+f46ROO
+         3TcM2Moed5/VXeUTI8V7W0O0c/ZI8jPgxjojMtXoGibpyCKRzz1tUivp9kSTXc5kzuka
+         U+1YaELKGK9BmNEk2UVeTpoU5hmuKgIMZ0ZKkUFWbfJ8sM1WRbLsZkiioGTl22aFhkGu
+         BC/QOPKBxU3Qm58ay3qLnLrNE8+V099EyDScdpi4NWkZp3mRgdEbT6wAWUyY1Z3xIe4f
+         49zw==
+X-Forwarded-Encrypted: i=1; AJvYcCWn7fhNoszn7F9Q8G31PA5uJ5I+LyWHbfcN208sD6/gmw5TwJg36Uj7wsl0RwIVAEELJ5CHrn0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwvntGos9Ad4jIka4vxUZxlgUkzsnZxl+0Qi0VbYIovH7Kngbeu
+	vIdTgkh2A0+2cKHsH0XHG/GNI0SYyASBDormfgtBqqUHJl48blWcpjNq
+X-Gm-Gg: AeBDieuTEaPQ0bISAHo39ClaKItqy3t7OlFZFG19H01hX4MpRN7HJDIEyJgbfyuHNPT
+	ljgH2On4UqF++4f9jJuDvs/DL+AchdJOQ8N39z6DPpTbEXW4ab90lvU4Ie/Uo34ccWhuPmu7HEW
+	JlRTwHfJToHwgkhMVdGS6BKzGF5zsXJehMATFjN7Bjlj1Q0OJSR/1HNZy6uhTCHMZOU39l2QEg7
+	JDbd3pw+vsC4xMuKNbODNmHctThUNMDlBfF5F+7nViCL0yfaSMfCwIijbp6qgF53j9RrIwu5V+I
+	IFF29t1QGYQzNBesQ1X4K6H93yrGEeyoLIgF81Y6/MogUEIRGODF8DqZ/g0vrEJAB2m5IOp0Po6
+	9LZEm4pzctFWgA/iBhhg2+Pz1GZls2E+KQlM1pn0tQ9hxIOF27h7/M+hSdBFmiIZ46kCM1socCD
+	O95G7C/n692WeHam/nP2n2pRy9Cj2IxA==
+X-Received: by 2002:a05:600d:d:b0:485:4eaf:eb54 with SMTP id 5b1f17b1804b1-488d684b88amr24792675e9.20.1775816204398;
+        Fri, 10 Apr 2026 03:16:44 -0700 (PDT)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488d5396293sm55661675e9.15.2026.04.10.03.16.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Apr 2026 03:14:00 -0700 (PDT)
-From: Weiming Shi <bestswngs@gmail.com>
-To: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Phil Sutter <phil@nwl.cc>,
-	Simon Horman <horms@kernel.org>,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Xiang Mei <xmei5@asu.edu>,
-	Weiming Shi <bestswngs@gmail.com>
-Subject: [PATCH nf] netfilter: nf_tables: use RCU-safe list primitives for basechain hook list
-Date: Fri, 10 Apr 2026 18:13:22 +0800
-Message-ID: <20260410101321.915190-2-bestswngs@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        Fri, 10 Apr 2026 03:16:43 -0700 (PDT)
+Date: Fri, 10 Apr 2026 13:16:41 +0300
+From: Dan Carpenter <error27@gmail.com>
+To: Yiqi Sun <sunyiqixm@gmail.com>,
+	Fernando Fernandez Mancera <fmancera@suse.de>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
+Subject: [bug report] ipv4: icmp: fix null-ptr-deref in icmp_build_probe()
+Message-ID: <adjOCdCW1EpPl8lf@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[nwl.cc,kernel.org,vger.kernel.org,netfilter.org,asu.edu,gmail.com];
-	TAGGED_FROM(0.00)[bounces-277323-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-277324-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com,suse.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
 	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[error27@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 41B453D5802
+	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,stanley.mountain:mid]
+X-Rspamd-Queue-Id: 96E013D5A4B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-NFT_MSG_GETCHAIN runs as an NFNL_CB_RCU callback, so chain dumps
-traverse basechain->hook_list under rcu_read_lock() without holding
-commit_mutex. Meanwhile, nft_delchain_hook() mutates that same live
-hook_list with plain list_move() and list_splice(), and the commit/abort
-paths splice hooks back with plain list_splice(). None of these are
-RCU-safe list operations.
+Hello Yiqi Sun,
 
-A concurrent GETCHAIN dump can observe partially updated list pointers,
-follow them into stack-local or transaction-private list heads, and
-crash when container_of() produces a bogus struct nft_hook pointer.
+Commit fde29fd93493 ("ipv4: icmp: fix null-ptr-deref in
+icmp_build_probe()") from Apr 2, 2026 (linux-next), leads to the
+following Smatch static checker warning:
 
-The PoC triggers this by racing GETCHAIN dumps against aborting DELCHAIN
-hook updates, reachable from an unprivileged user namespace since all
-capability checks use ns_capable() with CONFIG_NF_TABLES=y (default):
+	net/ipv4/icmp.c:1351 icmp_build_probe()
+	warn: 'dev' is not an error pointer
 
- Oops: general protection fault, probably for non-canonical address 0xdffffc0000000006: 0000 [#1] SMP KASAN NOPTI
- KASAN: null-ptr-deref in range [0x0000000000000030-0x0000000000000037]
- RIP: 0010:strlen (lib/string.c:420 (discriminator 1))
- Call Trace:
-  <TASK>
-  nf_tables_fill_chain_info (net/netfilter/nf_tables_api.c:1987 (discriminator 1) net/netfilter/nf_tables_api.c:1992 (discriminator 1) net/netfilter/nf_tables_api.c:2028 (discriminator 1) net/netfilter/nf_tables_api.c:2077 (discriminator 1))
-  nf_tables_dump_chains (net/netfilter/nf_tables_api.c:2173 (discriminator 1))
-  netlink_dump (net/netlink/af_netlink.c:2325 (discriminator 1))
-  __netlink_dump_start (net/netlink/af_netlink.c:2442)
-  nf_tables_getchain (net/netfilter/nf_tables_api.c:1314 net/netfilter/nf_tables_api.c:2212)
-  nfnetlink_rcv_msg (net/netfilter/nfnetlink.c:290)
-  netlink_rcv_skb (net/netlink/af_netlink.c:2550)
-  nfnetlink_rcv (net/netfilter/nfnetlink.c:653)
-  netlink_unicast (net/netlink/af_netlink.c:1319 net/netlink/af_netlink.c:1344)
-  netlink_sendmsg (net/netlink/af_netlink.c:1894)
-  __sys_sendto (net/socket.c:727 net/socket.c:742 net/socket.c:2206)
-  __x64_sys_sendto (net/socket.c:2209)
-  </TASK>
+net/ipv4/icmp.c
+    1341 #if IS_ENABLED(CONFIG_IPV6)
+    1342                 case ICMP_AFI_IP6:
+    1343                         if (iio->ident.addr.ctype3_hdr.addrlen != sizeof(struct in6_addr))
+    1344                                 goto send_mal_query;
+    1345                         dev = ipv6_dev_find(net, &iio->ident.addr.ip_addr.ipv6_addr, dev);
+    1346 
+    1347                         /*
+    1348                          * If IPv6 identifier lookup is unavailable, silently
+    1349                          * discard the request instead of misreporting NO_IF.
+    1350                          */
+--> 1351                         if (IS_ERR(dev))
+    1352                                 return false;
 
-Replace list_move() in nft_delchain_hook() with list_del_rcu() plus an
-intermediate pointer array, followed by synchronize_rcu() before the
-deleted hooks' list pointers are reused to link them into the
-transaction's private list. In the error paths, put hooks back with
-list_add_tail_rcu() which is safe for concurrent RCU readers (they
-either continue to the original successor or see the list head and
-terminate the walk).
+It looks like there were two patches that went in around the same
+time.  Commit fde29fd93493 ("ipv4: icmp: fix null-ptr-deref in
+icmp_build_probe()") updated the checking for
+ipv6_stub->ipv6_dev_find() but d98adfbdd5c0 ("ipv4: drop ipv6_stub usage
+and use direct function calls") changed it to not return error pointers.
 
-Add nft_hook_list_splice_rcu() helper that splices entries from a
-private list into a live RCU-protected list using individual
-list_add_tail_rcu() calls instead of plain list_splice(). Use it in
-the commit and abort paths for NEWCHAIN updates and DELCHAIN rollback.
+This IS_ERR() check can be removed.
 
-Fixes: 7d937b107108 ("netfilter: nf_tables: support for deleting devices in an existing netdev chain")
-Reported-by: Xiang Mei <xmei5@asu.edu>
-Signed-off-by: Weiming Shi <bestswngs@gmail.com>
----
- net/netfilter/nf_tables_api.c | 64 ++++++++++++++++++++++++++++++-----
- 1 file changed, 56 insertions(+), 8 deletions(-)
+    1353 
+    1354                         dev_hold(dev);
+    1355                         break;
+    1356 #endif
+    1357                 default:
+    1358                         goto send_mal_query;
+    1359                 }
 
-diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
-index 8c42247a176c7..62fcfefba7b0f 100644
---- a/net/netfilter/nf_tables_api.c
-+++ b/net/netfilter/nf_tables_api.c
-@@ -391,6 +391,22 @@ static void nft_netdev_unregister_hooks(struct net *net,
- 	}
- }
- 
-+/* Splice hooks from a private list into a live (RCU-protected) hook list.
-+ * Each entry is published individually via list_add_tail_rcu() so that
-+ * concurrent RCU readers walking the destination list never observe torn
-+ * list pointers.
-+ */
-+static void nft_hook_list_splice_rcu(struct list_head *from,
-+				     struct list_head *to)
-+{
-+	struct nft_hook *hook, *next;
-+
-+	list_for_each_entry_safe(hook, next, from, list) {
-+		list_del(&hook->list);
-+		list_add_tail_rcu(&hook->list, to);
-+	}
-+}
-+
- static int nf_tables_register_hook(struct net *net,
- 				   const struct nft_table *table,
- 				   struct nft_chain *chain)
-@@ -3162,9 +3178,11 @@ static int nft_delchain_hook(struct nft_ctx *ctx,
- 	const struct nlattr * const *nla = ctx->nla;
- 	struct nft_chain_hook chain_hook = {};
- 	struct nft_hook *this, *hook;
-+	struct nft_hook **del_hooks;
- 	LIST_HEAD(chain_del_list);
- 	struct nft_trans *trans;
--	int err;
-+	int err, n = 0, i;
-+	int max_hooks = 0;
- 
- 	if (ctx->table->flags & __NFT_TABLE_F_UPDATE)
- 		return -EOPNOTSUPP;
-@@ -3174,19 +3192,38 @@ static int nft_delchain_hook(struct nft_ctx *ctx,
- 	if (err < 0)
- 		return err;
- 
-+	list_for_each_entry(this, &chain_hook.list, list)
-+		max_hooks++;
-+
-+	del_hooks = kcalloc(max_hooks, sizeof(*del_hooks), GFP_KERNEL);
-+	if (!del_hooks) {
-+		nft_chain_release_hook(&chain_hook);
-+		return -ENOMEM;
-+	}
-+
- 	list_for_each_entry(this, &chain_hook.list, list) {
- 		hook = nft_hook_list_find(&basechain->hook_list, this);
- 		if (!hook) {
- 			err = -ENOENT;
- 			goto err_chain_del_hook;
- 		}
--		list_move(&hook->list, &chain_del_list);
-+		list_del_rcu(&hook->list);
-+		del_hooks[n++] = hook;
- 	}
- 
-+	/* Wait for any concurrent RCU readers (e.g. GETCHAIN dumps walking
-+	 * basechain->hook_list) to finish before modifying the removed hooks'
-+	 * list pointers to link them into the transaction's private list.
-+	 */
-+	synchronize_rcu();
-+
-+	for (i = 0; i < n; i++)
-+		list_add_tail(&del_hooks[i]->list, &chain_del_list);
-+
- 	trans = nft_trans_alloc_chain(ctx, NFT_MSG_DELCHAIN);
- 	if (!trans) {
- 		err = -ENOMEM;
--		goto err_chain_del_hook;
-+		goto err_chain_add_back;
- 	}
- 
- 	nft_trans_basechain(trans) = basechain;
-@@ -3194,13 +3231,24 @@ static int nft_delchain_hook(struct nft_ctx *ctx,
- 	INIT_LIST_HEAD(&nft_trans_chain_hooks(trans));
- 	list_splice(&chain_del_list, &nft_trans_chain_hooks(trans));
- 	nft_chain_release_hook(&chain_hook);
-+	kfree(del_hooks);
- 
- 	nft_trans_commit_list_add_tail(ctx->net, trans);
- 
- 	return 0;
- 
-+err_chain_add_back:
-+	for (i = 0; i < n; i++)
-+		list_add_tail_rcu(&del_hooks[i]->list, &basechain->hook_list);
-+	kfree(del_hooks);
-+	nft_chain_release_hook(&chain_hook);
-+
-+	return err;
-+
- err_chain_del_hook:
--	list_splice(&chain_del_list, &basechain->hook_list);
-+	for (i = 0; i < n; i++)
-+		list_add_tail_rcu(&del_hooks[i]->list, &basechain->hook_list);
-+	kfree(del_hooks);
- 	nft_chain_release_hook(&chain_hook);
- 
- 	return err;
-@@ -10912,8 +10960,8 @@ static int nf_tables_commit(struct net *net, struct sk_buff *skb)
- 				nft_chain_commit_update(nft_trans_container_chain(trans));
- 				nf_tables_chain_notify(&ctx, NFT_MSG_NEWCHAIN,
- 						       &nft_trans_chain_hooks(trans));
--				list_splice(&nft_trans_chain_hooks(trans),
--					    &nft_trans_basechain(trans)->hook_list);
-+				nft_hook_list_splice_rcu(&nft_trans_chain_hooks(trans),
-+							&nft_trans_basechain(trans)->hook_list);
- 				/* trans destroyed after rcu grace period */
- 			} else {
- 				nft_chain_commit_drop_policy(nft_trans_container_chain(trans));
-@@ -11231,8 +11279,8 @@ static int __nf_tables_abort(struct net *net, enum nfnl_abort_action action)
- 		case NFT_MSG_DELCHAIN:
- 		case NFT_MSG_DESTROYCHAIN:
- 			if (nft_trans_chain_update(trans)) {
--				list_splice(&nft_trans_chain_hooks(trans),
--					    &nft_trans_basechain(trans)->hook_list);
-+				nft_hook_list_splice_rcu(&nft_trans_chain_hooks(trans),
-+							&nft_trans_basechain(trans)->hook_list);
- 			} else {
- 				nft_use_inc_restore(&table->use);
- 				nft_clear(trans->net, nft_trans_chain(trans));
--- 
-2.43.0
+This email is a free service from the Smatch-CI project [smatch.sf.net].
 
+regards,
+dan carpenter
 
