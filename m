@@ -1,498 +1,227 @@
-Return-Path: <netdev+bounces-277513-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277514-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SP7rCStA2WkHnwgAu9opvQ
-	(envelope-from <netdev+bounces-277513-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 20:23:39 +0200
+	id gHiRAiJB2WkHnwgAu9opvQ
+	(envelope-from <netdev+bounces-277514-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 20:27:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B4163DB6E0
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 20:23:38 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49DCD3DB72E
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 20:27:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 2949E300B517
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 18:23:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AD5DB3014BE5
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 18:24:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 329033E1D1F;
-	Fri, 10 Apr 2026 18:23:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E3313E2758;
+	Fri, 10 Apr 2026 18:24:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WzDd6eOj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iIcbLRko"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f73.google.com (mail-yx1-f73.google.com [74.125.224.73])
+Received: from mail-yx1-f50.google.com (mail-yx1-f50.google.com [74.125.224.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D45678F29
-	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 18:23:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.73
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775845414; cv=none; b=AI2kl2qYQoiKCk+mwtkfohjQB+H56nhw1EOYsbAFD6g5s/Av//fYy7DHN8bDOxeaxzFp6jXsojJUVSZjKzq77+i0hyW9b4hH+ltVUrdivXLR+Wb59RM5H13b55KOhtDX5wMHUirwQm9Zu7UAsJ2Td4BS5dwacWQHZLJGK/Ha9ag=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775845414; c=relaxed/simple;
-	bh=A68+kTDo1PnM9jOva9AbGFOSalbvWj12qoKQC7F8ca4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=NjarloPHQkFuUfv4T/LUI3od1BMmW1vpYZyYno0LSdec8tPMBtZ9bJhtirD8tmxsvtKF5qqM8HwKHUCfv2AEF0R3fqe6kB6Ak2UA7/YR3DsKG2WL55CakBhnxvo7Ja/5P659N+pe0YJ/jZ6Jb5eHslhO41omSmU3vFmS4kO1BY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WzDd6eOj; arc=none smtp.client-ip=74.125.224.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yx1-f73.google.com with SMTP id 956f58d0204a3-65036e62f9bso3887925d50.3
-        for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 11:23:32 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFC913E3C4E
+	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 18:24:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775845456; cv=pass; b=B6Kvbd+mWpahlSpZlT1DrZHFEODdB0Kmo3XoJrF9Gs5xs2dA+rPM9b9xf9sYWWmHth1gkcKRVT9/FrlBWDnRy2+53ytzEuuJnhMhJf9P29hwzWowFeNZibcVP6kQdA/4EGhyv3HKJwpOKUjFMO/+1S5XZzEynormzDuC3Q2Lh7g=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775845456; c=relaxed/simple;
+	bh=EPE5zIbtuB9mtkemOydEeLuD7X/WZ572Yk/Mfjs+cuU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lZaJ9CEvcC08P8QS9AF9jY2fwXq4wqx7sZSGHCC96YqQu3vKnYbZ3kcGQ6jF7kmWgLAYolubi6x1JbEC6FryQlZixToAWHjETJLdZMUcLIRbOWcT9XHNNqIhye3rI2hi1b1bVPsQNSzG2ay/X6O0njSiHttBOlS1LeTppFNonEc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iIcbLRko; arc=pass smtp.client-ip=74.125.224.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f50.google.com with SMTP id 956f58d0204a3-64edf260b49so3649700d50.0
+        for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 11:24:14 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1775845454; cv=none;
+        d=google.com; s=arc-20240605;
+        b=drwSvObwmHmWeT20FYsagHzj559KQyIWnWn+Aje7tVtO4qbpKjIwmDwM9OIafrCK+k
+         9hb8bg1ZXvFYRSOuHtp6waVsEC3EJyckflvEsl7Wd2m4m9cXInFrJfp04OBa4wproFjQ
+         GGXXBy4/5BYfkYAzP3k3HOFCgjmaFMxk2LJqR/NrunKZ+GFACUeES12NK5aU5t0tWO+X
+         K6TWpuplIhqzZdVUmvKyrhP3XsPfGgTFUaCrajufOAPM8DC6YD8TiFv0IsiBoWLyxuai
+         CpegMFHCnE/5MbetHhqyHnVRSCAmwGgL3PoqwBP9Eq4H5EwM1gWtGfPzfyEfvESJLG8Y
+         4zag==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=OJal6zY8DzVlZERvT/baHzRbKlhu4zXHBYN1HlP+LdY=;
+        fh=1auwjbI2VGBKUWmJpibQ56VZ22+lMVm/0B0UMGePahE=;
+        b=Ax/9GTtGQJZDO+mYbV2ZAfQANP76hqUk1CNhO3Sg5flL2OPQC/8nptFlAOFCk70fZ9
+         hfBCpuqyvthUvIg377VVeROSIpkflK82o0SYjrcH+Cr2hAlgaSBxZPpv0O9V5u71Z877
+         Tyf6+E4LLIArjobFf3pLGHnnB1RQuWRqwz7P8LKfVq6tHB2v564IN0MnsOijHZpRU1VK
+         KCimxaRd4ok+AmAvXkW6AH116tqUJuPYgXi8MQHmnoTrODOttD2MMUY8B1kPkjMDwPhc
+         oSukhRShJ7J3mPI8/PO/rx31BU5cyvzTkhA9+CGAvZ7ISucavBL5QToCM97ThGWvaTjr
+         ceww==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1775845412; x=1776450212; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xPILxc+MO2kLmgLEp1DJwkQduMtISlxjej/4IadVx/g=;
-        b=WzDd6eOjm5w10kPdWOxfdqRJ/jUwKI2i9C3WcEBTaaS6AUmorlXnLwwX360bRMfn0/
-         0vou3l4OmWTM2m6+QsmFbMv7mJ0xtpkaEZ7najYWlxjSXs6feBJYWxk9eLHuhj2qLawc
-         622TTRDQM0CaYlqmdrexc4oNwk7qgrVf+QPWYNF/lshrtlg4N0QX2I+xE8e2A/zGZ651
-         9dztSooPlaMF23C2lIx2sfSz9KIWjrT0Hy93FuE3C3qHc3wDmmGlfLYMq23oWOJN0jaK
-         0W+MOmD75jVPswwXpZdT+tDMCiHZ7sHIuFVHhXCberR6+mjoyvQLF9AoSTmWARPc9JgV
-         YlNw==
+        d=gmail.com; s=20251104; t=1775845454; x=1776450254; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OJal6zY8DzVlZERvT/baHzRbKlhu4zXHBYN1HlP+LdY=;
+        b=iIcbLRkol0GjO2Vqg4DjEfXCRn5IDJj2/Yx7mI+yyOyET1qhmx0rsx9JHhPayC0YoH
+         jbhegpPGr6enzOM6JDxizowcArjzxCD1zdh0k0ykSUOdPcjhhfJOD5H3tI8c94DHUi5u
+         XVQmnE1wq+RucEqzJecrBrjAvrrjKScBh/NY/XhlgAatnwD5UnQfEDAef2EuMjR5Uip/
+         m3Iur6YKmcouXwih3JSeUYin1ciFcQ4J2rDyTUfTArJ+FM1ht7MlQurmc+Gd0ZmcnXsM
+         9GpgaHVIcByC78OOjZEC9cmcXQVP4HQZRJQ2TqY9/hETX6emysvJfBSCm60VnOLXNKMC
+         FhLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775845412; x=1776450212;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xPILxc+MO2kLmgLEp1DJwkQduMtISlxjej/4IadVx/g=;
-        b=aIv8BSLGX74XP5eU63MrVVDwLB3rMockd9N0eA/NrMTptxZLCf2w+jNiiBw0mbfxPL
-         jaTPHzCqsZAIqGNlbqOOHP0fwSGPg7VZGODyLD8qjsVs9EX1wkhPd1eGA0hOM+GmZDyF
-         icnwyEaCJl1ZohNgBAtvKQCGmSyHDpgMtSBgLWkdDOhLq0IIHTvpNvwaXFj25q0ZOvb+
-         6Z5o8L3DgeOtzW9GvJLQhUjjpJD0zm2IDvqk9Pkxok8Zsk/f1nJmsFjXOBoemRDHackY
-         S60t41+1hdRmRPm8fngGg1H+ymyuxXQRcLmau/2pFt5oxXh9wICiJrnIDiPRkbaxILb4
-         ZDUQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUgDFQp9L0Um7hdLtUUwwIBtkHY0YAR0RNVgqxVmvbp7xbOJF/OSv3BXkv6jzxnHRRXyHSxrPA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxwTa6dhW4+IzNQCksSTkEeeFgcFalRTlQlzEDqb7TxteQg/Gvl
-	6JgVqR1A0kIEUglsyB3QXsbAeAnXDqP/Q64gNvgu1lZABCO0jTpMZVfwT4t4C790WzFemFGbFQC
-	5kWqzCZDDGQmdkA==
-X-Received: from yxtr16.prod.google.com ([2002:a53:ec50:0:b0:650:7ea:d887])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a53:cb03:0:b0:649:da44:78ad with SMTP id 956f58d0204a3-65198b89b2dmr2941682d50.49.1775845411428;
- Fri, 10 Apr 2026 11:23:31 -0700 (PDT)
-Date: Fri, 10 Apr 2026 18:22:56 +0000
-In-Reply-To: <20260410182257.774311-1-edumazet@google.com>
+        d=1e100.net; s=20251104; t=1775845454; x=1776450254;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=OJal6zY8DzVlZERvT/baHzRbKlhu4zXHBYN1HlP+LdY=;
+        b=SvS7xi/EdH3NWygJuvoABqlV9D0Xg7am+JnnSwcrSyl8OZyTQUE60mLleQVNX/ygGD
+         QD3uw1xdZgZQAVzfSn/lGMSQWuBxD15DmNQ5+z2XNXFohUTdqvQAcGDnAhwP354UB0QH
+         ColLcQMe5ftAa145xtKc2JsJ6tXau0gBe5j8kUBq01r7bL2ZFCh/o3gThe91eanfi+BK
+         fQ32oSC/Nhmx0p4qsuL9QG70eUKxg1QqvuyBNWDHdjH4SyBGl/FDtMwjQcJ1vrbXMhaH
+         /HdAuL8EctKB32Bu5U87Yh1U6hxsghCpJ1lzi+g3wRCXDvUKhKnUcr6fHoL48XGcCZlX
+         yOPA==
+X-Forwarded-Encrypted: i=1; AJvYcCXazEYWKNexAVwFrLJzFTMNZ9lh/LXWqA4Sa0JQVYTLvnOZhaz9FShT5S0uHTzr4gq3lTFDjSk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxqdHAozfDJRbdJV/4HUOgJuoXIiTqEtV6o9HgnltMxVL2Rg3Gs
+	izr1tB+c49VaWaDMDQ+bPQQCQi7tURsVBrTIJ2umLOs/MawlzUGPWxMbogMvwqGnXdYa5ruI/xY
+	93f33FCwEWO7dAHYFSQRUu4JUV0mOsllgz8o6
+X-Gm-Gg: AeBDiesmzJF9JKJaka1br7a7q9U8T/GvvNPmLkjus1Bxu0PhapjzQ5Jnf0GIcw8np77
+	yS0Qp+kMZp08GJPswCDJZH5SP0bsWb83vH1OKkVQ9VHPmAVdnONJFEgTre6MVhFy8tzCxgSquPc
+	7U7GCiUqQlusFTKgc/NJ30v8mykrtANWiup2saWA9bKl7cWbifR5lLFNHH1weeYar0jSyQn380z
+	feTEkyQybsbBfN4rSOmhB3r/6fzzrnJx1QJpC+hKUYQ7MMYXU1PLzT5BvJXjXgVTL2vOtGEQUlU
+	s3VNrOSUKbUfiRCzEk1sNUrY6AapnJ9ArBRCqnyQbsI3mfo0u37H6oMSP3GEXYHYt41zyleToOe
+	qQwwIUY0PBPAurAXSwg6YcZeoGXKGgX8T4WzV
+X-Received: by 2002:a05:690e:151b:b0:650:3124:b8c9 with SMTP id
+ 956f58d0204a3-6519905ad2emr2529277d50.20.1775845453876; Fri, 10 Apr 2026
+ 11:24:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260410182257.774311-1-edumazet@google.com>
-X-Mailer: git-send-email 2.53.0.1213.gd9a14994de-goog
-Message-ID: <20260410182257.774311-15-edumazet@google.com>
-Subject: [PATCH v3 net-next 14/15] net/sched: mq: no longer acquire qdisc
- spinlocks in dump operations
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>, 
-	netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
+MIME-Version: 1.0
+References: <2026040730-untagged-groin-bbb7@gregkh> <20260409190328.GS469338@kernel.org>
+ <20260409203235.6b9329f0@kernel.org> <2026041026-excuse-slashing-c4ee@gregkh>
+ <20260410102827.GT469338@kernel.org> <18e3df62-34f9-4de0-903b-19919d7ae2ca@eastlink.ca>
+In-Reply-To: <18e3df62-34f9-4de0-903b-19919d7ae2ca@eastlink.ca>
+From: Dan Cross <crossd@gmail.com>
+Date: Fri, 10 Apr 2026 14:23:38 -0400
+X-Gm-Features: AQROBzBxfq16lsxWS4FbNmSiSUcjbWC2_Z2j86CJK6UrfqmFioX4ACM672Jt4CI
+Message-ID: <CAEoi9W5HOmH3AdCEjQqDo8f7=525k9HbvByiFhiWSmG1LmsAzg@mail.gmail.com>
+Subject: Re: [PATCH net] netrom: do some basic forms of validation on incoming frames
+To: jj <ve1jot@eastlink.ca>
+Cc: Simon Horman <horms@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, linux-hams@vger.kernel.org, 
+	Yizhe Zhuang <yizhe@darknavy.com>, stable <stable@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,mojatatu.com,resnulli.us,vger.kernel.org,gmail.com,google.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-277513-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-277514-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MISSING_XM_UA(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	FROM_NEQ_ENVFROM(0.00)[crossd@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MIME_TRACE(0.00)[0:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 2B4163DB6E0
+X-Rspamd-Queue-Id: 49DCD3DB72E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Prepare mq_dump_common(), mqprio_dump() and mqprio_dump_class_stats()
-for RTNL avoidance.
+On Fri, Apr 10, 2026 at 11:49=E2=80=AFAM jj <ve1jot@eastlink.ca> wrote:
+> This is NOT an obsolete protocol..this is in use by amateur radio
+> operators world-wide...we use it for RF comms usually, because what
+> happens if the internet goes "down", we can still provide comms over
+> slower RF links....(plus it's a fun mode)please PLEASE do not drop...and
+> sorry for the noise...
 
-Use private variables instead of assuming sch->bstats and sch->qstats
-can be used when folding stats from children.
+There are at least three separable issues being conflated here.
 
-This means the children qdisc spinlocks no longer need to be acquired.
+One is whether amateur radio operators are using AX.25, NET/ROM, and
+ROSE.  They are; that's indisputable.
 
-Add qdisc_qlen_lockless() helper, and change gnet_stats_add_basic()
-prototype.
+Another is whether those operators are using the implementation in the
+Linux kernel.  Some are (myself included), though many fewer than are
+using the protocols generally.
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- include/net/gen_stats.h   |  9 +++--
- include/net/sch_generic.h | 14 ++++++++
- net/core/gen_estimator.c  | 24 ++++++-------
- net/core/gen_stats.c      | 17 +++++-----
- net/sched/sch_mq.c        | 33 +++++++++++-------
- net/sched/sch_mqprio.c    | 71 +++++++++++++++++++--------------------
- 6 files changed, 95 insertions(+), 73 deletions(-)
+The third is whether preserving the implementation of these in the
+kernel is the best mechanism for using those protocols on Linux-based
+systems.  For that, I would argue that no, it is not.
 
-diff --git a/include/net/gen_stats.h b/include/net/gen_stats.h
-index 7aa2b8e1fb298c4f994a745b114fc4da785ddf4b..5484b67298e3fe94fe84f0e929799362d21499df 100644
---- a/include/net/gen_stats.h
-+++ b/include/net/gen_stats.h
-@@ -21,6 +21,11 @@ struct gnet_stats_basic_sync {
- 	struct u64_stats_sync syncp;
- } __aligned(2 * sizeof(u64));
- 
-+struct gnet_stats {
-+	u64	bytes;
-+	u64	packets;
-+};
-+
- struct net_rate_estimator;
- 
- struct gnet_dump {
-@@ -49,9 +54,9 @@ int gnet_stats_start_copy_compat(struct sk_buff *skb, int type,
- int gnet_stats_copy_basic(struct gnet_dump *d,
- 			  struct gnet_stats_basic_sync __percpu *cpu,
- 			  struct gnet_stats_basic_sync *b, bool running);
--void gnet_stats_add_basic(struct gnet_stats_basic_sync *bstats,
-+void gnet_stats_add_basic(struct gnet_stats *bstats,
- 			  struct gnet_stats_basic_sync __percpu *cpu,
--			  struct gnet_stats_basic_sync *b, bool running);
-+			  const struct gnet_stats_basic_sync *b, bool running);
- int gnet_stats_copy_basic_hw(struct gnet_dump *d,
- 			     struct gnet_stats_basic_sync __percpu *cpu,
- 			     struct gnet_stats_basic_sync *b, bool running);
-diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
-index b0564a39caf4471619b74179a06a0e41e3765d94..92683be33527bb0a5147d095ba08f5f8494933dd 100644
---- a/include/net/sch_generic.h
-+++ b/include/net/sch_generic.h
-@@ -542,6 +542,11 @@ static inline int qdisc_qlen(const struct Qdisc *q)
- 	return q->q.qlen;
- }
- 
-+static inline int qdisc_qlen_lockless(const struct Qdisc *q)
-+{
-+	return READ_ONCE(q->q.qlen);
-+}
-+
- static inline void qdisc_qlen_inc(struct Qdisc *q)
- {
- 	WRITE_ONCE(q->q.qlen, q->q.qlen + 1);
-@@ -947,6 +952,15 @@ static inline void _bstats_update(struct gnet_stats_basic_sync *bstats,
- 	u64_stats_update_end(&bstats->syncp);
- }
- 
-+static inline void _bstats_set(struct gnet_stats_basic_sync *bstats,
-+			       u64 bytes, u64 packets)
-+{
-+	u64_stats_update_begin(&bstats->syncp);
-+	u64_stats_set(&bstats->bytes, bytes);
-+	u64_stats_set(&bstats->packets, packets);
-+	u64_stats_update_end(&bstats->syncp);
-+}
-+
- static inline void bstats_update(struct gnet_stats_basic_sync *bstats,
- 				 const struct sk_buff *skb)
- {
-diff --git a/net/core/gen_estimator.c b/net/core/gen_estimator.c
-index c34e58c6c3e666743e72978f9a78cf7f95a360c3..40990aee45590f2c56c070b0d28f856fc82d1f55 100644
---- a/net/core/gen_estimator.c
-+++ b/net/core/gen_estimator.c
-@@ -60,9 +60,10 @@ struct net_rate_estimator {
- };
- 
- static void est_fetch_counters(struct net_rate_estimator *e,
--			       struct gnet_stats_basic_sync *b)
-+			       struct gnet_stats *b)
- {
--	gnet_stats_basic_sync_init(b);
-+	b->packets = 0;
-+	b->bytes = 0;
- 	if (e->stats_lock)
- 		spin_lock(e->stats_lock);
- 
-@@ -76,18 +77,15 @@ static void est_fetch_counters(struct net_rate_estimator *e,
- static void est_timer(struct timer_list *t)
- {
- 	struct net_rate_estimator *est = timer_container_of(est, t, timer);
--	struct gnet_stats_basic_sync b;
--	u64 b_bytes, b_packets;
-+	struct gnet_stats b;
- 	u64 rate, brate;
- 
- 	est_fetch_counters(est, &b);
--	b_bytes = u64_stats_read(&b.bytes);
--	b_packets = u64_stats_read(&b.packets);
- 
--	brate = (b_bytes - est->last_bytes) << (10 - est->intvl_log);
-+	brate = (b.bytes - est->last_bytes) << (10 - est->intvl_log);
- 	brate = (brate >> est->ewma_log) - (est->avbps >> est->ewma_log);
- 
--	rate = (b_packets - est->last_packets) << (10 - est->intvl_log);
-+	rate = (b.packets - est->last_packets) << (10 - est->intvl_log);
- 	rate = (rate >> est->ewma_log) - (est->avpps >> est->ewma_log);
- 
- 	preempt_disable_nested();
-@@ -97,8 +95,8 @@ static void est_timer(struct timer_list *t)
- 	write_seqcount_end(&est->seq);
- 	preempt_enable_nested();
- 
--	est->last_bytes = b_bytes;
--	est->last_packets = b_packets;
-+	est->last_bytes = b.bytes;
-+	est->last_packets = b.packets;
- 
- 	est->next_jiffies += ((HZ/4) << est->intvl_log);
- 
-@@ -138,7 +136,7 @@ int gen_new_estimator(struct gnet_stats_basic_sync *bstats,
- {
- 	struct gnet_estimator *parm = nla_data(opt);
- 	struct net_rate_estimator *old, *est;
--	struct gnet_stats_basic_sync b;
-+	struct gnet_stats b;
- 	int intvl_log;
- 
- 	if (nla_len(opt) < sizeof(*parm))
-@@ -172,8 +170,8 @@ int gen_new_estimator(struct gnet_stats_basic_sync *bstats,
- 	est_fetch_counters(est, &b);
- 	if (lock)
- 		local_bh_enable();
--	est->last_bytes = u64_stats_read(&b.bytes);
--	est->last_packets = u64_stats_read(&b.packets);
-+	est->last_bytes = b.bytes;
-+	est->last_packets = b.packets;
- 
- 	if (lock)
- 		spin_lock_bh(lock);
-diff --git a/net/core/gen_stats.c b/net/core/gen_stats.c
-index 1a2380e74272de8eaf3d4ef453e56105a31e9edf..14ee7a4e3709ad5c64a158d3c8d1177ada3a32b0 100644
---- a/net/core/gen_stats.c
-+++ b/net/core/gen_stats.c
-@@ -123,10 +123,9 @@ void gnet_stats_basic_sync_init(struct gnet_stats_basic_sync *b)
- }
- EXPORT_SYMBOL(gnet_stats_basic_sync_init);
- 
--static void gnet_stats_add_basic_cpu(struct gnet_stats_basic_sync *bstats,
-+static void gnet_stats_add_basic_cpu(struct gnet_stats *bstats,
- 				     struct gnet_stats_basic_sync __percpu *cpu)
- {
--	u64 t_bytes = 0, t_packets = 0;
- 	int i;
- 
- 	for_each_possible_cpu(i) {
-@@ -140,19 +139,18 @@ static void gnet_stats_add_basic_cpu(struct gnet_stats_basic_sync *bstats,
- 			packets = u64_stats_read(&bcpu->packets);
- 		} while (u64_stats_fetch_retry(&bcpu->syncp, start));
- 
--		t_bytes += bytes;
--		t_packets += packets;
-+		bstats->bytes += bytes;
-+		bstats->packets += packets;
- 	}
--	_bstats_update(bstats, t_bytes, t_packets);
- }
- 
--void gnet_stats_add_basic(struct gnet_stats_basic_sync *bstats,
-+void gnet_stats_add_basic(struct gnet_stats *bstats,
- 			  struct gnet_stats_basic_sync __percpu *cpu,
--			  struct gnet_stats_basic_sync *b, bool running)
-+			  const struct gnet_stats_basic_sync *b, bool running)
- {
- 	unsigned int start;
--	u64 bytes = 0;
- 	u64 packets = 0;
-+	u64 bytes = 0;
- 
- 	WARN_ON_ONCE((cpu || running) && in_hardirq());
- 
-@@ -167,7 +165,8 @@ void gnet_stats_add_basic(struct gnet_stats_basic_sync *bstats,
- 		packets = u64_stats_read(&b->packets);
- 	} while (running && u64_stats_fetch_retry(&b->syncp, start));
- 
--	_bstats_update(bstats, bytes, packets);
-+	bstats->bytes += bytes;
-+	bstats->packets += packets;
- }
- EXPORT_SYMBOL(gnet_stats_add_basic);
- 
-diff --git a/net/sched/sch_mq.c b/net/sched/sch_mq.c
-index ec8c91d3fde04e59daec2aecdb14d6bf50715e15..0d83e69f2f679988d56920c16acb659d2d1ba636 100644
---- a/net/sched/sch_mq.c
-+++ b/net/sched/sch_mq.c
-@@ -143,30 +143,39 @@ EXPORT_SYMBOL_NS_GPL(mq_attach, "NET_SCHED_INTERNAL");
- void mq_dump_common(struct Qdisc *sch, struct sk_buff *skb)
- {
- 	struct net_device *dev = qdisc_dev(sch);
-+	struct gnet_stats_queue qstats = { 0 };
-+	struct gnet_stats bstats = { 0 };
-+	const struct Qdisc *qdisc;
- 	unsigned int qlen = 0;
--	struct Qdisc *qdisc;
- 	unsigned int ntx;
- 
--	gnet_stats_basic_sync_init(&sch->bstats);
--	memset(&sch->qstats, 0, sizeof(sch->qstats));
--
- 	/* MQ supports lockless qdiscs. However, statistics accounting needs
- 	 * to account for all, none, or a mix of locked and unlocked child
- 	 * qdiscs. Percpu stats are added to counters in-band and locking
- 	 * qdisc totals are added at end.
- 	 */
-+	rcu_read_lock();
- 	for (ntx = 0; ntx < dev->num_tx_queues; ntx++) {
--		qdisc = rtnl_dereference(netdev_get_tx_queue(dev, ntx)->qdisc_sleeping);
--		spin_lock_bh(qdisc_lock(qdisc));
-+		qdisc = rcu_dereference(netdev_get_tx_queue(dev, ntx)->qdisc_sleeping);
- 
--		gnet_stats_add_basic(&sch->bstats, qdisc->cpu_bstats,
--				     &qdisc->bstats, false);
--		gnet_stats_add_queue(&sch->qstats, qdisc->cpu_qstats,
-+		gnet_stats_add_basic(&bstats, qdisc->cpu_bstats,
-+				     &qdisc->bstats, true);
-+		gnet_stats_add_queue(&qstats, qdisc->cpu_qstats,
- 				     &qdisc->qstats);
--		qlen += qdisc_qlen(qdisc);
--
--		spin_unlock_bh(qdisc_lock(qdisc));
-+		qlen += qdisc_qlen_lockless(qdisc);
- 	}
-+	rcu_read_unlock();
-+
-+	spin_lock_bh(qdisc_lock(sch));
-+	_bstats_set(&sch->bstats, bstats.bytes, bstats.packets);
-+	spin_unlock_bh(qdisc_lock(sch));
-+
-+	WRITE_ONCE(sch->qstats.qlen, qstats.qlen);
-+	WRITE_ONCE(sch->qstats.backlog, qstats.backlog);
-+	WRITE_ONCE(sch->qstats.drops, qstats.drops);
-+	WRITE_ONCE(sch->qstats.requeues, qstats.requeues);
-+	WRITE_ONCE(sch->qstats.overlimits, qstats.overlimits);
-+
- 	WRITE_ONCE(sch->q.qlen, qlen);
- }
- EXPORT_SYMBOL_NS_GPL(mq_dump_common, "NET_SCHED_INTERNAL");
-diff --git a/net/sched/sch_mqprio.c b/net/sched/sch_mqprio.c
-index 91a92992cd24ab6c30bf7db2288c08cd493c7bc3..0f58b3a3e99a100df929de110fe0bda1a44cc7d6 100644
---- a/net/sched/sch_mqprio.c
-+++ b/net/sched/sch_mqprio.c
-@@ -554,32 +554,40 @@ static int mqprio_dump(struct Qdisc *sch, struct sk_buff *skb)
- 	struct net_device *dev = qdisc_dev(sch);
- 	struct mqprio_sched *priv = qdisc_priv(sch);
- 	struct nlattr *nla = (struct nlattr *)skb_tail_pointer(skb);
-+	struct gnet_stats_queue qstats = { 0 };
- 	struct tc_mqprio_qopt opt = { 0 };
-+	struct gnet_stats bstats = { 0 };
-+	const struct Qdisc *qdisc;
- 	unsigned int qlen = 0;
--	struct Qdisc *qdisc;
- 	unsigned int ntx;
- 
--	qlen = 0;
--	gnet_stats_basic_sync_init(&sch->bstats);
--	memset(&sch->qstats, 0, sizeof(sch->qstats));
--
- 	/* MQ supports lockless qdiscs. However, statistics accounting needs
- 	 * to account for all, none, or a mix of locked and unlocked child
- 	 * qdiscs. Percpu stats are added to counters in-band and locking
- 	 * qdisc totals are added at end.
- 	 */
-+	rcu_read_lock();
- 	for (ntx = 0; ntx < dev->num_tx_queues; ntx++) {
--		qdisc = rtnl_dereference(netdev_get_tx_queue(dev, ntx)->qdisc_sleeping);
--		spin_lock_bh(qdisc_lock(qdisc));
-+		qdisc = rcu_dereference(netdev_get_tx_queue(dev, ntx)->qdisc_sleeping);
- 
--		gnet_stats_add_basic(&sch->bstats, qdisc->cpu_bstats,
--				     &qdisc->bstats, false);
--		gnet_stats_add_queue(&sch->qstats, qdisc->cpu_qstats,
-+		gnet_stats_add_basic(&bstats, qdisc->cpu_bstats,
-+				     &qdisc->bstats, true);
-+		gnet_stats_add_queue(&qstats, qdisc->cpu_qstats,
- 				     &qdisc->qstats);
--		qlen += qdisc_qlen(qdisc);
--
--		spin_unlock_bh(qdisc_lock(qdisc));
-+		qlen += qdisc_qlen_lockless(qdisc);
- 	}
-+	rcu_read_unlock();
-+
-+	spin_lock_bh(qdisc_lock(sch));
-+	_bstats_set(&sch->bstats, bstats.bytes, bstats.packets);
-+	spin_unlock_bh(qdisc_lock(sch));
-+
-+	WRITE_ONCE(sch->qstats.qlen, qstats.qlen);
-+	WRITE_ONCE(sch->qstats.backlog, qstats.backlog);
-+	WRITE_ONCE(sch->qstats.drops, qstats.drops);
-+	WRITE_ONCE(sch->qstats.requeues, qstats.requeues);
-+	WRITE_ONCE(sch->qstats.overlimits, qstats.overlimits);
-+
- 	WRITE_ONCE(sch->q.qlen, qlen);
- 
- 	mqprio_qopt_reconstruct(dev, &opt);
-@@ -661,45 +669,34 @@ static int mqprio_dump_class(struct Qdisc *sch, unsigned long cl,
- 
- static int mqprio_dump_class_stats(struct Qdisc *sch, unsigned long cl,
- 				   struct gnet_dump *d)
--	__releases(d->lock)
--	__acquires(d->lock)
- {
- 	if (cl >= TC_H_MIN_PRIORITY) {
- 		struct net_device *dev = qdisc_dev(sch);
- 		struct netdev_tc_txq tc = dev->tc_to_txq[cl & TC_BITMASK];
--		struct gnet_stats_queue qstats = {0};
-+		struct gnet_stats_queue qstats = { 0 };
- 		struct gnet_stats_basic_sync bstats;
-+		struct gnet_stats _bstats = { 0 };
- 		u32 qlen = 0;
- 		int i;
- 
--		gnet_stats_basic_sync_init(&bstats);
--		/* Drop lock here it will be reclaimed before touching
--		 * statistics this is required because the d->lock we
--		 * hold here is the look on dev_queue->qdisc_sleeping
--		 * also acquired below.
--		 */
--		if (d->lock)
--			spin_unlock_bh(d->lock);
--
-+		rcu_read_lock();
- 		for (i = tc.offset; i < tc.offset + tc.count; i++) {
--			struct netdev_queue *q = netdev_get_tx_queue(dev, i);
--			struct Qdisc *qdisc = rtnl_dereference(q->qdisc);
--
--			spin_lock_bh(qdisc_lock(qdisc));
-+			const struct netdev_queue *q = netdev_get_tx_queue(dev, i);
-+			const struct Qdisc *qdisc = rcu_dereference(q->qdisc);
- 
--			gnet_stats_add_basic(&bstats, qdisc->cpu_bstats,
--					     &qdisc->bstats, false);
-+			gnet_stats_add_basic(&_bstats, qdisc->cpu_bstats,
-+					     &qdisc->bstats, true);
- 			gnet_stats_add_queue(&qstats, qdisc->cpu_qstats,
- 					     &qdisc->qstats);
--			qlen += qdisc_qlen(qdisc);
--
--			spin_unlock_bh(qdisc_lock(qdisc));
-+			qlen += qdisc_qlen_lockless(qdisc);
- 		}
-+		rcu_read_unlock();
-+		u64_stats_init(&bstats.syncp);
-+		u64_stats_set(&bstats.bytes, _bstats.bytes);
-+		u64_stats_set(&bstats.packets, _bstats.packets);
-+
- 		qlen = qlen + qstats.qlen;
- 
--		/* Reclaim root sleeping lock before completing stats */
--		if (d->lock)
--			spin_lock_bh(d->lock);
- 		if (gnet_stats_copy_basic(d, NULL, &bstats, false) < 0 ||
- 		    gnet_stats_copy_queue(d, NULL, &qstats, qlen) < 0)
- 			return -1;
--- 
-2.53.0.1213.gd9a14994de-goog
+Taking just AX.25, the current implementation has known deficiencies:
+it is buggy, implements an older version of the protocol, and at best
+receives nominal maintenance: notably, the newer networking tools
+(`ip`, `ss`, etc) meant as replacements for `netstat`, `route`, and
+`ifconfig` have not been updated to incorporate information about the
+amateur radio protocols, and recent changes have left them broken for
+long stretches of time.  More details are available online, such as at
+https://blog.habets.se/2021/11/AX25-user-space.html
 
+There is very little to recommend the kernel implementations, and any
+unique functionality they once provided, such as IP over AX.25, can be
+done via other means in userspace; e.g., one can use TAP/TUN for IP
+over AX.25.
+
+Therefore, it would be better to remove these from the kernel, and
+implement them in userspace instead, or use an existing userspace
+implementation (e.g., LinBPQ or similar).  Backwards compatibility
+with existing Linux applications that expect to use the sockets API
+with amateur radio could `LD_PRELOAD` a shim compatibility library
+that simulates the current programming interface.  There is simply no
+reason to preserve these in the kernel, and bluntly, the
+implementation is pure drag at this point.
+
+Note that this doesn't preclude anyone from using AX.25 et al on
+Linux, or force dependency on the Internet: it just moves the
+implementation of those protocols out of the kernel and into a normal
+userspace program, which is arguably easier to maintain and iterate on
+for the ham community, anyway.
+
+        - Dan C.
+          (KZ2X)
+
+> On 2026-04-10 07:28, Simon Horman wrote:
+> > On Fri, Apr 10, 2026 at 07:24:36AM +0200, Greg Kroah-Hartman wrote:
+> >> On Thu, Apr 09, 2026 at 08:32:35PM -0700, Jakub Kicinski wrote:
+> >>> On Thu, 9 Apr 2026 20:03:28 +0100 Simon Horman wrote:
+> >>>> I expect that checking skb->len isn't sufficient here
+> >>>> and pskb_may_pull needs to be used to ensure that
+> >>>> the data is also available in the linear section of the skb.
+> >>> Or for simplicity we could also be testing against skb_headlen()
+> >>> since we don't expect any legit non-linear frames here? Dunno.
+> > Sure, that's find by me if it leads to simpler code than
+> > using pskb_may_pull(). Else I'd lean towards pskb_may_pull()
+> > as it is a more general approach that feels worth proliferating.
+> >
+> >> I'll be glad to change this either way, your call.  Given that this is
+> >> an obsolete protocol that seems to only be a target for drive-by fuzze=
+rs
+> >> to attack, whatever the simplest thing to do to quiet them up I'll be
+> >> glad to implement.
+> >>
+> >> Or can we just delete this stuff entirely?  :)
+> > Deleting sounds good to me.
+> > But we likely need a deprecation process.
+> > In which case fixing these bugs still makes sense for the short term.
+> >
+>
 
