@@ -1,187 +1,292 @@
-Return-Path: <netdev+bounces-277500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277501-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yJtzHtM42WkjnggAu9opvQ
-	(envelope-from <netdev+bounces-277500-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 19:52:19 +0200
+	id yCsgKOQ52WkjnggAu9opvQ
+	(envelope-from <netdev+bounces-277501-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 19:56:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75D243DB372
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 19:52:18 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2C523DB3C7
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 19:56:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 6EB2B302CF8A
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 17:49:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CBB4A305E340
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 17:52:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5B633DEFE5;
-	Fri, 10 Apr 2026 17:49:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13A5E3DA7CF;
+	Fri, 10 Apr 2026 17:52:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kuFb5voC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AFlpTv+q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com [209.85.219.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62B63230BE9
-	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 17:49:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EF7D73463;
+	Fri, 10 Apr 2026 17:52:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775843394; cv=none; b=HAB8AX3y2qnXxvjtV0zwsVpeA/rz2135KrPSp7PNqP8odWFHYaQQRutxAw5Ao/CkmPlyDVGNRpY9T3Me7XDg8DJO0+q71VlByWG76kfPPPi38psjRWnIAwU4SARNFvZKmJ+ywwb923vbqfPSsgxF0x8o5BgrBxG5+L0xCbICTj0=
+	t=1775843536; cv=none; b=sBLaunzpp4ZuUEOYB1x8arrv0JrU3gONBk96/9/HGvB4G1xWg/abIQAeaDyvm5A55A1396o77RVrDCOrxrQLni1OqfOI6iChoOIdUnTRMLJlBQKjqC9x+jiCZRYC/wCf2OUKV4QxxfCjio2bZ5vgmhR6keyH74eozuXmWVlpNlc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775843394; c=relaxed/simple;
-	bh=rgUPj2SbMNuzUiJlniaJmJhZ4ApbJNHsomKCgXNlwvo=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Rh1WTunW27uSlGg2JwB4nWLydONm+4eYk9HR2W7OzFYEywr4Rt8V/6ClPa9At+hlA1lwSNjIORHn6tvnHH4lrcS8g51oColQSFU8xI4/IXRjkm7Y+y07DVCzs90EMHLMgURS714ABNh6XbI/dp/wDQ0mO3nuxxcZANQRrXli7gA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kuFb5voC; arc=none smtp.client-ip=209.85.219.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qv1-f73.google.com with SMTP id 6a1803df08f44-89cd03be011so51643116d6.0
-        for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 10:49:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1775843392; x=1776448192; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=qF/dIdXkJEiI+cDWNOIJMntWsKT2yKOgBQOOaMqdwWs=;
-        b=kuFb5voCHJFcEZ5yJR3oifYSMbY+6xhW85tXuv9ru7NIvlkBh8HGZpyyHKE6FlS2U/
-         kD4wa6mI53LFPYStpvuUFDo00msPrZj4RgrLjiFl2vkEEENaE9sUVsuvj4beGKPynjRO
-         rLPfyoinaFAa5gUJMqNszLom5cIENIZo/HV+BiDmZ381r6Q53g8le8/4g6E717ew5JHg
-         ifoUhVnqZ5PI109Ue32ACIYc5iatm/6fBR71XEJBfSiZZklqzf509Z2f6+HLrtDE+eFt
-         fGEk47dBN35A3uZvQPozwa7GCcbNFaOSEquE6m651hkPfXyxsOcR6n3Cv6aeT8IFDxdp
-         22NA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775843392; x=1776448192;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=qF/dIdXkJEiI+cDWNOIJMntWsKT2yKOgBQOOaMqdwWs=;
-        b=HnwXI8uR+L3ZPk+shD2+x9hwCoBAH8JzzJ2dNEu7tX+SxG7cLNv9BWH3WQLKiyK/la
-         joCtdiWUhRkNblKUeNZxfdSnwhg6ETJNbI7JVqW3vY0SV6J70Bg7Q3z0Bn7bO7WtTL5o
-         duI8S+Ydhi9/TF+/7IkVRHrnBo3Dpdp9DH+5jEu01m33lAASmbmW39ndEzGBWb5Mi/8D
-         VwsW65fig/i1COpsWras6m21rX2BafkhPN0aj1h0goTj0t045z6TUdFae9kXi7JyDoR3
-         65MCjnPhtzwCUv7IeTJik0jQ8DOF0O9piBb9yEyx0z5EriwqFK68fr+9+gofe3QdwDaH
-         k3Ag==
-X-Forwarded-Encrypted: i=1; AJvYcCUzEjBg9i7JRry5tnLwTRUIYwFf0NNE5BhLapfRrQ4bK9t1VfbSD/JT4VYu7fdfa8kybdXJA7I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxLiAUbqB69+Fx6m/hynydPtCfY+HPXSJLMxVibMIAXThQdG2xp
-	ybYlbR6FNVQOqrr7TSWbbRJttTjF3ydUYnyss0np3vMqUDYUWMMGVLIkfj+Ht/I43Tz1NqRGE2Z
-	UPle3m9tl0/citQ==
-X-Received: from qtbob16.prod.google.com ([2002:a05:622a:7d90:b0:50b:68b1:a11])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:ac8:5d08:0:b0:50d:85c1:3616 with SMTP id d75a77b69052e-50dd5ba7225mr63554301cf.43.1775843391940;
- Fri, 10 Apr 2026 10:49:51 -0700 (PDT)
-Date: Fri, 10 Apr 2026 17:49:50 +0000
+	s=arc-20240116; t=1775843536; c=relaxed/simple;
+	bh=LJTedmk++KoZHRY+NxOICzm/1baOqnTkQt1qfB5CZhs=;
+	h=From:Date:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=HCgCYVsgjlRn/m+li7jKow8/hjCd3tFQvO3UAWQssFLsuaGBzP5Dz849SPVeCQNCxIkUUl5WRJXgAtF2w+ygHIT8ykJ77j8lKXiZGF+lNGzI5W2YpETeoPVDzcGiBYUM4z4gTN2BNMl2QhFYGKiOl1mlybcebwjTXn0EUNpGLqU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AFlpTv+q; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1775843534; x=1807379534;
+  h=from:date:to:cc:subject:in-reply-to:message-id:
+   references:mime-version:content-id;
+  bh=LJTedmk++KoZHRY+NxOICzm/1baOqnTkQt1qfB5CZhs=;
+  b=AFlpTv+qhhbi7CjY2vibRXn7Cmzhjwmgz2k2orPrMKj/lrYUdK1e84BB
+   6B/tgRslZbtchbIP2kMi5/5BhJADhRDSo5etkIkJpxdLg1X2HdMj3Bunv
+   R83W5LnLhs1LicuZxW1ClMq1JWDr2lNQcdqOLJyJ1RiCwaBpfC784g6X8
+   5BSIGf1SiHCIBN7U6S2k03QxozFpJYKLT/zTIgGxFF8WV82yOTfeIEKBJ
+   VZ9rzIOdz/ezEpC2vIJcJ2EmtsHDkMV/W7EMWRbpwRDTCdHJHqoYbKR/n
+   Wnb1cY5vT1EfceXwxra1Pg5FFWwXOA0Z2pJMXBZAPF8hXNmCJRs/1iKgf
+   Q==;
+X-CSE-ConnectionGUID: n0j3ozlBT6+TWpQLprC11A==
+X-CSE-MsgGUID: MaDGX8CERi+6M+nxsCm5HA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11755"; a="76830500"
+X-IronPort-AV: E=Sophos;i="6.23,171,1770624000"; 
+   d="scan'208";a="76830500"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2026 10:52:13 -0700
+X-CSE-ConnectionGUID: xpyzCYsgTQ2pDDI9D6JcYQ==
+X-CSE-MsgGUID: 33p7khnnR8yTRVFaYi+mKg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,171,1770624000"; 
+   d="scan'208";a="222665235"
+Received: from ijarvine-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.244.118])
+  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2026 10:52:11 -0700
+From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
+Date: Fri, 10 Apr 2026 20:52:07 +0300 (EEST)
+To: Ratheesh Kannoth <rkannoth@marvell.com>
+cc: Bjorn Helgaas <helgaas@kernel.org>, vidyas@nvidia.com, bhelgaas@google.com, 
+    Netdev <netdev@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+    linux-pci@vger.kernel.org
+Subject: Re: clarification: PCI device not getting enumerated
+In-Reply-To: <abojekUtFrMxM1RB@rkannoth-OptiPlex-7090>
+Message-ID: <2fd5b6c3-ee08-b73b-5d9d-4823d282f0ab@linux.intel.com>
+References: <abkqm_LCd9zAM8cW@rkannoth-OptiPlex-7090> <20260317210640.GA84423@bhelgaas> <abojekUtFrMxM1RB@rkannoth-OptiPlex-7090>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.53.0.1213.gd9a14994de-goog
-Message-ID: <20260410174950.745670-1-edumazet@google.com>
-Subject: [PATCH net-next] tcp: add indirect call wrapper in tcp_conn_request()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+MIME-Version: 1.0
+Content-Type: multipart/mixed; BOUNDARY="8323328-1950899332-1775840123=:1195"
+Content-ID: <2692f4b0-f161-3e21-36f4-e424fd9c5f5a@linux.intel.com>
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	CTYPE_MIXED_BOGUS(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
+	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-277500-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-277501-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+,1:+];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	FROM_NEQ_ENVFROM(0.00)[ilpo.jarvinen@linux.intel.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 75D243DB372
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,110.17.249.0:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:email]
+X-Rspamd-Queue-Id: E2C523DB3C7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Small improvement in SYN processing, to directly call
-tcp_v6_init_seq_and_ts_off() or tcp_v4_init_seq_and_ts_off().
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- include/net/tcp.h    | 6 ++++++
- net/ipv4/tcp_input.c | 5 ++++-
- net/ipv4/tcp_ipv4.c  | 2 +-
- net/ipv6/tcp_ipv6.c  | 2 +-
- 4 files changed, 12 insertions(+), 3 deletions(-)
+--8323328-1950899332-1775840123=:1195
+Content-Type: text/plain; CHARSET=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-ID: <39a77d0b-2a6e-b676-0b3b-1f17aa624cd0@linux.intel.com>
 
-diff --git a/include/net/tcp.h b/include/net/tcp.h
-index 6156d1d068e142f696ec9dfff63e3aaebb0171bc..8c3762a9d6fd4e23ed3e1af7fbc8404ad17b1923 100644
---- a/include/net/tcp.h
-+++ b/include/net/tcp.h
-@@ -3085,4 +3085,10 @@ static inline int tcp_recv_should_stop(struct sock *sk)
- 	       signal_pending(current);
- }
- 
-+INDIRECT_CALLABLE_DECLARE(union tcp_seq_and_ts_off
-+			  tcp_v4_init_seq_and_ts_off(const struct net *net,
-+						     const struct sk_buff *skb));
-+INDIRECT_CALLABLE_DECLARE(union tcp_seq_and_ts_off
-+			  tcp_v6_init_seq_and_ts_off(const struct net *net,
-+						     const struct sk_buff *skb));
- #endif	/* _TCP_H */
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index 7171442c3ed7ae62ec45c093cc58ad5a5c978ed9..021f745747c59d8b9e200c5954af7807a4d08866 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -7658,7 +7658,10 @@ int tcp_conn_request(struct request_sock_ops *rsk_ops,
- 		goto drop_and_free;
- 
- 	if (tmp_opt.tstamp_ok || (!want_cookie && !isn))
--		st = af_ops->init_seq_and_ts_off(net, skb);
-+		st = INDIRECT_CALL_INET(af_ops->init_seq_and_ts_off,
-+					tcp_v6_init_seq_and_ts_off,
-+					tcp_v4_init_seq_and_ts_off,
-+					net, skb);
- 
- 	if (tmp_opt.tstamp_ok) {
- 		tcp_rsk(req)->req_usec_ts = dst_tcp_usec_ts(dst);
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index 69ab236072e7142d5ca9d0703d99f02c1e17c738..9309294370a7ba256103813b6e1cb6b79b54cd44 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -105,7 +105,7 @@ static DEFINE_PER_CPU(struct sock_bh_locked, ipv4_tcp_sk) = {
- 
- static DEFINE_MUTEX(tcp_exit_batch_mutex);
- 
--static union tcp_seq_and_ts_off
-+INDIRECT_CALLABLE_SCOPE union tcp_seq_and_ts_off
- tcp_v4_init_seq_and_ts_off(const struct net *net, const struct sk_buff *skb)
- {
- 	return secure_tcp_seq_and_ts_off(net,
-diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index 8dc3874e8b9252da60f21ad77a5ca834532e650a..4e39e8dd8e1e04d3771455fee65aecb88436a578 100644
---- a/net/ipv6/tcp_ipv6.c
-+++ b/net/ipv6/tcp_ipv6.c
-@@ -105,7 +105,7 @@ static void inet6_sk_rx_dst_set(struct sock *sk, const struct sk_buff *skb)
- 	}
- }
- 
--static union tcp_seq_and_ts_off
-+INDIRECT_CALLABLE_SCOPE union tcp_seq_and_ts_off
- tcp_v6_init_seq_and_ts_off(const struct net *net, const struct sk_buff *skb)
- {
- 	return secure_tcpv6_seq_and_ts_off(net,
--- 
-2.53.0.1213.gd9a14994de-goog
+On Wed, 18 Mar 2026, Ratheesh Kannoth wrote:
 
+> On 2026-03-18 at 02:36:40, Bjorn Helgaas (helgaas@kernel.org) wrote:
+> > On Tue, Mar 17, 2026 at 03:49:07PM +0530, Ratheesh Kannoth wrote:
+> > > Hi,
+> > >
+> > > Below commit breaks PCI enumeration of a marvell PCI endpoint (177d:a=
+0e2).
+> > > I am not familiar with PCI code, could you please help in debugging/f=
+ixing this ?
+> > >
+> > > Before the commit, the kernel set PCI_REASSIGN_ALL_BUS. So pcibios_as=
+sign_all_busses() was true,
+> > > and in pci_scan_bridge_extend() the kernel took the =E2=80=9Creassign=
+=E2=80=9D path and used EA
+> > > (and pci_ea_fixed_busnrs()) to assign bus numbers.
+> > >
+> > > commit 7246a4520b4bf1494d7d030166a11b5226f6d508
+> > > Author: Vidya Sagar <vidyas@nvidia.com>
+> > > Date:   Wed May 8 23:11:38 2024 +0530
+> > >
+> > >     PCI: Use preserve_config in place of pci_flags
+> > >
+> > >     Use preserve_config in place of checking for PCI_PROBE_ONLY flag =
+to enable
+> > >     support for "linux,pci-probe-only" on a per host bridge basis.
+> > >
+> > >     This also obviates the use of adding PCI_REASSIGN_ALL_BUS flag if
+> > >     !PCI_PROBE_ONLY, as pci_assign_unassigned_root_bus_resources() ta=
+kes care
+> > >     of reassigning the resources that are not already claimed.
+> >
+> > This commit appeared in v6.11.  Apparently on v6.6, 0002:1b:00.0 is
+> > detected, and in the v6.12 dmesg below, we don't enumerate it.
+> >
+> > It looks like 7246a4520b4b can still be reverted cleanly from
+> > v7.0-rc1.  Can you collect the complete dmesg logs from v7.0-rc1
+> > (where I assume we won't see 0002:1b:00.0) and from v7.0-rc1 with
+> > 7246a4520b4b reverted (where I assume we *will* see it) and output of
+> > "sudo lspci -vv"?  Use the same kernel config and DT for both, of
+> > course.
+> Please find dmesg, lspci -vv and device tree output for v7.0-rc1 and v7.0=
+-rc1 with patch reverted
+> at bottom of this email. Used same kernel config and DT for both.
+>=20
+> >
+> > I don't understand some of the v6.12 dmesg log:
+> >
+> >   3.187193] pci-host-generic 878000000000.pci: Memory resource size exc=
+eeds max for 32 bits
+> >   3.313087] pci 0000:00:01.0: PCI bridge to [bus 01] (subtractive decod=
+e)
+> >   3.319878] pci 0000:00:01.0:   bridge window [mem 0x00000000-0x000ffff=
+f]
+> >   3.723673] pci 0000:01:00.0: [177d:a075] type 00 class 0x088000 PCIe E=
+ndpoint
+> >   3.730924] pci 0000:01:00.0: BAR 0 [mem 0x87e0fc000000-0x87e0fc03ffff =
+64bit]: from Enhanced Allocation, properties 0x0
+> >   3.741710] pci 0000:01:00.0: BAR 4 [mem 0x87e0fcf00000-0x87e0fcffffff =
+64bit]: from Enhanced Allocation, properties 0x0
+> >
+> >   3.448655] pci 0000:00:0c.0: PCI bridge to [bus 02] (subtractive decod=
+e)
+> >   3.455454] pci 0000:00:0c.0:   bridge window [mem 0x00000000-0x000ffff=
+f]
+> >   4.425308] pci 0000:02:00.0: [177d:a075] type 00 class 0x088000 PCIe E=
+ndpoint
+> >   4.432561] pci 0000:02:00.0: BAR 0 [mem 0x87e0f9000000-0x87e0f903ffff =
+64bit]: from Enhanced Allocation, properties 0x0
+> >
+> >   5.744082] pci-host-generic 878020000000.pci: Memory resource size exc=
+eeds max for 32 bits
+> >   5.799532] pci 0002:00:00.0: PCI bridge to [bus fa] (subtractive decod=
+e)
+> >   5.806322] pci 0002:00:00.0:   bridge window [mem 0x00000000-0x000ffff=
+f]
+> >   5.820632] pci 0002:00:01.0: PCI bridge to [bus fb] (subtractive decod=
+e)
+> >   5.827423] pci 0002:00:01.0:   bridge window [mem 0x00000000-0x000ffff=
+f]
+> >
+> > - The "Memory resource size exceeds max for 32 bits" warnings are
+> >   interesting.  Is this a DT error?
+>
+> I dont see any errors as such. Could you guide me how to locate this issu=
+e, or suggest any command to check
+> the same.
+
+I'm sorry I only noticed this thread now.
+
+Take a look for "root bus resource" lines in your log. When the size of=20
+those exceeds 4G, the warning is printed if the mem resource does not have=
+=20
+IORESOURCE_PREFETCH set (which implies 64-bit window in the old way things=
+=20
+were spec'ed). That resource printout includes "pref" when the flag is=20
+present.
+
+For such resource, I think having IORESOURCE_PREFETCH and=20
+IORESOURCE_MEM_64 would be appropriate. And also for any resource that is=
+=20
+expected to require >4G address even if size itself is small enough.=20
+Unfortunately things have not been very consistent when it comes to root=20
+bus resources.
+
+The resource bits are given in DT along with the address range (but I'm=20
+not an DT expert by any means so I state something stupid when it comes=20
+to DTs, take it with a grain of salt :-)):
+
+# pci feild (phys.hi)
+
+npt000ss bbbbbbbb dddddfff rrrrrrrr
+
+n: Relocateable Flag. (0 means relocation, 1 means impossible)
+p: Prefetch Flag. (0 means impossible 1 means possible)
+t: Aliased Flag.
+ss: space code
+  00: compositional space
+  01: I/O space
+  10: 32bit memory space
+  11: 64bit memory space
+
+I think your ranges have 0x03... which would seem to say they were 64-bit=
+=20
+but that flag did not get set (or got cleared) for some reason as there's=
+=20
+not "64-bit" in the root bus resource printouts.
+
+I suspect the warning goes away if you change 0x03... to 0x43... but you=20
+also need to pay attention that pci_parse_request_of_pci_ranges() requires=
+=20
+also one non-prefetchable resource within each set of root bus resources=20
+so or it will trigger another warning if you change them all.
+
+I'm not sure if it resolves the primary issue.
+
+> > - There should only be one subtractive decode bridge per segment, but
+> >   there are many here.
+> >
+> > - Most of the bridge windows look uninitialized ([mem
+> >   0x00000000-0x000fffff]), and we don't seem to reassign them, so BARs
+> >   of the downstream devices shouldn't be reachable.
+> >
+> > - Interesting to see so much "Enhanced Allocation"; that's very
+> >   unusual.
+> >
+> > - I guess your DT must have "linux,pci-probe-only"; seems like that
+> No.
+>=20
+> +++ fdt dump from uboot +++
+>=20
+> crb106-pcie> fdt print /soc/pci@878020000000
+> pci@878020000000 {
+>         compatible =3D "pci-host-ecam-generic";
+>         device_type =3D "pci";
+>         msi-map =3D <0x00000000 0x00000037 0x00020000 0x00010000>;
+>         bus-range =3D <0x00000000 0x000000ff>;
+>         #size-cells =3D <0x00000002>;
+>         #address-cells =3D <0x00000003>;
+>         dma-coherent;
+>         linux,pci-domain =3D <0x00000002>;
+>         reg =3D <0x00008780 0x20000000 0x00000000 0x10000000>;
+>         iommu-map =3D <0x00000000 0x00000039 0x00020000 0x00010000>;
+>         ranges =3D <0x03000000 0x00008400 0x00000000 0x00008400 0x0000000=
+0 0x000001f5 0x00000000 0x03000000 0x00000009 0xfc000000 0x00000009 0xfc000=
+000 0x00000000 0x03040000>;
+
+
+--=20
+ i.
+--8323328-1950899332-1775840123=:1195--
 
