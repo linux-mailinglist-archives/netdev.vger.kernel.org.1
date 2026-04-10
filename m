@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-277584-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277585-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oKeTBmFp2Wn5pQgAu9opvQ
-	(envelope-from <netdev+bounces-277584-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 23:19:29 +0200
+	id SBtgI0hp2Wn5pQgAu9opvQ
+	(envelope-from <netdev+bounces-277585-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 23:19:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 960123DCD3A
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 23:19:28 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC3F23DCD32
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 23:19:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 249F93065F28
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 21:17:56 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id BB7F2301D484
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 21:17:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA5623AEF32;
-	Fri, 10 Apr 2026 21:17:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C41923AF663;
+	Fri, 10 Apr 2026 21:17:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UzuRI1Oq"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="M/YeH/0S"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69A773A7844
-	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 21:17:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0567A3B27DE
+	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 21:17:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775855867; cv=none; b=GYI6VoSG8puO/yu8KtPhl7ir6bfW0EmNfCM5dxzEqVjrI0KowSo9Bw2aYLOAz9jB79zx/9DIAx50ojtLZYo8GqjK9ukg3oKlVxuBM0dQW12SYYXfpPwxR4UNJSBo/56ODRcnFaRSqfrIcs/mdMHJgywzvS5ndMMQ4AUl2izpMds=
+	t=1775855869; cv=none; b=ba5EACOWCKGlKji1JlorCcajyuV9C4Uy+u8NCOsfAfD4pVtlR3U2upxjhqEZofB0y00uchHTni3H0Rr146S6qZRLCpuBA88LutQFkBN5keSTn4z8/0d0Ui0pmAfBjCELU85hWuwdfGODfw3mnvpZ+hBN49cCfipcGPiAUFWtkbU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775855867; c=relaxed/simple;
-	bh=gk38U09WELWZR4HFgy1B876yJ3UfXDbh5i+UntveDQs=;
+	s=arc-20240116; t=1775855869; c=relaxed/simple;
+	bh=k2x9TMyIQBhC9wov2lvehh9vRM0e74z3YMhHyTc484M=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=WCDbnemqh6KdU6EHwp0ylByBZ7KWrq6DeEojiRHEuNKAnUVr1qL5nfS4CDXV9g1/RNXnuGV/EwWgHQWjld0kV2f7b+tI+pBxR9TK0L69S1TRGYBBpCOtoCzOccxekyaJU9U7TQB5OaybIKgJ99AeqA0v6ogCrfWFrNCvvpOoAx8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UzuRI1Oq; arc=none smtp.client-ip=209.85.210.202
+	 To:Cc:Content-Type; b=NfjFjwoSOW+5uyownRszmWqWnV/FqAtpnDbNO5AFzFYq8sVWkE7PPbTz641L9nQG4i0xAcsUcVF5+WzFPbUYW80mTYK2zLMuFILU2vALZVDjnPaoWFMRdjCV6NAvEvz4Ue9rL7++Nf5uqp6DVy40wAU864FY88l0V6EmZsZ5TpQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=M/YeH/0S; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-82c646e980bso1509579b3a.0
-        for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 14:17:46 -0700 (PDT)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2b242cbb97aso19374795ad.1
+        for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 14:17:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1775855866; x=1776460666; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1775855867; x=1776460667; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=zWv7c1HMNelJEJ20TdBXvirmsx0g/Itx1DloguKRdSs=;
-        b=UzuRI1Oqz2VaAO6QSAtQBPWmuvvmAEnrBxMphCcBK7houw0MFMzHjXuDsMNrYz/mvf
-         V/K6Xeaeihr52bXik2rleIz9vvZYMWhxKwSEGLcUeuR6936wlZcar1CGYqQIukQHWQu3
-         7IUMddF5MhW2VEcrRfI+UOYy3H2XS9n7d9gW+rKx8qRYcY+On2fTLw9lQfZ3BvFQbN7g
-         jLNyNR+IEfvaMWMLsHEPuldjO3YEYxfjH1+9fPdNnN9iOPSemoCS3hPW1iHrIhOSCSxE
-         5wNh5VUBdFXSj7/7QeahsIuHmmh7hQC+V3OO0nEBi+/m1oIxRKNteDo2ttu8l496g5Vj
-         zong==
+        bh=1SZrmOwe1ZKmgoayGFqmTXCHDPc2vmGRNnZRHExVJN4=;
+        b=M/YeH/0SHFFZzTmFS0Bcd4HBTNYTeTibwNG9JkQyzx15/WyhRY1K9N2y9DlPmojykP
+         9xndyBk1NiYBb+tkpJlP1k8vmtMAd37uYnVYnp+6i/m+hai0XJHncN/uqzBg9TUm2Irk
+         bj4icpKlU3jlEYZ7sddsA6zDNA1FXQ64Lyh8Rx5eYemdImE4r4fuOs/4an3A+QVNSzMG
+         odcvPlU20nP7kL8Gb2WpvDXk5YsfHUqn7mCTaKK9vpaeeH+U+OvXhh9ZqPWLCExdosNi
+         h+7sS5eYL1Elb+/TeFnK/qG1my14FScety/0C4DU0aNobCL/o48k+HO2k24UG+/6Pv1T
+         PGuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775855866; x=1776460666;
+        d=1e100.net; s=20251104; t=1775855867; x=1776460667;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zWv7c1HMNelJEJ20TdBXvirmsx0g/Itx1DloguKRdSs=;
-        b=BUAaZxSVFytnK2Je/3fr+MPD3qJ1Syk8PTupCz/ucJs4t0zZcmdzPcwQHNA6C+8nsh
-         RMDwuM8uti4cz61miz67l664p/dXAQblI/Q3WNm2Mn0HoWhlzSMiXOvMbWmTc9eCOsRK
-         gsHA6AtMrGz+GDNEo7m6cwkZ71TAjyL1radKUzkMm6M9sRiY58mGIIcWU+XbXD2u9t0T
-         Xo+pLb8psZvPXFBpPMEtH+O039j28yO6GuMiuqOJBPrniNbqN7OfZL0mmeHm2SFf6xQJ
-         5+Vj4Lp9qn9IeLTdCJNScoNTbx0wdw5Jmk9cI/Hh98d5TNCjdT4+24Zv+jFTQREnmz3G
-         RoKA==
-X-Forwarded-Encrypted: i=1; AJvYcCVHs7WmAZcBlLjgnOV3WBs5ExNJHMd8TcjVU6UgQltXKMR+HMy12ADlYvq1h7TGfr8irfPgpug=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yys1kCAXsbie8q0+nnH/9I9yiNVvgoVRMIPj3xB0335VxI7uGwB
-	bngiReNGl9edA0tfiqyyr4VNkM9c9oypeSTdGJTAYAOWgfRYAUqCwA90/fpW1KmgaWY300M3jML
-	ns2WCwg==
-X-Received: from pfbdo17.prod.google.com ([2002:a05:6a00:4a11:b0:82c:6863:427a])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:170c:b0:82c:ddbb:7db3
- with SMTP id d2e1a72fcca58-82f0c21d396mr4954734b3a.25.1775855865553; Fri, 10
- Apr 2026 14:17:45 -0700 (PDT)
-Date: Fri, 10 Apr 2026 21:17:04 +0000
+        bh=1SZrmOwe1ZKmgoayGFqmTXCHDPc2vmGRNnZRHExVJN4=;
+        b=aXNkfz+PWaiQI2MDt20RlX97OW85oXh/wMPtqIHpu8RyuzfX8WiPTxswBKQcIc0qGG
+         dV85yaSnP/uDWZXfBGAsynKX1RjsrzjEzLgy95YokIShU+nsv1MYispuZPJE4nT95Bmq
+         rMLfE7J9P3tw976cPHEV0Vc8IjeqZcc7uzm4ZQ1Bus2CUjBDElULm+Eg+i2DIOC8PGo4
+         POP7+2pYtxmUwVh9nVcpJbnUp0gkwrCNYXMxZ6789hXUBM30YGNxHY//ZW0XTj756sZE
+         ANDQkBi4EUGsGAUs6IKbcSnTBJPHxrvvA00uLiKbIccTH0M4qDZVbeEQfgmW/6IozNtC
+         ifaQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX4jVQaw2AmHk33zgrntScI1H+2CSsd6lsw68DDA2ZpQz/wYy0halWUXVpTaRBUUXoSEWZTzH8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzKf4zW/MWMH9IJWRr1yl0lxRMqOaHH+7+0aey/cHeVicZ2ovjQ
+	f4hqlNxssJE8M2It3QLilHnUvk5icVXRMgL/SoGi/A2jz9FA1+69Vf7OiHBNeZIkWT75XJ3QWfR
+	m3Anlug==
+X-Received: from pghz8.prod.google.com ([2002:a63:e108:0:b0:c76:9cb0:80cb])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:1591:b0:398:aaac:a079
+ with SMTP id adf61e73a8af0-39fe40839e4mr5785221637.45.1775855867216; Fri, 10
+ Apr 2026 14:17:47 -0700 (PDT)
+Date: Fri, 10 Apr 2026 21:17:05 +0000
 In-Reply-To: <20260410211726.1668756-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,8 +76,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260410211726.1668756-1-kuniyu@google.com>
 X-Mailer: git-send-email 2.53.0.1213.gd9a14994de-goog
-Message-ID: <20260410211726.1668756-9-kuniyu@google.com>
-Subject: [PATCH v2 net-next 08/15] ipmr: Free mr_table after RCU grace period.
+Message-ID: <20260410211726.1668756-10-kuniyu@google.com>
+Subject: [PATCH v2 net-next 09/15] ip6mr: Free mr_table after RCU grace period.
 From: Kuniyuki Iwashima <kuniyu@google.com>
 To: "David S . Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
@@ -90,18 +90,18 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-277584-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-277585-lists,netdev=lfdr.de];
 	FREEMAIL_CC(0.00)[kernel.org,google.com,gmail.com,vger.kernel.org];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
@@ -110,173 +110,148 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 960123DCD3A
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: AC3F23DCD32
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-With CONFIG_IP_MROUTE_MULTIPLE_TABLES=n, ipmr_fib_lookup()
-does not check if net->ipv4.mrt is NULL.
-
 Since default_device_exit_batch() is called after ->exit_rtnl(),
-a device could receive IGMP packets and access net->ipv4.mrt
-during/after ipmr_rules_exit_rtnl().
+idev->mc_ifc_work could finally call mroute6_is_socket() under RCU
+while ->exit_rtnl() is running. [0]
 
-If ipmr_rules_exit_rtnl() had already cleared it and freed the
-memory, the access would trigger null-ptr-deref or use-after-free.
+With CONFIG_IPV6_MROUTE_MULTIPLE_TABLES=n, ip6mr_fib_lookup() does
+not check if net->ipv6.mrt6 is NULL.  If ip6mr_net_exit_batch()
+set net->ipv6.mrt6 to NULL and freed it, the mrt->mroute_sk access
+could result in null-ptr-deref or use-after-free.
 
-Let's fix it by using RCU helper and free mrt after RCU grace
-period.
+Let's prepare for that situation by applying RCU rule to ip6mr
+table similarly.
 
-Note that rcu_head must be placed within <4K offset and mr_table
-is already 3864 bytes without rcu_head.
-
-Fixes: b22b01867406 ("ipmr: Convert ipmr_net_exit_batch() to ->exit_rtnl().")
+Link: https://lore.kernel.org/netdev/20260407184202.34cfe2d6@kernel.org/ #[0]
 Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
- include/linux/mroute_base.h |  2 ++
- net/ipv4/ipmr.c             | 51 ++++++++++++++++++++-----------------
- 2 files changed, 30 insertions(+), 23 deletions(-)
+ net/ipv6/ip6mr.c | 53 +++++++++++++++++++++++++++---------------------
+ 1 file changed, 30 insertions(+), 23 deletions(-)
 
-diff --git a/include/linux/mroute_base.h b/include/linux/mroute_base.h
-index cf3374580f74..db3f98cae4c9 100644
---- a/include/linux/mroute_base.h
-+++ b/include/linux/mroute_base.h
-@@ -226,6 +226,7 @@ struct mr_table_ops {
- 
- /**
-  * struct mr_table - a multicast routing table
-+ * @rcu: used for table destruction
-  * @list: entry within a list of multicast routing tables
-  * @net: net where this table belongs
-  * @ops: protocol specific operations
-@@ -243,6 +244,7 @@ struct mr_table_ops {
-  * @mroute_reg_vif_num: PIM-device vif index
-  */
- struct mr_table {
-+	struct rcu_head		rcu;
- 	struct list_head	list;
- 	possible_net_t		net;
- 	struct mr_table_ops	ops;
-diff --git a/net/ipv4/ipmr.c b/net/ipv4/ipmr.c
-index fa168513295d..3bf63f8ea606 100644
---- a/net/ipv4/ipmr.c
-+++ b/net/ipv4/ipmr.c
-@@ -151,16 +151,6 @@ static struct mr_table *__ipmr_get_table(struct net *net, u32 id)
+diff --git a/net/ipv6/ip6mr.c b/net/ipv6/ip6mr.c
+index 2b04e52ec61c..fdec7a541cf6 100644
+--- a/net/ipv6/ip6mr.c
++++ b/net/ipv6/ip6mr.c
+@@ -136,16 +136,6 @@ static struct mr_table *__ip6mr_get_table(struct net *net, u32 id)
  	return NULL;
  }
  
--static struct mr_table *ipmr_get_table(struct net *net, u32 id)
+-static struct mr_table *ip6mr_get_table(struct net *net, u32 id)
 -{
 -	struct mr_table *mrt;
 -
 -	rcu_read_lock();
--	mrt = __ipmr_get_table(net, id);
+-	mrt = __ip6mr_get_table(net, id);
 -	rcu_read_unlock();
 -	return mrt;
 -}
 -
- static int ipmr_fib_lookup(struct net *net, struct flowi4 *flp4,
- 			   struct mr_table **mrt)
+ static int ip6mr_fib_lookup(struct net *net, struct flowi6 *flp6,
+ 			    struct mr_table **mrt)
  {
-@@ -293,7 +283,7 @@ static void __net_exit ipmr_rules_exit_rtnl(struct net *net,
- 	struct mr_table *mrt, *next;
+@@ -274,7 +264,7 @@ static void __net_exit ip6mr_rules_exit(struct net *net)
  
- 	list_for_each_entry_safe(mrt, next, &net->ipv4.mr_tables, list) {
+ 	ASSERT_RTNL();
+ 	list_for_each_entry_safe(mrt, next, &net->ipv6.mr6_tables, list) {
 -		list_del(&mrt->list);
 +		list_del_rcu(&mrt->list);
- 		ipmr_free_table(mrt, dev_kill_list);
+ 		ip6mr_free_table(mrt);
  	}
+ 	fib_rules_unregister(net->ipv6.mr6_rules_ops);
+@@ -298,28 +288,30 @@ bool ip6mr_rule_default(const struct fib_rule *rule)
  }
-@@ -315,28 +305,30 @@ bool ipmr_rule_default(const struct fib_rule *rule)
- }
- EXPORT_SYMBOL(ipmr_rule_default);
+ EXPORT_SYMBOL(ip6mr_rule_default);
  #else
--#define ipmr_for_each_table(mrt, net) \
--	for (mrt = net->ipv4.mrt; mrt; mrt = NULL)
+-#define ip6mr_for_each_table(mrt, net) \
+-	for (mrt = net->ipv6.mrt6; mrt; mrt = NULL)
 -
- static struct mr_table *ipmr_mr_table_iter(struct net *net,
- 					   struct mr_table *mrt)
+ static struct mr_table *ip6mr_mr_table_iter(struct net *net,
+ 					    struct mr_table *mrt)
  {
  	if (!mrt)
--		return net->ipv4.mrt;
-+		return rcu_dereference(net->ipv4.mrt);
+-		return net->ipv6.mrt6;
++		return rcu_dereference(net->ipv6.mrt6);
  	return NULL;
  }
  
--static struct mr_table *ipmr_get_table(struct net *net, u32 id)
-+static struct mr_table *__ipmr_get_table(struct net *net, u32 id)
+-static struct mr_table *ip6mr_get_table(struct net *net, u32 id)
++static struct mr_table *__ip6mr_get_table(struct net *net, u32 id)
  {
--	return net->ipv4.mrt;
-+	return rcu_dereference_check(net->ipv4.mrt,
+-	return net->ipv6.mrt6;
++	return rcu_dereference_check(net->ipv6.mrt6,
 +				     lockdep_rtnl_is_held() ||
-+				     !rcu_access_pointer(net->ipv4.mrt));
++				     !rcu_access_pointer(net->ipv6.mrt6));
  }
  
--#define __ipmr_get_table ipmr_get_table
-+#define ipmr_for_each_table(mrt, net)				\
-+	for (mrt = __ipmr_get_table(net, 0); mrt; mrt = NULL)
+-#define __ip6mr_get_table ip6mr_get_table
++#define ip6mr_for_each_table(mrt, net)				\
++	for (mrt = __ip6mr_get_table(net, 0); mrt; mrt = NULL)
  
- static int ipmr_fib_lookup(struct net *net, struct flowi4 *flp4,
- 			   struct mr_table **mrt)
+ static int ip6mr_fib_lookup(struct net *net, struct flowi6 *flp6,
+ 			    struct mr_table **mrt)
  {
--	*mrt = net->ipv4.mrt;
-+	*mrt = rcu_dereference(net->ipv4.mrt);
+-	*mrt = net->ipv6.mrt6;
++	*mrt = rcu_dereference(net->ipv6.mrt6);
 +	if (!*mrt)
 +		return -EAGAIN;
  	return 0;
  }
  
-@@ -347,7 +339,8 @@ static int __net_init ipmr_rules_init(struct net *net)
- 	mrt = ipmr_new_table(net, RT_TABLE_DEFAULT);
+@@ -330,15 +322,19 @@ static int __net_init ip6mr_rules_init(struct net *net)
+ 	mrt = ip6mr_new_table(net, RT6_TABLE_DFLT);
  	if (IS_ERR(mrt))
  		return PTR_ERR(mrt);
--	net->ipv4.mrt = mrt;
+-	net->ipv6.mrt6 = mrt;
 +
-+	rcu_assign_pointer(net->ipv4.mrt, mrt);
++	rcu_assign_pointer(net->ipv6.mrt6, mrt);
  	return 0;
  }
  
-@@ -358,9 +351,10 @@ static void __net_exit ipmr_rules_exit(struct net *net)
- static void __net_exit ipmr_rules_exit_rtnl(struct net *net,
- 					    struct list_head *dev_kill_list)
+ static void __net_exit ip6mr_rules_exit(struct net *net)
  {
--	ipmr_free_table(net->ipv4.mrt, dev_kill_list);
-+	struct mr_table *mrt = rcu_dereference_protected(net->ipv4.mrt, 1);
- 
--	net->ipv4.mrt = NULL;
-+	RCU_INIT_POINTER(net->ipv4.mrt, NULL);
-+	ipmr_free_table(mrt, dev_kill_list);
++	struct mr_table *mrt = rcu_dereference_protected(net->ipv6.mrt6, 1);
++
+ 	ASSERT_RTNL();
+-	ip6mr_free_table(net->ipv6.mrt6);
+-	net->ipv6.mrt6 = NULL;
++
++	RCU_INIT_POINTER(net->ipv6.mrt6, NULL);
++	ip6mr_free_table(mrt);
  }
  
- static int ipmr_rules_dump(struct net *net, struct notifier_block *nb,
-@@ -381,6 +375,17 @@ bool ipmr_rule_default(const struct fib_rule *rule)
- EXPORT_SYMBOL(ipmr_rule_default);
+ static int ip6mr_rules_dump(struct net *net, struct notifier_block *nb,
+@@ -353,6 +349,17 @@ static unsigned int ip6mr_rules_seq_read(const struct net *net)
+ }
  #endif
  
-+static struct mr_table *ipmr_get_table(struct net *net, u32 id)
++static struct mr_table *ip6mr_get_table(struct net *net, u32 id)
 +{
 +	struct mr_table *mrt;
 +
 +	rcu_read_lock();
-+	mrt = __ipmr_get_table(net, id);
++	mrt = __ip6mr_get_table(net, id);
 +	rcu_read_unlock();
 +
 +	return mrt;
 +}
 +
- static inline int ipmr_hash_cmp(struct rhashtable_compare_arg *arg,
- 				const void *ptr)
+ static int ip6mr_hash_cmp(struct rhashtable_compare_arg *arg,
+ 			  const void *ptr)
  {
-@@ -446,7 +451,7 @@ static void ipmr_free_table(struct mr_table *mrt, struct list_head *dev_kill_lis
- 			    MRT_FLUSH_MFC | MRT_FLUSH_MFC_STATIC,
- 			    &ipmr_dev_kill_list);
+@@ -412,7 +419,7 @@ static void ip6mr_free_table(struct mr_table *mrt)
+ 	mroute_clean_tables(mrt, MRT6_FLUSH_MIFS | MRT6_FLUSH_MIFS_STATIC |
+ 				 MRT6_FLUSH_MFC | MRT6_FLUSH_MFC_STATIC);
  	rhltable_destroy(&mrt->mfc_hash);
 -	kfree(mrt);
 +	kfree_rcu(mrt, rcu);
+ }
  
- 	WARN_ON_ONCE(!net_initialized(net) && !list_empty(&ipmr_dev_kill_list));
- 	list_splice(&ipmr_dev_kill_list, dev_kill_list);
+ #ifdef CONFIG_PROC_FS
 -- 
 2.53.0.1213.gd9a14994de-goog
 
