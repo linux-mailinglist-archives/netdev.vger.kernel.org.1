@@ -1,74 +1,75 @@
-Return-Path: <netdev+bounces-277294-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277295-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AOvaJVCs2GljgwgAu9opvQ
-	(envelope-from <netdev+bounces-277294-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 09:52:48 +0200
+	id 6OAxCmqs2GljgwgAu9opvQ
+	(envelope-from <netdev+bounces-277295-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 09:53:14 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 194BB3D39C4
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 09:52:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B0CB3D39E1
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 09:53:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 79C3D304C112
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 07:49:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1FD4930523CE
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 07:49:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55AAE3A4F34;
-	Fri, 10 Apr 2026 07:49:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD5AA39E184;
+	Fri, 10 Apr 2026 07:49:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hPJQApxj"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GTbEJEHz"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB7B4355F43
-	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 07:49:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 818FC3A453B
+	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 07:49:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775807378; cv=none; b=m/qSBz5qYCPZ8pvkmdWVEFNhR0HQt/oc5K6vdVQxnlqOZUyf8cR4X6gjomr9okn3Xnu/K4r6UbRnIDs7lZl/+kacJpYVLVrU+or+hXAkjJX164Em5YbzZc41a6/K9A1jEuqNHRS3MU6klR2n3isiGCxfoSrmYTRfm3dM+bfYJZY=
+	t=1775807380; cv=none; b=Ilc+IuQf5SkfxQqpHb9YKnQZCBx6PSkU/g7ajjBrFx5v6Apa91xbl4A2Iq3tMxENbP7x2OiZMcaHc3LwEC5T9JykHUSLABCAjSYPNZ7EygjORlH653xN2vd4S9JH1j8vgRSpVRAikKdp3Jl3ZbYo/ZaC1rigaVnsDIShXmpZmg4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775807378; c=relaxed/simple;
-	bh=Tl3EkNAWXZS7VSusaCuL0Eb4xS+3persYVF/W/GWM1w=;
+	s=arc-20240116; t=1775807380; c=relaxed/simple;
+	bh=/GsckPs+NdN9rChj/2Ywk80a8qYQmlKLwO31lOo/oAA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XsOeuni6+vX9wBu7a+k/6RdIMk0wsAgJB4x5B1MHUslQaBB1kN5iCjoPfngoZg4rsTaIsaKtmUIE/YKyCZC/vFf7GuaX33KShYWaeZiTMhDQPhLmN11mX//nMXU5MOym0R/ZMv/FeTZkNb2g4OHR9NDHdDZei37bGxvoAxRB9TQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hPJQApxj; arc=none smtp.client-ip=198.175.65.16
+	 MIME-Version; b=P/7YQUcr2E3qiYTeu6kwDR7IPQbGQn+e7v8MUMHeyHAAUGGi0JIyPeLHTy9n0lCgWeHhKAYz9ADVKEeXdAQfQmURQt3xTa7HQLPHnVL0JEsP1T5STbFujyPIsdKCPWLzStJ+Pve5hlL3PHFQLmNeJTrGwsUcqtN0GhUYFV/KZu8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GTbEJEHz; arc=none smtp.client-ip=198.175.65.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1775807377; x=1807343377;
+  t=1775807378; x=1807343378;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Tl3EkNAWXZS7VSusaCuL0Eb4xS+3persYVF/W/GWM1w=;
-  b=hPJQApxj0ob/wlnkioW41Mvu9tT68OjvOk7kjQ8fHMHTpkjqRGFGAEUT
-   22Wp0B09kDnfPor6jq1v95iWhgpJX+KuOnpUzMBxlIgaKSKfKQPvWHxkc
-   uFFk3bjMjECzjJRAhHrnwUmpjRyVQBmfboxBiMZlYkvu+7s6vnp/FTdoQ
-   JOtZzNHstyqOolhw6WqBCMl3MCjl8TT1eWMZqkbKP2bjmeDVmdZRrZcyZ
-   LlxFLFpiL2JMRYqp2wMiRd7Klllw8FyDKzyBRMQF3RlaUmLZq/4d2OV2C
-   JdzM6r6cQmO9aLD1uCEGTypzFKx/gyGh+GCYcjJ39Zr7iAIhu02c09F+j
-   g==;
-X-CSE-ConnectionGUID: kBXvcS7hTNCooWw5S8nAKw==
-X-CSE-MsgGUID: /SCA/6A5SQ60lscDqAH9nA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11754"; a="77007942"
+  bh=/GsckPs+NdN9rChj/2Ywk80a8qYQmlKLwO31lOo/oAA=;
+  b=GTbEJEHzMxvfC9iI0ml3AGy7t/6T6ycaZNp+yI/r1TVHch4mbMV8K1yP
+   d1TQt3eAWhINmbV/MH29Ek3xadMWBpT5nDS4/WzBjS0QOJ9VPP1k8Ubm4
+   Kf+V75ZzM0ymS6jf3u7PUb+S7OodvG86HqA+agBmxscZSnOLS3wo4Mtde
+   nvFPHE3qSk7cLt5NaN1NCX2VHwMTjLLkQHLs+Z3KURAfUxiiOOZr9F5UT
+   16VQOKY73MiuJ6Y7mYGHYAbaoqRV/gCqDwbtGt3Z83XExPNN0aaKCE+54
+   ZFo1sEBeO0Cbuav0sv125ezCjAIIKD20A/GgB06n2isk2n7y8dViUIsBp
+   Q==;
+X-CSE-ConnectionGUID: D9VfSpNvRjOaweIy6iGNIw==
+X-CSE-MsgGUID: RgnwbA92RZ2/CiwJdvEujQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11754"; a="77007944"
 X-IronPort-AV: E=Sophos;i="6.23,171,1770624000"; 
-   d="scan'208";a="77007942"
+   d="scan'208";a="77007944"
 Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2026 00:49:36 -0700
-X-CSE-ConnectionGUID: P2JMCbCZRdiv7CpQKluA+g==
-X-CSE-MsgGUID: us4bh296TrO2QRq2vlpOcQ==
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2026 00:49:38 -0700
+X-CSE-ConnectionGUID: zT8ceFmrThObprmwK0C0cg==
+X-CSE-MsgGUID: b+wSATUkTWCA7gjGbjtZlw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,171,1770624000"; 
-   d="scan'208";a="228941899"
+   d="scan'208";a="228941906"
 Received: from amlin-019-225.igk.intel.com ([10.102.19.225])
-  by orviesa008.jf.intel.com with ESMTP; 10 Apr 2026 00:49:35 -0700
+  by orviesa008.jf.intel.com with ESMTP; 10 Apr 2026 00:49:37 -0700
 From: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 To: intel-wired-lan@lists.osuosl.org,
 	anthony.l.nguyen@intel.com,
 	aleksandr.loktionov@intel.com
-Cc: netdev@vger.kernel.org
-Subject: [PATCH iwl-next 8/10] ice: move ice_phy_get_speed_eth56g() from ice_ptp_hw.c to ice_common.c
-Date: Fri, 10 Apr 2026 09:49:19 +0200
-Message-ID: <20260410074921.1254213-9-aleksandr.loktionov@intel.com>
+Cc: netdev@vger.kernel.org,
+	Larysa Zaremba <larysa.zaremba@intel.com>
+Subject: [PATCH iwl-next 9/10] ice: use inline helpers instead of memcmp() for IPv6 mask checks in ice_ethtool_fdir
+Date: Fri, 10 Apr 2026 09:49:20 +0200
+Message-ID: <20260410074921.1254213-10-aleksandr.loktionov@intel.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260410074921.1254213-1-aleksandr.loktionov@intel.com>
 References: <20260410074921.1254213-1-aleksandr.loktionov@intel.com>
@@ -82,224 +83,158 @@ Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-277294-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[intel.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-277295-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[intel.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_FIVE(0.00)[5];
 	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MIME_TRACE(0.00)[0:+];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 194BB3D39C4
+X-Rspamd-Queue-Id: 8B0CB3D39E1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-ice_phy_get_speed_eth56g() is currently a file-local (static)
-helper in ice_ptp_hw.c. Future users outside that compilation
-unit require access to it.
+Replace static full_ipv6_addr_mask / zero_ipv6_addr_mask structs
+and the associated memcmp() calls in ice_ethtool_fdir.c with the
+kernel-provided ipv6_addr_any() helper and a new ice_ipv6_mask_full()
+inline, reducing boilerplate and making intent clearer.
 
-Move the function to ice_common.c, add a declaration in
-ice_common.h, and relocate the enum ice_eth56g_link_spd from
-ice_ptp_hw.h to ice_type.h so it is visible to callers of the
-new exported function.
-
-Suggested-by: Karol Kolacinski <karol.kolacinski@intel.com>
+Suggested-by: Larysa Zaremba <larysa.zaremba@intel.com>
 Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_common.c | 45 +++++++++++++++++++++
- drivers/net/ethernet/intel/ice/ice_common.h |  1 +
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 45 ---------------------
- drivers/net/ethernet/intel/ice/ice_ptp_hw.h | 13 ------
- drivers/net/ethernet/intel/ice/ice_type.h   | 13 ++++++
- 5 files changed, 59 insertions(+), 58 deletions(-)
+ .../net/ethernet/intel/ice/ice_ethtool_fdir.c | 57 ++++++-------------
+ 1 file changed, 16 insertions(+), 41 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index ce11fea..2cebe4e 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.c
-+++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -3513,6 +3513,51 @@ u16 ice_get_link_speed_based_on_phy_type(u64 phy_type_low, u64 phy_type_high)
- 		return speed_phy_type_high;
- }
+diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c b/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c
+index aceec18..1d7c595 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c
++++ b/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c
+@@ -8,23 +8,10 @@
+ #include "ice_fdir.h"
+ #include "ice_flow.h"
  
-+/**
-+ * ice_phy_get_speed_eth56g - Get link speed based on PHY link type
-+ * @li: pointer to link information struct
-+ *
-+ * Return: simplified ETH56G PHY speed
-+ */
-+enum ice_eth56g_link_spd ice_phy_get_speed_eth56g(struct ice_link_status *li)
-+{
-+	u16 speed = ice_get_link_speed_based_on_phy_type(li->phy_type_low,
-+							 li->phy_type_high);
-+
-+	switch (speed) {
-+	case ICE_AQ_LINK_SPEED_1000MB:
-+		return ICE_ETH56G_LNK_SPD_1G;
-+	case ICE_AQ_LINK_SPEED_2500MB:
-+		return ICE_ETH56G_LNK_SPD_2_5G;
-+	case ICE_AQ_LINK_SPEED_10GB:
-+		return ICE_ETH56G_LNK_SPD_10G;
-+	case ICE_AQ_LINK_SPEED_25GB:
-+		return ICE_ETH56G_LNK_SPD_25G;
-+	case ICE_AQ_LINK_SPEED_40GB:
-+		return ICE_ETH56G_LNK_SPD_40G;
-+	case ICE_AQ_LINK_SPEED_50GB:
-+		switch (li->phy_type_low) {
-+		case ICE_PHY_TYPE_LOW_50GBASE_SR:
-+		case ICE_PHY_TYPE_LOW_50GBASE_FR:
-+		case ICE_PHY_TYPE_LOW_50GBASE_LR:
-+		case ICE_PHY_TYPE_LOW_50GBASE_KR_PAM4:
-+		case ICE_PHY_TYPE_LOW_50G_AUI1_AOC_ACC:
-+		case ICE_PHY_TYPE_LOW_50G_AUI1:
-+			return ICE_ETH56G_LNK_SPD_50G;
-+		default:
-+			return ICE_ETH56G_LNK_SPD_50G2;
-+		}
-+	case ICE_AQ_LINK_SPEED_100GB:
-+		if (li->phy_type_high ||
-+		    li->phy_type_low == ICE_PHY_TYPE_LOW_100GBASE_SR2)
-+			return ICE_ETH56G_LNK_SPD_100G2;
-+		else
-+			return ICE_ETH56G_LNK_SPD_100G;
-+	default:
-+		return ICE_ETH56G_LNK_SPD_1G;
-+	}
-+}
-+
- /**
-  * ice_update_phy_type
-  * @phy_type_low: pointer to the lower part of phy_type
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.h b/drivers/net/ethernet/intel/ice/ice_common.h
-index e700ac0..cc5cee8 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.h
-+++ b/drivers/net/ethernet/intel/ice/ice_common.h
-@@ -342,6 +342,7 @@ ice_aq_get_gpio(struct ice_hw *hw, u16 gpio_ctrl_handle, u8 pin_idx,
- 		bool *value, struct ice_sq_cd *cd);
- bool ice_is_100m_speed_supported(struct ice_hw *hw);
- u16 ice_get_link_speed_based_on_phy_type(u64 phy_type_low, u64 phy_type_high);
-+enum ice_eth56g_link_spd ice_phy_get_speed_eth56g(struct ice_link_status *li);
- int
- ice_aq_set_lldp_mib(struct ice_hw *hw, u8 mib_type, void *buf, u16 buf_size,
- 		    struct ice_sq_cd *cd);
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-index 61c0a0d..54a8afa 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-@@ -1401,51 +1401,6 @@ static int ice_ptp_write_port_cmd_eth56g(struct ice_hw *hw, u8 port,
- 	return 0;
- }
- 
--/**
-- * ice_phy_get_speed_eth56g - Get link speed based on PHY link type
-- * @li: pointer to link information struct
-- *
-- * Return: simplified ETH56G PHY speed
-- */
--static enum ice_eth56g_link_spd
--ice_phy_get_speed_eth56g(struct ice_link_status *li)
--{
--	u16 speed = ice_get_link_speed_based_on_phy_type(li->phy_type_low,
--							 li->phy_type_high);
--
--	switch (speed) {
--	case ICE_AQ_LINK_SPEED_1000MB:
--		return ICE_ETH56G_LNK_SPD_1G;
--	case ICE_AQ_LINK_SPEED_2500MB:
--		return ICE_ETH56G_LNK_SPD_2_5G;
--	case ICE_AQ_LINK_SPEED_10GB:
--		return ICE_ETH56G_LNK_SPD_10G;
--	case ICE_AQ_LINK_SPEED_25GB:
--		return ICE_ETH56G_LNK_SPD_25G;
--	case ICE_AQ_LINK_SPEED_40GB:
--		return ICE_ETH56G_LNK_SPD_40G;
--	case ICE_AQ_LINK_SPEED_50GB:
--		switch (li->phy_type_low) {
--		case ICE_PHY_TYPE_LOW_50GBASE_SR:
--		case ICE_PHY_TYPE_LOW_50GBASE_FR:
--		case ICE_PHY_TYPE_LOW_50GBASE_LR:
--		case ICE_PHY_TYPE_LOW_50GBASE_KR_PAM4:
--		case ICE_PHY_TYPE_LOW_50G_AUI1_AOC_ACC:
--		case ICE_PHY_TYPE_LOW_50G_AUI1:
--			return ICE_ETH56G_LNK_SPD_50G;
--		default:
--			return ICE_ETH56G_LNK_SPD_50G2;
+-static struct in6_addr full_ipv6_addr_mask = {
+-	.in6_u = {
+-		.u6_addr8 = {
+-			0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+-			0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
 -		}
--	case ICE_AQ_LINK_SPEED_100GB:
--		if (li->phy_type_high ||
--		    li->phy_type_low == ICE_PHY_TYPE_LOW_100GBASE_SR2)
--			return ICE_ETH56G_LNK_SPD_100G2;
--		else
--			return ICE_ETH56G_LNK_SPD_100G;
--	default:
--		return ICE_ETH56G_LNK_SPD_1G;
 -	}
--}
- 
- /**
-  * ice_phy_cfg_parpcs_eth56g - Configure TUs per PAR/PCS clock cycle
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-index 9bfd3e7..a13256a 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-@@ -50,19 +50,6 @@ enum eth56g_res_type {
- 	NUM_ETH56G_PHY_RES
- };
- 
--enum ice_eth56g_link_spd {
--	ICE_ETH56G_LNK_SPD_1G,
--	ICE_ETH56G_LNK_SPD_2_5G,
--	ICE_ETH56G_LNK_SPD_10G,
--	ICE_ETH56G_LNK_SPD_25G,
--	ICE_ETH56G_LNK_SPD_40G,
--	ICE_ETH56G_LNK_SPD_50G,
--	ICE_ETH56G_LNK_SPD_50G2,
--	ICE_ETH56G_LNK_SPD_100G,
--	ICE_ETH56G_LNK_SPD_100G2,
--	NUM_ICE_ETH56G_LNK_SPD /* Must be last */
 -};
 -
- /**
-  * struct ice_phy_reg_info_eth56g - ETH56G PHY register parameters
-  * @base_addr: base address for each PHY block
-diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
-index 1e82f4c..4db235a 100644
---- a/drivers/net/ethernet/intel/ice/ice_type.h
-+++ b/drivers/net/ethernet/intel/ice/ice_type.h
-@@ -859,6 +859,19 @@ struct ice_mbx_data {
- #define ICE_PORTS_PER_QUAD	4
- #define ICE_GET_QUAD_NUM(port) ((port) / ICE_PORTS_PER_QUAD)
+-static struct in6_addr zero_ipv6_addr_mask = {
+-	.in6_u = {
+-		.u6_addr8 = {
+-			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+-			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+-		}
+-	}
+-};
++static bool ice_ipv6_mask_full(const __be32 *a)
++{
++	return (a[0] & a[1] & a[2] & a[3]) == cpu_to_be32(0xffffffff);
++}
  
-+enum ice_eth56g_link_spd {
-+	ICE_ETH56G_LNK_SPD_1G,
-+	ICE_ETH56G_LNK_SPD_2_5G,
-+	ICE_ETH56G_LNK_SPD_10G,
-+	ICE_ETH56G_LNK_SPD_25G,
-+	ICE_ETH56G_LNK_SPD_40G,
-+	ICE_ETH56G_LNK_SPD_50G,
-+	ICE_ETH56G_LNK_SPD_50G2,
-+	ICE_ETH56G_LNK_SPD_100G,
-+	ICE_ETH56G_LNK_SPD_100G2,
-+	NUM_ICE_ETH56G_LNK_SPD /* Must be last */
-+};
-+
- #define ATQBAL_FLAGS_INTR_IN_PROGRESS	BIT(0)
+ /* calls to ice_flow_add_prof require the number of segments in the array
+  * for segs_cnt. In this code that is one more than the index.
+@@ -1070,10 +1057,8 @@ ice_set_fdir_ip6_seg(struct ice_flow_seg_info *seg,
+ 	enum ice_flow_field src_port, dst_port;
  
- struct ice_e810_params {
+ 	/* make sure we don't have any empty rule */
+-	if (!memcmp(tcp_ip6_spec->ip6src, &zero_ipv6_addr_mask,
+-		    sizeof(struct in6_addr)) &&
+-	    !memcmp(tcp_ip6_spec->ip6dst, &zero_ipv6_addr_mask,
+-		    sizeof(struct in6_addr)) &&
++	if (ipv6_addr_any((struct in6_addr *)tcp_ip6_spec->ip6src) &&
++	    ipv6_addr_any((struct in6_addr *)tcp_ip6_spec->ip6dst) &&
+ 	    !tcp_ip6_spec->psrc && !tcp_ip6_spec->pdst)
+ 		return -EINVAL;
+ 
+@@ -1097,24 +1082,20 @@ ice_set_fdir_ip6_seg(struct ice_flow_seg_info *seg,
+ 	*perfect_fltr = true;
+ 	ICE_FLOW_SET_HDRS(seg, ICE_FLOW_SEG_HDR_IPV6 | l4_proto);
+ 
+-	if (!memcmp(tcp_ip6_spec->ip6src, &full_ipv6_addr_mask,
+-		    sizeof(struct in6_addr)))
++	if (ice_ipv6_mask_full(tcp_ip6_spec->ip6src))
+ 		ice_flow_set_fld(seg, ICE_FLOW_FIELD_IDX_IPV6_SA,
+ 				 ICE_FLOW_FLD_OFF_INVAL, ICE_FLOW_FLD_OFF_INVAL,
+ 				 ICE_FLOW_FLD_OFF_INVAL, false);
+-	else if (!memcmp(tcp_ip6_spec->ip6src, &zero_ipv6_addr_mask,
+-			 sizeof(struct in6_addr)))
++	else if (ipv6_addr_any((struct in6_addr *)tcp_ip6_spec->ip6src))
+ 		*perfect_fltr = false;
+ 	else
+ 		return -EOPNOTSUPP;
+ 
+-	if (!memcmp(tcp_ip6_spec->ip6dst, &full_ipv6_addr_mask,
+-		    sizeof(struct in6_addr)))
++	if (ice_ipv6_mask_full(tcp_ip6_spec->ip6dst))
+ 		ice_flow_set_fld(seg, ICE_FLOW_FIELD_IDX_IPV6_DA,
+ 				 ICE_FLOW_FLD_OFF_INVAL, ICE_FLOW_FLD_OFF_INVAL,
+ 				 ICE_FLOW_FLD_OFF_INVAL, false);
+-	else if (!memcmp(tcp_ip6_spec->ip6dst, &zero_ipv6_addr_mask,
+-			 sizeof(struct in6_addr)))
++	else if (ipv6_addr_any((struct in6_addr *)tcp_ip6_spec->ip6dst))
+ 		*perfect_fltr = false;
+ 	else
+ 		return -EOPNOTSUPP;
+@@ -1167,33 +1148,27 @@ ice_set_fdir_ip6_usr_seg(struct ice_flow_seg_info *seg,
+ 	if (usr_ip6_spec->l4_proto)
+ 		return -EOPNOTSUPP;
+ 	/* empty rules are not valid */
+-	if (!memcmp(usr_ip6_spec->ip6src, &zero_ipv6_addr_mask,
+-		    sizeof(struct in6_addr)) &&
+-	    !memcmp(usr_ip6_spec->ip6dst, &zero_ipv6_addr_mask,
+-		    sizeof(struct in6_addr)))
++	if (ipv6_addr_any((struct in6_addr *)usr_ip6_spec->ip6src) &&
++	    ipv6_addr_any((struct in6_addr *)usr_ip6_spec->ip6dst))
+ 		return -EINVAL;
+ 
+ 	*perfect_fltr = true;
+ 	ICE_FLOW_SET_HDRS(seg, ICE_FLOW_SEG_HDR_IPV6);
+ 
+-	if (!memcmp(usr_ip6_spec->ip6src, &full_ipv6_addr_mask,
+-		    sizeof(struct in6_addr)))
++	if (ice_ipv6_mask_full(usr_ip6_spec->ip6src))
+ 		ice_flow_set_fld(seg, ICE_FLOW_FIELD_IDX_IPV6_SA,
+ 				 ICE_FLOW_FLD_OFF_INVAL, ICE_FLOW_FLD_OFF_INVAL,
+ 				 ICE_FLOW_FLD_OFF_INVAL, false);
+-	else if (!memcmp(usr_ip6_spec->ip6src, &zero_ipv6_addr_mask,
+-			 sizeof(struct in6_addr)))
++	else if (ipv6_addr_any((struct in6_addr *)usr_ip6_spec->ip6src))
+ 		*perfect_fltr = false;
+ 	else
+ 		return -EOPNOTSUPP;
+ 
+-	if (!memcmp(usr_ip6_spec->ip6dst, &full_ipv6_addr_mask,
+-		    sizeof(struct in6_addr)))
++	if (ice_ipv6_mask_full(usr_ip6_spec->ip6dst))
+ 		ice_flow_set_fld(seg, ICE_FLOW_FIELD_IDX_IPV6_DA,
+ 				 ICE_FLOW_FLD_OFF_INVAL, ICE_FLOW_FLD_OFF_INVAL,
+ 				 ICE_FLOW_FLD_OFF_INVAL, false);
+-	else if (!memcmp(usr_ip6_spec->ip6dst, &zero_ipv6_addr_mask,
+-			 sizeof(struct in6_addr)))
++	else if (ipv6_addr_any((struct in6_addr *)usr_ip6_spec->ip6dst))
+ 		*perfect_fltr = false;
+ 	else
+ 		return -EOPNOTSUPP;
 -- 
 2.52.0
 
