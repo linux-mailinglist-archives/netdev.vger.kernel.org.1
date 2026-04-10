@@ -1,208 +1,120 @@
-Return-Path: <netdev+bounces-277334-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277335-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4HxRGlrb2GnHjAgAu9opvQ
-	(envelope-from <netdev+bounces-277334-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 13:13:30 +0200
+	id qCPfIi/d2GnHjAgAu9opvQ
+	(envelope-from <netdev+bounces-277335-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 13:21:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E3E53D605E
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 13:13:29 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CF7D3D6168
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 13:21:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 48B3330125A6
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 11:13:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 327883007E0C
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 11:15:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D174838F633;
-	Fri, 10 Apr 2026 11:13:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 940D63B9618;
+	Fri, 10 Apr 2026 11:15:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xj96enwI"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="YUxalXX6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE0C337EFFE;
-	Fri, 10 Apr 2026 11:13:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 624083B8D79;
+	Fri, 10 Apr 2026 11:15:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775819604; cv=none; b=VXQqKdqApfDOkJugUrvGAztYTkXQEM3WRPdEeta3Ok/EZHuUeVpwGXiEehO0+WFzlfpl9+rodKAW95BRSAFGlSo60Y4IDML9ncOaopelOrvNsh19KvCnXmPT56v/UitjX7tuMaS33vbblBdK4vtWryeCA9gSpuPu0DDJTAyLauc=
+	t=1775819706; cv=none; b=Lr96WIFEkgiUNrAvjbmWJz8kfpqQb3mBicPnYeAc3kcqPQrewmwJWI+h5R0euloKlYyx+Y+gIWnkZ1ReFPl0JYPhKdiE5gNgXknCT/5k8twWgpvFFfPRDkpzPaymj3IcoET7f7oN9fhnBgPpFLYSz1vOwoSMqo1UZCaWWq11Vtc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775819604; c=relaxed/simple;
-	bh=AQPeXi1aoQgGM8nK0LxMPVH1DZGL9c5t02oOQpq3BS8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:Cc:
-	 In-Reply-To:Content-Type; b=E23zvSLxGCVM3UIG/+SoQR8nhzXG/ATI0VvV6eTRYT5cRxtHlV3LByEEIw2pT2OUH/0g65Gm21Gwq02vFT/NZNnvLr8c/6vDEza9yss63HCxmhn2+lP/x54PRmm/WZEAuageLTU6eBarG0QWUO9rNsepS4FEKl5OrDwrrjJU8XI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xj96enwI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CDDD1C19421;
-	Fri, 10 Apr 2026 11:13:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775819604;
-	bh=AQPeXi1aoQgGM8nK0LxMPVH1DZGL9c5t02oOQpq3BS8=;
-	h=Date:Subject:To:References:From:Cc:In-Reply-To:From;
-	b=Xj96enwIbyhLeNEpPKkua5HcdXt5CcAvLVgG33GySaF/R+9xs/qNbYvG0nf7xBzNh
-	 Ml4KWJuVLHTqlVOO9YqjayOxajpXWGQxhM+wVQ1DhVh/SLmImXKGlNmrZyLRiOtcbH
-	 uFDd6tPt9pZjBYciIPOTGy8L69ds7n5tYX3aFwQdMi2J1+ij9SrO6Oa8kFOBDd3GCl
-	 rTO5zn8VOvktDmpZzA1rRrskz/geiOi+rccMymHlkfThICvtKlk67Fo5KSjHW+mURb
-	 O0q10Rz5MYVAKj6EwfPAFF2h+1S+XcMzD4sZDM2z2CtUudPznMMDvY8PdHyQlrD0zi
-	 BxKmYuYCKYoRg==
-Message-ID: <72122fb3-c1db-4dde-8f89-0ad4011badea@kernel.org>
-Date: Fri, 10 Apr 2026 13:13:18 +0200
+	s=arc-20240116; t=1775819706; c=relaxed/simple;
+	bh=8eu8GjfNcwmpDh12DHbw8IEt5L3Ifz1hcaq6AJy5lsY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MgTSA8CCUclyVu0NhSQHZAOnwuxL3ZeyGcX1kOILYew31JYeKVLYMXNx9J/Iqea3+LN2pHA6R7DnQVMUsf+RNLUbj5skP6SBauUnBKlS2us98UDNq9C8CNzZ5UL6UXU2Jn1I0vmC6ISC0z9xsHNO6oGf8YyNvpBa6Aj4RbgLdBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=YUxalXX6; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with UTF8SMTPSA id 6DB476017D;
+	Fri, 10 Apr 2026 13:14:56 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1775819696;
+	bh=Mh3S7WIx/yhoFJTOcpC2TOSd4VC6CTJCoUxt3kvMeh8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YUxalXX6CIjkCwx+feFuII932EZOeNwp1fzQTNWDzsY/bNxgdnqPgOJpMa+uNdJKF
+	 ZwWzf+82QI/F1a46afoOg5q9vvfw6XpY5+qBQvE3VfN9jJ2wmHpQLRbWVv4PMq7F5B
+	 mhqVGV7c1VpcUhss1YhC5ciXyg+4VTF/DDiOw4Wxb0+KN2obwOZDZTyExn0r1E8EX+
+	 dr51b1Uz0OB42UpZtsRvkaWWrMSU+Sy8NzQP8QilfZM+K2U9Idx3OrsbUzPqpxs3vA
+	 J+jM8awH/bxKLa8Ogs5APcbLDE0su4TPO4tcWpupDIfyu7mWGxYzcea4gLxnQ/vfdt
+	 F4NYfRJiTK91A==
+Date: Fri, 10 Apr 2026 13:14:53 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Florian Westphal <fw@strlen.de>
+Cc: Weiming Shi <bestswngs@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Phil Sutter <phil@nwl.cc>, Simon Horman <horms@kernel.org>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Xiang Mei <xmei5@asu.edu>
+Subject: Re: [PATCH nf] netfilter: nf_tables: use RCU-safe list primitives
+ for basechain hook list
+Message-ID: <adjbrcTOL8MLjtfh@chamomile>
+References: <20260410101321.915190-2-bestswngs@gmail.com>
+ <adjRiG_Bp3WpRYOz@strlen.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [syzbot] [mptcp?] possible deadlock in mptcp_pm_mp_prio_send_ack
-Content-Language: fr
-To: syzbot <syzbot+2204dbe6a049b3218db9@syzkaller.appspotmail.com>
-References: <69d7de34.050a0220.3030df.0019.GAE@google.com>
-From: Matthieu Baerts <matttbe@kernel.org>
-Cc: davem@davemloft.net, edumazet@google.com, geliang@kernel.org,
- horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org,
- martineau@kernel.org, mptcp@lists.linux.dev, netdev@vger.kernel.org,
- pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <69d7de34.050a0220.3030df.0019.GAE@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=6754c86e8d9e4c91];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <adjRiG_Bp3WpRYOz@strlen.de>
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-277334-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,syzkaller.appspot.com:url,storage.googleapis.com:url,appspotmail.com:email];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	HAS_ORG_HEADER(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[netfilter.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-277335-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[netfilter.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,2204dbe6a049b3218db9];
-	SUBJECT_HAS_QUESTION(0.00)[]
-X-Rspamd-Queue-Id: 5E3E53D605E
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,nwl.cc,vger.kernel.org,netfilter.org,asu.edu];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[netfilter.org:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 2CF7D3D6168
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello,
+On Fri, Apr 10, 2026 at 12:31:36PM +0200, Florian Westphal wrote:
+> Weiming Shi <bestswngs@gmail.com> wrote:
+[...]
+> > Replace list_move() in nft_delchain_hook() with list_del_rcu() plus an
+> > intermediate pointer array, followed by synchronize_rcu() before the
+> > deleted hooks' list pointers are reused to link them into the
+> > transaction's private list. In the error paths, put hooks back with
+> > list_add_tail_rcu() which is safe for concurrent RCU readers (they
+> > either continue to the original successor or see the list head and
+> > terminate the walk).
+> 
+> I don't understand the existing code.
 
-On 09/04/2026 19:13, syzbot wrote:
-> Hello,
-> 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    1caa871bb061 Merge branch 'net-stmmac-fix-tegra234-mgbe-cl..
-> git tree:       net
-> console output: https://syzkaller.appspot.com/x/log.txt?x=11d74e06580000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=6754c86e8d9e4c91
-> dashboard link: https://syzkaller.appspot.com/bug?extid=2204dbe6a049b3218db9
-> compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
-> 
-> Unfortunately, I don't have any reproducer for this issue yet.
-> 
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/014aae23b990/disk-1caa871b.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/c574a710638c/vmlinux-1caa871b.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/b29909f4efc4/bzImage-1caa871b.xz
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+2204dbe6a049b3218db9@syzkaller.appspotmail.com
-> 
-> netlink: 8 bytes leftover after parsing attributes in process `syz.2.2034'.
-> netlink: 8 bytes leftover after parsing attributes in process `syz.2.2034'.
-> ======================================================
-> WARNING: possible circular locking dependency detected
-> syzkaller #0 Not tainted
-> ------------------------------------------------------
-> syz.2.2034/13659 is trying to acquire lock:
-> ffff888031173560 (k-sk_lock-AF_INET){+.+.}-{0:0}, at: mptcp_pm_mp_prio_send_ack+0xaf8/0xba0 net/mptcp/pm.c:296
-> 
-> but task is already holding lock:
-> ffff88807e300ea0 (sk_lock-AF_INET){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1709 [inline]
-> ffff88807e300ea0 (sk_lock-AF_INET){+.+.}-{0:0}, at: mptcp_pm_nl_set_flags_all net/mptcp/pm_kernel.c:1482 [inline]
-> ffff88807e300ea0 (sk_lock-AF_INET){+.+.}-{0:0}, at: mptcp_pm_nl_set_flags+0x795/0xc90 net/mptcp/pm_kernel.c:1551
-> 
-> which lock already depends on the new lock.
-> 
-> 
-> the existing dependency chain (in reverse order) is:
-> 
-> -> #7 (sk_lock-AF_INET){+.+.}-{0:0}:
->        lock_sock_nested+0x48/0x100 net/core/sock.c:3780
->        lock_sock include/net/sock.h:1709 [inline]
->        inet_shutdown+0x6a/0x390 net/ipv4/af_inet.c:919
->        nbd_mark_nsock_dead+0x2e9/0x560 drivers/block/nbd.c:318
-
-If I'm not mistaken, it looks like this issue is also due to nbd
-introducing a lockdep dependency between reclaim and af_socket, and this
-is similar to a previous report:
-
-#syz dup: [syzbot] [mptcp?] possible deadlock in mptcp_subflow_create_socket (2)
-
-If that's not correct, please unduplicate it.
-
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
-
+I am working on an alternative fix.
 
