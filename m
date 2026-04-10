@@ -1,53 +1,86 @@
-Return-Path: <netdev+bounces-277605-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277606-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QC4vF4B82WmJqAgAu9opvQ
-	(envelope-from <netdev+bounces-277605-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 00:41:04 +0200
+	id YLoTEx5+2WmjqAgAu9opvQ
+	(envelope-from <netdev+bounces-277606-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 00:47:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C15583DD47E
-	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 00:41:03 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BB413DD4D5
+	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 00:47:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B7FB23039DBB
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 22:41:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 229CD300F9E8
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 22:47:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C05673E0C7E;
-	Fri, 10 Apr 2026 22:41:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62B7630F53C;
+	Fri, 10 Apr 2026 22:47:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XFL4VLPp"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b="Yagj6uHu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C4713E0C69;
-	Fri, 10 Apr 2026 22:41:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E82984317D
+	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 22:47:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775860861; cv=none; b=UGgBQnblCOQfsVHycXarL5F4D+smHrCZl+gn31L5cu7H18ywTl6DaE6IF8hZXPnV/ecDcV0kJn++8wXK4JvcUUvpZu7dXjLI/kDsXNSETZxlKKypQlmfjU/Dn/n70ggp4xIWXOH+0QGJp5Qn9ybfoa7Rm3uHvnSVb7KiJ5SkQ6E=
+	t=1775861275; cv=none; b=mcuEAuY76RUxEdDxZYNXCUpbnJAUawXaRQpYmvPiXdmvVheLj0ZNe11pn36yePlWmnTsW0ANrpzuPhif0WESzbvLoMNpJp8cb7hb0+EnVgsdAC0CXQi45dGArdWG4Mp4QE8bnE+HKAJ6W+FNL1l9EXa1ydGxvV5C8XXUeTfzQVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775860861; c=relaxed/simple;
-	bh=aIGzIaRL80ycn6DIDQoQBN+qIuaLMvNA3XN2zlYbL44=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=XPy4ATSbLvwV5cDiMv0ebfIo9Ku698Cll2EFhtNPfKgs2SDb2Qg0VW0LYDnaQe5d4ehf9y73kf8qjG5mVMKskFWaY1GokJTsv1a3jcZvLC+7tebN9de/b6siNaLMkYDqp/N6T0H07wRTdnhX+wC2QROV0Qutsgbx+cpYvrAnM7s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XFL4VLPp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7DD9BC19421;
-	Fri, 10 Apr 2026 22:41:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775860861;
-	bh=aIGzIaRL80ycn6DIDQoQBN+qIuaLMvNA3XN2zlYbL44=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=XFL4VLPpr5fbzpjWGXENqia1JwgF+o6VIJ+xsjlcxyDgdUSQp+HbpmTMO8r3Glpv2
-	 3Rt1yihcqnbiedAWv2EvyvEtIoEFjU/JH0WYHkL0MM7+UkLbGLW4yW9OQORIGKu+fB
-	 25U+gP5ERboYXRPe/g2HBp5mBOM7Xk8mlUPtz1HOG3rFhkhgKPFPY5fhi5yT9wjT+h
-	 Twl0nyKSzB9Hh1R43OE8LMvpimpQ+AeUWtBYFCYsPQEfH0f+mqUiSER8AZKCjqxMR2
-	 +7wYmMclnzBBVbMWOUd2FsSTNAJP1rLhhK2Dzmcd/m1D52f73/koHcDSFfNmBbtEvp
-	 cmJMIh0kDYNZw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02D673809A88;
-	Fri, 10 Apr 2026 22:40:37 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1775861275; c=relaxed/simple;
+	bh=lXD7vz8c+FIb4s7i07SO66oDZz2PyXUxHIaN70Bm2ks=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PA2QgPFnNDMX+fHHhyyOhFwQGR+jkBGgCdiiaJcu0C6/69Cl7npAIl4Xu4JcfM3rg4xz8yriykSgd2Y3/kQKZm1Ca9GCyk1fubg/MWT+QMZ1bw4HK5A3mNJPpW2zIevy55sO8y98lCu/xMWViQkdHy1sfV1nX/EDk5JNFBBHAbA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b=Yagj6uHu; arc=none smtp.client-ip=209.85.216.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-356337f058aso1900295a91.2
+        for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 15:47:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20251104.gappssmtp.com; s=20251104; t=1775861273; x=1776466073; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=dryQjV5m7mfU0pMKRGttKSi9Jxplf9Zr3xOMLjCzxpM=;
+        b=Yagj6uHuIejRyy44kJjAV5PHkguP1TtPRt7es6DgaXDIG6jM+eZxfUAGJORmVpHdS7
+         cTTs1X4N1eO2pGbTJ4euhi3YZ7f3wIT5PysuyhxTn8pzVmouz9xFJi/hzNc9V4sghWaw
+         pDJNii6GEcrayVPJn8aNK57cjva2kptaREtYuptoL1lYGSnwsWSx3bg7wDus3xGKq38u
+         QapIZ2on95OiGtJBR0wg5nom0lkll3KGq4EAg2i7cp6a65zXaxh3xuYHLAPCj6GhLa7+
+         KtWhyTMEYn2Zyg4C3ZjBdbs0dNtR+4/PJbWfJlevte6xwEPCFlKhe+h7vj/gNFr7tJNe
+         YdrQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775861273; x=1776466073;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dryQjV5m7mfU0pMKRGttKSi9Jxplf9Zr3xOMLjCzxpM=;
+        b=IHQ7qBSnZL8afIqdyGx5pUNw+KT5sEN+UIqBwwe2Zv5/kTzMmrw3up3c1/ztqLMHml
+         byFHOQQc5vSWlI2tIQvCjgZZt9rD9KjU6oFzvFzk2hgwGrglhpmL0LOXby4VFXKtQqlP
+         RMDBag3b+MOHRyjtIPQDfTvTRLe7gIxy3lDI5Xgut5W+O9B1fwNfLwLld6Kyxy37fVRX
+         WUieteDsztLUB7f3POk9atX673cZ0ZUw0au5ao/LnVvFs5gGzJZ0vn7LzWpYHng9AYAo
+         MvJvn+mUoNt5YD+QlqTCv8I/QNxvXAIwXRwhBvAStf4XmHPklDFQb8TJ3bKAKCRYTEYG
+         q4ig==
+X-Gm-Message-State: AOJu0Yzz+Wqny2nvV7x5PPjlWQs2PWN9QuJRPjYBKDCGA5/QYk68kZBW
+	tM9CaXDOXy0DK/qFZWXtGOxzH3nfNXO1pznU/doQ5CmaZIzmPGhzQ/e+AqiknwXPLcAEVVgaBXG
+	cGitC
+X-Gm-Gg: AeBDiesRHQNn4xVFe2dXIVVqJ0vGwkTvCxtFYy02wLUki5nzdrzg2KshPjZM8AegQTx
+	7g3/bJbURSuodAJl6Qq8iejJ+Srw729jLUzQMOD3g66GwtCTSO4aDiN6pLe0hU1IUVOn97X9Jdj
+	RjtGoj1ZMvMqye4ZGAZpb8LRiEsb2xSAasatl106PYeI8szug+QwOELRQ4y+iy4PRRJnKuubGrM
+	g5yB4cKEiX3Lkx6D7NNbW4Z/2nUXGqdLxbqvlgCjahzO+RQXiEnpWa6/mg8FOf2bMefA/wUNoLR
+	V2SP52KxkJR4ZKqjgE9eLNgG3XpaAYWCbUvi0PBzAcqj4XMpvvci5Uw4NS8ah0v6q+kxWSY5abp
+	pAIW5vEjhjXBKpiE/7yh9ZzH0PORpF9JrA4rXkpGPccLZWLAsmGwwQnLxjNjF+fPdSR/Y0tfZOy
+	lp2XJdUOjgDIQHLpliJ5vbyTlVbUxgcMAa
+X-Received: by 2002:a17:90b:4e86:b0:35c:30a8:32a with SMTP id 98e67ed59e1d1-35e4278074fmr5594127a91.9.1775861272813;
+        Fri, 10 Apr 2026 15:47:52 -0700 (PDT)
+Received: from phoenix.lan ([104.202.41.210])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b2d4f099d6sm51025295ad.50.2026.04.10.15.47.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 Apr 2026 15:47:52 -0700 (PDT)
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: netdev@vger.kernel.org
+Cc: Stephen Hemminger <stephen@networkplumber.org>
+Subject: [PATCH iproute 1/2] json_writer: support control character escaping
+Date: Fri, 10 Apr 2026 15:47:44 -0700
+Message-ID: <20260410224745.93416-1-stephen@networkplumber.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,77 +88,73 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/2] Add selftests for ntuple (NFC) rules
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177586083553.2670415.5524532409783816468.git-patchwork-notify@kernel.org>
-Date: Fri, 10 Apr 2026 22:40:35 +0000
-References: <20260407164954.2977820-1-dimitri.daskalakis1@gmail.com>
-In-Reply-To: <20260407164954.2977820-1-dimitri.daskalakis1@gmail.com>
-To: Dimitri Daskalakis <dimitri.daskalakis1@gmail.com>
-Cc: davem@davemloft.net, andrew+netdev@lunn.ch, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, shuah@kernel.org, willemb@google.com,
- petrm@nvidia.com, dw@davidwei.uk, carges@cloudflare.com, cjubran@nvidia.com,
- daskald@meta.com, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.06 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[networkplumber-org.20251104.gappssmtp.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-277605-lists,netdev=lfdr.de,netdevbpf];
+	RCPT_COUNT_TWO(0.00)[2];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
+	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NO_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-277606-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[networkplumber-org.20251104.gappssmtp.com:+];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[meta.com:email]
-X-Rspamd-Queue-Id: C15583DD47E
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,networkplumber.org:email,networkplumber.org:mid,networkplumber-org.20251104.gappssmtp.com:dkim]
+X-Rspamd-Queue-Id: 6BB413DD4D5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello:
+Iproute2 never handled control characters in strings correctly.
+There are some cases like where string is under user control
+like paths in ss command. Make iproute2 json output conform
+to RFC 8259.
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
+---
+ lib/json_writer.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-On Tue,  7 Apr 2026 09:49:52 -0700 you wrote:
-> From: Dimitri Daskalakis <daskald@meta.com>
-> 
-> Thoroughly testing a device's NFC implementation can be tedious. The more
-> features a device supports, the more combinations to validate.
-> 
-> This series aims to ease that burden, validating the most common NFC rule
-> combinations.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,1/2] selftests: drv-net: Add ntuple (NFC) flow steering test
-    https://git.kernel.org/netdev/net-next/c/18589df9344c
-  - [net-next,2/2] selftests: drv-net: ntuple: Add dst-ip, src-port, dst-port fields
-    https://git.kernel.org/netdev/net-next/c/a66374a3eb02
-
-You are awesome, thank you!
+diff --git a/lib/json_writer.c b/lib/json_writer.c
+index 2f3936c2..7202621e 100644
+--- a/lib/json_writer.c
++++ b/lib/json_writer.c
+@@ -53,7 +53,7 @@ static void jsonw_eor(json_writer_t *self)
+ 
+ 
+ /* Output JSON encoded string */
+-/* Handles C escapes, does not do Unicode */
++/* Handles C escapes and control characters per RFC 8259 */
+ static void jsonw_puts(json_writer_t *self, const char *str)
+ {
+ 	putc('"', self->out);
+@@ -81,7 +81,10 @@ static void jsonw_puts(json_writer_t *self, const char *str)
+ 			fputs("\\\"", self->out);
+ 			break;
+ 		default:
+-			putc(*str, self->out);
++			if ((unsigned char)*str < 0x20 || *str == 0x7f)
++				fprintf(self->out, "\\u%04x", *str);
++			else
++				putc(*str, self->out);
+ 		}
+ 	putc('"', self->out);
+ }
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.53.0
 
 
