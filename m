@@ -1,221 +1,147 @@
-Return-Path: <netdev+bounces-277280-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277281-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CN6nA5eo2GkhgggAu9opvQ
-	(envelope-from <netdev+bounces-277280-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 09:36:55 +0200
+	id WM+ZIMSo2GkhgggAu9opvQ
+	(envelope-from <netdev+bounces-277281-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 09:37:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 998C63D36A5
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 09:36:54 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 876EC3D36CA
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 09:37:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 73CF13025A7E
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 07:36:30 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 0D9EA301093A
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 07:37:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B76D3399019;
-	Fri, 10 Apr 2026 07:36:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A273439E17E;
+	Fri, 10 Apr 2026 07:37:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K1GqpRI7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W58v/jDC"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9453E308F23
-	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 07:36:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D4392FFDE3;
+	Fri, 10 Apr 2026 07:37:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775806586; cv=none; b=HbL2aIWslghydNui9gB1O5kX84hWeYwUBJ8K+oJwcQt3Xiy7ofASEedAwBaP2VLeXZ7CySbP4TvmelR/uCjmiBVYY3F/ffcCjR8qyCnLOWX3L9JGRetFMQK5Q8zEEibWpgkuWb+5Nc8wVckxHKi/IYiE1BXNPbuDMVXY0X3SsXw=
+	t=1775806634; cv=none; b=IZAasSqDsyd/4t69B4JkNCocXFNORo/WecxtPL+qYdLqD+/aqrNp6Zet+HVGjzBOOeLoK28h8NFvdZ1JsCdloZlm0T1YzLW+vqPIS5mIbVeEaqKuhlqzRdUBfkZ9LBNmsw1eYEVmwWXFMoPBHuskQ+hwnSfooTJrC2uriZIoDLw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775806586; c=relaxed/simple;
-	bh=3oWOppr0XZtEHSIjWbUXa0Jwhf+EuL+KzFva+4DOgGU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IUyn50vlOnC0zN4tIKJggSU/Xp2+49G6sTeVneugFTrSRYWsC1Jtrx2l10lwPLqjJe/WC2JlfGAs871urEjaGvETiQwGbueczvFNgvVjlc7c2RBUd/GH/B//1++oNFkLpEiDThitXuGG6qRQBNbGF0rBYFBctQJi6gAJGiuu2vE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K1GqpRI7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C9BBC2BCB6
-	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 07:36:26 +0000 (UTC)
+	s=arc-20240116; t=1775806634; c=relaxed/simple;
+	bh=L+afuylxddCzC0qlWKdr8ONiPG74QuiVnL53Ek0mUU8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=S/WL8dhTx+v/gnqpXZ6EXxNdLdDF8yAKds6/2nt/aYOgFMQW1bsO3TTTT8+xKo9GBdxDcuGSm+dopxUBUyYtVY3a9z60erMP9Gu8gO9G1a2DLYN/QltR3PlZr9wgwXfn7E1KWVejNzcU5ge5kOhPRZ1PZ7w8+c2gni354+F4xfE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W58v/jDC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94982C2BCB1;
+	Fri, 10 Apr 2026 07:37:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775806586;
-	bh=3oWOppr0XZtEHSIjWbUXa0Jwhf+EuL+KzFva+4DOgGU=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=K1GqpRI7Y2GjJGOEMw+aZJPTRGWZqv9KgTWGVwV95lxk9PtjOLkxO8maf0gnsVVZE
-	 cw0lOnFOICyoXdS5xAdyE9BmQcYBAABGxrBAzUCQi0TRmBhNuz9mvP0glgLLABNHeW
-	 KAZU5vvOTuSo3slf9qFZHyrbyELtpia57QQUegQ9nTaqIQM4s//PjnUGx5tswzCvKe
-	 oqOPnWz0dz6XrUgFGZDYgBTBYQNDFqZL2fPBEwukkEACsYNjq9E4p0S205LMpsCX09
-	 5jaj/YHVgOVzRlIuwXPvaIkO0Guc2ncq0dlFK+6J2+g95YeK1uMDO/cIGpsoKGORYF
-	 FsLEULv5ZW4Uw==
-Received: by mail-yx1-f53.google.com with SMTP id 956f58d0204a3-64eaf8aa893so1510268d50.3
-        for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 00:36:26 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCWPf6bPjnZC1K2PpyqG1dhUQoQc5gu3dJHF0drX+qL77ECMmqQYnnk8P6IOIt8fsSIMQ/rCg5M=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz24eJubRTN3Ip60l4IA8VYA32GBmw2xqnF9HZ9yAiuIeWbw49P
-	nH56uFOXxcCwjK/UGHwJddW8GmB8c1fBumFmVmBSObkBThqUfBtnsG7q/D+cCZ2ItwG8ld61Yu7
-	DKsKZW4CuPFwm937u0bBbhQNsgjuRKc8=
-X-Received: by 2002:a53:db50:0:b0:64e:8748:38a1 with SMTP id
- 956f58d0204a3-65198c0e535mr1364048d50.66.1775806585569; Fri, 10 Apr 2026
- 00:36:25 -0700 (PDT)
+	s=k20201202; t=1775806634;
+	bh=L+afuylxddCzC0qlWKdr8ONiPG74QuiVnL53Ek0mUU8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=W58v/jDCVmzbiO8lRxEyIcpgoP32tZO4PNUn8ztkh4iNldj9YSNYz8goQA43ylEzb
+	 uyiFmdjODWRke/cKBQq97+3gWycaGn5vHV/NoQrJmfLMxo8EoG8fU+YBGfwr0CQh/M
+	 VZMwFopLcpUnpwb03e6Al+mZhXauWjqugObkCK/k3cSneie+QMU6302lQ2kJcm/2r+
+	 I0K+2fZK0zymB4xPUCB6o8U5+/6LC3fDjoPA8EU9JwYGv66H0wNwKFlEKF3D5lR/Rv
+	 cAFMC6oUyt6yLJVmKTNYOJB+6sRtN9DrMYsrHofbLKVg1w3sRDlZ9rASGdk7KDSlnq
+	 kvJv2lIL0Q58A==
+Date: Fri, 10 Apr 2026 09:37:11 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Benjamin Larsson <benjamin.larsson@genexis.eu>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, Xuegang Lu <xuegang.lu@airoha.com>
+Subject: Re: [PATCH net-next v3 00/12] net: airoha: Support multiple
+ net_devices connected to the same GDM port
+Message-ID: <adiop-9Mo4ADfvfw@lore-desk>
+References: <20260406-airoha-eth-multi-serdes-v3-0-ab6ea49d59ff@kernel.org>
+ <20260409195950.74e4bc97@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260331-realtek_forward-v1-0-44fb63033b7e@gmail.com>
- <20260331-realtek_forward-v1-6-44fb63033b7e@gmail.com> <CAD++jLmRT+3EJ-f_FNuZwOGU4fBB6pGHhq2OuxBS7O-cEnWt=g@mail.gmail.com>
- <CAJq09z6Y3MfkyiyaMhPTQH3W7p-ZmsNeS-iBKOeQNWWpDi0UoQ@mail.gmail.com>
-In-Reply-To: <CAJq09z6Y3MfkyiyaMhPTQH3W7p-ZmsNeS-iBKOeQNWWpDi0UoQ@mail.gmail.com>
-From: Linus Walleij <linusw@kernel.org>
-Date: Fri, 10 Apr 2026 09:36:14 +0200
-X-Gmail-Original-Message-ID: <CAD++jLkqcqUThJe+kJhR2hwyg1y_RWJc7yrM-kqMeiA4T-Jqig@mail.gmail.com>
-X-Gm-Features: AQROBzARhYEjkcFV_qQAWXYJkwluCcPr8hqNWcmzSLyYWBc8ZxYLDLVbNfNJvJ8
-Message-ID: <CAD++jLkqcqUThJe+kJhR2hwyg1y_RWJc7yrM-kqMeiA4T-Jqig@mail.gmail.com>
-Subject: Re: [net-next PATCH 06/10] net: dsa: realtek: rtl8365mb: add VLAN support
-To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	=?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
-	Yury Norov <yury.norov@gmail.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, 
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Gabor Juhos <j4g8y7@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="NmDR2XRCUQIi1brc"
+Content-Disposition: inline
+In-Reply-To: <20260409195950.74e4bc97@kernel.org>
+X-Spamd-Result: default: False [-2.26 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-277280-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,bang-olufsen.dk,rasmusvillemoes.dk,armlinux.org.uk,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-277281-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,gmail.com,genexis.eu,lists.infradead.org,vger.kernel.org,airoha.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[linusw@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 998C63D36A5
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 876EC3D36CA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Apr 10, 2026 at 9:05=E2=80=AFAM Luiz Angelo Daros de Luca
-<luizluca@gmail.com> wrote:
 
-> Thanks for the review, I took some time to evaluate the possibility of
-> reusing rtl8366-core.
+--NmDR2XRCUQIi1brc
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Thanks Luiz.
+> On Mon, 06 Apr 2026 12:34:05 +0200 Lorenzo Bianconi wrote:
+> > EN7581 or AN7583 SoCs support connecting multiple external SerDes (e.g.
+> > Ethernet or USB SerDes) to GDM3 or GDM4 ports via a hw arbiter that
+> > manages the traffic in a TDM manner. As a result multiple net_devices c=
+an
+> > connect to the same GDM{3,4} port and there is a theoretical "1:n"
+> > relation between GDM ports and net_devices.
+>=20
+> Looks like this driver uses page pool.
+> If you're sharing the same page pool across multiple netdevs
+> it must not be linked to a netdev.
 
-Even if we end up splitting out VLAN, I think my comments on the other
-things that can be shared are still valid as well.
+are you referring to slow.netdev pointer? If so, this is not set in airoha_=
+eth
+driver.
 
-> While rtl8366-core is currently only used by RTL8366, I understand the
-> goal of sharing VLAN handling across these drivers. However, RTL8365MB
-> differs from RTL8366RB in how VLANs and PVIDs are implemented.
+Regards,
+Lorenzo
 
-To give the whole picture, RTL8365MB wasn't even in the picture when
-this abstraction was created.
+--NmDR2XRCUQIi1brc
+Content-Type: application/pgp-signature; name=signature.asc
 
-The ASICs the driver was supposed to handle (and which were/is used
-by OpenWrt) were:
-- RTL8366RB
-- RTL8366S
-- RTL8367
+-----BEGIN PGP SIGNATURE-----
 
-The abstraction was part of the outoftree "swconfig" driver for a long
-time before being migrated to DSA.
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCadiopwAKCRA6cBh0uS2t
+rCpsAQCwzG/SFe7EZ5FhdmGC1hKji7gkM+WgbUWiUJzcKeYNpwD/UHwDushvGmqd
+Qs42s/tZtg4WFpVh0jcCdmdhzxv23gI=
+=dEFl
+-----END PGP SIGNATURE-----
 
-I haven't yet wrapped my head around if the RTL8367 (no extra letters)
-is more RTL8366RB-ish or more RTL8365MB-ish... take a look at the
-old code if you can figure it out from register maps etc:
-https://github.com/openwrt/openwrt/tree/main/target/linux/generic/files/dri=
-vers/net/phy
-(maybe Gabor knows, put him on cc)
-
-If the VLAN is very dissimilar we can just as well have two different
-implementations.
-
-> 1) In RTL8366, VLAN4K, VLANMC and PVID are programmed together, and
-> the helpers in rtl8366-core assume this 1:1 relationship. In
-> RTL8365MB, the VLANMC is exclusively used as an indirect way to set
-> the port VID used in the PVID (port pvid points to vlan MC table index
-> and vlan MC entry has the VID number). In this patch, the VLANMC is
-> conditionally allocated only when a port uses it as PVID and
-> deallocated when no ports use it. VLAN MC membership is not checked by
-> the HW but I still keep it in sync when it is allocated.
->
-> As VLANMC, at least in RTL8365MB, is effectively only used for PVID,
-> I'll put all vlan MC methods behind public PVID methods in the
-> following v2. There is no need to expose them for now. For the next
-> RTL8367D family, VLANMC is gone and there are dedicated registers to
-> set the PVID VID number for each port.
->
-> 2) In RTL8365MB, vlan is always enabled, controlling filtering by port
-> (.port_vlan_filtering), while in RTL8366, it is enabled by vlan_add.
->
-> 3) The abstraction doesn't set the framefilter in RTL8366 nor does it
-> clear PVID status. I'm using framefilter as a way to disable PVID,
-> dropping untagged frames, together with setting PVID VLAN MC index to
-> 0 and keeping an empty (vid=3D0) vlan config at that index.
->
-> Without clearing the PVID state in RTL8366, removing a PVID VLAN
-> member and re-adding it as a non-PVID member will leave it configured
-> as PVID.
-
-OK seems we should split up the VLAN handling if there is nothing
-to share in the abstraction here. We don't do abstraction for abstractions
-sake.
-
-I'd say make a patch moving all functions from realtek_ops
-that can't be reused into the rtl8366rb driver and make them static.
-
-But probably keep the shared core for other stuff. Though I guess it
-might be empty then until we add more stuff :/
-
-> 4) I don't know how IVL would be handled in RTL8366... but that's a
-> topic for another patch.
-
-OTOMH it seems half of it is generic but it's a helicopter view.
-There is no question the ASICs are related, we just don't know
-by how much...
-
-> It is possible that the hardware
-> behavior between RTL8366 and RTL8365MB is more similar than what the
-> current drivers suggest. However, the existing rtl8366-core
-> abstraction does not model this in a way that can be directly reused
-> here. Aligning both drivers would likely require reworking that
-> abstraction rather than adapting the RTL8365MB implementation to fit
-> it.
->
-> This could be explored in the future as a separate effort as it
-> changes how RTL8366RB driver behave. For now, I would prefer to keep
-> this implementation local to RTL8365MB and then follow up with a
-> separate effort to reconcile both drivers and extract shared logic.
-> Some of that work will likely become clearer while adding RTL8367D
-> family support.
-
-The reason I push back a bit is that any kind of things that are
-"fix later" tend to never actually happen in my experience.
-Either we add the abstraction now or never.
-
-For VLAN I'm pretty much convinced that there is not much to
-share. For port separation/isolation and possibly FDB I'm not as
-convinced.
-
-Yours,
-Linus Walleij
+--NmDR2XRCUQIi1brc--
 
