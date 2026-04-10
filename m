@@ -1,194 +1,187 @@
-Return-Path: <netdev+bounces-277559-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277566-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6GV4DKdX2WlGoggAu9opvQ
-	(envelope-from <netdev+bounces-277559-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 22:03:51 +0200
+	id qIx3JuRZ2WksowgAu9opvQ
+	(envelope-from <netdev+bounces-277566-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 22:13:24 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFF8C3DC4B8
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 22:03:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B7C43DC698
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 22:13:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 9C9F1300DCEA
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 20:03:49 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 966403010618
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 20:13:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 110D838C416;
-	Fri, 10 Apr 2026 20:03:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A71C9394780;
+	Fri, 10 Apr 2026 20:13:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="CRHYEREQ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="i4fUbZAM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFEB3382F16
-	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 20:03:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62EC2392828
+	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 20:13:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775851427; cv=none; b=FJjz1/n9StVXikw7ZNvlJDPMk0qUhhmQ2D4Lc6rWyIFTpzZQYjJOmLzZ/i8x3uMPnNbwbIyTiHxJu/zg6mLc6XZyifLIgK905q7TuKRUGyaaYtJeGWrjV6CKdiTXgpEtJoUKflM+j2OkhFkSd8EKAIfRNlu+WPJJR8NfQNoSQeY=
+	t=1775852000; cv=none; b=bP3Z0QoJzxou1EMOvmrfGPXYMVgUnZ2ExHaYaLmPvDTTMQQ6BXHUeknSOqEIFGhfI+sabQ+8MS8s5yEwL55YaSG2uYvtVyu6Ac2vSoOOJk4fTbSIHIJ8F4NN5RBp2SWkD7docvT7JbdJ/4k60lBpdK0lPHQiWtbhqBwxBUduntk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775851427; c=relaxed/simple;
-	bh=tFDTGstwc5zUgkEge94ZB1BB77ApldDdGG1pk7v0Eyw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=vEU8v3tE1bHQvm/OGZNSQylfqLpERnwfp8q25UVDkHjTMQFEhGNTJHwSnaXVTf95BgfZZzPMsKpsu6TdjqNfv+lRcB6JkJp1pJ6FQCP3qZdcKgv/uk1K+MJ6MYSb1t/4GRTNiQ2B92Mram9K9sMsIOHf+KnXiS76kfAUK79KjKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=CRHYEREQ; arc=none smtp.client-ip=171.64.64.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:MIME-Version:
-	References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:
-	Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=iR/ai1qeHgMsvCFqwamHBo4kOY4OZHH7PA/IjFOU838=; t=1775851426; x=1776715426; 
-	b=CRHYEREQGxEjm3RPX20EiMyVX0zVcuEqur+iBRsmerjv3avxYSxiyWoMW38/gv0B4ykN/Hv874N
-	w/nRWWyq3Qcxc4xuY3r4dRA4yDavxcFIzGZ2cv4z4NBD2GGvT/TUfz7pWY5OLb1pVaRT2K9njepz9
-	syyko9KeMYy6mva5qd7orWOf76RiMDzLOMO7QCrhZ5qiysCAPOMftjjz3BT4JihZhoQNeHI35abhZ
-	pM4uUrpZcuW0wYFYIQ2MDxGaP4SaSNkqmIPp+oyI80Lj4j6rZFzpWuPbASFM00jA3B0iBx7Ef0Hku
-	rHKuKTNmF3AjVIKc8aH4yXi5xFj8aGmSObdQ==;
-Received: from ouster448.stanford.edu ([172.24.72.71]:51553 helo=ouster2022)
-	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ouster@cs.stanford.edu>)
-	id 1wBI4v-0003MV-Eo; Fri, 10 Apr 2026 13:03:46 -0700
-From: John Ousterhout <ouster@cs.stanford.edu>
-To: netdev@vger.kernel.org
-Cc: pabeni@redhat.com,
-	edumazet@google.com,
-	horms@kernel.org,
-	kuba@kernel.org,
-	John Ousterhout <ouster@cs.stanford.edu>
-Subject: [PATCH net-next v18 15/15] net: homa: create Makefile and Kconfig
-Date: Fri, 10 Apr 2026 13:03:09 -0700
-Message-ID: <20260410200310.1915-16-ouster@cs.stanford.edu>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260410200310.1915-1-ouster@cs.stanford.edu>
-References: <20260410200310.1915-1-ouster@cs.stanford.edu>
+	s=arc-20240116; t=1775852000; c=relaxed/simple;
+	bh=qiRcrLqgsly/sA58JHzcA1Yo5JF3HlyznqHytmQzUDg=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=B+Pk5r5InnOfOHmWS1nb4GM3/H8VvOMGBR8fdiphlhkXa0YMv3jAGDN3Dn/w7m0oluhCAZFgmmT2r4Bzvtk7BjFKBKSkJPBs9P9tePD6dVuLDimh+F6IWKfeYQfxRf+NwyBDO1w9/w3A4pZJzUhCbZ30hrfs1UDp2j1Rn8uHgrw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=i4fUbZAM; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-82c7ec40f92so2408832b3a.0
+        for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 13:13:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1775851998; x=1776456798; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=UqaTGJhN3710wR5/WAiTwoeY86F0ZEdJtqmdan8PJQE=;
+        b=i4fUbZAMBg2oMhovLkuQUnpFBUg9ncYy3OvbraDRvVBSKUPNheT1KRiuwZtEmcrHit
+         PvZskVxzLb4sk6FbzQeHDwI39gDp1kGJd//ibEyxRysIXCoL+HMsPLY5ThskxIM4DdpS
+         RyxnPYg82SRSzp8JUDH9UabM/RRm5kmFMv55BhFhXXGg7MnlwP6Qoq6ex7o/M9PMej3Q
+         q4Nu9Hu1OpPtFbjCF29XGSPoA1NN9dj8fLRty15EBX8/yMulq0jKKHT6SQMfJyBEVNvR
+         oozGOdi3NZjEtB8cmbUBY2x0m97w1i+fj4ahbZn3gvKHviNOBLd5zDA1GI54BFWdVALn
+         39Xg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775851998; x=1776456798;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UqaTGJhN3710wR5/WAiTwoeY86F0ZEdJtqmdan8PJQE=;
+        b=DIWkWyu4nAb7xThbvgIBvtt0i7AUPVUb0QuK1p5BoXQYAyrw8+DGCcVTP2sNSJWnFH
+         GNvQtISPE53d+Mn9T1U+ChEERQBStcHprqn0ce+uIbzyvzs6YrWi+9PgUeIGc/TBdYWC
+         m/xhQZBLw6lunzTMh697BqxjqhPQ6Rb9FkGyZ+QDSQ614sQh3NkFy4cI3oWl37FALPn2
+         vK1YN3uXI+9KNNuDQYpMDuDzpkMEIH1PKqVERfIxWKTbQAxgK8OwsOr2YZMDAB0Xc/JP
+         zP1nOoei/QzFVViR4pt88HuQ89dbUOpYicLLlSgIrk50oneHDX8Sj525FBSvkzcNzmJn
+         2H/g==
+X-Forwarded-Encrypted: i=1; AJvYcCVqK9+BW0Yfbbw4i7UuTGXkk9RAUbMR2QD4tkcCHqD6aslp4Zi0iAwQqBqmftOAHAiEM9YpMCY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx3yLrLDz50l+PzTBCAt9KAP0vzW6Jc2BkgrPi0r1ka7kj7J7PP
+	2wKnvlsXvUqh6IYrb2Bss51nX0AUbGVntaM9LrtEWoW4L+FrTfDv7Q/WHRjMqFdj72yzIvGgPh9
+	0PC6xnQ==
+X-Received: from pfbbj3.prod.google.com ([2002:a05:6a00:3183:b0:82c:e71a:ff8e])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:a217:b0:82d:1faf:7748
+ with SMTP id d2e1a72fcca58-82f0c2a7399mr5178809b3a.33.1775851997377; Fri, 10
+ Apr 2026 13:13:17 -0700 (PDT)
+Date: Fri, 10 Apr 2026 20:06:21 +0000
+In-Reply-To: <f6cbbc8da90e95584847b5ceb60aae830d1631c2.1775731983.git.wangjiexun2025@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Score: -101.1
-X-Scan-Signature: 182a93e729013cb8e6197caf3eccd507
-X-Spamd-Result: default: False [1.14 / 15.00];
+Mime-Version: 1.0
+References: <f6cbbc8da90e95584847b5ceb60aae830d1631c2.1775731983.git.wangjiexun2025@gmail.com>
+X-Mailer: git-send-email 2.53.0.1213.gd9a14994de-goog
+Message-ID: <20260410201315.1573403-1-kuniyu@google.com>
+Subject: Re: [PATCH net 1/1] af_unix: Hold receive queue lock in ioctl(SIOCATMARK)
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: n05ec@lzu.edu.cn
+Cc: bird@lzu.edu.cn, davem@davemloft.net, edumazet@google.com, 
+	enjou1224z@gmail.com, horms@kernel.org, kuba@kernel.org, kuniyu@google.com, 
+	netdev@vger.kernel.org, pabeni@redhat.com, rao.shoaib@oracle.com, 
+	tomapufckgml@gmail.com, wangjiexun2025@gmail.com, yifanwucs@gmail.com, 
+	yuantan098@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[cs.stanford.edu:s=cs2308];
-	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[cs.stanford.edu : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-277559-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-277566-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[lzu.edu.cn,davemloft.net,google.com,gmail.com,kernel.org,vger.kernel.org,redhat.com,oracle.com];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ouster@cs.stanford.edu,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[cs.stanford.edu:-];
-	NEURAL_HAM(-0.00)[-0.871];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[6];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[atlassian.net:url,cs.stanford.edu:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,stanford.edu:email]
-X-Rspamd-Queue-Id: DFF8C3DC4B8
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3B7C43DC698
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Before this commit the Homa code is "inert": it won't be compiled
-in kernel builds. This commit adds Homa's Makefile and Kconfig, and
-also links Homa into net/Makefile and net/Kconfig, so that Homa
-will be built during kernel builds if enabled (it is disabled by
-default).
+From: Ren Wei <n05ec@lzu.edu.cn>
+Date: Fri, 10 Apr 2026 14:31:57 +0800
+> From: Jiexun Wang <wangjiexun2025@gmail.com>
+> 
+> unix_ioctl() peeks at the receive queue and may check both the head skb
+> and its successor while deciding whether SIOCATMARK should report the
+> mark. However, u->iolock does not stabilize receive-queue element
+> lifetime. Queue teardown paths can purge or splice the queue under
 
-Signed-off-by: John Ousterhout <ouster@cs.stanford.edu>
----
- net/Kconfig       |  1 +
- net/Makefile      |  1 +
- net/homa/Kconfig  | 21 +++++++++++++++++++++
- net/homa/Makefile | 11 +++++++++++
- 4 files changed, 34 insertions(+)
- create mode 100644 net/homa/Kconfig
- create mode 100644 net/homa/Makefile
+Please be more specific here.
 
-diff --git a/net/Kconfig b/net/Kconfig
-index 62266eaf0e95..41bcc80ee9ec 100644
---- a/net/Kconfig
-+++ b/net/Kconfig
-@@ -252,6 +252,7 @@ source "net/bridge/netfilter/Kconfig"
- endif # if NETFILTER
+
+> sk->sk_receive_queue.lock and free the skb while unix_ioctl() still
+> uses it.
+> 
+> Take sk->sk_receive_queue.lock while inspecting the queue so the skb
+> and next_skb stay alive for the whole decision.
+> 
+> Fixes: 314001f0bf92 ("af_unix: Add OOB support")
+> Reported-by: Yifan Wu <yifanwucs@gmail.com>
+> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+> Co-developed-by: Yuan Tan <yuantan098@gmail.com>
+> Signed-off-by: Yuan Tan <yuantan098@gmail.com>
+> Suggested-by: Xin Liu <bird@lzu.edu.cn>
+> Tested-by: Ren Wei <enjou1224z@gmail.com>
+> Signed-off-by: Jiexun Wang <wangjiexun2025@gmail.com>
+> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+> ---
+>  net/unix/af_unix.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+> index b23c33df8b46..54f12d5cda37 100644
+> --- a/net/unix/af_unix.c
+> +++ b/net/unix/af_unix.c
+> @@ -3301,6 +3301,8 @@ static int unix_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg)
+>  			int answ = 0;
+>  
+>  			mutex_lock(&u->iolock);
+> +			/* The receive queue lock keeps skb and next_skb alive. */
+> +			spin_lock(&sk->sk_receive_queue.lock);
+
+I think this is not the correct fix.
+
+SIOCATMARK is apparently for MSG_OOB,
+
+  $ man 3 sockatmark
+
+and non SOCK_STREAM sockets do not support MSG_OOB
+and should not abuse SIOCATMARK.
+
+---8<---
+diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+index eebabf0bd850..868b26c963ab 100644
+--- a/net/unix/af_unix.c
++++ b/net/unix/af_unix.c
+@@ -3299,6 +3299,9 @@ static int unix_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg)
+ 			struct sk_buff *skb;
+ 			int answ = 0;
  
- source "net/sctp/Kconfig"
-+source "net/homa/Kconfig"
- source "net/rds/Kconfig"
- source "net/tipc/Kconfig"
- source "net/atm/Kconfig"
-diff --git a/net/Makefile b/net/Makefile
-index 90e3d72bf58b..17e0ba84bd15 100644
---- a/net/Makefile
-+++ b/net/Makefile
-@@ -44,6 +44,7 @@ ifneq ($(CONFIG_VLAN_8021Q),)
- obj-y				+= 8021q/
- endif
- obj-$(CONFIG_IP_SCTP)		+= sctp/
-+obj-$(CONFIG_HOMA)		+= homa/
- obj-$(CONFIG_RDS)		+= rds/
- obj-$(CONFIG_WIRELESS)		+= wireless/
- obj-$(CONFIG_MAC80211)		+= mac80211/
-diff --git a/net/homa/Kconfig b/net/homa/Kconfig
-new file mode 100644
-index 000000000000..16fec3fd52ba
---- /dev/null
-+++ b/net/homa/Kconfig
-@@ -0,0 +1,21 @@
-+# SPDX-License-Identifier: BSD-2-Clause or GPL-2.0+
-+#
-+# Homa transport protocol
-+#
++			if (sk->sk_type != SOCK_STREAM)
++				return -EOPNOTSUPP;
 +
-+menuconfig HOMA
-+	tristate "The Homa transport protocol"
-+	depends on INET
-+	depends on IPV6
-+
-+	help
-+	  Homa is a network transport protocol for communication within
-+	  a datacenter. It provides significantly lower latency than TCP,
-+	  particularly for workloads containing a mixture of large and small
-+	  messages operating at high network utilization. At present, Homa
-+	  has been only partially upstreamed; this version provides bare-bones
-+	  functionality but is not performant. For more information see the
-+	  homa(7) man page or checkout the Homa Wiki at
-+	  https://homa-transport.atlassian.net/wiki/spaces/HOMA/overview.
-+
-+	  If unsure, say N.
-diff --git a/net/homa/Makefile b/net/homa/Makefile
-new file mode 100644
-index 000000000000..57f051d44c6b
---- /dev/null
-+++ b/net/homa/Makefile
-@@ -0,0 +1,11 @@
-+obj-$(CONFIG_HOMA) := homa.o
-+homa-y:=        homa_incoming.o \
-+                homa_interest.o \
-+                homa_outgoing.o \
-+                homa_peer.o \
-+		homa_plumbing.o \
-+                homa_pool.o \
-+		homa_rpc.o \
-+		homa_sock.o \
-+		homa_timer.o \
-+		homa_utils.o
--- 
-2.43.0
-
+ 			mutex_lock(&u->iolock);
+ 
+ 			skb = skb_peek(&sk->sk_receive_queue);
+---8<---
 
