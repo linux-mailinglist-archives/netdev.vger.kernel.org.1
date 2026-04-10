@@ -1,271 +1,126 @@
-Return-Path: <netdev+bounces-277354-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277355-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eFwyOsvi2GnHjAgAu9opvQ
-	(envelope-from <netdev+bounces-277354-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 13:45:15 +0200
+	id GPrOI+zi2GnHjAgAu9opvQ
+	(envelope-from <netdev+bounces-277355-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 13:45:48 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97C443D6524
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 13:45:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D60543D6534
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 13:45:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A49BF30B340D
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 11:38:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 20D683006B7F
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 11:39:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8439D3BAD8F;
-	Fri, 10 Apr 2026 11:38:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9D2539BFFB;
+	Fri, 10 Apr 2026 11:39:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="h3upXIVR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OjPC8B9n"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F6E139B955;
-	Fri, 10 Apr 2026 11:38:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B72C637EFE3;
+	Fri, 10 Apr 2026 11:39:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775821095; cv=none; b=HV+tpEPJmHJsa9Q9DuKWIDu/gUFUN7a2QBvOuV63IFxYVHnVftG3jEYEVY9y/oW5AJNRWKTmgOQRzgx4s7H+uT6XwZYMtrMswBg580e3oTheW57WDxNVBAHnOXvrShNcBpnWhL8shrjWhBH1mPHBsjxwPXZhevUot56uGLffDcQ=
+	t=1775821154; cv=none; b=Mcl1jQn3qX0xgRxmqfNJg3na62TnlnGRGfOnXSoquyDI3UU2enTpBtO2mkPfBpUh32O/QOve696FGcc5BsnDuad6IOGAwlnnTMOByVrzsYmlX+yTD8h2iaHSQ8groPWobmopLjhHe+cUz/2igs8KgMKm3pdiuqkO7vVXn0tge9o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775821095; c=relaxed/simple;
-	bh=AWCGHMr8nQo9XENHPYNO3gNdIfX/Y9wTKaLGJfZGXgs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tLrOLoogdxbATHnD+Ne1Uj2VJqfFFarbUZc7jRPjqNY/oewJ+RmCPXl+gTUZhB79Vt2p2nxwpYImPUmw6eWVhb4o1wK7knDhiLfW91cUuc8+rGjujySy5xzJ/hpDtSmF9Mt7P10UayhcKdskf3iHdwTQvnofG4xFZjzhNcECXB0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=h3upXIVR; arc=none smtp.client-ip=95.215.58.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1775821091;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=n/513DDDdwX8CA3k/+2+q38x0A9p30a5TG1TXyuVxZA=;
-	b=h3upXIVR0yXYtg37kOcCTUjp7VlaQxt2bPnQAREYQ/L2pxjxqMZ0apYAb+5ebN16FL79WG
-	Myd6CBIGgyX5BnPqQE0AdFuqMlIdlwPnfsrlNLbvHf9n2Y/sTSMqvjs03H9DIk7YchjSj2
-	gR2kUmgAMDT7gp0/Qoo/Vnd37vZDusc=
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-To: netdev@vger.kernel.org
-Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	KP Singh <kpsingh@kernel.org>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
+	s=arc-20240116; t=1775821154; c=relaxed/simple;
+	bh=J6BP64+ovqcApdlO6UD29z7w6NRSJGoJAqCMVat2BMU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sbHOHRWVbLZ7r82R63nVnRs1Gg2vIoKddCJ1pYBH4S4QkruHr0KJDAG5ffZiXJDb7cGhs89ZjVTi/MQ5o7D+D9/yQAR+u/d3fPL4ApCWePB9MrE+ETtQUQeID0N3P5yG3rf4ykUNYSk4tqzLkvDPGtlAMgqqvQGX2xcvid243oM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OjPC8B9n; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97C8EC19425;
+	Fri, 10 Apr 2026 11:39:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775821154;
+	bh=J6BP64+ovqcApdlO6UD29z7w6NRSJGoJAqCMVat2BMU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OjPC8B9nzKdPmUxA2gIKfJhU91HvCr8JLLyo2/+Eyhz5fe/33kkLznaeEN6ZgvTQA
+	 QLZRSlIEoL9+Tyi4Y3mP6/QGac4gxcsKpc41bJJas/pyoHvj2tKJC3RIRteu88ecrx
+	 TOGIhy7RX/i6JK8iiuo2xtR03xSyBHCm3wBY8xLcoCd5Pek3e7X3wuujw7nEpdT6lc
+	 mic4xZ9c25Le0yzPIU4yWLuI+SB3uYGL15dzuSjk1P0rgdd/0ZilwMqgQMbt3MstXT
+	 9j33NKdCYaDG0nUCKspj2M4z1N2J8OJEDJwhd80V/SgbkNvrJ3o3n7G8Z1znd6XUm3
+	 3wDesgf4w/5Hw==
+Date: Fri, 10 Apr 2026 12:39:10 +0100
+From: Simon Horman <horms@kernel.org>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: netdev@vger.kernel.org, Jamal Hadi Salim <jhs@mojatatu.com>,
+	Jiri Pirko <jiri@resnulli.us>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Jussi Maki <joamaki@gmail.com>,
-	bpf@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net v6 2/2] selftests/bpf: add test for xdp_master_redirect with bond not up
-Date: Fri, 10 Apr 2026 19:37:23 +0800
-Message-ID: <20260410113726.368111-3-jiayuan.chen@linux.dev>
-In-Reply-To: <20260410113726.368111-1-jiayuan.chen@linux.dev>
-References: <20260410113726.368111-1-jiayuan.chen@linux.dev>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net v4 5/8] net/sched: netem: batch-transfer ready
+ packets to avoid child re-entrancy
+Message-ID: <20260410113910.GU469338@kernel.org>
+References: <20260406172627.210894-1-stephen@networkplumber.org>
+ <20260406172627.210894-6-stephen@networkplumber.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260406172627.210894-6-stephen@networkplumber.org>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[linux.dev,iogearbox.net,gmail.com,fomichev.me,kernel.org,google.com,davemloft.net,redhat.com,vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[3];
-	RCPT_COUNT_TWELVE(0.00)[25];
-	TAGGED_FROM(0.00)[bounces-277354-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-277355-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:email,linux.dev:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 97C443D6524
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[networkplumber.org:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D60543D6534
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add a selftest that reproduces the null-ptr-deref in
-bond_rr_gen_slave_id() when XDP redirect targets a bond device in
-round-robin mode that was never brought up. The test verifies the fix
-by ensuring no crash occurs.
+On Mon, Apr 06, 2026 at 10:25:13AM -0700, Stephen Hemminger wrote:
+> netem_dequeue_child() previously transferred one packet from the tfifo
+> to the child qdisc per dequeue call. Parents like HFSC that track
+> class active/inactive state on qlen transitions could see an enqueue
+> during dequeue, causing double-insertion into the eltree
+> (CVE-2025-37890, CVE-2025-38001). Non-work-conserving children like
+> TBF could also refuse to return a just-enqueued packet, making netem
+> return NULL despite having backlog, which causes parents like DRR to
+> incorrectly deactivate the class.
+> 
+> Move all time-ready packets into the child before calling its dequeue.
+> This separates the enqueue and dequeue phases so the parent sees
+> consistent qlen transitions.
+> 
+> Fixes: 50612537e9ab ("netem: fix classful handling")
+> 
 
-Test setup:
-- bond0: active-backup mode, UP, with native XDP (enables
-  bpf_master_redirect_enabled_key globally)
-- bond1: round-robin mode, never UP
-- veth1: slave of bond1, with generic XDP (XDP_TX)
-- BPF_PROG_TEST_RUN with live frames triggers the redirect path
+nit: no blank line here
 
-Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
----
- .../selftests/bpf/prog_tests/xdp_bonding.c    | 101 +++++++++++++++++-
- 1 file changed, 99 insertions(+), 2 deletions(-)
+> Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_bonding.c b/tools/testing/selftests/bpf/prog_tests/xdp_bonding.c
-index e8ea26464349..0d4ec1e5b401 100644
---- a/tools/testing/selftests/bpf/prog_tests/xdp_bonding.c
-+++ b/tools/testing/selftests/bpf/prog_tests/xdp_bonding.c
-@@ -191,13 +191,18 @@ static int bonding_setup(struct skeletons *skeletons, int mode, int xmit_policy,
- 	return -1;
- }
- 
--static void bonding_cleanup(struct skeletons *skeletons)
-+static void link_cleanup(struct skeletons *skeletons)
- {
--	restore_root_netns();
- 	while (skeletons->nlinks) {
- 		skeletons->nlinks--;
- 		bpf_link__destroy(skeletons->links[skeletons->nlinks]);
- 	}
-+}
-+
-+static void bonding_cleanup(struct skeletons *skeletons)
-+{
-+	restore_root_netns();
-+	link_cleanup(skeletons);
- 	ASSERT_OK(system("ip link delete bond1"), "delete bond1");
- 	ASSERT_OK(system("ip link delete veth1_1"), "delete veth1_1");
- 	ASSERT_OK(system("ip link delete veth1_2"), "delete veth1_2");
-@@ -493,6 +498,95 @@ static void test_xdp_bonding_nested(struct skeletons *skeletons)
- 	system("ip link del bond_nest2");
- }
- 
-+/*
-+ * Test that XDP redirect via xdp_master_redirect() does not crash when
-+ * the bond master device is not up. When bond is in round-robin mode but
-+ * never opened, rr_tx_counter is NULL.
-+ */
-+static void test_xdp_bonding_redirect_no_up(struct skeletons *skeletons)
-+{
-+	struct nstoken *nstoken = NULL;
-+	int xdp_pass_fd, xdp_tx_fd;
-+	int veth1_ifindex;
-+	int err;
-+	char pkt[ETH_HLEN + 1];
-+	struct xdp_md ctx_in = {};
-+
-+	DECLARE_LIBBPF_OPTS(bpf_test_run_opts, opts,
-+			    .data_in = &pkt,
-+			    .data_size_in = sizeof(pkt),
-+			    .ctx_in = &ctx_in,
-+			    .ctx_size_in = sizeof(ctx_in),
-+			    .flags = BPF_F_TEST_XDP_LIVE_FRAMES,
-+			    .repeat = 1,
-+			    .batch_size = 1,
-+		);
-+
-+	/* We can't use bonding_setup() because bond will be active */
-+	SYS(out, "ip netns add ns_rr_no_up");
-+	nstoken = open_netns("ns_rr_no_up");
-+	if (!ASSERT_OK_PTR(nstoken, "open ns_rr_no_up"))
-+		goto out;
-+
-+	/* bond0: active-backup, UP with slave veth0.
-+	 * Attaching native XDP to bond0 enables bpf_master_redirect_enabled_key
-+	 * globally.
-+	 */
-+	SYS(out, "ip link add bond0 type bond mode active-backup");
-+	SYS(out, "ip link add veth0 type veth peer name veth0p");
-+	SYS(out, "ip link set veth0 master bond0");
-+	SYS(out, "ip link set bond0 up");
-+	SYS(out, "ip link set veth0p up");
-+
-+	/* bond1: round-robin, never UP -> rr_tx_counter stays NULL */
-+	SYS(out, "ip link add bond1 type bond mode balance-rr");
-+	SYS(out, "ip link add veth1 type veth peer name veth1p");
-+	SYS(out, "ip link set veth1 master bond1");
-+
-+	veth1_ifindex = if_nametoindex("veth1");
-+	if (!ASSERT_GT(veth1_ifindex, 0, "veth1_ifindex"))
-+		goto out;
-+
-+	/* Attach native XDP to bond0 -> enables global redirect key */
-+	if (xdp_attach(skeletons, skeletons->xdp_tx->progs.xdp_tx, "bond0"))
-+		goto out;
-+
-+	/* Attach generic XDP (XDP_TX) to veth1.
-+	 * When packets arrive at veth1 via netif_receive_skb, do_xdp_generic()
-+	 * runs this program. XDP_TX + bond slave triggers xdp_master_redirect().
-+	 */
-+	xdp_tx_fd = bpf_program__fd(skeletons->xdp_tx->progs.xdp_tx);
-+	if (!ASSERT_GE(xdp_tx_fd, 0, "xdp_tx prog_fd"))
-+		goto out;
-+
-+	err = bpf_xdp_attach(veth1_ifindex, xdp_tx_fd,
-+			     XDP_FLAGS_SKB_MODE, NULL);
-+	if (!ASSERT_OK(err, "attach generic XDP to veth1"))
-+		goto out;
-+
-+	/* Run BPF_PROG_TEST_RUN with XDP_PASS live frames on veth1.
-+	 * XDP_PASS frames become SKBs with skb->dev = veth1, entering
-+	 * netif_receive_skb -> do_xdp_generic -> xdp_master_redirect.
-+	 * Without the fix, bond_rr_gen_slave_id() dereferences NULL
-+	 * rr_tx_counter and crashes.
-+	 */
-+	xdp_pass_fd = bpf_program__fd(skeletons->xdp_dummy->progs.xdp_dummy_prog);
-+	if (!ASSERT_GE(xdp_pass_fd, 0, "xdp_pass prog_fd"))
-+		goto out;
-+
-+	memset(pkt, 0, sizeof(pkt));
-+	ctx_in.data_end = sizeof(pkt);
-+	ctx_in.ingress_ifindex = veth1_ifindex;
-+
-+	err = bpf_prog_test_run_opts(xdp_pass_fd, &opts);
-+	ASSERT_OK(err, "xdp_pass test_run should not crash");
-+
-+out:
-+	link_cleanup(skeletons);
-+	close_netns(nstoken);
-+	SYS_NOFAIL("ip netns del ns_rr_no_up");
-+}
-+
- static void test_xdp_bonding_features(struct skeletons *skeletons)
- {
- 	LIBBPF_OPTS(bpf_xdp_query_opts, query_opts);
-@@ -738,6 +832,9 @@ void serial_test_xdp_bonding(void)
- 	if (test__start_subtest("xdp_bonding_redirect_multi"))
- 		test_xdp_bonding_redirect_multi(&skeletons);
- 
-+	if (test__start_subtest("xdp_bonding_redirect_no_up"))
-+		test_xdp_bonding_redirect_no_up(&skeletons);
-+
- out:
- 	xdp_dummy__destroy(skeletons.xdp_dummy);
- 	xdp_tx__destroy(skeletons.xdp_tx);
--- 
-2.43.0
+I forwarded an AI generated review separately.
+Because I couldn't convince myself it wasn't valid.
 
+...
 
