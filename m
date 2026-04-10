@@ -1,90 +1,95 @@
-Return-Path: <netdev+bounces-277607-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277608-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gEmxOTZ+2WmjqAgAu9opvQ
-	(envelope-from <netdev+bounces-277607-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 00:48:22 +0200
+	id qAqZHfV+2WmjqAgAu9opvQ
+	(envelope-from <netdev+bounces-277608-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 00:51:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F4E43DD4E4
-	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 00:48:22 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E8E43DD529
+	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 00:51:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 907123023511
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 22:47:57 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id CCBF73016510
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 22:51:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6804C78F4F;
-	Fri, 10 Apr 2026 22:47:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFE7C347BDB;
+	Fri, 10 Apr 2026 22:51:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b="NpVxgzRC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="arW4m0QT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1550E340260
-	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 22:47:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8328124EAB1
+	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 22:51:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775861277; cv=none; b=ouPr0WplxeXNAmYfNEqwg993rgcAei8Em9plWK75NH0qxCCNVHFmcuHcVlE66NvCPcG9DxVptCu4lkRB3BRXLUdevG/V1m755RBa/rDadzk1TaVlCsvQFxs4VWXe+fLfn953J1T+ch+yC0DeWwhFbsVoLhiv4XDZuVJQYNsjObs=
+	t=1775861488; cv=none; b=M24WQIGgs2BishCQD7vNPyj/DulnVsDJTWTcPK//ehG8NRh75tirxFzul8cZcMbFw/xtalLtUTS8Tt5XC5fjX5PkGxEWTdvRSEeh4UiBEZYQiMxL6pAeFbOkeb5nInwYC3Sn9NjTCOj6Nasx6SEAEAyr6/DferM6BasjUaxZ33o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775861277; c=relaxed/simple;
-	bh=1Lj8jTJZzO9AHNbL1S4fODooVoiEkCjCfVab5Xuzajo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BtFBJtXVBWOzuC39D7fIOoHlDLF8qy9hlaYVegk50jK61qiEj84QhM0SIUHtdQ0RndWDYKj8DMR3odTwG0fGkKfpruyYdTJQjxSiL05nSgL8+N0YbBvp0JiZ/0Ssv/h/0Dqc/4BEmCwE2Q0gLdmlJ5UdWGlAKHuaXCfi5bCMqag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b=NpVxgzRC; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2aae146b604so18377945ad.3
-        for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 15:47:55 -0700 (PDT)
+	s=arc-20240116; t=1775861488; c=relaxed/simple;
+	bh=g94ZvU6Eq6VpyU6gZKGEO5v6YDDlDdSD7Aa1Zvg13DE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nRRNsOzFRAuM3mNAKNfs2NDxN4E0ZImZhV/K7ka5tkialqsuwJr5H6owimrtzQOx6nj3QmpXnPS/Y7nLDxTJ6gpredXrEOyYIsW9OeccOUaKseBj/O2CDgeF7go0iqdJcehExX6INpaYtcSKzKnkXDHTzFqTj1pyp7g4TgG8DQ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=arW4m0QT; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-48896199cbaso27082025e9.1
+        for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 15:51:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20251104.gappssmtp.com; s=20251104; t=1775861275; x=1776466075; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=p/T4NAyBpXXt7e0KqwcEtqR1+BSMPN7JhX0W6/18kQU=;
-        b=NpVxgzRCMyP/M8JvAYG3INllH6pv0khxoyNle1EyVpBB11/4bNqR+5tdicohQ6JcJ3
-         yrtZNyAd9UR9PweUVsEjhAdVOlzGScjhLhV/xm9MfQ38yI7URQ3XqodPKbCWLMdzxJVq
-         LJ1CwErP9qPc+QTiZCQqDXFNTGxVKWFWwd+lObNk5zE234JgHUogAEjFoO0Ok6B4ksxx
-         FoYhjJpg2Dz0EZH6N+cfPCKZFHh/MhWlcKDamwEVCxxG8aywr1DAq8zi9ZzjwFmU1HBB
-         QuQ0cbO2ceg9UAxM+NZSVOAPWQ3jI4/LhUZh4cykPPINT8LQshE5eHDRvNdWglYNQNOL
-         7GPg==
+        d=gmail.com; s=20251104; t=1775861486; x=1776466286; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hSRTjy6wm25VHK2uTpX6ZsxoXvGmhSlH5xYLbZJnuyM=;
+        b=arW4m0QTOPPf05hrS5AjHRfG/+uUs/txJE8eYQKR2OF2YlIM6l9Y/aNMSat595hmtr
+         3/yQjWMmnHCaKz3L0F5xYbOKX1vOJipPjCziobAvhLbwmzzC2ncPxmkJ95hifT3CYCjb
+         KErI+PBJRPF+JMh4BvsrYRJSdUWO3TFVUmqqKk/Nk/4svGJVqpD74qL6gYXPs++S5e6M
+         SROks9h7fGqHzguzqfv55iNheOHJWwWDc4KwQ/ITR2cx7qumWYAtkNGi4vTaJpHGtC48
+         K50hxhQBzTss2V6BcScRZZo9YGhM8ps7AF+FWPpq5PIfC0rhhxCa+onhR04Ab+jJfAla
+         +Www==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775861275; x=1776466075;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=p/T4NAyBpXXt7e0KqwcEtqR1+BSMPN7JhX0W6/18kQU=;
-        b=fWUnU6XFf5ED+ZzmLMd0CucD9op9Iv9j9vwmwdktoQZxObWGpR07MJ91euxCp/Eky4
-         N2YRpm6s+dhLd2TyD3vSjBKTK0gNrTz+ZF4cpvJ6t0tGI0rWl7oeLyONn69rDEod4gbP
-         zNEMFDbVJQvDzHqv+9KcLi0+s2N8zXEZVEBgUMtI921Q/EasFRxbxA7dBjDdFOIW+wWD
-         lolL2D30awtA5X3DxCil2X3y6WQb533cOSzCNQZEImCpK2pFZfoyVGtn/pSqFRgXuyDf
-         rwZbyhJ2LINq3T1nGBFWmCvvITOb4YoNke32YwU2zUFupM+LSb9qzBcNGGrCIRKSHxcj
-         yAMw==
-X-Gm-Message-State: AOJu0YzkrtbApPPPnWie3xCyixt8K8wADJmCGhEqRJuEPeqFrYhGhpuE
-	bwiu08TWmixhq28itmFru36kT1rZpZSLzgc+ICQTidbWhzsyegonywF0k4pOgLNCq+IrnJPKkP5
-	IAQkN
-X-Gm-Gg: AeBDiev8t+2BsakC8Z+RjMIjQNj/2qy5pU84vQXLZ9nlOE2DzF56v2TW+cz99W/HOXy
-	Io/z29tBoahIt2Xvaf7Y6s0iVBbLle1WkIA0Hsl1msap3q0HKYUXWSGKdqt6oenCVKLQrgZgkrA
-	mvZiMagj5VSbXLT64bv4kBa/TTvTZKf+RidPno0qW61TedAtnyoAvMzVkl45hd3TH1oJM4ONW8K
-	3t6xDsYlcvdR56mLXUZ9F3iiuPg+Dl+vuvkmd3jntiTqPYey36O7qGFiEkhbH+3Sp7X1u5xpF+l
-	sTi5m6zh1YFFdhOeT5rA/mlUQtXHvCNZCIMtCm8Keshb/G5OOmsvatFvxQgUSgFGV77+dj0t4ve
-	uM2g7h+1luxwpTa4P2DWY/i//TobBcO2dKuDUa7jMqgA2c/N31NIEow7PB/BqEGRp2irb+RK3QS
-	JiX6hOTDbhw7dwDkmaqW5iMqPE1AUaNE19umJd2SpxMKI=
-X-Received: by 2002:a17:902:cf08:b0:2b2:6df1:1108 with SMTP id d9443c01a7336-2b2d59a34bcmr51388205ad.15.1775861275440;
-        Fri, 10 Apr 2026 15:47:55 -0700 (PDT)
-Received: from phoenix.lan ([104.202.41.210])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b2d4f099d6sm51025295ad.50.2026.04.10.15.47.53
+        d=1e100.net; s=20251104; t=1775861486; x=1776466286;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hSRTjy6wm25VHK2uTpX6ZsxoXvGmhSlH5xYLbZJnuyM=;
+        b=eaF37HoQM/GOF8lopdPvTjQvYv4Wqoa3JFi5zgLxkHWvKnINBBPp/Nmpstbe2fSX+o
+         MnL8PzSuU7r0bFvSzXpHblneHfHxuPr6FQI4+xsvh322fq8rtPeVgY5Yg5Eqmwn/8OCv
+         NauoTiypE6EgPfZxXH3cCr6b2+8Iw2HAXs6mFfXdI1OnnCbs+4tU1t1/4OlDaqAXQ2KC
+         xnEIVs83SfIB/2gyeaI3BQ4j6zSnJNQfpFDmtBYYZoqky483YexQIs5sRjJl59jLIh21
+         GEw0G+QulK5Az/U6uXyQrP5IW33WxFV05uI99aNyF/t6hBDyD16RxKkpRm9C1xg3reoQ
+         wDeA==
+X-Gm-Message-State: AOJu0YxRgo8iOugO/awwZwQF6J+vV/2fvzW89HGk9ACwmnitj1FAFTpy
+	wSbDuHlbrulNgouhLAd22XFK3wi6bdLZ3erRfeVjhOTq5onD/fsE2cQdMOVH7dHO
+X-Gm-Gg: AeBDiesKlHWy7hmlBF2OrYLm7YqOkuK+wCZa4VRuW3FmwlLgeIL//R5ixaojATvKfK6
+	2c9aj1HrHyzMuzFckJMykTZecdze7LBC4Vc6s1MbKjhtDewpWVklOMiP78oQFBqgFugjfaEGSWo
+	CT9OlFWPexFyXgcFuWStAZ6Lf6kzzIr1MSkLfjXkEtpkPg0FnXk7fif0QYGEPOcI1ornPRSQ+0D
+	WFIBEqoiSc28fnwcv3T8xWfDZbI8laDl3sYtzd1iDIeM5kgQ79IyvxhphuhbcGZFV3NtRuwp+GF
+	jTwrkcXLEPGOMybhP1Rn1KLuXjVqzVZXKrT60zdmG41+5KZbY1tMRvbckKlTxsGOkmJ1jW5wum4
+	3bKjSIi7PvdwpHT28hfVwbwZuf0nveKNs0C6GYY0e+hse/EQYwtbissBNxegpPEdgMT2Xl+7zmH
+	Lkp7zVe30uEPrZW3TmZYF0
+X-Received: by 2002:a05:600c:8585:b0:488:9bf8:7f17 with SMTP id 5b1f17b1804b1-488d684bcb0mr48381585e9.14.1775861485409;
+        Fri, 10 Apr 2026 15:51:25 -0700 (PDT)
+Received: from localhost ([2a03:2880:31ff:1c::])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488d5347ea5sm118712345e9.8.2026.04.10.15.51.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Apr 2026 15:47:55 -0700 (PDT)
-From: Stephen Hemminger <stephen@networkplumber.org>
+        Fri, 10 Apr 2026 15:51:24 -0700 (PDT)
+From: Mohsin Bashir <mohsin.bashr@gmail.com>
 To: netdev@vger.kernel.org
-Cc: Stephen Hemminger <stephen@networkplumber.org>
-Subject: [PATCH iproute 2/2] json_writer: fix builtin test code
-Date: Fri, 10 Apr 2026 15:47:45 -0700
-Message-ID: <20260410224745.93416-2-stephen@networkplumber.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260410224745.93416-1-stephen@networkplumber.org>
-References: <20260410224745.93416-1-stephen@networkplumber.org>
+Cc: ast@fiberby.net,
+	chuck.lever@oracle.com,
+	davem@davemloft.net,
+	donald.hunter@gmail.com,
+	edumazet@google.com,
+	horms@kernel.org,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	matttbe@kernel.org,
+	pabeni@redhat.com,
+	mohsin.bashr@gmail.com
+Subject: [PATCH net-next] net: shaper: Reject zero weight in shaper config
+Date: Fri, 10 Apr 2026 15:51:23 -0700
+Message-ID: <20260410225123.2341672-1-mohsin.bashr@gmail.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -92,75 +97,101 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.06 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[networkplumber-org.20251104.gappssmtp.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWO(0.00)[2];
 	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-277607-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-277608-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
-	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_COUNT_FIVE(0.00)[5];
-	DKIM_TRACE(0.00)[networkplumber-org.20251104.gappssmtp.com:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[fiberby.net,oracle.com,davemloft.net,gmail.com,google.com,kernel.org,vger.kernel.org,redhat.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	FROM_NEQ_ENVFROM(0.00)[mohsinbashr@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_NONE(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,networkplumber.org:email,networkplumber.org:mid,networkplumber-org.20251104.gappssmtp.com:dkim]
-X-Rspamd-Queue-Id: 4F4E43DD4E4
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[meta.com:email]
+X-Rspamd-Queue-Id: 1E8E43DD529
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The code under #ifdef was not generating valid JSON
-and it is missing test for control characters.
+A zero weight is meaningless for DWRR scheduling and can cause
+starvation of the affected node. Add a min-value constraint to
+the weight attribute in the net_shaper netlink spec so that zero
+is rejected at the netlink policy level.
 
-Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
+Found while prototyping a new driver, existing drivers are not
+affected.
+
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Mohsin Bashir <hmohsin@meta.com>
 ---
- lib/json_writer.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ Documentation/netlink/specs/net_shaper.yaml | 2 ++
+ net/shaper/shaper_nl_gen.c                  | 6 +++---
+ 2 files changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/lib/json_writer.c b/lib/json_writer.c
-index 7202621e..d4a1c72b 100644
---- a/lib/json_writer.c
-+++ b/lib/json_writer.c
-@@ -369,7 +369,7 @@ int main(int argc, char **argv)
- 	jsonw_null_field(wr, "my_null");
+diff --git a/Documentation/netlink/specs/net_shaper.yaml b/Documentation/netlink/specs/net_shaper.yaml
+index 3f2ad772b64b..7216568fcfc5 100644
+--- a/Documentation/netlink/specs/net_shaper.yaml
++++ b/Documentation/netlink/specs/net_shaper.yaml
+@@ -106,6 +106,8 @@ attribute-sets:
+       -
+         name: weight
+         type: u32
++        checks:
++          min: 1
+         doc: |
+           Relative weight for round robin scheduling of the
+           given shaper.
+diff --git a/net/shaper/shaper_nl_gen.c b/net/shaper/shaper_nl_gen.c
+index 9b29be3ef19a..0cad1a355350 100644
+--- a/net/shaper/shaper_nl_gen.c
++++ b/net/shaper/shaper_nl_gen.c
+@@ -20,7 +20,7 @@ const struct nla_policy net_shaper_handle_nl_policy[NET_SHAPER_A_HANDLE_ID + 1]
+ const struct nla_policy net_shaper_leaf_info_nl_policy[NET_SHAPER_A_WEIGHT + 1] = {
+ 	[NET_SHAPER_A_HANDLE] = NLA_POLICY_NESTED(net_shaper_handle_nl_policy),
+ 	[NET_SHAPER_A_PRIORITY] = { .type = NLA_U32, },
+-	[NET_SHAPER_A_WEIGHT] = { .type = NLA_U32, },
++	[NET_SHAPER_A_WEIGHT] = NLA_POLICY_MIN(NLA_U32, 1),
+ };
  
- 	jsonw_name(wr, "special chars");
--	jsonw_start_array(wr);
-+	jsonw_start_object(wr);
- 	jsonw_string_field(wr, "slash", "/");
- 	jsonw_string_field(wr, "newline", "\n");
- 	jsonw_string_field(wr, "tab", "\t");
-@@ -377,7 +377,14 @@ int main(int argc, char **argv)
- 	jsonw_string_field(wr, "quote", "\"");
- 	jsonw_string_field(wr, "tick", "\'");
- 	jsonw_string_field(wr, "backslash", "\\");
--	jsonw_end_array(wr);
-+	jsonw_end_object(wr);
-+
-+	jsonw_name(wr, "control chars");
-+	jsonw_start_object(wr);
-+	jsonw_string_field(wr, "bell", "\a");
-+	jsonw_string_field(wr, "esc", "\033");
-+	jsonw_string_field(wr, "del", "\177");
-+	jsonw_end_object(wr);
+ /* NET_SHAPER_CMD_GET - do */
+@@ -43,7 +43,7 @@ static const struct nla_policy net_shaper_set_nl_policy[NET_SHAPER_A_IFINDEX + 1
+ 	[NET_SHAPER_A_BW_MAX] = { .type = NLA_UINT, },
+ 	[NET_SHAPER_A_BURST] = { .type = NLA_UINT, },
+ 	[NET_SHAPER_A_PRIORITY] = { .type = NLA_U32, },
+-	[NET_SHAPER_A_WEIGHT] = { .type = NLA_U32, },
++	[NET_SHAPER_A_WEIGHT] = NLA_POLICY_MIN(NLA_U32, 1),
+ };
  
- 	jsonw_end_object(wr);
+ /* NET_SHAPER_CMD_DELETE - do */
+@@ -62,7 +62,7 @@ static const struct nla_policy net_shaper_group_nl_policy[NET_SHAPER_A_LEAVES +
+ 	[NET_SHAPER_A_BW_MAX] = { .type = NLA_UINT, },
+ 	[NET_SHAPER_A_BURST] = { .type = NLA_UINT, },
+ 	[NET_SHAPER_A_PRIORITY] = { .type = NLA_U32, },
+-	[NET_SHAPER_A_WEIGHT] = { .type = NLA_U32, },
++	[NET_SHAPER_A_WEIGHT] = NLA_POLICY_MIN(NLA_U32, 1),
+ 	[NET_SHAPER_A_LEAVES] = NLA_POLICY_NESTED(net_shaper_leaf_info_nl_policy),
+ };
  
 -- 
-2.53.0
+2.52.0
 
 
