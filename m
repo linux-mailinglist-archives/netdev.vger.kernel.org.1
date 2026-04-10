@@ -1,164 +1,206 @@
-Return-Path: <netdev+bounces-277365-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277368-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QGIsHbbl2GnHjAgAu9opvQ
-	(envelope-from <netdev+bounces-277365-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 13:57:42 +0200
+	id gLgtA/Hl2GmZjggAu9opvQ
+	(envelope-from <netdev+bounces-277368-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 13:58:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2E973D6752
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 13:57:41 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93D0C3D6780
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 13:58:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4125430AE703
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 11:49:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1A2A83008D37
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 11:51:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B3683BE649;
-	Fri, 10 Apr 2026 11:49:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8866E3BC692;
+	Fri, 10 Apr 2026 11:51:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b="K74eOzrq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KQeciTH0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 409333BFE31
-	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 11:49:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.175
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775821783; cv=pass; b=jO2B9t2dA9fw8r233Eb3PCXwuuUru7Ka6eLYf1R0+bcy5r1TfdUIQvmN7HZhVGGDOjsUdSHGg0aSzLkFa2w3QLOlgzghUEBcljwsUgPhknvk5OpUo3UY0Y7nMMA91HKZrMYXCboccEJLHmUPpEnyM89yTeuzLihPrHhClHMfszc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775821783; c=relaxed/simple;
-	bh=uBCwgU/FCqRzbvqSSQDslB759GJm5R3Q2CiFgEn/vEk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=d3sowKwf7DYnjM15zEa0OJZ+pjM0youHjrwBcfa+PCIwqT0CVmMS5YhavQ5/xhMp+gSeRNplyICVSePTn7GODWSDF7QwDlVQHDBNP1TfVs4IXIxrINdcxzX3yoIbrC/9GbBY7RbRe9qnQhHjEWY3J3zWUdMEn2/6zsuBvDhG6QU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b=K74eOzrq; arc=pass smtp.client-ip=209.85.210.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-8296d553142so1142103b3a.3
-        for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 04:49:32 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1775821772; cv=none;
-        d=google.com; s=arc-20240605;
-        b=lXt6LRHE13CK/ah581g+IUbyujDOx9u0I/BnR35JcQ1R9bI+Apvq9w0Pvw+pzAE8pl
-         MSnim9QMqG86T+/rStZXUWRnxFv6AZ0vUauV6VjK0JBprhUXlMhvStTmb3GGqDMeCp+k
-         k1Ewwj2Dr3DWPeSbbTbjFvnnyUWUrbFMHKLoMMuu0vZbrL3aSl1CrnrvgEc9RMOeqTkm
-         m3LB7Al3NIibyETmsyY8f59KXV/3fyYtBO37Y5aA7rRGhgcVpxCZ1kyrNl4DNe8yPFyl
-         Oe1MBdXrXXULht5OmwhyXTxxtSR9iX18W5ct7ltVvkpmMDqiOOeTZm2ekUmDCinDKuiE
-         mhmA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=uBCwgU/FCqRzbvqSSQDslB759GJm5R3Q2CiFgEn/vEk=;
-        fh=V5yMvRompT0/NoDZl2VO+R7ZqolHvQUMVf+ADlzfbv4=;
-        b=hEzKoTfzyOWqb/Z3f4jTNsE7+TJF42cAxKNYibtNbxy25k/f4KY0g7Q672mclgQzDa
-         Wg+y/Vk8E1csHHGUWjb/8Le1AxVLTunrP3YP612bUMq6tqhidcSaOvBdhVzOMaWTmH3E
-         uLoeZ1WPgKE/AGjRa56S+x0IF2WLgk1eSdP8b89RRBzw/dhByI/iWyUBuwXCLgmWeoq9
-         m1h6WWVsWHu7hJsJE7qd1rt7/jGGsUt9yNmffQAfXBz2rGmkX5oL8uit4knGz0+AG4Tk
-         MptM7QxwOTFH/UTfm/IxNgVpYTGxOX3js+MbXA2yOP3Q76du3MZiBxlUWDAhE6z/75xB
-         nwWw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20251104.gappssmtp.com; s=20251104; t=1775821772; x=1776426572; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uBCwgU/FCqRzbvqSSQDslB759GJm5R3Q2CiFgEn/vEk=;
-        b=K74eOzrqZhybS7hMf/dNrYEqXL0lueeHnvcb2fJhA3uF/FeyZ1fSxD96ml/u5CpfnM
-         70dRt/bbfDf7wg0UC1tJBV6OtLcq1BrURqsOUQxmHe6+XMbPH+ElpvLdiuFIR/LUY7w6
-         4hB1ap8E0SD+6v/EKGg7xNFHzVlOuSCvIAE2h2YBsESsLwKbAd6GoabIgsSnHek6WFDm
-         8yE9uPawYv5lTlfUZ81vWNAz5Pa6S94zluOEs40Anzu7LzoB5VkA9uChb0RStwB3QmYK
-         8pVHsAPaXJEv73BJdnDIInSq5R1uvb3RmkqGInBGC93frPY7Dqrs1+mA1A/9GHXb6ZAl
-         KaMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775821772; x=1776426572;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=uBCwgU/FCqRzbvqSSQDslB759GJm5R3Q2CiFgEn/vEk=;
-        b=VHAcqOISM7iDgWRmrF+xSkT7/89dCzSYBT4jnprvUZtoo+Xm1gk4DV+yGEI0Z/Va+x
-         XaQhzJh5f652IJ6cK2IoSo++vyhaGoTnLVFvc3GJq+7Q2HY4zE/dcnLcUpNPjjn6nEhX
-         LIn6bwqQ+0GYK+2sG1W0aAH76wSkKWaIVyCZYyb8tCnMA2aGU2HCawVwOMMLwx1Rr7Hu
-         N1vKa5o9rTGG7Xe0N64oHd42oMlLYVPD0bNnfy9hkrAeso4rq8Mvak3gZiFizJX+3IF3
-         YAgFsABETtM6y6tSha2VNB6zIKUqwrgCdKAi4ZA7JerpM+irZZVZD6mgjRryRCbIVVVV
-         OKYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX8Eluzb9XeqJAPunIRbNcIcON9otqKt5w55acRdfPuv3JdCiozHZWVG8N4Inrd4w9oqHYhmMM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxQYKW8s4kgCKsuk5dVuk9ndVTAS1+7N+qWlH81GN4mj8fLjcKb
-	cNm8uYRlpAoe10GS5nWpv/O4PIzFxk6IkGuB/HLB4FdiU0fjMJkkSX4EdLoNme1awOKPCcCsWCf
-	KWR5nGEVIlH3T0UfitUmiiOzrfsJMfNyuc/TypSz4
-X-Gm-Gg: AeBDievqsjRQR5K/S5W3mQWvzxtzlLzGc5nS7n/PPA7HrrDgLYyufb0GttxrnW8tyM5
-	TRAxrTSIczQQtJ47V3qn7Nqpf044Vr1QpcnQ7Zw7CWbtdTGB6rtxQRrsZ4crit+Vh1Ettad8vo2
-	Ij3mYR4mQQi3TqO/YmkRe32Xv5uONPM1l999dQadT2SMaBZkRLaq+NLyZLVNMZ9C6pzq5586t/k
-	UfUgDfW9K6MZhEOodkWTPxsV+iTCjX8ovIQcnn/LODDT8kG+VHrjywn7fkgeXWQDPWpfkPv8kbZ
-	nFYXPmc3xIEK2fd4JEw=
-X-Received: by 2002:a05:6a00:35ce:b0:781:2291:1045 with SMTP id
- d2e1a72fcca58-82f0c1cf099mr3143895b3a.8.1775821771716; Fri, 10 Apr 2026
- 04:49:31 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65ADA3BBA0D;
+	Fri, 10 Apr 2026 11:51:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775821888; cv=none; b=XSfCcP/EBGLhaf6kqXg36OgXCY0RcdQi1HHxHGiG/nxLGF8CT0DF3s2dBoxJPgBn3XIiedtuxUzgJ2FEUveWQMkww+g4fTcDP6W5om+0YCuBxmDo8LKWx1y3K44X/JKjToLRQK91FxoP5F4zhKu5gy3Lj3WHYjRvl8nsfplF4ig=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775821888; c=relaxed/simple;
+	bh=/v9RdEAhzS37lCkkSXoeeZkAOF1mvH24IcozDlYc1Sk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UwuSwFuAG7Ddpjichn6cAKCNSfPkY6d/hk7LWCYEnB4E0foZrQXC78ghYGfS97U+YYtcaB6CMycSQyGGEDvZdzLDPg2BNWtsNp+zkjmDWTXbV7PpSjXxRI/mpxOuE9m+TqY23mmpBajWurIFNGhwl3hyLoScqpHXz7Fo83S9c5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KQeciTH0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 941C8C19421;
+	Fri, 10 Apr 2026 11:51:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775821888;
+	bh=/v9RdEAhzS37lCkkSXoeeZkAOF1mvH24IcozDlYc1Sk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=KQeciTH0wbDVxWHCfhuS6Y+LIbp5to6StlVHunODdUah0VDc4u/jwg+o7W3Voy080
+	 LkSxAjQphEBPvs0gRrMpCLXGplUiVEvBLQuC9fAuPy79tEjvwAtQ7DqzCKvDt7Al+g
+	 K79MgjIo4vgMuGGAWor9mF8IVp4WtYDlqN8NSJtIEHMTjHnLgloM1Y49UxTuSpknrL
+	 sWTf+er889DEsqaUIQebfp3BgNbwgnS/4+3JGbDSQR9INnlrnBuJ0WQX90BWIxZmyo
+	 YlFy+6K7ZW9UkTSYQ9DMaS0eX9fHNMO9zf4IRWOIIZnmF4D93WmJPT7xNwCP6QpkiJ
+	 RtN2KLgdUMx/w==
+Date: Fri, 10 Apr 2026 13:51:25 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
+	conor+dt@kernel.org, ansuelsmth@gmail.com,
+	benjamin.larsson@genexis.eu, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next v3 04/12] net: airoha: Rely on net_device
+ pointer in HTB callbacks
+Message-ID: <adjkPSK-qR5UAuA-@lore-desk>
+References: <20260406-airoha-eth-multi-serdes-v3-4-ab6ea49d59ff@kernel.org>
+ <20260410025722.1809973-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260409214914.3072827-1-edumazet@google.com>
-In-Reply-To: <20260409214914.3072827-1-edumazet@google.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Fri, 10 Apr 2026 07:49:18 -0400
-X-Gm-Features: AQROBzBYwjEVmPf7owm_pJCUSTqnbjQh_TegnCF_t4J0y1Iv5G4y2HgxNTBpMP4
-Message-ID: <CAM0EoMnPVcdHoy4BNH_sC9H65iu=sHWQcZ25r9_0qcfdjRaTKA@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 00/15] net/sched: prepare RTNL removal from
- qdisc dumps
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jiri Pirko <jiri@resnulli.us>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.16 / 15.00];
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="7W5gcngAA2i51Gam"
+Content-Disposition: inline
+In-Reply-To: <20260410025722.1809973-1-kuba@kernel.org>
+X-Spamd-Result: default: False [-2.26 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[mojatatu-com.20251104.gappssmtp.com:s=20251104];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-277365-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-277368-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[mojatatu.com];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,resnulli.us,google.com,vger.kernel.org,gmail.com];
-	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,gmail.com,genexis.eu,lists.infradead.org,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[mojatatu-com.20251104.gappssmtp.com:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,mojatatu-com.20251104.gappssmtp.com:dkim]
-X-Rspamd-Queue-Id: C2E973D6752
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 93D0C3D6780
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Apr 9, 2026 at 5:49=E2=80=AFPM Eric Dumazet <edumazet@google.com> w=
-rote:
->
-> We add annotations for data-races, so that most dump methods
-> can run in parallel with data path.
->
-> Then change mq and mqprio to no longer acquire each children
-> qdisc spinlock.
->
-> Next round of patches will wait for linux-7.2.
 
-Reviewed-by: Jamal Hadi Salim <jhs@mojatatu.com>
+--7W5gcngAA2i51Gam
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-with a small caveat: Shouldnt patch #6 onwards go to net?
+> This is an AI-generated review of your patch. The human sending this
+> email says "For your consideration."
+> ---
+> net: airoha: Introduce WAN device flag
+>=20
+> This commit introduces a WAN flag to specify whether a device is used to
+> transmit or receive WAN or LAN traffic. It enables specifying multiple LAN
+> devices but limits the configuration to a single WAN device.
+>=20
+> > diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/eth=
+ernet/airoha/airoha_eth.c
+> > index 5b0cd37b155e4..9988011dca53f 100644
+> > --- a/drivers/net/ethernet/airoha/airoha_eth.c
+> > +++ b/drivers/net/ethernet/airoha/airoha_eth.c
+> > @@ -1796,36 +1796,77 @@ static int airoha_set_gdm2_loopback(struct airo=
+ha_gdm_dev *dev)
+>=20
+> [ ... ]
+>=20
+> > +static int airoha_dev_init(struct net_device *netdev)
+> > +{
+> > +	struct airoha_gdm_dev *dev =3D netdev_priv(netdev);
+> > +	struct airoha_gdm_port *port =3D dev->port;
+> > =20
+> >  	switch (port->id) {
+> >  	case AIROHA_GDM3_IDX:
+> > -	case AIROHA_GDM4_IDX:
+> > -		/* If GDM2 is active we can't enable loopback */
+> > -		if (!eth->ports[1]) {
+> > -			int err;
+> > +	case AIROHA_GDM4_IDX: {
+> > +		struct airoha_eth *eth =3D dev->eth;
+> > =20
+> > -			err =3D airoha_set_gdm2_loopback(dev);
+> > -			if (err)
+> > -				return err;
+> > -		}
+> > +		if (eth->ports[1] || airoha_get_wan_gdm_dev(eth))
+> > +			break;
+>=20
+> If a board's Device Tree enables both GDM3 and GDM4, and GDM2 is not pres=
+ent,
+> does this sequence permanently assign the WAN role to GDM3 since it is
+> initialized first? Is there a Device Tree property or fallback configurat=
+ion
+> mechanism to allow users to specify GDM4 as the WAN port instead?
 
-cheers,
-jamal
+This issue will be fixed with following series that allows to dynamically
+select LAN or WAN configuration at runtime.
+
+>=20
+> > +		fallthrough;
+> > +	}
+> > +	case AIROHA_GDM2_IDX:
+> > +		/* GDM2 is always used as wan */
+> > +		dev->flags |=3D PRIV_FLAG_WAN;
+> >  		break;
+> >  	default:
+> >  		break;
+> >  	}
+> > =20
+> > -	for (i =3D 0; i < eth->soc->num_ppe; i++)
+> > -		airoha_ppe_set_cpu_port(dev, i, airoha_get_fe_port(dev));
+> > +	airoha_dev_set_qdma(dev);
+> > +	airoha_set_macaddr(dev, netdev->dev_addr);
+>=20
+> Since the commit message notes it is possible to specify multiple LAN
+> devices, does unconditionally calling airoha_set_macaddr() for each
+> device overwrite the single shared hardware LAN MAC register?
+>=20
+> If so, could this cause only the last initialized LAN device to have its =
+MAC
+> correctly programmed into the hardware, leading to dropped unicast
+> packets for the other LAN interfaces?
+>=20
+> > +
+> > +	if (!airoha_is_lan_gdm_dev(dev) &&
+> > +	    (port->id =3D=3D AIROHA_GDM3_IDX || port->id =3D=3D AIROHA_GDM4_I=
+DX)) {
+> > +		int err;
+>=20
+> [ ... ]
+
+--7W5gcngAA2i51Gam
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCadjkPQAKCRA6cBh0uS2t
+rHwtAQCeVEB7opEH1jTAFAZgyCK8krbgv67AHGuqZexgJaekzQEApxT1RtXkOtbj
+ZispmFs1Ej3NlAgqNDlkItlht8fBzwM=
+=cCJU
+-----END PGP SIGNATURE-----
+
+--7W5gcngAA2i51Gam--
 
