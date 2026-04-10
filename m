@@ -1,152 +1,139 @@
-Return-Path: <netdev+bounces-277467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277456-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wOsuJS0e2WnVmQgAu9opvQ
-	(envelope-from <netdev+bounces-277467-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 17:58:37 +0200
+	id WEkVF1AV2Wm7lwgAu9opvQ
+	(envelope-from <netdev+bounces-277456-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 17:20:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65E533D9F01
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 17:58:37 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C389C3D926B
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 17:20:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8A28C302E4EF
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 15:44:35 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3DE07302CD0B
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 15:14:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EF003D333C;
-	Fri, 10 Apr 2026 15:44:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96CF13D9DB0;
+	Fri, 10 Apr 2026 15:14:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=eastlink.ca header.i=@eastlink.ca header.b="v25u0Dct"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DQRfv3hP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mta02.eastlink.ca (mta02.eastlink.ca [24.224.136.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 066FD35DD1C
-	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 15:44:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=24.224.136.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 556043D88FC;
+	Fri, 10 Apr 2026 15:14:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775835874; cv=none; b=MMqClH2bcLSjQC7WYyzLUS+qY9/+50LBvi34jg5JovBPXD21wqMR6ZBzGUSLjyww3md7Jsi9S11G7kQv98o3ShdRhYtbuvFCOp6SVSnKZoAkKjuQIjTUU/lP2rqiLrBYUSG89yURpbWdln9nh4mgKyertMk8yVQi6hd0wWTOheg=
+	t=1775834044; cv=none; b=gpgr7lzb9spY3gOIdofgYgwK0Kd6i0ZJPNyZgpAirXSmn/VjDcVjDXVZIXeJDOIDy8wCnYlsQ+tN/DSIc2bd05qaYN+EKsaKaW2PQ54kvnkMvR3PBOYnurqyqPFtWJ9255SgA7l4CCP1B0w0DmP49ZFsCHTVuhZ4aG8Pwl76RFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775835874; c=relaxed/simple;
-	bh=ys2qIIDim0m/Ax57bmDxe1wwI+RnRcMDUobY+/LAZUI=;
-	h=Message-id:Date:MIME-version:Subject:To:Cc:References:From:
-	 In-reply-to:Content-type; b=ejYjcpIplJbVAzYk7zrGX0Lxws0ZjDtYIZzKjSo/fMVtkV6zTmoh1uP223apMOd5Ep/GUXQ/FyleWUdaIJ9s5qka7WBKARNk8KF9fz4mWk2qzif7F3bbuOGnBmD4Wz9prvu5pUdihinzKsq+A2qBLIn240Ci9RNUCL/xvjLX1ZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=eastlink.ca; spf=pass smtp.mailfrom=eastlink.ca; dkim=pass (2048-bit key) header.d=eastlink.ca header.i=@eastlink.ca header.b=v25u0Dct; arc=none smtp.client-ip=24.224.136.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=eastlink.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eastlink.ca
-Received: from mail-cms03.eastlink.ca ([71.7.199.167])
- by mta02.eastlink.ca ([24.224.136.13])
- with ESMTPS id <0TDA0EJL7A8HEAE0@mta02.eastlink.ca> for
- netdev@vger.kernel.org; Fri, 10 Apr 2026 12:12:17 -0300 (ADT)
-Sun-Java-System-SMTP-Warning: Lines longer than SMTP allows found and wrapped.
-Received: from [192.168.1.239] ([24.222.238.48])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 256/256 bits)
- (Client did not present a certificate) by mail-cms03.eastlink.ca
- ([71.7.199.167]) with ESMTPSA id BDWpw66Glkg7aBDWpwNj31; Fri,
- 10 Apr 2026 12:12:16 -0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=eastlink.ca;
-	s=elelff16; t=1775833936;	bh=I61OpNNSxa7QfezN65BTggmQKaC1Ej3sLTFHrfX+cUw=;
-	h=Date:Subject:To:From:From:To:Subject:Date:Sender:Reply-to;
-	b=v25u0DctURMmtCg5wwJ3G0L8bhfCZeIkhepPK6zNTOhef52hNMloTvu+sy+C8Z2rO
- RzmaDBR59RcpSde58d4nxxt0r3BJHkH40ZK5rQPZDcpUD6pITkEZ1YLkuEYx5w9GUf
- eM59M/EgIh0+cZk5oO5Tn4c0L54Y7A39NRpHEbSeQhVGr+bYEf4fjHwPxlE0j5e48L
- mxuYdRpLfpMdmbWTwmK5m9LN8jga/4/NBaq5jVh4qJbIrdvZHcXoKljt+blRJR0JFA
- rbbmdp585VXLEMekdNO5ddDvUSoaSYESA76wwM1pTgF8NIao+0aVOoRQXwz4GOFm/0
- qZMby6wU97w4Q==
-X-Authority-Analysis: v=2.4 cv=e6xUSrp/ c=1 sm=1 tr=0 ts=69d91350 cx=c_est
- a=ien09DawV0SQ461Yvz+7bQ==:117 a=ien09DawV0SQ461Yvz+7bQ==:17 a=IkcTkHD0fZMA:10
- a=21JHI6EMHx3ttOpXyVYA:9 a=QEXdDO2ut3YA:10
-X-Vade-Cause:
- gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgddvleejgecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfgtefuvffnkffpmfenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepkfffgggfuffvvehfhfgjtgfgsehtjeertddtvdejnecuhfhrohhmpehjjhcuoehvvgdujhhothesvggrshhtlhhinhhkrdgtrgeqnecuggftrfgrthhtvghrnhepheduffejhfehkedvfeeikeegvefhjefgffdvffdtudekteehiefggefhieeuvdeinecukfhppedvgedrvddvvddrvdefkedrgeeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdegrddvvddvrddvfeekrdegkedphhgvlhhopegludelvddrudeikedruddrvdeflegnpdhmrghilhhfrhhomhepvhgvudhjohhtsegvrghsthhlihhnkhdrtggrpdhnsggprhgtphhtthhopeduvddprhgtphhtthhopeerredprhgtphhtthhopehhohhrmhhssehkvghrnhgvlhdrohhrghdprhgtphhtthhopehgrhgvghhkhheslhhinhhugihfohhunhgurghtihhonhdrohhrghdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtp
- hhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhm
-X-Vade-Score: -100
-X-Vade-State: 0
-X-EL-AUTH: ve1jot@eastlink.ca
-Message-id: <18e3df62-34f9-4de0-903b-19919d7ae2ca@eastlink.ca>
-Date: Fri, 10 Apr 2026 12:12:16 -0300
+	s=arc-20240116; t=1775834044; c=relaxed/simple;
+	bh=ZX44VkA/oGGdYrqGVtHG3BQ09eU0s5TAD8UsmKEvOJ4=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=AGz1vUoP8MTPzs+DH82yzUzCMeLVsUA8E9ihpsA94W30Pvzvmxpz6htpnzLWbOEQjfR1BZgD3Qw14EGnUUHYMqghdv4RAVArscyIJ+QCTikQ3yBG/ieYHQVo38XmP0V1Vr8v593YS5ziaQtFjMwPg3EwpOBmXFL/PBc/WQNcCPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DQRfv3hP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1CA7DC19421;
+	Fri, 10 Apr 2026 15:14:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775834044;
+	bh=ZX44VkA/oGGdYrqGVtHG3BQ09eU0s5TAD8UsmKEvOJ4=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=DQRfv3hPFw/TKa/ZakF0C/CvhlLPEsVqQv+2r4uwxdObvOGMMWr2s346gixb/wzYP
+	 kH3jI1VGrMbPCg8bbeliLsWsv0WorMVV9pr65pzZbqt3ANfLMAZ3WpCzHo7EbPC0aw
+	 sFqvG5W5Zh5Zl9hqpd/S10vk3SPDt4AvvXdP7MWFAVnJ1yy95RtrFN5r3P/n0YzraC
+	 K1ddeqgVvP6yW3cqrHOPD+5bbhJuKzxhUEtkBkREvZCz2D1PF358eBsZtX1OaLotF8
+	 mIrAdKqmlNIgawRmNAF5mT5jG8tytmCXBJPCuscrYjON8tMw7soKn19X1CoLhvhPBR
+	 sIA/Sxe0F1CKA==
+From: Thomas Gleixner <tglx@kernel.org>
+To: Baolu Lu <baolu.lu@linux.intel.com>, LKML <linux-kernel@vger.kernel.org>
+Cc: baolu.lu@linux.intel.com, x86@kernel.org, iommu@lists.linux.dev, Arnd
+ Bergmann <arnd@arndb.de>, Michael Grzeschik <m.grzeschik@pengutronix.de>,
+ netdev@vger.kernel.org, linux-wireless@vger.kernel.org, Herbert Xu
+ <herbert@gondor.apana.org.au>, linux-crypto@vger.kernel.org, Vlastimil
+ Babka <vbabka@kernel.org>, linux-mm@kvack.org, David Woodhouse
+ <dwmw2@infradead.org>, Bernie Thompson <bernie@plugable.com>,
+ linux-fbdev@vger.kernel.org, Theodore Tso <tytso@mit.edu>,
+ linux-ext4@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>,
+ Uladzislau Rezki <urezki@gmail.com>, Marco Elver <elver@google.com>,
+ Dmitry Vyukov <dvyukov@google.com>, kasan-dev@googlegroups.com, Andrey
+ Ryabinin <ryabinin.a.a@gmail.com>, Thomas Sailer
+ <t.sailer@alumni.ethz.ch>, linux-hams@vger.kernel.org, "Jason A.
+ Donenfeld" <Jason@zx2c4.com>, Richard Henderson
+ <richard.henderson@linaro.org>, linux-alpha@vger.kernel.org, Russell King
+ <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org, Catalin
+ Marinas <catalin.marinas@arm.com>, Huacai Chen <chenhuacai@kernel.org>,
+ loongarch@lists.linux.dev, Geert Uytterhoeven <geert@linux-m68k.org>,
+ linux-m68k@lists.linux-m68k.org, Dinh Nguyen <dinguyen@kernel.org>, Jonas
+ Bonn <jonas@southpole.se>, linux-openrisc@vger.kernel.org, Helge Deller
+ <deller@gmx.de>, linux-parisc@vger.kernel.org, Michael Ellerman
+ <mpe@ellerman.id.au>, linuxppc-dev@lists.ozlabs.org, Paul Walmsley
+ <pjw@kernel.org>, linux-riscv@lists.infradead.org, Heiko Carstens
+ <hca@linux.ibm.com>, linux-s390@vger.kernel.org, "David S. Miller"
+ <davem@davemloft.net>, sparclinux@vger.kernel.org
+Subject: Re: [patch 09/38] iommu/vt-d: Use sched_clock() instead of
+ get_cycles()
+In-Reply-To: <9db9515b-08e8-47bd-aced-206ac183195a@linux.intel.com>
+References: <20260410120044.031381086@kernel.org>
+ <20260410120318.187521447@kernel.org>
+ <9db9515b-08e8-47bd-aced-206ac183195a@linux.intel.com>
+Date: Fri, 10 Apr 2026 17:14:00 +0200
+Message-ID: <87y0iuzw3r.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] netrom: do some basic forms of validation on incoming
- frames
-To: Simon Horman <horms@kernel.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- linux-hams@vger.kernel.org, Yizhe Zhuang <yizhe@darknavy.com>,
- stable <stable@kernel.org>
-References: <2026040730-untagged-groin-bbb7@gregkh>
- <20260409190328.GS469338@kernel.org> <20260409203235.6b9329f0@kernel.org>
- <2026041026-excuse-slashing-c4ee@gregkh> <20260410102827.GT469338@kernel.org>
-Content-language: en-US
-From: jj <ve1jot@eastlink.ca>
-In-reply-to: <20260410102827.GT469338@kernel.org>
-Content-type: text/plain; charset=UTF-8; format=flowed
-Content-transfer-encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Spamd-Result: default: False [4.34 / 15.00];
+	MID_END_EQ_FROM_USER_PART(4.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[eastlink.ca,none];
-	R_DKIM_ALLOW(-0.20)[eastlink.ca:s=elelff16];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[eastlink.ca:+];
-	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-277456-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-277467-lists,netdev=lfdr.de];
+	GREYLIST(0.00)[pass,body];
+	RCPT_COUNT_TWELVE(0.00)[49];
 	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FREEMAIL_CC(0.00)[linux.intel.com,kernel.org,lists.linux.dev,arndb.de,pengutronix.de,vger.kernel.org,gondor.apana.org.au,kvack.org,infradead.org,plugable.com,mit.edu,linux-foundation.org,gmail.com,google.com,googlegroups.com,alumni.ethz.ch,zx2c4.com,linaro.org,armlinux.org.uk,lists.infradead.org,arm.com,linux-m68k.org,lists.linux-m68k.org,southpole.se,gmx.de,ellerman.id.au,lists.ozlabs.org,linux.ibm.com,davemloft.net];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[tglx@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-0.993];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ve1jot@eastlink.ca,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,eastlink.ca:dkim,eastlink.ca:mid]
-X-Rspamd-Queue-Id: 65E533D9F01
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C389C3D926B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This is NOT an obsolete protocol..this is in use by amateur radio 
-operators world-wide...we use it for RF comms usually, because what 
-happens if the internet goes "down", we can still provide comms over 
-slower RF links....(plus it's a fun mode)please PLEASE do not drop...and 
-sorry for the noise...
-
-de John VE1JOT
-
-On 2026-04-10 07:28, Simon Horman wrote:
-> On Fri, Apr 10, 2026 at 07:24:36AM +0200, Greg Kroah-Hartman wrote:
->> On Thu, Apr 09, 2026 at 08:32:35PM -0700, Jakub Kicinski wrote:
->>> On Thu, 9 Apr 2026 20:03:28 +0100 Simon Horman wrote:
->>>> I expect that checking skb->len isn't sufficient here
->>>> and pskb_may_pull needs to be used to ensure that
->>>> the data is also available in the linear section of the skb.
->>> Or for simplicity we could also be testing against skb_headlen()
->>> since we don't expect any legit non-linear frames here? Dunno.
-> Sure, that's find by me if it leads to simpler code than
-> using pskb_may_pull(). Else I'd lean towards pskb_may_pull()
-> as it is a more general approach that feels worth proliferating.
+On Fri, Apr 10 2026 at 21:45, Baolu Lu wrote:
+> On 4/10/2026 8:19 PM, Thomas Gleixner wrote:
+>> Calculating the timeout from get_cycles() is a historical leftover without
+>> any functional requirement.
+>> 
+>> Use ktime_get() instead.
 >
->> I'll be glad to change this either way, your call.  Given that this is
->> an obsolete protocol that seems to only be a target for drive-by fuzzers
->> to attack, whatever the simplest thing to do to quiet them up I'll be
->> glad to implement.
->>
->> Or can we just delete this stuff entirely?  :)
-> Deleting sounds good to me.
-> But we likely need a deprecation process.
-> In which case fixing these bugs still makes sense for the short term.
->
+> The subject line says "Use sched_clock() ...", but the implementation
+> actually uses ktime_get(). Is it a typo or anything I misunderstood?
+
+Indeed. Leftover from an earlier version.
+
+Thanks,
+
+        tglx
 
