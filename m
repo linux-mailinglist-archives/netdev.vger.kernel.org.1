@@ -1,235 +1,157 @@
-Return-Path: <netdev+bounces-277617-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277618-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mKw/HF+N2WnSqggAu9opvQ
-	(envelope-from <netdev+bounces-277617-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 01:53:03 +0200
+	id SFdLENiN2WnSqggAu9opvQ
+	(envelope-from <netdev+bounces-277618-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 01:55:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C66883DD935
-	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 01:53:02 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 969593DD958
+	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 01:55:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1633D303FDCD
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 23:51:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A1685300DE02
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 23:53:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25654389E18;
-	Fri, 10 Apr 2026 23:51:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8B7F38B13E;
+	Fri, 10 Apr 2026 23:53:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="yjgG1Uno"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h3TxYomg"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59534363C64;
-	Fri, 10 Apr 2026 23:51:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A53C737FF65
+	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 23:53:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775865097; cv=none; b=tH56hTZsSpzKo6HOi/GTMLMRwRn0qqzpVdawnSTZsdfqzrT1V0U/TluvZ9ndnP25diGpXYAYAXK/EVpBIqffvO5+Sal8PzBZk5+coQmiCh8prfShfEv9Z/7aEJITZwZLj/DSx3/7zxBpBJnoGjtehnqvvm+uL8C204/C2Jav1mg=
+	t=1775865212; cv=none; b=QneO8EzlTUx46Qgn6KFyxyCmIWvYWyb1cuUQqIzTVhfcCQBaNOBq43GRNVpLhSB8LvXito2WkvfUMh/4YlmtsZP419EUSqQ79MOi088Hkl3lL1KOgPm13Z3Rh/ka+4zI6Iej/X7tPBLlQF1Yd1r+7ZTyi9Ode27xcJ2wi6IgY2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775865097; c=relaxed/simple;
-	bh=H3h9oM/pAyNUP0Xl/szWiImDBrJ3w6FUxgxJnZ+zunw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dec/JJXSN14rZFbS/DAaMWCmdUVDxIzCxvLYcAL/krhmCd7wIB/2EEaaRe7Rxd8q47WqhxdywMH0sNjdErLJ/4P/N5r7KDM8y0wzYtBmeGgJY2r8tmuz/G7ZCC06jmoZE2HJO4qLFL5285fvdaKc4hTvWabRKs85XM8KCq02pl4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=yjgG1Uno; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=wJcLJpXPBwDXxBKnu3Ua3ryD7pYNhV+iw16fIM/TE/I=; b=yjgG1UnoMImRSW3dsvMVSHKAY8
-	/2g83xkMj9zdxauPdBF4XZqk6mLGl657x2vD0O/nFAIWLF500snT/ZftsQ3psEOKunzMHeeaHAeoO
-	QrS8hDRGt0nAPHZe6r2PW34mJ0WuxbsO7lYvGJFpB04kIGZuw26vU3mhoqQbZngNFIByJdJlN76+H
-	5rSl6jD0nw5JSBN4cXCPLxkmYe4BdTJlYA1DKdDLrZb6c/vJn26vJDPRN/Iq80/pvnioPZuY/Fj5y
-	Jhy3bIYpchw6GFfYpP5OHbSRccYspH291BptftKE1W9m0l/UF96XI9nz2U2jkJxlUO2c+uaM3MltO
-	Fz0E78XA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56170)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1wBLdI-000000005UU-3PWl;
-	Sat, 11 Apr 2026 00:51:28 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1wBLdH-0000000065H-22vA;
-	Sat, 11 Apr 2026 00:51:27 +0100
-Date: Sat, 11 Apr 2026 00:51:27 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Biju Das <biju.das.jz@bp.renesas.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Ovidiu Panait <ovidiu.panait.rb@renesas.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Prabhakar Mahadev Lad <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-	"linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>
-Subject: Re: [PATCH net-next] net: phy: call phy_init_hw() in phy resume path
-Message-ID: <admM_1bf6frKfLJ9@shell.armlinux.org.uk>
-References: <20260410142904.439666-1-biju.das.jz@bp.renesas.com>
- <adkOZl4gt5UoGv-0@shell.armlinux.org.uk>
- <adkPXI9pz1RCYpJ8@shell.armlinux.org.uk>
- <TY3PR01MB113466D8DD83EC0B48D8262CA86592@TY3PR01MB11346.jpnprd01.prod.outlook.com>
+	s=arc-20240116; t=1775865212; c=relaxed/simple;
+	bh=mrxyZ1+eCVyF7rvafNu6lasPaZuGp06j3PNNa2491SU=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=W+0qgyPAXTy1IZnvbiKHJcqeq0s/kttBHAjLfrwR+N5MAi23HYSPr+reKEL24CQtr8X6gBf34t0zbCBQMLRZWQ0qlfLt9BRVJy8I2qYO4DjYX3QmGqiGc0birHB/HCklvCz9dGxpQf4+TyW6K/teXwW+QAOXDx/tcT+OtP2RmrQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=h3TxYomg; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2b0f4e632caso36595965ad.3
+        for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 16:53:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1775865211; x=1776470011; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Nr1g2FHUeGn3VK0c3AFEuLVs4Ynz9EITyADBY3TVcYU=;
+        b=h3TxYomgtI9uIurjctUS9iyY6q8Ekon0cLiT98+O4QzRrraWsErofLYgQRzkJVBtME
+         vAV1huTqAaX9HPjepUhgtZwuNMdE7HP48i3WFX/Sxxdi9NPxQ8XWPntJlH1fZ96wXKy1
+         FWWKEMy7IhGCthGiG4Wgn3HzMw3y/I3YAkL2KiLGCsAGUGHXsvdWLdDrB9IeFOQeRYMF
+         jPOHCs0nSet+lFrsUrdyRLYg0PYiGEvUudHj2eOCfai1BsIRi1AOC0BZFbgyikDHB9+B
+         I88k40pMclvFUfVCc+9Ccet2fP7vhzVK9WPisyQSizTEfXiqhh66V9oFhAzfs2I5ItOl
+         UK6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775865211; x=1776470011;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Nr1g2FHUeGn3VK0c3AFEuLVs4Ynz9EITyADBY3TVcYU=;
+        b=HD/cni2y2vMEhTXlglNZcV8ausCF3vicrGMMMPTc9/yM4i3aJL/wIXuTDozY1uXfgs
+         8nJ07Xs7TIv3UpW30CDMAvgJa+oI0JQk2QRBfcXB8MqaVGdH8UM1U+1/AMUIvbyvXhiF
+         SW+CCq1477bzHUX4VFXxIsZvqVeLDwlmQHHaOvESfs762wZnj311166Jp818RABdBGic
+         hmKdv0B2BdoPQrOZ8DpHiEJOkKgXjH3JuMtWWUxFQdP4RU3SwMT0ojuc6vJMQwXOmbxk
+         g2opERKUE7YS3nPVmLgNAvNBvBE11HwUg7tS0MW/cEwW6pN/ks1H1zut3mvu/yaRrtoz
+         kTAw==
+X-Forwarded-Encrypted: i=1; AJvYcCWTRzPVfL+qEtaOlKZka8R8Oz0EOUKwloWuynbiXPBwEFtOPY4zGNAK3ja3gKF34+01EUzNwUc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxBwtbLFWF6VZyeEPaLmCjNrXzE4KL11wUPJUXsoUnYlJODq8bI
+	FDGjVUs2CVPkyP5nNjAMux+s318qmLFbRbLuiWhTpBhA9tLAixC7BzqU7KNN60fQswHJt0Z5zey
+	z4sAhLw==
+X-Received: from plsr17.prod.google.com ([2002:a17:902:be11:b0:2b0:ae6f:27e0])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d2cb:b0:2b0:bed1:46f7
+ with SMTP id d9443c01a7336-2b2d5a74a4amr50685925ad.37.1775865210800; Fri, 10
+ Apr 2026 16:53:30 -0700 (PDT)
+Date: Fri, 10 Apr 2026 23:53:27 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <TY3PR01MB113466D8DD83EC0B48D8262CA86592@TY3PR01MB11346.jpnprd01.prod.outlook.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spamd-Result: default: False [1.14 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.1213.gd9a14994de-goog
+Message-ID: <20260410235328.1773449-1-kuniyu@google.com>
+Subject: [PATCH v1 net] tcp: Don't set treq->req_usec_ts in cookie_tcp_reqsk_init().
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: Eric Dumazet <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,renesas.com,vger.kernel.org,glider.be,bp.renesas.com];
+	TAGGED_FROM(0.00)[bounces-277618-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,gmail.com,vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-277617-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	NEURAL_HAM(-0.00)[-0.980];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,renesas];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:email,armlinux.org.uk:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,renesas.com:email,shell.armlinux.org.uk:mid]
-X-Rspamd-Queue-Id: C66883DD935
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 969593DD958
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Apr 10, 2026 at 05:27:02PM +0000, Biju Das wrote:
-> Hi Russell King/ Andrew,
-> 
-> > -----Original Message-----
-> > From: Russell King <linux@armlinux.org.uk>
-> > Sent: 10 April 2026 15:55
-> > Subject: Re: [PATCH net-next] net: phy: call phy_init_hw() in phy resume path
-> > 
-> > On Fri, Apr 10, 2026 at 03:51:18PM +0100, Russell King (Oracle) wrote:
-> > > On Fri, Apr 10, 2026 at 03:29:01PM +0100, Biju wrote:
-> > > > From: Ovidiu Panait <ovidiu.panait.rb@renesas.com>
-> > > >
-> > > > When mac_managed_pm flag is set, mdio_bus_phy_resume() is skipped,
-> > > > so phy_init_hw(), which performs soft_reset and config_init, is not
-> > > > called during resume.
-> > > >
-> > > > This is inconsistent with the non-mac_managed_pm path, where
-> > > > mdio_bus_phy_resume() calls phy_init_hw() before phy_resume() on
-> > > > every resume.
-> > > >
-> > > > To align both paths, add a phy_init_hw() call at the top of
-> > > > __phy_resume(), before invoking the driver's resume callback. This
-> > > > guarantees the PHY undergoes soft reset and re-initialization
-> > > > regardless of whether PM is managed by the MAC or the MDIO bus.
-> > > >
-> > > > Signed-off-by: Ovidiu Panait <ovidiu.panait.rb@renesas.com>
-> > > > Signed-off-by: Biju Das <biju.das.jz@bp.renesas.com>
-> > > > ---
-> > > >  drivers/net/phy/phy_device.c | 4 ++++
-> > > >  1 file changed, 4 insertions(+)
-> > > >
-> > > > diff --git a/drivers/net/phy/phy_device.c
-> > > > b/drivers/net/phy/phy_device.c index 0edff47478c2..8255f4208d66
-> > > > 100644
-> > > > --- a/drivers/net/phy/phy_device.c
-> > > > +++ b/drivers/net/phy/phy_device.c
-> > > > @@ -2008,6 +2008,10 @@ int __phy_resume(struct phy_device *phydev)
-> > > >  	if (!phydrv || !phydrv->resume)
-> > > >  		return 0;
-> > > >
-> > > > +	ret = phy_init_hw(phydev);
-> > > > +	if (ret)
-> > > > +		return ret;
-> > >
-> > > Do we want to do this even when phydrv->resume is NULL?
-> > 
-> > I should've also added (sorry, busy packing) - with it always being called even when phydrv->resume is
-> > NULL, it means that the call sites to phy_resume() in phylib which are preceeded by a call to
-> > phy_init_hw() should have that call removed, otherwise we're going to be calling phy_init_hw() twice.
-> > 
-> > As the patch currently stands, that's the case when phydrv->resume is populated, and I think we should
-> > avoid that.
-> > 
-> > > Apart from that, looks fine to me - it seems some paths call
-> > > phy_init_hw() can be called with or without phydev->lock held, and
-> > > this one will call it with the lock held which seems to be okay.
-> 
-> 
-> The new patch will be like this, after moving phy_init_hw() without
-> phydev->lock held. Please let me know are you ok with this?
-> 
-> 
-> diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-> index 0edff47478c2..4a2b19d39373 100644
-> --- a/drivers/net/phy/phy_device.c
-> +++ b/drivers/net/phy/phy_device.c
-> @@ -396,10 +396,6 @@ static __maybe_unused int mdio_bus_phy_resume(struct device *dev)
->  	WARN_ON(phydev->state != PHY_HALTED && phydev->state != PHY_READY &&
->  		phydev->state != PHY_UP);
->  
-> -	ret = phy_init_hw(phydev);
-> -	if (ret < 0)
-> -		return ret;
-> -
->  	ret = phy_resume(phydev);
->  	if (ret < 0)
->  		return ret;
-> @@ -1857,16 +1853,14 @@ int phy_attach_direct(struct net_device *dev, struct phy_device *phydev,
->  	if (dev)
->  		netif_carrier_off(phydev->attached_dev);
->  
-> -	/* Do initial configuration here, now that
-> +	/* Do initial configuration inside phy_init_hw(), now that
->  	 * we have certain key parameters
->  	 * (dev_flags and interface)
->  	 */
-> -	err = phy_init_hw(phydev);
-> +	err = phy_resume(phydev);
->  	if (err)
->  		goto error;
->  
-> -	phy_resume(phydev);
-> -
->  	/**
->  	 * If the external phy used by current mac interface is managed by
->  	 * another mac interface, so we should create a device link between
-> @@ -2020,6 +2014,10 @@ int phy_resume(struct phy_device *phydev)
->  {
->  	int ret;
->  
-> +	ret = phy_init_hw(phydev);
-> +	if (ret)
-> +		return ret;
-> +
->  	mutex_lock(&phydev->lock);
->  	ret = __phy_resume(phydev);
->  	mutex_unlock(&phydev->lock);
+Commit de5626b95e13 ("tcp: Factorise cookie-independent fields
+initialisation in cookie_v[46]_check().") miscategorised
+tcp_rsk(req)->req_usec_ts init to cookie_tcp_reqsk_init(),
+which is used by both BPF/non-BPF SYN cookie reqsk.
 
-Looks good to me. Thanks!
+Rather, it should have been moved to cookie_tcp_reqsk_alloc() by
+commit 8e7bab6b9652 ("tcp: Factorise cookie-dependent fields
+initialisation in cookie_v[46]_check()") so that only non-BPF SYN
+cookie sets tcp_rsk(req)->req_usec_ts to false.
 
+Let's move the initialisation to cookie_tcp_reqsk_alloc() to
+respect bpf_tcp_req_attrs.usec_ts_ok.
+
+Fixes: e472f88891ab ("bpf: tcp: Support arbitrary SYN Cookie.")
+Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+---
+ net/ipv4/syncookies.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/ipv4/syncookies.c b/net/ipv4/syncookies.c
+index fc3affd9c801..b5f0a65c6786 100644
+--- a/net/ipv4/syncookies.c
++++ b/net/ipv4/syncookies.c
+@@ -286,7 +286,6 @@ static int cookie_tcp_reqsk_init(struct sock *sk, struct sk_buff *skb,
+ 	treq->rcv_isn = ntohl(th->seq) - 1;
+ 	treq->snt_isn = ntohl(th->ack_seq) - 1;
+ 	treq->syn_tos = TCP_SKB_CB(skb)->ip_dsfield;
+-	treq->req_usec_ts = false;
+ 
+ #if IS_ENABLED(CONFIG_MPTCP)
+ 	treq->is_mptcp = sk_is_mptcp(sk);
+@@ -349,6 +348,7 @@ struct request_sock *cookie_tcp_reqsk_alloc(const struct request_sock_ops *ops,
+ 	ireq->wscale_ok = tcp_opt->wscale_ok;
+ 	ireq->ecn_ok = !!(tcp_opt->rcv_tsecr & TS_OPT_ECN);
+ 
++	treq->req_usec_ts = false;
+ 	treq->ts_off = tsoff;
+ 
+ 	return req;
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.53.0.1213.gd9a14994de-goog
+
 
