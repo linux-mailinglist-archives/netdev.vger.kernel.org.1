@@ -1,87 +1,87 @@
-Return-Path: <netdev+bounces-277324-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277325-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qIuZDxfQ2GngiQgAu9opvQ
-	(envelope-from <netdev+bounces-277324-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 12:25:27 +0200
+	id yAVdES/Q2GngiQgAu9opvQ
+	(envelope-from <netdev+bounces-277325-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 12:25:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96E013D5A4B
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 12:25:26 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B39CD3D5A59
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 12:25:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A508E3031800
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 10:16:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 45ABA30038F1
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 10:17:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 694E03590A9;
-	Fri, 10 Apr 2026 10:16:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 187C437A4B9;
+	Fri, 10 Apr 2026 10:16:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WIb8/n3L"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tMqOunTc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D5EE3176E4
-	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 10:16:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C5C937C92E
+	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 10:16:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775816207; cv=none; b=g8pf6Bkgpiwq8FCR9ZalFoFZnBGC0IuegiHm9/jHVfb82zLN0u4mU4Bq4uRC6vFbtZBvCzS63Eq94c64AVaGxma8PX4N9R/1Wq74FiPSedyxYi6z50Wmex8NXUgBik+lUWpbgbO+LkZmAw6CbcTBKSJWdCTqbG+0DA4OMh6KTwQ=
+	t=1775816217; cv=none; b=T7IdBmufppbutg/DItPmFViKqxgLof++vogA9ZM5h+89DkLfKVtblV0pT2pWV8cFcLtnwM7d7oBq99aOF/JnGhy8RIOc85V0qMIWpxWXkFD+/3rITV+g54gLbcztb78buXCJR9laJvYhKrzYVRgw0O0cSuRioO7zSGyI8QngLHE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775816207; c=relaxed/simple;
-	bh=bTdNN7WD8kntYv71PIB4Ub29LjSLZkiKY6rDfVA+DbM=;
+	s=arc-20240116; t=1775816217; c=relaxed/simple;
+	bh=fuk6qNyCmgMZlA5RHX/rS5hn/FQZ7HEg91OJs5ukSHg=;
 	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=ky5HX739FYkLk1OCjJAjo2gINf7UHrOKb1M08s0jaiiPJ8I2bdVicD2XIyVo0v4hqrlxd9l4cGmNc78VqQ5bOSaOpe+IiC/kowy64WifORLWpGXhJtx6UCXoYH5bi3kxz+lMIz5MiUEOFXbFdvY6MEF9V5ddU95MrIgjrQhZ5Sw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WIb8/n3L; arc=none smtp.client-ip=209.85.128.53
+	 Content-Disposition; b=lbjzuUrgTyW1xNXsYMA+lEHfqVI1+RRBM7ni/5ngyIUMv5VUL4ltIlTcYxcZ62ANZCRGCXuhm19oappBC/ToBE7H+CvuTf5Z4FpjHa80LB8J61919/2zb00Smr94I0T0R3zdjsIhWmugYovc+iqziKwTWzKczWmEwNz6EJQVEa4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=tMqOunTc; arc=none smtp.client-ip=209.85.221.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-488a9033b2cso21487495e9.2
-        for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 03:16:45 -0700 (PDT)
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-43d01d6b50cso1853402f8f.1
+        for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 03:16:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775816204; x=1776421004; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1775816214; x=1776421014; darn=vger.kernel.org;
         h=content-disposition:mime-version:message-id:subject:cc:to:from:date
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=txmLoGCoKgdrToFXN0Js/UfR4KtS11aCDlbGXLQF5Qc=;
-        b=WIb8/n3L52z1//XKP+5Mnn+B9Gsnm0zFipqpnM0UPbCDNAlgr16n4rlphuwp/sHFgT
-         W+xocDDTNTcaYGei5Gih/qvl7m1NHHZEOk3xbuezdgLNc0TzLd6FsFRRyOqy/O3CRRWE
-         haaNfiCSoE2xXTCMHWMNWmDsxLzXaXcc5lbmsNHcU33cyRty9cMyz4guruQDnj0Kq3Lm
-         I7BKvJ63wzz1UOxEsdQqNoD3CbVofofjJhuhC0LsQvANw6irwaF2Mu064au2BNJai6z9
-         3EK8S6SFg+XE9/RU6Wg3jqJv3L1MS+SozMe089Uyf3beimWlivwEoHCgM/CbIEsVqpQo
-         IaOA==
+        bh=DfD9YHLFclioPj5l69dZ4W8ACXiR28AggmGdPC5XxUk=;
+        b=tMqOunTczOSp08m1cLoYnDx0zE3AOVTm4Rafk2LQ2PeiO36RVfxAd5x2Qvi6qKg8+o
+         Eh20MM2z+tJYWjAeQuMZJeHopDe4xmTYeufPTRwqAa7pqpq/zRreMHNy9JjrbjucMuLT
+         wX6V2nqAV9rxI+sIzfTXJcfiKUnrza5rPedghGn63/El0jVJCkCgKGGmPo7iETVaYZ7l
+         Z8m+oRLU8/bYtulxwkkjwQJoc3e/WklwM/31x09YdVMg4XwxstIS7JNFW49DgIHwN0ok
+         0o5QZqNzRo9gz5djdYmwUvQpzEH6ouT8EmuOb5VtsAHi4YZ2vxUwI7KsaRcVHqqUUQQj
+         aivg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775816204; x=1776421004;
+        d=1e100.net; s=20251104; t=1775816214; x=1776421014;
         h=content-disposition:mime-version:message-id:subject:cc:to:from:date
          :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=txmLoGCoKgdrToFXN0Js/UfR4KtS11aCDlbGXLQF5Qc=;
-        b=fyDtobPlIzz3qQrXmAjSJ2/95P5YtMbpcspkhCFj6vPuq97Yg7WDbvopzn9N6HogOa
-         6k++GOzVOAOjzoYn55wfAUy4u54QSuZlgnlbbiNwP2XfrCzp9qrOE8+hcFzWN+f46ROO
-         3TcM2Moed5/VXeUTI8V7W0O0c/ZI8jPgxjojMtXoGibpyCKRzz1tUivp9kSTXc5kzuka
-         U+1YaELKGK9BmNEk2UVeTpoU5hmuKgIMZ0ZKkUFWbfJ8sM1WRbLsZkiioGTl22aFhkGu
-         BC/QOPKBxU3Qm58ay3qLnLrNE8+V099EyDScdpi4NWkZp3mRgdEbT6wAWUyY1Z3xIe4f
-         49zw==
-X-Forwarded-Encrypted: i=1; AJvYcCWn7fhNoszn7F9Q8G31PA5uJ5I+LyWHbfcN208sD6/gmw5TwJg36Uj7wsl0RwIVAEELJ5CHrn0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwvntGos9Ad4jIka4vxUZxlgUkzsnZxl+0Qi0VbYIovH7Kngbeu
-	vIdTgkh2A0+2cKHsH0XHG/GNI0SYyASBDormfgtBqqUHJl48blWcpjNq
-X-Gm-Gg: AeBDieuTEaPQ0bISAHo39ClaKItqy3t7OlFZFG19H01hX4MpRN7HJDIEyJgbfyuHNPT
-	ljgH2On4UqF++4f9jJuDvs/DL+AchdJOQ8N39z6DPpTbEXW4ab90lvU4Ie/Uo34ccWhuPmu7HEW
-	JlRTwHfJToHwgkhMVdGS6BKzGF5zsXJehMATFjN7Bjlj1Q0OJSR/1HNZy6uhTCHMZOU39l2QEg7
-	JDbd3pw+vsC4xMuKNbODNmHctThUNMDlBfF5F+7nViCL0yfaSMfCwIijbp6qgF53j9RrIwu5V+I
-	IFF29t1QGYQzNBesQ1X4K6H93yrGEeyoLIgF81Y6/MogUEIRGODF8DqZ/g0vrEJAB2m5IOp0Po6
-	9LZEm4pzctFWgA/iBhhg2+Pz1GZls2E+KQlM1pn0tQ9hxIOF27h7/M+hSdBFmiIZ46kCM1socCD
-	O95G7C/n692WeHam/nP2n2pRy9Cj2IxA==
-X-Received: by 2002:a05:600d:d:b0:485:4eaf:eb54 with SMTP id 5b1f17b1804b1-488d684b88amr24792675e9.20.1775816204398;
-        Fri, 10 Apr 2026 03:16:44 -0700 (PDT)
+        bh=DfD9YHLFclioPj5l69dZ4W8ACXiR28AggmGdPC5XxUk=;
+        b=Fq8eqABq1jdjVGQx/VpIdc1Pe5wtcoignCnr+Fe/a0EXOoVKtrzahmI76wkuV5Vpvf
+         l+3vfdt4tUtCh97JIGKf6+M1+jUkruGNzya2+6Lwm3aGNysFARj5efpXZq+I6Kf2rc0O
+         A82AZd8uzlXIR8/KF1KeOSAbl+Sou8d+zlnPlO3XhCCJCseG89x0gYd6G0tdrceV62NS
+         YaHeQ58xn56cQglzW0BahgUxJNrjRNk2cHGSplUU+e4+XETc664Zl3aL6N/zNdAmV25C
+         U39YnADUmQM+D4fXjCmHqfsCUnnHBjZAuFEuxBrwrEz1WRa4NX6zEItI11DV5q3rqyFs
+         2Iug==
+X-Forwarded-Encrypted: i=1; AJvYcCVH0S2kobYnuMPs1VK/wqVnRnGqm2pEybgjOe0L8iiOISswsRCPpZF2d40AE2V9V828j/VW+u8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw5xDAkNGQ9Ckt9IjVVInCDOprBzkwjARus9scWKPEOaCkhZxO6
+	4nHan3xI0FMthpHfl+vH09KgVX1bZ9dGfiEtzpFxemGTjX4+j5H8qMVfeO9UPRdY
+X-Gm-Gg: AeBDieuY/WaUUWrQh4Pxjb2UbK7FkeUFCN070mH7yGLMq6/nrSy+Q5knVk6a5mzJHRE
+	Ede3LhDAjb1rU3mzqCkOUQAlabecnuqdmd8i5OHTGh7CCp72LowwH46yBl2xSy1j2qIetwMPZ/N
+	FA/Uz9FxAFsoFaBGT0pmQ+fqS/MMZEScLLSByKnZuftQUdlhYaW9fHrlZDVhsQ8pgYlSbz9rB4S
+	2RUt8TXS+JYtfsTZpIb0bd3nFX8QBDvoVAWcrEhBuUReEBBUHeo4P058GZ6sYSd4LZfBM4+LwCV
+	uGTkSwNiuQNIuVmdTWUNyDK61o65fDYm6jRJKECVSOvh9NXQSS7MdgYmBS6AZ9Hqz7+OWcTdrrQ
+	UYPIzCBmiIc6ELIY8JprDQ7dy6w6tvowqvpupvmaquL/y35sLp5c2R6hCbZPD4VsAsS8BFKrmXT
+	ngXrStte7Bf9x0Ai/6Wxk=
+X-Received: by 2002:a05:6000:4284:b0:43b:9c02:50ca with SMTP id ffacd0b85a97d-43d64286bb3mr3946797f8f.4.1775816213540;
+        Fri, 10 Apr 2026 03:16:53 -0700 (PDT)
 Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488d5396293sm55661675e9.15.2026.04.10.03.16.43
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43d63deb904sm6848506f8f.9.2026.04.10.03.16.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Apr 2026 03:16:43 -0700 (PDT)
-Date: Fri, 10 Apr 2026 13:16:41 +0300
+        Fri, 10 Apr 2026 03:16:52 -0700 (PDT)
+Date: Fri, 10 Apr 2026 13:16:49 +0300
 From: Dan Carpenter <error27@gmail.com>
-To: Yiqi Sun <sunyiqixm@gmail.com>,
-	Fernando Fernandez Mancera <fmancera@suse.de>
+To: Jiayuan Chen <jiayuan.chen@shopee.com>
 Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
-Subject: [bug report] ipv4: icmp: fix null-ptr-deref in icmp_build_probe()
-Message-ID: <adjOCdCW1EpPl8lf@stanley.mountain>
+Subject: [bug report] xfrm: fix ip_rt_bug race in icmp_route_lookup reverse
+ path
+Message-ID: <adjOEUXsHTZoB43e@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,73 +94,168 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-277324-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com,suse.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-277325-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[error27@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	RCPT_COUNT_THREE(0.00)[3];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,stanley.mountain:mid]
-X-Rspamd-Queue-Id: 96E013D5A4B
+X-Rspamd-Queue-Id: B39CD3D5A59
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello Yiqi Sun,
+Hello Jiayuan Chen,
 
-Commit fde29fd93493 ("ipv4: icmp: fix null-ptr-deref in
-icmp_build_probe()") from Apr 2, 2026 (linux-next), leads to the
-following Smatch static checker warning:
+Commit 81b84de32bb2 ("xfrm: fix ip_rt_bug race in icmp_route_lookup
+reverse path") from Feb 6, 2026 (linux-next), leads to the following
+Smatch static checker warning:
 
-	net/ipv4/icmp.c:1351 icmp_build_probe()
-	warn: 'dev' is not an error pointer
+	net/ipv4/icmp.c:587 icmp_route_lookup()
+	error: we previously assumed 'rt2' could be null (see line 576)
 
 net/ipv4/icmp.c
-    1341 #if IS_ENABLED(CONFIG_IPV6)
-    1342                 case ICMP_AFI_IP6:
-    1343                         if (iio->ident.addr.ctype3_hdr.addrlen != sizeof(struct in6_addr))
-    1344                                 goto send_mal_query;
-    1345                         dev = ipv6_dev_find(net, &iio->ident.addr.ip_addr.ipv6_addr, dev);
-    1346 
-    1347                         /*
-    1348                          * If IPv6 identifier lookup is unavailable, silently
-    1349                          * discard the request instead of misreporting NO_IF.
-    1350                          */
---> 1351                         if (IS_ERR(dev))
-    1352                                 return false;
+    491 static struct rtable *icmp_route_lookup(struct net *net, struct flowi4 *fl4,
+    492                                         struct sk_buff *skb_in,
+    493                                         const struct iphdr *iph, __be32 saddr,
+    494                                         dscp_t dscp, u32 mark, int type,
+    495                                         int code, struct icmp_bxm *param)
+    496 {
+    497         struct net_device *route_lookup_dev;
+    498         struct dst_entry *dst, *dst2;
+    499         struct rtable *rt, *rt2;
+    500         struct flowi4 fl4_dec;
+    501         int err;
+    502 
+    503         memset(fl4, 0, sizeof(*fl4));
+    504         fl4->daddr = (param->replyopts.opt.srr ?
+    505                       param->replyopts.opt.faddr : iph->saddr);
+    506         fl4->saddr = saddr;
+    507         fl4->flowi4_mark = mark;
+    508         fl4->flowi4_uid = sock_net_uid(net, NULL);
+    509         fl4->flowi4_dscp = dscp;
+    510         fl4->flowi4_proto = IPPROTO_ICMP;
+    511         fl4->fl4_icmp_type = type;
+    512         fl4->fl4_icmp_code = code;
+    513         route_lookup_dev = icmp_get_route_lookup_dev(skb_in);
+    514         fl4->flowi4_oif = l3mdev_master_ifindex(route_lookup_dev);
+    515 
+    516         security_skb_classify_flow(skb_in, flowi4_to_flowi_common(fl4));
+    517         rt = ip_route_output_key_hash(net, fl4, skb_in);
+    518         if (IS_ERR(rt))
+    519                 return rt;
+    520 
+    521         /* No need to clone since we're just using its address. */
+    522         rt2 = rt;
+    523 
+    524         dst = xfrm_lookup(net, &rt->dst,
+    525                           flowi4_to_flowi(fl4), NULL, 0);
+    526         rt = dst_rtable(dst);
+    527         if (!IS_ERR(dst)) {
+    528                 if (rt != rt2)
+    529                         return rt;
+    530                 if (inet_addr_type_dev_table(net, route_lookup_dev,
+    531                                              fl4->daddr) == RTN_LOCAL)
+    532                         return rt;
+    533         } else if (PTR_ERR(dst) == -EPERM) {
+    534                 rt = NULL;
+    535         } else {
+    536                 return rt;
+    537         }
+    538         err = xfrm_decode_session_reverse(net, skb_in, flowi4_to_flowi(&fl4_dec), AF_INET);
+    539         if (err)
+    540                 goto relookup_failed;
+    541 
+    542         if (inet_addr_type_dev_table(net, route_lookup_dev,
+    543                                      fl4_dec.saddr) == RTN_LOCAL) {
+    544                 rt2 = __ip_route_output_key(net, &fl4_dec);
+    545                 if (IS_ERR(rt2))
+    546                         err = PTR_ERR(rt2);
+    547         } else {
+    548                 struct flowi4 fl4_2 = {};
+    549                 unsigned long orefdst;
+    550 
+    551                 fl4_2.daddr = fl4_dec.saddr;
+    552                 rt2 = ip_route_output_key(net, &fl4_2);
+    553                 if (IS_ERR(rt2)) {
+    554                         err = PTR_ERR(rt2);
+    555                         goto relookup_failed;
+    556                 }
+    557                 /* Ugh! */
+    558                 orefdst = skb_dstref_steal(skb_in);
+    559                 err = ip_route_input(skb_in, fl4_dec.daddr, fl4_dec.saddr,
+    560                                      dscp, rt2->dst.dev) ? -EINVAL : 0;
+    561 
+    562                 dst_release(&rt2->dst);
+    563                 rt2 = skb_rtable(skb_in);
+    564                 /* steal dst entry from skb_in, don't drop refcnt */
+    565                 skb_dstref_steal(skb_in);
+    566                 skb_dstref_restore(skb_in, orefdst);
+    567 
+    568                 /*
+    569                  * At this point, fl4_dec.daddr should NOT be local (we
+    570                  * checked fl4_dec.saddr above). However, a race condition
+    571                  * may occur if the address is added to the interface
+    572                  * concurrently. In that case, ip_route_input() returns a
+    573                  * LOCAL route with dst.output=ip_rt_bug, which must not
+    574                  * be used for output.
+    575                  */
+    576                 if (!err && rt2 && rt2->rt_type == RTN_LOCAL) {
+                                    ^^^
+Can rt2 really be NULL here?
 
-It looks like there were two patches that went in around the same
-time.  Commit fde29fd93493 ("ipv4: icmp: fix null-ptr-deref in
-icmp_build_probe()") updated the checking for
-ipv6_stub->ipv6_dev_find() but d98adfbdd5c0 ("ipv4: drop ipv6_stub usage
-and use direct function calls") changed it to not return error pointers.
+    577                         net_warn_ratelimited("detected local route for %pI4 during ICMP sending, src %pI4\n",
+    578                                              &fl4_dec.daddr, &fl4_dec.saddr);
+    579                         dst_release(&rt2->dst);
+    580                         err = -EINVAL;
+    581                 }
+    582         }
+    583 
+    584         if (err)
+    585                 goto relookup_failed;
+    586 
+--> 587         dst2 = xfrm_lookup(net, &rt2->dst, flowi4_to_flowi(&fl4_dec), NULL,
+                                        ^^^^^^^^^
+Because, if so, then we are screwed here.
 
-This IS_ERR() check can be removed.
 
-    1353 
-    1354                         dev_hold(dev);
-    1355                         break;
-    1356 #endif
-    1357                 default:
-    1358                         goto send_mal_query;
-    1359                 }
+    588                            XFRM_LOOKUP_ICMP);
+    589         rt2 = dst_rtable(dst2);
+    590         if (!IS_ERR(dst2)) {
+    591                 dst_release(&rt->dst);
+    592                 rt = rt2;
+    593         } else if (PTR_ERR(dst2) == -EPERM) {
+    594                 if (rt)
+    595                         dst_release(&rt->dst);
+    596                 return rt2;
+    597         } else {
+    598                 err = PTR_ERR(dst2);
+    599                 goto relookup_failed;
+    600         }
+    601         return rt;
+    602 
+    603 relookup_failed:
+    604         if (rt)
+    605                 return rt;
+    606         return ERR_PTR(err);
+    607 }
 
 This email is a free service from the Smatch-CI project [smatch.sf.net].
 
