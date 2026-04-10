@@ -1,201 +1,265 @@
-Return-Path: <netdev+bounces-277310-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277311-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YE18CBnF2Gk4hwgAu9opvQ
-	(envelope-from <netdev+bounces-277310-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 11:38:33 +0200
+	id YBbUKJHG2GlQiAgAu9opvQ
+	(envelope-from <netdev+bounces-277311-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 11:44:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85A753D506B
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 11:38:32 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BAAC3D5209
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 11:44:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 67688307ABA2
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 09:35:17 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3A298303A3F3
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 09:38:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6E6F36EA8C;
-	Fri, 10 Apr 2026 09:34:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56BB23C198C;
+	Fri, 10 Apr 2026 09:36:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gjPKKK5X";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="di6hxw8J"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="HxvQTsky"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76C6B3B8BA1
-	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 09:34:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7D113C1983;
+	Fri, 10 Apr 2026 09:36:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775813674; cv=none; b=Aksyxhved9ErVtWVuk3pa+WimIidyY7F4nrJASR4tjcum9d2awywrLPHS27TpLHr5/l0g6Xd4JbhRKB7jjHWXaxz+ql78fQATHrVFlIfmoB+33HTYZLxMNUyEDmnaSv473Qqhs3Uio/n65Gc9cVF3+uE3yhtd0L4XC5mA8c86u4=
+	t=1775813765; cv=none; b=EMUxNjjds8dE6a/qfnP7UwU1rKPiU7ESv2vQ0jIrCJghAMRhGbzrLuXudDp25y+8gYYbXIVe/lpzBxaLG88353ua0O5T1xV+9Dm1dUmqPaNp83yys3IXOrSelxboKqa9RJWAY76SuCHXtrSsl38aqzSEG7199ml3r7Jlf/xCJq0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775813674; c=relaxed/simple;
-	bh=tzEUoH0FkVHlL1WtFfjdSc5lPF5SeHrWnmDDZ0MF4V4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pdPa/+c0dLjlEHnvG7tjPjd5y7o37CEz9Y561ZO/xJ9xUlLhCzwnpF0Yusyl9M+RpOzAncpCc/BBf+ETnST/phQjt7yuD8/5Di/mB9tWDQl0XkbhHq79MQ4RVXpMX5vyZzAQ0YbvweUpinoTb811l0JogSX8UCcY8WsAx/EzV34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gjPKKK5X; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=di6hxw8J; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1775813672;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qOOTcFGxnrzrTtnktwvjMFoVHaeGEwhYa6Pm50725v8=;
-	b=gjPKKK5X8BATwEStCCEFhdJa7yhM53U89EANxWmTpcaH/BTBFvVR5OJ3DOMYcufLS8bFvS
-	hJ/Hl5CYGDN0jEN8UQljtaXMZ8Jtjn1v1xoKjTDPptPT3h659kVwEDchlKwpZLWLLypcmp
-	P+dsA9b23xky1XKIw/9jD2pN9C9xZmc=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-194-ClnwTugEM1-fe97EvZP-Dw-1; Fri, 10 Apr 2026 05:34:31 -0400
-X-MC-Unique: ClnwTugEM1-fe97EvZP-Dw-1
-X-Mimecast-MFC-AGG-ID: ClnwTugEM1-fe97EvZP-Dw_1775813670
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-43d03065782so1066982f8f.0
-        for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 02:34:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1775813670; x=1776418470; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=qOOTcFGxnrzrTtnktwvjMFoVHaeGEwhYa6Pm50725v8=;
-        b=di6hxw8JCjL86FnefMybI4Qfme165IL+XX81m/caraMlhiN4IW0mwY8ZUiXdmFC4JM
-         VRf7+421MH8sjpvsVXzG6qX/ly1gJGQ50iPHAgVX6UN0rsTyIMeHOgAWG1gluSlo9gQg
-         v53iFNoBlppgoPxbCWKQcI6pEriTRISTDPr9yRj+oXRCQfVH6LCx5dnVmV5ko4jxPnwZ
-         6OVZ9jTFlBtgvfjCmHZQAp6RxgtVWfLrJTq2ZqNn96hJoZ+16OO9AgXDlJwBtuemFFsv
-         QUkSC499vfP0CjvhFF/xRc3Y/QennA17bw82rwsRlUU56w6Cvdl/fQ7LTMrwnZetWTBn
-         QMUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775813670; x=1776418470;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qOOTcFGxnrzrTtnktwvjMFoVHaeGEwhYa6Pm50725v8=;
-        b=lUevwBSH9eHNVV2DvKhs416LuCUFukkYRM23J/+L+SgZDkyE0k/QWe6UtTd2jPVvY+
-         bNiAieMv44QR6mCJFgU+Q+zs6glWlJTayLZXPl/lK7uYrcdSd+8+A7hDERJiHgvpmxzM
-         LrMLWROeewvMq9LoZ15knXG1zSvI/6smMaYK3BMiXhJg/LF/Oc90l2yU6uT1lDAlbGXh
-         vhz9pfUGJu8eMyBVP5zZqDKboUO6Imly4YwtntMzyOsI1+/sNyf3sW5pruFxT38aN7xm
-         IdyPI5VJhvgnUAOtu+D0cVjUjofvyxsPjOtERjA0+dHcJuSnvp4W83/GS5p8YZneNhbD
-         9o/g==
-X-Forwarded-Encrypted: i=1; AJvYcCVFBTqY4ql0KlQFsNY5m3TsrjfFIwiNOtPhKrrs5dA5ruUDTj8l/xHewP0UQWiyndVmMGtNk2k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzU/JlHMHMLTQ/aFiJjJGByLQAOtyFeAZ9yPAmUVs/t7TNhKEHX
-	CARLyLHeRn2C/dRUh/kIHqLsCQ3yeITwC6stI5H8S3L6xmLCn3vuIQ7Gf6SeYkNguB4xrkNAuZT
-	Jhx+EJrScVfu4sOm1zDj5AoZxj+VyyoFZp6VUpgtlikwd9nqPlR9ciwg/Rw==
-X-Gm-Gg: AeBDieu6ls8bRMyXBRyVUR6n/9BekputFk1E1SXtLB0Xq0sj/ukDu2U3mzn240OJfTu
-	g/9EWirsrRuNtBUdRMudBCfykyGhLwiisMG3zGZYmBsjoeTAT4jgJbhwvLBlKbbi8RryWal9viz
-	BN9GU8BarW1OiwC8GpGjRZZWZJqYaNg9wtpPnYgWRIDuWWyj10GmObgNcx35k6viVMVDARzh5PL
-	TF6QxEFRimwxr4EywAhWQLtZ8OuPiIRuDwMw0H/H5vvbKgIBu3rpP6I3kEyPdpEy90t9KAjIeAq
-	HQ7KGeq1RWFpFG3bfpaIto/VsAc/DCYj3uN+70y+N3bGwt7AJPHnmvL93W8t84reXc7bYsHy6dl
-	quUA0MFQ32P5i9gTVPyPi
-X-Received: by 2002:a5d:584b:0:b0:439:bdba:56be with SMTP id ffacd0b85a97d-43d64255118mr3234528f8f.10.1775813669867;
-        Fri, 10 Apr 2026 02:34:29 -0700 (PDT)
-X-Received: by 2002:a5d:584b:0:b0:439:bdba:56be with SMTP id ffacd0b85a97d-43d64255118mr3234492f8f.10.1775813669361;
-        Fri, 10 Apr 2026 02:34:29 -0700 (PDT)
-Received: from [192.168.2.83] ([46.175.183.46])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43d63de2a74sm6481641f8f.3.2026.04.10.02.34.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 10 Apr 2026 02:34:28 -0700 (PDT)
-Message-ID: <24a12da3-00f5-46ff-8719-b7a8654dd460@redhat.com>
-Date: Fri, 10 Apr 2026 11:34:27 +0200
+	s=arc-20240116; t=1775813765; c=relaxed/simple;
+	bh=M/uYTyeuN9fEg9NQih12G5o9aKb4P1e/IjDOSTk7gm8=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iYxULuZ/6gg0Ypp0YxCKJOQHLtTr4FfFPMh46TFg/f/DzAvdKDSpQMRjXuuubxJcMV+XYHb7W86dyPHHG/F5RR0mvRlZjluIGiSn24lwj5YWicx8rY3YTOmu/qV9Y0oC0LQzXGQ89LEev15/4Bv9epnrilbSLtgYMUQJoQagi1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=HxvQTsky; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63A7Xkei2131122;
+	Fri, 10 Apr 2026 02:35:42 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=CDH98RNRTLxPF0TY7GGANyGHl
+	UFwsYbxrwQBG7aqTsU=; b=HxvQTskyCdGgF0iQ9p67i2eJSPr5/Utiwb6qjwV0y
+	KirqT5KR65kFBLaQCHqJQH6ZAscfq+LarsSNDOTSWQZiTnrah+eyxwVuAPVKpCWw
+	dVupzbjrkz/lAfnVrt9SD/YkpZ5Vsk1Ie/ZsBeZnf2xX8UxAcHlKs+cfg80QvIPk
+	dS8zHKMHHPsVlb+EAqlvllUY8y3E6Qq1kLrV5KgSvSHerTGYoH5Yr42dyoVshZgO
+	KMIUvGEViAV2qTF5SDEvybRsFEGzapJx5ETcf+DXdXOnhncFgn19g++NmLlVMtLD
+	aFTpfWXwIdCUwwq20khMs6CANQKNb72nTKu1DUkCeUG9Q==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4de0u440ex-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 10 Apr 2026 02:35:42 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Fri, 10 Apr 2026 02:35:41 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Fri, 10 Apr 2026 02:35:41 -0700
+Received: from kernel-ep2 (unknown [10.29.36.53])
+	by maili.marvell.com (Postfix) with SMTP id 417893F7058;
+	Fri, 10 Apr 2026 02:35:37 -0700 (PDT)
+Date: Fri, 10 Apr 2026 15:05:36 +0530
+From: Subbaraya Sundeep <sbhatta@marvell.com>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <sgoutham@marvell.com>,
+        <gakula@marvell.com>, <bbhushan2@marvell.com>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        Linu Cherian <lcherian@marvell.com>
+Subject: Re: [net-next PATCH v5 1/4] octeontx2-af: npa: cn20k: Add NPA Halo
+ support
+Message-ID: <20260410093536.GA1783667@kernel-ep2>
+References: <1775728404-28451-1-git-send-email-sbhatta@marvell.com>
+ <1775728404-28451-2-git-send-email-sbhatta@marvell.com>
+ <00fc6c1e-638a-4e80-b3c4-14e4dfa3651a@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net 4/4] ice: fix
- ice_ptp_read_tx_hwtstamp_status_eth56g
-To: Jacob Keller <jacob.e.keller@intel.com>,
- Anthony Nguyen <anthony.l.nguyen@intel.com>,
- Intel Wired LAN <intel-wired-lan@lists.osuosl.org>, netdev@vger.kernel.org
-Cc: Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
- Timothy Miskell <timothy.miskell@intel.com>
-References: <20260408-jk-even-more-e825c-fixes-v1-0-b959da91a81f@intel.com>
- <20260408-jk-even-more-e825c-fixes-v1-4-b959da91a81f@intel.com>
-Content-Language: en-US
-From: Petr Oros <poros@redhat.com>
-In-Reply-To: <20260408-jk-even-more-e825c-fixes-v1-4-b959da91a81f@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <00fc6c1e-638a-4e80-b3c4-14e4dfa3651a@intel.com>
+X-Authority-Analysis: v=2.4 cv=KpN9H2WN c=1 sm=1 tr=0 ts=69d8c46e cx=c_pps
+ a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
+ a=kj9zAlcOel0A:10 a=A5OVakUREuEA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=l0iWHRpgs5sLHlkKQ1IR:22 a=qit2iCtTFQkLgVSMPQTB:22 a=QyXUC8HyAAAA:8
+ a=M5GUcnROAAAA:8 a=slVkAUMHAtotRH6mOaQA:9 a=CjuIK1q_8ugA:10
+ a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-ORIG-GUID: j8l_Fp168uWAHzn28YpsXcEDpjiut0KR
+X-Proofpoint-GUID: j8l_Fp168uWAHzn28YpsXcEDpjiut0KR
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDEwMDA4OCBTYWx0ZWRfX6eAflMHkuuaL
+ trfQoCsuOX8vG60wNzB+ghdI8Grvlyul6ljIHG3zZhmwkttZt/DJkS2Dy7NnFkfQqmtpfju5LX0
+ IT2Je+EaBNi298ktVShPQIsj714vo8Ae+/MGItgsfja9pj/e5uT41bdX44cWKtKo8zctaxUu2RO
+ vxBgaNRCJkU/xrmnZBjwm/X7M7DWzBcRH+v3dcLZ4tqgU+ZdCHyu+Y5dkpf2CV9fd5qhnueX6ZE
+ FiJIixR7UqBO4E1icbjTL6mwsPnGT+emhmn8qyUc3o4JgfaFCad3YJ6oJKXrb3nCikwPR91QD+3
+ lR6h4VdGRltyMwCzH8I94nrjP3COvbS3p8QLdKbvf+nPcZoejGHfh/0/TPuKyxjnc2IZMmVJpPG
+ ywhOoXiwTISJ6F5jRSjpOvwj6LEPchlM/1kxwC/m56hP03uDy4Y23CkNLqupScEG7gRgLqgACE/
+ tIbqe9oL8ykMFMZ0dCg==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-04-10_03,2026-04-09_02,2025-10-01_01
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-277310-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	TAGGED_FROM(0.00)[bounces-277311-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,marvell.com:dkim,marvell.com:email];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[poros@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[sbhatta@marvell.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[marvell.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:email]
-X-Rspamd-Queue-Id: 85A753D506B
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[8]
+X-Rspamd-Queue-Id: 1BAAC3D5209
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+On 2026-04-09 at 20:39:02, Alexander Lobakin (aleksander.lobakin@intel.com) wrote:
+> From: Subbaraya Sundeep <sbhatta@marvell.com>
+> Date: Thu, 9 Apr 2026 15:23:21 +0530
+> 
+> > From: Linu Cherian <lcherian@marvell.com>
+> > 
+> > CN20K silicon implements unified aura and pool context
+> > type called Halo for better resource usage. Add support to
+> > handle Halo context type operations.
+> > 
+> > Signed-off-by: Linu Cherian <lcherian@marvell.com>
+> > Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
+> 
+> [...]
+> 
+> > diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/struct.h b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/struct.h
+> > index 763f6cabd7c2..2364bafd329d 100644
+> > --- a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/struct.h
+> > +++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/struct.h
+> > @@ -377,4 +377,85 @@ struct npa_cn20k_pool_s {
+> >  
+> >  static_assert(sizeof(struct npa_cn20k_pool_s) == NIX_MAX_CTX_SIZE);
+> >  
+> > +struct npa_cn20k_halo_s {
+> > +	u64 stack_base                  : 64;
+> 
+> It's redundant to add : 64 to a 64-bit field.
+ Agreed. But this is for readability, it helps when checking HRM. For
+ instance HRM says [703:640] and we define as u64 reserved_640_703 : 64;
+ so that we do not have to count bits in mind.
+> Moreover, on 32-bit systems, the compilers sometimes complain on
+> bitfields > 32 bits.
+ This driver depends on 64BIT.
+> 
+> > +	u64 ena                         :  1;
+> > +	u64 nat_align                   :  1;
+> > +	u64 reserved_66_67              :  2;
+> > +	u64 stack_caching               :  1;
+> > +	u64 reserved_69_71              :  3;
+> > +	u64 aura_drop_ena               :  1;
+> > +	u64 reserved_73_79              :  7;
+> > +	u64 aura_drop                   :  8;
+> > +	u64 buf_offset                  : 12;
+> > +	u64 reserved_100_103            :  4;
+> > +	u64 buf_size                    : 12;
+> > +	u64 reserved_116_119            :  4;
+> > +	u64 ref_cnt_prof                :  3;
+> > +	u64 reserved_123_127            :  5;
+> > +	u64 stack_max_pages             : 32;
+> > +	u64 stack_pages                 : 32;
+> > +	u64 bp_0                        :  7;
+> > +	u64 bp_1                        :  7;
+> > +	u64 bp_2                        :  7;
+> > +	u64 bp_3                        :  7;
+> > +	u64 bp_4                        :  7;
+> > +	u64 bp_5                        :  7;
+> > +	u64 bp_6                        :  7;
+> > +	u64 bp_7                        :  7;
+> > +	u64 bp_ena_0                    :  1;
+> > +	u64 bp_ena_1                    :  1;
+> > +	u64 bp_ena_2                    :  1;
+> > +	u64 bp_ena_3                    :  1;
+> > +	u64 bp_ena_4                    :  1;
+> > +	u64 bp_ena_5                    :  1;
+> > +	u64 bp_ena_6                    :  1;
+> > +	u64 bp_ena_7                    :  1;
+> > +	u64 stack_offset                :  4;
+> > +	u64 reserved_260_263            :  4;
+> > +	u64 shift                       :  6;
+> > +	u64 reserved_270_271            :  2;
+> > +	u64 avg_level                   :  8;
+> > +	u64 avg_con                     :  9;
+> > +	u64 fc_ena                      :  1;
+> > +	u64 fc_stype                    :  2;
+> > +	u64 fc_hyst_bits                :  4;
+> > +	u64 fc_up_crossing              :  1;
+> > +	u64 reserved_297_299            :  3;
+> > +	u64 update_time                 : 16;
+> > +	u64 reserved_316_319            :  4;
+> > +	u64 fc_addr                     : 64;
+> > +	u64 ptr_start                   : 64;
+> > +	u64 ptr_end                     : 64;
+> > +	u64 bpid_0                      : 12;
+> > +	u64 reserved_524_535            : 12;
+> > +	u64 err_int                     :  8;
+> > +	u64 err_int_ena                 :  8;
+> > +	u64 thresh_int                  :  1;
+> > +	u64 thresh_int_ena              :  1;
+> > +	u64 thresh_up                   :  1;
+> > +	u64 reserved_555                :  1;
+> > +	u64 thresh_qint_idx             :  7;
+> > +	u64 reserved_563                :  1;
+> > +	u64 err_qint_idx                :  7;
+> > +	u64 reserved_571_575            :  5;
+> > +	u64 thresh                      : 36;
+> > +	u64 reserved_612_615            :  4;
+> > +	u64 fc_msh_dst                  : 11;
+> > +	u64 reserved_627_630            :  4;
+> > +	u64 op_dpc_ena                  :  1;
+> > +	u64 op_dpc_set                  :  5;
+> > +	u64 reserved_637_637            :  1;
+> > +	u64 stream_ctx                  :  1;
+> > +	u64 unified_ctx                 :  1;
+> > +	u64 reserved_640_703            : 64;
+> > +	u64 reserved_704_767            : 64;
+> > +	u64 reserved_768_831            : 64;
+> > +	u64 reserved_832_895            : 64;
+> > +	u64 reserved_896_959            : 64;
+> > +	u64 reserved_960_1023           : 64;
+> > +};
+> > +
+> > +static_assert(sizeof(struct npa_cn20k_halo_s) == NIX_MAX_CTX_SIZE);
+> 
+> Now the main question:
+> 
+> Is mailbox's Endianness fixed (LE/BE)? Or is it always the same as the
+> host's ones (I doubt so)?
+> If not, these need to be __le{8,16,32,64} (or __be if it's Big Endian)
+> and you need to handle the conversions manually.
+>
+ Yes endianness is LE and fixed. This is NOT a host side driver for an
+ endpoint card. This is driver for on chip PCI device of CN20K soc.
+ Hope I answered your question wrt host.
 
-On 4/8/26 20:46, Jacob Keller wrote:
-> The ice_ptp_read_tx_hwtstamp_status_eth56g function calls
-> ice_read_phy_eth56g with a PHY index. However the function actually expects
-> a port index. This causes the function to read the wrong PHY_PTP_INT_STATUS
-> registers, and effectively makes the status wrong for the second set of
-> ports from 4 to 7.
->
-> The ice_read_phy_eth56g function uses the provided port index to determine
-> which PHY device to read. We could refactor the entire chain to take a PHY
-> index, but this would impact many code sites. Instead, multiply the PHY
-> index by the number of ports, so that we read from the first port of each
-> PHY.
->
-> Fixes: 7cab44f1c35f ("ice: Introduce ETH56G PHY model for E825C products")
-> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-> ---
->   drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 10 ++++++++--
->   1 file changed, 8 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-> index 64ad5ed5c688..672218e5d1f9 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-> @@ -2219,13 +2219,19 @@ int ice_ptp_read_tx_hwtstamp_status_eth56g(struct ice_hw *hw, u32 *ts_status)
->   	*ts_status = 0;
->   
->   	for (phy = 0; phy < params->num_phys; phy++) {
-> +		u8 port;
->   		int err;
->   
-> -		err = ice_read_phy_eth56g(hw, phy, PHY_PTP_INT_STATUS, &status);
-> +		/* ice_read_phy_eth56g expects a port index, so use the first
-> +		 * port of the PHY
-> +		 */
-> +		port = phy * hw->ptp.ports_per_phy;
-> +
-> +		err = ice_read_phy_eth56g(hw, port, PHY_PTP_INT_STATUS, &status);
->   		if (err)
->   			return err;
->   
-> -		*ts_status |= (status & mask) << (phy * hw->ptp.ports_per_phy);
-> +		*ts_status |= (status & mask) << port;
->   	}
->   
->   	ice_debug(hw, ICE_DBG_PTP, "PHY interrupt err: %x\n", *ts_status);
-Reviewed-by: Petr Oros <poros@redhat.com>
+ Thanks,
+ Sundeep
 
+> Thanks,
+> Olek
 
