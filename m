@@ -1,292 +1,166 @@
-Return-Path: <netdev+bounces-277501-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277502-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yCsgKOQ52WkjnggAu9opvQ
-	(envelope-from <netdev+bounces-277501-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 19:56:52 +0200
+	id yEMoJh862WnJnggAu9opvQ
+	(envelope-from <netdev+bounces-277502-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 19:57:51 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2C523DB3C7
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 19:56:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F0B983DB421
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 19:57:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CBB4A305E340
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 17:52:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 29E993071033
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 17:53:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13A5E3DA7CF;
-	Fri, 10 Apr 2026 17:52:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 562F9230BE9;
+	Fri, 10 Apr 2026 17:53:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AFlpTv+q"
+	dkim=pass (2048-bit key) header.d=dama-to.20251104.gappssmtp.com header.i=@dama-to.20251104.gappssmtp.com header.b="txTxegbb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EF7D73463;
-	Fri, 10 Apr 2026 17:52:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF61E4A35
+	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 17:53:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775843536; cv=none; b=sBLaunzpp4ZuUEOYB1x8arrv0JrU3gONBk96/9/HGvB4G1xWg/abIQAeaDyvm5A55A1396o77RVrDCOrxrQLni1OqfOI6iChoOIdUnTRMLJlBQKjqC9x+jiCZRYC/wCf2OUKV4QxxfCjio2bZ5vgmhR6keyH74eozuXmWVlpNlc=
+	t=1775843592; cv=none; b=Nah5OYgO5HEdXU0YXZpvDPene/nARuDfLDUTLct2RFtpyz917YkofeQnYLJYft0kHhQXHKNnrzKaZo3Gy2aOHsgXYpw7MLtNAUAYKDmtrBpL5yD6CQUX7l0bqgAmwjQ1tbCZN/FucfRoz2ahKIxj/yP7BQ3X8O3d92d3QxTo9X8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775843536; c=relaxed/simple;
-	bh=LJTedmk++KoZHRY+NxOICzm/1baOqnTkQt1qfB5CZhs=;
-	h=From:Date:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=HCgCYVsgjlRn/m+li7jKow8/hjCd3tFQvO3UAWQssFLsuaGBzP5Dz849SPVeCQNCxIkUUl5WRJXgAtF2w+ygHIT8ykJ77j8lKXiZGF+lNGzI5W2YpETeoPVDzcGiBYUM4z4gTN2BNMl2QhFYGKiOl1mlybcebwjTXn0EUNpGLqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AFlpTv+q; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1775843534; x=1807379534;
-  h=from:date:to:cc:subject:in-reply-to:message-id:
-   references:mime-version:content-id;
-  bh=LJTedmk++KoZHRY+NxOICzm/1baOqnTkQt1qfB5CZhs=;
-  b=AFlpTv+qhhbi7CjY2vibRXn7Cmzhjwmgz2k2orPrMKj/lrYUdK1e84BB
-   6B/tgRslZbtchbIP2kMi5/5BhJADhRDSo5etkIkJpxdLg1X2HdMj3Bunv
-   R83W5LnLhs1LicuZxW1ClMq1JWDr2lNQcdqOLJyJ1RiCwaBpfC784g6X8
-   5BSIGf1SiHCIBN7U6S2k03QxozFpJYKLT/zTIgGxFF8WV82yOTfeIEKBJ
-   VZ9rzIOdz/ezEpC2vIJcJ2EmtsHDkMV/W7EMWRbpwRDTCdHJHqoYbKR/n
-   Wnb1cY5vT1EfceXwxra1Pg5FFWwXOA0Z2pJMXBZAPF8hXNmCJRs/1iKgf
-   Q==;
-X-CSE-ConnectionGUID: n0j3ozlBT6+TWpQLprC11A==
-X-CSE-MsgGUID: MaDGX8CERi+6M+nxsCm5HA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11755"; a="76830500"
-X-IronPort-AV: E=Sophos;i="6.23,171,1770624000"; 
-   d="scan'208";a="76830500"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2026 10:52:13 -0700
-X-CSE-ConnectionGUID: xpyzCYsgTQ2pDDI9D6JcYQ==
-X-CSE-MsgGUID: 33p7khnnR8yTRVFaYi+mKg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,171,1770624000"; 
-   d="scan'208";a="222665235"
-Received: from ijarvine-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.244.118])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2026 10:52:11 -0700
-From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
-Date: Fri, 10 Apr 2026 20:52:07 +0300 (EEST)
-To: Ratheesh Kannoth <rkannoth@marvell.com>
-cc: Bjorn Helgaas <helgaas@kernel.org>, vidyas@nvidia.com, bhelgaas@google.com, 
-    Netdev <netdev@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
-    linux-pci@vger.kernel.org
-Subject: Re: clarification: PCI device not getting enumerated
-In-Reply-To: <abojekUtFrMxM1RB@rkannoth-OptiPlex-7090>
-Message-ID: <2fd5b6c3-ee08-b73b-5d9d-4823d282f0ab@linux.intel.com>
-References: <abkqm_LCd9zAM8cW@rkannoth-OptiPlex-7090> <20260317210640.GA84423@bhelgaas> <abojekUtFrMxM1RB@rkannoth-OptiPlex-7090>
+	s=arc-20240116; t=1775843592; c=relaxed/simple;
+	bh=r/0pI3adLTYipWIJZGVAzMWqmoyRaJlcU5HdIEE5Y80=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Lol+sKGNW8cjItSjyNLd9mhcIgINJbjZDFbinNiNKGEub+XWFD4RNiV0jpk8qT5hHuUJTEg1nMV9oaiNp1FGbJiU22kpqIkXBdfHKAvQYUE9DtYerUC6FkLAHD/RKsV5dxX1FDDqbq3RA3ytoFup2YyCbRnzFoOrZ1nYEmeWdZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20251104.gappssmtp.com header.i=@dama-to.20251104.gappssmtp.com header.b=txTxegbb; arc=none smtp.client-ip=209.85.215.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
+Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-c766cf593daso1610115a12.3
+        for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 10:53:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=dama-to.20251104.gappssmtp.com; s=20251104; t=1775843590; x=1776448390; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Sq+y/9byaIkL7h6Mh25RQ0k7WMeVVSbAl+IgT/3yRhM=;
+        b=txTxegbbqK0fMAeuSYVBEdtY/VwXthUywF4NvAVH4jTDsN+LIIS/TtAI/uNRu9+xGW
+         UwkHKH2Ciq8JX2skSigX9mitLEcGNInpkiA7XiHyzO7v0WiLvSnP5ccfOb2HvDK2uS+2
+         EJFXE14LyG8SvvOw1saXLoqAK/ZVkK+f41RVyUW3FS9VgqIxpRrkKA+dp1NXQNM1ESIN
+         8kMR7+C5tZnJuPPwHHJiKfc2zf/C4W9metlet+IqQIhFjNzvmjgV5AbCYe9RK5PQzvrJ
+         llWBbt3K+Z0wGb38x+BdVzuS6M681LuRxm4scvPhIK39DUUXI7vNaTH5BVjmNjLysDZy
+         J8dg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775843590; x=1776448390;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Sq+y/9byaIkL7h6Mh25RQ0k7WMeVVSbAl+IgT/3yRhM=;
+        b=stl0pzKGPPFeoIMySZ1dZwpoWZYZtMIFxZpYgSbGeCrFz+/IdMemxzKiDhkFl1EWYG
+         9d5iQQiFXNX46GEadYSzXUH8R7Lsm04P5xwW27xIGgEYMkDgg49llgmXbSZe7yLEhwAS
+         3RzWS2W/m6yg4UBX/tR4IlpRzJZNBGMXVropScL1x0d9tQTwwNJUTtNiZJ/AwfoSEWw9
+         fott5huwO9xIuGm6P1LqH6V4TpiWtyOKVLEpm9gj4kKl073HqdtaYFPTtLlb4LjqtpEo
+         Q29bYTYmVZv8JmlRMyoUTwMeVl8Nj7HBqbZxzYm8PzKoSltqLwjBTvafr9dlhEB2lky2
+         x7PQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXIZPHl35VrSPkAXXOAN6eX+a9cUhRIZWSMS7SuwItm27+Xc1F2A+LlcJggWb3X65L2gEA19j8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXHfEHFbGB5JnfFKD9ka+TdTTm74sZ+xXZp7AL//iZjsvaRK1m
+	W/jHgX+cjRkDrjwka58c9aBpDGi627i6uayIudnpLMIdnfxcmC+wjXrr7FaFYdfI9qmpEMSOadG
+	8LHHh
+X-Gm-Gg: AeBDiesxEVkHFabSnLiSrpt2iG1m6XL6YakMx9BNX3gvJrToAbK3FJAdJP4bC5Tknmz
+	xNr+vq0P4wlCsfBi6PtCAZG27IukSLVGZTPN+f39H7JkU6Adg8u2q76/j4mWL1Mmd38KpPwkHJ5
+	HZkKQinyLSWYT6V5Af4pSXhCQXx8z834ffJ3Vs8cOCd2QWtw1cXqFm7CdCy3hSxjTa3qUKVAa+x
+	n7ycdIpqpihQurbHV+Znphw6DluRlGx7+GbxkFGUL9nSVGHkSPaCkbeW+G2kw8owfBxyLl8+fsJ
+	gsUNQ4ageVbXZgjcrZTLwOw/uZtGzuSuZJZRQXDB2QO5/M8JJItsSpkYDp5B0eiH0Zw8wDc6ZUO
+	ifqr+fbcTzLJa0exXFXVU9f+nKJcpYzqp2K6HDkbCl1pmVIMDzOPrGEHyfb2ugUIFVexzjmWSa0
+	2M7m95HUSbaQtafVY=
+X-Received: by 2002:a05:6a20:12d0:b0:39f:794f:94d8 with SMTP id adf61e73a8af0-39fe3f49777mr4765807637.29.1775843590350;
+        Fri, 10 Apr 2026 10:53:10 -0700 (PDT)
+Received: from localhost ([2a03:2880:2ff:46::])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c79218fc7e7sm3005525a12.10.2026.04.10.10.53.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 Apr 2026 10:53:09 -0700 (PDT)
+Date: Fri, 10 Apr 2026 10:53:09 -0700
+From: Joe Damato <joe@dama.to>
+To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
+	netdev@vger.kernel.org, Leszek Pepiak <leszek.pepiak@intel.com>
+Subject: Re: [PATCH net-next v2] iavf: fix kernel-doc comment style in
+ iavf_ethtool.c
+Message-ID: <adk5BS7W24iwY2qt@devvm20253.cco0.facebook.com>
+Mail-Followup-To: Joe Damato <joe@dama.to>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
+	netdev@vger.kernel.org, Leszek Pepiak <leszek.pepiak@intel.com>
+References: <20260409093020.3808687-1-aleksandr.loktionov@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; BOUNDARY="8323328-1950899332-1775840123=:1195"
-Content-ID: <2692f4b0-f161-3e21-36f4-e424fd9c5f5a@linux.intel.com>
-X-Spamd-Result: default: False [-1.16 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260409093020.3808687-1-aleksandr.loktionov@intel.com>
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	CTYPE_MIXED_BOGUS(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_DKIM_ALLOW(-0.20)[dama-to.20251104.gappssmtp.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-277501-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+,1:+];
-	MISSING_XM_UA(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[dama.to];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-277502-lists,netdev=lfdr.de];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[dama-to.20251104.gappssmtp.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ilpo.jarvinen@linux.intel.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[joe@dama.to,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,110.17.249.0:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:email]
-X-Rspamd-Queue-Id: E2C523DB3C7
+	RCPT_COUNT_FIVE(0.00)[5];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,dama-to.20251104.gappssmtp.com:dkim,devvm20253.cco0.facebook.com:mid,dama.to:email]
+X-Rspamd-Queue-Id: F0B983DB421
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+On Thu, Apr 09, 2026 at 11:30:20AM +0200, Aleksandr Loktionov wrote:
+> iavf_ethtool.c contains 31 kernel-doc comment blocks using the legacy
+> `**/` terminator instead of the correct single `*/`. Two function
+> headers also use a colon separator (`iavf_get_channels:`,
+> `iavf_set_channels:`) instead of the ` - ` dash required by kernel-doc.
+> 
+> Additionally several comments embed their return-value descriptions in
+> the body paragraph, producing `scripts/kernel-doc -Wreturn` warnings.
+> Void functions that incorrectly say "Returns ..." are also rephrased.
+> 
+> Fix all issues across the full file:
+>  - Replace every `**/` terminator with `*/`.
+>  - Change `function_name:` doc headers to `function_name -`.
+>  - Move inline "Returns ..." sentences into dedicated `Return:` sections
+>    for non-void functions (iavf_get_msglevel, iavf_get_rxnfc,
+>    iavf_set_channels, iavf_get_rxfh_key_size, iavf_get_rxfh_indir_size,
+>    iavf_get_rxfh, iavf_set_rxfh).
+>  - Rephrase body descriptions in void functions that incorrectly said
+>    "Returns ..." (iavf_get_drvinfo, iavf_get_ringparam, iavf_get_coalesce).
+>  - Remove boilerplate body text for iavf_get_rxfh_key_size and
+>    iavf_get_rxfh_indir_size; the `Return:` line now conveys the same
+>    information without the vague "Returns the table size." sentence.
+> 
+> Suggested-by: Anthony L. Nguyen <anthony.l.nguyen@intel.com>
+> Suggested-by: Leszek Pepiak <leszek.pepiak@intel.com>
+> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> ---
+> v1 -> v2 extending the scope of the changes to whole iavf_ethtool.c file
+> ---
+>  drivers/net/ethernet/intel/iavf/iavf_ethtool.c | 103 ++++++++++++------------
+>  1 file changed, 53 insertions(+), 50 deletions(-)
 
---8323328-1950899332-1775840123=:1195
-Content-Type: text/plain; CHARSET=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Content-ID: <39a77d0b-2a6e-b676-0b3b-1f17aa624cd0@linux.intel.com>
-
-On Wed, 18 Mar 2026, Ratheesh Kannoth wrote:
-
-> On 2026-03-18 at 02:36:40, Bjorn Helgaas (helgaas@kernel.org) wrote:
-> > On Tue, Mar 17, 2026 at 03:49:07PM +0530, Ratheesh Kannoth wrote:
-> > > Hi,
-> > >
-> > > Below commit breaks PCI enumeration of a marvell PCI endpoint (177d:a=
-0e2).
-> > > I am not familiar with PCI code, could you please help in debugging/f=
-ixing this ?
-> > >
-> > > Before the commit, the kernel set PCI_REASSIGN_ALL_BUS. So pcibios_as=
-sign_all_busses() was true,
-> > > and in pci_scan_bridge_extend() the kernel took the =E2=80=9Creassign=
-=E2=80=9D path and used EA
-> > > (and pci_ea_fixed_busnrs()) to assign bus numbers.
-> > >
-> > > commit 7246a4520b4bf1494d7d030166a11b5226f6d508
-> > > Author: Vidya Sagar <vidyas@nvidia.com>
-> > > Date:   Wed May 8 23:11:38 2024 +0530
-> > >
-> > >     PCI: Use preserve_config in place of pci_flags
-> > >
-> > >     Use preserve_config in place of checking for PCI_PROBE_ONLY flag =
-to enable
-> > >     support for "linux,pci-probe-only" on a per host bridge basis.
-> > >
-> > >     This also obviates the use of adding PCI_REASSIGN_ALL_BUS flag if
-> > >     !PCI_PROBE_ONLY, as pci_assign_unassigned_root_bus_resources() ta=
-kes care
-> > >     of reassigning the resources that are not already claimed.
-> >
-> > This commit appeared in v6.11.  Apparently on v6.6, 0002:1b:00.0 is
-> > detected, and in the v6.12 dmesg below, we don't enumerate it.
-> >
-> > It looks like 7246a4520b4b can still be reverted cleanly from
-> > v7.0-rc1.  Can you collect the complete dmesg logs from v7.0-rc1
-> > (where I assume we won't see 0002:1b:00.0) and from v7.0-rc1 with
-> > 7246a4520b4b reverted (where I assume we *will* see it) and output of
-> > "sudo lspci -vv"?  Use the same kernel config and DT for both, of
-> > course.
-> Please find dmesg, lspci -vv and device tree output for v7.0-rc1 and v7.0=
--rc1 with patch reverted
-> at bottom of this email. Used same kernel config and DT for both.
->=20
-> >
-> > I don't understand some of the v6.12 dmesg log:
-> >
-> >   3.187193] pci-host-generic 878000000000.pci: Memory resource size exc=
-eeds max for 32 bits
-> >   3.313087] pci 0000:00:01.0: PCI bridge to [bus 01] (subtractive decod=
-e)
-> >   3.319878] pci 0000:00:01.0:   bridge window [mem 0x00000000-0x000ffff=
-f]
-> >   3.723673] pci 0000:01:00.0: [177d:a075] type 00 class 0x088000 PCIe E=
-ndpoint
-> >   3.730924] pci 0000:01:00.0: BAR 0 [mem 0x87e0fc000000-0x87e0fc03ffff =
-64bit]: from Enhanced Allocation, properties 0x0
-> >   3.741710] pci 0000:01:00.0: BAR 4 [mem 0x87e0fcf00000-0x87e0fcffffff =
-64bit]: from Enhanced Allocation, properties 0x0
-> >
-> >   3.448655] pci 0000:00:0c.0: PCI bridge to [bus 02] (subtractive decod=
-e)
-> >   3.455454] pci 0000:00:0c.0:   bridge window [mem 0x00000000-0x000ffff=
-f]
-> >   4.425308] pci 0000:02:00.0: [177d:a075] type 00 class 0x088000 PCIe E=
-ndpoint
-> >   4.432561] pci 0000:02:00.0: BAR 0 [mem 0x87e0f9000000-0x87e0f903ffff =
-64bit]: from Enhanced Allocation, properties 0x0
-> >
-> >   5.744082] pci-host-generic 878020000000.pci: Memory resource size exc=
-eeds max for 32 bits
-> >   5.799532] pci 0002:00:00.0: PCI bridge to [bus fa] (subtractive decod=
-e)
-> >   5.806322] pci 0002:00:00.0:   bridge window [mem 0x00000000-0x000ffff=
-f]
-> >   5.820632] pci 0002:00:01.0: PCI bridge to [bus fb] (subtractive decod=
-e)
-> >   5.827423] pci 0002:00:01.0:   bridge window [mem 0x00000000-0x000ffff=
-f]
-> >
-> > - The "Memory resource size exceeds max for 32 bits" warnings are
-> >   interesting.  Is this a DT error?
->
-> I dont see any errors as such. Could you guide me how to locate this issu=
-e, or suggest any command to check
-> the same.
-
-I'm sorry I only noticed this thread now.
-
-Take a look for "root bus resource" lines in your log. When the size of=20
-those exceeds 4G, the warning is printed if the mem resource does not have=
-=20
-IORESOURCE_PREFETCH set (which implies 64-bit window in the old way things=
-=20
-were spec'ed). That resource printout includes "pref" when the flag is=20
-present.
-
-For such resource, I think having IORESOURCE_PREFETCH and=20
-IORESOURCE_MEM_64 would be appropriate. And also for any resource that is=
-=20
-expected to require >4G address even if size itself is small enough.=20
-Unfortunately things have not been very consistent when it comes to root=20
-bus resources.
-
-The resource bits are given in DT along with the address range (but I'm=20
-not an DT expert by any means so I state something stupid when it comes=20
-to DTs, take it with a grain of salt :-)):
-
-# pci feild (phys.hi)
-
-npt000ss bbbbbbbb dddddfff rrrrrrrr
-
-n: Relocateable Flag. (0 means relocation, 1 means impossible)
-p: Prefetch Flag. (0 means impossible 1 means possible)
-t: Aliased Flag.
-ss: space code
-  00: compositional space
-  01: I/O space
-  10: 32bit memory space
-  11: 64bit memory space
-
-I think your ranges have 0x03... which would seem to say they were 64-bit=
-=20
-but that flag did not get set (or got cleared) for some reason as there's=
-=20
-not "64-bit" in the root bus resource printouts.
-
-I suspect the warning goes away if you change 0x03... to 0x43... but you=20
-also need to pay attention that pci_parse_request_of_pci_ranges() requires=
-=20
-also one non-prefetchable resource within each set of root bus resources=20
-so or it will trigger another warning if you change them all.
-
-I'm not sure if it resolves the primary issue.
-
-> > - There should only be one subtractive decode bridge per segment, but
-> >   there are many here.
-> >
-> > - Most of the bridge windows look uninitialized ([mem
-> >   0x00000000-0x000fffff]), and we don't seem to reassign them, so BARs
-> >   of the downstream devices shouldn't be reachable.
-> >
-> > - Interesting to see so much "Enhanced Allocation"; that's very
-> >   unusual.
-> >
-> > - I guess your DT must have "linux,pci-probe-only"; seems like that
-> No.
->=20
-> +++ fdt dump from uboot +++
->=20
-> crb106-pcie> fdt print /soc/pci@878020000000
-> pci@878020000000 {
->         compatible =3D "pci-host-ecam-generic";
->         device_type =3D "pci";
->         msi-map =3D <0x00000000 0x00000037 0x00020000 0x00010000>;
->         bus-range =3D <0x00000000 0x000000ff>;
->         #size-cells =3D <0x00000002>;
->         #address-cells =3D <0x00000003>;
->         dma-coherent;
->         linux,pci-domain =3D <0x00000002>;
->         reg =3D <0x00008780 0x20000000 0x00000000 0x10000000>;
->         iommu-map =3D <0x00000000 0x00000039 0x00020000 0x00010000>;
->         ranges =3D <0x03000000 0x00008400 0x00000000 0x00008400 0x0000000=
-0 0x000001f5 0x00000000 0x03000000 0x00000009 0xfc000000 0x00000009 0xfc000=
-000 0x00000000 0x03040000>;
-
-
---=20
- i.
---8323328-1950899332-1775840123=:1195--
+Reviewed-by: Joe Damato <joe@dama.to>
 
