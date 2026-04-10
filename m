@@ -1,168 +1,236 @@
-Return-Path: <netdev+bounces-277302-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277303-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oGNKG5W32GnnhAgAu9opvQ
-	(envelope-from <netdev+bounces-277302-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 10:40:53 +0200
+	id 6FcIJsq52GmmhQgAu9opvQ
+	(envelope-from <netdev+bounces-277303-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 10:50:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1046E3D43E6
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 10:40:52 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFBB23D4500
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 10:50:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 67F0F30065D0
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 08:40:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 906283004C7A
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 08:49:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0B1A3ACEE1;
-	Fri, 10 Apr 2026 08:40:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A811C3AE185;
+	Fri, 10 Apr 2026 08:49:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="rqmqyPCM"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MUV31dvl"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D29EB306B1B
-	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 08:40:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775810405; cv=none; b=h+JZ9raMUi/rOsg9kKxd66Kg0UDylVvaVHPN25SzhHYRD6qTxH/c2Fr3564YpLJcYBIYuplfjnJvLlH+gk1hjwCtPNHPuP9R69nC0m4BuZonufK2ABCSi9DLP3P9BZx6w8yU6fEc3qqmw5kFoJhFG8fUNGBttYp38/yPm6oPdYM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775810405; c=relaxed/simple;
-	bh=TiLiBT6KTnhYXWpLCgTB1gPsKon+lMJReIv7vPRLxIg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m9Funev6gwWPVXWW/MTda65jsSmdR+B1Xed2EPBILZbXK8H893V/d6cDULHoPrTlVavVrN4LfGH7CwI8dOl4wptqtETjp1Dbf3A1GP+Im7vB264ws27H2reTsn+8yIEjo9FZn67DiQmdfw18QdRIIPsHJwMM9NWYnDkMKuANkbg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=rqmqyPCM; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ZdOnR/1mCgonR7f2wP3H5JqrF/rCMapSujGWUMtD9/A=; b=rqmqyPCMlvW3KvDYDz3/ETNIAh
-	G+ESQPCwbBnKWQSJh+ewTI/voRE6d3Ofr1iTuT3bDkAk27P35fRCtsFZbsndaH/5R0K66REmgJSa9
-	6DVG3w9ciTeMT7N2D8gBgu388hIIZw6pNykZbUBWSDiL7IR0aL2hPrX8lB4FFeNyxkZ34crCfawWq
-	ET2uU1utHtMx1ISS5KHV4cXaCRdUmtsF7xMSq6W4rlj8YdqvT2Z4amTnf9HBxDn9tiMn2tvOV0lU9
-	fP2Wv8AVO7k6NoEkFKJOMMsTBV69KWgM7sywkLGQu709m6YCrVMKL6osnzUr1As2obFMhYf3OddEf
-	Nyrg83EA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:45482)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1wB7P7-000000004e2-341K;
-	Fri, 10 Apr 2026 09:39:53 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1wB7P4-000000005UF-3z5f;
-	Fri, 10 Apr 2026 09:39:50 +0100
-Date: Fri, 10 Apr 2026 09:39:50 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, Chen-Yu Tsai <wens@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-sunxi@lists.linux.dev, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Samuel Holland <samuel@sholland.org>
-Subject: Re: [PATCH RFC net-next 02/10] net: stmmac: rename dev_id to userver
-Message-ID: <adi3Vks-N0a83ylE@shell.armlinux.org.uk>
-References: <adYfPBHsXxQUsMyr@shell.armlinux.org.uk>
- <E1wAPBR-0000000F7ju-1fD9@rmk-PC.armlinux.org.uk>
- <CAMdnO-+TK65AxjTsDd017Mhop+VC3Xf8jtfaTXYpE6wBNZOt4g@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3729A3ACF1D
+	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 08:49:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.171
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775810953; cv=pass; b=EwOH95wtxUu3ifR44RJtiAJ6xSvfjGQzQvaU4hCfxNN8O8oZ7vIVA5VhlV6+t/eaCWlRGBJ0ChiP3D8jGtee/8SGfIbHtSclPzfkVhkGgbC4Zcvz8ykWV50mL0jYBk2PFDHUAh/tsfCWGV8mj3cQqvUGRXb9PJoTNablqDbVBjw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775810953; c=relaxed/simple;
+	bh=6FiJu+BjvXNJmyw7qlfvfDWdh0oxLvy2LD04DomyEO8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=J9sa41TueaXXpDkAMpbIGyRqEZqg0Q1MJ4uyAm+68psAmY3sI58kviGOGS488kAvm0jKGWMkkE+y/AClKwaUcoTEtQDaBWYLo8gUN7Ta3EbUitExXlBT17xvFoTuwWSlyB371/9cLy0jQVYt1jLpxWBMjVwPx5enzOAdCpDGY/Y=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MUV31dvl; arc=pass smtp.client-ip=209.85.222.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-8cb20bcff5aso166817385a.3
+        for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 01:49:09 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1775810949; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Q1zVGQKVXkMQ1stogNGWvffvo2BsaD4hQkpIl6aVjb7TWHJnJ2DzNOBTD/U2rqNAXr
+         h4Z0TTXEVhH3U7LnP1xvR3EsUkiTdeP8KsMxN0vDcdmGtLlgqvAFGRb8lMh5Nl/hqit/
+         nlGa7ZVpLa+VtP/m+lUL4L32QzcXjzxxr4+wXTkAf9nxHbNsdqruhPb3wqdNvKcznCLp
+         uKAW71VNhvAZvQbZbm07/0KhFuNyfEO1U2yRjfmeJFX2+Tr4W3fPkMrtESh/DbscGKxg
+         hZ8kfWk5P4vXgrNcWaqq8J+HRiGDHYUhqnEYU+Q+wta4X9U4gYpfTeEE5C/1LfbyuCUg
+         nQqA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=lBD8yZrNx2mS06bjZoqEXQsGeeYcf6wdYAt3sRhSvfc=;
+        fh=ims/OAXt1euGXI/LKyy9XW9twYI94vrx/pL4bU5cgC8=;
+        b=bxcKcOLoB94lJQ7GH5+cBMKBeTpj8SVhPaItYpOFHVXDONIHu0x7ESLC5+QXWYVtGx
+         zgEVeZeh5vZ4nJxC6crvPgpYLPlwi8AsUxxPpysPiVyUApJb0LJPSehpLoYJ2eMK+9zE
+         7XoF7YcxF2fgfzEt2+qSfAYIkUWbFP5pVaDuYmRWZAs7SP5/dFVCASJcqllc7h3HcdKl
+         XscHs5E51eWDIF2zLxzPddcz5b9l4OyjeRjrZ7HDr7DTxpf8MRRzYU/F8hHJTj+J0W11
+         S0C0cjRQwI5eGE1eR3gANisHlZ+wkEvQXH34Y4d2yOlTJ3h7nEryoylhGjiPaJ+7+aC8
+         4a1Q==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1775810949; x=1776415749; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lBD8yZrNx2mS06bjZoqEXQsGeeYcf6wdYAt3sRhSvfc=;
+        b=MUV31dvlPRuwXVA0n1W61PqM2k7OtlQUabp8+4DmtCifrjNBv0H16xfUYZap4fekkw
+         rqrNGeqgfl8w+xfv2NBMAGN8o/j+1Zr8scV8GnJsqcIoLmkt0GFN4ekgPnIb3Nk64Kfy
+         xTB41MKk0MhEDA94P55eMNwNmzpPOKPsLVzWRw9Gz5I/i0wSRfc4+709wSIhke8sCXb4
+         E1vLO2CbN2BXwjBFaPd/RRHM3cR0jTacNauZAxC6zLtbZnC07vm58lkZ32tCDatOt52P
+         +gSSi753pY/TFA97KTSc42fR0XN2AjNl3ErHAtxsA04TEiXwJSOIC3Z9FRBhTVWwb+fZ
+         la5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775810949; x=1776415749;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=lBD8yZrNx2mS06bjZoqEXQsGeeYcf6wdYAt3sRhSvfc=;
+        b=a9UUpEmQ9TW+fupuGToZukgrQ0OO6TXx6+APwkTKQxyhU9zheaVGl0Ile2RvlMRWcW
+         JoG7sRxrTr1ysLs8GZHwHXK8SRJTf0TdAa5IQx4r6Y5bXb6DnIrht5LyfrNws54PW4BG
+         gIAsM86WtpyrpR0h+btHfNCeX7Pbviy+izrxxEowN3kF0gjaM7JVCOT1LTL0pNDenF2/
+         R7tsePDUY5Kv+UEP21bhX5mXjRZ6ilcAAHhchU2GVjvCNFFMY2LG4ddvTRxrT9lTndam
+         f5zeON/ubFRBtC82nBIbt1UyL7ywJjUKwb4ZliZgrSFiCOwVByHjpQClascMLTRAM8PB
+         Ipnw==
+X-Gm-Message-State: AOJu0Ywt+Va1bVX9tPiqV3U/N5PP5lgmJYkomv4+FcLO810uK376XYdi
+	7H+Gay8iGATAFW4MKvRiK0R2duI3psE2l9ARapGLlu3DPZx6Yi32zs+L0KyDa+tOBTDFh7Ve9tb
+	AAlXZN2P4q457Vt9fm29prRLXgLr04b++QImhDWdO
+X-Gm-Gg: AeBDiesamunnFw7NprYFqK4xP8geFtD7bAaXNogU1DQYOZgQRSwxidq8rfGYLd+ADVA
+	tsRaeBP2w7SLhNAjzUCChoOfalA/Cc7Ji+mvTx0lgWQoo62sagQ+dIrtjmu/KtAiHDCyfMc6VeZ
+	mdmn3fHK5KI738ADiZiJLani/Q/XyF6Ey4MFdtiuVkHr6xXGJ7EHIGpvffqhBT4iqmQuZnbjit5
+	fDnHrHaN4F00mPHeNKCEETfI0Ii4XyUdMUddKLelUkN6oSsGmefOWoAeow/HxN1LXezc4oRjeOY
+	jhvxiBS8dWPaI8e1ZqRL+6z2Cbjxbt8Mxdx22mTeaAjxxeCSTHRImLCQBxWAbLabtJOHdcZRIJE
+	=
+X-Received: by 2002:a05:622a:2d4:b0:50d:d7fc:23f0 with SMTP id
+ d75a77b69052e-50dd7fc3202mr21013121cf.38.1775810948256; Fri, 10 Apr 2026
+ 01:49:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAMdnO-+TK65AxjTsDd017Mhop+VC3Xf8jtfaTXYpE6wBNZOt4g@mail.gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spamd-Result: default: False [1.14 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+References: <cover.1775731983.git.wangjiexun2025@gmail.com> <f6cbbc8da90e95584847b5ceb60aae830d1631c2.1775731983.git.wangjiexun2025@gmail.com>
+In-Reply-To: <f6cbbc8da90e95584847b5ceb60aae830d1631c2.1775731983.git.wangjiexun2025@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 10 Apr 2026 01:48:57 -0700
+X-Gm-Features: AQROBzCJRzdYJkxnXuIzVJ5fXkk2yRDhmGbJ5PRN702Jpc7VaUi7GSVCgsD3C8Q
+Message-ID: <CANn89iJ+rBzO3zmhQmpzXU_5cs-oRodVTCcNeGKSte-2xnb3kg@mail.gmail.com>
+Subject: Re: [PATCH net 1/1] af_unix: Hold receive queue lock in ioctl(SIOCATMARK)
+To: Ren Wei <n05ec@lzu.edu.cn>
+Cc: netdev@vger.kernel.org, kuniyu@google.com, davem@davemloft.net, 
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, rao.shoaib@oracle.com, 
+	yifanwucs@gmail.com, tomapufckgml@gmail.com, yuantan098@gmail.com, 
+	bird@lzu.edu.cn, enjou1224z@gmail.com, wangjiexun2025@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-277302-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-277303-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,davemloft.net,kernel.org,redhat.com,oracle.com,gmail.com,lzu.edu.cn];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.997];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:email,armlinux.org.uk:url,shell.armlinux.org.uk:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 1046E3D43E6
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,lzu.edu.cn:email]
+X-Rspamd-Queue-Id: EFBB23D4500
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Apr 09, 2026 at 04:07:42PM -0700, Jitendra Vegiraju wrote:
-> Hi Russell,
-> 
-> On Wed, Apr 8, 2026 at 2:27 AM Russell King (Oracle)
-> <rmk+kernel@armlinux.org.uk> wrote:
-> >
-> > The Synopsys Databook and several implementation TRMs identify bits
-> > 15:8 of the version register in dwmac v3.xx and v4.xx as "userver".
-> > We even print its value with "User ID". Rather than using "dev_id",
-> > use "userver" instead.
-> >
-> > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> > ---
-> >  drivers/net/ethernet/stmicro/stmmac/hwif.c | 18 +++++++++---------
-> >  1 file changed, 9 insertions(+), 9 deletions(-)
-> >
-> > diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.c b/drivers/net/ethernet/stmicro/stmmac/hwif.c
-> > index 3774af66db48..830ff816ab4f 100644
-> > --- a/drivers/net/ethernet/stmicro/stmmac/hwif.c
-> > +++ b/drivers/net/ethernet/stmicro/stmmac/hwif.c
-> > @@ -15,7 +15,7 @@
-> >
-> >  struct stmmac_version {
-> >         u8 snpsver;
-> > -       u8 dev_id;
-> > +       u8 userver;
-> >  };
-> From the XGMAC databook that I have access to bits(15:8) identify the
-> DEVID field of MAC_version register.
-> The userver field is from bits(23:16) of the same register. This is a
-> customer defined field (configured with coreConsultant).
-> Currently stmmac doesn't care about bits(23:16).
+On Thu, Apr 9, 2026 at 11:32=E2=80=AFPM Ren Wei <n05ec@lzu.edu.cn> wrote:
+>
+> From: Jiexun Wang <wangjiexun2025@gmail.com>
+>
+> unix_ioctl() peeks at the receive queue and may check both the head skb
+> and its successor while deciding whether SIOCATMARK should report the
+> mark. However, u->iolock does not stabilize receive-queue element
+> lifetime. Queue teardown paths can purge or splice the queue under
+> sk->sk_receive_queue.lock and free the skb while unix_ioctl() still
+> uses it.
+>
+> Take sk->sk_receive_queue.lock while inspecting the queue so the skb
+> and next_skb stay alive for the whole decision.
+>
+> Fixes: 314001f0bf92 ("af_unix: Add OOB support")
+> Reported-by: Yifan Wu <yifanwucs@gmail.com>
+> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+> Co-developed-by: Yuan Tan <yuantan098@gmail.com>
+> Signed-off-by: Yuan Tan <yuantan098@gmail.com>
+> Suggested-by: Xin Liu <bird@lzu.edu.cn>
+> Tested-by: Ren Wei <enjou1224z@gmail.com>
+> Signed-off-by: Jiexun Wang <wangjiexun2025@gmail.com>
+> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+> ---
+>  net/unix/af_unix.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+> index b23c33df8b46..54f12d5cda37 100644
+> --- a/net/unix/af_unix.c
+> +++ b/net/unix/af_unix.c
+> @@ -3301,6 +3301,8 @@ static int unix_ioctl(struct socket *sock, unsigned=
+ int cmd, unsigned long arg)
+>                         int answ =3D 0;
+>
+>                         mutex_lock(&u->iolock);
+> +                       /* The receive queue lock keeps skb and next_skb =
+alive. */
+> +                       spin_lock(&sk->sk_receive_queue.lock);
+>
+>                         skb =3D skb_peek(&sk->sk_receive_queue);
+>                         if (skb) {
+> @@ -3315,6 +3317,7 @@ static int unix_ioctl(struct socket *sock, unsigned=
+ int cmd, unsigned long arg)
+>                                         answ =3D 1;
+>                         }
+>
+> +                       spin_unlock(&sk->sk_receive_queue.lock);
+>                         mutex_unlock(&u->iolock);
+>
+>                         err =3D put_user(answ, (int __user *)arg);
 
-Thanks for the additional information.
+Ok, but I think we also should remove the READ_ONCE() now we have
+proper locking.
 
-I don't have any XGMAC documentation, but this indicates that it differs
-between XGMAC and previous cores - GMAC and GMAC4 cores, 15:8 are
-documented as userver, and 31:16 are marked as reserved.
+diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+index 5d4baac499af8d0a9cc36f652acf129a2e3619b2..1c3b80b25ef8b37d8e6553066fb=
+7da20d81294a5
+100644
+--- a/net/unix/af_unix.c
++++ b/net/unix/af_unix.c
+@@ -3301,10 +3301,12 @@ static int unix_ioctl(struct socket *sock,
+unsigned int cmd, unsigned long arg)
+                        int answ =3D 0;
 
-Note that the dev_info() also prints 15:8 as "User ID" not "Device ID".
+                        mutex_lock(&u->iolock);
++                       /* The receive queue lock keeps skb and
+next_skb alive. */
++                       spin_lock(&sk->sk_receive_queue.lock);
 
-To confirm, is the XGMAC version register at offset 0x20 ? Later GMAC
-cores moved it to 0x110.
+                        skb =3D skb_peek(&sk->sk_receive_queue);
+                        if (skb) {
+-                               struct sk_buff *oob_skb =3D READ_ONCE(u->oo=
+b_skb);
++                               struct sk_buff *oob_skb =3D u->oob_skb;
+                                struct sk_buff *next_skb;
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+                                next_skb =3D skb_peek_next(skb,
+&sk->sk_receive_queue);
+@@ -3314,7 +3316,7 @@ static int unix_ioctl(struct socket *sock,
+unsigned int cmd, unsigned long arg)
+                                     (!oob_skb || next_skb =3D=3D oob_skb))=
+)
+                                        answ =3D 1;
+                        }
+-
++                       spin_unlock(&sk->sk_receive_queue.lock);
+                        mutex_unlock(&u->iolock);
+
+                        err =3D put_user(answ, (int __user *)arg);
 
