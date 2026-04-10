@@ -1,270 +1,193 @@
-Return-Path: <netdev+bounces-277522-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277523-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0BVVKWJI2WlToAgAu9opvQ
-	(envelope-from <netdev+bounces-277522-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 20:58:42 +0200
+	id KEHEHcJL2WkMoQgAu9opvQ
+	(envelope-from <netdev+bounces-277523-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 21:13:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 192423DBB8A
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 20:58:42 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3D363DBCB1
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 21:13:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9B2F53033228
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 18:58:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 91323301053B
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 19:03:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 645362BCF4C;
-	Fri, 10 Apr 2026 18:58:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4B4230AACB;
+	Fri, 10 Apr 2026 19:03:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="A7NL76do"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RgHxDIcx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11DA11862
-	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 18:58:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.10
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775847515; cv=fail; b=XQT1yLXjwGwtcjs+l3LgbBXqTdsxY5ddvOOLKAiQV2XmbvR4ZVhg7V8gSSzz1ij9qdI0XF9DSY8KfdYIKYGB/TDoRLrNeSztAdUknv3ZML31nrJTxU/VvbEuQuWT0lrnz3Ej2iby5urR7cIzVadaVFfj8Lepe2P9vuqjxg6FlvA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775847515; c=relaxed/simple;
-	bh=5A8w+cwR4uWwAGMul6RzKzxTpCJBmYclentq2vt0N+w=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=TvGmyczoTvgUVqDpvBymKke/IBow0JZMK0A91Y88BtIiOg38aI8tZYyyem7S56NCzlh5+PaofBeFd5oS//uRYh8gbezyGMp+H4zrHrK1lNPVtLg2g6KlYg6MYW2FaXTrICUJh5RvTa7fU+RWki1rg94weuEuct9sxEyCD4p70wk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=A7NL76do; arc=fail smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1775847514; x=1807383514;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=5A8w+cwR4uWwAGMul6RzKzxTpCJBmYclentq2vt0N+w=;
-  b=A7NL76dovCwNumQM/oHCAL5LIBmGl0Qco9iKjuyR7yO4w/AgeZRv6ZpS
-   kPqbGJZ4HGDyrQu5PRVhe8hO3YTT+g3JBe0PMR2jLQ9eNiDjHIR3TISpt
-   Wp4T+zoNBMb7MRQNFa34Tv8T3MNY45ak9G0r+dcIeSUAaw40A/b08xiGN
-   o7DY5kTUK3gnkUSzWO89tQBspEm8DoOvsFWW5TYkybRGWY6JUPB223kLB
-   mKBYg+O11HMBsLxtRUkNYxkF3HmdXPlrZ6o5V72OyymolbdZH6MK0PxUw
-   Qeh7ssfuR8P+4qGKDg8VL8LSAkIXr5eh0sI9iGM27FfA0GaHWQX8nZclv
-   Q==;
-X-CSE-ConnectionGUID: ++k8qc52SMuCRj4urCZhqw==
-X-CSE-MsgGUID: bF8ghZbkTHaq3wBZe6Ueyg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11755"; a="88260475"
-X-IronPort-AV: E=Sophos;i="6.23,172,1770624000"; 
-   d="scan'208";a="88260475"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2026 11:58:30 -0700
-X-CSE-ConnectionGUID: wl6ZGW9IQfCHK4RCbx0JBg==
-X-CSE-MsgGUID: ZJ+u1uoURqarks8YCP9jUA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,172,1770624000"; 
-   d="scan'208";a="234152493"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by orviesa005.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2026 11:58:31 -0700
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Fri, 10 Apr 2026 11:58:29 -0700
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Fri, 10 Apr 2026 11:58:29 -0700
-Received: from BN8PR05CU002.outbound.protection.outlook.com (52.101.57.19) by
- edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Fri, 10 Apr 2026 11:58:29 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=I1/VmWAcCVglloYn+ojDCgNvjGa2AQrRAyDDlAkZ8Z9TqL+P1/caUkmGuKNTOnDywrcp+F8oSjc9nLFmL3UlHeKLQwC4W0UvvlZpHgnX7rkmb0D95nBSs/vdOrWdlIfLptr4fiLWWQKgIfIfG/MTs6pveYPf4u2g8Biy79GxM7HUkL0U4m3kI4Dhxy8MyaBWQEye1NoflUfq6T/U6mIVu9SbfZfdU0+cjE9ZbU1VgmQVGupomJG8QKVSbf7dhRI03/88AFg5tXPMRHpgFXa1UwitDMHIIdP09nN9wgtVMrhu7prcmP7kPYhyw9D12NXvjbjqMl3lo2im/qhcP+rG6Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=sFt/c4xYcwsM0JEvETk9mLKqTQneAnNW65stQCp+FwY=;
- b=Co1qHjGASjg1JTJMfFAgIuoczya2Fh4zy/7SFEs3J2/fCnt6guuiXmNk++1jEZlNkQaoZq4Xxh5+GVBRrJHSXbEwrs2sggAj2lco4OjgsqhnHFbXrO9XulhxdeTXmWMPe0EPNP1Ll2m2gKqPTW4/qMilYO3XmPBZzPOYLc08FYydxTDWBSDwFp5Gec4IkndMg5gdV8HlW0ILnhGf+ibuaUM6ahZ50PQb4p8Fovr1ZnIjFmi01HpcUyJrD5k/3qoHeAPXq0w/4uy17v6o2/2GpAUVwHUSl4XqgDa6r+1D6TkFCLGKiAGu5n/PE4V88E/7SoaVGsXIyW5d/xfL3nA/4A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB8230.namprd11.prod.outlook.com (2603:10b6:8:158::21)
- by SA1PR11MB6968.namprd11.prod.outlook.com (2603:10b6:806:2be::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.21; Fri, 10 Apr
- 2026 18:58:27 +0000
-Received: from DS0PR11MB8230.namprd11.prod.outlook.com
- ([fe80::2592:f5a9:a751:be40]) by DS0PR11MB8230.namprd11.prod.outlook.com
- ([fe80::2592:f5a9:a751:be40%4]) with mapi id 15.20.9769.041; Fri, 10 Apr 2026
- 18:58:27 +0000
-Message-ID: <713893a9-fe42-4b74-9eb9-a4c9ac607d7c@intel.com>
-Date: Fri, 10 Apr 2026 11:58:25 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-net 10/10] ice: allow setting min_tx_rate to 0 to
- resolve VF bandwidth oversubscription
-To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	<intel-wired-lan@lists.osuosl.org>
-CC: <netdev@vger.kernel.org>
-References: <20260403054029.3789616-1-aleksandr.loktionov@intel.com>
- <20260403054029.3789616-11-aleksandr.loktionov@intel.com>
-Content-Language: en-US
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-In-Reply-To: <20260403054029.3789616-11-aleksandr.loktionov@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR03CA0207.namprd03.prod.outlook.com
- (2603:10b6:303:b8::32) To DS0PR11MB8230.namprd11.prod.outlook.com
- (2603:10b6:8:158::21)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FBB326FA60
+	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 19:03:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775847834; cv=none; b=FVy64k7vMb5wz+IAU9GyDgzNGBFIWytud5iTe1ydBh4A1O/5bcN+F0OX6HmicrBmngE/9r8udExgaNQDCngCaCpxyTdcegbyq539dPukZUoGonkrAXPwAfdMzFuzR9VcYvx9QrtLBEdTJxXSWbz2u8Rm54OFwHLUBssm/NQLjgM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775847834; c=relaxed/simple;
+	bh=0/ZauZOQB/NP1QcAH+PDITEaXUC773OeN19DfxcW1yQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DWGhV0/EajnMvpL+T477ZKRrVbqen876HsNpXtY2jkZu0AE4Lf2fCKzO9oJeZV5je0kE918BE9PfvuCvMK87GmhtAmu7SdIchL34BedwwmDAZq3hD2k4ik2YvgfQ/lEWF8HDfG5ZLIzOvCsaAuhLB8GuFjaRjnklAAjV2sKu2Q4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RgHxDIcx; arc=none smtp.client-ip=209.85.222.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-8c6f21c2d81so178176285a.2
+        for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 12:03:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775847832; x=1776452632; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=EMSX8d1QgLZUoJnKt34AnkG63ZeJBVmP3ekDSJT4BDs=;
+        b=RgHxDIcxGOYr5ijdsrNYCwn5BD85092DDYdqC/7CwkPtJgKSDmZOhLYci8rXuzqvgW
+         gAd90GtFj20TIdlt992pYhfRDMTLxEjOmbQh1pUHLw/Gi3fqZGEeVuzv8k8pWvm3obdK
+         erWR3A6dG/UFFhiApZBAU+j4YvVpIHTUFP06hHh3zCoVzT9MNxaKCbPtDcjJNkwI3eMV
+         thpZX9fucFJsn2ldFAUklkoYJbro9ou8pz8/fK8ShDcJv4fTR7/1145/dKo0V52uxFOR
+         gxUhzvKZvSGurqRpKhh0ap+mzyPp68rSvtblK4vwLjo1QUhP/Q++2WjrJNohF3Qif+bs
+         rkMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775847832; x=1776452632;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EMSX8d1QgLZUoJnKt34AnkG63ZeJBVmP3ekDSJT4BDs=;
+        b=K/M7+yd/75kSsep9Za81NplFu19gQ6tqZ7YZn0RGjFkjZiU4BNG7q/pVHrr9qgkldX
+         f+Eg2kkm2wCL3JObLTxPXn1fwf4qz6LiyawygFHbljv193wimTDC+SeoBks4bMufzG05
+         O0nNYKxxx/yr8zMitg0CfBhMtfkJWywXv8HTRS59vmOG/mEBO2vJyI7pFVjzdaOngpjo
+         Hmquf1fY+uwtEzo8JPChKzPXxRP4dsL1VMVO/spupe7PxFjglS9cRMcHhxLmcWvv0IkI
+         4xmF6yUSEgSs48L1ti/772qdwMcmfZcfq5j0ms6y9MVyIo8N1mR4xStdtfxOzBRPBxCD
+         M5tw==
+X-Gm-Message-State: AOJu0YwNCd5dKcE0dirdAU3jxpP4e1Hbkd/iKC0XbCC0hqXLRmjwwhQX
+	0PqkZf6hyYhPkdEwFQ1WzPm1GC5E/RQWLCvzmGs4lsj4jdFk7sUHz6kQc2fBOw==
+X-Gm-Gg: AeBDieskh46C3iqPC/M36WuJFI5/yC54gO5fmz9iaJRJ3KqX82IllA6qCqwCdeU6+ql
+	eVtFTdV99F24Wpgcjaf8jFXuAgpPdvMuLEsv+P/Mi4vePSnexSAClORX8URzJXDh/xF4AyNQkMS
+	g8Prvj/Wy4BDQAmqhkUcSWK45dngsRY6hZnzcbCxzfF16W95jEPxOMZby8kA4L3sWjYs7xl+y7B
+	IryUR1VdpAz6cQAyqsYTpML0djFqWuCrDIkbK/Qar99wZyZU1KnCEu40+BeTv3nsrYc2JUZeMn9
+	pu/RtPlEk8uHeseS6TdytNZ7AKA0lfSiP6eSAMFQ1WTgcmDcuyxaqah0q2xxcCEfTePvG5UP5DF
+	64OArrUkRkdpll7hOf50xnhlnpRmhfhwsg76xZZYPEOpelLPmpB0OXvH3Fw7tjxKIoaWK4l/ov4
+	70buh0J4m5FLIgpiMLzSnUKc7TQOtsSZH/mxpkpvEgbmUYNc1iSLe/saYaTFaHQrL1VFiYbbASA
+	kn8BaAB+iSiGbJHozQXxC2pO5rHpotQesM4PoRH80qD8bAG11tK7gpk5X0AOt3x
+X-Received: by 2002:a05:620a:2589:b0:8d9:5463:132b with SMTP id af79cd13be357-8ddcf6b5cadmr626066785a.49.1775847832034;
+        Fri, 10 Apr 2026 12:03:52 -0700 (PDT)
+Received: from wsfd-netdev58.anl.eng.rdu2.dc.redhat.com ([66.187.232.140])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8ac84a47a0dsm30598726d6.22.2026.04.10.12.03.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 Apr 2026 12:03:51 -0700 (PDT)
+From: Xin Long <lucien.xin@gmail.com>
+To: network dev <netdev@vger.kernel.org>,
+	linux-sctp@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Florian Westphal <fw@strlen.de>,
+	Yi Chen <yiche@redhat.com>
+Subject: [PATCH net 0/2] sctp: fix a vtag verification failure caused by stale INITs
+Date: Fri, 10 Apr 2026 14:59:15 -0400
+Message-ID: <cover.1775847557.git.lucien.xin@gmail.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB8230:EE_|SA1PR11MB6968:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3d19519c-e83d-43f6-0490-08de973325ee
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016|18002099003|22082099003|56012099003;
-X-Microsoft-Antispam-Message-Info: chvRrI7lhqPhLvdN5ap+nyQxK3rB/XVUELYO8SmGuuSXurFVN9+cUWIIBIhE6N3yhCdQCu//6pWX3WcLONS+lrPQiCrLDQivsMUfUdiXGQ949sqqUivLj73a8zn3az+WFUQ2yMeST/RHnH2XL2j64NKok1aHOuLuWFheWm+jYmigkxiw9T4zs47AUeYl7OR/vRAel6VDzsWdNvcslmEfRHG01/nOrkccWW0OD6O5jAKjqFI2orzWWcuY561AMhqbZmxtLlU7E0Ov3FRYoR/bn1Mi7L60YWBgQUDfU9/07/8Lrd5MjbePMRy7i99YXnR6VrGIv8oYTZGOixOm79d6uD5hwPO4SZtiQw2aX8ZgstCOyck391c5dfTcmT85lwDto5gb0+G2GfzJo95nFG7pCJAyjbX8m4CRh8HAC2RLe/KZuBLCTpnP/NzEHTOBV4HRBUUDLh7soDz2YORnsNCbceDeh3pCbOidQ33CyspuVliZUYV2t9wS56eeC0B5HmPfj8fg7as4sn7PAv8JFlfIJMkOO5O00Wj6gz7sVDaVaXNHrDrGRDNh38wvmSh93j1F86WvnokPOFw0VwZGx0ZSwJq9YkXxIXgpZP/q4NHPv/XvKJ0gAZAIBqolwMuc61a068zett3w152YMfryHvPe2m9Ee8HSdd10kA3pox3VCoCCzoAtwiUwPOfqLbYR27xrQQRvLOI5PxweUJDKtEkdzREGhHKcu3+93xCBx1T63Aw=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8230.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZXJCNnRnV1dVc0M2NFVaZVdVa24rcjRkS1IvazdtcWhaN0dvcWx4OVZWUDJk?=
- =?utf-8?B?SVg2UTFCOGIyL29sM3JDVngxMmorZkFXaTVZLzhiZW1RUTVnZ3NmZG1Gb1JS?=
- =?utf-8?B?UWN5dUtWdkJGYklVQTFVR1JxZVI2MkFaSEsrNThqSkd5Z3JVOWI4SjNCL2Nw?=
- =?utf-8?B?OFlXdmprdmJLeWZ1Mys5VHl0djE2QTcySHA0cCtwR0FlemM4b3lsR2t1NFRx?=
- =?utf-8?B?ZHpIRTZBQ2REWG5kZWZweGVZc2lDUk5lMVJlKytyem4zTnNraDBpajhqeWxh?=
- =?utf-8?B?c09CSnhzU1JFMXkwREk0NnRFU2kxWjloQXMzbVlyL2lkZzlpdkk4dXNXT0c5?=
- =?utf-8?B?Qi82bzFQdVVNUWhHZkVQMzI2YVJPMzRodjFzeDdCcm5CeXo5ZXdyUXBCMUZq?=
- =?utf-8?B?RzhBQ2hDSG5SS28zcHBJZzNvSUlFOXdFaUxqU0NZTkNBUCtkeUpobGhYSzZK?=
- =?utf-8?B?Z0loM1FqNm1sbmJoNWFOcXpTaUFDK2JWeUl3TnVFU2d6UVdndFZIaFRCRFhQ?=
- =?utf-8?B?dC92eDlLYkJ0dHRDcWRhWExUNVdvck9YcnlQYXFQQ28vL1gvVk5rRk5GMWpU?=
- =?utf-8?B?NWFjY0U3ZnA0SWZUQkVPRWE5aXNUT1NvN1ZncjZMdThLS1IxdlhXaFdpejJM?=
- =?utf-8?B?QUJhNytXakk4TjZ5RXUwTThGbWVJSENCTVU1WCtxZmhudUpMRXFEVUVaV3VI?=
- =?utf-8?B?VWxiMk9UU0E5V1duZnNESG8zbWdvNEVFKzIxb3NOZ2VIYjRKYlNiczVzdzMv?=
- =?utf-8?B?RlRxUWdqZHBnRjZQMGlYL1BkTVlhV3JjdmV1dEkxVnBkemlDMWtkNWxkV09a?=
- =?utf-8?B?RHN0bkMyVEdOaVd2Nlh6SUVLMnd0NE9zeER6TFdKNzZpSzB2M0pjV0krdC9D?=
- =?utf-8?B?NnVna09wOWV4alBDaGJPeWlqQ3B4VFc4RUJkT1podTMvU3FlVEIyK3dua3E4?=
- =?utf-8?B?cjdieGlwUjdrVVg4KzlyOVE0UkZ6UW9VK09ZR2Z3ZnRLQTZJVFNSM0JyMHRE?=
- =?utf-8?B?ayttRktRZGduVDh6WVpQOHM0TkFBcDJTeVBXdUVHRHBkYy9ZUENZUTRZaVVj?=
- =?utf-8?B?N1F2S0ZOb1NMckJjNDdNb244MTNzK2kyWC9BRkRzODZxalIxMURmZ0FhWSt6?=
- =?utf-8?B?eG9zUjM1MUVLSjU4ZzYwMHVObXFZQ2k4bkFmNEVQM2lmUStJSnNhTkJ4L3dZ?=
- =?utf-8?B?dEVzbWZVQktNODdWYkVUR0plTG9xZ1VXS29heWlhUzlTYkllQ01ybU1LLzFw?=
- =?utf-8?B?YTd1QUNJQXZaY2pjQ3NCRDhBL3Zxa3A5SzNkcVh5cURrMEFPRE5VL1gycFIz?=
- =?utf-8?B?VW9aYWlTVUJUbGEyS3d2WnVkbFN3MWdqRGd5VENuOGRHQkwzdXpGSHZkbFl3?=
- =?utf-8?B?K1lMNHB4RHpxTE1admVzT0hPbXhrcWtNWWpaMmVKWGFteU52WG05aUs4a2FQ?=
- =?utf-8?B?RzhlQVZrM0ZWbm5WekdTYXZrSGJSWTNXaFZhWE5HbStzY09LdXdjUDBhV3o5?=
- =?utf-8?B?RTJxYlRLc0F3dXNyb05BeXpFTjgwVnQxSjFMeWZaMTBqUVE3MzlDUUNPMWpk?=
- =?utf-8?B?NTZRejZtT1U3TGgveTYwRVdBSzdiWkdBdmFhaU5TKzdLaVAwRCtkYjZOa09Y?=
- =?utf-8?B?ZCtoeW1vWHZhVkZ4S05wbXlQckliUzU2blhQZVBhcUMwZlRDNDJHaS9xaloz?=
- =?utf-8?B?Zmo4ODlHY241bjBwVWhOMk5KdTM5Zk9KYnl3UlhQNVRVZ0FidThvNDlEUXhO?=
- =?utf-8?B?VW5RLy9TdG52d1hWampna0xEeW5VQ1dSWFpYUlpYUXVHTUtkb05iVW5FZmNH?=
- =?utf-8?B?SkNUZzNHa1Y2bzFmL2twd1lZTGtJYXlzTnROYmV0c21aVDVNWlQvdVRlZFZr?=
- =?utf-8?B?SjFKdytKT3JqTWQyYUVDQWhWZTFiK3prRHlQLzlKSUpIcEQxbFQ5VmJUNW5C?=
- =?utf-8?B?enNIallrbVl0d3YxM2lHWkdvMjhxNlJuVGY4blY1QSt1V1hEdGlEQlBWZlB3?=
- =?utf-8?B?aE9zK0VtVlh6Z0E1TXJOOXB4SjlqYi9wT0Y5YWRWbzJxa1pDc1BzNklabE9s?=
- =?utf-8?B?bkViempCNFI2ampTYVNCTEs1QVBQNXJudGFHemVjd3FOL0c4Y0lIY1pRZDl5?=
- =?utf-8?B?eGVGamtXVzNRQWh6YUZyUm9YdUo0VEpZNGZjckw3TkNJNDdCMS9DcExrYlRL?=
- =?utf-8?B?N0lnSXJmWHB2NkdjSml5czBHTGx2a0ZXdCtNSkRIc1FMalIxSHFPWGtOQXVy?=
- =?utf-8?B?SjIyWDZuamlieE9VY2Exa2ZwdWVzTHF4dnVFcW9HM2NPblo0amZGUCtmQThF?=
- =?utf-8?B?bWNDZ3pWRmFkWFM5bHplSFBRS0lQU0p3QUFtVXhoTEpzVENUL25ORGdrRFow?=
- =?utf-8?Q?A0XzxA7viwWC1U2k=3D?=
-X-Exchange-RoutingPolicyChecked: vNuKKFTDp49z20D4Nc//+NiNO5S8CKwMP9msygQLamoEHLx9mKV689WGivvD6G0L2DGtQcV/M0ZfcHbDy6tbt9LOZ7HCpthix+/5UdQRhZW54C9tHGjA+9KaK4sqwhUPKjpUzNTf4GOQfSolEbmNuRbDEwGbL9vOlLwZvQYlBZl+8oOThzvP0mLB1GXa95PSTo5qjzi47WeeMZPDIH1TnQEsyyIkNtAbHMOV6KPQgo6WXfPy1yS5b77Iv3exnVe0QaOf0kIKrTp9lDicMiPfwKuhAEJDWUrAhgwU1IwLvl8KOyB84KuVCwGtvH3s1LtJyN+4TCa0QhEpkW3q6dNgqg==
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3d19519c-e83d-43f6-0490-08de973325ee
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8230.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Apr 2026 18:58:27.0111
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: lt9WEF6wGUBbjb8gHRYUF7ArHWOb4c4yfGTkvwshs/40PtMw4Abc6A4q0STslKBTzpx8T6f4k1NWf8tSEyCrSJSpRYoX6mWX+CqeO5sRMyk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB6968
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-277522-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
-	DKIM_TRACE(0.00)[intel.com:+];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_THREE(0.00)[3];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[anthony.l.nguyen@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-277523-lists,netdev=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,google.com,redhat.com,gmail.com,strlen.de];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[10]
-X-Rspamd-Queue-Id: 192423DBB8A
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C3D363DBCB1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+Similar to Scenario B in commit 8e56b063c865 ( netfilter: handle the
+connecting collision properly in nf_conntrack_proto_sctp"):
 
+Scenario B: INIT_ACK is delayed until the peer completes its own handshake
 
-On 4/2/2026 10:40 PM, Aleksandr Loktionov wrote:
-> ice_set_vf_bw() refuses to accept any min_tx_rate value when the
-> total guaranteed bandwidth is already oversubscribed, even when the
-> requested value is 0. This makes it impossible to recover from an
-> oversubscribed state via "ip link set <pf> vf <id> min_tx_rate 0".
-> 
-> Allow a zero min_tx_rate to bypass the oversubscription check so
-> users can always clear the guaranteed rate. Additionally print an
-> informational message when the oversubscription guard fires to help
-> diagnose why a non-zero request was rejected.
-> 
-> Fixes: 4ecc8633056b ("ice: Add support for VF rate limiting")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Sudheer Mogilappagari <sudheer.mogilappagari@intel.com>
-> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-> ---
->   drivers/net/ethernet/intel/ice/ice_sriov.c | 8 +++++++-
->   1 file changed, 7 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_sriov.c b/drivers/net/ethernet/intel/ice/ice_sriov.c
-> index 7e00e09..6e3bec7 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_sriov.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_sriov.c
-> @@ -1507,6 +1507,12 @@ ice_min_tx_rate_oversubscribed(struct ice_vf *vf, int min_tx_rate)
->   	all_vfs_min_tx_rate -= vf->min_tx_rate;
->   
->   	if (all_vfs_min_tx_rate + min_tx_rate > link_speed_mbps) {
-> +		if (ice_calc_all_vfs_min_tx_rate(vf->pf) > link_speed_mbps) {
+  192.168.1.2 > 192.168.1.1: sctp (1) [INIT] [init tag: 3922216408]
+    192.168.1.1 > 192.168.1.2: sctp (1) [INIT] [init tag: 144230885]
+    192.168.1.2 > 192.168.1.1: sctp (1) [INIT ACK] [init tag: 3922216408]
+    192.168.1.1 > 192.168.1.2: sctp (1) [COOKIE ECHO]
+    192.168.1.2 > 192.168.1.1: sctp (1) [COOKIE ACK]
+  192.168.1.1 > 192.168.1.2: sctp (1) [INIT ACK] [init tag: 3914796021] *
 
-ice_calc_all_vfs_min_tx_rate() is already called above (out of this 
-patch context), can we save that to an interim var and save this second 
-call?
+There is another case:
 
-> +			dev_info(ice_pf_to_dev(vf->pf),
-> +				 "The sum of min_tx_rate for all VFs is greater than the link speed\n");
-> +			dev_info(ice_pf_to_dev(vf->pf),
-> +				 "Set min_tx_rate to 0 on VFs to resolve oversubscription\n");
+Scenario F: INIT is delayed until the peer completes its own handshake
 
-Why not 1 string/call?
+  192.168.1.2 > 192.168.1.1: sctp (1) [INIT] [init tag: 3922216408]
+  (OVS upcall)
+    192.168.1.1 > 192.168.1.2: sctp (1) [INIT] [init tag: 144230885]
+    192.168.1.2 > 192.168.1.1: sctp (1) [INIT ACK] [init tag: 3922216408]
+    192.168.1.1 > 192.168.1.2: sctp (1) [COOKIE ECHO]
+    192.168.1.2 > 192.168.1.1: sctp (1) [COOKIE ACK]
+  192.168.1.2 > 192.168.1.1: sctp (1) [INIT] [init tag: 3922216408]
+  (delayed)
+  192.168.1.1 > 192.168.1.2: sctp (1) [INIT ACK] [init tag: 3914796021] *
 
-Thanks,
-Tony
+In this case, the delayed INIT (e.g. due to OVS upcall) is recorded by
+conntrack, which prevents vtag verification from dropping the unexpected
+INIT-ACK in nf_conntrack_sctp_packet():
 
-> +		}
->   		dev_err(ice_pf_to_dev(vf->pf), "min_tx_rate of %d Mbps on VF %u would cause oversubscription of %d Mbps based on the current link speed %d Mbps\n",
->   			min_tx_rate, vf->vf_id,
->   			all_vfs_min_tx_rate + min_tx_rate - link_speed_mbps,
-> @@ -1556,7 +1562,7 @@ ice_set_vf_bw(struct net_device *netdev, int vf_id, int min_tx_rate,
->   		goto out_put_vf;
->   	}
->   
-> -	if (ice_min_tx_rate_oversubscribed(vf, min_tx_rate)) {
-> +	if (min_tx_rate && ice_min_tx_rate_oversubscribed(vf, min_tx_rate)) {
->   		ret = -EINVAL;
->   		goto out_put_vf;
->   	}
+  vtag = ct->proto.sctp.vtag[!dir];
+  if (!ct->proto.sctp.init[!dir] && vtag && vtag != ih->init_tag)
+          goto out_unlock;
+
+This happens because ct->proto.sctp.init[!dir] is set by the delayed INIT,
+even though it is stale.
+
+Fix this in two parts:
+
+- In netfilter: Do not record INITs whose init_tag matches the peer vtag,
+  as they carry no new handshake state in the 1st patch.
+
+- In SCTP: Prevent endpoints from responding to such INITs with INIT-ACK,
+  ensuring correctness even when middleboxes lack the netfilter fix in
+  the 2nd patch.
+
+A follow-up selftest for this scenario will be posted in a separate patch
+by Yi Chen.
+
+Xin Long (2):
+  netfilter: skip recording stale or retransmitted INIT
+  sctp: discard stale INIT after handshake completion
+
+ net/netfilter/nf_conntrack_proto_sctp.c | 10 +++++++---
+ net/sctp/sm_statefuns.c                 |  6 ++++++
+ 2 files changed, 13 insertions(+), 3 deletions(-)
+
+-- 
+2.47.1
 
 
