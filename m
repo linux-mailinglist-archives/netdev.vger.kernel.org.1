@@ -1,134 +1,142 @@
-Return-Path: <netdev+bounces-277488-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277496-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ICXlFgQo2WkPmwgAu9opvQ
-	(envelope-from <netdev+bounces-277488-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 18:40:36 +0200
+	id 4FpiJjQw2WkOnQgAu9opvQ
+	(envelope-from <netdev+bounces-277496-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 19:15:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2CC23DA87E
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 18:40:35 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 947E33DAF45
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 19:15:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4F1A33074EFF
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 16:35:34 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 899063003712
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 17:15:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 931C33DD519;
-	Fri, 10 Apr 2026 16:35:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="IendoEvj"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAD633E123C;
+	Fri, 10 Apr 2026 17:15:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 219213DCD8E
-	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 16:35:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
+Received: from trinity3.trinnet.net (trinity.trinnet.net [96.78.144.185])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81EB93E0C57;
+	Fri, 10 Apr 2026 17:15:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=96.78.144.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775838930; cv=none; b=pDg06kWLJ5nz6EgAgObqnG5DFYJu3x51gjS+yK3MIKTSEnpur49z8JfDnAWyW7iRRS6Js06c0P2KOZbY9sgjeGfmxaQTEoGqCzAaPAB7K0ejkceeq9Daru0jno3kw9RBWDs2Vpk7eaKic9MnLLHodBsRSzAydrF7uviNO215VgM=
+	t=1775841324; cv=none; b=kWzntigof6bsMqsytGZM8WDY/vMUuu1JGQNOzz9y/FDsIdAemkoAX1csnf78emyQJe1Xg6z4MEJiwLVYYc0k4JFHq4Z51SLJHCNRA0/Y7Xno2UtxASKeAqQHFWVEk/WB2OschRs/T7FcIj3bHFODNa7KlTImyZJLvRQqF8/Jf/Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775838930; c=relaxed/simple;
-	bh=4bEJckATCQovUDGTXgmxeu6pw7JgXLtzyOhX7nI99Ck=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JmnDrcaovDRBR9JOa+osMlWzdI7jOduEJgeyxHvDlHOlNzX29Ae6/5aTdviF4RiFU1Bg+1rcnblH7d/QYCzuYBTf5uGVLlhHjzl2HJBsUpdq/nmHXiz+9tqEKt1J6vSj5QBnw3sIurU0+EZm+5lZ1dw08+51BMFB9ssySDVNqPs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=IendoEvj; arc=none smtp.client-ip=82.195.75.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=2k7HVgLatXHkkiYA8xPjMurtGezO58LSDfzc29KudGI=; b=IendoEvjPx6BQP+b/oLMz08CTn
-	rIqggQ6Nd/iLqSjdOIyl7QFTVkKuRmzs8oQdvuQ3g7VuKmZKKkJJne1/6beBRCHrKZUYFBCvAPMz2
-	pvUzDVFcNT1YCt1cQ9BrBSG8pKlqjMMkBFwcDCh68y2rVgpCQqYVdXl7UE6KS++8KzPhXVlXjFkOE
-	gg2J3DsfmX4vjX7ss+jx8NQU+h6gNxyl9LV71Wd1w0QCRSvpxedsuWto9s4jNU9Og8kMzmKz4F0qp
-	g6Gn0kKp+u+9LH8zdVOXRF12Omt5r/nfL/F50jtzY7QtZfXVGu2R3Ury2DV+Ymy1CfgSKLIcpy58V
-	Zla2tMeQ==;
-Received: from authenticated user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.96)
-	(envelope-from <leitao@debian.org>)
-	id 1wBEpK-00A6xC-1u;
-	Fri, 10 Apr 2026 16:35:26 +0000
-Date: Fri, 10 Apr 2026 09:35:22 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Stanislav Fomichev <sdf.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com
-Subject: Re: [PATCH net-next v6 13/14] selftests: net: add
- team_bridge_macvlan rx_mode test
-Message-ID: <adkmmM6cCKWqogIx@gmail.com>
-References: <20260407153101.3694714-1-sdf@fomichev.me>
- <20260407153101.3694714-14-sdf@fomichev.me>
+	s=arc-20240116; t=1775841324; c=relaxed/simple;
+	bh=jCIgsDRilv7KIqAd1L2z7WRRBTaNL4Em2+kHrNaLTG0=;
+	h=Subject:To:References:Cc:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=EyzxGgfC/fvKb4Hu+kd4G61nZttmGbSk+/yL82L5HR+3sXMyYt8eaOJ8p6via8Mh1abQ7OG5fbVGXyk+rRzkP1izc8NZhBByRZ4a3FDHViGbwN+gHV+6cHhy2r28Jm+ign8UDVBT9bvGPlAnVbdytjk4fhuGpTH9NVWJcmzFw7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=trinnet.net; spf=pass smtp.mailfrom=trinnet.net; arc=none smtp.client-ip=96.78.144.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=trinnet.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trinnet.net
+Received: from trinity4.trinnet.net (trinity4.trinnet.net [192.168.0.11])
+	by trinity3.trinnet.net (TrinityOS hardened/8.15.2) with ESMTP id 63AGcPw0019678;
+	Fri, 10 Apr 2026 09:38:25 -0700
+Subject: Re: [PATCH net] netrom: do some basic forms of validation on incoming
+ frames
+To: jj <ve1jot@eastlink.ca>, Simon Horman <horms@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+References: <2026040730-untagged-groin-bbb7@gregkh>
+ <20260409190328.GS469338@kernel.org> <20260409203235.6b9329f0@kernel.org>
+ <2026041026-excuse-slashing-c4ee@gregkh> <20260410102827.GT469338@kernel.org>
+ <18e3df62-34f9-4de0-903b-19919d7ae2ca@eastlink.ca>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+        linux-hams@vger.kernel.org, Yizhe Zhuang <yizhe@darknavy.com>,
+        stable <stable@kernel.org>, "Bernard, f6bvp" <f6bvp@free.fr>
+From: David Ranch <linux-hams@trinnet.net>
+Message-ID: <2e0f1dca-56dc-d6e6-f4d4-1de3160e0179@trinnet.net>
+Date: Fri, 10 Apr 2026 09:38:25 -0700
+User-Agent: Mozilla/5.0 (X11; Linux i686; rv:45.0) Gecko/20100101
+ Thunderbird/45.8.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260407153101.3694714-14-sdf@fomichev.me>
-X-Debian-User: leitao
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+In-Reply-To: <18e3df62-34f9-4de0-903b-19919d7ae2ca@eastlink.ca>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [0.04 / 15.00];
+	DMARC_POLICY_QUARANTINE(1.50)[trinnet.net : SPF not aligned (relaxed), No valid DKIM,quarantine];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_MATCH_TO(1.00)[];
-	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	DMARC_NA(0.00)[debian.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,davemloft.net,google.com,redhat.com,darknavy.com,free.fr];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-277488-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-277496-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[debian.org:+];
+	FROM_NEQ_ENVFROM(0.00)[linux-hams@trinnet.net,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,fomichev.me:email]
-X-Rspamd-Queue-Id: C2CC23DA87E
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,trinnet.net:mid]
+X-Rspamd-Queue-Id: 947E33DAF45
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Apr 07, 2026 at 08:31:00AM -0700, Stanislav Fomichev wrote:
-> Add a test that exercises the ndo_change_rx_flags path through a
-> macvlan -> bridge -> team -> dummy stack. This triggers dev_uc_add
-> under addr_list_lock which flips promiscuity on the lower device.
-> With the new work queue approach, this must not deadlock.
-> 
-> Link: https://lore.kernel.org/netdev/20260214033859.43857-1-jiayuan.chen@linux.dev/
-> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
 
-Reviewed-by: Breno Leitao <leitao@debian.org>
+I agree with John VE1JOT that amateur radio protocols such as AX25, 
+NETROM, and ROSE are still very active in the Linux kernel.  This 
+discussion makes me wonder how the Linux kernel community judges how 
+"active" a given feature / driver / etc is being used in the real world 
+before considering deprecation.  If there is an official mechanism to 
+get metrics sent from users back to the kernel developer community, 
+please let us know and we'll try to get you some one-off or periodic 
+metrics.
+
+--David
+KI6ZHD
+Avid AX.25 and NETROM packet radio on X86 and ARM-based Raspberry Pi
+https://www.trinityos.com/HAM/index-ham.html
+
+
+On 04/10/2026 08:12 AM, jj wrote:
+> This is NOT an obsolete protocol..this is in use by amateur radio 
+> operators world-wide...we use it for RF comms usually, because what 
+> happens if the internet goes "down", we can still provide comms over 
+> slower RF links....(plus it's a fun mode)please PLEASE do not 
+> drop...and sorry for the noise...
 >
-> ---
->  tools/testing/selftests/net/config       |  3 ++
->  tools/testing/selftests/net/rtnetlink.sh | 44 ++++++++++++++++++++++++
->  2 files changed, 47 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/net/config b/tools/testing/selftests/net/config
-> index 2a390cae41bf..38611ea11c6b 100644
-> --- a/tools/testing/selftests/net/config
-> +++ b/tools/testing/selftests/net/config
-> @@ -101,6 +101,9 @@ CONFIG_NET_SCH_HTB=m
->  CONFIG_NET_SCH_INGRESS=m
->  CONFIG_NET_SCH_NETEM=y
->  CONFIG_NET_SCH_PRIO=m
-> +CONFIG_NET_TEAM=y
-> +CONFIG_NET_TEAM_MODE_ACTIVEBACKUP=y
-> +CONFIG_NET_TEAM_MODE_LOADBALANCE=y
+> de John VE1JOT
+>
+> On 2026-04-10 07:28, Simon Horman wrote:
+>> On Fri, Apr 10, 2026 at 07:24:36AM +0200, Greg Kroah-Hartman wrote:
+>>> On Thu, Apr 09, 2026 at 08:32:35PM -0700, Jakub Kicinski wrote:
+>>>> On Thu, 9 Apr 2026 20:03:28 +0100 Simon Horman wrote:
+>>>>> I expect that checking skb->len isn't sufficient here
+>>>>> and pskb_may_pull needs to be used to ensure that
+>>>>> the data is also available in the linear section of the skb.
+>>>> Or for simplicity we could also be testing against skb_headlen()
+>>>> since we don't expect any legit non-linear frames here? Dunno.
+>> Sure, that's find by me if it leads to simpler code than
+>> using pskb_may_pull(). Else I'd lean towards pskb_may_pull()
+>> as it is a more general approach that feels worth proliferating.
+>>
+>>> I'll be glad to change this either way, your call.  Given that this is
+>>> an obsolete protocol that seems to only be a target for drive-by 
+>>> fuzzers
+>>> to attack, whatever the simplest thing to do to quiet them up I'll be
+>>> glad to implement.
+>>>
+>>> Or can we just delete this stuff entirely?  :)
+>> Deleting sounds good to me.
+>> But we likely need a deprecation process.
+>> In which case fixing these bugs still makes sense for the short term.
+>>
 
-Why do you need LOADBALANCE enabled for the test?
 
