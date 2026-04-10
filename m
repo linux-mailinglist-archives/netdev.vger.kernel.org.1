@@ -1,182 +1,370 @@
-Return-Path: <netdev+bounces-277423-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277424-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yG+kHsL32GkYkQgAu9opvQ
-	(envelope-from <netdev+bounces-277423-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 15:14:42 +0200
+	id YO6TGPP42Gm1kQgAu9opvQ
+	(envelope-from <netdev+bounces-277424-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 15:19:47 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13BAA3D805D
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 15:14:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EEB183D80BF
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 15:19:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 481A030066B5
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 13:14:41 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 3C77A300B9DA
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 13:19:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3894377011;
-	Fri, 10 Apr 2026 13:14:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BABCA3A3E80;
+	Fri, 10 Apr 2026 13:19:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L+I3U6gU"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YC9AmIBk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEC63314D16;
-	Fri, 10 Apr 2026 13:14:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775826879; cv=none; b=gxXSo7bxA1JCh6NfKauAfJ8O/Rl5Z+7O9gOCaJeP9fgCQET1IltJKTvrG1w65cWkZICVDPjy/hMzLjIoscQHTUF3pejRSruOslIOPCBIFDFBxvGmKV/kO6dgAHfewExgIj0v7ptqF3eBmsO6Th7WEk076ZTgPRUcqHYvSzUfsSk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775826879; c=relaxed/simple;
-	bh=mQ/7OrrwieJDTdrH7hooz4EEuxSFq4IEqgQU97DnhbE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bbcKeUVYBy4UyJ1eidtS1rxsNOjPToVrTe0NOelMzvGyraB6DKHn4SGKdb9N9XABJjG0JM0gSPN4UjUB6nKkkfbSgqDfKB+3tj0vrkoKuOfug5BpkucKdVIDZSCWJ3zUgYsIVTfRKRStrbQEH6JIMWrIlOyfx0YoryIGkxjCqiA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L+I3U6gU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 244F8C19421;
-	Fri, 10 Apr 2026 13:14:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775826879;
-	bh=mQ/7OrrwieJDTdrH7hooz4EEuxSFq4IEqgQU97DnhbE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=L+I3U6gU0OxyPmQwzoqXjiYH+t54Yehw5ewLHCuioPKr8KMz6sHE7MaTydXX6Igmv
-	 +2iM+/lwImgN+0lJbzlr3uC1yPV3kTzA+TxM+9NiQhUZLcXlshdlFkqCdLiOpxdIHB
-	 Hkh/TS4sTMKxPhihYha/+QFydpIgHWLpkYTQx7MlAzhWXjTZfWqTBFeEZSxLgjPR83
-	 hdzMrTfS4IWLvGQKrq6KfQYbQJMkBO3kCZzmAGz0kdw6tyBjqcEscPt5qwYxawDE/V
-	 JYQxffvP869eX9CC5YyLB95QBAF/vAK18VkgOlrOi5NOImbPjnRVYJs+HnEDhG9Ca0
-	 /JQXer2WhHuJg==
-Date: Fri, 10 Apr 2026 15:14:37 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, ansuelsmth@gmail.com,
-	benjamin.larsson@genexis.eu, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next v3 01/12] dt-bindings: net: airoha: Add EN7581
- ethernet-ports properties
-Message-ID: <adj3vW7TKXccLSXa@lore-desk>
-References: <20260406-airoha-eth-multi-serdes-v3-1-ab6ea49d59ff@kernel.org>
- <20260410025717.1809904-1-kuba@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 426AC3A1CE6;
+	Fri, 10 Apr 2026 13:19:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.21
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775827184; cv=fail; b=od+ElN7VlXcnNVHf1VMqolRg7OGODWaA/7Fxzoj6iVDudfGFcuuw1Yvqfh1r/pVSogX6PjhzcvCfuFZt7evH1e1puH0xxQ+hjckQGS+rwTRvrXwKVSV7CHq8bw+80ZbPAWWklfnWhul/yr3ZDOLr0cWtfq7sF0Ti5rPDXA5LF0E=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775827184; c=relaxed/simple;
+	bh=7pnGKDNd3j+eHJvi7lZ2sCgswYu8IAzahNatqToothw=;
+	h=Message-ID:Date:Subject:From:To:CC:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=HY6g6ktJur+xOF87PlElxqxYw+iCX2ns7BVdEnulrkmiMedetBWpOz3gV+hU0r0L49IycRKZtahFK/DOd/pRgM54jEGoSYC18OU7k/X6nspddM+rfN8w5UzE59vbt2zLCNe4BMitc8VWnIvM6LsxzpWipX6N0BwyUn7Bf2gFjxU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YC9AmIBk; arc=fail smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1775827184; x=1807363184;
+  h=message-id:date:subject:from:to:cc:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=7pnGKDNd3j+eHJvi7lZ2sCgswYu8IAzahNatqToothw=;
+  b=YC9AmIBk0L+iDTY8lCaUF7GDh/S3SA0ezSTUKu6+XymlzYsWMW6gkWMM
+   qcejegbQ+jRKzL3FHUv5ODxdg85uUQ7vmVEJt0miGEZ9ycfkBbhaOwNu6
+   XlXYQkeXJdRz5jsJze4lfWKXfsxHK5wvvqja1Ws2blz79EOj7d7qud7qm
+   GSJhslgTEbffD2qkfz6OXQj0lhdS7h9XgDVSUEW8tAB9TIH6tFkNzxtIF
+   WyNL9n5sv2OkrAC5mm9W3Ql+5AObypEO+HWwCE/B3+OvHrD0lfjETw9yW
+   CfkPlq0a7cbbmCKV3NCfoxq2NSi/muCUbXy4SBiLM0mP6WEHo7+rQQza4
+   w==;
+X-CSE-ConnectionGUID: m39GZYpsRNCVgkju/k+HWw==
+X-CSE-MsgGUID: KXdAIzgCQLyn4KOmq3Jzxg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11754"; a="76723578"
+X-IronPort-AV: E=Sophos;i="6.23,171,1770624000"; 
+   d="scan'208";a="76723578"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2026 06:19:43 -0700
+X-CSE-ConnectionGUID: EnHieW76SGSoTYVourglNQ==
+X-CSE-MsgGUID: tVxLm4a9TsqlNto06SnKXQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,171,1770624000"; 
+   d="scan'208";a="230807026"
+Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
+  by fmviesa004.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2026 06:19:42 -0700
+Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Fri, 10 Apr 2026 06:19:42 -0700
+Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
+ FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Fri, 10 Apr 2026 06:19:42 -0700
+Received: from CY3PR05CU001.outbound.protection.outlook.com (40.93.201.1) by
+ edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Fri, 10 Apr 2026 06:19:41 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=NwjAifvAAc7Y/TL0qi1OdgwD6A12gn/KDbwrtDiEvcik7L/3bPlbg7qTjjiM4/KS8ZQi3dsEU2EpurVpRMn5jpOI2hjCCOspJmJBL2bGGtqQ+blPFe1sC1CT2wuSf5rRzH6JpUqWGymA1HpGKuqvfDH/vvTC0qHuT/shJAoYVIvErbYN5INQhGjVMYPTrx5KYkvmKCEsKFh8HB6wegmslY/VUgUaY/IGJ8VO77sRHONIcFXnf4m5M6ql8bz7tAb2K1cONKKlyuY3qmQP1HXIOsyDRux9KFFpcjKz5akKHcucIESTMRftcnYdr7gSsdESwFqbpCK0VMEIgvEcHd5cTg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=p47Gn4bIHQyfMpllVKYUXdD8PnbjMRaJ10VFmV8X+BA=;
+ b=cTHpU6TvF4jD8AsRaG5dKQ3cQB4ZqK3MvxnWrXee3+St9uOyvLI/us5MCzCFyVfw+196uAyL3mbyLRiKsUJkon1RmmESX7tkgytHxiHqej4zH4BPWjn2Xuc+VJvfhfAdd5MPW5w8r07Em/3/6aoO/XWXR39l7efw9lyeCPKaOKoPZ9lGU8NvuRi664REyjnzKBuDEQQisavjStAE7D+h8Ca8d1kvyIBXxgMByF6Rowl4Xnf/GTWDawws4NDBtVfESEe6eCsiGkAxhDZKIPt5wWxycTsZfvexebu4M48FVmAXWrMoUxhXv3cRPwXfwWF12A4+l01OsIEe/BNDTBaVXw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
+ by PH0PR11MB4824.namprd11.prod.outlook.com (2603:10b6:510:38::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.42; Fri, 10 Apr
+ 2026 13:19:40 +0000
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::8d98:e538:8d7:6311]) by MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::8d98:e538:8d7:6311%5]) with mapi id 15.20.9791.032; Fri, 10 Apr 2026
+ 13:19:39 +0000
+Message-ID: <30d48647-8c1d-4683-ae9d-becb33cf8d4f@intel.com>
+Date: Fri, 10 Apr 2026 15:19:34 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH net v2 3/4] iavf: send MAC change
+ request synchronously
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+To: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+CC: <netdev@vger.kernel.org>, <stable@vger.kernel.org>, <edumazet@google.com>,
+	<anthony.l.nguyen@intel.com>, <kuba@kernel.org>, Jacob Keller
+	<jacob.e.keller@intel.com>, <intel-wired-lan@lists.osuosl.org>,
+	<pabeni@redhat.com>, <davem@davemloft.net>, "kohei.enju@gmail.com"
+	<kohei.enju@gmail.com>
+References: <20260407165206.1121317-1-jtornosm@redhat.com>
+ <20260407165206.1121317-4-jtornosm@redhat.com>
+ <89bfd605-1877-4d40-95e1-bfeae6624168@intel.com>
+Content-Language: en-US
+In-Reply-To: <89bfd605-1877-4d40-95e1-bfeae6624168@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: DU2PR04CA0053.eurprd04.prod.outlook.com
+ (2603:10a6:10:234::28) To MN6PR11MB8102.namprd11.prod.outlook.com
+ (2603:10b6:208:46d::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="w8PmPGRkvaOhX7h0"
-Content-Disposition: inline
-In-Reply-To: <20260410025717.1809904-1-kuba@kernel.org>
-X-Spamd-Result: default: False [-2.26 / 15.00];
-	SIGNED_PGP(-2.00)[];
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|PH0PR11MB4824:EE_
+X-MS-Office365-Filtering-Correlation-Id: fdf80093-723d-4510-c828-08de9703d1f3
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|22082099003|18002099003|56012099003;
+X-Microsoft-Antispam-Message-Info: 41pXlk0XzmoMW3fCCmEKvhBo9roBcSINnPZsaYqByGe7CoPYxjssF2VmEOiFMrktr5jMN0l4XkTUycJx0mRDKV4DSF4SiPSQHfNnZzSn9jUt1Gly8DqigUtg1P+4zLsihEmkQECODA+bB8xP+1ml422IBZtg6fL9IjdC/71NLICLh4+9XDcPnzEGsdCQOi/GJLjApEZAMc31z7FYQpw4hdl7tGmXrV9h9xF5fGKeF41bPHpyftyt5QD5+oeWarGuHf0Qd+1WS96+x6FFZ5yvPqmF1vS6IMSxYQ4HmQAuaZAUZIsr8xIW0F8i3E+CZAQEaDsC8pSwQRYhPzaZOENYWyDtTqQSZhZjNZ0LlXelbXRrQ+cFfDm7An3vK/7dukO3QiU587XFhTHSUxhfQMZXUSPBwim76Z+8YN2ArWI7ZAp2eHoKA3fqcMV8TJYxZywEQzg6P98FjDJS4197Cc3yYLq/GFeJNU6NrYshccFduXDpTd6LJL3RuYmd+jZShLDn2Dhq8pr+c9ALWcES5/epVDG9O/Ua3YJL+FEDeiM+0VaKfgB17KQZjudb/cb9LTaFJDVL7LZEq8NfOW+UOpn5GGJeHo4EU2gU6W7TO0h3/I0trRwtRo+sIdmPrzc3ugZZxQZ+SMOuzpjWeBaJ0QHECu7MuWvGyM1VSEa5K+wuN9wWIJ2cQneK3bst+GZAf1fkj9Kufr3LEJW/ssBjKaeg0uFVwziOSKDD/Ht/5oa6f7s=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?S3VlWUZqaHVmeDVDMVZJOXBrTnVyRVBEY3Jjc3ZSK28rQUVEaDdjSnFWYmFm?=
+ =?utf-8?B?Nm41cGZGZU15VjluSGJ5LzNBcXVUcWQ0ZVJRSTNxTEVWejd2LzA2ZFI4VU1I?=
+ =?utf-8?B?akhLZnZYdEdtSXlmTVZLcFR0Nml2NE5Hazc1SWZ6L29qRVhtODZYaEhaV1dr?=
+ =?utf-8?B?S3plNmFNTlRvdjFIdEZjcjZFRmlmMXlQUWhSRzJRcmo3M3ZTQXJHbDFiNDZl?=
+ =?utf-8?B?NlZpS1ZMelJyNEV5cnFOWHBqSmhEVi9hVTNYL2VpdEZtbUV2aDZVMW56RzU3?=
+ =?utf-8?B?TnJ4K1ptQWNtWmhFVG1MTFVSLzRVdUtmS2VkZm8zelFuUkFzM0JUN1dISGZr?=
+ =?utf-8?B?MDBOMnNaeGoxYkZoc3l5SEhuV2JLalAvQUNaNlpDUzE3ZTZKVWo5RFZ5TWtH?=
+ =?utf-8?B?NC8xYU9tV25FVHU0Nm5mbk0xL2UvcHgwN2l2VHBUaUJpbEZEY1MxREJqVEp0?=
+ =?utf-8?B?dTdzSGVMekY0T1JkU3NWTW9WYjl6cmxNYm9OcVd1QnBFYkVDdU1kUnloRyti?=
+ =?utf-8?B?QzhCaVFqaEd6TzA1M2hhMkVaa3B3VDZ0eTFEWGZCcDdpTUFMQnJLT3hTMGls?=
+ =?utf-8?B?c3BEVG5qMjR5QnNpNVVucnEzb0lPeUZvcHgzdHE2LzM4L0hmWDJzb2U3UU04?=
+ =?utf-8?B?UUZ6OXNrWE8rUWRrRE81bDNFRnRGT1gzNzc2WFo0bUpBS1M1TExLMHQyTWVW?=
+ =?utf-8?B?WmtDMHl6dFpxVkVCSlptcmNqOEdXR3pCT3lHU1l5Um1tODZxeDRjNlluQXFy?=
+ =?utf-8?B?ZlFHVFhUWmF2YlYwbWl0eGZkbzY3SEV6T0loTmVmYlV2Z25sdUZoWW9DaXU1?=
+ =?utf-8?B?WGN0cklBZ2lDVE1icElRdFNHQzNLdENsV3dTU1dCN0N6NFJtTmU2eEZDOVVh?=
+ =?utf-8?B?UGpla2dsWkdIMXI0NGV5MVA5bmltL0FXSkJhUENGM1JJcTIrQy9qbEJwQnVi?=
+ =?utf-8?B?dzRhQmhHcWF1NEgyVjhZS0p5SkxhK3QydHJGUi9kL0FLTjV4aCtlZGVKRCt1?=
+ =?utf-8?B?R3BRV2s1Tk8yUDZBUHEzZG8xcCtJRFhuMHkwV1hWSW9BbENOUlNnWUljUmVy?=
+ =?utf-8?B?cGlHM0REeFgwU1N3UmJpRXVSWHJhWVBNc0RGSk54bTBWWGFrUnJWc1gvd2l5?=
+ =?utf-8?B?NzZZbHhUbkpmdGhMWk5XOG94OERSbzdnanZoUVhER2pRRythdGxkY1FOOTh5?=
+ =?utf-8?B?anhNQ0FyRDFPdDlkRzhlSi83cGo5REtSZTNXa3J6ZXdYaGxkdTc4TG9FSlU2?=
+ =?utf-8?B?Tlc0RExpY0ZLMXJWMXJLTzFYQW1uSFJVZ25kaHFFdjRQa2JiTExHYWRuNmtE?=
+ =?utf-8?B?L2lRMmp2elI3Ymc4eFFtdjhzWEZxckV1WWpiTjNIUmVLZEE5ODd4OVNxbTR4?=
+ =?utf-8?B?R1c5WUU2Z2FBVS9Balc1QW5ibE9DNTE2WldKQzhYMEZUWWJvczdUZEFtR0Q2?=
+ =?utf-8?B?RVhVWGJ1TSt5WitPWTVwbTlaVnVDRUw1VTMyMFcrOHZ2eC9yK2FWTlZWTkNI?=
+ =?utf-8?B?MC9sVUpkdVYyYUdaaUcxZVBGc1JOZXJqbTk3QklvQnJ3SC8vVTh6TGVhT1JM?=
+ =?utf-8?B?b0FBUjZqN0gvUy81bnczU1NQSzRUeVJFSXJlenJzbnFFZk1oN3NDdEluL1Vi?=
+ =?utf-8?B?eVJVNW1aa1NEUFhiSUNBQTh3bkxNNTIxSUFjR0w5N3dFM29odUJ5ODltSTVa?=
+ =?utf-8?B?L3lNbzJSV2huNnRvdXJwRTFQZXZvZzVJM1plb2RrMUY1SU1XdmcxOUY3Rm5o?=
+ =?utf-8?B?UjVNbU43MlgyU1VuT2tuQXQvWjYxQ1MwSUZBQklRNEFPMkkwRTVpaS95dEM4?=
+ =?utf-8?B?NWtQb0xBeEM1ckhmWUtja3M3NkYwR0FkTE5aNTFXdThXWVJpRGVYTXU4RjA4?=
+ =?utf-8?B?VHVWVTJIU3dLVzFJb3Q3NmpZY3dRaFc4U1dnZWc4a0U0bUdQTHRSRTV3V0Rw?=
+ =?utf-8?B?bytjTmdlYnBvOThRR0htVUpmUEJjZEZLdGhUMkNxMXh1WXpCM0tCcEd3VFpJ?=
+ =?utf-8?B?TUY0aGxZeWN6UU1BMEtOU0JMUVlJWFgxQWtiQmNwbU1naU9YZVJYRFIzYjMv?=
+ =?utf-8?B?d2hGT1YrU0V2czl3K3dtL1pUM3hyVWtWdlZCazBZRnRZT0wwQkdYY1JmMElo?=
+ =?utf-8?B?M01kTU14RUh2K2JUNFdKYWg5UkdpdHNReWhKeUQ1SWlsbUhJbVZldG8vckFj?=
+ =?utf-8?B?ekREeGdZRXJxN1ZxM0NZck9QYVAxa1dNQ3k2WWNPU3BESjdoS2FiUXUzZUhk?=
+ =?utf-8?B?eFBwRTc0N3NYNCswOFZKTXhHR3RxaDFDajJRcUx4SU9nYlpwcnJuV3RBSXgr?=
+ =?utf-8?B?VGxWTGpLV1hSL3FidEFNcG95WUsvTHdSWWo4N0JLNXlLcndSNVlINVU2Y0tC?=
+ =?utf-8?Q?+ZA57Nt0yrzDByW4=3D?=
+X-Exchange-RoutingPolicyChecked: Jx5zuvthcrBHDm0piZAGnem4EhzEj87DUqkeMH3J7RU0YpjoIkQyaX+1qxJz9ro58rQzv9N6eQsAXSVsdfCc9Ai8MVVM0J9r4EB2Xsb+VJMbh7utTsEBKs8DeYxyBhXEZjwZO6StsVG8aKG8/cjh21uFumf8gLSZYSXNro4xq3KrGhWtmVhtpLJigEuOtimQRttwu98Q2tm2HpZA/A7rzAECO4SzZHayF9NEHSB5gv6M9JPI0ZjttZ1ZuxcrWEp0QbBy5Kp9FFFSm1UnuOGVO+KW70orv4HmlBO69LhdBCdS4lQ/sM2OPqLS+owkvk3SCykmWzUXAiZe70s5VUZQig==
+X-MS-Exchange-CrossTenant-Network-Message-Id: fdf80093-723d-4510-c828-08de9703d1f3
+X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Apr 2026 13:19:39.8433
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: EUHzaBoyf1FmldBiV4oV+jvsXV42BBGDhqEYw1gehXNUPzySx0tcSnjwFzL4Q2qZdyaEWc4tkEAXTpDgGfz7k6bej4DQa78jf2/p494n2UQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB4824
+X-OriginatorOrg: intel.com
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	TAGGED_FROM(0.00)[bounces-277423-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,gmail.com,genexis.eu,lists.infradead.org,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-277424-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,intel.com,kernel.org,lists.osuosl.org,redhat.com,davemloft.net,gmail.com];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	FROM_NEQ_ENVFROM(0.00)[przemyslaw.kitszel@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 13BAA3D805D
+	RCVD_COUNT_SEVEN(0.00)[10]
+X-Rspamd-Queue-Id: EEB183D80BF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+I believe this is a move in right direction,
+please also find some more comments
 
---w8PmPGRkvaOhX7h0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+>> +/**
+>> + * iavf_poll_virtchnl_response - Poll admin queue for virtchnl response
+>> + * @adapter: board private structure
+>> + * @condition: callback to check if desired response received
+>> + * @cond_data: context data passed to condition callback
+>> + * @timeout_ms: maximum time to wait in milliseconds
+>> + *
+>> + * Polls admin queue and processes all messages until condition 
+>> returns true
+>> + * or timeout expires. Caller must hold netdev_lock. This can sleep 
+>> for up to
+>> + * timeout_ms while polling hardware.
+>> + *
+>> + * Returns 0 on success (condition met), -EAGAIN on timeout or error
 
-> This is an AI-generated review of your patch. The human sending this
-> email says "For your consideration."
-> ---
-> dt-bindings: net: airoha: Add EN7581 ethernet-ports properties
->=20
-> This commit introduces the ethernet-port property to model a net_device
-> connected via an external arbiter to the GDM3 or GDM4 ports on EN7581
-> and AN7583 SoCs.
->=20
-> > diff --git a/Documentation/devicetree/bindings/net/airoha,en7581-eth.ya=
-ml b/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
-> > index fbe2ddcdd909c..ebbd433e9c9fb 100644
-> > --- a/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
-> > +++ b/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
-> > @@ -130,6 +130,30 @@ patternProperties:
-> >          maximum: 4
-> >          description: GMAC port identifier
-> > =20
-> > +      '#address-cells':
-> > +        const: 1
-> > +      '#size-cells':
-> > +        const: 0
-> > +
-> > +    patternProperties:
-> > +      "^ethernet-port@[0-5]$":
->=20
-> The commit message states that GDM1 and GDM2 do not support connection
-> with the external arbiter. However, since this pattern property appears to
-> be placed inside the generic ^ethernet@[1-4]$ block, does this allow a
-> device tree to incorrectly configure ethernet-port subnodes on ethernet@1
-> or ethernet@2 and still pass schema validation?
+kdoc requires "Return:"
 
-ack, I will fix it in v4
+>> + */
+>> +static int iavf_poll_virtchnl_response(struct iavf_adapter *adapter,
 
->=20
-> Could this be restricted to GDM3 and GDM4, perhaps by splitting the
-> patternProperties or using an if/then block based on the reg property?
->=20
-> > +        type: object
-> > +        unevaluatedProperties: false
-> > +        $ref: ethernet-controller.yaml#
->=20
-> Does referencing ethernet-controller.yaml cause a validation conflict her=
-e?
->=20
-> The ethernet-controller.yaml schema enforces a strict nodename pattern
-> of ^ethernet(@.*)?$. Since these new nodes use the -port suffix and are
-> named ethernet-port@X, will they unconditionally fail the node name
-> validation enforced by the referenced schema during dt_binding_check?
+please move it to iavf_virtchnl.[ch], could be useful for other also,
+not need to move it then and loose your authorship in default blame view
 
-ack, I will fix it in v4
+one more thing is that this could be perhaps integrated with existing
+iavf_poll_virtchnl_msg(), which does not call
+iavf_virtchnl_completion(), but likely could
 
-Regards,
-Lorenzo
+>> +                       bool (*condition)(struct iavf_adapter *, void *),
+>> +                       void *cond_data,
+> 
+> this could be const, then no cast on the callsite
+> 
+>> +                       unsigned int timeout_ms)
+>> +{
+>> +    struct iavf_hw *hw = &adapter->hw;
+>> +    struct iavf_arq_event_info event;
+>> +    enum virtchnl_ops v_op;
+>> +    enum iavf_status v_ret;
+>> +    unsigned long timeout;
+>> +    int ret;
+>> +
+>> +    netdev_assert_locked(adapter->netdev);
+>> +
+>> +    event.buf_len = IAVF_MAX_AQ_BUF_SIZE;
+>> +    event.msg_buf = kzalloc(event.buf_len, GFP_KERNEL);
+>> +    if (!event.msg_buf)
+>> +        return -ENOMEM;
+>> +
+>> +    timeout = jiffies + msecs_to_jiffies(timeout_ms);
+>> +    while (time_before(jiffies, timeout)) {
 
->=20
-> [ ... ]
-> --=20
-> pw-bot: cr
+please consider do-while (after the rest of changes could be better)
 
---w8PmPGRkvaOhX7h0
-Content-Type: application/pgp-signature; name=signature.asc
+>> +        if (condition(adapter, cond_data)) {
+> 
+> if condition is met, but timed out, there should be no error
+> 
+>> +            ret = 0;
+>> +            goto out;
+>> +        }
+>> +
+>> +        ret = iavf_clean_arq_element(hw, &event, NULL);
 
------BEGIN PGP SIGNATURE-----
+instead of NULL pass "pending" param, if not zero you could omit
+next sleep
 
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCadj3vQAKCRA6cBh0uS2t
-rBlnAQChofOe0utPGIDu5PUixZsRZzjAtGGT6M2YM583zTPi5wD9H2ST3gaJBBny
-9/CzLBUS8ZiATfT1pwiaaFdOA9BHig0=
-=dppY
------END PGP SIGNATURE-----
+>> +        if (!ret) {
+>> +            v_op = (enum 
+>> virtchnl_ops)le32_to_cpu(event.desc.cookie_high);
+>> +            v_ret = (enum 
+>> iavf_status)le32_to_cpu(event.desc.cookie_low);
+>> +
+>> +            iavf_virtchnl_completion(adapter, v_op, v_ret,
+>> +                         event.msg_buf, event.msg_len);
+>> +
+>> +            memset(event.msg_buf, 0, IAVF_MAX_AQ_BUF_SIZE);
+>> +        }
+>> +
+>> +        usleep_range(1000, 2000);
 
---w8PmPGRkvaOhX7h0--
+very old commit 9e3f23f44f32 ("i40e: reduce wait time for adminq command
+completion") said that 50usec is right amount to sleep between checks
+
+> 
+> no sleep after message received (ok to do on empty queue)
+> 
+>> +    }
+>> +
+>> +    ret = -EAGAIN;
+>> +out:
+>> +    kfree(event.msg_buf);
+>> +    return ret;
+>> +}
+>> +
+>> +/**
+>> + * iavf_mac_change_done - Check if MAC change completed
+>> + * @adapter: board private structure
+>> + * @data: MAC address being checked (as void *)
+>> + *
+>> + * Callback for iavf_poll_virtchnl_response() to check if MAC change 
+>> completed.
+>> + *
+>> + * Returns true if MAC change completed, false otherwise
+>> + */
+>> +static bool iavf_mac_change_done(struct iavf_adapter *adapter, void 
+>> *data)
+>> +{
+>> +    const u8 *addr = data;
+>> +
+>> +    return iavf_is_mac_set_handled(adapter->netdev, addr);
+>> +}
+>> +
+>> +/**
+>> + * iavf_set_mac_sync - Synchronously change MAC address
+>> + * @adapter: board private structure
+>> + * @addr: MAC address to set
+>> + *
+>> + * Sends MAC change request to PF and polls admin queue for response.
+>> + * Caller must hold netdev_lock. This can sleep for up to 2.5 seconds.
+>> + *
+>> + * Returns 0 on success or error
+>> + */
+>> +static int iavf_set_mac_sync(struct iavf_adapter *adapter, const u8 
+>> *addr)
+>> +{
+>> +    int ret;
+>> +
+>> +    netdev_assert_locked(adapter->netdev);
+>> +
+>> +    ret = iavf_add_ether_addrs(adapter);
+>> +    if (ret)
+>> +        return ret;
+>> +
+>> +    return iavf_poll_virtchnl_response(adapter, iavf_mac_change_done,
+>> +                       (void *)addr, 2500);
+> 
+> this function looks elegant, thank you
+> 
+> I'm a little affraid that this model (if applied to other things than
+> setting MAC) will skip some of our "much needed" logic in the watchdog.
+> 
+> I have not thinked about much yet.
+> 
+> unrelated: callback looks elegant, but for virtchnl, it is almost always
+> the case that we wait for some VC OPCODE to come back, and this is just
+> a number. It could be easily coded as a callback too, passing wanted
+> value masked in pointer, but I would say that just passing a normal u32
+> param will be most clean
+> 
+> 
+
 
