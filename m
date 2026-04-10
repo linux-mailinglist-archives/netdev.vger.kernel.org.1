@@ -1,339 +1,195 @@
-Return-Path: <netdev+bounces-277454-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277455-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EPLmFrIT2Wm7lwgAu9opvQ
-	(envelope-from <netdev+bounces-277454-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 17:13:54 +0200
+	id qN16BOEU2Wm7lwgAu9opvQ
+	(envelope-from <netdev+bounces-277455-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 17:18:57 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC37D3D906D
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 17:13:53 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FED43D9196
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 17:18:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D00B530657A6
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 15:10:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 43C3D30A3578
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 15:11:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 516F23CC9FE;
-	Fri, 10 Apr 2026 15:10:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A7913D9045;
+	Fri, 10 Apr 2026 15:11:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b="Aq34bqNF";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Gtwjy26i"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dPdqteGM"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a7-smtp.messagingengine.com (fout-a7-smtp.messagingengine.com [103.168.172.150])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f67.google.com (mail-ot1-f67.google.com [209.85.210.67])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF84E3D9031
-	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 15:10:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3AEC3D902C
+	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 15:11:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.67
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775833838; cv=none; b=orFqaoRV4Vyo8VJizpKxwW8u9rhvrcft+0MaBm7gZCPQWe1Y8NPvPhMecwVkN0BWCxXx+5aEHYx5vXJ42/yK+2CEVob8cmEi+nGVPiGdaOR5J5snSRr0XfHb+oRr0US14Iv4DYIJlDWLocA5nklRvRGn8VtWlY6CpZ1PaZC7ea8=
+	t=1775833893; cv=none; b=alRhUxdW+lBnY25KNvltl5o6mVaU2mE2m0Wq3Lphjextx7ZvQreSKsdeKzj2oCdOs7WiqU9y6Ou0r2fxuU4c6ZW3jforsRcqNvs3Iu1kg19uPoAAxh+6RomI1nQsiVDYsF2x7d6UM+8ESjMlgjz6eAiLGnSBdGHWNRYHd2f4Cd8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775833838; c=relaxed/simple;
-	bh=EZ0vUC2EZNK82iKy89iF58UIFKbQ/1m5/IlLaOwADBY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Or1of7VtF7PFBTdeyG153Ku0HR6i8MjS6lKcsf2rFD5waKkqEFQGDimvyP3YN7Zuap214YmY5HIauJLw32iJVNHgTbFDsZHNpbB4je56AQ4Cct1L/GFN14ZMmaeLxMongh/jsmo2jlocx6wBY5QqF9tXW7tReqkHARGlYqY+Ry8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im; spf=pass smtp.mailfrom=fastmail.im; dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b=Aq34bqNF; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Gtwjy26i; arc=none smtp.client-ip=103.168.172.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.im
-Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
-	by mailfout.phl.internal (Postfix) with ESMTP id 20127EC0445;
-	Fri, 10 Apr 2026 11:10:36 -0400 (EDT)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-02.internal (MEProxy); Fri, 10 Apr 2026 11:10:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.im; h=
-	cc:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1775833836; x=
-	1775920236; bh=dFGt4ZHrKpXoNOA7fEKIDehhguiEGziu08du6+mV1vE=; b=A
-	q34bqNFIATq4Q+NuGtNqJ7hNAUD7fKbOnRlvkAFIXGDMth0AKGiQTWI3s9GWyZZo
-	XhN2SNclGUSc8ESZolW2j9Lla1DEJP+KJfmbun5MBuPb4z2fLUuXJQqB9I2NCoNP
-	wrMAGSy7a4roZ8wSshRs1EtksHNagT+Jt8KZQXeHqLyDWoyPRfXC1A4hbrbE6o1u
-	hJ8Jy5b0EoQL6McsqMpurNFIX/2kpF3XZmDeX6+JV0L0Ll3ds4HJjk3+Rj0g3anP
-	HhNDeZj1VTFa+MdeFgfWIYmzXeKPM7OrUJf088ye8W6fhOWKffoSzhD+jtnt5OVv
-	Lv9cqyzDzu0AEWSgdzaJw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm2; t=1775833836; x=1775920236; bh=d
-	FGt4ZHrKpXoNOA7fEKIDehhguiEGziu08du6+mV1vE=; b=Gtwjy26iuGSml7xYZ
-	F7MRgKuPOul5oWKgKetUMnaJmczDmK3/6Hl+Q2My+9W0Ag8l5rwsGQVepurr4K2O
-	YppkEOrWjB9mMA1yVqeByr3S4y2C4/7CQCAScB7U8tbCs0bpvlkmb7nhNzmn1Lix
-	4Tl+R0Zj+cC3VbqSTAyW+MZb9d7fzzBFrHSHq1tqhQoDoTqbI3neBMwC4Pn44Q6K
-	TEaL2T3EVn/S9Bk7czIF6TMrOvYhfHyJtfSR+mJXvIITNdzZ/QZ/PT7Zvapm/toI
-	a++wsPuMoY3jzI0XojouyqxycVOd+m48PSxa/veUMgFz8lH8At0hXfjy5QZ6tT8w
-	GFCsw==
-X-ME-Sender: <xms:7BLZaUxNqBl2Qan5gDzo-WxINYYs6iT6dKGSj7gPcutloPrIZMgiKA>
-    <xme:7BLZaY6hDq0wKZqH5JWp_hhXrvVV3VURQUpFN8rNSlh3MVP2E2OPvRYxqMhAuz4sB
-    p3gXE3asI2uDWJJ52J0ozHCWrIu7XJL8t6aGrOlpDDHtkAPJoaEntc>
-X-ME-Received: <xmr:7BLZaRct2j0gPQhEKIPkqzBQId3D_R00mUHzQ2dgzsfjUFAncNOMexlM9AGzwA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgddvleejfecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpefhvfevufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpeetlhhitggvucfo
-    ihhkihhthigrnhhskhgruceorghlihgtvgdrkhgvrhhnvghlsehfrghsthhmrghilhdrih
-    hmqeenucggtffrrghtthgvrhhnpeetffeljeefvdfhheeijeelgfekleejveeugeegveet
-    hffguefhudffgeekvddttdenucevlhhushhtvghrufhiiigvpeehnecurfgrrhgrmhepmh
-    grihhlfhhrohhmpegrlhhitggvrdhkvghrnhgvlhesfhgrshhtmhgrihhlrdhimhdpnhgs
-    pghrtghpthhtohepudeipdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegurghnih
-    gvlhesihhoghgvrghrsghogidrnhgvthdprhgtphhtthhopegurghvvghmsegurghvvghm
-    lhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomh
-    dprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggv
-    nhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehluhgtihgvnhdrgihinhesghhmrg
-    hilhdrtghomhdprhgtphhtthhopeifihhllhgvmhguvggsrhhuihhjnhdrkhgvrhhnvghl
-    sehgmhgrihhlrdgtohhmpdhrtghpthhtohepughsrghhvghrnheskhgvrhhnvghlrdhorh
-    hgpdhrtghpthhtoheprhgriihorhessghlrggtkhifrghllhdrohhrgh
-X-ME-Proxy: <xmx:7BLZaXHnRvjZoVP-PVBxbdbZfYaZ5Wi8t8ST6tPUZIlO52XkAueLAg>
-    <xmx:7BLZaZ5w_3eklVB_0m3b5RY-H1he8cFvYtBh97SNvN_vGaF3TfJq3Q>
-    <xmx:7BLZaStv6oCnKrwdVKZ2Dld0RdjwZh3gGx_8ylbAHkOxZmC1a14WjQ>
-    <xmx:7BLZaV813ChIvznMpGd-xFkgVPmNXdXwrMtdls3O4q4j49zX4XSq3Q>
-    <xmx:7BLZaR_85qDazMsMSPQwnGMufJMfm-Bw2mrteH7EMs__axmW_lxXq6FC>
-Feedback-ID: i559e4809:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 10 Apr 2026 11:10:35 -0400 (EDT)
-From: Alice Mikityanska <alice.kernel@fastmail.im>
-To: Daniel Borkmann <daniel@iogearbox.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Xin Long <lucien.xin@gmail.com>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	David Ahern <dsahern@kernel.org>,
-	Nikolay Aleksandrov <razor@blackwall.org>
-Cc: Shuah Khan <shuah@kernel.org>,
-	Stanislav Fomichev <stfomichev@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Simon Horman <horms@kernel.org>,
-	Florian Westphal <fw@strlen.de>,
-	netdev@vger.kernel.org,
-	Alice Mikityanska <alice@isovalent.com>
-Subject: [PATCH net-next v3 12/12] selftests: net: Add a test for BIG TCP in UDP tunnels
-Date: Fri, 10 Apr 2026 18:09:43 +0300
-Message-ID: <20260410150943.993350-13-alice.kernel@fastmail.im>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260410150943.993350-1-alice.kernel@fastmail.im>
-References: <20260410150943.993350-1-alice.kernel@fastmail.im>
+	s=arc-20240116; t=1775833893; c=relaxed/simple;
+	bh=xjJORM7tfy7vWxsh2geZIlFRt9OGr4V1D2nhCg5EtZo=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=k/Rmvqu1Fe8oBsAuinkawWZravgWpmiinrRvhQB+MZIg0joT33/p+VEBQ0scjJHiwma3de6rqPxNoT+lYkNcOJ2dUu61fn3xE0iQOv5nXybwycV24qNz8NARM1LaKI5N9dHXLmIvsC+zF1cPL7xHFy+45FjKGyDc+Llq+ILyTV0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dPdqteGM; arc=none smtp.client-ip=209.85.210.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f67.google.com with SMTP id 46e09a7af769-7d9e22176a7so1115982a34.1
+        for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 08:11:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775833891; x=1776438691; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=zvG0lUmWvJDVV9hH9ZMs4QcX1z2+NpKGjl8rKX6kmfA=;
+        b=dPdqteGMXfG9ncp72tu6tdueyp/AzdW32IBzu6cumBfqWtkJtTdQqEgnjTAVuex0S+
+         QuFNDU9ssuG/62+F8yM3RQ6kkXWfGRSMwVysrJ0LxqxOyOFCwvoCt86l9f+e86cSe8JY
+         050LQYdBO5WkXT3AGlpY3DwrBz9vayRg70SAFUcg4cO0nIHwTXWpGsa0K3oX0eGEILnK
+         L3qIRGC23ocvMPhxcT2kWbjSRwoDKlbL31bwVVZRVCfjQgN3PgKvK9i5RTbgV4sw0C4E
+         q7tHilimkIdtE1jgeb8CqgoEpUkD2xXF5rPGFaF5PMQI6BJ0VIRZXAQ6PuEu4rvFH7j8
+         JUiw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775833891; x=1776438691;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zvG0lUmWvJDVV9hH9ZMs4QcX1z2+NpKGjl8rKX6kmfA=;
+        b=IyWtFpLidBv008HdXX+rLIRbn6IOr9qXJWl6urbNfU3EoEJc1qeFqHehknf/ZKJos+
+         Y4OtnXQ/vpOH7xG4P8TlXc2NudTIA8PFbA7XcebRswsp5aWHr8yfp7uGEU/I5SLhmTvj
+         ZTP6dJzAJsyiJzHShvFPRrGGP/z5xoxgFNBFw9eYOLqyD2eLblpcIxLFUR8D5Xgu5VQ5
+         e4yqK66pfbcrLZPkeTdhn0ezT7J2/bjeU/zZ22XwTSpEHepmkrBX2EKevGR2gtRILbBz
+         Fnfz24ui2YWNoQDTnxJ8wAM6XjLj7DBRNJBCDOuQn+Xbgy3zONBzPFRs400RsX5Mmuk9
+         VggQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUWkG4AifuHNifhCFfIV1pcsparPh0x4Yx8ekfiM0WArqnc6yqwnd/pbVJFPZFwGOJ+fRvSiZs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz4xoHKxDzEdS6Dmgtu/URGNW1zPZ8Y1pg4GLb1d/u7/KMJJDo9
+	WCrpNGsc5RqVE4zx1pfKUo1BZxrJdd0f7GYDkqv/rRheJN3KNW9Swh/f
+X-Gm-Gg: AeBDieviSMCVoWCvDjHM8lgCj4Ys9SVC7YCsuW7ulpww3Gq5KCEwldPAfFtKsUyuSMU
+	ROx5eH3BlXEbxltCrGQXMwXNyTvYOrIQWLJ1ndKUWLaEFpz5FG3jJ7uxkiCMdh/27ca6YKGT4cI
+	H6RNc3BVFGV/X4jbmBiqZDHOtRbzUc310MPW8eW1hz71RvWS/G5xaXmqxl3xDCswcI2SQ54g8sG
+	A2mCE7i2yF1lmqFfAi9OMuw8mmiFxvyUPxDK2fBdp95IlSeGBNWMYc6Gm/Psu1VKQM8LjofHQwW
+	JNTphyGyI3ryijOeYZOiYj5zrdjaXsIEGVOwTZblSKaTJBUmF+QveO9paHwrMJeOWh9ksFhiy03
+	s2ASogtc2+zcuqeB0k4Ab7stsOEqfglaex5fPiACdrYLU3iKYVheq3HWydqmqLcasJ96U7iiOCx
+	bFX/HduPksH5IF8BHy
+X-Received: by 2002:a05:6830:488e:b0:7d7:fb0f:3e56 with SMTP id 46e09a7af769-7dc27f74436mr1889260a34.26.1775833890725;
+        Fri, 10 Apr 2026 08:11:30 -0700 (PDT)
+Received: from localhost ([2a03:2880:12ff:4::])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7dc323b3366sm472507a34.9.2026.04.10.08.11.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 Apr 2026 08:11:30 -0700 (PDT)
+From: Stanislav Fomichev <sdf.kernel@gmail.com>
+X-Google-Original-From: Stanislav Fomichev <stfomichev@gmail.com>
+Date: Fri, 10 Apr 2026 08:11:29 -0700
+To: Breno Leitao <leitao@debian.org>
+Cc: Stanislav Fomichev <sdf.kernel@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn <willemb@google.com>, metze@samba.org, 
+	axboe@kernel.dk, Stanislav Fomichev <sdf@fomichev.me>, io-uring@vger.kernel.org, 
+	bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	Linus Torvalds <torvalds@linux-foundation.org>, linux-kernel@vger.kernel.org, kernel-team@meta.com
+Subject: Re: [PATCH net-next v3 0/4] net: move .getsockopt away from __user
+ buffers
+Message-ID: <adkSnyihmD1Atfcf@devvm17672.vll0.facebook.com>
+References: <20260408-getsockopt-v3-0-061bb9cb355d@debian.org>
+ <adaJqy6Q4L7c-eTs@devvm17672.vll0.facebook.com>
+ <adjvoD9f7QaQMu5K@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <adjvoD9f7QaQMu5K@gmail.com>
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[fastmail.im,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[fastmail.im:s=fm2,messagingengine.com:s=fm2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,lunn.ch,strlen.de,vger.kernel.org,isovalent.com];
-	FREEMAIL_FROM(0.00)[fastmail.im];
-	TAGGED_FROM(0.00)[bounces-277454-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-277455-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,samba.org,kernel.dk,fomichev.me,vger.kernel.org,linux-foundation.org,meta.com];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[iogearbox.net,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,blackwall.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alice.kernel@fastmail.im,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[fastmail.im:+,messagingengine.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[sdfkernel@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[isovalent.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,fastmail.im:dkim,fastmail.im:mid,messagingengine.com:dkim,big_tcp_tunnels.sh:url]
-X-Rspamd-Queue-Id: BC37D3D906D
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[fomichev.me:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,devvm17672.vll0.facebook.com:mid]
+X-Rspamd-Queue-Id: 5FED43D9196
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Alice Mikityanska <alice@isovalent.com>
+On 04/10, Breno Leitao wrote:
+> Hello Stanislav,
+> 
+> On Wed, Apr 08, 2026 at 10:02:36AM -0700, Stanislav Fomichev wrote:
+> > On 04/08, Breno Leitao wrote:
+> >
+> > LGTM! Not sure what's your plan for the selftest? You wanna keep it
+> > outside or maybe repost v4 with it?
+> 
+> I'd be glad to include a selftest. I've already developed one covering both
+> protocols in this series and can respin with it if you'd like.
+> 
+> Test available at:
+> https://github.com/leitao/linux/commit/2d9311947061f1baa43858f597dd6c54d7ccc5d2
+> 
+> > Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+> 
+> Thanks for the review and guidance.
 
-The test sets up VXLAN and GENEVE tunnels over IPv4 and IPv6 and runs
-IPv4 and IPv6 traffic through them with BIG TCP enabled. It checks that
-a non-negligible amount of big aggregated packets are seen in tcpdump.
+Yes, yes, I did see the test, so let's add it? I'm thinking that we should
+already have a lot of coverage from packetdrill tests, but things like
+you convert (packet/can) are probably less covered.
+ 
+> > I'm also not sure your unconditional 'copy-optlen-back' will work for every
+> > proto, but I think we can put something into sockopt_t to make it avoid
+> > the copy if needed in the future.
+> 
+> Good point. I'd prefer not to over-engineer this now, but keep it
+> straightforward to add later if needed. This could be easily achieved with
+> something like:
+> 
+>   typedef struct sockopt {
+>         struct iov_iter iter_in;
+>         struct iov_iter iter_out;
+>         int optlen;
+> +       bool optlen_dirty;      /* set by callback when optlen should be written back */
+>   } sockopt_t;
+> 
+> Wrapper becomes:
+> 
+>   if (opt.optlen_dirty &&
+>       copy_to_sockptr(optlen, &opt.optlen, sizeof(int)))
+>         return -EFAULT;
+> 
+> and the protocol callback would need to set
+> 
+>    opt->optlen_dirty = true;
+> 
+> I don't think this is needed yet, and if we do need it, it would be better
+> to review and commit them together, making the rationale clearer for
+> future developers/LLM agents.
+> 
+> What do you think?
 
-Signed-off-by: Alice Mikityanska <alice@isovalent.com>
----
- tools/testing/selftests/net/Makefile          |   1 +
- .../testing/selftests/net/big_tcp_tunnels.sh  | 145 ++++++++++++++++++
- 2 files changed, 146 insertions(+)
- create mode 100755 tools/testing/selftests/net/big_tcp_tunnels.sh
-
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index cab74ebdaced..c8ea9d4bb94f 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -13,6 +13,7 @@ TEST_PROGS := \
- 	arp_ndisc_untracked_subnets.sh \
- 	bareudp.sh \
- 	big_tcp.sh \
-+	big_tcp_tunnels.sh \
- 	bind_bhash.sh \
- 	bpf_offload.py \
- 	bridge_vlan_dump.sh \
-diff --git a/tools/testing/selftests/net/big_tcp_tunnels.sh b/tools/testing/selftests/net/big_tcp_tunnels.sh
-new file mode 100755
-index 000000000000..b819911519ac
---- /dev/null
-+++ b/tools/testing/selftests/net/big_tcp_tunnels.sh
-@@ -0,0 +1,145 @@
-+#!/usr/bin/env bash
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# Testing for IPv4 and IPv6 BIG TCP over VXLAN and GENEVE tunnels.
-+
-+SERVER_NS=$(mktemp -u server-XXXXXXXX)
-+SERVER_IP4="192.168.1.1"
-+SERVER_IP6="2001:db8::1:1"
-+SERVER_IP4_TUN="192.168.2.1"
-+SERVER_IP6_TUN="2001:db8::2:1"
-+
-+CLIENT_NS=$(mktemp -u client-XXXXXXXX)
-+CLIENT_IP4="192.168.1.2"
-+CLIENT_IP6="2001:db8::1:2"
-+CLIENT_IP4_TUN="192.168.2.2"
-+CLIENT_IP6_TUN="2001:db8::2:2"
-+
-+PACKETS_THRESHOLD=10000
-+
-+# Kselftest framework requirement - SKIP code is 4.
-+ksft_skip=4
-+
-+setup() {
-+	ip netns add "$SERVER_NS"
-+	ip netns add "$CLIENT_NS"
-+	ip -netns "$SERVER_NS" link add link1 type veth peer name link0 netns "$CLIENT_NS"
-+
-+	ip -netns "$CLIENT_NS" link set link0 up
-+	ip -netns "$CLIENT_NS" addr replace "$CLIENT_IP4/24" dev link0
-+	ip -netns "$CLIENT_NS" addr replace "$CLIENT_IP6/112" dev link0 nodad
-+	ip -netns "$CLIENT_NS" link set link0 \
-+		gso_max_size 196608 gso_ipv4_max_size 196608 \
-+		gro_max_size 196608 gro_ipv4_max_size 196608
-+	ip -netns "$SERVER_NS" link set link1 up
-+	ip -netns "$SERVER_NS" addr replace "$SERVER_IP4/24" dev link1
-+	ip -netns "$SERVER_NS" addr replace "$SERVER_IP6/112" dev link1 nodad
-+	ip -netns "$SERVER_NS" link set link1 \
-+		gso_max_size 196608 gso_ipv4_max_size 196608 \
-+		gro_max_size 196608 gro_ipv4_max_size 196608
-+
-+	ip netns exec "$SERVER_NS" netserver >/dev/null
-+}
-+
-+setup_tunnel() {
-+	if [ "$2" = 4 ]; then
-+		SERVER_IP="$SERVER_IP4"
-+		CLIENT_IP="$CLIENT_IP4"
-+		echo "Setting up ${1^^} over IPv4"
-+	else
-+		SERVER_IP="$SERVER_IP6"
-+		CLIENT_IP="$CLIENT_IP6"
-+		echo "Setting up ${1^^} over IPv6"
-+	fi
-+
-+	if [ "$1" = vxlan ]; then
-+		ip -netns "$CLIENT_NS" link add tun0 type vxlan \
-+			id 5001 remote "$SERVER_IP" local "$CLIENT_IP" dev link0 dstport 4789
-+	else
-+		ip -netns "$CLIENT_NS" link add tun0 type geneve \
-+			id 5001 remote "$SERVER_IP"
-+	fi
-+	ip -netns "$CLIENT_NS" link set tun0 up
-+	ip -netns "$CLIENT_NS" addr replace "$CLIENT_IP4_TUN/24" dev tun0
-+	ip -netns "$CLIENT_NS" addr replace "$CLIENT_IP6_TUN/112" dev tun0 nodad
-+	ip -netns "$CLIENT_NS" link set tun0 \
-+		gso_max_size 196608 gso_ipv4_max_size 196608 \
-+		gro_max_size 196608 gro_ipv4_max_size 196608
-+	if [ "$1" = vxlan ]; then
-+		ip -netns "$SERVER_NS" link add tun1 type vxlan \
-+			id 5001 remote "$CLIENT_IP" local "$SERVER_IP" dev link1 dstport 4789
-+	else
-+		ip -netns "$SERVER_NS" link add tun1 type geneve \
-+			id 5001 remote "$CLIENT_IP"
-+	fi
-+	ip -netns "$SERVER_NS" link set tun1 up
-+	ip -netns "$SERVER_NS" addr replace "$SERVER_IP4_TUN/24" dev tun1
-+	ip -netns "$SERVER_NS" addr replace "$SERVER_IP6_TUN/112" dev tun1 nodad
-+	ip -netns "$SERVER_NS" link set tun1 \
-+		gso_max_size 196608 gso_ipv4_max_size 196608 \
-+		gro_max_size 196608 gro_ipv4_max_size 196608
-+}
-+
-+cleanup_tunnel() {
-+	ip -netns "$CLIENT_NS" link del tun0
-+	ip -netns "$SERVER_NS" link del tun1
-+}
-+
-+cleanup() {
-+	ip netns exec "$SERVER_NS" killall netserver
-+	ip netns del "$SERVER_NS"
-+	ip netns del "$CLIENT_NS"
-+}
-+
-+do_test() {
-+	exec 3< <(ip netns exec "$SERVER_NS" tcpdump -nn -i link1 greater 65536 2> /dev/null)
-+	TCPDUMP_SERVER_PID="$!"
-+	exec 4< <(wc -l <&3)
-+	exec 5< <(ip netns exec "$CLIENT_NS" tcpdump -nn -i link0 greater 65536 2> /dev/null)
-+	TCPDUMP_CLIENT_PID="$!"
-+	exec 6< <(wc -l <&5)
-+
-+	if [ "$1" = 4 ]; then
-+		SERVER_IP="$SERVER_IP4_TUN"
-+		echo "Running IPv4 traffic in the tunnel"
-+	else
-+		SERVER_IP="$SERVER_IP6_TUN"
-+		echo "Running IPv6 traffic in the tunnel"
-+	fi
-+
-+	ip netns exec "$CLIENT_NS" netperf -t TCP_STREAM -l 5 -H "$SERVER_IP" -- \
-+		-r 80000:80000 > /dev/null
-+	kill "$TCPDUMP_SERVER_PID" "$TCPDUMP_CLIENT_PID"
-+	wait "$TCPDUMP_SERVER_PID" "$TCPDUMP_CLIENT_PID"
-+	PACKETS_SERVER=$(cat <&4)
-+	PACKETS_CLIENT=$(cat <&6)
-+	exec 3>&- 4>&- 5>&- 6>&-
-+
-+	# One line is empty, each packet is two lines (inner and outer).
-+	echo "Captured BIG TCP GRO packets: $(((PACKETS_SERVER - 1) / 2))"
-+	echo "Captured BIG TCP GSO packets: $(((PACKETS_CLIENT - 1) / 2))"
-+	[ "$PACKETS_SERVER" -gt "$(( PACKETS_THRESHOLD * 2 + 1))" ] || return 1
-+	[ "$PACKETS_CLIENT" -gt "$(( PACKETS_THRESHOLD * 2 + 1))" ] || return 1
-+}
-+
-+if ! netperf -V &> /dev/null; then
-+	echo "SKIP: Could not run test without netperf tool"
-+	exit "$ksft_skip"
-+fi
-+
-+if ! ip link help 2>&1 | grep gso_ipv4_max_size &> /dev/null; then
-+	echo "SKIP: Could not run test without gso/gro_ipv4_max_size supported in ip-link"
-+	exit "$ksft_skip"
-+fi
-+
-+trap cleanup EXIT
-+setup
-+for tunnel in vxlan geneve; do
-+	for tun_family in 4 6; do
-+		for traffic_family in 4 6; do
-+			setup_tunnel "$tunnel" "$tun_family" || exit "$?"
-+			do_test "$traffic_family" || exit "$?"
-+			cleanup_tunnel
-+		done
-+	done
-+done
--- 
-2.53.0
-
+Agreed, I was thinking along the same lines. We can add it when/if
+needed. Since you wrap everything in sockopt_t it should be really
+easy to extend later.
 
