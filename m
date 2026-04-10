@@ -1,142 +1,274 @@
-Return-Path: <netdev+bounces-277441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277442-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IFmVFJ8S2Wl+lggAu9opvQ
-	(envelope-from <netdev+bounces-277441-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 17:09:19 +0200
+	id 8NQnMeUS2Wl+lggAu9opvQ
+	(envelope-from <netdev+bounces-277442-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 17:10:29 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E32FF3D8FB5
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 17:09:18 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 912543D8FE4
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 17:10:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 0875B30193BD
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 15:09:18 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E880C30157E1
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 15:10:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 519DF314A6B;
-	Fri, 10 Apr 2026 15:09:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A8D03D6CBD;
+	Fri, 10 Apr 2026 15:10:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TMJc2SEC"
+	dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b="HO8YGnIU";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="tD1XBIVZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f67.google.com (mail-oo1-f67.google.com [209.85.161.67])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-a7-smtp.messagingengine.com (fout-a7-smtp.messagingengine.com [103.168.172.150])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 075A81CF8B
-	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 15:09:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.67
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9204634B410
+	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 15:10:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775833755; cv=none; b=RF3hgPmr5BNAyoBc2jOC3tEIa/93DD8iYQahoBHL+hJ0BeT588mr63oicw50DykyFmyNxoyQ8NzaFWljK2QNXTTiOP/NFHmxIX20gYEH+W5N7IEU3mXfKmdH2hb5+pR5H6S02x2Ht4B/wEyoUbbkzLlHwl1jcOQKJ5H7NWpFfa8=
+	t=1775833804; cv=none; b=paIboFFnfgq00HmztxWocIACGMwhhFyIsP2laXlICeMIEC5wiKBy6FEGs/DjJmVL5tCm60yi8dDhCWyejWCJS6iTnyzECTnXJWACg6RzXHNQtGNrRBzShUvr8wCvJFdKx69Buop/ElOBSkDjcYedTcK5Fr2w+vur3CtepAvtnrI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775833755; c=relaxed/simple;
-	bh=wuMIPaPYMwA/H4Nn7Fr1DJZGzW6lwArqv5Mbl5mPNlw=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VALngkBu0S/FFqzRmQGJpb2dkonKQt6S+cDXM3H74c7npBoYbHgUScO7Wj8+FL4NGryYjMPZjVbhQJZW2zFy+3Dstk+Ma4VGTZsWyOL93ILL/KJMJwCgge8ibwmW/ncvAi1RoQa8dHCDZ1KB44i++tLmt1Ht/WJuIbbazXSnVbk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TMJc2SEC; arc=none smtp.client-ip=209.85.161.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f67.google.com with SMTP id 006d021491bc7-68a3b605bdcso1225345eaf.2
-        for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 08:09:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775833753; x=1776438553; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=3C1PMNOmQXQIpC+R30y8x9xaXsBdXwYRfzfJfB3GtNk=;
-        b=TMJc2SEC67KHcMsaPjbvmMnrneb/+ZdSSEKH6WJiFsfutsTH2zwxnCoj1vuVc5FwKb
-         YaoUHKtFayK0mMTzckmAD1VtmtrKVJ5vxs1jmcZSwmG3C2D+wDKlsjSW+L7XXtWmwjdE
-         U+4sxQMu6gTGHm/8PZd1hLweaDYEfiXAB6IKRp1SwIrbsqDvapZMdd5i6V4Cega3IJQF
-         zkLOvv6MFThABEmuUv+IEgJ4zqpB9sfshq7n60Z0vodf8cKfoF9I38Sd1CjyxuCSlUHx
-         kThEPHL3owQUoNzZy1RjXENtLG3MB2bSQA14cWpHEjMiq04AGJ/NLF3+0O1YoYp13Af3
-         r3Qw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775833753; x=1776438553;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3C1PMNOmQXQIpC+R30y8x9xaXsBdXwYRfzfJfB3GtNk=;
-        b=JGQOy4L6kpWNWSBZQ509HNUoNf6Sn4MdFhzLIu6JjgYyqrxv8MQ9JVhipiezF2dJDl
-         O5FGlKefIbfae7h4NfiVIeJ0m9B1id5aIa3+x9GHq81cPwIRfwOOhDV7Y9SjYLDwjQ6r
-         ZmM95kH33ACIPNPa8Ld7VYqKB61I/N9OrP5ziynuFxah6/b/3N1HY5Pwx5/A6bl1kTgq
-         1gD/eo5XqX9JMBQWuX6fvM+ukMDfJSfxfhsTrg1vaWNlYV8HM0P6SS+AECMQLT18ArHu
-         qsS8RB+pQ6rcWNRy7UAtUGzuFWCFbHX4fGcvJps0b7lSuXB94whVqzLjnkocr366e9o5
-         s4Kg==
-X-Forwarded-Encrypted: i=1; AJvYcCUy2S51zDXYuXpSPQaxYIn9waPqDZfZfRrAxv/IkLBcTeEIBitl8nuDMdT+uxRj047i7bwBh/A=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw6DkmMcH43gGhwyxaneZ2nmReusjYtneUOo/Q2BKw47rYkka4S
-	6/WqaGC5rPd9/yJh2QVhEs3lTzc7Jl0cxGXJjh9NebwaLx7gZTtUn+0X
-X-Gm-Gg: AeBDievu5uA8rdAZx5oHExEercssJPUeANZ3VTMNaedU1ryXjZsG4yrDxyBW+bNaR8S
-	6BHfHkbOXpNyAA6Y80FVti4/wE6KsTtohUSOURkNElSlNH4y+av1hCs1hZRjZq9UGx98Bc504vL
-	OijhLgBvVal71cPcyBLra7djQZ8cfUE0BBA7oA0xfXw4bVCGHNbVbz4TpEE359pT1ZWIW8uNEru
-	HQY5obWAQ0zmDeGXh0hIdTwNdhmAgxL+6hvyMX8cgfr9JDgWS8ywXc5PK5lkuWF4smyylnwmW5G
-	tJEEwsXdkSBXY48dcU66LJn92gofLbogt4f3X15+lvrmWkNbT9uUZKuiQwVqxLDisZaVkERQ/+9
-	hoNgrAkF3BToTxM7d4g589TQQ7J9ouhBu5tRuANbVqdkEdGiLRlHkG1cYll4jiSUW0/+1c0pZ61
-	X8fcONX7T/HAB4FGFbFw==
-X-Received: by 2002:a05:6820:168b:b0:689:ceb5:6f38 with SMTP id 006d021491bc7-68be5b5edabmr1719084eaf.5.1775833752820;
-        Fri, 10 Apr 2026 08:09:12 -0700 (PDT)
-Received: from localhost ([2a03:2880:12ff:45::])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-68bcacc9931sm1577202eaf.11.2026.04.10.08.09.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Apr 2026 08:09:12 -0700 (PDT)
-From: Stanislav Fomichev <sdf.kernel@gmail.com>
-X-Google-Original-From: Stanislav Fomichev <stfomichev@gmail.com>
-Date: Fri, 10 Apr 2026 08:09:11 -0700
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Stanislav Fomichev <sdf.kernel@gmail.com>, netdev@vger.kernel.org, 
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com
-Subject: Re: [PATCH net-next v6 00/14] net: sleepable ndo_set_rx_mode
-Message-ID: <adkSflwfvJSQ1y4H@devvm17672.vll0.facebook.com>
-References: <20260407153101.3694714-1-sdf@fomichev.me>
- <20260409204443.37c57907@kernel.org>
+	s=arc-20240116; t=1775833804; c=relaxed/simple;
+	bh=51HjXdtzuGGf0zsJVC5SryR7v9BB7+/xmWCLvR6NhcM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oPZUUlib4FGzbwsgIERcZjiKnDp0i06iwspWWx7l74U57RtdlVYv8RQo+MeFUqi87UBBcZVFZxPKW+VT0y6RjVFBVTtglEvxDudydwaeZ8Js2rasSf7jJjq0mDZrIEwpH4TRELXx9PhZKQ/ojznlVvxRoqk16SVyJ3kJ5oP/AGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im; spf=pass smtp.mailfrom=fastmail.im; dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b=HO8YGnIU; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=tD1XBIVZ; arc=none smtp.client-ip=103.168.172.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.im
+Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
+	by mailfout.phl.internal (Postfix) with ESMTP id 66015EC042C;
+	Fri, 10 Apr 2026 11:10:01 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-06.internal (MEProxy); Fri, 10 Apr 2026 11:10:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.im; h=
+	cc:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm2; t=1775833801; x=1775920201; bh=khxbtJl3UOgB7yrC3pJFr
+	N2wpLv6ngOkDoy15QIehKI=; b=HO8YGnIU5nh7Pu/DLAQKOPTPSwb5gLzt5OE+e
+	S/nRRMMdge7dKOTa/ktF2wAuxF3aUW8sEAiSUBj29oZ5r9mc3yraejK1NUVtmQZh
+	rITvon/vA/J5j3VJFiSrN19KDlSuWj5ZtpG0mYyBk/Yztqa4z8J2HKX/YOyA3M7z
+	T8n72wdAgjpBSa33tAKpS81B9Fk4/caEkIsOHr/Xfc0EI+Dm9qFGKRC6r1Txy0fw
+	zXGcVyJ3v9RJPm8FlYr8enn7XY/cUDINPndeVH8D16ouAEuTJJ5IWQwngd/o/b/r
+	r/QaFcav1Da52BizsZksX4isd806MW00/ay9EZS2b54qnypXw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1775833801; x=1775920201; bh=khxbtJl3UOgB7yrC3pJFrN2wpLv6ngOkDoy
+	15QIehKI=; b=tD1XBIVZKKbUYVBjoC/izYEyfiitoekefQo3g22eC6ftdrXbUNf
+	zNw7IEYSbpLsOamGfElAK/f1u/MqfWmNJUZ3Xph3aw4VhP605wbZD52d3vcblVMi
+	TLieQYobpFw51edrcYTLXqJoc2WP6AcFKEBdM0JGM9ol8jS14Bjs//+5MVAGtVQ/
+	5UnSAukwHL6ynZOicOdd2ky9cmbZ6/PEUJmUPKsI5BYu2VA6Wb9ALdfCMHbXsHRl
+	Nmxa83cBXl+6hcPzxQ7JikGd+NEYf1+jUDIW8WIILhIrDTkbGdbX0xbn0VrxWiyk
+	VUP7+z08y44v1gGnZ1QJQ6s5ryXE6Lb5hkg==
+X-ME-Sender: <xms:yBLZaenjr30g7dvkoeGpW0Sn_g0khYauRE7THFiCeaYF2pAFKTklDg>
+    <xme:yBLZaWTTHedLU6jmDfaeQVSuEqd6aytHGiNBzr4eLsxZXKUU2bw8ioqO4XIjIrvXl
+    TUNMuJXpl37m6YvWkVUo8-FguYX4HFYd7Ym2zM9DkkrB6Iccmaiuw>
+X-ME-Received: <xmr:yBLZacZJsizwlDdQIKkDzj98S6K-L5Hs-9zJuSaIuG0ujcxpAYKANgQLQtqYgQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgddvleejfecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpefhvfevufffkffoggfgsedtkeertdertddtnecuhfhrohhmpeetlhhitggvucfoihhk
+    ihhthigrnhhskhgruceorghlihgtvgdrkhgvrhhnvghlsehfrghsthhmrghilhdrihhmqe
+    enucggtffrrghtthgvrhhnpeehudeivdeifeffudeuleegheeuhfelkeeuffefieehuefh
+    teejtdevffefgfefgeenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsth
+    gvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprghlihgtvgdrkhgvrhhn
+    vghlsehfrghsthhmrghilhdrihhmpdhnsggprhgtphhtthhopeduiedpmhhouggvpehsmh
+    htphhouhhtpdhrtghpthhtohepuggrnhhivghlsehiohhgvggrrhgsohigrdhnvghtpdhr
+    tghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvug
+    humhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgv
+    lhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpth
+    htoheplhhutghivghnrdigihhnsehgmhgrihhlrdgtohhmpdhrtghpthhtohepfihilhhl
+    vghmuggvsghruhhijhhnrdhkvghrnhgvlhesghhmrghilhdrtghomhdprhgtphhtthhope
+    gushgrhhgvrhhnsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehrrgiiohhrsegslhgr
+    tghkfigrlhhlrdhorhhg
+X-ME-Proxy: <xmx:yBLZae8cS0PDYf3hLDXX2hesPhfrEpw6W41ayTNuX3d3fbqpGcGQOA>
+    <xmx:yBLZaWkW-Ss-BcmmwZFavoGPDlMO-C8ygpHdbVwRhwsxB-n-LmT73A>
+    <xmx:yBLZaTZAsO0GlGrMsvEmmx47tgnxyC8EJtSvIgB9hZ79XeeZE3PHGQ>
+    <xmx:yBLZaeNi1advZmMaGPgPBEPnyV6nLGO7EmKk9fCW9Y8FkfAF78KEMA>
+    <xmx:yRLZacSyToe9mQ5bMnoSoOM9i-gctk8xfzsSIN1aTqSlsO1DgF7dDTlv>
+Feedback-ID: i559e4809:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 10 Apr 2026 11:09:59 -0400 (EDT)
+From: Alice Mikityanska <alice.kernel@fastmail.im>
+To: Daniel Borkmann <daniel@iogearbox.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Xin Long <lucien.xin@gmail.com>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	David Ahern <dsahern@kernel.org>,
+	Nikolay Aleksandrov <razor@blackwall.org>
+Cc: Shuah Khan <shuah@kernel.org>,
+	Stanislav Fomichev <stfomichev@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Simon Horman <horms@kernel.org>,
+	Florian Westphal <fw@strlen.de>,
+	netdev@vger.kernel.org,
+	Alice Mikityanska <alice@isovalent.com>
+Subject: [PATCH net-next v3 00/12] BIG TCP for UDP tunnels
+Date: Fri, 10 Apr 2026 18:09:31 +0300
+Message-ID: <20260410150943.993350-1-alice.kernel@fastmail.im>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260409204443.37c57907@kernel.org>
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[fastmail.im,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[fastmail.im:s=fm2,messagingengine.com:s=fm2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,lunn.ch,strlen.de,vger.kernel.org,isovalent.com];
+	FREEMAIL_FROM(0.00)[fastmail.im];
+	TAGGED_FROM(0.00)[bounces-277442-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-277441-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,davemloft.net,google.com,redhat.com];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[iogearbox.net,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,blackwall.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sdfkernel@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alice.kernel@fastmail.im,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[fastmail.im:+,messagingengine.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,devvm17672.vll0.facebook.com:mid]
-X-Rspamd-Queue-Id: E32FF3D8FB5
+	NEURAL_HAM(-0.00)[-0.998];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,fastmail.im:dkim,fastmail.im:mid]
+X-Rspamd-Queue-Id: 912543D8FE4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 04/09, Jakub Kicinski wrote:
-> On Tue,  7 Apr 2026 08:30:47 -0700 Stanislav Fomichev wrote:
-> > This series adds a new ndo_set_rx_mode_async callback that enables
-> > drivers to handle address list updates in a sleepable context. The
-> > current ndo_set_rx_mode is called under the netif_addr_lock spinlock
-> > with BHs disabled, which prevents drivers from sleeping. This is
-> > problematic for ops-locked drivers that need to sleep.
-> 
-> I merged the queue leasing, now netkit warns :(
+From: Alice Mikityanska <alice@isovalent.com>
 
-No worries, will rebase/test/fix and repost!
+This series is a follow-up to "BIG TCP without HBH in IPv6", and it adds
+support for BIG TCP IPv4/IPv6 workloads in vxlan and geneve. Now that
+IPv6 BIG TCP doesn't require stripping the HBH in all various
+combinations in tunneled traffic, adding BIG TCP becomes feasible.
+
+Patches 01-03 are small fixups to some related code that I'm changing in
+the series.
+
+Patch 04 adds accessors for the length field in the UDP header, as
+suggested by Paolo in review. The usage of udp_set_len is then added in
+the following patches that start using length=0 in BIG TCP UDP packets.
+
+Patches 05-07 close the gaps that prevent BIG TCP packets from going
+through UDP tunnel code.
+
+Patch 08 re-adds proper validation of malformed packets that arrive with
+length=0 from the wire.
+
+Patch 09 is for proper formatting in tcpdump (set UDP len to 0 rather
+than a trimmed value on overflow).
+
+Patches 10-11 bump up tso_max_size for VXLAN and GENEVE.
+
+Patch 12 adds selftests.
+
+Thanks all!
+
+v3 changes: Fixed the redirect in the selftest, rebased over my L2TP fix
+[1] for the syzbot report [2].
+
+[1]: https://lore.kernel.org/netdev/20260403174949.843941-1-alice.kernel@fastmail.im/
+[2]: https://lore.kernel.org/netdev/69a1dfba.050a0220.3a55be.0026.GAE@google.com/
+
+v2: https://lore.kernel.org/all/20260226201600.222044-1-alice.kernel@fastmail.im/
+
+v2 changes: Addressed the review comments: added UDP len helpers,
+consolidated UDP len sanity checks in patch 08 into one, added
+selftests. Added fixups to related code (patch 01-03).
+
+v1: https://lore.kernel.org/netdev/20250923134742.1399800-1-maxtram95@gmail.com/
+
+Alice Mikityanska (11):
+  net/sched: act_csum: don't mangle UDP tunnel GSO packets
+  udp: gso: Simplify handling length in GSO_PARTIAL
+  geneve: Fix off-by-one comparing with GRO_LEGACY_MAX_SIZE
+  net: Use helpers to get/set UDP len tree-wide
+  net: Enable BIG TCP with partial GSO
+  udp: Support gro_ipv4_max_size > 65536
+  udp: Support BIG TCP GSO packets where they can occur
+  udp: Validate UDP length in udp_gro_receive
+  udp: Set length in UDP header to 0 for big GSO packets
+  vxlan: Enable BIG TCP packets
+  selftests: net: Add a test for BIG TCP in UDP tunnels
+
+Daniel Borkmann (1):
+  geneve: Enable BIG TCP packets
+
+ drivers/infiniband/core/lag.c                 |   2 +-
+ drivers/infiniband/sw/rxe/rxe_net.c           |   4 +-
+ drivers/net/amt.c                             |   6 +-
+ drivers/net/ethernet/intel/i40e/i40e_txrx.c   |   2 +-
+ drivers/net/ethernet/intel/iavf/iavf_txrx.c   |   2 +-
+ drivers/net/ethernet/intel/ice/ice_txrx.c     |   2 +-
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c   |   2 +-
+ .../marvell/octeontx2/nic/otx2_txrx.c         |   2 +-
+ .../net/ethernet/mellanox/mlx5/core/en_rx.c   |   4 +-
+ .../ethernet/mellanox/mlx5/core/en_selftest.c |   2 +-
+ drivers/net/ethernet/sfc/falcon/selftest.c    |   4 +-
+ drivers/net/ethernet/sfc/selftest.c           |   4 +-
+ drivers/net/ethernet/sfc/siena/selftest.c     |   4 +-
+ drivers/net/ethernet/sfc/tc_encap_actions.c   |   2 +-
+ .../stmicro/stmmac/stmmac_selftests.c         |   4 +-
+ drivers/net/geneve.c                          |   6 +-
+ drivers/net/netdevsim/dev.c                   |   2 +-
+ drivers/net/netdevsim/psample.c               |   2 +-
+ drivers/net/netdevsim/psp.c                   |   8 +-
+ drivers/net/vxlan/vxlan_core.c                |   2 +
+ drivers/net/wireguard/receive.c               |   2 +-
+ include/linux/udp.h                           |  16 ++
+ include/trace/events/icmp.h                   |   2 +-
+ lib/tests/blackhole_dev_kunit.c               |   2 +-
+ net/6lowpan/nhc_udp.c                         |  10 +-
+ net/core/netpoll.c                            |   2 +-
+ net/core/pktgen.c                             |   4 +-
+ net/core/selftests.c                          |   4 +-
+ net/core/skbuff.c                             |  10 +-
+ net/core/tso.c                                |   3 +-
+ net/ipv4/esp4.c                               |   2 +-
+ net/ipv4/fou_core.c                           |   2 +-
+ net/ipv4/ipconfig.c                           |   6 +-
+ net/ipv4/netfilter/nf_nat_snmp_basic_main.c   |   4 +-
+ net/ipv4/route.c                              |   2 +-
+ net/ipv4/udp.c                                |   8 +-
+ net/ipv4/udp_offload.c                        |  58 +++----
+ net/ipv4/udp_tunnel_core.c                    |   2 +-
+ net/ipv6/esp6.c                               |   5 +-
+ net/ipv6/fou6.c                               |   2 +-
+ net/ipv6/ip6_udp_tunnel.c                     |   2 +-
+ net/ipv6/udp.c                                |   3 +-
+ net/ipv6/udp_offload.c                        |   2 +-
+ net/l2tp/l2tp_core.c                          |   2 +-
+ net/netfilter/ipvs/ip_vs_xmit.c               |   2 +-
+ net/netfilter/nf_conntrack_proto_udp.c        |  19 ++-
+ net/netfilter/nf_log_syslog.c                 |   2 +-
+ net/netfilter/nf_nat_helper.c                 |   2 +-
+ net/psp/psp_main.c                            |   2 +-
+ net/sched/act_csum.c                          |  12 +-
+ net/xfrm/xfrm_nat_keepalive.c                 |   2 +-
+ tools/testing/selftests/net/Makefile          |   1 +
+ .../testing/selftests/net/big_tcp_tunnels.sh  | 145 ++++++++++++++++++
+ 53 files changed, 296 insertions(+), 112 deletions(-)
+ create mode 100755 tools/testing/selftests/net/big_tcp_tunnels.sh
+
+-- 
+2.53.0
+
 
