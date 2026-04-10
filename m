@@ -1,173 +1,142 @@
-Return-Path: <netdev+bounces-277440-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277441-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0D4oHmcQ2Wl+lggAu9opvQ
-	(envelope-from <netdev+bounces-277440-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 16:59:51 +0200
+	id IFmVFJ8S2Wl+lggAu9opvQ
+	(envelope-from <netdev+bounces-277441-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 17:09:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9DFB3D8DF3
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 16:59:50 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E32FF3D8FB5
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 17:09:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EACBF30071F3
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 14:55:34 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 0875B30193BD
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 15:09:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64AA73D7D97;
-	Fri, 10 Apr 2026 14:55:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 519DF314A6B;
+	Fri, 10 Apr 2026 15:09:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="JDI66gYZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TMJc2SEC"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f67.google.com (mail-oo1-f67.google.com [209.85.161.67])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82A79308F23;
-	Fri, 10 Apr 2026 14:55:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 075A81CF8B
+	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 15:09:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.67
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775832934; cv=none; b=pTUtVvvWOI+VuBqGMFU60OdBlEl0cNZqI+OkYLT5gnAm/nRMiP9ZLfbVLdP01g6cdJZyMCR/K0ietUILOpBe/688uvjD7vjIu18/bpGoGLaSDUVLoNUAlZTP/nuhtU6fO+HfcQ4l+IqHqUFuIDwVsj8vqfhCztZjbvre7eK4bN4=
+	t=1775833755; cv=none; b=RF3hgPmr5BNAyoBc2jOC3tEIa/93DD8iYQahoBHL+hJ0BeT588mr63oicw50DykyFmyNxoyQ8NzaFWljK2QNXTTiOP/NFHmxIX20gYEH+W5N7IEU3mXfKmdH2hb5+pR5H6S02x2Ht4B/wEyoUbbkzLlHwl1jcOQKJ5H7NWpFfa8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775832934; c=relaxed/simple;
-	bh=Ct77eSN/pyODbp+xdAgW04GL04De/iIrMh2Iofulfok=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FbFsyUMPEtpHz3u4jwuGzN3zrOaWdLV/uTRhBRDsKivbiNCcPBgk2RxWjMtzSnfCKHkNG2r1B7il7NrfBsVYRlf9Jd5mYA3E3s+8dFN6f2pEFWyATmix0AkRhJUpsMP2N6JyVvC0xTY8RWYeUlIulvPfAyAd8dmIVUvEWk+N1zk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=JDI66gYZ; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=uun455N00wPFIjb8RzsNjnhEL6zH/6y6n8q6AGsp+LY=; b=JDI66gYZXf0F3a+qoet7uxXt8l
-	q+eP9+Da3fG+b/yT8UH2bnUlzknamGKshyAbAva7c0TCu4L9DAdeeuKMVnK0dsgrSYMk5EOTORtpA
-	Zd6piTWTIK5z3aviNWM7aKUmc20qCFnPyJ0+2ZfSbFiy6fpg+0oTancKxZj8zgwrQeBLuD+KrGDpo
-	w0grAAC85wFx2ld32koPEEmow07Qw8XEOlRngRBzBW5OrbfY0Hm8xan+lyUMZKJObhy/Y4Y6qrTBZ
-	I1SzEqQRGgg9Lg0DGCswaV0kwKVArXhnfwJCGJ01Z9gA+KmvRX2gVtSKpYaHxOgDzJlBqiNRN/4vf
-	m/n4LHdQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:43448)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1wBDGY-0000000055n-0ZAx;
-	Fri, 10 Apr 2026 15:55:26 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1wBDGW-000000005hj-2YvG;
-	Fri, 10 Apr 2026 15:55:24 +0100
-Date: Fri, 10 Apr 2026 15:55:24 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Biju <biju.das.au@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Ovidiu Panait <ovidiu.panait.rb@renesas.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Prabhakar Mahadev Lad <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-	linux-renesas-soc@vger.kernel.org,
-	Biju Das <biju.das.jz@bp.renesas.com>
-Subject: Re: [PATCH net-next] net: phy: call phy_init_hw() in phy resume path
-Message-ID: <adkPXI9pz1RCYpJ8@shell.armlinux.org.uk>
-References: <20260410142904.439666-1-biju.das.jz@bp.renesas.com>
- <adkOZl4gt5UoGv-0@shell.armlinux.org.uk>
+	s=arc-20240116; t=1775833755; c=relaxed/simple;
+	bh=wuMIPaPYMwA/H4Nn7Fr1DJZGzW6lwArqv5Mbl5mPNlw=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VALngkBu0S/FFqzRmQGJpb2dkonKQt6S+cDXM3H74c7npBoYbHgUScO7Wj8+FL4NGryYjMPZjVbhQJZW2zFy+3Dstk+Ma4VGTZsWyOL93ILL/KJMJwCgge8ibwmW/ncvAi1RoQa8dHCDZ1KB44i++tLmt1Ht/WJuIbbazXSnVbk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TMJc2SEC; arc=none smtp.client-ip=209.85.161.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oo1-f67.google.com with SMTP id 006d021491bc7-68a3b605bdcso1225345eaf.2
+        for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 08:09:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775833753; x=1776438553; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=3C1PMNOmQXQIpC+R30y8x9xaXsBdXwYRfzfJfB3GtNk=;
+        b=TMJc2SEC67KHcMsaPjbvmMnrneb/+ZdSSEKH6WJiFsfutsTH2zwxnCoj1vuVc5FwKb
+         YaoUHKtFayK0mMTzckmAD1VtmtrKVJ5vxs1jmcZSwmG3C2D+wDKlsjSW+L7XXtWmwjdE
+         U+4sxQMu6gTGHm/8PZd1hLweaDYEfiXAB6IKRp1SwIrbsqDvapZMdd5i6V4Cega3IJQF
+         zkLOvv6MFThABEmuUv+IEgJ4zqpB9sfshq7n60Z0vodf8cKfoF9I38Sd1CjyxuCSlUHx
+         kThEPHL3owQUoNzZy1RjXENtLG3MB2bSQA14cWpHEjMiq04AGJ/NLF3+0O1YoYp13Af3
+         r3Qw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775833753; x=1776438553;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3C1PMNOmQXQIpC+R30y8x9xaXsBdXwYRfzfJfB3GtNk=;
+        b=JGQOy4L6kpWNWSBZQ509HNUoNf6Sn4MdFhzLIu6JjgYyqrxv8MQ9JVhipiezF2dJDl
+         O5FGlKefIbfae7h4NfiVIeJ0m9B1id5aIa3+x9GHq81cPwIRfwOOhDV7Y9SjYLDwjQ6r
+         ZmM95kH33ACIPNPa8Ld7VYqKB61I/N9OrP5ziynuFxah6/b/3N1HY5Pwx5/A6bl1kTgq
+         1gD/eo5XqX9JMBQWuX6fvM+ukMDfJSfxfhsTrg1vaWNlYV8HM0P6SS+AECMQLT18ArHu
+         qsS8RB+pQ6rcWNRy7UAtUGzuFWCFbHX4fGcvJps0b7lSuXB94whVqzLjnkocr366e9o5
+         s4Kg==
+X-Forwarded-Encrypted: i=1; AJvYcCUy2S51zDXYuXpSPQaxYIn9waPqDZfZfRrAxv/IkLBcTeEIBitl8nuDMdT+uxRj047i7bwBh/A=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw6DkmMcH43gGhwyxaneZ2nmReusjYtneUOo/Q2BKw47rYkka4S
+	6/WqaGC5rPd9/yJh2QVhEs3lTzc7Jl0cxGXJjh9NebwaLx7gZTtUn+0X
+X-Gm-Gg: AeBDievu5uA8rdAZx5oHExEercssJPUeANZ3VTMNaedU1ryXjZsG4yrDxyBW+bNaR8S
+	6BHfHkbOXpNyAA6Y80FVti4/wE6KsTtohUSOURkNElSlNH4y+av1hCs1hZRjZq9UGx98Bc504vL
+	OijhLgBvVal71cPcyBLra7djQZ8cfUE0BBA7oA0xfXw4bVCGHNbVbz4TpEE359pT1ZWIW8uNEru
+	HQY5obWAQ0zmDeGXh0hIdTwNdhmAgxL+6hvyMX8cgfr9JDgWS8ywXc5PK5lkuWF4smyylnwmW5G
+	tJEEwsXdkSBXY48dcU66LJn92gofLbogt4f3X15+lvrmWkNbT9uUZKuiQwVqxLDisZaVkERQ/+9
+	hoNgrAkF3BToTxM7d4g589TQQ7J9ouhBu5tRuANbVqdkEdGiLRlHkG1cYll4jiSUW0/+1c0pZ61
+	X8fcONX7T/HAB4FGFbFw==
+X-Received: by 2002:a05:6820:168b:b0:689:ceb5:6f38 with SMTP id 006d021491bc7-68be5b5edabmr1719084eaf.5.1775833752820;
+        Fri, 10 Apr 2026 08:09:12 -0700 (PDT)
+Received: from localhost ([2a03:2880:12ff:45::])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-68bcacc9931sm1577202eaf.11.2026.04.10.08.09.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 Apr 2026 08:09:12 -0700 (PDT)
+From: Stanislav Fomichev <sdf.kernel@gmail.com>
+X-Google-Original-From: Stanislav Fomichev <stfomichev@gmail.com>
+Date: Fri, 10 Apr 2026 08:09:11 -0700
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Stanislav Fomichev <sdf.kernel@gmail.com>, netdev@vger.kernel.org, 
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com
+Subject: Re: [PATCH net-next v6 00/14] net: sleepable ndo_set_rx_mode
+Message-ID: <adkSflwfvJSQ1y4H@devvm17672.vll0.facebook.com>
+References: <20260407153101.3694714-1-sdf@fomichev.me>
+ <20260409204443.37c57907@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <adkOZl4gt5UoGv-0@shell.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spamd-Result: default: False [1.14 / 15.00];
+In-Reply-To: <20260409204443.37c57907@kernel.org>
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-277440-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,renesas.com,vger.kernel.org,glider.be,bp.renesas.com];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-277441-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	MISSING_XM_UA(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,davemloft.net,google.com,redhat.com];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.596];
-	TAGGED_RCPT(0.00)[netdev,renesas];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sdfkernel@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,shell.armlinux.org.uk:mid,renesas.com:email]
-X-Rspamd-Queue-Id: C9DFB3D8DF3
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,devvm17672.vll0.facebook.com:mid]
+X-Rspamd-Queue-Id: E32FF3D8FB5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Apr 10, 2026 at 03:51:18PM +0100, Russell King (Oracle) wrote:
-> On Fri, Apr 10, 2026 at 03:29:01PM +0100, Biju wrote:
-> > From: Ovidiu Panait <ovidiu.panait.rb@renesas.com>
-> > 
-> > When mac_managed_pm flag is set, mdio_bus_phy_resume() is skipped, so
-> > phy_init_hw(), which performs soft_reset and config_init, is not called
-> > during resume.
-> > 
-> > This is inconsistent with the non-mac_managed_pm path, where
-> > mdio_bus_phy_resume() calls phy_init_hw() before phy_resume() on every
-> > resume.
-> > 
-> > To align both paths, add a phy_init_hw() call at the top of
-> > __phy_resume(), before invoking the driver's resume callback. This
-> > guarantees the PHY undergoes soft reset and re-initialization regardless
-> > of whether PM is managed by the MAC or the MDIO bus.
-> > 
-> > Signed-off-by: Ovidiu Panait <ovidiu.panait.rb@renesas.com>
-> > Signed-off-by: Biju Das <biju.das.jz@bp.renesas.com>
-> > ---
-> >  drivers/net/phy/phy_device.c | 4 ++++
-> >  1 file changed, 4 insertions(+)
-> > 
-> > diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-> > index 0edff47478c2..8255f4208d66 100644
-> > --- a/drivers/net/phy/phy_device.c
-> > +++ b/drivers/net/phy/phy_device.c
-> > @@ -2008,6 +2008,10 @@ int __phy_resume(struct phy_device *phydev)
-> >  	if (!phydrv || !phydrv->resume)
-> >  		return 0;
-> >  
-> > +	ret = phy_init_hw(phydev);
-> > +	if (ret)
-> > +		return ret;
+On 04/09, Jakub Kicinski wrote:
+> On Tue,  7 Apr 2026 08:30:47 -0700 Stanislav Fomichev wrote:
+> > This series adds a new ndo_set_rx_mode_async callback that enables
+> > drivers to handle address list updates in a sleepable context. The
+> > current ndo_set_rx_mode is called under the netif_addr_lock spinlock
+> > with BHs disabled, which prevents drivers from sleeping. This is
+> > problematic for ops-locked drivers that need to sleep.
 > 
-> Do we want to do this even when phydrv->resume is NULL?
+> I merged the queue leasing, now netkit warns :(
 
-I should've also added (sorry, busy packing) - with it always being
-called even when phydrv->resume is NULL, it means that the call sites
-to phy_resume() in phylib which are preceeded by a call to
-phy_init_hw() should have that call removed, otherwise we're going to
-be calling phy_init_hw() twice.
-
-As the patch currently stands, that's the case when phydrv->resume
-is populated, and I think we should avoid that.
-
-> Apart from that, looks fine to me - it seems some paths call
-> phy_init_hw() can be called with or without phydev->lock held, and
-> this one will call it with the lock held which seems to be okay.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+No worries, will rebase/test/fix and repost!
 
