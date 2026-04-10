@@ -1,207 +1,156 @@
-Return-Path: <netdev+bounces-277426-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277427-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kBy1EUf72Gk5kggAu9opvQ
-	(envelope-from <netdev+bounces-277426-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 15:29:43 +0200
+	id gEUFOi/82GmRkggAu9opvQ
+	(envelope-from <netdev+bounces-277427-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 15:33:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9468F3D81F9
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 15:29:42 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FCA83D826A
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 15:33:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3ECD5302BB94
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 13:25:39 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 97591300D4D2
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 13:33:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9592B398914;
-	Fri, 10 Apr 2026 13:25:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="CDvPQcC0";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="n0BsgU5B"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C174E3A7849;
+	Fri, 10 Apr 2026 13:33:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a5-smtp.messagingengine.com (fout-a5-smtp.messagingengine.com [103.168.172.148])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DF9C3A63FB
-	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 13:25:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCCB6388E40;
+	Fri, 10 Apr 2026 13:33:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775827538; cv=none; b=SoBPOOjwIrquPLqxi1tNAzp8aOwwvGEJFV6awa9vsy/xWrMx70LbzCoMwSldLjQ4IDQhufDourEzgynDdTaFwDiXbCNy6dEBTGi8jRw7HatG00C4Cd9/9NkOSvD6YBuPUgxebUtE3B4MVNVCRe4AasEbkdd3tEcZtbSrhonFpKI=
+	t=1775828012; cv=none; b=WQ36mzsq+eQansfLsrKpdRmbD4nCNgEa5KlU+2C1Nl6H/DjFEQC4PidJyVzJQDnLr17gn4RNhuTPk31rkP1ycGbjbhotZhVDdpmFTw9OBmuZNB3jHIUukY6x2EDTrkG4gFBjI7h3JvwNnM2+yUVeyyqVw/S/7cSPp6lbVk5aPek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775827538; c=relaxed/simple;
-	bh=CTcfoymNaxzlrXeM+5SZPO8JhTqk1n2JG4U1xY5q7cM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q9zaYllVs3lrr+laJr/qbPIEvCGq1rhen03KYmi0rg9F7kczQpCeLNiqEgCdXNFAwWsmvrdiiq//QfGyrW2e2bNwAZWkDgWMCKnUU1EoCc6fN43zRDUG8BSHgCu8gTVwy8KBHUl3CA7YeHiA6yZeUOPLf/9Z6U0SfG1vMqTZs7I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=CDvPQcC0; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=n0BsgU5B; arc=none smtp.client-ip=103.168.172.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-09.internal (phl-compute-09.internal [10.202.2.49])
-	by mailfout.phl.internal (Postfix) with ESMTP id 99AA0EC03F7;
-	Fri, 10 Apr 2026 09:25:34 -0400 (EDT)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-09.internal (MEProxy); Fri, 10 Apr 2026 09:25:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-transfer-encoding:content-type:content-type
-	:date:date:from:from:in-reply-to:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=fm3;
-	 t=1775827534; x=1775913934; bh=aFkmreeq3/dfbEM6YafxOOhalQEvs8cI
-	ZWWAaR+OyO8=; b=CDvPQcC0EYd8Mfq+IDwtxWV09TCn3p4JlOX4//LM+jtDme03
-	e8AOurdl1sZy4fgK6b9NU2JWgcgaF808ylrcZbal5H/7rTyJ0hC9nEFDgFnB4C3Z
-	BUNTMlCBP9pWxUwj1sxDPFd3TGlkmm8omoVoe1SZrzPuhc1WQH1az57RLkmrZBPP
-	fXFQ8pCio3C41CXGReUWxX0M0IbxQnxAxUgr9l5DXZABgd5vMv7ZQHVSHv1xbn5W
-	2tGFU/k2V1GDXiEJzdCCoVYu1rOb4VT6xKZCMxBXTnjgNrnOK7rQNCH31JdLNXlD
-	4u1xCaTUvRH7RAa3wW8PYv2QJiAUdm8Jqm8ETw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1775827534; x=
-	1775913934; bh=aFkmreeq3/dfbEM6YafxOOhalQEvs8cIZWWAaR+OyO8=; b=n
-	0BsgU5BTFu5QzznyQp42kHGxxv6xJA50HtIpHppXeBwhGmo5Rlk8jhNEPOC0s0gB
-	3YEHvYdon5RaT6nD3MR5QbhgI92b4c+yPiJKNsjvNS3Ot+m7gRQbkTCLXPVptM88
-	kLRcxMfM9Y/D5WX+rJk7C5K3QRDVr6A9nocURoF6EvRdCeRzjmQQ+0T9bj547wYJ
-	UX1RAxloKYSWpnVX367bA0CAl8EUDoxOg5fJ6q0NC1uVcwaYKStevR5wybsyX3WL
-	sQPA0XSO7f0hIfDckM9u1xyos/EiJvBshp9Y3riL5FQaAHdMIeRrJPN1cmSUGTtP
-	iLf9zizvTodhdpO4xPYgg==
-X-ME-Sender: <xms:TvrYaWLYNP14dvmV8Tawdso1JdZI_AzTwKHWakRsA1ryEdTPGIFlFA>
-    <xme:TvrYaZ-YcX385SqaHZwoq_THvPiTjPNb_-aEw4VS-UoN6xNAsuIi9bvfJxpN9-ooD
-    TWji1hc-LQbqZTxYXEMdLjR6iUX7NgJLs5jAdRnnreMtbVbRAP9x5w>
-X-ME-Received: <xmr:TvrYaSEPYtVwcMEAasM0AuD15AEnAJTiiqya9iA6qvMG3zhTp7gAQLkdzNz8>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgddvleehvdcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpeffhffvvefukfhfgggtugfgjgesthekredttddtjeenucfhrhhomhepufgrsghrihhn
-    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
-    grthhtvghrnhepgfdvgeeitefffedvgfdutdelgeeihfegueehteevveegveejudelfeff
-    ieehledvnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
-    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeduvddpmhho
-    uggvpehsmhhtphhouhhtpdhrtghpthhtoheprhhjvghthhifrghnihesphhurhgvshhtoh
-    hrrghgvgdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdr
-    ohhrghdprhgtphhtthhopehsrggvvggumhesnhhvihguihgrrdgtohhmpdhrtghpthhtoh
-    epthgrrhhiqhhtsehnvhhiughirgdrtghomhdprhgtphhtthhopehmsghlohgthhesnhhv
-    ihguihgrrdgtohhmpdhrtghpthhtohepsghorhhishhpsehnvhhiughirgdrtghomhdprh
-    gtphhtthhopehjohhhnhdrfhgrshhtrggsvghnugesghhmrghilhdrtghomhdprhgtphht
-    thhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggrvhgvmhesuggrvh
-    gvmhhlohhfthdrnhgvth
-X-ME-Proxy: <xmx:TvrYaU5UcrfSqGRFf8Ddw1IZe1vUdcy_mHRJ2rnmEXYZTi26nw5KhQ>
-    <xmx:TvrYabaP3nWKevnVQD4GN-WYHf84pmZ7clvaMWDIGO332LZnXMWW6g>
-    <xmx:TvrYaSiGp5_odMgjIh8KlC36pTmkP7qkqaNbA3kQ1l4cccGwZCz_dg>
-    <xmx:TvrYadccVaMsXXgV01bC2-Ok4m4wagzVSVxFgiV1LCrHdffmNGTunA>
-    <xmx:TvrYab__gMFOVa308DIDj6y04KdHNZObxzR0e2qW_KBxpgDvTgugaEpM>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 10 Apr 2026 09:25:33 -0400 (EDT)
-Date: Fri, 10 Apr 2026 15:25:29 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Rishikesh Jethwani <rjethwani@purestorage.com>
-Cc: netdev@vger.kernel.org, saeedm@nvidia.com, tariqt@nvidia.com,
-	mbloch@nvidia.com, borisp@nvidia.com, john.fastabend@gmail.com,
-	kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
-	edumazet@google.com, leon@kernel.org
-Subject: Re: [PATCH v12 5/6] tls: add hardware offload key update support
-Message-ID: <adj6SUiUDN38Hdv-@krikkit>
-References: <20260402235511.664801-1-rjethwani@purestorage.com>
- <20260402235511.664801-6-rjethwani@purestorage.com>
- <adQeoGH8qmhhCSal@krikkit>
- <CAKaoeS3pNe-DH2vA1E7t9NOn3H_ZUGk+cM0LgoYogkWEU0aqLQ@mail.gmail.com>
+	s=arc-20240116; t=1775828012; c=relaxed/simple;
+	bh=4q75PxGtQMEjd1qrWb2q48Z/ykzfKOA2kScs3WI76/k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SWOpaj2oScI3O8gZqjzCWCFTyhyPlv0IiOb1qI95dcC/4UoXcSy/GD6afoCAa8iN5eGBa/ZgSCQPLVUYWOQph+BDMVYiWpdQSK3RWn0ekG166wWQmtXyxfo74dBMTFkZFSbopWAqbwXAmyjc2pXvYVLaQnCg+TXemS9MxIPSaX4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [141.14.220.42] (g42.guest.molgen.mpg.de [141.14.220.42])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id ADF1D4C2C37D58;
+	Fri, 10 Apr 2026 15:32:37 +0200 (CEST)
+Message-ID: <0941aca7-66b9-4bd4-aa9f-c8e020e32bb1@molgen.mpg.de>
+Date: Fri, 10 Apr 2026 15:32:36 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAKaoeS3pNe-DH2vA1E7t9NOn3H_ZUGk+cM0LgoYogkWEU0aqLQ@mail.gmail.com>
-X-Spamd-Result: default: False [0.34 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH net] ice: fix double free in
+ ice_sf_eth_activate() error path
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Piotr Raczynski <piotr.raczynski@intel.com>, Jiri Pirko <jiri@resnulli.us>,
+ Simon Horman <horms@kernel.org>,
+ Michal Swiatkowski <michal.swiatkowski@linux.intel.com>, stable@kernel.org
+References: <2026040919-junior-glue-10d0@gregkh>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <2026040919-junior-glue-10d0@gregkh>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [0.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm3,messagingengine.com:s=fm2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-277426-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[queasysnail.net];
-	FREEMAIL_CC(0.00)[vger.kernel.org,nvidia.com,gmail.com,kernel.org,davemloft.net,redhat.com,google.com];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-277427-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	DMARC_NA(0.00)[mpg.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pmenzel@molgen.mpg.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 9468F3D81F9
+X-Rspamd-Queue-Id: 7FCA83D826A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-2026-04-09, 10:46:40 -0700, Rishikesh Jethwani wrote:
-> On Mon, Apr 6, 2026 at 1:59 PM Sabrina Dubroca <sd@queasysnail.net> wrote:
-> >
-> > 2026-04-02, 17:55:10 -0600, Rishikesh Jethwani wrote:
-> > > During a TLS 1.3 KeyUpdate the NIC key cannot be replaced immediately
-> > > if previously encrypted HW records are awaiting ACK. start_rekey sets
-> > > up a temporary SW context with the new key and redirects sendmsg through
-> > > tls_sw_sendmsg_locked. When no records are pending, complete_rekey runs
-> > > inline during setsockopt. Otherwise, clean_acked sets REKEY_READY once
-> > > all old-key records are ACKed, and the next sendmsg calls complete_rekey.
-> > > complete_rekey flushes remaining SW records, reinstalls HW offload at
-> > > the current write_seq, and frees the temporary context.
-> > >
-> > > If another KeyUpdate arrives while a rekey is already pending,
-> > > start_rekey just re-keys the existing SW AEAD in place.
-> > >
-> > > If complete_rekey fails (tls_dev_add or crypto_aead_setkey),
-> > > we stay in SW mode (REKEY_FAILED) until a subsequent rekey
-> > > succeeds, while maintaining TLS_HW configuration.
-> > >
-> > > Tested on Mellanox ConnectX-6 Dx (Crypto Enabled) with multiple
-> > > TLS 1.3 key update cycles.
-> >
-> > Something here doesn't seem to work. I have a very simple
-> > client/server pair where one side just loops doing large send()s and
-> > does a rekey (send keyupdate + change key) every N iterations (I've
-> > set N large enough that it goes about 5 seconds between rekeys), and
-> > the other receives all the data and changes its RX key when it sees a
-> > keyupdate. If both sides are doing SW, it works. If I configure either
-> > side to use offload, decrypt fails after the rekey unless I add a
-> > small sleep() just after changing keys on the TX side.
-> >
+Dear Greg,
+
+
+Thank you for the patch.
+
+Am 09.04.26 um 17:11 schrieb Greg Kroah-Hartman:
+> When auxiliary_device_add() fails, the aux_dev_uninit label calls
+> auxiliary_device_uninit() and falls through to sf_dev_free and xa_erase.
+> The uninit invokes ice_sf_dev_release(), which already frees sf_dev via
+> kfree() and erases the entry from ice_sf_aux_id.  The fall-through then
+> double-frees sf_dev and double-erases the id.
 > 
-> Found 2 issues with this test case:
+> This is reachable from userspace via the devlink port function state-set
+> netlink command.
 > 
-> TX HW Rekey: The start_rekey function is missing the EOR (End of
-> Record) marker. Fix will be included in the next code submission.
-
-For this, pay attention to the "[ANN] net-next is CLOSED" messages on
-netdev, we're approaching the next merge window.
-
-> RX HW Rekey: When the receiver tries to rekey, multiple new records
-> are already decrypted by the NIC with old key and present in receive
-> queue. To handle these records, we need to store the old key to
-> encrypt with the old key and decrypt with the new key. Also, we need
-> to consider back-to-back rekeys if we store the old key.
+> Fix this by returning right after uninit because the release callback
+> handles all cleanup correctly.
 > 
-> Any suggestions on how to address this?
+> Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
+> Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: Piotr Raczynski <piotr.raczynski@intel.com>
+> Cc: Jiri Pirko <jiri@resnulli.us>
+> Cc: Simon Horman <horms@kernel.org>
+> Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> Fixes: 177ef7f1e2a0 ("ice: base subfunction aux driver")
+> Cc: stable <stable@kernel.org>
+> Assisted-by: gregkh_clanker_t1000
+> Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> ---
+>   drivers/net/ethernet/intel/ice/ice_sf_eth.c | 2 ++
+>   1 file changed, 2 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_sf_eth.c b/drivers/net/ethernet/intel/ice/ice_sf_eth.c
+> index 2cf04bc6edce..6bc8aa896762 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_sf_eth.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_sf_eth.c
+> @@ -304,7 +304,9 @@ ice_sf_eth_activate(struct ice_dynamic_port *dyn_port,
+>   	return 0;
+>   
+>   aux_dev_uninit:
+> +	/* ice_sf_dev_release() frees sf_dev and erases the xa entry */
+>   	auxiliary_device_uninit(&sf_dev->adev);
+> +	return err;
+>   sf_dev_free:
+>   	kfree(sf_dev);
+>   xa_erase:
 
-I'm sorry, I can't spend this much time on solving this problem. I've
-already allocated a significant amount of time to reviewing/testing
-this submisison (including pointing out some very basic things). And
-it seems you've already found a solution (store and use the old
-key(s)).
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
 
--- 
-Sabrina
+
+Kind regards,
+
+Paul
 
