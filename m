@@ -1,291 +1,209 @@
-Return-Path: <netdev+bounces-277529-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277530-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id JM+NLTRU2WkcoggAu9opvQ
-	(envelope-from <netdev+bounces-277529-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 21:49:08 +0200
+	id 2F1XIvlU2WlGoggAu9opvQ
+	(envelope-from <netdev+bounces-277530-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 21:52:25 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15B523DC1C4
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 21:49:07 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE7523DC1EE
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 21:52:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 561EF3004203
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 19:49:05 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BE5253047BDF
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 19:52:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 438A5361672;
-	Fri, 10 Apr 2026 19:49:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2972735F16F;
+	Fri, 10 Apr 2026 19:52:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="PYTjcYVa"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="SCZqEapQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f99.google.com (mail-ua1-f99.google.com [209.85.222.99])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6DDE2135B8
-	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 19:49:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A0A63803C3
+	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 19:52:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775850544; cv=none; b=IamQXMYlexncbF1VSruoiBhO+FljcMwT9NqQ0CoFCSBV3sLFp5RZOf5k7IG+Qq0qy0GCBtO1X9NSiJUOsJwqr/gC9Yle0ZB2BEZIyj5Hzkz60tGAaN+v53piqTutwJPc8Izn9DnIVnr+a3clVLJhxFbAMgtWrQec9InLSwaxYWQ=
+	t=1775850729; cv=none; b=tNLUmclfeONI4o2NOuCY4BbJIiAW2iHUPUS//IqVDzE62ynrN44J/9tWkMNB+CdZpSPNd6PbFaAapdgY7Wofg4xztxY1Hr9HhpzTg8IDe2MedvB5ykJWC7RPDojhrOM0+ev1Z7rEcuJNdELXiCDD678PTQ3/6HOw66K2kkfxfmI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775850544; c=relaxed/simple;
-	bh=k6iCnGnmW1wnb3m0tS6ROnC9aBc6XfEeLBA2NEGS4Jw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XD0eBuqnTSFaej0rd6cpqleVCLjJLgqzIrkxDOsjP/cMqOQGuxeqhblmeNn6STlLCS2eYAWm6/cZJaDwH2FUpfl5tqRA5aCjfULkFnT6S8IMv8N4thhEl8tUz+FfCZTvLm9c9q0Gd9RP7pXM4dDyBzbs1LyzHeZ/Q8044syIUCY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=PYTjcYVa; arc=none smtp.client-ip=209.85.222.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ua1-f99.google.com with SMTP id a1e0cc1a2514c-953a26a9abcso676397241.3
-        for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 12:49:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775850542; x=1776455342;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HYGtEBUtVNnha0g7LOFTFU0pqXnrK0LnCyJjXjieN6k=;
-        b=rK0HZjwSOJ5lKna5HRODltlzPIia5skn/sOjh1FHvQw+9DSgHR/FNw2Le1Io7xsQ03
-         G0V6g65hCDuKJfLD3nW2GX/Db54nIFwR1ghIm1cADKAECJYLZ9hRg+8SyiYto0bOMzpQ
-         JL6P1tBKaudgsHbekcY06EgC7yMnDbk/csKN+0n7eObByNpg9AKrxImcyPQRuhsAOFSE
-         Qg9nwVIQmOI1y0fwodpdNTDee1kcFZe2be+Ez7j8bFa3iQBk+aoPlorwSBArxXNf5QIh
-         kV2Tn/2uwlM41tSsB9/Qmseje6hvqZUW62klwKkVNsdjw1wAxyF/OdoAufM5MxBYkDIX
-         K2UA==
-X-Forwarded-Encrypted: i=1; AJvYcCVKoIgXxf5bnWxOVhrEBb50XEiScX8DYiYNnqlWjrz36FR1pjjaiZb860QohnN6Ar+oHMRmH3U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyVqPAbCQnSQHMxWcnYLURdVTaGsgtqQlbnpVlQa5dPh6jtKV/v
-	/axCRupx6zu74Jys1v78R0NxADkN0Ov4uxjjn1BKnAEVsPd3VlgPygizFLb2m5ZOvi+QVO50l2U
-	xnORtkQ+76TxRAlKXwrczLVaMhT7YRSJ2ReC9Gy6mmx21QmgSZTztbKS2N2vGykS3j1rU59A5fm
-	FI+7g8vhoDzHFv5JW6fO92OHDOgL0ftlFUmkuSe1GcOt0WWP1604qWgu48UZYNV3/KrzM21tqk+
-	N0S9v0aj+PoqEqh0A==
-X-Gm-Gg: AeBDiesXetNjwblyX7gAfml1fxPh5aEkkN9X+Xlzh4B4ARWmslZ93X8BehGEHF365W1
-	wAz7t7lKZ0SzUK930Y/z8bT93p7mqMa0PKiT8fCr9CGJxpcxDnDvPUwkEUFvFkhxip9V7oLgtoP
-	RUkn07mqzlCUbBpN1sRx9LCTIizMDI6PDMvssGqPZ+KzIFh/YAspRRoXQbRcM918b20F/7yx7pR
-	8EZ8TagHsNh3fImQE+ppajTKn9q1GB7YeJAvudWv/DfM4kRXInuZLTpKrgA5VtXbkWYwghZfPFU
-	CRHCEUKZnMIZEWhgcKpkYwA/cFpHvSam5vl4vn3YaI2uZ45slFiqODneUrHg2H+i/liFA2N7qod
-	kWqcuBGRQLxnNwP8YnuKnXCynRyeZupUjTzd89oZ2cR+TGeJa1NV6XbidS1mvcbzWwJXW3/bLnm
-	ywia9iNq1NnYeAf/bN4obWpPt+D23MgM55zBLXSL3FnLUEbcFK0EdksXVoiziY2Xs=
-X-Received: by 2002:a05:6102:d8a:b0:5df:8f4:61e6 with SMTP id ada2fe7eead31-60a0136594emr2197741137.32.1775850541527;
-        Fri, 10 Apr 2026 12:49:01 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-15.dlp.protect.broadcom.com. [144.49.247.15])
-        by smtp-relay.gmail.com with ESMTPS id ada2fe7eead31-609d8c5b9fesm289669137.6.2026.04.10.12.49.01
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 10 Apr 2026 12:49:01 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-yw1-f200.google.com with SMTP id 00721157ae682-7982c466ee1so58992797b3.2
-        for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 12:49:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1775850541; x=1776455341; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=HYGtEBUtVNnha0g7LOFTFU0pqXnrK0LnCyJjXjieN6k=;
-        b=PYTjcYVaJBDmC/iZpR1NnI01rjM+knvWPNhR8I6zo65j+q1Ac3UNbWnbkPc3JDMJbH
-         7NLlNRaoryHPTdqtLdQE2pznhXOqf7ppRTk2wHim9wI+2MA01/Kpz7DuyAF68j9d0vOp
-         EIdIgxen+CHN5TEWQnalZ7TPPU7FFEcQxYwUo=
-X-Forwarded-Encrypted: i=1; AJvYcCXo2kHMDBhNyP+HGCIPasWHyRkMmGgoqMnLvs2l54WBDdkBF1UDOMPPEZLJHCN6xfRepUM3hso=@vger.kernel.org
-X-Received: by 2002:a05:690c:e3c5:b0:79a:3d1a:a667 with SMTP id 00721157ae682-7af7252e322mr52991587b3.48.1775850540924;
-        Fri, 10 Apr 2026 12:49:00 -0700 (PDT)
-X-Received: by 2002:a05:690c:e3c5:b0:79a:3d1a:a667 with SMTP id
- 00721157ae682-7af7252e322mr52991257b3.48.1775850540409; Fri, 10 Apr 2026
- 12:49:00 -0700 (PDT)
+	s=arc-20240116; t=1775850729; c=relaxed/simple;
+	bh=/acECG0t9e5CtCjKFwcO/1CVgXHyvRTGFllTwGnAnxY=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=dI1W3fpzT2COE5MOjEJ1zrcaKl+W1S/502P7BucUHn0aVCvESU5dss6xckeBt6J+0SdszJmqpACTXYtj//2BStdf6Z21qqDjGocHw8FCM56n5ZTjGFILOU/4dHD3/18CLww2TMbzDGlKKjOvbAZ8j4Tljz3ChkTfNklLQ59x0Uc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=SCZqEapQ; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 9CB0BC5C1A6;
+	Fri, 10 Apr 2026 19:52:39 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 23ED1603F0;
+	Fri, 10 Apr 2026 19:52:04 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 5EFA61045007B;
+	Fri, 10 Apr 2026 21:51:56 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1775850722; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding; bh=a1e5C5snqp7ity9V2CMWdtR7H1QuV/Cp6vsDR9/gMD4=;
+	b=SCZqEapQCczpG+MRlBxiAU2Uf76tOO3iNgxIxyIDSyNMmqGqI1Q9oJM9Hoer9N9w4CIqWY
+	q/ShAo1Ns1upP/UElp0kV9JgOt0JINEvS9VO585QxYBp4RpVeclOsC2EGrbObz4QWFoweR
+	xrpdFMUh5uyDyo7VOEz/r/mbnURS9VyLKiDDbJrwhLx60az4FUAm9UocLGDutzm6CD7Som
+	BrhTKS10LBCY/oxf2JTqOmrp3rwSuaygicVaYDwE2JVxSh6epujy5PS3nPD2t4bNBHmagL
+	tz1nNsalTUgqIq27a3JYkxII/8XYB5hjFDxovwpRCLsd//h1Ji1njreUDIbl/Q==
+From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
+Subject: [PATCH net-next v2 00/14] net: macb: implement context swapping
+Date: Fri, 10 Apr 2026 21:51:48 +0200
+Message-Id: <20260410-macb-context-v2-0-af39f71d40b6@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260406222305.4111170-1-akhilesh.samineni@broadcom.com>
- <20260406222305.4111170-3-akhilesh.samineni@broadcom.com> <willemdebruijn.kernel.327df0cb46f23@gmail.com>
-In-Reply-To: <willemdebruijn.kernel.327df0cb46f23@gmail.com>
-From: Akhilesh Samineni <akhilesh.samineni@broadcom.com>
-Date: Sat, 11 Apr 2026 01:18:47 +0530
-X-Gm-Features: AQROBzCufcbLkI5QabjoCpXAMgb5RG-eWE_DrRnZcb4bziGlb8sY3dupNKWxmQg
-Message-ID: <CANQF7iDojHOkRFjSfMH1oaSnChCLU4ECNgP_0zX==Err2kBoEQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 2/3] netdevsim: psp: handle the new crypt-offset
- and spi-threshold get/set operations
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, 
-	willemb@google.com, daniel.zahka@gmail.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, jayakrishnan.udayavarma@broadcom.com, 
-	ajit.khaparde@broadcom.com, kiran.kella@broadcom.com, 
-	sachin.suman@broadcom.com
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000ae3b54064f206c03"
-X-Spamd-Result: default: False [-2.76 / 15.00];
-	SIGNED_SMIME(-2.00)[];
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/22NwQ6CMBBEf4Xs2Zq2AQme/A/DoV0WWSMtaSvBE
+ P7dglePk3nzZoVIgSnCtVgh0MyRvctBnwrAwbgHCe5yBi31RZZSidGgFehdoiUJ20k0vZalKjv
+ IkylQz8uhu4OjJFymoP018W2fhGm37ezAMfnwOZ5ndSz+n8xKSNFUjcTK2FrX+ma9Ty92Z/Qjt
+ Nu2fQEX/f4DxgAAAA==
+X-Change-ID: 20260401-macb-context-bd0caf20414d
+To: Nicolas Ferre <nicolas.ferre@microchip.com>, 
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Richard Cochran <richardcochran@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>
+Cc: Paolo Valerio <pvalerio@redhat.com>, Conor Dooley <conor@kernel.org>, 
+ Nicolai Buchwitz <nb@tipi-net.de>, 
+ Vladimir Kondratiev <vladimir.kondratiev@mobileye.com>, 
+ Gregory CLEMENT <gregory.clement@bootlin.com>, 
+ =?utf-8?q?Beno=C3=AEt_Monin?= <benoit.monin@bootlin.com>, 
+ Tawfik Bayouk <tawfik.bayouk@mobileye.com>, 
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
+ Maxime Chevallier <maxime.chevallier@bootlin.com>, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
+X-Mailer: b4 0.15.1
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-277529-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	TAGGED_FROM(0.00)[bounces-277530-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	HAS_ATTACHMENT(0.00)[];
-	DKIM_TRACE(0.00)[broadcom.com:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_TO(0.00)[microchip.com,tuxon.dev,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[21];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[akhilesh.samineni@broadcom.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,lunn.ch,gmail.com,vger.kernel.org,broadcom.com];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,broadcom.com:dkim,broadcom.com:email]
-X-Rspamd-Queue-Id: 15B523DC1C4
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: EE7523DC1EE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
---000000000000ae3b54064f206c03
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MACB has a pretty primitive approach to buffer management. They are all
+stored in `struct macb *bp`. On operations that require buffer realloc
+(set_ringparam & change_mtu ATM), the only option is to close the
+interface, change our global state and re-open the interface.
 
-On Wed, Apr 8, 2026 at 3:19=E2=80=AFAM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> Akhilesh Samineni wrote:
-> > Implement the crypt-offset and spi-threshold get/set in netdevsim PSP.
-> >
-> > Signed-off-by: Akhilesh Samineni <akhilesh.samineni@broadcom.com>
-> > Reviewed-by: Kiran Kella <kiran.kella@broadcom.com>
-> > Reviewed-by: Ajit Kumar Khaparde <ajit.khaparde@broadcom.com>
-> > ---
-> >  drivers/net/netdevsim/netdevsim.h | 2 ++
-> >  drivers/net/netdevsim/psp.c       | 6 ++++++
-> >  2 files changed, 8 insertions(+)
-> >
-> > diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/=
-netdevsim.h
-> > index c904e14f6b3f..3ad7d42391c0 100644
-> > --- a/drivers/net/netdevsim/netdevsim.h
-> > +++ b/drivers/net/netdevsim/netdevsim.h
-> > @@ -117,6 +117,8 @@ struct netdevsim {
-> >               struct psp_dev *dev;
-> >               u32 spi;
-> >               u32 assoc_cnt;
-> > +             u8  crypt_offset;
-> > +             u32 spi_threshold;
-> >       } psp;
-> >
-> >       struct nsim_bus_dev *nsim_bus_dev;
-> > diff --git a/drivers/net/netdevsim/psp.c b/drivers/net/netdevsim/psp.c
-> > index 0b4d717253b0..9098edf00c5c 100644
-> > --- a/drivers/net/netdevsim/psp.c
-> > +++ b/drivers/net/netdevsim/psp.c
-> > @@ -122,6 +122,11 @@ static int
-> >  nsim_psp_set_config(struct psp_dev *psd, struct psp_dev_config *conf,
-> >                   struct netlink_ext_ack *extack)
-> >  {
-> > +     struct netdevsim *ns =3D psd->drv_priv;
-> > +
-> > +     ns->psp.crypt_offset =3D conf->crypt_offset;
-> > +     ns->psp.spi_threshold =3D conf->spi_threshold;
-> > +
-> >       return 0;
-> >  }
-> >
-> > @@ -249,6 +254,7 @@ int nsim_psp_init(struct netdevsim *ns)
-> >       if (err)
-> >               return err;
-> >
-> > +     ns->psp.spi_threshold =3D PSP_SPI_THRESHOLD_DEFAULT;
-> >       debugfs_create_file("psp_rereg", 0200, ddir, ns, &nsim_psp_rereg_=
-fops);
-> >       return 0;
->
-> Default initialization should probably all complete before the device
-> is made visible with psp_dev_create.
+Two issues:
+- It doesn't fly on memory pressured systems; we free our precious
+  buffers and don't manage to reallocate fully, meaning our machine
+  just lost its network access.
+- Anecdotally, it is pretty slow because it implies a full PHY reinit.
 
-Yes. I will update it in the next v2 patch.
+Instead, we shall:
+ - allocate a new context (including buffers) first
+ - if it fails, early return without any impact to the interface
+ - stop interface
+ - update global state (bp, netdev, etc)
+ - pass newly allocated buffer pointers to the hardware
+ - start interface
+ - free old context
 
---000000000000ae3b54064f206c03
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+This is what we implement here. Both .set_ringparam() and
+.ndo_change_mtu() are covered by this series. In the future,
+at least .set_channels() [0], XDP [1] and XSK [2] would benefit.
 
-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
-riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
-QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
-UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
-M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
-Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
-14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
-a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
-XzCCBVswggRDoAMCAQICDCI38VoeiWHImjdPjDANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
-RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
-UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMzA1MjIwODU3NDhaFw0yNjA1MjIwODU3NDhaMIGY
-MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
-BgNVBAoTDUJyb2FkY29tIEluYy4xGjAYBgNVBAMTEUFraGlsZXNoIFNhbWluZW5pMS0wKwYJKoZI
-hvcNAQkBFh5ha2hpbGVzaC5zYW1pbmVuaUBicm9hZGNvbS5jb20wggEiMA0GCSqGSIb3DQEBAQUA
-A4IBDwAwggEKAoIBAQDAO001ZnYPXmhKsI+E+ksMK/hc9m3qLeGDkvGAIpfLyKfdk2C4d6tsRhM8
-4xrNQmMMM+f5wF271rTc0O+CTfIIIayklTmjzksl5CwimtzjGpPZRcLeABJk4Z8VdCU+TW0gSDgU
-UGsHqEkCW3ifD8UhO+1xsg2k1ER9gbJ5HfkiiRjtx/jG0Eik3rXjcrxyU4CSTJeFrMsRfHBINs1b
-XQiZIKEA2v9ryzZcqBG67oV2mIMYV0PyoO5ccmjophMLX5I6d9LmhVG+o7Fb8fYE43v1Gmx1cF3/
-HLCRJ9lVtOZNrDg8Tx5LaODYomcqd8Jym3+vbToQ+O0SQyV9WNR9n6OnAgMBAAGjggHfMIIB2zAO
-BgNVHQ8BAf8EBAMCBaAwgaMGCCsGAQUFBwEBBIGWMIGTME4GCCsGAQUFBzAChkJodHRwOi8vc2Vj
-dXJlLmdsb2JhbHNpZ24uY29tL2NhY2VydC9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcnQw
-QQYIKwYBBQUHMAGGNWh0dHA6Ly9vY3NwLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNp
-Z24yY2EyMDIwME0GA1UdIARGMEQwQgYKKwYBBAGgMgEoCjA0MDIGCCsGAQUFBwIBFiZodHRwczov
-L3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzAJBgNVHRMEAjAAMEkGA1UdHwRCMEAwPqA8
-oDqGOGh0dHA6Ly9jcmwuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAu
-Y3JsMCkGA1UdEQQiMCCBHmFraGlsZXNoLnNhbWluZW5pQGJyb2FkY29tLmNvbTATBgNVHSUEDDAK
-BggrBgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU7Bc6
-vjugq1VNABQ8AiT04kX10IgwDQYJKoZIhvcNAQELBQADggEBAELCFtU20SHhQMZA0lekkhYfBuuc
-/5XYCUX21R6IQyTnqwWwOQ4xNOiq5rC7P2bOGpEKMcMBcHB/VDqpT7Cs0PXecOkC+0cWvmZoxCjx
-Hk+3d71Ie1w8r5QiYuGOgGhNWbfhc5aVZUENjC+zlYStnReq3uZcf/oziznbvTX38pyuhVsuHFSo
-+SP9KHflLUYGQLmToaPGlRjPh+LJmpbiZ0NRrRXz883+dlADC7tW3fUlrqdeLN9xsoTh7CoWxLUl
-xSAQfSnXdfTNfF36dQxm8Az8xhjNmD04jilAg+UVGs7xWqnIkFChNe8pykTtDwdrkjzaaISKeUDj
-4fW8f5qx0B4xggJgMIICXAIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWdu
-IG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIw
-AgwiN/FaHolhyJo3T4wwDQYJYIZIAWUDBAIBBQCggccwLwYJKoZIhvcNAQkEMSIEIA0VmWLoSUuP
-mLOsO1QUmryaMOJw8CCJAPCbXJSP5nCpMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZI
-hvcNAQkFMQ8XDTI2MDQxMDE5NDkwMVowXAYJKoZIhvcNAQkPMU8wTTALBglghkgBZQMEASowCwYJ
-YIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQcwCwYJYIZIAWUD
-BAIBMA0GCSqGSIb3DQEBAQUABIIBAGj3jV4rpIJVbP7tnQmTyZwmzFKFQTWpE0OtsF1CslojoY0l
-eaYpQdsaii4R5QtRoJN2McmlKjSi9L7ZqNfcUtl3p5xOy6iTvqAMOKbxX8O7sFmIDfIoTuEFVhQ+
-MXmHQSW/9sAi8miOsOjz+N5XYREQQ9pXpPL81o1yeNR2uLWC4tKkSw0HtXr6HUZqKmof1fVIFSxP
-gAiJgEqrJtLVNzDTubDK57k+pZTKKmPaEOWnQ55ZXHSfhTNDP7H40kW+RyI8pPMGjCLlobuctSnS
-j4YAfMPJAE9/UyNphMW7855kytTaupRXf3xEBP2p4OtjOFr6RZ2b+az8UAf57iJJ+7g=
---000000000000ae3b54064f206c03--
+The change is super intrusive so conflicts will be major. Sorry!
+
+Thanks,
+Have a nice day,
+Théo
+
+[0]: https://lore.kernel.org/netdev/20260317-macb-set-channels-v4-0-1bd4f4ffcfca@bootlin.com/
+[1]: https://lore.kernel.org/netdev/20260323221047.2749577-1-pvalerio@redhat.com/
+[2]: https://lore.kernel.org/netdev/20260304-macb-xsk-v1-0-ba2ebe2bdaa3@bootlin.com/
+
+Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
+---
+Changes in v2:
+- Patch "add subset of `struct macb` to `struct macb_context`" was
+  messed up. It contained much more than what the name implied. Split
+  into three commits (I caused trouble by rebase reordering).
+- Fix tieoff; V1 allocated it without initialisation.
+- Fix NULL pointer dereference on context in mab_get_regs() and
+  macb_get_ringparam() when interface is offline.
+- Patch "unify device pointer naming convention":
+  - Fix build issue when CONFIG_NETCONSOLE=y.
+  - Rename `struct net_device *dev` to `netdev` in macb.h.
+  - Rename `struct phy_device *phy` to `phydev` in macb_main.c.
+- On swap, call netdev_tx_reset_queue() to reset all DQL counters.
+- At end of swap, add missing kfree(old_ctx).
+- During HW disabling in swap, grab bp->lock to protect against IRQ
+  handler.
+- On swap, cancel the three BH features MACB has:
+  bp->hresp_err_bh_work, bp->tx_lpi_work and queue->tx_error_task.
+- On swap, call macb_configure_dma() which writes buffer size to
+  hardware registers. This is important because the change_mtu codepath
+  changes the buffer size.
+- Rebase onto latest net-next/main (58dd34dbd5b0) & resolve conflicts.
+- Link to v1: https://patch.msgid.link/20260401-macb-context-v1-0-9590c5ab7272@bootlin.com
+
+---
+Théo Lebrun (14):
+      net: macb: unify device pointer naming convention
+      net: macb: unify `struct macb *` naming convention
+      net: macb: unify queue index variable naming convention and types
+      net: macb: enforce reverse christmas tree (RCT) convention
+      net: macb: allocate tieoff descriptor once across device lifetime
+      net: macb: introduce macb_context struct for buffer management
+      net: macb: avoid macb_init_rx_buffer_size() modifying state
+      net: macb: make `struct macb` subset reachable from macb_context struct
+      net: macb: change caps helpers signatures
+      net: macb: change function signatures to take contexts
+      net: macb: introduce macb_context_alloc() helper
+      net: macb: re-read ISR inside IRQ handler locked section
+      net: macb: use context swapping in .set_ringparam()
+      net: macb: use context swapping in .ndo_change_mtu()
+
+ drivers/net/ethernet/cadence/macb.h      |  125 ++-
+ drivers/net/ethernet/cadence/macb_main.c | 1767 +++++++++++++++++-------------
+ drivers/net/ethernet/cadence/macb_pci.c  |   46 +-
+ drivers/net/ethernet/cadence/macb_ptp.c  |   26 +-
+ 4 files changed, 1126 insertions(+), 838 deletions(-)
+---
+base-commit: 6b6916526425235d5875df21dfa6f31fdc098599
+change-id: 20260401-macb-context-bd0caf20414d
+
+Best regards,
+--  
+Théo Lebrun <theo.lebrun@bootlin.com>
+
 
