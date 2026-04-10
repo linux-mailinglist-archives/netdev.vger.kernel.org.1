@@ -1,219 +1,202 @@
-Return-Path: <netdev+bounces-277275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277276-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wEwWI0uh2GnegAgAu9opvQ
-	(envelope-from <netdev+bounces-277275-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 09:05:47 +0200
+	id YIRdHVSh2GnegAgAu9opvQ
+	(envelope-from <netdev+bounces-277276-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 09:05:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9268A3D3122
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 09:05:46 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACE0F3D3131
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 09:05:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 63952300B472
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 07:05:43 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BD89B300D609
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 07:05:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61DB738B12E;
-	Fri, 10 Apr 2026 07:05:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E890137FF50;
+	Fri, 10 Apr 2026 07:05:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wx/Taxt5"
+	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="Qm4gw0jH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA22D385524
-	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 07:05:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.52
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775804742; cv=pass; b=q4n5Lm96Usu6RAkS5aDW3jLZXGgnbq5OpKqp7qKTnVN+EZ2RCiA4Wf8i/JBQnQi4xWPzpJAu9Xxc7V2QN4GBg3CVJu0BCaaNzCibs/XdQxUFhXbur/ftJDx28tvwhZZJzNOz5AzZCtx/lLwfsYLp83g+XGPb4poDNhx7tWamRjU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775804742; c=relaxed/simple;
-	bh=z8gSP3PcBd/It2/0Cdc30diOdfycFzZJjCzVVCHITZ8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=musX3MjuiZ4CMWUKw0LeTv1sEIFFPz5pfPXuq71jatpSA06yt+RxKPPThyJF486iHXE/qrKYiduUsKyfjMzI0ruyhML1nc/aWX3xbbFOTt3SCjNvvoAjIcSrI9ck9uKTsnPIFRJj302Ftmf0xirgvHe0aKfoZUBu1MigtClVvk8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wx/Taxt5; arc=pass smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-66f727d6849so2435430a12.1
-        for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 00:05:40 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1775804739; cv=none;
-        d=google.com; s=arc-20240605;
-        b=AQWe9p7CO7bJ2RkUGe81CumUYR6u3xWTf/mmdr4A3S6kilM+nMi3PKn5Jn1mOzb5xs
-         okE2TOFOtfLe3N3QzlHzSnUAuvgN37L60+SLSQ0Qv9mXKS9ByE4UGSxQ+QZVYAtclYMq
-         Ks39Cl7O0FJ42ygteOQxOsnlrzJKhdSJNBf0pAO5s/ab/7WNOm90aEPg2WBt2PWK2aZl
-         dMwpga9eKOn5aZJrd2dCjhNseL0JS0D4ZYomFGjtdZxCZ3qWbutYZQnpbaayv+9v0Chw
-         5C5hYyjL806R98Ys7SQnme57+lbYWkUfN5b//GRoA0qStDJKEetfJaOHg8Pt53Z6HpFP
-         V5kg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=z8gSP3PcBd/It2/0Cdc30diOdfycFzZJjCzVVCHITZ8=;
-        fh=vVMMmVnI+0qe3OOLOSIeljvRUf0tUDD2zS6snHRHC8A=;
-        b=Kb0pM3KkiQKKtH+tmY49EfdGQeirEWEU0vFuGUy/SE0U9f/ZcG5xIm8P5mYyimK4Y3
-         MxsEirM0XHG4kFXV4HZFE011uPRhG8oJXd9pN9FV71Qk2Y7/6MFhVgQIv0bzLUfwgoBF
-         4jUNlM0vw3M9wIYojVnFCTwoJqc+w1Wno9ybDCirD2wuiwsatt2m2+y2njWqM3boaYdz
-         vy6zPaLlzFuFr0P5iD6ZtlE67LAHIh6vD/jQ/CO7cuaam/+uw4rJrRVo8NlaH64kxcyF
-         Gt6n0kebYYun8aChW3WxVvHbDCbHliZAe0DzCgxoPwqKE6z1l9BcSz8cs8qM9OVU2Huj
-         3LfQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CCEE38B15E;
+	Fri, 10 Apr 2026 07:05:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775804748; cv=none; b=qMOcbjgf4xi7Gg5CHKMfbKO4jR8UniuzqChtABHSthXj2uhg44A0Eb1+cg8FJR/UyVynVlSpYBTHnyA1vY5WTNmPp9+VpwjzHonz4J8EMeSTMw0WhR3LilphrcMvJaqId7oFRP+d7m/m+rxhsTFAEpV4Z2pc44mh1iMTxLrOfWs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775804748; c=relaxed/simple;
+	bh=Oy/mYPLUCjkzN3QPWYx62GdWgbKmAadAtpo0ISNECrA=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=SRRN5Sc4Ll8RA7Bw7d2GYw7P45Irt5xkQUrecu9wbTppPwhYtfK4VWBB7dEdFMmh4IoD1r87THWzkFlEZxC2/Q16AgrsiWYDaYvyjjgwJR6BIMeOuewicdGOZMy2Jw+VsNujfRRntM+2DeeUJx0OmwRYb6UdPSmznPonXjt30IU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=Qm4gw0jH; arc=none smtp.client-ip=203.29.241.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775804739; x=1776409539; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=z8gSP3PcBd/It2/0Cdc30diOdfycFzZJjCzVVCHITZ8=;
-        b=Wx/Taxt5z/rg4BRGIevMsOyxvha1BWm8HmXBW4vvzyAIjuyy68V3WrJb70J0XeTGId
-         3IvNevHZjRMKWdZCukKcp5EEFsiRYFSHfB3tp6nmCwcPDk1BogO2viGTm8szGpCAplUY
-         VISZfS/CxoEWJ/tE1wiToatDDyN4WIJ4qjqC9b71D7H/qN0ywf/OHFzRoURKfuj4PHG2
-         iPbTIZAKDKAR1ooJMuHQzDU3ND8RMppPAXtBQx6uUva+cbTw+CNxB6ASPKO9ndo/q9dr
-         kG2nnhni6x10polNp9LuEOwRrH4gohZFRs59j8Y/2jpLcZj0ICu66LfnXZaAAd2iTiab
-         cHFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775804739; x=1776409539;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=z8gSP3PcBd/It2/0Cdc30diOdfycFzZJjCzVVCHITZ8=;
-        b=tPPqmIuZysEtZgGWKAG9He1NnI3N7KWJlVhIgzQ3xBqFSX2GNdk3C5wqO/VFdWDo6V
-         +4H6Awu6ZzjFKIQRtionYX5AFlP4Tl9ggyURlsKUWHfJB3gz132mZ/45iUiBezk+G80T
-         oKR8Q4pH6qbGhRhMROoMtMLygcZo8ckEMZ2OWS0ptZu1fWFkH8qc4+9tDoo98/QEzX0d
-         b0CTdhfCcRHBg9inldTQwmRuLvUb2qCEl0erzs7Y87bIFuB3qM7hwlJBnaBgRAC+35Zb
-         FvAxX26udxlqVFO3RZpnSHvNkJ7HZaDxIX9MR5CpktdFBV9MNL659gDug3YqH/X5bsaL
-         U/zg==
-X-Forwarded-Encrypted: i=1; AJvYcCUcoyMPOjbZsWLT6kAGqKmphvYGmul9Br23HYLa9i6ECtwN+/6qE+EK8UkMQBpYbPoQgIwU9zw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwcNnEvQh12Gtg/vTj6t4ruckBMc2FnytKX1yGcES9u09Up2ZIp
-	tp/hYeHPyEsIhwuzZ237UQ/+7Sp+V7DD3B71cKzT7XlmunJSISGyQ12y93wilABIk4WRnYdta6R
-	yP64T68sS34UBtBCRMGuH2xDOADUzcyeBD14ImJk=
-X-Gm-Gg: AeBDievFSUam+k2jHbKIvR9f9FfeI5X5pbUejOvmzgrOKicWVK4BmJh6ZEYHZeJp2IX
-	gdrzF/fMBr9khS2qfHpFseVQd8Wc/puQxt+0dWczBexhrWSdbubBrIHRh/UfRhS4lmnp4RFP+CB
-	xyVEq6+M6NLZj74OLY1NHkddVPr5hcQ5ClSPUSlSiIUqTLLbl3j16szvkfH6X0im9AYZ8mt0np5
-	SFHjdElyy3QjVLrfg+8cv3AdvnnsD2It37jmGSCV642DvyOnKLYduQtUELFJRacP4gpBaO38ut/
-	AGqLOxA1jEnfaPB2uGaGaaDj/5hsn8NEbmsbjJKubhi4nigGNpc=
-X-Received: by 2002:a05:6402:2109:b0:670:a4b4:2176 with SMTP id
- 4fb4d7f45d1cf-670a4b42493mr106612a12.22.1775804738789; Fri, 10 Apr 2026
- 00:05:38 -0700 (PDT)
+	d=codeconstruct.com.au; s=2022a; t=1775804744;
+	bh=4I6rRy/sQufd64AScJslz3j5lUTMK2dmDI6ASPTwMQA=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=Qm4gw0jHEzYGjnCJl5podtkU3MV6Qg5pBCNoZidfiq9/XwY2cz18/spiNEn/2tFD4
+	 fA+UIR9ECdrzjqgf0ILs1p83R4FRzF6hMrvCLYxsrxbtTIhIaTbEczNpvDl9o7s55B
+	 HLEIbzDoVar18mlNTRbm6kC5VzAeY5EDRsbixitSk/RlzEmbMYJbxUQdO4W2Jb1uyU
+	 bo7TEC753VoyTD7wB3fCTpk5LXgNvpnDFRP22LcvXTcQ6YaRkdCKABE8KQXpTTN8+v
+	 NSVw/PRCqYKid4IoFUbvzW4sE9521f0V8PYeEUJ6NXxySFXAVjppBLa7Jxo6rBUWVI
+	 sRcpkOuwGdpKQ==
+Received: from pecola.lan (unknown [159.196.93.152])
+	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 531B7658B7;
+	Fri, 10 Apr 2026 15:05:43 +0800 (AWST)
+Message-ID: <071438dea6e35df4a313142c91aaa9673179ab98.camel@codeconstruct.com.au>
+Subject: Re: [PATCH next-next v2] net:mctp: fix setting mctp hdr ver
+ reserved field cause  data dropped
+From: Jeremy Kerr <jk@codeconstruct.com.au>
+To: wit_yuan <yuanzhaoming901030@126.com>
+Cc: yuanzm2@lenovo.com, matt@codeconstruct.com.au, davem@davemloft.net, 
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org,  linux-kernel@vger.kernel.org
+Date: Fri, 10 Apr 2026 15:05:43 +0800
+In-Reply-To: <20260410061703.3547-2-yuanzhaoming901030@126.com>
+References: 
+	<ff147a3f0d27ef2aa6026cc86f9113d56a8c61ac.camel@codeconstruct.com.au>
+	 <20260410061703.3547-1-yuanzhaoming901030@126.com>
+	 <20260410061703.3547-2-yuanzhaoming901030@126.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4-2+deb12u1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260331-realtek_forward-v1-0-44fb63033b7e@gmail.com>
- <20260331-realtek_forward-v1-6-44fb63033b7e@gmail.com> <CAD++jLmRT+3EJ-f_FNuZwOGU4fBB6pGHhq2OuxBS7O-cEnWt=g@mail.gmail.com>
-In-Reply-To: <CAD++jLmRT+3EJ-f_FNuZwOGU4fBB6pGHhq2OuxBS7O-cEnWt=g@mail.gmail.com>
-From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Date: Fri, 10 Apr 2026 04:05:24 -0300
-X-Gm-Features: AQROBzAZ9LnSu5ywwTVwmSkGlEycqs2tbwq-wbRiBxYP7lds7t5ofpNcaU76usQ
-Message-ID: <CAJq09z6Y3MfkyiyaMhPTQH3W7p-ZmsNeS-iBKOeQNWWpDi0UoQ@mail.gmail.com>
-Subject: Re: [net-next PATCH 06/10] net: dsa: realtek: rtl8365mb: add VLAN support
-To: Linus Walleij <linusw@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	=?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
-	Yury Norov <yury.norov@gmail.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, 
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[codeconstruct.com.au,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[codeconstruct.com.au:s=2022a];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-277276-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-277275-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[126.com];
+	DKIM_TRACE(0.00)[codeconstruct.com.au:+];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,bang-olufsen.dk,rasmusvillemoes.dk,armlinux.org.uk,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[luizluca@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[jk@codeconstruct.com.au,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 9268A3D3122
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lenovo.com:email,codeconstruct.com.au:dkim,codeconstruct.com.au:mid]
+X-Rspamd-Queue-Id: ACE0F3D3131
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Linus,
+Hi,
 
-Thanks for the review, I took some time to evaluate the possibility of
-reusing rtl8366-core.
+Looks like a better approach, thanks for the improvements, including the
+net-next patch prefix.
 
-> This patch ignores the existing abstractions for generic RTL8366 VLAN
-> handling in rtl8366-core.c and realtek.h, which is actually compiled
-> and bundled into the same object with the RTL8365MB driver.
+I would suggest reading up on the contribution guidelines too:
 
-While rtl8366-core is currently only used by RTL8366, I understand the
-goal of sharing VLAN handling across these drivers. However, RTL8365MB
-differs from RTL8366RB in how VLANs and PVIDs are implemented.
+ https://docs.kernel.org/process/maintainer-netdev.html
 
-1) In RTL8366, VLAN4K, VLANMC and PVID are programmed together, and
-the helpers in rtl8366-core assume this 1:1 relationship. In
-RTL8365MB, the VLANMC is exclusively used as an indirect way to set
-the port VID used in the PVID (port pvid points to vlan MC table index
-and vlan MC entry has the VID number). In this patch, the VLANMC is
-conditionally allocated only when a port uses it as PVID and
-deallocated when no ports use it. VLAN MC membership is not checked by
-the HW but I still keep it in sync when it is allocated.
+(in this case, the 24 hour spacing between revisions).
 
-As VLANMC, at least in RTL8365MB, is effectively only used for PVID,
-I'll put all vlan MC methods behind public PVID methods in the
-following v2. There is no need to expose them for now. For the next
-RTL8367D family, VLANMC is gone and there are dedicated registers to
-set the PVID VID number for each port.
+> Subject: [PATCH next-next v2] net:mctp: fix setting mctp hdr ver reserved
+>   field cause  data dropped
 
-2) In RTL8365MB, vlan is always enabled, controlling filtering by port
-(.port_vlan_filtering), while in RTL8366, it is enabled by vlan_add.
+Add a space between the 'net:mctp:'. That should be 'net: mctp: [...]'
 
-3) The abstraction doesn't set the framefilter in RTL8366 nor does it
-clear PVID status. I'm using framefilter as a way to disable PVID,
-dropping untagged frames, together with setting PVID VLAN MC index to
-0 and keeping an empty (vid=0) vlan config at that index.
+And perhaps a tweak to the wording, giving:
 
-Without clearing the PVID state in RTL8366, removing a PVID VLAN
-member and re-adding it as a non-PVID member will leave it configured
-as PVID.
+  net: mctp: don't require received header reserved bits to be zero
 
-4) I don't know how IVL would be handled in RTL8366... but that's a
-topic for another patch.
+> From: Yuan Zhaoming <yuanzm2@lenovo.com>
+>=20
+> from spec dsp0236_1.2.1.pdf page 26, the mctp header contains the
+> RSVD(4bit) and Hdr version(4 bit).
 
-> I understand that it is always easier to develop and test something
-> for "just this one chip", but I predictably have to be the one to ask
-> if this can be done in the shared code.
+Some wording things there - It would be more clear to reference the spec
+by name, rather than by filename, giving something like:
 
-I agree there is room for sharing logic in the future, both for newer
-areas (table access, VLAN, L2) and existing ones (phy_read/write), but
-this likely requires rethinking the abstraction and harmonizing the
-assumptions on each driver first. It is possible that the hardware
-behavior between RTL8366 and RTL8365MB is more similar than what the
-current drivers suggest. However, the existing rtl8366-core
-abstraction does not model this in a way that can be directly reused
-here. Aligning both drivers would likely require reworking that
-abstraction rather than adapting the RTL8365MB implementation to fit
-it.
+  From the MCTP Base specification (DSP0236 v1.2.1), the first byte of
+  the MCTP header contains a 4 bit reserved field, and 4 bit version.
 
-This could be explored in the future as a separate effort as it
-changes how RTL8366RB driver behave. For now, I would prefer to keep
-this implementation local to RTL8365MB and then follow up with a
-separate effort to reconcile both drivers and extract shared logic.
-Some of that work will likely become clearer while adding RTL8367D
-family support.
+Then, explain the current issue:
 
-Regards,
+  On our current receive path, we require those 4 reserved bits to be
+  zero, but at least one device is non-conformant, and may set these
+  reserved bits.
 
-Luiz
+[If you can name the specific device, that will certainly help others
+with future debugging. I assume the device is currently public?]
+
+Then, maybe some rationale about the change, and an overview of the
+implementation:
+
+  DSP0236 states that the reserved bits must be written as zero, and
+  ignored when read. While the device might not conform to the former,
+  we should accept these message to conform to the latter.
+
+  Relax our check on the MCTP version byte to allow non-zero bits in the
+  reserved field.
+
+  Signed-off-by: ...
+
+> mctp_pkttype_receive invoke mctp_hdr, and get mh->ver whole byte=20
+> compare the MCTP_VER_MIN, MCTP_VER_MAX. the reserver bits may be by=20
+> misleading used.
+
+This is no longer relevant for the new revision.
+
+> @@ -35,6 +35,7 @@ struct mctp_hdr {
+> =C2=A0#define MCTP_HDR_SEQ_MASK=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0GENMAS=
+K(1, 0)
+> =C2=A0#define MCTP_HDR_TAG_SHIFT=C2=A0=C2=A0=C2=A0=C2=A0=C2=A00
+> =C2=A0#define MCTP_HDR_TAG_MASK=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0GENMAS=
+K(2, 0)
+> +#define MCTP_HDR_VER_MASK=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0GENMASK(3, =
+0)
+
+This section of #defines is commented to represent the flags/seq/tag
+field. I would prefer to move this definition above that comment.
+
+> =C2=A0
+> =C2=A0#define MCTP_INITIAL_DEFAULT_NET=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A01
+> =C2=A0
+> diff --git a/net/mctp/route.c b/net/mctp/route.c
+> index 56c441e90..aa0e89d67 100644
+> --- a/net/mctp/route.c
+> +++ b/net/mctp/route.c
+> @@ -464,7 +464,7 @@ static int mctp_dst_input(struct mctp_dst *dst, struc=
+t sk_buff *skb)
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0netid =3D mctp_cb(skb)->n=
+et;
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0skb_pull(skb, sizeof(stru=
+ct mctp_hdr));
+> =C2=A0
+> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (mh->ver !=3D 1)
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (((mh->ver & MCTP_HDR_VER_M=
+ASK)) < MCTP_VER_MIN || (mh->ver & MCTP_HDR_VER_MASK) > MCTP_VER_MAX)
+
+Use a temporary for the version, rather than repeating the mask
+operation. This makes the conditional much easier to read:
+
+    if (ver < MCTP_VER_MIN || ver > MCTP_VER_MAX)
+
+Cheers,
+
+
+Jeremy
 
