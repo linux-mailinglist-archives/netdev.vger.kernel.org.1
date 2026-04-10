@@ -1,165 +1,309 @@
-Return-Path: <netdev+bounces-277313-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277314-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QqfWLxnH2GmGiAgAu9opvQ
-	(envelope-from <netdev+bounces-277313-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 11:47:05 +0200
+	id uP6eE9/H2GmkiAgAu9opvQ
+	(envelope-from <netdev+bounces-277314-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 11:50:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E15E3D529F
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 11:47:05 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CAAEB3D538B
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 11:50:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E20DC3050C1F
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 09:41:06 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A4598302D962
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 09:44:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3AC336EAAA;
-	Fri, 10 Apr 2026 09:39:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCD2C33F360;
+	Fri, 10 Apr 2026 09:44:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CVlOo5SW"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LDyVh7QY"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4243334D3B0
-	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 09:39:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775813971; cv=none; b=NGL9TS3kdwXCbWjRcfGG0qNamsuEo7QMHTqcrnqT7fCEdQeZ2v3FRlybSg5Pi6AnGpklWld/6BapVzugt8No5wgtVqcVq+u8rxBF75Qm74fBzEKedDTquDbrN5awdcQBfahmok56Wfyx3PV9fJQuWKZZzVKAk/ARL2mBuIHJKPk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775813971; c=relaxed/simple;
-	bh=RIn5QS+/wQzlvfqGGsGZEx3uU16qwFy1NVNMP3oy5CU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QT7yF8t++j+Hs8ZpjPiCS8Wd7PJk/hlJBP7/CWenfPZUexcCM/gW3KiRNREvcvkYBAZTF+68noC+Vw1qrSQPA7JjW31sknFXN76s9LawE2meRT9VyTETAssDHCYPnYhfW6fZVDKIVwSYmONKTS/k2v4K6vAzjziF0CNN2LITlrQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CVlOo5SW; arc=none smtp.client-ip=95.215.58.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1775813958;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=KbAA0jl9JOczfY3YunY2afV3MXW4kTf45LXLhHaMhow=;
-	b=CVlOo5SWqqQx7F2ZN43SJCcEADQBbMBgQHw26nF2uyWU6VxP4NPGDgicWOVQhv2MiEde3P
-	+46PUZYEAxnijpTgN8n6L6uFOvPtetciQEe0ho7G2SpyVqMKa6enBOz93g1SpLJa/xTUhV
-	A3QkgtD7NbOyPbNglrKZFpW8G5Y1sxA=
-From: Qingfang Deng <qingfang.deng@linux.dev>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Qingfang Deng <qingfang.deng@linux.dev>,
-	Yue Haibing <yuehaibing@huawei.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Kees Cook <kees@kernel.org>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	linux-ppp@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Tom Parkin <tparkin@katalix.com>,
-	James Chapman <jchapman@katalix.com>,
-	Guillaume Nault <gnault@redhat.com>
-Subject: [PATCH net-next] ppp: tear down bridge before clearing pch->chan
-Date: Fri, 10 Apr 2026 17:38:56 +0800
-Message-ID: <20260410093859.69237-1-qingfang.deng@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0164A329365
+	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 09:44:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.15
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775814257; cv=fail; b=KRePwQXn9FTXxXshIIj90lJDrmiAMk6bdvYzrRqqbJd7uN+tKtLOz4AlT9W1xNpCJtGoIXAg1pz3Mgp9PprYmk9B9KOOCVgcWNMDAZXTakX4XPrxa0l3vVyYHjwdnjcP96eTl1ITj8sIvHqsjeS1qVyXjLKvOQqkGOON8k0itHs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775814257; c=relaxed/simple;
+	bh=MJMnxm8IP2gq3h5352ko5ohVSFTBxPbA9Ql3n3HH/j0=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=kPiqxSofnSt1UalQXE5N+5EPw/0lSioB7SNSnKK4113d8BdgfpRyG78wB/lHghI3A67E2onGf36flFGDjldQUr/PqGKFDM1n4AXG317RK1U1/NQmyKaelBab0dRSB+P5nxVHRlKCgHAa/VHSAKUkp1T8KCnhpzN30OyXVkDl3ak=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LDyVh7QY; arc=fail smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1775814256; x=1807350256;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=MJMnxm8IP2gq3h5352ko5ohVSFTBxPbA9Ql3n3HH/j0=;
+  b=LDyVh7QYo1ivmI5ZR/4+AT/nPZAZAEQ+XbOenAArWL7iiS/Odrp+hOTu
+   IgRT15kgfbFSbw4TQBO2xOGm5rlZP9UgG0OjRthg3fw4oOX98nyifpbG9
+   NOz+CgdnWRSQ9xTrNQeA/6RtRVoJgC9VYkTfNz6u0rueGNZeh+7FKJCvR
+   TWFkeEjN9X0lTJ/+GckNFVOjlW2DbwWjeIeUsMPux5jjhlAVYUhmdcnm4
+   ltXXiFBSFbBtD+69ZVZMGb2Ubx4F480XVWDukuQkqf5lRYUyhKo987/xz
+   LaT4wjkY4l+2esv9AWNl+F8lVmmxXNEaAhhy+Li5wPp5HGYyMTk7SqHK1
+   g==;
+X-CSE-ConnectionGUID: Kd/vr/uyS2Sn4Ah06npllg==
+X-CSE-MsgGUID: EqujCEvORGa9ODOZ9mV9ow==
+X-IronPort-AV: E=McAfee;i="6800,10657,11754"; a="80423576"
+X-IronPort-AV: E=Sophos;i="6.23,171,1770624000"; 
+   d="scan'208";a="80423576"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2026 02:44:15 -0700
+X-CSE-ConnectionGUID: An+1Xj0uQs+puX4yY0v1zg==
+X-CSE-MsgGUID: ht7MAEPYSySIYu4rnyYrjw==
+X-ExtLoop1: 1
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by fmviesa003.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2026 02:44:15 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Fri, 10 Apr 2026 02:44:14 -0700
+Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Fri, 10 Apr 2026 02:44:14 -0700
+Received: from MW6PR02CU001.outbound.protection.outlook.com (52.101.48.20) by
+ edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Fri, 10 Apr 2026 02:44:13 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=nAGI0PfHS9Fde6s70eIIPFz7Wn1L3zRKTlXf05cZSifBrjjDLu65tQIT+5W1tBDZ8YhtaEMVPJhP/7NVUkXNqsqa5IqhInIs0JR3vscphi1DVLKN4HwnwfmZb4NKo7f3Dn/0Q/TJOyWQwNzfgiBLlBFsB5RH8bXi/tLrGYisR139L0Sv46t1KBBvI1uMGvv7QLb20OehQ7evOYc5oviNx0g/OWWSzbk+WzNstOsr0nRtl8dbXxyk9+rDo3WrkAfY0Vf/jclI5KqzPNwFvaCebbuI2IwCMNWDS8rT6sSP24J7cXwc/kJfGv7SvLjblezZOYOjVQ6ldYEgB/V7E0iH3Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=nMykzzTtFNAuEK5OLvLfULn8JaALgunHoxbQ5RbfZUU=;
+ b=SrBJz+SfdeG64aMz8PfxQZ5KQbl9T/4B4z88gW9icv4+IihFnr/O9lj1DgxyG2kx3wZMUlidtqj2E4YDugkjFYRPS2HIK0bohCGpFUIR2yOMRlxWrx3sitmIjqg24o7toQYpS9Gss6VtdsG0r4Ye4rVstLu9rmzIKwI6YlEYnb9w/loq9xKy4vD8sq3K+SX/LSUgeXcMu/tQ9w49WQReJQ/RJGFmzyVqYTghf+wChrcLurF0anpTDvor79vgtRn3xvpo1m6SNJVYrUKr6y+vTxpmcMladI3urWtp0CjRzKynrj1S6sjjDCiWkYXe8i631JlCi5zRj537oCYtj4uSIQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
+ by SA2PR11MB4940.namprd11.prod.outlook.com (2603:10b6:806:fa::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9791.33; Fri, 10 Apr
+ 2026 09:44:06 +0000
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::6aa:411d:4bfa:619c]) by DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::6aa:411d:4bfa:619c%5]) with mapi id 15.20.9769.020; Fri, 10 Apr 2026
+ 09:44:06 +0000
+Message-ID: <1180bb81-ce15-4b3f-85aa-23f95915e3bd@intel.com>
+Date: Fri, 10 Apr 2026 11:42:10 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] ice: fix netdev bring-up and bring-down in self-test
+To: Tony Nguyen <anthony.l.nguyen@intel.com>, Jakub Kicinski <kuba@kernel.org>
+CC: Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	<intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>, "Konstantin
+ Ilichev" <konstantin.ilichev@intel.com>, Grzegorz Nitka
+	<grzegorz.nitka@intel.com>
+References: <20260327072332.130320-1-aleksandr.loktionov@intel.com>
+ <20260327072332.130320-7-aleksandr.loktionov@intel.com>
+ <c5f6796a-66de-40df-9f12-2bc7ff04be34@intel.com>
+Content-Language: en-US
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+In-Reply-To: <c5f6796a-66de-40df-9f12-2bc7ff04be34@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: VI1PR07CA0156.eurprd07.prod.outlook.com
+ (2603:10a6:802:16::43) To DS0PR11MB8718.namprd11.prod.outlook.com
+ (2603:10b6:8:1b9::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|SA2PR11MB4940:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6fa1cdca-35f4-4b91-f6f8-08de96e5b4b5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024|18002099003|56012099003|22082099003;
+X-Microsoft-Antispam-Message-Info: zlGOk/E5PvbsB6Rdj7/h0vAoYDwfbMcA/r57+dRY/iSdl5LrPxjiRcjotYGTibZQypO1jfpm7rTAskT7ggxyoO44+atjUT6JH9IMV9rwytZoi4dECXQgIE4kGuM/sObO4zb3t0tI5VXNNZh/yiAwetgCYufP7uuX+C4zJZ4J0DxoBIru0skGsyQVm456tGaBHrQiDRxlzBHpPxZXBjJNU4rSZNv4UQuT/maLj7a5TGBJTjdXOtxa84lovUo3Mumr7JAwE4xtYBgPi7rnI8dNDSXFw+9DRmnKBwQuJF5MHj9hWi1RfafgVSEdBxqjk8vjTJdBEMhXmnm6SG5pqIe5gzMdjbSVC6Zrb6PEAyhqgsOS5C4e87zpOI4KDBxPVRxVCIEuCf+4Id+DJM6rNbeDgnUXhmgOaKBcjjD+UqlOH5MssczWWko0eWYnV+PGPC0qPCrKquYzLhzN9raCt8D3p2oE7iovpobVZxjkI41pMVO4MoU0IY075g5Lej9HBWWCdyYwHFu86oDVijX7snTr8MwZhCY0LBDek4oviPjfoNHhTBQpL88KzpipOZIYI1w5Fw58cCHjlH9AP+iazJxLW7P5gClOWw11Ny+q6BUwefQajXp8viudZiULYZuoGFocyYaAxIC8uzYYGxzwtFm6fR0ofaei0Xlhy+epVWoViUHRbRJ+g4M/zEVD5ONocyopbZQigqUNPE9PhUvWupVTgjifq5qIPNdqK4AfDMplLlA=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(18002099003)(56012099003)(22082099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?OHVLRHdneUd1TnhaSkRXMWJ5OE9xb2h3cHNMZ3c2N25SeVBlNFM0b25IZnZp?=
+ =?utf-8?B?UHBnb2htclBHVEFTaUpJWTcvV29EbjE4eHB3cTZtMnhVQ1FveFBkbTdTNUZa?=
+ =?utf-8?B?MytvVTFnei80dnpqazdVL3p4b1djMXdXazRESll3Nnp5d2twdkN2Y000ZGlo?=
+ =?utf-8?B?dmFjek9pQy9yQkY2dXBQeGkyQUsxazlyYzhyMkdwamF6TVo3MzRveVdBMFJr?=
+ =?utf-8?B?MDhJTVBaUXJ0WlpaSTdmMnBNS1phV1BCamNDOEZxU2plNVNGTUhUTVM3SHFn?=
+ =?utf-8?B?VUg4aVpnVWZTMXNucE56aTM1QjJpQmJaUmZ3ZTNMcjJsenBLVE95VlBSbGtw?=
+ =?utf-8?B?OTVRUnpQOGxkUkRhcmJ2VDllbmRYdEZTRzEyTXc5VXIra1BxSDQrRmVFTWlm?=
+ =?utf-8?B?YkxUeGdTcGQxK3lkOGZSUmNISkd0ZTBZckJVUnE1bEIzdEVCR1lEaHp6T2FD?=
+ =?utf-8?B?QlZqVVE5RUdxYVVaelFXRkIybnk2ekhNQ2V3TVo5dzVTejV3blNDbEtZVFh4?=
+ =?utf-8?B?WEF2UC9xWDB2bHV6VDBlZEpmNHA5UEwyU2RESE15SWFZZHFtSS8zbjJPR1FZ?=
+ =?utf-8?B?NmRzczdOU3VQY21DR1JFdUNyb1RqcWQyNksrQWlwL2p2OHJXcmVmRTdPcTZC?=
+ =?utf-8?B?ZGdzTVJSeTF2ME1kSDlVUmlia0IyT0dqMG05bWh0Z21QVlBqdlEwSjNzRXEv?=
+ =?utf-8?B?KzZSdXJndUJqMXJGa1MwZkdhMEQxdUtsc3RTcEtKNk8vWFRSdldudmxNOTR6?=
+ =?utf-8?B?NWlUenkrVlRWTzExRy9EU1lPaFBNbFEyaHVCVUcxMy95dEpOdWc4eVdiTGJq?=
+ =?utf-8?B?VFFYdUNicE4xNmZ2NHVLaGRVT3ptNzd1aGNQNGQ0SzhnSDQwb0E5eFU2NjZj?=
+ =?utf-8?B?eC9DdXh6eHg0dDFDdGdxT1FBb3NyWVNvOFJkMWpJLzhCUFN0cWFseCt0VkhN?=
+ =?utf-8?B?RFVzRjIwWFpUdzZWMGVXSm9jSG56S0NPZGZKT2g4YmNXMFo2Nkh0NjR0Vi9O?=
+ =?utf-8?B?WXArTGNxeWZxMUpuZ3NVTzhXSWQybDFQVm5sSmUzZzNUM1lnRlFyN0tEaU5h?=
+ =?utf-8?B?SWN3WmxsNElIQTU0VlVIUUlKYVRJRGswbFFLWDZlMERaMHh2dDlZbElQTlU3?=
+ =?utf-8?B?YWhvd1ZxNm5FQ1RqNVl1TXc5Z2FOU2RYYmRUaWMzKzdwRk5FRXZ1MVZueDc4?=
+ =?utf-8?B?cVg5c0hlVlIzMWxIeW83ZFpzN2Y5YkV2ZzkrRzIwU0o1dFN3ckxUNWV1VVZT?=
+ =?utf-8?B?QTdoVDNxSzJieDBqdzhHbVlEOW1KRGJYeXJKM2VwV2tMbWtFdW15aXpBaUR2?=
+ =?utf-8?B?eVNNUERPL0RiaTFoMzhMUitBeUN0dlpQWFRyTEVOLyt3dHVVSWxPdm5yZHgw?=
+ =?utf-8?B?VGNidmw0dUtoMU9HVWJDdGY3TzkrYTRtMGtwVWVvYVllV0xkYldZeWlDbzc5?=
+ =?utf-8?B?NHdHSTAwcHVQbHAzalZWSjN0NlBQUFNHM1pEa3kwc0ZydGgxb2FUTFFLTjJF?=
+ =?utf-8?B?WldtT25rRzFsWHBXcWVtUHJrbzdUSGNjSzYrNGtDYVV4dncxc2pDeUM5M3dz?=
+ =?utf-8?B?RGNlNm5hcjE2T3BkemNKUktZblc4LzV1Y3l5U1c5Q1FIRHpEZW8wRVFhNXNS?=
+ =?utf-8?B?K0lxN0hEYzczZVZiWlZOYkQyNWJIQXVqVlR2cXRyR0dXbitUcVRFaG5pNjNV?=
+ =?utf-8?B?Y1loak9xSUZXTDlFOXhRY3N6MFZUbTZEaTUxOVA3Zy9CQTRTbVBySC9pbnQz?=
+ =?utf-8?B?MVlJVWlYRW9vbGcvZlFxWXBqNlNyUkRsdXFQcXQ5RVhtRzh5MjBMV3hxSFZ3?=
+ =?utf-8?B?akR6bHVwblAyZjFCUitmN0l5SkxIaDFPbk0wOUNvTWYrQWVpMVh6UHFZZnpR?=
+ =?utf-8?B?Y2ZCcW9JejdyejJQbjZHTFlUanBTOGFqNkFwMG42cHZhbUdOd2F6YXZvYXZB?=
+ =?utf-8?B?Z25YZzRFYXZUUXYzMWdZRnpvOE5CYkhOL29ySVNpNG9QTy9DMXl2V2xlQlJ4?=
+ =?utf-8?B?WXdwbDkwSnAyL3NaZzBiVkhUdnNvQUZxd0VlTElMSGxTajE3OUZkWUNUTTh6?=
+ =?utf-8?B?SzB5N3B6aTRzZVBnMlYxalQ1OW0yVS9sclFDVm1qeDNrb280UTFtRmpLeWtE?=
+ =?utf-8?B?dGNtdTFHN08ydEtzWGlUMGY1d1h4NzU2NzJNVnJtcnZ0YS9PQlpLMGlLRkc4?=
+ =?utf-8?B?RTFsM1JiSGhlQlZvbkxGZThGZ0Z4WnY3MklxRHd6cXR2YkY3WkhFUXdYT2d5?=
+ =?utf-8?B?QWZhUjFOQUNLREo3Qy91Wm9xV2U3Q3p1dU5nUWlrY2FDQW4zSzF5NklYVlNj?=
+ =?utf-8?B?dmlscWtNUTFiNHhFSkYwbHZDVyt4QnJJMU5xekhlamg2MjQvaDlyN2VkNzJX?=
+ =?utf-8?Q?KG5cBvla/JjVenBA=3D?=
+X-Exchange-RoutingPolicyChecked: hgxnd8XVNNE6zVjou16dANon+7RpNf3vSJbR7BFn8YV4ysVyjR7WmiORj2DlbA6s7ENZPvkhYd84ftMXbEH7QYiawE1ppzVpUrniy1MnzWT0AyW+aNLADEPCK1s+EKhltjp6zMqhpLHHm/vzggNjWN/KOyhiXVmcUktIu1WnbpWn1uITLp1RWNnfIdGiW6SJyD6GnGKZyFmR2wiU/pqbxoy3vN1C6rZQuDpBFXFTNsgMnqp7DxBI7IfmBwGLuZJeE1dcKEmOEfI0KX5g7oFl5/5ti4tlZhKB4iy1gn9HnbAaI1A3s/ZWvO9kxMcpvqNU+q5HbgnvgCtmGUmqjs9Tuw==
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6fa1cdca-35f4-4b91-f6f8-08de96e5b4b5
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Apr 2026 09:44:06.6262
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: l1kzC47wDILdgoyHc2MKl54aoSzM7b8PIPbyuKfl6LUXkTLgEFuxGk9bCh0eVjHk8zRqB8U9SrVu4PLdC3ZzfKAmv7C4HS2gJk8blbD0080=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR11MB4940
+X-OriginatorOrg: intel.com
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	TAGGED_FROM(0.00)[bounces-277313-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-277314-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[intel.com:+];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[qingfang.deng@linux.dev,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[aleksander.lobakin@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:email,linux.dev:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3E15E3D529F
+	RCVD_COUNT_SEVEN(0.00)[10]
+X-Rspamd-Queue-Id: CAAEB3D538B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-As we previously did to ppp_disconnect_channel(), also move
-ppp_unbridge_channels() before pch->chan is set to NULL in
-ppp_unregister_channel().
+From: Anthony Nguyen <anthony.l.nguyen@intel.com>
+Date: Wed, 8 Apr 2026 14:12:28 -0700
 
-ppp_unbridge_channels() calls synchronize_rcu(), so no concurrent RCU
-readers in ppp_channel_bridge_input() can observe the channel after its
-chan pointer is cleared.
+> 
+> 
+> On 3/27/2026 12:23 AM, Aleksandr Loktionov wrote:
+>> From: Konstantin Ilichev <konstantin.ilichev@intel.com>
+>>
+>> When an offline self-test is initiated with ethtool -t, any ongoing
+>> traffic could get stuck because ice_stop() and ice_open() are called
+>> without letting the OS know about state transitions.  In most cases
+>> a write() system call would block.
+>>
+>> Fix this by calling dev_change_flags() to bring the netdev up and
+>> down, which ensures ndo_open()/ndo_stop() are called and all watchers
+>> are notified correctly.
+> 
+> + Olek
+> 
+> AI review reports:
+> 
+> The ethtool core acquires the per-netdev mutex via netdev_lock_ops(dev)
+> before invoking the driver's .self_test callback. dev_change_flags() is
+> an exported API that explicitly re-acquires this exact same lock:
+> net/core/dev_api.c:dev_change_flags() {
+>     ...
+>     netdev_lock_ops(dev);
+>     ret = netif_change_flags(dev, flags, extack);
+>     netdev_unlock_ops(dev);
+>     ...
+> }
+> Because dev->lock is a standard, non-recursive mutex, this will result
+> in a hard deadlock for any driver that opts into request_ops_lock. While
+> ice might not currently set this flag, introducing nested lock
+> acquisitions of the same mutex guarantees a deadlock as the subsystem
+> migrates toward per-netdev locking.
+> 
+> 
+> With ice netdev lock changes in progress [1], this would soon become an
+> issue.
 
-This makes the !pchb->chan check in ppp_channel_bridge_input()
-redundant and can be safely removed.
+Hmmm, seems like we'll need to either export netif_change_flags() or
+introduce something like dev_change_flags_locked()...
 
-Signed-off-by: Qingfang Deng <qingfang.deng@linux.dev>
----
- drivers/net/ppp/ppp_generic.c | 10 ++--------
- 1 file changed, 2 insertions(+), 8 deletions(-)
+> 
+> Thanks,
+> Tony
+> 
+> [1] https://lore.kernel.org/netdev/20260325200644.2528726-4-
+> anthony.l.nguyen@intel.com/
+> 
+>> Fixes: 0e674aeb0b77 ("ice: Add handler for ethtool selftest")
+>> Cc: stable@vger.kernel.org
+>> Co-developed-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
+>> Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
+>> Signed-off-by: Konstantin Ilichev <konstantin.ilichev@intel.com>
+>> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+>> ---
+>>
+>>   drivers/net/ethernet/intel/ice/ice_ethtool.c | 8 +++++---
+>>   1 file changed, 5 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/
+>> net/ethernet/intel/ice/ice_ethtool.c
+>> index 96d95af..2a4f06f 100644
+>> --- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
+>> +++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+>> @@ -1416,7 +1416,7 @@ ice_self_test(struct net_device *netdev, struct
+>> ethtool_test *eth_test,
+>>           /* If the device is online then take it offline */
+>>           if (if_running)
+>>               /* indicate we're in test mode */
+>> -            ice_stop(netdev);
+>> +            dev_change_flags(netdev, netdev->flags & ~IFF_UP, NULL);
+>>             data[ICE_ETH_TEST_LINK] = ice_link_test(netdev);
+>>           data[ICE_ETH_TEST_EEPROM] = ice_eeprom_test(netdev);
+>> @@ -1434,10 +1434,12 @@ ice_self_test(struct net_device *netdev,
+>> struct ethtool_test *eth_test,
+>>           clear_bit(ICE_TESTING, pf->state);
+>>             if (if_running) {
+>> -            int status = ice_open(netdev);
+>> +            int status = dev_change_flags(netdev,
+>> +                              netdev->flags | IFF_UP,
+>> +                              NULL);
 
-diff --git a/drivers/net/ppp/ppp_generic.c b/drivers/net/ppp/ppp_generic.c
-index b097d1b38ac9..3a609d48a424 100644
---- a/drivers/net/ppp/ppp_generic.c
-+++ b/drivers/net/ppp/ppp_generic.c
-@@ -2285,17 +2285,11 @@ static bool ppp_channel_bridge_input(struct channel *pch, struct sk_buff *skb)
- 		goto out_rcu;
- 
- 	spin_lock_bh(&pchb->downl);
--	if (!pchb->chan) {
--		/* channel got unregistered */
--		kfree_skb(skb);
--		goto outl;
--	}
- 
- 	skb_scrub_packet(skb, !net_eq(pch->chan_net, pchb->chan_net));
- 	if (!pchb->chan->ops->start_xmit(pchb->chan, skb))
- 		kfree_skb(skb);
- 
--outl:
- 	spin_unlock_bh(&pchb->downl);
- out_rcu:
- 	rcu_read_unlock();
-@@ -2997,6 +2991,8 @@ ppp_unregister_channel(struct ppp_channel *chan)
- 	 * the channel's start_xmit or ioctl routine before we proceed.
- 	 */
- 	ppp_disconnect_channel(pch);
-+	ppp_unbridge_channels(pch);
-+
- 	down_write(&pch->chan_sem);
- 	spin_lock_bh(&pch->downl);
- 	pch->chan = NULL;
-@@ -3008,8 +3004,6 @@ ppp_unregister_channel(struct ppp_channel *chan)
- 	list_del(&pch->list);
- 	spin_unlock_bh(&pn->all_channels_lock);
- 
--	ppp_unbridge_channels(pch);
--
- 	pch->file.dead = 1;
- 	wake_up_interruptible(&pch->file.rwait);
- 
--- 
-2.43.0
+BTW are you sure there's no other way to do an ifdown/ifup cycle other
+than sneaking into the flags? Have you checked whether there's an
+exported generic function which calls .ndo_open()?
 
+>>                 if (status) {
+>> -                dev_err(dev, "Could not open device %s, err %d\n",
+>> +                dev_err(dev, "Could not bring up device %s, err %d\n",
+>>                       pf->int_name, status);
+>>               }
+>>           }
+
+Thanks,
+Olek
 
