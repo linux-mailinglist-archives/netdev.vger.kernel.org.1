@@ -1,162 +1,191 @@
-Return-Path: <netdev+bounces-277189-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277190-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WMF9LBZO2Gk/bggAu9opvQ
-	(envelope-from <netdev+bounces-277189-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 03:10:46 +0200
+	id kHTDKEBO2Gk/bggAu9opvQ
+	(envelope-from <netdev+bounces-277190-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 03:11:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34A923D0FB5
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 03:10:45 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FD013D0FD4
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 03:11:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D43353018588
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 01:10:44 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D8BE730078A9
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 01:11:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6F223164B4;
-	Fri, 10 Apr 2026 01:10:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94BD631A7F6;
+	Fri, 10 Apr 2026 01:11:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eqlNT4PP"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="DFxhTFz3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 936DF298991;
-	Fri, 10 Apr 2026 01:10:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 099B52D5C8E;
+	Fri, 10 Apr 2026 01:11:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775783443; cv=none; b=rOIDA6m4d3+io05CYUuMpu/xEjzZCcBYYQ++XiIqg1GQdRXsfTeKQndUXHNLnhPbUiNWGsITbsGl7zIMgxMgsD1tKd6mbtarbWZVUw2m694dhRT5hS+ZdC9LDJ8MgSEJsUZxgtVozmETJFozRE+ReB03sOadZfdzKTEUJus0290=
+	t=1775783486; cv=none; b=pWseH+DEs7fhCehsmccln6a4dt9CrAxozgz7WSCWADE1mNcnsCiPkri3FOrRBnBz8sx4wVo/4hwAQn3iWXGVyZ74RAGQ3TcGzqPMjooEeEc7ZdPPLo7w9ch4eiMLWAW8u7Rsqn36hR4U0xHtys+WOzqt6jG4sA1UHUz6iYZ6TIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775783443; c=relaxed/simple;
-	bh=bOsL/5Ai9nkE51jkRZmv54YIfdu2zvaWVlpTurET71Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LtR9HUkOJlgFf/uVihjmf+p5CCk84xJh4C5N5jKXQTXjNxrLX/+KZ4MYkjw9xW5G2OsEjw0XX6EDcQzStFrACyKY6YdcgaDTo1H/ucCwq2Wcl62a9Dt8Jk7TABGBaLd0RLsWI1t9YA7DdRKwLTrHdUVditsVDsOcZaBe6sgML7g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eqlNT4PP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55413C4CEF7;
-	Fri, 10 Apr 2026 01:10:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775783443;
-	bh=bOsL/5Ai9nkE51jkRZmv54YIfdu2zvaWVlpTurET71Q=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=eqlNT4PPbX5lYdH6cHK1Sb/ADvhscQaQLrSaA4bf1TWnsvM1Ms0SDiNYXziLykA4Y
-	 YiOvTOJ1CZBsmI34XvT2jH24hf7sfroANf9GVOkSizLCn9rp4ke6E3blQKliphchlF
-	 j81dQzdXslxdBuAi1wY3hJsXy94yApGjSVjaZ6sxwgJYAmNJl9c4TRbJAF78vDsiSR
-	 giueZKc2SKTmeJf4BQ8NI63DE0NvHHfackHzGwwjUcAfvSOaVaYuVrdejxeqy7dtIQ
-	 T3eJdfK6qrv0Nm4MuZwGGsJ6guP6xaSzE1l0uGU+OivfzAdfGW2G8K4ApSBZhAVF8M
-	 V4soj1S/G6aHg==
-Date: Thu, 9 Apr 2026 18:10:41 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Nitka, Grzegorz" <grzegorz.nitka@intel.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
- "Oros, Petr" <poros@redhat.com>, "richardcochran@gmail.com"
- <richardcochran@gmail.com>, "andrew+netdev@lunn.ch"
- <andrew+netdev@lunn.ch>, "Kitszel, Przemyslaw"
- <przemyslaw.kitszel@intel.com>, "Nguyen, Anthony L"
- <anthony.l.nguyen@intel.com>, "Prathosh.Satish@microchip.com"
- <Prathosh.Satish@microchip.com>, "Vecera, Ivan" <ivecera@redhat.com>,
- "jiri@resnulli.us" <jiri@resnulli.us>, "Kubalewski, Arkadiusz"
- <arkadiusz.kubalewski@intel.com>, "vadim.fedorenko@linux.dev"
- <vadim.fedorenko@linux.dev>, "donald.hunter@gmail.com"
- <donald.hunter@gmail.com>, "horms@kernel.org" <horms@kernel.org>,
- "pabeni@redhat.com" <pabeni@redhat.com>, "davem@davemloft.net"
- <davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>
-Subject: Re: [PATCH v5 net-next 0/8] dpll/ice: Add TXC DPLL type and full TX
- reference clock control for E825
-Message-ID: <20260409181041.395a0c37@kernel.org>
-In-Reply-To: <IA1PR11MB621925C1718B838147404DC492582@IA1PR11MB6219.namprd11.prod.outlook.com>
-References: <20260402230626.3826719-1-grzegorz.nitka@intel.com>
-	<20260406192312.0f7a2760@kernel.org>
-	<IA1PR11MB621925C1718B838147404DC492582@IA1PR11MB6219.namprd11.prod.outlook.com>
+	s=arc-20240116; t=1775783486; c=relaxed/simple;
+	bh=87h/Xu7wS8geKggg/q13T8v9/3cx/DJOSoRVzQn7DNk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Rpv4q9OYYzNnG/Uy4f+GwQVSD3l4YyUA1ivowo9Gdhuir4KkvnOq0WdR9Mu0xiXKtx1DRcQDWFS5kL/Ik1UWndr7Pp3T/7CecN8oi7RuV8EnVtMKc+kUejgvFzZ5XcxDMFvpB5oNlXZ8oeDX+F3ITu0u3x9Jn3eCyoWZ118I/Ts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=DFxhTFz3; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with UTF8SMTPSA id 0800860255;
+	Fri, 10 Apr 2026 03:11:23 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1775783483;
+	bh=/3ol8TcYNhnm6h5sjGfmupw+IQV4fRUDrGmbRxPlP+w=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=DFxhTFz3o/lCrJ0LjqNl/f/F7JU5N+e++YwDRMyiBUVHMsnMx7U1bbp5j7xs3H21I
+	 jgplTSI//zsIzxD8uCOoJA/596Nk55lIEe8VhQfNw5hq1saHjshBtcASOONdAUVukr
+	 yYE5qCpvm8hrtn3f5ek7C+zehy9KnMOKNcIx9f9NR5xowumqGaKi5BaPq9xldb8MEK
+	 eXPX+XiTD/0RZJpLw/OZX0lixzkiIbIPvfIRHe4v71DMXZF3UVF2dR/tRLQbsjKyaY
+	 2qk7ftRg3EKrMbrX7vjWWNVmFooQlUiwSWtcyz2eYRYyA2T4YYjjRJ7yOoZsMY4mlX
+	 cC3WWiPUJL/Ww==
+Date: Fri, 10 Apr 2026 03:11:20 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Yingnan Zhang <342144303@qq.com>
+Cc: horms@verge.net.au, ja@ssi.bg, fw@strlen.de, phil@nwl.cc,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	lvs-devel@vger.kernel.org, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v3] ipvs: fix MTU check for GSO packets in tunnel mode
+Message-ID: <adhOOC6hF_vNDl1g@chamomile>
+References: <tencent_73010FBD5FA1C05C3BC23A07A50B11CEC90A@qq.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <tencent_73010FBD5FA1C05C3BC23A07A50B11CEC90A@qq.com>
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.osuosl.org,redhat.com,gmail.com,lunn.ch,intel.com,microchip.com,resnulli.us,linux.dev,kernel.org,davemloft.net,google.com];
-	TAGGED_FROM(0.00)[bounces-277189-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[netfilter.org];
+	FREEMAIL_TO(0.00)[qq.com];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-277190-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[netfilter.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 34A923D0FB5
+X-Rspamd-Queue-Id: 6FD013D0FD4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, 9 Apr 2026 11:21:35 +0000 Nitka, Grzegorz wrote:
-> > On Fri,  3 Apr 2026 01:06:18 +0200 Grzegorz Nitka wrote: =20
-> > > This series adds TX reference clock support for E825 devices and expo=
-ses
-> > > TX clock selection and synchronization status via the Linux DPLL
-> > > subsystem.
-> > > E825 hardware contains a dedicated Tx clock (TXC) domain that is
-> > > distinct
-> > > from PPS and EEC. TX reference clock selection is device=E2=80=91wide=
-, shared
-> > > across ports, and mediated by firmware as part of the link bring=E2=
-=80=91up
-> > > process. As a result, TX clock selection intent may differ from the
-> > > effective hardware configuration, and software must verify the outcome
-> > > after link=E2=80=91up.
-> > > To support this, the series introduces TXC support incrementally acro=
-ss
-> > > the DPLL core and the ice driver:
-> > >
-> > > - add a new DPLL type (TXC) to represent transmit clock generators; =
-=20
-> >=20
-> > I'm not grasping why this is needed, isn't it part of any EEC system
-> > that the DPLL can drive the TXC? Is your system going to expose multiple
-> > DPLLs now for one NIC?
->=20
-> Hello Jakub,
-> For E825 device, the short answer is yes. We have platform EEC now and
-> we want to add:
-> - TXC DPLLs per port, and
-> - PPS DPLL for TSPLL config purposes (in the near future)
->=20
-> EEC (Ethernet Equipment Clock) type DPLL is designed to control multiple
-> source signals (internal-NIC or external), where one drives the dpll devi=
-ce,
-> where multiple outputs are possible, each could drive various components
-> as well as propagate signal to external devices.
-> TXC is specific dpll device that associated with single ETH port to contr=
-ol it's source,
-> there is no need to declare any outputs as the single output is already d=
-etermined.
-> Basically, having TXC DPLL indicates per port control over SyncE (or some=
- external)
-> clock source.=C2=A0
+On Thu, Apr 02, 2026 at 10:46:16PM +0800, Yingnan Zhang wrote:
+> Currently, IPVS skips MTU checks for GSO packets by excluding them with
+> the !skb_is_gso(skb) condition. This creates problems when IPVS tunnel
+> mode encapsulates GSO packets with IPIP headers.
+> 
+> The issue manifests in two ways:
+> 
+> 1. MTU violation after encapsulation:
+>    When a GSO packet passes through IPVS tunnel mode, the original MTU
+>    check is bypassed. After adding the IPIP tunnel header, the packet
+>    size may exceed the outgoing interface MTU, leading to unexpected
+>    fragmentation at the IP layer.
+> 
+> 2. Fragmentation with problematic IP IDs:
+>    When net.ipv4.vs.pmtu_disc=1 and a GSO packet with multiple segments
+>    is fragmented after encapsulation, each segment gets a sequentially
+>    incremented IP ID (0, 1, 2, ...). This happens because:
+> 
+>    a) The GSO packet bypasses MTU check and gets encapsulated
+>    b) At __ip_finish_output, the oversized GSO packet is split into
+>       separate SKBs (one per segment), with IP IDs incrementing
+>    c) Each SKB is then fragmented again based on the actual MTU
+> 
+>    This sequential IP ID allocation differs from the expected behavior
+>    and can cause issues with fragment reassembly and packet tracking.
+> 
+> Fix this by properly validating GSO packets using
+> skb_gso_validate_network_len(). This function correctly validates
+> whether the GSO segments will fit within the MTU after segmentation. If
+> validation fails, send an ICMP Fragmentation Needed message to enable
+> proper PMTU discovery.
+> 
+> Fixes: 4cdd34084d53 ("netfilter: nf_conntrack_ipv6: improve fragmentation handling")
+> Signed-off-by: Yingnan Zhang <342144303@qq.com>
+> ---
+> v3:
+> - Fixed compilation error (removed extra closing brace in IPv6 function)
+> - Fixed indentation to match kernel style
+> 
+> v2: https://lore.kernel.org/netdev/20260402030541.27855-1-342144303@qq.com/
+> v1: https://lore.kernel.org/netdev/20260401152228.31190-1-342144303@qq.com/
+> ---
+>  net/netfilter/ipvs/ip_vs_xmit.c | 9 +++++----
+>  1 file changed, 5 insertions(+), 4 deletions(-)
+> 
+> diff --git a/net/netfilter/ipvs/ip_vs_xmit.c b/net/netfilter/ipvs/ip_vs_xmit.c
+> index 3601eb86d..a4ca7cad0 100644
+> --- a/net/netfilter/ipvs/ip_vs_xmit.c
+> +++ b/net/netfilter/ipvs/ip_vs_xmit.c
+> @@ -111,8 +111,8 @@ __mtu_check_toobig_v6(const struct sk_buff *skb, u32 mtu)
+>  		 */
+>  		if (IP6CB(skb)->frag_max_size > mtu)
+>  			return true; /* largest fragment violate MTU */
+> -	}
+> -	else if (skb->len > mtu && !skb_is_gso(skb)) {
+> +	} else if (skb->len > mtu &&
+> +		   !(skb_is_gso(skb) && skb_gso_validate_network_len(skb, mtu))) {
 
-Could you share a diagram of how things are wired up?
-DPLL can have multiple outputs and multiple inputs. I'm not getting why
-a single device would have to have multiple actual DPLLs (which makes
-me worried this is just some "convenient use of the uAPI")
+Maybe helper function helps make this more readable?
+
+/* Based on ip_exceeds_mtu(). */
+static bool ip_vs_exceeds_mtu(const struct sk_buff *skb, unsigned int mtu)
+{
+        if (skb->len <= mtu)
+                return false;
+
+        if (skb_is_gso(skb) && skb_gso_validate_network_len(skb, mtu))
+                return false;
+
+        return true;
+}
+
+
+>  		return true; /* Packet size violate MTU size */
+>  	}
+>  	return false;
+> @@ -232,8 +232,9 @@ static inline bool ensure_mtu_is_adequate(struct netns_ipvs *ipvs, int skb_af,
+>  			return true;
+>  
+>  		if (unlikely(ip_hdr(skb)->frag_off & htons(IP_DF) &&
+> -			     skb->len > mtu && !skb_is_gso(skb) &&
+> -			     !ip_vs_iph_icmp(ipvsh))) {
+> +			     skb->len > mtu && !ip_vs_iph_icmp(ipvsh) &&
+> +			     !(skb_is_gso(skb) &&
+> +			       skb_gso_validate_network_len(skb, mtu)))) {
+>  			icmp_send(skb, ICMP_DEST_UNREACH, ICMP_FRAG_NEEDED,
+>  				  htonl(mtu));
+>  			IP_VS_DBG(1, "frag needed for %pI4\n",
+> -- 
+> 2.51.0
+> 
 
