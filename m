@@ -1,67 +1,68 @@
-Return-Path: <netdev+bounces-277457-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277458-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GDexDqoU2Wm7lwgAu9opvQ
-	(envelope-from <netdev+bounces-277457-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 17:18:02 +0200
+	id sFhBEPQV2Wm7lwgAu9opvQ
+	(envelope-from <netdev+bounces-277458-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 17:23:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CB433D9152
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 17:18:01 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFEE43D9329
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 17:23:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 05668300BEA1
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 15:15:52 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C1FD63059CE9
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 15:16:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C1623D9DB1;
-	Fri, 10 Apr 2026 15:15:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA3BE3D9DBC;
+	Fri, 10 Apr 2026 15:16:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="A9q8TcFZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nN7e6fzW"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C55F13BE14A;
-	Fri, 10 Apr 2026 15:15:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 970153D4117;
+	Fri, 10 Apr 2026 15:16:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775834148; cv=none; b=gYl8qwPvCG5CNKVfIFx2s8rb4keA4EqHqkpf3DZl4T5GHt2GU/JTNJUyakOdiE8ENBcqBSXuSHn0HskuNQ/0S2FW/y+VUoVioC8j+wKfQJaUqtd8eMuG78kCaYQgr7ABKYDjlVoEWhL/d3T0/TAzd3UV5o271AP3ECbs3Nl6OsE=
+	t=1775834197; cv=none; b=r/NlW3mTSlsw2ND3qC/AmJ92oE3bdWumAIqLg/VDaJkE1J3clVBELQJq9SlFlOSi3knZaQCP16h+wpvFeLRdberkDr6dSHgw58R+jonkiX0K/B/OyPDMz9jmxvk7gCCtijTZOBucdN1ezqbMysRgT2MRbO1CqTI4gM79rW6tKl8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775834148; c=relaxed/simple;
-	bh=79Ft3EawdRTaRPnsUc57WsU8IM1P/+6pKmvXxFX9G8w=;
+	s=arc-20240116; t=1775834197; c=relaxed/simple;
+	bh=Zbifno8UeSRvee5yMpEkcrdMKYo4zYWVvjNlJnyEkpI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fIXXk5heQghjtkTlgOa/B68ZlsyKnAJWNlcABPyR33MneKZp3VSC2l6Nh74fwTOima6WPbZHdaUdmvCC34soureuLTZE0xcTd+OnIw11tnyB90qQriyWAGM2QvcfabSGmjIJLBlElr8AeEO+xURQdabOoyEIPUqbWf1/2WIehF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=A9q8TcFZ; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=ApYujIacdP2aE8VOgRham25seSJS2gNnur5BRHQdK3E=; b=A9q8TcFZnrB/zmBE7U/X4VaTw4
-	yedLMh5M/3SLuWQab6ei7ktvAFhpRcBw9OBBHRV9db/l7OJPmPDc/mazSfbK8tg2frGBKc1M1snvj
-	8B5ewNpMh+d/t+ctfTF3MVu1z70yrfOsgBL4yxFmHszV2gtvgQkeovhwmvGD4LY0kiIw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wBDZp-00FcNS-US; Fri, 10 Apr 2026 17:15:21 +0200
-Date: Fri, 10 Apr 2026 17:15:21 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Biju <biju.das.au@gmail.com>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=ncxnbm5VDh33E9ylneZj6aru1BGqCNpUMgEby5lunC6LIA5KaqexWEVyw7HlrUs5RCarXETgIAE1o63eIWoAaLiKShhamloTApJvZ31iMlfMZB7qKczhEquT9HQLzmnZRe9W+s+19VkYlMs0guHV5i11sFK4RquRyePzOgaPnAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nN7e6fzW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33C21C19421;
+	Fri, 10 Apr 2026 15:16:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775834197;
+	bh=Zbifno8UeSRvee5yMpEkcrdMKYo4zYWVvjNlJnyEkpI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=nN7e6fzWk0vI2vN12ZiZflmNei0jSmE93f2Se4Loux8xkoL8LyCqocItVKIzmoUDO
+	 LeST/JMrWWjptXQLYqILNzUmsNUvHtvNdnPC0Q/Ct10p2wD3UbQFan7QRj7ZRW2ZNy
+	 PZEhj0/zTjEAgT3K5Lp/CghGonqN5eE3ETN4BR2MiJ0oZqlTKq2/5KG9fsZFELDHGJ
+	 c7Idmx2ktf0jH6hS0jvRVFkEXpLFAjdjGNb7pb7RqZNiwvragGnYhCG6vtgg+9mEm1
+	 VtdTO68WY13VRN/uE18qyO97AnH1pGl9Or5uqBsX4AgySfp+I+WmlIcP7NJaSblkgr
+	 znrECfyXl34Hw==
+Date: Fri, 10 Apr 2026 16:16:31 +0100
+From: Simon Horman <horms@kernel.org>
+To: "D. Wythe" <alibuda@linux.alibaba.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Dust Li <dust.li@linux.alibaba.com>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Ovidiu Panait <ovidiu.panait.rb@renesas.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Prabhakar Mahadev Lad <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-	linux-renesas-soc@vger.kernel.org,
-	Biju Das <biju.das.jz@bp.renesas.com>
-Subject: Re: [PATCH net-next] net: phy: call phy_init_hw() in phy resume path
-Message-ID: <839fec66-5ec0-4cc0-a0c4-ae2de6902188@lunn.ch>
-References: <20260410142904.439666-1-biju.das.jz@bp.renesas.com>
- <adkOZl4gt5UoGv-0@shell.armlinux.org.uk>
+	Sidraya Jayagond <sidraya@linux.ibm.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>,
+	Mahanta Jambigi <mjambigi@linux.ibm.com>,
+	Tony Lu <tonylu@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>, linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org, oliver.yang@linux.alibaba.com,
+	pasic@linux.ibm.com
+Subject: Re: [PATCH net-next v2] net/smc: cap allocation order for SMC-R
+ physically contiguous buffers
+Message-ID: <20260410151631.GY469338@kernel.org>
+References: <20260407124337.88128-1-alibuda@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,46 +71,91 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <adkOZl4gt5UoGv-0@shell.armlinux.org.uk>
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+In-Reply-To: <20260407124337.88128-1-alibuda@linux.alibaba.com>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-277457-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,renesas.com,vger.kernel.org,glider.be,bp.renesas.com];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-277458-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev,renesas];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,lunn.ch:dkim,lunn.ch:mid]
-X-Rspamd-Queue-Id: 1CB433D9152
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[alibaba.com:email]
+X-Rspamd-Queue-Id: BFEE43D9329
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-> Apart from that, looks fine to me - it seems some paths call
-> phy_init_hw() can be called with or without phydev->lock held, and
-> this one will call it with the lock held which seems to be okay.
+On Tue, Apr 07, 2026 at 08:43:37PM +0800, D. Wythe wrote:
+> The alloc_pages() cannot satisfy requests exceeding MAX_PAGE_ORDER,
+> and attempting such allocations will lead to guaranteed failures
+> and potential kernel warnings.
+> 
+> For SMCR_PHYS_CONT_BUFS, cap the allocation order to MAX_PAGE_ORDER.
+> This ensures the attempts to allocate the largest possible physically
+> contiguous chunk succeed, instead of failing with an invalid order.
+> This also avoids redundant "try-fail-degrade" cycles in
+> __smc_buf_create().
+> 
+> For SMCR_MIXED_BUFS, no cap is needed: if the order exceeds
+> MAX_PAGE_ORDER, alloc_pages() will silently fail (__GFP_NOWARN)
+> and automatically fall back to virtual memory.
+> 
+> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+> Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
+> ---
+> Changes v1 -> v2:
+> https://lore.kernel.org/netdev/20260312082154.36971-1-alibuda@linux.alibaba.com/
+> 
+> - Move the bufsize cap from smcr_new_buf_create() up to
+>   __smc_buf_create(), which is simpler and avoids touching
+>   the allocation logic itself.
 
-Haven't we had deadlocks in this area before?
+The nit below notwithstanding, this looks good to me.
 
-Please test with CONFIG_PROVE_LOCKING enabled.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-       Andrew
+> ---
+>  net/smc/smc_core.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/net/smc/smc_core.c b/net/smc/smc_core.c
+> index e2d083daeb7e..cdd881746e21 100644
+> --- a/net/smc/smc_core.c
+> +++ b/net/smc/smc_core.c
+> @@ -2440,6 +2440,10 @@ static int __smc_buf_create(struct smc_sock *smc, bool is_smcd, bool is_rmb)
+>  		/* use socket send buffer size (w/o overhead) as start value */
+>  		bufsize = smc->sk.sk_sndbuf / 2;
+>  
+> +	/* limit bufsize for physically contiguous buffers */
+> +	if (!is_smcd && lgr->buf_type == SMCR_PHYS_CONT_BUFS)
+> +		bufsize = min_t(int, bufsize, (PAGE_SIZE << MAX_PAGE_ORDER));
+
+nit: I think min() is sufficient here, and the inner parentheses are
+     unnecessary
+
+> +
+>  	for (bufsize_comp = smc_compress_bufsize(bufsize, is_smcd, is_rmb);
+>  	     bufsize_comp >= 0; bufsize_comp--) {
+>  		if (is_rmb) {
+> -- 
+> 2.45.0
+> 
 
