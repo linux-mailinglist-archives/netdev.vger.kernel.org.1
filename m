@@ -1,62 +1,89 @@
-Return-Path: <netdev+bounces-277204-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277207-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IEfaCU5b2GnJcQgAu9opvQ
-	(envelope-from <netdev+bounces-277204-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 04:07:10 +0200
+	id QG+eG0Vh2GnScggAu9opvQ
+	(envelope-from <netdev+bounces-277207-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 04:32:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 978963D151A
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 04:07:09 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74DC53D171E
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 04:32:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C377B3008D1A
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 02:06:52 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 92A653010200
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 02:32:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51D77329E5A;
-	Fri, 10 Apr 2026 02:06:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F20722C11C6;
+	Fri, 10 Apr 2026 02:32:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YxhlSvOO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="O96eZuXQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDEC530AD10
-	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 02:06:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C05625A354;
+	Fri, 10 Apr 2026 02:32:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775786812; cv=none; b=RniJ+Rc3eVpxJWIK4sOfvL7/0Xr2NHb8+yOGovWBEvmCU8T1dk/wHMnmWDaS6cvHxPmbJWR4Jkp9KMqB73Ncl/UMs5KuOiyjPalLFjKYlfvQvc+r7TvhaESYvZA5zdPO8gTQ7GGLR4//NIWGkOooArpnWa6v+ML0LgjL3cAkxNs=
+	t=1775788350; cv=none; b=tkg2p8G+tij3V+1NQCB/zvN3p4voIKsvPMacA5J0vbGQWKO2c2kdRME4iwylXCFt6dwI/2cd/TSMKwZo1Kyidk/9adAPRxDiMtKTncEJSq9J7EZfiF3D5gImNgxxSBR21BR7HX1QZAWCdFv0PNDH6NalBcFvDK0zPaK1ugfdS5A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775786812; c=relaxed/simple;
-	bh=dqTRc6lb5JaF64i9c1KKNSx1apIREzKFM78MB75p65w=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DQwop9IZJwJ94MjoCi1o+uX0FnMA1JCTomHqvjtJQjhFJxllrumkwawY4SvM6IiOroQdcWe23vnGOl98ijJ9m1wYqvTE3UN75iKexVL2oyIygPlCidixG7Owqvl3a6++fGLusBJaMRhNEwhtacQjT29rarQvEx+3ZzTTEOcgwNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YxhlSvOO; arc=none smtp.client-ip=91.218.175.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1775786798;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=gtvO2HkO2aMIv5kb02WZmk9nNe7YugVZonfkXfzzLO4=;
-	b=YxhlSvOONCBmz98+uvWTHMsjRA6kYnspHAal3tazUG9ehACq7QRebBFwgFQVxGCHF1DEHh
-	HGu9YZVewrX4SLVC3GShIpi5BqCL+5mZUjp/2NNTMNt8JH0eHGlI2hJhtsTz2uJIvyh2iX
-	qQeWDYG83NfbeHkgE3e/VK1pL48STns=
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-To: netdev@vger.kernel.org
-Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Weiming Shi <bestswngs@gmail.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net v2] net: fix __this_cpu_add() in preemptible code in dev_xmit_recursion_inc/dec
-Date: Fri, 10 Apr 2026 10:06:30 +0800
-Message-ID: <20260410020631.191786-1-jiayuan.chen@linux.dev>
+	s=arc-20240116; t=1775788350; c=relaxed/simple;
+	bh=wVncFe7SIQwq8Kgb0H/3/ttZShv2kknMzmQX3tCdVuU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QehGQhz3+GrWttNkjwvqDNFGd26bQHAyLtJSWrDI+ajByXCWxmoBZ0Y5BAuxBds5FfkUrx6dvY2vsxAYjCKtpAfOP82ixOoXJiE+HmHun4y9VSyGM/t19wWzTkWU0/wzQSohcFlNCyJTd5Z6L98UA2NiqkPEvU/zpd7PnwcwPq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=O96eZuXQ; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1775788349; x=1807324349;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=wVncFe7SIQwq8Kgb0H/3/ttZShv2kknMzmQX3tCdVuU=;
+  b=O96eZuXQ4WoWFxii+Cc35shDxCb6J+BkIBC44vnp8O5rVO3F3Wjzmk6m
+   73bKqpd/AkdBkyb4Yj3vw8PSVG/vt/pbO0vh7I4a+BVlClJUNmah89jQB
+   nfzIYwm2UxfjjuKBzGdR6TIx8E1MPiaLRQMLcIOp0n5bxtoFDYUzjQZNN
+   q6+BC5d6SGQR/fVNMUMM/lbOpA0AZCTz0a6Zp6eIm1FrLkZPem3K1ExgF
+   FZ3j3f7pa7c5aEwc0CekQhlGeUxsBzAkTi/q3YFKlagwgAcvfaKHbuQ/J
+   deuJkVkv/nvUFdRryONBQdfmGbQLJdWEUrQPEq0w4QxQra/IwtcDh8Ywc
+   w==;
+X-CSE-ConnectionGUID: TxVF/OT8SWWPJ1AIJLQb5w==
+X-CSE-MsgGUID: ooqHPET5Teyka51qHOnbHg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11754"; a="76988412"
+X-IronPort-AV: E=Sophos;i="6.23,170,1770624000"; 
+   d="scan'208";a="76988412"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2026 19:32:28 -0700
+X-CSE-ConnectionGUID: /Q0DNbedQzm+3Gr5cJESAw==
+X-CSE-MsgGUID: Z2bwjH9kRGqDrIYeAmS7xA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,170,1770624000"; 
+   d="scan'208";a="224214256"
+Received: from unknown (HELO localhost.png.intel.com) ([10.107.255.31])
+  by fmviesa006.fm.intel.com with ESMTP; 09 Apr 2026 19:32:24 -0700
+From: KhaiWenTan <khai.wen.tan@linux.intel.com>
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com,
+	rmk+kernel@armlinux.org.uk,
+	maxime.chevallier@bootlin.com,
+	ovidiu.panait.rb@renesas.com,
+	vladimir.oltean@nxp.com
+Cc: netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	yoong.siang.song@intel.com,
+	hong.aun.looi@intel.com,
+	khai.wen.tan@intel.com,
+	KhaiWenTan <khai.wen.tan@linux.intel.com>
+Subject: [PATCH net 1/1] net: stmmac: Update default_an_inband before passing value to phylink_config
+Date: Fri, 10 Apr 2026 10:07:35 +0800
+Message-ID: <20260410020735.327590-1-khai.wen.tan@linux.intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,131 +91,78 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[linux.dev,davemloft.net,kernel.org,google.com,redhat.com,gmail.com,vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
+	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,bootlin.com,renesas.com,nxp.com];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-277204-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-277207-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[khai.wen.tan@linux.intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev,kernel];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:dkim,linux.dev:email,linux.dev:mid]
-X-Rspamd-Queue-Id: 978963D151A
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,linux.intel.com:mid]
+X-Rspamd-Queue-Id: 74DC53D171E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-dev_xmit_recursion_{inc,dec}() use __this_cpu_{inc,dec}() which requires
-the caller to be non-preemptible in order to avoid cpu migration. However,
-some callers like SCTP's UDP encapsulation path invoke iptunnel_xmit()
-from process context without disabling BH or preemption:
+get_interfaces() will update both the plat->phy_interfaces and
+mdio_bus_data->default_an_inband based on reading a SERDES register.
 
-  sctp_inet_connect -> __sctp_connect -> sctp_do_sm ->
-  sctp_outq_flush -> sctp_packet_transmit -> sctp_v4_xmit ->
-  udp_tunnel_xmit_skb -> iptunnel_xmit -> dev_xmit_recursion_inc
+Therefore, we moved the priv->plat->get_interfaces() to be executed
+first before assigning mdio_bus_data->default_an_inband to
+config->default_an_inband to ensure default_an_inband is in correct
+value during PHY setup.
 
-This triggers the following warning on PREEMPT(full) kernels:
-
-  BUG: using __this_cpu_add() in preemptible [00000000]
-  caller is dev_xmit_recursion_inc include/linux/netdevice.h:3595 [inline]
-  caller is iptunnel_xmit+0x1cd/0xb80 net/ipv4/ip_tunnel_core.c:72
-  Tainted: [L]=SOFTLOCKUP
-  Call Trace:
-   <TASK>
-   __dump_stack lib/dump_stack.c:94 [inline]
-   dump_stack_lvl+0x100/0x190 lib/dump_stack.c:120
-   check_preemption_disabled+0xd8/0xe0 lib/smp_processor_id.c:47
-   dev_xmit_recursion_inc include/linux/netdevice.h:3595 [inline]
-   iptunnel_xmit+0x1cd/0xb80 net/ipv4/ip_tunnel_core.c:72
-   sctp_v4_xmit+0x75f/0x1060 net/sctp/protocol.c:1073
-   sctp_packet_transmit+0x22ec/0x3060 net/sctp/output.c:653
-   sctp_packet_singleton+0x19e/0x370 net/sctp/outqueue.c:783
-   sctp_outq_flush_ctrl net/sctp/outqueue.c:914 [inline]
-   sctp_outq_flush+0x315/0x3350 net/sctp/outqueue.c:1212
-   sctp_cmd_interpreter net/sctp/sm_sideeffect.c:1824 [inline]
-   sctp_side_effects net/sctp/sm_sideeffect.c:1204 [inline]
-   sctp_do_sm+0xce1/0x5be0 net/sctp/sm_sideeffect.c:1175
-   sctp_primitive_ASSOCIATE+0x9c/0xd0 net/sctp/primitive.c:73
-   __sctp_connect+0x9fc/0xc70 net/sctp/socket.c:1235
-   sctp_connect net/sctp/socket.c:4818 [inline]
-   sctp_inet_connect+0x15f/0x220 net/sctp/socket.c:4833
-   __sys_connect_file+0x141/0x1a0 net/socket.c:2089
-   __sys_connect+0x141/0x170 net/socket.c:2108
-   __do_sys_connect net/socket.c:2114 [inline]
-   __se_sys_connect net/socket.c:2111 [inline]
-   __x64_sys_connect+0x72/0xb0 net/socket.c:2111
-   do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-   do_syscall_64+0x106/0xf80 arch/x86/entry/syscall_64.c:94
-   entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-All other callers of dev_xmit_recursion_{inc,dec}() are fine: those in
-net/core/dev.c and net/core/filter.c run under local_bh_disable(), and
-lwtunnel_input() asserts in_softirq() context. Currently only
-iptunnel_xmit() and ip6tunnel_xmit() can be reached from process
-context via the SCTP UDP encapsulation path.
-
-Fix this by adding guard(migrate)() at the top of iptunnel_xmit() and
-ip6tunnel_xmit() to ensure dev_recursion_level(), dev_xmit_recursion_inc()
-and dev_xmit_recursion_dec() all run on the same CPU.
-
-Fixes: 6f1a9140ecda ("net: add xmit recursion limit to tunnel xmit functions")
-Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+Fixes: ca732e990fc8 ("net: stmmac: add get_interfaces() platform method")
+Signed-off-by: KhaiWenTan <khai.wen.tan@linux.intel.com>
 ---
-v1->v2: https://lore.kernel.org/netdev/20260409035344.214279-1-jiayuan.chen@linux.dev/
- - Move guard(migrate)() to iptunnel_xmit()/ip6tunnel_xmit() instead
-   of dev_xmit_recursion_{inc,dec}(), so that dev_recursion_level() is
-   also covered under the same migration protection.
- - Revert changes to include/linux/netdevice.h.
----
- include/net/ip6_tunnel.h  | 2 ++
- net/ipv4/ip_tunnel_core.c | 2 ++
- 2 files changed, 4 insertions(+)
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/include/net/ip6_tunnel.h b/include/net/ip6_tunnel.h
-index 359b595f1df9..3f877164233c 100644
---- a/include/net/ip6_tunnel.h
-+++ b/include/net/ip6_tunnel.h
-@@ -156,6 +156,8 @@ static inline void ip6tunnel_xmit(struct sock *sk, struct sk_buff *skb,
- {
- 	int pkt_len, err;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 13d3cac056be..c92054648a7e 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -1345,10 +1345,6 @@ static int stmmac_phylink_setup(struct stmmac_priv *priv)
+ 	priv->tx_lpi_clk_stop = priv->plat->flags &
+ 				STMMAC_FLAG_EN_TX_LPI_CLOCKGATING;
  
-+	guard(migrate)();
-+
- 	if (unlikely(dev_recursion_level() > IP_TUNNEL_RECURSION_LIMIT)) {
- 		if (dev) {
- 			net_crit_ratelimited("Dead loop on virtual device %s, fix it urgently!\n",
-diff --git a/net/ipv4/ip_tunnel_core.c b/net/ipv4/ip_tunnel_core.c
-index 5683c328990f..808b8eaf7fad 100644
---- a/net/ipv4/ip_tunnel_core.c
-+++ b/net/ipv4/ip_tunnel_core.c
-@@ -58,6 +58,8 @@ void iptunnel_xmit(struct sock *sk, struct rtable *rt, struct sk_buff *skb,
- 	struct iphdr *iph;
- 	int err;
+-	mdio_bus_data = priv->plat->mdio_bus_data;
+-	if (mdio_bus_data)
+-		config->default_an_inband = mdio_bus_data->default_an_inband;
+-
+ 	/* Get the PHY interface modes (at the PHY end of the link) that
+ 	 * are supported by the platform.
+ 	 */
+@@ -1356,6 +1352,10 @@ static int stmmac_phylink_setup(struct stmmac_priv *priv)
+ 		priv->plat->get_interfaces(priv, priv->plat->bsp_priv,
+ 					   config->supported_interfaces);
  
-+	guard(migrate)();
++	mdio_bus_data = priv->plat->mdio_bus_data;
++	if (mdio_bus_data)
++		config->default_an_inband = mdio_bus_data->default_an_inband;
 +
- 	if (unlikely(dev_recursion_level() > IP_TUNNEL_RECURSION_LIMIT)) {
- 		if (dev) {
- 			net_crit_ratelimited("Dead loop on virtual device %s, fix it urgently!\n",
+ 	/* Set the platform/firmware specified interface mode if the
+ 	 * supported interfaces have not already been provided using
+ 	 * phy_interface as a last resort.
 -- 
 2.43.0
 
