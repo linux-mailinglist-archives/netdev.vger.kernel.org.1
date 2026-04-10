@@ -1,160 +1,217 @@
-Return-Path: <netdev+bounces-277433-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277434-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UJ/ECoAG2WnolAgAu9opvQ
-	(envelope-from <netdev+bounces-277433-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 16:17:36 +0200
+	id 4KOcAgUH2WnolAgAu9opvQ
+	(envelope-from <netdev+bounces-277434-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 16:19:49 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEA4D3D887B
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 16:17:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 308553D88D4
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 16:19:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CB04B305A415
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 14:15:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9E6AB30056CD
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 14:17:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27CBE3CF699;
-	Fri, 10 Apr 2026 14:15:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03F003CCFA6;
+	Fri, 10 Apr 2026 14:17:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WrPaYkMn"
+	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="JrIzFoA9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C53FA3CF053
-	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 14:15:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54D663C943A
+	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 14:17:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775830531; cv=none; b=acCBC8/681OFEC0D5yohN8CTyHRjatASAXTVizNKMAZm1aCVRdZZLvEz6dYX3Ntzg020QpjA5AxQung5Ezx7GxYNoJi6H+Zih5ONXq3nNHpsQBL2DKOvI//h3lAnG6Z6ByuAvO/DU7svNGv+WluDXnL6mwQ5WCS/1tQ2mJBz/IA=
+	t=1775830646; cv=none; b=EEUfL3hoCk6MgUDe9X7eu1BaAvyPMSmjcATZvOj77BCX6rtMxU3EpgWaL/hu8TZNYWf6zoSmNUDtoOF1oPZFEMkH0kNSeCMPHOSC35w0UQHt5knJSomypUC6ixa6Q2lNT5pFWSKt7+3PBJ8a/iJ2kSYC8iLyHexS5jYdc099yXE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775830531; c=relaxed/simple;
-	bh=ZMMwOHR8+o5eywy7A4dv25R5kTA4VWF1ikDRQjsig3A=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZcpcOhaa4WtXv0n1biA0xVMI9tirBZVyHfPZEKCnNAKxONU9ka0R3cT4A6hbbh/LFfXPIbtzQFkbKUgn3AxoBytzWSnP/IBeQgPmMkbLXmhakxnF88SrMjCzeK4rRLcmbDzspEjwYTGVfv3FurITPLBfOQdXUr9Ye2nmW/ZP6m8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WrPaYkMn; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4887f49ec5aso25175265e9.1
-        for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 07:15:29 -0700 (PDT)
+	s=arc-20240116; t=1775830646; c=relaxed/simple;
+	bh=fzQz/YrviIwQ0Ix1HqFC536DtnfKWfAKYWMWvKAldYQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UugRhjHvAidBPnTSd8beXCidKWb1r2d7upbocXligQlnxssX025NHse+XWbGFkJUJyENaXO17GvD7azOITm6vfpDyRiGwsZkX5iYBdytEkZgAFGvfBqOSCTgziXvyZLknh+LshRV5TSIdPikWJyfml9IMmGbBzv3AOwcIU4z5JI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=JrIzFoA9; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-488ad135063so19266585e9.0
+        for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 07:17:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775830528; x=1776435328; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ibVIM3YRkDFxVQFXMQG/D+NUY7JRDZKRc/EMBS4wLuY=;
-        b=WrPaYkMnAp26p+pfLHavvii60oj5quWpAzHQOoJpk3pNcwB8rRbhAcKP26y3rCOfjE
-         2bUhrt7cYb6Ytu4f0pOA7b4UONhlHUH8Sd9zfz3SYosJTJGUD7Hg+ckcXSQKTAis6fZw
-         9/ku5BNFLGUqtIy4L5xgrDN1iOl0uNey2cJwZ43btsTFwSwE7HTK49/FdpdwoNxPjkQ4
-         pXO8Nw+TAjBMMzhpIg2JFep7mTQqTxtply2zVnqUkP/nz7ZNxLOcaQAz662QuPPQX5jf
-         WbmgdSTexyz0b2WpbyKoHyVqOE96QTZGb2TuFeOf3FQiBQ/nRAOW4R3uXWSuJiUuQF3Z
-         00gw==
+        d=blackwall.org; s=google; t=1775830644; x=1776435444; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=R7aglOIIkn+rsJVBdrit9b+LIWF415isue5Ccaul45k=;
+        b=JrIzFoA9bslYDm8BiCPtdFZRsd8bfvmc6Bvm/5TgAbx0iUkbshCc33T9l16gk4uztk
+         GTanABQXlVvtE9EPrIHPITrMWoRjcBq7w8DjXKu+wkzGCQvWIVbZ3f1UqqrQFyee0BXr
+         2bGZNnqx+a+AnDWm2ago9vq1ybu+YP/c6pY6g8YrN5rzLGJqquUkjjwiwTwFpk7z98kO
+         6hVnGJbGwBt3vFBUHtv3HihazwK2+bGNR0LVVpjk7POc4hcb6Crs3yeEMSnC6llfHHgi
+         w2rADJDD891Mhzd9D+6I3BzIHecvgolhT9XaGpTQzEv7BWx0htRGJXGa/uq0Bk4uQo8e
+         yOHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775830528; x=1776435328;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ibVIM3YRkDFxVQFXMQG/D+NUY7JRDZKRc/EMBS4wLuY=;
-        b=DTMmTArWg44Ov3F9tT1iQSeN6xRL/QaJhNsavvkVRnb0Ls9fb6jCt9h5GmyFarY8i/
-         BOsJ2ZJTsh0RhMHq8CKlN9PsUb5dq1hqKxygIK8OCgwEmV65LAN6HwwhrdURpxx+deSQ
-         reyqZkpQNV/0h8vCrntHKkCZWjW+ans5qkvwVIeO3oMN46Uf5sjdIR9qQFSTliOt/nD6
-         EvGzm1O6Xfp78VsHxFbBMQgbMpOTz74wu9cW4wqNss0TL1+1qRVV47kW647ivxxKJCrU
-         LGjUF5ZX7K9Il//L3V96yOlLij9xj9cFrKp0oqeIdcGucTrYSgbCbgJRwqyh4KkX6LIW
-         SNuQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWE7w0E5b2263JdZTJ3aBu8I6LS5thHDBAKNMiwvJjkGZvUnysXovjgDpDvXlI7nbAkQ8HmAbA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKQSnvPLXNFz7y614oGmuIW3PePbSoWW4vGrrNs2PtE2mTMM1Q
-	rjJ4W/xvSxiL7izo9MH+4fRuIZB6lXazSzwjvZqxUtxLHOpWOtmD0/uR
-X-Gm-Gg: AeBDieuujWMZv+HipH3szhyXzVU/BIJh/Yxe8DKnbvfjmRappZn/uxRjRqMt1dQNySq
-	yOGt+TjB9RjkrpmgFDk5eXIvpwMxOk+rl5GD/2W5uPAVinys/XdLK9MeC876UIEh3CpSGs1u5Cg
-	gWOZsFcc9KZtHO6HIBgSneEyC/bK5pgKaj+Kvt32LIxc2pBuy1v7BEeR79hJ0jctGxWYiUBqby9
-	g2y31LQ9fSTnx4KbbEOwf7aQncxO6jCOUGtrBe6d4ZuJj/9gRzcfIw40XXL5M0U8eVjccno7CZ3
-	4PU5Qeww/DKOHuDlcjwryGcYblPB5Sy8ewiem6eBE8R5RgJdvJXWLdT0nLydw6HLPXqGciUDqfI
-	E9EJftXL7JJ+zhYP4UsqiWZbAsKm8DZjcuQVDZgF1GvKR2MY2LEO//QCAvrM6N2rRJSfk8gqGaA
-	ezzbRS8t8HocgUhtrZcme6bchAZ8m09DIA7W8Zj94+UsuMo5VXzajDzKJre4dUgXZzFyDQBsuNU
-	fM=
-X-Received: by 2002:a05:600c:c08e:b0:488:9619:9bf4 with SMTP id 5b1f17b1804b1-488d686093bmr29672415e9.20.1775830527797;
-        Fri, 10 Apr 2026 07:15:27 -0700 (PDT)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488d5d68585sm36286005e9.1.2026.04.10.07.15.26
+        d=1e100.net; s=20251104; t=1775830644; x=1776435444;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=R7aglOIIkn+rsJVBdrit9b+LIWF415isue5Ccaul45k=;
+        b=rBWMa1VzEzflgPzswen0fODAEydYtar5xyKX+kf6l4/GCtRZmYcdMIm2RZs+4tHCXO
+         LTmrFnqnpbYuUC3MUGbw5CWNmGVd+3XVFlWH6oCFUvDrVQeuNZgoYBSZRpqhHWb7WwRZ
+         +MMlve0aNHJ58LmpqdKFpPoAZU7w+ywIT7NiPYv+Rt4iopQlHYOf3BrYRQqU7AaQbq9o
+         5burtvsPHAKA5TATTWsTkut+ht8tiLShD8GjurBFmEBdgHffxflPMletSWoHYtvqw9+K
+         IwSqNGxOfG1HQuIgO2ISQhzC4HSv8aEgA70GzJc9zVn0/nxqXUHap5WZbZMbMDNeYTVG
+         b/fQ==
+X-Gm-Message-State: AOJu0YzwuvFIwA5DiDMfPeXpwIo2Qp7S822ma8uWMztLrINGGqv7Pso8
+	fzrqrhLX2fy2N/V31xUmjhBjKkeJAGp9DD8FI0PcBIOvVIsaR/hQft1R/70PTyJ0B64=
+X-Gm-Gg: AeBDies7e7zD32emtHD8wXngsdZJgN9W9q9tFc7LQaVlC12+SJ6yOGoeezkJ5se3/8T
+	RuO/dt7ib5de3hFMJJHM8ZASuCC0YcUm/cQ+c6fB3yz+CSaCH64iVUKU4SthbM9OtEIyCZ2XR/F
+	2RD+7xbPibfeZP1mXXAWI402Xy6NabFhtX1Q3pdiD5NrKkVf6V2rkQDzp1dKyHpvHHy0LIZ6IJL
+	1rM+n3zv8tDlYidp+yTD1+7MqZ0PYreqt3woVBjR63f/7GJ9rxjBXZvXyeI/HJr4N9dh8gu1sq7
+	1HdvKlWq9E/rruFU+QArBBqAklcgG14JDq9xPDm9WKM04+n4KmjYQJuguoxFk+SJ/ijldVMBIt1
+	djUyvx9remNfjGDqw+pRWY38vAjFcYOegaDr4Glj3rgKcQR3LDPHEh6uHcJlU2Tgm9SjXAiJEte
+	dkNeACU+vqhOpPHeY=
+X-Received: by 2002:a05:600c:a411:b0:488:ac01:72de with SMTP id 5b1f17b1804b1-488d67ec72cmr34668505e9.5.1775830643175;
+        Fri, 10 Apr 2026 07:17:23 -0700 (PDT)
+Received: from localhost ([37.63.33.18])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488d53807d7sm127283505e9.10.2026.04.10.07.17.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Apr 2026 07:15:27 -0700 (PDT)
-Date: Fri, 10 Apr 2026 15:15:20 +0100
-From: David Laight <david.laight.linux@gmail.com>
-To: Breno Leitao <leitao@debian.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Kuniyuki Iwashima
- <kuniyu@google.com>, Willem de Bruijn <willemb@google.com>,
- metze@samba.org, axboe@kernel.dk, Stanislav Fomichev <sdf@fomichev.me>,
- io-uring@vger.kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org,
- Linus Torvalds <torvalds@linux-foundation.org>,
- linux-kernel@vger.kernel.org, kernel-team@meta.com
-Subject: Re: [PATCH net-next v3 0/4] net: move .getsockopt away from __user
- buffers
-Message-ID: <20260410151520.3e91c2ce@pumpkin>
-In-Reply-To: <adjkn7p4U13WBs2o@gmail.com>
-References: <20260408-getsockopt-v3-0-061bb9cb355d@debian.org>
-	<20260408122653.295953dd@pumpkin>
-	<adZcnNgxhsUjAgZW@gmail.com>
-	<20260408195640.324ee932@pumpkin>
-	<adjkn7p4U13WBs2o@gmail.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+        Fri, 10 Apr 2026 07:17:22 -0700 (PDT)
+Date: Fri, 10 Apr 2026 17:17:19 +0300
+From: Nikolay Aleksandrov <razor@blackwall.org>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, dw@davidwei.uk,
+	pabeni@redhat.com
+Subject: Re: [PATCH net-next] net: Rename ifq_idx to rxq_idx in netif_mp_*
+ helpers
+Message-ID: <adkGbyOQRRYIb3w4@penguin>
+References: <20260410130602.552600-1-daniel@iogearbox.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260410130602.552600-1-daniel@iogearbox.net>
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[blackwall.org:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-277433-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[blackwall.org];
+	TAGGED_FROM(0.00)[bounces-277434-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	DKIM_TRACE(0.00)[blackwall.org:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[razor@blackwall.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: BEA4D3D887B
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5]
+X-Rspamd-Queue-Id: 308553D88D4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, 10 Apr 2026 05:29:37 -0700
-Breno Leitao <leitao@debian.org> wrote:
+On Fri, Apr 10, 2026 at 03:06:02PM +0200, Daniel Borkmann wrote:
+> Rename the leftover ifq_idx parameter naming to rxq_idx to be
+> consistent with the rest of the file and the header declaration.
+> Back then this was taken out of the queue leasing series given
+> the cleanup is independent. No functional change.
+> 
+> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+> Link: https://lore.kernel.org/netdev/20260131160237.07789674@kernel.org
+> ---
+>  net/core/netdev_rx_queue.c | 26 +++++++++++++-------------
+>  1 file changed, 13 insertions(+), 13 deletions(-)
+> 
 
-...
-> Since these legacy protocols represent less than 1% of the cases, I'd prefer to
-> optimize for the common path and handle the exceptional cases as exceptions.
+Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
 
-Optimising for the common path would pass a fixed size on-stack buffer
-(say 64 bytes - or perhaps enough for an IPv6 address) through to the protocol
-code, update it, and do the copy_to_user() in the system call stub.
-Write to small constant offsets onto the buffer could then just be direct
-assignments through some pointer.
-
-The 'buffer descriptor' would need to contain any associated user address for
-the unusual cases (also look at the sctp socket options).
-
-But I still think you need functions that read/write at offsets into
-the buffer rather than using iov_iter - which is only really designed
-for sequential access. It isn't as though you need scatter-gather.
-
-	David
+> diff --git a/net/core/netdev_rx_queue.c b/net/core/netdev_rx_queue.c
+> index 8771e06a0afe..de4dac4c88b3 100644
+> --- a/net/core/netdev_rx_queue.c
+> +++ b/net/core/netdev_rx_queue.c
+> @@ -275,14 +275,14 @@ int netif_mp_open_rxq(struct net_device *dev, unsigned int rxq_idx,
+>  	return ret;
+>  }
+>  
+> -static void __netif_mp_close_rxq(struct net_device *dev, unsigned int ifq_idx,
+> +static void __netif_mp_close_rxq(struct net_device *dev, unsigned int rxq_idx,
+>  				 const struct pp_memory_provider_params *old_p)
+>  {
+>  	struct netdev_queue_config qcfg[2];
+>  	struct netdev_rx_queue *rxq;
+>  	int err;
+>  
+> -	rxq = __netif_get_rx_queue(dev, ifq_idx);
+> +	rxq = __netif_get_rx_queue(dev, rxq_idx);
+>  
+>  	/* Callers holding a netdev ref may get here after we already
+>  	 * went thru shutdown via dev_memory_provider_uninstall().
+> @@ -295,28 +295,28 @@ static void __netif_mp_close_rxq(struct net_device *dev, unsigned int ifq_idx,
+>  			 rxq->mp_params.mp_priv != old_p->mp_priv))
+>  		return;
+>  
+> -	netdev_queue_config(dev, ifq_idx, &qcfg[0]);
+> +	netdev_queue_config(dev, rxq_idx, &qcfg[0]);
+>  	memset(&rxq->mp_params, 0, sizeof(rxq->mp_params));
+> -	netdev_queue_config(dev, ifq_idx, &qcfg[1]);
+> +	netdev_queue_config(dev, rxq_idx, &qcfg[1]);
+>  
+> -	err = netdev_rx_queue_reconfig(dev, ifq_idx, &qcfg[0], &qcfg[1]);
+> +	err = netdev_rx_queue_reconfig(dev, rxq_idx, &qcfg[0], &qcfg[1]);
+>  	WARN_ON(err && err != -ENETDOWN);
+>  }
+>  
+> -void netif_mp_close_rxq(struct net_device *dev, unsigned int ifq_idx,
+> +void netif_mp_close_rxq(struct net_device *dev, unsigned int rxq_idx,
+>  			const struct pp_memory_provider_params *old_p)
+>  {
+> -	if (WARN_ON_ONCE(ifq_idx >= dev->real_num_rx_queues))
+> +	if (WARN_ON_ONCE(rxq_idx >= dev->real_num_rx_queues))
+>  		return;
+> -	if (!netif_rxq_is_leased(dev, ifq_idx))
+> -		return __netif_mp_close_rxq(dev, ifq_idx, old_p);
+> +	if (!netif_rxq_is_leased(dev, rxq_idx))
+> +		return __netif_mp_close_rxq(dev, rxq_idx, old_p);
+>  
+> -	if (!__netif_get_rx_queue_lease(&dev, &ifq_idx, NETIF_VIRT_TO_PHYS)) {
+> +	if (!__netif_get_rx_queue_lease(&dev, &rxq_idx, NETIF_VIRT_TO_PHYS)) {
+>  		WARN_ON_ONCE(1);
+>  		return;
+>  	}
+>  	netdev_lock(dev);
+> -	__netif_mp_close_rxq(dev, ifq_idx, old_p);
+> +	__netif_mp_close_rxq(dev, rxq_idx, old_p);
+>  	netdev_unlock(dev);
+>  }
+>  
+> @@ -339,11 +339,11 @@ void netif_rxq_cleanup_unlease(struct netdev_rx_queue *phys_rxq,
+>  			       struct netdev_rx_queue *virt_rxq)
+>  {
+>  	struct pp_memory_provider_params *p = &phys_rxq->mp_params;
+> -	unsigned int ifq_idx = get_netdev_rx_queue_index(phys_rxq);
+> +	unsigned int rxq_idx = get_netdev_rx_queue_index(phys_rxq);
+>  
+>  	if (!p->mp_ops)
+>  		return;
+>  
+>  	__netif_mp_uninstall_rxq(virt_rxq, p);
+> -	__netif_mp_close_rxq(phys_rxq->dev, ifq_idx, p);
+> +	__netif_mp_close_rxq(phys_rxq->dev, rxq_idx, p);
+>  }
+> -- 
+> 2.43.0
+> 
 
