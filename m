@@ -1,70 +1,77 @@
-Return-Path: <netdev+bounces-277351-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277353-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iEOSEP3g2GnHjAgAu9opvQ
-	(envelope-from <netdev+bounces-277351-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 13:37:33 +0200
+	id YBeFCHni2GnHjAgAu9opvQ
+	(envelope-from <netdev+bounces-277353-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 13:43:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A52003D6426
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 13:37:32 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77F863D64ED
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 13:43:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8F8633016295
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 11:37:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6F1C030A1967
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 11:38:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CFF539DBC1;
-	Fri, 10 Apr 2026 11:37:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C71103A1E9B;
+	Fri, 10 Apr 2026 11:38:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X0UhFAsG"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="U+wMO9WA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59E2937C11E;
-	Fri, 10 Apr 2026 11:37:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E40B39DBC1
+	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 11:38:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775821050; cv=none; b=gwDYI9JAMq9TAoWaD5kHLtJHaMwDB8FVMTGWLPJTqDr18xqpYhc7UFxQMdmd1jReP73vS/4aV6k/I5PfyII9AIZNg0g4m95hMr5maf7MiG5eCh3K2mKjIA9najti+Pwtffcu6EfXj1plNzyJ42y/gtK1+B0cHB/kddftlRqDMXU=
+	t=1775821083; cv=none; b=QEFuudN8QxQ8u5bpeshM2M/imIELwTwGFtn2MfMLULE82CXFcUd3jns563fCvQJZu5qiB4cvNCaOmhHouPNuUenHzK5uqerg6JURSlUTxTtf1KCjw96uuErTNbL7fnS8OKS0tVUcJW+rBZOlOQeR51yNXwZ7O4kd+b0oyqT70nI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775821050; c=relaxed/simple;
-	bh=ctf7tAqzWy2jgKyTqKSoTxspzO0eZ3u9h51Rjz0Q5AI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jF00KzbyxI5OUd866XKDRb5yPA9T+yTjffO4HUzEF4aaedkSZPPnvglM3OXyKRm9hZ587NNGsMXXCaQ4nKCuDWsAxWGUbfo7ELxkD85020wr1WxaBlraRwvA2B/+BbuQ0qGB9TyFD4T60L8Xa72JTjtlKPLB5DvzEJSakNJzdBo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X0UhFAsG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B437C19421;
-	Fri, 10 Apr 2026 11:37:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775821050;
-	bh=ctf7tAqzWy2jgKyTqKSoTxspzO0eZ3u9h51Rjz0Q5AI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=X0UhFAsGpoaEoV6t82Oou8k60dPyMZHSXibMehm43lul39FaRTlsrdtrV493qkppg
-	 hmvlSWktiCDBsDF8Eh5b+ufXf08dgTDIMiGH9vgVQ0dj+FK5KKEEu33RcXDuIu6PX+
-	 haYSRf/dMqd2Zy3PJyG8TJVEJsWfytKq5Ex+rrXNUDx8DcJGmNoKTvIGUm4gJNARRo
-	 rXt6FmPpmpVB3eapOtWU+fwdhFx6Yq3bLwaJFE6EXzvSuk94oCtNFte3BJwmNZ5DPz
-	 fmYHohx+sCfbvoq94HMrqtRfp4RYH++Q0fCQjwhWPeE48kNqzTqeHLXj2jA4wxBqZF
-	 JzNeBPpI3ri2g==
-From: Simon Horman <horms@kernel.org>
-To: stephen@networkplumber.org
-Cc: Simon Horman <horms@kernel.org>,
-	ncardwell@google.com,
-	linux-kernel@vger.kernel.org (open list),
-	francois.michel@uclouvain.be,
-	davem@davemloft.net,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	ysseung@google.com,
-	edumazet@google.com,
-	jhs@mojatatu.com,
-	kuba@kernel.org,
-	posk@google.com,
-	jiri@resnulli.us
-Subject: Re: [PATCH net v4 5/8] net/sched: netem: batch-transfer ready packets to avoid child re-entrancy
-Date: Fri, 10 Apr 2026 12:36:13 +0100
-Message-ID: <20260410113613.618124-2-horms@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260406172627.210894-6-stephen@networkplumber.org>
-References: <20260406172627.210894-6-stephen@networkplumber.org>
+	s=arc-20240116; t=1775821083; c=relaxed/simple;
+	bh=1dX4uXwGzRHChAqZIKUJnts7+cVmhDPfr4wixNUYVkk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CN/W/++o8WKFWFMa1u4CRIR9PaqycF2CWmeUuoCfIdeWN6o4Z0XZSIjBP4pCR+xoTWRKUWFZEarigcEjNuhb5FIZK1homha3dDmelBd23AGoiPM9/jcH5FDllehjvwqFX380BIvHThQFilpNWiI80ZhaBCg1veXMlcUz0zB4674=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=U+wMO9WA; arc=none smtp.client-ip=95.215.58.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1775821070;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=KeqZvV+Oy9FQiiKRUD3VowmUdxbmTHkCnn/4hwZRALo=;
+	b=U+wMO9WATDP9BfWiPwhR7iA5Nd5PfmBagdYVXBnjUUg5GTlNgvvs9+8klD9yhrYRFER/Qv
+	mjvMWlD3UrS3t4CNun37TbB3HwUNtfJ+dV6dnknl7ayAxNv/87zDo/BjN8XJipQLYeFC3a
+	TzXfV6JdAz6fbfqxBWEZvyY1sPe8K+Y=
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+To: netdev@vger.kernel.org
+Cc: Jiayuan Chen <jiayuan.chen@shopee.com>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Jussi Maki <joamaki@gmail.com>,
+	bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net v6 0/2] net,bpf: fix null-ptr-deref in xdp_master_redirect() for bonding and add selftest
+Date: Fri, 10 Apr 2026 19:37:21 +0800
+Message-ID: <20260410113726.368111-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,141 +79,122 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-277351-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_CC(0.00)[shopee.com,linux.dev,iogearbox.net,gmail.com,fomichev.me,kernel.org,google.com,davemloft.net,redhat.com,vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCPT_COUNT_TWELVE(0.00)[25];
+	TAGGED_FROM(0.00)[bounces-277353-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:url]
-X-Rspamd-Queue-Id: A52003D6426
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linutronix.de:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,syzkaller.appspot.com:url,shopee.com:email,linux.dev:dkim,linux.dev:mid]
+X-Rspamd-Queue-Id: 77F863D64ED
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+From: Jiayuan Chen <jiayuan.chen@shopee.com>
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
----
-net/sched: netem: batch-transfer ready packets to avoid child re-entrancy
+This series has gone through several rounds of discussion and the
+maintainers hold different views on where the fix should live (in the
+generic xdp_master_redirect() path vs. inside bonding). I respect all
+of the suggestions, but I would like to get the crash fixed first, so
+this version takes the approach of checking whether the master device
+is up in xdp_master_redirect(), as suggested by Daniel Borkmann. If a
+different shape is preferred later it can be done as a follow-up, but
+the null-ptr-deref should not linger.
 
-netem_dequeue_child() previously transferred one packet from the tfifo
-to the child qdisc per dequeue call. Parents like HFSC that track
-class active/inactive state on qlen transitions could see an enqueue
-during dequeue, causing double-insertion into the eltree
-(CVE-2025-37890, CVE-2025-38001). Non-work-conserving children like
-TBF could also refuse to return a just-enqueued packet, making netem
-return NULL despite having backlog, which causes parents like DRR to
-incorrectly deactivate the class.
+syzkaller reported a kernel panic, full decoded trace here:
+https://syzkaller.appspot.com/bug?extid=80e046b8da2820b6ba73
 
-Move all time-ready packets into the child before calling its dequeue.
-This separates the enqueue and dequeue phases so the parent sees
-consistent qlen transitions.
+Problem Description
 
-> diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
-> index e264f7aefb97..b93f0e886a2b 100644
-> --- a/net/sched/sch_netem.c
-> +++ b/net/sched/sch_netem.c
+bond_rr_gen_slave_id() dereferences bond->rr_tx_counter without a NULL
+check. rr_tx_counter is a per-CPU counter that bonding only allocates
+in bond_open() when the mode is round-robin. If the bond device was
+never brought up, rr_tx_counter stays NULL.
 
-[ ... ]
+The XDP redirect path can still reach that code on a bond that was
+never opened: bpf_master_redirect_enabled_key is a global static key,
+so as soon as any bond device has native XDP attached, the
+XDP_TX -> xdp_master_redirect() interception is enabled for every
+slave system-wide. The path xdp_master_redirect() ->
+bond_xdp_get_xmit_slave() -> bond_xdp_xmit_roundrobin_slave_get() ->
+bond_rr_gen_slave_id() then runs against a bond that has no
+rr_tx_counter and crashes.
 
-> @@ -743,31 +745,28 @@ static struct sk_buff *netem_dequeue_child(struct Qdisc *sch)
->  	u64 now = ktime_get_ns();
->  	struct sk_buff *skb;
->
-> -	skb = netem_peek(q);
-> -	if (skb) {
-> -		u64 time_to_send = netem_skb_cb(skb)->time_to_send;
-> -
-> -		if (q->slot.slot_next && q->slot.slot_next < time_to_send)
-> -			get_slot_next(q, now);
-> -
-> -		if (time_to_send <= now && q->slot.slot_next <= now) {
-> -			struct sk_buff *to_free = NULL;
-> -			unsigned int pkt_len;
-> -			int err;
-> +	while ((skb = netem_peek(q)) != NULL) {
-> +		struct sk_buff *to_free = NULL;
-> +		unsigned int pkt_len;
-> +		int err;
->
-> -			skb = netem_pull_tfifo(q, sch);
-> -			netem_slot_account(q, skb, now);
-> +		if (netem_skb_cb(skb)->time_to_send > now)
-> +			break;
-> +		if (q->slot.slot_next && q->slot.slot_next > now)
-> +			break;
+Solution
 
-Does the batch transfer preserve slot gap behavior?
+Patch 1: Fix this in the generic xdp_master_redirect() by skipping
+master interception when the master device is not running. Returning
+XDP_TX keeps the original XDP_TX behaviour on the receiving slave, and
+avoids calling into any master ->ndo_xdp_get_xmit_slave() on a device
+that has not fully initialized its XDP state. This is not specific to
+bonding: any current or future master that defers XDP state allocation
+to ->ndo_open() is protected.
+Patch 2: Add a selftest that reproduces the above scenario.
 
-The old code called get_slot_next(q, now) when a slot expired by time:
+Changes since v5:
+https://lore.kernel.org/netdev/20260309030659.xxxxx-1-jiayuan.chen@linux.dev/
+- Moved the fix back into xdp_master_redirect() and use netif_running()
+  on the master device to decide whether to intercept
+  (Suggested by Daniel Borkmann, seconded by Paolo Abeni and Eric Dumazet)
 
-    if (q->slot.slot_next && q->slot.slot_next < time_to_send)
-        get_slot_next(q, now);
+Changes since v4:
+https://lore.kernel.org/netdev/20260304074301.35482-1-jiayuan.chen@linux.dev/
+- Reverted unconditional alloc in bond_init(); instead add a NULL check
+  with unlikely()/READ_ONCE() in bond_rr_gen_slave_id() and WRITE_ONCE()
+  in bond_open(), avoiding memory waste for non-RR modes
+  (Suggested by Nikolay Aleksandrov, patch by Jay Vosburgh)
 
-This advanced the slot to a new future window (slot_next = now + next_delay),
-enforcing inter-slot gaps when a slot expired by time rather than by packet
-or byte budget exhaustion.
+Changes since v3:
+https://lore.kernel.org/netdev/20260228021918.141002-1-jiayuan.chen@linux.dev/T/#t
+- Added code comment and commit log explaining why rr_tx_counter is
+  allocated unconditionally for all modes (Suggested by Jay Vosburgh)
 
-The new batching loop only checks 'q->slot.slot_next > now' to break, and
-relies solely on netem_slot_account() -> get_slot_next() for slot advancement
-(which only triggers when packets_left or bytes_left reach zero).
+Changes since v2:
+https://lore.kernel.org/netdev/20260227092254.272603-1-jiayuan.chen@linux.dev/T/#t
+- Moved allocation from bond_create_init() helper into bond_init()
+  (ndo_init), which is the natural single point covering both creation
+  paths and also handles post-creation mode changes to round-robin
 
-When a slot expires by time but still has remaining budget, the new code
-transfers packets immediately without creating a new inter-slot gap.
+Changes since v1:
+https://lore.kernel.org/netdev/20260224112545.37888-1-jiayuan.chen@linux.dev/T/#t
+- Moved the guard for NULL rr_tx_counter from xdp_master_redirect()
+  into the bonding subsystem itself
+  (Suggested by Sebastian Andrzej Siewior <bigeasy@linutronix.de>)
 
-netem_dequeue_direct() still has the old slot gap logic:
+[1] https://syzkaller.appspot.com/bug?extid=80e046b8da2820b6ba73
 
-    if (q->slot.slot_next && q->slot.slot_next < time_to_send)
-        get_slot_next(q, now);
+Jiayuan Chen (2):
+  net, bpf: fix null-ptr-deref in xdp_master_redirect() for down master
+  selftests/bpf: add test for xdp_master_redirect with bond not up
 
-Should netem_dequeue_child() call get_slot_next() before the batching loop
-to maintain consistent slot-based traffic shaping semantics between the
-direct and child paths?
+ net/core/filter.c                             |   2 +
+ .../selftests/bpf/prog_tests/xdp_bonding.c    | 101 +++++++++++++++++-
+ 2 files changed, 101 insertions(+), 2 deletions(-)
 
->
-> -			pkt_len = qdisc_pkt_len(skb);
-> -			err = qdisc_enqueue(skb, q->qdisc, &to_free);
-> -			kfree_skb_list(to_free);
-> -			if (err != NET_XMIT_SUCCESS) {
-> -				if (net_xmit_drop_count(err))
-> -					qdisc_qstats_drop(sch);
-> -				sch->qstats.backlog -= pkt_len;
-> -				sch->q.qlen--;
-> -				qdisc_tree_reduce_backlog(sch, 1, pkt_len);
-> -			}
-> +		skb = netem_pull_tfifo(q, sch);
-> +		netem_slot_account(q, skb, now);
-> +
-> +		pkt_len = qdisc_pkt_len(skb);
-> +		err = qdisc_enqueue(skb, q->qdisc, &to_free);
-> +		kfree_skb_list(to_free);
-> +		if (unlikely(err != NET_XMIT_SUCCESS)) {
-> +			if (net_xmit_drop_count(err))
-> +				qdisc_qstats_drop(sch);
-> +			sch->qstats.backlog -= pkt_len;
-> +			sch->q.qlen--;
-> +			qdisc_tree_reduce_backlog(sch, 1, pkt_len);
->  		}
->  	}
+-- 
+2.43.0
+
 
