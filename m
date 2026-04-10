@@ -1,174 +1,199 @@
-Return-Path: <netdev+bounces-277461-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277462-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SEnuEQsg2WkQmggAu9opvQ
-	(envelope-from <netdev+bounces-277461-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 18:06:35 +0200
+	id +CO1JDAa2WnfmAgAu9opvQ
+	(envelope-from <netdev+bounces-277462-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 17:41:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F5EC3DA102
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 18:06:34 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 070553D987B
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 17:41:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CFB3F30C0568
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 15:37:48 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 43F9F302E7ED
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 15:38:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27A053DC4C3;
-	Fri, 10 Apr 2026 15:32:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A19F43D332F;
+	Fri, 10 Apr 2026 15:36:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=0x0f.com header.i=@0x0f.com header.b="cs+zJ0r8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b/Rq+v4x"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f45.google.com (mail-dl1-f45.google.com [74.125.82.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B64113DA7E5
-	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 15:32:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.45
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775835135; cv=pass; b=lC7e8AgIZa5jtwNwYY6G2fmI3cWj6ZTemHaZwyD1HKEiBI4ZhQGWkfFDtLZMFZUIb/kQRzxCU45thNIp9/mxrToRiaK+vbUUw4QaKQnThNq5t63wcss1F+q6nLs48Xm+suN2P3hLylRyadLRPEBA6uH5UdILJY5AEkemT3M8nl4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775835135; c=relaxed/simple;
-	bh=OBQJPBhzAm5teFuL1it4zrQEsej5woZw67yMwyO4d8U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bebExFI3ORs/Ofw/HmQymKodmf8Ep7or3NjZq7L8zRvt0ZM0+WtB4fviVzFl+AP2j+6VO6yox0xQLgkwVVA/mM+2i2gYGQX/GqvJ7Rz/SkM0kNhRHQXUoWVaR9b8HxIvWqgN73X1ESz7Vjnq8uCMXECumDJfhv3kbFpdE8VCBV8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0x0f.com; spf=pass smtp.mailfrom=0x0f.com; dkim=pass (1024-bit key) header.d=0x0f.com header.i=@0x0f.com header.b=cs+zJ0r8; arc=pass smtp.client-ip=74.125.82.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0x0f.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=0x0f.com
-Received: by mail-dl1-f45.google.com with SMTP id a92af1059eb24-12c1a170a50so2014881c88.0
-        for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 08:32:11 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1775835131; cv=none;
-        d=google.com; s=arc-20240605;
-        b=E9VtaE4OoeWUB8h1oXgHda7Zr1CS/JPu0k56OsaBYeyTEWS6iDVUQ6fmL1LbWxoGVJ
-         sscEqTnKEkWCwSkJREXZLd+/+jG8PxXSPKu3MNLxBVi1+TnWdSqDPTPyJvFOYwncnsyR
-         2j/aazRrljn6Enh1FWHMtZIfW0oCX3oHPQa+ej6+sbnfuJWuATetHPYaogJVTuFBTR0S
-         ACHZox6pwZg3wrHGrNASQLkoBA0yH1Ul+4gvfsdHkRR2oCgmq03dVBshmjdVT2tJicr8
-         TCk9gZAWDkXp4buN9xTSD6oz65hruguVK/0BVLDEpcr4yEHoEsZCHweA/USkPiQ0I/bt
-         PNpQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=OBQJPBhzAm5teFuL1it4zrQEsej5woZw67yMwyO4d8U=;
-        fh=ZQWMg/Zd1GXNdJ6FssB+aejBdTAoYGflaQgYST1jFQg=;
-        b=T05nJnSToPy2XJS9v0OkhNMDDatptYVqkBcCr1GaoU9ek8KQMnc+xgSsLuYi4QH6wW
-         YGPzfna8sD03x0c5Y+QQ23PmtilnPBUVKn1hywBHqruHv3YYVQY4pn6hZ2we51wCYe6n
-         4hcVf75P4Rgaja/jMn/lJfqsZzik7XiByNjLoW+o/LE/qdCnUQx9/zzidzzbBFlmLrcz
-         A7rgVTNXlCFEa11+Z1JU5UjyxoCDXEiHvp0z/LjnQ+IjBFm6Fc7VjB0JXQS6ZZkOZdhN
-         xh6wCbhPc7eoL4Q9ZW+9DqE9R9s9/f/FFntHJDWp9KO01nmMjGjtpNi/UnhCXusmWeJe
-         fDKg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=0x0f.com; s=google; t=1775835131; x=1776439931; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=OBQJPBhzAm5teFuL1it4zrQEsej5woZw67yMwyO4d8U=;
-        b=cs+zJ0r8E1VxbeERL/6orYDfRzBNN0xV+FBDuuOmam2/EuHZ7scxaUctzZ3REo2LBr
-         KdQSu4tLtUeUQ/Am7PGmtjXBLQ/7knpdVClf5erC+tpkhYxe59BfVvuW88STHDIDr49T
-         TpKPrBeobAalm+DfnxseCj+mCeyPg4AFXq4Ow=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775835131; x=1776439931;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OBQJPBhzAm5teFuL1it4zrQEsej5woZw67yMwyO4d8U=;
-        b=DiRwEPTXP6/xdSJLEfXN3wqrijWeieyxetrtxbdIIY92efa9rkxcNOqKx3u0dGxemg
-         vCL3XR/xb5WlDRpUZMF9q3Hfhy//mtKaJvenCeOPNhv4LL8CmZr7KBTcBYnqjOVMam3t
-         eQ03S1UZUWvjH6HJDjNX3GPZfN/EcGO4kmcX3n9uaSlLcoqqEIyau/0c4BNI3p4WcJOt
-         jk4wiTd+sGzeRpC/QWEmwtGAp92RKLTKY/DD4U7D/jvdZBG47aKzJcAG7X1/cOPSeEKM
-         TSkuGf4klrhzmmN26vSiqpVgDCJg/KtIL9AuS+KUlJYUfwpndGc2lXpPlTLEw2RqyPnc
-         aGhQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX20ybfhbK0QYEVdBR1zrpB1FhvwMNIuNWVrfwnZfmOnEZWev9ZMxS7Au/AAYVMiVWFK5mQFnk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxqzQ3Gu8QiUQF4WuujiE3rzYceSeSV6p3oJRZdt1OkK5lswPnZ
-	4RZo26n3NINJgqtxZGInl7/plVlBJBHopdodsbhoKY+T7R61Pt/BldylFEJh4Kt9K7o9Wgao/4d
-	cvYL1ZO+rIzcs1YYf5ttWfycc4fdgTkhfrMvi1Sn0Eg==
-X-Gm-Gg: AeBDieuiD7x/p32Gd06YXu9EIGtj86/DCtyRt5U6aE+LMR4P5DrFgL+RJtghhEB2Xkg
-	RafZSml26yt3PKqU4l3sXSIn7JWH5vfn4WHVj5/4LvYkDj/9JMcjCSJ9bSYi/HrhH+HyVD1xdoJ
-	q1H7w1h70yF7pMLP3YaB0oC+kWz0MJvsEd5Us9kv14jinRA1Vtuc46DjafDkbIkMoY+GAizYkam
-	Ry93YkbBxdsKY90LPskcw6Xhh/yigT3e6Ubdv6JObd3VxCIRT0H3xjLJBwQEWhIlCoAC212sgah
-	T9ny
-X-Received: by 2002:a05:7022:6097:b0:128:ccb7:7fa3 with SMTP id
- a92af1059eb24-12c34f069f8mr2159203c88.34.1775835130696; Fri, 10 Apr 2026
- 08:32:10 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E1B93CFF7F
+	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 15:36:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775835362; cv=none; b=XYDK2Nm2Qh4Gd0CvkWyyrr97rfSvpT98TJ2IazLeTpMEl28ViQTui1Wp0oSh2MKeaVEHl1dRyg6//1RMhK9pE4wFvLVRkI/Sag7XRNInQqP6Wzv2Mj1XS1HGLKo0XD40ZOJiWyE8BNrA8VR/f9MZ5Kco2WNmM1ZWbuYANVo9EVU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775835362; c=relaxed/simple;
+	bh=4Bh7d/3GixBwoUaqRnW98B60FTug76WcCUBGyN9XulQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GRQRJ3d4VlZ2kHR7OlM9ATf5huqdXZ9WKZqoF6nK1VxwvwmuZEWWPjfqpWmVpNDEeUDnROmkgTfq36RWZN71uGh3Hq8eg58Vkez93jg82h05i9ZMxt8mrlD+DrkcLBUfwfo0JuZkpwa8i9Jk6NQ+ogphsTftlrbmRFvJg++KnBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b/Rq+v4x; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90000C19424;
+	Fri, 10 Apr 2026 15:36:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775835362;
+	bh=4Bh7d/3GixBwoUaqRnW98B60FTug76WcCUBGyN9XulQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=b/Rq+v4xECW8ojgD5kpexZ6vwawgNQ9IbtxCdV2C9JUtB6oo9q34lUruJEJ3WUPL5
+	 W9xwOU1IkDI+QokNvvFjNwHdHfQBlRXo6o/8Twvu4vKFF9r0hzDjCEQ48pux8MQWqt
+	 md4AUbF0i2s3ybR8qCa3ceBNTGGMAI5PdoQHFOsQjXopWIfQfnm7Ag/IKcpMpLHymh
+	 HJS/fDx/uMTTy0VxkoUmpJiox86zKypOY8Pmpu1RKtPALPziBZgV24+bMvwrzRGL2r
+	 Wdsdvbqmuyn7WKAiRhInKXSR9vrWWz+BTGjg9cXCcSJqiFo6uPFaC6bw6l152tCaST
+	 ziHT3TDmpsNEQ==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	dw@davidwei.uk,
+	skhawaja@google.com,
+	bestswngs@gmail.com,
+	razor@blackwall.org,
+	daniel@iogearbox.net
+Subject: [PATCH net-next] net: fix reference tracker mismanagement in netdev_put_lock()
+Date: Fri, 10 Apr 2026 08:36:00 -0700
+Message-ID: <20260410153600.1984522-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260410120044.031381086@kernel.org> <20260410120319.397219631@kernel.org>
-In-Reply-To: <20260410120319.397219631@kernel.org>
-From: Daniel Palmer <daniel@0x0f.com>
-Date: Sat, 11 Apr 2026 00:31:59 +0900
-X-Gm-Features: AQROBzAnX-XEClLFV-qWYFUzCuq4P43sNZviESiWFI1yCPXm2VtVZ2QkaUGJoPY
-Message-ID: <CAFr9PXk7qK8-2JWrrfgXHoS9JWTRL+WobLjmAesyCE9VLL8ZyQ@mail.gmail.com>
-Subject: Re: [patch 27/38] m68k: Select ARCH_HAS_RANDOM_ENTROPY
-To: Thomas Gleixner <tglx@kernel.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, Geert Uytterhoeven <geert@linux-m68k.org>, 
-	linux-m68k@lists.linux-m68k.org, Arnd Bergmann <arnd@arndb.de>, x86@kernel.org, 
-	Lu Baolu <baolu.lu@linux.intel.com>, iommu@lists.linux.dev, 
-	Michael Grzeschik <m.grzeschik@pengutronix.de>, netdev@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>, 
-	linux-crypto@vger.kernel.org, Vlastimil Babka <vbabka@kernel.org>, linux-mm@kvack.org, 
-	David Woodhouse <dwmw2@infradead.org>, Bernie Thompson <bernie@plugable.com>, linux-fbdev@vger.kernel.org, 
-	Theodore Tso <tytso@mit.edu>, linux-ext4@vger.kernel.org, 
-	Andrew Morton <akpm@linux-foundation.org>, Uladzislau Rezki <urezki@gmail.com>, 
-	Marco Elver <elver@google.com>, Dmitry Vyukov <dvyukov@google.com>, kasan-dev@googlegroups.com, 
-	Andrey Ryabinin <ryabinin.a.a@gmail.com>, Thomas Sailer <t.sailer@alumni.ethz.ch>, 
-	linux-hams@vger.kernel.org, "Jason A. Donenfeld" <Jason@zx2c4.com>, 
-	Richard Henderson <richard.henderson@linaro.org>, linux-alpha@vger.kernel.org, 
-	Russell King <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org, 
-	Catalin Marinas <catalin.marinas@arm.com>, Huacai Chen <chenhuacai@kernel.org>, 
-	loongarch@lists.linux.dev, Dinh Nguyen <dinguyen@kernel.org>, 
-	Jonas Bonn <jonas@southpole.se>, linux-openrisc@vger.kernel.org, 
-	Helge Deller <deller@gmx.de>, linux-parisc@vger.kernel.org, 
-	Michael Ellerman <mpe@ellerman.id.au>, linuxppc-dev@lists.ozlabs.org, 
-	Paul Walmsley <pjw@kernel.org>, linux-riscv@lists.infradead.org, 
-	Heiko Carstens <hca@linux.ibm.com>, linux-s390@vger.kernel.org, 
-	"David S. Miller" <davem@davemloft.net>, sparclinux@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [-0.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_DKIM_ALLOW(-0.20)[0x0f.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,davidwei.uk,gmail.com,blackwall.org,iogearbox.net];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[0x0f.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-277461-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[49];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-277462-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[0x0f.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel@0x0f.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,linux-m68k.org,lists.linux-m68k.org,arndb.de,kernel.org,linux.intel.com,lists.linux.dev,pengutronix.de,gondor.apana.org.au,kvack.org,infradead.org,plugable.com,mit.edu,linux-foundation.org,gmail.com,google.com,googlegroups.com,alumni.ethz.ch,zx2c4.com,linaro.org,armlinux.org.uk,lists.infradead.org,arm.com,southpole.se,gmx.de,ellerman.id.au,lists.ozlabs.org,linux.ibm.com,davemloft.net];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,thingy.jp:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,0x0f.com:dkim]
-X-Rspamd-Queue-Id: 9F5EC3DA102
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,iogearbox.net:email,davidwei.uk:email,blackwall.org:email]
+X-Rspamd-Queue-Id: 070553D987B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi
+dev_put() releases a reference which didn't have a tracker.
+References without a tracker are accounted in the tracking
+code as "no_tracker". We can't free the tracker and then
+call dev_put(). The references themselves will be fine
+but the tracking code will think it's a double-release:
 
-On Fri, 10 Apr 2026 at 21:39, Thomas Gleixner <tglx@kernel.org> wrote:
->
-> The only remaining usage of get_cycles() is to provide
-> random_get_entropy().
->
-> Switch m68k over to the new scheme of selecting ARCH_HAS_RANDOM_ENTROPY and
-> providing random_get_entropy() in asm/random.h.
+  refcount_t: decrement hit 0; leaking memory.
 
-I have built and booted this on my Amiga 4000 and it apparently still
-works so FWIW:
+IOW commit under fixes confused dev_put() (release never tracked
+reference) with __dev_put() (just release the reference, skipping
+the reference tracking infra).
 
-Tested-by: Daniel Palmer <daniel@thingy.jp>
+Since __netdev_put_lock() uses dev_put() we can't feed a previously
+tracked netdev ref into it. Let's flip things around.
+netdev_put(dev, NULL) is the same as dev_put(dev) so make
+netdev_put_lock() the real function and have __netdev_put_lock()
+feed it a NULL tracker for all the cases that were untracked.
+
+Fixes: d04686d9bc86 ("net: Implement netdev_nl_queue_create_doit")
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: dw@davidwei.uk
+CC: skhawaja@google.com
+CC: bestswngs@gmail.com
+CC: razor@blackwall.org
+CC: daniel@iogearbox.net
+---
+ net/core/dev.h |  8 +++++++-
+ net/core/dev.c | 16 +++++-----------
+ 2 files changed, 12 insertions(+), 12 deletions(-)
+
+diff --git a/net/core/dev.h b/net/core/dev.h
+index 376bac4a82da..628bdaebf0ca 100644
+--- a/net/core/dev.h
++++ b/net/core/dev.h
+@@ -31,9 +31,15 @@ struct napi_struct *
+ netdev_napi_by_id_lock(struct net *net, unsigned int napi_id);
+ struct net_device *dev_get_by_napi_id(unsigned int napi_id);
+ 
+-struct net_device *__netdev_put_lock(struct net_device *dev, struct net *net);
+ struct net_device *netdev_put_lock(struct net_device *dev, struct net *net,
+ 				   netdevice_tracker *tracker);
++
++static inline struct net_device *
++__netdev_put_lock(struct net_device *dev, struct net *net)
++{
++	return netdev_put_lock(dev, net, NULL);
++}
++
+ struct net_device *
+ netdev_xa_find_lock(struct net *net, struct net_device *dev,
+ 		    unsigned long *index);
+diff --git a/net/core/dev.c b/net/core/dev.c
+index e7bc95cbd1fa..4a82983e8616 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -1060,16 +1060,18 @@ struct net_device *dev_get_by_napi_id(unsigned int napi_id)
+  * This helper is intended for locking net_device after it has been looked up
+  * using a lockless lookup helper. Lock prevents the instance from going away.
+  */
+-struct net_device *__netdev_put_lock(struct net_device *dev, struct net *net)
++struct net_device *
++netdev_put_lock(struct net_device *dev, struct net *net,
++		netdevice_tracker *tracker)
+ {
+ 	netdev_lock(dev);
+ 	if (dev->reg_state > NETREG_REGISTERED ||
+ 	    dev->moving_ns || !net_eq(dev_net(dev), net)) {
+ 		netdev_unlock(dev);
+-		dev_put(dev);
++		netdev_put(dev, tracker);
+ 		return NULL;
+ 	}
+-	dev_put(dev);
++	netdev_put(dev, tracker);
+ 	return dev;
+ }
+ 
+@@ -1121,14 +1123,6 @@ netdev_get_by_index_lock_ops_compat(struct net *net, int ifindex)
+ 	return __netdev_put_lock_ops_compat(dev, net);
+ }
+ 
+-struct net_device *
+-netdev_put_lock(struct net_device *dev, struct net *net,
+-		netdevice_tracker *tracker)
+-{
+-	netdev_tracker_free(dev, tracker);
+-	return __netdev_put_lock(dev, net);
+-}
+-
+ struct net_device *
+ netdev_xa_find_lock(struct net *net, struct net_device *dev,
+ 		    unsigned long *index)
+-- 
+2.53.0
+
 
