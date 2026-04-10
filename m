@@ -1,213 +1,222 @@
-Return-Path: <netdev+bounces-277614-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277615-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kPKWLAeK2WlDqggAu9opvQ
-	(envelope-from <netdev+bounces-277614-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 01:38:47 +0200
+	id mCuOCBqM2WnSqggAu9opvQ
+	(envelope-from <netdev+bounces-277615-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 01:47:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13AEE3DD844
-	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 01:38:47 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72C2E3DD8B6
+	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 01:47:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DC5EF3018096
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 23:38:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CE4C23031310
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 23:44:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 018A0386426;
-	Fri, 10 Apr 2026 23:38:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DE94387593;
+	Fri, 10 Apr 2026 23:44:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blemings.org header.i=@blemings.org header.b="QQ6LDQnW"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="2HtptLD+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011016.outbound.protection.outlook.com [40.93.194.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB2D333E368;
-	Fri, 10 Apr 2026 23:38:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775864320; cv=none; b=d7vrzc5r5b+GvPEKl7lWad0bECBdQHJaMWxdqAg3huYdBSfk8frjBflSi/EqZ7+kosoDdrn0/9MnHTaUTcZmPn1c3Jj7AMBu8BdkXSjduF7APHXcNu65cHvuJshjpDVPu2Z8GYcqLPiJltQHWhOmqY5dK5jZ6i2z7LlVkPPUMyY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775864320; c=relaxed/simple;
-	bh=2lY2cPva3CKc/NxtQaKZ+pj/giFWfBa29trZfe13XjA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TZH9tizz/wLNhJIr2m+6FQ2rIrBYX9emMeE62UUrjOl0sF7Nr7PIXEoeGX+FeGdsHrPHSsPNB2ltSvX+vtqwQTIB2/f6sRHdwrhWZCAZ1oaD+XwahQ1dbtH+GUf3VvR0GJaKlUFXqGI2P2ROFaJDGq+qgD0ZclLblvJ9nZBEzkY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blemings.org; spf=pass smtp.mailfrom=blemings.org; dkim=pass (2048-bit key) header.d=blemings.org header.i=@blemings.org header.b=QQ6LDQnW; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blemings.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=blemings.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=blemings.org;
-	s=202501; t=1775864314;
-	bh=0D/b94zewInA5OowtofcLef5XWAwRXC9yiMoOg2ndJI=;
-	h=Date:Reply-To:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=QQ6LDQnWk2WrijFDd+nhNxQ8VSF0rxfTa0vj4RpCGTa3CgrnjOC5v+HanSCe0P82I
-	 QjziEqNHepz8v1CKKPLO7TktBA6beERO32hxVshrFKLBIF8Ju+CVQuh6bBRrZ92AnT
-	 u761nD3zWXYDFJ3c/XBn4lpsvt0PnrudN6mZ1aCj0nqf7qMSv2WNIrWCtkwg3gBAnX
-	 BvyYXb9frbJy+04wTUj+QY5Ge4Yxi0LoKzMnaWqoXTje/CG6dp17WgU1hzpTMlJ9li
-	 fUQvifGvyOYNQai0hNkrGp7JL8IcjnorOisg1BKdxc3t0HR0cgeWq4QhHczUJubYXP
-	 qlRKMj0CVbqdQ==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4fstXm4rrsz4wTc;
-	Sat, 11 Apr 2026 09:38:32 +1000 (AEST)
-Message-ID: <91d50a72-a121-4b24-a559-892f8a3b3c3a@blemings.org>
-Date: Sat, 11 Apr 2026 09:38:32 +1000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5F0F37FF7A;
+	Fri, 10 Apr 2026 23:44:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.16
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775864666; cv=fail; b=Wx9sz7+cKTzSW63KZBL2Q8vTKqZSAA7q8Ewm2184Dkm2kAoCO66QrdgRiRFjmm/BDg0XYFdjsmflSSO7fuyZNW4L+9bmFC2FpKMR/rljz/xblhPcSnuwR4/HJSUnvb/0c6MEySZ2d6d7I/WZPckxCnXSUKxH76Id7hdcUqfP3Jc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775864666; c=relaxed/simple;
+	bh=N2u4406qslGMGAlP7GwFQipeGPqbMM/H6BzK+Ycj7dM=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=PsA/L47C9qltmsn21QkAWhrC5k5tDH8cbiRhmvQMYkz72c5lGwb1ob21F94PerP/JHthMUpl+fTdsE1nFOxCZrmhg/lgdA4NO5OvTx+ZFmbYJEov/4c8cjkfatAwE4u1KPZMgs8ZblgH2JfoK5O33AhH93+G/MX5tzbkZkzIIao=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=2HtptLD+; arc=fail smtp.client-ip=40.93.194.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=VYpKMmDhoovam79mdTh7SXGncSLrPC9cHlDBL9/67/5a3WAGGiq7w0KT9qY4jLycA5sNeewvgeq+TIw1oFbdB4LZWztcx1Tnll9RfJVfJ31r2ZFgiyYqBGWFq5hiSUVfXsjHEMNkSe3inIOe4OBsQ5OwzlcuDX0YNc4jVecmIBo//ZCvF2C2hUbrT+0CTIBwMOZiknNPENUpVNhnNO1GnFFYp28436CcqSgHz/gD9Aj7leWK6bmBLwhbu3uDLya0jLlEzFK6Sc4NmG+4Km+e6oHjanCgJ/UdWtc8LnVQhwJTXGlLSM0GeMEliGMfZtPf8OA5tqQY5oMRsLTf2VxQSQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ORjJzHqEfsHgNm4dN82QRLUIVuan/8U2zsVlz6EWIuM=;
+ b=LCshgZiUz5R2Na6IK1bpWsi1bncKT+VwEz1pnoU0t5FD7vIgyep/lsJaBeUHbHNekjwmY/WUW9wnQwS3CNQcJjo8DHm829+g5M8YHfAUNOupWfs5g7vtQr2RRkgCJwKPDPRWPj7gAewgEguE/monRVIRez7q7JPOiZoyf0dL/sts3ksOaJUWEGP98yDqydLDoua868ITGdT/uaOrDFyGmakgUSnITbZWh4ACeq6vnLI2kEKTtr8bjdyWxZfesWE1NDMSR1bJUXYx0xm+FvKa/5HxMIgt7mLNcH1djdj7H3RaBprSn1qYOVGwXx8TFsyF4h5DMnNjv8zv5dc3v08ueA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ORjJzHqEfsHgNm4dN82QRLUIVuan/8U2zsVlz6EWIuM=;
+ b=2HtptLD+UFhNFZ+ie08FKuPUcBjEk1tV83ww2k7VXsWk/5R4Kxms+UUSPkZGaHF6M76Rjsj+CJ+pdHc7GyFB8LgsMHZUxNanOciFPMai49pmjxGQZoc2zf9oDKTphpkUZ/lFpq1SI8kfU8yGzx502+LUNt/FFWtjYn6rkMHOJwA=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2797.namprd12.prod.outlook.com (2603:10b6:805:6e::22)
+ by LV8PR12MB9692.namprd12.prod.outlook.com (2603:10b6:408:295::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.42; Fri, 10 Apr
+ 2026 23:44:22 +0000
+Received: from SN6PR12MB2797.namprd12.prod.outlook.com
+ ([fe80::1ef0:99a5:313e:a60b]) by SN6PR12MB2797.namprd12.prod.outlook.com
+ ([fe80::1ef0:99a5:313e:a60b%7]) with mapi id 15.20.9769.014; Fri, 10 Apr 2026
+ 23:44:21 +0000
+Message-ID: <69c189b7-9896-41cf-b28f-5ed4c7b80d6a@amd.com>
+Date: Fri, 10 Apr 2026 19:44:18 -0400
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/4] net: ionic: Add PHC state page for user space access
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Abhijit Gangurde <abhijit.gangurde@amd.com>, jgg@ziepe.ca,
+ leon@kernel.org, brett.creeley@amd.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ nikhil.agarwal@amd.com, linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260401102501.3395305-1-abhijit.gangurde@amd.com>
+ <20260401102501.3395305-3-abhijit.gangurde@amd.com>
+ <20260401170600.312a23d1@kernel.org>
+ <52cee89f-50e2-4569-a622-b03e711ab26b@amd.com>
+ <20260410134311.785683cd@kernel.org>
+Content-Language: en-US
+From: Allen Hubbe <allen.hubbe@amd.com>
+In-Reply-To: <20260410134311.785683cd@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: CH0PR03CA0320.namprd03.prod.outlook.com
+ (2603:10b6:610:118::25) To SN6PR12MB2797.namprd12.prod.outlook.com
+ (2603:10b6:805:6e::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: hugh@blemings.id.au
-Subject: Re: [PATCH net] netrom: do some basic forms of validation on incoming
- frames
-To: Craig <edfardos@gmail.com>, hugh@blemings.id.au,
- Kuniyuki Iwashima <kuniyu@google.com>, kuba@kernel.org
-Cc: davem@davemloft.net, edumazet@google.com, gregkh@linuxfoundation.org,
- horms@kernel.org, linux-hams@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, pabeni@redhat.com, stable@kernel.org,
- workflows@vger.kernel.org, yizhe@darknavy.com
-References: <20260410145448.38253e3c@kernel.org>
- <20260410221220.1708137-1-kuniyu@google.com>
- <4f5810a7-c792-4d6b-9f7c-6c6b289def19@blemings.org>
- <761f83cc-58eb-4b4a-ba91-d11412e7b2a6@gmail.com>
-Content-Language: en-US
-From: Hugh Blemings <hugh@blemings.org>
-In-Reply-To: <761f83cc-58eb-4b4a-ba91-d11412e7b2a6@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[blemings.org:s=202501];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN6PR12MB2797:EE_|LV8PR12MB9692:EE_
+X-MS-Office365-Filtering-Correlation-Id: fe86a622-72f1-4142-853a-08de975b16e2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|366016|376014|7416014|22082099003|18002099003|56012099003;
+X-Microsoft-Antispam-Message-Info:
+	QslgCj22Rw/w5me7qKDnY6E+YJ4MLE2zdnkglm/y8/9wO2ioYcBTwcB1QD3tO6A+1G3PGq8IxcYkfmtT9PVnemeBn0YT0lC8qJLQ1MrRmz81c8Dcp6TJ5OfGbw8B/QWH2SL9+7x89OzSAOtqNdDdHJbS6B577Da+teKr66m/gMsMM+uuMPJF1F/wK12Ateed9+6li7YiRR0ztCjJKJkcM0G1/y8lk2s0e8ZdmHH04zaFc60mlR1QZ8Y18GDAuQtyjNi/aHcDdRvRMjyrJUjf20d8pkEjE8Tgx5B++c0G4ZPNFs5ooFXyXpb9EV/htRW6P4BHjYncyZSyA7sGJ+OQ/rCx5zQe6vzm0OBxofMihDvZ/5tnpZEpOFsB9iX6NEa0NPwTXY9yOsQ3xjKwD2fR96+sP7m+Gk6tsoFVHkE0rTDkBWrJUqjC7Ub9OjN0xh+HtlDbToTs0NLMFLY1AisK5/flqHmP259B1ynnxtopBvk1lTjcsvWa2WcQHNyzuzaLuVOgIAzY9pL0MrIRDau6kcPUTLWM7tRyYdV+4XD79RxgNJc76IuEOZD6pTtrLgHouEjfwsfMAlhRvV0iEz9J0U9r8vSowAWeYz5RU64igkT30vEXQHUIKJx6bkcVRFZMIIZ3j1K0ZwFLxAbrmOZEYrlLMBCMBlNsYefb/zZ9ZL2BlnRnkQZJ+I+GUvUPA5wQGYA2joytWWSMdyvQER/VvW5sbNANGYF3r8QuoQOxAdw=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2797.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?UVUza0tUNGdrSEdJMTRxMVFFdG4zWGowWExGcnppWU5xNnBzVDNKWDYxa2VJ?=
+ =?utf-8?B?cmRPMEx4djlCMkNpL2JCZmVSNjQ4T01HRXZRNk1pTUlpQkR1bnQrdExtOXBq?=
+ =?utf-8?B?UXBmUk4vdHZLVVgvdlVpWUFTeGxneVVZTGZnWDhzaEExS0FWb3RJN0x1VWlh?=
+ =?utf-8?B?QkxxOUNyL1BLZ2pMa0ptMjZuUGpOaHJvRzg2NnZVSzR2R1hYZ1Y4SldLd3pY?=
+ =?utf-8?B?MHRDU0tESkNHZyswRXoveFIyVGNBYm9YSUZLUW5nakRkVERyS0JjWG9ZRVlS?=
+ =?utf-8?B?ejRvWGJwUlc5cDZmWjlhd1NvdU9NZ0hDN1Zidmg1R1FIU2FWNXVKTGJjL2JS?=
+ =?utf-8?B?NkdIWVpVNG50NmpkUFVyRTM1SlZRV1dkZzBMT3VreWNkWURwTkJKMDYrYm5K?=
+ =?utf-8?B?ZVlHSHhmN1ZwOFlVQS83NFN6bFJYTVR2L05PRFJ1QmR1WlhxbVA0b2tUdWl6?=
+ =?utf-8?B?eU5DbDRRczkzb3NtMTFkSlgveHNJWHhwc0QvMUpndUMrOUNwZFVISlZ4Z2hk?=
+ =?utf-8?B?NHRKRktWRlJoR2FjQTIzYlh0YWZMU3laUHFNR2JvTlFudHFGWm02RTZaeUlt?=
+ =?utf-8?B?cGpuTkNLSVVFVDRlTUMxVkdMb0VJTlJHOGR1aXVMVTRDbzlSVS9xVmY1Rmk3?=
+ =?utf-8?B?ZVY4dFV4ekJYdE9EWFliaFdXU0dseEo1azh6ekdSYmFXZE5DMnM1Wk1mYnpZ?=
+ =?utf-8?B?VHQvTXV0aSticU1tWXNsVUxuR1ZtSzZYTWlhbHo4SVlQdTgxd0NrTHh1U0o3?=
+ =?utf-8?B?UWhwamJHMEtXVS85TUd5a3ZySzZRV2gvTlkwTzUzV01ubzY1ZlJ0K05Ibmk4?=
+ =?utf-8?B?ditpZy9YVmpUUSsxa25DSis5Tlg5Z2pnNkJscUVzOW1PeW5xQ2o3VWRIcXQx?=
+ =?utf-8?B?Z2trY0hqdHlIbzg5eHVwKzBZNWpTNjRIK25mWFpUYW9KSEl2cFNzMnZ5MVd3?=
+ =?utf-8?B?UVBObWJjaHRQdFRrZnB6MVFKSzlSREpPc3loR2FvUVJodk9UZEtpMGpKdDVl?=
+ =?utf-8?B?RkJKOUl0Nml4UXdxYkp5c0N1djBLSkcvYXVwZ09RcTlIeTl2Qm5RR3Z1enkr?=
+ =?utf-8?B?OVQzY0hMQTZNQkFiN1MzOWhMZUhYTm5KSU4rb0dsaHozampXSTZ1dzI1cjFp?=
+ =?utf-8?B?d0lZblZIOFp5c1BjeDZvVGJ0NWNKckh2ZWVNZ255cXFCZlVsUkhNeE1zK3oy?=
+ =?utf-8?B?dEtqZGpJV29ZQWNXN2E3UUhHQVpROW5oUm9QVnprc2tlYmMzVXo5UTYraFRP?=
+ =?utf-8?B?VHZOSTRWV2pYaDNxa3lXMlNoamw4WThCUlY0cjU2aVNTZjJqbWxpREEza2Ey?=
+ =?utf-8?B?RGljU1RCSG1rM3lTRFlDWEhKcnJ1d0JFRGF2NHFWSWt2K2RZUUlVTUtIR0Fr?=
+ =?utf-8?B?ekhubUlrcUhkK3UyczFiWDFnYy9zWXE0MEREbnNiZUY0V0MzcE5TalV6UDBO?=
+ =?utf-8?B?UnUxK0RRWkhTcmczZ3cxQ1Bubk9oVkltZXY4d0NacnVQWjlySjVZWnppU2hO?=
+ =?utf-8?B?RFNKSlpJZjdraEhFLzNZRWgzOVJsd05YeFpidGpsSEZ0Y2hIbVlnMTZVQlNh?=
+ =?utf-8?B?ZzR6S2crTnJHYjVMakVxc0h0L29VRWZBRTBpcHZVbTRTZU1USlVRa2N0THo4?=
+ =?utf-8?B?N05tczIxbC8vcy8rbEhsRjRyaHh0ZFIzRkNsVVFRS2swbGxsNUM5M3lMZGMz?=
+ =?utf-8?B?VVp3MmhoSGhGeEFOcjVyTE82aHd0QW5pNWthbmJoMjFyNE1qWVIyd0JnVDQy?=
+ =?utf-8?B?ck1jSHZFeS92cjlsN3lROVNHTGNjeHhhNFkwYTA1VjFuSElxOXI1YmJTQ2FK?=
+ =?utf-8?B?ZlNOUmMrSmlHeVBDSFVXZnFnQ0lnSXNVRmdWdmorckJWY0dUTGRIV0JYS2o2?=
+ =?utf-8?B?dlBXS2pLak9GdkhBRUFwNHZON2dEbk9iWXZPTXNhNnFndXFkNmk4Rm8rNjBX?=
+ =?utf-8?B?QjNQU09nVUpJcXNmTmpjd1c2bEU2LzJ1RXpwWHNqNXdjN0FkZ3cxNC9RL2Rr?=
+ =?utf-8?B?VnB3N2tWK0t6MDJrOGprV2s5czZ6Y3U4U3QzeHFxdFVsNkUydTl0bzFiNFIw?=
+ =?utf-8?B?dzJNdjdraWk4akh3d3dnbnJMbDZFSVJGcmY2R0RmUzY1clZWNDRSa0hoYnFs?=
+ =?utf-8?B?bHYzWkw0c3lYc28rTEtKWGtKRFgwUmNRMHhLbkR6cWVDZUlIbE1sSU85K3Ft?=
+ =?utf-8?B?WVV4QndSU2RjTGgxM3BMUXBxdCtFVk5qMVB3VERJaEwzRzlaalBzSGZ6MG8z?=
+ =?utf-8?B?UThuRm80ckc4eG9VTXRLYzF5QUtZMnkrVWNLbEpLcUtrYS9GaE9pTWhIbnhi?=
+ =?utf-8?Q?8VHIZX2OoT/DWocuQg?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fe86a622-72f1-4142-853a-08de975b16e2
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2797.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Apr 2026 23:44:21.6703
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: nFHvRMGICmSVw6KrrMWNalBZE6Ae+cYOcotyXB+QnQlUG016ItLblIw9lLTCj7Vf
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR12MB9692
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_NA(0.00)[blemings.org];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,blemings.id.au,google.com,kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-277614-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	HAS_REPLYTO(0.00)[hugh@blemings.id.au];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hugh@blemings.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[blemings.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-277615-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 13AEE3DD844
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[allen.hubbe@amd.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[amd.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,amd.com:dkim,amd.com:mid]
+X-Rspamd-Queue-Id: 72C2E3DD8B6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-
-On 11/4/2026 08:51, Craig wrote:
->> If the main concern here is ongoing maintenance of these Ham Radio 
->> related protocols/drivers, can we pause for a moment on anything as 
->> dramatic as removing from the tree entirely ?
+On 4/10/2026 4:43 PM, Jakub Kicinski wrote:
+> On Fri, 10 Apr 2026 09:10:09 -0400 Allen Hubbe wrote:
+>>>> +struct ionic_phc_state {
+>>>> +     __u32 seq;
+>>>> +     __u32 rsvd;
+>>>> +     __aligned_u64 mask;
+>>>> +     __aligned_u64 tick;
+>>>> +     __aligned_u64 nsec;
+>>>> +     __aligned_u64 frac;
+>>>> +     __u32 mult;
+>>>> +     __u32 shift;
+>>>> +};
+>>>
+>>> You're just exposing kernel timecounter internals.
+>>> Why is this ionic uAPI and not something reusable by other drivers?
 >>
->> There is a good cohort of capable kernel folks that either are or 
->> were ham radio operators who I believe, upon realising that things 
->> have got to this point, will be happy to redouble efforts to ensure 
->> this code maintained and tested to a satisfactory standard.
+>> The simple answer is just following the same approach as an existing
+>> implementation.  See struct mlx5_ib_clock_info and
+>> mlx5_update_clock_info_page().
 >>
->> Or, alternatively, as a technical community it may be that the Ham 
->> Radio interested folks conclude that out of tree or user space 
->> solutions are a better way forward as others have proposed.
->>
->> Give us a few days, please, for the word to be put around that we 
->> need to pull ourselves together a bit as a technical group :)
->>
->
-> I, for one, really can't imagine pulling an entire network subsytem 
-> out of the kernel without any
-> knowledge of how/if/when it's used.  Like intercontinental radio 
-> networks, global email, ax.25
-> keyboard-to-keyboard, BBS and other emergency-communication systems 
-> throughout the
-> world.  If you're sure the Internet will never fail, I guess it makes 
-> sense removing all of this
-> since it's inconvenient to maintain.
->
-> Global AX.25 keyboard-to-keyboard on 14.105Mhz
->
->    https://qsl.net/kb9pvh/105.html
->
-> AX.25/netrom VHF routed networks spanning from Oregon to Los Angeles.
->
->  https://www.easymapmaker.com/map/80666c4898ec6e8fa0c35add5d03282d
->
-> Global radio email using AX.25
->
->   https://winlink.org/RMSChannels (1,336 AX.25 email packet nodes on 
-> the Earth and Space)
->
-> This is all in operation by Amateur Radio ARES emergency 
-> protocols/technologies.  This
-> will not pass the headline test when it comes to Linux detractors.
->
-> Most of this is running on Raspberry Pi / Linux 24/7.
->
-> If we want to kill all these apps and somehow force them into user space,
-> it's akin to just switching to Windows - and flounder with the 
-> Microsoft folks
-> trying to do the same thing.
+>> Making this common might risk presuming that other implementations will
+>> be a similar design.  Compare these to the sfc driver.  The clock is
+>> quite different from ionic and mlx5, not using timecounter, because
+>> instead of a free-running cycle counter the hardware itself provides an
+>> adjustable clock for timestamping.
+> 
+> So your augment is basically that drivers which don't use sw timecounter
+> exist so we shouldn't bother creating common definitions for drivers
+> that do? Why do we have common implementation of timecounter in the
+> kernel at all then?
+> 
+> These are rhetorical questions.
 
-Your email Craig neatly encapsulates just some of the practical and 
-ongoing applications of the kernel code in question - I don't think this 
-is in dispute.
+There is no suggestion to get rid of timecounter in the kernel.
 
-What's pertinent is if we as the ham/amatuer radio community can agree 
-on whether in tree, out of tree modules, or a userspace device driver 
-approach make the most sense.  If we are to keep code in the kernel in 
-any form, we as a community need to find someone(s) that have the skills 
-and bandwidth to keep the in tree code up to date.
-
-I don't think this would be onerous and I have a couple of people in 
-mind to nudge who may be happy to do so if that proves the right way 
-forward.  At a pinch I could do it, but that'll mean a lot of catching 
-up. But I think it reasonable that the responsibility here falls to 
-folks that are closer to the code in question than the wider and 
-overworked kernel maintainer community.
-
-That said, I think Dan Cross (KZ2X) earlier email makes a pretty strong 
-case for moving out of the kernel while still providing a way to have 
-backward compatibility, perhaps this might be the way forward?
-
-In any case, done well, this approach would not kill the apps or force 
-anything like switching to Windows! :) Great projects like digipi would 
-be able to continue with minimal changes.
-
-I wonder if a separate thread in linux-hams makes sense to discuss the 
-various longer term approaches to maintaining these capabilities - I'll 
-try make time later today to kick one off - such deliberations will be 
-of less interest to the broader LKML and other lists.
-
-Cheers/73
-Hugh
-
-
-
->
->
-> -craig
-> https://digipi.org/
->
->
--- 
-I am slowly moving to hugh@blemings.id.au as my main email address.
-If you're using hugh@blemings.org please update your address book accordingly.
-Thank you :)
-
+Maybe I've been overthinking this and misunderstood your first reply. 
+Did you mean, just, why not move this to ib_user_verbs.h, struct 
+ib_uverbs_phc_state, and use it from the vendor driver?
 
