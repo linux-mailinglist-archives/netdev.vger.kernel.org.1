@@ -1,161 +1,142 @@
-Return-Path: <netdev+bounces-277458-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277459-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sFhBEPQV2Wm7lwgAu9opvQ
-	(envelope-from <netdev+bounces-277458-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 17:23:32 +0200
+	id oLo+JZgY2WnfmAgAu9opvQ
+	(envelope-from <netdev+bounces-277459-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 17:34:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFEE43D9329
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 17:23:31 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B16A3D962D
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 17:34:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C1FD63059CE9
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 15:16:38 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 30D3130A87CB
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 15:21:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA3BE3D9DBC;
-	Fri, 10 Apr 2026 15:16:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D861F3DF01A;
+	Fri, 10 Apr 2026 15:19:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nN7e6fzW"
+	dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b="VPk6fsRQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 970153D4117;
-	Fri, 10 Apr 2026 15:16:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A2AF3DEAF8
+	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 15:19:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.9.28.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775834197; cv=none; b=r/NlW3mTSlsw2ND3qC/AmJ92oE3bdWumAIqLg/VDaJkE1J3clVBELQJq9SlFlOSi3knZaQCP16h+wpvFeLRdberkDr6dSHgw58R+jonkiX0K/B/OyPDMz9jmxvk7gCCtijTZOBucdN1ezqbMysRgT2MRbO1CqTI4gM79rW6tKl8=
+	t=1775834346; cv=none; b=ou91eBYC/Wx4G+oTpd6LKOj4WB5meFY65IgWnxnBeAor6IbdTOSXzdtpPX7S3s/Ltdq+79XdyYsBqs7kLx4ZJbSelrjjqqBRVQ2oIln1wCqqV4ns6Q2UvQZnHlDhVrOpdaGpRWyygU9YqKcqRUhpA/EKBxCZ3ULIWzVeCTHuRH8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775834197; c=relaxed/simple;
-	bh=Zbifno8UeSRvee5yMpEkcrdMKYo4zYWVvjNlJnyEkpI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ncxnbm5VDh33E9ylneZj6aru1BGqCNpUMgEby5lunC6LIA5KaqexWEVyw7HlrUs5RCarXETgIAE1o63eIWoAaLiKShhamloTApJvZ31iMlfMZB7qKczhEquT9HQLzmnZRe9W+s+19VkYlMs0guHV5i11sFK4RquRyePzOgaPnAA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nN7e6fzW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33C21C19421;
-	Fri, 10 Apr 2026 15:16:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775834197;
-	bh=Zbifno8UeSRvee5yMpEkcrdMKYo4zYWVvjNlJnyEkpI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nN7e6fzWk0vI2vN12ZiZflmNei0jSmE93f2Se4Loux8xkoL8LyCqocItVKIzmoUDO
-	 LeST/JMrWWjptXQLYqILNzUmsNUvHtvNdnPC0Q/Ct10p2wD3UbQFan7QRj7ZRW2ZNy
-	 PZEhj0/zTjEAgT3K5Lp/CghGonqN5eE3ETN4BR2MiJ0oZqlTKq2/5KG9fsZFELDHGJ
-	 c7Idmx2ktf0jH6hS0jvRVFkEXpLFAjdjGNb7pb7RqZNiwvragGnYhCG6vtgg+9mEm1
-	 VtdTO68WY13VRN/uE18qyO97AnH1pGl9Or5uqBsX4AgySfp+I+WmlIcP7NJaSblkgr
-	 znrECfyXl34Hw==
-Date: Fri, 10 Apr 2026 16:16:31 +0100
-From: Simon Horman <horms@kernel.org>
-To: "D. Wythe" <alibuda@linux.alibaba.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Dust Li <dust.li@linux.alibaba.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Sidraya Jayagond <sidraya@linux.ibm.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	Mahanta Jambigi <mjambigi@linux.ibm.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>, linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org, oliver.yang@linux.alibaba.com,
-	pasic@linux.ibm.com
-Subject: Re: [PATCH net-next v2] net/smc: cap allocation order for SMC-R
- physically contiguous buffers
-Message-ID: <20260410151631.GY469338@kernel.org>
-References: <20260407124337.88128-1-alibuda@linux.alibaba.com>
+	s=arc-20240116; t=1775834346; c=relaxed/simple;
+	bh=2PJcapuxUWWHQgHKuYh+AB0Bg9+uWPE8WWtuj/kl/pY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=R7c1tpV+5g+thi8uVcOFU5FEu1b+ggFOAyyWrTBerOqLGjnraqR7mJaGj9fOPZksxh1qeL5fRgqnRDBrIlbi/25XCx4JqIYZRMooyBVtFb9ZoLtd7w1x6Rccp4C0+RxR3x/EbFoRsbGFC4kEuVweAmNKdXJTHgfH+evYPSbwnQI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu; spf=pass smtp.mailfrom=mit.edu; dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b=VPk6fsRQ; arc=none smtp.client-ip=18.9.28.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mit.edu
+Received: from trampoline.thunk.org (pool-173-48-116-90.bstnma.fios.verizon.net [173.48.116.90])
+	(authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+	by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 63AFIoOX015852
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 10 Apr 2026 11:18:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
+	t=1775834332; bh=eTlXD+fEi5OyNbu4TxRTwpDmEzFd2ThBwniicSqJG9M=;
+	h=From:Subject:Date:Message-ID:MIME-Version:Content-Type;
+	b=VPk6fsRQSXd/5Nh8TyOtre/wyuiwILVUqAvKliAeAoP9NWxPWea1Q4bx2oJrpWurM
+	 p0KwKN2oR00yADJbGywtFxHrkSJG+7akpDxyNmS3k4sITB9+LAQ7TS8gLOxrGyZcxm
+	 iD4ByRUzuod5KLDmmiVM+UapW56A71UlQ86DKwTjUgLnxxFdmaZEmaxScOtN1jt83o
+	 KncTyarsQsfg740s5ZTPNDrP3EVWK9I1eaZQ8RpFbx0tpkzHLOeLlgiMDfG5/h1trz
+	 DW2Ox+J23d04yMQY9WVUywWKP2CKxWAo6qH71mwqDeJ5+jdH6erLL9AAKNO/NyVKi7
+	 5qupF6y+RLfJA==
+Received: by trampoline.thunk.org (Postfix, from userid 15806)
+	id 0D7462E00E1; Fri, 10 Apr 2026 11:18:48 -0400 (EDT)
+From: "Theodore Ts'o" <tytso@mit.edu>
+To: amd-gfx@lists.freedesktop.org, apparmor@lists.ubuntu.com,
+        bpf@vger.kernel.org, ceph-devel@vger.kernel.org, cocci@inria.fr,
+        dm-devel@lists.linux.dev, dri-devel@lists.freedesktop.org,
+        gfs2@lists.linux.dev, intel-gfx@lists.freedesktop.org,
+        intel-wired-lan@lists.osuosl.org, iommu@lists.linux.dev,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+        linux-clk@vger.kernel.org, linux-erofs@lists.ozlabs.org,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-gpio@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-leds@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-mips@vger.kernel.org, linux-mm@kvack.org,
+        linux-modules@vger.kernel.org, linux-mtd@lists.infradead.org,
+        linux-nfs@vger.kernel.org, linux-omap@vger.kernel.org,
+        linux-phy@lists.infradead.org, linux-pm@vger.kernel.org,
+        linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org,
+        linux-security-module@vger.kernel.org, linux-sh@vger.kernel.org,
+        linux-sound@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+        linux-trace-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+        ntfs3@lists.linux.dev, samba-technical@lists.samba.org,
+        sched-ext@lists.linux.dev, target-devel@vger.kernel.org,
+        tipc-discussion@lists.sourceforge.net, v9fs@lists.linux.dev,
+        Philipp Hahn <phahn-oss@avm.de>
+Cc: "Theodore Ts'o" <tytso@mit.edu>, Andreas Dilger <adilger.kernel@dilger.ca>
+Subject: Re: [PATCH 04/61] ext4: Prefer IS_ERR_OR_NULL over manual NULL check
+Date: Fri, 10 Apr 2026 11:18:40 -0400
+Message-ID: <177583430870.2758959.6171961359325912353.b4-ty@b4>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20260310-b4-is_err_or_null-v1-4-bd63b656022d@avm.de>
+References: <20260310-b4-is_err_or_null-v1-4-bd63b656022d@avm.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260407124337.88128-1-alibuda@linux.alibaba.com>
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[mit.edu,none];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[mit.edu:s=outgoing];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-277458-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-277459-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[mit.edu:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[alibaba.com:email]
-X-Rspamd-Queue-Id: BFEE43D9329
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[tytso@mit.edu,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_GT_50(0.00)[56];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9B16A3D962D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Apr 07, 2026 at 08:43:37PM +0800, D. Wythe wrote:
-> The alloc_pages() cannot satisfy requests exceeding MAX_PAGE_ORDER,
-> and attempting such allocations will lead to guaranteed failures
-> and potential kernel warnings.
-> 
-> For SMCR_PHYS_CONT_BUFS, cap the allocation order to MAX_PAGE_ORDER.
-> This ensures the attempts to allocate the largest possible physically
-> contiguous chunk succeed, instead of failing with an invalid order.
-> This also avoids redundant "try-fail-degrade" cycles in
-> __smc_buf_create().
-> 
-> For SMCR_MIXED_BUFS, no cap is needed: if the order exceeds
-> MAX_PAGE_ORDER, alloc_pages() will silently fail (__GFP_NOWARN)
-> and automatically fall back to virtual memory.
-> 
-> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
-> Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
-> ---
-> Changes v1 -> v2:
-> https://lore.kernel.org/netdev/20260312082154.36971-1-alibuda@linux.alibaba.com/
-> 
-> - Move the bufsize cap from smcr_new_buf_create() up to
->   __smc_buf_create(), which is simpler and avoids touching
->   the allocation logic itself.
 
-The nit below notwithstanding, this looks good to me.
-
-Reviewed-by: Simon Horman <horms@kernel.org>
-
-> ---
->  net/smc/smc_core.c | 4 ++++
->  1 file changed, 4 insertions(+)
+On Tue, 10 Mar 2026 12:48:30 +0100, Philipp Hahn wrote:
+> Prefer using IS_ERR_OR_NULL() over using IS_ERR() and a manual NULL
+> check.
 > 
-> diff --git a/net/smc/smc_core.c b/net/smc/smc_core.c
-> index e2d083daeb7e..cdd881746e21 100644
-> --- a/net/smc/smc_core.c
-> +++ b/net/smc/smc_core.c
-> @@ -2440,6 +2440,10 @@ static int __smc_buf_create(struct smc_sock *smc, bool is_smcd, bool is_rmb)
->  		/* use socket send buffer size (w/o overhead) as start value */
->  		bufsize = smc->sk.sk_sndbuf / 2;
->  
-> +	/* limit bufsize for physically contiguous buffers */
-> +	if (!is_smcd && lgr->buf_type == SMCR_PHYS_CONT_BUFS)
-> +		bufsize = min_t(int, bufsize, (PAGE_SIZE << MAX_PAGE_ORDER));
+> Change generated with coccinelle.
 
-nit: I think min() is sufficient here, and the inner parentheses are
-     unnecessary
+Applied, thanks!
 
-> +
->  	for (bufsize_comp = smc_compress_bufsize(bufsize, is_smcd, is_rmb);
->  	     bufsize_comp >= 0; bufsize_comp--) {
->  		if (is_rmb) {
-> -- 
-> 2.45.0
-> 
+[04/61] ext4: Prefer IS_ERR_OR_NULL over manual NULL check
+        commit: 1d749e110277ce4103f27bd60d6181e52c0cc1e3
+
+Best regards,
+-- 
+Theodore Ts'o <tytso@mit.edu>
 
