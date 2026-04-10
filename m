@@ -1,198 +1,113 @@
-Return-Path: <netdev+bounces-277480-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277481-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cH44GvUg2WkqmggAu9opvQ
-	(envelope-from <netdev+bounces-277480-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 18:10:29 +0200
+	id oPr5C7wj2WlrmggAu9opvQ
+	(envelope-from <netdev+bounces-277481-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 18:22:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D0123DA231
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 18:10:29 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7404F3DA559
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 18:22:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 22DC73025192
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 16:10:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 50D553021E56
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 16:11:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E63A3DA7F6;
-	Fri, 10 Apr 2026 16:10:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE4643203B6;
+	Fri, 10 Apr 2026 16:11:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dikAX2jN"
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="Y3h+jL+I"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A8FF3D9023;
-	Fri, 10 Apr 2026 16:10:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 657482DD60E
+	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 16:11:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775837410; cv=none; b=N3Oa6QCgaOLTjcDXkJkZQira0IaSAnisHPJaQJxGzn7zwaJ4jPpUBkwiEQNu6eVBeRFi7wcKE2Htp9LVWmBTdZbMa9U6Gi2ut5S8m/wDLtLkaLaKsF3dCSjf/gqRxIMrVhB344GBfKvpHuy6VtnUMhITrN/ukYfedfQ8H8kZPkU=
+	t=1775837491; cv=none; b=NWkrU1ISGoixndC7rTmfxedqWWr4PTbEuUxSPSdCR6RfRcqtLRJg6JJkBO5ikro+cBMmSRkBH7LILrfLu7+sQQ7mfibH0AR5qGBmWISoFeaKmR7WetIp6H+1aMyMZ21TEfC2xfyF+Ptnnn9dKOLg/NphT7bVN+FGXZe+2diNOOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775837410; c=relaxed/simple;
-	bh=XNd1cTBZzPYsM3r8iicSJfeTerWVBa/bMKGdjtzQPyQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=iprnRwX7XIqR0BHn9Ge8b2Yo+F/NYdoDc9G+8FTu5bVIsYcggnhtUaZHQTzK/ahTJ8Lc9/LpPnCveAMbVYbuXlyoUn1EhxkpTioR7YkVmfCBwBYMIbzGf1o0IRR0t3OufNXpXvR8Vxrmxv5jYPy3n2O4db6vAjx2xD/bXU/ZTxQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dikAX2jN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4D1AC2BC87;
-	Fri, 10 Apr 2026 16:10:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775837410;
-	bh=XNd1cTBZzPYsM3r8iicSJfeTerWVBa/bMKGdjtzQPyQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=dikAX2jNfpxNoAOX+uTymI6QYeuCsrsBQgOBtHsVUAso52baCl9MBqdsCZ2XaXyrw
-	 hIhA5T3q6YtWDoe5vlsQlHHHvb3M8+ht+sP3SGjAJuYbh+Wn3MCZI5pXy5NeN+yHCU
-	 6iVIpIjKPg/A/bYg9caHMl2tOSalE/6kPVaZA0KfZxbaUrsRE3E3oO49loLRK4ytde
-	 3KA7ZZ5iLVlXUayev8cpd2cfxZC6zmtp+IWyBu7DS6E257gBMceX7GolpRW0Nb3P3O
-	 wu5PABc390llWcX75xbZ67McfimpbEhFzJWXh2fgiRNzFTW/0fEDfQmwrkuBgxyhAa
-	 q0Tun0pOMkfAA==
-From: Simon Horman <horms@kernel.org>
-To: mashiro.chen@mailbox.org
-Cc: 'Simon Horman' <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	gregkh@linuxfoundation.org,
-	ben@decadent.org.uk,
-	linux-hams@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH 3/3] net: rose: fix out-of-bounds read in rose_parse_ccitt()
-Date: Fri, 10 Apr 2026 17:10:01 +0100
-Message-ID: <20260410161001.644157-1-horms@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260407171600.102988-4-mashiro.chen@mailbox.org>
-References: <20260407171600.102988-4-mashiro.chen@mailbox.org>
+	s=arc-20240116; t=1775837491; c=relaxed/simple;
+	bh=HgXVDKCJ/yWhV5stgxUQVBx/2YLUAoG2ZWj1hbPJz4g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ndzyXYxQ/lyjQZ8KJAvIB1EakPYB4aROAO0ieMcnr2dTUfSABrlSTGpiXFdPuEC/Aiha5GiB5G/9ZKcB0LCUyPO3X9pg5mlhyFOiDCwfIqDl4Srg78hqyzDV8miQdxushDY5Ac42933WfoW9hHOsg19HIoDg/8Gqzw2T4JojYHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=Y3h+jL+I; arc=none smtp.client-ip=82.195.75.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=vWauY4MEDbOLUfnSq2co2FK59b47gPquA5iKla0DmsM=; b=Y3h+jL+It72UybWfx8Qm1H+R7s
+	CbTewanehdekD+Wdjo5ThMa/koI8suefU9I1NG6KG1ShXCJkGVobb7wupKoXO4rL7DIlDPaxhl5E+
+	OBOUqmXDRvdAiQKKqDSQ6MK/MhhrDLVAwXZDfffPflv32kBZ/isbsXiHNXXz1RHYI67oYNGMeVmBF
+	o6qLZARPrKd6yJa6SHRdrN1c8fm2BdgP3Uy9FxI9lEUXXp97Y1NV+/YBFdE72jnJFnaqylFav7ewq
+	taHjGL8NaGyvDv/ForL6Vuw8CWNdUsKUDsjJmMf060IttE0STmZh5Qo+3LdGfquLrHcNmx2Ok8mOx
+	56xxX10w==;
+Received: from authenticated user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.96)
+	(envelope-from <leitao@debian.org>)
+	id 1wBES6-00A635-13;
+	Fri, 10 Apr 2026 16:11:26 +0000
+Date: Fri, 10 Apr 2026 09:11:21 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Stanislav Fomichev <sdf.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com
+Subject: Re: [PATCH net-next v6 10/14] netdevsim: convert to
+ ndo_set_rx_mode_async
+Message-ID: <adkhGw-V9-e7F4-S@gmail.com>
+References: <20260407153101.3694714-1-sdf@fomichev.me>
+ <20260407153101.3694714-11-sdf@fomichev.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260407153101.3694714-11-sdf@fomichev.me>
+X-Debian-User: leitao
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_RHS_MATCH_TO(1.00)[];
+	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-277480-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[12];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	DMARC_NA(0.00)[debian.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 2D0123DA231
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-277481-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[debian.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,fomichev.me:email]
+X-Rspamd-Queue-Id: 7404F3DA559
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: 'Simon Horman' <horms@kernel.org>
+On Tue, Apr 07, 2026 at 08:30:57AM -0700, Stanislav Fomichev wrote:
+> Convert netdevsim from ndo_set_rx_mode to ndo_set_rx_mode_async.
+> The callback is a no-op stub so just update the signature and
+> ops struct wiring.
+> 
+> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev
----
-net: rose: fix out-of-bounds read in rose_parse_ccitt()
-
-This commit adds bounds checking to rose_parse_ccitt() for 0xC0-class
-facilities to prevent an out-of-bounds read when parsing call request
-frames. It ensures the remaining buffer contains enough bytes before
-accessing the facility data.
-
-Cc: stable@vger.kernel.org
-
-> diff --git a/net/rose/rose_subr.c b/net/rose/rose_subr.c
-> index 4dbc437a9e229..a902ddeddc5bd 100644
-> --- a/net/rose/rose_subr.c
-> +++ b/net/rose/rose_subr.c
-> @@ -370,6 +370,9 @@ static int rose_parse_ccitt(unsigned char *p, struct rose_facilities_struct *fac
->  			if (l < 10 || l > 20)
->  				return -1;
->  
-> +			if (len < 2 + l)
-> +				return -1;
-> +
->  			if (*p == FAC_CCITT_DEST_NSAP) {
->  				memcpy(&facilities->source_addr, p + 7, ROSE_ADDR_LEN);
->  				memcpy(callsign, p + 12,   l - 10);
-
-Can asc2ax() read uninitialized stack memory here?
-
-If a facility length of l = 17 is provided, memcpy() copies 7 bytes to the
-callsign array, and the 8th byte is set to null, leaving the remaining
-bytes uninitialized.
-
-When asc2ax() processes this, it consumes the first 6 bytes in its loop.
-The pointer then advances past the null byte, and the check if (*s != '\0')
-will read the 9th byte, which contains uninitialized stack garbage.
-
-Would zero-initializing the callsign array prevent this?
-
-This regression wasn't introduced by this patch, but exists in the modified
-function's loop termination logic:
-
-net/rose/rose_subr.c:rose_parse_ccitt() {
-    ...
-    } while (*p != 0x00 && len > 0);
-}
-
-Due to short-circuit evaluation, if a facility consumes the exact remaining
-bytes so that len becomes 0, will the loop dereference the pointer p before
-checking if len > 0?
-
-This would cause an out-of-bounds read past the valid facility data.
-
-Should the condition be swapped to while (len > 0 && *p != 0x00)?
-
-This regression wasn't introduced by this patch, but resides in the same
-parsing sequence:
-
-net/rose/rose_subr.c:rose_parse_facilities() {
-    ...
-    facilities_len = *p++;
-    if (facilities_len == 0 || (unsigned int)facilities_len > packet_len)
-    ...
-}
-
-Since packet_len represents the total remaining bytes including the 1-byte
-length prefix itself, and the length byte has already been consumed, only
-packet_len - 1 bytes actually remain for the facility data.
-
-If an attacker crafts a packet where facilities_len == packet_len, will
-this validation incorrectly pass?
-
-The parsing loops will then expect packet_len bytes but only have
-packet_len - 1 available, leading to an out-of-bounds read.
-
-Could this check be updated to use facilities_len >= packet_len?
-
-This regression wasn't introduced by this patch, but violates networking
-subsystem safety rules regarding socket buffers.
-
-Does the rose subsystem safely linearize socket buffers before dereferencing
-packet headers?
-
-Throughout the subsystem, including the parsing functions and routing logic,
-packet offsets are accessed directly from skb->data based only on skb->len.
-
-Since skb->len includes paged fragments, if a packet is fragmented such
-that skb_headlen(skb) is smaller than the accessed offset, could
-dereferencing skb->data trigger a page fault or read garbage memory?
-
-Would adding pskb_may_pull() checks before accessing headers resolve this?
+Reviewed-by: Breno Leitao <leitao@debian.org>
 
