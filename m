@@ -1,192 +1,131 @@
-Return-Path: <netdev+bounces-277609-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277610-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aN+DDDp/2WmjqAgAu9opvQ
-	(envelope-from <netdev+bounces-277609-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 00:52:42 +0200
+	id uKi5A26D2WmvqQgAu9opvQ
+	(envelope-from <netdev+bounces-277610-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 01:10:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FF273DD557
-	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 00:52:41 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05F643DD673
+	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 01:10:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id ABAA1304BC90
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 22:51:46 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 08912300E498
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 23:10:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 524CA340260;
-	Fri, 10 Apr 2026 22:51:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F85B343D7F;
+	Fri, 10 Apr 2026 23:10:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IM5ZA21M"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c4yH7//R"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f175.google.com (mail-dy1-f175.google.com [74.125.82.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AC2734107A
-	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 22:51:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C00F34E768
+	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 23:10:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775861504; cv=none; b=XHRceJrRVGdde40OFHTomJEMeXruVnA6x2kWX00GPAwEwVImzDnTtAM5m+534a3zI7HxrV6AY1rAsD4+2rsi4su+mTZgh/kU9nsoj0V2IUIgFxO0qIQgUGkiSDY5ssJNUlD+CKmt2BBfBG5vaiJG77DSSZDIHkUivph2jZIF5Lg=
+	t=1775862632; cv=none; b=u6EXjK29Ripr89sJf3p1uojKkqXs9zedOW05GvJydHpNJIknptGWcj9MgafgA2EtElT6q+REG+RB37G9OZOQ1ii0hi3pHj8g99yROHWeUpSbnunLLT2ixDdi+3qY7Pcdwnr04dEBahoxh20VXHJxzbIyTlYB6I156sQpkxh3W7M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775861504; c=relaxed/simple;
-	bh=Di4tu/kMFuGh2vl/5dJ4nd1Q5pkVKTyy3dHQxra9kns=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nHJVcliMqur+cJIs1tURqZdYdgvMUAMqlb/pon+DXW+CKppC7lTdwDzjzO9BJIOkyNjVoCMCcnrKyXnZcU4AJp3xywI5ybT9vRdoxnzDgah6zVaoHouJ0GprZ2oLNZyb1yW9gbfS3vLYK/ul/QEGcnLR6L5HMcQbMdk3vyyEXh4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IM5ZA21M; arc=none smtp.client-ip=74.125.82.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dy1-f175.google.com with SMTP id 5a478bee46e88-2c156c4a9efso3762953eec.1
-        for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 15:51:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775861502; x=1776466302; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=PrC7kkvkuprqe14U4AY2VBeTVieL7bWJ3KB9Z6fo1Gs=;
-        b=IM5ZA21MH6EFRXx9nO5hXyCzT8rSFEQQB65TbwpAftrKNQOhgBNyqRAKaFHFPqd/5k
-         plDQSs+0AlEyWub1MsAbQetS/kox6OeZikmDcrfDfEZW0ng4MCqn73hFt5BiTq5bozJD
-         V1bEuwC8Htpa3d19shB6usck99ShmiYZ+z/CQxwWOaYC4BnksZoVaMY3Nk/RO9HOQsX6
-         gJ078zF0xG9FZv/z4NQ4NQYqzQxu6wZJCUC6eAf9LN10gYCpRwz7+ENt91ovO1G+RUI5
-         0ijc8FN4HMGGyhsgVVxxu+/tpNSGzAMyPsMSiKS9mg6tHBB3PABCwvLbneG+88A5hFZR
-         GhOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775861502; x=1776466302;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PrC7kkvkuprqe14U4AY2VBeTVieL7bWJ3KB9Z6fo1Gs=;
-        b=QmU3BdGpEtVTGcVu0J6CnSBWLtrZ/7KofMycU0/o24pgudBqEhqaUOAjsEBPKxn0H/
-         eXVIIUucD2hTMpFL1xH3W1qB4+2JrtUzPUycozArRZX+2TQlCFI12kVxoph3LtUQcxtQ
-         l5TfsO4WS+0kocwkZekv2X2JUYsHm++JXNO5tI2h3mqsOjac7qip/vEzJ/5N3TSz/ctE
-         g4PJwaBme+2ztDwCRD4FhRgHgxZ592+oQt4tIs3jzyclCSfcjaozybdYakGZA2fGQGkl
-         FBjXJtE3UIjC3IsB5SmZ4J/g4ba+6LURQyNuJ2BDeWYj73tGB9lcdRzvxTPZUI7SEhE1
-         br1w==
-X-Forwarded-Encrypted: i=1; AJvYcCU5m3G+CGMCQO1jAXm17G4YKDQICn8hOXFp5+xigE/r+QduKk/Wrqe+S25EaevruSvzL5qYL38=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxKGNr7bGD7wFWCcDp4ZYL1yY31e0xPknvahUw5j16jfpCAa+bL
-	w2g1U0RZ+gY0tCygfYwW0kxKQe1T0zUNTMfxlvP92QJcW0ukpAsi32/l
-X-Gm-Gg: AeBDietJ1K4IpSq8T4ZYyTPsamL86MOiJ4YDv32qR5ZE4yL6gXshnHU4EsZgt5O931Z
-	4bSFOki8pz5lT2X+PjAUqcM3YSP7RPomD+WpXrzHw2JqXh8PCfOtrYVD6waNbp4V6K76uomyTME
-	LYr0vBNiHWAlZWgJ5/6AEPNNSDMyMzu9PkvW+s2T+hDu1TyuO2UeweMQg0N1evOpZx74cWE+fWY
-	eeoVzwKTkZmnR7RZRVM/BInPQg+hl/rk14AVVcOQ2NHDnHQkNXcorMBi6h20qM94N4wARg7aeFD
-	ekhc5vVvbbDhlsXCx9AbmjrE2VqAQJq2al98AvgsaYIFhc7qnzyeLOYF5xnwh1MLa481l9r4TPy
-	XPi5+B4++8W7iYPDvN1zOPiRG0a7cGZi9MPdu2SK3FZg5x2hIGLn+KXtT4QZm+3eudm9AoeT90g
-	r2MP3jWs2qIrcycambu834QktTADDgag58Z5HIy9zE6lcT+L0KlgbtV9KT0RO3VZt54PuRDxDuv
-	kdJ/1U=
-X-Received: by 2002:a05:693c:2c85:b0:2d2:cf9b:ee6e with SMTP id 5a478bee46e88-2d5895690b4mr2925275eec.22.1775861502242;
-        Fri, 10 Apr 2026 15:51:42 -0700 (PDT)
-Received: from [192.168.1.113] (c-73-151-174-35.hsd1.ca.comcast.net. [73.151.174.35])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2d55f5c6b10sm6249959eec.5.2026.04.10.15.51.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 10 Apr 2026 15:51:41 -0700 (PDT)
-Message-ID: <761f83cc-58eb-4b4a-ba91-d11412e7b2a6@gmail.com>
-Date: Fri, 10 Apr 2026 15:51:39 -0700
+	s=arc-20240116; t=1775862632; c=relaxed/simple;
+	bh=d03e/dwvqQqza4+LkOtN4S9qpgWPwtbFnEF2jM8WwD4=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=jCnRGWLmZ7sCIjzey9syXcvpuw/MDHSkGDB9lzQNOXKdE/awRRRPohIAeZxgdPgJU/5RXa1f/ZxM9Y325ptoZ9YbjGyKk21slOYPhAgEZdnJZu9BNsu4XXBmjvTFbzPqE0VWkMgch58Pda8z4GsHSyogPVIZBxtrEGxR7tS6VYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c4yH7//R; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75376C19421;
+	Fri, 10 Apr 2026 23:10:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775862631;
+	bh=d03e/dwvqQqza4+LkOtN4S9qpgWPwtbFnEF2jM8WwD4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=c4yH7//Ryte+HInfzodnE8TM+M7waoNYQV18sNZWou6kgUEXpzvAiRrcW8Q44bXWQ
+	 8UNd1k4doTFMrbPUAq4VSFR4aMfEK8lWumOrzM+p3JKDyzNbcKUzY0ujgFhLaeOPuI
+	 W3sYzccII5DOjY5jIHDOQHE1zTN6YMlIqpxN6JWdEDgY4G3aqsnBvbimojwcrcB+fN
+	 YV7WmkxQkHzrE4Q4H5nKnzj54kjjG1Lz1CtW5IT8zK1sFJUNHJhoTK/kuKqFq6uNh5
+	 wJ+LsMnsnc0xLtZS5Uh6+vZXjtd7jBxLjB/PVDVW8Bkg4mxwujDPc8+CqdbayGGaZx
+	 i93RBW3EknWCw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02CF53809A88;
+	Fri, 10 Apr 2026 23:10:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] netrom: do some basic forms of validation on incoming
- frames
-To: hugh@blemings.id.au, Kuniyuki Iwashima <kuniyu@google.com>,
- kuba@kernel.org
-Cc: davem@davemloft.net, edumazet@google.com, gregkh@linuxfoundation.org,
- horms@kernel.org, linux-hams@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, pabeni@redhat.com, stable@kernel.org,
- workflows@vger.kernel.org, yizhe@darknavy.com
-References: <20260410145448.38253e3c@kernel.org>
- <20260410221220.1708137-1-kuniyu@google.com>
- <4f5810a7-c792-4d6b-9f7c-6c6b289def19@blemings.org>
-Content-Language: en-US
-From: Craig <edfardos@gmail.com>
-In-Reply-To: <4f5810a7-c792-4d6b-9f7c-6c6b289def19@blemings.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Subject: Re: [PATCH net] net: airoha: Fix FE_PSE_BUF_SET configuration if PPE2
+ is available
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177586260580.2678602.13239417012036836659.git-patchwork-notify@kernel.org>
+Date: Fri, 10 Apr 2026 23:10:05 +0000
+References: <20260408-airoha-reg_fe_pse_buf_set-v1-1-0c4fa8f4d1d9@kernel.org>
+In-Reply-To: <20260408-airoha-reg_fe_pse_buf_set-v1-1-0c4fa8f4d1d9@kernel.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ netdev@vger.kernel.org, xuegang.lu@airoha.com
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-277609-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[14];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-277610-lists,netdev=lfdr.de,netdevbpf];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edfardos@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NO_DN(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,winlink.org:url,easymapmaker.com:url,digipi.org:url,qsl.net:url]
-X-Rspamd-Queue-Id: 9FF273DD557
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,airoha.com:email]
+X-Rspamd-Queue-Id: 05F643DD673
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-> If the main concern here is ongoing maintenance of these Ham Radio 
-> related protocols/drivers, can we pause for a moment on anything as 
-> dramatic as removing from the tree entirely ?
->
-> There is a good cohort of capable kernel folks that either are or were 
-> ham radio operators who I believe, upon realising that things have got 
-> to this point, will be happy to redouble efforts to ensure this code 
-> maintained and tested to a satisfactory standard.
->
-> Or, alternatively, as a technical community it may be that the Ham 
-> Radio interested folks conclude that out of tree or user space 
-> solutions are a better way forward as others have proposed.
->
-> Give us a few days, please, for the word to be put around that we need 
-> to pull ourselves together a bit as a technical group :)
->
+Hello:
 
-I, for one, really can't imagine pulling an entire network subsytem out 
-of the kernel without any
-knowledge of how/if/when it's used.  Like intercontinental radio 
-networks, global email, ax.25
-keyboard-to-keyboard, BBS and other emergency-communication systems 
-throughout the
-world.  If you're sure the Internet will never fail, I guess it makes 
-sense removing all of this
-since it's inconvenient to maintain.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Global AX.25 keyboard-to-keyboard on 14.105Mhz
+On Wed, 08 Apr 2026 12:20:09 +0200 you wrote:
+> airoha_fe_set routine is used to set specified bits to 1 in the selected
+> register. In the FE_PSE_BUF_SET case this can due to a overestimation of
+> the required buffers for I/O queues since we can miss to set some bits
+> of PSE_ALLRSV_MASK subfield to 0. Fix the issue relying on airoha_fe_rmw
+> routine instead.
+> 
+> Fixes: 8e38e08f2c560 ("net: airoha: fix PSE memory configuration in airoha_fe_pse_ports_init()")
+> Tested-by: Xuegang Lu <xuegang.lu@airoha.com>
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> 
+> [...]
 
-    https://qsl.net/kb9pvh/105.html
+Here is the summary with links:
+  - [net] net: airoha: Fix FE_PSE_BUF_SET configuration if PPE2 is available
+    https://git.kernel.org/netdev/net/c/02f729643959
 
-AX.25/netrom VHF routed networks spanning from Oregon to Los Angeles.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-    https://www.easymapmaker.com/map/80666c4898ec6e8fa0c35add5d03282d
-
-Global radio email using AX.25
-
-   https://winlink.org/RMSChannels (1,336 AX.25 email packet nodes on 
-the Earth and Space)
-
-This is all in operation by Amateur Radio ARES emergency 
-protocols/technologies.  This
-will not pass the headline test when it comes to Linux detractors.
-
-Most of this is running on Raspberry Pi / Linux 24/7.
-
-If we want to kill all these apps and somehow force them into user space,
-it's akin to just switching to Windows - and flounder with the Microsoft 
-folks
-trying to do the same thing.
-
-
--craig
-https://digipi.org/
 
 
