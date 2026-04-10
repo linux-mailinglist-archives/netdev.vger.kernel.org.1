@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-277542-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277543-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6B+WAiJW2WlGoggAu9opvQ
-	(envelope-from <netdev+bounces-277542-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 21:57:22 +0200
+	id AJlrHkJW2WlGoggAu9opvQ
+	(envelope-from <netdev+bounces-277543-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 21:57:54 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0215D3DC351
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 21:57:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A97253DC371
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 21:57:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 06EB6302FB5A
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 19:53:37 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 41EB2304ECDD
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 19:53:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 670323A0EBB;
-	Fri, 10 Apr 2026 19:52:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F8AE3A6EF4;
+	Fri, 10 Apr 2026 19:52:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Ig/U9x7C"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ydQXnl7D"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4E1739DBC9
-	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 19:52:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0A8E37F8D3
+	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 19:52:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775850761; cv=none; b=XIkHRsVzaSvuhmX7JNFt4FoRgNpJpIRWTczNBMTv7yi+Cft+w55v9g4s7EH33zS/87MkB+YQtbPqqavMoQKrI/dwXt1bQQX9QmdLDIk0xz5sb6CXx05oRAgCNWC76OX7C5iMe0/t0ZODFcjUVX+5eXS4JV4Edwxu6ngBLllFaTk=
+	t=1775850764; cv=none; b=qhJj4CWMCiCQDbQzCm/3XCaGJGlBE5fIc1JDSpgzIZdSVZ1y4nYFvAaJSKw6okQVFCMim/3e11PQqSwZNwypTN2aMGKA+OAcC/lLatpZpk87iUgROMHCSPgKf9uWgWVFYT8Rgw49w5WMmz+6z4eiCHi0s4J0O43CV+l2VwfdpJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775850761; c=relaxed/simple;
-	bh=do4o9qY0uLFmroGHU0FAD9AGkWE+vKquSkRX/0oiZTk=;
+	s=arc-20240116; t=1775850764; c=relaxed/simple;
+	bh=ylFosOyISRkCLcpLILfXR1jqq9ZJDl5D3Rd67XbsIZk=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=EQTu8zzA2HEh3kFx/CZUQlgGnuknndGYZ8skLuoxEQeTl44ozk5dBEjl0X82BFg0dLZ9wJmeI8OmAmpvCyCDMzU18dgTtH+JJDErp9zrfNo1zZ/cTjshB+XavRRyBbhLF43ljd7l3rk+c7bKu+fBcUYfOoT6CFzovalY85prm20=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Ig/U9x7C; arc=none smtp.client-ip=185.246.84.56
+	 In-Reply-To:To:Cc; b=PeWzTIu06Atyv21/CfJnvQ9DerRoVW1qV22JeQAKes2jyrTmKEOXEby96kQXfRTzf1wKfojW/CoiXykU/ENWQ2WXgcRYI7M/PyKkRuz6PACrGuKXAJV/ZbzOTrB/DOWR1EwtcMr7pFsGBehW9SZxPwe/sRDH60ku5csme/8J/5k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ydQXnl7D; arc=none smtp.client-ip=185.246.85.4
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 8B1761A3269;
-	Fri, 10 Apr 2026 19:52:38 +0000 (UTC)
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 9D7FF4E4294C;
+	Fri, 10 Apr 2026 19:52:41 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 5A044603F0;
-	Fri, 10 Apr 2026 19:52:38 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id E7E4B10450082;
-	Fri, 10 Apr 2026 21:52:34 +0200 (CEST)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 73708603F0;
+	Fri, 10 Apr 2026 19:52:41 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B2A6610450088;
+	Fri, 10 Apr 2026 21:52:37 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1775850757; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	t=1775850760; h=from:subject:date:message-id:to:cc:mime-version:content-type:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=prrOPMIw7nMYQCmGEiMpPgqNtOOmZZOsMRZWzN/Gv3k=;
-	b=Ig/U9x7CZBij4EB7QD3FbrOsXIok3CtJ74K5fJ2CXbcUdVyTxIbavsx8ZBpLdFLmSAgfM8
-	dcr1Qspae9YUIDSwzs2BbIUgMnT0nXQxBeZNoO2odSSlM4GXUmRtY6ONU2OhOTjnMbTntV
-	TSH4IIGNLAmGPDiOLPFnUnND2Q4JjgQIzAo61QiSbCna6+lXpq8bbJo1qfLI6ZBasv37HD
-	ahDDCLRqm8q1lcmpH9TRNdsiRBAuSWwm3DCkFcoYc1sxVDj7NwwnsgymvgppLPnZ1ZgHIS
-	03FCWnRY2GeDF4EHP/M5+/1c4pC/KSxOCGlGeLtin/P10kkAvSfRm8flqgioXg==
+	bh=lvkMSS621GEt/FKfEI0QkYcsjQ+tlBiP5wmcPdsLGHE=;
+	b=ydQXnl7DlcIUY4Zej6P4WopdUL83zZvP8IIsLJNa9mf3BKSdrcbu61xMIdYGBbbMP4C1g9
+	GaUWV4OwwR64gJ/RlT1Rnnjm3AOlNsnCHgmGGlG8uSi5FH/wjEdiuGZFL7sHKdGUl0rTpE
+	e9blU3auiCN09fz7LzJC7HOPx+V/yXUwSWAUGPAjoFuQ4naraFFZ6p393Fg7ZHWKKgQFiw
+	Aopajuh5UWcM0jclega8tfAndMfWV4EvRff0Q2VJ4lZhW39P4Vo+FWKnDUCDnbCjtIA7UU
+	zlmGtsss5pytqyCe9H/IMiP+nqlU5qDsa8HlI4Hpe3co8qalDJmwFg70M2/lDg==
 From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-Date: Fri, 10 Apr 2026 21:52:00 +0200
-Subject: [PATCH net-next v2 12/14] net: macb: re-read ISR inside IRQ
- handler locked section
+Date: Fri, 10 Apr 2026 21:52:01 +0200
+Subject: [PATCH net-next v2 13/14] net: macb: use context swapping in
+ .set_ringparam()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,7 +63,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Message-Id: <20260410-macb-context-v2-12-af39f71d40b6@bootlin.com>
+Message-Id: <20260410-macb-context-v2-13-af39f71d40b6@bootlin.com>
 References: <20260410-macb-context-v2-0-af39f71d40b6@bootlin.com>
 In-Reply-To: <20260410-macb-context-v2-0-af39f71d40b6@bootlin.com>
 To: Nicolas Ferre <nicolas.ferre@microchip.com>, 
@@ -95,7 +95,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-277542-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-277543-lists,netdev=lfdr.de];
 	FREEMAIL_TO(0.00)[microchip.com,tuxon.dev,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
@@ -113,45 +113,174 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:dkim,bootlin.com:email,bootlin.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 0215D3DC351
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,bootlin.com:dkim,bootlin.com:email,bootlin.com:mid]
+X-Rspamd-Queue-Id: A97253DC371
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The IRQ handler reads ISR register into the `status` stack variable.
-If empty, it early returns. Else, it grabs bp->lock and iterates on
-the status bits.
+ethtool_ops.set_ringparam() is implemented using the primitive close /
+update ring size / reopen sequence. Under memory pressure this does not
+fly: we free our buffers at close and cannot reallocate new ones at
+open. Also, it triggers a slow PHY reinit.
 
-If we tried grabbing bp->lock while already acquired, we might have
-slept and the status might have been updated. Our most likely
-competitor in this race (condition) is a swap operation, used in
-change_mtu and set_ringparam. It is the only MACB codepath that resets
-interrupts and HW inside a bp->lock critical section. Other codepaths
-that clear HW IRQ status do so outside the bp->lock critical section.
+Instead, exploit the new context mechanism and improve our sequence to:
+ - allocate a new context (including buffers) first
+ - if it fails, early return without any impact to the interface
+ - stop interface
+ - update global state (bp, netdev, etc)
+ - pass buffer pointers to the hardware
+ - start interface
+ - free old context.
+
+The HW disable sequence is inspired by macb_reset_hw() but avoids
+(1) setting NCR bit CLRSTAT and (2) clearing register PBUFRXCUT.
+
+The HW re-enable sequence is inspired by macb_mac_link_up(), skipping
+over register writes which would be redundant (because values have not
+changed).
+
+The generic context swapping parts are isolated into helper functions
+macb_context_swap_start|end(), reusable by other operations (change_mtu,
+set_channels, etc).
 
 Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
 ---
- drivers/net/ethernet/cadence/macb_main.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ drivers/net/ethernet/cadence/macb_main.c | 102 ++++++++++++++++++++++++++++---
+ 1 file changed, 95 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index ba7463a857dd..81beb67b206a 100644
+index 81beb67b206a..340ae7d881c6 100644
 --- a/drivers/net/ethernet/cadence/macb_main.c
 +++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -2190,6 +2190,13 @@ static irqreturn_t macb_interrupt(int irq, void *dev_id)
+@@ -3081,6 +3081,89 @@ static void macb_configure_dma(struct macb *bp)
+ 	}
+ }
  
- 	spin_lock(&bp->lock);
- 
-+	/* `status` stack variable might be stalled => re-read it */
-+	status = queue_readl(queue, ISR);
-+	if (unlikely(!status)) {
-+		spin_unlock(&bp->lock);
-+		return IRQ_NONE;
++static void macb_context_swap_start(struct macb *bp)
++{
++	struct macb_queue *queue;
++	unsigned long flags;
++	unsigned int q;
++	u32 ctrl;
++
++	/* Disable software Tx, disable HW Tx/Rx and disable NAPI. */
++
++	netif_tx_disable(bp->netdev);
++
++	spin_lock_irqsave(&bp->lock, flags);
++
++	ctrl = macb_readl(bp, NCR);
++	macb_writel(bp, NCR, ctrl & ~(MACB_BIT(RE) | MACB_BIT(TE)));
++
++	macb_writel(bp, TSR, -1);
++	macb_writel(bp, RSR, -1);
++
++	for (q = 0, queue = bp->queues; q < bp->num_queues; ++q, ++queue) {
++		queue_writel(queue, IDR, -1);
++		queue_readl(queue, ISR);
++		if (bp->caps & MACB_CAPS_ISR_CLEAR_ON_WRITE)
++			queue_writel(queue, ISR, -1);
 +	}
 +
- 	while (status) {
- 		/* close possible race with dev_close */
- 		if (unlikely(!netif_running(netdev))) {
++	spin_unlock_irqrestore(&bp->lock, flags);
++
++	for (q = 0, queue = bp->queues; q < bp->num_queues; ++q, ++queue) {
++		napi_disable(&queue->napi_rx);
++		napi_disable(&queue->napi_tx);
++		netdev_tx_reset_queue(netdev_get_tx_queue(bp->netdev, q));
++		cancel_work_sync(&queue->tx_error_task);
++	}
++
++	cancel_work_sync(&bp->hresp_err_bh_work);
++	cancel_delayed_work_sync(&bp->tx_lpi_work);
++}
++
++static void macb_context_swap_end(struct macb *bp,
++				  struct macb_context *new_ctx)
++{
++	struct macb_context *old_ctx;
++	struct macb_queue *queue;
++	unsigned int q;
++	u32 ctrl;
++
++	/* Swap contexts & give buffer pointers to HW. */
++
++	old_ctx = bp->ctx;
++	bp->ctx = new_ctx;
++	macb_init_buffers(bp);
++
++	/* Start NAPI, HW Tx/Rx and software Tx. */
++
++	for (q = 0, queue = bp->queues; q < bp->num_queues; ++q, ++queue) {
++		napi_enable(&queue->napi_rx);
++		napi_enable(&queue->napi_tx);
++	}
++
++	macb_configure_dma(bp);
++
++	if (!(bp->caps & MACB_CAPS_MACB_IS_EMAC)) {
++		for (q = 0, queue = bp->queues; q < bp->num_queues;
++		     ++q, ++queue) {
++			queue_writel(queue, IER,
++				     bp->rx_intr_mask |
++				     MACB_TX_INT_FLAGS |
++				     MACB_BIT(HRESP));
++		}
++	}
++
++	ctrl = macb_readl(bp, NCR);
++	macb_writel(bp, NCR, ctrl | MACB_BIT(RE) | MACB_BIT(TE));
++
++	netif_tx_start_all_queues(bp->netdev);
++
++	/* Free old context. */
++
++	macb_free_consistent(old_ctx);
++	kfree(old_ctx);
++}
++
+ static void macb_init_hw(struct macb *bp)
+ {
+ 	u32 config;
+@@ -3804,9 +3887,10 @@ static int macb_set_ringparam(struct net_device *netdev,
+ 			      struct kernel_ethtool_ringparam *kernel_ring,
+ 			      struct netlink_ext_ack *extack)
+ {
++	unsigned int new_rx_size, new_tx_size;
+ 	struct macb *bp = netdev_priv(netdev);
+-	u32 new_rx_size, new_tx_size;
+-	unsigned int reset = 0;
++	bool running = netif_running(netdev);
++	struct macb_context *new_ctx;
+ 
+ 	if ((ring->rx_mini_pending) || (ring->rx_jumbo_pending))
+ 		return -EINVAL;
+@@ -3825,16 +3909,20 @@ static int macb_set_ringparam(struct net_device *netdev,
+ 		return 0;
+ 	}
+ 
+-	if (netif_running(bp->netdev)) {
+-		reset = 1;
+-		macb_close(bp->netdev);
++	if (running) {
++		new_ctx = macb_context_alloc(bp, netdev->mtu,
++					     new_rx_size, new_tx_size);
++		if (IS_ERR(new_ctx))
++			return PTR_ERR(new_ctx);
++
++		macb_context_swap_start(bp);
+ 	}
+ 
+ 	bp->configured_rx_ring_size = new_rx_size;
+ 	bp->configured_tx_ring_size = new_tx_size;
+ 
+-	if (reset)
+-		macb_open(bp->netdev);
++	if (running)
++		macb_context_swap_end(bp, new_ctx);
+ 
+ 	return 0;
+ }
 
 -- 
 2.53.0
