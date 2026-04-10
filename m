@@ -1,91 +1,91 @@
-Return-Path: <netdev+bounces-277526-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277527-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id Pwk3OvFQ2WmooQgAu9opvQ
-	(envelope-from <netdev+bounces-277526-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 21:35:13 +0200
+	id eGreFj1R2WmooQgAu9opvQ
+	(envelope-from <netdev+bounces-277527-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 21:36:29 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38B743DC077
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 21:35:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AD5523DC087
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 21:36:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 872AD3004F50
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 19:35:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 311523004C79
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 19:36:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7386431E832;
-	Fri, 10 Apr 2026 19:35:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6972363C40;
+	Fri, 10 Apr 2026 19:36:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="I4ruxAHc"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Q2P+NXWY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f99.google.com (mail-oa1-f99.google.com [209.85.160.99])
+Received: from mail-yx1-f100.google.com (mail-yx1-f100.google.com [74.125.224.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B9412F12AF
-	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 19:35:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C91312D23A4
+	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 19:36:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775849707; cv=none; b=IeyqumxjFJuHQCewL5AKxNQuq+wLGPhIBug9vRzdI0IcIWM8t0xkw/YDKiUhcTcZw1JC3GE7WbrqPL9ankOGFxtIQxipXMpbsuKxFhJmcErBNGFMwA6jGJY2zMLgAT82AT/otRPS8rIGkhBLAduNiaHWndGqaTGwOCjg3i5oOeI=
+	t=1775849785; cv=none; b=pr+cwZm3c97eUu7F9qgkzvz77zNE3e04ld4vea5vJ/0oADpeWP/MpSEvfA76nmlaQmbtTElbC33iSqFIFkQMfSqKLWiTN8KbtNEbRFf36GK+ar+MMJpdNoIR881tNge2HS9K9pgczt5LeJX2/r8JAICNudQCdTIN/16f0Dj4gTw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775849707; c=relaxed/simple;
-	bh=f1HoDsB8R7IJohfCWyIQcg6mbyOTTSj/m9M+CxqMbuI=;
+	s=arc-20240116; t=1775849785; c=relaxed/simple;
+	bh=dDlD0ekMk0ItB2FaL/tmdZegA8Fk/8GLGu2VhDw/rQY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GXRw1h3vhsHdWgsd5K1apzFw1MO4NY37ek+gOiqikDZdz07KkskT1M/d7KYily5faM4o60p1bY68RfVOIdweRj8+ExczubfTzBmePXgZkydA3OU8urnc834e6KdzdVMTRp1bztfvWbxgOvZkD6jweea/I6fsj9JW+pNH1OTSGGY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=I4ruxAHc; arc=none smtp.client-ip=209.85.160.99
+	 To:Cc:Content-Type; b=W1+vo1MveUiXHEMG50lhAaoW8SqgeRy9J7xKoXNKlXP4cQILPKuSujCtmnaNNJFNNcbjB+Zy88VfsJ0NyK7vEfOEYEmtG+hceJjadlME8T9dvk1QypcaCtxn4BFjBtsfJtGRZGSCB91F0mTxXejXJeZHBlraI9t1OvdXtNEW0Hs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Q2P+NXWY; arc=none smtp.client-ip=74.125.224.100
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-oa1-f99.google.com with SMTP id 586e51a60fabf-40ea611d1a4so1119015fac.2
-        for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 12:35:05 -0700 (PDT)
+Received: by mail-yx1-f100.google.com with SMTP id 956f58d0204a3-6507a7d2eccso2541521d50.0
+        for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 12:36:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775849704; x=1776454504;
+        d=1e100.net; s=20251104; t=1775849781; x=1776454581;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Wb+SROsG8Qx3Kqg1xXWTzNrP8Z8K7i6BAoEVOF2edjc=;
-        b=Qp1v+mbozZfLcE+3GnLozmLt7FWXQzIR6w4jwV133FLAfAI9otN0grPbklizj9U2X4
-         lhUqoBn0sEcpIiwzowqVkz2GCm67XcyBRHi/8+Fh/rRomX9ZgzAQQwXEDNuuqGOg9vhY
-         wU8cytame7NbO8AY8uYS3wnE0NfHEedWVcGsVC0iOEwwI3nYZcw9i55qi/oPhmiNnzej
-         KvTaLXxWyhAv6geNoVjXbbxDsNyT3irg5FP577JkmacWv1a750N2n4TPxgmjLK0VKLLi
-         f7TCYMCeIQrPmNcvVr3Rkqf8uh3Iqkfj25LRSgqIQtOt6AIwQomwui3o9p8+h74t3xiC
-         9rww==
-X-Forwarded-Encrypted: i=1; AJvYcCVzjE1uk3N0MougANBAZWLU9EOKUelPm+AqXHspOnmeMXV9xk35rEbhoczLFNUmdjAc3qGsGBE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyvzdl4xk9370+Ol1BqeG7AtNY2XGEthhspnx+bTX4mq4FpFXXZ
-	sNBjAAYnsTUrb0M5ecDNhD2tqAvLnkH93EwjEzvLiOvhsLRyn7hABH4yxDESGIYe3RCfO2diKH9
-	3lIASHHMNFr9sqR1qJ7lyk8gQxmsYmBWpoxaZ1BtTU/irgMHz5fSGeYKauXTYxk0HGYDGw1ZEhM
-	4zEWgE1WLNLCjaypuMJbN+rgdXmuhjb4DLriY1s3lHSChOsQPrKbDyIgUhJeytxkNroLZsJKwy1
-	0HzxJWjIFnpvNdHNQ==
-X-Gm-Gg: AeBDieslirvnWmy5ziDvsTmB6NNvnim0/0qsnBbH+o6WFOIAPIPJSCUoHAZqJUW8XIP
-	0Pt0O3Gzi3dSvznW9anxhP3pdzXA7F/itYlWfJP/9JYpV82ucbfnI+e3hKs8XrpfOefCfnAbniW
-	YKwoQHHc6K5src+rGUGT1keLauikr2sOObWlD41TLIo8PE0Riw+lWN4bpOhukg5M4OJrWQPnDWA
-	RPrs4+4vwTl2oCXLfOLEGD/2lG/I3J8XOby8C4Ug5Ee+22M9IfFfbBF35QiViZ36R2Lko8PZegp
-	vnyHclcG0uG3KZI6lAzaM3GBn/45tTCZtitCsZIo2ixlDUlyf0z0KKYxhZy8hzci929qBRmB0LW
-	drSWFaainI20sDZs3WNmzN3w7s/o3N+VprjWP5R0XpngUqUiZRtRFUuDbqyyatjRjRo5l3vubrP
-	EAywGE9ad2KWBVbw2E3u7NcoHiVFP2/MHXd0K2Fu5u6QQOo1mymoFKlB3NMlnph0o=
-X-Received: by 2002:a05:6820:150e:b0:67c:9f59:23ee with SMTP id 006d021491bc7-68be604b1e8mr2167866eaf.14.1775849704391;
-        Fri, 10 Apr 2026 12:35:04 -0700 (PDT)
+        bh=Q2ljyW6OPnEiB9mquya6D4czdB/tly6I+iISG80bbGU=;
+        b=RPoQOYNOV7sv7BktWm2Kf9Wvl9IaqOFlyUTxS2GOqH4O/Hz190ELYIrLGWBi1FTf/5
+         fvwEPajpAAeXggqiZtiTSIMmfqTc1bvcJMUfVVt+dKE22AxvOc5SoruRH0VSRVclciGn
+         gZWGN7zPvSwsH1nXMD49RedWMy1FSLjte3eFqifbhgRuIi39Aceftbv0cuTnN5OOEYPV
+         SpOYljRmJQg3rZlT3gMgBUTI6yrmOiUgGK3INl8bEr2NPpfF/LoNN5Pu3EI+K/KNBatC
+         5SO94IgMtmp52WgL0/1kfA/i69zdoqDCuT7tt0utfTXOdQwrOVf5HtyvouM04nziTBXI
+         u4tg==
+X-Forwarded-Encrypted: i=1; AJvYcCVE1nKRmBF/8929VzUx5oGORAehm2C39u3i1jMTM+NrcqId/HJrQOheyypiBp2g4+tMr7QsQBQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwGqJ6z0gVBjl29JmQu2ygeY7QPGMaeF4NTgdvRfEJ6BWrHObRD
+	/C0In3ceq5sBRpN7V2d0zw0uYSNJEKFLqn3z3RQ91IEpJEbNOrjaQhedJhDp9k5+C+yAjXAXJRW
+	cmOKTkPfqbWEEGiAJ7Ttu4MqNWpmOIwTzTE329p9e+cs13QnkQQN0MXe8u4spBH4TcnkrsRC3lJ
+	gc3mlT/8f8h+LgWGctYAtIFotvl4N7QJl9o4Uxi0/EPKuIZ/UBpArLzIFUMhECmo0lSQi1xWRH8
+	QUT7y3REtCXmPLeYg==
+X-Gm-Gg: AeBDietlEd2PDZAgr2R/aGZBL98bhF/ioHy/XPp5f5lpqzs1/JRm0rzBtlvfjkQnVgB
+	pkqK5RwUDpiVIsHZQZT2Ios6EZtC/w5YI+JFwsGaGC810CYSk4zAtz1jbK1DttKLnYv+tMZI17R
+	UIqtErpac4hXAEOvozgEUDIhF7TklnKOD7oXPkLZQFpqIYGF5JVHuqb4zVSHrrZWNOCLipK8NjB
+	N9lQ89lVpWFpnL/0wIFogRUqQfj8YRTbVZjsZpvMk8nzk+tS5S5YpAzorMIdicfslKEjtBrAxKH
+	fY4CtRr+cPJZ/W3e4ribNNsLKRw2bSvmNQ10ThN6ItYmniBaf8Hvc5ajCTaiAnm9Mi1yDdS2zNi
+	nAs12G3oryhzTrsj3vkZrpQPlY/M7FCbMRQGhSslR2O976+YB6VTjTVe7M8rxC+SjKMvPHWCeIZ
+	imcwBDceAV5oUVDHMMFZaIfCJFlt1u9kOguiUEJQNA6n63FzYKI0C1IT6U9t7gQHM=
+X-Received: by 2002:a05:690e:480d:b0:64d:568b:bcc1 with SMTP id 956f58d0204a3-65198a2bdd1mr3049546d50.3.1775849781262;
+        Fri, 10 Apr 2026 12:36:21 -0700 (PDT)
 Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-15.dlp.protect.broadcom.com. [144.49.247.15])
-        by smtp-relay.gmail.com with ESMTPS id 006d021491bc7-68bca5f9493sm266343eaf.13.2026.04.10.12.35.04
+        by smtp-relay.gmail.com with ESMTPS id 956f58d0204a3-65197c6cadfsm242873d50.27.2026.04.10.12.36.21
         for <netdev@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 10 Apr 2026 12:35:04 -0700 (PDT)
+        Fri, 10 Apr 2026 12:36:21 -0700 (PDT)
 X-Relaying-Domain: broadcom.com
 X-CFilter-Loop: Reflected
-Received: by mail-yw1-f197.google.com with SMTP id 00721157ae682-794b74a8b2bso56912917b3.3
-        for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 12:35:03 -0700 (PDT)
+Received: by mail-yw1-f199.google.com with SMTP id 00721157ae682-7949310b90cso53599787b3.2
+        for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 12:36:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1775849703; x=1776454503; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1775849780; x=1776454580; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Wb+SROsG8Qx3Kqg1xXWTzNrP8Z8K7i6BAoEVOF2edjc=;
-        b=I4ruxAHcr3U+WVRargf4ZyVulNk/atGKqz21QeKWn3lgHx10pliojsDoA0GOvjtPzI
-         eHF4FvuCg2frCQFY6NhqurgnUBkZx9W4oORu9mmNSMUYt/wbHaLsq0CyKuOaXZfX11PI
-         uJ1Uz/3wtSGPlIM8r0zNiZirrCJH+tU+iqcLw=
-X-Forwarded-Encrypted: i=1; AJvYcCV1Jv+xjl2NU2eAXyn53fly42ax3QN6V5LXnEDGu4uEG6/mSFQqe7DbMeToZ2J5kP+uObGZIC4=@vger.kernel.org
-X-Received: by 2002:a05:690c:dd4:b0:7a2:ce0e:8635 with SMTP id 00721157ae682-7af6f9fe04dmr52246917b3.19.1775849703322;
-        Fri, 10 Apr 2026 12:35:03 -0700 (PDT)
-X-Received: by 2002:a05:690c:dd4:b0:7a2:ce0e:8635 with SMTP id
- 00721157ae682-7af6f9fe04dmr52246477b3.19.1775849702825; Fri, 10 Apr 2026
- 12:35:02 -0700 (PDT)
+        bh=Q2ljyW6OPnEiB9mquya6D4czdB/tly6I+iISG80bbGU=;
+        b=Q2P+NXWYJA7jL/HPlnQMoM0onvea0hTLPntB20puSSTUDjgaLiGfJ/77cNaszj757n
+         AmJlzvsDVZ2m9+taPY3dXUCHfy6WaRVoBiu4zVkd4QmbRc0S8M4kcy2vtqrC2QSma2Tv
+         6nYw/O1iq8tJuWTM7Vb30z6E9cSLwCStGX6Gc=
+X-Forwarded-Encrypted: i=1; AJvYcCUdcBb3ALwdIZ969eVoPM73AWV6l1zxqKtKIxluqh9Nrl/N/eIj/lUs3Q4/LK1QaRp/WWZvSZw=@vger.kernel.org
+X-Received: by 2002:a05:690c:dc3:b0:79a:d32c:790 with SMTP id 00721157ae682-7af724326d7mr52630767b3.48.1775849780574;
+        Fri, 10 Apr 2026 12:36:20 -0700 (PDT)
+X-Received: by 2002:a05:690c:dc3:b0:79a:d32c:790 with SMTP id
+ 00721157ae682-7af724326d7mr52630427b3.48.1775849780182; Fri, 10 Apr 2026
+ 12:36:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,329 +94,79 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20260406222305.4111170-1-akhilesh.samineni@broadcom.com>
  <20260406222305.4111170-2-akhilesh.samineni@broadcom.com> <willemdebruijn.kernel.1d7f9f774aa55@gmail.com>
-In-Reply-To: <willemdebruijn.kernel.1d7f9f774aa55@gmail.com>
+ <20260407180432.102073cf@kernel.org>
+In-Reply-To: <20260407180432.102073cf@kernel.org>
 From: Akhilesh Samineni <akhilesh.samineni@broadcom.com>
-Date: Sat, 11 Apr 2026 01:04:50 +0530
-X-Gm-Features: AQROBzCqdOiSFH2V3TG8W02uXCgbqpPrtGMxtmXtaLTUqiJAPT0IFIjUnfMkNLo
-Message-ID: <CANQF7iDycps5vpReLMCKeDVELAQSTcdiKM4ULqkc7XO59rHTxw@mail.gmail.com>
+Date: Sat, 11 Apr 2026 01:06:06 +0530
+X-Gm-Features: AQROBzCIozj4hBJgBy-QH_tlL2EHdp435jZupUh_xCe3Eak5lGeRPb2LU0YRva8
+Message-ID: <CANQF7iDj1E6=3pod078-++5wbweyMg0H7gpeq0kbGFZHNytDdA@mail.gmail.com>
 Subject: Re: [PATCH net-next 1/3] psp: add crypt-offset and spi-threshold
  get/set attributes
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, 
-	willemb@google.com, daniel.zahka@gmail.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, jayakrishnan.udayavarma@broadcom.com, 
-	ajit.khaparde@broadcom.com, kiran.kella@broadcom.com, 
-	sachin.suman@broadcom.com
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, davem@davemloft.net, 
+	edumazet@google.com, pabeni@redhat.com, andrew+netdev@lunn.ch, 
+	horms@kernel.org, willemb@google.com, daniel.zahka@gmail.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	jayakrishnan.udayavarma@broadcom.com, ajit.khaparde@broadcom.com, 
+	kiran.kella@broadcom.com, sachin.suman@broadcom.com
 X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000c5dcab064f203ab5"
+	boundary="0000000000005e09dd064f203fe9"
 X-Spamd-Result: default: False [-2.76 / 15.00];
 	SIGNED_SMIME(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
 	MAILLIST(-0.15)[generic];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-277526-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-277527-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[15];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[broadcom.com:+];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,redhat.com,lunn.ch,kernel.org,vger.kernel.org,broadcom.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	HAS_ATTACHMENT(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[akhilesh.samineni@broadcom.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,lunn.ch,gmail.com,vger.kernel.org,broadcom.com];
+	DKIM_TRACE(0.00)[broadcom.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,broadcom.com:dkim,broadcom.com:email]
-X-Rspamd-Queue-Id: 38B743DC077
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,broadcom.com:dkim,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: AD5523DC087
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
---000000000000c5dcab064f203ab5
+--0000000000005e09dd064f203fe9
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 8, 2026 at 3:07=E2=80=AFAM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
+On Wed, Apr 8, 2026 at 6:34=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
+te:
 >
-> Akhilesh Samineni wrote:
-> > crypt-offset (Crypt Offset)
-> > ----------------------------------
-> > The crypt-offset attribute specifies the byte offset within a packet
-> > from which encryption begins. This is a per-device attribute that
-> > allows a portion of the packet header to remain in plaintext while
-> > the rest of the payload is encrypted. This is useful in scenarios
-> > where intermediate nodes need to inspect or process a fixed-size
-> > header before the encrypted payload.
+> On Tue, 07 Apr 2026 17:37:41 -0400 Willem de Bruijn wrote:
+> > > +   if (info->attrs[PSP_A_DEV_CRYPT_OFFSET])
+> > > +           new_config.crypt_offset =3D
+> > > +                   nla_get_u8(info->attrs[PSP_A_DEV_CRYPT_OFFSET]);
 > >
-> > The default value is 0, meaning encryption starts from the beginning
-> > of the payload following the PSP header.
-> >
-> > spi-threshold (SPI Threshold)
-> > ------------------------------
-> > The SPI (Security Parameter Index) is a 32-bit per-device identifier
-> > used to distinguish security associations. As SPI values are allocated
-> > monotonically, a threshold is needed to trigger timely SPI rotation
-> > before the space is exhausted.
-> >
-> > The spi-threshold attribute allows userspace to configure the value at
-> > which an SPI rotation should be initiated. The default is set to
-> > PSP_SPI_THRESHOLD_DEFAULT (~90% of 0x7FFFFFFF), providing a comfortable
-> > margin to perform rotation without racing to exhaustion.
-> >
-> > NOTE: A follow-up series will add notification support to alert
-> > subscribed users when the configured spi-threshold is reached, enabling
-> > timely SPI rotation.
-> >
-> > Signed-off-by: Akhilesh Samineni <akhilesh.samineni@broadcom.com>
-> > Reviewed-by: Kiran Kella <kiran.kella@broadcom.com>
-> > Reviewed-by: Ajit Kumar Khaparde <ajit.khaparde@broadcom.com>
-> > ---
-> >  Documentation/netlink/specs/psp.yaml | 13 +++++++++++++
-> >  include/net/psp/types.h              |  7 +++++++
-> >  include/uapi/linux/psp.h             |  2 ++
-> >  net/psp/psp-nl-gen.c                 |  6 ++++--
-> >  net/psp/psp_main.c                   |  3 +++
-> >  net/psp/psp_nl.c                     | 27 +++++++++++++++++++++++----
-> >  6 files changed, 52 insertions(+), 6 deletions(-)
-> >
-> > diff --git a/Documentation/netlink/specs/psp.yaml b/Documentation/netli=
-nk/specs/psp.yaml
-> > index f3a57782d2cf..b22869be91cf 100644
-> > --- a/Documentation/netlink/specs/psp.yaml
-> > +++ b/Documentation/netlink/specs/psp.yaml
-> > @@ -38,6 +38,15 @@ attribute-sets:
-> >          type: u32
-> >          enum: version
-> >          enum-as-flags: true
-> > +      -
-> > +        name: crypt-offset
-> > +        doc: The offset from the end of the PSP header to the start of=
- the encrypted payload.
+> > PSP defines a 6-bit field in 4 octet units. Does this need bounds check=
+ing?
 >
-> In 4 octet units?
->
+> More fundamentally, were we to support this -- is it a device property
+> or an assoc property?
 
-Yes. crypt-offset is in 4 octet units only. I will update the
-description accordingly in the next v2 patch.
+It's a device property. All associations under the device will share
+the same crypt-offset.
 
-> > +        type: u8
-> > +      -
-> > +        name: spi-threshold
-> > +        doc: Threshold for the SPI to trigger notification to the user=
- for appropriate rotate action.
-> > +        type: u32
-> > +
-> >    -
-> >      name: assoc
-> >      attributes:
-> > @@ -170,6 +179,8 @@ operations:
-> >              - ifindex
-> >              - psp-versions-cap
-> >              - psp-versions-ena
-> > +            - crypt-offset
-> > +            - spi-threshold
-> >          pre: psp-device-get-locked
-> >          post: psp-device-unlock
-> >        dump:
-> > @@ -193,6 +204,8 @@ operations:
-> >            attributes:
-> >              - id
-> >              - psp-versions-ena
-> > +            - crypt-offset
-> > +            - spi-threshold
-> >          reply:
-> >            attributes: []
-> >          pre: psp-device-get-locked
-> > diff --git a/include/net/psp/types.h b/include/net/psp/types.h
-> > index 25a9096d4e7d..875f7822557f 100644
-> > --- a/include/net/psp/types.h
-> > +++ b/include/net/psp/types.h
-> > @@ -25,6 +25,9 @@ struct psphdr {
-> >  #define PSP_SPI_KEY_ID               GENMASK(30, 0)
-> >  #define PSP_SPI_KEY_PHASE    BIT(31)
-> >
-> > +/* Default SPI threshold: ~90% of max SPI (0x7FFFFFFF) to allow rotati=
-on before exhaustion */
-> > +#define PSP_SPI_THRESHOLD_DEFAULT    0x73333333
->
-> Do you want to choose a more round number, in either hex or dec?
->
-
-I think we can use 0x70000000; it's approximately 87.5% of the maximum SPI.
-
-> > +
-> >  #define PSPHDR_CRYPT_OFFSET  GENMASK(5, 0)
-> >
-> >  #define PSPHDR_VERFL_SAMPLE  BIT(7)
-> > @@ -38,9 +41,13 @@ struct psphdr {
-> >  /**
-> >   * struct psp_dev_config - PSP device configuration
-> >   * @versions: PSP versions enabled on the device
-> > + * @crypt_offset: crypto offset configured on the device
-> > + * @spi_threshold: SPI threshold value on the device
-> >   */
-> >  struct psp_dev_config {
-> >       u32 versions;
-> > +     u8 crypt_offset;
-> > +     u32 spi_threshold;
-> >  };
-> >
-> >  /**
-> > diff --git a/include/uapi/linux/psp.h b/include/uapi/linux/psp.h
-> > index a3a336488dc3..bb390159dc72 100644
-> > --- a/include/uapi/linux/psp.h
-> > +++ b/include/uapi/linux/psp.h
-> > @@ -22,6 +22,8 @@ enum {
-> >       PSP_A_DEV_IFINDEX,
-> >       PSP_A_DEV_PSP_VERSIONS_CAP,
-> >       PSP_A_DEV_PSP_VERSIONS_ENA,
-> > +     PSP_A_DEV_CRYPT_OFFSET,
-> > +     PSP_A_DEV_SPI_THRESHOLD,
-> >
-> >       __PSP_A_DEV_MAX,
-> >       PSP_A_DEV_MAX =3D (__PSP_A_DEV_MAX - 1)
-> > diff --git a/net/psp/psp-nl-gen.c b/net/psp/psp-nl-gen.c
-> > index 22a48d0fa378..e50b8b80955c 100644
-> > --- a/net/psp/psp-nl-gen.c
-> > +++ b/net/psp/psp-nl-gen.c
-> > @@ -23,9 +23,11 @@ static const struct nla_policy psp_dev_get_nl_policy=
-[PSP_A_DEV_ID + 1] =3D {
-> >  };
-> >
-> >  /* PSP_CMD_DEV_SET - do */
-> > -static const struct nla_policy psp_dev_set_nl_policy[PSP_A_DEV_PSP_VER=
-SIONS_ENA + 1] =3D {
-> > +static const struct nla_policy psp_dev_set_nl_policy[PSP_A_DEV_SPI_THR=
-ESHOLD + 1] =3D {
-> >       [PSP_A_DEV_ID] =3D NLA_POLICY_MIN(NLA_U32, 1),
-> >       [PSP_A_DEV_PSP_VERSIONS_ENA] =3D NLA_POLICY_MASK(NLA_U32, 0xf),
-> > +     [PSP_A_DEV_CRYPT_OFFSET] =3D { .type =3D NLA_U8, },
-> > +     [PSP_A_DEV_SPI_THRESHOLD] =3D { .type =3D NLA_U32, },
-> >  };
-> >
-> >  /* PSP_CMD_KEY_ROTATE - do */
-> > @@ -75,7 +77,7 @@ static const struct genl_split_ops psp_nl_ops[] =3D {
-> >               .doit           =3D psp_nl_dev_set_doit,
-> >               .post_doit      =3D psp_device_unlock,
-> >               .policy         =3D psp_dev_set_nl_policy,
-> > -             .maxattr        =3D PSP_A_DEV_PSP_VERSIONS_ENA,
-> > +             .maxattr        =3D PSP_A_DEV_SPI_THRESHOLD,
-> >               .flags          =3D GENL_CMD_CAP_DO,
-> >       },
-> >       {
-> > diff --git a/net/psp/psp_main.c b/net/psp/psp_main.c
-> > index 9508b6c38003..536ee44db09d 100644
-> > --- a/net/psp/psp_main.c
-> > +++ b/net/psp/psp_main.c
-> > @@ -79,6 +79,9 @@ psp_dev_create(struct net_device *netdev,
-> >       INIT_LIST_HEAD(&psd->stale_assocs);
-> >       refcount_set(&psd->refcnt, 1);
-> >
-> > +     /* ~90% of 0x7FFFFFFF; allows SPI rotation well before space is e=
-xhausted */
->
-> Repeat comment. Not needed here.
->
-
-Ack
-
-> > +     psd->config.spi_threshold =3D PSP_SPI_THRESHOLD_DEFAULT;
-> > +
-> >       mutex_lock(&psp_devs_lock);
-> >       err =3D xa_alloc_cyclic(&psp_devs, &psd->id, psd, xa_limit_16b,
-> >                             &last_id, GFP_KERNEL);
-> > diff --git a/net/psp/psp_nl.c b/net/psp/psp_nl.c
-> > index 6afd7707ec12..fbb77460a24b 100644
-> > --- a/net/psp/psp_nl.c
-> > +++ b/net/psp/psp_nl.c
-> > @@ -101,7 +101,9 @@ psp_nl_dev_fill(struct psp_dev *psd, struct sk_buff=
- *rsp,
-> >       if (nla_put_u32(rsp, PSP_A_DEV_ID, psd->id) ||
-> >           nla_put_u32(rsp, PSP_A_DEV_IFINDEX, psd->main_netdev->ifindex=
-) ||
-> >           nla_put_u32(rsp, PSP_A_DEV_PSP_VERSIONS_CAP, psd->caps->versi=
-ons) ||
-> > -         nla_put_u32(rsp, PSP_A_DEV_PSP_VERSIONS_ENA, psd->config.vers=
-ions))
-> > +         nla_put_u32(rsp, PSP_A_DEV_PSP_VERSIONS_ENA, psd->config.vers=
-ions) ||
-> > +         nla_put_u8(rsp, PSP_A_DEV_CRYPT_OFFSET, psd->config.crypt_off=
-set) ||
-> > +         nla_put_u32(rsp, PSP_A_DEV_SPI_THRESHOLD, psd->config.spi_thr=
-eshold))
-> >               goto err_cancel_msg;
-> >
-> >       genlmsg_end(rsp, hdr);
-> > @@ -193,6 +195,13 @@ int psp_nl_dev_set_doit(struct sk_buff *skb, struc=
-t genl_info *info)
-> >
-> >       memcpy(&new_config, &psd->config, sizeof(new_config));
-> >
-> > +     if (!info->attrs[PSP_A_DEV_PSP_VERSIONS_ENA] &&
-> > +         !info->attrs[PSP_A_DEV_CRYPT_OFFSET] &&
-> > +         !info->attrs[PSP_A_DEV_SPI_THRESHOLD]) {
-> > +             NL_SET_ERR_MSG(info->extack, "No settings present");
-> > +             return -EINVAL;
-> > +     }
-> > +
-> >       if (info->attrs[PSP_A_DEV_PSP_VERSIONS_ENA]) {
-> >               new_config.versions =3D
-> >                       nla_get_u32(info->attrs[PSP_A_DEV_PSP_VERSIONS_EN=
-A]);
-> > @@ -200,9 +209,19 @@ int psp_nl_dev_set_doit(struct sk_buff *skb, struc=
-t genl_info *info)
-> >                       NL_SET_ERR_MSG(info->extack, "Requested PSP versi=
-ons not supported by the device");
-> >                       return -EINVAL;
-> >               }
-> > -     } else {
-> > -             NL_SET_ERR_MSG(info->extack, "No settings present");
-> > -             return -EINVAL;
-> > +     }
-> > +
-> > +     if (info->attrs[PSP_A_DEV_CRYPT_OFFSET])
-> > +             new_config.crypt_offset =3D
-> > +                     nla_get_u8(info->attrs[PSP_A_DEV_CRYPT_OFFSET]);
->
-> PSP defines a 6-bit field in 4 octet units. Does this need bounds checkin=
-g?
->
-
- Yes, I will add the bound checks in the next v2 patch.
-> > +
-> > +     if (info->attrs[PSP_A_DEV_SPI_THRESHOLD]) {
-> > +             new_config.spi_threshold =3D
-> > +                     nla_get_u32(info->attrs[PSP_A_DEV_SPI_THRESHOLD])=
-;
-> > +             if (new_config.spi_threshold & PSP_SPI_KEY_PHASE) {
-> > +                     NL_SET_ERR_MSG(info->extack, "SPI threshold must =
-not have bit 31 set");
-> > +                     return -EINVAL;
-> > +             }
-> >       }
-> >
-> >       rsp =3D psp_nl_reply_new(info);
-> > --
-> > 2.45.4
-> >
->
->
-
---000000000000c5dcab064f203ab5
+--0000000000005e09dd064f203fe9
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -487,14 +237,14 @@ Hk+3d71Ie1w8r5QiYuGOgGhNWbfhc5aVZUENjC+zlYStnReq3uZcf/oziznbvTX38pyuhVsuHFSo
 xSAQfSnXdfTNfF36dQxm8Az8xhjNmD04jilAg+UVGs7xWqnIkFChNe8pykTtDwdrkjzaaISKeUDj
 4fW8f5qx0B4xggJgMIICXAIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWdu
 IG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIw
-AgwiN/FaHolhyJo3T4wwDQYJYIZIAWUDBAIBBQCggccwLwYJKoZIhvcNAQkEMSIEIKkdGKPjkVBb
-o8BY/uZcx60KDCygwelDFaVJzLDMYXPMMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZI
-hvcNAQkFMQ8XDTI2MDQxMDE5MzUwM1owXAYJKoZIhvcNAQkPMU8wTTALBglghkgBZQMEASowCwYJ
+AgwiN/FaHolhyJo3T4wwDQYJYIZIAWUDBAIBBQCggccwLwYJKoZIhvcNAQkEMSIEIIPeRqr2mAn5
+UZbhZv7Wzmw7zs0OVDu+3D0HUmsXV2/LMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZI
+hvcNAQkFMQ8XDTI2MDQxMDE5MzYyMFowXAYJKoZIhvcNAQkPMU8wTTALBglghkgBZQMEASowCwYJ
 YIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQcwCwYJYIZIAWUD
-BAIBMA0GCSqGSIb3DQEBAQUABIIBAIMWMKGxCYZQXB8drz4xf15eGw+gKdutwB8HUMCQORrwXS+C
-k+oCRK+WNPdlCz2mwMLylF2JjqjVMVRyX+Bqy3DBIyO8nodKThOcMLmUqUkQtC0pPfN2ttgNawM7
-1HQQm9QbbGLZdXWBRpuWYfuP7zU0cV1Oz564xrOIv1xyzM+10UuHVVzIpn2KfRqx0TrmxCKjakwh
-Ven+KHz4vHP5nS24ruEB6c2nkhzUIALJnJxh0jaRX8B++VwifwLL+jHN4ZPyCm8TgXFyFAiF0s7S
-vv7W9bLWNPBCokf6ClzDgmCpdQ2JHiHHItyRH9CBkkJ+Zxy9/b4fEJRvaYuZ+mtyqFE=
---000000000000c5dcab064f203ab5--
+BAIBMA0GCSqGSIb3DQEBAQUABIIBAE1Em/4U84fNbMFwuLxP0zGWMbJryfiDvu7ryg6MDaMaGFUS
+51AnzxNbCAtaWr/GRYlDGt+zToMZECy968S8PI610iWOjnuOyY5AmIdKNzhnWXw6owArOZJmf9Q6
+hKnB5SziExw1BXPv3kcIXawGDwWEasLk6tIPZnlHsoEHyKpgKrs+PRwbwCzkW6DRXeqK4+0Wz38W
+3K6tG1w/tOy5iud+7EpBMujkBr4Yb1WWwZqwgoSTj7pPRdlOqISLLYplUeN0/eBy76ViRWdUit86
+PQXVdxQvGFNM0f2hEVGQqvGvD0S7M4TsK7DxAqInlT2Ja+MXRqnDF/ZfuvoDgY3zx+c=
+--0000000000005e09dd064f203fe9--
 
