@@ -1,61 +1,103 @@
-Return-Path: <netdev+bounces-277469-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277470-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KFWMCgce2WnVmQgAu9opvQ
-	(envelope-from <netdev+bounces-277469-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 17:57:59 +0200
+	id WFiAJJ8f2WkQmggAu9opvQ
+	(envelope-from <netdev+bounces-277470-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 18:04:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6697F3D9EEB
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 17:57:57 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C27A3DA0A3
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 18:04:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 008573048F2C
-	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 15:53:28 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 69C513006159
+	for <lists+netdev@lfdr.de>; Fri, 10 Apr 2026 15:59:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 652E53148D2;
-	Fri, 10 Apr 2026 15:53:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E27E73DA5C8;
+	Fri, 10 Apr 2026 15:59:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="O1hVW7xU";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="5u8IoigD";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="O1hVW7xU";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="5u8IoigD"
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmja2lje4os4yms4ymjma.icoremail.net (zg8tmja2lje4os4yms4ymjma.icoremail.net [206.189.21.223])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA5683AE1AF
-	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 15:53:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=206.189.21.223
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42BDE3DA5C1
+	for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 15:59:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775836407; cv=none; b=APJqIZi3HasvZRgHXMKFZkYi3yYlrZK69ARL4nEqzq+tgCzd1MpmKrWnfSidPmVICd045xO/9tk8FaBFBNsy2WNFTnfYrwRGH4DLwEVeqQWKGWNBphZw6mTE8z6jDn6S6xD2L6omR+6QzXIv+5JH8mzjfhi5KQ2aOLxxO24OS8E=
+	t=1775836784; cv=none; b=sOI1Cu9WGUZJc1pvLeVCcUIv/mafwumzKaz4/KwQtXcW6qg0J5+I0NUP19fpdBC07jH4ibDY+2v5IccnpB1P5F4yql9mzAUtlOcMD1jBq1ekPwXqexvPuUerkpQ/oN8uyFQvYbrxvrx3V+ZRzGMqhgsHxhCCrKMytY7c7aQAD/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775836407; c=relaxed/simple;
-	bh=XyJxBrF5IWN79Ozjq+JvCPExBqEUKkO7azPq45Ms1W8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QwAYv3QGFL+ryzwLkDBPFJLP9VHh480tkK3irzhAq2wtjtl2Xa04w++7NvcPIrryqapOVVUnKkNVo1YvgcGD7FLISE8Fb7zZJq+3a+BjiIxqloGE09y0j//ONv70rosu4ge5seybFgJBwXPF6iRkzBCJEoxsbUziWxXbF1vaFi0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=206.189.21.223
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
-Received: from enjou-Legion-Y7000P-2019.coin-barley.ts.net (unknown [172.23.56.36])
-	by app1 (Coremail) with SMTP id ygmowAA3q_vkHNlpJoq6AA--.7702S3;
-	Fri, 10 Apr 2026 23:53:11 +0800 (CST)
-From: Ren Wei <n05ec@lzu.edu.cn>
-To: netdev@vger.kernel.org
-Cc: jmaloy@redhat.com,
+	s=arc-20240116; t=1775836784; c=relaxed/simple;
+	bh=GBeemjr/vXE55b3FuUq6lxhDo65Pmeh+YlNphWxsbRQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mkKITkrWYSb0ke2KTNu0ciVp4u/ItsFLeuGrUd+2TuCnUnyITggodqjtovhnvUn/AHOjqshV63jJPn/DFfmJINS//HeaYLunK1qTdx3F+V6Jg8kI8K4gyYIsaKnz20qw+NKu7bZCOCMJ3+Pza5efJoemsPfQPLQ9qTpt9mOYPxM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=O1hVW7xU; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=5u8IoigD; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=O1hVW7xU; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=5u8IoigD; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 4EEA15BDE6;
+	Fri, 10 Apr 2026 15:59:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1775836781; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=lE8cNDdtfJhg6IFDH4Z3sGwF3+x6WzgYPoRNG5YPyfM=;
+	b=O1hVW7xUmbaC0Ge9EiKPavmW4kwoym8jH6Ol4nEPyIQovdvyrsk96goBGOCTBoIok95dd8
+	PVRptdFQ8wo7Xg/Ju+yKVbT0KtiH+o7bFLvsHDxf5IV8nNIfL3VdX1jJHWnz13/2DbN73U
+	+ksWP2Qk9xmvCzyZS09JOGU1w1P17H0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1775836781;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=lE8cNDdtfJhg6IFDH4Z3sGwF3+x6WzgYPoRNG5YPyfM=;
+	b=5u8IoigDP9t7aZ8YrHF938rXiuat6mf1Q+cWRRRvDBokUsLJT2EzF7hnpDurdF/YBTBkID
+	7tP3edyaUI3iC6Cw==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1775836781; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=lE8cNDdtfJhg6IFDH4Z3sGwF3+x6WzgYPoRNG5YPyfM=;
+	b=O1hVW7xUmbaC0Ge9EiKPavmW4kwoym8jH6Ol4nEPyIQovdvyrsk96goBGOCTBoIok95dd8
+	PVRptdFQ8wo7Xg/Ju+yKVbT0KtiH+o7bFLvsHDxf5IV8nNIfL3VdX1jJHWnz13/2DbN73U
+	+ksWP2Qk9xmvCzyZS09JOGU1w1P17H0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1775836781;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=lE8cNDdtfJhg6IFDH4Z3sGwF3+x6WzgYPoRNG5YPyfM=;
+	b=5u8IoigDP9t7aZ8YrHF938rXiuat6mf1Q+cWRRRvDBokUsLJT2EzF7hnpDurdF/YBTBkID
+	7tP3edyaUI3iC6Cw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id F26474A0B2;
+	Fri, 10 Apr 2026 15:59:40 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 3sL3Lmwe2WkqQgAAD6G6ig
+	(envelope-from <krisman@suse.de>); Fri, 10 Apr 2026 15:59:40 +0000
+From: Gabriel Krisman Bertazi <krisman@suse.de>
+To: willemdebruijn.kernel@gmail.com,
 	davem@davemloft.net,
+	dsahern@kernel.org,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	horms@kernel.org,
-	tuong.t.lien@dektech.com.au,
-	ying.xue@windriver.com,
-	yifanwucs@gmail.com,
-	tomapufckgml@gmail.com,
-	yuantan098@gmail.com,
-	bird@lzu.edu.cn,
-	enjou1224z@gmail.com,
-	caoruide123@gmail.com,
-	n05ec@lzu.edu.cn
-Subject: [PATCH net 1/1] tipc: validate Gap ACK blocks in STATE message
-Date: Fri, 10 Apr 2026 23:53:07 +0800
-Message-ID: <1316452e465e9a96fce44ec15130a14f3872149f.1775809727.git.caoruide123@gmail.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <cover.1775809726.git.caoruide123@gmail.com>
-References: <cover.1775809726.git.caoruide123@gmail.com>
+	kuniyu@google.com
+Cc: horms@kernel.org,
+	netdev@vger.kernel.org,
+	Gabriel Krisman Bertazi <krisman@suse.de>,
+	Willem de Bruijn <willemb@google.com>
+Subject: [PATCH v2] udp: Force compute_score to always inline
+Date: Fri, 10 Apr 2026 11:59:36 -0400
+Message-ID: <20260410155936.654915-1-krisman@suse.de>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,135 +105,158 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:ygmowAA3q_vkHNlpJoq6AA--.7702S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxZryxXFy3AF1DtFWrZFWkWFg_yoW5CrWxpa
-	y3GFW8KrWqgrWfuFn2kF48tr13GFs7JFy7tas5Gw13Wan8tF45GFy5uFW2qF1Yyr40k3yU
-	ZwnIgr1jkrZ8ZaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUB01xkIjI8I6I8E6xAIw20EY4v20xvaj40_JFC_Wr1l1IIY67AE
-	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
-	IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E
-	87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c
-	8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_
-	Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwI
-	xGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAa
-	w2AFwI0_Jw0_GFylc2xSY4AK6svPMxAIw28IcxkI7VAKI48JMxAIw28IcVCjz48v1sIEY2
-	0_Gr4l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
-	jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE2I
-	x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK
-	8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
-	0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUonmRUUUUU
-X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQ0NCWnYuV4I-AAAsq
-X-Spamd-Result: default: False [-0.96 / 15.00];
+X-Spam-Score: -1.21
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-277469-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[lzu.edu.cn];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[redhat.com,davemloft.net,google.com,kernel.org,dektech.com.au,windriver.com,gmail.com,lzu.edu.cn];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FREEMAIL_TO(0.00)[gmail.com,davemloft.net,kernel.org,google.com,redhat.com];
+	TAGGED_FROM(0.00)[bounces-277470-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
-	TO_DN_NONE(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
-	R_DKIM_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[krisman@suse.de,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lzu.edu.cn:email]
-X-Rspamd-Queue-Id: 6697F3D9EEB
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,suse.de:dkim,suse.de:email,suse.de:mid]
+X-Rspamd-Queue-Id: 3C27A3DA0A3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Ruide Cao <caoruide123@gmail.com>
+Back in 2024 I reported a 7-12% regression on an iperf3 UDP loopback
+thoughput test that we traced to the extra overhead of calling
+compute_score on two places, introduced by commit f0ea27e7bfe1 ("udp:
+re-score reuseport groups when connected sockets are present").  At the
+time, I pointed out the overhead was caused by the multiple calls,
+associated with cpu-specific mitigations, and merged commit
+50aee97d1511 ("udp: Avoid call to compute_score on multiple sites") to
+jump back explicitly, to force the rescore call in a single place.
 
-tipc_get_gap_ack_blks() reads len, ugack_cnt and bgack_cnt directly from
-msg_data(hdr) before verifying that a STATE message actually contains the
-fixed Gap ACK block header in its logical data area.
+Recently though, we got another regression report against a newer distro
+version, which a team colleague traced back to the same root-cause.
+Turns out that once we updated to gcc-13, the compiler got smart enough
+to unroll the loop, undoing my previous mitigation.  Let's bite the
+bullet and __always_inline compute_score on both ipv4 and ipv6 to
+prevent gcc from de-optimizing it again in the future.  These functions
+are only called in two places each, udpX_lib_lookup1 and
+udpX_lib_lookup2, so the extra size shouldn't be a problem and it is hot
+enough to be very visible in profilings.  In fact, with gcc13, forcing
+the inline will prevent gcc from unrolling the fix from commit
+50aee97d1511, so we don't end up increasing udpX_lib_lookup2 at all.
 
-A peer that negotiates TIPC_GAP_ACK_BLOCK can send a short STATE message
-with a declared TIPC payload shorter than struct tipc_gap_ack_blks and
-still append a few physical bytes after the header. The helper then trusts
-those bytes as Gap ACK metadata, and the forged bgack_cnt/len values can
-drive the broadcast receive path into kmemdup() beyond the skb boundary.
+I haven't recollected the results myself, as I don't have access to the
+machine at the moment.  But the same colleague reported 4.67%
+inprovement with this patch in the loopback benchmark, solving the
+regression report within noise margins.
 
-Fix this by rejecting Gap ACK parsing unless the logical STATE payload is
-large enough to cover the fixed header, and by rejecting declared Gap ACK
-lengths that are smaller than the fixed header or larger than the logical
-payload. Return 0 for invalid lengths so malformed Gap ACK data is not
-treated as a valid payload offset, and drop unicast STATE messages that
-advertise Gap ACK support but still yield an invalid Gap ACK length. This
-keeps malformed Gap ACK data ignored without misaligning monitor payload
-parsing.
+Eric Dumazet reported no size change to vmlinux when built with clang.
+I report the same also with gcc-13:
 
-Fixes: d7626b5acff9 ("tipc: introduce Gap ACK blocks for broadcast link")
-Cc: stable@kernel.org
-Reported-by: Yifan Wu <yifanwucs@gmail.com>
-Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-Co-developed-by: Yuan Tan <yuantan098@gmail.com>
-Signed-off-by: Yuan Tan <yuantan098@gmail.com>
-Suggested-by: Xin Liu <bird@lzu.edu.cn>
-Tested-by: Ren Wei <enjou1224z@gmail.com>
-Signed-off-by: Ruide Cao <caoruide123@gmail.com>
-Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+scripts/bloat-o-meter vmlinux vmlinux-inline
+add/remove: 0/2 grow/shrink: 4/0 up/down: 616/-416 (200)
+Function                                     old     new   delta
+udp6_lib_lookup2                             762     949    +187
+__udp6_lib_lookup                            810     975    +165
+udp4_lib_lookup2                             757     906    +149
+__udp4_lib_lookup                            871     986    +115
+__pfx_compute_score                           32       -     -32
+compute_score                                384       -    -384
+Total: Before=35011784, After=35011984, chg +0.00%
+
+Fixes: 50aee97d1511 ("udp: Avoid call to compute_score on multiple sites")
+Reviewed-by: Eric Dumazet <edumazet@google.com>
+Acked-by: Willem de Bruijn <willemb@google.com>
+Signed-off-by: Gabriel Krisman Bertazi <krisman@suse.de>
+
 ---
- net/tipc/link.c | 16 ++++++++++++++--
- 1 file changed, 14 insertions(+), 2 deletions(-)
+v2:
+  - update comment in udpX_lib_lookup2(Willem)
+  - add bloat-o-meter information (Eric)
+---
+ net/ipv4/udp.c | 12 ++++++------
+ net/ipv6/udp.c | 13 +++++++------
+ 2 files changed, 13 insertions(+), 12 deletions(-)
 
-diff --git a/net/tipc/link.c b/net/tipc/link.c
-index 49dfc098d89b..44678d98939a 100644
---- a/net/tipc/link.c
-+++ b/net/tipc/link.c
-@@ -1415,12 +1415,22 @@ u16 tipc_get_gap_ack_blks(struct tipc_gap_ack_blks **ga, struct tipc_link *l,
- 			  struct tipc_msg *hdr, bool uc)
+diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+index 6c6b68a66dcd..74b621b20e83 100644
+--- a/net/ipv4/udp.c
++++ b/net/ipv4/udp.c
+@@ -365,10 +365,10 @@ int udp_v4_get_port(struct sock *sk, unsigned short snum)
+ 	return udp_lib_get_port(sk, snum, hash2_nulladdr);
+ }
+ 
+-static int compute_score(struct sock *sk, const struct net *net,
+-			 __be32 saddr, __be16 sport,
+-			 __be32 daddr, unsigned short hnum,
+-			 int dif, int sdif)
++static __always_inline int
++compute_score(struct sock *sk, const struct net *net,
++	      __be32 saddr, __be16 sport, __be32 daddr,
++	      unsigned short hnum, int dif, int sdif)
  {
- 	struct tipc_gap_ack_blks *p;
--	u16 sz = 0;
-+	u16 sz = 0, dlen = msg_data_sz(hdr);
+ 	int score;
+ 	struct inet_sock *inet;
+@@ -508,8 +508,8 @@ static struct sock *udp4_lib_lookup2(const struct net *net,
+ 				continue;
  
- 	/* Does peer support the Gap ACK blocks feature? */
- 	if (l->peer_caps & TIPC_GAP_ACK_BLOCK) {
-+		u16 min_sz = struct_size(p, gacks, 0);
-+
-+		if (dlen < min_sz)
-+			goto ignore;
-+
- 		p = (struct tipc_gap_ack_blks *)msg_data(hdr);
- 		sz = ntohs(p->len);
-+		if (sz < min_sz || sz > dlen) {
-+			sz = 0;
-+			goto ignore;
-+		}
-+
- 		/* Sanity check */
- 		if (sz == struct_size(p, gacks, size_add(p->ugack_cnt, p->bgack_cnt))) {
- 			/* Good, check if the desired type exists */
-@@ -1434,6 +1444,8 @@ u16 tipc_get_gap_ack_blks(struct tipc_gap_ack_blks **ga, struct tipc_link *l,
- 			}
- 		}
- 	}
-+
-+ignore:
- 	/* Other cases: ignore! */
- 	p = NULL;
+ 			/* compute_score is too long of a function to be
+-			 * inlined, and calling it again here yields
+-			 * measurable overhead for some
++			 * inlined twice here, and calling it uninlined
++			 * here yields measurable overhead for some
+ 			 * workloads. Work around it by jumping
+ 			 * backwards to rescore 'result'.
+ 			 */
+diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
+index 010b909275dd..301649a63e8a 100644
+--- a/net/ipv6/udp.c
++++ b/net/ipv6/udp.c
+@@ -127,10 +127,11 @@ void udp_v6_rehash(struct sock *sk)
+ 	udp_lib_rehash(sk, new_hash, new_hash4);
+ }
  
-@@ -2270,7 +2282,7 @@ static int tipc_link_proto_rcv(struct tipc_link *l, struct sk_buff *skb,
- 	case STATE_MSG:
- 		/* Validate Gap ACK blocks, drop if invalid */
- 		glen = tipc_get_gap_ack_blks(&ga, l, hdr, true);
--		if (glen > dlen)
-+		if (glen > dlen || ((l->peer_caps & TIPC_GAP_ACK_BLOCK) && !glen))
- 			break;
+-static int compute_score(struct sock *sk, const struct net *net,
+-			 const struct in6_addr *saddr, __be16 sport,
+-			 const struct in6_addr *daddr, unsigned short hnum,
+-			 int dif, int sdif)
++static __always_inline int
++compute_score(struct sock *sk, const struct net *net,
++	      const struct in6_addr *saddr, __be16 sport,
++	      const struct in6_addr *daddr, unsigned short hnum,
++	      int dif, int sdif)
+ {
+ 	int bound_dev_if, score;
+ 	struct inet_sock *inet;
+@@ -260,8 +261,8 @@ static struct sock *udp6_lib_lookup2(const struct net *net,
+ 				continue;
  
- 		l->rcv_nxt_state = msg_seqno(hdr) + 1;
+ 			/* compute_score is too long of a function to be
+-			 * inlined, and calling it again here yields
+-			 * measurable overhead for some
++			 * inlined twice here, and calling it uninlined
++			 * here yields measurable overhead for some
+ 			 * workloads. Work around it by jumping
+ 			 * backwards to rescore 'result'.
+ 			 */
 -- 
-2.34.1
+2.52.0
 
 
