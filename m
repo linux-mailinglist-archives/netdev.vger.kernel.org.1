@@ -1,48 +1,50 @@
-Return-Path: <netdev+bounces-277638-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277639-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wGqzCMik2WnwrggAu9opvQ
-	(envelope-from <netdev+bounces-277638-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 03:32:56 +0200
+	id yEVBBtqk2WnwrggAu9opvQ
+	(envelope-from <netdev+bounces-277639-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 03:33:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBC683DDDEF
-	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 03:32:55 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEE623DDE0E
+	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 03:33:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BDE3A3048126
-	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 01:32:54 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 00F883057C7A
+	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 01:32:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CD8F21D585;
-	Sat, 11 Apr 2026 01:32:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 011BB274B43;
+	Sat, 11 Apr 2026 01:32:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="XzHgE1xl"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="sPvrQ48E"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
+Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62DFC18050
-	for <netdev@vger.kernel.org>; Sat, 11 Apr 2026 01:32:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F0451DFDA1
+	for <netdev@vger.kernel.org>; Sat, 11 Apr 2026 01:32:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775871172; cv=none; b=YCfrYHrd4GNyNqoH5YRaMIO/kxT9pvB6v3vw8oLuHWqAfo0XEDNEV99FuoGMLZ6d4igM0yKrgeVLVo1jF1eNDNLRmp4H+h7Vol7smagF1Y+pdyd6DwmuQmYmLsliCdgF3/S5i3A5bgoIeYLbsK1NUffKaw9898GDpOER1H89UJQ=
+	t=1775871172; cv=none; b=szc7D1n173jaho5o6Vfl2K+GscQumBz5NaJorwsc2XSLQTDjju/hS2kIONRKLrRBxHoTR32epg6Wn+yaNmMg+QkTBTt2kZWTiHxbPJe+69YczNfNd0eAccWz5UcXFXpjQwgJ0vAv2lDKzT1ljYThT8W/jtIegeXgJYhycOqFw2g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1775871172; c=relaxed/simple;
-	bh=wJBoOnYjhw+pUBicokDxqfaJkrZTKbpeqNHlpSLQoA0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Nj3D9mycrKPoceJgxjcrzmuicsK6aGMf9udhSy65Zz9AYOq3POK9MA58QLABbmLLDe+SCWBFTnsZoptq92DosfliXURxPNBhiHF+7+uYlwWBobPB0iQbl+twOzPumvC+0CTkrXZszRop6mly+PXZfksLHe+R3UaotAn0VTvQeqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=XzHgE1xl; arc=none smtp.client-ip=95.215.58.187
+	bh=VO6BMkxq96+MVVztCDUAdoUouKK0RTwbTwrWVTmDayQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=QR4hyuYS+BgWqk6oICV8axSptn6JCQwOPV7BhX5Mk8uA49SkF15BRTCeWc+Tmhc5TSdY2u62otFHaEKgIn4LZSmrUElNuLaaKFs4bk7GkvoBUKkW4UMtoW2/ros6fW7rbpSCdTM26HjzRjtKCTz1iHw8XKEIGT7OfW3w/AaVMrg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=sPvrQ48E; arc=none smtp.client-ip=95.215.58.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1775871158;
+	t=1775871169;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=E79Q5CkAVpFseZarzsSAQtNJelU2PgVkwbeuT/mWF94=;
-	b=XzHgE1xl12TudtuCmASy/U7V6lglBs/QQk2o74v1gvkitxUrlSbtnqnPlOXR5QDrwcsH1+
-	U0OuPzkBk1aXr4e1YD8Vy9+AXvYMzvcBkspJrkDMY7FmtrVdfUQ9EFtX91uyhoXDNRhLsg
-	+kgk9/cRslRssLpldtLrgW3dWNlIBWA=
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qoJCAFaTxUEnMvDnlo8IAOnt4jK6ofxDJqaroElqR/U=;
+	b=sPvrQ48EhC0ZhnKra1/msHQQJN8Wu7PXFcsjVNhruGof3v1V+ShwNzVOvODxToSg8zGQc8
+	BEH8rdmGWV3uA0/wlCZMd2YuyWhWdJsToiZlrTEbtB10R53lqkWwtV8IabHGessLuYDvAg
+	jNqu+zyBT7rOoNafQBt3YamfD7lI9RY=
 From: Jiayuan Chen <jiayuan.chen@linux.dev>
 To: netdev@vger.kernel.org
 Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
@@ -54,11 +56,11 @@ Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
 	David Ahern <dsahern@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Eduard Zingerman <eddyz87@gmail.com>,
 	Alexei Starovoitov <ast@kernel.org>,
 	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
 	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>,
 	Song Liu <song@kernel.org>,
 	Yonghong Song <yonghong.song@linux.dev>,
 	John Fastabend <john.fastabend@gmail.com>,
@@ -70,172 +72,160 @@ Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
 	linux-kernel@vger.kernel.org,
 	bpf@vger.kernel.org,
 	linux-kselftest@vger.kernel.org
-Subject: [PATCH net-next v2 1/2] net: add missing syncookie statistics for BPF custom syncookies
-Date: Sat, 11 Apr 2026 09:32:04 +0800
-Message-ID: <20260411013211.225834-1-jiayuan.chen@linux.dev>
+Subject: [PATCH net-next v2 2/2] selftests/bpf: verify syncookie statistics in tcp_custom_syncookie
+Date: Sat, 11 Apr 2026 09:32:05 +0800
+Message-ID: <20260411013211.225834-2-jiayuan.chen@linux.dev>
+In-Reply-To: <20260411013211.225834-1-jiayuan.chen@linux.dev>
+References: <20260411013211.225834-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[linux.dev,google.com,davemloft.net,kernel.org,redhat.com,gmail.com,iogearbox.net,fomichev.me,vger.kernel.org];
+	FREEMAIL_CC(0.00)[linux.dev,google.com,davemloft.net,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,vger.kernel.org];
 	RCVD_COUNT_THREE(0.00)[3];
-	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[26];
+	TAGGED_FROM(0.00)[bounces-277639-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-277638-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[26];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[linux.dev:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: CBC683DDDEF
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:email,linux.dev:mid]
+X-Rspamd-Queue-Id: BEE623DDE0E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-1. Replace IS_ENABLED(CONFIG_BPF) with CONFIG_BPF_SYSCALL for
-   cookie_bpf_ok() and cookie_bpf_check(). CONFIG_BPF is selected by
-   CONFIG_NET unconditionally, so IS_ENABLED(CONFIG_BPF) is always
-   true and provides no real guard. CONFIG_BPF_SYSCALL is the correct
-   config for BPF program functionality.
+Add read_tcpext_snmp() helper to network_helpers which reads a
+TcpExt SNMP counter via nstat, and use it in the tcp_custom_syncookie
+test to verify that LINUX_MIB_SYNCOOKIESRECV is incremented and
+LINUX_MIB_SYNCOOKIESFAILED stays unchanged across a successful
+BPF custom syncookie validation.
 
-2. Remove the CONFIG_BPF_SYSCALL guard around struct bpf_tcp_req_attrs.
-   This struct is referenced by bpf_sk_assign_tcp_reqsk() in
-   net/core/filter.c which is compiled unconditionally, so wrapping
-   the definition in a config guard could cause build failures when
-   CONFIG_BPF_SYSCALL=n.
-
-3. Fix mismatched declaration of cookie_bpf_check() between the
-   CONFIG_BPF_SYSCALL and stub paths: the real definition takes
-   'struct net *net' but the declaration in the header did not.
-   Add the net parameter to the declaration and all call sites.
-
-4. Add missing LINUX_MIB_SYNCOOKIESRECV and LINUX_MIB_SYNCOOKIESFAILED
-   statistics in cookie_bpf_check(), so that BPF custom syncookie
-   validation is accounted for in SNMP counters just like the
-   non-BPF path.
-
-Compile-tested with CONFIG_BPF_SYSCALL=y and CONFIG_BPF_SYSCALL
-not set.
+The delta is captured between start_server() and accept(), which
+covers the full SYN/ACK/cookie-check path for one connection.
 
 Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
 ---
-No functional bug here — CONFIG_BPF is always enabled under
-CONFIG_NET, so the existing code compiles and works correctly.
-This is a cleanup and improvement, no backport needed.
+ tools/testing/selftests/bpf/network_helpers.c | 22 +++++++++++++++++++
+ tools/testing/selftests/bpf/network_helpers.h |  1 +
+ .../bpf/prog_tests/tcp_custom_syncookie.c     | 20 +++++++++++++++++
+ 3 files changed, 43 insertions(+)
 
-Added a selftest, suggested by Kuniyuki Iwashima.
----
- include/net/tcp.h     |  7 +++----
- net/ipv4/syncookies.c | 10 +++++++---
- net/ipv6/syncookies.c |  2 +-
- 3 files changed, 11 insertions(+), 8 deletions(-)
-
-diff --git a/include/net/tcp.h b/include/net/tcp.h
-index 6156d1d068e1..570a8836c2ba 100644
---- a/include/net/tcp.h
-+++ b/include/net/tcp.h
-@@ -598,7 +598,6 @@ struct request_sock *cookie_tcp_reqsk_alloc(const struct request_sock_ops *ops,
- 					    struct tcp_options_received *tcp_opt,
- 					    int mss, u32 tsoff);
- 
--#if IS_ENABLED(CONFIG_BPF)
- struct bpf_tcp_req_attrs {
- 	u32 rcv_tsval;
- 	u32 rcv_tsecr;
-@@ -612,7 +611,6 @@ struct bpf_tcp_req_attrs {
- 	u8 usec_ts_ok;
- 	u8 reserved[3];
- };
--#endif
- 
- #ifdef CONFIG_SYN_COOKIES
- 
-@@ -715,13 +713,14 @@ static inline bool cookie_ecn_ok(const struct net *net, const struct dst_entry *
- 		dst_feature(dst, RTAX_FEATURE_ECN);
+diff --git a/tools/testing/selftests/bpf/network_helpers.c b/tools/testing/selftests/bpf/network_helpers.c
+index b82f572641b7..3388dd5112b6 100644
+--- a/tools/testing/selftests/bpf/network_helpers.c
++++ b/tools/testing/selftests/bpf/network_helpers.c
+@@ -621,6 +621,28 @@ int get_socket_local_port(int sock_fd)
+ 	return -1;
  }
  
--#if IS_ENABLED(CONFIG_BPF)
-+#ifdef CONFIG_BPF_SYSCALL
- static inline bool cookie_bpf_ok(struct sk_buff *skb)
++int read_tcpext_snmp(const char *name, unsigned long *val)
++{
++	char cmd[128], buf[128];
++	int ret = 0;
++	FILE *f;
++
++	snprintf(cmd, sizeof(cmd),
++		 "nstat -az TcpExt%s | awk '/TcpExt/ {print $2}'", name);
++	f = popen(cmd, "r");
++	if (!f)
++		return -errno;
++
++	if (!fgets(buf, sizeof(buf), f)) {
++		ret = ferror(f) ? -errno : -ENODATA;
++		goto out;
++	}
++	*val = strtoul(buf, NULL, 10);
++out:
++	pclose(f);
++	return ret;
++}
++
+ int get_hw_ring_size(char *ifname, struct ethtool_ringparam *ring_param)
  {
- 	return skb->sk;
- }
+ 	struct ifreq ifr = {0};
+diff --git a/tools/testing/selftests/bpf/network_helpers.h b/tools/testing/selftests/bpf/network_helpers.h
+index 79a010c88e11..c53cd781df6e 100644
+--- a/tools/testing/selftests/bpf/network_helpers.h
++++ b/tools/testing/selftests/bpf/network_helpers.h
+@@ -84,6 +84,7 @@ int make_sockaddr(int family, const char *addr_str, __u16 port,
+ 		  struct sockaddr_storage *addr, socklen_t *len);
+ char *ping_command(int family);
+ int get_socket_local_port(int sock_fd);
++int read_tcpext_snmp(const char *name, unsigned long *val);
+ int get_hw_ring_size(char *ifname, struct ethtool_ringparam *ring_param);
+ int set_hw_ring_size(char *ifname, struct ethtool_ringparam *ring_param);
  
--struct request_sock *cookie_bpf_check(struct sock *sk, struct sk_buff *skb);
-+struct request_sock *cookie_bpf_check(struct net *net, struct sock *sk,
-+				      struct sk_buff *skb);
- #else
- static inline bool cookie_bpf_ok(struct sk_buff *skb)
+diff --git a/tools/testing/selftests/bpf/prog_tests/tcp_custom_syncookie.c b/tools/testing/selftests/bpf/prog_tests/tcp_custom_syncookie.c
+index eaf441dc7e79..6adfb4b892f8 100644
+--- a/tools/testing/selftests/bpf/prog_tests/tcp_custom_syncookie.c
++++ b/tools/testing/selftests/bpf/prog_tests/tcp_custom_syncookie.c
+@@ -91,12 +91,21 @@ static void transfer_message(int sender, int receiver)
+ 
+ static void create_connection(struct test_tcp_custom_syncookie_case *test_case)
  {
-diff --git a/net/ipv4/syncookies.c b/net/ipv4/syncookies.c
-index f1474598d2c8..d685631438cb 100644
---- a/net/ipv4/syncookies.c
-+++ b/net/ipv4/syncookies.c
-@@ -295,8 +295,9 @@ static int cookie_tcp_reqsk_init(struct sock *sk, struct sk_buff *skb,
- 	return 0;
- }
++	unsigned long recv_before, recv_after;
++	unsigned long failed_before, failed_after;
+ 	int server, client, child;
  
--#if IS_ENABLED(CONFIG_BPF)
--struct request_sock *cookie_bpf_check(struct sock *sk, struct sk_buff *skb)
-+#ifdef CONFIG_BPF_SYSCALL
-+struct request_sock *cookie_bpf_check(struct net *net, struct sock *sk,
-+				      struct sk_buff *skb)
- {
- 	struct request_sock *req = inet_reqsk(skb->sk);
+ 	server = start_server(test_case->family, test_case->type, test_case->addr, 0, 0);
+ 	if (!ASSERT_NEQ(server, -1, "start_server"))
+ 		return;
  
-@@ -306,6 +307,9 @@ struct request_sock *cookie_bpf_check(struct sock *sk, struct sk_buff *skb)
- 	if (cookie_tcp_reqsk_init(sk, skb, req)) {
- 		reqsk_free(req);
- 		req = NULL;
-+		__NET_INC_STATS(net, LINUX_MIB_SYNCOOKIESFAILED);
-+	} else {
-+		__NET_INC_STATS(net, LINUX_MIB_SYNCOOKIESRECV);
- 	}
++	if (!ASSERT_OK(read_tcpext_snmp("SyncookiesRecv", &recv_before),
++		       "read SyncookiesRecv before"))
++		goto close_server;
++	if (!ASSERT_OK(read_tcpext_snmp("SyncookiesFailed", &failed_before),
++		       "read SyncookiesFailed before"))
++		goto close_server;
++
+ 	client = connect_to_fd(server, 0);
+ 	if (!ASSERT_NEQ(client, -1, "connect_to_fd"))
+ 		goto close_server;
+@@ -105,9 +114,20 @@ static void create_connection(struct test_tcp_custom_syncookie_case *test_case)
+ 	if (!ASSERT_NEQ(child, -1, "accept"))
+ 		goto close_client;
  
- 	return req;
-@@ -419,7 +423,7 @@ struct sock *cookie_v4_check(struct sock *sk, struct sk_buff *skb)
- 		goto out;
++	if (!ASSERT_OK(read_tcpext_snmp("SyncookiesRecv", &recv_after),
++		       "read SyncookiesRecv after"))
++		goto close_child;
++	if (!ASSERT_OK(read_tcpext_snmp("SyncookiesFailed", &failed_after),
++		       "read SyncookiesFailed after"))
++		goto close_child;
++
++	ASSERT_EQ(recv_after - recv_before, 1, "SyncookiesRecv delta");
++	ASSERT_EQ(failed_after - failed_before, 0, "SyncookiesFailed delta");
++
+ 	transfer_message(client, child);
+ 	transfer_message(child, client);
  
- 	if (cookie_bpf_ok(skb)) {
--		req = cookie_bpf_check(sk, skb);
-+		req = cookie_bpf_check(net, sk, skb);
- 	} else {
- 		req = cookie_tcp_check(net, sk, skb);
- 		if (IS_ERR(req))
-diff --git a/net/ipv6/syncookies.c b/net/ipv6/syncookies.c
-index 4f6f0d751d6c..111d7a41d957 100644
---- a/net/ipv6/syncookies.c
-+++ b/net/ipv6/syncookies.c
-@@ -190,7 +190,7 @@ struct sock *cookie_v6_check(struct sock *sk, struct sk_buff *skb)
- 		goto out;
- 
- 	if (cookie_bpf_ok(skb)) {
--		req = cookie_bpf_check(sk, skb);
-+		req = cookie_bpf_check(net, sk, skb);
- 	} else {
- 		req = cookie_tcp_check(net, sk, skb);
- 		if (IS_ERR(req))
++close_child:
+ 	close(child);
+ close_client:
+ 	close(client);
 -- 
 2.43.0
 
