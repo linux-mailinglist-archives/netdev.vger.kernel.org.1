@@ -1,167 +1,187 @@
-Return-Path: <netdev+bounces-277672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277673-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id nV/RHGXs2WmQvwgAu9opvQ
-	(envelope-from <netdev+bounces-277672-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 08:38:29 +0200
+	id sPxhFC/32WncxQgAu9opvQ
+	(envelope-from <netdev+bounces-277673-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 09:24:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B69873DE8B0
-	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 08:38:28 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C37DB3DEAA5
+	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 09:24:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E3F4C30252BF
-	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 06:38:25 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D84ED303AF0E
+	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 07:24:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87D69311C1D;
-	Sat, 11 Apr 2026 06:38:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBC1C32FA2E;
+	Sat, 11 Apr 2026 07:24:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Mr27Lt6n"
+	dkim=pass (2048-bit key) header.d=blemings.org header.i=@blemings.org header.b="EajprrFB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37AB3E573
-	for <netdev@vger.kernel.org>; Sat, 11 Apr 2026 06:38:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.172
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775889503; cv=pass; b=UiCKWV5fzb1wrT1JZDGullKQ9D4aboJauoe0wV2PJ5Bna8FaECJ0ma5/B27dfiUKNbsoQiFf7vQC7KVxyAgt2S/s0SFYLoo+r0vy9vVAYO378mjL3J8+Lfdpo13yR00DwASzSk2FptfPmlszNqNrZ7QwStOHClLePc4BPqQjARI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775889503; c=relaxed/simple;
-	bh=Pjw5m9j2ub87LrSGTrnu78rE36tfGV3z59ZAy8/DTHQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dOP0LQYhIKHMuDVftss/BbhkbXn9MgngIgrzOqxtSRWa+eJ4oMGuCkzRnP47BxboiBSQdW4r+MK7RdNBb7WMpTrLbU794VMBL4lEz/SoCR544EjhajeukYWG6spqMyEUDOoK2xHhHUhLQs3JrVWqCK/pOPQdrYA5plde+1+S+Vs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Mr27Lt6n; arc=pass smtp.client-ip=209.85.160.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-50bbc41677dso37789251cf.0
-        for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 23:38:22 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1775889501; cv=none;
-        d=google.com; s=arc-20240605;
-        b=ZTuDgoKd7ylukUHLBvCTGZy76HrqEHfoULCtA0TDrAf99WSkZvPhT5teT017ljiQ1S
-         cEk1yadRC39gkzUbgz3Bta+L3F5dR0iucDulPdgSZUPiiIBkV5417rXWeHpz898syOTg
-         Ud88OuWB14sv/3Ymw556A46+OCB4/yUPRTC8Uxfw9YQCboS0+EoP6ZymowfDw9RTExOZ
-         Nfa2QYFYlrFwqz3uaLa8uvX7KVqyJJbUSAS5CvS4zxGwHsNtw8P0aJoeN5MCEMhYdxuj
-         9qzQQY8yauN9Stceo6aOdMJy7ai3l2SmgSyvwJuiV+19i4GHj6PewbtCTK3EQhJPgeEi
-         Tt8Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=Pjw5m9j2ub87LrSGTrnu78rE36tfGV3z59ZAy8/DTHQ=;
-        fh=3JaD3hmW7QDlgL2w/ixcWzpc8M9PUB0lf92LTafPEaA=;
-        b=T7Q3dg4TKrzbt3+WCy8/4tDjwdxOQbgu03y7CbqZciGAt1PqfFfJb7yftSjS3Xv4Es
-         JGfFzWffYqyGBUu26a+kh+8tAERZ3szzWxzu/Ws++WnN5EsDbGLYhgH7Jb21oiGH/HPw
-         UBh/SyIkef8tsLZ/pyRxKKPEMAn+zGNdMi5N2WOgaQzz4Nm11goxSZLC3ZlLI9uB9WAU
-         BNR4E2Cr3KFnbHdHsU0Eh3gdpYOl+tePZKrZmxmqlPz61ZIInnW+c66xjKWNYcWpZO9C
-         aJoini4Mv4Wb9gVS++hkLQyij0dmBi2d3ZIS9CI913aqt23Q8+zuvhY+8AiMYhRz4IhO
-         mlbQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1775889501; x=1776494301; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Pjw5m9j2ub87LrSGTrnu78rE36tfGV3z59ZAy8/DTHQ=;
-        b=Mr27Lt6nEIrvjsqd48T27S0lzz67zCtksPB0gRVMYnFcDkXaXA7q9hE/sEesMXKIYz
-         OSXBqp+ywyZBVMBJEB1uCsn/rDW2CjNaC6HEbf1vcGfeO3jzlL3GdgO5Su6EFtogXDM+
-         mPYGxS2OEII49Bjrtr2dw568nq+KcPAEXovClGDfLM80tktbsFUOQ8pDF9r4hEcyqTr/
-         KpijzJAI4HbtQm0xb03NwL4taUUXLb7KQM63BWBRX0f3JAAiH2rld6mpGT++SuzAjsIm
-         gE6/gmUUzDXoTmuGNMQl4fMXVFhckP0j5L/hBmCa4Arxo5iBs/cYo9KaqIvKanYIrCc2
-         Zqjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775889501; x=1776494301;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Pjw5m9j2ub87LrSGTrnu78rE36tfGV3z59ZAy8/DTHQ=;
-        b=TUz53fL3MGb01xqz+TyPZZHgDmUnd7RNakTtj0xK07DBK/a6iYy5PTHFj7hFKFgqS+
-         mxR+ab+YE6K4YLAjXtyJL8qtE0WklDYrOC56IISxX48gMLRdq20RyOCxbOunsy43LKER
-         aKz4gAXqEoU1ojBV/uK2qKEC2CHyaeSC/l4G3HQTG9l1nfCKZU1c9aI8P3HWPAntXol7
-         yA+XcsJcMR63iJnaXgK5sX7SJFoFpFHXL3aDlJThJrCr+YrTomZXjkZawq4t0ARAXV4Y
-         809qYt79HaAY2MyPGBowVuLw25yXiSYfg35QnB8/UIr9jd3doFK6Hyr+HGm0uCXS50TS
-         XGpA==
-X-Gm-Message-State: AOJu0YzQ7I7YAAL35Tx6Nm+vcqjTjz+wgum9MK2q0bfq+FbDa5UU2jtb
-	KFgGKJu3fJ8PChMqjkS0ECnYnRr4fmhbmOacczsybXUFc6qRrkyPPHX+LL8cWzbnCUoblJsYYdL
-	7WZIl6mxvXWa3vvyEISXjmw1Mf9KWmszSBRtSvpDV
-X-Gm-Gg: AeBDievFUBqIQYyzoeULI4oRyvFyyUktJK7s+PgInxKaaflQ2s/KYNoM1c3Z2e+nprz
-	Mb6lH8QsdsLryYgc4T7vut2jZI7+rlh7Ah4MAFTqC/mmVw6ksCm17jJo73JaXWkXrdrCz5X8Mnp
-	2brJ+ZUyy/bpW+A8ankHUJE4x6qvKmroZG0V/vrht7ZCPSTmhwA/V6m1clOpnfT/dWH11nuLIqk
-	zFxaQei/N/bpU6hI5TEONeQULPvUthog2lwOvzOx+MJk+OYJ0apRRUj6H8EryW/fVFD+xXy7aQh
-	EYjcYWoUGGODelUSX72RPwhMLZijYY3JkbQwCoAuxcthPnFBGvOjZPtPgHua9pLokOTgx8zC0w=
-	=
-X-Received: by 2002:ac8:5e11:0:b0:50d:ea46:7eb3 with SMTP id
- d75a77b69052e-50dea468559mr5982521cf.26.1775889500839; Fri, 10 Apr 2026
- 23:38:20 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B569B32BF5D;
+	Sat, 11 Apr 2026 07:24:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775892263; cv=none; b=NwXVUPgQfNtAsS5J1ozA50YAnS3Bawvu6XhrpwZHWjQ5j7rdlt3W1ZUiJ+2n0ajMtisZzA76bwAWdqfmDvuPWLduuf55lWZsk6AHrm/9Aec5xeMo5RRRAPiX1xbbNy/HqhtlbErf4Z4t2SXfHxxzlUetoooRq0PjT5X1ORda2hE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775892263; c=relaxed/simple;
+	bh=069FMlWOZ762g0DeUeR14CPGc6EqxAXTGHYAIw3GVk0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dLjXBk6KLn0rzYRsnOjhlIf/xN8EjaxT3dUlL4nn/oPxUEzJfJoAGTWLUZaHIPIvndxb9RAFhLSXg7t+qLBqzzuUi6kM6CPyKZmsPpeAD5vgyGkXma3DpjRIwMCxVd5/dOBZowmeIi3idQANem7BLFcuvHIYtD8fPOIOwthFhFk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blemings.org; spf=pass smtp.mailfrom=blemings.org; dkim=pass (2048-bit key) header.d=blemings.org header.i=@blemings.org header.b=EajprrFB; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blemings.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=blemings.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=blemings.org;
+	s=202501; t=1775892260;
+	bh=P587PAWRGw5EUkO02MO/7KJsYZrtrTl7DRb/I70f/MY=;
+	h=Date:Reply-To:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=EajprrFBd6AVXrhTOjX2ojMIrGdHgYj2g01kY5P15sTRCV7bVbJhSd0n/y2n4PrkW
+	 o+g/kgXFGFNSc9erd2gQVi80ePzK+7Kj1OExRz4Nt+tVH2ejDqCG3q78NqjkIYsF++
+	 7Lzu0vAl25VDwkSWswd0OCUGIwjHFP1rTHdRIxdmimosykdDtZ47V8RjspW/ktovcc
+	 k+2URIebwr5Dwb7kz0OXS5+UuLchhYxKDAHa9MdUKMmV7Oiw24rg7KXwB5JSQiezkG
+	 aDlg447v12m/vhuKE9E9FuOkpSLg/2NYrGXxQ/U21plTlSW7o3Qbx3bsF9i7pYRcNn
+	 eJi7LDw3460Ow==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4ft4t96DBgz4wJP;
+	Sat, 11 Apr 2026 17:24:17 +1000 (AEST)
+Message-ID: <b9355e3c-9252-4dd7-b7ed-dff13e3b2c8b@blemings.org>
+Date: Sat, 11 Apr 2026 17:24:17 +1000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260411051700.311679-1-stephen@networkplumber.org> <20260411051700.311679-7-stephen@networkplumber.org>
-In-Reply-To: <20260411051700.311679-7-stephen@networkplumber.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 10 Apr 2026 23:38:08 -0700
-X-Gm-Features: AQROBzDr27eodvQwHkvJKqi2dRn0dX6KmFpM8dVgLo0Xj_zabiQieGJWrAj39Qc
-Message-ID: <CANn89iJeS-Hw7NNouSWYw6BZvTUG=-grVxAiYzg8a8pEO_LJXQ@mail.gmail.com>
-Subject: Re: [PATTCH net v5 6/8] net/sched: netem: null-terminate tfifo linear
- queue tail
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, 
-	Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Peter Oskolkov <posk@google.com>, open list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+User-Agent: Mozilla Thunderbird
+Reply-To: hugh@blemings.id.au
+Subject: Re: [PATCH net] netrom: do some basic forms of validation on incoming
+ frames
+To: Greg KH <gregkh@linuxfoundation.org>, hugh@blemings.id.au
+Cc: Kuniyuki Iwashima <kuniyu@google.com>, kuba@kernel.org,
+ davem@davemloft.net, edumazet@google.com, horms@kernel.org,
+ linux-hams@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, pabeni@redhat.com, stable@kernel.org,
+ workflows@vger.kernel.org, yizhe@darknavy.com
+References: <20260410145448.38253e3c@kernel.org>
+ <20260410221220.1708137-1-kuniyu@google.com>
+ <4f5810a7-c792-4d6b-9f7c-6c6b289def19@blemings.org>
+ <2026041135-shindig-trekker-5d06@gregkh>
+Content-Language: en-US
+From: Hugh Blemings <hugh@blemings.org>
+In-Reply-To: <2026041135-shindig-trekker-5d06@gregkh>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_DKIM_ALLOW(-0.20)[blemings.org:s=202501];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-277672-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-277673-lists,netdev=lfdr.de];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B69873DE8B0
+	DMARC_NA(0.00)[blemings.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hugh@blemings.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[blemings.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	HAS_REPLYTO(0.00)[hugh@blemings.id.au];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[blemings.id.au:email,blemings.id.au:replyto,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C37DB3DEAA5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Apr 10, 2026 at 10:17=E2=80=AFPM Stephen Hemminger
-<stephen@networkplumber.org> wrote:
+
+On 11/4/2026 15:50, Greg KH wrote:
+> On Sat, Apr 11, 2026 at 08:25:19AM +1000, Hugh Blemings wrote:
+>> On 11/4/2026 08:11, Kuniyuki Iwashima wrote:
+>>> From: Jakub Kicinski <kuba@kernel.org>
+>>> Date: Fri, 10 Apr 2026 14:54:48 -0700
+>>>> On Fri, 10 Apr 2026 14:30:42 -0700 Jakub Kicinski wrote:
+>>>>> On Fri, 10 Apr 2026 07:24:36 +0200 Greg Kroah-Hartman wrote:
+>>>>>> On Thu, Apr 09, 2026 at 08:32:35PM -0700, Jakub Kicinski wrote:
+>>>>>>> Or for simplicity we could also be testing against skb_headlen()
+>>>>>>> since we don't expect any legit non-linear frames here? Dunno.
+>>>>>> I'll be glad to change this either way, your call.  Given that this is
+>>>>>> an obsolete protocol that seems to only be a target for drive-by fuzzers
+>>>>>> to attack, whatever the simplest thing to do to quiet them up I'll be
+>>>>>> glad to implement.
+>>>>>>
+>>>>>> Or can we just delete this stuff entirely?  :)
+>>>>> Yes.
+>>>>>
+>>>>> My thinking is to delete hamradio, nfc, atm, caif.. [more to come]
+>>>>> Create GH repos which provide them as OOT modules.
+>>>>> Hopefully we can convince any existing users to switch to that.
+>>>>>
+>>>>> The only thing stopping me is the concern that this is just the softest
+>>>>> target and the LLMs will find something else to focus on which we can't
+>>>>> delete. I suspect any PCIe driver can be flooded with "aren't you
+>>>>> trusting the HW to provide valid responses here?" bullshit.
+>>>>>
+>>>>> But hey, let's try. I'll post a patch nuking all of hamradio later
+>>>>> today.
+>>>> Well, either we "expunge" this code to OOT repos, or we mark it
+>>>> as broken and tell everyone that we don't take security fixes
+>>>> for anything that depends on BROKEN. I'd personally rather expunge.
+>>> +1 for "expunge" to prevent LLM-based patch flood.
+>>>
+>>> IIRC, we did that recently for one driver only used by OpenWRT ?
+>>>
+>>>
+>> If the main concern here is ongoing maintenance of these Ham Radio related
+>> protocols/drivers, can we pause for a moment on anything as dramatic as
+>> removing from the tree entirely ?
+> Sure, but:
 >
-> When tfifo_enqueue() appends a packet to the linear queue tail,
-> nskb->next is never set to NULL. The list terminates correctly
-> only by accident if the skb arrived with next already NULL.
->
-> Explicitly null-terminate the tail to prevent list corruption.
->
-> Fixes: d66280b12bd7 ("net: netem: use a list in addition to rbtree")
-> Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
-> Reviewed-by: Simon Horman <horms@kernel.org>
+>> There is a good cohort of capable kernel folks that either are or were ham
+>> radio operators who I believe, upon realising that things have got to this
+>> point, will be happy to redouble efforts to ensure this code maintained and
+>> tested to a satisfactory standard.
+> We need this code to be maintained, because as is being shown, there are
+> reported problems with it that will affect these devices/networks that
+> you all are using.  So all we need is a maintainer for this to be able
+> to take reports that we get and fix things up as needed.  I know you
+> have that experience, want to come back to kernel development, we've
+> missed you :)
 
-Can you explain how skb->next could be not NULL ?
+That's most kind Greg, thank you, have missed all you cool kids too :)
 
-This would be a bug in the upper stack.
+More seriously though - I'd be up for doing it, but I think there may be 
+others better placed than I who haven't yet realised we have this 
+conundrum. I'm nudging a few folks offline on this front.
 
-Only TCQ_F_NOLOCK qdiscs (pfifo_fast) can possibly get such skbs, and
-it would not care.
+I've also kicked off a thread in linux-hams to discuss some of the 
+broader questions raised about staying in tree, going to out of tree or 
+looking at userspace solutions instead.
 
-Other qdiscs already get skbs with skb_mark_not_on_list(skb).
+We'll try get a cohesive picture back over next few days.
+
+Cheers,
+Hugh
+
+-- 
+I am slowly moving to hugh@blemings.id.au as my main email address.
+If you're using hugh@blemings.org please update your address book accordingly.
+Thank you :)
+
 
