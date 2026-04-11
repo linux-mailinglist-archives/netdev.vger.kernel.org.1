@@ -1,167 +1,160 @@
-Return-Path: <netdev+bounces-277657-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277658-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id H8MUGm/X2WmutggAu9opvQ
-	(envelope-from <netdev+bounces-277657-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 07:09:03 +0200
+	id iKVYEFnZ2WkItwgAu9opvQ
+	(envelope-from <netdev+bounces-277658-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 07:17:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9C193DE5F9
-	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 07:09:02 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id A76023DE630
+	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 07:17:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5F980302DF9F
-	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 05:09:00 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5DDF4302F7C0
+	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 05:17:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B02E2EBBB9;
-	Sat, 11 Apr 2026 05:08:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A82C1B6CE9;
+	Sat, 11 Apr 2026 05:17:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b="0WSw4+yd"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b="rMM6EdjU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f172.google.com (mail-dy1-f172.google.com [74.125.82.172])
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8E1A212FAD
-	for <netdev@vger.kernel.org>; Sat, 11 Apr 2026 05:08:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26FAF17B425
+	for <netdev@vger.kernel.org>; Sat, 11 Apr 2026 05:17:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775884139; cv=none; b=lR6i88xQ3jXnF96EGZggTOUNtB63MkMTqjfvkn4EJEdDOg6fXiuDyfF0PyFLPJOH4+PNnlONRCaVRinegDvmhCTlp1mLlmBNJEoN7xTasBhdKDYbXKU50IdwOkqGAT3UzM/ZGUn2D/K8DgENCLBZaI/yH9uXVCB0TS3EtsfDs7o=
+	t=1775884630; cv=none; b=WtRwAL3enSCgU1UQV2LS+C2fiqjkPF7UMvx4HA6dviLhXP9ttIWHoUSQ7DNW3ueVuN8TgdJJCjhACgKYrof1l0qOFLKsm5/S/yVYjTua5+2gbiFEMytGfRyLQmdu0zpSgm515gbBzaredu6I0MAVtrqksveIiVu31ClkDYO9AZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775884139; c=relaxed/simple;
-	bh=hnhWOE4trs7qoLEby7/aycHMsLsS4L6lD8KHob2ggP0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=D597SI4zSm43CRej2zhJaHHx9d9qaFYoY8xzdnUJ+c4jDucrIeJKlmsKo//ybXW+56+435Hwf5c5oxUJW0vJPdD4Kzov0D1wH1CwmtV+bENddyJGyj6uGiO2h5FXjVkRGeudyRWkOdqgpHCPwM8D4xjCiO8JgX0qqwfrX4I2gwI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b=0WSw4+yd; arc=none smtp.client-ip=74.125.82.172
+	s=arc-20240116; t=1775884630; c=relaxed/simple;
+	bh=+5cmyVBngjtirzmI1ixD/zNwwxiX9r2wLQ7Mm7myxkU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mh6D07ChiHJwtZ+jADpySeTfGlHuJIkLDy0EM7pLiygj9NzMqdcTW7e97djdY2JalhNV82EkGS1S05bBJ3AEGkHUW35e6y3wpqLXq6nZ+aLfGZt5JWf0a8DEQ/6UMi6mLGI/hfSaVEiXA/Jd+dP11OXsemLIIaOwMwhWPvkUIBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b=rMM6EdjU; arc=none smtp.client-ip=209.85.215.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-dy1-f172.google.com with SMTP id 5a478bee46e88-2ba9c484e5eso3090506eec.1
-        for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 22:08:56 -0700 (PDT)
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-c70e27e2b74so995963a12.0
+        for <netdev@vger.kernel.org>; Fri, 10 Apr 2026 22:17:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20251104.gappssmtp.com; s=20251104; t=1775884136; x=1776488936; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XRF+l/zUg18CEVvIdDUatVFVj/D1hXEfu108gn4gtSY=;
-        b=0WSw4+ydsRb3czymF14tch8tkISlbC1lk38ly75MvyX01GPQF+v7E6TMOJXVVqg77q
-         /M89fyqPz21FZRiqF1ZWFClR1GcuQhgbee9yR/TGXvevT4TQ5p08nABXtmeDn+Knz6Y/
-         gJgn+yLLQcofQ5TmsaJ2+M8YwUjz0XMsYdLysNhnMnB1MA+hqssykcbHbMmtLmGStDNP
-         a1G7zS/AWRCS2p1M0phSaTTF+5fKPsPgnekImzhtznNvhhTXqQwS+29tcUcWp/7rt/FP
-         tZLLY4xaHqO0tfbz2vsHGtcksch1rVwcmsrQ+E2s/WQP7OJPxc/+ygo0sD0XhPaQf4z6
-         iiPg==
+        d=networkplumber-org.20251104.gappssmtp.com; s=20251104; t=1775884628; x=1776489428; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=H4K+j0HFzcE4tUW+MAnU0WDu48PUayY5FoZBhp8lrc0=;
+        b=rMM6EdjUrB8OhgpUBFBVGSHiEcS/9gEW0dfFTL/TrlklVZ7GdmTwSdjrZNM373Tu/b
+         7u5Jbt8eRazIbtSznyR54wl/UzKtFNEml7SI5EKYPj15yHYvffUfq88P9CVGBgW33odK
+         QQjm7beeq/wRWbhS9KXDGOUJD6fbSaFDn+YLRuK19oDP/r2fpEqMHFsYsqCMyvUv6Hgu
+         7ZBlU6li//4pEvsGYfAQBnArl/gDuQ/1Cc7hbzGt/4tjqPDIXkl6R5GgBJKYTNiniKLZ
+         yIM5YEtYxtr9l3StGBerS55/yZG7ZsaWwZECcoIC0Tf8SyFuF5RT/ufIgwFDFdc7hSvl
+         0ksw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775884136; x=1776488936;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=XRF+l/zUg18CEVvIdDUatVFVj/D1hXEfu108gn4gtSY=;
-        b=gn8COMA8jYkMVAedjQ7hSKOC2K0LELS5jCQ5vYi1b6pDtg9DfBkrwnKlHKHLOmco5a
-         I/TFhY3N+OWhZtCRT4ahZvceVfYZE1iPKk1z7BJBa33Iv3fF4gvf0CHKirf+e1GVt9T4
-         I4VKdFS3cZYmH+HIx0QPkJzZe4lrABdGeP2udO93NTtQ8mIM7XD6Z07SArPK4UrFJ7Od
-         IAacOPDxxaKz9Es4QuB4rBi1fNKF0opLLkxj40oZsohMF3onpMFJenxAXPczQi2NTUZe
-         GkL3+vwpJ7XAPYmOwGQ9OCxaUY+3T3QyIBaT+xdCi2MuYlqfTnTuktXU8ETzvieO1pVQ
-         OTFQ==
-X-Gm-Message-State: AOJu0Yyd7RtIfnbszpC5QL4FemHm+r1hXfi/X7cxNR4hSTtecK72cLuL
-	N8ksV6mC1r2GfQj+8TfubQPScrVSB1JO63SezpxdiTajrDHRNQmXTTQLOylc3DEmBEKbWj/cP2r
-	OjMAq
-X-Gm-Gg: AeBDietyRfOtVQrxuDjE332kQylOPOgSZR7EVKkttb+seO1PDMbkUx4fB6cWt1ghH6c
-	WaNyxEb2nGel2M9DXjDJ7CN6FmUh5Je01SIZ30GK5YAw1+6FyvR2YwFJZ+uJA56ApdyBVjMyzXg
-	VQP11INCR2A+LTDJcKBK5IHVNSihsHe3eHZUsqYDMk/N0gdDNGtUS29GH2st2truQLLWfVdUWBT
-	UNP1qRozGD8bOs0gDGI0QB3S02iM6maVKdEk39mL4/5AtVVUzoLL5LAsQkan7D1FAtcXysiV3K5
-	T5nbwn1h7Lgx7QkK7bIOK58cmG40ckDVJYU6DwAiIL5hwKM2GbR3GckYr6R7XvGbfRmFcFMVnmE
-	JQX17bgT/MTQMtV5xCPFasVQVHGDjkvx8QIrOeao+CkM9Aw88QBcnbwZ8I2jUvmDJQKTzlPHerd
-	Pv1dOUEKftwRqT+Mt0LDCfVMEUrXH8l032gN1cfZweg1eRvQ==
-X-Received: by 2002:a05:7300:2384:b0:2ce:25be:c8e8 with SMTP id 5a478bee46e88-2d5881a8f1dmr3818451eec.17.1775884135748;
-        Fri, 10 Apr 2026 22:08:55 -0700 (PDT)
-Received: from phoenix.local ([104.202.41.210])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2d55faa5257sm7451465eec.9.2026.04.10.22.08.54
+        d=1e100.net; s=20251104; t=1775884628; x=1776489428;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=H4K+j0HFzcE4tUW+MAnU0WDu48PUayY5FoZBhp8lrc0=;
+        b=Ak2lXU0/zN8VauB9izKSPMLVgkbkIqH1VFGX+9c8atidGAqmH4FaxWTdpGZSY9IB/E
+         MjxqSVs/fu5a1Q3l5h4di5i9TJe+facbD9XzzQ/P+ie9X16AZKAbFzYSQMz+be6LiM1e
+         NWH/xpe8mvj6Mnm2MUosFm6Mpx/nyAHNO9qt0r3rxKKJAp47Irnqt3jyfGwWXxnUzs5I
+         FVlIgOpvd+S2U0JdbUnh8eTILUigWo1WsHb87Di82f+8WfBp+agP+zvQWiFeJOEI1wEU
+         cW88HObv/KoEx4kSpq26Bi+l/68odJs6ZyshmviVd3HY87ufopygenAMSfmGTLuS16N3
+         Wafw==
+X-Gm-Message-State: AOJu0Ywvs6W3ttBpuKlPG+dCo37kEZpQu5Pcp0+exsO5NgbqSjrStW1W
+	kbaeVdPHiz4A+gIvMvAEeBjaAfWtcN1DEEQq6KKZg2QzFwz0hnmKNg3Riwon2WGxdqA2eebZnxR
+	oJtgb
+X-Gm-Gg: AeBDiety9Ah8vZ3EXre75Dh5FG+ZSBif8BOVdNjY48632N5NN+/rFYvJ24p3JXrsQlW
+	OP21VGl+VQQhBx+eWfUS8c7DuXVImdzMPUHbArCQbqeZE8apFE4vdkD8FFRPrIS1Q0YA1OeEqbx
+	wQ4otldjX2Es35nk7CiVbmMz7oQypfhl2c+mFoKl/1yrvXiwBzEQVievJjag6U2klV+eQiGzr8M
+	nUdre1ZD+631vIj/Qkph40Vp2C+o7iciZ0NYY8iKoSjTgCXlOJVtHO9yG7apmo+HGc9iWkcoAlA
+	pYTMera58UmWkHOrnGOzoSUX/4XUkooDB7mKKDCYjniaDDrPUFqkKoXAIJLq9e5RAjRGLkST6fq
+	+SLKpVrs0zI0KASKjpoVxV6uO2beb1uRFofOJkanbi+F0u+2m2/ARcz+zjzlaKAGrGaMGkPThPV
+	akDUItsiDgKgaqobMLUgrE+044C2+VJ0Yi
+X-Received: by 2002:a05:6a21:9987:b0:39f:1f92:28d with SMTP id adf61e73a8af0-39fe3f1d7fbmr6658156637.29.1775884628448;
+        Fri, 10 Apr 2026 22:17:08 -0700 (PDT)
+Received: from phoenix.lan ([104.202.41.210])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c7921a1ef00sm3855700a12.28.2026.04.10.22.17.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Apr 2026 22:08:55 -0700 (PDT)
-Date: Fri, 10 Apr 2026 22:08:52 -0700
+        Fri, 10 Apr 2026 22:17:08 -0700 (PDT)
 From: Stephen Hemminger <stephen@networkplumber.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko
- <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Simon Horman
- <horms@kernel.org>, open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 4/5] net/sched: netem: add per-impairment
- extended statistics
-Message-ID: <20260410220852.1fabffc0@phoenix.local>
-In-Reply-To: <36e86b68-f7d9-4455-a0b5-613f717e670a@redhat.com>
-References: <20260403225324.476787-1-stephen@networkplumber.org>
-	<20260403225324.476787-5-stephen@networkplumber.org>
-	<36e86b68-f7d9-4455-a0b5-613f717e670a@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Stephen Hemminger <stephen@networkplumber.org>
+Subject: [PATTCH net v5 0/8] net/sched: netem bug fixes
+Date: Fri, 10 Apr 2026 22:15:49 -0700
+Message-ID: <20260411051700.311679-1-stephen@networkplumber.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-1.56 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.06 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[networkplumber-org.20251104.gappssmtp.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[networkplumber-org.20251104.gappssmtp.com:+];
-	TAGGED_FROM(0.00)[bounces-277657-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWO(0.00)[2];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-277658-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	DKIM_TRACE(0.00)[networkplumber-org.20251104.gappssmtp.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,networkplumber-org.20251104.gappssmtp.com:dkim]
-X-Rspamd-Queue-Id: A9C193DE5F9
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[networkplumber-org.20251104.gappssmtp.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,networkplumber.org:mid]
+X-Rspamd-Queue-Id: A76023DE630
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, 9 Apr 2026 11:30:00 +0200
-Paolo Abeni <pabeni@redhat.com> wrote:
+These bugs were identified while using AI-assisted code review of
+sch_netem.c to analyze the packet duplication re-entrancy problem
+(CVE-2025-37890, CVE-2025-38001), which are addressed in a separate
+series.
 
-> On 4/4/26 12:52 AM, Stephen Hemminger wrote:
-> > diff --git a/include/uapi/linux/pkt_sched.h b/include/uapi/linux/pkt_sched.h
-> > index 66e8072f44df..fada10cb9b7b 100644
-> > --- a/include/uapi/linux/pkt_sched.h
-> > +++ b/include/uapi/linux/pkt_sched.h
-> > @@ -569,6 +569,15 @@ struct tc_netem_gemodel {
-> >  #define NETEM_DIST_SCALE	8192
-> >  #define NETEM_DIST_MAX		16384
-> >  
-> > +struct tc_netem_xstats {
-> > +	__u32	delayed;	/* packets delayed */
-> > +	__u32	dropped;	/* packets dropped by loss model      */
-> > +	__u32	corrupted;	/* packets with bit errors injected   */
-> > +	__u32	duplicated;	/* duplicate packets generated        */
-> > +	__u32	reordered;	/* packets sent out of order          */
-> > +	__u32	ecn_marked;	/* packets ECN CE-marked (not dropped)*/
-> > +};  
-> 
-> Sashiko notes that the counters size will be set in stone by the uAPI,
-> and u32 can wraparound very quickly (especially for unconditional delay).
-> 
-> I see other qdiscs generally use __u32, but some have __u64 too, so I
-> assume there are no architectural blocker to larger counter.
-> 
-> Could you please move use __u64 above?
-> 
-> Thanks,
-> 
-> Paolo
-> 
+The review uncovered several additional issues:
 
-Sure larger counters are fine, mostly just following the herd.
-I assume don't need to need about 32 bit tearing when reading these?
+- probability gaps in the 4-state Markov loss model where
+  boundary values produce no state transition
+- queue limit check not accounting for reordered packets
+- PRNG reseeded on every tc change, breaking reproducibility
+- the core dequeue re-entrancy issue with child qdiscs
+  causing HFSC eltree corruption and DRR class stalls
+- missing NULL termination on the tfifo linear list tail
+- slot delay configuration not validated for inverted ranges
+- slot delay arithmetic overflow for ranges above ~2.1 seconds
+
+v5 - fix slot dynamics in the dequeue change
+
+v4 - split refactoring and fix for dequeue into two patches
+
+Stephen Hemminger (8):
+  net/sched: netem: fix probability gaps in 4-state loss model
+  net/sched: netem: fix queue limit check to include reordered packets
+  net/sched: netem: only reseed PRNG when seed is explicitly provided
+  net/sched: netem: refactor dequeue into helper functions
+  net/sched: netem: batch-transfer ready packets to avoid child
+    re-entrancy
+  net/sched: netem: null-terminate tfifo linear queue tail
+  net/sched: netem: check for invalid slot range
+  net/sched: netem: fix slot delay calculation overflow
+
+ net/sched/sch_netem.c | 238 ++++++++++++++++++++++++++++--------------
+ 1 file changed, 159 insertions(+), 79 deletions(-)
+
+-- 
+2.53.0
+
 
