@@ -1,161 +1,179 @@
-Return-Path: <netdev+bounces-277710-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277711-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6KkfEhp72mnG2wgAu9opvQ
-	(envelope-from <netdev+bounces-277710-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 18:47:22 +0200
+	id QPn3Mqp92mlM3AgAu9opvQ
+	(envelope-from <netdev+bounces-277711-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 18:58:18 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C0063E0E55
-	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 18:47:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 286FF3E0F3E
+	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 18:58:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 29E05301BF63
-	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 16:47:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B33753008D13
+	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 16:54:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64D7026A1B9;
-	Sat, 11 Apr 2026 16:47:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C13DD3112AD;
+	Sat, 11 Apr 2026 16:54:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="PR7WAvLv"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="O2P6DHpx"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59A28DF6C;
-	Sat, 11 Apr 2026 16:47:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E1073B9608;
+	Sat, 11 Apr 2026 16:54:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775926036; cv=none; b=KLa1N+O+DJ75NN2pDKtYRGmtzYPYk7bq3+UaDmCDgtU9LGa91QR5Pl2Z7HRXwiHmHJGGCyWpSRW7zEjEds1RfYwrl+8+EVh47QKXhT4UCNCTPb6WX2zg5pgJcjcRux1yIp9vNCeIZAbNlTd+e7qVJi9VTcd4+btuMKWAyxKMzic=
+	t=1775926454; cv=none; b=m+1Lc/e+szyPlApcxsJFotOHmwygayjfP1/f8VNp5tYA+R7bySQiF05UheXPQ4ejZ9sZXBCwUbG9PKU5riru8s7ytgOGpTyZuacaOigP5BZDnsFweCK+DSVlYvT5oNVdQr04rP26VEn5l0rpZQJw5IdQ0q6eXdbjDNFsNdKI2c8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775926036; c=relaxed/simple;
-	bh=8cQZImQp+tuVvGHr4GmxXjui6MMfQ2dLUI/hZd9WRFc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ULEDL38HPr92Gyp7bC5N12lCs4R6l/bDzYg8wjuWxcOxIXhGuqEvcyrdXX1iTgG0iDFwikCzn3tDqS0+52xBNHiqn1B/JFatZA1gxXlHwGbeX7xj/5b2OhdSqniTzDI7F00oe+44jVD/Y72/JgkwXxmRWHWTxUBUJHh2HuZ8L34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=PR7WAvLv; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=qKF12S90jU35vPmsb+IS2nvo1a00d4ctwx48R3EXU9M=; b=PR7WAvLvGplY6r36JhuLZrC8rs
-	uXxSqxok7GpsE9ws+KIcaL7+qJ1T0W7eZdI8Awr9yScdz3nn++8zd56gn2POog78UdCdbAzDZaIti
-	XZNtOE2hSup3scYWBmsj0M/Z6GbSOrTYGAaVivFqwuoWa3+aOOPQMJnJ598yQ2lmkh6Mdfr5eKfsy
-	SWvyOPa9AsOfY0zubhAcnA/KEYmTtEP6b2IcU1HcbRNcw5VWC6UPZaDCxs9PnsGTNplLUVCAYIDCR
-	lTI9GL0s+yaW9tWWgcIv5nyEuQaJn7/+WK95P6/QSKrz7EDS0oOyj5Kot8Ce45dVB5WaBaBSFOL/I
-	S1DLTCTQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:60304)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1wBbTz-000000006JT-2VOg;
-	Sat, 11 Apr 2026 17:46:55 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1wBbTv-000000006la-4688;
-	Sat, 11 Apr 2026 17:46:52 +0100
-Date: Sat, 11 Apr 2026 17:46:51 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Biju Das <biju.das.jz@bp.renesas.com>,
-	"biju.das.au" <biju.das.au@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Ovidiu Panait <ovidiu.panait.rb@renesas.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Prabhakar Mahadev Lad <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-	"linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>
-Subject: Re: [PATCH net-next] net: phy: call phy_init_hw() in phy resume path
-Message-ID: <adp6-wElGOOijZRG@shell.armlinux.org.uk>
-References: <20260410142904.439666-1-biju.das.jz@bp.renesas.com>
- <adkOZl4gt5UoGv-0@shell.armlinux.org.uk>
- <839fec66-5ec0-4cc0-a0c4-ae2de6902188@lunn.ch>
- <TY3PR01MB11346B6680E5952BD7B7078CA86592@TY3PR01MB11346.jpnprd01.prod.outlook.com>
- <admMethCSjOQhu8g@shell.armlinux.org.uk>
- <dedab35c-39f4-469b-9227-cb8925d83b8e@lunn.ch>
+	s=arc-20240116; t=1775926454; c=relaxed/simple;
+	bh=Xy1i8/Vb4xb6aKipUIHhB8zyMf1+xp7IX2ZLwSpy02o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mv5YB3fM5uk7T6KZbwlyQ1dthQNUERUvrK7g3461KhnanutJsfdZe8Ifz7qWjOii0LNvV3vc+a8wqLTcLhtoBZIMY4ZQzHLzQ5VG4TXXmZXHyjJG0Ne6fWXORKOG1gUXK08Ath3EBKf4vt3hXDRJAhMQWCUSmEDJJXpbRoCXgB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=O2P6DHpx; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id F32414E429C7;
+	Sat, 11 Apr 2026 16:54:07 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id A7CF460410;
+	Sat, 11 Apr 2026 16:54:07 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B20771045001C;
+	Sat, 11 Apr 2026 18:54:02 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1775926446; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=W5IQ24kdhXhWFFYvlmQCRDImAovTvZLPLnv6pYIeYaw=;
+	b=O2P6DHpxDPhELF4ajyXzJ3baTB1Crkn9mpVScIXAJh1f1yER+6tM+qlAi/O6zbvkhq8ZE7
+	MSD7AzrrFafxgfdscvfdd+DzWfAbsleaL7fw5HeZv7C7f2EffF8xxKE+y7DIoWNSza9cy5
+	XpMsCSlLdPEurUcOESQ/1Bu4sxviuiMlv3z1RGDSNx+ePzEICBr86OJJNwMTOmDOi8zwl6
+	7FUnckGuqk0E+0My5+hboi6MOIctauhJiN2oT9pkXIeV3XnEqHs01+whGp7EELaP0L/cQx
+	zft+htkqeKaLgwJAQ5TWWLcuyCrMaNzkbzJzdTpFbNgVHuAvENBfltu8kkETMA==
+Message-ID: <c37f182e-cbb4-4f0b-817a-759d39940212@bootlin.com>
+Date: Sat, 11 Apr 2026 18:54:01 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <dedab35c-39f4-469b-9227-cb8925d83b8e@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spamd-Result: default: False [1.14 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: phy: qcom: at803x: Use the correct bit to
+ disable extended next page
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Russell King <linux@armlinux.org.uk>,
+ thomas.petazzoni@bootlin.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org
+References: <20260410171021.1277138-1-maxime.chevallier@bootlin.com>
+ <4b386a4a-9743-4e79-8d3d-3576bb9de492@lunn.ch>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <4b386a4a-9743-4e79-8d3d-3576bb9de492@lunn.ch>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[bp.renesas.com,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,renesas.com,vger.kernel.org,glider.be];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-277710-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	TAGGED_FROM(0.00)[bounces-277711-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	NEURAL_HAM(-0.00)[-0.977];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,renesas];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:url,shell.armlinux.org.uk:mid]
-X-Rspamd-Queue-Id: 7C0063E0E55
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,bootlin.com:dkim,bootlin.com:mid]
+X-Rspamd-Queue-Id: 286FF3E0F3E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sat, Apr 11, 2026 at 03:50:13PM +0200, Andrew Lunn wrote:
-> > So, I question whether any of the functions in this driver actually
-> > have a valid reason to take phydev->lock - looks to me like a not
-> > very well written driver.
-> > 
-> > In cases like this, I don't think we should make things more
-> > difficult in the core just because we have a lockdep splat when that
-> > can be avoided by killing off unnecessary locking.
+Hi Andrew,
+
+On 11/04/2026 16:10, Andrew Lunn wrote:
+> On Fri, Apr 10, 2026 at 07:10:20PM +0200, Maxime Chevallier wrote:
+>> As noted in the blamed commit, the AR8035 and other PHYs from this
+>> family advertise the Extended Next Page support by default, which may be
+>> understood by some partners as this PHY being multi-gig capable.
+>>
+>> The fix is to disable XNP advertising, which is done by setting bit 12
+>> of the Auto-Negotiation Advertisement Register (MII_ADVERTISE).
+>>
+>> The blamed commit incorrectly uses MDIO_AN_CTRL1_XNP, which is bit 13 as per
+>> 802.3 : 45.2.7.1 AN control register (Register 7.0)
+>>
+>> BIT 12 in MII_ADVERTISE is wrapped by ADVERTISE_RESV, used by some
+>> drivers such as the aquantia one. 802.3 Clause 28 defines bit 12 as
+>> Extended Next Page ability, at least in recent versions of the standard.
 > 
-> Agreed. This patchset should cleanup these locks.
+>> Let's add a define for it and use it in the at803x driver.
 > 
-> We also need to look at lan937x_dsp_workaround(). I also don't see
-> what that mutex lock/unlock is protecting. Accessing bank registers
-> need to be protected, so doing one additional access within that
-> should not need additional protection.
+> I agree with this, it defines the C22 4.12 bit. And this is what the
+> at803x driver is using it for.
+> 
+>>  static void at803x_link_change_notify(struct phy_device *phydev)
+>> diff --git a/include/uapi/linux/mii.h b/include/uapi/linux/mii.h
+>> index 39f7c44baf53..61d6edad4b94 100644
+>> --- a/include/uapi/linux/mii.h
+>> +++ b/include/uapi/linux/mii.h
+>> @@ -82,7 +82,8 @@
+>>  #define ADVERTISE_100BASE4	0x0200	/* Try for 100mbps 4k packets  */
+>>  #define ADVERTISE_PAUSE_CAP	0x0400	/* Try for pause               */
+>>  #define ADVERTISE_PAUSE_ASYM	0x0800	/* Try for asymetric pause     */
+>> -#define ADVERTISE_RESV		0x1000	/* Unused...                   */
+>> +#define ADVERTISE_XNP		0x1000  /* Extended Next Page */
+>> +#define ADVERTISE_RESV		ADVERTISE_XNP /* Used to be reserved */
+> 
+> Should we keep ADVERTISE_RESV?
+> 
+>   45.2.7.6 AN advertisement register
+> 
+>   If the Auto-Negotiation advertisement register (register 4) is
+>   present, (see 28.2.4.1.3), then this register is a copy of the
+>   Auto-Negotiation advertisement register (register 4). In this case,
+>   reads to the AN advertisement register (7.16) report the value of
+>   the Auto-Negotiation advertisement register (register 4); writes to
+>   the AN advertisement register (7.16) cause a write to occur to the
+>   Auto-Negotiation advertisement register.
+> 
+> So MDIO_MMD_AN:MDIO_AN_ADVERTISE is a straight copy of MII_ADVERTISE.
+> 
+>         ef4_mdio_write(efx, MDIO_MMD_AN, MDIO_AN_ADVERTISE, reg);
+>         ret = phy_write_mmd(phydev, MDIO_MMD_AN, MDIO_AN_ADVERTISE, adv);
+> 
+> So ADVERTISE_XNP is just as valid in the other two drivers using
+> ADVERTISE_RESV. I think we should change those as well to
+> ADVERTISE_XNP and remove ADVERTISE_RESV?
+> 
+> 	Andrew
 
-Looking at access_ereg(), shouldn't it be taking the MDIO bus lock
-and using the __phy_* accessors anyway because it's writing various
-registers which determine what is being read via the
-LAN87XX_EXT_REG_RD_DATA register or the value written via the
-LAN87XX_EXT_REG_WR_DATA register.
+I agree with that yes and I've considered converting these drivers once
+we have net merged into net-next should this patch be applied :)
 
-Also, as it has access_ereg_modify_changed(), that entire sequence
-needs to take the MDIO bus lock to safely do the read-modify-write.
+That said, ADVERTISE_RESV is in uapi, is it even possible to remove it ?
 
-Then there's lan87xx_config_rgmii_delay() which is a large open
-coded read-modify-write for the PHYACC_ATTR_BANK_MISC, LAN87XX_CTRL_1
-register.
+I think the best we can hope for is to no longer have in-tree users of
+ADVERTISE_RESV :(
 
-To me, this looks like a racy driver, and it also looks like it's using
-the wrong lock to try and protect hardware accesses.
+Maxime
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
