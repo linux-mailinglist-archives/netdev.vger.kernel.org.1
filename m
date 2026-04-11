@@ -1,164 +1,193 @@
-Return-Path: <netdev+bounces-277645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277646-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id B3Y3Caez2WkasQgAu9opvQ
-	(envelope-from <netdev+bounces-277645-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 04:36:23 +0200
+	id TePGMADC2WlvswgAu9opvQ
+	(envelope-from <netdev+bounces-277646-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 05:37:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BB4A3DE0A6
-	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 04:36:22 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58F8E3DE37F
+	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 05:37:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D3B42301DE13
-	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 02:36:20 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 450BC3035A42
+	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 03:37:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3AD021E091;
-	Sat, 11 Apr 2026 02:36:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BE7E285041;
+	Sat, 11 Apr 2026 03:37:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t2Ovoltu"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="K37Txh3O"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from canpmsgout10.his.huawei.com (canpmsgout10.his.huawei.com [113.46.200.225])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD83D18A6D4;
-	Sat, 11 Apr 2026 02:36:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3183242A96;
+	Sat, 11 Apr 2026 03:37:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775874979; cv=none; b=UHw2u1JcJOhFJMpVHhFphGQbXElr3mUcb9LiQAdEBIGbA5aYv+MzgKpUz6iaGbRyBF3KiI7P994Uos1QZa/hhES3BGtrANN6r+s4vxMl4Od4Gs3Jp1TPQDuu68bmeDYKLrJas71SffxP86T7Op3GTuuRgtkXj91c4lYFeUQOKyg=
+	t=1775878652; cv=none; b=gsIH1OFAlLR0pN8Z8pwnNgPbWGTgN5AIQpdXRBeoU/HCdoEKoQ3WB9eY5aFpM7Rqvyn7bSv8us+Oa7KcDdEfyyOSbOna/0i3uMjgryr7ghelkKp6mbZoLoYhARXjGEfli/4qnP6hxAIzEobeU1zSozI2FtBFH13B5gHnM04+k30=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775874979; c=relaxed/simple;
-	bh=eO4Mvhsq4Mq/cpZl11DpNXyx10kT44I69he5RD7wc/8=;
-	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
-	 Subject:From:To:Cc:Date; b=OcPtgFG8nxW4/oFDt/Hs9HRFrvBx8WbOZeOXT26zu1wOIGIpmbPGVMEBQuql9w19QH+Tspc6U+Zs8jMnKMe2KlW7D9gihKVRPA4UO5fB2GHhgxdps85y8CE3XJjfiGlXHMj49sjnnI7Qc4pkWEzR5CVIbpSUMSWAJnOE1U/65EQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t2Ovoltu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2BD1C19421;
-	Sat, 11 Apr 2026 02:36:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775874979;
-	bh=eO4Mvhsq4Mq/cpZl11DpNXyx10kT44I69he5RD7wc/8=;
-	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
-	b=t2OvoltuLUfVmjp7FcjEDwNKu8oookSya+80UUes3jhoNG6mqGSUWQFP66YhZlnjk
-	 L/GIaIw8MBpg/U7G5HZrSmjDFGbisqoKUpz59dkOLzZkcnPXRow5Lyq8850ruczK2E
-	 PeYsuAH4nDFZyx6+l1hy+ZyFFxjLyWwqTSwaCL5YvB/1N1b96qg+ItqBivX67kexqI
-	 cldb3A+WcpQkPovYxWM6tENLktQajaqTLLE526ciDFXuHSQRHo4xMU/VB/1jMu0oCC
-	 AyvB0hFICISy3Ct+saH3uYbvTqjQrY7uRwEchbTZ1fUu1/gXvDHKhsbfkxmK8/Uy2I
-	 T+apnZe7Vo9Vw==
-Content-Type: multipart/mixed; boundary="===============3484057471282728357=="
+	s=arc-20240116; t=1775878652; c=relaxed/simple;
+	bh=+sr76JA3AcwsJDDJEvZpRLZKh3QC/32zbS2D5TzOP10=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=HOnNFJgpez6E098ATBJF29oTmMLyhQ84KtL5YZJT2hcrRg97KxQN7cgJEfh6gzsjjM+LUGvA3PshMq9QmrkyA8Z3zpAs5LtPpdZAgAMvmHOpCBCwJ3d8eOK5aWu7fsid1oM3evgmpqJOgbPUhwmxwEVXtMTMDTQgvznDQc9p5Kk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=K37Txh3O; arc=none smtp.client-ip=113.46.200.225
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=bX7d30qWdzMng81HWLsyravL4XzU1hYQpVIysOygACQ=;
+	b=K37Txh3OeWqpg8WDkTTsCDXArYkVTJSRfjDiAEx7aCg2/FbZQEXwCeCHV3SbgDW/o6fh/6ZHv
+	+9T2+ueeyBzCRB6S8OTerePt26HfX0MnLlfS7Ukv7g9azeLWGuWRByMhRzfmdKv6yO3o/K7v3a4
+	dK8WX6MtAu/VJqRvIkCCiOA=
+Received: from mail.maildlp.com (unknown [172.19.163.163])
+	by canpmsgout10.his.huawei.com (SkyGuard) with ESMTPS id 4fszjD0mRSz1K973;
+	Sat, 11 Apr 2026 11:31:12 +0800 (CST)
+Received: from kwepemf100013.china.huawei.com (unknown [7.202.181.12])
+	by mail.maildlp.com (Postfix) with ESMTPS id 91EA84056E;
+	Sat, 11 Apr 2026 11:37:25 +0800 (CST)
+Received: from DESKTOP-62GVMTR.china.huawei.com (10.174.189.124) by
+ kwepemf100013.china.huawei.com (7.202.181.12) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.36; Sat, 11 Apr 2026 11:37:24 +0800
+From: Fan Gong <gongfan1@huawei.com>
+To: Fan Gong <gongfan1@huawei.com>, Zhu Yikai <zhuyikai1@h-partners.com>,
+	<netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, Ioana Ciornei <ioana.ciornei@nxp.com>, Mohsin Bashir
+	<mohsin.bashr@gmail.com>
+CC: <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>, luosifu
+	<luosifu@huawei.com>, Xin Guo <guoxin09@huawei.com>, Zhou Shuai
+	<zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>, Shi Jing
+	<shijing34@huawei.com>, Zheng Jiezhen <zhengjiezhen@h-partners.com>, Maxime
+ Chevallier <maxime.chevallier@bootlin.com>
+Subject: [PATCH net-next v05 0/6] net: hinic3: PF initialization
+Date: Sat, 11 Apr 2026 11:36:58 +0800
+Message-ID: <cover.1775711066.git.zhuyikai1@h-partners.com>
+X-Mailer: git-send-email 2.51.0.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <efdb35c2d8151489fb031ad63ce8bd6000b8bbaa2bf5a523c927907399c93ab0@mail.kernel.org>
-In-Reply-To: <20260411015419.114016-3-ameryhung@gmail.com>
-References: <20260411015419.114016-3-ameryhung@gmail.com>
-Subject: Re: [PATCH bpf-next v2 2/3] bpf: Use kmalloc_nolock() universally in local storage
-From: bot+bpf-ci@kernel.org
-To: ameryhung@gmail.com,bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org,alexei.starovoitov@gmail.com,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,memxor@gmail.com,ameryhung@gmail.com,kernel-team@meta.com,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
-Date: Sat, 11 Apr 2026 02:36:18 +0000 (UTC)
-X-Spamd-Result: default: False [0.34 / 15.00];
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
+ kwepemf100013.china.huawei.com (7.202.181.12)
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	CTYPE_MIXED_BOGUS(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-277645-lists,netdev=lfdr.de,bpf-ci];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,meta.com,linux.dev];
-	FROM_NEQ_ENVFROM(0.00)[bot@kernel.org,netdev@vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+,1:+];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	TAGGED_FROM(0.00)[bounces-277646-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NO_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
+	FREEMAIL_TO(0.00)[huawei.com,h-partners.com,vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,lunn.ch,nxp.com,gmail.com];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[gongfan1@huawei.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[huawei.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.kernel.org:mid]
-X-Rspamd-Queue-Id: 6BB4A3DE0A6
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[huawei.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 58F8E3DE37F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
---===============3484057471282728357==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+This is [3/3] part of hinic3 Ethernet driver second submission.
+With this patch hinic3 becomes a complete Ethernet driver with
+pf and vf.
 
-> diff --git a/kernel/bpf/bpf_local_storage.c b/kernel/bpf/bpf_local_storage.c
-> index cad17ca8552f..bc687b9d25a9 100644
-> --- a/kernel/bpf/bpf_local_storage.c
-> +++ b/kernel/bpf/bpf_local_storage.c
+Add 20 ethtool ops for information of queue, rss, coalesce and eth data.
+Add MTU size validation
+Config netdev watchdog timeout.
+Remove unneed coalesce parameters.
 
-[ ... ]
+Changes:
 
-> @@ -75,18 +75,12 @@ bpf_selem_alloc(struct bpf_local_storage_map *smap, void *owner,
->  	if (mem_charge(smap, owner, smap->elem_size))
->  		return NULL;
->
-> -	if (smap->use_kmalloc_nolock) {
-> -		selem = bpf_map_kmalloc_nolock(&smap->map, smap->elem_size,
-> -					       __GFP_ZERO, NUMA_NO_NODE);
-> -	} else {
-> -		selem = bpf_map_kzalloc(&smap->map, smap->elem_size,
-> -					gfp_flags | __GFP_NOWARN);
-> -	}
-> +	selem = bpf_map_kmalloc_nolock(&smap->map, smap->elem_size,
-> +				       __GFP_ZERO, NUMA_NO_NODE);
+PATCH 03 V01: https://lore.kernel.org/netdev/cover.1773387649.git.zhuyikai1@h-partners.com/
+* Add rmon/pause/phy/mac/ctrl stats (Ioana Ciornei)
 
-With this change, socket and inode local storage now always go through
-kmalloc_nolock(). kmalloc_nolock_noprof() in mm/slub.c has a hard size
-limit:
+PATCH 03 V02: https://lore.kernel.org/netdev/cover.1774684571.git.zhuyikai1@h-partners.com/
+* Modify "return -EINVAL" intension problem (AI review)
+* Use le16_to_cpu for rss_indir pair.out->buf (AI review)
+* Use u32 instead of int in coalesce_limits to avoid overflow (AI review)
+* Remove redundant u64_stats_update_begin/end when reading stats without
+  concurrent reader (AI review)
+* Modify nic_dev->stats.syncp logic (AI review)
+* Complete rxq/txq stats stats fileds in hinic3_rx/txq_get_stats (AI review)
+* Remove statistics values in rtnl_link_stats64 from ethtool statistics
+  values (AI review)
+* Add channel_cfg_lock & channel_res_lock to protect resources access (AI review)
+* Remove OutOfRangeLengthField, FrameToolong and InRangeLengthErrors (Ioana Ciornei)
+* Remove redundant mtu commit (Maxime Chevialler)
 
-    if (unlikely(size > KMALLOC_MAX_CACHE_SIZE))
-        return NULL;
+PATCH 03 V03: https://lore.kernel.org/netdev/cover.1774940117.git.zhuyikai1@h-partners.com/
+* Change unnedd to unneeded (AI review)
+* Remove packets,bytes,errors and dropped in hinic3_rx/tx_queue_stats (AI review)
+* Remove duplicated entried in hinic3_port_stats[] (AI review)
+* change stats_info.head.status to ps->head.status (AI review)
 
-KMALLOC_MAX_CACHE_SIZE is 1 << (PAGE_SHIFT + 1), which is 8KB on
-x86_64 with 4KB pages. But BPF_LOCAL_STORAGE_MAX_VALUE_SIZE in
-bpf_local_storage.h is calculated from KMALLOC_MAX_SIZE (not
-KMALLOC_MAX_CACHE_SIZE):
+PATCH 03 V04: https://lore.kernel.org/netdev/cover.1775618797.git.zhuyikai1@h-partners.com/
+* Remove restore_drop_sge in hinic3_rx_queue_stats (AI review)
+* Remove hinic3_nic_stats (AI review)
+* Use old_q_param to store old config and use it in error handling (Mohsin Bashir)
+* Add netdev_info to inform the user that depth is trimmed (Mohsin Bashir)
+* Remove const in hinic3_get_qp_stats_strings parameters (Mohsin Bashir)
+* Change EOPNOTSUPP to ERANGE in is_coalesce_exceed_limit (Mohsin Bashir)
+* Update nic_dev->rss_type after hinic3_set_rss_type (Mohsin Bashir)
+* Modify MGMT_STATUS_CMD_UNSUPPORTED to EOPNOTSUPP for complying with the
+  error code specifications (Mohsin Bashir)
 
-    #define BPF_LOCAL_STORAGE_MAX_VALUE_SIZE \
-        min_t(u32, \
-              (KMALLOC_MAX_SIZE - MAX_BPF_STACK - \
-               sizeof(struct bpf_local_storage_elem)), \
-              (U16_MAX - sizeof(struct bpf_local_storage_elem)))
+PATCH 03 V05:
+* Clear HINIC3_CHANGE_RES_INVALID bit in error handling (AI review)
+* Use low >= high to avoid low=high in is_coalesce_legal (AI review)
+* As tx and rx share interrupts, we only use ETHTOOL_COALESCE_RX_USECS for
+user setting to avoid user misunderstanding. So we do not add
+ETHTOOL_COALESCE_TX_USECS. (Mohsin Bashir & AI review)
 
-This allows value sizes up to ~65KB. Before this patch, socket and
-inode storage used bpf_map_kzalloc() (backed by regular kmalloc)
-which could handle those large sizes. After this patch, any
-elem_size above KMALLOC_MAX_CACHE_SIZE will silently fail: the map
-creation succeeds via bpf_local_storage_map_alloc_check() but every
-element allocation returns NULL.
+Fan Gong (6):
+  hinic3: Add ethtool queue ops
+  hinic3: Add ethtool statistic ops
+  hinic3: Add ethtool coalesce ops
+  hinic3: Add ethtool rss ops
+  hinic3: Configure netdev->watchdog_timeo to set nic tx timeout
+  hinic3: Remove unneeded coalesce parameters
 
-Should BPF_LOCAL_STORAGE_MAX_VALUE_SIZE be updated to use
-KMALLOC_MAX_CACHE_SIZE instead of KMALLOC_MAX_SIZE now that all
-storage types go through kmalloc_nolock()?
+ .../ethernet/huawei/hinic3/hinic3_ethtool.c   | 827 +++++++++++++++++-
+ .../ethernet/huawei/hinic3/hinic3_hw_intf.h   |  13 +-
+ .../net/ethernet/huawei/hinic3/hinic3_irq.c   |  16 +-
+ .../net/ethernet/huawei/hinic3/hinic3_main.c  |  15 +
+ .../huawei/hinic3/hinic3_mgmt_interface.h     |  39 +
+ .../huawei/hinic3/hinic3_netdev_ops.c         | 104 ++-
+ .../ethernet/huawei/hinic3/hinic3_nic_cfg.c   |  64 ++
+ .../ethernet/huawei/hinic3/hinic3_nic_cfg.h   | 109 +++
+ .../ethernet/huawei/hinic3/hinic3_nic_dev.h   |  16 +
+ .../ethernet/huawei/hinic3/hinic3_nic_io.h    |   4 +
+ .../net/ethernet/huawei/hinic3/hinic3_rss.c   | 487 ++++++++++-
+ .../net/ethernet/huawei/hinic3/hinic3_rss.h   |  19 +
+ .../net/ethernet/huawei/hinic3/hinic3_rx.c    |  59 +-
+ .../net/ethernet/huawei/hinic3/hinic3_rx.h    |  18 +-
+ .../net/ethernet/huawei/hinic3/hinic3_tx.c    |  71 +-
+ .../net/ethernet/huawei/hinic3/hinic3_tx.h    |   2 +
+ 16 files changed, 1836 insertions(+), 27 deletions(-)
 
-Slava Imameev raised the same concern for task storage in
-https://lore.kernel.org/bpf/20260410014341.47043-1-slava.imameev@crowdstrike.com/
 
-[ ... ]
+base-commit: 8e7adcf81564a3fe886a6270eea7558f063e5538
+-- 
+2.43.0
 
-
----
-AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
-
-CI run summary: https://github.com/kernel-patches/bpf/actions/runs/24272235145
---===============3484057471282728357==--
 
