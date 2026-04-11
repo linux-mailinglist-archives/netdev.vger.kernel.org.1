@@ -1,179 +1,248 @@
-Return-Path: <netdev+bounces-277711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277712-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QPn3Mqp92mlM3AgAu9opvQ
-	(envelope-from <netdev+bounces-277711-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 18:58:18 +0200
+	id 8Px1FVCK2mmv3ggAu9opvQ
+	(envelope-from <netdev+bounces-277712-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 19:52:16 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 286FF3E0F3E
-	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 18:58:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A8F723E1245
+	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 19:52:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B33753008D13
-	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 16:54:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B14DD3046992
+	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 17:51:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C13DD3112AD;
-	Sat, 11 Apr 2026 16:54:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 339763BAD8C;
+	Sat, 11 Apr 2026 17:51:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="O2P6DHpx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kFNilsEW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E1073B9608;
-	Sat, 11 Apr 2026 16:54:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 524F4282F00
+	for <netdev@vger.kernel.org>; Sat, 11 Apr 2026 17:51:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775926454; cv=none; b=m+1Lc/e+szyPlApcxsJFotOHmwygayjfP1/f8VNp5tYA+R7bySQiF05UheXPQ4ejZ9sZXBCwUbG9PKU5riru8s7ytgOGpTyZuacaOigP5BZDnsFweCK+DSVlYvT5oNVdQr04rP26VEn5l0rpZQJw5IdQ0q6eXdbjDNFsNdKI2c8=
+	t=1775929914; cv=none; b=AOCK22++iZB9mliT9KDpSYIYMNrs8sL9aNEK8bF+4dFff38JQbGY0PBK6YoMIvaG5mm2ASD1kHV5qfl9b9jUlMt2v+T0VucIEZWnbOLO2lb9gbMVimrZDG+itKNfQ4c/H9/glfcyf9MpesSmXnRP/UobU6/+GhxRMi21d00genQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775926454; c=relaxed/simple;
-	bh=Xy1i8/Vb4xb6aKipUIHhB8zyMf1+xp7IX2ZLwSpy02o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mv5YB3fM5uk7T6KZbwlyQ1dthQNUERUvrK7g3461KhnanutJsfdZe8Ifz7qWjOii0LNvV3vc+a8wqLTcLhtoBZIMY4ZQzHLzQ5VG4TXXmZXHyjJG0Ne6fWXORKOG1gUXK08Ath3EBKf4vt3hXDRJAhMQWCUSmEDJJXpbRoCXgB4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=O2P6DHpx; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id F32414E429C7;
-	Sat, 11 Apr 2026 16:54:07 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id A7CF460410;
-	Sat, 11 Apr 2026 16:54:07 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B20771045001C;
-	Sat, 11 Apr 2026 18:54:02 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1775926446; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=W5IQ24kdhXhWFFYvlmQCRDImAovTvZLPLnv6pYIeYaw=;
-	b=O2P6DHpxDPhELF4ajyXzJ3baTB1Crkn9mpVScIXAJh1f1yER+6tM+qlAi/O6zbvkhq8ZE7
-	MSD7AzrrFafxgfdscvfdd+DzWfAbsleaL7fw5HeZv7C7f2EffF8xxKE+y7DIoWNSza9cy5
-	XpMsCSlLdPEurUcOESQ/1Bu4sxviuiMlv3z1RGDSNx+ePzEICBr86OJJNwMTOmDOi8zwl6
-	7FUnckGuqk0E+0My5+hboi6MOIctauhJiN2oT9pkXIeV3XnEqHs01+whGp7EELaP0L/cQx
-	zft+htkqeKaLgwJAQ5TWWLcuyCrMaNzkbzJzdTpFbNgVHuAvENBfltu8kkETMA==
-Message-ID: <c37f182e-cbb4-4f0b-817a-759d39940212@bootlin.com>
-Date: Sat, 11 Apr 2026 18:54:01 +0200
+	s=arc-20240116; t=1775929914; c=relaxed/simple;
+	bh=hQyRgPipyQyaQJPCyX6Kz2rmAcO4Jcqde/NTAArq8Uc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=k9d8UJgDDW54AXZCxvGasAl9L8ksqP6uMWe6WiHVJOEAApAtOsvSh9lsyPdDlhZALblIZwcDWieE15rBHHEd1iAh5owZijLHEzplmdYhlvP3R8g8JtD2FVDg54/PrMV6dVP3sD5hr/z+vgJw0DytNr5NhcP5OSKYxk7l+llH+RY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kFNilsEW; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-6634bb959a2so4372083a12.1
+        for <netdev@vger.kernel.org>; Sat, 11 Apr 2026 10:51:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775929910; x=1776534710; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=7XzMVajH34DAZUEcGEEJc3FIbW91DMktp4naXjzHPjg=;
+        b=kFNilsEWc5iW37K+e5inK4if4pf2xMtyTnqZCdOywBTmnp0/MQVb0VyF0NBj5pC2Qt
+         DsjwmuOLT9X5wlr9b3D2Eiwj5uLtskZ00IQYpsp3knG3ERG2B9OvUqarzacObAx7vEwK
+         gtQKpUOOrx9ci0ORK5agJiey83KfAoBpt0fWg+CLwqAz0XqDXnA8e8R4M1rCTnKqBo8I
+         Z/TpVxe3Mi7x3Vpwc0iE9AVYcC+kED9ogBmiPudt0aXI3sKrshvMlf7Bjm0BnM6Niwxn
+         quVlbqJ0UCOC8zT8AJs6uhYDy6YFhWOLU8IsSN5zMY4ae9TP0V43On2+lfxTVAW1G3BL
+         Xc6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775929910; x=1776534710;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7XzMVajH34DAZUEcGEEJc3FIbW91DMktp4naXjzHPjg=;
+        b=PHDdnfjAW/jUkZRSQP22lTrWneXPvYQDUIvzDaNWbePVVIrFsC4hR89UyDEw5KyeYK
+         cu9pAIp1iuXBchJieCkCCHRS2ef50sasB9yG3HfLG9oOe5YqCr2gvRvX5WxuYoTpE2NG
+         3bal0vsjYidIq7t+2LcKE1JkYME5/Gn+hVQrRw166bSLnb3ExUS0G5p5sW3H7xmuIHCb
+         gdw+bFzO6AmIbvk6y/YQgGjHO5EVfvxAaIjKB6dSnaZPQOSjsHwM8vDcBSIJp0ouTp6H
+         d3Bm+rermVDrZdEumHbizoEYvLjAgH/Rd45fFjXQsxuI+zIT10iDaR1r5LM81VEv38NN
+         4JWw==
+X-Forwarded-Encrypted: i=1; AJvYcCVC9Iypjk+50WHRVGn5/JoL5Pvwit2shYDzyZQC9+JUKN8BVuSe5HNqi5nBBBcX1HwD3biUzCI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxEmrKXynZP0FA8Gz311F50S57xVfm076EcvnvSLCd5PgU334hj
+	DcgsOuM5e3Dz3jKqm8EhMo6QLUuoUNc9vbBma+A4shBdem4eAYo5PGqw
+X-Gm-Gg: AeBDievvSqlySjDDcG+6ft7SiDHxpSqOfNnt1XrzanbBDoUpFBLwo9XT87Ft46iqs0m
+	7jjETmTlB+M3JflD0c2+7cee14iPavI889zNHFPcyZGTaXZiY255bwJ74xfOJnoZKdbA19sp8nh
+	sfORUg4VP6GrEXrdF1UtGWUJZltg+gNDZ5vb/MJXeL9s7iVRwgUkZmqW+HhpPH+4HNUF33I2j/R
+	lP4dsRwC3tvhoCBgKRHmgVdHFyMw8q6mT9nH1lANVB2Q3MV5WN9BnAD1ZMCNB/JOS+FRBSBSfAt
+	kx90vMKBzmS91mVaGaklgIZpc4vRbtCJg130u+BaGO0hTjOFEwBMlU5WQdSxv9xpumBn12jjN+x
+	Yc1mYsWcAdQvDHP8uWo4uhMH2xKcJ1u5sHBs1FNFC8xnxr9pf9NTE5vmieFtJFzWsSU18DHsme5
+	gGBNG5l96/5q2oPlKPXHcOc50fHL9K8WObUchwc87sX/sWM3cGI1Fof/8Y
+X-Received: by 2002:a05:6402:a54d:20b0:670:8d90:e861 with SMTP id 4fb4d7f45d1cf-6708d90f131mr2408155a12.6.1775929909414;
+        Sat, 11 Apr 2026 10:51:49 -0700 (PDT)
+Received: from localhost.localdomain ([2a00:f41:1c39:2cef:2a0c:50ff:fe2f:36f4])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-67070816a8esm1486622a12.25.2026.04.11.10.51.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 11 Apr 2026 10:51:48 -0700 (PDT)
+From: "Jose A. Perez de Azpillaga" <azpijr@gmail.com>
+To: bpf@vger.kernel.org
+Cc: Madalin Bucur <madalin.bucur@nxp.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Simon Horman <horms@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	Jiri Olsa <jolsa@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [RFC PATCH] bpf: cpumap: report queue_index to xdp_rxq_info
+Date: Sat, 11 Apr 2026 19:51:23 +0200
+Message-ID: <20260411175134.771552-1-azpijr@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: phy: qcom: at803x: Use the correct bit to
- disable extended next page
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Russell King <linux@armlinux.org.uk>,
- thomas.petazzoni@bootlin.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org
-References: <20260410171021.1277138-1-maxime.chevallier@bootlin.com>
- <4b386a4a-9743-4e79-8d3d-3576bb9de492@lunn.ch>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <4b386a4a-9743-4e79-8d3d-3576bb9de492@lunn.ch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	TAGGED_FROM(0.00)[bounces-277711-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[nxp.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,linux.dev,vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	TAGGED_FROM(0.00)[bounces-277712-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[azpijr@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,bootlin.com:dkim,bootlin.com:mid]
-X-Rspamd-Queue-Id: 286FF3E0F3E
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,rxq.dev:url]
+X-Rspamd-Queue-Id: A8F723E1245
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Andrew,
+When a packet is redirected to a CPU map entry,
+cpu_map_bpf_prog_run_xdp() reconstructs a minimal xdp_rxq_info from
+xdp_frame fields (dev_rx and mem_type) before re-running the BPF program
+on the target CPU. However, queue_index was never preserved across the
+CPU boundary, so BPF programs running in cpumap context always observe
+ctx->rx_queue_index == 0, regardless of which hardware queue originally
+received the packet.
 
-On 11/04/2026 16:10, Andrew Lunn wrote:
-> On Fri, Apr 10, 2026 at 07:10:20PM +0200, Maxime Chevallier wrote:
->> As noted in the blamed commit, the AR8035 and other PHYs from this
->> family advertise the Extended Next Page support by default, which may be
->> understood by some partners as this PHY being multi-gig capable.
->>
->> The fix is to disable XNP advertising, which is done by setting bit 12
->> of the Auto-Negotiation Advertisement Register (MII_ADVERTISE).
->>
->> The blamed commit incorrectly uses MDIO_AN_CTRL1_XNP, which is bit 13 as per
->> 802.3 : 45.2.7.1 AN control register (Register 7.0)
->>
->> BIT 12 in MII_ADVERTISE is wrapped by ADVERTISE_RESV, used by some
->> drivers such as the aquantia one. 802.3 Clause 28 defines bit 12 as
->> Extended Next Page ability, at least in recent versions of the standard.
-> 
->> Let's add a define for it and use it in the at803x driver.
-> 
-> I agree with this, it defines the C22 4.12 bit. And this is what the
-> at803x driver is using it for.
-> 
->>  static void at803x_link_change_notify(struct phy_device *phydev)
->> diff --git a/include/uapi/linux/mii.h b/include/uapi/linux/mii.h
->> index 39f7c44baf53..61d6edad4b94 100644
->> --- a/include/uapi/linux/mii.h
->> +++ b/include/uapi/linux/mii.h
->> @@ -82,7 +82,8 @@
->>  #define ADVERTISE_100BASE4	0x0200	/* Try for 100mbps 4k packets  */
->>  #define ADVERTISE_PAUSE_CAP	0x0400	/* Try for pause               */
->>  #define ADVERTISE_PAUSE_ASYM	0x0800	/* Try for asymetric pause     */
->> -#define ADVERTISE_RESV		0x1000	/* Unused...                   */
->> +#define ADVERTISE_XNP		0x1000  /* Extended Next Page */
->> +#define ADVERTISE_RESV		ADVERTISE_XNP /* Used to be reserved */
-> 
-> Should we keep ADVERTISE_RESV?
-> 
->   45.2.7.6 AN advertisement register
-> 
->   If the Auto-Negotiation advertisement register (register 4) is
->   present, (see 28.2.4.1.3), then this register is a copy of the
->   Auto-Negotiation advertisement register (register 4). In this case,
->   reads to the AN advertisement register (7.16) report the value of
->   the Auto-Negotiation advertisement register (register 4); writes to
->   the AN advertisement register (7.16) cause a write to occur to the
->   Auto-Negotiation advertisement register.
-> 
-> So MDIO_MMD_AN:MDIO_AN_ADVERTISE is a straight copy of MII_ADVERTISE.
-> 
->         ef4_mdio_write(efx, MDIO_MMD_AN, MDIO_AN_ADVERTISE, reg);
->         ret = phy_write_mmd(phydev, MDIO_MMD_AN, MDIO_AN_ADVERTISE, adv);
-> 
-> So ADVERTISE_XNP is just as valid in the other two drivers using
-> ADVERTISE_RESV. I think we should change those as well to
-> ADVERTISE_XNP and remove ADVERTISE_RESV?
-> 
-> 	Andrew
+Fix this by storing the originating queue_index in struct xdp_frame,
+following the same pattern already established for dev_rx and mem_type.
+The field is populated from rxq->queue_index in
+xdp_convert_buff_to_frame() during NAPI context, when the rxq_info is
+still valid, and restored into the reconstructed rxq_info in
+cpu_map_bpf_prog_run_xdp().
 
-I agree with that yes and I've considered converting these drivers once
-we have net merged into net-next should this patch be applied :)
+Also use xdpf->queue_index in __xdp_build_skb_from_frame() to call
+skb_record_rx_queue(), which was previously listed as missing
+information in that function's comment.
 
-That said, ADVERTISE_RESV is in uapi, is it even possible to remove it ?
+Also propagate queue_index in dpaa_a050385_wa_xdpf(), which manually
+constructs a new xdp_frame from an uninitialized page. Without this,
+queue_index would contain stale data from the page allocator.
 
-I think the best we can hope for is to no longer have in-tree users of
-ADVERTISE_RESV :(
+Signed-off-by: Jose A. Perez de Azpillaga <azpijr@gmail.com>
+---
+Note: this patch was only compiled, not tested.
 
-Maxime
+ drivers/net/ethernet/freescale/dpaa/dpaa_eth.c | 1 +
+ include/net/xdp.h                              | 4 +++-
+ kernel/bpf/cpumap.c                            | 2 +-
+ net/core/xdp.c                                 | 2 +-
+ 4 files changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c b/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
+index 3edc8d142dd5..00e36b0ac74d 100644
+--- a/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
++++ b/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
+@@ -2281,6 +2281,7 @@ static int dpaa_a050385_wa_xdpf(struct dpaa_priv *priv,
+ 	new_xdpf->headroom = priv->tx_headroom;
+ 	new_xdpf->frame_sz = DPAA_BP_RAW_SIZE;
+ 	new_xdpf->mem_type = MEM_TYPE_PAGE_ORDER0;
++	new_xdpf->queue_index = xdpf->queue_index;
+
+ 	/* Release the initial buffer */
+ 	xdp_return_frame_rx_napi(xdpf);
+diff --git a/include/net/xdp.h b/include/net/xdp.h
+index aa742f413c35..6db10e6a8864 100644
+--- a/include/net/xdp.h
++++ b/include/net/xdp.h
+@@ -297,10 +297,11 @@ struct xdp_frame {
+ 	u32 headroom;
+ 	u32 metasize; /* uses lower 8-bits */
+ 	/* Lifetime of xdp_rxq_info is limited to NAPI/enqueue time,
+-	 * while mem_type is valid on remote CPU.
++	 * while mem_type and queue_index are valid on remote CPU.
+ 	 */
+ 	enum xdp_mem_type mem_type:32;
+ 	struct net_device *dev_rx; /* used by cpumap */
++	u32 queue_index; /* used by cpumap */
+ 	u32 frame_sz;
+ 	u32 flags; /* supported values defined in xdp_buff_flags */
+ };
+@@ -441,6 +442,7 @@ struct xdp_frame *xdp_convert_buff_to_frame(struct xdp_buff *xdp)
+
+ 	/* rxq only valid until napi_schedule ends, convert to xdp_mem_type */
+ 	xdp_frame->mem_type = xdp->rxq->mem.type;
++	xdp_frame->queue_index = xdp->rxq->queue_index;
+
+ 	return xdp_frame;
+ }
+diff --git a/kernel/bpf/cpumap.c b/kernel/bpf/cpumap.c
+index 5e59ab896f05..448da572de9a 100644
+--- a/kernel/bpf/cpumap.c
++++ b/kernel/bpf/cpumap.c
+@@ -197,7 +197,7 @@ static int cpu_map_bpf_prog_run_xdp(struct bpf_cpu_map_entry *rcpu,
+
+ 		rxq.dev = xdpf->dev_rx;
+ 		rxq.mem.type = xdpf->mem_type;
+-		/* TODO: report queue_index to xdp_rxq_info */
++		rxq.queue_index = xdpf->queue_index;
+
+ 		xdp_convert_frame_to_buff(xdpf, &xdp);
+
+diff --git a/net/core/xdp.c b/net/core/xdp.c
+index 9890a30584ba..326e3057ed7f 100644
+--- a/net/core/xdp.c
++++ b/net/core/xdp.c
+@@ -829,11 +829,11 @@ struct sk_buff *__xdp_build_skb_from_frame(struct xdp_frame *xdpf,
+
+ 	/* Essential SKB info: protocol and skb->dev */
+ 	skb->protocol = eth_type_trans(skb, dev);
++	skb_record_rx_queue(skb, xdpf->queue_index);
+
+ 	/* Optional SKB info, currently missing:
+ 	 * - HW checksum info		(skb->ip_summed)
+ 	 * - HW RX hash			(skb_set_hash)
+-	 * - RX ring dev queue index	(skb_record_rx_queue)
+ 	 */
+
+ 	if (xdpf->mem_type == MEM_TYPE_PAGE_POOL)
+--
+2.53.0
 
 
