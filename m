@@ -1,61 +1,64 @@
-Return-Path: <netdev+bounces-277632-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277633-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yENkHE+c2Wk3rQgAu9opvQ
-	(envelope-from <netdev+bounces-277632-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 02:56:47 +0200
+	id MFq6AWCc2Wk3rQgAu9opvQ
+	(envelope-from <netdev+bounces-277633-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 02:57:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF50E3DDC83
-	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 02:56:46 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE5703DDC9A
+	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 02:57:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D6A5B3048F29
-	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 00:56:21 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C798C304BCB3
+	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 00:56:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B9B22DEA6B;
-	Sat, 11 Apr 2026 00:56:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 918E72E8B81;
+	Sat, 11 Apr 2026 00:56:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qezc6sNQ"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="dJoWwF52"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 960472DC76C
-	for <netdev@vger.kernel.org>; Sat, 11 Apr 2026 00:56:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA9362E173D
+	for <netdev@vger.kernel.org>; Sat, 11 Apr 2026 00:56:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775868980; cv=none; b=PjJXB+mqTb2Q0NfJ798KOKW/AJUPee+KiQbtPh0u7GW6VJMnUkndjl/2zKknSBEhJJqjvp7HlfrgOH0bWLuXqfx6VgQNcu44PmyfEwAYIMpKDklYMJgGqLiNomRjBRe8ehL5hip3DjooX4Cma/x9PsH7izy9YH6z3YClpVXkp9w=
+	t=1775868994; cv=none; b=ubRjIt6isa36oZPICH/ahgmvBonEy3WCUgSxHuyEEhG8MEeFRMuzwqypvlyc/Z0CIoK9HKjkwgi805SeZUE410uq6D5QkxGiPMSav64KTPibvdYETmg4pv+83fkRvpQMkeDWVHwOel+aBGsIo/ZeUbT4vjWw+iCsQlBiXSHNQhw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775868980; c=relaxed/simple;
-	bh=UhPSy4/fYWFce1bfD0ev/eMwNHEg8KlSDVFosOxJ3fQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jVxKL7gUDjSNKsywdJTVU8P1qEjtG5X69FLT/oUzCq+tmgrsmHTGj7dH9VdWbdvNE81/DE7IWUasxwhetj2r3i+7ORkIiDpGoBMPVEmzVYl299HbCU68mh9yirY8F6cJWLoV9KhxsDbFDEgrATpRQcTKXWhluliMdCFKhJkxY+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qezc6sNQ; arc=none smtp.client-ip=95.215.58.180
+	s=arc-20240116; t=1775868994; c=relaxed/simple;
+	bh=uHit5QzoBpLpmdzStIo7+ZMWMQXqBSwH6ONqMzi+NqM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=DOH/Q959X5SxUtkm/EyfF2735LeAcpmvu/25Xfh77FWrDqKLhkOXGu+maL3eIhZrIq3aDvVQT/mcpWt7lrpIcQLi1aoJlkU1kK+C4AibT+hWjKkX+Ht1+5pZfkl0kbQdzSzIyDHBB7vhCNKuZvgtiPYNdrNRvwLq01mMhBWv2DQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dJoWwF52; arc=none smtp.client-ip=95.215.58.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1775868966;
+	t=1775868990;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=+rNhtKG0xmkmJ2NDX0q52BAZOuiro8T9jp4DQQcDi/Q=;
-	b=qezc6sNQmJe1dqqayCHSuJr7eDFEpTZCp8YePETtpJlFlhWTDulKSZg5qtzsJl0sDb81sM
-	ksecNx0Z/Nh8wuL4bp9jWP/BAZmzO+0mFPPiowWz1vmCDg3hNMpZrO2M6gtee5kykTorUy
-	2XLjGaAM/TsD3LAktt82w3dmM0QZ/zs=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cYzFUfFrkqx4LkPVQlxr+xVj30TuKV7HGjGwspIVupc=;
+	b=dJoWwF52wUlPx2i8gnyBoyVwNT1b6czZUABaGi2atXaxc3/cUhJa5MnpY9BylX3acm2Uzy
+	WiRX04+l5vrXMNlAfRFpeuf+4WqVAIyXOx13Tdf7ByENq2xSGOgxGQzgcAWssZHL5efoib
+	6LHwTEiJofOcAQiO86Ztlf8FrzPkvcw=
 From: Jiayuan Chen <jiayuan.chen@linux.dev>
 To: netdev@vger.kernel.org
-Cc: Jiayuan Chen <jiayuan.chen@shopee.com>,
-	Alexei Starovoitov <ast@kernel.org>,
+Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
+	syzbot+80e046b8da2820b6ba73@syzkaller.appspotmail.com,
 	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
 	Martin KaFai Lau <martin.lau@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
 	Eduard Zingerman <eddyz87@gmail.com>,
 	Song Liu <song@kernel.org>,
 	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
 	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
 	Hao Luo <haoluo@google.com>,
 	Jiri Olsa <jolsa@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -69,9 +72,11 @@ Cc: Jiayuan Chen <jiayuan.chen@shopee.com>,
 	bpf@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	linux-kselftest@vger.kernel.org
-Subject: [PATCH net v7 0/2] net,bpf: fix null-ptr-deref in xdp_master_redirect() for bonding and add selftest
-Date: Sat, 11 Apr 2026 08:55:18 +0800
-Message-ID: <20260411005524.201200-1-jiayuan.chen@linux.dev>
+Subject: [PATCH net v7 1/2] net, bpf: fix null-ptr-deref in xdp_master_redirect() for down master
+Date: Sat, 11 Apr 2026 08:55:19 +0800
+Message-ID: <20260411005524.201200-2-jiayuan.chen@linux.dev>
+In-Reply-To: <20260411005524.201200-1-jiayuan.chen@linux.dev>
+References: <20260411005524.201200-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,14 +92,14 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[shopee.com,kernel.org,iogearbox.net,linux.dev,gmail.com,fomichev.me,google.com,davemloft.net,redhat.com,vger.kernel.org];
+	FREEMAIL_CC(0.00)[linux.dev,syzkaller.appspotmail.com,iogearbox.net,gmail.com,fomichev.me,kernel.org,google.com,davemloft.net,redhat.com,vger.kernel.org];
 	RCVD_COUNT_THREE(0.00)[3];
-	RCPT_COUNT_TWELVE(0.00)[25];
-	TAGGED_FROM(0.00)[bounces-277632-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[26];
+	TAGGED_FROM(0.00)[bounces-277633-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -105,34 +110,23 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[linux.dev:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,80e046b8da2820b6ba73];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,shopee.com:email,linux.dev:dkim,linux.dev:mid,linutronix.de:email]
-X-Rspamd-Queue-Id: DF50E3DDC83
+	DBL_BLOCKED_OPENRESOLVER(0.00)[syzkaller.appspot.com:url,iogearbox.net:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,appspotmail.com:email,linux.dev:dkim,linux.dev:email,linux.dev:mid]
+X-Rspamd-Queue-Id: AE5703DDC9A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Jiayuan Chen <jiayuan.chen@shopee.com>
+syzkaller reported a kernel panic in bond_rr_gen_slave_id() reached via
+xdp_master_redirect(). Full decoded trace:
 
-This series has gone through several rounds of discussion and the
-maintainers hold different views on where the fix should live (in the
-generic xdp_master_redirect() path vs. inside bonding). I respect all
-of the suggestions, but I would like to get the crash fixed first, so
-this version takes the approach of checking whether the master device
-is up in xdp_master_redirect(), as suggested by Daniel Borkmann. If a
-different shape is preferred later it can be done as a follow-up, but
-the null-ptr-deref should not linger.
+  https://syzkaller.appspot.com/bug?extid=80e046b8da2820b6ba73
 
-syzkaller reported a kernel panic, full decoded trace here:
-https://syzkaller.appspot.com/bug?extid=80e046b8da2820b6ba73
-
-Problem Description
-
-bond_rr_gen_slave_id() dereferences bond->rr_tx_counter without a NULL
-check. rr_tx_counter is a per-CPU counter that bonding only allocates
-in bond_open() when the mode is round-robin. If the bond device was
-never brought up, rr_tx_counter stays NULL.
+bond_rr_gen_slave_id() dereferences bond->rr_tx_counter, a per-CPU
+counter that bonding only allocates in bond_open() when the mode is
+round-robin. If the bond device was never brought up, rr_tx_counter
+stays NULL.
 
 The XDP redirect path can still reach that code on a bond that was
 never opened: bpf_master_redirect_enabled_key is a global static key,
@@ -143,64 +137,38 @@ bond_xdp_get_xmit_slave() -> bond_xdp_xmit_roundrobin_slave_get() ->
 bond_rr_gen_slave_id() then runs against a bond that has no
 rr_tx_counter and crashes.
 
-Solution
+Fix this in the generic xdp_master_redirect() by refusing to call into
+the master's ->ndo_xdp_get_xmit_slave() when the master device is not
+up. IFF_UP is only set after ->ndo_open() has successfully returned,
+so this reliably excludes masters whose XDP state has not been fully
+initialized. Drop the frame with XDP_ABORTED so the exception is
+visible via trace_xdp_exception() rather than silently falling through.
+This is not specific to bonding: any current or future master that
+defers XDP state allocation to ->ndo_open() is protected.
 
-Patch 1: Fix this in the generic xdp_master_redirect() by skipping
-master interception when the master device is not running. Returning
-XDP_TX keeps the original XDP_TX behaviour on the receiving slave, and
-avoids calling into any master ->ndo_xdp_get_xmit_slave() on a device
-that has not fully initialized its XDP state. This is not specific to
-bonding: any current or future master that defers XDP state allocation
-to ->ndo_open() is protected.
-Patch 2: Add a selftest that reproduces the above scenario.
+Fixes: 879af96ffd72 ("net, core: Add support for XDP redirection to slave device")
+Reported-by: syzbot+80e046b8da2820b6ba73@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/all/698f84c6.a70a0220.2c38d7.00cc.GAE@google.com/T/
+Suggested-by: Daniel Borkmann <daniel@iogearbox.net>
+Acked-by: Daniel Borkmann <daniel@iogearbox.net>
+Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+---
+ net/core/filter.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Changes since v6:
-https://lore.kernel.org/netdev/20260410113726.368111-1-jiayuan.chen@linux.dev/T/#t
-- selftest: drop the redundant ASSERT_GE checks on bpf_program__fd()
-  and inline the fd into the bpf_xdp_attach() call
-  (Suggested by Daniel Borkmann)
-- patch 1: add Acked-by from Daniel Borkmann
-
-Changes since v5:
-https://lore.kernel.org/netdev/20260309030659.xxxxx-1-jiayuan.chen@linux.dev/
-- Moved the fix back into xdp_master_redirect() and check IFF_UP on the
-  master device; return XDP_ABORTED when the master is not up
-  (Suggested by Daniel Borkmann, seconded by Paolo Abeni and Eric Dumazet)
-
-Changes since v4:
-https://lore.kernel.org/netdev/20260304074301.35482-1-jiayuan.chen@linux.dev/
-- Reverted unconditional alloc in bond_init(); instead add a NULL check
-  with unlikely()/READ_ONCE() in bond_rr_gen_slave_id() and WRITE_ONCE()
-  in bond_open(), avoiding memory waste for non-RR modes
-  (Suggested by Nikolay Aleksandrov, patch by Jay Vosburgh)
-
-Changes since v3:
-https://lore.kernel.org/netdev/20260228021918.141002-1-jiayuan.chen@linux.dev/T/#t
-- Added code comment and commit log explaining why rr_tx_counter is
-  allocated unconditionally for all modes (Suggested by Jay Vosburgh)
-
-Changes since v2:
-https://lore.kernel.org/netdev/20260227092254.272603-1-jiayuan.chen@linux.dev/T/#t
-- Moved allocation from bond_create_init() helper into bond_init()
-  (ndo_init), which is the natural single point covering both creation
-  paths and also handles post-creation mode changes to round-robin
-
-Changes since v1:
-https://lore.kernel.org/netdev/20260224112545.37888-1-jiayuan.chen@linux.dev/T/#t
-- Moved the guard for NULL rr_tx_counter from xdp_master_redirect()
-  into the bonding subsystem itself
-  (Suggested by Sebastian Andrzej Siewior <bigeasy@linutronix.de>)
-
-[1] https://syzkaller.appspot.com/bug?extid=80e046b8da2820b6ba73
-
-Jiayuan Chen (2):
-  net, bpf: fix null-ptr-deref in xdp_master_redirect() for down master
-  selftests/bpf: add test for xdp_master_redirect with bond not up
-
- net/core/filter.c                             |  2 +
- .../selftests/bpf/prog_tests/xdp_bonding.c    | 96 ++++++++++++++++++-
- 2 files changed, 96 insertions(+), 2 deletions(-)
-
+diff --git a/net/core/filter.c b/net/core/filter.c
+index cf2113af4bc9..9ec70c4b7723 100644
+--- a/net/core/filter.c
++++ b/net/core/filter.c
+@@ -4398,6 +4398,8 @@ u32 xdp_master_redirect(struct xdp_buff *xdp)
+ 	struct net_device *master, *slave;
+ 
+ 	master = netdev_master_upper_dev_get_rcu(xdp->rxq->dev);
++	if (unlikely(!(master->flags & IFF_UP)))
++		return XDP_ABORTED;
+ 	slave = master->netdev_ops->ndo_xdp_get_xmit_slave(master, xdp);
+ 	if (slave && slave != xdp->rxq->dev) {
+ 		/* The target device is different from the receiving device, so
 -- 
 2.43.0
 
