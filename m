@@ -1,182 +1,239 @@
-Return-Path: <netdev+bounces-277694-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277695-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MOqEBh842mnYzAgAu9opvQ
-	(envelope-from <netdev+bounces-277694-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 14:01:35 +0200
+	id Md8QMiA62mn0zAgAu9opvQ
+	(envelope-from <netdev+bounces-277695-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 14:10:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC1203DFA6C
-	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 14:01:34 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38B043DFAB7
+	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 14:10:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1E3B3303F2B5
-	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 12:00:08 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9808230241BE
+	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 12:10:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA09534A3C9;
-	Sat, 11 Apr 2026 12:00:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 602323537D4;
+	Sat, 11 Apr 2026 12:10:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X+3YHCIu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ia8NIXWx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE387347BDC
-	for <netdev@vger.kernel.org>; Sat, 11 Apr 2026 12:00:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6067F1514F8
+	for <netdev@vger.kernel.org>; Sat, 11 Apr 2026 12:10:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775908807; cv=none; b=sTzFSE2zl61Kq/cuA3LTMmqMnyYdYEGfZBQxM1+DWTQ3WFWV3fgzFQNJdK0fXNv94RZ+KPXAhbTMzAP6WzYMq4tbJkVx/VfBvrxXns4mnrzW3I2dsXpUwpVc4QDxJ1pzZIEJWOuYB4AGDn+TyGZIGObU8kJ63vQORWYzakvJnaY=
+	t=1775909406; cv=none; b=gyAMux+8EPWdt0VGU0djKEWpPzW7EtMf7Vsqjf+Ab0Ei+Gu72ZqTHd3cxcjvQPwuZtmDMXwfJZx89/YnL0WGhKv5GNTJJATyWu/TC64X3r7kWXuP9IoAN0U+OLtQISNRWE6loXPjTTgpyRIOIpARUEHs/XC2QD2Q7ylDETdfkaw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775908807; c=relaxed/simple;
-	bh=GMQQ846bik74lm+a9kxAhWISSjbQN89Wh2uXyZKV+B4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZDXMGMffy9/CfLjTCESo7QFjtjhXnW4+d2HLojGkJKGZABerlkLH81eOXDFO1kAXYdbncruDa5OKY+qQCGvj76FpBrbAbAjwTYeLMMHbCn/QCvlepmHxxVxKz7m8SzvY22jkex4Jk8uKH8kxRsFPZ7XCjMzNCEwVhiraV5Mr8SY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X+3YHCIu; arc=none smtp.client-ip=209.85.216.41
+	s=arc-20240116; t=1775909406; c=relaxed/simple;
+	bh=4PPOUoWI/sGzynuL7aex65UKmPYBL2lt+b9RjgXNbBw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kXAdnTWvtnuy7IQ1nAfjB0Sat5zjYsf0FAj7f/Q0z6JuucX/RQl+vn6ZY/a4L+/UwrP/X2FWZrxvs/zSPag5M+b3CIXOvvcFmRkIK4XjEnWZcdq2ubLAR4WOsCetd7wOS6gJerK7G6bYrKA/gfq8mhkgh/A2ip8zVmhSh5/QORU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ia8NIXWx; arc=none smtp.client-ip=209.85.221.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-35d95017a68so1926903a91.3
-        for <netdev@vger.kernel.org>; Sat, 11 Apr 2026 05:00:05 -0700 (PDT)
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-43cfd96354aso1744645f8f.1
+        for <netdev@vger.kernel.org>; Sat, 11 Apr 2026 05:10:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775908805; x=1776513605; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=3BqptnOZV+wSO7mgK/jnSvUYe0PNtQ9QVGGsakN9kDs=;
-        b=X+3YHCIuD6LyyHYCbKoeoz6mlXSVY9kCMEkQjRSrvcD2hmo4LFvjUl6em7ty7ShB2p
-         PlgltWjmxVA1u0qaGej64kQMnhFeXZ+haJStdjyZl2S1Tq2OO3rPiN9IEogsGc9S5Rz7
-         qUaa/r0c9MBKfFZ9RQ11f9Z4iTcn2HEfCBSm93Ky90e2tG1ZODctyXu30N1xXgKKg2AA
-         /xkWxCMjPTHjwnNgfOgt5zNRlib/dbbRA/sM7Gc14w3RHyCUXSPXOPCOGM/cN/oe/Ssm
-         f1DBa0n8Sg9NKyysmeqBcuazou/Nhg6MrDc8/HWLOqHMJ79yWqziVo6wLFR/67PoyUMh
-         FvKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775908805; x=1776513605;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1775909402; x=1776514202; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3BqptnOZV+wSO7mgK/jnSvUYe0PNtQ9QVGGsakN9kDs=;
-        b=inuqkbsGNK1aL926sdHfo+pgIb5ygG+OF90hjog/5csPSzQ2EHhvhR+Bg42ySOlBLW
-         NueQqp+n76bmeBuP8tsDw+zvZ3ipcDT0YdYlVB/zsX2IfCp4Mxrz7mKmlaHlQICfyYl1
-         Wf1Gt0iG5sSr/WOFrPwb13Jym84LVWEXE/O68gOixFZ+LKR8jptTDk6STuapzEDky6xY
-         VOP/EEQfE5W4qg0VAcHz40qQGe04pYIi/St06s5ZSNEz8/IQBC/lqvncPLTpHTDdhWwJ
-         UEiJ54nE2Jaet/okvhTgoPUD9emC5+raSavYxaFCqHKoi+5hWcFTKFRlsPOugZ9v79sH
-         t7Rw==
-X-Forwarded-Encrypted: i=1; AJvYcCVTZBbpSglk62xxMXcppUTCLlu5i87KBFnyEX2W4JEGBtONOfFbojJmUO3b7lzklvAigTZDu+8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxE7I1Zy2hs9rpC5tKG6SkPGvucFH9S4XPBRljknEGMveJ9SSMg
-	SnO7i5n8WDdn1CCmtk58+C3ByiT7FiqWWWSSOjjikORMUDuwutNUXydG
-X-Gm-Gg: AeBDieuoIWvMDqyC/4mwJCjF41EX1K6r4Em0veBqUeWlc4kX/v1LDe13cO1zI4E/TT8
-	JTgx9roPAH2E0P+gK5L6DthAiehUMntrVvgw08AkSIJ1csMryN0DSBobuIIXDk8NT+fkOKG6Go2
-	X10IO3nkJGAirBpTMOxFthgybsTzLZIdRi3OZpyolJ01EbZyrRmca5Hd15LsqVO1MQZFCrNndcM
-	63DRBj+k3fq4lWUcHNUSMLtSYz9WhpR4DEteAKAOfgYddZRxVLV0DMEHFfScKCX6nt/zk84A046
-	t6PDk0oRaVm1CJF+sM+GICdQqlnMEipue0dLmjZ2Ey/M3wMM6dIAS7MiCDqqw8OTpgmiFUXZA8Y
-	DhxlUdbCiAO9Db6lTPwegsua7N8DUJxlptYUilx8iDqAsfJmK7ZSc9/LWelRppmAOKI9WvqN83T
-	3OZhY00R8tM5WGAAJAWU44QPpGhjVAYzLkiTZClRreSKeFzLY+NfDJTp1gRtAgpa6wCmphJhEje
-	QuFP3ItzytY+10=
-X-Received: by 2002:a17:90b:3952:b0:359:8eaa:7f42 with SMTP id 98e67ed59e1d1-35e4282294cmr6901564a91.18.1775908805039;
-        Sat, 11 Apr 2026 05:00:05 -0700 (PDT)
-Received: from localhost.localdomain ([103.10.31.101])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-35e3512f996sm9826696a91.12.2026.04.11.05.00.01
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Sat, 11 Apr 2026 05:00:04 -0700 (PDT)
-From: Shuvam Pandey <shuvampandey1@gmail.com>
-To: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	syzbot+5ec223ccb83b24ef982f@syzkaller.appspotmail.com,
-	shuvampandey1@gmail.com
-Subject: [PATCH net v2] atm: mpoa: keep mpc->dev referenced across mpoad restart
-Date: Sat, 11 Apr 2026 17:44:58 +0545
-Message-ID: <20260411115958.64827-1-shuvampandey1@gmail.com>
-X-Mailer: git-send-email 2.50.1
+        bh=nOqUKvzHbOtmysCumhKJ+ed6LDXdDC4PW3MeNbU0xPE=;
+        b=Ia8NIXWxzMhrLWN/g9dpcx3P8pRvNbMMBBwAK3GvrMCH2ZkS292qup0Fd9BhHXpB9k
+         7Vh9Lf0O/jKmLynljLcKbFJWjA+GxRwXNEBm0lYQasBcR+NwBUjAlEZtGUBnAggyECKb
+         QdiWpgBbnsGJ5HIuH6w95F6enKmSpNDe8ZNkcABzPwzo1iQnwpPJCSHoO9mUPH/bo/5R
+         COud8X4jWNWOVwoNQKT2obe6jOc6/NJE00x1i0GK+phyAZyzLWOaGGiaHUpp78qbcBSi
+         CRY4J2CATaSlhlMiAqPF+2aWrdXj6IKl4X1KZb2Y3Z0Lq31Iu1I4sUBYH9cq4KKLo68k
+         BIjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775909402; x=1776514202;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=nOqUKvzHbOtmysCumhKJ+ed6LDXdDC4PW3MeNbU0xPE=;
+        b=qAZUwZ1mv9skGdX/Z7yL5eNjkEJYRaR6OmYgIu0dcMM+zookc8rUYKuDH+tLeYUGo1
+         ezJ3bacOMkExVceUjteISjg3hw6Sq0s93sJtbr3IUFxtDztSNV0N+2l/+SQR9Sk79V+3
+         BCVS+F8n0nyOBggxeGwxyJhCwOuGpdUC7U65VmA1BAzcd99PCpVY4Cz+M9TFw8bENs6b
+         1a7J5u0bAdTnT+lI/5DF6lCBzrxD2D5faA1JJLS3gRQpAqQ+LL4VxTIbXMhsEnfg/fhg
+         FhEQNtofJjkiE2OSkuhnJ2V/1Lx1LRU48dl7Yu/T4+xgz5EnnCVEkQo/P8ZinhgXW1U0
+         yVDg==
+X-Forwarded-Encrypted: i=1; AJvYcCUwURS4Zf7wccJBpM/5stXniIZs1N7YjPRzcqVmwVAqTnX/qHJN7O5oXi2sXkSK9QQ8kfBc0tg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz7aG9uf41PS8sa9zflhzTINbHP8hBs7iHpe0n1ZQxOpgvhOjMA
+	t/IqQqhQpRvrM8I33bSaKFoVwjxyO28JaBq/ogAT7xMxk74ISUwp7f+X
+X-Gm-Gg: AeBDiesEoL0IHNka9nQGWR/RCFt3+pINxmrCtUkqD6dE29dFUtxE5ImudDbXyk4QMqm
+	r4kM6BIUnqtBHiu7Q3n+G1rLPHFfooXdCQKROZtIJDDsKrZ103dqyBqvNrcSnTgPZIy4sBmryag
+	WzQf7b9GrFozpLC+h2vTGeHkJpStwagNLrI0KDh/48s/0K8eOi4HgpQwlN6FdP87MFmeU+00xer
+	e9XhRERhy95YY7tqUKzTQcFeXfEngV1dMi8qbc9wGRw4Yr8MwizPyA06M58CiWWGZYI6hzKM3Yd
+	jU9CoeFLMkXx8dWhm9kDHzOtNW1yntkVb5QD0oncZwqWRaPqkz6kvtYAHhTEH0zDIv5sjItKwaJ
+	9lQO0hRjNrYFcVFICAWxELupPXKVAhk581PfRszcIdI/smzlGm4v8c+QzZs3jxdsgSuC+yxkHnE
+	MnpbqRjbRSw9m4kVIzlM7vKUtDCLyNb4qQUDpC8XRAKRsf3i8+TnbcFUM4gb/LZe1HWV4Eoy6i6
+	70=
+X-Received: by 2002:adf:fc12:0:b0:43d:6f0f:32fe with SMTP id ffacd0b85a97d-43d6f0f3403mr253339f8f.31.1775909401550;
+        Sat, 11 Apr 2026 05:10:01 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43d63e5c98fsm16293367f8f.35.2026.04.11.05.10.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 11 Apr 2026 05:10:01 -0700 (PDT)
+Date: Sat, 11 Apr 2026 13:09:58 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: deller@kernel.org, davem@davemloft.net, dsahern@kernel.org,
+ linux-kernel@vger.kernel.org, linux-parisc@vger.kernel.org,
+ netdev@vger.kernel.org, edumazet@google.com
+Subject: Re: [PATCH] net: Optimize flush calculation in inet_gro_receive()
+Message-ID: <20260411130958.70202bab@pumpkin>
+In-Reply-To: <20260411052037.2013228-1-kuniyu@google.com>
+References: <adkMqgP6QeBPgqP9@p100>
+	<20260411052037.2013228-1-kuniyu@google.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,syzkaller.appspotmail.com,gmail.com];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-277694-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-277695-lists,netdev=lfdr.de];
 	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shuvampandey1@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,5ec223ccb83b24ef982f];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: AC1203DFA6C
+	DBL_BLOCKED_OPENRESOLVER(0.00)[gmx.de:email,apana.org.au:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 38B043DFAB7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-atm: mpoa: keep mpc->dev referenced across mpoad restart
+On Sat, 11 Apr 2026 05:19:35 +0000
+Kuniyuki Iwashima <kuniyu@google.com> wrote:
 
-syzbot reported a netdevice refcount warning:
+> From: Helge Deller <deller@kernel.org>
+> Date: Fri, 10 Apr 2026 16:43:54 +0200
+> > For the calculation of the flush variable, use the get_unaligned_xxx() helpers
+> > to access only relevant bits of the IP header.
+> > 
+> > Note: Since I don't know the network details, I'm not sure if "& ~IP_DF"
+> > (& ~0x4000) is correct, or if "& IP_OFFSET" (& 0x1FFF) should be used instead  
+> 
+> ~IP_DF is correct (MF bit needs to be checked), see
+> 
+> commit db8caf3dbc77599dc90f4ea0a803cd1d97116f30
+> Author: Eric Dumazet <edumazet@google.com>
+> Date:   Fri May 31 11:18:10 2013
+> 
+>     gro: should aggregate frames without DF
+> 
+> 
+> > (which I believe would be more correct). Instead of possibly breaking things I
+> > left it as is, but maybe some expert can check?
+> > 
+> > Signed-off-by: Helge Deller <deller@gmx.de>
+> > 
+> > diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
+> > index c7731e300a44..58cad2687c2c 100644
+> > --- a/net/ipv4/af_inet.c
+> > +++ b/net/ipv4/af_inet.c
+> > @@ -1479,7 +1479,7 @@ struct sk_buff *inet_gro_receive(struct list_head *head, struct sk_buff *skb)
+> >  	struct sk_buff *p;
+> >  	unsigned int hlen;
+> >  	unsigned int off;
+> > -	int flush = 1;
+> > +	u16 flush = 1;
+> >  	int proto;
+> >  
+> >  	off = skb_gro_offset(skb);
+> > @@ -1504,7 +1504,8 @@ struct sk_buff *inet_gro_receive(struct list_head *head, struct sk_buff *skb)
+> >  		goto out;
+> >  
+> >  	NAPI_GRO_CB(skb)->proto = proto;
+> > -	flush = (u16)((ntohl(*(__be32 *)iph) ^ skb_gro_len(skb)) | (ntohl(*(__be32 *)&iph->id) & ~IP_DF));
+> > +	flush = (get_unaligned_be16(&iph->tot_len) ^ skb_gro_len(skb)) |
+> > +	        (get_unaligned_be16(&iph->frag_off) & ~IP_DF);  
+> 
+> I think here we intentionally use 32-bit loads:
+> 
+> commit 1075f3f65d0e0f49351b7d4310e9f94483972a51
+> Author: Herbert Xu <herbert@gondor.apana.org.au>
+> Date:   Tue May 26 18:50:29 2009
+> 
+>     ipv4: Use 32-bit loads for ID and length in GRO
+> 
+> 
+> Before your patch, 32-bit load + bswap are used while
+> 16-bit load + rol 8 after the change.
+> 
+> I feel the 4-byte aligned load + bswap is faster than
+> misaligned access + 8 times shift (Is this internally
+> optimised like xchg for a single word size ?)
+> 
+> Do you have some numbers ?
 
-refcount_t: decrement hit 0; leaking memory.
-WARNING: lib/refcount.c:31 at refcount_warn_saturate+0x70/0x110
-...
-dev_put include/linux/netdevice.h:4466 [inline]
-mpoad_close+0x1fc/0x3e0 net/atm/mpc.c:889
+Check on some architecture that doesn't support misaligned loads.
+Actually, aren't the accesses aligned??
+Also on ones without 32bit byteswap (some do have byteswapping
+memory reads).
 
-mpoad_close() drops the reference held in mpc->dev, but the mpoa_client
-itself stays alive and keeps the same device pointer.
+Also you may not want to change 'flush' to u16.
+On non-x86 it may force the compiler add extra masking instructions.
 
-When mpoad is attached again, atm_mpoa_mpoad_attach() reuses the existing
-mpoa_client and its mpc->dev without reacquiring that reference, so the
-next close can hit the netdevice refcount warning.
-
-This reference is owned by the mpoa_client/LEC association rather than a
-single mpoad open/close cycle. It is acquired when the client gets its
-LEC device and is released later from mpoa_event_listener() on
-NETDEV_UNREGISTER. Fix the imbalance by removing the dev_put() from
-mpoad_close().
-
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Reported-by: syzbot+5ec223ccb83b24ef982f@syzkaller.appspotmail.com
-Link: https://groups.google.com/g/syzkaller-bugs/c/qhZ5MJfLBOE/m/UnotmgRdAQAJ
-Signed-off-by: Shuvam Pandey <shuvampandey1@gmail.com>
----
-Changes in v2:
-- drop the atm_mpoa_cleanup() dev_put()/NULL hunk
-- add the syzbot warning excerpt
-- add a Fixes tag
-- clarify that the final dev_put() comes from the notifier path
-
- net/atm/mpc.c | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/net/atm/mpc.c b/net/atm/mpc.c
-index ce8e9780373b9..90ab8f2889734 100644
---- a/net/atm/mpc.c
-+++ b/net/atm/mpc.c
-@@ -886,7 +886,6 @@ static void mpoad_close(struct atm_vcc *vcc)
- 		struct lec_priv *priv = netdev_priv(mpc->dev);
- 		priv->lane2_ops->associate_indicator = NULL;
- 		stop_mpc(mpc);
--		dev_put(mpc->dev);
- 	}
+	David
  
- 	mpc->in_ops->destroy_cache(mpc);
+> 
+> 
+> Before:
+> 	flush = (u16)((ntohl(*(__be32 *)iph) ^ skb_gro_len(skb))
+> mov    edx,DWORD PTR [rcx]
+> bswap  edx
+> 	return skb->len - NAPI_GRO_CB(skb)->data_offset;
+> mov    r8d,DWORD PTR [rsi+0x38]
+> mov    r9d,DWORD PTR [rsi+0x70]
+> sub    r9d,r8d
+> xor    r9d,edx
+> 	| (ntohl(*(__be32 *)&iph->id) & ~IP_DF));
+> mov    ebp,0xffbfffff
+> and    ebp,DWORD PTR [rcx+0x4]
+> bswap  ebp
+> or     ebp,r9d
+> 
+> 
+> After:
+> 	flush = (get_unaligned_be16(&iph->tot_len) ^ skb_gro_len(skb))
+> movzx  edx,WORD PTR [rcx+0x2]
+> rol    dx,0x8
+> 	return skb->len - NAPI_GRO_CB(skb)->data_offset;
+> mov    r8d,DWORD PTR [rsi+0x38]
+> mov    r9d,DWORD PTR [rsi+0x70]
+> sub    r9d,r8d
+> xor    r9d,edx
+> 	| (get_unaligned_be16(&iph->frag_off) & ~IP_DF);
+> movzx  ebp,WORD PTR [rcx+0x6]
+> and    ebp,0xffffffbf
+> rol    bp,0x8
+> or     ebp,r9d
+> 
+
 
