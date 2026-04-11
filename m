@@ -1,375 +1,144 @@
-Return-Path: <netdev+bounces-277629-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277630-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GJ8JNb+Y2WmhrAgAu9opvQ
-	(envelope-from <netdev+bounces-277629-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 02:41:35 +0200
+	id +DOUMASb2WkTrQgAu9opvQ
+	(envelope-from <netdev+bounces-277630-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 02:51:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BE143DDC1C
-	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 02:41:35 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7DF23DDC43
+	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 02:51:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 44C84303D2C2
-	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 00:39:57 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id B0A17300A64C
+	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 00:51:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1B1B2E2F1F;
-	Sat, 11 Apr 2026 00:39:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF40B238C1B;
+	Sat, 11 Apr 2026 00:51:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AjKeuPf1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aUngIO7F"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 755442DECA3;
-	Sat, 11 Apr 2026 00:39:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BE4740DFA1;
+	Sat, 11 Apr 2026 00:51:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775867995; cv=none; b=bfoonR+bYbDP6cniJtSbgD/enP0vTUjHghV+MqJ8bp+g+qZ+JP70+CNOxsRF8EFRXcbsl16nP2J5BOTwkq4zTtaY0TSKIuHc6PCd3rvFnZWnaqPBmw3f4XCJh59SN6LTKVIa0gKUVNXaMLhSvf7uKHPDAUET9hfYXM9Izz8BSHk=
+	t=1775868669; cv=none; b=Pqc8sEq97bxJcgWxXhQB62+dwta6gmSiZRyQuTm6JqDaRuanPLvXs7qmZAEjD/I9oimS59qm0U9zp8Xzr7EAFkE4cA5ktGBm1n7DUfoTVxPE9mBFOIbAaPhrBO8ukHIga++RAXOKm48HCKg1pbjVKBVBf8r4X6u3yvzntlYFlM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775867995; c=relaxed/simple;
-	bh=CBYUwMJK9e/8mCc8Lx+DTlbe4j30OVzY4cQtWJ5dobY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=UWrR8T4EVx4hzc67b3tQiFNMt0Z/c1CT4I0tADoL8Es6O4hJBJt4Sf9yecQerY5GDEptk5jh6oTcmsr4j5ZiPTd5PcRCyuCFVP2U4SleaX8b9cMLRzsAgYfOAv9+BAxP6pkOEaa5pIx50vlDf857qQz52UpFs67P/nEh23urXa4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AjKeuPf1; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1775867993; x=1807403993;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references;
-  bh=CBYUwMJK9e/8mCc8Lx+DTlbe4j30OVzY4cQtWJ5dobY=;
-  b=AjKeuPf1m1YO0Eal3mIcJYbsokKE/SXygqmQmBMVpDxY+10OZdF7vekD
-   qxJMyOAmZ6OHr3cCJnlgi8hIQc1EjRyVwqfrNOg987HeIhyLdA3M2+x7Y
-   N4A+CImYSdWfbIL+6PVD73AnCAw5GnZftXjk2WHla2JUK2xmHxJzbe1Oj
-   1hhHuxlQHqXyk+/Q2WoMBk6cFnAerG0xNrmVZsZrcbxmqA15BFV8S4P0Z
-   Hlbu5U7Fs+kzwonuc4gRQJHp6QqWoOboGGGsPlZH46chrP8poj8wtlUL0
-   YyRjqb4mzN3xf40HkH0wX2La8ejnhiIx9tvQzCAIZnrDdVgMlO39IEJyo
-   w==;
-X-CSE-ConnectionGUID: 03qJR7YbSE2pfrU626WTqw==
-X-CSE-MsgGUID: kGz4FtqOQI6fo4zHJwaj3w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11755"; a="64423735"
-X-IronPort-AV: E=Sophos;i="6.23,172,1770624000"; 
-   d="scan'208";a="64423735"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2026 17:39:52 -0700
-X-CSE-ConnectionGUID: QiR4Bm+8Qqy9358d858MpA==
-X-CSE-MsgGUID: qHRd1gUYQjCWskEwzr2Qzw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,172,1770624000"; 
-   d="scan'208";a="228392494"
-Received: from estantil-desk.jf.intel.com ([10.166.241.24])
-  by orviesa010.jf.intel.com with ESMTP; 10 Apr 2026 17:39:51 -0700
-From: Emil Tantilov <emil.s.tantilov@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	przemyslaw.kitszel@intel.com,
-	jay.bhat@intel.com,
-	ivan.d.barrera@intel.com,
-	aleksandr.loktionov@intel.com,
-	larysa.zaremba@intel.com,
-	anthony.l.nguyen@intel.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	aleksander.lobakin@intel.com,
-	linux-pci@vger.kernel.org,
-	madhu.chittim@intel.com,
-	decot@google.com,
-	willemb@google.com,
-	sheenamo@google.com
-Subject: [PATCH iwl-next 2/2] idpf: implement pci error handlers
-Date: Fri, 10 Apr 2026 17:39:59 -0700
-Message-Id: <20260411003959.30959-3-emil.s.tantilov@intel.com>
-X-Mailer: git-send-email 2.17.2
-In-Reply-To: <20260411003959.30959-1-emil.s.tantilov@intel.com>
-References: <20260411003959.30959-1-emil.s.tantilov@intel.com>
+	s=arc-20240116; t=1775868669; c=relaxed/simple;
+	bh=vMNo/MofsUxEpMei2dJlX/3PBD4XqVvyrCAUDeEIyYM=;
+	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
+	 Subject:From:To:Cc:Date; b=ojT4ZaC4SbP8q7B5m27hDp2dkhCEDahJuZVPq8xYMCp8fgCYNjjjGDTeDEr5XWWv/C0evSX2lq7clNRixVWV8zLwEcKkHgyQ16AfhjujMCx7yZwD+UsRY6kwyyuz9MQI09wE8aA/23U0x/BFWpVl365vC0rvUPFGdgIRW4Dpk+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aUngIO7F; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D713BC19421;
+	Sat, 11 Apr 2026 00:51:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775868669;
+	bh=vMNo/MofsUxEpMei2dJlX/3PBD4XqVvyrCAUDeEIyYM=;
+	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
+	b=aUngIO7Fhim5CnF5C84c0z/tqOgq76B06GQA/lP1I1zb/0Jip7VFb1pb+pWJgj8Pe
+	 1q2xwQT0LWLJg+g7ZXj1TM0Sx/H1Y1pnDoy2HfniuV2mGQR6PqVkVQciAvGiHNy8uE
+	 u9ZWQotKfFPb9ZAChelbb6OPtDhp5jcTmnur/FP3d9Y4Scsu1kzAbUtEjTs5K3IUfJ
+	 7HyWcj4ONxCk3lr+nIIbAKTqLDmim5wJCfi4Zw+oH+d6cT9GMWJcv8urCp7OCyPk/v
+	 3/Q+sjM4QmBxclcewxczZpGZ2DD/2mS2AtU8jpl3U/V/3YKbsdAJiUou2+NCtDuus/
+	 azmjSrRfZTvuw==
+Content-Type: multipart/mixed; boundary="===============2983978709261763309=="
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-X-Spamd-Result: default: False [0.84 / 15.00];
+MIME-Version: 1.0
+Message-Id: <9f7e217d9a5184bfcf0bd1112a9075c0f3633266e8eb1026cd1c651a0754edb2@mail.kernel.org>
+In-Reply-To: <20260411001711.3418264-4-ameryhung@gmail.com>
+References: <20260411001711.3418264-4-ameryhung@gmail.com>
+Subject: Re: [PATCH bpf-next v1 3/3] bpf: Remove gfp_flags plumbing from bpf_local_storage_update()
+From: bot+bpf-ci@kernel.org
+To: ameryhung@gmail.com,bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org,alexei.starovoitov@gmail.com,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,memxor@gmail.com,ameryhung@gmail.com,kernel-team@meta.com,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
+Date: Sat, 11 Apr 2026 00:51:08 +0000 (UTC)
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+	CTYPE_MIXED_BOGUS(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
+	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-277630-lists,netdev=lfdr.de,bpf-ci];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,kernel.org,iogearbox.net,meta.com,linux.dev];
+	FROM_NEQ_ENVFROM(0.00)[bot@kernel.org,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+,1:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-277629-lists,netdev=lfdr.de];
-	TO_DN_NONE(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[emil.s.tantilov@intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NO_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3BE143DDC1C
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,mail.kernel.org:mid]
+X-Rspamd-Queue-Id: C7DF23DDC43
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add callbacks to handle PCI errors and FLR reset. When preparing to handle
-reset on the bus, the driver must stop all operations that can lead to MMIO
-access in order to prevent HW errors. To accomplish this introduce helper
-idpf_reset_prepare() that gets called prior to FLR or when PCI error is
-detected. Upon resume the recovery is done through the existing reset path
-by starting the event task.
+--===============2983978709261763309==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-The following callbacks are implemented:
-.reset_prepare runs the first portion of the generic reset path leading up
-to the part where we wait for the reset to complete.
-.reset_done/resume runs the recovery part of the reset handling.
-.error_detected is the callback dealing with PCI errors, similar to the
-prepare call, we stop all operations, prior to attempting a recovery.
-.slot_reset is the callback attempting to restore the device, provided a
-PCI reset was initiated by the AER driver.
+> diff --git a/include/linux/bpf_local_storage.h b/include/linux/bpf_local_storage.h
+> index dced54e9265f..9e4f5c45c974 100644
+> --- a/include/linux/bpf_local_storage.h
+> +++ b/include/linux/bpf_local_storage.h
+> @@ -188,7 +188,7 @@ int bpf_selem_link_map(struct bpf_local_storage_map *smap,
+>
+>  struct bpf_local_storage_elem *
+>  bpf_selem_alloc(struct bpf_local_storage_map *smap, void *owner, void *value,
+> -		bool swap_uptrs, gfp_t gfp_flags);
+> +		bool swap_uptrs);
 
-Whereas previously the init logic guaranteed netdevs during reset, the
-addition of idpf_detach_and_close() to the PCI callbacks flow makes it
-possible for the function to be called without netdevs. Add check to
-avoid NULL pointer dereference in that case.
+[ ... ]
 
-Co-developed-by: Alan Brady <alan.brady@intel.com>
-Signed-off-by: Alan Brady <alan.brady@intel.com>
-Signed-off-by: Emil Tantilov <emil.s.tantilov@intel.com>
-Reviewed-by: Jay Bhat <jay.bhat@intel.com>
-Reviewed-by: Madhu Chittim <madhu.chittim@intel.com>
+> @@ -196,12 +196,11 @@ void bpf_selem_free(struct bpf_local_storage_elem *selem,
+>  int
+>  bpf_local_storage_alloc(void *owner,
+>  			struct bpf_local_storage_map *smap,
+> -			struct bpf_local_storage_elem *first_selem,
+> -			gfp_t gfp_flags);
+> +			struct bpf_local_storage_elem *first_selem);
+
+bpf_selem_alloc() now takes 4 arguments and bpf_local_storage_alloc()
+takes 3, but bpf_sk_storage_clone_elem() and bpf_sk_storage_clone()
+in net/core/bpf_sk_storage.c were not updated:
+
+net/core/bpf_sk_storage.c:bpf_sk_storage_clone_elem() {
+    copy_selem = bpf_selem_alloc(smap, newsk, NULL, false, GFP_ATOMIC);
+}
+
+net/core/bpf_sk_storage.c:bpf_sk_storage_clone() {
+    ret = bpf_local_storage_alloc(newsk, smap, copy_selem, GFP_ATOMIC);
+}
+
+Won't this break the build?
+
+
 ---
- drivers/net/ethernet/intel/idpf/idpf.h      |   3 +
- drivers/net/ethernet/intel/idpf/idpf_lib.c  |  13 ++-
- drivers/net/ethernet/intel/idpf/idpf_main.c | 114 ++++++++++++++++++++
- 3 files changed, 128 insertions(+), 2 deletions(-)
+AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf.h b/drivers/net/ethernet/intel/idpf/idpf.h
-index 1d0e32e47e87..164d2f3e233a 100644
---- a/drivers/net/ethernet/intel/idpf/idpf.h
-+++ b/drivers/net/ethernet/intel/idpf/idpf.h
-@@ -88,6 +88,7 @@ enum idpf_state {
-  * @IDPF_REMOVE_IN_PROG: Driver remove in progress
-  * @IDPF_MB_INTR_MODE: Mailbox in interrupt mode
-  * @IDPF_VC_CORE_INIT: virtchnl core has been init
-+ * @IDPF_PCI_CB_RESET: Reset via the PCI callbacks
-  * @IDPF_FLAGS_NBITS: Must be last
-  */
- enum idpf_flags {
-@@ -97,6 +98,7 @@ enum idpf_flags {
- 	IDPF_REMOVE_IN_PROG,
- 	IDPF_MB_INTR_MODE,
- 	IDPF_VC_CORE_INIT,
-+	IDPF_PCI_CB_RESET,
- 	IDPF_FLAGS_NBITS,
- };
- 
-@@ -1012,4 +1014,5 @@ void idpf_idc_vdev_mtu_event(struct iidc_rdma_vport_dev_info *vdev_info,
- int idpf_add_del_fsteer_filters(struct idpf_adapter *adapter,
- 				struct virtchnl2_flow_rule_add_del *rule,
- 				enum virtchnl2_op opcode);
-+void idpf_detach_and_close(struct idpf_adapter *adapter);
- #endif /* !_IDPF_H_ */
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-index 7988836fbae0..1e706beb0098 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_lib.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-@@ -758,13 +758,16 @@ static int idpf_init_mac_addr(struct idpf_vport *vport,
- 	return 0;
- }
- 
--static void idpf_detach_and_close(struct idpf_adapter *adapter)
-+void idpf_detach_and_close(struct idpf_adapter *adapter)
- {
- 	int max_vports = adapter->max_vports;
- 
- 	for (int i = 0; i < max_vports; i++) {
- 		struct net_device *netdev = adapter->netdevs[i];
- 
-+		if (!netdev)
-+			continue;
-+
- 		/* If the interface is in detached state, that means the
- 		 * previous reset was not handled successfully for this
- 		 * vport.
-@@ -1908,6 +1911,10 @@ static void idpf_init_hard_reset(struct idpf_adapter *adapter)
- 
- 	dev_info(dev, "Device HW Reset initiated\n");
- 
-+	/* Reset has already happened, skip to recovery. */
-+	if (test_and_clear_bit(IDPF_PCI_CB_RESET, adapter->flags))
-+		goto check_rst_complete;
-+
- 	/* Prepare for reset */
- 	if (test_bit(IDPF_HR_DRV_LOAD, adapter->flags)) {
- 		reg_ops->trigger_reset(adapter, IDPF_HR_DRV_LOAD);
-@@ -1925,6 +1932,7 @@ static void idpf_init_hard_reset(struct idpf_adapter *adapter)
- 		goto unlock_mutex;
- 	}
- 
-+check_rst_complete:
- 	/* Wait for reset to complete */
- 	err = idpf_check_reset_complete(adapter, &adapter->reset_reg);
- 	if (err) {
-@@ -1984,7 +1992,8 @@ void idpf_vc_event_task(struct work_struct *work)
- 	if (test_bit(IDPF_HR_FUNC_RESET, adapter->flags))
- 		goto func_reset;
- 
--	if (test_bit(IDPF_HR_DRV_LOAD, adapter->flags))
-+	if (test_bit(IDPF_HR_DRV_LOAD, adapter->flags) ||
-+	    test_bit(IDPF_PCI_CB_RESET, adapter->flags))
- 		goto drv_load;
- 
- 	return;
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_main.c b/drivers/net/ethernet/intel/idpf/idpf_main.c
-index d99f759c55e1..cd467695047e 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_main.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_main.c
-@@ -234,6 +234,7 @@ static int idpf_cfg_device(struct idpf_adapter *adapter)
- 	if (err)
- 		pci_dbg(pdev, "PCIe PTM is not supported by PCIe bus/controller\n");
- 
-+	pci_save_state(pdev);
- 	pci_set_drvdata(pdev, adapter);
- 
- 	return 0;
-@@ -360,6 +361,118 @@ static int idpf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	return err;
- }
- 
-+static void idpf_reset_prepare(struct idpf_adapter *adapter)
-+{
-+	pci_dbg(adapter->pdev, "resetting\n");
-+	set_bit(IDPF_HR_RESET_IN_PROG, adapter->flags);
-+	cancel_delayed_work_sync(&adapter->serv_task);
-+	cancel_delayed_work_sync(&adapter->vc_event_task);
-+	idpf_detach_and_close(adapter);
-+	idpf_idc_issue_reset_event(adapter->cdev_info);
-+	idpf_vc_core_deinit(adapter);
-+}
-+
-+/**
-+ * idpf_pci_err_detected - PCI error detected, about to attempt recovery
-+ * @pdev: PCI device struct
-+ * @err: err detected
-+ *
-+ * Return: %PCI_ERS_RESULT_NEED_RESET to attempt recovery,
-+ * %PCI_ERS_RESULT_DISCONNECT if recovery is not possible.
-+ */
-+static pci_ers_result_t
-+idpf_pci_err_detected(struct pci_dev *pdev, pci_channel_state_t err)
-+{
-+	struct idpf_adapter *adapter = pci_get_drvdata(pdev);
-+
-+	/* Shutdown the mailbox if PCI I/O is in a bad state to avoid MBX
-+	 * timeouts during the prepare stage.
-+	 */
-+	if (pci_channel_offline(pdev))
-+		libie_ctlq_xn_shutdown(adapter->xnm);
-+
-+	idpf_reset_prepare(adapter);
-+
-+	if (err == pci_channel_io_perm_failure)
-+		return PCI_ERS_RESULT_DISCONNECT;
-+
-+	/* When called due to PCI error, driver will have to force PFR on
-+	 * resume, in order to complete the recovery via the event task.
-+	 */
-+	set_bit(IDPF_PCI_CB_RESET, adapter->flags);
-+
-+	return PCI_ERS_RESULT_NEED_RESET;
-+}
-+
-+/**
-+ * idpf_pci_err_slot_reset - PCI undergoing reset
-+ * @pdev: PCI device struct
-+ *
-+ * Reset PCI state and use a register read to see if we're good.
-+ *
-+ * Return: %PCI_ERS_RESULT_RECOVERED on success,
-+ * %PCI_ERS_RESULT_DISCONNECT on failure.
-+ */
-+static pci_ers_result_t
-+idpf_pci_err_slot_reset(struct pci_dev *pdev)
-+{
-+	struct idpf_adapter *adapter = pci_get_drvdata(pdev);
-+
-+	pci_restore_state(pdev);
-+	pci_set_master(pdev);
-+	pci_wake_from_d3(pdev, false);
-+	if (readl(adapter->reset_reg.rstat) != 0xFFFFFFFF) {
-+		pci_save_state(pdev);
-+		return PCI_ERS_RESULT_RECOVERED;
-+	}
-+
-+	return PCI_ERS_RESULT_DISCONNECT;
-+}
-+
-+/**
-+ * idpf_pci_err_resume - Resume operations after PCI error recovery
-+ * @pdev: PCI device struct
-+ */
-+static void idpf_pci_err_resume(struct pci_dev *pdev)
-+{
-+	struct idpf_adapter *adapter = pci_get_drvdata(pdev);
-+
-+	/* Force a PFR when resuming from PCI error. */
-+	if (test_and_set_bit(IDPF_PCI_CB_RESET, adapter->flags))
-+		adapter->dev_ops.reg_ops.trigger_reset(adapter, IDPF_HR_FUNC_RESET);
-+
-+	queue_delayed_work(adapter->vc_event_wq,
-+			   &adapter->vc_event_task,
-+			   msecs_to_jiffies(300));
-+}
-+
-+/**
-+ * idpf_pci_err_reset_prepare - Prepare driver for PCI reset
-+ * @pdev: PCI device struct
-+ */
-+static void idpf_pci_err_reset_prepare(struct pci_dev *pdev)
-+{
-+	idpf_reset_prepare(pci_get_drvdata(pdev));
-+}
-+
-+/**
-+ * idpf_pci_err_reset_done - PCI err reset recovery complete
-+ * @pdev: PCI device struct
-+ */
-+static void idpf_pci_err_reset_done(struct pci_dev *pdev)
-+{
-+	pci_dbg(pdev, "reset: done\n");
-+	idpf_pci_err_resume(pdev);
-+}
-+
-+static const struct pci_error_handlers idpf_pci_err_handler = {
-+	.error_detected = idpf_pci_err_detected,
-+	.slot_reset = idpf_pci_err_slot_reset,
-+	.reset_prepare = idpf_pci_err_reset_prepare,
-+	.reset_done = idpf_pci_err_reset_done,
-+	.resume = idpf_pci_err_resume,
-+};
-+
- /* idpf_pci_tbl - PCI Dev idpf ID Table
-  */
- static const struct pci_device_id idpf_pci_tbl[] = {
-@@ -377,5 +490,6 @@ static struct pci_driver idpf_driver = {
- 	.sriov_configure	= idpf_sriov_configure,
- 	.remove			= idpf_remove,
- 	.shutdown		= idpf_shutdown,
-+	.err_handler		= &idpf_pci_err_handler,
- };
- module_pci_driver(idpf_driver);
--- 
-2.37.3
-
+CI run summary: https://github.com/kernel-patches/bpf/actions/runs/24270284504
+--===============2983978709261763309==--
 
