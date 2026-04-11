@@ -1,119 +1,167 @@
-Return-Path: <netdev+bounces-277626-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277627-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qHGXF3mX2WlfrAgAu9opvQ
-	(envelope-from <netdev+bounces-277626-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 02:36:09 +0200
+	id CDmsJmCY2WmhrAgAu9opvQ
+	(envelope-from <netdev+bounces-277627-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 02:40:00 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9FED3DDBB9
-	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 02:36:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F15623DDBF1
+	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 02:39:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EDC65303F285
-	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 00:33:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EB9CB301FFB4
+	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 00:39:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E13C2C235E;
-	Sat, 11 Apr 2026 00:33:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E0462DA74C;
+	Sat, 11 Apr 2026 00:39:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="ccFpTkYf"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ibWeOg6j"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42C501D5CE0;
-	Sat, 11 Apr 2026 00:33:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA1E82C235E;
+	Sat, 11 Apr 2026 00:39:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775867639; cv=none; b=JcNi2dqAriCbr351z2TccJ5yzOZJXa/8/C2njrACYA1lJBcUEyZlqiBIJQUDgN3By3Nc1R60/yIrw9v3Y+xB1QcphhNJ56PngsgadF5tWk3oII3qzUmw/1Q6Z3TClXTGiwFIqe8CTpeD6MzlvJz4+15MPWbsd89i6Gj7Cts4j6Q=
+	t=1775867993; cv=none; b=NTILhv5H2mRbjmtFdxsrfh+Az+wpF+fVFZxeonfZjaOc4fHgleSmp3ePDi8ouP62Ypb/rhN/QiHcxbp99FLDTkzRSSNojTIYwbHqEPHhQbi2Xj0EwdYxbOjgvJrUW4gif3s+yb1CkAEXZezWuVW4oySgUwsSj6AsJ3s6hnUzIZE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775867639; c=relaxed/simple;
-	bh=hZmYgx6N35U1PNa5aPxvldJ8w84iPx4xEepXwqPiJyc=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-Id:
-	 Content-Type:MIME-Version; b=DsDb8++sBA1m+TEdRiz0MnregLVRo9x0BX20m9JGFz00+aIhA/2hxZpO0HO6pYHROgwHw9MBJwxDc/R+n2p2iumWa5gW2z6b3pDcqZsRZK2VA+WHhOJYQYSkZ/8MMnGh7UMf2FMQx2PzzMom/Ow2D+RybCFCxGgFJGKgQCDqwSE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=ccFpTkYf; arc=none smtp.client-ip=220.197.31.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:Content-Type:
-	MIME-Version; bh=aCJgJEXOOYWHgY+vNytWHl/rzVHq7HwxBHOyVe82DmA=;
-	b=ccFpTkYf+NNEQqqas0+ovyu7moloK5CuGGhRQHcI5Pe7SmjZSFJHxpUKv3CPcq
-	GIhvygyWa8hE1qVKt2BWo3IDL29h7s5udpi6UcQ8/VNvm76fzJ4xYqQB8hW8Uf5N
-	IQ35PSh/9HZUexhR1JNVIJ3jRPjOZqcD9Vuv7hSE6CIXw=
-Received: from 229.199.16.172.in-addr.arpa (unknown [])
-	by gzga-smtp-mtada-g0-4 (Coremail) with SMTP id _____wBnU9vVltlpBLjTEQ--.50831S2;
-	Sat, 11 Apr 2026 08:33:30 +0800 (CST)
-From: Cao Ruichuang <create0818@163.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Stefano Garzarella <sgarzare@redhat.com>,
- Bobby Eshleman <bobby.eshleman@bytedance.com>, virtualization@lists.linux.dev,
- linux-kselftest@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject:
- Re: [PATCH v3] selftests: vsock: avoid races creating Unix socket paths
-In-Reply-To: <20260410134733.1c10a183@kernel.org>
-References: <177581562073.13887.468247298173578281@163.com>
- <20260410134733.1c10a183@kernel.org>
-Date: Sat, 11 Apr 2026 08:33:25 +0800
-Message-Id: <177586760504.23328.14397180554353198920@163.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+	s=arc-20240116; t=1775867993; c=relaxed/simple;
+	bh=bf9rDhhDLQYlfFaN1vUUcDJylrZVM5QUZxazTmomJjk=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=AwkV+2jFyeQMcQpUKE0ePh3lTwoZdzdCblhMpWJsHsu78txt+YvApW7zy8JMXp2RGfVnkg6o1XIEznCHWZyjVo3da5j8Ojrfwu4VFtDdxWJ06YRg2uPabOEsl30DJh+LKbkZ/CVn8cbYua1BjoTdJE3k6SwtBu64CfXoYVz5iOU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ibWeOg6j; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1775867991; x=1807403991;
+  h=from:to:cc:subject:date:message-id;
+  bh=bf9rDhhDLQYlfFaN1vUUcDJylrZVM5QUZxazTmomJjk=;
+  b=ibWeOg6jfS20eq2abjON0wPFKGLEYTtrKVwmc0T1W6yt4QDjbccmUG/u
+   sLV73yCj55C5piBmme6nWiLSeuMOf8s7RuNj0wUkbxtB89mzmPkbQQgIX
+   BtLyZIVEZIBHvh9NdpMR8OwHUrmNQ5VOc6muiHPI7gG7H7tANAChA2q/v
+   OVBGQ9An4mi2reF3rBkgWi7KSYKR+TKhYBx7Q/+pAvfiivESysWFbI0xe
+   mV5NLDWlmh8irk5DoMZoLURcyJ5/YK+iL+ReRTFql6fGc6536Ci8ezMZ/
+   cIrjT7NRcMCSAxNEvqUfBX8vZING0SzUKqOex2LaVCezA3tvYJ3G7I1zs
+   Q==;
+X-CSE-ConnectionGUID: ASF6wV8RRLCBtk/yTaE1xw==
+X-CSE-MsgGUID: cV5oz8JrQFucRzShy6wiEw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11755"; a="64423717"
+X-IronPort-AV: E=Sophos;i="6.23,172,1770624000"; 
+   d="scan'208";a="64423717"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2026 17:39:51 -0700
+X-CSE-ConnectionGUID: x13t4GsSRpywFZyyfr8xKg==
+X-CSE-MsgGUID: hbH5JdM/S0qunHamrYpX+g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,172,1770624000"; 
+   d="scan'208";a="228392487"
+Received: from estantil-desk.jf.intel.com ([10.166.241.24])
+  by orviesa010.jf.intel.com with ESMTP; 10 Apr 2026 17:39:50 -0700
+From: Emil Tantilov <emil.s.tantilov@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	przemyslaw.kitszel@intel.com,
+	jay.bhat@intel.com,
+	ivan.d.barrera@intel.com,
+	aleksandr.loktionov@intel.com,
+	larysa.zaremba@intel.com,
+	anthony.l.nguyen@intel.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	aleksander.lobakin@intel.com,
+	linux-pci@vger.kernel.org,
+	madhu.chittim@intel.com,
+	decot@google.com,
+	willemb@google.com,
+	sheenamo@google.com
+Subject: [PATCH iwl-next 0/2] Introduce IDPF PCI callbacks
+Date: Fri, 10 Apr 2026 17:39:57 -0700
+Message-Id: <20260411003959.30959-1-emil.s.tantilov@intel.com>
+X-Mailer: git-send-email 2.17.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-CM-TRANSID:_____wBnU9vVltlpBLjTEQ--.50831S2
-X-Coremail-Antispam: 1Uf129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
-	VFW2AGmfu7bjvjm3AaLaJ3UbIYCTnIWIevJa73UjIFyTuYvjxUUPfHDUUUU
-X-CM-SenderInfo: pfuht3jhqyimi6rwjhhfrp/xtbC5xqs5WnZltqNFwAA3S
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[163.com,none];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[163.com:s=s110527];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-277626-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-277627-lists,netdev=lfdr.de];
+	TO_DN_NONE(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[163.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[emil.s.tantilov@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[create0818@163.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	FREEMAIL_FROM(0.00)[163.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B9FED3DDBB9
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: F15623DDBF1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Jakub,
+This series implements PCI callbacks for the purpose of handling FLR and
+PCI errors in the IDPF driver.
 
-Thanks for the correction.
+The first patch removes the conditional deinitialization of the mailbox in
+the idpf_vc_core_deinit() function. Aside from being redundant, due to the
+shutdown of the mailbox after a reset is detected, the check was also
+preventing the driver from sending messages to stop and disable the vports
+and queues on FW side, which is needed for the prepare phase of the FLR
+handling.
 
-No, I do not have a concrete failure reproducer for this one.  My change
-was based on the mktemp -u TOCTOU window in the selftest setup rather than
-on a demonstrated flaky failure.
+The second patch implements the PCI callbacks. The logic here follows
+the reset handling done in idpf_init_hard_reset(), but is split in
+prepare and resume phases, where idpf_reset_prepare() stops all driver
+operations and the resume callback attempt to recover following the
+reset or the PCI error event.
 
-Given that, I agree this is not strong enough to keep reposting on the
-netdev side.  I will stop here unless I can come back with a real repro.
+Testing hints:
+1. FLR via sysfs:
+echo 1 > /sys/class/net/<ifname>/device/reset
 
-I will also follow the netdev posting rules you mentioned for future
-updates.
+Previously this would have been handled by idpf_init_hard_reset() as the
+driver detects the reset. Now it will be done by the PCI err callbacks,
+so this is the easiest way to test the reset_prepare/resume path.
 
-Thanks,
-Cao Ruichuang
+2. PCI errors can be tested with aer-inject:
+./aer-inject -s 83:00.0 examples/<error_type>
+
+3. Stress testing can be done by combining various callbacks with the
+reset from step 1:
+echo 1 > /sys/class/net/<if>/device/reset& ethtool -L <if> combined 8
+ethtool -L <if> combined 16& echo 1 > /sys/class/net/<if>/device/reset
+
+Emil Tantilov (2):
+  idpf: remove conditonal MBX deinit from idpf_vc_core_deinit()
+  idpf: implement pci error handlers
+
+ drivers/net/ethernet/intel/idpf/idpf.h        |   3 +
+ drivers/net/ethernet/intel/idpf/idpf_lib.c    |  13 +-
+ drivers/net/ethernet/intel/idpf/idpf_main.c   | 114 ++++++++++++++++++
+ .../net/ethernet/intel/idpf/idpf_virtchnl.c   |  11 +-
+ 4 files changed, 129 insertions(+), 12 deletions(-)
+
+-- 
+2.37.3
 
 
