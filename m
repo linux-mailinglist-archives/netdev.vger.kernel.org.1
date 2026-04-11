@@ -1,458 +1,289 @@
-Return-Path: <netdev+bounces-277701-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277702-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sKCTKnhX2mn/0QgAu9opvQ
-	(envelope-from <netdev+bounces-277701-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 16:15:20 +0200
+	id WMT8NvZX2mkm0ggAu9opvQ
+	(envelope-from <netdev+bounces-277702-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 16:17:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 235A23E0470
-	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 16:15:20 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A6163E047C
+	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 16:17:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1500F304BBB8
-	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 14:15:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7D315301BF4D
+	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 14:17:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E720936EABF;
-	Sat, 11 Apr 2026 14:15:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE3C9340DB0;
+	Sat, 11 Apr 2026 14:17:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fqX/gWy6"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="U78tNUKT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f179.google.com (mail-dy1-f179.google.com [74.125.82.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48B3119EED3
-	for <netdev@vger.kernel.org>; Sat, 11 Apr 2026 14:15:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.179
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775916917; cv=none; b=AK5HAMJmNrlAWb+WJ+uP468t9QBEcM8qt57mUgYrewr6oDHfIfeKN9a31J8cxFfaUD8r7jvAPJeunErCF4u+S7CZ3M43qlsufaC6UN1Jmv0Nodn7fvuH2/PYZcLoEfxmWn72EFTgFp5u0uD9wpJ6S7MUl5isErl5eb6t8Z5wqcw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775916917; c=relaxed/simple;
-	bh=xz8ufQeOfD0RaPa3cxDIYLWhvLmAnj3P8cLi3v5AiJ0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DPS71O4tk3RmKErQaY4a+bI05BH3q4vTN4WIQFN41R6EAkFofHwLcZkdjU+rGDg2sRYFAXJOzxLQfy1b3CZoKFZB1uR7wPRtoTUrH6+IYzGmpkNxVF9FGOSIVCCZ+9+Bkx0rQaXJnvwgOKXO3pIB75HAHdpKNkr4sWoT/YmFdJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fqX/gWy6; arc=none smtp.client-ip=74.125.82.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dy1-f179.google.com with SMTP id 5a478bee46e88-2d323567f11so1279070eec.1
-        for <netdev@vger.kernel.org>; Sat, 11 Apr 2026 07:15:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775916912; x=1776521712; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ek3Lj4/DR6Mztj9LHpSZ6EK4fq4aWP0dbrOFhIMHTkU=;
-        b=fqX/gWy69gA6ofNBP/A0P/US8+8mtVdgOluFB+06lVga2gi/dhZN274e3loimjHsIy
-         CLWV+fad1cCQnd37pvYlfFe8SoRqDEpzHoD9yQ0RfvCylZ6xwmGzFGZoBBn8Uh70v6PN
-         2hZ3wFJyuORRv6gShA9U9yWlVwSDwR6SXDTLgHlyCHGvhGD4dG1RyYwYUf0aPTsRhSrN
-         USbI02ykNMkXlaqHBRAUvlI2zXFfeEox0Z8h3YPDm/T3O+1sT+on0Vt6VNGCi+1LH5wO
-         T1iHvD/wuc7kLtPl5jg0tk8CyXqzOmZfYnlqbzotsS4ZocscFN+iyOJjF19K+mTOfI2R
-         yE1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775916912; x=1776521712;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ek3Lj4/DR6Mztj9LHpSZ6EK4fq4aWP0dbrOFhIMHTkU=;
-        b=NXYjrwNcKYQHx3RPuo8Ey7TjCMUcxjRU6aB5DxEfRpRsoxDZkWAiwO+uKlSxFuXYNE
-         47JHW0QTknLbojhlHjku79maKcbaxQ33BNAzcrjHN4mofLUazpf6kmzBad3dbe3ndjqS
-         j/P26REzaQUXqT07WTKlILyJL2mcFSuwauNWh46/DQv4LS9in0k/DDdYGbRzMjOdahye
-         jXUe0uNirZ9nrDxYy7YI5ihkgLtmDHpI4QYm7pU5CmNkKtmN+A58FWWk3jdcc5Gj6H8x
-         64sQRf1f9QkXkGQk5vWJjehGpDHK2jFdo/mPCRWKc9bcXhDQQtYBbs/SVulTDlyS680p
-         jtUg==
-X-Forwarded-Encrypted: i=1; AJvYcCUG6TCJph8TaSywxvv26Zsaqt28vkOPy+aKS9pAM3RDH+qhs7mn7GhrBgmepgA7mAW7y4IC/xw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxbNsRBqONuCwcAqPlFMJdcaSthkBpZMw3rBGZZ5yRtoHN/r1fI
-	s6v7gS/ximpPx0cIVBM8JF5db9gmOZqlnXy6P6zt8AxnNa6sz9hL7Uhn
-X-Gm-Gg: AeBDievAofZq2+7ZyPLiYG9zhl7wuDeKjjOQtp3JV0YWKxObSKYHAftoYNyi7gUKQ+x
-	zjzDy5mM54TZq3DliPVByFGjFBWwg7S5CNbLZQJ6vHGUjQAT5ByOxxI/PXdtDGwCe/QvAnKafx0
-	zthnuRyTd1oRpD2ZXOaYpJGPNQ671YJgLzlFHv2Bakce0G+Q5DLCyb+S7YwdlkzYiowhVImORF8
-	qFvdSSd4K2fFvWZs1JPUHo+QsLQLSNZRoAY0LySBEteENhPWj/59MKnyjYfY3ZWVn9HjR8A2QUq
-	rsyPYjERB2627J6TgujiypH3nroJW9gTAv/iAcM8Axy30dMFwzVa7WZfNgCFOPjVxhKPPwTmCOu
-	TQNPUc8CxYN4U51aCyPD/Ck7fOuv8DGnPQPRahmLYDLBJzjYZ/+bpurwRYprbegqAJscDZ4hBtx
-	CBf5vB5OMV7oz59dmwKFIPLVOklOjfucrpKEV5zVk1NjInxJI2vqsysiNIxuGPQ1RFKzVIuCU4R
-	ST9Gopk6g==
-X-Received: by 2002:a05:7300:cd8a:b0:2d3:9c91:6c45 with SMTP id 5a478bee46e88-2d599d816d0mr3341767eec.6.1775916911685;
-        Sat, 11 Apr 2026 07:15:11 -0700 (PDT)
-Received: from efaec68ba852.tailc0aff1.ts.net ([206.206.192.132])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2d561cd2a4esm11236005eec.16.2026.04.11.07.15.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 11 Apr 2026 07:15:11 -0700 (PDT)
-From: Weiming Shi <bestswngs@gmail.com>
-To: Aaron Conole <aconole@redhat.com>,
-	Eelco Chaudron <echaudro@redhat.com>,
-	Ilya Maximets <i.maximets@ovn.org>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Pravin B Shelar <pshelar@ovn.org>,
-	Flavio Leitner <fbl@sysclose.org>,
-	Mark Gray <mark.d.gray@redhat.com>,
-	netdev@vger.kernel.org,
-	Xiang Mei <xmei5@asu.edu>,
-	Weiming Shi <bestswngs@gmail.com>
-Subject: [PATCH v2 net] openvswitch: fix vport netlink reply size for large upcall PID arrays
-Date: Sat, 11 Apr 2026 07:14:50 -0700
-Message-ID: <20260411141448.1479933-3-bestswngs@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <v1-message-id>
-References: <v1-message-id>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58F5A37D107;
+	Sat, 11 Apr 2026 14:17:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.13
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775917043; cv=fail; b=XWPhgaBTR+p8T/YdLyTI25z06BlKz5kPFy+L8krVmqA+ymhwFu0dqw0YCD1kzCYzm2E914jGsOxtNmvz3jqjdwKKN9oNEV6I/DJXX3jMkIHEtJUnAp7kAgkOyXahdpl+mBF9btG6qoRt7TqRoTSu7fz4JECS0DjgC8pgvNko8ws=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775917043; c=relaxed/simple;
+	bh=/HYKisi0To3TOVl32B6xK2xB1o2yI0Ik3iHk+5TlHFI=;
+	h=Date:From:To:CC:Subject:Message-ID:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=hQDpTnssWqk9dFvjVIH/0z5LfbCOHTBjrrnAm+7rqeEC0BccKFhb6IBopmXsB9ZuHd4gtnZAQEoNW6eEmrr0HxUDbP7Stlh2OM6SZzpF/iaUiPocBcwiemwW7tWpGo/WfSgRr5oY3PgJ9p1deovH2siMA2LSWBpYt6ceNYE22/4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=U78tNUKT; arc=fail smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1775917042; x=1807453042;
+  h=date:from:to:cc:subject:message-id:in-reply-to:
+   mime-version;
+  bh=/HYKisi0To3TOVl32B6xK2xB1o2yI0Ik3iHk+5TlHFI=;
+  b=U78tNUKTeoix4RiAO0iITtwUULrBr8ymWrVogamp9ypTaQtoPeQdciVv
+   8xgL45X8nxO70uyT7iL/pPk3mfO3DFluI0g5gzAhN49Dft57qwmmXqT92
+   3cQXQs5Q9bLRpeBkUUI/oy2eHdeS/mdrCHly6HuP1bjsJnNb85E9nbM36
+   Vz36l2Zes10X5nZjmajpTEPgWtlMb+IUyoRbvfaY7aVm1FxevdwWHXZzl
+   WBCNJbnKLra9U2TkWBBXZSgq3BifpPUUH8JivupILmUMiTIVECJpdrn+Z
+   4b9D88E1F/HVfZWRTk4UoNsliSc0xWkXYJjRhNPAS/FnVS9U7hNSshBoH
+   Q==;
+X-CSE-ConnectionGUID: ewAzLkR9RtOyvPEoZBoCFQ==
+X-CSE-MsgGUID: P5W3uUd1SJO+6k8dORu7ww==
+X-IronPort-AV: E=McAfee;i="6800,10657,11755"; a="87994704"
+X-IronPort-AV: E=Sophos;i="6.23,173,1770624000"; 
+   d="scan'208";a="87994704"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2026 07:17:22 -0700
+X-CSE-ConnectionGUID: fP0kaJfQRo2SgJdysY9nQg==
+X-CSE-MsgGUID: re9+1Ev3QBW7BjxN++2yoQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,173,1770624000"; 
+   d="scan'208";a="234340626"
+Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
+  by orviesa005.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2026 07:17:21 -0700
+Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Sat, 11 Apr 2026 07:17:21 -0700
+Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
+ FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Sat, 11 Apr 2026 07:17:21 -0700
+Received: from SN4PR2101CU001.outbound.protection.outlook.com (40.93.195.33)
+ by edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Sat, 11 Apr 2026 07:17:20 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=hUk9WtzvRU3gAnDfNoVI30N5Pso7lCzkdRLRL9cK8gODNtdXSfAwe/VJGeKOrkIPBPnyZr7VMcukSz7Dte0VtaOIP4gv4bdPv2FWyf4zocl4PVlqwskaisLoJ0Av3g54htFS+7ACJ9xPTImgficjhy48Egg/sPiy5ugioD92+cU6A6bBVzQAVfh3eHxC69pUi2RW/2ahoNsXpUSUnD2Dabr5g81P8UHJm2euL+BHw/PVPFqH1EFWVElzgKYhfF+zAuKFG6rves9gAJzxA9zb1hwLggRkUGt4biSXYkG5VQ3cmL3D+ijyr5MghstzdXeHjfWfSnqZg9+AmSN0SOUsxA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=j20hjZabvCg2B0isUJ7M+GyUvVBkMpYKz0hoaVcT6NY=;
+ b=Vra80xxOE3CdvS3AwxQf349N6856HCuvCV57rBWHGh9Mj4vvNxH0MJEOCYj5yaxqX5J6PMDHfUpxlIzYoVBRe3I8v+on4JNEkyn/j+rHxNGK+OrzbO7MRhEU6MR1M7c73Wh097jssBZ/+lEa5b5jrR5NUWqtIDSi2M1TCGS0NuYTUML1ao1CjTcHaA6S2oBXJN++wNQOTRmLHuo6Sv8Qud7Kj6gcalSypYG49nD6Q/qMdFG8gFNyqTQ8eFvfjBOtHVNkKg2s+al2b2vnQ+3S4Bvb0gaaG28/9rotsCuHp9UaglYnQnHyfATn0cSKxOgT3gYTotcEL725VQeFi6eyog==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from BYAPR11MB2808.namprd11.prod.outlook.com (2603:10b6:a02:c8::26)
+ by SN7PR11MB7637.namprd11.prod.outlook.com (2603:10b6:806:340::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9723.19; Sat, 11 Apr
+ 2026 14:17:17 +0000
+Received: from BYAPR11MB2808.namprd11.prod.outlook.com
+ ([fe80::defa:788:da96:2f9a]) by BYAPR11MB2808.namprd11.prod.outlook.com
+ ([fe80::defa:788:da96:2f9a%4]) with mapi id 15.20.9769.044; Sat, 11 Apr 2026
+ 14:17:17 +0000
+Date: Sat, 11 Apr 2026 22:17:05 +0800
+From: kernel test robot <lkp@intel.com>
+To: Konstantin Khorenko <khorenko@virtuozzo.com>, Peter Oberparleiter
+	<oberpar@linux.ibm.com>, Mikhail Zaslonko <zaslonko@linux.ibm.com>, "Nathan
+ Chancellor" <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>
+CC: <oe-kbuild-all@lists.linux.dev>, Masahiro Yamada <masahiroy@kernel.org>,
+	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>, Arnd Bergmann
+	<arnd@arndb.de>, Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu
+	<herbert@gondor.apana.org.au>, <linux-kbuild@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, Konstantin Khorenko
+	<khorenko@virtuozzo.com>, Pavel Tikhomirov <ptikhomirov@virtuozzo.com>,
+	Vasileios Almpanis <vasileios.almpanis@virtuozzo.com>, Jakub Kicinski
+	<kuba@kernel.org>
+Subject: Re: [PATCH] gcov: use atomic counter updates to fix concurrent
+ access crashes
+Message-ID: <adpX4W4rEQm4OUlu@rli9-mobl>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20260402141831.1437357-2-khorenko@virtuozzo.com>
+X-ClientProxiedBy: SG2PR04CA0152.apcprd04.prod.outlook.com (2603:1096:4::14)
+ To BYAPR11MB2808.namprd11.prod.outlook.com (2603:10b6:a02:c8::26)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BYAPR11MB2808:EE_|SN7PR11MB7637:EE_
+X-MS-Office365-Filtering-Correlation-Id: cedda10c-e38f-4da5-e061-08de97d50926
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|7416014|366016|56012099003|18002099003|22082099003;
+X-Microsoft-Antispam-Message-Info: SzsaI9b4+XewBEOo2VMY8LXWw8UhRUhhDLSncC2K4Cg/EuurNk+vgTXHyEXms2TzzRl8pmv4dD4VKA4vsViT+tJ5X4a1u3aWmv4HZKhWUEi5Bp++3WDqZnfTdtlfe1hHmHs0uF0SC/ISdND5cCA4xBREwaSUher9i6eULzDKfCP8h111wtGGAnP13wtUdbeA1dB2HWkXeVe4nwtZZo5hTrZF2iqSkByoJ6o5I1/KWL8qsR/eRbcxIPs6zAJ4bWaxs5ckOWh8FMyv+qY+iHBlYOxz7AV6Dy4lGWA1kvm3rDeBLXIso1CdCfJDsPPWKLXDBTrwHh+oVvt0ZahsClZMAvwB5AJ0i371b2TO+CK5+qsIZT88TOtYZSzUXzPBvYCcjbqo5dwl3XmWpeJtTAO27d8gNcXcPu2gDODCh2YOOVwpVoQJPbGQ0TNggiyqT2Q5P3A9qemjBU+zdhj4bC3qfttXawiJcZ9mxs8PhaTKF8PLYxkS0IskV2/Qa/gAeH9UK4N5aqZraodTUCKTksyNBa22NvSJUiVQG+P1aD0s9/U56egk1/1punxgajg2Tfg15m6eD86XUBdRGnf+T2Svv3X84/mC43ZIFvvEjMHh6fdHjj4zyvw/q6WuvN5l0vbrv3ykBAhLszs6fonT8deDBB/pJb/BjjuHcHoDYBgYZzR8s7dEc7x712g7UGcVpd6aHZYAFoO5ND6cf/R+Ae5Peg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR11MB2808.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(7416014)(366016)(56012099003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?e4t+qKU5ZkjO0XcuDl0DrfFg2mmM1aptSKeutyz+Lj58FZRyG5OQT5IzKYmR?=
+ =?us-ascii?Q?/M6kdepThTjffmZs9Qdf7Gs91qlQuFXAAgZDtwrfdrUt6EmzA7OEysM3Ci9P?=
+ =?us-ascii?Q?gZ4gO2KlvAgds2BKVo9UcyfwuvyhLgOcBQYwUx/Ka0AXvJ04UUt8a6K8vy9j?=
+ =?us-ascii?Q?YTWdGFfDjMT9zcZtY9KDfdHFwMGlmmBHbshVeFvUWZ4sN9KRF9bt1lcC2ExI?=
+ =?us-ascii?Q?fewtj4+DbbhRH/7SbxhMyq0vcHI/KGJLT5zICmSSYitnObyxBp99OMGpPIj1?=
+ =?us-ascii?Q?qD+IfahkuZYCa4T7NMZ8bF/7RFHpEOcNMhNZQmwfL+wWWLY97UuQi/Exr6/4?=
+ =?us-ascii?Q?LAERC0x6x2n8l5cIAcjLXwi/Mew9CDng2BIqA+hwnLUh9wx0wZSaJkd1Bugb?=
+ =?us-ascii?Q?/y1Z0zdKptyyp3X5h6yXv0r3pPXrZcYwJ9PyZWraAx8iV8vKzDUDLpqvGyuO?=
+ =?us-ascii?Q?mj51cOqp1PwfzRX0JZhWjzA5r8QlPqig39NutjkWHT3cSGv0LHfJwCf+O3zV?=
+ =?us-ascii?Q?WGvL4Ivv9dsextf9+k/uiI59MYg8pJJ8fobEujHYMLnwKfMeclkx4vGFIfz/?=
+ =?us-ascii?Q?mQQZv16tpUkQkqajdo0zPvxAP6Ob0IRF+o+qR2CRkKTGglydtlmjU/Ariyi/?=
+ =?us-ascii?Q?ROc0XQHYrCEx3o7GmXXSuFq/Yb83E+hUaXiBAGeFbSfeHKUaOjIC4BxgtPlL?=
+ =?us-ascii?Q?84w2Zg2xIIptLPaxsi/ROXnS+3H57CM5IGdhC3WjBMRRFmiBhQG+CfLYQKqu?=
+ =?us-ascii?Q?ChGiDUXJA96R8Wp6wIuytatOPWE3xLHCiu67Qia00+D6ZwNXvCunygCqOvkr?=
+ =?us-ascii?Q?QOY7f8eo8JvKhKqcPCmEWX4f/dtUSPvJF6UGIRkLEWoPZq3oP4YBB5eHI4sS?=
+ =?us-ascii?Q?qN98orZGgKFAiYVncgEe5H9m8jB5vajIdF0UYlsah58IVr5SS83NbEXmPqGI?=
+ =?us-ascii?Q?LfPLOOSmpDGd2rXfhnyycJmYVkkZjW9enRgTIkZZh1vNc7zfa0e1cn6CxTwT?=
+ =?us-ascii?Q?sGl3MXJYzQJbF5M9dzQVJQGq8y8amX04maSi2catLnrIeeyQhEoP338xjKWV?=
+ =?us-ascii?Q?EG+dHij+/heJrO3eAqh41LSEn8djTD7SCqzU+y391v0UqEpfe3TmYd8FqH0e?=
+ =?us-ascii?Q?HzQpC9BK9H7ej5ta/9A4bYyFtpBONw7x7yzG27BL+JRwKleXzQVeRH2eKqVq?=
+ =?us-ascii?Q?WBqxmxh/o9sxhybwI6JvDgH0ZwQf6NFxyE8WC2Z39mUyyAZ61PmYWLo8JTPC?=
+ =?us-ascii?Q?CCqjLnMF/FjhU9NLZh3Wrl2otxhwTE+4edwy5xmLyevQiFBaLFwonDAvqi7M?=
+ =?us-ascii?Q?KS8f+UXS9j45vl77VbA/Tt/iSRDKG0DUDSF9L92uH2reBxOt/jA0ickN3xwr?=
+ =?us-ascii?Q?8kUB06aO10XPM0nxqYay/vS9Ezr4dWBazkplMMXs0WmVubLWHHbKElJ7yMrm?=
+ =?us-ascii?Q?PZLC8iQhHp7TKhSXfQ6NLTub9bSWqUSO1lVqfQcqZbgCYqaQH3UEsmXxbXG9?=
+ =?us-ascii?Q?VC0jQGX/I7qJMSyoRV1nGNH9pMff0C0qB3pwgZb2VFNN8hZM8iCkcb2RGT2K?=
+ =?us-ascii?Q?NQD7pC9jfQIBukcfFElX7zg/dkN4Oj5hjzAoiecT9U1fSsAtVwvVBYSATL/W?=
+ =?us-ascii?Q?RF8gSZRY0sITqKqUVcDQ+iyi3I4KBvo+j15dF6ghnKvlWRF8BybzuWPlRxPH?=
+ =?us-ascii?Q?jZ7RThfQM85gnkpW0aP/VL1bsUo6ZUYR3wa0e3wwkOjssvtkdllFj5kEn+60?=
+ =?us-ascii?Q?QaFaNmPwRg=3D=3D?=
+X-Exchange-RoutingPolicyChecked: uYqkKIJvfJGIzw/PgBwE76uJQlhbCxS4B36uEGj+8Vk8zvxiYFbd+P8nKbncQUvtdEpJ3FFTHMvZwEhTkFa+f4uIsXQutbRIpIAk7loVvHhjt+q4NkT38cn62HNWnzBcVMxaWP+8cL3fKnp/WiG0PKPbKYBgaeWV69PmfqTXZLYaXbsWLDigXS7Ea7OW+8xd1TlKOjo4Od8wyglQ7G14TGWJfIQpLfgfmhEUhhrLQLVtcet1Y0qFOGwMGn6OIgRed1K7bSURVzWxEds/yghZvnjsBHTKaKdtC1jsNCRAf1/ADMyasudox2mAsTIUQN5gStCJsn6/jRFFeb73x5H7Zg==
+X-MS-Exchange-CrossTenant-Network-Message-Id: cedda10c-e38f-4da5-e061-08de97d50926
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR11MB2808.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Apr 2026 14:17:17.3256
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: +KoYdRAm3Y05GfuYVxEnhrfsBJ8E8nr6W7kNbN9EMaw44tdWA3Uf5xhzTQOLlxtUe3y1uKnd4FXYCOOAf4Wv5A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB7637
+X-OriginatorOrg: intel.com
+X-Spamd-Result: default: False [1.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,ovn.org,sysclose.org,vger.kernel.org,asu.edu,gmail.com];
-	TAGGED_FROM(0.00)[bounces-277701-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-277702-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[git-scm.com:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:dkim,intel.com:email];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,asu.edu:email]
-X-Rspamd-Queue-Id: 235A23E0470
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[10]
+X-Rspamd-Queue-Id: 2A6163E047C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The vport netlink reply helpers allocate a fixed-size skb with
-nlmsg_new(NLMSG_DEFAULT_SIZE, ...) but serialize the full upcall PID
-array via ovs_vport_get_upcall_portids(). Since
-ovs_vport_set_upcall_portids() accepts any non-zero multiple of
-sizeof(u32) with no upper bound, a CAP_NET_ADMIN user can install a PID
-array large enough to overflow the reply buffer. On systems with
-unprivileged user namespaces enabled (e.g., Ubuntu default), this is
-reachable via unshare -Urn since all OVS vport genl operations use
-GENL_UNS_ADMIN_PERM.
+Hi Konstantin,
 
-When the subsequent nla_put() fails with -EMSGSIZE, five BUG_ON(err < 0)
-sites fire and panic the kernel:
+kernel test robot noticed the following build warnings:
 
- kernel BUG at net/openvswitch/datapath.c:2414!
- Oops: invalid opcode: 0000 [#1] SMP KASAN NOPTI
- CPU: 1 UID: 0 PID: 65 Comm: poc Not tainted 7.0.0-rc7-00195-geb216e422044 #1
- RIP: 0010:ovs_vport_cmd_set+0x34c/0x400
- Call Trace:
-  <TASK>
-  genl_family_rcv_msg_doit (net/netlink/genetlink.c:1116)
-  genl_rcv_msg (net/netlink/genetlink.c:1194)
-  netlink_rcv_skb (net/netlink/af_netlink.c:2550)
-  genl_rcv (net/netlink/genetlink.c:1219)
-  netlink_unicast (net/netlink/af_netlink.c:1344)
-  netlink_sendmsg (net/netlink/af_netlink.c:1894)
-  __sys_sendto (net/socket.c:2206)
-  __x64_sys_sendto (net/socket.c:2209)
-  do_syscall_64 (arch/x86/entry/syscall_64.c:63)
-  entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
-  </TASK>
- Kernel panic - not syncing: Fatal exception
+[auto build test WARNING on soc/for-next]
+[also build test WARNING on linus/master v7.0-rc7 next-20260410]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Fix this by dynamically sizing the reply skb to account for the actual
-PID array length, and replace the BUG_ON() calls with graceful error
-returns.
+url:    https://github.com/intel-lab-lkp/linux/commits/Konstantin-Khorenko/gcov-use-atomic-counter-updates-to-fix-concurrent-access-crashes/20260411-133428
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/soc/soc.git for-next
+patch link:    https://lore.kernel.org/r/20260402141831.1437357-2-khorenko%40virtuozzo.com
+patch subject: [PATCH] gcov: use atomic counter updates to fix concurrent access crashes
+config: m68k-allmodconfig (https://download.01.org/0day-ci/archive/20260411/202604111946.Erd3tguU-lkp@intel.com/config)
+compiler: m68k-linux-gcc (GCC) 15.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260411/202604111946.Erd3tguU-lkp@intel.com/reproduce)
 
-Fixes: b83d23a2a38b ("openvswitch: Introduce per-cpu upcall dispatch")
-Reported-by: Xiang Mei <xmei5@asu.edu>
-Signed-off-by: Weiming Shi <bestswngs@gmail.com>
----
-Changes in v2:
- - Dynamically size reply skb instead of using fixed NLMSG_DEFAULT_SIZE.
- - Drop WARN_ON_ONCE (still panics with panic_on_warn); use plain error
-   returns instead.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/r/202604111946.Erd3tguU-lkp@intel.com/
 
- net/openvswitch/datapath.c | 102 +++++++++++++++++++++++++------------
- net/openvswitch/vport.c    |  12 +++++
- net/openvswitch/vport.h    |   1 +
- 3 files changed, 82 insertions(+), 33 deletions(-)
+All warnings (new ones prefixed by >>):
 
-diff --git a/net/openvswitch/datapath.c b/net/openvswitch/datapath.c
-index e209099218b4..72e27a38d3a7 100644
---- a/net/openvswitch/datapath.c
-+++ b/net/openvswitch/datapath.c
-@@ -2184,9 +2184,11 @@ static int ovs_vport_cmd_fill_info(struct vport *vport, struct sk_buff *skb,
- 	return err;
- }
- 
--static struct sk_buff *ovs_vport_cmd_alloc_info(void)
-+static struct sk_buff *ovs_vport_cmd_alloc_info(struct vport *vport)
- {
--	return nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
-+	return nlmsg_new(NLMSG_DEFAULT_SIZE +
-+			 ovs_vport_get_upcall_portids_size(vport),
-+			 GFP_KERNEL);
- }
- 
- /* Called with ovs_mutex, only via ovs_dp_notify_wq(). */
-@@ -2196,13 +2198,16 @@ struct sk_buff *ovs_vport_cmd_build_info(struct vport *vport, struct net *net,
- 	struct sk_buff *skb;
- 	int retval;
- 
--	skb = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
-+	skb = ovs_vport_cmd_alloc_info(vport);
- 	if (!skb)
- 		return ERR_PTR(-ENOMEM);
- 
- 	retval = ovs_vport_cmd_fill_info(vport, skb, net, portid, seq, 0, cmd,
- 					 GFP_KERNEL);
--	BUG_ON(retval < 0);
-+	if (retval < 0) {
-+		kfree_skb(skb);
-+		return ERR_PTR(retval);
-+	}
- 
- 	return skb;
- }
-@@ -2303,10 +2308,6 @@ static int ovs_vport_cmd_new(struct sk_buff *skb, struct genl_info *info)
- 	if (port_no >= DP_MAX_PORTS)
- 		return -EFBIG;
- 
--	reply = ovs_vport_cmd_alloc_info();
--	if (!reply)
--		return -ENOMEM;
--
- 	ovs_lock();
- restart:
- 	dp = get_dp(sock_net(skb->sk), ovs_header->dp_ifindex);
-@@ -2347,6 +2348,13 @@ static int ovs_vport_cmd_new(struct sk_buff *skb, struct genl_info *info)
- 		goto exit_unlock_free;
- 	}
- 
-+	reply = ovs_vport_cmd_alloc_info(vport);
-+	if (!reply) {
-+		ovs_dp_detach_port(vport);
-+		err = -ENOMEM;
-+		goto exit_unlock_free;
-+	}
-+
- 	err = ovs_vport_cmd_fill_info(vport, reply, genl_info_net(info),
- 				      info->snd_portid, info->snd_seq, 0,
- 				      OVS_VPORT_CMD_NEW, GFP_KERNEL);
-@@ -2358,7 +2366,11 @@ static int ovs_vport_cmd_new(struct sk_buff *skb, struct genl_info *info)
- 	else
- 		netdev_set_rx_headroom(vport->dev, dp->max_headroom);
- 
--	BUG_ON(err < 0);
-+	if (err < 0) {
-+		ovs_unlock();
-+		kfree_skb(reply);
-+		return err;
-+	}
- 	ovs_unlock();
- 
- 	ovs_notify(&dp_vport_genl_family, reply, info);
-@@ -2366,7 +2378,6 @@ static int ovs_vport_cmd_new(struct sk_buff *skb, struct genl_info *info)
- 
- exit_unlock_free:
- 	ovs_unlock();
--	kfree_skb(reply);
- 	return err;
- }
- 
-@@ -2377,10 +2388,6 @@ static int ovs_vport_cmd_set(struct sk_buff *skb, struct genl_info *info)
- 	struct vport *vport;
- 	int err;
- 
--	reply = ovs_vport_cmd_alloc_info();
--	if (!reply)
--		return -ENOMEM;
--
- 	ovs_lock();
- 	vport = lookup_vport(sock_net(skb->sk), genl_info_userhdr(info), a);
- 	err = PTR_ERR(vport);
-@@ -2399,7 +2406,6 @@ static int ovs_vport_cmd_set(struct sk_buff *skb, struct genl_info *info)
- 			goto exit_unlock_free;
- 	}
- 
--
- 	if (a[OVS_VPORT_ATTR_UPCALL_PID]) {
- 		struct nlattr *ids = a[OVS_VPORT_ATTR_UPCALL_PID];
- 
-@@ -2408,10 +2414,20 @@ static int ovs_vport_cmd_set(struct sk_buff *skb, struct genl_info *info)
- 			goto exit_unlock_free;
- 	}
- 
-+	reply = ovs_vport_cmd_alloc_info(vport);
-+	if (!reply) {
-+		err = -ENOMEM;
-+		goto exit_unlock_free;
-+	}
-+
- 	err = ovs_vport_cmd_fill_info(vport, reply, genl_info_net(info),
- 				      info->snd_portid, info->snd_seq, 0,
- 				      OVS_VPORT_CMD_SET, GFP_KERNEL);
--	BUG_ON(err < 0);
-+	if (err < 0) {
-+		ovs_unlock();
-+		kfree_skb(reply);
-+		return err;
-+	}
- 
- 	ovs_unlock();
- 	ovs_notify(&dp_vport_genl_family, reply, info);
-@@ -2419,7 +2435,6 @@ static int ovs_vport_cmd_set(struct sk_buff *skb, struct genl_info *info)
- 
- exit_unlock_free:
- 	ovs_unlock();
--	kfree_skb(reply);
- 	return err;
- }
- 
-@@ -2433,10 +2448,6 @@ static int ovs_vport_cmd_del(struct sk_buff *skb, struct genl_info *info)
- 	unsigned int new_headroom;
- 	int err;
- 
--	reply = ovs_vport_cmd_alloc_info();
--	if (!reply)
--		return -ENOMEM;
--
- 	ovs_lock();
- 	vport = lookup_vport(sock_net(skb->sk), genl_info_userhdr(info), a);
- 	err = PTR_ERR(vport);
-@@ -2448,10 +2459,20 @@ static int ovs_vport_cmd_del(struct sk_buff *skb, struct genl_info *info)
- 		goto exit_unlock_free;
- 	}
- 
-+	reply = ovs_vport_cmd_alloc_info(vport);
-+	if (!reply) {
-+		err = -ENOMEM;
-+		goto exit_unlock_free;
-+	}
-+
- 	err = ovs_vport_cmd_fill_info(vport, reply, genl_info_net(info),
- 				      info->snd_portid, info->snd_seq, 0,
- 				      OVS_VPORT_CMD_DEL, GFP_KERNEL);
--	BUG_ON(err < 0);
-+	if (err < 0) {
-+		ovs_unlock();
-+		kfree_skb(reply);
-+		return err;
-+	}
- 
- 	/* the vport deletion may trigger dp headroom update */
- 	dp = vport->dp;
-@@ -2474,7 +2495,6 @@ static int ovs_vport_cmd_del(struct sk_buff *skb, struct genl_info *info)
- 
- exit_unlock_free:
- 	ovs_unlock();
--	kfree_skb(reply);
- 	return err;
- }
- 
-@@ -2484,29 +2504,45 @@ static int ovs_vport_cmd_get(struct sk_buff *skb, struct genl_info *info)
- 	struct ovs_header *ovs_header = genl_info_userhdr(info);
- 	struct sk_buff *reply;
- 	struct vport *vport;
-+	size_t portids_size;
- 	int err;
- 
--	reply = ovs_vport_cmd_alloc_info();
-+	/* Get portids size under RCU, then allocate outside RCU
-+	 * since nlmsg_new(GFP_KERNEL) may sleep.
-+	 */
-+	rcu_read_lock();
-+	vport = lookup_vport(sock_net(skb->sk), ovs_header, a);
-+	if (IS_ERR(vport)) {
-+		err = PTR_ERR(vport);
-+		rcu_read_unlock();
-+		return err;
-+	}
-+	portids_size = ovs_vport_get_upcall_portids_size(vport);
-+	rcu_read_unlock();
-+
-+	reply = nlmsg_new(NLMSG_DEFAULT_SIZE + portids_size, GFP_KERNEL);
- 	if (!reply)
- 		return -ENOMEM;
- 
- 	rcu_read_lock();
- 	vport = lookup_vport(sock_net(skb->sk), ovs_header, a);
--	err = PTR_ERR(vport);
--	if (IS_ERR(vport))
--		goto exit_unlock_free;
-+	if (IS_ERR(vport)) {
-+		err = PTR_ERR(vport);
-+		rcu_read_unlock();
-+		kfree_skb(reply);
-+		return err;
-+	}
- 	err = ovs_vport_cmd_fill_info(vport, reply, genl_info_net(info),
- 				      info->snd_portid, info->snd_seq, 0,
- 				      OVS_VPORT_CMD_GET, GFP_ATOMIC);
--	BUG_ON(err < 0);
- 	rcu_read_unlock();
- 
--	return genlmsg_reply(reply, info);
-+	if (err < 0) {
-+		kfree_skb(reply);
-+		return err;
-+	}
- 
--exit_unlock_free:
--	rcu_read_unlock();
--	kfree_skb(reply);
--	return err;
-+	return genlmsg_reply(reply, info);
- }
- 
- static int ovs_vport_cmd_dump(struct sk_buff *skb, struct netlink_callback *cb)
-diff --git a/net/openvswitch/vport.c b/net/openvswitch/vport.c
-index 23f629e94a36..57a6df7d6829 100644
---- a/net/openvswitch/vport.c
-+++ b/net/openvswitch/vport.c
-@@ -424,6 +424,18 @@ int ovs_vport_set_upcall_portids(struct vport *vport, const struct nlattr *ids)
- 	return 0;
- }
- 
-+int ovs_vport_get_upcall_portids_size(const struct vport *vport)
-+{
-+	struct vport_portids *ids;
-+
-+	ids = rcu_dereference_ovsl(vport->upcall_portids);
-+
-+	if (vport->dp->user_features & OVS_DP_F_VPORT_PIDS)
-+		return nla_total_size(ids->n_ids * sizeof(u32));
-+	else
-+		return nla_total_size(sizeof(u32));
-+}
-+
- /**
-  *	ovs_vport_get_upcall_portids - get the upcall_portids of @vport.
-  *
-diff --git a/net/openvswitch/vport.h b/net/openvswitch/vport.h
-index 9f67b9dd49f9..ee674d59a9c6 100644
---- a/net/openvswitch/vport.h
-+++ b/net/openvswitch/vport.h
-@@ -38,6 +38,7 @@ int ovs_vport_set_options(struct vport *, struct nlattr *options);
- int ovs_vport_get_options(const struct vport *, struct sk_buff *);
- 
- int ovs_vport_set_upcall_portids(struct vport *, const struct nlattr *pids);
-+int ovs_vport_get_upcall_portids_size(const struct vport *vport);
- int ovs_vport_get_upcall_portids(const struct vport *, struct sk_buff *);
- u32 ovs_vport_find_upcall_portid(const struct vport *, struct sk_buff *);
- 
+>> io_uring/io_uring.c:3224:1: warning: target does not support atomic profile update, single mode is selected
+    3224 | __initcall(io_uring_init);
+         | ^~~~~~~~~~
+--
+>> io_uring/opdef.c:890:1: warning: target does not support atomic profile update, single mode is selected
+     890 | }
+         | ^
+--
+>> io_uring/kbuf.c:740:1: warning: target does not support atomic profile update, single mode is selected
+     740 | }
+         | ^
+--
+>> io_uring/rsrc.c:1555:1: warning: target does not support atomic profile update, single mode is selected
+    1555 | }
+         | ^
+--
+>> io_uring/notif.c:141:1: warning: target does not support atomic profile update, single mode is selected
+     141 | }
+         | ^
+--
+>> io_uring/tctx.c:388:1: warning: target does not support atomic profile update, single mode is selected
+     388 | }
+         | ^
+--
+>> io_uring/filetable.c:158:1: warning: target does not support atomic profile update, single mode is selected
+     158 | }
+         | ^
+--
+>> io_uring/rw.c:1397:1: warning: target does not support atomic profile update, single mode is selected
+    1397 | }
+         | ^
+--
+>> io_uring/poll.c:963:1: warning: target does not support atomic profile update, single mode is selected
+     963 | }
+         | ^
+--
+>> io_uring/tw.c:355:1: warning: target does not support atomic profile update, single mode is selected
+     355 | }
+         | ^
+--
+>> io_uring/wait.c:308:1: warning: target does not support atomic profile update, single mode is selected
+     308 | }
+         | ^
+..
+
+
+vim +3224 io_uring/io_uring.c
+
+76d3ccecfa186a io_uring/io_uring.c Matteo Rizzo 2023-08-21  3221  
+2b188cc1bb857a fs/io_uring.c       Jens Axboe   2019-01-07  3222  	return 0;
+2b188cc1bb857a fs/io_uring.c       Jens Axboe   2019-01-07  3223  };
+2b188cc1bb857a fs/io_uring.c       Jens Axboe   2019-01-07 @3224  __initcall(io_uring_init);
+
 -- 
-2.43.0
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
 
