@@ -1,289 +1,221 @@
-Return-Path: <netdev+bounces-277702-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277703-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WMT8NvZX2mkm0ggAu9opvQ
-	(envelope-from <netdev+bounces-277702-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 16:17:26 +0200
+	id IHIdD+9a2mmB0ggAu9opvQ
+	(envelope-from <netdev+bounces-277703-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 16:30:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A6163E047C
-	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 16:17:26 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFC493E0545
+	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 16:30:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7D315301BF4D
-	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 14:17:24 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D28133008989
+	for <lists+netdev@lfdr.de>; Sat, 11 Apr 2026 14:30:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE3C9340DB0;
-	Sat, 11 Apr 2026 14:17:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E983C2DA749;
+	Sat, 11 Apr 2026 14:30:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="U78tNUKT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZczkzRqQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58F5A37D107;
-	Sat, 11 Apr 2026 14:17:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.13
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775917043; cv=fail; b=XWPhgaBTR+p8T/YdLyTI25z06BlKz5kPFy+L8krVmqA+ymhwFu0dqw0YCD1kzCYzm2E914jGsOxtNmvz3jqjdwKKN9oNEV6I/DJXX3jMkIHEtJUnAp7kAgkOyXahdpl+mBF9btG6qoRt7TqRoTSu7fz4JECS0DjgC8pgvNko8ws=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775917043; c=relaxed/simple;
-	bh=/HYKisi0To3TOVl32B6xK2xB1o2yI0Ik3iHk+5TlHFI=;
-	h=Date:From:To:CC:Subject:Message-ID:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=hQDpTnssWqk9dFvjVIH/0z5LfbCOHTBjrrnAm+7rqeEC0BccKFhb6IBopmXsB9ZuHd4gtnZAQEoNW6eEmrr0HxUDbP7Stlh2OM6SZzpF/iaUiPocBcwiemwW7tWpGo/WfSgRr5oY3PgJ9p1deovH2siMA2LSWBpYt6ceNYE22/4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=U78tNUKT; arc=fail smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1775917042; x=1807453042;
-  h=date:from:to:cc:subject:message-id:in-reply-to:
-   mime-version;
-  bh=/HYKisi0To3TOVl32B6xK2xB1o2yI0Ik3iHk+5TlHFI=;
-  b=U78tNUKTeoix4RiAO0iITtwUULrBr8ymWrVogamp9ypTaQtoPeQdciVv
-   8xgL45X8nxO70uyT7iL/pPk3mfO3DFluI0g5gzAhN49Dft57qwmmXqT92
-   3cQXQs5Q9bLRpeBkUUI/oy2eHdeS/mdrCHly6HuP1bjsJnNb85E9nbM36
-   Vz36l2Zes10X5nZjmajpTEPgWtlMb+IUyoRbvfaY7aVm1FxevdwWHXZzl
-   WBCNJbnKLra9U2TkWBBXZSgq3BifpPUUH8JivupILmUMiTIVECJpdrn+Z
-   4b9D88E1F/HVfZWRTk4UoNsliSc0xWkXYJjRhNPAS/FnVS9U7hNSshBoH
-   Q==;
-X-CSE-ConnectionGUID: ewAzLkR9RtOyvPEoZBoCFQ==
-X-CSE-MsgGUID: P5W3uUd1SJO+6k8dORu7ww==
-X-IronPort-AV: E=McAfee;i="6800,10657,11755"; a="87994704"
-X-IronPort-AV: E=Sophos;i="6.23,173,1770624000"; 
-   d="scan'208";a="87994704"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2026 07:17:22 -0700
-X-CSE-ConnectionGUID: fP0kaJfQRo2SgJdysY9nQg==
-X-CSE-MsgGUID: re9+1Ev3QBW7BjxN++2yoQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,173,1770624000"; 
-   d="scan'208";a="234340626"
-Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
-  by orviesa005.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2026 07:17:21 -0700
-Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
- fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Sat, 11 Apr 2026 07:17:21 -0700
-Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
- FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Sat, 11 Apr 2026 07:17:21 -0700
-Received: from SN4PR2101CU001.outbound.protection.outlook.com (40.93.195.33)
- by edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Sat, 11 Apr 2026 07:17:20 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=hUk9WtzvRU3gAnDfNoVI30N5Pso7lCzkdRLRL9cK8gODNtdXSfAwe/VJGeKOrkIPBPnyZr7VMcukSz7Dte0VtaOIP4gv4bdPv2FWyf4zocl4PVlqwskaisLoJ0Av3g54htFS+7ACJ9xPTImgficjhy48Egg/sPiy5ugioD92+cU6A6bBVzQAVfh3eHxC69pUi2RW/2ahoNsXpUSUnD2Dabr5g81P8UHJm2euL+BHw/PVPFqH1EFWVElzgKYhfF+zAuKFG6rves9gAJzxA9zb1hwLggRkUGt4biSXYkG5VQ3cmL3D+ijyr5MghstzdXeHjfWfSnqZg9+AmSN0SOUsxA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=j20hjZabvCg2B0isUJ7M+GyUvVBkMpYKz0hoaVcT6NY=;
- b=Vra80xxOE3CdvS3AwxQf349N6856HCuvCV57rBWHGh9Mj4vvNxH0MJEOCYj5yaxqX5J6PMDHfUpxlIzYoVBRe3I8v+on4JNEkyn/j+rHxNGK+OrzbO7MRhEU6MR1M7c73Wh097jssBZ/+lEa5b5jrR5NUWqtIDSi2M1TCGS0NuYTUML1ao1CjTcHaA6S2oBXJN++wNQOTRmLHuo6Sv8Qud7Kj6gcalSypYG49nD6Q/qMdFG8gFNyqTQ8eFvfjBOtHVNkKg2s+al2b2vnQ+3S4Bvb0gaaG28/9rotsCuHp9UaglYnQnHyfATn0cSKxOgT3gYTotcEL725VQeFi6eyog==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from BYAPR11MB2808.namprd11.prod.outlook.com (2603:10b6:a02:c8::26)
- by SN7PR11MB7637.namprd11.prod.outlook.com (2603:10b6:806:340::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9723.19; Sat, 11 Apr
- 2026 14:17:17 +0000
-Received: from BYAPR11MB2808.namprd11.prod.outlook.com
- ([fe80::defa:788:da96:2f9a]) by BYAPR11MB2808.namprd11.prod.outlook.com
- ([fe80::defa:788:da96:2f9a%4]) with mapi id 15.20.9769.044; Sat, 11 Apr 2026
- 14:17:17 +0000
-Date: Sat, 11 Apr 2026 22:17:05 +0800
-From: kernel test robot <lkp@intel.com>
-To: Konstantin Khorenko <khorenko@virtuozzo.com>, Peter Oberparleiter
-	<oberpar@linux.ibm.com>, Mikhail Zaslonko <zaslonko@linux.ibm.com>, "Nathan
- Chancellor" <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>
-CC: <oe-kbuild-all@lists.linux.dev>, Masahiro Yamada <masahiroy@kernel.org>,
-	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>, Arnd Bergmann
-	<arnd@arndb.de>, Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu
-	<herbert@gondor.apana.org.au>, <linux-kbuild@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, Konstantin Khorenko
-	<khorenko@virtuozzo.com>, Pavel Tikhomirov <ptikhomirov@virtuozzo.com>,
-	Vasileios Almpanis <vasileios.almpanis@virtuozzo.com>, Jakub Kicinski
-	<kuba@kernel.org>
-Subject: Re: [PATCH] gcov: use atomic counter updates to fix concurrent
- access crashes
-Message-ID: <adpX4W4rEQm4OUlu@rli9-mobl>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20260402141831.1437357-2-khorenko@virtuozzo.com>
-X-ClientProxiedBy: SG2PR04CA0152.apcprd04.prod.outlook.com (2603:1096:4::14)
- To BYAPR11MB2808.namprd11.prod.outlook.com (2603:10b6:a02:c8::26)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C78EE385503
+	for <netdev@vger.kernel.org>; Sat, 11 Apr 2026 14:30:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775917803; cv=none; b=ltohukvsH7Fc+KDmKewObPmgjj9EpHcaDwnXK4bhq2r0p3qZTbWnGfjI3tVPbk8l9yXAriKl+E0ZOinayGeaJ+SuBfuZFDyi3zU9KLBgqWW9h8fPh8u3dtdR+1kWoe5kaySscSIWEcm6jid9OXG+xCMHP4OnIHD3XzQNkCJ02tY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775917803; c=relaxed/simple;
+	bh=I7otHS2UuBibAyk7ztbchnygQDdAGqIo613LgXlwUo0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qdXsff/O2D05wavwm6mE3mxLNYcxWyEbfESUX13qiPOzANGmuv/0oefGkeJYXgYwqI2QgjrupTD567mBKwFHkDKIhYFbMCmGxBJkfi6wyAK/Pp4CQh/mtGtk2CfUHE8bhaAi3e6A6xE8i63fvIAwwtL2ZSCs99s6OijgJtWvjsg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZczkzRqQ; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4852a9c6309so28253465e9.0
+        for <netdev@vger.kernel.org>; Sat, 11 Apr 2026 07:30:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775917799; x=1776522599; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=TfsfBk1yzNdC/+yEaYnXqko1EBtHRLDfqU2U7CZrU+k=;
+        b=ZczkzRqQMKa1cCeHcr4QKh4IVLcWKs8b5c2UnZZzW6TM6tGTlNQmYJx2XgQCpJS1dA
+         WXKduUoOWttSIlwYkkH7+xXbix55QMltQbxqKyuxYNVW19HznOTENe+qhoYKWwRIciyw
+         P2bbf+YT2fztRbnS4nHUNaZG6Qd3nMAKCHQvChTADn6bfIu4IxdeePGF+tsWjUx9FcNh
+         0Yg18GxDw/l11N11ztP7sMZRC3ABhf3LkHoVQIkOUuop/vIcDdoDqjEj4DX8N3VGwSig
+         ZDK3rIPNos6LEHAT9Gk6nceZLHAk69ywMvIV+mKMAvppzHX35HhY7qR2DFcQei8g12A+
+         eKcQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775917799; x=1776522599;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TfsfBk1yzNdC/+yEaYnXqko1EBtHRLDfqU2U7CZrU+k=;
+        b=CORM36zJl5jdzUS+Lg3NAN4aFCqMj18skC13dPBtj94aYd1nvdyvzBqvzyIe+khlQH
+         68U0zrp8Us4r7qAEIiPn2NFDnarvp6ZgEl/OZNFXLbbBrA62GF9sExzHuO6E2VifukNW
+         c8j30j2c9cHe176YGQ5YCNDJXe3IVKcA3TezpNxPeuom/Kx9VUX1Gl05W/AEDelKdtCh
+         NwnCmhrpVe4j6RW7KSkeitVfbYtO6NfnMR/kfh7HZzE1mBn+SNMlTn/Pssqn4WUo14u0
+         Q3Gr4SHthPtgXyTA/G1IA7uM491wgs6LnobCioe9CVHY9Z1SNw3rMUM3ZvhDCAD1Iq5b
+         u8rA==
+X-Forwarded-Encrypted: i=1; AJvYcCXK4hlZ9LYtoB3G0EZDBOZLPVN3rjS81QLunrMJMZ0b8Yas6LA5fv/X3+w7+eFt4b3zYwLFqI0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwkGF901AhrQwBs+ewdNF/M6/btrHbZw8V8cdYBLvX6815MRGJF
+	217sH8VFAoc3Qc/wizJolHpzVTBvCxjhdNb81dbbo1vQXdDeoLeSyZ3y
+X-Gm-Gg: AeBDievqw36B+/gRtQ5bjqHNI2J8MFxaSIQCQ+qN/93byDUePxYdcVe/8wca87a5+Qs
+	iouvE3TKhNToQpluzLqIG9qQ5oPKk8ikXfp3oN0HDl07BUziMUA+JLoKWpej2IQt4kC5ZASdBYN
+	20/EYnBo5FNVAJBFQkrcIhDTwRM96Fnhu8IvqOBRoJnq9OaEnOi/BDw7lp4bF92sakXbq0+Lv4E
+	Yyfa9qx9EDOJskw+RtT2osPAxXN88G15G1UpO56iKg4VghgH0YHUF3t0EDYeIEH0I+p+UyCwokz
+	Jq+UeydzjO6Ul7NeAQ0uriQ6xbn3Fv5RIGMWypZFTRy5MfuEp/BdFJcpukmYzd2SYAE4kB/HHs2
+	9NQJGicAo8M9swKRoO/Z9ks0THLvIXF1aVndY6HY/0YlYL2KzNM6qxw+MnC6q+Mn8TxOEK845gt
+	c5XBDNUDdh86MRaPvNSaSLlXZHBWAC7u0=
+X-Received: by 2002:a05:600c:314b:b0:488:b241:2c5f with SMTP id 5b1f17b1804b1-488d687c076mr80986065e9.26.1775917798783;
+        Sat, 11 Apr 2026 07:29:58 -0700 (PDT)
+Received: from biju.lan ([2a00:23c4:a758:8a01:1ef3:1f1e:3a7e:32e7])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488d58a414bsm151270785e9.4.2026.04.11.07.29.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 11 Apr 2026 07:29:58 -0700 (PDT)
+From: Biju <biju.das.au@gmail.com>
+X-Google-Original-From: Biju <biju.das.jz@bp.renesas.com>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Biju Das <biju.das.jz@bp.renesas.com>,
+	Russell King <linux@armlinux.org.uk>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Prabhakar Mahadev Lad <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+	Biju Das <biju.das.au@gmail.com>,
+	linux-renesas-soc@vger.kernel.org,
+	Ovidiu Panait <ovidiu.panait.rb@renesas.com>
+Subject: [PATCH net-next v2] net: phy: call phy_init_hw() in phy resume path
+Date: Sat, 11 Apr 2026 15:29:53 +0100
+Message-ID: <20260411142956.88343-1-biju.das.jz@bp.renesas.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BYAPR11MB2808:EE_|SN7PR11MB7637:EE_
-X-MS-Office365-Filtering-Correlation-Id: cedda10c-e38f-4da5-e061-08de97d50926
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|7416014|366016|56012099003|18002099003|22082099003;
-X-Microsoft-Antispam-Message-Info: SzsaI9b4+XewBEOo2VMY8LXWw8UhRUhhDLSncC2K4Cg/EuurNk+vgTXHyEXms2TzzRl8pmv4dD4VKA4vsViT+tJ5X4a1u3aWmv4HZKhWUEi5Bp++3WDqZnfTdtlfe1hHmHs0uF0SC/ISdND5cCA4xBREwaSUher9i6eULzDKfCP8h111wtGGAnP13wtUdbeA1dB2HWkXeVe4nwtZZo5hTrZF2iqSkByoJ6o5I1/KWL8qsR/eRbcxIPs6zAJ4bWaxs5ckOWh8FMyv+qY+iHBlYOxz7AV6Dy4lGWA1kvm3rDeBLXIso1CdCfJDsPPWKLXDBTrwHh+oVvt0ZahsClZMAvwB5AJ0i371b2TO+CK5+qsIZT88TOtYZSzUXzPBvYCcjbqo5dwl3XmWpeJtTAO27d8gNcXcPu2gDODCh2YOOVwpVoQJPbGQ0TNggiyqT2Q5P3A9qemjBU+zdhj4bC3qfttXawiJcZ9mxs8PhaTKF8PLYxkS0IskV2/Qa/gAeH9UK4N5aqZraodTUCKTksyNBa22NvSJUiVQG+P1aD0s9/U56egk1/1punxgajg2Tfg15m6eD86XUBdRGnf+T2Svv3X84/mC43ZIFvvEjMHh6fdHjj4zyvw/q6WuvN5l0vbrv3ykBAhLszs6fonT8deDBB/pJb/BjjuHcHoDYBgYZzR8s7dEc7x712g7UGcVpd6aHZYAFoO5ND6cf/R+Ae5Peg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR11MB2808.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(7416014)(366016)(56012099003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?e4t+qKU5ZkjO0XcuDl0DrfFg2mmM1aptSKeutyz+Lj58FZRyG5OQT5IzKYmR?=
- =?us-ascii?Q?/M6kdepThTjffmZs9Qdf7Gs91qlQuFXAAgZDtwrfdrUt6EmzA7OEysM3Ci9P?=
- =?us-ascii?Q?gZ4gO2KlvAgds2BKVo9UcyfwuvyhLgOcBQYwUx/Ka0AXvJ04UUt8a6K8vy9j?=
- =?us-ascii?Q?YTWdGFfDjMT9zcZtY9KDfdHFwMGlmmBHbshVeFvUWZ4sN9KRF9bt1lcC2ExI?=
- =?us-ascii?Q?fewtj4+DbbhRH/7SbxhMyq0vcHI/KGJLT5zICmSSYitnObyxBp99OMGpPIj1?=
- =?us-ascii?Q?qD+IfahkuZYCa4T7NMZ8bF/7RFHpEOcNMhNZQmwfL+wWWLY97UuQi/Exr6/4?=
- =?us-ascii?Q?LAERC0x6x2n8l5cIAcjLXwi/Mew9CDng2BIqA+hwnLUh9wx0wZSaJkd1Bugb?=
- =?us-ascii?Q?/y1Z0zdKptyyp3X5h6yXv0r3pPXrZcYwJ9PyZWraAx8iV8vKzDUDLpqvGyuO?=
- =?us-ascii?Q?mj51cOqp1PwfzRX0JZhWjzA5r8QlPqig39NutjkWHT3cSGv0LHfJwCf+O3zV?=
- =?us-ascii?Q?WGvL4Ivv9dsextf9+k/uiI59MYg8pJJ8fobEujHYMLnwKfMeclkx4vGFIfz/?=
- =?us-ascii?Q?mQQZv16tpUkQkqajdo0zPvxAP6Ob0IRF+o+qR2CRkKTGglydtlmjU/Ariyi/?=
- =?us-ascii?Q?ROc0XQHYrCEx3o7GmXXSuFq/Yb83E+hUaXiBAGeFbSfeHKUaOjIC4BxgtPlL?=
- =?us-ascii?Q?84w2Zg2xIIptLPaxsi/ROXnS+3H57CM5IGdhC3WjBMRRFmiBhQG+CfLYQKqu?=
- =?us-ascii?Q?ChGiDUXJA96R8Wp6wIuytatOPWE3xLHCiu67Qia00+D6ZwNXvCunygCqOvkr?=
- =?us-ascii?Q?QOY7f8eo8JvKhKqcPCmEWX4f/dtUSPvJF6UGIRkLEWoPZq3oP4YBB5eHI4sS?=
- =?us-ascii?Q?qN98orZGgKFAiYVncgEe5H9m8jB5vajIdF0UYlsah58IVr5SS83NbEXmPqGI?=
- =?us-ascii?Q?LfPLOOSmpDGd2rXfhnyycJmYVkkZjW9enRgTIkZZh1vNc7zfa0e1cn6CxTwT?=
- =?us-ascii?Q?sGl3MXJYzQJbF5M9dzQVJQGq8y8amX04maSi2catLnrIeeyQhEoP338xjKWV?=
- =?us-ascii?Q?EG+dHij+/heJrO3eAqh41LSEn8djTD7SCqzU+y391v0UqEpfe3TmYd8FqH0e?=
- =?us-ascii?Q?HzQpC9BK9H7ej5ta/9A4bYyFtpBONw7x7yzG27BL+JRwKleXzQVeRH2eKqVq?=
- =?us-ascii?Q?WBqxmxh/o9sxhybwI6JvDgH0ZwQf6NFxyE8WC2Z39mUyyAZ61PmYWLo8JTPC?=
- =?us-ascii?Q?CCqjLnMF/FjhU9NLZh3Wrl2otxhwTE+4edwy5xmLyevQiFBaLFwonDAvqi7M?=
- =?us-ascii?Q?KS8f+UXS9j45vl77VbA/Tt/iSRDKG0DUDSF9L92uH2reBxOt/jA0ickN3xwr?=
- =?us-ascii?Q?8kUB06aO10XPM0nxqYay/vS9Ezr4dWBazkplMMXs0WmVubLWHHbKElJ7yMrm?=
- =?us-ascii?Q?PZLC8iQhHp7TKhSXfQ6NLTub9bSWqUSO1lVqfQcqZbgCYqaQH3UEsmXxbXG9?=
- =?us-ascii?Q?VC0jQGX/I7qJMSyoRV1nGNH9pMff0C0qB3pwgZb2VFNN8hZM8iCkcb2RGT2K?=
- =?us-ascii?Q?NQD7pC9jfQIBukcfFElX7zg/dkN4Oj5hjzAoiecT9U1fSsAtVwvVBYSATL/W?=
- =?us-ascii?Q?RF8gSZRY0sITqKqUVcDQ+iyi3I4KBvo+j15dF6ghnKvlWRF8BybzuWPlRxPH?=
- =?us-ascii?Q?jZ7RThfQM85gnkpW0aP/VL1bsUo6ZUYR3wa0e3wwkOjssvtkdllFj5kEn+60?=
- =?us-ascii?Q?QaFaNmPwRg=3D=3D?=
-X-Exchange-RoutingPolicyChecked: uYqkKIJvfJGIzw/PgBwE76uJQlhbCxS4B36uEGj+8Vk8zvxiYFbd+P8nKbncQUvtdEpJ3FFTHMvZwEhTkFa+f4uIsXQutbRIpIAk7loVvHhjt+q4NkT38cn62HNWnzBcVMxaWP+8cL3fKnp/WiG0PKPbKYBgaeWV69PmfqTXZLYaXbsWLDigXS7Ea7OW+8xd1TlKOjo4Od8wyglQ7G14TGWJfIQpLfgfmhEUhhrLQLVtcet1Y0qFOGwMGn6OIgRed1K7bSURVzWxEds/yghZvnjsBHTKaKdtC1jsNCRAf1/ADMyasudox2mAsTIUQN5gStCJsn6/jRFFeb73x5H7Zg==
-X-MS-Exchange-CrossTenant-Network-Message-Id: cedda10c-e38f-4da5-e061-08de97d50926
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR11MB2808.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Apr 2026 14:17:17.3256
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: +KoYdRAm3Y05GfuYVxEnhrfsBJ8E8nr6W7kNbN9EMaw44tdWA3Uf5xhzTQOLlxtUe3y1uKnd4FXYCOOAf4Wv5A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB7637
-X-OriginatorOrg: intel.com
-X-Spamd-Result: default: False [1.84 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-277702-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	URIBL_MULTI_FAIL(0.00)[bp.renesas.com:server fail,sto.lore.kernel.org:server fail,renesas.com:server fail];
+	TAGGED_FROM(0.00)[bounces-277703-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
 	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[git-scm.com:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:dkim,intel.com:email];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FREEMAIL_CC(0.00)[bp.renesas.com,armlinux.org.uk,vger.kernel.org,glider.be,gmail.com,renesas.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[bijudasau@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev,renesas];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[10]
-X-Rspamd-Queue-Id: 2A6163E047C
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,renesas.com:email]
+X-Rspamd-Queue-Id: AFC493E0545
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Konstantin,
+From: Biju Das <biju.das.jz@bp.renesas.com>
 
-kernel test robot noticed the following build warnings:
+When mac_managed_pm flag is set, mdio_bus_phy_resume() is skipped, so
+phy_init_hw(), which performs soft_reset and config_init, is not called
+during resume.
 
-[auto build test WARNING on soc/for-next]
-[also build test WARNING on linus/master v7.0-rc7 next-20260410]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+This is inconsistent with the non-mac_managed_pm path, where
+mdio_bus_phy_resume() calls phy_init_hw() before phy_resume() on every
+resume.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Konstantin-Khorenko/gcov-use-atomic-counter-updates-to-fix-concurrent-access-crashes/20260411-133428
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/soc/soc.git for-next
-patch link:    https://lore.kernel.org/r/20260402141831.1437357-2-khorenko%40virtuozzo.com
-patch subject: [PATCH] gcov: use atomic counter updates to fix concurrent access crashes
-config: m68k-allmodconfig (https://download.01.org/0day-ci/archive/20260411/202604111946.Erd3tguU-lkp@intel.com/config)
-compiler: m68k-linux-gcc (GCC) 15.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260411/202604111946.Erd3tguU-lkp@intel.com/reproduce)
+To align both paths, move the phy_init_hw() call into phy_resume() itself,
+before invoking the driver's resume callback. This ensures PHY soft reset
+and re-initialization happen unconditionally, regardless of whether PM is
+managed by the MAC or the MDIO bus. As a result, drop the redundant
+phy_init_hw() call in mdio_bus_phy_resume().
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/r/202604111946.Erd3tguU-lkp@intel.com/
+Additionally, in phy_attach_direct(), replace the separate phy_init_hw()
+and phy_resume() calls with a single phy_resume() call, since
+phy_init_hw() is now handled inside phy_resume().
 
-All warnings (new ones prefixed by >>):
+Signed-off-by: Ovidiu Panait <ovidiu.panait.rb@renesas.com>
+Signed-off-by: Biju Das <biju.das.jz@bp.renesas.com>
+---
+v1->v2:
+ * Updated commit description.
+ * phy_init_hw() is moved from __phy_resume() -> phy_resume() to make it
+   lock-free.
+ * Dropped redundant phy_init_hw() call from mdio_bus_phy_resume() and
+   phy_attach_direct().
+---
+ drivers/net/phy/phy_device.c | 14 ++++++--------
+ 1 file changed, 6 insertions(+), 8 deletions(-)
 
->> io_uring/io_uring.c:3224:1: warning: target does not support atomic profile update, single mode is selected
-    3224 | __initcall(io_uring_init);
-         | ^~~~~~~~~~
---
->> io_uring/opdef.c:890:1: warning: target does not support atomic profile update, single mode is selected
-     890 | }
-         | ^
---
->> io_uring/kbuf.c:740:1: warning: target does not support atomic profile update, single mode is selected
-     740 | }
-         | ^
---
->> io_uring/rsrc.c:1555:1: warning: target does not support atomic profile update, single mode is selected
-    1555 | }
-         | ^
---
->> io_uring/notif.c:141:1: warning: target does not support atomic profile update, single mode is selected
-     141 | }
-         | ^
---
->> io_uring/tctx.c:388:1: warning: target does not support atomic profile update, single mode is selected
-     388 | }
-         | ^
---
->> io_uring/filetable.c:158:1: warning: target does not support atomic profile update, single mode is selected
-     158 | }
-         | ^
---
->> io_uring/rw.c:1397:1: warning: target does not support atomic profile update, single mode is selected
-    1397 | }
-         | ^
---
->> io_uring/poll.c:963:1: warning: target does not support atomic profile update, single mode is selected
-     963 | }
-         | ^
---
->> io_uring/tw.c:355:1: warning: target does not support atomic profile update, single mode is selected
-     355 | }
-         | ^
---
->> io_uring/wait.c:308:1: warning: target does not support atomic profile update, single mode is selected
-     308 | }
-         | ^
-..
-
-
-vim +3224 io_uring/io_uring.c
-
-76d3ccecfa186a io_uring/io_uring.c Matteo Rizzo 2023-08-21  3221  
-2b188cc1bb857a fs/io_uring.c       Jens Axboe   2019-01-07  3222  	return 0;
-2b188cc1bb857a fs/io_uring.c       Jens Axboe   2019-01-07  3223  };
-2b188cc1bb857a fs/io_uring.c       Jens Axboe   2019-01-07 @3224  __initcall(io_uring_init);
-
+diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+index 0edff47478c2..4a2b19d39373 100644
+--- a/drivers/net/phy/phy_device.c
++++ b/drivers/net/phy/phy_device.c
+@@ -396,10 +396,6 @@ static __maybe_unused int mdio_bus_phy_resume(struct device *dev)
+ 	WARN_ON(phydev->state != PHY_HALTED && phydev->state != PHY_READY &&
+ 		phydev->state != PHY_UP);
+ 
+-	ret = phy_init_hw(phydev);
+-	if (ret < 0)
+-		return ret;
+-
+ 	ret = phy_resume(phydev);
+ 	if (ret < 0)
+ 		return ret;
+@@ -1857,16 +1853,14 @@ int phy_attach_direct(struct net_device *dev, struct phy_device *phydev,
+ 	if (dev)
+ 		netif_carrier_off(phydev->attached_dev);
+ 
+-	/* Do initial configuration here, now that
++	/* Do initial configuration inside phy_init_hw(), now that
+ 	 * we have certain key parameters
+ 	 * (dev_flags and interface)
+ 	 */
+-	err = phy_init_hw(phydev);
++	err = phy_resume(phydev);
+ 	if (err)
+ 		goto error;
+ 
+-	phy_resume(phydev);
+-
+ 	/**
+ 	 * If the external phy used by current mac interface is managed by
+ 	 * another mac interface, so we should create a device link between
+@@ -2020,6 +2014,10 @@ int phy_resume(struct phy_device *phydev)
+ {
+ 	int ret;
+ 
++	ret = phy_init_hw(phydev);
++	if (ret)
++		return ret;
++
+ 	mutex_lock(&phydev->lock);
+ 	ret = __phy_resume(phydev);
+ 	mutex_unlock(&phydev->lock);
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.43.0
 
 
