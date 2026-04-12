@@ -1,169 +1,195 @@
-Return-Path: <netdev+bounces-277889-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277890-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0Bw5Ksn822kYKgkAu9opvQ
-	(envelope-from <netdev+bounces-277889-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 22:12:57 +0200
+	id IAVJI/v822kYKgkAu9opvQ
+	(envelope-from <netdev+bounces-277890-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 22:13:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C35C3E5D40
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 22:12:57 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05F9F3E5D50
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 22:13:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E1FA4300A756
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 20:12:55 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A6CAB300A7E7
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 20:13:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66A97379EE8;
-	Sun, 12 Apr 2026 20:12:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D359337DEB2;
+	Sun, 12 Apr 2026 20:13:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VKaT3+EV"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="WdBKKcS5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB76323D281
-	for <netdev@vger.kernel.org>; Sun, 12 Apr 2026 20:12:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3B371A3164
+	for <netdev@vger.kernel.org>; Sun, 12 Apr 2026 20:13:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776024775; cv=none; b=DLMT6Py1t/dzIjqQlzoyPSV8xtCUlLtMy5EltXhoqinUoraVgGgESsgO1I9JjG5/u7bAU74GD0Hu07gUe8YDHzMbooFzMcnFcnZTx20drEbaxnBQNe008d4bX72hc0sOVPnAck00VvSzMT4rDI8WEBD23uMqd12zjk1n6nZpwqs=
+	t=1776024824; cv=none; b=rgsym+CmYKBEaODHfhz9ndcpnTHPWzPXNn24ddFQekOKgD0bppGvwjEvr6fkJ47WdVoCwm0JIQc58BRZP3joaBQq1C9BJoz+f7ZgCikzV/P6KoS7aGPeJABcmI6G4DL/JABcLd0FWz3zfp/Y6m8jNyvNuGdy2bPEIP4Qpbv7xhc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776024775; c=relaxed/simple;
-	bh=9EHmBGbOcpV6F2r2vWgsHs3cWFEGuyMmtjfaJZdsimM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Gy4u2eTBCZHEU4Vk1IArPeAG/xSJI052xhR0RQfjenlKOawCt409X5RjisUbL5G9grErgOPC8nl+bt9vV1m0f3wiceKS2K8sxuim4zLeKPolf/PvbIOtVyloq52iG9IRswpqU5OctSY47Gh+Y3dqDQuneGde+wt+5oT+Iypx/dE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VKaT3+EV; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-43b8982c2f4so2203313f8f.2
-        for <netdev@vger.kernel.org>; Sun, 12 Apr 2026 13:12:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776024772; x=1776629572; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6hN6m/QzYh6HW+XfAh9ditjWhl6YsNRyPq6FG80kpoU=;
-        b=VKaT3+EVi3cIwEmw5ahQ6MufPpiMUUcob0SnG4TWxPH5bqZgTjpZdtBy6JnrYrBq80
-         Rr0xhWnXTmK+XIl8DcLyU71NgAsxBxSFv1ZWvB70OHOtaKk9nUKpLm1o1Or9wBFVkx9o
-         yO68xIA4yBnzBVXcEEbQpQl1nZ0j0fyTDD9KNGknV1aWDOdG882uLb+Qphq4ozyUb+QL
-         L86E/OhZlPO9ldU9mnJ/4rpuU3KEr48Eu9yN28U01NkUB/zksPxtyLGUDDnxKQAsNlRL
-         o52OvvgtlkMRnQpMUwbOSIwm7/LOWYhfhWqzPbhDDZvppZdbV+V/yu6aZ/hGoMw+UB75
-         mPdg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776024772; x=1776629572;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6hN6m/QzYh6HW+XfAh9ditjWhl6YsNRyPq6FG80kpoU=;
-        b=IyqJQaz43n/MqfLvwFy4Rnm4f7oEn12xP483GAim/9zwuAvlX3waMj3rJyK+UeIiBc
-         +Oy2RLtWm32yKExLYOJp/qZfnjpX0VA7iYKSm790RnTZc2+DU7n27jT9WcJR4CkffYEc
-         kBSSuUh3tyyF3HVYmEpls2SR0kJk4igU2ZJw5GBMUiX9FakmpJerouf3MYQ0xMmm322m
-         LqdgxtAvaIsBm3crBFACrdiJLihP+ZquviyZulU0qh4y7TlP2S2iry9TYAGTIero3cT3
-         7Ql8N/tKtXq8RKhEq3x3XPcTU8ye12IwYnraGXjojwy0K9C5VjZlsT11BcG6eZHvNqg6
-         8PIw==
-X-Forwarded-Encrypted: i=1; AFNElJ+6P2gadK4+Wpap+72WHgeN+nX0O0fYhXG8IZXMKhAc17AZFwQr0mDeb60vMkNpYfaieua1sTM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxx+9ZNTdpWGO1fsJBFWcesrN/HG4yIMWdW6mmx9svYemyb9CBS
-	LzNiqBF8OzFfhDk7LC0d6IiEBBkByqyfFh8umSdSnEzuXlA8CLFWyQGM
-X-Gm-Gg: AeBDievoMfm+0TooSdeY8lZbwdvfdFht7nzCtyZNAVGhPxwx1Ce+X4vy69kxkHKDJma
-	IHH2u8TL9Ik8Lr/07vwnIcs4tu2jz2jIhkABk6kkvyYUM6idwyqREAC1clcvPzN6b/FW/k/vMw0
-	YghXMaEo7Ot9KxxMfmqalwE8/92WtAbMZyVosuH0gagNMDgBUs9y/kInli1ifWq3wT1GggwnAki
-	p6ENtF/xj73fK7x6e0mvWOGR/msoJ7aPjRWtnoYI9E68+L+8YoB/M9jcyQI8h4ElO29b1iF763S
-	vDx9KgY7CPjk3a3wvNWlKr7qMRE1NNGS/XIGPyk4+cH9a4gMSX7xFlrgQJgLbsheuvYrDL3xR2X
-	+l8gaDTTGpW2CG2o6xXem41g5VP18mfvmHLeR2cvaXuccwvNtUVmwaQbfeptfL6ivtCkRyNV0OG
-	GKV6jUSMoyuqCZwVqLRYnUqH0KlNeuoX5LfV0FqAB+b2fdrQdO+vNNsnjY50IP47huLvjIgnWjR
-	ai1XEYX1bjwpmNxXfzrT1X+P3M1rq999nMDMYjsa6an+DVWF8Axv282jZ89D+s=
-X-Received: by 2002:a5d:5f46:0:b0:43c:f8b4:e58 with SMTP id ffacd0b85a97d-43d642c088fmr15346977f8f.41.1776024771908;
-        Sun, 12 Apr 2026 13:12:51 -0700 (PDT)
-Received: from ?IPV6:2003:ea:8f46:8d00:509:2813:3a95:e5b2? (p200300ea8f468d00050928133a95e5b2.dip0.t-ipconnect.de. [2003:ea:8f46:8d00:509:2813:3a95:e5b2])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43d6ffd3880sm11093762f8f.7.2026.04.12.13.12.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 12 Apr 2026 13:12:51 -0700 (PDT)
-Message-ID: <b6a44c0b-5258-42cb-8eac-0a6e6d077660@gmail.com>
-Date: Sun, 12 Apr 2026 22:12:49 +0200
+	s=arc-20240116; t=1776024824; c=relaxed/simple;
+	bh=2GOQ+7g+C4WqmPLOJXz+vmFiiyFGGybuosx9t3X2JnE=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=qKiHArqa03E+OlYmwN7fhC9bao3JD4yaTPCWWUiaTri4PQEAzd4XI2DhfbSWGihSWdFh61ecRFpYfj1fqVzr/t0wz6eAhyB97bDXz2EnVr1DFC4ywtr41DmvtZGPgukMHfcvFWaVLDqvMT3LOqdMnOhRm/Tynrh479T4H07lt9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=WdBKKcS5; arc=none smtp.client-ip=91.218.175.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Sun, 12 Apr 2026 22:13:35 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1776024821;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=U+GKgvetarubZ7eT2ndempdze700136pee4ifTTVdr4=;
+	b=WdBKKcS5UaYk96Bghe0okQ2joXXGKdoU45VNaLquoFmPVx9b/cv1KuyKiLyo54pjHe4UFl
+	PAZnoJ9SIvtzoeWCNhIGWmiMOY2p+WhAU7QWYx9dPwCIOvy8EgsgPVckHnTfP+Ey8Tnvv7
+	C7iRsLlKLkXgdKbxZZKfv9zZpCOHNYY=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Luka Gejak <luka.gejak@linux.dev>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ netdev@vger.kernel.org, fmaurer@redhat.com, horms@kernel.org,
+ luka.gejak@linux.dev
+Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_net-next_v5_1/2=5D_net=3A_hs?=
+ =?US-ASCII?Q?r=3A_require_valid_EOT_supervision_TLV?=
+In-Reply-To: <20260412124558.190c725f@kernel.org>
+References: <20260407162502.19462-1-luka.gejak@linux.dev> <20260407162502.19462-2-luka.gejak@linux.dev> <20260412124558.190c725f@kernel.org>
+Message-ID: <DDF9CC02-6FC1-44F0-B95D-967151BF0592@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2] r8169: Use napi_schedule_irqoff()
-To: Matt Vollrath <tactii@gmail.com>, netdev@vger.kernel.org
-Cc: edumazet@google.com, pabeni@redhat.com, kuba@kernel.org,
- andrew+netdev@lunn.ch, nic_swsd@realtek.com
-References: <20260412014031.525061-1-tactii@gmail.com>
- <d0e1bab5-3476-4b58-834c-6e742e89539d@gmail.com>
- <b6c325ea-8865-4aea-addd-3be2fe178244@gmail.com>
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-In-Reply-To: <b6c325ea-8865-4aea-addd-3be2fe178244@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [-0.96 / 15.00];
+	SUBJ_EXCESS_QP(1.20)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-277889-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	TAGGED_FROM(0.00)[bounces-277890-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hkallweit1@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[luka.gejak@linux.dev,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com]
-X-Rspamd-Queue-Id: 2C35C3E5D40
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 05F9F3E5D50
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 12.04.2026 15:51, Matt Vollrath wrote:
-> On 4/12/26 07:30, Heiner Kallweit wrote:
->> On 12.04.2026 03:40, Matt Vollrath wrote:
->>> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
->>> index 791277e750ba..4c0ad0de3410 100644
->>> --- a/drivers/net/ethernet/realtek/r8169_main.c
->>> +++ b/drivers/net/ethernet/realtek/r8169_main.c
->>> @@ -4873,7 +4873,7 @@ static irqreturn_t rtl8169_interrupt(int irq, void *dev_instance)
->>>           phy_mac_interrupt(tp->phydev);
->>>         rtl_irq_disable(tp);
->>> -    napi_schedule(&tp->napi);
->>> +    napi_schedule_irqoff(&tp->napi);
->>>   out:
->>>       rtl_ack_events(tp, status);
->>>   
->>
->> Not using napi_schedule_irqoff() here is intentional,
->> see 2734a24e6e5d18522fbf599135c59b82ec9b2c9e.
-> 
-> It looks like forced threading was fixed after your fix
-> to mitigate the issue of forced threading not masking
-> interrupts.
-> 
-> see 81e2073c175b887398e5bca6c004efa89983f58d
-> 
-> If I understand correctly, this should make
-> napi_schedule_irqoff() safe in any interrupt handler.
-> 
+On April 12, 2026 9:45:58 PM GMT+02:00, Jakub Kicinski <kuba@kernel=2Eorg> =
+wrote:
+>On Tue,  7 Apr 2026 18:25:01 +0200 luka=2Egejak@linux=2Edev wrote:
+>> From: Luka Gejak <luka=2Egejak@linux=2Edev>
+>>=20
+>> Supervision frames are only valid if terminated with a zero-length EOT
+>> TLV=2E The current check fails to reject non-EOT entries as the termina=
+l
+>> TLV, potentially allowing malformed supervision traffic=2E
+>>=20
+>> Fix this by strictly requiring the terminal TLV to be HSR_TLV_EOT
+>> with a length of zero, and properly linearizing the TLV header before
+>> access=2E
+>
+>> diff --git a/net/hsr/hsr_forward=2Ec b/net/hsr/hsr_forward=2Ec
+>> index 0aca859c88cb=2E=2Eeb89cc44eac0 100644
+>> --- a/net/hsr/hsr_forward=2Ec
+>> +++ b/net/hsr/hsr_forward=2Ec
+>> @@ -82,35 +82,33 @@ static bool is_supervision_frame(struct hsr_priv *h=
+sr, struct sk_buff *skb)
+>>  	    hsr_sup_tag->tlv=2EHSR_TLV_length !=3D sizeof(struct hsr_sup_payl=
+oad))
+>>  		return false;
+>> =20
+>> -	/* Get next tlv */
+>> +	/* Get next TLV */
+>
+>The capitalization of the comments makes the real changes in this patch
+>harder to spot and follow=2E Please don't tweak the comments unless you'r=
+e
+>really changing / improving them=2E
+>
+>>  	total_length +=3D hsr_sup_tag->tlv=2EHSR_TLV_length;
+>> -	if (!pskb_may_pull(skb, total_length))
+>> +	if (!pskb_may_pull(skb, total_length + sizeof(struct hsr_sup_tlv)))
+>>  		return false;
+>>  	skb_pull(skb, total_length);
+>>  	hsr_sup_tlv =3D (struct hsr_sup_tlv *)skb->data;
+>>  	skb_push(skb, total_length);
+>> =20
+>> -	/* if this is a redbox supervision frame we need to verify
+>> -	 * that more data is available
+>> -	 */
+>> +	/* If this is a RedBox supervision frame, verify additional data */
+>>  	if (hsr_sup_tlv->HSR_TLV_type =3D=3D PRP_TLV_REDBOX_MAC) {
+>> -		/* tlv length must be a length of a mac address */
+>> +		/* TLV length must be the size of a MAC address */
+>>  		if (hsr_sup_tlv->HSR_TLV_length !=3D sizeof(struct hsr_sup_payload))
+>>  			return false;
+>> =20
+>> -		/* make sure another tlv follows */
+>> +		/* Make sure another TLV follows */
+>>  		total_length +=3D sizeof(struct hsr_sup_tlv) + hsr_sup_tlv->HSR_TLV_=
+length;
+>> -		if (!pskb_may_pull(skb, total_length))
+>> +		if (!pskb_may_pull(skb, total_length + sizeof(struct hsr_sup_tlv)))
+>>  			return false;
+>> =20
+>> -		/* get next tlv */
+>> +		/* Get next TLV */
+>>  		skb_pull(skb, total_length);
+>>  		hsr_sup_tlv =3D (struct hsr_sup_tlv *)skb->data;
+>>  		skb_push(skb, total_length);
+>>  	}
+>> =20
+>> -	/* end of tlvs must follow at the end */
+>> -	if (hsr_sup_tlv->HSR_TLV_type =3D=3D HSR_TLV_EOT &&
+>> +	/* Supervision frame must end with EOT TLV */
+>> +	if (hsr_sup_tlv->HSR_TLV_type !=3D HSR_TLV_EOT ||
+>>  	    hsr_sup_tlv->HSR_TLV_length !=3D 0)
+>>  		return false;
+>
+>Aren't there more optional TLVs that we don't support?
+>You mentioned making sure that the final TLV is a zero-length EOT
+>but this check is far stricter=2E
+>
+>Should we replace this check with a loop which skips over TLVs
+>until EOT is reached?
 
-I think 8380c81d5c4fced6f4397795a5ae65758272bbfd needs to be
-mentioned too, because only with this change your patch is safe
-under PREEMPT_RT. Best extend the commit message based on our
-discussion. With that one:
-Reviewed-by: Heiner Kallweit <hkallweit1@gmail.com>
+Hi Jakub,
+Thank you for the feedback=2E
+I apologize for the noise in the comments=2E I will revert all cosmetic=20
+capitalization changes in v6 to keep the diff focused on the logic=2E
+Regarding the TLV loop: I actually implemented a TLV walker in v4 [1]=20
+for this exact reason, but I moved to strict sequential parsing in v5=20
+based on reviewer's feedback to keep the implementation simple=2E Could=20
+you please check if the approach used in v4 is what you had in mind?=20
+If so, I will rebase that logic onto the memory safety fixes=20
+(pskb_may_pull) from v5 and submit it as v6=2E
 
+[1] https://lore=2Ekernel=2Eorg/netdev/20260401092324=2E52266-2-luka=2Egej=
+ak@linux=2Edev/
+
+Best regards,
+Luka Gejak
 
