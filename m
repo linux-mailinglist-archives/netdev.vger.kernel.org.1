@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-277823-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277824-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CEYZESXA22mTGAkAu9opvQ
-	(envelope-from <netdev+bounces-277823-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 17:54:13 +0200
+	id EI9YJlDA22mTGAkAu9opvQ
+	(envelope-from <netdev+bounces-277824-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 17:54:56 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 948F03E4A04
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 17:54:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E64F13E4A1A
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 17:54:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 56B6D303A5E0
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 15:50:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B5B603045A8B
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 15:50:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E44E2C1788;
-	Sun, 12 Apr 2026 15:50:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA6C22BEC5E;
+	Sun, 12 Apr 2026 15:50:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N8dbS1Mf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DSqTFdAe"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A79ED531;
-	Sun, 12 Apr 2026 15:50:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C06112BE7BE;
+	Sun, 12 Apr 2026 15:50:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776009056; cv=none; b=HaA4RoUheE0QnUDG9rw0B90qWkUPSrSeTYDqkaf6nSgWA4KF7iB9JfvWtdbywJ0NtIiMvIenbS+a9k4d9BzOfdGkRUpPNvk/W2WJLl0hk8WJhBd1TB33ALs/V9ARCdmNRZKtGdTpB3B3rFbT6QftM5xolMmtVj0Tk+z7UuCglyA=
+	t=1776009057; cv=none; b=I9wVvPtM0ZSLor2FomxZkkhkpWm3iWXmXTUcNIA4usxx3WvvTMS4cNX3OHQGsAx2/AMiQpPP4W1jrwvwzmNcpfgmpelcBAE7nv+QqaJQci4dmW4xHl9smAy8aOuRGr5pDs4mOFwzBsa0VgM0YXEiyu9Uq2lojdwrWi7yECQe/QE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776009056; c=relaxed/simple;
-	bh=KHS/zZhqUsS6MvZIlIb/B4usR4SJUXAR3GDkT211Pu0=;
+	s=arc-20240116; t=1776009057; c=relaxed/simple;
+	bh=osIpXDbFP5WXV7jXS8qAjR1DaP4puI6wth/HrHBO2ak=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=oqUSMilmK8M92kJInztyj1tVPIOciSdxE6szxhQgdW0q0bWiGoBgwo+y8dXC+bqbdrPZK7MsMYfkyvxzGSVyCGly1qLcvr05vL7c4yxOEZu/8QaJXs98nzz7zKPul1HErPg3CQPIKscJ9Vfgj4c5Ow12+QK5Dm8XBDTjpZ5cn7s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N8dbS1Mf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E928FC2BCAF;
-	Sun, 12 Apr 2026 15:50:55 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=G8mWz3bRvvIdWTq80qUhXj9Act/vJT9v7if+JksNsVBMSVGZNdtefwbFL9i6KwkcJq9aX1uIf0OzAIUdY7uN5DN6GuKcoAK1mu9PplZE1B/kZMhBw6ND03eY/m6O0q+nqz+JAoiGUnIrpWCegJkYre1TBUMUP8UL+hCjYcGFyy8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DSqTFdAe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70106C19424;
+	Sun, 12 Apr 2026 15:50:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776009056;
-	bh=KHS/zZhqUsS6MvZIlIb/B4usR4SJUXAR3GDkT211Pu0=;
+	s=k20201202; t=1776009057;
+	bh=osIpXDbFP5WXV7jXS8qAjR1DaP4puI6wth/HrHBO2ak=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=N8dbS1Mfr90Lqt3QenxgTHDp84Y14g7GPYvRnhTP2XHRRr5SujaQVys5OPC6SiOF/
-	 ngOh8TdgVGXIZAW0BTL65hlZE/dP6wXHXVomB2gFGwJcBDsOzp443wmgqsACrciBWB
-	 3ZeK7jOx8WJIS57kV7P+k2V7/ExzUThmD4FIgG/Qd/1LvOcJoNd2LphkxC4xzYWwe/
-	 jshKdrpI5NnEv4jE9U3rTRkY7SQSICORAZCJgKHo6sSGo4lBYY7PtujsZ4TjtI7nrY
-	 p1kQzORZTvhp+Zokkm4S1hhtwp3kulhkxNanbOeviVn8VazfVSEnlmj8/eE8Ztk41m
-	 yrstN+YVgJNKQ==
+	b=DSqTFdAeFDNZGuUocuhhDxRfJJvlljme5xMaAEfGw9JQwdxUU4j7opnCHqAs7NPNt
+	 yUcJP+iD8oDYXPteDl0GoXgb42ngaHoebNCJ1An4KrTAQ+QpR9itdb5hrSXSBuG1G+
+	 dNzlLlW124kmzrCv2glwK3rwUyV1nWb2YwqL8ZjMiMhhRAbuU2qgMsUdTtVKLGAGmQ
+	 AO4YCN81F+Q10p3v3J+Yw2AJ2b2vggwzfNoXQq4PcKOLNJY+T1sLnEfBuvTEAMnNdg
+	 1ivLW+dM0S6T0d2rPud1nBb7jutu084Nc372VgtXlCLSOzRixF83+YSgsMk/wZNfkE
+	 JPxHjk+KFibBA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B9E6F3809A8B;
-	Sun, 12 Apr 2026 15:50:29 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FD2F3809A8B;
+	Sun, 12 Apr 2026 15:50:31 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -55,19 +55,24 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3 0/5] dpll: zl3073x: add ref-sync pair support
+Subject: Re: [PATCH net-next v4 1/2] dt-bindings: net: ti: k3-am654-cpsw-nuss:
+ Add
+ ti,j722s-cpsw-nuss compatible
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <177600902829.3323732.16856607917216838310.git-patchwork-notify@kernel.org>
-Date: Sun, 12 Apr 2026 15:50:28 +0000
-References: <20260408102716.443099-1-ivecera@redhat.com>
-In-Reply-To: <20260408102716.443099-1-ivecera@redhat.com>
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: netdev@vger.kernel.org, arkadiusz.kubalewski@intel.com, jiri@resnulli.us,
- mschmidt@redhat.com, poros@redhat.com, Prathosh.Satish@microchip.com,
- horms@kernel.org, vadim.fedorenko@linux.dev, linux-kernel@vger.kernel.org,
- conor+dt@kernel.org, krzk+dt@kernel.org, robh@kernel.org,
- devicetree@vger.kernel.org, pvaanane@redhat.com
+ <177600902979.3323732.15626307133193777506.git-patchwork-notify@kernel.org>
+Date: Sun, 12 Apr 2026 15:50:29 +0000
+References: 
+ <191e9f7e3a6c14eabe891a98c5fb646766479c0a.1775558273.git.nora.schiffer@ew.tq-group.com>
+In-Reply-To: 
+ <191e9f7e3a6c14eabe891a98c5fb646766479c0a.1775558273.git.nora.schiffer@ew.tq-group.com>
+To: Nora Schiffer <nora.schiffer@ew.tq-group.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, nm@ti.com, vigneshr@ti.com,
+ kristo@kernel.org, s-vadapalli@ti.com, rogerq@kernel.org, robh@kernel.org,
+ krzk+dt@kernel.org, conor+dt@kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux@ew.tq-group.com
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
@@ -80,7 +85,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_FROM(0.00)[bounces-277823-lists,netdev=lfdr.de,netdevbpf];
+	TAGGED_FROM(0.00)[bounces-277824-lists,netdev=lfdr.de,netdevbpf];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -93,9 +98,9 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,dt];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 948F03E4A04
+X-Rspamd-Queue-Id: E64F13E4A1A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
@@ -104,31 +109,21 @@ Hello:
 This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed,  8 Apr 2026 12:27:11 +0200 you wrote:
-> This series adds Reference-Sync pair support to the ZL3073x DPLL driver.
-> A Ref-Sync pair consists of a clock reference and a low-frequency sync
-> signal (e.g. 1 PPS) where the DPLL locks to the clock reference but
-> phase-aligns to the sync reference.
+On Tue,  7 Apr 2026 12:48:01 +0200 you wrote:
+> The J722S CPSW3G is mostly identical to the AM64's, but additionally
+> supports SGMII. The AM64 compatible ti,am642-cpsw-nuss is used as a
+> fallback.
 > 
-> Patches 1-3 are preparatory cleanups and helper additions:
-> - Clean up esync get/set callbacks with early returns and use the
->   zl3073x_out_is_ndiv() helper
-> - Convert open-coded clear-and-set bitfield patterns to FIELD_MODIFY()
-> - Add ref sync control and output clock type accessor helpers
+> Signed-off-by: Nora Schiffer <nora.schiffer@ew.tq-group.com>
+> ---
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v3,1/5] dpll: zl3073x: clean up esync get/set and use zl3073x_out_is_ndiv()
-    https://git.kernel.org/netdev/net-next/c/3c8c39768b10
-  - [net-next,v3,2/5] dpll: zl3073x: use FIELD_MODIFY() for clear-and-set patterns
-    https://git.kernel.org/netdev/net-next/c/737cb6195c40
-  - [net-next,v3,3/5] dpll: zl3073x: add ref sync and output clock type helpers
-    https://git.kernel.org/netdev/net-next/c/63009eb92b0f
-  - [net-next,v3,4/5] dt-bindings: dpll: add ref-sync-sources property
-    https://git.kernel.org/netdev/net-next/c/a1a702090def
-  - [net-next,v3,5/5] dpll: zl3073x: add ref-sync pair support
-    https://git.kernel.org/netdev/net-next/c/14f269ae6998
+  - [net-next,v4,1/2] dt-bindings: net: ti: k3-am654-cpsw-nuss: Add ti,j722s-cpsw-nuss compatible
+    https://git.kernel.org/netdev/net-next/c/f757a2da6df5
+  - [net-next,v4,2/2] net: ethernet: ti: am65-cpsw: add support for J722S SoC family
+    https://git.kernel.org/netdev/net-next/c/436e9e48ca51
 
 You are awesome, thank you!
 -- 
