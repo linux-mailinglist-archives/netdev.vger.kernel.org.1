@@ -1,130 +1,128 @@
-Return-Path: <netdev+bounces-277887-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277888-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OKAlL5/422n9JwkAu9opvQ
-	(envelope-from <netdev+bounces-277887-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 21:55:11 +0200
+	id hfDUG6D522mbKAkAu9opvQ
+	(envelope-from <netdev+bounces-277888-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 21:59:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 098313E5CAF
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 21:55:11 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF6533E5CCA
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 21:59:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C47E330097FC
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 19:55:06 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3DB9530068D6
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 19:59:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2B0A365A07;
-	Sun, 12 Apr 2026 19:55:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43F4837DEB5;
+	Sun, 12 Apr 2026 19:59:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vR1mmNVv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SJK2fyDo"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EFF343147;
-	Sun, 12 Apr 2026 19:55:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E623137CD3C;
+	Sun, 12 Apr 2026 19:59:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776023705; cv=none; b=HgxL3IriRcPQpY3zKo6CMAhXesPMgQnTYsbC/2TRkUMmDFb4X8nT/FRAXJzpu/HgxeKym6moF3ud353w4n1IO+w5+MvmQD4dipDc32g98CtGjzZ3VQiMLMAUNkCvy5kEbKw5ZsqgoH1Hw5wy+DkVjn7NjCwzUWnoryWhyGnelWU=
+	t=1776023961; cv=none; b=RVmC9lQRbqqRlB7mPyb8h3YM+obPh+lkiQG4M1LyG4IVqOG2xSdk6k0c+8Bx8J07MOcwybyDTahw7lrZBzpDUY1SaKUBymwbG61NR+qNCyXX+i8jL08a1EYEJGOzdcMv5ZIOrjYiqZzJ0w+XnauNkzZfoLRt+9kpSNZSW5kCKvs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776023705; c=relaxed/simple;
-	bh=WdJxeYmmwVGQcrKKOV+mgsVWVSfM6w4XxdfxGzCPDto=;
+	s=arc-20240116; t=1776023961; c=relaxed/simple;
+	bh=5JFGMjojVLjVjBuXH5cwllbciCfN+kWLL0KPdVKa2C8=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kwWYEEYgS7P8Va5odzCWVDiL6iK1U3PZZM9FJLmJjNKsKeJuW4QB32Dd84faxlFFYbwEm2hKOJ1wJHKs3duyL1uvE4Z+ywIWDGdR9OooLJke0IUaPAlweVYyz1t47PCIJ0I0nrcTRPABcK5fhKXGtKBfk8jwyB1wHCD4HVqkhJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vR1mmNVv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6440C19424;
-	Sun, 12 Apr 2026 19:55:03 +0000 (UTC)
+	 MIME-Version:Content-Type; b=SEklIZKgYitKGQ1QE/TNz/xIuSut2rEnJnWfG8e+9nUZbVNCLdzgy43XSlFFMq0m0HgQBSzbqbFrbT1Xtyw1QjAJN/rQrEFzdEUJOvYyhnItFN9IjMq/rxPUKdLYFANWbKmab2RRyo4qbd+/xTvPypfgHjPm1GvsYVjSuw1+VjU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SJK2fyDo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7F10C19424;
+	Sun, 12 Apr 2026 19:59:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776023705;
-	bh=WdJxeYmmwVGQcrKKOV+mgsVWVSfM6w4XxdfxGzCPDto=;
+	s=k20201202; t=1776023960;
+	bh=5JFGMjojVLjVjBuXH5cwllbciCfN+kWLL0KPdVKa2C8=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=vR1mmNVv21poI2EMgosTHT0V+9+hT1hkOpFnBoZFYKcT0UVkK/P1C2nzuM6jz12l0
-	 yo9lwh+zCYDkTikyfj/ALNggi06f6AB0/fndZ6rzM+sj1Pw1S3Htjgz3uDuBrIOJf+
-	 r1ZTHCGml6I/evdGn6lbyqlyoqAbP48SpH9xQ8ZekR13pSEbATHpwgSq3nbh4rwYZX
-	 ZUDxCGwr5XcIjoinUhEjFNI9K07MbMzjfu0f9kyouAGTTzjf6jPxy1EM3VHmrNiyjU
-	 Df26pAvhjsU3417ouN/V2bFXXBaBi3mFAhDfhCT0WyS31o4uH6n/mG2tUKkCvTfawP
-	 LmxN7joup4XKA==
-Date: Sun, 12 Apr 2026 12:55:02 -0700
+	b=SJK2fyDoSooRHzLNt5CadoC2V/OLevsHmQiX/kwT/hgDiCMZW47r0vtntQ5y5dPsX
+	 FUAjq5nH42WG1qkmVtNMKRCGqTlM5d8iDQIQFaQ/13fh+wMVHAggqU8y3hvTkcBe3n
+	 uYg3WHRpNVBKr/cr9eSeX82hsA78TSYOXNLfcLoekJFloux2HRtLUM7Cf8xjSuvWIF
+	 v8lsRzCaMsab/lUygANYwMTUqb9Bt5I7kQEuH7dq9TmnN2x+AMIfUWxl2IzcjHRi5G
+	 LPAfcQhTkXsAd0KJcx5+qEXaSEsnlBJJYK79GEqu0WJo6skejxRwcSOkzeLiFdvGB+
+	 XX8BuDDmOFIwQ==
+Date: Sun, 12 Apr 2026 12:59:17 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Christoph =?UTF-8?B?QsO2aG13YWxkZXI=?=
- <christoph.boehmwalder@linbit.com>
-Cc: Jens Axboe <axboe@kernel.dk>, drbd-dev@lists.linbit.com,
- linux-kernel@vger.kernel.org, Lars Ellenberg <lars.ellenberg@linbit.com>,
- Philipp Reisner <philipp.reisner@linbit.com>, linux-block@vger.kernel.org,
- Donald Hunter <donald.hunter@gmail.com>, Eric Dumazet
- <edumazet@google.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH 2/4] tools: ynl-gen-c: optionally emit structs and
- helpers
-Message-ID: <20260412125502.3f8ff576@kernel.org>
-In-Reply-To: <20260407173356.873887-3-christoph.boehmwalder@linbit.com>
-References: <20260407173356.873887-1-christoph.boehmwalder@linbit.com>
-	<20260407173356.873887-3-christoph.boehmwalder@linbit.com>
+To: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, leon@kernel.org,
+ longli@microsoft.com, kotaranov@microsoft.com, horms@kernel.org,
+ shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
+ ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
+ linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+ stephen@networkplumber.org, jacob.e.keller@intel.com, leitao@debian.org,
+ kees@kernel.org, john.fastabend@gmail.com, hawk@kernel.org,
+ bpf@vger.kernel.org, daniel@iogearbox.net, ast@kernel.org, sdf@fomichev.me,
+ dipayanroy@microsoft.com
+Subject: Re: [PATCH net-next v6 0/2] net: mana: add ethtool private flag for
+ full-page RX buffers
+Message-ID: <20260412125917.4fa8fc8d@kernel.org>
+In-Reply-To: <20260409183509.0b24dea6@kernel.org>
+References: <20260407200216.272659-1-dipayanroy@linux.microsoft.com>
+	<20260409183509.0b24dea6@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.dk,lists.linbit.com,vger.kernel.org,linbit.com,gmail.com,google.com];
-	TAGGED_FROM(0.00)[bounces-277887-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-277888-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FREEMAIL_CC(0.00)[microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,vger.kernel.org,networkplumber.org,intel.com,debian.org,gmail.com,iogearbox.net,fomichev.me];
+	RCPT_COUNT_TWELVE(0.00)[32];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 098313E5CAF
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: BF6533E5CCA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue,  7 Apr 2026 19:33:54 +0200 Christoph B=C3=B6hmwalder wrote:
-> The new flags in the genetlink-legacy spec that are required for
-> existing consumers to keep working are:
->=20
->   "default": a literal value or C define that sets the default value
->   for an attribute, consumed by set_defaults().
->=20
->   "required": if true, from_attrs() returns an error when this
->   attribute is missing from the request message.
->=20
->   "nla-policy-type": can be used to override the NLA type used in
->   policy arrays. This is needed when the semantic type differs from
->   the wire type for backward compatibility: genl_magic maps s32 fields
->   to NLA_U32/nla_get_u32, and existing userspace might depend on this
->   encoding. The immediate motivation is DRBD, whose genl spec
->   definition predates the addition of signed types in genl. However,
->   this is a generic issue that potentially affects multiple families:
->   for example, nftables has NFTA_HOOK_PRIORITY as s32 in the spec but
->   NLA_U32 in the actual kernel policy.
+On Thu, 9 Apr 2026 18:35:09 -0700 Jakub Kicinski wrote:
+> On Tue,  7 Apr 2026 12:59:17 -0700 Dipayaan Roy wrote:
+> > This behavior is observed on a single platform; other platforms
+> > perform better with page_pool fragments, indicating this is not a
+> > page_pool issue but platform-specific.  
+> 
+> Well, someone has to run some experiments and confirm other ARM
+> platforms are not impacted, with data. I was hoping to do it myself
+> but doesn't look like that will happen in time for the merge window :(
 
-The series doesn't apply for me (neither to Linus's tree nor=20
-to networking trees), so I didn't experiment with this code.
+Please repost with the perf analysis on other commercially available
+ARM platform. Something like:
 
-Are the new code gen additions purely for the kernel?
-Can we just commit the code they output and leave the YNL itself be?
-Every single legacy family has some weird quirks the point of YNL
-is to get rid of them, not support them all..
+  This is a workaround applicable to only some platforms. Modifying
+  driver X to use a similar workaround on [Ampere Max|nVidia
+  Grace|Amazon Graviton 3|..] the performance for split pages is
+  y% higher than when using single pages.
+-- 
+pw-bot: cr
 
