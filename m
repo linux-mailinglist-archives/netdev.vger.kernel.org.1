@@ -1,75 +1,75 @@
-Return-Path: <netdev+bounces-277790-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277791-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MK56M2KX22n1DgkAu9opvQ
-	(envelope-from <netdev+bounces-277790-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 15:00:18 +0200
+	id YMOqBF2X22n1DgkAu9opvQ
+	(envelope-from <netdev+bounces-277791-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 15:00:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B1873E3E86
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 15:00:17 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81E3E3E3E75
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 15:00:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9A03A3006972
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 12:59:36 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 33DB13008281
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 13:00:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F0D737B01E;
-	Sun, 12 Apr 2026 12:59:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E67837BE7F;
+	Sun, 12 Apr 2026 13:00:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y7wiMBHx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dfJHSvF1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B6B0337BB8;
-	Sun, 12 Apr 2026 12:59:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A4B91D54FA;
+	Sun, 12 Apr 2026 13:00:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775998776; cv=none; b=sGovFKoIEWKD/Hh2e7JlBr2M+AAVoMg3co9Hgg//5EVIuWmKKW3QUYhmyCqG82hW//QefyMigY+ED8dWysXvoQeJOqEsatDwVhQYCN23O+zHpno+qHl7hzEqM3wNmSBMlml7gxTsIQi+G0jXHoliDbhzHT8w0012Zq9xy7dHWLU=
+	t=1775998809; cv=none; b=dBrVil/+qyW1TwpQ14VnZKtKUjeNJsPqLdC4iF0OjvOyEGSXyZbKgpess9e7jW7sBvRPuELklQweYsj1EzUW3NTN9FH2FPItdTsui92N7v2GW9rYzexu7LsBYMOEJa8jzuSeOLoWAxlnvdO6T8FvxoHPPbUfwm3wK92u2iYXCRE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775998776; c=relaxed/simple;
-	bh=S4MIU9n9WtZTHe6aWIPGYeDb4WdLPsLl4V1eij9uszc=;
+	s=arc-20240116; t=1775998809; c=relaxed/simple;
+	bh=YOyEuLo74ep5TwCKRiq05kVPo3T4viLmFmQcJpmuUK8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NX0fhSjzkwlMyQNEVcoVWgskMYrF9GkcDY9KzYlxhmw8K+ZrjXvNtewrSqm23D+jF3R3kh2sHqPI5R56A+iPGvMcN9shDLDuBsEUxGeDsPi69lg8vE718m4dsMR/fZJnXQv+UyVw0JaCI9nqBlPdU1Ot3UAbHAwI2ND1l4yxf9E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y7wiMBHx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40677C19424;
-	Sun, 12 Apr 2026 12:59:32 +0000 (UTC)
+	 MIME-Version; b=kAcB93tm8goZR5Oea4GAUGMTg77o8O7hHjNnZDuBCdr0hlGkupkzOFfQv7MG8riF7+UTM/8ZlK4MDphwgQaYgP07CFXsWdmJYrYBzkBJfLI4eJFxpVdHMMmO4ZsckpdUXnbZpd5R4m2HsByutGize2PaF9jlbISz9KidjmOgPRk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dfJHSvF1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9432C19424;
+	Sun, 12 Apr 2026 13:00:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775998775;
-	bh=S4MIU9n9WtZTHe6aWIPGYeDb4WdLPsLl4V1eij9uszc=;
+	s=k20201202; t=1775998808;
+	bh=YOyEuLo74ep5TwCKRiq05kVPo3T4viLmFmQcJpmuUK8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Y7wiMBHxKsD3WT4v3W0fDtGgY0Zs5KCOQnjKtNOXsTJkAiZNDJH9mCbyeUjmig6lE
-	 LvMavUWqxy1nlB+o1MWqaBabVQWAggOJ6rHpZjqKM0tttbHB5ohcDr3MPdSP99QjZ8
-	 OIA65j6cLSyG74Hfn5ltDeGMmkA031uY5xHWbS51xFYETXBlU+EctiAZLgUh8ZfuYI
-	 8AFiIq3XOR17EK/n+O9lCqBTQWNNT0/7nQrPubXpaDyulu4uu6d4h7zysUqvcOHm2m
-	 Y+fL7JxNgFokCfvdFTO9+bdjG/5p5DjA/8bWIkbi59Gj9q5j1wielHcG5sB3PtqxFA
-	 Fwz1hJPsIWqBA==
+	b=dfJHSvF1BLFVJuG7TSuqKNOhmBGm96sP/XDWYHmHbij3LiLkyK+GZ4o8CCa7fxlLK
+	 RhMws3nS0VVqFpL/4jYTova2gp1dVR378JvGrpywLFp/BtaSwpZubnE4IlHTjys1/X
+	 b+HHkXZAP1A3j73QtvPd4P1uNDJnGraRD49tuvGCRVetKqatkgzwyY6A+S9CgKi6Fa
+	 GNS/2hTTDXN7nX6FLRq3+/MBOVL+kAf4X9Y8Txe4sfZ/VUrAdZ/l8KWocLQc0uwK/H
+	 UuyiXPAdjvl9+gzDerHDKNrIELbjf9CKKpHEu/17ko+sd1WfYRA213WkXkm5iJGfpt
+	 FtDwAS/6Ag5/g==
 From: Simon Horman <horms@kernel.org>
 To: illusion.wang@nebula-matrix.com
 Cc: Simon Horman <horms@kernel.org>,
-	dimon.zhao@nebula-matrix.com,
-	andrew+netdev@lunn.ch,
 	alvin.wang@nebula-matrix.com,
-	corbet@lwn.net,
-	enelsonmoore@gmail.com,
-	netdev@vger.kernel.org,
-	kuba@kernel.org,
 	sam.chen@nebula-matrix.com,
-	vadim.fedorenko@linux.dev,
-	edumazet@google.com,
+	netdev@vger.kernel.org,
 	skhan@linuxfoundation.org,
-	hkallweit1@gmail.com,
-	lukas.bulwahn@redhat.com,
 	lorenzo@kernel.org,
 	linux-kernel@vger.kernel.org (open list),
+	edumazet@google.com,
 	linux-doc@vger.kernel.org,
-	pabeni@redhat.com
-Subject: Re: [PATCH v11 net-next 05/11] net/nebula-matrix: add channel layer
-Date: Sun, 12 Apr 2026 13:59:14 +0100
-Message-ID: <20260412125914.663178-1-horms@kernel.org>
+	enelsonmoore@gmail.com,
+	andrew+netdev@lunn.ch,
+	pabeni@redhat.com,
+	lukas.bulwahn@redhat.com,
+	kuba@kernel.org,
+	hkallweit1@gmail.com,
+	dimon.zhao@nebula-matrix.com,
+	corbet@lwn.net,
+	vadim.fedorenko@linux.dev
+Subject: Re: [PATCH v11 net-next 09/11] net/nebula-matrix: add Dispatch layer implementation
+Date: Sun, 12 Apr 2026 13:59:45 +0100
+Message-ID: <20260412125945.663258-1-horms@kernel.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260408093739.56001-6-illusion.wang@nebula-matrix.com>
-References: <20260408093739.56001-6-illusion.wang@nebula-matrix.com>
+In-Reply-To: <20260408093739.56001-10-illusion.wang@nebula-matrix.com>
+References: <20260408093739.56001-10-illusion.wang@nebula-matrix.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,14 +84,14 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,nebula-matrix.com,lunn.ch,lwn.net,gmail.com,vger.kernel.org,linux.dev,google.com,linuxfoundation.org,redhat.com];
+	FREEMAIL_CC(0.00)[kernel.org,nebula-matrix.com,vger.kernel.org,linuxfoundation.org,google.com,gmail.com,lunn.ch,redhat.com,lwn.net,linux.dev];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCPT_COUNT_TWELVE(0.00)[19];
-	TAGGED_FROM(0.00)[bounces-277790-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-277791-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -104,9 +104,9 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.id:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:url]
-X-Rspamd-Queue-Id: 2B1873E3E86
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:url]
+X-Rspamd-Queue-Id: 81E3E3E3E75
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
@@ -115,131 +115,85 @@ email has considered the AI review valid, or at least plausible.
 
 For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
 ---
-net/nebula-matrix: add channel layer
+net/nebula-matrix: add Dispatch layer implementation
 
-This commit adds a channel management layer for the nebula-matrix
-network driver, providing mailbox-based communication between PF0
-and other PFs with message send/receive, ACK handling, and
-hash-based message handler lookup.
+This patch introduces a control-level routing mechanism for the Dispatch
+layer with two routing paths: a direct path (Dispatch -> Resource -> HW)
+and a channel path (Dispatch -> Channel). The implementation uses
+interface-declared control levels and upper-layer configured control
+levels to determine the routing.
 
-> diff --git a/drivers/net/ethernet/nebula-matrix/nbl/nbl_channel/nbl_channel.c b/drivers/net/ethernet/nebula-matrix/nbl/nbl_channel/nbl_channel.c
-> --- a/drivers/net/ethernet/nebula-matrix/nbl/nbl_channel/nbl_channel.c
-> +++ b/drivers/net/ethernet/nebula-matrix/nbl/nbl_channel/nbl_channel.c
-
-[ ... ]
-
-> +static int nbl_chan_send_msg(struct nbl_channel_mgt *chan_mgt,
-> +			     struct nbl_chan_send_info *chan_send)
+> diff --git a/drivers/net/ethernet/nebula-matrix/nbl/nbl_core/nbl_dispatch.c b/drivers/net/ethernet/nebula-matrix/nbl/nbl_core/nbl_dispatch.c
+> index 8b031f6e963f..eee41d10ad63 100644
+> --- a/drivers/net/ethernet/nebula-matrix/nbl/nbl_core/nbl_dispatch.c
+> +++ b/drivers/net/ethernet/nebula-matrix/nbl/nbl_core/nbl_dispatch.c
+> @@ -6,6 +6,396 @@
+>  #include <linux/pci.h>
+>  #include "nbl_dispatch.h"
+>
+> +static u16 nbl_disp_chan_get_vsi_id_req(struct nbl_dispatch_mgt *disp_mgt,
+> +					u16 func_id, u16 type)
 > +{
-
-[ ... ]
-
-> +	if (test_bit(NBL_CHAN_INTERRUPT_READY, chan_info->state)) {
-> +		ret = wait_event_timeout(wait_head->wait_queue,
-> +					 wait_head->acked,
-> +					 NBL_CHAN_ACK_WAIT_TIME);
-> +		if (!ret) {
-> +			wait_head->status = NBL_MBX_STATUS_TIMEOUT;
-> +			dev_err(dev,
-> +				"Channel waiting ack failed, message type: %d, msg id: %u\n",
-> +				chan_send->msg_type, msgid.id);
-> +			return -ETIMEDOUT;
-> +		}
-
-[ ... ]
-
-> +	/*polling wait mailbox ack*/
-> +	while (i--) {
-> +		nbl_chan_clean_queue(chan_mgt, chan_info);
+> +	struct nbl_channel_ops *chan_ops = disp_mgt->chan_ops_tbl->ops;
+> +	struct nbl_common_info *common = disp_mgt->common;
+> +	struct nbl_chan_param_get_vsi_id result = { 0 };
+> +	struct nbl_chan_param_get_vsi_id param = { 0 };
+> +	struct nbl_chan_send_info chan_send;
 > +
-> +		if (wait_head->acked) {
-> +			chan_send->ack_len = wait_head->ack_data_len;
-> +			wait_head->status = NBL_MBX_STATUS_IDLE;
-> +			return wait_head->ack_err;
-> +		}
-> +		usleep_range(NBL_CHAN_TX_WAIT_ACK_US_MIN,
-> +			     NBL_CHAN_TX_WAIT_ACK_US_MAX);
-> +	}
+> +	param.type = type;
 > +
-> +	wait_head->status = NBL_MBX_STATUS_TIMEOUT;
-> +	dev_err(dev,
-> +		"Channel polling ack failed, message type: %d msg id: %u\n",
-> +		chan_send->msg_type, msgid.id);
+> +	NBL_CHAN_SEND(chan_send, common->mgt_pf, NBL_CHAN_MSG_GET_VSI_ID,
+> +		      &param, sizeof(param), &result, sizeof(result), 1);
+> +	chan_ops->send_msg(disp_mgt->chan_ops_tbl->priv, &chan_send);
 > +
-> +	return -EFAULT;
-          ^^^^^^
-
-The interrupt-based ACK wait path above returns -ETIMEDOUT on timeout,
-but this polling-based ACK wait path returns -EFAULT. -EFAULT ("bad
-address") is not the right error code for a timeout condition.
-
-Should this also return -ETIMEDOUT for consistency? Any caller that
-checks specifically for -ETIMEDOUT to handle timeouts would miss
-this polling timeout case.
-
+> +	return result.vsi_id;
 > +}
 
-[ ... ]
+Does nbl_disp_chan_get_vsi_id_req() ignore the func_id parameter?
 
-> diff --git a/drivers/net/ethernet/nebula-matrix/nbl/nbl_common/nbl_common.c b/drivers/net/ethernet/nebula-matrix/nbl/nbl_common/nbl_common.c
-> --- /dev/null
-> +++ b/drivers/net/ethernet/nebula-matrix/nbl/nbl_common/nbl_common.c
+The function accepts func_id but only sends param.type in the channel
+message. The nbl_chan_param_get_vsi_id struct appears to have only
+{vsi_id, type} fields, with no func_id field.
 
-[ ... ]
+On the responder side:
 
-> +int nbl_common_create_wq(void)
+> +static void nbl_disp_chan_get_vsi_id_resp(void *priv, u16 src_id, u16 msg_id,
+> +					  void *data, u32 data_len)
 > +{
-> +	wq_mgt = kzalloc_obj(*wq_mgt);
-> +	if (!wq_mgt)
-> +		return -ENOMEM;
+> +	struct nbl_dispatch_mgt *disp_mgt = (struct nbl_dispatch_mgt *)priv;
+> +	struct nbl_channel_ops *chan_ops = disp_mgt->chan_ops_tbl->ops;
+> +	struct nbl_resource_ops *res_ops = disp_mgt->res_ops_tbl->ops;
+> +	struct nbl_resource_mgt *p = disp_mgt->res_ops_tbl->priv;
+> +	struct device *dev = disp_mgt->common->dev;
+> +	struct nbl_chan_param_get_vsi_id *param;
+> +	struct nbl_chan_param_get_vsi_id result = { 0 };
+> +	struct nbl_chan_ack_info chan_ack;
+> +	int err = NBL_CHAN_RESP_OK;
+> +	int ret;
 > +
-> +	wq_mgt->ctrl_dev_wq = alloc_workqueue("%s", WQ_MEM_RECLAIM | WQ_UNBOUND,
-> +					      0, "nbl_ctrldev_wq");
-> +	if (!wq_mgt->ctrl_dev_wq) {
-> +		pr_err("Failed to create workqueue nbl_ctrldev_wq\n");
-> +		goto alloc_ctrl_dev_wq_failed;
-> +	}
+> +	param = (struct nbl_chan_param_get_vsi_id *)data;
 > +
-> +	return 0;
-> +alloc_ctrl_dev_wq_failed:
-> +	kfree(wq_mgt);
-> +	return -ENOMEM;
+> +	result.vsi_id =
+> +		NBL_OPS_CALL_RET(res_ops->get_vsi_id, (p, src_id, param->type));
+
+nbl_disp_chan_get_vsi_id_resp() uses src_id (the channel source) instead
+of func_id. This creates a behavioral inconsistency with the direct path:
+
+> +static u16 nbl_disp_get_vsi_id(struct nbl_dispatch_mgt *disp_mgt, u16 func_id,
+> +			       u16 type)
+> +{
+> +	struct nbl_resource_ops *res_ops = disp_mgt->res_ops_tbl->ops;
+> +	struct nbl_resource_mgt *p = disp_mgt->res_ops_tbl->priv;
+> +
+> +	return NBL_OPS_CALL_RET(res_ops->get_vsi_id, (p, func_id, type));
 > +}
 
-When alloc_workqueue() fails, wq_mgt is freed but the static pointer
-is not set to NULL. After this error path, wq_mgt becomes a dangling
-pointer.
+The direct path correctly passes func_id to res_ops->get_vsi_id(p, func_id,
+type).
 
-If nbl_common_queue_work() or nbl_common_destroy_wq() is called
-afterwards, they dereference wq_mgt unconditionally:
-
-    nbl_common_queue_work():
-        queue_work(wq_mgt->ctrl_dev_wq, task);
-
-    nbl_common_destroy_wq():
-        destroy_workqueue(wq_mgt->ctrl_dev_wq);
-        kfree(wq_mgt);
-
-Would adding "wq_mgt = NULL;" after kfree(wq_mgt) on the error path
-prevent this?
+When the channel path is active, callers cannot query VSI IDs for
+functions other than the sender. Is the func_id parameter intended to be
+used in nbl_disp_chan_get_vsi_id_req()?
 
 [ ... ]
-
-> diff --git a/drivers/net/ethernet/nebula-matrix/nbl/nbl_common/nbl_common.h b/drivers/net/ethernet/nebula-matrix/nbl/nbl_common/nbl_common.h
-> --- /dev/null
-> +++ b/drivers/net/ethernet/nebula-matrix/nbl/nbl_common/nbl_common.h
-
-[ ... ]
-
-> +/* it used for y_axis no necessay */
-> +struct nbl_hash_entry_node {
-> +	struct hlist_node node;
-> +	void *key;
-> +	void *data;
-> +};
-
-This isn't a bug, but the comment "it used for y_axis no necessay"
-appears garbled and "necessay" is misspelled. Could the comment be
-rewritten to explain the purpose of this struct, or removed if it
-is no longer relevant?
 
