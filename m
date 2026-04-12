@@ -1,62 +1,63 @@
-Return-Path: <netdev+bounces-277733-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277734-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 5stnD3gL22l48ggAu9opvQ
-	(envelope-from <netdev+bounces-277733-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 05:03:20 +0200
+	id WBEwG6IL22l48ggAu9opvQ
+	(envelope-from <netdev+bounces-277734-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 05:04:02 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8821B3E2904
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 05:03:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D156F3E2930
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 05:04:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4E4E93018BCF
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 03:03:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D8945302591E
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 03:03:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CF6120E334;
-	Sun, 12 Apr 2026 03:03:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09A152D94BA;
+	Sun, 12 Apr 2026 03:03:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=verivus.ai header.i=@verivus.ai header.b="Ii11+k7S"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=verivus.ai header.i=@verivus.ai header.b="K8r7an4p"
 X-Original-To: netdev@vger.kernel.org
 Received: from SY8PR01CU002.outbound.protection.outlook.com (mail-australiaeastazon11020139.outbound.protection.outlook.com [52.101.150.139])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8B681514F8;
-	Sun, 12 Apr 2026 03:03:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78AEF25524C;
+	Sun, 12 Apr 2026 03:03:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.150.139
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775962995; cv=fail; b=SjGXn/4ARyq8iZ0A23cDMTlLWwasn+JiQIE8TcaKnnY88Cy9dwAtDB3XgK71PnJDB62/CSodOxjqJ1+ugAfnVY9MscUNKgce22flHACROCEGUVqvfecAhPWmUurUjQZmp5NsfBQry6Q+1FGESsVWjJK0Fk+ZcdR3ezY/C+SpKCE=
+	t=1775962996; cv=fail; b=XiVtF9P/Rlpv3UhZAByMF5PKFD2ZYUeP39Tfc/7v9qTt0PZMLq8xHAouTjDRi0oz0I0Y8dmQEYUtpLDNEaJa1fdqyJ1xgia65I3aoG1YikvZSQPJ5KAs80RTYnVzJju3WA/fk9G/BW2Ngkz1NgVSg4sksfMK7KibqW0tGs+JkmI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775962995; c=relaxed/simple;
-	bh=+JUEO+CglAc7awEi+XPm8s1gBRGT0rj4HS4nQ3RW68o=;
-	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=RKhXQL1+MbWbUFsoz27V6Ou278eusYKFfAzDy2uDb/x/u5WT0WBUYRzOWJJzWA6u2qp9/GzvQepv4y5ueKh2XBnG07vtH55Gq5bLnsiH2r27mxkVxehGkTUAP/JvKfd1f5hjgYiWnvCftn39k2D9wUSkxSP0sMndWyxJB4RDwQs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=verivus.ai; spf=pass smtp.mailfrom=verivus.ai; dkim=fail (2048-bit key) header.d=verivus.ai header.i=@verivus.ai header.b=Ii11+k7S reason="signature verification failed"; arc=fail smtp.client-ip=52.101.150.139
+	s=arc-20240116; t=1775962996; c=relaxed/simple;
+	bh=St0QV69XzIlA6L0XwUB1OlhfJFlxNeYVbDjL7KtxmaI=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=blKTjaakdZUzQkk2e7FPwuLjd9bQBy0qNSCwp3y5xERZjqtXhenu4BwA3M1Qdm1Lh5TzHtiRHkCQK/MOdRTg4qoWVRpTVBmIeQK9QuIH3J3FEqmeWzvmKpu3XxF3FvDc6t66Kb24XyvQPyHzLKjmyPiCE3Tk4kU5l8xBHZiVKB4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=verivus.ai; spf=pass smtp.mailfrom=verivus.ai; dkim=fail (2048-bit key) header.d=verivus.ai header.i=@verivus.ai header.b=K8r7an4p reason="signature verification failed"; arc=fail smtp.client-ip=52.101.150.139
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=verivus.ai
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=verivus.ai
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=cPTYwGcI6FARcz9a7hXdmnLf2UxxdaF6B9yjB0kk63IOd8aTVigSGmTOnO5qE4nYb2jaEtfXtnHQcImWmEdgWYE90tLQFfJbd2quyG/XCzZksMFjPwug5H9/qcRODdIT8sLlNlepPGFktALCXiLZkEaToMZyENxBp812cE9WQkVB7/u4yx30p6BqifIQrfQg1OOiJ7q6JbZsolppTioOhzvU1zdU2shwkaI4CJgEgQJhVsZl39KrUfS64auBzhn+G4qOLT/ZFNTXsr1YbDTio8Ix03H/Z1xai0Chezm6wUKbhlBU6f76id4f9f4qXsgvJAGWQMXc/hAP0Evy5QY1qw==
+ b=Qm9/X49MGJrQ7HZ3hDhfkXZy29t4H55EAe4Eood/rdKY0d63l+lLh8/oGj21jwO85u5Q9u6RTZiT3s1kVmNMB3P20ozXAHkpNVqx1JUJ/Twb3aC1lsqCIJGCaXEVaXRVPUxMKovkfVGK5LbO+ktkBNVmC8GnKRUfiBx9EMLn/WA1bJr/VqaMVNJCd6lhU4VvWtw7ocjU2F8NxD4MS2U07pvF+vddEi4HadrivfU2WhdXaVDnv3cJdC8q0ANBJyEsZepkS/mFDyr/8CmP8s3Ca1EyrKusU2DhSLaoHgs7PlFjgLTXROdD6IqX3JO0UJiS3atSy7ds+9WGJq4b99Fh0g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Z1pWrtJZe8So+nuHkBZRyULFtwV2rp9ou9iflkAs1k4=;
- b=ifsUo73Dn0/yVkyhHSrlHDS17xKxfBGLC/0/bx3MY6wNAIaHpDdR26e37V5czPETgWC/+RcW6xK/1TYuF/sjP0EJaTkd11HKFaRHzNFPAGfaTQMI8TeH88e53eLV3kmRmKxa87Rowkvxt1VkHoqsB7hTIR+TjGDvbVDkV3Zj2BDm/KoI/lll+8GawNLKjaAKNv+2ZLpWz3AZlBI+6meqxu3N1lqcskXCLo1qAR2hzFWPBfZgdcdN9jeWjw92ZQVRXJNyPp3qnDFx9B9CC7R+qAYHpw/bRbnYzohqKh+fIPe8071D/od9/DroVgzVPKt8F5SXIgMDXWrmlDZPPHR2nQ==
+ bh=lV5AWV7URH8Q6uLLZZOJnYzJTXbze65qgMFVgZSLPTE=;
+ b=NGkotd0jylU0O4VpbufllGNmSt6I3+lJ51lpDuVVGAAKDKrh5kj7IEgAkJUsG2YnjmZl4E0CfKxCRrUqoCItJaOEcH8vHkbpTEg0VBad8rcn8JF2Xq5IQSFnZRFgWiT9iKPaO7NY5ybtzjVYnsB1/iy5fS9C8Urxvn63huBykFBhjV/t0+jwI5rslq/5IXNQqHC5UPd/+L5dmn56kWUrfAqI/kLVwRFShnPb7RO7qjZCznkP2h3F2SYzvF8WKSBzLtlbkEgI2vjNVARSv0QCmczkM5cZydBGo4AEPNRUxMbJkgV4OATSVmghA8sc/Pq6vJsXgXw965o2tZvWOeKr8A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=verivus.ai; dmarc=pass action=none header.from=verivus.ai;
  dkim=pass header.d=verivus.ai; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verivus.ai;
  s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Z1pWrtJZe8So+nuHkBZRyULFtwV2rp9ou9iflkAs1k4=;
- b=Ii11+k7Svb2UA+d6Gpb4q7A3ALEgbATOQ9YzT6Jhimr9HP3Da2CqX90mioUxK7qH0HvAKth1OFbUaYzrLWIGup9tdU7ZzVF9NkU5CGqn300CWviQN0PY5WDJXsQyCNvY2kUoxbSxbDwXaTFS5l9EbhptStuvzpQTxjyQej/GzvGXIc5vOsdjz7qysWxyi6sBYiOmFczsBGLF93i0qzbZZyAl67+ZzRVKKYMHJ5kEs6V5P1nZulrL/bgCvUtjTe+FbL7W3V2hwLbeDUKryPZtEnARCWgadQ7frhVbSiXn8qpDzwZASSdddb/5/OqynHJnrZDBRxeD6uBndpyZHwtrnQ==
+ bh=lV5AWV7URH8Q6uLLZZOJnYzJTXbze65qgMFVgZSLPTE=;
+ b=K8r7an4pdxtfB3cbWutxSydfMgu9xd6BsD2IUB/l50cHIWjyt/RazPBXhVjvQL/z3J/InpPRIM1ZSExJqKXBjrjuhehOcy7FykZG4Br4KtAgwp9G8UCVKhQNgyNamAryjyhsQiwvM6jGAAeSUdPQ4drLVpKg3p9kE8tM1nQjAnhAGchJcRbhbXSO7QaHUbrYRpimHRGyjqlhp3Z6GsneJorWf+MZiLP4vAKDAD/TRtckrJVMDuwlD1QFrzqmSDIvO4VwjeqN2Dwcbkt478K2e55jSQBfrxiLJJ49wS9YPbSVyyb+Xrn8YFOm/muRdhXsX/+EtEW/tuwxYdJ1reCuBA==
 Received: from ME0P300MB0853.AUSP300.PROD.OUTLOOK.COM (2603:10c6:220:22a::5)
  by ME0P300MB0668.AUSP300.PROD.OUTLOOK.COM (2603:10c6:220:22e::9) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9818.17; Sun, 12 Apr
- 2026 03:03:09 +0000
+ 2026 03:03:10 +0000
 Received: from ME0P300MB0853.AUSP300.PROD.OUTLOOK.COM
  ([fe80::1e3f:9cb9:4a95:b5a2]) by ME0P300MB0853.AUSP300.PROD.OUTLOOK.COM
  ([fe80::1e3f:9cb9:4a95:b5a2%5]) with mapi id 15.20.9818.017; Sun, 12 Apr 2026
- 03:03:09 +0000
+ 03:03:10 +0000
 From: Werner Kasselman <werner@verivus.ai>
 To: Martin KaFai Lau <martin.lau@linux.dev>, Alexei Starovoitov
 	<ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko
@@ -72,13 +73,15 @@ CC: John Fastabend <john.fastabend@gmail.com>, Lawrence Brakmo
 	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Werner
  Kasselman <werner@verivus.ai>
-Subject: [PATCH v2 0/3] bpf: fix sock_ops rtt_min OOB read and related guard
- issues
-Thread-Topic: [PATCH v2 0/3] bpf: fix sock_ops rtt_min OOB read and related
- guard issues
-Thread-Index: AQHcyijkRApyD4bo20WHRGN/J6qm7w==
-Date: Sun, 12 Apr 2026 03:03:08 +0000
-Message-ID: <20260412030306.3469543-1-werner@verivus.com>
+Subject: [PATCH v2 1/3] bpf: zero dst_reg on sock_ops field guard failure when
+ dst == src
+Thread-Topic: [PATCH v2 1/3] bpf: zero dst_reg on sock_ops field guard failure
+ when dst == src
+Thread-Index: AQHcyijlT5ArfyP5c064P2oaI4incA==
+Date: Sun, 12 Apr 2026 03:03:10 +0000
+Message-ID: <20260412030306.3469543-2-werner@verivus.com>
+References: <20260412030306.3469543-1-werner@verivus.com>
+In-Reply-To: <20260412030306.3469543-1-werner@verivus.com>
 Accept-Language: en-AU, en-AT, en-GB, en-US
 Content-Language: en-US
 X-MS-Has-Attach:
@@ -88,48 +91,48 @@ authentication-results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=verivus.ai;
 x-ms-publictraffictype: Email
 x-ms-traffictypediagnostic: ME0P300MB0853:EE_|ME0P300MB0668:EE_
-x-ms-office365-filtering-correlation-id: ba00d37e-ff59-4dae-ebf9-08de9840069f
+x-ms-office365-filtering-correlation-id: 3b45d8cf-3b55-4fae-16cf-08de984007ca
 x-ms-exchange-senderadcheck: 1
 x-ms-exchange-antispam-relay: 0
 x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|366016|7416014|376014|38070700021|18002099003|56012099003;
+ BCL:0;ARA:13230040|1800799024|366016|7416014|376014|38070700021|22082099003|18002099003|56012099003;
 x-microsoft-antispam-message-info:
- QLk40FtSQJYzl7PbZRRwFrshvzLJbonjLcmscnbfiYn5dI+nPVTaf+pFJ4D1gmg+Jj1YRs6u0tUNnDmp+/AxJyHJXbBeaxD6i8iQhE4HeIxQzbklr/brFXD9XN4Z3zep4YWmWFxTC8lY+MiL/Mo+VcICpOBtHklsLHvC9Hikxoynfl/pJ6vmjBFAygldNULo0PPWSXQUo6FNVLhwzCaQTFzp5R7UpG2/fEQdA/LbDepP62Zq6+54EyOxTT7NCo3navw4u0mymkd6Fr8uiDGzzzeFA1nHBlIuFIX8oAE5Jo1qMHMDYEpq9cesahqe2oIAJDKZ82KrQr9q99k9crTOVNH55LwNr3/U1heVTuPrmzk4y7FLqqGA2SIwSSkUTStDgt6Q6db8YwZNPAXWwXdO5UnKdWdBELrP48jqBxc+ePAm0jZIGp7YiQDoCcoH06PGAZ66lyKCrR9dEwRcrVA6xkw4qLAhKoYo9avigRYpVCawOq+yO06bwcco37yRysw9hW4sHFbsWwNehcrAyXku3vshgPTr5ebbqxzrOPbShapRTI0HI2QUOLS2S8pTe9ndErppPWii7rVcePKVOaQuuK6yRcQYL2GvrIN3ac9A9Sc9e9uE81i0jC6mjRlVmXpkNkBfbR3ugPUHgllvwJyiRzX5LJWg10lOw1f9Jo6JB/8SFe+d7xtmFXFoArtaePcncB/ikwgnr5qI3SNUBkB4ZE6T97aO2Us4ph/d2sBAa0fHvdqmUooOJuDp8YZ1Lfym3MH2RdAKKhDGVDqM2t/4eyKDZ/qSeAhxsERm5V4x7vQ=
+ fsncDYD2dpAQBgEAFaS0WKKwnnIxw2wHlHZZ6pVRmtzK6Z6Qg6LjiXyJdQPUZh8HjEgqnkYEHwb2k6bllKkCcoFR1EFw7yi/qHtxa9RyA/EPK7+buaZhHN822ZUt62egd8zXFtjqqhks1i3uOO3ejn5jyLI9tbwveL/NXL9kuFjn0aFiQ6wj6SfGuZON4HhC6wI8OI4lkmBvW7Zb/Z/wYq9T4yEzuXCi3V2zGptNL1tewnGdxwMvZVxx9154oIEQDgqZ7TzTClPkUJiarY6QB+n8udhT6aF64Tymv5PCVIh2DPEHEdnjC8AHAltMCdv7MF1jaPHVQKK8R57ybTSfcXwsplOPA148+XBcnfIvMEZxCUhWSTNRYCsTGs8nlyb1FqImvZrRdmzS5zVBNR2d4ick0PVNNKo9/elNyjVkOhFZV3seT3W7ElFBd391Glbk1BqT6Y+kXl33l4CArmIIJqJU8/CY1BsGavrhA1mu2B5ya/Jhbzc3wyJFySRF6WcrR2a7MVRwSrAvuP3TVIjDWJ1dJA3u9i0qAVXGVJoXINt9uRsJ3o6UDuhSpqm5o3XELwWLcdJeOIMHLaOvCfR/5Jrtrb0+AwdxJSZsYNfoA2V+QgTcMry5zH2Pp0C4xSq6xiQnrKpgyYxurpWcoSy0YzmwNTuSwmZ2Oqaixpfs8zc3GOjLeJ3yPfEKrrSlVxFEmhfZJB+EBpK9Krqlk8lcHirmaAWafAtgyEwP+06NmAIMJjxQ4SVgZbsB6SwYJh1DOrgdWEekKm2+LcwWKi4///ekh/ExHb76YWss/43vBsE=
 x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:ME0P300MB0853.AUSP300.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(38070700021)(18002099003)(56012099003);DIR:OUT;SFP:1102;
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:ME0P300MB0853.AUSP300.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(38070700021)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1102;
 x-ms-exchange-antispam-messagedata-chunkcount: 1
 x-ms-exchange-antispam-messagedata-0:
- =?iso-8859-1?Q?O7ICUKQkjjTudSs4j59ACAWi/LHkdYdBvucFb3Fl+/Kl7vkd1dpG0n578Q?=
- =?iso-8859-1?Q?S/W2NTyuG2oJ5Asj1C/ryJM5Akt4s5d2MxXN6J4b5UmAYO53KeOZ+jp7aj?=
- =?iso-8859-1?Q?xjPHXjyIy6xH7uLPnc803K014LrjnStdUyu1Q8BdfVY8yvHhAlyFwXdCV5?=
- =?iso-8859-1?Q?yfRDe+56Ea4v51mJdAeZioGsi9pfa017Zrkln1rRRDVTlJSA1ub18iNnVj?=
- =?iso-8859-1?Q?MtZQ7mdBPbQ5dCdBYRT37TQI2fX9X3RE30FJuPx0bMJmHyxhK9IErX0Z0s?=
- =?iso-8859-1?Q?16b7qd5Hufe3z1m3eenmIJe60eEhgk+PG/iMpbW5siZeJSCXRsFfpCfEYL?=
- =?iso-8859-1?Q?0+v+XlWuIcTy/MVMSvjxhtuaQNTscCPRZeP+ywbUnFXlZ3wcY3kjxkG9SB?=
- =?iso-8859-1?Q?1U1mHEfi/IEaapzVPle/3kpmylJj3O1v0Gltufd2WervkGjtKilDFKWFJT?=
- =?iso-8859-1?Q?y7EdgkIuKjR8c7OEvNNTX9+kyntvKWJsgFjRcOi3GE6BhuoXbkbfMkx5PR?=
- =?iso-8859-1?Q?0jSBh+AorIkb5LadKLty4KaRJT9+ZcJU4n+4qL/RZ+i0WIcCewbRiW7x3z?=
- =?iso-8859-1?Q?T6G817Q1EK/CyNTECQoAi19tJ9WdoCb+AEPlC+Dfyd8bvfvT7sAjv9xGmo?=
- =?iso-8859-1?Q?4JZyb4F7ffy3OQXn0zUJIYOZmk38uvgWmZyvqmfIoiYqKfWqBcHSAI16Oy?=
- =?iso-8859-1?Q?V7QZNMzM8f6InVJY7XvNkdTWb0wc69T5fwIRkNiulKoyVMo9a05r4kL1Yo?=
- =?iso-8859-1?Q?TQ9n4VwcatQCVK2gnQRfF7dJFv/q4im0iDoXFNxZC/af+pOtW8eZqEF3Zy?=
- =?iso-8859-1?Q?o7i4kAtPOI7YOEKuZ+FW+deMAI8UyakYAEurTHSbpHZLsvr7N8KGG1y5bm?=
- =?iso-8859-1?Q?az4AuTo9l6z8S5Dx0MgnUVptQiPYwteUDaRqlBHFjNQ17W+lBA+Z/1mgzP?=
- =?iso-8859-1?Q?1GMrLKzO2zA5C7OrnMwP+xFFoxGGo0+SEkAYjGmEuw+45mKxDxBkkMPFNp?=
- =?iso-8859-1?Q?BDePANIAyhKUIcFLPLuaPkOJnw6hB/CmRTuE1rmjjynlKq8l31MLo40pyn?=
- =?iso-8859-1?Q?IlwtUlOtkGWlJpAofTJMDswMsp6m2K2laIalbTIClBVXkhYsBTQBglqEx/?=
- =?iso-8859-1?Q?C6eFB5nSnHlDrbDKTbLmr9s7m2XNDusfLq9Oj3ebI6z+RJEDtcTHwaX20T?=
- =?iso-8859-1?Q?/yViQKgLeV9QWkL9uchc7ih5HJNQBw3HljwKnjW5aTHXcuGPV9/6OkuUxI?=
- =?iso-8859-1?Q?Ctrcf4WXmQg3tKh1u+5zZjsTZJMkuckxHADSlnMru+42YJfv3EYZYhVV6Z?=
- =?iso-8859-1?Q?zyxWZBRl96Rw72pJUCs9CGowOEXLrDljZD/nxzuybsdJLA1kjhcTav4hhm?=
- =?iso-8859-1?Q?SFI6xE0642S0V1wIU63mXZFpnZJOQbD9OqjxCtHfl/r+IyUWawffuTvEGo?=
- =?iso-8859-1?Q?j26A29rRC+ik9/jqITIqrznvBvJNeYWZtbc2ejYrnToA36PcYEC3AJ60jY?=
- =?iso-8859-1?Q?9BtF192VoPG0KGk390ek4o9cWStNAUKLd+bDAihBOiIBMbbi6zjub+K4/y?=
- =?iso-8859-1?Q?zrApPk8h0gKFh9S5Kav1ud0F3OokRuNI2CDZQm1QIq0XaaIOwwALDWyCNU?=
- =?iso-8859-1?Q?VOBHLo9Vo1hdxN1HO4+utKpDlGivW0tqKgO9Z72zZ2aNrghrKwTxRyswwZ?=
- =?iso-8859-1?Q?aibydWEHg/97nlsJ4iehE7Ow6bM+Us4nNYfRPqNBZRiikwqVXPA9C9+bvo?=
- =?iso-8859-1?Q?gxCU0HoGIyczh+Bcw49K3A25dUURseJUJTN98TX+T3q7vxwoKVdyvgMWzM?=
- =?iso-8859-1?Q?CO9xDEgiqQ=3D=3D?=
+ =?iso-8859-1?Q?sC+pdh4DDyHEaY6+9cgXzWrp+8YBvbj3vH0IrokZPcJ6Kuqcok0nqZhouH?=
+ =?iso-8859-1?Q?MiJNsW5Hzubhx/tSFSs+2pLrjj5O13ZkAXk967gGiWErmU9B7tZvKbLarc?=
+ =?iso-8859-1?Q?FoI/SIV5EN94rBYWGph6Eye3tt4ZvLh9WmcB0Txg1n5o8qBdOUJN0lO5ES?=
+ =?iso-8859-1?Q?8vYgltM54UniB3LjbBHHk+5tHSwPSimhfN086lSEjmGE9tXsBzzcY+7asA?=
+ =?iso-8859-1?Q?Ojx/CEQ76NzxhMkYFMm03ZQG6BIOcqaeawf3OuDiQKXSLmOxmGqIjOBz+V?=
+ =?iso-8859-1?Q?o15KvSjEh8Voyjp+8QtazmYj+hdnQ6ibMIKAKQuKwu9AJP1INw+a4IrI/e?=
+ =?iso-8859-1?Q?Tu+l4wJSSOXN96idkT7bqYjNWeDcPw/YbB1Orw09192oK0cJFjwdyEXjBW?=
+ =?iso-8859-1?Q?spA1pLCZ9BEcbef9W03y76u9qg3cgSdR2RXi3Pl1ahXPT03VlQBJvxKA4+?=
+ =?iso-8859-1?Q?fgeqC0O+2f1Nj2akwjj4gUoY//Lxl4Cah4nryjws8VmTxS+gCsIbcD7tZO?=
+ =?iso-8859-1?Q?wR8S7sI6i8JGYAkHgpPtth13WHxj5iY8T+StGxJ7ark5TGgclS6L8l9v60?=
+ =?iso-8859-1?Q?tuhyYefVM+e9BOTKBfjOjhS7VmD7mFxK7n3C2QveBp+xvDopPFIya8izL2?=
+ =?iso-8859-1?Q?5nh4tfhYr8G1rMnCUUry6gXpRypoDqtH2jC79a96ndI50TeWloB7SrkLG6?=
+ =?iso-8859-1?Q?dHi3+Tu7/SJiRupv1xFUkm8jwOzWvB9ulAZp2YEsLcS/p1MqdwUCXRdNyb?=
+ =?iso-8859-1?Q?25E5ZIMJMztAn4PElZhA4BQ/Qfuvkbfk4o3i8xVnfm7S1ZH9zHiFowaKyK?=
+ =?iso-8859-1?Q?wq0YjxFrVVCQYtQZQifwQIkybrIBZ4G684AvhLZCAiMcANzvBhTSvV5m1b?=
+ =?iso-8859-1?Q?1fqLlw0YrS9BZHHlWxkMpk8wZkzwF4pqL6e7iHk0IX7PUaeY9rNLbiMIxj?=
+ =?iso-8859-1?Q?2UIyocLBSoJIe5+6RcLaskHZFG8HRaEmQtgNjUWgHsc9yE6BnMTrSxAhE8?=
+ =?iso-8859-1?Q?Rx85UDNM4hSB/IVHRMcfZlbrIGAhJhYkPK2ajqxSOZODBuhzRs90Y/yt1K?=
+ =?iso-8859-1?Q?xBU5ngQrRWXZi2vZQkL0NrZHXFxSIZbfcEDLTsj0w2EvxonsgDVzFjfapY?=
+ =?iso-8859-1?Q?VPusqhxR6lnu4Uk7roru4BsrRtVpRIEgo/CiIA1ods+hF8MhYyvlB6qwF4?=
+ =?iso-8859-1?Q?jDLAqvOxjk9bFDAkCJ8+V9YYPfu08wCAvBLth6/hbmHqYLucpe8FGtMlB2?=
+ =?iso-8859-1?Q?lMzry9BcDrbmtBrpLwIRtn7f4JUdtBNM3TL5LpzrualI8wGvzHIfH052w2?=
+ =?iso-8859-1?Q?WW6pM3s55BlOYgPKJSL3sbVlJpQj8U8bSCngVP+jO0xJVUxEkJ7IbMlGPi?=
+ =?iso-8859-1?Q?ONBRJeS8SaoKWmkzNvh5Q/uFR9EgU6eEkOmb9DC8vWBbBokWzpw5erXiwG?=
+ =?iso-8859-1?Q?eHOKX9HMsE3ui2lRTVM2VtEtAS9aVPgj/EigcIqu6kLoxZ/3/cTnhi/Tjw?=
+ =?iso-8859-1?Q?l82uZ6mOSH+cJrRqlkStmzNh0ZNLNm7ekgRlrCvzx3A6ekIbGij4QE2qQH?=
+ =?iso-8859-1?Q?zyhyeJdUJsin+KKe7Vf84CTxkVZTlb1CHuTYUK0l87SnxsWq9h12lt2km2?=
+ =?iso-8859-1?Q?ShFgHHbNYh4dSjYFfNzHRZsFLSG/x6uNBOqLzh/TDR+h0XB6F02IlKqXYY?=
+ =?iso-8859-1?Q?BrDrxttOsBrY77fFvdJLSe2MkBZ3WNv8bgQTd8L3fMDRONXUcXwHlHDviR?=
+ =?iso-8859-1?Q?C5y2jAz6ITnI9s24TBHygIBOh7O+tsJvqTOKFALySyZGDO6hAQyw3d0WqT?=
+ =?iso-8859-1?Q?/4jPYV/vYQ=3D=3D?=
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
@@ -141,24 +144,24 @@ MIME-Version: 1.0
 X-OriginatorOrg: verivus.ai
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: ME0P300MB0853.AUSP300.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: ba00d37e-ff59-4dae-ebf9-08de9840069f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Apr 2026 03:03:08.9080
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3b45d8cf-3b55-4fae-16cf-08de984007ca
+X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Apr 2026 03:03:10.8658
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: ccdcedb0-4edc-4cc8-9791-c44ee6610030
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: iHxLXYYjo6QBau7FVHYHSKP2/ajvsPSYHBCFdLvqZ7uGHnnSh6gWr50VQkvhyGHuIy8GdHUh2UVPpAWnqsITpA==
+X-MS-Exchange-CrossTenant-userprincipalname: 7evh+um3CLT1raX9ErPfcEw8cjFesQd5nWMA3pm+LHa5f7Q6hSG1ja9aoGtbrnobknlmNw0e5ztQLOFGja4F1Q==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: ME0P300MB0668
 X-Spamd-Result: default: False [3.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	R_DKIM_REJECT(1.00)[verivus.ai:s=selector1];
 	ARC_REJECT(1.00)[cv is fail on i=2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	DMARC_POLICY_SOFTFAIL(0.10)[verivus.ai : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-277733-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-277734-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_EQ_ADDR_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -167,54 +170,81 @@ X-Spamd-Result: default: False [3.14 / 15.00];
 	FREEMAIL_CC(0.00)[gmail.com,fb.com,kernel.org,linux.dev,fomichev.me,google.com,davemloft.net,redhat.com,vger.kernel.org,verivus.ai];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[werner@verivus.ai,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[verivus.ai:-];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.967];
+	NEURAL_HAM(-0.00)[-0.964];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8821B3E2904
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,verivus.com:email,verivus.com:mid]
+X-Rspamd-Queue-Id: D156F3E2930
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Patch 3 fixes an out-of-bounds read in sock_ops_convert_ctx_access()=0A=
-for the rtt_min context field. It is the only tcp_sock-backed field=0A=
-that bypasses the is_locked_tcp_sock guard, so on request_sock-backed=0A=
-sock_ops callbacks the converted BPF load reads past the end of a=0A=
-tcp_request_sock.=0A=
+When a BPF_PROG_TYPE_SOCK_OPS program reads a tcp_sock-backed context=0A=
+field (e.g. ctx->snd_ssthresh) or ctx->sk using the same register for=0A=
+source and destination, SOCK_OPS_GET_FIELD() and SOCK_OPS_GET_SK()=0A=
+load is_locked_tcp_sock/is_fullsock into a scratch register rather=0A=
+than into dst_reg. On the guard-failure branch the macro only=0A=
+restores the scratch register before falling through, leaving=0A=
+dst_reg holding the unchanged context pointer.=0A=
 =0A=
-Patches 1 and 2 are groundwork. Patch 1 fixes a pre-existing info=0A=
-leak in SOCK_OPS_GET_FIELD() and SOCK_OPS_GET_SK() where dst_reg is=0A=
-left holding the context pointer on the guard-failure branch when=0A=
-dst_reg =3D=3D src_reg, instead of being zeroed. Patch 2 extracts=0A=
-SOCK_OPS_LOAD_TCP_SOCK_FIELD() from SOCK_OPS_GET_FIELD() so the=0A=
-rtt_min sub-field access in patch 3 can reuse it.=0A=
+Callers expect dst_reg to read as a scalar 0 when the guard fails.=0A=
+Instead the BPF program sees a kernel heap address, which the=0A=
+verifier has already typed as a scalar, giving a narrow kernel=0A=
+pointer leak. Clang does not emit the dst =3D=3D src pattern for normal=0A=
+C ctx field reads, but it is reachable via inline asm and=0A=
+hand-written BPF.=0A=
 =0A=
-Patches 1 and 3 carry Fixes: tags and Cc: stable. Patch 2 is a pure=0A=
-refactor.=0A=
+Add an explicit BPF_MOV64_IMM(dst_reg, 0) on the failure path in=0A=
+both macros and bump the success-path BPF_JMP_A() to skip over it.=0A=
 =0A=
-v1: https://lore.kernel.org/bpf/ (earlier single-patch posting)=0A=
-  - Inlined the guarded load sequence by hand.=0A=
-  - Feedback: please factor it through the existing helper instead=0A=
-    of open-coding 30 lines.=0A=
+Found via AST-based call-graph analysis using sqry.=0A=
 =0A=
-v2:=0A=
-  - Patch 1 (new): fix latent dst =3D=3D src info leak in both macros.=0A=
-  - Patch 2 (new): refactor SOCK_OPS_GET_FIELD().=0A=
-  - Patch 3: use SOCK_OPS_LOAD_TCP_SOCK_FIELD() for rtt_min and use=0A=
-    offsetof(struct minmax_sample, v) for the sub-field offset.=0A=
+Fixes: fd09af010788 ("bpf: sock_ops ctx access may stomp registers in corne=
+r case")=0A=
+Fixes: 84f44df664e9 ("bpf: sock_ops sk access may stomp registers when dst_=
+reg =3D src_reg")=0A=
+Cc: stable@vger.kernel.org=0A=
+Signed-off-by: Werner Kasselman <werner@verivus.com>=0A=
+---=0A=
+ net/core/filter.c | 6 ++++--=0A=
+ 1 file changed, 4 insertions(+), 2 deletions(-)=0A=
 =0A=
-Werner Kasselman (3):=0A=
-  bpf: zero dst_reg on sock_ops field guard failure when dst =3D=3D src=0A=
-  bpf: extract SOCK_OPS_LOAD_TCP_SOCK_FIELD from SOCK_OPS_GET_FIELD=0A=
-  bpf: guard sock_ops rtt_min against non-locked tcp_sock=0A=
-=0A=
- net/core/filter.c | 37 +++++++++++++++++++++----------------=0A=
- 1 file changed, 21 insertions(+), 16 deletions(-)=0A=
-=0A=
+diff --git a/net/core/filter.c b/net/core/filter.c=0A=
+index 78b548158fb0..53ce06ed4a88 100644=0A=
+--- a/net/core/filter.c=0A=
++++ b/net/core/filter.c=0A=
+@@ -10581,10 +10581,11 @@ static u32 sock_ops_convert_ctx_access(enum bpf_a=
+ccess_type type,=0A=
+ 				      si->dst_reg, si->dst_reg,		      \=0A=
+ 				      offsetof(OBJ, OBJ_FIELD));	      \=0A=
+ 		if (si->dst_reg =3D=3D si->src_reg)	{			      \=0A=
+-			*insn++ =3D BPF_JMP_A(1);				      \=0A=
++			*insn++ =3D BPF_JMP_A(2);				      \=0A=
+ 			*insn++ =3D BPF_LDX_MEM(BPF_DW, reg, si->src_reg,	      \=0A=
+ 				      offsetof(struct bpf_sock_ops_kern,      \=0A=
+ 				      temp));				      \=0A=
++			*insn++ =3D BPF_MOV64_IMM(si->dst_reg, 0);	      \=0A=
+ 		}							      \=0A=
+ 	} while (0)=0A=
+ =0A=
+@@ -10618,10 +10619,11 @@ static u32 sock_ops_convert_ctx_access(enum bpf_a=
+ccess_type type,=0A=
+ 				      si->dst_reg, si->src_reg,		      \=0A=
+ 				      offsetof(struct bpf_sock_ops_kern, sk));\=0A=
+ 		if (si->dst_reg =3D=3D si->src_reg)	{			      \=0A=
+-			*insn++ =3D BPF_JMP_A(1);				      \=0A=
++			*insn++ =3D BPF_JMP_A(2);				      \=0A=
+ 			*insn++ =3D BPF_LDX_MEM(BPF_DW, reg, si->src_reg,	      \=0A=
+ 				      offsetof(struct bpf_sock_ops_kern,      \=0A=
+ 				      temp));				      \=0A=
++			*insn++ =3D BPF_MOV64_IMM(si->dst_reg, 0);	      \=0A=
+ 		}							      \=0A=
+ 	} while (0)=0A=
+ =0A=
 -- =0A=
 2.43.0=0A=
 =0A=
