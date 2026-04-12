@@ -1,245 +1,137 @@
-Return-Path: <netdev+bounces-277755-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277756-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KJFGFExe22kLBAkAu9opvQ
-	(envelope-from <netdev+bounces-277755-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 10:56:44 +0200
+	id YGlHF2Ns22k/BwkAu9opvQ
+	(envelope-from <netdev+bounces-277756-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 11:56:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36CF53E32B6
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 10:56:44 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9EF43E35B2
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 11:56:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 28F5030055BA
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 08:56:43 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 33E61300FF91
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 09:56:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B21D314D1A;
-	Sun, 12 Apr 2026 08:56:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 779CC36A01E;
+	Sun, 12 Apr 2026 09:56:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rmk25eS0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="re+ASIDo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EC0F312836
-	for <netdev@vger.kernel.org>; Sun, 12 Apr 2026 08:56:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5532F304BA3
+	for <netdev@vger.kernel.org>; Sun, 12 Apr 2026 09:56:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775984200; cv=none; b=mmPMaThNTp4nDA893c4Gj4Kqa9IP+BDd6263wA4RqkqfvSqWt+CQjXrjx1mbWsQrszN+Bb3Y2N4+PzMNGP7k2NA8zUxRblP4dyIKWDiAiWgf+8894kTx7xBdZ03jQg6f9A49OmBwC4r3G85mCDa+pENakg/gQ0+goXL/WiZatY4=
+	t=1775987796; cv=none; b=h9t5rbXjBBhA0dDFPyzKBPYLhS0/O706S+qROPCrNd3Kv5ACXQSD7X5rS1FmwP3wpxu6HV1gK9YDmyIJetE4hwtv3uTeogxnD/lr8fqokP2uIHerf7MGdt0CsQhgKkaJ8w4ZrdtI1+DZKVihpn2Ka1JcGILHWV9WDahuH1DPU5k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775984200; c=relaxed/simple;
-	bh=XZtsBYJ+xUzK/w66hhh7L4ep5/Nv3d9zyXSTiNiHtzQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QqOKKrdxXX8+ondkBAecm7WpaeiDAkILRpWWTr6Z4rb/47qDP6dMhc15J5HFkungSp7YDEIsyE4JLJkIUesp8Fk9qjQ91sU9TTklDmcYngVMXIHY6vvKvilhLZbYyI7Wn/CLsCS+DbdMmjqjQP1ot+lXjLXt+7J9S1Oc8NHfdO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rmk25eS0; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-488b8efed61so31603505e9.1
-        for <netdev@vger.kernel.org>; Sun, 12 Apr 2026 01:56:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775984196; x=1776588996; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EbDgrbrkQIZIzHMqS4zyFwb8jbE/7QCDRz8zhtNheE4=;
-        b=rmk25eS0pD3r1W6fBjCHCIGG+xosVecWiNg/3nfNyAKaxOqHC0aIxIp+bwKvPu9+1j
-         fAU2vugkDHatrG3Fzq7V9jewKzPcvw41odvofwZkis7b1Y4DeW1IWegwg5QbXQj7kCio
-         L+ztGdtDUlhH+iJPC48SIdv4mbiVxmA7Be8JQhGglK1VOqWIq1YR4dry10OotSVrXztE
-         o4/62vmfM6KQrUkxwd24yP/lrxDf8HyZquUshVzt2ycEVPZUv3y2nMTj7GvueTw7R7E/
-         WKG3HtUgcwPCHxCI4T+H5u0NML0HalT4/vA4x/F5vuumDuC+b3YDtjggzfClJhOrbI7r
-         R2bg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775984196; x=1776588996;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EbDgrbrkQIZIzHMqS4zyFwb8jbE/7QCDRz8zhtNheE4=;
-        b=LCNwLdYvxBVTntb2CU1FZwRk4rETKvHbDwTORpz2SS6wm5fCk4824u+FfEPmsvbwVd
-         xu/pCKbTaQ12Lj10QxlHtCAqtteh88fPCIDQURcW3MB2FU1KoSIXlWtTyuf+WOENNrCy
-         Wg5IlzcyktStNeRWJ+CkLwqUfkJx+rxIEl+E+EiJhUsXjrBri7vcrjFwirgv6FHAxVXh
-         AZwZeTmHl1ngRXcgmU3NNGZ2+1w1tx0fEz122BNW8qAGMAInPwSd+RiTTvbjIyZX1vvu
-         f4/SbB2/X1lnkLifGD2PYs0vkr9zltpnrrLiy65/xYxLc/hgCNRYr3x8/KqQPlYZ1eaZ
-         qUDg==
-X-Forwarded-Encrypted: i=1; AJvYcCU4/3wg24Rez1qJuUYoLVWvit7pPwnN7A2O6rN7W/MKM2s2SpfL08hx5FNeAvYqAJR4DHvokR4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyiWhVWMPAwmoGSToYGd9pWmdOuUjJZ2024cisMP9ysfNYB+9/4
-	X7E9eDOz7GZspHbDYL9gKFk1tctSGOpjO477SGeseukXyQxBt9TykDhk
-X-Gm-Gg: AeBDievFmDp6UF6Ibn4Sx9fs4J+Xr2HjM8BldSxOjcMYr3xpOs6abSIwL7OMOYfZYfo
-	0+hQkhUmCJt3g9g5amND1reVeNsLB23mMc8E95UvGAEaeeLWJESNwqIToDLW03Pvsqn7wbEt67l
-	Rfg4pWgy3u+2yRk4iZPC9YUviR2Oidlb9f0lz3X5PwsIn9Q7SKct3wWKbH8DnRR9+iUGznzaDtm
-	zR+4k7BYtFj4X0MY4c6ftVBlybordzA5794YMOkdbK4fMocf08OG2lIfp0FD7rvJ1vbYk6hs6+O
-	Ipd1nLPcTRWXaaDBXkZznwldHwW6Il9Xo248k++LHcV1J1gTUCXvIAVSJnAi1TUVGDAAQU8ufq+
-	dfJKCYXCFKIADdXcOP2o6PcBn0ZPPlBQleXoxvNQBJ7uXRFRvtxGV/mYr65j0NmYZtzhMyJ7u9f
-	3tqKzhwzzOT8Xdgo7OlefKIeQPw4LNkWujjkNYnt1H8dI60ZSa4khFgpz6Zxa91SjkVsMx/g9aW
-	613xw==
-X-Received: by 2002:a05:600c:698d:b0:487:22ad:403e with SMTP id 5b1f17b1804b1-488d6ac9ce5mr126951995e9.14.1775984195334;
-        Sun, 12 Apr 2026 01:56:35 -0700 (PDT)
-Received: from localhost (brnt-04-b2-v4wan-170138-cust2432.vm7.cable.virginm.net. [94.175.9.129])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488d532ed4dsm197923925e9.4.2026.04.12.01.56.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 12 Apr 2026 01:56:34 -0700 (PDT)
-Date: Sun, 12 Apr 2026 09:56:33 +0100
-From: Stafford Horne <shorne@gmail.com>
-To: Thomas Gleixner <tglx@kernel.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, Jonas Bonn <jonas@southpole.se>,
-	linux-openrisc@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
-	x86@kernel.org, Lu Baolu <baolu.lu@linux.intel.com>,
-	iommu@lists.linux.dev,
-	Michael Grzeschik <m.grzeschik@pengutronix.de>,
-	netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org, Vlastimil Babka <vbabka@kernel.org>,
-	linux-mm@kvack.org, David Woodhouse <dwmw2@infradead.org>,
-	Bernie Thompson <bernie@plugable.com>, linux-fbdev@vger.kernel.org,
-	Theodore Tso <tytso@mit.edu>, linux-ext4@vger.kernel.org,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Uladzislau Rezki <urezki@gmail.com>, Marco Elver <elver@google.com>,
-	Dmitry Vyukov <dvyukov@google.com>, kasan-dev@googlegroups.com,
-	Andrey Ryabinin <ryabinin.a.a@gmail.com>,
-	Thomas Sailer <t.sailer@alumni.ethz.ch>, linux-hams@vger.kernel.org,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	linux-alpha@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
-	linux-arm-kernel@lists.infradead.org,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Huacai Chen <chenhuacai@kernel.org>, loongarch@lists.linux.dev,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	linux-m68k@lists.linux-m68k.org, Dinh Nguyen <dinguyen@kernel.org>,
-	Helge Deller <deller@gmx.de>, linux-parisc@vger.kernel.org,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	linuxppc-dev@lists.ozlabs.org, Paul Walmsley <pjw@kernel.org>,
-	linux-riscv@lists.infradead.org, Heiko Carstens <hca@linux.ibm.com>,
-	linux-s390@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	sparclinux@vger.kernel.org
-Subject: Re: [patch 30/38] openrisc: Select ARCH_HAS_RANDOM_ENTROPY
-Message-ID: <adteQSw8c65MtX5l@antec>
-References: <20260410120044.031381086@kernel.org>
- <20260410120319.593798781@kernel.org>
+	s=arc-20240116; t=1775987796; c=relaxed/simple;
+	bh=bWTAU7CtOZ3is69U6C/L35u5+9IkLvK6b+Gt8sgHq14=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=ZppIiurM/S8JPtVNHVuoILucZyKhLkuYG6s7gP4gtHmUHnLK3085cKBII/vnmOR9bjDgWo2tufoeQijjCyYBtI7PnxRD1xZrOdzgLIkjwvY1Y5iLCd2vbNtsXMe+rS6wRUF4eycxNNqy31+atrQRZJ/9unXPvf+GsxQbmAlVJ68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=re+ASIDo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E81FC19424;
+	Sun, 12 Apr 2026 09:56:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775987796;
+	bh=bWTAU7CtOZ3is69U6C/L35u5+9IkLvK6b+Gt8sgHq14=;
+	h=From:Date:Subject:To:Cc:From;
+	b=re+ASIDoyvLcewdruxi3zdzfMhuhe06Y4T2is62zvRj1ZVH706WVGyOBTdaPqO3zr
+	 Cb1oh8voTefZCIHL7eYKII+R1xERpT+ZaZhlU1LZZOxwVAeinbNbk6HQwuasK+FNeU
+	 6oZtugDtdUwltwLBim44z7H9eYCOGuxCLMV5K8jNlhF4PsLAwM/RV8/9mdPdFHTsub
+	 eG8x+1Vnxz8/Znl6H+PhptGdJy5NNO2Oh4Jt+kN0oV2uyEvxCn5HaHn4fAvLeVjQmF
+	 QdMj9ubzAxjQSPEYa1AKYP9XyXjAC2RZSxVvV7yZLtkPxqjP9lCl8VN6VdP2k864m8
+	 xZLnKUYzFoLdA==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Date: Sun, 12 Apr 2026 11:56:25 +0200
+Subject: [PATCH net-next] net: airoha: Remove PCE_MC_EN_MASK bit in
+ REG_FE_PCE_CFG configuration
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260410120319.593798781@kernel.org>
-X-Spamd-Result: default: False [-0.16 / 15.00];
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260412-airoha_fe_init_remove_mc_en_bit-v1-1-7b6a5a25a74d@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x3NywqDMBBG4VeRWTegobWXVyllSMc/dRZOShJEE
+ N+9octvc85OBVlR6NHtlLFq0WQNw6kjmYN94HRqJt/7sT8P3gXNaQ4cwWpaOWNJK3gRhvFbqwu
+ 3+3SNIpcoI7XKNyPq9j88yVCdYav0Oo4fH3pjxHsAAAA=
+X-Change-ID: 20260412-airoha_fe_init_remove_mc_en_bit-a89d7fcc5fc6
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+X-Mailer: b4 0.14.3
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-277755-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[49];
-	FREEMAIL_CC(0.00)[vger.kernel.org,southpole.se,arndb.de,kernel.org,linux.intel.com,lists.linux.dev,pengutronix.de,gondor.apana.org.au,kvack.org,infradead.org,plugable.com,mit.edu,linux-foundation.org,gmail.com,google.com,googlegroups.com,alumni.ethz.ch,zx2c4.com,linaro.org,armlinux.org.uk,lists.infradead.org,arm.com,linux-m68k.org,lists.linux-m68k.org,gmx.de,ellerman.id.au,lists.ozlabs.org,linux.ibm.com,davemloft.net];
+	TAGGED_FROM(0.00)[bounces-277756-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shorne@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[southpole.se:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 36CF53E32B6
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C9EF43E35B2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Apr 10, 2026 at 02:20:55PM +0200, Thomas Gleixner wrote:
-> The only remaining non-architecture usage of get_cycles() is to provide
-> random_get_entropy().
-> 
-> Switch openrisc over to the new scheme of selecting ARCH_HAS_RANDOM_ENTROPY
-> and providing random_get_entropy() in asm/random.h.
-> 
-> Add 'asm/timex.h' includes to the relevant files, so the global include can
-> be removed once all architectures are converted over.
-> 
-> Signed-off-by: Thomas Gleixner <tglx@kernel.org>
-> Cc: Jonas Bonn <jonas@southpole.se>
-> Cc: linux-openrisc@vger.kernel.org
+PCE_MC_EN_MASK bit in REG_FE_PCE_CFG configuration performed in
+airoha_fe_init() is used to duplicate multicast packets and send a copy
+to the CPU when the traffic is offloaded. This is necessary just if
+it is requested by the user. Disable multicast packets duplication by
+default.
 
-This looks good to me.
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+---
+ drivers/net/ethernet/airoha/airoha_eth.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-Acked-by: Stafford Horne <shorne@gmail.com>
+diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
+index 8e4b043af4bc..9b5b677a7071 100644
+--- a/drivers/net/ethernet/airoha/airoha_eth.c
++++ b/drivers/net/ethernet/airoha/airoha_eth.c
+@@ -458,9 +458,8 @@ static int airoha_fe_init(struct airoha_eth *eth)
+ 		      FIELD_PREP(PSE_IQ_RES2_P5_MASK, 0x40) |
+ 		      FIELD_PREP(PSE_IQ_RES2_P4_MASK, 0x34));
+ 
+-	/* enable FE copy engine for MC/KA/DPI */
+-	airoha_fe_wr(eth, REG_FE_PCE_CFG,
+-		     PCE_DPI_EN_MASK | PCE_KA_EN_MASK | PCE_MC_EN_MASK);
++	/* enable FE copy engine for KA/DPI */
++	airoha_fe_wr(eth, REG_FE_PCE_CFG, PCE_DPI_EN_MASK | PCE_KA_EN_MASK);
+ 	/* set vip queue selection to ring 1 */
+ 	airoha_fe_rmw(eth, REG_CDM_FWD_CFG(1), CDM_VIP_QSEL_MASK,
+ 		      FIELD_PREP(CDM_VIP_QSEL_MASK, 0x4));
 
-> ---
->  arch/openrisc/Kconfig              |    1 +
->  arch/openrisc/include/asm/random.h |   12 ++++++++++++
->  arch/openrisc/include/asm/timex.h  |    5 -----
->  arch/openrisc/lib/delay.c          |    1 +
->  4 files changed, 14 insertions(+), 5 deletions(-)
-> 
-> --- a/arch/openrisc/Kconfig
-> +++ b/arch/openrisc/Kconfig
-> @@ -10,6 +10,7 @@ config OPENRISC
->  	select ARCH_HAS_DELAY_TIMER
->  	select ARCH_HAS_DMA_SET_UNCACHED
->  	select ARCH_HAS_DMA_CLEAR_UNCACHED
-> +	select ARCH_HAS_RANDOM_ENTROPY
->  	select ARCH_HAS_SYNC_DMA_FOR_DEVICE
->  	select GENERIC_BUILTIN_DTB
->  	select COMMON_CLK
-> --- /dev/null
-> +++ b/arch/openrisc/include/asm/random.h
-> @@ -0,0 +1,12 @@
-> +/* SPDX-License-Identifier: GPL-2.0-or-later */
-> +#ifndef __ASM_OPENRISC_RANDOM_H
-> +#define __ASM_OPENRISC_RANDOM_H
-> +
-> +#include <asm/timex.h>
-> +
-> +static inline unsigned long random_get_entropy(void)
-> +{
-> +	return get_cycles();
-> +}
-> +
-> +#endif
-> --- a/arch/openrisc/include/asm/timex.h
-> +++ b/arch/openrisc/include/asm/timex.h
-> @@ -9,13 +9,9 @@
->   * OpenRISC implementation:
->   * Copyright (C) 2010-2011 Jonas Bonn <jonas@southpole.se>
->   */
-> -
->  #ifndef __ASM_OPENRISC_TIMEX_H
->  #define __ASM_OPENRISC_TIMEX_H
->  
-> -#define get_cycles get_cycles
-> -
-> -#include <asm-generic/timex.h>
->  #include <asm/spr.h>
->  #include <asm/spr_defs.h>
->  
-> @@ -23,6 +19,5 @@ static inline cycles_t get_cycles(void)
->  {
->  	return mfspr(SPR_TTCR);
->  }
-> -#define get_cycles get_cycles
->  
->  #endif
-> --- a/arch/openrisc/lib/delay.c
-> +++ b/arch/openrisc/lib/delay.c
-> @@ -18,6 +18,7 @@
->  #include <linux/init.h>
->  
->  #include <asm/param.h>
-> +#include <asm/timex.h>
->  #include <asm/processor.h>
->  
->  bool delay_read_timer(unsigned long *timer_value)
-> 
-> 
+---
+base-commit: 3f3a2aefbc661b837c8e344f944982d61c2ae037
+change-id: 20260412-airoha_fe_init_remove_mc_en_bit-a89d7fcc5fc6
+
+Best regards,
+-- 
+Lorenzo Bianconi <lorenzo@kernel.org>
+
 
