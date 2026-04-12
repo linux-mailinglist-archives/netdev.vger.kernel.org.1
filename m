@@ -1,127 +1,164 @@
-Return-Path: <netdev+bounces-277876-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277877-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UzBaFmLr22lZIwkAu9opvQ
-	(envelope-from <netdev+bounces-277876-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 20:58:42 +0200
+	id lytCIzzu22kmJAkAu9opvQ
+	(envelope-from <netdev+bounces-277877-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 21:10:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A27E3E5894
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 20:58:41 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 922733E5A84
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 21:10:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D994B3008758
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 18:58:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 840B53009CFA
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 19:10:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E83F363093;
-	Sun, 12 Apr 2026 18:58:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B484F373C0D;
+	Sun, 12 Apr 2026 19:10:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="Q2wy5pv9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FDqZ6zhK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A11E372618;
-	Sun, 12 Apr 2026 18:58:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90FCC362156;
+	Sun, 12 Apr 2026 19:10:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776020319; cv=none; b=im2J+Y32/GOM33mXnwP//8OhCASfb7vbfm4oH89pGmhzuvmyb9tNmk2bdVcUNFoHt29jIZMB4/9H/6vXqp7bIqce5vl3TBa5meFtt+2qavu9V0c2kdJXtYZNT7difgutz03oLAqKppRfI+8hoNYRy+e6eyX2I07726256yYHEsM=
+	t=1776021047; cv=none; b=iulBl1AU+uMUvJDmxnOcOjGJ791vV5660+8I9SPD11u/UvFZeCEmp2uxqMP1Z3ZBgplQVoJ48UZWs+cki3iHy+PPttyFjwaMAHvbB4xOY7rMAIeSdd7ljf6oLtmLKtb+jYPEc0UJlbJ0riDsCyyCGaBRQxiMYPyygC5Wdj7qwZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776020319; c=relaxed/simple;
-	bh=iH4EvmRxOqT/IYuz0dKeLrMxKd9QUf80jI4i495BgSk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fxr+H5QNo4kBHvTiIJ4n8z+RhLmyjVBxLwajbk8BUpEqK6DQ6PdhOboxq++OqnZjMJUgzXG1Ps+9GiQn12cOY+zcv1hLvarLFVDn1+wz0ay3Ef0Kughvj4zmpLe7JqmBxc9ikEzoWb9U4rQ4NpOBNy1U0Qbr1doi63uMFXq9v6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=Q2wy5pv9; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: from netfilter.org (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with UTF8SMTPSA id 16BF5600B9;
-	Sun, 12 Apr 2026 20:58:27 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1776020307;
-	bh=T76DMLgCKqyBHsu8SuyCwla4NQBeBWedWAkvLEuxUJc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Q2wy5pv9u5hq6HDQp6YHgcTi8S5MDCl4sEZNO1oGfsomcL7PjzAS2p/6cK6fqbXFZ
-	 WAAEPD4DI1VFCWARowzqU1hHnL6DTLlWIf/Xywjbr/IBH+Quw3ZxsnloKuMUkf45Vk
-	 J0ZO3d8F4NO2uUmsw0wX5F2dIrVhueB80lDAv7shQirE6QIQhl96KmuqxeJl1/dugU
-	 wA3BnktPPk0zwRtMRcW+lqw6g9UenTuhIOUHgMylCHxmM6CJxiybqur9NYnbZgBIPe
-	 +BklFx8h6bAto2NmFM7RJKSWt6W4IBHNZuO9gZcTtTgiJ7XPK8F6PIWkVD1YhG1n2E
-	 iS+f1Eb3nilrg==
-Date: Sun, 12 Apr 2026 20:58:24 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Florian Westphal <fw@strlen.de>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, netfilter-devel@vger.kernel.org
-Subject: Re: [PATCH net-next 00/11] netfilter: updates for net-next
-Message-ID: <advrUCdRWruZt2ud@chamomile>
-References: <20260410112352.23599-1-fw@strlen.de>
- <20260412094049.7b01dd7b@kernel.org>
- <advOUl92VLlqaiCJ@strlen.de>
- <advTosG9qZ_ZW355@strlen.de>
+	s=arc-20240116; t=1776021047; c=relaxed/simple;
+	bh=Kc0kQATl+d9594mejcm7bbetw3M59+rLgfzTYHRikKY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SH4cxVxAbOcTveqaIoCbEUw7PA2Z9mni+rbr+jDhN3zHc9eCN7ynMZwS+NOiTpxSkT7hdO8vWESZxPPSKU8bBSvBGC30wJ3VRTaLNV3D10HOo3+vWgH3E2ER+/GvnuWy09Zt/lSk6Ufveuv735kRYZQb13EfUkUD/RHT6v6j0oA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FDqZ6zhK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7137EC19424;
+	Sun, 12 Apr 2026 19:10:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776021046;
+	bh=Kc0kQATl+d9594mejcm7bbetw3M59+rLgfzTYHRikKY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=FDqZ6zhKDmAZ0lD5ailhlm/73uT+Dif+w6H7eqZGKbYgI4saygeQYhuI/4pNO/YEI
+	 KWq6s+B8pBFw7J4pSb05MV4DOZEiN6NgFacOGouWHeTfAMeDxwuqIaiiP1IZmdsrhe
+	 d3hAHIbiwdJPCknlob2WoBNG8ur2D3yqxWHuqzGXwa6wjCqREkB9f6jnbbn1S7QIiK
+	 JU7FedDduXYmkOfdNZ0orQSbgHIq/JPhoSDs1+QCDrG2ieqOBIzNsnAVckgqifJJ26
+	 egI8krjA9Qnsazdzw6n4sX4K0erb2OgQ9atbBnctgOpzWY+mquAnMM5HfuetvLAk4e
+	 2FoZMpmW2pDCw==
+Date: Sun, 12 Apr 2026 12:10:44 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Nicolai Buchwitz <nb@tipi-net.de>
+Cc: netdev@vger.kernel.org, Justin Chen <justin.chen@broadcom.com>, Simon
+ Horman <horms@kernel.org>, Mohsin Bashir <mohsin.bashr@gmail.com>, Doug
+ Berger <opendmb@gmail.com>, Florian Fainelli
+ <florian.fainelli@broadcom.com>, Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>, Vikas Gupta
+ <vikas.gupta@broadcom.com>, Bhargava Marreddy
+ <bhargava.marreddy@broadcom.com>, Rajashekar Hudumula
+ <rajashekar.hudumula@broadcom.com>, Arnd Bergmann <arnd@arndb.de>, Fernando
+ Fernandez Mancera <fmancera@suse.de>, Markus =?UTF-8?B?QmzDtmNobA==?=
+ <markus@blochl.de>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v6 1/7] net: bcmgenet: convert RX path to
+ page_pool
+Message-ID: <20260412121044.4dbd4869@kernel.org>
+In-Reply-To: <20260406083536.839517-2-nb@tipi-net.de>
+References: <20260406083536.839517-1-nb@tipi-net.de>
+	<20260406083536.839517-2-nb@tipi-net.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <advTosG9qZ_ZW355@strlen.de>
-X-Spamd-Result: default: False [-1.16 / 15.00];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-277877-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	DMARC_NA(0.00)[netfilter.org];
-	TAGGED_FROM(0.00)[bounces-277876-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[netfilter.org:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,broadcom.com,kernel.org,gmail.com,lunn.ch,google.com,redhat.com,davemloft.net,arndb.de,suse.de,blochl.de];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[netfilter.org:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 9A27E3E5894
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 922733E5A84
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun, Apr 12, 2026 at 07:17:22PM +0200, Florian Westphal wrote:
-> Florian Westphal <fw@strlen.de> wrote:
-> > Jakub Kicinski <kuba@kernel.org> wrote:
-> > https://sashiko.dev/#/patchset/20260410112352.23599-1-fw%40strlen.de
+On Mon,  6 Apr 2026 10:35:25 +0200 Nicolai Buchwitz wrote:
+> Replace the per-packet __netdev_alloc_skb() + dma_map_single() in the
+> RX path with page_pool, which provides efficient page recycling and
+> DMA mapping management. This is a prerequisite for XDP support (which
+> requires stable page-backed buffers rather than SKB linear data).
 > 
-> Forgot to mention this:
-> 
-> ---------------
-> AF_PACKET raw sockets or tun devices, the network_header might be
-> uninitialized (~0U). In this state, skb_mac_header_len() will evaluate to
-> a very large number, bypassing the ETH_HLEN check completely.
-> ---------------
-> 
-> Really?  TIL.
-> 
-> ---------------------
-> Furthermore, skb_mac_header_len() only verifies the logical distance between
-> header offsets, rather than ensuring the bytes are actually present in the
-> physical linear buffer.
-> 
-> ---------------
-> 
-> Really?  Total news to me :-(
+> Key changes:
+> - Create a page_pool per RX ring (PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV)
+> - bcmgenet_rx_refill() allocates pages via page_pool_alloc_pages()
+> - bcmgenet_desc_rx() builds SKBs from pages via napi_build_skb() with
+>   skb_mark_for_recycle() for automatic page_pool return
+> - Buffer layout reserves XDP_PACKET_HEADROOM (256 bytes) before the HW
+>   RSB (64 bytes) + alignment pad (2 bytes) for future XDP headroom
 
-No problem, taking a look into this.
+some nits here, since I have more "real" comments on later patches
+
+> +/* Page pool RX buffer layout:
+> + * XDP_PACKET_HEADROOM | RSB(64) + pad(2) | frame data | skb_shared_info
+> + * The HW writes the 64B RSB + 2B alignment padding before the frame.
+> + */
+> +#define GENET_XDP_HEADROOM	XDP_PACKET_HEADROOM
+
+subjective but IDK what value this define adds vs using
+XDP_PACKET_HEADROOM directly.
+
+> +#define GENET_RSB_PAD		(sizeof(struct status_64) + 2)
+> +#define GENET_RX_HEADROOM	(GENET_XDP_HEADROOM + GENET_RSB_PAD)
+
+> +static int bcmgenet_rx_refill(struct bcmgenet_rx_ring *ring,
+> +			      struct enet_cb *cb)
+>  {
+> -	struct device *kdev = &priv->pdev->dev;
+> -	struct sk_buff *skb;
+> -	struct sk_buff *rx_skb;
+> +	struct bcmgenet_priv *priv = ring->priv;
+>  	dma_addr_t mapping;
+> +	struct page *page;
+>  
+> -	/* Allocate a new Rx skb */
+> -	skb = __netdev_alloc_skb(priv->dev, priv->rx_buf_len + SKB_ALIGNMENT,
+> -				 GFP_ATOMIC | __GFP_NOWARN);
+
+page pool adds __GFP_NOWARN automatically, you can drop it now
+
+> -	if (!skb) {
+> +	page = page_pool_alloc_pages(ring->page_pool,
+> +				     GFP_ATOMIC | __GFP_NOWARN);
+> +	if (!page) {
+>  		priv->mib.alloc_rx_buff_failed++;
+>  		netif_err(priv, rx_err, priv->dev,
+> -			  "%s: Rx skb allocation failed\n", __func__);
+> -		return NULL;
+> -	}
+
+
 
