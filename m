@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-277783-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277784-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GPk9FXaU22mPDgkAu9opvQ
-	(envelope-from <netdev+bounces-277783-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 14:47:50 +0200
+	id wDWNNgWV22mxDgkAu9opvQ
+	(envelope-from <netdev+bounces-277784-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 14:50:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id C379D3E3D57
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 14:47:49 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30F023E3D81
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 14:50:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 445553010B83
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 12:47:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A1D94300E70F
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 12:50:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CEAF30E0D6;
-	Sun, 12 Apr 2026 12:47:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 807CA379ED8;
+	Sun, 12 Apr 2026 12:50:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mjZ5Kexb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VXZoEuOX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 099E917C21C;
-	Sun, 12 Apr 2026 12:47:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C9511B4F2C;
+	Sun, 12 Apr 2026 12:50:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775998066; cv=none; b=douVZ8ZsXw3NKyRKc3DlkmJJS1tJYH1/AKy2mLUQn/e+PCa8tYwC+/E3LuGbT1hPYlBAxT5Im1y0uOi/VnLeC1CykANLqkzoImWlv6LUnnYu3yv3hVNvFiV369fed8UdqeuVJsOU+FboTYVgwB3sYv20rfLD+c+q8TI8CxfHAsQ=
+	t=1775998205; cv=none; b=HifRRAxy5B3CeKcDMGUnZTNj25WnsARGaYKLv1W1rfZIY3S/LmwuuwKbIdhv1Dvky4Ma/jlYPW793MxbH/kb2v3LoXQnr8IaH30BPla7wZGfKBj6bNDuNf/2TBvHjeEHOHIdJBeVBG2+cEoZSDVA19p4HWBz3y/c3smA3u2XNLQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775998066; c=relaxed/simple;
-	bh=FdH4zexPhqFY8dtxq69tNks3/MwjtwjeU80RC3u0gDY=;
+	s=arc-20240116; t=1775998205; c=relaxed/simple;
+	bh=cbC6PZSXYKpThgPVPXKvotKY9vK1A+vj+Eg9/VR8KXc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H1mj44RSlNn4rJseHbl3Cdmm4QL+/Go3H3SCdbkSFVxrixk8/QdtxB41V/bL8DRqChsx/9nz73q2LipDMzdumD+qD4rSJcPNftG6AhwOxSPlFkGDz7YPcSsGw8iBxkK100i1sa0NFd/WQ/TpF5SI3mJ8oYfEHdfm+N6x+vPrZuI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mjZ5Kexb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C0D7C19424;
-	Sun, 12 Apr 2026 12:47:42 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=G/JoYk+VFRlFN4RxU9oeZ9IgooRNjiukjEy0rpTiqDqHFq485K7Enf9/J1eF8hFdJ5OrfDdxN4gbcJQhJCHJfG4yAQPUMoogytAhxvCuBn9nxm2gf6k6wujIRXUN40mripPbrKb6S+qTWJvzw3/TquJm6r5dPkZs8m1RTQ28RK0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VXZoEuOX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE702C19424;
+	Sun, 12 Apr 2026 12:50:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775998065;
-	bh=FdH4zexPhqFY8dtxq69tNks3/MwjtwjeU80RC3u0gDY=;
+	s=k20201202; t=1775998204;
+	bh=cbC6PZSXYKpThgPVPXKvotKY9vK1A+vj+Eg9/VR8KXc=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mjZ5KexbotRv0QbhzvfuiYdW2yxnT3KacxFk5VAePsBTZppYRK0zG64wK2x4730PL
-	 FyQYw+VdHXJP5Aulj7lhmjHq/1JH3kN+e9JOQ2Z2v604n0O8Lv/R4Yt9gcUoyXyD6k
-	 MvK6kS6CgzxrH+oSCg+klMmv2W3ctRpIrKuG7xmR6iaxHM+zzOCQ4asNzk/Abo9q5d
-	 THuEv6imDbDelJcUoHb3CECB7lqtc08g3x0b8A3tjVujRxVI2adTfN+9CQCt1SXJfk
-	 A1EvP0TKRXhbewarF2CZ6vmi8Ao257oFl6+yz5gGn8KtLzNEExjE/pztSa0i70NO+4
-	 u5UmUDTwyceiQ==
-Date: Sun, 12 Apr 2026 13:47:40 +0100
+	b=VXZoEuOXPwbEtyYCBEl1GVBjV/PyvZcIavkVwmJtwptwlbdd6jkqxalo9FGyMJQcA
+	 qjdMG5GvABpwrrnWaW1owSP0ECHnt3PKmeWlqzTfMEj/JwDGph5wBj39X+aPGi0AyJ
+	 bpTfTcTqgmo/fnGJ9yrOX8ynWxdhgIl+S+Wym5ZpQ8pkVw3LeMAeRpwa9GGLrARtg6
+	 xq04TeJAgHtR7lOtTaasb5FhcwyAdsJZkXiVoieKAmqToP7WtjD1eImPxIpnoVzw0O
+	 GyoeW4K/cHxNGElU8SJ/M+8ww0Hw+1UOdyHGrr9S0CaIWOnigjzT5T9SpTX7OuHWYo
+	 XMEnE9SFao2BQ==
+Date: Sun, 12 Apr 2026 13:49:58 +0100
 From: Simon Horman <horms@kernel.org>
-To: Weiming Shi <bestswngs@gmail.com>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	"David S . Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Phil Sutter <phil@nwl.cc>, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, netdev@vger.kernel.org,
-	Xiang Mei <xmei5@asu.edu>
-Subject: Re: [PATCH nf] netfilter: arp_tables: fix IEEE1394 ARP payload
- parsing in arp_packet_match()
-Message-ID: <20260412124740.GG469338@kernel.org>
-References: <20260408073515.79296-2-bestswngs@gmail.com>
+To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, longli@microsoft.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, kotaranov@microsoft.com,
+	shradhagupta@linux.microsoft.com, shirazsaleem@microsoft.com,
+	yury.norov@gmail.com, kees@kernel.org, ssengar@linux.microsoft.com,
+	dipayanroy@linux.microsoft.com, gargaditya@linux.microsoft.com,
+	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org
+Subject: Re: [PATCH net-next v6] net: mana: Expose hardware diagnostic info
+ via debugfs
+Message-ID: <20260412124958.GH469338@kernel.org>
+References: <20260408081555.302620-1-ernis@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,124 +68,73 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260408073515.79296-2-bestswngs@gmail.com>
-X-Spamd-Result: default: False [-2.16 / 15.00];
+In-Reply-To: <20260408081555.302620-1-ernis@linux.microsoft.com>
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-277784-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-277783-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,gmail.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[23];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C379D3E3D57
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 30F023E3D81
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Apr 08, 2026 at 03:35:16PM +0800, Weiming Shi wrote:
-> arp_packet_match() unconditionally parses the ARP payload assuming two
-> hardware addresses are present (source and target). However,
-> IPv4-over-IEEE1394 ARP (RFC 2734) omits the target hardware address
-> field, and arp_hdr_len() already accounts for this by returning a
-> shorter length for ARPHRD_IEEE1394 devices.
+On Wed, Apr 08, 2026 at 01:15:46AM -0700, Erni Sri Satya Vennela wrote:
+> Add debugfs entries to expose hardware configuration and diagnostic
+> information that aids in debugging driver initialization and runtime
+> operations without adding noise to dmesg.
 > 
-> As a result, on IEEE1394 interfaces arp_packet_match() advances past a
-> nonexistent target hardware address and reads the wrong bytes for both
-> the target device address comparison and the target IP address. This
-> causes arptables rules to match against garbage data, leading to
-> incorrect filtering decisions: packets that should be accepted may be
-> dropped and vice versa.
+> The debugfs directory for each PCI device is named using pci_name()
+> (the unique BDF address), and its creation and removal is integrated
+> into mana_gd_setup() and mana_gd_cleanup_device() respectively, so
+> that all callers (probe, remove, suspend, resume, shutdown) share a
+> single code path.
 > 
-> The ARP stack in net/ipv4/arp.c (arp_create and arp_process) already
-> handles this correctly by skipping the target hardware address for
-> ARPHRD_IEEE1394. Apply the same pattern to arp_packet_match().
+> Device-level entries (under /sys/kernel/debug/mana/<BDF>/):
+>   - num_msix_usable, max_num_queues: Max resources from hardware
+>   - gdma_protocol_ver, pf_cap_flags1: VF version negotiation results
+>   - num_vports, bm_hostmode: Device configuration
 > 
-> Fixes: 6752c8db8e0c ("firewire net, ipv4 arp: Extend hardware address and remove driver-level packet inspection.")
-> Reported-by: Xiang Mei <xmei5@asu.edu>
-> Signed-off-by: Weiming Shi <bestswngs@gmail.com>
+> Per-vPort entries (under /sys/kernel/debug/mana/<BDF>/vportN/):
+>   - port_handle: Hardware vPort handle
+>   - max_sq, max_rq: Max queues from vPort config
+>   - indir_table_sz: Indirection table size
+>   - steer_rx, steer_rss, steer_update_tab, steer_cqe_coalescing:
+>     Last applied steering configuration parameters
+> 
+> Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
 > ---
->  net/ipv4/netfilter/arp_tables.c | 18 ++++++++++++++----
->  1 file changed, 14 insertions(+), 4 deletions(-)
-> 
-> diff --git a/net/ipv4/netfilter/arp_tables.c b/net/ipv4/netfilter/arp_tables.c
-> index 1cdd9c28ab2da..4b2392bdcd0a6 100644
-> --- a/net/ipv4/netfilter/arp_tables.c
-> +++ b/net/ipv4/netfilter/arp_tables.c
-> @@ -86,7 +86,7 @@ static inline int arp_packet_match(const struct arphdr *arphdr,
->  				   const struct arpt_arp *arpinfo)
->  {
->  	const char *arpptr = (char *)(arphdr + 1);
-> -	const char *src_devaddr, *tgt_devaddr;
-> +	const char *src_devaddr, *tgt_devaddr = NULL;
+> This patch depends on the following fixes submitted to net:
+>   - "net: mana: Use pci_name() for debugfs directory naming"
+>   - "net: mana: Move current_speed debugfs file to mana_init_port()"
+> Conflict resolution may be needed when net merges into net-next.
 
-I think that it's more in keeping with Kernel code practices
-to set tgt_devaddr conditionally.
+Unfortunately this patch doesn't apply to net-next,
+which is a requirement for our workflow.
 
->  	__be32 src_ipaddr, tgt_ipaddr;
->  	long ret;
->  
-> @@ -110,13 +110,23 @@ static inline int arp_packet_match(const struct arphdr *arphdr,
->  	arpptr += dev->addr_len;
->  	memcpy(&src_ipaddr, arpptr, sizeof(u32));
->  	arpptr += sizeof(u32);
-> -	tgt_devaddr = arpptr;
-> -	arpptr += dev->addr_len;
-> +	switch (dev->type) {
-> +#if IS_ENABLED(CONFIG_FIREWIRE_NET)
-> +	case ARPHRD_IEEE1394:
-> +		break;
-> +#endif
-> +	default:
-> +		tgt_devaddr = arpptr;
-> +		arpptr += dev->addr_len;
-> +		break;
-> +	}
-
-While I acknowledge this isn't the approach taken in arp_hdr_len()
-I think it would be nicer to use the following construction
-which will give build coverage to all paths regardless of if
-CONFIG_FIREWIRE_NET is set or not.
-
-	if (IS_ENABLED(CONFIG_FIREWIRE_NET) && dev->type == ARPHRD_IEEE1394) {
-		tgt_devaddr = NULL;
-	} else {
-		tgt_devaddr = arpptr;
-		arpptr += dev->addr_len;
-	}
-
-Also, I would include a blank line before the if condition.
-
->  	memcpy(&tgt_ipaddr, arpptr, sizeof(u32));
->  
->  	if (NF_INVF(arpinfo, ARPT_INV_SRCDEVADDR,
->  		    arp_devaddr_compare(&arpinfo->src_devaddr, src_devaddr,
-> -					dev->addr_len)) ||
-> +					dev->addr_len)))
-> +		return 0;
-> +	if (tgt_devaddr &&
->  	    NF_INVF(arpinfo, ARPT_INV_TGTDEVADDR,
->  		    arp_devaddr_compare(&arpinfo->tgt_devaddr, tgt_devaddr,
->  					dev->addr_len)))
-> -- 
-> 2.43.0
-> 
+-- 
+pw-bot: changes-requested
 
