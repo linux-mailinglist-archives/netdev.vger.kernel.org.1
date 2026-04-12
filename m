@@ -1,92 +1,90 @@
-Return-Path: <netdev+bounces-277801-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277802-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0PDOLqel22meEgkAu9opvQ
-	(envelope-from <netdev+bounces-277801-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 16:01:11 +0200
+	id YEogDVOm22nbEgkAu9opvQ
+	(envelope-from <netdev+bounces-277802-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 16:04:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B520D3E41D2
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 16:01:10 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 858D23E421E
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 16:04:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id CF98C30060AB
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 14:00:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1303B3058E1D
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 14:00:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EAF91D130E;
-	Sun, 12 Apr 2026 14:00:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A38578F26;
+	Sun, 12 Apr 2026 14:00:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aUff0ua9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mGpQaASC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EA0337C0FA
-	for <netdev@vger.kernel.org>; Sun, 12 Apr 2026 14:00:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CF6A37C926
+	for <netdev@vger.kernel.org>; Sun, 12 Apr 2026 14:00:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776002443; cv=none; b=rnwVu+CZhRJsfHw/hoLfTa7Om/i6rUMIWne10C97oFvaBw698awyRea7epYIsqHV4FEI0S//NfWJvKw6yYS8XWY3SiNVipbsdEbMedrwdSz5tvH9uisyvY7F+27XeLmSvPgpSv3dgeBlUwNHr7t08e/ntDrFrSa+iyBuB6CdAuE=
+	t=1776002444; cv=none; b=OGQ8Y6n0sW1dRkimru3njdqOo+pqzshjKhzSmhId+a06rioFvNE9pRe74uJQnWVJTSeZrIvSZrK4Zlo8jrqmqiQUxcSxtC5mG6TVPtyFT+I4l0wdoi1KtDEP9sGHrYkKsE7p04GM1bzbkP1NpsVmfCl4cZwzpbJZTyC7XQoWEWE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776002443; c=relaxed/simple;
-	bh=O65OagGdcA16yR+KSOfnD4PCfCavizX1V42BiBKUV8A=;
+	s=arc-20240116; t=1776002444; c=relaxed/simple;
+	bh=zcEQ344RiBm7JrfsgTgQ4Lp6CjbZtUDRo6ogiL5TbHQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MDClS1UdhIBmYt9J99HVmK5bKy4NJomIyJIvYwTKA0IqQ0+HvzeyU4rRlZqeP8d9YuEgAKg4Z87592lwibSPTejWf65Wrq3ZYUe/LdNVZYD32ORmEcmLu+yJdrg9q5wCs6oEvgRP+zQ68/f6dUgf6g2BLEN0RPJZ6+ceQxjKIV4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aUff0ua9; arc=none smtp.client-ip=209.85.221.45
+	 MIME-Version; b=SdOJf+aDWYJ/Uskn/g97UQkSqEANi45wjd9MfvmAqxcuygc3DoCbJ05LF8yiRM5pGsIWsUzd7SZ6YYkmtu8LoV8UrjMaoTnhx6oktepNalAxzZwzLd11OilEeyy7Mb4bzG9uhHe/bXPzZic3qwHylUiWh6kswWVz9fsF2qao0aY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mGpQaASC; arc=none smtp.client-ip=209.85.221.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-43d04fc3bf2so2081401f8f.3
-        for <netdev@vger.kernel.org>; Sun, 12 Apr 2026 07:00:41 -0700 (PDT)
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-43cfce3a195so2198490f8f.2
+        for <netdev@vger.kernel.org>; Sun, 12 Apr 2026 07:00:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776002440; x=1776607240; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1776002441; x=1776607241; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4Y8BPxcQ6465X542UsdBcHUWpSqQuKocfLy0RhQWsQM=;
-        b=aUff0ua989g5wLFcLWbqU6i8o3EiBg2BuKQYse0W5uylFQg4fDJEwjFSdNABw0JEKW
-         uSTHzvi8Uf/6c6AgB64pEgW0id44P55BAIPH6QKJ633+w5kZiGu/enV6EQLkwTKazmUW
-         Krz5UCrzSPvEljOVXDmOEHAryrAMHRton603+xeCnenFvCQB6H1onR4poPX7IwUFvek2
-         IsalReChqGe2eSAkmcnL9dXjlpVk7mabC+L6oXhNrqQy4ATM9bupVO4WgVRReI0i5nQz
-         +CxV0LcLcZghuuq0qRSojspnP+iaJYTLOJvLq0gO3c2HybcC/hMpyOcggJB9LX0Z8ttb
-         brNQ==
+        bh=cNQ4/Bgols+4vK0uVdE0kuKThLWN9Gx/3rmL3xyL0Gc=;
+        b=mGpQaASClSZZdW3sshx72H505xOtSaza6rn+UfaUh2aTggWGRAJRfY+vTSxOGuuxZY
+         B6GOXBg+CcxaXmk7YkT6vy+d5Ms3EFQX4GoLtYeZg8EH8KgoLyPPDFDXolzzSbfNSXrZ
+         upuvIPMVjnsJTu9XNPmD2K9JftY6pdro0I4j2LasfhE0bivVOnEWYIEGpnBY9o+MFc4j
+         Z35+8gJuHvVQCJOSOPIwTRED3MhynjnpW8rSGAqTfciFNSOj3nX/1NUEuu/9gG7oj9nE
+         nUMouj/iQjrYpojI7ta/D62+I2x+jOcUKoLUbtdfpLBWZS2U2jgmKyfSfvFa8eaHo6Q9
+         lfIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776002440; x=1776607240;
+        d=1e100.net; s=20251104; t=1776002441; x=1776607241;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=4Y8BPxcQ6465X542UsdBcHUWpSqQuKocfLy0RhQWsQM=;
-        b=rQScFpkBSU3Swx/ODOmmNZEnm834JN3D3MBqMe/ijzwRKGaPzdQWCMHCkV4CNXSlhF
-         BecARoByRy2geqqbcxHfL4gb5JFMzd7JYoA2KCB3s6jcd1xEnMPjuOOJzO5vsl7Y30NE
-         fJW/bfeFfhL5tYtOc3ppYwHR6nSBp1KOWyIwO1gpMq1qcjneW8UpBVK+3Q2nnP9V1SQt
-         hyC4WW+vsaM+hGo2cIip0seeuA2cktCIAJ7Wnk6mgnDNxZEJoKMavBuy6PKtw2usLzu5
-         6tJBgPlAB+i/7ThC+E+Rhtyf25IX/hR+w5LWjfZBmFqaiGbgPVQC1tkx0jkEdrVzka2W
-         6ypA==
-X-Forwarded-Encrypted: i=1; AFNElJ9b4gcCHZGn6O/CZTHkMFOMRd92ufgZdHFNJbpiLlsMvqNkFMWth5e0Xi/r5ZgDCoC85BzqjzY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyQWeztwPB0/b57AQkVxdF2+0emNu3worU7AT//MhNk7lNj7mER
-	jjzy9aUgks2ufv+9+LBteZwASsJcwNEluH7L6WDChQc/SIoYUow9ljzIxnd7uQ==
-X-Gm-Gg: AeBDietd3QOSHVGRrdk3PkK5cGYiYa2bN/jnGcehCPeY5RKwuB9koc+lEKBYUYNdySZ
-	OqxjTcxvUCqAic3CytJo3dLI2yiDjNjiqZloMOeFaIGZEzc591fH88IH96c7pFMhh7pfR0u0N0e
-	MZK8ouoph50/1BspxuuykY5rkgY3U3QT9VEllq8AHviuK3cKAGXxnNSOCfhhK6n59e5tUfZCAO0
-	ON/UUtkclYWk9vD/f0hU2cKycVfysn32Wu59zSdgYInMp1YGEC3paE0QVsrrA4FbK3kYedar357
-	f0Q4gCpdVrkJ3XgC3/5qSB0ktUfcQN3kKOsm89umnMrLCGTNPCMwS+IZVX4u0UbDPBaCI9F3yWk
-	n9Wj65yrCKPIiJSf3Yak9/h9gg4H2li2LPwWYc1SF851mO7CUF2RdVSxWtZMUxsc4+RDcQt0tgq
-	Ql+v+RGjKuPsJzqSsvqb65HhmkaPM7fiXyn/qkRruA/8tXRMPO
-X-Received: by 2002:a5d:5f46:0:b0:43c:f8b4:e58 with SMTP id ffacd0b85a97d-43d642c088fmr14267673f8f.41.1776002439898;
-        Sun, 12 Apr 2026 07:00:39 -0700 (PDT)
+        bh=cNQ4/Bgols+4vK0uVdE0kuKThLWN9Gx/3rmL3xyL0Gc=;
+        b=Ww/8QDgQ6t7ZFKVqY8pp9VkK+YNIVfJVGnOrOPPua0kdKppO8XYvvvi8GJA8A0o75H
+         vSNeshMMHU1LnI5AG9dDseXEbRCaHl0W2mfTesfzFr0X3ijLz2laSO0Eky1LQx3WapW2
+         Db0vyFKtK2xd8zYG3fHiWuVLDgBe/ITJPX75viC31HOf7lfTBAvOKVc9PtAOat32xnZL
+         5or/igt2u2fBbgpXZ+4SPjaBMrSMmaeuu1mlUDbJcUvMAStE+kV2duJT0yXQObta1/5v
+         6b9ODsz8i89rXSeFVBbzJepS1FCSWo6jJEq3uEuiYhuYeyM1oz7XVUq6n5Za5WucoOWm
+         LpdA==
+X-Forwarded-Encrypted: i=1; AFNElJ+UrVyL+xZYmRESGDg8d/bzpm3lB59PRpcaQw7pS9DIUmLELSPQUXkzDX6nfxyLrf31m2fG+Gg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKhWdNp/B6nPzTVzSTFiZhQCaBglLZy8UCJvbkk24YGbNXesPP
+	4NBKqSV6PKofvQznnplbYrdSkqu/dywNdq0VOYy0XIjSysK57E3MzCeQ
+X-Gm-Gg: AeBDieuKLL5yIeMLjL3mZnMNNZK9ikQSXlqfFk4Dvyedd8QzHd8297zCT9S67K7s8g4
+	an2qRHP4k1JmwnP1UvVYHJQGapMieFkNBDnPDeYiXcRAb9ashK/UHgpwtBemrTik6VTzSCyUkup
+	eGs/g/JCOnBfR1KoRWf3uEuSPLVP9mfI9G7YCBDfSbvE0jSEOW4DQSnYrp3h+UdZeHPmVzMtePD
+	GhH9oHZzqDPAvh/KfpaB78pwnXOVEDQtxs+8DVCkJm/85G9oBujPO/goXA3uRKdf0cn15SmyUiL
+	Wi8XVhnn5i70T2XA8WQ6o1ianphp7tmivxuKDqoxJJUrcOel4yEzgYIGr5rGQQybBsMtvI2Nt9b
+	fSyFgICyLv6FH0F640weGX+ZHEyRWULY6yHTBHaHrKPYQBvjnY8yL97JFY9kEynb1cGwXzpdTQX
+	q8Q1Y7Bz0arX31Vc95oUStb0N7njpIXs/hWlvpmFd57EeTJPSCi7Q2mxSVwxo=
+X-Received: by 2002:a5d:64c8:0:b0:43d:76b0:78e with SMTP id ffacd0b85a97d-43d76b0161cmr2231826f8f.14.1776002440962;
+        Sun, 12 Apr 2026 07:00:40 -0700 (PDT)
 Received: from localhost.localdomain ([2a00:23c4:a758:8a01:6956:2074:5220:4650])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43d63e50015sm26127538f8f.27.2026.04.12.07.00.38
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43d63e50015sm26127538f8f.27.2026.04.12.07.00.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 12 Apr 2026 07:00:39 -0700 (PDT)
+        Sun, 12 Apr 2026 07:00:40 -0700 (PDT)
 From: Biju <biju.das.au@gmail.com>
 X-Google-Original-From: Biju <biju.das.jz@bp.renesas.com>
-To: Arun Ramadoss <arun.ramadoss@microchip.com>,
-	Andrew Lunn <andrew@lunn.ch>,
+To: Andrew Lunn <andrew@lunn.ch>,
 	Heiner Kallweit <hkallweit1@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>
 Cc: Biju Das <biju.das.jz@bp.renesas.com>,
-	UNGLinuxDriver@microchip.com,
 	Russell King <linux@armlinux.org.uk>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
@@ -94,9 +92,9 @@ Cc: Biju Das <biju.das.jz@bp.renesas.com>,
 	Prabhakar Mahadev Lad <prabhakar.mahadev-lad.rj@bp.renesas.com>,
 	Biju Das <biju.das.au@gmail.com>,
 	linux-renesas-soc@vger.kernel.org
-Subject: [PATCH net-next v3 4/5] net: phy: microchip_t1: Replace phydev->lock with mdio_lock in lan937x_dsp_workaround()
-Date: Sun, 12 Apr 2026 15:00:26 +0100
-Message-ID: <20260412140032.122841-5-biju.das.jz@bp.renesas.com>
+Subject: [PATCH net-next v3 5/5] net: phy: Move phy_init_hw() from phy_resume() to __phy_resume()
+Date: Sun, 12 Apr 2026 15:00:27 +0100
+Message-ID: <20260412140032.122841-6-biju.das.jz@bp.renesas.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260412140032.122841-1-biju.das.jz@bp.renesas.com>
 References: <20260412140032.122841-1-biju.das.jz@bp.renesas.com>
@@ -112,19 +110,19 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-277801-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-277802-lists,netdev=lfdr.de];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[bp.renesas.com,microchip.com,armlinux.org.uk,vger.kernel.org,glider.be,gmail.com];
-	FREEMAIL_TO(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
+	FREEMAIL_CC(0.00)[bp.renesas.com,armlinux.org.uk,vger.kernel.org,glider.be,gmail.com];
+	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
@@ -134,61 +132,61 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev,renesas];
 	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[renesas.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,bp.renesas.com:mid]
-X-Rspamd-Queue-Id: B520D3E41D2
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bp.renesas.com:mid,renesas.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 858D23E421E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 From: Biju Das <biju.das.jz@bp.renesas.com>
 
-lan937x_dsp_workaround() performs raw MDIO bus accesses and must
-therefore hold mdio_lock rather than phydev->lock. Using phydev->lock
-here is incorrect as it does not serialise access to the MDIO bus.
+Now that redundant locking has been removed from PHY driver callbacks,
+phy_init_hw() can be called with phydev->lock held.
 
-Replace phydev->lock with bus->mdio_lock, and switch the phy_read()/
-phy_write() calls to their unlocked __phy_read()/__phy_write()
-variants since mdio_lock is now held explicitly.
+Many MAC drivers and the phylink framework resume the PHY via
+phy_start(), which invokes __phy_resume() directly without going
+through phy_resume(). Keeping phy_init_hw() in phy_resume() means it
+is not called in this path.
+
+Move phy_init_hw() into __phy_resume() so that PHY soft reset and
+re-initialisation happen unconditionally on every resume, regardless
+of which code path triggers it.
 
 Signed-off-by: Biju Das <biju.das.jz@bp.renesas.com>
 ---
 v3:
  * New patch.
 ---
- drivers/net/phy/microchip_t1.c | 8 ++++----
+ drivers/net/phy/phy_device.c | 8 ++++----
  1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/phy/microchip_t1.c b/drivers/net/phy/microchip_t1.c
-index 62b36a318100..afb4e8908b78 100644
---- a/drivers/net/phy/microchip_t1.c
-+++ b/drivers/net/phy/microchip_t1.c
-@@ -337,9 +337,9 @@ static int lan937x_dsp_workaround(struct phy_device *phydev, u16 ereg, u8 bank)
- 	int rc = 0;
- 	u16 val;
+diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+index 4a2b19d39373..16fc2fc63c50 100644
+--- a/drivers/net/phy/phy_device.c
++++ b/drivers/net/phy/phy_device.c
+@@ -1999,6 +1999,10 @@ int __phy_resume(struct phy_device *phydev)
  
--	mutex_lock(&phydev->lock);
-+	mutex_lock(&phydev->mdio.bus->mdio_lock);
- 	/* Read previous selected bank */
--	rc = phy_read(phydev, LAN87XX_EXT_REG_CTL);
-+	rc = __phy_read(phydev, LAN87XX_EXT_REG_CTL);
- 	if (rc < 0)
- 		goto out_unlock;
+ 	lockdep_assert_held(&phydev->lock);
  
-@@ -353,11 +353,11 @@ static int lan937x_dsp_workaround(struct phy_device *phydev, u16 ereg, u8 bank)
- 		val |= LAN87XX_EXT_REG_CTL_RD_CTL;
++	ret = phy_init_hw(phydev);
++	if (ret)
++		return ret;
++
+ 	if (!phydrv || !phydrv->resume)
+ 		return 0;
  
- 		/* access twice for DSP bank change,dummy access */
--		rc = phy_write(phydev, LAN87XX_EXT_REG_CTL, val);
-+		rc = __phy_write(phydev, LAN87XX_EXT_REG_CTL, val);
- 	}
+@@ -2014,10 +2018,6 @@ int phy_resume(struct phy_device *phydev)
+ {
+ 	int ret;
  
- out_unlock:
--	mutex_unlock(&phydev->lock);
-+	mutex_unlock(&phydev->mdio.bus->mdio_lock);
- 
- 	return rc;
- }
+-	ret = phy_init_hw(phydev);
+-	if (ret)
+-		return ret;
+-
+ 	mutex_lock(&phydev->lock);
+ 	ret = __phy_resume(phydev);
+ 	mutex_unlock(&phydev->lock);
 -- 
 2.43.0
 
