@@ -1,106 +1,130 @@
-Return-Path: <netdev+bounces-277904-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277905-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +CUxMwsI3GmoLQkAu9opvQ
-	(envelope-from <netdev+bounces-277904-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 23:00:59 +0200
+	id OOBYAi4I3GmoLQkAu9opvQ
+	(envelope-from <netdev+bounces-277905-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 23:01:34 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 595EC3E5FDF
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 23:00:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F77E3E5FF1
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 23:01:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D7AE93009529
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 20:58:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 34476301348C
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 21:00:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13AE537F8D3;
-	Sun, 12 Apr 2026 20:58:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FD5C2C0F91;
+	Sun, 12 Apr 2026 21:00:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EirTS/vN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U+fMG9D4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4FFF351C30;
-	Sun, 12 Apr 2026 20:58:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C24A25F988;
+	Sun, 12 Apr 2026 21:00:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776027509; cv=none; b=LWmwRtbpzoEB+4l3faBB7XYdV1js9cw83DrMO7nPrvqDt2U6X90ug0NfB+68JLpRbieIA+7+VBxp2NQLGLo5SgT9rCvvgKIzEo+rpkesI4GXo0dN7ezjbl3ICHUbYgixg9U+Izygm8a84UocUKEmMjPCQVLNPNg0E3vZmGAJHhM=
+	t=1776027640; cv=none; b=ohN9mQoYlZqnrNuv4TXlVOXe1LOmR6gedewHjLyHoj74aswP/KBpNHhigdghAvz5MFWqqUGl6yqVZ4wkOu/it0IIbpPV3GD/SUtXjT6/+qvcmnyDFpGebyO4WwnCVMLl9NZ/8yAuzGk7nAYG6RPGVmhc736W93Xp2e8WOlvfvOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776027509; c=relaxed/simple;
-	bh=UuQrIK1aHRDtycvnWsa1Fwi8cjQTRLCMiv417Myy+ds=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CdYvbaMkAcvh5p8Z05ffkss+F8gbCyrrCFX7EDQGg0zqhem1/xfG/Zq5FU6qinqDFd+SGBecDjIJTVmWfpqiQjGq+bN4F+esvqfeU71J+uX8fGS+/Talv7HRN1N0VMV1C0xGEKFkcL5tsl+vBeUDrAwePVgl8eecKDyraq+1rMM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EirTS/vN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44F71C19424;
-	Sun, 12 Apr 2026 20:58:28 +0000 (UTC)
+	s=arc-20240116; t=1776027640; c=relaxed/simple;
+	bh=w8P3oWsKjXqj+PHuBv3r3XUZwhjR55YCyirJfscCyd0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=St12zBBnNDIGOyRWmhdUK5H68uGZxcspnHtBuDQ5QR4lrtE6nxWlmh0bQuOOgKPz3FjfU/wEQTOXvgitAFeDgPZLqodhL7olV6dzRMQwXnZApnx/rSU2iyhdIHGdrhBWrNjq+YIywRSM9+SfpxQ5llpa9bb6Kz8i2gZ5cPIy5V0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U+fMG9D4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC7C9C19424;
+	Sun, 12 Apr 2026 21:00:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776027508;
-	bh=UuQrIK1aHRDtycvnWsa1Fwi8cjQTRLCMiv417Myy+ds=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=EirTS/vNi0+PFAF/vsi/uXnaMv1Dz1SMdJRU/B+gZm/HCLWTakhjvnr8k6znCwm/D
-	 QQsFkOdoasjSYryQKWj7hplaHhzfabTVxVEiv+3op45wbabHAMdLu88gKPotGp3t+o
-	 pbtMfF8rtsGlLyDs77eBUBYVKdQAMamioPCVrQBnHIZ8Nh0TNfXcreYH7+1N+IZse9
-	 MUg/L1ZrgrjNEpzM4ZR4oDEkBLNc0IviWWbsoi/HGIsJIzOVKurqqYGvwflFPECJP7
-	 12IpAS/Q9AkPx2wBu7zS0vPrBcYAYN0BB4Szhr9J7TCK4fTUE6qYKaiZDGLUFRGq6D
-	 xihgY1kW11bcA==
-Date: Sun, 12 Apr 2026 13:58:27 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: =?UTF-8?B?TGVrw6sgSGFww6dpdQ==?= <snowwlake@icloud.com>
-Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
- stable@vger.kernel.org, krzysztof.kozlowski@linaro.org
-Subject: Re: [PATCH net 1/4] nfc: digital: Fix stack buffer overflow in
- digital_in_recv_sensf_res()
-Message-ID: <20260412135827.0cb6f44c@kernel.org>
-In-Reply-To: <20260409223436.1887988-2-snowwlake@icloud.com>
-References: <20260409223436.1887988-1-snowwlake@icloud.com>
-	<20260409223436.1887988-2-snowwlake@icloud.com>
+	s=k20201202; t=1776027640;
+	bh=w8P3oWsKjXqj+PHuBv3r3XUZwhjR55YCyirJfscCyd0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=U+fMG9D4PjCqbHdvlweRpiwceCHwI47c4gR+jT4s3MWHFZWx91F49u3/J5dK1Cj0X
+	 b+E46leNKhlvvqN129NsF2qgfb3sXEElkB4Bl5yJa6RAIX+JgLxmLL/9ah6DC3W3yO
+	 6DB7ycjod3V0yvNyeiXVHjTgAiggf3hrtLzt217a//g0TCBR+xIzUuLW3/3ry78v7i
+	 uJE+FylqcMBCMzcMpFk58WwVB8tc1/aMnWu3O2auT4XxkDCmz8n1tvDf7Y7ngcIyOO
+	 VA+dapISn7BwK62nrBuodsz3kGFBQdyPJPHRbqWZg05Ne0RJtrjEUeK5lBxxE5zgTq
+	 Fem/ft9PuWeXw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CD403809A8C;
+	Sun, 12 Apr 2026 21:00:13 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/2] More fixes for the IPA driver
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177602761230.3408407.17983223165088900536.git-patchwork-notify@kernel.org>
+Date: Sun, 12 Apr 2026 21:00:12 +0000
+References: <20260409-ipa-fixes-v1-0-a817c30678ac@fairphone.com>
+In-Reply-To: <20260409-ipa-fixes-v1-0-a817c30678ac@fairphone.com>
+To: Luca Weiss <luca.weiss@fairphone.com>
+Cc: elder@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-277904-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[icloud.com];
-	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-277905-lists,netdev=lfdr.de,netdevbpf];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NO_DN(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5]
-X-Rspamd-Queue-Id: 595EC3E5FDF
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 5F77E3E5FF1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, 10 Apr 2026 00:34:31 +0200 Lek=C3=AB Hap=C3=A7iu wrote:
-> The function digital_in_recv_sensf_res() validates that the incoming
-> SENSF_RES frame is at least DIGITAL_SENSF_RES_MIN_LENGTH (17) bytes,
-> but does not check that it is at most NFC_SENSF_RES_MAXSIZE (18) bytes
-> before copying into the 18-byte target.sensf_res stack buffer.
+Hello:
 
-Hm, third similar fix we received for this.
-struct digital_sensf_res is 19 bytes, you're capping the length at 18
-something else is wrong here..
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Thu, 09 Apr 2026 10:13:30 +0200 you wrote:
+> Two more fixes for the Qualcomm IPA driver.
+> 
+> Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
+> ---
+> Luca Weiss (2):
+>       net: ipa: Fix programming of QTIME_TIMESTAMP_CFG
+>       net: ipa: Fix decoding EV_PER_EE for IPA v5.0+
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,1/2] net: ipa: Fix programming of QTIME_TIMESTAMP_CFG
+    https://git.kernel.org/netdev/net/c/de08f9585692
+  - [net,2/2] net: ipa: Fix decoding EV_PER_EE for IPA v5.0+
+    https://git.kernel.org/netdev/net/c/1335b903cf2e
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
