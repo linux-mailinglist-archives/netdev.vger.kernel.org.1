@@ -1,145 +1,183 @@
-Return-Path: <netdev+bounces-277751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277752-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id Cl1GAmxT22kpAQkAu9opvQ
-	(envelope-from <netdev+bounces-277751-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 10:10:20 +0200
+	id cq74FhlU22llAQkAu9opvQ
+	(envelope-from <netdev+bounces-277752-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 10:13:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFF643E312A
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 10:10:18 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B7003E3134
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 10:13:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 7CD64300BCBD
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 08:10:15 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 60F6C3019C88
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 08:13:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 752ED309DDB;
-	Sun, 12 Apr 2026 08:10:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fjziGkTO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5BF530B50F;
+	Sun, 12 Apr 2026 08:13:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52E2961FCE
-	for <netdev@vger.kernel.org>; Sun, 12 Apr 2026 08:10:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from zg8tmja2lje4os4yms4ymjma.icoremail.net (zg8tmja2lje4os4yms4ymjma.icoremail.net [206.189.21.223])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14BB254763
+	for <netdev@vger.kernel.org>; Sun, 12 Apr 2026 08:13:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=206.189.21.223
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775981412; cv=none; b=lmse3GG6WL+zaivvG05pGOyvHS4vZx1EosxD+TN0YmpdjywlIB38buZlB25n8tIyR7Ijr4DdeCNGNQd0XAFBGS6wzCXvhg2EFAdl8EGG+33CPKwbzJIPakDDCCpD0LTCOwuyJhjsAAjoYh9m9OrBegz/j1ff9kzslU8+tsxbSAI=
+	t=1775981589; cv=none; b=jUyopNsDP05aoikipKh72tiWRKnyLkMRSA826I9mKjofQEPUeoJ0P4u77HyYItNqXt/s6Y2Al/3/II7VgBm6p+qfq3isbDhteLTQq0TYkk22swUs3i8CzJuVkKjhjgNne3UXPgzd7hCIMlTUCl6+bRPJb82AodxClWb4otCmQus=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775981412; c=relaxed/simple;
-	bh=36H48P9hjoQUXkzENXR+4KOVxVLh08Uk+rBggeOjamo=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=WQDg3/qgCLQMS1CVBgHxBMamMl8KSqkcS70Kv3r0Dh89yc1nu11gxTXlqh3owgJq7WZ0fvOg+A66FbTHZlpz2uqoUiJ1OQNgt5oPlsqhUNbj2XLYKoI0vQeQTNjTxMyq15N2h+qVCtIdz0aSA/i1n8TS8hdA7scFUauksHzjZe0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fjziGkTO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5731CC19424;
-	Sun, 12 Apr 2026 08:10:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775981411;
-	bh=36H48P9hjoQUXkzENXR+4KOVxVLh08Uk+rBggeOjamo=;
-	h=From:Date:Subject:To:Cc:From;
-	b=fjziGkTO/dy4HMECql4anEfWbo8cHbp0IkS9s42ZvcrWSt6akH3InZQ5hmsQpP5Ut
-	 W9g/lCICDlqUbWKxCtpqmCFMhgp+FDMs327ptDG3KeVQsVp5N5f3T1lG0VDU7AeO5c
-	 Z6j2wvqnTRkTFHghQrRr4rOEB0Uu9TP+z1FQ/eIeA0e/rhQKA1UhFhdNzjYHK5bBKG
-	 i9bpQ7YHPnwCpjJpJix4/0Oqy/ag2kKFXZ6q2gzLG+AhVbYmqF+j80jub4x3hAa3Y3
-	 zfjJcK7a7WemazFtqjSUzyidz/yG3eHTRm3Kknd3jFdgZh8Vl4ESM6JHXgCcmh14RK
-	 2oVtNaJOPHkKA==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Sun, 12 Apr 2026 10:09:41 +0200
-Subject: [PATCH net] net: airoha: Fix max TX packet length configuration
+	s=arc-20240116; t=1775981589; c=relaxed/simple;
+	bh=ki/8U3tYgUK9saqw7pOasuCi2zPQ+O16kWO6B95oJok=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=nhznuoEglSUKMRghfFIy7+09Ay38+mUyhOc3NZLTzAoL/2b1MWB/6r4rlveswa2mHD6zQoyEWTQi81GSvP56YsQRB/j47Agirup2/84PJdKTFrdSEU5kquGHaoWVuf6+Jhhc6r8GW3BKDv8SpVc1bvdHIenvs+HYonX3ep4K3SQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=206.189.21.223
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
+Received: from Draw.localdomain (unknown [27.227.216.147])
+	by app1 (Coremail) with SMTP id ygmowAAnmPj6U9tp5qa9AA--.387S2;
+	Sun, 12 Apr 2026 16:12:42 +0800 (CST)
+From: Ao Zhou <n05ec@lzu.edu.cn>
+To: netdev@vger.kernel.org
+Cc: kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	longli@microsoft.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	ernis@linux.microsoft.com,
+	ssengar@linux.microsoft.com,
+	dipayanroy@linux.microsoft.com,
+	gargaditya@linux.microsoft.com,
+	shirazsaleem@microsoft.com,
+	kees@kernel.org,
+	leon@kernel.org,
+	Yifan Wu <yifanwucs@gmail.com>,
+	Juefei Pu <tomapufckgml@gmail.com>,
+	Yuan Tan <yuantan098@gmail.com>,
+	Xin Liu <bird@lzu.edu.cn>,
+	Ao Zhou <n05ec@lzu.edu.cn>,
+	ruijieli51@gmail.com
+Subject: [PATCH 1/1] net: mana: fix use-after-free in add_adev() error path
+Date: Sun, 12 Apr 2026 16:12:43 +0800
+Message-ID: <c4ea7d8907cf72b259bf70bd8c2e791e1c4ff70f.1774942606.git.623701471@qq.com>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <cover.1774942606.git.623701471@qq.com>
+References: <cover.1774942606.git.623701471@qq.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260412-airoha-fix-max-mtu-v1-1-333030d0a564@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x2MOwqAQAwFryKpDWgUf1cRi7BGTeEquyqCeHeDx
- RTD8N4DUYJKhC55IMilUTdvkqcJuIX9LKijOVBGVVbmhKxhWxgnvXFl4zhxal3dUOGEmMCGexD
- L/2kPXg4Y3vcDABmZzGkAAAA=
-X-Change-ID: 20260412-airoha-fix-max-mtu-f9c7823ce2a2
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
- Lorenzo Bianconi <lorenzo@kernel.org>
-X-Mailer: b4 0.14.3
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:ygmowAAnmPj6U9tp5qa9AA--.387S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7Ary3JFWkJF43Xr1DGryDJrb_yoW8tr4rpF
+	W3Ja4UKryIyr4293W8Zw4rCFy3Ga1kJ3s3K395Cw43uFn0vw4kZFWrKFy2vr18JrZ5uFn2
+	yFWY9w1kA3ZIkrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBI1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
+	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
+	IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E
+	87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcV
+	Aq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r10
+	6r15McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64
+	vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0E
+	n4kS14v26r4a6rW5MxkIecxEwVAFwVW8ZwCF04k20xvY0x0EwIxGrwCF04k20xvE74AGY7
+	Cv6cx26r4rMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2Iq
+	xVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42
+	IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY
+	6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aV
+	CY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7sRi-BMJUUUUU==
+X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQAPCWnaCt8KkQAAs6
+X-Spamd-Result: default: False [0.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-277751-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	DMARC_NA(0.00)[lzu.edu.cn];
 	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-277752-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,gmail.com,lzu.edu.cn];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: DFF643E312A
+	R_DKIM_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: 3B7003E3134
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-According to the Airoha documentation, REG_GDM_LEN_CFG() register does not
-include FCS length. Fix MTU configuration removing ETH_FCS_LEN from
-maximum TX packet length configuration.
+From: Ruijie Li <ruijieli51@gmail.com>
 
-Fixes: 54d989d58d2ac ("net: airoha: Move min/max packet len configuration in airoha_dev_open()")
-Fixes: 03b1b69f0662c ("net: airoha: Introduce airoha_dev_change_mtu callback")
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
- drivers/net/ethernet/airoha/airoha_eth.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+If auxiliary_device_add() fails, add_adev() jumps to add_fail and calls
+auxiliary_device_uninit(adev).
 
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-index c14cdce588a7..a81ffda72b39 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.c
-+++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -1629,9 +1629,9 @@ static void airoha_update_hw_stats(struct airoha_gdm_port *port)
- 
- static int airoha_dev_open(struct net_device *dev)
- {
--	int err, len = ETH_HLEN + dev->mtu + ETH_FCS_LEN;
- 	struct airoha_gdm_port *port = netdev_priv(dev);
- 	struct airoha_qdma *qdma = port->qdma;
-+	int err, len = ETH_HLEN + dev->mtu;
- 
- 	netif_tx_start_all_queues(dev);
- 	err = airoha_set_vip_for_gdm_port(port, true);
-@@ -1833,7 +1833,7 @@ static int airoha_dev_change_mtu(struct net_device *dev, int mtu)
- {
- 	struct airoha_gdm_port *port = netdev_priv(dev);
- 	struct airoha_eth *eth = port->qdma->eth;
--	u32 len = ETH_HLEN + mtu + ETH_FCS_LEN;
-+	u32 len = ETH_HLEN + mtu;
- 
- 	airoha_fe_rmw(eth, REG_GDM_LEN_CFG(port->id),
- 		      GDM_LONG_LEN_MASK,
+The auxiliary device has its release callback set to adev_release(),
+which frees the containing struct mana_adev. Since adev is embedded in
+struct mana_adev, the subsequent fall-through to init_fail and access
+to adev->id may result in a use-after-free.
+
+Fix this by saving the allocated auxiliary device id in a local
+variable before calling auxiliary_device_add(), and use that saved id
+in the cleanup path after auxiliary_device_uninit().
+
+Fixes: a69839d4327d ("net: mana: Add support for auxiliary device")
+Cc: <stable@kernel.org>
+Reported-by: Yifan Wu <yifanwucs@gmail.com>
+Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+Co-developed-by: Yuan Tan <yuantan098@gmail.com>
+Signed-off-by: Yuan Tan <yuantan098@gmail.com>
+Suggested-by: Xin Liu <bird@lzu.edu.cn>
+Tested-by: Yuqi Xu<xuyuqiabc@gmail.com>
+Signed-off-by: LI Ruijie <ruijieli51@gmail.com>
+Signed-off-by: Ao Zhou <n05ec@lzu.edu.cn>
 
 ---
-base-commit: 02f72964395911e7a09bb2ea2fe6f79eda4ea2c2
-change-id: 20260412-airoha-fix-max-mtu-f9c7823ce2a2
+ drivers/net/ethernet/microsoft/mana/mana_en.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-Best regards,
+diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+index 9017e806ecda..dca62fb9a3a9 100644
+--- a/drivers/net/ethernet/microsoft/mana/mana_en.c
++++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+@@ -3425,6 +3425,7 @@ static int add_adev(struct gdma_dev *gd, const char *name)
+ 	struct auxiliary_device *adev;
+ 	struct mana_adev *madev;
+ 	int ret;
++	int id;
+ 
+ 	madev = kzalloc_obj(*madev);
+ 	if (!madev)
+@@ -3434,7 +3435,8 @@ static int add_adev(struct gdma_dev *gd, const char *name)
+ 	ret = mana_adev_idx_alloc();
+ 	if (ret < 0)
+ 		goto idx_fail;
+-	adev->id = ret;
++	id = ret;
++	adev->id = id;
+ 
+ 	adev->name = name;
+ 	adev->dev.parent = gd->gdma_context->dev;
+@@ -3460,7 +3462,7 @@ static int add_adev(struct gdma_dev *gd, const char *name)
+ 	auxiliary_device_uninit(adev);
+ 
+ init_fail:
+-	mana_adev_idx_free(adev->id);
++	mana_adev_idx_free(id);
+ 
+ idx_fail:
+ 	kfree(madev);
 -- 
-Lorenzo Bianconi <lorenzo@kernel.org>
 
 
