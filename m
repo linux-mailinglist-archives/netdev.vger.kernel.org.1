@@ -1,183 +1,146 @@
-Return-Path: <netdev+bounces-277752-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277753-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cq74FhlU22llAQkAu9opvQ
-	(envelope-from <netdev+bounces-277752-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 10:13:13 +0200
+	id f98LD+hV22nkAQkAu9opvQ
+	(envelope-from <netdev+bounces-277753-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 10:20:56 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B7003E3134
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 10:13:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E6293E3152
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 10:20:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 60F6C3019C88
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 08:13:10 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id CD3F93011C69
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 08:20:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5BF530B50F;
-	Sun, 12 Apr 2026 08:13:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED0461E1A17;
+	Sun, 12 Apr 2026 08:20:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ji7HQV7w"
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmja2lje4os4yms4ymjma.icoremail.net (zg8tmja2lje4os4yms4ymjma.icoremail.net [206.189.21.223])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14BB254763
-	for <netdev@vger.kernel.org>; Sun, 12 Apr 2026 08:13:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=206.189.21.223
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9B6F1A6824
+	for <netdev@vger.kernel.org>; Sun, 12 Apr 2026 08:20:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775981589; cv=none; b=jUyopNsDP05aoikipKh72tiWRKnyLkMRSA826I9mKjofQEPUeoJ0P4u77HyYItNqXt/s6Y2Al/3/II7VgBm6p+qfq3isbDhteLTQq0TYkk22swUs3i8CzJuVkKjhjgNne3UXPgzd7hCIMlTUCl6+bRPJb82AodxClWb4otCmQus=
+	t=1775982050; cv=none; b=ZIRniYH2z7LVAXnPPTieXgUqa9DYyQdMjxK6MaiS3Ih/wG1Pd35oNEBlnSijEYdSMs7LchANYfgtGuAU+twWELvsYHEHvzh/OQ6Mk9E1yBFPILp15OKDCOlLNrnXFFKDMA99GjDylXFwUgaKlzTIHikN0K4N6fSkSbOTgmQgao8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775981589; c=relaxed/simple;
-	bh=ki/8U3tYgUK9saqw7pOasuCi2zPQ+O16kWO6B95oJok=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nhznuoEglSUKMRghfFIy7+09Ay38+mUyhOc3NZLTzAoL/2b1MWB/6r4rlveswa2mHD6zQoyEWTQi81GSvP56YsQRB/j47Agirup2/84PJdKTFrdSEU5kquGHaoWVuf6+Jhhc6r8GW3BKDv8SpVc1bvdHIenvs+HYonX3ep4K3SQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=206.189.21.223
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
-Received: from Draw.localdomain (unknown [27.227.216.147])
-	by app1 (Coremail) with SMTP id ygmowAAnmPj6U9tp5qa9AA--.387S2;
-	Sun, 12 Apr 2026 16:12:42 +0800 (CST)
-From: Ao Zhou <n05ec@lzu.edu.cn>
-To: netdev@vger.kernel.org
-Cc: kys@microsoft.com,
-	haiyangz@microsoft.com,
-	wei.liu@kernel.org,
-	decui@microsoft.com,
-	longli@microsoft.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	ernis@linux.microsoft.com,
-	ssengar@linux.microsoft.com,
-	dipayanroy@linux.microsoft.com,
-	gargaditya@linux.microsoft.com,
-	shirazsaleem@microsoft.com,
-	kees@kernel.org,
-	leon@kernel.org,
-	Yifan Wu <yifanwucs@gmail.com>,
-	Juefei Pu <tomapufckgml@gmail.com>,
-	Yuan Tan <yuantan098@gmail.com>,
-	Xin Liu <bird@lzu.edu.cn>,
-	Ao Zhou <n05ec@lzu.edu.cn>,
-	ruijieli51@gmail.com
-Subject: [PATCH 1/1] net: mana: fix use-after-free in add_adev() error path
-Date: Sun, 12 Apr 2026 16:12:43 +0800
-Message-ID: <c4ea7d8907cf72b259bf70bd8c2e791e1c4ff70f.1774942606.git.623701471@qq.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <cover.1774942606.git.623701471@qq.com>
-References: <cover.1774942606.git.623701471@qq.com>
+	s=arc-20240116; t=1775982050; c=relaxed/simple;
+	bh=xKqI+P1KWypfWU+RDHzu5Y0I3ZlpFtGyeLcvopY078M=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=WC7Bfs0EwTeL05OyVsbc/1xsXxx0j9VaQmTQ3BDOvpr0F6F2dCPnY6JAY6bO6fAbnUGAoJzIfKufBKZxOMo3TKiuG6VfrtWyFUCaA7MAratiJcfFp1UxYXm792LSMPWiCWG2OkGLNRhOpq2sEJmaY1LAgB2EemRsbLAYd2XNptI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ji7HQV7w; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E23F7C19424;
+	Sun, 12 Apr 2026 08:20:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775982050;
+	bh=xKqI+P1KWypfWU+RDHzu5Y0I3ZlpFtGyeLcvopY078M=;
+	h=From:Date:Subject:To:Cc:From;
+	b=Ji7HQV7wLSHLqUrLUzL1+khHMwXGT4URcxRT0FBdqPaKR0vd5EQoJ6AUyFPTZGJs0
+	 PVh/K4BQDRl941ayzkF1iePDiMGgRNOHkA8Eb6B7eSscy77ZWfnloHtVwGqSD5lhw3
+	 5868NX8YKMPIdfIvp6iFYSiZQTo3K9l2H8UcAbYWtwFr2Nz8KhrraEELuE2Rpf2tn+
+	 9wsH5ncsllRsijOQQ6pYDk8DLSlFzHa8UqH2dPAdknn5lS/OnvH++H/DPOV3kIoSM2
+	 lbrSnv6jCd7pT30IlUkvU4GNROE5EanlRGtC17HYRig4gJoVP6ubd4lt3SEDlNrxJh
+	 M82wB4R9Jw7cQ==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Date: Sun, 12 Apr 2026 10:20:25 +0200
+Subject: [PATCH net] net: airoha: Wait for NPU PPE configuration to
+ complete in airoha_ppe_offload_setup()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:ygmowAAnmPj6U9tp5qa9AA--.387S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7Ary3JFWkJF43Xr1DGryDJrb_yoW8tr4rpF
-	W3Ja4UKryIyr4293W8Zw4rCFy3Ga1kJ3s3K395Cw43uFn0vw4kZFWrKFy2vr18JrZ5uFn2
-	yFWY9w1kA3ZIkrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBI1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
-	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
-	IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E
-	87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcV
-	Aq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r10
-	6r15McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64
-	vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0E
-	n4kS14v26r4a6rW5MxkIecxEwVAFwVW8ZwCF04k20xvY0x0EwIxGrwCF04k20xvE74AGY7
-	Cv6cx26r4rMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2Iq
-	xVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42
-	IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY
-	6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aV
-	CY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7sRi-BMJUUUUU==
-X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQAPCWnaCt8KkQAAs6
-X-Spamd-Result: default: False [0.54 / 15.00];
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260412-airoha-wait-for-npu-config-offload-setup-v1-1-f4e0aa2a5d85@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x2NQQrDMAzAvlJ8niEJ7WD7ytghNE5rGHZw0nVQ+
+ veFHnWQdEAlY6rwHA4w+nJllQ7+NsC8RlkIOXWG4MLdjT5gZNM14h65YVZDKRvOKpkX1Jw/GhN
+ WaltB/0hunELoUoKeK0aZf9fqBUIN3uf5B/Jyqfd/AAAA
+X-Change-ID: 20260412-airoha-wait-for-npu-config-offload-setup-19d04522412d
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
+ Lorenzo Bianconi <lorenzo@kernel.org>
+X-Mailer: b4 0.14.3
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	DMARC_NA(0.00)[lzu.edu.cn];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-277752-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-277753-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,gmail.com,lzu.edu.cn];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	R_DKIM_NA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 3B7003E3134
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 5E6293E3152
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Ruijie Li <ruijieli51@gmail.com>
+In order to properly enable flowtable hw offloading, poll
+REG_PPE_PPE_FLOW_CFG register in airoha_ppe_offload_setup routine and
+wait for NPU PPE configuration triggered by ppe_init callback to complete
+before running airoha_ppe_hw_init().
 
-If auxiliary_device_add() fails, add_adev() jumps to add_fail and calls
-auxiliary_device_uninit(adev).
+Fixes: 00a7678310fe3 ("net: airoha: Introduce flowtable offload support")
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+---
+ drivers/net/ethernet/airoha/airoha_ppe.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-The auxiliary device has its release callback set to adev_release(),
-which frees the containing struct mana_adev. Since adev is embedded in
-struct mana_adev, the subsequent fall-through to init_fail and access
-to adev->id may result in a use-after-free.
-
-Fix this by saving the allocated auxiliary device id in a local
-variable before calling auxiliary_device_add(), and use that saved id
-in the cleanup path after auxiliary_device_uninit().
-
-Fixes: a69839d4327d ("net: mana: Add support for auxiliary device")
-Cc: <stable@kernel.org>
-Reported-by: Yifan Wu <yifanwucs@gmail.com>
-Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-Co-developed-by: Yuan Tan <yuantan098@gmail.com>
-Signed-off-by: Yuan Tan <yuantan098@gmail.com>
-Suggested-by: Xin Liu <bird@lzu.edu.cn>
-Tested-by: Yuqi Xu<xuyuqiabc@gmail.com>
-Signed-off-by: LI Ruijie <ruijieli51@gmail.com>
-Signed-off-by: Ao Zhou <n05ec@lzu.edu.cn>
+diff --git a/drivers/net/ethernet/airoha/airoha_ppe.c b/drivers/net/ethernet/airoha/airoha_ppe.c
+index c2c32b6833df..52199f6b39f9 100644
+--- a/drivers/net/ethernet/airoha/airoha_ppe.c
++++ b/drivers/net/ethernet/airoha/airoha_ppe.c
+@@ -1332,6 +1332,7 @@ static int airoha_ppe_offload_setup(struct airoha_eth *eth)
+ 	struct airoha_npu *npu = airoha_ppe_npu_get(eth);
+ 	struct airoha_ppe *ppe = eth->ppe;
+ 	int err, ppe_num_stats_entries;
++	u32 val;
+ 
+ 	if (IS_ERR(npu))
+ 		return PTR_ERR(npu);
+@@ -1340,6 +1341,13 @@ static int airoha_ppe_offload_setup(struct airoha_eth *eth)
+ 	if (err)
+ 		goto error_npu_put;
+ 
++	/* Wait for NPU PPE configuration to complete */
++	err = read_poll_timeout(airoha_fe_rr, val, val, USEC_PER_MSEC,
++				100 * USEC_PER_MSEC, false, eth,
++				REG_PPE_PPE_FLOW_CFG(0));
++	if (err)
++		goto error_npu_put;
++
+ 	ppe_num_stats_entries = airoha_ppe_get_total_num_stats_entries(ppe);
+ 	if (ppe_num_stats_entries > 0) {
+ 		err = npu->ops.ppe_init_stats(npu, ppe->foe_stats_dma,
 
 ---
- drivers/net/ethernet/microsoft/mana/mana_en.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+base-commit: 02f72964395911e7a09bb2ea2fe6f79eda4ea2c2
+change-id: 20260412-airoha-wait-for-npu-config-offload-setup-19d04522412d
 
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-index 9017e806ecda..dca62fb9a3a9 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-@@ -3425,6 +3425,7 @@ static int add_adev(struct gdma_dev *gd, const char *name)
- 	struct auxiliary_device *adev;
- 	struct mana_adev *madev;
- 	int ret;
-+	int id;
- 
- 	madev = kzalloc_obj(*madev);
- 	if (!madev)
-@@ -3434,7 +3435,8 @@ static int add_adev(struct gdma_dev *gd, const char *name)
- 	ret = mana_adev_idx_alloc();
- 	if (ret < 0)
- 		goto idx_fail;
--	adev->id = ret;
-+	id = ret;
-+	adev->id = id;
- 
- 	adev->name = name;
- 	adev->dev.parent = gd->gdma_context->dev;
-@@ -3460,7 +3462,7 @@ static int add_adev(struct gdma_dev *gd, const char *name)
- 	auxiliary_device_uninit(adev);
- 
- init_fail:
--	mana_adev_idx_free(adev->id);
-+	mana_adev_idx_free(id);
- 
- idx_fail:
- 	kfree(madev);
+Best regards,
 -- 
+Lorenzo Bianconi <lorenzo@kernel.org>
 
 
