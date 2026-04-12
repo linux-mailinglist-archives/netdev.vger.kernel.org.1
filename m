@@ -1,134 +1,125 @@
-Return-Path: <netdev+bounces-277838-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277839-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cMHVOVTJ22nzGgkAu9opvQ
-	(envelope-from <netdev+bounces-277838-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 18:33:24 +0200
+	id aPgVL3LJ22nzGgkAu9opvQ
+	(envelope-from <netdev+bounces-277839-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 18:33:54 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54A2F3E4D3C
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 18:33:19 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57ECA3E4D59
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 18:33:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3185F300D0FF
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 16:32:50 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id BD2DF3002311
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 16:33:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D85832D0606;
-	Sun, 12 Apr 2026 16:32:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A8542C0F6D;
+	Sun, 12 Apr 2026 16:33:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="QSgjPB9B"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gjbPiP12"
 X-Original-To: netdev@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60E102BDC16;
-	Sun, 12 Apr 2026 16:32:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17E7D280CE5;
+	Sun, 12 Apr 2026 16:33:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776011562; cv=none; b=G4Jh3JidAkwZnu5JlNKpq/ml5jrcNP4lvts03omCK7JkJmKLFDEBtTVp/CdB1G3T3kYMI0QTj5VAJVZNAaDGJmbE4+15Kq7rbBVgP6ErD8Lsbx5yS4DaH+KtoyCtUBj1rcUVvrbU2jxDmRsQX3zzP5r450tkTjSyBmd5DgBwAaE=
+	t=1776011630; cv=none; b=EX2GWo3V8JjSnrKVDrCXdg/lA6v5flr/FNW7eTmissnKoGGSK1XXfJI2OQoqxWzA+3pZUYdv+dtsbC/CL+3zqejiEsJMIVhT/ixJg24wnGVyJYTKatWAaF5+AD8qBlnMONk82qxz4BPsxBcmttEAOD+Mf5FkrXzGc66xJKfIbgk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776011562; c=relaxed/simple;
-	bh=UjQDAId9WQdEAg14YypIOiJ/06HqP8HxWPyBiEuJ7Vc=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=iLBpbjVgfMI3Xu9cu+04UiHsNIWbqTYGNU3f/QOGdG/W9pEYAYctYVb+5Rqr4AdgQwEEXqS28hIf2FQl3GBopsIWDPZu4N/GDqxSxHOo6GzalylH8W5o0iHfkJVzttHSR4T+wZypvvJSJS4n4pPwBLSzYX/AYvOrkNXh3Lg6DeE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=QSgjPB9B; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
-	:MIME-Version:Message-ID:References:In-Reply-To:Subject:CC:To:From:Date:
-	Sender:Reply-To:Content-ID:Content-Description;
-	bh=BvEui7YzOMs2w83yqMw0LMQ9AQ/M/3wnsv2L1WGp8e4=; b=QSgjPB9B/Sj+3KZH4ndY9jr5mB
-	TIEXIglSf74En2XewCfvlhWvSY4eGfle08xn4+ovhgJLQZmnBw/LsI5T6QRsAloXkqQ6zSKlFbBhF
-	ObRALBfrj07p0909nEo/ruT8IDe+iQfibgwapCmxbyr12h1koWMWB7Ky57Zh3EcJwKbNA8OX3Ne1a
-	NqhuqaCsXpahW31yXyWRTbNkEQyIH/vuYD+4NTgs3SspvU207gDMuGHBQTW5kNAxw+72fT0u9C+TI
-	fA6qDGDAqG/xqF/cefcXokVCd32ZdQW1je9LvqSPwDhWcvD5th/iLziGx3LPFTlIMHDLzNfn20aLh
-	M0eV2LIw==;
-Received: from [2a02:8013:6d1:1:722c:2a9d:de6a:f9a7] (helo=ehlo.thunderbird.net)
-	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1wBxjT-0000000Fi0j-34FG;
-	Sun, 12 Apr 2026 16:32:24 +0000
-Date: Sun, 12 Apr 2026 17:32:22 +0100
-From: David Woodhouse <dwmw2@infradead.org>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: Wen Gu <guwen@linux.alibaba.com>, tglx@kernel.org, richardcochran@gmail.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- jstultz@google.com, anna-maria@linutronix.de, frederic@kernel.org,
- daniel.lezcano@kernel.org, sboyd@kernel.org, vladimir.oltean@nxp.com,
- wei.fang@nxp.com, xiaoning.wang@nxp.com, jonathan.lemon@gmail.com,
- vadim.fedorenko@linux.dev, yangbo.lu@nxp.com, svens@linux.ibm.com,
- nick.shi@broadcom.com, ajay.kaher@broadcom.com, alexey.makhalov@broadcom.com,
- bcm-kernel-feedback-list@broadcom.com, linux-fpga@vger.kernel.org,
- imx@lists.linux.dev, linux-s390@vger.kernel.org, dust.li@linux.alibaba.com,
- xuanzhuo@linux.alibaba.com, mani@kernel.org, imran.shaik@oss.qualcomm.com,
- taniya.das@oss.qualcomm.com
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v2_2/2=5D_MAINTAINERS=3A_update_PT?=
- =?US-ASCII?Q?P_maintainer_entries_after_directory_split?=
-User-Agent: K-9 Mail for Android
-In-Reply-To: <20260412084704.743482ad@kernel.org>
-References: <20260407104802.34429-1-guwen@linux.alibaba.com> <20260407104802.34429-3-guwen@linux.alibaba.com> <20260412084704.743482ad@kernel.org>
-Message-ID: <4B889ED5-D1F6-401D-B753-89AE2037F316@infradead.org>
+	s=arc-20240116; t=1776011630; c=relaxed/simple;
+	bh=9caTNklsKH5fwtpgjJv6ZfoD6CMjftVt24Y2Ka4Zvhc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=DeQCC7aZBsOhK3NJjjGW067bP5zA+xATDu/MSoqKhRQgyRZbwFN5k4kx5Awj2eAFAovNMGGgrtIhvnxX9OWSq8SDJhjJ+RtWP+La4oKNGRNQvK2TWEmb4dkd4B/+K4EdCJ6urvBTykgf51zgo7WXyfUhwceU6u5o2/v4fO1EjXE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gjbPiP12; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 531ECC19424;
+	Sun, 12 Apr 2026 16:33:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776011629;
+	bh=9caTNklsKH5fwtpgjJv6ZfoD6CMjftVt24Y2Ka4Zvhc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=gjbPiP12XtIgGGM/XVKBjv2XyIiTq2KjSPNxHQmxOVWgOSkiMxIQkqtFxYxe2HR1Z
+	 FtQ95YwAn6wSapoXvfxOsZPbNFS9AzEQ9h//uZBIiPcwO184ITTUOyQgndaZdXjb+7
+	 wmnXWaFfzlGkgFF2AgSmHI6uGlo+ZEuVH5sWnmZVeU81yT35U9Y1XWDe8JWepf8//O
+	 SJlc5nubMiDa3aBJGPbp7jckyUFfYQAfU23QkWdm+y7i/ZZCppdImh7f8Lfzkk8t29
+	 luGtD2rwtTPJMFdzBqCfmSGZIXkHGItotcHJTZ8PuWO0/nIAaoQghvhRc0FWQhLQly
+	 ZPRBQV6NlhwJw==
+Date: Sun, 12 Apr 2026 09:33:48 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jiayuan Chen <jiayuan.chen@linux.dev>, Eric Dumazet
+ <edumazet@google.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, David
+ Ahern <dsahern@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Weiming Shi <bestswngs@gmail.com>,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v2] net: fix __this_cpu_add() in preemptible code in
+ dev_xmit_recursion_inc/dec
+Message-ID: <20260412093348.45ce45b0@kernel.org>
+In-Reply-To: <20260410020631.191786-1-jiayuan.chen@linux.dev>
+References: <20260410020631.191786-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
-X-Spamd-Result: default: False [1.24 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	SUBJ_EXCESS_QP(1.20)[];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[linux.alibaba.com,kernel.org,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,vger.kernel.org,linutronix.de,nxp.com,linux.dev,linux.ibm.com,broadcom.com,lists.linux.dev,oss.qualcomm.com];
-	DKIM_TRACE(0.00)[infradead.org:?];
-	RCPT_COUNT_TWELVE(0.00)[34];
-	TAGGED_FROM(0.00)[bounces-277838-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,kernel.org,redhat.com,gmail.com];
+	TAGGED_FROM(0.00)[bounces-277839-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	DMARC_DNSFAIL(0.00)[infradead.org : SPF/DKIM temp error,none];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dwmw2@infradead.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.998];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	R_DKIM_TEMPFAIL(0.00)[infradead.org:s=desiato.20200630];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[alibaba.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 54A2F3E4D3C
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 57ECA3E4D59
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 12 April 2026 16:47:04 BST, Jakub Kicinski <kuba@kernel=2Eorg> wrote:
->On Tue,  7 Apr 2026 18:48:02 +0800 Wen Gu wrote:
->> +PTP EMULATED CLOCK SUPPORT
->> +M:	David Woodhouse <dwmw2@infradead=2Eorg>
->> +M:	Wen Gu <guwen@linux=2Ealibaba=2Ecom>
->> +M:	Xuan Zhuo <xuanzhuo@linux=2Ealibaba=2Ecom>
->> +L:	linux-kernel@vger=2Ekernel=2Eorg
->> +S:	Maintained
->> +T:	git git://git=2Ekernel=2Eorg/pub/scm/linux/kernel/git/tip/tip=2Egit=
- timers/core
->
->Hi David,
->
->Do you have a tree to route the patches thru? Or do you really have
->access to the tip tree?
+On Fri, 10 Apr 2026 10:06:30 +0800 Jiayuan Chen wrote:
+> dev_xmit_recursion_{inc,dec}() use __this_cpu_{inc,dec}() which requires
+> the caller to be non-preemptible in order to avoid cpu migration. However,
+> some callers like SCTP's UDP encapsulation path invoke iptunnel_xmit()
+> from process context without disabling BH or preemption:
+> 
+>   sctp_inet_connect -> __sctp_connect -> sctp_do_sm ->
+>   sctp_outq_flush -> sctp_packet_transmit -> sctp_v4_xmit ->
+>   udp_tunnel_xmit_skb -> iptunnel_xmit -> dev_xmit_recursion_inc
 
-I do not have access to the tip tree=2E I can make a shared tree on git=2E=
-infradead=2Eorg if the other two maintainers would like to send me a SSH pu=
-bkey and preferred username=2E=2E=2E
+Eric, weren't there also a bunch of RCU reports because of this path?
+Should we perhaps take the RCU read lock here?
+
+> +	guard(migrate)();
+
+Sorry but I detest the guard() usage. Please use migrate_disable()
+
+Quoting documentation:
+
+  Use of ``guard()`` is discouraged within any function longer than 20
+  lines, ``scoped_guard()`` is considered more readable. Using normal
+  lock/unlock is still (weakly) preferred.
+
+See:
+https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#using-device-managed-and-cleanup-h-constructs
 
