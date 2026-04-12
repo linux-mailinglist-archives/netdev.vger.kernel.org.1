@@ -1,193 +1,241 @@
-Return-Path: <netdev+bounces-277802-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277803-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YEogDVOm22nbEgkAu9opvQ
-	(envelope-from <netdev+bounces-277802-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 16:04:03 +0200
+	id T9yLGeKm22kSEwkAu9opvQ
+	(envelope-from <netdev+bounces-277803-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 16:06:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 858D23E421E
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 16:04:02 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0EBA3E4240
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 16:06:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1303B3058E1D
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 14:00:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0C5B3300E3A5
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 14:02:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A38578F26;
-	Sun, 12 Apr 2026 14:00:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AE5E1D130E;
+	Sun, 12 Apr 2026 14:02:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mGpQaASC"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="H1SHUp2R"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CF6A37C926
-	for <netdev@vger.kernel.org>; Sun, 12 Apr 2026 14:00:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D04D17B50A
+	for <netdev@vger.kernel.org>; Sun, 12 Apr 2026 14:02:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776002444; cv=none; b=OGQ8Y6n0sW1dRkimru3njdqOo+pqzshjKhzSmhId+a06rioFvNE9pRe74uJQnWVJTSeZrIvSZrK4Zlo8jrqmqiQUxcSxtC5mG6TVPtyFT+I4l0wdoi1KtDEP9sGHrYkKsE7p04GM1bzbkP1NpsVmfCl4cZwzpbJZTyC7XQoWEWE=
+	t=1776002539; cv=none; b=Tkn1MD4uEvYDXehEYXRM+IMxOJe+lL/9Q7aS9sDFCVHRKB/M2DiIV8qACmxIj0hXoyNPB1uDR5DVDZjfts0StOSbSaX1y1lWNj8X9mChrZq5IR6Iy/qklmzrYTaJ3EB01dLbjc7RoTLJCeJ5Gkgt1keZagoul8/ZmVVuDm8Muf0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776002444; c=relaxed/simple;
-	bh=zcEQ344RiBm7JrfsgTgQ4Lp6CjbZtUDRo6ogiL5TbHQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SdOJf+aDWYJ/Uskn/g97UQkSqEANi45wjd9MfvmAqxcuygc3DoCbJ05LF8yiRM5pGsIWsUzd7SZ6YYkmtu8LoV8UrjMaoTnhx6oktepNalAxzZwzLd11OilEeyy7Mb4bzG9uhHe/bXPzZic3qwHylUiWh6kswWVz9fsF2qao0aY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mGpQaASC; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-43cfce3a195so2198490f8f.2
-        for <netdev@vger.kernel.org>; Sun, 12 Apr 2026 07:00:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776002441; x=1776607241; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cNQ4/Bgols+4vK0uVdE0kuKThLWN9Gx/3rmL3xyL0Gc=;
-        b=mGpQaASClSZZdW3sshx72H505xOtSaza6rn+UfaUh2aTggWGRAJRfY+vTSxOGuuxZY
-         B6GOXBg+CcxaXmk7YkT6vy+d5Ms3EFQX4GoLtYeZg8EH8KgoLyPPDFDXolzzSbfNSXrZ
-         upuvIPMVjnsJTu9XNPmD2K9JftY6pdro0I4j2LasfhE0bivVOnEWYIEGpnBY9o+MFc4j
-         Z35+8gJuHvVQCJOSOPIwTRED3MhynjnpW8rSGAqTfciFNSOj3nX/1NUEuu/9gG7oj9nE
-         nUMouj/iQjrYpojI7ta/D62+I2x+jOcUKoLUbtdfpLBWZS2U2jgmKyfSfvFa8eaHo6Q9
-         lfIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776002441; x=1776607241;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=cNQ4/Bgols+4vK0uVdE0kuKThLWN9Gx/3rmL3xyL0Gc=;
-        b=Ww/8QDgQ6t7ZFKVqY8pp9VkK+YNIVfJVGnOrOPPua0kdKppO8XYvvvi8GJA8A0o75H
-         vSNeshMMHU1LnI5AG9dDseXEbRCaHl0W2mfTesfzFr0X3ijLz2laSO0Eky1LQx3WapW2
-         Db0vyFKtK2xd8zYG3fHiWuVLDgBe/ITJPX75viC31HOf7lfTBAvOKVc9PtAOat32xnZL
-         5or/igt2u2fBbgpXZ+4SPjaBMrSMmaeuu1mlUDbJcUvMAStE+kV2duJT0yXQObta1/5v
-         6b9ODsz8i89rXSeFVBbzJepS1FCSWo6jJEq3uEuiYhuYeyM1oz7XVUq6n5Za5WucoOWm
-         LpdA==
-X-Forwarded-Encrypted: i=1; AFNElJ+UrVyL+xZYmRESGDg8d/bzpm3lB59PRpcaQw7pS9DIUmLELSPQUXkzDX6nfxyLrf31m2fG+Gg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxKhWdNp/B6nPzTVzSTFiZhQCaBglLZy8UCJvbkk24YGbNXesPP
-	4NBKqSV6PKofvQznnplbYrdSkqu/dywNdq0VOYy0XIjSysK57E3MzCeQ
-X-Gm-Gg: AeBDieuKLL5yIeMLjL3mZnMNNZK9ikQSXlqfFk4Dvyedd8QzHd8297zCT9S67K7s8g4
-	an2qRHP4k1JmwnP1UvVYHJQGapMieFkNBDnPDeYiXcRAb9ashK/UHgpwtBemrTik6VTzSCyUkup
-	eGs/g/JCOnBfR1KoRWf3uEuSPLVP9mfI9G7YCBDfSbvE0jSEOW4DQSnYrp3h+UdZeHPmVzMtePD
-	GhH9oHZzqDPAvh/KfpaB78pwnXOVEDQtxs+8DVCkJm/85G9oBujPO/goXA3uRKdf0cn15SmyUiL
-	Wi8XVhnn5i70T2XA8WQ6o1ianphp7tmivxuKDqoxJJUrcOel4yEzgYIGr5rGQQybBsMtvI2Nt9b
-	fSyFgICyLv6FH0F640weGX+ZHEyRWULY6yHTBHaHrKPYQBvjnY8yL97JFY9kEynb1cGwXzpdTQX
-	q8Q1Y7Bz0arX31Vc95oUStb0N7njpIXs/hWlvpmFd57EeTJPSCi7Q2mxSVwxo=
-X-Received: by 2002:a5d:64c8:0:b0:43d:76b0:78e with SMTP id ffacd0b85a97d-43d76b0161cmr2231826f8f.14.1776002440962;
-        Sun, 12 Apr 2026 07:00:40 -0700 (PDT)
-Received: from localhost.localdomain ([2a00:23c4:a758:8a01:6956:2074:5220:4650])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43d63e50015sm26127538f8f.27.2026.04.12.07.00.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 12 Apr 2026 07:00:40 -0700 (PDT)
-From: Biju <biju.das.au@gmail.com>
-X-Google-Original-From: Biju <biju.das.jz@bp.renesas.com>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Biju Das <biju.das.jz@bp.renesas.com>,
-	Russell King <linux@armlinux.org.uk>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Prabhakar Mahadev Lad <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-	Biju Das <biju.das.au@gmail.com>,
-	linux-renesas-soc@vger.kernel.org
-Subject: [PATCH net-next v3 5/5] net: phy: Move phy_init_hw() from phy_resume() to __phy_resume()
-Date: Sun, 12 Apr 2026 15:00:27 +0100
-Message-ID: <20260412140032.122841-6-biju.das.jz@bp.renesas.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260412140032.122841-1-biju.das.jz@bp.renesas.com>
-References: <20260412140032.122841-1-biju.das.jz@bp.renesas.com>
+	s=arc-20240116; t=1776002539; c=relaxed/simple;
+	bh=wwX6mI3xqtGIgeIMKXJg5s5oy1QGAwj+DCbH2wyNQbE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=aaD50KO1p50ZDDodD/ssaatNAzIMDZ9CFlGZYLpFLVaxkrPEU8+FDHpxelwF1eYuIlB9hllXvHfj+N/VwKu6r8fUC1i0BQcobgS5dM7N9romWnTqhiThUewppYgHmEBtipi7U8O1ixqUXjsq7dZnz67B0mWS0kjycvWViJG6Pbs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=H1SHUp2R; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 9F15F4E425B6;
+	Sun, 12 Apr 2026 14:02:08 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 72DEA5FFB9;
+	Sun, 12 Apr 2026 14:02:08 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id E243710450084;
+	Sun, 12 Apr 2026 16:02:00 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1776002527; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=JyrBejDYNW+FyCRkORkAaICvUo5I+HducgLjouVMK8Q=;
+	b=H1SHUp2R7XPwq9Y3NwXMRHFL9rv7/aMub8BCAbRoGsvkYB4u71U8GqMr0QXdounn2viENY
+	zw3G2x+z9Klw5QjfVdizmvk0jI7B04AX8ZpmqkoYXAbeFu1wJzDgkp71lYhIS4ii9K1DLO
+	2vBkQPe+HymDPy73T1Zt7U+JzMzxPhWnTmACykWg7uU2kaUg26+Hy7YmTEntANuVJwSI5Z
+	fp/Nj7T8u6mUUN5VVT1D2vLWHunbpjWtrvRheLGMv9Hgjr9ibBUmcBN5hRHNkJy8NSyNam
+	n/pWT7WmiWvqGU8UnIetUuUX+/iR4SESagBhFHwYVzPsr6Qoq71fhkwp2d1B+A==
+Message-ID: <266998d8-7e38-4bae-a4df-2f889538fe88@bootlin.com>
+Date: Sun, 12 Apr 2026 16:01:59 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: stmmac: enable RPS and RBU interrupts
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+ Andrew Lunn <andrew@lunn.ch>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
+ Paolo Abeni <pabeni@redhat.com>, Sam Edwards <cfsworks@gmail.com>
+References: <E1wBBaR-0000000GZHR-1dbM@rmk-PC.armlinux.org.uk>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <E1wBBaR-0000000GZHR-1dbM@rmk-PC.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-277802-lists,netdev=lfdr.de];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-277803-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[bp.renesas.com,armlinux.org.uk,vger.kernel.org,glider.be,gmail.com];
-	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bijudasau@gmail.com,netdev@vger.kernel.org];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[foss.st.com,lunn.ch,davemloft.net,google.com,kernel.org,lists.infradead.org,st-md-mailman.stormreply.com,vger.kernel.org,redhat.com,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev,renesas];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev,kernel];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[bp.renesas.com:mid,renesas.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 858D23E421E
+	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:email]
+X-Rspamd-Queue-Id: A0EBA3E4240
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Biju Das <biju.das.jz@bp.renesas.com>
+Hi Russell,
 
-Now that redundant locking has been removed from PHY driver callbacks,
-phy_init_hw() can be called with phydev->lock held.
+On 10/04/2026 15:07, Russell King (Oracle) wrote:
+> Enable receive process stopped and receive buffer unavailable
+> interrupts, so that the statistic counters can be updated.
+> 
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> ---
+> Since we are seeing receive buffer exhaustion on several platforms,
+> let's enable the interrupts so the statistics we publish via ethtool -S
+> actually work to aid diagnosis. I've been in two minds about whether
+> to send this patch, but given the problems with stmmac at the moment,
+> I think it should be merged.
 
-Many MAC drivers and the phylink framework resume the PHY via
-phy_start(), which invokes __phy_resume() directly without going
-through phy_resume(). Keeping phy_init_hw() in phy_resume() means it
-is not called in this path.
+Looks like my reply to your original RFC was lost in limbo as the review/test tags are missing.
 
-Move phy_init_hw() into __phy_resume() so that PHY soft reset and
-re-initialisation happen unconditionally on every resume, regardless
-of which code path triggers it.
+Here's my original answer :
 
-Signed-off-by: Biju Das <biju.das.jz@bp.renesas.com>
----
-v3:
- * New patch.
----
- drivers/net/phy/phy_device.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-index 4a2b19d39373..16fc2fc63c50 100644
---- a/drivers/net/phy/phy_device.c
-+++ b/drivers/net/phy/phy_device.c
-@@ -1999,6 +1999,10 @@ int __phy_resume(struct phy_device *phydev)
- 
- 	lockdep_assert_held(&phydev->lock);
- 
-+	ret = phy_init_hw(phydev);
-+	if (ret)
-+		return ret;
-+
- 	if (!phydrv || !phydrv->resume)
- 		return 0;
- 
-@@ -2014,10 +2018,6 @@ int phy_resume(struct phy_device *phydev)
- {
- 	int ret;
- 
--	ret = phy_init_hw(phydev);
--	if (ret)
--		return ret;
--
- 	mutex_lock(&phydev->lock);
- 	ret = __phy_resume(phydev);
- 	mutex_unlock(&phydev->lock);
--- 
-2.43.0
+It works, I can indeed see the stats get properly updated on imx8mp 🙂
+
+There's one downside to it though, which is that as soon as we hit a situation
+where we don't have RX bufs available, this patchs has a tendancy to make things
+worse as we'll trigger interrupts for each packet we receive and that we can't
+process, making it even longer for queues to be refilled.
+
+It shows on iperf3 with small packets :
+
+---- Before patch, 17% packet loss on UDP 56 bytes packets -----------------
+
+# iperf3 -u -b 0 -l 56 -c 192.168.2.1 -R
+Connecting to host 192.168.2.1, port 5201
+Reverse mode, remote host 192.168.2.1 is sending
+[  5] local 192.168.2.18 port 47851 connected to 192.168.2.1 port 5201
+[ ID] Interval           Transfer     Bitrate         Jitter    Lost/Total Datagrams
+[  5]   0.00-1.00   sec  10.7 MBytes  90.0 Mbits/sec  0.003 ms  48550/249650 (19%)  
+[  5]   1.00-2.00   sec  11.3 MBytes  95.0 Mbits/sec  0.003 ms  41881/253832 (16%)  
+[  5]   2.00-3.00   sec  11.3 MBytes  94.9 Mbits/sec  0.002 ms  42060/253913 (17%)  
+[  5]   3.00-4.00   sec  11.3 MBytes  95.1 Mbits/sec  0.003 ms  41499/253785 (16%)  
+[  5]   4.00-5.00   sec  11.3 MBytes  94.6 Mbits/sec  0.003 ms  42663/253787 (17%)  
+[  5]   5.00-6.00   sec  11.3 MBytes  94.9 Mbits/sec  0.006 ms  41976/253719 (17%)  
+[  5]   6.00-7.00   sec  11.3 MBytes  94.5 Mbits/sec  0.003 ms  43133/253999 (17%)  
+[  5]   7.00-8.00   sec  11.3 MBytes  95.0 Mbits/sec  0.004 ms  41442/253579 (16%)  
+[  5]   8.00-9.00   sec  11.4 MBytes  95.2 Mbits/sec  0.004 ms  41518/254131 (16%)  
+[  5]   9.00-10.00  sec  11.2 MBytes  94.3 Mbits/sec  0.006 ms  43580/254143 (17%)  
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate         Jitter    Lost/Total Datagrams
+[  5]   0.00-10.00  sec   135 MBytes   114 Mbits/sec  0.000 ms  0/0 (0%)  sender
+[  5]   0.00-10.00  sec   112 MBytes  94.3 Mbits/sec  0.006 ms  428302/2534538 (17%)  receiver
+
+iperf Done.
+# ethtool -S eth1 | grep rx_buf_unav_irq
+     rx_buf_unav_irq: 0
+
+---- After patch, 22% packet loss on UDP 56 bytes packets ----------------------
+
+# iperf3 -u -b 0 -l 56 -c 192.168.2.1 -R
+Connecting to host 192.168.2.1, port 5201
+Reverse mode, remote host 192.168.2.1 is sending
+[  5] local 192.168.2.18 port 42121 connected to 192.168.2.1 port 5201
+[ ID] Interval           Transfer     Bitrate         Jitter    Lost/Total Datagrams
+[  5]   0.00-1.00   sec  10.3 MBytes  85.8 Mbits/sec  0.004 ms  55146/247172 (22%)  
+[  5]   1.00-2.00   sec  10.6 MBytes  89.1 Mbits/sec  0.003 ms  54699/253355 (22%)  
+[  5]   2.00-3.00   sec  10.6 MBytes  89.0 Mbits/sec  0.003 ms  55231/253887 (22%)  
+[  5]   3.00-4.00   sec  10.6 MBytes  88.9 Mbits/sec  0.003 ms  55138/253602 (22%)  
+[  5]   4.00-5.00   sec  10.6 MBytes  89.0 Mbits/sec  0.003 ms  54938/253722 (22%)  
+[  5]   5.00-6.00   sec  10.6 MBytes  88.9 Mbits/sec  0.003 ms  55273/253580 (22%)  
+[  5]   6.00-7.00   sec  10.6 MBytes  89.0 Mbits/sec  0.003 ms  55202/253986 (22%)  
+[  5]   7.00-8.00   sec  10.6 MBytes  89.1 Mbits/sec  0.003 ms  55047/253958 (22%)  
+[  5]   8.00-9.00   sec  10.6 MBytes  88.9 Mbits/sec  0.003 ms  55612/254140 (22%)  
+[  5]   9.00-10.00  sec  10.6 MBytes  89.0 Mbits/sec  0.003 ms  55683/254403 (22%)  
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate         Jitter    Lost/Total Datagrams
+[  5]   0.00-10.00  sec   135 MBytes   113 Mbits/sec  0.000 ms  0/0 (0%)  sender
+[  5]   0.00-10.00  sec   106 MBytes  88.7 Mbits/sec  0.003 ms  551969/2531805 (22%)  receiver
+
+iperf Done.
+# ethtool -S eth1 | grep rx_buf_unav_irq
+     rx_buf_unav_irq: 30624
+
+
+So clearly there are pros and cons with this, but I don't want to fall into the
+"let's not break microbenchmarks" pitfall.
+
+I personnaly find the stat useful, and that having the stat visible to user
+but stuck at 0 is misleading so,
+
+Tested-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+
+
+Maxime
+
+> 
+>  drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.h | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.h b/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.h
+> index af6580332d49..43b036d4e95b 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.h
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.h
+> @@ -99,6 +99,8 @@ static inline u32 dma_chanx_base_addr(const struct dwmac4_addrs *addrs,
+>  #define DMA_CHAN_INTR_ENA_NIE_4_10	BIT(15)
+>  #define DMA_CHAN_INTR_ENA_AIE_4_10	BIT(14)
+>  #define DMA_CHAN_INTR_ENA_FBE		BIT(12)
+> +#define DMA_CHAN_INTR_ENA_RPS		BIT(8)
+> +#define DMA_CHAN_INTR_ENA_RBU		BIT(7)
+>  #define DMA_CHAN_INTR_ENA_RIE		BIT(6)
+>  #define DMA_CHAN_INTR_ENA_TIE		BIT(0)
+>  
+> @@ -107,6 +109,8 @@ static inline u32 dma_chanx_base_addr(const struct dwmac4_addrs *addrs,
+>  					 DMA_CHAN_INTR_ENA_TIE)
+>  
+>  #define DMA_CHAN_INTR_ABNORMAL		(DMA_CHAN_INTR_ENA_AIE | \
+> +					 DMA_CHAN_INTR_ENA_RPS | \
+> +					 DMA_CHAN_INTR_ENA_RBU | \
+>  					 DMA_CHAN_INTR_ENA_FBE)
+>  /* DMA default interrupt mask for 4.00 */
+>  #define DMA_CHAN_INTR_DEFAULT_MASK	(DMA_CHAN_INTR_NORMAL | \
+> @@ -117,6 +121,8 @@ static inline u32 dma_chanx_base_addr(const struct dwmac4_addrs *addrs,
+>  					 DMA_CHAN_INTR_ENA_TIE)
+>  
+>  #define DMA_CHAN_INTR_ABNORMAL_4_10	(DMA_CHAN_INTR_ENA_AIE_4_10 | \
+> +					 DMA_CHAN_INTR_ENA_RPS | \
+> +					 DMA_CHAN_INTR_ENA_RBU | \
+>  					 DMA_CHAN_INTR_ENA_FBE)
+>  /* DMA default interrupt mask for 4.10a */
+>  #define DMA_CHAN_INTR_DEFAULT_MASK_4_10	(DMA_CHAN_INTR_NORMAL_4_10 | \
 
 
