@@ -1,129 +1,123 @@
-Return-Path: <netdev+bounces-277825-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277826-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CMGbLKTB22mTGAkAu9opvQ
-	(envelope-from <netdev+bounces-277825-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 18:00:36 +0200
+	id PV9cLurB22lNGQkAu9opvQ
+	(envelope-from <netdev+bounces-277826-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 18:01:46 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 094C63E4A57
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 18:00:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 10A1E3E4A5F
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 18:01:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1D48A3008786
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 16:00:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B80F5300F5FC
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 16:01:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F3AD21A459;
-	Sun, 12 Apr 2026 16:00:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 542F7233722;
+	Sun, 12 Apr 2026 16:01:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W++dJ+eW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZwuErRpA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CB031A3164
-	for <netdev@vger.kernel.org>; Sun, 12 Apr 2026 16:00:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 317ED1A3164;
+	Sun, 12 Apr 2026 16:01:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776009633; cv=none; b=aroXTgcEcQwIrdmSlJqykj54Hc53qqGJA9Pufny/eO4O1NQPcT7Qn6oe0WPlX6yALwqiTaO8/NY1wXR4t2PVgrd2pAudUOnnpLEausbkGHsW5++sTaZZ7F/WVxrR7ahSXugkKnFWzMzowm+gVijhjOLujridc8fYVF2phIzalaQ=
+	t=1776009703; cv=none; b=jOCYnmMAgrBXL57JqZ0kT49LuXoDW35Sj6AMUdUde7OxpMswMmhrhvKpBPvkgVgZHbMoH9Qxhr0g++vMGahEu5EfcDcArL98yFtA70M68v5Xv7BGhGmCXT1/s6uPBMP7pKSVEYWblUZ6yXRHBnpx0GhxHU2bBxkMwCTyF/l/9hM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776009633; c=relaxed/simple;
-	bh=owp6qGPOGlMuyriYkecntgmkvuclPl+fwS5LqVs2t7g=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=V9WNSPqrl8tWgmq/Iwnrd2X89aLYGaiA4yzQOgAnxyPToXYmW3s74gl7zriuUozoTJvCCwzj/aFXnq0u0mUox5DNMEiITCnIMH84FWDJqsf4BiP724j/mc7dqRG06dZwM3/KOZysGdDQZXo8FK79nnXujrmM5DTfwAcoVHAY548=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W++dJ+eW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2A5CC19424;
-	Sun, 12 Apr 2026 16:00:32 +0000 (UTC)
+	s=arc-20240116; t=1776009703; c=relaxed/simple;
+	bh=vgerdKwbuKZBjz+foaiZAMrqhC3fWccDQiaJc3XbjQY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=R3E4oqsqVEzjwYBPSC4F8PiMOBhPPEBwUsLmn2KsUND6VX2pvOvB2fLLIlkzdcZ3xhJs/4fG6H1yhCRuWie5Obnl35VtivySEP/DRoq+RpSqX2EnU1S98z/N/FtUQ/JzO7H3aQQsYqPkxO1skqbCW8cRWnjPsNyekcQ3DsWTvwM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZwuErRpA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F075C19424;
+	Sun, 12 Apr 2026 16:01:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776009633;
-	bh=owp6qGPOGlMuyriYkecntgmkvuclPl+fwS5LqVs2t7g=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=W++dJ+eW53675c296BmEKO/CbdOf5/cGWql+9UrWll2Ze+zR3ue6z2kGsUretLuDI
-	 0MC1THjhI0NxNNHy0rTy0VZNzN7Spsuibol+fB4gO5kMo7o0tJJfkJQEv2oBmHnAwz
-	 CLneMEqxhljYWp88UcIl+UVFrTi5Aq9f3CPoEA11SYHurtBwb2ijJHxiDqkN0UbSWf
-	 q44+mFyeaQKDn0ms0oiVGqPdNFFhM98U4GmOQmvIBtGccPmQNIpaoybj23tvgFtVHU
-	 xj8zcW66N8ReHKaEgB3L5FOS+bEeFNedizo26YYhD5HtJdMqEckTLmT4OZlayXCV5V
-	 1G7hPJDQhgbsQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B9EBA3809A8B;
-	Sun, 12 Apr 2026 16:00:06 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1776009702;
+	bh=vgerdKwbuKZBjz+foaiZAMrqhC3fWccDQiaJc3XbjQY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ZwuErRpAaZTRXLGMb9pKMGSgiVO5wHd48b2zLACZdbA/yqzhaVpYG/quJCWVE0mby
+	 9XZKEjxSSCRGSggD91/9SFaqqn07Ju9y3ZhRWBXrOgKyf7uKMKpW2MpJE3ym2GiZcV
+	 YgDox0yikcN/7wx3tRtyXrSwhBgqT+1G/dWKPekhF0PzFPmAVp8D7stTKZ+I2ftzeI
+	 RwxI3hz3HwYGYkj9h3auSAwSr09Erc6GZxMVTacNvS+TxepAmEyg2M7g626sTyFQIa
+	 CpFWDBT6TPJKuLkZdpTyRqWBJMhZtbP8igJSG7QB81Z/bNv4j8JFbSL73I5g/ay9r3
+	 u2DsuXkWsDdpA==
+Date: Sun, 12 Apr 2026 09:01:41 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Marek Vasut <marex@nabladev.com>
+Cc: netdev@vger.kernel.org, stable@vger.kernel.org, "David S. Miller"
+ <davem@davemloft.net>, Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet
+ <edumazet@google.com>, Nicolai Buchwitz <nb@tipi-net.de>, Paolo Abeni
+ <pabeni@redhat.com>, Ronald Wahl <ronald.wahl@raritan.com>, Yicong Hui
+ <yiconghui@gmail.com>, linux-kernel@vger.kernel.org
+Subject: Re: [net,PATCH v2] net: ks8851: Reinstate disabling of BHs around
+ IRQ handler
+Message-ID: <20260412090141.21bf1534@kernel.org>
+In-Reply-To: <20260408162535.98108-1-marex@nabladev.com>
+References: <20260408162535.98108-1-marex@nabladev.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v3] net/sched: cls_fw: fix NULL dereference of "old"
- filters before change()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177600960555.3326316.18419358454968114055.git-patchwork-notify@kernel.org>
-Date: Sun, 12 Apr 2026 16:00:05 +0000
-References: 
- <e39cbd3103a337f1e515d186fe697b4459d24757.1775661704.git.dcaratti@redhat.com>
-In-Reply-To: 
- <e39cbd3103a337f1e515d186fe697b4459d24757.1775661704.git.dcaratti@redhat.com>
-To: Davide Caratti <dcaratti@redhat.com>
-Cc: jhs@mojatatu.com, jiri@resnulli.us, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- xmei5@asu.edu, netdev@vger.kernel.org, victor@mojatatu.com
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,lunn.ch,google.com,tipi-net.de,redhat.com,raritan.com,gmail.com];
+	TAGGED_FROM(0.00)[bounces-277826-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TAGGED_FROM(0.00)[bounces-277825-lists,netdev=lfdr.de,netdevbpf];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[11];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 094C63E4A57
+X-Rspamd-Queue-Id: 10A1E3E4A5F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello:
+On Wed,  8 Apr 2026 18:24:58 +0200 Marek Vasut wrote:
+> If CONFIG_PREEMPT_RT=y is set AND the driver executes ks8851_irq() AND
+> KSZ_ISR register bit IRQ_RXI is set AND ks8851_rx_pkts() detects that
+> there are packets in the RX FIFO, then netdev_alloc_skb_ip_align() is
+> called to allocate SKBs. If netdev_alloc_skb_ip_align() is called with
+> BH enabled, local_bh_enable() at the end of netdev_alloc_skb_ip_align()
+> will call __local_bh_enable_ip(), which will call __do_softirq(), which
+> may trigger net_tx_action() softirq, which may ultimately call the xmit
+> callback ks8851_start_xmit_par(). The ks8851_start_xmit_par() will try
+> to lock struct ks8851_net_par .lock spinlock, which is already locked
+> by ks8851_irq() from which ks8851_start_xmit_par() was called. This
+> leads to a deadlock, which is reported by the kernel, including a trace
+> listed below.
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+lock_par is a spinlock, and AFAIU softirqs run in their on thread on RT.
+I'm not following.
 
-On Wed,  8 Apr 2026 17:24:36 +0200 you wrote:
-> Like pointed out by Sashiko [1], since commit ed76f5edccc9 ("net: sched:
-> protect filter_chain list with filter_chain_lock mutex") TC filters are
-> added to a shared block and published to datapath before their ->change()
-> function is called. This is a problem for cls_fw: an invalid filter
-> created with the "old" method can still classify some packets before it
-> is destroyed by the validation logic added by Xiang.
-> Therefore, insisting with repeated runs of the following script:
-> 
-> [...]
-
-Here is the summary with links:
-  - [net,v3] net/sched: cls_fw: fix NULL dereference of "old" filters before change()
-    https://git.kernel.org/netdev/net/c/65782b2db732
-
-You are awesome, thank you!
+The patch looks way to "advanced" for a driver. Something is going
+very wrong here. Or the commit message must be updated to explain
+it better to people like me. Or both.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
