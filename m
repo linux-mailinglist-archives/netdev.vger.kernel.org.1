@@ -1,216 +1,245 @@
-Return-Path: <netdev+bounces-277851-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277847-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kBQuBfTT22m7HAkAu9opvQ
-	(envelope-from <netdev+bounces-277851-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 19:18:44 +0200
+	id UAMMLY7T22m7HAkAu9opvQ
+	(envelope-from <netdev+bounces-277847-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 19:17:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6534B3E50DC
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 19:18:43 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FCA93E50A9
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 19:17:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 58B44302ED55
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 17:13:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 69FEF30087B4
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 17:13:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7873313E38;
-	Sun, 12 Apr 2026 17:13:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA6763081D6;
+	Sun, 12 Apr 2026 17:13:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g7VwjRcK"
+	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="AtlDHy3t";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Raca2YiA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fout-a5-smtp.messagingengine.com (fout-a5-smtp.messagingengine.com [103.168.172.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9785F313E24
-	for <netdev@vger.kernel.org>; Sun, 12 Apr 2026 17:13:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 758AD303CAB;
+	Sun, 12 Apr 2026 17:13:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776014024; cv=none; b=WRtkJvKDeHylpPNgOUEB/cM04cEdkzkoyUFG606UG7LEfRAZ4/2JKYVuUzXKASV1nBcoSx11eZGopg3nHaPajs9rzAp5bB8z6YCciGPYV2JdBrlFlDEueBOU0Qx0wRPms9y3XoaSXYejdVmlg1N1F1Cmwaef0Vx5Xl8B3pzWld0=
+	t=1776014007; cv=none; b=ANm+7B3hSq1PsZqIvEouUO4EyitbTbPQxgvRl0cLw9NuAd9rSQTUU5ZF4BX3O5h2B2Daz5TLCqaRtNAvjV2x7vowU/wS3S7SHCChRorhGKz8QTtK9rzHxZDr93prFoW48X1Z+pNJH3ekARTYstVJGnVpETi6l8GdWPEAaQESa1s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776014024; c=relaxed/simple;
-	bh=BwXzSKo8O6XZ4uKlUSwMzQY2fTA/0n/oxvStx7Ka5oM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=GlMCsKB66aGPpUEjyCfI+fIZu6C1Bhoco9MWjER9OlZr+8Xb4PkfYUA02TbXfD3vOrcm8FmO/k7OnSz6y7RBDvlzuy7RMTmi3EvDaNF6MDX9bDiCmNjwNW+wnFX8/ogqYm55+obNODsRLFYo5vkq2fq/LPlBima11Mh+5YW3NYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g7VwjRcK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8228C19424;
-	Sun, 12 Apr 2026 17:13:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776014024;
-	bh=BwXzSKo8O6XZ4uKlUSwMzQY2fTA/0n/oxvStx7Ka5oM=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=g7VwjRcKwFy7gc7X/oa6VeIRpU4Tk/HA1FXGoi5k9c4RH3PiLaA36raLAJw6wnO24
-	 WgouBjti2v0hnGvVCwXQuMVwLf0nUvk/PsuZp8cPZVyEWhAtdeu6t/PqpoH3G0l51H
-	 K/zt9lTBgho3rsapudLiFwFuAqFtvTkP8LNNwJh+LrA+9eCnAsXs4MTJ0YaI3M8ho3
-	 pY/NT5vTdsnkgfRPY6C7X7Ap/0lU2DhItyRBXs07VlQwsEu/3X32ZU/6BGCjfhmB3v
-	 Vx87RG4SMWw8uSfKJO/FqvhcDvZc6nnZKwkqVC+VCFIV8jq/S1npptrGx3jF0KksFF
-	 y8AfL9AhvIOiQ==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Sun, 12 Apr 2026 19:13:14 +0200
-Subject: [PATCH net-next 3/3] net: airoha: Rely on net_device pointer in
- ETS callbacks
+	s=arc-20240116; t=1776014007; c=relaxed/simple;
+	bh=39JX7mOtNhsldORKgBwOADkTQ2nxQT4XamazNshont4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BEiZWEOddWrI5Gio9PlmEPKguPt2QhYRZCVF6HazLr4yLQEJOTv0bv8eifAeyfrCu8JxbaTBuAilrpgxBAbu72ixygEQ5M+mnKhNURgXqIfdc3QsN7aEQwiyiikPXCla2COEubqtBEXyJcF0ZniMhR7MdYHCWIcWdtWTS9azork=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=AtlDHy3t; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Raca2YiA; arc=none smtp.client-ip=103.168.172.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
+Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
+	by mailfout.phl.internal (Postfix) with ESMTP id 81710EC0098;
+	Sun, 12 Apr 2026 13:13:24 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-06.internal (MEProxy); Sun, 12 Apr 2026 13:13:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm1; t=1776014004;
+	 x=1776100404; bh=7f1hmyeIgfebnGinJ8rs0t5a3jQvl9wpW1r29MsIhUI=; b=
+	AtlDHy3tkkMGrCo0+vZJ+mAcLPGVGBzuUZf1+o6FDuQa+nKonsBX2AHrMT7CL7tN
+	oFcCXXWhOdMG0Vss5SetIWuX/9lpl9IYKe5J0xpYUKzmKbJhGpXWIV+0pOLsuKAG
+	UaAGSTzV/6yN1gbdzJxGk78mIDP2aQiA8R0jAb2nDybqytnV32xov0B+/w0Fq6Pk
+	kj9SVOuO4sN7p6E2KIqnANeXpcVIkQiTYGTidjy1hDTLMupU+x4nqTEymBFsF4Ea
+	bpqTKpKcbOq5GmKS0JFn9ejnU6jQSx0SPgD/o7QV4EDyqZQ2SPOfG4+G50Zp7A/l
+	lkHPkIS69irmS88PwfVbGg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1776014004; x=
+	1776100404; bh=7f1hmyeIgfebnGinJ8rs0t5a3jQvl9wpW1r29MsIhUI=; b=R
+	aca2YiArd/06bl2M/2WX+r4ac51k9yxGQgbux667vG6tKLSSsv0qLaG7C4WwZapa
+	ZcFamUFije4qze1Aqw+/7gPg67D6BvKxl0xSs2fTFV0/2cprnVnKtBTYFKfpOFlt
+	vrUOOPyCasCNi617sXE9C06oUz6pJ9wDlm9Q3nzzrxyijZy82qWyaM1NsQmDzMFZ
+	fBrA7TihCfMaebgLMD+M6lQ7jsNkzrMjfnO00vBkORqZ7OU990Nn7ZV7NaXV6Y8n
+	aB0tjphSB0yE6aCFxlKm0zXcW9qtzn5w0VaJ2MafXoPfui4OqMeSVm++gWgORCDW
+	aU/khkcBn0o3PJufnm3Tg==
+X-ME-Sender: <xms:s9Lbacej95EpFHTOC-XMJel27RfKtVWQywy5grQA1Mt-Z9gHuCwvJA>
+    <xme:s9LbaRSHfmHv4oYME_qMuzd93_7WU5merQOxufcNuSzQGoyn0G4MSkJKx8cyEOxqE
+    DpLhMwsBuRBbsBv1HhWn0ijtu18QZ1l2pKDSC73SGIgpztxxU67jibS>
+X-ME-Received: <xmr:s9LbaYJTyWpPoOHmqFmYTpJh_IpCUUn6tyPisVZCET3fqN95rF8MkLVens3118gJW9itVcjeVs39iStap9-8cqMPy3cgrSYgI-mL>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdefheekkecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpeffhffvvefukfhfgggtugfgjgesthekredttddtjeenucfhrhhomheppfhikhhlrghs
+    ucfunpguvghrlhhunhguuceonhhikhhlrghsrdhsohguvghrlhhunhguodhrvghnvghsrg
+    hssehrrghgnhgrthgvtghhrdhsvgeqnecuggftrfgrthhtvghrnhepkeegveffvdejheff
+    ieduleffkeeiteegieehkeetgeethefhvdfgkeetfeeuhfeknecuffhomhgrihhnpeguth
+    hsrdhimhenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhm
+    pehnihhklhgrshdrshhouggvrhhluhhnugdorhgvnhgvshgrshesrhgrghhnrghtvggthh
+    drshgvpdhnsggprhgtphhtthhopedutddpmhhouggvpehsmhhtphhouhhtpdhrtghpthht
+    ohepghgvvghrtheslhhinhhugidqmheikehkrdhorhhgpdhrtghpthhtohephihoshhhih
+    hhihhrohdrshhhihhmohgurgdruhhhsehrvghnvghsrghsrdgtohhmpdhrtghpthhtohep
+    phgruhhlsehpsggrrhhkvghrrdguvghvpdhrtghpthhtoheprghnughrvgifodhnvghtug
+    gvvheslhhunhhnrdgthhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhn
+    vghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtth
+    hopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvggu
+    hhgrthdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdroh
+    hrgh
+X-ME-Proxy: <xmx:s9LbaeLRmekTnlK_fLYcotezPLtwQeB0oe2850yVE2GNXbl39VDUcg>
+    <xmx:s9LbaTjSJ7WlkIYmI4JqDzKJm_kvVZirnezAtYBTix3dxVA_-7TrYQ>
+    <xmx:s9LbaYPi5AaKBLZwR954g2-QmbAMYxvmoQvJNMDQpzeICKkLpSOorg>
+    <xmx:s9LbaerlNIf9japYcJ8_FmMly7nylkO0mVOcrklVomC-qYYpd9g5GQ>
+    <xmx:tNLbac9II8u-N1M_uiKcwQ5CHdKWJ_sLe2L0-bhLVqxaMGSYPdUgQfFl>
+Feedback-ID: i80c9496c:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
+ 12 Apr 2026 13:13:23 -0400 (EDT)
+Date: Sun, 12 Apr 2026 19:13:21 +0200
+From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	Paul Barker <paul@pbarker.dev>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
+Subject: Re: [net-next] net: ethernet: ravb: Suspend and resume the
+ transmission flow
+Message-ID: <20260412171321.GA1520797@ragnatech.se>
+References: <20260401183608.1852225-1-niklas.soderlund+renesas@ragnatech.se>
+ <CAMuHMdWnjV=HGE1o08zLhUfTgOSene5fYx1J5GG10mB+Toq8qg@mail.gmail.com>
+ <20260407185443.GC2551274@ragnatech.se>
+ <CAMuHMdULBf3fBZU62F3YgBtJGzyTQgM-S-c9rhtX=cUCkqDQbA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260412-airoha-multi-serdes-preliminary-patch-v1-3-08d5b670ca8f@kernel.org>
-References: <20260412-airoha-multi-serdes-preliminary-patch-v1-0-08d5b670ca8f@kernel.org>
-In-Reply-To: <20260412-airoha-multi-serdes-preliminary-patch-v1-0-08d5b670ca8f@kernel.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
- Xuegang Lu <xuegang.lu@airoha.com>, Lorenzo Bianconi <lorenzo@kernel.org>
-X-Mailer: b4 0.14.3
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAMuHMdULBf3fBZU62F3YgBtJGzyTQgM-S-c9rhtX=cUCkqDQbA@mail.gmail.com>
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[ragnatech.se,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[ragnatech.se:s=fm1,messagingengine.com:s=fm2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-277851-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[ragnatech.se:+,messagingengine.com:+];
+	TAGGED_FROM(0.00)[bounces-277847-lists,netdev=lfdr.de,renesas];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[niklas.soderlund@ragnatech.se,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 6534B3E50DC
+X-Rspamd-Queue-Id: 1FCA93E50A9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Remove airoha_gdm_port dependency in ETS tc callback signatures and rely
-on net_device pointer instead. Please note this patch does not introduce
-any logical change and it is a preliminary patch in order to support
-multiple net_devices connected to the same GDM3 or GDM4 port via an
-external hw arbiter.
+Hi Geert,
 
-Tested-by: Xuegang Lu <xuegang.lu@airoha.com>
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
- drivers/net/ethernet/airoha/airoha_eth.c | 30 ++++++++++++++----------------
- 1 file changed, 14 insertions(+), 16 deletions(-)
+On 2026-04-08 09:44:33 +0200, Geert Uytterhoeven wrote:
+> Hi Niklas,
+> 
+> On Tue, 7 Apr 2026 at 20:54, Niklas Söderlund
+> <niklas.soderlund+renesas@ragnatech.se> wrote:
+> > On 2026-04-07 11:03:38 +0200, Geert Uytterhoeven wrote:
+> > > On Wed, 1 Apr 2026 at 20:39, Niklas Söderlund
+> > > <niklas.soderlund+renesas@ragnatech.se> wrote:
+> > > >
+> > > > From: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+> > > >
+> > > > The current driver does not follow the latest datasheet and does not
+> > > > suspend the flow when stopping DMA and resume it when starting. Update
+> > > > the driver to do so.
+> > > >
+> > > > Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+> > > > [Niklas: Rebase from BSP and reword commit message]
+> > > > Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+> > >
+> > > Thanks for your patch, which is now commit 353d8e7989b6babe ("net:
+> > > ethernet: ravb: Suspend and resume the transmission flow") in
+> > > linux-next/master net-next.
+> > >
+> > > > --- a/drivers/net/ethernet/renesas/ravb_main.c
+> > > > +++ b/drivers/net/ethernet/renesas/ravb_main.c
+> > > > @@ -694,6 +694,9 @@ static int ravb_dmac_init(struct net_device *ndev)
+> > > >         const struct ravb_hw_info *info = priv->info;
+> > > >         int error;
+> > > >
+> > > > +       /* Clear transmission suspension */
+> > > > +       ravb_modify(ndev, CCC, CCC_DTSR, 0);
+> > > > +
+> > > >         /* Set CONFIG mode */
+> > > >         error = ravb_set_opmode(ndev, CCC_OPC_CONFIG);
+> > > >         if (error)
+> > > > @@ -1103,6 +1106,12 @@ static int ravb_stop_dma(struct net_device *ndev)
+> > > >         if (error)
+> > > >                 return error;
+> > > >
+> > > > +       /* Request for transmission suspension */
+> > > > +       ravb_modify(ndev, CCC, CCC_DTSR, CCC_DTSR);
+> > > > +       error = ravb_wait(ndev, CSR, CSR_DTS, CSR_DTS);
+> > > > +       if (error)
+> > > > +               netdev_err(ndev, "failed to stop AXI BUS\n");
+> > >
+> > > This error message is printed during resume from s2idle or s2ram on
+> > > e.g. Salvator-XS and Gray Hawk Single.  Ethernet (nfsroot) still works
+> > > fine, though.
+> >
+> > I was not able to reproduce this on M3N (r8a77965-salvator-xs.dts) nor
+> > Sparrow Hawk (r8a779g3-sparrow-hawk.dts). I'm using the following to
+> > test, is your test-case different?
+> >
+> >   # echo enabled > /sys/class/tty/ttySC0/power/wakeup
+> >   # echo s2idle > /sys/power/mem_sleep
+> >   # echo 0 > /sys/module/printk/parameters/console_suspend
+> >   # echo mem > /sys/power/state
+> 
+> Looks good. Major difference seems to be that I use either Wake-on-LAN
+> or gpio-keys wake-up, and I always have WoL enabled for ravb.
 
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-index c2b5fcffce82..d426dc173d99 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.c
-+++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -2138,10 +2138,11 @@ airoha_ethtool_get_rmon_stats(struct net_device *dev,
- 	} while (u64_stats_fetch_retry(&port->stats.syncp, start));
- }
- 
--static int airoha_qdma_set_chan_tx_sched(struct airoha_gdm_port *port,
-+static int airoha_qdma_set_chan_tx_sched(struct net_device *dev,
- 					 int channel, enum tx_sched_mode mode,
- 					 const u16 *weights, u8 n_weights)
- {
-+	struct airoha_gdm_port *port = netdev_priv(dev);
- 	int i;
- 
- 	for (i = 0; i < AIROHA_NUM_TX_RING; i++)
-@@ -2173,17 +2174,15 @@ static int airoha_qdma_set_chan_tx_sched(struct airoha_gdm_port *port,
- 	return 0;
- }
- 
--static int airoha_qdma_set_tx_prio_sched(struct airoha_gdm_port *port,
--					 int channel)
-+static int airoha_qdma_set_tx_prio_sched(struct net_device *dev, int channel)
- {
- 	static const u16 w[AIROHA_NUM_QOS_QUEUES] = {};
- 
--	return airoha_qdma_set_chan_tx_sched(port, channel, TC_SCH_SP, w,
-+	return airoha_qdma_set_chan_tx_sched(dev, channel, TC_SCH_SP, w,
- 					     ARRAY_SIZE(w));
- }
- 
--static int airoha_qdma_set_tx_ets_sched(struct airoha_gdm_port *port,
--					int channel,
-+static int airoha_qdma_set_tx_ets_sched(struct net_device *dev, int channel,
- 					struct tc_ets_qopt_offload *opt)
- {
- 	struct tc_ets_qopt_offload_replace_params *p = &opt->replace_params;
-@@ -2224,20 +2223,21 @@ static int airoha_qdma_set_tx_ets_sched(struct airoha_gdm_port *port,
- 	else if (nstrict < AIROHA_NUM_QOS_QUEUES - 1)
- 		mode = nstrict + 1;
- 
--	return airoha_qdma_set_chan_tx_sched(port, channel, mode, w,
-+	return airoha_qdma_set_chan_tx_sched(dev, channel, mode, w,
- 					     ARRAY_SIZE(w));
- }
- 
--static int airoha_qdma_get_tx_ets_stats(struct airoha_gdm_port *port,
--					int channel,
-+static int airoha_qdma_get_tx_ets_stats(struct net_device *dev, int channel,
- 					struct tc_ets_qopt_offload *opt)
- {
-+	struct airoha_gdm_port *port = netdev_priv(dev);
- 	u64 cpu_tx_packets = airoha_qdma_rr(port->qdma,
- 					    REG_CNTR_VAL(channel << 1));
- 	u64 fwd_tx_packets = airoha_qdma_rr(port->qdma,
- 					    REG_CNTR_VAL((channel << 1) + 1));
- 	u64 tx_packets = (cpu_tx_packets - port->cpu_tx_packets) +
- 			 (fwd_tx_packets - port->fwd_tx_packets);
-+
- 	_bstats_update(opt->stats.bstats, 0, tx_packets);
- 
- 	port->cpu_tx_packets = cpu_tx_packets;
-@@ -2246,7 +2246,7 @@ static int airoha_qdma_get_tx_ets_stats(struct airoha_gdm_port *port,
- 	return 0;
- }
- 
--static int airoha_tc_setup_qdisc_ets(struct airoha_gdm_port *port,
-+static int airoha_tc_setup_qdisc_ets(struct net_device *dev,
- 				     struct tc_ets_qopt_offload *opt)
- {
- 	int channel;
-@@ -2259,12 +2259,12 @@ static int airoha_tc_setup_qdisc_ets(struct airoha_gdm_port *port,
- 
- 	switch (opt->command) {
- 	case TC_ETS_REPLACE:
--		return airoha_qdma_set_tx_ets_sched(port, channel, opt);
-+		return airoha_qdma_set_tx_ets_sched(dev, channel, opt);
- 	case TC_ETS_DESTROY:
- 		/* PRIO is default qdisc scheduler */
--		return airoha_qdma_set_tx_prio_sched(port, channel);
-+		return airoha_qdma_set_tx_prio_sched(dev, channel);
- 	case TC_ETS_STATS:
--		return airoha_qdma_get_tx_ets_stats(port, channel, opt);
-+		return airoha_qdma_get_tx_ets_stats(dev, channel, opt);
- 	default:
- 		return -EOPNOTSUPP;
- 	}
-@@ -2807,11 +2807,9 @@ static int airoha_tc_setup_qdisc_htb(struct net_device *dev,
- static int airoha_dev_tc_setup(struct net_device *dev, enum tc_setup_type type,
- 			       void *type_data)
- {
--	struct airoha_gdm_port *port = netdev_priv(dev);
--
- 	switch (type) {
- 	case TC_SETUP_QDISC_ETS:
--		return airoha_tc_setup_qdisc_ets(port, type_data);
-+		return airoha_tc_setup_qdisc_ets(dev, type_data);
- 	case TC_SETUP_QDISC_HTB:
- 		return airoha_tc_setup_qdisc_htb(dev, type_data);
- 	case TC_SETUP_BLOCK:
+WoL was indeed the key.
+
+Having iperf3 blasting traffic to the target made no difference and 
+access to URAM is allowed to be suspended and no warning was triggered,
+however just enabling WoL and no traffic.
+
+    # ethtool -s end0 wol g
+
+And URAM access will not be suspended and reported active when checking 
+DTS in CSR register and this warning will be printed. I will send a 
+patch to ignore the check if WoL is enabled (when net-next open), but 
+still keep the request to stop URAM access. Nice catch!
+
+> 
+> Gr{oetje,eeting}s,
+> 
+>                         Geert
+> 
+> -- 
+> Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+> 
+> In personal conversations with technical people, I call myself a hacker. But
+> when I'm talking to journalists I just say "programmer" or something like that.
+>                                 -- Linus Torvalds
 
 -- 
-2.53.0
-
+Kind Regards,
+Niklas Söderlund
 
