@@ -1,78 +1,67 @@
-Return-Path: <netdev+bounces-277808-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277809-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qBxrOVKx22lkFAkAu9opvQ
-	(envelope-from <netdev+bounces-277808-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 16:50:58 +0200
+	id UKSEGKWx22lkFAkAu9opvQ
+	(envelope-from <netdev+bounces-277809-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 16:52:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52BE73E4601
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 16:50:58 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C81883E4631
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 16:52:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id EA82F300AEE6
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 14:50:56 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7E75D300B57F
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 14:52:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 085DA19DF6A;
-	Sun, 12 Apr 2026 14:50:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF0D23081DF;
+	Sun, 12 Apr 2026 14:52:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qn/duyMb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uctA/RbY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8AFD2B9BA;
-	Sun, 12 Apr 2026 14:50:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABEE6125A9;
+	Sun, 12 Apr 2026 14:52:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776005455; cv=none; b=uZ+IRjX7m0aG136cHMR9zP+2faDweVyBPrrz6NDEmSYgxoq/avDUzkJP3j6FvMW93YDjImPrQUyj2mUGROk+vHSVY5IQTxftaZhLmHKaeX0ivS41kyyIZj9Qsg8JtXyG7Vt2L6eRM06f17iuLRPQ4gnq9M9CdRym+PT0+NHsARk=
+	t=1776005536; cv=none; b=VLFIbUrIcqHBK+z1UHe4bYj5coZ71cjLSuIhVFTwhhZ5ZFqxVJ36zXO07L7vGGJ0CNyQxh7THZw9vaWu0e9QK9TvOv0Z50ekLxu71ljWXIARmE5PCejjtAa08KJyvIaVTHO3C7W/Ty/jBetAUQB4KtCWrHQEwzRUIpklzD3GoiM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776005455; c=relaxed/simple;
-	bh=S32mcILpghlDeygeLc6FWvgkzRilryCAAV2qjAvE7zU=;
+	s=arc-20240116; t=1776005536; c=relaxed/simple;
+	bh=9m1OPLncfn29O6rzvkC43n0KxhQdSV1Gi/0mQAATyCA=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=otJ0ztobb8UQF2HenUgmBpvo4ILO0HPIYhdXmoM1pDvcLqH4yeB0Bewmv+MOprrhXFYL+jTT7KlFZP9bpA6sddoMw4kbfPLgZk+8B/oFgvTVtNJ1V5UUfBTO9CHiCsKw2tg3MYWjuH2AqPeW2A4QvOKfj5+EIq8tr15N7Nu38S4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qn/duyMb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A897EC19424;
-	Sun, 12 Apr 2026 14:50:54 +0000 (UTC)
+	 MIME-Version:Content-Type; b=u0yeEM0IPHwoFiS7f0+Itw9mW+hHsycM5DA3GozOlpvl2VKgbPICc+GwjCQD0hD/o+1uvJKuaSVaDBpOK2d9kN4aEnQ2fsiw6H1qGRQSuMa9M36Lh0BH2m9kyyZYl17/+F8/QhX9tGQHiHQPdBXDNrEF0jFkW7Ab0lnbCGraRYI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uctA/RbY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3467C19424;
+	Sun, 12 Apr 2026 14:52:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776005455;
-	bh=S32mcILpghlDeygeLc6FWvgkzRilryCAAV2qjAvE7zU=;
+	s=k20201202; t=1776005536;
+	bh=9m1OPLncfn29O6rzvkC43n0KxhQdSV1Gi/0mQAATyCA=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=qn/duyMbgo37GSHoV3G2LBAX/Q7Mg5TMfft/GqI9baJml7Kwngrxp/fKSpMtigjBU
-	 0RdXxHMONadZFd5hcDODRKBnRb1Z+LBlTCl+qA7Ki0xOOh/+9n6HMAeF/opCr577sK
-	 4+tTD7qROvuftcL1WMYzeOyQusfrjlpRmShhqMJMAEDWHabDrxj8NPTm44YAeI78DN
-	 WzDqZMWe4AtHofPAUKpyMjL4D5bIy4r+CuUtM7lBGNj79HsgP8DdQ5ve0NpmxRB+hc
-	 HIOEq/86m3ca2jWogZRdXjP6MgBducQ3TztjaXEN7BgRM/zXG8q7AattQu4ttOZGxu
-	 SPLb53CxJwrZA==
-Date: Sun, 12 Apr 2026 07:50:53 -0700
+	b=uctA/RbY5QPDddBTqYEBenaPzrCCVEDEzPU2fxZVji9bGIWtV7VzWBDAaKXn07TzQ
+	 nER9SjRjgTfsmh1mXpDLrvvHnQUhGB4Ajr56Ihf94az3LKpud8EAT8wa7f+HJjB9xS
+	 deN8F9N4HwiFC//nMeMh3E9e4sb/ZmzmMAInpyq7LFJE8M/4LyKkI1XJwHUAgBSG7d
+	 deOH/Y+34rOvM6QdDXs9it4YGagNUCHOBl5IyQR9Tht5JSAyX/uhSITqBhQE4Mw4/Q
+	 YUq75PifVlbPmx0dcIX2Lx9TPJ+HZwteG93pE/2OEi2UM6PHARUbcn78Mmj/Y5lJgo
+	 AOQCf/Nzjd6OQ==
+Date: Sun, 12 Apr 2026 07:52:14 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: "Nitka, Grzegorz" <grzegorz.nitka@intel.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
- "Oros, Petr" <poros@redhat.com>, "richardcochran@gmail.com"
- <richardcochran@gmail.com>, "andrew+netdev@lunn.ch"
- <andrew+netdev@lunn.ch>, "Kitszel, Przemyslaw"
- <przemyslaw.kitszel@intel.com>, "Nguyen, Anthony L"
- <anthony.l.nguyen@intel.com>, "Prathosh.Satish@microchip.com"
- <Prathosh.Satish@microchip.com>, "Vecera, Ivan" <ivecera@redhat.com>,
- "jiri@resnulli.us" <jiri@resnulli.us>, "Kubalewski, Arkadiusz"
- <arkadiusz.kubalewski@intel.com>, "vadim.fedorenko@linux.dev"
- <vadim.fedorenko@linux.dev>, "donald.hunter@gmail.com"
- <donald.hunter@gmail.com>, "horms@kernel.org" <horms@kernel.org>,
- "pabeni@redhat.com" <pabeni@redhat.com>, "davem@davemloft.net"
- <davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>
-Subject: Re: [PATCH v5 net-next 0/8] dpll/ice: Add TXC DPLL type and full TX
- reference clock control for E825
-Message-ID: <20260412075053.23660721@kernel.org>
-In-Reply-To: <IA1PR11MB62195E2AF6FE5B102B2EECD392272@IA1PR11MB6219.namprd11.prod.outlook.com>
-References: <20260402230626.3826719-1-grzegorz.nitka@intel.com>
-	<20260406192312.0f7a2760@kernel.org>
-	<IA1PR11MB621925C1718B838147404DC492582@IA1PR11MB6219.namprd11.prod.outlook.com>
-	<20260409181041.395a0c37@kernel.org>
-	<IA1PR11MB62194BF52262FCEB7FD5E76D92592@IA1PR11MB6219.namprd11.prod.outlook.com>
-	<20260410133812.4cf9b090@kernel.org>
-	<IA1PR11MB62195E2AF6FE5B102B2EECD392272@IA1PR11MB6219.namprd11.prod.outlook.com>
+To: Allen Hubbe <allen.hubbe@amd.com>
+Cc: Abhijit Gangurde <abhijit.gangurde@amd.com>, jgg@ziepe.ca,
+ leon@kernel.org, brett.creeley@amd.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ nikhil.agarwal@amd.com, linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/4] net: ionic: Add PHC state page for user space
+ access
+Message-ID: <20260412075214.3e87ace0@kernel.org>
+In-Reply-To: <69c189b7-9896-41cf-b28f-5ed4c7b80d6a@amd.com>
+References: <20260401102501.3395305-1-abhijit.gangurde@amd.com>
+	<20260401102501.3395305-3-abhijit.gangurde@amd.com>
+	<20260401170600.312a23d1@kernel.org>
+	<52cee89f-50e2-4569-a622-b03e711ab26b@amd.com>
+	<20260410134311.785683cd@kernel.org>
+	<69c189b7-9896-41cf-b28f-5ed4c7b80d6a@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,46 +75,59 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.osuosl.org,redhat.com,gmail.com,lunn.ch,intel.com,microchip.com,resnulli.us,linux.dev,kernel.org,davemloft.net,google.com];
-	TAGGED_FROM(0.00)[bounces-277808-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[19];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-277809-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 52BE73E4601
+X-Rspamd-Queue-Id: C81883E4631
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun, 12 Apr 2026 13:50:23 +0000 Nitka, Grzegorz wrote:
-> > > Proposed solution just seems to be clean and fully reflects current
-> > > connection topology.  
+On Fri, 10 Apr 2026 19:44:18 -0400 Allen Hubbe wrote:
+> On 4/10/2026 4:43 PM, Jakub Kicinski wrote:
+> > On Fri, 10 Apr 2026 09:10:09 -0400 Allen Hubbe wrote:  
+> >> The simple answer is just following the same approach as an existing
+> >> implementation.  See struct mlx5_ib_clock_info and
+> >> mlx5_update_clock_info_page().
+> >>
+> >> Making this common might risk presuming that other implementations will
+> >> be a similar design.  Compare these to the sfc driver.  The clock is
+> >> quite different from ionic and mlx5, not using timecounter, because
+> >> instead of a free-running cycle counter the hardware itself provides an
+> >> adjustable clock for timestamping.  
 > > 
-> > Do you have the link to the old proposal that was adding stuff to
-> > rtnetlink? I remember some discussion long-ish ago, maybe I was wrong.
->
-> This is the patch from the discussion I put the link in the cover letter:
-> https://lore.kernel.org/netdev/20250828164345.116097-1-arkadiusz.kubalewski@intel.com/
+> > So your augment is basically that drivers which don't use sw timecounter
+> > exist so we shouldn't bother creating common definitions for drivers
+> > that do? Why do we have common implementation of timecounter in the
+> > kernel at all then?
+> > 
+> > These are rhetorical questions.  
+> 
+> There is no suggestion to get rid of timecounter in the kernel.
+> 
+> Maybe I've been overthinking this and misunderstood your first reply. 
+> Did you mean, just, why not move this to ib_user_verbs.h, struct 
+> ib_uverbs_phc_state, and use it from the vendor driver?
 
-Let's go back to something like that. But leave the OC info out of 
-the XO, just ext-ref, dpll, xo? We can add the xo types later if really
-needed. Sorry for the flip flop.
+I think so, just drop the ionic from the names and pop it into a header
+that won't be awkward to reuse by other vendors.
 
