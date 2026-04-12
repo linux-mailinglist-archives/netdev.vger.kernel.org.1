@@ -1,121 +1,133 @@
-Return-Path: <netdev+bounces-277899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277900-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IPbLGMsE3GnCLAkAu9opvQ
-	(envelope-from <netdev+bounces-277899-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 22:47:07 +0200
+	id sHPNLKIF3GkgLQkAu9opvQ
+	(envelope-from <netdev+bounces-277900-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 22:50:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA2233E5EF5
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 22:47:06 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1ADAF3E5F07
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 22:50:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BF4FD300955A
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 20:47:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 46C77300877D
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 20:50:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89E0630CD85;
-	Sun, 12 Apr 2026 20:47:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00F57362136;
+	Sun, 12 Apr 2026 20:50:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="t2PPHmow"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="acMQAq1K"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0857C292B44
-	for <netdev@vger.kernel.org>; Sun, 12 Apr 2026 20:47:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D02BC239E76;
+	Sun, 12 Apr 2026 20:50:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776026823; cv=none; b=IwYBEetg40EffZzgup0pYjbI1KvHLmThyNAwiRl0UIRB2Nd1/3W9/ftV3dLvrv86iF0L4KxjfKnp4HArH/z+hwIxUYdOQ4+z8KZO7LO3MVVyDJvk9b+pmAawOJ94Y4+7TwyHDYuTIpiFvuSmcz5X2/4buX9x0OMJq3fojEXFuI0=
+	t=1776027037; cv=none; b=q+W7odHu7jtSNc13iV8Zef1dfghmDhVsMX/BDoqRcwiYHBIwE24ZRVGkQf7HlQyGiFD3LwefV2xFfiGyMuf77rmMShtXmiGTJ+7WLtdM2QafjJ0xG8xukOPCERIroYOpdrd0Z1rrB1R6fFTgWNDhn0JDctn/UCEzighS4/FBzug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776026823; c=relaxed/simple;
-	bh=kC2WfPwQn5GwuR+hHHVvoKKJeXooIQ0/5D03gv6/z9Y=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=N4ShW0+xkTyAJ/sZDDPAQJoZ7bYUux6dmwNToN9Xn9zCVDOYxIJVKEplinkZd0D11EQrxBgHBq4gNhrYgrfhvU6L+N0KVEw1TrOECu/rS/zmtDExMF9fPa5GyGQ3fc5c6osnRBEMV+m/+yG/jPDZeSDohfte+T9f4IDARuilP0A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=t2PPHmow; arc=none smtp.client-ip=95.215.58.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Sun, 12 Apr 2026 22:46:48 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1776026819;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kC2WfPwQn5GwuR+hHHVvoKKJeXooIQ0/5D03gv6/z9Y=;
-	b=t2PPHmow5NK8ETq5rmhrXbnr0TbpVgeyvLoJpMoQiM6wLfSCyefwCvI2Hz55Xh8fRtxyyP
-	5iiFh6rl15NQW0dHmfg0UOFtrgnuF69GQdX3gYOS5XsXMPfSsPj3kz5qw6Db2AtHSoLpwy
-	zFhRcPhnYQtNQSBgHVd220uURyjZddQ=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Luka Gejak <luka.gejak@linux.dev>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- netdev@vger.kernel.org, fmaurer@redhat.com, horms@kernel.org,
- luka.gejak@linux.dev
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_net-next_v5_1/2=5D_net=3A_hs?=
- =?US-ASCII?Q?r=3A_require_valid_EOT_supervision_TLV?=
-In-Reply-To: <20260412133157.3b335e1b@kernel.org>
-References: <20260407162502.19462-1-luka.gejak@linux.dev> <20260407162502.19462-2-luka.gejak@linux.dev> <20260412124558.190c725f@kernel.org> <DDF9CC02-6FC1-44F0-B95D-967151BF0592@linux.dev> <20260412133157.3b335e1b@kernel.org>
-Message-ID: <0CA147BE-C5AD-4B02-BE57-B586218B52A2@linux.dev>
+	s=arc-20240116; t=1776027037; c=relaxed/simple;
+	bh=6Z6UNS2ebQrH305yaq3CKGzqIvM0rJkgbl+imUkZLUc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=EeaeMwWZ1ksVv9PFnzoj0DcjvHrlYFmVbZcY0fARz8Ref5j34hW7+jXjzTePVPjWmpB5sUZdpPRdonpmWLYVPBdTUii5ctN1xCqD+616vdXVsBg0Mg+qoFssFNVBBMP9wTocYj1YeakdywJLnJc9b/jssb3pU4Y44vhglo3lVK8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=acMQAq1K; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 715D7C19424;
+	Sun, 12 Apr 2026 20:50:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776027037;
+	bh=6Z6UNS2ebQrH305yaq3CKGzqIvM0rJkgbl+imUkZLUc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=acMQAq1KL8Dv5JOmUq2KjdP+9o9oI8cFjvpDhpPs87R1psEPGZAZIFQPWWaGed0we
+	 nLnivfx8ABiN0q88Nwaixm8XQXEnzf181ctTvOIpDtRcHcVmRravQUoy1W3ENAtPe9
+	 LyAaO8YKoaYl6VfF7nqOMw1khL8KpfXJVcc9e8oY6QXcnJVOcFELLSE6RC/uphgMKc
+	 SxeyatNnn8D/TzZw93VoNA4VHgLhWe8z+bgESgkMRysrwq3U25VA+7pmBMTVxsvZmw
+	 Tth9riIxS+qGB/PPqvbX1M0a0eewq7Y68dB8b9ARtSze7Elv//FFZTUo4TeF9LuZx2
+	 5u/4fklhRoweg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02BDA3809A8C;
+	Sun, 12 Apr 2026 20:50:11 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [-0.96 / 15.00];
-	SUBJ_EXCESS_QP(1.20)[];
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2 0/2] net/rds: Fix use-after-free in RDS/IB for
+ non-init
+ namespaces
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177602700979.3405581.15178712327198304598.git-patchwork-notify@kernel.org>
+Date: Sun, 12 Apr 2026 20:50:09 +0000
+References: <20260408080420.540032-1-achender@kernel.org>
+In-Reply-To: <20260408080420.540032-1-achender@kernel.org>
+To: Allison Henderson <achender@kernel.org>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com,
+ rds-devel@oss.oracle.com, kuba@kernel.org, horms@kernel.org,
+ linux-rdma@vger.kernel.org
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	TAGGED_FROM(0.00)[bounces-277899-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	RCVD_TLS_LAST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-277900-lists,netdev=lfdr.de,netdevbpf];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NO_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[luka.gejak@linux.dev,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: CA2233E5EF5
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 1ADAF3E5F07
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On April 12, 2026 10:31:57 PM GMT+02:00, Jakub Kicinski <kuba@kernel=2Eorg>=
- wrote:
->On Sun, 12 Apr 2026 22:13:35 +0200 Luka Gejak wrote:
->> Regarding the TLV loop: I actually implemented a TLV walker in v4 [1]=
-=20
->> for this exact reason, but I moved to strict sequential parsing in v5=
-=20
->> based on reviewer's feedback to keep the implementation simple=2E Could=
-=20
->> you please check if the approach used in v4 is what you had in mind?=20
->> If so, I will rebase that logic onto the memory safety fixes=20
->> (pskb_may_pull) from v5 and submit it as v6=2E
->
->That's not really what I had in mind=2E I was thinking of a loop which
->just skips the TLVs in order, leaving the parsing of known TLVs as is=2E
->But I've never used HSR maybe this sort of strict validation is somehow
->okay in HSR deployments=2E
->
->Please just undo the comment tweaks then=2E
+Hello:
 
-So keep other changes as is and only undo comment changes?
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed,  8 Apr 2026 01:04:18 -0700 you wrote:
+> This series fixes syzbot bug da8e060735ae02c8f3d1
+> https://syzkaller.appspot.com/bug?extid=da8e060735ae02c8f3d1
+> 
+> The report finds a use-after-free bug where ib connections access an
+> invalid network namespace after it has been freed.  The stack is:
+> 
+>     rds_rdma_cm_event_handler_cmn
+>       rds_conn_path_drop
+>         rds_destroy_pending
+>           check_net()  <-- use-after-free
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v2,1/2] net/rds: Optimize rds_ib_laddr_check
+    https://git.kernel.org/netdev/net/c/236f718ac885
+  - [net,v2,2/2] net/rds: Restrict use of RDS/IB to the initial network namespace
+    https://git.kernel.org/netdev/net/c/ebf71dd4aff4
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
