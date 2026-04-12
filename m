@@ -1,175 +1,212 @@
-Return-Path: <netdev+bounces-277731-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277732-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YJ+dHC7/2mkQ8AgAu9opvQ
-	(envelope-from <netdev+bounces-277731-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 04:10:54 +0200
+	id 6E91G2EE22kH8QgAu9opvQ
+	(envelope-from <netdev+bounces-277732-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 04:33:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C37E83E2720
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 04:10:53 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 316663E2873
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 04:33:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B34AA300F107
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 02:08:21 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BCDEF301738E
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 02:33:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1EB42046BA;
-	Sun, 12 Apr 2026 02:08:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD602157487;
+	Sun, 12 Apr 2026 02:32:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lCcG9hVp"
+	dkim=pass (2048-bit key) header.d=blemings.org header.i=@blemings.org header.b="iZVUNNZN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EBCB19ADA4
-	for <netdev@vger.kernel.org>; Sun, 12 Apr 2026 02:08:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC76B40DFA7;
+	Sun, 12 Apr 2026 02:32:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775959700; cv=none; b=sJmQtrSzdmEDhdzNQs1EsqvD2TEcGpoUKlu0mcNEijwSC7URj5UI8QidAiptdPXYq1+ygIhA0W864F+irwUSDMqHgnxy509qBGwrIPKsJzqiOla4YV2B4d2o6v9jWZ5PGuxO1VWGLI8FB7So7NHZpGuLElj/aHV24q516GltsIM=
+	t=1775961179; cv=none; b=rqIZm42inKv+IV0MpRQ9fHTjRQJUzbZpqVEUj9qXIHc8xCoK1dekd4Ah38IpwW0FOh7U/lQxPCcZ1YGN6UR98eTxoyODyyhf9BWQ1t+/zDNRPPaYGLc/m4worsTsMMNg0UBa1XafBb8oKfGBC1aj91Ll/qn3/Kz4T3okvFMU03w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775959700; c=relaxed/simple;
-	bh=mFrqE7lagXsStiOP0X5yiw/yF1d4Ff2IenPECsOcHyk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mquMRg4fC/eeNr9NHWmFH3GnIG6JApgyUp1xIYDA83V9FFkiM8Stj93NRCoWcWpsed49ybb/sf0qmuSu233u1MX/cZ6WWkFQ2WjrNbEBcUTAQPGlBBwaCEYoahIUSxgNaPrpGqm1GQKYyR5HMCqbves0APcPsjNHTXSo6Tz/pCY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lCcG9hVp; arc=none smtp.client-ip=209.85.215.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-c766cf593daso2301497a12.3
-        for <netdev@vger.kernel.org>; Sat, 11 Apr 2026 19:08:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775959699; x=1776564499; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ikzjZv1iNggTetoTHsLYE3t4Vk7xU7GQd3FBLtlxYmA=;
-        b=lCcG9hVpuogR376NiO57mPJmnDX6iEVrchJ8ZVqRYvYb6Gq9VkkAEhQ1nvpLv8R+q9
-         dUmqGKtc1ibkCnNCCBOTHs4zYSafsvxHzpE4Wvr1rIzuwkLCo0P527oyXHxvGVvkanuW
-         h7REUct16UdBjjAeELkIJUR7bxUYmVExpEZYS8snHLHklO/tQ05+3p2v7NzRMZ2Xo3Xw
-         wF9C+HeOCt36egf14UePQi5rHm3eHwEmYxnCqNYQsxi1cXBJ+sDGraw67OUwfC1HzEVn
-         xbG9+g3+BXk7w6frQNhDje4mCT4tms+Cg3+UPTJkM4v02MG9epNbQ1ANCSf+5o5wrMyS
-         pZ4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775959699; x=1776564499;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ikzjZv1iNggTetoTHsLYE3t4Vk7xU7GQd3FBLtlxYmA=;
-        b=PdIb/fX+JVFceH5K5Y+H8KOwbUqnZFK5tQgfmCrNIGHnAx1nFi/45uNrjZl7mnQIeM
-         iciQRrsvzmIpB2DkWNgjjOccpO++IzzK5T33OXRFIcervmdIjHhNFO1xU4/MJpB+6n9H
-         nSa/pSzPW8IL6uDQam6xE7v2IzFZeB0hSS8FrF5t3isznGpNwNQl3FVlK9ghrpBQYhIG
-         OVHcBN67xnXjKMUladGLm2TUoYyYYG7OK7DjO8bQNN6PA2F2I9CoeDlpN/BPxGU1Z1iB
-         16EUsLP3nrLTqLyhd0FMMIAfokqjGhoWBqd2CdqdgMIrZMj9/trGfdEmSJw5nkQQh9bs
-         H7CQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXtS6A8b5U/fqmD/3uSrSCZUKvYgTcCBTXXLpJwm4ivbdjXFVeScYMcD27hPsQKuNIdbk8fb74=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzDeWd96YjeAYm4riYJHTrWPZ+wsUhqrjqWU4K2C65DDfrSOX97
-	0jGtfDbkIvQgChNr3KlOz4pL9gX6oWLQOimwhWusw3XYOs0Voqp03CAT
-X-Gm-Gg: AeBDies2XtYTnNxaszeaREJw4OtwtYVA2SJRU7JiQOuZY+urmk28jwyImOZRVKC5sTE
-	rvF70pBJzZ+SgDRhOumGxFkaaGgnwJTzZ0Bq30Q6DQxbosd1RbBbjrM0HRPrfthDV3c5wNip03t
-	1dnSCZRxBlYzQFhby49K/cMe5gweQZAXiu/xpLZ8DXGgF8KWG0QvbOCPH1b5BR9jfAejR4HRVv/
-	qmQin+ymK1ytpUpUGad0RujmRSoqcN4L4dsvAKYaJ/5aYlqOYVzl8LOdSjMUJ82qao38GNM/l6/
-	sJluldl5iqUrW8udjKEMRCXcC8cxtfUTnHwUklrjDjZuBYuVAftQIXzHWJhlHx6IXDXvrk3aGjs
-	9nbIMleGx2MimuwxoeOlNF65Q9Ir4Us/hjM1xWMw6rTNqIK7MiE+eYsHjrGDV+Jny+PayoqEADT
-	PkN5GwHtTix3fl1K8XctUad3Czqn8GzWW50iLPIvU9ROPosTXxja4eI+11d12oT+9lHOpyGV4tq
-	QNwlQ==
-X-Received: by 2002:a05:6a20:8d07:b0:398:4a5c:d5a3 with SMTP id adf61e73a8af0-39fe3f4f2ebmr6849021637.34.1775959698904;
-        Sat, 11 Apr 2026 19:08:18 -0700 (PDT)
-Received: from deepanshu-kernel-hacker.. ([2405:201:682f:389d:eeca:64a:ce77:d090])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c79216ffa87sm5677058a12.5.2026.04.11.19.08.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 11 Apr 2026 19:08:18 -0700 (PDT)
-From: Deepanshu Kartikey <kartikey406@gmail.com>
-To: steffen.klassert@secunet.com,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org
-Cc: leon@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Deepanshu Kartikey <kartikey406@gmail.com>,
-	syzbot+901d48e0b95aed4a2548@syzkaller.appspotmail.com
-Subject: [PATCH] xfrm: fix memory leak in xfrm_add_policy()
-Date: Sun, 12 Apr 2026 07:38:09 +0530
-Message-ID: <20260412020809.35465-1-kartikey406@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1775961179; c=relaxed/simple;
+	bh=zp1lGZb/Gd+MxuVvsJkpVPzwX7j6FIQDFj2sk7yuL5g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=J0g+F6ew7+I3JQ3agyP/3I49dCtM73u/g3Yvb3sgAaKCUHlr+V1YsP2fePFTrbDAKUhB8iC1WoSsvh0/3MyJGavmVZUrRI3FPwSKbL5UxVV7grOLk1IX72CrgggxfU1i4ymyCCrVO9HmjYTZF5E6MSTQtlysI3WQtk9tA/1SdGE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blemings.org; spf=pass smtp.mailfrom=blemings.org; dkim=pass (2048-bit key) header.d=blemings.org header.i=@blemings.org header.b=iZVUNNZN; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blemings.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=blemings.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=blemings.org;
+	s=202501; t=1775961167;
+	bh=0We60X5AUf8OatS8sDaDOf8kvQJA7x+/l9H3m0X8Z6U=;
+	h=Date:Reply-To:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=iZVUNNZN8tLQ2arQZZ4cVBbKPcwX1RNwNYD2kvlXHOMdtwIlHu8JqxavLa/c4k3qI
+	 893JJsO5PYYmdLU+6aIP/815UViv1WuL/tW4DBcOlY0G2u2ECSlwEEjcSliBkSQomy
+	 fjGh1ItaeDSLdeyb+EZwyZ3NXdBZXeyCNS2Z7qC8kqHZBy0YHeKs/aBWOboBbQLxqT
+	 2iGq2JEIfuucXb3RB0DD4TxJwR5zs2H8H+AHznZIqTSoCtSHXJRZc2hZHuKFqYpZTV
+	 v8jypgsLpr/PTjM3s/E/PzltHy47Urc0gdwpiOFUkdQ1L8E747OFzGTB1wsagiEw3U
+	 QOAAN/yL6WfKA==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4ftZMK2VfWz4wJG;
+	Sun, 12 Apr 2026 12:32:45 +1000 (AEST)
+Message-ID: <3cd91fbc-d3a9-431e-b915-58e851c7df9f@blemings.org>
+Date: Sun, 12 Apr 2026 12:32:44 +1000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Reply-To: hugh@blemings.id.au
+Subject: Re: [PATCH net] netrom: do some basic forms of validation on incoming
+ frames
+To: Greg KH <gregkh@linuxfoundation.org>
+Cc: Kuniyuki Iwashima <kuniyu@google.com>, kuba@kernel.org,
+ davem@davemloft.net, edumazet@google.com, horms@kernel.org,
+ linux-hams@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, pabeni@redhat.com, stable@kernel.org,
+ workflows@vger.kernel.org, yizhe@darknavy.com
+References: <20260410145448.38253e3c@kernel.org>
+ <20260410221220.1708137-1-kuniyu@google.com>
+ <4f5810a7-c792-4d6b-9f7c-6c6b289def19@blemings.org>
+ <2026041135-shindig-trekker-5d06@gregkh>
+ <b9355e3c-9252-4dd7-b7ed-dff13e3b2c8b@blemings.org>
+ <2026041124-hyphen-circulate-34ae@gregkh>
+Content-Language: en-US
+From: Hugh Blemings <hugh@blemings.org>
+In-Reply-To: <2026041124-hyphen-circulate-34ae@gregkh>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[blemings.org:s=202501];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,gmail.com,syzkaller.appspotmail.com];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-277731-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kartikey406@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev,901d48e0b95aed4a2548];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-277732-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
+	DMARC_NA(0.00)[blemings.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[blemings.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hugh@blemings.org,netdev@vger.kernel.org];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,appspotmail.com:email]
-X-Rspamd-Queue-Id: C37E83E2720
+	TAGGED_RCPT(0.00)[netdev];
+	HAS_REPLYTO(0.00)[hugh@blemings.id.au];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,blemings.id.au:replyto]
+X-Rspamd-Queue-Id: 316663E2873
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-When xfrm_policy_insert() fails, the error path performs manual
-cleanup by calling xfrm_dev_policy_free(), security_xfrm_policy_free()
-and kfree() directly. This is incorrect because xfrm_policy_destroy()
-already handles all of these, causing a memory leak detected by
-kmemleak.
 
-Replace the open-coded cleanup with xfrm_policy_destroy(), consistent
-with the error handling in xfrm_policy_construct(). The walk.dead
-flag must be set before calling xfrm_policy_destroy() as it requires
-it via BUG_ON(!policy->walk.dead).
+On 11/4/2026 18:58, Greg KH wrote:
+> On Sat, Apr 11, 2026 at 05:24:17PM +1000, Hugh Blemings wrote:
+>> On 11/4/2026 15:50, Greg KH wrote:
+>>> On Sat, Apr 11, 2026 at 08:25:19AM +1000, Hugh Blemings wrote:
+>>>> On 11/4/2026 08:11, Kuniyuki Iwashima wrote:
+>>>>> From: Jakub Kicinski <kuba@kernel.org>
+>>>>> Date: Fri, 10 Apr 2026 14:54:48 -0700
+>>>>>> On Fri, 10 Apr 2026 14:30:42 -0700 Jakub Kicinski wrote:
+>>>>>>> On Fri, 10 Apr 2026 07:24:36 +0200 Greg Kroah-Hartman wrote:
+>>>>>>>> On Thu, Apr 09, 2026 at 08:32:35PM -0700, Jakub Kicinski wrote:
+>>>>>>>>> Or for simplicity we could also be testing against skb_headlen()
+>>>>>>>>> since we don't expect any legit non-linear frames here? Dunno.
+>>>>>>>> I'll be glad to change this either way, your call.  Given that this is
+>>>>>>>> an obsolete protocol that seems to only be a target for drive-by fuzzers
+>>>>>>>> to attack, whatever the simplest thing to do to quiet them up I'll be
+>>>>>>>> glad to implement.
+>>>>>>>>
+>>>>>>>> Or can we just delete this stuff entirely?  :)
+>>>>>>> Yes.
+>>>>>>>
+>>>>>>> My thinking is to delete hamradio, nfc, atm, caif.. [more to come]
+>>>>>>> Create GH repos which provide them as OOT modules.
+>>>>>>> Hopefully we can convince any existing users to switch to that.
+>>>>>>>
+>>>>>>> The only thing stopping me is the concern that this is just the softest
+>>>>>>> target and the LLMs will find something else to focus on which we can't
+>>>>>>> delete. I suspect any PCIe driver can be flooded with "aren't you
+>>>>>>> trusting the HW to provide valid responses here?" bullshit.
+>>>>>>>
+>>>>>>> But hey, let's try. I'll post a patch nuking all of hamradio later
+>>>>>>> today.
+>>>>>> Well, either we "expunge" this code to OOT repos, or we mark it
+>>>>>> as broken and tell everyone that we don't take security fixes
+>>>>>> for anything that depends on BROKEN. I'd personally rather expunge.
+>>>>> +1 for "expunge" to prevent LLM-based patch flood.
+>>>>>
+>>>>> IIRC, we did that recently for one driver only used by OpenWRT ?
+>>>>>
+>>>>>
+>>>> If the main concern here is ongoing maintenance of these Ham Radio related
+>>>> protocols/drivers, can we pause for a moment on anything as dramatic as
+>>>> removing from the tree entirely ?
+>>> Sure, but:
+>>>
+>>>> There is a good cohort of capable kernel folks that either are or were ham
+>>>> radio operators who I believe, upon realising that things have got to this
+>>>> point, will be happy to redouble efforts to ensure this code maintained and
+>>>> tested to a satisfactory standard.
+>>> We need this code to be maintained, because as is being shown, there are
+>>> reported problems with it that will affect these devices/networks that
+>>> you all are using.  So all we need is a maintainer for this to be able
+>>> to take reports that we get and fix things up as needed.  I know you
+>>> have that experience, want to come back to kernel development, we've
+>>> missed you :)
+>> That's most kind Greg, thank you, have missed all you cool kids too :)
+>>
+>> More seriously though - I'd be up for doing it, but I think there may be
+>> others better placed than I who haven't yet realised we have this conundrum.
+>> I'm nudging a few folks offline on this front.
+> The main "conundrum" is, is that this protocol completly trusts the
+> hardware to give the kernel the "correct" data.  So if you trust the
+> hardware to work properly, it will be fine, but as the fuzzing tools are
+> finding, if the data from the hardware modems is a bit out-of-spec,
+> "bad" things can happen.
+>
+> I don't know how well controlled the data is from these devices, if it's
+> just a "pass through" from what they get off the "wire" or if the
+> devices always ensure the protocol packets are sane before passing them
+> off to the kernel.  That's going to be something you all with the
+> hardware is going to have to determine in order to keep this a working
+> system over time.  Especially given that this is a wireless protcol
+> where you "have" to trust the remote end.
 
-Fixes: 94b95dfaa814 ("xfrm: release all offloaded policy memory")
-Reported-by: syzbot+901d48e0b95aed4a2548@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=901d48e0b95aed4a2548
-Tested-by: syzbot+901d48e0b95aed4a2548@syzkaller.appspotmail.com
-Signed-off-by: Deepanshu Kartikey <kartikey406@gmail.com>
----
- net/xfrm/xfrm_user.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+Thanks for the thoughts Greg - and ya, I guess on balance I come back to 
+being generally skeptical of both hardware and software to Do The Right 
+Thing (TM)
 
-diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
-index d56450f61669..ae144d1e4a65 100644
---- a/net/xfrm/xfrm_user.c
-+++ b/net/xfrm/xfrm_user.c
-@@ -2267,9 +2267,8 @@ static int xfrm_add_policy(struct sk_buff *skb, struct nlmsghdr *nlh,
- 
- 	if (err) {
- 		xfrm_dev_policy_delete(xp);
--		xfrm_dev_policy_free(xp);
--		security_xfrm_policy_free(xp->security);
--		kfree(xp);
-+		xp->walk.dead = 1;
-+		xfrm_policy_destroy(xp);
- 		return err;
- 	}
- 
--- 
-2.43.0
+So bounds checking and the like seems prudent irrespective of whether 
+the kernel is getting the data from real hardware, software modems etc.
+
+I've done some initial digging around that confirms my suspicion that 
+this in kernel code remains quite widely used, if somewhat out of view. 
+Accordingly I lean then towards working to get these various mitigations 
+in place with some revised patches etc. as needed and into the main tree.
+
+Once this done I think that'll give me a good sense of whether I or 
+someone else is well positioned to keep the code maintained longer term 
+and thus justify it remaining in tree or not.
+
+More to follow once I finish remembering this kernel thing!
+
+Cheers,
+Hugh
+
+
 
 
