@@ -1,97 +1,53 @@
-Return-Path: <netdev+bounces-277928-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277929-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4HspOXwc3GlmMwkAu9opvQ
-	(envelope-from <netdev+bounces-277928-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 00:28:12 +0200
+	id WstRGg8d3GmAMwkAu9opvQ
+	(envelope-from <netdev+bounces-277929-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 00:30:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id D77A73E646A
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 00:28:11 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1E523E6484
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 00:30:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 0FEA630028E0
-	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 22:28:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 011FD300D84A
+	for <lists+netdev@lfdr.de>; Sun, 12 Apr 2026 22:30:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0E7B31ED83;
-	Sun, 12 Apr 2026 22:28:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 077622FF641;
+	Sun, 12 Apr 2026 22:30:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codereflect-io.20251104.gappssmtp.com header.i=@codereflect-io.20251104.gappssmtp.com header.b="yjgE6hUv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A7raTKe8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD553309F19
-	for <netdev@vger.kernel.org>; Sun, 12 Apr 2026 22:28:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8E7543147;
+	Sun, 12 Apr 2026 22:30:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776032887; cv=none; b=m2yuqnkQcn+ffH3NBy366hyLH38BeqyQ9b9ASpDrrai6awrViNMMCMTlJWc4L6n3XZYmNo0cZzZNYtp/7tZ7jJdPyQ2S4lwcNBJu0zGG+cAmW2jxB+kZm2zUCNHt5OQfs0eV2So3J7G6NHHiHN8WGCtmv9EXajHj789LqyubjI0=
+	t=1776033032; cv=none; b=A4HoxF2BNFbNaWbfHCSXkvlOG0AgWW63sx8Dng4YQGbLHSkNXiS0meZrGgJA4Bb528/kZkSwVTz/i6sPVTO/+9v5w84S8mNQzY+lg2g0JvUS9gnY63rdK6msAFsatpLCP5LrfMLUcHmdjrHhRiEIZsygAmaYtlQpyVhWk+gsZR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776032887; c=relaxed/simple;
-	bh=+E7OrLjirfF3etD2wCL8LfLILmHpRwGWXcgXbwUGLjg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=T5WLzdNpLMeKh95UEOmVolPP+diu00JYvEaQgIws3Q+BfqQ6FJvc9o9HkeiKtes+MWgfFp2y3lgpoWoROTfC0dKy0WQwKifMq2g5SNrFV22cc5H/WcLF6lOcrXxk0GAIbxSJafLmTnlJHT8K87YukHADB9ES9ImcJOxDKER2mxA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=codereflect.io; spf=none smtp.mailfrom=codereflect.io; dkim=pass (2048-bit key) header.d=codereflect-io.20251104.gappssmtp.com header.i=@codereflect-io.20251104.gappssmtp.com header.b=yjgE6hUv; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=codereflect.io
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=codereflect.io
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-488a88aeec9so50696565e9.2
-        for <netdev@vger.kernel.org>; Sun, 12 Apr 2026 15:28:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=codereflect-io.20251104.gappssmtp.com; s=20251104; t=1776032883; x=1776637683; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=JymgS9xKzYdXbFenZQ/ZXQb2L7c5DuoUb3it11um76c=;
-        b=yjgE6hUvzGUsMQsQ8IXB7avoWdoTEckRAhHNDHGZaRCv+jrXdPpwjJ81i462jfzTJe
-         CmaASqL00M+LcSZDFoZSeMRSQNEzXIwHpNKHpFejLQDQv2jN25bAeoja6/mjpySjS59P
-         G32Re4syp5J+dK1r788aqAywYSgRdLVSY5Yyms/7QkEF/cbaRLTUbfvni835B/N1xVxo
-         OlHAECF/3golbcgPBt/sDKgXJo8ILXDEAggNJL5AkY3s4hA12A5NbEelxrTLM4xzO5cq
-         2fXA4w1BR41lMET6wf3H4ZAXtI9na9GGbtHR/D0PekY3C5y/A6tx5G6Ljh2m9eSuY7Ih
-         GYvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776032883; x=1776637683;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JymgS9xKzYdXbFenZQ/ZXQb2L7c5DuoUb3it11um76c=;
-        b=aTt+HYIV4JBvksCzRRbERcmwTQmb7GmZ5poveq0nMMpwA3L08B5KYJDMo4gWyYXG58
-         98HSPPXWDh6ih/a8mEepPl9K+HikW1sPpgSnRTr9mqnkeo0Eh3zK72BFjl+e6hp+LOHo
-         TzJGyglUoNDfTyQ5EP/s6oHLECOLFz/D5y87U5pqC/szImmiNkMwMMQHXKgGpFsluhaA
-         PSaKq232V+cXdZWS6dG7LAt3b/2ZrjDxYcyhEmWo5byBYsEg5fuWZ9Fi1xCNE75Sb+od
-         G3ADJjAykHoISPQDTpmn2NnPmjQWQUeyL0aNT5uWoo03AVDojEFOEqosbh0Vkb8TY4nr
-         35Vg==
-X-Forwarded-Encrypted: i=1; AJvYcCUD9YXl+o5Gk7T4OLu0vALSx3sftH8RHrCdwTqqvEpna0SCzVx4TQksEUxQtdU50A6/d1qY0sE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwpecOzuSRsEvDvpSs63DDxuZhK2G/MHzKtfP8SH7ndZ2eZW7M5
-	2aYT9aoBoBqeBkR6W5FMMhYEzbOiaw6+kbU+yzOuoe2ksg3tDyXvT/qDJFtV2fwnQtI=
-X-Gm-Gg: AeBDiesHtd3S4lsobTAlQ8fyiRwKmPWPhIpyObBbcxk5Mn+A+7T9KDCr/J3Fpc4K7KG
-	1KKCEQ7GlPMchzrzhRyIndqqFAk7tIIRXXjqhNsek12aeO7XPgI18Dg8U3gb7qLphKv8Z0BlSJB
-	7feFzNzyUL9Ymuc28CkaBOqBJILRgAVyjj5AjazDxV3dQ3KDV/LGsr1+jPGsqOKOOnaCZmR0uGM
-	0YaCFRGqKyNecZbaJx0WKQ1bMeAATnIeYTR5myhhVpjXAue2+mVAnhaUQjpxPRdi14gQWEuukLg
-	Hb0PQtaKRJ1fd4nEbsrB9RN7O2Oje5VypATxd+edPUiAV99VbCZ8gRRWORQIcjuywyv2QTnq5L+
-	BmlyKC+87GnyaExwXjsYRriiBFe/KLC4kdem3zPoVn3swLslt+foLMuBjtsSGSVa+zhWXqYDV2r
-	9bULPeDY151YxdqCiM6cXXVe7ldmI5ceaa8P6WnfF0AFkmAhw1mhwy7jMEhG/8T2MHJEJ7xIOIh
-	PVmnNkNwdQRBcWLkWTrwYsacg==
-X-Received: by 2002:a05:600c:a11c:b0:485:303b:c50a with SMTP id 5b1f17b1804b1-488d6804721mr111550815e9.13.1776032883203;
-        Sun, 12 Apr 2026 15:28:03 -0700 (PDT)
-Received: from localhost.localdomain (cable-24-135-46-158.dynamic.sbb.rs. [24.135.46.158])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488d5888a97sm301980325e9.2.2026.04.12.15.28.01
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Sun, 12 Apr 2026 15:28:02 -0700 (PDT)
-From: Marko Jevtic <marko.jevtic@codereflect.io>
-To: pablo@netfilter.org,
-	fw@strlen.de,
-	netfilter-devel@vger.kernel.org
-Cc: phil@nwl.cc,
-	coreteam@netfilter.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net v3] netfilter: nft_set_rbtree: fix use count leak on transaction abort
-Date: Mon, 13 Apr 2026 00:28:01 +0200
-Message-ID: <20260412222801.34965-1-marko.jevtic@codereflect.io>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1776033032; c=relaxed/simple;
+	bh=Vkbqz7zSnWjuc4pCYjwiNLsgGE+7Xgk1fU+bplSwK2M=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=q+zzUr2KRUl2cG5z8mcXLR+vsbKo7xHyqefbabC7E/ncyIBXz023EHVSyRQCJSAQaU5T7kODZhbVmzbdlHo7JE2Z6D2PqAyxeHwTFwTDEnQ6ijHJc+DHRwSv3Qx40W9zaqmRz5VotiFEyBZ95yiWjhptXWUV1NK6FnCiaTIvA70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A7raTKe8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F039C19424;
+	Sun, 12 Apr 2026 22:30:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776033032;
+	bh=Vkbqz7zSnWjuc4pCYjwiNLsgGE+7Xgk1fU+bplSwK2M=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=A7raTKe8zc8OvdXJU8zSKq+zNvse90ovHrWigUqCsBUMRLoc9pKghuGwdsqo+jI2u
+	 IlgcW4V5Ac3ntYWPOX0ecHFsQj6cYLonurfiTldpPIODcyKZ06At4sWrEiG2WD/Wwe
+	 llH/5OGJtN2IxSv+Ibrv3I0GQDfLAdvHb1CNVlcSCQ4ydwPuwWuzKyXv6WzWwQhWvo
+	 9RVehWeezjdo/eQPZ1+VBvBU+MiI1UV4RGamAEh9O6ntTcCSLzobZZfJ/Ui16xogxe
+	 cU7kOlfQA9xjw/jl93YBO6BvlB02UbTfy0vkWHc0fkyKV7HfgCn5p/1y31w4IS/Jg1
+	 K/JLCRYIWA8xQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02C793809A8C;
+	Sun, 12 Apr 2026 22:30:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,317 +55,80 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
+Subject: Re: [PATCH net v2] net: ethernet: mtk_eth_soc: initialize PPE
+ per-tag-layer MTU registers
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177603300480.3841629.11936598519296387626.git-patchwork-notify@kernel.org>
+Date: Sun, 12 Apr 2026 22:30:04 +0000
+References: 
+ <ec995ab8ce8be423267a1cc093147a74d2eb9d82.1775789829.git.daniel@makrotopia.org>
+In-Reply-To: 
+ <ec995ab8ce8be423267a1cc093147a74d2eb9d82.1775789829.git.daniel@makrotopia.org>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: nbd@nbd.name, lorenzo@kernel.org, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
+ pablo@netfilter.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[codereflect-io.20251104.gappssmtp.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-277928-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[nbd.name,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,collabora.com,netfilter.org,vger.kernel.org,lists.infradead.org];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	DMARC_NA(0.00)[codereflect.io: no valid DMARC record];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[marko.jevtic@codereflect.io,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-277929-lists,netdev=lfdr.de,netdevbpf];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[codereflect-io.20251104.gappssmtp.com:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	PRECEDENCE_BULK(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	FROM_NO_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: D77A73E646A
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: B1E523E6484
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-nft_rbtree_abort() does not handle elements moved to the expired list
-by inline GC during __nft_rbtree_insert(). When inline GC encounters
-expired elements during overlap detection, it calls
-nft_rbtree_gc_elem_move() which deactivates element data (decrementing
-chain/object use counts), removes the element from the rbtree, and
-queues it for deferred freeing. On commit, these elements are freed
-via nft_rbtree_gc_queue(). On abort, however, the expired list is
-ignored entirely.
+Hello:
 
-This leaves use counts permanently decremented after abort.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-This restores transactional semantics by ensuring that inline GC side
-effects are fully rolled back on abort:
+On Fri, 10 Apr 2026 03:57:52 +0100 you wrote:
+> The PPE enforces output frame size limits via per-tag-layer VLAN_MTU
+> registers that the driver never initializes. The hardware defaults do
+> not account for PPPoE overhead, causing the PPE to punt encapsulated
+> frames back to the CPU instead of forwarding them.
+> 
+> Initialize the registers at PPE start and on MTU changes using the
+> maximum GMAC MTU. This is a conservative approximation -- the actual
+> per-PPE requirement depends on egress path, but using the global
+> maximum ensures the limits are never too small.
+> 
+> [...]
 
-- Introduce a separate tx_gc list for elements collected during insert
-  (transaction-scoped), distinct from the existing expired list used
-  by commit-time gc_scan (commit-scoped). This prevents abort from
-  touching committed expired elements left over from a prior gc_queue
-  OOM.
+Here is the summary with links:
+  - [net,v2] net: ethernet: mtk_eth_soc: initialize PPE per-tag-layer MTU registers
+    https://git.kernel.org/netdev/net/c/2dddb34dd0d0
 
-- On commit: splice tx_gc into expired after publishing the new binary
-  search blob, then drain via gc_queue as before.
-
-- On abort: iterate tx_gc, re-activate element data (restoring use
-  counts), and re-insert into the rbtree. Elements remain expired and
-  will be properly collected on the next successful commit.
-
-- Extract nft_rbtree_node_insert() helper from __nft_rbtree_insert()
-  to share the tree insertion logic with the abort restore path.
-
-- Add WARN_ON_ONCE in commit early-return path to catch any violation
-  of the invariant that tx_gc is empty when no tree changes occurred.
-
-- Reset start_rbe_cookie on abort so insertion state from a failed
-  transaction does not persist.
-
-Fixes: f6c383b8c31a ("netfilter: nf_tables: adapt set backend to use GC transaction API")
-Signed-off-by: Marko Jevtic <marko.jevtic@codereflect.io>
----
-v3:
-- add Fixes tag
-- narrow the changelog to the abort-side use-count accounting bug
-
-v2:
-- introduce a transaction-scoped tx_gc list for insert-time GC
-- restore tx_gc entries on abort and splice them to expired on commit
-- export nft_setelem_data_activate() and factor out nft_rbtree_node_insert()
-
- include/net/netfilter/nf_tables.h |  3 +
- net/netfilter/nf_tables_api.c     |  4 +-
- net/netfilter/nft_set_rbtree.c    | 96 ++++++++++++++++++++++---------
- 3 files changed, 74 insertions(+), 29 deletions(-)
-
-diff --git a/include/net/netfilter/nf_tables.h b/include/net/netfilter/nf_tables.h
-index ec8a8ec9c..f8c912332 100644
---- a/include/net/netfilter/nf_tables.h
-+++ b/include/net/netfilter/nf_tables.h
-@@ -1910,6 +1910,9 @@ struct nft_trans_gc *nft_trans_gc_catchall_async(struct nft_trans_gc *gc,
- 						 unsigned int gc_seq);
- struct nft_trans_gc *nft_trans_gc_catchall_sync(struct nft_trans_gc *gc);
- 
-+void nft_setelem_data_activate(const struct net *net,
-+				 const struct nft_set *set,
-+				 struct nft_elem_priv *elem_priv);
- void nft_setelem_data_deactivate(const struct net *net,
- 				 const struct nft_set *set,
- 				 struct nft_elem_priv *elem_priv);
-diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
-index 8c42247a1..8e783db3f 100644
---- a/net/netfilter/nf_tables_api.c
-+++ b/net/netfilter/nf_tables_api.c
-@@ -5837,7 +5837,7 @@ static void nf_tables_unbind_set(const struct nft_ctx *ctx, struct nft_set *set,
- 	}
- }
- 
--static void nft_setelem_data_activate(const struct net *net,
--				      const struct nft_set *set,
--				      struct nft_elem_priv *elem_priv);
-+void nft_setelem_data_activate(const struct net *net,
-+			       const struct nft_set *set,
-+			       struct nft_elem_priv *elem_priv);
- 
-@@ -7656,7 +7656,7 @@ static int nft_setelem_active_next(const struct net *net,
- 	return nft_set_elem_active(ext, genmask);
- }
- 
--static void nft_setelem_data_activate(const struct net *net,
--				      const struct nft_set *set,
--				      struct nft_elem_priv *elem_priv)
-+void nft_setelem_data_activate(const struct net *net,
-+			       const struct nft_set *set,
-+			       struct nft_elem_priv *elem_priv)
- {
-diff --git a/net/netfilter/nft_set_rbtree.c b/net/netfilter/nft_set_rbtree.c
-index 737c339de..e1f76d6ef 100644
---- a/net/netfilter/nft_set_rbtree.c
-+++ b/net/netfilter/nft_set_rbtree.c
-@@ -36,6 +36,7 @@ struct nft_rbtree {
- 	unsigned long		start_rbe_cookie;
- 	unsigned long		last_gc;
- 	struct list_head	expired;
-+	struct list_head	tx_gc;
- 	u64			last_tstamp;
- };
- 
-@@ -194,14 +195,14 @@ nft_rbtree_get(const struct net *net, const struct nft_set *set,
- 
- static void nft_rbtree_gc_elem_move(struct net *net, struct nft_set *set,
- 				    struct nft_rbtree *priv,
--				    struct nft_rbtree_elem *rbe)
-+				    struct nft_rbtree_elem *rbe,
-+				    struct list_head *target_list)
- {
- 	lockdep_assert_held_write(&priv->lock);
- 	nft_setelem_data_deactivate(net, set, &rbe->priv);
- 	rb_erase(&rbe->node, &priv->root);
- 
--	/* collected later on in commit callback */
--	list_add(&rbe->list, &priv->expired);
-+	list_add(&rbe->list, target_list);
- }
- 
- static const struct nft_rbtree_elem *
-@@ -229,10 +230,10 @@ nft_rbtree_gc_elem(const struct nft_set *__set, struct nft_rbtree *priv,
- 	rbe_prev = NULL;
- 	if (prev) {
- 		rbe_prev = rb_entry(prev, struct nft_rbtree_elem, node);
--		nft_rbtree_gc_elem_move(net, set, priv, rbe_prev);
-+		nft_rbtree_gc_elem_move(net, set, priv, rbe_prev, &priv->tx_gc);
- 	}
- 
--	nft_rbtree_gc_elem_move(net, set, priv, rbe);
-+	nft_rbtree_gc_elem_move(net, set, priv, rbe, &priv->tx_gc);
- 
- 	return rbe_prev;
- }
-@@ -335,6 +336,35 @@ static bool nft_rbtree_insert_same_interval(const struct net *net,
- 	return false;
- }
- 
-+static void nft_rbtree_node_insert(const struct nft_set *set,
-+				   struct nft_rbtree *priv,
-+				   struct nft_rbtree_elem *new)
-+{
-+	struct nft_rbtree_elem *rbe;
-+	struct rb_node *parent, **p;
-+	int d;
-+
-+	lockdep_assert_held_write(&priv->lock);
-+
-+	parent = NULL;
-+	p = &priv->root.rb_node;
-+	while (*p) {
-+		parent = *p;
-+		rbe = rb_entry(parent, struct nft_rbtree_elem, node);
-+		d = nft_rbtree_cmp(set, rbe, new);
-+		if (d < 0)
-+			p = &parent->rb_left;
-+		else if (d > 0)
-+			p = &parent->rb_right;
-+		else if (nft_rbtree_interval_end(rbe))
-+			p = &parent->rb_left;
-+		else
-+			p = &parent->rb_right;
-+	}
-+	rb_link_node_rcu(&new->node, parent, p);
-+	rb_insert_color(&new->node, &priv->root);
-+}
-+
- static int __nft_rbtree_insert(const struct net *net, const struct nft_set *set,
- 			       struct nft_rbtree_elem *new,
- 			       struct nft_elem_priv **elem_priv, u64 tstamp)
-@@ -516,25 +546,7 @@ static int __nft_rbtree_insert(const struct net *net, const struct nft_set *set,
- 		return -ENOTEMPTY;
- 
- 	/* Accepted element: pick insertion point depending on key value */
--	parent = NULL;
--	p = &priv->root.rb_node;
--	while (*p != NULL) {
--		parent = *p;
--		rbe = rb_entry(parent, struct nft_rbtree_elem, node);
--		d = nft_rbtree_cmp(set, rbe, new);
--
--		if (d < 0)
--			p = &parent->rb_left;
--		else if (d > 0)
--			p = &parent->rb_right;
--		else if (nft_rbtree_interval_end(rbe))
--			p = &parent->rb_left;
--		else
--			p = &parent->rb_right;
--	}
--
--	rb_link_node_rcu(&new->node, parent, p);
--	rb_insert_color(&new->node, &priv->root);
-+	nft_rbtree_node_insert(set, priv, new);
- 	return 0;
- }
- 
-@@ -920,11 +932,11 @@ static void nft_rbtree_gc_scan(struct nft_set *set)
- 		 */
- 		write_lock_bh(&priv->lock);
- 		if (rbe_end) {
--			nft_rbtree_gc_elem_move(net, set, priv, rbe_end);
-+			nft_rbtree_gc_elem_move(net, set, priv, rbe_end, &priv->expired);
- 			rbe_end = NULL;
- 		}
- 
--		nft_rbtree_gc_elem_move(net, set, priv, rbe);
-+		nft_rbtree_gc_elem_move(net, set, priv, rbe, &priv->expired);
- 		write_unlock_bh(&priv->lock);
- 	}
- 
-@@ -974,6 +986,7 @@ static int nft_rbtree_init(const struct nft_set *set,
- 	rwlock_init(&priv->lock);
- 	priv->root = RB_ROOT;
- 	INIT_LIST_HEAD(&priv->expired);
-+	INIT_LIST_HEAD(&priv->tx_gc);
- 
- 	priv->array = NULL;
- 	priv->array_next = NULL;
-@@ -1000,6 +1013,11 @@ static void nft_rbtree_destroy(const struct nft_ctx *ctx,
- 		nf_tables_set_elem_destroy(ctx, set, &rbe->priv);
- 	}
- 
-+	list_for_each_entry_safe(rbe, next, &priv->tx_gc, list) {
-+		list_del(&rbe->list);
-+		nf_tables_set_elem_destroy(ctx, set, &rbe->priv);
-+	}
-+
- 	while ((node = priv->root.rb_node) != NULL) {
- 		rb_erase(node, &priv->root);
- 		rbe = rb_entry(node, struct nft_rbtree_elem, node);
-@@ -1047,8 +1065,10 @@ static void nft_rbtree_commit(struct nft_set *set)
- 	struct rb_node *node;
- 
- 	/* No changes, skip, eg. elements updates only. */
--	if (!priv->array_next)
-+	if (!priv->array_next) {
-+		WARN_ON_ONCE(!list_empty(&priv->tx_gc));
- 		return;
-+	}
- 
- 	/* GC can be performed if the binary search blob is going
- 	 * to be rebuilt.  It has to be done in two phases: first
-@@ -1116,13 +1136,35 @@ static void nft_rbtree_commit(struct nft_set *set)
- 	/* New blob is public, queue collected entries for freeing.
- 	 * call_rcu ensures elements stay around until readers are done.
- 	 */
-+	list_splice_tail_init(&priv->tx_gc, &priv->expired);
- 	nft_rbtree_gc_queue(set);
- }
- 
- static void nft_rbtree_abort(const struct nft_set *set)
- {
- 	struct nft_rbtree *priv = nft_set_priv(set);
-+	struct nft_rbtree_elem *rbe, *tmp;
- 	struct nft_array *array_next;
-+	struct net *net;
-+
-+	/* Restore elements that inline GC moved to the tx_gc list during
-+	 * insert: their data was deactivated (use counts decremented) but
-+	 * the transaction was aborted, so re-activate and re-insert to
-+	 * undo GC side effects and restore transactional rollback semantics.
-+	 */
-+	if (!list_empty(&priv->tx_gc)) {
-+		net = read_pnet(&set->net);
-+
-+		write_lock_bh(&priv->lock);
-+		list_for_each_entry_safe(rbe, tmp, &priv->tx_gc, list) {
-+			list_del_init(&rbe->list);
-+			nft_setelem_data_activate(net, set, &rbe->priv);
-+			nft_rbtree_node_insert(set, priv, rbe);
-+		}
-+		write_unlock_bh(&priv->lock);
-+	}
-+
-+	priv->start_rbe_cookie = 0;
- 
- 	if (!priv->array_next)
- 		return;
+You are awesome, thank you!
 -- 
-2.43.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
