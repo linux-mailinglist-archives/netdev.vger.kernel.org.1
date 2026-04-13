@@ -1,288 +1,379 @@
-Return-Path: <netdev+bounces-277962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277963-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0LDgEaSG3GmgSQkAu9opvQ
-	(envelope-from <netdev+bounces-277962-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 08:01:08 +0200
+	id MIXxCFSQ3GkmTAkAu9opvQ
+	(envelope-from <netdev+bounces-277963-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 08:42:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4D293E79CC
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 08:01:07 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id B37443E7D89
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 08:42:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4EECE300F78B
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 06:01:02 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 3593130058DA
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 06:42:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0805389DF3;
-	Mon, 13 Apr 2026 06:01:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97AE83921DC;
+	Mon, 13 Apr 2026 06:42:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q0m5pEYr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YpxULcdE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f53.google.com (mail-dl1-f53.google.com [74.125.82.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A9181A3166
-	for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 06:00:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71A35389111;
+	Mon, 13 Apr 2026 06:42:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776060061; cv=none; b=tzEBM61u9xwTsuuFa5DdU/8zSYaz403PMD3XzDJT4V4X+BwrZfUonMG3ScTd82MDgruFOAk2MpLafmJ5rrqssexwyRwkLnAqDBpoF4QLMm1bT6zM92KWPnydfBUy6CaywnFTQ2Y0rYDRN3CFrxX9RrQVLiQ+sjK4Q4FlH4lehmI=
+	t=1776062543; cv=none; b=M9ADB/gJaGwGACxI7BMTNSNdK5I6h6tsdLqe2kb1i4wBpC1GSHAKSckvRBRW+jbYUtiaPcPP1Fnz3tHcYY4oVzhrLIriPs8TdcFc0RatbgKG3pgnWcO603BYHtNJCEkJR0c6caFgu0PKpaU3iUby3j2vGrstIe9LvMpBtb9Qe6U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776060061; c=relaxed/simple;
-	bh=Ln6IAvgOhcWwoR9rKuHTj2ywlYDUSlR7scx3Ax8/FyY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=M7pWFbGYhT7cRwt1DMq1LKHEXqbmVBqAbsXpl3P9u69WN1tdvmIc9Cuga1rRtLBnsfgzdhbidDgwOr428277B7kwmvmS0uhHMWYXITzKvEvfw4UXnIvuJqp9Hb0KOA42CIW3qXC7d+583untlYYxqGHUcNjhriUStNTR7uk/FG8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=q0m5pEYr; arc=none smtp.client-ip=74.125.82.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dl1-f53.google.com with SMTP id a92af1059eb24-126ea4b77adso11663492c88.1
-        for <netdev@vger.kernel.org>; Sun, 12 Apr 2026 23:00:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776060059; x=1776664859; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8VTVqe+ecIb6U9ywp6WWs2k9bOAQmGwTcDgM9/aAoBc=;
-        b=q0m5pEYrrT1E/gBozmLVOkrUTFr8yfP5tu93BrUIlvjMvEdJCqps7BunMY5IbZbyGa
-         cLIO9pMIkeGD+iwjPexsNzn7jK02GLuygsjENVIep+dcMhRd6eAC5lZyHOn9bvHxAb6i
-         0OVzpLJNlxJe4ugXs5NQQSaf0O+ZxlS416RMw0V4mzFLXVHqiLne/A0HSnXZngs6bLki
-         NoaUjGIodP9Owm2TgJ7Z/juVsD/0R6KtCEeb+jFu0TPSJ6NlrU/WBugGXMFfctVhHQ0O
-         LNjX/NGgybhc3fJOQN4Pw3/HoIgAkoK3QNe3ldrDEDGWDyPCfcSeusYzIqTewfB0AJ3u
-         AJSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776060059; x=1776664859;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8VTVqe+ecIb6U9ywp6WWs2k9bOAQmGwTcDgM9/aAoBc=;
-        b=tD3YdrqTmQbvhtczeXILXvl2qjIubTGnaCkYWttcIgYr0AkVIUau+NcStbENLJNySM
-         j6XH9YzgVZotP/OFNVnICu13wBIVIPtDMo0Pz/RPa/xnQC5M49jgBcclzs9bGAZSDi01
-         x3wdOet3W+fafrzg8Huu7XbWgXH07UM/VA8stQXqsuYdo9WpYfeH06rfktp5KteDac1z
-         KjlET2nfkA5KLNNT4Kh0zAm1GM9r6EovdxUfYNNGBCHNsVajyNl32D+z2MQGHU5MNCDy
-         mUB0C+3wnzaP9rNhGu+L83gTQwzaxGnYNwNjQYNS2KZ5WOFYgNbXlVztpvyjgLqC3tOM
-         bA3g==
-X-Forwarded-Encrypted: i=1; AFNElJ83iGFU0+YW7y/3P4G+jWuFLB7K3BWhDrEu9iXJhnN9GTzIV5opeetqwf3e2zR+MMQy8dUGOsE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw6ol8T+FVJjuE4n+HXLH92YzB9d0/5Ea115nm5pONRHuJUK7Y1
-	s++DNiAyvgOIqGwVI4XcsE/UyS3AByu/VHd6xsmYRwTtwZZtKA5hFTuY
-X-Gm-Gg: AeBDieu1yIvnH4rbR8qbrg5SNdpA8CEgWL5wnpgehjb58rn1vbjJ0w6Qp/6hoJv9zV3
-	UjbqPy1RQ3ovKgzBFIafNeAxEy0rv5ArygmtopGeqPGyi2YnG+gsMQ7lFhu6PwzWeCGCmHC9I5n
-	bEvfdkAaF1Z2a/Pig9syor8eyRZq3dDAtCfp9hevCxzNMR6EvK7gOPNum1hHFINujal/iXkuSWb
-	U+Be58ublPS5qhXtel2VcmLUQUa/B7gJ72al87VvzCqA1KSFp0Vhh4F3XEgzlRegF3Lujy5j2ZX
-	fnEMveLm7CZGfj8VAofRdqFGVEDb/mRoKYh51nrbs4i7a+F4jmrDcGFq7JegfhxgLq6P+zdN9GV
-	sIX/MYb93rf5Ulp0qG59hUs0vtNshQtNs7Oa9YiN76Psgf9niZ3HYW6jOhPZZpIPnLCSwlEroYI
-	fZYWXIjGYgx5WbpAI1fkLfPDxjL+wjVIPknLhzhQ==
-X-Received: by 2002:a05:7022:6614:b0:12c:43:839b with SMTP id a92af1059eb24-12c34f07cc9mr6433916c88.35.1776060058876;
-        Sun, 12 Apr 2026 23:00:58 -0700 (PDT)
-Received: from [10.0.0.3] ([169.235.25.186])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12c345b6208sm14051624c88.8.2026.04.12.23.00.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 12 Apr 2026 23:00:57 -0700 (PDT)
-Message-ID: <7369ab71-e3bc-48ac-8165-439ad8595fc0@gmail.com>
-Date: Sun, 12 Apr 2026 23:01:25 -0700
+	s=arc-20240116; t=1776062543; c=relaxed/simple;
+	bh=0lH0LC1aP3wRhPO0FuTozezUioK4pF5EefTJuQZXdfQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Wqem3731uZ5mjb6xq4upxvfUEyJ6cF9cIqixU7+LAgxXjbHQW+FKbQIyluevGgQcGnYe3C7dKYrvlf7+QrZvwxOiLxdRdLyndBi9Feae/cZbiA4kO41cRCh9EKQZUI3KMCteC8iFqSQAe9pvVg8I49VpoFTIgnHtPwM4TjLUV0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YpxULcdE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C659C2BCB1;
+	Mon, 13 Apr 2026 06:42:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776062543;
+	bh=0lH0LC1aP3wRhPO0FuTozezUioK4pF5EefTJuQZXdfQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YpxULcdEiToYfFRqvbT6mNWWGFi0R1omTWyY+y04c4i1F1/RBISmmWQoWHmHQylT7
+	 tTorexOMN0AMoTxm1p5zXi7mysDIVaRDKbvDSpcWk6zWUmgvXcUl2OpAbdY7BD/s+/
+	 bjxELWe5Is3aTj3Ug29Iv8E7K4JS3VnEGRmo8h1JZox+CFuCqlyBKPPTDR9hR1qnsf
+	 7wEK5Sr2R+HPBLWlJQXZyssoeTRknBZigsSQsZxI4JU1jNQpLhLK+FDFBkP0A3YSNT
+	 3b2yZ5aOST+dhnDKWgZRIEXXgUh6VbjCLe3eChGP+XzcPMWAZXUD1c4hrNMBjw0pGt
+	 TouuaQUItgGxA==
+Date: Mon, 13 Apr 2026 12:12:16 +0530
+From: Manivannan Sadhasivam <mani@kernel.org>
+To: Krishna Chaitanya Chundru <krishna.chundru@oss.qualcomm.com>
+Cc: Richard Cochran <richardcochran@gmail.com>, mhi@lists.linux.dev, 
+	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	Vivek Pernamitta <quic_vpernami@quicinc.com>
+Subject: Re: [PATCH v2 2/6] bus: mhi: host: Add support for non-posted TSC
+ timesync feature
+Message-ID: <rwyescvy4m64hffttma2ikpbtukyzm3oqmiapcd5h7i4evygwc@gq72yoedmnxp>
+References: <20260411-tsc_timesync-v2-0-6f25f72987b3@oss.qualcomm.com>
+ <20260411-tsc_timesync-v2-2-6f25f72987b3@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 1/1] tipc: validate Gap ACK blocks in STATE message
-To: Tung Quang Nguyen <tung.quang.nguyen@est.tech>, Ren Wei <n05ec@lzu.edu.cn>
-Cc: "jmaloy@redhat.com" <jmaloy@redhat.com>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>,
- "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
- <pabeni@redhat.com>, "horms@kernel.org" <horms@kernel.org>,
- "yifanwucs@gmail.com" <yifanwucs@gmail.com>,
- "tomapufckgml@gmail.com" <tomapufckgml@gmail.com>,
- "yuantan098@gmail.com" <yuantan098@gmail.com>,
- "bird@lzu.edu.cn" <bird@lzu.edu.cn>,
- "enjou1224z@gmail.com" <enjou1224z@gmail.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <cover.1775809726.git.caoruide123@gmail.com>
- <1316452e465e9a96fce44ec15130a14f3872149f.1775809727.git.caoruide123@gmail.com>
- <GV1P189MB1988963A155568005A37BF7FC6242@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
-Content-Language: en-US
-From: Ruide Cao <caoruide123@gmail.com>
-In-Reply-To: <GV1P189MB1988963A155568005A37BF7FC6242@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+In-Reply-To: <20260411-tsc_timesync-v2-2-6f25f72987b3@oss.qualcomm.com>
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[redhat.com,davemloft.net,google.com,kernel.org,gmail.com,lzu.edu.cn,vger.kernel.org];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-277962-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[gmail.com,lists.linux.dev,vger.kernel.org,quicinc.com];
+	TAGGED_FROM(0.00)[bounces-277963-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[caoruide123@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mani@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A4D293E79CC
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,qualcomm.com:email,quicinc.com:email]
+X-Rspamd-Queue-Id: B37443E7D89
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+On Sat, Apr 11, 2026 at 01:42:02PM +0530, Krishna Chaitanya Chundru wrote:
+> From: Vivek Pernamitta <quic_vpernami@quicinc.com>
+> 
+> Implement non-posted time synchronization as described in section 5.1.1
+> of the MHI v1.2 specification. The host disables low-power link states
+> to minimize latency, reads the local time, issues a MMIO read to the
+> device's TIME register.
+> 
+> Add support for initializing this feature and export a function to be
+> used by the drivers which does the time synchronization.
+> 
+> MHI reads the device time registers in the MMIO address space pointed to
+> by the capability register after disabling all low power modes and keeping
+> MHI in M0. Before and after MHI reads, the local time is captured
+> and shared for processing.
+> 
+> Signed-off-by: Vivek Pernamitta <quic_vpernami@quicinc.com>
+> Signed-off-by: Krishna Chaitanya Chundru <krishna.chundru@oss.qualcomm.com>
+> ---
+>  drivers/bus/mhi/common.h        |  4 +++
+>  drivers/bus/mhi/host/init.c     | 28 ++++++++++++++++
+>  drivers/bus/mhi/host/internal.h |  9 +++++
+>  drivers/bus/mhi/host/main.c     | 74 +++++++++++++++++++++++++++++++++++++++++
+>  include/linux/mhi.h             | 37 +++++++++++++++++++++
+>  5 files changed, 152 insertions(+)
+> 
+> diff --git a/drivers/bus/mhi/common.h b/drivers/bus/mhi/common.h
+> index 4c316f3d5a68beb01f15cf575b03747096fdcf2c..64f9b2b94387a112bb6b5e20c634c3ba8d6bc78e 100644
+> --- a/drivers/bus/mhi/common.h
+> +++ b/drivers/bus/mhi/common.h
+> @@ -118,6 +118,10 @@
+>  #define CAP_CAPID_MASK			GENMASK(31, 24)
+>  #define CAP_NEXT_CAP_MASK		GENMASK(23, 12)
+>  
+> +/* MHI TSC Timesync */
+> +#define TSC_TIMESYNC_TIME_LOW_OFFSET	(0x8)
+> +#define TSC_TIMESYNC_TIME_HIGH_OFFSET	(0xC)
+> +
+>  /* Command Ring Element macros */
+>  /* No operation command */
+>  #define MHI_TRE_CMD_NOOP_PTR		0
+> diff --git a/drivers/bus/mhi/host/init.c b/drivers/bus/mhi/host/init.c
+> index c2162aa04e810e45ccfbedd20aaa62f892420d31..eb720f671726d919646cbc450cd54bda655a1060 100644
+> --- a/drivers/bus/mhi/host/init.c
+> +++ b/drivers/bus/mhi/host/init.c
+> @@ -498,6 +498,30 @@ static int mhi_find_capability(struct mhi_controller *mhi_cntrl, u32 capability)
+>  	return 0;
+>  }
+>  
+> +static int mhi_init_tsc_timesync(struct mhi_controller *mhi_cntrl)
+> +{
+> +	struct device *dev = &mhi_cntrl->mhi_dev->dev;
+> +	struct mhi_timesync *mhi_tsc_tsync;
+> +	u32 time_offset;
+> +	int ret;
+> +
+> +	time_offset = mhi_find_capability(mhi_cntrl, MHI_CAP_ID_TSC_TIME_SYNC);
+> +	if (!time_offset)
+> +		return -ENXIO;
+> +
+> +	mhi_tsc_tsync = devm_kzalloc(dev, sizeof(*mhi_tsc_tsync), GFP_KERNEL);
+> +	if (!mhi_tsc_tsync)
+> +		return -ENOMEM;
+> +
+> +	mhi_cntrl->tsc_timesync = mhi_tsc_tsync;
+> +	mutex_init(&mhi_tsc_tsync->ts_mutex);
+> +
+> +	/* save time_offset for obtaining time via MMIO register reads */
+> +	mhi_tsc_tsync->time_reg = mhi_cntrl->regs + time_offset;
+> +
+> +	return 0;
+> +}
 
-On 4/12/2026 8:06 PM, Tung Quang Nguyen wrote:
->> Subject: [PATCH net 1/1] tipc: validate Gap ACK blocks in STATE message
->>
->> From: Ruide Cao <caoruide123@gmail.com>
->>
->> tipc_get_gap_ack_blks() reads len, ugack_cnt and bgack_cnt directly from
->> msg_data(hdr) before verifying that a STATE message actually contains the
->> fixed Gap ACK block header in its logical data area.
->>
->> A peer that negotiates TIPC_GAP_ACK_BLOCK can send a short STATE message
->> with a declared TIPC payload shorter than struct tipc_gap_ack_blks and still
->> append a few physical bytes after the header. The helper then trusts those
->> bytes as Gap ACK metadata, and the forged bgack_cnt/len values can drive the
->> broadcast receive path into kmemdup() beyond the skb boundary.
-> Can you explain how that peer can alter the STATE message ? If it can, what concrete values are used  and on what fields of the STATE messages ?
+Move all the function definitions from MHI core code to mhi_phc.c.
 
-Thanks for the review.
+> +
+>  int mhi_init_mmio(struct mhi_controller *mhi_cntrl)
+>  {
+>  	u32 val;
+> @@ -635,6 +659,10 @@ int mhi_init_mmio(struct mhi_controller *mhi_cntrl)
+>  		return ret;
+>  	}
+>  
+> +	ret = mhi_init_tsc_timesync(mhi_cntrl);
+> +	if (ret)
+> +		dev_dbg(dev, "TSC Time synchronization init failure\n");
 
-To clarify, the peer is not "altering" an already received STATE
-message; it is actively sending a malformed LINK_PROTOCOL/STATE_MSG
-after the link has already negotiated the TIPC_GAP_ACK_BLOCK capability.
+And just keep this call in the MHI core.
 
-Concretely, the crafted STATE message is sent with a modified msg_size
-so that msg_data_sz(hdr) is 0, but the actual UDP payload still carries
-extra physical bytes after the 40-byte TIPC header. Those bytes are then
-interpreted as the fixed Gap ACK header. For example:
-  len       = 0x07fc
-  ugack_cnt = 0xff
-  bgack_cnt = 0xff
+> +
+>  	return 0;
+>  }
+>  
+> diff --git a/drivers/bus/mhi/host/internal.h b/drivers/bus/mhi/host/internal.h
+> index 7b0ee5e3a12dd585064169b7b884750bf4d8c8db..a0e729e7a1198c1b82c70b6bfe3bc2ee24331229 100644
+> --- a/drivers/bus/mhi/host/internal.h
+> +++ b/drivers/bus/mhi/host/internal.h
+> @@ -15,6 +15,15 @@ extern const struct bus_type mhi_bus_type;
+>  #define MHI_SOC_RESET_REQ_OFFSET			0xb0
+>  #define MHI_SOC_RESET_REQ				BIT(0)
+>  
+> +/*
+> + * With ASPM enabled, the link may enter a low power state, requiring
+> + * a wake-up sequence. Use a short burst of back-to-back reads to
+> + * transition the link to the active state. Based on testing,
+> + * 4 iterations are necessary to ensure reliable wake-up without
+> + * excess latency.
+> + */
+> +#define MHI_NUM_BACK_TO_BACK_READS			4
+> +
+>  struct mhi_ctxt {
+>  	struct mhi_event_ctxt *er_ctxt;
+>  	struct mhi_chan_ctxt *chan_ctxt;
+> diff --git a/drivers/bus/mhi/host/main.c b/drivers/bus/mhi/host/main.c
+> index 53c0ffe300702bcc3caa8fd9ea8086203c75b186..b7a727b1a5d1f20b570c62707a991ec5b85bfec7 100644
+> --- a/drivers/bus/mhi/host/main.c
+> +++ b/drivers/bus/mhi/host/main.c
+> @@ -1626,3 +1626,77 @@ int mhi_get_channel_doorbell_offset(struct mhi_controller *mhi_cntrl, u32 *chdb_
+>  	return 0;
+>  }
+>  EXPORT_SYMBOL_GPL(mhi_get_channel_doorbell_offset);
+> +
+> +static int mhi_get_remote_time(struct mhi_controller *mhi_cntrl, struct mhi_timesync *mhi_tsync,
+> +			       struct mhi_timesync_info *time)
+> +{
+> +	struct device *dev = &mhi_cntrl->mhi_dev->dev;
+> +	int ret, i;
+> +
+> +	if (!mhi_tsync && !mhi_tsync->time_reg) {
+> +		dev_err(dev, "Time sync is not supported\n");
+> +		return -EINVAL;
 
-These values are specifically chosen so that the existing sanity check
-remains internally consistent:
-  struct_size(p, gacks, 0xff + 0xff) == 0x07fc
+-EOPNOTSUPP
 
-Therefore, the existing sanity check does not reject this case. It only
-checks the self-consistency of the attacker-controlled Gap ACK fields;
-it completely fails to check if the declared Gap ACK record actually
-fits inside the enclosing STATE message's logical payload length.
+> +	}
+> +
+> +	if (unlikely(MHI_PM_IN_ERROR_STATE(mhi_cntrl->pm_state))) {
+> +		dev_err(dev, "MHI is not in active state, pm_state:%s\n",
+> +			to_mhi_pm_state_str(mhi_cntrl->pm_state));
+> +		return -EIO;
+> +	}
+> +
+> +	/* bring to M0 state */
+> +	ret = mhi_device_get_sync(mhi_cntrl->mhi_dev);
+> +	if (ret)
+> +		return ret;
+> +
+> +	guard(mutex)(&mhi_tsync->ts_mutex);
+> +	mhi_cntrl->runtime_get(mhi_cntrl);
+> +
+> +	/*
+> +	 * time critical code to fetch device time, delay between these two steps
+> +	 * should be deterministic as possible.
+> +	 */
+> +	preempt_disable();
+> +	local_irq_disable();
+> +
+> +	time->t_host_pre = ktime_get_real();
+> +
+> +	/*
+> +	 * To ensure the PCIe link is in L0 when ASPM is enabled, perform series
+> +	 * of back-to-back reads. This is necessary because the link may be in a
+> +	 * low-power state (e.g., L1 or L1ss), and need to be forced it to
+> +	 * transition to L0.
+> +	 */
 
->> Fix this by rejecting Gap ACK parsing unless the logical STATE payload is large
->> enough to cover the fixed header, and by rejecting declared Gap ACK lengths
->> that are smaller than the fixed header or larger than the logical payload.
->> Return 0 for invalid lengths so malformed Gap ACK data is not treated as a
->> valid payload offset, and drop unicast STATE messages that advertise Gap ACK
->> support but still yield an invalid Gap ACK length. This keeps malformed Gap
->> ACK data ignored without misaligning monitor payload parsing.
->>
->> Fixes: d7626b5acff9 ("tipc: introduce Gap ACK blocks for broadcast link")
->> Cc: stable@kernel.org
->> Reported-by: Yifan Wu <yifanwucs@gmail.com>
->> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
->> Co-developed-by: Yuan Tan <yuantan098@gmail.com>
->> Signed-off-by: Yuan Tan <yuantan098@gmail.com>
->> Suggested-by: Xin Liu <bird@lzu.edu.cn>
->> Tested-by: Ren Wei <enjou1224z@gmail.com>
->> Signed-off-by: Ruide Cao <caoruide123@gmail.com>
->> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
->> ---
->> net/tipc/link.c | 16 ++++++++++++++--
->> 1 file changed, 14 insertions(+), 2 deletions(-)
->>
->> diff --git a/net/tipc/link.c b/net/tipc/link.c index 49dfc098d89b..44678d98939a
->> 100644
->> --- a/net/tipc/link.c
->> +++ b/net/tipc/link.c
->> @@ -1415,12 +1415,22 @@ u16 tipc_get_gap_ack_blks(struct
->> tipc_gap_ack_blks **ga, struct tipc_link *l,
->> 			  struct tipc_msg *hdr, bool uc)
->> {
->> 	struct tipc_gap_ack_blks *p;
->> -	u16 sz = 0;
->> +	u16 sz = 0, dlen = msg_data_sz(hdr);
->>
->> 	/* Does peer support the Gap ACK blocks feature? */
->> 	if (l->peer_caps & TIPC_GAP_ACK_BLOCK) {
->> +		u16 min_sz = struct_size(p, gacks, 0);
->> +
->> +		if (dlen < min_sz)
->> +			goto ignore;
-> This checking is redundant because with existing sanity checking, the invalid gap ACK blocks will not be used to release acked messages in transmit queue.
+You should be doing these back-to-back reads only if ASPM is enabled. You can
+check that using pcie_aspm_enabled(). Also, see if you can hide this call inside
+pci_generic driver to make mhi_phc truly transport agnostic.
 
-The `dlen < min_sz` check is required because the existing sanity check
-already dereferences `p->len`, `p->ugack_cnt`, and `p->bgack_cnt`.
-Without this new check, an Out-of-Bounds (OOB) read occurs before the
-old sanity check even has a chance to run.
+> +	for (i = 0; i < MHI_NUM_BACK_TO_BACK_READS; i++) {
+> +		ret = mhi_read_reg(mhi_cntrl, mhi_tsync->time_reg,
+> +				   TSC_TIMESYNC_TIME_LOW_OFFSET, &time->t_dev_lo);
+> +
+> +		ret = mhi_read_reg(mhi_cntrl, mhi_tsync->time_reg,
+> +				   TSC_TIMESYNC_TIME_HIGH_OFFSET, &time->t_dev_hi);
+> +	}
+> +
+> +	time->t_host_post = ktime_get_real();
+> +
+> +	local_irq_enable();
+> +	preempt_enable();
+> +
+> +	mhi_cntrl->runtime_put(mhi_cntrl);
+> +
+> +	mhi_device_put(mhi_cntrl->mhi_dev);
+> +
+> +	return 0;
+> +}
+> +
+> +int mhi_get_remote_tsc_time_sync(struct mhi_device *mhi_dev, struct mhi_timesync_info *time)
+> +{
+> +	struct mhi_controller *mhi_cntrl = mhi_dev->mhi_cntrl;
+> +	struct mhi_timesync *mhi_tsc_tsync = mhi_cntrl->tsc_timesync;
+> +	int ret;
+> +
+> +	ret = mhi_get_remote_time(mhi_cntrl, mhi_tsc_tsync, time);
+> +	if (ret)
+> +		dev_err(&mhi_dev->dev, "Failed to get TSC Time Sync value:%d\n", ret);
 
->> +
->> 		p = (struct tipc_gap_ack_blks *)msg_data(hdr);
->> 		sz = ntohs(p->len);
->> +		if (sz < min_sz || sz > dlen) {
->> +			sz = 0;
->> +			goto ignore;
->> +		}
-> This checking is redundant. Existing sanity checking is good enough.
+What is the difference between 'TSC' and 'Time Sync'?
 
-The `sz < min_sz || sz > dlen` check is not redundant because the old
-sanity check completely fails to verify if the declared Gap ACK length
-(`sz`) actually fits inside the enclosing STATE message's logical
-payload length (`dlen`).
+Nit: Space after 'value:'
 
-Without checking against `dlen`, an internally consistent spoofed packet
-will pass the old check and cause OOB reads during the subsequent block
-parsing.
+> +
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL_GPL(mhi_get_remote_tsc_time_sync);
+> diff --git a/include/linux/mhi.h b/include/linux/mhi.h
+> index 88ccb3e14f481d6b85c2a314eb74ba960c2d4c81..f39c8ca7c251954f2d83c1227d206b600b88c75f 100644
+> --- a/include/linux/mhi.h
+> +++ b/include/linux/mhi.h
+> @@ -286,6 +286,30 @@ struct mhi_controller_config {
+>  	bool m2_no_db;
+>  };
+>  
+> +/**
+> + * struct mhi_timesync - MHI time synchronization structure
+> + * @time_reg: Points to address of Timesync register
+> + * @ts_mutex: Mutex for synchronization
+> + */
+> +struct mhi_timesync {
+> +	void __iomem *time_reg;
+> +	struct mutex ts_mutex;
+> +};
+> +
+> +/**
+> + * struct mhi_timesync_info - MHI time sync info structure
+> + * @t_host_pre: Pre host soc time
+> + * @t_host_post: Post host soc time
 
->> +
->> 		/* Sanity check */
->> 		if (sz == struct_size(p, gacks, size_add(p->ugack_cnt, p-
->>> bgack_cnt))) {
->> 			/* Good, check if the desired type exists */ @@ -
->> 1434,6 +1444,8 @@ u16 tipc_get_gap_ack_blks(struct tipc_gap_ack_blks **ga,
->> struct tipc_link *l,
->> 			}
->> 		}
->> 	}
->> +
->> +ignore:
->> 	/* Other cases: ignore! */
->> 	p = NULL;
->>
->> @@ -2270,7 +2282,7 @@ static int tipc_link_proto_rcv(struct tipc_link *l, struct
->> sk_buff *skb,
->> 	case STATE_MSG:
->> 		/* Validate Gap ACK blocks, drop if invalid */
->> 		glen = tipc_get_gap_ack_blks(&ga, l, hdr, true);
->> -		if (glen > dlen)
->> +		if (glen > dlen || ((l->peer_caps & TIPC_GAP_ACK_BLOCK) &&
->> !glen))
-> This checking is redundant. Existing sanity checking is good enough.
+Get rid of 'soc', it provides no value.
 
-The unicast caller-side drop `((l->peer_caps & TIPC_GAP_ACK_BLOCK) &&
-!glen)` is also necessary. Once the capability is negotiated, a valid
-Gap ACK record MUST have at least the fixed 4-byte header. If `glen ==
-0` from such a peer, it indicates a malformed payload. 
+> + * @t_dev_lo: Mhi device time of lower dword
+> + * @t_dev_hi: Mhi device time of higher dword
 
-The STATE message must be dropped here so it is not passed on to
-`tipc_mon_rcv()` as if monitor data started at `data + 0`, which would
-misalign the monitor payload parsing.
+s/Mhi/MHI
 
->> 			break;
->>
->> 		l->rcv_nxt_state = msg_seqno(hdr) + 1;
->> --
->> 2.34.1
->>
+> + */
+> +struct mhi_timesync_info {
+> +	ktime_t t_host_pre;
+> +	ktime_t t_host_post;
+> +	u32 t_dev_lo;
+> +	u32 t_dev_hi;
+> +};
+> +
+>  /**
+>   * struct mhi_controller - Master MHI controller structure
+>   * @name: Device name of the MHI controller
+> @@ -323,6 +347,7 @@ struct mhi_controller_config {
+>   * @mhi_event: MHI event ring configurations table
+>   * @mhi_cmd: MHI command ring configurations table
+>   * @mhi_ctxt: MHI device context, shared memory between host and device
+> + * @tsc_timesync: MHI TSC timesync
+>   * @pm_mutex: Mutex for suspend/resume operation
+>   * @pm_lock: Lock for protecting MHI power management state
+>   * @timeout_ms: Timeout in ms for state transitions
+> @@ -401,6 +426,8 @@ struct mhi_controller {
+>  	struct mhi_cmd *mhi_cmd;
+>  	struct mhi_ctxt *mhi_ctxt;
+>  
+> +	struct mhi_timesync *tsc_timesync;
+> +
+>  	struct mutex pm_mutex;
+>  	rwlock_t pm_lock;
+>  	u32 timeout_ms;
+> @@ -795,4 +822,14 @@ bool mhi_queue_is_full(struct mhi_device *mhi_dev, enum dma_data_direction dir);
+>   */
+>  int mhi_get_channel_doorbell_offset(struct mhi_controller *mhi_cntrl, u32 *chdb_offset);
+>  
+> +/**
+> + * mhi_get_remote_tsc_time_sync - get external soc time relative to local soc
+
+Same comment as above
+
+- Mani
+
+-- 
+மணிவண்ணன் சதாசிவம்
 
