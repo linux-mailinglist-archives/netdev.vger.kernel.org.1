@@ -1,184 +1,311 @@
-Return-Path: <netdev+bounces-278080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278081-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KO6vNFHt3GkZYQkAu9opvQ
-	(envelope-from <netdev+bounces-278080-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 15:19:13 +0200
+	id cGhrIELv3GmvYQkAu9opvQ
+	(envelope-from <netdev+bounces-278081-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 15:27:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BEE13EC77F
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 15:19:13 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id CEF183EC854
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 15:27:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5D29A3002295
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 13:19:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 636003033506
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 13:23:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BEF0381AEB;
-	Mon, 13 Apr 2026 13:19:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4C9637FF79;
+	Mon, 13 Apr 2026 13:23:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J2+Xgq4O";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="JmYXJXeP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c6jG/1aJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E61342F90C5
-	for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 13:19:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E075B37F8A6
+	for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 13:22:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776086347; cv=none; b=ag0q89qJcGQ6ixb19zAIRJzKrALK3kvGDzby8WDpfHk3MNCl3ntlZWzo93pTiqSC/CDiuIJoonPX0KC75es4jdR+aspfZK/RGBcmOmqniR9OHPERloflLRY1DwJtrwFPMw2Q8h6VZyok8FNKNHPDCiBMob7DEILuHOnUaG/fkmk=
+	t=1776086580; cv=none; b=byHW/t5CHlnuGNCDsECcyZr4b+3RchnpPHQ4ZXk1X2wOokQnYtX+UfhrR9+7nj8mGTwsCPXsI8NuOVtSiBCagcLAx7+ak7XVXwhR2YK8MSWpXgCllegF8yezXOsuY5//4tt8pahZLn8EeYVplLfLli6PSLwB9EYwziGhBVyZsjs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776086347; c=relaxed/simple;
-	bh=tchUCn26E/co8gGiaVaMdaMujQkkkQCs11l6BKW+kp0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gXJOlmpkrotmxI2JwxSK+bVv2JE0nIpwtSucSIj+VLn3Y7mBffsxTTumVE7qcxNWP7eGpnNTIbEculC2d/m8z+8vV7h60+SPELvv/MFVVnOuG+OMTOqVaetCaBOJtTlBXkaEezVrXmuWOeBWHvxJKdrRhMWWa6cGDLKjAB/Zdmc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=J2+Xgq4O; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=JmYXJXeP; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1776086343;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7k2xp3bBV4lET1Ny4Madx/DQczLuqXWtDe45ShURu9Y=;
-	b=J2+Xgq4OrOvRueY7XnF2yehva1T9bX60TRdMGU7L/iuAwnJutrLdXHm1qSOzRQnzUkLlrD
-	fhZIF5lN51Cztfge87tfQnkqgGImKEWu6w/7U44c4ylxLRGVwlT57iVbXoACVPLjO2+t3C
-	BmLpHYuF+mJrvtusIp3+K1WbLcRTAEs=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-594-AAeHZeCxNMWgcPd7kD7UTw-1; Mon, 13 Apr 2026 09:19:02 -0400
-X-MC-Unique: AAeHZeCxNMWgcPd7kD7UTw-1
-X-Mimecast-MFC-AGG-ID: AAeHZeCxNMWgcPd7kD7UTw_1776086341
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4836abfc742so31845895e9.0
-        for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 06:19:02 -0700 (PDT)
+	s=arc-20240116; t=1776086580; c=relaxed/simple;
+	bh=qRT5bCyfsZocUIjQFHoiRZiMPLaCEanZRSedjTq1fHA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RiBi1/ok+kCTqRblezF+DduSHOHDjrPcCHARxjsR06181UJqF5Zi0pTYDYTfOZjJCueH73u2/0vgSJFXvbzmNSJrLFEvEK5ESr46NFwsH4NWqu8uFdBzMhDovukpYfc35wNsU/larAw0SCM5ADwQCKu7VNRYc3kg/T5sfG5NqLI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c6jG/1aJ; arc=none smtp.client-ip=209.85.221.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-56d958880ecso1407440e0c.2
+        for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 06:22:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1776086341; x=1776691141; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7k2xp3bBV4lET1Ny4Madx/DQczLuqXWtDe45ShURu9Y=;
-        b=JmYXJXePNlMkWsi0s2QNctmb3oATwyZfjbxzzQeIk5Im0yKU1IsePQfdQMWev4+yi6
-         fnxnTkyD1XNTZsXNf8j48I5yPHeklbz7QVDw8KNMRhPT/l/pqCro7VemUPFJ7GZQtUf0
-         XkP0YEwdLxMmQ/E1LSXyxOkHaai0FYSRLK04iSHziHVU5EtTEiiQlS2Gk+D0XkBGhgvh
-         c9MxjjCcilNI/DbnAHs2LFmFjLm58pCUB0SR2bdW+dYsBYbNlA8LM5zPaNv9B4QM3RO9
-         uEk6cveJV2HY3Rj+tPyx+gFYTh43t7RL8xNdv1ThU4yN8wO91JoJ3bEI+e0E0N0bw5hW
-         DAPA==
+        d=gmail.com; s=20251104; t=1776086577; x=1776691377; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=OCGHzY1FMguIBQXBT4VFc+kDu77bLE052c7KyR1b0is=;
+        b=c6jG/1aJkkDnEVEe/GnCaXWz6ON2T76/N83snaXuRmh4pjYSZ3QpQB7WTkxSkZU7Zt
+         qVoSjZmr+HzeF1qfAWByQ8cmxI6MKdoxg577k2ST7z4wYP9Z+IAQPF3TiAfJvI8Rw2id
+         dg4jqGsDgksyC9jmahxTV7Oj10fRPwWyF/g8/QsvAR3n06R2AovNzY3fn2tn3DmF395o
+         5BNMuBtUFgVJe+oOpMkx3utMKgBqfzrtLlgxN4cUlJfAPFNseh0ivPQZUpkH2C/tyuuA
+         6CXkP9ILsOiKDknHSqga7CQcfSiZOzR90VbMl2WDx6CgT8VkIG0QV4Rr+dSy+gpRjC7Z
+         Ux9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776086341; x=1776691141;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7k2xp3bBV4lET1Ny4Madx/DQczLuqXWtDe45ShURu9Y=;
-        b=ZOreiFq8i1575nG8GSqGSCJqLbWQFgXucYTMLSEA3sk3GxwjNqJspw+xIKkDIPPcyS
-         /rn7QzSs5MB3j+YPanjaICJSL++GB3gIU6keoFGZcfUWZcej0JtC0UYFXJ3cILSJb4tb
-         tX9FctX/NnxYM8RC3pRnMx0ru5fqjbIpeqjWAiXlzbAG8NM045FF8cNGvcjnQJipQLWh
-         P8rsWF2g9liONE7+7UZ9ItsIsAkaIXU848naHgmHUrQho6WwNnnUKq1dCqDuNGZ4bLAZ
-         +aSf/G84tKQ5/2mdR98HCbZm8MO9jlG1NsKolbEL+SVws8/tuDRbIC8AgyzatdFTUfOS
-         rzFQ==
-X-Gm-Message-State: AOJu0YxlYf4O5ks2RaIqJogDooTzwz7hXnoFQBTFolcSJDLcBteFx16p
-	zKUqjJ2phOx8/lbct7iAif9evQEr3fA+kehidyZzO5/L4S3ucgRotTSVcoCWOVSXtPXw9XCbOAT
-	YDfiDLtxihXH2vZyMzA/Ua0TUyPqlms9UGAY51qgKDM98YZ+hZ95y6D4oLw==
-X-Gm-Gg: AeBDievomKuReJIZIWGzrifVarbMV9ob0BGPj3O5jaDoQZBLRt+YKqEfIiglQlPeBBE
-	deQE22YVwZzO5tQ2/q0NIK02V6ZAummdyXU1Kk1DrnpxOA0CP5ZkxKmnJrnqJ6OrqAdTrrrZ2ls
-	qyePRD4BmHqqbgEMArr/oD0gbC0UrqEjfpy0jW7KHsZ5FfQkJSwmpBWAOSFmXCKuer2E7xjHyIE
-	3q5TsLLrYXYhO58vOlrvHHJzRpp6QQhadufHZ+BBxIprtNKEm/VHOa4WcsM5v1G3dAXZdU/v3Ct
-	Uh+ogVDhZx00/cZ+nP8GLwUxxi2EBCbYRY4rI/aKXZxDOa7Iyu21FD5RfblyeEOX5i8TB9cXsnL
-	KRSZ183LJRxXiocBYcpDZRXaVYv2xvP0rM/goBJz39z2+kSyY+oZW21kF
-X-Received: by 2002:a05:600c:c117:b0:486:fb69:4960 with SMTP id 5b1f17b1804b1-488d68af0e7mr124590525e9.19.1776086341110;
-        Mon, 13 Apr 2026 06:19:01 -0700 (PDT)
-X-Received: by 2002:a05:600c:c117:b0:486:fb69:4960 with SMTP id 5b1f17b1804b1-488d68af0e7mr124589985e9.19.1776086340631;
-        Mon, 13 Apr 2026 06:19:00 -0700 (PDT)
-Received: from [192.168.88.32] ([216.128.11.125])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488df272d55sm67056435e9.15.2026.04.13.06.18.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 13 Apr 2026 06:19:00 -0700 (PDT)
-Message-ID: <346925be-bec3-47ee-866b-a6890b455a0b@redhat.com>
-Date: Mon, 13 Apr 2026 15:18:58 +0200
+        d=1e100.net; s=20251104; t=1776086577; x=1776691377;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OCGHzY1FMguIBQXBT4VFc+kDu77bLE052c7KyR1b0is=;
+        b=SM7poNzg6Odrl1q/1TUhf5YrtAKuBSao/b8tIK1x5Bw9LsgWB5gC1CjZvptG2xE91p
+         484kYIdjk3Q6rOhA3z6QwSOWoj86akglfvtbop7a5k9eQ4QxBh0PTSgSB8s9dlvqafy0
+         6W+YWprZOwWNRZkJUCPtUsetTPPn/eJkOtpjPCNffLzA6iVIjq24sEFiobaqxN43h7Wi
+         WZ/llbM+tOgxFci/h9l7izNIctXLg8NuQ2SHe1hwyq1YoQmKz6tEr0uJ0TDMAl4NiUJ0
+         +Pj0huqSKN9yEUDer6NosuT+5dtcGdAlf9GhA0Jjt9PpXPeyEzozg2T+BF6VfSnXrfYK
+         kWvQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+MTQ0h/PefjV9I7Ff+b/cMUG5CCldkbNkfxjpHOrUDYFF5FeUKNbmDsNrua/DuqipvzrFj2cE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxRh8gHRLRb+YnQ/75kAc5MZ1Dg7H2q+0vSDo7lQwyZ/0rU3xFl
+	Evukg1Y2nQe3u5d019FsE47ncXyhRmvLmxAp7+dJSw4T8VrSfiM5v8dcsRGH/2aO94w=
+X-Gm-Gg: AeBDieujTBEgJXuhKNREp285TJepjMDnQktJfU5BaAgG9eqA2GwGWKquEKGtAbAjjF8
+	jKZaBbI/JivF69fovzQTEP1L1pkCaG3VKe9Sdtpuprdv/P4cBk9vTD641onq6yRogUGOtBnYi/4
+	/eVvOLmFhuBmbqpqdQNIe4rEVDg/db+aS4ZHkRt/f1K/sbp7A22FmqoqUfhO/e6aFa7PoOBW4zL
+	Szr3YlkPurI8O/KOdpzjpPTxBea1cKHKMhIqWdjYDETxJW1rM9SkXjHS8H5lczyfYsWiJs/DvFe
+	PtmFvyWSgWRdvC7XXNFxCcP6fMODMsEEwFYeEdw0bze0JLVZztjrJmUtlKipjC2YInqmMKTGbRX
+	36kTrSGvjI1D3bIhQboVzlvCierUc8UF/UPNUzZGuGt+5S0N5cSPCHahmnPEdPY6XkSboSVbn9o
+	e7zZzwdt/I4nRECSuOqKCJWYawFbVnyqbdvhsHWBq5zD9c+rpnDH9pz5oZXTvEI24dxQvdeb/mu
+	rqGCrLZEMuDggdsnA==
+X-Received: by 2002:a05:6122:2a02:b0:56f:1ea2:8609 with SMTP id 71dfb90a1353d-56f3bba0573mr6274623e0c.3.1776086577504;
+        Mon, 13 Apr 2026 06:22:57 -0700 (PDT)
+Received: from lvondent-mobl5 ([72.188.211.115])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-56f3b96f510sm6864034e0c.9.2026.04.13.06.22.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Apr 2026 06:22:56 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [GIT PULL] bluetooth-next 2026-04-13
+Date: Mon, 13 Apr 2026 09:22:47 -0400
+Message-ID: <20260413132247.320961-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v11 net-next 4/7] devlink: Implement devlink param multi
- attribute nested data values
-To: Ratheesh Kannoth <rkannoth@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-rdma@vger.kernel.org, sgoutham@marvell.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- donald.hunter@gmail.com, horms@kernel.org, jiri@resnulli.us,
- chuck.lever@oracle.com, matttbe@kernel.org, cjubran@nvidia.com,
- saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com, mbloch@nvidia.com,
- dtatulea@nvidia.com
-References: <20260409025055.1664053-1-rkannoth@marvell.com>
- <20260409025055.1664053-5-rkannoth@marvell.com>
- <b52ce943-18f7-4402-8b6a-3d9f69bf7d19@redhat.com>
- <adzMvyIr7-uBtGlI@rkannoth-OptiPlex-7090>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <adzMvyIr7-uBtGlI@rkannoth-OptiPlex-7090>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,marvell.com,lunn.ch,davemloft.net,google.com,kernel.org,gmail.com,resnulli.us,oracle.com,nvidia.com];
-	TAGGED_FROM(0.00)[bounces-278080-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-278081-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 4BEE13EC77F
+	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[luizdentz@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_NONE(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: CEF183EC854
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+The following changes since commit 42f9b4c6ef19e71d2c7d9bfd3c5037d4fe434ad7:
 
+  tools: ynl: tests: fix leading space on Makefile target (2026-04-09 20:41:40 -0700)
 
-On 4/13/26 1:00 PM, Ratheesh Kannoth wrote:
-> On 2026-04-13 at 16:24:41, Paolo Abeni (pabeni@redhat.com) wrote:
->> On 4/9/26 4:50 AM, Ratheesh Kannoth wrote:
->>> @@ -441,6 +448,7 @@ union devlink_param_value {
->>>  	u64 vu64;
->>>  	char vstr[__DEVLINK_PARAM_MAX_STRING_VALUE];
->>>  	bool vbool;
->>> +	struct devlink_param_u64_array u64arr;
->>
->> You mentioned that you intend to handle the possible CONFIG_FRAME_WARN
->> with a separate patch. IMHO such patch need to be part of this series,
->> or things will stay broken for an undefined amount of time until such
->> patch is merged separatelly.
-> 
-> Patch no: 3 in the same series.
-> https://lore.kernel.org/netdev/20260409025055.1664053-4-rkannoth@marvell.com/#t
+are available in the Git repository at:
 
-I fear that is not enough ?!? i.e. what's about
-devl_param_driverinit_value_set()? Likely devlink_param->validate is
-called with enough space available in the stack to not care about the
-huge argument, but the mentioned helper is called quite deeper.
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2026-04-13
 
-/P
+for you to fetch changes up to c347ca17d62a32c25564fee0ca3a2a7bc2d5fd6f:
 
+  Bluetooth: hci_qca: Fix missing wakeup during SSR memdump handling (2026-04-13 09:19:42 -0400)
+
+----------------------------------------------------------------
+bluetooth-next pull request for net-next:
+
+core:
+ - hci_core: Rate limit the logging of invalid ISO handle
+ - hci_sync: make hci_cmd_sync_run_once return -EEXIST if exists
+ - hci_event: fix locking in hci_conn_request_evt() with HCI_PROTO_DEFER
+ - hci_event: fix potential UAF in SSP passkey handlers
+ - HCI: Avoid a couple -Wflex-array-member-not-at-end warnings
+ - L2CAP: CoC: Disconnect if received packet size exceeds MPS
+ - L2CAP: Add missing chan lock in l2cap_ecred_reconf_rsp
+ - L2CAP: Fix printing wrong information if SDU length exceeds MTU
+ - SCO: check for codecs->num_codecs == 1 before assigning to sco_pi(sk)->codec
+
+drivers:
+ - btusb: MT7922: Add VID/PID 0489/e174
+ - btusb: Add Lite-On 04ca:3807 for MediaTek MT7921
+ - btusb: Add MT7927 IDs ASUS ROG Crosshair X870E Hero, Lenovo Legion Pro 7
+          16ARX9, Gigabyte Z790 AORUS MASTER X, MSI X870E Ace Max, TP-Link
+          Archer TBE550E, ASUS X870E / ProArt X870E-Creator.
+ - btusb: Add MT7902 IDs 13d3/3579, 13d3/3580, 13d3/3594, 13d3/3596, 0e8d/1ede
+ - btusb: Add MT7902 IDs 13d3/3579, 13d3/3580, 13d3/3594, 13d3/3596, 0e8d/1ede
+ - btusb: MediaTek MT7922: Add VID 0489 & PID e11d
+ - btintel: Add support for Scorpious Peak2 support
+ - btintel: Add support for Scorpious Peak2F support
+ - btintel_pcie: Add device id of Scorpius Peak2, Nova Lake-PCD-H
+ - btintel_pcie: Add device id of Scorpious2, Nova Lake-PCD-S
+ - btmtk: Add reset mechanism if downloading firmware failed
+ - btmtk: Add MT6639 (MT7927) Bluetooth support
+ - btmtk: fix ISO interface setup for single alt setting
+ - btmtk: add MT7902 SDIO support
+ - Bluetooth: btmtk: add MT7902 MCU support
+ - btbcm: Add entry for BCM4343A2 UART Bluetooth
+ - qca: enable pwrseq support for wcn39xx devices
+ - hci_qca: Fix BT not getting powered-off on rmmod
+ - hci_qca: disable power control for WCN7850 when bt_en is not defined
+ - hci_qca: Fix missing wakeup during SSR memdump handling
+ - hci_ldisc: Clear HCI_UART_PROTO_INIT on error
+ - mmc: sdio: add MediaTek MT7902 SDIO device ID
+ - hci_ll: Enable BROKEN_ENHANCED_SETUP_SYNC_CONN for WL183x
+
+----------------------------------------------------------------
+Arnd Bergmann (1):
+      Bluetooth: btmtk: hide unused btmtk_mt6639_devs[] array
+
+Chris Lu (4):
+      Bluetooth: btusb: MT7922: Add VID/PID 0489/e174
+      Bluetooth: btmtk: improve mt79xx firmware setup retry flow
+      Bluetooth: btmtk: add status check in mt79xx firmware setup
+      Bluetooth: btmtk: Add reset mechanism if downloading firmware failed
+
+Christian Eggers (1):
+      Bluetooth: L2CAP: CoC: Disconnect if received packet size exceeds MPS
+
+Dmitry Baryshkov (1):
+      Bluetooth: qca: enable pwrseq support for WCN39xx devices
+
+Dongyang Jin (1):
+      Bluetooth: btbcm: remove done label in btbcm_patchram
+
+Dudu Lu (1):
+      Bluetooth: l2cap: Add missing chan lock in l2cap_ecred_reconf_rsp
+
+Dylan Eray (1):
+      Bluetooth: btusb: Add Lite-On 04ca:3807 for MediaTek MT7921
+
+Gustavo A. R. Silva (1):
+      Bluetooth: hci.h: Avoid a couple -Wflex-array-member-not-at-end warnings
+
+Hans de Goede (2):
+      Bluetooth: hci_qca: Fix confusing shutdown() and power_off() naming
+      Bluetooth: hci_qca: Fix BT not getting powered-off on rmmod
+
+Javier Tia (8):
+      Bluetooth: btmtk: Add MT6639 (MT7927) Bluetooth support
+      Bluetooth: btmtk: fix ISO interface setup for single alt setting
+      Bluetooth: btusb: Add MT7927 ID for ASUS ROG Crosshair X870E Hero
+      Bluetooth: btusb: Add MT7927 ID for Lenovo Legion Pro 7 16ARX9
+      Bluetooth: btusb: Add MT7927 ID for Gigabyte Z790 AORUS MASTER X
+      Bluetooth: btusb: Add MT7927 ID for MSI X870E Ace Max
+      Bluetooth: btusb: Add MT7927 ID for TP-Link Archer TBE550E
+      Bluetooth: btusb: Add MT7927 ID for ASUS X870E / ProArt X870E-Creator
+
+Johan Hovold (2):
+      Bluetooth: btusb: refactor endpoint lookup
+      Bluetooth: btmtk: refactor endpoint lookup
+
+Jonathan Rissanen (1):
+      Bluetooth: hci_ldisc: Clear HCI_UART_PROTO_INIT on error
+
+Kamiyama Chiaki (1):
+      Bluetooth: btusb: MediaTek MT7922: Add VID 0489 & PID e11d
+
+Kiran K (10):
+      Bluetooth: btintel: Add support for hybrid signature for ScP2 onwards
+      Bluetooth: btintel: Replace CNVi id with hardware variant
+      Bluetooth: btintel: Add support for Scorpious Peak2 support
+      Bluetooth: btintel: Add DSBR support for ScP2 onwards
+      Bluetooth: btintel_pcie: Add support for exception dump for ScP2
+      Bluetooth: btintel: Add support for Scorpious Peak2F support
+      Bluetooth: btintel_pcie: Add support for exception dump for ScP2F
+      Bluetooth: btintel_pcie: Add device id of Scorpius Peak2, Nova Lake-PCD-H
+      Bluetooth: btintel_pcie: Add device id of Scorpious2, Nova Lake-PCD-S
+      Bluetooth: btintel_pcie: Align shared DMA memory to 128 bytes
+
+Luiz Augusto von Dentz (2):
+      Bluetooth: btintel_pci: Fix btintel_pcie_read_hwexp code style
+      Bluetooth: L2CAP: Fix printing wrong information if SDU length exceeds MTU
+
+Lukas Kraft (1):
+      bluetooth: btusb: Fix whitespace in btusb.c
+
+Marek Vasut (1):
+      Bluetooth: btbcm: Add entry for BCM4343A2 UART Bluetooth
+
+Pauli Virtanen (3):
+      Bluetooth: hci_core: Rate limit the logging of invalid ISO handle
+      Bluetooth: hci_sync: make hci_cmd_sync_run_once return -EEXIST if exists
+      Bluetooth: fix locking in hci_conn_request_evt() with HCI_PROTO_DEFER
+
+Sean Wang (8):
+      mmc: sdio: add MediaTek MT7902 SDIO device ID
+      Bluetooth: btmtk: add MT7902 MCU support
+      Bluetooth: btusb: Add new VID/PID 13d3/3579 for MT7902
+      Bluetooth: btusb: Add new VID/PID 13d3/3580 for MT7902
+      Bluetooth: btusb: Add new VID/PID 13d3/3594 for MT7902
+      Bluetooth: btusb: Add new VID/PID 13d3/3596 for MT7902
+      Bluetooth: btusb: Add new VID/PID 0e8d/1ede for MT7902
+      Bluetooth: btmtk: add MT7902 SDIO support
+
+Shuai Zhang (2):
+      Bluetooth: hci_qca: disable power control for WCN7850 when bt_en is not defined
+      Bluetooth: hci_qca: Fix missing wakeup during SSR memdump handling
+
+Shuvam Pandey (1):
+      Bluetooth: hci_event: fix potential UAF in SSP passkey handlers
+
+Stefan Metzmacher (1):
+      Bluetooth: SCO: check for codecs->num_codecs == 1 before assigning to sco_pi(sk)->codec
+
+Stefano Radaelli (1):
+      Bluetooth: hci_ll: Enable BROKEN_ENHANCED_SETUP_SYNC_CONN for WL183x
+
+Thorsten Blum (3):
+      Bluetooth: btintel_pcie: Replace snprintf("%s") with strscpy
+      Bluetooth: btintel_pcie: Use struct_size to improve hci_drv_read_info
+      Bluetooth: btintel_pcie: use strscpy to copy plain strings
+
+Vivek Sahu (1):
+      Bluetooth: qca: Refactor code on the basis of chipset names
+
+ drivers/bluetooth/btbcm.c        |  11 ++--
+ drivers/bluetooth/btintel.c      | 109 ++++++++++++++++++++++++++++------
+ drivers/bluetooth/btintel.h      |  20 +++++--
+ drivers/bluetooth/btintel_pcie.c | 122 ++++++++++++++++++++++++---------------
+ drivers/bluetooth/btintel_pcie.h |   3 -
+ drivers/bluetooth/btmtk.c        | 115 ++++++++++++++++++++++++++----------
+ drivers/bluetooth/btmtk.h        |   9 ++-
+ drivers/bluetooth/btmtksdio.c    |  44 +++++++++-----
+ drivers/bluetooth/btqca.c        |  37 ++++++------
+ drivers/bluetooth/btusb.c        |  84 +++++++++++++--------------
+ drivers/bluetooth/hci_ldisc.c    |   3 +
+ drivers/bluetooth/hci_ll.c       |  10 ++++
+ drivers/bluetooth/hci_qca.c      |  84 ++++++++++++++++-----------
+ include/linux/mmc/sdio_ids.h     |   1 +
+ include/net/bluetooth/hci.h      |  16 +++--
+ net/bluetooth/hci_conn.c         |   4 +-
+ net/bluetooth/hci_core.c         |   4 +-
+ net/bluetooth/hci_event.c        |  21 ++++---
+ net/bluetooth/hci_sync.c         |   2 +-
+ net/bluetooth/l2cap_core.c       |  15 ++++-
+ net/bluetooth/sco.c              |   3 +-
+ 21 files changed, 476 insertions(+), 241 deletions(-)
 
