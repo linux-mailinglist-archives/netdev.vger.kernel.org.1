@@ -1,90 +1,91 @@
-Return-Path: <netdev+bounces-278150-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278151-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KDj9M3Ap3WmVaQkAu9opvQ
-	(envelope-from <netdev+bounces-278150-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 19:35:44 +0200
+	id UJZdEccn3WlpaQkAu9opvQ
+	(envelope-from <netdev+bounces-278151-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 19:28:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33A563F18DF
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 19:35:44 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36BD13F1719
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 19:28:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3A5A430E1385
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 17:12:19 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 219D33050B91
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 17:12:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98FA134E745;
-	Mon, 13 Apr 2026 17:11:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A74D34EF1C;
+	Mon, 13 Apr 2026 17:11:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Eqsrpn/D"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="POJyDsyk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f193.google.com (mail-oi1-f193.google.com [209.85.167.193])
+Received: from mail-oo1-f67.google.com (mail-oo1-f67.google.com [209.85.161.67])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B2A134CFD6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3B6533F390
 	for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 17:11:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.193
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.67
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776100307; cv=none; b=knF94WBpl74VjvnceXMbKtZJTHjiw1E723WHM6A6JLU5E2Tw03M/HX+bKMqFYEraOp9Q2BKersDh4K79lWGbAH8UZ5ACcHbNWdJ50y5hIXMwxYo3dAWB8Ivic1HXAtI7N4u1on1MCg+toeFJsG+BH2Rr+Qz5QrIGeRO6Fe+24bg=
+	t=1776100308; cv=none; b=NCHYXQVxHQf0h1+2Nhvwog/5M34aLAqm9AJKBb6GZv1TO8sy66emAIbPMPZAeFYrqublwGOxaipJ1j+KdBiXGBCR/iQsdMOLcopfiYVAMeHtWPgSgzZg+Ndd750iLROtTXJT8KcapN/o8FZ6sIqTUVBxKXRClVvwg89+oMcMIOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776100307; c=relaxed/simple;
-	bh=DblTuTiiUScWKwjSM8y2bGCj9IwmvdkqVpvGEE/EQi8=;
+	s=arc-20240116; t=1776100308; c=relaxed/simple;
+	bh=XCn7fNG29eCyajNe7iRuuYGq5z55KVY9f/U8xl2Pcio=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZNrWOIbHMwqVDYoTn3SbijsUO/5oFk6a76TjoQQu7QH4qjncTMOcdbACtb2cLkPOdC3IadzkLIrLq0FvJrVLSJ9lT/2cJJ7k+/zE3H5yFydCfqbRokStFlH+AQ/TzELij+x9HMtHdOwHWZG3mvkXZtjLAIipfuLMw7E1fr9md3Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Eqsrpn/D; arc=none smtp.client-ip=209.85.167.193
+	 MIME-Version; b=SxvjUlkxwKk7sDjl2oZirgysuauq7+PQllO1ENkJ/wEFHN4nDFtcUtMx2IAjIDw2diWAz0psy+jia1/Zr+4UbtcADgzqlAv62RvWJixDxlsOj163GriX5GCi0cnbdhkFcn2dQxVXH9s7TenIFGGn2xQK4AiF3X0v1CQOYysPzgo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=POJyDsyk; arc=none smtp.client-ip=209.85.161.67
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f193.google.com with SMTP id 5614622812f47-4710c186d8aso1332383b6e.3
+Received: by mail-oo1-f67.google.com with SMTP id 006d021491bc7-688a8e5fe5eso2310051eaf.1
         for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 10:11:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776100305; x=1776705105; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1776100306; x=1776705106; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Fl9PJQRW1at9+hyIvljSyrZjl0s2ic+yWjg5140FMUY=;
-        b=Eqsrpn/DfkSNtoLUKj5IljZBaFFBPG/nCD60h09G5fhCFxfeC+EojFYelf7p+pjc5J
-         HPUqajZCiQRCTEOhJwlllcUSXv+yAjcIUKParWSTW+tweye7jFz+GeybxHc//QdmQxj9
-         YDXcCWxp6uc7At9HJ7SKHimOcv2k2jEgYriy2p7p7RgcQYbleTaCVg3LV1uExFesIdfT
-         Uk5UXMOq1uG+U3inF7l5Iuv3iSub+CAWGaTd9q3vyi9SIL2jfpPQy8SoWDui3O35f+7R
-         qjX4s/hpuowxSFwoDuTE2E/TkHFGM7F8KwTmVMA86RGWC6eUOw6WT/Vkvq93DFwaJkUA
-         p6Gg==
+        bh=pTCpb1WIQyNRfMSCX9t/p16yWG77DX8v8xzgWcYaii4=;
+        b=POJyDsyk2DT9Qqb8BFAug0ad6C1+xofn6s8crRu3TNHxf44RHPYkdr07q/D2mun/d+
+         /izV4rqbnwr223tQS41iPM20nkuys8l5jIYcSx7TSXQLZgXGSn2/e9zGWDgHByH/O8UM
+         +hEZI4WglvncZ1bppsF4LLvbrIHD9InMxnepihCUaWX4hiYRDX3YaN5QlWziOss/boE3
+         U0tsbuZGuu7lp1zlBIsBOVtcooI5GOMpZDn193bCN2s5d+kl+s5mwiDcAT+gdTOqRNxJ
+         1VwkDkvm/pLx+J9SEPo18hwXy8rCcbm8vLvYqCfM4iEvbAarfRePCi0a82w2kRHNQd8T
+         l41g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776100305; x=1776705105;
+        d=1e100.net; s=20251104; t=1776100306; x=1776705106;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=Fl9PJQRW1at9+hyIvljSyrZjl0s2ic+yWjg5140FMUY=;
-        b=a05eyGVCwF/MzmqgYI60X+UWdMZzOcyv19vcfnT75yjNfJwBhRwkrciMKkC5c5eK3Y
-         L8Gf+0OONI+WbVtrPYm5PR0hUUY4Rr+GNCFBAOp1WkiK2Z83UuOCvkR6mxHSm71KuQFp
-         +Ew6QAbWirTA6ppISCmrxY17kmu83EbXzjEisUtch1c3VHGx/FVO7dNkMrHCyFp5hbHO
-         S2NTQTZEMUyHhSX1Vi/MIkcvE7czczk61jGpcZh5zHGkyUz1cPVhHrDJHwNtQbowsPvp
-         SQxzzY8gjEqN97c7TQd7VtVm5OitjDSE2w4VARD8MKPRSNJMJUV8MfO57+5CBl83jjRK
-         0aMw==
-X-Gm-Message-State: AOJu0YzmBaeuWCz1m0rdRz47/MyMPgftpr7IvM8ZPV5xNfcCmLUzKNZy
-	c5osTg8D+Mn/gRcSqpDO3FGiMNRRiaUE8ugW/P2SPKNiLZHyCDXf6tX6kP84lX2d
-X-Gm-Gg: AeBDievnq37X80xpog6zTfYckJ3bXYbXKGW6aPwo5HTbiWK8NZSEDOe1Rhz/wcWYbKn
-	zYchUUgg+gPnLKJ4l9eOL8bhxlATy/IVOinQW9DtlzVTRAjQK532ga2GFdsapMMDFZEgIMO0t1J
-	XlCtgU+6eeu58zVAdX8guz/zJFrXpNVLCGQCbmPAXJ7qx5MEASn03hgDCY+z/aW3zl+qE3FQ8+z
-	9tLMb19vuaTx61GT3f0tBHkHwVPpRU7vOCGsHuDTR2HL9ZV6BCpBjxFg5mO8hKBmCIm7LSyLWAf
-	/B+lmyExx4pKKlFi39iU3W03k/Pr+bAWbr8Cw8Q0RrXDY4v3ZaZu7KAI9mbjnWGgVsfz9SsbG5a
-	DKX5A5f3itye9CetzVtrdLtI7I4s1hIh3/zDDsixisc0eom47KyT9dU5Jr3jMy7097b/kR2JS2x
-	D/KN/Y8GXLZ2HcKC+6di+ium/Xmjg=
-X-Received: by 2002:a05:6808:8955:b0:467:284:b3bf with SMTP id 5614622812f47-4789f210de6mr7017524b6e.42.1776100304973;
-        Mon, 13 Apr 2026 10:11:44 -0700 (PDT)
-Received: from localhost ([2a03:2880:12ff:5::])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-478a101b75esm6957926b6e.6.2026.04.13.10.11.44
+        bh=pTCpb1WIQyNRfMSCX9t/p16yWG77DX8v8xzgWcYaii4=;
+        b=TEUiSuRJk/8d8hGAAluiH290zXAFoEV5GWqF2V+cx8us4VW53AdXJb9zKCdIf8r3v2
+         sHo/USTqvk1rUpZWuwDJkHz0iGQW4xFIwhla5dYJ48GR95BxosuMjH/0R8Q351XqHEwY
+         MOxtxg2qEe0rfK4OEVqg/G/7CGar5N7W2obOX+2gseDqQaFAwdN+g1mAVwZwYcvzG7e+
+         UHdxbEtOdtFZzb5CXpJyQNCnrhqEMLCiV6QbuwrN/SGcJiNmRH2TgoJQz3mb1A6IaU3Q
+         fgrLXzFHonYE1da5DVG7cfCX9GuX03i8VTW4f9teFgBpfH+ZeL3gjCP1IEuBnFQbP9cM
+         h7/w==
+X-Gm-Message-State: AOJu0Yx0vmlX5KNso+JNJRxi06HZ236uYKcVRJHi304cQsuW7Eh2RksB
+	49zXh/4hII5oy91aJQ4/yiPSXBd/bGV50Aj6k78zEeB5sx77Wx4WS7Ko987aPt2+
+X-Gm-Gg: AeBDieuPMWZOs2LwRBU1K4NaXDULq4gIPriyj887HVBV9pDiEygspdxeHUHU0FjEQr6
+	zePsXYPzxNXYic0Ystw0yAkXOnd6lZS77ft5UJ9IVh0eU4JUjzRxYsHV3dWS73DHfl+sQWssEss
+	YDNbRt9BFowgbdxPtGkaAGaF7odjJzQYqDVXIJ7K+v4iFZDaAOYJoovytvm9cJRs93r+QCZDaR9
+	V//0T4p4oU1gZ2CUSrNZ7sjMO9XMwuY8ABkqJsE2VxDw5bGQJmpsl+liFp0E0EUJcJmkA5rJYv2
+	1t0DLxidZ46tVPZHnH2fkBl/4qfAxXaosYJfU0y4sUzB0NsbRTgMcsri0xkv6oAwTXYxl7xBa/c
+	brDMtxrTi1iogi7diV9KU6Rxgu8QwVh/Jl14+kLNE4nKZG4dAzSFkClYHeXyysBSxrZ9AYI4tjd
+	3nDEkals7yrm2DshJ0
+X-Received: by 2002:a05:6820:4dc3:b0:67e:dab:7cf5 with SMTP id 006d021491bc7-68be604a327mr7333571eaf.17.1776100305880;
+        Mon, 13 Apr 2026 10:11:45 -0700 (PDT)
+Received: from localhost ([2a03:2880:12ff:1::])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-423dd39a157sm8224128fac.3.2026.04.13.10.11.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Apr 2026 10:11:44 -0700 (PDT)
+        Mon, 13 Apr 2026 10:11:45 -0700 (PDT)
 From: Stanislav Fomichev <sdf.kernel@gmail.com>
 X-Google-Original-From: Stanislav Fomichev <sdf@fomichev.me>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
-	pabeni@redhat.com
-Subject: [PATCH net-next v7 12/15] netkit: convert to ndo_set_rx_mode_async
-Date: Mon, 13 Apr 2026 10:11:28 -0700
-Message-ID: <20260413171131.550126-13-sdf@fomichev.me>
+	pabeni@redhat.com,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Subject: [PATCH net-next v7 13/15] net: warn ops-locked drivers still using ndo_set_rx_mode
+Date: Mon, 13 Apr 2026 10:11:29 -0700
+Message-ID: <20260413171131.550126-14-sdf@fomichev.me>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260413171131.550126-1-sdf@fomichev.me>
 References: <20260413171131.550126-1-sdf@fomichev.me>
@@ -97,69 +98,83 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-278150-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-278151-lists,netdev=lfdr.de];
 	FREEMAIL_FROM(0.00)[gmail.com];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCPT_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[sdfkernel@gmail.com,netdev@vger.kernel.org];
-	TO_DN_NONE(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-0.999];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[fomichev.me:email,fomichev.me:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 33A563F18DF
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,intel.com:email,fomichev.me:email,fomichev.me:mid]
+X-Rspamd-Queue-Id: 36BD13F1719
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Convert netkit driver from ndo_set_rx_mode to ndo_set_rx_mode_async.
-The netkit driver's set_multicast_list is a no-op, presumably
-for the same reason as the one in dummy? (fake multicast ability)
+Now that all in-tree ops-locked drivers have been converted to
+ndo_set_rx_mode_async, add a warning in register_netdevice to catch
+any remaining or newly added drivers that use ndo_set_rx_mode with
+ops locking. This ensures future driver authors are guided toward
+the async path.
 
+Also route ops-locked devices through netdev_rx_mode_work even if they
+lack rx_mode NDOs, to ensure netdev_ops_assert_locked() does not fire
+on the legacy path where only RTNL is held.
+
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
 ---
- drivers/net/netkit.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ net/core/dev.c            | 5 +++++
+ net/core/dev_addr_lists.c | 3 ++-
+ 2 files changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/netkit.c b/drivers/net/netkit.c
-index 7b56a7ad7a49..5e2eecc3165d 100644
---- a/drivers/net/netkit.c
-+++ b/drivers/net/netkit.c
-@@ -186,7 +186,9 @@ static int netkit_get_iflink(const struct net_device *dev)
- 	return iflink;
- }
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 8a69aed56fca..d426c1beeb76 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -11360,6 +11360,11 @@ int register_netdevice(struct net_device *dev)
+ 		goto err_uninit;
+ 	}
  
--static void netkit_set_multicast(struct net_device *dev)
-+static void netkit_set_multicast(struct net_device *dev,
-+				 struct netdev_hw_addr_list *uc,
-+				 struct netdev_hw_addr_list *mc)
- {
- 	/* Nothing to do, we receive whatever gets pushed to us! */
- }
-@@ -330,7 +332,7 @@ static const struct net_device_ops netkit_netdev_ops = {
- 	.ndo_open		= netkit_open,
- 	.ndo_stop		= netkit_close,
- 	.ndo_start_xmit		= netkit_xmit,
--	.ndo_set_rx_mode	= netkit_set_multicast,
-+	.ndo_set_rx_mode_async	= netkit_set_multicast,
- 	.ndo_set_rx_headroom	= netkit_set_headroom,
- 	.ndo_set_mac_address	= netkit_set_macaddr,
- 	.ndo_get_iflink		= netkit_get_iflink,
++	if (netdev_need_ops_lock(dev) &&
++	    dev->netdev_ops->ndo_set_rx_mode &&
++	    !dev->netdev_ops->ndo_set_rx_mode_async)
++		netdev_WARN(dev, "ops-locked drivers should use ndo_set_rx_mode_async\n");
++
+ 	ret = netdev_do_alloc_pcpu_stats(dev);
+ 	if (ret)
+ 		goto err_uninit;
+diff --git a/net/core/dev_addr_lists.c b/net/core/dev_addr_lists.c
+index 49346d0cbc8a..3bd7bd396de0 100644
+--- a/net/core/dev_addr_lists.c
++++ b/net/core/dev_addr_lists.c
+@@ -1362,7 +1362,8 @@ void __dev_set_rx_mode(struct net_device *dev)
+ 	if (!netif_device_present(dev))
+ 		return;
+ 
+-	if (ops->ndo_set_rx_mode_async || ops->ndo_change_rx_flags) {
++	if (ops->ndo_set_rx_mode_async || ops->ndo_change_rx_flags ||
++	    netdev_need_ops_lock(dev)) {
+ 		netif_rx_mode_queue(dev);
+ 		return;
+ 	}
 -- 
 2.52.0
 
