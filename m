@@ -1,53 +1,72 @@
-Return-Path: <netdev+bounces-278224-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278226-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yE/qL0Nz3WkgeQkAu9opvQ
-	(envelope-from <netdev+bounces-278224-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 00:50:43 +0200
+	id gHWkM+503WngeQkAu9opvQ
+	(envelope-from <netdev+bounces-278226-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 00:57:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37CB93F40E9
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 00:50:43 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 720853F41E6
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 00:57:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BD9B4302DFA6
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 22:50:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8F8C1300D848
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 22:53:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B8DB39150F;
-	Mon, 13 Apr 2026 22:50:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4DB339C005;
+	Mon, 13 Apr 2026 22:53:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q89oAXhm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TqBaKfqs"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCD4B233704;
-	Mon, 13 Apr 2026 22:50:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A032539BFE0;
+	Mon, 13 Apr 2026 22:53:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776120637; cv=none; b=Tq1ZgtL7g6lw5YE/23egYrqn5uxj8WcpxWxPKidfnbjfjfSkJkga0NfK8g+rGR0gt3TY8FM9Iz9t9bKJLCB3C2v7jH1yfXPZB0n+lgZZosKMtudevNXs/pojzUcQf1Vfc4TGkNctmNj+y5mzaBcw9WQ5NY2r/pQ4kCIoOTAJ9VA=
+	t=1776120814; cv=none; b=dAYSp7cxeSkWrTJNDGKUf6zMGg8qeCeRyozYgTM2q4mIjHYw5AAByAfeX8eTBdpOfGIsJ7aqTV/Hb2Ifh0h5RgIkTxU1WYhNyhwdNsvvWAmXJOyYaf/7whvZUhqJ1haCg2AYvVTYYb1Pts1UpUfg+dzy7Yp4q6UQ05aSdvcK2qM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776120637; c=relaxed/simple;
-	bh=pHxYSm48GvZu9OgL63Naj9A5UM5duMr7/LPEHuVexGg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=jPglaAJ3p+Ruru0BvEtmSXNAcTU5nYCDYyJCntB/gHD4BevQxj5QqNysKr93JcHCgxtavAlwUZbaN5bbTfvrQT46lzfrQvdaBPbkgd5bpUqYn9U4E/tW4Wd9otzbShE6UwhcAI4VMP7RkP0NI5/k/2kXzJK+yaRSPnojd2oNgyQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q89oAXhm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD3BEC2BCAF;
-	Mon, 13 Apr 2026 22:50:37 +0000 (UTC)
+	s=arc-20240116; t=1776120814; c=relaxed/simple;
+	bh=gSbS1nlRpVF8hVXKTOWKoSW7xU9rDrZIooHLIsZCmRQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=rJSjn9jaxPqfI4LTEVFXnVPrLxqHs1VdhdcZxWf0cnMyrjalYsHPorBlfb/kpOYcn0FJ1++G+NtCpmNtD5BuayzXO2aic8u5HaR5tyawLBHbBzNZ3kdI0nfpbLesaGIm3QbBW/fb2qwtWMh+r+ZIZN8lVL06hdl/p/WR7y2gE1U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TqBaKfqs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8D9DC2BCB4;
+	Mon, 13 Apr 2026 22:53:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776120637;
-	bh=pHxYSm48GvZu9OgL63Naj9A5UM5duMr7/LPEHuVexGg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=q89oAXhm5ke0dUSczizJniadAlcSBvrFUnXmUlKCrDIGcTSPfm8zuxnYF2iTqZH+F
-	 3sDqMQm7+E/cLs17Avgp3HY7k4GjOfFrJXzsf7HPQMTjeblN2x9jdDQfUrZBiA+MK/
-	 WHYAdig2UNOFkBBTBU87cpMbZWzm7jpjDDufUBas/XpwEtWYTZMD9LbIwiv9cHCTgW
-	 AdBnZBlfYc2yRhgkwr0qZqHjIPH4ef40K9pGQoqFQZrfgxTTMtJHnmKhT5DBuiVqkj
-	 Ztesdhz8X3fW0Jsaxpzji4Fho8JCHxgiHeE5DqV4l3c9E8Y2pScezObmav5g7w1S/L
-	 lN2NEykpC9oKQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FE843809A0B;
-	Mon, 13 Apr 2026 22:50:10 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1776120814;
+	bh=gSbS1nlRpVF8hVXKTOWKoSW7xU9rDrZIooHLIsZCmRQ=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=TqBaKfqs9MiVwBY24iw5wQ4Ef0M4xk1TdGFFaOe6qBHfJAa13Y9HykE5ySUAK6q5O
+	 lDgfqP292iPs418MpHeQV0sW6BWYlLC2iWaZN9+u7inmXJzA4e2PR6Up9dRya0NY1x
+	 58vFUtxLR8syt2O670Sd3bTBhXlHhjU8dATGRxzV0O/VwoU8FkRlnyc53OnAl0VMf4
+	 gyPUxK5XYu1OW3KfrZHvGr8eA9EvGDpIRnHXJbjOAWkthnWOkrcezm4xtyme10mjc9
+	 q4pzlSvNXcIJSymfO34mGOpi30kAddcHxyMIml5AZlw2W7czjQ5xxnVwdmUueBEdcM
+	 ObUBGoEAcJhgg==
+From: Jakub Kicinski <kuba@kernel.org>
+To: github@szelinsky.de
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	o.rempel@pengutronix.de,
+	kory.maincent@bootlin.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	krzk@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	robh@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-leds@vger.kernel.org,
+	lkp@intel.com
+Subject: Re: [PATCH net-next v4 1/2] net: pse-pd: add devm_pse_poll_helper()
+Date: Mon, 13 Apr 2026 15:50:21 -0700
+Message-ID: <20260413225021.3634733-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260410124428.809943-2-github@szelinsky.de>
+References: <20260410124428.809943-2-github@szelinsky.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,78 +74,144 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2 0/2] octeon_ep_vf: fix napi_build_skb() NULL
- dereference
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177612060882.586394.18281739297986943310.git-patchwork-notify@kernel.org>
-Date: Mon, 13 Apr 2026 22:50:08 +0000
-References: <20260409184009.930359-1-devnexen@gmail.com>
-In-Reply-To: <20260409184009.930359-1-devnexen@gmail.com>
-To: David CARLIER <devnexen@gmail.com>
-Cc: netdev@vger.kernel.org, vburru@marvell.com, sedara@marvell.com,
- srasheed@marvell.com, sburla@marvell.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-278224-lists,netdev=lfdr.de,netdevbpf];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	TAGGED_FROM(0.00)[bounces-278226-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NO_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 37CB93F40E9
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[poll_work.work:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 720853F41E6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello:
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+---
+net: pse-pd: add devm_pse_poll_helper()
 
-This series was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Extract the common event handling loop from pse_isr() into a shared
+pse_handle_events() function, and add a generic poll-based alternative
+to the IRQ path for PSE controllers that lack interrupt support.
 
-On Thu,  9 Apr 2026 19:40:07 +0100 you wrote:
-> napi_build_skb() can return NULL on allocation failure. In
-> __octep_vf_oq_process_rx(), the result is used directly without a
-> NULL check in both the single-buffer and multi-fragment paths,
-> leading to a NULL pointer dereference.
-> 
-> Patch 1 introduces a helper to deduplicate the ring index advance
-> pattern, patch 2 adds the actual NULL checks.
-> 
-> [...]
+> Work cancellation on teardown is handled via devm_add_action_or_reset()
+> to ensure the delayed work is cancelled before poll_notifs is freed
+> by devres, avoiding a use-after-free when devm_pse_poll_helper() is
+> called after devm_pse_controller_register() (devres LIFO ordering).
 
-Here is the summary with links:
-  - [net,v2,1/2] octeon_ep_vf: introduce octep_vf_oq_next_idx() helper
-    https://git.kernel.org/netdev/net/c/4e5bc3ff060e
-  - [net,v2,2/2] octeon_ep_vf: add NULL check for napi_build_skb()
-    https://git.kernel.org/netdev/net/c/dd66b4285470
+Is it safe to rely on this devm registration order to prevent a
+use-after-free?
 
-You are awesome, thank you!
+Standard Linux driver initialization typically sets up interrupts and
+pollers before device registration to prevent race conditions where an
+unready device is exposed to userspace.
+
+If a driver follows this standard ordering by calling the helper before
+registration, devres will unregister the controller first. This will
+tear down resources in pse_controller_unregister() while the poll work
+remains active.
+
+If the worker executes during this race window, could it access the
+already-freed pcdev->pi array or push to the destroyed ntf_fifo? Would
+it be safer to explicitly cancel asynchronous event sources within
+pse_controller_unregister() instead?
+
+> --- a/drivers/net/pse-pd/pse_core.c
+> +++ b/drivers/net/pse-pd/pse_core.c
+[ ... ]
+> +static void pse_handle_events(struct pse_controller_dev *pcdev,
+> +			      unsigned long *notifs,
+> +			      unsigned long notifs_mask)
+>  {
+> -	struct pse_controller_dev *pcdev;
+> -	unsigned long notifs_mask = 0;
+> -	struct pse_irq_desc *desc;
+> -	struct pse_irq *h = data;
+> -	int ret, i;
+> -
+> -	desc = &h->desc;
+> -	pcdev = h->pcdev;
+> -
+> -	/* Clear notifs mask */
+> -	memset(h->notifs, 0, pcdev->nr_lines * sizeof(*h->notifs));
+> -	mutex_lock(&pcdev->lock);
+> -	ret = desc->map_event(irq, pcdev, h->notifs, &notifs_mask);
+> -	if (ret || !notifs_mask) {
+> -		mutex_unlock(&pcdev->lock);
+> -		return IRQ_NONE;
+> -	}
+> +	int i;
+>  
+>  	for_each_set_bit(i, &notifs_mask, pcdev->nr_lines) {
+
+Can this lead to an out-of-bounds read on the stack if a controller
+supports more than BITS_PER_LONG ports?
+
+The notifs_mask variable is passed by value to pse_handle_events(), but
+for_each_set_bit() takes its address. If pcdev->nr_lines is greater than
+BITS_PER_LONG (e.g., a 48-port switch on a 32-bit architecture), the
+macro will read past the function argument on the stack into uninitialized
+memory.
+
+[ ... ]
+> +static irqreturn_t pse_isr(int irq, void *data)
+> +{
+> +	struct pse_controller_dev *pcdev;
+> +	unsigned long notifs_mask = 0;
+> +	struct pse_irq *h = data;
+> +	int ret;
+> +
+> +	pcdev = h->pcdev;
+> +
+> +	/* Clear notifs mask */
+> +	memset(h->notifs, 0, pcdev->nr_lines * sizeof(*h->notifs));
+> +	mutex_lock(&pcdev->lock);
+> +	ret = h->desc.map_event(irq, pcdev, h->notifs, &notifs_mask);
+
+Could this also result in a stack out-of-bounds write?
+
+If map_event() uses set_bit() to report an event on a port index greater
+than or equal to BITS_PER_LONG, it will write past the 4-byte boundary of
+the scalar notifs_mask variable, corrupting adjacent stack memory.
+
+[ ... ]
+> +static void pse_poll_worker(struct work_struct *work)
+> +{
+> +	struct pse_controller_dev *pcdev =
+> +		container_of(work, struct pse_controller_dev,
+> +			     poll_work.work);
+> +	unsigned long notifs_mask = 0;
+> +	int ret;
+> +
+> +	memset(pcdev->poll_notifs, 0,
+> +	       pcdev->nr_lines * sizeof(*pcdev->poll_notifs));
+> +	mutex_lock(&pcdev->lock);
+> +	ret = pcdev->poll_desc.map_event(0, pcdev, pcdev->poll_notifs,
+> +					 &notifs_mask);
+
+Does this share the same out-of-bounds write risk for notifs_mask as the
+IRQ handler above?
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
