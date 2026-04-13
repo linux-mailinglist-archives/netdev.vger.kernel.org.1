@@ -1,279 +1,219 @@
-Return-Path: <netdev+bounces-278177-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278178-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wO7eEuM23WkmawkAu9opvQ
-	(envelope-from <netdev+bounces-278177-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 20:33:07 +0200
+	id SG+sFDM43Wk3awkAu9opvQ
+	(envelope-from <netdev+bounces-278178-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 20:38:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D866D3F217A
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 20:33:06 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id E66893F2294
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 20:38:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 0086730164D5
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 18:33:06 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 133543011176
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 18:38:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61DC8361DC3;
-	Mon, 13 Apr 2026 18:33:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E05AE38CFE4;
+	Mon, 13 Apr 2026 18:38:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="BhCoaxeI"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="OFg5MZpb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7ECB36897F
-	for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 18:33:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.153.30
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776105183; cv=fail; b=sIFx8FtVrUW/kluBM0V77WN0NiZAmrd9H49B/EM4m6VRdtyG9sQH3EYyK5+nDYF2XU7Ms9renYCX75/lxV3S3icf5LEYKJsfd9OH54DcTFQZds3sZuvQjd+uIwM3OstthzgydrCZdxGeEpgQs6HmhRISuaHdJqrJkripfFTLLPM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776105183; c=relaxed/simple;
-	bh=cBpXrkihGcjGQcaYRaWShDZmky7Cxex9eGcodqpepCM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=STCW1/3bnPFxgDMf6xvoi2UWUMzfON2B9YWIxVZ2L4ERWi13fG9OzjPYyU9i2Xw2mVGyeqCNcN+rvmhleb+yxqnHOLucHY7cd+aEwpR+06yh9iPclTQGcdKBgq+d3QTMpmjvmDpBCOfIOYLaM3U0FfXheCDBNp2gUlKJcuFTUNI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=BhCoaxeI; arc=fail smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0089730.ppops.net [127.0.0.1])
-	by m0089730.ppops.net (8.18.1.11/8.18.1.11) with ESMTP id 63D46HRO665597
-	for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 11:33:01 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
-	 bh=zG1i4GOJI0Qqxhx6X/y+OYVi9v31A3eEgoxO9M8dGo8=; b=BhCoaxeIAUTn
-	YJ7JhPz3Cx4IihaBsBpITr2/1JYDB8qkbM1UsOnx6Hz7lD9+VdcpE1EJyypDO/KG
-	WCuinBHxBNAbk1fqrW0/uMUNq3AFMFBcyij842gJXDxEArbnbnSFlkWcDzkkpHJw
-	93uzWR86iB/Yoqf4nv/24SWhVkPlWjvuAPhNCj2eGDalRmeGG5B83FBpS4No7Y7L
-	joGCbmbGXSXrXvzc89j++TyvF2Kco6Mo2SyFjdP79qHqn/VKxxhWFXQ309Ujk0O2
-	ZWUwUErBjTlmgcLhxUNhmB9eD3sRs8I5KPtN+ckqJ0rrQA5u0slfiHH3Lke5SO3z
-	mic2S/rLnA==
-Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com [209.85.210.71])
-	by m0089730.ppops.net (PPS) with ESMTPS id 4dfhssjs69-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 11:33:00 -0700 (PDT)
-Received: by mail-ot1-f71.google.com with SMTP id 46e09a7af769-7d7e995a87cso27444a34.1
-        for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 11:33:00 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776105180; cv=none;
-        d=google.com; s=arc-20240605;
-        b=S9sINkD13HribKQb/Ya/Qxk9n9BC/mLJTcw66FUWNZzxXCm5QYIO8ipLnu3yYJjyPb
-         nle9mFfXngvosoppfbn3FmlUkb5M9e2G9+eygWoEq0QxFeg/FY36kt62Qv4GIDEDtozt
-         UhNODAGzi3uz+Og1Vq1XSW53ZARa/3ODWiSUyXS2eHVTS8K5xt0w/cywYt7XBNWV9Ftx
-         /5RpbDqrLr4Y9QtZQLwq1HMp/S17kBPFbZVjqDagyp3Ygyw4JCSQ/bEy37ZSWqTJHlUT
-         Ik4EPMqk3aZA4Zsnp1gsHBzd4p9Y+YMal4VifXHI9r+wjEDkYSYLyOMrOIJenDdDgJyW
-         09dA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version;
-        bh=+JPsy6ZFn+T7uthNgDQuwBwhJArt54L0xqFFmpZV85I=;
-        fh=usF0mWYGWELhuRUGxAHPU/VJgjUGtw77tL7q2l0WCD8=;
-        b=HTjQH8vjKQ3/gzkmOdISr+228yRrkVqoxeIO407oD5a+KYk7/sWwzGV5mxoguyIty8
-         DkUVUb9WORJwiDzsfxh+X/vneDDnatS1FsXXwTkIeeMWl20x+I/nfN+p9P3DtErmOFf3
-         b1GlIgdG1IaWMjyaY+ne6KnP/gI9I9XYMaeqUWsySQ+dtEuxNkAMjUzIQddyOIRi5P7b
-         CtddsQrROtLqiyKT5EVCi6CskF0T/0w6ti/B6ZXRWczcTA6OPWwxUSi1xChhxN6a9te6
-         n/ceI107fSTZx+ln4ItwnGNafNJR9uqF/unWQAweikgeosGEfRwp+k9YcwCIlag2QL0f
-         1JIw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776105180; x=1776709980;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=+JPsy6ZFn+T7uthNgDQuwBwhJArt54L0xqFFmpZV85I=;
-        b=erwHKlOAh3045MydTqe0hIL2srKogexv610EwOW0osvuxp8cuMPqtzFfZSOOaaZM8D
-         8gq3n3tcEWdNGu+7PbE58clnC728aPJ9kdNLeE88TzZHUIJNqyJWEh063Px7EXnQlJYc
-         jwGZg7rhrHjEGBpcHEI4yyZBB5ilgEmAK4BfXG9ZKLI1cZm65Cr6P/Zu0boNluvqhpqS
-         MoGfnoe6iyYR01b4dQWTB6PFTXC6KGIXdnGuWXOzwJr5huR6NMGtMobcLVVNajUpMLro
-         E36Vpm7RJvTg5AmzDik5O/ABbbIon7Q3OwozqMff91xJy0vDHXHltdjazI/9cwHbGd13
-         7S6Q==
-X-Forwarded-Encrypted: i=1; AFNElJ86kPSymTc9T72ARu1aUS0071MAvdlN22IrrBVyBoflt8WqrCX2XJMPboLlTerrKqF2hebTYzQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxwag0cRj+dQBEM+WNEXzWwulUinMu34pMujTCVNWsXSpslR55V
-	5A8VzNOTjVCnlSmA8n943wP8K+6S1ATwtB65lihu9O6YLk0bXwans7x4TkJZn5NueBn5gAVbNCU
-	NBXQwxBcMgR+tkPdUDMxMR+fosCKPWzNNzor0wOr+G/ne5+O+ROeHsYWmVdqdlnKcvF3YP11Udj
-	Dv5+QXLjTCNP7OwsQn3OsMhNnikBfjpEc+ZfDvB1A=
-X-Gm-Gg: AeBDieuhg0/Jcex71Bo0mKcN9ZHbaq3oc66MauyKagOrpuJp8rsJq28dVVnd6HXWoIW
-	DRpmCXx+PVsPjWPtIpWTXpbqvVwSwWTfZIFXj23dif+fFUAnqRVX9rY18Gj6/Iqz5U4186nd2jX
-	Y9mwcKDvJJj6d73Rbm8g/lKd3kZVhv/kqNkotsyR3dkJ+TG2thJsK412dEdCt2jfz52LJ77qW3j
-	Xu4knwgY3qEutIugBIL+WykbyQUfdj+
-X-Received: by 2002:a05:6830:488e:b0:7db:a0b2:b5d5 with SMTP id 46e09a7af769-7dc27e1ca9cmr8189338a34.24.1776105180124;
-        Mon, 13 Apr 2026 11:33:00 -0700 (PDT)
-X-Received: by 2002:a05:6830:488e:b0:7db:a0b2:b5d5 with SMTP id
- 46e09a7af769-7dc27e1ca9cmr8189318a34.24.1776105179660; Mon, 13 Apr 2026
- 11:32:59 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00E4B38C431;
+	Mon, 13 Apr 2026 18:38:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776105519; cv=none; b=ftnGnyfhPxW3BcEs0oOwwKUUdgTvB+hvZdMEj1wfcH2bIpctiaigV3bwCRAv/FTElHFqvIPxsJ9fC1E2RbyHIZiDHDwijxrrhx+zIkOXISl1SmW8bGyELf+wZoZYGiRPKCsHdrTSr/+qX8/MfHzxuZSw9AbfpXHz2URNeEEaC6Y=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776105519; c=relaxed/simple;
+	bh=Z+PybH0v/8zQfn1t6sVkaec9wuVix0JrSRz6VyP98xo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eXH2eOhJMP2UiVn1iokG1z4aehYln9yOYfZB3O+5zogvl9zxup/Rj2uZjxQF8lduDPSvfUlrMRemClwS9VBuDEOzbQhELhlorzHAY1q1Pn4iPdcUoJO6wUamUFuIGRqMf46rGraGZydfuLL6WGRHnHZ41YnpBMsHQSealUrre30=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=OFg5MZpb; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=RiJEzJ8eTjeiFv8P6UZ6cKxNVQf/7faTUhy5gtzeM1g=; b=OFg5MZpbXQnaCr+FvINNlc3ASl
+	YULz5W5EDTzl6aAciGL9fIm5gnVTz/3iZUQeTOxWJz3uDOK8oTo4Zk0lJofoeMfN2F7kzb4CwnvDj
+	TyvLdTywPaMWS8B3H8KfEuYsDY0equsi3yZTJAR91eAeBS+jFlTIs4Kb6JGhUuqLv3RDG8gk/LwiI
+	XUdEtIhIo36Zo1BTXAm5XpQusKmlxF+JZY2gmrJl7AW9M6TbXdYY5nLgYHpO+IouurDLL3bicCz1q
+	1ToxqAUuAgFH7rXmVsoTXkWLyZL3cM7pNpZlldevrEE5OkjBds7kIgFLTD6rJECzmqtl9J+HxRxqA
+	hKWkSOWw==;
+Received: from sslproxy06.your-server.de ([78.46.172.3])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1wCMB4-000Pfr-0q;
+	Mon, 13 Apr 2026 20:38:30 +0200
+Received: from localhost ([127.0.0.1])
+	by sslproxy06.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1wCMAW-000Lu1-0G;
+	Mon, 13 Apr 2026 20:38:29 +0200
+Message-ID: <bfccb5ef-d5a0-451d-88b3-65dc84ceebc1@iogearbox.net>
+Date: Mon, 13 Apr 2026 20:38:28 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260325082534.GN814676@unreal> <acW2BwQKaUbS3eL9@kbusch-mbp>
- <20260331083758.GA814676@unreal> <acvFV8c5QVxnt3Em@kbusch-mbp>
- <20260331132942.GC814676@unreal> <acvNsvS5ShlQlrox@kbusch-mbp>
- <20260331140309.GH814676@unreal> <acvWplw67b3Gwlkc@kbusch-mbp>
- <20260331190220.GI814676@unreal> <acwkAo2k41xaxdTS@kbusch-mbp> <20260409120415.GF86584@unreal>
-In-Reply-To: <20260409120415.GF86584@unreal>
-From: Zhiping Zhang <zhipingz@meta.com>
-Date: Mon, 13 Apr 2026 11:32:48 -0700
-X-Gm-Features: AQROBzDIIpZEN3aiHYPi89ixDuzK7SpFChCr2JMeXAVEQc6s_3ctAex9jcSvckQ
-Message-ID: <CAH3zFs0hx_-3LetSUaPRMg=0jaL=GD7Mop3pEUhJ3O3qkaJrQg@mail.gmail.com>
-Subject: Re: [RFC v2 1/2] vfio: add callback to get tph info for dmabuf
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Keith Busch <kbusch@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
-        Bjorn Helgaas <bhelgaas@google.com>, linux-rdma@vger.kernel.org,
-        linux-pci@vger.kernel.org, netdev@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, Yochai Cohen <yochai@nvidia.com>,
-        Yishai Hadas <yishaih@nvidia.com>, Bjorn Helgaas <helgaas@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Proofpoint-GUID: 8caBfPd9AyqpW2Tf3XE3luvEiP9oUKF1
-X-Authority-Analysis: v=2.4 cv=Ye2NIQRf c=1 sm=1 tr=0 ts=69dd36dc cx=c_pps
- a=OI0sxtj7PyCX9F1bxD/puw==:117 a=IkcTkHD0fZMA:10 a=A5OVakUREuEA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=7x6HtfJdh03M6CCDgxCd:22 a=855S8uPTkML1Oy45N9_h:22
- a=VwQbUJbxAAAA:8 a=f99BUTzuh9MxvKowt8oA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-ORIG-GUID: 8caBfPd9AyqpW2Tf3XE3luvEiP9oUKF1
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDEzMDE4MiBTYWx0ZWRfX8Ml06RvUKBNm
- cZDdl2zTVdOGNyfD9YvbSTNzCg5YpkWaEQehS3LBhq12aAM/gffRN9VNGJhr5N5zvQUuFa5I8BF
- lthdkNRR5k8DWv08OGcbEhHYkEDxN7tE6f8zVgjZdQhnLApk4+U7xDHOJq0gE1MigcTbvO/ZqQf
- meGmqiIlrN4qQMBPvSP5O6rHM5iE865uuF297BY3+ORxCWyGtApwbLuZOI6mH9NHdyZ7Xxs9Mty
- Au7nJmWvQoN6YdfupH0ERmeoHPY2vchaS9j+3tX1DjVax9USvpo+DENQfvupgHAj1goAqJRt3iV
- 1z8VN+zoH2LwW8CAh06GflO9Fu3UAqrjNnOJABiY7ACVzti9tsZenzxif8z4n1YN8+ZeUn4mvoa
- qui7m06SFjRFOP8Pde7zBVpYnyX6ft5R59yRuobuivt/h1ClqvYZH/hF3382wYtPYF889WGDSaO
- UI7TyF/lDJcp/ETTCcQ==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-04-13_03,2026-04-13_04,2025-10-01_01
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[meta.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[meta.com:s=s2048-2025-q2];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2] net: check qdisc_pkt_len_segs_init() return
+ value on ingress
+To: David Carlier <devnexen@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+ Kuniyuki Iwashima <kuniyu@google.com>,
+ Samiullah Khawaja <skhawaja@google.com>, Hangbin Liu <liuhangbin@gmail.com>,
+ Krishna Kumar <krikku@gmail.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260413182225.10683-1-devnexen@gmail.com>
+Content-Language: en-US
+From: Daniel Borkmann <daniel@iogearbox.net>
+Autocrypt: addr=daniel@iogearbox.net; keydata=
+ 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
+In-Reply-To: <20260413182225.10683-1-devnexen@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Virus-Scanned: Clear (ClamAV 1.4.3/27970/Mon Apr 13 08:24:33 2026)
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[iogearbox.net,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[iogearbox.net:s=default2302];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,fomichev.me,google.com,gmail.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-278178-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,kernel.org,davemloft.net,google.com,redhat.com];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TAGGED_FROM(0.00)[bounces-278177-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[iogearbox.net:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zhipingz@meta.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[meta.com:+]
-X-Rspamd-Queue-Id: D866D3F217A
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: E66893F2294
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Apr 9, 2026 at 5:04=E2=80=AFAM Leon Romanovsky <leon@kernel.org> wr=
-ote:
->
-> >
-> On Tue, Mar 31, 2026 at 01:44:02PM -0600, Keith Busch wrote:
-> > On Tue, Mar 31, 2026 at 10:02:20PM +0300, Leon Romanovsky wrote:
-> > >
-> > > Right, what about adding TPH fields to struct vfio_region_dma_range
-> > > instead of struct vfio_device_feature_dma_buf?
-> >
-> > You might have to show me with code what you're talking about because I
-> > can't see any way we can add fields to any struct here without breaking
-> > backward compatibility.
-> >
-> > If we can't claim bits out of the unused "flags" field for this feature,
-> > then my initial reply is the only sane approach: we can introduce a new
-> > feature and struct for it that closely mirrors the existing one, but
-> > with the extra hint fields.
->
-> Something like that, on top of this proposal:
->
-> diff --git a/drivers/vfio/pci/vfio_pci_dmabuf.c b/drivers/vfio/pci/vfio_p=
-ci_dmabuf.c
-> index 3961afa640391..70d5ee1e3ef7b 100644
-> --- a/drivers/vfio/pci/vfio_pci_dmabuf.c
-> +++ b/drivers/vfio/pci/vfio_pci_dmabuf.c
-> @@ -241,9 +241,7 @@ int vfio_pci_core_feature_dma_buf(struct vfio_pci_cor=
-e_device *vdev, u32 flags,
->                 return -EFAULT;
->
->         if (!get_dma_buf.nr_ranges ||
-> -           (get_dma_buf.flags & ~(VFIO_DMABUF_FL_TPH |
-> -                                  VFIO_DMABUF_TPH_PH_MASK |
-> -                                  VFIO_DMABUF_TPH_ST_MASK)))
-> +           (get_dma_buf.flags & ~VFIO_DMABUF_FLAG_TPH))
->                 return -EINVAL;
->
->         /*
-> @@ -300,13 +298,10 @@ int vfio_pci_core_feature_dma_buf(struct vfio_pci_c=
-ore_device *vdev, u32 flags,
->                 ret =3D PTR_ERR(priv->dmabuf);
->                 goto err_dev_put;
->         }
-> -       if (get_dma_buf.flags & VFIO_DMABUF_FL_TPH) {
-> -               priv->steering_tag =3D (get_dma_buf.flags &
-> -                                     VFIO_DMABUF_TPH_ST_MASK) >>
-> -                                    VFIO_DMABUF_TPH_ST_SHIFT;
-> -               priv->ph =3D (get_dma_buf.flags &
-> -                           VFIO_DMABUF_TPH_PH_MASK) >>
-> -                          VFIO_DMABUF_TPH_PH_SHIFT;
-> +       if (get_dma_buf.flags & VFIO_DMABUF_FLAG_TPH) {
-> +               priv->steering_tag =3D
-> +                       dma_ranges[get_dma_buf.nr_ranges + 1].tph.tag;
-> +               priv->ph =3D dma_ranges[get_dma_buf.nr_ranges + 1].tph.ph;
->         }
->         /* dma_buf_put() now frees priv */
->         INIT_LIST_HEAD(&priv->dmabufs_elm);
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index e2a8962641d2c..a8b8d8b1a3278 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -1497,20 +1497,30 @@ struct vfio_device_feature_bus_master {
->   */
->  #define VFIO_DEVICE_FEATURE_DMA_BUF 11
->
-> +struct vfio_region_dma_tph {
-> +       u16 tag;
-> +       u8 ph;
-> +};
-> +
->  struct vfio_region_dma_range {
-> -       __u64 offset;
-> -       __u64 length;
-> +       union {
-> +               __u64 offset;
-> +               struct vfio_region_dma_tph tph;
-> +       };
-> +       union {
-> +               __u64 length;
-> +               __u64 reserved;
-> +       };
-> +};
-> +
-> +enum {
-> +       VFIO_DMABUF_FLAG_TPH =3D 1 << 0,
->  };
->
->  struct vfio_device_feature_dma_buf {
->         __u32   region_index;
->         __u32   open_flags;
->         __u32   flags;
-> -#define VFIO_DMABUF_FL_TPH             (1U << 0) /* TPH info is present =
-*/
-> -#define VFIO_DMABUF_TPH_PH_SHIFT       1         /* bits 1-2: PH (2-bit)=
- */
-> -#define VFIO_DMABUF_TPH_PH_MASK        0x6U
-> -#define VFIO_DMABUF_TPH_ST_SHIFT       16        /* bits 16-31: steering=
- tag */
-> -#define VFIO_DMABUF_TPH_ST_MASK                0xffff0000U
->         __u32   nr_ranges;
->         struct vfio_region_dma_range dma_ranges[] __counted_by(nr_ranges);
->  };
+On 4/13/26 8:22 PM, David Carlier wrote:
+> Commit 7fb4c1967011 ("net: pull headers in qdisc_pkt_len_segs_init()")
+> changed qdisc_pkt_len_segs_init() to return an skb drop reason when
+> it detects malicious GSO packets. The egress path in __dev_queue_xmit()
+> checks this return value and drops bad packets, but the ingress path in
+> sch_handle_ingress() ignores it.
+> 
+> This means malformed GSO packets entering via TC ingress are not dropped
+> and could be redirected to another interface or cause incorrect qdisc
+> accounting.
 
-Sounds good, thanks! We will follow up and move this RFC to a formal patch.
+Why we need to do this on both sides (and what's the perf impact)? If TC
+ingress redirects it to some other device, then don't we hit the same via
+__dev_queue_xmit() where the 7fb4c1967011 added the qdisc_pkt_len_segs_init()?
 
-Zhiping
+> Check the return value and drop the packet when a bad GSO is detected.
+> 
+> Fixes: 7fb4c1967011 ("net: pull headers in qdisc_pkt_len_segs_init()")
+> Signed-off-by: David Carlier <devnexen@gmail.com>
+> ---
+> 
+> v1 -> v2: reorder variable declarations for reverse xmas tree
+> v1: https://lore.kernel.org/netdev/20260408172307.46498-1-devnexen@gmail.com/
+>   net/core/dev.c | 12 ++++++++++--
+>   1 file changed, 10 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index 5a31f9d2128c..d11c22cafca9 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -4459,8 +4459,8 @@ sch_handle_ingress(struct sk_buff *skb, struct packet_type **pt_prev, int *ret,
+>   		   struct net_device *orig_dev, bool *another)
+>   {
+>   	struct bpf_mprog_entry *entry = rcu_dereference_bh(skb->dev->tcx_ingress);
+> -	enum skb_drop_reason drop_reason = SKB_DROP_REASON_TC_INGRESS;
+>   	struct bpf_net_context __bpf_net_ctx, *bpf_net_ctx;
+> +	enum skb_drop_reason drop_reason;
+>   	int sch_ret;
+>   
+>   	if (!entry)
+> @@ -4472,7 +4472,15 @@ sch_handle_ingress(struct sk_buff *skb, struct packet_type **pt_prev, int *ret,
+>   		*pt_prev = NULL;
+>   	}
+>   
+> -	qdisc_pkt_len_segs_init(skb);
+> +	drop_reason = qdisc_pkt_len_segs_init(skb);
+> +	if (unlikely(drop_reason)) {
+> +		kfree_skb_reason(skb, drop_reason);
+> +		*ret = NET_RX_DROP;
+> +		bpf_net_ctx_clear(bpf_net_ctx);
+> +		return NULL;
+> +	}
+> +
+> +	drop_reason = SKB_DROP_REASON_TC_INGRESS;
+>   	tcx_set_ingress(skb, true);
+>   
+>   	if (static_branch_unlikely(&tcx_needed_key)) {
+
 
