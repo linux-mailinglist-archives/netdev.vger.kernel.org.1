@@ -1,256 +1,320 @@
-Return-Path: <netdev+bounces-278074-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278075-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id xiv/Mozp3GkMYQkAu9opvQ
-	(envelope-from <netdev+bounces-278074-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 15:03:08 +0200
+	id EitDORfq3GkZYQkAu9opvQ
+	(envelope-from <netdev+bounces-278075-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 15:05:27 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9DB63EC523
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 15:03:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 984D43EC56D
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 15:05:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D69A5300DD4A
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 13:03:04 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 186A9300CC83
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 13:05:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70E8F3CAE7F;
-	Mon, 13 Apr 2026 13:03:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B16993CAE93;
+	Mon, 13 Apr 2026 13:05:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BV0pQeUP";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="T+S7GKpT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [160.30.148.35])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 517933CA4A6;
-	Mon, 13 Apr 2026 13:03:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.30.148.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B4423C9EDD
+	for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 13:05:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776085383; cv=none; b=bwTHW/tkxY99tCwHUoJHgwpZjOo9A4zphWbzXQFy0xtA7LtE2/PHO1efJ1LD+FjrcqUYN4wmN8mwVemBWTxUOwUARtUUPAfmUc2U5/3KXlt4tN8Ag06OSFV/i1ujLw2Ka7S8QY8lALOq/meKjp99DeWScs8GUZysYV9QMRgJy4w=
+	t=1776085521; cv=none; b=qVrAQ2VNEnSuwjzHuJ7OaSN8ujI6yxfs1RhB6z1Ok1yERJBlnPE/ytMPOz66U7kSn7i8yafBtQ1wG/FXMDfR3+Mxp43Eeje7XYbdxYWOhGGTbjMtieQXcfRCARmJzD9M0uMA3Gs1/6wnY729qv4S0C6roP3gXNvXyQlMpv5V7ZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776085383; c=relaxed/simple;
-	bh=EaqCVYb3mYfVBkGOFXvjwb/3rY9FtA9tCj0m3HXl1VM=;
-	h=Message-ID:In-Reply-To:References:Date:Mime-Version:From:To:Cc:
-	 Subject:Content-Type; b=E2FS0Mr44aeB66UkFZZ48HBwLHb5fdRBLmTQBxQVz5NXFeYCHKayBV+YvqzRMyLWWMZotdcE8UVuOqgnJWdgvSquHcamJwPcAlejOKjwDI3H3z1zYaykGK886Psv5TPOdGgdFb8ePR7Cxzxv0mzvy+YwqZTUZXgT6Hqx4CVxngs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=160.30.148.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
-Received: from mse-fl2.zte.com.cn (unknown [10.5.228.133])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4fvSJ26Vzyz8Xs70;
-	Mon, 13 Apr 2026 21:02:58 +0800 (CST)
-Received: from xaxapp05.zte.com.cn ([10.99.98.109])
-	by mse-fl2.zte.com.cn with SMTP id 63DD2n3P010875;
-	Mon, 13 Apr 2026 21:02:49 +0800 (+08)
-	(envelope-from hu.shengming@zte.com.cn)
-Received: from mapi (xaxapp01[null])
-	by mapi (Zmail) with MAPI id mid32;
-	Mon, 13 Apr 2026 21:02:52 +0800 (CST)
-X-Zmail-TransId: 2af969dce97c49e-2c715
-X-Mailer: Zmail v1.0
-Message-ID: <20260413210252672ZfdcegJLJtyvlYdFAUBlr@zte.com.cn>
-In-Reply-To: <adyyNeVTkXQlnh_2@hyeyoo>
-References: 20260410120044.031381086@kernel.org,20260410120318.525653921@kernel.org,adyyNeVTkXQlnh_2@hyeyoo
-Date: Mon, 13 Apr 2026 21:02:52 +0800 (CST)
+	s=arc-20240116; t=1776085521; c=relaxed/simple;
+	bh=8G0n+5N46kyHlC6zW0UIk+1mROJfOmueHkVVdUErsrc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XxwdnXfL2vRAsfexCIHLCLE4GGiSEJoFU9LQ3bWQgIFaUW33gw0XRYg2DPnD59wzHZqSG62UBu8kg56PMQ79EeXI1+SZ+rtUP9MbOlxMWAmbAgtKAMbIqqSn0lLc2qsMxhAAhRx+V+RFTqRrJn8CoAhdZT25Tk0cIEjlIvcmlOw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BV0pQeUP; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=T+S7GKpT; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1776085519;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zd81MzorX7tMHzshw5o/gcRBDu2OrmNaB6rEAdDyIBo=;
+	b=BV0pQeUPkhcxiDaJ08gZZhs47m50Qryr6mKNyQH2INym0vKJMExvF2WVe0rYsF6TNjYSTc
+	5EW79UUOKA+rM6Xa7sBdIcxn8tqFikvdkUlA2CjQnUScbjBDc6ncW5PrPHT3DLsBKX1x5P
+	mzTgNkAndSYpXxD7o7LUnBXGvJtBXLA=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-168-RmVZk3wgMlCycySbXgp7yA-1; Mon, 13 Apr 2026 09:05:16 -0400
+X-MC-Unique: RmVZk3wgMlCycySbXgp7yA-1
+X-Mimecast-MFC-AGG-ID: RmVZk3wgMlCycySbXgp7yA_1776085514
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-43d1dea12aaso3208729f8f.1
+        for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 06:05:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1776085514; x=1776690314; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zd81MzorX7tMHzshw5o/gcRBDu2OrmNaB6rEAdDyIBo=;
+        b=T+S7GKpTBSaPLqw3NI2UL77h0V9ySQMduOJ7cvh1wgdDesLkBAA2LrwtMK9DaWSkJX
+         2kgdfZn2ZuHqzRpZ/yIdx60bRhvfwbPPAgOhtK8yseErIVvn+VSEyLnA+N+pIBOXmFwN
+         rdnuHZV2Diuj/znPfGKXuNIP9fsjDkv8M7uO/afXVbN3SQbO4sM8LgbbRb5uup/vOYIs
+         Od/Mi4kd6HwQMFrglPs8WuIRqRy7dEi6uacIdvYoV/Pk5S2a0FIaJAYhNEmcQflwyJCQ
+         AeZNlM+eAA0EvRxnY5d74VoaFDBYBPdoaQzdddPz0eVUeDaqChh4yXxFUbqM+SN2Y/k2
+         aXgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776085514; x=1776690314;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zd81MzorX7tMHzshw5o/gcRBDu2OrmNaB6rEAdDyIBo=;
+        b=kH0A4Cm3s6SCn5fFzKfxVlbxzjQkAkycWwkoDM3fVWvuQPTu2i17iClzpBidOVrGWT
+         c06BLf4nyybKHaZzbQYSAw+EDQhnGCidn0iytC/LZJRQcttomAjJUbUcEZgY+ViaT1zP
+         V4nSA+6Dc6QGuzbxt+3vb4bxoxtI+wS0p5gwn56YOyteuq9VeESEfzFtGXwwTCaz7rym
+         jsNmGOsZQIUEAxzirdX1gzg2HqLfjVpyhWgIjBlGWVMnT6iVqW6bO/VJ7w+MsuIHWhEX
+         BThmUdDfcPTksaYpZn25SYBi+/wFlt8SvGLHv+MJQuV+jBbIadrGaUj8aXruq7RkIPxS
+         7HHw==
+X-Gm-Message-State: AOJu0Yx55v7IJb1dja5j4dQVHXj4arSxJWelHjwLUhgV2Ltoad+73w2U
+	yJnOLrJbFqI9kywQBNUz8DlZvv15p54FJ+baCHq+VfgCpSihT4FrTEYezbJy/JwwbKd7+wM6z7Z
+	W3xP5/urtFxq1RPyrFXOUKxeTjyhJn0w1mqNvfDkNn83qKQ/o90Hmijiv+A==
+X-Gm-Gg: AeBDietxUXp4R0B/NBxx4CkXyN3djWqkCAc9QKCKRZIZT6pU5/LtuSN+VhD55pgy4hb
+	PdffxUW923DZx52lqd3eCw2vdQKKoPn8XKC8eNbg0WgJQVhX/8MBrdwsVZWokuPYSoL3OlQvsgv
+	BH/3ELwbfqK+0UE10w3LHeVkp7fr+8OywtyVIqUAnvyplTFLTQTFg0knp/lB/hBpcx+EQIDPDxf
+	TgfNIWwYjqujFDJevxcKSl97rm2X6uBTquNEUPlrLQvTb6wvSOFJB9ueNpVcUYmrZk43qmYF/n0
+	6+amPGfw0S4Q3F+QNHsmmSGS2bScyiZBAiKK5ORUiAZHqXp1HyrZ8ckyqZFUuZvW+y0tFMu55q8
+	6t0c+ljRPNYdqUi+QaSFwp7P40UOpJ3PqFbWsVpWqYaSjD8qKTErQLKFl
+X-Received: by 2002:a05:600c:681:b0:488:e192:6fbd with SMTP id 5b1f17b1804b1-488e192710cmr60961355e9.30.1776085512954;
+        Mon, 13 Apr 2026 06:05:12 -0700 (PDT)
+X-Received: by 2002:a05:600c:681:b0:488:e192:6fbd with SMTP id 5b1f17b1804b1-488e192710cmr60960105e9.30.1776085512328;
+        Mon, 13 Apr 2026 06:05:12 -0700 (PDT)
+Received: from [192.168.88.32] ([216.128.11.125])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488d67ce3e4sm209725325e9.5.2026.04.13.06.05.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 13 Apr 2026 06:05:11 -0700 (PDT)
+Message-ID: <ce718e68-22bb-40bc-a046-8fc9b636590b@redhat.com>
+Date: Mon, 13 Apr 2026 15:05:10 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-From: <hu.shengming@zte.com.cn>
-To: <harry@kernel.org>
-Cc: <tglx@kernel.org>, <linux-kernel@vger.kernel.org>, <vbabka@kernel.org>,
-        <linux-mm@kvack.org>, <arnd@arndb.de>, <x86@kernel.org>,
-        <baolu.lu@linux.intel.com>, <iommu@lists.linux.dev>,
-        <m.grzeschik@pengutronix.de>, <netdev@vger.kernel.org>,
-        <linux-wireless@vger.kernel.org>, <herbert@gondor.apana.org.au>,
-        <linux-crypto@vger.kernel.org>, <dwmw2@infradead.org>,
-        <bernie@plugable.com>, <linux-fbdev@vger.kernel.org>, <tytso@mit.edu>,
-        <linux-ext4@vger.kernel.org>, <akpm@linux-foundation.org>,
-        <urezki@gmail.com>, <elver@google.com>, <dvyukov@google.com>,
-        <kasan-dev@googlegroups.com>, <ryabinin.a.a@gmail.com>,
-        <t.sailer@alumni.ethz.ch>, <linux-hams@vger.kernel.org>,
-        <Jason@zx2c4.com>, <richard.henderson@linaro.org>,
-        <linux-alpha@vger.kernel.org>, <linux@armlinux.org.uk>,
-        <linux-arm-kernel@lists.infradead.org>, <catalin.marinas@arm.com>,
-        <chenhuacai@kernel.org>, <loongarch@lists.linux.dev>,
-        <geert@linux-m68k.org>, <linux-m68k@lists.linux-m68k.org>,
-        <dinguyen@kernel.org>, <jonas@southpole.se>,
-        <linux-openrisc@vger.kernel.org>, <deller@gmx.de>,
-        <linux-parisc@vger.kernel.org>, <mpe@ellerman.id.au>,
-        <linuxppc-dev@lists.ozlabs.org>, <pjw@kernel.org>,
-        <linux-riscv@lists.infradead.org>, <hca@linux.ibm.com>,
-        <linux-s390@vger.kernel.org>, <davem@davemloft.net>,
-        <sparclinux@vger.kernel.org>, <hao.li@linux.dev>, <cl@gentwo.org>,
-        <rientjes@google.com>, <roman.gushchin@linux.dev>
-Subject: =?UTF-8?B?UmU6IFtwYXRjaCAxNC8zOF0gc2x1YjogVXNlIHByYW5kb20gaW5zdGVhZCBvZiBnZXRfY3ljbGVzKCk=?=
-Content-Type: text/plain;
-	charset="UTF-8"
-X-MAIL:mse-fl2.zte.com.cn 63DD2n3P010875
-X-TLS: YES
-X-SPF-DOMAIN: zte.com.cn
-X-ENVELOPE-SENDER: hu.shengming@zte.com.cn
-X-SPF: None
-X-SOURCE-IP: 10.5.228.133 unknown Mon, 13 Apr 2026 21:02:58 +0800
-X-Fangmail-Anti-Spam-Filtered: true
-X-Fangmail-MID-QID: 69DCE982.001/4fvSJ26Vzyz8Xs70
-X-Spamd-Result: default: False [2.14 / 15.00];
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v7 04/10] selftests: net: Add tests for failover
+ of team-aggregated ports
+To: Marc Harvey <marcharvey@google.com>, Jiri Pirko <jiri@resnulli.us>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Shuah Khan <shuah@kernel.org>,
+ Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, Kuniyuki Iwashima <kuniyu@google.com>
+References: <20260409-teaming-driver-internal-v7-0-f47e7589685d@google.com>
+ <20260409-teaming-driver-internal-v7-4-f47e7589685d@google.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20260409-teaming-driver-internal-v7-4-f47e7589685d@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	SUBJ_EXCESS_BASE64(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[zte.com.cn : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,kvack.org,arndb.de,linux.intel.com,lists.linux.dev,pengutronix.de,gondor.apana.org.au,infradead.org,plugable.com,mit.edu,linux-foundation.org,gmail.com,google.com,googlegroups.com,alumni.ethz.ch,zx2c4.com,linaro.org,armlinux.org.uk,lists.infradead.org,arm.com,linux-m68k.org,lists.linux-m68k.org,southpole.se,gmx.de,ellerman.id.au,lists.ozlabs.org,linux.ibm.com,davemloft.net,linux.dev,gentwo.org];
-	FROM_NEQ_ENVFROM(0.00)[hu.shengming@zte.com.cn,netdev@vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278074-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
-	NEURAL_HAM(-0.00)[-0.975];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_GT_50(0.00)[54];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-278075-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	R_DKIM_NA(0.00)[];
-	TO_DN_NONE(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,kvack.org:email]
-X-Rspamd-Queue-Id: E9DB63EC523
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,team_lib.sh:url,refleak.sh:url,options.sh:url]
+X-Rspamd-Queue-Id: 984D43EC56D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Harry wrote:
-> [Resending after fixing broken email headers]
-> 
-> On Fri, Apr 10, 2026 at 02:19:37PM +0200, Thomas Gleixner wrote:
-> > The decision whether to scan remote nodes is based on a 'random' number
-> > retrieved via get_cycles(). get_cycles() is about to be removed.
-> > 
-> > There is already prandom state in the code, so use that instead.
-> > 
-> > Signed-off-by: Thomas Gleixner <tglx@kernel.org>
-> > Cc: Vlastimil Babka <vbabka@kernel.org>
-> > Cc: linux-mm@kvack.org
-> > ---
-> 
-> Acked-by: Harry Yoo (Oracle) <harry@kernel.org>
-> 
-> Is this for this merge window?
-> 
-> This may conflict with upcoming changes on freelist shuffling [1]
-> (not queued for slab/for-next yet though), but it should be easy to
-> resolve.
-> 
 
-Hi Harry,
 
-Would you like me to wait for this patch to land linux-next and then
-rebase and send v6 on top?
-
-Thanks,
-
---
-With Best Regards,
-Shengming
-
-> [Cc'ing Shengming and SLAB ALLOCATOR folks]
-> [1] https://lore.kernel.org/linux-mm/20260409204352095kKWVYKtZImN59ybO6iRNj@zte.com.cn
+On 4/9/26 4:59 AM, Marc Harvey wrote:
+> There are currently no kernel tests that verify the effect of setting
+> the enabled team driver option. In a followup patch, there will be
+> changes to this option, so it will be important to make sure it still
+> behaves as it does now.
 > 
-> -- 
-> Cheers,
-> Harry / Hyeonggon
+> The test verifies that tcp continues to work across two different team
+> devices in separate network namespaces, even when member links are
+> manually disabled.
 > 
-> >  mm/slub.c |   37 +++++++++++++++++++++++--------------
-> >  1 file changed, 23 insertions(+), 14 deletions(-)
-> > 
-> > --- a/mm/slub.c
-> > +++ b/mm/slub.c
-> > @@ -3302,6 +3302,25 @@ static inline struct slab *alloc_slab_pa
-> >      return slab;
-> >  }
-> >  
-> > +#if defined(CONFIG_SLAB_FREELIST_RANDOM) || defined(CONFIG_NUMA)
-> > +static DEFINE_PER_CPU(struct rnd_state, slab_rnd_state);
-> > +
-> > +static unsigned int slab_get_prandom_state(unsigned int limit)
-> > +{
-> > +    struct rnd_state *state;
-> > +    unsigned int res;
-> > +
-> > +    /*
-> > +     * An interrupt or NMI handler might interrupt and change
-> > +     * the state in the middle, but that's safe.
-> > +     */
-> > +    state = &get_cpu_var(slab_rnd_state);
-> > +    res = prandom_u32_state(state) % limit;
-> > +    put_cpu_var(slab_rnd_state);
-> > +    return res;
-> > +}
-> > +#endif
-> > +
-> >  #ifdef CONFIG_SLAB_FREELIST_RANDOM
-> >  /* Pre-initialize the random sequence cache */
-> >  static int init_cache_random_seq(struct kmem_cache *s)
-> > @@ -3365,8 +3384,6 @@ static void *next_freelist_entry(struct
-> >      return (char *)start + idx;
-> >  }
-> >  
-> > -static DEFINE_PER_CPU(struct rnd_state, slab_rnd_state);
-> > -
-> >  /* Shuffle the single linked freelist based on a random pre-computed sequence */
-> >  static bool shuffle_freelist(struct kmem_cache *s, struct slab *slab,
-> >                   bool allow_spin)
-> > @@ -3383,15 +3400,7 @@ static bool shuffle_freelist(struct kmem
-> >      if (allow_spin) {
-> >          pos = get_random_u32_below(freelist_count);
-> >      } else {
-> > -        struct rnd_state *state;
-> > -
-> > -        /*
-> > -         * An interrupt or NMI handler might interrupt and change
-> > -         * the state in the middle, but that's safe.
-> > -         */
-> > -        state = &get_cpu_var(slab_rnd_state);
-> > -        pos = prandom_u32_state(state) % freelist_count;
-> > -        put_cpu_var(slab_rnd_state);
-> > +        pos = slab_get_prandom_state(freelist_count);
-> >      }
-> >  
-> >      page_limit = slab->objects * s->size;
-> > @@ -3882,7 +3891,7 @@ static void *get_from_any_partial(struct
-> >       * with available objects.
-> >       */
-> >      if (!s->remote_node_defrag_ratio ||
-> > -            get_cycles() % 1024 > s->remote_node_defrag_ratio)
-> > +        slab_get_prandom_state(1024) > s->remote_node_defrag_ratio)
-> >          return NULL;
-> >  
-> >      do {
-> > @@ -7102,7 +7111,7 @@ static unsigned int
-> >  
-> >      /* see get_from_any_partial() for the defrag ratio description */
-> >      if (!s->remote_node_defrag_ratio ||
-> > -            get_cycles() % 1024 > s->remote_node_defrag_ratio)
-> > +        slab_get_prandom_state(1024) > s->remote_node_defrag_ratio)
-> >          return 0;
-> >  
-> >      do {
-> > @@ -8421,7 +8430,7 @@ void __init kmem_cache_init_late(void)
-> >      flushwq = alloc_workqueue("slub_flushwq", WQ_MEM_RECLAIM | WQ_PERCPU,
-> >                    0);
-> >      WARN_ON(!flushwq);
-> > -#ifdef CONFIG_SLAB_FREELIST_RANDOM
-> > +#if defined(CONFIG_SLAB_FREELIST_RANDOM) || defined(CONFIG_NUMA)
-> >      prandom_init_once(&slab_rnd_state);
-> >  #endif
-> >  }
-> > 
-> >
+> Signed-off-by: Marc Harvey <marcharvey@google.com>
+> ---
+> Changes in v6:
+> - Use a tcp port with no associated service.
+> - Make tcpdump helper function not string-replace port numbers with
+>   associated service names, even on Fedora, which has a tcpdump patch
+>   that changes the required flag.
+> - Link to v5: https://lore.kernel.org/netdev/20260406-teaming-driver-internal-v5-4-e8a3f348a1c5@google.com/
+> 
+> Changes in v5:
+> - Use tcpdump for collecting traffic, rather than reading rx counters.
+> - Link to v4: https://lore.kernel.org/netdev/20260403-teaming-driver-internal-v4-4-d3032f33ca25@google.com/
+> 
+> Changes in v2:
+> - Fix shellcheck failures.
+> - Remove dependency on net forwarding lib and pipe viewer tools.
+> - Use iperf3 for tcp instead of netcat.
+> - Link to v1: https://lore.kernel.org/all/20260331053353.2504254-5-marcharvey@google.com/
+> ---
+>  tools/testing/selftests/drivers/net/team/Makefile  |   2 +
+>  tools/testing/selftests/drivers/net/team/config    |   4 +
+>  .../testing/selftests/drivers/net/team/team_lib.sh | 148 +++++++++++++++++++
+>  .../drivers/net/team/transmit_failover.sh          | 158 +++++++++++++++++++++
+>  tools/testing/selftests/net/forwarding/lib.sh      |   9 +-
+>  5 files changed, 319 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/drivers/net/team/Makefile b/tools/testing/selftests/drivers/net/team/Makefile
+> index 02d6f51d5a06..777da2e0429e 100644
+> --- a/tools/testing/selftests/drivers/net/team/Makefile
+> +++ b/tools/testing/selftests/drivers/net/team/Makefile
+> @@ -7,9 +7,11 @@ TEST_PROGS := \
+>  	options.sh \
+>  	propagation.sh \
+>  	refleak.sh \
+> +	transmit_failover.sh \
+>  # end of TEST_PROGS
+>  
+>  TEST_INCLUDES := \
+> +	team_lib.sh \
+>  	../bonding/lag_lib.sh \
+>  	../../../net/forwarding/lib.sh \
+>  	../../../net/in_netns.sh \
+> diff --git a/tools/testing/selftests/drivers/net/team/config b/tools/testing/selftests/drivers/net/team/config
+> index 5d36a22ef080..8f04ae419c53 100644
+> --- a/tools/testing/selftests/drivers/net/team/config
+> +++ b/tools/testing/selftests/drivers/net/team/config
+> @@ -6,4 +6,8 @@ CONFIG_NETDEVSIM=m
+>  CONFIG_NET_IPGRE=y
+>  CONFIG_NET_TEAM=y
+>  CONFIG_NET_TEAM_MODE_ACTIVEBACKUP=y
+> +CONFIG_NET_TEAM_MODE_BROADCAST=y
+>  CONFIG_NET_TEAM_MODE_LOADBALANCE=y
+> +CONFIG_NET_TEAM_MODE_RANDOM=y
+> +CONFIG_NET_TEAM_MODE_ROUNDROBIN=y
+> +CONFIG_VETH=y
+> diff --git a/tools/testing/selftests/drivers/net/team/team_lib.sh b/tools/testing/selftests/drivers/net/team/team_lib.sh
+> new file mode 100644
+> index 000000000000..2057f5edee79
+> --- /dev/null
+> +++ b/tools/testing/selftests/drivers/net/team/team_lib.sh
+> @@ -0,0 +1,148 @@
+> +#!/bin/bash
+> +# SPDX-License-Identifier: GPL-2.0
+> +
+> +test_dir="$(dirname "$0")"
+> +export REQUIRE_MZ=no
+> +export NUM_NETIFS=0
+> +# shellcheck disable=SC1091
+> +source "${test_dir}/../../../net/forwarding/lib.sh"
+> +
+> +TCP_PORT="43434"
+> +
+> +# Create a team interface inside of a given network namespace with a given
+> +# mode, members, and IP address.
+> +# Arguments:
+> +#  namespace - Network namespace to put the team interface into.
+> +#  team - The name of the team interface to setup.
+> +#  mode - The team mode of the interface.
+> +#  ip_address - The IP address to assign to the team interface.
+> +#  prefix_length - The prefix length for the IP address subnet.
+> +#  $@ - members - The member interfaces of the aggregation.
+> +setup_team()
+> +{
+> +	local namespace=$1
+> +	local team=$2
+> +	local mode=$3
+> +	local ip_address=$4
+> +	local prefix_length=$5
+> +	shift 5
+> +	local members=("$@")
+> +
+> +	# Prerequisite: team must have no members
+> +	for member in "${members[@]}"; do
+> +		ip -n "${namespace}" link set "${member}" nomaster
+> +	done
+> +
+> +	# Prerequisite: team must have no address in order to set it
+> +	# shellcheck disable=SC2086
+> +	ip -n "${namespace}" addr del "${ip_address}/${prefix_length}" \
+> +			${NODAD} dev "${team}"
+> +
+> +	echo "Setting team in ${namespace} to mode ${mode}"
+> +
+> +	if ! ip -n "${namespace}" link set "${team}" down; then
+> +		echo "Failed to bring team device down"
+> +		return 1
+> +	fi
+> +	if ! ip netns exec "${namespace}" teamnl "${team}" setoption mode \
+> +			"${mode}"; then
+> +		echo "Failed to set ${team} mode to '${mode}'"
+> +		return 1
+> +	fi
+> +
+> +	# Aggregate the members into teams.
+> +	for member in "${members[@]}"; do
+> +		ip -n "${namespace}" link set "${member}" master "${team}"
+> +	done
+> +
+> +	# Bring team devices up and give them addresses.
+> +	if ! ip -n "${namespace}" link set "${team}" up; then
+> +		echo "Failed to set ${team} up"
+> +		return 1
+> +	fi
+> +
+> +	# shellcheck disable=SC2086
+> +	if ! ip -n "${namespace}" addr add "${ip_address}/${prefix_length}" \
+> +			${NODAD} dev "${team}"; then
+> +		echo "Failed to give ${team} IP address in ${namespace}"
+> +		return 1
+> +	fi
+> +}
+> +
+> +# This is global used to keep track of the sender's iperf3 process, so that it
+> +# can be terminated.
+> +declare sender_pid
+> +
+> +# Start sending and receiving TCP traffic with iperf3.
+> +# Globals:
+> +#  sender_pid - The process ID of the iperf3 sender process. Used to kill it
+> +#  later.
+> +start_listening_and_sending()
+> +{
+> +	ip netns exec "${NS2}" iperf3 -s -p "${TCP_PORT}" --logfile /dev/null &
+> +	# Wait for server to become reachable before starting client.
+> +	slowwait 5 ip netns exec "${NS1}" iperf3 -c "${NS2_IP}" -p \
+> +			"${TCP_PORT}" -t 1 --logfile /dev/null
+
+Note for a possible follow-up: the iperf3 server is apparently never
+stopped. You could used the wait_local_port_listen helper and
+the`--one-off` iperf3 command line argument to avoid that (or explicitly
+killing the server pid at cleanup time)
+
+/P
+
 
