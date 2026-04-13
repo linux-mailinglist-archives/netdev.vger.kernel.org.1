@@ -1,586 +1,279 @@
-Return-Path: <netdev+bounces-278176-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278177-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kJhGJ2U23Wl9agkAu9opvQ
-	(envelope-from <netdev+bounces-278176-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 20:31:01 +0200
+	id wO7eEuM23WkmawkAu9opvQ
+	(envelope-from <netdev+bounces-278177-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 20:33:07 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A94A3F212F
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 20:31:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D866D3F217A
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 20:33:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 9D891302386E
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 18:30:16 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 0086730164D5
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 18:33:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 046903845CA;
-	Mon, 13 Apr 2026 18:29:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61DC8361DC3;
+	Mon, 13 Apr 2026 18:33:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="l+QWbYiW"
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="BhCoaxeI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34DDD366573;
-	Mon, 13 Apr 2026 18:29:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776104974; cv=none; b=bxqFRXxP+KYJTl8QSzXEHCdVK3uJycFbpthitc3Jz5g/SOpU9O0Z68uPh0YmOwwyGPh2C9W0d4Hw2FOnvPs15g+m/E73FeeJiN6T3o/9o9nP6RhrmcXAHyjGeQMCrxw5MZBY8ztQuvu9J1wn7XR59bO7S13upUkDQaAna3+VaSM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776104974; c=relaxed/simple;
-	bh=2ArdSjKR2RlI+jqmygWwNX6zIeyTDO5eF6SkrpbWQO8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=WLwwD40Yg5qcGxwLhg8kMrAybNcEj9dd77kCxFCNZxCj5d58X9yxhpqf/ofZy17LU+8zckngynHusyCQzAcz8DDYCPIyQEaVxjC0tTGVLoWkd4QeWLaiLQFGBPwJcNj7eZPLqq0YaHxl8xmGvUz4OLoBlcz1zjzS+y76sneQEcs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=l+QWbYiW; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id DEF001A322D;
-	Mon, 13 Apr 2026 18:29:31 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id B31185FFB9;
-	Mon, 13 Apr 2026 18:29:31 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id EB7DD104504B7;
-	Mon, 13 Apr 2026 20:29:25 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1776104969; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=15vke5PQWZFrVkgnnIyubbncfs+/GAw/Iqj1wymNY98=;
-	b=l+QWbYiWMGIz4qwFLYvxVvMGDaqNYLxl8K1kxh6kptb7szLGWRQXA8zBqpP99PBjYfp8qF
-	hoA1ZbpPykPq9PL8Qqxin+5v7f2di/xPCQjqjFU6MHvnHnb7DzKKp7Kxr2TzD0HFALS1qP
-	5ngtttZu6iq7pgtx9fYP2GUHSigLJA/zant3mcWAwXJWO57o7EYixDOPIMLE+oxnKesxjF
-	k+Q6hecUSaC5jbC0cNStpOirpqlYFEaQFckGdH4/SvkvwlJl/Ra4Hd/e9I1L+OYr5wYV4c
-	pl4AOaTC3FiTflrqPJAOjxm2TiiwfD3O7esj3A9Z/06x97gRP2S9RRjFwaQYsA==
-From: =?utf-8?q?Alexis_Lothor=C3=A9_=28eBPF_Foundation=29?= <alexis.lothore@bootlin.com>
-Date: Mon, 13 Apr 2026 20:28:48 +0200
-Subject: [PATCH RFC bpf-next 8/8] selftests/bpf: add tests to validate
- KASAN on JIT programs
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7ECB36897F
+	for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 18:33:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.153.30
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776105183; cv=fail; b=sIFx8FtVrUW/kluBM0V77WN0NiZAmrd9H49B/EM4m6VRdtyG9sQH3EYyK5+nDYF2XU7Ms9renYCX75/lxV3S3icf5LEYKJsfd9OH54DcTFQZds3sZuvQjd+uIwM3OstthzgydrCZdxGeEpgQs6HmhRISuaHdJqrJkripfFTLLPM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776105183; c=relaxed/simple;
+	bh=cBpXrkihGcjGQcaYRaWShDZmky7Cxex9eGcodqpepCM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=STCW1/3bnPFxgDMf6xvoi2UWUMzfON2B9YWIxVZ2L4ERWi13fG9OzjPYyU9i2Xw2mVGyeqCNcN+rvmhleb+yxqnHOLucHY7cd+aEwpR+06yh9iPclTQGcdKBgq+d3QTMpmjvmDpBCOfIOYLaM3U0FfXheCDBNp2gUlKJcuFTUNI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=BhCoaxeI; arc=fail smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0089730.ppops.net [127.0.0.1])
+	by m0089730.ppops.net (8.18.1.11/8.18.1.11) with ESMTP id 63D46HRO665597
+	for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 11:33:01 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
+	 bh=zG1i4GOJI0Qqxhx6X/y+OYVi9v31A3eEgoxO9M8dGo8=; b=BhCoaxeIAUTn
+	YJ7JhPz3Cx4IihaBsBpITr2/1JYDB8qkbM1UsOnx6Hz7lD9+VdcpE1EJyypDO/KG
+	WCuinBHxBNAbk1fqrW0/uMUNq3AFMFBcyij842gJXDxEArbnbnSFlkWcDzkkpHJw
+	93uzWR86iB/Yoqf4nv/24SWhVkPlWjvuAPhNCj2eGDalRmeGG5B83FBpS4No7Y7L
+	joGCbmbGXSXrXvzc89j++TyvF2Kco6Mo2SyFjdP79qHqn/VKxxhWFXQ309Ujk0O2
+	ZWUwUErBjTlmgcLhxUNhmB9eD3sRs8I5KPtN+ckqJ0rrQA5u0slfiHH3Lke5SO3z
+	mic2S/rLnA==
+Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com [209.85.210.71])
+	by m0089730.ppops.net (PPS) with ESMTPS id 4dfhssjs69-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 11:33:00 -0700 (PDT)
+Received: by mail-ot1-f71.google.com with SMTP id 46e09a7af769-7d7e995a87cso27444a34.1
+        for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 11:33:00 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776105180; cv=none;
+        d=google.com; s=arc-20240605;
+        b=S9sINkD13HribKQb/Ya/Qxk9n9BC/mLJTcw66FUWNZzxXCm5QYIO8ipLnu3yYJjyPb
+         nle9mFfXngvosoppfbn3FmlUkb5M9e2G9+eygWoEq0QxFeg/FY36kt62Qv4GIDEDtozt
+         UhNODAGzi3uz+Og1Vq1XSW53ZARa/3ODWiSUyXS2eHVTS8K5xt0w/cywYt7XBNWV9Ftx
+         /5RpbDqrLr4Y9QtZQLwq1HMp/S17kBPFbZVjqDagyp3Ygyw4JCSQ/bEy37ZSWqTJHlUT
+         Ik4EPMqk3aZA4Zsnp1gsHBzd4p9Y+YMal4VifXHI9r+wjEDkYSYLyOMrOIJenDdDgJyW
+         09dA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version;
+        bh=+JPsy6ZFn+T7uthNgDQuwBwhJArt54L0xqFFmpZV85I=;
+        fh=usF0mWYGWELhuRUGxAHPU/VJgjUGtw77tL7q2l0WCD8=;
+        b=HTjQH8vjKQ3/gzkmOdISr+228yRrkVqoxeIO407oD5a+KYk7/sWwzGV5mxoguyIty8
+         DkUVUb9WORJwiDzsfxh+X/vneDDnatS1FsXXwTkIeeMWl20x+I/nfN+p9P3DtErmOFf3
+         b1GlIgdG1IaWMjyaY+ne6KnP/gI9I9XYMaeqUWsySQ+dtEuxNkAMjUzIQddyOIRi5P7b
+         CtddsQrROtLqiyKT5EVCi6CskF0T/0w6ti/B6ZXRWczcTA6OPWwxUSi1xChhxN6a9te6
+         n/ceI107fSTZx+ln4ItwnGNafNJR9uqF/unWQAweikgeosGEfRwp+k9YcwCIlag2QL0f
+         1JIw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776105180; x=1776709980;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=+JPsy6ZFn+T7uthNgDQuwBwhJArt54L0xqFFmpZV85I=;
+        b=erwHKlOAh3045MydTqe0hIL2srKogexv610EwOW0osvuxp8cuMPqtzFfZSOOaaZM8D
+         8gq3n3tcEWdNGu+7PbE58clnC728aPJ9kdNLeE88TzZHUIJNqyJWEh063Px7EXnQlJYc
+         jwGZg7rhrHjEGBpcHEI4yyZBB5ilgEmAK4BfXG9ZKLI1cZm65Cr6P/Zu0boNluvqhpqS
+         MoGfnoe6iyYR01b4dQWTB6PFTXC6KGIXdnGuWXOzwJr5huR6NMGtMobcLVVNajUpMLro
+         E36Vpm7RJvTg5AmzDik5O/ABbbIon7Q3OwozqMff91xJy0vDHXHltdjazI/9cwHbGd13
+         7S6Q==
+X-Forwarded-Encrypted: i=1; AFNElJ86kPSymTc9T72ARu1aUS0071MAvdlN22IrrBVyBoflt8WqrCX2XJMPboLlTerrKqF2hebTYzQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxwag0cRj+dQBEM+WNEXzWwulUinMu34pMujTCVNWsXSpslR55V
+	5A8VzNOTjVCnlSmA8n943wP8K+6S1ATwtB65lihu9O6YLk0bXwans7x4TkJZn5NueBn5gAVbNCU
+	NBXQwxBcMgR+tkPdUDMxMR+fosCKPWzNNzor0wOr+G/ne5+O+ROeHsYWmVdqdlnKcvF3YP11Udj
+	Dv5+QXLjTCNP7OwsQn3OsMhNnikBfjpEc+ZfDvB1A=
+X-Gm-Gg: AeBDieuhg0/Jcex71Bo0mKcN9ZHbaq3oc66MauyKagOrpuJp8rsJq28dVVnd6HXWoIW
+	DRpmCXx+PVsPjWPtIpWTXpbqvVwSwWTfZIFXj23dif+fFUAnqRVX9rY18Gj6/Iqz5U4186nd2jX
+	Y9mwcKDvJJj6d73Rbm8g/lKd3kZVhv/kqNkotsyR3dkJ+TG2thJsK412dEdCt2jfz52LJ77qW3j
+	Xu4knwgY3qEutIugBIL+WykbyQUfdj+
+X-Received: by 2002:a05:6830:488e:b0:7db:a0b2:b5d5 with SMTP id 46e09a7af769-7dc27e1ca9cmr8189338a34.24.1776105180124;
+        Mon, 13 Apr 2026 11:33:00 -0700 (PDT)
+X-Received: by 2002:a05:6830:488e:b0:7db:a0b2:b5d5 with SMTP id
+ 46e09a7af769-7dc27e1ca9cmr8189318a34.24.1776105179660; Mon, 13 Apr 2026
+ 11:32:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20260413-kasan-v1-8-1a5831230821@bootlin.com>
-References: <20260413-kasan-v1-0-1a5831230821@bootlin.com>
-In-Reply-To: <20260413-kasan-v1-0-1a5831230821@bootlin.com>
-To: Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Eduard Zingerman <eddyz87@gmail.com>, 
- Kumar Kartikeya Dwivedi <memxor@gmail.com>, Song Liu <song@kernel.org>, 
- Yonghong Song <yonghong.song@linux.dev>, Jiri Olsa <jolsa@kernel.org>, 
- John Fastabend <john.fastabend@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
- Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, 
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
- x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, 
- Shuah Khan <shuah@kernel.org>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
- Alexandre Torgue <alexandre.torgue@foss.st.com>, 
- Andrey Ryabinin <ryabinin.a.a@gmail.com>, 
- Alexander Potapenko <glider@google.com>, 
- Andrey Konovalov <andreyknvl@gmail.com>, Dmitry Vyukov <dvyukov@google.com>, 
- Vincenzo Frascino <vincenzo.frascino@arm.com>, 
- Andrew Morton <akpm@linux-foundation.org>
-Cc: ebpf@linuxfoundation.org, 
- Bastien Curutchet <bastien.curutchet@bootlin.com>, 
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
- Xu Kuohai <xukuohai@huawei.com>, bpf@vger.kernel.org, 
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
- linux-arm-kernel@lists.infradead.org, kasan-dev@googlegroups.com, 
- linux-mm@kvack.org, 
- =?utf-8?q?Alexis_Lothor=C3=A9_=28eBPF_Foundation=29?= <alexis.lothore@bootlin.com>
-X-Mailer: b4 0.15.1
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+References: <20260325082534.GN814676@unreal> <acW2BwQKaUbS3eL9@kbusch-mbp>
+ <20260331083758.GA814676@unreal> <acvFV8c5QVxnt3Em@kbusch-mbp>
+ <20260331132942.GC814676@unreal> <acvNsvS5ShlQlrox@kbusch-mbp>
+ <20260331140309.GH814676@unreal> <acvWplw67b3Gwlkc@kbusch-mbp>
+ <20260331190220.GI814676@unreal> <acwkAo2k41xaxdTS@kbusch-mbp> <20260409120415.GF86584@unreal>
+In-Reply-To: <20260409120415.GF86584@unreal>
+From: Zhiping Zhang <zhipingz@meta.com>
+Date: Mon, 13 Apr 2026 11:32:48 -0700
+X-Gm-Features: AQROBzDIIpZEN3aiHYPi89ixDuzK7SpFChCr2JMeXAVEQc6s_3ctAex9jcSvckQ
+Message-ID: <CAH3zFs0hx_-3LetSUaPRMg=0jaL=GD7Mop3pEUhJ3O3qkaJrQg@mail.gmail.com>
+Subject: Re: [RFC v2 1/2] vfio: add callback to get tph info for dmabuf
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Keith Busch <kbusch@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+        Bjorn Helgaas <bhelgaas@google.com>, linux-rdma@vger.kernel.org,
+        linux-pci@vger.kernel.org, netdev@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, Yochai Cohen <yochai@nvidia.com>,
+        Yishai Hadas <yishaih@nvidia.com>, Bjorn Helgaas <helgaas@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-GUID: 8caBfPd9AyqpW2Tf3XE3luvEiP9oUKF1
+X-Authority-Analysis: v=2.4 cv=Ye2NIQRf c=1 sm=1 tr=0 ts=69dd36dc cx=c_pps
+ a=OI0sxtj7PyCX9F1bxD/puw==:117 a=IkcTkHD0fZMA:10 a=A5OVakUREuEA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=7x6HtfJdh03M6CCDgxCd:22 a=855S8uPTkML1Oy45N9_h:22
+ a=VwQbUJbxAAAA:8 a=f99BUTzuh9MxvKowt8oA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: 8caBfPd9AyqpW2Tf3XE3luvEiP9oUKF1
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDEzMDE4MiBTYWx0ZWRfX8Ml06RvUKBNm
+ cZDdl2zTVdOGNyfD9YvbSTNzCg5YpkWaEQehS3LBhq12aAM/gffRN9VNGJhr5N5zvQUuFa5I8BF
+ lthdkNRR5k8DWv08OGcbEhHYkEDxN7tE6f8zVgjZdQhnLApk4+U7xDHOJq0gE1MigcTbvO/ZqQf
+ meGmqiIlrN4qQMBPvSP5O6rHM5iE865uuF297BY3+ORxCWyGtApwbLuZOI6mH9NHdyZ7Xxs9Mty
+ Au7nJmWvQoN6YdfupH0ERmeoHPY2vchaS9j+3tX1DjVax9USvpo+DENQfvupgHAj1goAqJRt3iV
+ 1z8VN+zoH2LwW8CAh06GflO9Fu3UAqrjNnOJABiY7ACVzti9tsZenzxif8z4n1YN8+ZeUn4mvoa
+ qui7m06SFjRFOP8Pde7zBVpYnyX6ft5R59yRuobuivt/h1ClqvYZH/hF3382wYtPYF889WGDSaO
+ UI7TyF/lDJcp/ETTCcQ==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-04-13_03,2026-04-13_04,2025-10-01_01
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[meta.com,reject];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[meta.com:s=s2048-2025-q2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-278176-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_TO(0.00)[kernel.org,iogearbox.net,linux.dev,gmail.com,davemloft.net,redhat.com,alien8.de,linux.intel.com,zytor.com,foss.st.com,google.com,arm.com,linux-foundation.org];
-	RCVD_TLS_LAST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[40];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alexis.lothore@bootlin.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_HAS_DN(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 7A94A3F212F
+	RCPT_COUNT_SEVEN(0.00)[11];
+	TAGGED_FROM(0.00)[bounces-278177-lists,netdev=lfdr.de];
+	PRECEDENCE_BULK(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[zhipingz@meta.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[meta.com:+]
+X-Rspamd-Queue-Id: D866D3F217A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add a basic KASAN test runner that loads and test-run programs that can
-trigger memory management bugs. The test captures kernel logs and ensure
-that the expected KASAN splat is emitted by searching for the
-corresponding first lines in the report.
+On Thu, Apr 9, 2026 at 5:04=E2=80=AFAM Leon Romanovsky <leon@kernel.org> wr=
+ote:
+>
+> >
+> On Tue, Mar 31, 2026 at 01:44:02PM -0600, Keith Busch wrote:
+> > On Tue, Mar 31, 2026 at 10:02:20PM +0300, Leon Romanovsky wrote:
+> > >
+> > > Right, what about adding TPH fields to struct vfio_region_dma_range
+> > > instead of struct vfio_device_feature_dma_buf?
+> >
+> > You might have to show me with code what you're talking about because I
+> > can't see any way we can add fields to any struct here without breaking
+> > backward compatibility.
+> >
+> > If we can't claim bits out of the unused "flags" field for this feature,
+> > then my initial reply is the only sane approach: we can introduce a new
+> > feature and struct for it that closely mirrors the existing one, but
+> > with the extra hint fields.
+>
+> Something like that, on top of this proposal:
+>
+> diff --git a/drivers/vfio/pci/vfio_pci_dmabuf.c b/drivers/vfio/pci/vfio_p=
+ci_dmabuf.c
+> index 3961afa640391..70d5ee1e3ef7b 100644
+> --- a/drivers/vfio/pci/vfio_pci_dmabuf.c
+> +++ b/drivers/vfio/pci/vfio_pci_dmabuf.c
+> @@ -241,9 +241,7 @@ int vfio_pci_core_feature_dma_buf(struct vfio_pci_cor=
+e_device *vdev, u32 flags,
+>                 return -EFAULT;
+>
+>         if (!get_dma_buf.nr_ranges ||
+> -           (get_dma_buf.flags & ~(VFIO_DMABUF_FL_TPH |
+> -                                  VFIO_DMABUF_TPH_PH_MASK |
+> -                                  VFIO_DMABUF_TPH_ST_MASK)))
+> +           (get_dma_buf.flags & ~VFIO_DMABUF_FLAG_TPH))
+>                 return -EINVAL;
+>
+>         /*
+> @@ -300,13 +298,10 @@ int vfio_pci_core_feature_dma_buf(struct vfio_pci_c=
+ore_device *vdev, u32 flags,
+>                 ret =3D PTR_ERR(priv->dmabuf);
+>                 goto err_dev_put;
+>         }
+> -       if (get_dma_buf.flags & VFIO_DMABUF_FL_TPH) {
+> -               priv->steering_tag =3D (get_dma_buf.flags &
+> -                                     VFIO_DMABUF_TPH_ST_MASK) >>
+> -                                    VFIO_DMABUF_TPH_ST_SHIFT;
+> -               priv->ph =3D (get_dma_buf.flags &
+> -                           VFIO_DMABUF_TPH_PH_MASK) >>
+> -                          VFIO_DMABUF_TPH_PH_SHIFT;
+> +       if (get_dma_buf.flags & VFIO_DMABUF_FLAG_TPH) {
+> +               priv->steering_tag =3D
+> +                       dma_ranges[get_dma_buf.nr_ranges + 1].tph.tag;
+> +               priv->ph =3D dma_ranges[get_dma_buf.nr_ranges + 1].tph.ph;
+>         }
+>         /* dma_buf_put() now frees priv */
+>         INIT_LIST_HEAD(&priv->dmabufs_elm);
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index e2a8962641d2c..a8b8d8b1a3278 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -1497,20 +1497,30 @@ struct vfio_device_feature_bus_master {
+>   */
+>  #define VFIO_DEVICE_FEATURE_DMA_BUF 11
+>
+> +struct vfio_region_dma_tph {
+> +       u16 tag;
+> +       u8 ph;
+> +};
+> +
+>  struct vfio_region_dma_range {
+> -       __u64 offset;
+> -       __u64 length;
+> +       union {
+> +               __u64 offset;
+> +               struct vfio_region_dma_tph tph;
+> +       };
+> +       union {
+> +               __u64 length;
+> +               __u64 reserved;
+> +       };
+> +};
+> +
+> +enum {
+> +       VFIO_DMABUF_FLAG_TPH =3D 1 << 0,
+>  };
+>
+>  struct vfio_device_feature_dma_buf {
+>         __u32   region_index;
+>         __u32   open_flags;
+>         __u32   flags;
+> -#define VFIO_DMABUF_FL_TPH             (1U << 0) /* TPH info is present =
+*/
+> -#define VFIO_DMABUF_TPH_PH_SHIFT       1         /* bits 1-2: PH (2-bit)=
+ */
+> -#define VFIO_DMABUF_TPH_PH_MASK        0x6U
+> -#define VFIO_DMABUF_TPH_ST_SHIFT       16        /* bits 16-31: steering=
+ tag */
+> -#define VFIO_DMABUF_TPH_ST_MASK                0xffff0000U
+>         __u32   nr_ranges;
+>         struct vfio_region_dma_range dma_ranges[] __counted_by(nr_ranges);
+>  };
 
-This version implements two faulty programs triggering either a
-user-after-free, or an out-of-bounds memory usage. The bugs are
-triggered thanks to some dedicated kfuncs in bpf_testmod.c, but two
-different techniques are used, as some cases can be quite hard to
-trigger in a pure "black box" approach:
-- for reads, we can make the used kfuncs return some faulty pointers
-  that ebpf programs will manipulate, they will generate legitimate
-  kasan reports as a consequence
-- applying the same trick for faulty writes is harder, as ebpf programs
-  can't write kernel data freely. So ebpf programs can call another
-  specific testing kfunc that will alter the shadow memory matching the
-  passed memory (eg: a map). When the program will try to write to the
-  corresponding memory, it will trigger a report as well.
+Sounds good, thanks! We will follow up and move this RFC to a formal patch.
 
-Signed-off-by: Alexis Lothoré (eBPF Foundation) <alexis.lothore@bootlin.com>
----
-The way of bringing kasan_poison into bpf_testmod is definitely not
-ideal.  But I would like to validate the testing approach (triggering
-real faulty accesses, which is hard on some cases, VS manually poisoning
-BPF-manipulated memory) before eventually making clean bridges between
-KASAN APIs and bpf_testmod.c, if the latter approach is the valid one.
----
- tools/testing/selftests/bpf/prog_tests/kasan.c     | 165 +++++++++++++++++++++
- tools/testing/selftests/bpf/progs/kasan.c          | 146 ++++++++++++++++++
- .../testing/selftests/bpf/test_kmods/bpf_testmod.c |  79 ++++++++++
- 3 files changed, 390 insertions(+)
-
-diff --git a/tools/testing/selftests/bpf/prog_tests/kasan.c b/tools/testing/selftests/bpf/prog_tests/kasan.c
-new file mode 100644
-index 000000000000..fd628aaa8005
---- /dev/null
-+++ b/tools/testing/selftests/bpf/prog_tests/kasan.c
-@@ -0,0 +1,165 @@
-+// SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
-+#include <bpf/bpf.h>
-+#include <fcntl.h>
-+#include <linux/if_ether.h>
-+#include <sys/klog.h>
-+#include <test_progs.h>
-+#include <unpriv_helpers.h>
-+#include "kasan.skel.h"
-+
-+#define SUBTEST_NAME_MAX_LEN	64
-+#define SYSLOG_ACTION_READ_ALL	3
-+#define SYSLOG_ACTION_CLEAR	5
-+
-+#define MAX_LOG_SIZE		(8*1024)
-+#define READ_CHUNK_SIZE		128
-+
-+#define KASAN_PATTERN_SLAB_UAF "BUG: KASAN: slab-use-after-free in bpf_prog_"
-+#define KASAN_PATTERN_GLOBAL_OOB "BUG: KASAN: global-out-of-bounds in bpf_prog_"
-+
-+static char klog_buffer[MAX_LOG_SIZE];
-+
-+static int read_kernel_logs(char *buf, size_t max_len)
-+{
-+	return klogctl(SYSLOG_ACTION_READ_ALL, buf, max_len);
-+}
-+
-+static int clear_kernel_logs(void)
-+{
-+	return klogctl(SYSLOG_ACTION_CLEAR, NULL, 0);
-+}
-+
-+static int kernel_logs_have_matching_kasan_report(char *buf, char *pattern,
-+						  bool is_write, int size)
-+{
-+	char *access_desc_start, *access_desc_end, *tmp;
-+	char access_log[READ_CHUNK_SIZE];
-+	char *kasan_report_start;
-+	int hsize, nsize;
-+	/* Searched kasan report is valid if
-+	 * - it contains the expected kasan pattern
-+	 * - the next line is the description of the faulty access
-+	 * - faulty access properties match the tested type and size
-+	 */
-+	kasan_report_start = strstr(buf, pattern);
-+
-+	if (!kasan_report_start)
-+		return 1;
-+
-+	/* Find next line */
-+	access_desc_start = strchr(kasan_report_start, '\n');
-+	if (!access_desc_start)
-+		return 1;
-+	access_desc_start++;
-+
-+	access_desc_end = strchr(access_desc_start, '\n');
-+	if (!access_desc_end)
-+		return 1;
-+
-+	nsize = snprintf(access_log, READ_CHUNK_SIZE, "%s of size %d at addr",
-+		 is_write ? "Write" : "Read", size);
-+
-+	hsize = access_desc_end - access_desc_start;
-+	tmp = memmem(access_desc_start, hsize, access_log, nsize);
-+
-+	if (!tmp)
-+		return 1;
-+
-+	return 0;
-+}
-+
-+struct test_spec {
-+	char *prog_name;
-+	char *expected_report_pattern;
-+};
-+
-+static struct test_spec tests[] = {
-+	{
-+		.prog_name = "bpf_kasan_uaf",
-+		.expected_report_pattern = KASAN_PATTERN_SLAB_UAF
-+	},
-+	{
-+		.prog_name = "bpf_kasan_oob",
-+		.expected_report_pattern = KASAN_PATTERN_GLOBAL_OOB
-+	}
-+};
-+
-+static void run_test_with_type_and_size(struct kasan *skel,
-+					struct test_spec *test, bool is_write,
-+					int access_size)
-+{
-+	char subtest_name[SUBTEST_NAME_MAX_LEN];
-+	struct bpf_program *prog;
-+	uint8_t buf[ETH_HLEN];
-+	int ret;
-+
-+	prog = bpf_object__find_program_by_name(skel->obj, test->prog_name);
-+	if (!ASSERT_OK_PTR(prog, "find test prog"))
-+		return;
-+
-+	snprintf(subtest_name, SUBTEST_NAME_MAX_LEN, "%s_%s_%d",
-+		 test->prog_name, is_write ? "write" : "read", access_size);
-+
-+	if (!test__start_subtest(subtest_name))
-+		return;
-+
-+	ret = clear_kernel_logs();
-+	if (!ASSERT_OK(ret, "reset log buffer"))
-+		return;
-+
-+	LIBBPF_OPTS(bpf_test_run_opts, topts);
-+	topts.sz = sizeof(struct bpf_test_run_opts);
-+	topts.data_size_in = ETH_HLEN;
-+	topts.data_in = buf;
-+	skel->bss->is_write = is_write;
-+	skel->bss->access_size = access_size;
-+	ret = bpf_prog_test_run_opts(bpf_program__fd(prog), &topts);
-+	if (!ASSERT_OK(ret, "run prog"))
-+		return;
-+
-+	ret = read_kernel_logs(klog_buffer, MAX_LOG_SIZE);
-+	if (ASSERT_GE(ret, 0, "read kernel logs"))
-+		ASSERT_OK(kernel_logs_have_matching_kasan_report(
-+				  klog_buffer, test->expected_report_pattern,
-+				  is_write, access_size),
-+			  test->prog_name);
-+}
-+
-+static void run_test_with_type(struct kasan *skel, struct test_spec *test,
-+			       bool is_write)
-+{
-+	run_test_with_type_and_size(skel, test, is_write, 1);
-+	run_test_with_type_and_size(skel, test, is_write, 2);
-+	run_test_with_type_and_size(skel, test, is_write, 4);
-+	run_test_with_type_and_size(skel, test, is_write, 8);
-+}
-+
-+static void run_test(struct kasan *skel, struct test_spec *test)
-+{
-+	run_test_with_type(skel, test, false);
-+	run_test_with_type(skel, test, true);
-+}
-+
-+void test_kasan(void)
-+{
-+	struct test_spec *test;
-+	struct kasan *skel;
-+	int i;
-+
-+	if (!is_jit_enabled() || !get_kasan_jit_enabled()) {
-+		test__skip();
-+		return;
-+	}
-+
-+	skel = kasan__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "open and load prog"))
-+		return;
-+
-+	for (i = 0; i < ARRAY_SIZE(tests); i++) {
-+		test = &tests[i];
-+
-+		run_test(skel, test);
-+	}
-+
-+	kasan__destroy(skel);
-+}
-diff --git a/tools/testing/selftests/bpf/progs/kasan.c b/tools/testing/selftests/bpf/progs/kasan.c
-new file mode 100644
-index 000000000000..f713c9b7c9ce
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/kasan.c
-@@ -0,0 +1,146 @@
-+// SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
-+
-+#include <linux/bpf.h>
-+#include <bpf/bpf_helpers.h>
-+#include <bpf/bpf_tracing.h>
-+
-+#define KASAN_SLAB_FREE 0xFB
-+#define KASAN_GLOBAL_REDZONE 0xF9
-+
-+extern __u8 *bpf_kfunc_kasan_uaf_1(void) __ksym;
-+extern __u16 *bpf_kfunc_kasan_uaf_2(void) __ksym;
-+extern __u32 *bpf_kfunc_kasan_uaf_4(void) __ksym;
-+extern __u64 *bpf_kfunc_kasan_uaf_8(void) __ksym;
-+extern __u8 *bpf_kfunc_kasan_oob_1(void) __ksym;
-+extern __u16 *bpf_kfunc_kasan_oob_2(void) __ksym;
-+extern __u32 *bpf_kfunc_kasan_oob_4(void) __ksym;
-+extern __u64 *bpf_kfunc_kasan_oob_8(void) __ksym;
-+extern void bpf_kfunc_kasan_poison(void *mem, __u32 mem__sz, __u8 byte) __ksym;
-+
-+int access_size;
-+int is_write;
-+
-+struct kasan_write_val {
-+	__u8 data_1;
-+	__u16 data_2;
-+	__u32 data_4;
-+	__u64 data_8;
-+};
-+
-+struct {
-+	__uint(type, BPF_MAP_TYPE_ARRAY);
-+	__uint(max_entries, 1);
-+	__type(key, __u32);
-+	__type(value, struct kasan_write_val);
-+} test_map SEC(".maps");
-+
-+static void bpf_kasan_faulty_write(int size, __u8 poison_byte)
-+{
-+	struct kasan_write_val *val;
-+	__u32 key = 0;
-+
-+	val = bpf_map_lookup_elem(&test_map, &key);
-+	if (!val)
-+		return;
-+
-+	bpf_kfunc_kasan_poison(val, sizeof(struct kasan_write_val),
-+			       poison_byte);
-+	switch (size) {
-+	case 1:
-+		val->data_1 = 0xAA;
-+		break;
-+	case 2:
-+		val->data_2 = 0xAA;
-+		break;
-+	case 4:
-+		val->data_4 = 0xAA;
-+		break;
-+	case 8:
-+		val->data_8 = 0xAA;
-+		break;
-+	}
-+	bpf_kfunc_kasan_poison(val, sizeof(struct kasan_write_val), 0x00);
-+}
-+
-+
-+static int bpf_kasan_uaf_read(int size)
-+{
-+	__u8 *result_1;
-+	__u16 *result_2;
-+	__u32 *result_4;
-+	__u64 *result_8;
-+	int ret = 0;
-+
-+	switch (size) {
-+	case 1:
-+		result_1 = bpf_kfunc_kasan_uaf_1();
-+		ret = result_1[0] ? 1 : 0;
-+		break;
-+	case 2:
-+		result_2 = bpf_kfunc_kasan_uaf_2();
-+		ret = result_2[0] ? 1 : 0;
-+		break;
-+	case 4:
-+		result_4 = bpf_kfunc_kasan_uaf_4();
-+		ret = result_4[0] ? 1 : 0;
-+		break;
-+	case 8:
-+		result_8 = bpf_kfunc_kasan_uaf_8();
-+		ret = result_8[0] ? 1 : 0;
-+		break;
-+	}
-+	return ret;
-+}
-+
-+SEC("tcx/ingress")
-+int bpf_kasan_uaf(struct __sk_buff *skb)
-+{
-+	if (is_write) {
-+		bpf_kasan_faulty_write(access_size, KASAN_SLAB_FREE);
-+		return 0;
-+	}
-+
-+	return bpf_kasan_uaf_read(access_size);
-+}
-+
-+static int bpf_kasan_oob_read(int size)
-+{
-+	__u8 *result_1;
-+	__u16 *result_2;
-+	__u32 *result_4;
-+	__u64 *result_8;
-+	int ret = 0;
-+
-+	switch (size) {
-+	case 1:
-+		result_1 = bpf_kfunc_kasan_oob_1();
-+		ret = result_1[0] ? 1 : 0;
-+		break;
-+	case 2:
-+		result_2 = bpf_kfunc_kasan_oob_2();
-+		ret = result_2[0] ? 1 : 0;
-+		break;
-+	case 4:
-+		result_4 = bpf_kfunc_kasan_oob_4();
-+		ret = result_4[0] ? 1 : 0;
-+		break;
-+	case 8:
-+		result_8 = bpf_kfunc_kasan_oob_8();
-+		ret = result_8[0] ? 1 : 0;
-+		break;
-+	}
-+	return ret;
-+}
-+
-+SEC("tcx/ingress")
-+int bpf_kasan_oob(struct __sk_buff *skb)
-+{
-+	if (is_write) {
-+		bpf_kasan_faulty_write(access_size, KASAN_GLOBAL_REDZONE);
-+		return 0;
-+	}
-+
-+	return bpf_kasan_oob_read(access_size);
-+}
-+
-+char LICENSE[] SEC("license") = "GPL";
-diff --git a/tools/testing/selftests/bpf/test_kmods/bpf_testmod.c b/tools/testing/selftests/bpf/test_kmods/bpf_testmod.c
-index d876314a4d67..01554bcbbbb0 100644
---- a/tools/testing/selftests/bpf/test_kmods/bpf_testmod.c
-+++ b/tools/testing/selftests/bpf/test_kmods/bpf_testmod.c
-@@ -271,6 +271,76 @@ __bpf_kfunc void bpf_kfunc_put_default_trusted_ptr_test(struct prog_test_member
- 	 */
- }
- 
-+static void *kasan_uaf(void)
-+{
-+	void *p = kmalloc(64, GFP_ATOMIC);
-+
-+	if (!p)
-+		return NULL;
-+	memset(p, 0xAA, 64);
-+	kfree(p);
-+
-+	return p;
-+}
-+
-+#ifdef CONFIG_KASAN_GENERIC
-+extern void kasan_poison(const void *addr, size_t size, u8 value, bool init);
-+
-+__bpf_kfunc void bpf_kfunc_kasan_poison(void *mem, u32 mem__sz, u8 byte)
-+{
-+	kasan_poison(mem, mem__sz, byte, false);
-+}
-+#else
-+__bpf_kfunc void bpf_kfunc_kasan_poison(void *mem, u32 mem__sz, u8 byte) { }
-+#endif
-+
-+__bpf_kfunc u8 *bpf_kfunc_kasan_uaf_1(void)
-+{
-+	return kasan_uaf();
-+}
-+
-+__bpf_kfunc u16 *bpf_kfunc_kasan_uaf_2(void)
-+{
-+	return kasan_uaf();
-+}
-+
-+__bpf_kfunc u32 *bpf_kfunc_kasan_uaf_4(void)
-+{
-+	return kasan_uaf();
-+}
-+
-+__bpf_kfunc u64 *bpf_kfunc_kasan_uaf_8(void)
-+{
-+	return kasan_uaf();
-+}
-+
-+static u8 test_oob_buffer[64];
-+
-+static void *bpf_kfunc_kasan_oob(void)
-+{
-+	return test_oob_buffer+64;
-+}
-+
-+__bpf_kfunc u8 *bpf_kfunc_kasan_oob_1(void)
-+{
-+	return bpf_kfunc_kasan_oob();
-+}
-+
-+__bpf_kfunc u16 *bpf_kfunc_kasan_oob_2(void)
-+{
-+	return bpf_kfunc_kasan_oob();
-+}
-+
-+__bpf_kfunc u32 *bpf_kfunc_kasan_oob_4(void)
-+{
-+	return bpf_kfunc_kasan_oob();
-+}
-+
-+__bpf_kfunc u64 *bpf_kfunc_kasan_oob_8(void)
-+{
-+	return bpf_kfunc_kasan_oob();
-+}
-+
- __bpf_kfunc struct bpf_testmod_ctx *
- bpf_testmod_ctx_create(int *err)
- {
-@@ -740,6 +810,15 @@ BTF_ID_FLAGS(func, bpf_testmod_ops3_call_test_1)
- BTF_ID_FLAGS(func, bpf_testmod_ops3_call_test_2)
- BTF_ID_FLAGS(func, bpf_kfunc_get_default_trusted_ptr_test);
- BTF_ID_FLAGS(func, bpf_kfunc_put_default_trusted_ptr_test);
-+BTF_ID_FLAGS(func, bpf_kfunc_kasan_poison)
-+BTF_ID_FLAGS(func, bpf_kfunc_kasan_uaf_1)
-+BTF_ID_FLAGS(func, bpf_kfunc_kasan_uaf_2)
-+BTF_ID_FLAGS(func, bpf_kfunc_kasan_uaf_4)
-+BTF_ID_FLAGS(func, bpf_kfunc_kasan_uaf_8)
-+BTF_ID_FLAGS(func, bpf_kfunc_kasan_oob_1)
-+BTF_ID_FLAGS(func, bpf_kfunc_kasan_oob_2)
-+BTF_ID_FLAGS(func, bpf_kfunc_kasan_oob_4)
-+BTF_ID_FLAGS(func, bpf_kfunc_kasan_oob_8)
- BTF_KFUNCS_END(bpf_testmod_common_kfunc_ids)
- 
- BTF_ID_LIST(bpf_testmod_dtor_ids)
-
--- 
-2.53.0
-
+Zhiping
 
