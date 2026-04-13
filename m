@@ -1,181 +1,234 @@
-Return-Path: <netdev+bounces-278135-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278136-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EL2lCmsg3WneaAkAu9opvQ
-	(envelope-from <netdev+bounces-278135-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 18:57:15 +0200
+	id UA18IV8l3WlcaQkAu9opvQ
+	(envelope-from <netdev+bounces-278136-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 19:18:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C12DF3F054B
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 18:57:14 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E20923F123A
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 19:18:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id F1D1A307BBFA
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 16:47:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C51A03103394
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 16:49:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7B61314A8E;
-	Mon, 13 Apr 2026 16:47:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07FE631619A;
+	Mon, 13 Apr 2026 16:49:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lvG2mcu5"
+	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="tFla3PGd";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="vT0nUSWr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fout-a8-smtp.messagingengine.com (fout-a8-smtp.messagingengine.com [103.168.172.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A372E313298;
-	Mon, 13 Apr 2026 16:47:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98E5C317141
+	for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 16:49:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776098832; cv=none; b=BOCpmnnUUCE9afclpeH35gwo9Ghqhu1BIRsKBI1z/7nGfKUWCKgbhxrCbWK0yijGiR8L7Ncu9YfFMbrZ2yVat7plfGdXj84PmusN53CJCphKQphMqaU6ZCsfg4+TqgjSpqhx1zvpxIqN4rekD6Oqb1ERJtMfrD6wWV/opmrVjTo=
+	t=1776098997; cv=none; b=bjehUBGviAg4El9ADl+24VG3IJQUnF5/LpwpscK/MvuSdl/UzrSiMNN5o0bD/Upk/KAzWe2NMNsd4YQIKPEIPhuEou5o0SySINhDYNg7deUxDS/sdWOoRH/2uSbeuf7m3WFb4DG6Ey7ekvVgpeYVT/Lf++sAGdOMxsL3UZn2hRQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776098832; c=relaxed/simple;
-	bh=jNW0/buPHzZfl7bk0soR3fE7hl4JdwHL3dBiQwr/s+g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R8Pr182fUeH6b0RSEfLNVipcRoZMTCTVGx31Y4w9oDOmMBiPRN3MtTJye5PbV+kS3DF0PucUCw1DYtUs1XgkotcIOCg3DWsgcCAosTizpcC4SMl4q78diOMVn7PEWpIIAWYKXey12DB3lGfbmkFAE5wPWEBDVslUnKhWrhpODtE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lvG2mcu5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E3DAC2BCB3;
-	Mon, 13 Apr 2026 16:47:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776098832;
-	bh=jNW0/buPHzZfl7bk0soR3fE7hl4JdwHL3dBiQwr/s+g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lvG2mcu5j/XA3oxFBUu/Z/Ckhb+9VwD/m8gyJh4MxMuNdqi1+hNtyyO36fC0ior7/
-	 A+OrhCQDF2Y/r5AOyCF/qW+trC5lrBHxUKd+W/lq0hUKNgu/p07Vu5v0r6RGt4txGZ
-	 Yj7vCYGtNPF7zI/2VTqaM7GI7usYlK7+VYeJgt6zL11nMDdQRN2bjAXfLbqXsgcA2l
-	 nGeQz7WBlWa8kKJnM4qhEWvhtu2639aThsDpjrzVJg4KsrWcRphtizM0gOwq2VrvNX
-	 ztU3k+yLmc668bj4gr3L2wGMrXPttmZzSZOt/OvsgzOx3JYvd0GUq8mSOmq23Ts8u3
-	 AI9XXdCH73d3A==
-Date: Mon, 13 Apr 2026 17:47:07 +0100
-From: Simon Horman <horms@kernel.org>
-To: Shubham Chakraborty <chakrabortyshubham66@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, kuniyu@google.com,
-	corbet@lwn.net, skhan@linuxfoundation.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] Documentation: sysctl: document net core sysctls
-Message-ID: <20260413164707.GT469338@kernel.org>
-References: <20260407083213.27045-1-chakrabortyshubham66@gmail.com>
- <20260409174859.11854-1-chakrabortyshubham66@gmail.com>
+	s=arc-20240116; t=1776098997; c=relaxed/simple;
+	bh=rd+SrPjNwZ3cHs2dt1EXHrjTAbLf2SkzPf1coaIwYdc=;
+	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
+	 Content-Type:Date:Message-ID; b=OndA4GQdt7LHKAWGku6iBL2SeVl0OxS06BMcSPdC04OsYlodPrYEn6wtJLt0DnKW7+Yc1tY5IhodQCjzkWmnNMKaiEYtz8A5vubAPRCVCXRuDqZYhLXFCv0Ee9JQvxMwNqg9pVEJxVGnltUMVpDs/LGAPJazkj598BEspr6kzJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=tFla3PGd; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=vT0nUSWr; arc=none smtp.client-ip=103.168.172.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailfout.phl.internal (Postfix) with ESMTP id DAE68EC04D8;
+	Mon, 13 Apr 2026 12:49:55 -0400 (EDT)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-01.internal (MEProxy); Mon, 13 Apr 2026 12:49:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
+	 h=cc:cc:content-id:content-transfer-encoding:content-type
+	:content-type:date:date:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to; s=fm3; t=1776098995; x=1776185395; bh=hKNVFN/yOQ5Zc1eGnCFBW
+	uhsQ9tysRhfu9+x6ZY22Y0=; b=tFla3PGdzXlvTC7RhUXZcGk1UUcFIfvRfV2yR
+	Z67R1rHlRP/pRzhcr0PWVFkQ9E7Scedqno8Vu3JI/1Uymu/LYfRlpqdF/C5UyOIK
+	dKdOmpMFITwDq8FJYlKtviKxNovMeO5qr8ZIiX+BwbQIAri4OBwMlVPDQ8Em0tcl
+	3pHmZ1e6xqfr9OIzhwx1fB9wf2xoA8buuonLyhIEfgZ+y1pY/aH4biYnV4VYKXFB
+	Hpx8zvJUbL817Ifl2mQdKZac9HcfzUG6ezHMxpM9luNhYcgIzbKQeFQSqD6II9xh
+	ymTwcpu3Yv7EXJMf8vmI8m7yJxTKtCrktUzzA4rVK63/nKnJA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-id
+	:content-transfer-encoding:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1776098995; x=1776185395; bh=hKNVFN/yOQ5Zc1eGnCFBWuhsQ9tysRhfu9+
+	x6ZY22Y0=; b=vT0nUSWrARsKoAVWoeyLrCBeDIkONL51Xf/iprBotJDwPSOXdPB
+	DQuQKEqubzeSWa5ljd45do/4PWuBPLzKvYjELw/W2i0lMmVbN+zk6qoK3ZW4TV/h
+	GxoIQ1Q4jFPJ0Rj5jJGWvvI5JofRYEgys3kCXgG1UK8Ifj3j8KzxUlzXTX4PptiJ
+	+9m6Ut461YQ+iojNTfnHuW2zpBVPDbsPCjiReGvYgBv6QsydklP0GIOSTyJxwpLQ
+	ct1MikdLlbGX6OTpI0QtJ/D6yw4w5IIYLpAJbRRlWe/+DfR3USW3S5Lo/+/dqRHJ
+	FDa2TLUnHHF5kHzQ0fX+4qCdWefAH//v3nQ==
+X-ME-Sender: <xms:sx7daQvyIhZAWMUFj0eoBTqjXPaGOPbuL7E1D4pz86MRJdgMWbUKEA>
+    <xme:sx7daaDXRvYbBFsEPdvzrMayEOXvMMQqd4CSKthxUWAleR2-6eJAlNhhLVqM9fe0G
+    SIMNOD-_6ReBfbVJCB-8U84aDfuPbx0noHA0H3I-6M2s3XtF0b61Q>
+X-ME-Received: <xmr:sx7daQPICX1yEgei3ZX9vfaXl3ex5MK0qoOiMLjldmRODLGP7_g-C8Vn4C8sLR21ds4KWw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdefkeejiecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpefhvfevufgjfhfogggtgfffkfesthhqredtredtvdenucfhrhhomheplfgrhicuggho
+    shgsuhhrghhhuceojhhvsehjvhhoshgsuhhrghhhrdhnvghtqeenucggtffrrghtthgvrh
+    hnpeeifedvleefleejveethfefieduueeivdefieevleffuddvveeftdehffffteefffen
+    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehjvhesjh
+    hvohhssghurhhghhdrnhgvthdpnhgspghrtghpthhtohepuddtpdhmohguvgepshhmthhp
+    ohhuthdprhgtphhtthhopehlohhuihhsrdhstggrlhgsvghrthesieifihhnugdrtghomh
+    dprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohep
+    mhgrhhgvshhhsgesghhoohhglhgvrdgtohhmpdhrtghpthhtoheprghnugihsehgrhgvhi
+    hhohhushgvrdhnvghtpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgt
+    phhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepfh
+    gslhesrhgvughhrghtrdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdr
+    tghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:sx7daaDcFTQoTNo-Sbq09lVGJVU3V-E1HWiowGE9_nHheQtptO0FvA>
+    <xmx:sx7daR6IJFHCzJ_LsZuQ5HFHZdBymI0GpwtcZKmxeKRW6_mHM2528A>
+    <xmx:sx7daU5gg7eTx5zI29x9d64yOSkCCJWQQjPODMU5UuvLyrr2gUOsCA>
+    <xmx:sx7daTR-HishRSk5cxKfFhvDi3jdCso9P3q7K0MpGx1uhvI1ntLzsw>
+    <xmx:sx7dadUMLcvZRTO8Lok5BlbGezTA_v_b17Z8L2stBJVUiO4uOhbarWNB>
+Feedback-ID: i53714940:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 13 Apr 2026 12:49:55 -0400 (EDT)
+Received: by famine.localdomain (Postfix, from userid 1000)
+	id 96C909FB3D; Mon, 13 Apr 2026 09:49:54 -0700 (PDT)
+Received: from famine (localhost [127.0.0.1])
+	by famine.localdomain (Postfix) with ESMTP id 95DB59FB3C;
+	Mon, 13 Apr 2026 09:49:54 -0700 (PDT)
+From: Jay Vosburgh <jv@jvosburgh.net>
+To: Louis Scalbert <louis.scalbert@6wind.com>
+cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, edumazet@google.com,
+    kuba@kernel.org, pabeni@redhat.com, fbl@redhat.com,
+    andy@greyhouse.net, shemminger@vyatta.com, maheshb@google.com
+Subject: Re: [PATCH net v3 3/5] bonding: 3ad: fix mux port state on oper down
+In-reply-to: <20260408152353.276204-4-louis.scalbert@6wind.com>
+References: <20260408152353.276204-1-louis.scalbert@6wind.com>
+ <20260408152353.276204-4-louis.scalbert@6wind.com>
+Comments: In-reply-to Louis Scalbert <louis.scalbert@6wind.com>
+   message dated "Wed, 08 Apr 2026 17:23:51 +0200."
+X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260409174859.11854-1-chakrabortyshubham66@gmail.com>
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <707641.1776098994.1@famine>
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 13 Apr 2026 09:49:54 -0700
+Message-ID: <707642.1776098994@famine>
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[jvosburgh.net,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[jvosburgh.net:s=fm3,messagingengine.com:s=fm2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278135-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-278136-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[jvosburgh.net:+,messagingengine.com:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,6wind.com:email];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jv@jvosburgh.net,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C12DF3F054B
+	RCVD_COUNT_SEVEN(0.00)[8]
+X-Rspamd-Queue-Id: E20923F123A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Apr 09, 2026 at 11:18:59PM +0530, Shubham Chakraborty wrote:
-> Document missing net.core and net.unix sysctl entries in
-> admin-guide/sysctl/net.rst, and correct wording for defaults
-> that are derived from PAGE_SIZE, HZ, or CONFIG_MAX_SKB_FRAGS.
-> 
-> Also clarify that the RFS and flow-limit controls are only present
-> when CONFIG_RPS or CONFIG_NET_FLOW_LIMIT is enabled, and describe
-> rps_sock_flow_entries the way the handler implements it: non-zero
-> values are rounded up to the nearest power of two.
-> 
-> Signed-off-by: Shubham Chakraborty <chakrabortyshubham66@gmail.com>
+Louis Scalbert <louis.scalbert@6wind.com> wrote:
 
-...
+>When the bonding interface has carrier down due to the absence of
+>valid slaves and a slave transitions from down to up, the bonding
+>interface briefly goes carrier up, then down again, and finally up
+>once LACP negotiates collecting and distributing on the port.
 
-> @@ -238,6 +240,37 @@ rps_default_mask
->  The default RPS CPU mask used on newly created network devices. An empty
->  mask means RPS disabled by default.
->  
-> +rps_sock_flow_entries
-> +---------------------
-> +
-> +The total number of entries in the RPS flow table. This is used by
+	Instead of "valid," I would suggest "usable."
 
-Maybe s/This/The table/ to make it clearer that it is the table,
-rather than the number of entries, that track CPUs.
+>The interface should not transition to carrier up until LACP
+>negotiation is complete.
 
-> +RFS (Receive Flow Steering) to track which CPU is currently processing
-> +a flow in userspace. Non-zero values are rounded up to the nearest
-> +power of two.
-> +Available only when ``CONFIG_RPS`` is enabled.
+	If the new option is off, i.e., does not require successful LACP
+negotiation, it should wait some time before asserting carrier up.  If
+negotiation fails, however, how long should it wait?
 
-I think it would be worth noting that a value of 0 disables RPS.
+>This happens because the actor and partner port states remain in
+>collecting (and distributing) when the port goes down. When the port
+>comes back up, it temporarily remains in this state until LACP
+>renegotiation occurs.
+>
+>Previously this was mostly cosmetic, but since the bonding carrier
+>state now depends on the LACP negotiation state, it causes the
+>interface to flap.
 
-> +
-> +Default: 0
+	"now depends" -> "may depend"
 
-...
+>Fix this by unsetting the SELECTED flag when a port goes down so that
+>the mux state machine transitions through ATTACHED and DETACHED,
+>which clears the actor collecting and distributing flags. Do not
+>attempt to set the SELECTED flag if the port is still disabled.
+>
+>Fixes: 655f8919d549 ("bonding: add min links parameter to 802.3ad")
+>Signed-off-by: Louis Scalbert <louis.scalbert@6wind.com>
+>---
+> drivers/net/bonding/bond_3ad.c | 7 +++++++
+> 1 file changed, 7 insertions(+)
+>
+>diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond_3a=
+d.c
+>index b79a76296966..3a94fbcbf721 100644
+>--- a/drivers/net/bonding/bond_3ad.c
+>+++ b/drivers/net/bonding/bond_3ad.c
+>@@ -1570,6 +1570,12 @@ static void ad_port_selection_logic(struct port *p=
+ort, bool *update_slave_arr)
+> 	struct slave *slave;
+> 	int found =3D 0;
+> =
 
->  netdev_budget_usecs
->  ---------------------
->  
+>+	/* Disabled ports cannot be SELECTED.
+>+	 * Do not attempt to set the SELECTED flag if the port is still disable=
+d.
+>+	 */
+>+	if (!port->is_enabled)
+>+		return;
+>+
 
-The lines above the following hunk are:
+	I think the change is fine, but the comment seems redundant to
+me.
 
-netdev_budget_usecs
----------------------
+	-J
 
-Maximum number of microseconds in one NAPI polling cycle. Polling
+> 	/* if the port is already Selected, do nothing */
+> 	if (port->sm_vars & AD_PORT_SELECTED)
+> 		return;
+>@@ -2794,6 +2800,7 @@ void bond_3ad_handle_link_change(struct slave *slav=
+e, char link)
+> 		/* link has failed */
+> 		port->is_enabled =3D false;
+> 		ad_update_actor_keys(port, true);
+>+		port->sm_vars &=3D ~AD_PORT_SELECTED;
+> 	}
+> 	agg =3D __get_first_agg(port);
+> 	ad_agg_selection_logic(agg, &dummy);
+>-- =
 
-> @@ -297,12 +332,16 @@ Maximum number of microseconds in one NAPI polling cycle. Polling
->  will exit when either netdev_budget_usecs have elapsed during the
->  poll cycle or the number of packets processed reaches netdev_budget.
->  
-> +Default: ``2 * USEC_PER_SEC / HZ`` (2000 when ``HZ`` is 1000)
-> +
+>2.39.2
+>
 
-Well, that is awkward.
-
-Looking at git history, it seems that this sysctl was added by 7acf8a1e8a28
-("Replace 2 jiffies with sysctl netdev_budget_usecs to enable softirq
-tuning") in 2017. And at that time the unic was us, and the default was 2000 us.
-
-But that was changed by a fix for that commit, a4837980fd9f ("net: revert
-default NAPI poll timeout to 2 jiffies"), in 2020. As a side-effect of
-that commit, the default was changed to what you have documented above,
-and the unit changed to jiffies.
-
-So while what you have is correct it seems nonsensical to me for the unit
-to be jiffies. Because that's not a meaningful unit for users. And because
-the name of the sysctl ends in usecs.
-
-But I'm unsure what to do about it. Since changing the unit this would
-represent (another) KABI break.
-
-* Add another knob that shadows this one (But what to call it?)
-* Simply remove this one (KAPI break)
-* Change the unit of this knob (KAPI break)
-
-If the code is left as is, then I think it should be documented that the
-unit is jiffies.
-
-...
+---
+	-Jay Vosburgh, jv@jvosburgh.net
 
