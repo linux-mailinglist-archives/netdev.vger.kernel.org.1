@@ -1,192 +1,178 @@
-Return-Path: <netdev+bounces-277998-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277997-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8NxiIGGv3GnfVAkAu9opvQ
-	(envelope-from <netdev+bounces-277998-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 10:54:57 +0200
+	id aI+cEVGv3GnfVAkAu9opvQ
+	(envelope-from <netdev+bounces-277997-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 10:54:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 032CA3E963A
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 10:54:56 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A33A43E962C
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 10:54:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E87813028821
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 08:51:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AD0243021E7A
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 08:51:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10E673AE182;
-	Mon, 13 Apr 2026 08:51:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23AB93AD508;
+	Mon, 13 Apr 2026 08:51:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kaspersky.com header.i=@kaspersky.com header.b="MMhIZ8WL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="STNOPt8F"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx9.kaspersky-labs.com (mx9.kaspersky-labs.com [195.122.169.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C243F37EFFE;
-	Mon, 13 Apr 2026 08:51:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.122.169.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D80B33815DB
+	for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 08:51:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776070312; cv=none; b=raTxihV84vcR13fBK//rkvXYv6wETWzhHegxsqiHMkOBpZrM2iJgyDCyAyZVgTMtyQhVkgFeTz7maJRYDVA3lj+XseJNaqXet+8lAoO17pRmWVWXCKZvbrdn5UnAg6b9c/wxT3qYJbSX/Trt5rOGiczSvyuRESkNmCTkBvAGsiA=
+	t=1776070305; cv=none; b=UIr70yNpZIqUcgxYaukX42e+wQpItPp8cP6Lc+tmwzRi3cfnUXcchsTPH27rYwTOkCrTqPxpBRbFV25KIwPY4XR1+EPOr5pixlFPAuyLoQkxAmrCuCVe9WTORZCQVbkSAKNaQYe+Lzn6EAV/SxG2bPdzbjzckLmO41cyuc5Hax0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776070312; c=relaxed/simple;
-	bh=WzzuVQiM3vQq7Pu3MA9rG3D8KIzEfGSPLkZjzsLkU5o=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=uhEva6xmPCjowX+G7xzV6WFXr3A8U1UqDy5js9emcnugVZwivGXkDYFXM2Vpa8nlABoJFSD0eurEwYnBtZaflt8AJ6ctAhLVi7LOOAgcwDZmMVhymp/8DXdQF+LZh1YNw5uw2u6hsa7PisvT+hXtG7xWzo3WKww67Orr1C9sG0A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=kaspersky.com; spf=pass smtp.mailfrom=kaspersky.com; dkim=pass (2048-bit key) header.d=kaspersky.com header.i=@kaspersky.com header.b=MMhIZ8WL; arc=none smtp.client-ip=195.122.169.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=kaspersky.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kaspersky.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kaspersky.com;
-	s=mail202505; t=1776070304;
-	bh=K+knYpaQC63S6yxb+K9P2BEcXIw8nVZezjjBAu4p/T8=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
-	b=MMhIZ8WLlN8+jzXPL+j4hKcYUHbgJwG6ltHkOw2HP8hiMWNPacPd2PRkuv6rPO5PB
-	 mzxBWm1ba5iVWoi8IOh1sUBXv1w8EFZvJoWdc3b1lxZQEGXgQ3kgJazFpZCY+V1KLO
-	 uMUvXnVZp5ooYOZWd/ImRdvcQLqcM7v/Zsp6v1FPnPKHhyBLRoM9KyZqq33rKMnujI
-	 VToUS5hkCRjEekRRMx6Ydg6E+EEEaRhw9K9dlxiTviOsRe7ZVbuBi2ZSEmHa094Yjc
-	 Qih4CsEE1x5cVuJNbzIvOueR0RRX3AsX7rILf0qBISjcC6S1TS0edk0i+1UaEhH/Ji
-	 sseAfRI10ttew==
-Received: from relay9.kaspersky-labs.com (localhost [127.0.0.1])
-	by relay9.kaspersky-labs.com (Postfix) with ESMTP id 4C9398A0705;
-	Mon, 13 Apr 2026 11:51:44 +0300 (MSK)
-Received: from mail-hq2.kaspersky.com (unknown [91.103.66.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(Client CN "mail-hq2.kaspersky.com", Issuer "Kaspersky MailRelays CA G3" (verified OK))
-	by mailhub9.kaspersky-labs.com (Postfix) with ESMTPS id 906158A0620;
-	Mon, 13 Apr 2026 11:51:43 +0300 (MSK)
-Received: from chesnokov.avp.ru (10.16.105.7) by HQMAILSRV2.avp.ru
- (10.64.57.52) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Mon, 13 Apr
- 2026 11:51:42 +0300
-From: <Alexander.Chesnokov@kaspersky.com>
-To: <olteanv@gmail.com>
-CC: <lvc-project@linuxtesting.org>, <Oleg.Kazakov@kaspersky.com>,
-	<Pavel.Zhigulin@kaspersky.com>, Alexander Chesnokov
-	<Alexander.Chesnokov@kaspersky.com>, <stable@vger.kernel.org>, Andrew Lunn
-	<andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
-Subject: [PATCH] net: dsa: sja1105: fix division by zero in sja1105_tas_set_runtime_params()
-Date: Mon, 13 Apr 2026 11:51:32 +0300
-Message-ID: <20260413085140.33138-1-Alexander.Chesnokov@kaspersky.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1776070305; c=relaxed/simple;
+	bh=oEhqvsj8LZIzS+H6HZIm5cMpADVbGj819fda8YGrF5A=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=Mt4yc7/Q8+FyS052f0Ldsj/j3HekAS007BtT86NCmk0SF1dvJv1Ttu77ln2QtIANhN1OX4iKnIvh3yaciZV4l9RRkHzByAU92QD3sK5Eta0hjBhB1qQBWn4szZAuGKMjVQd503rHWyMcJ2rGOK6BXdOk1gHBfeXHw9DFviGI9AM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=STNOPt8F; arc=none smtp.client-ip=209.85.216.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-35da8d037a5so1963137a91.0
+        for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 01:51:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776070303; x=1776675103; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=u09n0AIpPYwujUPPnPEh5iEGhVUVRAozHgm92824yT0=;
+        b=STNOPt8FOX7mKq0lvrK8NOofF12upNo82E0hi47hEuPrnPDO9BrwYcDGKMycNj+GPw
+         5LbP+sjSwgUshy2HVuxjNYUawz+Msg68ovYaMHs32/KDeEZAnWCPMLgypwpJNjNJOg20
+         44/+LWsd5Kho/baN/tWzRqxiO1gDWr9pAWRpITwFTfxHpdJ/Z6EaHlPkbwGKQBmhkNkg
+         yIQXtHfWG0V8cA78b+UPwE+AMN7MDmV0Qgxg2mpXE7eShPSbXHhgmO9FjCk0vVgCD9uF
+         LRydfH2OtX+SsY4Ng09tSdVGLbCBxmtnLGxtNUIBF5bkXP/o+OGlFyU6q7579Xvwd6F7
+         3Xtw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776070303; x=1776675103;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=u09n0AIpPYwujUPPnPEh5iEGhVUVRAozHgm92824yT0=;
+        b=MKhIispfrYnKYdqfv29GY4sG8Is7PZr1HA9jG1ukwLo+ZmR3s+UcSt+OHCDAI4vlnl
+         0YKiggEmDLfrOY3nypTAvkNNX+SM9ZvL/WYOLbesNgbWef9C4i3k72m+lGTsPeKPhCJO
+         FsXTUHKVwyKWiOJKgX2U2P9g7zWi7sct9KkKUg+ZzeXcpi/VWbE4XQA2UsyidIp3IzJl
+         JccNdARlZ25qyuq/xzfYKYvd4HHeaGlH30wlFRxovmVrRzmorPnQ5cGfT6Z20xcssa0/
+         puE0EmLxk4fK3SISN/auT6eZ/KH/6Zst2MneTUeO64Cg6OIfEgIiWV0toCFM6BeRzpkM
+         3gQA==
+X-Gm-Message-State: AOJu0YzZwWMvCXNE6q/lYZzcWEA/ngUrQdFg8UAIGdW2LgZbhb2RAWYt
+	uij0wXFJlcQmuWVMwWcn4ZLSACoBA92AB8YycK/13Z/7Ds8MjwWez10S600nzw==
+X-Gm-Gg: AeBDiesYaF0LUtw7EgHRALbajtLLk2GPvHRBsjYsPHJ32AwDRYPZm27fikgcSn1MRaK
+	LnyABfQpZ3A6iTEeL+WobUeRlGmGkGuv601V9yqglgBUFqR9501m/ugShlJDoVMeQraclTnxthK
+	WGJE9b63f6b0ivYqurBqpaaP277A60Pj7M5VUHmZqCvz34IFCo5Fzflh0I+Lfo6Z7Pb/KKyc0XC
+	soWhPl/R9HEEfdFC04t05FLDVsd6UQbcLmP0vQOvaYWQDcxQfWjWm9W00tT4uiNeqyhZU6LD5Z4
+	uZOR2bpMtRTIklU2GmPM36E8IKqUyZSeduhOBGcwa+EsoG7Go4YXFW2Er63o11xfCgLRddKTNgv
+	inq9WS2b7tiB2dpzOxd5lc3ZQW8rKDTAXheMbP4qcYwh3rDPSXh3u0m6oMS1S/pRJ4zWF+iXwrj
+	zF07CLOsxw9TfaQXz6xxOxSG9u5+E1ZeWX3nXDfY1oQ4dQmZc7YM5I8ApJ/N4jUNhrdu9h588VF
+	ps=
+X-Received: by 2002:a17:90b:17c4:b0:35d:9c43:57fe with SMTP id 98e67ed59e1d1-35e4280cc70mr12776644a91.13.1776070303046;
+        Mon, 13 Apr 2026 01:51:43 -0700 (PDT)
+Received: from gmail.com (69-172-89-235.static.imsbiz.com. [69.172.89.235])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b461d599a1sm18181825ad.0.2026.04.13.01.51.41
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Mon, 13 Apr 2026 01:51:42 -0700 (PDT)
+From: Dudu Lu <phx0fer@gmail.com>
+To: netdev@vger.kernel.org
+Cc: steffen.klassert@secunet.com,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	Dudu Lu <phx0fer@gmail.com>
+Subject: [PATCH] xfrm: iptfs: fix deadlock in iptfs_destroy_state
+Date: Mon, 13 Apr 2026 16:51:38 +0800
+Message-Id: <20260413085138.72623-1-phx0fer@gmail.com>
+X-Mailer: git-send-email 2.39.3 (Apple Git-145)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: HQMAILSRV4.avp.ru (10.64.57.54) To HQMAILSRV2.avp.ru
- (10.64.57.52)
-X-KSE-ServerInfo: HQMAILSRV2.avp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.1, Database issued on: 04/13/2026 08:39:29
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 0
-X-KSE-AntiSpam-Info: Lua profiles 202220 [Apr 13 2026]
-X-KSE-AntiSpam-Info: Version: 6.1.1.22
-X-KSE-AntiSpam-Info: Envelope from: Alexander.Chesnokov@kaspersky.com
-X-KSE-AntiSpam-Info: LuaCore: 98 0.3.98
- ca9d2f3beca9ca2a85e178af9d8e97d5fa2c38a3
-X-KSE-AntiSpam-Info: {Tracking_cluster_exceptions}
-X-KSE-AntiSpam-Info: {Tracking_real_kaspersky_domains}
-X-KSE-AntiSpam-Info: {Tracking_black_eng_exceptions}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: chesnokov.avp.ru:7.1.1,5.0.1;127.0.0.199:7.1.2;kaspersky.com:7.1.1,5.0.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
-X-KSE-AntiSpam-Info: {Tracking_white_helo}
-X-KSE-AntiSpam-Info: FromAlignment: s
-X-KSE-AntiSpam-Info: Rate: 0
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Deterministic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 04/13/2026 08:42:00
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 4/13/2026 6:00:00 AM
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
-X-KSMG-AntiPhishing: NotDetected
-X-KSMG-AntiSpam-Interceptor-Info: not scanned
-X-KSMG-AntiSpam-Status: not scanned, disabled by settings
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.1.8310, bases: 2026/04/13 06:49:00 #28394185
-X-KSMG-AntiVirus-Status: NotDetected, skipped
-X-KSMG-LinksScanning: NotDetected
-X-KSMG-Message-Action: skipped
-X-KSMG-Rule-ID: 52
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kaspersky.com,reject];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kaspersky.com:s=mail202505];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[linuxtesting.org,kaspersky.com,vger.kernel.org,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-277998-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-277997-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[secunet.com,gondor.apana.org.au,davemloft.net,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[Alexander.Chesnokov@kaspersky.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kaspersky.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[phx0fer@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FROM_NO_DN(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,kaspersky.com:dkim,kaspersky.com:email,kaspersky.com:mid,linuxtesting.org:url]
-X-Rspamd-Queue-Id: 032CA3E963A
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A33A43E962C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Alexander Chesnokov <Alexander.Chesnokov@kaspersky.com>
+iptfs_destroy_state() acquires x->lock (spin_lock_bh) and then calls
+hrtimer_cancel(&xtfs->iptfs_timer). The timer callback
+iptfs_delay_timer() also acquires x->lock (spin_lock). If the timer
+fires on another CPU during destroy, hrtimer_cancel() waits for the
+callback to complete, but the callback is blocked trying to acquire
+the same lock — a classic ABBA deadlock.
 
-If taprio offload is configured such that none of the ports' base_time
-is less than S64_MAX (the initial value of earliest_base_time), then
-its_cycle_time remains zero and is passed to future_base_time() as
-cycle_time, causing division by zero in div_s64().
+The same pattern exists for drop_timer: destroy holds drop_lock and
+calls hrtimer_cancel(&xtfs->drop_timer), while iptfs_drop_timer()
+also acquires drop_lock.
 
-Add a check for its_cycle_time being zero before calling
-future_base_time() and return -EINVAL.
+Fix by cancelling the timers before acquiring the locks. The timer
+callbacks check for state validity, so a late cancel is safe. The
+queue splice is still done under the lock for consistency.
 
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
-
-Fixes: 86db36a347b4 ("net: dsa: sja1105: Implement state machine for TAS with PTP clock source")
-Cc: stable@vger.kernel.org
-
-Signed-off-by: Alexander Chesnokov <Alexander.Chesnokov@kaspersky.com>
+Fixes: 4b3faf610cc6 ("xfrm: iptfs: add new iptfs xfrm mode impl")
+Signed-off-by: Dudu Lu <phx0fer@gmail.com>
 ---
- drivers/net/dsa/sja1105/sja1105_tas.c | 3 +++
- 1 file changed, 3 insertions(+)
+ net/xfrm/xfrm_iptfs.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/dsa/sja1105/sja1105_tas.c b/drivers/net/dsa/sja1105/sja1105_tas.c
-index e6153848a950..ce4b544a2b9c 100644
---- a/drivers/net/dsa/sja1105/sja1105_tas.c
-+++ b/drivers/net/dsa/sja1105/sja1105_tas.c
-@@ -62,6 +62,9 @@ static int sja1105_tas_set_runtime_params(struct sja1105_private *priv)
- 	if (!tas_data->enabled)
- 		return 0;
+diff --git a/net/xfrm/xfrm_iptfs.c b/net/xfrm/xfrm_iptfs.c
+index 97bc979e55ba..11291b87158c 100644
+--- a/net/xfrm/xfrm_iptfs.c
++++ b/net/xfrm/xfrm_iptfs.c
+@@ -2708,8 +2708,10 @@ static void iptfs_destroy_state(struct xfrm_state *x)
+ 	if (!xtfs)
+ 		return;
  
-+	if (!its_cycle_time)
-+		return -EINVAL;
+-	spin_lock_bh(&xtfs->x->lock);
+ 	hrtimer_cancel(&xtfs->iptfs_timer);
++	hrtimer_cancel(&xtfs->drop_timer);
 +
- 	/* Roll the earliest base time over until it is in a comparable
- 	 * time base with the latest, then compare their deltas.
- 	 * We want to enforce that all ports' base times are within
++	spin_lock_bh(&xtfs->x->lock);
+ 	__skb_queue_head_init(&list);
+ 	skb_queue_splice_init(&xtfs->queue, &list);
+ 	spin_unlock_bh(&xtfs->x->lock);
+@@ -2717,9 +2719,7 @@ static void iptfs_destroy_state(struct xfrm_state *x)
+ 	while ((skb = __skb_dequeue(&list)))
+ 		kfree_skb(skb);
+ 
+-	spin_lock_bh(&xtfs->drop_lock);
+-	hrtimer_cancel(&xtfs->drop_timer);
+-	spin_unlock_bh(&xtfs->drop_lock);
++	/* drop_timer already cancelled above */
+ 
+ 	if (xtfs->ra_newskb)
+ 		kfree_skb(xtfs->ra_newskb);
 -- 
-2.43.0
+2.39.3 (Apple Git-145)
 
 
