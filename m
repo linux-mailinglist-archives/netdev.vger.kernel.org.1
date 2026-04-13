@@ -1,244 +1,335 @@
-Return-Path: <netdev+bounces-278007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278008-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uA+mAJyy3GmbVQkAu9opvQ
-	(envelope-from <netdev+bounces-278007-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 11:08:44 +0200
+	id gKp1KK+y3GmbVQkAu9opvQ
+	(envelope-from <netdev+bounces-278008-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 11:09:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4F953E99A6
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 11:08:43 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id F32333E99D4
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 11:08:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 840EE3017F88
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 09:07:06 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 238133001598
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 09:08:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FBC93AF65F;
-	Mon, 13 Apr 2026 09:07:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G3inY+8J"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA5D43AEF59;
+	Mon, 13 Apr 2026 09:08:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59E4B29E0F8;
-	Mon, 13 Apr 2026 09:07:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from zg8tmja2lje4os4yms4ymjma.icoremail.net (zg8tmja2lje4os4yms4ymjma.icoremail.net [206.189.21.223])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBF0C3AEF2E
+	for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 09:08:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=206.189.21.223
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776071224; cv=none; b=eSmqpm31dnyVJjiLyUxmNzLPaTfw0FeGgf8VKBwoIxDE0qb5wb1Flvq1UxpABT41DWSfEptJYwn6SC6GPCweqfPtcY0ottQRTCzvZXQR3wlffCxc/RWjc7taubsNnaEtfQvK6cpagw9KXpFZzoF6D3nHljosN2d3QRljUHVQwoE=
+	t=1776071333; cv=none; b=RHHIGUTTQhjJYQalGpLJmweEMePPk6azP4pDtbiLEsc1UNDbf5kK7f6Dyr1GFBKRIua2M+i/+yDfgHLOzaE+v8rvGjYlN8zPsvgjf3kyCYvOEb9GIpcz4OQuMYLV5Vz1W1r7trkR7F92BtZqbJYm8gNNBSuInq2N0i+IsTa77nc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776071224; c=relaxed/simple;
-	bh=cS2/Y+fD/C6Fj1LtxcJRcP0gMiu198023wVz+PX5eN8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qEyRQR3Rx43Ojaspqt1IkuSfZDLoc4WUHAYn+A4lWVlN6YnFafE1hqD8zei+kzhW6OXvNa6rE6H09awYXAXF7/S7lmbTddUt/yR6RK7ggzUzCvbvbFeXx8qksgRhWSZmCI0kUOxoLFYFJWna3+D1wXGqJ2yEDXT/bLEWAFx4DPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G3inY+8J; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95C51C116C6;
-	Mon, 13 Apr 2026 09:07:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776071224;
-	bh=cS2/Y+fD/C6Fj1LtxcJRcP0gMiu198023wVz+PX5eN8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=G3inY+8JxkEibVwYUFszuCWlat+2WMkdb9cxQNukGQ5jOO4YosRVw/teIPjzkykJe
-	 VBaoK4GWe1nSvdZccXGItvVBbCBawDxBQYXoSn8ku3lctCl78nWa1bXrv8Cz5ii5WC
-	 gS594pXSn/PDkAlQW1x8pf1/M/IPGL/2AZ9s3tUP2y+EEht32F5HbttQfHidlVLFR9
-	 SB3RrQSSOyCGHY83n0fRRZdud5Xcyx9d8MmEOZogxSk4gxdYZjmVHZxvo/hzD3ige5
-	 KqFGmCdWJVKzfE5LlEz9DNkdZh7AXZJZD7MdmFDUG+6QJAH+W76oJ0Vl3ycqghmmEe
-	 IWEm9rwhj2q9g==
-Date: Mon, 13 Apr 2026 18:07:01 +0900
-From: "Harry Yoo (Oracle)" <harry@kernel.org>
-To: Thomas Gleixner <tglx@kernel.org>
-Cc: LKML <linux-kernel@vger.kernel.org>,
-	Vlastimil Babka <vbabka@kernel.org>, linux-mm@kvack.org,
-	Arnd Bergmann <arnd@arndb.de>, x86@kernel.org,
-	Lu Baolu <baolu.lu@linux.intel.com>, iommu@lists.linux.dev,
-	Michael Grzeschik <m.grzeschik@pengutronix.de>,
-	netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org, David Woodhouse <dwmw2@infradead.org>,
-	Bernie Thompson <bernie@plugable.com>, linux-fbdev@vger.kernel.org,
-	Theodore Tso <tytso@mit.edu>, linux-ext4@vger.kernel.org,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Uladzislau Rezki <urezki@gmail.com>, Marco Elver <elver@google.com>,
-	Dmitry Vyukov <dvyukov@google.com>, kasan-dev@googlegroups.com,
-	Andrey Ryabinin <ryabinin.a.a@gmail.com>,
-	Thomas Sailer <t.sailer@alumni.ethz.ch>, linux-hams@vger.kernel.org,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	linux-alpha@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
-	linux-arm-kernel@lists.infradead.org,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Huacai Chen <chenhuacai@kernel.org>, loongarch@lists.linux.dev,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	linux-m68k@lists.linux-m68k.org, Dinh Nguyen <dinguyen@kernel.org>,
-	Jonas Bonn <jonas@southpole.se>, linux-openrisc@vger.kernel.org,
-	Helge Deller <deller@gmx.de>, linux-parisc@vger.kernel.org,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	linuxppc-dev@lists.ozlabs.org, Paul Walmsley <pjw@kernel.org>,
-	linux-riscv@lists.infradead.org, Heiko Carstens <hca@linux.ibm.com>,
-	linux-s390@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	sparclinux@vger.kernel.org, Hao Li <hao.li@linux.dev>,
-	Christoph Lameter <cl@gentwo.org>,
-	David Rientjes <rientjes@google.com>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Shengming Hu <hu.shengming@zte.com.cn>
-Subject: Re: [patch 14/38] slub: Use prandom instead of get_cycles()
-Message-ID: <adyyNeVTkXQlnh_2@hyeyoo>
-References: <20260410120044.031381086@kernel.org>
- <20260410120318.525653921@kernel.org>
+	s=arc-20240116; t=1776071333; c=relaxed/simple;
+	bh=oEz4rwIbTyzb3hyiVSZqMz7Em7MyynhIE4+aYpAuRgk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=kWOXXY/vrCYIdSaVfUxZRNFJGEmXgfJT37Qq2RDoOpxG69Du+8abwv76bW1fBe5i7ErJJp9t/vjdSwQyymNIzP65ppq286oSX7tzQhFPsDeo8g1l7vL+DmReqwfHQZF0yO1OD8W9sn6DmfjslQXXvoUCseHD/cRqdRRk9T4HJD8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=206.189.21.223
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
+Received: from enjou-Legion-Y7000P-2019.coin-barley.ts.net (unknown [172.23.56.36])
+	by app1 (Coremail) with SMTP id ygmowABXy_t7stxpxaG_AA--.9895S3;
+	Mon, 13 Apr 2026 17:08:24 +0800 (CST)
+From: Ren Wei <n05ec@lzu.edu.cn>
+To: netdev@vger.kernel.org
+Cc: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	kees@kernel.org,
+	yifanwucs@gmail.com,
+	tomapufckgml@gmail.com,
+	yuantan098@gmail.com,
+	bird@lzu.edu.cn,
+	ylong030@ucr.edu,
+	n05ec@lzu.edu.cn
+Subject: [PATCH net 1/1] 8021q: free cleared egress QoS mappings safely
+Date: Mon, 13 Apr 2026 17:07:20 +0800
+Message-ID: <b877895cd02d35254b5c05d3c40abbf130cd87eb.1776039122.git.ylong030@ucr.edu>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <cover.1776039122.git.ylong030@ucr.edu>
+References: <cover.1776039122.git.ylong030@ucr.edu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260410120318.525653921@kernel.org>
-X-Spamd-Result: default: False [-0.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:ygmowABXy_t7stxpxaG_AA--.9895S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxuFWxZFykXr43ArykuFW5trb_yoW3GF4fpF
+	WIqa4UXrW8JFnaqw4kJF1UKr45Z395J3y2k3sxG3s5Cw15trnIgF4UuF9F9rnIvrWDKr13
+	trZxuF48Gr45KrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBY1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
+	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
+	IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2
+	z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcV
+	Aq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j
+	6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64
+	vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0E
+	n4kS14v26r1q6r43MxkIecxEwVCm-wCF04k20xvY0x0EwIxGrwCF04k20xvE74AGY7Cv6c
+	x26r48MxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
+	r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6x
+	IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAI
+	w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x
+	0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbGQ6JUUUUU==
+X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQAQCWncrd8BBAAAsa
+X-Spamd-Result: default: False [0.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-278007-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,kvack.org,arndb.de,linux.intel.com,lists.linux.dev,pengutronix.de,gondor.apana.org.au,infradead.org,plugable.com,mit.edu,linux-foundation.org,gmail.com,google.com,googlegroups.com,alumni.ethz.ch,zx2c4.com,linaro.org,armlinux.org.uk,lists.infradead.org,arm.com,linux-m68k.org,lists.linux-m68k.org,southpole.se,gmx.de,ellerman.id.au,lists.ozlabs.org,linux.ibm.com,davemloft.net,linux.dev,gentwo.org,zte.com.cn];
-	RCVD_COUNT_THREE(0.00)[4];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TO_DN_NONE(0.00)[];
+	TAGGED_FROM(0.00)[bounces-278008-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,lzu.edu.cn,ucr.edu];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[54];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
+	R_DKIM_NA(0.00)[];
+	DMARC_DNSFAIL(0.00)[lzu.edu.cn : query timed out];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[harry@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	NEURAL_HAM(-0.00)[-0.567];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,kvack.org:email]
-X-Rspamd-Queue-Id: B4F953E99A6
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,m.to:url]
+X-Rspamd-Queue-Id: F32333E99D4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-[Resending after fixing broken email headers]
+From: Longxuan Yu <ylong030@ucr.edu>
 
-On Fri, Apr 10, 2026 at 02:19:37PM +0200, Thomas Gleixner wrote:
-> The decision whether to scan remote nodes is based on a 'random' number
-> retrieved via get_cycles(). get_cycles() is about to be removed.
-> 
-> There is already prandom state in the code, so use that instead.
-> 
-> Signed-off-by: Thomas Gleixner <tglx@kernel.org>
-> Cc: Vlastimil Babka <vbabka@kernel.org>
-> Cc: linux-mm@kvack.org
-> ---
+vlan_dev_set_egress_priority() leaves cleared egress priority mapping
+nodes in the hash until device teardown. Repeated set/clear cycles with
+distinct skb priorities therefore allocate an unbounded number of
+vlan_priority_tci_mapping objects and leak memory.
 
-Acked-by: Harry Yoo (Oracle) <harry@kernel.org>
+Delete mappings when vlan_prio is cleared instead of keeping
+tombstones. The TX fast path and reporting paths walk the lists without
+RTNL, so convert the egress mapping lists to RCU-protected pointers and
+defer freeing removed nodes until after a grace period.
 
-Is this for this merge window?
+Cc: stable@kernel.org
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Reported-by: Yifan Wu <yifanwucs@gmail.com>
+Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+Co-developed-by: Yuan Tan <yuantan098@gmail.com>
+Signed-off-by: Yuan Tan <yuantan098@gmail.com>
+Suggested-by: Xin Liu <bird@lzu.edu.cn>
+Signed-off-by: Longxuan Yu <ylong030@ucr.edu>
+Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+---
+ include/linux/if_vlan.h  | 23 +++++++++++--------
+ net/8021q/vlan_dev.c     | 48 +++++++++++++++++++++++-----------------
+ net/8021q/vlan_netlink.c |  9 +++-----
+ net/8021q/vlanproc.c     | 12 ++++++----
+ 4 files changed, 53 insertions(+), 39 deletions(-)
 
-This may conflict with upcoming changes on freelist shuffling [1]
-(not queued for slab/for-next yet though), but it should be easy to
-resolve.
-
-[Cc'ing Shengming and SLAB ALLOCATOR folks]
-[1] https://lore.kernel.org/linux-mm/20260409204352095kKWVYKtZImN59ybO6iRNj@zte.com.cn
-
+diff --git a/include/linux/if_vlan.h b/include/linux/if_vlan.h
+index e6272f9c5e42..0a27533e70f3 100644
+--- a/include/linux/if_vlan.h
++++ b/include/linux/if_vlan.h
+@@ -151,7 +151,7 @@ extern __be16 vlan_dev_vlan_proto(const struct net_device *dev);
+ struct vlan_priority_tci_mapping {
+ 	u32					priority;
+ 	u16					vlan_qos;
+-	struct vlan_priority_tci_mapping	*next;
++	struct vlan_priority_tci_mapping __rcu	*next;
+ };
+ 
+ struct proc_dir_entry;
+@@ -177,7 +177,7 @@ struct vlan_dev_priv {
+ 	unsigned int				nr_ingress_mappings;
+ 	u32					ingress_priority_map[8];
+ 	unsigned int				nr_egress_mappings;
+-	struct vlan_priority_tci_mapping	*egress_priority_map[16];
++	struct vlan_priority_tci_mapping __rcu	*egress_priority_map[16];
+ 
+ 	__be16					vlan_proto;
+ 	u16					vlan_id;
+@@ -209,19 +209,24 @@ static inline u16
+ vlan_dev_get_egress_qos_mask(struct net_device *dev, u32 skprio)
+ {
+ 	struct vlan_priority_tci_mapping *mp;
++	u16 vlan_qos = 0;
+ 
+-	smp_rmb(); /* coupled with smp_wmb() in vlan_dev_set_egress_priority() */
++	rcu_read_lock();
+ 
+-	mp = vlan_dev_priv(dev)->egress_priority_map[(skprio & 0xF)];
++	mp = rcu_dereference(vlan_dev_priv(dev)->egress_priority_map[skprio & 0xF]);
+ 	while (mp) {
+ 		if (mp->priority == skprio) {
+-			return mp->vlan_qos; /* This should already be shifted
+-					      * to mask correctly with the
+-					      * VLAN's TCI */
++			vlan_qos = READ_ONCE(mp->vlan_qos);
++			break;
+ 		}
+-		mp = mp->next;
++		mp = rcu_dereference(mp->next);
+ 	}
+-	return 0;
++	rcu_read_unlock();
++
++	/* This should already be shifted to mask correctly with
++	 * the VLAN's TCI.
++	 */
++	return vlan_qos;
+ }
+ 
+ extern bool vlan_do_receive(struct sk_buff **skb);
+diff --git a/net/8021q/vlan_dev.c b/net/8021q/vlan_dev.c
+index c40f7d5c4fca..377616f51697 100644
+--- a/net/8021q/vlan_dev.c
++++ b/net/8021q/vlan_dev.c
+@@ -172,41 +172,43 @@ int vlan_dev_set_egress_priority(const struct net_device *dev,
+ 				 u32 skb_prio, u16 vlan_prio)
+ {
+-	struct vlan_dev_priv *vlan = vlan_dev_priv(dev);
+-	struct vlan_priority_tci_mapping *mp = NULL;
+-	struct vlan_priority_tci_mapping *np;
+-	u32 vlan_qos = (vlan_prio << VLAN_PRIO_SHIFT) & VLAN_PRIO_MASK;
++	struct vlan_priority_tci_mapping __rcu **mpp;
++	struct vlan_priority_tci_mapping *mp;
++	struct vlan_priority_tci_mapping *np;
++	struct vlan_dev_priv *vlan = vlan_dev_priv(dev);
++	u32 bucket = skb_prio & 0xF;
++	u32 vlan_qos = (vlan_prio << VLAN_PRIO_SHIFT) & VLAN_PRIO_MASK;
+ 
+ 	/* See if a priority mapping exists.. */
+-	mp = vlan->egress_priority_map[skb_prio & 0xF];
++	mpp = &vlan->egress_priority_map[bucket];
++	mp = rtnl_dereference(*mpp);
+ 	while (mp) {
+ 		if (mp->priority == skb_prio) {
+-			if (mp->vlan_qos && !vlan_qos)
++			if (!vlan_qos) {
++				rcu_assign_pointer(*mpp, rtnl_dereference(mp->next));
+ 				vlan->nr_egress_mappings--;
+-			else if (!mp->vlan_qos && vlan_qos)
+-				vlan->nr_egress_mappings++;
+-			mp->vlan_qos = vlan_qos;
++				kfree_rcu_mightsleep(mp);
++			} else {
++				WRITE_ONCE(mp->vlan_qos, vlan_qos);
++			}
+ 			return 0;
+ 		}
+-		mp = mp->next;
++		mpp = &mp->next;
++		mp = rtnl_dereference(*mpp);
+ 	}
+ 
+ 	/* Create a new mapping then. */
+-	mp = vlan->egress_priority_map[skb_prio & 0xF];
++	if (!vlan_qos)
++		return 0;
++
+ 	np = kmalloc_obj(struct vlan_priority_tci_mapping);
+ 	if (!np)
+ 		return -ENOBUFS;
+ 
+-	np->next = mp;
+ 	np->priority = skb_prio;
+ 	np->vlan_qos = vlan_qos;
+-	/* Before inserting this element in hash table, make sure all its fields
+-	 * are committed to memory.
+-	 * coupled with smp_rmb() in vlan_dev_get_egress_qos_mask()
+-	 */
+-	smp_wmb();
+-	vlan->egress_priority_map[skb_prio & 0xF] = np;
+-	if (vlan_qos)
+-		vlan->nr_egress_mappings++;
++	RCU_INIT_POINTER(np->next, rtnl_dereference(vlan->egress_priority_map[bucket]));
++	rcu_assign_pointer(vlan->egress_priority_map[bucket], np);
++	vlan->nr_egress_mappings++;
+ 	return 0;
+ }
+ 
+@@ -604,11 +606,17 @@ void vlan_dev_free_egress_priority(const struct net_device *dev)
+ 	int i;
+ 
+ 	for (i = 0; i < ARRAY_SIZE(vlan->egress_priority_map); i++) {
+-		while ((pm = vlan->egress_priority_map[i]) != NULL) {
+-			vlan->egress_priority_map[i] = pm->next;
+-			kfree(pm);
++		pm = rtnl_dereference(vlan->egress_priority_map[i]);
++		RCU_INIT_POINTER(vlan->egress_priority_map[i], NULL);
++		while (pm) {
++			struct vlan_priority_tci_mapping *next;
++
++			next = rtnl_dereference(pm->next);
++			kfree_rcu_mightsleep(pm);
++			pm = next;
+ 		}
+ 	}
++	vlan->nr_egress_mappings = 0;
+ }
+ 
+ static void vlan_dev_uninit(struct net_device *dev)
+diff --git a/net/8021q/vlan_netlink.c b/net/8021q/vlan_netlink.c
+index a000b1ef0520..bbe7cbd97939 100644
+--- a/net/8021q/vlan_netlink.c
++++ b/net/8021q/vlan_netlink.c
+@@ -260,13 +260,10 @@ static int vlan_fill_info(struct sk_buff *skb, const struct net_device *dev)
+ 			goto nla_put_failure;
+ 
+ 		for (i = 0; i < ARRAY_SIZE(vlan->egress_priority_map); i++) {
+-			for (pm = vlan->egress_priority_map[i]; pm;
+-			     pm = pm->next) {
+-				if (!pm->vlan_qos)
+-					continue;
+-
++			for (pm = rtnl_dereference(vlan->egress_priority_map[i]); pm;
++			     pm = rtnl_dereference(pm->next)) {
+ 				m.from = pm->priority;
+-				m.to   = (pm->vlan_qos >> 13) & 0x7;
++				m.to   = (READ_ONCE(pm->vlan_qos) >> 13) & 0x7;
+ 				if (nla_put(skb, IFLA_VLAN_QOS_MAPPING,
+ 					    sizeof(m), &m))
+ 					goto nla_put_failure;
+diff --git a/net/8021q/vlanproc.c b/net/8021q/vlanproc.c
+index fa67374bda49..0e424e0895b7 100644
+--- a/net/8021q/vlanproc.c
++++ b/net/8021q/vlanproc.c
+@@ -262,15 +262,19 @@ static int vlandev_seq_show(struct seq_file *seq, void *offset)
+ 		   vlan->ingress_priority_map[7]);
+ 
+ 	seq_printf(seq, " EGRESS priority mappings: ");
++	rcu_read_lock();
+ 	for (i = 0; i < 16; i++) {
+-		const struct vlan_priority_tci_mapping *mp
+-			= vlan->egress_priority_map[i];
++		const struct vlan_priority_tci_mapping *mp =
++			rcu_dereference(vlan->egress_priority_map[i]);
+ 		while (mp) {
++			u16 vlan_qos = READ_ONCE(mp->vlan_qos);
++
+ 			seq_printf(seq, "%u:%d ",
+-				   mp->priority, ((mp->vlan_qos >> 13) & 0x7));
+-			mp = mp->next;
++				   mp->priority, ((vlan_qos >> 13) & 0x7));
++			mp = rcu_dereference(mp->next);
+ 		}
+ 	}
++	rcu_read_unlock();
+ 	seq_puts(seq, "\n");
+ 
+ 	return 0;
 -- 
-Cheers,
-Harry / Hyeonggon
+2.43.0
 
->  mm/slub.c |   37 +++++++++++++++++++++++--------------
->  1 file changed, 23 insertions(+), 14 deletions(-)
-> 
-> --- a/mm/slub.c
-> +++ b/mm/slub.c
-> @@ -3302,6 +3302,25 @@ static inline struct slab *alloc_slab_pa
->  	return slab;
->  }
->  
-> +#if defined(CONFIG_SLAB_FREELIST_RANDOM) || defined(CONFIG_NUMA)
-> +static DEFINE_PER_CPU(struct rnd_state, slab_rnd_state);
-> +
-> +static unsigned int slab_get_prandom_state(unsigned int limit)
-> +{
-> +	struct rnd_state *state;
-> +	unsigned int res;
-> +
-> +	/*
-> +	 * An interrupt or NMI handler might interrupt and change
-> +	 * the state in the middle, but that's safe.
-> +	 */
-> +	state = &get_cpu_var(slab_rnd_state);
-> +	res = prandom_u32_state(state) % limit;
-> +	put_cpu_var(slab_rnd_state);
-> +	return res;
-> +}
-> +#endif
-> +
->  #ifdef CONFIG_SLAB_FREELIST_RANDOM
->  /* Pre-initialize the random sequence cache */
->  static int init_cache_random_seq(struct kmem_cache *s)
-> @@ -3365,8 +3384,6 @@ static void *next_freelist_entry(struct
->  	return (char *)start + idx;
->  }
->  
-> -static DEFINE_PER_CPU(struct rnd_state, slab_rnd_state);
-> -
->  /* Shuffle the single linked freelist based on a random pre-computed sequence */
->  static bool shuffle_freelist(struct kmem_cache *s, struct slab *slab,
->  			     bool allow_spin)
-> @@ -3383,15 +3400,7 @@ static bool shuffle_freelist(struct kmem
->  	if (allow_spin) {
->  		pos = get_random_u32_below(freelist_count);
->  	} else {
-> -		struct rnd_state *state;
-> -
-> -		/*
-> -		 * An interrupt or NMI handler might interrupt and change
-> -		 * the state in the middle, but that's safe.
-> -		 */
-> -		state = &get_cpu_var(slab_rnd_state);
-> -		pos = prandom_u32_state(state) % freelist_count;
-> -		put_cpu_var(slab_rnd_state);
-> +		pos = slab_get_prandom_state(freelist_count);
->  	}
->  
->  	page_limit = slab->objects * s->size;
-> @@ -3882,7 +3891,7 @@ static void *get_from_any_partial(struct
->  	 * with available objects.
->  	 */
->  	if (!s->remote_node_defrag_ratio ||
-> -			get_cycles() % 1024 > s->remote_node_defrag_ratio)
-> +	    slab_get_prandom_state(1024) > s->remote_node_defrag_ratio)
->  		return NULL;
->  
->  	do {
-> @@ -7102,7 +7111,7 @@ static unsigned int
->  
->  	/* see get_from_any_partial() for the defrag ratio description */
->  	if (!s->remote_node_defrag_ratio ||
-> -			get_cycles() % 1024 > s->remote_node_defrag_ratio)
-> +	    slab_get_prandom_state(1024) > s->remote_node_defrag_ratio)
->  		return 0;
->  
->  	do {
-> @@ -8421,7 +8430,7 @@ void __init kmem_cache_init_late(void)
->  	flushwq = alloc_workqueue("slub_flushwq", WQ_MEM_RECLAIM | WQ_PERCPU,
->  				  0);
->  	WARN_ON(!flushwq);
-> -#ifdef CONFIG_SLAB_FREELIST_RANDOM
-> +#if defined(CONFIG_SLAB_FREELIST_RANDOM) || defined(CONFIG_NUMA)
->  	prandom_init_once(&slab_rnd_state);
->  #endif
->  }
-> 
-> 
 
