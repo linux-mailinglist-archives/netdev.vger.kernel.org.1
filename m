@@ -1,112 +1,112 @@
-Return-Path: <netdev+bounces-278215-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278216-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GDQeMVts3WlNeAkAu9opvQ
-	(envelope-from <netdev+bounces-278215-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 00:21:15 +0200
+	id YBKgFYps3WlNeAkAu9opvQ
+	(envelope-from <netdev+bounces-278216-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 00:22:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A0BA3F3C4F
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 00:21:15 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E59FB3F3C6D
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 00:22:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EA275302BA42
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 22:20:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 86CBD3037E43
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 22:20:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 725A939934C;
-	Mon, 13 Apr 2026 22:20:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C220C39B494;
+	Mon, 13 Apr 2026 22:20:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nUuHEjv9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U7iVQ4YE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F118137E315
-	for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 22:20:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB4AE394780
+	for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 22:20:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.42
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776118827; cv=pass; b=O5gjeBLO5px7E7BR4l6wx0QQAINMtvOz7IFPMteMD/Iy2nLs6HDxFzXsYIdL9GkTzLHY68ndo4E4yVM6G6Dyi4LxxVRjybaqM0+oF10D4G9NX64dLuh86CKOpbIVmTJHqvSiVsGB856If2MIMLgmOa0MNyAwprVorcJiXB6ot/k=
+	t=1776118843; cv=pass; b=diluKWYXfLB4+1hPS4sQRp3xvOfCuCtb9WWbL0r3fD3wR6cLRjtf7julzM4Pj8knIAQiI0zKMano6l8bLowXwKBA2dHIltytX9lRotAp0SrqfX/7iaY4ooHjq3oxWRQz2708SPkdrer3FEj+sXAQkqNj4UDTLzNEVT//h078d2U=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776118827; c=relaxed/simple;
-	bh=vxVQ2muHMuW2TUZfvshASG/qQsXz8ZNjUFFlQbYxcsc=;
+	s=arc-20240116; t=1776118843; c=relaxed/simple;
+	bh=L5sRhn39Gq/EuNejgwrQZjyUO/2vF2bKM1TN0xPKjqk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PNr1aPdoTd0OpnUx/BimrU6hhWZVlzavyrdUhqVaCE85sEy6tBmQArlkZh6Bpq7C+koInFGLLf1X0DeasxmdaocZQ78fGvVsRqYdjAFxtCdURhTjVJ0HCSnMPelgk76GwkCySvQR9n9eLPD70mnU5Hi4DTyqgNrODbMsAwnh9bY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nUuHEjv9; arc=pass smtp.client-ip=209.85.221.45
+	 To:Cc:Content-Type; b=c0Biw1kOG1IrbM16OXxz991xgrAzXJLkY1SfMaaEKZ+cZLdRrBfKw6V8WCXD6FEIB7b/aLDOf//9UmAHB6aMv9hjIcQH9FLLLdBBiCYgxmH5kBTTG8ggAYEpGvk37OEXm3/nwKACUFVuv7WDRjsjE9ugnCGL7gX6gcmKcbghs2c=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U7iVQ4YE; arc=pass smtp.client-ip=209.85.128.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-43d77f6092eso1125091f8f.2
-        for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 15:20:25 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776118824; cv=none;
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-483487335c2so54109385e9.2
+        for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 15:20:41 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776118840; cv=none;
         d=google.com; s=arc-20240605;
-        b=LwHzSBNUPBdZ9YNDycCdiMe9M7Iq1lANc4WjmRjq8QdXYmwBvJgYJG9qBPVsKKnr8I
-         LocgN6pZGWM15QPh4oZYoOJ8gulhOHdBcppWMV3fMyFwq98GFBLcs9D3hRAVT+u+KJCD
-         ejj+mdAy4260hxSJwnu9bGWhRus6Bs3jOBuXs+1Qit2dkxszBY7mcHD5arMlXyuYUUXC
-         BvgYmghdQ7yHi3MRj/AKPiVUb1WBX/3/fKAQ+DbVE0wp215HpI9Zm4ccmIHlnvNse25d
-         CiIs5rVKXg6MxITdbL8v5c2CtFaKr1xqbac83NBH/PIGVuGMVRD7Szm7cMVwR1vVNkVu
-         uSHA==
+        b=JTTvXyo7Xq4oWVWpA0fVK1Bd0E2u3vYepGsO8jZWMjxPlrnEXlE85CYztzGekKlbaD
+         T1LZi5U1f+3TGjMZBOdWEdvbU6kHascbVz9qKa1QFYvC6h1OUpMoAdLLkIeVljWpaipV
+         rBf0xRRKPLOsqg1G5Vy/bKmFrE2HGUObYooZAvCAcSGdna2QEf/FX0/ym8SgJJPGK/cp
+         XpdJU/olBNoY7Qgqn4r3SDcDuC6JFUzFUZhguG0BXKWs1WTI2Ff5j4sg/WbLEFpnywaA
+         s5ewbLRalV/PDRYw/FKnu03LUuxSNzurgd5a/vPu4B/xyDuvpR+GLZI12A3AQJjC/zSJ
+         7oGg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=fp+8IeHiDM+bCUp+Ky89VxSnxaC5A7VFTmU45Et8ZaE=;
-        fh=bQsHVbYPKw9Fykb/FnWMwiF8MttQdmsIW2i+gLIZVr0=;
-        b=KTA6T2w6TU7LOB++xaVzcjqiLsbXmKcJuLU+BtZ9AOvgRzT80LeGpRD8EZhwC9dkh4
-         F/GexyIjlGH43cE/NH4IoOE5zXkc7TVQquJKRLOLbcJA0DuSxFfTwJdktpGkBHqzGiy9
-         Y/mi/c+q0mEKVdShLrlQXXGwC3eEh9Ytom7g7nSbgGPFZb9PdUqKAey8dNbluP52AIPt
-         XTH2EDLJBjEV84WNh9dtiB3DfOPvkr0D9CTiTVJgd13QECnTg+P4a5mGsug/Bt4VfABj
-         /pKSN+av/05p6ELfaeYmOApfO9M37QRmHqd4x0SORbV6a2D1Dhupp3cGWzZ7FMSRhwOO
-         MUqg==;
+        bh=0GtrcgyRY8dcn3VLzUDN93WtruBuz/B9n6Ctjtr0M2A=;
+        fh=ccNpvIXyEodmEyEYw8G7v8sTNbkLrx9w0uwOeOZG3r4=;
+        b=VFYBk/2IXUSSOXJ+ZUkC89Z8AYxF13PWcjdAvRpUoK6jE5uflL2QAFnmLXcfxuNv7x
+         eriXXw5x6FpuCxUZmlvVEw+6AU9ZyBvbEQ+skwYzamEQlBcyy/5PakFEPCah0JKMCRkN
+         1QRcINoo0vOCHSvBXMsHbs5buvcd/nVFdSr5McVnS2yOen7W5uO1HFCFjKbLHqEtPPN6
+         d7sC99S6nrp6Y9Sp1v40Y/t5AZMP6+2mGuduvnBDwDmNDP9dfnL4qjIIg7c2S2CxPhXu
+         MxGHCZqml4o77RwcVc2Bml598RnJClRcrfDM5A/kifAQ3BYLFnDarSCzhDi4JnjMr4n+
+         aBiw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776118824; x=1776723624; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1776118840; x=1776723640; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fp+8IeHiDM+bCUp+Ky89VxSnxaC5A7VFTmU45Et8ZaE=;
-        b=nUuHEjv9Qng0o8+V9wNyx2C1uKpl067pNckpPRU8BSVRIZm6dfPLgPqP3Lw6xvRci+
-         rrcuEMkS2XRywm2h09uyOmnKTQLHjpwyQGvjUnLR+ExxnIb4xqqDFxbjpBpiCdkyHDu6
-         LngF2uqRRcGoW00iNEZr0UyyjrVcwf6T9kuuWf43+Q+4040c+17+hPikRfF7B+59GUTb
-         v0zLOfHxr3+GJWfTCLexySi89isOOMhUvNlxmklB6c0vrs0x3+/IhBVk0aINzdLUFyEc
-         ECICpTc89k2vaIx8sS2gDTBHGv8hhUFLZY3bqeBPytXxOYF2Wvk0vylCz5nLQgfVgPUv
-         tQVA==
+        bh=0GtrcgyRY8dcn3VLzUDN93WtruBuz/B9n6Ctjtr0M2A=;
+        b=U7iVQ4YEtR4ke+7DcubhsKKyixj5Dkr6VDXTe5lTATEJoAXxx4byxgT6fNj0UvfEDS
+         QJtQJa5vN5GbWSh2wvFn1loSdTUrEONym6KQY6MihFnJO/JBwmIEpQHitpp3kesQ0+H6
+         9gWWPkYn05gKKg6G9Qn0/0VlOMlDBIzxGaMz2t+GljMiQrJjRyOIgoHhFMDeuwhv8m0e
+         1+k+Iu3o9jojTYDiBIMoeyEaUekiUMm2iBiqmPWavCKKl6OliSajZIIumF2kCRmaWY3U
+         arnohCXvwaUrcvOJZTt5PiKPLP7XZQ4NILRf6MIT2hFl6XyNHwC1OEBuBqU8BY268JCO
+         wd9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776118824; x=1776723624;
+        d=1e100.net; s=20251104; t=1776118840; x=1776723640;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=fp+8IeHiDM+bCUp+Ky89VxSnxaC5A7VFTmU45Et8ZaE=;
-        b=Ts/b92cj7jJvd+u5R9r+QfprdH1C95dsVIulBCbYNpcYU8cJd00i9fjUb8yvGcFRPz
-         cIi9mxwiNRGlPNaNdRZZE6SISBAuPAVlx1KnH0/sLdZaaB2pfrdV0SmnMZYdT+oUcGEE
-         Mk5YzJckFtLB/67om9RqTd5ssY+uvdilpHqGash71W3dtZ7SHFI4xqEkSutRFVn/RPKp
-         kBwm5dX+5VLAJpkvuGtdabpVetYfKYM5AUL/DWEyEMIZCknuJc44b5fLjF20FeyOc+VI
-         U4d73uApODZUCe7qtXAxEHulzBwY7FxavqUDfOnMVQgU2irRBZHT+vaL3/bUZpObf1a6
-         B/vw==
-X-Forwarded-Encrypted: i=1; AFNElJ/e8V82D180Qz7tL2HefCRMUaSIqj2AwVET9Iu4aNqsfrI3F55XY7FEG2o5YH+BvX23Jw7/VXE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyqCtGH8yw9XCBYszjbiOBUOq94FyqfPTwVHdgINawNwmRM3Shd
-	oEeuEDlBO3gLxpDiVDoeJh93u5XtHKxOllNzi9ooRsi6UtimW1GMrQhhJEMas0IPxsl7E/6SWA2
-	hQ9I5mUU1Q7BhqcUXoZvzBbSG30noE6w=
-X-Gm-Gg: AeBDiesafIdddW0kNm3Hds7IxNjEb1l25MDTUjYP2F83AqpudHBJL59ci/deZX31+6T
-	DJ3R8ANEPHUyumRWTwU9VfVkqGU/JbRUC4q0g2VgKhav0AbTkCcrp9Jfa7FVDjfVp+Nn+nNLeM8
-	gA21p4zqUT+I7Tu58ANiSRwaxaNXkgvRCm6D6wOwjVzVFVRT9wBugR7WpAeXqub1JsssYYCxNUK
-	GqmrHj/FXamWXmYxEDMDSFFTe9xuU297+BLibOfEJIbr4dbIaQw+Z+W2LTM2FaDPyOpH90htDU6
-	6a9ehzNYStJqLbOZ4Bcsw/GCff532fKLRwilTTcY
-X-Received: by 2002:a05:6000:2303:b0:43d:7af0:3a8a with SMTP id
- ffacd0b85a97d-43d7af03dffmr7155232f8f.46.1776118824134; Mon, 13 Apr 2026
- 15:20:24 -0700 (PDT)
+        bh=0GtrcgyRY8dcn3VLzUDN93WtruBuz/B9n6Ctjtr0M2A=;
+        b=CzoUNIUf6CkJNjW9zS5kXZJHjJW12giAH7Jmgman+iBtMx30o4YDfbXPgnjJC0fmzk
+         yxyT9ES17Ouhrn4vEaQJZ65HfzcvT20qOsY1y0m0RuPC2Su0Q7ybEc/sDdZ4Zmb855i/
+         k9X0ls+8xevGC00IDJFG22n3c+tSTBNQ0GUGgrlAp9i77NqijJlzBnKwYmsrzr0aFmS6
+         oT8F+BHA7Rwc+HalAMxdBrt4si4VT1HczLKK3A9Os+cNDvFc0IlutUzZuKkmdMLpyZQt
+         AnFn3a9txd4cnvrtuG5DnWXveNXpimFzz4gi0YciucxI8WlCflb1aBf7AbHDM4iq+hKa
+         KjvQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/4vSX0rcZytGkB744Z0Afq8GGdXxEgcRjqtQwnTfNyIGnnoPPEcQkZDGl/GRWuyFgVnha2DmU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6HwjxRHCuqFTKur61Xmrekuv7RrnnF8pAw0OOb67q8io605i2
+	37Qwl3lPScjOm+vXBjl5oxaJMY7+M1hdkKlDTZkelYl+vwPS677Rq40A80PoreLtOD0pnkkoZNx
+	c1DlX5uksR/lDdAy1HowSfSY9bdxGVqA=
+X-Gm-Gg: AeBDietWaizhkDp+pybtWAGYCdQtJXdDmBHKtJCym5Y5TkrdHRtOi3pI5fSFhRyh1sN
+	ni6FPaFzB1ZW9f1YEId+1JdvJVGqp4ohzfi6IWAk4W1zIIjNmpr2L24Mb67bmaGaE3jHEEoq6NX
+	msfICjdBsHKsbg3g/BBiVWxyTJlarzF2w9ov6kY8hJAGRiFMdB5Wbw3P/n55Nx9cymJh23RWkra
+	uV3vmNB/VOdsQDy8oIQhmXM7y3ukWRi7ESza3+FVbMW9TlSUZ1ScveQUltXJGkj31GpM7yVhRus
+	crCwp1W2MB009x2zFIroEc8Eqlqn1N67gxl5l7Lb
+X-Received: by 2002:a05:6000:220b:b0:43c:fdd:ea96 with SMTP id
+ ffacd0b85a97d-43d642b6e75mr20785387f8f.26.1776118839833; Mon, 13 Apr 2026
+ 15:20:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260413-kasan-v1-0-1a5831230821@bootlin.com> <20260413-kasan-v1-3-1a5831230821@bootlin.com>
-In-Reply-To: <20260413-kasan-v1-3-1a5831230821@bootlin.com>
+References: <20260413-kasan-v1-0-1a5831230821@bootlin.com> <20260413-kasan-v1-8-1a5831230821@bootlin.com>
+In-Reply-To: <20260413-kasan-v1-8-1a5831230821@bootlin.com>
 From: Andrey Konovalov <andreyknvl@gmail.com>
-Date: Tue, 14 Apr 2026 00:20:13 +0200
-X-Gm-Features: AQROBzASLHf5ILBNuw_x5OeLAHJGUfv8fbkKsOkNoaIfzCwURKyPvUbS0Z-ZunI
-Message-ID: <CA+fCnZf-o8tiv_tX9YB5eBUGx17OpztKZsEB6Awjw3WAqBAiUw@mail.gmail.com>
-Subject: Re: [PATCH RFC bpf-next 3/8] bpf: add BPF_JIT_KASAN for KASAN
- instrumentation of JITed programs
+Date: Tue, 14 Apr 2026 00:20:28 +0200
+X-Gm-Features: AQROBzC46tJ1Vulp-Ruy1LR_qNHLJczc_Mec_FX1XvbzAbvB4RmfM9pOdtpD_VM
+Message-ID: <CA+fCnZekgcEgsZnRrOB=+HoG=neRg=oLTt2jStyrPJ6mYf2ctQ@mail.gmail.com>
+Subject: Re: [PATCH RFC bpf-next 8/8] selftests/bpf: add tests to validate
+ KASAN on JIT programs
 To: =?UTF-8?Q?Alexis_Lothor=C3=A9_=28eBPF_Foundation=29?= <alexis.lothore@bootlin.com>
 Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
 	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
@@ -133,12 +133,12 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278215-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-278216-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
@@ -153,11 +153,11 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[andreyknvl@gmail.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[gmail.com:+];
 	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,bootlin.com:email,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 3A0BA3F3C4F
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,bootlin.com:email,topts.sz:url]
+X-Rspamd-Queue-Id: E59FB3F3C6D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
@@ -165,49 +165,491 @@ On Mon, Apr 13, 2026 at 8:29=E2=80=AFPM Alexis Lothor=C3=A9 (eBPF Foundatio=
 n)
 <alexis.lothore@bootlin.com> wrote:
 >
-> Add a new Kconfig option CONFIG_BPF_JIT_KASAN that automatically enables
-> KASAN (Kernel Address Sanitizer) memory access checks for JIT-compiled
-> BPF programs, when both KASAN and JIT compiler are enabled. When
-> enabled, the JIT compiler will emit shadow memory checks before memory
-> loads and stores to detect use-after-free, out-of-bounds, and other
-> memory safety bugs at runtime. The option is gated behind
-> HAVE_EBPF_JIT_KASAN, as it needs proper arch-specific implementation.
+> Add a basic KASAN test runner that loads and test-run programs that can
+> trigger memory management bugs. The test captures kernel logs and ensure
+> that the expected KASAN splat is emitted by searching for the
+> corresponding first lines in the report.
+>
+> This version implements two faulty programs triggering either a
+> user-after-free, or an out-of-bounds memory usage. The bugs are
+> triggered thanks to some dedicated kfuncs in bpf_testmod.c, but two
+> different techniques are used, as some cases can be quite hard to
+> trigger in a pure "black box" approach:
+> - for reads, we can make the used kfuncs return some faulty pointers
+>   that ebpf programs will manipulate, they will generate legitimate
+>   kasan reports as a consequence
+> - applying the same trick for faulty writes is harder, as ebpf programs
+>   can't write kernel data freely. So ebpf programs can call another
+>   specific testing kfunc that will alter the shadow memory matching the
+>   passed memory (eg: a map). When the program will try to write to the
+>   corresponding memory, it will trigger a report as well.
 >
 > Signed-off-by: Alexis Lothor=C3=A9 (eBPF Foundation) <alexis.lothore@boot=
 lin.com>
 > ---
->  kernel/bpf/Kconfig | 9 +++++++++
->  1 file changed, 9 insertions(+)
+> The way of bringing kasan_poison into bpf_testmod is definitely not
+> ideal.  But I would like to validate the testing approach (triggering
+> real faulty accesses, which is hard on some cases, VS manually poisoning
+> BPF-manipulated memory) before eventually making clean bridges between
+> KASAN APIs and bpf_testmod.c, if the latter approach is the valid one.
+
+Would it make sense to put these tests into KASAN KUnit tests in
+mm/kasan/kasan_test_c.c? I assume there is a kernel API to JIT BPF
+programs from the kernel itself?
+
+There, you can just call kasan_poison(), some tests already do this.
+And you can also extend the KASAN KUnit test framework to find out
+whether the bad access is a read or write, if you want to check this.
+
+
+
+> ---
+>  tools/testing/selftests/bpf/prog_tests/kasan.c     | 165 +++++++++++++++=
+++++++
+>  tools/testing/selftests/bpf/progs/kasan.c          | 146 +++++++++++++++=
++++
+>  .../testing/selftests/bpf/test_kmods/bpf_testmod.c |  79 ++++++++++
+>  3 files changed, 390 insertions(+)
 >
-> diff --git a/kernel/bpf/Kconfig b/kernel/bpf/Kconfig
-> index eb3de35734f0..28392adb3d7e 100644
-> --- a/kernel/bpf/Kconfig
-> +++ b/kernel/bpf/Kconfig
-> @@ -17,6 +17,10 @@ config HAVE_CBPF_JIT
->  config HAVE_EBPF_JIT
->         bool
->
-> +# KASAN support for JIT compiler
-> +config HAVE_EBPF_JIT_KASAN
-> +       bool
+> diff --git a/tools/testing/selftests/bpf/prog_tests/kasan.c b/tools/testi=
+ng/selftests/bpf/prog_tests/kasan.c
+> new file mode 100644
+> index 000000000000..fd628aaa8005
+> --- /dev/null
+> +++ b/tools/testing/selftests/bpf/prog_tests/kasan.c
+> @@ -0,0 +1,165 @@
+> +// SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
+> +#include <bpf/bpf.h>
+> +#include <fcntl.h>
+> +#include <linux/if_ether.h>
+> +#include <sys/klog.h>
+> +#include <test_progs.h>
+> +#include <unpriv_helpers.h>
+> +#include "kasan.skel.h"
 > +
->  # Used by archs to tell that they want the BPF JIT compiler enabled by
->  # default for kernels that were compiled with BPF JIT support.
->  config ARCH_WANT_DEFAULT_BPF_JIT
-> @@ -101,4 +105,9 @@ config BPF_LSM
->
->           If you are unsure how to answer this question, answer N.
->
-> +config BPF_JIT_KASAN
-> +       bool
-> +       depends on HAVE_EBPF_JIT_KASAN
-> +       default y if BPF_JIT && KASAN_GENERIC
-
-Should this be "depends on KASAN && KASAN_GENERIC"?
-
-
+> +#define SUBTEST_NAME_MAX_LEN   64
+> +#define SYSLOG_ACTION_READ_ALL 3
+> +#define SYSLOG_ACTION_CLEAR    5
 > +
->  endmenu # "BPF subsystem"
+> +#define MAX_LOG_SIZE           (8*1024)
+> +#define READ_CHUNK_SIZE                128
+> +
+> +#define KASAN_PATTERN_SLAB_UAF "BUG: KASAN: slab-use-after-free in bpf_p=
+rog_"
+> +#define KASAN_PATTERN_GLOBAL_OOB "BUG: KASAN: global-out-of-bounds in bp=
+f_prog_"
+> +
+> +static char klog_buffer[MAX_LOG_SIZE];
+> +
+> +static int read_kernel_logs(char *buf, size_t max_len)
+> +{
+> +       return klogctl(SYSLOG_ACTION_READ_ALL, buf, max_len);
+> +}
+> +
+> +static int clear_kernel_logs(void)
+> +{
+> +       return klogctl(SYSLOG_ACTION_CLEAR, NULL, 0);
+> +}
+> +
+> +static int kernel_logs_have_matching_kasan_report(char *buf, char *patte=
+rn,
+> +                                                 bool is_write, int size=
+)
+> +{
+> +       char *access_desc_start, *access_desc_end, *tmp;
+> +       char access_log[READ_CHUNK_SIZE];
+> +       char *kasan_report_start;
+> +       int hsize, nsize;
+> +       /* Searched kasan report is valid if
+> +        * - it contains the expected kasan pattern
+> +        * - the next line is the description of the faulty access
+> +        * - faulty access properties match the tested type and size
+> +        */
+> +       kasan_report_start =3D strstr(buf, pattern);
+> +
+> +       if (!kasan_report_start)
+> +               return 1;
+> +
+> +       /* Find next line */
+> +       access_desc_start =3D strchr(kasan_report_start, '\n');
+> +       if (!access_desc_start)
+> +               return 1;
+> +       access_desc_start++;
+> +
+> +       access_desc_end =3D strchr(access_desc_start, '\n');
+> +       if (!access_desc_end)
+> +               return 1;
+> +
+> +       nsize =3D snprintf(access_log, READ_CHUNK_SIZE, "%s of size %d at=
+ addr",
+> +                is_write ? "Write" : "Read", size);
+> +
+> +       hsize =3D access_desc_end - access_desc_start;
+> +       tmp =3D memmem(access_desc_start, hsize, access_log, nsize);
+> +
+> +       if (!tmp)
+> +               return 1;
+> +
+> +       return 0;
+> +}
+> +
+> +struct test_spec {
+> +       char *prog_name;
+> +       char *expected_report_pattern;
+> +};
+> +
+> +static struct test_spec tests[] =3D {
+> +       {
+> +               .prog_name =3D "bpf_kasan_uaf",
+> +               .expected_report_pattern =3D KASAN_PATTERN_SLAB_UAF
+> +       },
+> +       {
+> +               .prog_name =3D "bpf_kasan_oob",
+> +               .expected_report_pattern =3D KASAN_PATTERN_GLOBAL_OOB
+> +       }
+> +};
+> +
+> +static void run_test_with_type_and_size(struct kasan *skel,
+> +                                       struct test_spec *test, bool is_w=
+rite,
+> +                                       int access_size)
+> +{
+> +       char subtest_name[SUBTEST_NAME_MAX_LEN];
+> +       struct bpf_program *prog;
+> +       uint8_t buf[ETH_HLEN];
+> +       int ret;
+> +
+> +       prog =3D bpf_object__find_program_by_name(skel->obj, test->prog_n=
+ame);
+> +       if (!ASSERT_OK_PTR(prog, "find test prog"))
+> +               return;
+> +
+> +       snprintf(subtest_name, SUBTEST_NAME_MAX_LEN, "%s_%s_%d",
+> +                test->prog_name, is_write ? "write" : "read", access_siz=
+e);
+> +
+> +       if (!test__start_subtest(subtest_name))
+> +               return;
+> +
+> +       ret =3D clear_kernel_logs();
+> +       if (!ASSERT_OK(ret, "reset log buffer"))
+> +               return;
+> +
+> +       LIBBPF_OPTS(bpf_test_run_opts, topts);
+> +       topts.sz =3D sizeof(struct bpf_test_run_opts);
+> +       topts.data_size_in =3D ETH_HLEN;
+> +       topts.data_in =3D buf;
+> +       skel->bss->is_write =3D is_write;
+> +       skel->bss->access_size =3D access_size;
+> +       ret =3D bpf_prog_test_run_opts(bpf_program__fd(prog), &topts);
+> +       if (!ASSERT_OK(ret, "run prog"))
+> +               return;
+> +
+> +       ret =3D read_kernel_logs(klog_buffer, MAX_LOG_SIZE);
+> +       if (ASSERT_GE(ret, 0, "read kernel logs"))
+> +               ASSERT_OK(kernel_logs_have_matching_kasan_report(
+> +                                 klog_buffer, test->expected_report_patt=
+ern,
+> +                                 is_write, access_size),
+> +                         test->prog_name);
+> +}
+> +
+> +static void run_test_with_type(struct kasan *skel, struct test_spec *tes=
+t,
+> +                              bool is_write)
+> +{
+> +       run_test_with_type_and_size(skel, test, is_write, 1);
+> +       run_test_with_type_and_size(skel, test, is_write, 2);
+> +       run_test_with_type_and_size(skel, test, is_write, 4);
+> +       run_test_with_type_and_size(skel, test, is_write, 8);
+> +}
+> +
+> +static void run_test(struct kasan *skel, struct test_spec *test)
+> +{
+> +       run_test_with_type(skel, test, false);
+> +       run_test_with_type(skel, test, true);
+> +}
+> +
+> +void test_kasan(void)
+> +{
+> +       struct test_spec *test;
+> +       struct kasan *skel;
+> +       int i;
+> +
+> +       if (!is_jit_enabled() || !get_kasan_jit_enabled()) {
+> +               test__skip();
+> +               return;
+> +       }
+> +
+> +       skel =3D kasan__open_and_load();
+> +       if (!ASSERT_OK_PTR(skel, "open and load prog"))
+> +               return;
+> +
+> +       for (i =3D 0; i < ARRAY_SIZE(tests); i++) {
+> +               test =3D &tests[i];
+> +
+> +               run_test(skel, test);
+> +       }
+> +
+> +       kasan__destroy(skel);
+> +}
+> diff --git a/tools/testing/selftests/bpf/progs/kasan.c b/tools/testing/se=
+lftests/bpf/progs/kasan.c
+> new file mode 100644
+> index 000000000000..f713c9b7c9ce
+> --- /dev/null
+> +++ b/tools/testing/selftests/bpf/progs/kasan.c
+> @@ -0,0 +1,146 @@
+> +// SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
+> +
+> +#include <linux/bpf.h>
+> +#include <bpf/bpf_helpers.h>
+> +#include <bpf/bpf_tracing.h>
+> +
+> +#define KASAN_SLAB_FREE 0xFB
+> +#define KASAN_GLOBAL_REDZONE 0xF9
+> +
+> +extern __u8 *bpf_kfunc_kasan_uaf_1(void) __ksym;
+> +extern __u16 *bpf_kfunc_kasan_uaf_2(void) __ksym;
+> +extern __u32 *bpf_kfunc_kasan_uaf_4(void) __ksym;
+> +extern __u64 *bpf_kfunc_kasan_uaf_8(void) __ksym;
+> +extern __u8 *bpf_kfunc_kasan_oob_1(void) __ksym;
+> +extern __u16 *bpf_kfunc_kasan_oob_2(void) __ksym;
+> +extern __u32 *bpf_kfunc_kasan_oob_4(void) __ksym;
+> +extern __u64 *bpf_kfunc_kasan_oob_8(void) __ksym;
+> +extern void bpf_kfunc_kasan_poison(void *mem, __u32 mem__sz, __u8 byte) =
+__ksym;
+> +
+> +int access_size;
+> +int is_write;
+> +
+> +struct kasan_write_val {
+> +       __u8 data_1;
+> +       __u16 data_2;
+> +       __u32 data_4;
+> +       __u64 data_8;
+> +};
+> +
+> +struct {
+> +       __uint(type, BPF_MAP_TYPE_ARRAY);
+> +       __uint(max_entries, 1);
+> +       __type(key, __u32);
+> +       __type(value, struct kasan_write_val);
+> +} test_map SEC(".maps");
+> +
+> +static void bpf_kasan_faulty_write(int size, __u8 poison_byte)
+> +{
+> +       struct kasan_write_val *val;
+> +       __u32 key =3D 0;
+> +
+> +       val =3D bpf_map_lookup_elem(&test_map, &key);
+> +       if (!val)
+> +               return;
+> +
+> +       bpf_kfunc_kasan_poison(val, sizeof(struct kasan_write_val),
+> +                              poison_byte);
+> +       switch (size) {
+> +       case 1:
+> +               val->data_1 =3D 0xAA;
+> +               break;
+> +       case 2:
+> +               val->data_2 =3D 0xAA;
+> +               break;
+> +       case 4:
+> +               val->data_4 =3D 0xAA;
+> +               break;
+> +       case 8:
+> +               val->data_8 =3D 0xAA;
+> +               break;
+> +       }
+> +       bpf_kfunc_kasan_poison(val, sizeof(struct kasan_write_val), 0x00)=
+;
+> +}
+> +
+> +
+> +static int bpf_kasan_uaf_read(int size)
+> +{
+> +       __u8 *result_1;
+> +       __u16 *result_2;
+> +       __u32 *result_4;
+> +       __u64 *result_8;
+> +       int ret =3D 0;
+> +
+> +       switch (size) {
+> +       case 1:
+> +               result_1 =3D bpf_kfunc_kasan_uaf_1();
+> +               ret =3D result_1[0] ? 1 : 0;
+> +               break;
+> +       case 2:
+> +               result_2 =3D bpf_kfunc_kasan_uaf_2();
+> +               ret =3D result_2[0] ? 1 : 0;
+> +               break;
+> +       case 4:
+> +               result_4 =3D bpf_kfunc_kasan_uaf_4();
+> +               ret =3D result_4[0] ? 1 : 0;
+> +               break;
+> +       case 8:
+> +               result_8 =3D bpf_kfunc_kasan_uaf_8();
+> +               ret =3D result_8[0] ? 1 : 0;
+> +               break;
+> +       }
+> +       return ret;
+> +}
+> +
+> +SEC("tcx/ingress")
+> +int bpf_kasan_uaf(struct __sk_buff *skb)
+> +{
+> +       if (is_write) {
+> +               bpf_kasan_faulty_write(access_size, KASAN_SLAB_FREE);
+> +               return 0;
+> +       }
+> +
+> +       return bpf_kasan_uaf_read(access_size);
+> +}
+> +
+> +static int bpf_kasan_oob_read(int size)
+> +{
+> +       __u8 *result_1;
+> +       __u16 *result_2;
+> +       __u32 *result_4;
+> +       __u64 *result_8;
+> +       int ret =3D 0;
+> +
+> +       switch (size) {
+> +       case 1:
+> +               result_1 =3D bpf_kfunc_kasan_oob_1();
+> +               ret =3D result_1[0] ? 1 : 0;
+> +               break;
+> +       case 2:
+> +               result_2 =3D bpf_kfunc_kasan_oob_2();
+> +               ret =3D result_2[0] ? 1 : 0;
+> +               break;
+> +       case 4:
+> +               result_4 =3D bpf_kfunc_kasan_oob_4();
+> +               ret =3D result_4[0] ? 1 : 0;
+> +               break;
+> +       case 8:
+> +               result_8 =3D bpf_kfunc_kasan_oob_8();
+> +               ret =3D result_8[0] ? 1 : 0;
+> +               break;
+> +       }
+> +       return ret;
+> +}
+> +
+> +SEC("tcx/ingress")
+> +int bpf_kasan_oob(struct __sk_buff *skb)
+> +{
+> +       if (is_write) {
+> +               bpf_kasan_faulty_write(access_size, KASAN_GLOBAL_REDZONE)=
+;
+> +               return 0;
+> +       }
+> +
+> +       return bpf_kasan_oob_read(access_size);
+> +}
+> +
+> +char LICENSE[] SEC("license") =3D "GPL";
+> diff --git a/tools/testing/selftests/bpf/test_kmods/bpf_testmod.c b/tools=
+/testing/selftests/bpf/test_kmods/bpf_testmod.c
+> index d876314a4d67..01554bcbbbb0 100644
+> --- a/tools/testing/selftests/bpf/test_kmods/bpf_testmod.c
+> +++ b/tools/testing/selftests/bpf/test_kmods/bpf_testmod.c
+> @@ -271,6 +271,76 @@ __bpf_kfunc void bpf_kfunc_put_default_trusted_ptr_t=
+est(struct prog_test_member
+>          */
+>  }
+>
+> +static void *kasan_uaf(void)
+> +{
+> +       void *p =3D kmalloc(64, GFP_ATOMIC);
+> +
+> +       if (!p)
+> +               return NULL;
+> +       memset(p, 0xAA, 64);
+> +       kfree(p);
+> +
+> +       return p;
+> +}
+> +
+> +#ifdef CONFIG_KASAN_GENERIC
+> +extern void kasan_poison(const void *addr, size_t size, u8 value, bool i=
+nit);
+> +
+> +__bpf_kfunc void bpf_kfunc_kasan_poison(void *mem, u32 mem__sz, u8 byte)
+> +{
+> +       kasan_poison(mem, mem__sz, byte, false);
+> +}
+> +#else
+> +__bpf_kfunc void bpf_kfunc_kasan_poison(void *mem, u32 mem__sz, u8 byte)=
+ { }
+> +#endif
+> +
+> +__bpf_kfunc u8 *bpf_kfunc_kasan_uaf_1(void)
+> +{
+> +       return kasan_uaf();
+> +}
+> +
+> +__bpf_kfunc u16 *bpf_kfunc_kasan_uaf_2(void)
+> +{
+> +       return kasan_uaf();
+> +}
+> +
+> +__bpf_kfunc u32 *bpf_kfunc_kasan_uaf_4(void)
+> +{
+> +       return kasan_uaf();
+> +}
+> +
+> +__bpf_kfunc u64 *bpf_kfunc_kasan_uaf_8(void)
+> +{
+> +       return kasan_uaf();
+> +}
+> +
+> +static u8 test_oob_buffer[64];
+> +
+> +static void *bpf_kfunc_kasan_oob(void)
+> +{
+> +       return test_oob_buffer+64;
+> +}
+> +
+> +__bpf_kfunc u8 *bpf_kfunc_kasan_oob_1(void)
+> +{
+> +       return bpf_kfunc_kasan_oob();
+> +}
+> +
+> +__bpf_kfunc u16 *bpf_kfunc_kasan_oob_2(void)
+> +{
+> +       return bpf_kfunc_kasan_oob();
+> +}
+> +
+> +__bpf_kfunc u32 *bpf_kfunc_kasan_oob_4(void)
+> +{
+> +       return bpf_kfunc_kasan_oob();
+> +}
+> +
+> +__bpf_kfunc u64 *bpf_kfunc_kasan_oob_8(void)
+> +{
+> +       return bpf_kfunc_kasan_oob();
+> +}
+> +
+>  __bpf_kfunc struct bpf_testmod_ctx *
+>  bpf_testmod_ctx_create(int *err)
+>  {
+> @@ -740,6 +810,15 @@ BTF_ID_FLAGS(func, bpf_testmod_ops3_call_test_1)
+>  BTF_ID_FLAGS(func, bpf_testmod_ops3_call_test_2)
+>  BTF_ID_FLAGS(func, bpf_kfunc_get_default_trusted_ptr_test);
+>  BTF_ID_FLAGS(func, bpf_kfunc_put_default_trusted_ptr_test);
+> +BTF_ID_FLAGS(func, bpf_kfunc_kasan_poison)
+> +BTF_ID_FLAGS(func, bpf_kfunc_kasan_uaf_1)
+> +BTF_ID_FLAGS(func, bpf_kfunc_kasan_uaf_2)
+> +BTF_ID_FLAGS(func, bpf_kfunc_kasan_uaf_4)
+> +BTF_ID_FLAGS(func, bpf_kfunc_kasan_uaf_8)
+> +BTF_ID_FLAGS(func, bpf_kfunc_kasan_oob_1)
+> +BTF_ID_FLAGS(func, bpf_kfunc_kasan_oob_2)
+> +BTF_ID_FLAGS(func, bpf_kfunc_kasan_oob_4)
+> +BTF_ID_FLAGS(func, bpf_kfunc_kasan_oob_8)
+>  BTF_KFUNCS_END(bpf_testmod_common_kfunc_ids)
+>
+>  BTF_ID_LIST(bpf_testmod_dtor_ids)
 >
 > --
 > 2.53.0
