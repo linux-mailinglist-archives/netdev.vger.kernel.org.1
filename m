@@ -1,142 +1,145 @@
-Return-Path: <netdev+bounces-278092-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278093-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GOziJyr53GnXYgkAu9opvQ
-	(envelope-from <netdev+bounces-278092-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 16:09:46 +0200
+	id sM6dLib43GnLYgkAu9opvQ
+	(envelope-from <netdev+bounces-278093-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 16:05:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0B733ED11B
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 16:09:45 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50AB53ECF18
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 16:05:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 556E830416DC
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 14:02:31 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 458B53012207
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 14:04:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98CDF3CE4BC;
-	Mon, 13 Apr 2026 14:02:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E1CB3D525A;
+	Mon, 13 Apr 2026 14:04:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TrHvvPzr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sQ/rI1Uv"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7594D3CB2C1
-	for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 14:02:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 793853D523E;
+	Mon, 13 Apr 2026 14:04:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776088950; cv=none; b=WdzmFS5AHsptjbteMlLV6umgS3xFNiHrWrrJ5GSGRsnA5TTrFMr/6+il/kVgXYBvIAzwnG8ZTZgPfczTk5d6nmCgUH6MeJRS1qAo7KHXC1MJjEqbQn9wlOzOHMEu3XPtkAg8kmHgqZrpietCLssUnGXIWR+Hm809dLpZSJDs3XQ=
+	t=1776089053; cv=none; b=EZM8rTuMDsd/kMoBMh1nCTjaQ1whqNMJLAUWKed/TjbyIDpxZnlW+6mG+iN9M81NzIggnoSahQXbVZYbwbxW1XghEkd49lY97CDtltW9blb3gwDHnK+Pb5Zl317ADZ+/ezWFrE5XhdDqj/c0fwvfAUXZNtG5qm8MZ7m0XaYXWzU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776088950; c=relaxed/simple;
-	bh=lsCmK8bgfymrGWmfnrdu1HhqbYmux52O5R+oq3QNKiw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XznfqKNLvzIWMozuTQ+LT1OsosZ52/+AcTTgIwabkDpRgejT//k5szK+3qMP+tKKN1zfPPRmOsXtSHpnJ4vmb6I2qn2RLSzckNR74/GUoVqdRPYXKWUdqt2GzY/X6QsskyQkaZTZfh0OJOy2Gl5vz3hthioKByytTX8zr0M+7A4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TrHvvPzr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F623C2BCAF;
-	Mon, 13 Apr 2026 14:02:28 +0000 (UTC)
+	s=arc-20240116; t=1776089053; c=relaxed/simple;
+	bh=PZPocgNq/t+BoK9YO0g4NcHOvsEnwrcuzcTMgVzbDRc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=lySxyctB2xFIXBFB4+OIAuG0ypwQZMERc/vAVEH7MYBWnvgyd9jIVAjDdnn/n1WSr3A/JMFA/jJ2v1oHxH/lDgFh/nVko6ULyG9JQZevYjLnNiCh4mh0by/K5NM4fZCuH1YWTn3vklAn+IBx443IAwy028HPwP/pKjTl+X2olqE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sQ/rI1Uv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9062CC2BCAF;
+	Mon, 13 Apr 2026 14:04:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776088950;
-	bh=lsCmK8bgfymrGWmfnrdu1HhqbYmux52O5R+oq3QNKiw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=TrHvvPzrpaItVhm08JmAQ2LYc1MyMWm5ZlJgajH2XrONzWtxui2XUkOlSEA6SjRrn
-	 JWxyBP38OFwqjqr4nN+52tbPPgBT28Q0TpaeRFlc6NSfWPA9Faox1scws8YQTJrpKD
-	 asmbtxTCSwiskLxl2sGMpV0Ntr1eGYa0XHELW5SHmbc+2eo2BSMye23okJaRP2Id2J
-	 mSRh2QM0HsGvP0o/z04EGtlud04GcO+gktRQr/oAu2PArDfb+8nSjdszoFUEvoPPRr
-	 tlwLJ/3DwadsQ1VblrpnvCoS6Kc7bNJRtDlcztSEFvm7TmHq6aN6qL7Be+3PhyMldb
-	 pkLEY4qsNClCg==
-Date: Mon, 13 Apr 2026 15:02:26 +0100
+	s=k20201202; t=1776089052;
+	bh=PZPocgNq/t+BoK9YO0g4NcHOvsEnwrcuzcTMgVzbDRc=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=sQ/rI1UvHOQ+roW0A6IDSgDJ1b0pLaQvXe5zqkw+FVGVpWk8EG1wK8fGIagzv6Mim
+	 4O8BpTNUTZPrNHweOqewPuZft/QR4+jHezJ/glnRr/F91wRA6HcCOzM7ormX8x8lds
+	 dR9IPCfYKcSZNwExOtF+Y78WtWLmejYpNQ92Ya7SH8y2HcZL4Tf4TVsEw+uehCRszU
+	 lUy0lOI5KQVDIewL3zdcwlsxR2nJw6h0XZda++ue09kUXr6LITbszedrYV4YeMqXUi
+	 D1ylNUlHp0S5hV4a0Xk971C+ZxKs2YgRY1oIAkHAgxmQ7oEVUsrCPzOWi7WeIfzBL4
+	 E/Fmsl2sCLMMQ==
 From: Simon Horman <horms@kernel.org>
-To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH iwl-net v2 6/6] ixgbe: fix integer overflow and wrong bit
- position in ixgbe_validate_rtr()
-Message-ID: <20260413140226.GQ469338@kernel.org>
-References: <20260408131154.2661818-1-aleksandr.loktionov@intel.com>
- <20260408131154.2661818-7-aleksandr.loktionov@intel.com>
- <20260413134334.GP469338@kernel.org>
+To: aleksandr.loktionov@intel.com
+Cc: 'Simon Horman' <horms@kernel.org>,
+	intel-wired-lan@lists.osuosl.org,
+	anthony.l.nguyen@intel.com,
+	netdev@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH iwl-net v2 6/6] ixgbe: fix integer overflow and wrong bit position in ixgbe_validate_rtr()
+Date: Mon, 13 Apr 2026 15:03:07 +0100
+Message-ID: <20260413140307.715409-1-horms@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260408131154.2661818-7-aleksandr.loktionov@intel.com>
+References: <20260408131154.2661818-7-aleksandr.loktionov@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260413134334.GP469338@kernel.org>
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-278092-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_FROM(0.00)[bounces-278093-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_THREE(0.00)[4];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: F0B733ED11B
+	RCPT_COUNT_FIVE(0.00)[6];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,sashiko.dev:url]
+X-Rspamd-Queue-Id: 50AB53ECF18
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Apr 13, 2026 at 02:43:34PM +0100, Simon Horman wrote:
-> On Wed, Apr 08, 2026 at 03:11:54PM +0200, Aleksandr Loktionov wrote:
-> > Two bugs in the same loop in ixgbe_validate_rtr():
-> > 
-> > 1. The 3-bit traffic-class field was extracted by shifting a u32 and
-> >    assigning the result directly to a u8.  For user priority 0 this is
-> >    harmless; for UP[5..7] the shift leaves bits [15..21] in the u32
-> >    which are then silently truncated when stored in u8.  Mask with
-> >    IXGBE_RTRUP2TC_UP_MASK before the assignment so only the intended
-> >    3 bits are kept.
-> > 
-> > 2. When clearing an out-of-bounds entry the mask was always shifted by
-> >    the fixed constant IXGBE_RTRUP2TC_UP_SHIFT (== 3), regardless of
-> >    which loop iteration was being processed.  This means only UP1 (bit
-> >    position 3) was ever cleared; UP0,2..7 (positions 0, 6, 9, ..., 21)
-> >    were left unreset, so invalid TC mappings persisted in hardware and
-> >    could mis-steer received packets to the wrong traffic class.
-> >    Use i * IXGBE_RTRUP2TC_UP_SHIFT to target the correct 3-bit field
-> >    for each iteration.
-> > 
-> > Swap the operand order in the mask expression to place the constant
-> > on the right per kernel coding style (noted by David Laight).
-> > 
-> > Fixes: e7589eab9291 ("ixgbe: consolidate, setup for multiple traffic classes")
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-> > ---
-> > v1 -> v2:
-> >  - Add Fixes: tag; reroute to iwl-net (wrong bit positions cause packet
-> >    mis-steering); swap to (reg >> ...) & MASK operand order per David
-> >    Laight.
-> 
-> Reviewed-by: Simon Horman <horms@kernel.org>
+From: 'Simon Horman' <horms@kernel.org>
 
-Sorry, I was a little too hasty there.
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://sashiko.dev
+---
+ixgbe: fix integer overflow and wrong bit position in ixgbe_validate_rtr()
 
-AI generated code review points out that the cited commit
-doesn't seem to have introduced the code being fixed,
-and that perhaps this Fixes tag would be more appropriate.
+This commit fixes two bugs in ixgbe_validate_rtr() by masking the
+traffic-class field properly before assigning it to a u8, and correctly
+shifting the mask for clearing out-of-bounds entries.
 
-Fixes: 8b1c0b24d9af ("ixgbe: configure minimal packet buffers to support TC")
+Cc: stable@vger.kernel.org
 
-I will also forward on a review from Sashiko, although it
-is for an existing bug and thus is strictly FYI.
+> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+> index 5ff462a848feb..8ebf717ce4017 100644
+> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+> @@ -9782,11 +9782,12 @@ static void ixgbe_validate_rtr(struct ixgbe_adapter *adapter, u8 tc)
+>  	rsave = reg;
+>  
+>  	for (i = 0; i < MAX_TRAFFIC_CLASS; i++) {
+> -		u8 up2tc = reg >> (i * IXGBE_RTRUP2TC_UP_SHIFT);
+> +		u8 up2tc = (reg >> (i * IXGBE_RTRUP2TC_UP_SHIFT)) &
+> +			   IXGBE_RTRUP2TC_UP_MASK;
+>  
+>  		/* If up2tc is out of bounds default to zero */
+>  		if (up2tc > tc)
+
+This wasn't introduced by this patch, but is there a pre-existing off-by-one
+error in this bounds check?
+
+If tc represents the number of enabled traffic classes (e.g., 4), the valid TC
+indices would be 0 through tc - 1. If up2tc equals tc, it would be out of
+bounds, but the condition up2tc > tc will evaluate to false and the invalid
+mapping won't be cleared.
+
+Could this allow an invalid UP-to-TC mapping to persist in the hardware
+register, potentially causing received packets to be mis-steered to an
+uninitialized or non-existent traffic class queue?
+
+Should the condition be corrected to ensure up2tc is strictly less than tc
+when tc > 0?
+
+> -			reg &= ~(0x7 << IXGBE_RTRUP2TC_UP_SHIFT);
+> +			reg &= ~(IXGBE_RTRUP2TC_UP_MASK << (i * IXGBE_RTRUP2TC_UP_SHIFT));
+>  	}
 
