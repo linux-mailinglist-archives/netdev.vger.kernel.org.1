@@ -1,78 +1,110 @@
-Return-Path: <netdev+bounces-278011-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278012-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KJnqMH213GlVVgkAu9opvQ
-	(envelope-from <netdev+bounces-278011-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 11:21:01 +0200
+	id CH/hNyC23Gm2VgkAu9opvQ
+	(envelope-from <netdev+bounces-278012-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 11:23:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30DA63E9C46
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 11:21:00 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AD713E9CCC
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 11:23:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A12803019BB9
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 09:14:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0B0273048578
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 09:16:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8EB13AF677;
-	Mon, 13 Apr 2026 09:14:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 845E537C92D;
+	Mon, 13 Apr 2026 09:16:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q+wTotKv"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="oY+vEH1n"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6049C3AE71E
-	for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 09:14:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5664E19C546;
+	Mon, 13 Apr 2026 09:16:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776071696; cv=none; b=YAan04BvgAJH4cDIlexajPrvGy4PtF36cVclfMtdR+x3f8xwCcFOXJaOVRmXMpgoX1ooNvF6Oh3JETVLizbWNKmiQtpPMVi3nrPI+Wyd7l37pT8QDdd50fkgbZFYo4OLLOMtCF+BtAdbHTHPTgmdp6xda8W5FIwC1AKAkFVqlZc=
+	t=1776071783; cv=none; b=DXyEAPU6HKBrYkw1IFuAYKk2/ZFxAm+FGqV+QUlnBoH71VOwgiXICiessO0I1ayP2P+61khY6MJGsQSPIb2wizLfMzfDULZ5ItD5/P4Y5d5h7/u03spEK6ZKIpUa/t+XU0AM6JAwGQ8BlaMC3BtBT9GP374TgT1P1/muHOxLnVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776071696; c=relaxed/simple;
-	bh=EbOzQjeAlCbrNoGjkAlLZRdIKSC8rV0R947KMWpOTls=;
+	s=arc-20240116; t=1776071783; c=relaxed/simple;
+	bh=j/tYEurlHNq5kx1yV6D47wbOZhhwgvOxlSSa1P5IOeM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UedgIYRgsWmEzm+rqwm4jeGBNgmg3Dishs9CUpS7zPkcE5qSlV9aFkEi1Fvu7EjEblO3fDaXvco42z2Bv6BYBYaQTjWxxtKZTTZhKVMZs0jjL1nkjbAYu/J3LcQ6Jzv72NlTmnxo69TKVw2F9PPZCqVn5ZSQJRi2e5dNIkCejoY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Q+wTotKv; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1776071694;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5Amw1IQyLXGLCBkbJ7N2kGgFQbYxjmSFWU332iVkB80=;
-	b=Q+wTotKv/AQhBn9cfRysBwPvDw6SCXMn4usjShZRQTW40ey5wYF/fAowyp71/GjsTXE64t
-	JpzEGXrxt0DrDOt9HdckN2QBfEIGdv4VEZnuZ+KNTxHykFEmi9Spn9LANj/ocoXTMfDpsY
-	9ldioXnAGIZh6sVBveewqYssdevVlhI=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-690-uz8z3eniNfCInjRPz1Fgkg-1; Mon,
- 13 Apr 2026 05:14:53 -0400
-X-MC-Unique: uz8z3eniNfCInjRPz1Fgkg-1
-X-Mimecast-MFC-AGG-ID: uz8z3eniNfCInjRPz1Fgkg_1776071692
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B9BDC1800372;
-	Mon, 13 Apr 2026 09:14:51 +0000 (UTC)
-Received: from thinkpad (headnet01.pony-001.prod.iad2.dc.redhat.com [10.2.32.101])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 85AFE3000C16;
-	Mon, 13 Apr 2026 09:14:49 +0000 (UTC)
-Date: Mon, 13 Apr 2026 11:14:46 +0200
-From: Felix Maurer <fmaurer@redhat.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Luka Gejak <luka.gejak@linux.dev>, davem@davemloft.net,
-	edumazet@google.com, pabeni@redhat.com, netdev@vger.kernel.org,
-	horms@kernel.org
-Subject: Re: [PATCH net-next v5 1/2] net: hsr: require valid EOT supervision
- TLV
-Message-ID: <ady0Bjkpiwm06Jmk@thinkpad>
-References: <20260407162502.19462-1-luka.gejak@linux.dev>
- <20260407162502.19462-2-luka.gejak@linux.dev>
- <20260412124558.190c725f@kernel.org>
- <DDF9CC02-6FC1-44F0-B95D-967151BF0592@linux.dev>
- <20260412133157.3b335e1b@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=K5FItm4pkWqIoz/HLDoSRvqOYcfcTW90Ijz3BL3hja+DhSPq7EPSBtz5R2UMMJhPvvZ8fAM0XCljCUcztKBQw9SxMrw/5RRrlgL4OzYKNVsYWnVn5Ic6ttpen+bHYyoXj4F2CuzeaLsxiRAT887zW1VHTVG7qH99bimsdTdwtsY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=oY+vEH1n; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63CNQ6Rp3649347;
+	Mon, 13 Apr 2026 09:15:18 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=3hYK9Ei+d9kVH0VV/CR68CUDnV5UVC
+	rS18XI/2Q3GjY=; b=oY+vEH1nHYm21zR7dKdG+rMVbiAs+2M4pSYJYH25H3Q/WQ
+	S5pbibNxKHXRtCU5RA4BZpoAC/CsLV14kYSk9HD7BI83gpVLqIVXm+N3/UD3mtFb
+	VGL3bfwkoS+MFSXp/7ksAXz/d/43BdzYyNe+WU94qMB7+oTAY5jMdy/aC1rg5QU1
+	UhBzNrX2r1ZHEsamBr6j/bYRaaLxasa1WWuLDHkVDfa2K6RkMY6wizvw26f4v3Pw
+	kdUQa11kKa0O4lHqHX35TBGaxo9cfSk8h/UtwhMbDVaUgMt8SMltIpECwIrRGVKB
+	KeirN6PqfMTEor0kXcjWPcrhlHvR883P23ApPmxw==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4dfdt3px1j-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 13 Apr 2026 09:15:17 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 63D80WMC015153;
+	Mon, 13 Apr 2026 09:15:16 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4dg0mscku7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 13 Apr 2026 09:15:16 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 63D9FEC727328866
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 13 Apr 2026 09:15:14 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 70F6620043;
+	Mon, 13 Apr 2026 09:15:14 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B712A2004F;
+	Mon, 13 Apr 2026 09:15:04 +0000 (GMT)
+Received: from li-dc0c254c-257c-11b2-a85c-98b6c1322444.ibm.com (unknown [9.123.13.2])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Mon, 13 Apr 2026 09:15:04 +0000 (GMT)
+Date: Mon, 13 Apr 2026 14:45:02 +0530
+From: Ojaswin Mujoo <ojaswin@linux.ibm.com>
+To: Thomas Gleixner <tglx@kernel.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+        x86@kernel.org, Lu Baolu <baolu.lu@linux.intel.com>,
+        iommu@lists.linux.dev, Michael Grzeschik <m.grzeschik@pengutronix.de>,
+        netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>, linux-crypto@vger.kernel.org,
+        Vlastimil Babka <vbabka@kernel.org>, linux-mm@kvack.org,
+        David Woodhouse <dwmw2@infradead.org>,
+        Bernie Thompson <bernie@plugable.com>, linux-fbdev@vger.kernel.org,
+        Theodore Tso <tytso@mit.edu>, linux-ext4@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Uladzislau Rezki <urezki@gmail.com>, Marco Elver <elver@google.com>,
+        Dmitry Vyukov <dvyukov@google.com>, kasan-dev@googlegroups.com,
+        Andrey Ryabinin <ryabinin.a.a@gmail.com>,
+        Thomas Sailer <t.sailer@alumni.ethz.ch>, linux-hams@vger.kernel.org,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        linux-alpha@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
+        linux-arm-kernel@lists.infradead.org,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Huacai Chen <chenhuacai@kernel.org>, loongarch@lists.linux.dev,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        linux-m68k@lists.linux-m68k.org, Dinh Nguyen <dinguyen@kernel.org>,
+        Jonas Bonn <jonas@southpole.se>, linux-openrisc@vger.kernel.org,
+        Helge Deller <deller@gmx.de>, linux-parisc@vger.kernel.org,
+        Michael Ellerman <mpe@ellerman.id.au>, linuxppc-dev@lists.ozlabs.org,
+        Paul Walmsley <pjw@kernel.org>, linux-riscv@lists.infradead.org,
+        Heiko Carstens <hca@linux.ibm.com>, linux-s390@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>, sparclinux@vger.kernel.org
+Subject: Re: [patch 07/38] treewide: Consolidate cycles_t
+Message-ID: <ady0Ft_tDrbGlu2o@li-dc0c254c-257c-11b2-a85c-98b6c1322444.ibm.com>
+References: <20260410120044.031381086@kernel.org>
+ <20260410120318.045532623@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,65 +113,121 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260412133157.3b335e1b@kernel.org>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
-X-Spamd-Result: default: False [-1.66 / 15.00];
+In-Reply-To: <20260410120318.045532623@kernel.org>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-ORIG-GUID: r6KN03kK1HZaoam71kVl5aHZm9BfgAQ4
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDEzMDA4NSBTYWx0ZWRfX+Gwbo0yddZP/
+ ED3CWrVQNFFw/TECS1M9+tSS57FYBZnMmG79KmJVnAwBWc3o5BgyeadFZ9maSHI4Tv+/+VHQiXF
+ uu6/EAbMsVnRYIXugjj6TyQBBqRyeSoPbLxIVX8tqr0goumkz0lPJ9Y4Y3a3ECfM9WbzUtOSm5u
+ eNbyrRMw+nuwi0Afz/QuxwA0FuazktkFPrSziYKfNEV92tR6ksCbhLbdKwZfOQ6IaUNAK3mHh04
+ Z9ZuJvFG4+5R/DIJQ8v5H1fE5bYExgqIL1hC1HoekBef4/UHL3Jav5jU5Ty8ib2gAESLlopFcCb
+ VttV6mxWXomhvrcFDBgGSdweqIiLio3UyKWRaxfdCdf1K3UdP0nDdx3LiWp/XKSUCxaso/02xav
+ PADy/jEsrag0vsgcCLG1/jcBcJ3bFL3cNcYlDCC6JXFySGCPKTcpDMOtfvLh9vv4Vg7VR02ItSs
+ a0USozVz3do3GTBrHkA==
+X-Proofpoint-GUID: iwEVNX-0n_YmGG6iAARt9TRRoEhRuwqE
+X-Authority-Analysis: v=2.4 cv=WpEb99fv c=1 sm=1 tr=0 ts=69dcb426 cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
+ a=kj9zAlcOel0A:10 a=A5OVakUREuEA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=iQ6ETzBq9ecOQQE5vZCe:22 a=VwQbUJbxAAAA:8
+ a=9Pz4rRoAHiK5H5RfW9YA:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-04-13_02,2026-04-09_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 phishscore=0 bulkscore=0 adultscore=0 spamscore=0
+ malwarescore=0 clxscore=1011 lowpriorityscore=0 suspectscore=0
+ impostorscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2604010000
+ definitions=main-2604130085
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-278011-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,arndb.de,kernel.org,linux.intel.com,lists.linux.dev,pengutronix.de,gondor.apana.org.au,kvack.org,infradead.org,plugable.com,mit.edu,linux-foundation.org,gmail.com,google.com,googlegroups.com,alumni.ethz.ch,zx2c4.com,linaro.org,armlinux.org.uk,lists.infradead.org,arm.com,linux-m68k.org,lists.linux-m68k.org,southpole.se,gmx.de,ellerman.id.au,lists.ozlabs.org,linux.ibm.com,davemloft.net];
+	TAGGED_FROM(0.00)[bounces-278012-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[li-dc0c254c-257c-11b2-a85c-98b6c1322444.ibm.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[49];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[ibm.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmaurer@redhat.com,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[ojaswin@linux.ibm.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 30DA63E9C46
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[11]
+X-Rspamd-Queue-Id: 8AD713E9CCC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun, Apr 12, 2026 at 01:31:57PM -0700, Jakub Kicinski wrote:
-> On Sun, 12 Apr 2026 22:13:35 +0200 Luka Gejak wrote:
-> > Regarding the TLV loop: I actually implemented a TLV walker in v4 [1]
-> > for this exact reason, but I moved to strict sequential parsing in v5
-> > based on reviewer's feedback to keep the implementation simple. Could
-> > you please check if the approach used in v4 is what you had in mind?
-> > If so, I will rebase that logic onto the memory safety fixes
-> > (pskb_may_pull) from v5 and submit it as v6.
->
-> That's not really what I had in mind. I was thinking of a loop which
-> just skips the TLVs in order, leaving the parsing of known TLVs as is.
-> But I've never used HSR maybe this sort of strict validation is somehow
-> okay in HSR deployments.
+On Fri, Apr 10, 2026 at 02:19:03PM +0200, Thomas Gleixner wrote:
+> Most architectures define cycles_t as unsigned long execpt:
+> 
+>  - x86 requires it to be 64-bit independent of the 32-bit/64-bit build.
+> 
+>  - parisc and mips define it as unsigned int
+> 
+>    parisc has no real reason to do so as there are only a few usage sites
+>    which either expand it to a 64-bit value or utilize only the lower
+>    32bits.
+> 
+>    mips has no real requirement either.
+> 
+> Move the typedef to types.h and provide a config switch to enforce the
+> 64-bit type for x86.
+> 
+> Signed-off-by: Thomas Gleixner <tglx@kernel.org>
+> ---
+>  arch/Kconfig                       |    4 ++++
+>  arch/alpha/include/asm/timex.h     |    3 ---
+>  arch/arm/include/asm/timex.h       |    1 -
+>  arch/loongarch/include/asm/timex.h |    2 --
+>  arch/m68k/include/asm/timex.h      |    2 --
+>  arch/mips/include/asm/timex.h      |    2 --
+>  arch/nios2/include/asm/timex.h     |    2 --
+>  arch/parisc/include/asm/timex.h    |    2 --
+>  arch/powerpc/include/asm/timex.h   |    4 +---
+>  arch/riscv/include/asm/timex.h     |    2 --
+>  arch/s390/include/asm/timex.h      |    2 --
+>  arch/sparc/include/asm/timex_64.h  |    1 -
+>  arch/x86/Kconfig                   |    1 +
+>  arch/x86/include/asm/tsc.h         |    2 --
+>  include/asm-generic/timex.h        |    1 -
+>  include/linux/types.h              |    6 ++++++
+>  16 files changed, 12 insertions(+), 25 deletions(-)
+> 
+<...>
 
-Hi Jakub,
+> --- a/arch/powerpc/include/asm/timex.h
+> +++ b/arch/powerpc/include/asm/timex.h
+> @@ -11,9 +11,7 @@
+>  #include <asm/cputable.h>
+>  #include <asm/vdso/timebase.h>
+>  
+> -typedef unsigned long cycles_t;
+> -
+> -static inline cycles_t get_cycles(void)
+> +ostatic inline cycles_t get_cycles(void)
 
-I'm chiming in here as I was one of the reviewers asking for the strict
-validation. The HSR supervision frames have this TLV structure that may
-appear to support optionals or (unknown) extensions of some kind. But
-the standard just has two potential frame formats (for normal and RedBox
-supervision frames), both of them completely specified. Also, the
-supervision frames have a version field in the beginning. IMHO, this
-leaves no room to put other TLVs there. Therefore, I don't think we gain
-anything but unexpected behavior if we start accepting frames with
-arbitrary additional TLVs/data.
+Hi Thomas, I'm in middle of testing this series on powerpc. In the meantime I
+noticed that there's probably a small typo here (althrough this is fixed
+later)
 
-Thanks,
-   Felix
-
+Regards,
+ojaswin
+>  {
+>  	return mftb();
+>  }
 
