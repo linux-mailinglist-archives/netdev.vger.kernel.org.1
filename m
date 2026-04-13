@@ -1,59 +1,60 @@
-Return-Path: <netdev+bounces-278168-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278170-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UNXZBQY23Wl9agkAu9opvQ
-	(envelope-from <netdev+bounces-278168-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 20:29:26 +0200
+	id 2GSaKAw23Wl9agkAu9opvQ
+	(envelope-from <netdev+bounces-278170-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 20:29:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CB6C3F209C
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 20:29:25 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 800F33F20BC
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 20:29:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 3F9913014DB4
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 18:29:10 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 416023020777
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 18:29:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BFEA366558;
-	Mon, 13 Apr 2026 18:29:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A3873806BE;
+	Mon, 13 Apr 2026 18:29:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="cZBSYs58"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="KLIXIQrj"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B426936165C;
-	Mon, 13 Apr 2026 18:29:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B405371D0A;
+	Mon, 13 Apr 2026 18:29:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776104945; cv=none; b=F8cuRtwYcpWlU5//r06NcUUmrj5zNlAeaRzKJYmdMDoxL3AqxXX5Bmn5wdw1UVejW7hgc2GTWChW/s/nbG2wDEfp82XV5S0Ec1ebY0Xwc/74q3ypTCoWK83qShXJ3tbQnp3gi5eJtcS4mEK4wTxfshV+muvmsZq86MqjzNiaJ+0=
+	t=1776104947; cv=none; b=ROj/MC8ImRQ6g9KvEi6SrULu8/EO54ImmyOUTOWefpMxk26gktx00Ey4Jpn0htUXyDhLg2HoRmXKSdwAMtAmZ6/XBBprN4Ck/SjueCTTG/zPTVNynzwOLPacMOGpSAIwn66iQsUCHrImI0SuMdP0htrzrWp7Gbn0lGTzeI0J2xA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776104945; c=relaxed/simple;
-	bh=qyLxzf8Ns2Ft5golu4A1kMhZlxoBRSzZkWlrr38IOZg=;
+	s=arc-20240116; t=1776104947; c=relaxed/simple;
+	bh=CyXCnBYI4nO8j+gMWgeD9gHLhICP6hs4mZuFbIzDQAo=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=aCmTgnWCdVIJ6DBEHifG1OHL9QfnX8194s5WlYQM949gqg/7VHhkqeltffURxSAPBK737cXtTwnpMp1rkcHNxE2ss5mSNAXcXVwQE/Mx6ar7EErCqdT4FX7sffXAf92G2gtAj/GxhHFLZK+m313K6wQiDhrwgdTF8lSX0JM5b1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=cZBSYs58; arc=none smtp.client-ip=185.246.85.4
+	 In-Reply-To:To:Cc; b=OmGDE9SK3B9nZx4UoDDemZ9bMgsdTi7nyu7ROO5og5sGYAqiX6o4+BKcw/qGcTicGVxnWQ73XT8LBdKwoTeDyrbpnQsTlcPExhDi1Uizrdgp0FLbM9dm/df0y4xN57okr4ktTqMyQpCMv48PtiqVaHAdogBWkVYP4QyA26TZo+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=KLIXIQrj; arc=none smtp.client-ip=185.171.202.116
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 29DF34E42977;
-	Mon, 13 Apr 2026 18:29:02 +0000 (UTC)
+	by smtpout-04.galae.net (Postfix) with ESMTPS id A43C0C5B1AD;
+	Mon, 13 Apr 2026 18:29:41 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id E99BB5FFB9;
-	Mon, 13 Apr 2026 18:29:01 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id DE28C104504C2;
-	Mon, 13 Apr 2026 20:28:55 +0200 (CEST)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id F191C5FFB9;
+	Mon, 13 Apr 2026 18:29:04 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id C7044104504B7;
+	Mon, 13 Apr 2026 20:28:59 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1776104939; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	t=1776104943; h=from:subject:date:message-id:to:cc:mime-version:content-type:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=J6w/vm8RhE1QibuAbeZrZpu+mbFZf/j6v7Old22bTNI=;
-	b=cZBSYs587EC2pPG0T0zWnt6Rm3YWgLoLQHo/fERZmvyCcXnMbHG6UHv4UW2EhRe6AcwwK4
-	rLJqLN0QcpxJ+eU2wnigOQQIs5tEOULYPsd1eLcu1LilosOrM1UCnTdfl+hYwGPMfNEMV/
-	/5Ph0br4h41uQYEnh8/FBrJsTvpWOM11sOt/QM2ZTP7geak6StbyhdakN5Z/m5BxbpCjin
-	o8OFL6dggWmiW+3fP5D/aD3dYrcXLqeqZdzncuDbmqmu9QPwy6ZHA14bp/bp5laVHfSfBf
-	7xNDlnmSlRRrNNIRvXgvQWAu27n6dhrzs7GZ2IUSyjAbZY1p1dja0IfA16reIg==
+	bh=SIbaQ9mg0ZbtaBPZTfhJW0y4Oug6knq3Mk42IMQtkEk=;
+	b=KLIXIQrj/Dt6o6ylVSJmfcaGlqn8TQDRCQGBXVjGupGskDl9p5aoxmau6a5GMRftUxpFpP
+	XXob2LzYqw709cOvxQ5a6hZGYrx/bejjqgSFQM7M3yCVGCevkepZRsrW22JHoJF1sJdmYj
+	i+d3PdzlC1LjCfqZTgrnQ66Lzt9Q7VBJLIq352bEOs30qOllcgBqkwoZ+xBRxoIMSjdmbG
+	2XqEp8UhjW1u3aJYbkCV4oPPq+JzqKyxPU/N6g+sv8PuS6VSbWtBmO71EcZ3QVymVhCtlo
+	qjIaEb+/iC68dcXGm9wEQ/ZTOVEQ204pR+3wpucVloW80kqFyZL8TKyYRm8oKQ==
 From: =?utf-8?q?Alexis_Lothor=C3=A9_=28eBPF_Foundation=29?= <alexis.lothore@bootlin.com>
-Date: Mon, 13 Apr 2026 20:28:41 +0200
-Subject: [PATCH RFC bpf-next 1/8] kasan: expose generic kasan helpers
+Date: Mon, 13 Apr 2026 20:28:42 +0200
+Subject: [PATCH RFC bpf-next 2/8] bpf: mark instructions accessing program
+ stack
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,7 +63,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Message-Id: <20260413-kasan-v1-1-1a5831230821@bootlin.com>
+Message-Id: <20260413-kasan-v1-2-1a5831230821@bootlin.com>
 References: <20260413-kasan-v1-0-1a5831230821@bootlin.com>
 In-Reply-To: <20260413-kasan-v1-0-1a5831230821@bootlin.com>
 To: Alexei Starovoitov <ast@kernel.org>, 
@@ -99,11 +100,11 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
 	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-278168-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-278170-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FREEMAIL_TO(0.00)[kernel.org,iogearbox.net,linux.dev,gmail.com,davemloft.net,redhat.com,alien8.de,linux.intel.com,zytor.com,foss.st.com,google.com,arm.com,linux-foundation.org];
@@ -111,7 +112,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[bootlin.com:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	RCPT_COUNT_TWELVE(0.00)[40];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
@@ -122,63 +123,103 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 0CB6C3F209C
+X-Rspamd-Queue-Id: 800F33F20BC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-In order to prepare KASAN helpers to be called from the eBPF subsystem
-(to add KASAN instrumentation at runtime when JITing eBPF programs),
-expose the __asan_{load,store}X functions in linux/kasan.h
+In order to prepare to emit KASAN checks in JITed programs, JIT
+compilers need to be aware about whether some load/store instructions
+are targeting the bpf program stack, as those should not be monitored
+(we already have guard pages for that, and it is difficult anyway to
+correctly monitor any kind of data passed on stack).
+
+To support this need, make the BPF verifier mark the instructions that
+access program stack:
+- add a setter that allows the verifier to mark instructions accessing
+  the program stack
+- add a getter that allows JIT compilers to check whether instructions
+  being JITed are accessing the stack
 
 Signed-off-by: Alexis Lothoré (eBPF Foundation) <alexis.lothore@bootlin.com>
 ---
- include/linux/kasan.h | 13 +++++++++++++
- mm/kasan/kasan.h      | 10 ----------
- 2 files changed, 13 insertions(+), 10 deletions(-)
+ include/linux/bpf.h          |  2 ++
+ include/linux/bpf_verifier.h |  2 ++
+ kernel/bpf/core.c            | 10 ++++++++++
+ kernel/bpf/verifier.c        |  7 +++++++
+ 4 files changed, 21 insertions(+)
 
-diff --git a/include/linux/kasan.h b/include/linux/kasan.h
-index 338a1921a50a..6f580d4a39e4 100644
---- a/include/linux/kasan.h
-+++ b/include/linux/kasan.h
-@@ -710,4 +710,17 @@ void kasan_non_canonical_hook(unsigned long addr);
- static inline void kasan_non_canonical_hook(unsigned long addr) { }
- #endif /* CONFIG_KASAN_GENERIC || CONFIG_KASAN_SW_TAGS */
+diff --git a/include/linux/bpf.h b/include/linux/bpf.h
+index b4b703c90ca9..774a0395c498 100644
+--- a/include/linux/bpf.h
++++ b/include/linux/bpf.h
+@@ -1543,6 +1543,8 @@ void bpf_jit_uncharge_modmem(u32 size);
+ bool bpf_prog_has_trampoline(const struct bpf_prog *prog);
+ bool bpf_insn_is_indirect_target(const struct bpf_verifier_env *env, const struct bpf_prog *prog,
+ 				 int insn_idx);
++bool bpf_insn_accesses_stack(const struct bpf_verifier_env *env,
++			     const struct bpf_prog *prog, int insn_idx);
+ #else
+ static inline int bpf_trampoline_link_prog(struct bpf_tramp_link *link,
+ 					   struct bpf_trampoline *tr,
+diff --git a/include/linux/bpf_verifier.h b/include/linux/bpf_verifier.h
+index b148f816f25b..ab99ed4c4227 100644
+--- a/include/linux/bpf_verifier.h
++++ b/include/linux/bpf_verifier.h
+@@ -660,6 +660,8 @@ struct bpf_insn_aux_data {
+ 	u16 const_reg_map_mask;
+ 	u16 const_reg_subprog_mask;
+ 	u32 const_reg_vals[10];
++	/* instruction accesses stack */
++	bool accesses_stack;
+ };
  
-+#ifdef CONFIG_KASAN_GENERIC
-+void __asan_load1(void *p);
-+void __asan_store1(void *p);
-+void __asan_load2(void *p);
-+void __asan_store2(void *p);
-+void __asan_load4(void *p);
-+void __asan_store4(void *p);
-+void __asan_load8(void *p);
-+void __asan_store8(void *p);
-+void __asan_load16(void *p);
-+void __asan_store16(void *p);
-+#endif /* CONFIG_KASAN_GENERIC */
+ #define MAX_USED_MAPS 64 /* max number of maps accessed by one eBPF program */
+diff --git a/kernel/bpf/core.c b/kernel/bpf/core.c
+index 8b018ff48875..340abfdadbed 100644
+--- a/kernel/bpf/core.c
++++ b/kernel/bpf/core.c
+@@ -1582,6 +1582,16 @@ bool bpf_insn_is_indirect_target(const struct bpf_verifier_env *env, const struc
+ 	insn_idx += prog->aux->subprog_start;
+ 	return env->insn_aux_data[insn_idx].indirect_target;
+ }
 +
- #endif /* LINUX_KASAN_H */
-diff --git a/mm/kasan/kasan.h b/mm/kasan/kasan.h
-index fc9169a54766..3bfce8eb3135 100644
---- a/mm/kasan/kasan.h
-+++ b/mm/kasan/kasan.h
-@@ -594,16 +594,6 @@ void __asan_handle_no_return(void);
- void __asan_alloca_poison(void *, ssize_t size);
- void __asan_allocas_unpoison(void *stack_top, ssize_t stack_bottom);
++bool bpf_insn_accesses_stack(const struct bpf_verifier_env *env,
++			     const struct bpf_prog *prog, int insn_idx)
++{
++	if (!env)
++		return false;
++	insn_idx += prog->aux->subprog_start;
++	return env->insn_aux_data[insn_idx].accesses_stack;
++}
++
+ #endif /* CONFIG_BPF_JIT */
  
--void __asan_load1(void *);
--void __asan_store1(void *);
--void __asan_load2(void *);
--void __asan_store2(void *);
--void __asan_load4(void *);
--void __asan_store4(void *);
--void __asan_load8(void *);
--void __asan_store8(void *);
--void __asan_load16(void *);
--void __asan_store16(void *);
- void __asan_loadN(void *, ssize_t size);
- void __asan_storeN(void *, ssize_t size);
+ /* Base function for offset calculation. Needs to go into .text section,
+diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
+index 1e36b9e91277..7bce4fb4e540 100644
+--- a/kernel/bpf/verifier.c
++++ b/kernel/bpf/verifier.c
+@@ -3502,6 +3502,11 @@ static void mark_indirect_target(struct bpf_verifier_env *env, int idx)
+ 	env->insn_aux_data[idx].indirect_target = true;
+ }
  
++static void mark_insn_accesses_stack(struct bpf_verifier_env *env, int idx)
++{
++	env->insn_aux_data[idx].accesses_stack = true;
++}
++
+ #define LR_FRAMENO_BITS	3
+ #define LR_SPI_BITS	6
+ #define LR_ENTRY_BITS	(LR_SPI_BITS + LR_FRAMENO_BITS + 1)
+@@ -6490,6 +6495,8 @@ static int check_mem_access(struct bpf_verifier_env *env, int insn_idx, u32 regn
+ 		else
+ 			err = check_stack_write(env, regno, off, size,
+ 						value_regno, insn_idx);
++
++		mark_insn_accesses_stack(env, insn_idx);
+ 	} else if (reg_is_pkt_pointer(reg)) {
+ 		if (t == BPF_WRITE && !may_access_direct_pkt_data(env, NULL, t)) {
+ 			verbose(env, "cannot write into packet\n");
 
 -- 
 2.53.0
