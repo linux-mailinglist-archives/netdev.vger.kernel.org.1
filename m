@@ -1,64 +1,61 @@
-Return-Path: <netdev+bounces-278197-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278198-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OKJKDYFY3WkFcQkAu9opvQ
-	(envelope-from <netdev+bounces-278197-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 22:56:33 +0200
+	id 3XHjNClZ3WnYcwkAu9opvQ
+	(envelope-from <netdev+bounces-278198-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 22:59:21 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 805A53F3505
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 22:56:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 578C43F3533
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 22:59:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2E63530B7EFC
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 20:50:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8539C302BDFD
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 20:53:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E4DA37E306;
-	Mon, 13 Apr 2026 20:50:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B80313859D9;
+	Mon, 13 Apr 2026 20:53:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ESXWXt2D"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R9isYdre"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B9213542E5
-	for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 20:50:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9450D347BA5;
+	Mon, 13 Apr 2026 20:53:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776113420; cv=none; b=EdDC5Voo0/vs+X7aHCYSH04hEBqCRfJ7WaFZtzIIE+yS/zFdddIqkjKVRm69Q/bW5Wx+rR/45ltmOKzG4jYZQhn1ccVOMQ+vtF/swt2pC53YijNIrekwc/7e3ej80NhGvmI+I3MvU6LvSeQEfdxx5iogsgEQcSrQ5L8vaV6s+uc=
+	t=1776113610; cv=none; b=AAC44yCE6atKe4f04CtmKWdCj4c8OLyBtoDpiym6RnnzKgffBBfCqFNpSMVhydjT5x0h/uCS1UG9pxYU7LiqPmlOtCPulBvfndKCo4b5nW1WNF6Jl+qNUvKqhSsLnD/HsA92HakV3YSxCW2UnkwOf8LyFNyIPu5BkEekywd36YQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776113420; c=relaxed/simple;
-	bh=z5ggFBTCYXZ4iQPoi4R7C2G+I1mDqrCkwTxUWC2hdKc=;
+	s=arc-20240116; t=1776113610; c=relaxed/simple;
+	bh=P/rJiMEHhO7Gh9LW3ve5RLu5Z8y7cE2unh6UzHui4n4=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bCqHhVUp3b3c5lycozR1KMyxwvVvDf1cGmohnJZ5WuePALHBOkFCfg8ClvJgJnkQgdJumJepquiYOMoGK3tPgZ+1RAwDzYuCJ0F+QAZQf/OMCQBVEwjIGcHPdma+9dhUQFdirbZoVLC+W/+K7mUu613G3yi1r4s0pr84NQMUys0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ESXWXt2D; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95926C2BCAF;
-	Mon, 13 Apr 2026 20:50:19 +0000 (UTC)
+	 MIME-Version:Content-Type; b=oWy+CehczFn6dQmDYmwZuhZP/jBzGv9rnDGDiH4dk7LvNBkW+URMARN3vX0rMClxs8rgxd9loG+s7ox4GMgb2hjh+hY3bK2CTXNe6zlPqV0tICtw18xRTr3DZBYun3YTiA3C69wwqlAz5ysXlIgA1qMaTd0R+v4X3Nglkoa+h1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R9isYdre; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0AF7C2BCAF;
+	Mon, 13 Apr 2026 20:53:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776113420;
-	bh=z5ggFBTCYXZ4iQPoi4R7C2G+I1mDqrCkwTxUWC2hdKc=;
+	s=k20201202; t=1776113610;
+	bh=P/rJiMEHhO7Gh9LW3ve5RLu5Z8y7cE2unh6UzHui4n4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ESXWXt2DCvlxBlS7DZFuJv6w9UMrL4eE5LY548srRAAVL4+tOUroVEm7DEP0ExrgZ
-	 acDFtv/Xo/9kU1VNXyqRF4YSya1rtvAnYin/psxase9mwTnDBn/GlmFhYlpRqOGtEr
-	 +QLv+mUlypfngz6t+344btCEjXgGEV2JjqtVJyq5aOQaW2qxC3zU6dxcUxUX3Ouib0
-	 rST9qZKgnReNi1aCQIUK2sLSj2i6je8te6XykaDgjpMnTWM0+zw/w9j5HOhjZiYa6y
-	 dQS/AUAm2WL3Ab/jvMMXvzUPHJUTzVX5MQ2LmHMrc7QmsEuJsWFNCk8MX96Utz8ofa
-	 EWSduCx8bT47A==
-Date: Mon, 13 Apr 2026 13:50:18 -0700
+	b=R9isYdrezLd8PaOvN1L+PpRrpNBzaImrF7/quEK2shoF3b5jJgO7KuvJTOOwBDWV5
+	 cWuo/j2xxeq822CJkJNI1BJAyGJmeE6ZOIVxmF+7rFeFufN80GMl5r0LhH6LcJodtN
+	 UW24ueaOTCUMv+7RVop65/iQwvmoeu9B0M9Z4NHOTAO/m7OUmOwL+BY/Gg7uP/n4w0
+	 rHqG44KWHfSGOmPmT5fmGWBFWn17XpiwMyzLlm99WUYVMdRTa5WAlZQVf6YKkNhZCU
+	 MytsfEwvdHkhU9SoJhQg92Tux1VUPKq/s6EB+FuKA836rGvX2EXCsHYXZuKvZhAdMW
+	 w32ZZ8p/FEjOg==
+Date: Mon, 13 Apr 2026 13:53:19 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Alexandre Torgue
- <alexandre.torgue@foss.st.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- linux-arm-kernel@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org, Paolo
- Abeni <pabeni@redhat.com>, Sam Edwards <cfsworks@gmail.com>
-Subject: Re: [PATCH net-next] net: stmmac: enable RPS and RBU interrupts
-Message-ID: <20260413135018.59fbd3a1@kernel.org>
-In-Reply-To: <ad06yiZZbLC9k3jY@shell.armlinux.org.uk>
-References: <E1wBBaR-0000000GZHR-1dbM@rmk-PC.armlinux.org.uk>
-	<20260413110222.49fc3759@kernel.org>
-	<ad06yiZZbLC9k3jY@shell.armlinux.org.uk>
+To: f6bvp <bernard.f6bvp@gmail.com>
+Cc: linux-hams@vger.kernel.org, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com
+Subject: Re: [PATCH net-next 2/3] rose: clear neighbour pointer after
+ rose_neigh_put() in state machines
+Message-ID: <20260413135319.20336802@kernel.org>
+In-Reply-To: <20260413174238.112418-2-bernard.f6bvp@gmail.com>
+References: <5a88b747-bb06-4ebd-99de-80ceb574cf22@free.fr>
+	<20260413174238.112418-1-bernard.f6bvp@gmail.com>
+	<20260413174238.112418-2-bernard.f6bvp@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,50 +73,36 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,foss.st.com,davemloft.net,google.com,lists.infradead.org,st-md-mailman.stormreply.com,vger.kernel.org,redhat.com,gmail.com];
-	TAGGED_FROM(0.00)[bounces-278197-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-278198-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_FIVE(0.00)[5];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 805A53F3505
+X-Rspamd-Queue-Id: 578C43F3533
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, 13 Apr 2026 19:49:46 +0100 Russell King (Oracle) wrote:
-> > Firing interrupts when Rx fill ring runs dry (which IIUC this patches
-> > dies?) is not a good idea.  
-> 
-> Well, I'm thinking that at least on some platforms, such as the Jetson
-> Xavier NX, unless a different solution can be found, we need the RBU
-> interrupt to fire off a reset of the stmmac IP when this happens to
-> reduce the PAUSE frame flood on the network.
-> 
-> If we can't do that, then I think stmmac on these platforms needs to be
-> marked with CONFIG_BROKEN because right now there doesn't seem to be any
-> other viable solution.
-> 
-> My intention with this patch is merely to start collecting the already
-> existing statistics so other users can start seeing whether they are
-> hitting the same or similar problem. If we're not prepared to do that,
-> then we should delete the useless statistics from ethtool -S, but I
-> suspect they're now part of the UAPI, even though without this patch
-> they will remain stedfastly stuck at zero.
+On Mon, 13 Apr 2026 19:42:37 +0200 f6bvp wrote:
+> Signed-off-by: f6bvp <bernard.f6bvp@gmail.com>
 
-Understood, thanks for the extra context. And the statistic we are
-talking about is rx_buf_unav_irq ?
+Human name is required when authoring patches.
+Please do not post patches in reply to existing threads. See:
+https://www.kernel.org/doc/html/next/process/maintainer-netdev.html
+-- 
+pw-bot: cr
 
