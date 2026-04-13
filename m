@@ -1,53 +1,65 @@
-Return-Path: <netdev+bounces-278209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278211-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KBGjD9Jn3WnsdgkAu9opvQ
-	(envelope-from <netdev+bounces-278209-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 00:01:54 +0200
+	id QB8bOoRp3WnfdwkAu9opvQ
+	(envelope-from <netdev+bounces-278211-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 00:09:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A9DC3F3B04
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 00:01:53 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 595643F3B69
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 00:09:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2C02A305E1F7
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 22:00:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5E010302BE21
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 22:08:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFC8538CFEF;
-	Mon, 13 Apr 2026 22:00:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6923539A7F0;
+	Mon, 13 Apr 2026 22:08:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S0RBCEYI"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="Vpj8tidj"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCACB18050
-	for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 22:00:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3606B399364
+	for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 22:08:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776117638; cv=none; b=P3qjU0zZ7ONMjbfxxkEwal7GJSxX44Q4aglWeRCKSVgGOisS3lXHCUr6yL+M77vvnrT5tcCrCkKauEm6IEXTOgRzhJsh+wo8VotaQ0BXO41K+6eh/Nb8xGYoBdHB1zJ8dcqqmYDjdqXqNzFo9QXroSPSOhUipy2yqNPLmmDH1As=
+	t=1776118104; cv=none; b=lyLzy5zaJuaBx9EtHFtR6NXlJhRRrEDwCutltTMDwYI1mthEkaZC3UfD+HYDB//QDDOgEdWoltGPzGfuz8bevFVRvrnKUmYMKnbCX0KmuaOLGHyhOwFxhMnQcjL7EewFy3VUVGns00ZzPgUtaNGN4l5M+3eBmvPEAVB/Vp79fC8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776117638; c=relaxed/simple;
-	bh=tLt4MrLSUuyC46ZPh6Lc6VBJjwvbru1bIpP/5h9L/yw=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Su/TfW4dnRmjegk4Pz1PiTI9CLdIusA1GYB+vtqeZCOiKawdn1osZqoPR2UU82k7o+KJsxIKbUhsR7YskAnOFPP87CYHnlmkJfFUv3dRdBeZlrRV6keiznYNH3wf9IzT630uXqkB8fkFpUHKogNuOB4F4g0JxdgP8N83YBrsonI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S0RBCEYI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B06FC2BCAF;
-	Mon, 13 Apr 2026 22:00:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776117638;
-	bh=tLt4MrLSUuyC46ZPh6Lc6VBJjwvbru1bIpP/5h9L/yw=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=S0RBCEYIx9NUrdM0xJSW1Km/E8zIxavKc3c/ikbebwI4VTs/qucZll2NqvUKaTdBA
-	 k21kXxJn3TxqrIE0nU0xmGYO5VBw+iJm1UWI+kuFVxFc5hCo5Iq8EiphFp14sHRiR9
-	 ssWUZsl3Wf/Ga3d+X9Ji43SjWYk51Z3QKihrretQ1UYd0J4alaLtKlhAlduKa8lDSb
-	 SvKHGewED7UG/NmGK2tvvHxIUkE/5+anFiSGSLHgRl/+X5RBGYaAKz26mJcO3dHLp4
-	 J3dBglkgiQBRSHKiGqmcYKI1FQYrpIS58ylqLYW/eTTcpdKSHkqcXetp8qOf1bQdWw
-	 3VdfuMw9QhrOQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02D0C3809A0C;
-	Mon, 13 Apr 2026 22:00:11 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1776118104; c=relaxed/simple;
+	bh=WP8RRazo4i8+pHKmdTpyGkzBs5OKglb0K8QfxB/9CtY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=N2NkGSQ2fEa8GIST9wGAtHIkc9EQcAd8I4e5MQy0ke/Y1aEsX43nsN7kWmBKqpDzVTDwV9xQprk88uJQwpzsQ/hjqBkRoyRd+iWLsaHUJOD+p8PN940re/D8/3AUYo2NsQQhGSlTNiFEk6kA6QAcXNHGxPw7vsC7eLTrPc/l1q4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=Vpj8tidj; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=AaAPAlrvaP4khcmeOKEgY8BTunVCuVMNBsFKS8WMTYg=; b=Vpj8tidjNuugUigfpCn2vB1uDn
+	JQe0ZazwZAuyLLbgngYofgIksDgHKKk0nyBmLWp9OHhq2l82NzC4uQZ2jpvpkrO4JMjlDDHQn3wHt
+	/vkmnOiWnOA2Zw9RqBn1WZqd9LrR5TM5xgfV7W7zPcDiWGhPcwKfjdFamTMWzBxhz+1fLpjsT9kuP
+	6tKP18a/XEXE06MYGeK/1bzsv8XxR4KAo2mfLPr8TxeDPucZQ/5375r2VCk9EOa14nvTUEuACfTyW
+	wTccsTfm6MsyFu249nvodJEvyJvIGtamfqAHVziXCubzkc77y288BP9cPvVglbFOH7KOEgDVFphZ9
+	Hu0xnbTQ==;
+Received: from localhost ([127.0.0.1])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1wCPRx-000Chq-2q;
+	Tue, 14 Apr 2026 00:08:10 +0200
+From: Daniel Borkmann <daniel@iogearbox.net>
+To: netdev@vger.kernel.org
+Cc: kuba@kernel.org,
+	dw@davidwei.uk,
+	pabeni@redhat.com,
+	razor@blackwall.org
+Subject: [PATCH net-next v2 0/3] Follow-ups to nk_qlease net selftests
+Date: Tue, 14 Apr 2026 00:08:03 +0200
+Message-ID: <20260413220809.604592-1-daniel@iogearbox.net>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,79 +67,72 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: stmmac: enable RPS and RBU interrupts
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177611760954.563263.9933342148326899367.git-patchwork-notify@kernel.org>
-Date: Mon, 13 Apr 2026 22:00:09 +0000
-References: <E1wBBaR-0000000GZHR-1dbM@rmk-PC.armlinux.org.uk>
-In-Reply-To: <E1wBBaR-0000000GZHR-1dbM@rmk-PC.armlinux.org.uk>
-To: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-Cc: andrew@lunn.ch, alexandre.torgue@foss.st.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- linux-arm-kernel@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
- pabeni@redhat.com, cfsworks@gmail.com
+X-Virus-Scanned: Clear (ClamAV 1.4.3/27970/Mon Apr 13 08:24:33 2026)
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[iogearbox.net,reject];
+	R_DKIM_ALLOW(-0.20)[iogearbox.net:s=default2302];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-278209-lists,netdev=lfdr.de,netdevbpf];
-	FREEMAIL_CC(0.00)[lunn.ch,foss.st.com,davemloft.net,google.com,kernel.org,lists.infradead.org,st-md-mailman.stormreply.com,vger.kernel.org,redhat.com,gmail.com];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NO_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_FROM(0.00)[bounces-278211-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[iogearbox.net:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_NONE(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-0.999];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,kernel];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8A9DC3F3B04
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 595643F3B69
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello:
+This is a set of follow-ups addressing [0]:
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+- Split netdevsim tests from HW tests in nk_qlease and move the SW
+  tests under selftests/net/
+- Remove multiple ksft_run()s to fix the recently enforced hard-fail
+- Move all the setup inside the test cases for the ones under
+  selftests/net/ (I'll defer the HW ones to David)
+- Add more test coverage related to queue leasing behavior and corner
+  cases, so now we have 45 tests in nk_qlease.py with netdevsim
+  which does not need special HW
 
-On Fri, 10 Apr 2026 14:07:51 +0100 you wrote:
-> Enable receive process stopped and receive buffer unavailable
-> interrupts, so that the statistic counters can be updated.
-> 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> ---
-> Since we are seeing receive buffer exhaustion on several platforms,
-> let's enable the interrupts so the statistics we publish via ethtool -S
-> actually work to aid diagnosis. I've been in two minds about whether
-> to send this patch, but given the problems with stmmac at the moment,
-> I think it should be merged.
-> 
-> [...]
+  [0] https://lore.kernel.org/netdev/20260409181950.7e099b6c@kernel.org
 
-Here is the summary with links:
-  - [net-next] net: stmmac: enable RPS and RBU interrupts
-    https://git.kernel.org/netdev/net-next/c/1b9707e6f1a9
+v1->v2:
+ - Fixed ruff ambiguous variable name
+ - Fixed https://sashiko.dev/#/patchset/20260413114011.588162-1-daniel%40iogearbox.net
+   findings except the one in patch 1 since if something goes wrong
+   there, then the test fails and socket gets cleaned up via cyclic
+   GC run anyway
 
-You are awesome, thank you!
+Daniel Borkmann (3):
+  tools/ynl: Make YnlFamily closeable as a context manager
+  selftests/net: Split netdevsim tests from HW tests in nk_qlease
+  selftests/net: Add additional test coverage in nk_qlease
+
+ tools/net/ynl/pyynl/lib/ynl.py                |   10 +
+ .../selftests/drivers/net/hw/nk_qlease.py     | 1142 ---------
+ tools/testing/selftests/net/Makefile          |    1 +
+ tools/testing/selftests/net/nk_qlease.py      | 2109 +++++++++++++++++
+ 4 files changed, 2120 insertions(+), 1142 deletions(-)
+ create mode 100755 tools/testing/selftests/net/nk_qlease.py
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.43.0
 
 
