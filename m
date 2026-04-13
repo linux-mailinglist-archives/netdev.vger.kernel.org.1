@@ -1,162 +1,173 @@
-Return-Path: <netdev+bounces-278045-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278046-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MBVbMtvM3GmcWQkAu9opvQ
-	(envelope-from <netdev+bounces-278045-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 13:00:43 +0200
+	id 4LyrJQLN3GmcWQkAu9opvQ
+	(envelope-from <netdev+bounces-278046-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 13:01:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B5F23EB05B
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 13:00:43 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 134CF3EB072
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 13:01:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id AF66F3007898
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 11:00:42 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8275730045B5
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 11:00:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E5E03BD64F;
-	Mon, 13 Apr 2026 11:00:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A3AB324B32;
+	Mon, 13 Apr 2026 11:00:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="P1XypkgU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NQvRH2li"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE16C318EDA;
-	Mon, 13 Apr 2026 11:00:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EDDA320A0B
+	for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 11:00:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776078039; cv=none; b=RmSI+ZTRn0GM3dxZX15eZXVWYCS4Dpxd9NCo1bR+r2sNW4CpeE8pbYqBvupGdnhY7HI14Tfeuk2hCAqc6OxSWJ9NuxT0FbynMOZknbYUHv48Ek2UUqQHza3RSNKPiaysFAo265lgH7sro4A3Vjf/Yfljq4c4Mg9r6Kwxop/1clE=
+	t=1776078049; cv=none; b=KTaDrUz1OnuszZtnJ44CXF8Iy2skk13BUks2remxia8cPbI11pgR1W+/m4M1TDF/HFWT7Wdzr5MWpyy+rfWDV/ZGjWahY823y5eERDTm3b3VnxDe06dc55TvCfEHbktBNi/2VKfBGkCNZbscCQwCL3a1/68g3vok53zS6yYNoME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776078039; c=relaxed/simple;
-	bh=n6dnNNSI4e88eDikuxGwDJcwTsuH1VbgE3phSAFdzFo=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OUAd5W3VkYmf4zM6Mt41KskLSmxroxFR1rxN8Dm9ggjzEScS+wAmeMsBYcLaOhSY+32BpMbM4nONG4tR1NGDJiVLJQfqiTI40A3VNLEIklS05cC1bNCDLjfkGOQ5ih3e+0B+nHHSbB9qhBZPnJOFciH0DR5maCX64+BFx/n/VTI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=P1XypkgU; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63D2IWi63996852;
-	Mon, 13 Apr 2026 04:00:25 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=eZ6cOdd746/9RpWlBI+Qa8/06
-	9H3roFVjc3HrN8FPiM=; b=P1XypkgUMl6iJQRQJdSfAH1SGYYOe8xwx6nPuWQeT
-	jBOg/Bm1iLO+QYDLnDzm503uLbor59iZVQL8gwvmATmNTJPoIew4EU9lO7nLREw+
-	Vk+ihwn/Ebg/esE9a/rCIiqg97HBXJywxESTezQcfz5X86AYKqR8VeIc2WLIHzSj
-	sjIlrkK8zPf+LvJS78QzwXYbT8liW0WAKpFrTpdc+jhw+27+B6i8TMOGaKViZ0sk
-	1YOyQIipURuiTSfzlWq8O2ZDQUwO6qOQUkWoMv1j1CrCuTjbLfoidpvLeBrbNoeV
-	e0QiQ7tqZC+qIubusbZrIpYcUY7PHd3qU3CLZ13xeMwHg==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4dgqjaruws-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 13 Apr 2026 04:00:24 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Mon, 13 Apr 2026 04:00:23 -0700
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Mon, 13 Apr 2026 04:00:23 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Mon, 13 Apr 2026 04:00:23 -0700
-Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with SMTP id E7A333F704C;
-	Mon, 13 Apr 2026 04:00:16 -0700 (PDT)
-Date: Mon, 13 Apr 2026 16:30:15 +0530
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: Paolo Abeni <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-rdma@vger.kernel.org>, <sgoutham@marvell.com>,
-        <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <donald.hunter@gmail.com>, <horms@kernel.org>,
-        <jiri@resnulli.us>, <chuck.lever@oracle.com>, <matttbe@kernel.org>,
-        <cjubran@nvidia.com>, <saeedm@nvidia.com>, <leon@kernel.org>,
-        <tariqt@nvidia.com>, <mbloch@nvidia.com>, <dtatulea@nvidia.com>
-Subject: Re: [PATCH v11 net-next 4/7] devlink: Implement devlink param multi
- attribute nested data values
-Message-ID: <adzMvyIr7-uBtGlI@rkannoth-OptiPlex-7090>
-References: <20260409025055.1664053-1-rkannoth@marvell.com>
- <20260409025055.1664053-5-rkannoth@marvell.com>
- <b52ce943-18f7-4402-8b6a-3d9f69bf7d19@redhat.com>
+	s=arc-20240116; t=1776078049; c=relaxed/simple;
+	bh=VZ8HyhhFjFyVQH7uSTfub/ydKk+nqQohlEtDDAToMxo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GALbBlPVN40fiy9gq7SpWz8aZQaiISetIN2pK6FOcHMyD8zBqrkaIxR+fBZugzjiJkG6EGz/UnakUjW+ILWlM6FGgJmAdodvmGPY7Y4/LrVEdntEm2hnxAsXl7JZBToJcDj5T0Fucf2SerCslTJR3Q0515tEXDzAr/i4j97Jlms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NQvRH2li; arc=none smtp.client-ip=209.85.216.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-35fb166b0c6so457012a91.0
+        for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 04:00:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776078047; x=1776682847; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=WlXWYUs2IaHZYtZ4dVKqvKjo4K/vgTx13ZoUtAyHYF0=;
+        b=NQvRH2li2NBvdQa6pH7Z+KFRhxsz2x+8PJWOFMgjuAW1lIb+AfrpItmk3wVPKYpxeJ
+         +kBk2M9UZGvELLYYCiCdbDBV0RneGLmit8Vl8shmMrwbVcsnbGvegui3b9iph/hCn8bz
+         6l431CwvmIUZHkmroX0TYEucNZVkfdes94wqox/ROJmW/d7k/7uZptP3qIJ314yxg7KI
+         gtk7OYfVmZetMKR5qlRb9fkhyFcjso8GJYsGvhwtR+p7WaT1azpdkl7xKpLWe63zYSsK
+         8I01jUW5yG7emiSVsbH6ezf/pi8mOklkxY5jCC3PI/lZ8bPYG7HjFGMbPbrE85gXbiuV
+         VC3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776078047; x=1776682847;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WlXWYUs2IaHZYtZ4dVKqvKjo4K/vgTx13ZoUtAyHYF0=;
+        b=n5jXkBGzzPAn2RNTppRRc1CfvkCq7a35L5K+RgRG7EZh3cRqOZJkhhGq1kjolcEwlI
+         ySK2dAW6SFMrzyembK0iqnTlV6RBJu4Rh0O9PncmR8I/uDSAybW/DbZtkOIh1jgGq/FU
+         f4Lxw1lpQRl1oB4PB9xZ1UYBueQ2UfiK+fekg83Pjc+JiNMEsgDm/PNKPzbs+JbzZ68r
+         v9JjSnHYEnIzS0fazkiqA3VobUNhJNhqLDIdI0Vr3gFhXrDMyJADZWiP44MvAwun38yw
+         4V+bZBOTuT1/sIocPRFV0oVbZCo6crsWI5/im/qZo5Htbsq8X+AAbpk8UpU5r8qmbWwF
+         yIFw==
+X-Gm-Message-State: AOJu0Yz9mx0DbfG/VJZzitO/2i4ru5FZzMgE2ueQNb2JFs+pORSGEUZQ
+	WgSZZvIh9Z2VvQRK23E/yr9w1D7hewJJzHjNs4DsdKMKxfVZJ1+bP6NvTs+VDw==
+X-Gm-Gg: AeBDiet4RbwqD8PSNzO6OALUBqIpPhcdF7wQlmkqp43kqeH3gno5PYvd/EBSD3UYFWA
+	zqZNrALdZrP46Gin6RKDGGiqWS3WU5u8swB7YsQQOmDtQyRuQd/gbw3Z+m9S9WE/RFlVb58lV1s
+	9JFUmYMEhtSzIiRjalaGMLw/WcvNbuKQZ//0v6aU9qGGcUYgQV59laeCv6MrW8AZd4LMb7K8PVX
+	3FoqTkUQHAxqL2QOnRq83K7yMTJQqKg20kvtsKo7GLChLgFiGYBB3ds0xS+nCrWf7wGBU8R77s8
+	zbuIxIel/cXsxFV18Q/oCqQHuqrg04HPUrn4GGKhcwQnRNU3IeQd7b9ZMpMU4/vnN7ibfLN46Yb
+	VgFG1V2HkAl6ZtLx/ycLD4enVzwHF27dTn4Zu40QAm/Hgl53VK8SW8cACsauNRHcoNdutZs/4K5
+	s0PccGeNPPOKnqXoBJOg0+umA1Zh79obVKWA==
+X-Received: by 2002:a17:90b:1d91:b0:35f:b57e:7f33 with SMTP id 98e67ed59e1d1-35fb57e8053mr2712625a91.14.1776078047091;
+        Mon, 13 Apr 2026 04:00:47 -0700 (PDT)
+Received: from gmail.com ([218.253.131.218])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-35e5aebb15esm4545825a91.4.2026.04.13.04.00.44
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Mon, 13 Apr 2026 04:00:46 -0700 (PDT)
+From: Dudu Lu <phx0fer@gmail.com>
+To: netdev@vger.kernel.org
+Cc: toke@toke.dk,
+	jhs@mojatatu.com,
+	jiri@resnulli.us,
+	Dudu Lu <phx0fer@gmail.com>
+Subject: [PATCH v2] net/sched: sch_cake: fix NAT destination port not being updated in cake_update_flowkeys
+Date: Mon, 13 Apr 2026 19:00:41 +0800
+Message-Id: <20260413110041.44704-1-phx0fer@gmail.com>
+X-Mailer: git-send-email 2.39.3 (Apple Git-145)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <b52ce943-18f7-4402-8b6a-3d9f69bf7d19@redhat.com>
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDEzMDEwOCBTYWx0ZWRfX1PrxP9GDcSSd
- p0pgA6jOLyHi23z9A+YFZYBJizpniNRBTrgyoumbQi3BpaXm/SL48tYsR86j+kj1tsXpyctKj9R
- KyNJnXWvBZwDk5qwturJGi9kg9CWjn4IMR0jYssC3NIsuODaRtTJrDG60x6HiuJ6stI5sT9jb+5
- eX665bbnLMtlZnLTOARm5dZ6s9jP/mocRPZnVm0t7ue2UaqEX3yihNMZ1IbxZ1aUr4E16oD5v+H
- Ypj+uNfpiIrQt4MyJ8EDBJe+LOMtojoa0gSIpP1jNjAVlLaplOIwt+RkB23j1OJP6w96T7PJ3jr
- kgbPdmcs7+gpnw7qBej6sFldv3ZlieAatA7YnvmDhLaurDGUt+gKZrwdFzrQ7F5T2S0TDxVS4gM
- aQYtkBvLoxESZUwiXP/ZNKrUyUyae8LjeC+n8spbOMnknrThxh5sy6fDSp7Y+tMKxH1jDbgjQd1
- g1gTv4clms31fq+O8rA==
-X-Proofpoint-ORIG-GUID: hweeKS6qICl4RCz2NEFftlZ1Ckp5m1nY
-X-Proofpoint-GUID: hweeKS6qICl4RCz2NEFftlZ1Ckp5m1nY
-X-Authority-Analysis: v=2.4 cv=M9p97Sws c=1 sm=1 tr=0 ts=69dcccc8 cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=kj9zAlcOel0A:10 a=A5OVakUREuEA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=l0iWHRpgs5sLHlkKQ1IR:22 a=qit2iCtTFQkLgVSMPQTB:22 a=VwQbUJbxAAAA:8
- a=M5GUcnROAAAA:8 a=20KFwNOVAAAA:8 a=J8eLg_BmoFaBhDuSrmQA:9 a=CjuIK1q_8ugA:10
- a=OBjm3rFKGHvpk9ecZwUJ:22 a=JSVlQr4fib6YhFFKv7Hz:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-04-13_03,2026-04-13_01,2025-10-01_01
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-278045-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[20];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[toke.dk,mojatatu.com,resnulli.us,gmail.com];
+	TAGGED_FROM(0.00)[bounces-278046-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,marvell.com,lunn.ch,davemloft.net,google.com,kernel.org,gmail.com,resnulli.us,oracle.com,nvidia.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,marvell.com:dkim];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[phx0fer@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[marvell.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[9]
-X-Rspamd-Queue-Id: 8B5F23EB05B
+	NEURAL_HAM(-0.00)[-0.998];
+	RCPT_COUNT_FIVE(0.00)[5];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 134CF3EB072
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 2026-04-13 at 16:24:41, Paolo Abeni (pabeni@redhat.com) wrote:
-> On 4/9/26 4:50 AM, Ratheesh Kannoth wrote:
-> > @@ -441,6 +448,7 @@ union devlink_param_value {
-> >  	u64 vu64;
-> >  	char vstr[__DEVLINK_PARAM_MAX_STRING_VALUE];
-> >  	bool vbool;
-> > +	struct devlink_param_u64_array u64arr;
->
-> You mentioned that you intend to handle the possible CONFIG_FRAME_WARN
-> with a separate patch. IMHO such patch need to be part of this series,
-> or things will stay broken for an undefined amount of time until such
-> patch is merged separatelly.
+cake_update_flowkeys() is supposed to update the flow dissector keys
+with the NAT-translated addresses and ports from conntrack, so that
+CAKE's per-flow fairness correctly identifies post-NAT flows as
+belonging to the same connection.
 
-Patch no: 3 in the same series.
-https://lore.kernel.org/netdev/20260409025055.1664053-4-rkannoth@marvell.com/#t
+For the source port, this works correctly:
+    keys->ports.src = port;
 
->
-> /P
->
+But for the destination port, the assignment is reversed:
+    port = keys->ports.dst;
+
+This means the NAT destination port is never updated in the flow keys.
+As a result, when multiple connections are NATed to the same destination,
+CAKE treats them as separate flows because the original (pre-NAT)
+destination ports differ. This breaks CAKE's NAT-aware flow isolation
+when using the "nat" mode.
+
+The bug was introduced in commit b0c19ed6088a ("sch_cake: Take advantage
+of skb->hash where appropriate") which refactored the original direct
+assignment into a compare-and-conditionally-update pattern, but wrote
+the destination port update backwards.
+
+Fix by reversing the assignment direction to match the source port
+pattern.
+
+Fixes: b0c19ed6088a ("sch_cake: Take advantage of skb->hash where appropriate")
+Signed-off-by: Dudu Lu <phx0fer@gmail.com>
+---
+ net/sched/sch_cake.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/sched/sch_cake.c b/net/sched/sch_cake.c
+index 9efe23f8371b..4ac6c36ca6e4 100644
+--- a/net/sched/sch_cake.c
++++ b/net/sched/sch_cake.c
+@@ -619,7 +619,7 @@ static bool cake_update_flowkeys(struct flow_keys *keys,
+ 		}
+ 		port = rev ? tuple.src.u.all : tuple.dst.u.all;
+ 		if (port != keys->ports.dst) {
+-			port = keys->ports.dst;
++			keys->ports.dst = port;
+ 			upd = true;
+ 		}
+ 	}
+-- 
+2.39.3 (Apple Git-145)
+
 
