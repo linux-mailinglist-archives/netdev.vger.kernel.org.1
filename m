@@ -1,145 +1,189 @@
-Return-Path: <netdev+bounces-278093-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278095-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sM6dLib43GnLYgkAu9opvQ
-	(envelope-from <netdev+bounces-278093-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 16:05:26 +0200
+	id gMeWOrH73Gk3YwkAu9opvQ
+	(envelope-from <netdev+bounces-278095-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 16:20:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50AB53ECF18
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 16:05:26 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EBAF3ED3E2
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 16:20:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 458B53012207
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 14:04:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D75C73045009
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 14:11:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E1CB3D525A;
-	Mon, 13 Apr 2026 14:04:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88F373D75C3;
+	Mon, 13 Apr 2026 14:11:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sQ/rI1Uv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HBiaJQi/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f41.google.com (mail-yx1-f41.google.com [74.125.224.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 793853D523E;
-	Mon, 13 Apr 2026 14:04:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776089053; cv=none; b=EZM8rTuMDsd/kMoBMh1nCTjaQ1whqNMJLAUWKed/TjbyIDpxZnlW+6mG+iN9M81NzIggnoSahQXbVZYbwbxW1XghEkd49lY97CDtltW9blb3gwDHnK+Pb5Zl317ADZ+/ezWFrE5XhdDqj/c0fwvfAUXZNtG5qm8MZ7m0XaYXWzU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776089053; c=relaxed/simple;
-	bh=PZPocgNq/t+BoK9YO0g4NcHOvsEnwrcuzcTMgVzbDRc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lySxyctB2xFIXBFB4+OIAuG0ypwQZMERc/vAVEH7MYBWnvgyd9jIVAjDdnn/n1WSr3A/JMFA/jJ2v1oHxH/lDgFh/nVko6ULyG9JQZevYjLnNiCh4mh0by/K5NM4fZCuH1YWTn3vklAn+IBx443IAwy028HPwP/pKjTl+X2olqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sQ/rI1Uv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9062CC2BCAF;
-	Mon, 13 Apr 2026 14:04:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776089052;
-	bh=PZPocgNq/t+BoK9YO0g4NcHOvsEnwrcuzcTMgVzbDRc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=sQ/rI1UvHOQ+roW0A6IDSgDJ1b0pLaQvXe5zqkw+FVGVpWk8EG1wK8fGIagzv6Mim
-	 4O8BpTNUTZPrNHweOqewPuZft/QR4+jHezJ/glnRr/F91wRA6HcCOzM7ormX8x8lds
-	 dR9IPCfYKcSZNwExOtF+Y78WtWLmejYpNQ92Ya7SH8y2HcZL4Tf4TVsEw+uehCRszU
-	 lUy0lOI5KQVDIewL3zdcwlsxR2nJw6h0XZda++ue09kUXr6LITbszedrYV4YeMqXUi
-	 D1ylNUlHp0S5hV4a0Xk971C+ZxKs2YgRY1oIAkHAgxmQ7oEVUsrCPzOWi7WeIfzBL4
-	 E/Fmsl2sCLMMQ==
-From: Simon Horman <horms@kernel.org>
-To: aleksandr.loktionov@intel.com
-Cc: 'Simon Horman' <horms@kernel.org>,
-	intel-wired-lan@lists.osuosl.org,
-	anthony.l.nguyen@intel.com,
-	netdev@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH iwl-net v2 6/6] ixgbe: fix integer overflow and wrong bit position in ixgbe_validate_rtr()
-Date: Mon, 13 Apr 2026 15:03:07 +0100
-Message-ID: <20260413140307.715409-1-horms@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260408131154.2661818-7-aleksandr.loktionov@intel.com>
-References: <20260408131154.2661818-7-aleksandr.loktionov@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EA323D9024
+	for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 14:11:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.41
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776089494; cv=pass; b=UJ3hvAHGR7RMMMg1lXCphnaZdbE50TLQlE42ODW1zLV8oEv084zlXkdoFMwMHI9OhI9QFLUMhFJNE8jLD7jwlB7yQxfjh/DfLfe1pcgl48qKozCipm8iU3S5I01dZxXWBBPhgIESTWB6qZvi0mACgzjWGXRNv/BrAEx5+gpkLOE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776089494; c=relaxed/simple;
+	bh=bT9M9n4XOV8yqBZqbYEWXJ4ln1b1YhEtptjZ4KTGE8A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Adn9saBEUNMoaIV+YRrH3uyIFosQALhyv9YO41b6USeA00RhkfDcs+cP6rd5Gx7MYEv+SiOlrfgEwMX6F1sAlBzHl0grPXXsU15kJcTTXNkuukWnUvOuwZgzvK9O6VFjBcMMnd4EwOxXlK6k3Sa8GBA45cJwq0nrlSg8fg4yJ1Q=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HBiaJQi/; arc=pass smtp.client-ip=74.125.224.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f41.google.com with SMTP id 956f58d0204a3-651b4d09141so2184422d50.1
+        for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 07:11:33 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776089492; cv=none;
+        d=google.com; s=arc-20240605;
+        b=aFiXgjb1Q7G1VpB9L6T90x6hNLU3xA3+uah4PkuaG1z8wydfcrQFc6QVgcBSAtCzHL
+         lfmPoaHSQMEug81NbKSeLsH6RkfxD8DkUuCzvOtO7yWHX1qtULFsAE5tRj9XxfyGiS1t
+         nQ14LrBzanwr8Fz8O2ohxR1v4Wl3K0zW9JCb7h4chUhrtRIxwoPCqiFpsr+jh6XTAEmm
+         BtGh+x9xQzfy8e9xRpGt/G07146/AGc/Id9SkDk3M5U2WQcfAsfIEmG1VFrGjx5zC9SP
+         avYoWv+R637XScI25+qVTnLF3GrLb5wrlLEPxbkAwJHR59F8BDQwlC0RLyAQTb6FgVRd
+         2cjw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=FpnyTQSu4pDMNNPRZu+lnNkKWw5DBBz1SoIVT6Ykkgc=;
+        fh=hLkgRsa9OUp7tgdlh2u/yCick2o7boSBcQ/frKpiKL8=;
+        b=XhfOu+pQGBkaOfSYuTtwIdQws/N4SCWV0bQWvsNM6sGNu30Imw2Kb17m+JOfj1ToCK
+         Y6K8DPmbfqijwaVRaz03mckyFkjqFjgCoVxYwy4K/hxG6O+ZI/pEOWduoCG2uIziyZtA
+         pS6KNhB8epDB2bC6daYF2xUp1vGNWN2WewoCNW6+M1lpdZ8sssDOkwIIekgd7NInbKDc
+         loMidRQqtrESo7nj3A8ocUUkStTKcf2lNOSClsuJe4XBA6ji/bzkS7DWklzoLerOpkLp
+         Q2JDEeZe+dvkGIOdGfp2l7T2vK3UVgLd2iAFATiRLHsc8Mcjg3jxOC7J6igFfEIpYjSi
+         6HXA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776089492; x=1776694292; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FpnyTQSu4pDMNNPRZu+lnNkKWw5DBBz1SoIVT6Ykkgc=;
+        b=HBiaJQi/htoNJsWAb137bTgqJaIX52RX3s8NFK1+vGL8Y7ypOqAI5+22m3DJilOKgd
+         bqWAom8abgETb0pySF7GW/GuI9kiY6Yjuo1T0FwRvvxa0OntVke8xzzUlfEeeHrVReuC
+         NC8qsThKsXFdVNkHe+GNbjA4dAc39kLRw1DaaZcCASFPXNPeYORVsBggRcxkxLXvqUh1
+         KetDHhD92vht1Lk3VfG8+gHoa137ozLTCPXee1/AaMMa3h1joyJmeB3jj1aOYrT+x7j7
+         ffLdoQYoqi07ZVemOTJ3qXKQecUTwQl8ba1/uMC8bNSWiGABzVYP9dKwnN8Jq4Ua0zCK
+         pxyg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776089492; x=1776694292;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=FpnyTQSu4pDMNNPRZu+lnNkKWw5DBBz1SoIVT6Ykkgc=;
+        b=P3AQCkJmEcjeRfF7w1ooDpK0nNcgnKZpYlQjh0HVCc18F6jEB1kv5HW/7qe9EESs0Q
+         8tWBkQsZnAde86G60AkzUczSrlJ5WCVaiz9ll8ueUjWp6OyeaIvVjhgFo6WXzy98vrX0
+         iF59gE0JfXUPofexSR2HMtmc9HFTfvmjHbRAFpBxz9EQWb//Dj58UUQKFdlO4T34lFpn
+         cXAfCNt3cVIZ7y+I7ms71zgN5G/1aathYLX/hnNgHgYZ7+CoUsl5YgnDlEehp+ctwIgr
+         Fb7fhrb8t2dMfU6PSnREEN8knAdrVnMocn4wQ3Bc+SNBtV6WmT2TtC2xZJKc6Ts1ll/0
+         hklw==
+X-Forwarded-Encrypted: i=1; AFNElJ8HU3JtDk1L8P0HWYyDeT+9LrQ7n+OaIDZ0yqSYavQDT7E+rrtyIrYcd+WTRBotEIbn1ZBA4L4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz9nPlxpAVz70H11Ufca50oMll4KGAa2NyewxWPhsc765ud8H1p
+	N8dFYZ2sV2zKMGcZ7uf4v6XOM72z6aNjPm40h9bwQuaGZfVdv3nNTxtf7QY6xPHmaaVLCVEbzGG
+	cXlhnyFaJ3szV/8bv1VLTMz8p98ickQ0=
+X-Gm-Gg: AeBDiev18AX4Y64PwKmdFD7Ll54/9GW/Ki37l6jmj+ySdp6o69HwlPVQ1eylAStBxoA
+	LzWNOgumfTG1/WTuwB7QjnIYJydZY2H36PMSxuXapWoxieKIb75PFaKKKjJ5nkQSlR7J51xj4OF
+	cs2li+rWDv+EeRzMrM8q3h/t9Dt0fUorwNS2FUItVaSrONCBOyxJYnbEBwmemFnCRgQVewisswR
+	c+V10ZN0UrSi7STZUN4QSDDUSNUK/0o+Y3DC33caFpQJ+SoosZ3WZwY11tpQmwsjKUr5LMzSGpD
+	DpmOOvOxH9jJoiC36LED/gHMWD+X6/J0h7gR391lcIYqm1vqeX1svszJEvIrxcfNyVWRIA==
+X-Received: by 2002:a05:690e:4185:b0:651:d4ee:8e4 with SMTP id
+ 956f58d0204a3-651d4ee0a12mr1180322d50.8.1776089492134; Mon, 13 Apr 2026
+ 07:11:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+References: <20260413132247.320961-1-luiz.dentz@gmail.com> <580f7972-56d5-4968-9dcc-32adc31e0673@redhat.com>
+In-Reply-To: <580f7972-56d5-4968-9dcc-32adc31e0673@redhat.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 13 Apr 2026 10:11:21 -0400
+X-Gm-Features: AQROBzC0eEI8SZRnxEM5vEglLMfdTCm_9b7YfdWWRuzp_gnamR7LXYwG1b7IomA
+Message-ID: <CABBYNZK5mMbuzvjAquy49vSk0pLRnk_s8oqEut1se4DToURn9A@mail.gmail.com>
+Subject: Re: [GIT PULL] bluetooth-next 2026-04-13
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278093-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-278095-lists,netdev=lfdr.de];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TO_DN_SOME(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[luizdentz@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[6];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,sashiko.dev:url]
-X-Rspamd-Queue-Id: 50AB53ECF18
+	RCPT_COUNT_FIVE(0.00)[5];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 7EBAF3ED3E2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: 'Simon Horman' <horms@kernel.org>
+Hi Paolo,
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev
----
-ixgbe: fix integer overflow and wrong bit position in ixgbe_validate_rtr()
+On Mon, Apr 13, 2026 at 9:41=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
+te:
+>
+> On 4/13/26 3:22 PM, Luiz Augusto von Dentz wrote:
+> > The following changes since commit 42f9b4c6ef19e71d2c7d9bfd3c5037d4fe43=
+4ad7:
+> >
+> >   tools: ynl: tests: fix leading space on Makefile target (2026-04-09 2=
+0:41:40 -0700)
+> >
+> > are available in the Git repository at:
+> >
+> >   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-nex=
+t.git tags/for-net-next-2026-04-13
+> >
+> > for you to fetch changes up to c347ca17d62a32c25564fee0ca3a2a7bc2d5fd6f=
+:
+> >
+> >   Bluetooth: hci_qca: Fix missing wakeup during SSR memdump handling (2=
+026-04-13 09:19:42 -0400)
+> >
+> > ----------------------------------------------------------------
+> > bluetooth-next pull request for net-next:
+>
+> Net-next is closed for the merge window. I guess Jakub could still
+> consider merging this, but unless you want it very, very badly, I hope
+> it can just be postponed, as the PW queue is already long.
 
-This commit fixes two bugs in ixgbe_validate_rtr() by masking the
-traffic-class field properly before assigning it to a u8, and correctly
-shifting the mask for clearing out-of-bounds entries.
+This update includes quite a few new hardware supports. This is a
+resend because the last one was dropped due to an invalid 'Fixes' tag.
 
-Cc: stable@vger.kernel.org
+ Btw, I don't know why the entire PR needs to be dropped if only a few
+items have invalid tags? Can't we just dropped those?
 
-> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-> index 5ff462a848feb..8ebf717ce4017 100644
-> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-> @@ -9782,11 +9782,12 @@ static void ixgbe_validate_rtr(struct ixgbe_adapter *adapter, u8 tc)
->  	rsave = reg;
->  
->  	for (i = 0; i < MAX_TRAFFIC_CLASS; i++) {
-> -		u8 up2tc = reg >> (i * IXGBE_RTRUP2TC_UP_SHIFT);
-> +		u8 up2tc = (reg >> (i * IXGBE_RTRUP2TC_UP_SHIFT)) &
-> +			   IXGBE_RTRUP2TC_UP_MASK;
->  
->  		/* If up2tc is out of bounds default to zero */
->  		if (up2tc > tc)
+> Thanks,
+>
+> /P
+>
 
-This wasn't introduced by this patch, but is there a pre-existing off-by-one
-error in this bounds check?
 
-If tc represents the number of enabled traffic classes (e.g., 4), the valid TC
-indices would be 0 through tc - 1. If up2tc equals tc, it would be out of
-bounds, but the condition up2tc > tc will evaluate to false and the invalid
-mapping won't be cleared.
-
-Could this allow an invalid UP-to-TC mapping to persist in the hardware
-register, potentially causing received packets to be mis-steered to an
-uninitialized or non-existent traffic class queue?
-
-Should the condition be corrected to ensure up2tc is strictly less than tc
-when tc > 0?
-
-> -			reg &= ~(0x7 << IXGBE_RTRUP2TC_UP_SHIFT);
-> +			reg &= ~(IXGBE_RTRUP2TC_UP_MASK << (i * IXGBE_RTRUP2TC_UP_SHIFT));
->  	}
+--=20
+Luiz Augusto von Dentz
 
