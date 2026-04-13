@@ -1,148 +1,256 @@
-Return-Path: <netdev+bounces-278085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278071-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eI/+Iefw3GnZYQkAu9opvQ
-	(envelope-from <netdev+bounces-278085-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 15:34:31 +0200
+	id sGbYLvno3GmUYAkAu9opvQ
+	(envelope-from <netdev+bounces-278071-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 15:00:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 499A13EC996
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 15:34:31 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27C1B3EC4DD
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 15:00:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A6A613017BF1
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 13:33:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 739F53026A8F
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 12:56:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C984A3A168F;
-	Mon, 13 Apr 2026 13:33:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4978B3CA48F;
+	Mon, 13 Apr 2026 12:56:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="IHDTvyRD"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DKFTYdC1";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="DyhR4wmh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A14C531B838;
-	Mon, 13 Apr 2026 13:33:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 678483C3BF7
+	for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 12:56:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776087202; cv=none; b=RXuRrlc7neYNq/spJkTQEa9VMWa4YceCa37+RzWkKTTLQEB0fRhQtcP/QjxqJ/vg/e3uNAc1rLuWnE0SlZhgJ95aUJ0HNDD2diw6PbVHDp/f3bOUxw1HcoM8ODXEZyiw2ygvDqOi5a6I7YGryOoBwXQMhgc8yN5lF9IDGJSR7HI=
+	t=1776084970; cv=none; b=FLA725XxnctKF8JD5fgigwBZ7OmmWMWLCLPKf19DYAfBkI6HN7UnzA0gYjVYr/OiIH7FheUunLK2K1LHRKASftEAIHZnVHf0B+wkn2A98YQ8HigJHnNaK2wp+uDbt1x6+DOVs7Sf3umSjXjPR+nTaX6rbXBftIdNIFeClse8EJ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776087202; c=relaxed/simple;
-	bh=RGoZ0kAv/HIA5tdh+NMoNMfUmNT/RqGCY7/2guxi8Jc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Mtb8qKK402FH++Qnn1yBsq830ILOdFWkFUzwUCbHy20gXcrji8vSiBzVscS5Ne89qIWYsa8hn5z5GD5j8z6EsqXFD96Jgw0nFUrTqOKoA4+NRbRIwm3tQVZm1UzVY24jPRURIjEXyzMvEbG8leJYT2GH2b50120bHgyaOdjaDPo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=IHDTvyRD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C7C8C2BCB1;
-	Mon, 13 Apr 2026 13:33:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1776087202;
-	bh=RGoZ0kAv/HIA5tdh+NMoNMfUmNT/RqGCY7/2guxi8Jc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IHDTvyRDE3WSwBk1xO9U6TZmQvfdJH63ZqQRXS5xECfan33vXrUVzEHG90u2kV7Fn
-	 UylDAJIxPnJdQlMf+2JKWCEhBBy39FUZ9K0avT2ls5CZm3Ud4F/olNHgxFeOYUSWUW
-	 4stFN1G0CrnrpDYN+hrfNNUQcQLaD/E1a+LnwX3c=
-Date: Mon, 13 Apr 2026 14:55:06 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Thorsten Leemhuis <regressions@leemhuis.info>
-Cc: "He, Guocai (CN)" <Guocai.He.CN@windriver.com>,
-	"Berg, Johannes" <johannes.berg@intel.com>,
-	Friend <netdev@vger.kernel.org>,
-	Linux kernel regressions list <regressions@lists.linux.dev>,
-	"Korenblit, Miriam Rachel" <miriam.rachel.korenblit@intel.com>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>
-Subject: Re: commit 0c4f1c02d27a880b cause a deadlock issue
-Message-ID: <2026041330-groggy-ruse-5e27@gregkh>
-References: <CO6PR11MB5586A4475A5EEC47FC10398BCD53A@CO6PR11MB5586.namprd11.prod.outlook.com>
- <PH0PR11MB55934A1C9A8C35B1E751C247CD50A@PH0PR11MB5593.namprd11.prod.outlook.com>
- <14d65103-8809-4a1b-b115-bf5f8d7110ea@leemhuis.info>
- <CO6PR11MB5586DF3964BAB4E6131A86CDCD5EA@CO6PR11MB5586.namprd11.prod.outlook.com>
- <2026040331-evasion-walk-f572@gregkh>
- <DM3PPF63A6024A9C09C1B13E5DF46C0B72AA35EA@DM3PPF63A6024A9.namprd11.prod.outlook.com>
- <2026040349-chowtime-freeload-5ca4@gregkh>
- <DM3PPF63A6024A9E931C940F849C60FAF9EA35EA@DM3PPF63A6024A9.namprd11.prod.outlook.com>
- <58f6e74d-480e-4e0c-aa66-68dfc1de7421@leemhuis.info>
+	s=arc-20240116; t=1776084970; c=relaxed/simple;
+	bh=pKdlBBc/Zo/O/9zta+3GqZOpzw/wF/xhfIybxfLv6Dw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=h5EHibIFitCcOuPropmlDxolftf3EPmHBVsTilfg11zKm2znuplPYy3YDU36EPjv3tfN2FcYBBSmwxOtyDt1wQp6Br3VWwnOrckFn2eaQU1us/GAbIrjfgsbeC5b3WoorpxI88I7Daj11Ta8Fx3uIrVKKFfv8B9S7JyyrtbLw9g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DKFTYdC1; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=DyhR4wmh; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1776084966;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bQHnab1AqDhEpIxV325QbEK6nu+RxguHD8R3QEZxdfM=;
+	b=DKFTYdC14g9e+7MxwmwxYdBkhkwJ3yaHjcM2xoAJtxO298hfj1kPW6lK7A4AekGR1/CMr+
+	sKtWl/rAO8pWcR8IpD/7G4iapc2jQm+EQTtoCcT0BwngyRNuQo1LQaTqZpx3MJj/aiqNOc
+	B5hN0lVbI+QQmNUr3AoxlTu0klNvt1w=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-488-tIjkNz_7Ms6ZgybWJomSrg-1; Mon, 13 Apr 2026 08:56:05 -0400
+X-MC-Unique: tIjkNz_7Ms6ZgybWJomSrg-1
+X-Mimecast-MFC-AGG-ID: tIjkNz_7Ms6ZgybWJomSrg_1776084964
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-488e1757205so8043935e9.0
+        for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 05:56:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1776084964; x=1776689764; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=bQHnab1AqDhEpIxV325QbEK6nu+RxguHD8R3QEZxdfM=;
+        b=DyhR4wmhQlHNvgnEzZCOrlpIEnw28H5pg9Ycp5nejHRcbQ1rcN3fnGBLX/MFV6qI4q
+         W181vXZ+Lf+U9OC6MLTOBCFlhuueP0iBaO7pJOVz7XfiYeLC/JYcQJuuFlqP9RWhdHTS
+         YLoStWLEaKmcIWWNXAQ6Rnl3Pq5E870j4GvFL1ZJCzDkXEkJvCznX4EXAGIq9r3KbRdI
+         qSWbJUa3XyQQBKv1+T1MLXOAJhAYOjCLIU5G+aoaoJUnTy1Uiiyq6KbgKZXJX8xVyuka
+         dugT9DhBqug8xaZgzhdR6B7JZqR5EIZb+ChallcjNNr53auUDaGa9curCy2+M8tRVd0g
+         4Nbg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776084964; x=1776689764;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=bQHnab1AqDhEpIxV325QbEK6nu+RxguHD8R3QEZxdfM=;
+        b=adXI2IbUGsv2AOQ7q3fIUXyRH1tDu7Akb6jLp13N/3XhcHdh+bFzyT8XjC9+3vmblv
+         oY5U3HRXsZLlEV4aFwczfHoEusTM0o7AGVD6QcC8AhJp/AX6vF+ChEFiVZRBLZ0ybCnD
+         mC5R9k3xWs7dzf52FA7tjHOcswDA0CrezW/Sr9R6WB5Vy1hkCL+3bgmPE8GRVn0HpqZh
+         eqqTPUbCLsooGP1nlmKwVVL1ltOk/s/HFX6j1F+FpXtuOr960q8vbo0cWG4rTpg/1uGA
+         AJCLr0Sq/JeL1qY8Y7IiETU8r51xJhqloW9Lf5OGG+t4ct2i5kpgPov4F2xQR+Nde0lg
+         eraw==
+X-Forwarded-Encrypted: i=1; AFNElJ9XOcOn1jDoVwKhNFbquDT6tE9Yi9DQ3idrq9Pf9ZWvEvMRwegzY4P0ovZ0YDE3qWsEcEYdKaQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJ+FrZEW01YHL3l3FT+XJbRqWttLD3TP65zMxArV11S4E9D/w9
+	0E3TewFDIbONulec0u+9wdJqQiYb0H3+C+84kvc4p0aTK1g1SWIz013sTLDJsTNTOFr80BxgZpa
+	or3XOJcqRZ4jNtmqV9u1qeG8V8EvD0lBJVEskdhSG0+/9HinCXidgReTYiA==
+X-Gm-Gg: AeBDieu24B5Ae4LrQ2388ASsVBuleE8+t2b1C7cX/Eg1G/tlUycEaR6mfnt/w0gBpYp
+	SQjCydSwUabwKPOIcbPumMetQzS7oV9UXtoT50ntQYnB9CXtqi4zIRds0nWyx1JakYJxNLD3mR+
+	cIfplCFz94r1BJOFB1Zg4IKoRTfc79/T5NaVcHvz0QcrcnFqi3YUusbH8sdKfDPxJfRXANgQ0Xa
+	AyqxOQk/3eJB0rhTj5ZM5eI2iFE2WyqNQlXUEIVopLTMcPk157XcdqLKd++CnnEiTDmQnlni906
+	7xzya76xFoMhrB9LfS0m3qICnwT4XsTw4k3YNuO0ztJ2Atnl29JcpvF2DNvRy7Kz9jQG8yOxOlh
+	Hbe/xIHXC8M9+vIZFwwLpwV/IAoaYN9BK73catbcfZ+7FM7FhesjSpp81
+X-Received: by 2002:a05:600d:d:b0:485:2a85:e5ec with SMTP id 5b1f17b1804b1-488d67b8db8mr139359855e9.2.1776084963898;
+        Mon, 13 Apr 2026 05:56:03 -0700 (PDT)
+X-Received: by 2002:a05:600d:d:b0:485:2a85:e5ec with SMTP id 5b1f17b1804b1-488d67b8db8mr139359395e9.2.1776084963420;
+        Mon, 13 Apr 2026 05:56:03 -0700 (PDT)
+Received: from [192.168.88.32] ([216.128.11.125])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488d5b3d4dbsm293834175e9.14.2026.04.13.05.56.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 13 Apr 2026 05:56:02 -0700 (PDT)
+Message-ID: <b9ffa72d-ebe2-4fd1-b668-93620f206179@redhat.com>
+Date: Mon, 13 Apr 2026 14:56:00 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <58f6e74d-480e-4e0c-aa66-68dfc1de7421@leemhuis.info>
-X-Spamd-Result: default: False [2.34 / 15.00];
-	MID_END_EQ_FROM_USER_PART(4.00)[];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v11 net-next 5/7] octeontx2-af: npc: cn20k: add subbank
+ search order control
+To: Ratheesh Kannoth <rkannoth@marvell.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org
+Cc: sgoutham@marvell.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, donald.hunter@gmail.com,
+ horms@kernel.org, jiri@resnulli.us, chuck.lever@oracle.com,
+ matttbe@kernel.org, cjubran@nvidia.com, saeedm@nvidia.com, leon@kernel.org,
+ tariqt@nvidia.com, mbloch@nvidia.com, dtatulea@nvidia.com
+References: <20260409025055.1664053-1-rkannoth@marvell.com>
+ <20260409025055.1664053-6-rkannoth@marvell.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20260409025055.1664053-6-rkannoth@marvell.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linuxfoundation.org,none];
-	R_DKIM_ALLOW(-0.20)[linuxfoundation.org:s=korg];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[marvell.com,lunn.ch,davemloft.net,google.com,kernel.org,gmail.com,resnulli.us,oracle.com,nvidia.com];
+	TAGGED_FROM(0.00)[bounces-278071-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278085-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[20];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	DKIM_TRACE(0.00)[linuxfoundation.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[gregkh@linuxfoundation.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[]
-X-Rspamd-Queue-Id: 499A13EC996
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 27C1B3EC4DD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Apr 13, 2026 at 01:58:56PM +0200, Thorsten Leemhuis wrote:
-> On 4/3/26 15:00, Korenblit, Miriam Rachel wrote:
-> >> From: Greg KH <gregkh@linuxfoundation.org>
-> >> On Fri, Apr 03, 2026 at 12:44:48PM +0000, Korenblit, Miriam Rachel wrote:
-> >>>> -----Original Message-----
-> >>>> From: Greg KH <gregkh@linuxfoundation.org>
-> >>>> On Fri, Apr 03, 2026 at 11:08:46AM +0000, He, Guocai (CN) wrote:
-> >>>>> No, The mainline have no this issue.
-> >>>>> The changes of 0c4f1c02d27a880b is not in mainline.
-> >>>>
-> >>>> That does not make sense, that commit is really commit e1696c8bd005
-> >>>> ("wifi: cfg80211: stop NAN and P2P in cfg80211_leave") which is in
-> >>>> all of the following releases:
-> >>>> 	5.10.252 5.15.202 6.1.165 6.6.128 6.12.75 6.18.14 6.19.4 7.0-rc1
-> >>>> confused,
-> >>> The change is indeed in mainline, but the locking situation in
-> >>> mainline is totally different (that mutex does not even exist there)
-> >>> Therefore, the issue is not supposed to happen in mainline.
-> >>
-> >> Ok, does that commit now need to be reverted from some of the stable branches?
-> >> If so, which ones?
-> > 
-> > From every version which is < 6.7.
+On 4/9/26 4:50 AM, Ratheesh Kannoth wrote:
+> CN20K NPC MCAM is split into 32 subbanks that are searched in a
+> predefined order during allocation. Lower-numbered subbanks have
+> higher priority than higher-numbered ones.
 > 
-> Greg, do you still have this in your todo mail queue somewhere? Just
-> wondering, as last weeks 6.6.y released afics lacked a revert of
-> e1696c8bd0056b ("wifi: cfg80211: stop NAN and P2P in cfg80211_leave") --
-> and I cannot spot one in your public stable queue either.
+> Add a runtime devlink parameter "srch_order" (
+> DEVLINK_PARAM_TYPE_U32_ARRAY) to control the order in which
+> subbanks are searched during MCAM allocation.
 > 
-> These are the commits that according to Miri need to be reverted if I
-> understood things right:
+> Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
+> ---
+>  .../ethernet/marvell/octeontx2/af/cn20k/npc.c | 91 +++++++++++++++++-
+>  .../ethernet/marvell/octeontx2/af/cn20k/npc.h |  2 +
+>  .../marvell/octeontx2/af/rvu_devlink.c        | 92 +++++++++++++++++--
+>  3 files changed, 173 insertions(+), 12 deletions(-)
 > 
-> v6.6.128 (4d7a05da767e5c), v6.1.165 (0c4f1c02d27a88), v5.15.202
-> (31344ffecd7a34), v5.10.252 (d91240f24e831d)
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
+> index e854b85ced9e..153765b3e504 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
+> @@ -3317,7 +3317,7 @@ rvu_mbox_handler_npc_cn20k_get_kex_cfg(struct rvu *rvu,
+>  	return 0;
+>  }
+>  
+> -static int *subbank_srch_order;
+> +static u32 *subbank_srch_order;
+>  
+>  static void npc_populate_restricted_idxs(int num_subbanks)
+>  {
+> @@ -3329,7 +3329,7 @@ static int npc_create_srch_order(int cnt)
+>  {
+>  	int val = 0;
+>  
+> -	subbank_srch_order = kcalloc(cnt, sizeof(int),
+> +	subbank_srch_order = kcalloc(cnt, sizeof(u32),
+>  				     GFP_KERNEL);
+>  	if (!subbank_srch_order)
+>  		return -ENOMEM;
+> @@ -3809,6 +3809,93 @@ static void npc_unlock_all_subbank(void)
+>  		mutex_unlock(&npc_priv.sb[i].lock);
+>  }
+>  
+> +int npc_cn20k_search_order_set(struct rvu *rvu,
+> +			       u64 arr[MAX_NUM_SUB_BANKS], int cnt)
+> +{
+> +	struct npc_mcam *mcam = &rvu->hw->mcam;
+> +	u32 fslots[MAX_NUM_SUB_BANKS][2];
+> +	u32 uslots[MAX_NUM_SUB_BANKS][2];
+> +	int fcnt = 0, ucnt = 0;
+> +	struct npc_subbank *sb;
+> +	int idx, val, rc = 0;
+> +
+> +	unsigned long index;
+> +	void *v;
+> +
+> +	if (cnt != npc_priv.num_subbanks) {
+> +		dev_err(rvu->dev, "Number of entries(%u) != %u\n",
+> +			cnt, npc_priv.num_subbanks);
+> +		return -EINVAL;
+> +	}
+> +
+> +	mutex_lock(&mcam->lock);
+> +	npc_lock_all_subbank();
+> +	restrict_valid = false;
+> +
+> +	for (int i = 0; i < cnt; i++)
+> +		subbank_srch_order[i] = (u32)arr[i];
+> +
+> +	xa_for_each(&npc_priv.xa_sb_used, index, v) {
+> +		val = xa_to_value(v);
+> +		uslots[ucnt][0] = index;
+> +		uslots[ucnt][1] = val;
+> +		xa_erase(&npc_priv.xa_sb_used, index);
+> +		ucnt++;
+> +	}
+> +
+> +	xa_for_each(&npc_priv.xa_sb_free, index, v) {
+> +		val = xa_to_value(v);
+> +		fslots[fcnt][0] = index;
+> +		fslots[fcnt][1] = val;
+> +		xa_erase(&npc_priv.xa_sb_free, index);
+> +		fcnt++;
+> +	}
+> +
+> +	/* xa_store() is done under lock. If xa_store fails
+> +	 * ,no rollback is planned as it might also fail.
 
-It is, yes, my queue is huge :(
+Why do you need to go throuh erase and add loop? Why can't you directly
+xa_store() the new value? Note that xa_store() can fail due to memory
+pressure.
 
-It's fastest if someone sends me the reverts and I can easily apply them
-that way.  Otherwise it takes me a bit to do each one manually :(
+Avoiding the previous erase will prevent deallocation and re allocation
+and will avoid any reasonable xa_store() failure.
 
-thanks,
+AFAICS there are a few more items reported by sashiko, please have a look:
 
-greg k-h
+https://sashiko.dev/#/patchset/20260409025055.1664053-1-rkannoth%40marvell.com
+
+/P
+
 
