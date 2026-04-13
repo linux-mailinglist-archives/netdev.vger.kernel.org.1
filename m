@@ -1,281 +1,177 @@
-Return-Path: <netdev+bounces-278009-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278010-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wE1sJku03GlVVgkAu9opvQ
-	(envelope-from <netdev+bounces-278009-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 11:15:55 +0200
+	id aAljOkez3GkDVgkAu9opvQ
+	(envelope-from <netdev+bounces-278010-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 11:11:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E553F3E9ADF
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 11:15:54 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5544B3E9A36
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 11:11:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 19AE43047BC8
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 09:09:49 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6490E30104A2
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 09:10:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EED173AF659;
-	Mon, 13 Apr 2026 09:09:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF3083B0AEF;
+	Mon, 13 Apr 2026 09:10:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LdpAM9c8"
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1C983AEF5F
-	for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 09:09:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.243.164.118
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776071388; cv=none; b=Gem/Q/VJzrJoIVvx1RYT8Moeshhg8sFHdK7Q3ol1paA0lam7/gzVrovBJnBZjDKollA4U/EaYULAmKisL+uUjkvy9FP+jnMBm50vaRfJQ+Kw8XLABMGVj7F3Cwa51fC2VPaOfEw0teGjCnHuc9zljYobe+K7nXQ8LqYHEOyIoc8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776071388; c=relaxed/simple;
-	bh=MdQzP6/OY331Npl4Keioe9hDdRPVOpTm7hZ5llDM89s=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=E8gjsy0xDaI7LYoFUyr/aE0QNsGOwiVzTXiqfBnTnUf3rsmXwhjmyeW7XXCcxHUg0kbpFLawJXWyvdW9g9mIDbse5AOBrI5zkG9p5Fl12hFD4xlWZD8fUlNqbU+FyeupCAreHiXT/e9NOorZxEyB9Zq6m7Tyux5udaF1EYy+w/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=162.243.164.118
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
-Received: from enjou-Legion-Y7000P-2019.coin-barley.ts.net (unknown [172.23.56.36])
-	by app2 (Coremail) with SMTP id zQmowABH4Ia7stxpfqI5AA--.31380S3;
-	Mon, 13 Apr 2026 17:09:18 +0800 (CST)
-From: Ren Wei <n05ec@lzu.edu.cn>
-To: bridge@lists.linux.dev,
-	netdev@vger.kernel.org
-Cc: razor@blackwall.org,
-	idosch@nvidia.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	makita.toshiaki@lab.ntt.co.jp,
-	vyasevic@redhat.com,
-	yifanwucs@gmail.com,
-	tomapufckgml@gmail.com,
-	yuantan098@gmail.com,
-	bird@lzu.edu.cn,
-	enjou1224z@gmail.com,
-	zcliangcn@gmail.com,
-	n05ec@lzu.edu.cn
-Subject: [PATCH net 1/1] net: bridge: use a stable FDB dst snapshot in RCU readers
-Date: Mon, 13 Apr 2026 17:08:46 +0800
-Message-ID: <6570fabb85ecadb8baaf019efe856f407711c7b9.1776043229.git.zcliangcn@gmail.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <cover.1776043229.git.zcliangcn@gmail.com>
-References: <cover.1776043229.git.zcliangcn@gmail.com>
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 614DC3A9DB9
+	for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 09:10:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.181
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776071418; cv=pass; b=krrzh/5sboMa/SFCWZl2Je5RijLdKuzsP3v+96/WUBxJ8QJZixtTlkev3+OfqcY0h1sVahxFVSmubC5FMp4gbO4AW1OgA6poCN5/Txaab4y04ooJLP0D4Kdoo05KbF+bNp87jNELvdTuKvasYVB64U2/Gfq/ZsXUIgvZWUk6I3M=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776071418; c=relaxed/simple;
+	bh=lwMsYud59ZH+wPN1u4VR2uGEKj06DabIZgiH+3bzOO4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=h+Lu4H5aBeEGTI5nbjyePtAWUp/VUyhWuVfqBBPhnshw+yo7iO1nzvm+GFhdIIqvn5oFEcceRjJE3pEu8cXnFzjQen8J5Pqn14nDmmacXjBevUCBh/eLr9Apnw6nv1ewwDMozwViVwhfHQsCmTpGSALn26yH0nOuLGrAOyH0ZLo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LdpAM9c8; arc=pass smtp.client-ip=209.85.160.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-50b3488fb31so54350711cf.1
+        for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 02:10:17 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776071416; cv=none;
+        d=google.com; s=arc-20240605;
+        b=HLjLXsf+D+Ju6wZFYvlyP1Ltt/Sjvx1jzEOpG8RBiGPGT1LnX4TiO4bhHva1Abex9y
+         2Td4hmN6HUDCWqUwlLabDdmuaFMdazgbsKP4iC/rJSLoHH+/zub4+XLCFytSBQ8dsy/+
+         UAVELlhKQCAlCARLJqwhyIFZhLBlNo4iw2cVDyjirXitwtUgNx4Iw9HKWscYGJxoJga0
+         FusRTxdKIeJSxyV3IPlzzUs+hDzhxwPs/0V9S5w9+I3TTx59hEs1JO4kdCRISBrA3x0E
+         5gSSb3WUkeRCPmxxxYYxSUyCYPeFtN+6eRfXan2jP0FNu+NZPUyHE3SEuQckbDcHSAoV
+         EGJg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=wFihvD5F5AL0vEScm9aPKM4KVPGTyMzzEuOFyc5tfzg=;
+        fh=0emub2htopEZ1vciyT6vJ4ueHnKj59KYxq7BQUBKLWw=;
+        b=IkvYiwqh0vEY2CqrfQ5Ta6TNevBNX/+f71UPYsuYgh1WAur7ILFtD3N5bGC/c6NDwl
+         yo6Edau13vTrEJWPKoSxhsLxaJEN3t+YdIdy0bZ5z4aI24aK7y4sFp+jMYfXYx2Sko3H
+         bONLORJBjTHu6DUa+rAAcO7soMZR6XLVYwru5BcZnwCTOs28NmwxBesAf8jRgo7rStJ4
+         +G3ris7jFbGo0PZoRyKQ4GsFQl8dxqgu6xGmTtzRlVKFuyKGEEVbmUomDEnGnXW2zDyd
+         bYHQCgz4nx5IEHXHBoZ7Ff+KUVgtHXSlLdNKZ7j3TVnQeAiEAN0kHD3v9H8aWgJ+9S0N
+         Fxvg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1776071416; x=1776676216; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wFihvD5F5AL0vEScm9aPKM4KVPGTyMzzEuOFyc5tfzg=;
+        b=LdpAM9c8ist2Z+LPQAOR04Hyn/AY0vRKWX95qdRJkdJVRQc8kukgExSXavEziuNQjJ
+         F25cUYgrhfh0jak+Iag5zXwQsJMZhJFBtNDWecSenwesWnD1C6hQYAEQY2CPBple5RPm
+         +s/7KWX6XH45twNli09FZlYo8Ufsob6hG8gKrQnEAAMjnnAefKG/6jKMUQvDTiqq7efH
+         BJJTbjHAXuvRWK0wBT11aRn6VzJ7bYNBJlfgSwDt9SZKb+n93nKWXIcv4G1l8Hs/E1rH
+         hudwNwQ7BLMs0we72xg2RoaQNkr8xdmlHKI5s7+eSwQoC/ChEOyyqk6itHSjiLjueiSD
+         HGww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776071416; x=1776676216;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=wFihvD5F5AL0vEScm9aPKM4KVPGTyMzzEuOFyc5tfzg=;
+        b=ldpCfmqR12NXthy4Tm2ZC6mmPoXgb3QqnhoVKVzfvtxQ0vfxc0nH1BASSCVQCOGAIO
+         7m8CqKXG3IWjkMn5e9fptNRZWuIuv+tdbuCPUW+VC7vRiQeCTe1SAHqkP+Lrlvjs9BD6
+         koBi/4DgrxsWipivfYeE2+pWdPuz46AYJegdMQLUR0mDUYdz01FW6WphLpyJrX83cvHn
+         saFgoGEpr5lMyg4UYQmsckqqCesDfr5hU+fxD/htnJdWWAoDB5AZTvhH6A/xtnqrwXud
+         01yPaQSkoBdvLEyBe1itDQenBKexD1kuFciQM7SACxhIKvOm5MO1O5OzYTP+IOWAUXr8
+         qiTQ==
+X-Gm-Message-State: AOJu0YxzAcPTE+TkzFntEKLi0rNXAP18pawQwVSvZNYMmEWF2POD6pcI
+	fZn5247YLFaM/5dqRy2VbxrjahUxn4gWWHmrsrQZ4RtAS3kCh2+0O2y99vAKBo0yrF9BJzSqjT8
+	LCAZH38/sZgy7UwugqyvYzbHYACoruHTAvewZfKAy95Ftt5hqjjN9NONt
+X-Gm-Gg: AeBDieslyu87AkpYFtfRgFAt7OdpI7w/1GQHNioqaQpAVwX+AHAnJ49OCoq8fGZKRDr
+	yGtDWFNVqzeB5EE1COxq1MfsBVVpoISuzuVEtjh/2M+z/sIcWVB3SkAdp2sqEENxMJALRUeo2Cf
+	0JUN6BugnYOfBKDkEoqZzFw9xEGRdi5kdGW2zfypEUVyS9S3klVyXcUlSddmbSnCmMFPeeUc2Rw
+	Z30A+UMWnkpD8Rp57A88Ad2hsJI74dQsssrcFmC0z4BcY/COF9fKrM82OHeofYoVN3COUD0OtTx
+	FC12Ks4FAynFcHqaIeDMVyjKzfZEkNZ5XhZ++qWCThSfcUnKRA8vn6GUeM8KODw5Imv4Wsycr2I
+	=
+X-Received: by 2002:a05:622a:1c0c:b0:50d:8ed0:7f10 with SMTP id
+ d75a77b69052e-50dd6abfc41mr155085601cf.13.1776071415917; Mon, 13 Apr 2026
+ 02:10:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zQmowABH4Ia7stxpfqI5AA--.31380S3
-X-Coremail-Antispam: 1UD129KBjvJXoW3Ar4Dtr18tFyxtrWDAw1fJFb_yoW7tF1rpF
-	Z0gayfJrWkXr1a9w48ZFW8ZF1UtF4kGay5urZrA34FvFn8tFn5CayktFyavF1rAFZ5uFWa
-	yr1jqrySvw1DXa7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBF1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
-	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
-	IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2
-	z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcV
-	Aq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r10
-	6r15McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64
-	vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0E
-	n4kS14v26r4a6rW5MxkIecxEwVCm-wCF04k20xvY0x0EwIxGrwCF04k20xvE74AGY7Cv6c
-	x26r48MxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
-	r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6x
-	IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1lIxAIcVCF
-	04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7
-	CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUj4E_UUUUU=
-X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQsQCWncrd8BFwAAsC
-X-Spamd-Result: default: False [-0.96 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+References: <20260413090420.79932-1-phx0fer@gmail.com>
+In-Reply-To: <20260413090420.79932-1-phx0fer@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 13 Apr 2026 02:10:04 -0700
+X-Gm-Features: AQROBzB48_FmzgV9CBEBfAdtFQTxw_m90qwCH6KEZJCpO4lSbCHBKVNu1jX-FJQ
+Message-ID: <CANn89i+hQaJmitXByaft+xqmpyOPkRctV+uzy2-DD23JargndA@mail.gmail.com>
+Subject: Re: [PATCH] rose: Fix rose_find_socket() returning without sock_hold()
+To: Dudu Lu <phx0fer@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
+	pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278009-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[lzu.edu.cn];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[blackwall.org,nvidia.com,davemloft.net,google.com,kernel.org,redhat.com,lab.ntt.co.jp,gmail.com,lzu.edu.cn];
 	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-278010-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FROM_HAS_DN(0.00)[];
-	NEURAL_HAM(-0.00)[-0.864];
-	TO_DN_NONE(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
-	R_DKIM_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lzu.edu.cn:email]
-X-Rspamd-Queue-Id: E553F3E9ADF
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5544B3E9A36
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Zhengchuan Liang <zcliangcn@gmail.com>
+On Mon, Apr 13, 2026 at 2:04=E2=80=AFAM Dudu Lu <phx0fer@gmail.com> wrote:
+>
+> rose_find_socket() returns a raw socket pointer after releasing
+> rose_list_lock. The socket can be freed by a concurrent close()
+> between the unlock and the caller's use of the pointer, leading
+> to a use-after-free.
+>
+> Add sock_hold() before returning the found socket, and update
+> callers to sock_put() when done.
+>
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Signed-off-by: Dudu Lu <phx0fer@gmail.com>
+> ---
+>  net/rose/af_rose.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/net/rose/af_rose.c b/net/rose/af_rose.c
+> index ba56213e0a2a..b32b136f80aa 100644
+> --- a/net/rose/af_rose.c
+> +++ b/net/rose/af_rose.c
+> @@ -1,4 +1,5 @@
+> -// SPDX-License-Identifier: GPL-2.0-or-later
+> +       if (s)
+> +               sock_hold(s);// SPDX-License-Identifier: GPL-2.0-or-later
+>  /*
+>   *
+>   * Copyright (C) Jonathan Naylor G4KLX (g4klx@g4klx.demon.co.uk)
+> --
+> 2.39.3 (Apple Git-145)
+>
 
-Local FDB entries can be rewritten in place by `fdb_delete_local()`, which
-updates `f->dst` to another port or to `NULL` while keeping the entry
-alive. Several bridge RCU readers inspect `f->dst`, including
-`br_fdb_fillbuf()` through the `brforward_read()` sysfs path.
-
-These readers currently load `f->dst` multiple times and can therefore
-observe inconsistent values across the check and later dereference.
-In `br_fdb_fillbuf()`, this means a concurrent local-FDB update can change
-`f->dst` after the NULL check and before the `port_no` dereference,
-leading to a NULL-ptr-deref.
-
-Fix this by taking a single `READ_ONCE()` snapshot of `f->dst` in each
-affected RCU reader and using that snapshot for the rest of the access
-sequence. Also publish the in-place `f->dst` updates in `fdb_delete_local()`
-with `WRITE_ONCE()` so the readers and writer use matching access patterns.
-
-Fixes: 960b589f86c7 ("bridge: Properly check if local fdb entry can be deleted in br_fdb_change_mac_address")
-Cc: stable@kernel.org
-Reported-by: Yifan Wu <yifanwucs@gmail.com>
-Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-Co-developed-by: Yuan Tan <yuantan098@gmail.com>
-Signed-off-by: Yuan Tan <yuantan098@gmail.com>
-Suggested-by: Xin Liu <bird@lzu.edu.cn>
-Tested-by: Ren Wei <enjou1224z@gmail.com>
-Signed-off-by: Zhengchuan Liang <zcliangcn@gmail.com>
-Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
----
- net/bridge/br_arp_nd_proxy.c |  8 +++++---
- net/bridge/br_fdb.c          | 28 ++++++++++++++++++----------
- 2 files changed, 23 insertions(+), 13 deletions(-)
-
-diff --git a/net/bridge/br_arp_nd_proxy.c b/net/bridge/br_arp_nd_proxy.c
-index 6b5595868a39c..7ace0f4941bb6 100644
---- a/net/bridge/br_arp_nd_proxy.c
-+++ b/net/bridge/br_arp_nd_proxy.c
-@@ -202,11 +202,12 @@ void br_do_proxy_suppress_arp(struct sk_buff *skb, struct net_bridge *br,
- 
- 		f = br_fdb_find_rcu(br, n->ha, vid);
- 		if (f) {
-+			const struct net_bridge_port *dst = READ_ONCE(f->dst);
- 			bool replied = false;
- 
- 			if ((p && (p->flags & BR_PROXYARP)) ||
--			    (f->dst && (f->dst->flags & BR_PROXYARP_WIFI)) ||
--			    br_is_neigh_suppress_enabled(f->dst, vid)) {
-+			    (dst && (dst->flags & BR_PROXYARP_WIFI)) ||
-+			    br_is_neigh_suppress_enabled(dst, vid)) {
- 				if (!vid)
- 					br_arp_send(br, p, skb->dev, sip, tip,
- 						    sha, n->ha, sha, 0, 0);
-@@ -470,9 +471,10 @@ void br_do_suppress_nd(struct sk_buff *skb, struct net_bridge *br,
- 
- 		f = br_fdb_find_rcu(br, n->ha, vid);
- 		if (f) {
-+			const struct net_bridge_port *dst = READ_ONCE(f->dst);
- 			bool replied = false;
- 
--			if (br_is_neigh_suppress_enabled(f->dst, vid)) {
-+			if (br_is_neigh_suppress_enabled(dst, vid)) {
- 				if (vid != 0)
- 					br_nd_send(br, p, skb, n,
- 						   skb->vlan_proto,
-diff --git a/net/bridge/br_fdb.c b/net/bridge/br_fdb.c
-index e2c17f620f009..6eb3ab69a5140 100644
---- a/net/bridge/br_fdb.c
-+++ b/net/bridge/br_fdb.c
-@@ -236,6 +236,7 @@ struct net_device *br_fdb_find_port(const struct net_device *br_dev,
- 				    const unsigned char *addr,
- 				    __u16 vid)
- {
-+	const struct net_bridge_port *dst;
- 	struct net_bridge_fdb_entry *f;
- 	struct net_device *dev = NULL;
- 	struct net_bridge *br;
-@@ -248,8 +249,11 @@ struct net_device *br_fdb_find_port(const struct net_device *br_dev,
- 	br = netdev_priv(br_dev);
- 	rcu_read_lock();
- 	f = br_fdb_find_rcu(br, addr, vid);
--	if (f && f->dst)
--		dev = f->dst->dev;
-+	if (f) {
-+		dst = READ_ONCE(f->dst);
-+		if (dst)
-+			dev = dst->dev;
-+	}
- 	rcu_read_unlock();
- 
- 	return dev;
-@@ -346,7 +350,7 @@ static void fdb_delete_local(struct net_bridge *br,
- 		vg = nbp_vlan_group(op);
- 		if (op != p && ether_addr_equal(op->dev->dev_addr, addr) &&
- 		    (!vid || br_vlan_find(vg, vid))) {
--			f->dst = op;
-+			WRITE_ONCE(f->dst, op);
- 			clear_bit(BR_FDB_ADDED_BY_USER, &f->flags);
- 			return;
- 		}
-@@ -357,7 +361,7 @@ static void fdb_delete_local(struct net_bridge *br,
- 	/* Maybe bridge device has same hw addr? */
- 	if (p && ether_addr_equal(br->dev->dev_addr, addr) &&
- 	    (!vid || (v && br_vlan_should_use(v)))) {
--		f->dst = NULL;
-+		WRITE_ONCE(f->dst, NULL);
- 		clear_bit(BR_FDB_ADDED_BY_USER, &f->flags);
- 		return;
- 	}
-@@ -928,6 +932,7 @@ int br_fdb_test_addr(struct net_device *dev, unsigned char *addr)
- int br_fdb_fillbuf(struct net_bridge *br, void *buf,
- 		   unsigned long maxnum, unsigned long skip)
- {
-+	const struct net_bridge_port *dst;
- 	struct net_bridge_fdb_entry *f;
- 	struct __fdb_entry *fe = buf;
- 	unsigned long delta;
-@@ -944,7 +949,8 @@ int br_fdb_fillbuf(struct net_bridge *br, void *buf,
- 			continue;
- 
- 		/* ignore pseudo entry for local MAC address */
--		if (!f->dst)
-+		dst = READ_ONCE(f->dst);
-+		if (!dst)
- 			continue;
- 
- 		if (skip) {
-@@ -956,8 +962,8 @@ int br_fdb_fillbuf(struct net_bridge *br, void *buf,
- 		memcpy(fe->mac_addr, f->key.addr.addr, ETH_ALEN);
- 
- 		/* due to ABI compat need to split into hi/lo */
--		fe->port_no = f->dst->port_no;
--		fe->port_hi = f->dst->port_no >> 8;
-+		fe->port_no = dst->port_no;
-+		fe->port_hi = dst->port_no >> 8;
- 
- 		fe->is_local = test_bit(BR_FDB_LOCAL, &f->flags);
- 		if (!test_bit(BR_FDB_STATIC, &f->flags)) {
-@@ -1083,9 +1089,11 @@ int br_fdb_dump(struct sk_buff *skb,
- 
- 	rcu_read_lock();
- 	hlist_for_each_entry_rcu(f, &br->fdb_list, fdb_node) {
-+		const struct net_bridge_port *dst = READ_ONCE(f->dst);
-+
- 		if (*idx < ctx->fdb_idx)
- 			goto skip;
--		if (filter_dev && (!f->dst || f->dst->dev != filter_dev)) {
-+		if (filter_dev && (!dst || dst->dev != filter_dev)) {
- 			if (filter_dev != dev)
- 				goto skip;
- 			/* !f->dst is a special case for bridge
-@@ -1093,10 +1101,10 @@ int br_fdb_dump(struct sk_buff *skb,
- 			 * Therefore need a little more filtering
- 			 * we only want to dump the !f->dst case
- 			 */
--			if (f->dst)
-+			if (dst)
- 				goto skip;
- 		}
--		if (!filter_dev && f->dst)
-+		if (!filter_dev && dst)
- 			goto skip;
- 
- 		err = fdb_fill_info(skb, br, f,
--- 
-2.43.0
-
+I suggest that your patches are checked by one human, before sending
+them to the lists.
 
