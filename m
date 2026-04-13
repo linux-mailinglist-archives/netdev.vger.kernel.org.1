@@ -1,124 +1,110 @@
-Return-Path: <netdev+bounces-278123-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278124-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OHyvGRcQ3WkOZQkAu9opvQ
-	(envelope-from <netdev+bounces-278123-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 17:47:35 +0200
+	id QM3KGNAQ3WkOZQkAu9opvQ
+	(envelope-from <netdev+bounces-278124-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 17:50:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D72FA3EE271
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 17:47:34 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id CAE0B3EE2F0
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 17:50:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id EB9E330333AF
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 15:44:51 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C20A9300680E
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 15:50:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39EA13E1236;
-	Mon, 13 Apr 2026 15:44:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 610963DFC67;
+	Mon, 13 Apr 2026 15:50:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q3pphuZZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KcB1Q6HF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 174513BF68E;
-	Mon, 13 Apr 2026 15:44:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB93335CB6A
+	for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 15:50:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776095087; cv=none; b=GOXgkXdH3NVr/Ou6sOkkKhDCn6qThlc4gDQsx6Y5AdRK8IjXe5eiDfa15GdMu3Gi9gqfz3p4JfGnkGAYFHzkd0JcLp5n9vzySgRn8sAzcyYWGrQF3NSBeTt2nKMfNFLACzvKm8/DE2XFbPvgEZbT1ok4HTAHGUlyzpAywcSo3Tg=
+	t=1776095435; cv=none; b=rhGwiNp1gDMxC0YFoseBnRGF+mYn2yYLrpCla/w7bNu4cXp8E9zanwlJ8QF+7Fxm9jT78fTGgaXUEaX4HhwYF49sCpIE4+Rg6id9OrrrOkWvEwtAYw588KTj/Y7dVLSxuv1lqFo2Lce1lS2c30wlctKF22zt9VeB0qfkb2y9kBY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776095087; c=relaxed/simple;
-	bh=h41+zKHDSlFppU8dT93Av6vuqeQYpMYo6zzpg+uma10=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=l5KkkjOuhD0gm3+LDZHW80drF0DiIKU68UryTQu/qw+ln6iCHaLvpayjSEruRlAJCLIGxg+Gfs1fS5bkuS40n4JuP/6Z2q7BSuYz/jnmJLN6Ill2NwROZbdCVC59+2rNwbsir1fiz+CXV7CEz5mC36apeAtd/NAUHKMQVfVoYi8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q3pphuZZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68B17C2BCB4;
-	Mon, 13 Apr 2026 15:44:46 +0000 (UTC)
+	s=arc-20240116; t=1776095435; c=relaxed/simple;
+	bh=GbXCe4AZJ6wicsCGLe6ipRR64a2u6eUyDZXiLtFO9C4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=g4QRqtzSiYl30pFxo85yP+Ok5B4hsVCK9nRmAQLJg3J8o9+IVY3EjRoO/nXpmHUulCwhkLqsLsDC5AeqDhKJ4EFW2wq4JW83Kzd396ZXuxFsE0fU5CJ2w59q1KW4d/pC3JENDN8e+690DnrWuk7AYrBsWXwZmxCou4EQdBRZmsE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KcB1Q6HF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12803C2BCAF;
+	Mon, 13 Apr 2026 15:50:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776095087;
-	bh=h41+zKHDSlFppU8dT93Av6vuqeQYpMYo6zzpg+uma10=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=q3pphuZZRzTukYyn0eA67SLzaRGQhs0Nk03/JEepeovDGCePM+la3sJnGAHBN37LC
-	 kjAmH/cBGBbj+zCd05N7msrabdci/ZaXvRF4bchs8su7AqtSp2A86yKQw7MxTWQIrX
-	 uwoj5rRxhem0d8p5Rx12SAqFv14v9trUsj38ScKUspCCE//nuKe/Ho885VBW5dk/q3
-	 JccpBKZ9uZ94uCRb4A4x+W/AcC9158L13zY3/X3jTTTzsVqUspEu2X6D2jgyr+9P/g
-	 kjdfjfFJ0a7A5iMXu43QROJMIkg49LZSQWI5K+xitHO93DzV5iVxKkwiFH21LAFsyL
-	 stobwcAh4mgIQ==
-Date: Mon, 13 Apr 2026 08:44:45 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Marek Vasut <marex@nabladev.com>, netdev@vger.kernel.org,
- stable@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Andrew
- Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>, Nicolai
- Buchwitz <nb@tipi-net.de>, Paolo Abeni <pabeni@redhat.com>, Ronald Wahl
- <ronald.wahl@raritan.com>, Yicong Hui <yiconghui@gmail.com>,
- linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@kernel.org>
-Subject: Re: [net,PATCH v2] net: ks8851: Reinstate disabling of BHs around
- IRQ handler
-Message-ID: <20260413084445.59fe28d6@kernel.org>
-In-Reply-To: <20260413125744.TVKkZcEK@linutronix.de>
-References: <20260408162535.98108-1-marex@nabladev.com>
-	<20260412090141.21bf1534@kernel.org>
-	<2558832d-c821-436d-898d-b708c5e0a228@nabladev.com>
-	<20260412105125.48f0c58f@kernel.org>
-	<20260413125744.TVKkZcEK@linutronix.de>
+	s=k20201202; t=1776095434;
+	bh=GbXCe4AZJ6wicsCGLe6ipRR64a2u6eUyDZXiLtFO9C4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=KcB1Q6HFzfWN5mQxagsPV2Twyxs6kE63fmDwruq2yPhAcNZiuAf2K2qPW9czREmRs
+	 Yd+VIsJDMzpcMDxZhgG8jyAcCd0YS0+ty7nYe9ydr+oSIAIJHVRpYNuc5+1F7ebXbv
+	 gJDsDqxleYITPzEgwf73UU+NyFTJd4nO74W2hpqcoMyZy0XosS7MmcKEgR3fymJjGq
+	 aM/8nzbiip+XIu1TGO/sZjameXp8ejJp0qRTacDbVim6HoEvjan/lmtwQb5xOGBuj5
+	 ZW3JoaLjjUFC4ileF3rqK8UgjxTrV7Q8vNHuwK42on9XK2lc8047j76ONQMaJB6+7k
+	 2v3clHkAsXK0Q==
+Date: Mon, 13 Apr 2026 16:50:30 +0100
+From: Simon Horman <horms@kernel.org>
+To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
+	netdev@vger.kernel.org, Jacob Keller <jacob.e.keller@intel.com>,
+	Paul Menzel <pmenzel@molgen.mpg.de>
+Subject: Re: [PATCH iwl-next v2] igb: use ktime_get_real helpers in
+ igb_ptp_reset()
+Message-ID: <20260413155030.GS469338@kernel.org>
+References: <20260409075523.3728506-1-aleksandr.loktionov@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260409075523.3728506-1-aleksandr.loktionov@intel.com>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-278123-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[nabladev.com,vger.kernel.org,davemloft.net,lunn.ch,google.com,tipi-net.de,redhat.com,raritan.com,gmail.com,kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-278124-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D72FA3EE271
+	RCPT_COUNT_FIVE(0.00)[6];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: CAE0B3EE2F0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, 13 Apr 2026 14:57:44 +0200 Sebastian Andrzej Siewior wrote:
-> On 2026-04-12 10:51:25 [-0700], Jakub Kicinski wrote:
-> > > Does the backtrace make the problem clearer, with the annotation abov=
-e ? =20
-> >=20
-> > Sebastian, do you have any recommendation here? tl;dr is that the drive=
-r does =20
-> =E2=80=A6
->=20
-> What about this:
+On Thu, Apr 09, 2026 at 09:55:23AM +0200, Aleksandr Loktionov wrote:
+> Replace ktime_to_ns(ktime_get_real()) with the direct equivalent
+> ktime_get_real_ns() and ktime_to_timespec64(ktime_get_real()) with
+> ktime_get_real_ts64() in igb_ptp_reset().  Using the combined helpers
+> makes the intent clearer.
+> 
+> Suggested-by: Jacob Keller <jacob.e.keller@intel.com>
+> Suggested-by: Simon Horman <horms@kernel.org>
+> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 
-Thanks for taking a look (according to you auto-reply immediately after
-a vacation ;))
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-TBH changing the driver feels like a workaround / invitation for a
-whack-a-mole game. I'd prefer to fix the skb allocation.
-Is there any way we can check if any locks which were _irq() on non-RT
-are held?
 
