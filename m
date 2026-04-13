@@ -1,215 +1,178 @@
-Return-Path: <netdev+bounces-278191-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278192-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +kS4ISxN3WmacAkAu9opvQ
-	(envelope-from <netdev+bounces-278191-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 22:08:12 +0200
+	id 8Dy4JFtO3WnYcAkAu9opvQ
+	(envelope-from <netdev+bounces-278192-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 22:13:15 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C49893F301C
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 22:08:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3329D3F305D
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 22:13:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EB46930210C5
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 20:08:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 96D99300DDF0
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 20:10:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 655F338BF67;
-	Mon, 13 Apr 2026 20:08:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16AD6392C36;
+	Mon, 13 Apr 2026 20:10:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="egeaQXz1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pkOFyXYM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f48.google.com (mail-yx1-f48.google.com [74.125.224.48])
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E29E2D9481
-	for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 20:08:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 454DD391E65
+	for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 20:10:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.180
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776110889; cv=pass; b=O3RRQn5g6WPbpH+lPXL7cozznFd40mXy9xMxdRHVzrzGOG6+4BKA5R3lFnxGKIY8YBnmohUjZipRuIjkkyb/zgXCL7rG6pvE6iUESZlrIB/xiDEqwwYiAInSmYpCh3/XQB4tWQSQqkI+b9a3fJXqV+0iu9rl7IdIqz7O44qCw0Y=
+	t=1776111002; cv=pass; b=FaqpwgPAHwJez8YkLtRfGYHJe2+Tw8EyJE19bpBDPiyUWJ3GDtTqg+yctgl+01QsHHJZKVKP+zOHgFcrrzI5wxyqWMxwR7pfNqEkDDlQHf7xK3EL+N2nBHuJJJ8L9zO3kn72kC6gthOhTw7sszjSHBG/KRE27nUCIvDYvcwz0HE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776110889; c=relaxed/simple;
-	bh=YVMIrUVS6zcmaa+3JMMy551/txh2lQw63V9+1RoWZ28=;
+	s=arc-20240116; t=1776111002; c=relaxed/simple;
+	bh=TSaae2JMjMSrj7G8Rx/iOQ52jYnr3TLUvG23wwobwsA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qdHgJKw6qdZZP+YY1tYXYVAItrGsqImY6SqSfDJMc99BE5SDX7RHzpcC/B+vMNTU57UxPItpdz61yY9n9mUNf753Ov1OTZLy2EFu8BXmKjhtmCPK/wfaD+9PZIBX0SHu+9V4mHVLkFkVyQEX7cEREZQscvqsZ2VCjCN8KHxIUoY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=egeaQXz1; arc=pass smtp.client-ip=74.125.224.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f48.google.com with SMTP id 956f58d0204a3-651bf4a4140so1806716d50.0
-        for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 13:08:07 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776110887; cv=none;
+	 To:Cc:Content-Type; b=ZaD4S+j7qChNJvV+eM6RB0DKFdumYl5SXX+Mf+QejdlX1WYkVLuWkMmlBMDLByr1PRgRBvHqfQAE4gws5rtMhNX98XiBbG5dK+mvyYmurcAC3fAdmIxCKVwAKyJkbkaB8bqGei0lgZja74S8/eqcHgdYJ5K2dYPuHv28QJw7Qrs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pkOFyXYM; arc=pass smtp.client-ip=209.85.160.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-50d9436f2adso57356091cf.3
+        for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 13:10:00 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776110999; cv=none;
         d=google.com; s=arc-20240605;
-        b=KBgMWwsHLtl5owJr7xiiUJqg6Y+X3U62iqMzr6xQDjO1QSLyBpWvOqTCsb1m71ai2b
-         kDDOKd7ojBlzzSAITNZPJ+Tyab7jWrF2zVekQVvd2UIRp3L79ovkrV/gjkkrNHrgHEQ5
-         ASwxv8lJ0w0iuk4oowqdEUgEN8Vo6aGqUCwlcVhu8yO7B4qS1mm2R9zWxB9exBC2+5LY
-         VpcAWDDvDcVKs64imksk34TMDYURr41InmflT9ZLgegwnhydK1u75Wbo2mgfvFd3pyOR
-         e8vCseRbdVC3s7QI/JYUyy3Vi93FE6xvIBKv8fLb7nfPOGuMMrrWakQ03T3CfCRtq7UQ
-         VaTQ==
+        b=Hwk7AIlQoxhIRgcPEX+zvtjpQDYY8FcEIZLTGuLagoJjuGdKKJJxM9FZ4K4EB50NvO
+         eQuT4FZACrrYlYVWE0spOm1q5dw+6+WElz4WI/OhCltzzY1ipdZuhR7sF8XkonOxxCJH
+         3k5Grr5bKU+TjA4lIDX0rDEM0Ie7kSiTPB34xrxCpNn85F+xDy2CQGNgHf/TRXzs2t5p
+         hidJ4UQ5AVsX0IsQzbiC7n9uWrSb3V83Tg0b96t7t/SX9FSEGS6fGomx3Cmg9ENXKf3x
+         izWMkpygfsaXqIXYJiIw/T5jouDLeol3vElDX9Im02YbWd0wP/8efbaQQ9IcjVq+Rs2c
+         2MlQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=aPf0rvmFFFJycYIPeYdrhVjXf9meJ4UbCJJ7TADNpE8=;
-        fh=4rh2dAgAhp6VsGkh0ckTbGyQR3eiClrbba7m7l8PXbI=;
-        b=bd3Ebvl8vhr2/cRkzT5keNmlq4nppp0kL8VlJN37+wk7QT1p6fkxfp6K2Srz5rIqwg
-         cm3JZGP7zrttxs2fAgWwK7VMt9Pk1DWR81s/pcQ0rG1NURtRKcEgPT/TRHQUsHc5jluB
-         upjbCTllMtM001b+7S3JHqoZ5IiW8JZL2qMD2VcGZ2gcpo7JdbB/y1wE2FSfVdg7KHb2
-         9fTFfZACA5+rYNmgE5aaJ74Duw+Bd/E3qLwj2TLvWkCgAegtfSMcKjI1X18o7jZOlG32
-         RQRn+CtVeQ6JuOcxXtQ1DZuLAU35Cug20GNLOFcPlsagkRoVSr3ucB28xwddvXQXA/Xt
-         K9zg==;
+        bh=PFVpay9aLRIXw094XmrL2r8cvxtLz/HHt2s41HTeDh8=;
+        fh=3Wsg1Jeohsw0YlMf+33szOMqv7SU7qtX2gfEnCstYtI=;
+        b=JxKg3fwEXI1UkCked+ltXcKQKf2FjbSJHwnH14MKRpKNyyICAqD9BD2ja7WEUxxmBz
+         XhZUAkGLrxv3iNnC8tN+pN0nkUJiAB/16W1MDEhgDmmPjC7VCSK1fOtvaDmkNinRfv72
+         Ws2UiHLMdbVdYVkRIRAQkSDRg10lu3T0vJ9tmMVF+Nll6j12StSv4Zp0ko2pMihOwgDM
+         IKwOZH59IMu8EkIvpf4VAxyrUN3Jcon8D+ocDtwXc5HhvpPOcuTIueC0yB2VLwuSF+Zw
+         ORBCgsmtzaIf+v/dfurLnz8nDnGggMZC0XHV8omrTxzC3iRj52onUrhCSKW1V6lDPjai
+         Ot0w==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776110887; x=1776715687; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1776110999; x=1776715799; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=aPf0rvmFFFJycYIPeYdrhVjXf9meJ4UbCJJ7TADNpE8=;
-        b=egeaQXz1sPI2rQH3TeLrsGVI6UEz444+82T7uUqKAkQBwoCt9loSBETe4SAvC2F8dt
-         KMkbyOEz8vL6yfelltOxnCvFX/aTP2ku2XE5piUY9qLnCS/nZByTrieUHB0nQMAznozn
-         hz+064mkJdew7xJpW6PKsUA/lMBU8k5sd7MS/9O/9rsHZWvgahi7n6k11V2mRtDzTuBA
-         kEFCvDati90yL0ex657/qNAlJNPO2u0MEmJkT4/chEN+w4EycfoSq2m98YJXF5EwP6GB
-         f/mPY8otywlBRNF8idPIuIZ/p+PizRzfEmtSFPYUeYjreI0Vu8rxlOG/e0Fb1exopEIL
-         RFfQ==
+        bh=PFVpay9aLRIXw094XmrL2r8cvxtLz/HHt2s41HTeDh8=;
+        b=pkOFyXYMYvcx4kH/XYfrjETUbK8ADfl++UYuoQWkNCUFFCfCP/fDPstEsur/6rcUAh
+         UK2lLBtYNvPFHFo9J37J0In7MKcnsE/W/zFGLmlXKdShW35nuI7cUlDu7XLaImNlk7cM
+         vKHaYQ63G2C8F16varDdcI7HZ8HykkJI6mCEC6QjyDhnoVPrgqRXKepwkM2vgTwGSZiR
+         dHvkEkJ9gkC/UbP8bl+cUKzuE3XpiHZEgCxv4v5ZO3FAm+Xeoq/t6Sr3ZnOX/3l3eKjG
+         lWT0daW/P+R2tjBXDm+aXrz8UeNBKFolecdWLcPGcW5Smlb1D1fj/qPCY7S0osqKXNuK
+         NX7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776110887; x=1776715687;
+        d=1e100.net; s=20251104; t=1776110999; x=1776715799;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=aPf0rvmFFFJycYIPeYdrhVjXf9meJ4UbCJJ7TADNpE8=;
-        b=JMD9M7a7oBbmz1IWsznw2DlOQeoZUxdzFbOOCL7fkPBtn8Fcq69+sFKow1TZYiS2Ye
-         BJnE4SjBiDBgxs8kWcmllVuIzJBtFKKpkByKO+fJF1w1bdqt/IE9byJWaQVw6FxlgBEZ
-         ms+cEj/ZB5QEZH4prJvL6m+T8QG0cGkjkG3qp+WTmIigywBRcJJIzrdKR6i+xYA7DIUS
-         QtMcIhY18sPxiUj91WhHx2oNqvh62w+jnEmS2gnyVHRGXk+5JIVPDGMUr0Yh7XzUkah9
-         k8ySwj6L0Uh7A/gNr2ywvIRia+KjMDfOgaJQap7g6znWGoEH6U8v76CRAN/6Dh71L1uS
-         rTLg==
-X-Forwarded-Encrypted: i=1; AFNElJ8jiJcBv5HTKrrsmPOoLHQwn1MA5MjJA2nY/5EMzecuklaS9PBJjoX+qimuwOVD5bF/+98dN8M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyM8pVa7rsVnGStAK2TspJejWeUO0lRW2uBjAPjFznii+PMcEY1
-	ISz9uyn1yiN4iw3r605zFZIfPgaG4mSGEMkSZwvEyMeJitxkWwF2vwl6dVyH4CIHehUIVDdFYbW
-	vwx2GVVAu3ayvWElSDVSgD3xUJ2UUcck=
-X-Gm-Gg: AeBDiesC9OSiOZfggXgL0U4+GwTxm7j4bnXOyQM93mSkL5qlEzApqN2hSeHRUIWqewP
-	aRB6QoCjzr7c7hE67PwNn20nHVkP33MkQxxtLVk61j4YHKxnqLonNhwbdISB87Ho7BtBDmx2enW
-	Hhw0dVZkLbu/d8RXrUABsPimom4CZSnxWGJtaI1DukhLSe3VggRQMIacZ5SbfKXN3czw7GrFtKX
-	HhP53x/GVz41xGJy1K/y8j+LagSqv3aSJppxIQsOhGCopMftjWQ42IkB3nDa/g9xzkSmIFEMzE3
-	MNjF36XN9J516PM5fjd+/WNwg+HYKkVughYYYGdX+xkcXL/+iIwKS2aZda3QwMXEehu28Q==
-X-Received: by 2002:a05:690e:1919:b0:651:b2ed:5dc with SMTP id
- 956f58d0204a3-651b2ed0f0bmr9095260d50.52.1776110886898; Mon, 13 Apr 2026
- 13:08:06 -0700 (PDT)
+        bh=PFVpay9aLRIXw094XmrL2r8cvxtLz/HHt2s41HTeDh8=;
+        b=RuWPxSLcGztURY1zO9oS6G0jM0gFVNpsQzfz2m2/D/31b4LYRuiehQvZzEe9CqBOE6
+         f0isBC1AEm2l3PTTUaYArQXiA0LPeB3MsZYb/biROneKEzhFvGApRIDixeFi7uPfM/fS
+         NubuhtR0dGaPJcDtNH6n/rfrhNxzfS09SNUDMDganGK6aRH4vTfoRcz1C6HjbF2XwbYy
+         YP7s/uSvKqkdRbu+UJB0pMCikNsSZj4QM9LsY6pbOzFOV3q25AcnvpWZdDUa2D+qA91k
+         LmKFx72BY4oO+r1vQBXYsSBlLGO3+Fb4qrGWQqE7qDZGOT8xbpmul8MitSrMZZfK2FET
+         265Q==
+X-Forwarded-Encrypted: i=1; AFNElJ91S8pXIQnKPMpCgkfiHxWCXZ6GHSm9j7KxQSFXAHK8+v89DkV4QyWHHXJnAGh+OtwXWZVH38Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxkPcUtPMD4QiBK+Hsdk1dSGaZrY4FxdnaHu8MqiQTfnFMqLzIg
+	Dq5Ld+W0ZA05rKMEbW0HnxDPPVf1SJrD8/OVzmG0n/YTgqq1NAEfTqXMGQpLSfRhLNxv7kSKuBW
+	9vmdq8qY5S+MDDtfIzjA/BDhjsebulLdJmy1l4ESA
+X-Gm-Gg: AeBDieuUL+gjz2rSArmt67IjXhCcJSmS8KvDz4UcUQ6927ZiGZyZS/J1Viynyb3ut7y
+	9jP1YkkQ/XqXhBaOVnLw6QDskDsri0Ydwepr4LP1qdmme3P6EE85fL5y9illtnY0V6VkcV0VNLa
+	lhvVQgd/qkeAl05QfxwLeNlIgENcmj5WOA+821RNGXVZGP84dCKud2L5INfRwnpOl1sSXug5gYz
+	dUypt2/HWA01uon5W62SyMC2GK+fjmJeACyw6FLB+mUy88Btv7Mh3RWKNeIvpveT0rFi0t93HeT
+	a5kQw1Ra6mBXbmyHnYrWnxwKPsoAYxHqjlvdYEF4lZ9cRCjRvzT0tDz4IvzyLesZCKL2NUv5kA=
+	=
+X-Received: by 2002:a05:622a:550d:b0:50b:2876:586 with SMTP id
+ d75a77b69052e-50dd5ad112emr226296811cf.5.1776110997701; Mon, 13 Apr 2026
+ 13:09:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260410172206.150975-1-luiz.dentz@gmail.com> <20260412091614.1786af4e@kernel.org>
-In-Reply-To: <20260412091614.1786af4e@kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 13 Apr 2026 16:07:55 -0400
-X-Gm-Features: AQROBzA-VwBQCcwLZ_TGntNXIr8QWO5A1gfM_ntaeN0OoblK55smm1NdczSB36s
-Message-ID: <CABBYNZLg_Dz9ieQ+ioXf2+Oa+vdL8BMbnt=qOfkONOpNsUZ5qw@mail.gmail.com>
-Subject: Re: [GIT PULL] bluetooth-next 2026-04-10
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org
+References: <20260413182225.10683-1-devnexen@gmail.com>
+In-Reply-To: <20260413182225.10683-1-devnexen@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 13 Apr 2026 13:09:45 -0700
+X-Gm-Features: AQROBzCNgCRJVXctfDh6yyQzR_TEOYZKCbp1HOyw6mceBcdeIaWVjS3CtoyPHNg
+Message-ID: <CANn89iLE4k=N62i9hs+GumpP5v7CU7L+Qj644=4Zk74_P0zDxw@mail.gmail.com>
+Subject: Re: [PATCH net-next v2] net: check qdisc_pkt_len_segs_init() return
+ value on ingress
+To: David Carlier <devnexen@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Samiullah Khawaja <skhawaja@google.com>, Hangbin Liu <liuhangbin@gmail.com>, 
+	Krishna Kumar <krikku@gmail.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-278191-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-278192-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,redhat.com,fomichev.me,google.com,gmail.com,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[luizdentz@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	MISSING_XM_UA(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: C49893F301C
+X-Rspamd-Queue-Id: 3329D3F305D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Jakub
+On Mon, Apr 13, 2026 at 11:22=E2=80=AFAM David Carlier <devnexen@gmail.com>=
+ wrote:
+>
+> Commit 7fb4c1967011 ("net: pull headers in qdisc_pkt_len_segs_init()")
+> changed qdisc_pkt_len_segs_init() to return an skb drop reason when
+> it detects malicious GSO packets. The egress path in __dev_queue_xmit()
+> checks this return value and drops bad packets, but the ingress path in
+> sch_handle_ingress() ignores it.
+>
+> This means malformed GSO packets entering via TC ingress are not dropped
+> and could be redirected to another interface or cause incorrect qdisc
+> accounting.
+>
+> Check the return value and drop the packet when a bad GSO is detected.
+>
+> Fixes: 7fb4c1967011 ("net: pull headers in qdisc_pkt_len_segs_init()")
+> Signed-off-by: David Carlier <devnexen@gmail.com>
+> ---
+>
+> v1 -> v2: reorder variable declarations for reverse xmas tree
+> v1: https://lore.kernel.org/netdev/20260408172307.46498-1-devnexen@gmail.=
+com/
+>  net/core/dev.c | 12 ++++++++++--
+>  1 file changed, 10 insertions(+), 2 deletions(-)
 
-On Sun, Apr 12, 2026 at 12:16=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> w=
-rote:
->
-> On Fri, 10 Apr 2026 13:22:06 -0400 Luiz Augusto von Dentz wrote:
-> > bluetooth-next pull request for net-next:
-> >
-> > core:
-> >  - hci_core: Rate limit the logging of invalid ISO handle
-> >  - hci_sync: make hci_cmd_sync_run_once return -EEXIST if exists
-> >  - hci_event: fix locking in hci_conn_request_evt() with HCI_PROTO_DEFE=
-R
-> >  - hci_event: fix potential UAF in SSP passkey handlers
-> >  - HCI: Avoid a couple -Wflex-array-member-not-at-end warnings
-> >  - L2CAP: CoC: Disconnect if received packet size exceeds MPS
-> >  - L2CAP: Add missing chan lock in l2cap_ecred_reconf_rsp
-> >  - L2CAP: Fix printing wrong information if SDU length exceeds MTU
-> >  - SCO: check for codecs->num_codecs =3D=3D 1 before assigning to sco_p=
-i(sk)->codec
-> >
-> > drivers:
-> >  - btusb: MT7922: Add VID/PID 0489/e174
-> >  - btusb: Add Lite-On 04ca:3807 for MediaTek MT7921
-> >  - btusb: Add MT7927 IDs ASUS ROG Crosshair X870E Hero, Lenovo Legion P=
-ro 7
-> >         16ARX9, Gigabyte Z790 AORUS MASTER X, MSI X870E Ace Max, TP-Lin=
-k
-> >         Archer TBE550E, ASUS X870E / ProArt X870E-Creator.
-> >  - btusb: Add MT7902 IDs 13d3/3579, 13d3/3580, 13d3/3594, 13d3/3596, 0e=
-8d/1ede
-> >  - btusb: MediaTek MT7922: Add VID 0489 & PID e11d
-> >  - btintel: Add support for Scorpious Peak2 support
-> >  - btintel: Add support for Scorpious Peak2F support
-> >  - btintel_pcie: Add device id of Scorpius Peak2, Nova Lake-PCD-H
-> >  - btintel_pcie: Add device id of Scorpious2, Nova Lake-PCD-S
-> >  - btmtk: Add reset mechanism if downloading firmware failed
-> >  - btmtk: Add MT6639 (MT7927) Bluetooth support
-> >  - btmtk: fix ISO interface setup for single alt setting
-> >  - btmtk: add MT7902 SDIO support
-> >  - Bluetooth: btmtk: add MT7902 MCU support
-> >  - btbcm: Add entry for BCM4343A2 UART Bluetooth
-> >  - qca: enable pwrseq support for wcn39xx devices
-> >  - hci_qca: Fix BT not getting powered-off on rmmod
-> >  - hci_qca: disable power control for WCN7850 when bt_en is not defined
-> >  - hci_qca: Fix missing wakeup during SSR memdump handling
-> >  - hci_ldisc: Clear HCI_UART_PROTO_INIT on error
-> >  - mmc: sdio: add MediaTek MT7902 SDIO device ID
-> >  - hci_ll: Enable BROKEN_ENHANCED_SETUP_SYNC_CONN for WL183x
->
-> Two fixes tags are messed up here:
->
-> Commit: 802446198014 ("Bluetooth: btmtk: hide unused btmtk_mt6639_devs[] =
-array")
->         Fixes tag: Fixes: 4cdd001ff03f ("Bluetooth: btmtk: Add MT6639 (MT=
-7927) Bluetooth support")
->         Has these problem(s):
->                 - Target SHA1 does not exist
->
-> Commit: 28c9cc700e30 ("Bluetooth: L2CAP: Fix printing wrong information i=
-f SDU length exceeds MTU")
->         Fixes tag: Fixes: fa768fce4aae ("Bluetooth: LE L2CAP: Disconnect =
-if received packet's SDU exceeds IMTU")
->         Has these problem(s):
->                 - Target SHA1 does not exist
+NACK. This is is not needed.
 
-Would you be able to pull the for-net-next-2026-04-13?
-
---=20
-Luiz Augusto von Dentz
+I will not even bother, this is an obvious LLM based patch.
 
