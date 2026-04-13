@@ -1,270 +1,233 @@
-Return-Path: <netdev+bounces-278137-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278138-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6HXgFjMj3WkYaQkAu9opvQ
-	(envelope-from <netdev+bounces-278137-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 19:09:07 +0200
+	id 2MfVEUUl3WlcaQkAu9opvQ
+	(envelope-from <netdev+bounces-278138-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 19:17:57 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9C573F0D70
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 19:09:06 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF6753F1207
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 19:17:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 36BE1309C6FE
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 17:02:15 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5DF273035A6F
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 17:11:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2289E340A6A;
-	Mon, 13 Apr 2026 17:01:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6757233C536;
+	Mon, 13 Apr 2026 17:11:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="RiVbdnDm";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="K1hsHPrr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a4KYWxqK"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a1-smtp.messagingengine.com (fout-a1-smtp.messagingengine.com [103.168.172.144])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f68.google.com (mail-ot1-f68.google.com [209.85.210.68])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68E4633F5B9
-	for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 17:01:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.144
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1A6632570D
+	for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 17:11:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.68
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776099711; cv=none; b=stwKeQBEtQS5e79Nx2J/P0ac6AVogO0ZGS4sao75vD/1IV+7zRD/NmwhsC9DoeHVG9TRlmIUivCNTlJTvR/Jj0bClPMQ8VkRHYgPYuM1nie/+TChkhCyJfPlNekvJxaD/cSjeRBs6RM6JG+u57BpqL8dywK7BN8vy1bcIF9urvU=
+	t=1776100295; cv=none; b=nsbF8qw3n7/RoU6Cy96EhprDgUTMGM6YOaGkkxnU08BJO1wqytxVkzDEf2TEegPDmtOcHyDgRA2ofzvYITvIDoSCpryI2UxmJZixamyPx+dNwl3azl3jzb2Uc9NeeRKY18d8tXL4rjiGbvcrCk3yLkcLAui/iAVo+HuKlzlosYo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776099711; c=relaxed/simple;
-	bh=TSwlAxL3NIy7mLB+6aUnVA8Iz5kB692n3v2BWl6dU08=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID; b=DJuv2Zesz9OYxx7q2VvXWek4936MAyxtGYWuPYQj9esU8Dk7Of2tOr3o9lsxtochZwhB5lNX+vXmcAf2D5XdoRLMajpAuDQF+IG/nb/aECV0nU2y2fc0zgyhqePHFSCsAKMWMgV7X1/54OO5bXYACwCp0RB0l+rni+t8h6cgsAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=RiVbdnDm; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=K1hsHPrr; arc=none smtp.client-ip=103.168.172.144
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
-Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
-	by mailfout.phl.internal (Postfix) with ESMTP id AD7C9EC04BC;
-	Mon, 13 Apr 2026 13:01:48 -0400 (EDT)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-06.internal (MEProxy); Mon, 13 Apr 2026 13:01:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
-	 h=cc:cc:content-id:content-transfer-encoding:content-type
-	:content-type:date:date:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to; s=fm3; t=1776099708; x=1776186108; bh=9bzSv8ANBPRBYyxxhF6AW
-	01Hs9b9FGc45068WeohEuo=; b=RiVbdnDm06VoZLwqnO/jZAyQ77QIvZha8LG0C
-	+9rO4qMzf/x0Pa4SEiO01f8DywECqfMPrGfUdfYNE/7rge5dEwuV2949fGn6M+x0
-	CANAfv1hh0GvvFG1bZ8fLzOM6uiBasbSllRUUreyyluM7aDborzNArz57CjXSwP8
-	tlVXsLUsTQqYwOF9VrEfQAXCBImezfcm+5jE/pTUHUU+3eA84eIwkhEbpmULC0Gl
-	JMARw/IdPAJhUQiGeIgh8m9VlCjrFPDlQ1VDfMb2ZhrqobxgyV81PuQ9zuo0NHPN
-	9I4xHAB0Cj1hCEwhMsNrgs0pEMGCaETm60OFqWzkBpcmYOcog==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-id
-	:content-transfer-encoding:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1776099708; x=1776186108; bh=9bzSv8ANBPRBYyxxhF6AW01Hs9b9FGc4506
-	8WeohEuo=; b=K1hsHPrr3e0J9gwbc9QfPOLMkIOjOU+pKKVw2094zgzbu7EjVaG
-	Y1zCOFei0B86QVkhSdhyvXAlrBO8PubtrRou3FJUjNiBEaJd2EokPGCVzcWITmae
-	Gh5LSv/Hf1OgTOmJO880SHgv+T+Eba3JaNxA2mhkMsdxs2GbpkbBa3x2QdRxukFx
-	e9bbwDYzByu33ceLay7i9qKraHXjMxbbFZK5OWyCVLIfe1xW6tpx8RitJuZFntJY
-	aUpfh5y9/y06znr4JUdEksai2yfe1d1kx/XnMd5AhhR+3PbVHa0MqJnZ2O5auhTx
-	TmUE/OzoRFYHvwrQt/c3YHYRbXQF7DjFmJA==
-X-ME-Sender: <xms:fCHdaQyNV3uZUH3fYPY6VcdUFcWddGm_M_1FhHZ6zYv5qh2MkpZ7Mg>
-    <xme:fCHdaQ292xOzQ28CKdkiLtzHHpdYqH4JTqBy-FV_r_NA_ZEHtTiwK_bYdgCmMlRQe
-    SmRf7UbGg5k2nyKIJUzC_pCb67hPPd-MVHJ43zJWDAqfsd8-bLNbfs>
-X-ME-Received: <xmr:fCHdaWxlC-IcL0irtJihbuwh0iuop1866beg9gdAwzKb1nLWFlcKhtsRAjdTtDd2t-8kgA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdefkeejkecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpefhvfevufgjfhfogggtgfffkfesthhqredtredtvdenucfhrhhomheplfgrhicuggho
-    shgsuhhrghhhuceojhhvsehjvhhoshgsuhhrghhhrdhnvghtqeenucggtffrrghtthgvrh
-    hnpeeifedvleefleejveethfefieduueeivdefieevleffuddvveeftdehffffteefffen
-    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehjvhesjh
-    hvohhssghurhhghhdrnhgvthdpnhgspghrtghpthhtohepuddtpdhmohguvgepshhmthhp
-    ohhuthdprhgtphhtthhopehlohhuihhsrdhstggrlhgsvghrthesieifihhnugdrtghomh
-    dprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohep
-    mhgrhhgvshhhsgesghhoohhglhgvrdgtohhmpdhrtghpthhtoheprghnugihsehgrhgvhi
-    hhohhushgvrdhnvghtpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgt
-    phhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepfh
-    gslhesrhgvughhrghtrdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdr
-    tghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:fCHdaVU4_tMiKF_uhiMmGsypA_ElDvFV5URbRId2La4AtMU-iyx7lw>
-    <xmx:fCHdaS8yVKpCTM0LY5Nh56P-3sJ4_AVKQNYK3X6rjK7P8Wmpvm1byA>
-    <xmx:fCHdaYsPRglwSYlBYpOTHBJp83yA59MpIo3qJ6MFtSvI2FnC_v3wOQ>
-    <xmx:fCHdaS3pr1b3-IGFI9hYFaK3kWTmDRi9-Q2mCuOOuaB0043IppFfpg>
-    <xmx:fCHdaY4Zs30YQCIBsadlvmFSUUThUKZuLzhCtILnUfsCzqcXIoIYF_Ij>
-Feedback-ID: i53714940:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 13 Apr 2026 13:01:48 -0400 (EDT)
-Received: by famine.localdomain (Postfix, from userid 1000)
-	id 37BBD9FB3D; Mon, 13 Apr 2026 10:01:47 -0700 (PDT)
-Received: from famine (localhost [127.0.0.1])
-	by famine.localdomain (Postfix) with ESMTP id 34B519FB3C;
-	Mon, 13 Apr 2026 10:01:47 -0700 (PDT)
-From: Jay Vosburgh <jv@jvosburgh.net>
-To: Louis Scalbert <louis.scalbert@6wind.com>
-cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, edumazet@google.com,
-    kuba@kernel.org, pabeni@redhat.com, fbl@redhat.com,
-    andy@greyhouse.net, shemminger@vyatta.com, maheshb@google.com
-Subject: Re: [PATCH net v3 2/5] bonding: 3ad: fix carrier when no valid slaves
-In-reply-to: <20260408152353.276204-3-louis.scalbert@6wind.com>
-References: <20260408152353.276204-1-louis.scalbert@6wind.com>
- <20260408152353.276204-3-louis.scalbert@6wind.com>
-Comments: In-reply-to Louis Scalbert <louis.scalbert@6wind.com>
-   message dated "Wed, 08 Apr 2026 17:23:50 +0200."
-X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
+	s=arc-20240116; t=1776100295; c=relaxed/simple;
+	bh=QFfXQdYraBMgxF2YL51WifepTgi61lv5Bs3U70u2Geo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=H/P27oiXGfKovM5OvvRsfJrf51rSNYDV5Q2caYmx8ohRAeZJILh8pm0To+liGPznxi6XN7o9mfxOhBD8BeI7c9dS6qfYUkTxchrouUNMtywm8qgQSdfHl8TqJRT7H7ntBpUw6T0inGaDN+3qxhKv9yzGVi+a+K7L2TmWEeHkaKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a4KYWxqK; arc=none smtp.client-ip=209.85.210.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f68.google.com with SMTP id 46e09a7af769-7dbca22dbfeso2457300a34.1
+        for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 10:11:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776100293; x=1776705093; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ArxValEzTg+tM9wLOLHIzVhZaHWsNTd1P3p2VjA1beo=;
+        b=a4KYWxqKJbomHMc6s+SRO+pFAP+kyaC1KHlo+VsbZqnMGaYXxQrx6lImJ/xH2MNDdd
+         yswA7Ptq4bUEjomIhZjwUARyrDD+MBbDzfs+sinxdKbICQPCed4G5jHcITaMlzmtwZ25
+         j0Jg6RQAAvFSXL6MXmT+0DEYlrQ6p3WnJyz31LBvXR1PLY9GRqEXyfee8U+Zeg42o+Kg
+         IhdkEz3gty4jdOHbG3TistIc4tgFx9Bfi7i+RHzcSI/puZO/JGIjDTG2VsearqjI9DHm
+         LcisnaeBgl1Q7kCZB1Ju0v1ceN7aLA++ig3FghkoYBZFX+7+bOGVjeAN+dcgCzEIck0Q
+         13KQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776100293; x=1776705093;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ArxValEzTg+tM9wLOLHIzVhZaHWsNTd1P3p2VjA1beo=;
+        b=kBbwhxp9vPoYwSkexO7GVvSM6ELOJpOlN7zbK354Ybyi69NQ+n3YFzUXXbpm3KFaRc
+         aPHHaMuesctQ/5gQZiq1BFYNyhA4lPrlxJUPl23Kd6qq9aI4vPfjcCJhzmD/M22AJyGy
+         TBALSvcK/FAyVW4jT9xrb1kyQXaXHoPyZDmeDZu5rydLX4vkXbZjmFs1v9lDtlAmDDOR
+         msyRdaqqCzaD8i4Yce7fqnT5nLDMdNys3vYzEtzmwjSoEhok46hu3LrQgcKFbhVOoZM6
+         CN5KXHNNWXftksiZfmAm+4m5sGrOexhCvMYyoc/+N7zJxi81NbU2SzzEqX97Kon268IV
+         fBAw==
+X-Gm-Message-State: AOJu0Yy8mANNguclq4FxcJ7kSACMAi6ovc0I7EydhalAtLvQ7RmqS7ul
+	JDDovhANPLz9joqc/UHN50MBa+avLwFsrvlJB0YH4RJUFPwvenCI/ZpnHvBdyjuK
+X-Gm-Gg: AeBDieu+FmjxvjeU0/oeTOoF1IXWEkzx3VhvpHK8twA36WnQ+Ore+KH9CgF6XcGU4wX
+	b3j2nLZtUZm1ks6p8dUVP6p+dM+e4MG8R0qi0PH/a+gzSdqDKq4z4iJzQA6+dYjwDqgeTU+7wlk
+	+0QAK/3QOhOhfP1OrVD4YT7QHi4bqtX71H4cxsM1GPuMZ4RWp8VwseNCGQaYfEXi1v0mOFQ1Kdb
+	+4nnGnolqm6mEoWc7JPDg9lFpP3THJEXkie2YpKFaU6D7N/Ze32m73ysM/P2kuURqFLjryJrtNh
+	vaDnltVt7BMRg/xU/pmUEyjDJMmhCyoOOU1R8mQlHDjkszL8Wroc3rvyXaXOLRd/2hX4YVpjQER
+	NMMvKJGfjGKeMd2npPhbWG7x2rAcyP6Hmd1yMBkqDwZfmVLGTTKBH/jiXGGwqkviSKHgs8Qucl7
+	iIWWJl209e3XdI04Sm
+X-Received: by 2002:a05:6820:f09:b0:68e:7e21:2245 with SMTP id 006d021491bc7-68e7e213a4cmr3587918eaf.19.1776100292679;
+        Mon, 13 Apr 2026 10:11:32 -0700 (PDT)
+Received: from localhost ([2a03:2880:12ff:1::])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-68bc7dfa196sm6284711eaf.2.2026.04.13.10.11.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Apr 2026 10:11:32 -0700 (PDT)
+From: Stanislav Fomichev <sdf.kernel@gmail.com>
+X-Google-Original-From: Stanislav Fomichev <sdf@fomichev.me>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Subject: [PATCH net-next v7 00/15] net: sleepable ndo_set_rx_mode
+Date: Mon, 13 Apr 2026 10:11:16 -0700
+Message-ID: <20260413171131.550126-1-sdf@fomichev.me>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <707938.1776099707.1@famine>
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 13 Apr 2026 10:01:47 -0700
-Message-ID: <707939.1776099707@famine>
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[jvosburgh.net,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[jvosburgh.net:s=fm3,messagingengine.com:s=fm2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-278137-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[jvosburgh.net:+,messagingengine.com:+];
+	TAGGED_FROM(0.00)[bounces-278138-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,6wind.com:email,messagingengine.com:dkim];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jv@jvosburgh.net,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[sdfkernel@gmail.com,netdev@vger.kernel.org];
+	TO_DN_NONE(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: E9C573F0D70
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_FIVE(0.00)[5];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[fomichev.me:mid]
+X-Rspamd-Queue-Id: AF6753F1207
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Louis Scalbert <louis.scalbert@6wind.com> wrote:
+This series adds a new ndo_set_rx_mode_async callback that enables
+drivers to handle address list updates in a sleepable context. The
+current ndo_set_rx_mode is called under the netif_addr_lock spinlock
+with BHs disabled, which prevents drivers from sleeping. This is
+problematic for ops-locked drivers that need to sleep.
 
->Apply the "lacp_fallback" configuration from the previous commit.
->
->"lacp_fallback" mode "strict" asserts that the bonding master carrier
->only when at least 'min_links' slaves are in the collecting/distributing
->state (or collecting only if the coupled_control default behavior is
->disabled).
->
->Fixes: 655f8919d549 ("bonding: add min links parameter to 802.3ad")
->Signed-off-by: Louis Scalbert <louis.scalbert@6wind.com>
->---
-> drivers/net/bonding/bond_3ad.c     | 26 ++++++++++++++++++++++++--
-> drivers/net/bonding/bond_options.c |  1 +
-> 2 files changed, 25 insertions(+), 2 deletions(-)
->
->diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond_3a=
-d.c
->index af7f74cfdc08..b79a76296966 100644
->--- a/drivers/net/bonding/bond_3ad.c
->+++ b/drivers/net/bonding/bond_3ad.c
->@@ -745,6 +745,22 @@ static void __set_agg_ports_ready(struct aggregator =
-*aggregator, int val)
-> 	}
-> }
-> =
+The approach:
+1. Add snapshot/reconcile infrastructure for address lists
+2. Introduce dev_rx_mode_work that takes snapshots under the lock,
+   drops the lock, calls the driver, then reconciles changes back
+3. Move promiscuity handling into the scheduled work as well
+4. Convert existing ops-locked drivers to ndo_set_rx_mode_async
+5. Add a warning for ops-locked drivers still using ndo_set_rx_mode
+6. Add a selftest exercising the team+bridge+macvlan topology that
+   triggers the addr_lock -> ops_lock ordering issue
 
->+static int __agg_valid_ports(struct aggregator *agg)
->+{
->+	struct port *port;
->+	int valid =3D 0;
->+
->+	for (port =3D agg->lag_ports; port;
->+	     port =3D port->next_port_in_aggregator) {
->+		if (port->actor_oper_port_state & LACP_STATE_COLLECTING &&
->+		    (!port->slave->bond->params.coupled_control ||
->+		     port->actor_oper_port_state & LACP_STATE_DISTRIBUTING))
->+			valid++;
+v7:
+- rebase and address netkit warning in a separate patch (Jakub)
+- keep only CONFIG_NET_TEAM=y in selftest (Breno)
 
-	Do we need to test coupled_control?  I.e., can the test be
+v6:
+- relink ref_ha in __hw_addr_list_reconcile (AI Review)
+- set real_ha->sync_cnt to delta, not 1 (AI Review)
+- s/KUNIT_ASSERT_EQ/KUNIT_EXPECT_EQ/ (AI Review)
+- drop netif_rx_mode_clean from free_netdev (AI Review)
+- clarify deep hierarchy flush in commit message (AI Review)
+- use dev trackers (AI Review)
+- drop mc argument from bnxt_cfg_rx_mode (AI Review)
+- keep uc_update, but as an argument in bnxt (AI Review)
+- add BNXT_STATE_OPEN check after re-lock in bnxt (AI Review)
+- add addr lock around iavf_set_rx_mode (AI Review)
 
-		if ((port->actor_oper_port_state & LACP_STATE_COLLECTING) &&
-		    (port->actor_oper_port_state & LACP_STATE_DISTRIBUTING))
+v5:
+- resolve 32 bit failure (Jakub)
 
-	To my reading, ad_mux_machine will set _COLLECTING and
-_DISTRIBUTING appropriately regardless of the coupled_control selection.
+v4:
+- rebase on https://lore.kernel.org/netdev/20260319005456.82745-1-saeed@kernel.org/T/#u (Cosmin)
+- reword ndo_set_rx_mode_async kdoc (Jakub)
+- s/EXPORT_SYMBOL/EXPORT_SYMBOL_IF_KUNIT/ (Jakub)
+- remove netif_up_and_present (Jakub)
+- netif_addr_lists_snapshot + netif_addr_lists_reconcile to better
+  explain mix-and-match between
+  ndo_set_rx_mode/ndo_set_rx_mode_async/ndo_change_rx_flags (Jakub)
+- s/cancel_work_sync/flush_work/ (Jakub)
+- separate commit to cache snapshot entries (Jakub)
+- add dev_addr_test_snapshot_benchmark (Jakub)
+  - dev_addr_test_snapshot_benchmark: 1024 addrs x 1000 snapshots: 89872802 ns total, 89872 ns/iter
+- remove redundant bnxt_uc_list_updated (Michael)
+- switch to linkwatch-like work stealing (Jakub)
 
->+	}
->+
->+	return valid;
->+}
->+
-> static int __agg_active_ports(struct aggregator *agg)
-> {
-> 	struct port *port;
->@@ -2120,6 +2136,7 @@ static void ad_enable_collecting_distributing(struc=
-t port *port,
-> 			  port->actor_port_number,
-> 			  port->aggregator->aggregator_identifier);
-> 		__enable_port(port);
->+		bond_3ad_set_carrier(port->slave->bond);
-> 		/* Slave array needs update */
-> 		*update_slave_arr =3D true;
-> 		/* Should notify peers if possible */
->@@ -2141,6 +2158,7 @@ static void ad_disable_collecting_distributing(stru=
-ct port *port,
-> 			  port->actor_port_number,
-> 			  port->aggregator->aggregator_identifier);
-> 		__disable_port(port);
->+		bond_3ad_set_carrier(port->slave->bond);
-> 		/* Slave array needs an update */
-> 		*update_slave_arr =3D true;
-> 	}
->@@ -2819,8 +2837,12 @@ int bond_3ad_set_carrier(struct bonding *bond)
-> 	}
-> 	active =3D __get_active_agg(&(SLAVE_AD_INFO(first_slave)->aggregator));
-> 	if (active) {
->-		/* are enough slaves available to consider link up? */
->-		if (__agg_active_ports(active) < bond->params.min_links) {
->+		/* are enough slaves in collecting (and distributing) state to conside=
-r
->+		 * link up?
->+		 */
->+		if ((bond->params.lacp_fallback ? __agg_valid_ports(active)
->+					: __agg_active_ports(active)) <
->+		    bond->params.min_links) {
+v3:
+- module_export(__rtnl_unlock) (nipa)
+- s/netdev_uc_count/netdev_hw_addr_list_count/ in bnxt (Aleksandr)
 
-	I think the original comment is better; if the new option is
-off, it doesn't require collecting / distributing state.
+v2:
+- wifi: cfg80211: use __rtnl_unlock in nl80211_pre_doit (syzbot)
+- simplify mlx5e_sync_netdev_addr for !uc (Cosmin)
+- switch to snapshot in bnxt_cfg_rx_mode (Michael)
+- add team to net/config (Jakub)
 
-	-J
+Stanislav Fomichev (15):
+  net: add address list snapshot and reconciliation infrastructure
+  net: introduce ndo_set_rx_mode_async and netdev_rx_mode_work
+  net: cache snapshot entries for ndo_set_rx_mode_async
+  net: move promiscuity handling into netdev_rx_mode_work
+  fbnic: convert to ndo_set_rx_mode_async
+  mlx5: convert to ndo_set_rx_mode_async
+  bnxt: convert to ndo_set_rx_mode_async
+  bnxt: use snapshot in bnxt_cfg_rx_mode
+  iavf: convert to ndo_set_rx_mode_async
+  netdevsim: convert to ndo_set_rx_mode_async
+  dummy: convert to ndo_set_rx_mode_async
+  netkit: convert to ndo_set_rx_mode_async
+  net: warn ops-locked drivers still using ndo_set_rx_mode
+  selftests: net: add team_bridge_macvlan rx_mode test
+  selftests: net: use ip commands instead of teamd in team rx_mode test
 
-> 			if (netif_carrier_ok(bond->dev)) {
-> 				netif_carrier_off(bond->dev);
-> 				goto out;
->diff --git a/drivers/net/bonding/bond_options.c b/drivers/net/bonding/bon=
-d_options.c
->index b672b8a881bb..d64a5d2f80b6 100644
->--- a/drivers/net/bonding/bond_options.c
->+++ b/drivers/net/bonding/bond_options.c
->@@ -1706,6 +1706,7 @@ static int bond_option_lacp_fallback_set(struct bon=
-ding *bond,
-> 	netdev_dbg(bond->dev, "Setting LACP fallback to %s (%llu)\n",
-> 		   newval->string, newval->value);
-> 	bond->params.lacp_fallback =3D newval->value;
->+	bond_3ad_set_carrier(bond);
-> =
+ Documentation/networking/netdevices.rst       |  13 +
+ drivers/net/dummy.c                           |   6 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     |  58 +--
+ drivers/net/ethernet/intel/iavf/iavf_main.c   |  16 +-
+ .../net/ethernet/mellanox/mlx5/core/en/fs.h   |   5 +-
+ .../net/ethernet/mellanox/mlx5/core/en_fs.c   |  32 +-
+ .../net/ethernet/mellanox/mlx5/core/en_main.c |  13 +-
+ .../net/ethernet/meta/fbnic/fbnic_netdev.c    |  20 +-
+ .../net/ethernet/meta/fbnic/fbnic_netdev.h    |   4 +-
+ drivers/net/ethernet/meta/fbnic/fbnic_pci.c   |   4 +-
+ drivers/net/ethernet/meta/fbnic/fbnic_rpc.c   |   2 +-
+ drivers/net/netdevsim/netdev.c                |   8 +-
+ drivers/net/netkit.c                          |   6 +-
+ include/linux/netdevice.h                     |  28 ++
+ net/core/dev.c                                |  67 +--
+ net/core/dev.h                                |   4 +
+ net/core/dev_addr_lists.c                     | 370 ++++++++++++++++-
+ net/core/dev_addr_lists_test.c                | 387 +++++++++++++++++-
+ net/core/dev_api.c                            |   3 +
+ net/core/dev_ioctl.c                          |   6 +-
+ net/core/rtnetlink.c                          |   1 +
+ .../selftests/drivers/net/bonding/lag_lib.sh  |  17 +-
+ .../drivers/net/team/dev_addr_lists.sh        |   2 -
+ tools/testing/selftests/net/config            |   1 +
+ tools/testing/selftests/net/rtnetlink.sh      |  44 ++
+ 25 files changed, 977 insertions(+), 140 deletions(-)
 
-> 	return 0;
-> }
->-- =
+-- 
+2.52.0
 
->2.39.2
->
-
----
-	-Jay Vosburgh, jv@jvosburgh.net
 
