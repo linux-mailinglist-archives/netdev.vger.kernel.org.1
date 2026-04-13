@@ -1,379 +1,208 @@
-Return-Path: <netdev+bounces-277963-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-277964-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MIXxCFSQ3GkmTAkAu9opvQ
-	(envelope-from <netdev+bounces-277963-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 08:42:28 +0200
+	id MJwTG8SU3GkkTQkAu9opvQ
+	(envelope-from <netdev+bounces-277964-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 09:01:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id B37443E7D89
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 08:42:27 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2CF13E8094
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 09:01:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3593130058DA
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 06:42:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8388F3016915
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 07:00:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97AE83921DC;
-	Mon, 13 Apr 2026 06:42:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C58273128B2;
+	Mon, 13 Apr 2026 07:00:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YpxULcdE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WAuh95Uk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f178.google.com (mail-dy1-f178.google.com [74.125.82.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71A35389111;
-	Mon, 13 Apr 2026 06:42:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CE78265CBE
+	for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 07:00:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776062543; cv=none; b=M9ADB/gJaGwGACxI7BMTNSNdK5I6h6tsdLqe2kb1i4wBpC1GSHAKSckvRBRW+jbYUtiaPcPP1Fnz3tHcYY4oVzhrLIriPs8TdcFc0RatbgKG3pgnWcO603BYHtNJCEkJR0c6caFgu0PKpaU3iUby3j2vGrstIe9LvMpBtb9Qe6U=
+	t=1776063622; cv=none; b=DRRMiaRazSB7AsdwLR4J1TVmQvr39064pDZLyTCi4Mf85smIeyrqx1sDeZI2PsSU7dTi4gZd//9G0PaqU7Lnwcug1DPk9HkW8a0DLwIAXeAopwLN21EEifv9EgOwtEvbY1x/drJdvIghHw/UocoRNeuffsU8pQ4CrNgbpaEMHkk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776062543; c=relaxed/simple;
-	bh=0lH0LC1aP3wRhPO0FuTozezUioK4pF5EefTJuQZXdfQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Wqem3731uZ5mjb6xq4upxvfUEyJ6cF9cIqixU7+LAgxXjbHQW+FKbQIyluevGgQcGnYe3C7dKYrvlf7+QrZvwxOiLxdRdLyndBi9Feae/cZbiA4kO41cRCh9EKQZUI3KMCteC8iFqSQAe9pvVg8I49VpoFTIgnHtPwM4TjLUV0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YpxULcdE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C659C2BCB1;
-	Mon, 13 Apr 2026 06:42:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776062543;
-	bh=0lH0LC1aP3wRhPO0FuTozezUioK4pF5EefTJuQZXdfQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YpxULcdEiToYfFRqvbT6mNWWGFi0R1omTWyY+y04c4i1F1/RBISmmWQoWHmHQylT7
-	 tTorexOMN0AMoTxm1p5zXi7mysDIVaRDKbvDSpcWk6zWUmgvXcUl2OpAbdY7BD/s+/
-	 bjxELWe5Is3aTj3Ug29Iv8E7K4JS3VnEGRmo8h1JZox+CFuCqlyBKPPTDR9hR1qnsf
-	 7wEK5Sr2R+HPBLWlJQXZyssoeTRknBZigsSQsZxI4JU1jNQpLhLK+FDFBkP0A3YSNT
-	 3b2yZ5aOST+dhnDKWgZRIEXXgUh6VbjCLe3eChGP+XzcPMWAZXUD1c4hrNMBjw0pGt
-	 TouuaQUItgGxA==
-Date: Mon, 13 Apr 2026 12:12:16 +0530
-From: Manivannan Sadhasivam <mani@kernel.org>
-To: Krishna Chaitanya Chundru <krishna.chundru@oss.qualcomm.com>
-Cc: Richard Cochran <richardcochran@gmail.com>, mhi@lists.linux.dev, 
-	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	Vivek Pernamitta <quic_vpernami@quicinc.com>
-Subject: Re: [PATCH v2 2/6] bus: mhi: host: Add support for non-posted TSC
- timesync feature
-Message-ID: <rwyescvy4m64hffttma2ikpbtukyzm3oqmiapcd5h7i4evygwc@gq72yoedmnxp>
-References: <20260411-tsc_timesync-v2-0-6f25f72987b3@oss.qualcomm.com>
- <20260411-tsc_timesync-v2-2-6f25f72987b3@oss.qualcomm.com>
+	s=arc-20240116; t=1776063622; c=relaxed/simple;
+	bh=KwPKKI8ujdK13H/nCvSAP0++ttyw8CHmOYPRVTAvVEQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rAq9xB01t+j2t05saM57XqZLQKTgwS4G3n8gj9kqUz3CJ5o3jYR8vLE/97RU4nfVdbxcK+aWI7ummiGVTSekamllYQPKrR+vx9bPe8WitjNXcdNXA6FWcEjW/fgbEAAujmtKw6IsWJ3JXqesf057a3GQX3JqZAzKpOX05d2JfZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WAuh95Uk; arc=none smtp.client-ip=74.125.82.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dy1-f178.google.com with SMTP id 5a478bee46e88-2d832f2f44cso1187082eec.0
+        for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 00:00:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776063621; x=1776668421; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Wcf1iWSRA87AUV2HNsi+KD2GJOFrP0HPCIjQVH9/1OY=;
+        b=WAuh95UkbamVEXg5fTfavwmmeU8lMug+M4R0ijRVEnMLWu+8b8TPfeXAtZhfKoRqGZ
+         1XBUq13LAkwrpVg8J3Q5mwa/SdU1B/zxiqBshGQc8zmyNPROTg6Fp9olyCqOJsYuF0s9
+         lPdBFu90i9W5IKaYO13GSJedf2ORXJqZC6m/SLKyHw0kExcPG0vGVzsOQ/wzrdfKeUd9
+         xWutG4hgT0MlZfVkov/EJX4MDfHctHdSA/ZH3NWnjsLEMod5ovv9SPy22AhIWVGLx15R
+         ViMVnlHVxwo00FSKvIC8rSctNzJHpmjmBkVbtqJ72+8VlrIhr02H6McPn5rv+DWy4oa/
+         CyFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776063621; x=1776668421;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Wcf1iWSRA87AUV2HNsi+KD2GJOFrP0HPCIjQVH9/1OY=;
+        b=GjEtInn3tJCQzqwIJ78g04YXuyfkhQW2+S21wBwzFSvDYcwdzbh4n3JRCl47MiwFpT
+         h3hwUoHDix7aE4Tjbv9b08Tk3gI845FgMAhD8XNlxu69jPTYuhIj8bpF5gTi8H8sJ5BY
+         XgeTZ09hHiQukk9OYG+b5JKrYBmbhhKtcLFRWuJG1kcYTSnfyTYnbzt/a3XcRx+Zrz9U
+         WJHrW4Gjhr9XmCEPv0HaywcpyH8/sOlozxwG6SbqcA/N0oGBL2FXfjv0LIYBsNh3dw3a
+         W+8SpUGoLxDMpVeZ2Sa7Vdfp6WgAGed+zM9royQIhTr4X29zbIVgSkiAKaAz1TaymEyl
+         T2Mg==
+X-Forwarded-Encrypted: i=1; AFNElJ9/xdFrF1ZBYNOAtNt6NlCfUb2sL70GJnDtH+AkaKva7WpZadBunevcN+QGEzejtI9xNaxJUbE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyymWadGweAgRj5RLBX7IK/qjpJG7FzkXHHqtv3DvwT2IwdrbMi
+	DmG9KyiJ6B/WE8mjdeomYYY601XC3MgwIDXHrjeY9Fh33sRcZ0qUIsHG
+X-Gm-Gg: AeBDieudAr5iRv04AStg0WapIIwaEI7oCW4e4HhfsAEmkuE0dh4IUasIeHHlfhizcZL
+	AHMVFQZsWRMIFhy0y4FiV0tfSqryGuneTRi67lHIaWjBp7JlH8EjP0OgSBpuXTdZHmgXiTKUfx1
+	Nc6VIa+kL9B7oCQcBP25vbsDZFAPvVN+xSCCczPhOIwEbGd47DsxxKvaruiLKb/TFMLkvRH8bjK
+	hVDgXCAmOsyKXwbITwFpNzQ4+u0b7ASYvl0NMh/6K9/e7sai73KvbpWlsT4wQ5tum6wAnBOyTDd
+	U7JkCfRO2dRamhtAUUGGOP8UvN/9r6daSxbr5hVUep8uhqWytIbAD8jxPxE2NmkQJS6Ad0q0rec
+	1kDWRRsQeWnTg2n5xQSJyMYFiFE+JyrsJuCGheWJL1GiZoczw7ijskomJCpHxIMZSvpgvN8MUJV
+	ykEWSgzPcmhOEfiuxpcY82Ivmfx1WFoYjTQA==
+X-Received: by 2002:a05:7022:517:b0:12b:ee92:a60e with SMTP id a92af1059eb24-12c34e89e20mr6767610c88.8.1776063615726;
+        Mon, 13 Apr 2026 00:00:15 -0700 (PDT)
+Received: from localhost.localdomain ([154.29.155.10])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12c3459f7ffsm12678394c88.3.2026.04.13.00.00.11
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Mon, 13 Apr 2026 00:00:14 -0700 (PDT)
+From: Xiaobo Liu <cppcoffee@gmail.com>
+To: Allison Henderson <achender@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	rds-devel@oss.oracle.com,
+	linux-kernel@vger.kernel.org,
+	Xiaobo Liu <cppcoffee@gmail.com>
+Subject: [PATCH net v2] RDS: Fix memory leak in rds_rdma_extra_size()
+Date: Mon, 13 Apr 2026 15:00:05 +0800
+Message-ID: <20260413070005.15272-1-cppcoffee@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260411-tsc_timesync-v2-2-6f25f72987b3@oss.qualcomm.com>
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,lists.linux.dev,vger.kernel.org,quicinc.com];
-	TAGGED_FROM(0.00)[bounces-277963-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[google.com,kernel.org,redhat.com,vger.kernel.org,oss.oracle.com,gmail.com];
+	TAGGED_FROM(0.00)[bounces-277964-lists,netdev=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mani@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[cppcoffee@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,qualcomm.com:email,quicinc.com:email]
-X-Rspamd-Queue-Id: B37443E7D89
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A2CF13E8094
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sat, Apr 11, 2026 at 01:42:02PM +0530, Krishna Chaitanya Chundru wrote:
-> From: Vivek Pernamitta <quic_vpernami@quicinc.com>
-> 
-> Implement non-posted time synchronization as described in section 5.1.1
-> of the MHI v1.2 specification. The host disables low-power link states
-> to minimize latency, reads the local time, issues a MMIO read to the
-> device's TIME register.
-> 
-> Add support for initializing this feature and export a function to be
-> used by the drivers which does the time synchronization.
-> 
-> MHI reads the device time registers in the MMIO address space pointed to
-> by the capability register after disabling all low power modes and keeping
-> MHI in M0. Before and after MHI reads, the local time is captured
-> and shared for processing.
-> 
-> Signed-off-by: Vivek Pernamitta <quic_vpernami@quicinc.com>
-> Signed-off-by: Krishna Chaitanya Chundru <krishna.chundru@oss.qualcomm.com>
-> ---
->  drivers/bus/mhi/common.h        |  4 +++
->  drivers/bus/mhi/host/init.c     | 28 ++++++++++++++++
->  drivers/bus/mhi/host/internal.h |  9 +++++
->  drivers/bus/mhi/host/main.c     | 74 +++++++++++++++++++++++++++++++++++++++++
->  include/linux/mhi.h             | 37 +++++++++++++++++++++
->  5 files changed, 152 insertions(+)
-> 
-> diff --git a/drivers/bus/mhi/common.h b/drivers/bus/mhi/common.h
-> index 4c316f3d5a68beb01f15cf575b03747096fdcf2c..64f9b2b94387a112bb6b5e20c634c3ba8d6bc78e 100644
-> --- a/drivers/bus/mhi/common.h
-> +++ b/drivers/bus/mhi/common.h
-> @@ -118,6 +118,10 @@
->  #define CAP_CAPID_MASK			GENMASK(31, 24)
->  #define CAP_NEXT_CAP_MASK		GENMASK(23, 12)
->  
-> +/* MHI TSC Timesync */
-> +#define TSC_TIMESYNC_TIME_LOW_OFFSET	(0x8)
-> +#define TSC_TIMESYNC_TIME_HIGH_OFFSET	(0xC)
-> +
->  /* Command Ring Element macros */
->  /* No operation command */
->  #define MHI_TRE_CMD_NOOP_PTR		0
-> diff --git a/drivers/bus/mhi/host/init.c b/drivers/bus/mhi/host/init.c
-> index c2162aa04e810e45ccfbedd20aaa62f892420d31..eb720f671726d919646cbc450cd54bda655a1060 100644
-> --- a/drivers/bus/mhi/host/init.c
-> +++ b/drivers/bus/mhi/host/init.c
-> @@ -498,6 +498,30 @@ static int mhi_find_capability(struct mhi_controller *mhi_cntrl, u32 capability)
->  	return 0;
->  }
->  
-> +static int mhi_init_tsc_timesync(struct mhi_controller *mhi_cntrl)
-> +{
-> +	struct device *dev = &mhi_cntrl->mhi_dev->dev;
-> +	struct mhi_timesync *mhi_tsc_tsync;
-> +	u32 time_offset;
-> +	int ret;
-> +
-> +	time_offset = mhi_find_capability(mhi_cntrl, MHI_CAP_ID_TSC_TIME_SYNC);
-> +	if (!time_offset)
-> +		return -ENXIO;
-> +
-> +	mhi_tsc_tsync = devm_kzalloc(dev, sizeof(*mhi_tsc_tsync), GFP_KERNEL);
-> +	if (!mhi_tsc_tsync)
-> +		return -ENOMEM;
-> +
-> +	mhi_cntrl->tsc_timesync = mhi_tsc_tsync;
-> +	mutex_init(&mhi_tsc_tsync->ts_mutex);
-> +
-> +	/* save time_offset for obtaining time via MMIO register reads */
-> +	mhi_tsc_tsync->time_reg = mhi_cntrl->regs + time_offset;
-> +
-> +	return 0;
-> +}
+Free iov->iov when copy_from_user() or page count validation fails
+in rds_rdma_extra_size().
 
-Move all the function definitions from MHI core code to mhi_phc.c.
+This preserves the existing success path and avoids leaking the
+allocated iovec array on error.
 
-> +
->  int mhi_init_mmio(struct mhi_controller *mhi_cntrl)
->  {
->  	u32 val;
-> @@ -635,6 +659,10 @@ int mhi_init_mmio(struct mhi_controller *mhi_cntrl)
->  		return ret;
->  	}
->  
-> +	ret = mhi_init_tsc_timesync(mhi_cntrl);
-> +	if (ret)
-> +		dev_dbg(dev, "TSC Time synchronization init failure\n");
+Signed-off-by: Xiaobo Liu <cppcoffee@gmail.com>
+---
+ net/rds/rdma.c | 28 +++++++++++++++++++++-------
+ 1 file changed, 21 insertions(+), 7 deletions(-)
 
-And just keep this call in the MHI core.
-
-> +
->  	return 0;
->  }
->  
-> diff --git a/drivers/bus/mhi/host/internal.h b/drivers/bus/mhi/host/internal.h
-> index 7b0ee5e3a12dd585064169b7b884750bf4d8c8db..a0e729e7a1198c1b82c70b6bfe3bc2ee24331229 100644
-> --- a/drivers/bus/mhi/host/internal.h
-> +++ b/drivers/bus/mhi/host/internal.h
-> @@ -15,6 +15,15 @@ extern const struct bus_type mhi_bus_type;
->  #define MHI_SOC_RESET_REQ_OFFSET			0xb0
->  #define MHI_SOC_RESET_REQ				BIT(0)
->  
-> +/*
-> + * With ASPM enabled, the link may enter a low power state, requiring
-> + * a wake-up sequence. Use a short burst of back-to-back reads to
-> + * transition the link to the active state. Based on testing,
-> + * 4 iterations are necessary to ensure reliable wake-up without
-> + * excess latency.
-> + */
-> +#define MHI_NUM_BACK_TO_BACK_READS			4
-> +
->  struct mhi_ctxt {
->  	struct mhi_event_ctxt *er_ctxt;
->  	struct mhi_chan_ctxt *chan_ctxt;
-> diff --git a/drivers/bus/mhi/host/main.c b/drivers/bus/mhi/host/main.c
-> index 53c0ffe300702bcc3caa8fd9ea8086203c75b186..b7a727b1a5d1f20b570c62707a991ec5b85bfec7 100644
-> --- a/drivers/bus/mhi/host/main.c
-> +++ b/drivers/bus/mhi/host/main.c
-> @@ -1626,3 +1626,77 @@ int mhi_get_channel_doorbell_offset(struct mhi_controller *mhi_cntrl, u32 *chdb_
->  	return 0;
->  }
->  EXPORT_SYMBOL_GPL(mhi_get_channel_doorbell_offset);
-> +
-> +static int mhi_get_remote_time(struct mhi_controller *mhi_cntrl, struct mhi_timesync *mhi_tsync,
-> +			       struct mhi_timesync_info *time)
-> +{
-> +	struct device *dev = &mhi_cntrl->mhi_dev->dev;
-> +	int ret, i;
-> +
-> +	if (!mhi_tsync && !mhi_tsync->time_reg) {
-> +		dev_err(dev, "Time sync is not supported\n");
-> +		return -EINVAL;
-
--EOPNOTSUPP
-
-> +	}
-> +
-> +	if (unlikely(MHI_PM_IN_ERROR_STATE(mhi_cntrl->pm_state))) {
-> +		dev_err(dev, "MHI is not in active state, pm_state:%s\n",
-> +			to_mhi_pm_state_str(mhi_cntrl->pm_state));
-> +		return -EIO;
-> +	}
-> +
-> +	/* bring to M0 state */
-> +	ret = mhi_device_get_sync(mhi_cntrl->mhi_dev);
-> +	if (ret)
-> +		return ret;
-> +
-> +	guard(mutex)(&mhi_tsync->ts_mutex);
-> +	mhi_cntrl->runtime_get(mhi_cntrl);
-> +
-> +	/*
-> +	 * time critical code to fetch device time, delay between these two steps
-> +	 * should be deterministic as possible.
-> +	 */
-> +	preempt_disable();
-> +	local_irq_disable();
-> +
-> +	time->t_host_pre = ktime_get_real();
-> +
-> +	/*
-> +	 * To ensure the PCIe link is in L0 when ASPM is enabled, perform series
-> +	 * of back-to-back reads. This is necessary because the link may be in a
-> +	 * low-power state (e.g., L1 or L1ss), and need to be forced it to
-> +	 * transition to L0.
-> +	 */
-
-You should be doing these back-to-back reads only if ASPM is enabled. You can
-check that using pcie_aspm_enabled(). Also, see if you can hide this call inside
-pci_generic driver to make mhi_phc truly transport agnostic.
-
-> +	for (i = 0; i < MHI_NUM_BACK_TO_BACK_READS; i++) {
-> +		ret = mhi_read_reg(mhi_cntrl, mhi_tsync->time_reg,
-> +				   TSC_TIMESYNC_TIME_LOW_OFFSET, &time->t_dev_lo);
-> +
-> +		ret = mhi_read_reg(mhi_cntrl, mhi_tsync->time_reg,
-> +				   TSC_TIMESYNC_TIME_HIGH_OFFSET, &time->t_dev_hi);
-> +	}
-> +
-> +	time->t_host_post = ktime_get_real();
-> +
-> +	local_irq_enable();
-> +	preempt_enable();
-> +
-> +	mhi_cntrl->runtime_put(mhi_cntrl);
-> +
-> +	mhi_device_put(mhi_cntrl->mhi_dev);
-> +
-> +	return 0;
-> +}
-> +
-> +int mhi_get_remote_tsc_time_sync(struct mhi_device *mhi_dev, struct mhi_timesync_info *time)
-> +{
-> +	struct mhi_controller *mhi_cntrl = mhi_dev->mhi_cntrl;
-> +	struct mhi_timesync *mhi_tsc_tsync = mhi_cntrl->tsc_timesync;
-> +	int ret;
-> +
-> +	ret = mhi_get_remote_time(mhi_cntrl, mhi_tsc_tsync, time);
-> +	if (ret)
-> +		dev_err(&mhi_dev->dev, "Failed to get TSC Time Sync value:%d\n", ret);
-
-What is the difference between 'TSC' and 'Time Sync'?
-
-Nit: Space after 'value:'
-
-> +
-> +	return ret;
-> +}
-> +EXPORT_SYMBOL_GPL(mhi_get_remote_tsc_time_sync);
-> diff --git a/include/linux/mhi.h b/include/linux/mhi.h
-> index 88ccb3e14f481d6b85c2a314eb74ba960c2d4c81..f39c8ca7c251954f2d83c1227d206b600b88c75f 100644
-> --- a/include/linux/mhi.h
-> +++ b/include/linux/mhi.h
-> @@ -286,6 +286,30 @@ struct mhi_controller_config {
->  	bool m2_no_db;
->  };
->  
-> +/**
-> + * struct mhi_timesync - MHI time synchronization structure
-> + * @time_reg: Points to address of Timesync register
-> + * @ts_mutex: Mutex for synchronization
-> + */
-> +struct mhi_timesync {
-> +	void __iomem *time_reg;
-> +	struct mutex ts_mutex;
-> +};
-> +
-> +/**
-> + * struct mhi_timesync_info - MHI time sync info structure
-> + * @t_host_pre: Pre host soc time
-> + * @t_host_post: Post host soc time
-
-Get rid of 'soc', it provides no value.
-
-> + * @t_dev_lo: Mhi device time of lower dword
-> + * @t_dev_hi: Mhi device time of higher dword
-
-s/Mhi/MHI
-
-> + */
-> +struct mhi_timesync_info {
-> +	ktime_t t_host_pre;
-> +	ktime_t t_host_post;
-> +	u32 t_dev_lo;
-> +	u32 t_dev_hi;
-> +};
-> +
->  /**
->   * struct mhi_controller - Master MHI controller structure
->   * @name: Device name of the MHI controller
-> @@ -323,6 +347,7 @@ struct mhi_controller_config {
->   * @mhi_event: MHI event ring configurations table
->   * @mhi_cmd: MHI command ring configurations table
->   * @mhi_ctxt: MHI device context, shared memory between host and device
-> + * @tsc_timesync: MHI TSC timesync
->   * @pm_mutex: Mutex for suspend/resume operation
->   * @pm_lock: Lock for protecting MHI power management state
->   * @timeout_ms: Timeout in ms for state transitions
-> @@ -401,6 +426,8 @@ struct mhi_controller {
->  	struct mhi_cmd *mhi_cmd;
->  	struct mhi_ctxt *mhi_ctxt;
->  
-> +	struct mhi_timesync *tsc_timesync;
-> +
->  	struct mutex pm_mutex;
->  	rwlock_t pm_lock;
->  	u32 timeout_ms;
-> @@ -795,4 +822,14 @@ bool mhi_queue_is_full(struct mhi_device *mhi_dev, enum dma_data_direction dir);
->   */
->  int mhi_get_channel_doorbell_offset(struct mhi_controller *mhi_cntrl, u32 *chdb_offset);
->  
-> +/**
-> + * mhi_get_remote_tsc_time_sync - get external soc time relative to local soc
-
-Same comment as above
-
-- Mani
-
+diff --git a/net/rds/rdma.c b/net/rds/rdma.c
+index aa6465dc7..91a20c1e2 100644
+--- a/net/rds/rdma.c
++++ b/net/rds/rdma.c
+@@ -560,6 +560,7 @@ int rds_rdma_extra_size(struct rds_rdma_args *args,
+ 	struct rds_iovec *vec;
+ 	struct rds_iovec __user *local_vec;
+ 	int tot_pages = 0;
++	int ret = 0;
+ 	unsigned int nr_pages;
+ 	unsigned int i;
+ 
+@@ -578,16 +579,20 @@ int rds_rdma_extra_size(struct rds_rdma_args *args,
+ 	vec = &iov->iov[0];
+ 
+ 	if (copy_from_user(vec, local_vec, args->nr_local *
+-			   sizeof(struct rds_iovec)))
+-		return -EFAULT;
++			   sizeof(struct rds_iovec))) {
++		ret = -EFAULT;
++		goto out;
++	}
+ 	iov->len = args->nr_local;
+ 
+ 	/* figure out the number of pages in the vector */
+ 	for (i = 0; i < args->nr_local; i++, vec++) {
+ 
+ 		nr_pages = rds_pages_in_vec(vec);
+-		if (nr_pages == 0)
+-			return -EINVAL;
++		if (nr_pages == 0) {
++			ret = -EINVAL;
++			goto out;
++		}
+ 
+ 		tot_pages += nr_pages;
+ 
+@@ -595,11 +600,20 @@ int rds_rdma_extra_size(struct rds_rdma_args *args,
+ 		 * nr_pages for one entry is limited to (UINT_MAX>>PAGE_SHIFT)+1,
+ 		 * so tot_pages cannot overflow without first going negative.
+ 		 */
+-		if (tot_pages < 0)
+-			return -EINVAL;
++		if (tot_pages < 0) {
++			ret = -EINVAL;
++			goto out;
++		}
+ 	}
+ 
+-	return tot_pages * sizeof(struct scatterlist);
++	ret = tot_pages * sizeof(struct scatterlist);
++
++out:
++	if (ret < 0) {
++		kfree(iov->iov);
++		iov->iov = NULL;
++	}
++	return ret;
+ }
+ 
+ /*
 -- 
-மணிவண்ணன் சதாசிவம்
+2.34.1
+
 
