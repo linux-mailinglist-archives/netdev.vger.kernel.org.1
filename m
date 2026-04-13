@@ -1,219 +1,261 @@
-Return-Path: <netdev+bounces-278178-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278179-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SG+sFDM43Wk3awkAu9opvQ
-	(envelope-from <netdev+bounces-278178-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 20:38:43 +0200
+	id SLsvBI443Wk3awkAu9opvQ
+	(envelope-from <netdev+bounces-278179-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 20:40:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id E66893F2294
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 20:38:42 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1831C3F22B1
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 20:40:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 133543011176
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 18:38:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 085F730160C1
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 18:40:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E05AE38CFE4;
-	Mon, 13 Apr 2026 18:38:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34E5C38C2A4;
+	Mon, 13 Apr 2026 18:39:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="OFg5MZpb"
+	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="RUpaAz/O";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="fURx7+dd"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from fhigh-a8-smtp.messagingengine.com (fhigh-a8-smtp.messagingengine.com [103.168.172.159])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00E4B38C431;
-	Mon, 13 Apr 2026 18:38:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D85E23264FD
+	for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 18:39:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.159
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776105519; cv=none; b=ftnGnyfhPxW3BcEs0oOwwKUUdgTvB+hvZdMEj1wfcH2bIpctiaigV3bwCRAv/FTElHFqvIPxsJ9fC1E2RbyHIZiDHDwijxrrhx+zIkOXISl1SmW8bGyELf+wZoZYGiRPKCsHdrTSr/+qX8/MfHzxuZSw9AbfpXHz2URNeEEaC6Y=
+	t=1776105597; cv=none; b=EOKjUua7Tzw8Nonh/teHrMNPe5r3NDto0TvotscAMH0Pyp0vSIFrQZIBuPMgGvg9/EUkPcPhrxb7uTDqCkIFTdsOaRGQ+/WsNz4s1fdNSgqa64BzaWWYraQKbTPfSrEaBF4CZ+9TxMZPXa3IZmWaBU/xRG6N4ubKoxKKI41oTe8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776105519; c=relaxed/simple;
-	bh=Z+PybH0v/8zQfn1t6sVkaec9wuVix0JrSRz6VyP98xo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eXH2eOhJMP2UiVn1iokG1z4aehYln9yOYfZB3O+5zogvl9zxup/Rj2uZjxQF8lduDPSvfUlrMRemClwS9VBuDEOzbQhELhlorzHAY1q1Pn4iPdcUoJO6wUamUFuIGRqMf46rGraGZydfuLL6WGRHnHZ41YnpBMsHQSealUrre30=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=OFg5MZpb; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=RiJEzJ8eTjeiFv8P6UZ6cKxNVQf/7faTUhy5gtzeM1g=; b=OFg5MZpbXQnaCr+FvINNlc3ASl
-	YULz5W5EDTzl6aAciGL9fIm5gnVTz/3iZUQeTOxWJz3uDOK8oTo4Zk0lJofoeMfN2F7kzb4CwnvDj
-	TyvLdTywPaMWS8B3H8KfEuYsDY0equsi3yZTJAR91eAeBS+jFlTIs4Kb6JGhUuqLv3RDG8gk/LwiI
-	XUdEtIhIo36Zo1BTXAm5XpQusKmlxF+JZY2gmrJl7AW9M6TbXdYY5nLgYHpO+IouurDLL3bicCz1q
-	1ToxqAUuAgFH7rXmVsoTXkWLyZL3cM7pNpZlldevrEE5OkjBds7kIgFLTD6rJECzmqtl9J+HxRxqA
-	hKWkSOWw==;
-Received: from sslproxy06.your-server.de ([78.46.172.3])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1wCMB4-000Pfr-0q;
-	Mon, 13 Apr 2026 20:38:30 +0200
-Received: from localhost ([127.0.0.1])
-	by sslproxy06.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1wCMAW-000Lu1-0G;
-	Mon, 13 Apr 2026 20:38:29 +0200
-Message-ID: <bfccb5ef-d5a0-451d-88b3-65dc84ceebc1@iogearbox.net>
-Date: Mon, 13 Apr 2026 20:38:28 +0200
+	s=arc-20240116; t=1776105597; c=relaxed/simple;
+	bh=rl7zRYx8B9DrK07mJpQKm7OYgr8gvfeXh+87Ok+qE6o=;
+	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
+	 Content-Type:Date:Message-ID; b=sQBzAMP81qQl2qxI0sS9ZsCBoJ1xbPK7IfhE0ezIqes7H+pq5OdMm5bmKggbBzdrP1w0drNhBL+My3Sa1f89Bborg2dskOn8OJaWHsZM/1mTC17ZDNoJEgQKf3VgtCgSxdR3VzIv+7LnMgog8IYMrN/rEZ9n3z07HINkV8utfIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=RUpaAz/O; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=fURx7+dd; arc=none smtp.client-ip=103.168.172.159
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
+Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id BBED41400057;
+	Mon, 13 Apr 2026 14:39:50 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-05.internal (MEProxy); Mon, 13 Apr 2026 14:39:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
+	 h=cc:cc:content-id:content-transfer-encoding:content-type
+	:content-type:date:date:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to; s=fm3; t=1776105590; x=1776191990; bh=6LD3YFTK7K77B/ulNguuD
+	hs9cmDF5i881u9BF5Ps/38=; b=RUpaAz/OFXSKv4TtfvhxWgaC0IfMDRavuf3bH
+	C2NT4b3WYAu0kR+ulxzulNjCO/iojEygm+wIcizclcikgpyO8UWOvF5mRQBY7y2/
+	z5XjIMZiBW77nnGsGDZZtIt4/Ap3sW+6ZwbFp5IeBMXojAAZ2GBqYwyitU+iBKCw
+	kobNHgGYEK/cWUpkr0kfFNU+uM4JShWK97PN8MDUUXuSA46UprpoHikvedogqQKp
+	qUWukdw5RGFD5jMosHqaIguG+IT0IPovMbZFVSTDZXVdC1svtELT3TfSu6JtwP8r
+	o4VA6qOTZFDw0IwuJW/sycMaAfo8CzCEjUUamqZgNKwLsns2A==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-id
+	:content-transfer-encoding:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1776105590; x=1776191990; bh=6LD3YFTK7K77B/ulNguuDhs9cmDF5i881u9
+	BF5Ps/38=; b=fURx7+ddfWb7jGjw50a1Nm08GbHpJRcm4axMFZY8GF0QCpY0ywy
+	rpjM7SXh/oOwHJPpmAbMPFMgQuway3WhaRJGUIeVMeEqWZS+/+iYcSg9dj4sdUW3
+	bBaEUTSySBINlDXfOx1Z8rrqFyID5ENrhOzzX2sVnJvdVrS33TKWMwh4DY8aNAw+
+	ZZbBOzy1T07VDPNz1tnHaYKPrPm2vIdwIf8LcFKXH0W8n/w5dM65h0Pz2StGzW+k
+	w/S03Z6fU41v092xpksSQiUErMEAw2jn4vK94TcnGspywJbN+Q/FzLwlwFs4xGHn
+	Ompu6VXfUZLXTuYrW+mORwXtw1ns0uz4ETQ==
+X-ME-Sender: <xms:djjdaWIKFRhEXgXzf4F7SzpLEB8TCOl1q66XAmlrrvIKwny-idSXkQ>
+    <xme:djjdaatebS6-MpiE1cj7s8W7mtRiBMlUYEetTOo65ZZ9z3jGOndeL-t5SGm1rF-kX
+    pGGFlxqDNjWgLfKy7UwigJGzyO612bQBn_c_07DBh0mWTI7noKFVAw>
+X-ME-Received: <xmr:djjdabIp6QqJZuHN23Vnb9BKflenJh1lrHaN_N4vLN7qZR8I1fdpZ_-d-Ty0gRdt5s5_Xg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdefkeeljecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpefhvfevufgjfhfogggtgfffkfesthhqredtredtvdenucfhrhhomheplfgrhicuggho
+    shgsuhhrghhhuceojhhvsehjvhhoshgsuhhrghhhrdhnvghtqeenucggtffrrghtthgvrh
+    hnpeeifedvleefleejveethfefieduueeivdefieevleffuddvveeftdehffffteefffen
+    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehjvhesjh
+    hvohhssghurhhghhdrnhgvthdpnhgspghrtghpthhtohepuddtpdhmohguvgepshhmthhp
+    ohhuthdprhgtphhtthhopehlohhuihhsrdhstggrlhgsvghrthesieifihhnugdrtghomh
+    dprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohep
+    mhgrhhgvshhhsgesghhoohhglhgvrdgtohhmpdhrtghpthhtoheprghnugihsehgrhgvhi
+    hhohhushgvrdhnvghtpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgt
+    phhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepfh
+    gslhesrhgvughhrghtrdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdr
+    tghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:djjdaSOuSR3H3RmUei8wd3PO6SSVB9pGo593QafwBLqEq6SkM0q9IA>
+    <xmx:djjdaeVuNOlxXnOjrs-JgTkp2zWNAdG3WHUExtgGs2LwH4OhMNt1ww>
+    <xmx:djjdaQltExExOCBjizHsUYvVnw3dxYjayJspJ1Rx2WbsycI0QH7Rpg>
+    <xmx:djjdadPrR58s7mC_AToCzi7DRJrDvnF9_mU-ONotUxeoVBZzFU2Bow>
+    <xmx:djjdabSyFNqOQJKmglhF9H03IsshUwQIDy0jYat5y3Sdb6eeVfsMDtSi>
+Feedback-ID: i53714940:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 13 Apr 2026 14:39:49 -0400 (EDT)
+Received: by famine.localdomain (Postfix, from userid 1000)
+	id EA07E9FB3D; Mon, 13 Apr 2026 11:39:48 -0700 (PDT)
+Received: from famine (localhost [127.0.0.1])
+	by famine.localdomain (Postfix) with ESMTP id E91BD9FB3C;
+	Mon, 13 Apr 2026 11:39:48 -0700 (PDT)
+From: Jay Vosburgh <jv@jvosburgh.net>
+To: Louis Scalbert <louis.scalbert@6wind.com>
+cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, edumazet@google.com,
+    kuba@kernel.org, pabeni@redhat.com, fbl@redhat.com,
+    andy@greyhouse.net, shemminger@vyatta.com, maheshb@google.com
+Subject: Re: [PATCH net v3 4/5] bonding: 3ad: fix stuck negotiation on
+ recovery
+In-reply-to: <20260408152353.276204-5-louis.scalbert@6wind.com>
+References: <20260408152353.276204-1-louis.scalbert@6wind.com>
+ <20260408152353.276204-5-louis.scalbert@6wind.com>
+Comments: In-reply-to Louis Scalbert <louis.scalbert@6wind.com>
+   message dated "Wed, 08 Apr 2026 17:23:52 +0200."
+X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2] net: check qdisc_pkt_len_segs_init() return
- value on ingress
-To: David Carlier <devnexen@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
- Kuniyuki Iwashima <kuniyu@google.com>,
- Samiullah Khawaja <skhawaja@google.com>, Hangbin Liu <liuhangbin@gmail.com>,
- Krishna Kumar <krikku@gmail.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260413182225.10683-1-devnexen@gmail.com>
-Content-Language: en-US
-From: Daniel Borkmann <daniel@iogearbox.net>
-Autocrypt: addr=daniel@iogearbox.net; keydata=
- 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
-In-Reply-To: <20260413182225.10683-1-devnexen@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Virus-Scanned: Clear (ClamAV 1.4.3/27970/Mon Apr 13 08:24:33 2026)
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <710786.1776105588.1@famine>
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 13 Apr 2026 11:39:48 -0700
+Message-ID: <710787.1776105588@famine>
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[iogearbox.net,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[iogearbox.net:s=default2302];
+	DMARC_POLICY_ALLOW(-0.50)[jvosburgh.net,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[jvosburgh.net:s=fm3,messagingengine.com:s=fm2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,fomichev.me,google.com,gmail.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-278178-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-278179-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,kernel.org,davemloft.net,google.com,redhat.com];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[iogearbox.net:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[jvosburgh.net:+,messagingengine.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[jv@jvosburgh.net,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: E66893F2294
+	RCVD_COUNT_SEVEN(0.00)[8]
+X-Rspamd-Queue-Id: 1831C3F22B1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 4/13/26 8:22 PM, David Carlier wrote:
-> Commit 7fb4c1967011 ("net: pull headers in qdisc_pkt_len_segs_init()")
-> changed qdisc_pkt_len_segs_init() to return an skb drop reason when
-> it detects malicious GSO packets. The egress path in __dev_queue_xmit()
-> checks this return value and drops bad packets, but the ingress path in
-> sch_handle_ingress() ignores it.
-> 
-> This means malformed GSO packets entering via TC ingress are not dropped
-> and could be redirected to another interface or cause incorrect qdisc
-> accounting.
+Louis Scalbert <louis.scalbert@6wind.com> wrote:
 
-Why we need to do this on both sides (and what's the perf impact)? If TC
-ingress redirects it to some other device, then don't we hit the same via
-__dev_queue_xmit() where the 7fb4c1967011 added the qdisc_pkt_len_segs_init()?
+>The previous commit introduced a side effect caused by clearing the
+>SELECTED flag on disabled ports. After all ports in an aggregator go
+>down, if only a subset of ports comes back up, those ports can no
+>longer renegotiate LACP unless all aggregator ports come back up.
+>
+>1. All aggregator ports go down
+>  - The SELECTED flag is cleared on all of them.
+>2. One port comes back up
+>  - Its SELECTED flag is set again.
+>  - It enters the WAITING state and gets its READY_N flag.
+>  - The remaining ports stay UNSELECTED. Because of that, they cannot
+>  enter the WAITING state and therefore never get READY_N.
 
-> Check the return value and drop the packet when a bad GSO is detected.
-> 
-> Fixes: 7fb4c1967011 ("net: pull headers in qdisc_pkt_len_segs_init()")
-> Signed-off-by: David Carlier <devnexen@gmail.com>
-> ---
-> 
-> v1 -> v2: reorder variable declarations for reverse xmas tree
-> v1: https://lore.kernel.org/netdev/20260408172307.46498-1-devnexen@gmail.com/
->   net/core/dev.c | 12 ++++++++++--
->   1 file changed, 10 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index 5a31f9d2128c..d11c22cafca9 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -4459,8 +4459,8 @@ sch_handle_ingress(struct sk_buff *skb, struct packet_type **pt_prev, int *ret,
->   		   struct net_device *orig_dev, bool *another)
->   {
->   	struct bpf_mprog_entry *entry = rcu_dereference_bh(skb->dev->tcx_ingress);
-> -	enum skb_drop_reason drop_reason = SKB_DROP_REASON_TC_INGRESS;
->   	struct bpf_net_context __bpf_net_ctx, *bpf_net_ctx;
-> +	enum skb_drop_reason drop_reason;
->   	int sch_ret;
->   
->   	if (!entry)
-> @@ -4472,7 +4472,15 @@ sch_handle_ingress(struct sk_buff *skb, struct packet_type **pt_prev, int *ret,
->   		*pt_prev = NULL;
->   	}
->   
-> -	qdisc_pkt_len_segs_init(skb);
-> +	drop_reason = qdisc_pkt_len_segs_init(skb);
-> +	if (unlikely(drop_reason)) {
-> +		kfree_skb_reason(skb, drop_reason);
-> +		*ret = NET_RX_DROP;
-> +		bpf_net_ctx_clear(bpf_net_ctx);
-> +		return NULL;
-> +	}
-> +
-> +	drop_reason = SKB_DROP_REASON_TC_INGRESS;
->   	tcx_set_ingress(skb, true);
->   
->   	if (static_branch_unlikely(&tcx_needed_key)) {
+	This is the part that I think we may be doing something else
+incorrectly.  If the port is UNSELECTED, then that means that no
+aggregator is currently selected for that port, and therefore it
+shouldn't be assigned to an aggregator with other ports (per
+802.1AX-2014 6.4.8, "Selected").
 
+	I'm not seeing anything in the 6.4.14 Selection Logic that makes
+me think a port that is down (port_enabled =3D=3D FALSE) is disallowed fro=
+m
+being SELECTED.
+
+	Looking at the Receive machine state diagram (Figure 6-18), I
+tend to think that in this case the port would transition to
+PORT_DISABLED state, as we're not asserting a BEGIN (reinitialization of
+the LACP protocol entity), so the port variables can remain unchanged.
+There's even some language that suggests this is intentional:
+
+	"If the Aggregation Port becomes inoperable and the BEGIN
+	variable is not asserted, the state machine enters the
+	PORT_DISABLED state. [...] This state allows the current
+	Selection state to remain undisturbed, so that, in the event
+	that the Aggregation Port is still connected to the same Partner
+	and Partner Aggregation Port when it becomes operable again,
+	there will be no disturbance caused to higher layers by
+	unnecessary re-configuration.
+
+	So, perhaps the actual bug is that these ports are attached to
+the aggregator but not SELECTED.
+
+	-J
+
+
+>  - __agg_ports_are_ready() returns 0 because it finds a port without
+>  READY_N.
+>  - As a result, __set_agg_ports_ready() keeps the READY flag cleared on
+>  all ports.
+>  - The port that came back up is therefore not marked READY and cannot
+>  transition to ATTACHED.
+>  - LACP negotiation becomes stuck, and the port cannot be used.
+>3. All aggregator ports come back up
+>  - They all regain SELECTED and READY_N.
+>  - __agg_ports_are_ready() now returns 1.
+>  - __set_agg_ports_ready() sets READY on all ports.
+>  - They can then transition to ATTACHED.
+>  - Negotiation resumes and the aggregator becomes operational again.
+>
+>Consider only ports currently in the WAITING mux state for READY_N in
+>order to avoid __agg_ports_are_ready() to return 0 because of a disabled
+>port. That matches 802.3ad, which states: "The Selection Logic asserts
+>Ready TRUE when the values of Ready_N for all ports that are waiting to
+>attach to a given Aggregator are TRUE.".
+>
+>Fixes: 655f8919d549 ("bonding: add min links parameter to 802.3ad")
+>Signed-off-by: Louis Scalbert <louis.scalbert@6wind.com>
+>---
+> drivers/net/bonding/bond_3ad.c | 5 ++++-
+> 1 file changed, 4 insertions(+), 1 deletion(-)
+>
+>diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond_3a=
+d.c
+>index 3a94fbcbf721..3f56d892b101 100644
+>--- a/drivers/net/bonding/bond_3ad.c
+>+++ b/drivers/net/bonding/bond_3ad.c
+>@@ -700,7 +700,8 @@ static void __update_ntt(struct lacpdu *lacpdu, struc=
+t port *port)
+> }
+> =
+
+> /**
+>- * __agg_ports_are_ready - check if all ports in an aggregator are ready
+>+ * __agg_ports_are_ready - check if all ports in an aggregator that are =
+in
+>+ * the WAITING state are ready
+>  * @aggregator: the aggregator we're looking at
+>  *
+>  */
+>@@ -716,6 +717,8 @@ static int __agg_ports_are_ready(struct aggregator *a=
+ggregator)
+> 		for (port =3D aggregator->lag_ports;
+> 		     port;
+> 		     port =3D port->next_port_in_aggregator) {
+>+			if (port->sm_mux_state !=3D AD_MUX_WAITING)
+>+				continue;
+> 			if (!(port->sm_vars & AD_PORT_READY_N)) {
+> 				retval =3D 0;
+> 				break;
+>-- =
+
+>2.39.2
+>
+
+---
+	-Jay Vosburgh, jv@jvosburgh.net
 
