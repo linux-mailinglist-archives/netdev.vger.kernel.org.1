@@ -1,91 +1,66 @@
-Return-Path: <netdev+bounces-278069-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278085-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iFAoCR3k3GnBXwkAu9opvQ
-	(envelope-from <netdev+bounces-278069-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 14:39:57 +0200
+	id eI/+Iefw3GnZYQkAu9opvQ
+	(envelope-from <netdev+bounces-278085-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 15:34:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1C683EC11F
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 14:39:55 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 499A13EC996
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 15:34:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id CAEE73005140
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 12:39:52 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A6A613017BF1
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 13:33:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A17F3C344F;
-	Mon, 13 Apr 2026 12:39:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C984A3A168F;
+	Mon, 13 Apr 2026 13:33:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FJu4U4hC"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="IHDTvyRD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f52.google.com (mail-dl1-f52.google.com [74.125.82.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E73C23AE87
-	for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 12:39:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A14C531B838;
+	Mon, 13 Apr 2026 13:33:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776083990; cv=none; b=KzwmeCnRx+gKFdMj8wnx02559wpJFvRAaJilm8Un8QvKWq67SLr3NoiBOX3ja5FNUewWfqgpa0NiLdlsr2RU+jF7BuknYHKy/Mv6CEDX6iqda3GuxmhiBooyBtqIkXhj4pbhDoQAFP3gbytuPzqt5Q9KBCzsXpSfKPDIhE/a0F8=
+	t=1776087202; cv=none; b=RXuRrlc7neYNq/spJkTQEa9VMWa4YceCa37+RzWkKTTLQEB0fRhQtcP/QjxqJ/vg/e3uNAc1rLuWnE0SlZhgJ95aUJ0HNDD2diw6PbVHDp/f3bOUxw1HcoM8ODXEZyiw2ygvDqOi5a6I7YGryOoBwXQMhgc8yN5lF9IDGJSR7HI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776083990; c=relaxed/simple;
-	bh=Mb8ynuEVZ9jnH95PjLHoWPiHHqGpMrjofGz0L1SAq14=;
+	s=arc-20240116; t=1776087202; c=relaxed/simple;
+	bh=RGoZ0kAv/HIA5tdh+NMoNMfUmNT/RqGCY7/2guxi8Jc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y3OPGujrJ0gBkv0U3lmPLpb7JzSdHBJll7Ld+z2J4Qfhj94C4/No2nnOSdpsfYvz22zVu5iEr+tWp+fkXGN7WZrrEcNk3K5FaKGBtoqGLoY6TAMA4C88XRkqe9Q9gOoBmG7le4dL9RCbAK0t6xVjnafTN8WK5BzpvKjlycLGnK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FJu4U4hC; arc=none smtp.client-ip=74.125.82.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dl1-f52.google.com with SMTP id a92af1059eb24-12c45281a06so1970382c88.1
-        for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 05:39:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776083988; x=1776688788; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Gjpp1vRzru8GZlAX0xmlAVC+tq/WF3FlyeoCkEJDGGc=;
-        b=FJu4U4hCO+LbYb5gV7/6gBuhdnxFhK6E7OlCmpzg4CZBg1uZ+S3GuLN3Matehj2z54
-         l/04aZ8teGllth6O1AeqcvNZsABDfKBbPKFL6gO4CAYo0CbF0qlo+IAZW4DTimGMzgj4
-         nCnYxc3A1cmgOphIcB71vcVUoWgqPNSsORhSgpDmvZI5KUq79Buuow1uPU/6TAmb7IHD
-         OEnrPDss3XMVO6wHNYq+yGbNIQYKxcnhm+Zv40BPUwHFZJlGJM0A+J97ADXRAnybiGjT
-         WqwNwoAkmpCnsDZUapZXG9qbbpj3H9Bh80ljEVRzVKs45Sf0p+Fya19oJ8DId3whKESH
-         3oVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776083988; x=1776688788;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Gjpp1vRzru8GZlAX0xmlAVC+tq/WF3FlyeoCkEJDGGc=;
-        b=lWV2uHBsUa17LPNzkqhj5XxcWzvXEd9CRjXlkv77aro2nF7Dwe79b2CMWRkBPuAMnX
-         E79oPpglwJpTFPMaQdQ4aUPvXuiFMtBPVa2vCDk04INjoqoXWTI74LaCzv0xQWyCuZGS
-         KjWkHvsIHdk+4AsjI5NLj4hYN0YahMJmI+VzEXF9L/oa4/eVuUhyWOF/9z8FFtmeBPr1
-         90iqkiEhnOjjQf/YTsjEU2c/RQJw3Z6Gnx4ntW2yctx9gmjVbbeIUiWw8Sz5RPcBzU97
-         CIVpj78QFwitaZkf3VEn/y5wXGHN8qFv30i4ERu46fYYPak9sijfvbkK4mXqCq9LBgwl
-         fqlQ==
-X-Gm-Message-State: AOJu0Yw0snJUIZdFs37BGeD9RVHWr6e8EQh3rrqmAfMB1/yKC9SVbgOq
-	OwC/BDr7D7oje/xZrpEFq4inVTyv7LzCa69GumvdmGC1FhQsBvtnbKSZ
-X-Gm-Gg: AeBDieuMu18deeHgw6Q+hT/hyMBWuQA4cROuvLMrRhSMeN0am1F4fAiItQeVLDm+QHS
-	UAyACsFgC/lyIBsvUbi4C7zUA7Vjhjc0lS1gT8hgw2jrGNk7wlo2okeuQAAlfnjdPHpgvGmmCyo
-	45tD+UcJdmHGSNOyYbeeeNekketqJBHA48oNlc5ngxbt7KA0faRonttsNgiB/impcuxYfArJBgG
-	30Ihs2T6DmpvNtHuMZsWqgrIU2zRU9jLC1DioquN1YykIS15R7xkqkvIyCOWphKCGgRlz6vOrW2
-	wNQecLBWx+8BV7K5w6WF1vGS4Q3upP9pICBE3kHIylHfbjzmu3MW0DjRNhHIBn3ey1q3G6oLhzW
-	7+oJDJrbn5QLkXMzdLTvh6KzAU83wf3N4UeUwt/M8rY1W9fU0bVQlv+jENLPzO32t7gzu3fJZkC
-	nKsh6mW0LEkLtJzYEDuj3+v9TxrrxfLuJj/QFGtw==
-X-Received: by 2002:a05:693c:3116:b0:2be:85d4:4a2a with SMTP id 5a478bee46e88-2d5870ac158mr7345736eec.1.1776083988319;
-        Mon, 13 Apr 2026 05:39:48 -0700 (PDT)
-Received: from t14s.localdomain ([177.37.143.168])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2d562db6ac8sm16168701eec.26.2026.04.13.05.39.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Apr 2026 05:39:47 -0700 (PDT)
-Received: by t14s.localdomain (Postfix, from userid 1000)
-	id 5286813FAC0B; Mon, 13 Apr 2026 09:39:45 -0300 (-03)
-Date: Mon, 13 Apr 2026 09:39:45 -0300
-From: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
-To: Xin Long <lucien.xin@gmail.com>
-Cc: network dev <netdev@vger.kernel.org>, linux-sctp@vger.kernel.org,
-	davem@davemloft.net, kuba@kernel.org,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Weiming Shi <bestswngs@gmail.com>
-Subject: Re: [PATCH net] sctp: disable BH before calling udp_tunnel_xmit_skb()
-Message-ID: <adzkEQ17BD546rXC@t14s.localdomain>
-References: <c874a8548221dcd56ff03c65ba75a74e6cf99119.1776017727.git.lucien.xin@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Mtb8qKK402FH++Qnn1yBsq830ILOdFWkFUzwUCbHy20gXcrji8vSiBzVscS5Ne89qIWYsa8hn5z5GD5j8z6EsqXFD96Jgw0nFUrTqOKoA4+NRbRIwm3tQVZm1UzVY24jPRURIjEXyzMvEbG8leJYT2GH2b50120bHgyaOdjaDPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=IHDTvyRD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C7C8C2BCB1;
+	Mon, 13 Apr 2026 13:33:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1776087202;
+	bh=RGoZ0kAv/HIA5tdh+NMoNMfUmNT/RqGCY7/2guxi8Jc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=IHDTvyRDE3WSwBk1xO9U6TZmQvfdJH63ZqQRXS5xECfan33vXrUVzEHG90u2kV7Fn
+	 UylDAJIxPnJdQlMf+2JKWCEhBBy39FUZ9K0avT2ls5CZm3Ud4F/olNHgxFeOYUSWUW
+	 4stFN1G0CrnrpDYN+hrfNNUQcQLaD/E1a+LnwX3c=
+Date: Mon, 13 Apr 2026 14:55:06 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Thorsten Leemhuis <regressions@leemhuis.info>
+Cc: "He, Guocai (CN)" <Guocai.He.CN@windriver.com>,
+	"Berg, Johannes" <johannes.berg@intel.com>,
+	Friend <netdev@vger.kernel.org>,
+	Linux kernel regressions list <regressions@lists.linux.dev>,
+	"Korenblit, Miriam Rachel" <miriam.rachel.korenblit@intel.com>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>
+Subject: Re: commit 0c4f1c02d27a880b cause a deadlock issue
+Message-ID: <2026041330-groggy-ruse-5e27@gregkh>
+References: <CO6PR11MB5586A4475A5EEC47FC10398BCD53A@CO6PR11MB5586.namprd11.prod.outlook.com>
+ <PH0PR11MB55934A1C9A8C35B1E751C247CD50A@PH0PR11MB5593.namprd11.prod.outlook.com>
+ <14d65103-8809-4a1b-b115-bf5f8d7110ea@leemhuis.info>
+ <CO6PR11MB5586DF3964BAB4E6131A86CDCD5EA@CO6PR11MB5586.namprd11.prod.outlook.com>
+ <2026040331-evasion-walk-f572@gregkh>
+ <DM3PPF63A6024A9C09C1B13E5DF46C0B72AA35EA@DM3PPF63A6024A9.namprd11.prod.outlook.com>
+ <2026040349-chowtime-freeload-5ca4@gregkh>
+ <DM3PPF63A6024A9E931C940F849C60FAF9EA35EA@DM3PPF63A6024A9.namprd11.prod.outlook.com>
+ <58f6e74d-480e-4e0c-aa66-68dfc1de7421@leemhuis.info>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,83 +69,80 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c874a8548221dcd56ff03c65ba75a74e6cf99119.1776017727.git.lucien.xin@gmail.com>
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+In-Reply-To: <58f6e74d-480e-4e0c-aa66-68dfc1de7421@leemhuis.info>
+X-Spamd-Result: default: False [2.34 / 15.00];
+	MID_END_EQ_FROM_USER_PART(4.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linuxfoundation.org,none];
+	R_DKIM_ALLOW(-0.20)[linuxfoundation.org:s=korg];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,kernel.org,google.com,redhat.com,gmail.com];
-	TAGGED_FROM(0.00)[bounces-278069-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-278085-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	DKIM_TRACE(0.00)[linuxfoundation.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[6];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[marceloleitner@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[gregkh@linuxfoundation.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[7];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[t14s.localdomain:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E1C683EC11F
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[]
+X-Rspamd-Queue-Id: 499A13EC996
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun, Apr 12, 2026 at 02:15:27PM -0400, Xin Long wrote:
-> udp_tunnel_xmit_skb() / udp_tunnel6_xmit_skb() are expected to run with
-> BH disabled.  After commit 6f1a9140ecda ("add xmit recursion limit to
-> tunnel xmit functions"), on the path:
+On Mon, Apr 13, 2026 at 01:58:56PM +0200, Thorsten Leemhuis wrote:
+> On 4/3/26 15:00, Korenblit, Miriam Rachel wrote:
+> >> From: Greg KH <gregkh@linuxfoundation.org>
+> >> On Fri, Apr 03, 2026 at 12:44:48PM +0000, Korenblit, Miriam Rachel wrote:
+> >>>> -----Original Message-----
+> >>>> From: Greg KH <gregkh@linuxfoundation.org>
+> >>>> On Fri, Apr 03, 2026 at 11:08:46AM +0000, He, Guocai (CN) wrote:
+> >>>>> No, The mainline have no this issue.
+> >>>>> The changes of 0c4f1c02d27a880b is not in mainline.
+> >>>>
+> >>>> That does not make sense, that commit is really commit e1696c8bd005
+> >>>> ("wifi: cfg80211: stop NAN and P2P in cfg80211_leave") which is in
+> >>>> all of the following releases:
+> >>>> 	5.10.252 5.15.202 6.1.165 6.6.128 6.12.75 6.18.14 6.19.4 7.0-rc1
+> >>>> confused,
+> >>> The change is indeed in mainline, but the locking situation in
+> >>> mainline is totally different (that mutex does not even exist there)
+> >>> Therefore, the issue is not supposed to happen in mainline.
+> >>
+> >> Ok, does that commit now need to be reverted from some of the stable branches?
+> >> If so, which ones?
+> > 
+> > From every version which is < 6.7.
 > 
->   udp(6)_tunnel_xmit_skb() -> ip(6)tunnel_xmit()
+> Greg, do you still have this in your todo mail queue somewhere? Just
+> wondering, as last weeks 6.6.y released afics lacked a revert of
+> e1696c8bd0056b ("wifi: cfg80211: stop NAN and P2P in cfg80211_leave") --
+> and I cannot spot one in your public stable queue either.
 > 
-> dev_xmit_recursion_inc()/dec() must stay balanced on the same CPU.
+> These are the commits that according to Miri need to be reverted if I
+> understood things right:
 > 
-> Without local_bh_disable(), the context may move between CPUs, which can
-> break the inc/dec pairing. This may lead to incorrect recursion level
-> detection and cause packets to be dropped in ip(6)_tunnel_xmit() or
-> __dev_queue_xmit().
-> 
-> Fix it by disabling BH around both IPv4 and IPv6 SCTP UDP xmit paths.
-> 
-> In my testing, after enabling the SCTP over UDP:
-> 
->   # ip net exec ha sysctl -w net.sctp.udp_port=9899
->   # ip net exec ha sysctl -w net.sctp.encap_port=9899
->   # ip net exec hb sysctl -w net.sctp.udp_port=9899
->   # ip net exec hb sysctl -w net.sctp.encap_port=9899
-> 
->   # ip net exec ha iperf3 -s
-> 
-> - without this patch:
-> 
->   # ip net exec hb iperf3 -c 192.168.0.1 --sctp
->   [  5]   0.00-10.00  sec  37.2 MBytes  31.2 Mbits/sec  sender
->   [  5]   0.00-10.00  sec  37.1 MBytes  31.1 Mbits/sec  receiver
-> 
-> - with this patch:
-> 
->   # ip net exec hb iperf3 -c 192.168.0.1 --sctp
->   [  5]   0.00-10.00  sec  3.14 GBytes  2.69 Gbits/sec  sender
->   [  5]   0.00-10.00  sec  3.14 GBytes  2.69 Gbits/sec  receiver
-> 
-> Fixes: 6f1a9140ecda ("add xmit recursion limit to tunnel xmit functions")
-> Fixes: 046c052b475e ("sctp: enable udp tunneling socks")
-> Signed-off-by: Xin Long <lucien.xin@gmail.com>
+> v6.6.128 (4d7a05da767e5c), v6.1.165 (0c4f1c02d27a88), v5.15.202
+> (31344ffecd7a34), v5.10.252 (d91240f24e831d)
 
-Nice catch!
+It is, yes, my queue is huge :(
 
-Acked-by: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+It's fastest if someone sends me the reverts and I can easily apply them
+that way.  Otherwise it takes me a bit to do each one manually :(
+
+thanks,
+
+greg k-h
 
