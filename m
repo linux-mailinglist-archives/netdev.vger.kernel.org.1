@@ -1,203 +1,157 @@
-Return-Path: <netdev+bounces-278049-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278050-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id COS8KRfS3GmcWQkAu9opvQ
-	(envelope-from <netdev+bounces-278049-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 13:23:03 +0200
+	id 4FDVIeTR3GmcWQkAu9opvQ
+	(envelope-from <netdev+bounces-278050-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 13:22:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08B7B3EB391
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 13:23:02 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AF703EB34B
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 13:22:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C32A2300D864
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 11:20:49 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 6CAFF3008253
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 11:22:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D71B3B0AF1;
-	Mon, 13 Apr 2026 11:20:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE0B535AC0A;
+	Mon, 13 Apr 2026 11:22:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dH1w5m0/"
+	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="ba49pVzo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout-y-111.mailbox.org (mout-y-111.mailbox.org [91.198.250.236])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C5CB30FF05
-	for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 11:20:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 093E730FF05;
+	Mon, 13 Apr 2026 11:22:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.198.250.236
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776079249; cv=none; b=b94LfDRH+VrrQsaN3uoqDIbI1uzAxLiVgjWef3zjzbQXBE+J4Jp89G/eMS8327KHj1Zzuc5EdcBw7DotJU23860OOD1dWjHkzNiv6pbf5Aa74S9pfKi1/Ml4rjqpJMRXrSknOReK5slWlFBjvA0clMaORO5kf4yYkcYpzfQk31s=
+	t=1776079327; cv=none; b=Yqj8l0qqSD/hEYmMcvXoqqOxGso0JzzHTBvRtZuLFyGsnPqz7kkbU+e/H2Pv0HwqeBzCBYgzw+I/A+VVNn+T39ZKcQj7gG9w8T/w9ynorKmUgQMhZXU3OW4fXe1OKC5rzZESNPJNMuw6K59tzl2BQNFDCyDbaobC5u0DThlUQKM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776079249; c=relaxed/simple;
-	bh=R5urYhnoHecl+KVX4m8FZXgsJfZf3ZpUYspi2EHPFBo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DuA/mG16xUeTQOsc40Igprd5n0xdGNQB+VNkUE6CY2UrEAALkhZgh541/vh7t5+KsjFAjzcbo9F8I1pMaw8s+Ow4wlEoO0k0Cmy/iYpq1BQDW1aHk+IZmIg1JnwmGq2t92QPsXs09mblTGG60U6YSRUwNGjCNAZ/05K+ldhT+98=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dH1w5m0/; arc=none smtp.client-ip=209.85.210.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-82418b0178cso2096826b3a.1
-        for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 04:20:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776079247; x=1776684047; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=iQ7f9KI9JqtBNgCC6+8bgvZa6CW8q9FixqdbvIgHfKA=;
-        b=dH1w5m0/WlAoZqvADSMi1fTBWlr7hchAIJlgpfCiiMuqLTucEhlMLKpbMXa15uJQJq
-         2Tz79GD8D2or5W65WoFY+OHew59Se6fEm7aeHj5uCUvneffTU+0mn0GDaivxMbCSLFyM
-         7wsb9n6E4SHVQZTPAnB6ig7iEkePBU1uPr2Ie89U1qk0tZ8PeMn8cK7203+VHVJskavb
-         2EZgekwIdmpqb1OeDPFbg9bXjG3ZWaBhvP77HldYwnquWlcGcSkmJWKtZ4bmP25mI/Gi
-         Ak3Rzjrj1qT6rOSGcvcVKOoMK9HEVb2VQ2R2w9RGU8109NRgB0nH6NjNx4aWlpIAM5Pj
-         Mo+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776079247; x=1776684047;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iQ7f9KI9JqtBNgCC6+8bgvZa6CW8q9FixqdbvIgHfKA=;
-        b=Hq84Ch990XREJbuosQ8bn60AOZQOZ0PZFbAvPnzSGadAP8XcH9Ml0LTy8GznwEIfQE
-         9SNbbpfBxxUb5MT7RZuXTFOD/45IKoyYi/BpOLAXWOEKJW2BhrCFy3PbgybfQc+cJop3
-         pnrs0Q50IXRFoSSkbezECUIbNltCjm9f9XQF5iDgAS7wdAsEaif/b++QAwRItHzwLvIE
-         cabRijvVDP/mNWF3aKrT8RT4gI49AqBOtjYZwept4VMZGHDYxObryzSzG1STr3DtVj0v
-         AH5KVas/Bq4mEN5n2eiJy+GO/TPSmxZlDPklPtsSP7+AcFb9HWWy8rRyepPJV5vUocod
-         Fyng==
-X-Forwarded-Encrypted: i=1; AFNElJ9GUu3S6LiGdh6S/Op7OcXcPdZKZN9jPOZyrTipvv5wjC5U7JFG5dlrtcPIixamGQGMxtdHrow=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzwowwcKml8+O/fY416rEFVc/BG1Z7M9VlzUmP5L4mRlJFY1au9
-	64aDIHdiNq5S/lsh0/sQ7VBdZHx5u/WhsGMZMTiJfGnPlDiC6cT5vYcX
-X-Gm-Gg: AeBDietC/pP/DMBl+44YZJ2D1swQAp6kBKyvF78vWIVOK7XiKJNMPJSoJ10dIIu4PPY
-	rDyWgAMo3tNDNKrxVwDiBmNM35bBNCDXomPx5Ms79WEN51YeIe3EZ0F/eL4OkaS11cMgAVwKdlt
-	wzMsrsLi6t6qBlrj2i/ZGoAxwc8Xffxj0Bm+gFOyG20PoAxbf/vdWxfM5EMbkBiTs1edKFIS+u0
-	alFj+NLI5wBlECCVlUgo7/DzzWlZXdDeYOUEVlYJJd1VGbTbgXiLO7FnlTmXL0gbyEcv3vy4GYU
-	i0FbPhwzggGovcuGwPYba6bgeI4pz2AYblzjX7dGHos/qywc2a3tCbtATBTodty9ysKGGYFswpF
-	dz7+aYIsG7rhWgEvFX25hO05fjvkeCQqLiEqtmCZCa1QQJ2s5JDKJpIdKMGgT8Mvl4/OnwnC8/0
-	TnRJHV3mefbqhrEw==
-X-Received: by 2002:a05:6a00:1887:b0:829:924c:348a with SMTP id d2e1a72fcca58-82f0c26b71fmr14463158b3a.45.1776079247519;
-        Mon, 13 Apr 2026 04:20:47 -0700 (PDT)
-Received: from lgs.. ([101.32.189.54])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82f0c4df7f5sm13555346b3a.43.2026.04.13.04.20.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Apr 2026 04:20:47 -0700 (PDT)
-From: Guangshuo Li <lgs201920130244@gmail.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Joshua Hay <joshua.a.hay@intel.com>,
-	Tatyana Nikolova <tatyana.e.nikolova@intel.com>,
-	Madhu Chittim <madhu.chittim@intel.com>,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Guangshuo Li <lgs201920130244@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH v2] dpf: fix UAF and double free in idpf_plug_vport_aux_dev() error path
-Date: Mon, 13 Apr 2026 19:20:30 +0800
-Message-ID: <20260413112030.2694563-1-lgs201920130244@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1776079327; c=relaxed/simple;
+	bh=aD6WW45e+NRp9O5rCvJhTmH0sTsR1ClEPzUe3gzQylo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QNNTJT/TXDamv6DRW3ev2gpB9aTtMld97Ark3+8Yv5ugjmayaU6KgJgQtAA0D6vsSeY3eU/pE3Q9fQK1HGnn6iM+GnQZ0nCN4vdcA8jNWbbrwr/C0K/71tGDR+4zsHstMkSeeeWIagr5TrivTbRUCJR/sJyfzvgNxoPvDq8cET8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=ba49pVzo; arc=none smtp.client-ip=91.198.250.236
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
+Received: from smtp102.mailbox.org (smtp102.mailbox.org [10.196.197.102])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-y-111.mailbox.org (Postfix) with ESMTPS id 4fvQ3S5QYkz9yR3;
+	Mon, 13 Apr 2026 13:21:56 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
+	t=1776079316;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4ujTFig8ng/0GP5w6u02e5j7gKiyai90e+dKLtJdkFs=;
+	b=ba49pVzoT+DpLoet5qXdX9pNRN6h4LcmnxIpQ67+Y07iStql2BIbTgr24jgSLhC60nYbYT
+	+VCZomXUnIX7A+6QOhU8G9awgtVFQGZ4riMM5ZIYN6a3nREuDYA0JJhSnIW5Ww4p0Rn890
+	BrLDhFC6XwSd71XzSenjH3N2iOOVEzCRWw8G2QTQYK0Yt5QEj3rPrklKOeuwJLjJaQTJIs
+	Cuj3m+g/9b7hcxPZoAsG8qVytFmNLpsVCygUj7LKX2eWpLPW5gcO/eqaajNKAN4sGEHFM0
+	J3zRqxnuA2c7grmcgR7Fm+I1lbhiSIUW/4Qj5QzqA5PQKyX0wUF2rkUh064c3g==
+Message-ID: <22da778a-a622-46b9-be7c-948f9178e77e@mailbox.org>
+Date: Mon, 13 Apr 2026 19:21:43 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+Subject: Re: [PATCH v2 net] net: ax25: fix integer overflow in
+ ax25_rx_fragment()
+To: David Laight <david.laight.linux@gmail.com>,
+ Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, horms@kernel.org, jreuter@yaina.de,
+ linux-hams@vger.kernel.org, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
+References: <20260409025026.24575-1-mashiro.chen@mailbox.org>
+ <20260412131751.0e90a053@kernel.org> <20260412220550.0f35f5ef@pumpkin>
+Content-Language: en-US
+From: Mashiro Chen <mashiro.chen@mailbox.org>
+In-Reply-To: <20260412220550.0f35f5ef@pumpkin>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-MBO-RS-ID: 9888fca2716acfe2476
+X-MBO-RS-META: igou1zj3j1uosk8uu1wz6rf3fon9giwe
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[mailbox.org,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[mailbox.org:s=mail20150812];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	TAGGED_FROM(0.00)[bounces-278049-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lgs201920130244@gmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-278050-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com,kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[mailbox.org:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mashiro.chen@mailbox.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.998];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 08B7B3EB391
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mailbox.org:dkim,mailbox.org:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 0AF703EB34B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-If auxiliary_device_add() fails, idpf_plug_vport_aux_dev() calls
-auxiliary_device_uninit(adev), whose release callback
-idpf_vport_adev_release() frees the containing
-struct iidc_rdma_vport_auxiliary_dev.
+Hi Jakub, Simon
 
-The current error path then accesses adev->id and later frees iadev
-again, which may lead to a use-after-free and double free.
+v3 has addressed the review comments on v2:
+1. Add pskb_may_pull(skb, 1) before dereferencing skb->data
+2. Remove the unnecessary (unsigned int) cast on fraglen
+3. Fix skb leak in overflow path that kfree_skb(skb) before return 1
+4. Reset ax25->fraglen = 0 after purge
 
-The issue was identified by a static analysis tool I developed and
-confirmed by manual review.
 
-Fix it by storing the allocated auxiliary device id in a local
-variable and avoiding direct freeing of iadev after
-auxiliary_device_uninit().
+P.S.:
+the reassembly copy loop at ax25_in.c:75 uses 
+skb_copy_from_linear_data(skbo, dst, skbo->len), which is equivalent to 
+memcpy(skbo->data, dst, skbo->len).
+If a queued skbo contains non-linear data, which means data_len > 0, 
+this silently reads only the linear head and copies stale data for the 
+remainder.
+In practice, all AX.25 lower-layer drivers like mkiss and 6pack allocate 
+fully linear skbs via dev_alloc_skb(), so this is not currently 
+reachable, I think there should be a separated patch to fix this.
 
-Fixes: be91128c579c ("idpf: implement RDMA vport auxiliary dev create, init, and destroy")
-Cc: stable@vger.kernel.org
-Signed-off-by: Guangshuo Li <lgs201920130244@gmail.com>
----
-v2:
-  - note that the issue was identified by my static analysis tool
-  - and confirmed by manual review
+73s,
+Mashiro Chen
 
- drivers/net/ethernet/intel/idpf/idpf_idc.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_idc.c b/drivers/net/ethernet/intel/idpf/idpf_idc.c
-index 6dad0593f7f2..2a18907643fc 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_idc.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_idc.c
-@@ -59,6 +59,7 @@ static int idpf_plug_vport_aux_dev(struct iidc_rdma_core_dev_info *cdev_info,
- 	char name[IDPF_IDC_MAX_ADEV_NAME_LEN];
- 	struct auxiliary_device *adev;
- 	int ret;
-+	int adev_id;
- 
- 	iadev = kzalloc(sizeof(*iadev), GFP_KERNEL);
- 	if (!iadev)
-@@ -74,11 +75,14 @@ static int idpf_plug_vport_aux_dev(struct iidc_rdma_core_dev_info *cdev_info,
- 		goto err_ida_alloc;
- 	}
- 	adev->id = ret;
-+	adev->id = adev_id;
- 	adev->dev.release = idpf_vport_adev_release;
- 	adev->dev.parent = &cdev_info->pdev->dev;
- 	sprintf(name, "%04x.rdma.vdev", cdev_info->pdev->vendor);
- 	adev->name = name;
- 
-+	/* iadev is owned by the auxiliary device */
-+	iadev = NULL;
- 	ret = auxiliary_device_init(adev);
- 	if (ret)
- 		goto err_aux_dev_init;
-@@ -92,7 +96,7 @@ static int idpf_plug_vport_aux_dev(struct iidc_rdma_core_dev_info *cdev_info,
- err_aux_dev_add:
- 	auxiliary_device_uninit(adev);
- err_aux_dev_init:
--	ida_free(&idpf_idc_ida, adev->id);
-+	ida_free(&idpf_idc_ida, adev_id);
- err_ida_alloc:
- 	vdev_info->adev = NULL;
- 	kfree(iadev);
--- 
-2.43.0
-
+On 4/13/26 05:05, David Laight wrote:
+> On Sun, 12 Apr 2026 13:17:51 -0700
+> Jakub Kicinski <kuba@kernel.org> wrote:
+>
+>> On Thu,  9 Apr 2026 10:50:26 +0800 Mashiro Chen wrote:
+>>> Fix mirrors the identical bug fixed in NET/ROM (nr_in.c): check for
+>>> overflow before adding skb->len to fraglen, and abort fragment
+>>> reassembly cleanly if the limit would be exceeded.
+>> Same problem as reported by Simon on the netrom patch applies here.
+>>
+>> nit: I don't think you need to cast ax25->fraglen to unsigned int
+>> in the comparison. since it's added with skb->len it should get
+>> auto-prompted to unsigned int.
+> It wouldn't matter if that comparison were signed.
+>
+> Or change the type of ax25->fraglen to be 32bits and do the
+> sanity check for overlong packets later in the code.
+> I had a quick look at the header and the structure hasn't
+> been size-optimised...
+>
+> 	David
+>
 
