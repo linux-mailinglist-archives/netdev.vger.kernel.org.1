@@ -1,188 +1,203 @@
-Return-Path: <netdev+bounces-278113-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278112-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UNxEL5sG3WkZZAkAu9opvQ
-	(envelope-from <netdev+bounces-278113-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 17:07:07 +0200
+	id 2NVzGoIF3WkZZAkAu9opvQ
+	(envelope-from <netdev+bounces-278112-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 17:02:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17C7A3EDB8D
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 17:07:07 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0C703EDA7F
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 17:02:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id ADE6030528B2
-	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 14:59:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5F54B3006B50
+	for <lists+netdev@lfdr.de>; Mon, 13 Apr 2026 14:56:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13C1A3B95E7;
-	Mon, 13 Apr 2026 14:59:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCF533AE6E6;
+	Mon, 13 Apr 2026 14:56:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TtW2TBS9"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ta/gv6tQ";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="PpcwSdvv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E50B23B774B;
-	Mon, 13 Apr 2026 14:59:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90096361670
+	for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 14:56:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776092392; cv=none; b=D0c8yZL3CssYhH0cmvTSK3zNT4x32qFztswh4UT/Ltjj6CMQOlK0uuRU8GuoB0bg2FgnRoldX4T3Z1n/GsYn3oUEV4YV9XQWkri//d/kdlM4Lp3JpJgkOUHZNJ+OV6BgMLwKO4/Zpcght19YIGKeW9gh6ZCnKGlWDJwe4g1thcM=
+	t=1776092202; cv=none; b=LI/qa0tah4m76qdmqlrVOU/ON93QstKQ+wXd+JqSQgt2iyFu3yFkNjevE4pZDPl1UE3TEKDLTRhS1yZNPJczQS/tHX33bLxmOeyB5fRJJQCHxG+UWW1aTQONQPVTsgebZAGSKU2tfcR36MbJoVp0coSLCyvlpbFbZb40BMPzhM8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776092392; c=relaxed/simple;
-	bh=ToPQhf+AU4et7lLAuA4KTwzfff0wXqHPucAzwkwJ6sY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Kq5OBJh0dDDo5JYAlbhlIM8cWIAxzqsY6CTwogLshz52aUZjmZM/wbPT+XUVF2aEjrAbtfDStIWynb4BCb5ttrgFst+qttuXIr3hGxf1/V98ldfVgnv43Zsbjx0PPuWUxV89wyoN1309FUY6H8U33UIyjsyglqCodfysF1/KGYs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TtW2TBS9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4EAB6C2BCAF;
-	Mon, 13 Apr 2026 14:59:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776092391;
-	bh=ToPQhf+AU4et7lLAuA4KTwzfff0wXqHPucAzwkwJ6sY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=TtW2TBS94vcUa9a4Ed7PcWrPV/FRaksQw2+2uT/VDXjTU7nqgp+KFWLTPRee+0gc5
-	 yvB4DOLk5RSddrYhq5YKFaGo4kGO4evnX4vGCfhrv6oe1ANV9EgFE6AQWFbm3ltNqT
-	 DabilfO/qj7VbMqv+W8TUF5tErjALJQHK4YRAuOvnhA84nSKkuo/fcBVMSI1srjBz1
-	 aGIV2+tIoq0GbZHnAALd64Wvj5n+Vat6IsDlxWFiYEmr2INVAkwbTYvN+PtBOLP2Gu
-	 f3nC/Ipd3gjo2civxcJrK0lYbr/IZLJJc4ipzTpiEJnbLf2IMo6q/ppcI27eKjL6aD
-	 keL1vs1jXFWOw==
-From: Simon Horman <horms@kernel.org>
-To: khai.wen.tan@linux.intel.com
-Cc: 'Simon Horman' <horms@kernel.org>,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	faizal.abdul.rahim@intel.com,
-	hector.blanco.alcaine@intel.com,
-	hong.aun.looi@intel.com,
-	khai.wen.tan@intel.com,
-	faizal.abdul.rahim@linux.intel.com
-Subject: Re: [PATCH iwl-next 1/1] igc: add support for forcing link speed without autonegotiation
-Date: Mon, 13 Apr 2026 15:52:15 +0100
-Message-ID: <20260413145215.718532-1-horms@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260409072747.217836-1-khai.wen.tan@linux.intel.com>
-References: <20260409072747.217836-1-khai.wen.tan@linux.intel.com>
+	s=arc-20240116; t=1776092202; c=relaxed/simple;
+	bh=pbpXMs7VXRZdtUynBjml+ZtskO/P0GLq4ZmlxeGlfkc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rPOtG4o3bxzqcOevqxDupJMDB2bt5pUoxSfHQD+xyod1fRqCDoKy+T6evODmL2exLhDCohsjdIWhVd6HF9k/k4JhvtTCdILgiENZKsmDfTNgRfmpAuwoADyn8R0/XiWVxM8LV7DRPJn6uMqaeJBjSebD12k36H+BAKK0bU/teD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ta/gv6tQ; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=PpcwSdvv; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1776092200;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kwNT9fe7fcVC+o/T4ujiYHM4r77SOsKtqnw72f+HZsM=;
+	b=Ta/gv6tQaq/p6mae1ZRjxtla2IKyNQAPRSWjohJjxKeWUDeGdIFMED/RNYs7oVABknDEFS
+	Q70yFrPY/Rpm8Gat8kbUDtCWlaybxxlluxC/lxabySf0Uf2KikroQ/a16/3//noQNtgcxi
+	GVL5SUwJdiMcySdmA0/c2M7eHZtR+Nc=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-382-F6TIpCl0MkyFMIOkUpgW1Q-1; Mon, 13 Apr 2026 10:56:37 -0400
+X-MC-Unique: F6TIpCl0MkyFMIOkUpgW1Q-1
+X-Mimecast-MFC-AGG-ID: F6TIpCl0MkyFMIOkUpgW1Q_1776092196
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-b9dff69b5aeso49058566b.1
+        for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 07:56:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1776092196; x=1776696996; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=kwNT9fe7fcVC+o/T4ujiYHM4r77SOsKtqnw72f+HZsM=;
+        b=PpcwSdvvcYdYcweFnLihPUMjvHV+dZzYnSmGYLtYm5GXCh+Q9dk2cLExty2TDIX5vw
+         1ESaeQLkuX8vJKGhPGOcExqYAzulKzLaLnyVGSK6FKSYCQgSb1Qh1rrNxxVGFe/Y5Tx7
+         +kiwn3XNtbcn5RpwLnD1+JZFqTSiII0u9SKuoIBPGtx4jEUr03WCZWKg4wnxfMeWMLwL
+         hZRqQsLhjdMlyudBohLKOY6KYdy1za1coBxmyPVW1rYReMdN6zZUbr2PxzogzcOr30Aj
+         zGsvQjL+BuQBLB9uVi8VOOvEbacx59IoeWWVLfbT2SxIgSbjN52EuB/eBr0k13eS2665
+         tmFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776092196; x=1776696996;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kwNT9fe7fcVC+o/T4ujiYHM4r77SOsKtqnw72f+HZsM=;
+        b=oDUwj4hGhnv3MYTjJrOWAoOJA5Y6yzK+yQqIYgW3jitRrHK4sUFRndx1lcYEvBRFSo
+         QblEx1/+OVKbxA9UBuWEkYzj3rvA0cPDFk5spY5crW9mZ6hIpmKYJXqNgsV6IwB4TuUG
+         Xul5pr8EvZDSgCI6nmDf1UNuBS9+DY4ohRDb9ztRfgIQUvd/ZIutjFAlkvgQuusowUzt
+         YZpOEHYQc4BmFuzG+Pkj3WCDXbSfa8t7Gy+K+QwISnW7KckuOhMRpLS05ywLqzdYdRaB
+         eWIWC/f227ypBBkhQzHsTQn9JVkpRp7U5UrPlvs06JTthcE0xltk7JhVGhH0OGER61iM
+         nd6w==
+X-Forwarded-Encrypted: i=1; AFNElJ/TsYuC7t9iGJRbopBlz8644gILhltvAQFcNyx8/t6krX3UGOG1MRDrLyGCW9/uxy5t4LOR4dI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyetKZtutjeZzucTVrYehee19rrCKTyaKug45velCMvzIPCxKpU
+	hGOtnvhGFSpp6f/LjjWfcknDFnNwCXxGlgmOmAnJu51G1RUK/Eqrl1HrNLIuj6djHVnwzVIPSbR
+	d0y7Ft4GfMnoYdUqkhEJkmygoU4AAIIwBeWFA/VRBy3xBYyvwBV/f2PCr5Q==
+X-Gm-Gg: AeBDiesu/MtLT7MuRWlNdMP9xUolLUEJpsMWcPP4js+gonx7HDSbEz6QGUBH98XBl+a
+	RnW/LoYaeg2jfX4WsPhWeXd4dwNpijEDajJe+cjkkq6G7IKs7vyPbp2HWsUWIA0aUYlVKOBkmzi
+	1SN9HAquOxldNyEK1SMQENK4rVscnh2gez2dstPTfeZvRbqjRBD34UrWE0h6kjMaa7WiUSZKDjy
+	PBcs5RVesRRDCMtno5GmuJdkAyM0vs0ZWyo7NN/S9xl4VuROEV0xs/1b4C1EyXPZg/lYuc+uo2+
+	0vFzWKrDgVgB63Fa/BTlRzizQlROwDgD6bYz50RWxfjqJXxup7klUqkJvdDDCIurpy8kRN1zMxR
+	2v39UrN2siWBOjRkifDTxbhc2S73p4o8T7nsw9y4nsvBgdrsojtdjeQtT
+X-Received: by 2002:a17:907:96ac:b0:b97:b9d5:4ae4 with SMTP id a640c23a62f3a-b9d724b225emr771975566b.20.1776092195970;
+        Mon, 13 Apr 2026 07:56:35 -0700 (PDT)
+X-Received: by 2002:a17:907:96ac:b0:b97:b9d5:4ae4 with SMTP id a640c23a62f3a-b9d724b225emr771973066b.20.1776092195339;
+        Mon, 13 Apr 2026 07:56:35 -0700 (PDT)
+Received: from [192.168.88.32] ([216.128.11.125])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b9d6e5c583asm311542966b.36.2026.04.13.07.56.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 13 Apr 2026 07:56:34 -0700 (PDT)
+Message-ID: <0f1690ed-d449-4b7a-b172-85af40e709f8@redhat.com>
+Date: Mon, 13 Apr 2026 16:56:33 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [GIT PULL] bluetooth-next 2026-04-13
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20260413132247.320961-1-luiz.dentz@gmail.com>
+ <580f7972-56d5-4968-9dcc-32adc31e0673@redhat.com>
+ <CABBYNZK5mMbuzvjAquy49vSk0pLRnk_s8oqEut1se4DToURn9A@mail.gmail.com>
+ <CABBYNZ+7zr1jQ7a-2p88zNqMdvn6MAB5NAZ7b4OW=P56DcMT5g@mail.gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <CABBYNZ+7zr1jQ7a-2p88zNqMdvn6MAB5NAZ7b4OW=P56DcMT5g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	TAGGED_FROM(0.00)[bounces-278113-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-278112-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 17C7A3EDB8D
+X-Rspamd-Queue-Id: D0C703EDA7F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: 'Simon Horman' <horms@kernel.org>
+On 4/13/26 4:17 PM, Luiz Augusto von Dentz wrote:
+> On Mon, Apr 13, 2026 at 10:11 AM Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> On Mon, Apr 13, 2026 at 9:41 AM Paolo Abeni <pabeni@redhat.com> wrote:
+>>>
+>>> On 4/13/26 3:22 PM, Luiz Augusto von Dentz wrote:
+>>>> The following changes since commit 42f9b4c6ef19e71d2c7d9bfd3c5037d4fe434ad7:
+>>>>
+>>>>   tools: ynl: tests: fix leading space on Makefile target (2026-04-09 20:41:40 -0700)
+>>>>
+>>>> are available in the Git repository at:
+>>>>
+>>>>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2026-04-13
+>>>>
+>>>> for you to fetch changes up to c347ca17d62a32c25564fee0ca3a2a7bc2d5fd6f:
+>>>>
+>>>>   Bluetooth: hci_qca: Fix missing wakeup during SSR memdump handling (2026-04-13 09:19:42 -0400)
+>>>>
+>>>> ----------------------------------------------------------------
+>>>> bluetooth-next pull request for net-next:
+>>>
+>>> Net-next is closed for the merge window. I guess Jakub could still
+>>> consider merging this, but unless you want it very, very badly, I hope
+>>> it can just be postponed, as the PW queue is already long.
+>>
+>> This update includes quite a few new hardware supports. This is a
+>> resend because the last one was dropped due to an invalid 'Fixes' tag.
+>>
+>>  Btw, I don't know why the entire PR needs to be dropped if only a few
+>> items have invalid tags? Can't we just dropped those?
+> 
+> Maybe Im doing something wrong in my side, the issue with the Fixes
+> that is that sometimes they become invalid once I rebase on top of
+> net-next, which, afaik, is necessary to detect already applied
+> patches. Or is rebasing is not really necessary and should only be
+> done once when rc1 is tagged?
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev
----
-igc: add support for forcing link speed without autonegotiation
+AFAICT, rebasing is needed if you have local patches not present in the
+tree that you are pulling from.
 
-This commit allows forcing 10/100 Mb/s link speed and duplex settings via
-ethtool when autonegotiation is disabled. It configures the MAC CTRL and
-PHY registers to bypass autonegotiation and apply the requested settings.
+If you e.g. send a PR to net-next, including all the patches present in
+your devel tree ATM, you could avoid the later rebase not applying any
+patch in your tree until you merge net-next back.
 
-> diff --git a/drivers/net/ethernet/intel/igc/igc_ethtool.c b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-> index 0122009bedd03..e14771532dad8 100644
-> --- a/drivers/net/ethernet/intel/igc/igc_ethtool.c
-> +++ b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-[ ... ]
-> +static int igc_handle_autoneg_disabled(struct net_device *netdev, u32 speed,
-> +				       u8 duplex)
-> +{
-> +	struct igc_adapter *adapter = netdev_priv(netdev);
-> +	struct igc_mac_info *mac = &adapter->hw.mac;
-> +	enum igc_forced_speed_duplex forced_speed_duplex;
->  
-> +	switch (speed) {
-> +	case SPEED_10:
-> +		forced_speed_duplex = (duplex == DUPLEX_FULL) ? IGC_FORCED_10F : IGC_FORCED_10H;
-> +		break;
-> +	case SPEED_100:
-> +		forced_speed_duplex = (duplex == DUPLEX_FULL) ? IGC_FORCED_100F : IGC_FORCED_100H;
-> +		break;
+Would that doable for you?
 
-Does forcing a half-duplex configuration here also require setting flow
-control to none (e.g., hw->fc.requested_mode = igc_fc_none)?
+Thanks,
 
-> diff --git a/drivers/net/ethernet/intel/igc/igc_mac.c b/drivers/net/ethernet/intel/igc/igc_mac.c
-> index 7ac6637f8db73..16b0f2db06896 100644
-> --- a/drivers/net/ethernet/intel/igc/igc_mac.c
-> +++ b/drivers/net/ethernet/intel/igc/igc_mac.c
-> @@ -452,7 +452,7 @@ s32 igc_config_fc_after_link_up(struct igc_hw *hw)
->  	 * so we had to force link.  In this case, we need to force the
->  	 * configuration of the MAC to match the "fc" parameter.
->  	 */
-> -	if (mac->autoneg_failed)
-> +	if (mac->autoneg_failed || !mac->autoneg_enabled)
->  		ret_val = igc_force_mac_fc(hw);
+Paolo
 
-If mac->autoneg_enabled is false, igc_force_mac_fc() will configure the MAC
-using the existing hw->fc.current_mode. If current_mode defaults to full flow
-control, this will enable PAUSE frames.
-
-Since autonegotiation is disabled, the MII status check further down in this
-same function will fail and return early:
-
-drivers/net/ethernet/intel/igc/igc_mac.c:igc_config_fc_after_link_up() {
-    ...
-    if (!(mii_status_reg & MII_SR_AUTONEG_COMPLETE)) {
-        hw_dbg("Copper PHY and Auto Neg has not completed.\n");
-        goto out;
-    }
-    ...
-}
-
-This early return skips the half-duplex safety check at the end of
-igc_config_fc_after_link_up() which would normally clear the flow control
-settings:
-
-drivers/net/ethernet/intel/igc/igc_mac.c:igc_config_fc_after_link_up() {
-    ...
-    if (duplex == HALF_DUPLEX)
-        hw->fc.current_mode = igc_fc_none;
-
-    ret_val = igc_force_mac_fc(hw);
-    ...
-}
-
-Does this leave the MAC incorrectly configured to send and receive PAUSE
-frames on a half-duplex link, violating the IEEE 802.3 specification?
 
