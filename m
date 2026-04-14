@@ -1,188 +1,222 @@
-Return-Path: <netdev+bounces-278459-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278461-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WHxABKBE3mlvpwkAu9opvQ
-	(envelope-from <netdev+bounces-278459-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 15:44:00 +0200
+	id JPmACSBG3mn+pwkAu9opvQ
+	(envelope-from <netdev+bounces-278461-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 15:50:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0ED53FAA36
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 15:43:59 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7A733FABAB
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 15:50:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 0C7E43013B83
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 13:43:59 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 6E20C301F19D
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 13:48:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CDE53939C2;
-	Tue, 14 Apr 2026 13:43:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98A123DD524;
+	Tue, 14 Apr 2026 13:48:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="S6AAfSv+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WIGtfU1G"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1C4825B2F4;
-	Tue, 14 Apr 2026 13:43:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31EB838B7A5
+	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 13:48:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776174237; cv=none; b=Ra3RXL+1JkVc7V2G51P/tAV7XYf+cC6y5tEjRwJeOuJjcNPNxNVPG4M7+gTiCZjrcYZ3OTST2szHZtRXPc6Gh1imuA17GO5Pb59gSNKyYqJzascUFNeSuJLI+IfulFidNTDgSchv6PgkQOpYdIkrOJS9or64h+IChhMuI7askvc=
+	t=1776174517; cv=none; b=IZ11H5vHITD/GVFc2Diq7l/pEHfkns4yhJfpi4x7cT9glIYQ47DaQ6+WuVecCzcd6mDgVwPY8yoyc3iC0XVj0j5xXGhaUqv3bpljqcuaRtSL9mjmVwIkYqTXQ+4DBRHxZm629RJF5nt2cP2Uik6xp1vBZ9FY3hDzH5KGX4kaDuw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776174237; c=relaxed/simple;
-	bh=7Qsjc8sieTy2NunPo1IUnobN9kKlNcjdypUZQ9CE4Zc=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:From:To:
-	 References:In-Reply-To; b=g/GdwK/+9o4RfTLE6v/OasI8T6bqinevbmT59eIF5AYkRSEur9ON6lEi42Axw3z09s5c6D10psYUEOUnpknwrWaXAEHNo9U6rYOKYphsPClUyLs2ET8UV9VrW6zDgGSEeQhgkFkkR/fwG1YGoglia2FV0uxnvihcX9agGxOx8So=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=S6AAfSv+; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 1406BC5AAAC;
-	Tue, 14 Apr 2026 13:44:31 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id E416660410;
-	Tue, 14 Apr 2026 13:43:53 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 450DD10450118;
-	Tue, 14 Apr 2026 15:43:42 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1776174232; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=fBYaHCpG8hC1NEAoLKhT2eDDnp5ePCFis5i2nukgCY4=;
-	b=S6AAfSv+oUeOvIrxD+z5bbdfpbvEOB21uXEtXvB4AqMh4FY8aCuyB3wHwx9r7WuVdHJYL+
-	rD0/08M7IBbmkTkrkT4y4rKcwWyqFckHbY0d9PtwNrkx7DaSk7KT0vztBafKaTOmUOws5w
-	qAGaNH/SCsFaeSpXq+U1fXnRnSb6RTAFiP4wAme1fA2E/ecJefwxeRaUPgj3ZmXhRt7wxY
-	aas0aDmqQnMSQ8xEcyHooL1//5S5S9RSul/ZsJlUWSIBozq2b3PI6l6xl3ldUHUduj47SE
-	koioV9P/g0ItanZHdEow/RtOOTONKeljDR3QB5PLNB90x26lfEpu4eQqk7yUEg==
+	s=arc-20240116; t=1776174517; c=relaxed/simple;
+	bh=+NIf6YWtruCdajeUPR86ezk4H6Rxe1H7k9Hfp/7xtbA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JMkgtNMRsjaO70qPfTMzdTMiSYp1+ygSxMQKIef6eBlgOoJ6HyPGChOLN1DfcTdNEXqf12dxwKnTU4Xj1pH7rBMjvtu4ELS94xYj9IvXRff52fiViW4S6sWWJTC9v15cf5yZqIRjFwtQGhKv4z8uBRyiZhly4uiA9OLfLbiMktM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WIGtfU1G; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-488971db0fdso55720325e9.0
+        for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 06:48:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776174515; x=1776779315; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=JyLOjyeR0ZbXLEUgpEciyu4epczHaYj8tmmKfzQz42c=;
+        b=WIGtfU1G7Js+If21he1p+je8C3Xv+gFZ5hhz4bUM3smZooPdliPHIBcGnwSmIfbWbh
+         VTKt3/bbjeuWWuFw35LCPbSH3CVeI7gUe4oEkSlCW6j6UCV02RQUBZVdD0l0fsIku/+M
+         dRE3vSnW+G/E9Nnw7ap5Pps3KrBzzHwAVz/MCT6i1HObbtcp+0uzXN6kD8b/y5mASXru
+         9AVcH3wgdT5uPXRx4DM3Qi8I8Y5vDGq+pBOoekbluVpY+MQY0ExKvbODBY/GT2aAGTJ1
+         xk89v9O3BDepqkYMAWinnPTrVbuS+rAxySqUyKxg38pwROdVCi2kkhQ3xsOjzyokJ9qv
+         bkcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776174515; x=1776779315;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=JyLOjyeR0ZbXLEUgpEciyu4epczHaYj8tmmKfzQz42c=;
+        b=oriTTZi2+mfL4tssDv0IdxXoBCbtl+5/x8/UUVn5m1xLoFeja6pnSmGWFKayyiH7am
+         prl6RY3Tq7/bUPM3WDUP/lkVsiQDngVCmBqGJlyS/OT2QUgtRjyUMdWEtYpa+uvQ1neD
+         WZYvp7cYSW5BycpXxPcbzB5/6jd9xnN/vQgVn/1fYSVfJYmFB48RF2B+jBR7FIZdFVvY
+         m7StTHVyv1pzj1BGTOy/mrppJsI3RjAXVceN7NJpYy60mR359LPQKK9VQEoZyGl7Y3g0
+         JBiP684CzL4T4r5PgO2v5iZ/oJMFtnOjEVHPQUe8AunFiwijD4tX2gmw5gVIyiaHgZg8
+         UmRQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+kA7n//exP05h6o9boCG9hX1K4qVZ8Uy6ejoeKOWPN2K7Z3drf9WrK42o9GSVMf+9JPn6Tey4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzy9VisBlceF5UVKur8BXo9gIuccwsI+p5J+sCV8mhZLFZz+XHR
+	CaaUzjvQQ4+/scUxVl3solm1+N+9BGkxiNXZpqQWgn0iGjRmSeInpnq5
+X-Gm-Gg: AeBDietJJTEmZZyLOXtKWF+zOsMN2zCTKkJR7RhW6uackQCjvGiJEyVAYyfn5hfRvy1
+	xvOYGELpi/c6HCaT6AjXMVGQBQsZgErMAoEWHpkx63L4htlWIPv59pxsRzLw0zxOtd4YnDD/cQ5
+	RLTMCv/l1krZOMsx2z3uDuthzpm5HBZYBl0aJF+C+l68A1jdX2pxZH5SUyWABjjTi2zPA+BxuO+
+	jgwlbVPgpyyHz2eFI1xo+iLBZprojrXW7B5sJcSBDHd5gANG61IDjJQyuuItuy0WPj/HpH8cpWP
+	M7rKU8UK6+8ePigqnwL4ItI97keQ41E0WTap4glMhB34lIlkY5oz+k3yjWNkmQtTINVY6wFSr8N
+	ar2ZddjE+e4Ln+TQGdSICYc/i7nRNuAvFZiPAWVq2shQVD/C16lOgw5GrmZKfBoJq9wD7bhXQfd
+	Ncov++iPeyEl3sCWCwl7A1DI1NVGPNQ/8WSHM5dhqDmKJ3JTt/e1hezWlwWkZfUddjgbqv/ig4X
+	hqq93+uKhD8jW81rb1A
+X-Received: by 2002:a05:600c:5d4:b0:488:d6eb:e63c with SMTP id 5b1f17b1804b1-488d6ebe787mr144787475e9.15.1776174514352;
+        Tue, 14 Apr 2026 06:48:34 -0700 (PDT)
+Received: from [10.1.4.108] (cust-east-par-46-193-119-166.cust.wifirst.net. [46.193.119.166])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488ede1de4asm116273755e9.4.2026.04.14.06.48.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 14 Apr 2026 06:48:34 -0700 (PDT)
+Message-ID: <264667a8-bbb2-44ac-84e7-df6c506ae6fa@gmail.com>
+Date: Tue, 14 Apr 2026 15:48:33 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Tue, 14 Apr 2026 15:43:42 +0200
-Message-Id: <DHSX7PABLUSN.1VYMRZ02DFZEL@bootlin.com>
-Subject: Re: [PATCH RFC bpf-next 8/8] selftests/bpf: add tests to validate
- KASAN on JIT programs
-Cc: "Alexei Starovoitov" <ast@kernel.org>, "Daniel Borkmann"
- <daniel@iogearbox.net>, "Andrii Nakryiko" <andrii@kernel.org>, "Martin
- KaFai Lau" <martin.lau@linux.dev>, "Eduard Zingerman" <eddyz87@gmail.com>,
- "Kumar Kartikeya Dwivedi" <memxor@gmail.com>, "Song Liu" <song@kernel.org>,
- "Yonghong Song" <yonghong.song@linux.dev>, "Jiri Olsa" <jolsa@kernel.org>,
- "John Fastabend" <john.fastabend@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, "David Ahern" <dsahern@kernel.org>, "Thomas
- Gleixner" <tglx@kernel.org>, "Ingo Molnar" <mingo@redhat.com>, "Borislav
- Petkov" <bp@alien8.de>, "Dave Hansen" <dave.hansen@linux.intel.com>,
- <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>, "Shuah Khan"
- <shuah@kernel.org>, "Maxime Coquelin" <mcoquelin.stm32@gmail.com>,
- "Alexandre Torgue" <alexandre.torgue@foss.st.com>, "Andrey Ryabinin"
- <ryabinin.a.a@gmail.com>, "Alexander Potapenko" <glider@google.com>,
- "Dmitry Vyukov" <dvyukov@google.com>, "Vincenzo Frascino"
- <vincenzo.frascino@arm.com>, "Andrew Morton" <akpm@linux-foundation.org>,
- <ebpf@linuxfoundation.org>, "Bastien Curutchet"
- <bastien.curutchet@bootlin.com>, "Thomas Petazzoni"
- <thomas.petazzoni@bootlin.com>, "Xu Kuohai" <xukuohai@huawei.com>,
- <bpf@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- <netdev@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
- <linux-stm32@st-md-mailman.stormreply.com>,
- <linux-arm-kernel@lists.infradead.org>, <kasan-dev@googlegroups.com>,
- <linux-mm@kvack.org>
-From: =?utf-8?q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
-To: "Andrey Konovalov" <andreyknvl@gmail.com>,
- =?utf-8?b?QWxleGlzIExvdGhvcsOpIChlQlBGIEZvdW5kYXRpb24p?=
- <alexis.lothore@bootlin.com>
-X-Mailer: aerc 0.21.0-0-g5549850facc2
-References: <20260413-kasan-v1-0-1a5831230821@bootlin.com>
- <20260413-kasan-v1-8-1a5831230821@bootlin.com>
- <CA+fCnZekgcEgsZnRrOB=+HoG=neRg=oLTt2jStyrPJ6mYf2ctQ@mail.gmail.com>
-In-Reply-To: <CA+fCnZekgcEgsZnRrOB=+HoG=neRg=oLTt2jStyrPJ6mYf2ctQ@mail.gmail.com>
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 1/3] net: dsa: microchip: implement KSZ87xx Module 3
+ low-loss cable errata
+To: Andrew Lunn <andrew@lunn.ch>, Marek Vasut <marex@nabladev.com>
+Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
+ Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Marek Vasut <marex@denx.de>,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ Simon Horman <horms@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Fidelio Lawson <fidelio.lawson@exotec.com>
+References: <20260414-ksz87xx_errata_low_loss_connections-v3-0-0e3838ca98c9@exotec.com>
+ <20260414-ksz87xx_errata_low_loss_connections-v3-1-0e3838ca98c9@exotec.com>
+ <ea90a671-70be-4d89-b842-1e54d687336f@nabladev.com>
+ <d9b161dd-f698-4d7e-8ccb-9ec12411bf87@lunn.ch>
+Content-Language: en-US
+From: Fidelio LAWSON <lawson.fidelio@gmail.com>
+In-Reply-To: <d9b161dd-f698-4d7e-8ccb-9ec12411bf87@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-278459-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,bootlin.com];
-	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,linux.dev,gmail.com,davemloft.net,redhat.com,alien8.de,linux.intel.com,zytor.com,foss.st.com,google.com,arm.com,linux-foundation.org,linuxfoundation.org,bootlin.com,huawei.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org,googlegroups.com,kvack.org];
-	RCPT_COUNT_TWELVE(0.00)[40];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[microchip.com,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,denx.de,bootlin.com,armlinux.org.uk,vger.kernel.org,exotec.com];
+	TAGGED_FROM(0.00)[bounces-278461-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alexis.lothore@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.997];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lawsonfidelio@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,bootlin.com:dkim,bootlin.com:mid,bootlin.com:email,bootlin.com:url]
-X-Rspamd-Queue-Id: A0ED53FAA36
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E7A733FABAB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue Apr 14, 2026 at 12:20 AM CEST, Andrey Konovalov wrote:
-> On Mon, Apr 13, 2026 at 8:29=E2=80=AFPM Alexis Lothor=C3=A9 (eBPF Foundat=
-ion)
-> <alexis.lothore@bootlin.com> wrote:
->>
->> Add a basic KASAN test runner that loads and test-run programs that can
->> trigger memory management bugs. The test captures kernel logs and ensure
->> that the expected KASAN splat is emitted by searching for the
->> corresponding first lines in the report.
->>
->> This version implements two faulty programs triggering either a
->> user-after-free, or an out-of-bounds memory usage. The bugs are
->> triggered thanks to some dedicated kfuncs in bpf_testmod.c, but two
->> different techniques are used, as some cases can be quite hard to
->> trigger in a pure "black box" approach:
->> - for reads, we can make the used kfuncs return some faulty pointers
->>   that ebpf programs will manipulate, they will generate legitimate
->>   kasan reports as a consequence
->> - applying the same trick for faulty writes is harder, as ebpf programs
->>   can't write kernel data freely. So ebpf programs can call another
->>   specific testing kfunc that will alter the shadow memory matching the
->>   passed memory (eg: a map). When the program will try to write to the
->>   corresponding memory, it will trigger a report as well.
->>
->> Signed-off-by: Alexis Lothor=C3=A9 (eBPF Foundation) <alexis.lothore@boo=
-tlin.com>
->> ---
->> The way of bringing kasan_poison into bpf_testmod is definitely not
->> ideal.  But I would like to validate the testing approach (triggering
->> real faulty accesses, which is hard on some cases, VS manually poisoning
->> BPF-manipulated memory) before eventually making clean bridges between
->> KASAN APIs and bpf_testmod.c, if the latter approach is the valid one.
->
-> Would it make sense to put these tests into KASAN KUnit tests in
-> mm/kasan/kasan_test_c.c? I assume there is a kernel API to JIT BPF
-> programs from the kernel itself?
+On 4/14/26 14:40, Andrew Lunn wrote:
+> On Tue, Apr 14, 2026 at 01:05:49PM +0200, Marek Vasut wrote:
+>> On 4/14/26 11:12 AM, Fidelio Lawson wrote:
+>>> Implement the "Module 3: Equalizer fix for short cables" erratum from
+>>> Microchip document DS80000687C for KSZ87xx switches.
+>>>
+>>> The issue affects short or low-loss cable links (e.g. CAT5e/CAT6),
+>>> where the PHY receiver equalizer may amplify high-amplitude signals
+>>> excessively, resulting in internal distortion and link establishment
+>>> failures.
+>>>
+>>> KSZ87xx devices require a workaround for the Module 3 low-loss cable
+>>> condition, controlled through the switch TABLE_LINK_MD_V indirect
+>>> registers.
+>>>
+>>> The affected registers are part of the switch address space and are not
+>>> directly accessible from the PHY driver. To keep the PHY-facing API
+>>> clean and avoid leaking switch-specific details, model this errata
+>>> control as vendor-specific Clause 22 PHY registers.
+>>>
+>>> A vendor-specific Clause 22 PHY register is introduced as a mode
+>>> selector in PHY_REG_LOW_LOSS_CTRL, and ksz8_r_phy() / ksz8_w_phy()
+>>> translate accesses to these bits into the appropriate indirect
+>>> TABLE_LINK_MD_V accesses.
+>>>
+>>> The control register defines the following modes:
+>>> 0: disabled (default behavior)
+>>> 1: EQ training workaround
+>>> 2: LPF 90 MHz
+>>> 3: LPF 62 MHz
+>>> 4: LPF 55 MHz
+>>> 5: LPF 44 MHz
+>> I may not fully understand this, but aren't the EQ and LPF settings
+>> orthogonal ?
+> 
+> What is the real life experience using this feature? Is it needed for
+> 1cm cables, but most > 1m cables are O.K with the defaults? Do we need
+> all these configuration options? How is a user supposed to discover
+> the different options? Can we simplify it down to a Boolean?
+> 
+> Ethernet is just supposed to work with any valid length of cable,
+> KISS. So maybe we should try to keep this feature KISS. Just tell the
+> driver it is a short cable, pick different defaults which should work
+> with any short cable?
+> 
+> A boolean should also help with making this tunable reusable with
+> other devices. It is unlikely any other devices have these same
+> configuration options, unless it is from the same vendor.
+> 
+>       Andrew
 
-Possibly indeed, but I think one important use case will be the
-possibility to run those tests in BPF CI ([1]), and this depends on
-those tests being integrated in the test_progs framework
-(tools/testing/selftests/bpf)
+The issue has been observed with very short or low‑loss
+cables, typically in industrial or embedded setups where the cable is
+below 3m or in a board-to-board setup.
 
-[1] https://github.com/kernel-patches/bpf/pulls
+ From our practical experience, this issue occurs in our setup where a 
+very short CAT‑6e cable (~20cm) is used.
+We were seeing random link dropouts with the default settings, and since 
+enabling the workaround 2, the link has remained stable and we have not 
+observed any further issues.
 
-> There, you can just call kasan_poison(), some tests already do this.
-> And you can also extend the KASAN KUnit test framework to find out
-> whether the bad access is a read or write, if you want to check this.
+We don’t need all these configuration options.
 
-Alexis
---=20
-Alexis Lothor=C3=A9, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+According to the Microchip erratum, the user should try workaround 1 (EQ 
+training), and if that does not resolve the random link dropouts,
+fall back to workaround 2 by reducing the LPF bandwidth to 62MHz.
+
+Since this procedure for determining which workaround is effective is 
+inherently experimental and requires observation in real deployments, 
+this is why I originally chose to expose the selection of the workaround 
+to the user, at least allowing them to choose between workaround 1 and 
+workaround 2.
+
+regards
+
+Fidelio
+
+
 
 
