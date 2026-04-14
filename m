@@ -1,243 +1,245 @@
-Return-Path: <netdev+bounces-278329-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278330-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EJwpKkf13WlolgkAu9opvQ
-	(envelope-from <netdev+bounces-278329-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 10:05:27 +0200
+	id SPJ0Mof23WlolgkAu9opvQ
+	(envelope-from <netdev+bounces-278330-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 10:10:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E7443F6EC2
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 10:05:27 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E65A83F6F90
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 10:10:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0C5013012C8E
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 08:04:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4FC10303F7FD
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 08:05:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CC6938B7DC;
-	Tue, 14 Apr 2026 08:04:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B968F3876DA;
+	Tue, 14 Apr 2026 08:05:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GElbqjki";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="oWm9mT5E"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="NmRQ9hC2"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010004.outbound.protection.outlook.com [52.101.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2043C38B7B4
-	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 08:04:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776153850; cv=none; b=tsBvXAYAxiPUtK13T24PLGwGOdTL7LbZ6VMJb9omyMTnoHrzr+mlF3zW9tPNsIs486b+wMYEdbBJcINYou36vbnHcgdwYKhpTyUzR/fE1xtd/pzKWgK7pOZKnpjy+N1XCh1Jx+6JeYlivkPe2/NWrwlxkOqNE8j6MoYJajqkzks=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776153850; c=relaxed/simple;
-	bh=Hnyj9T6i6WMrLQZCuxbS1CYUIk9h22kkXtxhKguP4AQ=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=P+chkEHv12Xbj5IWBS823AgIjDCNsTmUbbvL8ySY90xjRFwkCVzMsmYDqRkl24CPo5o2eFjVQHHzu3ecebG/f21AgVm5R0MLKJ/15jQZ0hpSkr0jWzB8JrZLulK6I2J3ZQonR5F/BJmkiy3QieboB1WP+nRwIQs2dtQqZAd4Wy0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GElbqjki; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=oWm9mT5E; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1776153848;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dnCO8guhms1mkaeYnJ8PInVTX4vnN/AYoV2EE/jBklQ=;
-	b=GElbqjkiXQlv5bon15AZROLiEFE1VFkavY4edRWyv8667X0gT1a6n+cKuACLR5sahmy2NR
-	jUSg0eEC3pCLDPv/WWu2kY/ZzG544YMSWlM+PDCQCKxKMe9tcRG3O8xNq6HtTrCq6qzawD
-	JknyHxPN2CJaHPU2xaxZ6uXuIPxKRnw=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-402-77raemmSO4GVrbct1SBNSQ-1; Tue, 14 Apr 2026 04:04:06 -0400
-X-MC-Unique: 77raemmSO4GVrbct1SBNSQ-1
-X-Mimecast-MFC-AGG-ID: 77raemmSO4GVrbct1SBNSQ_1776153846
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-43d1fec59c9so2784128f8f.0
-        for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 01:04:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1776153845; x=1776758645; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=dnCO8guhms1mkaeYnJ8PInVTX4vnN/AYoV2EE/jBklQ=;
-        b=oWm9mT5EIOa8TVG7CPo6/H3RibTUOp6zEdfqfGmg2EeOc74Xr7FZMlzK7LMIRKcejc
-         eubCEkm0NZH6/XfCYS6zAVoVWkBxa1fME12CAGBoD/PJvncW7SWHj+nEUoxdFNLcFzrZ
-         tki7z8hJ6iWOi1dY1Ycp0n3Rta3R2H/LAnhQ+Ge0f7C2rhpE84eEqxDlMXpcQYVgScYR
-         6PIwSyQo5RH03VawRg3tiLtHs6+0nUffoP7OsTgBAdNUnX4lLm6O2hEjTGqwfZtY3C/J
-         G2Ky72pnHwYtpMw0vYQEWFleRce02/RpxIsHFUNaUpi64GfQp/pkvnFpEwfT/kEI/5bF
-         zArw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776153845; x=1776758645;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dnCO8guhms1mkaeYnJ8PInVTX4vnN/AYoV2EE/jBklQ=;
-        b=MFCXYVNIgiuJhhmktdLqn81ChWOkX6eSlYNFwX1OSxfhx+jwUNi1zU8z/FWU43J8hb
-         tHKjNE04xh93no8Ri/t7o4ZAGCBlIDK2vfzh4CLYjwY/On0ZStb4hv9TcBj27Ctt4DhH
-         c76HsxqV49KzYA7Y2pGGenD42BrtYo9JCTBPo4bnInGdQkZqDns4Dt2szlGTsdirCjnZ
-         8x3EKArypRoiT8XZZpTOn0WRT73yoZRookxEXLl372cCIjnw4WdWjFG6fwaP6UZYs8Lt
-         vSLBNdbNYamIcNEAAPvf+BsDiyuO/FqsS0980Bt0/u5DdeaIFXyzHgxD43DbDg45MmLP
-         121g==
-X-Forwarded-Encrypted: i=1; AFNElJ9ELcNyqCLlOfWyognCV/+PLjtOUnXceQ6xeSowWuj/4McQPlSPDNlIMU6w3OnX1GWsjHDQncE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxeKpyiJxr3BcqHR9VtizvqvzzgRcnvOaqG/r2/cz5QpovSdNZZ
-	BDnnoEMVqvUV7ww+t8M99/loPhlMMAaoI+kJdsU3Tlq9L8ZgmPdUpePUWkSqW24LpuFfQyIOX/V
-	ezFA8aUd+5C632uiGeZ8yfxo3hAE9rvXAqoHQFmYnL6toNw6NHr3whl44HA==
-X-Gm-Gg: AeBDieuqqAq8dZQx0XwNseH0d76UPyEkiXKxS/ctiblevimUMQ2Xn2PvwbOJ2oUUc21
-	fpsGZfxNOEEQrQ/R0StVvmgL4cUnDwPOtADkcOMIJxpUr3bSAvppU17oRZIzgyFAemMH7Rylwmx
-	hkNbGXdpAa7AzH6bukrgHfZAvxfC3ZZO810IFF1vBI8/8VVrbgKD41QZnorP0BSCf672PxsOY3c
-	raHo+KS4ynNJy3WAYNkEcbPiQU8+MkA4lCQfx6hv0pKleA8RrNRzZkJlsD17OOXU2G8yq2AmUTA
-	pmKLK8fDIWNIy+p49JX+vfn24I3EO/FADGY9KcHGT4OkpWZLP0xhqN54RF8DdZUJCGO+uXddU3E
-	+bq+sff3XCCZPXIVg+E3sfrlNW8wEuyYDH+piphSURn9aDS8f8A4jWGc9
-X-Received: by 2002:a05:6000:40e1:b0:43d:772d:2b61 with SMTP id ffacd0b85a97d-43d772d2cb7mr11831181f8f.15.1776153845549;
-        Tue, 14 Apr 2026 01:04:05 -0700 (PDT)
-X-Received: by 2002:a05:6000:40e1:b0:43d:772d:2b61 with SMTP id ffacd0b85a97d-43d772d2cb7mr11831099f8f.15.1776153844935;
-        Tue, 14 Apr 2026 01:04:04 -0700 (PDT)
-Received: from [192.168.88.32] ([216.128.11.125])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43d7794cce5sm16813327f8f.9.2026.04.14.01.04.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 Apr 2026 01:04:04 -0700 (PDT)
-Message-ID: <afc0a3ca-311d-4c6a-9380-98d1b23ea536@redhat.com>
-Date: Tue, 14 Apr 2026 10:04:03 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04AD51DA23
+	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 08:05:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.4
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776153930; cv=fail; b=kHqDRgn8DaNLyXt3+wtNWXWM+peXI3GmQTROQJaGv2JH61kbpbhAZfY5gbmraG3/hlIpWpkw746KEu57mgMqm3px/H4NeM0hWgG/keU7My5QuXob2j6uW2iPi+mZbCI9+qFvasVLgBrgSzM3DJUGw0e5ThjpvnO1k+XnvJ8Nf4w=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776153930; c=relaxed/simple;
+	bh=jq3648GC3PhRnWP4Ynx6Lhh8TvH8QbIf9TGIv/y58/4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=Keb/R3+Vip2t3+Mz85E7hQgzP7GZWXRXH3F3KfzjG2w5irYwBg0zAJPn4SqZ4C2sSweXCKE/Oy0BSvnEPFtZ3pMC3T3m+tYb87cqHknGQmtNnnwMt9M3Lbgp72xiCDcJ1JcAiQbpJ4N6HZ8RVr+V7TxM7mFIWIdEds/ydmI9aI8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=NmRQ9hC2; arc=fail smtp.client-ip=52.101.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=wQSxFr7Ld4Xcl2yb9BV6QRUXMzzY4u8wYMOTHu4E0WJsSqzkkKgR3u3RU9gtD74C748gZLHmbpMqLbJNA9lQSxjuXMpLi4hOg57HSi+GnJN2vLbjR5U4eYvzkMUfoFnhctCFkde6p0dDK2Ij8ozwXUrfwjSGgVj4PR1uaMME3xfi3CfQDJJzvtBpAEg0y+Mkob7GF7RUvUwqrcyJIe3BXLb+GAyC0o3JrrkOjEzp6O4i4BgDgIQbgO0763BMslJ+8nyztLsojEL/Xyn9Tigj7otkLo0JlNeKH0UiDhXsCHZ46XuD0CcBuqukRKFl8kRAiXatpDU/inIcEfX4r8v8ww==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=4WFjyGsZIm/3KH6EwbeN4pozDTuM3lpvz7iiQfLTQ/Y=;
+ b=eBS2Wp4c6ee02yw0idpKTAcBIUuXii5ArsIERBwpgcUhomH2tQyt3BnGq/+6EqZP1j7AIArM+PpRXYRWmf3qKEa8q4rtHdhfPesdNUMXu7ddqHnGuONn5mQ5hTOqZtEUzqJBNIt4fXjTvfG+evX/pWU1qPElr48MWVJRPAJ6NslNY/28eOxt8LrkQJW40fPmHOhSfpNK6y7VtrpP/k+JCZ4X7r0BbbJTbFa1XncfWG/2SqQprECWwBIlQWYS8YxWWiaXxZuxLh9X7CcBsmUnHFREUkK2g17j9ebcv3/l2eDX1hnT+WOf1Slv/xoe5XctSVP+s7RGYgIu9C55fcblTg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4WFjyGsZIm/3KH6EwbeN4pozDTuM3lpvz7iiQfLTQ/Y=;
+ b=NmRQ9hC21MeiXqjEl8kVbzwxHsoRLT9ng6tuV3cC8VtDh6uo4+OGTuWGcbePpokCnSkCIqN7BNHoSCAjzOsaBpvbi4SwuEII2lU+uzesRisJKAJ8FQwVyWRSXoYYwgEitk9Pg+uSs1bHwCXifX1BoCFIx5GBIbTJLM7VAQ4fW+Ut2kLfU/9EY4MUn7AcfDGmGllNeD1spP51SamfT4mkWN5Jrhz6A5ARdB97GjJ3mqd0GBiLAR6N6X8zXKjcTzZ/GioxsDv05TwAhM4uWEMGMTmtD2rNMud7nkYpk1LC+s9tq19qKm6jtjsYmHOOqaeiRqSCHF1mpCiI2E43Gctr1A==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
+ by BL1PR12MB5707.namprd12.prod.outlook.com (2603:10b6:208:386::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9818.20; Tue, 14 Apr
+ 2026 08:05:25 +0000
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2]) by SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2%6]) with mapi id 15.20.9769.046; Tue, 14 Apr 2026
+ 08:05:24 +0000
+Date: Tue, 14 Apr 2026 11:05:14 +0300
+From: Ido Schimmel <idosch@nvidia.com>
+To: Ren Wei <n05ec@lzu.edu.cn>
+Cc: bridge@lists.linux.dev, netdev@vger.kernel.org, razor@blackwall.org,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, makita.toshiaki@lab.ntt.co.jp,
+	vyasevic@redhat.com, yifanwucs@gmail.com, tomapufckgml@gmail.com,
+	yuantan098@gmail.com, bird@lzu.edu.cn, enjou1224z@gmail.com,
+	zcliangcn@gmail.com
+Subject: Re: [PATCH net 1/1] net: bridge: use a stable FDB dst snapshot in
+ RCU readers
+Message-ID: <20260414074722.GA321402@shredder>
+References: <cover.1776043229.git.zcliangcn@gmail.com>
+ <6570fabb85ecadb8baaf019efe856f407711c7b9.1776043229.git.zcliangcn@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6570fabb85ecadb8baaf019efe856f407711c7b9.1776043229.git.zcliangcn@gmail.com>
+X-ClientProxiedBy: TL2P290CA0005.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:2::15) To SA3PR12MB7901.namprd12.prod.outlook.com
+ (2603:10b6:806:306::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 1/3] nfc: nci: fix u8 underflow in
- nci_store_general_bytes_nfc_dep
-From: Paolo Abeni <pabeni@redhat.com>
-To: =?UTF-8?B?TGVrw6sgSGFww6dpdQ==?= <snowwlake@icloud.com>,
- netdev@vger.kernel.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- linux-nfc@lists.01.org, stable@vger.kernel.org, horms@kernel.org,
- =?UTF-8?B?TGVrw6sgSGFww6dpdQ==?= <framemain@outlook.com>
-References: <20260409164129.GO469338@kernel.org>
- <20260409185958.1821242-1-snowwlake@icloud.com>
- <20260409185958.1821242-2-snowwlake@icloud.com>
- <5a6a95f0-a26c-4eed-9c9a-98e22c3bc682@redhat.com>
-Content-Language: en-US
-In-Reply-To: <5a6a95f0-a26c-4eed-9c9a-98e22c3bc682@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|BL1PR12MB5707:EE_
+X-MS-Office365-Filtering-Correlation-Id: fad5f4b4-a7ae-41ec-5587-08de99fc9514
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|1800799024|7416014|376014|56012099003|18002099003|22082099003;
+X-Microsoft-Antispam-Message-Info:
+	0DhECPObE6v8pkQDtuSyd/OYLK9DQdtRyFcpSX4ZOrev6/DUTljFTAa8ZDSmIFFTOZ1CoJRspcWeWTSZl9D7v7cXUh+P22PvFpLy4Fm4lYiaE2MkVl55aUqFXpARFEOf2fjMGjRD1cUr7QA5F0VkKwB8O5AB/N1MSZmRisC1wx0xMc6gR1XlRAd7o/PKeAVxzW0RunulYzJAKzth/YN0m01VkXQB43SQTy6DZdd+duP4i8vTbVn6rQSLDRAJnccxK9t2CR1zcAMm9Xi3hycSXO8x3x2L2SQlRc13LmsdK6wU0b669E3HuKQiK03cWwv7TEjnglWTj4hPlHQQdI+GKfYrvuH5qtsg8FZ+md2Bpjc2jMnvol2LDuknxcChkcBYI4YuD9lnUFa88UxQaeCE2KKPFuewHDEi+dVSD58tzep2+yHgowPs9j0C6yh5yewpowy+kVumqChwYTsRma/SnwnjPffibi6MICaa784nWhAnOJSpxk6LpHD31Sr2/1AE8HkhnznPMu46YQULCILYp2jskNcTRQExuSbv4nyoTfgAqq0UF/TZXgg9PQJxKsLN0gJJwtyOYkAGdEddTA1X5hGjoU8MoVOZmwofIdqM2oRz+/gx7Kwcu8/vjLuHcKpWxeRB7VYPRiVyapSHGIq318hEKGMjMtXiLWdb28HLWSdSW+dy6YSaao0NqAeH1ZyM/uQLxaKiMrtY/goVg7GdXGl+YcoBqie4Ph8QeoOH5hY=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(56012099003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?sTpOoqwZ/gKJU1J8Xm/c2Qg1kDSD2ymz3fsMpeqh1UbjEc9io6/cho8TRUKy?=
+ =?us-ascii?Q?d5KOU9S8s3ipRNnQK9QcdPNrau+xqPbB1tyei3NOGUsKxiXf2wtRa4nS9WP4?=
+ =?us-ascii?Q?rtJJUizKzUMw62NYkkKjhQuJQcGD5EDuOIoUaZsCfzdzXTmQjwUYheAcN9+L?=
+ =?us-ascii?Q?9bygX7htKEPAARjtLl64vgDYUcZI5pyWEtyMCADHE3ywbY6q1a9fBjB+qzPz?=
+ =?us-ascii?Q?7E+8cJWrVTlz0MV6o9cQfwiyoDJs5mWWh6fXRCQxIiMBXBkm3Ls+2KVmvJC4?=
+ =?us-ascii?Q?Q2eQxe/0aO4SaA4rodQ6Yngk2L7I6Zgr09pYb3397mg1bbaGNd/hYGuENzIf?=
+ =?us-ascii?Q?5w2o3iqGRc+hSdChQM5hb0E421ihNg5lbgp72t9iE/rcvYBNUREW4ej7OWWT?=
+ =?us-ascii?Q?JcnCV+/1I45SbrvbwoLXqftvW32R3WSToUI8T1HDlg3rbqPGvJ2Pndd8nLLb?=
+ =?us-ascii?Q?JIR8d8cVVv0EUs1dJqbTgCzlVFiT6Fol0kVgnRFpeFk+JFKkdgi1XR66oudo?=
+ =?us-ascii?Q?+/w9hQbzs7aJnrTf/mUUSVLtup/9aOYrBzJo2nbbS5fI8cqsyXWJmC2LHJ+L?=
+ =?us-ascii?Q?qWJIHsxM1y1T8I9GPRpvQ8gTuIOodNepKsh5YYU+VSe6IXl+rpy/+E3HOEmW?=
+ =?us-ascii?Q?I2BlSqZPpQmvg/GrsgP3IttHrkl6Zr+TCNQKbA5+Bir+6wFFlctmG88aorFH?=
+ =?us-ascii?Q?GIXTqPRoWXmFsUAxcUIgMyzFGLFHWlx5s6acWRunUSj1yvMCArWUAurfQh3C?=
+ =?us-ascii?Q?W87vu5mYt7RoMT9vSyqaqoqvne9FEY3QAs0jGMKplQxXhBXacHhVWF+m0L+N?=
+ =?us-ascii?Q?et5SFMp0Znkqs94I3S/V2EGvsBEOOBm03p+GPq1Ra1Pmn5kkEmB8K8DgGDSc?=
+ =?us-ascii?Q?PXJH43MtqQUzPQtnb92Q3RWXbquzUgFyK1xpQLrw6ZMOrFzzJLYtnrJ0tMpg?=
+ =?us-ascii?Q?i/RPiC6dCFjFQ9EpDhGoKn73wIldM1jwVdRvo6xcLFPJuD8X5zBilNFMYeYd?=
+ =?us-ascii?Q?qG2/3Cg5+W5iXK9cnJgo8zXWOXu2CTGNVpvG3EWm+EvCewYko6S+F1OgD0ZC?=
+ =?us-ascii?Q?y5n6vneHMAYeeTNqRllNYfMkVkInwVj9qCxquWRjhGHeiQx0ZwbjLp4bv8bK?=
+ =?us-ascii?Q?VM4rH7/A3w0OWuf2y0oMxahHXU/AawgQcw1aKDTOom/hV/54SHeJD8U6CcTF?=
+ =?us-ascii?Q?xrHPWVrEu44G5Y+CPntsWdtE5r8NVKDTj97OHc8cnViChFvEFQyqzlIhsybk?=
+ =?us-ascii?Q?A3QxGoi8IrhJJ9KfyDJFCcs0aug4j3yf7BrlfSWBxoqqCar+nOWY3XCUh/2R?=
+ =?us-ascii?Q?gy8mmFFTKl/qf+8vycSYiFTBLE0j3Gb1TIGMlNq8xxqnjAco8cyLqqh37HfT?=
+ =?us-ascii?Q?U6Odlc2P8VhLaTDRwT97dk/VX80N63zotiT810thY2LmxI1Ok++IMWqf16ha?=
+ =?us-ascii?Q?UhLpY8uTLmDaLScoSqfnfRiNYKfXP9NtjIAdiUEiMEEPJBSlWwjHEKKZWz/d?=
+ =?us-ascii?Q?eAEi2w2m1QxKnM2P/fzm3CgS8ngTacSoMEaT6MzRlOWQ7PsQbF+p1oakARAu?=
+ =?us-ascii?Q?WugCyG4cHEuo20YBCf6WY00aroEhE3dveaT64YJsDd6YuvKC4jOkhY+045zw?=
+ =?us-ascii?Q?FxTRM6xXyshtHwSptZDqn+Dnxm6TPqUMcLnuphIa8SIGmR6tG9gr6k+RylLw?=
+ =?us-ascii?Q?5BydeCvCXqEcHuzxLJdrvxqd6TzSOQxd+uVA2akGqJJbsgYeXLpDnBeLNySF?=
+ =?us-ascii?Q?Ke3P/ehl9w=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fad5f4b4-a7ae-41ec-5587-08de99fc9514
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Apr 2026 08:05:24.6807
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: uzO1UBN0+xFgW+Nzd56X8SIReigS+7yGYkCWEXUXdRZUzvj5ItZ/GMNBxm7fcFhrPfvpBii6HZM1FRxRO40SVA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5707
+X-Spamd-Result: default: False [0.34 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,lists.01.org,vger.kernel.org,outlook.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FREEMAIL_TO(0.00)[icloud.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-278330-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278329-lists,netdev=lfdr.de];
-	SEM_URIBL_UNKNOWN_FAIL(0.00)[outlook.com:server fail];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[lists.linux.dev,vger.kernel.org,blackwall.org,davemloft.net,google.com,kernel.org,redhat.com,lab.ntt.co.jp,gmail.com,lzu.edu.cn];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	SEM_URIBL_FRESH15_UNKNOWN_FAIL(0.00)[outlook.com:server fail];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RBL_SEM_FAIL(0.00)[172.105.105.114:server fail];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[outlook.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 1E7443F6EC2
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,nvidia.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E65A83F6F90
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 4/14/26 9:34 AM, Paolo Abeni wrote:
-> On 4/9/26 8:59 PM, Lekë Hapçiu wrote:
->> From: Lekë Hapçiu <framemain@outlook.com>
->>
->> nci_store_general_bytes_nfc_dep() computes the number of General Bytes
->> to copy from an ATR_RES or ATR_REQ frame by subtracting a fixed header
->> offset from the peer-supplied length field:
->>
->>   ndev->remote_gb_len = min_t(__u8,
->>       (atr_res_len - NFC_ATR_RES_GT_OFFSET),   /* offset = 15 */
->>       NFC_ATR_RES_GB_MAXSIZE);
->>
->> Both length fields are __u8.  When a malicious NFC-DEP target (POLL mode)
->> or initiator (LISTEN mode) sends an ATR_RES/ATR_REQ whose length field is
->> smaller than the fixed offset (< 15 or < 14 respectively), the subtraction
->> wraps in unsigned u8 arithmetic:
->>
->>   e.g. atr_res_len = 0 -> (u8)(0 - 15) = 241
->>
->> min_t(__u8, 241, 47) then yields 47, so the subsequent memcpy reads
->> 47 bytes from beyond the end of the valid activation parameter data into
->> ndev->remote_gb[].  This buffer is later passed to nfc_llcp_parse_gb_tlv()
->> as a TLV array, feeding directly into the TLV parser hardened by the
->> companion patch.
->>
->> Fix: add an explicit lower-bound check on each length field before the
->> subtraction.  If the length is smaller than the required offset the frame
->> is malformed; leave remote_gb_len at zero and skip the memcpy.
->>
->> Both the POLL (atr_res_len / NFC_ATR_RES_GT_OFFSET = 15) and the LISTEN
->> (atr_req_len / NFC_ATR_REQ_GT_OFFSET = 14) paths are affected; both are
->> fixed symmetrically.
->>
->> Reachability: the ATR_RES is sent by an NFC-DEP target during RF
->> activation, before any authentication or pairing.  The bug is therefore
->> reachable from any NFC peer within ~4 cm.
->>
->> Fixes: a99903ec4566 ("NFC: NCI: Handle Target mode activation")
->> Cc: stable@vger.kernel.org
->> Signed-off-by: Lekë Hapçiu <framemain@outlook.com>
->> ---
->>  net/nfc/nci/ntf.c | 22 ++++++++++++++--------
->>  1 file changed, 14 insertions(+), 8 deletions(-)
->>
->> diff --git a/net/nfc/nci/ntf.c b/net/nfc/nci/ntf.c
->> index c96512bb8..8eb295580 100644
->> --- a/net/nfc/nci/ntf.c
->> +++ b/net/nfc/nci/ntf.c
->> @@ -631,25 +631,31 @@ static int nci_store_general_bytes_nfc_dep(struct nci_dev *ndev,
->>  	switch (ntf->activation_rf_tech_and_mode) {
->>  	case NCI_NFC_A_PASSIVE_POLL_MODE:
->>  	case NCI_NFC_F_PASSIVE_POLL_MODE:
->> +		if (ntf->activation_params.poll_nfc_dep.atr_res_len <
->> +		    NFC_ATR_RES_GT_OFFSET)
->> +			break;
+On Mon, Apr 13, 2026 at 05:08:46PM +0800, Ren Wei wrote:
+> From: Zhengchuan Liang <zcliangcn@gmail.com>
 > 
-> This does not look the right fix: nci_store_general_bytes_nfc_dep() will
-> return success to the caller, and processing will proceed even if the
-> packet is malformed.
+> Local FDB entries can be rewritten in place by `fdb_delete_local()`, which
+> updates `f->dst` to another port or to `NULL` while keeping the entry
+> alive. Several bridge RCU readers inspect `f->dst`, including
+> `br_fdb_fillbuf()` through the `brforward_read()` sysfs path.
 > 
-> Looking at the (rather incomplete) error handling in
-> nci_rf_intf_activated_ntf_packet(), the latter function should error out
-> with EINVAL for truncated/malformed packets.
+> These readers currently load `f->dst` multiple times and can therefore
+> observe inconsistent values across the check and later dereference.
+> In `br_fdb_fillbuf()`, this means a concurrent local-FDB update can change
+> `f->dst` after the NULL check and before the `port_no` dereference,
+> leading to a NULL-ptr-deref.
 > 
-> You should return a proper error code here _and_ handle such error in
-> nci_rf_intf_activated_ntf_packet().
-> 
-> The same comment applies to the simlar check below.
-> 
->>  		ndev->remote_gb_len = min_t(__u8,
->> -			(ntf->activation_params.poll_nfc_dep.atr_res_len
->> -						- NFC_ATR_RES_GT_OFFSET),
->> +			ntf->activation_params.poll_nfc_dep.atr_res_len
->> +						- NFC_ATR_RES_GT_OFFSET,
-> 
-> Please do not include style-related changes in 'net' fix: it should
-> include the minimal delta to address the issue.
-> 
-> Other similar chuncks below.
+> Fix this by taking a single `READ_ONCE()` snapshot of `f->dst` in each
+> affected RCU reader and using that snapshot for the rest of the access
+> sequence. Also publish the in-place `f->dst` updates in `fdb_delete_local()`
+> with `WRITE_ONCE()` so the readers and writer use matching access patterns.
 
-I almost forgot: do not send you patches in reply to older revision: it
-will foul patchwork and make the review process harder, if possible at all.
+Sashiko is complaining [1] about missing READ_ONCE() annotations in some
+places, but I can handle them in net-next in a similar fashion to commit
+3e19ae7c6fd6 ("net: bridge: use READ_ONCE() and WRITE_ONCE() compiler
+barriers for fdb->dst").
 
-/P
+It's also complaining [2] about a not very interesting possible bug in
+br_fdb_dump() which is pre-existing.
 
+> 
+> Fixes: 960b589f86c7 ("bridge: Properly check if local fdb entry can be deleted in br_fdb_change_mac_address")
+> Cc: stable@kernel.org
+> Reported-by: Yifan Wu <yifanwucs@gmail.com>
+> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+> Co-developed-by: Yuan Tan <yuantan098@gmail.com>
+> Signed-off-by: Yuan Tan <yuantan098@gmail.com>
+> Suggested-by: Xin Liu <bird@lzu.edu.cn>
+> Tested-by: Ren Wei <enjou1224z@gmail.com>
+> Signed-off-by: Zhengchuan Liang <zcliangcn@gmail.com>
+> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+
+[1]
+"
+Are there other RCU readers that still need this protection?
+
+For instance, in br_dev_xmit(), br_fdb_find_rcu() returns a local FDB entry
+which is then passed to br_forward(). If a concurrent fdb_delete_local()
+sets the entry's dst to NULL, could this cause a NULL pointer dereference if
+br_forward() is inlined and the compiler emits multiple loads?
+
+Similarly, br_handle_frame_finish() appears to perform an unmarked read of
+dst->dst, which might race with br_fdb_update().
+
+Also, in br_fdb_delete_by_port(), f->dst is read directly without
+READ_ONCE(). While called under br->hash_lock, the br_fdb_update()
+fast path updates f->dst locklessly. Could this trigger KCSAN warnings due
+to an unmarked data race?
+"
+
+[2]
+"
+Does passing f to fdb_fill_info() allow a concurrent update to change
+the destination port after the filtering check?
+
+fdb_fill_info() executes a new READ_ONCE(fdb->dst). If f->dst changes
+between the filter_dev check above and the call to fdb_fill_info(), the
+dumped entry might claim to be on a device that doesn't match the requested
+filter_dev.
+
+Should fdb_fill_info() be updated to accept the dst snapshot instead?
+"
 
