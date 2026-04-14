@@ -1,211 +1,245 @@
-Return-Path: <netdev+bounces-278305-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278306-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sJqCLezn3WmulAkAu9opvQ
-	(envelope-from <netdev+bounces-278305-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 09:08:28 +0200
+	id aC2aG1/n3WmulAkAu9opvQ
+	(envelope-from <netdev+bounces-278306-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 09:06:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22CF73F668B
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 09:08:28 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 582F83F65F0
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 09:06:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C94E93083D97
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 07:05:30 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E7738301073B
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 07:05:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E55235A3B2;
-	Tue, 14 Apr 2026 07:05:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F69235B651;
+	Tue, 14 Apr 2026 07:05:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=est.tech header.i=@est.tech header.b="sWTMO/7U"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Lb11EKax"
 X-Original-To: netdev@vger.kernel.org
-Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11010057.outbound.protection.outlook.com [52.101.84.57])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93B3C2D8364
-	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 07:05:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.84.57
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776150330; cv=fail; b=CsPp/syGvluunRejPKenJioSqGFF3zaMap1Rri0jMW1jwx44fceBd6mOq+8D/EUfETWFqJCIeOoy/lxvH8zNpZDuWbSdwqHM1tRv40xsEC2PFllFZ4mkUJhWqRHDECIOx3ukAhQxwWOFDEFaFVyUbdwSCXRteaVx7tlDp9w1r60=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776150330; c=relaxed/simple;
-	bh=dnN8wlNLcKJacfQEUcV6/8M2Bj0KAvdgIJxS1sjQ5Z8=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=d7MBc5+cppb/ld9Jr7XJXpH8vxxLizTRxIUs8v1ZVJSBgTD3F7VwcKB1+1Ff1D3c64Gf2nwHRtIT6UwmeSn9itCNCnocyHnKS9FqXn05pGsJTBden+HX0d5jDv7GaYPPw9Eh9mQs/KGAo4uS8Kh9bejzhTVaUwV958DHjRmvFNo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=est.tech; spf=pass smtp.mailfrom=est.tech; dkim=pass (2048-bit key) header.d=est.tech header.i=@est.tech header.b=sWTMO/7U; arc=fail smtp.client-ip=52.101.84.57
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=est.tech
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=est.tech
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=pr3vB8n0GqfEk2iUMTcDvC6j75PDEc6bORXYU0U9vX4le5/vK7jUuQ+6jiIFftxP0svIzS54z1gRf7DqkmTnrRDrWgU/N4xx1VeaBj/ItDzehFSIH9wVOp020Ocg3wIfPNnIWnR7PF2jRKQJ8JW3IEc2bhwQOs9JMJvDqiPb8lhhb0qrgx6HUkh58qFSFmCUUaYd1UDwhNDGghcWat/lndgXNLKkTVkeV6KTMnC1ddWOVARgeGZH3xOQKaFNT42yvY6dCP/gUe6FuvloRsmXjZn1jUKSlXFa4mCUntM4kkWyd416uEplQNRuBykNMwk3nHIekGBinjib9BeQhj8hWA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+27zcSzr7ZfNBGvtVORKiMYrUb2KsAz8H4zJBfQJDzA=;
- b=WjVxl6vySXRpF89YvIEEpD11nAy5di5OJMywtLq52iZU9pgOGpdEDnOKqyzu3xKTqF+cOKV0TcQuCdxxa7dzhbSmn8TrizRcGhCQN3ruUCevq+vQBuGBcBJaMZHwamSiXT7j5vk6elBGYaTNJOQgCMFWP13ujECDZzgnFm4t1b82rpLw3C6MrfIHrSBXk7qFdvFqi2a5A3hFjmsA0jMQQ6efTOdZBH9inw49QBqaqVJZ9Wzw35nBMwy3OBNFYExRQv3O875syJXJq9yWTZbWk2h3sYaEfJGj/f9zkBr+83ymJLv+HslgKWhWRxAdz0vN4vGEanoqF+aqUYn0GOBaDg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=est.tech; dmarc=pass action=none header.from=est.tech;
- dkim=pass header.d=est.tech; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=est.tech; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+27zcSzr7ZfNBGvtVORKiMYrUb2KsAz8H4zJBfQJDzA=;
- b=sWTMO/7U36z9SXWpELn1VaVrANd6cOTMm1/ZrfExYcl5YF0IGclWpN+2tS7gbm0+pIxKX3Q31Kn2ICaZWGaOCVttD/L0Ei4wsOXSgaoA1rw5DwWZAhTzjG3LHEaNu36t6e0yMgH7iXDfkn2w4u6VI3/6pjFo1YHWIFMlkgTErnQyu/xVXT/xdQHP+OOTIWAQplznGWARnX0yZd3/layoVisbUqEAL0t+rV4iF0xt1lkI93Jwhdr4Uw24WqhonA4haY9CV1l9V6BdlfjA95xwROrcPja8o0JoECDZl4dWaBIc/N3FYoQVZwYXr2L+e0KZjou5Wb8kvXZNI8j/IQUTaQ==
-Received: from GV1P189MB1988.EURP189.PROD.OUTLOOK.COM (2603:10a6:150:63::5) by
- VI1P18901MB0815.EURP189.PROD.OUTLOOK.COM (2603:10a6:800:12a::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.48; Tue, 14 Apr
- 2026 07:05:24 +0000
-Received: from GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
- ([fe80::bfff:5391:8a49:21b7]) by GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
- ([fe80::bfff:5391:8a49:21b7%5]) with mapi id 15.20.9769.046; Tue, 14 Apr 2026
- 07:05:24 +0000
-From: Tung Quang Nguyen <tung.quang.nguyen@est.tech>
-To: Dudu Lu <phx0fer@gmail.com>
-CC: "jmaloy@redhat.com" <jmaloy@redhat.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-Subject: RE: [PATCH] tipc: Ensure NUL-termination of remote algorithm name
-Thread-Topic: [PATCH] tipc: Ensure NUL-termination of remote algorithm name
-Thread-Index: AQHcyyS0OQwVS2jRCUi+I63KaTpGq7XeIeYg
-Date: Tue, 14 Apr 2026 07:05:24 +0000
-Message-ID:
- <GV1P189MB19889E0B65316560D9108AEBC6252@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
-References: <20260413085852.76786-1-phx0fer@gmail.com>
-In-Reply-To: <20260413085852.76786-1-phx0fer@gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=est.tech;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: GV1P189MB1988:EE_|VI1P18901MB0815:EE_
-x-ms-office365-filtering-correlation-id: 62005320-7daf-4456-fecb-08de99f4333e
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|1800799024|376014|38070700021|18002099003|22082099003|56012099003;
-x-microsoft-antispam-message-info:
- 6bTuGfqwqsnEf9sBJys/w6tsTpYoHzeqvqdY9JM1LPfHnSKKefv6hwJk0IVL0Yjt/bCqp9SUrboSpblFQh5lVfj9ke8Yc8mufrgdERvZvcwg3YnHQuVd/+DrcsorX5lNZ9RNAWxotPv/DpJcgOPmNlnNmNKdT2rbc39LZAVrcTfYnt2b8/PU8w7zP2rADe6IusXgrjV9SieUQCcaQdsEqAFpmsdaLKsdUHU2OYo9aiJbRbqIccqkcphOH0hZLbNZpFdvlhXT5G56E2wR2V38MMZHYd1jcW5/tPx7yZqpWpC7O6GB2Vgl7Z/74sc8t+rrVSFI0bTF+QNo8w4pwf6uy2qRn4xMv45Jv9M38uHdSY5n4qvGbgdJuhmj4cSN3+gzNAq7Qm9kxNybrEn1FfSAUoRZjXIaTFkxKoLC3+5y683n0QQXJwGCGlTCRTmFuRuQqUnRKDw+KPiBZ8BlNZijSiJRjRlDYaLuXIDBHTv4lNQ2YFnclhQt6b9QRgZAVvUOVKimJsDFwSrB6cMb4h11Umy/31m6t4p+a+3nChpYXJip2cd3+QRwBO4NnAMxoVDZ2xeZ/N4oqHYiUPnRN7+q7oOJYX4zBlrFJHcCi0VWiDBOjVBPiEaIvY1cvHQP6HGNS0SOMKAlDooXGHCRSV4vQWuLX/x6N7qyR5posssJSwVNQ5z4bA9faeOZHiZTBylUrIe1TFPfDhE5MAik0tMLcpBpUTpl86e/eZRuW2q9g4vJH/sfJyK/7Q2UnrzA8TsdWat9N76oufK/tH8BZZxBtZ1v1RIh/r/xlX3/6nrNQKM=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1P189MB1988.EURP189.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700021)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?pfRe3VRcibM+qdKcmpcaZpxsO4iF7GQw5eqnwL1dX4g2Ir3c5Y9yZpLEhpII?=
- =?us-ascii?Q?vC2Pn/+PEEhEYHCqWCErx2Fw6nkG33aj2Jcf7ifUlXwYlGCHUDyZd3P3tPJm?=
- =?us-ascii?Q?G1a36OOInv8L9LMYVrhC93HggCrOJFn8scWDEhVhuHcX2Ilhng16j/z6bE6l?=
- =?us-ascii?Q?+DSzMMjYIjSQWytohJh07whcJLeyQuII1N9B8zhqCp5hUaQof07+juowu8Mf?=
- =?us-ascii?Q?kRkRnF29/dOwiSJs3q0vzxYADiT57zbG8K7gabaJ0FZQ/kk6z4PtUVCZvKRu?=
- =?us-ascii?Q?u86+Uhnp9CCEaOfi9gsf+7gCnbpco3rhsRQIeVv2G9NRTFPZi00hIOjkxopL?=
- =?us-ascii?Q?XyxsZ7kmnupwmO54IU/hi8LyzeMerMgujbUe9x56Oze6N4RIpi27Ik10YELb?=
- =?us-ascii?Q?nkVqvoFimvzEc+ZynMDw+7r5chlrp0X0+hzV667nOj5D5tf2T7BE4aXxaBnP?=
- =?us-ascii?Q?hZx7B8Z3+3yCubtwgrQaEKvzoEk8rLG9isGh6uBWrSukthYr7G4iWWR3jt6Y?=
- =?us-ascii?Q?V3hd0KAVZefHEcvAbygF6eXkWU68wlpnQKd9ZKZoqen8SksnFNvO9rOwieWr?=
- =?us-ascii?Q?Ma4gReE5cabJ/zggFQpq/qFumu/rXLLv2i/dTMUfcsuMRaueWH2cVtbJ6inj?=
- =?us-ascii?Q?EsW6sSFXMCm2T+6zuS4TB/W356rJHvOg7vnDFAAD/omwzeVUu1Nel2mY15St?=
- =?us-ascii?Q?tYCnbmrkBbj0+gnyVMI7OQwQ0AMKVt3PRMpV86WLgkAwD5YogfRGTS+hGqgE?=
- =?us-ascii?Q?ATaqZFxqyyl3sR/lCFwAszTGsPK0RIGZI6vYFQBd1aQPSRA9t7t0UsZ4hIwC?=
- =?us-ascii?Q?ENe1P1kK8QHlOzh46cmRqMJsEJ33J/DjI+6N/6qcccOHzdhXjQyQkirUYjA6?=
- =?us-ascii?Q?41FcDbm4J6/KocL+QENerP7ma4vmmLU/jdFunCDBZyUgrHVrWwPJBhoFDi+I?=
- =?us-ascii?Q?CnX636KeQ0ePqOSDuoxe6eFJpuV559yeEUwj4ge7RDqzN0dqrkx7mnjlOtT/?=
- =?us-ascii?Q?lGmeQwtirFjzaOKgFVPOZCEpC4DjH1QP+Hjwqjhda2jl5QrJSvmK+CfPmt9L?=
- =?us-ascii?Q?8M8xKVQVvwlrmZ8ahjPUrqJ6B0Su1a0sv2BSLN9xDMbz+tFFs2EsWxVbpBxY?=
- =?us-ascii?Q?El0HOdVsFGxJAjzIi1T6ycaLNiXYpYU+Pk2qwJhNtrG9bKvkRUBjJH2AZKpg?=
- =?us-ascii?Q?cg3K+y7KlLI1I/NJixptYO9x2Ps490J4wj1Cg1g9KKsEohs4PySKt6Dp0Kla?=
- =?us-ascii?Q?mscddx8yxsyZkKJis6WSISR6M22v0neUC7FJCE0+7KZaag94Jzg3ifbxVpLB?=
- =?us-ascii?Q?tnIUbBOJyF9uBHFkOhc3yjXHfhbYmE9wx5peli+U0tb5Kbdgwz9lDtQeGp+F?=
- =?us-ascii?Q?UoNSb6mnIs91Adrw5zMEU5Y0JL4fPcYbqpjBYw1sIyVjgw+B/jYZmxWrpVbR?=
- =?us-ascii?Q?ydCdKQUYHKONfMdC2DJRl/L90aQbiRcfOpCQipPNvGG7XWSFyxfKVYjgHzth?=
- =?us-ascii?Q?9O76W+TcatzGizXSGhFBBBT9AW4fSHzd66aLuNYDx96dDf5K0tfZOI6tM1jw?=
- =?us-ascii?Q?oCO0cD9eGSAPsWjLVlYN5hGH9WrdgYlkZK7cpf9FBrr8o/+xb/YIZrUwUCOk?=
- =?us-ascii?Q?+CoKqjz5/N4Y4t35Kc1+y5qxUZp39LmpggO/ybCZLhUGEdDzm69aHfXMRw5W?=
- =?us-ascii?Q?a70DI/T0DIMmspn/XvAnaBEI054kWH7B3hLj4vRW5Scu8bk7uKmBzh/hmrTb?=
- =?us-ascii?Q?qIDYHsAfsg=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5BB535A3B2;
+	Tue, 14 Apr 2026 07:05:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776150333; cv=none; b=h6g1l9gqn+QAuYz8nArkubeWsfnWK0Vil0/h6auDzwDkaYjcLdYsqaTNryFlAIPWfGHW47cenySSk53KESXVUU6KzUVFK3OQTJ4DbFqTUMkl/ez2H2yHvuZnh9mYom8ZD+4A6r/FSm1cFu7b5avN4JKaJc0CQnMX9Qa2q6hZvys=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776150333; c=relaxed/simple;
+	bh=UEaAzxTV5k9qgAQSvHOrlSueZGJf50PP0Vc880X5kxY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bjNKiCP++hWn3deRmGJ2BrlPwzuTUjkzX/G4hiKQGuZvZt10KyPab1hOp/XWBrAhZ+AZNQ6SUFuBEh+LE2FmnHarev9I8moCbOOs5jdG5F4ZaxnuG41kkFsGDDOhhkn9x3hBlm1/JTk2gSFsWlf2wMynjTFOkt51EkwVcgHqjxI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Lb11EKax; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1776150330; x=1807686330;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=UEaAzxTV5k9qgAQSvHOrlSueZGJf50PP0Vc880X5kxY=;
+  b=Lb11EKax1zGODQKuo5qgnlDVPLQ11eCe3wNkqt3roXYJxc1Vkyd3qlUc
+   bkhUAEoeFltUW8WBmn/Joea+JZobdE1OyYHfpwo6j5J4fb5ad9uZICuP9
+   Y4L23DQFQYZ3Qi8P6cYh8dFZbgyFRCNjgQs0aeaZrY6tork4DvGAcs/CK
+   +byjS15qQwx/sN+DtDVy58THQdH8v3wLYd4Nz3bI0oDVIRMOeJvnH4p+W
+   eAmRs5peH3ftWSpK2+GkAFQFeIcF01fb6hXrqBNO6YrpUhnQrSxXgLEXD
+   CtgihOMWqBHizNvz9iWSvwtcpexiUzXCmuQgTCjCXbAeV2NioXb/Wfki7
+   Q==;
+X-CSE-ConnectionGUID: oMJ1SYlySDeF4gcsQvGrSQ==
+X-CSE-MsgGUID: r6C/ohE9SR21x7aZwIPZKA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11758"; a="99742465"
+X-IronPort-AV: E=Sophos;i="6.23,179,1770624000"; 
+   d="scan'208";a="99742465"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2026 00:05:29 -0700
+X-CSE-ConnectionGUID: uqTXe9gHSgSP8qxj2lBBJw==
+X-CSE-MsgGUID: AAVr1BnyRwinhOcehdtPBw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,179,1770624000"; 
+   d="scan'208";a="231744549"
+Received: from guptapa-desk.jf.intel.com (HELO desk) ([10.165.239.46])
+  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2026 00:05:28 -0700
+Date: Tue, 14 Apr 2026 00:05:28 -0700
+From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To: x86@kernel.org, Jon Kohler <jon@nutanix.com>,
+	Nikolay Borisov <nik.borisov@suse.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	David Kaplan <david.kaplan@amd.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>, KP Singh <kpsingh@kernel.org>,
+	Jiri Olsa <jolsa@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Laight <david.laight.linux@gmail.com>,
+	Andy Lutomirski <luto@kernel.org>,
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+	David Ahern <dsahern@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	Asit Mallick <asit.k.mallick@intel.com>,
+	Tao Zhang <tao1.zhang@intel.com>, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org
+Subject: [PATCH v10 01/12] x86/bhi: x86/vmscape: Move LFENCE out of
+ clear_bhb_loop()
+Message-ID: <20260414-vmscape-bhb-v10-1-efa924abae5f@linux.intel.com>
+X-Mailer: b4 0.16-dev
+References: <20260414-vmscape-bhb-v10-0-efa924abae5f@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: est.tech
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: 62005320-7daf-4456-fecb-08de99f4333e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Apr 2026 07:05:24.3916
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: d2585e63-66b9-44b6-a76e-4f4b217d97fd
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: X96m0wVR1/TriZCl/YSI9IMuSccxLcRY0by1DdYtJL4CHLVfu37753IXj855kzlxEO6EALLVdaL4hf0deEQ5Mnfv+V3WEze667CulfMqhH8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1P18901MB0815
-X-Spamd-Result: default: False [0.34 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	R_DKIM_ALLOW(-0.20)[est.tech:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260414-vmscape-bhb-v10-0-efa924abae5f@linux.intel.com>
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-278305-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-278306-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	DMARC_NA(0.00)[est.tech];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_TO(0.00)[kernel.org,nutanix.com,suse.com,zytor.com,amd.com,google.com,alien8.de,linux.intel.com,infradead.org,iogearbox.net,davemloft.net,gmail.com,redhat.com,linux.dev,fomichev.me,lwn.net];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[37];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tung.quang.nguyen@est.tech,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[est.tech:+];
+	FROM_NEQ_ENVFROM(0.00)[pawan.kumar.gupta@linux.intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,est.tech:dkim,GV1P189MB1988.EURP189.PROD.OUTLOOK.COM:mid]
-X-Rspamd-Queue-Id: 22CF73F668B
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,suse.com:email,intel.com:dkim,intel.com:email,linux.intel.com:mid]
+X-Rspamd-Queue-Id: 582F83F65F0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
->Subject: [PATCH] tipc: Ensure NUL-termination of remote algorithm name
->
->In tipc_crypto_key_rcv(), the algorithm name is copied from the incoming
->message using memcpy with a fixed size of TIPC_AEAD_ALG_NAME (32 bytes).
->If the remote peer sends a name that fills all 32 bytes without a NUL
->terminator, the alg_name field will not be NUL-terminated. This string is =
-later
->passed to crypto_alloc_aead() which expects a NUL-terminated string,
->potentially causing an out-of-bounds read when the crypto subsystem
->searches for the algorithm by name.
-TIPC only supports one algorithm name "gcm(aes)" which is 8-byte length.
-So, there is no " name that fills all 32 bytes" as you mentioned.
->
->Fix by explicitly NUL-terminating the last byte of alg_name after the memc=
-py.
->
->Fixes: 1ef6f7c9390f ("tipc: add automatic session key exchange")
->Signed-off-by: Dudu Lu <phx0fer@gmail.com>
->---
-> net/tipc/crypto.c | 1 +
-> 1 file changed, 1 insertion(+)
->
->diff --git a/net/tipc/crypto.c b/net/tipc/crypto.c index
->d3046a39ff72..ac072356bf0c 100644
->--- a/net/tipc/crypto.c
->+++ b/net/tipc/crypto.c
->@@ -2325,6 +2325,7 @@ static bool tipc_crypto_key_rcv(struct tipc_crypto
->*rx, struct tipc_msg *hdr)
-> 	/* Copy key from msg data */
-> 	skey->keylen =3D keylen;
-> 	memcpy(skey->alg_name, data, TIPC_AEAD_ALG_NAME);
->+	skey->alg_name[TIPC_AEAD_ALG_NAME - 1] =3D '\0';
-This is not needed as explained above.
-> 	memcpy(skey->key, data + TIPC_AEAD_ALG_NAME + sizeof(__be32),
-> 	       skey->keylen);
->
->--
->2.39.3 (Apple Git-145)
->
+Currently, the BHB clearing sequence is followed by an LFENCE to prevent
+transient execution of subsequent indirect branches prematurely. However,
+the LFENCE barrier could be unnecessary in certain cases. For example, when
+the kernel is using the BHI_DIS_S mitigation, and BHB clearing is only
+needed for userspace. In such cases, the LFENCE is redundant because ring
+transitions would provide the necessary serialization.
+
+Below is a quick recap of BHI mitigation options:
+
+On Alder Lake and newer
+
+    BHI_DIS_S: Hardware control to mitigate BHI in ring0. This has low
+    performance overhead.
+
+    Long loop: Alternatively, a longer version of the BHB clearing sequence
+    can be used to mitigate BHI. It can also be used to mitigate the BHI
+    variant of VMSCAPE. This is not yet implemented in Linux.
+
+On older CPUs
+
+    Short loop: Clears BHB at kernel entry and VMexit. The "Long loop" is
+    effective on older CPUs as well, but should be avoided because of
+    unnecessary overhead.
+
+On Alder Lake and newer CPUs, eIBRS isolates the indirect targets between
+guest and host. But when affected by the BHI variant of VMSCAPE, a guest's
+branch history may still influence indirect branches in userspace. This
+also means the big hammer IBPB could be replaced with a cheaper option that
+clears the BHB at exit-to-userspace after a VMexit.
+
+In preparation for adding the support for the BHB sequence (without LFENCE)
+on newer CPUs, move the LFENCE to the caller side after clear_bhb_loop() is
+executed. Allow callers to decide whether they need the LFENCE or not. This
+adds a few extra bytes to the call sites, but it obviates the need for
+multiple variants of clear_bhb_loop().
+
+Suggested-by: Dave Hansen <dave.hansen@linux.intel.com>
+Tested-by: Jon Kohler <jon@nutanix.com>
+Reviewed-by: Nikolay Borisov <nik.borisov@suse.com>
+Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+---
+ arch/x86/entry/entry_64.S            | 5 ++++-
+ arch/x86/include/asm/nospec-branch.h | 4 ++--
+ arch/x86/net/bpf_jit_comp.c          | 2 ++
+ 3 files changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/arch/x86/entry/entry_64.S b/arch/x86/entry/entry_64.S
+index 42447b1e1dff..3a180a36ca0e 100644
+--- a/arch/x86/entry/entry_64.S
++++ b/arch/x86/entry/entry_64.S
+@@ -1528,6 +1528,9 @@ SYM_CODE_END(rewind_stack_and_make_dead)
+  * refactored in the future if needed. The .skips are for safety, to ensure
+  * that all RETs are in the second half of a cacheline to mitigate Indirect
+  * Target Selection, rather than taking the slowpath via its_return_thunk.
++ *
++ * Note, callers should use a speculation barrier like LFENCE immediately after
++ * a call to this function to ensure BHB is cleared before indirect branches.
+  */
+ SYM_FUNC_START(clear_bhb_loop)
+ 	ANNOTATE_NOENDBR
+@@ -1562,7 +1565,7 @@ SYM_FUNC_START(clear_bhb_loop)
+ 	sub	$1, %ecx
+ 	jnz	1b
+ .Lret2:	RET
+-5:	lfence
++5:
+ 	pop	%rbp
+ 	RET
+ SYM_FUNC_END(clear_bhb_loop)
+diff --git a/arch/x86/include/asm/nospec-branch.h b/arch/x86/include/asm/nospec-branch.h
+index 4f4b5e8a1574..70b377fcbc1c 100644
+--- a/arch/x86/include/asm/nospec-branch.h
++++ b/arch/x86/include/asm/nospec-branch.h
+@@ -331,11 +331,11 @@
+ 
+ #ifdef CONFIG_X86_64
+ .macro CLEAR_BRANCH_HISTORY
+-	ALTERNATIVE "", "call clear_bhb_loop", X86_FEATURE_CLEAR_BHB_LOOP
++	ALTERNATIVE "", "call clear_bhb_loop; lfence", X86_FEATURE_CLEAR_BHB_LOOP
+ .endm
+ 
+ .macro CLEAR_BRANCH_HISTORY_VMEXIT
+-	ALTERNATIVE "", "call clear_bhb_loop", X86_FEATURE_CLEAR_BHB_VMEXIT
++	ALTERNATIVE "", "call clear_bhb_loop; lfence", X86_FEATURE_CLEAR_BHB_VMEXIT
+ .endm
+ #else
+ #define CLEAR_BRANCH_HISTORY
+diff --git a/arch/x86/net/bpf_jit_comp.c b/arch/x86/net/bpf_jit_comp.c
+index e9b78040d703..63d6c9fa5e80 100644
+--- a/arch/x86/net/bpf_jit_comp.c
++++ b/arch/x86/net/bpf_jit_comp.c
+@@ -1624,6 +1624,8 @@ static int emit_spectre_bhb_barrier(u8 **pprog, u8 *ip,
+ 
+ 		if (emit_call(&prog, func, ip))
+ 			return -EINVAL;
++		/* Don't speculate past this until BHB is cleared */
++		EMIT_LFENCE();
+ 		EMIT1(0x59); /* pop rcx */
+ 		EMIT1(0x58); /* pop rax */
+ 	}
+
+-- 
+2.34.1
+
 
 
