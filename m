@@ -1,154 +1,147 @@
-Return-Path: <netdev+bounces-278575-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278576-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4JOAFTWd3mlrGQAAu9opvQ
-	(envelope-from <netdev+bounces-278575-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 22:01:57 +0200
+	id QO5nMl+d3mlIGgAAu9opvQ
+	(envelope-from <netdev+bounces-278576-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 22:02:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5FC83FE359
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 22:01:56 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C4BE3FE37E
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 22:02:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 97D75302F3A0
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 20:00:48 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B896D301977F
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 20:02:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D51B4225397;
-	Tue, 14 Apr 2026 20:00:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DB8224336D;
+	Tue, 14 Apr 2026 20:02:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="p72VqbeV"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="HCmdSF+u"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A37DB13DDA4
-	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 20:00:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F281C1CFBA
+	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 20:02:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776196847; cv=none; b=UAYjhShdQeXiF/b27zfRnffo3MEHd5OLadwykBUoU1R/4DExTQCl0WKas0M3DmHEkDkbvLE4uNx9Sau+RNWWK2S1xF3EbP4RVmH3jGe2JgIKb8G3sFYb3OR5xKJVdY68bH1q4UtK2aFqXHKvIGQz8EYL8K3dFuSLK8o7cGxHiU8=
+	t=1776196955; cv=none; b=YW2HN6pShdzciUGH1TSeTLt6VyrpXKfH4fIcITgcn+u0sfBtzGXJnNvuQ86J2U03XNl0mzesgRQKUfR5ovP4XJVhMLTxXqKAMTT22BdeFyCUOzF0EKrmIa5NAe8kNLIiSu5jNx1w9c9Dlu4xlq62lcMyC4NMNJJk4aAhDoHcTtc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776196847; c=relaxed/simple;
-	bh=ithCxZ94/lpCyjWS5Q1yqtuB5xCNWYQO26fHa8taySU=;
+	s=arc-20240116; t=1776196955; c=relaxed/simple;
+	bh=EN+PtLnaKD8HEY73xxSJCPjkEkd7hKDTdNognbNaPVo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eu8ggxv7BcFzOtheeFcp11iGNFp8kNlmMedzokSOjuska4hXEFsZJ321NqE/gQMWggyLNNDSG1o3dW9EsRmfeNAEg2t22EtU91NNKYNDDiI4xtlH3+q002vBGpVMiw4hYZGW8RpqI4t6NVbpjzgWNTOjcqzbAOicnxRy92sW3NM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=p72VqbeV; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2b2e8b95bdbso263005ad.0
-        for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 13:00:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1776196846; x=1776801646; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1lj5suPMM0090nuUB3pghGeuC5Cz7fnPMxIf04NMBZA=;
-        b=p72VqbeV7ejGRWmzuBeMbSS1hfzW+2NVze5lL/voUPyLSzlc8iYZG8iqNhtL4blI2R
-         yKqaA6kgZBzDShPUNBdXMuH78b+V1SEf93gqKgjQMelc0PdAYN8yrTJgOCbmTh8r4zrl
-         LOu+pkGANKtQqvFR+c/DscqTnT6/zg3tzxS+nSoTYyrd2N8mcm4tKtWBdm99E0SFmEK6
-         R/p0wmq2MTJX/I+v+ByceT97n23YdGizOSUIngpiioIy3vLHQokNDHEONxLgaIRG/zDQ
-         MchVOryx2k3h9F4zJac/9877khuc00ccrXWy7t8VJEDQuBcdJrWGmmolp4ubTnJEOJxv
-         gALw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776196846; x=1776801646;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1lj5suPMM0090nuUB3pghGeuC5Cz7fnPMxIf04NMBZA=;
-        b=YoTlQ47G2dE+cy8AqaX1k/D/5nLPh8/N7FXtmY2/KS8OLtlziWivMvmygwo262JDl6
-         QWUWwE84cInWTofhLra0JBmrpZcQViE0PqxCtiAkr6IGyxP6M+NlHk3fxfve99jdXnte
-         vQSklz0npr1DU/7uRwrYsQDyfXC12qrbt9SWgt0C49CJ5m+L+wJjgWqPs/Ix6DTdv9AM
-         eEXpe0IjLbSdmq+UsGahw0L7m7ikdKBqPnqw5XG6O3A9Om6d2/1vHg6fblY9IAm/t1KQ
-         B7QUfDTUkEfg3Toxf7g3hexHfNmD/Wz3lbCNSJmfmeEHFii+aEvjxwGNloe3Kf1ersdW
-         Sn/A==
-X-Forwarded-Encrypted: i=1; AFNElJ8QHN5GsF87fqttQHxRRy84LeJGeRtG1oXHcoY5r9ULpBVwhW9zjAFQNkvluYAHQ7bjVtf4C5M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyICLMTFX4Wg7vrgB0Qr5UBD10miUSJYMvKKT+578JwmgMJOLli
-	LEe/6pxfthRj8vyoOdzhdZ25IynpP+BHVmWcn87VlzZ+J+Lh2U+tIpFTsW7wzbu0vA==
-X-Gm-Gg: AeBDieuTsvSCbmd7E/qzsQobs/JpyyxSsV/FSXI5K38Lpd/gQvrCuyT33YOaR+4Qs0r
-	qY0F+IZ8uGrXGLjE+XZJMvfaic1C3xkv+rTMWLezEFQ6R/HX2VN5Q3XFRNYn8Tp2hAkLWexjzNu
-	FJOY5+iZaFRcHu5sgADPmzFquYxs3ePpqur6ulV73ZZT09rrPQUTFIggyZVR8TxFzazKq+VP2ur
-	PT3z410C9hxnef/a0AY0yppHN/+FFSkOTaQjOx63qkm1hco8uElvFp9Wsad3O3lnzlVR57MrJ2T
-	QYXPAbobFL0m0U37Ss0Du3/ODNsqyAkHG3ADyoSZve4HSPXuzn7b5O16JOW+S3yqoafO9VyKFj5
-	MLzfpE3PDOKDZYiFKnC8PPyhcv+uMZJph/nTfbe3kAF8hEtWaINgBsoVblqb3ephpSYkbBEf8U/
-	dmMP2H9+iwD3JVrvVdJbz6AyA1TlPFS18vz9F9+bDsYFpAuIsOTa6FZ+uYt9S155BuquWe+FiFz
-	vHUYxE=
-X-Received: by 2002:a17:903:4b50:b0:2b2:70ba:304b with SMTP id d9443c01a7336-2b474d3d9b5mr926455ad.10.1776196845352;
-        Tue, 14 Apr 2026 13:00:45 -0700 (PDT)
-Received: from google.com (174.188.87.34.bc.googleusercontent.com. [34.87.188.174])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b2d4f0adbbsm158961075ad.46.2026.04.14.13.00.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Apr 2026 13:00:43 -0700 (PDT)
-Date: Tue, 14 Apr 2026 20:00:37 +0000
-From: Pranjal Shrivastava <praan@google.com>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: trond.myklebust@hammerspace.com, anna@kernel.org, davem@davemloft.net,
-	kuba@kernel.org, edumazet@google.com, pabeni@redhat.com,
-	chuck.lever@oracle.com, jlayton@kernel.org, tom@talpey.com,
-	okorniev@redhat.com, neil@brown.name, dai.ngo@oracle.com,
-	linux-nfs@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [RFC PATCH 4/4] nfs: allow P2PDMA in direct I/O path
-Message-ID: <ad6c5fI0HsHkUbKH@google.com>
-References: <20260401194501.2269200-1-praan@google.com>
- <20260401194501.2269200-5-praan@google.com>
- <ac35ICYHuw4lEOri@infradead.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=TWJj2seeOCDsD9e9Jg6LRk7tS820TbdFt6LdnY2m8yRWUny+VovCIVgrizFuiNP1KI4aqlMUR7jxbpHsLQLDDqC4GLo93tfuA5YgIkbbekgElX10srZ8p0JFb6pxbBF37Yr0nIO+S4+EL3zRajhRCu2ck6Pa47dkm5Y7b9UPZm8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=HCmdSF+u; arc=none smtp.client-ip=91.218.175.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Tue, 14 Apr 2026 13:02:13 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1776196941;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hVulSorLZqSOev8jY1Kt7v0qUZeYnyrZOKpTRmYQuLA=;
+	b=HCmdSF+uzymU8UJ9oUOJhxska8uNEoFMpwiTwEnIABuUQIHer6f7hd5Dr01gHj8GhfnnFc
+	ZHL4CWaqA57+fyBcjM4ymYvWYHE0vbw1RgZfc96XAtqks5WiwKM7VjTjAY57AatIUs5T4d
+	SSD28ptrpR1A1AxwsvJYyMleuuAN0n8=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Kuniyuki Iwashima <kuniyu@google.com>, 
+	Jiayuan Chen <jiayuan.chen@linux.dev>, Eric Dumazet <edumazet@google.com>, 
+	Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org, Neal Cardwell <ncardwell@google.com>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, 
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>, 
+	linux-kernel@vger.kernel.org, bpf@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v2 2/2] selftests/bpf: verify syncookie
+ statistics in tcp_custom_syncookie
+Message-ID: <2026414195145.Ur8-.martin.lau@linux.dev>
+References: <20260411013211.225834-1-jiayuan.chen@linux.dev>
+ <20260411013211.225834-2-jiayuan.chen@linux.dev>
+ <CAAVpQUCCZVogDUUTfr3k-JxV52kpVvdYzqFC68-J3n6_ugd4Uw@mail.gmail.com>
+ <6b22a595-cd65-42ec-b332-c835273bc174@redhat.com>
+ <04cafd50-7af5-4835-b0df-67393d9f5a51@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <ac35ICYHuw4lEOri@infradead.org>
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <04cafd50-7af5-4835-b0df-67393d9f5a51@redhat.com>
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-278575-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-278576-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCPT_COUNT_TWELVE(0.00)[25];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[google.com,linux.dev,iogearbox.net,vger.kernel.org,davemloft.net,kernel.org,gmail.com,fomichev.me];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[praan@google.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[martin.lau@linux.dev,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A5FC83FE359
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,linux.dev:dkim,linux.dev:mid]
+X-Rspamd-Queue-Id: 5C4BE3FE37E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Apr 01, 2026 at 10:05:36PM -0700, Christoph Hellwig wrote:
-> On Wed, Apr 01, 2026 at 07:45:00PM +0000, Pranjal Shrivastava wrote:
-> > Migrate the NFS Direct I/O path from the legacy iov_iter_get_pages_alloc2()
-> > API to the modern iov_iter_extract_pages() API. This migration enables
-> > support for PCI Peer-to-Peer DMA (P2PDMA) by allowing the setting the
-> > ITER_ALLOW_P2PDMA flag.
+On Tue, Apr 14, 2026 at 11:17:39AM +0200, Paolo Abeni wrote:
+> On 4/14/26 11:08 AM, Paolo Abeni wrote:
+> > On 4/14/26 7:50 AM, Kuniyuki Iwashima wrote:
+> >> On Fri, Apr 10, 2026 at 6:32 PM Jiayuan Chen <jiayuan.chen@linux.dev> wrote:
+> >>>
+> >>> Add read_tcpext_snmp() helper to network_helpers which reads a
+> >>> TcpExt SNMP counter via nstat, and use it in the tcp_custom_syncookie
+> >>> test to verify that LINUX_MIB_SYNCOOKIESRECV is incremented and
+> >>> LINUX_MIB_SYNCOOKIESFAILED stays unchanged across a successful
+> >>> BPF custom syncookie validation.
+> >>>
+> >>> The delta is captured between start_server() and accept(), which
+> >>> covers the full SYN/ACK/cookie-check path for one connection.
+> >>>
+> >>> Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+> >>> ---
+> >>>  tools/testing/selftests/bpf/network_helpers.c | 22 +++++++++++++++++++
+> >>>  tools/testing/selftests/bpf/network_helpers.h |  1 +
+> >>>  .../bpf/prog_tests/tcp_custom_syncookie.c     | 20 +++++++++++++++++
+> >>
+> >> As you touch bpf selftest helper files, please rebase on bpf-next
+> >> to avoid possible conflicts and tag bpf-next in the Subject.
 > > 
-> > Pass ITER_ALLOW_P2PDMA to iov_iter_extract_pages() only if the local
-> > mount indicates support via the NFS_CAP_P2PDMA capability bit (detected
-> > at mount time for RDMA transports).
+> > To hopefully  minimize the conflicts handling I'm going to apply patch
+> > 1/2 to net-next. Please resubmit patch 2/2 to bpf-next after the
+> > relevant net core reach there.
 > 
-> Please split theconversion to iov_iter_extract_pages into a separate
-> preparation patch, and even series.  That is a long overdue change
-> that fixes potential data corruption in XFS.
-> 
+> Uhmm... the original feature went through the bpf tree, so I guess both
+> patches could/should via bpf-next. Hopefully conflict into the tcp code
+> should be minimal.
 
-Sure, I'll send out a series with the migration to 
-iov_iter_extract_pages, should I club this with the pin-aware + folios
-for direct I/O or send it as a separate series?
-
-Thanks,
-Praan
+I think it is best to land both patches together. It seems the 7.1 pull-request
+is out. We can take it to bpf-next/net after the merge window and then follow
+by a pull-request for the net-next tree as usual.
 
