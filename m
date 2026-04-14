@@ -1,142 +1,198 @@
-Return-Path: <netdev+bounces-278383-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278384-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CHgdCNsX3mlBmwkAu9opvQ
-	(envelope-from <netdev+bounces-278383-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 12:32:59 +0200
+	id IPN8BnUY3mlBmwkAu9opvQ
+	(envelope-from <netdev+bounces-278384-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 12:35:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB7773F8BED
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 12:32:58 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6E193F8CA2
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 12:35:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 760513061143
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 10:27:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 94D6E30D699F
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 10:30:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CA7F1514F8;
-	Tue, 14 Apr 2026 10:26:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b="WkHVGH+j"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CF023D5239;
+	Tue, 14 Apr 2026 10:30:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.nabladev.com (mx.nabladev.com [178.251.229.89])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f77.google.com (mail-oo1-f77.google.com [209.85.161.77])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D35743D5258;
-	Tue, 14 Apr 2026 10:26:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.251.229.89
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF4E53D566C
+	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 10:30:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.77
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776162415; cv=none; b=rn7bW8ybLWpEjV6tYnGb05xvk5klfevPcFpc99ufo2EG+otBG/AL/MUfyK5GinBatyQCXpRdJNe2a+HrLMZqtictGRc1+5ecnhM92vWJy68KEOeYjHnFLuzja91CseoWi/kxYWG4CdeejnUxP2uE9uGKE0c+RN3NnKVznvUMj0E=
+	t=1776162636; cv=none; b=XeYgmW3sgrIBVXB9XVGcRJjlgiylc5bgEE+K5Av7NyQIzczOcbhKcjKe0khGtGVOZvAUEP8KUToXN3zpnhp0FbleNyNmbt/p8u+bnrE1BwVrO9GLyHPSFkJJ7BhYCS0tL2fydLXcJ8yBKRZbkuy2bVc5Ot0sAxvP54YPOLs6bMg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776162415; c=relaxed/simple;
-	bh=ZfFf+Xb9PptclsHbGofHnbDruAIXwhUSQ+T+mgmk3Qo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GYOdicx91ZebKe9z0wEQznAhqEBN+i8AWxULbruGIhFnolGbSUC6xhj4Dk3sjhS7o0Aoq60aS8Rn+KnZ2rkgjckeG75EGMxmz0HeVA6FdkUHpTEauWZ4vfuBLYzvQJGPc5RsvVLNIiu1fNK1s+JguHajAR2QBi5IAfCpkLmtCBE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com; spf=pass smtp.mailfrom=nabladev.com; dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b=WkHVGH+j; arc=none smtp.client-ip=178.251.229.89
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nabladev.com
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 9296510CE86;
-	Tue, 14 Apr 2026 12:26:42 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nabladev.com;
-	s=dkim; t=1776162404;
-	h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=QUw1GVmNa8Tm46eOKkaFDELo/gPbvua9u5RkS9ks50Q=;
-	b=WkHVGH+jj8fht7LcddhRDZghm6vajSldF7jCuPPld8XaJDmTaavEKLjPoyAyiSo++KUoeB
-	yY6lRuBcEQxo02s6xWZd2oP88iW/C9ZeUYfQElpKoQq6jIbpSGEJXAWXpZUsVll3RdYw/K
-	z6BusZnCnsxCW3891oKe2Dv+Yo02pJL3mhCPPQiCtgjPYkXCJ0sl/vWA8DNsQohqqACxN9
-	fAg1LL7BanNxdvRBXbnxQ3L2cfOENpERevQTsStSd+PtfepD8mRGDARaXkuRlCQjNkqjot
-	j+m+QXBfJXMu5IQox2zqitdZoPEG+Xwzgp6Icb9hjcr2WZJ6fzL5Pm9hwanYjQ==
-Message-ID: <a3a1333b-5b08-4f18-8bce-6d83408d915e@nabladev.com>
-Date: Tue, 14 Apr 2026 12:26:41 +0200
+	s=arc-20240116; t=1776162636; c=relaxed/simple;
+	bh=FCSBefH/oTmdgHdyyArq8Sd+rdXE9JmhilR3WYZJjdE=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=HWuLSPO4sBwqFK1FZD1izTCw5VJ16hgGqvQAVtplhP5dyLynM3G2w632A9FFNQxy412m0+T0y66phqQA0BkJYGd9sicbBaGirOZbc7pynNt42f7icrV0O1dWIKFeStctXsXLcW8MEYjJARUDIkPvKK+X0n6ZS3lU/VED+SFsAqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f77.google.com with SMTP id 006d021491bc7-6853c2438b9so10258510eaf.3
+        for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 03:30:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776162627; x=1776767427;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=H9YZZSGezJHiuJUYElsZmyJ9oq+8X/IHgJLyoXz58+k=;
+        b=cVtcBRID9u5I+SsEMJMJyHCMdjd9zlbDCvDDxnFqIAxyvtihHwpDGpuP1UgpBkR2Fk
+         a5ptoL4tbp3ENd18fP+xn5gDmJT3h/znw9AGVCwQ+eBDzEnzhacsXxIrYwYCsgTmZglc
+         jocdiyqch4hHq5b8VJK+mqnzxOvxBNFrFq17RrhAOusLn0A+RMM8BvpLXAyaFZIZtAOg
+         l78Bavcz7AXuMPQqDdIqDIgFkRHwjnmkDKmV8Lv45NVDVPLQTDiVQxUZu6o+aTV8RXjB
+         pcXxfCdrhbvCItr/Z3K0WBYyArkZBP67zbWoj9W6Y9BuuNOBoti8JgM35oFhpG3tUL5h
+         znYQ==
+X-Forwarded-Encrypted: i=1; AFNElJ8J4dxj/6PhJbQYs1/dgIGOeW5jZcXbPwQ+6Rj4HYbGhdufem2Tlp5hNtqPAxczcjvtufrFS6c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxxJ/scHON8JY5cZEIVp6B/080Gk45TImz53dVgO+T9/h6D/to+
+	cRIt2nfHFXIVlAJDG3jdL7OCb3r2b3lBo/JWbU56NbuVdSZoeTf2Dm+PIrxZr932AvZhISIGiKa
+	y8xcko6lbg/cYROMraAgDd3MDXf28QnfUW1E63nrsmbCYHr6HdFjf93Uso4Y=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net,PATCH v2] net: ks8851: Reinstate disabling of BHs around IRQ
- handler
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
- stable@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>,
- Nicolai Buchwitz <nb@tipi-net.de>, Paolo Abeni <pabeni@redhat.com>,
- Ronald Wahl <ronald.wahl@raritan.com>, Yicong Hui <yiconghui@gmail.com>,
- linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@kernel.org>
-References: <20260408162535.98108-1-marex@nabladev.com>
- <20260412090141.21bf1534@kernel.org>
- <2558832d-c821-436d-898d-b708c5e0a228@nabladev.com>
- <20260412105125.48f0c58f@kernel.org> <20260413125744.TVKkZcEK@linutronix.de>
- <16fdeec9-9208-4c9b-b228-d6c6e045e116@nabladev.com>
- <20260413160336.GQCaw-1d@linutronix.de>
- <20260414085556.SJSDwbpW@linutronix.de>
-Content-Language: en-US
-From: Marek Vasut <marex@nabladev.com>
-In-Reply-To: <20260414085556.SJSDwbpW@linutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Received: by 2002:a05:6820:16a5:b0:682:7662:ccfa with SMTP id
+ 006d021491bc7-691bfecef49mr821814eaf.49.1776162627631; Tue, 14 Apr 2026
+ 03:30:27 -0700 (PDT)
+Date: Tue, 14 Apr 2026 03:30:27 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69de1743.a00a0220.475f0.0040.GAE@google.com>
+Subject: [syzbot] [lvs?] BUG: sleeping function called from invalid context in ip_vs_conn_expire
+From: syzbot <syzbot+504e778ddaecd36fdd17@syzkaller.appspotmail.com>
+To: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com, 
+	fw@strlen.de, horms@verge.net.au, ja@ssi.bg, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, lvs-devel@vger.kernel.org, 
+	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, pabeni@redhat.com, 
+	pablo@netfilter.org, phil@nwl.cc, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [-0.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[nabladev.com,reject];
-	R_DKIM_ALLOW(-0.20)[nabladev.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=56c2b36de3316f1b];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-278384-lists,netdev=lfdr.de,504e778ddaecd36fdd17];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278383-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,davemloft.net,lunn.ch,google.com,tipi-net.de,redhat.com,raritan.com,gmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	SUBJECT_HAS_QUESTION(0.00)[];
+	REDIRECTOR_URL(0.00)[goo.gl];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[marex@nabladev.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[nabladev.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,nabladev.com:dkim,nabladev.com:mid]
-X-Rspamd-Queue-Id: AB7773F8BED
+	DBL_BLOCKED_OPENRESOLVER(0.00)[googlegroups.com:email,syzkaller.appspot.com:url,storage.googleapis.com:url,appspotmail.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,goo.gl:url]
+X-Rspamd-Queue-Id: A6E193F8CA2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 4/14/26 10:55 AM, Sebastian Andrzej Siewior wrote:
-> On 2026-04-13 18:03:38 [+0200], To Marek Vasut wrote:
->> On 2026-04-13 17:31:34 [+0200], Marek Vasut wrote:
->>>> I don't see why it needs to disable interrupts.
->>>
->>> Because when the lock is held, the PAR code shouldn't be interrupted by an
->>> interrupt, otherwise it would completely mess up the state of the KS8851
->>> MAC. The spinlock does not protect only the IRQ handler, it protects also
->>> ks8851_start_xmit_par() and ks8851_write_mac_addr() and
->>> ks8851_read_mac_addr() and ks8851_net_open() and ks8851_net_stop() and other
->>> sites which call ks8851_lock()/ks8851_unlock() which cannot be executed
->>> concurrently, but where BHs can be enabled.
->>
->> I need check this once brain is at full power again. But which
->> interrupt? Your interrupt is threaded. So that should be okay.
-> 
-> I don't understand. There is no point in using spin_lock_irqsave() in
-> ks8851_lock_par(). You don't protect against interrupts because none of
-> the user actually run in an interrupt. As far as I can see, the
-> interrupt is threaded and the mdio phy link checks should come from the
-> workqueue.
+Hello,
 
-Ha, now that the IRQ handler is indeed only threaded, I can use 
-spin_lock_bh() indeed. I will send a V3 like that.
+syzbot found the following issue on:
 
-> What is wrong is that the ndo_start_xmit callback can be invoked from a
-> softirq and such you must disable BHs while acquiring a lock which can
-> be accessed from both contexts. Therefore spin_lock() is not sufficient,
-> it needs the _bh() and _irq() brings no additional value here.
+HEAD commit:    1c7cc4904160 Add linux-next specific files for 20260413
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=10327cd2580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=56c2b36de3316f1b
+dashboard link: https://syzkaller.appspot.com/bug?extid=504e778ddaecd36fdd17
+compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/91a765b703da/disk-1c7cc490.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/da75a3061146/vmlinux-1c7cc490.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/d55367ced048/bzImage-1c7cc490.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+504e778ddaecd36fdd17@syzkaller.appspotmail.com
+
+BUG: sleeping function called from invalid context at kernel/locking/spinlock_rt.c:48
+in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 16, name: ktimers/0
+preempt_count: 2, expected: 0
+RCU nest depth: 3, expected: 3
+8 locks held by ktimers/0/16:
+ #0: ffffffff8de5f260 (local_bh){.+.+}-{1:3}, at: __local_bh_disable_ip+0x3c/0x420 kernel/softirq.c:163
+ #1: ffffffff8dfc80c0 (rcu_read_lock){....}-{1:3}, at: __local_bh_disable_ip+0x3c/0x420 kernel/softirq.c:163
+ #2: ffff8880b8826360 (&base->expiry_lock){+...}-{3:3}, at: spin_lock include/linux/spinlock_rt.h:45 [inline]
+ #2: ffff8880b8826360 (&base->expiry_lock){+...}-{3:3}, at: timer_base_lock_expiry kernel/time/timer.c:1502 [inline]
+ #2: ffff8880b8826360 (&base->expiry_lock){+...}-{3:3}, at: __run_timer_base+0x120/0x9f0 kernel/time/timer.c:2384
+ #3: ffffffff8dfc80c0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:300 [inline]
+ #3: ffffffff8dfc80c0 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:838 [inline]
+ #3: ffffffff8dfc80c0 (rcu_read_lock){....}-{1:3}, at: __rt_spin_lock kernel/locking/spinlock_rt.c:50 [inline]
+ #3: ffffffff8dfc80c0 (rcu_read_lock){....}-{1:3}, at: rt_spin_lock+0x1e0/0x400 kernel/locking/spinlock_rt.c:57
+ #4: ffffc90000157a80 ((&cp->timer)){+...}-{0:0}, at: call_timer_fn+0xd4/0x5e0 kernel/time/timer.c:1745
+ #5: ffffffff8dfc80c0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:300 [inline]
+ #5: ffffffff8dfc80c0 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:838 [inline]
+ #5: ffffffff8dfc80c0 (rcu_read_lock){....}-{1:3}, at: ip_vs_conn_unlink net/netfilter/ipvs/ip_vs_conn.c:315 [inline]
+ #5: ffffffff8dfc80c0 (rcu_read_lock){....}-{1:3}, at: ip_vs_conn_expire+0x257/0x2390 net/netfilter/ipvs/ip_vs_conn.c:1260
+ #6: ffffffff8de5f260 (local_bh){.+.+}-{1:3}, at: __local_bh_disable_ip+0x3c/0x420 kernel/softirq.c:163
+ #7: ffff888068d4c3f0 (&cp->lock#2){+...}-{3:3}, at: spin_lock include/linux/spinlock_rt.h:45 [inline]
+ #7: ffff888068d4c3f0 (&cp->lock#2){+...}-{3:3}, at: ip_vs_conn_unlink net/netfilter/ipvs/ip_vs_conn.c:324 [inline]
+ #7: ffff888068d4c3f0 (&cp->lock#2){+...}-{3:3}, at: ip_vs_conn_expire+0xd4a/0x2390 net/netfilter/ipvs/ip_vs_conn.c:1260
+Preemption disabled at:
+[<ffffffff898a6358>] bit_spin_lock include/linux/bit_spinlock.h:38 [inline]
+[<ffffffff898a6358>] hlist_bl_lock+0x18/0x110 include/linux/list_bl.h:149
+CPU: 0 UID: 0 PID: 16 Comm: ktimers/0 Tainted: G        W    L      syzkaller #0 PREEMPT_{RT,(full)} 
+Tainted: [W]=WARN, [L]=SOFTLOCKUP
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/18/2026
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+ __might_resched+0x329/0x480 kernel/sched/core.c:9162
+ __rt_spin_lock kernel/locking/spinlock_rt.c:48 [inline]
+ rt_spin_lock+0xc2/0x400 kernel/locking/spinlock_rt.c:57
+ spin_lock include/linux/spinlock_rt.h:45 [inline]
+ ip_vs_conn_unlink net/netfilter/ipvs/ip_vs_conn.c:324 [inline]
+ ip_vs_conn_expire+0xd4a/0x2390 net/netfilter/ipvs/ip_vs_conn.c:1260
+ call_timer_fn+0x192/0x5e0 kernel/time/timer.c:1748
+ expire_timers kernel/time/timer.c:1799 [inline]
+ __run_timers kernel/time/timer.c:2374 [inline]
+ __run_timer_base+0x6a3/0x9f0 kernel/time/timer.c:2386
+ run_timer_base kernel/time/timer.c:2395 [inline]
+ run_timer_softirq+0xb7/0x170 kernel/time/timer.c:2405
+ handle_softirqs+0x1de/0x6d0 kernel/softirq.c:622
+ __do_softirq kernel/softirq.c:656 [inline]
+ run_ktimerd+0x69/0x100 kernel/softirq.c:1151
+ smpboot_thread_fn+0x541/0xa50 kernel/smpboot.c:160
+ kthread+0x388/0x470 kernel/kthread.c:436
+ ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
