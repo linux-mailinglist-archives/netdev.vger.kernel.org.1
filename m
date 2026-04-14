@@ -1,348 +1,488 @@
-Return-Path: <netdev+bounces-278412-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278411-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yHWqCBEl3mmMoAkAu9opvQ
-	(envelope-from <netdev+bounces-278412-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 13:29:21 +0200
+	id SP48OzMk3mk1ngkAu9opvQ
+	(envelope-from <netdev+bounces-278411-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 13:25:39 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BB1B3F95AC
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 13:29:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E67FC3F94A0
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 13:25:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id CE32F3015319
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 11:29:16 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 3CD4F301AABE
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 11:25:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50DEA3D9DA2;
-	Tue, 14 Apr 2026 11:29:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA7223DBD44;
+	Tue, 14 Apr 2026 11:25:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=uni-hannover.de header.i=@uni-hannover.de header.b="bipSc/Tp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h4fmXoo4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailout1n.rrzn.uni-hannover.de (mailout1n.rrzn.uni-hannover.de [130.75.2.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBE57359A8D;
-	Tue, 14 Apr 2026 11:29:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=130.75.2.107
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B54313D9DCD;
+	Tue, 14 Apr 2026 11:25:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776166155; cv=none; b=rmjFsVh0Z3wv87eTB9KHLfhudTU8deL+3Lc4xRL5ZHC5A2XNidE0233vB6oNRyTQtT669HrWF09fi0LcKpYj/j+TEPbA7Ld09c/JJb/5VT8ihwAjVXNAyAel82SadQJTxpOMidh1O3FaBzgWlCRLIUw47icQUKJKbUHiLxRh8PY=
+	t=1776165915; cv=none; b=NcOWKT1TcmvqHAuuptQ5qC6CU811FNFwMeqvsRMS6l8ij4AAlq1YG7w83k5ksNPIjG7bParvYpNH9PjFWtWNIozdTp0DISmszCLxY8Bajrf/n+Pb5yl9E7un2Kx+sOnrPY8PCwReazEPDtCKtSwfFaGMSElJ8VjKy7lGpuP3Q9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776166155; c=relaxed/simple;
-	bh=aIvlOhVc3N1/VfSl72PbeaxfsGhW5PrhBZcZTFvOXyE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lqjZJvT5IJRXFzxrLd9vMRZdR2HR5z9bF17l9slW0DMruD6GXEQuHO2FEhLk/oksKlHOjuO1I3tCaa4Jvgri03fr/p8VO3q+tvsr82zWlh+0ZvgfN+0kDrQQ6E8zHSP84mtR9N4zcVIa7slSYrfUd+yYNaF2WkydhOlb5yB2UoM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ikt.uni-hannover.de; spf=pass smtp.mailfrom=ikt.uni-hannover.de; dkim=pass (2048-bit key) header.d=uni-hannover.de header.i=@uni-hannover.de header.b=bipSc/Tp; arc=none smtp.client-ip=130.75.2.107
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ikt.uni-hannover.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ikt.uni-hannover.de
-Received: from [172.23.180.109] (gateway.ikt.uni-hannover.de [130.75.73.1])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mailout1n.rrzn.uni-hannover.de (Postfix) with ESMTPSA id 5B0A3104;
-	Tue, 14 Apr 2026 13:23:33 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=uni-hannover.de;
-	s=2024all; t=1776165814;
-	bh=aIvlOhVc3N1/VfSl72PbeaxfsGhW5PrhBZcZTFvOXyE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=bipSc/TphMxvzeBxuQ+yhGj1hgqTGSz1EJHk5Wn+SVR1Cmmmcz4gH5//4B54iSFi3
-	 iyV4lV9iTZy9+BlPzAmWYM42fXFZhclUGcuT7IJtUwVrfu6ft21999PK/MVM8cZ2v9
-	 V+0Mr21ogJfZTDysMBKxrszDnw7PnifXVqxcIJu/wovpjrYY/FMo00cVpKYXbuUkqk
-	 7DHCwtHkhg6SWvqJEkyp3JWZ7lwgwhCbF/nZiGb/0iMaTe7H7KtKHKdkFWA8SXDhhE
-	 ZIrdHgwEFcNlDX5hjfp161NnDABrfTZfS3qDbKVmQPmKdo8xrc4I5a0Z7O3xf22mHm
-	 Qoh1Lm4R4Q6zg==
-Message-ID: <1bce4c38-3bc3-4d59-bf36-6aa47c7a5c77@ikt.uni-hannover.de>
-Date: Tue, 14 Apr 2026 13:23:33 +0200
+	s=arc-20240116; t=1776165915; c=relaxed/simple;
+	bh=NoYrBg1ZRQqVciZb5ygqUsK3dsUjEu3DQbClFVmIsq0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rdslNC64WpMJ9L9XH4uV+TpAM3e2abtueDvy26SC3O1kEaIcCa6auxqLkodphmXEGaNjhs+yLKQsrK3R8LeRIiHnR1jyFZ3VnnaVGR1pUx/npjJdhm+JNv94onq4SZ75aa6rO2BIFW3klSlJremoQHPJVD2/qcUFiQV27hcQzr0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h4fmXoo4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8458C2BCB6;
+	Tue, 14 Apr 2026 11:25:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776165915;
+	bh=NoYrBg1ZRQqVciZb5ygqUsK3dsUjEu3DQbClFVmIsq0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=h4fmXoo4yqLacLgw2WC4WNRvl4x4F2ctleWd81f6T6amNBhOQJO59H5mFzg9pzQ3Z
+	 lO/UjiVcd2ZzqEl3H8KMvchK3RfrAvAnlIIQFueEWy2UH2LOeYbrvw7i2q3FCJGsIC
+	 8juYmwY6OKSHgw6W6jrhIHVRMBPaJakddZi2v4EEWrZbKH0QeXgyufKTXQzfhTo+CF
+	 KYV+fskTomPeeGjzmL3mcWBc8bgbXuc+dN23EAJk9WX8b+p2grwBeLigxWEQ4HK3VK
+	 me1xTXPNx4OXoP/yWiF2paOshqqhT8EbnjjKwOeSz54Iw9Kgzzx2ZKJyXdebxiY/xX
+	 1dmI9tYQLN9FA==
+From: Sasha Levin <sashal@kernel.org>
+To: patches@lists.linux.dev,
+	stable@vger.kernel.org
+Cc: John Pavlick <jspavlick@posteo.net>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Marcin Nita <marcin.nita@leolabs.pl>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Sasha Levin <sashal@kernel.org>,
+	linux@armlinux.org.uk,
+	andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.19-6.12] net: sfp: add quirks for Hisense and HSGQ GPON ONT SFP modules
+Date: Tue, 14 Apr 2026 07:24:59 -0400
+Message-ID: <20260414112509.410217-3-sashal@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260414112509.410217-1-sashal@kernel.org>
+References: <20260414112509.410217-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Re: [PATCH,net-next] tcp: Add TCP ROCCET congestion control
- module.
-To: Neal Cardwell <ncardwell@google.com>, Tim Fuechsel <t.fuechsel@gmx.de>
-Cc: "David S. Miller" <davem@davemloft.net>, David Ahern
- <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-References: <adIUY2N6HOKZNzSJ@volt-roccet-vm>
- <CADVnQymmsispHew4-frsuBBfObZHdSbH+jfP-9aSW1HguK_N4A@mail.gmail.com>
-Content-Language: de-DE
-From: Lukas Prause <lukas.prause@ikt.uni-hannover.de>
-In-Reply-To: <CADVnQymmsispHew4-frsuBBfObZHdSbH+jfP-9aSW1HguK_N4A@mail.gmail.com>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-512; boundary="------------ms050900040809060206030106"
-X-Virus-Scanned: clamav-milter 0.103.9 at mailout1n
-X-Virus-Status: Clean
-X-Spamd-Result: default: False [-4.26 / 15.00];
-	SIGNED_SMIME(-2.00)[];
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.19.12
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[uni-hannover.de,none];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_DKIM_ALLOW(-0.20)[uni-hannover.de:s=2024all];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278412-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-278411-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[google.com,gmx.de];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	HAS_ATTACHMENT(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[posteo.net,armlinux.org.uk,leolabs.pl,kernel.org,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lukas.prause@ikt.uni-hannover.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[uni-hannover.de:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,arxiv.org:url,acm.org:url,ikt.uni-hannover.de:mid]
-X-Rspamd-Queue-Id: 2BB1B3F95AC
+	TAGGED_RCPT(0.00)[netdev,kernel];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:email,msgid.link:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,leolabs.pl:email]
+X-Rspamd-Queue-Id: E67FC3F94A0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This is a cryptographically signed message in MIME format.
+From: John Pavlick <jspavlick@posteo.net>
 
---------------ms050900040809060206030106
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+[ Upstream commit 95aca8602ef70ffd3d971675751c81826e124f90 ]
 
-Thanks for the very detailed review of our code.
-We will incorporate your comments regarding documentation and variable
-usage into a new version of our code.
+Several GPON ONT SFP sticks based on Realtek RTL960x report
+1000BASE-LX at 1300MBd in their EEPROM but can operate at 2500base-X.
+On hosts capable of 2500base-X (e.g. Banana Pi R3 / MT7986), the
+kernel negotiates only 1G because it trusts the incorrect EEPROM data.
 
+Add quirks for:
+- Hisense-Leox LXT-010S-H
+- Hisense ZNID-GPON-2311NA
+- HSGQ HSGQ-XPON-Stick
 
-> Please reference figures in the paper and mention specific concrete
-> numerical examples of latency reductions to quantify these statements.
+Each quirk advertises 2500base-X and ignores TX_FAULT during the
+module's ~40s Linux boot time.
 
-Figures 5 and 6 show the performance of ROCCET in stationary and mobile
-scenarios (https://arxiv.org/pdf/2510.25281). In the analyzed scenario,
-we have observed a lower sRTT with ROCCET than with BBRv3 and CUBIC. The
-observed throughput was marginally lower than that of BBRv3, but still
-on a similar level. A detailed quantitative evaluation can be found in
-the paper in sections VI and VII.
+Tested on Banana Pi R3 (MT7986) with OpenWrt 25.12.1, confirmed
+2.5Gbps link and full throughput with flow offloading.
 
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Suggested-by: Marcin Nita <marcin.nita@leolabs.pl>
+Signed-off-by: John Pavlick <jspavlick@posteo.net>
+Link: https://patch.msgid.link/20260406132321.72563-1-jspavlick@posteo.net
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
 
-> Can you please elaborate on this statement here? AFAICT from figures 7
-> and 8 in https://arxiv.org/pdf/2510.25281 it seems ROCCET is
-> essentially starved by CUBIC when sharing a bottleneck with CUBIC when
-> the bottleneck has 2*BDP or more of buffering. AFAICT it sounds like
-> ROCCET does have "fairness issues when sharing a link with TCP CUBIC"?
+LLM Generated explanations, may be completely bogus:
 
-Our main use case is a connection where the bottleneck link is in the
-cellular network, where the bottleneck queue is typically not shared
-between flows. "Fairness" between flows is being implemented by the base
-station's scheduler. In this scenario, ROCCET achieves its objective to
-not "bloat" its own queue.
+Now I have all the information needed. Let me compile my full analysis.
 
-We have performed additional fairness experiments in non-cellular
-networks (figures 7 and 8). Here we show that even when used in other
-types of networks, ROCCET does not cause harm (see
-https://dl.acm.org/doi/10.1145/3365609.3365855) to other congestion contr=
-ol.
+---
 
+## Complete Analysis
 
-> Please specify what side effect or side effects ROCCET is claiming to
-> solve (presumably bufferbloat?).
-The side effect we observe in cellular networks is that, in particular,
-for loss-based congestion control, the cwnd often gets 'frozen' at a
-size that is too large for the BDP of the current link. This effect is
-caused by the TCP cwnd validation, which at some point stops increasing
-the cwnd because it assumes that the sender is application-limited.
-However, this often leads to a cwnd size that is too large for the link,
-but too small to cause a congestion event by overfilling the buffer. The
-result is a standing queue that causes permanently high RTTs. Figure 2
-in the paper (https://arxiv.org/pdf/2510.25281) shows the described
-behaviour for a single TCP CUBIC flow.
+### PHASE 1: COMMIT MESSAGE FORENSICS
 
-> Expressed in isolation like this, that sounds potentially dangerous.
-> Please mention what signal(s) ROCCET uses to exit slow start if it's
-> not using loss.
->
-> In addition, from reading the code AFAICT the connection does use loss
-> to exit slow start (see my remarks below in this message). So AFAICT
-> this summary seems inaccurate, or at least misleading?
-You are right, the summary is misleading. In the code we submitted,
-there are three conditions for exiting slow start:
-The first one is packet loss (as you already mentioned, without a cwnd
-reduction) Second is if the srRTT calculated by ROCCET exceeds an upper
-bound and ACK rate, sampled in 100ms time intervals, differs by 10
-segments. The third one is when the growth of the cwnd is stopped by the
-TCP cwnd validation  (which considers the connection as
-application-limited).
+**Step 1.1: Subject Line**
+- Subsystem: `net: sfp:`
+- Action verb: "add" (quirks)
+- Summary: Adding hardware quirks for Hisense and HSGQ GPON ONT SFP
+  modules
+- Record: [net: sfp] [add] [hardware quirks for GPON ONT SFP modules
+  with incorrect EEPROM data]
 
+**Step 1.2: Tags**
+- Reviewed-by: Russell King (Oracle) — the SFP subsystem maintainer
+- Suggested-by: Marcin Nita — suggested investigating sfp.c quirks as a
+  solution
+- Signed-off-by: John Pavlick (author)
+- Link:
+  https://patch.msgid.link/20260406132321.72563-1-jspavlick@posteo.net
+- Signed-off-by: Jakub Kicinski (netdev maintainer, applied the patch)
+- No Cc: stable (expected — that's why we're reviewing)
+- No Fixes: tag (expected — this is a quirk addition, not a code fix)
+- Record: Notable: Russell King, the SFP subsystem maintainer/author,
+  reviewed this. Strong quality signal.
 
-> If no lower RTT is found for 10 seconds, the algorithm interpolates
-> the `min_rtt` upwards towards the current RTT.
->
-> +  If the path is persistently congested (e.g., a large buffer is
-> constantly full), the `min_rtt` baseline will drift up.
->
-> +  This makes the algorithm less sensitive to queueing delay over
-> time, potentially defeating the purpose of reducing bufferbloat in the
-> long run. Contrast this with BBR, which actively drains the queue
-> (using the ProbeRTT mechanism) to try to find the true physical
-> minimum RTT.
->
-> Can you please add a comment explaining why the ROCCET algorithm takes
-> this approach, and how the algorithm expects to avoid queues that
-> ratchet ever higher?
-We added this functionality for the edge case of long-lived fat flows,
-which are experiencing routing changes, to detect a higher base RTT.
-Since this functionality is disabled by default and can also cause
-problems with min_RTT detection, we have decided to remove it.
-The measurement results in our paper have been obtained with this
-functionality disabled.
+**Step 1.3: Commit Body**
+- Bug: GPON ONT SFP sticks report 1000BASE-LX / 1300MBd in EEPROM but
+  actually support 2500base-X
+- Symptom: Kernel negotiates only 1G because it trusts incorrect EEPROM
+  data
+- Affected hardware: Hisense-Leox LXT-010S-H, Hisense ZNID-GPON-2311NA,
+  HSGQ HSGQ-XPON-Stick
+- All based on Realtek RTL960x chipset
+- Tested: Banana Pi R3 (MT7986) with OpenWrt 25.12.1, confirmed 2.5Gbps
+  link
+- TX_FAULT quirk needed during module's ~40s Linux boot time
+- Record: Real-world hardware problem limiting link speed. Users get 1G
+  instead of 2.5G.
 
+**Step 1.4: Hidden Bug Fix Detection**
+- This is not a "hidden" bug fix — it is an explicit hardware quirk
+  addition to work around incorrect EEPROM data. This falls squarely
+  into the "QUIRKS and WORKAROUNDS" exception category for stable.
 
-> Here, `cnt` is incremented by `1` on every call, regardless of the
-> `acked` value (number of packets ACKed in this event).
-You are right, we will change this.
+### PHASE 2: DIFF ANALYSIS
 
+**Step 2.1: Inventory**
+- Files changed: 1 (`drivers/net/phy/sfp.c`)
+- Lines added: 16 (including comments)
+- Lines removed: 0
+- Functions modified: None — only the `sfp_quirks[]` static const array
+  is extended
+- Scope: Single-file, table-only addition
+- Record: Extremely contained — 3 new entries in a quirk table, with
+  explanatory comments.
 
-> +  With the default `ack_rate_diff_ca` of `200`, this condition will
-> become true for $sum_cwnd * 100 / sum_acked >=3D 200$, i.e.
-> $num_acks_per_round * 100 >=3D 200$. So AFAICT we expect this condition=
+**Step 2.2: Code Flow Change**
+- Before: These three SFP modules (Hisense-Leox LXT-010S-H, Hisense
+  ZNID-GPON-2311NA, HSGQ HSGQ-XPON-Stick) have no quirk entries, so the
+  kernel reads their EEPROM data literally and negotiates 1G
+- After: These modules are matched by vendor/part strings and:
+  1. `sfp_quirk_2500basex` enables 2500base-X mode advertisement
+  2. `sfp_fixup_ignore_tx_fault` ignores the TX_FAULT signal during boot
 
-> to be true if there are 2 or more ACKs in a round trip. This makes
-> `bw_limit_detect` effectively a no-op or always-on trigger rather than
-> a true detector of queue growth or bandwidth limits.
-The purpose of this part of the code was to detect an increasing queue
-by monitoring data sent and acknowledged in combination with an
-increasing sRTT over 5 RTT time intervals. In the steady state of a TCP
-connection, the sending rate of the TCP sender should be equal to the
-receiver's ack rate, due to TCP self-clocking. The idea behind this code
-was to check if the cwnd is still correlated to the sending rate. If
-this is not the case and we also observe increasing RTTs, we assume the
-TCP sender is filling a buffer. However, we have made a mistake when
-calculating sum_cwnd:
-We are accumulating the cwnd on each ack event, instead of each RTT,
-which, as you mentioned, would make more sense. Because this leads to
-the erroneous behaviour that you described, we will remove this part of
-the code for now until we have evaluated the intended implementation.
+**Step 2.3: Bug Mechanism**
+- Category: Hardware workaround (h)
+- The modules have incorrect EEPROM data (report 1000BASE-LX but support
+  2500base-X)
+- The quirks use the exact same pattern as many existing entries (e.g.,
+  HUAWEI MA5671A, FS GPON-ONU-34-20BI)
+- Record: Hardware quirk — identical pattern to existing accepted
+  entries.
 
+**Step 2.4: Fix Quality**
+- Obviously correct: Uses exact same macro and functions as ~10 other
+  existing entries
+- Minimal/surgical: Only adds data to a static table; no logic changes
+- Regression risk: Zero for users without these modules (quirks matched
+  by vendor/part string)
+- For users WITH these modules: enables 2.5G link (improvement) and
+  ignores TX_FAULT during boot
+- Record: Highest possible confidence — data-only addition using
+  established infrastructure.
 
-> Did the experiments in the paper use the approach documented in the
-> paper, or the approach documented in this code? They are very
-> different, AFAICT.
-The experiments were performed using the submitted code. This means that
-the mentioned code snippet always evaluates to true, so that ROCCET only
-reacts to changes in latency, which is different from what we described
-in the paper.
+### PHASE 3: GIT HISTORY INVESTIGATION
 
+**Step 3.1: Blame**
+- The `sfp_quirks[]` table was introduced by Russell King in commit
+  23571c7b9643 (2022-09-13)
+- The `sfp_quirk_2500basex` function and `sfp_fixup_ignore_tx_fault`
+  function have existed since at least v6.1
+- Record: Infrastructure is mature and present in all active stable
+  trees.
 
-> Having a module parameter to ignore loss in this way makes it too easy
-> for users to cause excessive congestion. I would urge you to remove
-> that module parameter. Researchers can add that sort of mechanism in
-> their own code for research.
-That is true, we will remove this part of the implementation.
+**Step 3.2: Fixes Tag**
+- No Fixes: tag (expected for quirk additions). N/A.
 
-Thanks,
-Lukas
+**Step 3.3: File History**
+- SFP quirk additions are extremely frequent — ~17 quirk-related commits
+  since v6.6
+- This is a well-established pattern in the kernel community
+- Record: Standalone commit, no dependencies on other patches.
 
---------------ms050900040809060206030106
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+**Step 3.4: Author**
+- John Pavlick is a community contributor (not subsystem maintainer)
+- But the patch was reviewed by Russell King (SFP subsystem
+  author/maintainer) and applied by Jakub Kicinski (netdev maintainer)
+- Record: Properly reviewed by the right maintainers.
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgMFADCABgkqhkiG9w0BBwEAAKCC
-DTswggZEMIIELKADAgECAhAV+a5sqo0u1NNveH8e3HsBMA0GCSqGSIb3DQEBCwUAMG8xCzAJ
-BgNVBAYTAkdSMTcwNQYDVQQKDC5IZWxsZW5pYyBBY2FkZW1pYyBhbmQgUmVzZWFyY2ggSW5z
-dGl0dXRpb25zIENBMScwJQYDVQQDDB5IQVJJQ0EgQ2xpZW50IFJTQSBSb290IENBIDIwMjEw
-HhcNMjUwMTAzMTExMzA4WhcNMzkxMjMxMTExMzA3WjBjMQswCQYDVQQGEwJHUjE3MDUGA1UE
-CgwuSGVsbGVuaWMgQWNhZGVtaWMgYW5kIFJlc2VhcmNoIEluc3RpdHV0aW9ucyBDQTEbMBkG
-A1UEAwwSR0VBTlQgUy9NSU1FIFJTQSAxMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKC
-AYEAq7hur/5vIqMejblfPfZgGY75auSZz5SZ9x1dIIjvJrDBT0lIwQcAAoABJomkuv0kDK36
-2UH+uf9JrOdLBjiKkEh99HQPmT+d1+Ijnnd1aAjiL+2Q4aU16P/snITYJL2ROU46zqmDkdoO
-nCqMCEKSN74gHKDmApYfqXO8wmjmNA62wYHarp7lxgrBr0sk4BxHyKq52z0sWyxsdIy5V1K5
-OOkCNwYupZ9b74LRhelYP5SieNDqU0S6IpQOasVz5IS0vDnqVi2ni67Gbgtb8dBKzH6gbAwG
-ppHoeEFDcvJ042Oxtxt6BGolkUmguyfAgeisRqDjhQi+NfNgkDH81OLBV0eV07twS9axwNvJ
-AtH2SgGiWKrYeuBgVCzs1DFT7sws1KHyLrOdZU0hJQSDfoz/8jwFmXhWoPvQQuWEoo3uvH6L
-sHAo53aDF1aAUmGQ/JC72j7zZH16leJFuWj+t2TK/7YEVHtWluA9TOdx2Lz/SHh0/+pAVicD
-4N/QUWPuBhzPAgMBAAGjggFmMIIBYjASBgNVHRMBAf8ECDAGAQH/AgEAMB8GA1UdIwQYMBaA
-FKDWBz1eJPd7oEQuJFINGaorBJGnMFAGCCsGAQUFBwEBBEQwQjBABggrBgEFBQcwAoY0aHR0
-cDovL2NydC5oYXJpY2EuZ3IvSEFSSUNBLUNsaWVudC1Sb290LTIwMjEtUlNBLmNlcjBEBgNV
-HSAEPTA7MDkGBFUdIAAwMTAvBggrBgEFBQcCARYjaHR0cDovL3JlcG8uaGFyaWNhLmdyL2Rv
-Y3VtZW50cy9DUFMwHQYDVR0lBBYwFAYIKwYBBQUHAwIGCCsGAQUFBwMEMEUGA1UdHwQ+MDww
-OqA4oDaGNGh0dHA6Ly9jcmwuaGFyaWNhLmdyL0hBUklDQS1DbGllbnQtUm9vdC0yMDIxLVJT
-QS5jcmwwHQYDVR0OBBYEFOuyLzv9rgLMKkQGXSXNHRIiaLBHMA4GA1UdDwEB/wQEAwIBhjAN
-BgkqhkiG9w0BAQsFAAOCAgEAO964RfbcPCuTKAq2wXsOZxMaaLxITbSOYkt7RMxPw3CzU2qm
-kTQALKbVqC1jUiNQWbkxZpsb8hy9FOHywH1xFmANAypks0Iuh+ovhqP90oFcfhvAfYxV2M0c
-Gga9mTKFHP+QET7HW9pZdyWFZAw5fmdW9Ex+IQmJii0w/sozzwhpVn0OQYkkRV+2ydRa68JZ
-S2NqAPpdaWoseM2X4u5+Jn+H2UO9paobX+ht91K2Ch8xzfREv4RLqBgpHBmkIDVygXNdXsKf
-DHy2hOXxtF6oI1d7ErPGWoBxFc86aUqQlC6pEjb3ug24w+eg1kJj7IufHJ3iRm67Rdw5M1Ol
-WMzxu+DwAKqFJhqes0OL/NOJOTuDCb0bIfVfjl8U0Y0QWCkhoCmNPZQQu6QM6Y/XxnALgRB4
-drA8kip98wSZQmbqptE8oac2ZzLKCHiJlTdBuREsundnpBXdahMSrJ/mYv2pMZLpYkbrkvyh
-orDVeH9t0a5UgPIFqGl8/ZzakJ3RQfr7HvdGur0YWU6KNWvY5BK8qHMRM0b3XtK9xREIGEyc
-hAVReodDIhjrR4fWmjpa006r/UrmSk4bpKrVFVzTYsSK3jy4ri1ExVQp6RI6Ou4ZdbfwOYCu
-I9wweMjpVBuqNzRKrVU/Pvp57gUzm4u+JJRkdioMOoxZrwsUiYr2KIojwTcwggbvMIIFV6AD
-AgECAhBPXyBI3o2lCNUEcHAwcrzzMA0GCSqGSIb3DQEBCwUAMGMxCzAJBgNVBAYTAkdSMTcw
-NQYDVQQKDC5IZWxsZW5pYyBBY2FkZW1pYyBhbmQgUmVzZWFyY2ggSW5zdGl0dXRpb25zIENB
-MRswGQYDVQQDDBJHRUFOVCBTL01JTUUgUlNBIDEwHhcNMjUwNzAxMTEyODQ0WhcNMjcwNzAx
-MTEyODQ0WjCB7TELMAkGA1UEBhMCREUxFjAUBgNVBAgMDU5pZWRlcnNhY2hzZW4xODA2BgNV
-BAoML0dvdHRmcmllZCBXaWxoZWxtIExlaWJuaXogVW5pdmVyc2l0YWV0IEhhbm5vdmVyMREw
-DwYDVQRhDAhHT1ZERStOSTEPMA0GA1UEBAwGUHJhdXNlMRcwFQYDVQQqDA5MdWthcyBKb2hh
-bm5lczEeMBwGA1UEAwwVTHVrYXMgSm9oYW5uZXMgUHJhdXNlMS8wLQYJKoZIhvcNAQkBFiBs
-dWthcy5wcmF1c2VAaWt0LnVuaS1oYW5ub3Zlci5kZTCCAiIwDQYJKoZIhvcNAQEBBQADggIP
-ADCCAgoCggIBAMCey8Cfa8UVWdHPBu0eKmLN1vBp98X8mwtdWPoWASp77Ce8g8ta0f6y3XAY
-6W8+gSrb0etZO/P5vxjus9CSVr9QQQr+AHLx9I2iuurzNoZ4Tq1NYLpfPbsI2xlXnTP7YJcx
-kOo2x743dIAP3rkY5LJsccmU+Nw/Cdfmk0Nl1rFYvguj7rjkxVoB0wVnVCgiFeqMWhPVfN1m
-iEElmkqZcf30z+lkq6yN7WKVPhw9Me8BBkr6uGJqa1QuQRS8sJswjFkXtIrHHdAuHwhHLm4U
-cPYWQlWwY+sAa2CkT9cvMAxa24jHabaJjCTfAQ/cB/9qrBEbw82XWB6CX51gxoKe36AjHiL5
-Xdz3eaFvZF/zmUR8OC58M2KObBrZwmBgmbAal0BpfU6EmB0+FaVO54iqb4gKOb9mHGa8Q4o5
-qDJwumTaY+1ALd1sUu/XkGbLE6P9PcLXxA4DjjpUD93LALpG70e20POlYVGIo1/P8zA5GDlG
-XLQhvdxZMOMS/c9AxtBxNy4QGlJETzHwQkLs9XK5PxyWUXvCYdnHXhHsFnaQi0OB45+3ve88
-jI6ayFVUxvirAdwEJLmo0tqzkFL+G4dKmujaoeCnP/mV+Yam9PS1wC/E9tMMrgP+f6htKCzJ
-a+R/jl7nuo9gB7b2vdgZa8luFPL9GifWK3QvEwycpZ5DPKZfAgMBAAGjggGSMIIBjjAfBgNV
-HSMEGDAWgBTrsi87/a4CzCpEBl0lzR0SImiwRzBKBggrBgEFBQcBAQQ+MDwwOgYIKwYBBQUH
-MAKGLmh0dHA6Ly9jcnQuaGFyaWNhLmdyL0hBUklDQS1HRUFOVC1TTUlNRS1SMS5jZXIwKwYD
-VR0RBCQwIoEgbHVrYXMucHJhdXNlQGlrdC51bmktaGFubm92ZXIuZGUwYwYDVR0gBFwwWjAJ
-BgdngQwBBQMCMAgGBgQAj3oBAzBDBg0rBgEEAYHPEQEBAgQCMDIwMAYIKwYBBQUHAgEWJGh0
-dHBzOi8vcmVwby5oYXJpY2EuZ3IvZG9jdW1lbnRzL0NQUzAdBgNVHSUEFjAUBggrBgEFBQcD
-AgYIKwYBBQUHAwQwPwYDVR0fBDgwNjA0oDKgMIYuaHR0cDovL2NybC5oYXJpY2EuZ3IvSEFS
-SUNBLUdFQU5ULVNNSU1FLVIxLmNybDAdBgNVHQ4EFgQUa+4u0KVjTBoRRNYzCyDqQHvvkGkw
-DgYDVR0PAQH/BAQDAgWgMA0GCSqGSIb3DQEBCwUAA4IBgQCNMzZAFmerRlElJ/YZ1KmKt3FB
-QH37XjUYYDlmx8a+zw+THQI8uxBUBVFulpxD6eCZ9VT4hEznAV8CeAyg+FZ3m8gHUoMF7Ge9
-tAej/iH1nHLXRt8SEnwwfpICAVPoZT32hf9gmu1sxlaxKPb+dO7e8eoQoFRTlWOIoYtf5+dN
-1PXsLEcyQEx9RnJZeDjyZmN5HtcAxMzCzAm7otP+YLXCVi8OiQM2ytcCaBKKrtc1tYlrJpl+
-8ot2YfbvAAF0TPc0Mj4xOZ1a4CtqAIOWmuKynK5jO4tbMEbN5S/+oFihm5as0MeeMVECLcT6
-wHinSGM2ALMC2Vxw3nzL/7v1H+GxVlGM91bLRCCFxYPKr/lnVu6GqLHNZpWUVjXTw4pfANY4
-HPBK7tDWqfrNVPKJlk0YFUK0M6i/5AFwgcHK1bv/4hwMi9VdXIXsB/OPeHa9D5t+/WkBqk3F
-ZM/GjOWPhKUjVHdgByoq5M6qbxBNQLQWZg+jUa2KPshqEfwudiTA/IgxggWeMIIFmgIBATB3
-MGMxCzAJBgNVBAYTAkdSMTcwNQYDVQQKDC5IZWxsZW5pYyBBY2FkZW1pYyBhbmQgUmVzZWFy
-Y2ggSW5zdGl0dXRpb25zIENBMRswGQYDVQQDDBJHRUFOVCBTL01JTUUgUlNBIDECEE9fIEje
-jaUI1QRwcDByvPMwDQYJYIZIAWUDBAIDBQCgggL4MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0B
-BwEwHAYJKoZIhvcNAQkFMQ8XDTI2MDQxNDExMjMzM1owTwYJKoZIhvcNAQkEMUIEQHC2j8Vb
-mqtf1Cx+nxIHE4VQy2SK3GWwRBof5fGJOvLxkhvPWeMutV9XArhIuleaLBIA9srep9KKrAVl
-F1FbK6gwgYYGCSsGAQQBgjcQBDF5MHcwYzELMAkGA1UEBhMCR1IxNzA1BgNVBAoMLkhlbGxl
-bmljIEFjYWRlbWljIGFuZCBSZXNlYXJjaCBJbnN0aXR1dGlvbnMgQ0ExGzAZBgNVBAMMEkdF
-QU5UIFMvTUlNRSBSU0EgMQIQT18gSN6NpQjVBHBwMHK88zCBiAYLKoZIhvcNAQkQAgsxeaB3
-MGMxCzAJBgNVBAYTAkdSMTcwNQYDVQQKDC5IZWxsZW5pYyBBY2FkZW1pYyBhbmQgUmVzZWFy
-Y2ggSW5zdGl0dXRpb25zIENBMRswGQYDVQQDDBJHRUFOVCBTL01JTUUgUlNBIDECEE9fIEje
-jaUI1QRwcDByvPMwggFXBgkqhkiG9w0BCQ8xggFIMIIBRDALBglghkgBZQMEASowCwYJYIZI
-AWUDBAECMAoGCCqGSIb3DQMHMA0GCCqGSIb3DQMCAgEFMA0GCCqGSIb3DQMCAgEFMAcGBSsO
-AwIHMA0GCCqGSIb3DQMCAgEFMAcGBSsOAwIaMAsGCWCGSAFlAwQCATALBglghkgBZQMEAgIw
-CwYJYIZIAWUDBAIDMAsGCWCGSAFlAwQCBDALBglghkgBZQMEAgcwCwYJYIZIAWUDBAIIMAsG
-CWCGSAFlAwQCCTALBglghkgBZQMEAgowCwYJKoZIhvcNAQEBMAsGCSuBBRCGSD8AAjAIBgYr
-gQQBCwAwCAYGK4EEAQsBMAgGBiuBBAELAjAIBgYrgQQBCwMwCwYJK4EFEIZIPwADMAgGBiuB
-BAEOADAIBgYrgQQBDgEwCAYGK4EEAQ4CMAgGBiuBBAEOAzANBgkqhkiG9w0BAQEFAASCAgBo
-SaCcCbn+7yWntXV5EY9YiLsJw3mY6Rjvx9uQdVKPGzaEVZYdsXlkIktxijjadoxPLlqBK42c
-rTjOycjD+tgH1GVQUDWDjFSP3CcgTb85bAp3jjUphQPkGqn0RUny3QHb4v9OMoUsmYrHzUpx
-IXmHuUkDEGSelp42Fq+x7zEcR3CvAJW58D8lsAb/7IJeg5ZJPlM5o74xDynfjITh+ddZo2YV
-OjHOkdJO/P+sUFb0EpNmi5AXJW0lxdGDDo2rUiJabrP3XFO8jGJJ345kp9U2JJe8q7W9Q2Vw
-7lzyiQC5+pIOzESDjZvqH4KPog+eee5CsWtHSeF2zppdlRITx271SMvBsHu1Dg5J69Y2UxIC
-uBud3iCcTPU27UEiTvwh/byqMn99BmymhScPa2unxhi9pdiykq8N64zSQRlwttEGyDvFj/2m
-GG9shzlJsTXz6rAgPYdw/nIrBkDcYTHOSVyZRtjEuvoFpQEWjoUod8G4fFrLiYdKKCA81Klz
-l19srKbLlzc6wsz/n7OOcOnDKo2e2u5zeP8oOVWpESNrje04Fw/SyvMOvobLeuD9pZVaXVyW
-Balt1NgW3u+wAnGQr3gq+byokYgZhsAaydKwrOvOlLyXx7gNQAXhdvtT3pLZAeS/zZVecIXO
-wNofV9xb0waoF3zSEwWqq6MaUvIAnJyuBQAAAAAAAA==
---------------ms050900040809060206030106--
+**Step 3.5: Dependencies**
+- The patch uses `SFP_QUIRK()` macro, `sfp_quirk_2500basex`, and
+  `sfp_fixup_ignore_tx_fault`
+- All three exist in v6.1, v6.6, and v6.12 stable trees (verified)
+- Record: No dependencies. Completely self-contained.
+
+### PHASE 4: MAILING LIST RESEARCH
+
+**Step 4.1: Original Patch Discussion**
+- Found via lore: v3 of the patch, submitted 2026-04-06
+- v1→v2: Added Suggested-by tag
+- v2→v3: Fixed inaccurate commit message about MT7986 SerDes
+  capabilities
+- Applied by Jakub Kicinski to netdev/net.git (main) as commit
+  95aca8602ef7
+- Record: Clean submission history, no objections.
+
+**Step 4.2: Reviewers**
+- Russell King (Oracle) — SFP subsystem maintainer — Reviewed-by
+- Applied by Jakub Kicinski — netdev maintainer
+- Record: Reviewed by the right people.
+
+**Step 4.3-4.5: Bug Reports / Related / Stable Discussion**
+- No formal bug report — this is a hardware enablement quirk
+- The underlying problem is that these GPON SFP sticks' EEPROM
+  incorrectly reports capabilities
+- No stable-specific discussion found; no prior nomination
+
+### PHASE 5: CODE SEMANTIC ANALYSIS
+
+**Step 5.1-5.4: Functions**
+- No functions are modified. Only static data (the `sfp_quirks[]` array)
+  is extended.
+- The quirk matching happens in `sfp_lookup_quirk()` which iterates the
+  table and matches vendor/part strings
+- The matched `sfp_quirk_2500basex` and `sfp_fixup_ignore_tx_fault`
+  functions are called during SFP module insertion
+- Record: No code flow changes — purely data-driven matching.
+
+**Step 5.5: Similar Patterns**
+- Exact same pattern used by:
+  - HUAWEI MA5671A (sfp_quirk_2500basex + sfp_fixup_ignore_tx_fault)
+  - FS GPON-ONU-34-20BI (sfp_quirk_2500basex +
+    sfp_fixup_ignore_tx_fault)
+  - ALCATELLUCENT G010SP (sfp_quirk_2500basex +
+    sfp_fixup_ignore_tx_fault)
+- Record: Identical pattern to multiple existing accepted entries.
+
+### PHASE 6: STABLE TREE ANALYSIS
+
+**Step 6.1: Code Existence in Stable**
+- `sfp_quirk_2500basex` exists in v6.1, v6.6, v6.12 (verified)
+- `sfp_fixup_ignore_tx_fault` exists in v6.1, v6.6, v6.12 (verified)
+- `SFP_QUIRK()` 4-argument macro exists in all stable trees (verified)
+- Record: All needed infrastructure exists in all active stable trees.
+
+**Step 6.2: Backport Complications**
+- Minor context difference: In mainline, HUAWEI MA5671A uses
+  `sfp_fixup_ignore_tx_fault_and_los` (changed by commit 9f9c31bacaae),
+  while in v6.6 and v6.12 it still uses `sfp_fixup_ignore_tx_fault`.
+  This affects the context lines around the insertion point.
+- The Lantech entries also differ (SFP_QUIRK_S vs SFP_QUIRK_M,
+  additional 8330-265D entry)
+- This means the patch will need minor context adjustment (fuzz or
+  manual resolution) for older trees
+- Record: Expected minor context conflicts, trivially resolvable.
+
+**Step 6.3: Related Fixes Already in Stable**
+- No — these specific modules (Hisense-Leox, Hisense ZNID, HSGQ) have no
+  existing quirks in any tree.
+
+### PHASE 7: SUBSYSTEM AND MAINTAINER CONTEXT
+
+**Step 7.1: Subsystem Criticality**
+- Subsystem: net/phy (SFP transceiver support)
+- Criticality: IMPORTANT — SFP modules are used in many networking
+  setups, particularly in GPON/fiber deployments and embedded/router
+  platforms (OpenWrt, etc.)
+- Record: [net/phy/sfp] [IMPORTANT]
+
+**Step 7.2: Subsystem Activity**
+- Very active — 31 changes since v6.6, including many quirk additions
+- SFP quirk additions to stable are a well-established practice
+- Record: Actively maintained, frequent quirk additions.
+
+### PHASE 8: IMPACT AND RISK ASSESSMENT
+
+**Step 8.1: Affected Users**
+- Users of Hisense-Leox LXT-010S-H, Hisense ZNID-GPON-2311NA, and HSGQ
+  HSGQ-XPON-Stick SFP modules
+- These are GPON ONT SFP sticks commonly used in fiber-to-the-home
+  setups and by OpenWrt users
+- Record: Driver-specific, but affects a real user population in the
+  fiber networking community.
+
+**Step 8.2: Trigger Conditions**
+- Every time these SFP modules are inserted into a host capable of
+  2500base-X
+- 100% reproducible — the EEPROM always reports wrong data
+- Record: Deterministic, always triggers, no race or timing dependency.
+
+**Step 8.3: Failure Mode**
+- Without quirk: Link operates at 1G instead of 2.5G — loss of 60%
+  bandwidth
+- This is a functional issue, not a crash or security issue
+- Severity: MEDIUM (hardware not working at full capability)
+- Record: Performance/capability limitation, not crash or corruption.
+
+**Step 8.4: Risk-Benefit**
+- BENEFIT: HIGH — enables proper 2.5G operation for these GPON SFP
+  modules
+- RISK: VERY LOW — data-only addition, zero impact on users without
+  these specific modules, uses well-tested infrastructure
+- Record: Very favorable risk-benefit ratio.
+
+### PHASE 9: FINAL SYNTHESIS
+
+**Step 9.1: Evidence Summary**
+
+FOR backporting:
+- Falls squarely into the "SFP/NETWORK QUIRKS" exception category
+  (explicitly called out as YES for stable)
+- 16 lines added, zero lines removed — purely additive data
+- Uses exact same pattern as many existing entries already in stable
+  trees
+- All required infrastructure (macros, functions) exists in all active
+  stable trees
+- Reviewed by Russell King (SFP subsystem maintainer)
+- Applied by Jakub Kicinski (netdev maintainer)
+- Tested on real hardware with confirmed results
+- Zero regression risk for unaffected users
+- Fixes real hardware limitation for GPON fiber users
+
+AGAINST backporting:
+- Not a crash/security/corruption fix — it's hardware enablement
+- Minor context conflicts needed for older stable trees
+- No explicit Cc: stable nomination (but this is expected per our
+  guidelines)
+
+**Step 9.2: Stable Rules Checklist**
+1. Obviously correct and tested? YES — data-only addition, reviewed by
+   subsystem maintainer, tested on hardware
+2. Fixes a real bug? YES — SFP modules operate at wrong speed due to
+   incorrect EEPROM
+3. Important issue? MEDIUM — hardware not operating at full capability
+4. Small and contained? YES — 16 lines in one file, data-only
+5. No new features or APIs? CORRECT — no new features, just device quirk
+   entries
+6. Can apply to stable? YES — with minor context adjustment
+
+**Step 9.3: Exception Categories**
+This is a **hardware quirk/workaround** — one of the explicitly listed
+exception categories that is "YES for stable" even though it technically
+"adds code." SFP quirks are specifically called out in the analysis
+guidelines.
+
+**Step 9.4: Decision**
+This is a textbook SFP quirk addition. The guidelines explicitly state:
+"SFP_QUIRK_* for optical modules with broken behavior... These are all
+YES for stable." The patch is minimal, uses existing infrastructure
+available in all stable trees, is reviewed by the subsystem maintainer,
+was tested on real hardware, and carries essentially zero regression
+risk.
+
+### Verification
+
+- [Phase 1] Parsed tags: Reviewed-by Russell King (SFP maintainer),
+  Signed-off-by Jakub Kicinski (netdev maintainer), Suggested-by Marcin
+  Nita, Link to lore
+- [Phase 2] Diff analysis: 16 lines added (3 SFP_QUIRK entries +
+  comments) to static const sfp_quirks[] array, zero lines removed,
+  single file
+- [Phase 3] git blame: sfp_quirks[] table introduced by Russell King in
+  23571c7b9643 (2022-09-13), infrastructure present since v6.1
+- [Phase 3] Verified sfp_quirk_2500basex exists in v6.1 (line 355), v6.6
+  (line 399), v6.12 (line 424)
+- [Phase 3] Verified sfp_fixup_ignore_tx_fault exists in v6.1 (line
+  325), v6.6 (line 348), v6.12 (line 358)
+- [Phase 3] Verified SFP_QUIRK() 4-argument macro exists in v6.1, v6.6,
+  v6.12
+- [Phase 3] No dependencies — standalone commit confirmed
+- [Phase 4] Lore thread found: v3 submission, applied to netdev/net, no
+  NAKs or concerns
+- [Phase 4] b4 dig found original submission; Russell King CC'd and
+  provided Reviewed-by
+- [Phase 4] Patch went through v1→v2→v3, applied version is v3 (latest)
+- [Phase 5] No function modifications — only static data table extended
+- [Phase 6] Minor context conflict expected: HUAWEI MA5671A entry uses
+  sfp_fixup_ignore_tx_fault in v6.6/v6.12 but
+  sfp_fixup_ignore_tx_fault_and_los in mainline; Lantech entries differ
+  (SFP_QUIRK_M vs SFP_QUIRK_S)
+- [Phase 6] Confirmed all needed infrastructure exists in all active
+  stable trees
+- [Phase 7] SFP subsystem is actively maintained with frequent quirk
+  additions
+- [Phase 8] Zero regression risk for unaffected users; deterministic
+  2.5G enablement for affected hardware
+
+**YES**
+
+ drivers/net/phy/sfp.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
+index 7a85b758fb1e6..c62e3f364ea73 100644
+--- a/drivers/net/phy/sfp.c
++++ b/drivers/net/phy/sfp.c
+@@ -543,6 +543,22 @@ static const struct sfp_quirk sfp_quirks[] = {
+ 	SFP_QUIRK("HUAWEI", "MA5671A", sfp_quirk_2500basex,
+ 		  sfp_fixup_ignore_tx_fault_and_los),
+ 
++	// Hisense LXT-010S-H is a GPON ONT SFP (sold as LEOX LXT-010S-H) that
++	// can operate at 2500base-X, but reports 1000BASE-LX / 1300MBd in its
++	// EEPROM
++	SFP_QUIRK("Hisense-Leox", "LXT-010S-H", sfp_quirk_2500basex,
++		  sfp_fixup_ignore_tx_fault),
++
++	// Hisense ZNID-GPON-2311NA can operate at 2500base-X, but reports
++	// 1000BASE-LX / 1300MBd in its EEPROM
++	SFP_QUIRK("Hisense", "ZNID-GPON-2311NA", sfp_quirk_2500basex,
++		  sfp_fixup_ignore_tx_fault),
++
++	// HSGQ HSGQ-XPON-Stick can operate at 2500base-X, but reports
++	// 1000BASE-LX / 1300MBd in its EEPROM
++	SFP_QUIRK("HSGQ", "HSGQ-XPON-Stick", sfp_quirk_2500basex,
++		  sfp_fixup_ignore_tx_fault),
++
+ 	// Lantech 8330-262D-E and 8330-265D can operate at 2500base-X, but
+ 	// incorrectly report 2500MBd NRZ in their EEPROM.
+ 	// Some 8330-265D modules have inverted LOS, while all of them report
+-- 
+2.53.0
+
 
