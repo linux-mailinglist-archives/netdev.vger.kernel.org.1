@@ -1,127 +1,177 @@
-Return-Path: <netdev+bounces-278243-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278244-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MMMDJzeG3WnvfAkAu9opvQ
-	(envelope-from <netdev+bounces-278243-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 02:11:35 +0200
+	id WGtuIzqH3WkgfQkAu9opvQ
+	(envelope-from <netdev+bounces-278244-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 02:15:54 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC84C3F45D4
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 02:11:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DB9D23F4603
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 02:15:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 98275303FABB
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 00:11:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4033F303F07F
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 00:15:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2F543D561;
-	Tue, 14 Apr 2026 00:11:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7E50188596;
+	Tue, 14 Apr 2026 00:15:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="U3zd1/5P"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="smpGiiph"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 643E212B93;
-	Tue, 14 Apr 2026 00:11:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 822CB13DDAA;
+	Tue, 14 Apr 2026 00:15:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776125492; cv=none; b=tg6VIjg7sWW8GWtW61ZhZG5oh/9htPSkcXszpe4JWSmuEOI981He/7YW4fr5zD56x6OZDPiJrasDlOiIkyvmZ3KByVdWAlNw9q1CIIN9An3es/FsQ1U58rScU9ySLDi+ZlCgKjgQWnL15hGodYds6UrO/fH/sbnbI3m4gGeCMw8=
+	t=1776125750; cv=none; b=diyfR0srKumP/UtzU1BsbRE7mSh89Yyngrr7l0/t1PgIB0AASW9r2UbjyWokBpCjM3MkvFApjHtUlWSbPzV9sQsxGZaf/gVgg/EhAZMlk+KbI883+Gpy1I4bef2m/8sgLD2DapKwgmjp+Prwlx6SQyyJA8jbIZK2axv6EjRtlio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776125492; c=relaxed/simple;
-	bh=BsJ44EHp9plgRWqro2dZPO4rDiLIW6QcDNIeoNvIS1c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LCIDm/n/CpNNstL12WG4pWdUdd1dzwGc+1xugyNIu0NpV7YvI6sBSYvWVy4MwQawVA32SAN7HxJS+QrGEJrFDQZRXj0m3uJMk04SA5aIBDO+RU+HSUOYsht7oUka3y7NXDQrszLuJAxOTFctpgB7QOqFtoKPHxZkHt+/ITUD7W4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=U3zd1/5P; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: from netfilter.org (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with UTF8SMTPSA id 5162560177;
-	Tue, 14 Apr 2026 02:11:29 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1776125489;
-	bh=NvfB7f0eOiBdW3wAIWp57z2zunsl+ur5h/Olq4MZt50=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=U3zd1/5PXjK7qonqD6c0rFazYmPOeAL5ygx886wH1wRG3FSXRlUkIYMOCHVAlY2FC
-	 UPwQVw1sQTMDex2bN4qSpD5V7/IUvA/8T0wABTL+l2yqMGSfIXVyneN4jz8LM4IwEe
-	 Pq62AKWDYivSJ5BXE7kerS86mapw4Ey1p2+Xh0oCUsNvnSgu7yOg/JaX/vNuTzE3IW
-	 Qs1XF3xFRFU/eaRDi/7YJNDLQ7VuBXg2DQglNv25iLn2qg+Egr38xXwM2gHwgxFfaO
-	 aZwRx8dfrgA1DUVStXsrRgUyVYLIuH06swDcsYK4g1JtNdehYnXPOzfr+v3dQ4v8hj
-	 5ziXkU5xWlfSw==
-Date: Tue, 14 Apr 2026 02:11:26 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Marko Jevtic <marko.jevtic@codereflect.io>
-Cc: fw@strlen.de, netfilter-devel@vger.kernel.org, phil@nwl.cc,
-	coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v3] netfilter: nft_set_rbtree: fix use count leak on
- transaction abort
-Message-ID: <ad2GLmdP2wRVyd5c@chamomile>
-References: <20260412222801.34965-1-marko.jevtic@codereflect.io>
+	s=arc-20240116; t=1776125750; c=relaxed/simple;
+	bh=/KsjYsvdykoCUcRhppsdRI5ZRMsJIIzrqtQA2lvXVW4=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=VG3Iu4CAw817imEcChhME/8OAa0QCDdZnUepG0F+Olzm0jBM946K7M6k2SFZMk4iPHmqEarzFGwEwdy9MtiQrd9m0pEoK1J70USo3jX1hzzdfMpA69HVuo0NhnpKY3Nh6G7VJg2AuBNb3KwQScmlBgBqxYmpWJbu7YB4oNrHAq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=smpGiiph; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0F70C2BCAF;
+	Tue, 14 Apr 2026 00:15:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776125750;
+	bh=/KsjYsvdykoCUcRhppsdRI5ZRMsJIIzrqtQA2lvXVW4=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=smpGiiphv9CG4RZAun++HCq1EKwc++OmIX7vrMRUMd2K7F6SE7GV2HyP5vLcOa7Z9
+	 0Gob217U6w7aMdaBShFo3kk/1Byn/vhq4/I8yx7avDWemyRl0UC9pDCN20Bal1eum1
+	 Gvcrj/JuTRzDb8l2rH7gKTOyVUfiCv2gIsCP7w04DHkenQyBGp/BE4T4+Gq4uc6the
+	 66lK7eaYbVyHjCO4hnIq9Nn3QHzJFjsiOMXTnt9tLA6IGE6IgwP57YdwDPwq5AjaXO
+	 Da+vvsOTIWHbghxyIjvLwN5OYKi1Aug+KQ7BObvN5AZJvQbktaMc20SW6yPbg2bYD1
+	 Vw8+vdi1vV0WQ==
+Message-ID: <70b9eca6eac73a9ac71662b45ffc330314aee9d7.camel@kernel.org>
+Subject: Re: [PATCH net v2] RDS: Fix memory leak in rds_rdma_extra_size()
+From: Allison Henderson <achender@kernel.org>
+To: Xiaobo Liu <cppcoffee@gmail.com>, "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ netdev@vger.kernel.org,  linux-rdma@vger.kernel.org,
+ rds-devel@oss.oracle.com,  linux-kernel@vger.kernel.org
+Date: Mon, 13 Apr 2026 17:15:48 -0700
+In-Reply-To: <20260413070005.15272-1-cppcoffee@gmail.com>
+References: <20260413070005.15272-1-cppcoffee@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.3-0ubuntu1.1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260412222801.34965-1-marko.jevtic@codereflect.io>
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_NA(0.00)[netfilter.org];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-278244-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,davemloft.net];
 	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[netfilter.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-278243-lists,netdev=lfdr.de];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,netfilter.org:dkim]
-X-Rspamd-Queue-Id: EC84C3F45D4
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[achender@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: DB9D23F4603
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi,
+On Mon, 2026-04-13 at 15:00 +0800, Xiaobo Liu wrote:
+> Free iov->iov when copy_from_user() or page count validation fails
+> in rds_rdma_extra_size().
+>=20
+> This preserves the existing success path and avoids leaking the
+> allocated iovec array on error.
+>=20
+> Signed-off-by: Xiaobo Liu <cppcoffee@gmail.com>
 
-On Mon, Apr 13, 2026 at 12:28:01AM +0200, Marko Jevtic wrote:
-> nft_rbtree_abort() does not handle elements moved to the expired list
-> by inline GC during __nft_rbtree_insert(). When inline GC encounters
-> expired elements during overlap detection, it calls
-> nft_rbtree_gc_elem_move() which deactivates element data (decrementing
-> chain/object use counts), removes the element from the rbtree, and
-> queues it for deferred freeing. On commit, these elements are freed
-> via nft_rbtree_gc_queue(). On abort, however, the expired list is
-> ignored entirely.
-> 
-> This leaves use counts permanently decremented after abort.
+I think this looks good now.  Thanks Xiaobo.
+Reviewed-by: Allison Henderson <achender@kernel.org>
 
-Yes, but that is expected?
+> ---
+>  net/rds/rdma.c | 28 +++++++++++++++++++++-------
+>  1 file changed, 21 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/net/rds/rdma.c b/net/rds/rdma.c
+> index aa6465dc7..91a20c1e2 100644
+> --- a/net/rds/rdma.c
+> +++ b/net/rds/rdma.c
+> @@ -560,6 +560,7 @@ int rds_rdma_extra_size(struct rds_rdma_args *args,
+>  	struct rds_iovec *vec;
+>  	struct rds_iovec __user *local_vec;
+>  	int tot_pages =3D 0;
+> +	int ret =3D 0;
+>  	unsigned int nr_pages;
+>  	unsigned int i;
+> =20
+> @@ -578,16 +579,20 @@ int rds_rdma_extra_size(struct rds_rdma_args *args,
+>  	vec =3D &iov->iov[0];
+> =20
+>  	if (copy_from_user(vec, local_vec, args->nr_local *
+> -			   sizeof(struct rds_iovec)))
+> -		return -EFAULT;
+> +			   sizeof(struct rds_iovec))) {
+> +		ret =3D -EFAULT;
+> +		goto out;
+> +	}
+>  	iov->len =3D args->nr_local;
+> =20
+>  	/* figure out the number of pages in the vector */
+>  	for (i =3D 0; i < args->nr_local; i++, vec++) {
+> =20
+>  		nr_pages =3D rds_pages_in_vec(vec);
+> -		if (nr_pages =3D=3D 0)
+> -			return -EINVAL;
+> +		if (nr_pages =3D=3D 0) {
+> +			ret =3D -EINVAL;
+> +			goto out;
+> +		}
+> =20
+>  		tot_pages +=3D nr_pages;
+> =20
+> @@ -595,11 +600,20 @@ int rds_rdma_extra_size(struct rds_rdma_args *args,
+>  		 * nr_pages for one entry is limited to (UINT_MAX>>PAGE_SHIFT)+1,
+>  		 * so tot_pages cannot overflow without first going negative.
+>  		 */
+> -		if (tot_pages < 0)
+> -			return -EINVAL;
+> +		if (tot_pages < 0) {
+> +			ret =3D -EINVAL;
+> +			goto out;
+> +		}
+>  	}
+> =20
+> -	return tot_pages * sizeof(struct scatterlist);
+> +	ret =3D tot_pages * sizeof(struct scatterlist);
+> +
+> +out:
+> +	if (ret < 0) {
+> +		kfree(iov->iov);
+> +		iov->iov =3D NULL;
+> +	}
+> +	return ret;
+>  }
+> =20
+>  /*
 
-Expired elements reside in priv->expired, these elements are already
-deactivated, ie. removed from the rbtree and chain reference is
-decremented.
-
-From abort path, the deactivated element simply remains there until
-there is a commit run that gets rid of it.
-
-I can't make any sense of this bug report so far.
-
-Why do you think there is a need to restore an expired element?
 
