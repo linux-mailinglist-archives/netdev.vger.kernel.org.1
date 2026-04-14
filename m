@@ -1,172 +1,129 @@
-Return-Path: <netdev+bounces-278515-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278516-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aP9mCWNh3mn+CQAAu9opvQ
-	(envelope-from <netdev+bounces-278515-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 17:46:43 +0200
+	id cJlHNm1g3mn+CQAAu9opvQ
+	(envelope-from <netdev+bounces-278516-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 17:42:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 925773FC18F
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 17:46:42 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D882C3FC0E6
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 17:42:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 00BA830B3FA1
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 15:40:06 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E06193032ABC
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 15:40:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 258573EAC90;
-	Tue, 14 Apr 2026 15:40:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E6F83EAC8A;
+	Tue, 14 Apr 2026 15:40:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="dPXEwOuX"
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="hcJLcAVt"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 001793E959D;
-	Tue, 14 Apr 2026 15:40:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C2F13D902A
+	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 15:40:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776181202; cv=none; b=IT4AVnco9XvSVRRWUUp4Tt8erMIssOfdSqcRKnORSR63oTR8jo7VxtOjFrWamMej3zmPbB9aFEEfcHX3GZ4g9k+HCYWfMKcf+/RXdm+vRGeipZQCRF8/AjEy4Aplr0e/cco6xR6R9uxJbUnY1ejQOoxwhwdmKugHnO7xeDgTJ38=
+	t=1776181222; cv=none; b=Blp6+oAdUio6P+K2mA4NQtz1pAk3sg4vgoc9cOXYSxlc73SUjJJdnDc+Ci/HXtf//LdsEMDsHNcr1wZWjIjMFD9o9NamWFMk8nqyj1F5aQiHbCtBiFOJ5nZYy7aeI6YSavQY2uofsMdAXcuRwN8/0WyTaHuQ0h8hEp1BYcWD0xE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776181202; c=relaxed/simple;
-	bh=g9XpWWz1SxVgb0pf9yHfFzddWuvrZobpuA6QIzfLLWg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rKZhLCNZLbmslHsu2MP1RQFzVXdlGuYuz7umvW/aXlvv8CVIqGAF6MJe5yJ22NHbYhiZscTpX4+5SU1gM406+8eE1AFMljztM+Q3BekEVHXxrf2IxqKq+1juT5BY8zO0dV91oprdkeuQ/RJ8QKwSTG//eF+3+WjaLt/2Qzngxns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=dPXEwOuX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA9EDC19425;
-	Tue, 14 Apr 2026 15:40:00 +0000 (UTC)
+	s=arc-20240116; t=1776181222; c=relaxed/simple;
+	bh=hNEgoftVnqoHxChDeFRkfLMjkNJ9rWqwQSFm616iVJo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uiyJzk48u73KMlpIaT95yj4HjVes3jvF/mrJKn+Zh+bgmPd9+p2/m6em4h1gpseUH0UuGi6+AI3bNJ0eaF4aUYuy/lgoBO+5wk1SWqfChF51Bztf0NyUVj+jdmBIFey10f19J7MaIX030pwm5fZiqZEdfLRmp6o0tMj/nV338Zs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=hcJLcAVt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0AA59C2BCB3
+	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 15:40:21 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="dPXEwOuX"
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="hcJLcAVt"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1776181199;
+	t=1776181217;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=1OD9H9fIMPiOoqvYQ6ai2yEsDn71I8Os81Ip4a3JthM=;
-	b=dPXEwOuXVjKNIr+HKgbWP1iCVk1plqJU7/aK+doi02LwHMdWaXPFrmfm//88fGiRYuaMNM
-	dtu90IMV95YIYE9w8DyDCqPMUNWvWf+7cNR748odHshi8sVRCKgl3snq8k16jVJPFuKIbh
-	FHCF5eikD9JcmkVYYxEryfoN6w4xT+8=
+	bh=hNEgoftVnqoHxChDeFRkfLMjkNJ9rWqwQSFm616iVJo=;
+	b=hcJLcAVtp/lhy/6qIa1d586uxjXRaJek6BpZ1pAlo0kTkFQH9N2T9hhEBIRQU3VeFAjVIa
+	78Di1AG3BY8qK+sMyc0zYhpQk19/sEi1mi4TLsdfxHwBE9ED8+8Ni2sFqQJol9FMzW+5Ee
+	JxI477YaSaXBqowBXv8pHArJZkKaD4k=
 Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id c3676861 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Tue, 14 Apr 2026 15:39:59 +0000 (UTC)
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: netdev@vger.kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: Shardul Bankar <shardul.b@mpiricsoftware.com>,
-	syzbot+f2fbf7478a35a94c8b7c@syzkaller.appspotmail.com,
-	stable@vger.kernel.org,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH net-next 4/4] wireguard: device: use exit_rtnl callback instead of manual rtnl_lock in pre_exit
-Date: Tue, 14 Apr 2026 17:39:44 +0200
-Message-ID: <20260414153944.2742252-5-Jason@zx2c4.com>
-In-Reply-To: <20260414153944.2742252-1-Jason@zx2c4.com>
-References: <20260414153944.2742252-1-Jason@zx2c4.com>
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 24fd0403 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO)
+	for <netdev@vger.kernel.org>;
+	Tue, 14 Apr 2026 15:40:17 +0000 (UTC)
+Received: by mail-oi1-f169.google.com with SMTP id 5614622812f47-4779b2497b4so3012603b6e.3
+        for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 08:40:17 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ8OjHTnF8EIuVQ15QRV5Wh66v/+zkkS4kGCNFUweJBUaUB4Ke2Oa2SoXsEbk+54NAuUAFv3Mys=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzMFEbsU0s/HO3RLDXJinegezJKmB9ZReKTECMOgz4ceACQ+8NR
+	cThRFqMdILfoM44EvD37IG3+7nnl5luU0SAXMs7FeqoOCUDATsf2VDxEqQ1TXq+xqZ1veukyzxC
+	h5gUiyhtDA3qNe7BomNtSBnXqVXJa6nc=
+X-Received: by 2002:a54:4386:0:b0:45f:2788:b006 with SMTP id
+ 5614622812f47-4789a7837a7mr6900130b6e.0.1776181215218; Tue, 14 Apr 2026
+ 08:40:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+References: <20260413151232.1004611-1-shardul.b@mpiricsoftware.com>
+ <CAHmME9oXoXykXq_emkA3v8nG2VR28CmRP2+WmhrvGJc0ZbPfpA@mail.gmail.com> <20260414081824.0edf6113@kernel.org>
+In-Reply-To: <20260414081824.0edf6113@kernel.org>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date: Tue, 14 Apr 2026 17:40:03 +0200
+X-Gmail-Original-Message-ID: <CAHmME9rwKae5b9PYzuqmwG3p05iZ=jqyp6LQefg0OsB3OP6oWg@mail.gmail.com>
+X-Gm-Features: AQROBzDS9-WdOFRB3RLO4RUiIqKfEG5TSyNuS3pFkcbRNyBINYjricSkOHLuOXs
+Message-ID: <CAHmME9rwKae5b9PYzuqmwG3p05iZ=jqyp6LQefg0OsB3OP6oWg@mail.gmail.com>
+Subject: Re: [PATCH v2] wireguard: device: use exit_rtnl callback instead of
+ manual rtnl_lock in pre_exit
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Shardul Bankar <shardul.b@mpiricsoftware.com>, kuniyu@google.com, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
+	wireguard@lists.zx2c4.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, janak@mpiric.us, kalpan.jani@mpiricsoftware.com, 
+	shardulsb08@gmail.com, syzbot+f2fbf7478a35a94c8b7c@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[zx2c4.com,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[zx2c4.com:s=20210105];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-278516-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[mpiricsoftware.com,google.com,lunn.ch,davemloft.net,redhat.com,lists.zx2c4.com,vger.kernel.org,mpiric.us,gmail.com,syzkaller.appspotmail.com];
 	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[Jason@zx2c4.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278515-lists,netdev=lfdr.de];
-	PRECEDENCE_BULK(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[zx2c4.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	NEURAL_HAM(-0.00)[-0.998];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev,f2fbf7478a35a94c8b7c];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[Jason@zx2c4.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[zx2c4.com:email,zx2c4.com:dkim,zx2c4.com:mid,appspotmail.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mpiricsoftware.com:email]
-X-Rspamd-Queue-Id: 925773FC18F
+	TAGGED_RCPT(0.00)[netdev,f2fbf7478a35a94c8b7c];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[zx2c4.com:dkim,mail.gmail.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D882C3FC0E6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Shardul Bankar <shardul.b@mpiricsoftware.com>
+On Tue, Apr 14, 2026 at 5:18=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Tue, 14 Apr 2026 15:28:37 +0200 Jason A. Donenfeld wrote:
+> > Thanks. Applied to the wireguard tree, and also added the missing
+> > __net_exit and __read_mostly annotations in the process.
+>
+> Hi Jason, while we have you - do you have a PR for us for wireguard?
+> We're going to be sending the net-next PR later today..
 
-wg_netns_pre_exit() manually acquires rtnl_lock() inside the
-pernet .pre_exit callback.  This causes a hung task when another
-thread holds rtnl_mutex - the cleanup_net workqueue (or the
-setup_net failure rollback path) blocks indefinitely in
-wg_netns_pre_exit() waiting to acquire the lock.
-
-Convert to .exit_rtnl, introduced in commit 7a60d91c690b ("net:
-Add ->exit_rtnl() hook to struct pernet_operations."), where the
-framework already holds RTNL and batches all callbacks under a
-single rtnl_lock()/rtnl_unlock() pair, eliminating the contention
-window.
-
-The rcu_assign_pointer(wg->creating_net, NULL) is safe to move
-from .pre_exit to .exit_rtnl (which runs after synchronize_rcu())
-because all RCU readers of creating_net either use maybe_get_net()
-- which returns NULL for a dying namespace with zero refcount - or
-access net->user_ns which remains valid throughout the entire
-ops_undo_list sequence.
-
-Reported-by: syzbot+f2fbf7478a35a94c8b7c@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?id=cb64c22a492202ca929e18262fdb8cb89e635c70
-Signed-off-by: Shardul Bankar <shardul.b@mpiricsoftware.com>
-[ Jason: added __net_exit and __read_mostly annotations that were missing. ]
-Fixes: 900575aa33a3 ("wireguard: device: avoid circular netns references")
-Cc: stable@vger.kernel.org
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
----
- drivers/net/wireguard/device.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/net/wireguard/device.c b/drivers/net/wireguard/device.c
-index 46a71ec36af87..67b07ee2d6600 100644
---- a/drivers/net/wireguard/device.c
-+++ b/drivers/net/wireguard/device.c
-@@ -411,12 +411,11 @@ static struct rtnl_link_ops link_ops __read_mostly = {
- 	.newlink		= wg_newlink,
- };
- 
--static void wg_netns_pre_exit(struct net *net)
-+static void __net_exit wg_netns_exit_rtnl(struct net *net, struct list_head *dev_kill_list)
- {
- 	struct wg_device *wg;
- 	struct wg_peer *peer;
- 
--	rtnl_lock();
- 	list_for_each_entry(wg, &device_list, device_list) {
- 		if (rcu_access_pointer(wg->creating_net) == net) {
- 			pr_debug("%s: Creating namespace exiting\n", wg->dev->name);
-@@ -429,11 +428,10 @@ static void wg_netns_pre_exit(struct net *net)
- 			mutex_unlock(&wg->device_update_lock);
- 		}
- 	}
--	rtnl_unlock();
- }
- 
--static struct pernet_operations pernet_ops = {
--	.pre_exit = wg_netns_pre_exit
-+static struct pernet_operations pernet_ops __read_mostly = {
-+	.exit_rtnl = wg_netns_exit_rtnl
- };
- 
- int __init wg_device_init(void)
--- 
-2.53.0
-
+Sent!
 
