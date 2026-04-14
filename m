@@ -1,238 +1,213 @@
-Return-Path: <netdev+bounces-278567-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278568-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MNivKZ6S3mkHGAAAu9opvQ
-	(envelope-from <netdev+bounces-278567-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 21:16:46 +0200
+	id uJmlJpmT3mnZFwAAu9opvQ
+	(envelope-from <netdev+bounces-278568-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 21:20:57 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09DAC3FDF4E
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 21:16:45 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECF903FDFD1
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 21:20:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id F267F30552BE
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 19:16:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DDB503088BA0
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 19:16:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D0E22D1F64;
-	Tue, 14 Apr 2026 19:16:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A15372DCBF4;
+	Tue, 14 Apr 2026 19:16:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mpc7xVpy"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VkXUI/g3";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="h0u6ubxO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97FEF2E975E
-	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 19:16:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.50
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776194180; cv=pass; b=dlFtJg/l9P4iEc5bTkT1mBUC9002/pjNepJsNBeYUA3AbafSgOW+OzrQR2zV3kBhow0q/GKkqiZyvgMxStL3s0caWizGGDm67dslARvx3lFjbNKq7RyY7G+3EPiQTs6i1ZzKeQxVaqYqwj17zIK2s3aPkxEl6qbocQaTDAEdDOQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776194180; c=relaxed/simple;
-	bh=Pa9Tyq9G0aEPQgad+vwhYFPvxVvYUvSmDxYTMccNEa8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=M+HnHBVSurL3Rh9E/qmpBWPFPP4+SWgIrs+howpgdJh8LE657swCuyQfdRQJonMowGnHpoOyuTByxESdDemNHLlrqeG/mD7XlJK/vF7RLgVoqVNmN9cPZCrAGIaVDRD778CFGpu+ecgTmv5PIYwrnU2+nwBusBW2/OXVh/lxKZg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mpc7xVpy; arc=pass smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4838c15e3cbso56142465e9.3
-        for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 12:16:18 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776194177; cv=none;
-        d=google.com; s=arc-20240605;
-        b=bNomggAIRvSon/mm8wJkpmPfasllRsMQ66sGwRfK+1eZsYKSw+vbSn4OZu5runb1np
-         4CTfClG4wsNdoRe4IRradQRgjNl2KwhMs610RRML2pkI5bjsWmpusa2pfo1M9Rs0Owmn
-         wW+c/TjAdbMWUbh3tiq8iQMiFd5KgOTAr5caaapRtd1a1V6GpFI4DsFlNEHoxMos6D/a
-         TUlYixNspTzEAXJTdniqlyJPY4H7aNOHR4qvaYlXvaOTj7San0hVgawA4DiOtsqpWA48
-         3Ek5xH8UvUH8zRrSrhxJ1gFoLC77MPBROpjzL5hgImVYsHyA9UvakTpa/pEDdNORFNg+
-         DUpA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=Pa9Tyq9G0aEPQgad+vwhYFPvxVvYUvSmDxYTMccNEa8=;
-        fh=i9onXbMYrEhbDfg+AFXGl9ljLaUMs3QcYp0yxXFqiTU=;
-        b=iLCg3hPX5jrD40xIKKI64zED/QOKZA2hZviBXwptb4mvTUNDOBoliZiR3rmn/MllGZ
-         8Uq07SMKQDYo1X/pM3lFrgpZTwxDp2tNpW8YPC8je7hAe4QAQCBx8OL3tZQD9dWlOdqm
-         wJkcSCxSv3PtXWVVjyPpBV1jzYxjR9k7rc52k8sguJE+yb56FLF75iWnljQPFO/xZWGa
-         yZomb71dp7RMuJr/I6wCcWASJ93emv3rcS5qnLotYmshTeabxv+FzlE+mAP4wvLkLUnQ
-         kdi5lM6OujVdD9Id4x7wxk0UNYKY+UqOe4CuzhTHtnP0rhBlXgeQASc5onVjiET3HXJI
-         A7EQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 681A2282F25
+	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 19:16:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776194206; cv=none; b=tVxRcLYn4+AXHEpahcRMPzSrm0zHLzp1g52dcLvT6zNndKIQO9NdhTq9ifMOgiBcdPXnucQkeM+NNtCZDFB5aeNdIedpLz5vuiP2KnVB2v4QTCWxzbVGvU/8NJqHt7PBLcdiTEPxX62Rd0Tt/GWcnHnqnhBcIWa4/JeoOBbrx98=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776194206; c=relaxed/simple;
+	bh=Kae0NE+YEJhUab058VBKfamPJWyW4Acc1sAaLV1mvK8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Rm/uYUAAq/QfzfL7TD+ve0Bq8F15qtBLdsyi14pzti0aNJUsoFvngXVsl4AizoDjdLd+MQSjFNIp86qfVHUh3vVtVwPtdiUgb8SxU3IAuxDdLBpYFMqFhkUE8494SdjXBS1FHsHjWhDZ6lTDr28rmh3srqLLzBdn/n+f6MBCYjE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VkXUI/g3; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=h0u6ubxO; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1776194203;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OTjtecZ1iSoz/j8YichwBmmBonCgsoUrO3OWetqEhiA=;
+	b=VkXUI/g3loQQhli1XAfsiBcPhnQp2D8gazeJm1BeE7LV0CmO3h2XYmys1NHsUzUbdmPQuM
+	+K6a1nDIAOK70lYigaHfmycOpHY/qjl4HptgUpa458wIHvrSyDRphExyTZiQgoBuoHk7MX
+	fztJBky3cuYkx0lIqX2MIb38iNlvAYc=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-374-sQFYKgF4Nc2CBMcvQBtuMw-1; Tue, 14 Apr 2026 15:16:41 -0400
+X-MC-Unique: sQFYKgF4Nc2CBMcvQBtuMw-1
+X-Mimecast-MFC-AGG-ID: sQFYKgF4Nc2CBMcvQBtuMw_1776194201
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-43d05004501so403554f8f.3
+        for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 12:16:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776194177; x=1776798977; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Pa9Tyq9G0aEPQgad+vwhYFPvxVvYUvSmDxYTMccNEa8=;
-        b=Mpc7xVpy0aat/nOvxYcxYcf2t38XGL68q0eCA5v8oM4hPWbLdss4Rdsj8qSPNKhUqi
-         KOczID1epKGzJJbY7riB26JVfzODnvHVKvoEUn79UDeMfee5OzhrgRdK1TpYXbhjZsWX
-         JhK6CkseYiAEXB9MJqp7p5UviYRFK9SMlDFtSaWcj6Z8V9/HICDnls2FgnuLznBXww4p
-         6snmdRCdSEuCc6aQnsWjc2cMPKwpaSRio8NKUZmUCm4qv0jybc+2GTvTOfosR7ZSPDGH
-         J8H7u7gvVoRhzbOYL57IJGZujPjwoYSKuRkRVdro1b5v6HTcj2LCdPo81G1vaLdfglOp
-         HxEw==
+        d=redhat.com; s=google; t=1776194201; x=1776799001; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=OTjtecZ1iSoz/j8YichwBmmBonCgsoUrO3OWetqEhiA=;
+        b=h0u6ubxONkBkpDvSL5lt0dhYd7ubTWAp7fKiqQzPMMNkoX1Wt1KY+7edzEG8/VDOTt
+         LzzC2kY+T95sBfKHtFIDtYtShgnGajw7HX62R/PiLpNPwIYJyfqokXQc6BOYgannPfut
+         +45x6afia1Pjxk8QJSoBjcxcjfJm19r++cDaMCEk2x5rOTkCpUO66qZEQPQXFNI0LN22
+         qbnxb8OZtzS+W5yQY6epS8hfayrU6NSIJFB12pH/DLCQY7cRdVKKnqEWHmR9OrV7/VuW
+         HvJWkTJUbkKN/hZSMB1tkoOpwZK6RA6Z1mtd7QwOQO/eQ9HWMPU8zTdSe6bO6XePo7EA
+         13RQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776194177; x=1776798977;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Pa9Tyq9G0aEPQgad+vwhYFPvxVvYUvSmDxYTMccNEa8=;
-        b=mCgoKYpiM4NBtNkXrmJ0wJyukOj99/8p7BzZJF814ybCDBdRbvFOMOAiZGpFdT1Dzy
-         TDzSY83NOLVRuZSVZVetKLxpfKZ+ew4OXsxDZ81mltbv1vvX/jA+4ioyVZVCfqxQeSsg
-         TQ9gcz3IeVvQrJdArKRD2IbtUTJihBcuiBuDfrhBQ7oGcQtF3E3Yx74CoZhk3paXcmmu
-         RqN2AXoEe6OltQKn5LFY9GnDNLAhYRygIkGcoPYDMy0robwZg4/uDZv5RUxjEXFWACBq
-         sYcjGJa0ZbPXUuhQ6/4t9+c+EO5Dd9Yh3rVp4ExBOFf4ZJ3XkKVTly1jUTTfACsmf0QI
-         59kw==
-X-Forwarded-Encrypted: i=1; AFNElJ8T/3kByFQglmU8Ryqc/afAFKabzx0SJH5YH+t1T11Av5vtrIpMb4y3IvdnE5jMfD/ODExn8vc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxn8qvx6pjwMMRcsSHI/uWpdquP1Q/mnfFGJTE4VvYdQrSMRIvP
-	7Jrx1vyWL0MDMSNNmf4KHWBQPAUHebnbtMUhPjuBMLj5SKJh0mWpmAwyXgA+VXK7Bb2SWtJx0hg
-	WIhERFnmt/RAI0Kixcrk8uk9dClIm6i0=
-X-Gm-Gg: AeBDieuKuMin/fMQ8vGwS9myx0cRCGPjuH143vM9L/s/i7lhjjjSG0w7GiTNG4GQrgl
-	Sawe2UYybUd/vkSryrp83iaTm827X9CsU/T/YNIni8sOSx/gj1qzgSisEmS2iodvJ7WIoPVZofu
-	8t0aloBC2gSAcgmGquWxo9VfWSHQQZk3xoil8Ui35/4BrTZSUYWlwVmOUYw+ftPm4gsoGCf34R8
-	cy7NNfFcoWU2jhbQkTOC7iDLdSrO8Jl7roJlVb7yrj5+corGF7S4L+/J+zNcYL4b1tsB1He9IWU
-	DSoWWjdICS3gaxA1B59E/iYUjxaFbiM/5604v5QG5whIOtCDMgj7Y3MDYZ9+jtM+Y2NYBH6X8ZL
-	TtnZW/Vksa8ZDZ0mDjCt3XRAxS+e2/JL+b4uN
-X-Received: by 2002:a05:600c:1f83:b0:488:b99b:4177 with SMTP id
- 5b1f17b1804b1-488d687bf61mr256552315e9.25.1776194176915; Tue, 14 Apr 2026
- 12:16:16 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1776194201; x=1776799001;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OTjtecZ1iSoz/j8YichwBmmBonCgsoUrO3OWetqEhiA=;
+        b=gtMGRiMgswrEaAjDYaGtiIMjFfa8mY/A+VSgPO/s/pmDvGFiVR4XWIuC90a9ydeoyb
+         ZMdZLTLlTg5Vaw4AHN8J6HTBou1bSwSjImwRcKMU74BFxtK2oORdXj/K+LDcN6/CeA7J
+         8ttQpCAzuRD22xJNn4C9/x3OQQNi7nPaI5c80pF6XvanG0zLIQXaD8uFOwce39iFGk8X
+         VBT7scRnffgTQGQHTSw6UNkrNq9CIG+MyyRJ2umGlatAT19wbUBpkOb1K/CW8fHEnbrm
+         JEPZF9WXFRnf43UzMLOc3++e18YHT+AS5pP53nJpFTJb6XvtkxCK8Rnm+FtcVaVvq4CY
+         XCBg==
+X-Forwarded-Encrypted: i=1; AFNElJ8Pi8B2bnGeygmXPYxFxPADIt4tPy/seAEGD6CoCC4Kr7f01my/T2WVXFBAFd1CWZi6i3iVEks=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzl2Hlb79p7/K9xRVY0l0D8k5NkFRoHEbEaQn6rOBq5N0JpR3uR
+	JqF+XyQvitsZwh3QsaVpqpTjfKHUesesnflhrlWPUOq6KBOk+0tRK8uFbIfTQ/Esc5jaWICIWiX
+	yKKiH/jF8j0kksYAQvPoAh0hAHfnK2I6rRJOF1qXHWePqMrgf76kxTYPznQ==
+X-Gm-Gg: AeBDietfwZFzdLumsIuJj0uEkvplU8g0C9zZB5RT1ZUBzRSQyFMzFGRxGyjybkLmVdz
+	59OBRgFKPfNRA5FHAosntd7K2OYY179qkfA7lWzk9tt7oGQ33fEmAEjh1/ug4jQlmuLtq0m1N4q
+	V0lJuwmX8crsFRhsXNWOWr5dGNSQHGdPmq4OnuFOhyti4skEKUDDaCofdUv9qNsmfem8HVIYk0+
+	0vbdHr52/4ydk+rVHGK2tm3cb1AcMzvtsFz9ZgwV05KpHE50NdqaSJFzruDaUz/FXzEUXZ9K6IQ
+	IIOhf58LvbIk7Tr5sF0YtKhC7W2BZo3IXtyVIHDbH/rjT7plFLQaR9K6iyD8qaY7Jq8yTT/EzR2
+	TbyY4jiOf5kTJUnyYMofPp2itS89/eG+Q9vPj8rm1x+Id9+w=
+X-Received: by 2002:a05:600c:4689:b0:485:358b:e7ee with SMTP id 5b1f17b1804b1-488d6655c82mr155399275e9.0.1776194200594;
+        Tue, 14 Apr 2026 12:16:40 -0700 (PDT)
+X-Received: by 2002:a05:600c:4689:b0:485:358b:e7ee with SMTP id 5b1f17b1804b1-488d6655c82mr155399085e9.0.1776194200138;
+        Tue, 14 Apr 2026 12:16:40 -0700 (PDT)
+Received: from [192.168.1.77] (109-81-81-198.rct.o2.cz. [109.81.81.198])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43d73b44b3esm27090422f8f.13.2026.04.14.12.16.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 14 Apr 2026 12:16:39 -0700 (PDT)
+Message-ID: <68b5cc9d-81d2-4ff5-9d3e-a6d6746dcb3e@redhat.com>
+Date: Tue, 14 Apr 2026 21:16:37 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260413-kasan-v1-0-1a5831230821@bootlin.com> <20260413-kasan-v1-1-1a5831230821@bootlin.com>
- <CA+fCnZfubV6LgRjO3NQvhrG2Q5o0ftkFFupLWVYS50XDnmCaog@mail.gmail.com>
- <DHSWK17EZUDP.GIJ6BX2NFR6U@bootlin.com> <CAADnVQLJ=fJ7t1i2+_RYqU1gqYqiLP9Zrwo4vdZsgzjK_yzJTQ@mail.gmail.com>
- <DHT3JV7GTOBL.29205LGGNEDSH@bootlin.com>
-In-Reply-To: <DHT3JV7GTOBL.29205LGGNEDSH@bootlin.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Tue, 14 Apr 2026 12:16:05 -0700
-X-Gm-Features: AQROBzCIKxzyzm1_jzBBwpYG5l-_Hq5ftS9HvYZuKsAkHlvW0CNWB1k5nfXPFjQ
-Message-ID: <CAADnVQ+c9h_wuNwj8pjx885oNErGY7bxxCwKi+DiJ0XKSpyYfg@mail.gmail.com>
-Subject: Re: [PATCH RFC bpf-next 1/8] kasan: expose generic kasan helpers
-To: =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
-Cc: Andrey Konovalov <andreyknvl@gmail.com>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, 
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, Jiri Olsa <jolsa@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>, Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, X86 ML <x86@kernel.org>, 
-	"H. Peter Anvin" <hpa@zytor.com>, Shuah Khan <shuah@kernel.org>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Andrey Ryabinin <ryabinin.a.a@gmail.com>, Alexander Potapenko <glider@google.com>, 
-	Dmitry Vyukov <dvyukov@google.com>, Vincenzo Frascino <vincenzo.frascino@arm.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, ebpf@linuxfoundation.org, 
-	Bastien Curutchet <bastien.curutchet@bootlin.com>, 
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>, Xu Kuohai <xukuohai@huawei.com>, 
-	bpf <bpf@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
-	Network Development <netdev@vger.kernel.org>, 
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, 
-	kasan-dev <kasan-dev@googlegroups.com>, linux-mm <linux-mm@kvack.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwl-net v5] ice: fix missing dpll notifications for SW
+ pins
+To: Petr Oros <poros@redhat.com>, netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>,
+ Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ intel-wired-lan@lists.osuosl.org, linux-kernel@vger.kernel.org
+References: <20260409102501.1447628-1-poros@redhat.com>
+Content-Language: en-US
+From: Michal Schmidt <mschmidt@redhat.com>
+In-Reply-To: <20260409102501.1447628-1-poros@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278567-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[40];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,iogearbox.net,linux.dev,davemloft.net,redhat.com,alien8.de,linux.intel.com,zytor.com,foss.st.com,google.com,arm.com,linux-foundation.org,linuxfoundation.org,bootlin.com,huawei.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org,googlegroups.com,kvack.org];
+	TAGGED_FROM(0.00)[bounces-278568-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alexeistarovoitov@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[mschmidt@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,bootlin.com:email]
-X-Rspamd-Queue-Id: 09DAC3FDF4E
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: ECF903FDFD1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Apr 14, 2026 at 11:41=E2=80=AFAM Alexis Lothor=C3=A9
-<alexis.lothore@bootlin.com> wrote:
->
-> On Tue Apr 14, 2026 at 4:36 PM CEST, Alexei Starovoitov wrote:
-> > On Tue, Apr 14, 2026 at 6:13=E2=80=AFAM Alexis Lothor=C3=A9
-> > <alexis.lothore@bootlin.com> wrote:
-> >>
-> >> Hi Andrey, thanks for the prompt review !
-> >>
-> >> On Tue Apr 14, 2026 at 12:19 AM CEST, Andrey Konovalov wrote:
-> >> > On Mon, Apr 13, 2026 at 8:29=E2=80=AFPM Alexis Lothor=C3=A9 (eBPF Fo=
-undation)
-> >> > <alexis.lothore@bootlin.com> wrote:
-> >> >>
-> >>
-> >> [...]
-> >>
-> >> >> +#ifdef CONFIG_KASAN_GENERIC
-> >> >> +void __asan_load1(void *p);
-> >> >> +void __asan_store1(void *p);
-> >> >> +void __asan_load2(void *p);
-> >> >> +void __asan_store2(void *p);
-> >> >> +void __asan_load4(void *p);
-> >> >> +void __asan_store4(void *p);
-> >> >> +void __asan_load8(void *p);
-> >> >> +void __asan_store8(void *p);
-> >> >> +void __asan_load16(void *p);
-> >> >> +void __asan_store16(void *p);
-> >> >> +#endif /* CONFIG_KASAN_GENERIC */
-> >> >
-> >> > This looks ugly, let's not do this unless it's really required.
-> >> >
-> >> > You can just use kasan_check_read/write() instead - these are public
-> >> > wrappers around the same shadow memory checking functions. And they
-> >> > also work with the SW_TAGS mode, in case the BPF would want to use
-> >> > that mode at some point. (For HW_TAGS, we only have kasan_check_byte=
-()
-> >> > that checks a single byte, but it can be extended in the future if
-> >> > required to be used by BPF.)
-> >>
-> >> ACK, I'll try to use those kasan_check_read and kasan_check_write rath=
-er
-> >> than __asan_{load,store}X.
-> >
-> > No. The performance penalty will be too high.
->
-> Since we are mentioning it, I did not consider yet any performance
-> comparision/benchmarking (and I am not really familiar with usual bpf
-> performance validation practices for new bpf features). Is there any
-> existing test I should take a look at for this ? Maybe some specific
-> benches in tools/testing/selftests/bpf/bench ?
+On 4/9/26 12:25, Petr Oros wrote:
+> ---
+>   drivers/net/ethernet/intel/ice/ice_dpll.c | 74 +++++++++++++++++++----
+>   1 file changed, 63 insertions(+), 11 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.c b/drivers/net/ethernet/intel/ice/ice_dpll.c
+> index 3f8cd5b8298b57..d817f17dcf1951 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_dpll.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_dpll.c
+> @@ -1154,6 +1154,30 @@ ice_dpll_input_state_get(const struct dpll_pin *pin, void *pin_priv,
+>   				      extack, ICE_DPLL_PIN_TYPE_INPUT);
+>   }
+>   
+> +/**
+> + * ice_dpll_sw_pin_notify_peer - notify the paired SW pin after a state change
+> + * @d: pointer to dplls struct
+> + * @changed: the SW pin that was explicitly changed (already notified by dpll core)
+> + *
+> + * SMA and U.FL pins share physical signal paths in pairs (SMA1/U.FL1 and
+> + * SMA2/U.FL2).  When one pin's routing changes via the PCA9575 GPIO
+> + * expander, the paired pin's state may also change.  Send a change
+> + * notification for the peer pin so userspace consumers monitoring the
+> + * peer via dpll netlink learn about the update.
+> + *
+> + * Context: Can be called under pf->dplls.lock, dpll_pin_change_ntf() is safe.
+> + */
+> +static void ice_dpll_sw_pin_notify_peer(struct ice_dplls *d,
+> +					struct ice_dpll_pin *changed)
+> +{
+> +	struct ice_dpll_pin *peer;
+> +
+> +	peer = (changed >= d->sma && changed < d->sma + ICE_DPLL_PIN_SW_NUM) ?
+> +		&d->ufl[changed->idx] : &d->sma[changed->idx];
+> +	if (peer->pin)
+> +		dpll_pin_change_ntf(peer->pin);
+> +}
+> +
+>   /**
+>    * ice_dpll_sma_direction_set - set direction of SMA pin
+>    * @p: pointer to a pin
+> @@ -1233,6 +1257,8 @@ static int ice_dpll_sma_direction_set(struct ice_dpll_pin *p,
+>   			ret = ice_dpll_pin_state_update(p->pf, target,
+>   							type, extack);
+>   	}
+> +	if (!ret)
+> +		ice_dpll_sw_pin_notify_peer(d, p);
+>   
+>   	return ret;
+>   }
 
-So far everything in bpf/bench/ measures bpf infra like
-maps, kprobes, tracepoints, etc.
-We don't have benchmarks for bpf programs.
-So we don't know how well JITs are generating code
-and how much inlining done by the verifier, JITs actually helps.
+ice_dpll_sma_direction_set() runs to process a DPLL_CMD_PIN_SET command 
+from userspace. It runs with dpll_lock held - taken in dpll_pin_pre_doit().
+ice_dpll_sw_pin_notify_peer() -> dpll_pin_change_ntf() will take 
+dpll_lock again and deadlock.
 
-Puranjay is working on creating a SPECint like set of benchmarks.
+Michal
 
-For this kasan work we should make the best decisions from
-performance point of view, like not wasting unnecessary call
-and not saving unnecessary registers. btw in the other patch
-I think you can skip saving of r10 and r11.
-But we cannot quantify yet that avoiding extra call gives us N%.
-
-You can micro-benchmark, of course, but gotta be careful
-interpreting the results. It might be too easy to get into
-thinking that JIT must inline __asan_load() for the sake of performance.
 
