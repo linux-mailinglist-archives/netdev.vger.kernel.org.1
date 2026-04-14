@@ -1,119 +1,176 @@
-Return-Path: <netdev+bounces-278443-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278444-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MG9eL2843mnbpQkAu9opvQ
-	(envelope-from <netdev+bounces-278443-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 14:51:59 +0200
+	id sOfSIdk53mkxpgkAu9opvQ
+	(envelope-from <netdev+bounces-278444-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 14:58:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 448F73FA2F2
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 14:51:58 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2C1E3FA38C
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 14:58:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 959CC30886DE
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 12:49:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 93DE33020AA5
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 12:57:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 550043E63A8;
-	Tue, 14 Apr 2026 12:48:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2404B3E5EE8;
+	Tue, 14 Apr 2026 12:57:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IvU2nXq6"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="sv7iUGM+";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="tvRFN1Za"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4E5C3E5596
-	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 12:48:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAA512472B6;
+	Tue, 14 Apr 2026 12:57:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776170925; cv=none; b=YstXhjKBj5QhqupFQmUr0N0daF5zOyoqC/KGBJ2YC6fu+elm7rdmRUOUVU98DOQm3WdCmMv9sZeU+QupJJ8IIpy1NqRiZ0TjkOQWKOEdfYBrQaUXFmpy5wx4nKY4UQD9bldhfioqf1yKB55/+33NFdvTyBJTGqX0fFIcc8wVB0I=
+	t=1776171479; cv=none; b=p3fakYUW2eb/cc5pRwXscZwx/x8IR8NAXUyAd36TK7NLd+rFW6PvODLIX00bbQ2LCVj1xXLCWB1MsX8vhmTrNuJm0KufiioZdLgXSJYIwiS7xBMDXngd6kaCu+qJratpTIYGX56BxwDrVFWFEcToLb/Xq0fm5pqhdHDq0YAhT4I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776170925; c=relaxed/simple;
-	bh=ywvmaEFfcZLbgJZzgdExmYObQSQSsjeTYz/irjz5laA=;
+	s=arc-20240116; t=1776171479; c=relaxed/simple;
+	bh=e/0lHKOvgcWf2Zrk+6tNU9NIf7s+Ti5kJPa+Y10F3c4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DZp7eJZxwCCdxIKfY3ecrYrhL4AxVMmBzLOV/davoKDjYzukV7ovbFlkUNYiyykQXPEAqq1cpL89QVl4g+T86iRlxP190yCdUzQt16uWAPkuQMvd9297s3NyEW2AdzbdDXlSk+h24EqMkE58cmtNID2t0+xrSK4l5RjVz99Z6X4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IvU2nXq6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 918AAC19425;
-	Tue, 14 Apr 2026 12:48:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776170925;
-	bh=ywvmaEFfcZLbgJZzgdExmYObQSQSsjeTYz/irjz5laA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IvU2nXq6Q4wsp2dI5CJL0+WLnFsCXIt2Ghi87O1uv5Ik1R0cMsO/7z2ftR2IhjZMd
-	 Mzo1Rp+Rr2xO/Swp5zJTlvT4nM79ak7W/fmYW39HUydPku0PR74Y26IwsW1WrNSIxM
-	 zlBMo8UDgmvzRpLxa443rbekz6/dFMruYCeqhxMcite0KKx1NUGrKcPUrwpNMWl79U
-	 hNuFa0U3WJRfbtQY6tbR4Is6V17nkJf7AaKeEIWTj5R6/2BC+nLf+kxo7P/7dU1Qag
-	 ton6XG5S61YsoGgrq2xJZKbWJMJG9ayfT+uKKVwxtVlLFVgs8Yd7pcTWLOD16rFtXf
-	 bQJc/c76L637w==
-Date: Tue, 14 Apr 2026 13:48:41 +0100
-From: Simon Horman <horms@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=NGCU6Mce4c0pGPzRxRF2K3FnF0XbuIB4lm8v3as5RNlEpDj65jLWgXT3qnsmE97XWZRANwKQSC+cgSYA1S0vEEas8sreks36kdJD7grL/tlFlzvn5DwJU05VJUFpdbr9YyDq9A911SE2WpkgD35OajCwBPrkLC0zYLwBkre6ZeQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=sv7iUGM+; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=tvRFN1Za; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Tue, 14 Apr 2026 14:57:53 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1776171475;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QvqkN2kc2jG1EPUl+z7gcg+ViG5hTylKgu0C0kIyBFw=;
+	b=sv7iUGM+PIaP1kEvu78/0jATc16pPZxkEkVqQZFne/QoxQNxult2lE35N7syeHNBnT8STQ
+	u3W85ycamJrJ+f8j+nmp7LvkHrpXuf9fc556jpIhE50hlivPqf4Um5Gs1kw/NwZxB9eoV8
+	GT+l0lU6kkX+frqGKRB4U44x0ryOF8cyDXDO//k+bxyVCzoKZVsf5eP9AL7JAXXmpxKpCU
+	7CiMF9BNg/WzFp4KVoMVpNR0hYyWy2C7Q/vVl0VPR+axx5L5FxiBC6zOLHaf2+rCFAp+x8
+	pqa8Z9ZMYwQoBoPdUqC+VawVqmiuuFcMQnv8Y5xt2u9egFNvAesgQg4j0rzbKA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1776171475;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QvqkN2kc2jG1EPUl+z7gcg+ViG5hTylKgu0C0kIyBFw=;
+	b=tvRFN1ZahxnMVWRYZIEAAWBTytPbKkBcSO4aQmdKJeLvOfkM93B06XF7BmZrYuVgU+hjGF
+	a7cKEiQC94bBu+BA==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Marek Vasut <marex@nabladev.com>
+Cc: netdev@vger.kernel.org, stable@vger.kernel.org,
 	"David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net] net: airoha: Add missing PPE configurations in
- airoha_ppe_hw_init()
-Message-ID: <20260414124841.GF469338@kernel.org>
-References: <20260412-airoha_ppe_hw_init-missing-bits-v1-1-06ac670819e3@kernel.org>
+	Jakub Kicinski <kuba@kernel.org>, Nicolai Buchwitz <nb@tipi-net.de>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Ronald Wahl <ronald.wahl@raritan.com>,
+	Yicong Hui <yiconghui@gmail.com>, linux-kernel@vger.kernel.org
+Subject: Re: [net,PATCH v3 1/2] net: ks8851: Reinstate disabling of BHs
+ around IRQ handler
+Message-ID: <20260414125753.Im6GAIHn@linutronix.de>
+References: <20260414103327.113500-1-marex@nabladev.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260412-airoha_ppe_hw_init-missing-bits-v1-1-06ac670819e3@kernel.org>
+In-Reply-To: <20260414103327.113500-1-marex@nabladev.com>
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
+	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-278443-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-278444-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,lunn.ch,google.com,kernel.org,tipi-net.de,redhat.com,raritan.com,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linutronix.de:+];
 	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 448F73FA2F2
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nabladev.com:email,linutronix.de:dkim,linutronix.de:email,linutronix.de:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E2C1E3FA38C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun, Apr 12, 2026 at 10:43:26AM +0200, Lorenzo Bianconi wrote:
-> Add the following PPE configuration in airoha_ppe_hw_init routine:
-> - 6RD hw offloading is currently not supported by Netfilter flowtable.
->   Disable explicitly PPE 6RD offloading in order to prevent PPE to learn
->   6RD flows and eventually interrupt the traffic.
-> - Add missing PPE bind rate configuration for L3 and L2 traffic.
->   PPE bind rate configuration specifies the pps threshold to move a PPE
->   entry state from UNBIND to BIND. Without this configuration this value
->   is random.
-> - Set ageing thresholds to the values used in the vendor SDK in order to
->   improve connection stability under load and avoid packet loss caused by
->   fast aging.
+On 2026-04-14 12:32:52 [+0200], Marek Vasut wrote:
+> If CONFIG_PREEMPT_RT=y is set AND the driver executes ks8851_irq() AND
+> KSZ_ISR register bit IRQ_RXI is set AND ks8851_rx_pkts() detects that
+> there are packets in the RX FIFO, then netdev_alloc_skb_ip_align() is
+> called to allocate SKBs. If netdev_alloc_skb_ip_align() is called with
+> BH enabled, local_bh_enable() at the end of netdev_alloc_skb_ip_align()
+> will call __local_bh_enable_ip(), which will call __do_softirq(), which
+> may trigger net_tx_action() softirq, which may ultimately call the xmit
+> callback ks8851_start_xmit_par(). The ks8851_start_xmit_par() will try
+> to lock struct ks8851_net_par .lock spinlock, which is already locked
+> by ks8851_irq() from which ks8851_start_xmit_par() was called. This
+> leads to a deadlock, which is reported by the kernel, including a trace
+> listed below.
+
+#1 [received RX packet and a] TX packet has been sent
+#2 Driver enables TX queue via netif_wake_queue() which schedules TX
+   softirq to queue packets for this device.
+#2 After spin_unlock_bh(&ks->statelock) the pending softirqs will be
+   processed
+#3 This deadlocks because of recursive locking via ks8851_net::lock in
+   ks8851_irq() and ks8851_start_xmit_par().
+
+This is what happens since commit 0913ec336a6c0 ("net: ks8851: Fix
+deadlock with the SPI chip variant"). Before that commit the softirq
+execution will be picked up by netdev_alloc_skb_ip_align() and requires
+PREEMPT_RT and a RX packet in #1 to trigger the deadlock.
+
+> Fix the problem by disabling BH around critical sections, including the
+> IRQ handler, thus preventing the net_tx_action() softirq from triggering
+> during these critical sections. The net_tx_action() softirq is triggered
+> at the end of the IRQ handler, once all the other IRQ handler actions have
+> been completed.
 > 
-> Fixes: 00a7678310fe3 ("net: airoha: Introduce flowtable offload support")
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+>  __schedule from schedule_rtlock+0x1c/0x34
+>  schedule_rtlock from rtlock_slowlock_locked+0x548/0x904
+>  rtlock_slowlock_locked from rt_spin_lock+0x60/0x9c
+>  rt_spin_lock from ks8851_start_xmit_par+0x74/0x1a8
+>  ks8851_start_xmit_par from netdev_start_xmit+0x20/0x44
+>  netdev_start_xmit from dev_hard_start_xmit+0xd0/0x188
+>  dev_hard_start_xmit from sch_direct_xmit+0xb8/0x25c
+>  sch_direct_xmit from __qdisc_run+0x1f8/0x4ec
+>  __qdisc_run from qdisc_run+0x1c/0x28
+>  qdisc_run from net_tx_action+0x1f0/0x268
+>  net_tx_action from handle_softirqs+0x1a4/0x270
+>  handle_softirqs from __local_bh_enable_ip+0xcc/0xe0
+>  __local_bh_enable_ip from __alloc_skb+0xd8/0x128
+>  __alloc_skb from __netdev_alloc_skb+0x3c/0x19c
+>  __netdev_alloc_skb from ks8851_irq+0x388/0x4d4
+>  ks8851_irq from irq_thread_fn+0x24/0x64
+>  irq_thread_fn from irq_thread+0x178/0x28c
+>  irq_thread from kthread+0x12c/0x138
+>  kthread from ret_from_fork+0x14/0x28
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+The backtrace here and the description is based on an older kernel.
+However
 
+Reviewed-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+
+> Fixes: e0863634bf9f ("net: ks8851: Queue RX packets in IRQ handler instead of disabling BHs")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Marek Vasut <marex@nabladev.com>
+
+Sebastian
 
