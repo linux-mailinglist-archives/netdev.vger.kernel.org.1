@@ -1,194 +1,111 @@
-Return-Path: <netdev+bounces-278361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278362-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8MRmIH8F3mlRmQkAu9opvQ
-	(envelope-from <netdev+bounces-278361-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 11:14:39 +0200
+	id yA5YHKMG3mlRmQkAu9opvQ
+	(envelope-from <netdev+bounces-278362-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 11:19:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 103FA3F7B7D
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 11:14:38 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AE943F7CCE
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 11:19:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 17ACB300A30C
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 09:14:38 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 2B7CC3032378
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 09:16:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 459753BA227;
-	Tue, 14 Apr 2026 09:14:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B7D13BE16C;
+	Tue, 14 Apr 2026 09:16:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NwGVb1Pj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f79.google.com (mail-ot1-f79.google.com [209.85.210.79])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 101DE3BBA19
-	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 09:14:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.79
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECB5D3B38BD
+	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 09:16:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776158074; cv=none; b=cW8w92OCT+tFxmVEIIuN80gSi7mrUNXV9OVT6663uG0pJWsZBRKKWSHhxIW2I5+jcZXViEIxU+F5uDCqxnkzCwi4WxwXJrThH0aWRjIum4IMq9AAjOybxqLlQUMCQiydE2x6m9VhvPxL+mE2Of3j1lbsD0zJ2wI+a56WgOcfSK8=
+	t=1776158191; cv=none; b=NkPIkt4/5i8YFYFPNHBjgPufYTlUUkaF0y4ALOsNSejCklFEvGKkWxxyzBDwcsnJKhQcvYe77qNi5a+A4wvifzHik90kA17AL48xnxFMZX86u9d575WQ5gN68w7/lwEdkLHhVZrWoEB0Ybzb0I7EJ9m56vXrtwQiA/QkhKwG6xI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776158074; c=relaxed/simple;
-	bh=GPNEvwTV3YCZM/IQhX2qX/16wfmzdwPlkAEZNY2yz18=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=op1dfEJTaQQlSu15PTcdUvvKw+1MT7Ip7fPF0ESI1e0pjoPBbwzZEFKVuqgCOXq8Sqg16hPcb5VgCtHTZjIAAuRkf1hqr3NegHuJH6Y1YboQtywrM/oCKzmQ1UnQWERrdnpQ74ep4DbKhlLdr07kBNgBABUduNmGSG8SFI1Phu8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.79
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-ot1-f79.google.com with SMTP id 46e09a7af769-7dc4044e3beso5199729a34.0
-        for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 02:14:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776158070; x=1776762870;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=c4/P5vYiyQeQxekanU/M1VkImZhr/JuEMOleJPaKHW0=;
-        b=nhajaukYoK/J5x5nrljlH1MrpJtsPtQDGk+C1Vk+88arfTUxRCRu7sNy8/llm6iPdG
-         ddjClPZJ7pECuurvSqf/9H1GFSEDoypll6KVA2Cbb+J8yJESazycU0brRPASFLdZx1eF
-         TcFjehKJBMxa1ulsAnJSGNEr5mNeAYEkBuHB70M/BXYaDFOoxwF52cqn17qz6VBt8Rh0
-         qT8f25j8tEV8qJob/R/RoLJRKnAKXSHozcFuiZkyHsUyaLbDZ2ic5QscvY+ZTICLHmR7
-         BlmZRYzFcngtGSbUa0ySnVwVhAqI2xqY+GRSTKIPzJyJUxo9FV1ueArzm7bgwwrlpMCb
-         kwPg==
-X-Forwarded-Encrypted: i=1; AFNElJ8C9s8ALDozKLOdeTCMpgkf0USCnljMtA89qatvXqfMx9RV2iFFKduz6BNJkaZEfFraeHhJ2ec=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzv51UYSS1IKcjC/BlAYJy6VTErTMEbHe99tWsD/2tFhAsupLsV
-	g+vxFHmuJNQUhaALDpsNRZ8eUbsgcZgjGcBjWVN1d1WcZviA7jYFjJl3RhwwPjkKJLsC7ucHnWl
-	/zl0zJOvbxH/0rUEcv1el/+HArErGW9ho0nP6H5tjBjUL1jzFF5Y/2/8RU4Q=
+	s=arc-20240116; t=1776158191; c=relaxed/simple;
+	bh=XdU3+uXpTQHIkDhg40fCylMNlGQWcd1ytCGfIDJGre4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rBjybuLQ1jxI4lRYQtBW7+F1hgogYTmiwgHqTt0nwidecFCd9nR3glPT4Ij3N8efHFWYN3bsquh3A22nBZlqCJqDWOHpTz+S9dsWuA7Jsvxrvm1k3x2z9RjRRyaEkow/ChzN20EClQBcvR/sC7azlm6+0ctvNxG6lMAOlRuEv5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NwGVb1Pj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E78DC2BCB5;
+	Tue, 14 Apr 2026 09:16:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776158190;
+	bh=XdU3+uXpTQHIkDhg40fCylMNlGQWcd1ytCGfIDJGre4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NwGVb1PjURl89jj6D0za1hOgBuYJOHOhbHYJAVHRMEPiRxT7rNp/VoQL2DttNvyVV
+	 AzP1cQje3+dbP1GSuMYiT/qXdkSiHReAtUWQzwSz9biONaTrzE8e2VoWalqKGtfHuQ
+	 dlcS9GVEF4e5kSSiS9U0JZAUlz5EYr5U/8A2mmDf3CGN+yLvDj+8xi0yfQ8mzyiyMH
+	 J05Iy1sPTEcHKdB9MAYsIFEEsHdDryjrfntuB8YYXZaJx8awahZlsQUX/U8GvGs4lK
+	 1/FybHYNiGtX+zI0WbFdwICFc1lZj0OVmPrCH+lNGvZxV335gOXO0jGW9usRS1dxXz
+	 /6qXrLknPeprw==
+Date: Tue, 14 Apr 2026 10:16:27 +0100
+From: Simon Horman <horms@kernel.org>
+To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
+	netdev@vger.kernel.org, Jacob Keller <jacob.e.keller@intel.com>
+Subject: Re: [PATCH iwl-next 4/10] ice: reorder ice_flash_info fields to
+ eliminate padding
+Message-ID: <20260414091627.GX469338@kernel.org>
+References: <20260410074921.1254213-1-aleksandr.loktionov@intel.com>
+ <20260410074921.1254213-5-aleksandr.loktionov@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:628d:b0:683:a6e:970a with SMTP id
- 006d021491bc7-68a6b54c90cmr7115601eaf.40.1776158069823; Tue, 14 Apr 2026
- 02:14:29 -0700 (PDT)
-Date: Tue, 14 Apr 2026 02:14:29 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69de0575.a00a0220.468cb.005c.GAE@google.com>
-Subject: [syzbot] [ppp?] KMSAN: uninit-value in ppp_sync_receive (4)
-From: syzbot <syzbot+88679c919eb801bd16f8@syzkaller.appspotmail.com>
-To: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-ppp@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [1.14 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=963de479f54c6dbb];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260410074921.1254213-5-aleksandr.loktionov@intel.com>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TAGGED_FROM(0.00)[bounces-278361-lists,netdev=lfdr.de,88679c919eb801bd16f8];
 	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[goo.gl:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,googlegroups.com:email,syzkaller.appspot.com:url,storage.googleapis.com:url,appspotmail.com:email];
-	REDIRECTOR_URL(0.00)[goo.gl];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-278362-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	SUBJECT_HAS_QUESTION(0.00)[]
-X-Rspamd-Queue-Id: 103FA3F7B7D
+	RCPT_COUNT_FIVE(0.00)[5];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 8AE943F7CCE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello,
+On Fri, Apr 10, 2026 at 09:49:15AM +0200, Aleksandr Loktionov wrote:
+> From: Jacob Keller <jacob.e.keller@intel.com>
+> 
+> The ice_flash_info structure has a u16 sr_words field before a u32
+> flash_size value. This creates a 2-byte hole as well as 3 bytes of
+> padding at the end of the structure due to the blank_nvm_mode bitfield.
+> 
+> Re-order the structure to place flash_size first, which gives a better
+> layout and reduces padding.
+> 
+> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 
-syzbot found the following issue on:
-
-HEAD commit:    9a9c8ce300cd Merge tag 'kbuild-fixes-7.0-4' of git://git.k..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=112a874e580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=963de479f54c6dbb
-dashboard link: https://syzkaller.appspot.com/bug?extid=88679c919eb801bd16f8
-compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/3e2ad23d804a/disk-9a9c8ce3.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/a3dde4990296/vmlinux-9a9c8ce3.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/256e0a89d22c/bzImage-9a9c8ce3.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+88679c919eb801bd16f8@syzkaller.appspotmail.com
-
-=====================================================
-BUG: KMSAN: uninit-value in ppp_sync_input drivers/net/ppp/ppp_synctty.c:684 [inline]
-BUG: KMSAN: uninit-value in ppp_sync_receive+0x626/0xfa0 drivers/net/ppp/ppp_synctty.c:334
- ppp_sync_input drivers/net/ppp/ppp_synctty.c:684 [inline]
- ppp_sync_receive+0x626/0xfa0 drivers/net/ppp/ppp_synctty.c:334
- tty_ldisc_receive_buf+0x1f7/0x2c0 drivers/tty/tty_buffer.c:391
- tty_port_default_receive_buf+0xd7/0x1a0 drivers/tty/tty_port.c:37
- receive_buf drivers/tty/tty_buffer.c:445 [inline]
- flush_to_ldisc+0x43e/0xe40 drivers/tty/tty_buffer.c:495
- process_one_work kernel/workqueue.c:3276 [inline]
- process_scheduled_works+0xb82/0x1e80 kernel/workqueue.c:3359
- worker_thread+0xee4/0x1590 kernel/workqueue.c:3440
- kthread+0x53f/0x600 kernel/kthread.c:436
- ret_from_fork+0x20f/0x910 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
-Uninit was created at:
- slab_post_alloc_hook mm/slub.c:4545 [inline]
- slab_alloc_node mm/slub.c:4866 [inline]
- __do_kmalloc_node mm/slub.c:5259 [inline]
- __kmalloc_noprof+0x486/0x1680 mm/slub.c:5272
- kmalloc_noprof include/linux/slab.h:954 [inline]
- tty_buffer_alloc drivers/tty/tty_buffer.c:180 [inline]
- __tty_buffer_request_room+0x3d4/0x7a0 drivers/tty/tty_buffer.c:273
- __tty_insert_flip_string_flags+0x157/0x6e0 drivers/tty/tty_buffer.c:309
- tty_insert_flip_char include/linux/tty_flip.h:77 [inline]
- uart_insert_char+0x368/0x930 drivers/tty/serial/serial_core.c:3431
- serial8250_read_char+0x1ba/0x670 drivers/tty/serial/8250/8250_port.c:1643
- serial8250_rx_chars drivers/tty/serial/8250/8250_port.c:1660 [inline]
- serial8250_handle_irq_locked+0x6d4/0xa40 drivers/tty/serial/8250/8250_port.c:1820
- serial8250_handle_irq+0x187/0x730 drivers/tty/serial/8250/8250_port.c:1841
- serial8250_default_handle_irq+0x116/0x370 drivers/tty/serial/8250/8250_port.c:1855
- serial8250_interrupt+0xcb/0x420 drivers/tty/serial/8250/8250_core.c:86
- __handle_irq_event_percpu+0x13c/0xf90 kernel/irq/handle.c:209
- handle_irq_event_percpu kernel/irq/handle.c:246 [inline]
- handle_irq_event+0xe0/0x2a0 kernel/irq/handle.c:263
- handle_edge_irq+0x2a9/0xb30 kernel/irq/chip.c:855
- generic_handle_irq_desc include/linux/irqdesc.h:186 [inline]
- handle_irq arch/x86/kernel/irq.c:262 [inline]
- call_irq_handler arch/x86/kernel/irq.c:-1 [inline]
- __common_interrupt+0x9d/0x180 arch/x86/kernel/irq.c:333
- common_interrupt+0x4c/0xb0 arch/x86/kernel/irq.c:326
- asm_common_interrupt+0x2b/0x40 arch/x86/include/asm/idtentry.h:688
-
-CPU: 0 UID: 0 PID: 35 Comm: kworker/u8:2 Tainted: G        W    L      syzkaller #0 PREEMPT(full) 
-Tainted: [W]=WARN, [L]=SOFTLOCKUP
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/18/2026
-Workqueue: events_unbound flush_to_ldisc
-=====================================================
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Reviewed-by: Simon Horman <horms@kernel.org>
 
