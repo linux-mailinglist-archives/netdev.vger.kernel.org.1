@@ -1,172 +1,182 @@
-Return-Path: <netdev+bounces-278447-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278448-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AOWVB2A73mnipgkAu9opvQ
-	(envelope-from <netdev+bounces-278447-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 15:04:32 +0200
+	id mM6YKBA83mn6pgkAu9opvQ
+	(envelope-from <netdev+bounces-278448-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 15:07:28 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 825153FA46F
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 15:04:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FCCA3FA505
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 15:07:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8E9793001BEA
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 13:04:11 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3A215300F17E
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 13:04:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A338396582;
-	Tue, 14 Apr 2026 13:04:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E13B3E5ECF;
+	Tue, 14 Apr 2026 13:04:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h9oAJT39"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UeFgOJH2";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lq5AZQ66"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3774F1F8723
-	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 13:04:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 352641F8723
+	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 13:04:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776171849; cv=none; b=CX1EMS78eMmR1B/QcnXAI/EfaMFeLPubXmH7GWC9mqrddYii7+pEjADShRpcnL9Vs08I/L9OFyTXPIfto4gqesTEqqsWAaPIWQIcR6+5Z4LmlszhR1mZS8h0HSHKvuCspBf2Hi6NIbKQFqmGn3NAKt1bUGXqVfehm7fTJCh3VLY=
+	t=1776171886; cv=none; b=KhBZuWMkja26YgCKDsKufNU7AQFo3/Ccr3/IRPmiC2L0EvTYnrYqcYE8jKuu0juvReNE59H3Xwtk4nKvkwlE+881N34Me2pqy+W1b34vGtOeeif8eWb5khbyMYTQh25V132Lu1iQq+wdtYMGAsuM+HPRoGqKUavEyodtVWRxnJ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776171849; c=relaxed/simple;
-	bh=+SdxuvV++RW3Au9ENkYe7TDMNH7gu+U+TpzaE8EMu60=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bmEnkO1SxWvUPkwvQmK5IrsWRILInjK956RIMLQoxMd3OeXY4OzEEppL3yPRLRDLxcD2g2aY5p8bVrxkgx/cGyWqRTkeSUMdZ2tGWGfsDqa7+SJnaC3A/t0aJ2H/XIygaN9JncrUQ+N+kb/arfOi7GGE05/DtTW6rIruhHgsozQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h9oAJT39; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64FCFC19425;
-	Tue, 14 Apr 2026 13:04:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776171848;
-	bh=+SdxuvV++RW3Au9ENkYe7TDMNH7gu+U+TpzaE8EMu60=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=h9oAJT39GRuHqt8X4CzT3FAocKIXUrycPfF479DhSGQ9lDYjqZdrVJMMal/khypft
-	 uiE8m/T/lSLmTIrK4QZWNc34kZjGFlo/wt5DEA2oaCJcSw7k68zV185MyRzvJ0gf77
-	 gmQqDnU+8WShfOA5yrhzQaTFUgVOE0lRhPJjt6Rbi8PFzGeQSJHVv86Spki/3gY24c
-	 a85V+kaLHRCLxXfBwiuGHLaMEVADYE/07rb4xmJQpgYmq0hFqSlY/90+VLZQGnF00L
-	 OzZEGAoHbm7cCiw6TAahbBkkvoG2JfZYlUQvV1HFlpnClg1Ukpzqq3uefkRNX+JbU4
-	 dNrPfidGe3fKg==
-Date: Tue, 14 Apr 2026 15:04:06 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Simon Horman <horms@kernel.org>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net] net: airoha: Fix max TX packet length configuration
-Message-ID: <ad47Rn6O3zxMGvga@lore-desk>
-References: <20260412-airoha-fix-max-mtu-v1-1-333030d0a564@kernel.org>
- <20260414124011.751922-1-horms@kernel.org>
+	s=arc-20240116; t=1776171886; c=relaxed/simple;
+	bh=fgU/EJ8fhNjWG9tUrnCWQvq2hGfoS2SKtGyUgO1KF7Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FzWQ2VnAYHbl/dVX8bZ+T98m6mBO5zo3UoSQiCEW0zeMmg1d7sFL8H/J/tiaTCwDO7k4VnRGgvhlAEOXm1ASSMMLxnbWuVQ4duVLz7cFSBp+N00pO1oy9Qdf4eJAHQfV3gjO93KeTk82fVcZD9OlFGR8BiR2iFldv0ig946fI80=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UeFgOJH2; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Lq5AZQ66; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1776171884;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7SB2FdFz1cnEJeeU7lmGtgbspb+2GXG652NxyTVE25c=;
+	b=UeFgOJH2cHBsNxYcIPxoD5G70EDFerZkHk5SaCjQviGfBSfaPFxf21YGNM4Fv3KfOmR+NI
+	SmN4fbBfXj94aFWPGS02IuPUJHodvO4MhkPVxncLrMhGiH46g3vg++OtU52O1AhJizhKU3
+	wfQV6F78r5IhvgBdZ3EHQ+ofUbiugdg=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-549-Vd1SDyJcNEWVnSgZFREnJw-1; Tue, 14 Apr 2026 09:04:43 -0400
+X-MC-Unique: Vd1SDyJcNEWVnSgZFREnJw-1
+X-Mimecast-MFC-AGG-ID: Vd1SDyJcNEWVnSgZFREnJw_1776171882
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-43d705eaa64so2818768f8f.0
+        for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 06:04:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1776171881; x=1776776681; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7SB2FdFz1cnEJeeU7lmGtgbspb+2GXG652NxyTVE25c=;
+        b=Lq5AZQ66P+d/mMchyrqkp9+0oBZhrBlDw4kp2dCfRccm0IH/s3wHhrv8zflyRo+jIN
+         oMponaP0GudRomxu5uQ28XDR76kOJ6ti2YFlVH29fbqsAWNb6lcLxQpPx3kNWrYDklCP
+         brPeo8nyXz2mO23TH82HfQWxElE7Q55T6YRfG/tZLhUgbumuE4aTqRxk4rD3Dc4z/Adk
+         FMilINgDYDS/JASE7gNmRAhCQhRYygFaQP4paj2+zqf6NlriTG9m249v9wLQK19XxexN
+         RD2DGiqP0CLYOcm1l7OTm2YYPPc1LfXu6C/N5fJ62CxhOCfQYMzdhUg5QVQftu6rX7C6
+         U6PA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776171881; x=1776776681;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7SB2FdFz1cnEJeeU7lmGtgbspb+2GXG652NxyTVE25c=;
+        b=h3lvw+nqOZ38+QkBANUecGJp8YfczZIr9qKF0vj6lBQY+o935G5gMl9vfsGbKcUG+A
+         csLPEA3JKm30rPcCIp7kZ4mD6H0JBWrG/ssoEpDdxc44wixGpzIIKS7BoeBxWri/jVYD
+         JzkxJw/e+4Rv5nXuKfJSKNFweAqZXTnxYThyxBRsJFnPYsfKO83gWjDui7JvlE4k3O8e
+         7AdRJXJALoQkALWaD6IkrZ4SSeV8Px/b3pPHq7khCmp64UKZZU1oievqY+QBi2WwrTNW
+         LTBbEMjdeUTFW2X7JsWCPtBJv5OPDnftYPFyUQk9UtPqECbnqAs1htIgR187ogX2NZoR
+         j1wg==
+X-Forwarded-Encrypted: i=1; AFNElJ9TxHgSjF3/bLRN8zBmbLz9eci3HO0uU9ItZ4KqPsIQMttun01g1aqbsg72XZ2bRCCraRdSuDw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzhdE7iDV3tSoOcT4bXCrn8Q/hzEvFgefmCOoP+BNdLyn7v1GB+
+	EN6do1fbAvktY5uLNsMqniUhO0SaD1xJAj+0cyDwlUGWkXajHH103Mr7cyrjQlxK1uYfHyALVOe
+	y5cRxKhg67RVijiyDIv5gZuYN4eMre4beap7SVgXCfPsdTK6SKYDxuDxbIgPk6Rv73g==
+X-Gm-Gg: AeBDieuL7OdEE4koVxAExBC37L0/+koOW4WfUAfFbWQ/eegdESIsaTpEcRxxAvUYldX
+	TWkuVMANYxe/SQ4JzBuLUzBWQKOIXJiDwTlH3k3/n6QN/KoUtS9tQklyj4m1e70oHg+HbxyYEcw
+	AMLOU3XZXs+aATCI9rvIjG5Q7fULkOPImnexHj0l55edGFbvgZ+IbW/hASm/NV3AfK0tCs/T9Jk
+	LHjqQ9/idxxShmUJ7OnRzYQggH5JTaFtEMoU5HzSONoVa4nDRUBEoYTQJPPnx6xNuxxylP8huZe
+	RFJeYoWugKZ5+GBAgwZOQwGcXXK65IwaxznH0bkaa+6tyqUCzUCdybyWUB785M93w8+zClRk/cz
+	hWmuvSjnSNUjuPYvc2ofTdSmkQk7IDunJh7Fn/kSjee65lPxrmPNlZvCW
+X-Received: by 2002:a05:6000:238a:b0:43d:7883:87c2 with SMTP id ffacd0b85a97d-43d788389b2mr11234917f8f.39.1776171874779;
+        Tue, 14 Apr 2026 06:04:34 -0700 (PDT)
+X-Received: by 2002:a05:600c:820a:b0:488:b675:360f with SMTP id 5b1f17b1804b1-488d6889a6bmr214737225e9.27.1776171861891;
+        Tue, 14 Apr 2026 06:04:21 -0700 (PDT)
+Received: from [192.168.88.32] ([216.128.11.125])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488d67b128dsm200877535e9.2.2026.04.14.06.04.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 14 Apr 2026 06:04:20 -0700 (PDT)
+Message-ID: <5767dffc-26e7-40da-8be9-46b878795a85@redhat.com>
+Date: Tue, 14 Apr 2026 15:04:19 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="Q+gggKPI9waM/m7U"
-Content-Disposition: inline
-In-Reply-To: <20260414124011.751922-1-horms@kernel.org>
-X-Spamd-Result: default: False [-2.26 / 15.00];
-	SIGNED_PGP(-2.00)[];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: airoha: Fix max TX packet length configuration
+To: Lorenzo Bianconi <lorenzo@kernel.org>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ netdev@vger.kernel.org
+References: <20260412-airoha-fix-max-mtu-v1-1-333030d0a564@kernel.org>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20260412-airoha-fix-max-mtu-v1-1-333030d0a564@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-278447-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-278448-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 825153FA46F
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 0FCCA3FA505
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-
---Q+gggKPI9waM/m7U
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-> From: 'Simon Horman' <horms@kernel.org>
->=20
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
-> Full review at: https://sashiko.dev
+On 4/12/26 10:09 AM, Lorenzo Bianconi wrote:
+> According to the Airoha documentation, REG_GDM_LEN_CFG() register does not
+> include FCS length. Fix MTU configuration removing ETH_FCS_LEN from
+> maximum TX packet length configuration.
+> 
+> Fixes: 54d989d58d2ac ("net: airoha: Move min/max packet len configuration in airoha_dev_open()")
+> Fixes: 03b1b69f0662c ("net: airoha: Introduce airoha_dev_change_mtu callback")
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 > ---
-> net: airoha: Fix max TX packet length configuration
->=20
-> This commit fixes the MTU configuration for the Airoha driver by removing
-> ETH_FCS_LEN from the maximum TX packet length, matching the hardware
-> documentation which states the register does not include the FCS length.
->=20
-> > diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/eth=
-ernet/airoha/airoha_eth.c
-> > index c14cdce588a7c..a81ffda72b39f 100644
-> > --- a/drivers/net/ethernet/airoha/airoha_eth.c
-> > +++ b/drivers/net/ethernet/airoha/airoha_eth.c
-> > @@ -1629,9 +1629,9 @@ static void airoha_update_hw_stats(struct airoha_=
-gdm_port *port)
-> > =20
-> >  static int airoha_dev_open(struct net_device *dev)
-> >  {
-> > -	int err, len =3D ETH_HLEN + dev->mtu + ETH_FCS_LEN;
-> >  	struct airoha_gdm_port *port =3D netdev_priv(dev);
-> >  	struct airoha_qdma *qdma =3D port->qdma;
-> > +	int err, len =3D ETH_HLEN + dev->mtu;
->=20
-> Does this regression cause MTU-sized VLAN-tagged frames to be dropped by =
-the
-> hardware?
->=20
-> By limiting the frame size to ETH_HLEN + dev->mtu, the maximum allowed le=
-ngth
-> becomes 1514 bytes for a standard 1500 MTU. An Ethernet frame containing a
-> standard 802.1Q VLAN tag and a maximum-sized 1500-byte IP payload require=
-s an
-> 18-byte L2 header, making the total frame size 1518 bytes (excluding FCS).
->=20
-> Previously, the inclusion of ETH_FCS_LEN inadvertently provided the 4-byte
-> headroom needed to accommodate a single VLAN tag.=20
->=20
-> Could the configuration explicitly account for VLAN headers using VLAN_ET=
-H_HLEN
-> instead?
+>  drivers/net/ethernet/airoha/airoha_eth.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
+> index c14cdce588a7..a81ffda72b39 100644
+> --- a/drivers/net/ethernet/airoha/airoha_eth.c
+> +++ b/drivers/net/ethernet/airoha/airoha_eth.c
+> @@ -1629,9 +1629,9 @@ static void airoha_update_hw_stats(struct airoha_gdm_port *port)
+>  
+>  static int airoha_dev_open(struct net_device *dev)
+>  {
+> -	int err, len = ETH_HLEN + dev->mtu + ETH_FCS_LEN;
+>  	struct airoha_gdm_port *port = netdev_priv(dev);
+>  	struct airoha_qdma *qdma = port->qdma;
+> +	int err, len = ETH_HLEN + dev->mtu;
 
-ack, thx for pointing this out. I will fix it in v2.
+Sashiko noted that the above may cause regressions, dropping max MTU
+vlan frames.
 
-Regards,
-Lorenzo
+/P
 
->=20
-> [ ... ]
-
---Q+gggKPI9waM/m7U
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCad47RgAKCRA6cBh0uS2t
-rPLDAP9Q5H7Gu+YaELSGXFfA19Ve/ujnBdFo02w+qdtwsV1EiwEAz8wT7BGV5Axj
-dQ8zS8efuQJZOHb4yYvA+gf5P4uGIQ8=
-=4+Tn
------END PGP SIGNATURE-----
-
---Q+gggKPI9waM/m7U--
 
