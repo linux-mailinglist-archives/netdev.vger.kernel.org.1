@@ -1,120 +1,133 @@
-Return-Path: <netdev+bounces-278520-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278521-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ME12Jepg3mn+CQAAu9opvQ
-	(envelope-from <netdev+bounces-278520-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 17:44:42 +0200
+	id uPUNIb9i3mlqDgAAu9opvQ
+	(envelope-from <netdev+bounces-278521-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 17:52:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FF653FC131
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 17:44:41 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF3CE3FC2A0
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 17:52:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 93995300372E
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 15:44:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5FFA7300B062
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 15:49:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FFEC3EC2D7;
-	Tue, 14 Apr 2026 15:44:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AED673E8C55;
+	Tue, 14 Apr 2026 15:49:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lG3NAFvp"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="IcqO+l7J"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DC183E6396;
-	Tue, 14 Apr 2026 15:44:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FD703EAC77;
+	Tue, 14 Apr 2026 15:49:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776181448; cv=none; b=CoAAV1WZ/K9MbOOyrQu1qS0ctOf31ud2mT+OVo7R0nt7NPjZXEThxbHMM1qulW9AXiBqEF7yVJB6u/GQ21i/zzhXphLJox7j2HU7Q0eO5Gillhkyxl+RXj78bfljEhWqGJWaRJd7aRax/nsb3gCeLSKo8szlxZfcVB0DWTqkwCo=
+	t=1776181742; cv=none; b=UTJn9ljNSiDNGgmEmW+25dENoMEDd25poc4xEJbbwCEXbv1WOvom7cMj3F0+SpUEK9Nl/s7CFp/pCYO5d7BD3X2TqkF4i3koKuEdhcxJ2U91clBDXQ9epC+4dhXWVHu6RFu9Bl2pTurEPztJJXwDGAQPHC/dyjp0IwojaaEkkbk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776181448; c=relaxed/simple;
-	bh=GOEHN8D4mrXLesq3Uxwxg1mrKL7Yav8u1R6lnIlIxfs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WyxeFb0LrcdT6mu8lnwxo8JpE1nREZyoGWAxzbELnxjdHmhuy04ZEpynvAAu+0fme8/THhlCkfQa9VPdQxW9w4mOMERr+dysKYLn5I8lhgpnnsaQjRhVgF8dXD7kaye8F5xxufGcL6+u+JJOup7T+LVdPgKCchDqZTerzbtHMRo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lG3NAFvp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A88CC19425;
-	Tue, 14 Apr 2026 15:44:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776181447;
-	bh=GOEHN8D4mrXLesq3Uxwxg1mrKL7Yav8u1R6lnIlIxfs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=lG3NAFvp4uV/avU7Keluh5lA044kTwGigw0dtOcBFsT/SkWas1n5pMgD1fD3QgWZO
-	 T5FgsgvIdFbVWp0Yo3F+gYIuuohxZjGOqjFFKei2sD2aNLTKSk4c31G2OeSnW5PORL
-	 I7XuhwVrlaUQSyKMLJpYpOgwytC5MKrODYcI7uDn/PpssWe4JWbhJehzfzrSEvgyiX
-	 dapobBBO1yB9Y882/R+KSYYP22kgMIQZCoDy+8i2QrI9r5Gu/m+FS51PjTwlfPTgEL
-	 KWDxEEAmcej3DOx46/LCH6VE1sD/qtGm18rOlxnepUioDWDCLiSeYCKhX4JnWUImDu
-	 swVJJKmHkEFVw==
-Date: Tue, 14 Apr 2026 08:44:06 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc: Shardul Bankar <shardul.b@mpiricsoftware.com>, kuniyu@google.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, wireguard@lists.zx2c4.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, janak@mpiric.us,
- kalpan.jani@mpiricsoftware.com, shardulsb08@gmail.com,
- syzbot+f2fbf7478a35a94c8b7c@syzkaller.appspotmail.com
-Subject: Re: [PATCH v2] wireguard: device: use exit_rtnl callback instead of
- manual rtnl_lock in pre_exit
-Message-ID: <20260414084406.779336af@kernel.org>
-In-Reply-To: <CAHmME9rwKae5b9PYzuqmwG3p05iZ=jqyp6LQefg0OsB3OP6oWg@mail.gmail.com>
-References: <20260413151232.1004611-1-shardul.b@mpiricsoftware.com>
-	<CAHmME9oXoXykXq_emkA3v8nG2VR28CmRP2+WmhrvGJc0ZbPfpA@mail.gmail.com>
-	<20260414081824.0edf6113@kernel.org>
-	<CAHmME9rwKae5b9PYzuqmwG3p05iZ=jqyp6LQefg0OsB3OP6oWg@mail.gmail.com>
+	s=arc-20240116; t=1776181742; c=relaxed/simple;
+	bh=MyOEAHk13j2Vli/fr4lMwMn/wak442eSkps0lVwOgfc=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=t/VmP1GCsDP5GoNyHNP11N7rQTagrhXYEg2+AQKnDCbLvPzHmWDEBJlAU8x3ZomGH0KV76pp1hMYkn4oo/z9VyZdYJSJ7RQo4RB6ZdFQhC2p2n++5ifXkUQ5Msbu7Vz2xIvVojdg2Swu6QoBqTjcymXB+zdkFEaef81MOsqgMJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=IcqO+l7J; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1776181739; x=1807717739;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=MyOEAHk13j2Vli/fr4lMwMn/wak442eSkps0lVwOgfc=;
+  b=IcqO+l7JQzL9eIoFGZ/Wa01DCKiVPibmOAfBJPGdWpl+DcGuIpcMafU0
+   h3tQuLsbq+bKHErBwePZKKEYkeXrPg0A9qOVwvLae78h42CWDlSEqLCqU
+   3ZKBUkK4SjHcMC6Jw+g1OKpD7zOWjjU4qJTby013YZW7bN3BZ6ovgLIqs
+   zIxkysUPPn9QugTuGuziXUKVXLKzSTFqBYrQSmSAda/FMyu7xf0ZyH8xQ
+   pv7QJ3c9SfDT2HXVm01da7v3I3Dyx0PpS67yAlNjvdyA/NJlXUyiDSnUD
+   Mt44TUwPdiB2o7RC9q/nxPqYS8Qez59xUEmuXpUqw1RmEQzRX0+jpezeG
+   A==;
+X-CSE-ConnectionGUID: MwNeHAjATNaMqKWLeqM2Vw==
+X-CSE-MsgGUID: Nj7+nOnMR5i78T0Jzh0sAA==
+X-IronPort-AV: E=Sophos;i="6.23,179,1770620400"; 
+   d="scan'208";a="287458014"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2026 08:48:51 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.87.71) by
+ chn-vm-ex4.mchp-main.com (10.10.87.33) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.35; Tue, 14 Apr 2026 08:48:34 -0700
+Received: from bby-cbu-swbuild03.eng.microchip.com (10.10.85.11) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.58 via Frontend Transport; Tue, 14 Apr 2026 08:48:32 -0700
+Date: Tue, 14 Apr 2026 08:48:31 -0700
+From: Charles Perry <charles.perry@microchip.com>
+To: Geert Uytterhoeven <geert+renesas@glider.be>
+CC: Charles Perry <charles.perry@microchip.com>, Conor Dooley
+	<conor@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Maxime Chevallier
+	<maxime.chevallier@bootlin.com>, Andrew Lunn <andrew@lunn.ch>, "Heiner
+ Kallweit" <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+	"Paolo Abeni" <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] net: mdio: MDIO_PIC64HPSC should depend on ARCH_MICROCHIP
+Message-ID: <ad5hzwdci3q3MXIJ@bby-cbu-swbuild03.eng.microchip.com>
+References: <980c57efa5843733ef95459c3283aebade56f142.1776162544.git.geert+renesas@glider.be>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <980c57efa5843733ef95459c3283aebade56f142.1776162544.git.geert+renesas@glider.be>
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-278520-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[mpiricsoftware.com,google.com,lunn.ch,davemloft.net,redhat.com,lists.zx2c4.com,vger.kernel.org,mpiric.us,gmail.com,syzkaller.appspotmail.com];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[microchip.com,kernel.org,bootlin.com,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,redhat.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-278521-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[microchip.com:+];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,f2fbf7478a35a94c8b7c];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 9FF653FC131
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[charles.perry@microchip.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.998];
+	TAGGED_RCPT(0.00)[netdev,renesas];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[microchip.com:dkim,microchip.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,glider.be:email,bby-cbu-swbuild03.eng.microchip.com:mid]
+X-Rspamd-Queue-Id: DF3CE3FC2A0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, 14 Apr 2026 17:40:03 +0200 Jason A. Donenfeld wrote:
-> On Tue, Apr 14, 2026 at 5:18=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> =
-wrote:
-> >
-> > On Tue, 14 Apr 2026 15:28:37 +0200 Jason A. Donenfeld wrote: =20
-> > > Thanks. Applied to the wireguard tree, and also added the missing
-> > > __net_exit and __read_mostly annotations in the process. =20
-> >
-> > Hi Jason, while we have you - do you have a PR for us for wireguard?
-> > We're going to be sending the net-next PR later today.. =20
->=20
-> Sent!
+On Tue, Apr 14, 2026 at 12:30:47PM +0200, Geert Uytterhoeven wrote:
+> The PIC64-HPSC/HX MDIO interface is only present on Microchip
+> PIC64-HPSC/HX SoCs.  Hence add a dependency on ARCH_MICROCHIP, to
+> prevent asking the user about this driver when configuring a kernel
+> without Microchip SoC support.
+> 
+> Fixes: f76aef980206e7c6 ("net: mdio: add a driver for PIC64-HPSC/HX MDIO controller")
+> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
 
-Thanks!=20
-(I'll apply in a couple of hours once the CI had its way with it.)
+Reviewed-by: Charles Perry <charles.perry@microchip.com>
+
+Thanks!
+Charles
+
 
