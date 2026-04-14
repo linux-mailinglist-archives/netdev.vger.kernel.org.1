@@ -1,147 +1,156 @@
-Return-Path: <netdev+bounces-278549-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278550-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mFS6A7983mm/EwAAu9opvQ
-	(envelope-from <netdev+bounces-278549-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 19:43:27 +0200
+	id gBpZB3R93mm/EwAAu9opvQ
+	(envelope-from <netdev+bounces-278550-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 19:46:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C78B3FD347
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 19:43:25 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35FF33FD3A5
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 19:46:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id D9DA7302742C
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 17:42:49 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 8CB5B300D74D
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 17:46:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4B043F0777;
-	Tue, 14 Apr 2026 17:42:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17CE93090C5;
+	Tue, 14 Apr 2026 17:46:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ypQma+/V"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RiVso49o"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 972583F0761;
-	Tue, 14 Apr 2026 17:42:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 790D23033D6
+	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 17:46:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776188568; cv=none; b=L5rhEBRflRCufn0gt3LRpQKfCnYCynGSnFV9Msylrea3XwhKkNI+eiBsbyVOaKUjFKW8juSCYZxmw2lwZvWJbb66g78zdSszRi63EO96Wlok0Rx4zeMWpBl0xdGYKYE8o7eqWpGOB9AQlse0p9eVX3vBeKxbaOD9l/WxcaDMb6o=
+	t=1776188785; cv=none; b=YS1fCpZ8G3BRh88ZuhPgGb+dapjq7534Oufq0gqLs2liYcfiV0T8ga/IhDapkpDqNHmqUze5xiLdTbePPX6pDNxckmsaluIL8Exkgo6+Mkbn6vWXggN+5yApzVsZR7WqLlMOG5vxEbRiIqhdYiiiuKbkMssDfumlwcZUP3FBdt8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776188568; c=relaxed/simple;
-	bh=5W7FvYPoolVxHBjNG1Q5nwS/9/wrVz0X+7d/L2tF8JE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QTazkh8Cz7c77vPSVprQN0weFsHdehWxgU2XStbS/a6puxaKxWb0kushvNHJ+bAe1D8+BcZMIdCdz5YO9H73pg0L1t9JZRzlV/NjZMGg1Z1BfzUi/gC9MEl1lw8lE9sztKlVZ3VbmyZLTD1qryAje/wO+9BxbzbILDxazhUujo0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ypQma+/V; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=CJKWkxB0gYZ24Tdv1A3cXZH75CGO07izxPTmES74YL8=; b=ypQma+/VP27jY1qgvvLD9vOKGm
-	hOO5xc3UjHVXi4saKQ6cLfS1FhVOAVXcbQ7bmz/mhL9WXifCml/HKW5Ta3LywfRIBzwieJJnYyw8p
-	df98RCq3eCEzWrLdq89bz8G0s+J2ORNrY/Qi6ikPA9t7vdHftRRRdXS92+68bOwXq8ODtfBalW1aI
-	XKoFgdvW9/qETHBIFtjfrDaL3T6rNnPkLId6ri/Mb+5PHo7scZVRH3Ls5tQBV7kYD8b+X73cOpvrM
-	xVgjBqq5WtsrXYoM/qwXjfAIA/+a5njJ+/Bkyoa2E+yhsT8iw1aVxN1oozN/Zp4709ti0ZyrZ/o+X
-	rfYwhc8w==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:35602)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1wChmZ-000000001GK-43td;
-	Tue, 14 Apr 2026 18:42:40 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1wChmT-000000001Ol-3B2t;
-	Tue, 14 Apr 2026 18:42:33 +0100
-Date: Tue, 14 Apr 2026 18:42:33 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Chen Jung Ku <ku.loong@gapp.nthu.edu.tw>, davem@davemloft.net,
-	kuba@kernel.org, edumazet@google.com, pabeni@redhat.com,
-	hkallweit1@gmail.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: mdio: octeon: use %p for bus id
-Message-ID: <ad58iba02vSmM6rW@shell.armlinux.org.uk>
-References: <20260414155652.7468-1-ku.loong@gapp.nthu.edu.tw>
- <efc34ba8-730a-4c01-bc44-ee64569d2d4e@lunn.ch>
+	s=arc-20240116; t=1776188785; c=relaxed/simple;
+	bh=xmt7s/twQSu4aPxzKgIdkdZzdmbSv5AWDgrjt5WYi8Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=vAEC1X8WzY/0CYIwzAT6kWfrjFOy6Yv+6pPFT2f6gTDhWfYl4XXLzoSwnZ/8P1rJl6GhELNnHc1Sqbz3jFQXf4u81wK+NQ9FS7GgFSTqY9aChawnNPnaoukD7NQwCXfqf/5l9Nuuh2V5Z6W7pm0GrBGpBxTuXCqSlX9vA/KNs+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RiVso49o; arc=none smtp.client-ip=95.215.58.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <cbe3bd2a-4cbe-43db-bb19-37b2d8890eb4@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1776188780;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=aRLMPgmEQNtIZ1+s3R+uauqPySY8kfsW8C0JvL3DnhI=;
+	b=RiVso49oHMRT5XG/F91j0pD7x6IqHgQbtqMpyhzFq94sPN9gPK2R0IIVei0IypZxTRX+gm
+	V5lktbqZR6nixC7Y9yTwLsbbiY6dFKpoiDW8umfx64qbPEV8/QPr23d4zqt9ZqASRACHpw
+	v6g7f+YNzBMV/iQr+TX1hGYRmmMzc4U=
+Date: Tue, 14 Apr 2026 18:46:14 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <efc34ba8-730a-4c01-bc44-ee64569d2d4e@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spamd-Result: default: False [-0.36 / 15.00];
+Subject: Re: [PATCH v2 2/6] bus: mhi: host: Add support for non-posted TSC
+ timesync feature
+To: Krishna Chaitanya Chundru <krishna.chundru@oss.qualcomm.com>,
+ Manivannan Sadhasivam <mani@kernel.org>,
+ Richard Cochran <richardcochran@gmail.com>
+Cc: mhi@lists.linux.dev, linux-arm-msm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ Vivek Pernamitta <quic_vpernami@quicinc.com>
+References: <20260411-tsc_timesync-v2-0-6f25f72987b3@oss.qualcomm.com>
+ <20260411-tsc_timesync-v2-2-6f25f72987b3@oss.qualcomm.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20260411-tsc_timesync-v2-2-6f25f72987b3@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gapp.nthu.edu.tw,davemloft.net,kernel.org,google.com,redhat.com,gmail.com,vger.kernel.org];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278549-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_FROM(0.00)[bounces-278550-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[oss.qualcomm.com,kernel.org,gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.764];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,armlinux.org.uk:url,shell.armlinux.org.uk:mid]
-X-Rspamd-Queue-Id: 2C78B3FD347
+	RCPT_COUNT_SEVEN(0.00)[8];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux.dev:dkim,linux.dev:mid]
+X-Rspamd-Queue-Id: 35FF33FD3A5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Apr 14, 2026 at 06:16:08PM +0200, Andrew Lunn wrote:
-> On Tue, Apr 14, 2026 at 11:56:52PM +0800, Chen Jung Ku wrote:
-> > Replace %px with %p to avoid exposing raw kernel pointer values.
+On 11/04/2026 09:12, Krishna Chaitanya Chundru wrote:
+> From: Vivek Pernamitta <quic_vpernami@quicinc.com>
 > 
-> What exactly are we giving away here?
+> Implement non-posted time synchronization as described in section 5.1.1
+> of the MHI v1.2 specification. The host disables low-power link states
+> to minimize latency, reads the local time, issues a MMIO read to the
+> device's TIME register.
 > 
->                         compatible = "cavium,octeon-3860-mdio";
->                         #address-cells = <1>;
->                         #size-cells = <0>;
->                         reg = <0x11800 0x00001900 0x0 0x40>;
+> Add support for initializing this feature and export a function to be
+> used by the drivers which does the time synchronization.
 > 
-> Isn't bus->register_base this well known value?
-> 
-> You also need to think about ABI.
+> MHI reads the device time registers in the MMIO address space pointed to
+> by the capability register after disabling all low power modes and keeping
+> MHI in M0. Before and after MHI reads, the local time is captured
+> and shared for processing.
 
-There isn't ABI here.
+[...]
 
-        bus->register_base = devm_platform_ioremap_resource(pdev, 0);
+> +	/*
+> +	 * time critical code to fetch device time, delay between these two steps
+> +	 * should be deterministic as possible.
+> +	 */
+> +	preempt_disable();
+> +	local_irq_disable();
+> +
+> +	time->t_host_pre = ktime_get_real();
+> +
+> +	/*
+> +	 * To ensure the PCIe link is in L0 when ASPM is enabled, perform series
+> +	 * of back-to-back reads. This is necessary because the link may be in a
+> +	 * low-power state (e.g., L1 or L1ss), and need to be forced it to
+> +	 * transition to L0.
+> +	 */
+> +	for (i = 0; i < MHI_NUM_BACK_TO_BACK_READS; i++) {
+> +		ret = mhi_read_reg(mhi_cntrl, mhi_tsync->time_reg,
+> +				   TSC_TIMESYNC_TIME_LOW_OFFSET, &time->t_dev_lo);
+> +
+> +		ret = mhi_read_reg(mhi_cntrl, mhi_tsync->time_reg,
+> +				   TSC_TIMESYNC_TIME_HIGH_OFFSET, &time->t_dev_hi);
+> +	}
+> +
+> +	time->t_host_post = ktime_get_real();
+> +
+> +	local_irq_enable();
+> +	preempt_enable();
 
-        snprintf(bus->mii_bus->id, MII_BUS_ID_SIZE, "%px", bus->register_base);
+PTP_SYS_OFFSET_EXTENDED receives the amount of samples to read from user
+space, you can use it instead of MHI_NUM_BACK_TO_BACK_READS, and in this
+case it's better to grab host-pre and host-post time for a single
+register read.
 
-bus->register_base is the ioremap'd version of the resource, which is
-effectively random, and it can be either a 32 or 64-bit hex number
-depending on the pointer size. It's an exceedingly bad choice of MDIO
-bus ID.
-
-A better more stable choice would be to use the bus address or
-dev_name().
-
-Even so, I don't think there's any ABI here as the existing "ID" will
-not be stable.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Also, PTP_SYS_OFFSET_EXTENDED was improved and currently supports
+multiple clockids as system time, it's good to account for it.
 
