@@ -1,75 +1,79 @@
-Return-Path: <netdev+bounces-278600-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278601-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wJa3FDnQ3ml0IgAAu9opvQ
-	(envelope-from <netdev+bounces-278600-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 01:39:37 +0200
+	id qKSYC6vQ3ml0IgAAu9opvQ
+	(envelope-from <netdev+bounces-278601-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 01:41:31 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D3833FF19E
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 01:39:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 63EE03FF1D9
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 01:41:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5DCCE3036D42
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 23:38:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 54AF9301A903
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 23:41:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF3A435C19D;
-	Tue, 14 Apr 2026 23:38:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0E303BF69E;
+	Tue, 14 Apr 2026 23:41:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="kEv//FjR"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kNamr9HD"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A5603CB2EA;
-	Tue, 14 Apr 2026 23:38:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E260383C9D
+	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 23:41:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776209916; cv=none; b=UcVwyIecbavsDbeEXAqHGpWRahQnbJ9uW0OrTnkFQnBE/2jdeELL6x67LysjdG0GU9JLumLJPHyI9Rs2MA0/ibnwrXpRbFw2oF8sf4sokMXGRwStFAznVJQlss8Mg1gJzDHwvH5EBss7FmdK06FrxGxwoQyEqlvSH6yNFYHezRc=
+	t=1776210081; cv=none; b=JP5SOlSSEDsUluke8vzSFm80l9hinQxxBt1PrP1P2vqYT2wSGhJFGKrhmc0GofKM9C3RVi1c5fHJnaguG1mSxe83gyuJvo4RAppqymzlsUY3phf0o4sbz4HSug1wI4/GeWzfRVPjTeqVWUYAFKfUDgvIzsxBgqHXEkglWPAL+50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776209916; c=relaxed/simple;
-	bh=6WDWty/8aY0CpyFn2wQvvOFo01God1rk6PU0DkYmRH8=;
+	s=arc-20240116; t=1776210081; c=relaxed/simple;
+	bh=vZo9dbW4pd0F5AHbJWgmGW8QYcZboCRAl+ucLogtGY0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ML3mH1qqGrJP3D0IvSN7+0dXqrFFmAFMil5SkqgELuEtZEQYOIzqjQBzToK8tqR7WbgcMY2Roi4ecAb4qAa+S7dikrQ3dNB4Yaa2XGfOXD8t88lNJXL9m5GEKHn0I1YgKX9kGF51V/wh/AgR+1Dkn4JYrHrGE6SXAVIR32Htw0A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=kEv//FjR; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=qsfu9lx4dXimVzqfgFepm2Tp9mFrZ4Nb+jaMnc5/0X4=; b=kEv//FjRuUw5o4UhL3TeCbPuWA
-	p+MeVy8AyzkuRCdgqCCDcnaA5M1UdFz56HTv5huTaI3CkuPRMupExuBpJBHIZz73EC4F+4Tp552qW
-	Tk497M0v1Eq2X+2bjhyKIKtOCVdM81KcBCVn05KMO9/UzLatmDjcbiQq4ZeTndKquH2g=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wCnKv-00G6tv-0U; Wed, 15 Apr 2026 01:38:29 +0200
-Date: Wed, 15 Apr 2026 01:38:28 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: davem@davemloft.net, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
-	Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
-	Romain Gantois <romain.gantois@bootlin.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-Subject: Re: [PATCH net-next v9 03/10] net: phylink: Register a phy_port for
- MAC-driven SFP busses
-Message-ID: <7838a71b-ae3a-4681-8516-c450ea8a5321@lunn.ch>
-References: <20260403123755.175742-1-maxime.chevallier@bootlin.com>
- <20260403123755.175742-4-maxime.chevallier@bootlin.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=q8CzDkwyB2QDrHi18JGsSVp/H69OLq+IumeM9e+vf+gAsCvMlJyjhF80ZlX1eiCfY1iJVnLd4e4OR0eDH5MOaeYNyMpFARFdJovYgv87Tn7I22EiwWMN1CfByChSpHeBKgFG+RRU5IqD50z6Wh5oSOkemfO3TPF2WwGrv8aoihs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kNamr9HD; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1776210080; x=1807746080;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=vZo9dbW4pd0F5AHbJWgmGW8QYcZboCRAl+ucLogtGY0=;
+  b=kNamr9HDNnVevaC7aLbEveQhDkw7soXCRFThcl0YbdSXzR7LdDU0XScy
+   FMJJkQTOxffINyyPKd6qkduzMFYl+tzwEZedruzguW/oDanLkH0s0QcuB
+   E7uCVLrTWGBR7eyEf5c7AMtmbmb/+uIiL9KONSV/fHqyqjwIlAtyt6an+
+   teE8nvJ9axGAb6b42vntV83DZhaZ5OupuNoqB9WHmeTWB3s8XezKeP+4y
+   WWecx8wciGv60GdenU4rhBiSPYu+sOCwaoKXJcAJXx+/mRNKJyy+QHqNk
+   Yp7DDF2h3BOsrFRJtleDAxTCRYOmno9lQIX/+/PFeG3W2YVNJBJwRhz+v
+   w==;
+X-CSE-ConnectionGUID: XrnY1hwoSh+Zl0R4Y6M0Tw==
+X-CSE-MsgGUID: 4Vv9vR2eQgmz1y1pw7OLEA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11759"; a="94747597"
+X-IronPort-AV: E=Sophos;i="6.23,179,1770624000"; 
+   d="scan'208";a="94747597"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2026 16:41:19 -0700
+X-CSE-ConnectionGUID: psX7x4ebS3mO40OdMfdXeg==
+X-CSE-MsgGUID: y2mulXTsRuKwr4EwSdEP/w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,179,1770624000"; 
+   d="scan'208";a="235188687"
+Received: from lkp-server01.sh.intel.com (HELO 7b0b59b3a0d4) ([10.239.97.150])
+  by orviesa005.jf.intel.com with ESMTP; 14 Apr 2026 16:41:17 -0700
+Received: from kbuild by 7b0b59b3a0d4 with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1wCnNa-000000001xV-1kfX;
+	Tue, 14 Apr 2026 23:41:14 +0000
+Date: Wed, 15 Apr 2026 07:40:23 +0800
+From: kernel test robot <lkp@intel.com>
+To: Dudu Lu <phx0fer@gmail.com>, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, stefanha@redhat.com, sgarzare@redhat.com,
+	mst@redhat.com, jasowang@redhat.com, Dudu Lu <phx0fer@gmail.com>
+Subject: Re: [PATCH] vsock/virtio: fix accept queue count leak on transport
+ mismatch in recv_listen
+Message-ID: <202604150747.6LyaJckM-lkp@intel.com>
+References: <20260413085243.73200-1-phx0fer@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,66 +82,90 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260403123755.175742-4-maxime.chevallier@bootlin.com>
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+In-Reply-To: <20260413085243.73200-1-phx0fer@gmail.com>
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278600-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,google.com,redhat.com,armlinux.org.uk,gmail.com,vger.kernel.org,bootlin.com,csgroup.eu,nxp.com,pengutronix.de,chromium.org,makrotopia.org,liebherr.com];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[lists.linux.dev,redhat.com,gmail.com];
+	TAGGED_FROM(0.00)[bounces-278601-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:dkim,lunn.ch:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 9D3833FF19E
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,01.org:url]
+X-Rspamd-Queue-Id: 63EE03FF1D9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-> This phy_port represents the SFP cage itself, and not the module
+Hi Dudu,
 
-> +static int phylink_create_sfp_port(struct phylink *pl)
+kernel test robot noticed the following build errors:
 
-I'm thinking about naming here. If this represent the cage, why not
-call this phylink_create_sfp_cage_port(). I assume as some point there
-is going to be something for the module, and it seem like the naming
-is going to be confusing.
+[auto build test ERROR on mst-vhost/linux-next]
+[also build test ERROR on net/main net-next/main linus/master horms-ipvs/master v7.0 next-20260414]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-> +{
-> +	struct phy_port *port;
-> +	int ret = 0;
-> +
-> +	if (!pl->netdev || !pl->sfp_bus)
-> +		return 0;
-> +
-> +	port = phy_port_alloc();
-> +	if (!port)
-> +		return -ENOMEM;
-> +
-> +	port->is_sfp = true;
-> +	port->is_mii = true;
-> +	port->active = true;
+url:    https://github.com/intel-lab-lkp/linux/commits/Dudu-Lu/vsock-virtio-fix-accept-queue-count-leak-on-transport-mismatch-in-recv_listen/20260414-233232
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git linux-next
+patch link:    https://lore.kernel.org/r/20260413085243.73200-1-phx0fer%40gmail.com
+patch subject: [PATCH] vsock/virtio: fix accept queue count leak on transport mismatch in recv_listen
+config: sparc-randconfig-001-20260415 (https://download.01.org/0day-ci/archive/20260415/202604150747.6LyaJckM-lkp@intel.com/config)
+compiler: sparc64-linux-gcc (GCC) 8.5.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260415/202604150747.6LyaJckM-lkp@intel.com/reproduce)
 
-If this is a cage, not a module, does is_sfp = true make sense?
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202604150747.6LyaJckM-lkp@intel.com/
 
-And what does an active cage mean?
+All errors (new ones prefixed by >>):
 
-	Andrew
+   net/vmw_vsock/virtio_transport_common.c:1:2: warning: data definition has no type or storage class
+     sk_acceptq_added(sk);
+     ^~~~~~~~~~~~~~~~
+   net/vmw_vsock/virtio_transport_common.c:1:2: error: type defaults to 'int' in declaration of 'sk_acceptq_added' [-Werror=implicit-int]
+   net/vmw_vsock/virtio_transport_common.c:1:2: warning: parameter names (without types) in function declaration
+   In file included from include/linux/virtio_vsock.h:7,
+                    from net/vmw_vsock/virtio_transport_common.c:15:
+>> include/net/sock.h:1080:20: error: conflicting types for 'sk_acceptq_added'
+    static inline void sk_acceptq_added(struct sock *sk)
+                       ^~~~~~~~~~~~~~~~
+   net/vmw_vsock/virtio_transport_common.c:1:2: note: previous declaration of 'sk_acceptq_added' was here
+     sk_acceptq_added(sk);
+     ^~~~~~~~~~~~~~~~
+   cc1: some warnings being treated as errors
+
+
+vim +/sk_acceptq_added +1080 include/net/sock.h
+
+^1da177e4c3f415 Linus Torvalds 2005-04-16  1079  
+^1da177e4c3f415 Linus Torvalds 2005-04-16 @1080  static inline void sk_acceptq_added(struct sock *sk)
+^1da177e4c3f415 Linus Torvalds 2005-04-16  1081  {
+288efe8606b62d0 Eric Dumazet   2019-11-05  1082  	WRITE_ONCE(sk->sk_ack_backlog, sk->sk_ack_backlog + 1);
+^1da177e4c3f415 Linus Torvalds 2005-04-16  1083  }
+^1da177e4c3f415 Linus Torvalds 2005-04-16  1084  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
