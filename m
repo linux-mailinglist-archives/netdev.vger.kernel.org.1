@@ -1,59 +1,63 @@
-Return-Path: <netdev+bounces-278541-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278542-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OP2FEmFr3mm5EAAAu9opvQ
-	(envelope-from <netdev+bounces-278541-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 18:29:21 +0200
+	id +KAmJwBv3mleEQAAu9opvQ
+	(envelope-from <netdev+bounces-278542-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 18:44:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCA1C3FC949
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 18:29:20 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0866E3FCB02
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 18:44:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id CF4FE3073607
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 16:23:37 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 585233024A3E
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 16:44:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9330A3E8C72;
-	Tue, 14 Apr 2026 16:23:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FE8E31ED93;
+	Tue, 14 Apr 2026 16:44:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=1wt.eu header.i=@1wt.eu header.b="GmH2UP0S"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Jg1JabnE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mta1.formilux.org (mta1.formilux.org [51.159.59.229])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 133AC2FF160;
-	Tue, 14 Apr 2026 16:23:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.159.59.229
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DF712949E0;
+	Tue, 14 Apr 2026 16:44:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776183815; cv=none; b=F1e3110v7wExYSfU75bLCQm0Oz1W7uRcvvioUvzdXcJ3AYjbtMYYsybgTp6XCPAmPZcfkS866NKDNsAdoDF44PUReGZJ2Q9bYlGPUDTeLvhhSEU+jzYIOfrD0aB+XY1r5SRXpHVER43sscZz9Z27zHNQGgecTZhKNmSI3yLDeXA=
+	t=1776185084; cv=none; b=kmD9CmPaBbViv3rx0sD4siqF5lvfP9xOcVbjUtRqucu1MOGMYp+39qr3U/ImmMJXbG66xdKuW2n2BMgZHySrnWlEaAYyGniXOltTyvIdGktMXf+igInR41LmDAcob1+j8p7/HVDUfocUb6v5jQrfrSSWeKyvLpe0dVXhZO1WABE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776183815; c=relaxed/simple;
-	bh=6uDb7kejujBqUUB9ZxrJQJb7QoGJK8VBUq9D7VjAZx0=;
+	s=arc-20240116; t=1776185084; c=relaxed/simple;
+	bh=JHHZyb2azwc6UMLJsUH6MvpF11bh5FdFdSawhVoZ7qE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qHXu/NQKyRHD2CxlLBkkDW33Qadw52ARpI3j8EKAam/sGGfxteZuPfBa3zNi+DvWg5oU7947txl2J9vUwbiAAeBRMFyr/07kaWM5pfW51xIYGCXDnKaI6b4rO8hOgoEeX8wpRAI2t5FOu+nRKZpGa5mRscwA4u35fFaHXmFLS8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=1wt.eu; spf=pass smtp.mailfrom=1wt.eu; dkim=pass (1024-bit key) header.d=1wt.eu header.i=@1wt.eu header.b=GmH2UP0S; arc=none smtp.client-ip=51.159.59.229
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=1wt.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=1wt.eu
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=1wt.eu; s=mail;
-	t=1776183800; bh=A9w41jfbeBcNMsPNcn43GbwXzCi67ge8k9Gp5bHo37k=;
-	h=From:Message-ID:From;
-	b=GmH2UP0S4F7NTFLQSPWUt+Y5+qVp/NHGAtFg4tdsJhORGacHG5wIrP2H3n0G6qrhA
-	 asVFgL6ZDuexsnNfzXdP3DhXk2ZLSPsICUhm0e5W70m+gHbNYdyxlh39Nobyhdma8Y
-	 bX+SSXby8ukWX0KhRqRJ4GXrFbxrnkp+CXl7YADs=
-Received: from 1wt.eu (ded1.1wt.eu [163.172.96.212])
-	by mta1.formilux.org (Postfix) with ESMTP id 0EAD9C2E94;
-	Tue, 14 Apr 2026 18:23:20 +0200 (CEST)
-Date: Tue, 14 Apr 2026 18:23:09 +0200
-From: Willy Tarreau <w@1wt.eu>
-To: Pavitra Jha <jhapavitra98@gmail.com>
-Cc: pabeni@redhat.com, chandrashekar.devegowda@intel.com,
-        linux-wwan@lists.linux.dev, netdev@vger.kernel.org,
-        stable@vger.kernel.org
-Subject: Re: [PATCH v2] net: wwan: t7xx: validate port_count against message
- length in t7xx_port_enum_msg_handler
-Message-ID: <ad5p7XlSOKoaQC5D@1wt.eu>
-References: <ad4-bTbjtxbUXDU9@1wt.eu>
- <20260414153201.1633720-1-jhapavitra98@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=t6VamhHNlUYQIR0nFwBvYEb9rbWiVLkI06Y2KsLmoR0ODVL7HvrznD/XfmXzkH91N1Ke0lptgCwEqKw2JvSIY82DKgNP9i+fH81fI3MaKd44hhpMXBPKAS12DS07J2HnTbC/BG5xQqPQhwzg28+0d8ezpPyqr79uqbGqJHO0QEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Jg1JabnE; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=3a0DWUaoW/JnQkGYGDLAFuXtJNUitULf7loQyMk66lE=; b=Jg1JabnESm66jdatAdoWAMVbtA
+	sEY/2zVnDTmwex5xzg+DQybfLyEI8h8Lbt8BS3n12WxfGo9AYC2DgqC7Y2viak/wTiZUEruLM0JUJ
+	6JyDECQaaJd3DIn88Dm7184vMKx3kmxlDDhTMzCxnePLVfH5T4xa9FKJ8bvncXjfwnfY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wCgsS-00G4so-AK; Tue, 14 Apr 2026 18:44:40 +0200
+Date: Tue, 14 Apr 2026 18:44:40 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net] net: pse-pd: fix kernel-doc function name for
+ pse_control_find_by_id()
+Message-ID: <7c20e672-c169-4d38-a617-84f9ad3fb5c2@lunn.ch>
+References: <20260414150948.744618-1-kory.maincent@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,128 +66,48 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260414153201.1633720-1-jhapavitra98@gmail.com>
-X-Spamd-Result: default: False [-2.16 / 15.00];
+In-Reply-To: <20260414150948.744618-1-kory.maincent@bootlin.com>
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[1wt.eu,none];
-	R_DKIM_ALLOW(-0.20)[1wt.eu:s=mail];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278541-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-278542-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[w@1wt.eu,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[1wt.eu:+];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[6];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,1wt.eu:dkim,1wt.eu:mid]
-X-Rspamd-Queue-Id: BCA1C3FC949
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 0866E3FCB02
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello,
-
-On Tue, Apr 14, 2026 at 11:31:56AM -0400, Pavitra Jha wrote:
-> t7xx_port_enum_msg_handler() uses the modem-supplied port_count field as
-> a loop bound over port_msg->data[] without checking that the message buffer
-> contains sufficient data. A modem sending port_count=65535 in a 12-byte
-> buffer triggers a slab-out-of-bounds read of up to 262140 bytes.
+On Tue, Apr 14, 2026 at 05:09:47PM +0200, Kory Maincent wrote:
+> The kernel-doc comment header incorrectly referenced the function
+> name pse_control_find_net_by_id() instead of the actual function name
+> pse_control_find_by_id(). Correct the function name in the documentation
+> to match the implementation.
 > 
-> Add a struct_size() check after extracting port_count and before the loop.
-> Pass msg_len to t7xx_port_enum_msg_handler() and use it to validate
-> the message size before accessing port_msg->data[].
-> Pass msg_len from both call sites: skb->len at the DPMAIF path after
-> skb_pull(), and the captured rt_feature->data_len at the handshake path.
-> 
-> Fixes: 39d439047f1d ("net: wwan: t7xx: Add control DMA interface")
-> Cc: stable@vger.kernel.org
-> Reported-by: Pavitra Jha <jhapavitra98@gmail.com>
-> Signed-off-by: Pavitra Jha <jhapavitra98@gmail.com>
+> Fixes: fc0e6db30941a ("net: pse-pd: Add support for reporting events")
+> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 
-Please note that you don't need the Reported-by tag when it's the same
-as the Signed-off-by one.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-Also, I'm noticing a few empty-line removals out of context below:
-
-> diff --git a/drivers/net/wwan/t7xx/t7xx_modem_ops.c b/drivers/net/wwan/t7xx/t7xx_modem_ops.c
-> index 7968e208d..d0559fe16 100644
-> --- a/drivers/net/wwan/t7xx/t7xx_modem_ops.c
-> +++ b/drivers/net/wwan/t7xx/t7xx_modem_ops.c
-> @@ -453,25 +453,25 @@ static int t7xx_parse_host_rt_data(struct t7xx_fsm_ctl *ctl, struct t7xx_sys_inf
->  {
->  	enum mtk_feature_support_type ft_spt_st, ft_spt_cfg;
->  	struct mtk_runtime_feature *rt_feature;
-> +	size_t feat_data_len;
->  	int i, offset;
->  
->  	offset = sizeof(struct feature_query);
->  	for (i = 0; i < FEATURE_COUNT && offset < data_length; i++) {
->  		rt_feature = data + offset;
-> -		offset += sizeof(*rt_feature) + le32_to_cpu(rt_feature->data_len);
-> -
-> +		feat_data_len = le32_to_cpu(rt_feature->data_len);
-> +		offset += sizeof(*rt_feature) + feat_data_len;
->  		ft_spt_cfg = FIELD_GET(FEATURE_MSK, core->feature_set[i]);
->  		if (ft_spt_cfg != MTK_FEATURE_MUST_BE_SUPPORTED)
->  			continue;
-> -
-
-here
-
->  		ft_spt_st = FIELD_GET(FEATURE_MSK, rt_feature->support_info);
->  		if (ft_spt_st != MTK_FEATURE_MUST_BE_SUPPORTED)
->  			return -EINVAL;
-> -
-
-Here, the original author probably left the line to highlight the return
-statement.
-
-> -		if (i == RT_ID_MD_PORT_ENUM || i == RT_ID_AP_PORT_ENUM)
-> -			t7xx_port_enum_msg_handler(ctl->md, rt_feature->data);
-> +		if (i == RT_ID_MD_PORT_ENUM || i == RT_ID_AP_PORT_ENUM) {
-> +			t7xx_port_enum_msg_handler(ctl->md, rt_feature->data,
-> +						   feat_data_len);
-> +		}
->  	}
-> -
-
-Here, why?
-
->  	return 0;
->  }
->  
-> diff --git a/drivers/net/wwan/t7xx/t7xx_port_ctrl_msg.c b/drivers/net/wwan/t7xx/t7xx_port_ctrl_msg.c
-> index ae632ef96..d984a688d 100644
-> --- a/drivers/net/wwan/t7xx/t7xx_port_ctrl_msg.c
-> +++ b/drivers/net/wwan/t7xx/t7xx_port_ctrl_msg.c
-> @@ -154,7 +161,6 @@ int t7xx_port_enum_msg_handler(struct t7xx_modem *md, void *msg)
->  
->  	return 0;
->  }
-> -
-
-This one as well.
-
->  static int control_msg_handler(struct t7xx_port *port, struct sk_buff *skb)
->  {
->  	const struct t7xx_port_conf *port_conf = port->port_conf;
-
-Better leave them untouched, it will keep the code as readable as it
-previously was and reduce the overall review effort.
-
-thanks,
-willy
+    Andrew
 
