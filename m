@@ -1,260 +1,169 @@
-Return-Path: <netdev+bounces-278435-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278436-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OL/7B00w3mnxogkAu9opvQ
-	(envelope-from <netdev+bounces-278435-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 14:17:17 +0200
+	id 2EYoJ68w3mnxogkAu9opvQ
+	(envelope-from <netdev+bounces-278436-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 14:18:55 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87C7D3F9E92
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 14:17:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 54D8D3F9EE6
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 14:18:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A70D330021F9
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 12:14:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DBF3F3023D91
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 12:18:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EBE8302756;
-	Tue, 14 Apr 2026 12:14:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B6543E51F8;
+	Tue, 14 Apr 2026 12:18:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lyKvlcM7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="acvcYm0Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA1123E5EE5
-	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 12:14:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67FEC35B633;
+	Tue, 14 Apr 2026 12:18:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776168863; cv=none; b=SC1KRwrHl1gVLXGZNOIOEewByVlzDRRa9w0b/E3Z+S0ufqJdpGcAK7vd2j8Z/t4MVBSXplhqhY1It2Lhce79kEpSPmZ5ei/NLDtCBf4EwGFjOPfO9fH364Eu8xftq3qLQHZLAibgeOSO2IlE82oP6FUE+lblQ+kkgCftK1zp4po=
+	t=1776169097; cv=none; b=Sbd0gDDIHOfI4UpKCSIfml+759tTdPL4T8XI863aeJFATSJa8hU0uDICPG7to+/9XZZO45GY73Dtu4s2BjhFX9tl5nNdGK1ErFj3bGIHnHW5k1UjZMvNpkmLfSu9wXG9WHZMYc9Bp3LZ+VTibVhASh/rraY6LiRg5SptbPt0S48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776168863; c=relaxed/simple;
-	bh=aoQqQPGJhc03KFS3wOJRIWobNOhGmxoRm0pwr6KLZKU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=tnevDjuxu0gJjMyWog9GExjGJHkFFkKI/Dk6zqXGgssMBxi0MAafpscETCFYnm1hTubrVK6RDWhHL2veylD4YJfrwv/gTULelsAM6IBdTBuEyrITx/f+DXnM2jDedm+ZyNUCDqG6JKD8AtOWcahYSEu9nYfaJQZQ9wEUUA40Bzo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lyKvlcM7; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1776168861; x=1807704861;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=aoQqQPGJhc03KFS3wOJRIWobNOhGmxoRm0pwr6KLZKU=;
-  b=lyKvlcM7Pkkrghc3S9Xai25MRE8Okjjq2nahUfzHi9ZyWTWBRwN8fxYM
-   NVBxxnj9R+MC8F4sIe2JpnKUxtMT3RwpnQd1JLocSBu0qq9+JvWZva2Lm
-   q+N9kZ9sYBHkrr51GIqIaidrXWN+VMZW5ElZU0yjK5/erSG9Xj50RsvzK
-   BOBwSwsW7mcgO+hWv7sCAmomd12Nu1Asllla6U52agyrCGuPSGdkx4B5/
-   FTyYc6Zt/w/zcJ5idKFQZqUQ9p2JJrIMRX1MEc5G/sqlaaYvaB4WI8NEI
-   mSW//o5/LyfTsgPIIfgJrJTVGo3GGZhmG0mAwY4XBgJ/Ylb6VoZBMYiSk
-   A==;
-X-CSE-ConnectionGUID: C1rsLnj3TOWu2paCfSnYdA==
-X-CSE-MsgGUID: A2UMQsRtSA+ojPZGZohnUA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11759"; a="79707432"
-X-IronPort-AV: E=Sophos;i="6.23,179,1770624000"; 
-   d="scan'208";a="79707432"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2026 05:14:21 -0700
-X-CSE-ConnectionGUID: XWSIhP6NQ06y/MK2T9SRjQ==
-X-CSE-MsgGUID: GNf6lb5bS/mOHE3aWRvTvg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,179,1770624000"; 
-   d="scan'208";a="223580738"
-Received: from boxer.igk.intel.com ([10.102.20.173])
-  by fmviesa009.fm.intel.com with ESMTP; 14 Apr 2026 05:14:18 -0700
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	magnus.karlsson@intel.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	przemyslaw.kitszel@intel.com,
-	jacob.e.keller@intel.com,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Subject: [PATCH iwl-net] i40e: keep q_vectors array in sync with channel count changes
-Date: Tue, 14 Apr 2026 14:14:05 +0200
-Message-Id: <20260414121405.631092-1-maciej.fijalkowski@intel.com>
-X-Mailer: git-send-email 2.38.1
+	s=arc-20240116; t=1776169097; c=relaxed/simple;
+	bh=4gn9oT3Io797IMn6UnyTmbEEIEuxg+1BvCtywthXl40=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=AnKw0WQD4e0kego428fbjdwAv6rKjk/I+jZLd2E64s5fhhqlh/dqS7RvQesNvErflAtzA2yDaO/hZuW5tmv3yJbrIlsEe/wsbM7/2YMCkTbz4SASvlBiq5K1fnMe65pfTaj/KeynyZWAjlQr8Xxym6YkYoFlPWu+KS6p1BnB9ts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=acvcYm0Q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18826C19425;
+	Tue, 14 Apr 2026 12:18:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776169097;
+	bh=4gn9oT3Io797IMn6UnyTmbEEIEuxg+1BvCtywthXl40=;
+	h=Date:From:To:Cc:Subject:From;
+	b=acvcYm0QPOU+ysbDfBpUPQ1wr/Fn+6i1NhhNlu6a2KzKH3yN0mrfTMLQyj5pzr/Vc
+	 0MYQ1xA+WyoQULBEuwLd0BjQfec/sy5RAfqSw5FMGf2fV/tjbsWR7pJ5HxjBCXRcK/
+	 rZciD0mgiwLVGbPKaVvwZH2sDro/rKZJfcKCbMns8hKiH1+4uqc2sPhK+2umhzoMdu
+	 HlDaKc4us9fxGuTecpRQF00XDZwm/cKgBy7SblfcpaPkGXvoIizdz8MXpozyRy/eja
+	 BCwN91FgZ1olRla/Dv1nTIRZqF/FY+FkBLLTXY+KjE89aMfqB1X5mVYOD/uK8A6G23
+	 vyErC0xDRqr0Q==
+Date: Tue, 14 Apr 2026 13:18:12 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Daniel Borkmann <daniel@iogearbox.net>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>, bpf <bpf@vger.kernel.org>,
+	Networking <netdev@vger.kernel.org>
+Cc: Joel Fernandes <joelagnelf@nvidia.com>,
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Next Mailing List <linux-next@vger.kernel.org>,
+	"Paul E. McKenney" <paulmck@kernel.org>
+Subject: linux-next: manual merge of the bpf-next tree with the origin tree
+Message-ID: <ad4whCJuB-viVAae@sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="ssHmiU8O+IQxzZ3+"
+Content-Disposition: inline
+X-Spamd-Result: default: False [-4.26 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278435-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-278436-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[nvidia.com,gmail.com,vger.kernel.org,kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maciej.fijalkowski@intel.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[intel.com:+];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_TLS_LAST(0.00)[];
+	TO_DN_ALL(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 87C7D3F9E92
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[broonie@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,sirena.org.uk:mid]
+X-Rspamd-Queue-Id: 54D8D3F9EE6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-For the main VSI, i40e_set_num_rings_in_vsi() always derives
-num_q_vectors from pf->num_lan_msix. At the same time, ethtool -L stores
-the user requested channel count in vsi->req_queue_pairs and the queue
-setup path uses that value for the effective number of queue pairs.
 
-This leaves queue and vector counts out of sync after shrinking channel
-count via ethtool -L. The active queue configuration is reduced, but the
-VSI still keeps the full PF-sized q_vector topology.
+--ssHmiU8O+IQxzZ3+
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-That mismatch breaks reconfiguration flows which rely on vector/NAPI
-state matching the effective channel configuration. In particular,
-toggling /sys/class/net/<dev>/threaded after reducing the channel count
-can hang, and later channel-count changes can fail because VSI reinit
-does not rebuild q_vectors to match the new vector count.
+Hi all,
 
-Fix this by making the main VSI num_q_vectors follow the effective
-requested channel count, capped by the available MSI-X vectors. Update
-i40e_vsi_reinit_setup() to rebuild q_vectors during VSI reinit so the
-vector topology is refreshed together with the ring arrays when channel
-count changes.
+Today's linux-next merge of the bpf-next tree got a conflict in:
 
-Keep alloc_queue_pairs unchanged and based on pf->num_lan_qps so the VSI
-retains its full queue capacity.
+  include/linux/rcupdate.h
 
-Selftest napi_threaded.py was originally used when Jakub reported hang
-on /sys/class/net/<dev>/threaded toggle. In order to make it pass on
-i40e, use persistent NAPI configuration for q_vector NAPIs so NAPI
-identity and threaded settings survive q_vector reallocation across
-channel-count changes. This is achieved by using netif_napi_add_config()
-when configuring q_vectors.
+between commit:
 
-$ export NETIF=ens259f1np1
-$ sudo -E env PATH="$PATH" ./tools/testing/selftests/drivers/net/napi_threaded.py
-TAP version 13
-1..3
-ok 1 napi_threaded.napi_init
-ok 2 napi_threaded.change_num_queues
-ok 3 napi_threaded.enable_dev_threaded_disable_napi_threaded
-Totals: pass:3 fail:0 xfail:0 xpass:0 skip:0 error:0
+  ad6ef775cbeff ("rcu-tasks: Document that RCU Tasks Trace grace periods no=
+w imply RCU grace periods")
 
-Reported-by: Jakub Kicinski <kuba@kernel.org>
-Closes: https://lore.kernel.org/intel-wired-lan/20260316133100.6054a11f@kernel.org/
-Fixes: d2a69fefd756 ("i40e: Fix changing previously set num_queue_pairs for PFs")
-Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
----
- drivers/net/ethernet/intel/i40e/i40e_main.c | 34 +++++++++++++++++----
- 1 file changed, 28 insertions(+), 6 deletions(-)
+=66rom the origin tree and commit:
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index 926d001b2150..5636ad71f940 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -11403,10 +11403,14 @@ static void i40e_service_timer(struct timer_list *t)
- static int i40e_set_num_rings_in_vsi(struct i40e_vsi *vsi)
- {
- 	struct i40e_pf *pf = vsi->back;
-+	u16 qps;
- 
- 	switch (vsi->type) {
- 	case I40E_VSI_MAIN:
- 		vsi->alloc_queue_pairs = pf->num_lan_qps;
-+		qps = vsi->req_queue_pairs ?
-+		      min_t(u16, vsi->req_queue_pairs, pf->num_lan_qps) :
-+		      pf->num_lan_qps;
- 		if (!vsi->num_tx_desc)
- 			vsi->num_tx_desc = ALIGN(I40E_DEFAULT_NUM_DESCRIPTORS,
- 						 I40E_REQ_DESCRIPTOR_MULTIPLE);
-@@ -11414,7 +11418,8 @@ static int i40e_set_num_rings_in_vsi(struct i40e_vsi *vsi)
- 			vsi->num_rx_desc = ALIGN(I40E_DEFAULT_NUM_DESCRIPTORS,
- 						 I40E_REQ_DESCRIPTOR_MULTIPLE);
- 		if (test_bit(I40E_FLAG_MSIX_ENA, pf->flags))
--			vsi->num_q_vectors = pf->num_lan_msix;
-+			vsi->num_q_vectors = max_t(int, 1,
-+						   min_t(int, qps, pf->num_lan_msix));
- 		else
- 			vsi->num_q_vectors = 1;
- 
-@@ -12043,7 +12048,8 @@ static int i40e_vsi_alloc_q_vector(struct i40e_vsi *vsi, int v_idx)
- 	cpumask_copy(&q_vector->affinity_mask, cpu_possible_mask);
- 
- 	if (vsi->netdev)
--		netif_napi_add(vsi->netdev, &q_vector->napi, i40e_napi_poll);
-+		netif_napi_add_config(vsi->netdev, &q_vector->napi,
-+				      i40e_napi_poll, v_idx);
- 
- 	/* tie q_vector and vsi together */
- 	vsi->q_vectors[v_idx] = q_vector;
-@@ -14265,12 +14271,27 @@ static struct i40e_vsi *i40e_vsi_reinit_setup(struct i40e_vsi *vsi)
- 
- 	pf = vsi->back;
- 
-+	if (test_bit(I40E_FLAG_MSIX_ENA, pf->flags)) {
-+		i40e_put_lump(pf->irq_pile, vsi->base_vector, vsi->idx);
-+		vsi->base_vector = 0;
-+	}
-+
- 	i40e_put_lump(pf->qp_pile, vsi->base_queue, vsi->idx);
- 	i40e_vsi_clear_rings(vsi);
- 
--	i40e_vsi_free_arrays(vsi, false);
-+	i40e_vsi_free_q_vectors(vsi);
-+	i40e_vsi_free_arrays(vsi, true);
- 	i40e_set_num_rings_in_vsi(vsi);
--	ret = i40e_vsi_alloc_arrays(vsi, false);
-+
-+	ret = i40e_vsi_alloc_arrays(vsi, true);
-+	if (ret)
-+		goto err_vsi;
-+
-+	/* Rebuild q_vectors during VSI reinit because the effective channel
-+	 * count may change num_q_vectors. Keep vector topology aligned with the
-+	 * queue configuration after ethtool's .set_channels() callback.
-+	 */
-+	ret = i40e_vsi_setup_vectors(vsi);
- 	if (ret)
- 		goto err_vsi;
- 
-@@ -14282,7 +14303,7 @@ static struct i40e_vsi *i40e_vsi_reinit_setup(struct i40e_vsi *vsi)
- 		dev_info(&pf->pdev->dev,
- 			 "failed to get tracking for %d queues for VSI %d err %d\n",
- 			 alloc_queue_pairs, vsi->seid, ret);
--		goto err_vsi;
-+		goto err_lump;
- 	}
- 	vsi->base_queue = ret;
- 
-@@ -14306,7 +14327,6 @@ static struct i40e_vsi *i40e_vsi_reinit_setup(struct i40e_vsi *vsi)
- 	return vsi;
- 
- err_rings:
--	i40e_vsi_free_q_vectors(vsi);
- 	if (vsi->netdev_registered) {
- 		vsi->netdev_registered = false;
- 		unregister_netdev(vsi->netdev);
-@@ -14316,6 +14336,8 @@ static struct i40e_vsi *i40e_vsi_reinit_setup(struct i40e_vsi *vsi)
- 	if (vsi->type == I40E_VSI_MAIN)
- 		i40e_devlink_destroy_port(pf);
- 	i40e_aq_delete_element(&pf->hw, vsi->seid, NULL);
-+err_lump:
-+	i40e_vsi_free_q_vectors(vsi);
- err_vsi:
- 	i40e_vsi_clear(vsi);
- 	return NULL;
--- 
-2.43.0
+  57b23c0f612dc ("bpf: Retire rcu_trace_implies_rcu_gp()")
 
+=66rom the bpf-next tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+diff --combined include/linux/rcupdate.h
+index 18a85c30fd4f3,bfa765132de85..0000000000000
+--- a/include/linux/rcupdate.h
++++ b/include/linux/rcupdate.h
+@@@ -205,15 -205,6 +205,6 @@@ static inline void exit_tasks_rcu_start
+  static inline void exit_tasks_rcu_finish(void) { }
+  #endif /* #else #ifdef CONFIG_TASKS_RCU_GENERIC */
+ =20
+- /**
+-  * rcu_trace_implies_rcu_gp - does an RCU Tasks Trace grace period imply =
+an RCU grace period?
+-  *
+-  * Now that RCU Tasks Trace is implemented in terms of SRCU-fast, a
+-  * call to synchronize_rcu_tasks_trace() is guaranteed to imply at least
+-  * one call to synchronize_rcu().
+-  */
+- static inline bool rcu_trace_implies_rcu_gp(void) { return true; }
+-=20
+  /**
+   * cond_resched_tasks_rcu_qs - Report potential quiescent states to RCU
+   *
+
+--ssHmiU8O+IQxzZ3+
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmneMIMACgkQJNaLcl1U
+h9Bpuwf/QKDAkJrSAPQ80+ExxzxCI8BNzZdRC05PUG52TynImnik0wsGYuaECe6t
+teQPkUVhzEa+TsIIYhNOtHy25LV7yNmnWrlxY2x14cp+5sLeePqkgkiQVqhcOYyZ
+rZru/5i4M0vqgnaHOG9iC5AaFmOan8BIwkL+LF1p+6bmgzasqHuK8Wjm2s5aTfsk
+H5+mv+1Rm5RxACcX7bup/ak7QquTJPSKqpBNuXjiJRJ+ccK1kN8vgRN6sXzakRx7
+8iLsOmZQ1VRpy1JjyIP1QQMmH2SyaFGrcY3piHV4YHWRGQYExwoSmpWCppxhzlkE
+MZk4/NOcZBJoYFgmS1+qk7Snc4NZFg==
+=rWQ8
+-----END PGP SIGNATURE-----
+
+--ssHmiU8O+IQxzZ3+--
 
