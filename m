@@ -1,173 +1,207 @@
-Return-Path: <netdev+bounces-278467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278468-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IM0nMclL3mmwqAkAu9opvQ
-	(envelope-from <netdev+bounces-278467-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 16:14:33 +0200
+	id OCevCvpL3mkzqAkAu9opvQ
+	(envelope-from <netdev+bounces-278468-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 16:15:22 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5551A3FAF53
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 16:14:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 82E173FAF77
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 16:15:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5AD493064948
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 14:09:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 38A92302170B
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 14:10:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1F193E717A;
-	Tue, 14 Apr 2026 14:09:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 895163E7179;
+	Tue, 14 Apr 2026 14:09:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U1EaK8ua"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eUipLdF+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EE6E3DBD59
-	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 14:09:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776175744; cv=none; b=gMFqHMfaSxcXx5i0K2nPx36Qy9r/hjLR6A2CxAdOTewrCTp1EsfmaSda3+M66wTxsEXTNEvOALuFEDeywX2MBfs82nzv3lp4HSmfqo6oV/XwzdhbzCOl3B0WdZUr9d9hoQY5qkuD/eJ9CSjsxabKRoJmouVVbckRilFq69WlveM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776175744; c=relaxed/simple;
-	bh=ZxZWJI8qqfzCDhQbBvHw11oPHk45TsukiZ+I1BwbZBo=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=HWkDT40ZLKNxjtziTu5nphX2OvpqIMUXSRh2boZGSlNNAnmOsWAnu32DbhlVdnjo1At3whZXPVM6Yy7byboPj/gEamuSm55n9pVZSd8+U0CbNZGNYNSM23HBvI78KiMNt+pJqip2kjmvIBq9EP9I+o41yZunk1htRyzgJ4Azlso=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U1EaK8ua; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFD7DC19425;
-	Tue, 14 Apr 2026 14:09:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776175744;
-	bh=ZxZWJI8qqfzCDhQbBvHw11oPHk45TsukiZ+I1BwbZBo=;
-	h=From:Date:Subject:To:Cc:From;
-	b=U1EaK8uaOIEaRDvFnhCDxrClEYZPnNEOObNFPqWT38CCV6LpArpBW27pHOhjs8xpY
-	 9lXg5oT+/wGbyZpZw80tVHLODI0PsOqoGSqcR0evklDSv5shC+hy09rAu6+VZ0T4sg
-	 AZtMq3d2k+CgLkNFqyUydTu8MI5vYw35ntTgQHFoH5TdQSprjx7NoN4f9gmLDEyXyC
-	 HulQcpKv3bliqEowIIOs83KiyOPtgKbm5oUih1CfvkTn6DHpiSioU9psb7q6RZow0G
-	 7Pgq8z5T6EtGI9NmKq6gvbAI5LgKuYQJyPFoxBSGhp2ld0E6vjQa+QGR86icTsJqCi
-	 li+nRO3EMBnyA==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Tue, 14 Apr 2026 16:08:52 +0200
-Subject: [PATCH net v2] net: airoha: Wait for NPU PPE configuration to
- complete in airoha_ppe_offload_setup()
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C74A3E5EE5
+	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 14:09:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776175799; cv=pass; b=YqKHgmNuEGiPUrhedIoOJvm18BJSHmwEr8+EZdsKeOokcRB5hWt9Gv5win8nTBqlt3Bj6VGJw+aQapSwXGy1WZ54YKJCaAhGLphev08Lz4mneBTkLAN2oq/iOyQMZ4NsQIrZS408oxSe3wckQdIpQw2633uH1aEQW1w2F/FUiT8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776175799; c=relaxed/simple;
+	bh=nvHkXaKy+A4a3zjmlxYTM7ZEfGs/MAzu/4aP88j9k0U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=L//M6J6OlBaqkdC4ndZ2sO9ypYhCKFeOOIHdN93g6hlTltC1jlpK/stjbS0o70S6BYMD8mIri5ty2VJfjo5dkh+xXwB/94yzone3EGYwgH48IzYvk7aQU8/b4mKoIt74PrxcILLDjYmGjk+w5TFA7p4edrjPmzzgS85yKdTaC6w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eUipLdF+; arc=pass smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-488971db0fdso55974195e9.0
+        for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 07:09:57 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776175796; cv=none;
+        d=google.com; s=arc-20240605;
+        b=RchJZPjdMIIyAjFuArnTloXFoZsTMlAmmJqvbyGYlQ5IsK0F50wHYxESowm8rXPi6k
+         dB/X2J61o7xs3maQjRBI2j6sL6j8OqzAVlfTD1+lWg3aRYhBAh+TYbdYHUeiO69qgbir
+         98Bv8VWN8lsX9h2ZSJBU+zs5ZEcNh/DmqaZWg5gCON0PGtsBJPgJdSxBo4J+0MIt25jY
+         ee/+a06v0bHar4RKMMnwMVhOuY+/oxB2fz5wBislEpfz06QExCQcwqRcFR0GoCaqQiEs
+         YoS+HJA+WqbINZEo1Bt93wWF7Id6pOWSpDa3344OMUT991p3p2pH6+Zd4fFMIhs0gct4
+         MuDQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=n8OdkUuaCi8mFEcW4isBiQRI/EoubzWNeked/wrjNEo=;
+        fh=ueLkhL3fs2XB6NE6u0SEknG/EGAH6QQ1j+k2tAmzy1c=;
+        b=ghr6NPsGzwKxJC6AF5He+4te7ggQW111YNqSBSVk1jFoK8toI0oQNzPVNBpRSj5qLZ
+         nMQF51TKq8HdzDJH76M/DDS7k8O6S/K2hIKXivtBeQsmacmjwr6m6zQ1a2d0JE1ybPRW
+         adodueAp98VzhMB5esrhzPmFGvvOwEwAJXTxO3ArgEWhwIDBlhLamJ2eiLW2i/c1BAfg
+         lpWs4xxKL1x3nEA68ALwO7As/IzmVV2qPLSd8tBdl8IxXloJaQCDU737ghv6EMfBg/Pk
+         VP5wEqke8cDBLOJWFxNlSC1gv2MQrdaYVvuIdWAOyJRpr56dd46FpJt31GmQtdNV9c/h
+         iksg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776175796; x=1776780596; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=n8OdkUuaCi8mFEcW4isBiQRI/EoubzWNeked/wrjNEo=;
+        b=eUipLdF+z7g89ab356OR86U5Ekyr0FCnM4g1xKC3P8S99Biooamez/BjQ48bWBVhV9
+         xxEgyg8MZ1LU1uCZ+1dDR54VmNnmAQULNoVioLzx0Bf49J71sSujW1z+/B2W+Vi3ZB5z
+         8CzfjrBbrE2qPCzVp7mLvbcPe1BU6rQQDRKoVmisTfzYtXE+6HxQhDyxbdDrP/syx/qP
+         5QNXBqbtJE2xdUvOLxj+Qdgd2InmjMj41Cz9BAENmeFu9dmH+nvwlGzoNq2g5diqJD0U
+         vi8/osUiwepEuKvn8uUC5gqBQk2RnzCfR7L7gN1W+iMCNf2xHvIdR7Uo6QEz3II25OX4
+         HjnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776175796; x=1776780596;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=n8OdkUuaCi8mFEcW4isBiQRI/EoubzWNeked/wrjNEo=;
+        b=JsjSM2d1Fu5aY9KCAuNKnWDDYcVXTkpDkpL9mzpjBrVVjmeI+xckm602Hgzxc+v9yT
+         VYtds87zsI8j+cTBKalsH0F6xa9B5ZdASbjuGdpBwbDfufzONV5FvAXQgqBpVPKq2gzG
+         Ihn+UMgMYjI8NhKCUnPefEF+oh8oWWISgizlFViW1Yrwr5ebBOaJY8qRLOjwt2O3+Gs0
+         Cgt1uxc6KoVwzE25zPM8vGmwiF/kPJgeDC1iWlRKTr+tAdUlUvQPrfSG90ZXENMQNfww
+         ihXrXUY+zbAywJ+2DO7vij7vEewA5QgeoJa7IHewDNPV2ip75pAAut6bnBRaLOi3jLzb
+         ixfQ==
+X-Forwarded-Encrypted: i=1; AFNElJ8uPsLJ4WdJeFIsLISxOfbhVWSUCYHs5c10mwqEqajMZWgcHpaWVmqb+EDeqniRWpHV0iPhIw0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXaHjX8oKDSEPdy6R0znEOTGgXwD204wQFas4WOitvbTEVeDkN
+	KTVYv5+UHWqXnrFGYJtUl+diT50J15dXa7DzYtGmQQEh43qjecwh+/mLqXLN8Z3Z/plm+Ug59IJ
+	a6sC9AQZjKmHnccEs2YDhpKVE0sT3dak=
+X-Gm-Gg: AeBDietQqB5GgABHMzUV18T0BmrrUi8MSherqts6zLvEEBkAUgJl1TftlmqvOhtu7BM
+	1r5K9C9TmQag2p0Icw+DDtp3vgCQXpwU9VMnIIgkmEXZWhq5NFcqzyiqWAgIt1MM5d271S6MLBb
+	88UhmAqezIk9wM84zCjn4P18Q+/gxY7Y5fouLP9fn1U5hdc6eQMNgIoMKznKuhF4rIPc+OV8CPz
+	ymeSAVfLKcgs8rvQGzf6xOWLe1zj7N6cN7VHRbd90mNQcia3gcpBnvg2B5YS+IvUxUodQlS7xc4
+	eAlUUz0wVOi/wzStqALJnwY8Md0waFZ9kHEd2OkDIUODQwl2y5cfst+x7GqMmR53GUf2nmQjPhV
+	Vq4gFgqXzBkp7AL5AG21aDqFAyA==
+X-Received: by 2002:a05:600d:8449:b0:486:fdba:f5db with SMTP id
+ 5b1f17b1804b1-488d664f29emr197490795e9.0.1776175796268; Tue, 14 Apr 2026
+ 07:09:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260414-airoha-wait-for-npu-config-offload-setup-v2-1-5a9bf6d43aee@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/5WNQQ6CMBBFr0Jm7RjagFFX3sOwmNApTCQd0hbUE
- O5uww1cvv/z/9sgcRROcK82iLxKEg0F7KmCfqQwMIorDLa2l7oxFkmijoRvkoxeI4Z5wV6DlwH
- V+0nJYeK8zGhurm5aa8vIQbmbI3v5HKonBM7QlXCUlDV+D/1qjup/02rQoG+4JrLUumv7eHEMP
- J01DtDt+/4DwctuKuYAAAA=
-X-Change-ID: 20260412-airoha-wait-for-npu-config-offload-setup-19d04522412d
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-X-Mailer: b4 0.14.3
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+References: <ad4whCJuB-viVAae@sirena.org.uk>
+In-Reply-To: <ad4whCJuB-viVAae@sirena.org.uk>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Tue, 14 Apr 2026 07:09:44 -0700
+X-Gm-Features: AQROBzAq8LwGSoUQB6Tp7PVEnWgUkhAM1WnjY5UlIcDEYXRlptGcA56OQDX1H8w
+Message-ID: <CAADnVQLz6-LK4+qad_XqEZXrspttpe4b49jRZ6wUCgEhJeTvgw@mail.gmail.com>
+Subject: Re: linux-next: manual merge of the bpf-next tree with the origin tree
+To: Mark Brown <broonie@kernel.org>
+Cc: Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov <ast@kernel.org>, 
+	Andrii Nakryiko <andrii@kernel.org>, bpf <bpf@vger.kernel.org>, 
+	Networking <netdev@vger.kernel.org>, Joel Fernandes <joelagnelf@nvidia.com>, 
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
+	Linux Next Mailing List <linux-next@vger.kernel.org>, "Paul E. McKenney" <paulmck@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-278468-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[iogearbox.net,kernel.org,vger.kernel.org,nvidia.com,gmail.com];
+	TO_DN_ALL(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278467-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MISSING_XM_UA(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alexeistarovoitov@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5551A3FAF53
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 82E173FAF77
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-In order to properly enable flowtable hw offloading, poll
-REG_PPE_FLOW_CFG register in airoha_ppe_offload_setup routine and
-wait for NPU PPE configuration triggered by ppe_init callback to complete
-before running airoha_ppe_hw_init().
+On Tue, Apr 14, 2026 at 5:18=E2=80=AFAM Mark Brown <broonie@kernel.org> wro=
+te:
+>
+> Hi all,
+>
+> Today's linux-next merge of the bpf-next tree got a conflict in:
+>
+>   include/linux/rcupdate.h
+>
+> between commit:
+>
+>   ad6ef775cbeff ("rcu-tasks: Document that RCU Tasks Trace grace periods =
+now imply RCU grace periods")
+>
+> from the origin tree and commit:
+>
+>   57b23c0f612dc ("bpf: Retire rcu_trace_implies_rcu_gp()")
+>
+> from the bpf-next tree.
+>
+> I fixed it up (see below) and can carry the fix as necessary. This
+> is now fixed as far as linux-next is concerned, but any non trivial
+> conflicts should be mentioned to your upstream maintainer when your tree
+> is submitted for merging.  You may also want to consider cooperating
+> with the maintainer of the conflicting tree to minimise any particularly
+> complex conflicts.
+>
+> diff --combined include/linux/rcupdate.h
+> index 18a85c30fd4f3,bfa765132de85..0000000000000
+> --- a/include/linux/rcupdate.h
+> +++ b/include/linux/rcupdate.h
+> @@@ -205,15 -205,6 +205,6 @@@ static inline void exit_tasks_rcu_start
+>   static inline void exit_tasks_rcu_finish(void) { }
+>   #endif /* #else #ifdef CONFIG_TASKS_RCU_GENERIC */
+>
+> - /**
+> -  * rcu_trace_implies_rcu_gp - does an RCU Tasks Trace grace period impl=
+y an RCU grace period?
+> -  *
+> -  * Now that RCU Tasks Trace is implemented in terms of SRCU-fast, a
+> -  * call to synchronize_rcu_tasks_trace() is guaranteed to imply at leas=
+t
+> -  * one call to synchronize_rcu().
+> -  */
+> - static inline bool rcu_trace_implies_rcu_gp(void) { return true; }
+> -
 
-Fixes: 00a7678310fe3 ("net: airoha: Introduce flowtable offload support")
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
-Changes in v2:
-- Check for both REG_PPE_PPE_FLOW_CFG(0) and REG_PPE_PPE_FLOW_CFG(1) to
-  complete.
-- Link to v1: https://lore.kernel.org/r/20260412-airoha-wait-for-npu-config-offload-setup-v1-1-f4e0aa2a5d85@kernel.org
----
- drivers/net/ethernet/airoha/airoha_ppe.c | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+Right. I mentioned it in my bpf-next PR.
 
-diff --git a/drivers/net/ethernet/airoha/airoha_ppe.c b/drivers/net/ethernet/airoha/airoha_ppe.c
-index 62cfffb4f0e5..684c8ae9576f 100644
---- a/drivers/net/ethernet/airoha/airoha_ppe.c
-+++ b/drivers/net/ethernet/airoha/airoha_ppe.c
-@@ -1335,6 +1335,29 @@ static struct airoha_npu *airoha_ppe_npu_get(struct airoha_eth *eth)
- 	return npu;
- }
- 
-+static int airoha_ppe_wait_for_npu_init(struct airoha_eth *eth)
-+{
-+	int err;
-+	u32 val;
-+
-+	/* PPE_FLOW_CFG default register value is 0. Since we reset FE
-+	 * during the device probe we can just check the configured value
-+	 * is not 0 here.
-+	 */
-+	err = read_poll_timeout(airoha_fe_rr, val, val, USEC_PER_MSEC,
-+				100 * USEC_PER_MSEC, false, eth,
-+				REG_PPE_PPE_FLOW_CFG(0));
-+	if (err)
-+		return err;
-+
-+	if (airoha_ppe_is_enabled(eth, 1))
-+		err = read_poll_timeout(airoha_fe_rr, val, val, USEC_PER_MSEC,
-+					100 * USEC_PER_MSEC, false, eth,
-+					REG_PPE_PPE_FLOW_CFG(1));
-+
-+	return err;
-+}
-+
- static int airoha_ppe_offload_setup(struct airoha_eth *eth)
- {
- 	struct airoha_npu *npu = airoha_ppe_npu_get(eth);
-@@ -1348,6 +1371,11 @@ static int airoha_ppe_offload_setup(struct airoha_eth *eth)
- 	if (err)
- 		goto error_npu_put;
- 
-+	/* Wait for NPU PPE configuration to complete */
-+	err = airoha_ppe_wait_for_npu_init(eth);
-+	if (err)
-+		goto error_npu_put;
-+
- 	ppe_num_stats_entries = airoha_ppe_get_total_num_stats_entries(ppe);
- 	if (ppe_num_stats_entries > 0) {
- 		err = npu->ops.ppe_init_stats(npu, ppe->foe_stats_dma,
+But how come you're saying it was discovered "today" ?
 
----
-base-commit: b9d8b856689d2b968495d79fe653d87fcb8ad98c
-change-id: 20260412-airoha-wait-for-npu-config-offload-setup-19d04522412d
+Paul's commit ad6ef775cbeff was committed to rcu tree on Mar 30,
+while Kumar's 57b23c0f612dc was committed to bpf-next on Apr 7.
 
-Best regards,
--- 
-Lorenzo Bianconi <lorenzo@kernel.org>
+"today" is April 14.
 
+My only explanation is that rcu tree was not in linux-next until today?!
 
