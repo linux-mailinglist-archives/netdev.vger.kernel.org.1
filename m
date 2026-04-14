@@ -1,81 +1,70 @@
-Return-Path: <netdev+bounces-278499-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278496-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IZEPDgpd3mn+CQAAu9opvQ
-	(envelope-from <netdev+bounces-278499-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 17:28:10 +0200
+	id QJs2OTtc3mlfCQAAu9opvQ
+	(envelope-from <netdev+bounces-278496-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 17:24:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC5413FBCE9
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 17:28:09 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CE773FBBF6
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 17:24:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4E8BE3043AD5
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 15:15:28 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B52273053297
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 15:13:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2FB03E9F8B;
-	Tue, 14 Apr 2026 15:15:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFF9D3E959D;
+	Tue, 14 Apr 2026 15:13:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="H42WZCDH"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Y0oFLH8x"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7132C3E95A8;
-	Tue, 14 Apr 2026 15:15:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43AC83E715C;
+	Tue, 14 Apr 2026 15:13:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776179720; cv=none; b=JBQJ6lrPTtDkTTUZauUlws1qA+qRMHHMSGPzktH+LRpIb+gCk3H8F1wNHI4Z6fTKZujpPcp6PpNDBtCmh781JrZEvPVujhWfPFzZYfyrpGIWDR8cp6iOhDXYUEKXZC2VC4fQJ0e7cucdtIGhRoTXjKOTd209IGbnqgrV7mYPNaI=
+	t=1776179621; cv=none; b=knrVaBzpaj1+sNzT4t0jmzL+oCwr2PL6qg+kfPKHj33+lqTOQkPe1Xk/yHcYs42aGHWrJKhr5RI+VT/iNN3uT0ic+UKXXwIcVBNRJJCAqn+DRN8h8cwd50uLzAwMkDFrT0l5i6rus3W1Gqc2n0YR9PJWklcMPyLAGNxfIordrms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776179720; c=relaxed/simple;
-	bh=Di1JA4Ram1MiQF1FyaOBMzcfg/g+eA4bIa7w+mZnfYo=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tqvNrurSM24YkStWbVz3sbBLIKCmt+smN/6mJcxRsauZSPqDpw1XEKxH0pUc5WWFs/q4s5nhQMgG18QNK5rgxljg14oG23rLgpLfTwhYI02/aljmDLkoQqFXNkHgHjvalpo7P2Qp06Y0lbQ2amfE7vfpZ7DzziJ8+UHh8xajfro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=H42WZCDH; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1231)
-	id 64E0B20B6F08; Tue, 14 Apr 2026 08:15:11 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 64E0B20B6F08
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1776179711;
-	bh=rLZz0PkYAQ7B4IWNnTCFmEXHXhEdRzFN3farQz9kRRA=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=H42WZCDHrqJZfUKiEmY5AUspv0fEKNA5ews5vBOPD+Kun4RdgDKUS6iDQh4NbjX+/
-	 jA/L/EsqWaByPh43BjeFLfun5Cg9i3lbJG0wGKqM9/9NDz2mMOMlmrSazueo2soN7A
-	 jG9XIAzIpM+/2A2EmRQTzsoCz2+nD7fX15+SHGeo=
-From: Aditya Garg <gargaditya@linux.microsoft.com>
-To: kys@microsoft.com,
-	haiyangz@microsoft.com,
-	wei.liu@kernel.org,
-	decui@microsoft.com,
-	longli@microsoft.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	kotaranov@microsoft.com,
-	horms@kernel.org,
-	ssengar@linux.microsoft.com,
-	jacob.e.keller@intel.com,
-	dipayanroy@linux.microsoft.com,
-	ernis@linux.microsoft.com,
-	shirazsaleem@microsoft.com,
-	kees@kernel.org,
-	sbhatta@marvell.com,
-	leitao@debian.org,
+	s=arc-20240116; t=1776179621; c=relaxed/simple;
+	bh=Vz9rKL54iiHymEiW3uv51q84eEtAHKuWK73E/syCT54=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MMoGT+0rLSIotuAbCZ6mgKGWMgF/MQ6ql2GumWhQ83+VHDCD6locI4s8+SeyQVRNKFm8L0SuSNA0aXuD9ZGyl6TwdH/jw0dwEnHYvz4uf8MAMEPzon4JXPtpYfjVjcvUqjUssUjxdWRdcI2BKWdwv+3LAkxt0u903OEdIk6F/dg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Y0oFLH8x; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id B027A4E42990;
+	Tue, 14 Apr 2026 15:13:38 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 746DE60410;
+	Tue, 14 Apr 2026 15:13:38 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id AC0621045127E;
+	Tue, 14 Apr 2026 17:13:35 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1776179617; h=from:subject:date:message-id:to:cc:mime-version:
+	 content-transfer-encoding; bh=SC94qSGZ3uavMZ8B7XaCT46R2BgoL8muSdeO4dwNkx4=;
+	b=Y0oFLH8xQRI0z0LMnsor1c1F3XqxDT3IrcWjWVM5XuuopyWo1lc4Eb6VCaiLY9op8iXwYp
+	t1kQod75Z3wn9Xiismg87nV45obwNL1gG+W0zN/HTF3jS7EXc1paN7t7txWybW13Zk4R1I
+	4569/CN2+prsug6UH1nZ9xx3krDCHxAJVd0eC7uQtsiHBaZW8iWJfPxmZcANwmIsPjl36z
+	lykkcZTJ3jFsu9tReQxFcSpkobj/J7pUo6vWCVKLC7ic4KBLJJ2BJuWAdmydKWETzZOTSX
+	lIrmNaZ0JyaxsmPZtETezo/pzoJmXwV1IHSLSE8UKu1cGhDowUglsZmGkoylOg==
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: "Kory Maincent (Dent Project)" <kory.maincent@bootlin.com>,
+	Jakub Kicinski <kuba@kernel.org>,
 	netdev@vger.kernel.org,
-	linux-hyperv@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	bpf@vger.kernel.org,
-	gargaditya@microsoft.com,
-	gargaditya@linux.microsoft.com
-Subject: [PATCH net-next 1/2] net: mana: Use per-queue allocation for tx_qp to reduce allocation size
-Date: Tue, 14 Apr 2026 08:13:29 -0700
-Message-ID: <20260414151456.687506-2-gargaditya@linux.microsoft.com>
-X-Mailer: git-send-email 2.43.7
-In-Reply-To: <20260414151456.687506-1-gargaditya@linux.microsoft.com>
-References: <20260414151456.687506-1-gargaditya@linux.microsoft.com>
+	linux-kernel@vger.kernel.org
+Cc: Carlo Szelinsky <github@szelinsky.de>,
+	thomas.petazzoni@bootlin.com,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net] net: pse-pd: fix out-of-bounds bitmap access in pse_isr() on 32-bit
+Date: Tue, 14 Apr 2026 17:13:30 +0200
+Message-ID: <20260414151331.745552-1-kory.maincent@bootlin.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,228 +72,114 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
-	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278499-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[gargaditya@linux.microsoft.com,netdev@vger.kernel.org];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-278496-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.microsoft.com:+];
-	TO_DN_NONE(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kory.maincent@bootlin.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.992];
-	RCPT_COUNT_TWELVE(0.00)[27];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.microsoft.com:dkim,linux.microsoft.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: DC5413FBCE9
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,bootlin.com:email,bootlin.com:dkim,bootlin.com:mid]
+X-Rspamd-Queue-Id: 8CE773FBBF6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Convert tx_qp from a single contiguous array allocation to per-queue
-individual allocations. Each mana_tx_qp struct is approximately 35KB.
-With many queues (e.g., 32/64), the flat array requires a single
-contiguous allocation that can fail under memory fragmentation.
+In pse_isr(), notifs_mask was declared as a single unsigned long on the
+stack (32 bits on 32-bit architectures). For PSE controllers with more
+than 32 ports, this causes two problems:
 
-Change mana_tx_qp *tx_qp to mana_tx_qp **tx_qp (array of pointers),
-allocating each queue's mana_tx_qp individually via kvzalloc. This
-reduces each allocation to ~35KB and provides vmalloc fallback,
-avoiding allocation failure due to fragmentation.
+- map_event callbacks could wrote bit positions >= 32 via
+  *notifs_mask |= BIT(i), which is undefined behaviour on a 32-bit
+  unsigned long and corrupts adjacent stack memory.
 
-Signed-off-by: Aditya Garg <gargaditya@linux.microsoft.com>
-Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+- for_each_set_bit(i, &notifs_mask, pcdev->nr_lines) treats
+  &notifs_mask as a multi-word bitmap and reads beyond the single
+  unsigned long when nr_lines > BITS_PER_LONG.
+
+Fix this by moving notifs_mask out of the stack and into struct pse_irq
+as a dynamically allocated bitmap. It is sized with
+BITS_TO_LONGS(pcdev->nr_lines) words in devm_pse_irq_helper(), so it
+is always wide enough regardless of the host word size.
+
+Fixes: fc0e6db30941a ("net: pse-pd: Add support for reporting events")
+Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 ---
- .../net/ethernet/microsoft/mana/mana_bpf.c    |  2 +-
- drivers/net/ethernet/microsoft/mana/mana_en.c | 49 ++++++++++++-------
- .../ethernet/microsoft/mana/mana_ethtool.c    |  2 +-
- include/net/mana/mana.h                       |  2 +-
- 4 files changed, 33 insertions(+), 22 deletions(-)
+ drivers/net/pse-pd/pse_core.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_bpf.c b/drivers/net/ethernet/microsoft/mana/mana_bpf.c
-index 7697c9b52ed3..b5e9bb184a1d 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_bpf.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_bpf.c
-@@ -68,7 +68,7 @@ int mana_xdp_xmit(struct net_device *ndev, int n, struct xdp_frame **frames,
- 		count++;
- 	}
+diff --git a/drivers/net/pse-pd/pse_core.c b/drivers/net/pse-pd/pse_core.c
+index 3beaaaeec9e1f..2ced837f375d2 100644
+--- a/drivers/net/pse-pd/pse_core.c
++++ b/drivers/net/pse-pd/pse_core.c
+@@ -1170,6 +1170,7 @@ struct pse_irq {
+ 	struct pse_controller_dev *pcdev;
+ 	struct pse_irq_desc desc;
+ 	unsigned long *notifs;
++	unsigned long *notifs_mask;
+ };
  
--	tx_stats = &apc->tx_qp[q_idx].txq.stats;
-+	tx_stats = &apc->tx_qp[q_idx]->txq.stats;
- 
- 	u64_stats_update_begin(&tx_stats->syncp);
- 	tx_stats->xdp_xmit += count;
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-index 09a53c977545..49ee77b0939a 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-@@ -355,9 +355,9 @@ netdev_tx_t mana_start_xmit(struct sk_buff *skb, struct net_device *ndev)
- 	if (skb_cow_head(skb, MANA_HEADROOM))
- 		goto tx_drop_count;
- 
--	txq = &apc->tx_qp[txq_idx].txq;
-+	txq = &apc->tx_qp[txq_idx]->txq;
- 	gdma_sq = txq->gdma_sq;
--	cq = &apc->tx_qp[txq_idx].tx_cq;
-+	cq = &apc->tx_qp[txq_idx]->tx_cq;
- 	tx_stats = &txq->stats;
- 
- 	BUILD_BUG_ON(MAX_TX_WQE_SGL_ENTRIES != MANA_MAX_TX_WQE_SGL_ENTRIES);
-@@ -614,7 +614,7 @@ static void mana_get_stats64(struct net_device *ndev,
- 	}
- 
- 	for (q = 0; q < num_queues; q++) {
--		tx_stats = &apc->tx_qp[q].txq.stats;
-+		tx_stats = &apc->tx_qp[q]->txq.stats;
- 
- 		do {
- 			start = u64_stats_fetch_begin(&tx_stats->syncp);
-@@ -2284,21 +2284,26 @@ static void mana_destroy_txq(struct mana_port_context *apc)
- 		return;
- 
- 	for (i = 0; i < apc->num_queues; i++) {
--		debugfs_remove_recursive(apc->tx_qp[i].mana_tx_debugfs);
--		apc->tx_qp[i].mana_tx_debugfs = NULL;
-+		if (!apc->tx_qp[i])
-+			continue;
-+
-+		debugfs_remove_recursive(apc->tx_qp[i]->mana_tx_debugfs);
-+		apc->tx_qp[i]->mana_tx_debugfs = NULL;
- 
--		napi = &apc->tx_qp[i].tx_cq.napi;
--		if (apc->tx_qp[i].txq.napi_initialized) {
-+		napi = &apc->tx_qp[i]->tx_cq.napi;
-+		if (apc->tx_qp[i]->txq.napi_initialized) {
- 			napi_synchronize(napi);
- 			napi_disable_locked(napi);
- 			netif_napi_del_locked(napi);
--			apc->tx_qp[i].txq.napi_initialized = false;
-+			apc->tx_qp[i]->txq.napi_initialized = false;
- 		}
--		mana_destroy_wq_obj(apc, GDMA_SQ, apc->tx_qp[i].tx_object);
-+		mana_destroy_wq_obj(apc, GDMA_SQ, apc->tx_qp[i]->tx_object);
- 
--		mana_deinit_cq(apc, &apc->tx_qp[i].tx_cq);
-+		mana_deinit_cq(apc, &apc->tx_qp[i]->tx_cq);
- 
--		mana_deinit_txq(apc, &apc->tx_qp[i].txq);
-+		mana_deinit_txq(apc, &apc->tx_qp[i]->txq);
-+
-+		kvfree(apc->tx_qp[i]);
- 	}
- 
- 	kfree(apc->tx_qp);
-@@ -2307,7 +2312,7 @@ static void mana_destroy_txq(struct mana_port_context *apc)
- 
- static void mana_create_txq_debugfs(struct mana_port_context *apc, int idx)
+ /**
+@@ -1247,7 +1248,6 @@ static int pse_set_config_isr(struct pse_controller_dev *pcdev, int id,
+ static irqreturn_t pse_isr(int irq, void *data)
  {
--	struct mana_tx_qp *tx_qp = &apc->tx_qp[idx];
-+	struct mana_tx_qp *tx_qp = apc->tx_qp[idx];
- 	char qnum[32];
+ 	struct pse_controller_dev *pcdev;
+-	unsigned long notifs_mask = 0;
+ 	struct pse_irq_desc *desc;
+ 	struct pse_irq *h = data;
+ 	int ret, i;
+@@ -1257,14 +1257,15 @@ static irqreturn_t pse_isr(int irq, void *data)
  
- 	sprintf(qnum, "TX-%d", idx);
-@@ -2346,7 +2351,7 @@ static int mana_create_txq(struct mana_port_context *apc,
- 	int err;
- 	int i;
+ 	/* Clear notifs mask */
+ 	memset(h->notifs, 0, pcdev->nr_lines * sizeof(*h->notifs));
++	bitmap_zero(h->notifs_mask, pcdev->nr_lines);
+ 	mutex_lock(&pcdev->lock);
+-	ret = desc->map_event(irq, pcdev, h->notifs, &notifs_mask);
+-	if (ret || !notifs_mask) {
++	ret = desc->map_event(irq, pcdev, h->notifs, h->notifs_mask);
++	if (ret || bitmap_empty(h->notifs_mask, pcdev->nr_lines)) {
+ 		mutex_unlock(&pcdev->lock);
+ 		return IRQ_NONE;
+ 	}
  
--	apc->tx_qp = kzalloc_objs(struct mana_tx_qp, apc->num_queues);
-+	apc->tx_qp = kzalloc_objs(struct mana_tx_qp *, apc->num_queues);
- 	if (!apc->tx_qp)
+-	for_each_set_bit(i, &notifs_mask, pcdev->nr_lines) {
++	for_each_set_bit(i, h->notifs_mask, pcdev->nr_lines) {
+ 		unsigned long notifs, rnotifs;
+ 		struct pse_ntf ntf = {};
+ 
+@@ -1340,6 +1341,11 @@ int devm_pse_irq_helper(struct pse_controller_dev *pcdev, int irq,
+ 	if (!h->notifs)
  		return -ENOMEM;
  
-@@ -2366,10 +2371,16 @@ static int mana_create_txq(struct mana_port_context *apc,
- 	gc = gd->gdma_context;
- 
- 	for (i = 0; i < apc->num_queues; i++) {
--		apc->tx_qp[i].tx_object = INVALID_MANA_HANDLE;
-+		apc->tx_qp[i] = kvzalloc_obj(*apc->tx_qp[i]);
-+		if (!apc->tx_qp[i]) {
-+			err = -ENOMEM;
-+			goto out;
-+		}
++	h->notifs_mask = devm_kcalloc(dev, BITS_TO_LONGS(pcdev->nr_lines),
++				      sizeof(*h->notifs_mask), GFP_KERNEL);
++	if (!h->notifs_mask)
++		return -ENOMEM;
 +
-+		apc->tx_qp[i]->tx_object = INVALID_MANA_HANDLE;
- 
- 		/* Create SQ */
--		txq = &apc->tx_qp[i].txq;
-+		txq = &apc->tx_qp[i]->txq;
- 
- 		u64_stats_init(&txq->stats.syncp);
- 		txq->ndev = net;
-@@ -2387,7 +2398,7 @@ static int mana_create_txq(struct mana_port_context *apc,
- 			goto out;
- 
- 		/* Create SQ's CQ */
--		cq = &apc->tx_qp[i].tx_cq;
-+		cq = &apc->tx_qp[i]->tx_cq;
- 		cq->type = MANA_CQ_TYPE_TX;
- 
- 		cq->txq = txq;
-@@ -2416,7 +2427,7 @@ static int mana_create_txq(struct mana_port_context *apc,
- 
- 		err = mana_create_wq_obj(apc, apc->port_handle, GDMA_SQ,
- 					 &wq_spec, &cq_spec,
--					 &apc->tx_qp[i].tx_object);
-+					 &apc->tx_qp[i]->tx_object);
- 
- 		if (err)
- 			goto out;
-@@ -3242,7 +3253,7 @@ static int mana_dealloc_queues(struct net_device *ndev)
- 	 */
- 
- 	for (i = 0; i < apc->num_queues; i++) {
--		txq = &apc->tx_qp[i].txq;
-+		txq = &apc->tx_qp[i]->txq;
- 		tsleep = 1000;
- 		while (atomic_read(&txq->pending_sends) > 0 &&
- 		       time_before(jiffies, timeout)) {
-@@ -3261,7 +3272,7 @@ static int mana_dealloc_queues(struct net_device *ndev)
- 	}
- 
- 	for (i = 0; i < apc->num_queues; i++) {
--		txq = &apc->tx_qp[i].txq;
-+		txq = &apc->tx_qp[i]->txq;
- 		while ((skb = skb_dequeue(&txq->pending_skbs))) {
- 			mana_unmap_skb(skb, apc);
- 			dev_kfree_skb_any(skb);
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-index f2d220b371b5..f5901e4c9816 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-@@ -251,7 +251,7 @@ static void mana_get_ethtool_stats(struct net_device *ndev,
- 	}
- 
- 	for (q = 0; q < num_queues; q++) {
--		tx_stats = &apc->tx_qp[q].txq.stats;
-+		tx_stats = &apc->tx_qp[q]->txq.stats;
- 
- 		do {
- 			start = u64_stats_fetch_begin(&tx_stats->syncp);
-diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
-index a078af283bdd..60b4a4146ea2 100644
---- a/include/net/mana/mana.h
-+++ b/include/net/mana/mana.h
-@@ -505,7 +505,7 @@ struct mana_port_context {
- 	bool tx_shortform_allowed;
- 	u16 tx_vp_offset;
- 
--	struct mana_tx_qp *tx_qp;
-+	struct mana_tx_qp **tx_qp;
- 
- 	/* Indirection Table for RX & TX. The values are queue indexes */
- 	u32 *indir_table;
+ 	ret = devm_request_threaded_irq(dev, irq, NULL, pse_isr,
+ 					IRQF_ONESHOT | irq_flags,
+ 					irq_name, h);
 -- 
 2.43.0
 
