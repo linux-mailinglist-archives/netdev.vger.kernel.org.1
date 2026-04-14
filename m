@@ -1,179 +1,169 @@
-Return-Path: <netdev+bounces-278375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278376-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cM6WFswN3mnRmQkAu9opvQ
-	(envelope-from <netdev+bounces-278375-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 11:50:04 +0200
+	id 2KxGNDYR3mnRmQkAu9opvQ
+	(envelope-from <netdev+bounces-278376-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 12:04:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3D253F8371
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 11:50:03 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CAF23F864C
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 12:04:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4D82C308C1A5
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 09:47:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8CE4530D2B66
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 09:58:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DB6F3CA4A9;
-	Tue, 14 Apr 2026 09:47:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9FA13CAE90;
+	Tue, 14 Apr 2026 09:58:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IDB0Mgid";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="UZq20/WJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rsKyQ3fb"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12A9C3ACA52
-	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 09:47:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776160036; cv=none; b=LPXOicdvtqX+q/Ccd5gHuUe/ar96q24HwFyCiucVrcuRtHh6hXDnOXwLtUFCPEvK58/Z63nsjyg4OOM1tc3TFpvJ/4d94X30KQ2d/zUHzjO9mZdMMvC/FKSSSCnz5mby48pqmVz3MtmQ342bMhtO58hhVeg/jGO4CJkRbuecF1s=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776160036; c=relaxed/simple;
-	bh=bv5AeWRl6aqaLxTnVdjqykd7H/2wPJRUbc+/MvSkyxc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HizXJI9w+q46rBXc3ZdF0QrvFJI3azFvwW4ckVYMmakV+z+bGneszXDjfnX5oJVBqB5gQQsW1N5YRu06d2hmkabSIc/Hy1VwuVcAgcbzyowJmbO8hpHZs27YPH4B5fhdZZk4ePtdkdoQc1beGjR9PRHPuqrN8U2vBjl8hU8afiY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IDB0Mgid; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=UZq20/WJ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1776160033;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oFua1/KhgIXdwvS4cvD1iQ3GFhM2dsTn/9+KosrTEag=;
-	b=IDB0Mgidfd1ERE8ECMjkVa5PBlfP+mftZKBOJJp1W1uzf3TWMADurkkyr5TGGPKv4EynCw
-	atlLmL9R7hXsZkYy10K9SwDXkXmuOZGTzMYtG+D8KuKJ144YNFJsY2sWLIwUbHWtWfVqeV
-	Di0bdnJeO+VXMXus/3FLjFT5m83vOtU=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-619-ag_-g-V5Oqqv5FRTwfPE-Q-1; Tue, 14 Apr 2026 05:47:11 -0400
-X-MC-Unique: ag_-g-V5Oqqv5FRTwfPE-Q-1
-X-Mimecast-MFC-AGG-ID: ag_-g-V5Oqqv5FRTwfPE-Q_1776160031
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-43ea728e38cso306796f8f.2
-        for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 02:47:11 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B11B3C1414
+	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 09:58:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.170
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776160686; cv=pass; b=d0bdBKm/lNsKSA4dfzeJ5iCFdrTszty723xzJSZJAQwDXjxXYyi3q9/uk4XqxIdT/ftUjd1hqTciM8Om50SHoWUZLaQQPhTeF2HGZQAFNV/fgqQrgkPPLiMmGL4pjriqtMGaZy0qqDpkewFdazrQAi4XmGbnuU4NKcf9Kf4zE8E=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776160686; c=relaxed/simple;
+	bh=9G4aNW0qSYXCAoZGlzimeLIoaqXuWiYpcS90B5BpCe0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XaooMCDDvuKCageZRm+EF5pcjbCKOEX0JyOAhwjpQEtT0sBbhxEkRZJ9XhCm6F+NT+SX7wyciC7fgwtNCYu0gn5QBZD+DBdouY6sJHiVuGvtW2g5+2HZqWjFtQ85RLl3ayrOjCQGae1xvdLnV+FeaebXLcQyVJ+p5xPDdSxDNTI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rsKyQ3fb; arc=pass smtp.client-ip=209.85.160.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-506aa68065eso41973171cf.1
+        for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 02:58:05 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776160684; cv=none;
+        d=google.com; s=arc-20240605;
+        b=hMaMWY59jl72GYJFEcnAZ1aRfjiA2JZ4DYhytXs3bNg1sEHAGU+3Py0EyjLvfSXnlS
+         3n7/nulA1tf2vi2HSLzgwZsNJHB31sb5FRise4jrRVpDnOiddlZ4Ed3GO+iy9jRvM6fm
+         9/Se5kdFS4K5aQSXpiYYKzPutDuybG3LYpSOUdHSWD7CQ3kf6fbcwDIKxmJtznhdZEdB
+         Si0cLpzM9HRoW5+r2M2mk3L4q2BkDeud35kTEQJ1nvxPdPB2Pxc35bvKW1v0dCcQ8HuY
+         C9W0gatwiXTMg5IWVIhL2Da60LoAmNNNlKHwzK1++e+KcjWtB6QEf8GmH//mXSU/J9Es
+         RXfw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=Lt2L91R0t0j4a+adrKa4HTX+KJG0QWfVScgNiR2mXBA=;
+        fh=zWJa+rro9PZHuTnUo20D9GcPeJedeuG2D7mnbRz4WYo=;
+        b=LZyYu3FRLwlDkV4B8c2yIWSozwxye/JLikevUzeBZjW4ug1pceMfh3frj064sg8tt7
+         VZimtr/w54G8RnW217Sjr9ijsPFsEaPEhPYJjcc81sr1STy/CuqO77Nh7GoTh0hRwUfx
+         YmKa4a/2/ZGg/iAWbPehn74lPuir4Z/wUpBGfTE/Wj6JLyFLQFxPKWDT5Z2p2xAJGpW1
+         +8S+LA7VdR9oFg25fZDDV+z0hVq+HRuXFovT0vUdrVNHzPHozL6hM0xKwtjk1Hg0E6d7
+         7Mrex1klbB8FVvMHmpzbgoDkQ8Le16oj/yiZeMeig2UvZHWeL+Wx7lJykPdvsvBtVGn2
+         OYhQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1776160031; x=1776764831; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=oFua1/KhgIXdwvS4cvD1iQ3GFhM2dsTn/9+KosrTEag=;
-        b=UZq20/WJIQ3sBx/QUx8NBDXGQG2Qn27OakOmsXMglzBadJnJzIb9eC8gxJSo4qU4B9
-         0s6eIxQIFveDAgegRZx2ODLwqdt9QsIy3n1ctMQoBSNhlKt5iDbiwU1kOF9vl+bZmYsv
-         ++/WTDYYuVEP9X+H0lyPZbQDifY1eImOITlcNCcmQsl02WY5+vYdBu3WFF6pnOm6l2b0
-         q0bUvWvUSjTngwQ4hDkxJ9ElFsea3eMr1/qbgutfcpDpLqPod9lrTfugrlxaDETefQRy
-         9lhuFXhUaUbIPQSetpFDVxmCKO1rFloLCOXKvgSyXebVLqRQfV74LxMvfLB1JrHRrlEQ
-         c8dA==
+        d=google.com; s=20251104; t=1776160684; x=1776765484; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Lt2L91R0t0j4a+adrKa4HTX+KJG0QWfVScgNiR2mXBA=;
+        b=rsKyQ3fbbP8gNxAx7veUXSMDFp+lTdueolZ7ogKJj1W/BfO4COxVwBxhJwKOr3hVGf
+         NaCseoibiFNuhc+10wvrCWxgMQEvEWJTJ9Q7XnSIjapuAH4xKJKSzKOA0v2htfk2zmBu
+         So4pKEhI3ZdnnpXdUeTYEFCutOscA6e4COkRF1wzb5OQj0Zi+4gf6M1pGhGMXVykHug4
+         Djuu68FcYqUapF0+iALxCEaQNajaYf7ALOrSmdxANlXEJd5LOUuQCQpyQDr1/0NQNKc3
+         Rh5JswBLr2Du7deSD4AEFgE8cizQ4lwWpS+98MJxjRHrCO0o+KQo8f/3rViqPnIyNdOZ
+         gCJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776160031; x=1776764831;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=oFua1/KhgIXdwvS4cvD1iQ3GFhM2dsTn/9+KosrTEag=;
-        b=TWd7fcuQkKSluDd5/5gB/fzi65vgDBT09KHZLsa527amnwiKCdQJoeW9sr50LU14BM
-         VvJpDGfAudhAqvBOMH1opIChGMcCqdD73XS8U+uH2HJbKDydX88ruIk4BlXoOgniRuWJ
-         Aqn8zw7R+Be+yi68cBno4Vnds7FyvIiRj/vJ3EaWbHVeo9h+ljNSXSlqb8jl0ylxggod
-         2wqZOPPM1sQXOppehk/vZ3m106kpMcwebKnUIq0ukdi99ya2AqJAc2xluEmisdwzYzNP
-         EmLQGRgsqCRneyUDBDtWpDtn79gSomHRp2soteJ7zTvxH5XesubSRB8GtodwMi4Yb+m+
-         LtAg==
-X-Forwarded-Encrypted: i=1; AFNElJ9hP+wIoBLh78yzaLTZQbYuxq6F24HMXYXRIAMymz5OOHofjnS5cQYQRH1yVB57OyDWlaJ8bqA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy6PX2CXF5PgmxJc/Dm3YE3td8Mya4aJ6jK5cXkBp7lPECg5qqv
-	bVr+2+gLowazO2QbGJuIZqQKCsMipiju/lZC4cb+YMVxM1Dy44LlQTnYy1ta0jHtKvVS8m2uW0J
-	x1n04h9i/xTUCIINSQ5B6nMBqRTwuP1EgsQxjhU9FSa+tIR9xvUDypfSNSA==
-X-Gm-Gg: AeBDiesaP8vjz3kTo3w9Orb2Q+YN8FGxu7ALxCIC7nhJyDIyUomaFnmvoiPQg6n/s6k
-	G/yLss8fOD6aNjwI1RfofOVOD0SLNERerhu+/FqVuIl49b43tyFXN5GVR33WuVaxQs5wSx1N+c6
-	OWadJIvk4r305bHdmrhb3Rw4+Fil6Kl+mPRAfXOrMmkQLflD4P9qfazsPyEvkEmmTvlvURYcooE
-	gXBbdpNHRU8D9wPGjAqZJsEU9KSgrNE6WU13sWBqssdv5Y2TDQkJhzZZjhOikb5xSKr+nZ4mHpg
-	Vw5PVHnBhgssMn7djwTrXYeQm4OkNU2iGabbZHni0iECete4UYvmMHNc3XRXrzgf3uErsGCUC1Y
-	z7t+0fgtsTmPlSN2C/h8Gc4fK4pJxYBgBc0f0NOkotlpkz8XiQvEBPNDA
-X-Received: by 2002:a05:600c:c108:b0:488:c282:e78c with SMTP id 5b1f17b1804b1-488d684bd3amr159160475e9.19.1776160030510;
-        Tue, 14 Apr 2026 02:47:10 -0700 (PDT)
-X-Received: by 2002:a05:600c:c108:b0:488:c282:e78c with SMTP id 5b1f17b1804b1-488d684bd3amr159160155e9.19.1776160029969;
-        Tue, 14 Apr 2026 02:47:09 -0700 (PDT)
-Received: from [192.168.88.32] ([216.128.11.125])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488ede1513csm42116795e9.2.2026.04.14.02.47.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 Apr 2026 02:47:09 -0700 (PDT)
-Message-ID: <a3974cae-728d-4eb6-8bfa-f926ed1c49ce@redhat.com>
-Date: Tue, 14 Apr 2026 11:47:08 +0200
+        d=1e100.net; s=20251104; t=1776160684; x=1776765484;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Lt2L91R0t0j4a+adrKa4HTX+KJG0QWfVScgNiR2mXBA=;
+        b=CbCfB8EuGrUElhCD+Ga1FPWDeqXtq4MLVnCyOGPf9GrswcCQOhzw0ZtZVt91qmx750
+         R6O0jN8SHRS/tNJcZw2r5PqtqNhXcPxRj/PIf4sxbLK0v25pRTIBMn8of7ml26NgsYKF
+         okF3eH726nM6CPd1gooW4ihn09WrUfMv1RYEhRa3bGkN57dfpi8i3J1CTC2s4bE5sOO4
+         jIuDtOhNWe0fsCZtwh3JhLAVXVXA9nZznyewiUxfQuZii8t4h8dlDgne4leVru1WEBG0
+         n5y2NQMrt1b1L2ebc4wPgXGlSNvzgy/XpnFIGZK6tJ1ODnMiCyuX2nDTQcP5hCvHsld9
+         68ng==
+X-Forwarded-Encrypted: i=1; AFNElJ8CjK3LVHQG0/HJjDfowODLYLtWTyIO9SVvQWHOiDUBAL19Pn8yc3nALUuM7pp2JOEKUvc9OeE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxiPJ1tAyYzRgjybjPGN94x8hUCp2ucytfYM6BYTc9l5+vTYoU+
+	z3wuPfoAIv46O9CaW0pbXdztxMYTLQU4WnPlu7e0/o9jNdgXpLT4k1tMrSfr48DLLX3l+O6vXP3
+	mH03U3RtRSz41tZqpZ10vvnd9KZ6GiVZrbfKUobn3
+X-Gm-Gg: AeBDiev8RK/UfDPRf6oIB+wcsYyRCilF2ZykFTiYhpIGLvVoraARW3a+3/tOXWKR4B3
+	gtSLGZLdgRilE4esgxgjsLXTm3hntxRU7g1smEXdBCk95T35GCcc/19qk1MrrZbNT4dtMUiZdXA
+	7sUV6L7AGaRRD7Xq0Moiu7IJ+MDXgUBocxLFsH9+zWnuwG3+vzQGqlaWFl1GwTr+OZp1y1Zffkf
+	SFOMGPCVRVp6xiFhFzR1NelV6HmjnK7kfwwjkvMn1BNHK43rcH9okfmX1GmNkjHl3oVL4Wu+PQy
+	fUVZbVaIQRkTQ5KhbnVaF97biQ9sW78CStUAYl/wYt1U69KrIg0B1eCcIktHPEpw47b2krMc3sK
+	IQ1TaaAk=
+X-Received: by 2002:ac8:590a:0:b0:50b:4537:2e21 with SMTP id
+ d75a77b69052e-50dd5c10684mr241979191cf.45.1776160683955; Tue, 14 Apr 2026
+ 02:58:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: usb: cdc-phonet: fix skb frags[] overflow in
- rx_complete()
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- linux-usb@vger.kernel.org, netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, stable <stable@kernel.org>
-References: <2026041134-dreamboat-buddhism-d1ec@gregkh>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <2026041134-dreamboat-buddhism-d1ec@gregkh>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <adkMqgP6QeBPgqP9@p100> <20260411052037.2013228-1-kuniyu@google.com>
+ <20260411130958.70202bab@pumpkin> <49c05cd8-5ad0-4015-8f55-fed3416784bf@gmx.de>
+ <20260414103633.4d5fe92a@pumpkin>
+In-Reply-To: <20260414103633.4d5fe92a@pumpkin>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 14 Apr 2026 02:57:52 -0700
+X-Gm-Features: AQROBzD2w-k7YonaYKfDIbemD_J7tzVfxbt-N8Q_GrDjDbdtgzVEkik3UF74vmc
+Message-ID: <CANn89iJv59ZEeaTCY28emRPr2LGAD42hukmLnYU-KfJJs052xQ@mail.gmail.com>
+Subject: Re: [PATCH] net: Optimize flush calculation in inet_gro_receive()
+To: David Laight <david.laight.linux@gmail.com>
+Cc: Helge Deller <deller@gmx.de>, Kuniyuki Iwashima <kuniyu@google.com>, deller@kernel.org, 
+	davem@davemloft.net, dsahern@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-parisc@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278375-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-278376-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[gmx.de,google.com,kernel.org,davemloft.net,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
 	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linuxfoundation.org:email,lunn.ch:email]
-X-Rspamd-Queue-Id: C3D253F8371
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 2CAF23F864C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 4/11/26 1:01 PM, Greg Kroah-Hartman wrote:
-> A malicious USB device claiming to be a CDC Phonet modem can overflow
-> the skb_shared_info->frags[] array by sending an unbounded sequence of
-> full-page bulk transfers.
-> 
-> Drop the skb and increment the length error when the frag limit is
-> reached.  This matches the same fix that commit f0813bcd2d9d ("net:
-> wwan: t7xx: fix potential skb->frags overflow in RX path") did for the
-> t7xx driver.
-> 
-> Cc: Andrew Lunn <andrew+netdev@lunn.ch>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: stable <stable@kernel.org>
-> Assisted-by: gregkh_clanker_t1000
-> Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+On Tue, Apr 14, 2026 at 2:36=E2=80=AFAM David Laight
+<david.laight.linux@gmail.com> wrote:
 
-It looks like the fixes tag should be:
+> The network stack is supposed to ensure that all receive packets are
+> aligned to that IP header is on a 4-byte boundary.
+> This typically requires the ethernet receive buffer be 4n+2 aligned.
+> Unfortunately there is some ethernet hardware that requires 4n aligned
+> buffers (often on SoC devices with cpu that fault misaligned accesses).
+> (Just writing two bytes of garbage before the frame solves the issue.)
 
-Fixes: 87cf65601e17 ("USB host CDC Phonet network interface driver")
+This is mostly true, but depends on NET_IP_ALIGN,
 
-Right?
+On x86, this constant was changed to 0 back in 2010.
 
-/P
+commit ea812ca1b06113597adcd8e70c0f84a413d97544
+Author: Alexander Duyck <alexander.h.duyck@intel.com>
+Date:   Tue Jun 29 18:38:00 2010 +0000
 
+    x86: Align skb w/ start of cacheline on newer core 2/Xeon Arch
 
