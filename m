@@ -1,134 +1,190 @@
-Return-Path: <netdev+bounces-278326-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278327-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6P5OLmHy3WmMlQkAu9opvQ
-	(envelope-from <netdev+bounces-278326-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 09:53:05 +0200
+	id eNZJF8703WlolgkAu9opvQ
+	(envelope-from <netdev+bounces-278327-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 10:03:26 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C12A3F6C41
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 09:53:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C2EC3F6E2D
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 10:03:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2B84D301FA62
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 07:52:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1C59A300FC76
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 08:00:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D069B386C22;
-	Tue, 14 Apr 2026 07:52:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A754738B147;
+	Tue, 14 Apr 2026 08:00:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="C9MBp3L1"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="DouCmozL"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F175386C2A
-	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 07:52:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7685938AC97;
+	Tue, 14 Apr 2026 08:00:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776153178; cv=none; b=r12O2PAynvVSNhQYpHkCd7w8RSBalV3PhKlMnD5HODO+P0QlJvlipUWLEc9WQ0hI+dQKm3bKOW0gPoO+srvkRjTFKkaVVeJLY4Pawf0whRpgSJiNfetJ9/7fJR3lkr1zme2IG5/NODtShJrKnnnHrAtQLwSx+P0NMvgqhw6f0oU=
+	t=1776153636; cv=none; b=MFPfm6ECZdjhlr/Kmg02wyf3a5V3q9mmDsUDnjmbSgf/zN/fuWiT3ArbS2dBKnVKJkNanEuE81rvTOFfgLzmd1SI/6TTnbZyypY3H25O4gZg0T2Y5vF2hrnI+VaDImwyE2kczv0D+Wd9FUrFj86gJdOE8yLB0NkFUxzLCZ0ZDsE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776153178; c=relaxed/simple;
-	bh=V4KG5wElUlezmm/yj1BYoN4o9YUHIwTu2s72ur4KbfE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=C1jBX1MaL5XaaKdmCmegFH/IM0JUemEk+mzugKrrRwoGgzNOW1sHcEOGp/wCsNy67YRDRVv/mZ1Ewt1orGIEdQxKh3cAB/N721FGm2t4BhMOHIGEshEEkxT8qHyFTxA/PAc9wb9CFrMl9vro+nUyLo25GgzIvZdeuRPkxNI32Q0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=C9MBp3L1; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
-	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References;
-	bh=LXhy0xtXR5CdHT8zZ2R+BWAYxXUsO6P0r/n1Iimw8NA=; b=C9MBp3L1g0FWuVPKUJB5+jP0a+
-	8YfOPFU5x/5Wo4YhPZJz8Mz6stLOA6en18aF9lRtJjHRQmc0s1nowNz90UwdlxDxUKGKISnOyXQ/6
-	BkyQCnK7LGp7MNaQbAxp9ziz2FwV/AH8h5F+GQE9yUln7Tje2a+fetkP+QyuBd6ffbOIYp7TZm/4t
-	SoaMaG/YGomrd9uFECiK9Yjf+XT2P9OFz3kG8d0xB7/4gJjB98PLCNbvqGUfePVIXt+GQoNgwM4MK
-	oF7ThdUlT/Oeg0HCQmz28b597iO2PJBAzIITdPmK3bPFg0cPiQeVSy7P07cczYTY7sXwCGMADE2/U
-	EFf4XMvg==;
-Received: from localhost ([127.0.0.1])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1wCYZm-000CXZ-1T;
-	Tue, 14 Apr 2026 09:52:50 +0200
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org,
-	dw@davidwei.uk,
-	pabeni@redhat.com,
-	razor@blackwall.org
-Subject: [PATCH net-next] MAINTAINERS: Add netkit selftest files
-Date: Tue, 14 Apr 2026 09:52:49 +0200
-Message-ID: <20260414075249.611608-1-daniel@iogearbox.net>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1776153636; c=relaxed/simple;
+	bh=wVp6VFTURygsoghzYoYKFP8ZTFf9WBviBiJBhkIUNAM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iPYNR3s/kgNsXFf3lor/MPf8DsQMRd7wy91apm3Y5FAH1Jr4Jr+Yc7z/Wzt3c3/Wmqa9SdscLJwrkQkkrEAHinQe7jt+XP29hFcDiGaa0tGk+vcGtuIqPiSn6Xglkueke4d+88or9MeWtApuzv98J60lCqxM+Vou0kVEzjcGkJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=DouCmozL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1922C19425;
+	Tue, 14 Apr 2026 08:00:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1776153636;
+	bh=wVp6VFTURygsoghzYoYKFP8ZTFf9WBviBiJBhkIUNAM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=DouCmozLwuDvvUGnIMpqz0RM3dfCWjXbeibZx/ghMTjGwjW/c8XS5RUuVETaXBPAB
+	 KAg6/HcgBzBDtA+8G3sobBBUQ+aADKKK6j0mo7SoA12I18pmJdG5PziSWRlXKN4oPY
+	 rjIvhmTqjCzzD3eUE+FgBlyp2zPisfgq/i69k/Ac=
+Date: Tue, 14 Apr 2026 10:00:06 +0200
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	stable <stable@kernel.org>
+Subject: Re: [Intel-wired-lan] [PATCH net] idpf: fix double free and
+ use-after-free in aux device error paths
+Message-ID: <2026041432-tapestry-condition-22ff@gregkh>
+References: <2026041116-retail-bagginess-250f@gregkh>
+ <afefe8b5-5bd9-4019-9d12-5ee2a7f577a2@molgen.mpg.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: Clear (ClamAV 1.4.3/27971/Tue Apr 14 08:24:44 2026)
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <afefe8b5-5bd9-4019-9d12-5ee2a7f577a2@molgen.mpg.de>
+X-Spamd-Result: default: False [3.84 / 15.00];
+	MID_END_EQ_FROM_USER_PART(4.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[iogearbox.net,reject];
-	R_DKIM_ALLOW(-0.20)[iogearbox.net:s=default2302];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linuxfoundation.org,none];
+	R_DKIM_ALLOW(-0.20)[linuxfoundation.org:s=korg];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-278326-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-278327-lists,netdev=lfdr.de];
+	SEM_URIBL_UNKNOWN_FAIL(0.00)[mpg.de:server fail,intel.com:server fail,davemloft.net:server fail,lunn.ch:server fail,linuxfoundation.org:server fail];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	DKIM_TRACE(0.00)[iogearbox.net:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[linuxfoundation.org:+];
+	MISSING_XM_UA(0.00)[];
+	RSPAMD_EMAILBL_FAIL(0.00)[andrew.lunn.ch:query timed out,edumazet.google.com:query timed out];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
+	SEM_URIBL_FRESH15_UNKNOWN_FAIL(0.00)[linuxfoundation.org:server fail,davemloft.net:server fail,lunn.ch:server fail,intel.com:server fail,mpg.de:server fail];
+	FROM_NEQ_ENVFROM(0.00)[gregkh@linuxfoundation.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[iogearbox.net:dkim,iogearbox.net:email,iogearbox.net:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:email]
-X-Rspamd-Queue-Id: 1C12A3F6C41
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:email,intel.com:email,linuxfoundation.org:dkim,linuxfoundation.org:email,mpg.de:email,davemloft.net:email]
+X-Rspamd-Queue-Id: 0C2EC3F6E2D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The following selftest files are related to netkit and should have
-netkit folks in Cc for review:
+On Tue, Apr 14, 2026 at 08:54:55AM +0200, Paul Menzel wrote:
+> Dear Greg,
+> 
+> 
+> Thank you for the patch.
+> 
+> Am 11.04.26 um 12:12 schrieb Greg Kroah-Hartman:
+> > When auxiliary_device_add() fails in idpf_plug_vport_aux_dev() or
+> > idpf_plug_core_aux_dev(), the err_aux_dev_add label calls
+> > auxiliary_device_uninit() and falls through to err_aux_dev_init.  The
+> > uninit call will trigger put_device(), which invokes the release
+> > callback (idpf_vport_adev_release / idpf_core_adev_release) that frees
+> > iadev.  The fall-through then reads adev->id from the freed iadev for
+> > ida_free() and double-frees iadev with kfree().
+> > 
+> > Free the IDA slot and clear the back-pointer before uninit, while adev
+> > is still valid, then return immediately.
+> > 
+> > Commit 65637c3a1811 65637c3a1811 ("idpf: fix UAF in RDMA core aux dev
+> 
+> The commit hash is pasted twice.
 
-  - tools/testing/selftests/bpf/prog_tests/tc_netkit.c
-  - tools/testing/selftests/drivers/net/hw/nk_qlease.py
-  - tools/testing/selftests/net/nk_qlease.py
+Argh, when I cut/paste from my terminal that happened, my fault.
 
-Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
----
- [ on top of https://lore.kernel.org/netdev/20260413220809.604592-1-daniel@iogearbox.net/ ]
+> > deinitialization") fixed the same use-after-free in the matching unplug
+> > path in this file but missed both probe error paths.
+> > 
+> > Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
+> > Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> > Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+> > Cc: "David S. Miller" <davem@davemloft.net>
+> > Cc: Eric Dumazet <edumazet@google.com>
+> > Cc: Jakub Kicinski <kuba@kernel.org>
+> > Cc: Paolo Abeni <pabeni@redhat.com>
+> > Cc: stable <stable@kernel.org>
+> > Fixes: be91128c579c ("idpf: implement RDMA vport auxiliary dev create, init, and destroy")
+> > Fixes: f4312e6bfa2a ("idpf: implement core RDMA auxiliary dev create, init, and destroy")
+> > Assisted-by: gregkh_clanker_t1000
+> > Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> > ---
+> > Note, these cleanup paths are messy, but I couldn't see a simpler way
+> > without a lot more rework, so I choose the simple way :)
+> > 
+> >   drivers/net/ethernet/intel/idpf/idpf_idc.c | 6 ++++++
+> >   1 file changed, 6 insertions(+)
+> > 
+> > diff --git a/drivers/net/ethernet/intel/idpf/idpf_idc.c b/drivers/net/ethernet/intel/idpf/idpf_idc.c
+> > index 7e4f4ac92653..b7d6b08fc89e 100644
+> > --- a/drivers/net/ethernet/intel/idpf/idpf_idc.c
+> > +++ b/drivers/net/ethernet/intel/idpf/idpf_idc.c
+> > @@ -90,7 +90,10 @@ static int idpf_plug_vport_aux_dev(struct iidc_rdma_core_dev_info *cdev_info,
+> >   	return 0;
+> >   err_aux_dev_add:
+> > +	ida_free(&idpf_idc_ida, adev->id);
+> > +	vdev_info->adev = NULL;
+> >   	auxiliary_device_uninit(adev);
+> > +	return ret;
+> >   err_aux_dev_init:
+> >   	ida_free(&idpf_idc_ida, adev->id);
+> >   err_ida_alloc:
+> > @@ -228,7 +231,10 @@ static int idpf_plug_core_aux_dev(struct iidc_rdma_core_dev_info *cdev_info)
+> >   	return 0;
+> >   err_aux_dev_add:
+> > +	ida_free(&idpf_idc_ida, adev->id);
+> > +	cdev_info->adev = NULL;
+> >   	auxiliary_device_uninit(adev);
+> > +	return ret;
+> >   err_aux_dev_init:
+> >   	ida_free(&idpf_idc_ida, adev->id);
+> >   err_ida_alloc:
+> 
+> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+> 
+> gemini/gemini-3.1-pro-preview has two comments [1]. Maybe the driver
+> developers could judge their relevance.
 
- MAINTAINERS | 3 +++
- 1 file changed, 3 insertions(+)
+These "pre-existing" reports are getting annoying.  While they are nice
+to see for driver authors, it makes developers sending bug fixes in feel
+like they are forced to do "more".  I think they are trying to tune this
+to be a bit more sane...
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 65902b97f5df..fa1bdb1db73e 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -4901,6 +4901,9 @@ L:	netdev@vger.kernel.org
- S:	Supported
- F:	drivers/net/netkit.c
- F:	include/net/netkit.h
-+F:	tools/testing/selftests/bpf/prog_tests/tc_netkit.c
-+F:	tools/testing/selftests/drivers/net/hw/nk_qlease.py
-+F:	tools/testing/selftests/net/nk_qlease.py
- 
- BPF [NETWORKING] (struct_ops, reuseport)
- M:	Martin KaFai Lau <martin.lau@linux.dev>
--- 
-2.43.0
+thanks,
 
+greg k-h
 
