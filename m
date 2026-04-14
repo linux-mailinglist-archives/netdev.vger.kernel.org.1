@@ -1,145 +1,328 @@
-Return-Path: <netdev+bounces-278477-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278478-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2MQZJilP3mndqAkAu9opvQ
-	(envelope-from <netdev+bounces-278477-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 16:28:57 +0200
+	id cP31Mk5P3mndqAkAu9opvQ
+	(envelope-from <netdev+bounces-278478-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 16:29:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13C9D3FB356
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 16:28:57 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABBEB3FB394
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 16:29:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 036DE306668C
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 14:22:30 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 28CA43029D68
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 14:27:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 676743E715F;
-	Tue, 14 Apr 2026 14:22:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64D263E8C47;
+	Tue, 14 Apr 2026 14:27:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="Y5BjaLt0"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="CgH0RXK2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
+Received: from smtp-190f.mail.infomaniak.ch (smtp-190f.mail.infomaniak.ch [185.125.25.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3FF22C11FA;
-	Tue, 14 Apr 2026 14:22:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9789F3E8C4F
+	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 14:27:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.25.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776176549; cv=none; b=hN44rPuHSmCbJhftHeYT9RLcFs3z0v2W36KagN50l+CG2XHkigTJPh219f3vw3q18l8lyBkL0VFjRPuCwhTS9RCf5NP4vhNHZHCDaMRu0edf4+nWVaTN+HiMKNfIQKMl9yYNRiqomvf1pX3jwbwLermeg7XAnuu3ZmlBuvPW8vQ=
+	t=1776176868; cv=none; b=sS68mmbNgzh/0eodmXl+9ZI2I0BlrKjnDa4jzyEPjZz7zKnWHq3OOzxB17S7NkP+Jaa17vEomzGVh1Dw04M88n1k7BOIEX7VAZQ9bI9i1HNuKFwHevH3JPA0rKJgRDOuDYrrctgbypGnnb+rfVqTN9UTAJ3DLFlM4za2og7c3Wk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776176549; c=relaxed/simple;
-	bh=UIcmHulSaQtBHy2vVHU+6OgGuET68ZtsO2HlSja/A14=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=gG8qLazPZumWlRk+hNSImnG6IYrXPpOWU6FXxO/TsYjnZHRRqEtOj44hwxC3Zk76g/bK42u3FeUmOTGLBTpcNIb20n6AOq+InuL1QfgDeT6i8OJUIQ3+G9l7vcbHYjHltEYaWcTiHCFR7XU1Xs9lccbwNTLPboCwfWMqcy5bxfQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=Y5BjaLt0; arc=none smtp.client-ip=185.226.149.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1wCeem-00FC9b-KE; Tue, 14 Apr 2026 16:22:24 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:References:
-	Cc:To:Subject:From:MIME-Version:Date:Message-ID;
-	bh=XN4JIfDgNH9DCaRDhVx/eV6ftjzRJWNMrRvzCG8XlRM=; b=Y5BjaLt0zEQ7VzcC9Qf9HQJDpZ
-	+8ve9zJdXcz5rP1c1l/s5pF3jiME85s0kok+vY3QE/++DQzP7tWmZ0CvI5C29geYcZrAJYfkxfiWS
-	k0mgs1p7DVRXEQBYlcDVPl1DZMJxcsXSEX4tupCTIQgJiwje0xtj4JinBZeK9Qc515VLCcu6brlCl
-	fW5PVnu7o+b5ipuhmn2fxE+MS9C6u1Cr0SfUZ9OkoM+Ba+zYvce43zW9f7bkXHPUJ99HO7ug8vsq2
-	IJNr/nrRqKhixfXAFSCgqocJ7GUv4euJruWVigp+oNv/jf0AR6u6S1orInYa9ZAtsOMe3CqE0B9dw
-	hIqfdkUA==;
-Received: from [10.9.9.72] (helo=submission01.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1wCeeg-0002cY-KB; Tue, 14 Apr 2026 16:22:19 +0200
-Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1wCeeT-00DigL-6l; Tue, 14 Apr 2026 16:22:05 +0200
-Message-ID: <e965ff22-37b2-406d-b885-e2736e84c0f3@rbox.co>
-Date: Tue, 14 Apr 2026 16:22:04 +0200
+	s=arc-20240116; t=1776176868; c=relaxed/simple;
+	bh=K60VdChesLkeCOFcEDK0KcjPfs82yv9WfP6hSv0Cws4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=e8ZwoblnNyd4rZxqxl1H9+/pZEHNXeCbhJhZBgAp6sffXghazRvHMseT9eqrlJTiQLAyvRF2jQ2glCIsh3t7bQ9NLzbziui7Tzw6w+HyPQt4xIk4Dli9hJU4dDQEQRGtejwwGc6qq9uRtvRm4skaGSwy3gFh2pX41pI/mdIXwjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=CgH0RXK2; arc=none smtp.client-ip=185.125.25.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+Received: from smtp-4-0001.mail.infomaniak.ch (unknown [IPv6:2001:1600:7:10::a6c])
+	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4fw67F4kK0zsn;
+	Tue, 14 Apr 2026 16:27:37 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
+	s=20191114; t=1776176857;
+	bh=2Zd7lTPsqwGBJ7VRZvsLZOU4qlrRazK/V1KUdLaYILk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=CgH0RXK2ZnWcW8DEJi2EXhpagIc0uqOFYEykiqHkCqF02uD/l7FnCmrJ4Yelgvd7v
+	 g0omzq5ykQbFui2siwlUW4ShzDizzblatAejzdfPcEBOxQg2Dj9GfFLARqBUjKzqYl
+	 exZbkqDcj3l3eo9AIMWCKJMyplashuSfy7VCX/O8=
+Received: from unknown by smtp-4-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4fw67D5w00z7M6;
+	Tue, 14 Apr 2026 16:27:36 +0200 (CEST)
+Date: Tue, 14 Apr 2026 16:27:32 +0200
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+Cc: gnoack@google.com, willemdebruijn.kernel@gmail.com, matthieu@buffet.re, 
+	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
+	yusongping@huawei.com, artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com
+Subject: Re: [RFC PATCH v4 00/19] Support socket access-control
+Message-ID: <20260414.thaeki1iigeM@digikod.net>
+References: <20251118134639.3314803-1-ivanov.mikhail1@huawei-partners.com>
+ <20260408.icooCaighie2@digikod.net>
+ <ca9b74f3-ce72-1d7f-c922-be1b276b69a8@huawei-partners.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Michal Luczaj <mhal@rbox.co>
-Subject: Re: [PATCH v3 net] vsock: fix buffer size clamping order
-To: Norbert Szetei <norbert@doyensec.com>,
- Stefano Garzarella <sgarzare@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- virtualization@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <180118C5-8BCF-4A63-A305-4EE53A34AB9C@doyensec.com>
-Content-Language: pl-PL, en-GB
-In-Reply-To: <180118C5-8BCF-4A63-A305-4EE53A34AB9C@doyensec.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ca9b74f3-ce72-1d7f-c922-be1b276b69a8@huawei-partners.com>
+X-Infomaniak-Routing: alpha
+X-Spamd-Result: default: False [0.61 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[rbox.co,none];
-	R_DKIM_ALLOW(-0.20)[rbox.co:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_MIXED_CHARSET(0.77)[subject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[digikod.net:s=20191114];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[rbox.co:+];
-	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[digikod.net];
+	FREEMAIL_CC(0.00)[google.com,gmail.com,buffet.re,vger.kernel.org,huawei.com];
+	DKIM_TRACE(0.00)[digikod.net:+];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-278478-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278477-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[mic@digikod.net,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mhal@rbox.co,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,rbox.co:dkim,rbox.co:mid]
-X-Rspamd-Queue-Id: 13C9D3FB356
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,digikod.net:dkim,digikod.net:mid,yp.to:url]
+X-Rspamd-Queue-Id: ABBEB3FB394
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 4/9/26 18:34, Norbert Szetei wrote:
-> In vsock_update_buffer_size(), the buffer size was being clamped to the
-> maximum first, and then to the minimum. If a user sets a minimum buffer
-> size larger than the maximum, the minimum check overrides the maximum
-> check, inverting the constraint.
+On Mon, Apr 13, 2026 at 08:11:48PM +0300, Mikhail Ivanov wrote:
+> On 4/8/2026 1:26 PM, Mickaël Salaün wrote:
+> > Hi Mikhail,
 > 
-> This breaks the intended socket memory boundaries by allowing the
-> vsk->buffer_size to grow beyond the configured vsk->buffer_max_size.
+> Hi!
 > 
-> Fix this by checking the minimum first, and then the maximum. This
-> ensures the buffer size never exceeds the buffer_max_size.
+> > 
+> > On Tue, Nov 18, 2025 at 09:46:20PM +0800, Mikhail Ivanov wrote:
+> > > Hello! This is v4 RFC patch dedicated to socket protocols restriction.
+> > > 
+> > > It is based on the landlock's mic-next branch on top of Linux 6.16-rc2
+> > > kernel version.
+> > > 
+> > > Objective
+> > > =========
+> > > Extend Landlock with a mechanism to restrict any set of protocols in
+> > > a sandboxed process.
+> > > 
+> > > Closes: https://github.com/landlock-lsm/linux/issues/6
+> > > 
+> > > Motivation
+> > > ==========
+> > > Landlock implements the `LANDLOCK_RULE_NET_PORT` rule type, which provides
+> > > fine-grained control of actions for a specific protocol. Any action or
+> > > protocol that is not supported by this rule can not be controlled. As a
+> > > result, protocols for which fine-grained control is not supported can be
+> > > used in a sandboxed system and lead to vulnerabilities or unexpected
+> > > behavior.
+> > > 
+> > > Controlling the protocols used will allow to use only those that are
+> > > necessary for the system and/or which have fine-grained Landlock control
+> > > through others types of rules (e.g. TCP bind/connect control with
+> > > `LANDLOCK_RULE_NET_PORT`, UNIX bind control with
+> > > `LANDLOCK_RULE_PATH_BENEATH`).
+> > > 
+> > > Consider following examples:
+> > > * Server may want to use only TCP sockets for which there is fine-grained
+> > >    control of bind(2) and connect(2) actions [1].
+> > > * System that does not need a network or that may want to disable network
+> > >    for security reasons (e.g. [2]) can achieve this by restricting the use
+> > >    of all possible protocols.
+> > > 
+> > > [1] https://lore.kernel.org/all/ZJvy2SViorgc+cZI@google.com/
+> > > [2] https://cr.yp.to/unix/disablenetwork.html
+> > > 
+> > > Implementation
+> > > ==============
+> > > This patchset adds control over the protocols used by implementing a
+> > > restriction of socket creation. This is possible thanks to the new type
+> > > of rule - `LANDLOCK_RULE_SOCKET`, that allows to restrict actions on
+> > > sockets, and a new access right - `LANDLOCK_ACCESS_SOCKET_CREATE`, that
+> > > corresponds to user space sockets creation. The key in this rule
+> > > corresponds to communication protocol signature from socket(2) syscall.
+> > 
+> > FYI, I sent a new patch series that adds a handled_perm field to
+> > rulesets:
+> > https://lore.kernel.org/all/20260312100444.2609563-6-mic@digikod.net/
+> > See also the rationale:
+> > https://lore.kernel.org/all/20260312100444.2609563-12-mic@digikod.net/
+> > 
+> > I think that would work well with the socket creation permission.  WDYT?
+> 
+> Agreed. AFAICS restrictions of protocols used for communication (eg.TCP)
+> will complement restriction of network namespace which sandboxed process
+> is pinned by LANDLOCK_PERM_NAMESPACE_ENTER permission.
 
-Something may be missing. After adding another ioctl to your reproducer, I
-still see crashes.
+I mean that socket creation restriction should use the same handled_perm
+interface e.g. add a LANDLOCK_PERM_SOCKET_CREATE right with related
+LANDLOCK_RULE_SOCKET rule type.
 
-     SYSCHK(setsockopt(fd, AF_VSOCK, SO_VM_SOCKETS_BUFFER_MIN_SIZE, &min,
-                       sizeof(min)));
-+    SYSCHK(setsockopt(fd, AF_VSOCK, SO_VM_SOCKETS_BUFFER_MAX_SIZE, &min,
-+                      sizeof(min)));
- }
+With the first RFC for handled_perm, the related rules (e.g. struct
+landlock_socket_attr) don't have an allowed_access field but an
+allowed_perm one instead.  The related permission would then be
+LANDLOCK_PERM_SOCKET_CREATE.  WDYT?
 
-[*] Setting buffer_min_size to 0x400000000.
-[socket][0] sending...
+> 
+> > 
+> > Do you think you'll be able to continue this work or would you like me
+> > or Günther to complete the remaining last bits (while of course keeping
+> > you as the main author)?
+> 
+> Sorry for the delay. I will finish and send patch series ASAP.
 
-refcount_t: saturated; leaking memory.
-WARNING: lib/refcount.c:22 at refcount_warn_saturate+0x7d/0xb0, CPU#2:
-a.out/1478
-...
-refcount_t: underflow; use-after-free.
-WARNING: lib/refcount.c:28 at refcount_warn_saturate+0x50/0xb0, CPU#12:
-kworker/12:0/80
-Workqueue: vsock-loopback vsock_loopback_work
-...
+This new version should then be on top of the Landlock namespace and
+capability patchset to reuse the handled_perm interface.  I plan to send
+a new version by the end of the month, but this should not change the
+handled_perm interface.
 
+> 
+> > 
+> > 
+> > > 
+> > > The right to create a socket is checked in the LSM hook which is called
+> > > in the __sock_create method. The following user space operations are
+> > > subject to this check: socket(2), socketpair(2), io_uring(7).
+> > > 
+> > > `LANDLOCK_ACCESS_SOCKET_CREATE` does not restrict socket creation
+> > > performed by accept(2), because created socket is used for messaging
+> > > between already existing endpoints.
+> > > 
+> > > Design discussion
+> > > ===================
+> > > 1. Should `SCTP_SOCKOPT_PEELOFF` and socketpair(2) be restricted?
+> > > 
+> > > SCTP socket can be connected to a multiple endpoints (one-to-many
+> > > relation). Calling setsockopt(2) on such socket with option
+> > > `SCTP_SOCKOPT_PEELOFF` detaches one of existing connections to a separate
+> > > UDP socket. This detach is currently restrictable.
+> > > 
+> > > Same applies for the socketpair(2) syscall. It was noted that denying
+> > > usage of socketpair(2) in sandboxed environment may be not meaninful [1].
+> > > 
+> > > Currently both operations use general socket interface to create sockets.
+> > > Therefore it's not possible to distinguish between socket(2) and those
+> > > operations inside security_socket_create LSM hook which is currently
+> > > used for protocols restriction. Providing such separation may require
+> > > changes in socket layer (eg. in __sock_create) interface which may not be
+> > > acceptable.
+> > > 
+> > > [1] https://lore.kernel.org/all/ZurZ7nuRRl0Zf2iM@google.com/
+> > > 
+> > > Code coverage
+> > > =============
+> > > Code coverage(gcov) report with the launch of all the landlock selftests:
+> > > * security/landlock:
+> > > lines......: 94.0% (1200 of 1276 lines)
+> > > functions..: 95.0% (134 of 141 functions)
+> > > 
+> > > * security/landlock/socket.c:
+> > > lines......: 100.0% (56 of 56 lines)
+> > > functions..: 100.0% (5 of 5 functions)
+> > > 
+> > > Currently landlock-test-tools fails on mini.kernel_socket test due to lack
+> > > of SMC protocol support.
+> > > 
+> > > General changes v3->v4
+> > > ======================
+> > > * Implementation
+> > >    * Adds protocol field to landlock_socket_attr.
+> > >    * Adds protocol masks support via wildcards values in
+> > >      landlock_socket_attr.
+> > >    * Changes LSM hook used from socket_post_create to socket_create.
+> > >    * Changes protocol ranges acceptable by socket rules.
+> > >    * Adds audit support.
+> > >    * Changes ABI version to 8.
+> > > * Tests
+> > >    * Adds 5 new tests:
+> > >      * mini.rule_with_wildcard, protocol_wildcard.access,
+> > >        mini.ruleset_with_wildcards_overlap:
+> > >        verify rulesets containing rules with wildcard values.
+> > >      * tcp_protocol.alias_restriction: verify that Landlock doesn't
+> > >        perform protocol mappings.
+> > >      * audit.socket_create: tests audit denial logging.
+> > >    * Squashes tests corresponding to Landlock rule adding to a single commit.
+> > > * Documentation
+> > >    * Refactors Documentation/userspace-api/landlock.rst.
+> > > * Commits
+> > >    * Rebases on mic-next.
+> > >    * Refactors commits.
+> > > 
+> > > Previous versions
+> > > =================
+> > > v3: https://lore.kernel.org/all/20240904104824.1844082-1-ivanov.mikhail1@huawei-partners.com/
+> > > v2: https://lore.kernel.org/all/20240524093015.2402952-1-ivanov.mikhail1@huawei-partners.com/
+> > > v1: https://lore.kernel.org/all/20240408093927.1759381-1-ivanov.mikhail1@huawei-partners.com/
+> > > 
+> > > Mikhail Ivanov (19):
+> > >    landlock: Support socket access-control
+> > >    selftests/landlock: Test creating a ruleset with unknown access
+> > >    selftests/landlock: Test adding a socket rule
+> > >    selftests/landlock: Testing adding rule with wildcard value
+> > >    selftests/landlock: Test acceptable ranges of socket rule key
+> > >    landlock: Add hook on socket creation
+> > >    selftests/landlock: Test basic socket restriction
+> > >    selftests/landlock: Test network stack error code consistency
+> > >    selftests/landlock: Test overlapped rulesets with rules of protocol
+> > >      ranges
+> > >    selftests/landlock: Test that kernel space sockets are not restricted
+> > >    selftests/landlock: Test protocol mappings
+> > >    selftests/landlock: Test socketpair(2) restriction
+> > >    selftests/landlock: Test SCTP peeloff restriction
+> > >    selftests/landlock: Test that accept(2) is not restricted
+> > >    lsm: Support logging socket common data
+> > >    landlock: Log socket creation denials
+> > >    selftests/landlock: Test socket creation denial log for audit
+> > >    samples/landlock: Support socket protocol restrictions
+> > >    landlock: Document socket rule type support
+> > > 
+> > >   Documentation/userspace-api/landlock.rst      |   48 +-
+> > >   include/linux/lsm_audit.h                     |    8 +
+> > >   include/uapi/linux/landlock.h                 |   60 +-
+> > >   samples/landlock/sandboxer.c                  |  118 +-
+> > >   security/landlock/Makefile                    |    2 +-
+> > >   security/landlock/access.h                    |    3 +
+> > >   security/landlock/audit.c                     |   12 +
+> > >   security/landlock/audit.h                     |    1 +
+> > >   security/landlock/limits.h                    |    4 +
+> > >   security/landlock/ruleset.c                   |   37 +-
+> > >   security/landlock/ruleset.h                   |   46 +-
+> > >   security/landlock/setup.c                     |    2 +
+> > >   security/landlock/socket.c                    |  198 +++
+> > >   security/landlock/socket.h                    |   20 +
+> > >   security/landlock/syscalls.c                  |   61 +-
+> > >   security/lsm_audit.c                          |    4 +
+> > >   tools/testing/selftests/landlock/base_test.c  |    2 +-
+> > >   tools/testing/selftests/landlock/common.h     |   14 +
+> > >   tools/testing/selftests/landlock/config       |   47 +
+> > >   tools/testing/selftests/landlock/net_test.c   |   11 -
+> > >   .../selftests/landlock/protocols_define.h     |  169 +++
+> > >   .../testing/selftests/landlock/socket_test.c  | 1169 +++++++++++++++++
+> > >   22 files changed, 1990 insertions(+), 46 deletions(-)
+> > >   create mode 100644 security/landlock/socket.c
+> > >   create mode 100644 security/landlock/socket.h
+> > >   create mode 100644 tools/testing/selftests/landlock/protocols_define.h
+> > >   create mode 100644 tools/testing/selftests/landlock/socket_test.c
+> > > 
+> > > 
+> > > base-commit: 6dde339a3df80a57ac3d780d8cfc14d9262e2acd
+> > > -- 
+> > > 2.34.1
+> > > 
+> > > 
+> 
 
