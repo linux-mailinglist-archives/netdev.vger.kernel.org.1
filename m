@@ -1,190 +1,180 @@
-Return-Path: <netdev+bounces-278327-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278328-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eNZJF8703WlolgkAu9opvQ
-	(envelope-from <netdev+bounces-278327-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 10:03:26 +0200
+	id 2D/2Mgb13WlolgkAu9opvQ
+	(envelope-from <netdev+bounces-278328-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 10:04:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C2EC3F6E2D
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 10:03:20 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCC3D3F6E62
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 10:04:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1C59A300FC76
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 08:00:37 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id F2FC63024478
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 08:02:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A754738B147;
-	Tue, 14 Apr 2026 08:00:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C90538B7C3;
+	Tue, 14 Apr 2026 08:02:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="DouCmozL"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mo6Qnnmj";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="AxhfafsM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7685938AC97;
-	Tue, 14 Apr 2026 08:00:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22C0F38C2AE
+	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 08:02:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776153636; cv=none; b=MFPfm6ECZdjhlr/Kmg02wyf3a5V3q9mmDsUDnjmbSgf/zN/fuWiT3ArbS2dBKnVKJkNanEuE81rvTOFfgLzmd1SI/6TTnbZyypY3H25O4gZg0T2Y5vF2hrnI+VaDImwyE2kczv0D+Wd9FUrFj86gJdOE8yLB0NkFUxzLCZ0ZDsE=
+	t=1776153761; cv=none; b=fD6JWGQFrr+GZb/rE297AIdRkJoVIZwZgdEizfyB6peHnkM2PXe2DR6oJRBKKt+P0gGnDEanjF9IYvcjvnAlyDDeiTmTuq0XDLWhnU2OkMng/Ps5LrnLxiBFB+Z56AFezA52NqlJ0Gyhchw38rRfus2Wi8f7oPv+vQ12t6bffmc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776153636; c=relaxed/simple;
-	bh=wVp6VFTURygsoghzYoYKFP8ZTFf9WBviBiJBhkIUNAM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iPYNR3s/kgNsXFf3lor/MPf8DsQMRd7wy91apm3Y5FAH1Jr4Jr+Yc7z/Wzt3c3/Wmqa9SdscLJwrkQkkrEAHinQe7jt+XP29hFcDiGaa0tGk+vcGtuIqPiSn6Xglkueke4d+88or9MeWtApuzv98J60lCqxM+Vou0kVEzjcGkJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=DouCmozL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1922C19425;
-	Tue, 14 Apr 2026 08:00:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1776153636;
-	bh=wVp6VFTURygsoghzYoYKFP8ZTFf9WBviBiJBhkIUNAM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DouCmozLwuDvvUGnIMpqz0RM3dfCWjXbeibZx/ghMTjGwjW/c8XS5RUuVETaXBPAB
-	 KAg6/HcgBzBDtA+8G3sobBBUQ+aADKKK6j0mo7SoA12I18pmJdG5PziSWRlXKN4oPY
-	 rjIvhmTqjCzzD3eUE+FgBlyp2zPisfgq/i69k/Ac=
-Date: Tue, 14 Apr 2026 10:00:06 +0200
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	stable <stable@kernel.org>
-Subject: Re: [Intel-wired-lan] [PATCH net] idpf: fix double free and
- use-after-free in aux device error paths
-Message-ID: <2026041432-tapestry-condition-22ff@gregkh>
-References: <2026041116-retail-bagginess-250f@gregkh>
- <afefe8b5-5bd9-4019-9d12-5ee2a7f577a2@molgen.mpg.de>
+	s=arc-20240116; t=1776153761; c=relaxed/simple;
+	bh=rZCA+zaQ6M5iJd2rjJRrrZnbpAOEaBFdMeSHQoNeGw0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=H2E/EjOhnbG6E+Lh19x5Dt3PTDQ8mjdzatut+FRnWec7mtTHLXPsSNc0vzXcjFjJxkh/lYnDK5rm+iN1ITzWvgo3x10NIWBLoJNdYJsrBu1iNvr7M2pq7KC+KAW41NratAB41CZPzfAfmT54Tlauz0To04raZ6Ijb42Cl0CLNZg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Mo6Qnnmj; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=AxhfafsM; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1776153756;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=I0Zfw5O+OpGTZWtCSJAetrjJ/SPWXO2K80aEA+W4QDQ=;
+	b=Mo6Qnnmj6w/rXlQNeIaVryTktns69qPBIhEsncTOTTjt/9SiuchO2ztOMoUIut3cvDO00y
+	Mk+wD7AaWUAVjr+ZjCQ92cAdoCIv95lOnXiSV4mZNfgCSbTCZuEe/FkdNzl0G0OG9yK+nx
+	+kXPFmUA2H14SxeysxCOAPKq+DysKJE=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-373-GLXB_u3UPxG2yZzEeCRMPw-1; Tue, 14 Apr 2026 04:02:34 -0400
+X-MC-Unique: GLXB_u3UPxG2yZzEeCRMPw-1
+X-Mimecast-MFC-AGG-ID: GLXB_u3UPxG2yZzEeCRMPw_1776153753
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-488d6ebe9cfso31174495e9.2
+        for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 01:02:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1776153753; x=1776758553; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=I0Zfw5O+OpGTZWtCSJAetrjJ/SPWXO2K80aEA+W4QDQ=;
+        b=AxhfafsMAStSb86IBz+cNdS691lyJAKAbbSwPqslo6t9NUvsZ8uVF+LSg7n41OddFW
+         A4JuigsgsyjhDU+mInmvOn3+DB36Ex4QAJjhPKLmbK1+no8xrW08WB0MpkuBJESzowjj
+         hJqE1pcRoC98NI+iAIR/BjHLvaKTLBi2L8jMhusQCZakHIt3yJnDV+WEmAM2Hq4asxFD
+         dnwydnNLlwcFXF+psR0DIDMaVwXkfeOOXOCnEVWC3vu6kC7eH9bvJ5xNIwsUg/laZWi7
+         993feDyz6Q55gW576VqgnEqGhxhlvSPD89FzELqMX06oEV/30xvQ97Zv+seAVrT/+8Z0
+         7dvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776153753; x=1776758553;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=I0Zfw5O+OpGTZWtCSJAetrjJ/SPWXO2K80aEA+W4QDQ=;
+        b=bsI1DtJBzyo8OeOjuc/yu+CxIWYmdYZlx02oAk/wnoZvqIQh+L2aaevX9q4k05WKAz
+         M8zK1uFz9zwrGAN8M6NlIW0mDGaaG/hF7RZ2RE7vEXre9rJnoSl2xWVb+Ct9E6Gn6LOU
+         zHrYGWG92MjD/VkhUdcGoDDjol5MJ5QRftBCRdzrobWr2ailaAEaSoaS2Ubd9oWpsqja
+         RD7MpiqCmrbnTkB2/zjCde1zrAf4s2xy29xKHrl6ZiSDordzZC9nASJWK68FnvLluHdM
+         WUAjTen0/GjT5LemTIal4/sonAV43K4TX5FTlult16b6B3w+nAKleLHHiN881DO8JlVJ
+         0TwQ==
+X-Forwarded-Encrypted: i=1; AFNElJ8rtIWX245tRjzw8+GQo8fgPaPQA3GBwkaMH0vbpoYKKdAQpWTjZgEOc/H1HqvLhZi0VHW8zi4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyeeH2TfBNhvug6uvjfzOq4O32Oivr3WF+JrlNGyqWZlSDDj790
+	iUa2vxQeMq8e8NBDO0CESixq7sMgSCqtCeQWA81dzfsNNUcoTK1BUSZ+dpZff5VN92jgRQfPKIE
+	bpSEXmyve3/CbUusg/fGTNckBSQI3sUINUMjnZRmYnTDsALlaqmJlwmWqXw==
+X-Gm-Gg: AeBDietASiAhX/0JnbU1BpjIhZH2c1T3iJQ/n2zRP6o67nK+ARxUtiWwqM73RSZ6fdO
+	ffZvGfa4/e/cWWR0LQXnwlbdtuKo9U6zArZyvckWzlLzZ7ZmS4Gs4oQkBR0+qPJAxxdBu9Voo5K
+	QOrbVK8Jh+5UnXfLRYaKncUcIjG3/bdl2+Muuhx9U3Xh2G0npLWTyFRsDTkfOdEDJejYdIzMDku
+	QkO0uleAP/PfPJtBHruDFb1icS0KeOFN/SNaiI+GcYazMboVTJDYp1ILlc4L/pY9deJ9VzhQ6cw
+	90ulJ5X9aAVSIQQpS4v9gzZ1QRX2YdzslkWU4zKyxAJh5fruxmWvlNCXTfxF8t4BE7PWxWPkThu
+	dlSy+XYCWyy6lp38smLotyKDIxdfMQmecYeIKH8HxpPU8bkoqQavyRNdq
+X-Received: by 2002:a05:600c:681:b0:488:e192:6fbd with SMTP id 5b1f17b1804b1-488e192710cmr86691345e9.30.1776153753354;
+        Tue, 14 Apr 2026 01:02:33 -0700 (PDT)
+X-Received: by 2002:a05:600c:681:b0:488:e192:6fbd with SMTP id 5b1f17b1804b1-488e192710cmr86690905e9.30.1776153752818;
+        Tue, 14 Apr 2026 01:02:32 -0700 (PDT)
+Received: from [192.168.88.32] ([216.128.11.125])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43d63e4f16bsm37458714f8f.26.2026.04.14.01.02.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 14 Apr 2026 01:02:32 -0700 (PDT)
+Message-ID: <67d12c45-6c9d-486f-b3f9-7fc50ccc9a5a@redhat.com>
+Date: Tue, 14 Apr 2026 10:02:31 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <afefe8b5-5bd9-4019-9d12-5ee2a7f577a2@molgen.mpg.de>
-X-Spamd-Result: default: False [3.84 / 15.00];
-	MID_END_EQ_FROM_USER_PART(4.00)[];
-	SUSPICIOUS_RECIPS(1.50)[];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2 3/3] nfc: llcp: fix TLV parsing OOB and length
+ underflow in nfc_llcp_recv_snl
+To: =?UTF-8?B?TGVrw6sgSGFww6dpdQ==?= <snowwlake@icloud.com>,
+ netdev@vger.kernel.org
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ linux-nfc@lists.01.org, stable@vger.kernel.org, horms@kernel.org,
+ =?UTF-8?B?TGVrw6sgSGFww6dpdQ==?= <framemain@outlook.com>
+References: <20260409164129.GO469338@kernel.org>
+ <20260409185958.1821242-1-snowwlake@icloud.com>
+ <20260409185958.1821242-4-snowwlake@icloud.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20260409185958.1821242-4-snowwlake@icloud.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linuxfoundation.org,none];
-	R_DKIM_ALLOW(-0.20)[linuxfoundation.org:s=korg];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278327-lists,netdev=lfdr.de];
-	SEM_URIBL_UNKNOWN_FAIL(0.00)[mpg.de:server fail,intel.com:server fail,davemloft.net:server fail,lunn.ch:server fail,linuxfoundation.org:server fail];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[linuxfoundation.org:+];
-	MISSING_XM_UA(0.00)[];
-	RSPAMD_EMAILBL_FAIL(0.00)[andrew.lunn.ch:query timed out,edumazet.google.com:query timed out];
-	PRECEDENCE_BULK(0.00)[];
-	SEM_URIBL_FRESH15_UNKNOWN_FAIL(0.00)[linuxfoundation.org:server fail,davemloft.net:server fail,lunn.ch:server fail,intel.com:server fail,mpg.de:server fail];
-	FROM_NEQ_ENVFROM(0.00)[gregkh@linuxfoundation.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,lists.01.org,vger.kernel.org,outlook.com];
+	TAGGED_FROM(0.00)[bounces-278328-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[icloud.com,vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:email,intel.com:email,linuxfoundation.org:dkim,linuxfoundation.org:email,mpg.de:email,davemloft.net:email]
-X-Rspamd-Queue-Id: 0C2EC3F6E2D
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RBL_SEM_IPV6_FAIL(0.00)[2600:3c04:e001:36c::12fc:5321:query timed out];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: DCC3D3F6E62
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Apr 14, 2026 at 08:54:55AM +0200, Paul Menzel wrote:
-> Dear Greg,
-> 
-> 
-> Thank you for the patch.
-> 
-> Am 11.04.26 um 12:12 schrieb Greg Kroah-Hartman:
-> > When auxiliary_device_add() fails in idpf_plug_vport_aux_dev() or
-> > idpf_plug_core_aux_dev(), the err_aux_dev_add label calls
-> > auxiliary_device_uninit() and falls through to err_aux_dev_init.  The
-> > uninit call will trigger put_device(), which invokes the release
-> > callback (idpf_vport_adev_release / idpf_core_adev_release) that frees
-> > iadev.  The fall-through then reads adev->id from the freed iadev for
-> > ida_free() and double-frees iadev with kfree().
-> > 
-> > Free the IDA slot and clear the back-pointer before uninit, while adev
-> > is still valid, then return immediately.
-> > 
-> > Commit 65637c3a1811 65637c3a1811 ("idpf: fix UAF in RDMA core aux dev
-> 
-> The commit hash is pasted twice.
+On 4/9/26 8:59 PM, Lekë Hapçiu wrote:
+> @@ -1300,11 +1305,17 @@ static void nfc_llcp_recv_snl(struct nfc_llcp_local *local,
+>  	sdres_tlvs_len = 0;
+>  
+>  	while (offset < tlv_len) {
+> +		if (tlv_len - offset < 2)
+> +			break;
+>  		type = tlv[0];
+>  		length = tlv[1];
+> +		if (tlv_len - offset - 2 < length)
+> +			break;
+>  
+>  		switch (type) {
+>  		case LLCP_TLV_SDREQ:
+> +			if (length < 1)
+> +				break;
+>  			tid = tlv[2];
+>  			service_name = (char *) &tlv[3];
 
-Argh, when I cut/paste from my terminal that happened, my fault.
+Sashiko noted that you are validating a single additional byte, but the
+code reads 2 of them.
 
-> > deinitialization") fixed the same use-after-free in the matching unplug
-> > path in this file but missed both probe error paths.
-> > 
-> > Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
-> > Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> > Cc: Andrew Lunn <andrew+netdev@lunn.ch>
-> > Cc: "David S. Miller" <davem@davemloft.net>
-> > Cc: Eric Dumazet <edumazet@google.com>
-> > Cc: Jakub Kicinski <kuba@kernel.org>
-> > Cc: Paolo Abeni <pabeni@redhat.com>
-> > Cc: stable <stable@kernel.org>
-> > Fixes: be91128c579c ("idpf: implement RDMA vport auxiliary dev create, init, and destroy")
-> > Fixes: f4312e6bfa2a ("idpf: implement core RDMA auxiliary dev create, init, and destroy")
-> > Assisted-by: gregkh_clanker_t1000
-> > Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> > ---
-> > Note, these cleanup paths are messy, but I couldn't see a simpler way
-> > without a lot more rework, so I choose the simple way :)
-> > 
-> >   drivers/net/ethernet/intel/idpf/idpf_idc.c | 6 ++++++
-> >   1 file changed, 6 insertions(+)
-> > 
-> > diff --git a/drivers/net/ethernet/intel/idpf/idpf_idc.c b/drivers/net/ethernet/intel/idpf/idpf_idc.c
-> > index 7e4f4ac92653..b7d6b08fc89e 100644
-> > --- a/drivers/net/ethernet/intel/idpf/idpf_idc.c
-> > +++ b/drivers/net/ethernet/intel/idpf/idpf_idc.c
-> > @@ -90,7 +90,10 @@ static int idpf_plug_vport_aux_dev(struct iidc_rdma_core_dev_info *cdev_info,
-> >   	return 0;
-> >   err_aux_dev_add:
-> > +	ida_free(&idpf_idc_ida, adev->id);
-> > +	vdev_info->adev = NULL;
-> >   	auxiliary_device_uninit(adev);
-> > +	return ret;
-> >   err_aux_dev_init:
-> >   	ida_free(&idpf_idc_ida, adev->id);
-> >   err_ida_alloc:
-> > @@ -228,7 +231,10 @@ static int idpf_plug_core_aux_dev(struct iidc_rdma_core_dev_info *cdev_info)
-> >   	return 0;
-> >   err_aux_dev_add:
-> > +	ida_free(&idpf_idc_ida, adev->id);
-> > +	cdev_info->adev = NULL;
-> >   	auxiliary_device_uninit(adev);
-> > +	return ret;
-> >   err_aux_dev_init:
-> >   	ida_free(&idpf_idc_ida, adev->id);
-> >   err_ida_alloc:
-> 
-> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-> 
-> gemini/gemini-3.1-pro-preview has two comments [1]. Maybe the driver
-> developers could judge their relevance.
+/P
 
-These "pre-existing" reports are getting annoying.  While they are nice
-to see for driver authors, it makes developers sending bug fixes in feel
-like they are forced to do "more".  I think they are trying to tune this
-to be a bit more sane...
-
-thanks,
-
-greg k-h
 
