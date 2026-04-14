@@ -1,53 +1,62 @@
-Return-Path: <netdev+bounces-278476-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278477-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0BQqCkpN3mnvqAkAu9opvQ
-	(envelope-from <netdev+bounces-278476-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 16:20:58 +0200
+	id 2MQZJilP3mndqAkAu9opvQ
+	(envelope-from <netdev+bounces-278477-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 16:28:57 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE4AD3FB102
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 16:20:57 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13C9D3FB356
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 16:28:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 2812B300E5B6
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 14:20:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 036DE306668C
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 14:22:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B9C83D9DBD;
-	Tue, 14 Apr 2026 14:20:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 676743E715F;
+	Tue, 14 Apr 2026 14:22:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b="KeSBYpyx"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="Y5BjaLt0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.nabladev.com (mx.nabladev.com [178.251.229.89])
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0BA23E6DC1;
-	Tue, 14 Apr 2026 14:20:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.251.229.89
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3FF22C11FA;
+	Tue, 14 Apr 2026 14:22:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776176455; cv=none; b=VgjbuQ0BFWh/uesmoCyckrPH3ELFWfkZDyO8K8cUmEPU2Ktrdza4XdZVe5G1Eh1t66d1QqXU8iZ2aQwViZrCd6vqZF409CQmXTz1xNAky5vhr2Oi+Dj4ADBmHYIC6wdf8U52b8SA5HfBwX0wCDyDi8s/wrOBYyjZNEtsk/cthvA=
+	t=1776176549; cv=none; b=hN44rPuHSmCbJhftHeYT9RLcFs3z0v2W36KagN50l+CG2XHkigTJPh219f3vw3q18l8lyBkL0VFjRPuCwhTS9RCf5NP4vhNHZHCDaMRu0edf4+nWVaTN+HiMKNfIQKMl9yYNRiqomvf1pX3jwbwLermeg7XAnuu3ZmlBuvPW8vQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776176455; c=relaxed/simple;
-	bh=B5dMtFOs6kq3A5Ov7eNkJuTcT6gEoY2pp8/XAmqnkbg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GAsrbgcAHCbGasmZngvYQIUB2qMzYrttxEOLb34VQ6czhk36jVp65ySmEaW9/rymckAcQlbz8uQihMjWMg+vKAW1h2S8aTaKhnl2OEWcytI7orP18CilFaneQKSVwGQwSgiOn3fceuGSkPEzYUybwHXmu2Mci9V9LUe9Lase6dk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com; spf=pass smtp.mailfrom=nabladev.com; dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b=KeSBYpyx; arc=none smtp.client-ip=178.251.229.89
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nabladev.com
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 3AA11112505;
-	Tue, 14 Apr 2026 16:20:48 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nabladev.com;
-	s=dkim; t=1776176451;
-	h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=eNZ9AyAMBhe+pcTZPe0oBKKSK8EzT1VMTf3KG2FuHP4=;
-	b=KeSBYpyxW3kiMDRjUSk2Aoskm2CggKEyq+vX+F+iXinaMMFTMY4Uf7a1S4RSga07ca/XY7
-	IfNLm3t21Hsix0JnoqATkJl0N2WIW4w8aPWFDcOb2ezkxSVGFNkn+FB0WzJF8LNJUtn1j3
-	l6QPwdUTRdOeY9AWgsLRBwmQcxgL1OnPAGI7jXt5ENhTeMAH/pRMIYEaA/KwwlUulPJVuN
-	Q5/2+DrfpKmcOivpyVN7JmJFIJ3ob28ufcCLm9qqsfzuYhHFebGhOAwNOswubLRbdaWjLX
-	YRWcJGDHymtsj6t12YZjhYvvJJjNWcOHdztB0Qq0MKF9ao07WV9SVDCZjaVY8Q==
-Message-ID: <2fcfb84f-69f6-493e-94d6-95d85d8000f6@nabladev.com>
-Date: Tue, 14 Apr 2026 16:20:46 +0200
+	s=arc-20240116; t=1776176549; c=relaxed/simple;
+	bh=UIcmHulSaQtBHy2vVHU+6OgGuET68ZtsO2HlSja/A14=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=gG8qLazPZumWlRk+hNSImnG6IYrXPpOWU6FXxO/TsYjnZHRRqEtOj44hwxC3Zk76g/bK42u3FeUmOTGLBTpcNIb20n6AOq+InuL1QfgDeT6i8OJUIQ3+G9l7vcbHYjHltEYaWcTiHCFR7XU1Xs9lccbwNTLPboCwfWMqcy5bxfQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=Y5BjaLt0; arc=none smtp.client-ip=185.226.149.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1wCeem-00FC9b-KE; Tue, 14 Apr 2026 16:22:24 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:References:
+	Cc:To:Subject:From:MIME-Version:Date:Message-ID;
+	bh=XN4JIfDgNH9DCaRDhVx/eV6ftjzRJWNMrRvzCG8XlRM=; b=Y5BjaLt0zEQ7VzcC9Qf9HQJDpZ
+	+8ve9zJdXcz5rP1c1l/s5pF3jiME85s0kok+vY3QE/++DQzP7tWmZ0CvI5C29geYcZrAJYfkxfiWS
+	k0mgs1p7DVRXEQBYlcDVPl1DZMJxcsXSEX4tupCTIQgJiwje0xtj4JinBZeK9Qc515VLCcu6brlCl
+	fW5PVnu7o+b5ipuhmn2fxE+MS9C6u1Cr0SfUZ9OkoM+Ba+zYvce43zW9f7bkXHPUJ99HO7ug8vsq2
+	IJNr/nrRqKhixfXAFSCgqocJ7GUv4euJruWVigp+oNv/jf0AR6u6S1orInYa9ZAtsOMe3CqE0B9dw
+	hIqfdkUA==;
+Received: from [10.9.9.72] (helo=submission01.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1wCeeg-0002cY-KB; Tue, 14 Apr 2026 16:22:19 +0200
+Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1wCeeT-00DigL-6l; Tue, 14 Apr 2026 16:22:05 +0200
+Message-ID: <e965ff22-37b2-406d-b885-e2736e84c0f3@rbox.co>
+Date: Tue, 14 Apr 2026 16:22:04 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,114 +64,82 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [net,PATCH v3 1/2] net: ks8851: Reinstate disabling of BHs around
- IRQ handler
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: netdev@vger.kernel.org, stable@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Nicolai Buchwitz <nb@tipi-net.de>,
- Paolo Abeni <pabeni@redhat.com>, Ronald Wahl <ronald.wahl@raritan.com>,
- Yicong Hui <yiconghui@gmail.com>, linux-kernel@vger.kernel.org
-References: <20260414103327.113500-1-marex@nabladev.com>
- <20260414125753.Im6GAIHn@linutronix.de>
-Content-Language: en-US
-From: Marek Vasut <marex@nabladev.com>
-In-Reply-To: <20260414125753.Im6GAIHn@linutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Michal Luczaj <mhal@rbox.co>
+Subject: Re: [PATCH v3 net] vsock: fix buffer size clamping order
+To: Norbert Szetei <norbert@doyensec.com>,
+ Stefano Garzarella <sgarzare@redhat.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ virtualization@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <180118C5-8BCF-4A63-A305-4EE53A34AB9C@doyensec.com>
+Content-Language: pl-PL, en-GB
+In-Reply-To: <180118C5-8BCF-4A63-A305-4EE53A34AB9C@doyensec.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[nabladev.com,reject];
-	R_DKIM_ALLOW(-0.20)[nabladev.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[rbox.co,none];
+	R_DKIM_ALLOW(-0.20)[rbox.co:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278476-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,lunn.ch,google.com,kernel.org,tipi-net.de,redhat.com,raritan.com,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[marex@nabladev.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[nabladev.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	DKIM_TRACE(0.00)[rbox.co:+];
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-278477-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,nabladev.com:dkim,nabladev.com:mid]
-X-Rspamd-Queue-Id: BE4AD3FB102
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mhal@rbox.co,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,rbox.co:dkim,rbox.co:mid]
+X-Rspamd-Queue-Id: 13C9D3FB356
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 4/14/26 2:57 PM, Sebastian Andrzej Siewior wrote:
-> On 2026-04-14 12:32:52 [+0200], Marek Vasut wrote:
->> If CONFIG_PREEMPT_RT=y is set AND the driver executes ks8851_irq() AND
->> KSZ_ISR register bit IRQ_RXI is set AND ks8851_rx_pkts() detects that
->> there are packets in the RX FIFO, then netdev_alloc_skb_ip_align() is
->> called to allocate SKBs. If netdev_alloc_skb_ip_align() is called with
->> BH enabled, local_bh_enable() at the end of netdev_alloc_skb_ip_align()
->> will call __local_bh_enable_ip(), which will call __do_softirq(), which
->> may trigger net_tx_action() softirq, which may ultimately call the xmit
->> callback ks8851_start_xmit_par(). The ks8851_start_xmit_par() will try
->> to lock struct ks8851_net_par .lock spinlock, which is already locked
->> by ks8851_irq() from which ks8851_start_xmit_par() was called. This
->> leads to a deadlock, which is reported by the kernel, including a trace
->> listed below.
+On 4/9/26 18:34, Norbert Szetei wrote:
+> In vsock_update_buffer_size(), the buffer size was being clamped to the
+> maximum first, and then to the minimum. If a user sets a minimum buffer
+> size larger than the maximum, the minimum check overrides the maximum
+> check, inverting the constraint.
 > 
-> #1 [received RX packet and a] TX packet has been sent
-> #2 Driver enables TX queue via netif_wake_queue() which schedules TX
->     softirq to queue packets for this device.
-> #2 After spin_unlock_bh(&ks->statelock) the pending softirqs will be
->     processed
-> #3 This deadlocks because of recursive locking via ks8851_net::lock in
->     ks8851_irq() and ks8851_start_xmit_par().
+> This breaks the intended socket memory boundaries by allowing the
+> vsk->buffer_size to grow beyond the configured vsk->buffer_max_size.
 > 
-> This is what happens since commit 0913ec336a6c0 ("net: ks8851: Fix
-> deadlock with the SPI chip variant"). Before that commit the softirq
-> execution will be picked up by netdev_alloc_skb_ip_align() and requires
-> PREEMPT_RT and a RX packet in #1 to trigger the deadlock.
+> Fix this by checking the minimum first, and then the maximum. This
+> ensures the buffer size never exceeds the buffer_max_size.
 
-Do you want me to add this into the V4 commit message ?
+Something may be missing. After adding another ioctl to your reproducer, I
+still see crashes.
 
->> Fix the problem by disabling BH around critical sections, including the
->> IRQ handler, thus preventing the net_tx_action() softirq from triggering
->> during these critical sections. The net_tx_action() softirq is triggered
->> at the end of the IRQ handler, once all the other IRQ handler actions have
->> been completed.
->>
->>   __schedule from schedule_rtlock+0x1c/0x34
->>   schedule_rtlock from rtlock_slowlock_locked+0x548/0x904
->>   rtlock_slowlock_locked from rt_spin_lock+0x60/0x9c
->>   rt_spin_lock from ks8851_start_xmit_par+0x74/0x1a8
->>   ks8851_start_xmit_par from netdev_start_xmit+0x20/0x44
->>   netdev_start_xmit from dev_hard_start_xmit+0xd0/0x188
->>   dev_hard_start_xmit from sch_direct_xmit+0xb8/0x25c
->>   sch_direct_xmit from __qdisc_run+0x1f8/0x4ec
->>   __qdisc_run from qdisc_run+0x1c/0x28
->>   qdisc_run from net_tx_action+0x1f0/0x268
->>   net_tx_action from handle_softirqs+0x1a4/0x270
->>   handle_softirqs from __local_bh_enable_ip+0xcc/0xe0
->>   __local_bh_enable_ip from __alloc_skb+0xd8/0x128
->>   __alloc_skb from __netdev_alloc_skb+0x3c/0x19c
->>   __netdev_alloc_skb from ks8851_irq+0x388/0x4d4
->>   ks8851_irq from irq_thread_fn+0x24/0x64
->>   irq_thread_fn from irq_thread+0x178/0x28c
->>   irq_thread from kthread+0x12c/0x138
->>   kthread from ret_from_fork+0x14/0x28
-> 
-> The backtrace here and the description is based on an older kernel.
-> However
-I actually did update the backtrace in V3 with the one from current next 
-20260413 .
+     SYSCHK(setsockopt(fd, AF_VSOCK, SO_VM_SOCKETS_BUFFER_MIN_SIZE, &min,
+                       sizeof(min)));
++    SYSCHK(setsockopt(fd, AF_VSOCK, SO_VM_SOCKETS_BUFFER_MAX_SIZE, &min,
++                      sizeof(min)));
+ }
+
+[*] Setting buffer_min_size to 0x400000000.
+[socket][0] sending...
+
+refcount_t: saturated; leaking memory.
+WARNING: lib/refcount.c:22 at refcount_warn_saturate+0x7d/0xb0, CPU#2:
+a.out/1478
+...
+refcount_t: underflow; use-after-free.
+WARNING: lib/refcount.c:28 at refcount_warn_saturate+0x50/0xb0, CPU#12:
+kworker/12:0/80
+Workqueue: vsock-loopback vsock_loopback_work
+...
+
 
