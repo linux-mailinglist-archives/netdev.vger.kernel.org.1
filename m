@@ -1,245 +1,278 @@
-Return-Path: <netdev+bounces-278330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278331-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SPJ0Mof23WlolgkAu9opvQ
-	(envelope-from <netdev+bounces-278330-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 10:10:47 +0200
+	id yAvlD/z23WlolgkAu9opvQ
+	(envelope-from <netdev+bounces-278331-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 10:12:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E65A83F6F90
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 10:10:46 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92D743F6FD6
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 10:12:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4FC10303F7FD
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 08:05:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EA0DF30B077A
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 08:07:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B968F3876DA;
-	Tue, 14 Apr 2026 08:05:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CA2138BF9C;
+	Tue, 14 Apr 2026 08:07:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="NmRQ9hC2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GSajAOhh"
 X-Original-To: netdev@vger.kernel.org
-Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010004.outbound.protection.outlook.com [52.101.85.4])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04AD51DA23
-	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 08:05:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.4
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776153930; cv=fail; b=kHqDRgn8DaNLyXt3+wtNWXWM+peXI3GmQTROQJaGv2JH61kbpbhAZfY5gbmraG3/hlIpWpkw746KEu57mgMqm3px/H4NeM0hWgG/keU7My5QuXob2j6uW2iPi+mZbCI9+qFvasVLgBrgSzM3DJUGw0e5ThjpvnO1k+XnvJ8Nf4w=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776153930; c=relaxed/simple;
-	bh=jq3648GC3PhRnWP4Ynx6Lhh8TvH8QbIf9TGIv/y58/4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=Keb/R3+Vip2t3+Mz85E7hQgzP7GZWXRXH3F3KfzjG2w5irYwBg0zAJPn4SqZ4C2sSweXCKE/Oy0BSvnEPFtZ3pMC3T3m+tYb87cqHknGQmtNnnwMt9M3Lbgp72xiCDcJ1JcAiQbpJ4N6HZ8RVr+V7TxM7mFIWIdEds/ydmI9aI8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=NmRQ9hC2; arc=fail smtp.client-ip=52.101.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=wQSxFr7Ld4Xcl2yb9BV6QRUXMzzY4u8wYMOTHu4E0WJsSqzkkKgR3u3RU9gtD74C748gZLHmbpMqLbJNA9lQSxjuXMpLi4hOg57HSi+GnJN2vLbjR5U4eYvzkMUfoFnhctCFkde6p0dDK2Ij8ozwXUrfwjSGgVj4PR1uaMME3xfi3CfQDJJzvtBpAEg0y+Mkob7GF7RUvUwqrcyJIe3BXLb+GAyC0o3JrrkOjEzp6O4i4BgDgIQbgO0763BMslJ+8nyztLsojEL/Xyn9Tigj7otkLo0JlNeKH0UiDhXsCHZ46XuD0CcBuqukRKFl8kRAiXatpDU/inIcEfX4r8v8ww==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4WFjyGsZIm/3KH6EwbeN4pozDTuM3lpvz7iiQfLTQ/Y=;
- b=eBS2Wp4c6ee02yw0idpKTAcBIUuXii5ArsIERBwpgcUhomH2tQyt3BnGq/+6EqZP1j7AIArM+PpRXYRWmf3qKEa8q4rtHdhfPesdNUMXu7ddqHnGuONn5mQ5hTOqZtEUzqJBNIt4fXjTvfG+evX/pWU1qPElr48MWVJRPAJ6NslNY/28eOxt8LrkQJW40fPmHOhSfpNK6y7VtrpP/k+JCZ4X7r0BbbJTbFa1XncfWG/2SqQprECWwBIlQWYS8YxWWiaXxZuxLh9X7CcBsmUnHFREUkK2g17j9ebcv3/l2eDX1hnT+WOf1Slv/xoe5XctSVP+s7RGYgIu9C55fcblTg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4WFjyGsZIm/3KH6EwbeN4pozDTuM3lpvz7iiQfLTQ/Y=;
- b=NmRQ9hC21MeiXqjEl8kVbzwxHsoRLT9ng6tuV3cC8VtDh6uo4+OGTuWGcbePpokCnSkCIqN7BNHoSCAjzOsaBpvbi4SwuEII2lU+uzesRisJKAJ8FQwVyWRSXoYYwgEitk9Pg+uSs1bHwCXifX1BoCFIx5GBIbTJLM7VAQ4fW+Ut2kLfU/9EY4MUn7AcfDGmGllNeD1spP51SamfT4mkWN5Jrhz6A5ARdB97GjJ3mqd0GBiLAR6N6X8zXKjcTzZ/GioxsDv05TwAhM4uWEMGMTmtD2rNMud7nkYpk1LC+s9tq19qKm6jtjsYmHOOqaeiRqSCHF1mpCiI2E43Gctr1A==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
- by BL1PR12MB5707.namprd12.prod.outlook.com (2603:10b6:208:386::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9818.20; Tue, 14 Apr
- 2026 08:05:25 +0000
-Received: from SA3PR12MB7901.namprd12.prod.outlook.com
- ([fe80::6f7f:5844:f0f7:acc2]) by SA3PR12MB7901.namprd12.prod.outlook.com
- ([fe80::6f7f:5844:f0f7:acc2%6]) with mapi id 15.20.9769.046; Tue, 14 Apr 2026
- 08:05:24 +0000
-Date: Tue, 14 Apr 2026 11:05:14 +0300
-From: Ido Schimmel <idosch@nvidia.com>
-To: Ren Wei <n05ec@lzu.edu.cn>
-Cc: bridge@lists.linux.dev, netdev@vger.kernel.org, razor@blackwall.org,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, makita.toshiaki@lab.ntt.co.jp,
-	vyasevic@redhat.com, yifanwucs@gmail.com, tomapufckgml@gmail.com,
-	yuantan098@gmail.com, bird@lzu.edu.cn, enjou1224z@gmail.com,
-	zcliangcn@gmail.com
-Subject: Re: [PATCH net 1/1] net: bridge: use a stable FDB dst snapshot in
- RCU readers
-Message-ID: <20260414074722.GA321402@shredder>
-References: <cover.1776043229.git.zcliangcn@gmail.com>
- <6570fabb85ecadb8baaf019efe856f407711c7b9.1776043229.git.zcliangcn@gmail.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6570fabb85ecadb8baaf019efe856f407711c7b9.1776043229.git.zcliangcn@gmail.com>
-X-ClientProxiedBy: TL2P290CA0005.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:2::15) To SA3PR12MB7901.namprd12.prod.outlook.com
- (2603:10b6:806:306::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75E353876D7;
+	Tue, 14 Apr 2026 08:07:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776154021; cv=none; b=k5c6U/cF8T5TxkmyRyh2OY4NasLug7nH+leaoid5Q3IpwM8FFmsLAuLWy9LAiwKsUmNzmNbixufZhm6wGNWlQa/oB0r7BG467/tbcX2qzvFVHxp083QwQ/H7RW+ZzUyXdj84nf9iwSiLs4sybo2wri4UT6fn2vkhvo7YmR0xQbg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776154021; c=relaxed/simple;
+	bh=OzjBk4AYOFhybT2ucLvcmVBU3yRTKpZ/qj32G+RhUlo=;
+	h=Content-Type:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To; b=X97unsninPyQDhTNRy1WTDcOyx07/0S7qN0T3Or7r7lPm15x6Bff1jQvfDRZYmGMkKDEgYsCKH7mnS5pkPiXL8kp16vB5tBd507fhhoqmxywJuaAzwpNDGf1Epsft9BZb9tybjQYXKLgNY1rIqjskwsrmJjIm1uTVKVFhB+A4yA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GSajAOhh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DF9EC19425;
+	Tue, 14 Apr 2026 08:06:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776154021;
+	bh=OzjBk4AYOFhybT2ucLvcmVBU3yRTKpZ/qj32G+RhUlo=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=GSajAOhhw0dMHByeMA6VUOri5zwG36Lr/C+VAkhCsPePHClrSbLBjM6IrZRQrjnBN
+	 dNoBZG5SzAc5ShN78uz+F794zZoOK1oHGz67p/7pcBfkHw5tIoI5SskMCFLWxXhngS
+	 4v7cFb2yYfeCWhPc95IsCdR4XXXO3CG3YH8jPWn8QjGcolaDhXb4ve/zF6EjJCcBKl
+	 qiHxTyVG1epIqKq3nr1+pATIX6OoCsP8f9euA5FI9Kl0UBwL/ZYYmvKSy1/ekkJQMt
+	 XPW0xcra8+1HYSByE4dk4SSYNorMFa5mj+9k9lryOJCtbAVNrxRKVMh/RilW6o47Ld
+	 doA5HJvKOGlNA==
+Content-Type: multipart/mixed; boundary="------------R9ueKS8Bzv10EHzded4CpN98"
+Message-ID: <41689f2e-8786-49a6-912d-f65e48245a61@kernel.org>
+Date: Tue, 14 Apr 2026 10:06:54 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|BL1PR12MB5707:EE_
-X-MS-Office365-Filtering-Correlation-Id: fad5f4b4-a7ae-41ec-5587-08de99fc9514
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|7416014|376014|56012099003|18002099003|22082099003;
-X-Microsoft-Antispam-Message-Info:
-	0DhECPObE6v8pkQDtuSyd/OYLK9DQdtRyFcpSX4ZOrev6/DUTljFTAa8ZDSmIFFTOZ1CoJRspcWeWTSZl9D7v7cXUh+P22PvFpLy4Fm4lYiaE2MkVl55aUqFXpARFEOf2fjMGjRD1cUr7QA5F0VkKwB8O5AB/N1MSZmRisC1wx0xMc6gR1XlRAd7o/PKeAVxzW0RunulYzJAKzth/YN0m01VkXQB43SQTy6DZdd+duP4i8vTbVn6rQSLDRAJnccxK9t2CR1zcAMm9Xi3hycSXO8x3x2L2SQlRc13LmsdK6wU0b669E3HuKQiK03cWwv7TEjnglWTj4hPlHQQdI+GKfYrvuH5qtsg8FZ+md2Bpjc2jMnvol2LDuknxcChkcBYI4YuD9lnUFa88UxQaeCE2KKPFuewHDEi+dVSD58tzep2+yHgowPs9j0C6yh5yewpowy+kVumqChwYTsRma/SnwnjPffibi6MICaa784nWhAnOJSpxk6LpHD31Sr2/1AE8HkhnznPMu46YQULCILYp2jskNcTRQExuSbv4nyoTfgAqq0UF/TZXgg9PQJxKsLN0gJJwtyOYkAGdEddTA1X5hGjoU8MoVOZmwofIdqM2oRz+/gx7Kwcu8/vjLuHcKpWxeRB7VYPRiVyapSHGIq318hEKGMjMtXiLWdb28HLWSdSW+dy6YSaao0NqAeH1ZyM/uQLxaKiMrtY/goVg7GdXGl+YcoBqie4Ph8QeoOH5hY=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(56012099003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?sTpOoqwZ/gKJU1J8Xm/c2Qg1kDSD2ymz3fsMpeqh1UbjEc9io6/cho8TRUKy?=
- =?us-ascii?Q?d5KOU9S8s3ipRNnQK9QcdPNrau+xqPbB1tyei3NOGUsKxiXf2wtRa4nS9WP4?=
- =?us-ascii?Q?rtJJUizKzUMw62NYkkKjhQuJQcGD5EDuOIoUaZsCfzdzXTmQjwUYheAcN9+L?=
- =?us-ascii?Q?9bygX7htKEPAARjtLl64vgDYUcZI5pyWEtyMCADHE3ywbY6q1a9fBjB+qzPz?=
- =?us-ascii?Q?7E+8cJWrVTlz0MV6o9cQfwiyoDJs5mWWh6fXRCQxIiMBXBkm3Ls+2KVmvJC4?=
- =?us-ascii?Q?Q2eQxe/0aO4SaA4rodQ6Yngk2L7I6Zgr09pYb3397mg1bbaGNd/hYGuENzIf?=
- =?us-ascii?Q?5w2o3iqGRc+hSdChQM5hb0E421ihNg5lbgp72t9iE/rcvYBNUREW4ej7OWWT?=
- =?us-ascii?Q?JcnCV+/1I45SbrvbwoLXqftvW32R3WSToUI8T1HDlg3rbqPGvJ2Pndd8nLLb?=
- =?us-ascii?Q?JIR8d8cVVv0EUs1dJqbTgCzlVFiT6Fol0kVgnRFpeFk+JFKkdgi1XR66oudo?=
- =?us-ascii?Q?+/w9hQbzs7aJnrTf/mUUSVLtup/9aOYrBzJo2nbbS5fI8cqsyXWJmC2LHJ+L?=
- =?us-ascii?Q?qWJIHsxM1y1T8I9GPRpvQ8gTuIOodNepKsh5YYU+VSe6IXl+rpy/+E3HOEmW?=
- =?us-ascii?Q?I2BlSqZPpQmvg/GrsgP3IttHrkl6Zr+TCNQKbA5+Bir+6wFFlctmG88aorFH?=
- =?us-ascii?Q?GIXTqPRoWXmFsUAxcUIgMyzFGLFHWlx5s6acWRunUSj1yvMCArWUAurfQh3C?=
- =?us-ascii?Q?W87vu5mYt7RoMT9vSyqaqoqvne9FEY3QAs0jGMKplQxXhBXacHhVWF+m0L+N?=
- =?us-ascii?Q?et5SFMp0Znkqs94I3S/V2EGvsBEOOBm03p+GPq1Ra1Pmn5kkEmB8K8DgGDSc?=
- =?us-ascii?Q?PXJH43MtqQUzPQtnb92Q3RWXbquzUgFyK1xpQLrw6ZMOrFzzJLYtnrJ0tMpg?=
- =?us-ascii?Q?i/RPiC6dCFjFQ9EpDhGoKn73wIldM1jwVdRvo6xcLFPJuD8X5zBilNFMYeYd?=
- =?us-ascii?Q?qG2/3Cg5+W5iXK9cnJgo8zXWOXu2CTGNVpvG3EWm+EvCewYko6S+F1OgD0ZC?=
- =?us-ascii?Q?y5n6vneHMAYeeTNqRllNYfMkVkInwVj9qCxquWRjhGHeiQx0ZwbjLp4bv8bK?=
- =?us-ascii?Q?VM4rH7/A3w0OWuf2y0oMxahHXU/AawgQcw1aKDTOom/hV/54SHeJD8U6CcTF?=
- =?us-ascii?Q?xrHPWVrEu44G5Y+CPntsWdtE5r8NVKDTj97OHc8cnViChFvEFQyqzlIhsybk?=
- =?us-ascii?Q?A3QxGoi8IrhJJ9KfyDJFCcs0aug4j3yf7BrlfSWBxoqqCar+nOWY3XCUh/2R?=
- =?us-ascii?Q?gy8mmFFTKl/qf+8vycSYiFTBLE0j3Gb1TIGMlNq8xxqnjAco8cyLqqh37HfT?=
- =?us-ascii?Q?U6Odlc2P8VhLaTDRwT97dk/VX80N63zotiT810thY2LmxI1Ok++IMWqf16ha?=
- =?us-ascii?Q?UhLpY8uTLmDaLScoSqfnfRiNYKfXP9NtjIAdiUEiMEEPJBSlWwjHEKKZWz/d?=
- =?us-ascii?Q?eAEi2w2m1QxKnM2P/fzm3CgS8ngTacSoMEaT6MzRlOWQ7PsQbF+p1oakARAu?=
- =?us-ascii?Q?WugCyG4cHEuo20YBCf6WY00aroEhE3dveaT64YJsDd6YuvKC4jOkhY+045zw?=
- =?us-ascii?Q?FxTRM6xXyshtHwSptZDqn+Dnxm6TPqUMcLnuphIa8SIGmR6tG9gr6k+RylLw?=
- =?us-ascii?Q?5BydeCvCXqEcHuzxLJdrvxqd6TzSOQxd+uVA2akGqJJbsgYeXLpDnBeLNySF?=
- =?us-ascii?Q?Ke3P/ehl9w=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fad5f4b4-a7ae-41ec-5587-08de99fc9514
-X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Apr 2026 08:05:24.6807
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: uzO1UBN0+xFgW+Nzd56X8SIReigS+7yGYkCWEXUXdRZUzvj5ItZ/GMNBxm7fcFhrPfvpBii6HZM1FRxRO40SVA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5707
-X-Spamd-Result: default: False [0.34 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [syzbot ci] Re: veth: add Byte Queue Limits (BQL) support
+To: syzbot ci <syzbot+cib904ea9ebb647254@syzkaller.appspotmail.com>,
+ andrew@lunn.ch, ast@kernel.org, bpf@vger.kernel.org, corbet@lwn.net,
+ daniel@iogearbox.net, davem@davemloft.net, edumazet@google.com,
+ frederic@kernel.org, horms@kernel.org, j.koeppeler@tu-berlin.de,
+ john.fastabend@gmail.com, kernel-team@cloudflare.com, kuba@kernel.org,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
+ sdf@fomichev.me, shuah@kernel.org
+Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
+References: <69dd48c2.a00a0220.468cb.004e.GAE@google.com>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <69dd48c2.a00a0220.468cb.004e.GAE@google.com>
+X-Spamd-Result: default: False [1.04 / 15.00];
+	MIME_BAD_ATTACHMENT(1.60)[sh:application/x-shellscript];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
+	MIME_UNKNOWN(0.10)[application/x-shellscript];
+	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-278330-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[17];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[lists.linux.dev,vger.kernel.org,blackwall.org,davemloft.net,google.com,kernel.org,redhat.com,lab.ntt.co.jp,gmail.com,lzu.edu.cn];
+	TAGGED_FROM(0.00)[bounces-278331-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[syzkaller.appspotmail.com,lunn.ch,kernel.org,vger.kernel.org,lwn.net,iogearbox.net,davemloft.net,google.com,tu-berlin.de,gmail.com,cloudflare.com,redhat.com,fomichev.me];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,nvidia.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E65A83F6F90
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hawk@kernel.org,netdev@vger.kernel.org];
+	HAS_ATTACHMENT(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,cib904ea9ebb647254];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,googlesource.com:url]
+X-Rspamd-Queue-Id: 92D743F6FD6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Apr 13, 2026 at 05:08:46PM +0800, Ren Wei wrote:
-> From: Zhengchuan Liang <zcliangcn@gmail.com>
+This is a multi-part message in MIME format.
+--------------R9ueKS8Bzv10EHzded4CpN98
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+
+
+
+On 13/04/2026 21.49, syzbot ci wrote:
+> syzbot ci has tested the following series
 > 
-> Local FDB entries can be rewritten in place by `fdb_delete_local()`, which
-> updates `f->dst` to another port or to `NULL` while keeping the entry
-> alive. Several bridge RCU readers inspect `f->dst`, including
-> `br_fdb_fillbuf()` through the `brforward_read()` sysfs path.
+> [v2] veth: add Byte Queue Limits (BQL) support
+> https://lore.kernel.org/all/20260413094442.1376022-1-hawk@kernel.org
+> * [PATCH net-next v2 1/5] net: add dev->bql flag to allow BQL sysfs for IFF_NO_QUEUE devices
+> * [PATCH net-next v2 2/5] veth: implement Byte Queue Limits (BQL) for latency reduction
+> * [PATCH net-next v2 3/5] veth: add tx_timeout watchdog as BQL safety net
+> * [PATCH net-next v2 4/5] net: sched: add timeout count to NETDEV WATCHDOG message
+> * [PATCH net-next v2 5/5] selftests: net: add veth BQL stress test
 > 
-> These readers currently load `f->dst` multiple times and can therefore
-> observe inconsistent values across the check and later dereference.
-> In `br_fdb_fillbuf()`, this means a concurrent local-FDB update can change
-> `f->dst` after the NULL check and before the `port_no` dereference,
-> leading to a NULL-ptr-deref.
+> and found the following issue:
+> WARNING in veth_napi_del_range
 > 
-> Fix this by taking a single `READ_ONCE()` snapshot of `f->dst` in each
-> affected RCU reader and using that snapshot for the rest of the access
-> sequence. Also publish the in-place `f->dst` updates in `fdb_delete_local()`
-> with `WRITE_ONCE()` so the readers and writer use matching access patterns.
-
-Sashiko is complaining [1] about missing READ_ONCE() annotations in some
-places, but I can handle them in net-next in a similar fashion to commit
-3e19ae7c6fd6 ("net: bridge: use READ_ONCE() and WRITE_ONCE() compiler
-barriers for fdb->dst").
-
-It's also complaining [2] about a not very interesting possible bug in
-br_fdb_dump() which is pre-existing.
-
+> Full report is available here:
+> https://ci.syzbot.org/series/ee732006-8545-4abd-a105-b4b1592a7baf
 > 
-> Fixes: 960b589f86c7 ("bridge: Properly check if local fdb entry can be deleted in br_fdb_change_mac_address")
-> Cc: stable@kernel.org
-> Reported-by: Yifan Wu <yifanwucs@gmail.com>
-> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-> Co-developed-by: Yuan Tan <yuantan098@gmail.com>
-> Signed-off-by: Yuan Tan <yuantan098@gmail.com>
-> Suggested-by: Xin Liu <bird@lzu.edu.cn>
-> Tested-by: Ren Wei <enjou1224z@gmail.com>
-> Signed-off-by: Zhengchuan Liang <zcliangcn@gmail.com>
-> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+> ***
+> 
+> WARNING in veth_napi_del_range
+>
 
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+Attached a reproducer myself.
+- I have V3 ready see below for diff
 
-[1]
-"
-Are there other RCU readers that still need this protection?
+> tree:      net-next
+> URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net-next.git
+> base:      8806d502e0a7e7d895b74afbd24e8550a65a2b17
+> arch:      amd64
+> compiler:  Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+> config:    https://ci.syzbot.org/builds/90743a26-f003-44cf-abcc-5991c47588b2/config
+> syz repro: https://ci.syzbot.org/findings/d068bfb2-9f8b-466a-95b4-cd7e7b00006c/syz_repro
+> 
+> ------------[ cut here ]------------
+> index >= dev->num_tx_queues
+> WARNING: ./include/linux/netdevice.h:2672 at netdev_get_tx_queue include/linux/netdevice.h:2672 [inline], CPU#0: syz.1.27/6002
+> WARNING: ./include/linux/netdevice.h:2672 at veth_napi_del_range+0x3b7/0x4e0 drivers/net/veth.c:1142, CPU#0: syz.1.27/6002
+> Modules linked in:
+> CPU: 0 UID: 0 PID: 6002 Comm: syz.1.27 Not tainted syzkaller #0 PREEMPT(full)
+> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+> RIP: 0010:netdev_get_tx_queue include/linux/netdevice.h:2672 [inline]
+> RIP: 0010:veth_napi_del_range+0x3b7/0x4e0 drivers/net/veth.c:1142
+> Code: 00 e8 ad 96 69 fe 44 39 6c 24 10 74 5e e8 41 61 44 fb 41 ff c5 49 bc 00 00 00 00 00 fc ff df e9 6d ff ff ff e8 2a 61 44 fb 90 <0f> 0b 90 42 80 3c 23 00 75 8e eb 94 48 8b 0c 24 80 e1 07 80 c1 03
+> RSP: 0018:ffffc90003adf918 EFLAGS: 00010293
+> RAX: ffffffff86814ec6 RBX: 1ffff110227a6c03 RCX: ffff888103a857c0
+> RDX: 0000000000000000 RSI: 0000000000000002 RDI: 0000000000000002
+> RBP: 1ffff110227a6c9a R08: ffff888113f01ab7 R09: 0000000000000000
+> R10: ffff888113f01a98 R11: ffffed10227e0357 R12: dffffc0000000000
+> R13: 0000000000000002 R14: 0000000000000002 R15: ffff888113d36018
+> FS:  000055555ea16500(0000) GS:ffff88818de4a000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00007efc287456b8 CR3: 000000010cdd0000 CR4: 00000000000006f0
+> Call Trace:
+>   <TASK>
+>   veth_napi_del drivers/net/veth.c:1153 [inline]
+>   veth_disable_xdp+0x1b0/0x310 drivers/net/veth.c:1255
+>   veth_xdp_set drivers/net/veth.c:1693 [inline]
+>   veth_xdp+0x48e/0x730 drivers/net/veth.c:1717
+>   dev_xdp_propagate+0x125/0x260 net/core/dev_api.c:348
+>   bond_xdp_set drivers/net/bonding/bond_main.c:5715 [inline]
+>   bond_xdp+0x3ca/0x830 drivers/net/bonding/bond_main.c:5761
+>   dev_xdp_install+0x42c/0x600 net/core/dev.c:10387
+>   dev_xdp_detach_link net/core/dev.c:10579 [inline]
+>   bpf_xdp_link_release+0x362/0x540 net/core/dev.c:10595
+>   bpf_link_free+0x103/0x480 kernel/bpf/syscall.c:3292
+>   bpf_link_put_direct kernel/bpf/syscall.c:3344 [inline]
+>   bpf_link_release+0x6b/0x80 kernel/bpf/syscall.c:3351
+>   __fput+0x44f/0xa70 fs/file_table.c:469
+>   task_work_run+0x1d9/0x270 kernel/task_work.c:233
 
-For instance, in br_dev_xmit(), br_fdb_find_rcu() returns a local FDB entry
-which is then passed to br_forward(). If a concurrent fdb_delete_local()
-sets the entry's dst to NULL, could this cause a NULL pointer dereference if
-br_forward() is inlined and the compiler emits multiple loads?
 
-Similarly, br_handle_frame_finish() appears to perform an unmarked read of
-dst->dst, which might race with br_fdb_update().
+The BQL reset loop in veth_napi_del_range() iterates
+dev->real_num_rx_queues but indexes into peer's TX queues,
+which goes out of bounds when the peer has fewer TX queues
+(e.g. veth enslaved to a bond with XDP).
 
-Also, in br_fdb_delete_by_port(), f->dst is read directly without
-READ_ONCE(). While called under br->hash_lock, the br_fdb_update()
-fast path updates f->dst locklessly. Could this trigger KCSAN warnings due
-to an unmarked data race?
-"
+Fix is to clamp the loop to the peer's real_num_tx_queues.
+Will be included in the V3 submission.
 
-[2]
-"
-Does passing f to fdb_fill_info() allow a concurrent update to change
-the destination port after the filtering check?
+#syz test
 
-fdb_fill_info() executes a new READ_ONCE(fdb->dst). If f->dst changes
-between the filter_dev check above and the call to fdb_fill_info(), the
-dumped entry might claim to be on a device that doesn't match the requested
-filter_dev.
+---
+  drivers/net/veth.c | 4 +++-
+  1 file changed, 3 insertions(+), 1 deletion(-)
 
-Should fdb_fill_info() be updated to accept the dst snapshot instead?
-"
+diff --git a/drivers/net/veth.c b/drivers/net/veth.c
+index 911e7e36e166..9d7b085c9548 100644
+--- a/drivers/net/veth.c
++++ b/drivers/net/veth.c
+@@ -1138,7 +1138,9 @@ static void veth_napi_del_range(struct net_device 
+*dev, int start, int end)
+  	 */
+  	peer = rtnl_dereference(priv->peer);
+  	if (peer) {
+-		for (i = start; i < end; i++)
++		int peer_end = min(end, (int)peer->real_num_tx_queues);
++
++		for (i = start; i < peer_end; i++)
+  			netdev_tx_reset_queue(netdev_get_tx_queue(peer, i));
+  	}
+
+
+
+--------------R9ueKS8Bzv10EHzded4CpN98
+Content-Type: application/x-shellscript; name="repro-syzbot-veth-bql.sh"
+Content-Disposition: attachment; filename="repro-syzbot-veth-bql.sh"
+Content-Transfer-Encoding: base64
+
+IyEvYmluL2Jhc2gKIyBSZXByb2R1Y2VyIGZvciBzeXpib3QgV0FSTklORyBpbiB2ZXRoX25h
+cGlfZGVsX3JhbmdlCiMgaHR0cHM6Ly9jaS5zeXpib3Qub3JnL3Nlcmllcy9lZTczMjAwNi04
+NTQ1LTRhYmQtYTEwNS1iNGIxNTkyYTdiYWYKIwojIEJ1ZzogdmV0aF9uYXBpX2RlbF9yYW5n
+ZSgpIGl0ZXJhdGVzIGRldi0+cmVhbF9udW1fcnhfcXVldWVzCiMgYnV0IGluZGV4ZXMgcGVl
+ci0+dHhxW2ldLCBzbyBpZiBkZXYtPnJ4X3F1ZXVlcyA+IHBlZXItPnR4X3F1ZXVlcwojIHdl
+IGdldDogV0FSTklORzogbmV0ZGV2X2dldF90eF9xdWV1ZTogaW5kZXggPj0gZGV2LT5udW1f
+dHhfcXVldWVzCiMKIyBUcmlnZ2VyOiBjcmVhdGUgdmV0aCB3aXRoIGFzeW1tZXRyaWMgcXVl
+dWVzIChyeD0yLCBwZWVyX3R4PTEpLAojIGF0dGFjaCBYRFAsIHRoZW4gZGV0YWNoIGl0IHRv
+IGhpdCB2ZXRoX25hcGlfZGVsX3JhbmdlLgoKc2V0IC1lCgojIFJlcXVpcmVzIENPTkZJR19E
+RUJVR19ORVQ9eSBmb3IgdGhlIFdBUk5fT05fT05DRSBpbiBuZXRkZXZfZ2V0X3R4X3F1ZXVl
+KCkKaWYgWyAtZiAvcHJvYy9jb25maWcuZ3ogXTsgdGhlbgogICAgaWYgISB6Y2F0IC9wcm9j
+L2NvbmZpZy5neiB8IGdyZXAgLXEgIkNPTkZJR19ERUJVR19ORVQ9eSI7IHRoZW4KICAgICAg
+ICBlY2hvICJTS0lQOiBDT05GSUdfREVCVUdfTkVUPXkgcmVxdWlyZWQgdG8gdHJpZ2dlciB0
+aGUgV0FSTklORyIKICAgICAgICBleGl0IDQKICAgIGZpCmZpCgpjbGVhbnVwKCkgewogICAg
+aXAgbGluayBkZWwgdmV0aDAgMj4vZGV2L251bGwgfHwgdHJ1ZQogICAgcm0gLWYgL3RtcC94
+ZHBfcGFzcy5vCn0KdHJhcCBjbGVhbnVwIEVYSVQKCiMgTWluaW1hbCBYRFAgcHJvZ3JhbSAo
+WERQX1BBU1MpCiMgSWYgYnBmdG9vbCBpcyBhdmFpbGFibGUsIGdlbmVyYXRlIGl0OyBvdGhl
+cndpc2UgdXNlIGlwIGxpbmsgeGRwIG9iagpjYXQgPiAvdG1wL3hkcF9wYXNzLmMgPDwgJ0VP
+RicKI2RlZmluZSBTRUMobmFtZSkgX19hdHRyaWJ1dGVfXygoc2VjdGlvbihuYW1lKSwgdXNl
+ZCkpCiNkZWZpbmUgWERQX1BBU1MgMgpzdHJ1Y3QgeGRwX21kOwpTRUMoInhkcCIpCmludCB4
+ZHBfcGFzcyhzdHJ1Y3QgeGRwX21kICpjdHgpIHsgcmV0dXJuIFhEUF9QQVNTOyB9CmNoYXIg
+X2xpY2Vuc2VbXSBTRUMoImxpY2Vuc2UiKSA9ICJHUEwiOwpFT0YKCiMgVHJ5IHRvIGNvbXBp
+bGUgaWYgY2xhbmcgaXMgYXZhaWxhYmxlCmlmIGNvbW1hbmQgLXYgY2xhbmcgJj4vZGV2L251
+bGw7IHRoZW4KICAgIGNsYW5nIC1PMiAtZyAtdGFyZ2V0IGJwZiAtYyAvdG1wL3hkcF9wYXNz
+LmMgLW8gL3RtcC94ZHBfcGFzcy5vCmVsc2UKICAgIGVjaG8gIlNLSVA6IGNsYW5nIG5vdCBh
+dmFpbGFibGUgdG8gY29tcGlsZSBYRFAgcHJvZ3JhbSIKICAgIGV4aXQgNApmaQoKZWNobyAi
+PT09IENyZWF0aW5nIHZldGggcGFpciB3aXRoIGFzeW1tZXRyaWMgcXVldWVzID09PSIKZWNo
+byAiICAgIHZldGgwOiBudW10eHF1ZXVlcz0xIG51bXJ4cXVldWVzPTIiCmVjaG8gIiAgICB2
+ZXRoMTogbnVtdHhxdWV1ZXM9MSBudW1yeHF1ZXVlcz0xIgoKIyB2ZXRoMCBoYXMgMiBSWCBx
+dWV1ZXMsIHBlZXIgKHZldGgxKSBoYXMgb25seSAxIFRYIHF1ZXVlCmlwIGxpbmsgYWRkIHZl
+dGgwIG51bXR4cXVldWVzIDEgbnVtcnhxdWV1ZXMgMiBcCiAgIHR5cGUgdmV0aCBwZWVyIG5h
+bWUgdmV0aDEgbnVtdHhxdWV1ZXMgMSBudW1yeHF1ZXVlcyAxCgppcCBsaW5rIHNldCB2ZXRo
+MCB1cAppcCBsaW5rIHNldCB2ZXRoMSB1cAoKZWNobyAiPT09IEF0dGFjaGluZyBYRFAgdG8g
+dmV0aDAgKHJ4PTIsIHBlZXJfdHg9MSkgPT09IgojIFRoaXMgcGFzc2VzIHRoZSBYRFAgYXR0
+YWNoIGNoZWNrIChkZXYtPnJ4ID49IHBlZXItPnR4OiAyID49IDEpCmlwIGxpbmsgc2V0IGRl
+diB2ZXRoMCB4ZHAgb2JqIC90bXAveGRwX3Bhc3MubyBzZWMgeGRwCgplY2hvICI9PT0gVmVy
+aWZ5aW5nIHF1ZXVlIGFzeW1tZXRyeSA9PT0iClYwX1JYPSQoY2F0IC9zeXMvY2xhc3MvbmV0
+L3ZldGgwL3F1ZXVlcy9yeC0qL3Jwc19jcHVzIHwgd2MgLWwpClYxX1RYPSQobHMgLWQgL3N5
+cy9jbGFzcy9uZXQvdmV0aDEvcXVldWVzL3R4LSogMj4vZGV2L251bGwgfCB3YyAtbCkKZWNo
+byAiICAgIHZldGgwIHJ4X3F1ZXVlcz0kVjBfUlggIHZldGgxIHR4X3F1ZXVlcz0kVjFfVFgi
+CmlmIFsgIiRWMF9SWCIgLWd0ICIkVjFfVFgiIF07IHRoZW4KICAgIGVjaG8gIiAgICBCVUcg
+Q09ORElUSU9OOiBkZXYtPnJ4X3F1ZXVlcyAoJFYwX1JYKSA+IHBlZXItPnR4X3F1ZXVlcyAo
+JFYxX1RYKSIKZWxzZQogICAgZWNobyAiICAgIFNLSVA6IHF1ZXVlIGFzeW1tZXRyeSBub3Qg
+YWNoaWV2ZWQiCiAgICBleGl0IDQKZmkKCmRtZXNnIC1DIDI+L2Rldi9udWxsIHx8IHRydWUK
+CmVjaG8gIj09PSBEZXRhY2hpbmcgWERQIGZyb20gdmV0aDAgPT09IgojIFRoaXMgdHJpZ2dl
+cnMgdmV0aF9kaXNhYmxlX3hkcCAtPiB2ZXRoX25hcGlfZGVsIC0+CiMgdmV0aF9uYXBpX2Rl
+bF9yYW5nZSh2ZXRoMCwgMCwgMikgd2hpY2ggbG9vcHMgaT0wLDEKIyBhbmQgYWNjZXNzZXMg
+cGVlcih2ZXRoMSktPnR4cVsxXSAtLSBidXQgcGVlciBvbmx5IGhhcyAxIHR4cSEKaXAgbGlu
+ayBzZXQgZGV2IHZldGgwIHhkcCBvZmYKCiMgQ2hlY2sgZG1lc2cgZm9yIFdBUk5JTkcgKHJl
+cXVpcmVzIENPTkZJR19ERUJVR19ORVQ9eSBmb3IgdGhlIFdBUk4pCmlmIGRtZXNnIDI+L2Rl
+di9udWxsIHwgZ3JlcCAtcWkgIldBUk5JTkcuKnZldGhfbmFwaV9kZWxfcmFuZ2VcfFdBUk5J
+TkcuKm5ldGRldmljZS5oIjsgdGhlbgogICAgZWNobyAiPT09IEZBSUw6IFdBUk5JTkcgaW4g
+dmV0aF9uYXBpX2RlbF9yYW5nZSAoYnVnIHJlcHJvZHVjZWQpID09PSIKICAgIGRtZXNnIHwg
+Z3JlcCAtQjEgLUExMCAiV0FSTklORy4qdmV0aCIKICAgIGV4aXQgMQplbHNlCiAgICBlY2hv
+ICI9PT0gUEFTUzogbm8gV0FSTklORyBpbiBkbWVzZyA9PT0iCiAgICBleGl0IDAKZmkK
+
+--------------R9ueKS8Bzv10EHzded4CpN98--
 
