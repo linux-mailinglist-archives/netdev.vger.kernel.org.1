@@ -1,164 +1,163 @@
-Return-Path: <netdev+bounces-278484-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278485-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uL5hGK9U3mmUqgkAu9opvQ
-	(envelope-from <netdev+bounces-278484-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 16:52:31 +0200
+	id eOk8KkBV3mmoqgkAu9opvQ
+	(envelope-from <netdev+bounces-278485-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 16:54:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FD9F3FB7D4
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 16:52:30 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 639153FB80F
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 16:54:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 5568A300BE1E
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 14:52:27 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DB136300B994
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 14:54:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80CCA1D5ABA;
-	Tue, 14 Apr 2026 14:52:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A83439A81B;
+	Tue, 14 Apr 2026 14:54:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="wUDOimQ/";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="yS2FBc3b"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="kwxwXhS0"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B35340DFC3;
-	Tue, 14 Apr 2026 14:52:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C26CB27470;
+	Tue, 14 Apr 2026 14:54:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776178343; cv=none; b=nm9qJGME+kATbvinlvBlvi+26JixREGgYp7sQ3YPeVTxKv6aAOnP20XTt49lPYEGDrGTywB1UWT6bTQXsCSV+p1umup/7QLAf6e6I0A+H+y4W7qL+VPV9lyXIP8+iL0PHif+A1KCkPB9j8nR2xCF/oYN0NyRfJ67QErUCMXmgPQ=
+	t=1776178474; cv=none; b=dFhTg4e/Oo0Bs0qZ7VzTdr8XgmRzX7kIsocR8gVm6A4Y7Oz4pFJphGG/gFx6PjocmVdufKYxBlwgxC5kxPBZB2c1/+tyAm843QY5l17ixqYIDjrc3kH/a5QyGS8Qu10/LG7/d9Ulpa8VcazdIUjKauLsEK8EwkYMyiI6ZYTqrT4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776178343; c=relaxed/simple;
-	bh=FyNFq22OhHv2Uq0gQRgQgJmKXPxe1cwbacldtyh4gSk=;
+	s=arc-20240116; t=1776178474; c=relaxed/simple;
+	bh=GySGflb+yx8HkAtjxWgclmKRF9aMiN3Y2FsCPjZRnYU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KVOab8DNel3AY016WJaNvGz/Qd61AaAr1VUcApbJ1y4WmHpotYW8X+wN0QOUX7t8PapaS1mL3EQVCgeVH+2EDidTBdW+5P4Grjx9B4egkese9mqt7ReTYKq73uREsuwMxmcseDMVi9XrdpOfCXfKoWbaXWbZiv9Ue8sR8eCsrGY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=wUDOimQ/; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=yS2FBc3b; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Tue, 14 Apr 2026 16:52:18 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1776178340;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NczqJSvb7D2JbBqpsIRK9tRIb6npKGXPUg4+M7x7Etk=;
-	b=wUDOimQ/Td2fFgAKxasB+wTs+OR5mDYfLShmZBjc3LIylaAXN58ptt5EkpJ+wJhoIG+IBX
-	SlvmOU5N0V0znagYmJIUx3gx6bCoiBeQ3OteLoQbcfpM9WtLCKSEpR/IjJab0qdIHoKq7v
-	wLTP4W6VJbxtIKMsGa0TKY58Bc0hwW0E3/UpLRBJGOD6qtkuShzrH+kXKpD41Seu2FE7SY
-	9e6YmXd3qQwbhRgB0dei/PHOzvyeQKbGsbVOUw79Udokw5Bz81oa7Qsrs9agHNrRMqGYo8
-	avTn2zVayeiG84RChKuusNIBJOu/2fKcAFWzQrYZM+vgUPcLVC0sHt3npP+A2g==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1776178340;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NczqJSvb7D2JbBqpsIRK9tRIb6npKGXPUg4+M7x7Etk=;
-	b=yS2FBc3b5vQKhGu0Kx1Mc7bxKNIGUPMh2r0tl7DJN9LkKzFvJtYeu9DPtNb+CufcPojT2K
-	n4PZFg86YsRoW1Cg==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Marek Vasut <marex@nabladev.com>
-Cc: netdev@vger.kernel.org, stable@vger.kernel.org,
+	 Content-Type:Content-Disposition:In-Reply-To; b=cHx9aPGn0S+iNuSWfaLXcq5bbb9EOWPrczZ/r2Q78Ug69ia/yTOyZx3QQLWnE2vkl36D1aJuQiAnc7Ry4jUPRCjoLXryKNucrV6GCcWZ+VivZRBCgyvjPcVk5tiZTehQqne5NpJ7iMYrQzhC8F9QSWSsYM/OWqzNa1rANWBdXSk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=kwxwXhS0; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=vxRKW52fMMlDsBtAf4BxmXyd0sFK8uxO4jiS8du193o=; b=kwxwXhS08XvKdbqNvVua9AlLJo
+	iwiTfBG5EyIKOZ7BxSVcy8B/JuGfQjuKN4O5xev16T50ahmWGns6v0VJS6WWuzcfO+DHoez9YnLOB
+	i+RStt67SlvL1Vjk0cmMgYX9w8HLHoYmxuBQbfpHRfBrGrHpUjAqRNxgyrBgyNNQXiLA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wCf9c-00G415-OH; Tue, 14 Apr 2026 16:54:16 +0200
+Date: Tue, 14 Apr 2026 16:54:16 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Fidelio LAWSON <lawson.fidelio@gmail.com>
+Cc: Marek Vasut <marex@nabladev.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	UNGLinuxDriver@microchip.com, Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Nicolai Buchwitz <nb@tipi-net.de>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Ronald Wahl <ronald.wahl@raritan.com>,
-	Yicong Hui <yiconghui@gmail.com>, linux-kernel@vger.kernel.org
-Subject: Re: [net,PATCH v3 1/2] net: ks8851: Reinstate disabling of BHs
- around IRQ handler
-Message-ID: <20260414145218.lsNpdAJI@linutronix.de>
-References: <20260414103327.113500-1-marex@nabladev.com>
- <20260414125753.Im6GAIHn@linutronix.de>
- <2fcfb84f-69f6-493e-94d6-95d85d8000f6@nabladev.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Marek Vasut <marex@denx.de>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Simon Horman <horms@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Fidelio Lawson <fidelio.lawson@exotec.com>
+Subject: Re: [PATCH v3 1/3] net: dsa: microchip: implement KSZ87xx Module 3
+ low-loss cable errata
+Message-ID: <d584bd42-ee6d-465f-b4f7-2edc992368d6@lunn.ch>
+References: <20260414-ksz87xx_errata_low_loss_connections-v3-0-0e3838ca98c9@exotec.com>
+ <20260414-ksz87xx_errata_low_loss_connections-v3-1-0e3838ca98c9@exotec.com>
+ <ea90a671-70be-4d89-b842-1e54d687336f@nabladev.com>
+ <d9b161dd-f698-4d7e-8ccb-9ec12411bf87@lunn.ch>
+ <264667a8-bbb2-44ac-84e7-df6c506ae6fa@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2fcfb84f-69f6-493e-94d6-95d85d8000f6@nabladev.com>
+In-Reply-To: <264667a8-bbb2-44ac-84e7-df6c506ae6fa@gmail.com>
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
-	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278484-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,lunn.ch,google.com,kernel.org,tipi-net.de,redhat.com,raritan.com,gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-278485-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[nabladev.com,microchip.com,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,denx.de,bootlin.com,armlinux.org.uk,vger.kernel.org,exotec.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	NEURAL_HAM(-0.00)[-0.998];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linutronix.de:+];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5FD9F3FB7D4
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lunn.ch:dkim,lunn.ch:mid]
+X-Rspamd-Queue-Id: 639153FB80F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 2026-04-14 16:20:46 [+0200], Marek Vasut wrote:
-> > This is what happens since commit 0913ec336a6c0 ("net: ks8851: Fix
-> > deadlock with the SPI chip variant"). Before that commit the softirq
-> > execution will be picked up by netdev_alloc_skb_ip_align() and requires
-> > PREEMPT_RT and a RX packet in #1 to trigger the deadlock.
-> 
-> Do you want me to add this into the V4 commit message ?
-
-The description does not match the code since the commit mentioned
-above.
-
-> > > Fix the problem by disabling BH around critical sections, including the
-> > > IRQ handler, thus preventing the net_tx_action() softirq from triggering
-> > > during these critical sections. The net_tx_action() softirq is triggered
-> > > at the end of the IRQ handler, once all the other IRQ handler actions have
-> > > been completed.
-> > > 
-> > >   __schedule from schedule_rtlock+0x1c/0x34
-> > >   schedule_rtlock from rtlock_slowlock_locked+0x548/0x904
-> > >   rtlock_slowlock_locked from rt_spin_lock+0x60/0x9c
-> > >   rt_spin_lock from ks8851_start_xmit_par+0x74/0x1a8
-> > >   ks8851_start_xmit_par from netdev_start_xmit+0x20/0x44
-> > >   netdev_start_xmit from dev_hard_start_xmit+0xd0/0x188
-> > >   dev_hard_start_xmit from sch_direct_xmit+0xb8/0x25c
-> > >   sch_direct_xmit from __qdisc_run+0x1f8/0x4ec
-> > >   __qdisc_run from qdisc_run+0x1c/0x28
-> > >   qdisc_run from net_tx_action+0x1f0/0x268
-> > >   net_tx_action from handle_softirqs+0x1a4/0x270
-> > >   handle_softirqs from __local_bh_enable_ip+0xcc/0xe0
-> > >   __local_bh_enable_ip from __alloc_skb+0xd8/0x128
-> > >   __alloc_skb from __netdev_alloc_skb+0x3c/0x19c
-> > >   __netdev_alloc_skb from ks8851_irq+0x388/0x4d4
-> > >   ks8851_irq from irq_thread_fn+0x24/0x64
-> > >   irq_thread_fn from irq_thread+0x178/0x28c
-> > >   irq_thread from kthread+0x12c/0x138
-> > >   kthread from ret_from_fork+0x14/0x28
+On Tue, Apr 14, 2026 at 03:48:33PM +0200, Fidelio LAWSON wrote:
+> On 4/14/26 14:40, Andrew Lunn wrote:
+> > On Tue, Apr 14, 2026 at 01:05:49PM +0200, Marek Vasut wrote:
+> > > On 4/14/26 11:12 AM, Fidelio Lawson wrote:
+> > > > Implement the "Module 3: Equalizer fix for short cables" erratum from
+> > > > Microchip document DS80000687C for KSZ87xx switches.
+> > > > 
+> > > > The issue affects short or low-loss cable links (e.g. CAT5e/CAT6),
+> > > > where the PHY receiver equalizer may amplify high-amplitude signals
+> > > > excessively, resulting in internal distortion and link establishment
+> > > > failures.
+> > > > 
+> > > > KSZ87xx devices require a workaround for the Module 3 low-loss cable
+> > > > condition, controlled through the switch TABLE_LINK_MD_V indirect
+> > > > registers.
+> > > > 
+> > > > The affected registers are part of the switch address space and are not
+> > > > directly accessible from the PHY driver. To keep the PHY-facing API
+> > > > clean and avoid leaking switch-specific details, model this errata
+> > > > control as vendor-specific Clause 22 PHY registers.
+> > > > 
+> > > > A vendor-specific Clause 22 PHY register is introduced as a mode
+> > > > selector in PHY_REG_LOW_LOSS_CTRL, and ksz8_r_phy() / ksz8_w_phy()
+> > > > translate accesses to these bits into the appropriate indirect
+> > > > TABLE_LINK_MD_V accesses.
+> > > > 
+> > > > The control register defines the following modes:
+> > > > 0: disabled (default behavior)
+> > > > 1: EQ training workaround
+> > > > 2: LPF 90 MHz
+> > > > 3: LPF 62 MHz
+> > > > 4: LPF 55 MHz
+> > > > 5: LPF 44 MHz
+> > > I may not fully understand this, but aren't the EQ and LPF settings
+> > > orthogonal ?
 > > 
-> > The backtrace here and the description is based on an older kernel.
-> > However
-> I actually did update the backtrace in V3 with the one from current next
-> 20260413 .
+> > What is the real life experience using this feature? Is it needed for
+> > 1cm cables, but most > 1m cables are O.K with the defaults? Do we need
+> > all these configuration options? How is a user supposed to discover
+> > the different options? Can we simplify it down to a Boolean?
+> We were seeing random link dropouts with the default settings, and since
+> enabling the workaround 2, the link has remained stable and we have not
+> observed any further issues.
 
-That would be from yesterday and the change is merged since v6.10. But
-why is the softirq starting from __netdev_alloc_skb() instead of
-spin_unlock_bh(&ks->statelock)? After that unlock, the softirq must be
-processed and __netdev_alloc_skb() _could_ observe pending softirqs but
-not from ks8851.
+So for you, a boolean which enables workaround 2 would be sufficient.
 
-Sebastian
+Marek, what is your experience?
+
+       Andrew
 
