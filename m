@@ -1,119 +1,193 @@
-Return-Path: <netdev+bounces-278543-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278544-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sCyDIjx03mkqEgAAu9opvQ
-	(envelope-from <netdev+bounces-278543-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 19:07:08 +0200
+	id 6FhfFLt03mkqEgAAu9opvQ
+	(envelope-from <netdev+bounces-278544-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 19:09:15 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C375F3FCD54
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 19:07:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9ABB13FCD8B
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 19:09:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B5D08303EC3C
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 17:05:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7067E30086E7
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 17:08:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F4FC26159E;
-	Tue, 14 Apr 2026 17:05:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88F092EC08C;
+	Tue, 14 Apr 2026 17:08:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FArvBtao"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f72.google.com (mail-oa1-f72.google.com [209.85.160.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4B322C0F7F
-	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 17:05:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64C592E8B9B;
+	Tue, 14 Apr 2026 17:08:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776186350; cv=none; b=FAdYIW/wHnYVVGUmZAkmHWI72cV7/jtMqn4b56mcoaceF8NfFI9RbasntfsVSNDiYjPIIUPNEZOrIFUne5vj5+sxG8B9SwSzgBay6e6wR5K/eri1bG+ATo582+rHUkIGsi+Q/r+1YZiGYLCsRE/XD4gDVxRZwp1bdQ/GPMx+Asw=
+	t=1776186518; cv=none; b=LwBZEBch/knRj9th3PAF7RdO+/OpAYst5KmKSiDWSdTugd3TRRlwkTz+AaCrg3PhF3gHz50K28OWNv+bDG3hnofyKjf/GMaDrpyb25orjd7MOChy5xDII3JP4/GmGkKi2g9X244imUYKVbEaKR2DX+gvVZISWqe3fgYjbSpbgUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776186350; c=relaxed/simple;
-	bh=gq3wRbVC4xiTc6eKlo03Eo/RVYblxKYExexEkzap//c=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=I+8Atj9RH5Lund2tCSq5QfzHc1uxyb6hFoJFI42jLsIVKiM8bj6MPMUsARs3QM16dFYHgo+5Q60y8QxHwA7jrV3buTxpMmAQFek0D8Ef6n17uYbOpZG+JLIRvbiWAMiZJEz2HPfAqE5Z0iHlxUyU6GKcH09gzuQj3j3GJFCPafs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.160.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oa1-f72.google.com with SMTP id 586e51a60fabf-42394108a90so10472466fac.0
-        for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 10:05:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776186348; x=1776791148;
-        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gq3wRbVC4xiTc6eKlo03Eo/RVYblxKYExexEkzap//c=;
-        b=X1xaO/iZ3/TIADQzNod6WwzxOpmbv3H8R06TWReiTj+jekKCqtnqcD9KvVHEVfHyX+
-         CSkUgnMAerHIG/SihZHKDUodwdqGuJKANPGZVIqrWTwszSW7azsYYi4iQGUegdLb6Myh
-         ieaurGvj0z8mRHhafJi0mUV4ZsNZmLGzMEsJ14VLnowr8x7jxqtYvfabIapn1X+PQpxF
-         cudHKcleH/Bf0vqBXQ0Gl5sYw6JRJWGAYndNV4BxJ1YrWHSJYKzgEHj2yaUi5+eP9rpy
-         toVw9HjNHd5zXUYIwM7CLW/o4l+MAe6niftuWr3WU8Nn0LFvOn3+HSTWJwTsyy7vaPAx
-         9ogw==
-X-Forwarded-Encrypted: i=1; AFNElJ8oXLw0XL3G1lwh+g6aAVdMRWupuBvD3NVLqzEvVrfh8Mv9SWj7/9Hj80iocepg8v4I1mC/8nI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzykRBqD/oCkvs5UHFLrPiDU08z2EUq0k9CA+OVQZCF7D52L7GQ
-	s/33G37+Xeb7YUTur5tpmbl5Yrb/mJW3KKYBCZGM4L+sZV/Ty5prqN9WLTy8Zkg8gAqekvBw4Oj
-	tOFD8ODhQfpCvH9fcbIWexx8qCccZh65mahAhTGzYC5ZMHv5LAOypV4GRxSk=
+	s=arc-20240116; t=1776186518; c=relaxed/simple;
+	bh=vKs+gWxdRfR0fLmOIUgbDBGc6PxJXrnR6lXTej2mrEo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=o4sglLGpO36ZDBy741eKrDGN5CJ07a3H392rbOxquJXhOt8RbFHGkUlWoUpl+DyNuFep1/nhCP0MUP6x+eFzf/ogBAliCjrMvuThywuWpoUOb+NF8ofS+6r0CC8CRy7ItlflMHxW8ZSr+0WLQr+EQ6ikFxTd3z/Aa0MKM4KDIw8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FArvBtao; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A974C19425;
+	Tue, 14 Apr 2026 17:08:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776186518;
+	bh=vKs+gWxdRfR0fLmOIUgbDBGc6PxJXrnR6lXTej2mrEo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=FArvBtaocYCI8ri7juv9TQmMH6xhe16gS2YBBBr8ytQeLt9UciyEDIOG2K5Py1FAl
+	 te1/nXiV54qnAEzS3kSOxdyovUEErDALSPDTWm/4rl++/Q88fxYzOTlu60iyPEvosS
+	 kRo1aLNhx4bBewyR/+5byZSra5+vJThsQWavDaXLxPPL9QX1Ql7ojNyYaXjx4++6Gd
+	 x1ZDexKwNfwz94Q6kANifRMKcH3mD1Fae3SuOhPt0oXZsaMmPRD+zXj5lfhY8a+q3n
+	 MIXM8iT2BoSk/FBgk1/e/3MVLaGX5iKHUXF+g1UuXB09pxKPbG2kq1g0YGdtmyQ54J
+	 iH9kQ2yZWMO1Q==
+Date: Tue, 14 Apr 2026 18:08:32 +0100
+From: Simon Horman <horms@kernel.org>
+To: Qingfang Deng <qingfang.deng@linux.dev>
+Cc: linux-ppp@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Guillaume Nault <gnault@redhat.com>,
+	Wojciech Drewek <wojciech.drewek@intel.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
+	Jaco Kroon <jaco@uls.co.za>,
+	James Carlson <carlsonj@workingcode.com>,
+	Marcin Szycik <marcin.szycik@linux.intel.com>
+Subject: Re: [PATCH net v5 1/2] flow_dissector: do not dissect PPPoE PFC
+ frames
+Message-ID: <20260414170745.GA772482@horms.kernel.org>
+References: <20260414021353.23471-1-qingfang.deng@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:8519:b0:689:7ad4:cba2 with SMTP id
- 006d021491bc7-68be7ee3984mr7566692eaf.35.1776186347962; Tue, 14 Apr 2026
- 10:05:47 -0700 (PDT)
-Date: Tue, 14 Apr 2026 10:05:47 -0700
-In-Reply-To: <20260414083316.19864-1-nogikh@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69de73eb.a00a0220.475f0.0045.GAE@google.com>
-Subject: [syzbot ci] Re: veth: add Byte Queue Limits (BQL) support
-From: syzbot ci <syzbot+ci113dfe74f48c7ad5@syzkaller.appspotmail.com>
-To: nogikh@google.com, hawk@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, syzbot@lists.linux.dev, 
-	syzkaller-bugs@googlegroups.com
-Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [1.14 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260414021353.23471-1-qingfang.deng@linux.dev>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_MATCH_TO(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278543-lists,netdev=lfdr.de,ci113dfe74f48c7ad5];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-278544-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	R_DKIM_NA(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,syzbot.org:url]
-X-Rspamd-Queue-Id: C375F3FCD54
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,msgid.link:url,horms.kernel.org:mid]
+X-Rspamd-Queue-Id: 9ABB13FCD8B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-syzbot ci has tested the suggested fix patch on top of the following series:
+On Tue, Apr 14, 2026 at 10:13:48AM +0800, Qingfang Deng wrote:
+> RFC 2516 Section 7 states that Protocol Field Compression (PFC) is NOT
+> RECOMMENDED for PPPoE. In practice, pppd does not support negotiating
+> PFC for PPPoE sessions, and the flow dissector driver has assumed an
+> uncompressed frame until the blamed commit.
+> 
+> During the review process of that commit [1], support for PFC is
+> suggested. However, having a compressed (1-byte) protocol field means
+> the subsequent PPP payload is shifted by one byte, causing 4-byte
+> misalignment for the network header and an unaligned access exception
+> on some architectures.
+> 
+> The exception can be reproduced by sending a PPPoE PFC frame to an
+> ethernet interface of a MIPS board, with RPS enabled, even if no PPPoE
+> session is active on that interface:
+> 
+> $ 0   : 00000000 80c40000 00000000 85144817
+> $ 4   : 00000008 00000100 80a75758 81dc9bb8
+> $ 8   : 00000010 8087ae2c 0000003d 00000000
+> $12   : 000000e0 00000039 00000000 00000000
+> $16   : 85043240 80a75758 81dc9bb8 00006488
+> $20   : 0000002f 00000007 85144810 80a70000
+> $24   : 81d1bda0 00000000
+> $28   : 81dc8000 81dc9aa8 00000000 805ead08
+> Hi    : 00009d51
+> Lo    : 2163358a
+> epc   : 805e91f0 __skb_flow_dissect+0x1b0/0x1b50
+> ra    : 805ead08 __skb_get_hash_net+0x74/0x12c
+> Status: 11000403        KERNEL EXL IE
+> Cause : 40800010 (ExcCode 04)
+> BadVA : 85144817
+> PrId  : 0001992f (MIPS 1004Kc)
+> Call Trace:
+> [<805e91f0>] __skb_flow_dissect+0x1b0/0x1b50
+> [<805ead08>] __skb_get_hash_net+0x74/0x12c
+> [<805ef330>] get_rps_cpu+0x1b8/0x3fc
+> [<805fca70>] netif_receive_skb_list_internal+0x324/0x364
+> [<805fd120>] napi_complete_done+0x68/0x2a4
+> [<8058de5c>] mtk_napi_rx+0x228/0xfec
+> [<805fd398>] __napi_poll+0x3c/0x1c4
+> [<805fd754>] napi_threaded_poll_loop+0x234/0x29c
+> [<805fd848>] napi_threaded_poll+0x8c/0xb0
+> [<80053544>] kthread+0x104/0x12c
+> [<80002bd8>] ret_from_kernel_thread+0x14/0x1c
+> 
+> Code: 02d51821  1060045b  00000000 <8c640000> 3084000f  2c820005  144001a2  00042080  8e220000
+> 
+> To reduce the attack surface and maintain performance, do not process
+> PPPoE PFC frames.
+> 
+> [1] https://patch.msgid.link/20220630231016.GA392@debian.home
+> Fixes: 46126db9c861 ("flow_dissector: Add PPPoE dissectors")
+> Signed-off-by: Qingfang Deng <qingfang.deng@linux.dev>
+> ---
+> Changes in v5: drop byte-swap change
+>  Link to v4: https://lore.kernel.org/netdev/20260410033627.93786-1-qingfang.deng@linux.dev/
+> 
+>  net/core/flow_dissector.c | 10 +---------
+>  1 file changed, 1 insertion(+), 9 deletions(-)
+> 
+> diff --git a/net/core/flow_dissector.c b/net/core/flow_dissector.c
+> index 1b61bb25ba0e..f9aaba554128 100644
+> --- a/net/core/flow_dissector.c
+> +++ b/net/core/flow_dissector.c
+> @@ -1374,16 +1374,8 @@ bool __skb_flow_dissect(const struct net *net,
+>  			break;
+>  		}
+>  
+> -		/* least significant bit of the most significant octet
+> -		 * indicates if protocol field was compressed
+> -		 */
+>  		ppp_proto = ntohs(hdr->proto);
+> -		if (ppp_proto & 0x0100) {
+> -			ppp_proto = ppp_proto >> 8;
+> -			nhoff += PPPOE_SES_HLEN - 1;
+> -		} else {
+> -			nhoff += PPPOE_SES_HLEN;
+> -		}
 
-[v2] veth: add Byte Queue Limits (BQL) support
-https://lore.kernel.org/all/20260413094442.1376022-1-hawk@kernel.org
+I think it would be good to add a comment around here
+describing how PFC is safely handled in this function.
 
-Patch: https://ci.syzbot.org/jobs/bf27b11f-8196-4c99-bc10-11843ded8a31/patch
-
-The patch testing request could not be completed:
-tree "net-next" is no longer known
-
-Full report is available here:
-https://ci.syzbot.org/session/31e795da-e7ea-4f46-8412-c30d420a5f1e
-
----
-This report is generated by a bot. It may contain errors.
-syzbot ci engineers can be reached at syzkaller@googlegroups.com.
+> +		nhoff += PPPOE_SES_HLEN;
+>  
+>  		if (ppp_proto == PPP_IP) {
+>  			proto = htons(ETH_P_IP);
+> -- 
+> 2.43.0
+> 
 
