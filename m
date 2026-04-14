@@ -1,174 +1,177 @@
-Return-Path: <netdev+bounces-278270-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278271-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yI4gBv2h3Wl8hAkAu9opvQ
-	(envelope-from <netdev+bounces-278270-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 04:10:05 +0200
+	id 2l9PGT6i3WmzhAkAu9opvQ
+	(envelope-from <netdev+bounces-278271-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 04:11:10 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8705E3F4E63
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 04:10:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BEF603F4E82
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 04:11:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7957C302D09D
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 02:09:59 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8EE813028F60
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 02:11:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD3763043C9;
-	Tue, 14 Apr 2026 02:09:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C4DE2FFF8D;
+	Tue, 14 Apr 2026 02:11:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q1nYtCjy"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="jwgNvNCm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FAC62FBDE0
-	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 02:09:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E19024A0C;
+	Tue, 14 Apr 2026 02:11:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776132598; cv=none; b=q1e6srTTyUPba0sct25xTE+iSA/ALse27WH04VrQtfpsFCdYc0cnXzLd1jx+rpySOshNqhAq9WN9lWYuHAIaFPJYoxKSsyTkB6Vs/vZDG9+mFuFcNNsx0tVOCjynpTdrPCX7sZijRThdAWk+NLITaKUC+Tk5ybcj8X8Kpj407PY=
+	t=1776132667; cv=none; b=AlEZQ5EmnFP5zyWGOtgOmPvc/h5bn2Uf90CPZmdmkR0wWvAYul0YXucnOSvr1qlmz67vKchwSlbcskUpzxR/UYuOS/CUx/ai3XbUJT0CRYJJxl04SaVAgb1y/NBpz8O0Df0KeY8/mfvXrWZRSb6IWZ4rcRccSzDW08Oa4iiWuRs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776132598; c=relaxed/simple;
-	bh=xY4b9wGUIkCrctiEpdGWM1HC1dXk7NDB/lOt+BaRB6Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Cs61S+QCT/QIdcu51XQGErrxTvE7iyQLANMKwQywgAW2/HhE09Hy1j4nnw81bbPw6nGAZEgDj7NSy/8OFae62qoLLkdHTLJAzujKhD5kqzb/XVguWuKp5iBgZabS4+mXsGg1tW+u+1IO6U/5pkA+lTA/8jbQDhFheoqX5UfGxfk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q1nYtCjy; arc=none smtp.client-ip=209.85.215.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-c76b994f7a8so1740714a12.3
-        for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 19:09:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776132596; x=1776737396; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=FUZYksfTG/qLw7MfI55z+3Kvxpv1PSmQo+kMyhRoDJA=;
-        b=Q1nYtCjy5zZ16XBg63+1sgVSNFEcr8EB27ipZXP0/DmTnJSQi1PeLkOhvybuCTszqh
-         csyVgVArrBwTDe3OHSG5S2FH356ikuL7Es/qA0cnvgROCaD1fx4LvrUnprPP3LCB9teo
-         uX3bv0TG4fQ2L9EVLfTCUxBo0ta8G0y80GSFTcmrgQDrqBjF7L9/UxjUCFPl10oG7ztA
-         4z+Ub9vkcLKtvNtQ7DY06ORxfiHht61xv++73u0yCXsTtEWoniCP8R0kh1WsgDSRLJAM
-         eMSmDpj2TXnyXeNITPjMTI3U7gXLw7QtLu6WAZJlrRcPX5H9RDvzEY+ol/GmaMbs7nia
-         ajew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776132596; x=1776737396;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FUZYksfTG/qLw7MfI55z+3Kvxpv1PSmQo+kMyhRoDJA=;
-        b=CMdv9mcVH8H87aQCbVjJgWseqT60iL+rOnXIrLHDZ0Onv+2yppdbpFlphBIJ2QBpJ5
-         UMPho73dP1JcKlVFaSxBwcmjNbqEyuDB0ruNS+qTyAiLpNBDSEJZAYBdzLi88tkXlmX7
-         qjUbcMW8riZZ4SjiV8TT10W+aRhQZgcnakTdr05Qnf6RfD6vNpqPle9Vroq4MPlb7LcP
-         zgeC57nKxnW3YLfDRb5QFWgvlkvOEi4eiDm/rNmrSb9qamiVOuN5PHs1MdHIngQuypZ0
-         3/EtbOL+qGY9ZknXYmq3o4WgnYP+teHmefrd4PGtk7FHn3UD6XG+T8XaHgYkzvlA3RmQ
-         akIA==
-X-Gm-Message-State: AOJu0Yx3BJ3s7uBheSZwtOVY5+PIfwFDUuZw8FIX/+b8Cog1oLhQlJo0
-	FDrkNxnH4LSLNDBV9CQOoAg9tNEoUW5zEMYeN54lXIe81+6BFTf2geSP
-X-Gm-Gg: AeBDiet27M3DPeOIWujNhGdexTM7JhDGB7YIoAXXscLd46mykbE0iE/w1BoVV126le+
-	o4+0XgUoL1K0v8tcypbFz5XuHMZVkP9Ewmd2Ec9fuDQ3RjEJJPhASuZFwKpuDtXplfoQfEeG+K+
-	DAJI6dHssOojK34wBNDMg6KGNimzTI+SMknoesWzGR7rNDoKOhfFyqhWBLz21UmtuE1l7oSq+Mj
-	b3r4RAhW+NJLw874+jUWih8dYxAZ+nc/XMNAwbqJQIJCgs2o5jHDKOGJqUuBq3uXjfowwIVoguC
-	G54lrfaagh+pP5hqXH8BOYIbEqPdOCZxR5QXkl44by/u3XoK+gZgsdJfzu7eQGG7KJn+52Vnt8J
-	zOPhwaWzg+7nL//Au2DzdheAhGRXDHYwNao1KKDOCV5QVTR06HZZ6ZqFPbqtOl5sEFZqFRLV+Kg
-	xAeV8zdJyO6R/RjJ8GyN03rC/5brCB9jijw2gk17JzhPdx3+ygubyv6o2fzTo3cZ0UxoUHkRmHW
-	MgCOMziL9+rVZfDQA==
-X-Received: by 2002:a05:6a00:3e27:b0:82a:5e9a:922e with SMTP id d2e1a72fcca58-82f0c3a9497mr15921602b3a.42.1776132595740;
-        Mon, 13 Apr 2026 19:09:55 -0700 (PDT)
-Received: from deepanshu-kernel-hacker.. ([2405:201:682f:383f:445c:f4a3:a803:e3c6])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82f0c4b6d43sm11297750b3a.31.2026.04.13.19.09.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Apr 2026 19:09:55 -0700 (PDT)
-From: Deepanshu Kartikey <kartikey406@gmail.com>
-To: steffen.klassert@secunet.com,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	sd@queasysnail.net
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Deepanshu Kartikey <kartikey406@gmail.com>
-Subject: [PATCH ipsec-next v3] xfrm: cleanup error path in xfrm_add_policy()
-Date: Tue, 14 Apr 2026 07:39:47 +0530
-Message-ID: <20260414020947.65905-1-kartikey406@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1776132667; c=relaxed/simple;
+	bh=qONVCwTdjOsPJicXgg54drut12/jVHItxnBei3Ez/24=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gW4ygj3nZKUTpEIaYyfD5ZL0ExMaazxBh7ssls6OlM5Bs9NVN1UflzeiA3WSvp2rzRgON9KBgkiao09N5JHEsWHCvTfLmHyL6KLEQRqhxixyOyh8gMs98qE97RCOWwrH7W8tZyiPSBHqLiWP4DGS4uKkbPvmArTgHUGAVT3ko8w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=jwgNvNCm; arc=none smtp.client-ip=115.124.30.99
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1776132655; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=2GEV5QxYqXEC3gg+qrv5++VkT+kGhafbXkPa1JP+x14=;
+	b=jwgNvNCmZjLE6NyUS2+Ts9NXVRZfpboa65Z4tqH5IkenwiDSSuzogCSl4K43vAdopPYODX+CC4DO5U2BbMgP8KgwTxJsuOn2RF/nwRA2WGksm5GgHB7f5kCAaLYzTMuO+QJKLCLjEUgm+uMaT5tjhGzhvtG1TUw026oV611RBME=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045098064;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=18;SR=0;TI=SMTPD_---0X1.hUBx_1776132654;
+Received: from localhost(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0X1.hUBx_1776132654 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Tue, 14 Apr 2026 10:10:54 +0800
+Date: Tue, 14 Apr 2026 10:10:54 +0800
+From: "D. Wythe" <alibuda@linux.alibaba.com    >
+To: Simon Horman <horms@kernel.org>
+Cc: "D. Wythe" <alibuda@linux.alibaba.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Dust Li <dust.li@linux.alibaba.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Sidraya Jayagond <sidraya@linux.ibm.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>,
+	Mahanta Jambigi <mjambigi@linux.ibm.com>,
+	Tony Lu <tonylu@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>, linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org, oliver.yang@linux.alibaba.com,
+	pasic@linux.ibm.com
+Subject: Re: [PATCH net-next v2] net/smc: cap allocation order for SMC-R
+ physically contiguous buffers
+Message-ID: <20260414021054.GA111420@j66a10360.sqa.eu95>
+References: <20260407124337.88128-1-alibuda@linux.alibaba.com>
+ <20260410151631.GY469338@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+In-Reply-To: <20260410151631.GY469338@kernel.org>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Spamd-Result: default: False [-9.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
+	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-278270-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-278271-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kartikey406@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-0.999];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[alibuda@linux.alibaba.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.alibaba.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8705E3F4E63
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.alibaba.com:dkim,alibaba.com:email]
+X-Rspamd-Queue-Id: BEF603F4E82
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Replace the open-coded manual cleanup in the error path of
-xfrm_add_policy() with xfrm_policy_destroy(), which already
-handles all the necessary cleanup internally. This is consistent
-with how xfrm_policy_construct() handles its own error paths.
+On Fri, Apr 10, 2026 at 04:16:31PM +0100, Simon Horman wrote:
+> On Tue, Apr 07, 2026 at 08:43:37PM +0800, D. Wythe wrote:
+> > The alloc_pages() cannot satisfy requests exceeding MAX_PAGE_ORDER,
+> > and attempting such allocations will lead to guaranteed failures
+> > and potential kernel warnings.
+> > 
+> > For SMCR_PHYS_CONT_BUFS, cap the allocation order to MAX_PAGE_ORDER.
+> > This ensures the attempts to allocate the largest possible physically
+> > contiguous chunk succeed, instead of failing with an invalid order.
+> > This also avoids redundant "try-fail-degrade" cycles in
+> > __smc_buf_create().
+> > 
+> > For SMCR_MIXED_BUFS, no cap is needed: if the order exceeds
+> > MAX_PAGE_ORDER, alloc_pages() will silently fail (__GFP_NOWARN)
+> > and automatically fall back to virtual memory.
+> > 
+> > Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+> > Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
+> > ---
+> > Changes v1 -> v2:
+> > https://lore.kernel.org/netdev/20260312082154.36971-1-alibuda@linux.alibaba.com/
+> > 
+> > - Move the bufsize cap from smcr_new_buf_create() up to
+> >   __smc_buf_create(), which is simpler and avoids touching
+> >   the allocation logic itself.
+> 
+> The nit below notwithstanding, this looks good to me.
+> 
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> 
+> > ---
+> >  net/smc/smc_core.c | 4 ++++
+> >  1 file changed, 4 insertions(+)
+> > 
+> > diff --git a/net/smc/smc_core.c b/net/smc/smc_core.c
+> > index e2d083daeb7e..cdd881746e21 100644
+> > --- a/net/smc/smc_core.c
+> > +++ b/net/smc/smc_core.c
+> > @@ -2440,6 +2440,10 @@ static int __smc_buf_create(struct smc_sock *smc, bool is_smcd, bool is_rmb)
+> >  		/* use socket send buffer size (w/o overhead) as start value */
+> >  		bufsize = smc->sk.sk_sndbuf / 2;
+> >  
+> > +	/* limit bufsize for physically contiguous buffers */
+> > +	if (!is_smcd && lgr->buf_type == SMCR_PHYS_CONT_BUFS)
+> > +		bufsize = min_t(int, bufsize, (PAGE_SIZE << MAX_PAGE_ORDER));
+> 
+> nit: I think min() is sufficient here, and the inner parentheses are
+>      unnecessary
 
-The walk.dead flag must be set before calling xfrm_policy_destroy()
-as required by BUG_ON(!policy->walk.dead).
+Hi Simon,
 
-Signed-off-by: Deepanshu Kartikey <kartikey406@gmail.com>
----
-v3:
-  - Changed prefix to ipsec-next as this is a cleanup
-  - Dropped syzbot references as suggested by Sabrina Dubroca
-v2:
-  - Reworded commit message to reflect cleanup rather than bugfix
-    as suggested by Sabrina Dubroca
-  - Removed incorrect Fixes: and Closes: tags
-  - Corrected subject prefix to PATCH ipsec
----
- net/xfrm/xfrm_user.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+I think min_t is required here because min() triggers a signedness
+error:
 
-diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
-index d56450f61669..ae144d1e4a65 100644
---- a/net/xfrm/xfrm_user.c
-+++ b/net/xfrm/xfrm_user.c
-@@ -2267,9 +2267,8 @@ static int xfrm_add_policy(struct sk_buff *skb, struct nlmsghdr *nlh,
- 
- 	if (err) {
- 		xfrm_dev_policy_delete(xp);
--		xfrm_dev_policy_free(xp);
--		security_xfrm_policy_free(xp->security);
--		kfree(xp);
-+		xp->walk.dead = 1;
-+		xfrm_policy_destroy(xp);
- 		return err;
- 	}
- 
--- 
-2.43.0
+././include/linux/compiler_types.h:706:38: error: call to
+‘__compiletime_assert_950’ declared with attribute error: min(bufsize,
+((1UL) << 12) << 10) signedness error
 
+The inner parentheses can be removed, though.
+
+D. Wythe
+
+> 
+> > +
+> >  	for (bufsize_comp = smc_compress_bufsize(bufsize, is_smcd, is_rmb);
+> >  	     bufsize_comp >= 0; bufsize_comp--) {
+> >  		if (is_rmb) {
+> > -- 
+> > 2.45.0
+> > 
 
