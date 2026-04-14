@@ -1,86 +1,87 @@
-Return-Path: <netdev+bounces-278357-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278358-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IO5mMB8F3mlRmQkAu9opvQ
-	(envelope-from <netdev+bounces-278357-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 11:13:03 +0200
+	id OAxEJ3kF3mlRmQkAu9opvQ
+	(envelope-from <netdev+bounces-278358-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 11:14:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D96A3F7B24
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 11:13:02 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E0583F7B76
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 11:14:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 822CD301DB8C
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 09:13:01 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 79D1B3040690
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 09:13:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09D5F3B9DAC;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 895B53BB9F6;
 	Tue, 14 Apr 2026 09:13:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N9YNrc4r"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DlVNWBxL"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78A8A13635C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA5D93B38A7
 	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 09:12:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776157980; cv=none; b=HjM60nZBjxqKlrekGiVumfTvrIAWPdbCvt6mD1XaO7l4UVpWItv4MN9UPRHhj65Dv0kYE3ocNIn7l7SPxhWXzag2etffZsiQxJpRpS0tVdt2BehIFwEHRR4ATbq25CeSGpCceEX7DEzZoQhtH8tGA7YAemzvMFgFiTUjZBbMguA=
+	t=1776157981; cv=none; b=gVD06YAnBCVYaOgCw9aZ1OKUdLr5I4kaIxgwQczj57w35yiqo+zeu5TtR3xoJ/8wJhcKzAyM3XnB5RBDuM0y8xy7CIbEeqhFLjQ37fh6OceOl8BStmULsb8Yam3AMgd9jDDH7qutOy98ZHyGR26prxll0JpAbG3iI46oIbtcoNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776157980; c=relaxed/simple;
-	bh=U6zwG99hw985545cJNtTNsDusgPzyPeUkX9br2IJj5I=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=jIbnM1J1G3Mi/cZeWDD+MKXNJIhSTZurm9Q5V852/L6ewOPOFlJ/lO1I+g5wCZNhRtxVFRWfJifdh+beJhK16A+N+a0UD0P1gXgha1cr8ByF5XdIHsSXBUcfqWxAhRkpf4XSWl0fno+c3ZpVkSjCcJ8RXELEB4rJbiAYdjt6qvw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N9YNrc4r; arc=none smtp.client-ip=209.85.128.49
+	s=arc-20240116; t=1776157981; c=relaxed/simple;
+	bh=b2vABH9CUTGVy1b/2pVmKvFnsTTGQEzVcL53yfqfBH8=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=g6dgFwoO6IZCgcm69NCvcgNMrGHMK9yQTpik+r87yrFN8h0oD6p4C0/nztIQu9bqrHKd4mH+huMOCjkVmIQwHzv0QzEU9n7d8bH/FLuMtbZPqxu+mTab+BMC5e//dwP7ZxZgA9vW62yRI8qAjTS8XVV0NwN9178vngihxXlFclU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DlVNWBxL; arc=none smtp.client-ip=209.85.128.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-488a041eae5so39265155e9.1
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-488ba840146so51816795e9.1
         for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 02:12:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20251104; t=1776157978; x=1776762778; darn=vger.kernel.org;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=4t1G4+4JmAZQxqNkrkh1AxLVx0ioJOhQlGcd0wan2yw=;
-        b=N9YNrc4rllVd9a69NKnC533c1dJGjfEosVBa+vMcOpjuyxtBrLtLZA4gcO6WoJ+dF4
-         d9XiO3xxW/roVmxMJcKJINJXuuROp0Sn4aeiHWDRDw1URf6Zgzy0IprP4j5ac27DW6qv
-         88Z7CHxgjmruYBYlLh2CN9oWckZluFnPxj+YZs+tCTT+vLyI9yomuhNMFaV2D3FjTzJj
-         GlCs9Da93S7cG1/uhXOoGvoyEyFZKm4eSiohWo8Bre+GIu/JJoScF4f/AzkDARiWQNXx
-         4Ya3Ek5J6F2ynInrhXP9v2BH8KJwWJP6JWyV6kXx7+cdK2MhP5OvmkgHsEG2lv5qP888
-         8a9A==
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=EDSOwTMIxUubFUHj5t2nw1K3vQ5AcGm2RW0GMElvL0c=;
+        b=DlVNWBxLilFDc1CxFhvDlUr5Aub04sDCdyUqsAxifkTNh3/oa3JXjdGE4SNbkebluH
+         nPYOrl1qTaVEouYqwuoPn/vMQnud+FT6c9ocG+r4y00WZ3n6mftqxy/Olr9f25YJ2S0r
+         Ewh3JW+1m9D/HrBvxB3N1qXOHgDetNEOJlJOBjBX2RrsQNiVMmkXwzMf47TB+MD9/Jyf
+         1LRzthhq5LpEW/SUhoEqTl9yGJoVu9G2FaxE/kP0PEOTa+gq+ypxaM9BGJkq0mRV11Kr
+         A3h/EBpSn3nfWnOiukvc2xsco7gsyaMnUgTV0+h91VJChFYp3WWG+2M3THfls0MvH4D0
+         fNKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20251104; t=1776157978; x=1776762778;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4t1G4+4JmAZQxqNkrkh1AxLVx0ioJOhQlGcd0wan2yw=;
-        b=M4NQiLH07/e/oBZ/6Wjh9RMPSDIqIh2JziVAPDMVxJJ+P3SX5VX/tGwANAi2GXQ1Nu
-         xBd2pIHd2ov9lBw+dL+2cnPMtG+WwWen1R9u4TDG+x02Eokge90a2CFvJvwpKrVthH+N
-         QFNSua3vC6v4JXo1C6TXvn5WoJf2YAa3MtX+dExOo68pyz7ggumex/ozyPN+2/uUNdH2
-         LRlPRH/JwE5NmlB/EQw62BRR0fcGQjGSYdMxa/HnRaOh4uxcemLrkJEynmcO/r6gj1n+
-         tzM+6ew68AA9EI8zaE0eGTbUIYTbjqeOMZbGC+w3fbvy3V9+4tcXitScXKkuUHML3FUz
-         YkYg==
-X-Forwarded-Encrypted: i=1; AFNElJ/YD95K+nkzMDX61/rIqhmzp4oBPoNiGB2ci6KLWHLkBItrE8dpVv8/vkQZ9bNpph/LGht0BLQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxLXa27/ZVNgugwUUTJrU0mjgJV163ztRPxri6OJMntuDH55kUC
-	YkxURFd2fnVHp+hOPsHh/dYPvVZFNc5V5TDI+WANhDkiuFA4A5ys/6jx
-X-Gm-Gg: AeBDieu5ehRXyCCcBNgEyVW22OpznkAChPxHPUCBuC+/So0ZVTM/kiN+6itdBR1JSMv
-	FzdMj4w2lQMs7MaaUAOpCJ0GC6dOwFSEKgq85lKA3f28vbSrGwdpgxsUz059LDPCCi7b55O+R1s
-	Gda1Idq4f9Py+BASUlGGqNgcQwwskEa50x41dhh2bkK0xyAo/STyYZFFiugVtCP6hjh1G4O5HVh
-	Vr5Ein6GcUDhGzlUSMGbLuQBrT9I5NQj7w/g+0EqXS8HXLfudwzLyslZbuk28rdxZqIu3nLBzKj
-	XOlyyPOogekPZYqpPIQu1yomNM5ZlfFzMFc5z1dR1qYo82m5oh5tw+4gpzSuFjmlAN4a9FLrltL
-	gOhjnj09RP8gprwV90jVSmKGba0od6GYXTcC8FvkGI8S8onETm3d9uzTARMSwrcjuXBfcp2pQtt
-	zzmeXkQNUWUgg1e56NfEJHE0Hzlq1YTyGqmzDYPyiU0xGj5bLVPxMDTPKKfv/lfvQ4/5eY06zwz
-	ckCjHUhSA==
-X-Received: by 2002:a05:600c:8709:b0:488:945a:ed63 with SMTP id 5b1f17b1804b1-488d6655adfmr230520435e9.0.1776157977530;
-        Tue, 14 Apr 2026 02:12:57 -0700 (PDT)
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=EDSOwTMIxUubFUHj5t2nw1K3vQ5AcGm2RW0GMElvL0c=;
+        b=s2p4Eg7THCwzH+pKL0f9BE+RyrovQ9lTgu2qrApysUgR3YIx2Uyd7ZkssIhyuo51Sq
+         3MK2W0KDDQvS0qWOiFV02YERxhj4NzV74rYNZvZCmrrGNSbOutg8egwGC7d4ML6mPGBG
+         fjoX2+rQcVI9nz1S02xNqXALmbX8AgbGWezbushgYpTYT9kFFh/ZDnjUcyuf5BffHKpE
+         DPnUKp/R7IdQrHPUFajFAfGf6jbjE4nXtYOGlAMEUn/YCbV17FXPjWZkJMMD2xu54q6C
+         7HTg005ZWRI5MX5ZVxe79KWHC3DxSwtCmChqLUxcfOTV7ZYOOyIbT/F8GZgayZJsuoWb
+         FkUQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9CIyAzNWjCd/yo18B+/yFMN1Q3HiYdd/C4V+4niR6RYfmvaA5QZtC0LE76lL59GYtrf3isZYg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6J57kbT6ba1hlaLkaRJiVUOFibfQs3/WTTM09TXNHVsIMlM8/
+	6V4gLOH7cvxjc0LMoDtDUGSnQMlbSDBzP13fMLV+tGRYVStDpk//wWes
+X-Gm-Gg: AeBDiesAqQ6KZ2dHI1FaIFN4ReP/qA3CHAqRcVWJZVkuzS7mzW0AwTT6R4bw6+tt8YF
+	YF7PlF3D/sgd/m95rVtoEdGUfVS6zKHHkhEW+FburFmXbl00OTKYuqgDdyxPMgiscU80uRWgGcN
+	a9xwvpjSliW0HyxD/9+sMPhBpWcIeSsSWFwdpomzzuXX6t1QRt3uE7/RVWD+g80mLP0XLW4sZOO
+	Q390RwELgB5cFexTSP/n1VMSTx8TD1p/tSg2+ClgwIwDUeGpAYmtjoHCo6QFwuWozYgGzB1qpiu
+	40VIhdjimrVb8hhoCGRLYaZhH6OMPya3b8jg48Xz2jNRWEGWUFtf8iElg1Ss8HMQaJOBUT5Y48Q
+	I0Up6xIzThxFBqrnw8aP9ZhSECuQcU81aFhW3MzcVGJoAqBFU21xDxuYCTK1pBqFiIMVDdXyIgN
+	0mAgvnG4bFIZop57hpqe4H9NDEmrwiuUD+sqO5uhT7pNX7dKQBi4jsZOZU35c22cDRPyb5keHW3
+	ZKh6mBFRw==
+X-Received: by 2002:a05:600c:4fcb:b0:488:c120:480a with SMTP id 5b1f17b1804b1-488d6891181mr241537365e9.31.1776157978248;
+        Tue, 14 Apr 2026 02:12:58 -0700 (PDT)
 Received: from [127.0.1.1] (cust-east-par-46-193-119-166.cust.wifirst.net. [46.193.119.166])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488eddba112sm37720175e9.0.2026.04.14.02.12.56
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488eddba112sm37720175e9.0.2026.04.14.02.12.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Apr 2026 02:12:57 -0700 (PDT)
+        Tue, 14 Apr 2026 02:12:58 -0700 (PDT)
 From: Fidelio Lawson <lawson.fidelio@gmail.com>
 X-Google-Original-From: Fidelio Lawson <fidelio.lawson@exotec.com>
-Subject: [PATCH v3 0/3] ksz87xx: add support for low-loss cable equalizer
- errata
-Date: Tue, 14 Apr 2026 11:12:33 +0200
-Message-Id: <20260414-ksz87xx_errata_low_loss_connections-v3-0-0e3838ca98c9@exotec.com>
+Date: Tue, 14 Apr 2026 11:12:34 +0200
+Subject: [PATCH v3 1/3] net: dsa: microchip: implement KSZ87xx Module 3
+ low-loss cable errata
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,11 +90,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-B4-Tracking: v=1; b=H4sIAAEF3mkC/42Oyw6CMBBFf8V0bU0fWMCV/2EMgTpIfVDTQawS/
- t0WY4w7FrO4yb3nzEAQnAEkm8VAHPQGjW1DkMsF0U3ZHoGaQ8hEMKGYFJKe8ZWl3hfgXNmVxcU
- +wiEW2rYt6C7MkVZqDakCUSVMkkC6OaiNnyy7/SfjvTqFekTHRmOws+45vdHz2Psa1Sxjzymja
- V6qPKsTqYTagrcd6JW2VxKVvfhBE5bNgwrKaa5rkJnKecrlH3Qcxzd1XamTPgEAAA==
-X-Change-ID: 20260323-ksz87xx_errata_low_loss_connections-b65e76e2b403
+Message-Id: <20260414-ksz87xx_errata_low_loss_connections-v3-1-0e3838ca98c9@exotec.com>
+References: <20260414-ksz87xx_errata_low_loss_connections-v3-0-0e3838ca98c9@exotec.com>
+In-Reply-To: <20260414-ksz87xx_errata_low_loss_connections-v3-0-0e3838ca98c9@exotec.com>
 To: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, 
  Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
@@ -105,17 +104,17 @@ To: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
 Cc: Woojung Huh <Woojung.Huh@microchip.com>, netdev@vger.kernel.org, 
  linux-kernel@vger.kernel.org, Fidelio Lawson <fidelio.lawson@exotec.com>
 X-Mailer: b4 0.15.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1776157976; l=3261;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1776157976; l=7009;
  i=fidelio.lawson@exotec.com; s=20260326; h=from:subject:message-id;
- bh=U6zwG99hw985545cJNtTNsDusgPzyPeUkX9br2IJj5I=;
- b=pmTViQdFeg77t3R0Cp4veQ9ddDJs2seEPNd8Pph8Uizosm5tTe91N+RPLvWIHe6xp/TUuhR+K
- Z0LTBWsmeWoC4zJ/y5GRsIstNPBqo26REw9JtAgYTDoOUxxt5aJXhzE
+ bh=b2vABH9CUTGVy1b/2pVmKvFnsTTGQEzVcL53yfqfBH8=;
+ b=1EdUKsDD5kIx0r/m1y1jf+NIHZjI939g6JX7+0sZbH92Eh6h8RlGaG7dStAAsPGCeMkgh6zEQ
+ oN9nBsoHh7kA3fzag/cdtOHqo5tLS2bECSYcgE6p6ivvs4BHPXSJYm/
 X-Developer-Key: i=fidelio.lawson@exotec.com; a=ed25519;
  pk=866eH9Bmmpjc+ctgkr5T1uXxBefZzob3tEEuiVWZ6BI=
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -124,11 +123,11 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	FREEMAIL_TO(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,denx.de,bootlin.com,armlinux.org.uk];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-278357-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-278358-lists,netdev=lfdr.de];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	RCPT_COUNT_TWELVE(0.00)[17];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
@@ -138,35 +137,32 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 1D96A3F7B24
+	DBL_BLOCKED_OPENRESOLVER(0.00)[exotec.com:email,exotec.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 1E0583F7B76
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello,
+Implement the "Module 3: Equalizer fix for short cables" erratum from
+Microchip document DS80000687C for KSZ87xx switches.
 
-This patch implements the “Module 3: Equalizer fix for short cables” erratum
-described in Microchip document DS80000687C for KSZ87xx switches.
+The issue affects short or low-loss cable links (e.g. CAT5e/CAT6),
+where the PHY receiver equalizer may amplify high-amplitude signals
+excessively, resulting in internal distortion and link establishment
+failures.
 
-According to the erratum, the embedded PHY receiver in KSZ87xx switches is
-tuned by default for long, high-loss Ethernet cables. When operating with
-short or low-loss cables (for example CAT5e or CAT6), the PHY equalizer may
-over-amplify the incoming signal, leading to internal distortion and link
-establishment failures.
+KSZ87xx devices require a workaround for the Module 3 low-loss cable
+condition, controlled through the switch TABLE_LINK_MD_V indirect
+registers.
 
-Microchip provides two workarounds, each requiring a write to a different
-indirect PHY register access mechanism.
+The affected registers are part of the switch address space and are not
+directly accessible from the PHY driver. To keep the PHY-facing API
+clean and avoid leaking switch-specific details, model this errata
+control as vendor-specific Clause 22 PHY registers.
 
-The workaround requires programming internal PHY/DSP registers located in the
-LinkMD table, accessed through the KSZ8 indirect register mechanism. Since these
-registers belong to the switch address space and are not directly accessible
-from a standalone PHY driver, the erratum control is modeled as a vendor-specific
-Clause 22 PHY register, virtualized by the KSZ8 DSA driver.
-
-Reads and writes to this register are intercepted by ksz8_r_phy() /
-ksz8_w_phy() and translated into the required TABLE_LINK_MD_V indirect accesses.
-The erratum affects the shared PHY analog front-end and therefore applies
-globally to the switch.
+A vendor-specific Clause 22 PHY register is introduced as a mode
+selector in PHY_REG_LOW_LOSS_CTRL, and ksz8_r_phy() / ksz8_w_phy()
+translate accesses to these bits into the appropriate indirect
+TABLE_LINK_MD_V accesses.
 
 The control register defines the following modes:
 0: disabled (default behavior)
@@ -176,46 +172,170 @@ The control register defines the following modes:
 4: LPF 55 MHz
 5: LPF 44 MHz
 
-The register can be read and written from userspace via a phy tunable.
-Note that current ethtool userspace only supports a fixed set of PHY tunables;
-vendor-specific tunables may require either phytool or a newer userspace extension.
+Workaround 1: Adjusts the DSP EQ training behavior via LinkMD register
+0x3C. Widens and optimizes the DSP EQ compensation range,
+and is expected to solve most short/low-loss cable issues.
 
-This series is based on Linux v7.0-rc1.
+Workaround 2: for the cases where Workaround 1 is not sufficient.
+This one adjusts the receiver low-pass filter bandwidth, effectively
+reducing the high-frequency component of the received signal
+
+The register is accessible through standard PHY read/write operations
+(e.g. phytool), without requiring any switch-specific userspace
+interface. This allows robust link establishment on short or
+low-loss cabling without requiring DTS properties and without
+constraining hardware design choices.
+
+The erratum affects the shared PHY analog front-end and therefore
+applies globally to the switch.
 
 Signed-off-by: Fidelio Lawson <fidelio.lawson@exotec.com>
 ---
-Changes in v3:
-- Exposed all LPF bandwidth values supported by the hardware.
-- Added phy tunable.
-- Link to v2: https://patch.msgid.link/20260408-ksz87xx_errata_low_loss_connections-v2-1-9cfe38691713@exotec.com
-
-Changes in v2:
-- Dropped the device tree approach based on review feedback
-- Modeled the errata control as a vendor-specific Clause 22 PHY register
-- Added KSZ87xx-specific guards and replaced magic values with named macros
-- Rebased on Linux v7.0-rc1
-- Link to v1: https://patch.msgid.link/20260326-ksz87xx_errata_low_loss_connections-v1-0-79a698f43626@exotec.com
-
----
-Fidelio Lawson (3):
-      net: dsa: microchip: implement KSZ87xx Module 3 low-loss cable errata
-      net: ethtool: add KSZ87xx low-loss PHY tunable
-      net: phy: micrel: expose KSZ87xx low-loss erratum via PHY tunable
-
  drivers/net/dsa/microchip/ksz8.c       | 45 ++++++++++++++++++++++++++++++++++
  drivers/net/dsa/microchip/ksz8_reg.h   | 36 ++++++++++++++++++++++++++-
  drivers/net/dsa/microchip/ksz_common.h |  3 +++
- drivers/net/phy/micrel.c               | 39 +++++++++++++++++++++++++++++
- include/uapi/linux/ethtool.h           |  1 +
- net/ethtool/common.c                   |  1 +
- net/ethtool/ioctl.c                    |  1 +
- 7 files changed, 125 insertions(+), 1 deletion(-)
----
-base-commit: 2d1373e4246da3b58e1df058374ed6b101804e07
-change-id: 20260323-ksz87xx_errata_low_loss_connections-b65e76e2b403
+ 3 files changed, 83 insertions(+), 1 deletion(-)
 
-Best regards,
---  
-Fidelio Lawson <fidelio.lawson@exotec.com>
+diff --git a/drivers/net/dsa/microchip/ksz8.c b/drivers/net/dsa/microchip/ksz8.c
+index c354abdafc1b..596c85654f24 100644
+--- a/drivers/net/dsa/microchip/ksz8.c
++++ b/drivers/net/dsa/microchip/ksz8.c
+@@ -1058,6 +1058,11 @@ int ksz8_r_phy(struct ksz_device *dev, u16 phy, u16 reg, u16 *val)
+ 		if (ret)
+ 			return ret;
+ 
++		break;
++	case PHY_REG_KSZ87XX_LOW_LOSS:
++		if (!ksz_is_ksz87xx(dev))
++			return -EOPNOTSUPP;
++		data = dev->low_loss_wa_mode;
+ 		break;
+ 	default:
+ 		processed = false;
+@@ -1271,6 +1276,46 @@ int ksz8_w_phy(struct ksz_device *dev, u16 phy, u16 reg, u16 val)
+ 		if (ret)
+ 			return ret;
+ 		break;
++	case PHY_REG_KSZ87XX_LOW_LOSS:
++		if (!ksz_is_ksz87xx(dev))
++			return -EOPNOTSUPP;
++
++		switch (val & PHY_KSZ87XX_LOW_LOSS_MASK) {
++		case PHY_LOW_LOSS_ERRATA_DISABLED:
++			ret = ksz8_ind_write8(dev, TABLE_LINK_MD, KSZ87XX_REG_EQ_TRAIN,
++					      KSZ87XX_EQ_TRAIN_DEFAULT);
++			if (!ret)
++				ret = ksz8_ind_write8(dev, TABLE_LINK_MD,
++						      KSZ87XX_REG_PHY_LPF,
++						      KSZ87XX_LOW_LOSS_LPF_90MHZ);
++			break;
++		case KSZ87XX_LOW_LOSS_EQ_TRAIN:
++			ret = ksz8_ind_write8(dev, TABLE_LINK_MD, KSZ87XX_REG_EQ_TRAIN,
++					      KSZ87XX_EQ_TRAIN_LOW_LOSS);
++			break;
++		case KSZ87XX_LOW_LOSS_LPF_90MHZ:
++			ret = ksz8_ind_write8(dev, TABLE_LINK_MD, KSZ87XX_REG_PHY_LPF,
++					      KSZ87XX_PHY_LPF_90MHZ);
++			break;
++		case KSZ87XX_LOW_LOSS_LPF_62MHZ:
++			ret = ksz8_ind_write8(dev, TABLE_LINK_MD, KSZ87XX_REG_PHY_LPF,
++					      KSZ87XX_PHY_LPF_62MHZ);
++			break;
++		case KSZ87XX_LOW_LOSS_LPF_55MHZ:
++			ret = ksz8_ind_write8(dev, TABLE_LINK_MD, KSZ87XX_REG_PHY_LPF,
++					      KSZ87XX_PHY_LPF_55MHZ);
++			break;
++		case KSZ87XX_LOW_LOSS_LPF_44MHZ:
++			ret = ksz8_ind_write8(dev, TABLE_LINK_MD, KSZ87XX_REG_PHY_LPF,
++					      KSZ87XX_PHY_LPF_44MHZ);
++			break;
++		default:
++			return -EINVAL;
++		}
++
++		if (!ret)
++			dev->low_loss_wa_mode = val & PHY_KSZ87XX_LOW_LOSS_MASK;
++		return ret;
+ 	default:
+ 		break;
+ 	}
+diff --git a/drivers/net/dsa/microchip/ksz8_reg.h b/drivers/net/dsa/microchip/ksz8_reg.h
+index 332408567b47..4e02e044339c 100644
+--- a/drivers/net/dsa/microchip/ksz8_reg.h
++++ b/drivers/net/dsa/microchip/ksz8_reg.h
+@@ -202,6 +202,10 @@
+ #define REG_PORT_3_STATUS_0		0x38
+ #define REG_PORT_4_STATUS_0		0x48
+ 
++/* KSZ87xx LinkMD registers (TABLE_LINK_MD_V) */
++#define KSZ87XX_REG_EQ_TRAIN		0x3C
++#define KSZ87XX_REG_PHY_LPF			0x4C
++
+ /* For KSZ8765. */
+ #define PORT_REMOTE_ASYM_PAUSE		BIT(5)
+ #define PORT_REMOTE_SYM_PAUSE		BIT(4)
+@@ -342,7 +346,7 @@
+ #define TABLE_EEE			(TABLE_EEE_V << TABLE_EXT_SELECT_S)
+ #define TABLE_ACL			(TABLE_ACL_V << TABLE_EXT_SELECT_S)
+ #define TABLE_PME			(TABLE_PME_V << TABLE_EXT_SELECT_S)
+-#define TABLE_LINK_MD			(TABLE_LINK_MD << TABLE_EXT_SELECT_S)
++#define TABLE_LINK_MD			(TABLE_LINK_MD_V << TABLE_EXT_SELECT_S)
+ #define TABLE_READ			BIT(4)
+ #define TABLE_SELECT_S			2
+ #define TABLE_STATIC_MAC_V		0
+@@ -729,6 +733,36 @@
+ #define PHY_POWER_SAVING_ENABLE		BIT(2)
+ #define PHY_REMOTE_LOOPBACK		BIT(1)
+ 
++/* Equalizer low-loss workaround */
++#define PHY_REG_KSZ87XX_LOW_LOSS       0x1C
++#define PHY_KSZ87XX_LOW_LOSS_MASK      GENMASK(2, 0)
++
++/* KSZ87xx low-loss EQ mode selector (vendor-specific PHY reg 0x1c)
++ *
++ * Values:
++ *  0: disabled (default behavior)
++ *  1: EQ training workaround
++ *  2: LPF 90 MHz
++ *  3: LPF 62 MHz
++ *  4: LPF 55 MHz
++ *  5: LPF 44 MHz
++ */
++#define PHY_LOW_LOSS_ERRATA_DISABLED		0
++#define KSZ87XX_LOW_LOSS_EQ_TRAIN			1
++#define KSZ87XX_LOW_LOSS_LPF_90MHZ			2
++#define KSZ87XX_LOW_LOSS_LPF_62MHZ			3
++#define KSZ87XX_LOW_LOSS_LPF_55MHZ			4
++#define KSZ87XX_LOW_LOSS_LPF_44MHZ			5
++
++#define KSZ87XX_EQ_TRAIN_DEFAULT       0x0A
++#define KSZ87XX_EQ_TRAIN_LOW_LOSS      0x15
++
++/* LPF bandwidth bits [7:6]: 00 = 90MHz, 01 = 62MHz, 10 = 55MHz, 11 = 44MHz  */
++#define KSZ87XX_PHY_LPF_90MHZ          0x00
++#define KSZ87XX_PHY_LPF_62MHZ          0x40
++#define KSZ87XX_PHY_LPF_55MHZ          0x80
++#define KSZ87XX_PHY_LPF_44MHZ          0xC0
++
+ /* KSZ8463 specific registers. */
+ #define P1MBCR				0x4C
+ #define P1MBSR				0x4E
+diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/microchip/ksz_common.h
+index 929aff4c55de..16a6074ea4b4 100644
+--- a/drivers/net/dsa/microchip/ksz_common.h
++++ b/drivers/net/dsa/microchip/ksz_common.h
+@@ -219,6 +219,9 @@ struct ksz_device {
+ 	 * the switch’s internal PHYs, bypassing the main SPI interface.
+ 	 */
+ 	struct mii_bus *parent_mdio_bus;
++
++	/* Equalizer low-loss workaround tunable */
++	u8 low_loss_wa_mode; /* KSZ87xx low-loss EQ/LPF mode selector (0-5) */
+ };
+ 
+ /* List of supported models */
+
+-- 
+2.53.0
 
 
