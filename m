@@ -1,185 +1,116 @@
-Return-Path: <netdev+bounces-278497-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278495-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mIykExda3mmLCAAAu9opvQ
-	(envelope-from <netdev+bounces-278497-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 17:15:35 +0200
+	id 0PmDG/xb3mlfCQAAu9opvQ
+	(envelope-from <netdev+bounces-278495-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 17:23:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7D483FB97E
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 17:15:34 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9BAA3FBB91
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 17:23:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id BA58E300831F
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 15:15:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A31D630210E7
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 15:13:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40CB83E9F98;
-	Tue, 14 Apr 2026 15:15:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="IcR9egO0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27C1A3E9588;
+	Tue, 14 Apr 2026 15:13:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7122E3E95A0;
-	Tue, 14 Apr 2026 15:15:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mailout2.hostsharing.net (mailout2.hostsharing.net [83.223.78.233])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 491E23E9580;
+	Tue, 14 Apr 2026 15:13:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.78.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776179720; cv=none; b=FaegEhsNgxpELCZzPRviSC81ij7vKi5bma59kggK6e+EjSrDROQRNnXe1yAqwrlYZL26EV/MPAs1o3z2qdZQeLQhzBW6jZF9afxRBbc7qfieyvTLyUDQHnOxkXNG0CkP6zhSzTvAU62tFFOcPclQW/LImIvUd6nTyPl/LcNxiis=
+	t=1776179621; cv=none; b=ar+6RoMMfne6Jq/mxP249oPH75HXWWviHHLviQPf3cWUgSWxIS72zxIISmibtfq4Qxl56J2llwTaF3ZKt11FbMqUPh9CxYF97Dpbw2zmJpylT8ezyMuV3ubugCnOba6RF/zYvgxLVdirr5TXf1EzgYps/TZT99inyCQmXydQlJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776179720; c=relaxed/simple;
-	bh=6YwKydianqUwY/z33wdXDA5OWdT1iJUUog0AXC/st0g=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hIhGPFY0DE1DFH050apjqbnFrXD3lt3s6Hre9I0sCUGeSTykQYnHx5MRw6cM99QLv7Rvx2KqPujCg3eGD7YJ82TdXlrz+rD2Lbjofo9wo+YoNRW6FOzvwgwfv5whmxzVaxC2uE+0TrXoluVicztjLtO7/rBu3fYTXz2U1wziU3g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=IcR9egO0; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1231)
-	id 72F7F20B6F15; Tue, 14 Apr 2026 08:15:11 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 72F7F20B6F15
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1776179711;
-	bh=DwhaJTyNdzr7spJcBnG3kAKjuT66n1GUjfUJRIF8+Ck=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=IcR9egO0gVUmpT4RNn+h/pxmaWid5VJyYhIvtsII04siXegrdeKRhikqmfvJCP4G6
-	 +RmI83Dl4BgaRchqUJpS95jdyl4vj0pvB2u4/TijbdnslteSASTrTg7bf04/0iWutg
-	 ZIHPmSZGsoCmU1Xt+Oo0rEpFINdkjk5M8VKrQN0s=
-From: Aditya Garg <gargaditya@linux.microsoft.com>
-To: kys@microsoft.com,
-	haiyangz@microsoft.com,
-	wei.liu@kernel.org,
-	decui@microsoft.com,
-	longli@microsoft.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	kotaranov@microsoft.com,
-	horms@kernel.org,
-	ssengar@linux.microsoft.com,
-	jacob.e.keller@intel.com,
-	dipayanroy@linux.microsoft.com,
-	ernis@linux.microsoft.com,
-	shirazsaleem@microsoft.com,
-	kees@kernel.org,
-	sbhatta@marvell.com,
-	leitao@debian.org,
-	netdev@vger.kernel.org,
-	linux-hyperv@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	bpf@vger.kernel.org,
-	gargaditya@microsoft.com,
-	gargaditya@linux.microsoft.com
-Subject: [PATCH net-next 2/2] net: mana: Use kvmalloc for large RX queue and buffer allocations
-Date: Tue, 14 Apr 2026 08:13:30 -0700
-Message-ID: <20260414151456.687506-3-gargaditya@linux.microsoft.com>
-X-Mailer: git-send-email 2.43.7
-In-Reply-To: <20260414151456.687506-1-gargaditya@linux.microsoft.com>
-References: <20260414151456.687506-1-gargaditya@linux.microsoft.com>
+	s=arc-20240116; t=1776179621; c=relaxed/simple;
+	bh=SxMcvDSO1WH57hVUH3MEAHeEedBtt6pHuvvrisfSZ9Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oVl1nUIsMwQZQwh6uTv/jc2CRR44kHVLHPW91wA/10v/3yszCztDznJhHcbarYLrar+WxQalo1c0hwC/EaOIpk5wEiU5kvxUbrybsF/JHz/7D2GRP2qWOoGbh/4+IeK19pxhNkjp0SmFKImD6p3twF2XS34VRRwZNBCN+NmaJe4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=pass smtp.mailfrom=wunner.de; arc=none smtp.client-ip=83.223.78.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wunner.de
+Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature ECDSA (secp384r1) server-digest SHA384
+	 client-signature ECDSA (secp384r1) client-digest SHA384)
+	(Client CN "*.hostsharing.net", Issuer "GlobalSign GCC R6 AlphaSSL CA 2025" (verified OK))
+	by mailout2.hostsharing.net (Postfix) with ESMTPS id 8EB0410586;
+	Tue, 14 Apr 2026 17:13:36 +0200 (CEST)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+	id 6E6506034192; Tue, 14 Apr 2026 17:13:36 +0200 (CEST)
+Date: Tue, 14 Apr 2026 17:13:36 +0200
+From: Lukas Wunner <lukas@wunner.de>
+To: Emil Tantilov <emil.s.tantilov@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	przemyslaw.kitszel@intel.com, jay.bhat@intel.com,
+	ivan.d.barrera@intel.com, aleksandr.loktionov@intel.com,
+	larysa.zaremba@intel.com, anthony.l.nguyen@intel.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, aleksander.lobakin@intel.com,
+	linux-pci@vger.kernel.org, madhu.chittim@intel.com,
+	decot@google.com, willemb@google.com, sheenamo@google.com
+Subject: Re: [PATCH iwl-next v2 2/2] idpf: implement pci error handlers
+Message-ID: <ad5ZoDCuSsPW0lKo@wunner.de>
+References: <20260414031631.2107-1-emil.s.tantilov@intel.com>
+ <20260414031631.2107-3-emil.s.tantilov@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260414031631.2107-3-emil.s.tantilov@intel.com>
+X-Spamd-Result: default: False [0.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
-	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	TAGGED_FROM(0.00)[bounces-278495-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[wunner.de: no valid DMARC record];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278497-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[gargaditya@linux.microsoft.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.microsoft.com:+];
-	TO_DN_NONE(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lukas@wunner.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.998];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.993];
-	RCPT_COUNT_TWELVE(0.00)[27];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.microsoft.com:dkim,linux.microsoft.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D7D483FB97E
+	DBL_BLOCKED_OPENRESOLVER(0.00)[wunner.de:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E9BAA3FBB91
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The RX path allocations for rxbufs_pre, das_pre, and rxq scale with
-queue count and queue depth. With high queue counts and depth, these can
-exceed what kmalloc can reliably provide from physically contiguous
-memory under fragmentation.
+On Mon, Apr 13, 2026 at 08:16:31PM -0700, Emil Tantilov wrote:
+> +static pci_ers_result_t
+> +idpf_pci_err_slot_reset(struct pci_dev *pdev)
+> +{
+> +	struct idpf_adapter *adapter = pci_get_drvdata(pdev);
+> +
+> +	pci_restore_state(pdev);
+> +	pci_set_master(pdev);
+> +	pci_wake_from_d3(pdev, false);
+> +	if (readl(adapter->reset_reg.rstat) != 0xFFFFFFFF)
+> +		return PCI_ERS_RESULT_RECOVERED;
 
-Switch these from kmalloc to kvmalloc variants so the allocator
-transparently falls back to vmalloc when contiguous memory is scarce,
-and update the corresponding frees to kvfree.
+FWIW, there's a PCI_POSSIBLE_ERROR() helper that you may find useful
+to check for an "all ones" MMIO read.
 
-Signed-off-by: Aditya Garg <gargaditya@linux.microsoft.com>
-Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
----
- drivers/net/ethernet/microsoft/mana/mana_en.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+Thanks,
 
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-index 49ee77b0939a..585d891bbbac 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-@@ -685,11 +685,11 @@ void mana_pre_dealloc_rxbufs(struct mana_port_context *mpc)
- 		put_page(virt_to_head_page(mpc->rxbufs_pre[i]));
- 	}
- 
--	kfree(mpc->das_pre);
-+	kvfree(mpc->das_pre);
- 	mpc->das_pre = NULL;
- 
- out2:
--	kfree(mpc->rxbufs_pre);
-+	kvfree(mpc->rxbufs_pre);
- 	mpc->rxbufs_pre = NULL;
- 
- out1:
-@@ -806,11 +806,11 @@ int mana_pre_alloc_rxbufs(struct mana_port_context *mpc, int new_mtu, int num_qu
- 	num_rxb = num_queues * mpc->rx_queue_size;
- 
- 	WARN(mpc->rxbufs_pre, "mana rxbufs_pre exists\n");
--	mpc->rxbufs_pre = kmalloc_array(num_rxb, sizeof(void *), GFP_KERNEL);
-+	mpc->rxbufs_pre = kvmalloc_array(num_rxb, sizeof(void *), GFP_KERNEL);
- 	if (!mpc->rxbufs_pre)
- 		goto error;
- 
--	mpc->das_pre = kmalloc_objs(dma_addr_t, num_rxb);
-+	mpc->das_pre = kvmalloc_objs(dma_addr_t, num_rxb);
- 	if (!mpc->das_pre)
- 		goto error;
- 
-@@ -2527,7 +2527,7 @@ static void mana_destroy_rxq(struct mana_port_context *apc,
- 	if (rxq->gdma_rq)
- 		mana_gd_destroy_queue(gc, rxq->gdma_rq);
- 
--	kfree(rxq);
-+	kvfree(rxq);
- }
- 
- static int mana_fill_rx_oob(struct mana_recv_buf_oob *rx_oob, u32 mem_key,
-@@ -2667,7 +2667,7 @@ static struct mana_rxq *mana_create_rxq(struct mana_port_context *apc,
- 
- 	gc = gd->gdma_context;
- 
--	rxq = kzalloc_flex(*rxq, rx_oobs, apc->rx_queue_size);
-+	rxq = kvzalloc_flex(*rxq, rx_oobs, apc->rx_queue_size);
- 	if (!rxq)
- 		return NULL;
- 
--- 
-2.43.0
-
+Lukas
 
