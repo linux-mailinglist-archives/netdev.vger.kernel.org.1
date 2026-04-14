@@ -1,211 +1,175 @@
-Return-Path: <netdev+bounces-278433-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278434-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eDjtB2Mu3mnxogkAu9opvQ
-	(envelope-from <netdev+bounces-278433-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 14:09:07 +0200
+	id sMfoOkUv3mnxogkAu9opvQ
+	(envelope-from <netdev+bounces-278434-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 14:12:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A84B93F9CDE
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 14:09:06 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4AF93F9DEF
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 14:12:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C09E0300D4EB
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 12:09:05 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 22259303F44C
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 12:09:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2C003E51F8;
-	Tue, 14 Apr 2026 12:09:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9E243E1203;
+	Tue, 14 Apr 2026 12:09:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linbit-com.20251104.gappssmtp.com header.i=@linbit-com.20251104.gappssmtp.com header.b="Lq7s86bb"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Mhd4qYrp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2D9A3921E4
-	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 12:09:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B1122FD69D
+	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 12:09:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776168544; cv=none; b=rLLLS5sNyj92PEpIih4eSUyCrCKfe7SPDtcMeIw7SC+1gdclg2zoyb0To0zzfkttCDtzu+izza0V4UpIZ18PS8nMKD6nJ6XgkBVqgvhBr3jmsllMVhS2rTVtp1u1XfFQvxbYfU/jZZD4CoHpLyatUOGkm396HRl2croEXqm1urk=
+	t=1776168574; cv=none; b=CHAssxCdeW4416DZoNTDX6FmTDjsj8PyluXnA7sdGV21eg4sKuNmRepix2vzJ7QsEwRExSnvJO6MAzivMUlj4Gmk4tTCnxwvrWLsLJjqkV+PEBLpoMRGmsSenDkbSB0vt29ZxiQhOcmn6FIq1bVFKvie2xzxCO3MMsQWseCzZWQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776168544; c=relaxed/simple;
-	bh=2dKC+bNzART0TN1K0cGjO0fj56UlUraZs5ruQszSvF0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dZXgyz5tpd4SnPwcwDHg/udY3YBc68VvGgj0Fg68TFZiYDRGuETvb0mXwfjuKUwJpnt+bZkHnmfET99i9GE3tGLqkwJz0fqUIRo2ipZXi2NKJ4IJoxFJHn8yffg0jodLrP5mvqkaM94E9m9KiPstXNWK81aOkbqrq740lQtZrLM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com; spf=pass smtp.mailfrom=linbit.com; dkim=pass (2048-bit key) header.d=linbit-com.20251104.gappssmtp.com header.i=@linbit-com.20251104.gappssmtp.com header.b=Lq7s86bb; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linbit.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-48334ee0aeaso53455895e9.1
-        for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 05:09:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linbit-com.20251104.gappssmtp.com; s=20251104; t=1776168541; x=1776773341; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:mail-followup-to:message-id:subject:cc:to
-         :from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2dKC+bNzART0TN1K0cGjO0fj56UlUraZs5ruQszSvF0=;
-        b=Lq7s86bbWgl7HZFmbhLkjJUhPeb56Ly+ZSHa9rnH0vktGsXnPUBFcbWV9unFTi+N41
-         I6m7HV1kRjYe4+Z5ZK8BMi6hRodRU/Y0FSg6t7WDOw2mhi/Vh1m0m7wh6uaJVFYSa3a2
-         SLR/YOOhzs15rcwrW6E4+fSQq6Uqy1AoA5arLwkOObiBpG2/DHB/D7LegUbWGeEONNSx
-         1tkBtQ/8qf9Cc38q+vd7w0+l6fTna1g8WF3aC3B/t5SkxNmPVyf28nrlND4x9pAPhjQM
-         eUznqhcfHBMfr2bws+bXMB8uhZy3X1eIJexwb8las6g7xHrMysCCB0cy23kxd/QxsQmh
-         O3MA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776168541; x=1776773341;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:mail-followup-to:message-id:subject:cc:to
-         :from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2dKC+bNzART0TN1K0cGjO0fj56UlUraZs5ruQszSvF0=;
-        b=LwO4lnTAh5RuVHsCa1J9a1gx1oJ2z1FdVypy1wYeVVtQkEHgvfnNC14LbTv85Sg56V
-         xv6QSFkxnYhlxIK0TbBunQFf1yksJXxInG4AlyLeVxjMPqH6oQY6QM3/C3fwEUVHHbhK
-         FQrMcLg2yXJIiIcDD00qRzZrcPaG+rsZEEuO58ET/gf9PKlOdMdi8P78ZA7bH+QvU430
-         Z1lQPKfOdKt9rsM+lo79A53f9bNuKT4qY9b5a7CZL5jAdQgn4d67vgmhFri+hNuHh7th
-         lToU0tyMhMqLMH+dgOQLm/H8uwpxetZfXBEI6sYFruj0Ai+KRAI+3/jnoNttcgQSoUDN
-         OuNA==
-X-Forwarded-Encrypted: i=1; AFNElJ/ABXGy0hQhOosuhvYgbF/5iUhHiBfOeFvG14zD8r9IR2wpMEjus9w/esIIMB/s8l7wdEBnenw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxlCy8UcfNc+qgsLmtoezkc9NmNm0nnMhA5Da6o8feubXbEEIJK
-	oRua5byb7sekAsh9J1q38/o9RScopTCViQ42CrXR3+uty/85m1yQX1//GJGy+L9vZMc=
-X-Gm-Gg: AeBDievv3yE1ts1Ijy+syUVL9INIroaO3+J0TdeICihmMp7kn6qVxvJ4MqNAmb2a3a2
-	5s9meVRAb2LsyQGf8+xEfUlZhGpe2Voo07VSyOkJa4nNhXk9lRH9rzil8/y0sDPHuQ3z7Itj2OO
-	B+v3UZDzTFMlQsGG3oMlFzAAB4r2LOFhyy6TLyHUOFRcDZ+4HZTQbSNFktEOMg8jmW7sSIRPkq3
-	EdfvoEOsdRwVeeh+2VimGL75d3pss/DlHfyvTyhFDba5a04fs/KbegJp91dT4EipxFNiOy6jlCu
-	3nyh+4m3sBZjPFzFD9ea4pRf0+spzVv58vbRvTOml63poao98bAbbUaFrU4f0+1Db8QW9WVH0ep
-	o41fOJhdV/exFPyO2GmJu08BNuLvrfV4Iry1+IeBasc8MLaA8r0RLz4frjKnX5NdosK7kZiA2yS
-	IqF7fA5JyjLax+buzBsDFqtVErg97MjgjekTxKNsw1IBT4S8EZDgdKjFy5M1sg18bFQ7YQ0b1Yl
-	Y33JQ==
-X-Received: by 2002:a05:600c:a11c:b0:487:2671:fb8f with SMTP id 5b1f17b1804b1-488d67fa40fmr168478205e9.8.1776168541312;
-        Tue, 14 Apr 2026 05:09:01 -0700 (PDT)
-Received: from localhost (h082218028181.host.wavenet.at. [82.218.28.181])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488ede1df12sm106112055e9.4.2026.04.14.05.08.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Apr 2026 05:09:00 -0700 (PDT)
-Date: Tue, 14 Apr 2026 14:08:58 +0200
-From: Christoph =?utf-8?Q?B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, drbd-dev@lists.linbit.com, 
-	linux-kernel@vger.kernel.org, Lars Ellenberg <lars.ellenberg@linbit.com>, 
-	Philipp Reisner <philipp.reisner@linbit.com>, linux-block@vger.kernel.org, 
-	Donald Hunter <donald.hunter@gmail.com>, Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH 2/4] tools: ynl-gen-c: optionally emit structs and helpers
-Message-ID: <ad4ox7ibZoiW-tje@localhost.localdomain>
-Mail-Followup-To: Jakub Kicinski <kuba@kernel.org>, 
-	Jens Axboe <axboe@kernel.dk>, drbd-dev@lists.linbit.com, linux-kernel@vger.kernel.org, 
-	Lars Ellenberg <lars.ellenberg@linbit.com>, Philipp Reisner <philipp.reisner@linbit.com>, 
-	linux-block@vger.kernel.org, Donald Hunter <donald.hunter@gmail.com>, 
-	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org
-References: <20260407173356.873887-1-christoph.boehmwalder@linbit.com>
- <20260407173356.873887-3-christoph.boehmwalder@linbit.com>
- <20260412125502.3f8ff576@kernel.org>
- <adzVUdf74CVk2DwJ@localhost.localdomain>
- <20260413104939.5ef4d9dc@kernel.org>
+	s=arc-20240116; t=1776168574; c=relaxed/simple;
+	bh=v1fK/1cChZ6rrt99Qr8LYZy9YUmvcWvPUtcVecbwhLI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=IpRjiBUYBjrXd2sY35Ei4+xi5toP5MosCf55oOa65TFtTgmkh3OW2YEU2/p2bQ7AmRAALvTbOPM4SyQ98xQaKZGkgqK/ubxKyx3+5/kkp6G5c8V1DY+iuz3s262i0ozEBVbucUTobgAYz2I5KgQ1KCo9heSNeWyr153PYI9Ciik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Mhd4qYrp; arc=none smtp.client-ip=91.218.175.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <927be094-315b-48ab-8e89-45bbe9183d5b@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1776168559;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QVtXc7JLuD25nmtQ2i0cFNoD/wmAUFxwAuqwgL+A5s0=;
+	b=Mhd4qYrpk0vHcZ6XtlaxOCrsqiOVGVafokFS+/nVPJBuE8TZTDC7yeH4F27Gugz4qkBBGr
+	l1wk4HFGFCIMQJiB83Mp4skTGCxIKO+Ewzp7RlFrmRK8i9bXmir72e7NkHW5EbHEvsbvQu
+	ofP0rK18INZLsc9rOuFm4wVulFrJxqs=
+Date: Tue, 14 Apr 2026 20:09:05 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
+Subject: Re: [syzbot] [lvs?] BUG: sleeping function called from invalid
+ context in ip_vs_conn_expire
+To: syzbot <syzbot+504e778ddaecd36fdd17@syzkaller.appspotmail.com>,
+ coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com,
+ fw@strlen.de, horms@verge.net.au, ja@ssi.bg, kuba@kernel.org,
+ linux-kernel@vger.kernel.org, lvs-devel@vger.kernel.org,
+ netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, pabeni@redhat.com,
+ pablo@netfilter.org, phil@nwl.cc, syzkaller-bugs@googlegroups.com
+References: <69de1743.a00a0220.475f0.0040.GAE@google.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+In-Reply-To: <69de1743.a00a0220.475f0.0040.GAE@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260413104939.5ef4d9dc@kernel.org>
-X-Spamd-Result: default: False [-0.06 / 15.00];
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[linbit-com.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[linbit.com : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-278433-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.dk,lists.linbit.com,vger.kernel.org,linbit.com,gmail.com,google.com];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-278434-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,appspotmail.com:email];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[linbit-com.20251104.gappssmtp.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[christoph.boehmwalder@linbit.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,localhost.localdomain:mid]
-X-Rspamd-Queue-Id: A84B93F9CDE
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev,504e778ddaecd36fdd17];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	SUBJECT_HAS_QUESTION(0.00)[]
+X-Rspamd-Queue-Id: A4AF93F9DEF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Apr 13, 2026 at 10:49:39AM -0700, Jakub Kicinski wrote:
->On Mon, 13 Apr 2026 13:48:32 +0200 Christoph Böhmwalder wrote:
->> >Can we just commit the code they output and leave the YNL itself be?
->> >Every single legacy family has some weird quirks the point of YNL
->> >is to get rid of them, not support them all..
->>
->> Fair enough, we could also do that. Though the question then becomes
->> whether we want to keep the YAML spec for the "drbd" family (patch 3 of
->> this series) in Documentation/.
->>
->> I would argue it makes sense to keep it around somewhere so that the old
->> family is somehow documented, but obviously that yaml file won't work
->> with the unmodified generator.
+
+On 4/14/26 6:30 PM, syzbot wrote:
+
+[...]
+
+> if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+504e778ddaecd36fdd17@syzkaller.appspotmail.com
 >
->To be clear (correct me if I misunderstood) it looked like we would be
->missing out on "automating" things, so extra work would still need to
->be done in the C code / manually written headers. But pure YNL (eg
->Python or Rust) client _would_ work? They could generate correct
->requests and parse responses, right?
+> BUG: sleeping function called from invalid context at kernel/locking/spinlock_rt.c:48
 
-I haven't tested this, but yes, a regular YNL client should work with
-this spec. The new flags only influence kernel codegen, so a client
-that doesn't know about them could still construct valid messages and
-parse responses.
 
-However, if we drop patch 2 completely, the new flags won't be in the
-genetlink-legacy schema either, so schema validation would fail when
-trying to generate.
 
->If yes, keeping it makes sense. FWIW all the specs we have for "old"
->networking families (routing etc) also don't replace any kernel code.
->They are purely to enable user space libraries in various languages.
->Whether having broad languages support for drbd or you just have one
->well known user space stack - I dunno.
+The problem occurs under PREEMPT_RT. conn_tab_lock pair with spin_lock 
+has the problem:
 
-Well, one of the main motivations for porting the current "drbd" family
-to YNL is to get rid of the genl_magic infrastructure. We intend to add
-a new modernized "drbd2" family, which will be fully YNL-based from the
-start.
-But we still need to support the current family via a compat path, and
-I would much rather have two YNL-based families than one genl_magic and
-one YNL-based. Carrying both sounds like a nightmare.
+     conn_tab_lock(...) -> hlist_bl_lock -> preempt_disable()  ==> 
+disables preemption
+     spin_lock(&cp->lock) -> rt_mutex  ==> sleepable under RT, but 
+preemption is already disabled by conn_tab_lock
 
-So the spec proposed in this series would never actually be used to
-generate a userspace client, if that's what you're asking. We would
-continue to use the current libgenl-based approach, with some userspace
-compat shims to make it work with YNL. Then, when "drbd2" comes along,
-we could "do things properly".
 
-Might also be worth to mention that we are also experimenting with
-Rust-based userspace utilities at the moment, so once we have "drbd2",
-there will be a real benefit to having multi-language support.
-
-So I'm fine with whichever route you want to take here, as long as
-it enables us to move away from genl_magic.
-
-If we decide to carry the "drbd" spec in-tree, that would then pretty
-much only be for documentation purposes. Otherwise there would be
-generated code where the spec it was generated from is non-existant,
-which may be surprising.
-
+> in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 16, name: ktimers/0
+> preempt_count: 2, expected: 0
+> RCU nest depth: 3, expected: 3
+> 8 locks held by ktimers/0/16:
+>   #0: ffffffff8de5f260 (local_bh){.+.+}-{1:3}, at: __local_bh_disable_ip+0x3c/0x420 kernel/softirq.c:163
+>   #1: ffffffff8dfc80c0 (rcu_read_lock){....}-{1:3}, at: __local_bh_disable_ip+0x3c/0x420 kernel/softirq.c:163
+>   #2: ffff8880b8826360 (&base->expiry_lock){+...}-{3:3}, at: spin_lock include/linux/spinlock_rt.h:45 [inline]
+>   #2: ffff8880b8826360 (&base->expiry_lock){+...}-{3:3}, at: timer_base_lock_expiry kernel/time/timer.c:1502 [inline]
+>   #2: ffff8880b8826360 (&base->expiry_lock){+...}-{3:3}, at: __run_timer_base+0x120/0x9f0 kernel/time/timer.c:2384
+>   #3: ffffffff8dfc80c0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:300 [inline]
+>   #3: ffffffff8dfc80c0 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:838 [inline]
+>   #3: ffffffff8dfc80c0 (rcu_read_lock){....}-{1:3}, at: __rt_spin_lock kernel/locking/spinlock_rt.c:50 [inline]
+>   #3: ffffffff8dfc80c0 (rcu_read_lock){....}-{1:3}, at: rt_spin_lock+0x1e0/0x400 kernel/locking/spinlock_rt.c:57
+>   #4: ffffc90000157a80 ((&cp->timer)){+...}-{0:0}, at: call_timer_fn+0xd4/0x5e0 kernel/time/timer.c:1745
+>   #5: ffffffff8dfc80c0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:300 [inline]
+>   #5: ffffffff8dfc80c0 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:838 [inline]
+>   #5: ffffffff8dfc80c0 (rcu_read_lock){....}-{1:3}, at: ip_vs_conn_unlink net/netfilter/ipvs/ip_vs_conn.c:315 [inline]
+>   #5: ffffffff8dfc80c0 (rcu_read_lock){....}-{1:3}, at: ip_vs_conn_expire+0x257/0x2390 net/netfilter/ipvs/ip_vs_conn.c:1260
+>   #6: ffffffff8de5f260 (local_bh){.+.+}-{1:3}, at: __local_bh_disable_ip+0x3c/0x420 kernel/softirq.c:163
+>   #7: ffff888068d4c3f0 (&cp->lock#2){+...}-{3:3}, at: spin_lock include/linux/spinlock_rt.h:45 [inline]
+>   #7: ffff888068d4c3f0 (&cp->lock#2){+...}-{3:3}, at: ip_vs_conn_unlink net/netfilter/ipvs/ip_vs_conn.c:324 [inline]
+>   #7: ffff888068d4c3f0 (&cp->lock#2){+...}-{3:3}, at: ip_vs_conn_expire+0xd4a/0x2390 net/netfilter/ipvs/ip_vs_conn.c:1260
+> Preemption disabled at:
+> [<ffffffff898a6358>] bit_spin_lock include/linux/bit_spinlock.h:38 [inline]
+> [<ffffffff898a6358>] hlist_bl_lock+0x18/0x110 include/linux/list_bl.h:149
+> CPU: 0 UID: 0 PID: 16 Comm: ktimers/0 Tainted: G        W    L      syzkaller #0 PREEMPT_{RT,(full)}
+> Tainted: [W]=WARN, [L]=SOFTLOCKUP
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/18/2026
+> Call Trace:
+>   <TASK>
+>   dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+>   __might_resched+0x329/0x480 kernel/sched/core.c:9162
+>   __rt_spin_lock kernel/locking/spinlock_rt.c:48 [inline]
+>   rt_spin_lock+0xc2/0x400 kernel/locking/spinlock_rt.c:57
+>   spin_lock include/linux/spinlock_rt.h:45 [inline]
+>   ip_vs_conn_unlink net/netfilter/ipvs/ip_vs_conn.c:324 [inline]
+>   ip_vs_conn_expire+0xd4a/0x2390 net/netfilter/ipvs/ip_vs_conn.c:1260
+>   call_timer_fn+0x192/0x5e0 kernel/time/timer.c:1748
+>   expire_timers kernel/time/timer.c:1799 [inline]
+>   __run_timers kernel/time/timer.c:2374 [inline]
+>   __run_timer_base+0x6a3/0x9f0 kernel/time/timer.c:2386
+>   run_timer_base kernel/time/timer.c:2395 [inline]
+>   run_timer_softirq+0xb7/0x170 kernel/time/timer.c:2405
+>   handle_softirqs+0x1de/0x6d0 kernel/softirq.c:622
+>   __do_softirq kernel/softirq.c:656 [inline]
+>   run_ktimerd+0x69/0x100 kernel/softirq.c:1151
+>   smpboot_thread_fn+0x541/0xa50 kernel/smpboot.c:160
+>   kthread+0x388/0x470 kernel/kthread.c:436
+>   ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+>   ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+>   </TASK>
 >
->> Maybe keep it, but with a comment at the top that notes that
->> - this family is deprecated and "frozen",
->> - the spec is only for documentation purposes, and
->> - the spec doesn't work with the upstream parser?
->
->The past point needs a clarification, I guess..
 
