@@ -1,367 +1,241 @@
-Return-Path: <netdev+bounces-278381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278382-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mE7BAvMW3mlBmwkAu9opvQ
-	(envelope-from <netdev+bounces-278381-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 12:29:07 +0200
+	id IG7tJGwX3mlBmwkAu9opvQ
+	(envelope-from <netdev+bounces-278382-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 12:31:08 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 777EB3F8AF4
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 12:29:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C0573F8B48
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 12:31:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id EAE7C30844E5
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 10:24:01 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0F30B301FA92
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 10:25:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92C3C3D3D0C;
-	Tue, 14 Apr 2026 10:23:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA2763D47A0;
+	Tue, 14 Apr 2026 10:25:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kus47UvF";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="MaWeuXMd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7330839B486
-	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 10:23:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4602A21A95D
+	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 10:25:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776162239; cv=none; b=egb22/0MmmiT238g/r7+UNfOxP1sLBXpkOgSTEC8t0FGfDkhMknXqYuFfHgVxDrHeLfKsDvmdMsmXR85mrm7OuALtJWAnQ0dhHX4aRHo0c+j8EIc7CNUlxPKK/VJpcjlu6lQB8vfXLG2xeNggQ4kIAjSoE56R4AGO6OfwSfcQPE=
+	t=1776162346; cv=none; b=OC5bCcKi4EsAiK6KZH+ExbJNl0b06gFCBW+49EuqjwNJ/QJ85HtLE//9hojrOqsONNA+tvFGn6WjDflPrIOIOgEcHKuu4C0uKG0ErwX7fJz0cxuiv1CMoePl+1qYG/bHxepy4Vj+jZu5Sss0NgAgLl8lRTAB2vNvE7bJ81sVYCw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776162239; c=relaxed/simple;
-	bh=kXxYyFY2N/cEQFJ8qJDkGUJKJ4FyU6QZbTb+jig8aIo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dh2bzyvp4hM2biDKOF7WHaZ4NL8PinzdhQ0/Htm5wX6yyuu9KQLV02ehezE2Bq1AH4tJKAbNrepdoClIuObnb7HfQTUkuO8SF/4GpZ8XzbusrYIJqByGCogtTiYseb22qpclr/1rzsOlHkUwckq29GXI5pa50ixlw7B4hu5xN88=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=crimson.net.eu.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=crimson.net.eu.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-43d03db7f87so3314275f8f.3
-        for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 03:23:51 -0700 (PDT)
+	s=arc-20240116; t=1776162346; c=relaxed/simple;
+	bh=3QXD7GJIAqpZRmLtARP/utY396oJhDYWb3JERCacaxQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hDdD4C1tE6LHo1k2a2PuxbN9ZnfECrbV1zFz+C3GiggFpzWAYWYZn3NqtKRnzJn0PcjDMPzA+JShX2rNcmGrW97kcmiKYM5JomwAwmG38CeWsw9qAUEuW+UFD3J3MjOtfPvoHIEU0fQ3OCSMdtxMMJwZH9GlZUnVgrtw8n0nFoU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Kus47UvF; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=MaWeuXMd; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1776162340;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Oj1V/752PwAsLzIkNf4HW9sYa+wm+QQJNq86aY3tyTg=;
+	b=Kus47UvFiz59hrG4QWPMbs0leasAn1JHUv4K0yKFAtP7vOtcxL4ekqW60340EUaJTUbeTd
+	v5kTC6t05JHjmIJF2NbO7a5vN688p4ZsSJvshxhT9/+n6kLRCWzSJ7qfg1nx0G5Hh4lpLD
+	aj8NvHxy639J5gI8w5MAT+KtCNngZws=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-370-5KfQz5gONFOh_r2sLO65Xw-1; Tue, 14 Apr 2026 06:25:37 -0400
+X-MC-Unique: 5KfQz5gONFOh_r2sLO65Xw-1
+X-Mimecast-MFC-AGG-ID: 5KfQz5gONFOh_r2sLO65Xw_1776162336
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-43d705eaa64so2629313f8f.0
+        for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 03:25:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1776162335; x=1776767135; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Oj1V/752PwAsLzIkNf4HW9sYa+wm+QQJNq86aY3tyTg=;
+        b=MaWeuXMdOyagHfZNhjA7xxg2OLDySp7ABUTzrB8w7PCp0tChF9iJc3Azpmm68Wsbac
+         erbxJriV6F9apbUBnCmzKus9ZKSpr+u7eVwW5K5cUi4+G1CfBLLiLD/Spne2wxDn530m
+         /Xe5GIHzjC34k3zYZVhfv5EOS5BbWwTA4Cv+sNzq/kC1Y5c6/92H6djx9xg/KO9DEiME
+         zF5b72R7Fhh9oR1mG4+5y8VC6K2DUPLup437BfZGPXpIV3qiWyBMfbhJRIt6/xqEvRVk
+         62dXYbu1up3BSrVoS2n9Tny/BDNU8Fozwx4dkbTkoVcD60fN3E2uLNGiZHA8ba3EDkHK
+         aQjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776162229; x=1776767029;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=agEPNcn5UfOsWzLW0MOgaJUmP7o4DXe8RlSLgKzjHg4=;
-        b=lvlid+5GlTpRCzKPEAxI4wBSln6Ti94vW0nZ1nGbaEZRG+cgI4Pb+QCKVPs1pQFI5S
-         /MJxqwjESkdof8OeKTvTvfGgl4Enf8/K4qkcOS3KMVpDH9ILAk8WLdhFD13gF/cUCHON
-         l6RjgGoNp2XomIROf5/LwVgNeHgbNEDbIDqVVltJcK2K73k6Zi80daD8mwTgUUAz6mV3
-         NHBd6guGjOwaqWqmGPhkmRcQ9r3KLwVrnEzMNcIG5Heh0TyyZRYTQha/50F5QLE0sFCM
-         /YhFD0+MIu5/cxu1EwgdnVWLEWhEjLTyCumq8qhfqymI4Nr3q3axfRkM+Lahdj1IECd3
-         aGuw==
-X-Forwarded-Encrypted: i=1; AFNElJ+SkGgMC0gOzTA+/XXQkGXrUj9K2hdxuOT7je+hHPvFzEL7YEEAw1IP/WcepPIUFNJl+1VG6mQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxMHIpU+Aud8MUHQQG9borEwISnJJbr9bjeY9a0EPYeVzt6JP+e
-	hfSXbgR9a7mro3XWiBgDoNB0wYh1uMOLuILnxJwBQcC0H98X4Y/p92pk
-X-Gm-Gg: AeBDietPEnypZFmUyD69m1e40d3Gm4x2CUw10lpuMmaPZABM4rDo9RWCasEDelgSxcl
-	i2/JMDQxLn9EfBQ1uKETMry/ihEl2AOCBD7aCNY2qMGGPR0Ouy7po/hFJpOdn2W6G1F+EMdX8VU
-	9ZeNo58pjinArjugd+8f97wRGG6XQrxKKN/dzoiWmT8pkLEgwUpg8Kw41e9LNxbMISqskW+DTvl
-	murCUy6VC3K7aeTRJZoevO9+l5tSQf60yXEd1XBcUTlBH6yoEptM69quRpXApjAbaYfp4EZ65CN
-	O6+yN8itIrgworhMGkVPD7+uLjGQDLDXXoH1UWEagyr+5CCq36wMjpSbdeNz+EOfQdcoJ6ET13c
-	Is8HJRCT6fa3bWI8TISypOxpYLNDhUkeXFqvIQDlg8m1kphuqBQYNLkjsB7n07yj2TTB39Sw5Uz
-	dkNt5QtMWHRdfMO2auXbsKKVaA8bZWC4jWW0SEdnQRO/iVLTayAfmm/21c+M8arRXW3wWzq1jOu
-	5trCU8RlGGyewaukgbQUdWDBuB4lSOFDLmA/HPI4qdQ8xaR/2xd0rUL5VGfEzMCuov/42k=
-X-Received: by 2002:a5d:5d83:0:b0:43b:40ef:5d1a with SMTP id ffacd0b85a97d-43d642552e7mr23917731f8f.5.1776162228496;
-        Tue, 14 Apr 2026 03:23:48 -0700 (PDT)
-Received: from localhost.localdomain (host-79-18-131-221.retail.telecomitalia.it. [79.18.131.221])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43d750f0ca9sm21461453f8f.37.2026.04.14.03.23.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Apr 2026 03:23:48 -0700 (PDT)
-From: deep@crimson.net.eu.org
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Linus Walleij <linusw@kernel.org>,
-	Bartosz Golaszewski <brgl@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-nfc@lists.01.org,
-	linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org,
-	Kenet Jovan Sokoli <deep@crimson.net.eu.org>
-Subject: [PATCH] nfc: s3fwrn5: switch to GPIO descriptor API
-Date: Tue, 14 Apr 2026 12:22:57 +0200
-Message-ID: <20260414102257.365421-1-deep@crimson.net.eu.org>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20251104; t=1776162335; x=1776767135;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Oj1V/752PwAsLzIkNf4HW9sYa+wm+QQJNq86aY3tyTg=;
+        b=ZQOR+f2Hjq4HYi3657khZ1Mm+B+2gy/T0eEojaQqYmgHRroitlhDYRNmCeMqANsrad
+         EA8BF8ULxMwzY8eNz76QuqNArI5bHIj2wFIc/Myn6v/kRk0Pl8/bCHNQqzcGaZsZeTkV
+         qth2S/wmq7UT3EhMGgDOTIyvEP3wb7FzoVLydWrH0ncadfvcOcegAKHi38DSVJYjilel
+         WNgCsNRfCPNlNn87b9U8iugV4chm8xXYbuaz8CboktBITuEHHLBMyeVJhqdDpnOZjaWp
+         QeaI/lhZnxzzTQaRs6cMFsgP3L13WFoHUwX0vRIrHhZKNlttYY8Ij6F0oEES45351h/X
+         hSvw==
+X-Forwarded-Encrypted: i=1; AFNElJ/XbMsd2dw6NYou+Fz9rids3tLa+eDbT9weILNyHAvRzEGQ2qHlLquJi5QkRdKoS6aFXofToqc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx/Ts3k2VZMGYQgSoBb2RXh762yDWjwM+MWF63ZCCnrTfFn0/eJ
+	ecS3dbWcTxPPbQAI6jrG90BXCMiIRltVSJ9oOrAkZJdi2jnFXLgYptZHOe063ajybAq+q1F2xde
+	94f3IigBSjrLEd8Rlv8G+7oPIoysnhcR3rI1FSv8tXCBVxqtwpps4qFQsOQ==
+X-Gm-Gg: AeBDieukVVO34AB1lGRJW1FDWpobRjwY5CtmN7lG31HGiYeQNriUbAc+Z3OCUw5Bqnk
+	rPiGF7VSlnE7KP6XMAUhpE3+4mgp+1HbAWu9rb7v2mfClItdFQVU1e6cCrOJ5xMnYTB+hsqeQE6
+	A+lq22CPi0DNI92AuIGVxiyNZo9de01yQiTgm90gxBw1GcMubrV17Hwvqv0La8hEJkkugExilbz
+	0CUwmso41XZ2zpXHHUS2i00z1+Zc3hxfgoBMQRFh8NC97tLcM/PyhErXAKmeCWh9IhL6Sr/Zc1t
+	E/CrnCMOSF3atXIiQ/UqMgGCEkA044Zq2WEq/Inw0ytRDMtQg7amQTbkIHrkWC5n9Qjl5BUn3ae
+	FokQhEhmLuYtNZlttdyK4MQ8fszp3gDuUBYO5aNMKqN/fcP4+rBHueVMD
+X-Received: by 2002:a05:600c:c0da:b0:485:4eaf:eb53 with SMTP id 5b1f17b1804b1-488d685c12dmr197561375e9.19.1776162335456;
+        Tue, 14 Apr 2026 03:25:35 -0700 (PDT)
+X-Received: by 2002:a05:600c:c0da:b0:485:4eaf:eb53 with SMTP id 5b1f17b1804b1-488d685c12dmr197560965e9.19.1776162334954;
+        Tue, 14 Apr 2026 03:25:34 -0700 (PDT)
+Received: from [192.168.88.32] ([216.128.11.125])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488ede1de4asm91719845e9.4.2026.04.14.03.25.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 14 Apr 2026 03:25:34 -0700 (PDT)
+Message-ID: <f9c028ef-9021-4405-940d-4630732cd122@redhat.com>
+Date: Tue, 14 Apr 2026 12:25:32 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.14 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2] atm: mpoa: keep mpc->dev referenced across mpoad
+ restart
+To: Shuvam Pandey <shuvampandey1@gmail.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+ syzbot+5ec223ccb83b24ef982f@syzkaller.appspotmail.com
+References: <20260411115958.64827-1-shuvampandey1@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20260411115958.64827-1-shuvampandey1@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[crimson.net.eu.org : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278381-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[deep@crimson.net.eu.org,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com,davemloft.net,google.com,kernel.org,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-278382-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.988];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCPT_COUNT_SEVEN(0.00)[8];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 777EB3F8AF4
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,5ec223ccb83b24ef982f];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,syzkaller.appspot.com:url]
+X-Rspamd-Queue-Id: 0C0573F8B48
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Kenet Jovan Sokoli <deep@crimson.net.eu.org>
 
-I am working on cleaning up some legacy GPIO usage in the NFC subsystem.
-This patch converts the s3fwrn5 driver to use the modern descriptor based
-GPIO API instead of the old integer based one.
 
-Specifically:
-- I changed the gpio_en and gpio_fw_wake types to struct gpio_desc.
-- Replaced the manual DT parsing with devm_gpiod_get() in the probe
-functions.
-- Updated the calls in phy_common.c to use gpiod_set_value().
+On 4/11/26 1:59 PM, Shuvam Pandey wrote:
+> atm: mpoa: keep mpc->dev referenced across mpoad restart
+> 
+> syzbot reported a netdevice refcount warning:
+> 
+> refcount_t: decrement hit 0; leaking memory.
+> WARNING: lib/refcount.c:31 at refcount_warn_saturate+0x70/0x110
+> ...
+> dev_put include/linux/netdevice.h:4466 [inline]
+> mpoad_close+0x1fc/0x3e0 net/atm/mpc.c:889
 
-This also allowed me to remove the s3fwrn5_i2c_parse_dt and
-s3fwrn82_uart_parse_dt functions as they are no longer needed with the
-new API.
+The full decoded backtrace is preferred to a small excerpt
 
-Signed-off-by: Kenet Jovan Sokoli <deep@crimson.net.eu.org>
----
-I have verified that this patch builds successfully with "make M=drivers/nfc/s3fwrn5"
-"scripts/checkpatch.pl" with no errors or warnings.
-This is very complicated stuff, but I am learning a lot by doing these cleanup works.
-I really hope I can contribute as much as possible to this environment, little by little.
----
- drivers/nfc/s3fwrn5/i2c.c        | 58 ++++++--------------------------
- drivers/nfc/s3fwrn5/phy_common.c | 12 +++----
- drivers/nfc/s3fwrn5/phy_common.h |  5 +--
- drivers/nfc/s3fwrn5/uart.c       | 43 ++++++-----------------
- 4 files changed, 31 insertions(+), 87 deletions(-)
+> mpoad_close() drops the reference held in mpc->dev, but the mpoa_client
+> itself stays alive and keeps the same device pointer.
+> 
+> When mpoad is attached again, atm_mpoa_mpoad_attach() reuses the existing
+> mpoa_client and its mpc->dev without reacquiring that reference, so the
+> next close can hit the netdevice refcount warning.
+> 
+> This reference is owned by the mpoa_client/LEC association rather than a
+> single mpoad open/close cycle. It is acquired when the client gets its
+> LEC device and is released later from mpoa_event_listener() on
+> NETDEV_UNREGISTER. Fix the imbalance by removing the dev_put() from
+> mpoad_close().
+> 
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Reported-by: syzbot+5ec223ccb83b24ef982f@syzkaller.appspotmail.com
+> Link: https://groups.google.com/g/syzkaller-bugs/c/qhZ5MJfLBOE/m/UnotmgRdAQAJ
 
-diff --git a/drivers/nfc/s3fwrn5/i2c.c b/drivers/nfc/s3fwrn5/i2c.c
-index 110d086cfe5b..a629fbcd3237 100644
---- a/drivers/nfc/s3fwrn5/i2c.c
-+++ b/drivers/nfc/s3fwrn5/i2c.c
-@@ -8,9 +8,8 @@
- 
- #include <linux/clk.h>
- #include <linux/i2c.h>
--#include <linux/gpio.h>
-+#include <linux/gpio/consumer.h>
- #include <linux/delay.h>
--#include <linux/of_gpio.h>
- #include <linux/of_irq.h>
- #include <linux/module.h>
- 
-@@ -146,37 +145,6 @@ static irqreturn_t s3fwrn5_i2c_irq_thread_fn(int irq, void *phy_id)
- 	return IRQ_HANDLED;
- }
- 
--static int s3fwrn5_i2c_parse_dt(struct i2c_client *client)
--{
--	struct s3fwrn5_i2c_phy *phy = i2c_get_clientdata(client);
--	struct device_node *np = client->dev.of_node;
--
--	if (!np)
--		return -ENODEV;
--
--	phy->common.gpio_en = of_get_named_gpio(np, "en-gpios", 0);
--	if (!gpio_is_valid(phy->common.gpio_en)) {
--		/* Support also deprecated property */
--		phy->common.gpio_en = of_get_named_gpio(np,
--							"s3fwrn5,en-gpios",
--							0);
--		if (!gpio_is_valid(phy->common.gpio_en))
--			return -ENODEV;
--	}
--
--	phy->common.gpio_fw_wake = of_get_named_gpio(np, "wake-gpios", 0);
--	if (!gpio_is_valid(phy->common.gpio_fw_wake)) {
--		/* Support also deprecated property */
--		phy->common.gpio_fw_wake = of_get_named_gpio(np,
--							     "s3fwrn5,fw-gpios",
--							     0);
--		if (!gpio_is_valid(phy->common.gpio_fw_wake))
--			return -ENODEV;
--	}
--
--	return 0;
--}
--
- static int s3fwrn5_i2c_probe(struct i2c_client *client)
- {
- 	struct s3fwrn5_i2c_phy *phy;
-@@ -193,21 +161,17 @@ static int s3fwrn5_i2c_probe(struct i2c_client *client)
- 	phy->i2c_dev = client;
- 	i2c_set_clientdata(client, phy);
- 
--	ret = s3fwrn5_i2c_parse_dt(client);
--	if (ret < 0)
--		return ret;
--
--	ret = devm_gpio_request_one(&phy->i2c_dev->dev, phy->common.gpio_en,
--				    GPIOF_OUT_INIT_HIGH, "s3fwrn5_en");
--	if (ret < 0)
--		return ret;
--
--	ret = devm_gpio_request_one(&phy->i2c_dev->dev,
--				    phy->common.gpio_fw_wake,
--				    GPIOF_OUT_INIT_LOW, "s3fwrn5_fw_wake");
--	if (ret < 0)
--		return ret;
-+	phy->common.gpio_en = devm_gpiod_get(&client->dev, "en", GPIOD_OUT_HIGH);
-+	if (IS_ERR(phy->common.gpio_en)) {
-+		return dev_err_probe(&client->dev, PTR_ERR(phy->common.gpio_en),
-+				"Failed to get EN gpio\n");
-+	}
- 
-+	phy->common.gpio_fw_wake = devm_gpiod_get(&client->dev, "wake", GPIOD_OUT_LOW);
-+	if (IS_ERR(phy->common.gpio_fw_wake)) {
-+		return dev_err_probe(&client->dev, PTR_ERR(phy->common.gpio_fw_wake),
-+			     "Failed to get WAKE gpio\n");
-+	}
- 	/*
- 	 * S3FWRN5 depends on a clock input ("XI" pin) to function properly.
- 	 * Depending on the hardware configuration this could be an always-on
-diff --git a/drivers/nfc/s3fwrn5/phy_common.c b/drivers/nfc/s3fwrn5/phy_common.c
-index deb2c039f0fd..e802b4e609c8 100644
---- a/drivers/nfc/s3fwrn5/phy_common.c
-+++ b/drivers/nfc/s3fwrn5/phy_common.c
-@@ -8,7 +8,7 @@
-  * Bongsu Jeon <bongsu.jeon@samsung.com>
-  */
- 
--#include <linux/gpio.h>
-+#include <linux/gpio/consumer.h>
- #include <linux/delay.h>
- #include <linux/module.h>
- 
-@@ -19,7 +19,7 @@ void s3fwrn5_phy_set_wake(void *phy_id, bool wake)
- 	struct phy_common *phy = phy_id;
- 
- 	mutex_lock(&phy->mutex);
--	gpio_set_value(phy->gpio_fw_wake, wake);
-+	gpiod_set_value(phy->gpio_fw_wake, wake);
- 	if (wake)
- 		msleep(S3FWRN5_EN_WAIT_TIME);
- 	mutex_unlock(&phy->mutex);
-@@ -33,14 +33,14 @@ bool s3fwrn5_phy_power_ctrl(struct phy_common *phy, enum s3fwrn5_mode mode)
- 
- 	phy->mode = mode;
- 
--	gpio_set_value(phy->gpio_en, 1);
--	gpio_set_value(phy->gpio_fw_wake, 0);
-+	gpiod_set_value(phy->gpio_en, 1);
-+	gpiod_set_value(phy->gpio_fw_wake, 0);
- 	if (mode == S3FWRN5_MODE_FW)
--		gpio_set_value(phy->gpio_fw_wake, 1);
-+		gpiod_set_value(phy->gpio_fw_wake, 1);
- 
- 	if (mode != S3FWRN5_MODE_COLD) {
- 		msleep(S3FWRN5_EN_WAIT_TIME);
--		gpio_set_value(phy->gpio_en, 0);
-+		gpiod_set_value(phy->gpio_en, 0);
- 		msleep(S3FWRN5_EN_WAIT_TIME);
- 	}
- 
-diff --git a/drivers/nfc/s3fwrn5/phy_common.h b/drivers/nfc/s3fwrn5/phy_common.h
-index 9cef25436bf9..10210a8fd755 100644
---- a/drivers/nfc/s3fwrn5/phy_common.h
-+++ b/drivers/nfc/s3fwrn5/phy_common.h
-@@ -13,6 +13,7 @@
- 
- #include <linux/mutex.h>
- #include <net/nfc/nci_core.h>
-+#include <linux/gpio/consumer.h>
- 
- #include "s3fwrn5.h"
- 
-@@ -21,8 +22,8 @@
- struct phy_common {
- 	struct nci_dev *ndev;
- 
--	int gpio_en;
--	int gpio_fw_wake;
-+	struct gpio_desc *gpio_en;
-+	struct gpio_desc *gpio_fw_wake;
- 
- 	struct mutex mutex;
- 
-diff --git a/drivers/nfc/s3fwrn5/uart.c b/drivers/nfc/s3fwrn5/uart.c
-index 4ee481bd7e96..5a7c7741a881 100644
---- a/drivers/nfc/s3fwrn5/uart.c
-+++ b/drivers/nfc/s3fwrn5/uart.c
-@@ -15,8 +15,7 @@
- #include <linux/netdevice.h>
- #include <linux/of.h>
- #include <linux/serdev.h>
--#include <linux/gpio.h>
--#include <linux/of_gpio.h>
-+#include <linux/gpio/consumer.h>
- 
- #include "phy_common.h"
- 
-@@ -92,25 +91,6 @@ static const struct of_device_id s3fwrn82_uart_of_match[] = {
- };
- MODULE_DEVICE_TABLE(of, s3fwrn82_uart_of_match);
- 
--static int s3fwrn82_uart_parse_dt(struct serdev_device *serdev)
--{
--	struct s3fwrn82_uart_phy *phy = serdev_device_get_drvdata(serdev);
--	struct device_node *np = serdev->dev.of_node;
--
--	if (!np)
--		return -ENODEV;
--
--	phy->common.gpio_en = of_get_named_gpio(np, "en-gpios", 0);
--	if (!gpio_is_valid(phy->common.gpio_en))
--		return -ENODEV;
--
--	phy->common.gpio_fw_wake = of_get_named_gpio(np, "wake-gpios", 0);
--	if (!gpio_is_valid(phy->common.gpio_fw_wake))
--		return -ENODEV;
--
--	return 0;
--}
--
- static int s3fwrn82_uart_probe(struct serdev_device *serdev)
- {
- 	struct s3fwrn82_uart_phy *phy;
-@@ -144,20 +124,19 @@ static int s3fwrn82_uart_probe(struct serdev_device *serdev)
- 
- 	serdev_device_set_flow_control(serdev, false);
- 
--	ret = s3fwrn82_uart_parse_dt(serdev);
--	if (ret < 0)
--		goto err_serdev;
--
--	ret = devm_gpio_request_one(&phy->ser_dev->dev, phy->common.gpio_en,
--				    GPIOF_OUT_INIT_HIGH, "s3fwrn82_en");
--	if (ret < 0)
-+	phy->common.gpio_en = devm_gpiod_get(&serdev->dev, "en", GPIOD_OUT_HIGH);
-+	if (IS_ERR(phy->common.gpio_en)) {
-+		ret = dev_err_probe(&serdev->dev, PTR_ERR(phy->common.gpio_en),
-+			     "failed to get en gpio\n");
- 		goto err_serdev;
-+	}
- 
--	ret = devm_gpio_request_one(&phy->ser_dev->dev,
--				    phy->common.gpio_fw_wake,
--				    GPIOF_OUT_INIT_LOW, "s3fwrn82_fw_wake");
--	if (ret < 0)
-+	phy->common.gpio_fw_wake = devm_gpiod_get(&serdev->dev, "wake", GPIOD_OUT_LOW);
-+	if (IS_ERR(phy->common.gpio_fw_wake)) {
-+		ret = dev_err_probe(&serdev->dev, PTR_ERR(phy->common.gpio_fw_wake),
-+			     "failed to get wake gpio\n");
- 		goto err_serdev;
-+	}
- 
- 	ret = s3fwrn5_probe(&phy->common.ndev, phy, &phy->ser_dev->dev,
- 			    &uart_phy_ops);
--- 
-2.43.0
+Preferred link is to the syzbot console:
+https://syzkaller.appspot.com/bug?extid=5ec223ccb83b24ef982f
+
+> Signed-off-by: Shuvam Pandey <shuvampandey1@gmail.com>
+> ---
+> Changes in v2:
+> - drop the atm_mpoa_cleanup() dev_put()/NULL hunk
+> - add the syzbot warning excerpt
+> - add a Fixes tag
+> - clarify that the final dev_put() comes from the notifier path
+> 
+>  net/atm/mpc.c | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/net/atm/mpc.c b/net/atm/mpc.c
+> index ce8e9780373b9..90ab8f2889734 100644
+> --- a/net/atm/mpc.c
+> +++ b/net/atm/mpc.c
+> @@ -886,7 +886,6 @@ static void mpoad_close(struct atm_vcc *vcc)
+>  		struct lec_priv *priv = netdev_priv(mpc->dev);
+>  		priv->lane2_ops->associate_indicator = NULL;
+>  		stop_mpc(mpc);
+> -		dev_put(mpc->dev);
+
+Sashiko noted a possible regression introduced by this change:
+
+Since this patch removes the dev_put(mpc->dev) here to defer the
+netdevice reference release to the NETDEV_UNREGISTER event, does this
+introduce a leak of the netdevice reference on module unload?
+If the atm_mpoa module is unloaded while a lec device is still active,
+atm_mpoa_cleanup() unregisters the netdevice notifier and frees all
+mpoa_client structures without releasing their mpc->dev references:
+net/atm/mpc.c:atm_mpoa_cleanup() {
+    ...
+	unregister_netdevice_notifier(&mpoa_notifier);
+    ...
+	while (mpc != NULL) {
+		tmp = mpc->next;
+		if (mpc->dev != NULL) {
+			stop_mpc(mpc);
+            ...
+		}
+        ...
+		kfree(mpc->mps_macs);
+		kfree(mpc);
+		mpc = tmp;
+	}
+}
+Because the notifier is unregistered, NETDEV_UNREGISTER will never be
+delivered to clean up the references, which would permanently leak the
+netdevice reference and prevent the interface from ever being unregistered.
+Should a dev_put() be added in the module exit function atm_mpoa_cleanup()?
+
+/P
 
 
