@@ -1,67 +1,65 @@
-Return-Path: <netdev+bounces-278312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278310-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GPQFGx7o3WmulAkAu9opvQ
-	(envelope-from <netdev+bounces-278312-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 09:09:18 +0200
+	id OKnlLuLn3WmulAkAu9opvQ
+	(envelope-from <netdev+bounces-278310-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 09:08:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B0AB3F66A9
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 09:09:17 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 433733F666C
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 09:08:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1D09F30345BB
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 07:07:43 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id EEA79302BE66
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 07:07:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7AFA365A02;
-	Tue, 14 Apr 2026 07:07:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A295335E95A;
+	Tue, 14 Apr 2026 07:07:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PovEGdae"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KWMZxDbo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68A2935E956;
-	Tue, 14 Apr 2026 07:07:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40B5C35A925;
+	Tue, 14 Apr 2026 07:07:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776150442; cv=none; b=hlXJjwc2DCXthQfSnngB9QZyRpwMCeGP+bq8lZ5PvQLVGpTRht0h/y5+Ng7c9OcLIoCCpSVC3FmuumqosGFJk/gpkCMhgNndl7sZrgJNziJAnz1inEx6cXhQLXE8KLsuvtK6A8EoOoNs4g6wdjCY12lwHgrCjl8FxcmWlID4Xac=
+	t=1776150428; cv=none; b=r2hT2MoUrliPr6lLDfe6X75AvlqNpdGE4F0XItKWcumiIvBmjb9WqpKsAQQzMXPpSfUwgoMXgDcMaOqkl65ThZx3OGh6KhUtsdO8vMv7BxSfcwCK94nXbwfAh4o1A8ryQtWjXgjptv9eJIOGlwj6g5S+IZxi5trYnJdwyC8mfhM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776150442; c=relaxed/simple;
-	bh=YsdvlQqeVior0g/k+WAElPcnRGxse6gI8p2joQTg8Fc=;
+	s=arc-20240116; t=1776150428; c=relaxed/simple;
+	bh=ru4xmAG5090zMTorvzBMO3CkMmXYAyYQWFiIdf/Og8c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rJC0DzCBip2KX0dk3hJje0tFhnRoN1+lcKeMN3i9tbcN7zhJ/PxD2o7FCDDF0MeVbRrNrKf5pfXLTegzO1YlU3fmcbc9N1WcorjnIyCnsKKWSOxCM3Ub7EOCRTORpcLwMpMIw1g7cYTpRP5dH5bPR2lI8SibR8yB9ln1o21NcTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PovEGdae; arc=none smtp.client-ip=198.175.65.9
+	 Content-Type:Content-Disposition:In-Reply-To; b=ObpIU4IwfJdzbonjTgrTUfiJy52JxeX6yoxN+QZNkEfI+59IsIjN18MH0aql9au2CIYh6lct+Gf5IK0QnRvAsc16WdfnX3SMs06bt8zYqXxMG1U7XO/1dsSDj8I/S+LwH/DPsHnya9PQtkjBGiDLmfe6wEhmaIbtlhxI2edM7VQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KWMZxDbo; arc=none smtp.client-ip=198.175.65.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1776150440; x=1807686440;
+  t=1776150428; x=1807686428;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=YsdvlQqeVior0g/k+WAElPcnRGxse6gI8p2joQTg8Fc=;
-  b=PovEGdae8yNB/AX6euDry4JoYMxrWZxXzWQoydG3w9Fo3DkpObX9cW11
-   LhogVTP9YqI5XKURzMV02suRkYUbou9mx8ijnZDxWuPAAikWmj1q/ZBdM
-   XOllFPlhSCogrn/MVT6MzKcbdHy+y8lXhJIuhvPWJve2OwyI7p8CMemuO
-   9SK1DEOMHe8ubqjXs/550mf+1MuE+mc4LD/ObxDC2oA95IsI6dQVcIo81
-   6XJpVQg6MCkB5YYU1QcF4Q8f/V+NUQppeef4E6j8lUunybJcaYE1nPQX8
-   +3S98Jh/pUZXctD5T5iV4bsaKNTs6kN/XTN8yoW6pEakgv255dpFetnBD
-   Q==;
-X-CSE-ConnectionGUID: rFHTN/mrSRa0XFt8ZVzD0A==
-X-CSE-MsgGUID: eFYd2JKhRuaLPIihMKletg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11758"; a="99742708"
+  bh=ru4xmAG5090zMTorvzBMO3CkMmXYAyYQWFiIdf/Og8c=;
+  b=KWMZxDboe5ZZE8TD0yEhFVGtVXdInqzl5WXVx0txiXJsKtEdK5vlzZNr
+   Zp71RSgF6m5VuPCSMD+/q3CsnfId/KyokoGT3pd0DN0HSpukB6woVW29+
+   I77EVp1apG8YzPECuwM55OZsHmuZYx4xDcZmdfnkc5LuCXEPDb8Fv2DEf
+   Lf+H/f96/1vgpfuyYjrAnreu5Nj4ib2TwQOSzL7IRYh8bmFoSOxSG7SuZ
+   O8C4pVWZ2s1AoAezdIpoTiVaMylx/+4DbDUBaQpAy72YS++23Yh57iBq0
+   g51ozkiFse6rSfdtlbMb2XOMprRWtBzy5U5+RvRNQ4+84El8JADJJNPDZ
+   A==;
+X-CSE-ConnectionGUID: 0rWqj1kMRUCSHfHUyrpRvg==
+X-CSE-MsgGUID: Itpu1xHuS82Mxdf2iLi/qA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11758"; a="77279725"
 X-IronPort-AV: E=Sophos;i="6.23,179,1770624000"; 
-   d="scan'208";a="99742708"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2026 00:06:49 -0700
-X-CSE-ConnectionGUID: Qqv0CU4hSmi1Ya0DhafpcQ==
-X-CSE-MsgGUID: ld6HPmOxQI28P4mVvbJYIw==
+   d="scan'208";a="77279725"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2026 00:07:07 -0700
+X-CSE-ConnectionGUID: B+lsJgTXQpCjAHLtvJHINg==
+X-CSE-MsgGUID: Uoq8nSZtSuSIdJW7nhtEjg==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,179,1770624000"; 
-   d="scan'208";a="231744909"
 Received: from guptapa-desk.jf.intel.com (HELO desk) ([10.165.239.46])
-  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2026 00:06:49 -0700
-Date: Tue, 14 Apr 2026 00:06:48 -0700
+  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2026 00:07:05 -0700
+Date: Tue, 14 Apr 2026 00:07:05 -0700
 From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
 To: x86@kernel.org, Jon Kohler <jon@nutanix.com>,
 	Nikolay Borisov <nik.borisov@suse.com>,
@@ -92,9 +90,8 @@ Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
 	Asit Mallick <asit.k.mallick@intel.com>,
 	Tao Zhang <tao1.zhang@intel.com>, bpf@vger.kernel.org,
 	netdev@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: [PATCH v10 06/12] x86/vmscape: Use write_ibpb() instead of
- indirect_branch_prediction_barrier()
-Message-ID: <20260414-vmscape-bhb-v10-6-efa924abae5f@linux.intel.com>
+Subject: [PATCH v10 07/12] static_call: Add EXPORT_STATIC_CALL_FOR_MODULES()
+Message-ID: <20260414-vmscape-bhb-v10-7-efa924abae5f@linux.intel.com>
 X-Mailer: b4 0.16-dev
 References: <20260414-vmscape-bhb-v10-0-efa924abae5f@linux.intel.com>
 Precedence: bulk
@@ -111,18 +108,18 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-278312-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-278310-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_TO(0.00)[kernel.org,nutanix.com,suse.com,zytor.com,amd.com,google.com,alien8.de,linux.intel.com,infradead.org,iogearbox.net,davemloft.net,gmail.com,redhat.com,linux.dev,fomichev.me,lwn.net];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[37];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
@@ -132,40 +129,66 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.intel.com:mid,suse.com:email,intel.com:dkim,intel.com:email,nutanix.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 0B0AB3F66A9
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.intel.com:mid,intel.com:dkim,intel.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,infradead.org:email]
+X-Rspamd-Queue-Id: 433733F666C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-indirect_branch_prediction_barrier() is a wrapper to write_ibpb(), which
-also checks if the CPU supports IBPB. For VMSCAPE, call to
-indirect_branch_prediction_barrier() is only possible when CPU supports
-IBPB.
+There is EXPORT_STATIC_CALL_TRAMP() that hides the static key from all
+modules. But there is no equivalent of EXPORT_SYMBOL_FOR_MODULES() to
+restrict symbol visibility to only certain modules.
 
-Simply call write_ibpb() directly to avoid unnecessary alternative
-patching.
+Add EXPORT_STATIC_CALL_FOR_MODULES(name, mods) that wraps both the key and
+the trampoline with EXPORT_SYMBOL_FOR_MODULES(), allowing only a limited
+set of modules to see and update the static key.
 
-Suggested-by: Dave Hansen <dave.hansen@linux.intel.com>
-Tested-by: Jon Kohler <jon@nutanix.com>
-Reviewed-by: Nikolay Borisov <nik.borisov@suse.com>
+The immediate user is KVM, in the following commit.
+
+checkpatch reported below warnings with this change that I believe don't
+apply in this case:
+
+  include/linux/static_call.h:219: WARNING: Non-declarative macros with multiple statements should be enclosed in a do - while loop
+  include/linux/static_call.h:220: WARNING: EXPORT_SYMBOL(foo); should immediately follow its function/variable
+
+Suggested-by: Peter Zijlstra <peterz@infradead.org>
 Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
 ---
- arch/x86/include/asm/entry-common.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/linux/static_call.h | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/arch/x86/include/asm/entry-common.h b/arch/x86/include/asm/entry-common.h
-index c45858db16c9..78b143673ca7 100644
---- a/arch/x86/include/asm/entry-common.h
-+++ b/arch/x86/include/asm/entry-common.h
-@@ -97,7 +97,7 @@ static inline void arch_exit_to_user_mode_prepare(struct pt_regs *regs,
- 	/* Avoid unnecessary reads of 'x86_predictor_flush_exit_to_user' */
- 	if (cpu_feature_enabled(X86_FEATURE_IBPB_EXIT_TO_USER) &&
- 	    this_cpu_read(x86_predictor_flush_exit_to_user)) {
--		indirect_branch_prediction_barrier();
-+		write_ibpb();
- 		this_cpu_write(x86_predictor_flush_exit_to_user, false);
- 	}
- }
+diff --git a/include/linux/static_call.h b/include/linux/static_call.h
+index 78a77a4ae0ea..b610afd1ed55 100644
+--- a/include/linux/static_call.h
++++ b/include/linux/static_call.h
+@@ -216,6 +216,9 @@ extern long __static_call_return0(void);
+ #define EXPORT_STATIC_CALL_GPL(name)					\
+ 	EXPORT_SYMBOL_GPL(STATIC_CALL_KEY(name));			\
+ 	EXPORT_SYMBOL_GPL(STATIC_CALL_TRAMP(name))
++#define EXPORT_STATIC_CALL_FOR_MODULES(name, mods)			\
++	EXPORT_SYMBOL_FOR_MODULES(STATIC_CALL_KEY(name), mods);		\
++	EXPORT_SYMBOL_FOR_MODULES(STATIC_CALL_TRAMP(name), mods)
+ 
+ /* Leave the key unexported, so modules can't change static call targets: */
+ #define EXPORT_STATIC_CALL_TRAMP(name)					\
+@@ -276,6 +279,9 @@ extern long __static_call_return0(void);
+ #define EXPORT_STATIC_CALL_GPL(name)					\
+ 	EXPORT_SYMBOL_GPL(STATIC_CALL_KEY(name));			\
+ 	EXPORT_SYMBOL_GPL(STATIC_CALL_TRAMP(name))
++#define EXPORT_STATIC_CALL_FOR_MODULES(name, mods)			\
++	EXPORT_SYMBOL_FOR_MODULES(STATIC_CALL_KEY(name), mods);		\
++	EXPORT_SYMBOL_FOR_MODULES(STATIC_CALL_TRAMP(name), mods)
+ 
+ /* Leave the key unexported, so modules can't change static call targets: */
+ #define EXPORT_STATIC_CALL_TRAMP(name)					\
+@@ -346,6 +352,8 @@ static inline int static_call_text_reserved(void *start, void *end)
+ 
+ #define EXPORT_STATIC_CALL(name)	EXPORT_SYMBOL(STATIC_CALL_KEY(name))
+ #define EXPORT_STATIC_CALL_GPL(name)	EXPORT_SYMBOL_GPL(STATIC_CALL_KEY(name))
++#define EXPORT_STATIC_CALL_FOR_MODULES(name, mods)			\
++	EXPORT_SYMBOL_FOR_MODULES(STATIC_CALL_KEY(name), mods)
+ 
+ #endif /* CONFIG_HAVE_STATIC_CALL */
+ 
 
 -- 
 2.34.1
