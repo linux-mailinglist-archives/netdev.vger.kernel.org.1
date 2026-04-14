@@ -1,248 +1,231 @@
-Return-Path: <netdev+bounces-278298-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278299-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id Srp/L6Ha3WnukAkAu9opvQ
-	(envelope-from <netdev+bounces-278298-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 08:11:45 +0200
+	id OAOKJqzi3WnrkgkAu9opvQ
+	(envelope-from <netdev+bounces-278299-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 08:46:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 050DF3F5DE2
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 08:11:44 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A40B3F6337
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 08:46:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8FD63303A112
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 06:11:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0A71F30B4127
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 06:39:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1426A30BB97;
-	Tue, 14 Apr 2026 06:11:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E916370D5C;
+	Tue, 14 Apr 2026 06:39:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="F9ymhVHe"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Eu6URQhC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
+Received: from mail-vk1-f228.google.com (mail-vk1-f228.google.com [209.85.221.228])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B0332FFFB8
-	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 06:11:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.177
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776147103; cv=pass; b=im/BB2LX40IZC87eYk9dUl0Gl4JKQbtxzl8cxSXlyr3A3/DwcBpNUIar4g44Oco8MEs7nVWqHWEwf2ydO2/sCtVWIxaO8Kt5oxBPdjgO4IEjrnL+IvQcgpeBh/Ui4wWg7LVeZuldI/+mq+/p1rjk2zYnbyaG+LfoepzeYl0ZTOw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776147103; c=relaxed/simple;
-	bh=zlED/jrEEWRWLJ0Yf78FvE6LghQYdstVM2QEXnaqevk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iN6DmOuzY2arXHyWmUQ7vjFFTbIsYOiM10new1ON3a8xtyNc9ottz9GBAK77KY8oajxBZpWksaSbPAzJVIkGZvdUALVR0tKkGZNuBoyKuTrDn3LJYovojhXae8whSZKn1puJnxB9kidKANp8aqhwhYDGVFEAX7NJn2n6j1Vx9ho=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=F9ymhVHe; arc=pass smtp.client-ip=209.85.222.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-8cfdac74050so537474485a.3
-        for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 23:11:41 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776147100; cv=none;
-        d=google.com; s=arc-20240605;
-        b=UAEver+xPiYg4dz4G9dMTHRnoCwVzb4o2lJXr/P5Dif0uUiu4wio0oPC8PnpQgHB8s
-         IKIcB/w/j7I2E8ZiPZfJiYIJAsC+o2q98ii+KMGK97z0NlAkTO6rBUHULe6kML9iNaJL
-         ziB3LjCgzi4BcSYO7DIv/FnzBlGdOomKiFJ2Ye/VmysV2+u6kL0dMMRxiX0Sc0exKAp+
-         BBB9/S9hQ6xfWKxQKus86Ha2feHJflEu0B1T4edfWYABEBdP3Mx6mvLYKqjUlgigHCdB
-         TZD43/DOLq+uvqWDB4mGezQ3srXYDWmTcqCpJkKqIPDXIUKuilT0/Qt2ZiW9LUe3vdMr
-         Nwjg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=OAF0Vl7njHyXK7EYn4RJLUuBj27JTwxYrzgtP7tc5r0=;
-        fh=f4E7HkNM2fQGXBmVy46i+QLVt0GmkH+V13fhpkTRjMA=;
-        b=cEFRbp3y8dM/OfIoF+GLJvpk3vHeBZGM451pArG076m42+fmPhigGIVTVeEtzpznnm
-         AliJYAcfpDtKfAiszaAGkz68LMMgMJcn1O3bJToanLtrPkrgfINtvKJBfbwtgVEnKFA9
-         esmD6F9vcUXm9acomyJFSstnNdiqOVMUEHFTUW15aPWfcstF7FGhOWl7RE0miOkcTRTA
-         2405msnHSH3ua0Dxp1K5sBlY8+0qPDJPodkosYzpCTtKnmjgDD7YyQsDp2XqV+wMx/LZ
-         UeZR1+8SyhxWURdOdYBbXZeNYRp/jTzRJT+NwT4XBgkWhBAwEhEHRz/pMXUjKgR+Q6j0
-         /xHw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1776147100; x=1776751900; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OAF0Vl7njHyXK7EYn4RJLUuBj27JTwxYrzgtP7tc5r0=;
-        b=F9ymhVHecZjpAjNFwjuwn2HO+cqwe1ARVzE5KmP2DjqQOtiYBfi/xIRnkk35Jr/CET
-         4E7VT8PZrsr2gNdSlQf3K4n1bFPGlWq03JS0x60YHCs9RcnfElEok9JbYNYOIHmAjJ1K
-         cjkrlEKvyvJq/jAcxWEV08frh0MgKh9o4pew3Hu/WKVPQfmTKyAoIsUx/hX8qb1O08Qf
-         yH/rjlVQSaFNEs6rYspxrHz/J9wmisSu2L79tvAoSG9QyNN/xPWG+jmmJmS8X5uenOa6
-         Tg/nnUvXUyEVTSKHppGcZb7RHFj10Tircg2tYXSb6FHa/Z3lIJcgtM1ujdhe1ns9QCBH
-         PsXw==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3F6036EAB0
+	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 06:39:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.228
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776148744; cv=none; b=KbZ1R22jzsU1TJZmDqRqzH7K0vU3u4GlvoMmdxyCMCgy0VgK3JyPrbOAIlorNDQLTHh4AH4AuX9C9Pklu4bnT3pvn457DyAnWQRna9lIH22CRlnZ16qvyc3wO9b+VpCLZFsHMB7ue1ceyWKZYsQr2oOE/EbFYMocLLnaRYZ3q3k=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776148744; c=relaxed/simple;
+	bh=5ww9EE9Omd+lxTQKlJOWj/4hV3jbfueaHdGT5uwPtjc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=k3ZiuUiLcifVL2p7e/iOUfWOhjpEJDnxXSFaelkkyG0u/gamWA1NGU0YbMMS+AUsCkeVjXDy54Doidz2cuZL8fSZp9X/Jms1ojO3o8t8Bn5+TMGuJ64jMchC7cTWMiLqzJR/bXys9snUuBNT2r3lTec6eGXngICimOsG6ukSKUo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Eu6URQhC; arc=none smtp.client-ip=209.85.221.228
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-vk1-f228.google.com with SMTP id 71dfb90a1353d-56f664b7d1fso61929e0c.0
+        for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 23:39:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776147100; x=1776751900;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=OAF0Vl7njHyXK7EYn4RJLUuBj27JTwxYrzgtP7tc5r0=;
-        b=Q+ZFbOAG4rTnyus1IfTX+P8qm/XUxZ8yAqcz5QX8h2kKGdcckdAulXp/vyW3tbY/zX
-         Fwo/TdCu7OCNsas8HLa/CKlG5h8xrioMVnsA8c329oXWyRamT5zXxImow/4VDg5NXDCU
-         wl7LYFld7YsM6zyuCn163IPVhSJk1MWTU7rRsYlLncztmR0ugZntMuTv2vxLgT29ufbr
-         2rntT1bcmT398dtP8tCxEOgxIbQJw9rZXd5meNNaSE1DOA4CUaLrGQ3DlcMLuyvn/6YT
-         2TTbVPiua1MvsThUjOr45T3FYooTo4bT3O2d3gsmUIeNzqqvPwjY5ARFyHwY2FqJYcNV
-         ltVg==
-X-Gm-Message-State: AOJu0YwU4SIiIARIT/rQ+1FT4b8KbOnLmdMyZcqwPrwWFP/w6fW2tBpT
-	FwsBaiE0OCOS5VVVRvPwjLOj1bPCxQkk7L/xxLm3H2wKRgJRNyP8vQQbRReiSEfDxw7ImtZYlqj
-	FCbW5x2/a64BY0dWmjocsfASdDvQRHXYvNxUoOvmd
-X-Gm-Gg: AeBDies8aH3SU8EDir4ZTYSKbIQ3zSXDs0Rb2CXlj6DDuNOF57v0p+lU6nrwkt/40V5
-	qE48MlLqJI9msx/i/E9VpCuuwZdfH9803/uhmoFePGKYO/7XZo4At1peWY5XVARxw4CXCarlJiI
-	0Jn2VjF5uomJ4el18UcSXcjnkULkr7MGroPJ8mwRmEC4wm6txCVYNnTxQwiTSi4na82El0sTPtr
-	XUrsrFKHHLAQ+i/5MJ8LWV3CacoCnG0tH7FMlNf4LU5nGSbA9qlr9ITnWbUcoBKpiRW3xe7B7JK
-	x72jEj1yTzmauNZD5J7uN0GfBngT4dLQtXY9/NEaxL7BiTZK3FS6rgT1ZbzsvTNVGQV+5D3UoBD
-	VGsRoxRA=
-X-Received: by 2002:a05:622a:90d:b0:50d:b030:fc6a with SMTP id
- d75a77b69052e-50dd5bbe532mr244310831cf.49.1776147100067; Mon, 13 Apr 2026
- 23:11:40 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1776148742; x=1776753542;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GYL2a3cReHZZ5YSJ0wmm3zCuDsPFAtU2gKvk7jCr2V0=;
+        b=GHAJkpVdnMOKuQrlL3ESQQzVEh3wU+hEa7m7tLJEYd1gYIkYrNEaFZcl8HN79Hbo4G
+         DV/ItRbWEEDN3Z+lvMw+Xmu7yDNeOnY3Vcuq1sSngb1Mw/x6cw7qntfi/rhhuIOxMMEA
+         i1NPjJO1/K8K9PouPNJPgzE9iE0BN16GgdaDVQcNM8nK9ow0HSx7Q2j8X0tt8sHQ8IdH
+         ZYnLHg+v14ZMvQmgPeFfOMQtk/X4Q50reXGe0rTl4uLvdkKhroxpXZ1tt6hPZuG4AyES
+         DZ/6fcNqYb6cTJK0E+6MTvw2Vqpr/GXv8/PhqT/uz5T15ueSNjnC03e41ZYcHLltCLsC
+         FEVA==
+X-Forwarded-Encrypted: i=1; AFNElJ9AjWAbLWwHFL3MZccqgFC9LkoWdyerUEUe/k753RkUdrZwGdvNR+rSpbz418IxL5YYHatwpjo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzXuJzaU37mwE9tyKCCgoN6ruHzpObBxUVCQLdwfOEbJntopdC3
+	sBE4Hl0sP2AiVw9RTg8vj94dYZ6hcx3r3MFIE2wXvrwCsAl3y53UYuAyjj+0pPlLn7cD+cBROJb
+	vsYvGbF/U9hpRbKq4ZyX5RbQc+C++ybdhsKf9iJez3qrEP0NRtTg2Qpwd8kM2YehLR+UG658O2X
+	M/KvMeI9l15b9tyedfrhatPv0n1NkKhaXj1WbJe62EafboBRJAs7B6+3p0E+e8QT33Yd+3FpWYN
+	bKggN6qtxUeXT1pEj+CI+zSR9aFtLA=
+X-Gm-Gg: AeBDievZyf30gj0UPDd09nNVmYC+2buiWYkCcAwIqFXuxHFOIT2v12NhGNaC1NWKkBJ
+	og4s1inSR6Ap5wvJGnla25vl4ECZ0P669py8h1XWSQhM+1ucYYbxv5Yh9QvZoXCR4DSJx/yk1jy
+	vr8leB0+V1oM/VxC8EOe8uNF2aP1fNGt0GfrbIN1CMKNvDYtSjf8untsk+9FNhEHC66pDTcYYQA
+	QVOTLvfx6jWjvGs22pcTfksYRomKwNVOx9Hbru2z5cyVjubpEjtVxyjElFesFfjS44iEui5cVex
+	KW+OdJhgE34ILN5KXXmKV0B729RqjvHmQ0kbH67bbKo0a4vmgQmAJ6oDRy5qSlrD1+9FWTwoUab
+	Lc6L4L7w1HDS0VLAtPLFXrrfJcOdFhIhZklZ/qx7oFUYr5MshgX6CdDW4ylhqFzrFQKrZBgWF3r
+	bjIMaEbo0ETl3QdXSId2QBURY82IW+JUcsYQGF2pfiGXsIfWOE62sgoyrhgdAAcf8d45bzMa7js
+	kSTOmsCR/Bz
+X-Received: by 2002:a05:6122:4696:b0:567:4293:8d38 with SMTP id 71dfb90a1353d-56f3e849721mr3389362e0c.0.1776148741717;
+        Mon, 13 Apr 2026 23:39:01 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-15.dlp.protect.broadcom.com. [144.49.247.15])
+        by smtp-relay.gmail.com with ESMTPS id 71dfb90a1353d-56f70e3b4c8sm245698e0c.7.2026.04.13.23.39.00
+        for <netdev@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 13 Apr 2026 23:39:01 -0700 (PDT)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-dl1-f70.google.com with SMTP id a92af1059eb24-12713e56abaso1566549c88.3
+        for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 23:39:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1776148740; x=1776753540; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=GYL2a3cReHZZ5YSJ0wmm3zCuDsPFAtU2gKvk7jCr2V0=;
+        b=Eu6URQhC3iV+FnxPjArmO6tA160eauufzD4dJrNcAGsjIEKmhoPe+M155F533tudRM
+         aBOuuIHfTDbnk8XaO/rMhC9jeTdykKu+Ucy+WjyTaeH0N2oaKJTwr+K3CmD26fAPv1cB
+         AXqdps3MPyjfegbB4WX8ZDl9c+6tZqCxukoAA=
+X-Forwarded-Encrypted: i=1; AFNElJ+1wj1lVrL3OzL7vO3j2cWVAJeskhYUxButjdY6tcprsTWuZnIH3ZEfNhf+pLz9BKvZ4j+hdzM=@vger.kernel.org
+X-Received: by 2002:a05:693c:300d:b0:2bd:d8e6:90a0 with SMTP id 5a478bee46e88-2d5c39f6544mr3735039eec.3.1776148739842;
+        Mon, 13 Apr 2026 23:38:59 -0700 (PDT)
+X-Received: by 2002:a05:693c:300d:b0:2bd:d8e6:90a0 with SMTP id 5a478bee46e88-2d5c39f6544mr3735024eec.3.1776148739232;
+        Mon, 13 Apr 2026 23:38:59 -0700 (PDT)
+Received: from keerthanak-ph5-dev.. ([192.19.161.250])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2d5630ac330sm19396261eec.29.2026.04.13.23.38.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Apr 2026 23:38:58 -0700 (PDT)
+From: Keerthana K <keerthana.kalyanasundaram@broadcom.com>
+To: stable@vger.kernel.org,
+	gregkh@linuxfoundation.org
+Cc: pablo@netfilter.org,
+	kadlec@netfilter.org,
+	fw@strlen.de,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ajay.kaher@broadcom.com,
+	alexey.makhalov@broadcom.com,
+	vamsi-krishna.brahmajosyula@broadcom.com,
+	yin.ding@broadcom.com,
+	tapas.kundu@broadcom.com,
+	Stefano Brivio <sbrivio@redhat.com>,
+	Mukul Sikka <mukul.sikka@broadcom.com>,
+	Brennan Lamoreaux <brennan.lamoreaux@broadcom.com>,
+	Keerthana K <keerthana.kalyanasundaram@broadcom.com>
+Subject: [PATCH v2 v5.15-v6.1] netfilter: nft_set_pipapo: do not rely on ZERO_SIZE_PTR
+Date: Tue, 14 Apr 2026 06:31:31 +0000
+Message-ID: <20260414063131.4054234-1-keerthana.kalyanasundaram@broadcom.com>
+X-Mailer: git-send-email 2.43.7
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <177614667427.3606651.8700070406932922261@gmail.com>
-In-Reply-To: <177614667427.3606651.8700070406932922261@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 13 Apr 2026 23:11:28 -0700
-X-Gm-Features: AQROBzAo4pWAgj6mqIT7boi1_hwaMvrf2yxvVlFSjJeeXAUS1D9VQOZ7QAM6Iog
-Message-ID: <CANn89iLXG5ZMNeHkcLW+Ug9PxNnw_EKtpGVkPw1qeXEjJNtA0g@mail.gmail.com>
-Subject: Re: [PATCH v2] rose: fix OOB reads on short CLEAR REQUEST frames
-To: Ashutosh Desai <ashutoshdesai993@gmail.com>
-Cc: netdev@vger.kernel.org, linux-hams@vger.kernel.org, davem@davemloft.net, 
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+Content-Transfer-Encoding: 8bit
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278298-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-278299-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[broadcom.com:dkim,broadcom.com:email,broadcom.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,strlen.de:email];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[google.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	FROM_NEQ_ENVFROM(0.00)[keerthana.kalyanasundaram@broadcom.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 050DF3F5DE2
+	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[broadcom.com:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 3A40B3F6337
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Apr 13, 2026 at 11:04=E2=80=AFPM Ashutosh Desai
-<ashutoshdesai993@gmail.com> wrote:
->
-> rose_process_rx_frame() calls rose_decode() which reads skb->data[2]
-> without any prior length check. For CLEAR REQUEST frames the state
-> machines then read skb->data[3] and skb->data[4] as the cause and
-> diagnostic bytes.
->
-> A crafted 3-byte ROSE CLEAR REQUEST frame passes the minimum length
-> gate in rose_route_frame() and reaches rose_process_rx_frame(), where
-> rose_decode() reads one byte past the header and the state machines
-> read two bytes past the valid buffer.
->
-> Add a pskb_may_pull(skb, 3) check before rose_decode() to cover its
-> skb->data[2] access, and a pskb_may_pull(skb, 5) check afterwards for
-> the CLEAR REQUEST path to cover the cause and diagnostic reads.
->
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Ashutosh Desai <ashutoshdesai993@gmail.com>
-> ---
-> V1 -> V2: switch skb->len check to pskb_may_pull; also add
->           pskb_may_pull(skb, 3) before rose_decode() to cover its
->           skb->data[2] access
->
-> v1: https://lore.kernel.org/netdev/20260409013246.2051746-1-ashutoshdesai=
-993@gmail.com/
->
->  net/rose/rose_in.c | 10 ++++++++++
->  1 file changed, 10 insertions(+)
->
-> diff --git a/net/rose/rose_in.c b/net/rose/rose_in.c
-> index 0276b393f0e5..b9f01a11e2df 100644
-> --- a/net/rose/rose_in.c
-> +++ b/net/rose/rose_in.c
-> @@ -269,8 +269,18 @@ int rose_process_rx_frame(struct sock *sk, struct sk=
-_buff *skb)
->  if (rose->state =3D=3D ROSE_STATE_0)
->   0;
->
-> +if (!pskb_may_pull(skb, 3)) {
-> +kfree_skb(skb);
-> +return 0;
-> +}
-> +
->  frametype =3D rose_decode(skb, &ns, &nr, &q, &d, &m);
->
-> +if (frametype =3D=3D ROSE_CLEAR_REQUEST && !pskb_may_pull(skb, 5)) {
-> +kfree_skb(skb);
-> +return 0;
-> +}
-> +
->  switch (rose->state) {
->  case ROSE_STATE_1:
->  ueued =3D rose_state1_machine(sk, skb, frametype);
-> --
-> 2.34.1
+From: Florian Westphal <fw@strlen.de>
 
-rose_process_rx_frame() callers already call kfree_skb(skb) if
-rose_process_rx_frame()
-returns a 0.
-Your patch would add double-frees.
+commit 07ace0bbe03b3d8e85869af1dec5e4087b1d57b8 upstream
 
+pipapo relies on kmalloc(0) returning ZERO_SIZE_PTR (i.e., not NULL
+but pointer is invalid).
 
-Your patch is white-space mangled.
+Rework this to not call slab allocator when we'd request a 0-byte
+allocation.
 
-Please take a look at Documentation/process/maintainer-netdev.rst
+Reviewed-by: Stefano Brivio <sbrivio@redhat.com>
+Signed-off-by: Florian Westphal <fw@strlen.de>
+Signed-off-by: Mukul Sikka <mukul.sikka@broadcom.com>
+Signed-off-by: Brennan Lamoreaux <brennan.lamoreaux@broadcom.com>
+[Keerthana: In older stable branches (v6.6 and earlier), the allocation logic in
+pipapo_clone() still relies on `src->rules` rather than `src->rules_alloc`
+(introduced in v6.9 via 9f439bd6ef4f). Consequently, the previously
+backported INT_MAX clamping check uses `src->rules`. This patch correctly
+moves that `src->rules > (INT_MAX / ...)` check inside the new
+`if (src->rules > 0)` block]
+Signed-off-by: Keerthana K <keerthana.kalyanasundaram@broadcom.com>
+---
+Changes in v2:
+- Fixed patch apply failure
 
-Preparing changes
------------------
+v1: https://lore.kernel.org/all/20260413043247.3327855-1-keerthana.kalyanasundaram@broadcom.com/
 
-Attention to detail is important.  Re-read your own work as if you were the
-reviewer.  You can start with using ``checkpatch.pl``, perhaps even with
-the ``--strict`` flag.  But do not be mindlessly robotic in doing so.
-If your change is a bug fix, make sure your commit log indicates the
-end-user visible symptom, the underlying reason as to why it happens,
-and then if necessary, explain why the fix proposed is the best way to
-get things done.  Don't mangle whitespace, and as is common, don't
-mis-indent function arguments that span multiple lines.  If it is your
-first patch, mail it to yourself so you can test apply it to an
-unpatched tree to confirm infrastructure didn't mangle it.
+ net/netfilter/nft_set_pipapo.c | 20 ++++++++++++++------
+ 1 file changed, 14 insertions(+), 6 deletions(-)
 
-Finally, go back and read
-:ref:`Documentation/process/submitting-patches.rst <submittingpatches>`
-to be sure you are not repeating some common mistake documented there.
+diff --git a/net/netfilter/nft_set_pipapo.c b/net/netfilter/nft_set_pipapo.c
+index 863162c82330..2072c89a467d 100644
+--- a/net/netfilter/nft_set_pipapo.c
++++ b/net/netfilter/nft_set_pipapo.c
+@@ -525,6 +525,8 @@ static struct nft_pipapo_elem *pipapo_get(const struct net *net,
+ 	int i;
+ 
+ 	m = priv->clone;
++	if (m->bsize_max == 0)
++		return ret;
+ 
+ 	res_map = kmalloc_array(m->bsize_max, sizeof(*res_map), GFP_ATOMIC);
+ 	if (!res_map) {
+@@ -1365,14 +1367,20 @@ static struct nft_pipapo_match *pipapo_clone(struct nft_pipapo_match *old)
+ 		       src->bsize * sizeof(*dst->lt) *
+ 		       src->groups * NFT_PIPAPO_BUCKETS(src->bb));
+ 
+-		if (src->rules > (INT_MAX / sizeof(*src->mt)))
+-			goto out_mt;
++		if (src->rules > 0) {
++			if (src->rules > (INT_MAX / sizeof(*src->mt)))
++				goto out_mt;
++
++			dst->mt = kvmalloc_array(src->rules, sizeof(*src->mt),
++						 GFP_KERNEL);
++			if (!dst->mt)
++				goto out_mt;
+ 
+-		dst->mt = kvmalloc(src->rules * sizeof(*src->mt), GFP_KERNEL);
+-		if (!dst->mt)
+-			goto out_mt;
++			memcpy(dst->mt, src->mt, src->rules * sizeof(*src->mt));
++		} else {
++			dst->mt = NULL;
++		}
+ 
+-		memcpy(dst->mt, src->mt, src->rules * sizeof(*src->mt));
+ 		src++;
+ 		dst++;
+ 	}
+-- 
+2.43.7
 
-Also:
-
-Indicating target tree
-~~~~~~~~~~~~~~~~~~~~~~
-
-To help maintainers and CI bots you should explicitly mark which tree
-your patch is targeting. Assuming that you use git, use the prefix
-flag::
-
-  git format-patch --subject-prefix=3D'PATCH net-next' start..finish
-
-Use ``net`` instead of ``net-next`` (always lower case) in the above for
-bug-fix ``net`` content.
-
-Please
-
-pw-bot: cr
 
