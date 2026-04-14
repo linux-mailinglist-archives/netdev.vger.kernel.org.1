@@ -1,96 +1,76 @@
-Return-Path: <netdev+bounces-278407-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278408-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cC8MJ1Aj3mk1ngkAu9opvQ
-	(envelope-from <netdev+bounces-278407-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 13:21:52 +0200
+	id GGZRNdkj3mk1ngkAu9opvQ
+	(envelope-from <netdev+bounces-278408-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 13:24:09 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F40293F9417
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 13:21:51 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6C623F9448
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 13:24:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4E7953008201
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 11:21:40 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 8B5393014D9A
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 11:24:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91900397E86;
-	Tue, 14 Apr 2026 11:21:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4317B3D9DBA;
+	Tue, 14 Apr 2026 11:24:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rvw8ESC3"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="N61uzNTv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D6213469E0
-	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 11:21:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6D3F3B9DAC
+	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 11:24:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776165699; cv=none; b=OgXWeoYSZHB0vb7m8GUr0TYF0eBDt58Ghebcai89zJz9XhiUGbLos8XofRGPuR0VkGB6KC7THsK2XqU7n17JGM/vYwVxvmgXjwJXr+9Z731nAqMFUUG8WK2OFhsiTvgoV1/AODuBRsHo5U15EOzTpw0z0hunIF4tdY1CpTNM/eY=
+	t=1776165844; cv=none; b=TC9VlUZ42NvcoJT9+CDbY/6cXwKIcmL8mPF+Pt7Xkj+OxYMrh6eVjjFm81x9LPjvpkRtzjASnK9WYKWb1dp5onKo21YM0zLMBffMGxza5xaBPa9IEA9ai+8cqO0BUMOaad/MixLkUmmhzFXcweiZSIFUJotti7LH8HJPhYRN48Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776165699; c=relaxed/simple;
-	bh=HNw0+spdTOu60fa7PI1Xd858IwuDlVTKSwE3Fp5tlxA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iKk+jmf77ty/6CTX8zIUTy+dB18X5FnF9CP4REmnKhU5N3ZO7fLg9JPs6+JaXt1cFIqx0Bf4MbABpzRoVulHrAsrgiRiP8C9dUU4ymgkoe7UjRy+946b2YYgcq9XODCAlIEYpLUiC2imgv6Nmzi5T2uK8Gzh98VDBFm2ij6J6ZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rvw8ESC3; arc=none smtp.client-ip=209.85.218.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-b9910707d82so676842566b.1
-        for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 04:21:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776165697; x=1776770497; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=R6fUbZJjiAUJqseR0AfY4kN5/jG1XsjI0aKzIVoGFQI=;
-        b=rvw8ESC38vPj4NcWY7znjv9Iuo7K7FAOAsKKRxd+ZnpTR5yfQHiDBFQKLD/FkWN9jd
-         oill3VmnfQNBbQ7XOtC7OZVbwXH8xjnEyVWm31IfT5ATpolFCuWNGnSxLD2vLDU89lbb
-         HiycfR7prbI2QLSI3upEwz9l+N94DO1LJ7kkP8q7aNRMFBmSCwLgJdOiJ3XubYas4Y8j
-         nM7UiUUy7NCzt0JD22sUguB1LghPY7nEDS5iwG3y0KOxRSJ+aJDUnQ+PevP0Q9EpEhiM
-         xWBsUYUSH5TNZwJ47OCAHNLkys/RLmmQIcmWDfyZ6Af/bAeSbOy3sxyaSSCUXtYdSJ4Z
-         DZ5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776165697; x=1776770497;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=R6fUbZJjiAUJqseR0AfY4kN5/jG1XsjI0aKzIVoGFQI=;
-        b=Yi9Zsqa7Fw98VGnWzn0jZR5fZ5JqyO4XERsoIfh+x8JXswSGAGID3yXOnX1hMKVCsw
-         FN2z+8P7CRT+guFn5veM+E41PtM3u4wc3Yzonmiim4vkOqa8SIy8sfdtE3foRlTAE9Wn
-         1KWTax0jiCIutuxEAlnbp942Pn6d5xmmuhMR0nFIDIpIJrbg8VZWA8rweLO3J2Xi0OTi
-         bMDs3RjOAIwWwH4HbpE42SK23aoHVH/UU9r3lYZV0uQiwqXdS+oVt0nVFqdHMAfL9XYJ
-         x355f7ujqjFnhlveAcge7l0NDhWw7bbZq/+Z0r/ZIq7Mc1G54nri9lhnxkKNt/sBYsKI
-         G8Iw==
-X-Forwarded-Encrypted: i=1; AFNElJ/mIqFNGMQubX4TvkZMg7j6XN5gHMdCRiKtx34+GQbJDhAUGhj1ziNXu5Xh94h5briG3Uv1Jic=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzXnsCwLTowMredBmujc2gw+k788L2T/7hWrKds7xDvbKNEmo7o
-	R6kt90j1BG8tyIoD1nvJoy9ncsunFg5gxB9V+mAOKPl0oL7lWIM4C31M
-X-Gm-Gg: AeBDievZWQKY4QV/8SeRW11K3PsPkh9MoRmPsE8tH3+YR71eYKw9z1OEWauqM/SlPHF
-	ipjK2N72aJNRLUSKFDENWkjDqZavppSB6BLLLy5nXEOaQLcX6JWy7aKqj4UkjrrYquiV2ZK0kVk
-	w7mcC1gMV4CLUgknu2PM0PgtWNLhhgHAqwsCbS+UkpjP7SQT2PR7pY/tGR5esA+OkS8a7uy1FbZ
-	ZfEHaHpC3Y31BdrUkpi9VuuW8B+tzF9JXnpppto8p/lkk4qyFnZBTYFsbFAmMiO0bU2obvA5JNR
-	fqCQEyEDFy9lrf+HHry0trrAnm6zqe8FFvi8ad2Xv8GCWB5i+ZA0/Vbly8NOIsY0oh6AB815ni3
-	OrIKjLDHoOimfugYSHV6WA3T4iHB6xLGmpCVmr08R6GDMT30+J4jf0ipYBNJhPRADsoNMajFMjJ
-	Ux9YapxFVvw7oQ6XcSPY5cz8uWkWe1YPmzBS5UPjSmV5WatDRkUO97VhJAkiui4RKPyEWbI8Xdq
-	VFUVXeoOGsfqggnm7y5t2LqcdIjTsyPC/mdg1W8qTziJ7IuCZj0sko=
-X-Received: by 2002:a17:907:1b08:b0:b98:6177:2f16 with SMTP id a640c23a62f3a-b9d72ad9ff6mr827094966b.53.1776165696277;
-        Tue, 14 Apr 2026 04:21:36 -0700 (PDT)
-Received: from eric (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b9d6e5c544asm389679366b.33.2026.04.14.04.21.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Apr 2026 04:21:35 -0700 (PDT)
-From: Eric Woudstra <ericwouds@gmail.com>
-To: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	Phil Sutter <phil@nwl.cc>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Eric Woudstra <ericwouds@gmail.com>
-Cc: netfilter-devel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH v2 nf] netfilter: nf_flow_table_ip: Introduce nf_flow_vlan_push()
-Date: Tue, 14 Apr 2026 13:21:20 +0200
-Message-ID: <20260414112120.248744-1-ericwouds@gmail.com>
-X-Mailer: git-send-email 2.53.0
+	s=arc-20240116; t=1776165844; c=relaxed/simple;
+	bh=0vM8Wm0yvMs1PHZRliZhxIPfiXZ2NOCQ06VtNDnSSis=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=ZHuOLPq6XNJIIAMrNWdqJP7S2X2QIy7sWAXpjmvHmPMnoBlyKnbvOVI3l8zueEsG7n6+RH4Ib9MSgrxRMZGTQ29PaAVM4Rh5Q6TrVZLgaaNuUBuTkmeINgHMR4Kl287Z9PXu4egtcsc0+y12xV4AbLFClEfEqR16/U9Ko7uglF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=N61uzNTv; arc=none smtp.client-ip=95.215.58.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1776165830;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=nD3+pYkuUta613cN19y/PkEcTwKQ+sxBqJw2XDXKABc=;
+	b=N61uzNTvbqRwJAPfiGs2bl1u9zlbXJ5Q9XC7AEX2fSmGy/yIm0C7aQM+fcz1qOGAs13T7H
+	TjC/zsy6kPDbYtxxTH2YhBMGMbadzmTz3uifuW01J51dCRIpWmyYrXPJCQfc8YjC2NEwaS
+	COkYCs+LVBgN/fJwE2Gqiv2MP2QGDf0=
+From: KaFai Wan <kafai.wan@linux.dev>
+To: edumazet@google.com,
+	ncardwell@google.com,
+	kuniyu@google.com,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	eddyz87@gmail.com,
+	memxor@gmail.com,
+	song@kernel.org,
+	yonghong.song@linux.dev,
+	jolsa@kernel.org,
+	shuah@kernel.org,
+	kafai.wan@linux.dev,
+	sdf@fomichev.me,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH bpf-next 0/2] bpf: tcp: Reject TCP_NODELAY from BPF hdr opt callbacks
+Date: Tue, 14 Apr 2026 19:23:08 +0800
+Message-ID: <20260414112310.1285783-1-kafai.wan@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,103 +78,53 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_FROM(0.00)[bounces-278407-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[netfilter.org,strlen.de,nwl.cc,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-278408-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ericwouds@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[google.com,davemloft.net,kernel.org,redhat.com,iogearbox.net,linux.dev,gmail.com,fomichev.me,vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[3];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[24];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[kafai.wan@linux.dev,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: F40293F9417
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,linux.dev:dkim,linux.dev:mid]
+X-Rspamd-Queue-Id: C6C623F9448
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Calling skb_reset_mac_header() before calling skb_vlan_push() does
-remove the error:
-
-"skb_vlan_push got skb with skb->data not at mac header (offset 18)"
-
-But the inner vlan tag is still not inserted correctly.
-
-skb_vlan_push() uses __vlan_insert_inner_tag() to insert the tag
-at offset ETH_HLEN. But the inner tag should only be pushed, without
-offset, similar to nf_flow_pppoe_push().
-
-Fixes: c653d5a78f34 ("netfilter: flowtable: inline vlan encapsulation in xmit path")
-Fixes: a3aca98aec9a ("netfilter: nf_flow_table_ip: reset mac header before vlan push")
-Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
+This small patchset is about avoid infinite recursion in bpf_skops_hdr_opt_len() 
+via TCP_NODELAY setsockopt.
 
 ---
+KaFai Wan (2):
+  bpf: tcp: Reject TCP_NODELAY from BPF hdr opt callbacks
+  selftests/bpf: Cover TCP_NODELAY in hdr opt callback
 
- net/netfilter/nf_flow_table_ip.c | 25 ++++++++++++++++++++++---
- 1 file changed, 22 insertions(+), 3 deletions(-)
+ net/ipv4/tcp.c                                |  5 ++-
+ .../bpf/prog_tests/tcp_hdr_options.c          | 34 +++++++++++++++++++
+ .../bpf/progs/test_misc_tcp_hdr_options.c     | 18 ++++++++++
+ 3 files changed, 56 insertions(+), 1 deletion(-)
 
-diff --git a/net/netfilter/nf_flow_table_ip.c b/net/netfilter/nf_flow_table_ip.c
-index fd56d663cb5b..0086f8a1a0d6 100644
---- a/net/netfilter/nf_flow_table_ip.c
-+++ b/net/netfilter/nf_flow_table_ip.c
-@@ -544,6 +544,26 @@ static int nf_flow_offload_forward(struct nf_flowtable_ctx *ctx,
- 	return 1;
- }
- 
-+static int nf_flow_vlan_push(struct sk_buff *skb, __be16 proto, u16 id)
-+{
-+	if (skb_vlan_tag_present(skb)) {
-+		struct vlan_hdr *vhdr;
-+
-+		if (skb_cow_head(skb, VLAN_HLEN))
-+			return -1;
-+
-+		__skb_push(skb, VLAN_HLEN);
-+		skb_reset_network_header(skb);
-+		vhdr = (struct vlan_hdr *)(skb->data);
-+		vhdr->h_vlan_TCI = htons(id);
-+		vhdr->h_vlan_encapsulated_proto = skb->protocol;
-+		skb->protocol = proto;
-+	} else {
-+		__vlan_hwaccel_put_tag(skb, proto, id);
-+	}
-+	return 0;
-+}
-+
- static int nf_flow_pppoe_push(struct sk_buff *skb, u16 id)
- {
- 	int data_len = skb->len + sizeof(__be16);
-@@ -738,9 +758,8 @@ static int nf_flow_encap_push(struct sk_buff *skb,
- 		switch (tuple->encap[i].proto) {
- 		case htons(ETH_P_8021Q):
- 		case htons(ETH_P_8021AD):
--			skb_reset_mac_header(skb);
--			if (skb_vlan_push(skb, tuple->encap[i].proto,
--					  tuple->encap[i].id) < 0)
-+			if (nf_flow_vlan_push(skb, tuple->encap[i].proto,
-+					      tuple->encap[i].id) < 0)
- 				return -1;
- 			break;
- 		case htons(ETH_P_PPP_SES):
 -- 
-2.53.0
+2.43.0
 
 
