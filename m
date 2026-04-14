@@ -1,169 +1,207 @@
-Return-Path: <netdev+bounces-278455-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278456-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IHmUNs5A3mlvpwkAu9opvQ
-	(envelope-from <netdev+bounces-278455-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 15:27:42 +0200
+	id MCKROhBA3mlvpwkAu9opvQ
+	(envelope-from <netdev+bounces-278456-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 15:24:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45DA23FA7D9
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 15:27:42 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EAC03FA719
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 15:24:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 724D9300576C
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 13:23:29 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id DB3B43012224
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 13:24:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F299B3E6DD4;
-	Tue, 14 Apr 2026 13:23:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 425373E6DF2;
+	Tue, 14 Apr 2026 13:24:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nziiY2cH"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="X6A4tqU3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D03F33E63AC
-	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 13:23:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D01C93E6DE0;
+	Tue, 14 Apr 2026 13:24:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776173008; cv=none; b=AQq/O8s3ad/hjTIVEsJIoud9mbZhcxGYh5J1Y3vSlX5YIQwxScn22E4AoxwlbSeCq9HhIJu3K80VTK1oEQKFGhp9pnt8yRammu6cmqCQoVfNvfn5W5oTqQT8zRCCONUqpNozZQ8w7toNIRKWYGntFNj+4qzmrO4VqxFurzN20N0=
+	t=1776173068; cv=none; b=axQyPllwswrP9bQPa/T/sCq+LG6jh3yzyJGIxJuPxSboZy7aeYOrYzncQmtGPDI5++2l2WAG3H6WAnBl8czDCFyLjFe0zfcKpq8GRaSuPXP2t09hx9Yo7Pms3ZWt2YA/9Cv8k3Cqh4r8fuYnhDFEbJ7tdsmJJg2crDHk26FLI7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776173008; c=relaxed/simple;
-	bh=i28YYCrUHHMDpraT0Z5aLv8IuBAQodP0RU10t8qP06M=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Bl5yzmsNTYGN9c4aLQH5sCmlwfh1mgHFgnzBiw5iQf7ONLaynx05cEdWY7NgUsFWmysJuk1oc69kQe5IUSH4aP7FL3mNx0PjdrvPQa0GDwYC8ogi3uiA2+bRpCodcFOtcPeE5Tja/9DSLPHd2465vsVGKoI+Bu75MQeWFRi2kxE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nziiY2cH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 461F5C19425;
-	Tue, 14 Apr 2026 13:23:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776173008;
-	bh=i28YYCrUHHMDpraT0Z5aLv8IuBAQodP0RU10t8qP06M=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=nziiY2cHF9SaKIleFtCmSzONxdI75XT7GwROAvqbs3etvAtGuC7zRg/p2mFMsMKID
-	 UKe0EpUVm/KmVEbZZjPNMUNYvh8XnzEmKQZSU+HX2ztEeQyt5xW4UuNQHqHVhk4bwZ
-	 Rm11fEs0gfl3m4BjdvxG2/sBJrwSE2dmu52Fx2MD5l0lec9TmmDE7hHeKCYVmXvWrH
-	 xz2ZHSXJsOg8Jbom2t+kdj/PVsfOs7tUG7U/4qlLmy9ac/dPl4dieg/xuiKxk2fBML
-	 USfeDJzFTmwVPqttkH4nKaF7Xb5H/FNrZlwEsIXgX4ZpPHLBX4kBwTgbzOHzxAXIYT
-	 a7DRHJZgXMwHQ==
-From: Simon Horman <horms@kernel.org>
-To: aleksandr.loktionov@intel.com
-Cc: 'Simon Horman' <horms@kernel.org>,
-	intel-wired-lan@lists.osuosl.org,
-	anthony.l.nguyen@intel.com,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH iwl-next v2 5/8] ixgbe: remove ixgbe_ping_all_vfs() from link state change handlers
-Date: Tue, 14 Apr 2026 14:23:00 +0100
-Message-ID: <20260414132301.756968-1-horms@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260408131216.2662245-6-aleksandr.loktionov@intel.com>
-References: <20260408131216.2662245-6-aleksandr.loktionov@intel.com>
+	s=arc-20240116; t=1776173068; c=relaxed/simple;
+	bh=hrlp+8/wSmW3Jx7uBVXodU++OJHYVgQMsMTogDvagaY=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:From:To:
+	 References:In-Reply-To; b=BP6A2TUncmmLTiYbt9PM4FtiqCnB0ZlPU/YHR8MEFEbhf84AyEH73TtOr2pvce2DFkWidDjaTWEUyILaP89cVmO0rnaMI2WjOOabt9oDi5cOdWcbHgqtrFZ6Tx2EGSI1Aw94xTbdSoFx9+Kb5kCAJHjPc7DbT70I+p00z6JW75s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=X6A4tqU3; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 49A624E429A0;
+	Tue, 14 Apr 2026 13:24:24 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 15A6960410;
+	Tue, 14 Apr 2026 13:24:24 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 91474104500A2;
+	Tue, 14 Apr 2026 15:24:15 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1776173062; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=cMPO/P6ZptnY7PwA9Kq6DHiKsIFPvqoz4r+zqZlAlBc=;
+	b=X6A4tqU3MkoqM6hdV2BYcurk14+6JZDEN/gbqla0kWX1zkUOVhzepr1g+eqrPNbNUv/huV
+	YvRVcaXQMDSoKNvHHEev5avgGrcMFEKbpEaqiYiDYgm7Bt3jlvoqJQ5ERrTOmbM6hkpZ4c
+	lSZlrap8zNk/UzuRZwSWbVolH6CoRl3/X0CCVwBfc1YF32vGuKDzOTtnFMST1koqfhy2JQ
+	FHgxzpJuT7y8RT0NzKx5KsKEo6MlgAJgguOw61CCS91aw38/mmn96yQctauQKN1Mw/26EC
+	Mku30aEpcpuqoVCUdGMmoRzHpFjahdvvfYrXfOquex2Iaj6Ff2PksIHe5lfBCw==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Tue, 14 Apr 2026 15:24:14 +0200
+Message-Id: <DHSWSSYRPUVC.2W3G3OU27L3HG@bootlin.com>
+Subject: Re: [PATCH RFC bpf-next 3/8] bpf: add BPF_JIT_KASAN for KASAN
+ instrumentation of JITed programs
+Cc: "Alexei Starovoitov" <ast@kernel.org>, "Daniel Borkmann"
+ <daniel@iogearbox.net>, "Andrii Nakryiko" <andrii@kernel.org>, "Martin
+ KaFai Lau" <martin.lau@linux.dev>, "Eduard Zingerman" <eddyz87@gmail.com>,
+ "Kumar Kartikeya Dwivedi" <memxor@gmail.com>, "Song Liu" <song@kernel.org>,
+ "Yonghong Song" <yonghong.song@linux.dev>, "Jiri Olsa" <jolsa@kernel.org>,
+ "John Fastabend" <john.fastabend@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, "David Ahern" <dsahern@kernel.org>, "Thomas
+ Gleixner" <tglx@kernel.org>, "Ingo Molnar" <mingo@redhat.com>, "Borislav
+ Petkov" <bp@alien8.de>, "Dave Hansen" <dave.hansen@linux.intel.com>,
+ <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>, "Shuah Khan"
+ <shuah@kernel.org>, "Maxime Coquelin" <mcoquelin.stm32@gmail.com>,
+ "Alexandre Torgue" <alexandre.torgue@foss.st.com>, "Andrey Ryabinin"
+ <ryabinin.a.a@gmail.com>, "Alexander Potapenko" <glider@google.com>,
+ "Dmitry Vyukov" <dvyukov@google.com>, "Vincenzo Frascino"
+ <vincenzo.frascino@arm.com>, "Andrew Morton" <akpm@linux-foundation.org>,
+ <ebpf@linuxfoundation.org>, "Bastien Curutchet"
+ <bastien.curutchet@bootlin.com>, "Thomas Petazzoni"
+ <thomas.petazzoni@bootlin.com>, "Xu Kuohai" <xukuohai@huawei.com>,
+ <bpf@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <netdev@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+ <linux-stm32@st-md-mailman.stormreply.com>,
+ <linux-arm-kernel@lists.infradead.org>, <kasan-dev@googlegroups.com>,
+ <linux-mm@kvack.org>
+From: =?utf-8?q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
+To: "Andrey Konovalov" <andreyknvl@gmail.com>,
+ =?utf-8?b?QWxleGlzIExvdGhvcsOpIChlQlBGIEZvdW5kYXRpb24p?=
+ <alexis.lothore@bootlin.com>
+X-Mailer: aerc 0.21.0-0-g5549850facc2
+References: <20260413-kasan-v1-0-1a5831230821@bootlin.com>
+ <20260413-kasan-v1-3-1a5831230821@bootlin.com>
+ <CA+fCnZf-o8tiv_tX9YB5eBUGx17OpztKZsEB6Awjw3WAqBAiUw@mail.gmail.com>
+In-Reply-To: <CA+fCnZf-o8tiv_tX9YB5eBUGx17OpztKZsEB6Awjw3WAqBAiUw@mail.gmail.com>
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278455-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-278456-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com,bootlin.com];
+	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,linux.dev,gmail.com,davemloft.net,redhat.com,alien8.de,linux.intel.com,zytor.com,foss.st.com,google.com,arm.com,linux-foundation.org,linuxfoundation.org,bootlin.com,huawei.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org,googlegroups.com,kvack.org];
+	RCPT_COUNT_TWELVE(0.00)[40];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alexis.lothore@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sashiko.dev:url]
-X-Rspamd-Queue-Id: 45DA23FA7D9
+	NEURAL_HAM(-0.00)[-0.998];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:dkim,bootlin.com:mid,bootlin.com:email,bootlin.com:url]
+X-Rspamd-Queue-Id: 8EAC03FA719
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: 'Simon Horman' <horms@kernel.org>
+On Tue Apr 14, 2026 at 12:20 AM CEST, Andrey Konovalov wrote:
+> On Mon, Apr 13, 2026 at 8:29=E2=80=AFPM Alexis Lothor=C3=A9 (eBPF Foundat=
+ion)
+> <alexis.lothore@bootlin.com> wrote:
+>>
+>> Add a new Kconfig option CONFIG_BPF_JIT_KASAN that automatically enables
+>> KASAN (Kernel Address Sanitizer) memory access checks for JIT-compiled
+>> BPF programs, when both KASAN and JIT compiler are enabled. When
+>> enabled, the JIT compiler will emit shadow memory checks before memory
+>> loads and stores to detect use-after-free, out-of-bounds, and other
+>> memory safety bugs at runtime. The option is gated behind
+>> HAVE_EBPF_JIT_KASAN, as it needs proper arch-specific implementation.
+>>
+>> Signed-off-by: Alexis Lothor=C3=A9 (eBPF Foundation) <alexis.lothore@boo=
+tlin.com>
+>> ---
+>>  kernel/bpf/Kconfig | 9 +++++++++
+>>  1 file changed, 9 insertions(+)
+>>
+>> diff --git a/kernel/bpf/Kconfig b/kernel/bpf/Kconfig
+>> index eb3de35734f0..28392adb3d7e 100644
+>> --- a/kernel/bpf/Kconfig
+>> +++ b/kernel/bpf/Kconfig
+>> @@ -17,6 +17,10 @@ config HAVE_CBPF_JIT
+>>  config HAVE_EBPF_JIT
+>>         bool
+>>
+>> +# KASAN support for JIT compiler
+>> +config HAVE_EBPF_JIT_KASAN
+>> +       bool
+>> +
+>>  # Used by archs to tell that they want the BPF JIT compiler enabled by
+>>  # default for kernels that were compiled with BPF JIT support.
+>>  config ARCH_WANT_DEFAULT_BPF_JIT
+>> @@ -101,4 +105,9 @@ config BPF_LSM
+>>
+>>           If you are unsure how to answer this question, answer N.
+>>
+>> +config BPF_JIT_KASAN
+>> +       bool
+>> +       depends on HAVE_EBPF_JIT_KASAN
+>> +       default y if BPF_JIT && KASAN_GENERIC
+>
+> Should this be "depends on KASAN && KASAN_GENERIC"?
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev
----
-ixgbe: remove ixgbe_ping_all_vfs() from link state change handlers
+Meaning, making it an explicit user-selectable option ?
 
-This commit removes ixgbe_ping_all_vfs() from the link watchdog handlers
-to prevent a race condition during VF initialization where a gratuitous
-ping collides with the VF mailbox state machine.
+If so, the current design choice is voluntary and based on the feedback
+received on the original RFC, where I have been suggested to
+automatically enable the KASAN instrumentation in BPF programs if KASAN
+support is enabled in the kernel ([1]). But if a user-selectable toggle
+is eventually a better solution, I'm fine with changing it.
 
-> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-> index 8110bcf006a30..3071302901499 100644
-> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-> @@ -8164,9 +8164,6 @@ static void ixgbe_watchdog_link_is_up(struct ixgbe_adapter *adapter)
->  
->  	/* update the default user priority for VFs */
->  	ixgbe_update_default_up(adapter);
-> -
-> -	/* ping all the active vfs to let them know link has changed */
-> -	ixgbe_ping_all_vfs(adapter);
->  }
+[1] https://lore.kernel.org/bpf/CAADnVQLX7RSnOqQuU32Cgq-e0MVqyeNrtCQSBbk0W2=
+xGkE-ZNw@mail.gmail.com/
 
-How will legacy VFs (such as 82599, X540, and X550) receive link state
-changes without these pings?
+>
+>
+>> +
+>>  endmenu # "BPF subsystem"
+>>
+>> --
+>> 2.53.0
+>>
 
-The commit message states that link-state changes are already communicated
-to VFs through the normal mailbox protocol. However, older VFs appear to
-rely on receiving an IXGBE_VT_MSGTYPE_CTS message from the PF to clear
-mac->get_link_status and complete the link up sequence in
-ixgbevf_check_mac_link_vf().
 
-Without the ping, will these legacy VFs fail to read the mailbox and stay
-stuck reporting the link as down?
 
-Is the mailbox corruption race still triggerable from other paths?
 
-If ixgbe_ping_vf() is called locklessly from process-context NDO callbacks
-like ixgbe_ndo_set_vf_link_state() or ixgbe_ndo_set_vf_trust(), could it be
-preempted by a hardirq triggering ixgbe_msg_task() (which correctly acquires
-vfs_lock before writing to the mailbox)?
+--=20
+Alexis Lothor=C3=A9, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
-Since ixgbe_write_mbx_pf() only arbitrates between the PF and VF via the
-IXGBE_PFMAILBOX_PFU hardware lock, it provides no mutual exclusion between
-concurrent host threads. Could concurrent writes corrupt the IXGBE_PFMBMEM
-buffer and cause the exact same VF initialization failure this patch intended
-to fix?
-
-Would wrapping the pings in spin_lock_irqsave(&adapter->vfs_lock, flags)
-prevent the mailbox corruption instead of removing the pings entirely?
-
-[ ... ]
-
-> @@ -8197,9 +8194,6 @@ static void ixgbe_watchdog_link_is_down(struct ixgbe_adapter *adapter)
->  
->  	e_info(drv, "NIC Link is Down\n");
->  	netif_carrier_off(netdev);
-> -
-> -	/* ping all the active vfs to let them know link has changed */
-> -	ixgbe_ping_all_vfs(adapter);
->  }
-
-Without this ping, will older VFs miss the mailbox interrupt needed to set
-mac->get_link_status = 1, causing them to remain stuck reporting the link as
-up indefinitely and silently drop traffic when the cable is unplugged?
-
-This isn't a bug, but removing the calls from the link handlers appears to
-leave ixgbe_ping_all_vfs() as dead code without any remaining callers in
-the kernel. Should the function definition in ixgbe_sriov.c and its
-declaration in ixgbe_sriov.h be removed as well?
 
