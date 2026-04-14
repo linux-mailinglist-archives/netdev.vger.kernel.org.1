@@ -1,129 +1,200 @@
-Return-Path: <netdev+bounces-278406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278407-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +KV2HZMh3mk1ngkAu9opvQ
-	(envelope-from <netdev+bounces-278406-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 13:14:27 +0200
+	id cC8MJ1Aj3mk1ngkAu9opvQ
+	(envelope-from <netdev+bounces-278407-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 13:21:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0D363F9332
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 13:14:26 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F40293F9417
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 13:21:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 05160300DD79
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 11:14:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4E7953008201
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 11:21:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7718A3D8101;
-	Tue, 14 Apr 2026 11:14:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91900397E86;
+	Tue, 14 Apr 2026 11:21:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rvw8ESC3"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FFD620DE3;
-	Tue, 14 Apr 2026 11:14:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D6213469E0
+	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 11:21:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776165255; cv=none; b=F73oiXm30CFlLiTWSs/uCGl3SvfwKfsfxWCNLJJfe7pDyMnObjDEHO3oxGK+i9Qfd427dUbQ8JORtvz+FvnvjXYXLoriXHSPQxhGDhgyKlq88ncbeP9AwCvfOIQt6XQv/IbNzqn4Qmcrl0rE0N9qVPsp4ul1woPIZVGASD0wDvg=
+	t=1776165699; cv=none; b=OgXWeoYSZHB0vb7m8GUr0TYF0eBDt58Ghebcai89zJz9XhiUGbLos8XofRGPuR0VkGB6KC7THsK2XqU7n17JGM/vYwVxvmgXjwJXr+9Z731nAqMFUUG8WK2OFhsiTvgoV1/AODuBRsHo5U15EOzTpw0z0hunIF4tdY1CpTNM/eY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776165255; c=relaxed/simple;
-	bh=09uiMZRs7r7SYhGOfTyq/qJWTKsO/uLe3Dd56LS2Js4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R4JfR/CtQII0adH0ULXIUO8fj9KR6TMpdUe//GDwDSdBbOAZmJtYjCreTTR1tQV8FVnkF9JbjhOEFDZmiJyVGoyX9b8xFMoRAntENea5uUehAR20jcv11G2biNfiFygQhDIsV3WOUn5rdm7grhobEUBG+mhIEnadQYGnyQN3MqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
-	id E1E2360490; Tue, 14 Apr 2026 13:14:11 +0200 (CEST)
-Date: Tue, 14 Apr 2026 13:14:11 +0200
-From: Florian Westphal <fw@strlen.de>
-To: "Kito Xu (veritas501)" <hxzene@gmail.com>
-Cc: pablo@netfilter.org, coreteam@netfilter.org, davem@davemloft.net,
-	edumazet@google.com, ffmancera@riseup.net, horms@kernel.org,
-	kuba@kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
-	pabeni@redhat.com, phil@nwl.cc
-Subject: Re: [PATCH v2] netfilter: nfnetlink_osf: fix null-ptr-deref in
- nf_osf_ttl
-Message-ID: <ad4hg4Wm90sVb1OB@strlen.de>
-References: <20260414074556.2512750-1-hxzene@gmail.com>
- <20260414104900.2617863-1-hxzene@gmail.com>
+	s=arc-20240116; t=1776165699; c=relaxed/simple;
+	bh=HNw0+spdTOu60fa7PI1Xd858IwuDlVTKSwE3Fp5tlxA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iKk+jmf77ty/6CTX8zIUTy+dB18X5FnF9CP4REmnKhU5N3ZO7fLg9JPs6+JaXt1cFIqx0Bf4MbABpzRoVulHrAsrgiRiP8C9dUU4ymgkoe7UjRy+946b2YYgcq9XODCAlIEYpLUiC2imgv6Nmzi5T2uK8Gzh98VDBFm2ij6J6ZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rvw8ESC3; arc=none smtp.client-ip=209.85.218.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-b9910707d82so676842566b.1
+        for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 04:21:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776165697; x=1776770497; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=R6fUbZJjiAUJqseR0AfY4kN5/jG1XsjI0aKzIVoGFQI=;
+        b=rvw8ESC38vPj4NcWY7znjv9Iuo7K7FAOAsKKRxd+ZnpTR5yfQHiDBFQKLD/FkWN9jd
+         oill3VmnfQNBbQ7XOtC7OZVbwXH8xjnEyVWm31IfT5ATpolFCuWNGnSxLD2vLDU89lbb
+         HiycfR7prbI2QLSI3upEwz9l+N94DO1LJ7kkP8q7aNRMFBmSCwLgJdOiJ3XubYas4Y8j
+         nM7UiUUy7NCzt0JD22sUguB1LghPY7nEDS5iwG3y0KOxRSJ+aJDUnQ+PevP0Q9EpEhiM
+         xWBsUYUSH5TNZwJ47OCAHNLkys/RLmmQIcmWDfyZ6Af/bAeSbOy3sxyaSSCUXtYdSJ4Z
+         DZ5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776165697; x=1776770497;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=R6fUbZJjiAUJqseR0AfY4kN5/jG1XsjI0aKzIVoGFQI=;
+        b=Yi9Zsqa7Fw98VGnWzn0jZR5fZ5JqyO4XERsoIfh+x8JXswSGAGID3yXOnX1hMKVCsw
+         FN2z+8P7CRT+guFn5veM+E41PtM3u4wc3Yzonmiim4vkOqa8SIy8sfdtE3foRlTAE9Wn
+         1KWTax0jiCIutuxEAlnbp942Pn6d5xmmuhMR0nFIDIpIJrbg8VZWA8rweLO3J2Xi0OTi
+         bMDs3RjOAIwWwH4HbpE42SK23aoHVH/UU9r3lYZV0uQiwqXdS+oVt0nVFqdHMAfL9XYJ
+         x355f7ujqjFnhlveAcge7l0NDhWw7bbZq/+Z0r/ZIq7Mc1G54nri9lhnxkKNt/sBYsKI
+         G8Iw==
+X-Forwarded-Encrypted: i=1; AFNElJ/mIqFNGMQubX4TvkZMg7j6XN5gHMdCRiKtx34+GQbJDhAUGhj1ziNXu5Xh94h5briG3Uv1Jic=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzXnsCwLTowMredBmujc2gw+k788L2T/7hWrKds7xDvbKNEmo7o
+	R6kt90j1BG8tyIoD1nvJoy9ncsunFg5gxB9V+mAOKPl0oL7lWIM4C31M
+X-Gm-Gg: AeBDievZWQKY4QV/8SeRW11K3PsPkh9MoRmPsE8tH3+YR71eYKw9z1OEWauqM/SlPHF
+	ipjK2N72aJNRLUSKFDENWkjDqZavppSB6BLLLy5nXEOaQLcX6JWy7aKqj4UkjrrYquiV2ZK0kVk
+	w7mcC1gMV4CLUgknu2PM0PgtWNLhhgHAqwsCbS+UkpjP7SQT2PR7pY/tGR5esA+OkS8a7uy1FbZ
+	ZfEHaHpC3Y31BdrUkpi9VuuW8B+tzF9JXnpppto8p/lkk4qyFnZBTYFsbFAmMiO0bU2obvA5JNR
+	fqCQEyEDFy9lrf+HHry0trrAnm6zqe8FFvi8ad2Xv8GCWB5i+ZA0/Vbly8NOIsY0oh6AB815ni3
+	OrIKjLDHoOimfugYSHV6WA3T4iHB6xLGmpCVmr08R6GDMT30+J4jf0ipYBNJhPRADsoNMajFMjJ
+	Ux9YapxFVvw7oQ6XcSPY5cz8uWkWe1YPmzBS5UPjSmV5WatDRkUO97VhJAkiui4RKPyEWbI8Xdq
+	VFUVXeoOGsfqggnm7y5t2LqcdIjTsyPC/mdg1W8qTziJ7IuCZj0sko=
+X-Received: by 2002:a17:907:1b08:b0:b98:6177:2f16 with SMTP id a640c23a62f3a-b9d72ad9ff6mr827094966b.53.1776165696277;
+        Tue, 14 Apr 2026 04:21:36 -0700 (PDT)
+Received: from eric (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b9d6e5c544asm389679366b.33.2026.04.14.04.21.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Apr 2026 04:21:35 -0700 (PDT)
+From: Eric Woudstra <ericwouds@gmail.com>
+To: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	Phil Sutter <phil@nwl.cc>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Eric Woudstra <ericwouds@gmail.com>
+Cc: netfilter-devel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH v2 nf] netfilter: nf_flow_table_ip: Introduce nf_flow_vlan_push()
+Date: Tue, 14 Apr 2026 13:21:20 +0200
+Message-ID: <20260414112120.248744-1-ericwouds@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260414104900.2617863-1-hxzene@gmail.com>
-X-Spamd-Result: default: False [-1.46 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_FROM(0.00)[bounces-278407-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[strlen.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
+	FREEMAIL_TO(0.00)[netfilter.org,strlen.de,nwl.cc,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278406-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ericwouds@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	MID_RHS_MATCH_FROM(0.00)[];
-	R_DKIM_NA(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[netfilter.org:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D0D363F9332
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: F40293F9417
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Kito Xu (veritas501) <hxzene@gmail.com> wrote:
-> nf_osf_ttl() calls __in_dev_get_rcu(skb->dev) and passes the result
-> to in_dev_for_each_ifa_rcu() without checking for NULL. When the
-> receiving device has no IPv4 configuration (ip_ptr is NULL),
-> __in_dev_get_rcu() returns NULL and in_dev_for_each_ifa_rcu()
-> dereferences it unconditionally, causing a kernel crash.
-> 
-> This can happen when a packet arrives on a device that has had its
-> IPv4 configuration removed (e.g., MTU set below IPV4_MIN_MTU causing
-> inetdev_destroy) or on a device that was never assigned an IPv4
-> address, while an xt_osf or nft_osf rule with TTL_LESS mode is
-> active and the packet TTL exceeds the fingerprint TTL.
-> 
-> Add a NULL check for in_dev before using it. When in_dev is NULL,
-> return 0 (no match) since source-address locality cannot be
-> determined without IPv4 addresses on the device.
-> 
-> KASAN: null-ptr-deref in range [0x0000000000000010-0x0000000000000017]
-> RIP: 0010:nf_osf_match_one+0x204/0xa70
-> Call Trace:
->  <IRQ>
->  nf_osf_match+0x2f8/0x780
->  xt_osf_match_packet+0x11c/0x1f0
->  ipt_do_table+0x7fe/0x12b0
->  nf_hook_slow+0xac/0x1e0
->  ip_rcv+0x123/0x370
->  __netif_receive_skb_one_core+0x166/0x1b0
->  process_backlog+0x197/0x590
->  __napi_poll+0xa1/0x540
->  net_rx_action+0x401/0xd80
->  handle_softirqs+0x19f/0x610
->  </IRQ>
-> 
-> Fixes: a218dc82f0b5 ("netfilter: nft_osf: Add ttl option support")
-> Suggested-by: Pablo Neira Ayuso <pablo@netfilter.org>
-> Signed-off-by: Kito Xu (veritas501) <hxzene@gmail.com>
+Calling skb_reset_mac_header() before calling skb_vlan_push() does
+remove the error:
 
-The other __in_dev_get_rcu() callers in netfilter check return value, so:
+"skb_vlan_push got skb with skb->data not at mac header (offset 18)"
 
-Reviewed-by: Florian Westphal <fw@strlen.de>
+But the inner vlan tag is still not inserted correctly.
+
+skb_vlan_push() uses __vlan_insert_inner_tag() to insert the tag
+at offset ETH_HLEN. But the inner tag should only be pushed, without
+offset, similar to nf_flow_pppoe_push().
+
+Fixes: c653d5a78f34 ("netfilter: flowtable: inline vlan encapsulation in xmit path")
+Fixes: a3aca98aec9a ("netfilter: nf_flow_table_ip: reset mac header before vlan push")
+Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
+
+---
+
+ net/netfilter/nf_flow_table_ip.c | 25 ++++++++++++++++++++++---
+ 1 file changed, 22 insertions(+), 3 deletions(-)
+
+diff --git a/net/netfilter/nf_flow_table_ip.c b/net/netfilter/nf_flow_table_ip.c
+index fd56d663cb5b..0086f8a1a0d6 100644
+--- a/net/netfilter/nf_flow_table_ip.c
++++ b/net/netfilter/nf_flow_table_ip.c
+@@ -544,6 +544,26 @@ static int nf_flow_offload_forward(struct nf_flowtable_ctx *ctx,
+ 	return 1;
+ }
+ 
++static int nf_flow_vlan_push(struct sk_buff *skb, __be16 proto, u16 id)
++{
++	if (skb_vlan_tag_present(skb)) {
++		struct vlan_hdr *vhdr;
++
++		if (skb_cow_head(skb, VLAN_HLEN))
++			return -1;
++
++		__skb_push(skb, VLAN_HLEN);
++		skb_reset_network_header(skb);
++		vhdr = (struct vlan_hdr *)(skb->data);
++		vhdr->h_vlan_TCI = htons(id);
++		vhdr->h_vlan_encapsulated_proto = skb->protocol;
++		skb->protocol = proto;
++	} else {
++		__vlan_hwaccel_put_tag(skb, proto, id);
++	}
++	return 0;
++}
++
+ static int nf_flow_pppoe_push(struct sk_buff *skb, u16 id)
+ {
+ 	int data_len = skb->len + sizeof(__be16);
+@@ -738,9 +758,8 @@ static int nf_flow_encap_push(struct sk_buff *skb,
+ 		switch (tuple->encap[i].proto) {
+ 		case htons(ETH_P_8021Q):
+ 		case htons(ETH_P_8021AD):
+-			skb_reset_mac_header(skb);
+-			if (skb_vlan_push(skb, tuple->encap[i].proto,
+-					  tuple->encap[i].id) < 0)
++			if (nf_flow_vlan_push(skb, tuple->encap[i].proto,
++					      tuple->encap[i].id) < 0)
+ 				return -1;
+ 			break;
+ 		case htons(ETH_P_PPP_SES):
+-- 
+2.53.0
+
 
