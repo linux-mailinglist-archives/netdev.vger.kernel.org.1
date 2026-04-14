@@ -1,298 +1,187 @@
-Return-Path: <netdev+bounces-278553-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278554-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SJr6LIWB3mnkFAAAu9opvQ
-	(envelope-from <netdev+bounces-278553-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 20:03:49 +0200
+	id AHIVI/KB3mnkFAAAu9opvQ
+	(envelope-from <netdev+bounces-278554-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 20:05:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F40643FD69F
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 20:03:48 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA25E3FD6ED
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 20:05:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EC8803022974
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 17:58:56 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 4B8C7300E280
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 18:05:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD93230EF68;
-	Tue, 14 Apr 2026 17:58:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A34E2874FB;
+	Tue, 14 Apr 2026 18:05:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QW5pso70"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EAGTSUYk"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FD1130B53C
-	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 17:58:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.15
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776189535; cv=fail; b=OndjdO26632iSRqSTMfURm3dH/ss/mpv+OQMC1x4Rru13xIb0UatO/hI4ZaCUD9nUcQIQ9FixcHkLcz3rbRrxtF5dKkHIDJ79k2mLyk9aDGeoQ/xyMD7/oPoZz9iS170l/rSp596g3pwP4fTkb/qzDQU4q9odiMDUXpacmf4Oks=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776189535; c=relaxed/simple;
-	bh=otjVQHCEmzcUl0njekQEoGNF2fQ6FW5jj/Gvescywhc=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=uP3iY+yyiBjLIXEAqjHBSHFOGs5Y22LQvFC40k4e4oalSfn0XnvYHAtsqtoVxI1ANXODGME6QFEkOOg2nisGeGrShrBpJ+Wv8T7TTWG3xETmhyS9baI/y9S6tVXdwSpJDTAwKH7cfhcqFUEtiSiZJoiieL8rvTXZL0WnDD4VQkg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QW5pso70; arc=fail smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F004248166;
+	Tue, 14 Apr 2026 18:05:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776189935; cv=none; b=mlEyw3vWEKXgwrz9PGgYVVl6+cBI96bQllImt16GB2jG31Z5QapS/hzvaQ8LA7PCQEHoFWiE+VlBOuGbfheEDTh2Q6zkSqQARBoqua3fb8kpj4fLV4V2L+LBbgUzcfzYiZyGTsVrxe/8gPa+8PhOSWOoGnUc+An0cunb5lmqN2g=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776189935; c=relaxed/simple;
+	bh=q2DrsFnuxK1fHmNxOuRECS2OWVI0HZxW9voN9duT66w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nC7RQ4BIU5k5FsSynqhC/jW1S4IlvJK9cKy0uXFp6Gjn9TY7Idy+8KIrq0gXw7wGv/ipj0Z6ZWbNopBKBwldZMMZTmsWoTh61SXifIaTyYXLEsY6nkFJp9r4E3i+XULbqZ9MNYXl+vNwJ4sOGHEKJK6koAuhvGZ/Vc4HOrTOzj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EAGTSUYk; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1776189534; x=1807725534;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=otjVQHCEmzcUl0njekQEoGNF2fQ6FW5jj/Gvescywhc=;
-  b=QW5pso70JWzmFYYJynVXpTTbUUjD5/sulp2/W3KB/ilhAd2p66k3irY4
-   vOaYC8MRdy4uex9a2kDdAVDK/q9+iQrsyi8qvMOctfefG8QoNgjF+lGtV
-   0uH/r2iUq6TjLl898NWjTa3rDQhJTgL6fxgfpNcPq6bSXA5JVuoZgeyGd
-   IEKnubgtdKoig8h/GmeCL6VMwNbOG2+EpKvPiVTguJOwGmF7TYlZlbAmt
-   /77d2EKjLJLFSCqbyFxKDGpasW4oytLAxPExsZ7dwjaMdc8FkWA2yS+aU
-   jps+6hjWZmNVcXw6hmLwea1uf4G2fi129RDv/aETgMN5iNrFfhe0VuWzV
-   g==;
-X-CSE-ConnectionGUID: G2hvqGA+Rce2JffenewDwA==
-X-CSE-MsgGUID: JfxCkgxCSRqIBiSN8zri/w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11759"; a="80750546"
+  t=1776189935; x=1807725935;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=q2DrsFnuxK1fHmNxOuRECS2OWVI0HZxW9voN9duT66w=;
+  b=EAGTSUYkUJ758mdy2h8UrDVyHnUMN9shwpNX6JEty7mEMS3i1XGqrNpA
+   k6LDouC1f8LLJ1KoKZyAGt63oZs7X9kYiA//Wx6WSJk1gHn62+QGBwk3J
+   qv8b+7qTI5zObK7B2foun4U9NOjfoKe12pS+IAt+FHi9MZ3VZ2QbAuzrM
+   0LhJRu7yODrcJiCngHf89UWEFJzbwiCWFkVymFVaHtt7NXGAvhu9Vcpq9
+   niT5A7Fzqki6TmCI1rcifEiVtleWObiXP5f7B4Uq0y42uCxrDsGDiJvhM
+   8go0720F84xmSgU2ezn5RXEHwVEXb5bp5ICMbN6LoeV5SQdPLvDuer2XV
+   Q==;
+X-CSE-ConnectionGUID: deWxrDmaRoe1bH65EFtpLg==
+X-CSE-MsgGUID: 5a6cH/lmSgaZsTqq6ybFDA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11759"; a="80751352"
 X-IronPort-AV: E=Sophos;i="6.23,179,1770624000"; 
-   d="scan'208";a="80750546"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2026 10:58:53 -0700
-X-CSE-ConnectionGUID: pgO7COyERm6McaZ3/zzWrw==
-X-CSE-MsgGUID: MGDFikfnRcalDlrULxOjVw==
+   d="scan'208";a="80751352"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2026 11:05:34 -0700
+X-CSE-ConnectionGUID: E6+mn6gRRpCxIi3eA8k+Gg==
+X-CSE-MsgGUID: 8cAOYDHdTKawlZGUMUgCbQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,179,1770624000"; 
-   d="scan'208";a="230390978"
-Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
-  by orviesa007.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2026 10:58:52 -0700
-Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
- fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Tue, 14 Apr 2026 10:58:51 -0700
-Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
- FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Tue, 14 Apr 2026 10:58:51 -0700
-Received: from SA9PR02CU001.outbound.protection.outlook.com (40.93.196.2) by
- edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Tue, 14 Apr 2026 10:58:50 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=dknfXh1UjhHWlClwCw1FgWQVbwrFPP3fKak2wj4VXUn4CnD8XbFRWhhUJKUoKWhlL0uKeaeVljRwfeoxbDF4DKF+MREBz49SlwC/eNbqfpGaPpflm8UF/8Vb4Z5czs6LZ0IRv08xRMXALYAr98Q/6cAgj6T+yPJc7jFWTIO7D4ebqYMKs/06cEfTbFPfjaoMv+Z0zANt1DH+DsPuE1dMEXmXTv0DEeIhBhUMPhnblt2vf2qaS2MHrmURCDe+GiIZg1/16aGn4NlG+Nl5GsVmeLv0Qy4El7I4csueYERM90jfOJDrR7dYxAihTf48R7uGKrV5WFsrUIgFILubsCaQMw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uCtOM1HYTFKozcOJEncytoG38IKz4n2/lLWeIfRJo/c=;
- b=MiHO3exhhWCesx8lVsbf0RCBv1FpC5twPMOUseEFEmvSO57rUOd/MNNvBTuceA+XQed5BK/BS60MfG3dO6tpMWJnXBT7yp706b+DhbcrDmM81d/nx+RU0z/eEqySudUBBDU6amv9r5p7DWQtVBE0lIr8kwCaExgj5GeiDIDhFZUfsTZPDoHqvHQiUIA3NIi6IvhWblSpcsTumRE1WOLVnuNRgvpsOYzq7gaPxZ+XMarYPGYPwOhlqE9um6TbFxMDQOpvTpxtUmMqWwTzjG0ZKjpVvODb/KTOwA4GcaJmR2Tk0D9YsF1Hj6I3IEOn/4uhBvh6TmZsfI0eWV+C2+Xtlg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from PH0PR11MB7522.namprd11.prod.outlook.com (2603:10b6:510:289::8)
- by CH3PR11MB7793.namprd11.prod.outlook.com (2603:10b6:610:129::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.49; Tue, 14 Apr
- 2026 17:58:47 +0000
-Received: from PH0PR11MB7522.namprd11.prod.outlook.com
- ([fe80::ba5b:e8f1:5eb8:3ca3]) by PH0PR11MB7522.namprd11.prod.outlook.com
- ([fe80::ba5b:e8f1:5eb8:3ca3%6]) with mapi id 15.20.9769.046; Tue, 14 Apr 2026
- 17:58:47 +0000
-From: "Mekala, SunithaX D" <sunithax.d.mekala@intel.com>
-To: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "Loktionov, Aleksandr"
-	<aleksandr.loktionov@intel.com>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Jakub Kicinski
-	<kuba@kernel.org>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-net v1] i40e: fix
- napi_enable/disable skipping ringless q_vectors
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-net v1] i40e: fix
- napi_enable/disable skipping ringless q_vectors
-Thread-Index: AQHcu498BFwUbLaiFU6LRrmUAtjYNrXe+HRw
-Date: Tue, 14 Apr 2026 17:58:47 +0000
-Message-ID: <PH0PR11MB75223C8A00C3183C5082A096A0252@PH0PR11MB7522.namprd11.prod.outlook.com>
-References: <20260324130922.562714-1-aleksandr.loktionov@intel.com>
-In-Reply-To: <20260324130922.562714-1-aleksandr.loktionov@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH0PR11MB7522:EE_|CH3PR11MB7793:EE_
-x-ms-office365-filtering-correlation-id: 802f8095-d8be-497d-0337-08de9a4f7a36
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|38070700021|18002099003|56012099003|22082099003;
-x-microsoft-antispam-message-info: Bo8I+O32acC+inQs/bKyK3cqzk4uaAinoYykMz753Qeo/Gb9tCyIsavgBf9pMIoleoUwtBZ+iqDp+u35eiACB/uNhtum7dFA/QkayHpra6uMf2bMGXrc7r9SBBGnKWv0wpXakk8Xz4AdAhq7DZMruNJK/Mw30l+GZAdlZPDuqnSNvqemB2XFqDbQicqdV0/j9FFfIFyl5xD6jM/sMzOfBJQZ0n31xQLpju1+sIwLBCs5VfvmIcXb7TnCLxskF0LyPGmCDrJ2nqw6KmZUesapbtoXHFTCHD/LA5vTPys0xu7VLWkJe89aKWbb4wwhFDfqqeU5RU1y6fnyiRQEHTLh8qzFcLZ9u4Z4JgvApXZCY+uJ0xlvQWHyHWvCgQe69G6fjIFW8ofNTKoyJv86Mifsr76CMGx8e35lW8h7N9yzDzrO/awhhUGHUDEZQIWpwJ1ClPCWkTeyYxDSSL2iuXTlha7fWSUciqTY8+IfluAMhSLzCO5Xv8sYMi9dIES6/JsCYuf9DP64OwjpdFOZoEGDt44pZERaGwRYMwwMRM0cATWjAe6GbWIFJr9FBwDBomvpWNkqCCC4CzJZ5Hi8M++QpW2bOvdH4bViN+bnxP+RabiNuglLC+Ctng0iFYG5GiCmrgxZbt1W4AnknTHV3DGNMUwKwbgUd52mTc1qzW98dkBQkCUt4u3PpzcvKEqbP53LS9v7/6fF8P+qbJdnd7uxuZ48DYPg/9cbZ3Bb3upGBwQ6If/HB/VrPOab3xR0gWJVnklvVePkHbXV6eEuEd5JLXImLlQasa/izHlrNlVJo8U=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB7522.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700021)(18002099003)(56012099003)(22082099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?egevJKzFgT+IKd6YQ8W8Pcs5c2VP2R1xvoS1hPfvQi6wM63lVvLR+Ftg0bJw?=
- =?us-ascii?Q?BBHiOUj5kjykof6T1AVMsOAXClMGVqxPSZxcIlkjfmXaa2tiA27s9SuqRc8q?=
- =?us-ascii?Q?teCtNjE3+XEbrT5pqtv0Sb126rfy+nSGA3so+9lVvdneqnobkYBYi8TVaM5U?=
- =?us-ascii?Q?cpStqOoVL/XqMPt2Nm+nwBWOqS7/F6x5Z9PgAE8DeVi/TCV4a5r4gSHmlh1k?=
- =?us-ascii?Q?AyQgPn8gPcyV+4tdtBrmqhhBZmZHrfoXVnjmstRN5uoi3t9Ji7O3WWz8Pl6L?=
- =?us-ascii?Q?k3Am55XermWU4U2+Ho6WRVLpwQlwx5COYDpSZ2y1UXuLnwZnt8bPYKIZdkfn?=
- =?us-ascii?Q?HPtCIuIS5vU4txHhNuEF/GNkhQn5PoJymVXMSbENvpnqP1ZHlr9/Shu7oYot?=
- =?us-ascii?Q?CvPh++US7huQklfOojPctpGZuitdFD/EFdrMqR4eVrYsp41ooQ9jBHMxEtDP?=
- =?us-ascii?Q?q9XgAmQv5iVZidNo/4OGDxoE2h2s6Eg5GdM6XEVw2rtJyjAsKzX6FvhotbWN?=
- =?us-ascii?Q?btM4I9u4BYYyq/e8nyYWi+Vh87+R+3HTTNTRIZ0ZRuzthWVnNZa2iL/FPkWB?=
- =?us-ascii?Q?yFW2bsQiLBmD93yM+sy+kRk2ASve1YXYZTilHjMFMRjXv1eZFwQypLsxWmDq?=
- =?us-ascii?Q?SE4Ju2bYbImT40kuA2XTlvro5rPoAYxxk/6O4hj0dq94aeWNpdZb45RAXYDA?=
- =?us-ascii?Q?8zQJoZBfAJgSjEnV/Q1DXU8RB8JLcL+w09zNb1k3oWwH3jpCQZBBlTjLRPoQ?=
- =?us-ascii?Q?8PMD359rCVTqwdPgmndLNqbKnNyS7jilmsPqb1RVxu1tTQ6jzfHcm/4OypyZ?=
- =?us-ascii?Q?i8aCin3HfKiQ8hXrsLuzgW/PCbM8RGg+0nDOP2H4G3fT0dgyCQLG018cADWP?=
- =?us-ascii?Q?s1eAg00gm+ErN9W2OTZaXwxaQgnC0TxWvFE3KC4bD5gQSM6HOxSkLQb5RVv/?=
- =?us-ascii?Q?wi6Ah1CI+HTkPNDOstvS5rBH9b9uh2XxDNcxOvJ6UjaH+ZtUsdY/x2gnIPYA?=
- =?us-ascii?Q?tgDnqjE/P+S4BuwY7GTLoqsnRiwt9l7wPazeUPUUFbUeZXESc2XL5ody5A0w?=
- =?us-ascii?Q?1XY11vZ8xMjSuUSWdJp+GxQwr6sklVzb0k4jUZh7a/aFQxg4HILPo6szE5t6?=
- =?us-ascii?Q?PvyzcyumpMqoXFsKkHsb8EmRmWJH92NFpf+mrMscnpoGbzx2k+vocnL1Q66t?=
- =?us-ascii?Q?0biHi2tcscVXRqN/LVM3iBy+MRnAl2rnAoWW99C8LqFsQRZCll9UIFMf6hI+?=
- =?us-ascii?Q?ZGkQL2cx9dcUkodsLsj14dxmwIjHfstNttxGKbdrNOo5uHtz+zz8BOEKQ4y3?=
- =?us-ascii?Q?08J9ehqG7Bi7/juvMGQOThejVZwVwiyEfr4N6uaFupposWNxzF/GDogQzL6J?=
- =?us-ascii?Q?KgGuO321ocmi5gFvsfpfDlUWUVQYF+seFn4tV2StRpPMN9cNr4AmuEEpDYcT?=
- =?us-ascii?Q?r96H6rLxw3+rPMzcotfRecdfMGoLCJBm9eAeA2pcLh/Y44OQBwQyKLV5/REf?=
- =?us-ascii?Q?rgyP87rxzF7KYtyK73Pj/GIbm/FmPnULUsU9Lc4ts8VYi3ygYzRO+ppMUvKy?=
- =?us-ascii?Q?libAo8a+G0HPxiNn+TXXNClpGRdVKdHyHxNyZeK4jTmdc2MJtEPWH5cp+A40?=
- =?us-ascii?Q?gQwrN+h7wgB2Es4FeyEoBf+IDUw0KkqC+2omJIGSk3nSXaLG5ANDNwCpgHt6?=
- =?us-ascii?Q?yiUZxqiWAfQ80jU5JwCegoJiIZAb8NlFMNi+i4uN12kiAWJxVUc5HzrBEk6u?=
- =?us-ascii?Q?OjHU4soA1/AiEb6PlR1z5WlLcffz3u0=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+   d="scan'208";a="235119082"
+Received: from guptapa-desk.jf.intel.com (HELO desk) ([10.165.239.46])
+  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2026 11:05:33 -0700
+Date: Tue, 14 Apr 2026 11:05:00 -0700
+From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To: x86@kernel.org, Jon Kohler <jon@nutanix.com>,
+	Nikolay Borisov <nik.borisov@suse.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	David Kaplan <david.kaplan@amd.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>, KP Singh <kpsingh@kernel.org>,
+	Jiri Olsa <jolsa@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Laight <david.laight.linux@gmail.com>,
+	Andy Lutomirski <luto@kernel.org>,
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+	David Ahern <dsahern@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	Asit Mallick <asit.k.mallick@intel.com>,
+	Tao Zhang <tao1.zhang@intel.com>, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org
+Subject: Re: [PATCH v10 01/12] x86/bhi: x86/vmscape: Move LFENCE out of
+ clear_bhb_loop()
+Message-ID: <20260414180442.gcio7h6zjwjcayrs@desk>
+References: <20260414-vmscape-bhb-v10-0-efa924abae5f@linux.intel.com>
+ <20260414-vmscape-bhb-v10-1-efa924abae5f@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: J7Y5oLij6ZFv2Ws0zqRFyxKtfKyQU0s0wEHi1Am9QtAdD8eMb0IB3FhptCh7DnAQkklr/pC+c3mB2X1vfYKaA7XNqmaHq74/GWhbW2/BURTRJgRfin3a2XfXz3W2ZN7B0pOndrvx2oChDma1mrylxXxEX0uFzMyCukEF76wTNzBOjI2S0SV9jIETkTTGVF2lbJcRHZK1rx/W37diYEMxQkeobyCprOYgcb6UpneUHwBZRa4LBW69qJjUWayCuHZEE4DA1TwIPb0o4HiifS1Zu/Hm1iVJvF+id+YIj1aWxFK0cEmh3utvQb8vnU+VTF/AJv9sv532TrDLeWBRSuO9uw==
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB7522.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 802f8095-d8be-497d-0337-08de9a4f7a36
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Apr 2026 17:58:47.6427
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 9EPL4yoaMazeE9h7wF+3GpCf7bpgLxoTdF3pXlZ7YGpQmoILoZguOyvVi5yzeQIWPp/HIGdM0teJAKuhaOd9TiLxfmWB9IU/xpuCR7Sik7c=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB7793
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260414-vmscape-bhb-v10-1-efa924abae5f@linux.intel.com>
 X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278553-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-278554-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[kernel.org,nutanix.com,suse.com,zytor.com,amd.com,google.com,alien8.de,linux.intel.com,infradead.org,iogearbox.net,davemloft.net,gmail.com,redhat.com,linux.dev,fomichev.me,lwn.net];
 	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[osuosl.org:email,intel.com:dkim,intel.com:email,PH0PR11MB7522.namprd11.prod.outlook.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sunithax.d.mekala@intel.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[37];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pawan.kumar.gupta@linux.intel.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[intel.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[10]
-X-Rspamd-Queue-Id: F40643FD69F
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,suse.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: EA25E3FD6ED
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of A=
-leksandr Loktionov
-> Sent: Tuesday, March 24, 2026 6:09 AM
-> To: intel-wired-lan@lists.osuosl.org; Nguyen, Anthony L <anthony.l.nguyen=
-@intel.com>; Loktionov, Aleksandr <aleksandr.loktionov@intel.com>
-> Cc: netdev@vger.kernel.org; Jakub Kicinski <kuba@kernel.org>
-> Subject: [Intel-wired-lan] [PATCH iwl-net v1] i40e: fix napi_enable/disab=
-le skipping ringless q_vectors
->
-> After ethtool -L reduces the queue count, i40e_napi_disable_all() sets
-> NAPI_STATE_SCHED on all q_vectors, then i40e_vsi_map_rings_to_vectors()
-> clears ring pointers on the excess ones.  i40e_napi_enable_all() skips
-> those with:
->
->	if (q_vector->rx.ring || q_vector->tx.ring)
->		napi_enable(&q_vector->napi);
->
-> leaving them on dev->napi_list with NAPI_STATE_SCHED permanently set.
->
-> Writing to /sys/class/net/<iface>/threaded calls napi_stop_kthread()
-> on every entry in dev->napi_list.  The function loops on msleep(20)
-> waiting for NAPI_STATE_SCHED to clear -- which never happens for the
-> stale q_vectors.  The task hangs in D state forever; a concurrent write
-> deadlocks on dev->lock held by the first.
->
-> Commit 13a8cd191a2b added the guard to prevent a divide-by-zero in
-> i40e_napi_poll() when epoll busy-poll iterated all device NAPIs (4.x
-> era).  Since 7adc3d57fe2b ("net: Introduce preferred busy-polling",
-> v5.11) napi_busy_loop() polls by napi_id keyed to the socket, so
-> ringless q_vectors are never selected.  i40e_msix_clean_rings() also
-> independently avoids scheduling NAPI for them.  The guard is safe to
-> remove.
->
-> Add an early return in i40e_napi_poll() for num_ringpairs =3D=3D 0 so the
-> function is self-defending against a NULL tx.ring dereference at the
-> WB_ON_ITR check, should the NAPI ever fire through an unexpected path.
->
-> Reported-by: Jakub Kicinski <kuba@kernel.org>
-> Closes: https://lore.kernel.org/intel-wired-lan/20260316133100.6054a11f@k=
-ernel.org/
-> Fixes: 13a8cd191a2b ("i40e: Do not enable NAPI on q_vectors that have no =
-rings")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+On Tue, Apr 14, 2026 at 12:05:28AM -0700, Pawan Gupta wrote:
+> Currently, the BHB clearing sequence is followed by an LFENCE to prevent
+> transient execution of subsequent indirect branches prematurely. However,
+> the LFENCE barrier could be unnecessary in certain cases. For example, when
+> the kernel is using the BHI_DIS_S mitigation, and BHB clearing is only
+> needed for userspace. In such cases, the LFENCE is redundant because ring
+> transitions would provide the necessary serialization.
+> 
+> Below is a quick recap of BHI mitigation options:
+> 
+> On Alder Lake and newer
+> 
+>     BHI_DIS_S: Hardware control to mitigate BHI in ring0. This has low
+>     performance overhead.
+> 
+>     Long loop: Alternatively, a longer version of the BHB clearing sequence
+>     can be used to mitigate BHI. It can also be used to mitigate the BHI
+>     variant of VMSCAPE. This is not yet implemented in Linux.
+> 
+> On older CPUs
+> 
+>     Short loop: Clears BHB at kernel entry and VMexit. The "Long loop" is
+>     effective on older CPUs as well, but should be avoided because of
+>     unnecessary overhead.
+> 
+> On Alder Lake and newer CPUs, eIBRS isolates the indirect targets between
+> guest and host. But when affected by the BHI variant of VMSCAPE, a guest's
+> branch history may still influence indirect branches in userspace. This
+> also means the big hammer IBPB could be replaced with a cheaper option that
+> clears the BHB at exit-to-userspace after a VMexit.
+> 
+> In preparation for adding the support for the BHB sequence (without LFENCE)
+> on newer CPUs, move the LFENCE to the caller side after clear_bhb_loop() is
+> executed. Allow callers to decide whether they need the LFENCE or not. This
+> adds a few extra bytes to the call sites, but it obviates the need for
+> multiple variants of clear_bhb_loop().
+> 
+> Suggested-by: Dave Hansen <dave.hansen@linux.intel.com>
+> Tested-by: Jon Kohler <jon@nutanix.com>
+> Reviewed-by: Nikolay Borisov <nik.borisov@suse.com>
+> Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
 > ---
-> Test configuration:
->   Kernel   : Linux 6.19.0-rc8+
->   NIC      : Intel Ethernet Controller XXV710 for 25GbE SFP28 [8086:158b]
->   Driver   : i40e (in-tree)
->   Firmware : 9.40 0x8000ed12 1.3429.0
->   CPU      : 2 x Intel Xeon Gold 6238M (88 logical CPUs, x86_64)
->   RAM      : 64 GiB
->
-> Reproduction steps (FAIL before fix):
->   # 1. Reduce queues so excess q_vectors lose their ring pointers
->  ethtool -L <iface> combined 1
->
->   # 2. Enable threaded NAPI (completes fast in 6.19, no hang on enable pa=
-th)
->   echo 1 > /sys/class/net/<iface>/threaded
->
- >  # 3. Two concurrent writes to disable -- fires the msleep deadlock
->   echo 0 > /sys/class/net/<iface>/threaded &
->   echo 0 > /sys/class/net/<iface>/threaded &
->
->   Both background tasks enter uninterruptible sleep (D state) immediately
->   and never return.
->
->   Observed kernel stack (W1, holds dev->lock):
->     msleep+0x2d/0x50
->     napi_set_threaded+0x10b/0x110
->     netif_set_threaded+0xe1/0x140
->     threaded_store+0xd2/0x100
->     kernfs_fop_write_iter+0x138/0x1d0
->
->   Kernel hung_task message (~120 s after trigger):
->     INFO: task bash blocked for more than 122 seconds.
->     INFO: task bash is blocked on a mutex likely owned by task bash.
->
-> Validation (PASS with fix):
->   Both background tasks exit within 1 second.
->   D-state process count: 0.
->   Busy-poll (net.core.busy_poll=3D50) + 50000-packet UDP flood with
->   1 active queue: no NULL dereference, no crash.
->
->  drivers/net/ethernet/intel/i40e/i40e_main.c | 28 ++++++++++++---------
->  drivers/net/ethernet/intel/i40e/i40e_txrx.c | 10 ++++++++
->  2 files changed, 26 insertions(+), 12 deletions(-)
 
-Tested-by: Sunitha Mekala <sunithax.d.mekala@intel.com> (A Contingent worke=
-r at Intel)
+Sorry this is missing Boris's Ack, I will fix.
+
+> Acked-by: Borislav Petkov (AMD) <bp@alien8.de>
 
