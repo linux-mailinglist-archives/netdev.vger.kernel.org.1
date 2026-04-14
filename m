@@ -1,131 +1,143 @@
-Return-Path: <netdev+bounces-278437-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278438-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MJqoHg803mm4pAkAu9opvQ
-	(envelope-from <netdev+bounces-278437-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 14:33:19 +0200
+	id CAMzEtI23mkRpQkAu9opvQ
+	(envelope-from <netdev+bounces-278438-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 14:45:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F2E93FA021
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 14:33:18 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D50E13FA1DE
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 14:45:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 2F3F9300D771
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 12:33:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8A5573027104
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 12:40:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31150390CA9;
-	Tue, 14 Apr 2026 12:33:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E0593E5EED;
+	Tue, 14 Apr 2026 12:40:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NtK0m82D"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l+o6JimJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DE8A1D9A54
-	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 12:33:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ACD83E5ECE
+	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 12:40:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776169997; cv=none; b=k230YOuVtpM4bqqoq5nbUOlxybtw3V7TGf2gfSd3mqkV/vMFiV/ymDR4dXP1mzULMX5m+0L26ZyS5F2o15lBfFMtxpiwaXgGm3dPv8lqT22kGqgXDSWgGmR7nWSR9DGd4vhwzdz0jM1slMaKm4F6Z5Cyl5w1Rp7b/R7mx2FDPAo=
+	t=1776170427; cv=none; b=KEs+QZp+ZGd+BalPBQWbrR5usDJD2CwOJDRTY9iLKIoUM2VqCvZPQzRXIwzNBR18RJGAN2WKj78edt89tb7XDE54zGxcHJEhsaosGQHdTwKE1gw/Z5CL850iJTDVXt3Xw1eo0qGTCzsBrA9WV6iIHCBq0F/gSCSEVTJWnPBoT84=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776169997; c=relaxed/simple;
-	bh=VqY197kaRg/NI/6eR7QGHIk1nvNHulpurLpja3VDkuQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZXxbIeMsLw4iKoO4ZiHt7nBSr9eR5l6WD6Vps2A+ThIOqVLUShEKW5E2JR7ZOW/or8IF0K7kMuawxoxbAsHdi8/IMycecy1v7jm4mnlBUAN48h9uJKracI2bqeKiroVeMZQtPhkd14hkMLwZubmtXrooKOSw5cTEkMrphZ4swYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NtK0m82D; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6A2FC19425;
-	Tue, 14 Apr 2026 12:33:13 +0000 (UTC)
+	s=arc-20240116; t=1776170427; c=relaxed/simple;
+	bh=IPBwqh9d3tDbxmlKfehIU4Pa/JiRA+IdViszBuMtYAg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=bBvWKHYFpr8tp50vjBSj1CXh+bTWtuVA/AUIda9ALySUur0KTaBCNH8cwLyS4EBJ8Y/yegqKK9KdnoTmrRUcxicHBI50Pp/0SNcYu2jDvwm0wfpR+0gwlPcCraWQgf0j7detlqWQsmMzFBWvV7GcZK64awPWAyj4FIwPnkiTJuw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l+o6JimJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A47EC19425;
+	Tue, 14 Apr 2026 12:40:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776169996;
-	bh=VqY197kaRg/NI/6eR7QGHIk1nvNHulpurLpja3VDkuQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=NtK0m82DHW0nRdwBpSp1njXIFWhDpZCCdAFeoyTvddiaZBgmn/HU0JiUTe/yuNBO7
-	 Qki7xMCVtgBT9PTlCVhIP8i7JOtOEPZER2RY5XvEKfkobQxclzVo0a7w5hbukxZk8w
-	 g2WoQI7g4bcuaRjgnwXLbm31jdP2sdL7egbiV8tvvgh2laCSXq3dMy9LSQnFajt2k5
-	 +OmNU7+iZU/O5F7juvMctilERMpvcftwlKSJ3J6Upadw389JKOX1gmhn8ufRvYkQEN
-	 lUFzb7NCTALzi40Di83Eer3N8t/XdOU+08Kq3dNqI3fs8tnIK4tTpnYO/WP3/0rJCJ
-	 0zLrH/Y9qhQLQ==
-Date: Tue, 14 Apr 2026 13:33:11 +0100
+	s=k20201202; t=1776170426;
+	bh=IPBwqh9d3tDbxmlKfehIU4Pa/JiRA+IdViszBuMtYAg=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=l+o6JimJSyx0n76jesd6mCHnnhRw0R97PxIu1yNKcBHkqXebFznuJ4wQvjRE2Jf0r
+	 H5pS6nhw8wsbwz6zcAlqNG0+5JM0yUpBW64Q0KUIC/saKUWa8CXBo8CLl0BM2tYwJe
+	 /yC+jTNFhqchoZlVTqiV/NH+mGZ5zCTUFKmUfQ5amTHKmZan/hGLqkgcDOh6kqa5Un
+	 PP3SGIGAMjuuVAOoIcpq4PAc+qTuDhjECcYVCgazCVL7I4txSLrm4WqhtAywLG8ZT5
+	 8OAv6dyZbOFWMoLsr/jQnii/m3pNJqKNIaQz8rsCTasnzS6znKczm1Xh/+bt/nOdN9
+	 Y5Du/+H/533tQ==
 From: Simon Horman <horms@kernel.org>
-To: Ren Wei <n05ec@lzu.edu.cn>
-Cc: netdev@vger.kernel.org, steffen.klassert@secunet.com,
-	herbert@gondor.apana.org.au, davem@davemloft.net,
-	dsahern@kernel.org, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, sd@queasysnail.net, yifanwucs@gmail.com,
-	tomapufckgml@gmail.com, yuantan098@gmail.com, bird@lzu.edu.cn,
-	caoruide123@gmail.com, zylzyl2333@gmail.com
-Subject: Re: [PATCH net 1/1] ipv6: xfrm6: release dst on error in
- xfrm6_rcv_encap()
-Message-ID: <20260414123311.GE469338@kernel.org>
-References: <cover.1775886482.git.zylzyl2333@gmail.com>
- <fc06a81e1c1cbbb3e918825a718046cb18204f3c.1775886483.git.zylzyl2333@gmail.com>
+To: lorenzo@kernel.org
+Cc: 'Simon Horman' <horms@kernel.org>,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net] net: airoha: Fix max TX packet length configuration
+Date: Tue, 14 Apr 2026 13:40:11 +0100
+Message-ID: <20260414124011.751922-1-horms@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260412-airoha-fix-max-mtu-v1-1-333030d0a564@kernel.org>
+References: <20260412-airoha-fix-max-mtu-v1-1-333030d0a564@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fc06a81e1c1cbbb3e918825a718046cb18204f3c.1775886483.git.zylzyl2333@gmail.com>
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,secunet.com,gondor.apana.org.au,davemloft.net,kernel.org,google.com,redhat.com,queasysnail.net,gmail.com,lzu.edu.cn];
-	TAGGED_FROM(0.00)[bounces-278437-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-278438-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,lzu.edu.cn:email]
-X-Rspamd-Queue-Id: 1F2E93FA021
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sashiko.dev:url]
+X-Rspamd-Queue-Id: D50E13FA1DE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun, Apr 12, 2026 at 01:07:54PM +0800, Ren Wei wrote:
-> From: Yilin Zhu <zylzyl2333@gmail.com>
-> 
-> xfrm6_rcv_encap() performs an IPv6 route lookup when the skb does not
-> already have a dst attached. ip6_route_input_lookup() returns a
-> referenced dst entry even when the lookup resolves to an error route.
-> 
-> If dst->error is set, xfrm6_rcv_encap() drops the skb without attaching
-> the dst to the skb and without releasing the reference returned by the
-> lookup. Repeated packets hitting this path therefore leak dst entries.
-> 
-> Release the dst before jumping to the drop path.
-> 
-> Fixes: 0146dca70b87 ("xfrm: add support for UDPv6 encapsulation of ESP")
-> Cc: stable@kernel.org
-> Reported-by: Yifan Wu <yifanwucs@gmail.com>
-> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-> Co-developed-by: Yuan Tan <yuantan098@gmail.com>
-> Signed-off-by: Yuan Tan <yuantan098@gmail.com>
-> Suggested-by: Xin Liu <bird@lzu.edu.cn>
-> Tested-by: Ruide Cao <caoruide123@gmail.com>
-> Signed-off-by: Yilin Zhu <zylzyl2333@gmail.com>
-> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
-> ---
->  net/ipv6/xfrm6_protocol.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+From: 'Simon Horman' <horms@kernel.org>
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://sashiko.dev
+---
+net: airoha: Fix max TX packet length configuration
 
+This commit fixes the MTU configuration for the Airoha driver by removing
+ETH_FCS_LEN from the maximum TX packet length, matching the hardware
+documentation which states the register does not include the FCS length.
+
+> diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
+> index c14cdce588a7c..a81ffda72b39f 100644
+> --- a/drivers/net/ethernet/airoha/airoha_eth.c
+> +++ b/drivers/net/ethernet/airoha/airoha_eth.c
+> @@ -1629,9 +1629,9 @@ static void airoha_update_hw_stats(struct airoha_gdm_port *port)
+>  
+>  static int airoha_dev_open(struct net_device *dev)
+>  {
+> -	int err, len = ETH_HLEN + dev->mtu + ETH_FCS_LEN;
+>  	struct airoha_gdm_port *port = netdev_priv(dev);
+>  	struct airoha_qdma *qdma = port->qdma;
+> +	int err, len = ETH_HLEN + dev->mtu;
+
+Does this regression cause MTU-sized VLAN-tagged frames to be dropped by the
+hardware?
+
+By limiting the frame size to ETH_HLEN + dev->mtu, the maximum allowed length
+becomes 1514 bytes for a standard 1500 MTU. An Ethernet frame containing a
+standard 802.1Q VLAN tag and a maximum-sized 1500-byte IP payload requires an
+18-byte L2 header, making the total frame size 1518 bytes (excluding FCS).
+
+Previously, the inclusion of ETH_FCS_LEN inadvertently provided the 4-byte
+headroom needed to accommodate a single VLAN tag. 
+
+Could the configuration explicitly account for VLAN headers using VLAN_ETH_HLEN
+instead?
+
+[ ... ]
 
