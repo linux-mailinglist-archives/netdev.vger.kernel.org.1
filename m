@@ -1,138 +1,149 @@
-Return-Path: <netdev+bounces-278511-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278512-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EMc8N9Ff3mn+CQAAu9opvQ
-	(envelope-from <netdev+bounces-278511-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 17:40:01 +0200
+	id QKBRIyBg3mn+CQAAu9opvQ
+	(envelope-from <netdev+bounces-278512-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 17:41:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 689133FC04B
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 17:40:01 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FA8A3FC09C
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 17:41:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 2D2A73011CA3
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 15:39:56 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 0812A3023D67
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 15:39:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FB9E3E959D;
-	Tue, 14 Apr 2026 15:39:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 858113D902A;
+	Tue, 14 Apr 2026 15:39:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="RPUITlzw"
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="VCEU6llp"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65BA02DA768
-	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 15:39:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62AE92DA768
+	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 15:39:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776181193; cv=none; b=CBGi5fK/k7GhvFopgLRBXIsOScQrMX+1IbRD08jJTC3a0CHeI+FlSWayqFVYWE3fSiafFbBE2FAdYDYxOjnJ2J9e9Zf3Dk5kta0zdgB1Q6glDhdwNO7VzJGF1WbOzWkQFBgSrJ3p1KlGuuFWzMMvrjoryHcK6KBKVrVH5mIUeB8=
+	t=1776181195; cv=none; b=dyXMuL0JlvRUXljh4rN0K+eswGgm8qmXn/wpPlJgNwnG7ewZZvigNTA9Vdo9P6Tv5e7mI6jiRm6JOmVA+SLfp6WZlX0UbIVuDu06ZZA2KEc3AIeBKfUlrLhcOBbgd/E0iQBHtJ0W97YiiNY5z845VheFuzAOu3xOdY68Or7VHXA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776181193; c=relaxed/simple;
-	bh=rc8YWa+QqaRcpu1Oo0rtsTn3rXkcJx2hfU//4JuPyho=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Frdumg80d6a8Kek1NvupVbqw45koNKgCddvBlQ01c/uzNwt8yr0ecj6Z8H0ekOU4OUcfbJb6MGq6LEAK39H+oib5pHJ8GBJIX2vodF5dA0v0OmTQyQQch9xZAg1BL30P+9CLEBUwzL+AW3cDhyRrfDFBm+ZB+NxuFl7QiQt6puU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=RPUITlzw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C5C2C19425;
-	Tue, 14 Apr 2026 15:39:52 +0000 (UTC)
+	s=arc-20240116; t=1776181195; c=relaxed/simple;
+	bh=mxut1PkXQRo0l14ieYyl/5kLa9LofThSlO6BcIGNVpM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=LVbp8zU9svNmto8mYBI/y37LpqDuQLPA/TVLjgAo7HS1f+5eqmHlK4jkFAHrdCDCFTimoGh0vKTwLyC/DS6endaV1ywvQSP+03nYSccUz0CjOBTysdGfEkWmCifWUcRiJpr6DVdWOgpwS5SzhprCwKsB/QSCCnyaulP2offl57c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=VCEU6llp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 436D0C2BCB5;
+	Tue, 14 Apr 2026 15:39:54 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="RPUITlzw"
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="VCEU6llp"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1776181190;
+	t=1776181193;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=30hCCXzbFg17NxGsEUGIbZXIblWXSwm91E14SGXiyeo=;
-	b=RPUITlzwwa7sAy4soSEK//iyrD9qap56ta+IUJO5CJkny73pKvghN9M4ZY9UO1RcE9PW48
-	XpIs5qiHbhKJ4XcT8i7yZzK34gVxtIHu3tR2AubqDpx0y2X2xgE29v78LhvhV3RQUeRFk4
-	WPi1yh3num+kxwMfnYvjp85K9j2yvHY=
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eNAQQQKcj7LooQ11Ru3wVQgPPA9e1wOhZxTzTxnMs0s=;
+	b=VCEU6llp9poMiQEdmWdvxk6lcE83jdTcgYK5+AKaj1NsDEjQKBC3GPW7LbPLRo3pQtYvQL
+	rbSekdbInzvfpMFzlyUH9mTqOl1XcfvDZaznm+DqrjVLuq8OWfj6oDRz9TNDDD1WUrLiwt
+	orxba8wzCQlqEooPYeRqp9hIwwK0jbU=
 Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 006213c8 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Tue, 14 Apr 2026 15:39:49 +0000 (UTC)
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 24d2e3fa (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Tue, 14 Apr 2026 15:39:52 +0000 (UTC)
 From: "Jason A. Donenfeld" <Jason@zx2c4.com>
 To: netdev@vger.kernel.org,
 	kuba@kernel.org,
 	pabeni@redhat.com
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH net-next 0/4] WireGuard fixes for 7.1-rc1
-Date: Tue, 14 Apr 2026 17:39:40 +0200
-Message-ID: <20260414153944.2742252-1-Jason@zx2c4.com>
+Cc: Fushuai Wang <wangfushuai@baidu.com>,
+	Simon Horman <horms@kernel.org>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: [PATCH net-next 1/4] wireguard: allowedips: Use kfree_rcu() instead of call_rcu()
+Date: Tue, 14 Apr 2026 17:39:41 +0200
+Message-ID: <20260414153944.2742252-2-Jason@zx2c4.com>
+In-Reply-To: <20260414153944.2742252-1-Jason@zx2c4.com>
+References: <20260414153944.2742252-1-Jason@zx2c4.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[zx2c4.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[zx2c4.com:s=20210105];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278511-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
 	DKIM_TRACE(0.00)[zx2c4.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-278512-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCPT_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[Jason@zx2c4.com,netdev@vger.kernel.org];
-	RCPT_COUNT_THREE(0.00)[4];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,zx2c4.com:dkim,zx2c4.com:mid]
-X-Rspamd-Queue-Id: 689133FC04B
+	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,zx2c4.com:email,zx2c4.com:dkim,zx2c4.com:mid]
+X-Rspamd-Queue-Id: 8FA8A3FC09C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Jakub,
+From: Fushuai Wang <wangfushuai@baidu.com>
 
-Please find 4 simple patches attached:
+Replace call_rcu() + kmem_cache_free() with kfree_rcu() to simplify
+the code and reduce function size.
 
-1) Asbjørn's YNL sample, finally merged. Sorry for the wait on this one.
+Signed-off-by: Fushuai Wang <wangfushuai@baidu.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+---
+ drivers/net/wireguard/allowedips.c | 9 ++-------
+ 1 file changed, 2 insertions(+), 7 deletions(-)
 
-2) A simplification to use kfree_rcu instead of call_rcu, since
-   kfree_rcu now works with kmem caches.
-
-3) A trivial formatting derp.
-
-4) Fix for a deadlock by moving to using exit_rtnl instead of pre_exit.
-
-Please apply these!
-
-Thanks,
-Jason
-
-Asbjørn Sloth Tønnesen (1):
-  tools: ynl: add sample for wireguard
-
-Fushuai Wang (1):
-  wireguard: allowedips: Use kfree_rcu() instead of call_rcu()
-
-Jason A. Donenfeld (1):
-  wireguard: allowedips: remove redundant space in comment
-
-Shardul Bankar (1):
-  wireguard: device: use exit_rtnl callback instead of manual rtnl_lock
-    in pre_exit
-
- drivers/net/wireguard/allowedips.c          |   9 +-
- drivers/net/wireguard/device.c              |   8 +-
- drivers/net/wireguard/selftest/allowedips.c |   2 +-
- tools/net/ynl/tests/.gitignore              |   1 +
- tools/net/ynl/tests/wireguard.c             | 106 ++++++++++++++++++++
- 5 files changed, 113 insertions(+), 13 deletions(-)
- create mode 100644 tools/net/ynl/tests/wireguard.c
-
+diff --git a/drivers/net/wireguard/allowedips.c b/drivers/net/wireguard/allowedips.c
+index 09f7fcd7da78b..5ece9acad64d8 100644
+--- a/drivers/net/wireguard/allowedips.c
++++ b/drivers/net/wireguard/allowedips.c
+@@ -48,11 +48,6 @@ static void push_rcu(struct allowedips_node **stack,
+ 	}
+ }
+ 
+-static void node_free_rcu(struct rcu_head *rcu)
+-{
+-	kmem_cache_free(node_cache, container_of(rcu, struct allowedips_node, rcu));
+-}
+-
+ static void root_free_rcu(struct rcu_head *rcu)
+ {
+ 	struct allowedips_node *node, *stack[MAX_ALLOWEDIPS_DEPTH] = {
+@@ -271,13 +266,13 @@ static void remove_node(struct allowedips_node *node, struct mutex *lock)
+ 	if (free_parent)
+ 		child = rcu_dereference_protected(parent->bit[!(node->parent_bit_packed & 1)],
+ 						  lockdep_is_held(lock));
+-	call_rcu(&node->rcu, node_free_rcu);
++	kfree_rcu(node, rcu);
+ 	if (!free_parent)
+ 		return;
+ 	if (child)
+ 		child->parent_bit_packed = parent->parent_bit_packed;
+ 	*(struct allowedips_node **)(parent->parent_bit_packed & ~3UL) = child;
+-	call_rcu(&parent->rcu, node_free_rcu);
++	kfree_rcu(parent, rcu);
+ }
+ 
+ static int remove(struct allowedips_node __rcu **trie, u8 bits, const u8 *key,
 -- 
 2.53.0
 
