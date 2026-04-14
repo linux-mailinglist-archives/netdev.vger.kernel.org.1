@@ -1,160 +1,367 @@
-Return-Path: <netdev+bounces-278380-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278381-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cLcCFwUV3mlBmwkAu9opvQ
-	(envelope-from <netdev+bounces-278380-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 12:20:53 +0200
+	id mE7BAvMW3mlBmwkAu9opvQ
+	(envelope-from <netdev+bounces-278381-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 12:29:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id E20FF3F8978
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 12:20:52 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 777EB3F8AF4
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 12:29:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 691AC300DEE2
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 10:20:51 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id EAE7C30844E5
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 10:24:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 682C53D3CF5;
-	Tue, 14 Apr 2026 10:20:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92C3C3D3D0C;
+	Tue, 14 Apr 2026 10:23:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f45.google.com (mail-ua1-f45.google.com [209.85.222.45])
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF5843D47B0
-	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 10:20:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7330839B486
+	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 10:23:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776162037; cv=none; b=UQi79sMelQNXdKtUq6vYAJ+yEFfF0OOhnJgZXLZQL5uJqwBYPeHEKCh+RnhnFJ+04u1bR9keEvmfTEGn5vGGCVW1QnWy/73nLsEoL/AgZbKkjYJd4TxtvupbtOdtTzsQjOvzzfiLGKy/Xuy5ccDhDo0nCN2awnvNdSQY/4ZTV7o=
+	t=1776162239; cv=none; b=egb22/0MmmiT238g/r7+UNfOxP1sLBXpkOgSTEC8t0FGfDkhMknXqYuFfHgVxDrHeLfKsDvmdMsmXR85mrm7OuALtJWAnQ0dhHX4aRHo0c+j8EIc7CNUlxPKK/VJpcjlu6lQB8vfXLG2xeNggQ4kIAjSoE56R4AGO6OfwSfcQPE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776162037; c=relaxed/simple;
-	bh=w4RU3LbA8U81TCj411ChOJb2AxIw+5nh+I9X8CndoHU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZDXwc+UJ1fxCawWMriiGa3R707PSO00pBL4CgwQpYLvvtHTOVzqu60oVHO+K//XgxEOcQ/r6CY5ac8DEL/lJprm039zzSP7erFt82LXZYppViK1R9No2HnX9SaVJr4yT1dgXnwNWBmz9XWzr/qFDyQAAhAje0ju8EwBnfUsQnsQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.222.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+	s=arc-20240116; t=1776162239; c=relaxed/simple;
+	bh=kXxYyFY2N/cEQFJ8qJDkGUJKJ4FyU6QZbTb+jig8aIo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dh2bzyvp4hM2biDKOF7WHaZ4NL8PinzdhQ0/Htm5wX6yyuu9KQLV02ehezE2Bq1AH4tJKAbNrepdoClIuObnb7HfQTUkuO8SF/4GpZ8XzbusrYIJqByGCogtTiYseb22qpclr/1rzsOlHkUwckq29GXI5pa50ixlw7B4hu5xN88=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=crimson.net.eu.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=crimson.net.eu.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f45.google.com with SMTP id a1e0cc1a2514c-953ad5a55b7so3292446241.3
-        for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 03:20:33 -0700 (PDT)
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-43d03db7f87so3314275f8f.3
+        for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 03:23:51 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776162032; x=1776766832;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=/1PSSGgZqIviWrUMA+aGkWAd7pcIuv8HlmdSZUkq2R0=;
-        b=nZ+aNDE6TX8aDCU9+H4XY2m5KvZQhFTWKLnGo6K065ATQmev/2BWspz69l0fzHMuYv
-         a33nnqe9RjpN04pSr/t0LVWK521PkCe8aObT9egiVmWQ3CiQI0GH3vAxhdkKqZjdY7ps
-         wbfuQ/YXWIUDjyeAMDMDHdfjImcX8u62qoIPoDry4RkqdoA1WyjvOtIlzEFFUK1AlP05
-         g25Wk0edx5QPzteAK3dlOGMrsyhv8ROdldjX86kd4oHIAeNXK3yaLEF59XKW4WpPTSeL
-         EwesAWp/2ndcybotSAAJKvgSVEnH8fkwNtpF+ZklR0eeIQ3UElcHYDja9I6NgPbR3bo+
-         bDbA==
-X-Forwarded-Encrypted: i=1; AFNElJ+HriUki0JuR7hue4QSm9pUtgRwACtvyQci5oslrotn3xfBRQmcSqTYLeDEFMfAjtL+ON3Y950=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyT2JNLjq65T4oJQJTN33ns/WAbyzBqJzQw8XGgTf4KY8HQ8xx9
-	zdKt0gQET480wrBRaw5tSt1I/tjzUD721w1vYGYXz2xXXAihPJEgHc7JebKFINz0
-X-Gm-Gg: AeBDiesORkAwMJb1ETeEU0w3XeoseGI6xFWgIheECHgkOqwurr9Dga8gH2PLMVSl0qg
-	ZKcXCkRsFogg3kQ9HZe2rMBfHXfumU1OfbxDqTkFvoPVKtovZ8PBd5mTfgxUs7iVoLiP6kDSRDW
-	w5JFNUJR393FeR+KAtwjV5gadzLLsKkQvJ0LukFDLAn9h0296ltn/GqMJUJIuvm+b0O+17A0c8T
-	JQvdvP01CbdX4LMLoHt7hxFSjrkevsXNFGprKxSV9gSrzrfdFlTgZsd6UbXbTQThIyKYlklZRvY
-	aG6gA+xOpCU6tp8cVHMFGfDnHv6CVE7f2xVU2s2hU2LW+CaF1QNLVZLkf/XgbOCM3Ban8YaPE5L
-	2U6lzHvXqRLP2M0IHWQCvlEadfSgPVLAUOxlpZjgNQe6wHrmFyrHMmI/PYoEefUkOJNeNc/208u
-	1Vwh7vreZeKkZCyGSj9+8zi1882OH1Qno46LfNX1rm0+l5rPZXyJUPb5YG1H59GZILO9RCoeE=
-X-Received: by 2002:a05:6102:a51:b0:605:2df4:c5dd with SMTP id ada2fe7eead31-60a01885ff5mr7444849137.26.1776162032009;
-        Tue, 14 Apr 2026 03:20:32 -0700 (PDT)
-Received: from mail-vs1-f46.google.com (mail-vs1-f46.google.com. [209.85.217.46])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-6103c881cbfsm2319393137.6.2026.04.14.03.20.30
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 Apr 2026 03:20:31 -0700 (PDT)
-Received: by mail-vs1-f46.google.com with SMTP id ada2fe7eead31-605def5b7f8so3351246137.1
-        for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 03:20:30 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ+jllnAI9rakz2lbZErfNWWg8S2OSGMBfEaOBq3BDgfeAjrEAzx1ErVSOotnHiDx0UtWpeYgmM=@vger.kernel.org
-X-Received: by 2002:a67:e70d:0:b0:603:1a8a:c84a with SMTP id
- ada2fe7eead31-609fecb952fmr7637834137.2.1776162030603; Tue, 14 Apr 2026
- 03:20:30 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1776162229; x=1776767029;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=agEPNcn5UfOsWzLW0MOgaJUmP7o4DXe8RlSLgKzjHg4=;
+        b=lvlid+5GlTpRCzKPEAxI4wBSln6Ti94vW0nZ1nGbaEZRG+cgI4Pb+QCKVPs1pQFI5S
+         /MJxqwjESkdof8OeKTvTvfGgl4Enf8/K4qkcOS3KMVpDH9ILAk8WLdhFD13gF/cUCHON
+         l6RjgGoNp2XomIROf5/LwVgNeHgbNEDbIDqVVltJcK2K73k6Zi80daD8mwTgUUAz6mV3
+         NHBd6guGjOwaqWqmGPhkmRcQ9r3KLwVrnEzMNcIG5Heh0TyyZRYTQha/50F5QLE0sFCM
+         /YhFD0+MIu5/cxu1EwgdnVWLEWhEjLTyCumq8qhfqymI4Nr3q3axfRkM+Lahdj1IECd3
+         aGuw==
+X-Forwarded-Encrypted: i=1; AFNElJ+SkGgMC0gOzTA+/XXQkGXrUj9K2hdxuOT7je+hHPvFzEL7YEEAw1IP/WcepPIUFNJl+1VG6mQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxMHIpU+Aud8MUHQQG9borEwISnJJbr9bjeY9a0EPYeVzt6JP+e
+	hfSXbgR9a7mro3XWiBgDoNB0wYh1uMOLuILnxJwBQcC0H98X4Y/p92pk
+X-Gm-Gg: AeBDietPEnypZFmUyD69m1e40d3Gm4x2CUw10lpuMmaPZABM4rDo9RWCasEDelgSxcl
+	i2/JMDQxLn9EfBQ1uKETMry/ihEl2AOCBD7aCNY2qMGGPR0Ouy7po/hFJpOdn2W6G1F+EMdX8VU
+	9ZeNo58pjinArjugd+8f97wRGG6XQrxKKN/dzoiWmT8pkLEgwUpg8Kw41e9LNxbMISqskW+DTvl
+	murCUy6VC3K7aeTRJZoevO9+l5tSQf60yXEd1XBcUTlBH6yoEptM69quRpXApjAbaYfp4EZ65CN
+	O6+yN8itIrgworhMGkVPD7+uLjGQDLDXXoH1UWEagyr+5CCq36wMjpSbdeNz+EOfQdcoJ6ET13c
+	Is8HJRCT6fa3bWI8TISypOxpYLNDhUkeXFqvIQDlg8m1kphuqBQYNLkjsB7n07yj2TTB39Sw5Uz
+	dkNt5QtMWHRdfMO2auXbsKKVaA8bZWC4jWW0SEdnQRO/iVLTayAfmm/21c+M8arRXW3wWzq1jOu
+	5trCU8RlGGyewaukgbQUdWDBuB4lSOFDLmA/HPI4qdQ8xaR/2xd0rUL5VGfEzMCuov/42k=
+X-Received: by 2002:a5d:5d83:0:b0:43b:40ef:5d1a with SMTP id ffacd0b85a97d-43d642552e7mr23917731f8f.5.1776162228496;
+        Tue, 14 Apr 2026 03:23:48 -0700 (PDT)
+Received: from localhost.localdomain (host-79-18-131-221.retail.telecomitalia.it. [79.18.131.221])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43d750f0ca9sm21461453f8f.37.2026.04.14.03.23.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Apr 2026 03:23:48 -0700 (PDT)
+From: deep@crimson.net.eu.org
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Linus Walleij <linusw@kernel.org>,
+	Bartosz Golaszewski <brgl@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-nfc@lists.01.org,
+	linux-kernel@vger.kernel.org,
+	linux-gpio@vger.kernel.org,
+	Kenet Jovan Sokoli <deep@crimson.net.eu.org>
+Subject: [PATCH] nfc: s3fwrn5: switch to GPIO descriptor API
+Date: Tue, 14 Apr 2026 12:22:57 +0200
+Message-ID: <20260414102257.365421-1-deep@crimson.net.eu.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260412173213.3179426-1-niklas.soderlund+renesas@ragnatech.se>
-In-Reply-To: <20260412173213.3179426-1-niklas.soderlund+renesas@ragnatech.se>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Tue, 14 Apr 2026 12:20:19 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdWLp=vz5qgOx-N9Pf_FC9o3AsdDXq8Uhu+rW+h6__4vFw@mail.gmail.com>
-X-Gm-Features: AQROBzALmSC5WPRkCgFTwaDsUgYaBeV27KPyK6fy-gnOYEKtgB1RvcJLdAOt3Hg
-Message-ID: <CAMuHMdWLp=vz5qgOx-N9Pf_FC9o3AsdDXq8Uhu+rW+h6__4vFw@mail.gmail.com>
-Subject: Re: [PATCH net] net: ethernet: ravb: Do not check URAM suspension
- when WoL is active
-To: =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-Cc: Paul Barker <paul@pbarker.dev>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, netdev@vger.kernel.org, 
-	linux-renesas-soc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [0.04 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.14 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[crimson.net.eu.org : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FROM_NO_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[linux-m68k.org];
-	TAGGED_FROM(0.00)[bounces-278380-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TAGGED_FROM(0.00)[bounces-278381-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,renesas];
+	TAGGED_RCPT(0.00)[netdev];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[geert@linux-m68k.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[deep@crimson.net.eu.org,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[5];
 	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mail.gmail.com:mid,linux-m68k.org:email,glider.be:email]
-X-Rspamd-Queue-Id: E20FF3F8978
+	NEURAL_HAM(-0.00)[-0.988];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 777EB3F8AF4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun, 12 Apr 2026 at 19:33, Niklas S=C3=B6derlund
-<niklas.soderlund+renesas@ragnatech.se> wrote:
-> When updating the driver to match latest datasheet to suspend access to
-> URAM when suspending DMA transfers a corner-case was missed, URAM access
-> will not be suspended if WoL is enabled. This lead to the error message
-> (correctly) being triggered as URAM access is not suspended even tho
-> it's requested as part of stopping DMA.
->
-> Avoid checking if URAM access is suspended and printing the error
-> message if WoL is enabled when we suspend the system, as we know it will
-> not be.
->
-> Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
-> Closes: https://lore.kernel.org/all/CAMuHMdWnjV%3DHGE1o08zLhUfTgOSene5fYx=
-1J5GG10mB%2BToq8qg@mail.gmail.com/
-> Fixes: 353d8e7989b6 ("net: ethernet: ravb: Suspend and resume the transmi=
-ssion flow")
-> Signed-off-by: Niklas S=C3=B6derlund <niklas.soderlund+renesas@ragnatech.=
-se>
+From: Kenet Jovan Sokoli <deep@crimson.net.eu.org>
 
-Tested-by: Geert Uytterhoeven <geert+renesas@glider.be>
+I am working on cleaning up some legacy GPIO usage in the NFC subsystem.
+This patch converts the s3fwrn5 driver to use the modern descriptor based
+GPIO API instead of the old integer based one.
 
-Gr{oetje,eeting}s,
+Specifically:
+- I changed the gpio_en and gpio_fw_wake types to struct gpio_desc.
+- Replaced the manual DT parsing with devm_gpiod_get() in the probe
+functions.
+- Updated the calls in phy_common.c to use gpiod_set_value().
 
-                        Geert
+This also allowed me to remove the s3fwrn5_i2c_parse_dt and
+s3fwrn82_uart_parse_dt functions as they are no longer needed with the
+new API.
 
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
+Signed-off-by: Kenet Jovan Sokoli <deep@crimson.net.eu.org>
+---
+I have verified that this patch builds successfully with "make M=drivers/nfc/s3fwrn5"
+"scripts/checkpatch.pl" with no errors or warnings.
+This is very complicated stuff, but I am learning a lot by doing these cleanup works.
+I really hope I can contribute as much as possible to this environment, little by little.
+---
+ drivers/nfc/s3fwrn5/i2c.c        | 58 ++++++--------------------------
+ drivers/nfc/s3fwrn5/phy_common.c | 12 +++----
+ drivers/nfc/s3fwrn5/phy_common.h |  5 +--
+ drivers/nfc/s3fwrn5/uart.c       | 43 ++++++-----------------
+ 4 files changed, 31 insertions(+), 87 deletions(-)
 
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
+diff --git a/drivers/nfc/s3fwrn5/i2c.c b/drivers/nfc/s3fwrn5/i2c.c
+index 110d086cfe5b..a629fbcd3237 100644
+--- a/drivers/nfc/s3fwrn5/i2c.c
++++ b/drivers/nfc/s3fwrn5/i2c.c
+@@ -8,9 +8,8 @@
+ 
+ #include <linux/clk.h>
+ #include <linux/i2c.h>
+-#include <linux/gpio.h>
++#include <linux/gpio/consumer.h>
+ #include <linux/delay.h>
+-#include <linux/of_gpio.h>
+ #include <linux/of_irq.h>
+ #include <linux/module.h>
+ 
+@@ -146,37 +145,6 @@ static irqreturn_t s3fwrn5_i2c_irq_thread_fn(int irq, void *phy_id)
+ 	return IRQ_HANDLED;
+ }
+ 
+-static int s3fwrn5_i2c_parse_dt(struct i2c_client *client)
+-{
+-	struct s3fwrn5_i2c_phy *phy = i2c_get_clientdata(client);
+-	struct device_node *np = client->dev.of_node;
+-
+-	if (!np)
+-		return -ENODEV;
+-
+-	phy->common.gpio_en = of_get_named_gpio(np, "en-gpios", 0);
+-	if (!gpio_is_valid(phy->common.gpio_en)) {
+-		/* Support also deprecated property */
+-		phy->common.gpio_en = of_get_named_gpio(np,
+-							"s3fwrn5,en-gpios",
+-							0);
+-		if (!gpio_is_valid(phy->common.gpio_en))
+-			return -ENODEV;
+-	}
+-
+-	phy->common.gpio_fw_wake = of_get_named_gpio(np, "wake-gpios", 0);
+-	if (!gpio_is_valid(phy->common.gpio_fw_wake)) {
+-		/* Support also deprecated property */
+-		phy->common.gpio_fw_wake = of_get_named_gpio(np,
+-							     "s3fwrn5,fw-gpios",
+-							     0);
+-		if (!gpio_is_valid(phy->common.gpio_fw_wake))
+-			return -ENODEV;
+-	}
+-
+-	return 0;
+-}
+-
+ static int s3fwrn5_i2c_probe(struct i2c_client *client)
+ {
+ 	struct s3fwrn5_i2c_phy *phy;
+@@ -193,21 +161,17 @@ static int s3fwrn5_i2c_probe(struct i2c_client *client)
+ 	phy->i2c_dev = client;
+ 	i2c_set_clientdata(client, phy);
+ 
+-	ret = s3fwrn5_i2c_parse_dt(client);
+-	if (ret < 0)
+-		return ret;
+-
+-	ret = devm_gpio_request_one(&phy->i2c_dev->dev, phy->common.gpio_en,
+-				    GPIOF_OUT_INIT_HIGH, "s3fwrn5_en");
+-	if (ret < 0)
+-		return ret;
+-
+-	ret = devm_gpio_request_one(&phy->i2c_dev->dev,
+-				    phy->common.gpio_fw_wake,
+-				    GPIOF_OUT_INIT_LOW, "s3fwrn5_fw_wake");
+-	if (ret < 0)
+-		return ret;
++	phy->common.gpio_en = devm_gpiod_get(&client->dev, "en", GPIOD_OUT_HIGH);
++	if (IS_ERR(phy->common.gpio_en)) {
++		return dev_err_probe(&client->dev, PTR_ERR(phy->common.gpio_en),
++				"Failed to get EN gpio\n");
++	}
+ 
++	phy->common.gpio_fw_wake = devm_gpiod_get(&client->dev, "wake", GPIOD_OUT_LOW);
++	if (IS_ERR(phy->common.gpio_fw_wake)) {
++		return dev_err_probe(&client->dev, PTR_ERR(phy->common.gpio_fw_wake),
++			     "Failed to get WAKE gpio\n");
++	}
+ 	/*
+ 	 * S3FWRN5 depends on a clock input ("XI" pin) to function properly.
+ 	 * Depending on the hardware configuration this could be an always-on
+diff --git a/drivers/nfc/s3fwrn5/phy_common.c b/drivers/nfc/s3fwrn5/phy_common.c
+index deb2c039f0fd..e802b4e609c8 100644
+--- a/drivers/nfc/s3fwrn5/phy_common.c
++++ b/drivers/nfc/s3fwrn5/phy_common.c
+@@ -8,7 +8,7 @@
+  * Bongsu Jeon <bongsu.jeon@samsung.com>
+  */
+ 
+-#include <linux/gpio.h>
++#include <linux/gpio/consumer.h>
+ #include <linux/delay.h>
+ #include <linux/module.h>
+ 
+@@ -19,7 +19,7 @@ void s3fwrn5_phy_set_wake(void *phy_id, bool wake)
+ 	struct phy_common *phy = phy_id;
+ 
+ 	mutex_lock(&phy->mutex);
+-	gpio_set_value(phy->gpio_fw_wake, wake);
++	gpiod_set_value(phy->gpio_fw_wake, wake);
+ 	if (wake)
+ 		msleep(S3FWRN5_EN_WAIT_TIME);
+ 	mutex_unlock(&phy->mutex);
+@@ -33,14 +33,14 @@ bool s3fwrn5_phy_power_ctrl(struct phy_common *phy, enum s3fwrn5_mode mode)
+ 
+ 	phy->mode = mode;
+ 
+-	gpio_set_value(phy->gpio_en, 1);
+-	gpio_set_value(phy->gpio_fw_wake, 0);
++	gpiod_set_value(phy->gpio_en, 1);
++	gpiod_set_value(phy->gpio_fw_wake, 0);
+ 	if (mode == S3FWRN5_MODE_FW)
+-		gpio_set_value(phy->gpio_fw_wake, 1);
++		gpiod_set_value(phy->gpio_fw_wake, 1);
+ 
+ 	if (mode != S3FWRN5_MODE_COLD) {
+ 		msleep(S3FWRN5_EN_WAIT_TIME);
+-		gpio_set_value(phy->gpio_en, 0);
++		gpiod_set_value(phy->gpio_en, 0);
+ 		msleep(S3FWRN5_EN_WAIT_TIME);
+ 	}
+ 
+diff --git a/drivers/nfc/s3fwrn5/phy_common.h b/drivers/nfc/s3fwrn5/phy_common.h
+index 9cef25436bf9..10210a8fd755 100644
+--- a/drivers/nfc/s3fwrn5/phy_common.h
++++ b/drivers/nfc/s3fwrn5/phy_common.h
+@@ -13,6 +13,7 @@
+ 
+ #include <linux/mutex.h>
+ #include <net/nfc/nci_core.h>
++#include <linux/gpio/consumer.h>
+ 
+ #include "s3fwrn5.h"
+ 
+@@ -21,8 +22,8 @@
+ struct phy_common {
+ 	struct nci_dev *ndev;
+ 
+-	int gpio_en;
+-	int gpio_fw_wake;
++	struct gpio_desc *gpio_en;
++	struct gpio_desc *gpio_fw_wake;
+ 
+ 	struct mutex mutex;
+ 
+diff --git a/drivers/nfc/s3fwrn5/uart.c b/drivers/nfc/s3fwrn5/uart.c
+index 4ee481bd7e96..5a7c7741a881 100644
+--- a/drivers/nfc/s3fwrn5/uart.c
++++ b/drivers/nfc/s3fwrn5/uart.c
+@@ -15,8 +15,7 @@
+ #include <linux/netdevice.h>
+ #include <linux/of.h>
+ #include <linux/serdev.h>
+-#include <linux/gpio.h>
+-#include <linux/of_gpio.h>
++#include <linux/gpio/consumer.h>
+ 
+ #include "phy_common.h"
+ 
+@@ -92,25 +91,6 @@ static const struct of_device_id s3fwrn82_uart_of_match[] = {
+ };
+ MODULE_DEVICE_TABLE(of, s3fwrn82_uart_of_match);
+ 
+-static int s3fwrn82_uart_parse_dt(struct serdev_device *serdev)
+-{
+-	struct s3fwrn82_uart_phy *phy = serdev_device_get_drvdata(serdev);
+-	struct device_node *np = serdev->dev.of_node;
+-
+-	if (!np)
+-		return -ENODEV;
+-
+-	phy->common.gpio_en = of_get_named_gpio(np, "en-gpios", 0);
+-	if (!gpio_is_valid(phy->common.gpio_en))
+-		return -ENODEV;
+-
+-	phy->common.gpio_fw_wake = of_get_named_gpio(np, "wake-gpios", 0);
+-	if (!gpio_is_valid(phy->common.gpio_fw_wake))
+-		return -ENODEV;
+-
+-	return 0;
+-}
+-
+ static int s3fwrn82_uart_probe(struct serdev_device *serdev)
+ {
+ 	struct s3fwrn82_uart_phy *phy;
+@@ -144,20 +124,19 @@ static int s3fwrn82_uart_probe(struct serdev_device *serdev)
+ 
+ 	serdev_device_set_flow_control(serdev, false);
+ 
+-	ret = s3fwrn82_uart_parse_dt(serdev);
+-	if (ret < 0)
+-		goto err_serdev;
+-
+-	ret = devm_gpio_request_one(&phy->ser_dev->dev, phy->common.gpio_en,
+-				    GPIOF_OUT_INIT_HIGH, "s3fwrn82_en");
+-	if (ret < 0)
++	phy->common.gpio_en = devm_gpiod_get(&serdev->dev, "en", GPIOD_OUT_HIGH);
++	if (IS_ERR(phy->common.gpio_en)) {
++		ret = dev_err_probe(&serdev->dev, PTR_ERR(phy->common.gpio_en),
++			     "failed to get en gpio\n");
+ 		goto err_serdev;
++	}
+ 
+-	ret = devm_gpio_request_one(&phy->ser_dev->dev,
+-				    phy->common.gpio_fw_wake,
+-				    GPIOF_OUT_INIT_LOW, "s3fwrn82_fw_wake");
+-	if (ret < 0)
++	phy->common.gpio_fw_wake = devm_gpiod_get(&serdev->dev, "wake", GPIOD_OUT_LOW);
++	if (IS_ERR(phy->common.gpio_fw_wake)) {
++		ret = dev_err_probe(&serdev->dev, PTR_ERR(phy->common.gpio_fw_wake),
++			     "failed to get wake gpio\n");
+ 		goto err_serdev;
++	}
+ 
+ 	ret = s3fwrn5_probe(&phy->common.ndev, phy, &phy->ser_dev->dev,
+ 			    &uart_phy_ops);
+-- 
+2.43.0
+
 
