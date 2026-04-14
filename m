@@ -1,280 +1,241 @@
-Return-Path: <netdev+bounces-278390-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278391-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oNbfOnMa3mmFnAkAu9opvQ
-	(envelope-from <netdev+bounces-278390-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 12:44:03 +0200
+	id 8FqPKv8b3mmFnAkAu9opvQ
+	(envelope-from <netdev+bounces-278391-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 12:50:39 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D7183F8E55
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 12:44:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 06D463F8F52
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 12:50:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D39683112357
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 10:37:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 02BF530D00BF
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 10:43:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE6BC3D5225;
-	Tue, 14 Apr 2026 10:35:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF9903D7D8B;
+	Tue, 14 Apr 2026 10:43:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WKPWgq5y"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nVavkm82"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B63C93D7D9E;
-	Tue, 14 Apr 2026 10:35:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 549AB3D5662
+	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 10:43:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776162955; cv=none; b=IhjRXKZzxjEZ1dt5zD2qOoTYy3R4c2a9NlSMKDrDA7p1uIc1CvKQZtpnrAbP0wViFF2MDGr43t7qeXNUHn9ve2UxhyKt0tVqJYVCJcOO5tZTuErU+uLf75v7tx1eRG/wUseAvB/Mg8Zjk652yGtpnig5a2WCTywc2Nas+6ckEN8=
+	t=1776163423; cv=none; b=gc2zHgNTCY0E6ka7Q0yqwt6k8p8as+8BLcBj59yxkuiIeKAjDtwrqL8jNDyzRael+4/yEbKCCN4fICnbNWgUwT+DdN+KiAuna9NtHZN6vrGO0NpOqo2l939J9+9PF6Vfsh0282L+5yiV6MUk3Jdun9ys6XP97emDRtLZIy9raDU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776162955; c=relaxed/simple;
-	bh=SFNQ0GUXZDmko3umJzr38nltBojjjdV+yz2yRE036ik=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SdADOrCscmrROw+Tl3h7gGZ0Ak637JZxJJNH13rGl+JLxqGyJSKSjul4cKtDudITEIEi47/tul8bMmZUO17bwvtHvH/xIw/c0uxPqa/QkVdMQRC9AWBMN0jr5KsyOetv3WCpPrQAemWgKQnoaToCQGABfKeJcB7cRBSQoEphZnI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WKPWgq5y; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60B61C19425;
-	Tue, 14 Apr 2026 10:35:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776162954;
-	bh=SFNQ0GUXZDmko3umJzr38nltBojjjdV+yz2yRE036ik=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WKPWgq5yvXTwdm6Mn7ddnAlqSEEiLBiWHTaX5mT5aGATcja8JjLui6ZcqNanm6scd
-	 CvXrq5dpTAh4lfYq1EVZUX4GCculXV6aUZ8B2O66uXnN4hL8M3IpV0q1QnBYf/Cgl2
-	 uXmzZTnbW+Tg8K5+cr8iHrkx2+6e8RjuZe77W4iUy0UXTXGq+qIpq/A/xcKV1UjzsD
-	 tSBo0NXcGq1hWol0n071OCMjHVTW3JNe8xQS1eQwar0Cs0wcpqFjwIeRuJfCLbea1B
-	 MZfrvQ0InJkZRVLl5oIPVYvATc3jjlfrLG2y30pSPcM877QPNc8FyNTCL8ekqjzoew
-	 0U2KV9PxBXr2w==
-Date: Tue, 14 Apr 2026 13:35:47 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: fengchengwen <fengchengwen@huawei.com>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>, Bjorn Helgaas <bhelgaas@google.com>,
-	linux-rdma@vger.kernel.org, linux-pci@vger.kernel.org,
-	netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	Keith Busch <kbusch@kernel.org>, Yochai Cohen <yochai@nvidia.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Zhiping Zhang <zhipingz@meta.com>
-Subject: Re: [RFC] Proposal: Add sysfs interface for PCIe TPH Steering Tag
- retrieval and configuration
-Message-ID: <20260414103547.GA361495@unreal>
-References: <6ea4c4c2-774e-aa76-3665-918e2a24cc84@huawei.com>
- <20260413100152.GG21470@unreal>
- <c3a6c6ca-3b71-476c-947a-5f2393d046bd@huawei.com>
- <20260413191930.GP21470@unreal>
- <b95ced54-339f-4859-b3eb-8bf261393ffc@huawei.com>
- <20260414085723.GR21470@unreal>
- <84bf119e-fa8c-4c97-9197-3377b7e2b250@huawei.com>
+	s=arc-20240116; t=1776163423; c=relaxed/simple;
+	bh=YltDh2A8O2U9vk5yt1hOIdfJZJy0KrnykCQzCOPrV3s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=h2+Azg/zkwqnGOShuwfTCCFCyJ0YxZG9e3xwxXo3II+BMuSvQongBn6TL3FXaPVlJJw0q2fSdhhjeV3SmiRNQFM+ElfCHFU5AXr1N+vymPZTdJ7jxlsi7vfm57DoO13j/c6EhveJk0OqM4ymETrlz8jHBCpPkh/fvgORe+1BOgI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nVavkm82; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2ab232cc803so27085385ad.3
+        for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 03:43:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776163415; x=1776768215; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=OfnybGMnoxGjJ0hXXGbvVi2E4t4Gka9BqnzKdhcl8dQ=;
+        b=nVavkm82nO+rY70ah9Q0hYBU0C+BJnbZx51fiqI83kI39+WZ77OI0c9GzOBi3R4hdQ
+         UTINHHxIRRbWE9d/uLSztfPt7vE0rC4myIa7BwLMaaorJcf9wpFniRn/HIawctvoE71s
+         iaTN9YnT4wgB6L/Py/MWbZIolcu5X9ONvi1RZ4ghEbbO7/itqK/LHK+g+NiH/27lJnGM
+         qT3AvIsNj/oZ/h204vNZsFWbVGEwGk7Uosk7WG2GsVGM7qzRcQYnQboCGXM210eGChTw
+         W++fZZSSHSkYgKk/dZGEFfYKhscT1PDQmbL/z3y2jnGiuQ+YEQdD6fTWvOmLz/eW16uY
+         kZCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776163415; x=1776768215;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OfnybGMnoxGjJ0hXXGbvVi2E4t4Gka9BqnzKdhcl8dQ=;
+        b=QkcDd/9axYAAke0JC2aIrjhlw3FbHrDTwXzcHOWGJsBczV/l8CZwpV3+7qn5aEPDRf
+         U5us9GvKk01Ro6xwl40bzPHsUCH00oFTJZ6uaf69lvebO5XCLwYaTYuFUSEv5jkRICBQ
+         mVZygziC+SdghnMrqp6w6PlQSk8ga9JYAUWEElrQen2HdL9MKBf1IZWKaXGyVKUSSMSA
+         CHBvNiu8dFhov7+PHfkzlW9CICod5XmxwDyywoJ3eQOvWAJqTe2pyTRgf6daR2hMrb36
+         APR1zh6dW1FAOKQkv8yj4wrNNsTShCLK8cKGdn09jGnAmExDpNeJJPoNHUHe20SXwxa1
+         Fy3A==
+X-Forwarded-Encrypted: i=1; AFNElJ+9W6lSYWvEa4/sCCrGnaz2hxSkv36vY2dEWU7QuVw4/H2BCs/daJ5IqLCrRjQnt3IEMB9Zkhg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx1RPIRcSHCnRGE7q3hBl9ndNsBIEPRb9mZGXhR/9adAyMhy5oL
+	W4cA4lPYqQZSSlXWO0xI1gL4oPtT23p3eeSCAfC+slHaQEgPZKJR4EoF
+X-Gm-Gg: AeBDieu6gleLdZEZ9BIJDisM1K6u6ipMZIHuYx4zOFtDvtSR+fgysihDMQ1mJSyx8XX
+	K/v33z2p5BlC6fmPSHoB/xGM0G4CYslvlv9qSa0+NhHsE94IV2xPSTmcedBXT+PsDLLdNpK+D1v
+	XQ8h01zm1TpUW9LmL6Zvv8MjFZy4lMz5f95CYA1mFx8XPRNIeXs5VauQUGI7jXuggwyQ+g7AZow
+	ippdXSiUU6dZ84z/6udMy4FgLSYOjjS5KyDHgV4B0uAdtuznjnt6dkTJso1oDsEY5rzOuEnVLdW
+	i9tKxhGoXRcBNnoh/2WJFBOFP9p3sXx1n66/l8KO6eiywadNQUGPbXkhXOPDoFo7qy1k1kegmkz
+	h3pQZXGm25mV9PD9/inTxO850E6wld8iF+TkSzZGPi2cndiBkl3ava9pZdGSVqwYtAMWtpKQzW9
+	4ZoxO25u1j8o9vfsOydbyfMko5nC+dgupNBF65TsoFYS2tOiXTyJhVIAYzjuxr/d6oEfPdz1OEk
+	nRBhyQLyqlk
+X-Received: by 2002:a17:903:2847:b0:2b2:ebed:7af5 with SMTP id d9443c01a7336-2b2ebed7f52mr67126875ad.13.1776163414902;
+        Tue, 14 Apr 2026 03:43:34 -0700 (PDT)
+Received: from SLSGDTSWING002.tail0ac356.ts.net ([129.126.109.177])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b2d4f469casm141703575ad.81.2026.04.14.03.43.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Apr 2026 03:43:34 -0700 (PDT)
+From: Weiming Shi <bestswngs@gmail.com>
+To: Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	Xiang Mei <xmei5@asu.edu>,
+	Weiming Shi <bestswngs@gmail.com>
+Subject: [PATCH net v3] net/sched: taprio: fix NULL pointer dereference in class dump
+Date: Tue, 14 Apr 2026 18:43:12 +0800
+Message-ID: <20260414104311.74115-2-bestswngs@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <84bf119e-fa8c-4c97-9197-3377b7e2b250@huawei.com>
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278390-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,asu.edu,gmail.com];
+	TAGGED_FROM(0.00)[bounces-278391-lists,netdev=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-0.997];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 4D7183F8E55
+X-Rspamd-Queue-Id: 06D463F8F52
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Apr 14, 2026 at 05:30:09PM +0800, fengchengwen wrote:
-> On 4/14/2026 4:57 PM, Leon Romanovsky wrote:
-> > On Tue, Apr 14, 2026 at 09:07:23AM +0800, fengchengwen wrote:
-> >> On 4/14/2026 3:19 AM, Leon Romanovsky wrote:
-> >>> On Mon, Apr 13, 2026 at 08:04:10PM +0800, fengchengwen wrote:
-> >>>> On 4/13/2026 6:01 PM, Leon Romanovsky wrote:
-> >>>>> On Fri, Apr 10, 2026 at 10:30:52PM +0800, fengchengwen wrote:
-> >>>>>> Hi all,
-> >>>>>>
-> >>>>>> I'm writing to propose adding a sysfs interface to expose and configure the
-> >>>>>> PCIe TPH
-> >>>>>> Steering Tag for PCIe devices, which is retrieved inside the kernel.
-> >>>>>>
-> >>>>>>
-> >>>>>> Background: The TPH Steering Tag is tightly coupled with both a PCIe device
-> >>>>>> (identified
-> >>>>>> by its BDF) and a CPU core. It can only be obtained in kernel mode. To allow
-> >>>>>> user-space
-> >>>>>> applications to fetch and set this value securely and conveniently, we need
-> >>>>>> a standard
-> >>>>>> kernel-to-user interface.
-> >>>>>>
-> >>>>>>
-> >>>>>> Proposed Solution: Add several sysfs attributes under each PCIe device's
-> >>>>>> sysfs directory:
-> >>>>>> 1. /sys/bus/pci/devices/<BDF>/tph_mode to query the TPH mode (interrupt or
-> >>>>>> device specific)
-> >>>>>> 2. /sys/bus/pci/devices/<BDF>/tph_enable to control the TPH feature
-> >>>>>> 3. /sys/bus/pci/devices/<BDF>/tph_st to support both read and write
-> >>>>>> operations, e.g.:
-> >>>>>>    Read operation:
-> >>>>>>      echo "cpu=3" > /sys/bus/pci/devices/0000:01:00.0/tph_st
-> >>>>>>      cat /sys/bus/pci/devices/0000:01:00.0/tph_st
-> >>>>>>    Write operation:
-> >>>>>>      echo "index=10 st=123" > /sys/bus/pci/devices/0000:01:00.0/tph_st
-> >>>>>>
-> >>>>>>
-> >>>>>> The design strictly follows PCI subsystem sysfs standards and has the
-> >>>>>> following key properties:
-> >>>>>>
-> >>>>>> 1. Dynamic Visibility: The sysfs attributes will only be present for PCIe
-> >>>>>> devices that
-> >>>>>>    support TPH Steering Tag. Devices without TPH capability will not show
-> >>>>>> these nodes,
-> >>>>>>    avoiding unnecessary user confusion.
-> >>>>>>
-> >>>>>> 2. Permission Control: The attributes will use 0600 file permissions,
-> >>>>>> ensuring only
-> >>>>>>    privileged root users can read or write them, which satisfies security
-> >>>>>> requirements
-> >>>>>>    for hardware configuration interfaces.
-> >>>>>>
-> >>>>>> 3. Standard Implementation Location: The interface will be implemented in
-> >>>>>>    drivers/pci/pci-sysfs.c, the canonical location for all PCI device sysfs
-> >>>>>> attributes,
-> >>>>>>    ensuring consistency and maintainability within the PCI subsystem.
-> >>>>>>
-> >>>>>>
-> >>>>>> Why sysfs instead of alternatives like VFIO-PCI ioctl:
-> >>>>>>
-> >>>>>> - Universality: sysfs does not require binding the device to a special
-> >>>>>> driver such as
-> >>>>>>   vfio-pci. It is available to any privileged user-space component,
-> >>>>>> including system
-> >>>>>>   utilities, daemons, and monitoring tools.
-> >>>>>>
-> >>>>>> - Simplicity: Both user-space usage (cat/echo) and kernel implementation are
-> >>>>>>   straightforward, reducing code complexity and long-term maintenance cost.
-> >>>>>>
-> >>>>>> - Design Alignment: TPH Steering Tag is a generic PCIe device feature, not
-> >>>>>> specific to
-> >>>>>>   user-space drivers like DPDK or VFIO. Exposing it via sysfs matches the
-> >>>>>> kernel's
-> >>>>>>   standard pattern for hardware capabilities.
-> >>>>>>
-> >>>>>>
-> >>>>>> I look forward to your comments about this design before submitting the
-> >>>>>> final patch.
-> >>>>>
-> >>>>> You need to explain more clearly why this write functionality is useful
-> >>>>> and necessary outside the VFIO/RDMA context:
-> >>>>> https://lore.kernel.org/all/20260324234615.3731237-1-zhipingz@meta.com/
-> >>>>>
-> >>>>> AFAIK, for non-VFIO TPH callers, kernel has enough knowledge to set
-> >>>>> right ST values.
-> >>>>>
-> >>>>> There are several comments regarding the implementation, but those can wait
-> >>>>> until the rationale behind the proposal is fully clarified.
-> >>>>
-> >>>> Thanks for your review and comments.
-> >>>>
-> >>>> Let me clarify the rationale behind this user-space sysfs interface:
-> >>>>
-> >>>> 1. VFIO is just one of the user-space device access frameworks.
-> >>>>    There are many other in-kernel frameworks that expose devices
-> >>>>    to user space, such as UIO, UACCE, etc., which may also require
-> >>>>    TPH Steering Tag support.
-> >>>>
-> >>>> 2. The kernel can automatically program Steering Tags only when
-> >>>>    the device provides a standard ST table in MSI-X or config space.
-> >>>>    However, many devices implement vendor-specific or platform-specific
-> >>>>    Steering Tag programming methods that cannot be fully handled
-> >>>>    by the generic kernel code.
-> >>>>
-> >>>> 3. For such devices, user-space applications or framework drivers
-> >>>>    need to retrieve and configure TPH Steering Tags directly.
-> >>>>    A unified sysfs interface allows all user-space frameworks
-> >>>>    (not just VFIO) to use a common, standard way to manage
-> >>>>    TPH Steering Tags, rather than implementing duplicated logic
-> >>>>    in each subsystem.
-> >>>>
-> >>>> This interface provides a uniform method for any user-space
-> >>>> device access solution to work with TPH, which is why I believe
-> >>>> it is useful and necessary beyond the VFIO/RDMA case.
-> >>>
-> >>> I understand the rationale for providing a read interface, for example for
-> >>> debugging, but I do not see any justification for a write interface.
-> >>
-> >> Thank you for the comment!
-> >>
-> >> As I explained, read interface is not only for debugging. It was used to
-> >> such device who don't declare ST location in MSI-X or config-space, the following
-> >> is Intel X710 NIC device's lspci output (only TPH part):
-> >>
-> >> 	Capabilities: [1a0 v1] Transaction Processing Hints
-> >> 		Device specific mode supported
-> >> 		No steering table available
-> >>
-> >> So we could not config the ST for device on kernel because it's vendor specific.
-> >> But we could configure ST by it's vendor user-space driver, in this case, we
-> >> should get ST from kernel to user-space.
-> > 
-> > Vendor-specific, in the context of the PCI specification, does not mean the
-> > kernel cannot configure it. It simply means that the ST values are not
-> > stored in the ST table.
-> 
-> Thank you for the clarification!
-> 
-> I agree with your interpretation of "vendor-specific" in PCI spec terms—it
-> does not prevent the kernel from handling TPH in principle. However, the
-> real problem is that the kernel has no standardized way to know where or
-> how to program those vendor-specific ST values.
+When a TAPRIO child qdisc is deleted via RTM_DELQDISC, taprio_graft()
+is called with new == NULL and stores NULL into q->qdiscs[cl - 1].
+Subsequent RTM_GETTCLASS dump operations walk all classes via
+taprio_walk() and call taprio_dump_class(), which calls taprio_leaf()
+returning the NULL pointer, then dereferences it to read child->handle,
+causing a kernel NULL pointer dereference.
 
-No one here is opposed to you implementing the appropriate callbacks or
-extending the existing in-kernel API to support a device‑specific mode.
+The bug is reachable with namespace-scoped CAP_NET_ADMIN on any kernel
+with CONFIG_NET_SCH_TAPRIO enabled. On systems with unprivileged user
+namespaces enabled, an unprivileged local user can trigger a kernel
+panic by creating a taprio qdisc inside a new network namespace,
+grafting an explicit child qdisc, deleting it, and requesting a class
+dump. The RTM_GETTCLASS dump itself requires no capability.
 
-> 
-> When a device  reports "No steering table available" and operates in
-> device-specific mode, the method used to set ST values is entirely
-> device-specific and not covered by the PCI specification. If the device
-> is taken over to user-space by UIO framework (e.g. VFIO or IGB_UIO), the
-> generic kernel cannot infer the proper programming sequence or registers
-> for each vendor-specific implementation.
-> 
-> In these cases, the configuration must be done by the vendor’s
-> user-space driver, which is aware of the device’s private programming
-> model. But such a user-space driver still needs to obtain valid,
-> platform-provided ST values (from ACPI _DSM), which it cannot do
-> without a kernel interface.
+ Oops: general protection fault, probably for non-canonical address 0xdffffc0000000007: 0000 [#1] SMP KASAN NOPTI
+ KASAN: null-ptr-deref in range [0x0000000000000038-0x000000000000003f]
+ RIP: 0010:taprio_dump_class (net/sched/sch_taprio.c:2475)
+ Call Trace:
+  <TASK>
+  tc_fill_tclass (net/sched/sch_api.c:1966)
+  qdisc_class_dump (net/sched/sch_api.c:2329)
+  taprio_walk (net/sched/sch_taprio.c:2510)
+  tc_dump_tclass_qdisc (net/sched/sch_api.c:2353)
+  tc_dump_tclass_root (net/sched/sch_api.c:2370)
+  tc_dump_tclass (net/sched/sch_api.c:2431)
+  rtnl_dumpit (net/core/rtnetlink.c:6827)
+  netlink_dump (net/netlink/af_netlink.c:2325)
+  rtnetlink_rcv_msg (net/core/rtnetlink.c:6927)
+  netlink_rcv_skb (net/netlink/af_netlink.c:2550)
+  </TASK>
 
-The objection applies to this point. The PCI device exists in kernel space,
-and the kernel is responsible for managing its internal state.
+Fix this by substituting &noop_qdisc when new is NULL in
+taprio_graft(), following the same pattern used by multiq_graft() and
+prio_graft(). This ensures q->qdiscs[] slots are never NULL, making
+control-plane dump paths safe without requiring individual NULL checks.
 
-> 
-> This is why a read-only interface to retrieve ST values is still
-> needed: the kernel holds the valid platform tags, while the user-space
-> driver handles the device-specific programming.
-> 
-> Thanks
-> 
-> > 
-> > Thanks
-> 
+Since the data-plane paths (taprio_enqueue and taprio_dequeue_from_txq)
+previously had explicit NULL guards that would drop/skip the packet
+cleanly, update those checks to test for &noop_qdisc instead. Without
+this, packets would reach taprio_enqueue_one() which increments the root
+qdisc's qlen and backlog before calling the child's enqueue; noop_qdisc
+drops the packet but those counters are never rolled back, permanently
+inflating the root qdisc's statistics.
+
+Fixes: 665338b2a7a0 ("net/sched: taprio: dump class stats for the actual q->qdiscs[]")
+Reported-by: Xiang Mei <xmei5@asu.edu>
+Signed-off-by: Weiming Shi <bestswngs@gmail.com>
+---
+v3: fix broken patch
+v2: Also update NULL guards in taprio_enqueue() and
+    taprio_dequeue_from_txq() to avoid qlen/backlog inflation (Paolo).
+---
+ net/sched/sch_taprio.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/net/sched/sch_taprio.c b/net/sched/sch_taprio.c
+index f721c03514f60..07723b156c5b3 100644
+--- a/net/sched/sch_taprio.c
++++ b/net/sched/sch_taprio.c
+@@ -634,7 +634,7 @@ static int taprio_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+ 	queue = skb_get_queue_mapping(skb);
+ 
+ 	child = q->qdiscs[queue];
+-	if (unlikely(!child))
++	if (unlikely(child == &noop_qdisc))
+ 		return qdisc_drop(skb, sch, to_free);
+ 
+ 	if (taprio_skb_exceeds_queue_max_sdu(sch, skb)) {
+@@ -717,7 +717,7 @@ static struct sk_buff *taprio_dequeue_from_txq(struct Qdisc *sch, int txq,
+ 	int len;
+ 	u8 tc;
+ 
+-	if (unlikely(!child))
++	if (unlikely(child == &noop_qdisc))
+ 		return NULL;
+ 
+ 	if (TXTIME_ASSIST_IS_ENABLED(q->flags))
+@@ -2183,6 +2183,9 @@ static int taprio_graft(struct Qdisc *sch, unsigned long cl,
+ 	if (!dev_queue)
+ 		return -EINVAL;
+ 
++	if (!new)
++		new = &noop_qdisc;
++
+ 	if (dev->flags & IFF_UP)
+ 		dev_deactivate(dev);
+ 
+@@ -2196,14 +2199,14 @@ static int taprio_graft(struct Qdisc *sch, unsigned long cl,
+ 	*old = q->qdiscs[cl - 1];
+ 	if (FULL_OFFLOAD_IS_ENABLED(q->flags)) {
+ 		WARN_ON_ONCE(dev_graft_qdisc(dev_queue, new) != *old);
+-		if (new)
++		if (new != &noop_qdisc)
+ 			qdisc_refcount_inc(new);
+ 		if (*old)
+ 			qdisc_put(*old);
+ 	}
+ 
+ 	q->qdiscs[cl - 1] = new;
+-	if (new)
++	if (new != &noop_qdisc)
+ 		new->flags |= TCQ_F_ONETXQUEUE | TCQ_F_NOPARENT;
+ 
+ 	if (dev->flags & IFF_UP)
+-- 
+2.43.0
+
 
