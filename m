@@ -1,160 +1,119 @@
-Return-Path: <netdev+bounces-278442-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278443-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QPGbChs43mnbpQkAu9opvQ
-	(envelope-from <netdev+bounces-278442-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 14:50:35 +0200
+	id MG9eL2843mnbpQkAu9opvQ
+	(envelope-from <netdev+bounces-278443-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 14:51:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F39E3FA2CE
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 14:50:34 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 448F73FA2F2
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 14:51:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 858D1303525C
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 12:46:51 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 959CC30886DE
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 12:49:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 487CF34EF08;
-	Tue, 14 Apr 2026 12:46:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 550043E63A8;
+	Tue, 14 Apr 2026 12:48:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s+lll3ap"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IvU2nXq6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24A5B22FE0E
-	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 12:46:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4E5C3E5596
+	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 12:48:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776170810; cv=none; b=J/B1fh3ZRGWyjHTISyOhbQdbTnQD36Qy/hgrXGJKnv7JjTaPzB+Si/Mo7bkIZe08i9JAnsIIgc5oOEsYgf2HJCMnK1e6QeGuBmKDowdY0DHOQXMuotKmFPKgT0hd0aqE7bQUOCi3k5U1kpf6hGDEphk7DnkbN9ikAQ4P8vRn6QA=
+	t=1776170925; cv=none; b=YstXhjKBj5QhqupFQmUr0N0daF5zOyoqC/KGBJ2YC6fu+elm7rdmRUOUVU98DOQm3WdCmMv9sZeU+QupJJ8IIpy1NqRiZ0TjkOQWKOEdfYBrQaUXFmpy5wx4nKY4UQD9bldhfioqf1yKB55/+33NFdvTyBJTGqX0fFIcc8wVB0I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776170810; c=relaxed/simple;
-	bh=0xrsRx8+fhBqILy3gChyEPRzzf8cZshNTlrUxsv7RZE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jhf1+svmwWMHl4WtNBbTfptej3fls/PXImWE5vHnpCLM8FfueglAZmDIKLOJTAC6/kCJ4aU6s7Ye3wK0xuJCrdDWtrTS/IYaOiCEOEmzqaDCThRiZgO4SVMrhpw2AEJeIHjNu75eDqS8L6lVXmds0TaGi9r4OKZ7b0Zwe8MZZjI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s+lll3ap; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B10DFC19425;
-	Tue, 14 Apr 2026 12:46:47 +0000 (UTC)
+	s=arc-20240116; t=1776170925; c=relaxed/simple;
+	bh=ywvmaEFfcZLbgJZzgdExmYObQSQSsjeTYz/irjz5laA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DZp7eJZxwCCdxIKfY3ecrYrhL4AxVMmBzLOV/davoKDjYzukV7ovbFlkUNYiyykQXPEAqq1cpL89QVl4g+T86iRlxP190yCdUzQt16uWAPkuQMvd9297s3NyEW2AdzbdDXlSk+h24EqMkE58cmtNID2t0+xrSK4l5RjVz99Z6X4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IvU2nXq6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 918AAC19425;
+	Tue, 14 Apr 2026 12:48:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776170809;
-	bh=0xrsRx8+fhBqILy3gChyEPRzzf8cZshNTlrUxsv7RZE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=s+lll3apOXZ6lUCDqv5yjMnIzo9yurD/78YpGTKuGiu5ceEmxt38X8F6eUAOQb4lK
-	 w4cTDQgA1U9R+Zsn6xepiteJzeFNVxVhUQrfs1GEnM2NYOBBJuHuTm1wPE/TMigTCc
-	 ciSfADwOeRtZqqQ+4iTr2y9FjwfaComoC1tgU8qG8cfdNzhsO+D/OcMwogPbSQYyLz
-	 o/FLEeGhEE6EQ93hNdu3eZHQjmWjh5hXMwpL3nP6PFgaHzPO2N6XLXQBC58GHG+v0c
-	 e7ceZE86pS8SNSIwm3GGq+/5WrnHoo4qlX5KX8OGUgO7rp8l+eLEYtcUVa3LWLBsIP
-	 4dmVU0sH6dU9w==
+	s=k20201202; t=1776170925;
+	bh=ywvmaEFfcZLbgJZzgdExmYObQSQSsjeTYz/irjz5laA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=IvU2nXq6Q4wsp2dI5CJL0+WLnFsCXIt2Ghi87O1uv5Ik1R0cMsO/7z2ftR2IhjZMd
+	 Mzo1Rp+Rr2xO/Swp5zJTlvT4nM79ak7W/fmYW39HUydPku0PR74Y26IwsW1WrNSIxM
+	 zlBMo8UDgmvzRpLxa443rbekz6/dFMruYCeqhxMcite0KKx1NUGrKcPUrwpNMWl79U
+	 hNuFa0U3WJRfbtQY6tbR4Is6V17nkJf7AaKeEIWTj5R6/2BC+nLf+kxo7P/7dU1Qag
+	 ton6XG5S61YsoGgrq2xJZKbWJMJG9ayfT+uKKVwxtVlLFVgs8Yd7pcTWLOD16rFtXf
+	 bQJc/c76L637w==
+Date: Tue, 14 Apr 2026 13:48:41 +0100
 From: Simon Horman <horms@kernel.org>
-To: lorenzo@kernel.org
-Cc: 'Simon Horman' <horms@kernel.org>,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net] net: airoha: Wait for NPU PPE configuration to complete in airoha_ppe_offload_setup()
-Date: Tue, 14 Apr 2026 13:46:41 +0100
-Message-ID: <20260414124641.754059-1-horms@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260412-airoha-wait-for-npu-config-offload-setup-v1-1-f4e0aa2a5d85@kernel.org>
-References: <20260412-airoha-wait-for-npu-config-offload-setup-v1-1-f4e0aa2a5d85@kernel.org>
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net] net: airoha: Add missing PPE configurations in
+ airoha_ppe_hw_init()
+Message-ID: <20260414124841.GF469338@kernel.org>
+References: <20260412-airoha_ppe_hw_init-missing-bits-v1-1-06ac670819e3@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260412-airoha_ppe_hw_init-missing-bits-v1-1-06ac670819e3@kernel.org>
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-278443-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278442-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sashiko.dev:url]
-X-Rspamd-Queue-Id: 7F39E3FA2CE
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 448F73FA2F2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: 'Simon Horman' <horms@kernel.org>
+On Sun, Apr 12, 2026 at 10:43:26AM +0200, Lorenzo Bianconi wrote:
+> Add the following PPE configuration in airoha_ppe_hw_init routine:
+> - 6RD hw offloading is currently not supported by Netfilter flowtable.
+>   Disable explicitly PPE 6RD offloading in order to prevent PPE to learn
+>   6RD flows and eventually interrupt the traffic.
+> - Add missing PPE bind rate configuration for L3 and L2 traffic.
+>   PPE bind rate configuration specifies the pps threshold to move a PPE
+>   entry state from UNBIND to BIND. Without this configuration this value
+>   is random.
+> - Set ageing thresholds to the values used in the vendor SDK in order to
+>   improve connection stability under load and avoid packet loss caused by
+>   fast aging.
+> 
+> Fixes: 00a7678310fe3 ("net: airoha: Introduce flowtable offload support")
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev
----
-    net: airoha: Wait for NPU PPE configuration to complete in airoha_ppe_offload_setup()
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-This commit adds a poll loop in airoha_ppe_offload_setup() to wait for the NPU
-PPE configuration to complete before running airoha_ppe_hw_init().
-
-> diff --git a/drivers/net/ethernet/airoha/airoha_ppe.c b/drivers/net/ethernet/airoha/airoha_ppe.c
-> index c2c32b6833df9..52199f6b39f9b 100644
-> --- a/drivers/net/ethernet/airoha/airoha_ppe.c
-> +++ b/drivers/net/ethernet/airoha/airoha_ppe.c
-[ ... ]
-> @@ -1340,6 +1341,13 @@ static int airoha_ppe_offload_setup(struct airoha_eth *eth)
->  	if (err)
->  		goto error_npu_put;
->  
-> +	/* Wait for NPU PPE configuration to complete */
-> +	err = read_poll_timeout(airoha_fe_rr, val, val, USEC_PER_MSEC,
-> +				100 * USEC_PER_MSEC, false, eth,
-> +				REG_PPE_PPE_FLOW_CFG(0));
-
-If the SoC has multiple PPE instances, is it sufficient to only wait for
-REG_PPE_PPE_FLOW_CFG(0)?
-
-Later in airoha_ppe_hw_init(), the code iterates up to eth->soc->num_ppe,
-initializing all available instances:
-
-drivers/net/ethernet/airoha/airoha_ppe.c:airoha_ppe_hw_init() {
-    ...
-	for (i = 0; i < eth->soc->num_ppe; i++) {
-		...
-		airoha_fe_wr(eth, REG_PPE_TB_BASE(i),
-			     ppe->foe_dma + sram_tb_size);
-    ...
-}
-
-If we only poll PPE 0, could the driver race with the NPU firmware's
-initialization of subsequent PPEs?
-
-Additionally, does this poll condition properly ensure the hardware is ready?
-Since the break condition is simply `val`, it exits immediately if the register
-contains any non-zero value.
-
-If the register retains a non-zero value from a previous session (like across
-driver reloads), or if an unclocked domain returns 0xFFFFFFFF, this poll might
-succeed immediately and bypass the wait.
-
-Could we clear the register before polling, or wait for a specific bit instead?
-
-> +	if (err)
-> +		goto error_npu_put;
-> +
->  	ppe_num_stats_entries = airoha_ppe_get_total_num_stats_entries(ppe);
 
