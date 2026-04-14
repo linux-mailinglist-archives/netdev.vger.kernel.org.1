@@ -1,80 +1,88 @@
-Return-Path: <netdev+bounces-278551-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278552-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aPq1Nz9/3mm/EwAAu9opvQ
-	(envelope-from <netdev+bounces-278551-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 19:54:07 +0200
+	id 0JbxAXKB3mnkFAAAu9opvQ
+	(envelope-from <netdev+bounces-278552-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 20:03:30 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47B2E3FD4FC
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 19:54:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 742AD3FD689
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 20:03:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 383EC30DDF6B
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 17:48:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id ECBBF308078E
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 17:57:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48B1830DEDD;
-	Tue, 14 Apr 2026 17:48:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97978386421;
+	Tue, 14 Apr 2026 17:57:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="0Rlud1TX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hfR8JKlP"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D70AF3090D9;
-	Tue, 14 Apr 2026 17:48:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E2F9318EF4
+	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 17:57:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776188889; cv=none; b=pKcwISLhBPiwn/iqJA2uBCdlFqqZ9f5bF7q0Q5R4VWvE7heMUzcKgiv7TltklcHcDUC1reZgcIe1QnHCO+P6bf8pwP6e+zFfZgADBprlckPrFDSzF+8GoybRGyNIJ4hxfH/9FZn2Lai4EfbBj74EtdiOFRYW9KPQ5tuf+b6rzr8=
+	t=1776189443; cv=none; b=G87FiYQySRYVNEQu+UeXjX2JJVhgDeGJKcNrNMRhKL7Hzcj1RZHjlzoTVo6SuA0JQzAgMG7TiokHlcvre9vTg8atFRR5YO+bwKvKCOamooJ9FW28qqxuc8e96Sb8wCn5QbVJyXnrGeDQKB359iaPt4hne2vUf6PXoa2yFZa/i8s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776188889; c=relaxed/simple;
-	bh=vwkmPQ4vECj24CaAKCQNvFAt03oFvGc25MGVu236yj8=;
+	s=arc-20240116; t=1776189443; c=relaxed/simple;
+	bh=RxLJJLLzEOf28UzybbeVMCDS56pJ/dqW9LsUPIaHKeE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l1FC/GqeCQqj5xKkecy76LuGn6q/YqrO4SmMznH08Ia22Y1mjFjR8KbVBMXeKMmRv5VpWlAlU0P/inUlN0ABG4S2V7wE2Hqq1X63RpvX0tH7yxpr9h0bxQBRNQ/2eeQy2T+rtmuagwozfEzj3b9XTPgArlG+7/A719c0t5WlCpE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=0Rlud1TX; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ZASKAzVGF+jSQfIpJWuXt8y+ZdMesuU0Htwl33sN3Xo=; b=0Rlud1TXYs8L4yxoNl/rmtSg7e
-	14qdUaHeHu7JGF8qL/4u3D1kwz8Gx83xhcLUsqJPzkXVNJjnEX5DBiX+7jkSCnrrkuVj6VJ+9augH
-	vg/Fv1+DPlT5LSydyc0ffJjg6Urx3S0MkWTAG17qY/iI9M6q07hBr2K82fo6vAP/974si/vaRkwQ8
-	kdKwJhE2v/qbQje4SmTTo/6FJ+HdAHsv4Tqq65mNbRDrV6YLZ+FgE42ZWLVRJ+JJFpdTcyY9641A7
-	H/G8jRU3BdaPo65//+mgwBb5Y7Ho6YKasnTAXiJv1J77TRBSCwZyKYdKYsI8SNwMxAKH/TjbnGgqG
-	p/JRrc2g==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54232)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1wChri-000000001Ge-1GvT;
-	Tue, 14 Apr 2026 18:47:58 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1wChrg-000000001Oy-0Lgf;
-	Tue, 14 Apr 2026 18:47:56 +0100
-Date: Tue, 14 Apr 2026 18:47:55 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Biju <biju.das.au@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Biju Das <biju.das.jz@bp.renesas.com>,
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	linux-renesas-soc@vger.kernel.org
-Subject: Re: [PATCH net-next v3 3/5] net: phy: mscc: Drop unnecessary
- phydev->lock
-Message-ID: <ad59y5ZfJDKFo3eU@shell.armlinux.org.uk>
-References: <20260412140032.122841-1-biju.das.jz@bp.renesas.com>
- <20260412140032.122841-4-biju.das.jz@bp.renesas.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Kopqq8hLDWXJqWTFAhO47msirglm+JB6kKBhLA4OIc/ASOfzmhzygDcfHOTlcJnJQx3yaN7B0hOV8XiWsPqMSZVIUDUP7ZdUZciSSTRBnawaJ/ZpUBmkDDPL5UNtp24szjfdK/IMe969q9p2jmJV9805To+OtLzJzFWrmIBDGq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hfR8JKlP; arc=none smtp.client-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-82f1f6103afso1717282b3a.1
+        for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 10:57:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776189442; x=1776794242; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Z+1c4uO7iq2Fg7R/gMK90WQL2cE90NN7fs2Y4N4QIao=;
+        b=hfR8JKlPlrpNNR1QmGGZVBwmumBU2MS6WIbhbEwoBrc3nEatsj5ZnjpBGtB/MGHbV8
+         ZPo1nVPQ1/CJVbN34WF94xoBKsy185cegiozMjs9WGZ2EngajYWHvoFtrqPWJ/4elhNo
+         1JbWJJtKJohbFdPqDqBl4onXvm17Y7aheBC3QlOGXByrHIHKXgQbXa+3JlN+O4w8jI7H
+         +yd7dp5fdxQ8z+lhnLMx1WV3r3bycC152NfVrJGK2uC8+iB2tfj5cvnS3RqRApmGfjBs
+         p6Shu4HREIhV8IhGIDRRuNwjdX3cV9i1Q/KLCdrjXMcU6s/MUVr46G1jryNjQVdFXaGT
+         q7Og==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776189442; x=1776794242;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Z+1c4uO7iq2Fg7R/gMK90WQL2cE90NN7fs2Y4N4QIao=;
+        b=MPBjTMh+NcgfxH4tb1Qx7XKH1GiPcepE5UjiXCMDEXu+XBozmwohgP6xQHKayIrgS8
+         Luba6Jr7G5yn6+l9P/CIqIdrDx3ezCKocqwV/1vYOiI1apVFIHVrU0rtd55CF4ZcryAN
+         4kJmF65k2prb7YC6RIoz8Xqh7XdicLzj3ev2MCIl8g8n5d0ajsgXtrHE74xICKSGrGZ5
+         lTis9AnoycB7T8YnTI5f4JesrDDdDoi2cac1G7Ln1wdewQXeU1NqmELKU+Cdj/z0HiYN
+         nU7JrpfBiFsgJz+c5d/5Y4b1T3qU/Cf5XF2n49w23yf5L6qancLwZ0an6/uxRyuA+gvw
+         SOZg==
+X-Gm-Message-State: AOJu0YxSguiS1IFD/h9zVM/T+fMrYzqWsDEituogYKOwM/6AvJRf2vOD
+	6RqRRlLMnNfh3Xq5vw85kIfjvtCu1RMZavjUGjQgyWTt1k5Gf6pteUu9QilYBg==
+X-Gm-Gg: AeBDievlXdAm6j4okWNaQhqHobxKcNu/R3KY3tVrjEWbxjw7/cih0YZsd5J4QxHAgDA
+	wPatenKs8u3CPe5gSwEHtejy9GomXqaUVDuch9B99+mV88xfAV64kDde8FgXZyk4+0rNy3PxdEp
+	UAuk0cDlDAI2/uUDN27Ia3Vln5Mf1A9A43nlGZ75NHiySH70vdjJMDlp0ocR0kgbnjbAx2zDSFr
+	FsMTUPhy7JCQdm1T+9WwH5NmjfocvlCZKjha88BkYmbZdPNw/s7q+JgmTntUpH53si1HdfiJ+Uo
+	T24W52dFUWXs2Q9pu8mk9VHE2WTzq7xCdgH0ick6Wbd7/YHtN1rfiMARUSAfhvwT70GZrehTJa3
+	BilYhfI1UTZJwbJILrqL/n+0GHkxnNNTw5QxZ29h3d959IQ4yv/I2kMYdt8DPPnRQCDAfFmbQuW
+	nvcS1ON0x6YtmOVGSkZdjOHNT32Rkn2AV3hJUenTSGj3HrAQcSPRtDMwI=
+X-Received: by 2002:a05:6a00:ad8d:b0:82f:316:3208 with SMTP id d2e1a72fcca58-82f0c35628bmr18240962b3a.29.1776189441624;
+        Tue, 14 Apr 2026 10:57:21 -0700 (PDT)
+Received: from devvm29614.prn0.facebook.com ([2a03:2880:ff:49::])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82f0c50cd34sm15616638b3a.54.2026.04.14.10.57.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Apr 2026 10:57:20 -0700 (PDT)
+Date: Tue, 14 Apr 2026 10:57:18 -0700
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: Dudu Lu <phx0fer@gmail.com>
+Cc: netdev@vger.kernel.org, stefanha@redhat.com, sgarzare@redhat.com,
+	mst@redhat.com, jasowang@redhat.com
+Subject: Re: [PATCH v2] vsock/virtio: fix accept queue count leak on
+ transport mismatch
+Message-ID: <ad5//tvvMRGnX39R@devvm29614.prn0.facebook.com>
+References: <20260413131409.19022-1-phx0fer@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,136 +91,87 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260412140032.122841-4-biju.das.jz@bp.renesas.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spamd-Result: default: False [1.14 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+In-Reply-To: <20260413131409.19022-1-phx0fer@gmail.com>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-278552-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278551-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,bp.renesas.com,microchip.com,nxp.com,vger.kernel.org,glider.be];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	NEURAL_SPAM(0.00)[0.125];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,renesas];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:url,shell.armlinux.org.uk:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 47B2E3FD4FC
+	DBL_BLOCKED_OPENRESOLVER(0.00)[meta.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,devvm29614.prn0.facebook.com:mid]
+X-Rspamd-Queue-Id: 742AD3FD689
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun, Apr 12, 2026 at 03:00:25PM +0100, Biju wrote:
-> @@ -486,15 +486,9 @@ static int vsc85xx_dt_led_modes_get(struct phy_device *phydev,
->  
->  static int vsc85xx_edge_rate_cntl_set(struct phy_device *phydev, u8 edge_rate)
->  {
-> -	int rc;
-> -
-> -	mutex_lock(&phydev->lock);
-> -	rc = phy_modify_paged(phydev, MSCC_PHY_PAGE_EXTENDED_2,
-> -			      MSCC_PHY_WOL_MAC_CONTROL, EDGE_RATE_CNTL_MASK,
-> -			      edge_rate << EDGE_RATE_CNTL_POS);
-> -	mutex_unlock(&phydev->lock);
-> -
-> -	return rc;
-> +	return phy_modify_paged(phydev, MSCC_PHY_PAGE_EXTENDED_2,
-> +				MSCC_PHY_WOL_MAC_CONTROL, EDGE_RATE_CNTL_MASK,
-> +				edge_rate << EDGE_RATE_CNTL_POS);
+On Mon, Apr 13, 2026 at 09:14:09PM +0800, Dudu Lu wrote:
+> virtio_transport_recv_listen() calls sk_acceptq_added() before
+> vsock_assign_transport(). If vsock_assign_transport() fails or
+> selects a different transport, the error path returns without
+> calling sk_acceptq_removed(), permanently incrementing
+> sk_ack_backlog.
+> 
+> After approximately backlog+1 such failures, sk_acceptq_is_full()
+> returns true, causing the listener to reject all new connections.
+> 
+> Fix by moving sk_acceptq_added() to after the transport validation,
+> matching the pattern used by vmci_transport and hyperv_transport.
+> 
+> Fixes: c0cfa2d8a788 ("vsock: add multi-transports support")
+> Signed-off-by: Dudu Lu <phx0fer@gmail.com>
+> ---
 
-This one is fine.
+Just a heads up that version change lists are encouraged.
 
-> @@ -503,7 +497,6 @@ static int vsc85xx_mac_if_set(struct phy_device *phydev,
->  	int rc;
->  	u16 reg_val;
->  
-> -	mutex_lock(&phydev->lock);
->  	reg_val = phy_read(phydev, MSCC_PHY_EXT_PHY_CNTL_1);
->  	reg_val &= ~(MAC_IF_SELECTION_MASK);
->  	switch (interface) {
-> @@ -522,17 +515,15 @@ static int vsc85xx_mac_if_set(struct phy_device *phydev,
->  		break;
->  	default:
->  		rc = -EINVAL;
-> -		goto out_unlock;
-> +		goto err;
+>  net/vmw_vsock/virtio_transport_common.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+> index 8a9fb23c6e85..e01d983488e5 100644
+> --- a/net/vmw_vsock/virtio_transport_common.c
+> +++ b/net/vmw_vsock/virtio_transport_common.c
+> @@ -1560,8 +1560,6 @@ virtio_transport_recv_listen(struct sock *sk, struct sk_buff *skb,
+>  		return -ENOMEM;
 >  	}
->  	rc = phy_write(phydev, MSCC_PHY_EXT_PHY_CNTL_1, reg_val);
-
-I would much rather this was converted to use phy_modify() as well so
-that we ensure that the update is atomic.
-
-	rc = phy_modify(phydev, MSCC_PHY_EXT_PHY_CNTL_1,
-			MAC_IF_SELECTION_MASK, reg_val);
-
-where reg_val is assigned the field value in the switch above.
-
-> @@ -668,19 +659,15 @@ static int vsc8531_pre_init_seq_set(struct phy_device *phydev)
->  	if (rc < 0)
->  		return rc;
 >  
-> -	mutex_lock(&phydev->lock);
->  	oldpage = phy_select_page(phydev, MSCC_PHY_PAGE_TR);
->  	if (oldpage < 0)
-> -		goto out_unlock;
-> +		goto restore_oldpage;
->  
->  	for (i = 0; i < ARRAY_SIZE(init_seq); i++)
->  		vsc85xx_tr_write(phydev, init_seq[i].reg, init_seq[i].val);
->  
-> -out_unlock:
-> -	oldpage = phy_restore_page(phydev, oldpage, oldpage);
-> -	mutex_unlock(&phydev->lock);
+> -	sk_acceptq_added(sk);
 > -
-> -	return oldpage;
-> +restore_oldpage:
-> +	return phy_restore_page(phydev, oldpage, oldpage);
-
-This is fine.
-
-> @@ -708,19 +695,15 @@ static int vsc85xx_eee_init_seq_set(struct phy_device *phydev)
->  	unsigned int i;
->  	int oldpage;
+>  	lock_sock_nested(child, SINGLE_DEPTH_NESTING);
 >  
-> -	mutex_lock(&phydev->lock);
->  	oldpage = phy_select_page(phydev, MSCC_PHY_PAGE_TR);
->  	if (oldpage < 0)
-> -		goto out_unlock;
-> +		goto restore_oldpage;
+>  	child->sk_state = TCP_ESTABLISHED;
+> @@ -1583,6 +1581,7 @@ virtio_transport_recv_listen(struct sock *sk, struct sk_buff *skb,
+>  		return ret;
+>  	}
 >  
->  	for (i = 0; i < ARRAY_SIZE(init_eee); i++)
->  		vsc85xx_tr_write(phydev, init_eee[i].reg, init_eee[i].val);
+> +	sk_acceptq_added(sk);
+>  	if (virtio_transport_space_update(child, skb))
+>  		child->sk_write_space(child);
 >  
-> -out_unlock:
-> -	oldpage = phy_restore_page(phydev, oldpage, oldpage);
-> -	mutex_unlock(&phydev->lock);
-> -
-> -	return oldpage;
-> +restore_oldpage:
-> +	return phy_restore_page(phydev, oldpage, oldpage);
+> -- 
+> 2.39.3 (Apple Git-145)
+> 
 
-Also fine.
+This makes sense to me.
 
-Thanks.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Reviewed-by: Bobby Eshleman <bobbyeshleman@meta.com>
 
