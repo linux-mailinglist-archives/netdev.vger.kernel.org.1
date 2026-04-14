@@ -1,324 +1,211 @@
-Return-Path: <netdev+bounces-278304-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278305-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UJRQLzfn3WmulAkAu9opvQ
-	(envelope-from <netdev+bounces-278304-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 09:05:27 +0200
+	id sJqCLezn3WmulAkAu9opvQ
+	(envelope-from <netdev+bounces-278305-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 09:08:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C62363F65B3
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 09:05:26 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22CF73F668B
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 09:08:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C919B300A657
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 07:05:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C94E93083D97
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 07:05:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 831BE35B12B;
-	Tue, 14 Apr 2026 07:05:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E55235A3B2;
+	Tue, 14 Apr 2026 07:05:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Fn2fTE3v"
+	dkim=pass (2048-bit key) header.d=est.tech header.i=@est.tech header.b="sWTMO/7U"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11010057.outbound.protection.outlook.com [52.101.84.57])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C77B2D8364;
-	Tue, 14 Apr 2026 07:05:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776150321; cv=none; b=QODWjjlb7biLGcrogGgi955aEpiYumbA9jZ4qcRQHSgR2SkM4+ZSI59s6G7P99NCHuIlBj3OXR7ZbtHJFcri9w9ROTwUoFPpYOY1AR6xDtBZLWGGwCPln9ARx0DuV9eT5mXXzu0F/y/gGXy91VCbF3gTG6S5QupEYsSr2duWkNc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776150321; c=relaxed/simple;
-	bh=eiK/74tfdqHKat9y+xuL2tR+KmBCHs426kLj5QskTbI=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=FlVb9OTZfl/eQCeF+Mu560PDCkACbA74sB+SAh0z1lFMIcPKrZm7V7v6onuftw8XXEigDKnW1egzJODBlqVwdbKlpOAxTYayMbAvDGIz6JB9eCPOiYPD5bBO0PwixaGgqBVmW0KiAN/boij8TWtXQGPMdEuU4KtH/4s1lXmiqRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Fn2fTE3v; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1776150318; x=1807686318;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=eiK/74tfdqHKat9y+xuL2tR+KmBCHs426kLj5QskTbI=;
-  b=Fn2fTE3vVvfUdIADVRAKn4TPpHbzUg16IHXJ3ZAZ+aoAi32OOL2TMolU
-   djMjclKSSyoBJLXrXVA31CUtMAC5ANppQa9yyjfU+nhTOHQ2srsTlv/cn
-   TmxUnr2AQFkf+mS1BCyt1tjAJJ9sX9Ptvz1/URQBg7HBrowEEySp2yQll
-   rh4u+shvrXhNh7S3UUwEoX24i2naL3W1O1jIDBfV49yCuD1jMy1JU6i7w
-   jdqpw436O0OmwJim6PcXd0mCt2UXqzFAWfWbQonCJFsfaSOJE90D28YHu
-   IzoIQ627/Lsc8e/xA8Ry+QBveKdotFR4mUNzGGyE9IKKvrza0lwrRrVr2
-   g==;
-X-CSE-ConnectionGUID: jyphCPPcQyCTKwthCGYGNA==
-X-CSE-MsgGUID: 1qsQrYCTRUKEHjuVxxT6MQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11758"; a="99742428"
-X-IronPort-AV: E=Sophos;i="6.23,179,1770624000"; 
-   d="scan'208";a="99742428"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2026 00:05:16 -0700
-X-CSE-ConnectionGUID: iKbeaX9HTBuu2VDH9NVUcg==
-X-CSE-MsgGUID: hlP3smgrTDWFTsEeAX0Teg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,179,1770624000"; 
-   d="scan'208";a="231744498"
-Received: from guptapa-desk.jf.intel.com (HELO desk) ([10.165.239.46])
-  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2026 00:05:12 -0700
-Date: Tue, 14 Apr 2026 00:05:12 -0700
-From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-To: x86@kernel.org, Jon Kohler <jon@nutanix.com>,
-	Nikolay Borisov <nik.borisov@suse.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	David Kaplan <david.kaplan@amd.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>, KP Singh <kpsingh@kernel.org>,
-	Jiri Olsa <jolsa@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Laight <david.laight.linux@gmail.com>,
-	Andy Lutomirski <luto@kernel.org>,
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-	David Ahern <dsahern@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	Asit Mallick <asit.k.mallick@intel.com>,
-	Tao Zhang <tao1.zhang@intel.com>, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: [PATCH v10 00/12] VMSCAPE optimization for BHI variant
-Message-ID: <20260414-vmscape-bhb-v10-0-efa924abae5f@linux.intel.com>
-X-B4-Tracking: v=1; b=H4sIAJzm3WkC/23SzWrDMAwH8FcpPi/Fkr+infYeYwfbclZDm5SkC
- x2l7z6nbGtTfJRAP/hLuogpjTlN4nVzEWOa85SHvhQgXzYi7nz/mZrMpSFQopEEtpkPU/TH1IR
- daNixtkTOddiJMnEcU5fPN+79o9S7PJ2G8fumz7B0fx3UK2eGRjbsDXQyASnNb/vcf523uT+l/
- TYOB7FoM/4LIMGsBSwCQQzMFJUnWxfUg4BuLagiGEcqolE6kaoL+i4A0FrQRQDPnnWyxBzrgnk
- QcL3P2TQlB7K1SaMKUtYFexdQwlqwyyYtSGYDxoGuC+5PsFI9p3BFCM5655yn1nd1oX0Qnq/ZF
- sG2IRjUQflAdYHugpa4Fmi5pmawIWJ5r0qK6/X6A+rjXXW9AgAA
-X-Change-ID: 20250916-vmscape-bhb-d7d469977f2f
-X-Mailer: b4 0.16-dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93B3C2D8364
+	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 07:05:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.84.57
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776150330; cv=fail; b=CsPp/syGvluunRejPKenJioSqGFF3zaMap1Rri0jMW1jwx44fceBd6mOq+8D/EUfETWFqJCIeOoy/lxvH8zNpZDuWbSdwqHM1tRv40xsEC2PFllFZ4mkUJhWqRHDECIOx3ukAhQxwWOFDEFaFVyUbdwSCXRteaVx7tlDp9w1r60=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776150330; c=relaxed/simple;
+	bh=dnN8wlNLcKJacfQEUcV6/8M2Bj0KAvdgIJxS1sjQ5Z8=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=d7MBc5+cppb/ld9Jr7XJXpH8vxxLizTRxIUs8v1ZVJSBgTD3F7VwcKB1+1Ff1D3c64Gf2nwHRtIT6UwmeSn9itCNCnocyHnKS9FqXn05pGsJTBden+HX0d5jDv7GaYPPw9Eh9mQs/KGAo4uS8Kh9bejzhTVaUwV958DHjRmvFNo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=est.tech; spf=pass smtp.mailfrom=est.tech; dkim=pass (2048-bit key) header.d=est.tech header.i=@est.tech header.b=sWTMO/7U; arc=fail smtp.client-ip=52.101.84.57
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=est.tech
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=est.tech
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=pr3vB8n0GqfEk2iUMTcDvC6j75PDEc6bORXYU0U9vX4le5/vK7jUuQ+6jiIFftxP0svIzS54z1gRf7DqkmTnrRDrWgU/N4xx1VeaBj/ItDzehFSIH9wVOp020Ocg3wIfPNnIWnR7PF2jRKQJ8JW3IEc2bhwQOs9JMJvDqiPb8lhhb0qrgx6HUkh58qFSFmCUUaYd1UDwhNDGghcWat/lndgXNLKkTVkeV6KTMnC1ddWOVARgeGZH3xOQKaFNT42yvY6dCP/gUe6FuvloRsmXjZn1jUKSlXFa4mCUntM4kkWyd416uEplQNRuBykNMwk3nHIekGBinjib9BeQhj8hWA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+27zcSzr7ZfNBGvtVORKiMYrUb2KsAz8H4zJBfQJDzA=;
+ b=WjVxl6vySXRpF89YvIEEpD11nAy5di5OJMywtLq52iZU9pgOGpdEDnOKqyzu3xKTqF+cOKV0TcQuCdxxa7dzhbSmn8TrizRcGhCQN3ruUCevq+vQBuGBcBJaMZHwamSiXT7j5vk6elBGYaTNJOQgCMFWP13ujECDZzgnFm4t1b82rpLw3C6MrfIHrSBXk7qFdvFqi2a5A3hFjmsA0jMQQ6efTOdZBH9inw49QBqaqVJZ9Wzw35nBMwy3OBNFYExRQv3O875syJXJq9yWTZbWk2h3sYaEfJGj/f9zkBr+83ymJLv+HslgKWhWRxAdz0vN4vGEanoqF+aqUYn0GOBaDg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=est.tech; dmarc=pass action=none header.from=est.tech;
+ dkim=pass header.d=est.tech; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=est.tech; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+27zcSzr7ZfNBGvtVORKiMYrUb2KsAz8H4zJBfQJDzA=;
+ b=sWTMO/7U36z9SXWpELn1VaVrANd6cOTMm1/ZrfExYcl5YF0IGclWpN+2tS7gbm0+pIxKX3Q31Kn2ICaZWGaOCVttD/L0Ei4wsOXSgaoA1rw5DwWZAhTzjG3LHEaNu36t6e0yMgH7iXDfkn2w4u6VI3/6pjFo1YHWIFMlkgTErnQyu/xVXT/xdQHP+OOTIWAQplznGWARnX0yZd3/layoVisbUqEAL0t+rV4iF0xt1lkI93Jwhdr4Uw24WqhonA4haY9CV1l9V6BdlfjA95xwROrcPja8o0JoECDZl4dWaBIc/N3FYoQVZwYXr2L+e0KZjou5Wb8kvXZNI8j/IQUTaQ==
+Received: from GV1P189MB1988.EURP189.PROD.OUTLOOK.COM (2603:10a6:150:63::5) by
+ VI1P18901MB0815.EURP189.PROD.OUTLOOK.COM (2603:10a6:800:12a::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.48; Tue, 14 Apr
+ 2026 07:05:24 +0000
+Received: from GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
+ ([fe80::bfff:5391:8a49:21b7]) by GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
+ ([fe80::bfff:5391:8a49:21b7%5]) with mapi id 15.20.9769.046; Tue, 14 Apr 2026
+ 07:05:24 +0000
+From: Tung Quang Nguyen <tung.quang.nguyen@est.tech>
+To: Dudu Lu <phx0fer@gmail.com>
+CC: "jmaloy@redhat.com" <jmaloy@redhat.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+Subject: RE: [PATCH] tipc: Ensure NUL-termination of remote algorithm name
+Thread-Topic: [PATCH] tipc: Ensure NUL-termination of remote algorithm name
+Thread-Index: AQHcyyS0OQwVS2jRCUi+I63KaTpGq7XeIeYg
+Date: Tue, 14 Apr 2026 07:05:24 +0000
+Message-ID:
+ <GV1P189MB19889E0B65316560D9108AEBC6252@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
+References: <20260413085852.76786-1-phx0fer@gmail.com>
+In-Reply-To: <20260413085852.76786-1-phx0fer@gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=est.tech;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: GV1P189MB1988:EE_|VI1P18901MB0815:EE_
+x-ms-office365-filtering-correlation-id: 62005320-7daf-4456-fecb-08de99f4333e
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|1800799024|376014|38070700021|18002099003|22082099003|56012099003;
+x-microsoft-antispam-message-info:
+ 6bTuGfqwqsnEf9sBJys/w6tsTpYoHzeqvqdY9JM1LPfHnSKKefv6hwJk0IVL0Yjt/bCqp9SUrboSpblFQh5lVfj9ke8Yc8mufrgdERvZvcwg3YnHQuVd/+DrcsorX5lNZ9RNAWxotPv/DpJcgOPmNlnNmNKdT2rbc39LZAVrcTfYnt2b8/PU8w7zP2rADe6IusXgrjV9SieUQCcaQdsEqAFpmsdaLKsdUHU2OYo9aiJbRbqIccqkcphOH0hZLbNZpFdvlhXT5G56E2wR2V38MMZHYd1jcW5/tPx7yZqpWpC7O6GB2Vgl7Z/74sc8t+rrVSFI0bTF+QNo8w4pwf6uy2qRn4xMv45Jv9M38uHdSY5n4qvGbgdJuhmj4cSN3+gzNAq7Qm9kxNybrEn1FfSAUoRZjXIaTFkxKoLC3+5y683n0QQXJwGCGlTCRTmFuRuQqUnRKDw+KPiBZ8BlNZijSiJRjRlDYaLuXIDBHTv4lNQ2YFnclhQt6b9QRgZAVvUOVKimJsDFwSrB6cMb4h11Umy/31m6t4p+a+3nChpYXJip2cd3+QRwBO4NnAMxoVDZ2xeZ/N4oqHYiUPnRN7+q7oOJYX4zBlrFJHcCi0VWiDBOjVBPiEaIvY1cvHQP6HGNS0SOMKAlDooXGHCRSV4vQWuLX/x6N7qyR5posssJSwVNQ5z4bA9faeOZHiZTBylUrIe1TFPfDhE5MAik0tMLcpBpUTpl86e/eZRuW2q9g4vJH/sfJyK/7Q2UnrzA8TsdWat9N76oufK/tH8BZZxBtZ1v1RIh/r/xlX3/6nrNQKM=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1P189MB1988.EURP189.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700021)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?pfRe3VRcibM+qdKcmpcaZpxsO4iF7GQw5eqnwL1dX4g2Ir3c5Y9yZpLEhpII?=
+ =?us-ascii?Q?vC2Pn/+PEEhEYHCqWCErx2Fw6nkG33aj2Jcf7ifUlXwYlGCHUDyZd3P3tPJm?=
+ =?us-ascii?Q?G1a36OOInv8L9LMYVrhC93HggCrOJFn8scWDEhVhuHcX2Ilhng16j/z6bE6l?=
+ =?us-ascii?Q?+DSzMMjYIjSQWytohJh07whcJLeyQuII1N9B8zhqCp5hUaQof07+juowu8Mf?=
+ =?us-ascii?Q?kRkRnF29/dOwiSJs3q0vzxYADiT57zbG8K7gabaJ0FZQ/kk6z4PtUVCZvKRu?=
+ =?us-ascii?Q?u86+Uhnp9CCEaOfi9gsf+7gCnbpco3rhsRQIeVv2G9NRTFPZi00hIOjkxopL?=
+ =?us-ascii?Q?XyxsZ7kmnupwmO54IU/hi8LyzeMerMgujbUe9x56Oze6N4RIpi27Ik10YELb?=
+ =?us-ascii?Q?nkVqvoFimvzEc+ZynMDw+7r5chlrp0X0+hzV667nOj5D5tf2T7BE4aXxaBnP?=
+ =?us-ascii?Q?hZx7B8Z3+3yCubtwgrQaEKvzoEk8rLG9isGh6uBWrSukthYr7G4iWWR3jt6Y?=
+ =?us-ascii?Q?V3hd0KAVZefHEcvAbygF6eXkWU68wlpnQKd9ZKZoqen8SksnFNvO9rOwieWr?=
+ =?us-ascii?Q?Ma4gReE5cabJ/zggFQpq/qFumu/rXLLv2i/dTMUfcsuMRaueWH2cVtbJ6inj?=
+ =?us-ascii?Q?EsW6sSFXMCm2T+6zuS4TB/W356rJHvOg7vnDFAAD/omwzeVUu1Nel2mY15St?=
+ =?us-ascii?Q?tYCnbmrkBbj0+gnyVMI7OQwQ0AMKVt3PRMpV86WLgkAwD5YogfRGTS+hGqgE?=
+ =?us-ascii?Q?ATaqZFxqyyl3sR/lCFwAszTGsPK0RIGZI6vYFQBd1aQPSRA9t7t0UsZ4hIwC?=
+ =?us-ascii?Q?ENe1P1kK8QHlOzh46cmRqMJsEJ33J/DjI+6N/6qcccOHzdhXjQyQkirUYjA6?=
+ =?us-ascii?Q?41FcDbm4J6/KocL+QENerP7ma4vmmLU/jdFunCDBZyUgrHVrWwPJBhoFDi+I?=
+ =?us-ascii?Q?CnX636KeQ0ePqOSDuoxe6eFJpuV559yeEUwj4ge7RDqzN0dqrkx7mnjlOtT/?=
+ =?us-ascii?Q?lGmeQwtirFjzaOKgFVPOZCEpC4DjH1QP+Hjwqjhda2jl5QrJSvmK+CfPmt9L?=
+ =?us-ascii?Q?8M8xKVQVvwlrmZ8ahjPUrqJ6B0Su1a0sv2BSLN9xDMbz+tFFs2EsWxVbpBxY?=
+ =?us-ascii?Q?El0HOdVsFGxJAjzIi1T6ycaLNiXYpYU+Pk2qwJhNtrG9bKvkRUBjJH2AZKpg?=
+ =?us-ascii?Q?cg3K+y7KlLI1I/NJixptYO9x2Ps490J4wj1Cg1g9KKsEohs4PySKt6Dp0Kla?=
+ =?us-ascii?Q?mscddx8yxsyZkKJis6WSISR6M22v0neUC7FJCE0+7KZaag94Jzg3ifbxVpLB?=
+ =?us-ascii?Q?tnIUbBOJyF9uBHFkOhc3yjXHfhbYmE9wx5peli+U0tb5Kbdgwz9lDtQeGp+F?=
+ =?us-ascii?Q?UoNSb6mnIs91Adrw5zMEU5Y0JL4fPcYbqpjBYw1sIyVjgw+B/jYZmxWrpVbR?=
+ =?us-ascii?Q?ydCdKQUYHKONfMdC2DJRl/L90aQbiRcfOpCQipPNvGG7XWSFyxfKVYjgHzth?=
+ =?us-ascii?Q?9O76W+TcatzGizXSGhFBBBT9AW4fSHzd66aLuNYDx96dDf5K0tfZOI6tM1jw?=
+ =?us-ascii?Q?oCO0cD9eGSAPsWjLVlYN5hGH9WrdgYlkZK7cpf9FBrr8o/+xb/YIZrUwUCOk?=
+ =?us-ascii?Q?+CoKqjz5/N4Y4t35Kc1+y5qxUZp39LmpggO/ybCZLhUGEdDzm69aHfXMRw5W?=
+ =?us-ascii?Q?a70DI/T0DIMmspn/XvAnaBEI054kWH7B3hLj4vRW5Scu8bk7uKmBzh/hmrTb?=
+ =?us-ascii?Q?qIDYHsAfsg=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+X-OriginatorOrg: est.tech
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: 62005320-7daf-4456-fecb-08de99f4333e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Apr 2026 07:05:24.3916
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: d2585e63-66b9-44b6-a76e-4f4b217d97fd
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: X96m0wVR1/TriZCl/YSI9IMuSccxLcRY0by1DdYtJL4CHLVfu37753IXj855kzlxEO6EALLVdaL4hf0deEQ5Mnfv+V3WEze667CulfMqhH8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1P18901MB0815
+X-Spamd-Result: default: False [0.34 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	R_DKIM_ALLOW(-0.20)[est.tech:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-278304-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-278305-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[kernel.org,nutanix.com,suse.com,zytor.com,amd.com,google.com,alien8.de,linux.intel.com,infradead.org,iogearbox.net,davemloft.net,gmail.com,redhat.com,linux.dev,fomichev.me,lwn.net];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[37];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FREEMAIL_TO(0.00)[gmail.com];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	DMARC_NA(0.00)[est.tech];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_THREE(0.00)[3];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pawan.kumar.gupta@linux.intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
+	FROM_NEQ_ENVFROM(0.00)[tung.quang.nguyen@est.tech,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[est.tech:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.intel.com:mid,intel.com:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,ethz.ch:url]
-X-Rspamd-Queue-Id: C62363F65B3
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,est.tech:dkim,GV1P189MB1988.EURP189.PROD.OUTLOOK.COM:mid]
+X-Rspamd-Queue-Id: 22CF73F668B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-v10:
-- Add patches to define EXPORT_STATIC_CALL_FOR_MODULES() and
-  EXPORT_STATIC_CALL_FOR_KVM(), so that vmscape_predictor_flush static key
-  is only accessible to KVM and not to other kernel modules. (PeterZ)
-  (Borisov earlier objected to exporting the static key to all modules, but
-  now the static key is only exported to KVM. I guess that resolves the
-  concern.)
-- Avoid an explicit call to vmscape_mitigation_enabled() and instead use
-  static_call_query() in VMexit hot path. (Sean)
-- Drop vmscape_mitigation_enabled(), as it is no longer needed.
-- Rebased to v7.0
-
-v9: https://lore.kernel.org/r/20260402-vmscape-bhb-v9-0-94d16bc29774@linux.intel.com
-- Use global variables for BHB loop counters instead of ALTERNATIVE-based
-  approach. (Dave & others)
-- Use 32-bit registers (%eax/%ecx) for loop counters, loaded via movzbl
-  from 8-bit globals. 8-bit registers (e.g. %ah in the inner loop) caused
-  performance regression on certain CPUs due to partial-register stalls. (David Laight)
-- Let BPF save/restore %rax/%rcx as in the original implementation, since
-  it is the only caller that needs these registers preserved across the
-  BHB clearing sequence.
-- Drop Reviewed-by from patch 2/10 as the implementation changed significantly.
-- Apply Tested-by from Jon Kohler to the series (except patch 2/10).
-- Fix commit message grammar. (Borislav)
-- Rebased to v7.0-rc6.
-
-v8: https://lore.kernel.org/r/20260324-vmscape-bhb-v8-0-68bb524b3ab9@linux.intel.com
-- Use helper in KVM to convey the mitigation status. (PeterZ/Borisov)
-- Fix the documentation for default vmscape mitigation. (BPF bot)
-- Remove the stray lines in bug.c (BPF bot).
-- Updated commit messages and comments.
-- Rebased to v7.0-rc5.
-
-v7: https://lore.kernel.org/r/20260319-vmscape-bhb-v7-0-b76a777a98af@linux.intel.com
-- s/This allows/Allow/ and s/This does adds/This adds/ in patch 1/10 commit
-  message (Borislav).
-- Minimize register usage in BHB clearing seq. (David Laight)
-  - Instead of separate ecx/eax counters, use al/ah.
-  - Adjust the alignment of RET due to register size change.
-  - save/restore rax in the seq itself.
-  - Remove the save/restore of rax/rcx for BPF callers.
-- Rename clear_bhb_loop() to clear_bhb_loop_nofence() to make it
-  obvious that the LFENCE is not part of the sequence (Borislav).
-- Fix Kconfig: s/select/depends on/ HAVE_STATIC_CALL (PeterZ).
-- Rebased to v7.0-rc4.
-
-v6: https://lore.kernel.org/r/20251201-vmscape-bhb-v6-0-d610dd515714@linux.intel.com
-- Remove semicolon at the end of asm in ALTERNATIVE (Uros).
-- Fix build warning in vmscape_select_mitigation() (LKP).
-- Rebased to v6.18.
-
-v5: https://lore.kernel.org/r/20251126-vmscape-bhb-v5-2-02d66e423b00@linux.intel.com
-- For BHI seq, limit runtime-patching to loop counts only (Dave).
-  Dropped 2 patches that moved the BHB seq to a macro.
-- Remove redundant switch cases in vmscape_select_mitigation() (Nikolay).
-- Improve commit message (Nikolay).
-- Collected tags.
-
-v4: https://lore.kernel.org/r/20251119-vmscape-bhb-v4-0-1adad4e69ddc@linux.intel.com
-- Move LFENCE to the callsite, out of clear_bhb_loop(). (Dave)
-- Make clear_bhb_loop() work for larger BHB. (Dave)
-  This now uses hardware enumeration to determine the BHB size to clear.
-- Use write_ibpb() instead of indirect_branch_prediction_barrier() when
-  IBPB is known to be available. (Dave)
-- Use static_call() to simplify mitigation at exit-to-userspace. (Dave)
-- Refactor vmscape_select_mitigation(). (Dave)
-- Fix vmscape=on which was wrongly behaving as AUTO. (Dave)
-- Split the patches. (Dave)
-  - Patch 1-4 prepares for making the sequence flexible for VMSCAPE use.
-  - Patch 5 trivial rename of variable.
-  - Patch 6-8 prepares for deploying BHB mitigation for VMSCAPE.
-  - Patch 9 deploys the mitigation.
-  - Patch 10-11 fixes ON Vs AUTO mode.
-
-v3: https://lore.kernel.org/r/20251027-vmscape-bhb-v3-0-5793c2534e93@linux.intel.com
-- s/x86_pred_flush_pending/x86_predictor_flush_exit_to_user/ (Sean).
-- Removed IBPB & BHB-clear mutual exclusion at exit-to-userspace.
-- Collected tags.
-
-v2: https://lore.kernel.org/r/20251015-vmscape-bhb-v2-0-91cbdd9c3a96@linux.intel.com
-- Added check for IBPB feature in vmscape_select_mitigation(). (David)
-- s/vmscape=auto/vmscape=on/ (David)
-- Added patch to remove LFENCE from VMSCAPE BHB-clear sequence.
-- Rebased to v6.18-rc1.
-
-v1: https://lore.kernel.org/r/20250924-vmscape-bhb-v1-0-da51f0e1934d@linux.intel.com
-
-Hi All,
-
-These patches aim to improve the performance of a recent mitigation for
-VMSCAPE[1] vulnerability. This improvement is relevant for BHI variant of
-VMSCAPE that affect Alder Lake and newer processors.
-
-The current mitigation approach uses IBPB on kvm-exit-to-userspace for all
-affected range of CPUs. This is an overkill for CPUs that are only affected
-by the BHI variant. On such CPUs clearing the branch history is sufficient
-for VMSCAPE, and also more apt as the underlying issue is due to poisoned
-branch history.
-
-Below is the iPerf data for transfer between guest and host, comparing IBPB
-and BHB-clear mitigation. BHB-clear shows performance improvement over IBPB
-in most cases.
-
-Platform: Emerald Rapids
-Baseline: vmscape=off
-Target: IBPB at VMexit-to-userspace Vs the new BHB-clear at
-	VMexit-to-userspace mitigation (both compared against baseline).
-
-(pN = N parallel connections)
-
-| iPerf user-net | IBPB    | BHB Clear |
-|----------------|---------|-----------|
-| UDP 1-vCPU_p1  | -12.5%  |   1.3%    |
-| TCP 1-vCPU_p1  | -10.4%  |  -1.5%    |
-| TCP 1-vCPU_p1  | -7.5%   |  -3.0%    |
-| UDP 4-vCPU_p16 | -3.7%   |  -3.7%    |
-| TCP 4-vCPU_p4  | -2.9%   |  -1.4%    |
-| UDP 4-vCPU_p4  | -0.6%   |   0.0%    |
-| TCP 4-vCPU_p4  |  3.5%   |   0.0%    |
-
-| iPerf bridge-net | IBPB    | BHB Clear |
-|------------------|---------|-----------|
-| UDP 1-vCPU_p1    | -9.4%   |  -0.4%    |
-| TCP 1-vCPU_p1    | -3.9%   |  -0.5%    |
-| UDP 4-vCPU_p16   | -2.2%   |  -3.8%    |
-| TCP 4-vCPU_p4    | -1.0%   |  -1.0%    |
-| TCP 4-vCPU_p4    |  0.5%   |   0.5%    |
-| UDP 4-vCPU_p4    |  0.0%   |   0.9%    |
-| TCP 1-vCPU_p1    |  0.0%   |   0.9%    |
-
-| iPerf vhost-net | IBPB    | BHB Clear |
-|-----------------|---------|-----------|
-| UDP 1-vCPU_p1   | -4.3%   |   1.0%    |
-| TCP 1-vCPU_p1   | -3.8%   |  -0.5%    |
-| TCP 1-vCPU_p1   | -2.7%   |  -0.7%    |
-| UDP 4-vCPU_p16  | -0.7%   |  -2.2%    |
-| TCP 4-vCPU_p4   | -0.4%   |   0.8%    |
-| UDP 4-vCPU_p4   |  0.4%   |  -0.7%    |
-| TCP 4-vCPU_p4   |  0.0%   |   0.6%    |
-
-[1] https://comsec.ethz.ch/research/microarch/vmscape-exposing-and-exploiting-incomplete-branch-predictor-isolation-in-cloud-environments/
-
----
-Pawan Gupta (12):
-      x86/bhi: x86/vmscape: Move LFENCE out of clear_bhb_loop()
-      x86/bhi: Make clear_bhb_loop() effective on newer CPUs
-      x86/bhi: Rename clear_bhb_loop() to clear_bhb_loop_nofence()
-      x86/vmscape: Rename x86_ibpb_exit_to_user to x86_predictor_flush_exit_to_user
-      x86/vmscape: Move mitigation selection to a switch()
-      x86/vmscape: Use write_ibpb() instead of indirect_branch_prediction_barrier()
-      static_call: Add EXPORT_STATIC_CALL_FOR_MODULES()
-      kvm: Define EXPORT_STATIC_CALL_FOR_KVM()
-      x86/vmscape: Use static_call() for predictor flush
-      x86/vmscape: Deploy BHB clearing mitigation
-      x86/vmscape: Resolve conflict between attack-vectors and vmscape=force
-      x86/vmscape: Add cmdline vmscape=on to override attack vector controls
-
- Documentation/admin-guide/hw-vuln/vmscape.rst   | 15 ++++-
- Documentation/admin-guide/kernel-parameters.txt |  6 +-
- arch/x86/Kconfig                                |  1 +
- arch/x86/entry/entry_64.S                       | 21 ++++---
- arch/x86/include/asm/cpufeatures.h              |  2 +-
- arch/x86/include/asm/entry-common.h             | 13 ++--
- arch/x86/include/asm/kvm_types.h                |  1 +
- arch/x86/include/asm/nospec-branch.h            | 15 +++--
- arch/x86/kernel/cpu/bugs.c                      | 84 +++++++++++++++++++++----
- arch/x86/kvm/x86.c                              |  4 +-
- arch/x86/net/bpf_jit_comp.c                     |  4 +-
- include/linux/kvm_types.h                       | 13 +++-
- include/linux/static_call.h                     |  8 +++
- 13 files changed, 150 insertions(+), 37 deletions(-)
----
-base-commit: 028ef9c96e96197026887c0f092424679298aae8
-change-id: 20250916-vmscape-bhb-d7d469977f2f
-
-Best regards,
---  
-Thanks,
-Pawan
-
+>Subject: [PATCH] tipc: Ensure NUL-termination of remote algorithm name
+>
+>In tipc_crypto_key_rcv(), the algorithm name is copied from the incoming
+>message using memcpy with a fixed size of TIPC_AEAD_ALG_NAME (32 bytes).
+>If the remote peer sends a name that fills all 32 bytes without a NUL
+>terminator, the alg_name field will not be NUL-terminated. This string is =
+later
+>passed to crypto_alloc_aead() which expects a NUL-terminated string,
+>potentially causing an out-of-bounds read when the crypto subsystem
+>searches for the algorithm by name.
+TIPC only supports one algorithm name "gcm(aes)" which is 8-byte length.
+So, there is no " name that fills all 32 bytes" as you mentioned.
+>
+>Fix by explicitly NUL-terminating the last byte of alg_name after the memc=
+py.
+>
+>Fixes: 1ef6f7c9390f ("tipc: add automatic session key exchange")
+>Signed-off-by: Dudu Lu <phx0fer@gmail.com>
+>---
+> net/tipc/crypto.c | 1 +
+> 1 file changed, 1 insertion(+)
+>
+>diff --git a/net/tipc/crypto.c b/net/tipc/crypto.c index
+>d3046a39ff72..ac072356bf0c 100644
+>--- a/net/tipc/crypto.c
+>+++ b/net/tipc/crypto.c
+>@@ -2325,6 +2325,7 @@ static bool tipc_crypto_key_rcv(struct tipc_crypto
+>*rx, struct tipc_msg *hdr)
+> 	/* Copy key from msg data */
+> 	skey->keylen =3D keylen;
+> 	memcpy(skey->alg_name, data, TIPC_AEAD_ALG_NAME);
+>+	skey->alg_name[TIPC_AEAD_ALG_NAME - 1] =3D '\0';
+This is not needed as explained above.
+> 	memcpy(skey->key, data + TIPC_AEAD_ALG_NAME + sizeof(__be32),
+> 	       skey->keylen);
+>
+>--
+>2.39.3 (Apple Git-145)
+>
 
 
