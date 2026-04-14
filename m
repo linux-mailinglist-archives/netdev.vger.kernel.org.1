@@ -1,157 +1,143 @@
-Return-Path: <netdev+bounces-278599-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278600-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ULNUKtzP3ml0IgAAu9opvQ
-	(envelope-from <netdev+bounces-278599-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 01:38:04 +0200
+	id wJa3FDnQ3ml0IgAAu9opvQ
+	(envelope-from <netdev+bounces-278600-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 01:39:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BB653FF14B
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 01:38:04 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D3833FF19E
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 01:39:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 314A530B0727
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 23:36:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5DCCE3036D42
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 23:38:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAAFC3CEB84;
-	Tue, 14 Apr 2026 23:36:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF3A435C19D;
+	Tue, 14 Apr 2026 23:38:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="IspQtOly"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="kEv//FjR"
 X-Original-To: netdev@vger.kernel.org
-Received: from outbound.ms.icloud.com (p-west3-cluster5-host9-snip4-3.eps.apple.com [57.103.72.86])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2D5B3CCA02
-	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 23:36:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.72.86
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A5603CB2EA;
+	Tue, 14 Apr 2026 23:38:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776209778; cv=none; b=lvQHiVmsvV4mVV/qVcRvOWwrfXk+uuhQjRsU+kvNUtOo7/KbziMJAfZj2jdPZnA5q8Hw0oHPGg7gYg/gQE7S7q4iX7oQjt1uyh4NbxGNPGKu3chqtb4NeFCRGLsJyrkOG7Y857bVe0kdG23gz9+TCc1/BFcJz+QfwCkZ07w3NSU=
+	t=1776209916; cv=none; b=UcVwyIecbavsDbeEXAqHGpWRahQnbJ9uW0OrTnkFQnBE/2jdeELL6x67LysjdG0GU9JLumLJPHyI9Rs2MA0/ibnwrXpRbFw2oF8sf4sokMXGRwStFAznVJQlss8Mg1gJzDHwvH5EBss7FmdK06FrxGxwoQyEqlvSH6yNFYHezRc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776209778; c=relaxed/simple;
-	bh=/is+ISiFTsGRxrCqkX2ae/QgdazHgSMWgrCeT+K+ACs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=s5v+2oV04OlHhVvVR7Z1OW4fNKgIALFy4/l6fqaxWOZiFgPbzTVijJW+U2f/hvgMeAv45v3ZqHulPmOiIVhTIeSI46XEw9GvRFrXGw/yYcZRJ5RLl7fgXHCyk+HwLG9G6M9j1cWYfPipba8747x/O4cqdg3n4U3LdlvjU5sFC/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=IspQtOly; arc=none smtp.client-ip=57.103.72.86
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
-Received: from outbound.ms.icloud.com (unknown [127.0.0.2])
-	by p00-icloudmta-asmtp-us-west-3a-100-percent-8 (Postfix) with ESMTPS id 9B77018000B6;
-	Tue, 14 Apr 2026 23:36:15 +0000 (UTC)
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com; s=1a1hai; t=1776209777; x=1778801777; bh=sMfRl873E8ikWe9vuUyT4zRihNQqfNfGBczSTfHe588=; h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:x-icloud-hme; b=IspQtOlyKTFTFmwTgQKcra6JTEnqlJj3jilwRwmxlofMI4ePBdITfLV07CLoDd/Vgb0v9Y1KONUy0DIdwFIlx1tWEYii/pbw6yGJShEJi4dvOjxTWZqbpmYIIYSRHZkR2AvypHNKjQyx/fS6UBRSxrYlOht7GrmYkki+IB3VjztfHRi46Xzld4zdB7K+OxW88PFNVBcfTAYfOPt0uNRtujf1fCIVi6WqtNstjvTX5asbQCLCg/Lp//hqqEXHUz085foSNKneNMkVbh4aBL0jrta+vRrD6jUZBy++swNixyi/2eKQQBN+bCtPY6xEe1eNM201Pp38kFif8TA4DMcU2g==
-Received: from mainframe.tailfb0f7b.ts.net (unknown [17.57.154.37])
-	by p00-icloudmta-asmtp-us-west-3a-100-percent-8 (Postfix) with ESMTPSA id 41B0E18000CF;
-	Tue, 14 Apr 2026 23:36:13 +0000 (UTC)
-From: =?UTF-8?q?Lek=C3=AB=20Hap=C3=A7iu?= <snowwlake@icloud.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	=?UTF-8?q?Lek=C3=AB=20Hap=C3=A7iu?= <framemain@outlook.com>
-Subject: [PATCH net v3 4/4] nfc: llcp: fix OOB read of DM reason byte in nfc_llcp_recv_dm
-Date: Wed, 15 Apr 2026 01:35:33 +0200
-Message-ID: <20260414233534.55973-5-snowwlake@icloud.com>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1776209916; c=relaxed/simple;
+	bh=6WDWty/8aY0CpyFn2wQvvOFo01God1rk6PU0DkYmRH8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ML3mH1qqGrJP3D0IvSN7+0dXqrFFmAFMil5SkqgELuEtZEQYOIzqjQBzToK8tqR7WbgcMY2Roi4ecAb4qAa+S7dikrQ3dNB4Yaa2XGfOXD8t88lNJXL9m5GEKHn0I1YgKX9kGF51V/wh/AgR+1Dkn4JYrHrGE6SXAVIR32Htw0A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=kEv//FjR; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=qsfu9lx4dXimVzqfgFepm2Tp9mFrZ4Nb+jaMnc5/0X4=; b=kEv//FjRuUw5o4UhL3TeCbPuWA
+	p+MeVy8AyzkuRCdgqCCDcnaA5M1UdFz56HTv5huTaI3CkuPRMupExuBpJBHIZz73EC4F+4Tp552qW
+	Tk497M0v1Eq2X+2bjhyKIKtOCVdM81KcBCVn05KMO9/UzLatmDjcbiQq4ZeTndKquH2g=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wCnKv-00G6tv-0U; Wed, 15 Apr 2026 01:38:29 +0200
+Date: Wed, 15 Apr 2026 01:38:28 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
+	Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+Subject: Re: [PATCH net-next v9 03/10] net: phylink: Register a phy_port for
+ MAC-driven SFP busses
+Message-ID: <7838a71b-ae3a-4681-8516-c450ea8a5321@lunn.ch>
+References: <20260403123755.175742-1-maxime.chevallier@bootlin.com>
+ <20260403123755.175742-4-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-GUID: HP_WtEuZwVDPRcYWtqQSVaFmedxO7wr5
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDE0MDIyMCBTYWx0ZWRfXwnS9KvTpitHk
- jFlo7Pa+Y7ZuBNaz91LkLE1+cE/rt0psETdVF4gTP90dYGqmZ9XB2eDSNNRO6h7J8W2prxiMs+1
- EusPC4PmxotKI0HIaQTO7QEQodju/Rz6ZeYKMMUfJQq7GmFlkp6g/QsM3SE0cplyGcIu1EtBU4H
- 9pSwKddB895K+IQvCsqqf5MpBbR9zu44i1Wp9xgiLnP4G3YnOWnd8ADUtPn6Cu7clEkyt3fP+Qq
- /EoyFx6K7z/HOybtKUaEbDrWQwMEbUWipTnK/HYQyFSbSCqgw7BgVxh+XDO8KC+FtFnLGfrWDpa
- 16rqccG79W9Nlrn21649V//2uzRRHYfTm+ka4F3ZYTgunqEIEaj9WPgWaXOVyQ=
-X-Authority-Info-Out: v=2.4 cv=Xqr3+FF9 c=1 sm=1 tr=0 ts=69decf70
- cx=c_apl:c_pps:t_out a=qkKslKyYc0ctBTeLUVfTFg==:117 a=IkcTkHD0fZMA:10
- a=A5OVakUREuEA:10 a=M51BFTxLslgA:10 a=x7bEGLp0ZPQA:10 a=LbuW6tbUWPcA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=UqCG9HQmAAAA:8 a=VwQbUJbxAAAA:8
- a=DIMQZ1PCNJLnr07J7f4A:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
-X-Proofpoint-ORIG-GUID: HP_WtEuZwVDPRcYWtqQSVaFmedxO7wr5
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-04-14_04,2026-04-13_04,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- spamscore=0 mlxlogscore=999 bulkscore=0 phishscore=0 mlxscore=0
- malwarescore=0 adultscore=0 lowpriorityscore=0 clxscore=1015 classifier=spam
- authscore=0 adjust=0 reason=mlx scancount=1 engine=8.22.0-2601150000
- definitions=main-2604140220
-X-Spamd-Result: default: False [-0.63 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260403123755.175742-4-maxime.chevallier@bootlin.com>
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MIXED_CHARSET(0.53)[subject];
-	DMARC_POLICY_ALLOW(-0.50)[icloud.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[icloud.com:s=1a1hai];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,outlook.com];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278599-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[icloud.com:+];
+	TAGGED_FROM(0.00)[bounces-278600-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,google.com,redhat.com,armlinux.org.uk,gmail.com,vger.kernel.org,bootlin.com,csgroup.eu,nxp.com,pengutronix.de,chromium.org,makrotopia.org,liebherr.com];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[snowwlake@icloud.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	FREEMAIL_FROM(0.00)[icloud.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[icloud.com:dkim,icloud.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,outlook.com:email]
-X-Rspamd-Queue-Id: 3BB653FF14B
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:dkim,lunn.ch:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9D3833FF19E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Lekë Hapçiu <framemain@outlook.com>
+> This phy_port represents the SFP cage itself, and not the module
 
-nfc_llcp_recv_dm() reads skb->data[2] (the DM reason byte) without
-first verifying that skb->len is at least LLCP_HEADER_SIZE + 1.  A DM
-PDU carrying only the 2-byte LLCP header from a rogue peer therefore
-triggers a 1-byte OOB read.
+> +static int phylink_create_sfp_port(struct phylink *pl)
 
-Add the minimum-length guard at function entry, matching the pattern
-used by nfc_llcp_recv_snl() and nfc_llcp_recv_agf().
+I'm thinking about naming here. If this represent the cage, why not
+call this phylink_create_sfp_cage_port(). I assume as some point there
+is going to be something for the module, and it seem like the naming
+is going to be confusing.
 
-Reachable from any NFC peer within ~4 cm once an LLCP link is up.
+> +{
+> +	struct phy_port *port;
+> +	int ret = 0;
+> +
+> +	if (!pl->netdev || !pl->sfp_bus)
+> +		return 0;
+> +
+> +	port = phy_port_alloc();
+> +	if (!port)
+> +		return -ENOMEM;
+> +
+> +	port->is_sfp = true;
+> +	port->is_mii = true;
+> +	port->active = true;
 
-Fixes: d646960f7986 ("NFC: Add LLCP sockets")
-Cc: stable@vger.kernel.org
-Signed-off-by: Lekë Hapçiu <framemain@outlook.com>
----
- net/nfc/llcp_core.c | 5 +++++
- 1 file changed, 5 insertions(+)
+If this is a cage, not a module, does is_sfp = true make sense?
 
-diff --git a/net/nfc/llcp_core.c b/net/nfc/llcp_core.c
-index efe228f96..6baf2fc6b 100644
---- a/net/nfc/llcp_core.c
-+++ b/net/nfc/llcp_core.c
-@@ -1237,6 +1237,11 @@ static void nfc_llcp_recv_dm(struct nfc_llcp_local *local,
- 	struct sock *sk;
- 	u8 dsap, ssap, reason;
- 
-+	if (skb->len < LLCP_HEADER_SIZE + 1) {
-+		pr_err("Malformed DM PDU\n");
-+		return;
-+	}
-+
- 	dsap = nfc_llcp_dsap(skb);
- 	ssap = nfc_llcp_ssap(skb);
- 	reason = skb->data[2];
--- 
-2.51.0
+And what does an active cage mean?
 
+	Andrew
 
