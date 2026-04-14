@@ -1,201 +1,189 @@
-Return-Path: <netdev+bounces-278540-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278541-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4OTJEe9p3ml6EAAAu9opvQ
-	(envelope-from <netdev+bounces-278540-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 18:23:11 +0200
+	id OP2FEmFr3mm5EAAAu9opvQ
+	(envelope-from <netdev+bounces-278541-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 18:29:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id C73C53FC819
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 18:23:10 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCA1C3FC949
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 18:29:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C9CA130AF1D0
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 16:18:59 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id CF4FE3073607
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 16:23:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CFD23ED5A3;
-	Tue, 14 Apr 2026 16:18:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9330A3E8C72;
+	Tue, 14 Apr 2026 16:23:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="VNKHyQ15"
+	dkim=pass (1024-bit key) header.d=1wt.eu header.i=@1wt.eu header.b="GmH2UP0S"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f226.google.com (mail-pl1-f226.google.com [209.85.214.226])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mta1.formilux.org (mta1.formilux.org [51.159.59.229])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DA2C3ED119
-	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 16:18:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.226
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 133AC2FF160;
+	Tue, 14 Apr 2026 16:23:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.159.59.229
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776183527; cv=none; b=WFSp/h5hdaunBtXVyEaa5BDIbhEH2pCtnP9/2syNrlc+adS4IqKXMjh/b4a4jLReltVWid2BqLQ7XzfvL8+o2yEmad77RMJ7xFTKaOw+c/kgZfUcjsxmVo8Cgaz2wjhPS2NX3SvZPBmTcgJFyH3glqIUPHpQpui4q72RdhFC7xc=
+	t=1776183815; cv=none; b=F1e3110v7wExYSfU75bLCQm0Oz1W7uRcvvioUvzdXcJ3AYjbtMYYsybgTp6XCPAmPZcfkS866NKDNsAdoDF44PUReGZJ2Q9bYlGPUDTeLvhhSEU+jzYIOfrD0aB+XY1r5SRXpHVER43sscZz9Z27zHNQGgecTZhKNmSI3yLDeXA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776183527; c=relaxed/simple;
-	bh=GCgDDpu2B53/qUhZyvshhcXz2298Bd+Oje9z+1iRt9g=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EY85xutdhWX5giAIKKDCAk/thtvwIFwb6tSfG+k7up5T2IgKHYlJrCsZw8gRFDlF8peCcMBtzoOT/qnvzcSoxOb79kDsAvCcYfr0Zq5LHW/eV4U5kPL8tNpY4lMaDpuug+dRwZ8/PhtJ1HBtDmpYS0yJ+fGgHQJBDHr6QiMCJjc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=VNKHyQ15; arc=none smtp.client-ip=209.85.214.226
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f226.google.com with SMTP id d9443c01a7336-2b458ca2296so18098545ad.0
-        for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 09:18:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776183525; x=1776788325;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:dkim-signature:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3zw7X0VqXssjVHJZjNzeBf7bZ6UNYJogP4btvXmnLlo=;
-        b=IvXQknLqs++8W1zPFPau/JcTDzjapR6/f2Kxn5D9dEZVEs4yYUd4jHyV0dAXQzo8fp
-         jbnJDIu+2CDDPZvu1zVEhaLm+CnnzxDUtjB3CXoGZ4tw8txueIphMDl5DGIO994kQ6oK
-         CDNPYsQjf1jazKwAKVvrc+mkxxAs3bsZDjaMJVcNjHsMDzT3kkVQOPX/JHodGnkp7SbN
-         2BWMbFIsa4ESBdon8v2hlyW7uUj+xX8Gd1E9VGGcuemYOkVcXOknyabHGS7yFViBF/GY
-         XQdaUaNtPSWLqp/dAdVeLXEAuZ2uXypRQ3x0L959Fc5N3bIfE4z7JCZidE6soCems1RI
-         CjzA==
-X-Gm-Message-State: AOJu0YzfibCLFYCkWI3SprB8u6sCDg8q2Z9b7N0bRbsaqmOULHyoMHFh
-	zEhAuyT2ZRd4etfhMno1izl/H8QFHOFOBwJvfL6XaavLr2duy5w7692iffKUTnJyZpmhIkfvJgz
-	Jcxsbqxf2E6ldme4H96VkZ+aoTkdTmlmMzwTOe29+SwJbKPTJdR0UnOxjZ001dhcpCv1TwZxRJK
-	qezuopc8kN8p5I0ceO9J1gWqN9ymL93wkzHSn9z7XyRz/vgofo2twK4e+3WQ8GZTcn349o25HuP
-	JsHH/EyQA==
-X-Gm-Gg: AeBDiessouUeCJA29LulW6wvTy8os6bIrsiY7hjYfNhdyJKlFgF6fD08PL2f20PnpED
-	V+1/OD2H8eVmo6HDnGF8Rg/3WwPid3YDvRqXjwSNixr2oSQvdLg+zHBTfyG8NQ7pV6Lk1qZYTYp
-	g5vQWfFTZtd/WVWFYHz4vpfSnjN09ycgfpUSac0DN9D9UffCRonLyVvna61LKm+e+bn1ZGGqWCx
-	TLs5MQ6dfUTn1e+unPHhoz6BhjMdBbRNXB2myBwTYtbK74wQxNEHLxOzJlPKwALmoMuDFvSSnC2
-	3EZCG9irUKPr9UOcTUCKRHNJ8r/IWEwXSzYTQpxCD01rHC/efdE5qhNEHHwIgLQd6pwQKS+U0KI
-	u5UzC/cRNCTNGw39J8zoIsn0CAShYwhtg8sgBNgTwdWUM+3E/qw6DnkuI1wdDSSeVt3jrV1WW1F
-	RC2HPn70VesYOHOx2moM1QqzmLAEurFA7sPo8lGwB4H4KHBIOifKbAzWU=
-X-Received: by 2002:a17:903:98c:b0:2b4:5b1a:d09c with SMTP id d9443c01a7336-2b45b1ad1ddmr97768705ad.15.1776183525141;
-        Tue, 14 Apr 2026 09:18:45 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-29.dlp.protect.broadcom.com. [144.49.247.29])
-        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-2b2eaeccbdfsm7303535ad.36.2026.04.14.09.18.44
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 14 Apr 2026 09:18:45 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-c7424d91b2dso3039798a12.1
-        for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 09:18:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1776183523; x=1776788323; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3zw7X0VqXssjVHJZjNzeBf7bZ6UNYJogP4btvXmnLlo=;
-        b=VNKHyQ15TGxGCLegdxdXnuMT5r12wPOxnla5f/2VgLqBJEcgeGot8j+G8BTH5Qdrmq
-         Q6XTEKebPNYY8g1RiOkdZ99bzsjAlI2Z+5fYKvdM6X0650aaFX7LprrxbR7OwgZ0gpkw
-         FgzPHVXrKLO2E1QNZ5uJOw7l/7uQ7hCTDItAM=
-X-Received: by 2002:a05:6a20:12ce:b0:398:c0ba:9cfd with SMTP id adf61e73a8af0-39fe3c2d400mr19264368637.1.1776183523208;
-        Tue, 14 Apr 2026 09:18:43 -0700 (PDT)
-X-Received: by 2002:a05:6a20:12ce:b0:398:c0ba:9cfd with SMTP id adf61e73a8af0-39fe3c2d400mr19264331637.1.1776183522630;
-        Tue, 14 Apr 2026 09:18:42 -0700 (PDT)
-Received: from localhost.localdomain ([192.19.203.250])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c79219cbc21sm12042656a12.17.2026.04.14.09.18.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Apr 2026 09:18:41 -0700 (PDT)
-From: Vikas Gupta <vikas.gupta@broadcom.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	vsrama-krishna.nemani@broadcom.com,
-	bhargava.marreddy@broadcom.com,
-	rajashekar.hudumula@broadcom.com,
-	ajit.khaparde@broadcom.com,
-	dharmender.garg@broadcom.com,
-	rahul-rg.gupta@broadcom.com,
-	Vikas Gupta <vikas.gupta@broadcom.com>
-Subject: [PATCH net 2/2] bnge: remove unsupported backing store type
-Date: Tue, 14 Apr 2026 21:48:22 +0530
-Message-ID: <20260414161822.742382-3-vikas.gupta@broadcom.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20260414161822.742382-1-vikas.gupta@broadcom.com>
-References: <20260414161822.742382-1-vikas.gupta@broadcom.com>
+	s=arc-20240116; t=1776183815; c=relaxed/simple;
+	bh=6uDb7kejujBqUUB9ZxrJQJb7QoGJK8VBUq9D7VjAZx0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qHXu/NQKyRHD2CxlLBkkDW33Qadw52ARpI3j8EKAam/sGGfxteZuPfBa3zNi+DvWg5oU7947txl2J9vUwbiAAeBRMFyr/07kaWM5pfW51xIYGCXDnKaI6b4rO8hOgoEeX8wpRAI2t5FOu+nRKZpGa5mRscwA4u35fFaHXmFLS8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=1wt.eu; spf=pass smtp.mailfrom=1wt.eu; dkim=pass (1024-bit key) header.d=1wt.eu header.i=@1wt.eu header.b=GmH2UP0S; arc=none smtp.client-ip=51.159.59.229
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=1wt.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=1wt.eu
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=1wt.eu; s=mail;
+	t=1776183800; bh=A9w41jfbeBcNMsPNcn43GbwXzCi67ge8k9Gp5bHo37k=;
+	h=From:Message-ID:From;
+	b=GmH2UP0S4F7NTFLQSPWUt+Y5+qVp/NHGAtFg4tdsJhORGacHG5wIrP2H3n0G6qrhA
+	 asVFgL6ZDuexsnNfzXdP3DhXk2ZLSPsICUhm0e5W70m+gHbNYdyxlh39Nobyhdma8Y
+	 bX+SSXby8ukWX0KhRqRJ4GXrFbxrnkp+CXl7YADs=
+Received: from 1wt.eu (ded1.1wt.eu [163.172.96.212])
+	by mta1.formilux.org (Postfix) with ESMTP id 0EAD9C2E94;
+	Tue, 14 Apr 2026 18:23:20 +0200 (CEST)
+Date: Tue, 14 Apr 2026 18:23:09 +0200
+From: Willy Tarreau <w@1wt.eu>
+To: Pavitra Jha <jhapavitra98@gmail.com>
+Cc: pabeni@redhat.com, chandrashekar.devegowda@intel.com,
+        linux-wwan@lists.linux.dev, netdev@vger.kernel.org,
+        stable@vger.kernel.org
+Subject: Re: [PATCH v2] net: wwan: t7xx: validate port_count against message
+ length in t7xx_port_enum_msg_handler
+Message-ID: <ad5p7XlSOKoaQC5D@1wt.eu>
+References: <ad4-bTbjtxbUXDU9@1wt.eu>
+ <20260414153201.1633720-1-jhapavitra98@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260414153201.1633720-1-jhapavitra98@gmail.com>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[1wt.eu,none];
+	R_DKIM_ALLOW(-0.20)[1wt.eu:s=mail];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278540-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[broadcom.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_FROM(0.00)[bounces-278541-lists,netdev=lfdr.de];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vikas.gupta@broadcom.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,broadcom.com:email,broadcom.com:dkim,broadcom.com:mid];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[w@1wt.eu,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[1wt.eu:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.997];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: C73C53FC819
+	RCPT_COUNT_FIVE(0.00)[6];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,1wt.eu:dkim,1wt.eu:mid]
+X-Rspamd-Queue-Id: BCA1C3FC949
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The backing store type, BNGE_CTX_MRAV, is not applicable in Thor Ultra
-devices. Remove it from the backing store configuration, as the firmware
-will not populate entities in this backing store type, due to which the
-driver load fails.
+Hello,
 
-Signed-off-by: Vikas Gupta <vikas.gupta@broadcom.com>
-Reviewed-by: Dharmender Garg <dharmender.garg@broadcom.com>
----
- drivers/net/ethernet/broadcom/bnge/bnge_rmem.c | 16 ----------------
- 1 file changed, 16 deletions(-)
+On Tue, Apr 14, 2026 at 11:31:56AM -0400, Pavitra Jha wrote:
+> t7xx_port_enum_msg_handler() uses the modem-supplied port_count field as
+> a loop bound over port_msg->data[] without checking that the message buffer
+> contains sufficient data. A modem sending port_count=65535 in a 12-byte
+> buffer triggers a slab-out-of-bounds read of up to 262140 bytes.
+> 
+> Add a struct_size() check after extracting port_count and before the loop.
+> Pass msg_len to t7xx_port_enum_msg_handler() and use it to validate
+> the message size before accessing port_msg->data[].
+> Pass msg_len from both call sites: skb->len at the DPMAIF path after
+> skb_pull(), and the captured rt_feature->data_len at the handshake path.
+> 
+> Fixes: 39d439047f1d ("net: wwan: t7xx: Add control DMA interface")
+> Cc: stable@vger.kernel.org
+> Reported-by: Pavitra Jha <jhapavitra98@gmail.com>
+> Signed-off-by: Pavitra Jha <jhapavitra98@gmail.com>
 
-diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_rmem.c b/drivers/net/ethernet/broadcom/bnge/bnge_rmem.c
-index 94f15e08a88c..b066ee887a09 100644
---- a/drivers/net/ethernet/broadcom/bnge/bnge_rmem.c
-+++ b/drivers/net/ethernet/broadcom/bnge/bnge_rmem.c
-@@ -324,7 +324,6 @@ int bnge_alloc_ctx_mem(struct bnge_dev *bd)
- 	u32 l2_qps, qp1_qps, max_qps;
- 	u32 ena, entries_sp, entries;
- 	u32 srqs, max_srqs, min;
--	u32 num_mr, num_ah;
- 	u32 extra_srqs = 0;
- 	u32 extra_qps = 0;
- 	u32 fast_qpmd_qps;
-@@ -390,21 +389,6 @@ int bnge_alloc_ctx_mem(struct bnge_dev *bd)
- 	if (!bnge_is_roce_en(bd))
- 		goto skip_rdma;
- 
--	ctxm = &ctx->ctx_arr[BNGE_CTX_MRAV];
--	/* 128K extra is needed to accommodate static AH context
--	 * allocation by f/w.
--	 */
--	num_mr = min_t(u32, ctxm->max_entries / 2, 1024 * 256);
--	num_ah = min_t(u32, num_mr, 1024 * 128);
--	ctxm->split_entry_cnt = BNGE_CTX_MRAV_AV_SPLIT_ENTRY + 1;
--	if (!ctxm->mrav_av_entries || ctxm->mrav_av_entries > num_ah)
--		ctxm->mrav_av_entries = num_ah;
--
--	rc = bnge_setup_ctxm_pg_tbls(bd, ctxm, num_mr + num_ah, 2);
--	if (rc)
--		return rc;
--	ena |= FUNC_BACKING_STORE_CFG_REQ_ENABLES_MRAV;
--
- 	ctxm = &ctx->ctx_arr[BNGE_CTX_TIM];
- 	rc = bnge_setup_ctxm_pg_tbls(bd, ctxm, l2_qps + qp1_qps + extra_qps, 1);
- 	if (rc)
--- 
-2.47.1
+Please note that you don't need the Reported-by tag when it's the same
+as the Signed-off-by one.
 
+Also, I'm noticing a few empty-line removals out of context below:
+
+> diff --git a/drivers/net/wwan/t7xx/t7xx_modem_ops.c b/drivers/net/wwan/t7xx/t7xx_modem_ops.c
+> index 7968e208d..d0559fe16 100644
+> --- a/drivers/net/wwan/t7xx/t7xx_modem_ops.c
+> +++ b/drivers/net/wwan/t7xx/t7xx_modem_ops.c
+> @@ -453,25 +453,25 @@ static int t7xx_parse_host_rt_data(struct t7xx_fsm_ctl *ctl, struct t7xx_sys_inf
+>  {
+>  	enum mtk_feature_support_type ft_spt_st, ft_spt_cfg;
+>  	struct mtk_runtime_feature *rt_feature;
+> +	size_t feat_data_len;
+>  	int i, offset;
+>  
+>  	offset = sizeof(struct feature_query);
+>  	for (i = 0; i < FEATURE_COUNT && offset < data_length; i++) {
+>  		rt_feature = data + offset;
+> -		offset += sizeof(*rt_feature) + le32_to_cpu(rt_feature->data_len);
+> -
+> +		feat_data_len = le32_to_cpu(rt_feature->data_len);
+> +		offset += sizeof(*rt_feature) + feat_data_len;
+>  		ft_spt_cfg = FIELD_GET(FEATURE_MSK, core->feature_set[i]);
+>  		if (ft_spt_cfg != MTK_FEATURE_MUST_BE_SUPPORTED)
+>  			continue;
+> -
+
+here
+
+>  		ft_spt_st = FIELD_GET(FEATURE_MSK, rt_feature->support_info);
+>  		if (ft_spt_st != MTK_FEATURE_MUST_BE_SUPPORTED)
+>  			return -EINVAL;
+> -
+
+Here, the original author probably left the line to highlight the return
+statement.
+
+> -		if (i == RT_ID_MD_PORT_ENUM || i == RT_ID_AP_PORT_ENUM)
+> -			t7xx_port_enum_msg_handler(ctl->md, rt_feature->data);
+> +		if (i == RT_ID_MD_PORT_ENUM || i == RT_ID_AP_PORT_ENUM) {
+> +			t7xx_port_enum_msg_handler(ctl->md, rt_feature->data,
+> +						   feat_data_len);
+> +		}
+>  	}
+> -
+
+Here, why?
+
+>  	return 0;
+>  }
+>  
+> diff --git a/drivers/net/wwan/t7xx/t7xx_port_ctrl_msg.c b/drivers/net/wwan/t7xx/t7xx_port_ctrl_msg.c
+> index ae632ef96..d984a688d 100644
+> --- a/drivers/net/wwan/t7xx/t7xx_port_ctrl_msg.c
+> +++ b/drivers/net/wwan/t7xx/t7xx_port_ctrl_msg.c
+> @@ -154,7 +161,6 @@ int t7xx_port_enum_msg_handler(struct t7xx_modem *md, void *msg)
+>  
+>  	return 0;
+>  }
+> -
+
+This one as well.
+
+>  static int control_msg_handler(struct t7xx_port *port, struct sk_buff *skb)
+>  {
+>  	const struct t7xx_port_conf *port_conf = port->port_conf;
+
+Better leave them untouched, it will keep the code as readable as it
+previously was and reduce the overall review effort.
+
+thanks,
+willy
 
