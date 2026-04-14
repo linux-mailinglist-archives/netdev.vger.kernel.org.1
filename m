@@ -1,166 +1,239 @@
-Return-Path: <netdev+bounces-278585-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278586-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GKhkMFbI3mmDIQAAu9opvQ
-	(envelope-from <netdev+bounces-278585-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 01:05:58 +0200
+	id oJHMC4jJ3mmVIQAAu9opvQ
+	(envelope-from <netdev+bounces-278586-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 01:11:04 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA8C73FEF43
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 01:05:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2608D3FEF67
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 01:11:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 882BB302290D
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 23:05:54 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id EFB2F3026927
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 23:10:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9388D396B63;
-	Tue, 14 Apr 2026 23:05:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51A383B0ACB;
+	Tue, 14 Apr 2026 23:10:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mG/2gu0j"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gc6Czc27"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f47.google.com (mail-dl1-f47.google.com [74.125.82.47])
+Received: from mail-ot1-f66.google.com (mail-ot1-f66.google.com [209.85.210.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46CCA38AC8E
-	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 23:05:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3576396B63
+	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 23:10:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776207951; cv=none; b=L4ugvYo8L5j+Iivg+R/B4nvaf6NCwhE1cbL41mw8o3mujbz8E27uyXmCYWeA7HTECnoWonr7Rb6FB8dr6S9fzpmSY4I2atVNYiHGXt68AxeGDs1VhjSQvA0pjFyNbXM0UCxjk68rvlM3vpn0F5eykz8wIUj154F7LQcneujdYYg=
+	t=1776208239; cv=none; b=Dhk+KygtPzviarfB/CFJ1dhfQGQoiMzGegJwsRR67w7Fp/JRhiCQKF+/dArPMMffyRkUCgVefPQ8dXFBbs7EmGiJpcD/aY8IBYVG5LRtHu3jO18GNO4yt7n5maqVLCBNccPDW86B4PgMIgWQoLFln67iM/bOdkM+ruw5I5klEb8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776207951; c=relaxed/simple;
-	bh=ulJiA40YjWBzinlQif5Nk1h/1JoKF6J9GjoMKAkxoTY=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=d/Hh8Dz1LH1xp14WpwM+RrLoUnfHoJUu8AuRPDX2tM1aInhIhEdcJ2S+/YqR7dDVuMNrGNjY99OY96+2BlnQOm4KhmiD4Hl7O5QSGCLGmbbMITOliMHIaP79hboL33bxwA+D8LlZ9y9iLxDT5LxwcCfDIayLfEvyxW5p6jJ3UE8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mG/2gu0j; arc=none smtp.client-ip=74.125.82.47
+	s=arc-20240116; t=1776208239; c=relaxed/simple;
+	bh=4wvu9qOxTFhgIplgheLqN3J/RpDztRSNXawiCm/1EEc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NmFya5LumVVrg83BDgTiuOzzia5n0MO1Jg0L08OLW4YA/0NK08T6DfoZ6izq3ESKqkypJCmW1jEs+SSyTUi4zhMYvR7dIhoZxe0EoDtu8Jcs30hWAcxSNL6cFHB2i4Oy6J/VATUvHevFlI1BI4MWwo93yBRM9QMG1AAdTeQF+I8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Gc6Czc27; arc=none smtp.client-ip=209.85.210.66
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dl1-f47.google.com with SMTP id a92af1059eb24-12732165d1eso16838298c88.1
-        for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 16:05:50 -0700 (PDT)
+Received: by mail-ot1-f66.google.com with SMTP id 46e09a7af769-7dbe07d3ec3so2996564a34.0
+        for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 16:10:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776207949; x=1776812749; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:to:subject:cc
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oIy4aYaXvRpOFfPSJZ2zgV8yIQ5jTx0wxsayXzjvZfI=;
-        b=mG/2gu0joxHbqKfVK46rv12lCwT7xYJ7dkb/YxblPQlo1BtQDqp4uD2VkzYecvvN7Z
-         QUrPIS2mW9Zg9+iIHnpLQJPUK5/sSRRV+d9Gn0YrFYct0oL8EJAWRJhhCJHl9R0vAAv2
-         gplhG107XDIT+5UnNwg9Lx/1rZ0uriOx+kgexo/ZEC7TEVpWen+NCnJv45Lga37WCbQ2
-         mWDo3n8+4SNrBU9nJoZOZd5gYd0TqhTXtTDWLx/NdmXYMoTgO18LsGYkZTu72H0CyKeN
-         4z8Yk9Ko0sjVvA31g6vNPFsfqsUO50m+CjkkYkjipWvt8QuTCiC6+0xIg/0bilQUFA0Z
-         lvmA==
+        d=gmail.com; s=20251104; t=1776208237; x=1776813037; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=DDVYRZIW5YXcg0u/WJDBbjUu/JAxIWnmG1clJ8HBE1s=;
+        b=Gc6Czc27SL1h3ZRnor3x3uz+omYxrklNuNXZq8LHkd6MD6WYYB5mzSupIXPJ2vDwoY
+         oGDcAIsOwmBCJmz9o/X6HT/MEQIW6LLZjxAlRx1bOxAziCK0W6QC4RNORTD28LCcwPij
+         RDCmjgFqlJrJiPRPOAiZ1Izj/9xWvDG8hCsSk8OnkEsv/RJjFKLWlIj0egRkmFHRjtoQ
+         0WAXyX7Qn6C8INf9LTAZz0Mkv7YjG0ISxwvbxwLZlXn6slHEjkvz21LU0/OZepiXVvM+
+         0pAw6nOjtHeIyB0NyKR/vI2gbDmZMarX5ggbNMt+LeyONfSK+iTD9AyMz0wItq9awFUn
+         GWEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776207949; x=1776812749;
-        h=content-transfer-encoding:in-reply-to:from:references:to:subject:cc
-         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=oIy4aYaXvRpOFfPSJZ2zgV8yIQ5jTx0wxsayXzjvZfI=;
-        b=nh4JrpqOKeT68g5oKi+q+6pGRYW+AgxEO1PhxgDA06sO2R+y1SS4cUoyXDFPBiYt+y
-         inBo+Y6OB0W6H3c46MKbZLNWa08rH3ZO5gXrGUbXluPT3sj6H+BHleu7NK5ul/h8nwOs
-         G9chGa1vYLH2wb+DTzaJgZ0QwU+qQZnPWDgmXlC+qswLUsZBKaMgb2WC1MRomEVdUqhL
-         km23M9hXfEQ1Hbt1vZNMYGc/+nCdjDJDF2Oh40nynrgHGhkZVB4M7buKH8sYyB8iWeF+
-         OWz6nzzsOMvpe1h+4YSwe0qNwf/JU6O5K0N92rNhKeofgSybPNCG5HvEZ0HBf/bK9UK3
-         Otyg==
-X-Forwarded-Encrypted: i=1; AFNElJ+oJ6TI8D6F7IH5fUcy70n2WdTPNUQklgDGtqBHDIlzU//Ev79ZZMxVxl5ikmZ4KO1M+8keeOQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YypHhFrLGe8X79d4fxxslGdtd7w+lGjS5PAhWwCeOGCrhw7Wb36
-	5meL7o/1shetDI7Db9UA/70AyR+hLjUEUDwQfZwzkIvI/H58cGEqixYe
-X-Gm-Gg: AeBDieugYTzlLJsZFQNcTbCciwzl4Ml5BA63pkxuUpBKMkLyqArEhTqcOy5ASdAg/ST
-	tNz2vU66aJEx2XiNCUDG8ypcN0VEOnz+eFmPLO0sgwa11cIWGKq48ZZ3vAL7Jehi8dMJaPuE4DA
-	OsvEth6PCCJakAh7kdpdPBGmO9Tx6tSaYSZf7JLhvnO0awN/9acXxs5sAxwbKtkX+fWbYxhT24G
-	rznsUZbL+xYeQOr3URAQRLKX5L9kTTLMXh9i8WyyYJjxu6pSnif2Ijq0Rg1sXTw8rTMpMAI5d2l
-	V+P36sLIwgm+31bCAw69SW9PeJ1O07Ul4ExtImE3ZvXObpwg0K4FfsARvZzcYon7+GgXEnrlRJS
-	8h6AdQ+tgXiVOWptKIob+dJTymHPZVm1MpS3qwbsIHzuVG5vpdgBm9oyAz5oFkMpDqgqODkfZ+F
-	EUxmiws9fiIVV6WGJA4zyNF3x4+720wCw0vgt3SyRljtfLeHg=
-X-Received: by 2002:a05:7300:8c1b:b0:2d8:b814:29af with SMTP id 5a478bee46e88-2d8b8142df1mr5698464eec.3.1776207949270;
-        Tue, 14 Apr 2026 16:05:49 -0700 (PDT)
-Received: from [10.0.0.2] ([169.235.25.186])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2de8c016198sm75119eec.1.2026.04.14.16.05.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 Apr 2026 16:05:48 -0700 (PDT)
-Message-ID: <c34567b0-a8b3-4c89-88e9-8ae507756944@gmail.com>
-Date: Tue, 14 Apr 2026 16:05:34 -0700
+        d=1e100.net; s=20251104; t=1776208237; x=1776813037;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DDVYRZIW5YXcg0u/WJDBbjUu/JAxIWnmG1clJ8HBE1s=;
+        b=gCoF3kmPQi6cVolZRFk8i9HFJB5BeZpoTaAe4WBd2SV9cVChMeuIJ18XpdRba0/Dm7
+         Ed6bmG6GVxI6pC/cEmLVmygjWxB0GHygJKjUCmVEcATwy7UjuMp8leDed5bysNjFwsCs
+         BwgheJl2Kz+caoxS0bjULTnTav/fVFggXEwVFJo4+3q1ghcpqS4MY/N0QQkKNywP5k4T
+         OtdfbNbGf7cur78hxz/+FNGj/S3T7wH+ImMjPIbIzfGUfxwegQYxLGF/6Rydfxzi1xec
+         qaUNSnLw5iSZjx8N8imNdV7WoiYj76dV8GkVmRdlfjj34B7i3/ij5wZJezogvR8GN7xN
+         xYbQ==
+X-Gm-Message-State: AOJu0YwPjNAKsEDtr0/not1toPR7CLlcmfrDINlNpwX+YPp7IjmAnX4U
+	Uo/3eA7EWiy3shEvfu7dHw9Lz0gM89dU6WtEBz0AJqlF65Oof91ePduYEz02AzVG
+X-Gm-Gg: AeBDietY6k+S5gjbg0wmXNnkQ7ohfT2LENMX34i0t5DK8bkSiAphzbGfG1KofROrnJ7
+	5NXa49+JWkD+dyLNdeq7LgHFYtmBYXGQzPRukSFHdbArFbBUY+0zPju3kOBRPj7er5uSo4HQcEH
+	v2ExP2SSu1G+mCqbIbFDFGT/vHjnrG/wFbPB2LRM7RxN0Ewj6Pzm39t0BQNA8dSn9R5uMAQP3gd
+	pp/JQ5BbC4qV2GDRTIZXQTD0i6dzOgUhCZmhEbwjWZBTmL5ycanZ7F+Fdz2hr4lMnbIBZao25Yp
+	+FgbMUGBi9uv7KZy1BcAjWXXyBdIDsNGBvcLJru26qaE2IWxYd1sfzqijY5NOW1c8i5RroA5COS
+	lFHZY8iOn8fkYJryWJPB8r/B8n/EJmG+N6B87kOGDccdJZPFMG1NjZzrF6IIiDOWsRS0VLK88Kd
+	o/FYf0Oq8LT1FjSKRe
+X-Received: by 2002:a05:6830:4490:b0:7d9:b10c:c85b with SMTP id 46e09a7af769-7dc27cbe979mr10971694a34.11.1776208236772;
+        Tue, 14 Apr 2026 16:10:36 -0700 (PDT)
+Received: from localhost ([2a03:2880:12ff:3::])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7dc76a51845sm106310a34.12.2026.04.14.16.10.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Apr 2026 16:10:36 -0700 (PDT)
+From: Stanislav Fomichev <sdf.kernel@gmail.com>
+X-Google-Original-From: Stanislav Fomichev <sdf@fomichev.me>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	andrew@lunn.ch,
+	olteanv@gmail.com,
+	horms@kernel.org,
+	sdf@fomichev.me,
+	linux-kernel@vger.kernel.org,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>
+Subject: [PATCH net] net: dsa: remove redundant netdev_lock_ops() from conduit ethtool ops
+Date: Tue, 14 Apr 2026 16:10:35 -0700
+Message-ID: <20260414231035.1917035-1-sdf@fomichev.me>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: yuantan098@gmail.com, netdev@vger.kernel.org,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Murali Karicheri <m-karicheri2@ti.com>,
- Shaurya Rane <ssrane_b23@ee.vjti.ac.in>, Ingo Molnar <mingo@kernel.org>,
- Kees Cook <kees@kernel.org>, Yifan Wu <yifanwucs@gmail.com>,
- Juefei Pu <tomapufckgml@gmail.com>, Xin Liu <bird@lzu.edu.cn>,
- Yuqi Xu <xuyuqiabc@gmail.com>, Haoze Xie <royenheart@gmail.com>
-Subject: Re: [PATCH net v2 1/1] net: hsr: avoid learning unknown senders for
- local delivery
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Felix Maurer <fmaurer@redhat.com>, Ao Zhou <n05ec@lzu.edu.cn>
-References: <cover.1775056603.git.royenheart@outlook.com>
- <b053e938014c9bac22f7f687ecc2970f23a2b74a.1775281843.git.royenheart@gmail.com>
- <adYwjxLBBaLY52Wb@thinkpad> <20260414145926.0Lwoa8ca@linutronix.de>
-From: Yuan Tan <yuantan098@gmail.com>
-In-Reply-To: <20260414145926.0Lwoa8ca@linutronix.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,ti.com,ee.vjti.ac.in,lzu.edu.cn];
-	TAGGED_FROM(0.00)[bounces-278585-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-278586-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yuantan098@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,lunn.ch,gmail.com,fomichev.me,vger.kernel.org,bootlin.com];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[sdfkernel@gmail.com,netdev@vger.kernel.org];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-0.998];
+	RCVD_COUNT_FIVE(0.00)[5];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: CA8C73FEF43
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,fomichev.me:mid,fomichev.me:email]
+X-Rspamd-Queue-Id: 2608D3FEF67
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+DSA replaces the conduit (master) device's ethtool_ops with its own
+wrappers that aggregate stats from both the conduit and DSA switch
+ports. Taking the lock again inside the DSA wrappers causes a deadlock.
 
-On 4/14/2026 7:59 AM, Sebastian Andrzej Siewior wrote:
-> On 2026-04-08 12:40:15 [+0200], Felix Maurer wrote:
->> IMHO, the only real way to prevent excessive resource use on our side is
->> to put a limit on these resources. In this case, limit the size of the
->> node table (bonus: make that limit configurable as Paolo suggested).
-> I am slowly catching up. There was no follow-up on this one, right?
+Stumbled upon this when booting qemu with fbnic and CONFIG_NET_DSA_LOOP=y
+(which looks like some kind of testing device that auto-populates the ports
+of eth0). `ethtool -i` is enough to deadlock. This means we have basically zero
+coverage for DSA stuff with real ops locked devs.
 
+Remove the redundant netdev_lock_ops()/netdev_unlock_ops() calls from
+the DSA conduit ethtool wrappers.
 
-Hi,
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Fixes: 2bcf4772e45a ("net: ethtool: try to protect all callback with netdev instance lock")
+Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+(cherry picked from commit 1538c00ab3212273240112bd53692d54d95f2dd5)
+---
+ net/dsa/conduit.c | 16 +---------------
+ 1 file changed, 1 insertion(+), 15 deletions(-)
 
-Thank you for checking in. Please excuse the delay as we are only able
-to work on this part-time.
+diff --git a/net/dsa/conduit.c b/net/dsa/conduit.c
+index a1b044467bd6..8398d72d7e4d 100644
+--- a/net/dsa/conduit.c
++++ b/net/dsa/conduit.c
+@@ -27,9 +27,7 @@ static int dsa_conduit_get_regs_len(struct net_device *dev)
+ 	int len;
+ 
+ 	if (ops && ops->get_regs_len) {
+-		netdev_lock_ops(dev);
+ 		len = ops->get_regs_len(dev);
+-		netdev_unlock_ops(dev);
+ 		if (len < 0)
+ 			return len;
+ 		ret += len;
+@@ -60,15 +58,11 @@ static void dsa_conduit_get_regs(struct net_device *dev,
+ 	int len;
+ 
+ 	if (ops && ops->get_regs_len && ops->get_regs) {
+-		netdev_lock_ops(dev);
+ 		len = ops->get_regs_len(dev);
+-		if (len < 0) {
+-			netdev_unlock_ops(dev);
++		if (len < 0)
+ 			return;
+-		}
+ 		regs->len = len;
+ 		ops->get_regs(dev, regs, data);
+-		netdev_unlock_ops(dev);
+ 		data += regs->len;
+ 	}
+ 
+@@ -115,10 +109,8 @@ static void dsa_conduit_get_ethtool_stats(struct net_device *dev,
+ 	int count, mcount = 0;
+ 
+ 	if (ops && ops->get_sset_count && ops->get_ethtool_stats) {
+-		netdev_lock_ops(dev);
+ 		mcount = ops->get_sset_count(dev, ETH_SS_STATS);
+ 		ops->get_ethtool_stats(dev, stats, data);
+-		netdev_unlock_ops(dev);
+ 	}
+ 
+ 	list_for_each_entry(dp, &dst->ports, list) {
+@@ -149,10 +141,8 @@ static void dsa_conduit_get_ethtool_phy_stats(struct net_device *dev,
+ 		if (count >= 0)
+ 			phy_ethtool_get_stats(dev->phydev, stats, data);
+ 	} else if (ops && ops->get_sset_count && ops->get_ethtool_phy_stats) {
+-		netdev_lock_ops(dev);
+ 		count = ops->get_sset_count(dev, ETH_SS_PHY_STATS);
+ 		ops->get_ethtool_phy_stats(dev, stats, data);
+-		netdev_unlock_ops(dev);
+ 	}
+ 
+ 	if (count < 0)
+@@ -176,13 +166,11 @@ static int dsa_conduit_get_sset_count(struct net_device *dev, int sset)
+ 	struct dsa_switch_tree *dst = cpu_dp->dst;
+ 	int count = 0;
+ 
+-	netdev_lock_ops(dev);
+ 	if (sset == ETH_SS_PHY_STATS && dev->phydev &&
+ 	    (!ops || !ops->get_ethtool_phy_stats))
+ 		count = phy_ethtool_get_sset_count(dev->phydev);
+ 	else if (ops && ops->get_sset_count)
+ 		count = ops->get_sset_count(dev, sset);
+-	netdev_unlock_ops(dev);
+ 
+ 	if (count < 0)
+ 		count = 0;
+@@ -239,7 +227,6 @@ static void dsa_conduit_get_strings(struct net_device *dev, u32 stringset,
+ 	struct dsa_switch_tree *dst = cpu_dp->dst;
+ 	int count, mcount = 0;
+ 
+-	netdev_lock_ops(dev);
+ 	if (stringset == ETH_SS_PHY_STATS && dev->phydev &&
+ 	    !ops->get_ethtool_phy_stats) {
+ 		mcount = phy_ethtool_get_sset_count(dev->phydev);
+@@ -253,7 +240,6 @@ static void dsa_conduit_get_strings(struct net_device *dev, u32 stringset,
+ 			mcount = 0;
+ 		ops->get_strings(dev, stringset, data);
+ 	}
+-	netdev_unlock_ops(dev);
+ 
+ 	list_for_each_entry(dp, &dst->ports, list) {
+ 		if (!dsa_port_is_dsa(dp) && !dsa_port_is_cpu(dp))
+-- 
+2.52.0
 
-We are still refining the fix approach based on the recent feedback to
-ensure the fix is suitable and robust.
-
-Thanks for your patience.
-
-Best,
-
-Yuan
-
->> Thanks,
->>    Felix
-> Sebastian
 
