@@ -1,367 +1,377 @@
-Return-Path: <netdev+bounces-278286-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278287-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 3WfGMrW43WkRiQkAu9opvQ
-	(envelope-from <netdev+bounces-278286-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 05:47:01 +0200
+	id aL/+KVK83WmCiQkAu9opvQ
+	(envelope-from <netdev+bounces-278287-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 06:02:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD4E63F5572
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 05:47:00 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFD943F56BA
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 06:02:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 84E303013A93
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 03:46:54 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 3A2FA3031F2D
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 04:00:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4110F33A9C3;
-	Tue, 14 Apr 2026 03:46:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08401366056;
+	Tue, 14 Apr 2026 04:00:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="lEs12Y/Y"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ENgEJqUQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48C072EFDAF;
-	Tue, 14 Apr 2026 03:46:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F24EF6F2F2
+	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 03:59:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776138413; cv=none; b=B+zpjsxkcfyKrCw26IOA5/5rQBgnayINtnMucsS6O4RR6knFQhj5bDKMoLeSbnr6q568fQnC/HFUmopIKwAmq8p8yidvyZ5w9b4DpgT0AU6arNyZR8VaNdZ6MY1uZc0kTuB8ddyklXyLzAQ9AePZh5Sg3PkoZelnUXvtidpPAis=
+	t=1776139203; cv=none; b=e6U3/JNXgrYTPojL8T3nNs4ly36sbSObdojgde4Jhy7oXNTiFWcb6VZc6PFPRuvvvdYFqWhmBD7lLvACoHR2YZByLmdtABcNL5/sT/YJpI7XIwYWvqRyfQJBdekbXJEzVeJV9K9GdSH9gB7O2X9XSQQCiOb1wmKbQAsaPOiKvhs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776138413; c=relaxed/simple;
-	bh=h+8tYZnDNut7N+qjHrTNV6ZQ1BZ4tm0AsavZ8FV5pjw=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=c7E65SXg814AkXkiZRzci7POQBH6WioYwPWIBLzEzg0AsylJwk18l5KKCuGFoP72HlodHfU1Zeb9M0VXm39WSzJyvfrhtN6I2PQOYo+0n/UYqzkLRe4RXiDpjRSpsLuYEuvdI4wuEnDRNUv7KD+bY3CcgIdeo6nipyrjzlB8oZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=lEs12Y/Y; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63DL7lus1628427;
-	Mon, 13 Apr 2026 20:46:35 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=YiWf24idfLOna0cEbxoX+AYgB
-	F1BS4mOvgW6ikn7h3g=; b=lEs12Y/Y8KuYm36DSYCd0FkR2ncwV+4tdoCCTmzP7
-	FgVH55RbnQ0Od5s5+gnnoDgrNVz4nrMBJT1FLpzBE2d9wy+N9vAIhPNTF7lxYkw6
-	CMFP/3eP29kJXEGIwAvzyEoXjm9xJk0B7tQaqR88s4d1zasS31A7E2IIrbasPXe/
-	CbW1McULEjqDgnLwHp3wzoBFD6gcQmCkVxd0nPcYfJSHZ+bsmarRYD/Ux3zdPg5G
-	3F0/Iwpj2MIWWCIz78QzdmiJs0Ssida/o2DcA4Fs7FFOOQAxiHU3Cj9rRX080ikh
-	8OEoYGECYgkB+QgXZR4R9qhhWKxXGb5Wmi45uKcBNGCYw==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4dh84qrrpf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 13 Apr 2026 20:46:34 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Mon, 13 Apr 2026 20:46:34 -0700
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Mon, 13 Apr 2026 20:46:33 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Mon, 13 Apr 2026 20:46:33 -0700
-Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with SMTP id 181F33F703F;
-	Mon, 13 Apr 2026 20:46:26 -0700 (PDT)
-Date: Tue, 14 Apr 2026 09:16:25 +0530
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: Paolo Abeni <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-rdma@vger.kernel.org>, <sgoutham@marvell.com>,
-        <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <donald.hunter@gmail.com>, <horms@kernel.org>,
-        <jiri@resnulli.us>, <chuck.lever@oracle.com>, <matttbe@kernel.org>,
-        <cjubran@nvidia.com>, <saeedm@nvidia.com>, <leon@kernel.org>,
-        <tariqt@nvidia.com>, <mbloch@nvidia.com>, <dtatulea@nvidia.com>
-Subject: Re: [PATCH v11 net-next 5/7] octeontx2-af: npc: cn20k: add subbank
- search order control
-Message-ID: <ad24kZnhUXkysNKF@rkannoth-OptiPlex-7090>
-References: <20260409025055.1664053-1-rkannoth@marvell.com>
- <20260409025055.1664053-6-rkannoth@marvell.com>
- <b9ffa72d-ebe2-4fd1-b668-93620f206179@redhat.com>
+	s=arc-20240116; t=1776139203; c=relaxed/simple;
+	bh=3x31s0xphA1KzJ7zU0vHbpVL9GF3jKZyINontzZJTKc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jn+UAAUekMaVyWkEv+IaXD67Yp7tMtFLoo0QWGrdYTDg/iU0kR0EDwLlsmBfXgpzwxV5eUUWe3Wli5r+gMCVky5mAQmdwuCz/ai8y3VB++9fwsqhxj66m6559CiI1wZA3EWPjm9fQQksetX+5H1DA3kxFUBWaVI+0abQ+fDqg4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ENgEJqUQ; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2b45cb89f7eso12075375ad.0
+        for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 20:59:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776139193; x=1776743993; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=GaQwC6PXCoTitxa7wZplAr6LrVi+IQ8jXIX0gDbXPI4=;
+        b=ENgEJqUQHvUhp/RoLUwGBTDsiy+9/wTceuQKL5yvWpXvSRauWgGBVjf+Y9snVjPEZR
+         FPsxw5rvfV7+0I2rfCBEPoR+beWhv8DXf09lQsoQmf9COWtq333EszztZkEHb67EdMNW
+         X5i+O61QAeFWnkf/VW4aKyh9YppEgKE58lloNANfR0AxOZbPEXJsJFKvTIyf8GZsW0Nd
+         /XNwV+Co4FQrHoPxmtJ5ZgYeasAQYVi/iP2/P3l9kWWTSfdggbrZ1Caj9NuYazk8ims6
+         c7MsNp/7/fGueQ5wYWU6lV6XSfbdVIIDn8YBZD1Ryxw8uYKr7NPX405rPGMRCZ17JYiz
+         oSgw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776139193; x=1776743993;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GaQwC6PXCoTitxa7wZplAr6LrVi+IQ8jXIX0gDbXPI4=;
+        b=C201okUTi9ZH2Y9xyerTh+eeyWl+L7xLKzWaq61vSeRnVPJrNyIzVz6Ux/86EvpCLU
+         qbfvHRh0xVvnaQsELZ1IvgrIM2coDP5qtGIic3MQ/G/W5w16LXWcYLeaVapJiF+EkWae
+         qjQ62gEbmL4Rr0EyrImAlRBUAC+bUNDSv1/d7vC9k5COKiwvkp11HEXmpkiVYpR3bsF1
+         1JSaFxv3LaI7vLs/CYQFB+59Kt3fA0x9sxTdJRsYtEjGaktwPmV61PTQOfwx5KEoILdF
+         ERY68zRivgoGNe+egwVcQ5bLEof/Grt59t1ct1XTSMnc9qTeTKUeMSo4cvg2eHUDs5z2
+         C9qA==
+X-Forwarded-Encrypted: i=1; AFNElJ8Vx4OfwDMIFMzrtft5VTivXiyR0tSsL9irOXul0DEKX6hBvKuEUjgbzgb0o1kwYipZmj+LnJg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz/AnK7jjr358f/YoKJ+nNf7DNkArk6GN3nBA2k+ByhOh/Ws0qt
+	pM83+2M3nd6cke6HGj+zE3D1n9+dS6/p3M+nY731VcNXQU6Xx4sZZkGn
+X-Gm-Gg: AeBDiesLPBPuPbGr2J3nTIeqNxLOdhqHo0HBW3cIo2xp/OtLDGZfvvFzyD3unJll4LL
+	HKbV57kyFrFrfrdfSWcEODH992lB+pK+NXiIqSwTFsCokkkX7cOSHy7HEIgfNXX4UczFza+l0Li
+	e5xqwIIaCBdTEj4+b+zr4rCBEuHMyqKRk1WTQBOJ1dROYDRWqGv06DAkRt2xmBBa2rZwzJoS1ed
+	WN5ZxQANi5tMFsHWqEhWiyavOTVhVP5M9q7uN748fLwWgk8NQOtWxwC2rdMn8ZQQcxMACJpfDzx
+	qnIYJ//NYQspKIr7VmlUOZ8JNfTPVB6k7zlLyEO3LWPzKm4ZqrHtLQtMLmV2C5Ga84xBSmAv7TH
+	6+u2H6I19GchNmfI37g14oteIzTn/FtH4e6zToBPNEmw5u1ca/8Np4SD5vOz6MTS/YJW4GbbXdQ
+	BOnCaGZfurap/mqr5O+trxh06s1jtBh4emcfrUstCqzJTW89IaFf+M8MLDQ1NIUf8=
+X-Received: by 2002:a17:903:283:b0:2b4:5c0d:314b with SMTP id d9443c01a7336-2b45c0d3361mr68981475ad.38.1776139192689;
+        Mon, 13 Apr 2026 20:59:52 -0700 (PDT)
+Received: from localhost.localdomain ([2409:891f:1b61:a738:ec5f:4173:769:6994])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b2d4dd7faasm131741895ad.26.2026.04.13.20.59.47
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Mon, 13 Apr 2026 20:59:52 -0700 (PDT)
+From: Chuang Wang <nashuiliang@gmail.com>
+To: 
+Cc: Chuang Wang <nashuiliang@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Samiullah Khawaja <skhawaja@google.com>,
+	Hangbin Liu <liuhangbin@gmail.com>,
+	Krishna Kumar <krikku@gmail.com>,
+	Neal Cardwell <ncardwell@google.com>,
+	Willem de Bruijn <willemb@google.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net v2] net: reduce RFS/ARFS flow updates by checking LLC affinity
+Date: Tue, 14 Apr 2026 11:59:20 +0800
+Message-ID: <20260414035931.45692-1-nashuiliang@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <b9ffa72d-ebe2-4fd1-b668-93620f206179@redhat.com>
-X-Proofpoint-ORIG-GUID: orukX0zeH64LpU1d97G3ejZgOW0NItZH
-X-Proofpoint-GUID: orukX0zeH64LpU1d97G3ejZgOW0NItZH
-X-Authority-Analysis: v=2.4 cv=arqCzyZV c=1 sm=1 tr=0 ts=69ddb89a cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=kj9zAlcOel0A:10 a=A5OVakUREuEA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=l0iWHRpgs5sLHlkKQ1IR:22 a=EAYMVhzMl8SCOHhVQcBL:22 a=c92rfblmAAAA:8
- a=M5GUcnROAAAA:8 a=20KFwNOVAAAA:8 a=f7ZYTRpxgPyUO7SbQ74A:9 a=CjuIK1q_8ugA:10
- a=GvGzcOZaWPEFPQC_NcjD:22 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDE0MDAzMiBTYWx0ZWRfX2dHgW4gWTWlP
- F9oSOU9aFOwtRZ8D9tsqF8dPO8PR3nEbQMFIQV/+luW4ZrAhnwBGd2LeL7esO2Q6frI+YN/8LRW
- qnIRV7q78yJFRo6oP5TafZMqOQP0GspNGKHc0zNuYj7Z4Mgdcoqk7qt1ROuIttUnZUH1AulJK2t
- Cwq0ceAgeupvln7oKhopOqAZ3t7WG0TeU/rlUiJEbp6tvQdhO/fgNZfVTTi70AJlZvJVstABvER
- mPWveEzBRFDBQgc5EPlmp2+82yTkpkEcBDdY2S6B09qJP8NSz4yMwSpY+JntL0frjLhaLxR3dvq
- 1vI3Mmd5rBJUhNhj9OucHostK+SI/xRU6nZfxd2ALOcqSlI1RKRT43lE0KHUQ0qKryrbfjPvno/
- 2mLzhQ2lad8XdsrfGXj3B2CQ6jiZD+O4rbPvsMSfXs4mw7sGh9Tt1fdQBNxMYsYsXYXX8+kzqxl
- BSncZbX3byRG9W7fLIA==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-04-13_03,2026-04-13_04,2025-10-01_01
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-278286-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[20];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,fomichev.me,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-278287-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,marvell.com,lunn.ch,davemloft.net,google.com,kernel.org,gmail.com,resnulli.us,oracle.com,nvidia.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[marvell.com:dkim,sashiko.dev:url];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[nashuiliang@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[marvell.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[9]
-X-Rspamd-Queue-Id: DD4E63F5572
+	NEURAL_HAM(-0.00)[-0.998];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: AFD943F56BA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 2026-04-13 at 18:26:00, Paolo Abeni (pabeni@redhat.com) wrote:
-> > +	xa_for_each(&npc_priv.xa_sb_free, index, v) {
-> > +		val = xa_to_value(v);
-> > +		fslots[fcnt][0] = index;
-> > +		fslots[fcnt][1] = val;
-> > +		xa_erase(&npc_priv.xa_sb_free, index);
-> > +		fcnt++;
-> > +	}
-> > +
-> > +	/* xa_store() is done under lock. If xa_store fails
-> > +	 * ,no rollback is planned as it might also fail.
->
-> Why do you need to go throuh erase and add loop? Why can't you directly
-> xa_store() the new value? Note that xa_store() can fail due to memory
-> pressure.
->
-> Avoiding the previous erase will prevent deallocation and re allocation
-> and will avoid any reasonable xa_store() failure.
-ACK.
+The current implementation of rps_record_sock_flow() updates the flow
+table every time a socket is processed on a different CPU. In high-load
+scenarios, especially with Accelerated RFS (ARFS), this triggers
+frequent flow steering updates via ndo_rx_flow_steer.
 
->
-> AFAICS there are a few more items reported by sashiko, please have a look:
->
-> https://sashiko.dev/#/patchset/20260409025055.1664053-1-rkannoth%40marvell.com
->
-> /P
->
+For drivers like mlx5 that implement hardware flow steering, these
+constant updates lead to significant contention on internal driver locks
+(e.g., arfs_lock). This contention often becomes a performance
+bottleneck that outweighs the steering benefits.
 
-Patch 1: [PATCH v11 net-next 1/7] octeontx2-af: npc: cn20k: debugfs enhancements
+This patch introduces a cache-aware update strategy: the flow record is
+only updated if the flow migrates across Last Level Cache (LLC)
+boundaries. This minimizes expensive hardware reconfigurations while
+preserving cache locality for the application. A new sysctl,
+net.core.rps_feat_llc_affinity, is added to toggle this feature.
 
->"+static u64 dstats[MAX_NUM_BANKS][MAX_SUBBANK_DEPTH * MAX_NUM_SUB_BANKS] = {};
->Is it safe to use a static global array here? If multiple RVU AF devices exist
->in the system, it looks like they might share this array and overwrite each
->other's hardware statistics."
-There is only one single rvu AF device in the system. Ignore the comment.
-as it is false positive.
+Performance Test Results:
+The patch was tested in a K8s environment (AMD CPU 128*2, 16-core Pod
+with CPU pinning, mlx5 NIC) using brpc[1] echo_server and rpc_press.
 
->"Also, since there are no locks, could concurrent reads of the debugfs file by
->multiple threads cause a data race and corrupt the stored statistics?"
-ACK. added a mutex lock.
+rpc_press Commands:
 
->"Since en_map is added to the global npc_priv structure, is it ever explicitly
->cleared during device initialization?"
-npc_priv is defined as static. So all fields are set to 0, by default.
-Anyway, added bitmap clear to get rid of this AI review warning.
+  for i in {1..8}; do
+    ./rpc_press -proto=./echo.proto -method=example.EchoService.Echo
+    -server=<IP>:8000 -input='{"message":"hello"}'
+    -qps=0 -thread_num=512 -connection_type=pooled &
+  done
 
->"Does updating dstats inline during the seq_file show callback break the
->statistics if the buffer overflows?"
-ACK. Used seq open with size() API to set required size of buffer at the start.
-Added a check to see if there is a buffer over flow by counting buffers wrote into
-seq_file. dstats are "delta stats", and used for debugging.
+Monitor mlx5e_rx_flow_steer frequency:
 
->"Does updating dstats inline during the seq_file show callback break the
->statistics if the buffer overflows?Does updating dstats inline during the seq_file show callback break the
->statistics if the buffer overflows?"
-ACK.
+  /usr/share/bcc/tools/funccount -i 1 mlx5e_rx_flow_steer
 
->"When seq_read detects the overflow, it allocates a larger buffer and calls
->this show callback again from the beginning. During the retry,
->stats == dstats[bank][idx] will evaluate to true because the array was
->already updated, which skips all the previously overflowing entries."
-ACK.
+Frequency of mlx5e_rx_flow_steer (via funccount[2]):
 
->"This isn't a bug, but using the ternary operator for its void side-effects
->is generally avoided in the kernel. Could this be written using an if/else
->block, or the assign_bit() macro instead?"
-ACK.
+  Before: ~335,000 counts/sec
+  After:   ~23,000 counts/sec (reduced by ~93%)
 
->"Since en_map is added to the global npc_priv structure, is it ever explicitly
->cleared during device initialization?
->If the PCI device is unbound and rebound via sysfs, could en_map retain bits
->from the previous lifecycle and cause the new mismatch debugfs file to falsely
->report old enabled rules as mismatched?"
-ACK. Reset bitmap to zero on deinit.
+System Metrics (after enabling rps_feat_llc_affinity):
 
-Patch 2: [PATCH v11 net-next 2/7] net/mlx5e: heap-allocate devlink param values
+  CPU Utilization: 38% -> 32%
+  CPU PSI (Pressure Stall Information): 20% -> 10%
 
->Could we avoid the dynamic allocation entirely? Instead of storing all four
->values at once, could a single union devlink_param_value be declared inside
->the loop, populated, and immediately assigned to the respective config field?
->This would reduce the stack usage to a single union, avoiding both the frame
->size warning and the new memory allocation failure path."
-ACK.
+These results demonstrate that filtering updates by LLC affinity
+significantly reduces driver lock contention and improves overall
+CPU efficiency under heavy network load.
 
-Patch 3: [PATCH v11 net-next 3/7] devlink: Change function syntax.
+[1] https://github.com/apache/brpc/
+[2] https://github.com/iovisor/bcc/blob/master/tools/funccount.py
 
->"The commit message notes that exported APIs will be updated to pass the
->unions by pointer. Is this incomplete? Exported APIs like
->devl_param_driverinit_value_set and the validate callback in struct
->devlink_param still appear to take the union by value, which might continue
->to push the large structure onto the stack during validation."
-ACK.
+Signed-off-by: Chuang Wang <nashuiliang@gmail.com>
+---
+v1 -> v2: add rps_feat_llc_affinity; add brpc tests
 
->"This isn't a bug, but it looks like an automated search and replace
->accidentally modified the word "values" in this comment."
-ACK.
+ include/net/rps.h          | 18 ++--------
+ net/core/dev.c             | 72 ++++++++++++++++++++++++++++++++++++++
+ net/core/sysctl_net_core.c | 34 ++++++++++++++++++
+ 3 files changed, 108 insertions(+), 16 deletions(-)
 
-Patch 5: [PATCH v11 net-next 5/7] octeontx2-af: npc: cn20k: add subbank search order control
+diff --git a/include/net/rps.h b/include/net/rps.h
+index e33c6a2fa8bb..37bbb7009c36 100644
+--- a/include/net/rps.h
++++ b/include/net/rps.h
+@@ -12,6 +12,7 @@
+ 
+ extern struct static_key_false rps_needed;
+ extern struct static_key_false rfs_needed;
++extern struct static_key_false rps_feat_llc_affinity;
+ 
+ /*
+  * This structure holds an RPS map which can be of variable length.  The
+@@ -55,22 +56,7 @@ struct rps_sock_flow_table {
+ 
+ #define RPS_NO_CPU 0xffff
+ 
+-static inline void rps_record_sock_flow(rps_tag_ptr tag_ptr, u32 hash)
+-{
+-	unsigned int index = hash & rps_tag_to_mask(tag_ptr);
+-	u32 val = hash & ~net_hotdata.rps_cpu_mask;
+-	struct rps_sock_flow_table *table;
+-
+-	/* We only give a hint, preemption can change CPU under us */
+-	val |= raw_smp_processor_id();
+-
+-	table = rps_tag_to_table(tag_ptr);
+-	/* The following WRITE_ONCE() is paired with the READ_ONCE()
+-	 * here, and another one in get_rps_cpu().
+-	 */
+-	if (READ_ONCE(table[index].ent) != val)
+-		WRITE_ONCE(table[index].ent, val);
+-}
++void rps_record_sock_flow(rps_tag_ptr tag_ptr, u32 hash);
+ 
+ static inline void _sock_rps_record_flow_hash(__u32 hash)
+ {
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 203dc36aaed5..630a7f21d8de 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -4964,6 +4964,8 @@ struct static_key_false rps_needed __read_mostly;
+ EXPORT_SYMBOL(rps_needed);
+ struct static_key_false rfs_needed __read_mostly;
+ EXPORT_SYMBOL(rfs_needed);
++struct static_key_false rps_feat_llc_affinity __read_mostly;
++EXPORT_SYMBOL(rps_feat_llc_affinity);
+ 
+ static u32 rfs_slot(u32 hash, rps_tag_ptr tag_ptr)
+ {
+@@ -5175,6 +5177,76 @@ static int get_rps_cpu(struct net_device *dev, struct sk_buff *skb,
+ 	return cpu;
+ }
+ 
++/**
++ * rps_record_cond - Determine if RPS flow table should be updated
++ * @old_val: Previous flow record value
++ * @new_val: Target flow record value
++ *
++ * Returns true if the record needs an update.
++ */
++static inline bool rps_record_cond(u32 old_val, u32 new_val)
++{
++	u32 old_cpu = old_val & ~net_hotdata.rps_cpu_mask;
++	u32 new_cpu = new_val & ~net_hotdata.rps_cpu_mask;
++
++	if (old_val == new_val)
++		return false;
++
++	/*
++	 * RPS LLC Affinity Feature:
++	 * Reduce RFS/ARFS flow updates by checking LLC affinity.
++	 *
++	 * Frequent flow table updates can trigger constant hardware steering
++	 * reconfigurations (e.g., ndo_rx_flow_steer), leading to significant
++	 * contention on driver internal locks (like mlx5's arfs_lock).
++	 *
++	 * This strategy only updates the flow record if it migrates across LLC
++	 * boundaries. This minimizes expensive hardware updates while preserving
++	 * cache locality for the application.
++	 */
++	if (static_branch_unlikely(&rps_feat_llc_affinity)) {
++		/* Force update if the recorded CPU is invalid or has gone offline */
++		if (old_cpu >= nr_cpu_ids || !cpu_active(old_cpu))
++			return true;
++
++		/*
++		 * Force an update if the current task is no longer permitted
++		 * to run on the old_cpu.
++		 */
++		if (!cpumask_test_cpu(old_cpu, current->cpus_ptr))
++			return true;
++
++		/*
++		 * If CPUs do not share a cache, allow the update to prevent
++		 * expensive remote memory accesses and cache misses.
++		 */
++		if (!cpus_share_cache(old_cpu, new_cpu))
++			return true;
++
++		return false;
++	}
++
++	return true;
++}
++
++void rps_record_sock_flow(rps_tag_ptr tag_ptr, u32 hash)
++{
++	unsigned int index = hash & rps_tag_to_mask(tag_ptr);
++	u32 val = hash & ~net_hotdata.rps_cpu_mask;
++	struct rps_sock_flow_table *table;
++
++	/* We only give a hint, preemption can change CPU under us */
++	val |= raw_smp_processor_id();
++
++	table = rps_tag_to_table(tag_ptr);
++	/* The following WRITE_ONCE() is paired with the READ_ONCE()
++	 * here, and another one in get_rps_cpu().
++	 */
++	if (rps_record_cond(READ_ONCE(table[index].ent), val))
++		WRITE_ONCE(table[index].ent, val);
++}
++EXPORT_SYMBOL(rps_record_sock_flow);
++
+ #ifdef CONFIG_RFS_ACCEL
+ 
+ /**
+diff --git a/net/core/sysctl_net_core.c b/net/core/sysctl_net_core.c
+index 502705e04649..dbc99aea7bb0 100644
+--- a/net/core/sysctl_net_core.c
++++ b/net/core/sysctl_net_core.c
+@@ -210,6 +210,32 @@ static int rps_sock_flow_sysctl(const struct ctl_table *table, int write,
+ 	kvfree_rcu_mightsleep(tofree);
+ 	return ret;
+ }
++
++static int rps_feat_llc_affinity_sysctl(const struct ctl_table *table, int write,
++					void *buffer, size_t *lenp, loff_t *ppos)
++{
++	u8 curr_state;
++	int ret;
++	const struct ctl_table tmp = {
++		.data = &curr_state,
++		.maxlen = sizeof(curr_state),
++		.mode = table->mode,
++		.extra1 = table->extra1,
++		.extra2 = table->extra2
++	};
++
++	curr_state = static_branch_unlikely(&rps_feat_llc_affinity) ? 1 : 0;
++
++	ret = proc_dou8vec_minmax(&tmp, write, buffer, lenp, ppos);
++	if (write && ret == 0) {
++		if (curr_state && !static_branch_unlikely(&rps_feat_llc_affinity))
++			static_branch_enable(&rps_feat_llc_affinity);
++		else if (!curr_state && static_branch_unlikely(&rps_feat_llc_affinity))
++			static_branch_disable(&rps_feat_llc_affinity);
++	}
++
++	return ret;
++}
+ #endif /* CONFIG_RPS */
+ 
+ #ifdef CONFIG_NET_FLOW_LIMIT
+@@ -531,6 +557,14 @@ static struct ctl_table net_core_table[] = {
+ 		.mode		= 0644,
+ 		.proc_handler	= rps_sock_flow_sysctl
+ 	},
++	{
++		.procname	= "rps_feat_llc_affinity",
++		.maxlen		= sizeof(u8),
++		.mode		= 0644,
++		.proc_handler   = rps_feat_llc_affinity_sysctl,
++		.extra1     = SYSCTL_ZERO,
++		.extra2     = SYSCTL_ONE
++	},
+ #endif
+ #ifdef CONFIG_NET_FLOW_LIMIT
+ 	{
+-- 
+2.47.3
 
->Does this code overflow uslots[]?
->Looking at npc_priv_init(), num_subbanks is populated directly from the
->hardware register NPC_AF_CONST2. While it ensures the value is a power of 2,
->there doesn't seem to be a check that restricts it to MAX_NUM_SUB_BANKS.
->If the hardware reports a value larger than 32, ucnt could exceed the
->bounds of the stack-allocated uslots array.
-ACK.
-
->Can this approach cause a permanent leak of the erased subbanks?
->If any xa_store() call fails, the function jumps to fail_used and returns
->without rolling back the state. Since the subbanks were already erased from
->the xarray into the local stack arrays, failing to re-insert them leaves the
->hardware allocator state partially empty and corrupts it for the lifetime of
->the system.
->Would it be safer to pre-allocate with xa_reserve(), or build new xarrays and
->swap them in on success?
-Used xa_store without xa_erase. If xa_store fails due to memory pressure, error is
-unrecoverable as this error can happen in between (for loop).
-
-[PATCH v11 net-next 6/7] octeontx2-af: npc: cn20k: dynamically allocate and free default MCAM entries
-
->"The NIX_LF_DONT_FREE_DFT_IDXS flag is read directly from the mailbox message
->structure. Since mailbox messages can be initiated by Virtual Functions, what
->prevents an unprivileged VF from repeatedly allocating and freeing LFs with
->this flag set to exhaust the hardware MCAM entries?"
-rvu_mbox_handler_nix_lf_alloc() ---> npc_cn20k_dft_rules_alloc(). npc_cn20k_dft_rules_alloc() will alloc default entries if and only if it is not already there. So if
-VF calls alloc and free LF without setting the flag, the default entries wont be allocated or freed.
-
->Are the values in ptr[] virtual or physical MCAM indices? It appears that
->npc_cn20k_dft_rules_idx_get() retrieves virtual indices, but they are used
->here as direct indices into mcam->entry2pfvf_map and passed to
->npc_mcam_clear_bit(). Since those structures are sized for physical indices,
->could this cause an out-of-bounds memory corruption or an integer underflow?
-default entries are allways allocated by setting "ref_entry" field in struct npc_mcam_alloc_entry_req. Then, rvu_mbox_handler_npc_mcam_alloc_entry() wont return a virtual
-mcam index.
-
->If xa_erase() fails above and returns NULL, ptr[i] is not cleared and the
->code falls through to the free_rules label. Will this result in
->unconditionally calling npc_cn20k_idx_free() on the stale index, potentially
->causing a double-free?
-ACK.
-
->Furthermore, if a VF manually frees its default MCAM rules via the
->NPC_MCAM_FREE_ENTRY mailbox command before this NIX LF teardown occurs,
->npc_cn20k_idx_free() will be called during that manual free. Since the manual
->free does not remove the index from xa_pf2dfl_rmap, could this teardown path
->fetch the same index and attempt to free it again?
-default mcam rules are allocated in rvu_mbox_handler_nix_lf_alloc(). Not thru
-NPC_MCAM_FREE_ENTRY. if it does intentionally, then it is a violation. we have dev_err() there, and need to debug at User point.
-
->Does the caller of this function properly handle negative error codes?
->For example, in npc_enadis_default_mce_entry() and
->npc_enadis_default_entries(), the returned index is passed directly to
->npc_enable_mcam_entry() and nix_update_mce_list() without checking for a
->negative value. This could lead to a WARN(1) in npc_enable_mcam_entry() or an
->out-of-bounds write in nix_update_mce_list().
-We intentionally did the change to find out the flow which pass wrong mcam index.
-So we need a splat using WARN(1)
-
->Here, index is a physical index from the bitmap iteration, but the values
->returned into dft_idxs[] by npc_cn20k_dft_rules_idx_get() are virtual
->indices. Will this comparison always fail, causing default rules to be
->erroneously physically freed?
-No. default indexes are not virtual. This is ensured during allocation itself.
-
->Additionally, if the NIX LF is freed with NIX_LF_DONT_FREE_DFT_IDXS to
->preserve default rules, the ownership mapping is cleared here.
-ACK.
-
->Upon
->re-allocation, npc_cn20k_dft_rules_alloc() will detect the rules in
->xa_pf2dfl_rmap but won't restore the ownership in entry2pfvf_map, meaning
->subsequent operations on these rules will fail verification.
-ACK.
-
->Does this make the firmware layout dependent on the internal size of
->ikpu_action_entries?
-Yes.
->If future kernel versions add new packet kinds and increase the size of
->this array, older firmware files will fail this bounds check and be rejected.
-struct npc_kpu_profile_fwdata does not have a field to indicate the size of ikpu_action_entries.
-We can't modify the structure as it would break backward compatability on old fw.
-
->ill this trigger a compiler warning or build failure on strict builds?
->The min() macro performs strict type checking, and fw_kpu->entries appears
->to be a signed int, while rvu->hw->npc_kpu_entries is an unsigned u16.
-ACK.
-
->Could a negative value in fw_kpu->entries cause an integer underflow here?
->If fw_kpu->entries is read from untrusted firmware as a negative value, the
->offset calculation can underflow the size_t offset variable.
->This would bypass the subsequent bounds check because the wrapped offset
->plus hdr_sz wraps again to a small positive value.
->On the next iteration, calculating fw_kpu = fw->data + offset could result
->in an out-of-bounds memory read.
-Addded check to return on invalid value.
-
->Does modifying profile->kpu here corrupt the global default profile state?
->Earlier in the flow, profile->kpu is initialized to point to the global
->static array npc_kpu_profiles. Allocating device-managed memory into
->profile->kpu[kpu].cam2 overwrites this global state with device-specific
->pointers.
->When the device is unbound and the memory is freed, could this leave dangling
->pointers in the global array for other RVU devices in the system? The same
->applies to the legacy firmware parsing path where cam[entry] is overwritten.
-
->We are not using profile->kpu after unbind and memory is freed. During reinit, these
->fields are intialized again. So there is no issue with it.
->
->Could this printk formatter read past the end of the profile name?
->The name array in the firmware header is 32 bytes. If a user provides a
->firmware file with exactly 32 non-null characters, the string will lack a
->null terminator.
->Printing this with %s can leak adjacent heap memory contents into the kernel
->log. Using %.32s would ensure the read stays within bounds.
-ACK.
-
->Do these fields require an endianness conversion before use?
->The 16-bit values like dp0, dp1, and dp2 are read directly from the firmware
->blob.
->If the firmware payload uses little-endian byte order, applying these
->directly to hardware registers could result in misprogramming on big-endian
->architectures. Would it be safer to use le16_to_cpu() here?
-s/w is validated only for little endian as HW is little endian. if big endian required,
-we will provide seperate firmware for the same.
 
