@@ -1,199 +1,154 @@
-Return-Path: <netdev+bounces-278296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278297-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qFz3ErjX3WlLkAkAu9opvQ
-	(envelope-from <netdev+bounces-278296-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 07:59:20 +0200
+	id aA/EAPrY3WmTkAkAu9opvQ
+	(envelope-from <netdev+bounces-278297-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 08:04:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5D8A3F5D5E
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 07:59:19 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54A773F5D9B
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 08:04:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 42CD330067BE
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 05:59:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B092E3010D81
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 06:04:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4836833066E;
-	Tue, 14 Apr 2026 05:59:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BB702F532C;
+	Tue, 14 Apr 2026 06:04:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="PeKl84O5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nnYR0gye"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D76D023A562
-	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 05:59:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B06923182D
+	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 06:04:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776146357; cv=none; b=rkYmPmAwBkY5HZ8QYO7Kgv4TfbMG5ohY0qxvAs9gVCH8d68+Mxyv+cnwH+rAJad5vTFQ2xToPEpLmeQce61lsD6S6ewZdig4/Ad10at9tS+4MuIknq/eyvblVJXmNWKa2JJjAsTAxZcD2t6ZVLV9cdmGe2lhTB8bBm8iIDOZhIw=
+	t=1776146678; cv=none; b=ueuBgShwrZjDm1RHrcpS8olD1IHgpjuUd/P8XIP+bKXIwn14O829SYrt8y5Q5MjwcvgQ+K/ZoLVXPOKDnUgABFsLIxvg6Yt6dwI9WEFq1OrE4ntDTbZBxtOVPv4mG07zZxipZJ2q1CrncW9hqj2WHRHJz+c8m4GZBIDE8uwcDNY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776146357; c=relaxed/simple;
-	bh=IXFwVz7pP81B0uC19OlWZ820OcjrEtLhkBy2UNGkeS4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UGzNS5EPK+fFqnC/+C/Vqw6uV8MEUIfNjaETaoPeO5AT8MMoBp0ae6fTYhW4steKUDrgnDI+Vb/jPmnyNtvkA3H6xwSlhVhuX5TpQC/arKzzve9EWCX0XcuE1khwRfZCyDc/Ci30rXcHC8OGLOm7HIvi2uDCIcIVqSAgi/S2MFM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=PeKl84O5; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-488b8efed61so49694005e9.1
-        for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 22:59:15 -0700 (PDT)
+	s=arc-20240116; t=1776146678; c=relaxed/simple;
+	bh=kwwtfunrD7hHLNzuaOfO0jJzIZvS2EcOuH2zmnFPgUk=;
+	h=Content-Type:MIME-Version:From:To:Cc:Subject:Date:Message-ID; b=cdGuqTwGNcjnkiEKdhg4XSbmGLxoLvfui+sELVIDvl8+CKwSOQnqzqhGBoagk+GXr6LY5b7EkBQdT85WULdgvpcEB9Wbbaj15vPs1AK2NxyVyEvGagpLnV+igLmLbMfXO4/a49/33wxPXw138aiTa1lc8UEhPdRNL/98B3thvSE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nnYR0gye; arc=none smtp.client-ip=209.85.219.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-8a58057d7baso56965236d6.1
+        for <netdev@vger.kernel.org>; Mon, 13 Apr 2026 23:04:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall.org; s=google; t=1776146354; x=1776751154; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=JM3KKroWo3iah2X1lSRBk+9/kqAHz8X4Y/dyTwo34GU=;
-        b=PeKl84O5a9/z5SMZf7N/CM/Fk8zKzWSQBSc9hOiKDdVF4LIQulpszjrkUPNHcfvHjD
-         QMgP9HgfeDi+9NTtBg5fDba7jlk5mFIIfJbh7ygB1Xrse753wiOcj854QETTP60FZe6B
-         u6YFs2i3MzFsVG3zS1I4jK+0KQLa9XG1aNWM0gKRIDsFFsPwZNdmW4rQnv0An7cuvnrd
-         KCOy9L6CSB8dW+2eL3WxvkS1KWuet3WKcoo13fAQVw8SCawxtgYjq/Q/nzuZpNGbppQM
-         TgmifLMaORDWk3GSscJSTv/jEEmfVr+vjrg0QPJhJoXfeNA/p/6C8JpRfpqvz4aMuUNH
-         4Clw==
+        d=gmail.com; s=20251104; t=1776146676; x=1776751476; darn=vger.kernel.org;
+        h=message-id:date:subject:cc:to:from:content-transfer-encoding
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=kwwtfunrD7hHLNzuaOfO0jJzIZvS2EcOuH2zmnFPgUk=;
+        b=nnYR0gyeyzVRzoqMyZiwHiNiTy1LLnjPwA5R9z4ZWUvuoga3Vi1Z3MrRNKMu6BGycD
+         utUmEgxUr1MdIeXSIQrR4sqwJuGAcjOfRTrtqL7sfoEOLYQC8P8tb+0eNxze97p7Sz4Z
+         bA/YoeKMxRm+uf7zdFeAcaL6Bt1OlkPyjuqLX4XVxXxnm4mKBDHIajd3p+oOwtihuNzq
+         JXEnBcq8hazL48bk6trY3rTjQ6kzKwlSS4aiTvDSysfczrBxDohdGoM98wjtYOxzbncr
+         MeVKbLtzN+SxjoicKmO3uxJFjc8LtYAEff09g/F+ejnC90fclfKWehQT/AazmmqRoDWb
+         5S2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776146354; x=1776751154;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=JM3KKroWo3iah2X1lSRBk+9/kqAHz8X4Y/dyTwo34GU=;
-        b=UcPiJNI5fnEZBEeSPb6btXPBHxwMCTIQ7oihVJVbAa1iC1NDkB6q1cs3HaAtqyqRbB
-         Nr5xqP5IjizWoV38AqudsMgHdYcfACp8oCelM35mqvCjugJgW6vEG1QTKt+H9AnAkJ6C
-         5htYOWu3bh4udPADfd1kXaYgukERI+/61TIxiXAlcWfBN4jx6ItrbyWgG3XEwyjx3fil
-         n3WO7p7F27GV6oS+r4lHTk1kpZGXIyZYxjPW4aMDM/jm0kU91Z7OsMtFQyUgMRRol1+U
-         o+bcMPkO1bNt60s/3LUTiMdaeemvr6IqR+8FEo/Lat3uQy7HqMnmXxfmnpm1QZSAvPUP
-         Ptig==
-X-Forwarded-Encrypted: i=1; AFNElJ//7CJswRSp7LgppE2Mq9/ehpAJod+wKhI70Q2XsCbWv7SllxlOVujy2klUOdrhrb2mCtihnhg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzDTB/REO/mvq8UPK+TIPnyxVm6qiSP7u4VsjvpJKmgHUjDAaLv
-	s1r7Lo3AIRKnK9EEHHq9URC6LJsHeE0ID0t52rkiv8v4wwO5NbPoq2ITEPT4WKmyVL0GVi+Dfq4
-	/NRYc
-X-Gm-Gg: AeBDietUvbC0Z3SAWrJ6u2arDYJJjgsnN6ypqk/jtxvn+mB6ocdROeIS0uIX5hZ4FrR
-	/S+FQcLNRVt3VoqtRH+XxO/HSgvyP7y6FdoskCqjCuJLsVr+z179kHRQsNhRnm0rRMUmvkDR7Mk
-	+FmYS8NEX5+MT0HEzs/dP4LDPJgg9aHHeb/L/bQsRGCVxyKTjTGwOjZ1XYrxf1zijTY0NdDrXhU
-	+tmjBYl1lNAGGJM+pYe4Yw1X8Mznq2clPukZHiaDwPRziXJOIpV5KmluYBkLfoNK6F3qemroFHD
-	X+wJH9nn7mk4dgP3nep+N+2Rs2P+mKPnD5fms7xpGpoIk9DZgidKE3pNrDV+rZfgNtwFY3vHAel
-	I8ecibtqwP6A9ft5MVFNztBiEbOvSjsFU91yO2CWfx0BU6yfPaSutJA+FUQm3ujTnoDQs23CCOQ
-	Lyoqj2UfIOL5xnwh8r6tfvLEVpMa1zANwatThTvoAIfiM9yF6NToZCpCE=
-X-Received: by 2002:a05:600c:a105:b0:485:fbd2:f72 with SMTP id 5b1f17b1804b1-488d681701fmr146503485e9.1.1776146354210;
-        Mon, 13 Apr 2026 22:59:14 -0700 (PDT)
-Received: from [192.168.0.161] (78-154-15-182.ip.btc-net.bg. [78.154.15.182])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488ee049333sm21754165e9.15.2026.04.13.22.59.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 13 Apr 2026 22:59:13 -0700 (PDT)
-Message-ID: <2ede8302-91ea-4a27-b8ea-1813cc0eff0e@blackwall.org>
-Date: Tue, 14 Apr 2026 08:59:12 +0300
+        d=1e100.net; s=20251104; t=1776146676; x=1776751476;
+        h=message-id:date:subject:cc:to:from:content-transfer-encoding
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kwwtfunrD7hHLNzuaOfO0jJzIZvS2EcOuH2zmnFPgUk=;
+        b=N+hBeymqkL1dDIzpqG2ykeQCsSd9a9Goc1oJnEGr188Uw/JWEPbWCxF2MIY6N3vWBE
+         aLqpZ4z6k6WGuk+x6EYCMJhOY5hqyPan3J8exn4l/ftQ33VhEhhkVvOoSe+1zPsDbFSx
+         C84Pb/PnbDuF3MPEnXsLCLcOVrMxqVPAfDHnRud2L2NkFn8zSM69fMx42Zg86idCR69Q
+         /6jzXFPaOMWLp7ht9mybX5bMfL6HJZRyb6se3iAF5Olmxl/KvJyOnaboReBtWfNd932V
+         NMZBEuLrYLOjqUAMWzdW0wXJ5+1fY2BmweNAoEy7Xx37cHIuR7P/FgCIn1pjo2Ojhfqd
+         CQgA==
+X-Gm-Message-State: AOJu0Yz0JdYzLgQzVBg4cYStK5WWY6z/6AxGlEdT4+FhmF5oOFELag1y
+	9skqXxswuh8MpT5zqyl2sAMdC8qLNmyLy9apfl+9Gf/4TVfUJm3XQqxa0pTPx6V6vFmpxg==
+X-Gm-Gg: AeBDiettxSKa+HPfBwUdTmt/doWIX6umkF6lx2meBJVzTQ4tdmRXQxyugiXk8hi/J/Y
+	mc2+ShNSF1HshTeatUR3h87HNrMQcENBtRDziceiP77ZhbJuuNFH9wTCWCJ6fzaH87wXJQeZulS
+	fnBFEkkE7m6cWgvDmF6BaZe7BmJfIa5U6oIRWr5XYvY8dC4vTlO3mmqfb8McLMC82Fon8w1SWbp
+	TybW2ZkhtaEmCPvuOGNEgGDJBkpbkIJpYrCdU83sw9R2pwd+aWvVgZXyGnHGWoLC7lYY6uoAAUH
+	mngxpws9Yqh4N16Gae4SXvP8sQ2KyngjSnTIzU+eCcTkJqwr0romeETm+0YVMJuKYczopjtiT92
+	VswccENkqvNQNt1cSvfybnc34HSonSX6EvEe4DLSKS88cSTioe02HdriuAM/cmL+hrhTH1OY6yy
+	rgt6d8APg6mWPEGbR28QAvTKpCCesnj6ScUxvCuC7A5VXsfpINp6hVG3FSeA0owXa1Ifl8M/s=
+X-Received: by 2002:a05:6214:5402:b0:89c:5f6e:451a with SMTP id 6a1803df08f44-8ac861cac52mr271499016d6.21.1776146676021;
+        Mon, 13 Apr 2026 23:04:36 -0700 (PDT)
+Received: from tdc4045031631.internal.cloudapp.net ([20.63.37.123])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8ac84a10e7esm113910586d6.16.2026.04.13.23.04.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Apr 2026 23:04:35 -0700 (PDT)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 3/3] selftests/net: Add additional test
- coverage in nk_qlease
-To: Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org
-Cc: kuba@kernel.org, dw@davidwei.uk, pabeni@redhat.com
-References: <20260413220809.604592-1-daniel@iogearbox.net>
- <20260413220809.604592-4-daniel@iogearbox.net>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20260413220809.604592-4-daniel@iogearbox.net>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Content-Transfer-Encoding: base64
+From: Ashutosh Desai <ashutoshdesai993@gmail.com>
+To: netdev@vger.kernel.org
+Cc: linux-hams@vger.kernel.org, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v2] rose: fix OOB reads on short CLEAR REQUEST frames
+Date: Tue, 14 Apr 2026 06:04:34 -0000
+Message-ID: <177614667427.3606651.8700070406932922261@gmail.com>
+X-Spamd-Result: default: False [-1.06 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[blackwall.org:s=google];
+	MIME_BASE64_TEXT_BOGUS(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278296-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	MIME_TRACE(0.00)[0:+];
-	DMARC_NA(0.00)[blackwall.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[blackwall.org:+];
+	TAGGED_FROM(0.00)[bounces-278297-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[razor@blackwall.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[ashutoshdesai993@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,iogearbox.net:email,blackwall.org:dkim,blackwall.org:email,blackwall.org:mid]
-X-Rspamd-Queue-Id: E5D8A3F5D5E
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 54A773F5D9B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 4/14/26 01:08, Daniel Borkmann wrote:
-> Add further netkit queue-lease coverage for netns lifecycle of the guest
-> and physical halves, channel resize across active leases, single-device
-> and multi-lessee scenarios, L3 mode operation, lease capacity exhaustion,
-> and corner-cases of e.g. queue-create rejection paths. Also make the tests
-> more robust by removing the time.sleep(0.1) after netns deletion and turn
-> them into a wait loop.
-> 
-> Full test run:
-> 
->   # ./nk_qlease.py
->   TAP version 13
->   1..45
->   ok 1 nk_qlease.test_remove_phys
->   ok 2 nk_qlease.test_double_lease
->   ok 3 nk_qlease.test_virtual_lessor
->   ok 4 nk_qlease.test_phys_lessee
->   ok 5 nk_qlease.test_different_lessors
->   ok 6 nk_qlease.test_queue_out_of_range
->   ok 7 nk_qlease.test_resize_leased
->   ok 8 nk_qlease.test_self_lease
->   ok 9 nk_qlease.test_create_tx_type
->   ok 10 nk_qlease.test_create_primary
->   ok 11 nk_qlease.test_create_limit
->   ok 12 nk_qlease.test_link_flap_phys
->   ok 13 nk_qlease.test_queue_get_virtual
->   ok 14 nk_qlease.test_remove_virt_first
->   ok 15 nk_qlease.test_multiple_leases
->   ok 16 nk_qlease.test_lease_queue_tx_type
->   ok 17 nk_qlease.test_invalid_netns
->   ok 18 nk_qlease.test_invalid_phys_ifindex
->   ok 19 nk_qlease.test_multi_netkit_remove_phys
->   ok 20 nk_qlease.test_single_remove_phys
->   ok 21 nk_qlease.test_link_flap_virt
->   ok 22 nk_qlease.test_phys_queue_no_lease
->   ok 23 nk_qlease.test_same_ns_lease
->   ok 24 nk_qlease.test_resize_after_unlease
->   ok 25 nk_qlease.test_lease_queue_zero
->   ok 26 nk_qlease.test_release_and_reuse
->   ok 27 nk_qlease.test_veth_queue_create
->   ok 28 nk_qlease.test_two_netkits_same_queue
->   ok 29 nk_qlease.test_l3_mode_lease
->   ok 30 nk_qlease.test_single_double_lease
->   ok 31 nk_qlease.test_single_different_lessors
->   ok 32 nk_qlease.test_cross_ns_netns_id
->   ok 33 nk_qlease.test_delete_guest_netns
->   ok 34 nk_qlease.test_move_guest_netns
->   ok 35 nk_qlease.test_resize_phys_no_reduction
->   ok 36 nk_qlease.test_delete_one_netkit_of_two
->   ok 37 nk_qlease.test_bind_rx_leased_phys_queue
->   ok 38 nk_qlease.test_resize_phys_shrink_past_leased
->   ok 39 nk_qlease.test_resize_virt_not_supported
->   ok 40 nk_qlease.test_lease_devices_down
->   ok 41 nk_qlease.test_lease_capacity_exhaustion
->   ok 42 nk_qlease.test_resize_phys_up
->   ok 43 nk_qlease.test_multi_ns_lease
->   ok 44 nk_qlease.test_multi_ns_delete_one
->   ok 45 nk_qlease.test_move_phys_netns
->   # Totals: pass:45 fail:0 xfail:0 xpass:0 skip:0 error:0
-> 
-> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
-> ---
->  tools/testing/selftests/net/nk_qlease.py | 951 ++++++++++++++++++++++-
->  1 file changed, 946 insertions(+), 5 deletions(-)
-> 
-
-Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
-
+cm9zZV9wcm9jZXNzX3J4X2ZyYW1lKCkgY2FsbHMgcm9zZV9kZWNvZGUoKSB3aGljaCByZWFkcyBz
+a2ItPmRhdGFbMl0Kd2l0aG91dCBhbnkgcHJpb3IgbGVuZ3RoIGNoZWNrLiBGb3IgQ0xFQVIgUkVR
+VUVTVCBmcmFtZXMgdGhlIHN0YXRlCm1hY2hpbmVzIHRoZW4gcmVhZCBza2ItPmRhdGFbM10gYW5k
+IHNrYi0+ZGF0YVs0XSBhcyB0aGUgY2F1c2UgYW5kCmRpYWdub3N0aWMgYnl0ZXMuCgpBIGNyYWZ0
+ZWQgMy1ieXRlIFJPU0UgQ0xFQVIgUkVRVUVTVCBmcmFtZSBwYXNzZXMgdGhlIG1pbmltdW0gbGVu
+Z3RoCmdhdGUgaW4gcm9zZV9yb3V0ZV9mcmFtZSgpIGFuZCByZWFjaGVzIHJvc2VfcHJvY2Vzc19y
+eF9mcmFtZSgpLCB3aGVyZQpyb3NlX2RlY29kZSgpIHJlYWRzIG9uZSBieXRlIHBhc3QgdGhlIGhl
+YWRlciBhbmQgdGhlIHN0YXRlIG1hY2hpbmVzCnJlYWQgdHdvIGJ5dGVzIHBhc3QgdGhlIHZhbGlk
+IGJ1ZmZlci4KCkFkZCBhIHBza2JfbWF5X3B1bGwoc2tiLCAzKSBjaGVjayBiZWZvcmUgcm9zZV9k
+ZWNvZGUoKSB0byBjb3ZlciBpdHMKc2tiLT5kYXRhWzJdIGFjY2VzcywgYW5kIGEgcHNrYl9tYXlf
+cHVsbChza2IsIDUpIGNoZWNrIGFmdGVyd2FyZHMgZm9yCnRoZSBDTEVBUiBSRVFVRVNUIHBhdGgg
+dG8gY292ZXIgdGhlIGNhdXNlIGFuZCBkaWFnbm9zdGljIHJlYWRzLgoKRml4ZXM6IDFkYTE3N2U0
+YzNmNCAoIkxpbnV4LTIuNi4xMi1yYzIiKQpDYzogc3RhYmxlQHZnZXIua2VybmVsLm9yZwpTaWdu
+ZWQtb2ZmLWJ5OiBBc2h1dG9zaCBEZXNhaSA8YXNodXRvc2hkZXNhaTk5M0BnbWFpbC5jb20+Ci0t
+LQpWMSAtPiBWMjogc3dpdGNoIHNrYi0+bGVuIGNoZWNrIHRvIHBza2JfbWF5X3B1bGw7IGFsc28g
+YWRkCiAgICAgICAgICBwc2tiX21heV9wdWxsKHNrYiwgMykgYmVmb3JlIHJvc2VfZGVjb2RlKCkg
+dG8gY292ZXIgaXRzCiAgICAgICAgICBza2ItPmRhdGFbMl0gYWNjZXNzCgp2MTogaHR0cHM6Ly9s
+b3JlLmtlcm5lbC5vcmcvbmV0ZGV2LzIwMjYwNDA5MDEzMjQ2LjIwNTE3NDYtMS1hc2h1dG9zaGRl
+c2FpOTkzQGdtYWlsLmNvbS8KCiBuZXQvcm9zZS9yb3NlX2luLmMgfCAxMCArKysrKysrKysrCiAx
+IGZpbGUgY2hhbmdlZCwgMTAgaW5zZXJ0aW9ucygrKQoKZGlmZiAtLWdpdCBhL25ldC9yb3NlL3Jv
+c2VfaW4uYyBiL25ldC9yb3NlL3Jvc2VfaW4uYwppbmRleCAwMjc2YjM5M2YwZTUuLmI5ZjAxYTEx
+ZTJkZiAxMDA2NDQKLS0tIGEvbmV0L3Jvc2Uvcm9zZV9pbi5jCisrKyBiL25ldC9yb3NlL3Jvc2Vf
+aW4uYwpAQCAtMjY5LDggKzI2OSwxOCBAQCBpbnQgcm9zZV9wcm9jZXNzX3J4X2ZyYW1lKHN0cnVj
+dCBzb2NrICpzaywgc3RydWN0IHNrX2J1ZmYgKnNrYikKIGlmIChyb3NlLT5zdGF0ZSA9PSBST1NF
+X1NUQVRFXzApCiAgMDsKIAoraWYgKCFwc2tiX21heV9wdWxsKHNrYiwgMykpIHsKK2tmcmVlX3Nr
+Yihza2IpOworcmV0dXJuIDA7Cit9CisKIGZyYW1ldHlwZSA9IHJvc2VfZGVjb2RlKHNrYiwgJm5z
+LCAmbnIsICZxLCAmZCwgJm0pOwogCitpZiAoZnJhbWV0eXBlID09IFJPU0VfQ0xFQVJfUkVRVUVT
+VCAmJiAhcHNrYl9tYXlfcHVsbChza2IsIDUpKSB7CitrZnJlZV9za2Ioc2tiKTsKK3JldHVybiAw
+OworfQorCiBzd2l0Y2ggKHJvc2UtPnN0YXRlKSB7CiBjYXNlIFJPU0VfU1RBVEVfMToKIHVldWVk
+ID0gcm9zZV9zdGF0ZTFfbWFjaGluZShzaywgc2tiLCBmcmFtZXR5cGUpOwotLSAKMi4zNC4x
 
