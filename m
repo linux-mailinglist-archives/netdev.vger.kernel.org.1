@@ -1,235 +1,194 @@
-Return-Path: <netdev+bounces-278360-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278361-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8M/9ClQF3mlRmQkAu9opvQ
-	(envelope-from <netdev+bounces-278360-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 11:13:56 +0200
+	id 8MRmIH8F3mlRmQkAu9opvQ
+	(envelope-from <netdev+bounces-278361-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 11:14:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7ACD33F7B5E
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 11:13:55 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 103FA3F7B7D
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 11:14:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AE4D530459ED
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 09:13:05 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 17ACB300A30C
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 09:14:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8DD33BED0C;
-	Tue, 14 Apr 2026 09:13:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ant7J/HE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 459753BA227;
+	Tue, 14 Apr 2026 09:14:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-ot1-f79.google.com (mail-ot1-f79.google.com [209.85.210.79])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CE913BA222
-	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 09:13:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 101DE3BBA19
+	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 09:14:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.79
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776157982; cv=none; b=skYfhz8QQ+dNdLesd8f7aweMlMD0UmAgi4+znFxYQXNZzBkgbG9KRmpXUHBC1YJ7Z3p4rrUZsPBtrGXeBUrZN9we+5aiRzGSvyMYnjfUKuGhYNU2dGptVSoY1uRwUNa7q8EU33xiSRRmXa+8xPlX8zgtloQ8KVhuPVWjrdCxwBQ=
+	t=1776158074; cv=none; b=cW8w92OCT+tFxmVEIIuN80gSi7mrUNXV9OVT6663uG0pJWsZBRKKWSHhxIW2I5+jcZXViEIxU+F5uDCqxnkzCwi4WxwXJrThH0aWRjIum4IMq9AAjOybxqLlQUMCQiydE2x6m9VhvPxL+mE2Of3j1lbsD0zJ2wI+a56WgOcfSK8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776157982; c=relaxed/simple;
-	bh=2vI6ognLDqNvbJVGBaJD46iIjBYSoIanjoxDpv86i8Y=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=UM+rhlxrAL0Rf3kihYR3GpQODpdN5yS/MX2tBYePKcEn0Vu84mHjFequmaQd/vGyy+FjRoPFnVZm+Nw9YUqxQsoo+rEoVVgMAKyy1pv5x0vTBft23ccaHy0fsEZScs2n7Fb6WgC4tAXZJMtp+Ul+0v2LcnjY+dmGgueyFE2MitI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ant7J/HE; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-488af96f6b2so70921805e9.0
-        for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 02:13:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776157979; x=1776762779; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=QOp42/ywV8i4T7a1g68YDk4e+77ZBYbSBwy2mOXtNU0=;
-        b=Ant7J/HET8p9uKvVQUfr3DRxk9d+3j4kB2H2WA7Q94b8eu7mgkHNjBZBDmi8NJkCaM
-         WxHxVPUHeDyZLnIC/dH8q0+ZB6w4YJe+/SFYB5SnmZND1e4DwdyaEhnHmQ4XuYAoq4hi
-         K4NfmLodEEfkT/vb43U+JAqLPKgTM6jXB0iZ4vSqd/5KKHOf2Bkq6mt9S/v+Cg3hV9cI
-         3XfKMTM9X9jAK6ynTlbYQlltnRzD0E0sAVAuh/Pg11sV7GFMGg5dUMEhGOlPqEgJRwhe
-         mrsWmZCFj05V4dZDZg8D8UIooGXQimyfOvKQWZZrcLruXuF853RHkKHu5klqfhWBshWB
-         RqVA==
+	s=arc-20240116; t=1776158074; c=relaxed/simple;
+	bh=GPNEvwTV3YCZM/IQhX2qX/16wfmzdwPlkAEZNY2yz18=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=op1dfEJTaQQlSu15PTcdUvvKw+1MT7Ip7fPF0ESI1e0pjoPBbwzZEFKVuqgCOXq8Sqg16hPcb5VgCtHTZjIAAuRkf1hqr3NegHuJH6Y1YboQtywrM/oCKzmQ1UnQWERrdnpQ74ep4DbKhlLdr07kBNgBABUduNmGSG8SFI1Phu8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.79
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-ot1-f79.google.com with SMTP id 46e09a7af769-7dc4044e3beso5199729a34.0
+        for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 02:14:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776157979; x=1776762779;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=QOp42/ywV8i4T7a1g68YDk4e+77ZBYbSBwy2mOXtNU0=;
-        b=oUJ4sR2RmhjFhIOBjzksnZApj9hp/uQprsqmg/IjmP9+BdtV15+ycU9laxLLwQkFLx
-         X2KTcVq55eMVLohk9pwk7tOsI4ArRyAs8O7taTepC5Rc27H8LtN38nDqRtiCAEqtjFAA
-         322H+0aqX36agS79k3SZV82Gx9j+pCWXuD5HpCCOsVGUWLZJmdOeW1lO7f724vvcy8IG
-         iOiwgS3Z0pNYSXXlqo0i/Ql0gOgjGXak2Y432CKOThZ4HotWekux3+Xsf6QJpggBrIWN
-         YH8iXXLqaGI5iNEveOmfOaKOSDL7T/AjKaW4tgTKQ3EX1c5FxcGoftFhq2CfnyPpp7ij
-         vY4A==
-X-Forwarded-Encrypted: i=1; AFNElJ+2323Suk3BLlxUtSEk2EjheW0RLp62oRfD78gYT3yeCmQWToSLqYPfVD4lYfKMauTusV0n4ac=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz9JfuZzAOZHUdTD9RVNI7r4R2ESCd+s1uG2NmBZ2DuvE0KC4IF
-	qPBcH3/WKO0mBWDab70MbACbD+bmseESHfooXl64tzL+iBnxMgy/wniJ1589jYLuQaI=
-X-Gm-Gg: AeBDievQg5YKzeMi0ni4dP4bWiAMqbmiQEcUfLgBIhGpjePyjTKIVAtn+r+cfMeGTg5
-	dAACn4t8WMRCJ6opvAq6yGe1Z50Ut22UxVqQ8m4QMxNKP7Yah8MWz9wktI32JvSiLVBeOLx+RCc
-	WxUwBQm7yrX0dDzAP2/sqeoIwJpbHaPVFJN2NxasC4q7ixuHlUJzsv0ZDjc8dnZ6cccAaXvgjj7
-	peNuw5XwkcZ+dPbJA0ZiIKxNS55bA6Ifdo/3bfkQ9fOtBVl/CMfLR7fLNpcCBb//8Au9DvM0Co0
-	6NtHflgS9YH+2o2iKGYjByih2HajjgGuoFf1MG36dwxBH91g1sOGDBH3Dnh+QJn/avcSAPiyJeW
-	HtoIMW/HZfRP19nE2eV9eZnuZCd4Uq/X6KE2KJ5eif8agv1vrLX+dezfYsqxsORirhycI2L5V5e
-	G7KewbDV3ljIlbOfe5vOrdiiDO2EepBhMJXeAas5QLYaw3y3obYyIV/0rRgTSEfYKd7x+9EsfT6
-	AHrsMhXdQ==
-X-Received: by 2002:a05:600c:c084:b0:485:4006:960c with SMTP id 5b1f17b1804b1-488d685b86bmr165530925e9.16.1776157979473;
-        Tue, 14 Apr 2026 02:12:59 -0700 (PDT)
-Received: from [127.0.1.1] (cust-east-par-46-193-119-166.cust.wifirst.net. [46.193.119.166])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488eddba112sm37720175e9.0.2026.04.14.02.12.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Apr 2026 02:12:59 -0700 (PDT)
-From: Fidelio Lawson <lawson.fidelio@gmail.com>
-X-Google-Original-From: Fidelio Lawson <fidelio.lawson@exotec.com>
-Date: Tue, 14 Apr 2026 11:12:36 +0200
-Subject: [PATCH v3 3/3] net: phy: micrel: expose KSZ87xx low-loss erratum
- via PHY tunable
+        d=1e100.net; s=20251104; t=1776158070; x=1776762870;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=c4/P5vYiyQeQxekanU/M1VkImZhr/JuEMOleJPaKHW0=;
+        b=nhajaukYoK/J5x5nrljlH1MrpJtsPtQDGk+C1Vk+88arfTUxRCRu7sNy8/llm6iPdG
+         ddjClPZJ7pECuurvSqf/9H1GFSEDoypll6KVA2Cbb+J8yJESazycU0brRPASFLdZx1eF
+         TcFjehKJBMxa1ulsAnJSGNEr5mNeAYEkBuHB70M/BXYaDFOoxwF52cqn17qz6VBt8Rh0
+         qT8f25j8tEV8qJob/R/RoLJRKnAKXSHozcFuiZkyHsUyaLbDZ2ic5QscvY+ZTICLHmR7
+         BlmZRYzFcngtGSbUa0ySnVwVhAqI2xqY+GRSTKIPzJyJUxo9FV1ueArzm7bgwwrlpMCb
+         kwPg==
+X-Forwarded-Encrypted: i=1; AFNElJ8C9s8ALDozKLOdeTCMpgkf0USCnljMtA89qatvXqfMx9RV2iFFKduz6BNJkaZEfFraeHhJ2ec=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzv51UYSS1IKcjC/BlAYJy6VTErTMEbHe99tWsD/2tFhAsupLsV
+	g+vxFHmuJNQUhaALDpsNRZ8eUbsgcZgjGcBjWVN1d1WcZviA7jYFjJl3RhwwPjkKJLsC7ucHnWl
+	/zl0zJOvbxH/0rUEcv1el/+HArErGW9ho0nP6H5tjBjUL1jzFF5Y/2/8RU4Q=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260414-ksz87xx_errata_low_loss_connections-v3-3-0e3838ca98c9@exotec.com>
-References: <20260414-ksz87xx_errata_low_loss_connections-v3-0-0e3838ca98c9@exotec.com>
-In-Reply-To: <20260414-ksz87xx_errata_low_loss_connections-v3-0-0e3838ca98c9@exotec.com>
-To: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, 
- Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Marek Vasut <marex@denx.de>, 
- Maxime Chevallier <maxime.chevallier@bootlin.com>, 
- Simon Horman <horms@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>, 
- Russell King <linux@armlinux.org.uk>
-Cc: Woojung Huh <Woojung.Huh@microchip.com>, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Fidelio Lawson <fidelio.lawson@exotec.com>
-X-Mailer: b4 0.15.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1776157976; l=3026;
- i=fidelio.lawson@exotec.com; s=20260326; h=from:subject:message-id;
- bh=2vI6ognLDqNvbJVGBaJD46iIjBYSoIanjoxDpv86i8Y=;
- b=FP4OCvNO1ZybW4xzvNdkF5/zBzYowz+zBvp4wt3FGg6LXKDVyOeI//tDQ21+a/LHMjJOoODrL
- suZIjX1OlaCDZEecu+jz9QT7l9X9/v49Yj6V2DMUjItbPTYpuUdmRi7
-X-Developer-Key: i=fidelio.lawson@exotec.com; a=ed25519;
- pk=866eH9Bmmpjc+ctgkr5T1uXxBefZzob3tEEuiVWZ6BI=
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Received: by 2002:a05:6820:628d:b0:683:a6e:970a with SMTP id
+ 006d021491bc7-68a6b54c90cmr7115601eaf.40.1776158069823; Tue, 14 Apr 2026
+ 02:14:29 -0700 (PDT)
+Date: Tue, 14 Apr 2026 02:14:29 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69de0575.a00a0220.468cb.005c.GAE@google.com>
+Subject: [syzbot] [ppp?] KMSAN: uninit-value in ppp_sync_receive (4)
+From: syzbot <syzbot+88679c919eb801bd16f8@syzkaller.appspotmail.com>
+To: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-ppp@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [1.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=963de479f54c6dbb];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,denx.de,bootlin.com,armlinux.org.uk];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-278360-lists,netdev=lfdr.de];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-278361-lists,netdev=lfdr.de,88679c919eb801bd16f8];
+	RCVD_TLS_LAST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[goo.gl:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,googlegroups.com:email,syzkaller.appspot.com:url,storage.googleapis.com:url,appspotmail.com:email];
+	REDIRECTOR_URL(0.00)[goo.gl];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lawsonfidelio@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[exotec.com:email,exotec.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7ACD33F7B5E
+	RCPT_COUNT_SEVEN(0.00)[9];
+	SUBJECT_HAS_QUESTION(0.00)[]
+X-Rspamd-Queue-Id: 103FA3F7B7D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Expose the KSZ87xx low-loss cable erratum control through the PHY
-tunable interface.
+Hello,
 
-KSZ87xx switches integrate embedded PHYs whose receiver analog front-end
-may require specific equalizer or low-pass filter adjustments when used
-with short or low-loss Ethernet cables, as described in Microchip errata
-DS80000687C (Module 3).
+syzbot found the following issue on:
 
-Implement get_tunable / set_tunable callbacks in the Micrel PHY driver
-for KSZ87xx devices, mapping the ETHTOOL_PHY_KSZ87XX_LOW_LOSS tunable
-to a vendor-specific Clause 22 PHY register. Accesses are routed through
-standard phy_read() / phy_write() operations and translated by the KSZ8
-DSA driver into the appropriate internal LinkMD table updates.
+HEAD commit:    9a9c8ce300cd Merge tag 'kbuild-fixes-7.0-4' of git://git.k..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=112a874e580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=963de479f54c6dbb
+dashboard link: https://syzkaller.appspot.com/bug?extid=88679c919eb801bd16f8
+compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
 
-The tunable uses a u8 mode selector, allowing userspace to select
-between the documented equalizer and LPF bandwidth configurations.
+Unfortunately, I don't have any reproducer for this issue yet.
 
-Signed-off-by: Fidelio Lawson <fidelio.lawson@exotec.com>
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/3e2ad23d804a/disk-9a9c8ce3.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/a3dde4990296/vmlinux-9a9c8ce3.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/256e0a89d22c/bzImage-9a9c8ce3.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+88679c919eb801bd16f8@syzkaller.appspotmail.com
+
+=====================================================
+BUG: KMSAN: uninit-value in ppp_sync_input drivers/net/ppp/ppp_synctty.c:684 [inline]
+BUG: KMSAN: uninit-value in ppp_sync_receive+0x626/0xfa0 drivers/net/ppp/ppp_synctty.c:334
+ ppp_sync_input drivers/net/ppp/ppp_synctty.c:684 [inline]
+ ppp_sync_receive+0x626/0xfa0 drivers/net/ppp/ppp_synctty.c:334
+ tty_ldisc_receive_buf+0x1f7/0x2c0 drivers/tty/tty_buffer.c:391
+ tty_port_default_receive_buf+0xd7/0x1a0 drivers/tty/tty_port.c:37
+ receive_buf drivers/tty/tty_buffer.c:445 [inline]
+ flush_to_ldisc+0x43e/0xe40 drivers/tty/tty_buffer.c:495
+ process_one_work kernel/workqueue.c:3276 [inline]
+ process_scheduled_works+0xb82/0x1e80 kernel/workqueue.c:3359
+ worker_thread+0xee4/0x1590 kernel/workqueue.c:3440
+ kthread+0x53f/0x600 kernel/kthread.c:436
+ ret_from_fork+0x20f/0x910 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+Uninit was created at:
+ slab_post_alloc_hook mm/slub.c:4545 [inline]
+ slab_alloc_node mm/slub.c:4866 [inline]
+ __do_kmalloc_node mm/slub.c:5259 [inline]
+ __kmalloc_noprof+0x486/0x1680 mm/slub.c:5272
+ kmalloc_noprof include/linux/slab.h:954 [inline]
+ tty_buffer_alloc drivers/tty/tty_buffer.c:180 [inline]
+ __tty_buffer_request_room+0x3d4/0x7a0 drivers/tty/tty_buffer.c:273
+ __tty_insert_flip_string_flags+0x157/0x6e0 drivers/tty/tty_buffer.c:309
+ tty_insert_flip_char include/linux/tty_flip.h:77 [inline]
+ uart_insert_char+0x368/0x930 drivers/tty/serial/serial_core.c:3431
+ serial8250_read_char+0x1ba/0x670 drivers/tty/serial/8250/8250_port.c:1643
+ serial8250_rx_chars drivers/tty/serial/8250/8250_port.c:1660 [inline]
+ serial8250_handle_irq_locked+0x6d4/0xa40 drivers/tty/serial/8250/8250_port.c:1820
+ serial8250_handle_irq+0x187/0x730 drivers/tty/serial/8250/8250_port.c:1841
+ serial8250_default_handle_irq+0x116/0x370 drivers/tty/serial/8250/8250_port.c:1855
+ serial8250_interrupt+0xcb/0x420 drivers/tty/serial/8250/8250_core.c:86
+ __handle_irq_event_percpu+0x13c/0xf90 kernel/irq/handle.c:209
+ handle_irq_event_percpu kernel/irq/handle.c:246 [inline]
+ handle_irq_event+0xe0/0x2a0 kernel/irq/handle.c:263
+ handle_edge_irq+0x2a9/0xb30 kernel/irq/chip.c:855
+ generic_handle_irq_desc include/linux/irqdesc.h:186 [inline]
+ handle_irq arch/x86/kernel/irq.c:262 [inline]
+ call_irq_handler arch/x86/kernel/irq.c:-1 [inline]
+ __common_interrupt+0x9d/0x180 arch/x86/kernel/irq.c:333
+ common_interrupt+0x4c/0xb0 arch/x86/kernel/irq.c:326
+ asm_common_interrupt+0x2b/0x40 arch/x86/include/asm/idtentry.h:688
+
+CPU: 0 UID: 0 PID: 35 Comm: kworker/u8:2 Tainted: G        W    L      syzkaller #0 PREEMPT(full) 
+Tainted: [W]=WARN, [L]=SOFTLOCKUP
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/18/2026
+Workqueue: events_unbound flush_to_ldisc
+=====================================================
+
+
 ---
- drivers/net/phy/micrel.c | 39 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 39 insertions(+)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
-index c6b011a9d636..7cbca6a7ed84 100644
---- a/drivers/net/phy/micrel.c
-+++ b/drivers/net/phy/micrel.c
-@@ -287,6 +287,11 @@
- /* PHY Control 2 / PHY Control (if no PHY Control 1) */
- #define MII_KSZPHY_CTRL_2			0x1f
- #define MII_KSZPHY_CTRL				MII_KSZPHY_CTRL_2
-+
-+/* Vendor-specific Clause 22 register, virtualized by KSZ87xx embedded PHYs DSA driver */
-+#define MII_KSZ87XX_LOW_LOSS			0x1c
-+#define KSZ87XX_LOW_LOSS_MAX			5
-+
- /* bitmap of PHY register to set interrupt mode */
- #define KSZ8081_CTRL2_HP_MDIX			BIT(15)
- #define KSZ8081_CTRL2_MDI_MDI_X_SELECT		BIT(14)
-@@ -940,6 +945,38 @@ static int ksz8795_match_phy_device(struct phy_device *phydev,
- 	return ksz8051_ksz8795_match_phy_device(phydev, false);
- }
- 
-+static int ksz87xx_get_tunable(struct phy_device *phydev,
-+			       struct ethtool_tunable *tuna, void *data)
-+{
-+	int ret;
-+
-+	switch (tuna->id) {
-+	case ETHTOOL_PHY_KSZ87XX_LOW_LOSS:
-+		ret = phy_read(phydev, MII_KSZ87XX_LOW_LOSS);
-+		if (ret < 0)
-+			return ret;
-+		*(u8 *)data = ret;
-+		return 0;
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+}
-+
-+static int ksz87xx_set_tunable(struct phy_device *phydev,
-+			       struct ethtool_tunable *tuna, const void *data)
-+{
-+	u8 val = *(const u8 *)data;
-+
-+	switch (tuna->id) {
-+	case ETHTOOL_PHY_KSZ87XX_LOW_LOSS:
-+		if (val > KSZ87XX_LOW_LOSS_MAX)
-+			return -EINVAL;
-+		return phy_write(phydev, MII_KSZ87XX_LOW_LOSS, val);
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+}
-+
- static int ksz9021_load_values_from_of(struct phy_device *phydev,
- 				       const struct device_node *of_node,
- 				       u16 reg,
-@@ -6809,6 +6846,8 @@ static struct phy_driver ksphy_driver[] = {
- 	/* PHY_BASIC_FEATURES */
- 	.config_init	= kszphy_config_init,
- 	.match_phy_device = ksz8795_match_phy_device,
-+	.get_tunable	= ksz87xx_get_tunable,
-+	.set_tunable	= ksz87xx_set_tunable,
- 	.suspend	= genphy_suspend,
- 	.resume		= genphy_resume,
- }, {
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
--- 
-2.53.0
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
