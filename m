@@ -1,62 +1,53 @@
-Return-Path: <netdev+bounces-278475-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278476-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ECJQGeZO3mndqAkAu9opvQ
-	(envelope-from <netdev+bounces-278475-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 16:27:50 +0200
+	id 0BQqCkpN3mnvqAkAu9opvQ
+	(envelope-from <netdev+bounces-278476-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 16:20:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF41F3FB303
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 16:27:49 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE4AD3FB102
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 16:20:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 840513055420
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 14:20:20 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 2812B300E5B6
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 14:20:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8875D3E6DFF;
-	Tue, 14 Apr 2026 14:20:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B9C83D9DBD;
+	Tue, 14 Apr 2026 14:20:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="G2hnTda/"
+	dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b="KeSBYpyx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
+Received: from mx.nabladev.com (mx.nabladev.com [178.251.229.89])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 286EF3E5EF8;
-	Tue, 14 Apr 2026 14:20:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0BA23E6DC1;
+	Tue, 14 Apr 2026 14:20:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.251.229.89
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776176419; cv=none; b=L/i68q58Ib0Ayrm0r32lWXN62tVDFG5MDZUurmp8ft857WcpfCBTKwGhG+EHKKzU5jSOEanCD8bf1O/kbSXgDxaGXaqvv1W+WyXv2+Ye7vz0breRfWdENtS3f7FBredWFfn5oq0Po9smlvW5hqdnLDT6vDjWgO29TlPC2hgfPtU=
+	t=1776176455; cv=none; b=VgjbuQ0BFWh/uesmoCyckrPH3ELFWfkZDyO8K8cUmEPU2Ktrdza4XdZVe5G1Eh1t66d1QqXU8iZ2aQwViZrCd6vqZF409CQmXTz1xNAky5vhr2Oi+Dj4ADBmHYIC6wdf8U52b8SA5HfBwX0wCDyDi8s/wrOBYyjZNEtsk/cthvA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776176419; c=relaxed/simple;
-	bh=L8h8ncj1xlogJQEUDHS5GItbXkq0sblifQ1BGwMeHJ0=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=ciJCFyf2G9vmsAzxMoNSUYbHlHnEU3qfJ95PlkzQWC+o/vLdlkPSeC5UpvDrNZp2eU65KLzeCHMDlYn4grjsP0R24OwqdfLXIyN0YD4LC/d+5wfVb+xVdfIQuJVXwSLFeHUVBIXdUnKdLlsk5I1l15SNt51NE/JxgR+oe3o++3I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=G2hnTda/; arc=none smtp.client-ip=185.226.149.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1wCecS-00FBt1-Gn; Tue, 14 Apr 2026 16:20:00 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:References:
-	Cc:To:Subject:From:MIME-Version:Date:Message-ID;
-	bh=/SY+gHDpWMFn5J7DtwXLF7yg5El1T/4gAkeMvZeGiow=; b=G2hnTda/hO4AAjCnS4C+cObxam
-	ho6HXvp70qD8xJI3VHQG1xAdJPHyGpZ6Ftz6XYY7ktORAHE81YX5Fo+EDuwDVveOaQ7FJ18ehP+vA
-	BiMiQ2aMfMvl5urmxOSfamjoocJbsC2izLS8Qz0j/SHn/LlzfVmUchTNA5m8EoXnhyQT4Zz+PLoMU
-	JWfP00I98A0Fi0EoEsBel3xso8sU9J0d1M0iqChqwBmOcA3LovrLZ3ap0L85+OCpIquVvXW4valVk
-	CCf9XRkppSTqsH9WnqpVp6ig7qMvOYL5cY+cilhP+waOvCrOn5gn9MxvYwDhggi4g0Cym6pOShBEE
-	8vcpPHMw==;
-Received: from [10.9.9.72] (helo=submission01.runbox)
-	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1wCecR-000126-3k; Tue, 14 Apr 2026 16:19:59 +0200
-Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1wCec9-00DiJt-Oi; Tue, 14 Apr 2026 16:19:41 +0200
-Message-ID: <fa2456d0-51fe-4569-9940-085404cda70f@rbox.co>
-Date: Tue, 14 Apr 2026 16:19:39 +0200
+	s=arc-20240116; t=1776176455; c=relaxed/simple;
+	bh=B5dMtFOs6kq3A5Ov7eNkJuTcT6gEoY2pp8/XAmqnkbg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GAsrbgcAHCbGasmZngvYQIUB2qMzYrttxEOLb34VQ6czhk36jVp65ySmEaW9/rymckAcQlbz8uQihMjWMg+vKAW1h2S8aTaKhnl2OEWcytI7orP18CilFaneQKSVwGQwSgiOn3fceuGSkPEzYUybwHXmu2Mci9V9LUe9Lase6dk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com; spf=pass smtp.mailfrom=nabladev.com; dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b=KeSBYpyx; arc=none smtp.client-ip=178.251.229.89
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nabladev.com
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 3AA11112505;
+	Tue, 14 Apr 2026 16:20:48 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nabladev.com;
+	s=dkim; t=1776176451;
+	h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=eNZ9AyAMBhe+pcTZPe0oBKKSK8EzT1VMTf3KG2FuHP4=;
+	b=KeSBYpyxW3kiMDRjUSk2Aoskm2CggKEyq+vX+F+iXinaMMFTMY4Uf7a1S4RSga07ca/XY7
+	IfNLm3t21Hsix0JnoqATkJl0N2WIW4w8aPWFDcOb2ezkxSVGFNkn+FB0WzJF8LNJUtn1j3
+	l6QPwdUTRdOeY9AWgsLRBwmQcxgL1OnPAGI7jXt5ENhTeMAH/pRMIYEaA/KwwlUulPJVuN
+	Q5/2+DrfpKmcOivpyVN7JmJFIJ3ob28ufcCLm9qqsfzuYhHFebGhOAwNOswubLRbdaWjLX
+	YRWcJGDHymtsj6t12YZjhYvvJJjNWcOHdztB0Qq0MKF9ao07WV9SVDCZjaVY8Q==
+Message-ID: <2fcfb84f-69f6-493e-94d6-95d85d8000f6@nabladev.com>
+Date: Tue, 14 Apr 2026 16:20:46 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,144 +55,114 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-From: Michal Luczaj <mhal@rbox.co>
-Subject: Re: [PATCH bpf v3 5/5] bpf, sockmap: Adapt for af_unix-specific lock
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: Jiayuan Chen <mrpre@163.com>, John Fastabend <john.fastabend@gmail.com>,
- Jakub Sitnicki <jakub@cloudflare.com>, Eric Dumazet <edumazet@google.com>,
- Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Willem de Bruijn <willemb@google.com>, "David S. Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Simon Horman <horms@kernel.org>, Yonghong Song <yhs@fb.com>,
- Andrii Nakryiko <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Eduard Zingerman
- <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>,
- Cong Wang <cong.wang@bytedance.com>, netdev@vger.kernel.org,
- bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-References: <20260306-unix-proto-update-null-ptr-deref-v3-0-2f0c7410c523@rbox.co>
- <20260306-unix-proto-update-null-ptr-deref-v3-5-2f0c7410c523@rbox.co>
- <2192e9ef-894f-4826-b296-4f90e973a31b@163.com>
- <b9a956dd-ebb2-47ca-8b49-ccbba6ff9b26@rbox.co>
- <b21fac4e-891b-481c-9734-e95290e49097@linux.dev>
- <fa818820-c0c9-48dc-8ebc-661cb3349935@rbox.co>
- <dd043c69-4d03-46fe-8325-8f97101435cf@linux.dev>
- <27fa6e91-02a5-46cd-8c95-b75fd2c5fa08@rbox.co>
- <ae86a1e5-769c-44d8-ad7e-ad724800e9e4@linux.dev>
- <08c824b0-cfbb-40ca-b976-9fbd41e5e855@rbox.co>
- <ac2z6IqYyIxSZFPS@devbig1721.ftw5.facebook.com>
-Content-Language: pl-PL, en-GB
-In-Reply-To: <ac2z6IqYyIxSZFPS@devbig1721.ftw5.facebook.com>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [net,PATCH v3 1/2] net: ks8851: Reinstate disabling of BHs around
+ IRQ handler
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: netdev@vger.kernel.org, stable@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Nicolai Buchwitz <nb@tipi-net.de>,
+ Paolo Abeni <pabeni@redhat.com>, Ronald Wahl <ronald.wahl@raritan.com>,
+ Yicong Hui <yiconghui@gmail.com>, linux-kernel@vger.kernel.org
+References: <20260414103327.113500-1-marex@nabladev.com>
+ <20260414125753.Im6GAIHn@linutronix.de>
+Content-Language: en-US
+From: Marek Vasut <marex@nabladev.com>
+In-Reply-To: <20260414125753.Im6GAIHn@linutronix.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[rbox.co,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[rbox.co:s=selector1];
+	DMARC_POLICY_ALLOW(-0.50)[nabladev.com,reject];
+	R_DKIM_ALLOW(-0.20)[nabladev.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[163.com,gmail.com,cloudflare.com,google.com,redhat.com,davemloft.net,kernel.org,fb.com,iogearbox.net,linux.dev,fomichev.me,bytedance.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-278475-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[28];
+	TAGGED_FROM(0.00)[bounces-278476-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[rbox.co:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mhal@rbox.co,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,lunn.ch,google.com,kernel.org,tipi-net.de,redhat.com,raritan.com,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[marex@nabladev.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[nabladev.com:+];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,rbox.co:dkim,rbox.co:mid]
-X-Rspamd-Queue-Id: AF41F3FB303
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,nabladev.com:dkim,nabladev.com:mid]
+X-Rspamd-Queue-Id: BE4AD3FB102
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 4/2/26 03:34, Martin KaFai Lau wrote:
-> On Wed, 01 Apr 2026 00:43:58 +0200, Michal Luczaj wrote:
->> On 3/31/26 02:20, Martin KaFai Lau wrote:
->>> On 3/30/26 4:03 PM, Michal Luczaj wrote:
->>>> On 3/26/26 07:26, Martin KaFai Lau wrote:
->>>>> On 3/15/26 4:58 PM, Michal Luczaj wrote:
->>>>>>> Beside, from looking at the may_update_sockmap(), I don't know if it is
->>>>>>> even doable (or useful) to bpf_map_update_elem(unix_sk) in
->>>>>>> tc/flow_dissector/xdp. One possible path is the SOCK_FILTER when looking
->>>>>>> at unix_dgram_sendmsg() => sk_filter(). It was not the original use case
->>>>>>> when the bpf_map_update_elem(sockmap) support was added iirc.
->>>>>>
->>>>>> What about a situation when unix_sk is stored in a sockmap, then tc prog
->>>>>> looks it up and invokes bpf_map_update_elem(unix_sk)? I'm not sure it's
->>>>>> useful, but seems doable.
->>>>>
->>>>> [ Sorry for the late reply ]
->>>>>
->>>>> It is a bummer that the bpf_map_update_elem(unix_sk) path is possible
->>>>> from tc :(
->>>>>
->>>>> Then unix_state_lock() in its current form cannot be safely acquired in
->>>>> sock_map_update_elem(). It is currently a spin_lock() instead of
->>>>> spin_lock_bh().
->>>>
->>>> Is there a specific deadlock you have in your mind?
->>>
->>> e.g. unix_stream_connect() is taking unix_state_lock(). Can a tc's 
->>> ingress bpf prog call unix_state_lock()?
->>
->> Ah, right, that's the problem, thanks for explaining.
->>
->> But, as I've asked in the parallel thread, do we really need to take the
->> unix_state_lock() in sock_map_update_elem()? Taking it in
->> sock_map_update_elem_sys() fixes the null-ptr-deref and does not lead to a
->> deadlock. Taking unix_state_lock() in sock_map_update_elem() seems
->> unnecessary. Well, at least under the assumption progs can only access
->> unix_sk via the sockmap lookup.
+On 4/14/26 2:57 PM, Sebastian Andrzej Siewior wrote:
+> On 2026-04-14 12:32:52 [+0200], Marek Vasut wrote:
+>> If CONFIG_PREEMPT_RT=y is set AND the driver executes ks8851_irq() AND
+>> KSZ_ISR register bit IRQ_RXI is set AND ks8851_rx_pkts() detects that
+>> there are packets in the RX FIFO, then netdev_alloc_skb_ip_align() is
+>> called to allocate SKBs. If netdev_alloc_skb_ip_align() is called with
+>> BH enabled, local_bh_enable() at the end of netdev_alloc_skb_ip_align()
+>> will call __local_bh_enable_ip(), which will call __do_softirq(), which
+>> may trigger net_tx_action() softirq, which may ultimately call the xmit
+>> callback ks8851_start_xmit_par(). The ks8851_start_xmit_par() will try
+>> to lock struct ks8851_net_par .lock spinlock, which is already locked
+>> by ks8851_irq() from which ks8851_start_xmit_par() was called. This
+>> leads to a deadlock, which is reported by the kernel, including a trace
+>> listed below.
 > 
-> right, sock_map_update_elem_sys() should be safe to take
-> unix_state_lock().
+> #1 [received RX packet and a] TX packet has been sent
+> #2 Driver enables TX queue via netif_wake_queue() which schedules TX
+>     softirq to queue packets for this device.
+> #2 After spin_unlock_bh(&ks->statelock) the pending softirqs will be
+>     processed
+> #3 This deadlocks because of recursive locking via ks8851_net::lock in
+>     ks8851_irq() and ks8851_start_xmit_par().
 > 
-> If it is fixed by testing unix_peer(), is the TCPF_ESTABLISHED test
-> in sock_map_sk_state_allowed() still useful and needed?
+> This is what happens since commit 0913ec336a6c0 ("net: ks8851: Fix
+> deadlock with the SPI chip variant"). Before that commit the softirq
+> execution will be picked up by netdev_alloc_skb_ip_align() and requires
+> PREEMPT_RT and a RX packet in #1 to trigger the deadlock.
 
-I don't think it's necessary. Although removing it may slightly mask the
-fact that we're interested in TCP_ESTABLISHED sockets (we watch the sock's
-life cycle and invoke sock_map_close() as it transitions to TCP_CLOSE).
-Removing this check will also mean listening socks will be rejected not
-early in sock_map_sk_state_allowed(), but deeper in
-unix_stream_bpf_update_proto() (and with a different error code?).
+Do you want me to add this into the V4 commit message ?
 
-> Also,
-> please explain in detail in the commit message why testing for NULL
-> without unix_state_lock() is enough.
-
-OK, will do.
-
-> For example, for the BPF iterator on
-> sock_map, my understanding is that unix_release_sock() can still happen
-> while the BPF iterator is iterating over a unix_sock. I guess a future
-> unix_state_lock() in the iterator's seq_show() should be useful.
-
-That's right. That's also why, I think, Kuniyuki was asking for
-"lock_sock() + unix_state_lock() + SOCK_DEAD check" in a parallel thread.
-
-> It will also be useful to mention what was discovered about TC + lookup
-> + update_elem(&sock_map, ...) and why it is not safe to take
-> unix_state_lock() in that path. Thanks.
-
-The softirq vs. process context? Sure, I'll mention that.
-
-Took a while (sorry), but here's v4:
-https://lore.kernel.org/netdev/20260414-unix-proto-update-null-ptr-deref-v4-0-2af6fe97918e@rbox.co/
-
+>> Fix the problem by disabling BH around critical sections, including the
+>> IRQ handler, thus preventing the net_tx_action() softirq from triggering
+>> during these critical sections. The net_tx_action() softirq is triggered
+>> at the end of the IRQ handler, once all the other IRQ handler actions have
+>> been completed.
+>>
+>>   __schedule from schedule_rtlock+0x1c/0x34
+>>   schedule_rtlock from rtlock_slowlock_locked+0x548/0x904
+>>   rtlock_slowlock_locked from rt_spin_lock+0x60/0x9c
+>>   rt_spin_lock from ks8851_start_xmit_par+0x74/0x1a8
+>>   ks8851_start_xmit_par from netdev_start_xmit+0x20/0x44
+>>   netdev_start_xmit from dev_hard_start_xmit+0xd0/0x188
+>>   dev_hard_start_xmit from sch_direct_xmit+0xb8/0x25c
+>>   sch_direct_xmit from __qdisc_run+0x1f8/0x4ec
+>>   __qdisc_run from qdisc_run+0x1c/0x28
+>>   qdisc_run from net_tx_action+0x1f0/0x268
+>>   net_tx_action from handle_softirqs+0x1a4/0x270
+>>   handle_softirqs from __local_bh_enable_ip+0xcc/0xe0
+>>   __local_bh_enable_ip from __alloc_skb+0xd8/0x128
+>>   __alloc_skb from __netdev_alloc_skb+0x3c/0x19c
+>>   __netdev_alloc_skb from ks8851_irq+0x388/0x4d4
+>>   ks8851_irq from irq_thread_fn+0x24/0x64
+>>   irq_thread_fn from irq_thread+0x178/0x28c
+>>   irq_thread from kthread+0x12c/0x138
+>>   kthread from ret_from_fork+0x14/0x28
+> 
+> The backtrace here and the description is based on an older kernel.
+> However
+I actually did update the backtrace in V3 with the one from current next 
+20260413 .
 
