@@ -1,213 +1,211 @@
-Return-Path: <netdev+bounces-278431-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278433-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QAmWNHEt3mnxogkAu9opvQ
-	(envelope-from <netdev+bounces-278431-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 14:05:05 +0200
+	id eDjtB2Mu3mnxogkAu9opvQ
+	(envelope-from <netdev+bounces-278433-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 14:09:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CC663F9C4E
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 14:05:04 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A84B93F9CDE
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 14:09:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DAD05306AA4B
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 12:01:06 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C09E0300D4EB
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 12:09:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 541D03E5EEA;
-	Tue, 14 Apr 2026 12:01:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2C003E51F8;
+	Tue, 14 Apr 2026 12:09:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iHnPXdgh"
+	dkim=pass (2048-bit key) header.d=linbit-com.20251104.gappssmtp.com header.i=@linbit-com.20251104.gappssmtp.com header.b="Lq7s86bb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B5C43E5EE4
-	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 12:01:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2D9A3921E4
+	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 12:09:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776168065; cv=none; b=XdZil/GiU6kxtdihyKA115PV+GDIMmBIXywAfAiefasUfD8vWxuCk19n6+2nZkpL5/My2cYwAIW8dfPzZ334+pqfvxrLJbhEfPCTI9N0mL7pwaBnTkTyYBbdt84nTyhfHGiefu+8+Cd+XtAaFMCIhDSHQkJvFtGWKr0+Wc8fg1U=
+	t=1776168544; cv=none; b=rLLLS5sNyj92PEpIih4eSUyCrCKfe7SPDtcMeIw7SC+1gdclg2zoyb0To0zzfkttCDtzu+izza0V4UpIZ18PS8nMKD6nJ6XgkBVqgvhBr3jmsllMVhS2rTVtp1u1XfFQvxbYfU/jZZD4CoHpLyatUOGkm396HRl2croEXqm1urk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776168065; c=relaxed/simple;
-	bh=HXU24dwSM6A1AxV04g/pB5XxRZxXiy1LoONcd+loM3Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bH5TIeL7RmQ/AW8UGf9LO/A6vtwKEEOL3T0BhtTSBecZdm20nKxe14lESCv08SJUoJXn344xr+iMVUrt32FTb3Wa7FD+ujXjPOXFDyMY/SlD8ARGUZ+7zkPDQhkwSxfIhrZxRTlSAj7R7MYSySwFnImCv+afCITPVsXZ9RUcAUU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iHnPXdgh; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-670f6ae9c7dso3748985a12.2
-        for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 05:01:01 -0700 (PDT)
+	s=arc-20240116; t=1776168544; c=relaxed/simple;
+	bh=2dKC+bNzART0TN1K0cGjO0fj56UlUraZs5ruQszSvF0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dZXgyz5tpd4SnPwcwDHg/udY3YBc68VvGgj0Fg68TFZiYDRGuETvb0mXwfjuKUwJpnt+bZkHnmfET99i9GE3tGLqkwJz0fqUIRo2ipZXi2NKJ4IJoxFJHn8yffg0jodLrP5mvqkaM94E9m9KiPstXNWK81aOkbqrq740lQtZrLM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com; spf=pass smtp.mailfrom=linbit.com; dkim=pass (2048-bit key) header.d=linbit-com.20251104.gappssmtp.com header.i=@linbit-com.20251104.gappssmtp.com header.b=Lq7s86bb; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linbit.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-48334ee0aeaso53455895e9.1
+        for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 05:09:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776168060; x=1776772860; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2d7SDP4tYVNHF5RjK6Z4XWLo0StG4PwjgZJsw7TAjok=;
-        b=iHnPXdghhNhZxQbXGPpMQAy/WghyKP2lAqDKIiIHKVP2ztJFDYMq53D48MDqEdRDO7
-         6ViTDklUvBoUzzELRjXzMFeGMW8aH2tAUofR8+0D2flzvi0k0sDcF21Jla/JfFWLMGtC
-         N19iii2ppBH+JXZsnOC1V/mfn/ZV0kgJPE0lBmm9z1tbJDqzqZ8DCML/yT1YGNrfYDpj
-         cXQbZx8uP+MydG2v+QhdZ0+p3ACbAJcEwok93FL5OHndXiDkxBE9dzLDMbjzE46wgv2J
-         anz+RbGttUpBQ21ZTv3zNiRyhk5CMV1NfSOpV8Hka03hd+MF61Kg1gT5bqQItvRRFtRv
-         2MIQ==
+        d=linbit-com.20251104.gappssmtp.com; s=20251104; t=1776168541; x=1776773341; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:mail-followup-to:message-id:subject:cc:to
+         :from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=2dKC+bNzART0TN1K0cGjO0fj56UlUraZs5ruQszSvF0=;
+        b=Lq7s86bbWgl7HZFmbhLkjJUhPeb56Ly+ZSHa9rnH0vktGsXnPUBFcbWV9unFTi+N41
+         I6m7HV1kRjYe4+Z5ZK8BMi6hRodRU/Y0FSg6t7WDOw2mhi/Vh1m0m7wh6uaJVFYSa3a2
+         SLR/YOOhzs15rcwrW6E4+fSQq6Uqy1AoA5arLwkOObiBpG2/DHB/D7LegUbWGeEONNSx
+         1tkBtQ/8qf9Cc38q+vd7w0+l6fTna1g8WF3aC3B/t5SkxNmPVyf28nrlND4x9pAPhjQM
+         eUznqhcfHBMfr2bws+bXMB8uhZy3X1eIJexwb8las6g7xHrMysCCB0cy23kxd/QxsQmh
+         O3MA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776168060; x=1776772860;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=2d7SDP4tYVNHF5RjK6Z4XWLo0StG4PwjgZJsw7TAjok=;
-        b=TSbOOndTbmNjysHoaUfD88msRkfiK9/uAHmKVYCueJAjB+DfOvw8x2/Gz+qH8UrvB0
-         /3ULqQ+EO7qKsIWZz8pZS7f/TzisrXRcm1V7pTvqCEqTsTu0pOXl3Pf3Eug9rHj8MB70
-         gQtdGdYDFwDvImH5YMBw5QwDCtKgXbdiwyTXQhOvpg0POI+Nloll9pcVJ/btucqOw/pJ
-         ufF/l0zK08TY18KR0rM5MOY76WfuHQTyoFyawNoCerUQ/9SUT+Txwfo6YWVK4gLVzk6u
-         NXkhYDFxQzMmNlrwN+RuL1bSBfVUpnqMDvq7ayQvTUciVihyh2gKx73DLsEOY7l1gqmo
-         zU4A==
-X-Forwarded-Encrypted: i=1; AFNElJ+1dl2DZba4TpHuXjwRV5h/YU/rCgGld3m1GiR/qo2XugJQSZo0Zdl4e0rIQDV80Vwqje0TYXQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxFEGOCroXVI23PlaqfstxyVEIMM4Jd/N5qug1TbMjshTwq4TU+
-	nqqGSRiKUKCvvv/43Urj2nY9YQ1B5D7wUfUW5rvP7u8p0ogIm1KzEt7x
-X-Gm-Gg: AeBDiev/sVxphxKHi/zhfhae9TG88HCZUID4MYm7UJrFuIR7MrdPqdoxqSq+S1Bq7gV
-	lPdzqX52De2SMpALpIAhL/eNefPkJf62Znfvd8Eq/Aztw0BpljTHyzpNzZkfTMcjUngn0oB2c7p
-	aqVbRRGNR6zf2MWKUhwcDErIiaSEeVlpfOvtdQ9O/hgUHbt+g1r57q3dRAp29pHSsFyfUAioHXe
-	piRyqvtXxxqfdca+DDUmwv9eLmn5zZtROFgExCP+fI9ZgXXsJMKzxLCFFq2xG+x6BiFwNPj3QgC
-	HH1qLUoTwh9x6+sw6XXSvHNeC1D3fKOqe0Ibp2xtnPhDa3/XV3+TgNpdt9czUvGFVB/DVCZUDrB
-	KsooKtTzX9Gbn6v+GlGzVnQnoblz2pCCgukkm/TsFdWtrQ1IMSRXICZcMHOH/ruCAl5Y6VmlyhE
-	rxp3xGbYEjRfLi3QPrRYYTpEbVEx1f4PRAVeLEpY6CGwsbVXEjCDTNzQt9IsaAddJVtOGBXx9we
-	Y3bDn93dGNsJ6wywwepYD4+1LP9Lg2wLppngdUTpplNsrnz3xK+E5uUcJ7zMckWYn1FqVmwpJj9
-	99JSLhmr4rGxQbYoN02xKVlWXCeUzXlbTw==
-X-Received: by 2002:a05:6402:1cc5:b0:66d:d0c1:f87b with SMTP id 4fb4d7f45d1cf-67079508c00mr8427873a12.10.1776168059477;
-        Tue, 14 Apr 2026 05:00:59 -0700 (PDT)
-Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-671a15577f9sm967915a12.17.2026.04.14.05.00.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 Apr 2026 05:00:59 -0700 (PDT)
-Message-ID: <0f0f217e-a32b-4c9a-ab65-1cac5c86c76f@gmail.com>
-Date: Tue, 14 Apr 2026 14:00:57 +0200
+        d=1e100.net; s=20251104; t=1776168541; x=1776773341;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:mail-followup-to:message-id:subject:cc:to
+         :from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2dKC+bNzART0TN1K0cGjO0fj56UlUraZs5ruQszSvF0=;
+        b=LwO4lnTAh5RuVHsCa1J9a1gx1oJ2z1FdVypy1wYeVVtQkEHgvfnNC14LbTv85Sg56V
+         xv6QSFkxnYhlxIK0TbBunQFf1yksJXxInG4AlyLeVxjMPqH6oQY6QM3/C3fwEUVHHbhK
+         FQrMcLg2yXJIiIcDD00qRzZrcPaG+rsZEEuO58ET/gf9PKlOdMdi8P78ZA7bH+QvU430
+         Z1lQPKfOdKt9rsM+lo79A53f9bNuKT4qY9b5a7CZL5jAdQgn4d67vgmhFri+hNuHh7th
+         lToU0tyMhMqLMH+dgOQLm/H8uwpxetZfXBEI6sYFruj0Ai+KRAI+3/jnoNttcgQSoUDN
+         OuNA==
+X-Forwarded-Encrypted: i=1; AFNElJ/ABXGy0hQhOosuhvYgbF/5iUhHiBfOeFvG14zD8r9IR2wpMEjus9w/esIIMB/s8l7wdEBnenw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxlCy8UcfNc+qgsLmtoezkc9NmNm0nnMhA5Da6o8feubXbEEIJK
+	oRua5byb7sekAsh9J1q38/o9RScopTCViQ42CrXR3+uty/85m1yQX1//GJGy+L9vZMc=
+X-Gm-Gg: AeBDievv3yE1ts1Ijy+syUVL9INIroaO3+J0TdeICihmMp7kn6qVxvJ4MqNAmb2a3a2
+	5s9meVRAb2LsyQGf8+xEfUlZhGpe2Voo07VSyOkJa4nNhXk9lRH9rzil8/y0sDPHuQ3z7Itj2OO
+	B+v3UZDzTFMlQsGG3oMlFzAAB4r2LOFhyy6TLyHUOFRcDZ+4HZTQbSNFktEOMg8jmW7sSIRPkq3
+	EdfvoEOsdRwVeeh+2VimGL75d3pss/DlHfyvTyhFDba5a04fs/KbegJp91dT4EipxFNiOy6jlCu
+	3nyh+4m3sBZjPFzFD9ea4pRf0+spzVv58vbRvTOml63poao98bAbbUaFrU4f0+1Db8QW9WVH0ep
+	o41fOJhdV/exFPyO2GmJu08BNuLvrfV4Iry1+IeBasc8MLaA8r0RLz4frjKnX5NdosK7kZiA2yS
+	IqF7fA5JyjLax+buzBsDFqtVErg97MjgjekTxKNsw1IBT4S8EZDgdKjFy5M1sg18bFQ7YQ0b1Yl
+	Y33JQ==
+X-Received: by 2002:a05:600c:a11c:b0:487:2671:fb8f with SMTP id 5b1f17b1804b1-488d67fa40fmr168478205e9.8.1776168541312;
+        Tue, 14 Apr 2026 05:09:01 -0700 (PDT)
+Received: from localhost (h082218028181.host.wavenet.at. [82.218.28.181])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488ede1df12sm106112055e9.4.2026.04.14.05.08.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Apr 2026 05:09:00 -0700 (PDT)
+Date: Tue, 14 Apr 2026 14:08:58 +0200
+From: Christoph =?utf-8?Q?B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, drbd-dev@lists.linbit.com, 
+	linux-kernel@vger.kernel.org, Lars Ellenberg <lars.ellenberg@linbit.com>, 
+	Philipp Reisner <philipp.reisner@linbit.com>, linux-block@vger.kernel.org, 
+	Donald Hunter <donald.hunter@gmail.com>, Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH 2/4] tools: ynl-gen-c: optionally emit structs and helpers
+Message-ID: <ad4ox7ibZoiW-tje@localhost.localdomain>
+Mail-Followup-To: Jakub Kicinski <kuba@kernel.org>, 
+	Jens Axboe <axboe@kernel.dk>, drbd-dev@lists.linbit.com, linux-kernel@vger.kernel.org, 
+	Lars Ellenberg <lars.ellenberg@linbit.com>, Philipp Reisner <philipp.reisner@linbit.com>, 
+	linux-block@vger.kernel.org, Donald Hunter <donald.hunter@gmail.com>, 
+	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org
+References: <20260407173356.873887-1-christoph.boehmwalder@linbit.com>
+ <20260407173356.873887-3-christoph.boehmwalder@linbit.com>
+ <20260412125502.3f8ff576@kernel.org>
+ <adzVUdf74CVk2DwJ@localhost.localdomain>
+ <20260413104939.5ef4d9dc@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 nf] netfilter: nf_flow_table_ip: Introduce
- nf_flow_vlan_push()
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20260414112120.248744-1-ericwouds@gmail.com>
- <ad4nQzsbeF1S53zt@chamomile>
-From: Eric Woudstra <ericwouds@gmail.com>
-Content-Language: en-US
-In-Reply-To: <ad4nQzsbeF1S53zt@chamomile>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260413104939.5ef4d9dc@kernel.org>
+X-Spamd-Result: default: False [-0.06 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[linbit-com.20251104.gappssmtp.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[linbit.com : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-278433-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278431-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.dk,lists.linbit.com,vger.kernel.org,linbit.com,gmail.com,google.com];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ericwouds@gmail.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[linbit-com.20251104.gappssmtp.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[christoph.boehmwalder@linbit.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[10];
-	FREEMAIL_FROM(0.00)[gmail.com]
-X-Rspamd-Queue-Id: 4CC663F9C4E
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,localhost.localdomain:mid]
+X-Rspamd-Queue-Id: A84B93F9CDE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+On Mon, Apr 13, 2026 at 10:49:39AM -0700, Jakub Kicinski wrote:
+>On Mon, 13 Apr 2026 13:48:32 +0200 Christoph Böhmwalder wrote:
+>> >Can we just commit the code they output and leave the YNL itself be?
+>> >Every single legacy family has some weird quirks the point of YNL
+>> >is to get rid of them, not support them all..
+>>
+>> Fair enough, we could also do that. Though the question then becomes
+>> whether we want to keep the YAML spec for the "drbd" family (patch 3 of
+>> this series) in Documentation/.
+>>
+>> I would argue it makes sense to keep it around somewhere so that the old
+>> family is somehow documented, but obviously that yaml file won't work
+>> with the unmodified generator.
+>
+>To be clear (correct me if I misunderstood) it looked like we would be
+>missing out on "automating" things, so extra work would still need to
+>be done in the C code / manually written headers. But pure YNL (eg
+>Python or Rust) client _would_ work? They could generate correct
+>requests and parse responses, right?
 
+I haven't tested this, but yes, a regular YNL client should work with
+this spec. The new flags only influence kernel codegen, so a client
+that doesn't know about them could still construct valid messages and
+parse responses.
 
-On 4/14/26 1:38 PM, Pablo Neira Ayuso wrote:
-> On Tue, Apr 14, 2026 at 01:21:20PM +0200, Eric Woudstra wrote:
->> Calling skb_reset_mac_header() before calling skb_vlan_push() does
->> remove the error:
->>
->> "skb_vlan_push got skb with skb->data not at mac header (offset 18)"
->>
->> But the inner vlan tag is still not inserted correctly.
->>
->> skb_vlan_push() uses __vlan_insert_inner_tag() to insert the tag
->> at offset ETH_HLEN. But the inner tag should only be pushed, without
->> offset, similar to nf_flow_pppoe_push().
-> 
-> It is doubled-tagged-vlan that is broken, right? I observed this once
-> but I have been burdened into a few things.
+However, if we drop patch 2 completely, the new flags won't be in the
+genetlink-legacy schema either, so schema validation would fail when
+trying to generate.
 
-That is correct, both q-in-q and q-in-ad (that may not be the correct
-terms, but I think it is clear).
+>If yes, keeping it makes sense. FWIW all the specs we have for "old"
+>networking families (routing etc) also don't replace any kernel code.
+>They are purely to enable user space libraries in various languages.
+>Whether having broad languages support for drbd or you just have one
+>well known user space stack - I dunno.
 
->> Fixes: c653d5a78f34 ("netfilter: flowtable: inline vlan encapsulation in xmit path")
->> Fixes: a3aca98aec9a ("netfilter: nf_flow_table_ip: reset mac header before vlan push")
->> Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
->>
->> ---
->>
->>  net/netfilter/nf_flow_table_ip.c | 25 ++++++++++++++++++++++---
->>  1 file changed, 22 insertions(+), 3 deletions(-)
->>
->> diff --git a/net/netfilter/nf_flow_table_ip.c b/net/netfilter/nf_flow_table_ip.c
->> index fd56d663cb5b..0086f8a1a0d6 100644
->> --- a/net/netfilter/nf_flow_table_ip.c
->> +++ b/net/netfilter/nf_flow_table_ip.c
->> @@ -544,6 +544,26 @@ static int nf_flow_offload_forward(struct nf_flowtable_ctx *ctx,
->>  	return 1;
->>  }
->>  
->> +static int nf_flow_vlan_push(struct sk_buff *skb, __be16 proto, u16 id)
->> +{
->> +	if (skb_vlan_tag_present(skb)) {
->> +		struct vlan_hdr *vhdr;
->> +
->> +		if (skb_cow_head(skb, VLAN_HLEN))
->> +			return -1;
->> +
->> +		__skb_push(skb, VLAN_HLEN);
->> +		skb_reset_network_header(skb);
->> +		vhdr = (struct vlan_hdr *)(skb->data);
->> +		vhdr->h_vlan_TCI = htons(id);
->> +		vhdr->h_vlan_encapsulated_proto = skb->protocol;
->> +		skb->protocol = proto;
->> +	} else {
->> +		__vlan_hwaccel_put_tag(skb, proto, id);
->> +	}
->> +	return 0;
->> +}
->> +
->>  static int nf_flow_pppoe_push(struct sk_buff *skb, u16 id)
->>  {
->>  	int data_len = skb->len + sizeof(__be16);
->> @@ -738,9 +758,8 @@ static int nf_flow_encap_push(struct sk_buff *skb,
->>  		switch (tuple->encap[i].proto) {
->>  		case htons(ETH_P_8021Q):
->>  		case htons(ETH_P_8021AD):
->> -			skb_reset_mac_header(skb);
->> -			if (skb_vlan_push(skb, tuple->encap[i].proto,
->> -					  tuple->encap[i].id) < 0)
->> +			if (nf_flow_vlan_push(skb, tuple->encap[i].proto,
->> +					      tuple->encap[i].id) < 0)
->>  				return -1;
->>  			break;
->>  		case htons(ETH_P_PPP_SES):
->> -- 
->> 2.53.0
->>
+Well, one of the main motivations for porting the current "drbd" family
+to YNL is to get rid of the genl_magic infrastructure. We intend to add
+a new modernized "drbd2" family, which will be fully YNL-based from the
+start.
+But we still need to support the current family via a compat path, and
+I would much rather have two YNL-based families than one genl_magic and
+one YNL-based. Carrying both sounds like a nightmare.
 
+So the spec proposed in this series would never actually be used to
+generate a userspace client, if that's what you're asking. We would
+continue to use the current libgenl-based approach, with some userspace
+compat shims to make it work with YNL. Then, when "drbd2" comes along,
+we could "do things properly".
+
+Might also be worth to mention that we are also experimenting with
+Rust-based userspace utilities at the moment, so once we have "drbd2",
+there will be a real benefit to having multi-language support.
+
+So I'm fine with whichever route you want to take here, as long as
+it enables us to move away from genl_magic.
+
+If we decide to carry the "drbd" spec in-tree, that would then pretty
+much only be for documentation purposes. Otherwise there would be
+generated code where the spec it was generated from is non-existant,
+which may be surprising.
+
+>
+>> Maybe keep it, but with a comment at the top that notes that
+>> - this family is deprecated and "frozen",
+>> - the spec is only for documentation purposes, and
+>> - the spec doesn't work with the upstream parser?
+>
+>The past point needs a clarification, I guess..
 
