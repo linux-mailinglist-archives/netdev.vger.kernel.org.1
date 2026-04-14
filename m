@@ -1,156 +1,218 @@
-Return-Path: <netdev+bounces-278550-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278551-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gBpZB3R93mm/EwAAu9opvQ
-	(envelope-from <netdev+bounces-278550-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 19:46:28 +0200
+	id aPq1Nz9/3mm/EwAAu9opvQ
+	(envelope-from <netdev+bounces-278551-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 19:54:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35FF33FD3A5
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 19:46:26 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47B2E3FD4FC
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 19:54:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8CB5B300D74D
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 17:46:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 383EC30DDF6B
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 17:48:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17CE93090C5;
-	Tue, 14 Apr 2026 17:46:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48B1830DEDD;
+	Tue, 14 Apr 2026 17:48:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RiVso49o"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="0Rlud1TX"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 790D23033D6
-	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 17:46:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D70AF3090D9;
+	Tue, 14 Apr 2026 17:48:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776188785; cv=none; b=YS1fCpZ8G3BRh88ZuhPgGb+dapjq7534Oufq0gqLs2liYcfiV0T8ga/IhDapkpDqNHmqUze5xiLdTbePPX6pDNxckmsaluIL8Exkgo6+Mkbn6vWXggN+5yApzVsZR7WqLlMOG5vxEbRiIqhdYiiiuKbkMssDfumlwcZUP3FBdt8=
+	t=1776188889; cv=none; b=pKcwISLhBPiwn/iqJA2uBCdlFqqZ9f5bF7q0Q5R4VWvE7heMUzcKgiv7TltklcHcDUC1reZgcIe1QnHCO+P6bf8pwP6e+zFfZgADBprlckPrFDSzF+8GoybRGyNIJ4hxfH/9FZn2Lai4EfbBj74EtdiOFRYW9KPQ5tuf+b6rzr8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776188785; c=relaxed/simple;
-	bh=xmt7s/twQSu4aPxzKgIdkdZzdmbSv5AWDgrjt5WYi8Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=vAEC1X8WzY/0CYIwzAT6kWfrjFOy6Yv+6pPFT2f6gTDhWfYl4XXLzoSwnZ/8P1rJl6GhELNnHc1Sqbz3jFQXf4u81wK+NQ9FS7GgFSTqY9aChawnNPnaoukD7NQwCXfqf/5l9Nuuh2V5Z6W7pm0GrBGpBxTuXCqSlX9vA/KNs+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RiVso49o; arc=none smtp.client-ip=95.215.58.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <cbe3bd2a-4cbe-43db-bb19-37b2d8890eb4@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1776188780;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aRLMPgmEQNtIZ1+s3R+uauqPySY8kfsW8C0JvL3DnhI=;
-	b=RiVso49oHMRT5XG/F91j0pD7x6IqHgQbtqMpyhzFq94sPN9gPK2R0IIVei0IypZxTRX+gm
-	V5lktbqZR6nixC7Y9yTwLsbbiY6dFKpoiDW8umfx64qbPEV8/QPr23d4zqt9ZqASRACHpw
-	v6g7f+YNzBMV/iQr+TX1hGYRmmMzc4U=
-Date: Tue, 14 Apr 2026 18:46:14 +0100
+	s=arc-20240116; t=1776188889; c=relaxed/simple;
+	bh=vwkmPQ4vECj24CaAKCQNvFAt03oFvGc25MGVu236yj8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=l1FC/GqeCQqj5xKkecy76LuGn6q/YqrO4SmMznH08Ia22Y1mjFjR8KbVBMXeKMmRv5VpWlAlU0P/inUlN0ABG4S2V7wE2Hqq1X63RpvX0tH7yxpr9h0bxQBRNQ/2eeQy2T+rtmuagwozfEzj3b9XTPgArlG+7/A719c0t5WlCpE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=0Rlud1TX; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=ZASKAzVGF+jSQfIpJWuXt8y+ZdMesuU0Htwl33sN3Xo=; b=0Rlud1TXYs8L4yxoNl/rmtSg7e
+	14qdUaHeHu7JGF8qL/4u3D1kwz8Gx83xhcLUsqJPzkXVNJjnEX5DBiX+7jkSCnrrkuVj6VJ+9augH
+	vg/Fv1+DPlT5LSydyc0ffJjg6Urx3S0MkWTAG17qY/iI9M6q07hBr2K82fo6vAP/974si/vaRkwQ8
+	kdKwJhE2v/qbQje4SmTTo/6FJ+HdAHsv4Tqq65mNbRDrV6YLZ+FgE42ZWLVRJ+JJFpdTcyY9641A7
+	H/G8jRU3BdaPo65//+mgwBb5Y7Ho6YKasnTAXiJv1J77TRBSCwZyKYdKYsI8SNwMxAKH/TjbnGgqG
+	p/JRrc2g==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54232)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1wChri-000000001Ge-1GvT;
+	Tue, 14 Apr 2026 18:47:58 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1wChrg-000000001Oy-0Lgf;
+	Tue, 14 Apr 2026 18:47:56 +0100
+Date: Tue, 14 Apr 2026 18:47:55 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Biju <biju.das.au@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Biju Das <biju.das.jz@bp.renesas.com>,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	linux-renesas-soc@vger.kernel.org
+Subject: Re: [PATCH net-next v3 3/5] net: phy: mscc: Drop unnecessary
+ phydev->lock
+Message-ID: <ad59y5ZfJDKFo3eU@shell.armlinux.org.uk>
+References: <20260412140032.122841-1-biju.das.jz@bp.renesas.com>
+ <20260412140032.122841-4-biju.das.jz@bp.renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 2/6] bus: mhi: host: Add support for non-posted TSC
- timesync feature
-To: Krishna Chaitanya Chundru <krishna.chundru@oss.qualcomm.com>,
- Manivannan Sadhasivam <mani@kernel.org>,
- Richard Cochran <richardcochran@gmail.com>
-Cc: mhi@lists.linux.dev, linux-arm-msm@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- Vivek Pernamitta <quic_vpernami@quicinc.com>
-References: <20260411-tsc_timesync-v2-0-6f25f72987b3@oss.qualcomm.com>
- <20260411-tsc_timesync-v2-2-6f25f72987b3@oss.qualcomm.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20260411-tsc_timesync-v2-2-6f25f72987b3@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260412140032.122841-4-biju.das.jz@bp.renesas.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spamd-Result: default: False [1.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278550-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[oss.qualcomm.com,kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-278551-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,bp.renesas.com,microchip.com,nxp.com,vger.kernel.org,glider.be];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	NEURAL_SPAM(0.00)[0.125];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux.dev:dkim,linux.dev:mid]
-X-Rspamd-Queue-Id: 35FF33FD3A5
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,renesas];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:url,shell.armlinux.org.uk:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 47B2E3FD4FC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 11/04/2026 09:12, Krishna Chaitanya Chundru wrote:
-> From: Vivek Pernamitta <quic_vpernami@quicinc.com>
-> 
-> Implement non-posted time synchronization as described in section 5.1.1
-> of the MHI v1.2 specification. The host disables low-power link states
-> to minimize latency, reads the local time, issues a MMIO read to the
-> device's TIME register.
-> 
-> Add support for initializing this feature and export a function to be
-> used by the drivers which does the time synchronization.
-> 
-> MHI reads the device time registers in the MMIO address space pointed to
-> by the capability register after disabling all low power modes and keeping
-> MHI in M0. Before and after MHI reads, the local time is captured
-> and shared for processing.
+On Sun, Apr 12, 2026 at 03:00:25PM +0100, Biju wrote:
+> @@ -486,15 +486,9 @@ static int vsc85xx_dt_led_modes_get(struct phy_device *phydev,
+>  
+>  static int vsc85xx_edge_rate_cntl_set(struct phy_device *phydev, u8 edge_rate)
+>  {
+> -	int rc;
+> -
+> -	mutex_lock(&phydev->lock);
+> -	rc = phy_modify_paged(phydev, MSCC_PHY_PAGE_EXTENDED_2,
+> -			      MSCC_PHY_WOL_MAC_CONTROL, EDGE_RATE_CNTL_MASK,
+> -			      edge_rate << EDGE_RATE_CNTL_POS);
+> -	mutex_unlock(&phydev->lock);
+> -
+> -	return rc;
+> +	return phy_modify_paged(phydev, MSCC_PHY_PAGE_EXTENDED_2,
+> +				MSCC_PHY_WOL_MAC_CONTROL, EDGE_RATE_CNTL_MASK,
+> +				edge_rate << EDGE_RATE_CNTL_POS);
 
-[...]
+This one is fine.
 
-> +	/*
-> +	 * time critical code to fetch device time, delay between these two steps
-> +	 * should be deterministic as possible.
-> +	 */
-> +	preempt_disable();
-> +	local_irq_disable();
-> +
-> +	time->t_host_pre = ktime_get_real();
-> +
-> +	/*
-> +	 * To ensure the PCIe link is in L0 when ASPM is enabled, perform series
-> +	 * of back-to-back reads. This is necessary because the link may be in a
-> +	 * low-power state (e.g., L1 or L1ss), and need to be forced it to
-> +	 * transition to L0.
-> +	 */
-> +	for (i = 0; i < MHI_NUM_BACK_TO_BACK_READS; i++) {
-> +		ret = mhi_read_reg(mhi_cntrl, mhi_tsync->time_reg,
-> +				   TSC_TIMESYNC_TIME_LOW_OFFSET, &time->t_dev_lo);
-> +
-> +		ret = mhi_read_reg(mhi_cntrl, mhi_tsync->time_reg,
-> +				   TSC_TIMESYNC_TIME_HIGH_OFFSET, &time->t_dev_hi);
-> +	}
-> +
-> +	time->t_host_post = ktime_get_real();
-> +
-> +	local_irq_enable();
-> +	preempt_enable();
+> @@ -503,7 +497,6 @@ static int vsc85xx_mac_if_set(struct phy_device *phydev,
+>  	int rc;
+>  	u16 reg_val;
+>  
+> -	mutex_lock(&phydev->lock);
+>  	reg_val = phy_read(phydev, MSCC_PHY_EXT_PHY_CNTL_1);
+>  	reg_val &= ~(MAC_IF_SELECTION_MASK);
+>  	switch (interface) {
+> @@ -522,17 +515,15 @@ static int vsc85xx_mac_if_set(struct phy_device *phydev,
+>  		break;
+>  	default:
+>  		rc = -EINVAL;
+> -		goto out_unlock;
+> +		goto err;
+>  	}
+>  	rc = phy_write(phydev, MSCC_PHY_EXT_PHY_CNTL_1, reg_val);
 
-PTP_SYS_OFFSET_EXTENDED receives the amount of samples to read from user
-space, you can use it instead of MHI_NUM_BACK_TO_BACK_READS, and in this
-case it's better to grab host-pre and host-post time for a single
-register read.
+I would much rather this was converted to use phy_modify() as well so
+that we ensure that the update is atomic.
 
-Also, PTP_SYS_OFFSET_EXTENDED was improved and currently supports
-multiple clockids as system time, it's good to account for it.
+	rc = phy_modify(phydev, MSCC_PHY_EXT_PHY_CNTL_1,
+			MAC_IF_SELECTION_MASK, reg_val);
+
+where reg_val is assigned the field value in the switch above.
+
+> @@ -668,19 +659,15 @@ static int vsc8531_pre_init_seq_set(struct phy_device *phydev)
+>  	if (rc < 0)
+>  		return rc;
+>  
+> -	mutex_lock(&phydev->lock);
+>  	oldpage = phy_select_page(phydev, MSCC_PHY_PAGE_TR);
+>  	if (oldpage < 0)
+> -		goto out_unlock;
+> +		goto restore_oldpage;
+>  
+>  	for (i = 0; i < ARRAY_SIZE(init_seq); i++)
+>  		vsc85xx_tr_write(phydev, init_seq[i].reg, init_seq[i].val);
+>  
+> -out_unlock:
+> -	oldpage = phy_restore_page(phydev, oldpage, oldpage);
+> -	mutex_unlock(&phydev->lock);
+> -
+> -	return oldpage;
+> +restore_oldpage:
+> +	return phy_restore_page(phydev, oldpage, oldpage);
+
+This is fine.
+
+> @@ -708,19 +695,15 @@ static int vsc85xx_eee_init_seq_set(struct phy_device *phydev)
+>  	unsigned int i;
+>  	int oldpage;
+>  
+> -	mutex_lock(&phydev->lock);
+>  	oldpage = phy_select_page(phydev, MSCC_PHY_PAGE_TR);
+>  	if (oldpage < 0)
+> -		goto out_unlock;
+> +		goto restore_oldpage;
+>  
+>  	for (i = 0; i < ARRAY_SIZE(init_eee); i++)
+>  		vsc85xx_tr_write(phydev, init_eee[i].reg, init_eee[i].val);
+>  
+> -out_unlock:
+> -	oldpage = phy_restore_page(phydev, oldpage, oldpage);
+> -	mutex_unlock(&phydev->lock);
+> -
+> -	return oldpage;
+> +restore_oldpage:
+> +	return phy_restore_page(phydev, oldpage, oldpage);
+
+Also fine.
+
+Thanks.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
