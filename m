@@ -1,128 +1,176 @@
-Return-Path: <netdev+bounces-278594-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278595-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id LzYeJEzO3mlEIgAAu9opvQ
-	(envelope-from <netdev+bounces-278594-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 01:31:24 +0200
+	id UJPwA3HP3ml0IgAAu9opvQ
+	(envelope-from <netdev+bounces-278595-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 01:36:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6CC73FF0BB
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 01:31:23 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 797A03FF0F2
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 01:36:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1BCB430151C2
-	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 23:31:22 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id AC999307405B
+	for <lists+netdev@lfdr.de>; Tue, 14 Apr 2026 23:36:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 973B636073E;
-	Tue, 14 Apr 2026 23:31:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBF4E3BF69E;
+	Tue, 14 Apr 2026 23:36:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="AcSpfqUh"
+	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="04JAb1MR"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from outbound.ms.icloud.com (p-west3-cluster5-host5-snip4-5.eps.apple.com [57.103.72.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CDECCA6B;
-	Tue, 14 Apr 2026 23:31:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C20835C19D
+	for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 23:36:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.72.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776209480; cv=none; b=ISypOcwPcnhsRRdmStlUkl8fPjgY7jgn/IzRydnMGztGfUbBUedPXSNoT9qcQBR4e6W4b64bGGQBDw77Ejh7dtiOAmpjEofR34vihEJiRRyCjOJMFCtd8XCABAIokPxD6B9/oad//mBJZEWXlgSo51IKu3vfmukhPB/DcO9vSQI=
+	t=1776209771; cv=none; b=OgJbmQQhysesxBmeKWbayolv6oDUgXxdajiAZR7QZGSuT+hIGfDC492cppE99dvOPU6X+VFKDXQwDZfH72FBTN3IIpenHLDiOpuJyrnd5muV25QCGUa0LEN840A+E36ZJ8FFhDqlUc9vP57tHrHQyIlWxu/ol4c6l7VztDw13sw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776209480; c=relaxed/simple;
-	bh=Q6gJohhS1AKYJXX+G5/OrC4MZui65F82wif5+hEkVtE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Rf767tw2IBaT0xMn7e3Dx2AmTKHoQBWmtqH9hWz1CafsANwJQPnJzCW19+QMbrgeGXVayOh4v7rAZ+j4tORR+OKVbvoDXJFO8Rkev37WWiFYNdFePJJpntO+tppgQcz41sLYOVABupniWdDaFbJUUs7PQnQLEnNw657Oq2reJ4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=AcSpfqUh; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=zSSDo8sckLb7yaO0qwXduLvY+DGJprunVPrxUMqmKjQ=; b=AcSpfqUhnzoM3GIkZWyi1BnlRb
-	KZ01EgYTn7TqMWpt1uvu9uykL9ObyT9RMncpPE/8Oa8MugQp5xZs9YMul3bTGInaOEYN3EjM0q05O
-	AZIYjng7MXUDp42h++HPxZ8gyhh1j8tsoWXLFKNRHWYidUpIq6uhTZpJtFnl0x9mp1qI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wCnDt-00G6qx-B6; Wed, 15 Apr 2026 01:31:13 +0200
-Date: Wed, 15 Apr 2026 01:31:13 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: davem@davemloft.net, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
-	Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
-	Romain Gantois <romain.gantois@bootlin.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-Subject: Re: [PATCH net-next v9 02/10] net: phy: phy_link_topology: Track
- ports in phy_link_topology
-Message-ID: <1810076d-745e-43ad-918b-f0913ab615ad@lunn.ch>
-References: <20260403123755.175742-1-maxime.chevallier@bootlin.com>
- <20260403123755.175742-3-maxime.chevallier@bootlin.com>
+	s=arc-20240116; t=1776209771; c=relaxed/simple;
+	bh=liaIf8mk3ClIG66+FMlWN5Lj0XtendDylxyecG6Cp8Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=VWm3+en59splKrPNoVm5l3tadsCGkES90awsTZxfSqwjjKTilLlyAZHNyselYIKGaoPu0T/bc+aPjquIo5s2JLtVKWHCc/nxPk5iuiL3qiQlcK4U2PdSrKPdqJ5uM25Mqzv643PUVjca5QVKVFgfZzdd6ZCNEXzjgrrE1SWLNbk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=04JAb1MR; arc=none smtp.client-ip=57.103.72.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
+Received: from outbound.ms.icloud.com (unknown [127.0.0.2])
+	by p00-icloudmta-asmtp-us-west-3a-100-percent-8 (Postfix) with ESMTPS id 105C318000CF;
+	Tue, 14 Apr 2026 23:36:06 +0000 (UTC)
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com; s=1a1hai; t=1776209769; x=1778801769; bh=Jrzww6qgwfWE9yECgprU7sFvmUJeciqHUUqb2Ja9g9A=; h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:x-icloud-hme; b=04JAb1MRwB0OVJhbjuWH2iLvOG7zksVslGL6Xw2GqiLCrmRNakCPk+RWQ9ZuCgWrytrk0F73Z3R0MuG/Z4zJryjRjbJH3yV9H5LiPQ8WgLYYpRS7IUgR9DYwvdLzv2sp7x2pBVQlbqshnC72YRULdUyv09b3RorhU+IGNSQme3whvkVnZQob6+7iB4fDGaksymcSjvAORXEspVJI+77t7+vK3EZsDVMz8qTWxMZRxylLaKry9BtVjcRFY/h4I3EM54XpDxeENQRoNiBB/2dkp4HMEdWYNLpWfIRz9Mab/KBy32IpsRJkCFdGFlG2yYrZAW6x3bDhUrCAguVJBtzHIA==
+Received: from mainframe.tailfb0f7b.ts.net (unknown [17.57.154.37])
+	by p00-icloudmta-asmtp-us-west-3a-100-percent-8 (Postfix) with ESMTPSA id 6670418000FC;
+	Tue, 14 Apr 2026 23:36:04 +0000 (UTC)
+From: =?UTF-8?q?Lek=C3=AB=20Hap=C3=A7iu?= <snowwlake@icloud.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org,
+	=?UTF-8?q?Lek=C3=AB=20Hap=C3=A7iu?= <framemain@outlook.com>
+Subject: [PATCH net v3 0/4] nfc: fix multiple parsing vulnerabilities reachable from RF
+Date: Wed, 15 Apr 2026 01:35:29 +0200
+Message-ID: <20260414233534.55973-1-snowwlake@icloud.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260403123755.175742-3-maxime.chevallier@bootlin.com>
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-ORIG-GUID: LiepSwMM88gkrc9LWwHV0LvXA1XzBxPX
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDE0MDIyMSBTYWx0ZWRfXwEfijQVBuvPq
+ t+lTccMvJhNxKDZgiIr+44R1TWBPldzPKD3dZivk6KBwwhVToW8rnAfREAP/7hXjazGnJ52APi0
+ 9e5Qc6gwX769JX57lUJqT3suSiIHETiEonGEub03QDiStbjUShRm4Xof74Wcn19KeW3hX/waOpB
+ bgDUt48W2TSBTHrwMqH0LxyHYA//2/rIKvoFb6GxNEhEYdfr1tTvUqc61YykdUCvanb3O5huKUq
+ Tj18FDV7+Box96Ki0qrArCHGXYF/TCgyBJoAcp+94AIAnJbbPB89AyrnZYVw7DRpmzOqVqjxbq8
+ RDuUeISK/qFZd+jUQNDNoI0Y2QQkLiS9tVyvLIOemlV/NsazqVHv/0ZcTHXdjQ=
+X-Authority-Info-Out: v=2.4 cv=L4cQguT8 c=1 sm=1 tr=0 ts=69decf68
+ cx=c_apl:c_pps:t_out a=qkKslKyYc0ctBTeLUVfTFg==:117 a=IkcTkHD0fZMA:10
+ a=A5OVakUREuEA:10 a=M51BFTxLslgA:10 a=x7bEGLp0ZPQA:10 a=LbuW6tbUWPcA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=UqCG9HQmAAAA:8 a=jKCiv9OuvI1guS1cGhQA:9
+ a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: LiepSwMM88gkrc9LWwHV0LvXA1XzBxPX
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-04-14_04,2026-04-13_04,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ lowpriorityscore=0 bulkscore=0 spamscore=0 clxscore=1015 adultscore=0
+ phishscore=0 mlxscore=0 suspectscore=0 malwarescore=0 mlxlogscore=999
+ classifier=spam authscore=0 adjust=0 reason=mlx scancount=1
+ engine=8.22.0-2601150000 definitions=main-2604140221
+X-Spamd-Result: default: False [-0.53 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MIXED_CHARSET(0.63)[subject];
+	DMARC_POLICY_ALLOW(-0.50)[icloud.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[icloud.com:s=1a1hai];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278594-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,google.com,redhat.com,armlinux.org.uk,gmail.com,vger.kernel.org,bootlin.com,csgroup.eu,nxp.com,pengutronix.de,chromium.org,makrotopia.org,liebherr.com];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,outlook.com];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-278595-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[icloud.com:+];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[snowwlake@icloud.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,bootlin.com:email,lunn.ch:email,lunn.ch:dkim,lunn.ch:mid]
-X-Rspamd-Queue-Id: D6CC73FF0BB
+	RCPT_COUNT_SEVEN(0.00)[9];
+	FREEMAIL_FROM(0.00)[icloud.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[icloud.com:dkim,icloud.com:mid,outlook.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 797A03FF0F2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Apr 03, 2026 at 02:37:46PM +0200, Maxime Chevallier wrote:
-> phy_port is aimed at representing the various physical interfaces of a
-> net_device. They can be controlled by various components in the link,
-> such as the Ethernet PHY, the Ethernet MAC, and SFP module, etc.
-> 
-> Let's therefore make so we keep track of all the ports connected to a
-> netdev in phy_link_topology. The only ports added for now are phy-driven
-> ports.
-> 
-> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+From: Lekë Hapçiu <framemain@outlook.com>
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+This series fixes four RF-reachable parsing vulnerabilities in the NFC
+stack.  All four are triggerable from an NFC peer within ~4 cm of the
+victim, before any pairing or authentication.
 
-    Andrew
+Patch 1 fixes a u8 underflow in nci_store_general_bytes_nfc_dep() where
+a short ATR_RES/ATR_REQ causes (atr_res_len - NFC_ATR_RES_GT_OFFSET) to
+wrap in u8 arithmetic, producing a bogus remote_gb_len that copies up
+to 47 bytes beyond the valid activation parameter data.
+
+Patch 2 hardens nfc_llcp_parse_gb_tlv() and
+nfc_llcp_parse_connection_tlv().  The loop guard does not prove that
+two header bytes can be read, and the peer-controlled `length` field
+is used to advance `tlv` without bounds checking.  An 8-bit `offset`
+against a 16-bit `tlv_array_len` compounds the issue in
+parse_connection_tlv() where the TLV array can exceed 255 bytes.
+
+Patch 3 fixes nfc_llcp_recv_snl().  The SNL handler accesses skb->data
+before verifying skb->len, and its inner TLV loop has the same two
+weaknesses as patch 2.  SDREQ handling additionally requires
+length >= 2 because both tid (tlv[2]) and the start of service_name
+(tlv[3]) are read.
+
+Patch 4 fixes nfc_llcp_recv_dm() which reads skb->data[2] (the DM
+reason byte) without checking skb->len >= 3.
+
+Changes in v3:
+ - Restore the u8 -> u16 `offset` promotion in patch 2.  v2 split this
+   into a separate v1 patch and did not re-send it; v3 combines the
+   promotion and the bounds checks in a single patch (Paolo Abeni).
+ - Return -EINVAL from nci_store_general_bytes_nfc_dep() and propagate
+   the error out of nci_rf_intf_activated_ntf_packet() rather than
+   silently accepting the malformed packet (Paolo Abeni).
+ - Drop the style-only paren removal in patch 1 (Paolo Abeni).
+ - Condense commit message in patch 2 (Paolo Abeni).
+ - Consolidate the length >= 1 checks before the switch in patch 2,
+   keeping length >= 2 only for the llcp_tlv16() accessors (Paolo Abeni).
+ - Tighten SDREQ length check from >=1 to >=2 in patch 3; the handler
+   reads both tlv[2] and tlv[3] (Sashiko).
+ - Add patch 4 for nfc_llcp_recv_dm().
+ - Send as a fresh thread rather than In-Reply-To v2 (Paolo Abeni).
+
+Lekë Hapçiu (4):
+  nfc: nci: fix u8 underflow in nci_store_general_bytes_nfc_dep
+  nfc: llcp: fix TLV parsing in parse_gb_tlv and parse_connection_tlv
+  nfc: llcp: fix TLV parsing OOB in nfc_llcp_recv_snl
+  nfc: llcp: fix OOB read of DM reason byte in nfc_llcp_recv_dm
+
+ net/nfc/llcp_commands.c | 24 ++++++++++++++++++++++--
+ net/nfc/llcp_core.c     | 16 ++++++++++++++++
+ net/nfc/nci/ntf.c       | 10 +++++++++-
+ 3 files changed, 47 insertions(+), 3 deletions(-)
+
+-- 
+2.51.0
+
 
