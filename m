@@ -1,205 +1,261 @@
-Return-Path: <netdev+bounces-278831-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278832-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qKOPEEK132lCXwAAu9opvQ
-	(envelope-from <netdev+bounces-278831-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 17:56:50 +0200
+	id 8N4bEKO532mOYQAAu9opvQ
+	(envelope-from <netdev+bounces-278832-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 18:15:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C55E406249
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 17:56:49 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A8A34064E0
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 18:15:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 232ED3027104
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 15:56:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1244E300EFAF
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 16:13:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 536653E3C63;
-	Wed, 15 Apr 2026 15:56:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F8403DEAC5;
+	Wed, 15 Apr 2026 16:13:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QV/84CX3"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mDCOVIft"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F46C3E3C5E;
-	Wed, 15 Apr 2026 15:56:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BDB63D649D
+	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 16:13:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776268604; cv=none; b=SdapKcD0q0E9S46civvmJF/mNKxwrW+Osx+icFTOc3LelwovSKr16BPTDq80wwtbkxQmOhPiajze7S4ipjaA51V6FtBJPmkZZP5cyEO+LJBSXxfxmeYNql+5PA1elJbHuhLyO0XXLgeiFxR+kStlAFOROHHVxPQTijk6YVqxd4Y=
+	t=1776269606; cv=none; b=sgQGEBhMB2cz6BmaOAaq6h9JoNw4gj4rTEEYjpWsa02HGzcQrj88jd5ez3QTligVv5fCcZFaf9xoS6Z9J2XcUo6+z+86pXn48Bu/ISxEXpldLkD7sV80TOw1FU1dXKeqsdN4Fj2RJzylXIX+DCNg6bHTSCnJEPkYF7r2yE5QZFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776268604; c=relaxed/simple;
-	bh=3U/D4UJ1AZ9cCh8oZwiYyTzVpVp39NmKWBMFwFLnlzo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eiNy6+RQjKR8RiivrGfOcIe0fnPJ1uXOXL4wBkfW1qdIF1aeuqAbwq6SfP9hxe7omfSCF+I8AbX12swWEL/iu8bVb6V8jhWQ9bjIHrINIfYuvtLn4JF8WxjTAbpaztkyPZliflGEfVwJU/vps94fw3rmf7pm4HStN72ieADf0Kg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QV/84CX3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 581D0C19424;
-	Wed, 15 Apr 2026 15:56:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776268603;
-	bh=3U/D4UJ1AZ9cCh8oZwiYyTzVpVp39NmKWBMFwFLnlzo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=QV/84CX3NyG5jxXjtSz99+7b5OTHRS6jNngo1dhG0kVggGlohmtFEOkQ2f/GA3gQl
-	 dzfSAKjc7EvwV83P/sCfhESNbBJq8DNej/jEoBGPmVBXptUgcHJ9PcWxaPrpMQl3rw
-	 cZ0Ropt7TzzuAzuSZ7zYaGMm/6tCg9AvDTH75/nk/FKikfKrK1+HbFSsBeJ1XbVgRr
-	 +GFaDLXxDFOoiLGJS0xU3m5Nxw3eQgIqRb+DfqlPJ+bPBvBVJMiTYg+29AuOnSgutB
-	 7H/vDnT/67IIewRYqkDhv/PRzAMilTVmewChPAWbtF3UWL90/DVtfbWGiQT+w6SDdR
-	 0flumdLzU3Gmw==
-From: Simon Horman <horms@kernel.org>
-To: mashiro.chen@mailbox.org
-Cc: 'Simon Horman' <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	jreuter@yaina.de,
-	linux-hams@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH net] net: ax25: fix integer overflow in ax25_rx_fragment()
-Date: Wed, 15 Apr 2026 16:56:17 +0100
-Message-ID: <20260415155616.826085-2-horms@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260408172521.281365-1-mashiro.chen@mailbox.org>
-References: <20260408172521.281365-1-mashiro.chen@mailbox.org>
+	s=arc-20240116; t=1776269606; c=relaxed/simple;
+	bh=jPS7AA5tsKAcQLt6aX16GmHwFfcop8nd8+e8ICqABDo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SyJ+pnpC/eACHOpxEegTaTxFsnm8V1zBtbSBrjWJicNNBxdDDvVanyH1Qwl4nFivUuy49Q4TcszacJeQz/bFD4XFWvkZzSQn56I0BrrBJhce2+V60wuDT6t/OmCWDVFp7+ur8Fc1Sk5jB0kl873KGv/Afo7ptrFXBTEN4+bWSRQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mDCOVIft; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1776269606; x=1807805606;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=jPS7AA5tsKAcQLt6aX16GmHwFfcop8nd8+e8ICqABDo=;
+  b=mDCOVIfttDJqLJz4HUVutgqmYmdHG8gEXtrL2rMW9ZOQSg9+OQh74ok7
+   EFyk87okVOflIEW3GU2AY46jeLUdFqU+xTyzWdixShSTKeiaviDVWRZak
+   KUBE1jP3jzB1D1nqCnLOCMB/KU87kKx3yxlgcLkXnOQxD1ebTU1+zCfCT
+   KzSvCKPm15HBi1S/0EqRVKCdigvkQEqPUAHnVAOHkMTjwzBBcX3S3BtD8
+   XwIf4Cc2ymlFLRubeSi2PGcjo7HJ2ZTh9X7m5gw2ipzM+DB/5GcP9aPEL
+   gJULioOD3DLODjN+sADZM+vTVOahVm4Ql/vUtItYHa0Mlr+0q4e9eE53+
+   Q==;
+X-CSE-ConnectionGUID: zHf5zfl6SxuRvgpwQLLtsQ==
+X-CSE-MsgGUID: nv2kc3UzQGC8gO5LSofHSg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11760"; a="77227561"
+X-IronPort-AV: E=Sophos;i="6.23,179,1770624000"; 
+   d="scan'208";a="77227561"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2026 09:13:25 -0700
+X-CSE-ConnectionGUID: hxu9Xgm7RXKcyFicPUm2Cg==
+X-CSE-MsgGUID: JbXqJXrYTI+NcU72WWRUig==
+X-ExtLoop1: 1
+Received: from lkp-server01.sh.intel.com (HELO 7f3b36e5d6a5) ([10.239.97.150])
+  by fmviesa003.fm.intel.com with ESMTP; 15 Apr 2026 09:13:22 -0700
+Received: from kbuild by 7f3b36e5d6a5 with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1wD2rf-000000000gA-1D2q;
+	Wed, 15 Apr 2026 16:13:19 +0000
+Date: Thu, 16 Apr 2026 00:12:19 +0800
+From: kernel test robot <lkp@intel.com>
+To: Dudu Lu <phx0fer@gmail.com>, netdev@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, Dudu Lu <phx0fer@gmail.com>
+Subject: Re: [PATCH] rose: Fix rose_find_socket() returning without
+ sock_hold()
+Message-ID: <202604160039.PLn74vyE-lkp@intel.com>
+References: <20260413090420.79932-1-phx0fer@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260413090420.79932-1-phx0fer@gmail.com>
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278831-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[lists.linux.dev,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
+	TAGGED_FROM(0.00)[bounces-278832-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8C55E406249
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,intel.com:mid,git-scm.com:url,01.org:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,animats.net:email,ukuu.org.uk:email]
+X-Rspamd-Queue-Id: 8A8A34064E0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: 'Simon Horman' <horms@kernel.org>
+Hi Dudu,
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev
----
-net: ax25: fix integer overflow in ax25_rx_fragment()
+kernel test robot noticed the following build errors:
 
-This commit addresses an integer overflow in the ax25_cb fragmentation
-reassembly accumulator. It adds a check to ensure the combined payload
-of fragments does not exceed USHRT_MAX. If the limit is exceeded, the
-fragment queue is purged to prevent allocating a tiny buffer that leads
-to a panic.
+[auto build test ERROR on net/main]
+[also build test ERROR on net-next/main linus/master horms-ipvs/master v7.0 next-20260414]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-> Every skb_put() call in the copy loop
-> that follows writes far beyond the allocated headroom, corrupting
-> the kernel heap.
+url:    https://github.com/intel-lab-lkp/linux/commits/Dudu-Lu/rose-Fix-rose_find_socket-returning-without-sock_hold/20260414-194608
+base:   net/main
+patch link:    https://lore.kernel.org/r/20260413090420.79932-1-phx0fer%40gmail.com
+patch subject: [PATCH] rose: Fix rose_find_socket() returning without sock_hold()
+config: i386-randconfig-012-20260415 (https://download.01.org/0day-ci/archive/20260416/202604160039.PLn74vyE-lkp@intel.com/config)
+compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260416/202604160039.PLn74vyE-lkp@intel.com/reproduce)
 
-Is this description accurate?
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202604160039.PLn74vyE-lkp@intel.com/
 
-skb_put() explicitly performs strict bounds checking and triggers a
-deterministic kernel panic via skb_over_panic() if exceeded, rather than
-silently corrupting the heap.
+All errors (new ones prefixed by >>):
 
-> Fix mirrors the identical bug fixed in NET/ROM (nr_in.c):
+>> net/rose/af_rose.c:1:2: error: expected identifier or '('
+       1 |         if (s)
+         |         ^
+   In file included from net/rose/af_rose.c:21:
+   In file included from include/linux/sched/signal.h:6:
+   include/linux/signal.h:98:11: warning: array index 3 is past the end of the array (that has type 'unsigned long[2]') [-Warray-bounds]
+      98 |                 return (set->sig[3] | set->sig[2] |
+         |                         ^        ~
+   arch/x86/include/asm/signal.h:24:2: note: array 'sig' declared here
+      24 |         unsigned long sig[_NSIG_WORDS];
+         |         ^
+   In file included from net/rose/af_rose.c:21:
+   In file included from include/linux/sched/signal.h:6:
+   include/linux/signal.h:98:25: warning: array index 2 is past the end of the array (that has type 'unsigned long[2]') [-Warray-bounds]
+      98 |                 return (set->sig[3] | set->sig[2] |
+         |                                       ^        ~
+   arch/x86/include/asm/signal.h:24:2: note: array 'sig' declared here
+      24 |         unsigned long sig[_NSIG_WORDS];
+         |         ^
+   In file included from net/rose/af_rose.c:21:
+   In file included from include/linux/sched/signal.h:6:
+   include/linux/signal.h:114:11: warning: array index 3 is past the end of the array (that has type 'const unsigned long[2]') [-Warray-bounds]
+     114 |                 return  (set1->sig[3] == set2->sig[3]) &&
+         |                          ^         ~
+   arch/x86/include/asm/signal.h:24:2: note: array 'sig' declared here
+      24 |         unsigned long sig[_NSIG_WORDS];
+         |         ^
+   In file included from net/rose/af_rose.c:21:
+   In file included from include/linux/sched/signal.h:6:
+   include/linux/signal.h:114:27: warning: array index 3 is past the end of the array (that has type 'const unsigned long[2]') [-Warray-bounds]
+     114 |                 return  (set1->sig[3] == set2->sig[3]) &&
+         |                                          ^         ~
+   arch/x86/include/asm/signal.h:24:2: note: array 'sig' declared here
+      24 |         unsigned long sig[_NSIG_WORDS];
+         |         ^
+   In file included from net/rose/af_rose.c:21:
+   In file included from include/linux/sched/signal.h:6:
+   include/linux/signal.h:115:5: warning: array index 2 is past the end of the array (that has type 'const unsigned long[2]') [-Warray-bounds]
+     115 |                         (set1->sig[2] == set2->sig[2]) &&
+         |                          ^         ~
+   arch/x86/include/asm/signal.h:24:2: note: array 'sig' declared here
+      24 |         unsigned long sig[_NSIG_WORDS];
+         |         ^
+   In file included from net/rose/af_rose.c:21:
+   In file included from include/linux/sched/signal.h:6:
+   include/linux/signal.h:115:21: warning: array index 2 is past the end of the array (that has type 'const unsigned long[2]') [-Warray-bounds]
+     115 |                         (set1->sig[2] == set2->sig[2]) &&
+         |                                          ^         ~
+   arch/x86/include/asm/signal.h:24:2: note: array 'sig' declared here
+      24 |         unsigned long sig[_NSIG_WORDS];
+         |         ^
+   In file included from net/rose/af_rose.c:21:
+   In file included from include/linux/sched/signal.h:6:
+   include/linux/signal.h:157:1: warning: array index 3 is past the end of the array (that has type 'const unsigned long[2]') [-Warray-bounds]
+     157 | _SIG_SET_BINOP(sigorsets, _sig_or)
+         | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/signal.h:138:8: note: expanded from macro '_SIG_SET_BINOP'
+     138 |                 a3 = a->sig[3]; a2 = a->sig[2];                         \
+         |                      ^      ~
+   arch/x86/include/asm/signal.h:24:2: note: array 'sig' declared here
+      24 |         unsigned long sig[_NSIG_WORDS];
+         |         ^
+   In file included from net/rose/af_rose.c:21:
+   In file included from include/linux/sched/signal.h:6:
+   include/linux/signal.h:157:1: warning: array index 2 is past the end of the array (that has type 'const unsigned long[2]') [-Warray-bounds]
+     157 | _SIG_SET_BINOP(sigorsets, _sig_or)
+         | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/signal.h:138:24: note: expanded from macro '_SIG_SET_BINOP'
+     138 |                 a3 = a->sig[3]; a2 = a->sig[2];                         \
+         |                                      ^      ~
+   arch/x86/include/asm/signal.h:24:2: note: array 'sig' declared here
+      24 |         unsigned long sig[_NSIG_WORDS];
+         |         ^
+   In file included from net/rose/af_rose.c:21:
+   In file included from include/linux/sched/signal.h:6:
+   include/linux/signal.h:157:1: warning: array index 3 is past the end of the array (that has type 'const unsigned long[2]') [-Warray-bounds]
+     157 | _SIG_SET_BINOP(sigorsets, _sig_or)
+         | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/signal.h:139:8: note: expanded from macro '_SIG_SET_BINOP'
+     139 |                 b3 = b->sig[3]; b2 = b->sig[2];                         \
+         |                      ^      ~
+   arch/x86/include/asm/signal.h:24:2: note: array 'sig' declared here
+      24 |         unsigned long sig[_NSIG_WORDS];
+         |         ^
+   In file included from net/rose/af_rose.c:21:
+   In file included from include/linux/sched/signal.h:6:
+   include/linux/signal.h:157:1: warning: array index 2 is past the end of the array (that has type 'const unsigned long[2]') [-Warray-bounds]
+     157 | _SIG_SET_BINOP(sigorsets, _sig_or)
+         | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/signal.h:139:24: note: expanded from macro '_SIG_SET_BINOP'
+     139 |                 b3 = b->sig[3]; b2 = b->sig[2];                         \
+         |                                      ^      ~
+   arch/x86/include/asm/signal.h:24:2: note: array 'sig' declared here
+      24 |         unsigned long sig[_NSIG_WORDS];
+         |         ^
+   In file included from net/rose/af_rose.c:21:
+   In file included from include/linux/sched/signal.h:6:
+   include/linux/signal.h:157:1: warning: array index 3 is past the end of the array (that has type 'unsigned long[2]') [-Warray-bounds]
+     157 | _SIG_SET_BINOP(sigorsets, _sig_or)
+         | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/signal.h:140:3: note: expanded from macro '_SIG_SET_BINOP'
 
-This isn't a bug, but is this the correct file reference? The check for
-USHRT_MAX actually appears to exist in X.25 (x25_in.c), not NET/ROM.
 
-> diff --git a/net/ax25/ax25_in.c b/net/ax25/ax25_in.c
-> index d75b3e9ed93de..68202c19b19e3 100644
-> --- a/net/ax25/ax25_in.c
-> +++ b/net/ax25/ax25_in.c
-> @@ -41,6 +41,11 @@ static int ax25_rx_fragment(ax25_cb *ax25, struct sk_buff *skb)
->  				/* Enqueue fragment */
->  				ax25->fragno = *skb->data & AX25_SEG_REM;
->  				skb_pull(skb, 1);	/* skip fragno */
-> +				if ((unsigned int)ax25->fraglen + skb->len > USHRT_MAX) {
+vim +1 net/rose/af_rose.c
 
-Is there a race condition with ax25->fraglen here?
+   > 1		if (s)
+     2			sock_hold(s);// SPDX-License-Identifier: GPL-2.0-or-later
+     3	/*
+     4	 *
+     5	 * Copyright (C) Jonathan Naylor G4KLX (g4klx@g4klx.demon.co.uk)
+     6	 * Copyright (C) Alan Cox GW4PTS (alan@lxorguk.ukuu.org.uk)
+     7	 * Copyright (C) Terry Dawson VK2KTJ (terry@animats.net)
+     8	 * Copyright (C) Tomi Manninen OH2BNS (oh2bns@sral.fi)
+     9	 */
+    10	
 
-If fragments for the same connection arrive concurrently on different CPUs,
-both could evaluate this bounds check as safe and then concurrently add
-their lengths.
-
-> +					skb_queue_purge(&ax25->frag_queue);
-> +					ax25->fragno = 0;
-> +					return 1;
-
-Does this code leak the skb?
-
-When returning 1 here, the caller might skip freeing the skb because it
-assumes the packet was successfully consumed or queued.
-
-Could we explicitly call kfree_skb(skb) before returning 1, or return 0 to
-instruct the caller to free it?
-
-> +				}
->  				ax25->fraglen += skb->len;
->  				skb_queue_tail(&ax25->frag_queue, skb);
-
-[ ... ]
-
->  					/* Copy data from the fragments */
->  					while ((skbo = skb_dequeue(&ax25->frag_queue)) != NULL) {
->  						skb_copy_from_linear_data(skbo,
->  							  skb_put(skbn, skbo->len),
->  									  skbo->len);
-
-Could this read past the end of the skbo->data buffer if the fragment is
-non-linear?
-
-If the skb has paged data, skbo->len exceeds the linearly mapped data size,
-which might trigger a panic or leak adjacent memory into the reassembled
-packet.
-
-Should this use skb_copy_bits() instead?
-
-[ ... ]
-
->  	} else {
->  		/* First fragment received */
->  		if (*skb->data & AX25_SEG_FIRST) {
->  			skb_queue_purge(&ax25->frag_queue);
->  			ax25->fragno = *skb->data & AX25_SEG_REM;
->  			skb_pull(skb, 1);		/* skip fragno */
->  			ax25->fraglen = skb->len;
-
-Is there a possibility of truncating the length here?
-
-Since ax25->fraglen is an unsigned short, if a first fragment arrives with
-skb->len > USHRT_MAX, it might be silently truncated.
-
-Subsequent continuation fragments will be validated against this artificially
-small fraglen, bypassing the new USHRT_MAX check.
-
-Should the bounds check be applied to the first fragment as well?
-
->  			skb_queue_tail(&ax25->frag_queue, skb);
->  			return 1;
->  		}
->  	}
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
