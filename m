@@ -1,157 +1,121 @@
-Return-Path: <netdev+bounces-278835-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278836-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SIyrAle732mOYQAAu9opvQ
-	(envelope-from <netdev+bounces-278835-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 18:22:47 +0200
+	id 8EyFM5G732mOYQAAu9opvQ
+	(envelope-from <netdev+bounces-278836-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 18:23:45 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B4B1406588
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 18:22:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 40A364065A0
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 18:23:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D5ED33045018
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 16:21:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7B45F303799C
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 16:22:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45F25351C39;
-	Wed, 15 Apr 2026 16:21:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="ZERztMOD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6447E3DC4C7;
+	Wed, 15 Apr 2026 16:22:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f71.google.com (mail-oa1-f71.google.com [209.85.160.71])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68AD134A767;
-	Wed, 15 Apr 2026 16:21:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 021A43CF030
+	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 16:22:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776270096; cv=none; b=en3gIfGNbfceFVz4CNBHMd2qQJPfEziYWsGkp50urbCVqCJJaVEJ3T2ItIHwnCrUhHQrMqYOwdPn6TCz2SrB5JlAS37/gG0fbIafieLuUUR2F8rqr9IgyYMg2jo8nEU3u6TZdPT8eEZkr6DNtY7bKegXKIRRUM5Mdl1HUtp7oRI=
+	t=1776270126; cv=none; b=oNRlgHKJm6469KwDBckqcpGFzib/juR0pJlibQZ/OCMisPbu1NGjDY4XXMpSh9+NOGldFCHcaCzZtQJOEfgff2B1IeAMjV6MXRDggd9AJhavs2srMesEiXFid54ylp0iFBoHDdL8WhZGjiT3lbUwG6Ezred/5cCcrP8q3PRQEYw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776270096; c=relaxed/simple;
-	bh=nKY2FNElFVAaM0L4ieLyB49PFRaTeWKOhpywzm9fA3o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RrQ0KgwDGtneEAPXxpeDTnbsYxkslaeaRByMattvLKDFivR05qz7EvSJ0wJhx+MeWUz8HLQKhWglOiPNgWYXxFIKy3DsqseF+9tRzBJJxVeXNVRL+J6h+ZTl+FR7cDoI6S2YZJ3dLH9A7gTX57zH8Aldk6aBLdk64xQyW5EzetI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=ZERztMOD; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: from netfilter.org (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with UTF8SMTPSA id A4B68600B5;
-	Wed, 15 Apr 2026 18:21:31 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1776270091;
-	bh=X3T8CYcKtn+rhTvs0sJGYEhOtkqxJirQRB4VejoqTE4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZERztMOD1VYnc5lgHlY9682sI0x7f7U4z8PDJ0wqO28JscZxacxPYJKkTyl1b4LQ0
-	 lOjCsg4xrMRgAzGl2N60196BAkdx2/FDgatUksyHbBAOd0Grm6QMMfRYU343idDioG
-	 UpYf0pJbs7/z5nwwhqGoEojXhyo8u3b+lDK4R+VXdjdE9/HnGSQKnSQ+jC13zP788k
-	 tJHV4G7NPo127jW3gR35+DnaeUhZSK4SINmEIpSl7kIuO2sr/DtkRWtPFvCMa8SY0g
-	 vo6Iwo026C95UH6rt+azD5yGwr+wrQ/NjA15SnRxqqJep8Om85Wx6QHiheRAn+qfKT
-	 ftKgu13eReIug==
-Date: Wed, 15 Apr 2026 18:21:28 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Florian Westphal <fw@strlen.de>
-Cc: "Kito Xu (veritas501)" <hxzene@gmail.com>, phil@nwl.cc,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, jengelh@medozas.de,
-	kaber@trash.net, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] netfilter: xt_realm: fix null-ptr-deref in realm_mt()
-Message-ID: <ad-7CNqWLz23NVVe@chamomile>
-References: <20260415034343.107920-1-hxzene@gmail.com>
- <ad9UF5Cr12YGJnbi@strlen.de>
- <ad9aDziQEBR0h3U8@chamomile>
- <ad9d52dQWrS1H_ju@strlen.de>
+	s=arc-20240116; t=1776270126; c=relaxed/simple;
+	bh=60BWNQow8KA/1jCwUkssd2INilh9p6HszbZr5hYNB/w=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=et/UDK59hV/8WVB54ZXectnCnWWO8lUl6WM+3wipJE4R25hAyiaAnBPbadhF8w5E7RNlpKb+dslgAe9enV3+W3f/4vwBV0Am3dvlmTz3mOTrgOTmSfzVo6fkD0Ht/ie0zjFISYyyNSV5JqS8s2TIi1iBde/FamVMzOKASDFKUFA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.160.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oa1-f71.google.com with SMTP id 586e51a60fabf-40ea48ccbd2so6050550fac.3
+        for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 09:22:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776270124; x=1776874924;
+        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=60BWNQow8KA/1jCwUkssd2INilh9p6HszbZr5hYNB/w=;
+        b=o4XKbnsMpBaaS7SLYs4jFh//bGcX+AeD2oEgHuKbMZq9k0TSaSHMl9pTSsvphsTUzo
+         YvL06hiE02r+nXvXSuTt1CBceAougc3ly21+rffdGpWU9Lj6MGHkHOGnaK0tUyXz9+C3
+         BjJd8nZNq7ONNP8UD8ULPu8iCTwpvP4iNr+is5ulH8k+OsOvzzmicdCcJ7Qop2EFvrth
+         hD2tDNgNQWwvrmHcvK0OOpUJOJ6kO2v/ife3xdIeXlDG0T8dLMZpR8LvVyU0/N/zm8y0
+         UWVkwCjer3lFH3lVVwSU782R+lDwOJyyvzmzVJlLqrDHdnB8sT1L1s6wWatPQdEWhwBS
+         WeTQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9xECZ5DDJalAfqFkXCUgdInf4aBK6Cw9hE4P7tlbV12mMAsyvwRNZUl0jTGog3nwQJN9HfMpM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxmP1l9zFcdASPPOpbqedQce6qoo2paiLpPOMsWCHloGR9tV60c
+	F894JiKTm/HJyxd9F6RV+OXyc5/9F+e8tsn8jxtPZuVyB9DgcAYmjWLblSwoljdhbUQgaaYlWFB
+	APJmiNnUgA7MJ/Xqlt4Meu1Vfx9pPCDkev8nrOyYdi0qpkiXrzGL/APrx6zM=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <ad9d52dQWrS1H_ju@strlen.de>
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Received: by 2002:a05:6820:f024:b0:67d:f523:5bde with SMTP id
+ 006d021491bc7-68be596a99dmr11083641eaf.7.1776270123982; Wed, 15 Apr 2026
+ 09:22:03 -0700 (PDT)
+Date: Wed, 15 Apr 2026 09:22:03 -0700
+In-Reply-To: <20260415130533.849053-1-nogikh@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69dfbb2b.a70a0220.259bc5.000c.GAE@google.com>
+Subject: [syzbot ci] Re: veth: add Byte Queue Limits (BQL) support
+From: syzbot ci <syzbot+ciebb51dbf2354d2fd@syzkaller.appspotmail.com>
+To: nogikh@google.com, hawk@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, syzbot@lists.linux.dev, 
+	syzkaller-bugs@googlegroups.com
+Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [1.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
+	MID_RHS_MATCH_TO(1.00)[];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[netfilter.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-278835-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[netfilter.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[gmail.com,nwl.cc,davemloft.net,google.com,kernel.org,redhat.com,medozas.de,trash.net,vger.kernel.org,netfilter.org];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-278836-lists,netdev=lfdr.de,ciebb51dbf2354d2fd];
 	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ozlabs.org:url,netfilter.org:dkim,netfilter.org:email]
-X-Rspamd-Queue-Id: 4B4B1406588
+	NEURAL_HAM(-0.00)[-0.998];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	R_DKIM_NA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[googlegroups.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,syzbot.org:url]
+X-Rspamd-Queue-Id: 40A364065A0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Apr 15, 2026 at 11:44:07AM +0200, Florian Westphal wrote:
-> Pablo Neira Ayuso <pablo@netfilter.org> wrote:
-> > On Wed, Apr 15, 2026 at 11:02:15AM +0200, Florian Westphal wrote:
-> > > Kito Xu (veritas501) <hxzene@gmail.com> wrote:
-> > > > realm_mt() unconditionally dereferences skb_dst(skb) without a NULL
-> > > > check. The xt_realm match registers with .family = NFPROTO_UNSPEC,
-> > > > making it available to all netfilter protocol families. Through the
-> > > > nftables compat layer (nft_compat), an unprivileged user inside a
-> > > > user/net namespace can load this match into a bridge-family chain.
-> > > 
-> > > I do not think this bug is related to nft_compat.
-> > > You can also use ebtables setsockopt api to request xt_realm, no?
-> > > 
-> > > > Fixes: ab4f21e6fb1c ("netfilter: xtables: use NFPROTO_UNSPEC in more extensions")
-> > > 
-> > > Looks correct.  Alternatively we could revert the xt_realm.c change.
-> > > But I don't have a strong opinion here, patch looks correct.
-> > 
-> > Maybe partial revert makes sense, since in ab4f21e6fb1c:
-> > 
-> > - xt_MARK: OK
-> > - xt_NOTRACK: OK
-> > - xt_comment: OK
-> 
-> Agree.
-> 
-> > - xt_mac: There is a better way to do this in bridge.
-> 
-> Right.
-> 
-> > - xt_owner, no sockets in bridge.
-> 
-> Output/postrouting maybe?
-> 
-> > - xt_physdev, which makes no sense in bridge, this is for br_netfilter
-> >   only.
-> 
-> Agree.
-> 
-> > - xt_realm (as already mentioned).
-> > That is, a partial revert of this patch for:
-> > 
-> > - xt_mac
-> > - xt_owner
-> > - xt_physdev
-> > - xt_realm
-> 
-> I'm ok with that too.
+syzbot ci has tested the suggested fix patch on top of the following series:
 
-For the record, this patch has been replaced by:
+[v2] veth: add Byte Queue Limits (BQL) support
+https://lore.kernel.org/all/20260413094442.1376022-1-hawk@kernel.org
 
-https://patchwork.ozlabs.org/project/netfilter-devel/patch/20260415113334.61008-1-pablo@netfilter.org/
+Patch: https://ci.syzbot.org/jobs/4a19c4e7-8505-49e5-b80f-6107406612b0/patch
+
+The patch testing request could not be completed:
+Testing failed due to an infrastructure error.
+Testing results:
+* [build 0] Build Patched: error
+
+Full report is available here:
+https://ci.syzbot.org/session/67022682-86d9-4483-a528-4d95990f8038
+
+---
+This report is generated by a bot. It may contain errors.
+syzbot ci engineers can be reached at syzkaller@googlegroups.com.
 
