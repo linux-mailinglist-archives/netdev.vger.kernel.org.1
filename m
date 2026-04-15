@@ -1,373 +1,443 @@
-Return-Path: <netdev+bounces-278672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278673-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KOJMMLUs32nOPgAAu9opvQ
-	(envelope-from <netdev+bounces-278672-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 08:14:13 +0200
+	id WL+zKmUt32nOPgAAu9opvQ
+	(envelope-from <netdev+bounces-278673-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 08:17:09 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A722400C68
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 08:14:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CECDE400CA6
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 08:17:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 541DE3029771
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 06:12:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7F1D63024164
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 06:17:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF32437F742;
-	Wed, 15 Apr 2026 06:12:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13258387359;
+	Wed, 15 Apr 2026 06:17:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qYSTFRpu"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DpQ9l3a/";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="EDOjvFGd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 306862C3757
-	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 06:12:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776233572; cv=none; b=Kjsg6I9yFk1kzVfcJRpb0jKkArvusHOV1O9e7ZMueSzpcL1Smno5QRXFHMqXXzKQV3wospQ75raHCoSN13ZZ4aXJWi0l0l+ag4anQjLzrLg2D0DQOKNQlUMsq3mUpESNLax0yleM00o/BHV4UQeRzZCpspWIU4vDYji6oQoetEk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776233572; c=relaxed/simple;
-	bh=YBuKzw5MiBpMt8chIfY6CgsYp+HFY9LSLYxZHviAwOM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=orcNS0cwohmHibPIFqApVTmF8dzqpZOurkX1B4wvdU6Y3kQOdiWtzLXkZlugY5t4AJ2vwoKsoiiWOOLhZr3xmm1Z/mwnUeb2CeB8uP+NIlVWvS1S+CLj++kj6mp/s5lB8jIMT7nuE2SMKrnNhNaxxHKZVZqBIa02ieHVuMUbj6k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qYSTFRpu; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-488ab2db91aso98350985e9.3
-        for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 23:12:51 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C7DE3859C7
+	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 06:17:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.129.124
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776233827; cv=pass; b=lkCHtKViBKcF96hEl03jcx53u5t/7HyQVC0xPTkAt5JTNxU/4LjWbrmJjC3vDspp19IHe0X0yQ6c6ApwrqlQqOBw4RhJJYzyRjrnvuF+8XkH46Y/BTm6ntxiRxi3i0XHFuQ58SdBmdGJepVpd16cY0CegWFziMyDBkrmvOe8GxE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776233827; c=relaxed/simple;
+	bh=fbrcFDpIcaMmdyaAevSs9B9dUlzxWObF1EZXXDVTng8=;
+	h=From:References:MIME-Version:In-Reply-To:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KC0YOdlJB84VAnCTEIvaqBjVfLna6YAljHobtnrln3McibZdrQVajC3LruSE327ysnPEA+qA4+F4u65uEq1mJcl5hHkP0mcwgrpAw0u7Drzag+guUrd0ISPLk8y+eu4KcGMweDtiZauYKItz/j+71MCe3Z2HetgHPvgfYUIiox8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DpQ9l3a/; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=EDOjvFGd; arc=pass smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1776233824;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=opmHXqrsxPdRoCy64tj4Lr9BaPyxTTYaJkinRCgCCHY=;
+	b=DpQ9l3a/aTpATmD3wVFZMYnqrVgd9735yfVNLbTzp6LaYxDjPZMMa64DC+9dauDAv/P8mO
+	/rJNpx+7SsaElA5EzKaI8/KUWnn9NthW+183wjH3vk5FN+oWBwzFPAl7W7ZTJB4PAWLPCj
+	NzxgiyvG49pLnwvQJ5gKgCpMAr9nyWE=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-679-EV3m_V6SPvOgnD75jVCbcg-1; Wed, 15 Apr 2026 02:17:03 -0400
+X-MC-Unique: EV3m_V6SPvOgnD75jVCbcg-1
+X-Mimecast-MFC-AGG-ID: EV3m_V6SPvOgnD75jVCbcg_1776233822
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-b9c603ec28eso681592266b.2
+        for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 23:17:03 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776233821; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Rp7nkWOzTqr57pescKgW3pe1YZJqrNfECTzs259juyUymRhgeyPoJRgHNx30yO0rI3
+         rZUingCwMvd5qlDg2izrLhKVfj5sauolTcA24lCRSokUlSrDhiNnnISegy5AsXceWSQS
+         Uw4FEL0VyFFB2YhXjd1WL4xzRx3CwsTBI7OY5ol5CmvfXlbWIV1l9n/Ud+Tjdt2//ee5
+         hyp7etwm2X5arrx+JYidv4YSHj/53S78oul++DvRq964I5PkbihbU8PenuRJk7SSBylj
+         eb4FKjpFnUlN3murdvlKbz1neV9hRR8L9d9+SC+aP+jmYfnZrtJmhImjmdTdCq6aQ5CN
+         KwBA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:in-reply-to
+         :mime-version:references:from:dkim-signature;
+        bh=opmHXqrsxPdRoCy64tj4Lr9BaPyxTTYaJkinRCgCCHY=;
+        fh=izX2hvL3q/lpWP8t1JBzb9QUXf7eO90jtaYEcxsVvAM=;
+        b=hyh5j8haMLRmO9tDkajhFZdLabZbgwnRydKtaXgGQaAPFAXhqQ3TcBxZaBJT5qFCMi
+         kFRekZcWGyRD0G2HdQdttEDoqMf3SQgyGfAMsAuF41iVlmFWUkeRsWRGcsMoFcyc7j4b
+         vM1rT8rrXFHe1GDtscS+Uk/KLeh+VMTDPJ+wNmiCnOuO1vh11lZZgVbha9ifgLfV9xj+
+         Zj0OSDWjDd9Cui/I7d/ucEbkaknDBAGN1wQO127+qNG8tUL+8Sj2ygudmesIQbt+yVoD
+         vFLmfLvWRpfQGxMnQu7OhZxTFzO3sXOBFL9dMHtQEYFc4t98gj+590K+JOfenYoWBpCI
+         UjOA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776233569; x=1776838369; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=SSNgeZakK1IlX2VGc1M5dpQgdhHGi7URNL9nqA5mqxk=;
-        b=qYSTFRpumHuJ2JxejMEtRFv6oOHkEjf8uQUgnObhNbcAY9KMUkFb9SNrkzSKDgwA58
-         PctjuUijtjHOHGrOn28xdU2IO0Ljj7wb2rSBX/3vdXDZ83RLVbt36RB6o+LJo9vk1twf
-         SAGt0LL19BU6l581/w64zfihfFfTKhKZ0cSYuTkFdznA2AA0IDGAT0jpr9123hMiNNLy
-         einB+hp2Ar9aX8xrdVZZOJNCao0FS4oKgPau89KLWRpvW3PcHA/BprRcTDxgOkTKlYQo
-         99CHyB7dEI5dpxnZqloFDSDGvG6qnoycc6Mm7DZB1x1gXvLRU047y4a9AlcDxzLLmNLE
-         vsWA==
+        d=redhat.com; s=google; t=1776233821; x=1776838621; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:in-reply-to
+         :mime-version:references:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=opmHXqrsxPdRoCy64tj4Lr9BaPyxTTYaJkinRCgCCHY=;
+        b=EDOjvFGdJHU9JdcF4idl5OdCtG0kbjv2IB/A2N8mbNBVPaEn7WrTQ8NThvEAZT86J4
+         yw0xUCa/17RDF3mqXPhGnssQKBvcc6zHDx+7WiSwTzBLym2L4OOvkypuj0IAIbNd4BPT
+         oXE5sW4Y/yClRTf+W+5raWSVim5YZZ5R1kPK1Lx2Bx4dQAErb7fUNt30kMfiTuy7Z/fV
+         VGFo1nqzNyx/V1QO9QfH78EkRQEsmaedzUat270ghrcoDhLJ6MwZ69P16nlj8OiiAMD5
+         4HU8tvSbg8PAVkxs/q6IKGH4smA2Kxx0dpD4FkzSqelgXpUbGFIdZoSwP6JzuOaeVJr+
+         SAmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776233569; x=1776838369;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SSNgeZakK1IlX2VGc1M5dpQgdhHGi7URNL9nqA5mqxk=;
-        b=pBETjzSSlrSj47rd6yoIYR3ErMkY0MwAIzEYIoCWBdCd3S6XIxC8L1swzhJ/g3Duig
-         /3WVZlaQ7n/LiERreuhVyze6sveTrbteo84/KAhcYyzvWZx5U+clxpGBUr3lqciez197
-         99RN0ijRLJI10MSuR7K/HL7eqtz4lNJAbRyjxSXotae3Xpt7gv3hKvjvfSykZJaHQRdz
-         Hme00f/Z+u1lbXEOAJPfBRYYm3eXjHc0Px1g/VMMOro2oWSa/w6daOihgfrffXj5aW3A
-         rGJsVd9bdfUTnJl24fqf7MaZXPjXkiePmoFx8BXtH8N1x5yudXdK9gz+i0iT+evJ+Kq0
-         4M9Q==
-X-Gm-Message-State: AOJu0YxthQTT6UI5aEy0RNWoJ8kaIETOyQIT8O8/FLec2cPvyvuKbqUC
-	tSK8TVjkOTeF5TsoBU+G/3FtotyevU7xNHPlEEF7t0weGigbEV7+8nvvYQKMB/64
-X-Gm-Gg: AeBDieto12YslmuDghEXizW3lPpvFZwta7876QqUO60RnPsp4bIjjh1f94YQED/Y727
-	EJf22QRCLJnm6THFserYNM/F8Xw50faMbkVqb5EAc2+G3dMZnIF0E4XKdoGJ39K4PHIwjxt+POI
-	Xe9iwCb3uMovDKYg07R4P/472V/4mmAF310s1KmCRyY1hCDBEVdmmBPLaReuvGpnb8Cbxk83P8+
-	8ekxa/XV9JzPnOvAm+c/9PW5yxi4Hm2HqALYJfKaVlF0UaKQk/7b21g7CsW97JcYXq9AxtlxAlN
-	VrSbvZ9j5Yi67CrgiLXdXaJk1o3YnjFajgVqd8QkyxPwRdeSoy/ec6tZ5d6CF+8tHze1yAG9Fo+
-	WibTOsIRARIY2P+5KpPzHddiTX8159L9ScxJeN7CNXrZOMaBA1p4zEuv5Qaxtul2a9Wkt0xKxjt
-	hfUazzqm9oWr/nCGIZjZIAhDy+9nWFiFtLn0nqiMjHDda+gF0N14DBznuBUxfZnRjX1JT4a9ySE
-	sU5T5VQD90cDpJqwu6eB/CXSMahdOcHuniMtW3yEA/KObfyDhfDtpmE
-X-Received: by 2002:a05:600c:608e:b0:488:8185:e672 with SMTP id 5b1f17b1804b1-488d688d2fbmr277894905e9.30.1776233569070;
-        Tue, 14 Apr 2026 23:12:49 -0700 (PDT)
-Received: from localhost.localdomain ([2a00:a041:e04f:2600:a4ae:7896:c26b:4cc6])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488f1e95130sm23697125e9.13.2026.04.14.23.12.47
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 14 Apr 2026 23:12:48 -0700 (PDT)
-From: "SnailSploit | Kai Aizen" <kai.aizen.dev@gmail.com>
-X-Google-Original-From: SnailSploit | Kai Aizen <95986478+SnailSploit@users.noreply.github.com>
-To: netdev@vger.kernel.org
-Cc: tipc-discussion@lists.sourceforge.net,
-	jmaloy@redhat.com,
-	ying.xue@windriver.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	stable@vger.kernel.org,
-	Kai Aizen <kai.aizen.dev@gmail.com>
-Subject: [PATCH] [PATCH net] tipc: fix UAF race in tipc_mon_peer_up/down/remove_peer vs bearer teardown
-Date: Wed, 15 Apr 2026 09:12:11 +0300
-Message-ID: <20260415061211.45530-1-95986478+SnailSploit@users.noreply.github.com>
-X-Mailer: git-send-email 2.53.0
+        d=1e100.net; s=20251104; t=1776233821; x=1776838621;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:in-reply-to
+         :mime-version:references:from:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=opmHXqrsxPdRoCy64tj4Lr9BaPyxTTYaJkinRCgCCHY=;
+        b=h6UYJ/w4OavmQmFfmYVD5zwv3FUZAii3xr1a8Aqdp3pkXsuNEIH95z52X2WIMevFFg
+         Tz46S4i2MXRT4wGaShHC20G+XOjbq0yNRA2ZaT+hSaUedZiK8N7wSTBvLw2t8Qr9lOdX
+         rtKc2NS8We3qKFQJhk6ANMYxtx9hYgHXV3lO3RnoVO2PmjVCa5SkkETHQLVOQS00IxDQ
+         dkglVA0dW6kFS8I8sGcWqxYbTG6HYNNTGpgtsFuHJYexI08yHnq3pGosJCOSY4lL27lj
+         rUT6iS1a35Hve7/rinGqRMAZxwN+yKTT3kpRjsEkeiMXc7d61ncNAPmH+bcrCjG5bDam
+         c6Ag==
+X-Gm-Message-State: AOJu0YwGAQQ03IxHfAHQMQ8fiSCJBSbWP5aW49kx71Fbo6BNUuh2soQh
+	I6it5VsE/TFEEa1oWyEV+WeX7xpHI9JufQThUTip83NcXzBjaD/djcX8oCEtuGGe1p9l7pI0bTh
+	qio5XAwS1memI9x4aL/XreFyVl4uifvNQMJ727dhn9P/HdawQqFMw6oyaIiIssUVQXBhxkjKCul
+	57IDSPW7F02FJCxp6fQQkWoCfj2iU0j9NVZpTwyAh8
+X-Gm-Gg: AeBDievXLWZxCfgm1SJGdMqtO/YGHhk/gs/Mx91P/gwKG1RUBmNYbqsvIfKQOHFhWRm
+	Rux9V7n20oA1/yvne3YXsazUQNIEvrm5Tj1kJSoE2B7+EHwYt5Abhf9/hBidHwJ2811pApS9pPn
+	AYZEBzvSzfSxgDCgwHiHDXDu4OmQGC5v5buI/azvPLT9bK3SoM/2VYnxBwOPQHjqrJHpnKCwMZ5
+	ri++Cch
+X-Received: by 2002:a17:906:c3a2:b0:b9c:451b:234e with SMTP id a640c23a62f3a-b9d7267a8ffmr929108766b.11.1776233821040;
+        Tue, 14 Apr 2026 23:17:01 -0700 (PDT)
+X-Received: by 2002:a17:906:c3a2:b0:b9c:451b:234e with SMTP id
+ a640c23a62f3a-b9d7267a8ffmr929107766b.11.1776233820498; Tue, 14 Apr 2026
+ 23:17:00 -0700 (PDT)
+Received: from 753933720722 named unknown by gmailapi.google.com with
+ HTTPREST; Tue, 14 Apr 2026 23:16:58 -0700
+Received: from 753933720722 named unknown by gmailapi.google.com with
+ HTTPREST; Tue, 14 Apr 2026 23:16:58 -0700
+From: =?UTF-8?Q?Adri=C3=A1n_Moreno?= <amorenoz@redhat.com>
+References: <20260407120418.356718-1-amorenoz@redhat.com> <b4534229-994a-42ac-a200-a9cb1b333e60@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+In-Reply-To: <b4534229-994a-42ac-a200-a9cb1b333e60@redhat.com>
+Date: Tue, 14 Apr 2026 23:16:58 -0700
+X-Gm-Features: AQROBzC8WfnLD8eHUER-4k5Y5BkWpGbwOkp3FX07oIzX-iLMj145bUvIFxsrB5k
+Message-ID: <CAG=2xmPLRsVE4si-6P0Pe3C6fnszO4bBVhiri=7ZntEUExowWQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2] net: openvswitch: decouple flow_table from ovs_mutex
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Aaron Conole <aconole@redhat.com>, 
+	Eelco Chaudron <echaudro@redhat.com>, Ilya Maximets <i.maximets@ovn.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, 
+	"open list:OPENVSWITCH" <dev@openvswitch.org>, open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278672-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[lists.sourceforge.net,redhat.com,windriver.com,kernel.org,vger.kernel.org,gmail.com];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kaiaizendev@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-278673-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	NEURAL_HAM(-0.00)[-0.989];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[amorenoz@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[users.noreply.github.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6A722400C68
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: CECDE400CA6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Kai Aizen <kai.aizen.dev@gmail.com>
+On Mon, Apr 13, 2026 at 10:39:37AM +0200, Paolo Abeni wrote:
+> On 4/7/26 2:04 PM, Adrian Moreno wrote:
+> > Currently the entire ovs module is write-protected using the global
+> > ovs_mutex. While this simple approach works fine for control-plane
+> > operations (such as vport configurations), requiring the global mutex
+> > for flow modifications can be problematic.
+> >
+> > During periods of high control-plane operations, e.g: netdevs (vports)
+> > coming and going, RTNL can suffer contention. This contention is easily
+> > transferred to the ovs_mutex as RTNL nests inside ovs_mutex. Flow
+> > modifications, however, are done as part of packet processing and havin=
+g
+> > them wait for RTNL pressure to go away can lead to packet drops.
+> >
+> > This patch decouples flow_table modifications from ovs_mutex by means o=
+f
+> > the following:
+> >
+> > 1 - Make flow_table an rcu-protected pointer inside the datapath.
+> > This allows both objects to be protected independently while reducing t=
+he
+> > amount of changes required in "flow_table.c".
+> >
+> > 2 - Create a new mutex inside the flow_table that protects it from
+> > concurrent modifications.
+> > Putting the mutex inside flow_table makes it easier to consume for
+> > functions inside flow_table.c that do not currently take pointers to th=
+e
+> > datapath.
+> > Some function signatures need to be changed to accept flow_table so tha=
+t
+> > lockdep checks can be performed.
+> >
+> > 3 - Create a reference count to temporarily extend rcu protection from
+> > the datapath to the flow_table.
+> > In order to use the flow_table without locking ovs_mutex, the flow_tabl=
+e
+> > pointer must be first dereferenced within an rcu-protected region.
+> > Next, the table->mutex needs to be locked to protect it from
+> > concurrent writes but mutexes must not be locked inside an rcu-protecte=
+d
+> > region, so the rcu-protected region must be left at which point the
+> > datapath can be concurrently freed.
+> > To extend the protection beyond the rcu region, a reference count is us=
+ed.
+> > One reference is held by the datapath, the other is temporarily
+> > increased during flow modifications. For example:
+> >
+> > Datapath deletion:
+> >
+> >   ovs_lock();
+> >   table =3D rcu_dereference_protected(dp->table, ...);
+> >   rcu_assign_pointer(dp->table, NULL);
+> >   ovs_flow_tbl_put(table);
+> >   ovs_unlock();
+> >
+> > Flow modification:
+> >
+> >   rcu_read_lock();
+> >   dp =3D get_dp(...);
+> >   table =3D rcu_dereference(dp->table);
+> >   ovs_flow_tbl_get(table);
+> >   rcu_read_unlock();
+> >
+> >   mutex_lock(&table->lock);
+> >   /* Perform modifications on the flow_table */
+> >   mutex_unlock(&table->lock);
+> >   ovs_flow_tbl_put(table);
+> >
+> > Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
+> > ---
+> > v2: Fix argument in ovs_flow_tbl_put (sparse)
+> >     Remove rcu checks in ovs_dp_masks_rebalance
+> > ---
+> >  net/openvswitch/datapath.c   | 285 ++++++++++++++++++++++++-----------
+> >  net/openvswitch/datapath.h   |   2 +-
+> >  net/openvswitch/flow.c       |  13 +-
+> >  net/openvswitch/flow.h       |   9 +-
+> >  net/openvswitch/flow_table.c | 180 ++++++++++++++--------
+> >  net/openvswitch/flow_table.h |  51 ++++++-
+> >  6 files changed, 380 insertions(+), 160 deletions(-)
+>
+> This is too big for a single patch. The changelog above already suggests
+> a way of splitting the change. At least the RCU-ification addition
+> should be straight forward in a separate patch, which in turn should be
+> easily reviewable.
 
-CVE-2025-40280 fixed tipc_mon_reinit_self() accessing monitors[] from a
-workqueue without RTNL.  That patch closed the workqueue path by adding
-rtnl_lock() around the call.
+I agree. I'll try to split it in the next version.
 
-However, three additional functions in the same subsystem access
-tipc_net->monitors[] from softirq context with no RCU protection at all:
+>
+> > diff --git a/net/openvswitch/datapath.c b/net/openvswitch/datapath.c
+> > index e209099218b4..9c234993520c 100644
+> > --- a/net/openvswitch/datapath.c
+> > +++ b/net/openvswitch/datapath.c
+> > @@ -88,13 +88,17 @@ static void ovs_notify(struct genl_family *family,
+> >   * DOC: Locking:
+> >   *
+> >   * All writes e.g. Writes to device state (add/remove datapath, port, =
+set
+> > - * operations on vports, etc.), Writes to other state (flow table
+> > - * modifications, set miscellaneous datapath parameters, etc.) are pro=
+tected
+> > - * by ovs_lock.
+> > + * operations on vports, etc.) and writes to other datapath parameters
+> > + * are protected by ovs_lock.
+> > + *
+> > + * Writes to the flow table are NOT protected by ovs_lock. Instead, a =
+per-table
+> > + * mutex and reference count are used (see comment above "struct flow_=
+table"
+> > + * definition). On some few occasions, the per-flow table mutex is nes=
+ted
+> > + * inside ovs_mutex.
+> >   *
+> >   * Reads are protected by RCU.
+> >   *
+> > - * There are a few special cases (mostly stats) that have their own
+> > + * There are a few other special cases (mostly stats) that have their =
+own
+> >   * synchronization but they nest under all of above and don't interact=
+ with
+> >   * each other.
+> >   *
+> > @@ -166,7 +170,6 @@ static void destroy_dp_rcu(struct rcu_head *rcu)
+> >  {
+> >  	struct datapath *dp =3D container_of(rcu, struct datapath, rcu);
+> >
+> > -	ovs_flow_tbl_destroy(&dp->table);
+> >  	free_percpu(dp->stats_percpu);
+> >  	kfree(dp->ports);
+> >  	ovs_meters_exit(dp);
+> > @@ -247,6 +250,7 @@ void ovs_dp_process_packet(struct sk_buff *skb, str=
+uct sw_flow_key *key)
+> >  	struct ovs_pcpu_storage *ovs_pcpu =3D this_cpu_ptr(ovs_pcpu_storage);
+> >  	const struct vport *p =3D OVS_CB(skb)->input_vport;
+> >  	struct datapath *dp =3D p->dp;
+> > +	struct flow_table *table;
+> >  	struct sw_flow *flow;
+> >  	struct sw_flow_actions *sf_acts;
+> >  	struct dp_stats_percpu *stats;
+> > @@ -257,9 +261,16 @@ void ovs_dp_process_packet(struct sk_buff *skb, st=
+ruct sw_flow_key *key)
+> >  	int error;
+> >
+> >  	stats =3D this_cpu_ptr(dp->stats_percpu);
+> > +	table =3D rcu_dereference(dp->table);
+> > +	if (!table) {
+> > +		net_dbg_ratelimited("ovs: no flow table on datapath %s\n",
+> > +				    ovs_dp_name(dp));
+> > +		kfree_skb(skb);
+> > +		return;
+> > +	}
+> >
+> >  	/* Look up flow. */
+> > -	flow =3D ovs_flow_tbl_lookup_stats(&dp->table, key, skb_get_hash(skb)=
+,
+> > +	flow =3D ovs_flow_tbl_lookup_stats(table, key, skb_get_hash(skb),
+> >  					 &n_mask_hit, &n_cache_hit);
+> >  	if (unlikely(!flow)) {
+> >  		struct dp_upcall_info upcall;
+> > @@ -752,12 +763,16 @@ static struct genl_family dp_packet_genl_family _=
+_ro_after_init =3D {
+> >  static void get_dp_stats(const struct datapath *dp, struct ovs_dp_stat=
+s *stats,
+> >  			 struct ovs_dp_megaflow_stats *mega_stats)
+> >  {
+> > +	struct flow_table *table =3D ovsl_dereference(dp->table);
+>
+> Should be rcu_dereference_ovs_tbl() ?
+>
 
-  tipc_mon_peer_up()      - called from tipc_node_write_unlock()
-  tipc_mon_peer_down()    - called from tipc_node_write_unlock()
-  tipc_mon_remove_peer()  - called from tipc_node_link_down()
+This function is only called with ovs_lock() (at least for now, we might
+reconsider it based on your other comments below), so I kept the
+stricter assertion.
 
-These three are invoked from the packet receive path (tipc_rcv ->
-tipc_node_write_unlock / tipc_node_link_down) and hold only the per-node
-rwlock, not RTNL.
+> >  	int i;
+> >
+> >  	memset(mega_stats, 0, sizeof(*mega_stats));
+> >
+> > -	stats->n_flows =3D ovs_flow_tbl_count(&dp->table);
+> > -	mega_stats->n_masks =3D ovs_flow_tbl_num_masks(&dp->table);
+> > +	if (table) {
+> > +		stats->n_flows =3D ovs_flow_tbl_count(table);
+>
+> As noted by Aaron, READ_ONCE() is now needed when accessing
+> table->count. And WRITE_ONCE when writing it
+>
 
-Concurrently, bearer_disable() -- which always holds RTNL per its own
-inline documentation -- calls tipc_mon_delete(), which:
+Yep.
 
-  1. acquires mon->lock
-  2. sets tn->monitors[bearer_id] = NULL
-  3. frees all peer entries
-  4. releases mon->lock
-  5. calls kfree(mon)                     <-- no synchronize_rcu()
+> > +		mega_stats->n_masks =3D ovs_flow_tbl_num_masks(table);
+>
+> Sashiko says:
+>
+> ---
+> get_dp_stats() accesses table->mask_array via ovs_flow_tbl_num_masks()
+> while holding only ovs_mutex. Since this patch decouples flow table updat=
+es
+> by moving them under table->lock, ovs_flow_cmd_new() can execute
+> concurrently and trigger a reallocation of the mask array, freeing the ol=
+d
+> one via call_rcu().
+> Because get_dp_stats() does not hold rcu_read_lock(), the thread can be
+> preempted (as ovs_mutex is sleepable) and the RCU grace period might expi=
+re
+> before the count is read. Can this lead to a use-after-free?
+> ---
+>
 
-The race is structural: there is no shared lock between the data-path
-reader (which reads monitors[id] then acquires mon->lock) and the
-teardown path (which acquires mon->lock, NULLs the slot, then frees).
-A softirq thread can read a non-NULL mon pointer, get preempted, and
-resume after kfree(mon) has run on another CPU, then call
-write_lock_bh(&mon->lock) on freed memory:
+I guess it is possible that all that happens between the dereference of
+table->mask_array and the read of "ma->count".
 
-  CPU 0 (softirq / tipc_rcv)            CPU 1 (RTNL / bearer_disable)
-  tipc_mon_peer_up()
-    mon = tipc_monitor(net, id)
-    [mon is non-NULL]
-                                         tipc_mon_delete()
-                                           write_lock_bh(&mon->lock)
-                                           tn->monitors[id] = NULL
-                                           ...
-                                           write_unlock_bh(&mon->lock)
-                                           kfree(mon)
-    write_lock_bh(&mon->lock)   <-- UAF
+Maybe we could rcu_read_lock() the call to "ofs_flow_tbl_num_masks" or
+use RCU protection for the entire flow-table-related statistics?
+I think this would allow us to demote "rcu_dereference_ovs_tbl" to only
+consider table lock and RCU and use to dereference "dp->table".
 
-The fix mirrors the existing bearer_list[] pattern in the same module:
-convert monitors[] to __rcu, use rcu_assign_pointer() on creation,
-RCU_INIT_POINTER() + synchronize_rcu() on deletion (before the kfree),
-and the appropriate rcu_dereference_bh() vs rtnl_dereference() variant
-at each read site depending on execution context.
+> Note that it also spotted pre-existing issues, please have a look:
+>
+> https://sashiko.dev/#/patchset/20260407120418.356718-1-amorenoz%40redhat.=
+com
+>
 
-synchronize_rcu() in tipc_mon_delete() is placed after the
-write_unlock_bh() and before timer_shutdown_sync() + kfree() to ensure
-all softirq-context readers that already observed the old pointer have
-completed before the memory is freed.
+Interesting. I'll look deeper into this, thanks!
 
-Fixes: 35c55c9877f8 ("tipc: add neighbor monitoring framework")
-Cc: stable@vger.kernel.org
-Signed-off-by: Kai Aizen <kai.aizen.dev@gmail.com>
----
- net/tipc/core.h    |  2 +-
- net/tipc/monitor.c | 45 +++++++++++++++++++++++++++++----------------
- 2 files changed, 30 insertions(+), 17 deletions(-)
+> [...]
+> > @@ -71,15 +93,40 @@ struct flow_table {
+> >
+> >  extern struct kmem_cache *flow_stats_cache;
+> >
+> > +#ifdef CONFIG_LOCKDEP
+> > +int lockdep_ovs_tbl_is_held(const struct flow_table *table);
+> > +#else
+> > +static inline int lockdep_ovs_tbl_is_held(const struct flow_table *tab=
+le)
+> > +{
+> > +	(void)table;
+>
+> You can use the __always_unused annotation.
+>
 
-diff --git a/net/tipc/core.h b/net/tipc/core.h
-index 9ce5f9ff6..cd582f7a2 100644
---- a/net/tipc/core.h
-+++ b/net/tipc/core.h
-@@ -109,7 +109,7 @@ struct tipc_net {
- 	u32 num_links;
- 
- 	/* Neighbor monitoring list */
--	struct tipc_monitor *monitors[MAX_BEARERS];
-+	struct tipc_monitor __rcu *monitors[MAX_BEARERS];
- 	int mon_threshold;
- 
- 	/* Bearer list */
-diff --git a/net/tipc/monitor.c b/net/tipc/monitor.c
-index a94b9b36a..2a0665e1d 100644
---- a/net/tipc/monitor.c
-+++ b/net/tipc/monitor.c
-@@ -97,9 +97,21 @@ struct tipc_monitor {
- 	unsigned long timer_intv;
- };
- 
--static struct tipc_monitor *tipc_monitor(struct net *net, int bearer_id)
-+/*
-+ * tipc_monitor_rcu_bh - dereference monitors[] from softirq / data path.
-+ * Caller must be in an RCU-bh read-side critical section (softirq context
-+ * implicitly satisfies this on non-PREEMPT_RT kernels; use explicit
-+ * rcu_read_lock_bh() where needed on RT).
-+ */
-+static struct tipc_monitor *tipc_monitor_rcu_bh(struct net *net, int bearer_id)
-+{
-+	return rcu_dereference_bh(tipc_net(net)->monitors[bearer_id]);
-+}
-+
-+/* tipc_monitor_rtnl - dereference monitors[] from RTNL-held control path. */
-+static struct tipc_monitor *tipc_monitor_rtnl(struct net *net, int bearer_id)
- {
--	return tipc_net(net)->monitors[bearer_id];
-+	return rtnl_dereference(tipc_net(net)->monitors[bearer_id]);
- }
- 
- const int tipc_max_domain_size = sizeof(struct tipc_mon_domain);
-@@ -194,7 +206,7 @@ static struct tipc_peer *get_peer(struct tipc_monitor *mon, u32 addr)
- 
- static struct tipc_peer *get_self(struct net *net, int bearer_id)
- {
--	struct tipc_monitor *mon = tipc_monitor(net, bearer_id);
-+	struct tipc_monitor *mon = tipc_monitor_rcu_bh(net, bearer_id);
- 
- 	return mon->self;
- }
-@@ -351,7 +363,7 @@ static void mon_assign_roles(struct tipc_monitor *mon, struct tipc_peer *head)
- 
- void tipc_mon_remove_peer(struct net *net, u32 addr, int bearer_id)
- {
--	struct tipc_monitor *mon = tipc_monitor(net, bearer_id);
-+	struct tipc_monitor *mon = tipc_monitor_rcu_bh(net, bearer_id);
- 	struct tipc_peer *self;
- 	struct tipc_peer *peer, *prev, *head;
- 
-@@ -421,7 +433,7 @@ static bool tipc_mon_add_peer(struct tipc_monitor *mon, u32 addr,
- 
- void tipc_mon_peer_up(struct net *net, u32 addr, int bearer_id)
- {
--	struct tipc_monitor *mon = tipc_monitor(net, bearer_id);
-+	struct tipc_monitor *mon = tipc_monitor_rcu_bh(net, bearer_id);
- 	struct tipc_peer *self = get_self(net, bearer_id);
- 	struct tipc_peer *peer, *head;
- 
-@@ -440,7 +452,7 @@ void tipc_mon_peer_up(struct net *net, u32 addr, int bearer_id)
- 
- void tipc_mon_peer_down(struct net *net, u32 addr, int bearer_id)
- {
--	struct tipc_monitor *mon = tipc_monitor(net, bearer_id);
-+	struct tipc_monitor *mon = tipc_monitor_rcu_bh(net, bearer_id);
- 	struct tipc_peer *self;
- 	struct tipc_peer *peer, *head;
- 	struct tipc_mon_domain *dom;
-@@ -480,7 +492,7 @@ void tipc_mon_peer_down(struct net *net, u32 addr, int bearer_id)
- void tipc_mon_rcv(struct net *net, void *data, u16 dlen, u32 addr,
- 		  struct tipc_mon_state *state, int bearer_id)
- {
--	struct tipc_monitor *mon = tipc_monitor(net, bearer_id);
-+	struct tipc_monitor *mon = tipc_monitor_rcu_bh(net, bearer_id);
- 	struct tipc_mon_domain *arrv_dom = data;
- 	struct tipc_mon_domain dom_bef;
- 	struct tipc_mon_domain *dom;
-@@ -566,7 +578,7 @@ void tipc_mon_rcv(struct net *net, void *data, u16 dlen, u32 addr,
- void tipc_mon_prep(struct net *net, void *data, int *dlen,
- 		   struct tipc_mon_state *state, int bearer_id)
- {
--	struct tipc_monitor *mon = tipc_monitor(net, bearer_id);
-+	struct tipc_monitor *mon = tipc_monitor_rcu_bh(net, bearer_id);
- 	struct tipc_mon_domain *dom = data;
- 	u16 gen = mon->dom_gen;
- 	u16 len;
-@@ -600,7 +612,7 @@ void tipc_mon_get_state(struct net *net, u32 addr,
- 			struct tipc_mon_state *state,
- 			int bearer_id)
- {
--	struct tipc_monitor *mon = tipc_monitor(net, bearer_id);
-+	struct tipc_monitor *mon = tipc_monitor_rcu_bh(net, bearer_id);
- 	struct tipc_peer *peer;
- 
- 	if (!tipc_mon_is_active(net, mon)) {
-@@ -651,7 +663,7 @@ int tipc_mon_create(struct net *net, int bearer_id)
- 	struct tipc_peer *self;
- 	struct tipc_mon_domain *dom;
- 
--	if (tn->monitors[bearer_id])
-+	if (rtnl_dereference(tn->monitors[bearer_id]))
- 		return 0;
- 
- 	mon = kzalloc_obj(*mon, GFP_ATOMIC);
-@@ -663,7 +675,7 @@ int tipc_mon_create(struct net *net, int bearer_id)
- 		kfree(dom);
- 		return -ENOMEM;
- 	}
--	tn->monitors[bearer_id] = mon;
-+	rcu_assign_pointer(tn->monitors[bearer_id], mon);
- 	rwlock_init(&mon->lock);
- 	mon->net = net;
- 	mon->peer_cnt = 1;
-@@ -682,7 +694,7 @@ int tipc_mon_create(struct net *net, int bearer_id)
- void tipc_mon_delete(struct net *net, int bearer_id)
- {
- 	struct tipc_net *tn = tipc_net(net);
--	struct tipc_monitor *mon = tipc_monitor(net, bearer_id);
-+	struct tipc_monitor *mon = rtnl_dereference(tn->monitors[bearer_id]);
- 	struct tipc_peer *self;
- 	struct tipc_peer *peer, *tmp;
- 
-@@ -691,7 +703,7 @@ void tipc_mon_delete(struct net *net, int bearer_id)
- 
- 	self = get_self(net, bearer_id);
- 	write_lock_bh(&mon->lock);
--	tn->monitors[bearer_id] = NULL;
-+	RCU_INIT_POINTER(tn->monitors[bearer_id], NULL);
- 	list_for_each_entry_safe(peer, tmp, &self->list, list) {
- 		list_del(&peer->list);
- 		hlist_del(&peer->hash);
-@@ -700,6 +712,7 @@ void tipc_mon_delete(struct net *net, int bearer_id)
- 	}
- 	mon->self = NULL;
- 	write_unlock_bh(&mon->lock);
-+	synchronize_rcu();
- 	timer_shutdown_sync(&mon->timer);
- 	kfree(self->domain);
- 	kfree(self);
-@@ -712,7 +725,7 @@ void tipc_mon_reinit_self(struct net *net)
- 	int bearer_id;
- 
- 	for (bearer_id = 0; bearer_id < MAX_BEARERS; bearer_id++) {
--		mon = tipc_monitor(net, bearer_id);
-+		mon = rtnl_dereference(tipc_net(net)->monitors[bearer_id]);
- 		if (!mon)
- 			continue;
- 		write_lock_bh(&mon->lock);
-@@ -798,7 +811,7 @@ static int __tipc_nl_add_monitor_peer(struct tipc_peer *peer,
- int tipc_nl_add_monitor_peer(struct net *net, struct tipc_nl_msg *msg,
- 			     u32 bearer_id, u32 *prev_node)
- {
--	struct tipc_monitor *mon = tipc_monitor(net, bearer_id);
-+	struct tipc_monitor *mon = rtnl_dereference(tipc_net(net)->monitors[bearer_id]);
- 	struct tipc_peer *peer;
- 
- 	if (!mon)
-@@ -827,7 +840,7 @@ int tipc_nl_add_monitor_peer(struct net *net, struct tipc_nl_msg *msg,
- int __tipc_nl_add_monitor(struct net *net, struct tipc_nl_msg *msg,
- 			  u32 bearer_id)
- {
--	struct tipc_monitor *mon = tipc_monitor(net, bearer_id);
-+	struct tipc_monitor *mon = rtnl_dereference(tipc_net(net)->monitors[bearer_id]);
- 	char bearer_name[TIPC_MAX_BEARER_NAME];
- 	struct nlattr *attrs;
- 	void *hdr;
--- 
-2.43.0
+Thanks, will do.
+
+> > +	return 1;
+> > +}
+> > +#endif
+> > +
+> > +#define ASSERT_OVS_TBL(tbl)   WARN_ON(!lockdep_ovs_tbl_is_held(tbl))
+> > +
+> > +/* Lock-protected update-allowed dereferences.*/
+> > +#define ovs_tbl_dereference(p, tbl)	\
+> > +	rcu_dereference_protected(p, lockdep_ovs_tbl_is_held(tbl))
+> > +
+> > +/* Read dereferences can be protected by either RCU, table lock or ovs=
+_mutex. */
+>
+> Is this access schema really safe? I understand tables can be
+> written/deleted under the table lock only. If so this should ignore the
+> OVS mutex status.
+>
+
+Even if it was safe (which it might not), it's confusing and makes it
+difficult to understand the overall locking strategy.
+
+I'll revisit all uses carefully but I think the only use-cases for only
+holding the ovs_mutex are datapath statistics reading (such as
+ovs_dp_stats we are discussing above). I will try to make use RCU in
+those cases which might make them safer and everything more robust.
+
+Thank you!
+Adri=C3=A1n
+
+> /P
+>
 
 
