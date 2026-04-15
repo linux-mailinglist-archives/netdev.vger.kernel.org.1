@@ -1,82 +1,82 @@
-Return-Path: <netdev+bounces-278710-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278711-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2MGxLCFM32mFRQAAu9opvQ
-	(envelope-from <netdev+bounces-278710-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 10:28:17 +0200
+	id IPPmHi5M32mFRQAAu9opvQ
+	(envelope-from <netdev+bounces-278711-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 10:28:30 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0866401F42
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 10:28:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2801E401F58
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 10:28:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 9B5AC303650B
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 08:28:12 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 72D6F3040B0D
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 08:28:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CBE53D410D;
-	Wed, 15 Apr 2026 08:28:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 840763B0AEF;
+	Wed, 15 Apr 2026 08:28:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Be3d7lCg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dStVBq0D"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0EC53AEF53
-	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 08:28:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22F173A3E78
+	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 08:28:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776241689; cv=none; b=D3ZZNHNnYLpMAycbVMA8txwmPeTiJ5VXPzHVPVWsgp16Kca3prSwAdozkpyojOklGVB4qpWfUaU3inxIGEVdIGXi9AL/tIi7ZdLnNeMUZYhDT/DQQaB4TZK5spLMUXEv1zFbNhn0Z4VPqh4i6KLFMc1VTz21/TckAAOwUmwcDYs=
+	t=1776241697; cv=none; b=Vgey2ZX5CcOWmqziBOajrlfCVpiz7ETh3Z210tEiILRlPQaKYZ32neRAnkVTtTDt0NwhYiVwjUBZd3y5cC2X+V727J+a5fhjdmJsthVUAnYxGH2n25yfdv/ZSWkkNMEXImK2/NhJBofyqdhRr+anezNWRJw7XgRhNKVNsyZmoPc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776241689; c=relaxed/simple;
-	bh=mfGH8PXsgNGoAUVak2QkX9SmpnxShRY1KKH0A84oZTU=;
+	s=arc-20240116; t=1776241697; c=relaxed/simple;
+	bh=VFxn96JHNW5QH+1nLwEYppxJ0YIlpZL6X5l+KJFGafY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Fm+bGW84LKGBSsN+IV+USK4HHp0DQ2ttKjHHcXSy2UuyKh5Ag4nPCmu03wPuBubAqbV1Uj85RPsnXsKSthibjLNvvomLs2N5o4gEfCvtAuklWu/Tc3fr8yywN6i8FF9by1s79m+sID9bUiJK/IEjxWK6DqD4a6lWkBu0HiL3Aeo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Be3d7lCg; arc=none smtp.client-ip=209.85.214.180
+	 MIME-Version; b=TSKQZhTnP1reDgoL31pPc0mslj3IaX1bmarbFpXLSWQucLA7vZW1sNyXu/udMxUEC/4u9yMTx0xHwZ+uW+j05c57HzFLMsaB9BrOoRwieL/NMI0QNziBxN7hSbXaOQrb4t0s+urle2P7IPS6mxuBAa685XSrsvwDYP7mk6q7egk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dStVBq0D; arc=none smtp.client-ip=209.85.214.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2b25cf1b5f0so43473355ad.3
-        for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 01:28:08 -0700 (PDT)
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2b458ca2296so22567735ad.0
+        for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 01:28:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776241688; x=1776846488; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1776241695; x=1776846495; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=z76sQ1pIrwnQrnT/9DZ6xoWkdfsEI4At+20OGeyJlFw=;
-        b=Be3d7lCgmuC7a03gDDnjsknYdnjtRbsTTUXyJ2EeNX2YipTgl5AyFnvvfIvztLvd/Y
-         xTGWm7L3s4J7Ijew2KMzmaZI0IdONp1bUdZDvgDKuX59uowyELKx8Wz8n1AmmdJ1uRK2
-         P+clLG5z+WJh+2MY0V9V3rOkzSZlj/AuX+LhX4NBL0xUuIZMVH01Y+cf59Pej2GO3ujd
-         np6T9gHLXEuuxJzps9bme9KYC4ONF62vnCv1RqYWsINWiVvfT6/Vr8cYnWsHqIWimWg8
-         BdpVuXoYWz/iJ43FwSXE9OSNAV4UsQGTQMb9tqBPdYr5rnb1tKIACbwV+FivoKofRpvw
-         7sNw==
+        bh=bIyBdT4LGGdGx6wgDVyPUXcWl+JiGu8xkKVYACtK5gw=;
+        b=dStVBq0D5Wq+ahbjERsatjlq35YuYAFEVBW5GBViy5lugYZxAmTcGM9pHk5bgcuX9w
+         SKQliAlVzCl57V1b0Z4nRw33QW3foItyw6PZZQxHQ6N8qExg+iBcjs4dmbZoMATSbzvH
+         GmXwntnRXhZNobkIGss8iMky9Cov69jeb9XLcMBg4s9EBuFsodg6fCI7ac3pShrTjhIE
+         CnZ9z0JXRA7vGbrWfGCDnI9+3NhF+U1ZM70p6wOyRtsCLZPKX6xSaXtxv9WVpLCK2zI3
+         vDIviXmYtFl0uC/7OLnWz7nn/K27LVGAAqx9NyqS5tD+UlvGYGa4VWSNX1xPG9KxZ2GM
+         KpJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776241688; x=1776846488;
+        d=1e100.net; s=20251104; t=1776241695; x=1776846495;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=z76sQ1pIrwnQrnT/9DZ6xoWkdfsEI4At+20OGeyJlFw=;
-        b=kmcBhFlWc7Wm8JKjySI/xeFhYesMN4zRYVQElxRkWt53oJMBt6JE7Q3cm6AOmM1W2D
-         xWOQ3h01G5obkfvxv4YV5ZnWXKJp01ZTz8bf+vFVtwg6fRFJCrrgrT+H3+p2AnNz+VrD
-         9RnFNIBPTA8xTYhojPaqVEd2mR1fG78fvn6wPxlBdhcteOPkPEKkcCZgMk6Hbxcq+RW0
-         pxS05QfG0EjvB/fN0oIVdpat9ErzES50xtRDxUNY0YOrUabVTD0+In86zMKVO9ZuV3L3
-         Qz7GqDe6/Uui4q1/QnrwtFnzs50ubgpeNFi2RaLYCnZGU5rZGbo9Qeu2gb98MwgW2uPZ
-         yGJw==
-X-Forwarded-Encrypted: i=1; AFNElJ9/prQZAL/8xZbsQSfw6cp6lv+CPGipN6r1V8oY2Xbx+yQdGqJP04UjvOWWwWNOoxp20Xm+wtc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzP4r8ocQz8DIH0ZljJRvMUhsyrszC0suUOZlVozXazD08rX7td
-	n6BwXrXER1ZR0XtCQMpYOTXN0CDrP6/PSljigv/7bqgqntWOw4VoLsp6
-X-Gm-Gg: AeBDieuA4fPjhfyXroFwQAgh0IadnwJ4Y5IaKywOwLr0GsSGcyhSjhZe12PKvX3IUDf
-	/CiXkQj1YhSa6kOLO4tYOWkmRixd3OdtOVf8HUMHuvBSvw19/2YGY1kVp4lXODAZDIk8dcpQyra
-	3XxcZr4fIEDDRRmXiu0i0Gd9uHn41ZD+NzKgV4j2XSeta6ozHvN1MWUPmoC51svldi5Wqp0jL3w
-	/E3DDNnoJZBfl7GrE9aHaL3yfwjkldbgj+9i6bUeZiuvWqDX92AJC8TuHiPlX0hIYI5qJoJMltv
-	0K4Fc0zYBNnZf8l+KIE3DZv30u2JmHPzq1ph3vVZmU7kS8aDpWqKAdCTmOKUHSFbrn29f8CltcH
-	1qN4y6NpnoUmeKarOW0xpMbgA/++ACCC4jLlA3C7k/Ka9g+1rP5+AWLofX1/28GcelxiDp9PHPg
-	6d+FZ2ch0BLigC9nj4bYCZQYY+7BV80eI5iTVu3oMDepO0TlU7bvS94H0MFBKZCoJKUypujpSY0
-	fK1Eu2W
-X-Received: by 2002:a17:903:2596:b0:2b0:9101:1b77 with SMTP id d9443c01a7336-2b2d5965babmr136700755ad.17.1776241688093;
-        Wed, 15 Apr 2026 01:28:08 -0700 (PDT)
+        bh=bIyBdT4LGGdGx6wgDVyPUXcWl+JiGu8xkKVYACtK5gw=;
+        b=Rpz828p7sNS0Aoim2iMyNU0dyVrFeLJqUgvDb64Up5vvs8lJonD2oswq2iRUh02+J5
+         Bh9VYJqMZewvx50E0EE5Ng2/pJzmpxD7Z1f5pHX52tfv56eplO/DOMjf4GMhWao5mgwy
+         aLRJ941xldZbUKjUIHyogocenmpJEiMH7kbsYD5BNqdRtxPoqLrEfE21lO5oEYCGKPIy
+         Gw7+PadHN7bwg61k5A401SDxDbpW6VxtQKDgfRPmQWSCFXMB88CanA2FlMuyrwPL+zgk
+         JOMn2d0Nx0QOcAVWa4HCfdB03x4mDtjZiUmP7MraC2BbQ6/scuO1p+1NR9SnyVWkDjuY
+         SRrA==
+X-Forwarded-Encrypted: i=1; AFNElJ8XbY/oGZbxkksudXUpkAaH3NOx3Xa6UiUcZFPSDvyVIKENQfp87vrj22SZiFFuPS7jD0yybyo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxCMYfmrudakirkhPYcV7WllkM7zylMLqOQX5BY7OW7Cd/wZ85/
+	xYj3xdqFrtuPF1JP+NokS+U7qMn12uAMShdDkEA3gOqq+7gw3HzVyLJQ
+X-Gm-Gg: AeBDiet23ZqtK+6dhizwbkITGJ1vCVQ8sVi6CgEmpCp0pmEfT64qoN97jqIZMXhILP4
+	mwifSEwbwI/GnzJiC4elcM/mC0Eu0HuyecXRUyT/CkJjgqtHyi+goEg7449Bidw38I5tgncwRIn
+	XPtO7zGcAEXiNV4Nh4ShWCB0FFedDI/flJlMFFANFJSekvxtlCpwfyRrm5LG5f//W85h2SA2FKa
+	hhflZcsfsyO3jSrHjaEIwWFMQVxZW7xZOLBT2oPRUVHuEkRgWhf8ZVvTOnGwhoSh/EPk+36IDn2
+	kR1YC3lREhJ0dhXJNn0XE6jTQVD/m6YPFt/XZIrBezs9G9td8i2IYDrcctcw/GUHXAsuCfyP+PK
+	8ZHgUqUMFg67LjXyVklqKgysx2BleU1CfR77RzM0GmIwoJ7FNrpsaBMNdcFl0xmDSUUxsqrYVSW
+	HW57mrFywIFg/F+Bc69x/i9EVOfUwEeGROXgd5T694FVftSqMOrmTGS4Ulle8gTayBtBRoCIDmT
+	g5vfXmY
+X-Received: by 2002:a17:903:1207:b0:2b0:5ec1:97c1 with SMTP id d9443c01a7336-2b2d5939275mr213554065ad.7.1776241695479;
+        Wed, 15 Apr 2026 01:28:15 -0700 (PDT)
 Received: from KERNELXING-MB0.tencent.com ([43.132.141.25])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b4782a93c7sm12174215ad.62.2026.04.15.01.28.00
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b4782a93c7sm12174215ad.62.2026.04.15.01.28.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Apr 2026 01:28:07 -0700 (PDT)
+        Wed, 15 Apr 2026 01:28:14 -0700 (PDT)
 From: Jason Xing <kerneljasonxing@gmail.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -94,9 +94,9 @@ To: davem@davemloft.net,
 Cc: bpf@vger.kernel.org,
 	netdev@vger.kernel.org,
 	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH RFC net-next v4 10/14] xsk: extend xsk_cq_reserve_locked() to reserve n slots
-Date: Wed, 15 Apr 2026 16:26:50 +0800
-Message-Id: <20260415082654.21026-11-kerneljasonxing@gmail.com>
+Subject: [PATCH RFC net-next v4 11/14] xsk: support batch xmit main logic
+Date: Wed, 15 Apr 2026 16:26:51 +0800
+Message-Id: <20260415082654.21026-12-kerneljasonxing@gmail.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20260415082654.21026-1-kerneljasonxing@gmail.com>
 References: <20260415082654.21026-1-kerneljasonxing@gmail.com>
@@ -120,7 +120,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278710-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-278711-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
@@ -136,81 +136,175 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: A0866401F42
+X-Rspamd-Queue-Id: 2801E401F58
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 From: Jason Xing <kernelxing@tencent.com>
 
-Previously it only reserves one slot. The patch extends it to n to cover
-the batch mode.
+This function __xsk_generic_xmit_batch() is the core function in batches
+xmit, implement a batch version of __xsk_generic_xmit().
+
+The whole logic is divided into sections:
+1. check if we have enough available slots in tx ring and completion
+   ring.
+2. read descriptors from tx ring into pool->tx_descs in batches
+3. reserve enough slots in completion ring to avoid backpressure
+4. allocate and build skbs in batches
+5. send all the possible packets in batches at one time
 
 Signed-off-by: Jason Xing <kernelxing@tencent.com>
 ---
- net/xdp/xsk.c       | 12 ++++++++----
- net/xdp/xsk_queue.h | 12 +++++++-----
- 2 files changed, 15 insertions(+), 9 deletions(-)
+ net/xdp/xsk.c       | 116 ++++++++++++++++++++++++++++++++++++++++++++
+ net/xdp/xsk_queue.h |   8 +++
+ 2 files changed, 124 insertions(+)
 
 diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-index 6cd2e58e170c..c26e26cb4dda 100644
+index c26e26cb4dda..e1ad2ac2b39a 100644
 --- a/net/xdp/xsk.c
 +++ b/net/xdp/xsk.c
-@@ -546,12 +546,17 @@ static int xsk_wakeup(struct xdp_sock *xs, u8 flags)
- 	return dev->netdev_ops->ndo_xsk_wakeup(dev, xs->queue_id, flags);
+@@ -920,6 +920,122 @@ struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
+ 	return ERR_PTR(err);
  }
  
--static int xsk_cq_reserve_locked(struct xsk_buff_pool *pool)
-+/* The function tries to reserve as many descs as possible. If there
-+ * is no single slot to allocate, return zero. Otherwise, return how
-+ * many slots are available, even though it might stop reserving at
-+ * certain point.
-+ */
-+static int xsk_cq_reserve_locked(struct xsk_buff_pool *pool, u32 n)
++static int __xsk_generic_xmit_batch(struct xdp_sock *xs)
++{
++	struct xsk_buff_pool *pool = xs->pool;
++	struct xsk_batch *batch = &xs->batch;
++	struct xdp_desc *descs = batch->desc_cache;
++	struct net_device *dev = xs->dev;
++	u32 max_batch, max_budget;
++	bool sent_frame = false;
++	struct sk_buff *skb;
++	u32 cons_descs;
++	int err = 0;
++	u32 i = 0;
++
++	mutex_lock(&xs->mutex);
++
++	/* Since we dropped the RCU read lock, the socket state might have changed. */
++	if (unlikely(!xsk_is_bound(xs))) {
++		err = -ENXIO;
++		goto out;
++	}
++
++	if (xs->queue_id >= dev->real_num_tx_queues) {
++		err = -ENXIO;
++		goto out;
++	}
++
++	if (unlikely(!netif_running(dev) || !netif_carrier_ok(dev))) {
++		err = -ENETDOWN;
++		goto out;
++	}
++
++	max_budget = READ_ONCE(xs->max_tx_budget);
++	max_batch = batch->generic_xmit_batch;
++
++	for (i = 0; i < max_budget; i += cons_descs) {
++		u32 nb_pkts = 0;
++		u32 nb_descs;
++
++		nb_descs = min(max_batch, max_budget - i);
++		nb_descs = xskq_cons_nb_entries(xs->tx, nb_descs);
++		if (!nb_descs)
++			goto out;
++
++		/* This is the backpressure mechanism for the Tx path. Try to
++		 * reserve space in the completion queue for all packets, but
++		 * if there are fewer slots available, just process that many
++		 * packets. This avoids having to implement any buffering in
++		 * the Tx path.
++		 */
++		nb_descs = xsk_cq_reserve_locked(pool, nb_descs);
++		if (!nb_descs) {
++			err = -EAGAIN;
++			goto out;
++		}
++
++		cons_descs = xskq_cons_read_desc_batch_copy(xs->tx, pool, descs,
++							    nb_descs, &nb_pkts);
++		if (cons_descs < nb_descs) {
++			u32 delta = nb_descs - cons_descs;
++
++			xsk_cq_cancel_locked(pool, delta);
++			xs->tx->queue_empty_descs += delta;
++			if (!cons_descs) {
++				err = -EAGAIN;
++				goto out;
++			}
++			nb_descs = cons_descs;
++		}
++
++		cons_descs = xsk_alloc_batch_skb(xs, nb_pkts, nb_descs, &err);
++		/* Return 'nb_descs - cons_descs' number of descs to the
++		 * pool if the batch allocation partially fails
++		 */
++		if (cons_descs < nb_descs) {
++			xskq_cons_cancel_n(xs->tx, nb_descs - cons_descs);
++			xsk_cq_cancel_locked(pool, nb_descs - cons_descs);
++		}
++
++		if (!skb_queue_empty(&batch->send_queue)) {
++			int err_xmit;
++
++			err_xmit = xsk_direct_xmit_batch(xs, dev);
++			if (err_xmit == NETDEV_TX_BUSY)
++				err = -EAGAIN;
++			else if (err_xmit == NET_XMIT_DROP)
++				err = -EBUSY;
++
++			sent_frame = true;
++		}
++
++		if (err)
++			goto out;
++	}
++
++	/* Maximum budget of descriptors have been consumed */
++	if (xskq_has_descs(xs->tx))
++		err = -EAGAIN;
++
++out:
++	if (xs->skb)
++		xsk_drop_skb(xs->skb);
++
++	/* If send_queue has more pending skbs, we must to clear
++	 * the rest of them.
++	 */
++	while ((skb = __skb_dequeue(&batch->send_queue)) != NULL) {
++		xskq_cons_cancel_n(xs->tx, xsk_get_num_desc(skb));
++		xsk_consume_skb(skb);
++	}
++	if (sent_frame)
++		__xsk_tx_release(xs);
++
++	mutex_unlock(&xs->mutex);
++	return err;
++}
++
+ static int __xsk_generic_xmit(struct sock *sk)
  {
- 	int ret;
- 
- 	spin_lock(&pool->cq->cq_cached_prod_lock);
--	ret = xskq_prod_reserve(pool->cq);
-+	ret = xskq_prod_reserve(pool->cq, n);
- 	spin_unlock(&pool->cq->cq_cached_prod_lock);
- 
- 	return ret;
-@@ -947,8 +952,7 @@ static int __xsk_generic_xmit(struct sock *sk)
- 		 * if there is space in it. This avoids having to implement
- 		 * any buffering in the Tx path.
- 		 */
--		err = xsk_cq_reserve_locked(xs->pool);
--		if (err) {
-+		if (!xsk_cq_reserve_locked(xs->pool, 1)) {
- 			err = -EAGAIN;
- 			goto out;
- 		}
+ 	struct xdp_sock *xs = xdp_sk(sk);
 diff --git a/net/xdp/xsk_queue.h b/net/xdp/xsk_queue.h
-index 354f6fe86893..34cc07d6115e 100644
+index 34cc07d6115e..c3b97c6f2910 100644
 --- a/net/xdp/xsk_queue.h
 +++ b/net/xdp/xsk_queue.h
-@@ -413,14 +413,16 @@ static inline void xskq_prod_cancel_n(struct xsk_queue *q, u32 cnt)
- 	q->cached_prod -= cnt;
+@@ -314,6 +314,14 @@ xskq_cons_read_desc_batch(struct xsk_queue *q, struct xsk_buff_pool *pool,
+ 					   NULL, pool->xdp_zc_max_segs);
  }
  
--static inline int xskq_prod_reserve(struct xsk_queue *q)
-+static inline int xskq_prod_reserve(struct xsk_queue *q, u32 n)
- {
--	if (xskq_prod_is_full(q))
--		return -ENOSPC;
-+	u32 nr_free = xskq_prod_nb_free(q, n);
++static inline u32
++xskq_cons_read_desc_batch_copy(struct xsk_queue *q, struct xsk_buff_pool *pool,
++			       struct xdp_desc *descs, u32 max, u32 *nb_pkts)
++{
++	return __xskq_cons_read_desc_batch(q, pool, descs, max,
++					   nb_pkts, MAX_SKB_FRAGS);
++}
 +
-+	if (!nr_free)
-+		return 0;
+ /* Functions for consumers */
  
- 	/* A, matches D */
--	q->cached_prod++;
--	return 0;
-+	q->cached_prod += nr_free;
-+	return nr_free;
- }
- 
- static inline int xskq_prod_reserve_addr(struct xsk_queue *q, u64 addr)
+ static inline void __xskq_cons_release(struct xsk_queue *q)
 -- 
 2.41.3
 
