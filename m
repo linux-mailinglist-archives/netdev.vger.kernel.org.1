@@ -1,164 +1,166 @@
-Return-Path: <netdev+bounces-278626-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278627-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GBFjI6L93mlINQAAu9opvQ
-	(envelope-from <netdev+bounces-278626-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 04:53:22 +0200
+	id eGbpN3oE32khNwAAu9opvQ
+	(envelope-from <netdev+bounces-278627-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 05:22:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FC8F3FFDC5
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 04:53:21 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C2A23FFF02
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 05:22:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id B746E301A2F7
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 02:53:18 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 261E53043D1C
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 03:22:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0D3F3126D0;
-	Wed, 15 Apr 2026 02:53:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35227309EF4;
+	Wed, 15 Apr 2026 03:22:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b="tBTq3uwi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oY84GHcq"
 X-Original-To: netdev@vger.kernel.org
-Received: from www2881.sakura.ne.jp (www2881.sakura.ne.jp [49.212.198.91])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f176.google.com (mail-vk1-f176.google.com [209.85.221.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 419F87260D
-	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 02:53:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.198.91
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776221597; cv=none; b=s1LbVz1P9BIYvqNxXq/XsYehPw0KIy9bj4Bz2EM7gwxNYxxsad11gveZNYkySaY7TT9gTqKeIDGTvzLN+zhReBN9/qDlHQQtr3OIIDprmvdK7GDIKMn7j/ngPfH6vHbfy0VYSOeGPcYL/qjwEs+yj3FBkUeyt4LSVVLn9jwgags=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776221597; c=relaxed/simple;
-	bh=haA4kYFbvqtiqFuCHUW5iCmkV1x3Oma+LWqgQLmvkUA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Mdfo3rOW+uWxBRPvQOuTAKlqIvBkYRPH2YJCvk6/Ra1g0/fglo/12BoGS6rd70XP9ZWPFziAN7WXq1W+J+icrw4B1r+UudUR5hq0HtcBf5U3QCrU0qOHN/XJBZbi/HGlu2GNi+kn2krlJl7ajbmRVBYnlz4hzcjFdt5v+mRrMJ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp; spf=pass smtp.mailfrom=enjuk.jp; dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b=tBTq3uwi; arc=none smtp.client-ip=49.212.198.91
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enjuk.jp
-Received: from ms-a2 (92.192.13.160.dy.iij4u.or.jp [160.13.192.92])
-	(authenticated bits=0)
-	by www2881.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 63F2qSsp035194
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Wed, 15 Apr 2026 11:52:28 +0900 (JST)
-	(envelope-from kohei@enjuk.jp)
-DKIM-Signature: a=rsa-sha256; bh=3+5pFTC9L4TcAgd/RnB8ZvQWCS/U/+fZRKbBPq/6RR8=;
-        c=relaxed/relaxed; d=enjuk.jp;
-        h=From:Message-ID:To:Subject:Date;
-        s=rs20251215; t=1776221548; v=1;
-        b=tBTq3uwiwD5z03dO8vqZL864WNI/kPy8x1eH0MmgDZvWKMwbMaoArTJhH5akHj6G
-         h9MxXMI8bXFLK0LoRSQ2y2SG1CSrfoDeWBKqQ5/VuRdyxDXoAqOKWOb8u/UkoASl
-         5egcH5Wzpcth3LEeVwSQNetM7QoUip/zexFeGD6UuyDEiae69wzl0FB6op7GRmnV
-         zZIKS0lYc4SNbXwOhcpBqYw6rMH57ISlnWrH7YjWkSMeBtVs1xanAcKBGzdAUo5/
-         W0LEIhjWVXIbd80x8mC1UGUPZITzlv9kxqVCvwqWv4DASI9i5VWMtO2J4t7wIgx5
-         AKIyR5dHuxP2fz++0I7h7g==
-From: Kohei Enju <kohei@enjuk.jp>
-To: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
-        Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Faizal Rahim <faizal.abdul.rahim@linux.intel.com>,
-        kohei.enju@gmail.com, Kohei Enju <kohei@enjuk.jp>,
-        stable@vger.kernel.org
-Subject: [PATCH iwl-net v2] igc: fix potential skb leak in igc_fpe_xmit_smd_frame()
-Date: Wed, 15 Apr 2026 02:52:18 +0000
-Message-ID: <20260415025226.114115-1-kohei@enjuk.jp>
-X-Mailer: git-send-email 2.51.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB19D288B8
+	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 03:22:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.176
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776223352; cv=pass; b=pW5ujOerYUqS8Uvn+0LVt43SUHP7otUU9dOZOV63rR/MFGhZzaIXD0zZUWpkwBvlIlJksaAispbPwwRXGrtIUL745vCwKbmAuKL247t7h6LVFl1k4uiuZ1FSfpD7bCHstXSemfuoAQx9swvZfZlwvJRojyV+Xty3ugMrYpQsRmY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776223352; c=relaxed/simple;
+	bh=c4onuS1GRSAjfT7aJOqFbi5T6EuvpcHtSN6WR6LagfY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=W+M1JehQxjEq0Cn5hd0/wQJdWuKFbVyeiyovbAcTlbFJgN4rp/N2KOCk4v8/UXpmmGUfEG2tdszgrx8IoTn9DPpMEXFQwWPQfBDh+DWcM5y8p1yZ+5B0Kr0QILLiN0sAUMd9bTv2aavsLaOjVQ60YIq1xhiCvIZMIyh4RFtElDc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=oY84GHcq; arc=pass smtp.client-ip=209.85.221.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f176.google.com with SMTP id 71dfb90a1353d-5675d609621so4859594e0c.2
+        for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 20:22:30 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776223350; cv=none;
+        d=google.com; s=arc-20240605;
+        b=KRA7ySubSLvYO8pk3NO83HfJUvsXw5X3ntZWOOe9ezWhFe2zkLVZjumKzx0L2l7vu4
+         /gO5HqeiDVAfq2SyFFROGCx5CUZEwKaH/hIA40CVDKShzJ27KpR0bJL43n6Qk8iVQe0B
+         1c2jpTArJbxPWawYQ65jcRqanEoYDh68GGTsAwzKHqRu76YNmRg41e8thxl/3dEfRs2+
+         xCNgo9Lvdbj2eSk3+MQZF7kTQDnKLABx5xv08TbxMqWSMauVAaVHLC1TGogqgXZvqibv
+         FeSm/eylOXB5NZF5jYQ6NZ52hJBZa00biWEYr9qIpPeQmtVt+ta1TBfqczxWPthYnfeK
+         rYow==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=c4onuS1GRSAjfT7aJOqFbi5T6EuvpcHtSN6WR6LagfY=;
+        fh=hP4TRSFeG2+nLEURD/+NDx9PjPmD+dKACS1VZ8zr3to=;
+        b=U7QHBtdjAoQhcUF4NrCbak78pRA25FQDUEiAfO+r4GKlhZFD5E6KWOK1ERQYv65H2H
+         xbWQKOvvDPlK5d7hEk2HvGj+cS/UEJu+i8uvEM4e8C9MDtXMLX+wz8bnWRVRw6xIxpP/
+         cIbpGHXummehzVuxqE+CDVXSuOSBGZRh4RprMLe68PEczAisXuKfW/fvy5Lgvjzhigrb
+         mv7HIdtXsC6fJP3O47NcnS89NU5mCEyJH1552bGe9sO1LHKgjyeJblOzJEnZFsORX9DQ
+         7n7UT7ZmLtG+LUR0pLfJHLHdqWxlD6us3/JvvXeEbBr20CE/0ksXtwXu3p4VOcrkTZz5
+         hBgQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776223350; x=1776828150; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=c4onuS1GRSAjfT7aJOqFbi5T6EuvpcHtSN6WR6LagfY=;
+        b=oY84GHcqS1YVypPnD94vDCvpmOqfruTYFyV0hdR9FZEoeOrwF565yj/R3Fl7GAvwHh
+         xEWzNvUrINT+ICZaGpAalw7QkMX7uOwR5mEgGcnJ1rQzL0A3HGMLOoaTVFtMVEdTsqRS
+         4oWN23OCeW6n4AATW3ld7v7OADJVe4UWJGC1l3duW0cqyS5ldqCWcZU/jUbL9e7Nm2V+
+         hJ7Pz+Z9hR3lFj+13q4N06VstborTPHDowbVQOMQZKUVuUESRWvS/g2e+9QL/jTh9cmv
+         PzE5oN1zZqrdkd4ty6/O39nYB6vNtEzlEZzr7/zM6XtVHNfaP6JO16Ys7KD9c1EwcxEI
+         7Eog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776223350; x=1776828150;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=c4onuS1GRSAjfT7aJOqFbi5T6EuvpcHtSN6WR6LagfY=;
+        b=MhnXD38DVU6GN8t2u7AVNqpiLNMq6tKjy6xsEZ/2UUoCS+xf2B8m9aOmYG4dCcJj65
+         hWrY9F+Ukm+gDXrEf4rhiOvtU+8FwlDNftPNTU9T/obVroyYvwQL8Hh4mKj23I4tbSuR
+         iZtCQnYNh0Qm2gGrwFdEnkhgiyEMdr8TYbO8vTDQXZ95i5l125Y1e9hwLiIgTUW8SvcX
+         v1UtNcMNqMiF0PONIuDaBYT4cVt8EF+lVYHmL4ciM8+pMJopYU5qjub0T2jSGw9Zh5yf
+         k5qJ/J0+qi99KM9IUjJn4sXVkhKJquGDMdzLuZsoeMeHiZFEA8vU4M0PxOVYsaELdCAl
+         zgwA==
+X-Forwarded-Encrypted: i=1; AFNElJ+8hwTavD7E/ovn1MxOjLkqzoqM7i2r45j5o2utllsIRFL6j5vr7zwfecbi3bA5UK+/7zenW90=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw5Eb9A8VlYauNy+b7QxOAEI1pCInvNET7Bgh8YSc6zp/uiHE0O
+	dTaziR6hocSXxEgmIrnHElcf2h1v/ZM04Vz7VkTOZff5rU5sMoiLU8XKQpTIXHIxwWx4YP5V4Cm
+	FknXCQIcrCmFH5J2+SU4lBy+Vpou3ctU=
+X-Gm-Gg: AeBDietxP+oFSQv21+Ka+LbLcOWFKosuRputp8eskL1RyKJgsXnEqVICo1tc82TGetj
+	0bj2FaQ78pd0KdnoOzGGGO/QfotEG7x1yLlXAlIrSlj8QvbMaUfNKvMoFnhtFkECPl9pvip8VBn
+	sSR5b6lwi1jrrF2aL+J74hiWEDGHvxtbdHSZP102tAMrNE5dpOwc3dxKCeoHiBOBLs5D1cwcVYA
+	OvV0PhWogGTAYm2w2r/lyI+okEllqkKNKKbGAU5PVUpJTsCVmK0lchFv34vAekJUgm2kqQwy3Vi
+	Rjl1Og+Kth8wc601Xd+usSnf+HQlNzNS1v3lPO3RuCVeppM4+rA=
+X-Received: by 2002:a05:6122:e24f:b0:56b:815c:961d with SMTP id
+ 71dfb90a1353d-56f3bb904c1mr10409428e0c.5.1776223349721; Tue, 14 Apr 2026
+ 20:22:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+References: <20260411115958.64827-1-shuvampandey1@gmail.com> <f9c028ef-9021-4405-940d-4630732cd122@redhat.com>
+In-Reply-To: <f9c028ef-9021-4405-940d-4630732cd122@redhat.com>
+From: Shuvam Pandey <shuvampandey1@gmail.com>
+Date: Wed, 15 Apr 2026 09:07:18 +0545
+X-Gm-Features: AQROBzB6ElzhyE09bnLe-Wo93T_M_FoFjdTgNEszNGZdZlLQlDJqmEWbUxuk_k4
+Message-ID: <CANAAWH+zBpk4JRNpc_HYbsgpVZk=SxwpyuYSjRaGYm6J41R7ug@mail.gmail.com>
+Subject: Re: [PATCH net v2] atm: mpoa: keep mpc->dev referenced across mpoad restart
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, 
+	syzbot+5ec223ccb83b24ef982f@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[enjuk.jp,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[enjuk.jp:s=rs20251215];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,linux.intel.com,gmail.com,enjuk.jp,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-278627-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-278626-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MISSING_XM_UA(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kohei@enjuk.jp,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[enjuk.jp:+];
-	NEURAL_HAM(-0.00)[-0.989];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[enjuk.jp:email,enjuk.jp:dkim,enjuk.jp:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8FC8F3FFDC5
+	FROM_NEQ_ENVFROM(0.00)[shuvampandey1@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,5ec223ccb83b24ef982f];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 7C2A23FFF02
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-When igc_fpe_init_tx_descriptor() fails, no one takes care of an
-allocated skb, leaking it. [1]
-Use dev_kfree_skb_any() on failure.
+Hi Paolo,
 
-Tested on an I226 adapter with the following command, while injecting
-faults in igc_fpe_init_tx_descriptor() to trigger the error path.
- # ethtool --set-mm $DEV verify-enabled on tx-enabled on pmac-enabled on
+> Since this patch removes the dev_put(mpc->dev) here to defer the
+> netdevice reference release to the NETDEV_UNREGISTER event, does this
+> introduce a leak of the netdevice reference on module unload?
+> ...
+> Should a dev_put() be added in the module exit function atm_mpoa_cleanup()?
 
-[1]
-unreferenced object 0xffff888113c6cdc0 (size 224):
-...
-  backtrace (crc be3d3fda):
-    kmem_cache_alloc_node_noprof+0x3b1/0x410
-    __alloc_skb+0xde/0x830
-    igc_fpe_xmit_smd_frame.isra.0+0xad/0x1b0
-    igc_fpe_send_mpacket+0x37/0x90
-    ethtool_mmsv_verify_timer+0x15e/0x300
+For the netdevice reference itself, I don't think a cleanup-side
+dev_put() is needed here.
 
-Cc: stable@vger.kernel.org
-Fixes: 5422570c0010 ("igc: add support for frame preemption verification")
-Signed-off-by: Kohei Enju <kohei@enjuk.jp>
----
-Changes:
-  v2:
-    - change to idiomatic style with goto (Simon)
-    - add Cc to stable (Alex)
-    - add reprodunction steps (Alex)
-  v1: https://lore.kernel.org/all/20260329145122.126040-1-kohei@enjuk.jp/
----
- drivers/net/ethernet/intel/igc/igc_tsn.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+unregister_netdevice_notifier() synthesizes NETDEV_UNREGISTER to the
+removed notifier, and mpoa_event_listener() already drops mpc->dev in
+that path. So removing the dev_put() from mpoad_close() should not leak
+the netdevice reference on module unload.
 
-diff --git a/drivers/net/ethernet/intel/igc/igc_tsn.c b/drivers/net/ethernet/intel/igc/igc_tsn.c
-index 8a110145bfee..02dd9f0290a3 100644
---- a/drivers/net/ethernet/intel/igc/igc_tsn.c
-+++ b/drivers/net/ethernet/intel/igc/igc_tsn.c
-@@ -109,10 +109,16 @@ static int igc_fpe_xmit_smd_frame(struct igc_adapter *adapter,
- 	__netif_tx_lock(nq, cpu);
- 
- 	err = igc_fpe_init_tx_descriptor(ring, skb, type);
--	igc_flush_tx_descriptors(ring);
-+	if (err)
-+		goto err_free_skb_any;
- 
-+	igc_flush_tx_descriptors(ring);
- 	__netif_tx_unlock(nq);
-+	return 0;
- 
-+err_free_skb_any:
-+	__netif_tx_unlock(nq);
-+	dev_kfree_skb_any(skb);
- 	return err;
- }
- 
--- 
-2.51.0
+I'll fold that into v3 together with the full decoded backtrace, the
+syzbot console link, and a clearer lifetime explanation.
 
+Shuvam
 
