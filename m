@@ -1,182 +1,122 @@
-Return-Path: <netdev+bounces-278604-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278605-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0BzrNk3W3mnwIwAAu9opvQ
-	(envelope-from <netdev+bounces-278604-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 02:05:33 +0200
+	id wOtvL9jX3mmpJAAAu9opvQ
+	(envelope-from <netdev+bounces-278605-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 02:12:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03CA83FF34E
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 02:05:32 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 228B63FF3BC
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 02:12:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id AFF9530457C6
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 00:05:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 81164300B9C6
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 00:12:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90CE42744F;
-	Wed, 15 Apr 2026 00:05:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D63A40DFC9;
+	Wed, 15 Apr 2026 00:12:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eq+seCv3"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="aloffz5V"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19759BA45
-	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 00:05:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63D9F78F3A
+	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 00:12:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776211522; cv=none; b=fIta9EF3YPweVY+jkrYRUvG71dISDTmYEM6YO1grStpJMd031xc+Gyvo1YoTJmor/53sRjrvReUSc/rbGoS3drXtW3aBNr/qWrrZ2NIUQeskjceRRm2ZLbCSFWUw4o6wGJ6hX5NBGnijMu1epwIqaOCN3SflaF/BIauVFB57GlQ=
+	t=1776211925; cv=none; b=IvsJ1VViCYM5YaPtll/AlUiFTSEGxTOujun4jvECLpQO0rDhqao/SToyJXAywdTWZ34O2M3WAmV6e/yp45ou9GtrFfOxp3hkr7BgM/l5hORlxjOF0fdBe0wr+aDj82tsPch2QbPsPYVpUiuIezEl8YGNCjhAQIPDAQqLUA2NfOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776211522; c=relaxed/simple;
-	bh=fQje050jDuyd96KgCNCMqmUH2G68XSqEHGGCVHawldU=;
+	s=arc-20240116; t=1776211925; c=relaxed/simple;
+	bh=QYX6zOhjE5SBE8f2AYjW27oGmBb0zhr0qBuZuOUAsAg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JXcsOWQHGHS3GJGj9WpYHwLjKwRJ7h2THREPxWd6t+v0NFe0v/SkMOUA6IA3ouznMt+o4imbO5iqye0APVZhZOCCK3FSK7FlDsPFiLfcvye2bVcDTL8DYsAODGMGPw6yZ4mKo/Bqe4QCBITHzINIcts1l66vxfz54CBdXUSoyPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eq+seCv3; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1776211522; x=1807747522;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=fQje050jDuyd96KgCNCMqmUH2G68XSqEHGGCVHawldU=;
-  b=eq+seCv3q0yjwv7u3OgzopMGuRRj+wL+DR9ZQ828BqtGi0x2rlJ8q2md
-   UzZY0Un1MdgLsIvD2iOBsblNqNgKh4DGCS8EI5DpCR/2Lpx+NYspAdaxw
-   sbW4IDAhMfdTZHWAqqG4jzEl2/o0zgvM0E1UNqYva3wJFpFpszWkF2TuQ
-   zSHGMvGN0lqQWXB7nKjSf3sH+MjtXFERpu/s3Nd/co31Q6uNwMHVgG6Jm
-   bUFA0RXhJAqfEZ/prA/p75LcmF9g5af3WLomeeJbvOVmYpE7MFLZJDw0F
-   yQ6lVucJYlQPfeJayzO4vLwc+XdfHgFmUFmLM6Vv95UjLhCuXWY9STvvL
-   Q==;
-X-CSE-ConnectionGUID: XCGFBuUlSdKMLZAvSpNenQ==
-X-CSE-MsgGUID: QThJJ8RQQEWlV7Ari2rzPg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11759"; a="88260238"
-X-IronPort-AV: E=Sophos;i="6.23,179,1770624000"; 
-   d="scan'208";a="88260238"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2026 17:05:21 -0700
-X-CSE-ConnectionGUID: xB+3kYvpQQyOKv2LxeNgYg==
-X-CSE-MsgGUID: rZ+GFvWIT3atgyfE0y8q0g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,179,1770624000"; 
-   d="scan'208";a="268224377"
-Received: from lkp-server01.sh.intel.com (HELO 7b0b59b3a0d4) ([10.239.97.150])
-  by orviesa001.jf.intel.com with ESMTP; 14 Apr 2026 17:05:19 -0700
-Received: from kbuild by 7b0b59b3a0d4 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1wCnkq-000000001zX-140H;
-	Wed, 15 Apr 2026 00:05:16 +0000
-Date: Wed, 15 Apr 2026 08:04:20 +0800
-From: kernel test robot <lkp@intel.com>
-To: Dudu Lu <phx0fer@gmail.com>, netdev@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, stefanha@redhat.com, sgarzare@redhat.com,
-	mst@redhat.com, jasowang@redhat.com, Dudu Lu <phx0fer@gmail.com>
-Subject: Re: [PATCH] vsock/virtio: fix accept queue count leak on transport
- mismatch in recv_listen
-Message-ID: <202604150741.iQBI3cGE-lkp@intel.com>
-References: <20260413085243.73200-1-phx0fer@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Y3rzWkXI2z5gG7HOetuGp3YIQHl++p4IOKEtIfU7/+JMybhMaa4zWkPbMIz1mtTOQ1FUY9vDHXe7FJQhSx5G1v61zoaWcQb9Moul5MpWbfY9tL8sSSv/HS5HI14BtKtAtZxRG/4eWndjek8R8Pff+Oud7ntrt+F5Wu2d1XSFgjE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=aloffz5V; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=9RmvYgIcDgnjc3TN0sF76qBS1rwb8ZMn0Vhou6ML3pg=; b=al
+	offz5Vqq87vLxguFsCA/k6WAw80qDV9baqw5Bs/k+iehvTjRGyWOUlrxFGMmkUlX9sqfw9CKGELOU
+	kMvrERRTCciWBfB373dowONE6u0gF/1CtZCtZ+lafgKvNXTS2HMZnkpqd0sA7m9q/EAraw13aL3du
+	KYns2O3mscdOH+4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wCnrM-00G71s-Ce; Wed, 15 Apr 2026 02:12:00 +0200
+Date: Wed, 15 Apr 2026 02:12:00 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: =?iso-8859-1?Q?Beno=EEt?= Dufour <benoit.dufour@mail.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: DMA issues with the SKGE drivers
+Message-ID: <c3130329-a7ea-406c-9ac1-2fa5d9d3a8bc@lunn.ch>
+References: <9df653d6-d7f8-4b36-87de-65daf28635dd@mail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20260413085243.73200-1-phx0fer@gmail.com>
-X-Spamd-Result: default: False [-1.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <9df653d6-d7f8-4b36-87de-65daf28635dd@mail.com>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lists.linux.dev,redhat.com,gmail.com];
-	TAGGED_FROM(0.00)[bounces-278604-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWO(0.00)[2];
+	FREEMAIL_TO(0.00)[mail.com];
+	TAGGED_FROM(0.00)[bounces-278605-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[git-scm.com:url,01.org:url]
-X-Rspamd-Queue-Id: 03CA83FF34E
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:dkim,lunn.ch:mid]
+X-Rspamd-Queue-Id: 228B63FF3BC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Dudu,
+On Tue, Apr 14, 2026 at 07:23:17PM -0400, Benoît Dufour wrote:
+> In 2024, I reported a bug about the SKGE driver, you can see it here:
+> https://bugzilla.kernel.org/show_bug.cgi?id=219270
+> 
+> Basically, the problem is that the Marvell 88E8001 on my ASUS A8V motherboard
+> can only work with 32bit DMA, and if trying to use 64bit DMA, the NIC won't
+> work at all and after some time, the operating system will become completely
+> unresponsive (on screen tty will stop refresh, keyboard and mouse input will
+> stop working too).
+> 
+> The fix is quite easy:
+> 
+> At the very end of the SKGE driver source code, the ASUS A8V motherboard (as
+> well as many other boards like the ASUS A8V Deluxe) should be added to the list
+> of 32bit DMA boards:
+> https://github.com/torvalds/linux/blob/508fed6795411f5ab277fd1edc0d7adca4946f23
+> /drivers/net/ethernet/marvell/skge.c#L4150
 
-kernel test robot noticed the following build errors:
+Hi Benoît 
 
-[auto build test ERROR on mst-vhost/linux-next]
-[also build test ERROR on net/main net-next/main linus/master horms-ipvs/master v7.0 next-20260414]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Could you submit a patch adding the needed entry for your board?
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Dudu-Lu/vsock-virtio-fix-accept-queue-count-leak-on-transport-mismatch-in-recv_listen/20260414-233232
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git linux-next
-patch link:    https://lore.kernel.org/r/20260413085243.73200-1-phx0fer%40gmail.com
-patch subject: [PATCH] vsock/virtio: fix accept queue count leak on transport mismatch in recv_listen
-config: arc-randconfig-001-20260415 (https://download.01.org/0day-ci/archive/20260415/202604150741.iQBI3cGE-lkp@intel.com/config)
-compiler: arc-linux-gcc (GCC) 13.4.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260415/202604150741.iQBI3cGE-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202604150741.iQBI3cGE-lkp@intel.com/
-
-All error/warnings (new ones prefixed by >>):
-
->> net/vmw_vsock/virtio_transport_common.c:1:9: warning: data definition has no type or storage class
-       1 |         sk_acceptq_added(sk);
-         |         ^~~~~~~~~~~~~~~~
->> net/vmw_vsock/virtio_transport_common.c:1:9: error: type defaults to 'int' in declaration of 'sk_acceptq_added' [-Werror=implicit-int]
->> net/vmw_vsock/virtio_transport_common.c:1:9: warning: parameter names (without types) in function declaration
-   In file included from include/linux/virtio_vsock.h:7,
-                    from net/vmw_vsock/virtio_transport_common.c:15:
->> include/net/sock.h:1080:20: error: conflicting types for 'sk_acceptq_added'; have 'void(struct sock *)'
-    1080 | static inline void sk_acceptq_added(struct sock *sk)
-         |                    ^~~~~~~~~~~~~~~~
-   net/vmw_vsock/virtio_transport_common.c:1:9: note: previous declaration of 'sk_acceptq_added' with type 'int()'
-       1 |         sk_acceptq_added(sk);
-         |         ^~~~~~~~~~~~~~~~
-   cc1: some warnings being treated as errors
+	Andrew
 
 
-vim +1 net/vmw_vsock/virtio_transport_common.c
-
-   > 1		sk_acceptq_added(sk);
-     2	// SPDX-License-Identifier: GPL-2.0-only
-     3	/*
-     4	 * common code for virtio vsock
-     5	 *
-     6	 * Copyright (C) 2013-2015 Red Hat, Inc.
-     7	 * Author: Asias He <asias@redhat.com>
-     8	 *         Stefan Hajnoczi <stefanha@redhat.com>
-     9	 */
-    10	#include <linux/spinlock.h>
-    11	#include <linux/module.h>
-    12	#include <linux/sched/signal.h>
-    13	#include <linux/ctype.h>
-    14	#include <linux/list.h>
-    15	#include <linux/virtio_vsock.h>
-    16	#include <uapi/linux/vsockmon.h>
-    17	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
