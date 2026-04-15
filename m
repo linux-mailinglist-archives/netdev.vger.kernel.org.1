@@ -1,371 +1,266 @@
-Return-Path: <netdev+bounces-278750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278751-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sPuGO4p332kATgAAu9opvQ
-	(envelope-from <netdev+bounces-278750-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 13:33:30 +0200
+	id UOzQM2V432kATgAAu9opvQ
+	(envelope-from <netdev+bounces-278751-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 13:37:09 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 460A0403D84
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 13:33:29 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B742403E57
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 13:37:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 536A73085D94
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 11:26:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AAE723059E3C
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 11:31:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D260C342524;
-	Wed, 15 Apr 2026 11:26:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2187E336895;
+	Wed, 15 Apr 2026 11:31:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="A9Lm+Rml"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f2nf7olA";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="SqqrRiIa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9EBC30DECB
-	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 11:26:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B099D2E0938
+	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 11:31:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776252378; cv=none; b=EbUhZc1GRC+TjDrLgB4AZEt6BOCPMmJSmmJMqjXMJfdvfQ2dAS1Iz9yfV0rCjieSz4Zugk0zbRy7g59hl82eYgEURgaHh6ZoKRFWlYhOUUriem56FWaMeBVhksLa1g63DQvQzCl7r2LKMEhYeA38/Wkm2IZ1j1snL3EOA1rJdVY=
+	t=1776252700; cv=none; b=FqZKujmLkk+gO91/dUFWlcFSLseWbg7NdL+qiWy7PAgc4OWvpgjn71bzK9wGXWeffaSeNNPaT4+NuLOJSOGB45zXt15M6MPJM4wYya2tFNR0ZNWDE7YLdjz8VVptPhbsFsUSfr+UM1aQNCV5dni0WZEI/ifrrjrlo5UzPG7x4hU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776252378; c=relaxed/simple;
-	bh=eIZb6zCxsJfPaW4k4tZ8a8BEq2ntgaMYL7LfKkdt5ho=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=fUBP93cKnNcm3vkd/CZNqQ+E4k/XAlNAa3uDWv/kSUkjdQQJ9WR24Dw71JAW6wBjXmiAs2gxVRnbmHqcMBhE7pSCa73Lce+NWZKirAkiT+PNS2ZfQs85pcumzXiTAHR+UoJdlSLv5IryhtiQ/S7xmyMST8st/xEkikcRUWE6T+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=A9Lm+Rml; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1776252377; x=1807788377;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=eIZb6zCxsJfPaW4k4tZ8a8BEq2ntgaMYL7LfKkdt5ho=;
-  b=A9Lm+RmlzcVppj/xnWAiyYWLasOhAn0s5TOl8DwGuVh6PPspzns3dbTu
-   oLmxTcSvDNcz04XQLxTAEtimaMA3+C1O59UXB5+Q8ZFPN1mjJmxFRl9Hv
-   J6ZFDsqcOwZtoC9hF0c4XDrQl0V4TJPNHnrVegcFyY3cYqaUvy8K+5rW2
-   H0etcE7PIOx0RHGaNls9Oy5FyDHIBHeQvfChd+VGwXkYDMiZZAKMYVXQu
-   TCHB+tg7GcGdnWUMuIq0L5F9VxMXPM6O1xlCPddm5iNEIFPKXPMenFSNh
-   w3guVcbcUoucJwWOEjbPP8w7jedAy6n9fYTwjZ6F77djm4f4uTo7MXm+M
-   w==;
-X-CSE-ConnectionGUID: 6NU9KQujScSatVB2jMsGWA==
-X-CSE-MsgGUID: V9hWTIWkRCyNOq6Xv32yOw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11759"; a="94626761"
-X-IronPort-AV: E=Sophos;i="6.23,179,1770624000"; 
-   d="scan'208";a="94626761"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2026 04:26:17 -0700
-X-CSE-ConnectionGUID: cFiMoeY0QKWnbnpjPLr5Fg==
-X-CSE-MsgGUID: 5o0dAeXFQk+/x73ulD9N8Q==
-X-ExtLoop1: 1
-Received: from pae-d-dell-r7525-263.igk.intel.com ([172.28.191.240])
-  by fmviesa003.fm.intel.com with ESMTP; 15 Apr 2026 04:26:14 -0700
-From: Przemyslaw Korba <przemyslaw.korba@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	Przemyslaw Korba <przemyslaw.korba@intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Subject: [PATCH iwl-next] ice: add SBQ posted writes with non-posted support for CGU
-Date: Wed, 15 Apr 2026 13:27:05 +0200
-Message-ID: <20260415112706.1562382-2-przemyslaw.korba@intel.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1776252700; c=relaxed/simple;
+	bh=QLX1J418M4jWHF/CD6zKmlQZG8fsqg6qyHarNz+l24E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Cc9F+TNof/ZBfBXdIRxCWUtMpgw9V1RlVrB5OeBg7QJ2daPU9XR6iUu2TXivsd8lxpzPgYm0w6N7Pd0NjGQg3AbyopnIlrL2oS7njyN7OJcw7RAIwEp1a72ihji/Ldk6qPwXLdroUKUl+RMXMrkSfFFx3n5SedKFqhDc2xtpddA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=f2nf7olA; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=SqqrRiIa; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1776252697;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VGpVm/oGR94wogmAdWmA8vqPEnCDIzFyVWrXuXhdJ4U=;
+	b=f2nf7olAztvNmNsEpMWPTH46rdxshFlVR/Y+o5kEmDhoyLX72y4zAboS9xTnrvmmIskzXs
+	oM32zm2lX/AIIlK8BWqOhyw8dile2uMX12GmC5mmZ/beBYxct4U8wybF2cPRcPur/42LuV
+	Xc9PEypVSLKw5lxPyLsdMqhNFPHr+nI=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-36-SXiO6rcWNtai0FwaeR1Zkg-1; Wed, 15 Apr 2026 07:31:36 -0400
+X-MC-Unique: SXiO6rcWNtai0FwaeR1Zkg-1
+X-Mimecast-MFC-AGG-ID: SXiO6rcWNtai0FwaeR1Zkg_1776252695
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-488d9e1e61aso35565815e9.0
+        for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 04:31:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1776252695; x=1776857495; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=VGpVm/oGR94wogmAdWmA8vqPEnCDIzFyVWrXuXhdJ4U=;
+        b=SqqrRiIacLIukQom1KZIcaycjKkh7czuM0KNoRgdqGyPlnHjHey0xkFNWmXOmv+oyo
+         A3HliPYbKwFzgEe13rCbRJ20acG1J5uXPGcbE0TyQrFU2qKSE6QqG5Pq4TwLq4Yomge7
+         Uuweg396a31kLXW9otPZgMY8+QKfusn1tVNV7zfld229r+ZUZ6adp0RpROUn6RuG/q90
+         5FI02Jh1aq8qqGWA6zZjT7SBf3mJXTWunZj9D66vexZPunNcMlQngSuk0UCX+9qOJGry
+         MeQbVNCwRD+5sA5NKbwskeLreRF2KINYiYRcTY60rG1IWqT5KuSnJiQ6H91qxhd2qAGJ
+         GeOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776252695; x=1776857495;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VGpVm/oGR94wogmAdWmA8vqPEnCDIzFyVWrXuXhdJ4U=;
+        b=LVaVVdKcWI0v1dlhYLqwcUsg83YJCJ7f2BJbFuuwnHp28jYeqBaI0N5QXkJSGRwmtt
+         xTPgfxodU7qUi8ckgiEE0CDH7sPO9ERsEfs4PDyZyLFiVYyvZxR02S/V6mGfJgQMP72i
+         KYYMOXs9nXJ7nJaw+FNzTbm6hYWVIeTfIozsFHn8bCl2Os6Wn4StyDcwexPy8XBiSeDP
+         2kkvi+fKzUr5z3W7Io0FKSUn9pBJg98MkZLp8588FNYH5jW/gD3eeuzcDDyYh5UMbmqJ
+         L0sEkp+5DrMf+fWRKMsn/tgNKdvCcWGeWRxBZYPya9X9M6jSk2zaM6/7t3ZSWNQMdlLt
+         ypLQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/nGevN2nh8Vzq7UBHsD5GkhPl2taaWByL4LaaJyxv6BLDPv94ThV6Wjxmt2m22EsLr6i0D+KE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx932DKUysP00tSfm5v0lkDxs1hycBAeRiD3BMv2uK5vMBlPDXy
+	/4PjsZScUKwIJR2RUXHoFagzl7whb7oKvDTGRG6tzbpwSkb7PkFIhaTjA734JAnW9sit9yNNFrw
+	FsrGkAqGKVU+S6cDn6Doo+/NstdMCniDBCbHdWtlpz/IcqKlPzkGPM+A3/Q==
+X-Gm-Gg: AeBDiet5m1gXQKcMD+3m/RsRqCwSLTf75f8IDSb3Hla08n5r0PTHHX03fPkJVvBXAwj
+	ogvaJIJSODJB+th8a+11v2DMFpCNiIDzqAsK6w1Oy0hOOzIjIRsfqUU6ty+K6iJCF8Xh3R5jMjN
+	9QAX3UhuO9zTNO0UrhYz3TbZxjF7g97/5NDMT6YLbH0GUpMJgB2GAUkS3cz6Rzd69+WeWvzmGgE
+	Y0Pw1ryhbyxypYtMSG7eIi7JZ+9zjAbEp4DSoeTPdFZsLJh+971oErZg9WcBZ0RzNPV3rSdq9x8
+	VYDNyZXo9ps4FeNg6FCbEeUpbAo7AwZTN0ykedMYS4XXc7PmZaGAdjHKw06Vyml7ZFaom2cCXea
+	kcALuJSaBS5V9ecrT5NqiiQXtFAipY+vU2l6mxjQYWrg7jp+nm+l4A2amivg27b+kfDGPhXFc7N
+	7IDq294Q==
+X-Received: by 2002:a05:600c:c108:b0:488:c282:e78c with SMTP id 5b1f17b1804b1-488d684bd3amr202998215e9.19.1776252695196;
+        Wed, 15 Apr 2026 04:31:35 -0700 (PDT)
+X-Received: by 2002:a05:600c:c108:b0:488:c282:e78c with SMTP id 5b1f17b1804b1-488d684bd3amr202997745e9.19.1776252694669;
+        Wed, 15 Apr 2026 04:31:34 -0700 (PDT)
+Received: from sgarzare-redhat (host-87-16-204-83.retail.telecomitalia.it. [87.16.204.83])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43ead33d6e9sm4680580f8f.1.2026.04.15.04.31.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Apr 2026 04:31:34 -0700 (PDT)
+Date: Wed, 15 Apr 2026 13:31:11 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Luigi Leonardi <leonardi@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Arseniy Krasnov <avkrasnov@salutedevices.com>, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v3 2/3] vsock/test: fix MSG_PEEK handling in
+ recv_buf()
+Message-ID: <ad9uYrUjgCkW1D_k@sgarzare-redhat>
+References: <20260414-fix_peek-v3-0-e7daead49f83@redhat.com>
+ <20260414-fix_peek-v3-2-e7daead49f83@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-1.16 / 15.00];
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20260414-fix_peek-v3-2-e7daead49f83@redhat.com>
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[intel.com:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278750-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-278751-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[przemyslaw.korba@intel.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	FROM_NEQ_ENVFROM(0.00)[sgarzare@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[msg.data:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,intel.com:mid]
-X-Rspamd-Queue-Id: 460A0403D84
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6B742403E57
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Karol Kolacinski <karol.kolacinski@intel.com>
+On Tue, Apr 14, 2026 at 06:10:22PM +0200, Luigi Leonardi wrote:
+>`recv_buf` does not handle the MSG_PEEK flag correctly: it keeps calling
+>`recv` until all requested bytes are available or an error occurs.
+>
+>The problem is how it calculates the amount of bytes read: MSG_PEEK
+>doesn't consume any bytes, will re-read the same bytes from the buffer
+>head, so, summing the return value every time is wrong.
+>
+>Moreover, MSG_PEEK doesn't consume the bytes in the buffer, so if the
+>requested amount is more than the bytes available, the loop will never
+>terminate, because `recv` will never return EOF. For this reason we need
+>to compare the amount of read bytes with the number of bytes expected.
+>
+>Add a check, and if the MSG_PEEK flag is present, update the counter of
+>read bytes differently, and break if we read the expected amount.
 
-Sideband queue (SBQ) is a HW queue with very short completion time. All
-SBQ writes were posted by default, which means that the driver did not
-have to wait for completion from the neighbor device, because there was
-none. This introduced unnecessary delays, where only those delays were
-"ensuring" that the command is "completed" and this was a potential race
-condition.
+nit: "..., update the counter for bytes read only after all expected
+bytes have been read and break out of the loop; otherwise, try again
+after a short delay to avoid consuming too many CPU cycles."
 
-Add the possibility to perform non-posted writes where it's necessary to
-wait for completion, instead of relying on fake completion from the FW,
-where only the delays are guarding the writes.
+>
+>This allows us to simplify the `test_stream_credit_update_test`, by
+>reusing `recv_buf`, like some other tests already do.
+>
+>This also fixes callers that pass MSG_PEEK to recv_buf().
 
-Flush the SBQ by reading address 0 from the PHY 0 before issuing SYNC
-command to ensure that writes to all PHYs were completed and skip SBQ
-message completion if it's posted.
+nit: this is implicit from the first part of the description.
 
-To analyze if delays are gone, look for and compare time spent in
-ice_sq_send_cmd — posted writes should return immediately after the wr32.
-That can be done for example by adjusting phc time with phc_ctl on E830
-device, for less than 2 seconds to use this new mechanism. Without it,
-command below will fail.
+>
+>Suggested-by: Stefano Garzarella <sgarzare@redhat.com>
+>Signed-off-by: Luigi Leonardi <leonardi@redhat.com>
+>---
+> tools/testing/vsock/util.c       | 15 +++++++++++++++
+> tools/testing/vsock/vsock_test.c | 13 +------------
+> 2 files changed, 16 insertions(+), 12 deletions(-)
+>
+>diff --git a/tools/testing/vsock/util.c b/tools/testing/vsock/util.c
+>index 1fe1338c79cd..2c9ee3210090 100644
+>--- a/tools/testing/vsock/util.c
+>+++ b/tools/testing/vsock/util.c
+>@@ -381,7 +381,13 @@ void send_buf(int fd, const void *buf, size_t len, int flags,
+> 	}
+> }
+>
+>+#define RECV_PEEK_RETRY_USEC 10
 
-Reproduction steps:
-phc_ctl eth13 adj 1
-phc_ctl[4478170.994]: adjusted clock by 1.000000 seconds
+10 usec IMO are a bit low, it could be the same order of the syscalls 
+involved in the loop, I'd go to some milliseconds like we do for 
+SEND_SLEEP_USEC.
 
-Check trace for timing for comparisions:
-echo ice_sbq_send_cmd > /sys/kernel/debug/tracing/set_ftrace_filter
-echo function_graph > /sys/kernel/debug/tracing/current_tracer
-cat /sys/kernel/debug/tracing/trace
+>+
+> /* Receive bytes in a buffer and check the return value.
+>+ *
+>+ * MSG_PEEK note: MSG_PEEK doesn't consume bytes from the buffer, so partial
+>+ * reads cannot be summed. Instead, the function retries until recv() returns
+>+ * exactly expected_ret bytes in a single call.
 
-Tested on:
-  - Intel E830 NIC (FW version 1.00)
-  - Kernel 6.19.0+
+I'd replace with something like this:
 
-Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
-Signed-off-by: Przemyslaw Korba <przemyslaw.korba@intel.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_common.c  | 18 ++++--
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c  | 64 ++++++++++++--------
- drivers/net/ethernet/intel/ice/ice_sbq_cmd.h |  5 +-
- 3 files changed, 53 insertions(+), 34 deletions(-)
+    * When MSG_PEEK is set, recv() is retried until it returns exactly
+    * expected_ret bytes. The function returns on error, EOF, or timeout
+    * as usual.
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index f84990996530..2cd3d6d450a9 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.c
-+++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -1777,23 +1777,29 @@ int ice_sbq_rw_reg(struct ice_hw *hw, struct ice_sbq_msg_input *in, u16 flags)
- 	msg.msg_addr_low = cpu_to_le16(in->msg_addr_low);
- 	msg.msg_addr_high = cpu_to_le32(in->msg_addr_high);
- 
--	if (in->opcode)
-+	switch (in->opcode) {
-+	case ice_sbq_msg_wr_p:
-+	case ice_sbq_msg_wr_np:
- 		msg.data = cpu_to_le32(in->data);
--	else
-+		break;
-+	case ice_sbq_msg_rd:
- 		/* data read comes back in completion, so shorten the struct by
- 		 * sizeof(msg.data)
- 		 */
- 		msg_len -= sizeof(msg.data);
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
- 
--	if (in->opcode == ice_sbq_msg_wr)
--		cd.posted = 1;
-+	cd.posted = in->opcode == ice_sbq_msg_wr_p;
- 
- 	desc.flags = cpu_to_le16(flags);
- 	desc.opcode = cpu_to_le16(ice_sbq_opc_neigh_dev_req);
- 	desc.param0.cmd_len = cpu_to_le16(msg_len);
- 	status = ice_sbq_send_cmd(hw, &desc, &msg, msg_len, &cd);
- 
--	if (!status && !in->opcode)
-+	if (!status && in->opcode == ice_sbq_msg_rd)
- 		in->data = le32_to_cpu
- 			(((struct ice_sbq_msg_cmpl *)&msg)->data);
- 	return status;
-@@ -6701,7 +6707,7 @@ int ice_write_cgu_reg(struct ice_hw *hw, u32 addr, u32 val)
- {
- 	struct ice_sbq_msg_input cgu_msg = {
- 		.dest_dev = ice_get_dest_cgu(hw),
--		.opcode = ice_sbq_msg_wr,
-+		.opcode = ice_sbq_msg_wr_np,
- 		.msg_addr_low = addr,
- 		.data = val
- 	};
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-index 690f9d874443..0f202d4dae7c 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-@@ -368,6 +368,16 @@ void ice_ptp_src_cmd(struct ice_hw *hw, enum ice_ptp_tmr_cmd cmd)
- static void ice_ptp_exec_tmr_cmd(struct ice_hw *hw)
- {
- 	struct ice_pf *pf = container_of(hw, struct ice_pf, hw);
-+	struct ice_sbq_msg_input msg = {
-+		.dest_dev = ice_sbq_dev_phy_0,
-+		.opcode = ice_sbq_msg_rd,
-+	};
-+	int err;
-+
-+	/* Flush SBQ by reading address 0 on PHY 0 */
-+	err = ice_sbq_rw_reg(hw, &msg, LIBIE_AQ_FLAG_RD);
-+	if (err)
-+		dev_warn(ice_hw_to_dev(hw), "Failed to flush SBQ: %d\n", err);
- 
- 	if (!ice_is_primary(hw))
- 		hw = ice_get_primary_hw(pf);
-@@ -433,7 +443,7 @@ static int ice_write_phy_eth56g(struct ice_hw *hw, u8 port, u32 addr, u32 val)
- {
- 	struct ice_sbq_msg_input msg = {
- 		.dest_dev = ice_ptp_get_dest_dev_e825(hw, port),
--		.opcode = ice_sbq_msg_wr,
-+		.opcode = ice_sbq_msg_wr_p,
- 		.msg_addr_low = lower_16_bits(addr),
- 		.msg_addr_high = upper_16_bits(addr),
- 		.data = val
-@@ -2358,11 +2368,12 @@ static bool ice_is_40b_phy_reg_e82x(u16 low_addr, u16 *high_addr)
- static int
- ice_read_phy_reg_e82x(struct ice_hw *hw, u8 port, u16 offset, u32 *val)
- {
--	struct ice_sbq_msg_input msg = {0};
-+	struct ice_sbq_msg_input msg = {
-+		.opcode = ice_sbq_msg_rd,
-+	};
- 	int err;
- 
- 	ice_fill_phy_msg_e82x(hw, &msg, port, offset);
--	msg.opcode = ice_sbq_msg_rd;
- 
- 	err = ice_sbq_rw_reg(hw, &msg, LIBIE_AQ_FLAG_RD);
- 	if (err) {
-@@ -2435,12 +2446,13 @@ ice_read_64b_phy_reg_e82x(struct ice_hw *hw, u8 port, u16 low_addr, u64 *val)
- static int
- ice_write_phy_reg_e82x(struct ice_hw *hw, u8 port, u16 offset, u32 val)
- {
--	struct ice_sbq_msg_input msg = {0};
-+	struct ice_sbq_msg_input msg = {
-+		.opcode = ice_sbq_msg_wr_p,
-+		.data = val
-+	};
- 	int err;
- 
- 	ice_fill_phy_msg_e82x(hw, &msg, port, offset);
--	msg.opcode = ice_sbq_msg_wr;
--	msg.data = val;
- 
- 	err = ice_sbq_rw_reg(hw, &msg, LIBIE_AQ_FLAG_RD);
- 	if (err) {
-@@ -2594,15 +2606,15 @@ static int ice_fill_quad_msg_e82x(struct ice_hw *hw,
- int
- ice_read_quad_reg_e82x(struct ice_hw *hw, u8 quad, u16 offset, u32 *val)
- {
--	struct ice_sbq_msg_input msg = {0};
-+	struct ice_sbq_msg_input msg = {
-+		.opcode = ice_sbq_msg_rd,
-+	};
- 	int err;
- 
- 	err = ice_fill_quad_msg_e82x(hw, &msg, quad, offset);
- 	if (err)
- 		return err;
- 
--	msg.opcode = ice_sbq_msg_rd;
--
- 	err = ice_sbq_rw_reg(hw, &msg, LIBIE_AQ_FLAG_RD);
- 	if (err) {
- 		ice_debug(hw, ICE_DBG_PTP, "Failed to send message to PHY, err %d\n",
-@@ -2628,16 +2640,16 @@ ice_read_quad_reg_e82x(struct ice_hw *hw, u8 quad, u16 offset, u32 *val)
- int
- ice_write_quad_reg_e82x(struct ice_hw *hw, u8 quad, u16 offset, u32 val)
- {
--	struct ice_sbq_msg_input msg = {0};
-+	struct ice_sbq_msg_input msg = {
-+		.opcode = ice_sbq_msg_wr_p,
-+		.data = val
-+	};
- 	int err;
- 
- 	err = ice_fill_quad_msg_e82x(hw, &msg, quad, offset);
- 	if (err)
- 		return err;
- 
--	msg.opcode = ice_sbq_msg_wr;
--	msg.data = val;
--
- 	err = ice_sbq_rw_reg(hw, &msg, LIBIE_AQ_FLAG_RD);
- 	if (err) {
- 		ice_debug(hw, ICE_DBG_PTP, "Failed to send message to PHY, err %d\n",
-@@ -4275,14 +4287,14 @@ static void ice_ptp_init_phy_e82x(struct ice_ptp_hw *ptp)
-  */
- static int ice_read_phy_reg_e810(struct ice_hw *hw, u32 addr, u32 *val)
- {
--	struct ice_sbq_msg_input msg = {0};
-+	struct ice_sbq_msg_input msg = {
-+		.dest_dev = ice_sbq_dev_phy_0,
-+		.opcode = ice_sbq_msg_rd,
-+		.msg_addr_low = lower_16_bits(addr),
-+		.msg_addr_high = upper_16_bits(addr),
-+	};
- 	int err;
- 
--	msg.msg_addr_low = lower_16_bits(addr);
--	msg.msg_addr_high = upper_16_bits(addr);
--	msg.opcode = ice_sbq_msg_rd;
--	msg.dest_dev = ice_sbq_dev_phy_0;
--
- 	err = ice_sbq_rw_reg(hw, &msg, LIBIE_AQ_FLAG_RD);
- 	if (err) {
- 		ice_debug(hw, ICE_DBG_PTP, "Failed to send message to PHY, err %d\n",
-@@ -4305,15 +4317,15 @@ static int ice_read_phy_reg_e810(struct ice_hw *hw, u32 addr, u32 *val)
-  */
- static int ice_write_phy_reg_e810(struct ice_hw *hw, u32 addr, u32 val)
- {
--	struct ice_sbq_msg_input msg = {0};
-+	struct ice_sbq_msg_input msg = {
-+		.dest_dev = ice_sbq_dev_phy_0,
-+		.opcode = ice_sbq_msg_wr_p,
-+		.msg_addr_low = lower_16_bits(addr),
-+		.msg_addr_high = upper_16_bits(addr),
-+		.data = val
-+	};
- 	int err;
- 
--	msg.msg_addr_low = lower_16_bits(addr);
--	msg.msg_addr_high = upper_16_bits(addr);
--	msg.opcode = ice_sbq_msg_wr;
--	msg.dest_dev = ice_sbq_dev_phy_0;
--	msg.data = val;
--
- 	err = ice_sbq_rw_reg(hw, &msg, LIBIE_AQ_FLAG_RD);
- 	if (err) {
- 		ice_debug(hw, ICE_DBG_PTP, "Failed to send message to PHY, err %d\n",
-diff --git a/drivers/net/ethernet/intel/ice/ice_sbq_cmd.h b/drivers/net/ethernet/intel/ice/ice_sbq_cmd.h
-index 21bb861febbf..86a143ebf089 100644
---- a/drivers/net/ethernet/intel/ice/ice_sbq_cmd.h
-+++ b/drivers/net/ethernet/intel/ice/ice_sbq_cmd.h
-@@ -54,8 +54,9 @@ enum ice_sbq_dev_id {
- };
- 
- enum ice_sbq_msg_opcode {
--	ice_sbq_msg_rd	= 0x00,
--	ice_sbq_msg_wr	= 0x01
-+	ice_sbq_msg_rd		= 0x00,
-+	ice_sbq_msg_wr_p	= 0x01,
-+	ice_sbq_msg_wr_np	= 0x02,
- };
- 
- #define ICE_SBQ_MSG_FLAGS	0x40
+Thanks,
+Stefano
 
-base-commit: 0851f49814a8899a9769619b50baaeef59f9ece4
--- 
-2.43.0
+>  *
+>  * expected_ret:
+>  *  <0 Negative errno (for testing errors)
+>@@ -403,6 +409,15 @@ void recv_buf(int fd, void *buf, size_t len, int flags, ssize_t expected_ret)
+> 		if (ret <= 0)
+> 			break;
+>
+>+		if (flags & MSG_PEEK) {
+>+			if (ret == expected_ret) {
+>+				nread = ret;
+>+				break;
+>+			}
+>+			timeout_usleep(RECV_PEEK_RETRY_USEC);
+>+			continue;
+>+		}
+>+
+> 		nread += ret;
+> 	} while (nread < len);
+> 	timeout_end();
+>diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
+>index 5bd20ccd9335..bdb0754965df 100644
+>--- a/tools/testing/vsock/vsock_test.c
+>+++ b/tools/testing/vsock/vsock_test.c
+>@@ -1500,18 +1500,7 @@ static void test_stream_credit_update_test(const struct test_opts *opts,
+> 	}
+>
+> 	/* Wait until there will be 128KB of data in rx queue. */
+>-	while (1) {
+>-		ssize_t res;
+>-
+>-		res = recv(fd, buf, buf_size, MSG_PEEK);
+>-		if (res == buf_size)
+>-			break;
+>-
+>-		if (res <= 0) {
+>-			fprintf(stderr, "unexpected 'recv()' return: %zi\n", res);
+>-			exit(EXIT_FAILURE);
+>-		}
+>-	}
+>+	recv_buf(fd, buf, buf_size, MSG_PEEK, buf_size);
+>
+> 	/* There is 128KB of data in the socket's rx queue, dequeue first
+> 	 * 64KB, credit update is sent if 'low_rx_bytes_test' == true.
+>
+>-- 
+>2.53.0
+>
 
 
