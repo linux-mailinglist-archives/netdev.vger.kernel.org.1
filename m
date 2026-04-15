@@ -1,185 +1,207 @@
-Return-Path: <netdev+bounces-278685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278686-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UC/cF5c432nAQQAAu9opvQ
-	(envelope-from <netdev+bounces-278685-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 09:04:55 +0200
+	id mFlLBHg832kLQwAAu9opvQ
+	(envelope-from <netdev+bounces-278686-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 09:21:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCFB7401322
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 09:04:54 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A16D401525
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 09:21:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 451B8302B972
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 07:04:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 10E8A30A6920
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 07:20:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A97A390217;
-	Wed, 15 Apr 2026 07:04:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F62A3A0B3F;
+	Wed, 15 Apr 2026 07:20:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="b5EMbtMU"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="G1i0Q2jh"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAFB6296BD2;
-	Wed, 15 Apr 2026 07:04:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F98D385527;
+	Wed, 15 Apr 2026 07:19:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776236692; cv=none; b=buYNYpzgzqp9XYLujlhaiSnd2sC1VamlrljJ5yVPlumg8LvaYzGH8FF5Js6YOi9EdsfEdJgB0rX3J+KR3byuwRiHwtGB0wEGPaLFlXKqmv6h0EGypO5F6dpkWmHanbrZi842UfcWUKgcJGSYDM82RZvGoD2DNrzzPAZudmbJgIA=
+	t=1776237600; cv=none; b=NL3ZfGFHqNBi9mm8QjwVZ2RC9sH05yeBd9KxiGCdCgJR0RVCGWb30o9MJkJnNvgAEMPeGqmGTzx73ZPlTtx5idMLwUXJWoqAPhZyhwN30kDYLCaip6TFtMuEmV1LQIKqy76cZoGnvahYVQxccGmqAcsT0dCaVy8AePXnMUCHblg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776236692; c=relaxed/simple;
-	bh=h6jbL43JVw2PgM6UEaVTDkIyCWLY9mHAPYeKqDJmxKA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Almop9NVVm43MHJeTe8xl9gDdrv+SF478mtCtyq3nnlVxakEh561LtjrqEJUtdcHJQEK5iOkA8YXkZG1EhZS1mY//h9pxp8luqi5jy1zwJd4W74DAwrgMzpq54uQ8ud0c/lpE1QJop76jujOjcEzOBBibf1D7oqVvcK+HV2MwYs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=b5EMbtMU; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1173)
-	id AEEC920B7128; Wed, 15 Apr 2026 00:04:51 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com AEEC920B7128
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1776236691;
-	bh=uYck4DdEmNbmUydY4pSIYMd6QIGrusKz3HcPwwEHtQo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=b5EMbtMUI8Yu04TUVItL6bkZwJoXrVDTA98VEYtnbMWlIjmg6Aa3uKyW2KP9BXMEi
-	 nDmLGQz4W2Z33vH45KeKmbFngabiHTgNnMBj6sfBgI0hq/csJf6rBVafqFU8pbmodS
-	 dMAEU6qZJaMLHTglrtVZNXNik0CepWX8sz36NROQ=
-Date: Wed, 15 Apr 2026 00:04:51 -0700
-From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-To: Simon Horman <horms@kernel.org>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, longli@microsoft.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, ssengar@linux.microsoft.com,
-	dipayanroy@linux.microsoft.com, gargaditya@linux.microsoft.com,
-	shirazsaleem@microsoft.com, kees@kernel.org,
-	kotaranov@microsoft.com, leon@kernel.org, shacharr@microsoft.com,
-	stephen@networkplumber.org, linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2 3/4] net: mana: Don't overwrite port probe error
- with add_adev result
-Message-ID: <ad84k4qaMd9wnYwd@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <20260413050843.605789-4-ernis@linux.microsoft.com>
- <20260414153503.769476-1-horms@kernel.org>
+	s=arc-20240116; t=1776237600; c=relaxed/simple;
+	bh=iL4qnyzYD0+HjPCZwNoVOf7kj2fFo/CQ5dfX0B7N0+o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bYvFcPhmCtqeEUo2QIO8w5x9THtKG965iTaqvfUbM73ts3JU6VmzjJiIYmK4ef6xwqhQMlYl1tE1f+HUq6IqkIiHT/vm2e/TdFwh4vSrrnnsSx80di97VopCwkoHwWH5fD5m4vLP63L+J4GGkE3boEF2mwNCsHPjk4AjN1ynz84=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=G1i0Q2jh; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id E63DDC59F5D;
+	Wed, 15 Apr 2026 07:20:33 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 7F9A760420;
+	Wed, 15 Apr 2026 07:19:56 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 0A4CE10451388;
+	Wed, 15 Apr 2026 09:19:46 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1776237595; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=RAWdFKvWHQ1+QstGKwxtv4g5iwHO+BNUcp9lPcgcG0Q=;
+	b=G1i0Q2jhuQ53aL/8i+69T+paXUk+sXyT65qxBI6DMReGMzguVK27jou24s3uCJr8SU86Xj
+	jxvkFoDq2iBdXHmr4hbTcbGBKbpMOcfiqBTxG330Q6gur0Ag02DYmKzyjLAYeHshRVKBBQ
+	xPAKZCUyuhBvUtDErzVbROvTEMpY/skyLVyOCIw5pHX0qzmjAVZeYnww9cLg7mglKTrztl
+	F0f2SsRFLjQv7bUPHM+1qX3hpClmctaYuh9mfmCRcgePMaOvCKQ0fLC4Q6R8x4Dt4z0IWg
+	g/bSLRCrJCSUshhs4m4Jwcsor21SFYiiHon0HXcOvWpF9MOgTEOTjCP5huVgLw==
+Message-ID: <e4f6503c-6514-46f1-bf4f-a38c12903c16@bootlin.com>
+Date: Wed, 15 Apr 2026 09:19:45 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260414153503.769476-1-horms@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v9 04/10] net: phy: Create SFP phy_port before
+ registering upstream
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: davem@davemloft.net, Jakub Kicinski <kuba@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Russell King <linux@armlinux.org.uk>, Heiner Kallweit
+ <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>,
+ =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
+ =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>,
+ Oleksij Rempel <o.rempel@pengutronix.de>,
+ =?UTF-8?Q?Nicol=C3=B2_Veronese?= <nicveronese@gmail.com>,
+ Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
+ Romain Gantois <romain.gantois@bootlin.com>,
+ Daniel Golle <daniel@makrotopia.org>,
+ Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+References: <20260403123755.175742-1-maxime.chevallier@bootlin.com>
+ <20260403123755.175742-5-maxime.chevallier@bootlin.com>
+ <2bdd6224-6acf-49db-955a-5552e64d4b73@lunn.ch>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <2bdd6224-6acf-49db-955a-5552e64d4b73@lunn.ch>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
-	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-278686-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278685-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,google.com,redhat.com,armlinux.org.uk,gmail.com,vger.kernel.org,bootlin.com,csgroup.eu,nxp.com,pengutronix.de,chromium.org,makrotopia.org,liebherr.com];
 	RCPT_COUNT_TWELVE(0.00)[23];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ernis@linux.microsoft.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.microsoft.com:+];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.microsoft.com:dkim,linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: CCFB7401322
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:dkim,bootlin.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 1A16D401525
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Apr 14, 2026 at 04:35:03PM +0100, Simon Horman wrote:
-> From: 'Simon Horman' <horms@kernel.org>
-> 
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
-> Full review at: https://sashiko.dev
-> ---
-> net: mana: Don't overwrite port probe error with add_adev result
-> 
-> This commit ensures that if mana_probe_port() or mana_attach() fails, the
-> error is not overwritten by the result of add_adev(). By preserving the
-> error, it triggers mana_remove() cleanup instead of leaving ports partially
-> initialized.
-> 
-> > diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-> > index 9d095a6fb56c7..4d42cbfb3f15b 100644
-> > --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-> > +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-> > @@ -3634,10 +3634,9 @@ int mana_probe(struct gdma_dev *gd, bool resuming)
-> >  	if (!resuming) {
-> >  		for (i = 0; i < ac->num_ports; i++) {
-> >  			err = mana_probe_port(ac, i, &ac->ports[i]);
-> > -			/* we log the port for which the probe failed and stop
-> > -			 * probes for subsequent ports.
-> > -			 * Note that we keep running ports, for which the probes
-> > -			 * were successful, unless add_adev fails too
-> > +			/* Log the port for which the probe failed, stop probing
-> > +			 * subsequent ports, and skip add_adev.
-> > +			 * Already-probed ports remain functional.
-> >  			 */
-> 
-> Are these comments accurate regarding ports remaining functional?
-> 
-> Since this patch preserves the error code, execution falls through to the end
-> of mana_probe() where it checks if err is set and calls mana_remove().
-> mana_remove() will iterate over the successfully allocated ports, completely
-> detach them, unregister their net_devices, and destroy event queues.
-> 
-> It appears no ports remain functional because the device is completely torn
-> down.
->
-I will update the patch with the updated comment message. 
-> [ ... ]
-> 
-> > @@ -3651,10 +3650,9 @@ int mana_probe(struct gdma_dev *gd, bool resuming)
-> >  			enable_work(&apc->queue_reset_work);
-> >  			err = mana_attach(ac->ports[i]);
-> >  			rtnl_unlock();
-> > -			/* we log the port for which the attach failed and stop
-> > -			 * attach for subsequent ports
-> > -			 * Note that we keep running ports, for which the attach
-> > -			 * were successful, unless add_adev fails too
-> > +			/* Log the port for which the attach failed, stop
-> > +			 * attaching subsequent ports, and skip add_adev.
-> > +			 * Already-attached ports remain functional.
-> >  			 */
-> >  			if (err) {
-> >  				dev_err(dev, "Attach Failed for port %d\n", i);
-> > @@ -3663,7 +3661,8 @@ int mana_probe(struct gdma_dev *gd, bool resuming)
-> 
-> Does propagating this error during PM resume introduce a NULL pointer
-> dereference?
-> 
-> If PM resume fails here (resuming == true), the preserved error code causes
-> mana_probe() to call mana_remove(), which tears down the device and sets
-> gd->gdma_context = NULL.
-> 
-> However, a failed resume callback does not automatically unbind the driver.
-> When the device is eventually unbound later, mana_remove() is invoked again:
-> 
-> drivers/net/ethernet/microsoft/mana/mana_en.c:mana_remove() {
->     struct gdma_context *gc = gd->gdma_context;
->     struct device *dev = gc->dev;
->     ...
-> }
-> 
-> In the second invocation, gd->gdma_context is NULL, meaning gc is NULL,
-> which could lead to a kernel panic when dereferencing gc->dev.
+Hi Andrew,
 
-Thankyou for pointing it out, Simon.
-Since this is a pre-existing bug, I will create a different patch for
-this change and make it as part of this patchset.
+On 15/04/2026 01:46, Andrew Lunn wrote:
+> On Fri, Apr 03, 2026 at 02:37:48PM +0200, Maxime Chevallier wrote:
+>> When dealing with PHY-driven SFP, we create a phy_port representing the
+>> SFP bus when we know we have such a bus.
+> 
+> I'm missing the big picture here.
+> 
+> Do we have three different things represented in the topology:
+> 
+> SFP bus-> SFP cage-> SFP module
+> 
+> 	Andrew
 
-- Vennela
+Ah by bad, this is a wording issue, this is the port for the cage indeed.
+
+The model I ended-up with is to represent the SFP cage itself as a PHY
+port, but I've been calling that the "sfp bus port" in the code so far :/
+
+Let me try to summarize the phy_port usage, especially with SFP :
+
+
+         phylink->sfp_bus_port (should be renamed sfp_cage_port)
+          vacant = true
+              |
+              v
++-----+   +----------+
+| MAC | - | SFP cage |
++-----+   +----------+
+
+
+           phylink->sfp_bus_port, vacant = false
+                |
+                |             phylink->mod_port
+                v                v
++-----+     +----------+     +------------+
+| MAC | --- | SFP cage | --- | SFP Module |
++-----+     +----------+     +------------+
+
+
+                    one of phydev->ports
+                           v
++-----+     +-----+     +------+
+| MAC | --- | PHY | --- | RJ45 |
++-----+     +-----+     +------+
+
+
+                      one of phydev->ports
+                             v
+                          +------+
++-----+     +-----+   /-- | RJ45 |
+| MAC | --- | PHY | -+    +------+
++-----+     |     | -+    +----------+
+            +-----+   \-- | SFP Cage |
+                          +----------+
+                             ^
+                      phydev->sfp_bus_port +
+                   is also in phydev->ports
+                     port->vacant = true
+
+
+                      one of phydev->ports
+                             v
+                          +------+
++-----+     +-----+   /-- | RJ45 |         phydev->mod_port
+| MAC | --- | PHY | -+    +------+              v
++-----+     |     | -+    +----------+     +------------+
+            +-----+   \-- | SFP Cage | --- | SFP Module |
+                          +----------+     +------------+
+                             ^
+                      phydev->sfp_bus_port +
+                   is also in phydev->ports
+                     port->vacant = false
+
+
+I should probably add that at least in the cover. Does it clarify the
+picture a little bit ?
+
+Thanks a lot for the reviews :)
+
+Maxime
 
