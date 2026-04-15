@@ -1,212 +1,127 @@
-Return-Path: <netdev+bounces-278812-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278813-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YIDQA5ij32miXAAAu9opvQ
-	(envelope-from <netdev+bounces-278812-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 16:41:28 +0200
+	id sBs1LM2j32miXAAAu9opvQ
+	(envelope-from <netdev+bounces-278813-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 16:42:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED8D34056C9
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 16:41:26 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C0084056E6
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 16:42:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 0A4DC300B9FB
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 14:41:26 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id A88C33004DAA
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 14:42:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60AEF3D3D1E;
-	Wed, 15 Apr 2026 14:41:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DDBA3D3D1E;
+	Wed, 15 Apr 2026 14:42:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="M27oVr6C"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="MA1oi+iP"
 X-Original-To: netdev@vger.kernel.org
-Received: from out162-62-57-252.mail.qq.com (out162-62-57-252.mail.qq.com [162.62.57.252])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE956345CC0;
-	Wed, 15 Apr 2026 14:41:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.252
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 891C13D5649;
+	Wed, 15 Apr 2026 14:42:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776264083; cv=none; b=g861w4p6f6Gln8L3AMu4GZXRQ8mvymRABek3XRYxWVMaiSA/4Mpu18vCTY+vVVmraEOHPf/vAI9Z4rjkmuSCH3YseTFJqHSpFh9DFQTK4kHIyjPtAU2GLblC5hAbs/p+kHBNBdb3tivmYQVHC2op5NMBXiHo3cdhmcjubS1SK14=
+	t=1776264136; cv=none; b=nXAKj1NweWW0PMKj6UZyLLSpFITdc3b32o7yKtGOPnG0nFhasB5ZJVICplLcyio891jki9DBrK5e2NKUgMHKQlx+Oz9pFQO+Yn95hoOlvE4xDSdhBiralquqzCsSuW+Uqmpqc/yPZwZ8OS2M0wqovl7ZgmddadPWI/FRj5KAzTw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776264083; c=relaxed/simple;
-	bh=NLdFmBcpcThoyIQcsmRJNRdMjiBLR4JkAP3J1LwUNLI=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=aUrqZFqb6ZPsHe0onVX+fpOrkO/h/ppBTkIL1lRXUIMIpLsM09p76cpRqd6VRSy95rWAWe7X0P1SvMQMb1quYTnUfFFIUAOM1Vl2/6aej+EmeOAb4fcSsOLHqSu7yGdL5wJyYAF9kijLhu5MFQWKLmRIV3HfbXr+QYW8p5WJMuc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=M27oVr6C; arc=none smtp.client-ip=162.62.57.252
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1776264070; bh=ccKpOWW8f06p267HUyKJnI4zbqOhJE6jpn/wLRRikCE=;
-	h=From:To:Cc:Subject:Date;
-	b=M27oVr6CBoNlysvkipCuzUimTEwpVug8SWmbz72HGcC1onmG7u8etub4oCDXgrOb0
-	 cPXuqARnNw9xjVwetIr7NLydT4mAqVfDcvLqilNqY8zojR9q94YPH2+3ClYnKUipQD
-	 eH+G0AvBcKypMxBLDI6Fp2kK5KjER3Z0kxpggKtE=
-Received: from Lego ([2409:8a1e:9553:b2d0:d44a:f28c:2e52:3bf6])
-	by newxmesmtplogicsvrszb51-0.qq.com (NewEsmtp) with SMTP
-	id A44AA2FE; Wed, 15 Apr 2026 22:41:04 +0800
-X-QQ-mid: xmsmtpt1776264064ts5m2jgd8
-Message-ID: <tencent_7F7B107ECA750C095D05C19C3B723AFFA60A@qq.com>
-X-QQ-XMAILINFO: NAuAIaytDrXpIaFOVq8MbWxJeDYlYBG7iDbjLUP6zeQpSH4AXQJW/jyXiHC//d
-	 2Ru48s7GIF7Sr3foIe7x32/NA2gp+B6zHnNHWOFyr9bXdz3+7QbqEqKa/xzUiLynD6Sey+fZxUFD
-	 D7beR6o/Kvxsowq0ZjXhjULVujUzPOb4AhC7jWFEvfswRNCEdbheepAD2/p63LDt2yWn0lRhGbMD
-	 cPHNEYMHgU1jBomBdOqpnFurmD/dsCT/nftrXNUymSjN8gO5GOZD4T6WS5NNCn6117WCQnAHQfCx
-	 x2L7Iy4ieinaRE4S8iH7BYv8HTdTCiR2H+kyp72jzmh1a+ZDd3oi+bfrBwvubfuJgs4tvDDCPWoE
-	 oly7SoJ/Z4CvZJV5YyBgvCFgzTGbQtw5OVHZVxsMpbfZc2LYmcuAIgcD5fH8n2PpKqKyuTGIrb5X
-	 fNxDunRcicX6CigjksoeXG1/F1jyV+1Z+78QGSVYaB9v7cmN2l/hy+tMZ5GsHaSUzW4Zax7zwnuw
-	 y4lNHJ/nuYox9r0JUeQDUusu31YJ3OzoAOwfYPaVLlMds2puvMreF+b/bpjDaYFSD01UzWVRZIPe
-	 DShIo3FjDlmdUmkaCrLiJ2YkDK4CHhkQ9v0QemF+TLh+oQHd5eLzvcNRwJ3FKr29ReCXGPDZufn5
-	 MNq1tFCJiKR6Epi1ww04Mi3ZnbmwMl91UIff2ABLmGqLWUxSj6HUHZBB+43RwVP1/z1DQBkEHXYx
-	 qVQvsBnSpqGQnWIg4keBn7Pao7yw2VDxX0w8ARinj6AUhRPxba9v8bKrYRkunGoRCR77CHRHjygU
-	 cNtYCLZGu7kw9Lq++QjxyzVvTEWAqdm3Jv0M0taw/0s4TMiRL/CUAweeJ2qD8wetY4uJATKsc9Va
-	 LjZ3LQVtyKax5S375gqi//sjcoxmF4CSYOqhHAUj7H9+PU0z68OSsfgZQCCW6DXa1MfJicgvTyoA
-	 C+v82iTBHHmq4yGMGGdSU4tKXtFrHj8VufsllNGc5TmC3I87xzEO0pvh48+odjEYMJiuyMwCAixG
-	 ndy4C3uiuNX/xMurzceEmDXp9hEnPYVp5t3c2pb7nM5Boz8UVm
-X-QQ-XMRINFO: MPJ6Tf5t3I/ylTmHUqvI8+Wpn+Gzalws3A==
-From: Yingnan Zhang <342144303@qq.com>
-To: ja@ssi.bg,
-	pablo@netfilter.org
-Cc: coreteam@netfilter.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	fw@strlen.de,
-	horms@verge.net.au,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	lvs-devel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	netfilter-devel@vger.kernel.org,
-	pabeni@redhat.com,
-	phil@nwl.cc,
-	Yingnan Zhang <342144303@qq.com>
-Subject: [PATCH net v4] ipvs: fix MTU check for GSO packets in tunnel mode
-Date: Wed, 15 Apr 2026 22:40:29 +0800
-X-OQ-MSGID: <20260415144030.531-1-342144303@qq.com>
-X-Mailer: git-send-email 2.51.0.windows.1
+	s=arc-20240116; t=1776264136; c=relaxed/simple;
+	bh=r6howsbtoIvDVeoqDUVWjHDsH+PgHplJ1VmgD9lgJ4s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=u01BaQRPs+vCUwWGpo1FiLaaTNY0IijOsgehNxB/VQhNW8AjwQWXIas4ZC2jMqAddkcncg863hE/EHxIN48/lXYQOE3XKMCdkDiluGKJHx4Z52aoWIkzit+wvSOaOqI3zljy/0PvrgSLWoV5IRft/P9srr3oa0LH+6dOmahg93o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=MA1oi+iP; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=GafeSQPMXfCPOHMEQWCEWif9iKPy7e3G+fkpH6sE1o8=; b=MA1oi+iPiPoFa5iA8TQe7EpEM+
+	pDHAUb1FoGKvLsgjp/fEuqLDo26YR5tsQyfxQBCZnLEIj22zNZqhcGLF7kPazTnOl7NZy5/KVqLi+
+	gb2AOoGQQYF8SqxPpYhSrv9tKNBep1Od01Wxro4q1q05Hz2xuMe1Vnu0xTixCXiPYPgA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wD1RK-00GBLD-7S; Wed, 15 Apr 2026 16:42:02 +0200
+Date: Wed, 15 Apr 2026 16:42:02 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Minda Chen <minda.chen@starfivetech.com>
+Cc: Frank <Frank.Sae@motor-comm.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [net-next v1 2/3] net: motorcomm: phy: set drive strength in
+ 8531s RGMII case
+Message-ID: <26068310-a27b-4bd1-ad4c-3d1f3df6f558@lunn.ch>
+References: <20260415092654.64907-1-minda.chen@starfivetech.com>
+ <20260415092654.64907-3-minda.chen@starfivetech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260415092654.64907-3-minda.chen@starfivetech.com>
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[qq.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[qq.com:s=s201512];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[qq.com];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278812-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FREEMAIL_CC(0.00)[netfilter.org,davemloft.net,google.com,strlen.de,verge.net.au,kernel.org,vger.kernel.org,redhat.com,nwl.cc,qq.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[342144303@qq.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[motor-comm.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-278813-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[qq.com:+];
-	NEURAL_HAM(-0.00)[-0.997];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.998];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[qq.com:email,qq.com:dkim,qq.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: ED8D34056C9
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:dkim,lunn.ch:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,starfivetech.com:email]
+X-Rspamd-Queue-Id: 9C0084056E6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Currently, IPVS skips MTU checks for GSO packets by excluding them with
-the !skb_is_gso(skb) condition. This creates problems when IPVS tunnel
-mode encapsulates GSO packets with IPIP headers.
+On Wed, Apr 15, 2026 at 05:26:53PM +0800, Minda Chen wrote:
+> Set RXD and RX CLK pin drive strength while in 8531s RGMII
+> case.
+> 
+> Signed-off-by: Minda Chen <minda.chen@starfivetech.com>
+> ---
+>  drivers/net/phy/motorcomm.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/drivers/net/phy/motorcomm.c b/drivers/net/phy/motorcomm.c
+> index 35aff1519b4b..f3129419f7c9 100644
+> --- a/drivers/net/phy/motorcomm.c
+> +++ b/drivers/net/phy/motorcomm.c
+> @@ -1714,6 +1714,11 @@ static int yt8521_config_init(struct phy_device *phydev)
+>  		if (ret < 0)
+>  			goto err_restore_page;
+>  	}
+> +
+> +	if (phydev->drv->phy_id == PHY_ID_YT8531S &&
+> +	    phydev->interface != PHY_INTERFACE_MODE_SGMII)
+> +		ret = yt8531_set_ds(phydev, true);
 
-The issue manifests in two ways:
-
-1. MTU violation after encapsulation:
-   When a GSO packet passes through IPVS tunnel mode, the original MTU
-   check is bypassed. After adding the IPIP tunnel header, the packet
-   size may exceed the outgoing interface MTU, leading to unexpected
-   fragmentation at the IP layer.
-
-2. Fragmentation with problematic IP IDs:
-   When net.ipv4.vs.pmtu_disc=1 and a GSO packet with multiple segments
-   is fragmented after encapsulation, each segment gets a sequentially
-   incremented IP ID (0, 1, 2, ...). This happens because:
-
-   a) The GSO packet bypasses MTU check and gets encapsulated
-   b) At __ip_finish_output, the oversized GSO packet is split into
-      separate SKBs (one per segment), with IP IDs incrementing
-   c) Each SKB is then fragmented again based on the actual MTU
-
-   This sequential IP ID allocation differs from the expected behavior
-   and can cause issues with fragment reassembly and packet tracking.
-
-Fix this by properly validating GSO packets using
-skb_gso_validate_network_len(). This function correctly validates
-whether the GSO segments will fit within the MTU after segmentation. If
-validation fails, send an ICMP Fragmentation Needed message to enable
-proper PMTU discovery.
-
-Fixes: 4cdd34084d53 ("netfilter: nf_conntrack_ipv6: improve fragmentation handling")
-Signed-off-by: Yingnan Zhang <342144303@qq.com>
-
----
-v4:
-- Introduce a new helper function ip_vs_exceeds_mtu() to improve readability (reviewer feedback)
-
-v3: https://lore.kernel.org/netdev/tencent_73010FBD5FA1C05C3BC23A07A50B11CEC90A@qq.com/
-v2: https://lore.kernel.org/netdev/tencent_CA2C1C219C99D315086BE55E8654AF7E6009@qq.com/
-v1: https://lore.kernel.org/netdev/tencent_4A3E1C339C75D359093BE4F08648AFAA6009@qq.com/
----
----
- net/netfilter/ipvs/ip_vs_xmit.c | 16 ++++++++++++++--
- 1 file changed, 14 insertions(+), 2 deletions(-)
-
-diff --git a/net/netfilter/ipvs/ip_vs_xmit.c b/net/netfilter/ipvs/ip_vs_xmit.c
-index 0fb5162992e5..64dfdf8b00c4 100644
---- a/net/netfilter/ipvs/ip_vs_xmit.c
-+++ b/net/netfilter/ipvs/ip_vs_xmit.c
-@@ -102,6 +102,18 @@ __ip_vs_dst_check(struct ip_vs_dest *dest)
- 	return dest_dst;
- }
- 
-+/* Based on ip_exceeds_mtu(). */
-+static bool ip_vs_exceeds_mtu(const struct sk_buff *skb, unsigned int mtu)
-+{
-+	if (skb->len <= mtu)
-+		return false;
-+
-+	if (skb_is_gso(skb) && skb_gso_validate_network_len(skb, mtu))
-+		return false;
-+
-+	return true;
-+}
-+
- static inline bool
- __mtu_check_toobig_v6(const struct sk_buff *skb, u32 mtu)
- {
-@@ -112,7 +124,7 @@ __mtu_check_toobig_v6(const struct sk_buff *skb, u32 mtu)
- 		if (IP6CB(skb)->frag_max_size > mtu)
- 			return true; /* largest fragment violate MTU */
- 	}
--	else if (skb->len > mtu && !skb_is_gso(skb)) {
-+	else if (ip_vs_exceeds_mtu(skb, mtu)) {
- 		return true; /* Packet size violate MTU size */
- 	}
- 	return false;
-@@ -232,7 +244,7 @@ static inline bool ensure_mtu_is_adequate(struct netns_ipvs *ipvs, int skb_af,
- 			return true;
- 
- 		if (unlikely(ip_hdr(skb)->frag_off & htons(IP_DF) &&
--			     skb->len > mtu && !skb_is_gso(skb) &&
-+			     ip_vs_exceeds_mtu(skb, mtu) &&
- 			     !ip_vs_iph_icmp(ipvsh))) {
- 			icmp_send(skb, ICMP_DEST_UNREACH, ICMP_FRAG_NEEDED,
- 				  htonl(mtu));
--- 
-2.51.0.windows.1
+phy_interface_is_rgmii().
 
 
