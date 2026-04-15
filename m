@@ -1,268 +1,594 @@
-Return-Path: <netdev+bounces-278878-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278879-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gBHaESoU4GmPcQAAu9opvQ
-	(envelope-from <netdev+bounces-278878-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 00:41:46 +0200
+	id kM9jMvQa4Gm3cgAAu9opvQ
+	(envelope-from <netdev+bounces-278879-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 01:10:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0507408C0E
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 00:41:45 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 281FB408CC3
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 01:10:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5009630A7CBC
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 22:41:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4DB2A302EEE6
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 23:10:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F8BE279334;
-	Wed, 15 Apr 2026 22:41:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9C5238E100;
+	Wed, 15 Apr 2026 23:10:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b="EruTwyD2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f68.google.com (mail-wm1-f68.google.com [209.85.128.68])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx.nabladev.com (mx.nabladev.com [178.251.229.89])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EF8C3191D6
-	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 22:41:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 516D235C1A6;
+	Wed, 15 Apr 2026 23:10:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.251.229.89
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776292902; cv=none; b=Q9Rw3aqgg77rtLo9u+2WljFJseyvkccZi6jOe8z0WPXFh3LkAOTHzLsV1JONYrVwyJAdi+ommoe8z3q1tdTUj5wRpk9CZEzvifU/RrHMTjiENXr/ONmxXuiZlDtECZlr5BIzSbL9KaCNVg/1hmHoUY6o9W2PAhER9mqJaagXGCY=
+	t=1776294639; cv=none; b=Hv3NKHsJVPcf8cg78DaT0Wn9DY+FoAP9FvCLXndmH+1EAWPiiIbTHKXST2iMW4wBL08SuEs9sdI62v7rvRIP23v5wW3eNw2ZJpmJRzVB8b+zGEXyNLoILVjMatV8JjOTscxaz/1ljAFoI2IuGVtdVIs07QS2TeURgDQgC2tKEuw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776292902; c=relaxed/simple;
-	bh=Z4N8cTZJBDQmkP5CXP1jeTxG+4D9+qjs4UoRMOFY6XY=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=cL0Lp761KprvNOc+xsY4VSPi++HYCeLtWsXppT5IfiuIXaJ7LjuSkpSRXB6WdUMZNJ3bdTY+U7Cc9Vp37I/Ji3XtvHKrbjgmuitMvCb0YvyYhYoPHKfcZefVREqEI3CX3Lv1MvhymrYTVXCPpLgFFJfYGgUgcmGbL/fdtjZv/50=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f68.google.com with SMTP id 5b1f17b1804b1-488b3f8fa2bso471585e9.1
-        for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 15:41:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776292899; x=1776897699;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:to:subject:cc:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pIWwLJ/z71SMElCeVQxzvoG2kHlTfG0aEyp1Q0/iHKI=;
-        b=XFBtteuI8OCjv5qpHvAc8ngazMlen6eaSv/ysf9MktXtheUKs4ptYGCcUtg/PxEDff
-         oz1KcRUgLtcy5qE1Y+iycLiWpzmMBzZ+5xtEcGvUFMv+JQPNahkOlwC0fS5Xgtlgyo5z
-         rP3vIIs/mk92n36Rdu91Q3W+JnQ/W6VjHQ3P+IiZbJ36743xOJctpm7oLBYAIMQn69Ip
-         l3q+SFcIObZQAEPpCNGs2+iUC8wJf8KaWhpFgNqqyQ3TV3iPUOVnhsswWineqtT5xnNb
-         8UOf5C3XXBea1UBjdI2CIRTEQlvSCGeTVx7YEYDVBjiZPtpso1CAoSKP193FVPkTIs/u
-         Ze3A==
-X-Forwarded-Encrypted: i=1; AFNElJ+qXDDsX9XUWdCHTEcVHjp9S0xMzzWDFeTamoIWsp5CGIeITNEEh4FyC/fXu1Rgn7UxYjTxbn0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzicpLG6jGTc1UIMDFgvyfME3G6UpS9Fv/rKoX1H9YSBKlWdVub
-	GObQj3vNHTHYQHpmcxwAWEQT+MgbpwJ5mZcYhZLONAfdIbe/+W9HZ2Es
-X-Gm-Gg: AeBDievT6Df+MyyD/cYri6Y2LY8P1HDu8BTL26JE0/9KBLCo23yC+8Ub9LRCeEN8Aam
-	M9DkWsqWB7UxOCHY8VHM36qE31Q7NAAh2+QV3uQP93rEMYn6qXv32BlDt8X81MQS6DWRrlecC5z
-	gBLYez0+W+ovfGUO4+NEYQ9Dg6rmavVKbzpXP3AbuIiqH/HTBS41Hh1yAAyUcu1UKp0XXu2sarA
-	131yDufQCYybnX8UybI7MhQ/bFzgXc1NPY4bg+Pnm46VALoorfG4xXN1/Sk6YMKTJT7YBt9k6Bv
-	BRPTDF/NvhZR7bYBpida/SOqRyn7B469PSUhhCasfUutqwm34OXoHTat4ZdD6pMZro9G/nQrsXQ
-	W6Kb7+5SHYkWmHfb50q+ve873jLcj3GRFyR3JXfxQwvGVWpG16sv2Hn98P2awi40BLiPKe1wF1s
-	/CwkZykGBsmH3DO2qxxQoCUwtTuF5du7XUtgPtETR211FBJcjTEC0ILyk=
-X-Received: by 2002:a05:600c:1e28:b0:488:9c3b:ff40 with SMTP id 5b1f17b1804b1-488f4829bc6mr14356225e9.15.1776292898554;
-        Wed, 15 Apr 2026 15:41:38 -0700 (PDT)
-Received: from [192.168.88.241] (89-24-32-159.nat.epc.tmcz.cz. [89.24.32.159])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488f5827145sm4184545e9.13.2026.04.15.15.41.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Apr 2026 15:41:38 -0700 (PDT)
-Message-ID: <eb2f03bf-302e-4fb6-8735-3194703505be@ovn.org>
-Date: Thu, 16 Apr 2026 00:41:36 +0200
+	s=arc-20240116; t=1776294639; c=relaxed/simple;
+	bh=AlcPb/IiUz+l4mWn0jIT2RN8LTORnvw3af0zvHpU+pM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=V+S/Shqlrb6FaEPV5KzfJ+r/BHLhzPceB5faOYF7VPWFr0aCfyEukPyUKVkEP2fcEx3rPYRFTvXCQzI+p9E8wAy5hLQ/6g2X4fTeFrXRYmdXdVC9BGbwDeetu/s1C6iRqrCjGqwSXlbqVwQwob1EBwATFLdD4ysJAdSARuCT5g0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com; spf=pass smtp.mailfrom=nabladev.com; dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b=EruTwyD2; arc=none smtp.client-ip=178.251.229.89
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nabladev.com
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id A602411255C;
+	Thu, 16 Apr 2026 01:10:25 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nabladev.com;
+	s=dkim; t=1776294628; h=from:subject:date:message-id:to:cc:mime-version:
+	 content-transfer-encoding; bh=KW8JcqusDQNetRb41SmbQHwm9O0GIKHTKKBJVba3FIg=;
+	b=EruTwyD27UiAEmrCfvs9d4lUegYByV4bd7a9n6uQtvJPmollYD1vjjQ4myoQCFJ+UFWEcd
+	rFcJUih+7UlA/1+DqO6IVVnx7BHCL3FgJRr6bpys1mQLNkYbTWbixO+h8TB26yoelv51eC
+	QIhSHduJUl6rL4CtMpzYJftsJMizLA9xRaEaU51UEmGSr3LyqjLDIO/UgfQdpxkTOCPnSH
+	6aUMPIs7zWOt/lj9dM/YsF0mpCZy6yipccdwamgTNKSRPTc0N2zPC6aHVdle6LWk/GlCOg
+	JnQtdaI1NQ+ZomYv1KYAjHfhkkkMts1WK5FehoyVwg9tG7NPLyn/k79HXaTKJQ==
+From: Marek Vasut <marex@nabladev.com>
+To: netdev@vger.kernel.org
+Cc: Marek Vasut <marex@nabladev.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	stable@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Nicolai Buchwitz <nb@tipi-net.de>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Ronald Wahl <ronald.wahl@raritan.com>,
+	Yicong Hui <yiconghui@gmail.com>,
+	linux-kernel@vger.kernel.org
+Subject: [net,PATCH v4 1/2] net: ks8851: Reinstate disabling of BHs around IRQ handler
+Date: Thu, 16 Apr 2026 01:09:44 +0200
+Message-ID: <20260415231020.455298-1-marex@nabladev.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: i.maximets@ovn.org, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org, dev@openvswitch.org, Xiang Mei <xmei5@asu.edu>
-Subject: Re: [PATCH net v4] openvswitch: cap upcall PID array size and
- pre-size vport replies
-To: Weiming Shi <bestswngs@gmail.com>, Aaron Conole <aconole@redhat.com>,
- Eelco Chaudron <echaudro@redhat.com>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-References: <20260415125121.110874-2-bestswngs@gmail.com>
-Content-Language: en-US
-From: Ilya Maximets <i.maximets@ovn.org>
-Autocrypt: addr=i.maximets@ovn.org; keydata=
- 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
-In-Reply-To: <20260415125121.110874-2-bestswngs@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-1.46 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nabladev.com,reject];
+	R_DKIM_ALLOW(-0.20)[nabladev.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278878-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-278879-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,redhat.com,davemloft.net,google.com,kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[ovn.org];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FREEMAIL_CC(0.00)[nabladev.com,linutronix.de,vger.kernel.org,davemloft.net,lunn.ch,google.com,kernel.org,tipi-net.de,redhat.com,raritan.com,gmail.com];
+	DKIM_TRACE(0.00)[nabladev.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[marex@nabladev.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.978];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[i.maximets@ovn.org,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	MID_RHS_MATCH_FROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,ovn.org:mid]
-X-Rspamd-Queue-Id: B0507408C0E
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linutronix.de:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nabladev.com:email,nabladev.com:dkim,nabladev.com:mid,davemloft.net:email,raritan.com:email]
+X-Rspamd-Queue-Id: 281FB408CC3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 4/15/26 2:51 PM, Weiming Shi wrote:
-> The vport netlink reply helpers allocate a fixed-size skb with
-> nlmsg_new(NLMSG_DEFAULT_SIZE, ...) but serialize the full upcall PID
-> array via ovs_vport_get_upcall_portids().  Since
-> ovs_vport_set_upcall_portids() accepts any non-zero multiple of
-> sizeof(u32) with no upper bound, a CAP_NET_ADMIN user can install a PID
-> array large enough to overflow the reply buffer, causing nla_put() to
-> fail with -EMSGSIZE and hitting BUG_ON(err < 0).  On systems with
-> unprivileged user namespaces enabled (e.g., Ubuntu default), this is
-> reachable via unshare -Urn since OVS vport mutation operations use
-> GENL_UNS_ADMIN_PERM.
-> 
->  kernel BUG at net/openvswitch/datapath.c:2414!
->  Oops: invalid opcode: 0000 [#1] SMP KASAN NOPTI
->  CPU: 1 UID: 0 PID: 65 Comm: poc Not tainted 7.0.0-rc7-00195-geb216e422044 #1
->  RIP: 0010:ovs_vport_cmd_set+0x34c/0x400
->  Call Trace:
->   <TASK>
->   genl_family_rcv_msg_doit (net/netlink/genetlink.c:1116)
->   genl_rcv_msg (net/netlink/genetlink.c:1194)
->   netlink_rcv_skb (net/netlink/af_netlink.c:2550)
->   genl_rcv (net/netlink/genetlink.c:1219)
->   netlink_unicast (net/netlink/af_netlink.c:1344)
->   netlink_sendmsg (net/netlink/af_netlink.c:1894)
->   __sys_sendto (net/socket.c:2206)
->   __x64_sys_sendto (net/socket.c:2209)
->   do_syscall_64 (arch/x86/entry/syscall_64.c:63)
->   entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
->   </TASK>
->  Kernel panic - not syncing: Fatal exception
-> 
-> Reject attempts to set more PIDs than nr_cpu_ids in
-> ovs_vport_set_upcall_portids(), and pre-compute the worst-case reply
-> size in ovs_vport_cmd_msg_size() based on that bound, similar to the
-> existing ovs_dp_cmd_msg_size().  nr_cpu_ids matches the cap already
-> used by the per-CPU dispatch configuration on the datapath side
-> (ovs_dp_cmd_fill_info() serialises at most nr_cpu_ids PIDs), so the
-> two sides stay consistent.
-> 
-> Fixes: 5cd667b0a456 ("openvswitch: Allow each vport to have an array of 'port_id's.")
-> Reported-by: Xiang Mei <xmei5@asu.edu>
-> Signed-off-by: Weiming Shi <bestswngs@gmail.com>
-> ---
-> v4 (per Ilya):
-> - Use nr_cpu_ids instead of num_possible_cpus() for consistency with
->   the per-CPU dispatch on the datapath side.
-> - Annotate ovs_vport_cmd_msg_size() per-attribute; split nested sums.
-> v3: Cap at num_possible_cpus(); add ovs_vport_cmd_msg_size(); keep
->     BUG_ON(); fix Fixes tag.
-> v2: Dynamically size reply skb; drop WARN_ON_ONCE, return plain errors.
+If the driver executes ks8851_irq() AND a TX packet has been sent, then
+the driver enables TX queue via netif_wake_queue() which schedules TX
+softirq to queue packets for this device.
 
-Please, don't re-name the patch for every version if there are no changes
-that actually invalidate the name.  It was definitely not necessary in the
-past few versions of this patch.  Could've even kept the original name
-from v1, it was fine.  But please, keep the current v4 name in v5.
+If CONFIG_PREEMPT_RT=y is set AND a packet has also been received by
+the MAC, then ks8851_rx_pkts() calls netdev_alloc_skb_ip_align() to
+allocate SKBs for the received packets. If netdev_alloc_skb_ip_align()
+is called with BH enabled, then local_bh_enable() at the end of
+netdev_alloc_skb_ip_align() will trigger the pending softirq processing,
+which may ultimately call the .xmit callback ks8851_start_xmit_par().
+The ks8851_start_xmit_par() will try to lock struct ks8851_net_par
+.lock spinlock, which is already locked by ks8851_irq() from which
+ks8851_start_xmit_par() was called. This leads to a deadlock, which
+is reported by the kernel, including a trace listed below.
 
-These renames are messing up version tracking.  Also, please, add lore links
-into the changelog for previous versions, especially if you're renaming the
-patch, so reviewers can find the older versions.
+If CONFIG_PREEMPT_RT is not set, then since commit 0913ec336a6c0
+("net: ks8851: Fix deadlock with the SPI chip variant") the deadlock
+can also be triggered without received packet in the RX FIFO. The
+pending softirqs will be processed on return from
+spin_unlock_bh(&ks->statelock) in ks8851_irq(), which triggers the
+deadlock as well.
 
-In case you're using AI to help with these patches (which would explain the
-constant renaming), you should disclose that by adding an Assisted-by tag:
-  https://docs.kernel.org/process/coding-assistants.html#attribution
+Fix the problem by disabling BH around critical sections, including the
+IRQ handler, thus preventing the net_tx_action() softirq from triggering
+during these critical sections. The net_tx_action() softirq is triggered
+once BH are re-enabled and at the end of the IRQ handler, once all the
+other IRQ handler actions have been completed.
 
-> ---
->  net/openvswitch/datapath.c | 33 +++++++++++++++++++++++++++++++--
->  net/openvswitch/vport.c    |  3 +++
->  2 files changed, 34 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/openvswitch/datapath.c b/net/openvswitch/datapath.c
-> index e209099218b4..35e67e51b0d2 100644
-> --- a/net/openvswitch/datapath.c
-> +++ b/net/openvswitch/datapath.c
-> @@ -2184,9 +2184,38 @@ static int ovs_vport_cmd_fill_info(struct vport *vport, struct sk_buff *skb,
->  	return err;
->  }
->  
-> +static size_t ovs_vport_cmd_msg_size(void)
-> +{
-> +	size_t msgsize = NLMSG_ALIGN(sizeof(struct ovs_header));
-> +
-> +	msgsize += nla_total_size(sizeof(u32)); /* OVS_VPORT_ATTR_PORT_NO */
-> +	msgsize += nla_total_size(sizeof(u32)); /* OVS_VPORT_ATTR_TYPE */
-> +	msgsize += nla_total_size(IFNAMSIZ);    /* OVS_VPORT_ATTR_NAME */
-> +	msgsize += nla_total_size(sizeof(u32)); /* OVS_VPORT_ATTR_IFINDEX */
-> +	msgsize += nla_total_size(sizeof(s32)); /* OVS_VPORT_ATTR_NETNSID */
+ __schedule from schedule_rtlock+0x1c/0x34
+ schedule_rtlock from rtlock_slowlock_locked+0x548/0x904
+ rtlock_slowlock_locked from rt_spin_lock+0x60/0x9c
+ rt_spin_lock from ks8851_start_xmit_par+0x74/0x1a8
+ ks8851_start_xmit_par from netdev_start_xmit+0x20/0x44
+ netdev_start_xmit from dev_hard_start_xmit+0xd0/0x188
+ dev_hard_start_xmit from sch_direct_xmit+0xb8/0x25c
+ sch_direct_xmit from __qdisc_run+0x1f8/0x4ec
+ __qdisc_run from qdisc_run+0x1c/0x28
+ qdisc_run from net_tx_action+0x1f0/0x268
+ net_tx_action from handle_softirqs+0x1a4/0x270
+ handle_softirqs from __local_bh_enable_ip+0xcc/0xe0
+ __local_bh_enable_ip from __alloc_skb+0xd8/0x128
+ __alloc_skb from __netdev_alloc_skb+0x3c/0x19c
+ __netdev_alloc_skb from ks8851_irq+0x388/0x4d4
+ ks8851_irq from irq_thread_fn+0x24/0x64
+ irq_thread_fn from irq_thread+0x178/0x28c
+ irq_thread from kthread+0x12c/0x138
+ kthread from ret_from_fork+0x14/0x28
 
-Add an empty line here, it's hard to read when comments are sandwiched
-between the code.  Same for all the blocks below (empty line before the
-comment line).
+Reviewed-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Fixes: e0863634bf9f ("net: ks8851: Queue RX packets in IRQ handler instead of disabling BHs")
+Cc: stable@vger.kernel.org
+Signed-off-by: Marek Vasut <marex@nabladev.com>
+---
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Nicolai Buchwitz <nb@tipi-net.de>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Ronald Wahl <ronald.wahl@raritan.com>
+Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: Yicong Hui <yiconghui@gmail.com>
+Cc: linux-kernel@vger.kernel.org
+Cc: netdev@vger.kernel.org
+---
+V2: Register dedicated IRQ handler wrapper which disables BH for the
+    parallel variant of the MAC, the variant which uses spinlocks as
+    the locking primitive. Use stock IRQ handler with BH unchanged
+    for the SPI variant, which uses mutexes as locking primitive.
+V3: Switch to spin_lock_bh(), update commit message
+V4: Extend the commit message
+    Add RB from Sebastian
+---
+ drivers/net/ethernet/micrel/ks8851.h        |  6 +-
+ drivers/net/ethernet/micrel/ks8851_common.c | 64 +++++++++------------
+ drivers/net/ethernet/micrel/ks8851_par.c    | 15 ++---
+ drivers/net/ethernet/micrel/ks8851_spi.c    | 11 ++--
+ 4 files changed, 38 insertions(+), 58 deletions(-)
 
-> +	/* OVS_VPORT_ATTR_STATS */
-> +	msgsize += nla_total_size_64bit(sizeof(struct ovs_vport_stats));
-> +	/* OVS_VPORT_ATTR_UPCALL_STATS(OVS_VPORT_UPCALL_ATTR_SUCCESS +
-> +	 *                             OVS_VPORT_UPCALL_ATTR_FAIL)
-> +	 */
-> +	msgsize += nla_total_size(nla_total_size_64bit(sizeof(u64)) +
-> +				  nla_total_size_64bit(sizeof(u64)));
-> +	/* OVS_VPORT_ATTR_UPCALL_PID (capped at nr_cpu_ids by
-> +	 * ovs_vport_set_upcall_portids())
+diff --git a/drivers/net/ethernet/micrel/ks8851.h b/drivers/net/ethernet/micrel/ks8851.h
+index 31f75b4a67fd7..b795a3a605711 100644
+--- a/drivers/net/ethernet/micrel/ks8851.h
++++ b/drivers/net/ethernet/micrel/ks8851.h
+@@ -408,10 +408,8 @@ struct ks8851_net {
+ 	struct gpio_desc	*gpio;
+ 	struct mii_bus		*mii_bus;
+ 
+-	void			(*lock)(struct ks8851_net *ks,
+-					unsigned long *flags);
+-	void			(*unlock)(struct ks8851_net *ks,
+-					  unsigned long *flags);
++	void			(*lock)(struct ks8851_net *ks);
++	void			(*unlock)(struct ks8851_net *ks);
+ 	unsigned int		(*rdreg16)(struct ks8851_net *ks,
+ 					   unsigned int reg);
+ 	void			(*wrreg16)(struct ks8851_net *ks,
+diff --git a/drivers/net/ethernet/micrel/ks8851_common.c b/drivers/net/ethernet/micrel/ks8851_common.c
+index 8048770958d60..6c375647b24de 100644
+--- a/drivers/net/ethernet/micrel/ks8851_common.c
++++ b/drivers/net/ethernet/micrel/ks8851_common.c
+@@ -28,25 +28,23 @@
+ /**
+  * ks8851_lock - register access lock
+  * @ks: The chip state
+- * @flags: Spinlock flags
+  *
+  * Claim chip register access lock
+  */
+-static void ks8851_lock(struct ks8851_net *ks, unsigned long *flags)
++static void ks8851_lock(struct ks8851_net *ks)
+ {
+-	ks->lock(ks, flags);
++	ks->lock(ks);
+ }
+ 
+ /**
+  * ks8851_unlock - register access unlock
+  * @ks: The chip state
+- * @flags: Spinlock flags
+  *
+  * Release chip register access lock
+  */
+-static void ks8851_unlock(struct ks8851_net *ks, unsigned long *flags)
++static void ks8851_unlock(struct ks8851_net *ks)
+ {
+-	ks->unlock(ks, flags);
++	ks->unlock(ks);
+ }
+ 
+ /**
+@@ -129,11 +127,10 @@ static void ks8851_set_powermode(struct ks8851_net *ks, unsigned pwrmode)
+ static int ks8851_write_mac_addr(struct net_device *dev)
+ {
+ 	struct ks8851_net *ks = netdev_priv(dev);
+-	unsigned long flags;
+ 	u16 val;
+ 	int i;
+ 
+-	ks8851_lock(ks, &flags);
++	ks8851_lock(ks);
+ 
+ 	/*
+ 	 * Wake up chip in case it was powered off when stopped; otherwise,
+@@ -149,7 +146,7 @@ static int ks8851_write_mac_addr(struct net_device *dev)
+ 	if (!netif_running(dev))
+ 		ks8851_set_powermode(ks, PMECR_PM_SOFTDOWN);
+ 
+-	ks8851_unlock(ks, &flags);
++	ks8851_unlock(ks);
+ 
+ 	return 0;
+ }
+@@ -163,12 +160,11 @@ static int ks8851_write_mac_addr(struct net_device *dev)
+ static void ks8851_read_mac_addr(struct net_device *dev)
+ {
+ 	struct ks8851_net *ks = netdev_priv(dev);
+-	unsigned long flags;
+ 	u8 addr[ETH_ALEN];
+ 	u16 reg;
+ 	int i;
+ 
+-	ks8851_lock(ks, &flags);
++	ks8851_lock(ks);
+ 
+ 	for (i = 0; i < ETH_ALEN; i += 2) {
+ 		reg = ks8851_rdreg16(ks, KS_MAR(i));
+@@ -177,7 +173,7 @@ static void ks8851_read_mac_addr(struct net_device *dev)
+ 	}
+ 	eth_hw_addr_set(dev, addr);
+ 
+-	ks8851_unlock(ks, &flags);
++	ks8851_unlock(ks);
+ }
+ 
+ /**
+@@ -312,11 +308,10 @@ static irqreturn_t ks8851_irq(int irq, void *_ks)
+ {
+ 	struct ks8851_net *ks = _ks;
+ 	struct sk_buff_head rxq;
+-	unsigned long flags;
+ 	unsigned int status;
+ 	struct sk_buff *skb;
+ 
+-	ks8851_lock(ks, &flags);
++	ks8851_lock(ks);
+ 
+ 	status = ks8851_rdreg16(ks, KS_ISR);
+ 	ks8851_wrreg16(ks, KS_ISR, status);
+@@ -373,7 +368,7 @@ static irqreturn_t ks8851_irq(int irq, void *_ks)
+ 		ks8851_wrreg16(ks, KS_RXCR1, rxc->rxcr1);
+ 	}
+ 
+-	ks8851_unlock(ks, &flags);
++	ks8851_unlock(ks);
+ 
+ 	if (status & IRQ_LCI)
+ 		mii_check_link(&ks->mii);
+@@ -405,7 +400,6 @@ static void ks8851_flush_tx_work(struct ks8851_net *ks)
+ static int ks8851_net_open(struct net_device *dev)
+ {
+ 	struct ks8851_net *ks = netdev_priv(dev);
+-	unsigned long flags;
+ 	int ret;
+ 
+ 	ret = request_threaded_irq(dev->irq, NULL, ks8851_irq,
+@@ -418,7 +412,7 @@ static int ks8851_net_open(struct net_device *dev)
+ 
+ 	/* lock the card, even if we may not actually be doing anything
+ 	 * else at the moment */
+-	ks8851_lock(ks, &flags);
++	ks8851_lock(ks);
+ 
+ 	netif_dbg(ks, ifup, ks->netdev, "opening\n");
+ 
+@@ -471,7 +465,7 @@ static int ks8851_net_open(struct net_device *dev)
+ 
+ 	netif_dbg(ks, ifup, ks->netdev, "network device up\n");
+ 
+-	ks8851_unlock(ks, &flags);
++	ks8851_unlock(ks);
+ 	mii_check_link(&ks->mii);
+ 	return 0;
+ }
+@@ -487,23 +481,22 @@ static int ks8851_net_open(struct net_device *dev)
+ static int ks8851_net_stop(struct net_device *dev)
+ {
+ 	struct ks8851_net *ks = netdev_priv(dev);
+-	unsigned long flags;
+ 
+ 	netif_info(ks, ifdown, dev, "shutting down\n");
+ 
+ 	netif_stop_queue(dev);
+ 
+-	ks8851_lock(ks, &flags);
++	ks8851_lock(ks);
+ 	/* turn off the IRQs and ack any outstanding */
+ 	ks8851_wrreg16(ks, KS_IER, 0x0000);
+ 	ks8851_wrreg16(ks, KS_ISR, 0xffff);
+-	ks8851_unlock(ks, &flags);
++	ks8851_unlock(ks);
+ 
+ 	/* stop any outstanding work */
+ 	ks8851_flush_tx_work(ks);
+ 	flush_work(&ks->rxctrl_work);
+ 
+-	ks8851_lock(ks, &flags);
++	ks8851_lock(ks);
+ 	/* shutdown RX process */
+ 	ks8851_wrreg16(ks, KS_RXCR1, 0x0000);
+ 
+@@ -512,7 +505,7 @@ static int ks8851_net_stop(struct net_device *dev)
+ 
+ 	/* set powermode to soft power down to save power */
+ 	ks8851_set_powermode(ks, PMECR_PM_SOFTDOWN);
+-	ks8851_unlock(ks, &flags);
++	ks8851_unlock(ks);
+ 
+ 	/* ensure any queued tx buffers are dumped */
+ 	while (!skb_queue_empty(&ks->txq)) {
+@@ -566,14 +559,13 @@ static netdev_tx_t ks8851_start_xmit(struct sk_buff *skb,
+ static void ks8851_rxctrl_work(struct work_struct *work)
+ {
+ 	struct ks8851_net *ks = container_of(work, struct ks8851_net, rxctrl_work);
+-	unsigned long flags;
+ 
+-	ks8851_lock(ks, &flags);
++	ks8851_lock(ks);
+ 
+ 	/* need to shutdown RXQ before modifying filter parameters */
+ 	ks8851_wrreg16(ks, KS_RXCR1, 0x00);
+ 
+-	ks8851_unlock(ks, &flags);
++	ks8851_unlock(ks);
+ }
+ 
+ static void ks8851_set_rx_mode(struct net_device *dev)
+@@ -780,7 +772,6 @@ static int ks8851_set_eeprom(struct net_device *dev,
+ {
+ 	struct ks8851_net *ks = netdev_priv(dev);
+ 	int offset = ee->offset;
+-	unsigned long flags;
+ 	int len = ee->len;
+ 	u16 tmp;
+ 
+@@ -794,7 +785,7 @@ static int ks8851_set_eeprom(struct net_device *dev,
+ 	if (!(ks->rc_ccr & CCR_EEPROM))
+ 		return -ENOENT;
+ 
+-	ks8851_lock(ks, &flags);
++	ks8851_lock(ks);
+ 
+ 	ks8851_eeprom_claim(ks);
+ 
+@@ -817,7 +808,7 @@ static int ks8851_set_eeprom(struct net_device *dev,
+ 	eeprom_93cx6_wren(&ks->eeprom, false);
+ 
+ 	ks8851_eeprom_release(ks);
+-	ks8851_unlock(ks, &flags);
++	ks8851_unlock(ks);
+ 
+ 	return 0;
+ }
+@@ -827,7 +818,6 @@ static int ks8851_get_eeprom(struct net_device *dev,
+ {
+ 	struct ks8851_net *ks = netdev_priv(dev);
+ 	int offset = ee->offset;
+-	unsigned long flags;
+ 	int len = ee->len;
+ 
+ 	/* must be 2 byte aligned */
+@@ -837,7 +827,7 @@ static int ks8851_get_eeprom(struct net_device *dev,
+ 	if (!(ks->rc_ccr & CCR_EEPROM))
+ 		return -ENOENT;
+ 
+-	ks8851_lock(ks, &flags);
++	ks8851_lock(ks);
+ 
+ 	ks8851_eeprom_claim(ks);
+ 
+@@ -845,7 +835,7 @@ static int ks8851_get_eeprom(struct net_device *dev,
+ 
+ 	eeprom_93cx6_multiread(&ks->eeprom, offset/2, (__le16 *)data, len/2);
+ 	ks8851_eeprom_release(ks);
+-	ks8851_unlock(ks, &flags);
++	ks8851_unlock(ks);
+ 
+ 	return 0;
+ }
+@@ -904,7 +894,6 @@ static int ks8851_phy_reg(int reg)
+ static int ks8851_phy_read_common(struct net_device *dev, int phy_addr, int reg)
+ {
+ 	struct ks8851_net *ks = netdev_priv(dev);
+-	unsigned long flags;
+ 	int result;
+ 	int ksreg;
+ 
+@@ -912,9 +901,9 @@ static int ks8851_phy_read_common(struct net_device *dev, int phy_addr, int reg)
+ 	if (ksreg < 0)
+ 		return ksreg;
+ 
+-	ks8851_lock(ks, &flags);
++	ks8851_lock(ks);
+ 	result = ks8851_rdreg16(ks, ksreg);
+-	ks8851_unlock(ks, &flags);
++	ks8851_unlock(ks);
+ 
+ 	return result;
+ }
+@@ -949,14 +938,13 @@ static void ks8851_phy_write(struct net_device *dev,
+ 			     int phy, int reg, int value)
+ {
+ 	struct ks8851_net *ks = netdev_priv(dev);
+-	unsigned long flags;
+ 	int ksreg;
+ 
+ 	ksreg = ks8851_phy_reg(reg);
+ 	if (ksreg >= 0) {
+-		ks8851_lock(ks, &flags);
++		ks8851_lock(ks);
+ 		ks8851_wrreg16(ks, ksreg, value);
+-		ks8851_unlock(ks, &flags);
++		ks8851_unlock(ks);
+ 	}
+ }
+ 
+diff --git a/drivers/net/ethernet/micrel/ks8851_par.c b/drivers/net/ethernet/micrel/ks8851_par.c
+index 78695be2570bf..9f1c33f6ddec0 100644
+--- a/drivers/net/ethernet/micrel/ks8851_par.c
++++ b/drivers/net/ethernet/micrel/ks8851_par.c
+@@ -55,29 +55,27 @@ struct ks8851_net_par {
+ /**
+  * ks8851_lock_par - register access lock
+  * @ks: The chip state
+- * @flags: Spinlock flags
+  *
+  * Claim chip register access lock
+  */
+-static void ks8851_lock_par(struct ks8851_net *ks, unsigned long *flags)
++static void ks8851_lock_par(struct ks8851_net *ks)
+ {
+ 	struct ks8851_net_par *ksp = to_ks8851_par(ks);
+ 
+-	spin_lock_irqsave(&ksp->lock, *flags);
++	spin_lock_bh(&ksp->lock);
+ }
+ 
+ /**
+  * ks8851_unlock_par - register access unlock
+  * @ks: The chip state
+- * @flags: Spinlock flags
+  *
+  * Release chip register access lock
+  */
+-static void ks8851_unlock_par(struct ks8851_net *ks, unsigned long *flags)
++static void ks8851_unlock_par(struct ks8851_net *ks)
+ {
+ 	struct ks8851_net_par *ksp = to_ks8851_par(ks);
+ 
+-	spin_unlock_irqrestore(&ksp->lock, *flags);
++	spin_unlock_bh(&ksp->lock);
+ }
+ 
+ /**
+@@ -233,7 +231,6 @@ static netdev_tx_t ks8851_start_xmit_par(struct sk_buff *skb,
+ {
+ 	struct ks8851_net *ks = netdev_priv(dev);
+ 	netdev_tx_t ret = NETDEV_TX_OK;
+-	unsigned long flags;
+ 	unsigned int txqcr;
+ 	u16 txmir;
+ 	int err;
+@@ -241,7 +238,7 @@ static netdev_tx_t ks8851_start_xmit_par(struct sk_buff *skb,
+ 	netif_dbg(ks, tx_queued, ks->netdev,
+ 		  "%s: skb %p, %d@%p\n", __func__, skb, skb->len, skb->data);
+ 
+-	ks8851_lock_par(ks, &flags);
++	ks8851_lock_par(ks);
+ 
+ 	txmir = ks8851_rdreg16_par(ks, KS_TXMIR) & 0x1fff;
+ 
+@@ -262,7 +259,7 @@ static netdev_tx_t ks8851_start_xmit_par(struct sk_buff *skb,
+ 		ret = NETDEV_TX_BUSY;
+ 	}
+ 
+-	ks8851_unlock_par(ks, &flags);
++	ks8851_unlock_par(ks);
+ 
+ 	return ret;
+ }
+diff --git a/drivers/net/ethernet/micrel/ks8851_spi.c b/drivers/net/ethernet/micrel/ks8851_spi.c
+index a161ae45743ab..b9e68520278d0 100644
+--- a/drivers/net/ethernet/micrel/ks8851_spi.c
++++ b/drivers/net/ethernet/micrel/ks8851_spi.c
+@@ -71,11 +71,10 @@ struct ks8851_net_spi {
+ /**
+  * ks8851_lock_spi - register access lock
+  * @ks: The chip state
+- * @flags: Spinlock flags
+  *
+  * Claim chip register access lock
+  */
+-static void ks8851_lock_spi(struct ks8851_net *ks, unsigned long *flags)
++static void ks8851_lock_spi(struct ks8851_net *ks)
+ {
+ 	struct ks8851_net_spi *kss = to_ks8851_spi(ks);
+ 
+@@ -85,11 +84,10 @@ static void ks8851_lock_spi(struct ks8851_net *ks, unsigned long *flags)
+ /**
+  * ks8851_unlock_spi - register access unlock
+  * @ks: The chip state
+- * @flags: Spinlock flags
+  *
+  * Release chip register access lock
+  */
+-static void ks8851_unlock_spi(struct ks8851_net *ks, unsigned long *flags)
++static void ks8851_unlock_spi(struct ks8851_net *ks)
+ {
+ 	struct ks8851_net_spi *kss = to_ks8851_spi(ks);
+ 
+@@ -309,7 +307,6 @@ static void ks8851_tx_work(struct work_struct *work)
+ 	struct ks8851_net_spi *kss;
+ 	unsigned short tx_space;
+ 	struct ks8851_net *ks;
+-	unsigned long flags;
+ 	struct sk_buff *txb;
+ 	bool last;
+ 
+@@ -317,7 +314,7 @@ static void ks8851_tx_work(struct work_struct *work)
+ 	ks = &kss->ks8851;
+ 	last = skb_queue_empty(&ks->txq);
+ 
+-	ks8851_lock_spi(ks, &flags);
++	ks8851_lock_spi(ks);
+ 
+ 	while (!last) {
+ 		txb = skb_dequeue(&ks->txq);
+@@ -343,7 +340,7 @@ static void ks8851_tx_work(struct work_struct *work)
+ 	ks->tx_space = tx_space;
+ 	spin_unlock_bh(&ks->statelock);
+ 
+-	ks8851_unlock_spi(ks, &flags);
++	ks8851_unlock_spi(ks);
+ }
+ 
+ /**
+-- 
+2.53.0
 
-The explanation inside the parentheses is not needed, IMO.
-
-The rest seems fine to me.
-
-Best regards, Ilya Maximets.
 
