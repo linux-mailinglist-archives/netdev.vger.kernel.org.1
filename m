@@ -1,100 +1,100 @@
-Return-Path: <netdev+bounces-278645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278646-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GBldCOgb32myOwAAu9opvQ
-	(envelope-from <netdev+bounces-278645-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 07:02:32 +0200
+	id 6A2vKBAc32myOwAAu9opvQ
+	(envelope-from <netdev+bounces-278646-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 07:03:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75F3E4004DA
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 07:02:31 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1132D4004EF
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 07:03:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 30148303662C
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 05:01:47 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A6BAA3087430
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 05:03:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D1A735F162;
-	Wed, 15 Apr 2026 05:01:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 770153644A3;
+	Wed, 15 Apr 2026 05:03:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MuFHBfzM"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FzydE54M"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f48.google.com (mail-dl1-f48.google.com [74.125.82.48])
+Received: from mail-dl1-f54.google.com (mail-dl1-f54.google.com [74.125.82.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0D2F2EFDAF
-	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 05:01:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F38D41F131A
+	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 05:03:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.54
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776229306; cv=pass; b=NdxFByP7CcUekoKczoBNBsXrsGDw9QTjhcL+Wfd/08hf7msBQphelrqBuVpSIbh04lNPfocuDmPBoqBufeAuhGxBQMT/AD/Pr2l5Fon8goHhdM0+n/B6QDWaTjiHvH86k9vH0Yu+jVykl8bvzoCym2uDa0F+u/FT12SftGq8Mtw=
+	t=1776229388; cv=pass; b=kx4wxaE605uM9XWIKYd8W4bG4q9Xy+lpG2gd6ifMflbxiIxWcbZ9hVw+p+iKu/DKAVVgGdyyNGHHqyaGN57UujJ+eWnpf3HHbvtlSTmDKEdIzy5qYyC788DvJDMfXfcYkuoA8Bzzvcmuc465ySDl9uQcYAydJWdmYext2kh4y+s=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776229306; c=relaxed/simple;
-	bh=pJUSotdmTzr909dQmu6Z/4Wm9WvdYY/zfwb72+1evp8=;
+	s=arc-20240116; t=1776229388; c=relaxed/simple;
+	bh=fGuuE8tUzF5eS1PAD+Ab0UOa4wxXcjrLg+nGVcrtBwM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tDHp11yFnsJYVbDrmGfgsoZXF//YYgPNnkiAtBGa3UjQ94nuQPUyieEza7sn/8sozvzHNTiQ9t8u9x4vREiEev73pcjzzgzxEtlgzCZtVis3ZI2rZk37tnn7FD1onbSJt8zwpv8EBE0i/307vUAG+8MCfTMVcLOzKAlrVVXmnRw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MuFHBfzM; arc=pass smtp.client-ip=74.125.82.48
+	 To:Cc:Content-Type; b=YP2A/txggiF5gkjYmkHbFpk08xwlNZu6QTdXpJ5PzhVfzqMXaBVI8sYhrmrVm3xrtmZTIibSREdLjCxxqGmrISH7PKEDfdBOsdpa7soQ2nkVo36LmfQyAWH4iz0Oggsj3iGeiUHKJlhQxoegjq374lhGu7ZQx2q9gQXONiGXQ0M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FzydE54M; arc=pass smtp.client-ip=74.125.82.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-dl1-f48.google.com with SMTP id a92af1059eb24-128b9b7e3edso3833156c88.0
-        for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 22:01:44 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776229304; cv=none;
+Received: by mail-dl1-f54.google.com with SMTP id a92af1059eb24-12c55e3858cso3830242c88.0
+        for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 22:03:06 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776229386; cv=none;
         d=google.com; s=arc-20240605;
-        b=cSycMMt0jpIUkroYDvJWXo0mi4v41dOdFo0r2rvtN0Vqi1iohKC4P++rrWCR/wg3tB
-         yY0A/Ana6jywERX3zjJNhC/nDAssK3libW+M0dE9q+L6mfkP0Q4NhN63dRHQMkULgZvS
-         oDAQjEfy3CFG5HBpYGiGu1heIOjos5NwZ2mTDQCKT9pBRzqBLeShjToKIPaF7QilyWqd
-         nCZyGppoP+JqZQYpY6rVV3b8SKWTWOpB6WvM3Cjeo648pewbVtBm0HoafhKLDr3+AXNg
-         ROjPl1Hl8eW8cUGVkR/rrIWMMFE9YhZmdEZxH5mfFFx2EQkndrvdCTYGO354wIHZYhlj
-         a6gg==
+        b=QE2AdTlcUe5BTfl98FX81AIsPm0wAcCa90JTmV2dWlk2dsrVk/A1mn2VnFDLmc653K
+         WTCTtilzKbT5nTwnFUMWDKt33CYfZcveOST3GPuOQ9X1XWTM+9STYXQCmmSrL4egggh6
+         KvERB7Tuc9MVUsPPlyjFS84dgPGJ6rRArd5VHCGomCGyBFgBL7EtSgIH1pDenyMjCbou
+         lpFA5PoRF5znyxRd0plnhYlFC2k0PtL/q7FlKvuxrqPqM9NuVQSvMurcGyS58kLHV7a+
+         /8VFrtDzQ5pZo4ZDDKGdjqXpBIKbbMMvbcMt6F8Z9s0s3k9YPjjQf7SCFltuIgHtN+oD
+         PGug==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=pJUSotdmTzr909dQmu6Z/4Wm9WvdYY/zfwb72+1evp8=;
-        fh=E1jCyC2pd3gxhKqDeeUEsepF4WjuHscpjyzxlL+ooRc=;
-        b=Ipqq70l5lDDpkTDEzoCa2SI02aCwu4ryUPBGcJU9+GSojhOUXMEL02AIbo10W1l39T
-         /3aAcN4Oy0Yi9ocF2Db2odkLj8TfA9QgOo8l4R8M1/YHM2W3YGf9eAST67BxQjt/hSrs
-         IIvH1ABTJMrOao/VBAwFl1Ve4li6Uw/izpkveaCpshm0ngKD9MXsKobyvBXyY4UljuAP
-         z6yfYJ/Ozn49IfAac4AW+oLrXgoZA3c//a3OWyv8oJkZ5D9VcG52BjSezfnEDqOU2YgR
-         vX5MWaUn5gePzVe2444jzZ4RcwIC5aaQoUZBcWRuSUdRpngWQDVDlWd0Yg+3JoHWwOLe
-         s0Fg==;
+        bh=uZC9Xmxwou/YeM1QDbSuaSicunUg5xqUIEJn3vfDI0E=;
+        fh=I4WXp1e5QH4NNZkPDAXj6Dtph/9iBDAOjR7aoJfEjVk=;
+        b=iXtYB1rypKT58rOTjCkWZOYp3hMToS61T1N41UBOcpyhq+1qSJY1IQvNYYc3VDzitu
+         PlAAhO8hf8uzhda72bSnVZOolMmXcBRmLNqi3ibYUsrx5s4Zj3ah9sI9dpon9fxMpUzS
+         fY0h6l3zwLc6w911KXMilyig+Ojf6+bWGRfQaVmU65pDzcbFxgKddt2RUC4kt3a0cRZi
+         sJFeaFZs4xvLAVmlCxUtTf5mvzHaccnEXP8unpwqJY4Ooh384kyiemUC/ejzTVkZIzHj
+         LaW3aDDlRF4Maa+LwZn2w6tYq1BQiMRmWwLr/v+lRfSKVbIu64siu37G6FYOInES7CvW
+         MUYg==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1776229304; x=1776834104; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1776229386; x=1776834186; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=pJUSotdmTzr909dQmu6Z/4Wm9WvdYY/zfwb72+1evp8=;
-        b=MuFHBfzMtF6ES9S2JbmLmV9lxwnzw4thqZh1QNxMylBJ2vKW5dQKVHXsBYKRa5SQiX
-         H0ePjRksjMRzPopYZTL2em7AQcOFh78cUw24WaQH3PI5xHiytKL6HPplWNouEDyAFwiX
-         96kkrfKC5babTuD4IFpjIwOywrCDeTGFtltv5nFJSVTL48CGeP6k6wrtdXrkVdBg/j22
-         IjqVktvQz+YH7dMPT6FBNN8xIKMW7KOKSMEO3C4JLAC5X68knqEDMy10WiYRrRJb9RnG
-         /jIvgTOzc8slnQnCzKS7qVIMVcGFuwpIpuQ4Cr6TJj/Mm+553rrv6xRl9ZHcT8Z9LUEz
-         vvZA==
+        bh=uZC9Xmxwou/YeM1QDbSuaSicunUg5xqUIEJn3vfDI0E=;
+        b=FzydE54MCUpFwKefARAstG2UILU/+dVykGD6eTZm/Slstq6Sof5aWlljVGMkGNu4V6
+         sx3ka9F0lYz08bWzSFN18xeLaLoF5HlHrOlX9Vm4tF1SVbN9w+7xPRKG15Ge4hLd2Nv5
+         KDlhhu3B3YIaYnsH1VLcw8M0eftdCUcnILIhz0UJF+qmppTF9Xo+w1037NqQk6y2iBrG
+         eLZtxODIDxAr4V0G522+pBplLL8c5P+0a4tMZYegBcnzAYqt6+Dq0A9K6WxNozZStsmf
+         GEGbN/3StpTISrPNt9Ty2nwxGQTvfQ9cnbkfJcW/RM96wFSS7RYAgDkqKtR3e5Lp6ASb
+         kLNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776229304; x=1776834104;
+        d=1e100.net; s=20251104; t=1776229386; x=1776834186;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=pJUSotdmTzr909dQmu6Z/4Wm9WvdYY/zfwb72+1evp8=;
-        b=aC4gKQ/lcBlhN9XmVdA48HkPUEt9PqFjoAHxLifzXLKmHjC7VigeY838FPNQRmxHIK
-         Li39OEBGBEttPYCVyNf3gJVb0B+L7oFhHJ/S3dg5z8isbiAYUkvwXxCur1GBf7cit26U
-         97R+6+u6ySE6Ew4zvotFimt4jgHiBmNhOTYCwVAhBzC7aa/mePmf2+hnTpFOxdktR1+m
-         aYyXA53zlVGDv3qNtTxGg47AgXccZbjtUW25gvD94axkxVi6G0f/m5o7GXTVr+sI9byQ
-         UjwD1/ehNGCkQ79vta8kHi18lUky4UrVRSEhZnBa1pAlY+voTNQK0YMVuYEUhWUv6HrI
-         8nNg==
-X-Forwarded-Encrypted: i=1; AFNElJ84PRTMKD5wQqQIr/zRU0f9LXCA9M0BUNGVyVfjMXlkDhxjSjmi3plhZdeS4S/y9f7m5JKX5mg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyWXJDl0McMRTEEqMUOAG+nOg2D6UUJKHEQ5EwioOU8B7M60W+M
-	Zk5nhtJTitYM2DodSa8792YEdixqenBWi1qqxgCendM6OrCQuynCTfX4Iyb79/OySAafFzjb9ya
-	s0Vsxrs8zQ41QGiztlfRB7C0jKY5ipK+4XUG4PXym
-X-Gm-Gg: AeBDievchtnIvDmli5scsJTzQcQrHRVB0wKTRe+0Ud59EsKZzjD4ahiRlRtVHI8shDd
-	foyiZHKKpopa3PCNuYA5iaAhku+/6nMllSr+hAYs1kxNLTaCdPvEjHg97Ox5qBn6mvriM4HLH6Z
-	rEab62u7ccz0f1GZUwgwhi0FQTtKr5Kh/EWDJWzp4mkEJj7EPZexF2GrJTg707IG3FvNi7HW9So
-	xFWjNs9XRkc2IEaNHXxAWmgr5ftk0xmHS/bNI/kvLNfI08MefCxNOcg3GAC6b66kpYwxvUE26F6
-	Me7j09mAIbB7polGVUaqAmCcoKQAQKnLX5Pyzy/7NTqIMXkcdawAGaZxx0unRAJ35GBj0ATaQBm
-	ZrgkFndGmgM8rQyQW5/Vdykk/RqtYPAxW3L/f/RPOrETNMVgw454rxJXm+CyOKoXEKOk8k/7tgg
-	==
-X-Received: by 2002:a05:7022:389:b0:128:d24a:a5c1 with SMTP id
- a92af1059eb24-12c34eeac88mr11841217c88.28.1776229303335; Tue, 14 Apr 2026
- 22:01:43 -0700 (PDT)
+        bh=uZC9Xmxwou/YeM1QDbSuaSicunUg5xqUIEJn3vfDI0E=;
+        b=ioXlf4LyDHeDLnEHJ0roCOBsH29RkLMEaZhtOldXcPQmNZKe9Bsvmdbb+fGL6roXuM
+         w927HKWv8bHPyoftVHpsXs6OSUJuANu4qfXr1sF4BRlfzNhqDayc24lwGK7gqqId1KRX
+         qe6+kuRFjG/fFGIJgXl5M7A2n/21Yxnj7N9U3v9ELXVoAvkUsW39E215umzY1llS5FI0
+         +NEd5j/0lzAdipQGqlLNBZDF51uiTqkn1xA2gzHU8KyXMrIDcCV5lQZ2Lu7CDBuYn/3c
+         UBVw5pIYC/Hbe/MAeIpRdJ3p1DhOudTvF5L+iN7dZm7DfrsOsl2iBUtOGa99B+4eex+c
+         VqhA==
+X-Forwarded-Encrypted: i=1; AFNElJ976ZSNzx6NVYmWDkkgctIdWCGFQz4+gBqZtNeig30lEYAqIiEJCDqIa4+XbntObEoX8IYXthU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwM8UFnGLcFHGledCGBaPuG5OP/Y3sWwjKtbY9Ga0c2HNdKzP+N
+	kYFSMhRMfECo4AiWHrw1YX/xXoxScqvgTu9VoxkTV6WZNc81sQNItwi1K0aqYkaxVF8I4F7GGcW
+	Y9kiJjjNTo/hBYadcM0LxjoXA4Gt7hPQtXAgppa1M
+X-Gm-Gg: AeBDievInfvClniUabNLKxjFo7WV5WFRaxbaLMVgD9nF+9W1lzxOhJkqmAls5pJCSna
+	5DRE6b+ba4ohV1IQelXOPVLnBGyDBB2K4kOJPCPUntcDF0r6T0ZBWB6VB+PH4Ca/ZBKugqGNADK
+	XsYFo4hkJ6kDzgwHN6moKrBQfNYAuBUgXuGEtG+kwlF8nO7f1Gr2GRU6M6utZLK+3dpbv0zTfp4
+	F0auRmEV3z2VvPUZVWsJyVgbCqo/Ou+orswxXVNFsi0AVYbMfl3XmmlPncwz0DprhXkrfSi49rl
+	dmzdE7xCoQ1VWVG79hcZ5tGh1JQREm351vGbvoVXb+ZcXRpo2PhKigepH4SlfTNMYlir5aHFs+v
+	dpxisPwPpXbTSA6M+dE8an99DMW0N4PI1acrAg8BAs8ZegfePbG113RIWf35F4CyUprD7gCfhEp
+	gPhKu/PaLG
+X-Received: by 2002:a05:7022:faa:b0:127:3915:76b2 with SMTP id
+ a92af1059eb24-12c34f07f1fmr11520144c88.27.1776229385519; Tue, 14 Apr 2026
+ 22:03:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -102,13 +102,13 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20260414-unix-proto-update-null-ptr-deref-v4-0-2af6fe97918e@rbox.co>
- <20260414-unix-proto-update-null-ptr-deref-v4-3-2af6fe97918e@rbox.co>
-In-Reply-To: <20260414-unix-proto-update-null-ptr-deref-v4-3-2af6fe97918e@rbox.co>
+ <20260414-unix-proto-update-null-ptr-deref-v4-5-2af6fe97918e@rbox.co>
+In-Reply-To: <20260414-unix-proto-update-null-ptr-deref-v4-5-2af6fe97918e@rbox.co>
 From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Tue, 14 Apr 2026 22:01:31 -0700
-X-Gm-Features: AQROBzAtbLi74sgP-HJJxeDMhYc_8XgwX0AD5wIVbleVSSv1wtKRsUz6FlLLeDo
-Message-ID: <CAAVpQUAe2dhWaMnKPH=uvmGxVA_dd2gVyCL=Y55+eUJ3G6QOFg@mail.gmail.com>
-Subject: Re: [PATCH bpf v4 3/5] selftests/bpf: Extend bpf_iter_unix to attempt deadlocking
+Date: Tue, 14 Apr 2026 22:02:54 -0700
+X-Gm-Features: AQROBzC61U2caASKHWRYjmp86WpWvwDPDOjBGrBWlvFKCfDox66DepDxhPOqVoc
+Message-ID: <CAAVpQUBkq+wNSRiNLMKhpeY2AAZ48d9=hG9dWyGbf_MRS89-Mw@mail.gmail.com>
+Subject: Re: [PATCH bpf v4 5/5] bpf, sockmap: Take state lock for af_unix iter
 To: Michal Luczaj <mhal@rbox.co>
 Cc: John Fastabend <john.fastabend@gmail.com>, Jakub Sitnicki <jakub@cloudflare.com>, 
 	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
@@ -121,47 +121,123 @@ Cc: John Fastabend <john.fastabend@gmail.com>, Jakub Sitnicki <jakub@cloudflare.
 	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
 	Shuah Khan <shuah@kernel.org>, Cong Wang <cong.wang@bytedance.com>, netdev@vger.kernel.org, 
 	bpf@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, Jiayuan Chen <jiayuan.chen@linux.dev>
+	linux-kselftest@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278645-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-278646-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[28];
+	RCPT_COUNT_TWELVE(0.00)[27];
 	FREEMAIL_CC(0.00)[gmail.com,cloudflare.com,google.com,redhat.com,davemloft.net,kernel.org,fb.com,iogearbox.net,linux.dev,fomichev.me,bytedance.com,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 75F3E4004DA
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,rbox.co:email]
+X-Rspamd-Queue-Id: 1132D4004EF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 On Tue, Apr 14, 2026 at 7:13=E2=80=AFAM Michal Luczaj <mhal@rbox.co> wrote:
 >
-> Updating a sockmap from a unix iterator prog may lead to a deadlock.
-> Piggyback on the original selftest.
+> When a BPF iterator program updates a sockmap, there is a race condition =
+in
+> unix_stream_bpf_update_proto() where the `peer` pointer can become stale[=
+1]
+> during a state transition TCP_ESTABLISHED -> TCP_CLOSE.
 >
-> Reviewed-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+>         CPU0 bpf                          CPU1 close
+>         --------                          ----------
+> // unix_stream_bpf_update_proto()
+> sk_pair =3D unix_peer(sk)
+> if (unlikely(!sk_pair))
+>    return -EINVAL;
+>                                      // unix_release_sock()
+>                                      skpair =3D unix_peer(sk);
+>                                      unix_peer(sk) =3D NULL;
+>                                      sock_put(skpair)
+> sock_hold(sk_pair) // UaF
+>
+> More practically, this fix guarantees that the iterator program is
+> consistently provided with a unix socket that remains stable during
+> iterator execution.
+>
+> [1]:
+> BUG: KASAN: slab-use-after-free in unix_stream_bpf_update_proto+0x155/0x4=
+90
+> Write of size 4 at addr ffff8881178c9a00 by task test_progs/2231
+> Call Trace:
+>  dump_stack_lvl+0x5d/0x80
+>  print_report+0x170/0x4f3
+>  kasan_report+0xe4/0x1c0
+>  kasan_check_range+0x125/0x200
+>  unix_stream_bpf_update_proto+0x155/0x490
+>  sock_map_link+0x71c/0xec0
+>  sock_map_update_common+0xbc/0x600
+>  sock_map_update_elem+0x19a/0x1f0
+>  bpf_prog_bbbf56096cdd4f01_selective_dump_unix+0x20c/0x217
+>  bpf_iter_run_prog+0x21e/0xae0
+>  bpf_iter_unix_seq_show+0x1e0/0x2a0
+>  bpf_seq_read+0x42c/0x10d0
+>  vfs_read+0x171/0xb20
+>  ksys_read+0xff/0x200
+>  do_syscall_64+0xf7/0x5e0
+>  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>
+> Allocated by task 2236:
+>  kasan_save_stack+0x30/0x50
+>  kasan_save_track+0x14/0x30
+>  __kasan_slab_alloc+0x63/0x80
+>  kmem_cache_alloc_noprof+0x1d5/0x680
+>  sk_prot_alloc+0x59/0x210
+>  sk_alloc+0x34/0x470
+>  unix_create1+0x86/0x8a0
+>  unix_stream_connect+0x318/0x15b0
+>  __sys_connect+0xfd/0x130
+>  __x64_sys_connect+0x72/0xd0
+>  do_syscall_64+0xf7/0x5e0
+>  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>
+> Freed by task 2236:
+>  kasan_save_stack+0x30/0x50
+>  kasan_save_track+0x14/0x30
+>  kasan_save_free_info+0x3b/0x70
+>  __kasan_slab_free+0x47/0x70
+>  kmem_cache_free+0x11c/0x590
+>  __sk_destruct+0x432/0x6e0
+>  unix_release_sock+0x9b3/0xf60
+>  unix_release+0x8a/0xf0
+>  __sock_release+0xb0/0x270
+>  sock_close+0x18/0x20
+>  __fput+0x36e/0xac0
+>  fput_close_sync+0xe5/0x1a0
+>  __x64_sys_close+0x7d/0xd0
+>  do_syscall_64+0xf7/0x5e0
+>  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>
+> Suggested-by: Kuniyuki Iwashima <kuniyu@google.com>
+> Fixes: 2c860a43dd77 ("bpf: af_unix: Implement BPF iterator for UNIX domai=
+n socket.")
 > Signed-off-by: Michal Luczaj <mhal@rbox.co>
 
 Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+
+Thanks for the fixes, Michal !
 
