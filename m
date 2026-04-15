@@ -1,202 +1,185 @@
-Return-Path: <netdev+bounces-278824-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278825-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wFQgL3at32lCXwAAu9opvQ
-	(envelope-from <netdev+bounces-278824-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 17:23:34 +0200
+	id GLjrILWs32mOXgAAu9opvQ
+	(envelope-from <netdev+bounces-278825-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 17:20:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 220D6405DA0
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 17:23:33 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06388405CFD
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 17:20:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 157CA314CE50
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 15:17:00 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 14A9A30360B9
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 15:19:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCA893DA5CF;
-	Wed, 15 Apr 2026 15:16:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F1D83D88EC;
+	Wed, 15 Apr 2026 15:19:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="fWUa4DjV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qFRQHxuh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f99.google.com (mail-ua1-f99.google.com [209.85.222.99])
+Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 664C13D9DA6
-	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 15:16:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.99
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776266204; cv=none; b=JpUKT7N30SGsvEv4D3TKA2GncddyT1uULLxNt77EvHd7ZH+jGU9a1im/7nBxrDUwHw25aFA5aE66tdoFsGpcs4pxm1gmVlBczSFglXsmTCNBLHEFJJAhDLFL6Dxq/bmIy4YqYvb5a4McAejeJDSwJFfoLPKGA1Y28La0/rEeybY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776266204; c=relaxed/simple;
-	bh=d3x2gNn1Bbyg1yw4s21emyIabKpOHh2eOaQ/OxOuP4w=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NgjVdzRp0QKKv6RiW5s+SoW2PbB5b4RSxCO5sCMpxrOMLJgW3XGZb+Uscu/3xTPKEQV8ZtQcspQfeHSySbBgEsjI9er2kix1b+W1wQKUNeWcRHBYJwrT4VlVfUoVI4WrUobcw7prfg29DfoHYpWGyMwv714cA81d7X++tpjsQMM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=fWUa4DjV; arc=none smtp.client-ip=209.85.222.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ua1-f99.google.com with SMTP id a1e0cc1a2514c-953acf7ae20so3866841241.0
-        for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 08:16:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776266202; x=1776871002;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:dkim-signature:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=84sFWA5iPQtCuiPSRotWoZ/dQClTvY8wWRS2hHonCSY=;
-        b=aTL9x/4KrrJW4pr5roWvxzZEV7PZ2e1l3a5628+vV+0yWTiCkAtk0ZOSfDBaAuybhO
-         NSQGn7BoiG+RYqJZCg1+tsID9mVkDYrwyenuPPMZFWuQ7t28XcP02vpoaXGVlqMkWK8H
-         HnmcyTWSremIG5DmECOw2uYEYX6JA2vJbnVN4tpL7r3mmDqmUe7t83dfzL72Zqr8JVOI
-         OYs3YrZdOj+4rwZjMn4t91n3VnA3LBaik8nIo3ULRmRJqrOFKN/Sg0kEcSk3XviwMSMf
-         PoBW5EvLYmByw/mNIFLwiq7s5NDo/UTRoX83o8F23NZcD4au6A/3Uu4boX1K/QXidLVA
-         9+Lw==
-X-Gm-Message-State: AOJu0YxHjFa0FX18YnlBfRTCggmkavT+ITsLlm6qn1q0/YV7ZyyvixZY
-	/9PD/dRAlOAYNt799uZ10DiVm9two7VEJgAt4JJwYCEcyfPjPoPM4OhYmbqm1Wha2huZIK0DnnT
-	1BY1+937WmECqpJC5P41aKXYLs9bnVZszqZcoTPxJTCLQodanp3L4ZH2MTgxm4Dr7adiHxo/VEA
-	jJq/zN1JctamvjLxP32MOIPSfTAdGpiCDdDsVP5AS4eRv57+I0A/kEEi0Wmvostq/6XpO5QRE/C
-	prsN0JtaQ==
-X-Gm-Gg: AeBDieuRX0zAL8+bl/MIPZj672ogFafVSgKq/w1tlmhXw3YrxYf94kMf+F7dF1HK+Mc
-	MTEKmFNE27KIg5kgYj03ytiACr4KJkaMTwoPoEDHoFqmKm60pJ+N0QvkwdlphUFX17Ex4Hkf1vo
-	zO8hIDWwiiPuHeCbFM/K7/pqSYpQprlDSwNi8EtO7C9LrztOCGzRS/cCKm6mEe3URzm9VPSGaHk
-	5R29kY73wfDdbkeZ+RwHsZjVHFiNb3UqMR2iF3zxx3kPIxoez2JteOkz3330RyLbpgnI3jy7Xuf
-	D3NRd0S3iwrJGE0dcVbY/iCJv3eQdsth9SoLjMN9qLynCN+aMOmMdUCoIiqBsWD1bxvfkkTCHiR
-	UCLy2OznM+3gAzVuDZZziitugPyVrLpec9sE5DgRWRG3AQDRHujV41Zx8fzuSL7IygdWv05zfSJ
-	VSkBiPD8Mznxp1/JU3lKyUhmytGzLCYognIkzgky0jr51cvy+oV161dJdOpQ==
-X-Received: by 2002:a05:6102:1623:b0:613:3fff:febc with SMTP id ada2fe7eead31-613400002cbmr685304137.2.1776266202336;
-        Wed, 15 Apr 2026 08:16:42 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-103.dlp.protect.broadcom.com. [144.49.247.103])
-        by smtp-relay.gmail.com with ESMTPS id ada2fe7eead31-612ce7247e5sm130244137.13.2026.04.15.08.16.42
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 15 Apr 2026 08:16:42 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-pf1-f198.google.com with SMTP id d2e1a72fcca58-82f5baa5418so1256236b3a.0
-        for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 08:16:42 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39AA933EAED
+	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 15:19:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.53
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776266379; cv=pass; b=uj/GntvELhK9SCkiHPXQG2L2md9M2brE5LJy9ShSzbq92tSMD96ROvTwwEGy5lEK0A5ZUd5haDzUzlgp8kn3H8qTlIGZW5zr9UVbQEIwMXB6k5ZU3QUfGl845JSga61DPmoqxxSN9+88nvSbSM/spVV97QjN+zhf/ZhEcPGdqiQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776266379; c=relaxed/simple;
+	bh=R35x7FeinH2LTmH0GOByVG4M38bJg/xLsvDfT8GEsJ4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=s05GnXZYKVN+f0vrv8S9I2nppR3h85nADPAMbZ2IMSsWb5ilWcMhkMcxiQhWJ/Gqn2ICxw1yq+thaXJVxZbf9xFlje8ctMPe1/lhdMghkqnXDpRb3tl6bDHkR6CpkLGFxk4Ei1IeFiIE4EiLlDdrH0LaCvSqjrAVMTWtaY2Crts=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qFRQHxuh; arc=pass smtp.client-ip=209.85.210.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-7dbb89ab229so5999543a34.1
+        for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 08:19:38 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776266377; cv=none;
+        d=google.com; s=arc-20240605;
+        b=RUGgBKk5hF5QgJZHrkg6DUZ61gMRfkAecA632GTy3cuI1bmGa6het0xzs8lcsf3J4U
+         726kVhkmZl8nDA3x9ci+S5TBY0XVvIfxYyClkcMYsp68LVtzWgAJcZd3xEdxuEiTzh4c
+         8lD25l7IhEIYdUZHjXUbO9fFeFZ/Ir4TIs/pTsqMUM7lBUR70GSKKM1e4uIpkUeAgdeT
+         5PIjTvrQXyIfpqg4k2AdoPyP76DtX7A3m3T3Tw69YAk4u54ZgXyegQGQx9cgVknuhCAt
+         S46u87Llq08875d7IjAmjd/7Aho11U37kani+/uu50ViHAYOHZFrsc6E1alGcwEOwuUj
+         nodw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=1VOuNwEfeozQq2kMUhcXYFUYg+uJ+za15jc5bP91H/o=;
+        fh=dpu5Bm7uEYP+spzdil8Jj/npGPeODe8murPmXzTZNSY=;
+        b=XvE5MnWEIkkfFfE8s1zfAWdCB3S+6lNBWuw3Nz6cXFSwhC0FyfEXaZ2dOwZcb7SyLC
+         KPUG5uU7X3cOUw1S5MzZfJPOYGjtSc4MoMmEEV4Q1DtM+CxBwAB996OPYu/1koZSykgx
+         BWbOS24Mutm8v37R1BbiLFpgN9FjWRZ51jC92Nv3be/QFGotdNqUTW7IljgbI04BBCoE
+         GsYxdjWQ7bKMGmQKcR+npKBY50RepC4kSPAfGvkleVFVpvdHSoPsUQ9L7dC8CVRLYWOF
+         xCUEk5pxjGL3wRQYB7Z25O0zwC6SKeQBUGroKQci2yuc9vVT1yh7ENmDGUjUlhDhN8Yg
+         60/w==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1776266201; x=1776871001; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1776266377; x=1776871177; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=84sFWA5iPQtCuiPSRotWoZ/dQClTvY8wWRS2hHonCSY=;
-        b=fWUa4DjVoDCngqsV12avUtWs0yoRu1r9e9lMWGUZRDHAZUQGmPp4y/d3jxd1+/oFya
-         KdabwsWySKKFcS0FuYFgpC9pQm7TbpLzC08NpHY3gDiC71pHsN1klkZ//GilEwAICzcQ
-         /6wWPBm0jBtQGIPNU8Ri53C7/tR4f6vBEVqjA=
-X-Received: by 2002:a05:6a00:8c0d:b0:82f:4bcb:a9d5 with SMTP id d2e1a72fcca58-82f4bcbaf89mr5810536b3a.14.1776266201018;
-        Wed, 15 Apr 2026 08:16:41 -0700 (PDT)
-X-Received: by 2002:a05:6a00:8c0d:b0:82f:4bcb:a9d5 with SMTP id d2e1a72fcca58-82f4bcbaf89mr5810515b3a.14.1776266200579;
-        Wed, 15 Apr 2026 08:16:40 -0700 (PDT)
-Received: from localhost.localdomain ([192.19.203.250])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82f673e0f15sm2996555b3a.35.2026.04.15.08.16.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Apr 2026 08:16:40 -0700 (PDT)
-From: Vikas Gupta <vikas.gupta@broadcom.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	vsrama-krishna.nemani@broadcom.com,
-	bhargava.marreddy@broadcom.com,
-	rajashekar.hudumula@broadcom.com,
-	ajit.khaparde@broadcom.com,
-	dharmender.garg@broadcom.com,
-	rahul-rg.gupta@broadcom.com,
-	Vikas Gupta <vikas.gupta@broadcom.com>
-Subject: [PATCH net v2 2/2] bnge: remove unsupported backing store type
-Date: Wed, 15 Apr 2026 20:46:21 +0530
-Message-ID: <20260415151621.1104956-3-vikas.gupta@broadcom.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20260415151621.1104956-1-vikas.gupta@broadcom.com>
-References: <20260415151621.1104956-1-vikas.gupta@broadcom.com>
+        bh=1VOuNwEfeozQq2kMUhcXYFUYg+uJ+za15jc5bP91H/o=;
+        b=qFRQHxuh4+ctWi9DbmNYCPbSakY9Apnh9G2PupcDxXkQXRl+tJA2966KYHj0GcpE8M
+         pG31wS83LMosq6KV5z0RKaSulG/NOGjG5ZYrfQwA7NZe0rm3giAPsygVPyfcnGNiQsKU
+         cV/auqh1BXsj/d0HCIIAjxEB/cgkixDaC6mByDFoL+xOKkz5hGuBrgtVKq8f70jA2+4j
+         nWEi3guSfqicPJPoO2FPRvewKWQ1OhYlSKOwBAzzMaSqAxU9uv+qU/1hMGFOxEM9HgQe
+         39+d8iLtS4mwX6cofPS71CacQPezPM0/WZp75GGosv9PHNckzb+WVFhHSEI2bHhkpIb4
+         XUSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776266377; x=1776871177;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=1VOuNwEfeozQq2kMUhcXYFUYg+uJ+za15jc5bP91H/o=;
+        b=BjHoyjIYJaVjresRkUkBEKCPL7S+gub6O3StYDVPj9aIgc5ZyK6CzzpjpvodKdd/RQ
+         cy+ataKSSCgS/koqvjvMlcFOOTtD6o25gZswRzITHFqJ/KOdtqJE7wxHoY6ZllEwg65/
+         XMlzR3M0Q42ej326kWgJQjIR1G+VukfpNpwiW2axYU36lqZZ3ckap1fxtx3+xllwtGIW
+         WmrC9QEBX7BB7l9PUHqZxaqbNXSzOEpJARQktBrzaZgImpFt3P/23Kr4ODLE7nfTu24b
+         EwFJ/xHRgMmSQ1KODWIEmy7pLQDwyRBAiZ3v+ouC5izHCPtRkDj6bobDIWMUkhxbrVSu
+         GfkA==
+X-Forwarded-Encrypted: i=1; AFNElJ8O3AdErvhct8oKPzCocbi+gvzu4lwiJ8n55PlIHEefYMiSbVP7Gy+rknLc4GdG3kh5ekwtmfE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxlEKCfTEAzqaM2Oihpau1q6h3pF/4wWNPug9t3gvU9Q3q2MD5J
+	r5EETU+7xmWSAzqyBu5td3geIZtolyw5kPqlsLPRMqnBXKZTLJ1faTzXde6DnUfm3fB5of/wcYX
+	A1zEu4c/rlPkN2q6+Qw4Q08SiUH8zMWA=
+X-Gm-Gg: AeBDieuoZKkXISpPFDAJhwGcinV6XtWRrBUrPRKhoT5Ft/vX9alXOzHAckrAE/EzBuR
+	vxr9ll/xDBvS4scMOc6r4KbSHf9iODH+CY1LoCB+4wXLtCIo1q092lEMYGOWAlM8A7MLGVFSPR3
+	5NU729WjwmCtL/dpxxDyW1YX8uwvrHm1fXQSWSfO+D7nN2qPx8puLVXFRn85GQKdYAlqJE0cBRn
+	f87WAwQoFU7+gp6+3J3EuIkZsh8llZwtZo4VdyhaJhPdztPvhqyvN/FkNHCcp1y40KkPwkbi6QG
+	ZpF0NUvgDpJHqcqQG812WsYQm4ASLtTq0zOt1Y2H/zt0QxwIA/I5u4MSs9GLQub5E4XL6/Gk6zw
+	RZw==
+X-Received: by 2002:a05:6820:98a:b0:68c:a53c:8ff1 with SMTP id
+ 006d021491bc7-68ca54bd3eamr11009276eaf.11.1776266377081; Wed, 15 Apr 2026
+ 08:19:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
-X-Spamd-Result: default: False [0.84 / 15.00];
+References: <20260407-brcm-prio-v2-1-3f745edf49af@gmail.com>
+ <CABBYNZJAEqwfTuVqbFAnx97HBSjcwn3Hb+y+r4r2C=MMPxFoDg@mail.gmail.com> <CAMT+MTQ6orj5tpiGL9hz8m2TGiBjA-9D_0e1iLt=_dXBFHcOgg@mail.gmail.com>
+In-Reply-To: <CAMT+MTQ6orj5tpiGL9hz8m2TGiBjA-9D_0e1iLt=_dXBFHcOgg@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 15 Apr 2026 11:19:24 -0400
+X-Gm-Features: AQROBzDwk1p0rJ7IlG2lPh_IuUkTifTHO7F9HnsebEPzRDlTsV8TRziiZbRGV7g
+Message-ID: <CABBYNZLNR8hYS9jLLKeB=M9XVvtSFtf1wi4DmcJKBbQVvHTPaw@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: Add Broadcom channel priority commands
+To: Sasha Finkelstein <fnkl.kernel@gmail.com>
+Cc: Sven Peter <sven@kernel.org>, Janne Grunau <j@jannau.net>, Neal Gompa <neal@gompa.dev>, 
+	Marcel Holtmann <marcel@holtmann.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org, asahi@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-bluetooth@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-278825-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278824-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[broadcom.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vikas.gupta@broadcom.com,netdev@vger.kernel.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,broadcom.com:email,broadcom.com:dkim,broadcom.com:mid];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[luizdentz@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.997];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 220D6405DA0
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 06388405CFD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The backing store type, BNGE_CTX_MRAV, is not applicable in Thor Ultra
-devices. Remove it from the backing store configuration, as the firmware
-will not populate entities in this backing store type, due to which the
-driver load fails.
+Hi Sasha,
 
-Fixes: 29c5b358f385 ("bng_en: Add backing store support")
-Signed-off-by: Vikas Gupta <vikas.gupta@broadcom.com>
-Reviewed-by: Dharmender Garg <dharmender.garg@broadcom.com>
----
- drivers/net/ethernet/broadcom/bnge/bnge_rmem.c | 16 ----------------
- 1 file changed, 16 deletions(-)
+On Wed, Apr 15, 2026 at 8:34=E2=80=AFAM Sasha Finkelstein <fnkl.kernel@gmai=
+l.com> wrote:
+>
+> On Tue, 14 Apr 2026 at 16:00, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+> > > +       if (sock)
+> > > +               set_bit(SOCK_CUSTOM_SOCKOPT, &sock->flags);
+> >
+> > This is more complicated than it needs to be. I'd just add a new
+> > callback, `hdev->set_priority(handle, skb->priority)`, so the driver
+> > is called whenever it needs to elevate a connection's priority, that
+> > said there could be cases where a connection needs its priority set
+> > momentarily to transmit A2DP, followed by OBEX packets that are best
+> > effort. Therefore, `hci_conn` will probably need to track the priority
+> > so it can detect when it needs changing on a per skb basis.
+>
+> I have tested per-skb priorities, and unfortunately, this does not work.
+> If something tries to send a low-priority packet (for example - a volume
+> adjustment), a priority drop causes the same kind of dropout that is
+> caused by scans. It appears that the only way to make this hardware work
+> is to set the entire hci connection as high priority for as long as it
+> is being used to transmit audio.
 
-diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_rmem.c b/drivers/net/ethernet/broadcom/bnge/bnge_rmem.c
-index 94f15e08a88c..b066ee887a09 100644
---- a/drivers/net/ethernet/broadcom/bnge/bnge_rmem.c
-+++ b/drivers/net/ethernet/broadcom/bnge/bnge_rmem.c
-@@ -324,7 +324,6 @@ int bnge_alloc_ctx_mem(struct bnge_dev *bd)
- 	u32 l2_qps, qp1_qps, max_qps;
- 	u32 ena, entries_sp, entries;
- 	u32 srqs, max_srqs, min;
--	u32 num_mr, num_ah;
- 	u32 extra_srqs = 0;
- 	u32 extra_qps = 0;
- 	u32 fast_qpmd_qps;
-@@ -390,21 +389,6 @@ int bnge_alloc_ctx_mem(struct bnge_dev *bd)
- 	if (!bnge_is_roce_en(bd))
- 		goto skip_rdma;
- 
--	ctxm = &ctx->ctx_arr[BNGE_CTX_MRAV];
--	/* 128K extra is needed to accommodate static AH context
--	 * allocation by f/w.
--	 */
--	num_mr = min_t(u32, ctxm->max_entries / 2, 1024 * 256);
--	num_ah = min_t(u32, num_mr, 1024 * 128);
--	ctxm->split_entry_cnt = BNGE_CTX_MRAV_AV_SPLIT_ENTRY + 1;
--	if (!ctxm->mrav_av_entries || ctxm->mrav_av_entries > num_ah)
--		ctxm->mrav_av_entries = num_ah;
--
--	rc = bnge_setup_ctxm_pg_tbls(bd, ctxm, num_mr + num_ah, 2);
--	if (rc)
--		return rc;
--	ena |= FUNC_BACKING_STORE_CFG_REQ_ENABLES_MRAV;
--
- 	ctxm = &ctx->ctx_arr[BNGE_CTX_TIM];
- 	rc = bnge_setup_ctxm_pg_tbls(bd, ctxm, l2_qps + qp1_qps + extra_qps, 1);
- 	if (rc)
--- 
-2.47.1
+Ok, then maybe we should decrease the priority, so it can only go up.
+That said, in a multiple connection scenario, we cannot really tell
+what should be prioritized if we cannot momentarily decrease the
+priority.
 
+--=20
+Luiz Augusto von Dentz
 
