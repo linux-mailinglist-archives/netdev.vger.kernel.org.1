@@ -1,167 +1,162 @@
-Return-Path: <netdev+bounces-278847-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278848-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yKOnI2PL32nVYwAAu9opvQ
-	(envelope-from <netdev+bounces-278847-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 19:31:15 +0200
+	id uFdqCKHL32nVYwAAu9opvQ
+	(envelope-from <netdev+bounces-278848-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 19:32:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87AF4406D0E
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 19:31:14 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 367AC406D25
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 19:32:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id DB634305497C
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 17:23:38 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2F15F3006B38
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 17:32:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B90763E9585;
-	Wed, 15 Apr 2026 17:23:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 171043EC2FF;
+	Wed, 15 Apr 2026 17:32:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KBvTTE8a"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="hDOnBqER"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f173.google.com (mail-dy1-f173.google.com [74.125.82.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C82A395D9F
-	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 17:23:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DBAA3ED10A
+	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 17:32:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776273813; cv=none; b=pLKxv2Ab/R4vcGO/xQhQmGCtYOa6zq1dCqKnq2pdJzEd498BA2ErPqF5olX6Rs4h059JlgyfF6KozZwYzngJ4EsTJvsccyJozy+UNxG+7DeJS8PYbHttR9AkBoKNSp3rnMhvdU/3QkhQxNo7gEkh2xhGikgt8szicY4QiIpFfvA=
+	t=1776274333; cv=none; b=BH7psHk7GaoPIy+h22+S09NxqWK8h8XM2gVL5QYFfDg9kXdGvKzo5s32wb7XiZ1ZnwX4JSGIuWSLEUNBeKhOqNcHHDEEvzGoxTTqNAcPKptXa9ELrj9tGtpqPMtenlow/gX8I+lfkeTEa1QJIb4sW6gwkNwRlv+Dtsit8Vfv5H8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776273813; c=relaxed/simple;
-	bh=mpiW98q5chB3jszBp5OXfQ1hRIuKU7nwacyQchk257U=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=imHap76Zn6Z+UxvrYZ9zXBSb0OV+G1BalkIgdUnu72eo7o5a0i5hJJJo4iURcuqrYY8JfgNwVg2ZNPqPPVAFwW/QPvEAVM/9WzFmxc10NkTxHl47dKwajCz8YFNN5Za/pmzlqbCGuuUiKplH2TEBSIozKolk0fGStgI+kHkLFSY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KBvTTE8a; arc=none smtp.client-ip=74.125.82.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dy1-f173.google.com with SMTP id 5a478bee46e88-2d8ffdc31d0so7631084eec.0
-        for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 10:23:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776273810; x=1776878610; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:to:subject:cc
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mpiW98q5chB3jszBp5OXfQ1hRIuKU7nwacyQchk257U=;
-        b=KBvTTE8a1mEX0n5ee3suoG6vnre8r0VQSYC3Z8kVmp/bulTZkImpUjiCTVGRwE1PoN
-         MqAJmHBHvIlTCOPVh0TH4qDI0KZUw3FpHFjesFyH9IxhiKEksQqcC/GbJDp+LSHepgGI
-         NkYWfluGQOF6ouigZUpThu8l8MBPzmEr0fOTpmPtGTdtqVX2iz7+0KIynxOxza6efz9H
-         2ltl24ozJItfGthqUFxBMnDgJIrOk9rqQMIEMtf/RAaVmuMFfF4DiWgfIrqCPs87+Cvt
-         SEwxmB1PY4D9ttRcA4ZvNkTpXkIzTT5LtrWc2xj/13yjgDoztAxLQJ3bClxgSsFBuFFW
-         DuQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776273810; x=1776878610;
-        h=content-transfer-encoding:in-reply-to:from:references:to:subject:cc
-         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=mpiW98q5chB3jszBp5OXfQ1hRIuKU7nwacyQchk257U=;
-        b=IupDVWP36gWncY/upMZ/4ucfOgisVGsFRQ6mZKncGQF3yknfswcmBH3aQjbMJ7MgUQ
-         la0Sf8jb+ewiPRotnMiYM9SlJRc3xeleX2fc3Rjmy93YEB5L0oHl3A9ht7PShv8dRegu
-         LQcDYZJz86KbuLAf55ylyu/pVPIghEyW2XjcRhVehn8fVGQGqcfMv4Y/YR/pJNGlxcJi
-         RBZi0ce9gupU3ZrL0b9ncpNaTyZd6aVjo3hlZl4uNM+PkIlhgbCr1uSd3SLoc2/SxMbO
-         ek40b+hi4wl1ntX4/BedfttjuNCwT0BHNonlcBzocOe7ccfATXjGxb1Qfgd7hIken0P2
-         2PIw==
-X-Forwarded-Encrypted: i=1; AFNElJ/EiEvCKrG70IY5WZxQM7RZ6smPRvvlXn3DxwieJ3mT726SXMtAKZiL0nTYD2Yk1qfEXhJ7jLE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxe1qu9tUC559raJVGYbYOhOAWRwKLYziq1+X2gIQoDA8aYgHE+
-	5uDWW0z6GUj66ZuriemxfxmUHp87M3DHrdn91eoSMrPViUFCaPhxLyce
-X-Gm-Gg: AeBDieuf2V2LPwr5g/SKtCJv8UN4oYjIIPvHA0mQN+XnYpjD5V5Ixa36XiEdnl1e6Yp
-	ASH7eGOpNd8A6MezNCZoG0GI4+n+165eefTzbJ8dcTvlmPVfMsqlIvpX/s0xKrq6qt9jvilnFpU
-	Z/kqMEDqfYEXb5ndRs0DlYiy6g7XD92O9mMnSoxyEi1SmXXjcV1uxt1iYrriD2QqWSzkUXj2fSR
-	I9eBo2nBvmdZpQSgWMkafwyClnOjBy3r/GysQ5bex32qWP+bkcfAZk3fg7Th7NVVlODs261RLW+
-	kXE6Bh/+ntJfGzLTrAY11vGMD/TdAzmMglTZlLllebzAwqnSVJwsVMsduA4ZzIzsOzQNEH88hNP
-	kRNemcMteb1RqrxpNeri43eHa/itGGcBUCAk6gb76z4Muoa1CR1wspWDfl6NAg4CM/HXpJQJv99
-	jmaeYFPkF6xjn5Bl+PnLPSic61j1Xi16a7P9C/BWrROWJOHyo=
-X-Received: by 2002:a05:7022:fa8:b0:128:d2a5:709c with SMTP id a92af1059eb24-12c34f18363mr12935629c88.33.1776273810099;
-        Wed, 15 Apr 2026 10:23:30 -0700 (PDT)
-Received: from [10.0.0.2] ([169.235.25.186])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2de8f65fc42sm3485269eec.23.2026.04.15.10.22.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Apr 2026 10:23:29 -0700 (PDT)
-Message-ID: <2fbe2fc5-0e4d-4a87-93b7-9b23f8b3a16b@gmail.com>
-Date: Wed, 15 Apr 2026 10:22:06 -0700
+	s=arc-20240116; t=1776274333; c=relaxed/simple;
+	bh=1I1KmVFUZ5qSJm4NxYrqYBOrSRz2EsAkrxr7eQWclx4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iNm7o8qR2vHk0JzXvhb/WagF6qo/YUx5rOvnIqCxbiBPnFT+vIU8Rm51ZJFWW2q1oXdm+aHYN36o2sXfDr7UHfuodWQuUKj41Qk5jacDLM+z2MtUorMaqi6AvIoE8DBJ60oW9gvR4prXbfvQ7gJWHQMKlLZilEKOfuU/xtUgYkI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=hDOnBqER; arc=none smtp.client-ip=91.218.175.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Wed, 15 Apr 2026 10:31:42 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1776274315;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1E9SNK8votdUUiELWyxRQ1UqK27dc1Rr/hhOeHUwdoA=;
+	b=hDOnBqERvoCMz08Ir2a3RtH+hTMsuZ4BHDTcoUHor1IZRAhPilXWIUhAICj9zqewdfmNRc
+	CxDxjRzmrJWSzPAUsBdiRx4ADUm0M9s1W+KRe9Opybqq+1xWD0G5y9tVAifm2xnEKIMSdT
+	DqIHDxj21hZEfv2aLmnCLD0AfpZB6Xg=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+To: KaFai Wan <kafai.wan@linux.dev>
+Cc: edumazet@google.com, ncardwell@google.com, kuniyu@google.com, 
+	davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, 
+	horms@kernel.org, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
+	eddyz87@gmail.com, memxor@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
+	jolsa@kernel.org, shuah@kernel.org, sdf@fomichev.me, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	Quan Sun <2022090917019@std.uestc.edu.cn>, Yinhao Hu <dddddd@hust.edu.cn>, 
+	Kaiyan Mei <M202472210@hust.edu.cn>
+Subject: Re: [PATCH bpf-next 1/2] bpf: tcp: Reject TCP_NODELAY from BPF hdr
+ opt callbacks
+Message-ID: <2026415171036.QLi9.martin.lau@linux.dev>
+References: <20260414112310.1285783-1-kafai.wan@linux.dev>
+ <20260414112310.1285783-2-kafai.wan@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: yuantan098@gmail.com, magnus.karlsson@intel.com,
- maciej.fijalkowski@intel.com, netdev@vger.kernel.org, bpf@vger.kernel.org,
- sdf@fomichev.me, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, ast@kernel.org, daniel@iogearbox.net,
- hawk@kernel.org, john.fastabend@gmail.com, bjorn@kernel.org,
- linux-kernel@vger.kernel.org, yifanwucs@gmail.com
-Subject: Re: [PATCH 1/1] xskmap: reject TX-only AF_XDP sockets
-To: Jason Xing <kerneljasonxing@gmail.com>, Linpu Yu <linpu5433@gmail.com>
-References: <cover.1774701288.git.linpu5433@gmail.com>
- <6584463e576b7bb3619dc302cfecfb8ca56bc86a.1774701288.git.linpu5433@gmail.com>
- <CAL+tcoAy5WQRsL6z=YinPaiBNvd_=WB7qsR4amf1x4=qVw7AAg@mail.gmail.com>
-From: Yuan Tan <yuantan098@gmail.com>
-In-Reply-To: <CAL+tcoAy5WQRsL6z=YinPaiBNvd_=WB7qsR4amf1x4=qVw7AAg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260414112310.1285783-2-kafai.wan@linux.dev>
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [4.34 / 15.00];
+	SEM_URIBL(3.50)[uestc.edu.cn:email];
+	MID_CONTAINS_FROM(1.00)[];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	BAD_REP_POLICIES(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-278847-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[gmail.com,intel.com,vger.kernel.org,fomichev.me,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net];
-	RCPT_COUNT_TWELVE(0.00)[20];
+	TAGGED_FROM(0.00)[bounces-278848-lists,netdev=lfdr.de];
+	R_DKIM_ALLOW(0.00)[linux.dev:s=key1];
+	GREYLIST(0.00)[pass,meta];
+	FREEMAIL_CC(0.00)[google.com,davemloft.net,kernel.org,redhat.com,iogearbox.net,gmail.com,linux.dev,fomichev.me,vger.kernel.org,std.uestc.edu.cn,hust.edu.cn];
+	RCPT_COUNT_TWELVE(0.00)[26];
+	RCVD_COUNT_THREE(0.00)[3];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yuantan098@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lzu.edu.cn:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 87AF4406D0E
+	R_SPF_ALLOW(0.00)[+ip4:172.105.105.114:c];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[martin.lau@linux.dev,netdev@vger.kernel.org];
+	DMARC_POLICY_ALLOW(0.00)[linux.dev,none];
+	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_SPAM(0.00)[0.492];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,linux.dev:dkim,linux.dev:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,hust.edu.cn:email]
+X-Rspamd-Queue-Id: 367AC406D25
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+On Tue, Apr 14, 2026 at 07:23:09PM +0800, KaFai Wan wrote:
+> A BPF_SOCK_OPS program can enable
+> BPF_SOCK_OPS_WRITE_HDR_OPT_CB_FLAG and then call
+> bpf_setsockopt(TCP_NODELAY) from BPF_SOCK_OPS_HDR_OPT_LEN_CB.
+> 
+> That reaches __tcp_sock_set_nodelay(), which may call
+> tcp_push_pending_frames(). The transmit path then computes TCP
+> options again, re-enters bpf_skops_hdr_opt_len(), and invokes the
+> same BPF callback recursively. This can loop until the kernel
+> stack overflows.
+> 
+> TCP_NODELAY is not safe from the header option callback context.
+> Reject it with -EOPNOTSUPP when TCP header option callbacks are
+> enabled on the socket, so the callback cannot recurse back into
+> tcp_push_pending_frames() through do_tcp_setsockopt().
+> 
+> Reported-by: Quan Sun <2022090917019@std.uestc.edu.cn>
+> Reported-by: Yinhao Hu <dddddd@hust.edu.cn>
+> Reported-by: Kaiyan Mei <M202472210@hust.edu.cn>
+> Closes: https://lore.kernel.org/bpf/d1d523c9-6901-4454-a183-94462b8f3e4e@std.uestc.edu.cn/
+> Fixes: 7e41df5dbba2 ("bpf: Add a few optnames to bpf_setsockopt")
+> Signed-off-by: KaFai Wan <kafai.wan@linux.dev>
+> ---
+>  net/ipv4/tcp.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+> index 202a4e57a218..7ac4c98be19d 100644
+> --- a/net/ipv4/tcp.c
+> +++ b/net/ipv4/tcp.c
+> @@ -4004,7 +4004,10 @@ int do_tcp_setsockopt(struct sock *sk, int level, int optname,
+>  
+>  	switch (optname) {
+>  	case TCP_NODELAY:
+> -		__tcp_sock_set_nodelay(sk, val);
+> +		if (val && BPF_SOCK_OPS_TEST_FLAG(tp, BPF_SOCK_OPS_WRITE_HDR_OPT_CB_FLAG))
 
-On 4/15/2026 1:43 AM, Jason Xing wrote:
-> On Mon, Mar 30, 2026 at 3:33 AM Linpu Yu <linpu5433@gmail.com> wrote:
->> Reject TX-only AF_XDP sockets from XSKMAP updates. Redirected
->> packets always enter the Rx path, where the kernel expects the
->> selected socket to have an Rx ring. A TX-only socket can
->> currently be inserted into an XSKMAP, and redirecting a packet
->> to it crashes the kernel in xsk_generic_rcv().
->>
->> Keep TX-only AF_XDP sockets valid for pure Tx use, but prevent
->> them from being published through XSKMAP.
->>
->> Fixes: fbfc504a24f5 ("bpf: introduce new bpf AF_XDP map type BPF_MAP_TYPE_XSKMAP")
->> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
->> Reported-by: Yuan Tan <yuantan098@gmail.com>
->> Signed-off-by: Xin Liu <bird@lzu.edu.cn>
->> Signed-off-by: Yifan Wu <yifanwucs@gmail.com>
->> Signed-off-by: Linpu Yu <linpu5433@gmail.com>
-> Hi Linpu,
->
-> Any plan to post a v2 with our questions resolved?
->
-> Thanks,
-> Jason
+It will break the syscall setsockopt and also break the existing bpf prog
+that calls bpf_setsockopt(TCP_NODELAY) in CB other than the
+BPF_SOCK_OPS_HDR_OPT_LEN_CB/BPF_SOCK_OPS_WRITE_HDR_OPT_CB.
 
-Hi Jason, Linpu has an exam to take this week. He told he can try
-preparing the v2 patch this weekend. Best,
+Lets brainstorm other options suggested on the list that have smaller
+blast radius.
 
-Yuan
+pw-bot: cr
 
+> +			err = -EOPNOTSUPP;
+> +		else
+> +			__tcp_sock_set_nodelay(sk, val);
+>  		break;
+>  
+>  	case TCP_THIN_LINEAR_TIMEOUTS:
+> -- 
+> 2.43.0
+> 
 
