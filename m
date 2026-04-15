@@ -1,165 +1,215 @@
-Return-Path: <netdev+bounces-278744-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278745-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IFDDF09q32niSgAAu9opvQ
-	(envelope-from <netdev+bounces-278744-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 12:37:03 +0200
+	id SBATA5xq32niSgAAu9opvQ
+	(envelope-from <netdev+bounces-278745-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 12:38:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1BB2403514
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 12:37:02 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83996403534
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 12:38:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2741E3017C18
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 10:37:01 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2C7A0302D955
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 10:38:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 682BC33FE1F;
-	Wed, 15 Apr 2026 10:37:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87B1F39FD4;
+	Wed, 15 Apr 2026 10:38:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SzGAju9R"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AJrnX99Y";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="U0NcrzVV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F65033F5B5
-	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 10:36:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3726734253B
+	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 10:38:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776249420; cv=none; b=hlpLF1FDIt6i6d58xfAx8UDbbl7hFNDCpGYwDYdEjSPDL6BiXaEY1FHBttr4/YPgmQ95xY140OmQ7n28ImeADJWdqhCfkR+d/vhe6ZOhuHQpcDupIhbGfpPNRNaB9vIkqjvN6IlygcVuFgmqXvtWXSNt/hEzpKTrZUT1AtZNh84=
+	t=1776249497; cv=none; b=RI8UTwaWQxJ6aq538kSV7uBDpuQ+1Vor0CCOPGk8G3Yx6a0IfD7/1CofXKsTvluEWMQChwRBdiFz2V56ZAw+ULtTdo3o7IjVjJFKgu3H5lCMpBZkIBaK6I0Ri4jcY+2KTDQcJgZ0t0swXd/qIvp9Ze0VIEFWqb7rzMcikJ2sa9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776249420; c=relaxed/simple;
-	bh=ec1Boe0Z09sA9RCgq46h2z0pwuvhXspYVCvKglVxqvI=;
+	s=arc-20240116; t=1776249497; c=relaxed/simple;
+	bh=MTvLj66Y77ArXLSp+TSw8ghHRCXJwgL40oURLnpQzt4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L65QK8opWmuX5f3/4pnqg1im1pLu0P6B4D+xeQa2p77QrK2Gh+5b/JO/cphdFUKiV/AVUiNDAN6jrc9qkYGf1SSIYUTrrA0rI9mdAh+Iqe5AUH8Rx9BUzwBdrmH7g9cJfVST/8NHh0Ui+j/H54gDnE+X+qh2lsnDkl+9QnhGaTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SzGAju9R; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1776249418; x=1807785418;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=ec1Boe0Z09sA9RCgq46h2z0pwuvhXspYVCvKglVxqvI=;
-  b=SzGAju9RCFKgQ3tZELvyYuX0+pUoqxvvO9Tjf82GbAp20tE9wDKqO69T
-   9jgqWRdx4aiBIIuw2htPI0LGIS8fzqS/g1QemqPvkE1c2Q2FyKIe1Z0Z5
-   AVx0FKhVyNJj26lpNUQMBGmbzvKw6E5qOdjBae/Wmkuama8wWzmgK/rGg
-   TN09gyBKRVMB4Ljx7yK/tTNTOFITbBuDgBFJibnzVP/7se7FEEFNnkOAz
-   yVoFrY328OhPbXGft2GHhjZ4OaT81DG3/qdLc36IXOFBhS4HCqI2CzKi5
-   m7OsuiU0YUOrWP+fwPaINx8Stkogq9keNBCp4B4QRNA1ke64+RglStcsy
-   Q==;
-X-CSE-ConnectionGUID: +bE9yWJIRTOPCXuIT9n1cw==
-X-CSE-MsgGUID: IqUVF5XnQRm/++1ZHQ3YcA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11759"; a="77334820"
-X-IronPort-AV: E=Sophos;i="6.23,179,1770624000"; 
-   d="scan'208";a="77334820"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2026 03:36:58 -0700
-X-CSE-ConnectionGUID: 2TSAZElDSEO2Uf60wpHf9Q==
-X-CSE-MsgGUID: vzhLAkB5QayV6zUVHj4HOg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,179,1770624000"; 
-   d="scan'208";a="268382713"
-Received: from lkp-server01.sh.intel.com (HELO 7f3b36e5d6a5) ([10.239.97.150])
-  by orviesa001.jf.intel.com with ESMTP; 15 Apr 2026 03:36:57 -0700
-Received: from kbuild by 7f3b36e5d6a5 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1wCxc5-000000000Ov-0z7b;
-	Wed, 15 Apr 2026 10:36:53 +0000
-Date: Wed, 15 Apr 2026 18:36:48 +0800
-From: kernel test robot <lkp@intel.com>
-To: Dudu Lu <phx0fer@gmail.com>, netdev@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, Dudu Lu <phx0fer@gmail.com>
-Subject: Re: [PATCH] rose: Fix rose_find_socket() returning without
- sock_hold()
-Message-ID: <202604151819.celyrwKo-lkp@intel.com>
-References: <20260413090420.79932-1-phx0fer@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=DPm8XQzOdl4Yst+k0qaAWFXvgCCVoVtZB+NKXGoo/BjluzgvgXxJ/gXLUhEoT3RlCTjmZBWx8HaTqZ6M5ZahfDreVZrQLCFwV9A5gOwmama87jm+SqjkjSUSjAupa8L1nMkhDcGWc4wCACahb1JZNRXrNq6odkri5Sgc/3iNQ88=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AJrnX99Y; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=U0NcrzVV; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1776249495;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hHOnfYuW3tC+yUaHMZSnrjEvT22LJH6fSZwyXCPhnqE=;
+	b=AJrnX99YSbM91yM5IEAYd1hTzUSta3A2/doH1UdZxvvcWgNRzuWtnuLBqnZuWYPNpvpMix
+	nTaLHeNOubZesjyizOtecxt+f6ZecKrstn2W0satE1VkrVcA2bc0HGsoJlR3x4bBMcLUm2
+	kZEl1U+6AuQzLIkGvZ80b4t3lgY15dM=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-198-sOQG2OUpM6GUnfgg6JefaA-1; Wed, 15 Apr 2026 06:38:14 -0400
+X-MC-Unique: sOQG2OUpM6GUnfgg6JefaA-1
+X-Mimecast-MFC-AGG-ID: sOQG2OUpM6GUnfgg6JefaA_1776249493
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-483786a09b1so70108905e9.3
+        for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 03:38:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1776249493; x=1776854293; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=hHOnfYuW3tC+yUaHMZSnrjEvT22LJH6fSZwyXCPhnqE=;
+        b=U0NcrzVVjY6gjX5DffGCbMccj7Whri+rEWRWeYaofTN2IrFM4sp0h81cRl7C91bkwG
+         aggg36rkrlKfEesRAWLDrmBYIaO/FQwjqqZXOkmT4lnqB1PxiGE5MAYZOq2fSnIAVNl0
+         AxVH0qemkkFKqsRQOEBRLrwOame+g5w7Wnne84LzAtkovuIzGyMSJd9TeAF1eKIzRIGi
+         rQPDIwW1s/Nh53AURiwjbWHipsTO/+QDckmt1/V9KgN5bNiw6ycmeWggQx8NcxA8iC0S
+         v+cdw0lJxeJW39MLJRmBIc/y/9KyfoQGWOfGVYVdM6OXIpO5rqjd0lN1FzOxV6tqVpa2
+         hJRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776249493; x=1776854293;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hHOnfYuW3tC+yUaHMZSnrjEvT22LJH6fSZwyXCPhnqE=;
+        b=Y6PE2XkVcuU3lsNdG7A0kBkWrq8AgS7JfudIXk7I55BwMP1QoZpNFpWboAlTvEnlYQ
+         rHuanihrvs1on8yRyCa4v8nuF6lBczu0WRhn7nN15vZz6L0Gn4JRyjzyMbqQmq5+H8Kf
+         wMYKG956Iw+SkJdyf/70MGaETBb7JjkENsg28Y9Iwx6NLD8DEhUoPnN/Ozpn4+Lzld+2
+         qpQAYV6507KwWlWZwWisOagiYJ3gAlgQn5UTgvVOeMVAtmomw4nmDx0MAn2b3RuyvQdB
+         hTNY+ZtDBTEf50Ix63tAF2pcm6+41Dv9tYzTp+YwWU+0GwdPXe7gTrhz4zJPAhODYgao
+         8QIA==
+X-Forwarded-Encrypted: i=1; AFNElJ8u5TgxudHWs2EHS48p6a4pYxco7JDRLvDkb4x2GeVbKnvnidnDIkTniIeC/n+LNWOCmw9xQqY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx+R8QeXmFsNgp+31Zb0yHK4KkaTKi/fF2bQDdnowMVA6Wb9fPF
+	HZwbFfkbgBGx8Xdey2U5DHtKCFcBze7KXBl1kYp9QVG+OhZyz5uk3xY4Y1J2yyOseQNH4xNh3jj
+	p/9G4H6XiCgyOGhbGbP6zSFFAhR3pzo+BaIDKFci4y9pzRwjN0iLfeM9SMw==
+X-Gm-Gg: AeBDiesAROupdfwkgNHkLYXjm/grDs8MLReXWDWiB1MN8ktZo5dGyKl0WC7sICaeEff
+	yDDZb29pdaDpKPawsHwFx8+gz3/sxxm/TGHV86f7HZ2r+Fi4ZbNOzezolNWN5a9WbJ40OW+kqFd
+	9ODzcKgz2LsTxjLYwpwtvSRJk+M0tOiNFk33yAp2nBaKZJ4ujSc9X/lqdT4Itg2faMSJ+3T/KOe
+	g8AQwQCgCPw4wwIX81zy9VoJlQVDvfLis4SRPviHLQ54T6mwBXPiDyHIp62nGeUhbnd+M4HRbJF
+	9/r50OQHXuLriCeX2vH7XMW+DXWeUnR6J4WmzMoNEcFOmpyqdH1KJetVGXrOs7pbLzckmsVnBNT
+	bSXcWU0gIFc6zCM/1FCdu2H917EOMwWc+e4KARaGmrSEjT1NBwZZsVpMqMsUwd0dZJVonAxzUd5
+	MBxXzzUQ==
+X-Received: by 2002:a05:600c:890e:b0:488:bd79:94d8 with SMTP id 5b1f17b1804b1-488d684331emr195084365e9.18.1776249492706;
+        Wed, 15 Apr 2026 03:38:12 -0700 (PDT)
+X-Received: by 2002:a05:600c:890e:b0:488:bd79:94d8 with SMTP id 5b1f17b1804b1-488d684331emr195083925e9.18.1776249492197;
+        Wed, 15 Apr 2026 03:38:12 -0700 (PDT)
+Received: from sgarzare-redhat (host-87-16-204-83.retail.telecomitalia.it. [87.16.204.83])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488f0ec6cc6sm17072045e9.29.2026.04.15.03.38.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Apr 2026 03:38:11 -0700 (PDT)
+Date: Wed, 15 Apr 2026 12:38:04 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Dexuan Cui <decui@microsoft.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org, 
+	longli@microsoft.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, horms@kernel.org, niuxuewei.nxw@antgroup.com, 
+	linux-hyperv@vger.kernel.org, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org, Ben Hillis <Ben.Hillis@microsoft.com>, 
+	Mitchell Levy <levymitchell0@gmail.com>
+Subject: Re: [PATCH net] hv_sock: Report EOF instead of -EIO for FIN
+Message-ID: <ad9pPrji1uYSgNir@sgarzare-redhat>
+References: <20260414234316.711578-1-decui@microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20260413090420.79932-1-phx0fer@gmail.com>
-X-Spamd-Result: default: False [-1.16 / 15.00];
+In-Reply-To: <20260414234316.711578-1-decui@microsoft.com>
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lists.linux.dev,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
-	TAGGED_FROM(0.00)[bounces-278744-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-278745-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[microsoft.com,kernel.org,davemloft.net,google.com,redhat.com,antgroup.com,vger.kernel.org,lists.linux.dev,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[sgarzare@redhat.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ukuu.org.uk:email,demon.co.uk:email,sral.fi:email,git-scm.com:url,intel.com:email,intel.com:dkim,intel.com:mid]
-X-Rspamd-Queue-Id: B1BB2403514
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 83996403534
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Dudu,
+On Tue, Apr 14, 2026 at 04:43:16PM -0700, Dexuan Cui wrote:
+>Commit f0c5827d07cb unluckily causes a regression for the FIN packet,
+>and the final read syscall gets an error rather than 0.
+>
+>Ideally, we would want to fix hvs_channel_readable_payload() so that it
+>could return 0 in the FIN scenario, but it's not good for the hv_sock
+>driver to use the VMBus ringbuffer's cached priv_read_index, which is
+>internal data in the VMBus driver.
+>
+>Fix the regression in hv_sock by returning 0 rather than -EIO.
+>
+>Fixes: f0c5827d07cb ("hv_sock: Return the readable bytes in hvs_stream_has_data()")
+>Cc: stable@vger.kernel.org
+>Reported-by: Ben Hillis <Ben.Hillis@microsoft.com>
+>Reported-by: Mitchell Levy <levymitchell0@gmail.com>
+>Signed-off-by: Dexuan Cui <decui@microsoft.com>
+>---
+> net/vmw_vsock/hyperv_transport.c | 18 ++++++++++++++++--
+> 1 file changed, 16 insertions(+), 2 deletions(-)
+>
+>diff --git a/net/vmw_vsock/hyperv_transport.c b/net/vmw_vsock/hyperv_transport.c
+>index 069386a74557..63d3549125be 100644
+>--- a/net/vmw_vsock/hyperv_transport.c
+>+++ b/net/vmw_vsock/hyperv_transport.c
+>@@ -703,8 +703,22 @@ static s64 hvs_stream_has_data(struct vsock_sock *vsk)
+> 	switch (hvs_channel_readable_payload(hvs->chan)) {
+> 	case 1:
+> 		need_refill = !hvs->recv_desc;
+>-		if (!need_refill)
+>-			return -EIO;
+>+		if (!need_refill) {
 
-kernel test robot noticed the following build errors:
+Can we drop `need_refill` entirly and just check `hvs->recv_desc` here?
 
-[auto build test ERROR on net/main]
-[also build test ERROR on net-next/main linus/master horms-ipvs/master v7.0 next-20260414]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Mainly because now the comment we are adding is confusing me about what 
+`need_refill` means.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Dudu-Lu/rose-Fix-rose_find_socket-returning-without-sock_hold/20260414-194608
-base:   net/main
-patch link:    https://lore.kernel.org/r/20260413090420.79932-1-phx0fer%40gmail.com
-patch subject: [PATCH] rose: Fix rose_find_socket() returning without sock_hold()
-config: i386-randconfig-141-20260415 (https://download.01.org/0day-ci/archive/20260415/202604151819.celyrwKo-lkp@intel.com/config)
-compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-smatch: v0.5.0-9007-gcf3ea02b
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260415/202604151819.celyrwKo-lkp@intel.com/reproduce)
+The rest LGTM.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202604151819.celyrwKo-lkp@intel.com/
+Thanks,
+Stefano
 
-All errors (new ones prefixed by >>):
+>+			/* Here hvs->recv_data_len is 0, so hvs->recv_desc must
+>+			 * be NULL unless it points to the 0-byte-payload FIN
+>+			 * packet: see hvs_update_recv_data().
+>+			 *
+>+			 * Here all the payload has been dequeued, but
+>+			 * hvs_channel_readable_payload() still returns 1,
+>+			 * because the VMBus ringbuffer's read_index is not
+>+			 * updated for the FIN packet: hvs_stream_dequeue() ->
+>+			 * hv_pkt_iter_next() updates the cached priv_read_index
+>+			 * but has no opportunity to update the read_index in
+>+			 * hv_pkt_iter_close() as hvs_stream_has_data() returns
+>+			 * 0 for the FIN packet, so it won't get dequeued.
+>+			 */
+>+			return 0;
+>+		}
+>
+> 		hvs->recv_desc = hv_pkt_iter_first(hvs->chan);
+> 		if (!hvs->recv_desc)
+>-- 
+>2.49.0
+>
+>
 
->> net/rose/af_rose.c:1:9: error: expected identifier or '(' before 'if'
-       1 |         if (s)
-         |         ^~
-
-
-vim +1 net/rose/af_rose.c
-
-   > 1		if (s)
-     2			sock_hold(s);// SPDX-License-Identifier: GPL-2.0-or-later
-     3	/*
-     4	 *
-     5	 * Copyright (C) Jonathan Naylor G4KLX (g4klx@g4klx.demon.co.uk)
-     6	 * Copyright (C) Alan Cox GW4PTS (alan@lxorguk.ukuu.org.uk)
-     7	 * Copyright (C) Terry Dawson VK2KTJ (terry@animats.net)
-     8	 * Copyright (C) Tomi Manninen OH2BNS (oh2bns@sral.fi)
-     9	 */
-    10	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
