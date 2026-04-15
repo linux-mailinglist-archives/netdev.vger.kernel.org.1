@@ -1,240 +1,247 @@
-Return-Path: <netdev+bounces-278651-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278652-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +I9iGpcl32lcPQAAu9opvQ
-	(envelope-from <netdev+bounces-278651-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 07:43:51 +0200
+	id qCYWOQYn32nmPQAAu9opvQ
+	(envelope-from <netdev+bounces-278652-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 07:49:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8FBB4008C1
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 07:43:50 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60E31400959
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 07:49:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7D6B030182BD
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 05:43:49 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5931930A4F58
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 05:49:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1C7E37F8A9;
-	Wed, 15 Apr 2026 05:43:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16F02361DD2;
+	Wed, 15 Apr 2026 05:49:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uxuJODnr"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XfD2deoI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CF0D37E2F9
-	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 05:43:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.50
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776231828; cv=pass; b=cCc5DoXXwATFMoSnIe+YwDPf4mOhlSz77s1ywMf87Wh4jCNYqzVz2RL7Yaqo0akawhHLY7U9WcRjb6ePTe09JVI+b0IBvPHqzmAXq0qksAxQeHZ1mW5xosaluNXcJhCFWpCL0RaSIwGf4pY4ethJ2dZJtuTpjmxWcYdG2RhfTcw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776231828; c=relaxed/simple;
-	bh=V3U97sip5Mv4JbGeVHgOZ36r6bRgJkRsbKyhPYwGEV0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fFooG8nVUnpNxOf43LU8wuJuRnpswgudP6/wJx9HF1twuNO3CNuShscShbxu3AVwBNLJXzuSZaSkt9/cgd7fU9TS7qhTbbBNGDYFTDZ+uhnvkwGVs2f2BXBKhawE77kA/Z7n2Zy3nAMlcgBGkdwAmODJ4gMKhQk+JLKoaIOotdg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uxuJODnr; arc=pass smtp.client-ip=209.85.219.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-8aca0469204so35962986d6.2
-        for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 22:43:46 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776231826; cv=none;
-        d=google.com; s=arc-20240605;
-        b=YDVu0khRPcfjraFN5dTJ8AQAsD7cVxVYZUpcgEDc51YG7Kc3fjxwwhGzeA+cRAfF7j
-         sZRBL9dJwG8nOcGp4Xo6O4pcFHb90lg9QJNV51Hz81pOzg3Wt+kxQ/oZlpgqhAvzEkph
-         u1/ddrLBSJTxSjaL7+kTBwzeNuYGb8W2Nm3KewGEza1kSElFUbOV2TEhGhODNgmlDMlT
-         dLPf1WGJ5+MZaGwbjQGYfG0B9UzYE4xMy0LgOQUWmQJz5QssnHRpzIlCoyzG1A8RSz8I
-         y/ecGXaW72+33JE0v+w9u8rgm8yRM+GoAQITsdGQB4AIjqlY6PIOnyqmMcxlDFPZawl8
-         ieVQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=rUq3AhoGeUTEXVFbLhU6OMKy97K/qIMl3XnWAtEojyE=;
-        fh=biXnKMvMaHmXKzwwcRbfe+xz0KSzGf64Ls7CpRP63HE=;
-        b=F/nLisM1/E2kb35KiNThz/sduGWOEKetkhcvLQgjKNAP7lpP4CquyG7LpvZAcyDg/z
-         Gb2GXGvDLgvGAeR4D3mC0wBZvoY5pkgM4OAaJiybYugcmMDb0jXjoOJKECirAq04JZe1
-         zr3qAgxQehIeKIoj+PGTzjc5dEHTJIDxjy0SrT5Bjf6Sd2sgAzkKDhl8SO5p+iBkDkmB
-         mv3cuHtEsFm8keJZxiD69R5kGTMIWtuISJ5S7FEpEJYwmVI29aT3RSJ7X69JrMAH64z2
-         e6J5PR08OAU+DFKX+YB0rlNUiOSTQWHfdxZoFGQ4e/+v+OE9oAk6kDUtglpSsD5p0Lhi
-         dYwA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1776231826; x=1776836626; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rUq3AhoGeUTEXVFbLhU6OMKy97K/qIMl3XnWAtEojyE=;
-        b=uxuJODnrNwteherc5RDRtkFobbDsu/5onvdU9RUg701AQx+30aTZfjE+dD5sRdXA2d
-         DkOv0y6hyGN49S9GuPrrj6evia6gF3ZB0INzArlDpxADp3S9hp96Ooi9vt1G0nHcGyKM
-         plGa88VbgbH/msGGrJLIfnJqiA9HVBxh/5BpsBcHMbY/ro7iB2ksTNfae3zerubPsJ+A
-         sR9rhvl+iEEnK7/kDGL4Sq9Zohjrt1PVauGUc1ii0M3VlmV3SmgtMcorKxBrNu86NAOa
-         mAVVZvTvVGEE9i+jzBW9xpBGyI4dwAfrRnY2U2JcDGBiiripcUTfPdUg9MbHXmi2iG5W
-         hhPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776231826; x=1776836626;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=rUq3AhoGeUTEXVFbLhU6OMKy97K/qIMl3XnWAtEojyE=;
-        b=GdOBo8cDYpzEN/dniJjFx2/+qXcz9RWpq2E++6E/heJitk4sAyk9vHBPMZbLSMvrMB
-         ERS6gdt1QnMpm8Q3a5xx6zIb6kPm6ytmIKWg3jrzrqXk1Ujx0nAvyZs1Eu0l0zUrwRAU
-         A/O0qJpOZwPDaFOFKFpAWW1GI+Eik2t5Q0YPAnFXE3rC+aS2pFnXYvpNhzfcK0BFgO7U
-         MbqGD0EHipP3eIwd9RYRLEywzxAf9kKbIpLtHE3MSlKITrKmQ96LHuazxc374QRITkMf
-         P7gk3CuAvRxHHRjDhB+vzgr3My5TzRS37PsXu+OJw6DtDz2EPXcODUq1Vy67etWXRDgK
-         0IgQ==
-X-Gm-Message-State: AOJu0YyLYz/W04aDhcQ8YS1VuNLDqSt9HR0aEoDqzYwxgrGwl+aq5nMc
-	O+qBsHtBUD/UfxmGw5Lr4gm6l4rSuzzP1uNz78VKsSk5eOHHRtjZJ6yrsst21HNi1xsYOuUJxRl
-	cXbdIjaFa6ZsLW/7HKciX79CWRQjUGHMU88VuPTtO
-X-Gm-Gg: AeBDieuXlG/sqgTsN2QeOevNevOT+9cRjXBTYXinm9LQFp1kgqGWnRhwkEyOWmm7GGK
-	M376t3rSEJH2tKJVxd8ysdiLE7yRz5jT/cDGy37RJimBwdKcxTzUJE5rFPY3x9X982PZpwDyg+y
-	ynVYiulaO1ppNKoNZF2EYdi+l4ramDC1XPj9pA11yHgT2e+Hkq8EF88JtDFXek6bLH78iyGlGMY
-	1ccvQYFFfj4a51x/n9nxxO/vsvy3MXQktjoqvqGbtTiP5RFDBFPKAEoIx/CMxcI4P/OP1skCjMg
-	wZjpxZfSLTzS+IuXwQ7P6O8fsmiVu4EQ/Vi1p+QxdqmPa/1DzYyqpqfjq6Zl1jMUxopXJFxAiAy
-	XPYnAIA==
-X-Received: by 2002:a05:6214:498a:b0:8ac:800f:10d5 with SMTP id
- 6a1803df08f44-8ac86139ec5mr312117346d6.2.1776231825618; Tue, 14 Apr 2026
- 22:43:45 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52F6B2F9998;
+	Wed, 15 Apr 2026 05:49:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776232167; cv=none; b=ViWXxRFM5D2A9zXDgZlk2zyg2FXk+y8wyXHVe/iDOmpFLZdFTO0LNSvbPKqLsEV7RmAKlOQht/qGh2QL9C/rtn3oRxuDFoTI4qKyAzv8FDwGr+MNtfK6lWmeHwoFYOL/OzomirXmpkUDQy4bWobiFW+3alPVztcfsZ//sZ4u8wc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776232167; c=relaxed/simple;
+	bh=SToZHeiExoVmCVjlNNleco04kxxV7uv1KyLf6s8n+os=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=p6wdWezgLViwrF5nxTwSRPPd8gM5S4frkRyXd2MTGdPp4u0uCvSBzKB+tIxirurmZ/sAvJfsuBe2M3MxGfxksIS2Mp0QfbPVslReEN4Xs5L9HuZuZBmSv9okrovV1oj7122FDjYVZxBVToMGke3Wwap0AaXSMXSRhOj+ZWNMB6Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XfD2deoI; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1776232165; x=1807768165;
+  h=from:subject:date:message-id:mime-version:
+   content-transfer-encoding:to:cc;
+  bh=SToZHeiExoVmCVjlNNleco04kxxV7uv1KyLf6s8n+os=;
+  b=XfD2deoIEWXoJmkNZ47jTb2PQCJtxJLTjckx6ucGEJbcV0gxfdspT5z/
+   NusF+fWYBxLBysDon0QKwxFp5aVdMWgKotdh3Ei4uLS9jcRi4kmGeIMS6
+   R5UsWlY/Sx93YDTdEphuHeUkYf9mRtZx1QXXNKHxVUecWIfZwJ4H5zaf1
+   t7kFF94+DUTq5vNxoBkaLPbiSUI5mzYxfRJj96HZLR9FGLyO/kZbAhicJ
+   EIHuqK3asS4RhzxLwnw827Kyb+e7A/Lo6u9NyjeihciH6D+Py0C38OmcS
+   lFawldW4avEJYhGVo7CZueJslGR2H1fvMMGVl8/AWKewpooOatlUn5y4H
+   w==;
+X-CSE-ConnectionGUID: dU79un4HRZ6AKfoZvfyAJQ==
+X-CSE-MsgGUID: Y8BgpUAZT2m7JKK4UpKh+g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11759"; a="77105904"
+X-IronPort-AV: E=Sophos;i="6.23,179,1770624000"; 
+   d="scan'208";a="77105904"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2026 22:49:24 -0700
+X-CSE-ConnectionGUID: sUemhswkTjqfUHh6/YHxVQ==
+X-CSE-MsgGUID: tBn3KHTBQlKh5PN6u2WVUw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,179,1770624000"; 
+   d="scan'208";a="253714784"
+Received: from orcnseosdtjek.jf.intel.com (HELO [10.166.28.109]) ([10.166.28.109])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2026 22:49:23 -0700
+From: Jacob Keller <jacob.e.keller@intel.com>
+Subject: [PATCH net 00/13] Intel Wired LAN Driver Updates 2026-04-14 (ice,
+ i40e, iavf, idpf, e1000e)
+Date: Tue, 14 Apr 2026 22:47:55 -0700
+Message-Id: <20260414-iwl-net-submission-2026-04-14-v1-0-852f38e7da39@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260415051343.1190626-1-juno.choi@lge.com>
-In-Reply-To: <20260415051343.1190626-1-juno.choi@lge.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 14 Apr 2026 22:43:34 -0700
-X-Gm-Features: AQROBzDc24cK0Vx__LVonLpxYLUrDPSB3lSAE_BJVtbHJbhj9hZnSv12-voqCKU
-Message-ID: <CANn89iL7Q0bxJ1nnJoLH3RwozfVf2ijGNo4PmJFHtScbpGAwRw@mail.gmail.com>
-Subject: Re: [PATCH] net: ipv4: fix alignment fault in sysctl_fib_multipath_hash_seed
- on ARM64 with Clang
-To: Juno Choii <juno.choi@lge.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yWM2wrCMAyGX2Xk2kDalSK+injhtkwj2o1mJxh7d
+ 1O9/P7Dt4NyFla4VDtkXkRlSAbuVEH7vKcHo3TG4MlHCi6grG9MPKHOzUe0zLF0SAGtjZ5qdud
+ IXV+DOcbMvWw//xXsBrd/aO8Xt1Mxw3F8AVZp2KeGAAAA
+X-Change-ID: 20260414-iwl-net-submission-2026-04-14-6203e1860df3
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Jacob Keller <jacob.e.keller@intel.com>, 
+ Grzegorz Nitka <grzegorz.nitka@intel.com>, 
+ Aleksandr Loktionov <aleksandr.loktionov@intel.com>, 
+ Simon Horman <horms@kernel.org>, Rinitha S <sx.rinitha@intel.com>, 
+ Zoltan Fodor <zoltan.fodor@intel.com>, 
+ Sunitha Mekala <sunithax.d.mekala@intel.com>, 
+ Guangshuo Li <lgs201920130244@gmail.com>, stable@vger.kernel.org, 
+ Michal Schmidt <mschmidt@redhat.com>, 
+ Paul Greenwalt <paul.greenwalt@intel.com>, 
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+ Keita Morisaki <kmta1236@gmail.com>, Kohei Enju <kohei@enjuk.jp>, 
+ Petr Oros <poros@redhat.com>, Paul Menzel <pmenzel@molgen.mpg.de>, 
+ Rafal Romanowski <rafal.romanowski@intel.com>, 
+ Emil Tantilov <emil.s.tantilov@intel.com>, 
+ Patryk Holda <patryk.holda@intel.com>, Matt Vollrath <tactii@gmail.com>, 
+ Avigail Dahan <avigailx.dahan@intel.com>
+X-Mailer: b4 0.16-dev-ea14f
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4153;
+ i=jacob.e.keller@intel.com; h=from:subject:message-id;
+ bh=SToZHeiExoVmCVjlNNleco04kxxV7uv1KyLf6s8n+os=;
+ b=owGbwMvMwCWWNS3WLp9f4wXjabUkhsz7andmFZw9sWXCsm8x7csYLs0v2vFiT3PNuVnz5N7dY
+ /pm1H3JpqOUhUGMi0FWTJFFwSFk5XXjCWFab5zlYOawMoEMYeDiFICJPCpiZNjftmzNTffp7ck/
+ 2eQmbOieJGbTzp7R6Sa/dnUx/9nVkrsZ/jvMfWXw9XW1XEz67oo9Hdek1bZw/Vs6xTx5qtjmNXf
+ r/BkB
+X-Developer-Key: i=jacob.e.keller@intel.com; a=openpgp;
+ fpr=204054A9D73390562AEC431E6A965D3E6F0F28E8
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-278651-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[27];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-278652-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,intel.com,kernel.org,gmail.com,redhat.com,enjuk.jp,molgen.mpg.de];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jacob.e.keller@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lge.com:email,mail.gmail.com:mid,msgid.link:url]
-X-Rspamd-Queue-Id: B8FBB4008C1
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,intel.com:mid]
+X-Rspamd-Queue-Id: 60E31400959
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Apr 14, 2026 at 10:13=E2=80=AFPM Juno Choii <juno.choi@lge.com> wro=
-te:
->
-> From: Juno Choi <juno.choi@lge.com>
->
-> On ARM64, Clang may generate ldaxr (64-bit exclusive load) for
-> READ_ONCE() on 8-byte structs. ldaxr requires 8-byte natural
-> alignment, but sysctl_fib_multipath_hash_seed (two u32 members)
-> only has 4-byte natural alignment.
->
-> When this struct lands at a 4-byte-aligned but not 8-byte-aligned
-> offset within struct netns_ipv4, the ldaxr triggers an alignment
-> fault in rt6_multipath_hash(), causing a kernel panic in the IPv6
-> packet receive path (rtl8168_poll -> ipv6_list_rcv ->
-> rt6_multipath_hash).
->
-> Add __aligned(8) to the struct definition when building for ARM64
-> with Clang to ensure proper alignment for atomic 8-byte loads.
->
-> Signed-off-by: Juno Choi <juno.choi@lge.com>
-> ---
+Grzegorz updates the logic for adjusting the PTP hardware clock on E830,
+fixing a bug that prevented adjustments below S32_MAX/MIN nanoseconds.
 
-It seems you missed
+Grzegorz and Zoli update the PCS latency settings for E825 devices at 10GbE
+and 25GbE, improving the accuracy of timestamps based on data from
+production hardware.
 
-commit 4ee7fa6cf78ff26d783d39e2949d14c4c1cd5e7f
-Author: Yung Chih Su <yuuchihsu@gmail.com>
-Date:   Mon Mar 2 14:02:47 2026 +0800
+Michal Schmidt fixes a double-free that could happen if a particular error
+path is taken in ice_xmit_frame_ring().
 
-    net: ipv4: fix ARM64 alignment fault in multipath hash seed
+Guangshuo fixes a double-free that could happen during error paths in the
+ice_sf_eth_activate() function.
 
-    `struct sysctl_fib_multipath_hash_seed` contains two u32 fields
-    (user_seed and mp_seed), making it an 8-byte structure with a 4-byte
-    alignment requirement.
+Paul Greenwalt fixes the PHY link configuration when the link-down-on-close
+driver parameter is enabled and new media is inserted.
 
-    In `fib_multipath_hash_from_keys()`, the code evaluates the entire
-    struct atomically via `READ_ONCE()`:
+Paul Greenwalt fixes the ICE_AQ_LINK_SPEED_M macro for 200G, enabling 200G
+link speed advertisement.
 
-        mp_seed =3D READ_ONCE(net->ipv4.sysctl_fib_multipath_hash_seed).mp_=
-seed;
+Keita Morisaki fixes a race condition in the ice Tx timestamp ring cleanup,
+preventing a possible NULL pointer dereference.
 
-    While this silently works on GCC by falling back to unaligned regular
-    loads which the ARM64 kernel tolerates, it causes a fatal kernel panic
-    when compiled with Clang and LTO enabled.
+Kohei Enju fixes a potential NULL pointer dereference in ice_set_ring_param().
 
-    Commit e35123d83ee3 ("arm64: lto: Strengthen READ_ONCE() to acquire
-    when CONFIG_LTO=3Dy") strengthens `READ_ONCE()` to use Load-Acquire
-    instructions (`ldar` / `ldapr`) to prevent compiler reordering bugs
-    under Clang LTO. Since the macro evaluates the full 8-byte struct,
-    Clang emits a 64-bit `ldar` instruction. ARM64 architecture strictly
-    requires `ldar` to be naturally aligned, thus executing it on a 4-byte
-    aligned address triggers a strict Alignment Fault (FSC =3D 0x21).
+Kohei Enju fixes i40e to stop advertising IFF_SUPP_NOFCS, when the driver
+does not actually support the feature.
 
-    Fix the read side by moving the `READ_ONCE()` directly to the `u32`
-    member, which emits a safe 32-bit `ldar Wn`.
+Aleksandr fixes i40e napi_enable/disable for q_vectors that no longer have
+rings.
 
-    Furthermore, Eric Dumazet pointed out that `WRITE_ONCE()` on the entire
-    struct in `proc_fib_multipath_hash_set_seed()` is also flawed. Analysis
-    shows that Clang splits this 8-byte write into two separate 32-bit
-    `str` instructions. While this avoids an alignment fault, it destroys
-    atomicity and exposes a tear-write vulnerability. Fix this by
-    explicitly splitting the write into two 32-bit `WRITE_ONCE()`
-    operations.
+Petr fixes the VLAN L2TAG2 mask when the iAVF VF and a PF negotiate use of
+the legacy Rx descriptor format.
 
-    Finally, add the missing `READ_ONCE()` when reading `user_seed` in
-    `proc_fib_multipath_hash_seed()` to ensure proper pairing and
-    concurrency safety.
+Emil fixes a NULL pointer dereference that can happen in the soft reset if
+a particular error path is taken.
 
-    Fixes: 4ee2a8cace3f ("net: ipv4: Add a sysctl to set multipath hash see=
-d")
-    Signed-off-by: Yung Chih Su <yuuchihsu@gmail.com>
-    Reviewed-by: Eric Dumazet <edumazet@google.com>
-    Link: https://patch.msgid.link/20260302060247.7066-1-yuuchihsu@gmail.co=
-m
-    Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Matt fixes the unrolling logic for PTP when the e1000e probe fails after
+the PTP clock has been registered.
 
-So perhaps you only want this followup:
+ **A note to stable backports**
 
-diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c
-b/drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c
-index 7bd87d0547d8af40ca8736e97eac9e3d8a069052..5de5fd9465b8c5ea81d92dc74d7=
-c6e50e3a94c73
-100644
---- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c
-+++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c
-@@ -11404,7 +11404,7 @@ static int mlxsw_sp_mp_hash_init(struct
-mlxsw_sp *mlxsw_sp)
-        u32 seed;
-        int err;
+  The patches [7/13] ("ice: fix race condition in TX timestamp ring
+  cleanup") and [8/13] ("ice: fix potential NULL pointer deref in error
+  path of ice_set_ringparam()") must be backported together. Otherwise the
+  fix in patch 8 will not work properly.
 
--       seed =3D READ_ONCE(net->ipv4.sysctl_fib_multipath_hash_seed).user_s=
-eed;
-+       seed =3D READ_ONCE(net->ipv4.sysctl_fib_multipath_hash_seed.user_se=
-ed);
-        if (!seed)
-                seed =3D jhash(mlxsw_sp->base_mac, sizeof(mlxsw_sp->base_ma=
-c), 0);
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+---
+Aleksandr Loktionov (1):
+      i40e: fix napi_enable/disable skipping ringless q_vectors
+
+Emil Tantilov (1):
+      idpf: fix xdp crash in soft reset error path
+
+Grzegorz Nitka (2):
+      ice: fix 'adjust' timer programming for E830 devices
+      ice: update PCS latency settings for E825 10G/25Gb modes
+
+Guangshuo Li (1):
+      ice: fix double free in ice_sf_eth_activate() error path
+
+Keita Morisaki (1):
+      ice: fix race condition in TX timestamp ring cleanup
+
+Kohei Enju (2):
+      ice: fix potential NULL pointer deref in error path of ice_set_ringparam()
+      i40e: don't advertise IFF_SUPP_NOFCS
+
+Matt Vollrath (1):
+      e1000e: Unroll PTP in probe error handling
+
+Michal Schmidt (1):
+      ice: fix double-free of tx_buf skb
+
+Paul Greenwalt (2):
+      ice: fix PHY config on media change with link-down-on-close
+      ice: fix ICE_AQ_LINK_SPEED_M for 200G
+
+Petr Oros (1):
+      iavf: fix wrong VLAN mask for legacy Rx descriptors L2TAG2
+
+ drivers/net/ethernet/intel/iavf/iavf_type.h     |   2 +-
+ drivers/net/ethernet/intel/ice/ice.h            |   4 +-
+ drivers/net/ethernet/intel/ice/ice_adminq_cmd.h |   2 +-
+ drivers/net/ethernet/intel/ice/ice_ptp_consts.h |  12 +--
+ drivers/net/ethernet/intel/ice/ice_txrx.h       |  16 ++--
+ drivers/net/ethernet/intel/e1000e/netdev.c      |   1 +
+ drivers/net/ethernet/intel/i40e/i40e_main.c     |  29 +++---
+ drivers/net/ethernet/intel/i40e/i40e_txrx.c     |  10 ++
+ drivers/net/ethernet/intel/ice/ice_dcb_lib.c    |   2 +-
+ drivers/net/ethernet/intel/ice/ice_ethtool.c    |   1 +
+ drivers/net/ethernet/intel/ice/ice_lib.c        |   4 +-
+ drivers/net/ethernet/intel/ice/ice_main.c       | 121 ++++++------------------
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c     |   6 +-
+ drivers/net/ethernet/intel/ice/ice_sf_eth.c     |   2 +
+ drivers/net/ethernet/intel/ice/ice_txrx.c       |  29 ++++--
+ drivers/net/ethernet/intel/idpf/xdp.c           |   1 +
+ drivers/net/ethernet/intel/idpf/xsk.c           |   4 +-
+ 17 files changed, 107 insertions(+), 139 deletions(-)
+---
+base-commit: b9d8b856689d2b968495d79fe653d87fcb8ad98c
+change-id: 20260414-iwl-net-submission-2026-04-14-6203e1860df3
+
+Best regards,
+--  
+Jacob Keller <jacob.e.keller@intel.com>
+
 
