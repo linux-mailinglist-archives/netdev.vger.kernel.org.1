@@ -1,202 +1,220 @@
-Return-Path: <netdev+bounces-278828-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278829-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WAazArGx32lSYAAAu9opvQ
-	(envelope-from <netdev+bounces-278828-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 17:41:37 +0200
+	id 6IviHBqy32lCXwAAu9opvQ
+	(envelope-from <netdev+bounces-278829-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 17:43:22 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FDF8406071
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 17:41:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CF3444060B5
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 17:43:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id AD16B309DC4D
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 15:32:11 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7D26330138A2
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 15:35:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E77EE3DE420;
-	Wed, 15 Apr 2026 15:32:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 312DD3E0C66;
+	Wed, 15 Apr 2026 15:35:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RdmWN6+S"
+	dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b="UVO4X2mZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx.ssi.bg (mx.ssi.bg [193.238.174.39])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCABB3DDDDA;
-	Wed, 15 Apr 2026 15:32:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D406E3DFC78;
+	Wed, 15 Apr 2026 15:35:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.238.174.39
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776267128; cv=none; b=elqsUEk3kViwctep66DIRQGB9U5mwFrjNjS4vkMN9mJJwROvrV4LtzqmHnlXX96huJhzSx4MLM3s3MsJ3xfoq4hd+7IcdG47aOsc2yRfus3cttxaZqNH1bfZlV7D2spVwkJVYgjEVfZsdYeNR1XxM0/iqZajHKt5Kny4bHywoBA=
+	t=1776267340; cv=none; b=eA4Qv39ZiEKNYtHB9akUbcz/Iwn/zzY8NxWRoCP8GfsoJwgiHQF1EXe9S+kkEo57YRlzBDXnzqypeKkI1AnRnW6Rq561RXJ4EBxnURw1BD0Gv8B0SNjd338gbkpP1oJkiYb6YN50uaMp0AyUCdP3/Mj7q/CF+raGgdkdWo3zj8s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776267128; c=relaxed/simple;
-	bh=CFtvHa69WMtKCj/klsJ3WU0C10TJimhD3Vxn1IO+iCM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HM6T8AczVKrmp75nax6ggsVgnFI/bMYYJPWJZ2BbYCq/zPkY8ydFrotsL9NEVi1lY8gMFOKx+Q0SXQLx8pXuJ9V9zu5gSA0YJq9nH0k6xaDq8cYQxXHKG368zyqpHFHzvATFxYNsUoX/XAcoMuPhgzhT81y+AQdNseUsL4vnv70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RdmWN6+S; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55E4BC19424;
-	Wed, 15 Apr 2026 15:32:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776267128;
-	bh=CFtvHa69WMtKCj/klsJ3WU0C10TJimhD3Vxn1IO+iCM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=RdmWN6+SJFrQQb4hezram+/Iz6r+1onMQBy6pNxoIIbpik7ZqSw13stv/gbvpEWy5
-	 p5jikQte1ObegSNij0r1JNPrdSuY33RcW+Kneclpy95pvU+eya/TD03teOyHLTmkoD
-	 4Bf/Z0Bwc3a7H4zYwOLeN5C6hexRdts9Zq2MZVBI6m+eUjDcj+uLUKJGBHsBerNcqh
-	 mepGZ69Nf78Rs+GZQRlx73iatRFZi8WMs731346WGQgpiDkWW4IX6dtRXnd/Fb707O
-	 qHimezRMrYbLJzoHMpHhDn0g/HtWK9T5mhAyB+Zu+9plRd2qd4Bm5Q5fkRivP+Wiar
-	 yNNjAineXfOaw==
-From: Simon Horman <horms@kernel.org>
-To: hxzene@gmail.com
-Cc: 'Simon Horman' <horms@kernel.org>,
-	jhs@mojatatu.com,
-	jiri@resnulli.us,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: sched: teql: fix use-after-free in teql_master_xmit
-Date: Wed, 15 Apr 2026 16:31:52 +0100
-Message-ID: <20260415153152.816553-1-horms@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260413094448.2263828-1-hxzene@gmail.com>
-References: <20260413094448.2263828-1-hxzene@gmail.com>
+	s=arc-20240116; t=1776267340; c=relaxed/simple;
+	bh=PSHo872UTpSY7Pd7+/Sgn/7YWlvCJs+jK6EXZQzMhfY=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=p+8nI0uuHGY0afAprBdykRZJdpGf6FN9T9I5oZWm8wdyOq4MUXQMcqhNTQjpCiL16HxeHiNlnDhP8ov7pCoarUR6HIDpYrTMQjTx3PeFIY/IBWtEa8NyDzhWYyRRDe1tnqrBCEz3PIthEqRvlf4TD14eN15TY+LZDI/HiW1EGQo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=UVO4X2mZ; arc=none smtp.client-ip=193.238.174.39
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ssi.bg
+Received: from mx.ssi.bg (localhost [127.0.0.1])
+	by mx.ssi.bg (Potsfix) with ESMTP id 236FC21107;
+	Wed, 15 Apr 2026 18:35:19 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ssi.bg; h=cc:cc
+	:content-type:content-type:date:from:from:in-reply-to:message-id
+	:mime-version:references:reply-to:subject:subject:to:to; s=ssi;
+	 bh=OUQKghrpmJGe/+qFiqhRsCk1OBnY75g47ZnibPNkAnc=; b=UVO4X2mZF2We
+	YVrfnNa0vWaQN0olivm7j5OAMUwiElxHCRXUs94wj/4nEx8wilxOmesQp8Bt7xy5
+	lwXre+RBqyqO8oS1NJ+VSQwsT6YVHT5AW/mFKB0gjXjEkYByMhUabrdVbAo4+aHJ
+	AQauZbAAdazl0pLxlZg7fVDEbVrWPvuI7sEUF561IVThPDhqb4B/VgjO22eJ737A
+	PWQ5XCfeVzcAvLNl3NMwX5BjO8eeVr9vD/hV5YL8Ai3Z/ZZOx+FoIOTxydpdoOL+
+	t28e2pWuBHw38a7NzSVIBKL6EQ9q0uk+9LSXR1/2Hv6SeucZivtIDhU0tgcOikFT
+	BcugsptzPtDh2XGFByYPN5yrOHJzn3W0M7hrmwZ9MqIJJYgqufD40+Ic6724CIYg
+	sj6inbLzVWyMbPbLWrnzGJHZSDQyHJtS8E3Y935SlerFqYYu+SeRX4TI9GwL7VU3
+	mCsr2qt3dIkVlc/zWj5dLdH3FXl0vEhObLI0qQLvHIgVYomIR/PxbBOItn5plr+q
+	sh2RsTHxzb227gSg/94ioFntkUpeRtrIfjMaR31bDSdmf2G8uHYdL3D2U+9r2Pi7
+	dE+3lAqfuW1qIZUeE+/4CFUZZ2GRqf2TQ/zeDTO9Tp0cOB1U1xAuyRInFJkgD5rB
+	6QgjYmtva8tB115e2VMj/4X43HCf+Xw=
+Received: from box.ssi.bg (box.ssi.bg [193.238.174.46])
+	by mx.ssi.bg (Potsfix) with ESMTPS;
+	Wed, 15 Apr 2026 18:35:17 +0300 (EEST)
+Received: from ja.ssi.bg (unknown [213.16.62.126])
+	by box.ssi.bg (Potsfix) with ESMTPSA id 450DF608CD;
+	Wed, 15 Apr 2026 18:35:15 +0300 (EEST)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by ja.ssi.bg (8.18.1/8.18.1) with ESMTP id 63FFZ3hV058241;
+	Wed, 15 Apr 2026 18:35:04 +0300
+Date: Wed, 15 Apr 2026 18:35:03 +0300 (EEST)
+From: Julian Anastasov <ja@ssi.bg>
+To: Yingnan Zhang <342144303@qq.com>
+cc: pablo@netfilter.org, coreteam@netfilter.org, davem@davemloft.net,
+        edumazet@google.com, fw@strlen.de, horms@verge.net.au, kuba@kernel.org,
+        linux-kernel@vger.kernel.org, lvs-devel@vger.kernel.org,
+        netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
+        pabeni@redhat.com, phil@nwl.cc
+Subject: Re: [PATCH net v4] ipvs: fix MTU check for GSO packets in tunnel
+ mode
+In-Reply-To: <tencent_7F7B107ECA750C095D05C19C3B723AFFA60A@qq.com>
+Message-ID: <72814fe9-7abc-111e-6142-d2f3455aa220@ssi.bg>
+References: <tencent_7F7B107ECA750C095D05C19C3B723AFFA60A@qq.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=US-ASCII
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[ssi.bg,reject];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[ssi.bg:s=ssi];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-278828-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,ssi.bg:email,ssi.bg:dkim,ssi.bg:mid,qq.com:email];
+	TAGGED_FROM(0.00)[bounces-278829-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[qq.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	DKIM_TRACE(0.00)[ssi.bg:+];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[ja@ssi.bg,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6FDF8406071
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: CF3444060B5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: 'Simon Horman' <horms@kernel.org>
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev
----
-net: sched: teql: fix use-after-free in teql_master_xmit
+	Hello,
 
-This patch attempts to fix a use-after-free in teql_master_xmit() by
-saving master->slaves to a local head variable during teql_destroy(),
-and by adding READ_ONCE()/WRITE_ONCE() to datapath accesses.
+On Wed, 15 Apr 2026, Yingnan Zhang wrote:
 
-> diff --git a/net/sched/sch_teql.c b/net/sched/sch_teql.c
-> index ec4039a201a2c..2e86397a5219c 100644
-> --- a/net/sched/sch_teql.c
-> +++ b/net/sched/sch_teql.c
-> @@ -101,7 +101,7 @@ teql_dequeue(struct Qdisc *sch)
->  	if (skb == NULL) {
->  		struct net_device *m = qdisc_dev(q);
->  		if (m) {
-> -			dat->m->slaves = sch;
-> +			WRITE_ONCE(dat->m->slaves, sch);
+> Currently, IPVS skips MTU checks for GSO packets by excluding them with
+> the !skb_is_gso(skb) condition. This creates problems when IPVS tunnel
+> mode encapsulates GSO packets with IPIP headers.
+> 
+> The issue manifests in two ways:
+> 
+> 1. MTU violation after encapsulation:
+>    When a GSO packet passes through IPVS tunnel mode, the original MTU
+>    check is bypassed. After adding the IPIP tunnel header, the packet
+>    size may exceed the outgoing interface MTU, leading to unexpected
+>    fragmentation at the IP layer.
+> 
+> 2. Fragmentation with problematic IP IDs:
+>    When net.ipv4.vs.pmtu_disc=1 and a GSO packet with multiple segments
+>    is fragmented after encapsulation, each segment gets a sequentially
+>    incremented IP ID (0, 1, 2, ...). This happens because:
+> 
+>    a) The GSO packet bypasses MTU check and gets encapsulated
+>    b) At __ip_finish_output, the oversized GSO packet is split into
+>       separate SKBs (one per segment), with IP IDs incrementing
+>    c) Each SKB is then fragmented again based on the actual MTU
+> 
+>    This sequential IP ID allocation differs from the expected behavior
+>    and can cause issues with fragment reassembly and packet tracking.
+> 
+> Fix this by properly validating GSO packets using
+> skb_gso_validate_network_len(). This function correctly validates
+> whether the GSO segments will fit within the MTU after segmentation. If
+> validation fails, send an ICMP Fragmentation Needed message to enable
+> proper PMTU discovery.
+> 
+> Fixes: 4cdd34084d53 ("netfilter: nf_conntrack_ipv6: improve fragmentation handling")
+> Signed-off-by: Yingnan Zhang <342144303@qq.com>
 
-Can this lockless publication write a soon-to-be-freed pointer to
-master->slaves?
+	Looks good to me for the nf tree, thanks!
 
-If teql_dequeue() concurrently executes this write while teql_destroy()
-is unlinking sch and scheduling it for deletion via call_rcu(), sch could
-be published globally just as it is being destroyed.
+Acked-by: Julian Anastasov <ja@ssi.bg>
 
-When the RCU grace period ends, sch would be freed but still globally
-referenced. The WRITE_ONCE() prevents store-tearing but does not prevent
-this race condition.
-
->  		}
->  	} else {
-[ ... ]
-> @@ -136,19 +136,23 @@ teql_destroy(struct Qdisc *sch)
->  	if (!master)
->  		return;
+> ---
+> v4:
+> - Introduce a new helper function ip_vs_exceeds_mtu() to improve readability (reviewer feedback)
+> 
+> v3: https://lore.kernel.org/netdev/tencent_73010FBD5FA1C05C3BC23A07A50B11CEC90A@qq.com/
+> v2: https://lore.kernel.org/netdev/tencent_CA2C1C219C99D315086BE55E8654AF7E6009@qq.com/
+> v1: https://lore.kernel.org/netdev/tencent_4A3E1C339C75D359093BE4F08648AFAA6009@qq.com/
+> ---
+> ---
+>  net/netfilter/ipvs/ip_vs_xmit.c | 16 ++++++++++++++--
+>  1 file changed, 14 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/netfilter/ipvs/ip_vs_xmit.c b/net/netfilter/ipvs/ip_vs_xmit.c
+> index 0fb5162992e5..64dfdf8b00c4 100644
+> --- a/net/netfilter/ipvs/ip_vs_xmit.c
+> +++ b/net/netfilter/ipvs/ip_vs_xmit.c
+> @@ -102,6 +102,18 @@ __ip_vs_dst_check(struct ip_vs_dest *dest)
+>  	return dest_dst;
+>  }
 >  
-> -	prev = master->slaves;
-> +	prev = READ_ONCE(master->slaves);
->  	if (prev) {
-> +		struct Qdisc *head = prev;
+> +/* Based on ip_exceeds_mtu(). */
+> +static bool ip_vs_exceeds_mtu(const struct sk_buff *skb, unsigned int mtu)
+> +{
+> +	if (skb->len <= mtu)
+> +		return false;
 > +
->  		do {
->  			q = NEXT_SLAVE(prev);
->  			if (q == sch) {
->  				NEXT_SLAVE(prev) = NEXT_SLAVE(q);
-> -				if (q == master->slaves) {
-> -					master->slaves = NEXT_SLAVE(q);
-> -					if (q == master->slaves) {
-> +				if (q == head) {
+> +	if (skb_is_gso(skb) && skb_gso_validate_network_len(skb, mtu))
+> +		return false;
+> +
+> +	return true;
+> +}
+> +
+>  static inline bool
+>  __mtu_check_toobig_v6(const struct sk_buff *skb, u32 mtu)
+>  {
+> @@ -112,7 +124,7 @@ __mtu_check_toobig_v6(const struct sk_buff *skb, u32 mtu)
+>  		if (IP6CB(skb)->frag_max_size > mtu)
+>  			return true; /* largest fragment violate MTU */
+>  	}
+> -	else if (skb->len > mtu && !skb_is_gso(skb)) {
+> +	else if (ip_vs_exceeds_mtu(skb, mtu)) {
+>  		return true; /* Packet size violate MTU size */
+>  	}
+>  	return false;
+> @@ -232,7 +244,7 @@ static inline bool ensure_mtu_is_adequate(struct netns_ipvs *ipvs, int skb_af,
+>  			return true;
+>  
+>  		if (unlikely(ip_hdr(skb)->frag_off & htons(IP_DF) &&
+> -			     skb->len > mtu && !skb_is_gso(skb) &&
+> +			     ip_vs_exceeds_mtu(skb, mtu) &&
+>  			     !ip_vs_iph_icmp(ipvsh))) {
+>  			icmp_send(skb, ICMP_DEST_UNREACH, ICMP_FRAG_NEEDED,
+>  				  htonl(mtu));
+> -- 
+> 2.51.0.windows.1
 
-Could changing this condition introduce a use-after-free if master->slaves
-is concurrently advanced?
+Regards
 
-If the datapath (teql_master_xmit() or teql_dequeue()) advances
-master->slaves to point to sch after head was snapshot, head will not
-equal sch.
+--
+Julian Anastasov <ja@ssi.bg>
 
-When teql_destroy() unlinks sch, the q == head check would evaluate
-to false, meaning master->slaves is not updated. This would leave
-master->slaves pointing to the unlinked sch, which will then be freed.
-
-> +					WRITE_ONCE(master->slaves,
-> +						   NEXT_SLAVE(q));
-[ ... ]
-> @@ -317,7 +321,7 @@ static netdev_tx_t teql_master_xmit(struct sk_buff *skb, struct net_device *dev)
->  				    netdev_start_xmit(skb, slave, slave_txq, false) ==
->  				    NETDEV_TX_OK) {
->  					__netif_tx_unlock(slave_txq);
-> -					master->slaves = NEXT_SLAVE(q);
-> +					WRITE_ONCE(master->slaves, NEXT_SLAVE(q));
-
-Similarly to teql_dequeue() above, does this risk publishing a dying qdisc
-globally?
-
-If NEXT_SLAVE(q) is read before teql_destroy() unlinks it, but the
-WRITE_ONCE() executes immediately after the unlink, it appears the
-unlinked qdisc would be written to the global master->slaves pointer.
-
-[ ... ]
-
-While looking at the concurrency issues addressed by this patch, it appears
-teql_qdisc_init() might also be affected by concurrent updates to
-m->slaves:
-
-net/sched/sch_teql.c:teql_qdisc_init() {
-    ...
-		q->next = NEXT_SLAVE(m->slaves);
-		NEXT_SLAVE(m->slaves) = sch;
-    ...
-}
-
-Because NEXT_SLAVE(m->slaves) evaluates m->slaves twice, if m->slaves
-is concurrently advanced between these two statements, could this break
-the list linkage and cause lost elements or infinite loops?
 
