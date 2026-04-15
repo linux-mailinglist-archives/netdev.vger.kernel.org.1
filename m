@@ -1,58 +1,84 @@
-Return-Path: <netdev+bounces-278838-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278839-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YDfMHsO832mOYQAAu9opvQ
-	(envelope-from <netdev+bounces-278838-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 18:28:51 +0200
+	id 8HM2C0m932mOYQAAu9opvQ
+	(envelope-from <netdev+bounces-278839-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 18:31:05 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7063406613
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 18:28:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7346D406646
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 18:31:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A66AB3083FE8
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 16:26:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9C1B430417A9
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 16:28:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E8B23DC4A0;
-	Wed, 15 Apr 2026 16:26:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 764EC3A9D9C;
+	Wed, 15 Apr 2026 16:28:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QDR7JnJ2"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="nMR9rhZH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B744334C17;
-	Wed, 15 Apr 2026 16:26:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47B393DC4A0;
+	Wed, 15 Apr 2026 16:28:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776270405; cv=none; b=YGduebCuZMYC2h07QPFp61bhlXwzScwo92wEvT6Pe4UyMkdSPvAXhwJbdiGE1kF1S5MIRzm8vllLDTYl6PhOs7MG5AA+Rw6FVunsu6yzeZ3JGLRXFFv+suS6VI7IyaCAa7oMl6UO2A0opM8GkjA/rPaCP8GE2SNzP8w1JAht82w=
+	t=1776270525; cv=none; b=G35JM+QmxvTGXK3eGkztQDgTi9FQRtUd/U1TjmAX6ZcO2yR7MDDZjQOFGfnUZ34EOfjAX7s7V/J8ejiQTXZGE5mdw1A6L6yr+OuFUmcYw6+Hp/DCzdZYzzrGz9PEHHFdO3xtznIXS49z/W5oaAtQlEbaFqAi9GBsiNeai/6Uma8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776270405; c=relaxed/simple;
-	bh=a8mDYPz1M6wXk9VaiA8wda/mu1hXkdRK/6Aw1zc3d7Y=;
+	s=arc-20240116; t=1776270525; c=relaxed/simple;
+	bh=aof32GZdYa8Oryjhe9ylzBwFzjJaPRLNrDRXmz9WUpI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UkzZwoT61nCivxl7XxLOXnuoaXzPG0+MHNEXUMihGZyIOe5aDEnFVzSvGWpD6hYhkJZBgtoXBIqzlSlOZ1Fva+luWg9N2PUi2CMt4mUQz2MOQtEOIKKAV5VVYTZlZNgUayE/gHJ0ESrPswJQLX/A6Vpenwdnz1iu4qeL8AILn2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QDR7JnJ2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F6CEC2BCB0;
-	Wed, 15 Apr 2026 16:26:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776270405;
-	bh=a8mDYPz1M6wXk9VaiA8wda/mu1hXkdRK/6Aw1zc3d7Y=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QDR7JnJ2voaF/uOHFNKKwOuuvY9g/JwJsXK4/Gm2/AZyKHjRdH5Mrg9kdFi8A+KmN
-	 qLsrHtVNOBbnppRyyf26514i4RkBop7DhdAQ6ezopPC5q4jC4iBc9UMGzf1iraO67n
-	 CrfoKCnazPjNDG0Ud6jPi2krp49MRoWF99M9J063n+54vRYEo88uFmQXAwjxwNsLVs
-	 vIm9t2zChMHyVHqt5ZhxDyJhCmtfzt4qaW/9bp0GvHy+j/n/c55IwNMYZJBcK/DW/N
-	 nLrRqcxnh+PIhn8253KaFNr1Wl+wqBAlEIEEB1QOT5fGq78ec8rADC5do2iZus2aWb
-	 T0B4ymmpnZtpw==
-Date: Wed, 15 Apr 2026 17:26:41 +0100
-From: Simon Horman <horms@kernel.org>
-To: Ashutosh Desai <ashutoshdesai993@gmail.com>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, edumazet@google.com,
-	davem@davemloft.net, pabeni@redhat.com,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4] nfc: hci: fix out-of-bounds read in HCP header parsing
-Message-ID: <20260415162641.GO772670@horms.kernel.org>
-References: <177614425081.3600288.2536320552978506086@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=htRdWMJoiaQfABLHpHP6X8Qy3htbmtPBlgB722rza13uuVdWDidzZbgYorPyulXaqjVgh1aCMHkPhQcc8wRGAoB8wXAeMoskt1Unmju1UrmZTtIfvSJG/25xMaXeHV+dQRzxojPuyPz3pEADbFjjH6HT+OYD4IgduweLal4bCM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=nMR9rhZH; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=xpnoSDDGsBCL+2BDd4JTT1XxKpjuL1ghLwvkFgcvTjA=; b=nMR9rhZHp02XU3aSVh1bIewT7H
+	Xgo9Jdkgy1fEEb7SgxTiqMZO5/IOYh6iOuPqlHM7P0qcFq/Cz5ZxKt7zQ+rlZMaI2TBw2UgXBMHU5
+	HriC4AedygCY5+7VjHUYQUGcYOgcZXIRjZNYjCWAejcjmNe2GFDZZfIeUopiIIMIb9xmOjMtea/Cc
+	IZyVMbecLSxdYh7dmwr7LDrDAJ6VDKEZ4GLZ2nIEA0nmHkUBCudEyk/VgNCDISD6yOKZAFxxa7Bjg
+	ofArRRTshrucwsaKkGej5QQ6qcRl0a/6wOM8tgCs5b+wJSZ76Nvbz+8BuOD1D10HLy984fUXXb+0P
+	RXVJsO5A==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:60524)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1wD36N-000000002I9-1yPN;
+	Wed, 15 Apr 2026 17:28:31 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1wD36J-000000002LW-20lB;
+	Wed, 15 Apr 2026 17:28:27 +0100
+Date: Wed, 15 Apr 2026 17:28:27 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Sam Edwards <cfsworks@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Ovidiu Panait <ovidiu.panait.rb@renesas.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Baruch Siach <baruch@tkos.co.il>,
+	Serge Semin <fancer.lancer@gmail.com>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH net v5] net: stmmac: Prevent NULL deref when RX memory
+ exhausted
+Message-ID: <ad-8q4OrOm-VtGrO@shell.armlinux.org.uk>
+References: <20260415023947.7627-1-CFSworks@gmail.com>
+ <ad-LAB08-_rpmMzK@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,57 +87,123 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <177614425081.3600288.2536320552978506086@gmail.com>
-X-Spamd-Result: default: False [-2.16 / 15.00];
+In-Reply-To: <ad-LAB08-_rpmMzK@shell.armlinux.org.uk>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spamd-Result: default: False [1.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278838-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-278839-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FREEMAIL_TO(0.00)[gmail.com];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,bootlin.com,renesas.com,nxp.com,tkos.co.il,st.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	NEURAL_SPAM(0.00)[0.054];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[horms.kernel.org:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D7063406613
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[shell.armlinux.org.uk:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,armlinux.org.uk:url]
+X-Rspamd-Queue-Id: 7346D406646
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Apr 14, 2026 at 05:24:10AM -0000, Ashutosh Desai wrote:
-> nfc_hci_recv_from_llc() and nci_hci_data_received_cb() cast skb->data
-> to struct hcp_packet and read the message header byte without checking
-> that enough data is present in the linear sk_buff area. A malicious NFC
-> peer can send a 1-byte HCP frame that passes through the SHDLC layer
-> and reaches these functions, causing an out-of-bounds heap read.
+On Wed, Apr 15, 2026 at 01:56:32PM +0100, Russell King (Oracle) wrote:
+> On Tue, Apr 14, 2026 at 07:39:47PM -0700, Sam Edwards wrote:
+> > The CPU receives frames from the MAC through conventional DMA: the CPU
+> > allocates buffers for the MAC, then the MAC fills them and returns
+> > ownership to the CPU. For each hardware RX queue, the CPU and MAC
+> > coordinate through a shared ring array of DMA descriptors: one
+> > descriptor per DMA buffer. Each descriptor includes the buffer's
+> > physical address and a status flag ("OWN") indicating which side owns
+> > the buffer: OWN=0 for CPU, OWN=1 for MAC. The CPU is only allowed to set
+> > the flag and the MAC is only allowed to clear it, and both must move
+> > through the ring in sequence: thus the ring is used for both
+> > "submissions" and "completions."
+> > 
+> > In the stmmac driver, stmmac_rx() bookmarks its position in the ring
+> > with the `cur_rx` index. The main receive loop in that function checks
+> > for rx_descs[cur_rx].own=0, gives the corresponding buffer to the
+> > network stack (NULLing the pointer), and increments `cur_rx` modulo the
+> > ring size. After the loop exits, stmmac_rx_refill(), which bookmarks its
+> > position with `dirty_rx`, allocates fresh buffers and rearms the
+> > descriptors (setting OWN=1). If it fails any allocation, it simply stops
+> > early (leaving OWN=0) and will retry where it left off when next called.
+> > 
+> > This means descriptors have a three-stage lifecycle (terms my own):
+> > - `empty` (OWN=1, buffer valid)
+> > - `full` (OWN=0, buffer valid and populated)
+> > - `dirty` (OWN=0, buffer NULL)
+> > 
+> > But because stmmac_rx() only checks OWN, it confuses `full`/`dirty`. In
+> > the past (see 'Fixes:'), there was a bug where the loop could cycle
+> > `cur_rx` all the way back to the first descriptor it dirtied, resulting
+> > in a NULL dereference when mistaken for `full`. The aforementioned
+> > commit resolved that *specific* failure by capping the loop's iteration
+> > limit at `dma_rx_size - 1`, but this is only a partial fix: if the
+> > previous stmmac_rx_refill() didn't complete, then there are leftover
+> > `dirty` descriptors that the loop might encounter without needing to
+> > cycle fully around. The current code therefore panics (see 'Closes:')
+> > when stmmac_rx_refill() is memory-starved long enough for `cur_rx` to
+> > catch up to `dirty_rx`.
+> > 
+> > Fix this by further tightening the clamp from `dma_rx_size - 1` to
+> > `dma_rx_size - stmmac_rx_dirty() - 1`, subtracting any remnant dirty
+> > entries and limiting the loop so that `cur_rx` cannot catch back up to
+> > `dirty_rx`. This carries no risk of arithmetic underflow: since the
+> > maximum possible return value of stmmac_rx_dirty() is `dma_rx_size - 1`,
+> > the worst the clamp can do is prevent the loop from running at all.
+> > 
+> > Fixes: b6cb4541853c7 ("net: stmmac: avoid rx queue overrun")
+> > Closes: https://bugzilla.kernel.org/show_bug.cgi?id=221010
+> > Cc: stable@vger.kernel.org
+> > Signed-off-by: Sam Edwards <CFSworks@gmail.com>
 > 
-> Fix this by adding pskb_may_pull() before each cast to ensure the full
-> 2-byte HCP header is pulled into the linear area before it is accessed.
+> Locally, while debugging my issues, I used this to prevent cur_rx
+> catching up with dirty_rx:
 > 
-> Fixes: 8b8d2e08bf0d ("NFC: HCI support")
-> Fixes: 11f54f228643 ("NFC: nci: Add HCI over NCI protocol support")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Ashutosh Desai <ashutoshdesai993@gmail.com>
+>                 status = stmmac_rx_status(priv, &priv->xstats, p);
+>                 /* check if managed by the DMA otherwise go ahead */
+>                 if (unlikely(status & dma_own))
+>                         break;
+> 
+>                 next_entry = STMMAC_NEXT_ENTRY(rx_q->cur_rx,
+>                                                priv->dma_conf.dma_rx_size);
+>                 if (unlikely(next_entry == rx_q->dirty_rx))
+>                         break;
+> 
+>                 rx_q->cur_rx = next_entry;
+> 
+> If we care about the cost of reloading rx_q->dirty_rx on every
+> iteration, then I'd suggest that the cost we already incur reading and
+> writing rx_q->cur_rx is something that should be addressed, and
+> eliminating that would counter the cost of reading rx_q->dirty_rx. I
+> suspect, however, that the cost is minimal, as cur_tx and dirty_rx are
+> likely in the same cache line.
+> 
+> It looks like any fix to stmmac_rx() will also need a corresponding
+> fix for stmmac_rx_zc().
 
-Unfortunately this patch seems to be whitespace-damaged
-and does not apply. Please address that and repost.
+I have some further information, but a new curveball has just been
+chucked... and I've no idea what this will mean at this stage. Just
+take it that I won't be responding for a while.
 
 -- 
-pw-bot: changes-requested
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
