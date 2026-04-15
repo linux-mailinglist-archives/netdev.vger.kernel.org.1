@@ -1,234 +1,113 @@
-Return-Path: <netdev+bounces-278624-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278625-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iCcMNXn93mlINQAAu9opvQ
-	(envelope-from <netdev+bounces-278624-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 04:52:41 +0200
+	id oAuVCuD93mlINQAAu9opvQ
+	(envelope-from <netdev+bounces-278625-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 04:54:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64A1F3FFDA0
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 04:52:41 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90F523FFDD4
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 04:54:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C9938312B23D
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 02:40:59 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 454CA31AD864
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 02:42:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2ABF32E12E;
-	Wed, 15 Apr 2026 02:39:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 657A534D385;
+	Wed, 15 Apr 2026 02:41:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UUNtMEqU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jNmnAASx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5117832C94A
-	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 02:39:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4305034BA50;
+	Wed, 15 Apr 2026 02:41:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776220794; cv=none; b=AnnFUXEPDOJIDk6Q6/sV34q71yYVqCiPL17AhZjvZBt4EfCkNczsBDhKx6SwJw+pSAc1V61h126D7DDwQU6MqhAiZEaiQ/2P+sgeN9ngCksy8qQPEJBc/W6heXev0nYYegcV1RlWvJNVqyFu+/V2alN4fN0zezG/yjSLNF36cV8=
+	t=1776220866; cv=none; b=ZD88rVYe56JfQlXjoUbMblY01lzAXh6RxLwJ+kR7fCNiyqsZtropHhX4rVSlX42w/wV6tt0B5hbAB2FbCP1l3ry+h5VE1BB3+S8BYlG9+NCSxH0Qh39a3B6IZj/qqG+aFAFo6kMANuEAsSQPSps5/YedbDdbyd4SQrj2wn4wMUQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776220794; c=relaxed/simple;
-	bh=318sjCWYvNQGpSzDuO5m9LBM2Spar7kIKnblAHp1PYE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eZwWIMYtQEUgCidkvEhEMr9dpSUnpWLwSV3UW7xkNXB3siAHyd4OAiJe7g8A/Q2FRGNfdldgALI/cPuB05uJpXVWj25ffN3YwtmaeJAlPbPtDen6uWrV2w5qgtZPUPrW2fNpB4LFiNisFLcbWPC4bUiVeSjqRgwfgjjMEBok4dE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UUNtMEqU; arc=none smtp.client-ip=209.85.210.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-7dbd08144deso5750825a34.0
-        for <netdev@vger.kernel.org>; Tue, 14 Apr 2026 19:39:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776220792; x=1776825592; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=/4pZEJvuS7ozDbMvLtLQ4Yf4fNz+jgNzCYp57Or0UAE=;
-        b=UUNtMEqUMmD6Ab7d6mD9od9BdNeXUkUCo40wkdQmEYAQeqbBvZXpf/kq0Qlp6/VGrq
-         yHEkvDm5dIQTfw7jGIMOfsMhJf48PMJgGTImG5DQzecuZFu2hv7aYIkZ0VgkY3UsjQSu
-         w4v3bVe43uL0Q6lwq/zlcf6CcZsVCzkw03GKu2VuYg6n1v2FprM8wpPvcTIsA3FBweBm
-         jNfhjAcgRh1NpSiss+riOlbIvdmaZ5yMY0+p6wEd9+qAmFRtZ/o8UNJv0G6py6OEX2kf
-         sGrT4wnTrP9gAauNRn1sjP4I1ViFULYlXBz275m/yh3xQtr1TmeP2bh8YOcFf+ffjYUK
-         gq0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776220792; x=1776825592;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/4pZEJvuS7ozDbMvLtLQ4Yf4fNz+jgNzCYp57Or0UAE=;
-        b=duvkwpUTfg/fy8rQU1MgFcitGX+EiqD1iqi9xqWahEw6K1LwemXByjMZWWRfM9BddZ
-         QZt6+4HphYbbqQo6D00OQTOxHpqo00m+HLhoNtk343MbwQY95yySqjzv3xw2LGroUjS/
-         QSR/g6eq80d5Lk1DrGCEn0VpiHcBn/OELUPY9a49fkMA21w0esai2OkdIqFfXpJur99j
-         ujlHhmYX5Di6v3mPNmSlubMD+vZmrizHP9LeTIeBWEEEXqhO2TR5uqc5VhGKKYJtlciD
-         OQeGhAwQYAhMwYTfnQE4OYaiXOWEVN/1OG6DvzbMDYcj1mONzhIlbJSXjBne+hy23AzA
-         kIBQ==
-X-Forwarded-Encrypted: i=1; AFNElJ/1+a0fVKl7aJjhRyV+CB3A/AND94xA9Wxqc9+GvGiSommDoJo3DvliYvNMNagLFRITDaPE8I4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzYbDnJvXn75mqW2w0DUDDqtRImAPmYp60Kwu9fc52rCyrd5mLe
-	/x65XhtwE/ETBOEZdk9MvFYhXqXZm+Yz5k1j7Q779DRjTMQZSj8EhxMi
-X-Gm-Gg: AeBDieubegyJdfC8FDK7XLMqdykAtexl66xvA5EnghhxohRJM7/5gsUBD2ufg8uiz5w
-	cl+Y3zStgUHSJfZTADkOfNPMiqDj6sWfo17dSlT+IwUAn7blXmRumOGKvTF9F+nsxCEIEpD5kDi
-	UcKPq9GC9+oIq9/KmN3wWYWfG0CbgLvPVwS1EC1SAvtHBDBfg205nmn1oQESq5XfuU74kAAx438
-	eypOtjw6/REIxPo635/C7bWeXXJ+1o4PT7tJsbDahSo/SuNKLCxIbpIHBaoEM2GcNf2oPL3j3N2
-	Sdgq7JfISFJMxXlWn9Bfd931N7jo++HvFQKG1dolqHEjDh3nuLndJHUaq9VNB1cPyW3spnCPDgi
-	E1JegQbuDlR8i6W5l74D8oyiL+Kf/PzYuufmXWDJnu2D8eZoYEeMhcakSzCKwUjoJoje0OFkpXG
-	SxcT7CUl1Rzr2G8zuYN5t0K8COxXW8PSxQs4vU4IlxD82ClT7KIfDXnCoe1xOdegqPC751XQ==
-X-Received: by 2002:a05:6830:25c5:b0:7d9:f50f:96cf with SMTP id 46e09a7af769-7dc27c6632amr11719357a34.6.1776220792258;
-        Tue, 14 Apr 2026 19:39:52 -0700 (PDT)
-Received: from localhost (static-23-234-115-121.cust.tzulo.com. [23.234.115.121])
-        by smtp.gmail.com with UTF8SMTPSA id 46e09a7af769-7dc76a333e8sm406838a34.8.2026.04.14.19.39.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 Apr 2026 19:39:51 -0700 (PDT)
-From: Sam Edwards <cfsworks@gmail.com>
-X-Google-Original-From: Sam Edwards <CFSworks@gmail.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Ovidiu Panait <ovidiu.panait.rb@renesas.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Baruch Siach <baruch@tkos.co.il>,
-	Serge Semin <fancer.lancer@gmail.com>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Sam Edwards <CFSworks@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH net v5] net: stmmac: Prevent NULL deref when RX memory exhausted
-Date: Tue, 14 Apr 2026 19:39:47 -0700
-Message-ID: <20260415023947.7627-1-CFSworks@gmail.com>
-X-Mailer: git-send-email 2.52.0
+	s=arc-20240116; t=1776220866; c=relaxed/simple;
+	bh=7ddT1jnx0DhwTTOczx5qFSYQ6w4ZwHtwpFlWTfSQr/c=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=XixV+Ru8R+L4z/BHKTQYtk6YHG26ULUVoaIhnGjYPHeSd50DkOq2+Xr1MDZJx02w5LOGdNq3gmms1TF8GlZ4W+G8DP3uu6hezcJWlvMxGTkJLdhkWpRdbpVhe3CSrXMIZ6vX9RWDssKoFjqesifFW4VDJnpff446lD0ugkglWTg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jNmnAASx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28078C2BCB3;
+	Wed, 15 Apr 2026 02:41:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776220866;
+	bh=7ddT1jnx0DhwTTOczx5qFSYQ6w4ZwHtwpFlWTfSQr/c=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=jNmnAASxRJfVR0+BNLePLMTyDRx8EUaI490F/F8dNS/RJvyCTBz9qaOFEOZc974GS
+	 zQN0zixFyC0Ytvxkykqu0XtKQErqJpVsGhByFE4lDSQKBgzDHJKm1OgNBW5WZv4uIp
+	 69pRFTGpE5Vlsz8MIOBsyP6jNicqr8lvn4zgsdeKTdyiBWcXVShaoim067ofUUrQZR
+	 be3trRm3g4tBkAwLc90c65i4bPmmKcwimaVjGTaoQKOs9ar7Kh9uu8vS4NHI4/Q5lM
+	 cGDlGEclPxlwGx0ylsX25HqBy5KXnJRX6wCF5rhpghPsA0bpcbAhBNTS7QmqZbtygx
+	 2ti6YQILrlg3w==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7D2453809A33;
+	Wed, 15 Apr 2026 02:40:37 +0000 (UTC)
+Subject: Re: [GIT PULL] Networking for 7.1
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20260414193324.1390838-1-kuba@kernel.org>
+References: <20260414193324.1390838-1-kuba@kernel.org>
+X-PR-Tracked-List-Id: <netdev.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20260414193324.1390838-1-kuba@kernel.org>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git tags/net-next-7.1
+X-PR-Tracked-Commit-Id: 35c2c39832e569449b9192fa1afbbc4c66227af7
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 91a4855d6c03e770e42f17c798a36a3c46e63de2
+Message-Id: <177622083630.1583446.3647968761703946403.pr-tracker-bot@kernel.org>
+Date: Wed, 15 Apr 2026 02:40:36 +0000
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-278624-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-278625-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	FREEMAIL_CC(0.00)[gmail.com,foss.st.com,armlinux.org.uk,bootlin.com,renesas.com,nxp.com,tkos.co.il,st.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[cfsworks@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev,kernel];
-	NEURAL_HAM(-0.00)[-0.978];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pr-tracker-bot@kernel.org,netdev@vger.kernel.org];
+	FROM_NO_DN(0.00)[];
+	NEURAL_HAM(-0.00)[-0.998];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 64A1F3FFDA0
+X-Rspamd-Queue-Id: 90F523FFDD4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The CPU receives frames from the MAC through conventional DMA: the CPU
-allocates buffers for the MAC, then the MAC fills them and returns
-ownership to the CPU. For each hardware RX queue, the CPU and MAC
-coordinate through a shared ring array of DMA descriptors: one
-descriptor per DMA buffer. Each descriptor includes the buffer's
-physical address and a status flag ("OWN") indicating which side owns
-the buffer: OWN=0 for CPU, OWN=1 for MAC. The CPU is only allowed to set
-the flag and the MAC is only allowed to clear it, and both must move
-through the ring in sequence: thus the ring is used for both
-"submissions" and "completions."
+The pull request you sent on Tue, 14 Apr 2026 12:33:24 -0700:
 
-In the stmmac driver, stmmac_rx() bookmarks its position in the ring
-with the `cur_rx` index. The main receive loop in that function checks
-for rx_descs[cur_rx].own=0, gives the corresponding buffer to the
-network stack (NULLing the pointer), and increments `cur_rx` modulo the
-ring size. After the loop exits, stmmac_rx_refill(), which bookmarks its
-position with `dirty_rx`, allocates fresh buffers and rearms the
-descriptors (setting OWN=1). If it fails any allocation, it simply stops
-early (leaving OWN=0) and will retry where it left off when next called.
+> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git tags/net-next-7.1
 
-This means descriptors have a three-stage lifecycle (terms my own):
-- `empty` (OWN=1, buffer valid)
-- `full` (OWN=0, buffer valid and populated)
-- `dirty` (OWN=0, buffer NULL)
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/91a4855d6c03e770e42f17c798a36a3c46e63de2
 
-But because stmmac_rx() only checks OWN, it confuses `full`/`dirty`. In
-the past (see 'Fixes:'), there was a bug where the loop could cycle
-`cur_rx` all the way back to the first descriptor it dirtied, resulting
-in a NULL dereference when mistaken for `full`. The aforementioned
-commit resolved that *specific* failure by capping the loop's iteration
-limit at `dma_rx_size - 1`, but this is only a partial fix: if the
-previous stmmac_rx_refill() didn't complete, then there are leftover
-`dirty` descriptors that the loop might encounter without needing to
-cycle fully around. The current code therefore panics (see 'Closes:')
-when stmmac_rx_refill() is memory-starved long enough for `cur_rx` to
-catch up to `dirty_rx`.
+Thank you!
 
-Fix this by further tightening the clamp from `dma_rx_size - 1` to
-`dma_rx_size - stmmac_rx_dirty() - 1`, subtracting any remnant dirty
-entries and limiting the loop so that `cur_rx` cannot catch back up to
-`dirty_rx`. This carries no risk of arithmetic underflow: since the
-maximum possible return value of stmmac_rx_dirty() is `dma_rx_size - 1`,
-the worst the clamp can do is prevent the loop from running at all.
-
-Fixes: b6cb4541853c7 ("net: stmmac: avoid rx queue overrun")
-Closes: https://bugzilla.kernel.org/show_bug.cgi?id=221010
-Cc: stable@vger.kernel.org
-Signed-off-by: Sam Edwards <CFSworks@gmail.com>
----
-
-Hi list,
-
-This is a single patch broken out of [1]. The second patch in that series,
-which proactively refills the RX ring buffer when memory is low, still has some
-unresolved feedback: it should use a timer to avoid nuisance polling while the
-system is suffering OOM.
-
-Further discussion makes me wonder whether that second patch should even be
-threshold-triggered at all, or if it should be a handler for the RBU
-("Receive Buffer Unavailable") interrupt instead.
-
-So, while that patch is back at the drawing board, I am submitting this one
-(which is higher-priority as it resolves a *panic*) separately.
-
-Regards,
-Sam
-
-[1] https://lore.kernel.org/all/20260401041929.12392-1-CFSworks@gmail.com/
-
----
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 13d3cac056be..fc11f75f7dc0 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -5609,7 +5609,8 @@ static int stmmac_rx(struct stmmac_priv *priv, int limit, u32 queue)
- 
- 	dma_dir = page_pool_get_dma_dir(rx_q->page_pool);
- 	bufsz = DIV_ROUND_UP(priv->dma_conf.dma_buf_sz, PAGE_SIZE) * PAGE_SIZE;
--	limit = min(priv->dma_conf.dma_rx_size - 1, (unsigned int)limit);
-+	limit = min(priv->dma_conf.dma_rx_size - stmmac_rx_dirty(priv, queue) - 1,
-+		    (unsigned int)limit);
- 
- 	if (netif_msg_rx_status(priv)) {
- 		void *rx_head;
 -- 
-2.52.0
-
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
 
