@@ -1,153 +1,149 @@
-Return-Path: <netdev+bounces-278881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278882-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2GKuAvIb4GnPcgAAu9opvQ
-	(envelope-from <netdev+bounces-278881-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 01:14:58 +0200
+	id cCPCCaId4GkGcwAAu9opvQ
+	(envelope-from <netdev+bounces-278882-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 01:22:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AE1E408D10
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 01:14:56 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA48B408D66
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 01:22:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id ACF143001CF9
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 23:14:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 353B0305FC21
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 23:22:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28274386428;
-	Wed, 15 Apr 2026 23:14:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE0B1386C06;
+	Wed, 15 Apr 2026 23:22:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b="U+F5ZJpX"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="Z3A0Bzew"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.nabladev.com (mx.nabladev.com [178.251.229.89])
+Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEC953385AC;
-	Wed, 15 Apr 2026 23:14:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.251.229.89
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C89A3264C0
+	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 23:22:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776294880; cv=none; b=N9Tw7WxbQ6xzaMxCn3Pyj4+yepoavrGt60Bx7jbIVEcjAKlgK/xprTAjsV38KI0TbVHweYtpTC+yyF9ACRwrP6tU75aFHTsYMic0GCGgI7YnPC7wQg3hu/NE9KoVUpH421tRhjKRdyc5/aMp1eivGXYKU09xdmkU3bjoGgI3hUc=
+	t=1776295325; cv=none; b=GNW08ESgFBTtXKx/g0at1tBTOp/hCUfHUk5b7+OTAAviL8DHas+GjKuW/fMsTFhN3EdFMvaV0ctQD/N1Xy4JKmWmTvWID+Ii8eFNfUnW2EiVgMMePjTbFNl+GkxgoMpEzMzeXRycw43dsqr+32Pm7OIN8hBHa8b2WVxGgl7FkPc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776294880; c=relaxed/simple;
-	bh=IcmijxZdC+BhUBqiRwmbE8FYI8MorWaag56fwHIYnaM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KfiGGQHydXTR8LfGTy+i9HxlCKG3A94zEjvcVgxaZ5pbJZHS1JVfEKNVyiP42sRo63MlxqTkI4fVHMyOt75bR9gGxVtDFH2nanR4Kdnmt75lWtMDb0mE8t72ovMLRb8gIxKjULcGKAmZR1MJMzcJ0TT6cup4BfjgKRiu4iuALW8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com; spf=pass smtp.mailfrom=nabladev.com; dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b=U+F5ZJpX; arc=none smtp.client-ip=178.251.229.89
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nabladev.com
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id A9D43113E7D;
-	Thu, 16 Apr 2026 01:14:35 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nabladev.com;
-	s=dkim; t=1776294876;
-	h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=OeFPr+ALTgMq0IMKEDlEFOHJAoIK1gIcttz9sveYRvI=;
-	b=U+F5ZJpX3/4zSS+By5YIWlbop6c4YtPZ6kTIpUZ2HH8bxMnuXVWbfvWfoFjiNHYIzAOn4/
-	AayiRoDkbcBSoPHWIEADWLmvZs6VbZq02mXIwA22OS00AJVfd6solAOuA+j6h1lzG5irKG
-	14QoQuP7K+aByr8rHfN7xrJ0S8Bi6v0iWqc/nvRhRY094d+5jZh2gl/4vuZ3XONkNTO6FZ
-	9tT99r7l5i+19KgixmmJtgk8fYHhZG+CM2lxwoSj3CDBcKPr5x5zHy8ZdAeBFb7ovTyQRK
-	FxUlUouWIwAc48oFHOkUq1Z65zTTAfLxR53zv6YDGfWLLAI72m1jQP3Sjq8k4g==
-Message-ID: <7734527a-d08b-49fa-b258-c37c5ae2da55@nabladev.com>
-Date: Thu, 16 Apr 2026 01:14:35 +0200
+	s=arc-20240116; t=1776295325; c=relaxed/simple;
+	bh=zuRT2gmso4pn2w4RNjIlAbL/5OOrwijPo7pSImuPVEE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=U0ZfHLXN7gP8usySIKblv9ERy/StOtp+QxXGCS46jLNxIL0OWilvLEgjMq+VZ40DY0YjJEzULi45YKtFUydk0jwp6XctedJ4GXxp+uwcYefmQXoSmCVcvb/17X/pcZG1jgdh9iXuRO1/ypc3FGa5R/BaFklrDwh4680YzKpt1hQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=Z3A0Bzew; arc=none smtp.client-ip=171.64.64.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=cs.stanford.edu; s=cs2308; h=Content-Type:Cc:To:Subject:Message-ID:Date:
+	From:In-Reply-To:References:MIME-Version:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=zuRT2gmso4pn2w4RNjIlAbL/5OOrwijPo7pSImuPVEE=; t=1776295324; x=1777159324; 
+	b=Z3A0BzewUoAXaYcZlMPDyBS3O3ZaW1RTYO7vUe0sNawifrvZGOLEdrU8MSyDHNiF0r5xSloOD0k
+	cGRxW02xHHEYd7VVBWz5r+c5rFo+N+sMYTcADTijEk7mgASDtH50byXVnAPdpCaRB2W+1lSmH86h1
+	jx03lgGM80iWITTDqj9/UJaRd5EnQj/jJibz2I2ApxnlBxo2VcB5XHb0hCWPYCctqydWww2rvHdQn
+	zRTM0WQ0fLb/UfTE9eBOtAS/5MUpbNbEuwy4JW2drq70qeSwfVISGVkwQT1Fs/JmzKLa80bUBqZMB
+	+mHYr9g8lmic3dR6houIzehwYjgJJaJfh0MA==;
+Received: from mail-yw1-f182.google.com ([209.85.128.182]:58614)
+	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.94.2)
+	(envelope-from <ouster@cs.stanford.edu>)
+	id 1wD9YT-0004uc-JQ
+	for netdev@vger.kernel.org; Wed, 15 Apr 2026 16:21:58 -0700
+Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-7991db3dc98so87296877b3.0
+        for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 16:21:57 -0700 (PDT)
+X-Gm-Message-State: AOJu0YwKmlQwCHJzyisBAicWo3eXq745uEsXCeInMHRRSpyrmeFV37Dz
+	tQdA4NSLgOC8loqMLdsw94GQ+tmO3l4bxCI3qTJzvOFaA500SkrrtSH7ibBYi4bdY4sXFj/9cPq
+	pshjEphIOq1MG83uooHlOjZUbA2UWKeg=
+X-Received: by 2002:a05:690c:6f06:b0:78f:bc2b:83f5 with SMTP id
+ 00721157ae682-7af6fcee940mr263760717b3.20.1776295316920; Wed, 15 Apr 2026
+ 16:21:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net,PATCH v3 1/2] net: ks8851: Reinstate disabling of BHs around
- IRQ handler
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: netdev@vger.kernel.org, stable@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Nicolai Buchwitz <nb@tipi-net.de>,
- Paolo Abeni <pabeni@redhat.com>, Ronald Wahl <ronald.wahl@raritan.com>,
- Yicong Hui <yiconghui@gmail.com>, linux-kernel@vger.kernel.org
-References: <20260414103327.113500-1-marex@nabladev.com>
- <20260414125753.Im6GAIHn@linutronix.de>
- <2fcfb84f-69f6-493e-94d6-95d85d8000f6@nabladev.com>
- <20260414145218.lsNpdAJI@linutronix.de>
-Content-Language: en-US
-From: Marek Vasut <marex@nabladev.com>
-In-Reply-To: <20260414145218.lsNpdAJI@linutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+References: <20260410200310.1915-1-ouster@cs.stanford.edu> <20260412134531.21341692@kernel.org>
+ <CAGXJAmxCsBPJttXdvK=s2SLxFUBzTDvf6PewPo+6QkxZbuES2Q@mail.gmail.com>
+In-Reply-To: <CAGXJAmxCsBPJttXdvK=s2SLxFUBzTDvf6PewPo+6QkxZbuES2Q@mail.gmail.com>
+From: John Ousterhout <ouster@cs.stanford.edu>
+Date: Wed, 15 Apr 2026 16:21:21 -0700
+X-Gmail-Original-Message-ID: <CAGXJAmwfszU5dLnpeb_vO9=NuLa1ii7_cmEQ+czFR0dJSjCE4g@mail.gmail.com>
+X-Gm-Features: AQROBzD3NSrfyrPkD6JACuTDViT6eQhlY_kUMwzZjeP8hER5PFczxEh4gO4G4UM
+Message-ID: <CAGXJAmwfszU5dLnpeb_vO9=NuLa1ii7_cmEQ+czFR0dJSjCE4g@mail.gmail.com>
+Subject: Re: [PATCH net-next v18 00/15] Begin upstreaming Homa transport protocol
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com, 
+	horms@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Score: -1.1
+X-Scan-Signature: 67f4a389e065da33eb5969ecb4726704
+X-Spamd-Result: default: False [-0.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[nabladev.com,reject];
-	R_DKIM_ALLOW(-0.20)[nabladev.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_REJECT(1.00)[cs.stanford.edu:s=cs2308];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[cs.stanford.edu : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-278882-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278881-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,lunn.ch,google.com,kernel.org,tipi-net.de,redhat.com,raritan.com,gmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[cs.stanford.edu:-];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[marex@nabladev.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[nabladev.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ouster@cs.stanford.edu,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,nabladev.com:dkim,nabladev.com:mid]
-X-Rspamd-Queue-Id: 0AE1E408D10
+	NEURAL_HAM(-0.00)[-0.892];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: EA48B408D66
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 4/14/26 4:52 PM, Sebastian Andrzej Siewior wrote:
-> On 2026-04-14 16:20:46 [+0200], Marek Vasut wrote:
->>> This is what happens since commit 0913ec336a6c0 ("net: ks8851: Fix
->>> deadlock with the SPI chip variant"). Before that commit the softirq
->>> execution will be picked up by netdev_alloc_skb_ip_align() and requires
->>> PREEMPT_RT and a RX packet in #1 to trigger the deadlock.
->>
->> Do you want me to add this into the V4 commit message ?
-> 
-> The description does not match the code since the commit mentioned
-> above.
+For the record, I have fixed all of the issues reported by the AI
+review of this patch series, except for the following comments:
 
-I hope the V4 commit message is a bit better.
+(the following comment was on patch 8/15)
 
->>> The backtrace here and the description is based on an older kernel.
->>> However
->> I actually did update the backtrace in V3 with the one from current next
->> 20260413 .
-> 
-> That would be from yesterday and the change is merged since v6.10. But
-> why is the softirq starting from __netdev_alloc_skb() instead of
-> spin_unlock_bh(&ks->statelock)? After that unlock, the softirq must be
-> processed and __netdev_alloc_skb() _could_ observe pending softirqs but
-> not from ks8851.
-Because __netdev_alloc_skb() also enables/disables BH , see the "else" 
-branch:
+> In v17, Paolo followed up asking about kmem_cache performance and whether
+> optimization makes sense. The author responded that kmem_cache was actually
+> slower than kzalloc (400 vs 380 cycles). While the author provided
+> justification, Paolo's v17 response suggests this remains a point of
+> discussion about understanding the performance characteristics.
 
-  759 struct sk_buff *__netdev_alloc_skb(struct net_device *dev, 
-unsigned int len,
-  760                                    gfp_t gfp_mask)
-  761 {
-...
-  786         if (in_hardirq() || irqs_disabled()) {
-  787                 nc = this_cpu_ptr(&netdev_alloc_cache);
-  788                 data = page_frag_alloc(nc, len, gfp_mask);
-  789                 pfmemalloc = page_frag_cache_is_pfmemalloc(nc);
-  790         } else {
-  791                 local_bh_disable();
-  792                 local_lock_nested_bh(&napi_alloc_cache.bh_lock);
-...
-  798                 local_unlock_nested_bh(&napi_alloc_cache.bh_lock);
-  799                 local_bh_enable();
-...
+I have not attempted to track down why this optimization didn't help
+for Homa. Let me know if that needs to be done as part of the
+acceptance process for this patch series.
+
+(the following comment was on patch 11/15)
+
+> Eric Dumazet raised a performance concern during the September 2025 review
+> (https://lore.kernel.org/netdev/CANn89i+r6ogvutW1+C7ZDhEYKZN7WU=OVONpgnoX4EgYX=BF4A@mail.gmail.com/):
+
+> "Also if homa does not have yet GRO support, I doubt
+> skb_attempt_defer_free() is a big win."
+
+> Is there evidence that skb_attempt_defer_free provides meaningful
+> performance benefits for Homa without GRO support? The concern appears
+> unaddressed in subsequent patch versions.
+
+I implemented skb_attempt_defer_free at Paolo's suggestion. My
+performance measurements indicated that it does not reduce overall CPU
+usage (it actually increases it slightly), but it moves CPU time off
+the critical path for receiving long messages. Thus I'm inclined to
+retain it. Maybe the performance benefits will increase when I
+upstream Homa's GRO support?
+
+-John-
 
