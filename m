@@ -1,111 +1,110 @@
-Return-Path: <netdev+bounces-278745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278746-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SBATA5xq32niSgAAu9opvQ
-	(envelope-from <netdev+bounces-278745-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 12:38:20 +0200
+	id iCuzIK9r32niSgAAu9opvQ
+	(envelope-from <netdev+bounces-278746-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 12:42:55 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83996403534
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 12:38:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2018A4035C4
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 12:42:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2C7A0302D955
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 10:38:18 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 84F293094B4A
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 10:42:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87B1F39FD4;
-	Wed, 15 Apr 2026 10:38:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71A4D335072;
+	Wed, 15 Apr 2026 10:42:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AJrnX99Y";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="U0NcrzVV"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lnsnk7QF";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="tIxeoYOU"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3726734253B
-	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 10:38:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3100C346FAB
+	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 10:42:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776249497; cv=none; b=RI8UTwaWQxJ6aq538kSV7uBDpuQ+1Vor0CCOPGk8G3Yx6a0IfD7/1CofXKsTvluEWMQChwRBdiFz2V56ZAw+ULtTdo3o7IjVjJFKgu3H5lCMpBZkIBaK6I0Ri4jcY+2KTDQcJgZ0t0swXd/qIvp9Ze0VIEFWqb7rzMcikJ2sa9c=
+	t=1776249754; cv=none; b=jmkoRiCHIE6eX6oN9SbKy2TVdmkKk8Y9wmZLeZuTeq/ltUZbF5lkwdHaZguL1IJYGbryyLLeno3CtTvqdFFAYOQsyxDXAPAqPrIrlpN7xTU1fH54h+bL16FxtmruQq84iwOuhuWeyxXUZMQ6/4sreage8BjdotmBTAJwqrVdJvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776249497; c=relaxed/simple;
-	bh=MTvLj66Y77ArXLSp+TSw8ghHRCXJwgL40oURLnpQzt4=;
+	s=arc-20240116; t=1776249754; c=relaxed/simple;
+	bh=Z8ZM7RZK8ybTCU1uHBOlcPD8CQy1Evp7Q8nKaT8TGXk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DPm8XQzOdl4Yst+k0qaAWFXvgCCVoVtZB+NKXGoo/BjluzgvgXxJ/gXLUhEoT3RlCTjmZBWx8HaTqZ6M5ZahfDreVZrQLCFwV9A5gOwmama87jm+SqjkjSUSjAupa8L1nMkhDcGWc4wCACahb1JZNRXrNq6odkri5Sgc/3iNQ88=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AJrnX99Y; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=U0NcrzVV; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=MiYW4rMmrYRrg8lJ/e+d1+EiJYCRLtuXQS22lFf27nqpJW6U3FOU7mIa1HT494yykwLtF1rHLSJmksUEAMOQlg+1Rp+1pv4Vw+RlB+xck69WG9+gUmaEfpzWCZx7ifFOFyD69SBo5cFrBsuHkjW5CyYRfh/yUlxOLMNA7yHPMks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Lnsnk7QF; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=tIxeoYOU; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1776249495;
+	s=mimecast20190719; t=1776249752;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=hHOnfYuW3tC+yUaHMZSnrjEvT22LJH6fSZwyXCPhnqE=;
-	b=AJrnX99YSbM91yM5IEAYd1hTzUSta3A2/doH1UdZxvvcWgNRzuWtnuLBqnZuWYPNpvpMix
-	nTaLHeNOubZesjyizOtecxt+f6ZecKrstn2W0satE1VkrVcA2bc0HGsoJlR3x4bBMcLUm2
-	kZEl1U+6AuQzLIkGvZ80b4t3lgY15dM=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=S5Es++6jZY8aKLtLSfo9uIdq7eeB6041SLW/QpiJsjA=;
+	b=Lnsnk7QFBGhRQXgCG+fyIZw3Xt1yf7rx4SDn3TB7M/15phOVXiMd3LoJ2JQ/6N4SbmK8qr
+	34WATitmCnTrBm4xv2JV069fIE2ebzHiWzarNLjo0Uzd2CREPEwIKgKJ+kHA9AS0o6VLry
+	ZjjAR+q61QV9HVkMRsPOR5li+0HyZvQ=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-198-sOQG2OUpM6GUnfgg6JefaA-1; Wed, 15 Apr 2026 06:38:14 -0400
-X-MC-Unique: sOQG2OUpM6GUnfgg6JefaA-1
-X-Mimecast-MFC-AGG-ID: sOQG2OUpM6GUnfgg6JefaA_1776249493
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-483786a09b1so70108905e9.3
-        for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 03:38:13 -0700 (PDT)
+ us-mta-687-J4dwooAWNC-NVJXMJO1Z1A-1; Wed, 15 Apr 2026 06:42:26 -0400
+X-MC-Unique: J4dwooAWNC-NVJXMJO1Z1A-1
+X-Mimecast-MFC-AGG-ID: J4dwooAWNC-NVJXMJO1Z1A_1776249745
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-43ea7a5da42so865938f8f.1
+        for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 03:42:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1776249493; x=1776854293; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1776249745; x=1776854545; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hHOnfYuW3tC+yUaHMZSnrjEvT22LJH6fSZwyXCPhnqE=;
-        b=U0NcrzVVjY6gjX5DffGCbMccj7Whri+rEWRWeYaofTN2IrFM4sp0h81cRl7C91bkwG
-         aggg36rkrlKfEesRAWLDrmBYIaO/FQwjqqZXOkmT4lnqB1PxiGE5MAYZOq2fSnIAVNl0
-         AxVH0qemkkFKqsRQOEBRLrwOame+g5w7Wnne84LzAtkovuIzGyMSJd9TeAF1eKIzRIGi
-         rQPDIwW1s/Nh53AURiwjbWHipsTO/+QDckmt1/V9KgN5bNiw6ycmeWggQx8NcxA8iC0S
-         v+cdw0lJxeJW39MLJRmBIc/y/9KyfoQGWOfGVYVdM6OXIpO5rqjd0lN1FzOxV6tqVpa2
-         hJRg==
+        bh=S5Es++6jZY8aKLtLSfo9uIdq7eeB6041SLW/QpiJsjA=;
+        b=tIxeoYOUhjh5hS2B/6UiVEHcrrTiTSWMcsLl7mu3qH9NM+UnaWS2E7H88n0qi0c7Aj
+         nJi37mXKvWlFFkwKeyPGiRFDDWoLtuj27h9JILICuwzrWANZch+6uz4VzIkbiu3iOgTS
+         FskOI+nZ/vPdJMqT1rdPk0J+exy2uqJsM4qxvJkwRQqPBBzqI11RzDG+swjlW4sj4GSA
+         dEPuP9DiAD1sUvk01fQ8ZvQWUS41UbhGgAMn2Kds4HNyHoKCyNtTR42QSx7QCgAr4iKI
+         h2ObSRAfd+3UZa+KjSSrgAH78WrLrkvGHsCZquOjmtsGalBOg7lT8cssSD3+z4saGd+s
+         okIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776249493; x=1776854293;
+        d=1e100.net; s=20251104; t=1776249745; x=1776854545;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=hHOnfYuW3tC+yUaHMZSnrjEvT22LJH6fSZwyXCPhnqE=;
-        b=Y6PE2XkVcuU3lsNdG7A0kBkWrq8AgS7JfudIXk7I55BwMP1QoZpNFpWboAlTvEnlYQ
-         rHuanihrvs1on8yRyCa4v8nuF6lBczu0WRhn7nN15vZz6L0Gn4JRyjzyMbqQmq5+H8Kf
-         wMYKG956Iw+SkJdyf/70MGaETBb7JjkENsg28Y9Iwx6NLD8DEhUoPnN/Ozpn4+Lzld+2
-         qpQAYV6507KwWlWZwWisOagiYJ3gAlgQn5UTgvVOeMVAtmomw4nmDx0MAn2b3RuyvQdB
-         hTNY+ZtDBTEf50Ix63tAF2pcm6+41Dv9tYzTp+YwWU+0GwdPXe7gTrhz4zJPAhODYgao
-         8QIA==
-X-Forwarded-Encrypted: i=1; AFNElJ8u5TgxudHWs2EHS48p6a4pYxco7JDRLvDkb4x2GeVbKnvnidnDIkTniIeC/n+LNWOCmw9xQqY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+R8QeXmFsNgp+31Zb0yHK4KkaTKi/fF2bQDdnowMVA6Wb9fPF
-	HZwbFfkbgBGx8Xdey2U5DHtKCFcBze7KXBl1kYp9QVG+OhZyz5uk3xY4Y1J2yyOseQNH4xNh3jj
-	p/9G4H6XiCgyOGhbGbP6zSFFAhR3pzo+BaIDKFci4y9pzRwjN0iLfeM9SMw==
-X-Gm-Gg: AeBDiesAROupdfwkgNHkLYXjm/grDs8MLReXWDWiB1MN8ktZo5dGyKl0WC7sICaeEff
-	yDDZb29pdaDpKPawsHwFx8+gz3/sxxm/TGHV86f7HZ2r+Fi4ZbNOzezolNWN5a9WbJ40OW+kqFd
-	9ODzcKgz2LsTxjLYwpwtvSRJk+M0tOiNFk33yAp2nBaKZJ4ujSc9X/lqdT4Itg2faMSJ+3T/KOe
-	g8AQwQCgCPw4wwIX81zy9VoJlQVDvfLis4SRPviHLQ54T6mwBXPiDyHIp62nGeUhbnd+M4HRbJF
-	9/r50OQHXuLriCeX2vH7XMW+DXWeUnR6J4WmzMoNEcFOmpyqdH1KJetVGXrOs7pbLzckmsVnBNT
-	bSXcWU0gIFc6zCM/1FCdu2H917EOMwWc+e4KARaGmrSEjT1NBwZZsVpMqMsUwd0dZJVonAxzUd5
-	MBxXzzUQ==
-X-Received: by 2002:a05:600c:890e:b0:488:bd79:94d8 with SMTP id 5b1f17b1804b1-488d684331emr195084365e9.18.1776249492706;
-        Wed, 15 Apr 2026 03:38:12 -0700 (PDT)
-X-Received: by 2002:a05:600c:890e:b0:488:bd79:94d8 with SMTP id 5b1f17b1804b1-488d684331emr195083925e9.18.1776249492197;
-        Wed, 15 Apr 2026 03:38:12 -0700 (PDT)
+        bh=S5Es++6jZY8aKLtLSfo9uIdq7eeB6041SLW/QpiJsjA=;
+        b=iV/QGI80adZ3E2ZzTnFm7j8w3vjrcKow3KO8o80LB7kS/IwHGsx4Vrfu/PB3hBD72T
+         jQ2NzeSeOUtARYEaoSL41l7lY+GKCmelsUYTbq+zBPCWQrXKXMUswzMO3X+p05qTl/1O
+         rwTUCExMvlxjZWCYN/Kdxp/M8JQxpkM3Ll6EyVlHK84kL5eJCFDuxuiMt5pJuDlB/Z61
+         Y0gplPVlfx3qTM6gcTfxF+O/RU/b1uDfgW+hfjqJONPllan0e9VifpdIYcnHe1QAvvdw
+         HV8qhCpUXoYNoCjfB5P+AdGA8ZODdsN/eujyTh09wsjDgznFSXanTNTQfF20v4cio1H4
+         VTMA==
+X-Forwarded-Encrypted: i=1; AFNElJ8NQQiEJYmXJheEtVfah57qgEFtNMgHUkd2kcB3h2pPxr/ltw/l35mbqzmtrOu5dHgmZ/JfZE8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwwQa/mFWy8i3MHHrEPyY0G0LMWGSdCWuJVf3rfrOhNj6154Ofv
+	i2HQ1wiOFZrqTm2qdC62YOvKqgq6CtjjOc7TfsR3GLT1KFFy9yLz43q45NwZqQ6uX8knT+L6LkV
+	a1qal6OS/cdHT0zB7k7zqGDbqIMDYUD04/dfPqA7r5sp8P4D1gxJA3X5afA==
+X-Gm-Gg: AeBDiev5v3afulJvJ7HmeIJKKShYxj1K2cuz98iIWvIumY3ekl0t5GfIlBIPGtVnn69
+	Y7EeyCOmMYC2+fbpIYXbJDCvDLvCEaBMJD4DbjQZZfE55Jmf2aQNRbE/THHUyEAUclQkXJATpDw
+	tf5Tx5ztfFAYtInFgngTDtLiMO9f/6lI4XJ+YeVzUqio+tLToxwoBfb6LtLc1fEA5VPDrVpaH1f
+	Es5jYQDFZDxGY3RKQpo0W2yW29+e+AvWiZ4WIbSOh4aicnei3o/flciwi1oVIpA+IP29rYwibDv
+	fPha213vUJQjJ57OruwX6PSAafHGo2MbtD/ejAZUFzd7kLIHOtCkEl1aIxmXub+L2u+2SAy98kA
+	CO7h6QCQEXo0WTAwE5dx8ORi0WoRH9/robahdwPPBPf07IP2VAe8w+saUJsbVqzcffjXaFKuLHh
+	iXcio/HQ==
+X-Received: by 2002:a05:600c:34cd:b0:487:575:5e1 with SMTP id 5b1f17b1804b1-488d68c2cb4mr269862015e9.24.1776249744835;
+        Wed, 15 Apr 2026 03:42:24 -0700 (PDT)
+X-Received: by 2002:a05:600c:34cd:b0:487:575:5e1 with SMTP id 5b1f17b1804b1-488d68c2cb4mr269861615e9.24.1776249744366;
+        Wed, 15 Apr 2026 03:42:24 -0700 (PDT)
 Received: from sgarzare-redhat (host-87-16-204-83.retail.telecomitalia.it. [87.16.204.83])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488f0ec6cc6sm17072045e9.29.2026.04.15.03.38.10
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43ead3d5fd6sm4397440f8f.24.2026.04.15.03.42.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Apr 2026 03:38:11 -0700 (PDT)
-Date: Wed, 15 Apr 2026 12:38:04 +0200
+        Wed, 15 Apr 2026 03:42:23 -0700 (PDT)
+Date: Wed, 15 Apr 2026 12:42:16 +0200
 From: Stefano Garzarella <sgarzare@redhat.com>
-To: Dexuan Cui <decui@microsoft.com>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org, 
-	longli@microsoft.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org, niuxuewei.nxw@antgroup.com, 
-	linux-hyperv@vger.kernel.org, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org, Ben Hillis <Ben.Hillis@microsoft.com>, 
-	Mitchell Levy <levymitchell0@gmail.com>
-Subject: Re: [PATCH net] hv_sock: Report EOF instead of -EIO for FIN
-Message-ID: <ad9pPrji1uYSgNir@sgarzare-redhat>
-References: <20260414234316.711578-1-decui@microsoft.com>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: Norbert Szetei <norbert@doyensec.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	virtualization@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 net] vsock: fix buffer size clamping order
+Message-ID: <ad9q6r6ZBHIH7k4f@sgarzare-redhat>
+References: <180118C5-8BCF-4A63-A305-4EE53A34AB9C@doyensec.com>
+ <e965ff22-37b2-406d-b885-e2736e84c0f3@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -114,102 +113,80 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20260414234316.711578-1-decui@microsoft.com>
+In-Reply-To: <e965ff22-37b2-406d-b885-e2736e84c0f3@rbox.co>
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
 	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-278745-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[microsoft.com,kernel.org,davemloft.net,google.com,redhat.com,antgroup.com,vger.kernel.org,lists.linux.dev,gmail.com];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
 	DKIM_TRACE(0.00)[redhat.com:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-278746-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[sgarzare@redhat.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 83996403534
+X-Rspamd-Queue-Id: 2018A4035C4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Apr 14, 2026 at 04:43:16PM -0700, Dexuan Cui wrote:
->Commit f0c5827d07cb unluckily causes a regression for the FIN packet,
->and the final read syscall gets an error rather than 0.
+On Tue, Apr 14, 2026 at 04:22:04PM +0200, Michal Luczaj wrote:
+>On 4/9/26 18:34, Norbert Szetei wrote:
+>> In vsock_update_buffer_size(), the buffer size was being clamped to the
+>> maximum first, and then to the minimum. If a user sets a minimum buffer
+>> size larger than the maximum, the minimum check overrides the maximum
+>> check, inverting the constraint.
+>>
+>> This breaks the intended socket memory boundaries by allowing the
+>> vsk->buffer_size to grow beyond the configured vsk->buffer_max_size.
+>>
+>> Fix this by checking the minimum first, and then the maximum. This
+>> ensures the buffer size never exceeds the buffer_max_size.
 >
->Ideally, we would want to fix hvs_channel_readable_payload() so that it
->could return 0 in the FIN scenario, but it's not good for the hv_sock
->driver to use the VMBus ringbuffer's cached priv_read_index, which is
->internal data in the VMBus driver.
+>Something may be missing. After adding another ioctl to your reproducer, I
+>still see crashes.
 >
->Fix the regression in hv_sock by returning 0 rather than -EIO.
+>     SYSCHK(setsockopt(fd, AF_VSOCK, SO_VM_SOCKETS_BUFFER_MIN_SIZE, &min,
+>                       sizeof(min)));
+>+    SYSCHK(setsockopt(fd, AF_VSOCK, SO_VM_SOCKETS_BUFFER_MAX_SIZE, &min,
+>+                      sizeof(min)));
+> }
 >
->Fixes: f0c5827d07cb ("hv_sock: Return the readable bytes in hvs_stream_has_data()")
->Cc: stable@vger.kernel.org
->Reported-by: Ben Hillis <Ben.Hillis@microsoft.com>
->Reported-by: Mitchell Levy <levymitchell0@gmail.com>
->Signed-off-by: Dexuan Cui <decui@microsoft.com>
->---
-> net/vmw_vsock/hyperv_transport.c | 18 ++++++++++++++++--
-> 1 file changed, 16 insertions(+), 2 deletions(-)
+>[*] Setting buffer_min_size to 0x400000000.
+>[socket][0] sending...
 >
->diff --git a/net/vmw_vsock/hyperv_transport.c b/net/vmw_vsock/hyperv_transport.c
->index 069386a74557..63d3549125be 100644
->--- a/net/vmw_vsock/hyperv_transport.c
->+++ b/net/vmw_vsock/hyperv_transport.c
->@@ -703,8 +703,22 @@ static s64 hvs_stream_has_data(struct vsock_sock *vsk)
-> 	switch (hvs_channel_readable_payload(hvs->chan)) {
-> 	case 1:
-> 		need_refill = !hvs->recv_desc;
->-		if (!need_refill)
->-			return -EIO;
->+		if (!need_refill) {
+>refcount_t: saturated; leaking memory.
+>WARNING: lib/refcount.c:22 at refcount_warn_saturate+0x7d/0xb0, CPU#2:
+>a.out/1478
+>...
+>refcount_t: underflow; use-after-free.
+>WARNING: lib/refcount.c:28 at refcount_warn_saturate+0x50/0xb0, CPU#12:
+>kworker/12:0/80
+>Workqueue: vsock-loopback vsock_loopback_work
+>...
+>
 
-Can we drop `need_refill` entirly and just check `hvs->recv_desc` here?
-
-Mainly because now the comment we are adding is confusing me about what 
-`need_refill` means.
-
-The rest LGTM.
+yeah, I pointed out the same during the bug discussion 
+(https://lore.kernel.org/netdev/acuKUpZQq6z1DY_n@sgarzare-redhat/) and 
+suggested to add a sysctl or reuse net.core.wmem_max/rmem_max
+(https://lore.kernel.org/netdev/adYKERRYwzMIhZAl@sgarzare-redhat/)
 
 Thanks,
 Stefano
-
->+			/* Here hvs->recv_data_len is 0, so hvs->recv_desc must
->+			 * be NULL unless it points to the 0-byte-payload FIN
->+			 * packet: see hvs_update_recv_data().
->+			 *
->+			 * Here all the payload has been dequeued, but
->+			 * hvs_channel_readable_payload() still returns 1,
->+			 * because the VMBus ringbuffer's read_index is not
->+			 * updated for the FIN packet: hvs_stream_dequeue() ->
->+			 * hv_pkt_iter_next() updates the cached priv_read_index
->+			 * but has no opportunity to update the read_index in
->+			 * hv_pkt_iter_close() as hvs_stream_has_data() returns
->+			 * 0 for the FIN packet, so it won't get dequeued.
->+			 */
->+			return 0;
->+		}
->
-> 		hvs->recv_desc = hv_pkt_iter_first(hvs->chan);
-> 		if (!hvs->recv_desc)
->-- 
->2.49.0
->
->
 
 
