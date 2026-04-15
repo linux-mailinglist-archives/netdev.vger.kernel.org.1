@@ -1,163 +1,202 @@
-Return-Path: <netdev+bounces-278827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278828-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yH/MCYqx32lCXwAAu9opvQ
-	(envelope-from <netdev+bounces-278827-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 17:40:58 +0200
+	id WAazArGx32lSYAAAu9opvQ
+	(envelope-from <netdev+bounces-278828-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 17:41:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3D4740605A
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 17:40:57 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FDF8406071
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 17:41:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8DA4B312DF31
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 15:31:32 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id AD16B309DC4D
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 15:32:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 970C53DD52C;
-	Wed, 15 Apr 2026 15:31:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E77EE3DE420;
+	Wed, 15 Apr 2026 15:32:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xh3vE5Ka"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RdmWN6+S"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69E042F4A0C
-	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 15:31:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.214.180
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776267090; cv=pass; b=eoTpW+t0VScXJkVMJYUXHcKs1/qA6JUdKrOLZFc4ketTyQVWmLJ3MQoaTxU9hm/7Y396RnvDrh3CwrbIznZqurCvfxxeGPiSapoSbmUXmK1pRho6O3hnxR0fgu5QfytuQSGR8208lIryhCzdIG9Z4HJ1jzF9RZkxumOby1j8liI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776267090; c=relaxed/simple;
-	bh=eZZ9MBeGinL5cKg3LaYZTrFFidLDf8L6MNP8Brjr8zM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=e6+XO/bymNkJPjPcf3B0iAECYZtO0vgnygkdR4ql0y1c5EK5A10l+4aSjcNYeYHk+XRRtx2YVlQj1/0CKZ+dPYNxn5Ad531sFFBRyNor3xx3YUJi9iYthuoFVs6ZXB9jJ97zZzI83all5qg/JAcQVxqLvlA50hNZB+Qv4s0CRK4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xh3vE5Ka; arc=pass smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2ad9f316d68so30919505ad.2
-        for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 08:31:29 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776267089; cv=none;
-        d=google.com; s=arc-20240605;
-        b=kXu281e2GxZ7OntjgNhNKrnu/Zx8EIyt99WpO3846wSX5S0sMOiWNmDXNS+92Hry9a
-         ToXZ2jj1N3UwqnC3G4qb2ehZEt8TZTK3UVlhMUw0sVzwQBHvyBRsCMDRmFfq09Rd+CYc
-         uoWo8b53QGGu6bLTYa6dow+UXXCcRLgjPYR3NYl6GwMjd30wp39+58ppb3Yu/8wpkEjC
-         zPBuh43IzUQ0wCqapqZMlvvKlAWQAV06XO8Jthr4ObSTX78AYC/3Rtd/kd0iV+P4zZBH
-         VrQkS7MSWlkKYDgCDdwmeVY8iV0nA7Pi0Aui7ByrZ6ChXDjvUPb4e3LBCi4VlsH7iG4/
-         QRcQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=eZZ9MBeGinL5cKg3LaYZTrFFidLDf8L6MNP8Brjr8zM=;
-        fh=Vl99Q8+bF9eVYyit8JUsL3bPT+9wA/oBvf6ppogPfN0=;
-        b=EfzCo96bG4O2h2o4l7jSeUFzLKlPGHXJWkqmLx6Dur1UAnC5J+tiGrx7ek6MswYgRR
-         l+eZTZOeWB/y/Xh4JB5vN+7LN9MaSjDS3BGJzvVQGJlwBV82unV3zZcoq+Z7q1nMd0uS
-         6sP9O+HUDBI0lM8Eh7/5gZD1YSTNiyhp/5ITefisDB/TlRXgZhj+xLHgJYInEp4mC1jt
-         H0FRKNwliXn4taiMnkhErkph7t6mPBN5Q97LCyJ7+RmEbu+qfqqcTCiPIu3qbLiIZnkP
-         MD7hVUPgvy3Jwh9SgQH9wfMsWZLtTbL3kH3ZM2XQRWEs/kE4mR2fgeFz46J0HiG3XA7u
-         lggg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776267089; x=1776871889; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=eZZ9MBeGinL5cKg3LaYZTrFFidLDf8L6MNP8Brjr8zM=;
-        b=Xh3vE5Ka+ikHFYhtiWH88Gnvjbdgj77mPsCMci+y12a1lRzUub88MtgbVD5clye780
-         QEvQxOc4RVKnxPvwkCtiwD6u6bkS1laWUSg4b+GN4gtAyggysNZeXfyWACq8/oU54zKq
-         nv3kVnEpRXgk3nDRnsU/Ljg512hEAlUXA86Qe03v6D6t08238Uc1J7EtoR635Kro3AMl
-         PziUR+AAS1X+IIm/lNCI+5cZx5s8kkP8OquVVxX01TZCUYxxQDr8P2eUv9U36nwHLGEC
-         TXFW3T8IOx8aSt1GA0GdOClDXHVaZo6HzUuJy+sfPMJhsWPlRE0nI2hGnv95rcoaOcNB
-         KpTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776267089; x=1776871889;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eZZ9MBeGinL5cKg3LaYZTrFFidLDf8L6MNP8Brjr8zM=;
-        b=lP6mZICWjfDy6aXpnOAEdFXSZjtnWNgvgMbpVgK3UUkNPqntMcAu9atRKVFOsNUHJn
-         oFGct2Huu3VFo4ZhzCIngHRP2TD5JP0hvMTPJ7ds9mCPfkXQKfI7UmxJbzm8D2rhVvh1
-         wlKMfGV//QInJh06264fuErhekN6DkMueu7+T5ld7gj4fHG5LbKiRpw7+othidA1CbD6
-         P/w+8PDi2ZvYVgE5cT8nPO4Xb2b5FLyrONBs5SzsenXt7umWVBMO+dZ8gGTCt/xMaVlR
-         dEolDRpyQqPt8mhCWNXaSbvg2w0ncEqvqjKxM7Ci1rAV9VTbvmRLuRdToodIE/YArWYa
-         UC1Q==
-X-Forwarded-Encrypted: i=1; AFNElJ8Y+XKNycsMf67YYdUK9l/6RYlt96SFVzoWbWcun74etQtBtBLcQcSIoDtlCIl3CuEVa2CMrl0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YykQ7DCzdPe9O2VhYU+eLhv9L3SfCTKy8b8cXWK1NixM4tolUht
-	LnuKntMOHBWF4YSAKTXKQ7BW7ZEscRPizd4EXiLCS9mIBLeRZEhgYXOBeBMMjcdfumD+TuXMWLe
-	IZ/sYTlZCjVDHp9Ch/BpfjTt4DC8SvIo=
-X-Gm-Gg: AeBDievxpntutXcKkMo+PyRP92+TKknmJ0CsDpbqAO7gD6ztOvYpWMSx0Erdqf99PBp
-	cJa4KbDIhNnH0NiXrhAX3ME4bAAAajp3hgBEBZzHyIZKdwjE4rcQj4QaGx3NSmVAjye79stxTQg
-	TU06tPXibg9ABhE9Oiz7/jziwKdkf+ao1YRXuYUgEimCzBOaNEf/+mz96zIvUiU96OV6d9JwrPR
-	pDq5VyGIvlbJKmMCqSGXVpQxbnxnX30ZMoh4yzYlHCx+6pqzr347YZPivSY2vorIvGnivXhiEtz
-	CL3y8i8T/Iq8lZ86T3jZonLPQd2CZQ==
-X-Received: by 2002:a17:903:1211:b0:2b2:4b4e:e4d8 with SMTP id
- d9443c01a7336-2b2d591b8aemr215377705ad.4.1776267088525; Wed, 15 Apr 2026
- 08:31:28 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCABB3DDDDA;
+	Wed, 15 Apr 2026 15:32:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776267128; cv=none; b=elqsUEk3kViwctep66DIRQGB9U5mwFrjNjS4vkMN9mJJwROvrV4LtzqmHnlXX96huJhzSx4MLM3s3MsJ3xfoq4hd+7IcdG47aOsc2yRfus3cttxaZqNH1bfZlV7D2spVwkJVYgjEVfZsdYeNR1XxM0/iqZajHKt5Kny4bHywoBA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776267128; c=relaxed/simple;
+	bh=CFtvHa69WMtKCj/klsJ3WU0C10TJimhD3Vxn1IO+iCM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=HM6T8AczVKrmp75nax6ggsVgnFI/bMYYJPWJZ2BbYCq/zPkY8ydFrotsL9NEVi1lY8gMFOKx+Q0SXQLx8pXuJ9V9zu5gSA0YJq9nH0k6xaDq8cYQxXHKG368zyqpHFHzvATFxYNsUoX/XAcoMuPhgzhT81y+AQdNseUsL4vnv70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RdmWN6+S; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55E4BC19424;
+	Wed, 15 Apr 2026 15:32:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776267128;
+	bh=CFtvHa69WMtKCj/klsJ3WU0C10TJimhD3Vxn1IO+iCM=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=RdmWN6+SJFrQQb4hezram+/Iz6r+1onMQBy6pNxoIIbpik7ZqSw13stv/gbvpEWy5
+	 p5jikQte1ObegSNij0r1JNPrdSuY33RcW+Kneclpy95pvU+eya/TD03teOyHLTmkoD
+	 4Bf/Z0Bwc3a7H4zYwOLeN5C6hexRdts9Zq2MZVBI6m+eUjDcj+uLUKJGBHsBerNcqh
+	 mepGZ69Nf78Rs+GZQRlx73iatRFZi8WMs731346WGQgpiDkWW4IX6dtRXnd/Fb707O
+	 qHimezRMrYbLJzoHMpHhDn0g/HtWK9T5mhAyB+Zu+9plRd2qd4Bm5Q5fkRivP+Wiar
+	 yNNjAineXfOaw==
+From: Simon Horman <horms@kernel.org>
+To: hxzene@gmail.com
+Cc: 'Simon Horman' <horms@kernel.org>,
+	jhs@mojatatu.com,
+	jiri@resnulli.us,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: sched: teql: fix use-after-free in teql_master_xmit
+Date: Wed, 15 Apr 2026 16:31:52 +0100
+Message-ID: <20260415153152.816553-1-horms@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260413094448.2263828-1-hxzene@gmail.com>
+References: <20260413094448.2263828-1-hxzene@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260407-brcm-prio-v2-1-3f745edf49af@gmail.com>
- <CABBYNZJAEqwfTuVqbFAnx97HBSjcwn3Hb+y+r4r2C=MMPxFoDg@mail.gmail.com>
- <CAMT+MTQ6orj5tpiGL9hz8m2TGiBjA-9D_0e1iLt=_dXBFHcOgg@mail.gmail.com> <CABBYNZLNR8hYS9jLLKeB=M9XVvtSFtf1wi4DmcJKBbQVvHTPaw@mail.gmail.com>
-In-Reply-To: <CABBYNZLNR8hYS9jLLKeB=M9XVvtSFtf1wi4DmcJKBbQVvHTPaw@mail.gmail.com>
-From: Sasha Finkelstein <fnkl.kernel@gmail.com>
-Date: Wed, 15 Apr 2026 17:31:16 +0200
-X-Gm-Features: AQROBzD-Fi9TwOA2iNwLMvKH3PB5XbyRvKB5pMzjCowARYCArTwXFPUUzeFibBI
-Message-ID: <CAMT+MTSdVnor4+3vXhyfhye2kVp5-UPgg_Fwm4rH0mJHM_FuAg@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: Add Broadcom channel priority commands
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Sven Peter <sven@kernel.org>, Janne Grunau <j@jannau.net>, Neal Gompa <neal@gompa.dev>, 
-	Marcel Holtmann <marcel@holtmann.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org, asahi@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-278827-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-278828-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fnklkernel@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B3D4740605A
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6FDF8406071
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, 15 Apr 2026 at 17:19, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Ok, then maybe we should decrease the priority, so it can only go up.
-> That said, in a multiple connection scenario, we cannot really tell
-> what should be prioritized if we cannot momentarily decrease the
-> priority.
+From: 'Simon Horman' <horms@kernel.org>
 
-I believe that the priority is only per-connection and is not designed
-to be used per-packet. On Android they change priority when an
-A2DP stream starts or stops, by sending the commands from
-userspace and are accepting that other things using the same hci
-connection will also have high priority.
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://sashiko.dev
+---
+net: sched: teql: fix use-after-free in teql_master_xmit
+
+This patch attempts to fix a use-after-free in teql_master_xmit() by
+saving master->slaves to a local head variable during teql_destroy(),
+and by adding READ_ONCE()/WRITE_ONCE() to datapath accesses.
+
+> diff --git a/net/sched/sch_teql.c b/net/sched/sch_teql.c
+> index ec4039a201a2c..2e86397a5219c 100644
+> --- a/net/sched/sch_teql.c
+> +++ b/net/sched/sch_teql.c
+> @@ -101,7 +101,7 @@ teql_dequeue(struct Qdisc *sch)
+>  	if (skb == NULL) {
+>  		struct net_device *m = qdisc_dev(q);
+>  		if (m) {
+> -			dat->m->slaves = sch;
+> +			WRITE_ONCE(dat->m->slaves, sch);
+
+Can this lockless publication write a soon-to-be-freed pointer to
+master->slaves?
+
+If teql_dequeue() concurrently executes this write while teql_destroy()
+is unlinking sch and scheduling it for deletion via call_rcu(), sch could
+be published globally just as it is being destroyed.
+
+When the RCU grace period ends, sch would be freed but still globally
+referenced. The WRITE_ONCE() prevents store-tearing but does not prevent
+this race condition.
+
+>  		}
+>  	} else {
+[ ... ]
+> @@ -136,19 +136,23 @@ teql_destroy(struct Qdisc *sch)
+>  	if (!master)
+>  		return;
+>  
+> -	prev = master->slaves;
+> +	prev = READ_ONCE(master->slaves);
+>  	if (prev) {
+> +		struct Qdisc *head = prev;
+> +
+>  		do {
+>  			q = NEXT_SLAVE(prev);
+>  			if (q == sch) {
+>  				NEXT_SLAVE(prev) = NEXT_SLAVE(q);
+> -				if (q == master->slaves) {
+> -					master->slaves = NEXT_SLAVE(q);
+> -					if (q == master->slaves) {
+> +				if (q == head) {
+
+Could changing this condition introduce a use-after-free if master->slaves
+is concurrently advanced?
+
+If the datapath (teql_master_xmit() or teql_dequeue()) advances
+master->slaves to point to sch after head was snapshot, head will not
+equal sch.
+
+When teql_destroy() unlinks sch, the q == head check would evaluate
+to false, meaning master->slaves is not updated. This would leave
+master->slaves pointing to the unlinked sch, which will then be freed.
+
+> +					WRITE_ONCE(master->slaves,
+> +						   NEXT_SLAVE(q));
+[ ... ]
+> @@ -317,7 +321,7 @@ static netdev_tx_t teql_master_xmit(struct sk_buff *skb, struct net_device *dev)
+>  				    netdev_start_xmit(skb, slave, slave_txq, false) ==
+>  				    NETDEV_TX_OK) {
+>  					__netif_tx_unlock(slave_txq);
+> -					master->slaves = NEXT_SLAVE(q);
+> +					WRITE_ONCE(master->slaves, NEXT_SLAVE(q));
+
+Similarly to teql_dequeue() above, does this risk publishing a dying qdisc
+globally?
+
+If NEXT_SLAVE(q) is read before teql_destroy() unlinks it, but the
+WRITE_ONCE() executes immediately after the unlink, it appears the
+unlinked qdisc would be written to the global master->slaves pointer.
+
+[ ... ]
+
+While looking at the concurrency issues addressed by this patch, it appears
+teql_qdisc_init() might also be affected by concurrent updates to
+m->slaves:
+
+net/sched/sch_teql.c:teql_qdisc_init() {
+    ...
+		q->next = NEXT_SLAVE(m->slaves);
+		NEXT_SLAVE(m->slaves) = sch;
+    ...
+}
+
+Because NEXT_SLAVE(m->slaves) evaluates m->slaves twice, if m->slaves
+is concurrently advanced between these two statements, could this break
+the list linkage and cause lost elements or infinite loops?
 
