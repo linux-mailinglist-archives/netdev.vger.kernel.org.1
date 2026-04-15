@@ -1,252 +1,215 @@
-Return-Path: <netdev+bounces-278715-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278716-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AOAmK2pN32mFRQAAu9opvQ
-	(envelope-from <netdev+bounces-278715-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 10:33:46 +0200
+	id 2GRwLxdP32nLRgAAu9opvQ
+	(envelope-from <netdev+bounces-278716-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 10:40:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17E91402065
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 10:33:46 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E736402176
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 10:40:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DDF5D300D45D
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 08:30:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 09ED230A2D9E
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 08:38:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BF88321457;
-	Wed, 15 Apr 2026 08:30:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9985E2D8378;
+	Wed, 15 Apr 2026 08:38:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WB4Rty8R"
 X-Original-To: netdev@vger.kernel.org
-Received: from out28-109.mail.aliyun.com (out28-109.mail.aliyun.com [115.124.28.109])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 299602F1FC9;
-	Wed, 15 Apr 2026 08:30:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.28.109
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73BC4218845;
+	Wed, 15 Apr 2026 08:38:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776241825; cv=none; b=ZNud1cNpSRibFa72ayXIX5BAxhAO3GujYinHWFADWwZGcrmIxtVWP+omKhbbaJXV51O+bZ1NjNOwcsswwNvPbxHKMvNyG1KQqv+BvwlBIS2Zp/tCi8Bk/fa0Ak2KNXzPjNnAV/L6d2Ul/tc+aHKOB+HnXKDm9/Pjgn8nabIIHs4=
+	t=1776242293; cv=none; b=cFktHZ3DlDquV+z7ic6oQoCzV8p4S1Yl7LuCrrrRVVDxRebQkd5zMCjW+CnhodQEC0FHLQwUjj4dbMEYA1ZUp/W4w+NDPKhuIezR/mo4aUNcPWk9W1NFPB2AtKnNl83+UhsXbWVZ+fQuClfYvYR6dl+JJjwSFoQxlwSrSZOc70s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776241825; c=relaxed/simple;
-	bh=ZFWNY7o1gS8U/ryZVFGW84W4xPzvZ1rSWcQxubmrT+I=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nTFUYoIqX2Cdrg17awyF4n3owMzBuLMFp+QeMJExB4T4ktRmGYYrkLsUWDu+f7Hb/SVpSPVSkUL/bmaHUbSZ4ckpwl/JOE1MCzjCT6sH3mzxoLUj7p6cedCQbQaeA1Pls62dkOFKvN9BLOQNmFxzt2MaP3xFPEOcoomNu3/6t1Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nebula-matrix.com; spf=pass smtp.mailfrom=nebula-matrix.com; arc=none smtp.client-ip=115.124.28.109
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nebula-matrix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nebula-matrix.com
-X-Alimail-AntiSpam:AC=SUSPECT;BC=0.6694804|-1;BR=01201311R191b1;CH=blue;DM=|SUSPECT|false|;DS=CONTINUE|ham_alarm|0.114224-0.0105365-0.87524;FP=5076060736871470642|2|1|10|0|-1|-1|-1;HT=maildocker-contentspam033037006180;MF=illusion.wang@nebula-matrix.com;NM=1;PH=DS;RN=3;RT=3;SR=0;TI=SMTPD_---.hCYiVa._1776241812;
-Received: from localhost.localdomain(mailfrom:illusion.wang@nebula-matrix.com fp:SMTPD_---.hCYiVa._1776241812 cluster:ay29)
-          by smtp.aliyun-inc.com;
-          Wed, 15 Apr 2026 16:30:13 +0800
-From: "illusion.wang" <illusion.wang@nebula-matrix.com>
-To: netdev@vger.kernel.org
-Cc: "illusion.wang" <illusion.wang@nebula-matrix.com>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH v12 net-next 00/11] nbl driver for Nebulamatrix NICs
-Date: Wed, 15 Apr 2026 16:29:59 +0800
-Message-ID: <20260415033608.2438-1-illusion.wang@nebula-matrix.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260415033608.2438-2-illusion.wang@nebula-matrix.com>
-References: 
+	s=arc-20240116; t=1776242293; c=relaxed/simple;
+	bh=+E24YrPrdzJ1ya9Ikgcx0KKiXJaJ4AYDwwErZxu5fG0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=H7wIzyfCS7bGeNe+H6BSsOrv70spYJdtt+k1fzB5sAhChpiTl1FbQUraqobB+/SpA6iTLFNCFrVULba03XWwnLl6JKDepdePKZe5h8IQ9aDixKwi+g29UfYhQCSpJ5rYyH3H5VMz/JvyzDE4m0IYiNCaTTopk0TphZfjgplKYas=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WB4Rty8R; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1776242292; x=1807778292;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=+E24YrPrdzJ1ya9Ikgcx0KKiXJaJ4AYDwwErZxu5fG0=;
+  b=WB4Rty8REWJYIHweme5mBnXmrcnwcaDDRIPu+fkQKIh74+9fG6jC9hzR
+   yh7ce+lRmUtO88cZq7GkKdTYEjJD2mmTCj3tNJS7DwNzqzvvPscSn/kCC
+   9/2tNjJV45rhGjt3sDEkYLmSL2MHqEKk98LYlRDN4npkuiJdvLKATrgIh
+   rX8KVDEfVW9LPBRFYrKTLACmpAG9vVVY+Ojfr5pyzj6bMYidIAuyWwurg
+   iARpIEQ9GXrlfCaWjSDcEWlc65I9/qELy7hP0hWqkcyRp4cnjbXRJJ+hv
+   CyDFw1sAeALbiRbfk+0M6gN8W+f20liplklUhLxSwutwUhj3UuRoPCzVo
+   A==;
+X-CSE-ConnectionGUID: YdYuSVWvTQOWnRg20Z+vCA==
+X-CSE-MsgGUID: n2HNbwCOSgipVsaO2mgfwg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11759"; a="87914967"
+X-IronPort-AV: E=Sophos;i="6.23,179,1770624000"; 
+   d="scan'208";a="87914967"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2026 01:38:11 -0700
+X-CSE-ConnectionGUID: T4ArbB4xS227m+HZRmDGeQ==
+X-CSE-MsgGUID: DIzosRa5RXmyFA6P+VAa2g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,179,1770624000"; 
+   d="scan'208";a="223857364"
+Received: from mohdfai2-mobl.gar.corp.intel.com (HELO [10.247.20.182]) ([10.247.20.182])
+  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2026 01:38:06 -0700
+Message-ID: <f1c6f5d0-61a7-4866-b122-ce18933d92eb@linux.intel.com>
+Date: Wed, 15 Apr 2026 16:37:51 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwl-next 1/1] igc: add support for forcing link speed
+ without autonegotiation
+To: Simon Horman <horms@kernel.org>, khai.wen.tan@linux.intel.com
+Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, intel-wired-lan@lists.osuosl.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ faizal.abdul.rahim@intel.com, hector.blanco.alcaine@intel.com,
+ hong.aun.looi@intel.com, khai.wen.tan@intel.com
+References: <20260409072747.217836-1-khai.wen.tan@linux.intel.com>
+ <20260413145215.718532-1-horms@kernel.org>
+Content-Language: en-US
+From: "Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com>
+In-Reply-To: <20260413145215.718532-1-horms@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.46 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_COUNT_THREE(0.00)[4];
-	NEURAL_HAM(-0.00)[-0.999];
-	TAGGED_RCPT(0.00)[netdev];
-	R_DKIM_NA(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[illusion.wang@nebula-matrix.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[nebula-matrix.com];
-	PRECEDENCE_BULK(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[intel.com:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278715-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-278716-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_THREE(0.00)[3]
-X-Rspamd-Queue-Id: 17E91402065
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[faizal.abdul.rahim@linux.intel.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 1E736402176
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This patch series represents the first phase. We plan to integrate it in
-two phases: the first phase covers mailbox and chip configuration,
-while the second phase involves net dev configuration.
-Together, they will provide basic PF-based Ethernet port transmission and
-reception capabilities.
 
-After that, we will consider other features, such as ethtool support,
-flow management, adminq messaging, VF support, debugfs support, etc.
 
-changes v11->v12
-Link to v10:https://lore.kernel.org/netdev/20260408093739.56001-1-illusion.wang@nebula-matrix.com/
-AI review issues
-changes v10->v11
-Link to v10:https://lore.kernel.org/netdev/20260401022318.28550-1-illusion.wang@nebula-matrix.com/
-1.Issues found by Mohsin
-2.AI review issues
-changes v9->v10
-Link to v9:https://lore.kernel.org/netdev/20260325040048.2313-1-illusion.wang@nebula-matrix.com/
-1.Issues found by Jakub
-2.AI review issue
-changes v8->v9
-Link to v8:https://lore.kernel.org/netdev/20260317034533.5600-1-illusion.wang@nebula-matrix.com/
-1.Issues found by Jakub
-2.AI review issue
-Changes v7→v8
-Link to v7:https://lore.kernel.org/netdev/20260310120959.22015-1-illusion.wang@nebula-matrix.com/
-1.Issues found by Paolo
-Changes v6->v7
-Link to v6:https://lore.kernel.org/netdev/20260306033451.5196-1-illusion.wang@nebula-matrix.com/
-1.Issue found by Jakub
-2.AI review issue
-Changes v5->v6
-Link to V5:https://lore.kernel.org/netdev/20260226073840.3222-1-illusion.wang@nebula-matrix.com/
-1.put all standard linux includes files the .c file which needs it & others
---Andrew
-2.AI review issue
-Changes v4->v5
-Link to V4:https://lore.kernel.org/netdev/20260206021608.85381-1-illusion.wang@nebula-matrix.com/
-1.change nbl_core to nbl & change ** pointers to *pointers & others
---Andrew
-2.AI review issue
-Changes v3->v4
-Link to v3: https://lore.kernel.org/netdev/20260123011804.31263-1-illusion.wang@nebula-matrix.com
-1.cut down to part of a mini driver(mailbox and chip init)
---Jakub Kicinski Simon Horman(some sort of staged approached)
-2.modify issues found by ai.
-3. Reverse Christmas tree/nbl_err/devm_kfree/remove some macros/
-void type to real type/others
---Andrew Lunn
-4.change deprecated pci_enable_msix_range to pci_alloc_irq_vectors
-5.delete service layer
-6.the style of kconfig---Randy Dunlap
-7.add to Documentation/networking/device_drivers/ethernet/index.rst
---Simon Horman
-Changes v2 →v3
-Link to v2: https://lore.kernel.org/netdev/20260109100146.63569-1-illusion.wang@nebula-matrix.com/
-1.cut down to a mini driver:
-    delete vf support
-    use promisc mode to cut down flow management
-    drop patch15 in v2
-    delete adminq msg
-    delete abnormal handling
-    delete some unimportant interfaces
-2.modify issues found by ai review
-Changes v1->v2
-Link to v1: https://lore.kernel.org/netdev/20251223035113.31122-1-illusion.wang@nebula-matrix.com/
-1.Format Issues and Compilation Issues
-- Paolo Abeni
-2.add sysfs patch and drop coexisting patch
-- Andrew Lunn
-3.delete some unimportant ndo operations
-4.add machine generated headers patch
-5.Modify the issues found in patch1-2 and apply the same fixes to other
-patches
-6.modify issues found by nipa
+On 13/4/2026 10:52 pm, Simon Horman wrote:
+> From: 'Simon Horman' <horms@kernel.org>
+> 
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+> Full review at: https://sashiko.dev
+> ---
+> igc: add support for forcing link speed without autonegotiation
+> 
+> This commit allows forcing 10/100 Mb/s link speed and duplex settings via
+> ethtool when autonegotiation is disabled. It configures the MAC CTRL and
+> PHY registers to bypass autonegotiation and apply the requested settings.
+> 
+>> diff --git a/drivers/net/ethernet/intel/igc/igc_ethtool.c b/drivers/net/ethernet/intel/igc/igc_ethtool.c
+>> index 0122009bedd03..e14771532dad8 100644
+>> --- a/drivers/net/ethernet/intel/igc/igc_ethtool.c
+>> +++ b/drivers/net/ethernet/intel/igc/igc_ethtool.c
+> [ ... ]
+>> +static int igc_handle_autoneg_disabled(struct net_device *netdev, u32 speed,
+>> +				       u8 duplex)
+>> +{
+>> +	struct igc_adapter *adapter = netdev_priv(netdev);
+>> +	struct igc_mac_info *mac = &adapter->hw.mac;
+>> +	enum igc_forced_speed_duplex forced_speed_duplex;
+>>   
+>> +	switch (speed) {
+>> +	case SPEED_10:
+>> +		forced_speed_duplex = (duplex == DUPLEX_FULL) ? IGC_FORCED_10F : IGC_FORCED_10H;
+>> +		break;
+>> +	case SPEED_100:
+>> +		forced_speed_duplex = (duplex == DUPLEX_FULL) ? IGC_FORCED_100F : IGC_FORCED_100H;
+>> +		break;
+> 
+> Does forcing a half-duplex configuration here also require setting flow
+> control to none (e.g., hw->fc.requested_mode = igc_fc_none)?
+> 
+>> diff --git a/drivers/net/ethernet/intel/igc/igc_mac.c b/drivers/net/ethernet/intel/igc/igc_mac.c
+>> index 7ac6637f8db73..16b0f2db06896 100644
+>> --- a/drivers/net/ethernet/intel/igc/igc_mac.c
+>> +++ b/drivers/net/ethernet/intel/igc/igc_mac.c
+>> @@ -452,7 +452,7 @@ s32 igc_config_fc_after_link_up(struct igc_hw *hw)
+>>   	 * so we had to force link.  In this case, we need to force the
+>>   	 * configuration of the MAC to match the "fc" parameter.
+>>   	 */
+>> -	if (mac->autoneg_failed)
+>> +	if (mac->autoneg_failed || !mac->autoneg_enabled)
+>>   		ret_val = igc_force_mac_fc(hw);
+> 
+> If mac->autoneg_enabled is false, igc_force_mac_fc() will configure the MAC
+> using the existing hw->fc.current_mode. If current_mode defaults to full flow
+> control, this will enable PAUSE frames.
+> 
+> Since autonegotiation is disabled, the MII status check further down in this
+> same function will fail and return early:
+> 
+> drivers/net/ethernet/intel/igc/igc_mac.c:igc_config_fc_after_link_up() {
+>      ...
+>      if (!(mii_status_reg & MII_SR_AUTONEG_COMPLETE)) {
+>          hw_dbg("Copper PHY and Auto Neg has not completed.\n");
+>          goto out;
+>      }
+>      ...
+> }
+> 
+> This early return skips the half-duplex safety check at the end of
+> igc_config_fc_after_link_up() which would normally clear the flow control
+> settings:
+> 
+> drivers/net/ethernet/intel/igc/igc_mac.c:igc_config_fc_after_link_up() {
+>      ...
+>      if (duplex == HALF_DUPLEX)
+>          hw->fc.current_mode = igc_fc_none;
+> 
+>      ret_val = igc_force_mac_fc(hw);
+>      ...
+> }
+> 
+> Does this leave the MAC incorrectly configured to send and receive PAUSE
+> frames on a half-duplex link, violating the IEEE 802.3 specification?
 
-illusion.wang (11):
-  net/nebula-matrix: add minimum nbl build framework
-  net/nebula-matrix: add our driver architecture
-  net/nebula-matrix: add chip related definitions
-  net/nebula-matrix: channel msg value and msg struct
-  net/nebula-matrix: add channel layer
-  net/nebula-matrix: add common resource implementation
-  net/nebula-matrix: add intr resource implementation
-  net/nebula-matrix: add vsi resource implementation
-  net/nebula-matrix: add Dispatch layer implementation
-  net/nebula-matrix: add common/ctrl dev init/reinit operation
-  net/nebula-matrix: add common dev start/stop operation
+Hi Simon,
+Thanks for the review.
 
- .../device_drivers/ethernet/index.rst         |    1 +
- .../ethernet/nebula-matrix/nbl.rst            |   27 +
- MAINTAINERS                                   |   10 +
- drivers/net/ethernet/Kconfig                  |    1 +
- drivers/net/ethernet/Makefile                 |    1 +
- drivers/net/ethernet/nebula-matrix/Kconfig    |   34 +
- drivers/net/ethernet/nebula-matrix/Makefile   |    6 +
- .../net/ethernet/nebula-matrix/nbl/Makefile   |   16 +
- .../nbl/nbl_channel/nbl_channel.c             |  843 +++++
- .../nbl/nbl_channel/nbl_channel.h             |  163 +
- .../nebula-matrix/nbl/nbl_common/nbl_common.c |  214 ++
- .../nebula-matrix/nbl/nbl_common/nbl_common.h |   33 +
- .../net/ethernet/nebula-matrix/nbl/nbl_core.h |   59 +
- .../nebula-matrix/nbl/nbl_core/nbl_dev.c      |  441 +++
- .../nebula-matrix/nbl/nbl_core/nbl_dev.h      |   58 +
- .../nebula-matrix/nbl/nbl_core/nbl_dispatch.c |  487 +++
- .../nebula-matrix/nbl/nbl_core/nbl_dispatch.h |   56 +
- .../nbl/nbl_hw/nbl_hw_leonis/nbl_hw_leonis.c  |  797 +++++
- .../nbl/nbl_hw/nbl_hw_leonis/nbl_hw_leonis.h  |  493 +++
- .../nbl_hw/nbl_hw_leonis/nbl_hw_leonis_regs.c | 2901 +++++++++++++++++
- .../nbl_hw/nbl_hw_leonis/nbl_hw_leonis_regs.h |   11 +
- .../nbl_hw_leonis/nbl_resource_leonis.c       |  264 ++
- .../nbl_hw_leonis/nbl_resource_leonis.h       |   10 +
- .../nebula-matrix/nbl/nbl_hw/nbl_hw_reg.h     |   68 +
- .../nebula-matrix/nbl/nbl_hw/nbl_interrupt.c  |  246 ++
- .../nebula-matrix/nbl/nbl_hw/nbl_interrupt.h  |   12 +
- .../nebula-matrix/nbl/nbl_hw/nbl_resource.c   |  118 +
- .../nebula-matrix/nbl/nbl_hw/nbl_resource.h   |  116 +
- .../nebula-matrix/nbl/nbl_hw/nbl_vsi.c        |   51 +
- .../nebula-matrix/nbl/nbl_hw/nbl_vsi.h        |   11 +
- .../nbl/nbl_include/nbl_def_channel.h         |  362 ++
- .../nbl/nbl_include/nbl_def_common.h          |   80 +
- .../nbl/nbl_include/nbl_def_dev.h             |   16 +
- .../nbl/nbl_include/nbl_def_dispatch.h        |   42 +
- .../nbl/nbl_include/nbl_def_hw.h              |   54 +
- .../nbl/nbl_include/nbl_def_resource.h        |   37 +
- .../nbl/nbl_include/nbl_include.h             |   79 +
- .../nbl/nbl_include/nbl_product_base.h        |   19 +
- .../net/ethernet/nebula-matrix/nbl/nbl_main.c |  329 ++
- 39 files changed, 8566 insertions(+)
- create mode 100644 Documentation/networking/device_drivers/ethernet/nebula-matrix/nbl.rst
- create mode 100644 drivers/net/ethernet/nebula-matrix/Kconfig
- create mode 100644 drivers/net/ethernet/nebula-matrix/Makefile
- create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/Makefile
- create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_channel/nbl_channel.c
- create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_channel/nbl_channel.h
- create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_common/nbl_common.c
- create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_common/nbl_common.h
- create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_core.h
- create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_core/nbl_dev.c
- create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_core/nbl_dev.h
- create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_core/nbl_dispatch.c
- create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_core/nbl_dispatch.h
- create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_hw_leonis/nbl_hw_leonis.c
- create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_hw_leonis/nbl_hw_leonis.h
- create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_hw_leonis/nbl_hw_leonis_regs.c
- create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_hw_leonis/nbl_hw_leonis_regs.h
- create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_hw_leonis/nbl_resource_leonis.c
- create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_hw_leonis/nbl_resource_leonis.h
- create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_hw_reg.h
- create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_interrupt.c
- create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_interrupt.h
- create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_resource.c
- create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_resource.h
- create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_vsi.c
- create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_vsi.h
- create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_def_channel.h
- create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_def_common.h
- create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_def_dev.h
- create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_def_dispatch.h
- create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_def_hw.h
- create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_def_resource.h
- create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_include.h
- create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_product_base.h
- create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_main.c
+Yes, you're right, I missed that interaction.
 
--- 
-2.47.3
+I’ll update the code to also set the following in 
+igc_handle_autoneg_disabled() when forcing half‑duplex:
+hw->fc.requested_mode = igc_fc_none
+
+I’ll test it and, if everything looks good, send out v2.
+
+Thanks again!
+
+
 
 
