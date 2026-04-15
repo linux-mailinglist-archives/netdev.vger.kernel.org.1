@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-278728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278729-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QIn/GCJe32m5SAAAu9opvQ
-	(envelope-from <netdev+bounces-278728-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 11:45:06 +0200
+	id qBzwDnNe32n+SAAAu9opvQ
+	(envelope-from <netdev+bounces-278729-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 11:46:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9E18402C7C
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 11:45:05 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0DE9402CBD
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 11:46:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6B22430EE777
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 09:39:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CA3F7311BEC0
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 09:39:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D663E33B95A;
-	Wed, 15 Apr 2026 09:39:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6814F33DEC8;
+	Wed, 15 Apr 2026 09:39:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qeyt6jHZ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PdNQyN4F"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f73.google.com (mail-ed1-f73.google.com [209.85.208.73])
+Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E98E733B6DB
-	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 09:39:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 305F033DED1
+	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 09:39:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776245978; cv=none; b=TSDQVP6uuAZGeKgaTldrS+PQMfutDyql2Ruv2REb9u9L3kgXL1HRrwCIl0kLVWsBdAAoe0vpckwgWCzaAzqUZlCVoLoL8Qaxp7E+/OqDn9iTeQ6R8IGiUvf50Q4LwJ2KMp0zqK+BpBLWAwVxfa5eHFMfd+8VSYPS12HfVYZkN14=
+	t=1776245982; cv=none; b=F8/qd9Rk5CtPK99vPxqVttCulaZT4gYMwqZpAFLyMgGIcOMJKL6EdUygO95S5SOdcX9qptuRzY9nOXDjF/iPGO2zuKhmziFTD08zCztnu4RgZLWZUQsc0uelZuD/a1UYcBZmmTyZTK+zmsXDLzDsWGyyZkDBbT8WcFaAwbe2Ikk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776245978; c=relaxed/simple;
-	bh=pYERZwVis0sfOfVf5rbB7rXtctv5TUqHOfYeJEFG54Y=;
+	s=arc-20240116; t=1776245982; c=relaxed/simple;
+	bh=zNZrVUvlUUacK2uhATRh2O/ldEh8gnA9RA9Mdle7mFI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=lr+B4MWEHDW7rhUumwtoaI3nKpc7C0WkNy8RIfgz8YGNV1mAeM4iRRQgHkSrGPeyVi+G7rk7jQa9VUNxOJdj7Q34KVrG7uWQMDakKOGSFwdGi/u76xHJw2Hvf+mDsheOC+WLyFvbhX7nnEIZy915PHYJJkAdGkZKEDFWqfulK5o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qeyt6jHZ; arc=none smtp.client-ip=209.85.208.73
+	 To:Cc:Content-Type; b=J/wVabdL2PnFItYyQixYBIXbP4HhrFkn6GpjMGNwX013tAzZu2Z4IpjAJPiB36LZfQI6/EpXXGIXqthwgDPd63mbQ/ezacAetOaMoBpQyd56d5P0bGpneA4ivoBe+rYH+NnV5Agx7wPJmckZCpnOQmxhhMMOBWuQSZyPATekWAM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PdNQyN4F; arc=none smtp.client-ip=209.85.221.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com
-Received: by mail-ed1-f73.google.com with SMTP id 4fb4d7f45d1cf-66f103b3141so4212939a12.0
-        for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 02:39:36 -0700 (PDT)
+Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-43d744128b9so2776856f8f.0
+        for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 02:39:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1776245975; x=1776850775; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1776245978; x=1776850778; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tOHvc+UXkFcaiR1CPEBZRUJAR3W/AL9Q6jZjmIFzwd4=;
-        b=qeyt6jHZOG2ZgGMqXaJbJ6LS2+jH5KwB558Btvv4nVXODm8pZhlv8ygd5pWgQUF5BE
-         w2SY0Aay6WWhNu4qYdPegtj2QdiUPOLZbPYxLlF5XBZNYkoR+5zYp/fETlPHa+8wrTT6
-         BUeSbh0RZrwlP8bsUhtBR0pHmRslU2ueEwbepNerb+LJ4mH32JqF7leSLsvq5v0gfJkQ
-         c26K0W76jM1CUsdpzqIX+E1R99HL9IvwdMOKAa4XsRMCb73VyptZDqLb02IrAoT1SrFm
-         FgUTcroYX6wdsriZKtmCoUvfO2pE6EyVFL19vglz0FnHVhVIhdDtuBZvdIZv3LbiFSuV
-         pOKA==
+        bh=e/MVTcJFkC+EYfL8l2u+nLk94ROweihpl1VmTbmUq7w=;
+        b=PdNQyN4F1T2kOuiM+pIqaBsAw5O04ItGcN/5pu5H1bGZ8joYETE88sZJXGdiYqkthK
+         Jopcq0Lrfv2QNsEoYhzk6nSn4LM9ARt3dfO7+7h1t9hH26Dv0wFj5GEIG78C2Xrh+gdi
+         XWFnGl1xLTFMiSXqL4k7brY//6weYJ8Utp7BBABQbAIZrsNwBhirLbxr7AE/iHyV4Wgq
+         q1Gbd/vIP36vh8I7QyvALL/ivpfh1ILDzLK1SVBCu5TwHYoY518pMxicrvkVed/OY7uO
+         RMz39E/hZFOZahV2Wd1P/UF0OosiG8Rhu97B9l/DOFue6+1dH+40VW/HjBBYkJpBM4X7
+         J2aw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776245975; x=1776850775;
+        d=1e100.net; s=20251104; t=1776245978; x=1776850778;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tOHvc+UXkFcaiR1CPEBZRUJAR3W/AL9Q6jZjmIFzwd4=;
-        b=osIcE2FwdnnkpFTj+nq1ACYM3anZsSnqQyca7waoInAmtvkctL40tlKuuWI+jD8LIE
-         1FSobSTQXVHgtzb/JmCthdPd4a1H4Lune6QDqZMXilCFqa0A8fWcepCN03Ldsw5qtH9G
-         qHYa3SW8W85MIVWxpvR5LL+zc4d74rzBu2IT9ayD8K6e23eDpTKJfWi06r8xVQXBB7Nj
-         obxofXEFACD9OrE7U5s9zPSWWMjj6A7WenBRHSUTzityUP0MtyevBgMkHsmx10E6eNil
-         YgFczJCRLnO9tQtr0B9i9tX0BO/6T9mbPZktAu29awQ8uABLlA61tRDitx5UJUSDhOUV
-         oKKw==
-X-Forwarded-Encrypted: i=1; AFNElJ9T8fEzcTUFB8OZHXkkq3p3o+jp3w38FKbitJB78GsSp4Ih0x69lQWTwKUV9wRe0mz8Xy0DYPc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZc5cVArW951+u24u1l+RdrqHH/+DNZxdI6Gd5lmSK4Y0Bb8Sh
-	UfwHGSSgVxDNe4AhIbxCf+82sUu5mmm4n9zlZRmc6TsgQqG73MvFDdp65ejJeI5YwA1xlFlyche
-	2Sd16UliPfN2oeWyUIQ==
-X-Received: from eddo19.prod.google.com ([2002:a05:6402:5613:b0:669:e76e:1fc1])
+        bh=e/MVTcJFkC+EYfL8l2u+nLk94ROweihpl1VmTbmUq7w=;
+        b=PSecvDBD4QUI+2fOOLF7MMkrA/qDUS7QYaK5tj5eCfQAMMgn2JdSNpzes0K1HVHHW4
+         4F8WgJi9D2ze3TMlFlRV++5fN+7V7iNlBRjnTnmbUs2FLcAWp+aXPR8mMvplZJekw2uQ
+         xNPBwQquO6twupb9HiZc8PoAt3/bQElnjPR7GxdlMODuScmVG9Af7bQJEHVqirqtiHI4
+         BAggQc6GopM3xjABfdxGorEtdqIZRNFltCrXS3ZS3H8D9c8JFoJNuXtZYVUawDnhm8SS
+         407lnqV4WjA8dQzmyU4Seydp3DtZ7OQcCAknZ0JefKGvWz6OhLiNRY/ImdCzMuXLUJgn
+         m7Mg==
+X-Forwarded-Encrypted: i=1; AFNElJ9CvKlE7FhK7qrDCoWDuMRRjapHf5q+LlRUWN6HYUCkGkAuRSgF/NqcOcOitNYosSEbPsl/SPU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxacnW+tGJnCbpwl8r5OxbX196mvVa60JUhbQxgrI5Rtg7aMbOf
+	lLmVtuBREgWdZCaV9bxUooLqROh86Sq83QihXQchIJfzivhBnMpMCQXIhQ5/v/JXsmzZRfV85Li
+	FYhHzGMZZKnjnLlCc6Q==
+X-Received: from wmqn6.prod.google.com ([2002:a05:600c:4f86:b0:488:ad14:4c60])
  (user=aliceryhl job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6402:4409:b0:66d:3ebe:3f18 with SMTP id 4fb4d7f45d1cf-6707a471cffmr10854613a12.25.1776245974941;
- Wed, 15 Apr 2026 02:39:34 -0700 (PDT)
-Date: Wed, 15 Apr 2026 09:37:52 +0000
+ 2002:a05:600c:19cd:b0:485:17a7:b9c7 with SMTP id 5b1f17b1804b1-488d67e3671mr285545145e9.10.1776245977384;
+ Wed, 15 Apr 2026 02:39:37 -0700 (PDT)
+Date: Wed, 15 Apr 2026 09:37:53 +0000
 In-Reply-To: <20260415-binder-netlink-v3-0-84be9ba63ee2@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,22 +76,22 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260415-binder-netlink-v3-0-84be9ba63ee2@google.com>
 X-Developer-Key: i=aliceryhl@google.com; a=openpgp; fpr=49F6C1FAA74960F43A5B86A1EE7A392FDE96209F
-X-Developer-Signature: v=1; a=openpgp-sha256; l=7884; i=aliceryhl@google.com;
- h=from:subject:message-id; bh=pYERZwVis0sfOfVf5rbB7rXtctv5TUqHOfYeJEFG54Y=;
- b=owEBbQKS/ZANAwAKAQRYvu5YxjlGAcsmYgBp31zOwI1Z/qaXVGkJIb+gdFwKml7bNTySwX69G
- 2ICiC51d42JAjMEAAEKAB0WIQSDkqKUTWQHCvFIvbIEWL7uWMY5RgUCad9czgAKCRAEWL7uWMY5
- RiU7EACgpzsMvxPt41bivzL0Ky3Ir1wanoaWgKiUkEaTa9qcCksjaXn+nwG8UHENQNVUdmjxj0H
- 2e+Nixx06lM/jaCHbn+i70GZIdbXOBvpMy88IiFUbhCBkmGnFwkdk2MVNTWxf0IvbIycPVI26EQ
- IVP7dtKeIQmWl2SdAXrNMW5SrG2hMCn3l8qWY6KFxmgY39JhK0QhDyspdiLfKbkAQqa3qzknZ5h
- x6WbRw2MeyFGMo+gkhnPB+yiE8FmqYoY8Aw4vtl4Ryy6r/UWVnKECilnbl8tSjJgT1VhtNJdEWF
- X2dVhEGRpBJWrY5CUT2L3pc/BO0tcekb7m0ubJy+2LUrelV7hxqpwCV7mY/5KiRGaeK8DLIFVOY
- lpnhgie+tdEhRkY3g5LE52t+0scgU2CGFcN82nVUqIK+8l6Rg3HXbbCwKkaPbGNuN7sehlkL/g2
- y8OK2mW9yJzqKQfgFXDeC2SVb0aaoCGRD2jqMCl3ZI4hyumbaTC1cDERa4XDl/SGBgchj0pnyUz
- +e4Y5eah6cbtZ+vZ3/0kexizpAaqwdWRH0NFA7St1gwz092UNWmHn7JXBM1BnATnsQvTmfe6ctp
- tKklg5CoO+DXV/wfX3IRDE7dj3ub2RuIzJynjsWY07mWe7a34rIzDKFaBOwlkWeUzzD3eNxADcf 2sGuJUCBT8rA6Iw==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=7776; i=aliceryhl@google.com;
+ h=from:subject:message-id; bh=zNZrVUvlUUacK2uhATRh2O/ldEh8gnA9RA9Mdle7mFI=;
+ b=owEBbQKS/ZANAwAKAQRYvu5YxjlGAcsmYgBp31zOpb/X3H5KVDxnJg+z0/8mY1syUfppmoDEq
+ vAW+PS1vPmJAjMEAAEKAB0WIQSDkqKUTWQHCvFIvbIEWL7uWMY5RgUCad9czgAKCRAEWL7uWMY5
+ RtVxD/4j/wFrXmCUB1T1DC3Tqoa4xOWS6oAYUqUzfs53UibmR5Gab7kQbI3h3jrF37RDv5uTZtK
+ zSDJuj8MwIRDVW7o9uka9IJ/+cZmzBfM9PlXb7PqE2/xmPXZ53gXZmMcOMERM8vbxea6fBNL1av
+ HVEqWiBGfqTMFUIr4bQCkrScf09/ELayO23vg4JBMzNx3OEyxfbMfo/YIncIBO0V4C9jgdtHF5m
+ 4rVolRp1dUT82q6iIT6v+NBS13o8PP2P6dsxiGObjrcdoKIG48j/s/BFD32iwWtI/4LnazSCFAy
+ P+xj2P3+9d4RQOXCMhy/4COtfyG5SCit0cH14y0+r9l5E2S7CA4D6SSKLDCfSCv702LmzGOLasP
+ gPdEqhGFTnNt7piP0qDVlEB8s000FVz3pZsnVuC1/B9V+VlVXV+1dD2X0wEkT5YD90+emTZmIMc
+ JKFj7BZJssbD8aF7VOmx3dXrxTXfmClM2v3a0F2hV0sJREY3COxbHdz9e3WREch0uze6ZMG4VJq
+ VWQGanK079F8yS3y7eM94m413BWXtCC0f4+25hkrRJjwvaW7EGee2wid1BeKI6Be6SPOUA7vMAu
+ feeJhtn8VRIFN6PYJsCTVG1W2J5OHjO6DC3KiV2byPkOCSxfTLr5uK3Rd3Y5pLn3nKcRYJ7CzRE pnoRhozCv3AOAPQ==
 X-Mailer: b4 0.14.3
-Message-ID: <20260415-binder-netlink-v3-2-84be9ba63ee2@google.com>
-Subject: [PATCH v3 2/4] ynl_gen: generate Rust files from yaml files
+Message-ID: <20260415-binder-netlink-v3-3-84be9ba63ee2@google.com>
+Subject: [PATCH v3 3/4] rust_binder: add generated netlink.rs file
 From: Alice Ryhl <aliceryhl@google.com>
 To: Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, 
 	"=?utf-8?q?Bj=C3=B6rn_Roy_Baron?=" <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, 
@@ -111,12 +111,12 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278728-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-278729-lists,netdev=lfdr.de];
 	FREEMAIL_TO(0.00)[kernel.org,garyguo.net,protonmail.com,umich.edu,gmail.com,davemloft.net,google.com,redhat.com,linuxfoundation.org,android.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
@@ -130,221 +130,206 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	DKIM_TRACE(0.00)[google.com:+];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ynl_gen_c.py:url]
-X-Rspamd-Queue-Id: B9E18402C7C
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C0DE9402CBD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-To generate netlink frames from Rust code easily, generate Rust
-libraries with methods for generating different netlink messages as
-appropriate.
-
-The new 'rust' type corresponds to a Rust version of the C target
-'kernel'. There is no Rust version of the 'uapi' target since Rust code
-exports its uapi via C headers - choice of language is opaque to
-userspace.
-
-This logic is kept in the existing ynl_gen_c.py file to reuse CodeWriter
-and other shared pieces of logic in the existing python file. This has
-the disadvantage that the gen_c part of the name is now wrong, as it
-also generates Rust. One possible solution to this could be to rename
-the file.
+To use netlink from Rust Binder, add a new generated netlink file using
+the new script and Documentation/netlink/specs/binder.yaml.
 
 Signed-off-by: Alice Ryhl <aliceryhl@google.com>
 ---
- tools/net/ynl/pyynl/ynl_gen_c.py | 139 ++++++++++++++++++++++++++++++++++++++-
- tools/net/ynl/ynl-regen.sh       |   2 +-
- 2 files changed, 139 insertions(+), 2 deletions(-)
+ drivers/android/Kconfig                    |   2 +-
+ drivers/android/binder/netlink.rs          | 113 +++++++++++++++++++++++++++++
+ drivers/android/binder/rust_binder_main.rs |   9 ++-
+ rust/uapi/uapi_helper.h                    |   1 +
+ 4 files changed, 122 insertions(+), 3 deletions(-)
 
-diff --git a/tools/net/ynl/pyynl/ynl_gen_c.py b/tools/net/ynl/pyynl/ynl_gen_c.py
-index 0e1e486c1185..76b8b2f1ac16 100755
---- a/tools/net/ynl/pyynl/ynl_gen_c.py
-+++ b/tools/net/ynl/pyynl/ynl_gen_c.py
-@@ -19,6 +19,7 @@ import pathlib
- import os
- import re
- import shutil
-+import subprocess
- import sys
- import tempfile
- import yaml as pyyaml
-@@ -1744,6 +1745,19 @@ class CodeWriter:
-         else:
-             self.p('}' + line)
+diff --git a/drivers/android/Kconfig b/drivers/android/Kconfig
+index e2e402c9d175..606a9d07f774 100644
+--- a/drivers/android/Kconfig
++++ b/drivers/android/Kconfig
+@@ -16,7 +16,7 @@ config ANDROID_BINDER_IPC
  
-+    def array_start(self, line=''):
-+        if line:
-+            line = line + ' '
-+        self.p(line + '[')
-+        self._ind += 1
-+
-+    def array_end(self, line=''):
-+        if line and line[0] not in {';', ','}:
-+            line = ' ' + line
-+        self._ind -= 1
-+        self._nl = False
-+        self.p(']' + line)
-+
-     def write_doc_line(self, doc, indent=True):
-         words = doc.split()
-         line = ' *'
-@@ -3415,10 +3429,126 @@ def find_kernel_root(full_path):
-             return full_path, sub_path[:-1]
+ config ANDROID_BINDER_IPC_RUST
+ 	bool "Rust version of Android Binder IPC Driver"
+-	depends on RUST && MMU && !ANDROID_BINDER_IPC
++	depends on RUST && MMU && NET && !ANDROID_BINDER_IPC
+ 	help
+ 	  This enables the Rust implementation of the Binder driver.
  
+diff --git a/drivers/android/binder/netlink.rs b/drivers/android/binder/netlink.rs
+new file mode 100644
+index 000000000000..2a842c7b1b33
+--- /dev/null
++++ b/drivers/android/binder/netlink.rs
+@@ -0,0 +1,113 @@
++// SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
++/* Do not edit directly, auto-generated from: */
++/*	Documentation/netlink/specs/binder.yaml */
++/* YNL-GEN rust source */
++/* To regenerate run: tools/net/ynl/ynl-regen.sh */
++
++#![allow(unreachable_pub, clippy::wrong_self_convention)]
++use kernel::netlink::{Family, MulticastGroup};
++use kernel::prelude::*;
++
++pub static BINDER_NL_FAMILY: Family = Family::const_new(
++    &crate::THIS_MODULE,
++    kernel::uapi::BINDER_FAMILY_NAME,
++    kernel::uapi::BINDER_FAMILY_VERSION,
++    &BINDER_NL_FAMILY_MCGRPS,
++);
++
++static BINDER_NL_FAMILY_MCGRPS: [MulticastGroup; 1] = [MulticastGroup::const_new(c"report")];
++
++/// A multicast event sent to userspace subscribers to notify them about
++/// binder transaction failures. The generated report provides the full
++/// details of the specific transaction that failed. The intention is for
++/// programs to monitor these events and react to the failures as needed.
++pub struct Report {
++    skb: kernel::netlink::GenlMsg,
++}
++
++impl Report {
++    /// Create a new multicast message.
++    pub fn new(
++        size: usize,
++        portid: u32,
++        seq: u32,
++        flags: kernel::alloc::Flags,
++    ) -> Result<Self, kernel::alloc::AllocError> {
++        const BINDER_CMD_REPORT: u8 = kernel::uapi::BINDER_CMD_REPORT as u8;
++        let skb = kernel::netlink::NetlinkSkBuff::new(size, flags)?;
++        let skb = skb.genlmsg_put(portid, seq, &BINDER_NL_FAMILY, BINDER_CMD_REPORT)?;
++        Ok(Self { skb })
++    }
++
++    /// Broadcast this message.
++    pub fn multicast(self, portid: u32, flags: kernel::alloc::Flags) -> Result {
++        self.skb.multicast(&BINDER_NL_FAMILY, portid, 0, flags)
++    }
++
++    /// Check if this message type has listeners.
++    pub fn has_listeners() -> bool {
++        BINDER_NL_FAMILY.has_listeners(0)
++    }
++
++    /// The enum binder_driver_return_protocol returned to the sender.
++    pub fn error(&mut self, val: u32) -> Result {
++        const BINDER_A_REPORT_ERROR: c_int = kernel::uapi::BINDER_A_REPORT_ERROR as c_int;
++        self.skb.put_u32(BINDER_A_REPORT_ERROR, val)
++    }
++
++    /// The binder context where the transaction occurred.
++    pub fn context(&mut self, val: &CStr) -> Result {
++        const BINDER_A_REPORT_CONTEXT: c_int = kernel::uapi::BINDER_A_REPORT_CONTEXT as c_int;
++        self.skb.put_string(BINDER_A_REPORT_CONTEXT, val)
++    }
++
++    /// The PID of the sender process.
++    pub fn from_pid(&mut self, val: u32) -> Result {
++        const BINDER_A_REPORT_FROM_PID: c_int = kernel::uapi::BINDER_A_REPORT_FROM_PID as c_int;
++        self.skb.put_u32(BINDER_A_REPORT_FROM_PID, val)
++    }
++
++    /// The TID of the sender thread.
++    pub fn from_tid(&mut self, val: u32) -> Result {
++        const BINDER_A_REPORT_FROM_TID: c_int = kernel::uapi::BINDER_A_REPORT_FROM_TID as c_int;
++        self.skb.put_u32(BINDER_A_REPORT_FROM_TID, val)
++    }
++
++    /// The PID of the recipient process. This attribute may not be present
++    /// if the target could not be determined.
++    pub fn to_pid(&mut self, val: u32) -> Result {
++        const BINDER_A_REPORT_TO_PID: c_int = kernel::uapi::BINDER_A_REPORT_TO_PID as c_int;
++        self.skb.put_u32(BINDER_A_REPORT_TO_PID, val)
++    }
++
++    /// The TID of the recipient thread. This attribute may not be present
++    /// if the target could not be determined.
++    pub fn to_tid(&mut self, val: u32) -> Result {
++        const BINDER_A_REPORT_TO_TID: c_int = kernel::uapi::BINDER_A_REPORT_TO_TID as c_int;
++        self.skb.put_u32(BINDER_A_REPORT_TO_TID, val)
++    }
++
++    /// When present, indicates the failed transaction is a reply.
++    pub fn is_reply(&mut self) -> Result {
++        const BINDER_A_REPORT_IS_REPLY: c_int = kernel::uapi::BINDER_A_REPORT_IS_REPLY as c_int;
++        self.skb.put_flag(BINDER_A_REPORT_IS_REPLY)
++    }
++
++    /// The bitmask of enum transaction_flags from the transaction.
++    pub fn flags(&mut self, val: u32) -> Result {
++        const BINDER_A_REPORT_FLAGS: c_int = kernel::uapi::BINDER_A_REPORT_FLAGS as c_int;
++        self.skb.put_u32(BINDER_A_REPORT_FLAGS, val)
++    }
++
++    /// The application-defined code from the transaction.
++    pub fn code(&mut self, val: u32) -> Result {
++        const BINDER_A_REPORT_CODE: c_int = kernel::uapi::BINDER_A_REPORT_CODE as c_int;
++        self.skb.put_u32(BINDER_A_REPORT_CODE, val)
++    }
++
++    /// The transaction payload size in bytes.
++    pub fn data_size(&mut self, val: u32) -> Result {
++        const BINDER_A_REPORT_DATA_SIZE: c_int = kernel::uapi::BINDER_A_REPORT_DATA_SIZE as c_int;
++        self.skb.put_u32(BINDER_A_REPORT_DATA_SIZE, val)
++    }
++}
+diff --git a/drivers/android/binder/rust_binder_main.rs b/drivers/android/binder/rust_binder_main.rs
+index 678e987902aa..9057e5dba7ed 100644
+--- a/drivers/android/binder/rust_binder_main.rs
++++ b/drivers/android/binder/rust_binder_main.rs
+@@ -36,6 +36,8 @@
+ mod deferred_close;
+ mod defs;
+ mod error;
++#[allow(dead_code)]
++mod netlink;
+ mod node;
+ mod page_range;
+ mod process;
+@@ -286,19 +288,22 @@ fn ptr_align(value: usize) -> Option<usize> {
+ // SAFETY: We call register in `init`.
+ static BINDER_SHRINKER: Shrinker = unsafe { Shrinker::new() };
  
-+def render_rust(family, cw):
-+    cw.p('#![allow(unreachable_pub, clippy::wrong_self_convention)]')
-+    cw.p('use kernel::netlink::{Family, MulticastGroup};')
-+    cw.p('use kernel::prelude::*;')
-+    cw.nl()
-+
-+    family_upper = c_upper(family.ident_name)
-+    family_name = f'{family_upper}_NL_FAMILY'
-+    mcgrps_name = f'{family_name}_MCGRPS'
-+
-+    cw.p(f'pub static {family_name}: Family = Family::const_new(')
-+    cw._ind += 1
-+    cw.p('&crate::THIS_MODULE,')
-+    cw.p(f'kernel::uapi::{family.fam_key},')
-+    cw.p(f'kernel::uapi::{family.ver_key},')
-+    if family.mcgrps['list']:
-+        cw.p(f'&{mcgrps_name},')
-+    else:
-+        cw.p('&[],')
-+    cw._ind -= 1
-+    cw.p(');')
-+    cw.nl()
-+
-+    if family.mcgrps['list']:
-+        cw.array_start(f'static {mcgrps_name}: [MulticastGroup; {len(family.mcgrps["list"])}] = ')
-+        for grp in family.mcgrps['list']:
-+            cw.p(f'MulticastGroup::const_new(c"{grp["name"]}"),')
-+        cw.array_end(';')
-+        cw.nl()
-+
-+    for idx, (op_name, op) in enumerate(item for item in family.msgs.items() if 'event' in item[1]):
-+        struct_name = op_name.capitalize()
-+
-+        if 'doc' in op:
-+            doc_lines = op['doc'].strip().split('\n')
-+            for line in doc_lines:
-+                cw.p(f'/// {line.strip()}')
-+
-+        cw.block_start(f'pub struct {struct_name}')
-+        cw.p('skb: kernel::netlink::GenlMsg,')
-+        cw.block_end()
-+        cw.nl()
-+
-+        cw.block_start(f'impl {struct_name}')
-+        cw.p('/// Create a new multicast message.')
-+        cw.p('pub fn new(')
-+        cw._ind += 1
-+        cw.p('size: usize,')
-+        cw.p('portid: u32,')
-+        cw.p('seq: u32,')
-+        cw.p('flags: kernel::alloc::Flags,')
-+        cw._ind -= 1
-+        cw.block_start(') -> Result<Self, kernel::alloc::AllocError>')
-+        cw.p(f'const {op.enum_name}: u8 = kernel::uapi::{op.enum_name} as u8;')
-+        cw.p('let skb = kernel::netlink::NetlinkSkBuff::new(size, flags)?;')
-+        cw.p(f'let skb = skb.genlmsg_put(portid, seq, &{family_name}, {op.enum_name})?;')
-+        cw.p('Ok(Self { skb })')
-+        cw.block_end()
-+        cw.nl()
-+
-+        grp_idx = 0
-+        if 'mcgrp' in op:
-+            grp_idx = next(i for i, grp in enumerate(family.mcgrps['list']) if grp['name'] == op['mcgrp'])
-+
-+        cw.p('/// Broadcast this message.')
-+        cw.block_start('pub fn multicast(self, portid: u32, flags: kernel::alloc::Flags) -> Result')
-+        cw.p(f'self.skb.multicast(&{family_name}, portid, {grp_idx}, flags)')
-+        cw.block_end()
-+        cw.nl()
-+
-+        cw.p('/// Check if this message type has listeners.')
-+        cw.block_start('pub fn has_listeners() -> bool')
-+        cw.p(f'{family_name}.has_listeners({grp_idx})')
-+        cw.block_end()
-+
-+        attr_set_name = op['attribute-set']
-+        attr_set = family.attr_sets[attr_set_name]
-+        event_attrs = op['event']['attributes']
-+
-+        for attr_name in event_attrs:
-+            attr = attr_set[attr_name]
-+            method_name = attr_name.replace('-', '_')
-+
-+            if attr.type == 'u32':
-+                put_fn = 'put_u32'
-+                arg_str = ', val'
-+                method_args = '(&mut self, val: u32)'
-+            elif attr.type == 'string':
-+                put_fn = 'put_string'
-+                arg_str = ', val'
-+                method_args = '(&mut self, val: &CStr)'
-+            elif attr.type == 'flag':
-+                put_fn = 'put_flag'
-+                arg_str = ''
-+                method_args = '(&mut self)'
-+            else:
-+                put_fn = f'put_{attr.type}'
-+                arg_str = ', val'
-+                method_args = f'(&mut self, val: {attr.type})'
-+
-+            cw.nl()
-+            if 'doc' in attr.yaml:
-+                doc_lines = attr.yaml['doc'].strip().split('\n')
-+                for line in doc_lines:
-+                    cw.p(f'/// {line.strip()}')
-+
-+            cw.block_start(f'pub fn {method_name}{method_args} -> Result')
-+            cw.p(f'const {attr.enum_name}: c_int = kernel::uapi::{attr.enum_name} as c_int;')
-+            cw.p(f'self.skb.{put_fn}({attr.enum_name}{arg_str})')
-+            cw.block_end()
-+
-+        cw.block_end()
-+        cw.nl()
-+    cw.p(' ')
-+
-+
- def main():
-     parser = argparse.ArgumentParser(description='Netlink simple parsing generator')
-     parser.add_argument('--mode', dest='mode', type=str, required=True,
--                        choices=('user', 'kernel', 'uapi'))
-+                        choices=('user', 'kernel', 'uapi', 'rust'))
-     parser.add_argument('--spec', dest='spec', type=str, required=True)
-     parser.add_argument('--header', dest='header', action='store_true', default=None)
-     parser.add_argument('--source', dest='header', action='store_false')
-@@ -3471,6 +3601,13 @@ def main():
-         render_uapi(parsed, cw)
-         return
+-struct BinderModule {}
++struct BinderModule {
++    _netlink: kernel::netlink::Registration,
++}
  
-+    if args.mode == 'rust':
-+        render_rust(parsed, cw)
-+        cw.close_out_file()
-+        if args.out_file:
-+            subprocess.run(['rustfmt', '--edition', '2021', args.out_file])
-+        return
-+
-     hdr_prot = f"_LINUX_{parsed.c_name.upper()}_GEN_H"
-     if args.header:
-         cw.p('#ifndef ' + hdr_prot)
-diff --git a/tools/net/ynl/ynl-regen.sh b/tools/net/ynl/ynl-regen.sh
-index d9809276db98..4f5ceb4fe147 100755
---- a/tools/net/ynl/ynl-regen.sh
-+++ b/tools/net/ynl/ynl-regen.sh
-@@ -17,7 +17,7 @@ done
- KDIR=$(dirname $(dirname $(dirname $(dirname $(realpath $0)))))
- pushd ${search:-$KDIR} >>/dev/null
+ impl kernel::Module for BinderModule {
+     fn init(_module: &'static kernel::ThisModule) -> Result<Self> {
+         // SAFETY: The module initializer never runs twice, so we only call this once.
+         unsafe { crate::context::CONTEXTS.init() };
  
--files=$(git grep --files-with-matches '^/\* YNL-GEN \(kernel\|uapi\|user\)')
-+files=$(git grep --files-with-matches '^/\* YNL-GEN \(kernel\|uapi\|user\|rust\)')
- for f in $files; do
-     # params:     0       1      2     3
-     #         $YAML YNL-GEN kernel $mode
++        let netlink = crate::netlink::BINDER_NL_FAMILY.register()?;
+         BINDER_SHRINKER.register(c"android-binder")?;
+ 
+         // SAFETY: The module is being loaded, so we can initialize binderfs.
+         unsafe { kernel::error::to_result(binderfs::init_rust_binderfs())? };
+ 
+-        Ok(Self {})
++        Ok(Self { _netlink: netlink })
+     }
+ }
+ 
+diff --git a/rust/uapi/uapi_helper.h b/rust/uapi/uapi_helper.h
+index 06d7d1a2e8da..86c7b6b284b0 100644
+--- a/rust/uapi/uapi_helper.h
++++ b/rust/uapi/uapi_helper.h
+@@ -11,6 +11,7 @@
+ #include <uapi/drm/nova_drm.h>
+ #include <uapi/drm/panthor_drm.h>
+ #include <uapi/linux/android/binder.h>
++#include <uapi/linux/android/binder_netlink.h>
+ #include <uapi/linux/mdio.h>
+ #include <uapi/linux/mii.h>
+ #include <uapi/linux/ethtool.h>
 
 -- 
 2.54.0.rc0.605.g598a273b03-goog
