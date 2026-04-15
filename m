@@ -1,157 +1,189 @@
-Return-Path: <netdev+bounces-278768-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278770-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EMbQDQON32l5VAAAu9opvQ
-	(envelope-from <netdev+bounces-278768-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 15:05:07 +0200
+	id uK3fAMKN32l5VAAAu9opvQ
+	(envelope-from <netdev+bounces-278770-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 15:08:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80828404A4C
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 15:05:06 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 683F8404AC9
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 15:08:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BA56E30082A9
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 12:59:47 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9E60D309ECBF
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 13:03:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67A3337CD46;
-	Wed, 15 Apr 2026 12:59:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4E0538A72B;
+	Wed, 15 Apr 2026 13:03:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="aFyriBXu"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Ll4+zFs4"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C66935C197
-	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 12:59:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60E6538A29A
+	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 13:03:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776257985; cv=none; b=uaJv41mtpMfbn4u0edfgu1EUUcklo5CEnA8D+LS1YJ031tvTj+iHlGiu3EVjBpMx66gtP2dmuEMXnvO9MCDFZ+Ph/fR+eL4cgjPxHOB6M3HA3vHvoXnWRuk3GinVUOR2fFCdTUTNC+sDoVBdq64i1ind/xmoOHZ0jpufu7NWN9U=
+	t=1776258201; cv=none; b=AW6muSdTtVpgORn/EM+oY2v0TwiAEG3LTksJc7NDFkX1M7QBYGSiEj7+R55pLTqSxXjdwgQDRu75rOxLRLUhsX5dgvye68uGM2jfDu91/rDh7KbTKDFR5fELdnEDMbBrGMw/d9Y8BU+IeLeoyGv3qjSyF00oqE2L4Ct3y2I6S64=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776257985; c=relaxed/simple;
-	bh=QI8hvSFR4MG7toHeGfU6mUaxTYPzK5OvM+q+8pgdxDM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JYQu9/KvUlPB39nR3y31G6tO9D//8tcX7HIW7Z1EjbcFZVxxKThX8MSQr76bXSOT3jjVwX6Hn84jMjI/J7LFExdhiweWrK8Mp3Y1FgJnCqZCt3BgCTcdJ1UcjWZtezofkQNgM9XQnR1ESdUOWEBL1hi+lrIiGOJ9j8udCVXvSuA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=aFyriBXu; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=k1puqjkx70xR77cxDwbqQolTS/KLwYlYFTOWLOqnzlM=; b=aFyriBXuIy8LHVTejW1TUXwLSI
-	SOGtjKg/MRydcxHRxyQwoWq1ZMD5bmH+zHEXuwt9s/TgJKEIQvXYmU/CVhy/JjHCom2U4e8bU6qLo
-	87W1gK0L3wGZJMrRowFSZIdUb+E5XAcib8X4LG7+rupk+ph3+nYjveF29ZNvTl7ss6iIIRG/g6FZK
-	mcPmRJ4JcBkbfPOt09h5TjV0eVBiQPuuQ3xMWChxR/IXz3YuKsLinJOie1NfDpQDAxDgIo7K1PSuK
-	TL5zcIE/On68zsFvm6Mc7BgNzAyjhZay+pKmXU5Qcc3uqdKZTDhOF93nE+/MPpFU6TeMtUwXoDDkv
-	m8g+Ib8A==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:59050)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1wCzqA-0000000026f-2wkF;
-	Wed, 15 Apr 2026 13:59:34 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1wCzq8-000000002EM-3sFk;
-	Wed, 15 Apr 2026 13:59:32 +0100
-Date: Wed, 15 Apr 2026 13:59:32 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Alexander Stein <alexander.stein@ew.tq-group.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	s=arc-20240116; t=1776258201; c=relaxed/simple;
+	bh=sbEgJoIQrDI51cDybI635FZDGN+pqj6j2mC77Xzsgeg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ju3wLEfHQpRvj8qjprwNUyz5At/vqb0Vuin+nEhaH/WLju9z9fp0GrLK1nRM3zNF1TX0hg9IvC6+g52GqLc+/w63LB6O2Zi6Fo17tlbweJZTUN6EM8dm2VbnNBN4eKIpufjpqnPijmpLncxJYPH0aBUPWSc/dXsaHzBjMf8+DLE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Ll4+zFs4; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id A77161A32D9;
+	Wed, 15 Apr 2026 13:03:16 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 6501A60420;
+	Wed, 15 Apr 2026 13:03:16 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id D242110451AC4;
+	Wed, 15 Apr 2026 15:03:07 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1776258191; h=from:subject:date:message-id:to:cc:mime-version:
+	 content-transfer-encoding; bh=aPR1TWodNx5RYWHwu3ZdmoXUly8UeFqfQ8nq2inuZX4=;
+	b=Ll4+zFs4/AyS2qTq+ibkW4oXZP3ruJH2DAac8VIr8OJ0YsslE1xUWiB1jq+L5ffimKvC3h
+	JWnxYCXrzVELJw+fRcU0h0dVJsGA/xsn1YplhQmLV3+wzQhONEOENhOXZsrpgY+TncuSsc
+	GAD5Lc3Gdt5qsiieulPs5Ny3l28/CrMU6ZH1pGWCsgrddnW9pPaSh17SQWedyMfCdirC81
+	NyCMyxx+NtE0uBqxQfEP+7Y73928DjyXAFIKmr0NWqEmvDL7bml9hrRBu9f7wF925cIu8K
+	FplAuTYsUdJb/I6DYSVGtz4HHTfq888TkI3gXTJOU+HLJ0uusDJVFf+3IP280g==
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Jakub Kicinski <kuba@kernel.org>,
+	"Kory Maincent (Dent Project)" <kory.maincent@bootlin.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Carlo Szelinsky <github@szelinsky.de>,
+	thomas.petazzoni@bootlin.com,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next 5/6] net: stmmac: move PHY handling out of
- __stmmac_open()/release()
-Message-ID: <ad-LtOBrKREM1tCk@shell.armlinux.org.uk>
-References: <aNKDqqI7aLsuDD52@shell.armlinux.org.uk>
- <E1v11A3-0000000774G-3PKY@rmk-PC.armlinux.org.uk>
- <8409022.LvFx2qVVIh@steina-w>
+Subject: [PATCH net v2] net: pse-pd: fix out-of-bounds bitmap access in pse_isr() on 32-bit
+Date: Wed, 15 Apr 2026 15:02:59 +0200
+Message-ID: <20260415130300.806152-1-kory.maincent@bootlin.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8409022.LvFx2qVVIh@steina-w>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spamd-Result: default: False [1.14 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-278768-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-278770-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,foss.st.com,davemloft.net,google.com,kernel.org,lists.infradead.org,st-md-mailman.stormreply.com,vger.kernel.org,redhat.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_SPAM(0.00)[0.149];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kory.maincent@bootlin.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[bootlin.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-0.998];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,shell.armlinux.org.uk:mid]
-X-Rspamd-Queue-Id: 80828404A4C
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,bootlin.com:email,bootlin.com:dkim,bootlin.com:mid]
+X-Rspamd-Queue-Id: 683F8404AC9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Apr 15, 2026 at 08:08:40AM +0200, Alexander Stein wrote:
-> Hi,
-> 
-> Am Dienstag, 23. September 2025, 13:26:19 CEST schrieb Russell King (Oracle):
-> > Move the PHY attachment/detachment from the network driver out of
-> > __stmmac_open() and __stmmac_release() into stmmac_open() and
-> > stmmac_release() where these actions will only happen when the
-> > interface is administratively brought up or down. It does not make
-> > sense to detach and re-attach the PHY during a change of MTU.
-> 
-> Sorry for coming up now. But I recently noticed this commit breaks changing
-> the MTU on i.MX8MP. Once I simply change the MTU I run into some DMA error:
-> $ ip link set dev end1 mtu 1400
-> imx-dwmac 30bf0000.ethernet end1: Register MEM_TYPE_PAGE_POOL RxQ-0
-> imx-dwmac 30bf0000.ethernet end1: Register MEM_TYPE_PAGE_POOL RxQ-1
-> imx-dwmac 30bf0000.ethernet end1: Register MEM_TYPE_PAGE_POOL RxQ-2
-> imx-dwmac 30bf0000.ethernet end1: Register MEM_TYPE_PAGE_POOL RxQ-3
-> imx-dwmac 30bf0000.ethernet end1: Register MEM_TYPE_PAGE_POOL RxQ-4
-> imx-dwmac 30bf0000.ethernet end1: Link is Down
-> imx-dwmac 30bf0000.ethernet end1: Failed to reset the dma
-> imx-dwmac 30bf0000.ethernet end1: stmmac_hw_setup: DMA engine initialization failed
+In pse_isr(), notifs_mask was declared as a single unsigned long on the
+stack (32 bits on 32-bit architectures). For PSE controllers with more
+than 32 ports, this causes two problems:
 
-This basically means that a clock is missing. Please provide more
-information:
+- map_event callbacks could wrote bit positions >= 32 via
+  *notifs_mask |= BIT(i), which is undefined behaviour on a 32-bit
+  unsigned long and corrupts adjacent stack memory.
 
-- what kernel version are you using?
-- has EEE been negotiated?
-- does the problem persist when EEE is disabled?
-- which PHY is attached to stmmac?
-- which PHY interface mode is being used to connect the PHY to stmmac?
+- for_each_set_bit(i, &notifs_mask, pcdev->nr_lines) treats
+  &notifs_mask as a multi-word bitmap and reads beyond the single
+  unsigned long when nr_lines > BITS_PER_LONG.
 
-Thanks.
+Fix this by moving notifs_mask out of the stack and into struct pse_irq
+as a dynamically allocated bitmap. It is sized with
+BITS_TO_LONGS(pcdev->nr_lines) words in devm_pse_irq_helper(), so it
+is always wide enough regardless of the host word size.
 
+Fixes: fc0e6db30941a ("net: pse-pd: Add support for reporting events")
+Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+---
+
+Changes in v2:
+- Use devm_bitmap_zalloc() instead of devm_kcalloc().
+---
+ drivers/net/pse-pd/pse_core.c | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/pse-pd/pse_core.c b/drivers/net/pse-pd/pse_core.c
+index f6b94ac7a68a4..87aa4f4e97249 100644
+--- a/drivers/net/pse-pd/pse_core.c
++++ b/drivers/net/pse-pd/pse_core.c
+@@ -1170,6 +1170,7 @@ struct pse_irq {
+ 	struct pse_controller_dev *pcdev;
+ 	struct pse_irq_desc desc;
+ 	unsigned long *notifs;
++	unsigned long *notifs_mask;
+ };
+ 
+ /**
+@@ -1247,7 +1248,6 @@ static int pse_set_config_isr(struct pse_controller_dev *pcdev, int id,
+ static irqreturn_t pse_isr(int irq, void *data)
+ {
+ 	struct pse_controller_dev *pcdev;
+-	unsigned long notifs_mask = 0;
+ 	struct pse_irq_desc *desc;
+ 	struct pse_irq *h = data;
+ 	int ret, i;
+@@ -1257,14 +1257,15 @@ static irqreturn_t pse_isr(int irq, void *data)
+ 
+ 	/* Clear notifs mask */
+ 	memset(h->notifs, 0, pcdev->nr_lines * sizeof(*h->notifs));
++	bitmap_zero(h->notifs_mask, pcdev->nr_lines);
+ 	mutex_lock(&pcdev->lock);
+-	ret = desc->map_event(irq, pcdev, h->notifs, &notifs_mask);
+-	if (ret || !notifs_mask) {
++	ret = desc->map_event(irq, pcdev, h->notifs, h->notifs_mask);
++	if (ret || bitmap_empty(h->notifs_mask, pcdev->nr_lines)) {
+ 		mutex_unlock(&pcdev->lock);
+ 		return IRQ_NONE;
+ 	}
+ 
+-	for_each_set_bit(i, &notifs_mask, pcdev->nr_lines) {
++	for_each_set_bit(i, h->notifs_mask, pcdev->nr_lines) {
+ 		unsigned long notifs, rnotifs;
+ 		struct pse_ntf ntf = {};
+ 
+@@ -1340,6 +1341,10 @@ int devm_pse_irq_helper(struct pse_controller_dev *pcdev, int irq,
+ 	if (!h->notifs)
+ 		return -ENOMEM;
+ 
++	h->notifs_mask = devm_bitmap_zalloc(dev, pcdev->nr_lines, GFP_KERNEL);
++	if (!h->notifs_mask)
++		return -ENOMEM;
++
+ 	ret = devm_request_threaded_irq(dev, irq, NULL, pse_isr,
+ 					IRQF_ONESHOT | irq_flags,
+ 					irq_name, h);
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.43.0
+
 
