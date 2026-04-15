@@ -1,220 +1,182 @@
-Return-Path: <netdev+bounces-278829-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278830-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6IviHBqy32lCXwAAu9opvQ
-	(envelope-from <netdev+bounces-278829-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 17:43:22 +0200
+	id 8H04O7Wx32lCXwAAu9opvQ
+	(envelope-from <netdev+bounces-278830-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 17:41:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF3444060B5
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 17:43:21 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C72D406080
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 17:41:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7D26330138A2
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 15:35:43 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 44E78300612F
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 15:41:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 312DD3E0C66;
-	Wed, 15 Apr 2026 15:35:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C09E3E1CE4;
+	Wed, 15 Apr 2026 15:41:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b="UVO4X2mZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SqjTryjH";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="KhP1L7EG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.ssi.bg (mx.ssi.bg [193.238.174.39])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D406E3DFC78;
-	Wed, 15 Apr 2026 15:35:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.238.174.39
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 566053DAC02
+	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 15:41:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776267340; cv=none; b=eA4Qv39ZiEKNYtHB9akUbcz/Iwn/zzY8NxWRoCP8GfsoJwgiHQF1EXe9S+kkEo57YRlzBDXnzqypeKkI1AnRnW6Rq561RXJ4EBxnURw1BD0Gv8B0SNjd338gbkpP1oJkiYb6YN50uaMp0AyUCdP3/Mj7q/CF+raGgdkdWo3zj8s=
+	t=1776267671; cv=none; b=X0IDo3+y0KzIwowHpwDRy01H+G0oz4G3jz09+D4gpH9YF3ysV9vodC4s9pNSysUXLjArukBpvq30cjUtHEww9YuWJx0ZtPy5QnS72+lZsaKKgKtg2cullWMX/ZvmMeVxECoX81AuygeVs/0Tk5cFhPHklGXACkOABx/jDGXKsM8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776267340; c=relaxed/simple;
-	bh=PSHo872UTpSY7Pd7+/Sgn/7YWlvCJs+jK6EXZQzMhfY=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=p+8nI0uuHGY0afAprBdykRZJdpGf6FN9T9I5oZWm8wdyOq4MUXQMcqhNTQjpCiL16HxeHiNlnDhP8ov7pCoarUR6HIDpYrTMQjTx3PeFIY/IBWtEa8NyDzhWYyRRDe1tnqrBCEz3PIthEqRvlf4TD14eN15TY+LZDI/HiW1EGQo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=UVO4X2mZ; arc=none smtp.client-ip=193.238.174.39
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ssi.bg
-Received: from mx.ssi.bg (localhost [127.0.0.1])
-	by mx.ssi.bg (Potsfix) with ESMTP id 236FC21107;
-	Wed, 15 Apr 2026 18:35:19 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ssi.bg; h=cc:cc
-	:content-type:content-type:date:from:from:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=ssi;
-	 bh=OUQKghrpmJGe/+qFiqhRsCk1OBnY75g47ZnibPNkAnc=; b=UVO4X2mZF2We
-	YVrfnNa0vWaQN0olivm7j5OAMUwiElxHCRXUs94wj/4nEx8wilxOmesQp8Bt7xy5
-	lwXre+RBqyqO8oS1NJ+VSQwsT6YVHT5AW/mFKB0gjXjEkYByMhUabrdVbAo4+aHJ
-	AQauZbAAdazl0pLxlZg7fVDEbVrWPvuI7sEUF561IVThPDhqb4B/VgjO22eJ737A
-	PWQ5XCfeVzcAvLNl3NMwX5BjO8eeVr9vD/hV5YL8Ai3Z/ZZOx+FoIOTxydpdoOL+
-	t28e2pWuBHw38a7NzSVIBKL6EQ9q0uk+9LSXR1/2Hv6SeucZivtIDhU0tgcOikFT
-	BcugsptzPtDh2XGFByYPN5yrOHJzn3W0M7hrmwZ9MqIJJYgqufD40+Ic6724CIYg
-	sj6inbLzVWyMbPbLWrnzGJHZSDQyHJtS8E3Y935SlerFqYYu+SeRX4TI9GwL7VU3
-	mCsr2qt3dIkVlc/zWj5dLdH3FXl0vEhObLI0qQLvHIgVYomIR/PxbBOItn5plr+q
-	sh2RsTHxzb227gSg/94ioFntkUpeRtrIfjMaR31bDSdmf2G8uHYdL3D2U+9r2Pi7
-	dE+3lAqfuW1qIZUeE+/4CFUZZ2GRqf2TQ/zeDTO9Tp0cOB1U1xAuyRInFJkgD5rB
-	6QgjYmtva8tB115e2VMj/4X43HCf+Xw=
-Received: from box.ssi.bg (box.ssi.bg [193.238.174.46])
-	by mx.ssi.bg (Potsfix) with ESMTPS;
-	Wed, 15 Apr 2026 18:35:17 +0300 (EEST)
-Received: from ja.ssi.bg (unknown [213.16.62.126])
-	by box.ssi.bg (Potsfix) with ESMTPSA id 450DF608CD;
-	Wed, 15 Apr 2026 18:35:15 +0300 (EEST)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by ja.ssi.bg (8.18.1/8.18.1) with ESMTP id 63FFZ3hV058241;
-	Wed, 15 Apr 2026 18:35:04 +0300
-Date: Wed, 15 Apr 2026 18:35:03 +0300 (EEST)
-From: Julian Anastasov <ja@ssi.bg>
-To: Yingnan Zhang <342144303@qq.com>
-cc: pablo@netfilter.org, coreteam@netfilter.org, davem@davemloft.net,
-        edumazet@google.com, fw@strlen.de, horms@verge.net.au, kuba@kernel.org,
-        linux-kernel@vger.kernel.org, lvs-devel@vger.kernel.org,
-        netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
-        pabeni@redhat.com, phil@nwl.cc
-Subject: Re: [PATCH net v4] ipvs: fix MTU check for GSO packets in tunnel
- mode
-In-Reply-To: <tencent_7F7B107ECA750C095D05C19C3B723AFFA60A@qq.com>
-Message-ID: <72814fe9-7abc-111e-6142-d2f3455aa220@ssi.bg>
-References: <tencent_7F7B107ECA750C095D05C19C3B723AFFA60A@qq.com>
+	s=arc-20240116; t=1776267671; c=relaxed/simple;
+	bh=2SsUYUfpJ6Cn7ENP9SVUB703hjWJHv3onCi+Vq1hxh0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Fsg9R+JBJrVSXDDDBsQi/kvQHb7ZX5+8ga9yCnffZiZGPVhQ8FnWx/b7J20T4mPnHruR0cEjZ4qkdQNGm8Y1N0SCItnMsa9PvU5tqqvqYLt/QO5i32CHme8KUjDFaxrprpeSTwaVyQSefRLc1H5GrcUWskdunudsWzduAnKgAFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SqjTryjH; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=KhP1L7EG; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1776267667;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Ow5K8hzTuD9W/wj2bq1mSm/2juaMM9qh5FYIv6eXqRM=;
+	b=SqjTryjH7qhUBGLNcRp0FPPlpy6oAePtmYmX/l+DuHYjfKhNHF0YpwuPN9nEv5NsdTkWXm
+	MdSNtpbfdLFhmlKIWfTnrdLfNCX0ZiiiaJxYWVhis6VZjPs5m3U1orIK8Ma50ttg69WGTY
+	PHFCtBUbyOt5hBdpsFRFH43PpKPPVSE=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-592-h8WLNxqeM7uza-Ho2JPHrQ-1; Wed, 15 Apr 2026 11:41:04 -0400
+X-MC-Unique: h8WLNxqeM7uza-Ho2JPHrQ-1
+X-Mimecast-MFC-AGG-ID: h8WLNxqeM7uza-Ho2JPHrQ_1776267664
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-488c2cc0cbaso40141135e9.3
+        for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 08:41:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1776267663; x=1776872463; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ow5K8hzTuD9W/wj2bq1mSm/2juaMM9qh5FYIv6eXqRM=;
+        b=KhP1L7EGSGj8v7+RertazyvQR/n+mGipRSK9QxpGjQFFK/qBvI9GeunI1mk0/tTtYg
+         LWI0d6OWYUhct8O7r+mRTct6iEsIGYp1Zt8sjjUsEVxcKJzNU5y4COQ/s8Rg6+2oPGc7
+         25nxsD7QB3G/cqgUCQzyI6mTuanwQ7lQBtzxKx/3eROx1u8Z0LAlsPhE8lc06A7DzIuq
+         418d4Nnlfd01wzlzOFMjnV741yBJuLYnSQ9yrx++ZwSNgiF+TR9+etFJoUaudbM9E7Ks
+         qmxZ3NaFJpw5kyss4rfavX1+uRa2rk2kAHr5zYE4VQ6cu9pgdQzuzjw4T2FgyoneU5kJ
+         ki5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776267663; x=1776872463;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Ow5K8hzTuD9W/wj2bq1mSm/2juaMM9qh5FYIv6eXqRM=;
+        b=ixHjg3/JawL4220RVfTy3S12H8bqF3OmW0aX57N9w95M1UHD3tD/dXc41BLQsIr2Ip
+         7yrulFJ8Md0ZFfKJLRkBJaKIAlV0EyGylI2xUA6yUOqppB564a8QeBU8q/VauJ1F+NAI
+         z0yqSPoTV0cWrm7gJuT+mOt5h4C4powgCfQ5+Zt6xbr1sFZoscTG+ZDG15hTuO0bCSde
+         mi5SsIOGCLz+3cCD6p9LbCg6qbX1UFcp22mNPjE98usj+2ceSPDFdkpHzhLX7Af+MbMq
+         KTvNihQ1ChlNsLBHjx8YKC1s2kNsAShGwJv2RKyfiCeQgX4fHARr0LyZRtDlHgVyzRjz
+         OHhA==
+X-Forwarded-Encrypted: i=1; AFNElJ+pOv2LCgjxNVJC/ukfm3xnRZyUVusIC1ZU8vWZJo4aha9lCs0Nb+XDcrtFaJ6Wg2T7VVJiKKY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwvXi+WWvMZSDO83Wf1oP0xw/6mjcFxV7YB77eIQG9+PBAtRifc
+	6grAtYS79C9W6AKToks0SpHfMKXvo/a6EntYqBS9Z1rlRvXH6PWwQ/wLa9oQhHwilQ8WzvddAYF
+	HHYLoYwQhF8hkSbCHoVDLKjCSOK59gfOJTmOwUl7hYDTDzSf6JeITJKGhfQ==
+X-Gm-Gg: AeBDiesO6euEGtapI3UN5PZiGTejtKICPHq0uFZN7YJEnb6+34Vxo8vpftw4dup/P3X
+	fWdNpi9BX2iPOdEXLSy6eLNj6U/lnbmR9lowl7c+eUkDx6L/oeEtbJZxydVRLfN9IrfvDdboAvy
+	kKjgGPdu4ejAo/aAPmBJ6UeEwUp0Ow2YoeR56l7OkY3N2hVd+9r7HOktyjL9G0YQTq/1HbcJTmT
+	efGYKU6NBaRI55Qiu+LBdl2ge48tgAG952UwwsrLuVc/hcGpWrLff85QwVMVz04OPr063U8bu//
+	nqgCGSFQwONhx4VPpoM2YSimXSAljn7IYKi9J0brCalWccnPXduP3b9DYFnTFm8S1Q23fINZYH1
+	2ilxGczWoP/ucQJ1LjSH8Ut28jUWbIz+4HE5Vstn62AZIM9/x3iD+rFtcaycYciWiUy3Vdarox+
+	cWErp63g==
+X-Received: by 2002:a05:600c:a106:b0:486:fbe1:2499 with SMTP id 5b1f17b1804b1-488d685fcf7mr215995665e9.22.1776267663579;
+        Wed, 15 Apr 2026 08:41:03 -0700 (PDT)
+X-Received: by 2002:a05:600c:a106:b0:486:fbe1:2499 with SMTP id 5b1f17b1804b1-488d685fcf7mr215995085e9.22.1776267662938;
+        Wed, 15 Apr 2026 08:41:02 -0700 (PDT)
+Received: from sgarzare-redhat (host-87-16-204-83.retail.telecomitalia.it. [87.16.204.83])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43ead3d5eb4sm6314894f8f.20.2026.04.15.08.41.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Apr 2026 08:41:02 -0700 (PDT)
+Date: Wed, 15 Apr 2026 17:40:55 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Luigi Leonardi <leonardi@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Arseniy Krasnov <avkrasnov@salutedevices.com>, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v4 2/3] vsock/test: fix MSG_PEEK handling in
+ recv_buf()
+Message-ID: <ad-xdCce7fPbBeyP@sgarzare-redhat>
+References: <20260415-fix_peek-v4-0-8207e872759e@redhat.com>
+ <20260415-fix_peek-v4-2-8207e872759e@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20260415-fix_peek-v4-2-8207e872759e@redhat.com>
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ssi.bg,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[ssi.bg:s=ssi];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,ssi.bg:email,ssi.bg:dkim,ssi.bg:mid,qq.com:email];
-	TAGGED_FROM(0.00)[bounces-278829-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[qq.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[ssi.bg:+];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ja@ssi.bg,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-278830-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sgarzare@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: CF3444060B5
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9C72D406080
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+On Wed, Apr 15, 2026 at 05:09:29PM +0200, Luigi Leonardi wrote:
+>`recv_buf` does not handle the MSG_PEEK flag correctly: it keeps calling
+>`recv` until all requested bytes are available or an error occurs.
+>
+>The problem is how it calculates the number of bytes read: MSG_PEEK
+>doesn't consume any bytes and will re-read the same bytes from the buffer
+>head, so summing the return value every time is wrong.
+>
+>Moreover, MSG_PEEK doesn't consume the bytes in the buffer, so if more
+>bytes are requested than are available, the loop will never terminate,
+>because `recv` will never return EOF. For this reason, we need to compare
+>the number of bytes read with the number of bytes expected.
+>
+>Add a check: if the MSG_PEEK flag is present, update the byte counter and
+>break out of the loop only after at least the expected number of bytes
+>have been received; otherwise, retry after a short delay to avoid
+>consuming too many CPU cycles.
+>
+>This allows us to simplify the `test_stream_credit_update_test` by
+>reusing `recv_buf`, like some other tests already do.
+>
+>Suggested-by: Stefano Garzarella <sgarzare@redhat.com>
+>Signed-off-by: Luigi Leonardi <leonardi@redhat.com>
+>---
+> tools/testing/vsock/util.c       | 15 +++++++++++++++
+> tools/testing/vsock/vsock_test.c | 13 +------------
+> 2 files changed, 16 insertions(+), 12 deletions(-)
 
-	Hello,
-
-On Wed, 15 Apr 2026, Yingnan Zhang wrote:
-
-> Currently, IPVS skips MTU checks for GSO packets by excluding them with
-> the !skb_is_gso(skb) condition. This creates problems when IPVS tunnel
-> mode encapsulates GSO packets with IPIP headers.
-> 
-> The issue manifests in two ways:
-> 
-> 1. MTU violation after encapsulation:
->    When a GSO packet passes through IPVS tunnel mode, the original MTU
->    check is bypassed. After adding the IPIP tunnel header, the packet
->    size may exceed the outgoing interface MTU, leading to unexpected
->    fragmentation at the IP layer.
-> 
-> 2. Fragmentation with problematic IP IDs:
->    When net.ipv4.vs.pmtu_disc=1 and a GSO packet with multiple segments
->    is fragmented after encapsulation, each segment gets a sequentially
->    incremented IP ID (0, 1, 2, ...). This happens because:
-> 
->    a) The GSO packet bypasses MTU check and gets encapsulated
->    b) At __ip_finish_output, the oversized GSO packet is split into
->       separate SKBs (one per segment), with IP IDs incrementing
->    c) Each SKB is then fragmented again based on the actual MTU
-> 
->    This sequential IP ID allocation differs from the expected behavior
->    and can cause issues with fragment reassembly and packet tracking.
-> 
-> Fix this by properly validating GSO packets using
-> skb_gso_validate_network_len(). This function correctly validates
-> whether the GSO segments will fit within the MTU after segmentation. If
-> validation fails, send an ICMP Fragmentation Needed message to enable
-> proper PMTU discovery.
-> 
-> Fixes: 4cdd34084d53 ("netfilter: nf_conntrack_ipv6: improve fragmentation handling")
-> Signed-off-by: Yingnan Zhang <342144303@qq.com>
-
-	Looks good to me for the nf tree, thanks!
-
-Acked-by: Julian Anastasov <ja@ssi.bg>
-
-> ---
-> v4:
-> - Introduce a new helper function ip_vs_exceeds_mtu() to improve readability (reviewer feedback)
-> 
-> v3: https://lore.kernel.org/netdev/tencent_73010FBD5FA1C05C3BC23A07A50B11CEC90A@qq.com/
-> v2: https://lore.kernel.org/netdev/tencent_CA2C1C219C99D315086BE55E8654AF7E6009@qq.com/
-> v1: https://lore.kernel.org/netdev/tencent_4A3E1C339C75D359093BE4F08648AFAA6009@qq.com/
-> ---
-> ---
->  net/netfilter/ipvs/ip_vs_xmit.c | 16 ++++++++++++++--
->  1 file changed, 14 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/netfilter/ipvs/ip_vs_xmit.c b/net/netfilter/ipvs/ip_vs_xmit.c
-> index 0fb5162992e5..64dfdf8b00c4 100644
-> --- a/net/netfilter/ipvs/ip_vs_xmit.c
-> +++ b/net/netfilter/ipvs/ip_vs_xmit.c
-> @@ -102,6 +102,18 @@ __ip_vs_dst_check(struct ip_vs_dest *dest)
->  	return dest_dst;
->  }
->  
-> +/* Based on ip_exceeds_mtu(). */
-> +static bool ip_vs_exceeds_mtu(const struct sk_buff *skb, unsigned int mtu)
-> +{
-> +	if (skb->len <= mtu)
-> +		return false;
-> +
-> +	if (skb_is_gso(skb) && skb_gso_validate_network_len(skb, mtu))
-> +		return false;
-> +
-> +	return true;
-> +}
-> +
->  static inline bool
->  __mtu_check_toobig_v6(const struct sk_buff *skb, u32 mtu)
->  {
-> @@ -112,7 +124,7 @@ __mtu_check_toobig_v6(const struct sk_buff *skb, u32 mtu)
->  		if (IP6CB(skb)->frag_max_size > mtu)
->  			return true; /* largest fragment violate MTU */
->  	}
-> -	else if (skb->len > mtu && !skb_is_gso(skb)) {
-> +	else if (ip_vs_exceeds_mtu(skb, mtu)) {
->  		return true; /* Packet size violate MTU size */
->  	}
->  	return false;
-> @@ -232,7 +244,7 @@ static inline bool ensure_mtu_is_adequate(struct netns_ipvs *ipvs, int skb_af,
->  			return true;
->  
->  		if (unlikely(ip_hdr(skb)->frag_off & htons(IP_DF) &&
-> -			     skb->len > mtu && !skb_is_gso(skb) &&
-> +			     ip_vs_exceeds_mtu(skb, mtu) &&
->  			     !ip_vs_iph_icmp(ipvsh))) {
->  			icmp_send(skb, ICMP_DEST_UNREACH, ICMP_FRAG_NEEDED,
->  				  htonl(mtu));
-> -- 
-> 2.51.0.windows.1
-
-Regards
-
---
-Julian Anastasov <ja@ssi.bg>
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
 
