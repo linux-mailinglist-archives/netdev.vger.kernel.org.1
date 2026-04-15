@@ -1,162 +1,168 @@
-Return-Path: <netdev+bounces-278792-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278793-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EMVQESif32kEWwAAu9opvQ
-	(envelope-from <netdev+bounces-278792-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 16:22:32 +0200
+	id kGo7OGCf32kEWwAAu9opvQ
+	(envelope-from <netdev+bounces-278793-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 16:23:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A327440539D
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 16:22:31 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 390584053BC
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 16:23:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5F0F33081D01
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 14:19:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8D5023027691
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 14:19:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28DE63D34BB;
-	Wed, 15 Apr 2026 14:19:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 009EC3D3CEC;
+	Wed, 15 Apr 2026 14:19:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="PFIukb78"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UydNJhxI"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD2C524A06D
-	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 14:19:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1F153BB9EB;
+	Wed, 15 Apr 2026 14:19:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776262769; cv=none; b=XWOoGaKl3Wggs24JmoCXas8PqFLcI8Jyc2O6vGraDcI45qTc7TLguZ/IWCXUFO3RzJ8xX1oZESoeiJnkzOcB8Sx4cl5nlI76Phgylk009LMKe3e4lM0Wv+jRaoV414lMjudG2+j4GChNdXlJN/6jjfKiL6429s9VmRoRrJev5Kw=
+	t=1776262784; cv=none; b=cr3uQXNO2pVR52gS8kKfnFBEhP8/spt7XjMxX5/1YHXx1+A22RcpyPWBSoNAyePOlTQ9el+DVNl98E5VeOYiXldtu5X6mWVDv+sfYCpuFqwiQhmxeIqbHO9J2ELPa+5/MoLKWzwrTcHu08qrCq/cZqyebFuigPqMpiKSTEhTvpI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776262769; c=relaxed/simple;
-	bh=A9/HJmOJ69OSwvl2pHbLs4KBA7n2j2nuNmKQfY0oRsk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eh9+1mtfTVUc+8Anm0Ck2A+QAIfaKvChgHYGEcoCr8qV3TQZ4AY5oa5GWbr8WAPX9iBKvMvuDc1xWOyLuwTrHJhUfQ0fRFWNGmWTxp6ze+vCvw0vFRSbP8RgX0GVTClQ6thkWcSIZ+PuBuIhdjEFnpntbWMiQjYQWV0xDPPTMqY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=PFIukb78; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=+EE8QyuRSmRcMm7llKJ9cfCpHASsFH3SVkHhUH7aEV4=; b=PFIukb78PhHO6VKbeeF55eY5M8
-	98haQWTnDZ6SvnB8qG+jtQEU07LPsNuI/6v+mavktPeX7QNEcZTSc4Ptb2TvNtUQlSx2vumI3+Xyo
-	wrd7gtrWnlSSKWeJE33DqcJYZdcYw1FYgPqNWMUUAMmW7JXgTQMUghcp8zqYYvDqx01s=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wD15R-00GB9b-HF; Wed, 15 Apr 2026 16:19:25 +0200
-Date: Wed, 15 Apr 2026 16:19:25 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Junyang Han <han.junyang@zte.com.cn>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, andrew+netdev@lunn.ch,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	ran.ming@zte.com.cn, han.chengfei@zte.com.cn,
-	zhang.yanze@zte.com.cn
-Subject: Re: [PATCH net-next 2/3] net/ethernet/zte/dinghai: add logging
- infrastructure
-Message-ID: <fe3501da-13a7-461d-bba7-790618f067e1@lunn.ch>
-References: <20260415015334.2018453-1-han.junyang@zte.com.cn>
- <20260415015334.2018453-2-han.junyang@zte.com.cn>
+	s=arc-20240116; t=1776262784; c=relaxed/simple;
+	bh=4GDlMJEm4uVtqtram785F36PyRUfMCvFYewp0lcHc8o=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=jDx+51oSsl/7X2vbA0ErpL9BNoHjGTCcw1Jj2YOw9xLeV4mhlTHMU2Kxyl8SzrJy7VsaXVMkfjvz/3BO2KgijXGRctZGBMzaqBXmnHHJ3eTyzzcWvdJ0aXi4GzZnrKZsEUxJoDTXbzo2SczIyremySjl6GUw0FsGPqAixP7CJf0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UydNJhxI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1CE62C19424;
+	Wed, 15 Apr 2026 14:19:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776262784;
+	bh=4GDlMJEm4uVtqtram785F36PyRUfMCvFYewp0lcHc8o=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=UydNJhxIRJG9BJgltJg71m5M4dy/9nd9xl5tI0PlbHQ/gDR5h7w+Xa4ZmvKPG2Mj5
+	 FGd+gudalqE2TgVn2T8WukPXMV2J1HuilVDxIhVLDWIyiPrBlGBA7HGzz0TTLPlU0q
+	 snciT6pPnPcQfpYF7r6P9Fk/1DWo24gvhw+1YPfifNED6etuLY7VpN6FJ6MHA4bWQu
+	 TIz2nNbOU2WBu8t2T+hhFR2j6HjjpQwYA/arTS5EroyPpQGWuHSFAOW9SF5fhnuAt5
+	 BD4Os/SbKn9Ng2FMuxvwtSHPrj9bYUMb6LtVUSaPpSWQd7Df28aL//CGqVnIuLFou6
+	 4tF6EsMBlZDcA==
+From: Simon Horman <horms@kernel.org>
+To: hxzene@gmail.com
+Cc: 'Simon Horman' <horms@kernel.org>,
+	jhs@mojatatu.com,
+	jiri@resnulli.us,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	victor@mojatatu.com,
+	pctammela@mojatatu.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net/sched: act_mirred: Fix blockcast recursion bypass leading to stack overflow
+Date: Wed, 15 Apr 2026 15:19:31 +0100
+Message-ID: <20260415141931.808383-1-horms@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260413082027.2244884-1-hxzene@gmail.com>
+References: <20260413082027.2244884-1-hxzene@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260415015334.2018453-2-han.junyang@zte.com.cn>
+Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-278792-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-278793-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:dkim,lunn.ch:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A327440539D
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sashiko.dev:url]
+X-Rspamd-Queue-Id: 390584053BC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-> +#define dh_dbg(__dev, format, ...)                    \
-> +    dev_dbg((__dev)->device, "%s:%d:(pid %d): " format,        \
-> +         __func__, __LINE__, current->pid,            \
-> +         ##__VA_ARGS__)
-> +
-> +#define dh_dbg_once(__dev, format, ...)                \
-> +    dev_dbg_once((__dev)->device,                \
-> +             "%s:%d:(pid %d): " format,            \
-> +             __func__, __LINE__, current->pid,        \
-> +             ##__VA_ARGS__)
+From: 'Simon Horman' <horms@kernel.org>
 
-There is a dislike for adding wrappers around the existing kernel log
-functions. What value does this add?
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://sashiko.dev
+---
+net/sched: act_mirred: Fix blockcast recursion bypass leading to stack overflow
 
-> +int debug_print;
-> +module_param(debug_print, int, 0644);
+This patch fixes a stack overflow bug where mirred blockcast actions would
+bypass the recursion limit check because the recursion counter was not
+incremented for blockcast actions.
 
-Module parameters are not liked.
-
-> +module_param_named(debug_mask, dh_debug_mask, uint, 0644);
-> +MODULE_PARM_DESC(debug_mask, "debug mask: 1 = dump cmd data, 2 =
->  dump cmd exec time, 3 = both. Default=0");
-> +static bool probe_vf = 1;
-> +module_param(probe_vf, bool, 0644);
-> +MODULE_PARM_DESC(probe_vf, "probe_vf: 0 = N, 1 = Y");
-
-I suggest you remove all these.
-
-Debug code is reasonable to have during development. But once the
-driver actually works, it should not be needed.
-
->  const struct pci_device_id dh_pf_pci_table[] = {
-> @@ -39,26 +47,34 @@ static int dh_pf_pci_init(struct dh_core_dev *dev)
->      pci_set_drvdata(dev->pdev, dev);
+> diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
+> index 05e0b14b57731..5928fcf3e6514 100644
+> --- a/net/sched/act_mirred.c
+> +++ b/net/sched/act_mirred.c
+> @@ -444,8 +444,12 @@ TC_INDIRECT_SCOPE int tcf_mirred_act(struct sk_buff *skb,
+>  	tcf_action_update_bstats(&m->common, skb);
 >  
->      ret = pci_enable_device(dev->pdev);
-> -    if (ret)
-> +    if (ret) {
-> +        LOG_ERR("pci_enable_device failed: %d\n", ret);
+>  	blockid = READ_ONCE(m->tcfm_blockid);
+> -	if (blockid)
+> -		return tcf_blockcast(skb, m, blockid, res, retval);
+> +	if (blockid) {
+> +		xmit->sched_mirred_nest++;
 
-dev_err(dev, ..)
+Could this leave a stale pointer in sched_mirred_dev since netdev_xmit is
+persistent per-CPU (or per-task in PREEMPT_RT) memory?
 
->          return -ENOMEM;
-> +    }
->  
->      ret = dma_set_mask_and_coherent(dev->device, DMA_BIT_MASK(64));
->      if (ret) {
->          ret = dma_set_mask_and_coherent(dev->device, DMA_BIT_MASK(32));
-> -        if (ret)
-> +        if (ret) {
-> +            LOG_ERR("dma_set_mask_and_coherent failed: %d\n", ret);
+If a nested mirred action later iterates over sched_mirred_dev up to the new
+nesting depth to detect routing loops, could it match a stale pointer from
+whatever unrelated packet previously reached this nesting level?
 
-dev_err(dev, ...
+This might cause a false-positive loop detection and incorrectly drop a valid
+packet. Should we set xmit->sched_mirred_dev[xmit->sched_mirred_nest] = NULL
+before incrementing the counter?
 
-And maybe it should actually be dev_err_probe() if this is a probe
-function, and you need to handle -EPROBE_DEFER.
+> +		retval = tcf_blockcast(skb, m, blockid, res, retval);
 
-Debug logging should be limited to actual debug stuff. Please use the
-standard logging primitives for anything which is not debug, so
-dev_err(), dev_warn(), dev_info(). netdev_err(), netdev_warn() etc.
+This isn't a regression introduced by this patch, but it exists in the early
+error returns of tcf_mirred_act() (e.g., when the target device is gone, or a
+routing loop is detected) and in tcf_blockcast() (e.g., when
+xa_empty(&block->ports) is true).
 
-	Andrew
+In these error paths, the functions simply return retval. For mirred redirect
+actions, retval is initialized to m->tcf_action, which is typically
+TC_ACT_STOLEN.
+
+When TC_ACT_STOLEN is returned, the TC framework assumes the action has taken
+ownership of the packet and will not free the sk_buff. Since the code does
+not free the sk_buff before returning in these error paths, does this leak
+the sk_buff?
+
+Could an unprivileged user inside a network namespace trigger this
+intentionally by creating a routing loop with mirred redirect rules, leading
+to continuous sk_buff leaks and system memory exhaustion?
+
+Should these error paths ensure the sk_buff is freed or force the return value
+to TC_ACT_SHOT if the action is a redirect, mirroring the existing behavior in
+tcf_mirred_to_dev()?
+
+> +		xmit->sched_mirred_nest--;
+> +		return retval;
+> +	}
 
