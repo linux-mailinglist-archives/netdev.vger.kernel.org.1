@@ -1,215 +1,177 @@
-Return-Path: <netdev+bounces-278716-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278718-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2GRwLxdP32nLRgAAu9opvQ
-	(envelope-from <netdev+bounces-278716-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 10:40:55 +0200
+	id uHfmKu9P32nLRgAAu9opvQ
+	(envelope-from <netdev+bounces-278718-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 10:44:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E736402176
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 10:40:54 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D2484021C3
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 10:44:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 09ED230A2D9E
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 08:38:15 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5DCB13035603
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 08:44:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9985E2D8378;
-	Wed, 15 Apr 2026 08:38:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA5F33D47A9;
+	Wed, 15 Apr 2026 08:44:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WB4Rty8R"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OVwjpQhf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73BC4218845;
-	Wed, 15 Apr 2026 08:38:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776242293; cv=none; b=cFktHZ3DlDquV+z7ic6oQoCzV8p4S1Yl7LuCrrrRVVDxRebQkd5zMCjW+CnhodQEC0FHLQwUjj4dbMEYA1ZUp/W4w+NDPKhuIezR/mo4aUNcPWk9W1NFPB2AtKnNl83+UhsXbWVZ+fQuClfYvYR6dl+JJjwSFoQxlwSrSZOc70s=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776242293; c=relaxed/simple;
-	bh=+E24YrPrdzJ1ya9Ikgcx0KKiXJaJ4AYDwwErZxu5fG0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=H7wIzyfCS7bGeNe+H6BSsOrv70spYJdtt+k1fzB5sAhChpiTl1FbQUraqobB+/SpA6iTLFNCFrVULba03XWwnLl6JKDepdePKZe5h8IQ9aDixKwi+g29UfYhQCSpJ5rYyH3H5VMz/JvyzDE4m0IYiNCaTTopk0TphZfjgplKYas=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WB4Rty8R; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1776242292; x=1807778292;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=+E24YrPrdzJ1ya9Ikgcx0KKiXJaJ4AYDwwErZxu5fG0=;
-  b=WB4Rty8REWJYIHweme5mBnXmrcnwcaDDRIPu+fkQKIh74+9fG6jC9hzR
-   yh7ce+lRmUtO88cZq7GkKdTYEjJD2mmTCj3tNJS7DwNzqzvvPscSn/kCC
-   9/2tNjJV45rhGjt3sDEkYLmSL2MHqEKk98LYlRDN4npkuiJdvLKATrgIh
-   rX8KVDEfVW9LPBRFYrKTLACmpAG9vVVY+Ojfr5pyzj6bMYidIAuyWwurg
-   iARpIEQ9GXrlfCaWjSDcEWlc65I9/qELy7hP0hWqkcyRp4cnjbXRJJ+hv
-   CyDFw1sAeALbiRbfk+0M6gN8W+f20liplklUhLxSwutwUhj3UuRoPCzVo
-   A==;
-X-CSE-ConnectionGUID: YdYuSVWvTQOWnRg20Z+vCA==
-X-CSE-MsgGUID: n2HNbwCOSgipVsaO2mgfwg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11759"; a="87914967"
-X-IronPort-AV: E=Sophos;i="6.23,179,1770624000"; 
-   d="scan'208";a="87914967"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2026 01:38:11 -0700
-X-CSE-ConnectionGUID: T4ArbB4xS227m+HZRmDGeQ==
-X-CSE-MsgGUID: DIzosRa5RXmyFA6P+VAa2g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,179,1770624000"; 
-   d="scan'208";a="223857364"
-Received: from mohdfai2-mobl.gar.corp.intel.com (HELO [10.247.20.182]) ([10.247.20.182])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2026 01:38:06 -0700
-Message-ID: <f1c6f5d0-61a7-4866-b122-ce18933d92eb@linux.intel.com>
-Date: Wed, 15 Apr 2026 16:37:51 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A91123CA487
+	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 08:44:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.49
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776242666; cv=pass; b=m/7kWXZkgzPbi+bUCtWzjpCnRhWQ2YEbnir0mEuPiJABFnjWMCxV84K/i0w0hD5U89lwmiEJU4+D/BZEhSU1mbcicqkGt03x6K7A4sZ/6/T83AFa7Ur5HNLg7zJQ0Cpm+g025644AM0xVl8QktlorlYy7wFGllHowMRi0kvHpQg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776242666; c=relaxed/simple;
+	bh=Mp0Dhk0lYnbwO2gDSPWZreLqZBbZWgOEa+uBM9bOFwc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=a/pxjIn28oM/llp3WwZERWfQ4Ty2QLYHtFVWMDP7ZZ4GzvSd55dcAEpgGwOkEmPwvRSkD1yMrFxKASCMckYmPcxCOBF7AUmo1S+3b6wN09N+7ipGH3YkqPuRf/+7jyUhtxvaBNaTOoJDi/6g03p77dOLPNuqi6fDAdfuVuV4MRM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OVwjpQhf; arc=pass smtp.client-ip=209.85.167.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-5a402dea4a5so2499485e87.2
+        for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 01:44:23 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776242662; cv=none;
+        d=google.com; s=arc-20240605;
+        b=X7DZuFUWHLousaOxHMw1XjiwA9BlP9QapmeEiqP6fu72LKtn+9z+giAv5Yr7XyyOYM
+         bC9XpPglsqkAfN0QhlpCBr0B6Qxqmp5JEX62Lb94aMboHrHcRK/rcDVLSo5cpJeGyQxR
+         5qbvHHZgyFS6Qo+QUXm69iF3Xt7F+93xTxxS4gmB37QqGbMDdzQf5p7orLYrdsZdV+F5
+         U08pvrKf1QuJ4UeZuQ5jPAj+4R64njl6T9c1DnrodtSCYGiqwZeVDOdyd70xvKDHQweP
+         eOxknW+N052/cc7hUwbwsah+n+CKh2csqRatyNicPR0zuQXS/3eNf8nf5FivgxsQDd4F
+         ACZg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=Mp0Dhk0lYnbwO2gDSPWZreLqZBbZWgOEa+uBM9bOFwc=;
+        fh=Mc28aEGU1iY4fjFSvUNGMSY8TAu2YkeOqwEgMw35Qt0=;
+        b=N2LOneRbAS6C94cds2TtYbs3o2Y2PFjQl+1F9OIAPmQUs7kQf3xDBkmbPsE7mqwUQv
+         qGSeFrE77Fehb8maipGHIgZhjs3lKih6e6c3QVE5YPpwp1ZLRlR6OuTPZ5RpboQW6Sep
+         cnxRjx+4vE8BnHRejJSSAHaq3FVuXtIO65cnIqCaCtsR0n9g6maTNus3toQzyApcURPb
+         NDDRQFHUJALP5eHwIt/PyB39L6LoGh77MNOpkhOAB/8zF1VhvJW7s4HZmrT6oMNcKyxL
+         ErXV/59xpYCrQUl6LBps5O3qdP9gMc28sZ3WfBmH5tX9v+TTQZKpVk47TqIcPBeMx9Uv
+         qpOA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776242662; x=1776847462; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Mp0Dhk0lYnbwO2gDSPWZreLqZBbZWgOEa+uBM9bOFwc=;
+        b=OVwjpQhfrQJREJW7sgaaQuxPFZrLF/hPaKkuU/LHNcdBJYwPpEmdDzxQBxtsowUwCv
+         JK+ZnAWl/Qw4IFqxvFxK8dSdfaemjWHnLA+5IZJ5IXPRh0/Ud4OxhMsy+jo1hhdTJ5Qe
+         xIPxwGk8qoZGhXIfRdPSkGx6RNv9hgDbZcZIxUFz2fDNvY4zT2H69MC8i2AUbXPnZW9Q
+         RB4i4YoOnn12FMZ8MJB+rsiEBAqTBinWkGJ3SXmrDk/MDxebU1rfFe4aqlW63CDBmQks
+         LB/qFGiXJwsTPzJ9cncS/xuNE0XGWgjh63x3xpmj1XQkghpXaX7IbHKmFDDeeC/lW/T8
+         qmyg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776242662; x=1776847462;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Mp0Dhk0lYnbwO2gDSPWZreLqZBbZWgOEa+uBM9bOFwc=;
+        b=T325CyDG3QrppQz/AXePOesptF6vev35i+Z1DaQ7VHrE++FOMuZTGUygRPOO7MLlS1
+         ziT5kCPZrtTHwHrUK+opiCZKR4X+F67YqvNzw7idfL7oi44yINm+Fdyk9fK7K24OEbjM
+         0+9+zHgQADO+2hTO1A6kylZxQCVKbAcjyvKien5/dwu+goC9Ak8aYoP0MB6aNlVRiF1X
+         Sss4mRtp0GK/Qn4HfViX73uBZClRTFLZZATXDaEBNCsy7IKe0jKDyybGr1CYhm8uplS6
+         EGRcQj/s4U6GBHJdcoJx/wn8uW8p/+pMNA3JHTpCUAyBcKF3FbJ27mmF7xlVda6Zk+gM
+         LoEg==
+X-Forwarded-Encrypted: i=1; AFNElJ//LKOkjQjapyW6LAxu/Cv9QNSgh56nPZc0tApkbY7Vn6ITisUP6mT/ZMe5H9X0jGxCSHdugQ0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx+B8cviquDXzlV1dpZQyFlsCk8esvx90FE4ss950f+OR10mlgJ
+	Clw8ResuJNQtc/StvOl8Cha7GzLd2qF0+8Uh/Dqw2JNDwWTKZidAtOxTNSrcJH7qWyl4fis7812
+	A+pSYAdAJGzv85Jlxk+U9ok7BeEWCDoM=
+X-Gm-Gg: AeBDieumvY7IdBsfwR25azWC/9cDren7T6Y7vGU/Y0b2hMvYefOOWr91yjX+FF+UvUs
+	3kBwj3kGJ6tjR6i502mcd5ksZlTVtrvW9jNMxF5qUN3dlIJ/KeUHkUnXo875BnnhCVriI7oMTyf
+	tUUh8IlizNiNmrQYZqboxl1+tT/f8SjUHmnnCc51tr4S1orjpXqv3QbDeDoRV4R3frAtJENUCEM
+	yeIaMhSkouy9nRXpe74N7ZNJf+xEvggd9JdxXEL2WLJNskTkrck3H8/8A5358ACX9tHnvXNVnDA
+	LCSOnEdDOw6t7S42VJG/ATUGI3mYYw==
+X-Received: by 2002:a05:6512:3c97:b0:5a2:c686:9ccc with SMTP id
+ 2adb3069b0e04-5a3efe95a7fmr7954372e87.43.1776242661492; Wed, 15 Apr 2026
+ 01:44:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-next 1/1] igc: add support for forcing link speed
- without autonegotiation
-To: Simon Horman <horms@kernel.org>, khai.wen.tan@linux.intel.com
-Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, intel-wired-lan@lists.osuosl.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- faizal.abdul.rahim@intel.com, hector.blanco.alcaine@intel.com,
- hong.aun.looi@intel.com, khai.wen.tan@intel.com
-References: <20260409072747.217836-1-khai.wen.tan@linux.intel.com>
- <20260413145215.718532-1-horms@kernel.org>
-Content-Language: en-US
-From: "Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com>
-In-Reply-To: <20260413145215.718532-1-horms@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <cover.1774701288.git.linpu5433@gmail.com> <6584463e576b7bb3619dc302cfecfb8ca56bc86a.1774701288.git.linpu5433@gmail.com>
+In-Reply-To: <6584463e576b7bb3619dc302cfecfb8ca56bc86a.1774701288.git.linpu5433@gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Wed, 15 Apr 2026 16:43:44 +0800
+X-Gm-Features: AQROBzCt2wgsTaaBC9SpVkmhIZQ7-Is_FsZn4GXEUWW-Zwn2cocdtw-dm-HR96E
+Message-ID: <CAL+tcoAy5WQRsL6z=YinPaiBNvd_=WB7qsR4amf1x4=qVw7AAg@mail.gmail.com>
+Subject: Re: [PATCH 1/1] xskmap: reject TX-only AF_XDP sockets
+To: Linpu Yu <linpu5433@gmail.com>
+Cc: magnus.karlsson@intel.com, maciej.fijalkowski@intel.com, 
+	netdev@vger.kernel.org, bpf@vger.kernel.org, sdf@fomichev.me, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	horms@kernel.org, ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
+	john.fastabend@gmail.com, bjorn@kernel.org, linux-kernel@vger.kernel.org, 
+	yuantan098@gmail.com, yifanwucs@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[intel.com:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278716-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-278718-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[intel.com,vger.kernel.org,fomichev.me,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[faizal.abdul.rahim@linux.intel.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[kerneljasonxing@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 1E736402176
+X-Rspamd-Queue-Id: 4D2484021C3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+On Mon, Mar 30, 2026 at 3:33=E2=80=AFAM Linpu Yu <linpu5433@gmail.com> wrot=
+e:
+>
+> Reject TX-only AF_XDP sockets from XSKMAP updates. Redirected
+> packets always enter the Rx path, where the kernel expects the
+> selected socket to have an Rx ring. A TX-only socket can
+> currently be inserted into an XSKMAP, and redirecting a packet
+> to it crashes the kernel in xsk_generic_rcv().
+>
+> Keep TX-only AF_XDP sockets valid for pure Tx use, but prevent
+> them from being published through XSKMAP.
+>
+> Fixes: fbfc504a24f5 ("bpf: introduce new bpf AF_XDP map type BPF_MAP_TYPE=
+_XSKMAP")
+> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+> Reported-by: Yuan Tan <yuantan098@gmail.com>
+> Signed-off-by: Xin Liu <bird@lzu.edu.cn>
+> Signed-off-by: Yifan Wu <yifanwucs@gmail.com>
+> Signed-off-by: Linpu Yu <linpu5433@gmail.com>
 
+Hi Linpu,
 
-On 13/4/2026 10:52 pm, Simon Horman wrote:
-> From: 'Simon Horman' <horms@kernel.org>
-> 
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
-> Full review at: https://sashiko.dev
-> ---
-> igc: add support for forcing link speed without autonegotiation
-> 
-> This commit allows forcing 10/100 Mb/s link speed and duplex settings via
-> ethtool when autonegotiation is disabled. It configures the MAC CTRL and
-> PHY registers to bypass autonegotiation and apply the requested settings.
-> 
->> diff --git a/drivers/net/ethernet/intel/igc/igc_ethtool.c b/drivers/net/ethernet/intel/igc/igc_ethtool.c
->> index 0122009bedd03..e14771532dad8 100644
->> --- a/drivers/net/ethernet/intel/igc/igc_ethtool.c
->> +++ b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-> [ ... ]
->> +static int igc_handle_autoneg_disabled(struct net_device *netdev, u32 speed,
->> +				       u8 duplex)
->> +{
->> +	struct igc_adapter *adapter = netdev_priv(netdev);
->> +	struct igc_mac_info *mac = &adapter->hw.mac;
->> +	enum igc_forced_speed_duplex forced_speed_duplex;
->>   
->> +	switch (speed) {
->> +	case SPEED_10:
->> +		forced_speed_duplex = (duplex == DUPLEX_FULL) ? IGC_FORCED_10F : IGC_FORCED_10H;
->> +		break;
->> +	case SPEED_100:
->> +		forced_speed_duplex = (duplex == DUPLEX_FULL) ? IGC_FORCED_100F : IGC_FORCED_100H;
->> +		break;
-> 
-> Does forcing a half-duplex configuration here also require setting flow
-> control to none (e.g., hw->fc.requested_mode = igc_fc_none)?
-> 
->> diff --git a/drivers/net/ethernet/intel/igc/igc_mac.c b/drivers/net/ethernet/intel/igc/igc_mac.c
->> index 7ac6637f8db73..16b0f2db06896 100644
->> --- a/drivers/net/ethernet/intel/igc/igc_mac.c
->> +++ b/drivers/net/ethernet/intel/igc/igc_mac.c
->> @@ -452,7 +452,7 @@ s32 igc_config_fc_after_link_up(struct igc_hw *hw)
->>   	 * so we had to force link.  In this case, we need to force the
->>   	 * configuration of the MAC to match the "fc" parameter.
->>   	 */
->> -	if (mac->autoneg_failed)
->> +	if (mac->autoneg_failed || !mac->autoneg_enabled)
->>   		ret_val = igc_force_mac_fc(hw);
-> 
-> If mac->autoneg_enabled is false, igc_force_mac_fc() will configure the MAC
-> using the existing hw->fc.current_mode. If current_mode defaults to full flow
-> control, this will enable PAUSE frames.
-> 
-> Since autonegotiation is disabled, the MII status check further down in this
-> same function will fail and return early:
-> 
-> drivers/net/ethernet/intel/igc/igc_mac.c:igc_config_fc_after_link_up() {
->      ...
->      if (!(mii_status_reg & MII_SR_AUTONEG_COMPLETE)) {
->          hw_dbg("Copper PHY and Auto Neg has not completed.\n");
->          goto out;
->      }
->      ...
-> }
-> 
-> This early return skips the half-duplex safety check at the end of
-> igc_config_fc_after_link_up() which would normally clear the flow control
-> settings:
-> 
-> drivers/net/ethernet/intel/igc/igc_mac.c:igc_config_fc_after_link_up() {
->      ...
->      if (duplex == HALF_DUPLEX)
->          hw->fc.current_mode = igc_fc_none;
-> 
->      ret_val = igc_force_mac_fc(hw);
->      ...
-> }
-> 
-> Does this leave the MAC incorrectly configured to send and receive PAUSE
-> frames on a half-duplex link, violating the IEEE 802.3 specification?
+Any plan to post a v2 with our questions resolved?
 
-Hi Simon,
-Thanks for the review.
-
-Yes, you're right, I missed that interaction.
-
-I’ll update the code to also set the following in 
-igc_handle_autoneg_disabled() when forcing half‑duplex:
-hw->fc.requested_mode = igc_fc_none
-
-I’ll test it and, if everything looks good, send out v2.
-
-Thanks again!
-
-
-
+Thanks,
+Jason
 
