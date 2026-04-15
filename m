@@ -1,117 +1,157 @@
-Return-Path: <netdev+bounces-278834-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278835-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kFQuH0+632mOYQAAu9opvQ
-	(envelope-from <netdev+bounces-278834-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 18:18:23 +0200
+	id SIyrAle732mOYQAAu9opvQ
+	(envelope-from <netdev+bounces-278835-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 18:22:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 271C740652D
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 18:18:23 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B4B1406588
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 18:22:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B84A73013D5B
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 16:18:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D5ED33045018
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 16:21:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFFEC3218BA;
-	Wed, 15 Apr 2026 16:18:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45F25351C39;
+	Wed, 15 Apr 2026 16:21:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WEzJjJUv"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="ZERztMOD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC4B73148D9;
-	Wed, 15 Apr 2026 16:18:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68AD134A767;
+	Wed, 15 Apr 2026 16:21:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776269883; cv=none; b=OvIMGa2IbLosK00XVzPAo6zaY4FHeHzJU5jg207jMR//1VPqCvDrctEGuKT57yNpY/IwwcO6I26PsYS/SGgek8accv/BDkSDE1ogKBdWs7A9nS+iouAeyx3BX9phnXxu2lWRGrHADDri4QmHhU1skod6yXt00EtavrIa+1mol+0=
+	t=1776270096; cv=none; b=en3gIfGNbfceFVz4CNBHMd2qQJPfEziYWsGkp50urbCVqCJJaVEJ3T2ItIHwnCrUhHQrMqYOwdPn6TCz2SrB5JlAS37/gG0fbIafieLuUUR2F8rqr9IgyYMg2jo8nEU3u6TZdPT8eEZkr6DNtY7bKegXKIRRUM5Mdl1HUtp7oRI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776269883; c=relaxed/simple;
-	bh=3ws53r2J96HXdLAnlDw3rb6ZAdNe2W1UZpcLfLVfWyc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LU4SqLxFquJm2WYzFYtrmmkioW1XJNrT38grq8XAgm66HimVIlTKSrwm0SbmPMUW6c9uj1RLVP8lB8whl6TlBUdMfRheSU/Mjr/p9L5kfTDteWYEqSor1Uy6dbIqdwIPYMtdMBpf1niIHayKVUHWFVNWm31sqcbD0BeGp6AUkqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WEzJjJUv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43ED4C19424;
-	Wed, 15 Apr 2026 16:18:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776269883;
-	bh=3ws53r2J96HXdLAnlDw3rb6ZAdNe2W1UZpcLfLVfWyc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=WEzJjJUv8ocSJdZlMKQN/SjLu9Yvg9S1dTvODRgMVQdzMyOfLlTPrZtatCaFKC7+M
-	 qrAQn5aqvUXwk2xtpaFrYE6IrGswDH4IJIxdTZWIElncDoWmpMI6OiY/nq3FNPbfOQ
-	 FOfrXh5oFCmWAwBt81cAGdAJ7dzzTMlLXOc1kE4tXue10Oav8IbyHPujPWH7nTFITx
-	 2QbYaux7nIxLgwLQ2cITZm7/jQNhJXYD9ijhRnez+qb7idwKgSSBjQI/p6r0/tMt3s
-	 aaSts8510r4XFx2fqMiDY4go6XyWY9YkBkWxotWsXOAEVT/Vz7BZ/IGfrcwbjoH23C
-	 bF2AL1HPeM+4g==
-Date: Wed, 15 Apr 2026 09:18:00 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Anton Danilov <littlesmilingcloud@gmail.com>
-Cc: Breno Leitao <leitao@debian.org>, netdev@vger.kernel.org,
- willemdebruijn.kernel@gmail.com, davem@davemloft.net, dsahern@kernel.org,
- edumazet@google.com, pabeni@redhat.com, horms@kernel.org, shuah@kernel.org,
- linux-kselftest@vger.kernel.org
-Subject: Re: [RFC PATCH net-next 2/2] selftests: net: add FOU multicast
- encapsulation resubmit test
-Message-ID: <20260415091800.4ee4d744@kernel.org>
-In-Reply-To: <ad9hkJXAnlv2ZUm6@gmail.com>
-References: <ad7MsSJOuUU6EGwS@dau-home-pc>
-	<ad7NhoxmrFJAsXe7@dau-home-pc>
-	<ad9hkJXAnlv2ZUm6@gmail.com>
+	s=arc-20240116; t=1776270096; c=relaxed/simple;
+	bh=nKY2FNElFVAaM0L4ieLyB49PFRaTeWKOhpywzm9fA3o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RrQ0KgwDGtneEAPXxpeDTnbsYxkslaeaRByMattvLKDFivR05qz7EvSJ0wJhx+MeWUz8HLQKhWglOiPNgWYXxFIKy3DsqseF+9tRzBJJxVeXNVRL+J6h+ZTl+FR7cDoI6S2YZJ3dLH9A7gTX57zH8Aldk6aBLdk64xQyW5EzetI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=ZERztMOD; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with UTF8SMTPSA id A4B68600B5;
+	Wed, 15 Apr 2026 18:21:31 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1776270091;
+	bh=X3T8CYcKtn+rhTvs0sJGYEhOtkqxJirQRB4VejoqTE4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ZERztMOD1VYnc5lgHlY9682sI0x7f7U4z8PDJ0wqO28JscZxacxPYJKkTyl1b4LQ0
+	 lOjCsg4xrMRgAzGl2N60196BAkdx2/FDgatUksyHbBAOd0Grm6QMMfRYU343idDioG
+	 UpYf0pJbs7/z5nwwhqGoEojXhyo8u3b+lDK4R+VXdjdE9/HnGSQKnSQ+jC13zP788k
+	 tJHV4G7NPo127jW3gR35+DnaeUhZSK4SINmEIpSl7kIuO2sr/DtkRWtPFvCMa8SY0g
+	 vo6Iwo026C95UH6rt+azD5yGwr+wrQ/NjA15SnRxqqJep8Om85Wx6QHiheRAn+qfKT
+	 ftKgu13eReIug==
+Date: Wed, 15 Apr 2026 18:21:28 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Florian Westphal <fw@strlen.de>
+Cc: "Kito Xu (veritas501)" <hxzene@gmail.com>, phil@nwl.cc,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, jengelh@medozas.de,
+	kaber@trash.net, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] netfilter: xt_realm: fix null-ptr-deref in realm_mt()
+Message-ID: <ad-7CNqWLz23NVVe@chamomile>
+References: <20260415034343.107920-1-hxzene@gmail.com>
+ <ad9UF5Cr12YGJnbi@strlen.de>
+ <ad9aDziQEBR0h3U8@chamomile>
+ <ad9d52dQWrS1H_ju@strlen.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <ad9d52dQWrS1H_ju@strlen.de>
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[debian.org,vger.kernel.org,gmail.com,davemloft.net,kernel.org,google.com,redhat.com];
-	TAGGED_FROM(0.00)[bounces-278834-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[netfilter.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-278835-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[netfilter.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,nwl.cc,davemloft.net,google.com,kernel.org,redhat.com,medozas.de,trash.net,vger.kernel.org,netfilter.org];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 271C740652D
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ozlabs.org:url,netfilter.org:dkim,netfilter.org:email]
+X-Rspamd-Queue-Id: 4B4B1406588
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, 15 Apr 2026 03:25:59 -0700 Breno Leitao wrote:
-> On Wed, Apr 15, 2026 at 02:28:06AM +0300, Anton Danilov wrote:
-> > +send_fou_gre_packets() {
-> > +	local count=$1
-> > +
-> > +	ip netns exec "$NSENDER" python3 -c "  
+On Wed, Apr 15, 2026 at 11:44:07AM +0200, Florian Westphal wrote:
+> Pablo Neira Ayuso <pablo@netfilter.org> wrote:
+> > On Wed, Apr 15, 2026 at 11:02:15AM +0200, Florian Westphal wrote:
+> > > Kito Xu (veritas501) <hxzene@gmail.com> wrote:
+> > > > realm_mt() unconditionally dereferences skb_dst(skb) without a NULL
+> > > > check. The xt_realm match registers with .family = NFPROTO_UNSPEC,
+> > > > making it available to all netfilter protocol families. Through the
+> > > > nftables compat layer (nft_compat), an unprivileged user inside a
+> > > > user/net namespace can load this match into a bridge-family chain.
+> > > 
+> > > I do not think this bug is related to nft_compat.
+> > > You can also use ebtables setsockopt api to request xt_realm, no?
+> > > 
+> > > > Fixes: ab4f21e6fb1c ("netfilter: xtables: use NFPROTO_UNSPEC in more extensions")
+> > > 
+> > > Looks correct.  Alternatively we could revert the xt_realm.c change.
+> > > But I don't have a strong opinion here, patch looks correct.
+> > 
+> > Maybe partial revert makes sense, since in ab4f21e6fb1c:
+> > 
+> > - xt_MARK: OK
+> > - xt_NOTRACK: OK
+> > - xt_comment: OK
 > 
-> Having Python code embedded directly in the shell function makes this
-> difficult to review and maintain. Could you extract the Python script to
-> a separate file? This would simplify the code to just:
+> Agree.
 > 
-> 	ip netns exec "$NSENDER" python3 my_python_script.py
+> > - xt_mac: There is a better way to do this in bridge.
+> 
+> Right.
+> 
+> > - xt_owner, no sockets in bridge.
+> 
+> Output/postrouting maybe?
+> 
+> > - xt_physdev, which makes no sense in bridge, this is for br_netfilter
+> >   only.
+> 
+> Agree.
+> 
+> > - xt_realm (as already mentioned).
+> > That is, a partial revert of this patch for:
+> > 
+> > - xt_mac
+> > - xt_owner
+> > - xt_physdev
+> > - xt_realm
+> 
+> I'm ok with that too.
 
-Or just rewrite the whole thing in Python (no preference)
+For the record, this patch has been replaced by:
+
+https://patchwork.ozlabs.org/project/netfilter-devel/patch/20260415113334.61008-1-pablo@netfilter.org/
 
