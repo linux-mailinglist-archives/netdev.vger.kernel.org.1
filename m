@@ -1,202 +1,201 @@
-Return-Path: <netdev+bounces-278850-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278851-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sIGiF1nN32lwZAAAu9opvQ
-	(envelope-from <netdev+bounces-278850-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 19:39:37 +0200
+	id 6JXTOoDR32kNZQAAu9opvQ
+	(envelope-from <netdev+bounces-278851-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 19:57:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id F140B406DB2
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 19:39:36 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 502F8406EF9
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 19:57:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 5E5B23050573
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 17:39:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 187B23012C75
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 17:53:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C43083E3C5E;
-	Wed, 15 Apr 2026 17:39:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE2D13ED110;
+	Wed, 15 Apr 2026 17:53:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KvNpJEJT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="keLEtq8c"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1ED6314A82;
-	Wed, 15 Apr 2026 17:39:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776274774; cv=none; b=cXuOVk+hPoFuJK2uplairrauGIkdR07WzQz9K+PxeMiPeWQtp4UfoRL+zyP8VOnkeZ9kkbT3FdBRgElR7HIqWlh3jk4Y9VaPZJGkj5zDshyj1/T9thV8vdWFPnVscDODK2SJZoT1WKFk+cgBiftp94hM86F/osNyV4JD6tdNWDk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776274774; c=relaxed/simple;
-	bh=gPGHF3cu/RG4HIb6IsiMrXmvpuVwVLlNLA7KZZAJZV8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hUWzop2pTq1ZFzBOkfUl6hQKfcyiOXs/W8zljI9mUCHlvQsqkU8pTXixDB9Itcik8e7nu740ZgNsPl4A8Qbbldl+XmPzJO97v3AwTP4XfWGWPYs4Dbw6khpya8admKSxbaZ+QJ0XG5lgI7pVmP2b/xuxQZIwCjkCd5KsSOKxagA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KvNpJEJT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 004B1C19424;
-	Wed, 15 Apr 2026 17:39:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776274774;
-	bh=gPGHF3cu/RG4HIb6IsiMrXmvpuVwVLlNLA7KZZAJZV8=;
-	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-	b=KvNpJEJTZzxeF/asC9lOsWr0VJ1wskeSDoV2h1oqRp/5db6vmR7BrvVG0JAtoA6IQ
-	 lq+LvzuKaCZeJ99zWBdaLQ1vO4Lb0Gqu4XXx7hXOEv0YkDwjkaxwxtuvHBi3i0gtLk
-	 LHxK5KUs2mGDZfm801QCIhJgbpa71orsntHgjztcUNS/m4IAC5O+8IG7Crckij9M7N
-	 AzdrLbcI3LKsRwK/dfCV8nvw7Fz78fy2FSySWe/SgA3jfoJtlghab5SAifpiPn33Br
-	 lesJNG/6BtmsymgG52TBzAgxJ8vv1oogI3Cpyy3gHPh1sgjaPHFwJa3Ywe6kpzAYuJ
-	 YkNdGG0aedeEw==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-	id 93032CE0781; Wed, 15 Apr 2026 10:39:33 -0700 (PDT)
-Date: Wed, 15 Apr 2026 10:39:33 -0700
-From: "Paul E. McKenney" <paulmck@kernel.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
-	netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
-	edumazet@google.com, fw@strlen.de, horms@kernel.org,
-	joelagnelf@nvidia.com, josh@joshtriplett.org, boqun@kernel.org,
-	urezki@gmail.com, rostedt@goodmis.org,
-	mathieu.desnoyers@efficios.com, jiangshanlai@gmail.com,
-	qiang.zhang@linux.dev, rcu@vger.kernel.org
-Subject: Re: [PATCH nf,v2 1/3] rculist: add list_splice_rcu() for private
- lists
-Message-ID: <9210a276-8158-40f4-b3b5-6431f5f13541@paulmck-laptop>
-Reply-To: paulmck@kernel.org
-References: <20260415170844.41355-1-pablo@netfilter.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A42B53ECBDC
+	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 17:53:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776275611; cv=pass; b=HS75bXJKd+q8tDucItTCsZcOrcJcMuYXXx8uHDzpBcbqZ6+YYutRpeyCM7QScqO/IWUQqKLOvMFwu8M9ZHAstUhBb+79LayXttc2cswSVrs+aBxzCf/i9Btatu8eW3Ot3meeDtez3fk8X2JSwD7aA3ffwt1znsliAibLQAMOWc8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776275611; c=relaxed/simple;
+	bh=F3dLbPszutyYqEbfKeX1nNL7G18PjJB7QbuhqCEdFpM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OLMwGx6Pdq81zAXC7QA4EBV84Bc8N9CVBYOSQODmfe8mOoCqoSzMQGlxpE4dvIVrXhdrG5YQ9WAQ9ne1dz/zoej7lUZBO4xSup9QiqfaUb5p/jdsOs8NBwXxjLDO4smd/OmJ/cjb3Ki/vGNQdfIQRnpwrmMoHKrjp/PiHqwM1Yc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=keLEtq8c; arc=pass smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-488971db0fdso70400435e9.0
+        for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 10:53:28 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776275607; cv=none;
+        d=google.com; s=arc-20240605;
+        b=ScqhUPlwlgzSKH36QMFwvTDTaqvlm/gkOyptID7Bm9xiAEfrcTHWLUZE7yVAOmUGca
+         LRl0cPomYVUmc/BEPUQP76K+wMVGhr6zHXduj7zNfSf0n1beiY8+PGm4n5cNnbqFuYHy
+         zoABg9lTAd064CjYmmKDd3xBaaFuhT6LOiaYN/qMccB/w0a9SDi7Hqd4vFnSqHNXVkd6
+         cX2o+zglp0Pd+vJDC1jV1PPyJDMB1Kjrj5LfIyhvigWPfERkrIiHxARzNlMY/Fx7R75H
+         r+U+L2UGKJiqT4EbycrKIzXCFZ4collvrtpg3E3YgNy1VL3sPQXKr0kQKpaa9ULcOZXo
+         zwcw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=vXTyVOg75691/SqrnwQ0Y7XVqOHRVyrJmHlOD7bYftw=;
+        fh=1fk0ycNkBomTK7sIaDopbt2nk7sqeT9p6XxZfF6Pyg4=;
+        b=e1NLp9GlU5aJ1LJH4RzWmf6w5MuWrDouGGRO4POBh0jsN+e3fUEL30MvbwNXDyz+/e
+         nYEKya5mBzf1I70mDZZEefFcw22YSANjcqGxBh5zoMg7vBEqwkFIcLYGBlmnzZblczrN
+         3xsLz0yyb9gPTzH0JAa4H9BHS9rcUYK/hIk3rLdndy6hUgm7Gxsm/RTjS70SL9C9sONN
+         mnAqzGz1Ui6adzszbCoM9F1EeXX0l1Egq5U9YDTlum3rHCb4RG8tc2yp2GP/GgPwh0Hd
+         oFl2xGUutb6O/R7bzlVj/LQgZveWhBMd4Cb5urDJOHOhTQIjYn8ZAVrQzYoa7x/aKd3j
+         a6fg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776275607; x=1776880407; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vXTyVOg75691/SqrnwQ0Y7XVqOHRVyrJmHlOD7bYftw=;
+        b=keLEtq8cKNDrI1OenQnTJxsVjrhNmZrzEBbGQg/MiNExeOqyxKL3EAw4hSufEn6mBg
+         2T/1dMYRe0JOmIKTour08V2/lljI51Q3pkGNkw6OLrXVjdEQnZ2+20jldu7bl5+OKJeo
+         c1f0segxZ48fBi4Y7p9bZFHY4IdWqcoS9LT7Ax3r1LsrFIjxik/8rPwbamfwiWEuhLUp
+         wBTOopxE4joUfMbaSww+nNhqf2JL8jXnAY5gJE3HXp0y3oQtOiWGUBIjJo/DoJ38TZ4Q
+         wNF2WRvcVlV0yTpqfc3YLgTDs14iEtIQlMwY+w45O2wjKU0eGneh/b9QXmXT9havLsqf
+         eLFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776275607; x=1776880407;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=vXTyVOg75691/SqrnwQ0Y7XVqOHRVyrJmHlOD7bYftw=;
+        b=AraJo/lcBqC7RofVAb9uqItJ/tyGlvY1/1vvRS4gPVa+LzCLEy1msEWwuSORk+zQuL
+         iRAGdtyCLIKALiZ6egEWOJhHiOJEJkWkpZTCvRJZNydnlM8kV64IrVBQ+ReB9/XZ+Rq4
+         BgqlFMKWv+pUH9H6nVHg7lCwjzlu0g0IBXA74yGIG1GBC7RmOUPSVlM87AbaoRwjmuyd
+         3gPzZqMFBxL09yAETSz6Sk0hUnmJooYCtTljLgmZ+1XTx3ETxacNkqH3UczEkzPl//vV
+         qTPiguPUdyV2e2OBsmIAfxzZnyaHamZz3yT+xgg6DxuoKtWNAPfQ2ptlEnjG+uUyNnuJ
+         SU8g==
+X-Forwarded-Encrypted: i=1; AFNElJ8OHwQb4ZMAXLjKGvzoFm3KqoDKnbM2u65WLF2QH+t6Q3Tk38lWGV3sJSwJU0/i+GnPIvENK1c=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx+TTKG44OguPf3G351ioKlcao1eSy/6sJ8jV2dQDe1odL8CwfA
+	x0YT2iFRWhZWyh93hNGZZ7HnmVYsVU9nrRqvB9fQhFW+AC7Te7Ycl5QfF2IF/vaxujJYHfcKhlF
+	+q/XMTJFJUSIp6+ouK4C6iGNi/DVtzaY=
+X-Gm-Gg: AeBDievtXMAITsiIBDPYz/td5MFXuwcThj3aTcZBR0lKeOK43s9dsjOiy2ENLaFgDL6
+	Wr+ayx7hyFuq96bSLjZ0ZIg/fEVHlWKWRqzIIwizu273mJtLkF80vZ7421N0uvtY3ghjdyE9Tiq
+	YPe02ndAtrIFgE5oi5hNGDlOl6YiVdg5Lj8ZhlXdJq3hHWGcSJTvvLuzJ8Zmg9+HZZHSN+5T1j3
+	96w1qpH7uzzQM5CmSiqk+zeLfz8ARRqGrfzoZiAbOZ1xIxZeBDLWFZqyn5j1ijM2W4lp9CWrJno
+	v+Zh49fid9MV3xrXJ+ybuBmzPbbNWfsBk2Sj8dV7ObTnzghVJ4qqNXTKAx70pQ==
+X-Received: by 2002:a05:600c:5d4:b0:488:d6eb:e63c with SMTP id
+ 5b1f17b1804b1-488d6ebe787mr187773555e9.15.1776275606586; Wed, 15 Apr 2026
+ 10:53:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260415170844.41355-1-pablo@netfilter.org>
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+References: <20260415023947.7627-1-CFSworks@gmail.com> <ad-LAB08-_rpmMzK@shell.armlinux.org.uk>
+ <ad-8q4OrOm-VtGrO@shell.armlinux.org.uk>
+In-Reply-To: <ad-8q4OrOm-VtGrO@shell.armlinux.org.uk>
+From: Sam Edwards <cfsworks@gmail.com>
+Date: Wed, 15 Apr 2026 10:53:15 -0700
+X-Gm-Features: AQROBzDx1d-IgIRVj7cWC6Z49XonSYVLruilzmwd4JOrF6rh0MceXKBVK6meuRA
+Message-ID: <CAH5Ym4gy6g8d88-vGhe1zxoV7jNH_fXHsDSdDWC4x00H7s-3=w@mail.gmail.com>
+Subject: Re: [PATCH net v5] net: stmmac: Prevent NULL deref when RX memory exhausted
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Maxime Chevallier <maxime.chevallier@bootlin.com>, 
+	Ovidiu Panait <ovidiu.panait.rb@renesas.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, 
+	Baruch Siach <baruch@tkos.co.il>, Serge Semin <fancer.lancer@gmail.com>, 
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>, netdev@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-278850-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-278851-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,kernel.org,redhat.com,google.com,strlen.de,nvidia.com,joshtriplett.org,gmail.com,goodmis.org,efficios.com,linux.dev];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,bootlin.com,renesas.com,nxp.com,tkos.co.il,st.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[paulmck@kernel.org,netdev@vger.kernel.org];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[cfsworks@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	HAS_REPLYTO(0.00)[paulmck@kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,netfilter.org:email]
-X-Rspamd-Queue-Id: F140B406DB2
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,armlinux.org.uk:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 502F8406EF9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Apr 15, 2026 at 07:08:44PM +0200, Pablo Neira Ayuso wrote:
-> This patch adds a helper function, list_splice_rcu(), to safely splice
-> a private (non-RCU-protected) list into an RCU-protected list.
-> 
-> The function ensures that only the pointer visible to RCU readers
-> (prev->next) is updated using rcu_assign_pointer(), while the rest of
-> the list manipulations are performed with regular assignments, as the
-> source list is private and not visible to concurrent RCU readers.
-> 
-> This is useful for moving elements from a private list into a global
-> RCU-protected list, ensuring safe publication for RCU readers.
-> Subsystems with some sort of batching mechanism from userspace can
-> benefit from this new function.
-> 
-> The function __list_splice_rcu() has been added for clarity and to
-> follow the same pattern as in the existing list_splice*() interfaces,
-> where there is a check to ensure that that the list to splice is not
-> empty. Note that __list_splice_rcu() has no documentation for this
-> reason.
-> 
-> Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
-> ---
-> v2: including comments by Paul McKenney.
-> 
->     Except, I have deliberately keep back the suggestion to squash
->     __list_splice_rcu() into list_splice_rcu(), I instead removed
->     the documentation for __list_splice_rcu(). I am looking
->     at other existing list_splice*() function in list.h and rculist.h
->     to get this aligned with __list_splice(), which also has no users
->     in the tree and no documentation. I find it easier to read with
->     __list_splice(), but if this explaination is not sound so...
-> 
->     @Paul: I can post v3 squashing __list_splice_rcu(), just let me
->            know.
+On Wed, Apr 15, 2026 at 9:28=E2=80=AFAM Russell King (Oracle)
+<linux@armlinux.org.uk> wrote:
+>
+> On Wed, Apr 15, 2026 at 01:56:32PM +0100, Russell King (Oracle) wrote:
+> > Locally, while debugging my issues, I used this to prevent cur_rx
+> > catching up with dirty_rx:
+> >
+> >                 status =3D stmmac_rx_status(priv, &priv->xstats, p);
+> >                 /* check if managed by the DMA otherwise go ahead */
+> >                 if (unlikely(status & dma_own))
+> >                         break;
+> >
+> >                 next_entry =3D STMMAC_NEXT_ENTRY(rx_q->cur_rx,
+> >                                                priv->dma_conf.dma_rx_si=
+ze);
+> >                 if (unlikely(next_entry =3D=3D rx_q->dirty_rx))
+> >                         break;
+> >
+> >                 rx_q->cur_rx =3D next_entry;
+> >
+> > If we care about the cost of reloading rx_q->dirty_rx on every
+> > iteration, then I'd suggest that the cost we already incur reading and
+> > writing rx_q->cur_rx is something that should be addressed, and
+> > eliminating that would counter the cost of reading rx_q->dirty_rx. I
+> > suspect, however, that the cost is minimal, as cur_tx and dirty_rx are
+> > likely in the same cache line.
 
-Removing the comment addresses most of my concerns.  I do have a slight
-but not overwhelming preference for the squashed version, but either way:
+No, no, I like your approach better. :) It also removes the need for
+the `limit` clamp at the top of the function, so later code can assume
+limit=3D=3Dbudget.
 
-Reviewed-by: Paul E. McKenney <paulmck@kernel.org>
+> > It looks like any fix to stmmac_rx() will also need a corresponding
+> > fix for stmmac_rx_zc().
 
-Or if you want this to go in via RCU, please let us know.  My guess is
-that it would be easier for you to take it in with the code using it.
+I agree that stmmac_rx_zc() is likely also broken (in a similar way,
+but not similar enough to permit a "corresponding" fix), but I don't
+agree that there's a dependency relationship here. This patch is
+addressing #221010, which affects the generic/non-ZC codepath; I'm
+afraid the ZC codepath warrants its own investigation.
 
-							Thanx, Paul
+> I have some further information, but a new curveball has just been
+> chucked... and I've no idea what this will mean at this stage. Just
+> take it that I won't be responding for a while.
 
->     Thanks!
-> 
->  include/linux/rculist.h | 29 +++++++++++++++++++++++++++++
->  1 file changed, 29 insertions(+)
-> 
-> diff --git a/include/linux/rculist.h b/include/linux/rculist.h
-> index 2abba7552605..e3bc44225692 100644
-> --- a/include/linux/rculist.h
-> +++ b/include/linux/rculist.h
-> @@ -261,6 +261,35 @@ static inline void list_replace_rcu(struct list_head *old,
->  	old->prev = LIST_POISON2;
->  }
->  
-> +static inline void __list_splice_rcu(struct list_head *list,
-> +				     struct list_head *prev,
-> +				     struct list_head *next)
-> +{
-> +	struct list_head *first = list->next;
-> +	struct list_head *last = list->prev;
-> +
-> +	last->next = next;
-> +	first->prev = prev;
-> +	next->prev = last;
-> +	rcu_assign_pointer(list_next_rcu(prev), first);
-> +}
-> +
-> +/**
-> + * list_splice_rcu - splice a non-RCU list into an RCU-protected list,
-> + *                   designed for stacks.
-> + * @list:	the non RCU-protected list to splice
-> + * @head:	the place in the existing RCU-protected list to splice
-> + *
-> + * The list pointed to by @head can be RCU-read traversed concurrently with
-> + * this function.
-> + */
-> +static inline void list_splice_rcu(struct list_head *list,
-> +				   struct list_head *head)
-> +{
-> +	if (!list_empty(list))
-> +		__list_splice_rcu(list, head, head->next);
-> +}
-> +
->  /**
->   * __list_splice_init_rcu - join an RCU-protected list into an existing list.
->   * @list:	the RCU-protected list to splice
-> -- 
-> 2.47.3
-> 
-> 
+I think I follow your meaning. Good luck getting it straightened out!
 
