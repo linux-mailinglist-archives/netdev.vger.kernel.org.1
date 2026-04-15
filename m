@@ -1,166 +1,227 @@
-Return-Path: <netdev+bounces-278787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278788-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aDoSGTid32kEWwAAu9opvQ
-	(envelope-from <netdev+bounces-278787-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 16:14:16 +0200
+	id 2MEQMlWd32kEWwAAu9opvQ
+	(envelope-from <netdev+bounces-278788-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 16:14:45 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA93D4052FA
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 16:14:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 219A8405302
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 16:14:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 57D4B3008A4E
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 14:11:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4EE0B303467A
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 14:11:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD9C03CAE68;
-	Wed, 15 Apr 2026 14:10:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D86563CAE68;
+	Wed, 15 Apr 2026 14:11:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LMBXtaMn"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="rG6ak423"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABD233B2FFF
-	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 14:10:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D0A23B2FFF
+	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 14:11:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776262259; cv=none; b=Z/zskw3qxw4kJJRjxUHSH4+hOdeU6+YlGetdzmIGwvAUHo53ZRM3ti4pUoAU/2DO+Gpvcp9nT4GTjkCDPXt2viNWGU0gfxu0ujfswjNWfv/yN1Kq1HTmCEYTLc6tJQFsNp6PIJxQFy03mR+KJ4+AWF3porwvwZY/tvn1frnRk6Y=
+	t=1776262265; cv=none; b=jM4X7v8b0HlHN/FkrKdS8Wb7BdLiiDr8mtfUeitBGOcFVygQOZ+kLecdOPhHrvCpvahoHcsKkjsPOZZtNRqc1D+TLaLy6yhtX7SAmYEML/LpNC03d7lqjdMa2y3Q9NG+NeP9Qek7NTNtAgx/y5GEdeYoP6plGc0g7QDP0vE9JJE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776262259; c=relaxed/simple;
-	bh=sjBRVDAsmAulNnV9BDsC6LoztIdR2DPuHoBI+7DM6j8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fP+FbdnXIOxU46Evu5UKw00NYcCkbqbXz3hcCf90hSNXuaj/DUPGTdGCTFPzXQE41uAjw3GLRZtD/N3NJNC/eUOGPwWRnj9P6rmQ+WVqzTexY6wdAjH6sXzeWuCG28nav9BrUXB34t321+fuyDS034n4HcuSRozc4VjqVlYuyzE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LMBXtaMn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1DC9FC2BCB3;
-	Wed, 15 Apr 2026 14:10:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776262259;
-	bh=sjBRVDAsmAulNnV9BDsC6LoztIdR2DPuHoBI+7DM6j8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=LMBXtaMn58FoSThQH457XP4dSv2JaQ9S632C6UXa09cZSurQxfaz+AvzbkQ7pYL+k
-	 QLJqwt19xlxQF4XI4y2tvyLGez30+QgB2hSxMX9/mR7QkUsrD29MavK3YhSKVFJRTb
-	 anuJTcpZeGYvgeSGJThGY24YO0PQ6KKiEyGFI+6vTfpAeJ7hY8MGNYs27UBT9IUCGX
-	 25LW3+h2d2nTwObn1NUPBddyBKWQ9qk4VyRyxrhBKLRYb4EQ9hpOG5rIIIcxQEmn3I
-	 jyiVGMnOofF0CfQJS1e2YEoKraSQ9EhJBos8LmSDtNl272RaVf+4kW5H8DxkGBYyyC
-	 unncmVBxp+WAw==
-From: Simon Horman <horms@kernel.org>
-To: phx0fer@gmail.com
-Cc: Simon Horman <horms@kernel.org>,
-	jiri@resnulli.us,
-	netdev@vger.kernel.org,
-	jhs@mojatatu.com
-Subject: Re: [PATCH] net/sched: act_ct: fix skb leak on fragment check failure
-Date: Wed, 15 Apr 2026 15:10:26 +0100
-Message-ID: <20260415141027.807275-1-horms@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260413084609.69560-1-phx0fer@gmail.com>
-References: <20260413084609.69560-1-phx0fer@gmail.com>
+	s=arc-20240116; t=1776262265; c=relaxed/simple;
+	bh=dpNeQ/TZ4v1JJrvvtGriqAAFjmhLydaQoUtYG18Wc28=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Dlvh55dWPguv3iEFZWCRJAdRalvAUpaaEGAqCUx1lI7hFcmQCuYa1XVereECr0+PKq3oo1h0Hxj0wmd3FeRZ76CBCHRKckj1drNpL1Amy0BjaLtxc/VRcbZkukVtz1r1W7TJlXLMn7YOlRcze/02Xvou4GYfc/KfsQYiIFbjxxQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=rG6ak423; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=+/LZqKR+uWHCsrNRniyAouEniFyPlNCQMgEazTxDHns=; b=rG6ak423QutmjSzjUrB0bms13f
+	2aEidTwq1gaK0EZ1HNglPQftLS5Kl0NS4teSYtu65RGZW6GzObvW6OsLQRfYew4bCVPBS1EDV4PHr
+	3vcm/oFevLzcOzhddUnhEOE3uB5tkIxTKbMb6XH+bMYWZPsM42MdlZrY47/o2eYHC7Y0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wD0xD-00GB5X-UG; Wed, 15 Apr 2026 16:10:55 +0200
+Date: Wed, 15 Apr 2026 16:10:55 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Junyang Han <han.junyang@zte.com.cn>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, andrew+netdev@lunn.ch,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	ran.ming@zte.com.cn, han.chengfei@zte.com.cn,
+	zhang.yanze@zte.com.cn
+Subject: Re: [PATCH net-next 1/3] net/ethernet: add ZTE network driver support
+Message-ID: <7cadad17-f3e7-45c7-9a3c-505f0bd9351c@lunn.ch>
+References: <20260415015334.2018453-1-han.junyang@zte.com.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260415015334.2018453-1-han.junyang@zte.com.cn>
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278787-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-278788-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:url]
-X-Rspamd-Queue-Id: AA93D4052FA
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:dkim,lunn.ch:mid]
+X-Rspamd-Queue-Id: 219A8405302
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+On Wed, Apr 15, 2026 at 09:53:32AM +0800, Junyang Han wrote:
+> Add basic framework for ZTE DingHai ethernet PF driver, including
+> Kconfig/Makefile build support and PCIe device probe/remove skeleton.
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+Please take a read on
+
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+
+and
+
+https://docs.kernel.org/process/submitting-patches.html
+
+Please always include a patch 0/X in a patch set, explaining the big
+picture.
+
+Thanks for keeping the driver small and easy to review.
+
+> + * ZTE DingHai Ethernet driver
+> + * Copyright (c) 2022-2024, ZTE Corporation.
+
+And the last two years?
+
+> +#define DRV_VERSION "1.0-1"
+
+Driver versions are generally useless. What does this actually mean
+for the given very limited driver? Are you going to change the version
+with each patchset?
+
+> +#define DRV_SUMMARY "ZTE(R) zxdh-net driver"
+> +
+> +const char zxdh_pf_driver_version[] = DRV_VERSION;
+> +static const char zxdh_pf_driver_string[] = DRV_SUMMARY;
+> +static const char zxdh_pf_copyright[] = "Copyright (c)
+>  2022-2024, ZTE Corporation.";
+
+You don't need this, you have the copyright above.
+
+> +MODULE_AUTHOR("ZTE");
+
+Author is a person, with an email address.
+
+> +MODULE_DESCRIPTION(DRV_SUMMARY);
+
+Please just put the string here, not #define.
+
+> +MODULE_VERSION(DRV_VERSION);
+> +MODULE_LICENSE("GPL");
+> +static int dh_pf_pci_init(struct dh_core_dev *dev)
+> +{
+> +    int ret = 0;
+> +    struct zxdh_pf_device *pf_dev = NULL;
+
+Reverse Christmas tree. This applies everywhere for a netdev driver.
+
+> +static int dh_pf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+> +{
+
+> +err_cfg_init:
+> +    mutex_destroy(&pf_dev->irq_lock);
+> +    mutex_destroy(&dh_dev->lock);
+> +    devlink_free(devlink);
+> +    pf_dev = NULL;
+
+Since this is a probe function, do you really need to set pf_dev to
+NULL? How is it going to keep a value over EPROBE_DEFER cycles?
+
+> +static void dh_pf_remove(struct pci_dev *pdev)
+> +{
+> +    struct dh_core_dev *dh_dev = pci_get_drvdata(pdev);
+> +    struct devlink *devlink = priv_to_devlink(dh_dev);
+> +    struct zxdh_pf_device *pf_dev = dh_core_priv(dh_dev);
+> +
+> +    if (!dh_dev)
+> +        return;
+
+How does that happen?
+
+> +    dh_pf_pci_close(dh_dev);
+> +    mutex_destroy(&pf_dev->irq_lock);
+> +    mutex_destroy(&dh_dev->lock);
+> +    devlink_free(devlink);
+> +    pci_set_drvdata(pdev, NULL);
+> +}
+
+> +static int dh_pf_suspend(struct pci_dev *pdev, pm_message_t state)
+> +{
+> +    return 0;
+> +}
+> +
+> +static int dh_pf_resume(struct pci_dev *pdev)
+> +{
+> +    return 0;
+> +}
+
+If they do nothing, don't provide them. You can add them when you add
+suspend/resume support.
+
+> +static int __init dh_pf_pci_init_module(void)
+> +{
+> +    return pci_register_driver(&dh_pf_driver);
+> +}
+> +
+> +static void __exit dh_pf_pci_exit_module(void)
+> +{
+> +    pci_unregister_driver(&dh_pf_driver);
+> +}
+> +
+> +module_init(dh_pf_pci_init_module);
+> +module_exit(dh_pf_pci_exit_module);
+
+The PCI subsystem offers a wrapper to do this.
+
+> +struct dh_core_dev {
+> +    struct device *device;
+> +    enum dh_coredev_type coredev_type;
+> +    struct pci_dev *pdev;
+> +    struct devlink *devlink;
+> +    struct mutex lock; /* Protects device configuration */
+> +    char priv[] __aligned(32);
+
+That is unusual. priv is usually a void * and allocated. If you want
+an actual array, you might want to have a second member indicate the
+size of the array, look at all the work done recently on flexible
+arrays.
+	
+    Andrew
+
 ---
-net/sched: act_ct: fix skb leak on fragment check failure
-
-This commit fixes a socket buffer leak in the act_ct traffic control action.
-When tcf_ct_handle_fragments() encounters malformed fragments and returns an
-error, the skb was not being freed, leading to memory exhaustion under
-sustained traffic. The fix changes the return value to TC_ACT_SHOT to ensure
-proper cleanup.
-
-> net/sched: act_ct: fix skb leak on fragment check failure
->
-> tcf_ct_handle_fragments() returns TC_ACT_CONSUMED when
-> tcf_ct_ipv4/6_is_fragment() fails. This causes the caller to
-
-The commit message contains a technical inaccuracy. It states
-'tcf_ct_handle_fragments() returns TC_ACT_CONSUMED when
-tcf_ct_ipv4/6_is_fragment() fails', but tcf_ct_handle_fragments() returns
-integer error codes (like -EINVAL, -ENOMEM, -EPROTO), not TC action codes.
-
-The function that returns TC_ACT_CONSUMED is tcf_ct_act(), which interprets
-the error codes from tcf_ct_handle_fragments(). The code fix itself is
-correct - only the commit message attribution is wrong.
-
-More accurate would be: 'tcf_ct_act() returns TC_ACT_CONSUMED when
-tcf_ct_handle_fragments() fails'.
-
-> believe the skb was consumed, but it was not freed. Each
-> malformed fragment leaks one skb, leading to OOM DoS under
-> sustained traffic.
->
-> Change the return value to TC_ACT_SHOT so the skb is properly
-> freed by the caller.
->
-> Fixes: b57dc7c13ea9 ("net/sched: Introduce action ct")
-
-The existing Fixes: tag points to commit b57dc7c13ea9 ("net/sched: Introduce
-action ct"), but the bug was actually introduced by commit 3f14b377d01d
-("net/sched: act_ct: fix skb leak and crash on ooo frags").
-
-The original commit b57dc7c13ea9 had correct error handling where fragment
-check failures went to the 'drop' label. Commit 3f14b377d01d introduced the
-'out_frag' label that always returns TC_ACT_CONSUMED, causing the skb leak
-when fragment checks fail with errors other than -EINPROGRESS.
-
-Suggested: Fixes: 3f14b377d01d ("net/sched: act_ct: fix skb leak and crash on ooo frags")
-
-> Signed-off-by: Dudu Lu <phx0fer@gmail.com>
->
-> diff --git a/net/sched/act_ct.c b/net/sched/act_ct.c
-> index 7d5e50c921a0..870655f682bd 100644
-> --- a/net/sched/act_ct.c
-> +++ b/net/sched/act_ct.c
-> @@ -1107,8 +1107,10 @@ TC_INDIRECT_SCOPE int tcf_ct_act(struct sk_buff *skb, const struct tc_action *a,
->  	return retval;
->
->  out_frag:
-> -	if (err != -EINPROGRESS)
-> +	if (err != -EINPROGRESS) {
->  		tcf_action_inc_drop_qstats(&c->common);
-> +		return TC_ACT_SHOT;
-> +	}
->  	return TC_ACT_CONSUMED;
->
->  drop:
+pw-bot: cr
 
