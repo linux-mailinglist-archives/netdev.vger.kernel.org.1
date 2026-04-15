@@ -1,168 +1,265 @@
-Return-Path: <netdev+bounces-278861-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278862-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gKU+GYvg32kzZwAAu9opvQ
-	(envelope-from <netdev+bounces-278861-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 21:01:31 +0200
+	id 2CSGOxzi32kzZwAAu9opvQ
+	(envelope-from <netdev+bounces-278862-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 21:08:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB06A407418
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 21:01:30 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47AA7407494
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 21:08:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 34DD2315F674
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 18:55:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 16A943013250
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 19:05:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44C09384246;
-	Wed, 15 Apr 2026 18:55:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fzYxV+y4"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1042A383C9E;
+	Wed, 15 Apr 2026 19:05:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFFD0367F3C;
-	Wed, 15 Apr 2026 18:55:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E436F40DFA7;
+	Wed, 15 Apr 2026 19:05:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776279358; cv=none; b=e6PFUD5FARqF9aY+jaPBLUl6JD7tuU1qkz6QIp8iAZmP6VOKGE9kZaS+R9RkMw0a7O4v/ZMjliiGtx2LlTIymsixeuHpItldyPjIwLvUySO6uIZZs98s5eUis0Ezgbt/wXZwFb+9sxt3+0C+qnCAvRd8cHtUFzdVWytqCr42sPY=
+	t=1776279901; cv=none; b=PuWJiUzU2RLbNxPhxMflgZPnngrTiYvC/uYfZhLRdTLZIHN2usCNrKFvbrAUGO+vP61qhkSIuHzfNci1SCkB1CnI8+b+DcFfeTMkv9EWTbLYL27sWwRy8kyzCdeW+yKXgrtaTBGiiC11ujejURwU7wYfFmVjqSkZF6mTeRhefG8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776279358; c=relaxed/simple;
-	bh=d7HDCHlfPHMSEJBcmaZKe18Vvx67Ei5xQjkmXpACwf4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=crbNK+L3QovsmdvoNb922HSUhdL8h2RC+0w2scRaCd9IMP6tu+F/TcCz2sehTuvXyUR1214dHvM5jMKNfyt6GwfWNk1McIVb8rEH5Y2WOMaB49hqmcbcM3c8ShKV/y+qhZ0qkKy6S6YejdcQe1S1XNhlD8dz8mDCwvP6bA8ehLY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fzYxV+y4; arc=none smtp.client-ip=95.215.58.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Wed, 15 Apr 2026 11:55:21 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1776279353;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tHMuDGDqeRqZTISBkfQrfUInooZ5oSER0Tkzkf4P5Pc=;
-	b=fzYxV+y4RadUsTRwF1/2GBnbPHyGieoAH0rO8okhzSU0soXIw0qYxW0SKH4lR7diZRFZ1I
-	LNshEC6Duel7JiG/WFrETZLnE1c9HKSUadudH5h9zwfDJ8yuDLcwevEJTNaqljtoQ+LYIN
-	zu4NFl3fFmX3s6RsryakztldT+J1+XA=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-To: Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: bpf@vger.kernel.org, Quan Sun <2022090917019@std.uestc.edu.cn>, 
-	Yinhao Hu <dddddd@hust.edu.cn>, Kaiyan Mei <M202472210@hust.edu.cn>, 
-	Dongliang Mu <dzm91@hust.edu.cn>, Eric Dumazet <edumazet@google.com>, 
-	Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, 
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, David Ahern <dsahern@kernel.org>, 
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH bpf] bpf,tcp: avoid infinite recursion in
- BPF_SOCK_OPS_HDR_OPT_LEN_CB
-Message-ID: <2026415181939.1bue.martin.lau@linux.dev>
-References: <20260414105702.248310-1-jiayuan.chen@linux.dev>
+	s=arc-20240116; t=1776279901; c=relaxed/simple;
+	bh=gVVPxbvdn0cCwIIKCjiY3NHeFS6oYMS7bCJlpf9Xv8w=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=VXdoIV1VUoyT3A5R93CmHO+BzNgNVIuL9v0V7YIWg6fw8EjagTiMT+18hYBdBqjjESLUFRYwHFJxmLQbox0lQzyLF2+TJ/kaF0r1e4gP0vkRlCkED6+B/KR5aRBepIFOUS4L8zCnnHZ6xlg/G2yvM0sweNapponqYIfhaQ5/YH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F9FDC19424;
+	Wed, 15 Apr 2026 19:04:56 +0000 (UTC)
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+To: jiri@resnulli.us
+Cc: andrew+netdev@lunn.ch,
+	chuck.lever@oracle.com,
+	cjubran@nvidia.com,
+	corbet@lwn.net,
+	daniel.zahka@gmail.com,
+	davem@davemloft.net,
+	donald.hunter@gmail.com,
+	edumazet@google.com,
+	horms@kernel.org,
+	kuba@kernel.org,
+	leon@kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org,
+	mathieu.desnoyers@efficios.com,
+	matttbe@kernel.org,
+	mbloch@nvidia.com,
+	mhiramat@kernel.org,
+	mschmidt@redhat.com,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	przemyslaw.kitszel@intel.com,
+	rostedt@goodmis.org,
+	saeedm@nvidia.com,
+	skhan@linuxfoundation.org,
+	tariqt@nvidia.com,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v4 04/13] devlink: allow to use devlink index as a command handle
+Date: Wed, 15 Apr 2026 21:04:54 +0200
+Message-ID: <20260415190454.2632348-1-geert@linux-m68k.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260312100407.551173-5-jiri@resnulli.us>
+References: <20260312100407.551173-5-jiri@resnulli.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260414105702.248310-1-jiayuan.chen@linux.dev>
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [5.84 / 15.00];
-	SEM_URIBL(3.50)[uestc.edu.cn:email];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [1.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
-	BAD_REP_POLICIES(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278861-lists,netdev=lfdr.de];
-	R_DKIM_ALLOW(0.00)[linux.dev:s=key1];
-	RCVD_COUNT_THREE(0.00)[3];
-	GREYLIST(0.00)[pass,body];
-	RCPT_COUNT_TWELVE(0.00)[30];
-	FREEMAIL_CC(0.00)[vger.kernel.org,std.uestc.edu.cn,hust.edu.cn,google.com,davemloft.net,kernel.org,redhat.com,lwn.net,linuxfoundation.org,iogearbox.net,gmail.com,linux.dev,fomichev.me];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-278862-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[linux-m68k.org];
+	TO_DN_NONE(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	TO_DN_SOME(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	R_SPF_ALLOW(0.00)[+ip4:172.234.253.10:c];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[martin.lau@linux.dev,netdev@vger.kernel.org];
-	DMARC_POLICY_ALLOW(0.00)[linux.dev,none];
-	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[lunn.ch,oracle.com,nvidia.com,lwn.net,gmail.com,davemloft.net,google.com,kernel.org,vger.kernel.org,efficios.com,redhat.com,intel.com,goodmis.org,linuxfoundation.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_SPAM(0.00)[0.811];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:dkim,linux.dev:mid,uestc.edu.cn:email,hust.edu.cn:email]
-X-Rspamd-Queue-Id: AB06A407418
+	PRECEDENCE_BULK(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.969];
+	FROM_NEQ_ENVFROM(0.00)[geert@linux-m68k.org,netdev@vger.kernel.org];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_TWELVE(0.00)[28];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:email,linux-m68k.org:mid,linux-m68k.org:email]
+X-Rspamd-Queue-Id: 47AA7407494
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Apr 14, 2026 at 06:57:00PM +0800, Jiayuan Chen wrote:
-> A BPF_PROG_TYPE_SOCK_OPS program can set BPF_SOCK_OPS_WRITE_HDR_OPT_CB_FLAG
-> to inject custom TCP header options. When the kernel builds a TCP packet,
-> it calls tcp_established_options() to calculate the header size, which
-> invokes bpf_skops_hdr_opt_len() to trigger the BPF_SOCK_OPS_HDR_OPT_LEN_CB
-> callback.
+On Thu, 12 Mar 2026, Jiri Pirko wrote:
+> Currently devlink instances are addressed bus_name/dev_name tuple.
+> Allow the newly introduced DEVLINK_ATTR_INDEX to be used as
+> an alternative handle for all devlink commands.
 > 
-> If the BPF program calls bpf_setsockopt(TCP_NODELAY) inside this callback,
-> __tcp_sock_set_nodelay() will call tcp_push_pending_frames(), which calls
-> tcp_current_mss(), which calls tcp_established_options() again,
-> re-triggering the same BPF callback. This creates an infinite recursion
-> that exhausts the kernel stack and causes a panic.
+> When DEVLINK_ATTR_INDEX is present in the request, use it for a direct
+> xarray lookup instead of iterating over all instances comparing
+> bus_name/dev_name strings.
 > 
-> BPF_SOCK_OPS_HDR_OPT_LEN_CB
->   -> bpf_setsockopt(TCP_NODELAY)
-> 	-> tcp_push_pending_frames()
-> 	  -> tcp_current_mss()
-> 		-> tcp_established_options()
-> 		  -> bpf_skops_hdr_opt_len()
->                            /* infinite recursion */
-> 			-> BPF_SOCK_OPS_HDR_OPT_LEN_CB
-> 
-> A similar reentrancy issue exists for TCP congestion control, which is
-> guarded by tp->bpf_chg_cc_inprogress. Adopt the same approach: introduce
-> tp->bpf_hdr_opt_len_cb_inprogress, set it before invoking the callback in
-> bpf_skops_hdr_opt_len(), and check it in sol_tcp_sockopt() to reject
-> bpf_setsockopt(TCP_NODELAY) calls that would trigger
-> tcp_push_pending_frames() and cause the recursion.
-> 
-> Reported-by: Quan Sun <2022090917019@std.uestc.edu.cn>
-> Reported-by: Yinhao Hu <dddddd@hust.edu.cn>
-> Reported-by: Kaiyan Mei <M202472210@hust.edu.cn>
-> Reported-by: Dongliang Mu <dzm91@hust.edu.cn>
-> Closes: https://lore.kernel.org/bpf/d1d523c9-6901-4454-a183-94462b8f3e4e@std.uestc.edu.cn/
+> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 
-Thanks for the report and fixes suggested across different threads.
+Thanks for your patch, which is now commit d85a8af57da87196 ("devlink:
+allow to use devlink index as a command handle").
 
-Using has_current_bpf_ctx() to avoid tcp_push_pending_frames() should
-work but it may change the expectation for bpf_setsockopt(TCP_NODELAY).
-e.g. A bpf_tcp_iter does bpf_setsockopt(TCP_NODELAY).
+This has a rather large impact on kernel size.
+For e.g. m68k/atari_defconfig, bloat-o-meter reports:
 
-Adding another bit in the tcp_sock is not ideal either. I agree with
-Alexei that it is better to reuse the existing bit if we go down this path.
-We also need to audit more closely if there are cases that two different
-type of bpf progs may call bpf_setsockopt(). e.g.
-bpf_tcp_iter does bpf_setsockopt(TCP_CONGESTION) to switch
-to a bpf_tcp_cc and the new bpf_tcp_cc->init() will also do
-bpf_setsockopt(xxx) which then will be rejected.
+    add/remove: 4/1 grow/shrink: 72/1 up/down: 65804/-76 (65728)
+    Function                                     old     new   delta
+    devlink_trap_policer_get_dump_nl_policy       24    1480   +1456
+    devlink_trap_group_get_dump_nl_policy         24    1480   +1456
+    devlink_trap_get_dump_nl_policy               24    1480   +1456
+    devlink_selftests_get_nl_policy               24    1480   +1456
+    devlink_sb_tc_pool_bind_get_dump_nl_policy      24    1480   +1456
+    devlink_sb_port_pool_get_dump_nl_policy       24    1480   +1456
+    devlink_sb_pool_get_dump_nl_policy            24    1480   +1456
+    devlink_sb_get_dump_nl_policy                 24    1480   +1456
+    devlink_resource_dump_nl_policy               24    1480   +1456
+    devlink_region_get_dump_nl_policy             24    1480   +1456
+    devlink_rate_get_dump_nl_policy               24    1480   +1456
+    devlink_port_get_dump_nl_policy               24    1480   +1456
+    devlink_param_get_dump_nl_policy              24    1480   +1456
+    devlink_linecard_get_dump_nl_policy           24    1480   +1456
+    devlink_info_get_nl_policy                    24    1480   +1456
+    devlink_get_nl_policy                         24    1480   +1456
+    devlink_eswitch_get_nl_policy                 24    1480   +1456
+    devlink_dpipe_headers_get_nl_policy           24    1480   +1456
+    devlink_port_unsplit_nl_policy                32    1480   +1448
+    devlink_port_param_set_nl_policy              32    1480   +1448
+    devlink_port_param_get_nl_policy              32    1480   +1448
+    devlink_port_get_do_nl_policy                 32    1480   +1448
+    devlink_port_del_nl_policy                    32    1480   +1448
+    devlink_notify_filter_set_nl_policy           32    1480   +1448
+    devlink_health_reporter_get_dump_nl_policy      32    1480   +1448
+    devlink_port_split_nl_policy                  80    1480   +1400
+    devlink_sb_occ_snapshot_nl_policy             96    1480   +1384
+    devlink_sb_occ_max_clear_nl_policy            96    1480   +1384
+    devlink_sb_get_do_nl_policy                   96    1480   +1384
+    devlink_sb_port_pool_get_do_nl_policy        144    1480   +1336
+    devlink_sb_pool_get_do_nl_policy             144    1480   +1336
+    devlink_sb_pool_set_nl_policy                168    1480   +1312
+    devlink_sb_port_pool_set_nl_policy           176    1480   +1304
+    devlink_sb_tc_pool_bind_set_nl_policy        184    1480   +1296
+    devlink_sb_tc_pool_bind_get_do_nl_policy     184    1480   +1296
+    devlink_dpipe_table_get_nl_policy            240    1480   +1240
+    devlink_dpipe_entries_get_nl_policy          240    1480   +1240
+    devlink_dpipe_table_counters_set_nl_policy     272    1480   +1208
+    devlink_eswitch_set_nl_policy                504    1480    +976
+    devlink_resource_set_nl_policy               544    1480    +936
+    devlink_param_get_do_nl_policy               656    1480    +824
+    devlink_region_get_do_nl_policy              712    1480    +768
+    devlink_region_new_nl_policy                 744    1480    +736
+    devlink_region_del_nl_policy                 744    1480    +736
+    devlink_health_reporter_test_nl_policy       928    1480    +552
+    devlink_health_reporter_recover_nl_policy     928    1480    +552
+    devlink_health_reporter_get_do_nl_policy     928    1480    +552
+    devlink_health_reporter_dump_get_nl_policy     928    1480    +552
+    devlink_health_reporter_dump_clear_nl_policy     928    1480    +552
+    devlink_health_reporter_diagnose_nl_policy     928    1480    +552
+    devlink_trap_get_do_nl_policy               1048    1480    +432
+    devlink_trap_set_nl_policy                  1056    1480    +424
+    devlink_trap_group_get_do_nl_policy         1088    1480    +392
+    devlink_trap_policer_get_do_nl_policy       1144    1480    +336
+    devlink_trap_group_set_nl_policy            1144    1480    +336
+    devlink_trap_policer_set_nl_policy          1160    1480    +320
+    devlink_port_set_nl_policy                  1168    1480    +312
+    devlink_flash_update_nl_policy              1224    1480    +256
+    devlink_reload_nl_policy                    1248    1480    +232
+    devlink_port_new_nl_policy                  1320    1480    +160
+    devlink_rate_get_do_nl_policy               1352    1480    +128
+    devlink_rate_del_nl_policy                  1352    1480    +128
+    devlink_linecard_get_do_nl_policy           1376    1480    +104
+    __devlinks_xa_find_get                         -      96     +96
+    devlink_linecard_set_nl_policy              1392    1480     +88
+    devlink_selftests_run_nl_policy             1416    1480     +64
+    devlink_get_from_attrs_lock                  262     314     +52
+    devlink_region_read_nl_policy               1440    1480     +40
+    devlink_rate_set_nl_policy                  1448    1480     +32
+    devlink_rate_new_nl_policy                  1448    1480     +32
+    devlinks_xa_lookup_get                         -      30     +30
+    devlink_health_reporter_set_nl_policy       1456    1480     +24
+    devlink_attr_index_range                       -      16     +16
+    devlink_param_set_nl_policy                 1472    1480      +8
+    devlink_nl_dumpit                            276     282      +6
+    __initcall__kmod_core__670_573_devlink_init4       -       4      +4
+    __initcall__kmod_core__670_561_devlink_init4       4       -      -4
+    devlinks_xa_find_get                          96      24     -72
+    Total: Before=5203976, After=5269704, chg +1.26%
 
-Another fix could be, the bpf_setsockopt(TCP_NODELAY) is always broken
-for BPF_SOCK_OPS_HDR_OPT_LEN_CB and BPF_SOCK_OPS_WRITE_HDR_OPT_CB unless
-the bpf prog is doing some maneuver to avoid the recursion. Thus,
-this use case is basically broken as is and I don't see a use case
-for bpf_setsockopt(TCP_NODELAY) when writing header also.
-How about checking the bpf_sock->op, level, and optname in
-bpf_sock_ops_setsockopt() and return -EOPNOTSUPP?
+> --- a/net/devlink/netlink_gen.c
+> +++ b/net/devlink/netlink_gen.c
+> @@ -11,6 +11,11 @@
+>  
+>  #include <uapi/linux/devlink.h>
+>  
+> +/* Integer value ranges */
+> +static const struct netlink_range_validation devlink_attr_index_range = {
+> +	.max	= U32_MAX,
+> +};
+> +
+>  /* Sparse enums validation callbacks */
+>  static int
+>  devlink_attr_param_type_validate(const struct nlattr *attr,
+> @@ -56,37 +61,42 @@ const struct nla_policy devlink_dl_selftest_id_nl_policy[DEVLINK_ATTR_SELFTEST_I
+>  };
+>  
+>  /* DEVLINK_CMD_GET - do */
+> -static const struct nla_policy devlink_get_nl_policy[DEVLINK_ATTR_DEV_NAME + 1] = {
+> +static const struct nla_policy devlink_get_nl_policy[DEVLINK_ATTR_INDEX + 1] = {
+
+Unrelated to this change, but the explicit sizing of these arrays is not
+needed, as the compiler will take care of that.
+
+>  	[DEVLINK_ATTR_BUS_NAME] = { .type = NLA_NUL_STRING, },
+>  	[DEVLINK_ATTR_DEV_NAME] = { .type = NLA_NUL_STRING, },
+> +	[DEVLINK_ATTR_INDEX] = NLA_POLICY_FULL_RANGE(NLA_UINT, &devlink_attr_index_range),
+
+This array, and many others below, are sparse, with large gaps (up to
+1456 or 2912 bytes on 32-bit resp. 64-bit systems) before the last
+entries.
+
+>  };
+>  
+>  /* DEVLINK_CMD_PORT_GET - do */
+> -static const struct nla_policy devlink_port_get_do_nl_policy[DEVLINK_ATTR_PORT_INDEX + 1] = {
+> +static const struct nla_policy devlink_port_get_do_nl_policy[DEVLINK_ATTR_INDEX + 1] = {
+>  	[DEVLINK_ATTR_BUS_NAME] = { .type = NLA_NUL_STRING, },
+>  	[DEVLINK_ATTR_DEV_NAME] = { .type = NLA_NUL_STRING, },
+> +	[DEVLINK_ATTR_INDEX] = NLA_POLICY_FULL_RANGE(NLA_UINT, &devlink_attr_index_range),
+
+Shouldn't this be inserted at the end, as DEVLINK_ATTR_INDEX >
+DEVLINK_ATTR_PORT_INDEX, for readability?
+
+>  	[DEVLINK_ATTR_PORT_INDEX] = { .type = NLA_U32, },
+>  };
+
+Gr{oetje,eeting}s,
+
+						Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+							    -- Linus Torvalds
 
