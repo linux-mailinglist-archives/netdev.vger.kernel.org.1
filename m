@@ -1,123 +1,181 @@
-Return-Path: <netdev+bounces-278794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278801-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EBjOJ9Wg32kEWwAAu9opvQ
-	(envelope-from <netdev+bounces-278794-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 16:29:41 +0200
+	id 2Pu5MCqi32mBXAAAu9opvQ
+	(envelope-from <netdev+bounces-278801-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 16:35:22 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E7A64054BC
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 16:29:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 15F1D405580
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 16:35:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DBBFA30DA029
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 14:27:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 943F830AABF7
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 14:28:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BE023D3D1E;
-	Wed, 15 Apr 2026 14:27:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D3933D3D1E;
+	Wed, 15 Apr 2026 14:28:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kFmQ67eu"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HeQp5uSU"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDC8F3CC9EB
-	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 14:27:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FA6930C631
+	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 14:28:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776263253; cv=none; b=brbl0ThP0D8qLhpgb8zxC5A9tc07JB0NW92iV3MLqSGegPIPCE/9INtExFmcQsAfbjz9GTLU+V9K3jtjibWAxrOBQINw+iBkfFhha+42T50szLpBwQW0k16pbfnmd7ieDUNLjgSME+DqeM1QPHZdAXqWnRpkKrbNAYvr3Iy3nT8=
+	t=1776263325; cv=none; b=DSAn4XXdf2/QTit72csnN54zgtGOXXJb5PnIGaxA0scbAuAbDgcziZI9DzKSg5CFe87FWitpssOGvVphoBoF69nhKTtkNPX8ILPSF83amp2DaWkSzcKoErjp/JPA2/V+SgSD1cIfqXm9DEIQw7pjChjam+XNODEAbQ+b7yUDr9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776263253; c=relaxed/simple;
-	bh=oOIzZsC9lz45sjHKDaOFTn54Y2WN2iyBVliEwttc3p4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mS34rnPQehOuReIQ8Mvl4pLsJvGUYhmX/0S/g779fvdUNdJFxKhmyqEP38X5V1H3mLpVM7eWUcq1fuBvt4ZDVlzkJCz/BL4+OqWoh7omvB9vr23TP/mb2PuSJMbG27disPRe/zS5Qlmk/eVpIhRDbZuZSj7PD9RRKyZwXs66qhw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kFmQ67eu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99F04C2BCB4;
-	Wed, 15 Apr 2026 14:27:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776263252;
-	bh=oOIzZsC9lz45sjHKDaOFTn54Y2WN2iyBVliEwttc3p4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kFmQ67euydmOkj2SIqtOssQwxgGbwoLtM0v6UOvzw+h7J+cjZPVTrALSlYiaJ4qIx
-	 MGdgG9SReiBeXp1OBLTAhdc5HfRT6PrQGMc06wkQxWlIv+LsjNmazUsd8IcmqvYTBn
-	 v6YVRkA9A4MOzjljdA9pIb1Uuopx2PyMF5AmJ5GfFhhGQwsX8UjaW68rk6RilusnJc
-	 fAfxn4YMJn7JdKpOWBo/CIGJmWoM0ML9ayRilcT5lOTiRFqqAjbXHNup103PA//cQD
-	 o3A0W1pLIXa1WdSMH1qmSicsjthCZPWNLDjQ3+vHiKGOs04HDdMgrTvcdGEiLsw2us
-	 BU8LWuEoCmHdQ==
-Date: Wed, 15 Apr 2026 15:27:29 +0100
-From: Simon Horman <horms@kernel.org>
-To: Dudu Lu <phx0fer@gmail.com>
-Cc: netdev@vger.kernel.org, jhs@mojatatu.com, jiri@resnulli.us
-Subject: Re: [PATCH] net/sched: act_mirred: fix wrong device for
- mac_header_xmit check in tcf_blockcast_redir
-Message-ID: <20260415142729.GL772670@horms.kernel.org>
-References: <20260413084927.71353-1-phx0fer@gmail.com>
+	s=arc-20240116; t=1776263325; c=relaxed/simple;
+	bh=hGYpdPt5f7E7jW84kiyLG0thuZ8oo2TpL9uLwiLJ2N4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FW7DVtrSxwNJvSlWtvZD/teCfSdYi4vQvjrJFh05t5gd6PbQqJpUMrb81LVmbgwmgmh00LwrQKI8ZGk/HHaiAhDPibO/XzjWCRnptS2/6bPJkybfVL4nBtG9YlkVDM7HbKZeRe5ggw+Y4QeFEcebzfXhQY2K4l0HxYnze0MoMqI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HeQp5uSU; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1776263324; x=1807799324;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=hGYpdPt5f7E7jW84kiyLG0thuZ8oo2TpL9uLwiLJ2N4=;
+  b=HeQp5uSUXuVE0ECZ5zIGz+15RcMpahn3a15VHAC0SDW0clRENssUShfk
+   OYOg4fyvBGOMGj6gQlGoSoww6lW7Zp8aC6mhJlFpQ848J26b1nbm4XMSk
+   4oFFy4DIY/ubW9Y0zEV0+7b9mt60bomksiseqWdQgFIPZam+QcyhMMpAx
+   HWGru9DanReC+w/WbexSKF84qR/mLvkvt5irIMQ2pCUq/eghoqv4deFQu
+   Y7nxgEo2ippZoOTr+Chol2xYv2B41GyVU3wMdebbys9K2B55owT3q6ZUJ
+   QoOpMp/Sw+DnkUmG10Q25K8BXHxeZC+HUhz6Emi5+06AgN/r6aX6W67/M
+   A==;
+X-CSE-ConnectionGUID: Jmwjkp2nSuSgfs+Ty5SExw==
+X-CSE-MsgGUID: rqbGkG+tSJiIB+fB9YUhIw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11760"; a="77423725"
+X-IronPort-AV: E=Sophos;i="6.23,179,1770624000"; 
+   d="scan'208";a="77423725"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2026 07:28:43 -0700
+X-CSE-ConnectionGUID: 3CeTPOSiQZ6o5qn6eSGebw==
+X-CSE-MsgGUID: HNKefGP3R3a9pY2lsv6PCQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,179,1770624000"; 
+   d="scan'208";a="234467814"
+Received: from amlin-019-225.igk.intel.com ([10.102.19.225])
+  by orviesa003.jf.intel.com with ESMTP; 15 Apr 2026 07:28:42 -0700
+From: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+To: intel-wired-lan@lists.osuosl.org,
+	anthony.l.nguyen@intel.com,
+	aleksandr.loktionov@intel.com
+Cc: netdev@vger.kernel.org
+Subject: [PATCH iwl-net v3 0/6] ixgbe: six bug fixes
+Date: Wed, 15 Apr 2026 16:28:35 +0200
+Message-ID: <20260415142841.3222399-1-aleksandr.loktionov@intel.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260413084927.71353-1-phx0fer@gmail.com>
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-278801-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[intel.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278794-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	NEURAL_HAM(-0.00)[-0.999];
+	TO_DN_NONE(0.00)[];
 	RCPT_COUNT_THREE(0.00)[4];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,horms.kernel.org:mid]
-X-Rspamd-Queue-Id: 1E7A64054BC
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 15F1D405580
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Apr 13, 2026 at 04:49:27PM +0800, Dudu Lu wrote:
-> In tcf_blockcast_redir(), when iterating block ports to redirect
-> packets to multiple devices, the mac_header_xmit flag is queried
-> from the wrong device. The loop sends to dev_prev but queries
-> dev_is_mac_header_xmit(dev) — which is the NEXT device in the
-> iteration, not the one being sent to.
-> 
-> This causes tcf_mirred_to_dev() to make incorrect decisions about
-> whether to push or pull the MAC header. When the block contains
-> mixed device types (e.g., an ethernet veth and a tunnel device),
-> intermediate devices get the wrong mac_header_xmit flag, leading to
-> skb header corruption. In the worst case, skb_push_rcsum with an
-> incorrect mac_len can exhaust headroom and panic.
-> 
-> The last device in the loop is handled correctly (line 365-366 uses
-> dev_is_mac_header_xmit(dev_prev)), confirming this is a copy-paste
-> oversight for the intermediate devices.
-> 
-> Fix by using dev_prev instead of dev for the mac_header_xmit query,
-> consistent with the device actually being sent to.
-> 
-> Fixes: 42f39036cda8 ("net/sched: act_mirred: Allow mirred to block")
-> Signed-off-by: Dudu Lu <phx0fer@gmail.com>
+Six fixes for the ixgbe driver, covering a SWFW semaphore timeout
+miscalculation, a security-relevant debugfs out-of-bounds, a broken
+flow-control NVM-reset path, a false-success return in the cls_u32
+nexthdr path, an adaptive-ITR u8 overflow, and wrong bit positions in
+the UP-to-TC register normalisation.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Patches 1-3 fix issues that could result in functional regressions
+(FW update failures, OOB MMIO, traffic stall after NVM update).
+Patches 4-6 fix correctness bugs with user-visible effects.
 
+Patch 3 guards against calling setup_fc() on 82599 backplane links:
+on those interfaces setup_fc() resolves to prot_autoc_write() ->
+ixgbe_reset_pipeline_82599(), which toggles IXGBE_AUTOC_AN_RESTART
+and causes an infinite link-flap loop.  setup_fc() is now skipped for
+ixgbe_media_type_backplane; fc_enable() is still called.  The failure-
+path guard introduced in v2 (skip fc_enable when setup_fc fails) is
+preserved.
+
+Patch 5 reworks the ITR write-back to keep the mode flag
+(IXGBE_ITR_ADAPTIVE_LATENCY, bit 7) and the usec delay in separate
+operands until the final store, and clamps the delay to
+[IXGBE_ITR_ADAPTIVE_MIN_USECS, IXGBE_ITR_ADAPTIVE_MAX_USECS] via
+clamp_val().
+
+Patch 6 corrects the Fixes: tag to 8b1c0b24d9af ("ixgbe: configure
+minimal packet buffers to support TC") per Simon Horman.
+
+Changes in v3:
+ - cover: removed Patch 1 squash-history description (v1->v2 background
+          no longer needed in the cover letter).
+ - 1/6: add Reviewed-by: Simon Horman, Reviewed-by: Jacob Keller;
+        no code change (Jacob suggested read_poll_timeout() but
+        accepted as-is for net).
+ - 2/6: add Reviewed-by: Simon Horman; no code change.
+ - 3/6: add backplane-link guard in ixgbe_watchdog_update_link();
+        skip setup_fc() when media type is ixgbe_media_type_backplane
+        to prevent infinite link-flap on 82599 backplane interfaces.
+ - 4/6: add Reviewed-by: Simon Horman; no code change.
+ - 5/6: rework clamping -- use clamp_val() with mode and delay as
+        separate operands; clamp to [IXGBE_ITR_ADAPTIVE_MIN_USECS,
+        IXGBE_ITR_ADAPTIVE_MAX_USECS] instead of LATENCY-1.
+ - 6/6: correct Fixes: tag to 8b1c0b24d9af; add Reviewed-by:
+        Simon Horman.
+
+Changes in v2:
+ - 1/6: Squash two patches; fix commit msg ("200ms" -> "1s"); three
+        explicit mac.type == comparisons instead of range check.
+ - 2/6: Add Fixes: tag; reroute from iwl-next to iwl-net.
+ - 3/6: Add Fixes: tag; reroute to iwl-net; skip fc_enable() when
+        setup_fc() fails to avoid committing stale FC state.
+ - 4/6: Add Fixes: tag; reroute from iwl-next to iwl-net.
+ - 5/6: Add proper [N/M] patch numbering.
+ - 6/6: Reroute to iwl-net; swap to (expr >> ..) & MASK operand order.
+
+---
+
+Aleksandr Loktionov (5):
+  ixgbe: fix SWFW semaphore timeout for X550 family
+  ixgbe: call ixgbe_setup_fc() before fc_enable() after NVM update
+  ixgbe: fix cls_u32 nexthdr path returning success when no entry installed
+  ixgbe: fix ITR value overflow in adaptive interrupt throttling
+  ixgbe: fix integer overflow and wrong bit position in ixgbe_validate_rtr()
+
+Paul Greenwalt (1):
+  ixgbe: add bounds check for debugfs register access
+
+ drivers/net/ethernet/intel/ixgbe/ixgbe_debugfs.c |  4 ++--
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c    | 18 ++++++++++++------
+ drivers/net/ethernet/intel/ixgbe/ixgbe_x540.c    |  8 ++++++++
+ 3 files changed, 22 insertions(+), 8 deletions(-)
+-- 
+2.52.0
 
