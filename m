@@ -1,233 +1,120 @@
-Return-Path: <netdev+bounces-278842-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278843-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yMsfAR/C32m9YgAAu9opvQ
-	(envelope-from <netdev+bounces-278842-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 18:51:43 +0200
+	id +BytKQLF32kmYwAAu9opvQ
+	(envelope-from <netdev+bounces-278843-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 19:04:02 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BE80406815
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 18:51:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 06C5E406993
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 19:04:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AC9D0317112C
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 16:46:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4F92D3284756
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 16:55:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84A093E51EC;
-	Wed, 15 Apr 2026 16:46:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D90603E63AF;
+	Wed, 15 Apr 2026 16:54:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fW/f26Es"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="USudHZsI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 621D93E51E4
-	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 16:46:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E944B3BD64D;
+	Wed, 15 Apr 2026 16:54:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776271607; cv=none; b=HH+IfbD3C1U1v/roVzEB7JMKPVQgZ2+YbG9UVEol7oo96q8mowiwG2NUK9InKqzO8d94j0coJbYsqHzk8xCrC92CQKg05RMS+I4NenTaUuDflLFixWcCOYQjRwqHUwQ2aP/1Px+hz1vuktgVQsnxCRtG79Z8YiIbnySXtQFpI/I=
+	t=1776272091; cv=none; b=SZTj4uM1wngWwihA75P9AsZqQdTzT+DHnnVAy8Mh9fR3h0wvssWo5+VtC9d7x6PNqftMpVs3NfXuwwRJIDuCulJZ5tUiBGJGn7IDRm1wHdJ/OfIWl8OMqUFPkTDIV0dB6+aIztIDiE/Wio8y/NGvXFFh9RzhTflIGUOsBlhhhbE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776271607; c=relaxed/simple;
-	bh=9V5UV0H7MNGsiv3j20XRW3gOxXBgz2rZPl/n+ef13Uw=;
+	s=arc-20240116; t=1776272091; c=relaxed/simple;
+	bh=6DNTZ0ERM+6asbMeGGsrZ6aDsAY5gnasAF9NXF3KX/I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=o0zvBM570IpWswaJElNL6PZRnIV/T8KlYgtFo9o0U8Gdxy81EzIXw6zjtkqu8ms5ORivBCPE1XXgTQMOAnvJz4m+DFTJ0b+2MGG1IIgGdmyIjx0N/jUyKpaMadBk0lrGX0sfVNgiOJFYA2ywqVpWcjj9hv4IRK5NGIJXZMw/yOI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fW/f26Es; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7531AC19424;
-	Wed, 15 Apr 2026 16:46:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776271607;
-	bh=9V5UV0H7MNGsiv3j20XRW3gOxXBgz2rZPl/n+ef13Uw=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=O9N30p79KGHe+wCpzCw9Urbm1kE2FowSixPw1TaYIosJv4Guw9Tk+DZJRn6O5q8Sere3jW62caOVF+ZZj13f1Y5z1RfLP/0JLKsChquiBgut/+aBiHSJyHGqWCOLubRf1vFt+FlEf7n1z4TWNY/WOfiZ4x/E6zZUGWtBHkLPygI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=USudHZsI; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with UTF8SMTPSA id C119E60177;
+	Wed, 15 Apr 2026 18:54:47 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1776272087;
+	bh=wI1AsDb3z2P6i589haHLZlIIadhnDuo0oWVn9mLJshA=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fW/f26Es+VpZNbsFgLDGuFZPeNpaxhhh4Snuyt9w2JIMPiB1dhxrqeL6YBx8Jpt4E
-	 ZQ7/nvDHkkPpEo8MOH4NbMh/Ok3l9PHn1ELWTJjvicCfCC994+ciDxlnXoQ2QlLykV
-	 dPDakfB6qFZ5v3sKcVhSSyBmuHBHHUeoQYG5BP9LXCdfjzgHeenrjWUkjF40swEwNx
-	 a0mVjfMq2eaSGSMKoOXfbZF0xPIUvGN3ErKGA2Z0kW4V3TAe3zyqy9v9zPM/HRF1Gc
-	 oLN05DTT8JdNdkSG9UbHnbRc3budngWXSxJwrPBGbCc4sBjUbqX5wYgYT1EH4khf6m
-	 F7Aed9NzH5q4A==
-Date: Wed, 15 Apr 2026 17:46:43 +0100
-From: Simon Horman <horms@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
+	b=USudHZsIvGmL8Zp3SEelOosguhygRWXOemwMzscPov6DdONVtsBsjeY3c77AQylZ8
+	 KfsyxDDwi0zzTBU+3Jm1P5WKV37IzyT0c+PbxsjM6F02Jgc8LR1+3GWVmOAHNXffY4
+	 a8WhGFvPLXh8A3J++H3zCxZrwYUk7yAF9N1Is3ood5khhdsMYzgGCJBSPWy6aOjOUB
+	 0qJoCk9c7NgIM/dFOc3y0NngnkHRSGXPH9VbuNJ5+m2bJSmArSLQovJPfXTt1CCENw
+	 WyiMIWNoeRHbf7XIMv8o9wLxVGZ3kIFaJrNihkGUvCY8XBLuQeneDLzCOhRHhA7noZ
+	 lxdCi1/eg0cig==
+Date: Wed, 15 Apr 2026 18:54:45 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Weiming Shi <bestswngs@gmail.com>
+Cc: Florian Westphal <fw@strlen.de>,
+	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net v2] net: airoha: Add missing bits in
- airoha_qdma_cleanup_tx_queue()
-Message-ID: <20260415164643.GQ772670@horms.kernel.org>
-References: <20260414-airoha_qdma_cleanup_tx_queue-fix-net-v2-1-875de57cc022@kernel.org>
+	Phil Sutter <phil@nwl.cc>, Simon Horman <horms@kernel.org>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Xiang Mei <xmei5@asu.edu>
+Subject: Re: [PATCH nf] netfilter: nf_tables: use RCU-safe list primitives
+ for basechain hook list
+Message-ID: <ad_C1f2cW5-kctHi@chamomile>
+References: <20260410101321.915190-2-bestswngs@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260414-airoha_qdma_cleanup_tx_queue-fix-net-v2-1-875de57cc022@kernel.org>
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+In-Reply-To: <20260410101321.915190-2-bestswngs@gmail.com>
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_RHS_NOT_FQDN(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-278842-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[netfilter.org];
 	RCVD_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[netfilter.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-278843-lists,netdev=lfdr.de];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[horms.kernel.org:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5BE80406815
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[netfilter.org:dkim,ozlabs.org:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 06C5E406993
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Apr 14, 2026 at 08:50:52AM +0200, Lorenzo Bianconi wrote:
-> Similar to airoha_qdma_cleanup_rx_queue(), reset DMA TX descriptors in
-> airoha_qdma_cleanup_tx_queue routine. Moreover, reset TX_DMA_IDX to
-> TX_CPU_IDX to notify the NIC the QDMA TX ring is empty.
+On Fri, Apr 10, 2026 at 06:13:22PM +0800, Weiming Shi wrote:
+> NFT_MSG_GETCHAIN runs as an NFNL_CB_RCU callback, so chain dumps
+> traverse basechain->hook_list under rcu_read_lock() without holding
+> commit_mutex. Meanwhile, nft_delchain_hook() mutates that same live
+> hook_list with plain list_move() and list_splice(), and the commit/abort
+> paths splice hooks back with plain list_splice(). None of these are
+> RCU-safe list operations.
 > 
-> Fixes: 23020f0493270 ("net: airoha: Introduce ethernet support for EN7581 SoC")
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> ---
-> Changes in v2:
-> - Move q->ndesc initialization at end of airoha_qdma_init_tx routine in
->   order to avoid any possible NULL pointer dereference in
->   airoha_qdma_cleanup_tx_queue()
+> A concurrent GETCHAIN dump can observe partially updated list pointers,
+> follow them into stack-local or transaction-private list heads, and
+> crash when container_of() produces a bogus struct nft_hook pointer.
 
-This seems to be a separate issue.
-If so, I think it should be split out into a separate patch.
+For the record, v1 of proposed series to fix this is here:
 
-> - Check if q->tx_list is empty in airoha_qdma_cleanup_tx_queue()
-> - Link to v1: https://lore.kernel.org/r/20260410-airoha_qdma_cleanup_tx_queue-fix-net-v1-1-b7171c8f1e78@kernel.org
-
-I think it was covered in the review Jakub forwarded for v1.  But FTR,
-Sashiko has some feedback on this patch in the form of an existing bug
-(that should almost certainly be handled separately from this patch).
-
-> ---
->  drivers/net/ethernet/airoha/airoha_eth.c | 41 ++++++++++++++++++++++++++------
->  1 file changed, 34 insertions(+), 7 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-> index 9e995094c32a..3c1a2bc68c42 100644
-> --- a/drivers/net/ethernet/airoha/airoha_eth.c
-> +++ b/drivers/net/ethernet/airoha/airoha_eth.c
-> @@ -966,27 +966,27 @@ static int airoha_qdma_init_tx_queue(struct airoha_queue *q,
->  	dma_addr_t dma_addr;
->  
->  	spin_lock_init(&q->lock);
-> -	q->ndesc = size;
->  	q->qdma = qdma;
->  	q->free_thr = 1 + MAX_SKB_FRAGS;
->  	INIT_LIST_HEAD(&q->tx_list);
->  
-> -	q->entry = devm_kzalloc(eth->dev, q->ndesc * sizeof(*q->entry),
-> +	q->entry = devm_kzalloc(eth->dev, size * sizeof(*q->entry),
->  				GFP_KERNEL);
->  	if (!q->entry)
->  		return -ENOMEM;
->  
-> -	q->desc = dmam_alloc_coherent(eth->dev, q->ndesc * sizeof(*q->desc),
-> +	q->desc = dmam_alloc_coherent(eth->dev, size * sizeof(*q->desc),
->  				      &dma_addr, GFP_KERNEL);
->  	if (!q->desc)
->  		return -ENOMEM;
->  
-> -	for (i = 0; i < q->ndesc; i++) {
-> +	for (i = 0; i < size; i++) {
->  		u32 val = FIELD_PREP(QDMA_DESC_DONE_MASK, 1);
->  
->  		list_add_tail(&q->entry[i].list, &q->tx_list);
->  		WRITE_ONCE(q->desc[i].ctrl, cpu_to_le32(val));
->  	}
-> +	q->ndesc = size;
->  
->  	/* xmit ring drop default setting */
->  	airoha_qdma_set(qdma, REG_TX_RING_BLOCKING(qid),
-> @@ -1051,13 +1051,17 @@ static int airoha_qdma_init_tx(struct airoha_qdma *qdma)
->  
->  static void airoha_qdma_cleanup_tx_queue(struct airoha_queue *q)
->  {
-> -	struct airoha_eth *eth = q->qdma->eth;
-> -	int i;
-> +	struct airoha_qdma *qdma = q->qdma;
-> +	struct airoha_eth *eth = qdma->eth;
-> +	int i, qid = q - &qdma->q_tx[0];
-> +	struct airoha_queue_entry *e;
-> +	u16 index = 0;
->  
->  	spin_lock_bh(&q->lock);
->  	for (i = 0; i < q->ndesc; i++) {
-> -		struct airoha_queue_entry *e = &q->entry[i];
-
-super nit: In v2 e is always used within a block (here and in the hunk below).
-           So I would lean towards declaring e in the blocks where it is
-	   used.
-
-	   No need to repost just for this!
-
-> +		struct airoha_qdma_desc *desc = &q->desc[i];
->  
-> +		e = &q->entry[i];
->  		if (!e->dma_addr)
->  			continue;
->  
-> @@ -1067,8 +1071,31 @@ static void airoha_qdma_cleanup_tx_queue(struct airoha_queue *q)
->  		e->dma_addr = 0;
->  		e->skb = NULL;
->  		list_add_tail(&e->list, &q->tx_list);
-> +
-> +		/* Reset DMA descriptor */
-> +		WRITE_ONCE(desc->ctrl, 0);
-> +		WRITE_ONCE(desc->addr, 0);
-> +		WRITE_ONCE(desc->data, 0);
-> +		WRITE_ONCE(desc->msg0, 0);
-> +		WRITE_ONCE(desc->msg1, 0);
-> +		WRITE_ONCE(desc->msg2, 0);
-> +
->  		q->queued--;
->  	}
-> +
-> +	if (!list_empty(&q->tx_list)) {
-> +		e = list_first_entry(&q->tx_list, struct airoha_queue_entry,
-> +				     list);
-> +		index = e - q->entry;
-> +	}
-> +	/* Set TX_DMA_IDX to TX_CPU_IDX to notify the hw the QDMA TX ring is
-> +	 * empty.
-> +	 */
-> +	airoha_qdma_rmw(qdma, REG_TX_CPU_IDX(qid), TX_RING_CPU_IDX_MASK,
-> +			FIELD_PREP(TX_RING_CPU_IDX_MASK, index));
-> +	airoha_qdma_rmw(qdma, REG_TX_DMA_IDX(qid), TX_RING_DMA_IDX_MASK,
-> +			FIELD_PREP(TX_RING_DMA_IDX_MASK, index));
-> +
->  	spin_unlock_bh(&q->lock);
->  }
->  
-> 
-> ---
-> base-commit: 2cd7e6971fc2787408ceef17906ea152791448cf
-> change-id: 20260410-airoha_qdma_cleanup_tx_queue-fix-net-93375f5ee80f
-> 
-> Best regards,
-> -- 
-> Lorenzo Bianconi <lorenzo@kernel.org>
-> 
+https://patchwork.ozlabs.org/project/netfilter-devel/list/?series=499757
 
