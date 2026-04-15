@@ -1,97 +1,97 @@
-Return-Path: <netdev+bounces-278854-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278855-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cDnPIhjT32kNZQAAu9opvQ
-	(envelope-from <netdev+bounces-278854-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 20:04:08 +0200
+	id EJacFxfU32l0ZQAAu9opvQ
+	(envelope-from <netdev+bounces-278855-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 20:08:23 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D98BC406FCF
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 20:04:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A2D51406FF1
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 20:08:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CD3FA30597AA
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 18:03:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B330B3024111
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 18:08:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 539A331AF31;
-	Wed, 15 Apr 2026 18:03:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CB623D649D;
+	Wed, 15 Apr 2026 18:08:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="dL92YRdA"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="R8/25VZH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91DDA13C918
-	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 18:03:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87BED3195E4
+	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 18:08:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.42
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776276208; cv=pass; b=GlMa0TXfD+HmO6nR8ag0cPlDwY/YHqb29H4/ZRt9SD4lgzmnGtKTsTShU2gayEXWW9zVS6/Xi1nwAqNdqes3weqoPND8FkxweGz57PytgNTfXJEtWBWXtmQsJfHgzyFkgRqnccyZUYezRg6FEuTy1+VKuGA20y6KxgjW0tLgvyA=
+	t=1776276500; cv=pass; b=u581mYWWOT60moYUpnkMZO5dJaec8M2WGbxR7m8cy3GT9MVCz69Z0xkSBuhetSfMC/kinxYDGYslguuMFBR2djD8hSekO18iQ92hopekn9463ZjmxlwxiKnrU56SYC362egBJOVDRYzhMlktF1wD3M3I9KcoSbhIyeYJh7os6s8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776276208; c=relaxed/simple;
-	bh=tmmZyGxhNfrOBuJl+Uy3KRe0cfdB4K/rFTEvPqD+9iY=;
+	s=arc-20240116; t=1776276500; c=relaxed/simple;
+	bh=cJT/V1RaPX7xQlpuUxPMCYhNmPenUvZGVmWNJGcaX2U=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=foIE/GUV4cNKicvo1RVuoBge4lQOjKblSu6f7jTWyblX/DK2xGANlFA2ETiFN136sB4wEl7xh5eIyaZGOnDAEY3weBCfnkNAGp8h6VoGef4bOBlj3CZScu6dt+oUTfIhWwBYd10xozDMCg3gGNNoBtOiszpjKjIu+vyMcurywgQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=dL92YRdA; arc=pass smtp.client-ip=209.85.218.48
+	 To:Cc:Content-Type; b=ep5zOBh3P19H70d805JRMic/rTXe+KYcgJsPjhLXm3XSq2l2h6g/TeClqAsnmzQQH5qDrng8jv0B/1gZMH2G44v05K98aysk8YnPyfKuQMId3AVS7fww4OA9Q+MI4yvHT1zN2JPdf3oGIb8U/sF8af6Iv6eHfd8R5C9bgfCJMEY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=R8/25VZH; arc=pass smtp.client-ip=209.85.208.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-b9b1df1a6b3so816254266b.0
-        for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 11:03:26 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776276205; cv=none;
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-671dad7cac8so3789423a12.0
+        for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 11:08:18 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776276497; cv=none;
         d=google.com; s=arc-20240605;
-        b=O5D5meIEVxRNotzJdwC6CCb7Y/+64JCLVC6hUXYAirZF6TiJvnEJhgOKEGHdjB0nyJ
-         oUoYiyICFegkon5K/Fc8du8hXzyOuYUIpcqprSMyQEyr1vXcCH2zPIQKcj5lwmpYOUtT
-         a6yNWFjlmCY89aU7f84vRYNkfnuWLOe8jo4imiOQyTQldSjQQNBq9714nmbxDwFgitf5
-         H+8D3DcEm/2gK4hqT7YYKS8CnKqGd1SqM3xYi93vCWmMa9poYWSGy0ot+fLvwnvlS+Mu
-         ILTUXp4BgbY+jK9HXjS424i9oZOIEjs8mQ4ihmI4DxbHvLHh6Ll3uubAM/Mjo+WywCvS
-         lvNA==
+        b=gfkCf3DsmY5KqqF+gn1iKKqdonsUIDE0w7ACZqBBEJhpZoFn601LC8cVtb5HUuhINJ
+         Co89Jfyl4wr5PrnzB03qTz8F9I5riwAMx1bYwZtdesq8F7lYmKJiSPc1mwDLVZ3cd2Er
+         XcYxkWjrb7HwS6BXUkWuitRjqtQ2aQbWajiAr7UsOAZgOeVsc3z3viyULUDkrUK0/T56
+         wxIew71EOe0w1GEL1C8yH4bd9lyWUQh/KLiz64PAjSuEn8sdoK/nQqdtoRgIHWZ9O1FH
+         /HGp/1Q6X2PjhTu5WNgWtL32nV6oQLuqK4QZEnf4hDR2Tx0n2X8x7wn2uaAwHHXyxE3L
+         E2pQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=ByBXDqA5q1B0FZhDcK57G+p+lp1SYGrMGUX9uywlaEI=;
+        bh=26dUy5Nk7fi7bs64cuAGqDvpQjZ4Ui+HpDi9p02QqOk=;
         fh=8i4BkJ7A2sbsgM1+Fe68SjLDkqmJfGNb+pxYd/lDi1E=;
-        b=NHrsOxbm7Y0GyvexUdbZP65HIMswaBbkI+FulDDNLKskdEUmtc6OfIM6vv6Lsx5LCe
-         jigXfy8X4lhp3NDQowfBXJD6LcepDqS2j6O1X9hOvHqcKvLbGETrdD3jRbZXx8wNaMSs
-         2MdmjyUFOHi3CM1mdr0KmhODCHxYL1LTVWRGcWzfcEtjuj3T6ejWJofysPlOzDfJeLpp
-         HuJcp2ZKn5yNEz3glcoq8yODuIyByMToKQ9wPcTxysGmtSb+gBYjahwGPQpIYWt041rf
-         sfSojDCDlBktwrZn198UJflOmC2iTj/7RtMeKgSkuh/vB9vwOe7BTJNjKyG+RgTz8Fmk
-         jBCA==;
+        b=SiwejGDX34m5kSB+qkdeylWHnSqcIwasv6CzKAWRgJ5KJiqJVAv4od38OLCmAx+uJB
+         mfbfF/+aLGALWI73TEb4vHEF2pNq0eOkev8YmmEpgXk+rXNI2Shwd+3YIEzIwkgp2fWl
+         zkGJXPIOLKeWwzytmZSF94OuFLjiFPiXkIf8e8wJLfW00CqUHSPs6cAu5N3SEH0XjkDQ
+         scOmJM7qgKI524uj7//J1UIBWrUThV6BQfLs3/Iya1b8uUeuCCJsVA2pdzyTMy3P/lGt
+         WVhXY7Z1h4l5yy75V+hbGXsCO1aAncXdJhBD9US4ie8BWMzeWbV94W0XOc0/01TJ3tbF
+         h9eQ==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1776276205; x=1776881005; darn=vger.kernel.org;
+        d=6wind.com; s=google; t=1776276497; x=1776881297; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ByBXDqA5q1B0FZhDcK57G+p+lp1SYGrMGUX9uywlaEI=;
-        b=dL92YRdAnbvvse6gTolRuE3bQcK0TyUfH2OQ7c+nA4+NvFYKyZq4JvB6AtmrHpS9d4
-         xXNaGQ/KcobarygHUbef8vkjt/wMSOyNLGOeuNKBHigSeKV8BC9qiPqvtgWtrbz6NLYL
-         gq89ChXsQrHuEJpK+YMjc03xcL4imbTGbtvrMeA64P+pkdhqXGXZSWfy3/dvYzJkhWUz
-         kNd6mEBH+KddgBQeIYgj0FDli7zKXLXxYLesiKrW+kXqwB1xnxdPULQAcK/fb32ycpUt
-         QBBoM4PIB7iItKLC7HlaUDjZTw53wcR2fuMFYYNHyygoqNnht/dl5ItVR+LI7N8iYPTs
-         OAQw==
+        bh=26dUy5Nk7fi7bs64cuAGqDvpQjZ4Ui+HpDi9p02QqOk=;
+        b=R8/25VZHmBbKeW5H5F74axvTK+PElw+LRIQXlsWaiSDOTUcAADUafT6jsDPMKKadWL
+         HmJsVT3tXpyvLw51oDkg4ntAhX0u4orkJPieP8+HW8IzSZVsjQsrzLs1g/SdTkYHz5om
+         SfaWIcCukb4RruKf4JojQep6s1NWcXyMgHUl4GElzt1YdAyeA+Ut/x2ufnDOIg7m24dE
+         C2H3O5vM56V5sBCumLDGgwH5hpg4i+KwDrmZYVdo538NuwzsZ0mOVIJVw5NmPNmYHjbO
+         Gn1Dd3h7OwyEukJMEgQ4NPEhSf0ruk0NEVK6RnTHZgVhtGjri2jE5qstlw//VrYD4B3W
+         kZQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776276205; x=1776881005;
+        d=1e100.net; s=20251104; t=1776276497; x=1776881297;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=ByBXDqA5q1B0FZhDcK57G+p+lp1SYGrMGUX9uywlaEI=;
-        b=gUJUefYlg2h7kr1w4bPT/9VVV3OYRFvN7r75AeWTuQL28kYQCsTwY0cOgpVvgASuQJ
-         O9cZmGWHCGUi8lHz+rGGx/nWNbWQyRX2uonfo9K53H6vBMAxPKz0XYCwwWe9pwzjnFnp
-         MdKIOIeGVrc+cStn0USzc9oB7oHP0Dbkf0BCB5N7wZQ61rjoIitbtThg4jc2Ts/X3hcQ
-         7ZdpjgdvzaOIdJQ3RjBgQGbeiWDttwleOADor5C6O3j9KqChLybHC8gwhrDeMbbcNRsN
-         qLIPWMa7V7TgY017hbMf/xLLIY/b5bHUs5B/yt61+7ktbhkTgRYPDjmZ3zFKl0d4lUKY
-         rDmA==
-X-Gm-Message-State: AOJu0YzKGdPI5boEfySgYS3WqHuvIpU+EXYhWuawUCgcE6fhG2JPFWVt
-	pBx6MC7/9tf18o2fi/rUPZrpohKuNaIpM/1q/WsN0WDvUjzBHuikT9NtW98sufIdYuj24vyzsnO
-	InSbQxnl5NnCCmfiscP4SSsJF9OzbWqAE8BdJ8eC6lYlLxZyLpZa/y1jPGB6r
-X-Gm-Gg: AeBDieudh19k+leg8Jz9bUcc1vKzQtMlRItiBDB2TG2stsMIfHWOfhN6viH3XqN1Rod
-	1w92OOFMOG5iE8nMYmMNnfi1be49YwVzBxWYIGSVLjzffeOlKQXQYsaSDtDTjdY4Lz0dn2UFeVQ
-	hxTpCqWGrrBLSMi7NTjUInwz8utveTPrPCgCYk5zOuNowVLb9Yrlf1V6sIkE3uCUYSQwodleQp3
-	7ddxtIUv9Tfv+VE3aTJmZcnchuQbKTULqj4zyz4aHnCGp/+9Eax3efphuc1EkGe8gNqiyxCf/Bi
-	gPEptFI6p6sLasfWkQnFv81/EME2zTkaby0En9FjAen8rkJxtsM=
-X-Received: by 2002:a17:907:6c0f:b0:b9b:e346:9a7d with SMTP id
- a640c23a62f3a-b9d7299000amr1201680866b.35.1776276204807; Wed, 15 Apr 2026
- 11:03:24 -0700 (PDT)
+        bh=26dUy5Nk7fi7bs64cuAGqDvpQjZ4Ui+HpDi9p02QqOk=;
+        b=ZMxHgMo4rPnRem9SXLaChc/uzDsoGG7xKCXAnOoJjPR9mBiFQceYKdopqVXmCiTyzk
+         lS806UuPps7JQnpHH7T/Zlq1Ec+HfILskXeBsHzYlGJenNXTlcCtBHSXnijpAV5DahCJ
+         Sx93PsadZK39r0vG8ETzzqqpSk26YNTNSlHQepWFU0wVPHSCFvsEgsK8v27Sn6NjxZNo
+         CpfpsCRvrB8EfWt6k4zrqN5nxqddIUhXId8SebD45RAxxa4hCt4m5JFPpHVq9ioOzTEA
+         CmRN35EsI8dsWb5cY54bfWfeJV09ozyGn3UqV4zfER1JdHj06xIZDGZRugahj9TXXAZq
+         zfeQ==
+X-Gm-Message-State: AOJu0Yzd3g6+k/x5kpXUfLwAFvLV3T+2Ot3hP67mCKhdvmfCARkrRADx
+	zJKwI/W4irhQUIGHqFOShM67ZjagsqdgE0iyXZimOO3oTmpWgGRxIkxdQ8uzZKLCJ1ofoq1k15q
+	nKc+5YIQQePWMFWMU5b+V6DjyshCDUkdDIS4hTAOP5Q==
+X-Gm-Gg: AeBDievN+SzvwxiCEKOOeoMpJZ6A62kHjb7sVhvi5PSvM4DSYlUZ+H4JlAFWq99PbXP
+	prV9+70or+MJcN7t721KcQTIpCXYXTI0ZyWSycTkD5JWIS7YA7eUruCIqWbHU1GbZF9uTTABAo3
+	Sah1aiiXnrvRuKXN3LLzBCigQZRO9CrYcljZszlF7d4SUxlhLYCpFxND+pNc5sn+4wkBNgnHsXp
+	WTkyrM2+FSFd6kRBdPCqCmQdjnmjN1AeKsQOlB2Mrv3/q3jmKlJTvUThTZSpqo4PemoFwljjQpc
+	66lFMFMxsHBr12MGLl2b5KmiYlVMi21Aa6fZC9XWs0BD/q1NA/Q=
+X-Received: by 2002:a17:907:c448:b0:b9c:30b8:dcad with SMTP id
+ a640c23a62f3a-b9d727971cfmr1347727666b.34.1776276496830; Wed, 15 Apr 2026
+ 11:08:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,13 +99,13 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20260408152353.276204-1-louis.scalbert@6wind.com>
- <20260408152353.276204-4-louis.scalbert@6wind.com> <707642.1776098994@famine>
-In-Reply-To: <707642.1776098994@famine>
+ <20260408152353.276204-5-louis.scalbert@6wind.com> <710787.1776105588@famine>
+In-Reply-To: <710787.1776105588@famine>
 From: Louis Scalbert <louis.scalbert@6wind.com>
-Date: Wed, 15 Apr 2026 20:03:12 +0200
-X-Gm-Features: AQROBzBVccjdsLu_f8uwYuXswLRXD2mbtLVWETnLdct3I6UvF225mGOY-uWfmyo
-Message-ID: <CAJ5u_OeByyvrUxy3Ri_9QChKKtWqPNZwegjPUvR9fR4zdnFL7g@mail.gmail.com>
-Subject: Re: [PATCH net v3 3/5] bonding: 3ad: fix mux port state on oper down
+Date: Wed, 15 Apr 2026 20:08:03 +0200
+X-Gm-Features: AQROBzCNYdFMnVDFTJ555v4vX8z3pgzXxzTtnlTHosPKM2wMtaVUI4sIW4lqbjI
+Message-ID: <CAJ5u_Oe90J6Kdt1wR=0se4YRWF6LJwzPvyt+oqPe0od-9vACtQ@mail.gmail.com>
+Subject: Re: [PATCH net v3 4/5] bonding: 3ad: fix stuck negotiation on recovery
 To: Jay Vosburgh <jv@jvosburgh.net>
 Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, edumazet@google.com, 
 	kuba@kernel.org, pabeni@redhat.com, fbl@redhat.com, andy@greyhouse.net, 
@@ -121,7 +121,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-278854-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-278855-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
@@ -137,106 +137,135 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[10];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D98BC406FCF
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,6wind.com:dkim,6wind.com:email]
+X-Rspamd-Queue-Id: A2D51406FF1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Le lun. 13 avr. 2026 =C3=A0 18:49, Jay Vosburgh <jv@jvosburgh.net> a =C3=A9=
+Le lun. 13 avr. 2026 =C3=A0 20:39, Jay Vosburgh <jv@jvosburgh.net> a =C3=A9=
 crit :
 >
 > Louis Scalbert <louis.scalbert@6wind.com> wrote:
 >
-> >When the bonding interface has carrier down due to the absence of
-> >valid slaves and a slave transitions from down to up, the bonding
-> >interface briefly goes carrier up, then down again, and finally up
-> >once LACP negotiates collecting and distributing on the port.
->
->         Instead of "valid," I would suggest "usable."
->
-> >The interface should not transition to carrier up until LACP
-> >negotiation is complete.
-
-I agree to take lacp_strict as the new parameter name.
-I should write instead:
-
-*With lacp_strict enabled,* the interface should not transition...
-
->
->         If the new option is off, i.e., does not require successful LACP
-> negotiation, it should wait some time before asserting carrier up.  If
-> negotiation fails, however, how long should it wait?
->
-
-I am not sure I understand your point.
-
-When lacp_strict is disabled, the existing behavior should remain
-unchanged. The purpose of this patch is only to correct the
-Collecting/Distributing state when the port is not operational.
-
-This state is not used to determine carrier assertion when lacp_strict
-is disabled.
-
-I will double-check that the timing remains unchanged before posting
-the next version of the patch.
-
-> >This happens because the actor and partner port states remain in
-> >collecting (and distributing) when the port goes down. When the port
-> >comes back up, it temporarily remains in this state until LACP
-> >renegotiation occurs.
+> >The previous commit introduced a side effect caused by clearing the
+> >SELECTED flag on disabled ports. After all ports in an aggregator go
+> >down, if only a subset of ports comes back up, those ports can no
+> >longer renegotiate LACP unless all aggregator ports come back up.
 > >
-> >Previously this was mostly cosmetic, but since the bonding carrier
-> >state now depends on the LACP negotiation state, it causes the
-> >interface to flap.
+> >1. All aggregator ports go down
+> >  - The SELECTED flag is cleared on all of them.
+> >2. One port comes back up
+> >  - Its SELECTED flag is set again.
+> >  - It enters the WAITING state and gets its READY_N flag.
+> >  - The remaining ports stay UNSELECTED. Because of that, they cannot
+> >  enter the WAITING state and therefore never get READY_N.
 >
->         "now depends" -> "may depend"
+>         This is the part that I think we may be doing something else
+> incorrectly.  If the port is UNSELECTED, then that means that no
+> aggregator is currently selected for that port, and therefore it
+> shouldn't be assigned to an aggregator with other ports (per
+> 802.1AX-2014 6.4.8, "Selected").
 >
-> >Fix this by unsetting the SELECTED flag when a port goes down so that
-> >the mux state machine transitions through ATTACHED and DETACHED,
-> >which clears the actor collecting and distributing flags. Do not
-> >attempt to set the SELECTED flag if the port is still disabled.
+>         I'm not seeing anything in the 6.4.14 Selection Logic that makes
+> me think a port that is down (port_enabled =3D=3D FALSE) is disallowed fr=
+om
+> being SELECTED.
+
+Yes. Clearing SELECTED when port_enabled =3D=3D FALSE is incorrect.
+That means my previous patch was wrong.
+
+>
+>         Looking at the Receive machine state diagram (Figure 6-18), I
+> tend to think that in this case the port would transition to
+> PORT_DISABLED state, as we're not asserting a BEGIN (reinitialization of
+> the LACP protocol entity), so the port variables can remain unchanged.
+> There's even some language that suggests this is intentional:
+>
+>         "If the Aggregation Port becomes inoperable and the BEGIN
+>         variable is not asserted, the state machine enters the
+>         PORT_DISABLED state. [...] This state allows the current
+>         Selection state to remain undisturbed, so that, in the event
+>         that the Aggregation Port is still connected to the same Partner
+>         and Partner Aggregation Port when it becomes operable again,
+>         there will be no disturbance caused to higher layers by
+>         unnecessary re-configuration.
+>
+>         So, perhaps the actual bug is that these ports are attached to
+> the aggregator but not SELECTED.
+
+Yes. According to the Mux state machine diagram, the correct behavior
+when port_enabled =3D=3D FALSE is to transition to the WAITING state,
+except when already in the DETACHED state.
+
+The WAITING state should then be responsible for clearing the
+Synchronization, Collecting, and Distributing flags.
+
+I will address this in the previous patch, so this one will no longer
+be necessary.
+
+best regards,
+
+Louis Scalbert
+
+
+>
+>         -J
+>
+>
+> >  - __agg_ports_are_ready() returns 0 because it finds a port without
+> >  READY_N.
+> >  - As a result, __set_agg_ports_ready() keeps the READY flag cleared on
+> >  all ports.
+> >  - The port that came back up is therefore not marked READY and cannot
+> >  transition to ATTACHED.
+> >  - LACP negotiation becomes stuck, and the port cannot be used.
+> >3. All aggregator ports come back up
+> >  - They all regain SELECTED and READY_N.
+> >  - __agg_ports_are_ready() now returns 1.
+> >  - __set_agg_ports_ready() sets READY on all ports.
+> >  - They can then transition to ATTACHED.
+> >  - Negotiation resumes and the aggregator becomes operational again.
+> >
+> >Consider only ports currently in the WAITING mux state for READY_N in
+> >order to avoid __agg_ports_are_ready() to return 0 because of a disabled
+> >port. That matches 802.3ad, which states: "The Selection Logic asserts
+> >Ready TRUE when the values of Ready_N for all ports that are waiting to
+> >attach to a given Aggregator are TRUE.".
 > >
 > >Fixes: 655f8919d549 ("bonding: add min links parameter to 802.3ad")
 > >Signed-off-by: Louis Scalbert <louis.scalbert@6wind.com>
 > >---
-> > drivers/net/bonding/bond_3ad.c | 7 +++++++
-> > 1 file changed, 7 insertions(+)
+> > drivers/net/bonding/bond_3ad.c | 5 ++++-
+> > 1 file changed, 4 insertions(+), 1 deletion(-)
 > >
 > >diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond_3=
 ad.c
-> >index b79a76296966..3a94fbcbf721 100644
+> >index 3a94fbcbf721..3f56d892b101 100644
 > >--- a/drivers/net/bonding/bond_3ad.c
 > >+++ b/drivers/net/bonding/bond_3ad.c
-> >@@ -1570,6 +1570,12 @@ static void ad_port_selection_logic(struct port *=
-port, bool *update_slave_arr)
-> >       struct slave *slave;
-> >       int found =3D 0;
+> >@@ -700,7 +700,8 @@ static void __update_ntt(struct lacpdu *lacpdu, stru=
+ct port *port)
+> > }
 > >
-> >+      /* Disabled ports cannot be SELECTED.
-> >+       * Do not attempt to set the SELECTED flag if the port is still d=
-isabled.
-> >+       */
-> >+      if (!port->is_enabled)
-> >+              return;
-> >+
->
->         I think the change is fine, but the comment seems redundant to
-> me.
->
->         -J
->
-> >       /* if the port is already Selected, do nothing */
-> >       if (port->sm_vars & AD_PORT_SELECTED)
-> >               return;
-> >@@ -2794,6 +2800,7 @@ void bond_3ad_handle_link_change(struct slave *sla=
-ve, char link)
-> >               /* link has failed */
-> >               port->is_enabled =3D false;
-> >               ad_update_actor_keys(port, true);
-> >+              port->sm_vars &=3D ~AD_PORT_SELECTED;
-> >       }
-> >       agg =3D __get_first_agg(port);
-> >       ad_agg_selection_logic(agg, &dummy);
+> > /**
+> >- * __agg_ports_are_ready - check if all ports in an aggregator are read=
+y
+> >+ * __agg_ports_are_ready - check if all ports in an aggregator that are=
+ in
+> >+ * the WAITING state are ready
+> >  * @aggregator: the aggregator we're looking at
+> >  *
+> >  */
+> >@@ -716,6 +717,8 @@ static int __agg_ports_are_ready(struct aggregator *=
+aggregator)
+> >               for (port =3D aggregator->lag_ports;
+> >                    port;
+> >                    port =3D port->next_port_in_aggregator) {
+> >+                      if (port->sm_mux_state !=3D AD_MUX_WAITING)
+> >+                              continue;
+> >                       if (!(port->sm_vars & AD_PORT_READY_N)) {
+> >                               retval =3D 0;
+> >                               break;
 > >--
 > >2.39.2
 > >
