@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-278776-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278777-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6HgHBguS32l0WAAAu9opvQ
-	(envelope-from <netdev+bounces-278776-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 15:26:35 +0200
+	id mEJ7DgeT32n5WAAAu9opvQ
+	(envelope-from <netdev+bounces-278777-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 15:30:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 841B7404C1F
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 15:26:34 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A892404C83
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 15:30:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 14E6F3016810
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 13:26:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8F7C63013D74
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 13:29:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 599403A5E64;
-	Wed, 15 Apr 2026 13:26:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6CD03A75A1;
+	Wed, 15 Apr 2026 13:29:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bf7vnJgp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d4GXhRDY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3029422538F
-	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 13:26:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0B383A759E
+	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 13:29:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776259592; cv=none; b=mn/qn36UB9upvG43ERni5yH4NX65K9Os1Xgm1gel74apEJZfo52PFfIACOWuROzJEO1gQtGahZq8CcXlmDnDPvScLILRb0lLG1F83fqhah09X2foHjzTYf0dmoPPjn175vAhYSvgHlsHq0yvO9V8fY6iouF1SErMYbTcBiFY1wE=
+	t=1776259754; cv=none; b=THTqKHo+QXL5xwxw72r3uoEVcCV+mNm/cV2oD7K1D74brh00jhdE1jwDoizGA6Xe6m3lStlas+hSCqPAg6jwGVEE4CQRqmrJXdVdzJR1yMvHKpTXSwl8JKvH4uNQysmJt+FqEVZzhfGbCQSPGJeJrLqAS1e0YWRe134EgGJr4DQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776259592; c=relaxed/simple;
-	bh=DENY9p9CKwihwW347KzzpeYMyVvwNcN5J3ZSHZcwozU=;
+	s=arc-20240116; t=1776259754; c=relaxed/simple;
+	bh=eAWQHpbhG+wTBm+8dI2tV4sVTXIGvKAGTUtdJwkdizg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=czF/uKUiP20BMfBuMofCq+sgFaOzHnzUe6uffr94yZxz//wjXDndJp138NNc2F/Kk4qJjY+O5tY0SJ0Ti48RMzDi9ntnjuEPdh5kMh88LQ7547zAJbdUigLJpy+4m5hnAsHvDAms77PzCVbc3RcTfj2w0s717Inp+iytArc/DpM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bf7vnJgp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B309EC19424;
-	Wed, 15 Apr 2026 13:26:30 +0000 (UTC)
+	 MIME-Version; b=f5iuce/wPakujtq1Ksf3WWzXRAaleMjtNC3oya7FgrMct1RH6zA3VVSm4ssK03I4T747e1g0BwsgQ/PBzafH6OgumbtaV1veVZxtbQu2UYuNFhbsWnBYIMOtlNVhjtksl82E74JTBc7F/6JznfYjFaOblrcA6MagSUJmIexO1wk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d4GXhRDY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E17A4C19424;
+	Wed, 15 Apr 2026 13:29:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776259592;
-	bh=DENY9p9CKwihwW347KzzpeYMyVvwNcN5J3ZSHZcwozU=;
+	s=k20201202; t=1776259754;
+	bh=eAWQHpbhG+wTBm+8dI2tV4sVTXIGvKAGTUtdJwkdizg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=bf7vnJgpzCsbPUH8WG8aESx8Oi+xPqzTkKQaUX7Pc5u2zei199VgIVJlfLq5cU4v9
-	 TGajpwWHwS8L9OyXYRva8Iv/nJm3OJj1vLNpCyfTKA/MnGfZUAvSVIQ/irb6M1vPGI
-	 UZ/oAZ0211kBLmKkwVazf18jzrnthWWp5eGlXWWilmllIaKghpfjLJ4XiGSFjLTDMU
-	 zeP86rJ4KfySFbfchl5zVQHbNaci1v7fIEwY8mEgOl0inXbgomqSDYoiZZ0f2WqjEY
-	 HxNJrENRJAV4FdDNtfNQpLJGIrIFUlXbr2IGm7IpEY4juAuAOVw0Met80TpFdcYMFQ
-	 z6Q+AO+uypEtQ==
+	b=d4GXhRDY6Ln7jxPnxTRB9PU3l07/uBxnJfD/Uxj9AihJXctersFsfAcUach85VjQT
+	 FNRyjiRtLR/dUlFDMMvecy9n6xvc3cpD7r5SPx3CPw/T+JqElKwVjOA0YqTobera+a
+	 zt0kkkX57W8ykDHOqhQTrN5VE/ynycmBDz7vRX/NS/Ut68vTgTz1tv3swmbatmWXR0
+	 jfeo5pLA9pHppGZRdaszcygckFC3U1iuG6suozQzFKZaNGcrvrCSwqx7OD4shYtNz6
+	 /M4CYM/rZy1koLakm/4VI8JaAKCLD1+rbV/pj4d621v2FuGAD40TS8SDGFrvgzKqcP
+	 naTS9wOlzLA9Q==
 From: Simon Horman <horms@kernel.org>
 To: aleksandr.loktionov@intel.com
 Cc: 'Simon Horman' <horms@kernel.org>,
@@ -51,12 +51,12 @@ Cc: 'Simon Horman' <horms@kernel.org>,
 	anthony.l.nguyen@intel.com,
 	netdev@vger.kernel.org,
 	kiran.patil@intel.com
-Subject: Re: [PATCH iwl-net 2/5] iavf: fix error path in iavf_request_misc_irq
-Date: Wed, 15 Apr 2026 14:26:11 +0100
-Message-ID: <20260415132610.803526-2-horms@kernel.org>
+Subject: Re: [PATCH iwl-net 3/5] iavf: prevent VSI corruption when ring params changed during reset
+Date: Wed, 15 Apr 2026 14:28:58 +0100
+Message-ID: <20260415132858.805112-1-horms@kernel.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260413073035.4082204-3-aleksandr.loktionov@intel.com>
-References: <20260413073035.4082204-3-aleksandr.loktionov@intel.com>
+In-Reply-To: <20260413073035.4082204-4-aleksandr.loktionov@intel.com>
+References: <20260413073035.4082204-4-aleksandr.loktionov@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,18 +69,18 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278776-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-278777-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	TO_DN_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
@@ -90,8 +90,8 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_FIVE(0.00)[6];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 841B7404C1F
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 8A892404C83
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
@@ -101,47 +101,64 @@ This is an AI-generated review of your patch. The human sending this
 email has considered the AI review valid, or at least plausible.
 Full review at: https://sashiko.dev
 ---
-iavf: fix error path in iavf_request_misc_irq
+iavf: prevent VSI corruption when ring params changed during reset
 
-This patch drops the free_irq() call from the error path of
-iavf_request_misc_irq() when request_irq() fails. This is intended to
-prevent a kernel warning when freeing an unrequested vector.
+Changing ring parameters via ethtool triggers a VF reset and queue
+reconfiguration. If ethtool is called again before the first reset
+completes, the second reset races with uninitialised queue state and
+can corrupt the VSI resource tree on the PF side. Return -EAGAIN from
+iavf_set_ringparam() when the adapter is already resetting or its queues
+are disabled.
 
-> diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
-> index dad001abc9086..ab5f5adc2d3c2 100644
-> --- a/drivers/net/ethernet/intel/iavf/iavf_main.c
-> +++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
-> @@ -587,7 +587,6 @@ static int iavf_request_misc_irq(struct iavf_adapter *adapter)
->  		dev_err(&adapter->pdev->dev,
->  			"request_irq for %s failed: %d\n",
->  			adapter->misc_vector_name, err);
-> -		free_irq(adapter->msix_entries[0].vector, netdev);
+> diff --git a/drivers/net/ethernet/intel/iavf/iavf_ethtool.c b/drivers/net/ethernet/intel/iavf/iavf_ethtool.c
+> index 1cd1f3f2930a0..390913170315f 100644
+> --- a/drivers/net/ethernet/intel/iavf/iavf_ethtool.c
+> +++ b/drivers/net/ethernet/intel/iavf/iavf_ethtool.c
+> @@ -495,6 +495,11 @@ static int iavf_set_ringparam(struct net_device *netdev,
+>  	if ((ring->rx_mini_pending) || (ring->rx_jumbo_pending))
+>  		return -EINVAL;
+>  
+> +	if (adapter->state == __IAVF_RESETTING ||
+> +	    (adapter->state == __IAVF_RUNNING &&
+> +	     adapter->flags & IAVF_FLAG_QUEUES_DISABLED))
+> +		return -EAGAIN;
+> +
 
-Does this patch completely fix the warning?
+Is there a lockless Time-Of-Check to Time-Of-Use race here?
 
-If request_irq() fails, iavf_request_misc_irq() returns an error but leaves
-adapter->msix_entries allocated.
+iavf_set_ringparam() is called from ethtool under rtnl_lock(), but the
+background iavf_reset_task() synchronizes using netdev_lock(). Because iavf
+does not set netdev->request_ops_lock = true, the ethtool core does not
+acquire netdev_lock() for iavf_set_ringparam().
 
-In caller error handling paths like iavf_disable_vf() which clean up after a
-failure, iavf_free_misc_irq() is called:
+This allows adapter->state to transition to __IAVF_RESETTING immediately
+after this lockless check.
 
-static void iavf_free_misc_irq(struct iavf_adapter *adapter)
-{
-	struct net_device *netdev = adapter->netdev;
+Furthermore, calling iavf_reset_step() later in this function without
+holding netdev_lock() allows the hardware reset sequence to execute
+concurrently from both the ethtool thread and the workqueue, which could
+lead to VSI resource corruption.
 
-	if (!adapter->msix_entries)
-		return;
+Could this open-coded state check miss pending resets?
 
-	free_irq(adapter->msix_entries[0].vector, netdev);
-}
+If a reset is scheduled (e.g., by a watchdog timeout setting
+IAVF_FLAG_RESET_NEEDED) but the worker task hasn't started yet,
+adapter->state will still be __IAVF_RUNNING. This check will pass, and
+iavf_set_ringparam() will proceed to mutate ring parameters and execute
+iavf_reset_step(), racing with the previously scheduled iavf_reset_task.
 
-Since adapter->msix_entries is still allocated, the check passes and free_irq()
-is called on the unrequested vector anyway, triggering the exact same warning.
+Can this be addressed by also checking for IAVF_FLAG_RESET_NEEDED and
+IAVF_FLAG_RESET_PENDING?
 
-Does the driver need to explicitly track whether the IRQ was successfully
-requested?
+Also, the commit message notes that triggering a VF reset before the first
+one completes causes VSI resource tree corruption. Both iavf_set_channels()
+and iavf_change_mtu() also dynamically reconfigure queues and
+unconditionally trigger resets by calling iavf_reset_step(adapter).
 
->  	}
->  	return err;
->  }
+Should these functions be updated to include a similar state check to
+prevent the same VSI resource tree corruption on the PF side?
+
+>  	if (ring->tx_pending > IAVF_MAX_TXD ||
+>  	    ring->tx_pending < IAVF_MIN_TXD ||
+>  	    ring->rx_pending > IAVF_MAX_RXD ||
 
