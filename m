@@ -1,192 +1,167 @@
-Return-Path: <netdev+bounces-278846-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278847-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8KRTKz3K32nVYwAAu9opvQ
-	(envelope-from <netdev+bounces-278846-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 19:26:21 +0200
+	id yKOnI2PL32nVYwAAu9opvQ
+	(envelope-from <netdev+bounces-278847-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 19:31:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10984406C84
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 19:26:20 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87AF4406D0E
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 19:31:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DC20530E1D08
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 17:08:55 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id DB634305497C
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 17:23:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC1373E5581;
-	Wed, 15 Apr 2026 17:08:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B90763E9585;
+	Wed, 15 Apr 2026 17:23:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="ubOpxq+0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KBvTTE8a"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f173.google.com (mail-dy1-f173.google.com [74.125.82.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0300133120C;
-	Wed, 15 Apr 2026 17:08:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C82A395D9F
+	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 17:23:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776272934; cv=none; b=Bc27cjLx+/KNX3dlsnGlewN78FlSKVD5xisVDA11f7eCCZXE4+Bd0rU8dHak3n7x3zGkk+iGwyj915X17YLhJed/RVjf3ZuIe5dvteDM80ds1vxdkbKi3GPX2zdYPmGsDu84vKaAoUQtXdky+8YYmoY8A8Ios3BaubLadjj0E3w=
+	t=1776273813; cv=none; b=pLKxv2Ab/R4vcGO/xQhQmGCtYOa6zq1dCqKnq2pdJzEd498BA2ErPqF5olX6Rs4h059JlgyfF6KozZwYzngJ4EsTJvsccyJozy+UNxG+7DeJS8PYbHttR9AkBoKNSp3rnMhvdU/3QkhQxNo7gEkh2xhGikgt8szicY4QiIpFfvA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776272934; c=relaxed/simple;
-	bh=8EdpDbjWpEfY9zXDyutbjs8BUV0E1+6AmdmLmyEMfSA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fPzrIajZ75VS92XP+uAuT/JS+NIPuZB7QPdb2P6BzeBGqE8/13vgfhDlm3SUKA+Ve0g9FI/b3Csf5RnTNFJdWini5g4CHdIFwIePW204KVLMZuFV4A5TW22Qt2smQSBPhQXQpFBTHHXUx5q6mjiKyJ218oADo2kfueH0zAtjKF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=ubOpxq+0; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: from localhost.localdomain (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with ESMTPSA id 1EF2B60177;
-	Wed, 15 Apr 2026 19:08:50 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1776272931;
-	bh=6bOJS2bqcYmFCvqyYFWPjJ+z4vwva44OIAdYCVYUYSo=;
-	h=From:To:Cc:Subject:Date:From;
-	b=ubOpxq+02y2nkfryzTbNz7OyvqmyTWu6sHYiBPJgeLGpItsTJCx0xYalP8cAMA88b
-	 Kz0ePAVgyk05w6OJM7my66kp4C0bvdquWxhHtmX3yZ5yao7d4Zkya3zQPTWTBwDz6r
-	 Qnov6lW822xlJsuR6zjdMOZksXh1Z8Qs0nQE6wuHFF2KDqzssAZRjB9Alwv75/URnH
-	 jUywN5eqFzvckPQqXNCsu4yBoZwUOpqdt30EmL7fjp9bXP5xl6PyDu9MH/cnltUJUV
-	 XLYlzBDiVnG6kTKY6iCH5Pmns6zxpmKCrxfccyWipanjOJaBy67oY/w7zcx4P2NKg6
-	 JUdhol/zGMnGQ==
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net,
-	netdev@vger.kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	fw@strlen.de,
-	horms@kernel.org,
-	joelagnelf@nvidia.com,
-	josh@joshtriplett.org,
-	boqun@kernel.org,
-	urezki@gmail.com,
-	rostedt@goodmis.org,
-	mathieu.desnoyers@efficios.com,
-	jiangshanlai@gmail.com,
-	qiang.zhang@linux.dev,
-	rcu@vger.kernel.org
-Subject: [PATCH nf,v2 1/3] rculist: add list_splice_rcu() for private lists
-Date: Wed, 15 Apr 2026 19:08:44 +0200
-Message-ID: <20260415170844.41355-1-pablo@netfilter.org>
-X-Mailer: git-send-email 2.47.3
+	s=arc-20240116; t=1776273813; c=relaxed/simple;
+	bh=mpiW98q5chB3jszBp5OXfQ1hRIuKU7nwacyQchk257U=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=imHap76Zn6Z+UxvrYZ9zXBSb0OV+G1BalkIgdUnu72eo7o5a0i5hJJJo4iURcuqrYY8JfgNwVg2ZNPqPPVAFwW/QPvEAVM/9WzFmxc10NkTxHl47dKwajCz8YFNN5Za/pmzlqbCGuuUiKplH2TEBSIozKolk0fGStgI+kHkLFSY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KBvTTE8a; arc=none smtp.client-ip=74.125.82.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dy1-f173.google.com with SMTP id 5a478bee46e88-2d8ffdc31d0so7631084eec.0
+        for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 10:23:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776273810; x=1776878610; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:to:subject:cc
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mpiW98q5chB3jszBp5OXfQ1hRIuKU7nwacyQchk257U=;
+        b=KBvTTE8a1mEX0n5ee3suoG6vnre8r0VQSYC3Z8kVmp/bulTZkImpUjiCTVGRwE1PoN
+         MqAJmHBHvIlTCOPVh0TH4qDI0KZUw3FpHFjesFyH9IxhiKEksQqcC/GbJDp+LSHepgGI
+         NkYWfluGQOF6ouigZUpThu8l8MBPzmEr0fOTpmPtGTdtqVX2iz7+0KIynxOxza6efz9H
+         2ltl24ozJItfGthqUFxBMnDgJIrOk9rqQMIEMtf/RAaVmuMFfF4DiWgfIrqCPs87+Cvt
+         SEwxmB1PY4D9ttRcA4ZvNkTpXkIzTT5LtrWc2xj/13yjgDoztAxLQJ3bClxgSsFBuFFW
+         DuQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776273810; x=1776878610;
+        h=content-transfer-encoding:in-reply-to:from:references:to:subject:cc
+         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=mpiW98q5chB3jszBp5OXfQ1hRIuKU7nwacyQchk257U=;
+        b=IupDVWP36gWncY/upMZ/4ucfOgisVGsFRQ6mZKncGQF3yknfswcmBH3aQjbMJ7MgUQ
+         la0Sf8jb+ewiPRotnMiYM9SlJRc3xeleX2fc3Rjmy93YEB5L0oHl3A9ht7PShv8dRegu
+         LQcDYZJz86KbuLAf55ylyu/pVPIghEyW2XjcRhVehn8fVGQGqcfMv4Y/YR/pJNGlxcJi
+         RBZi0ce9gupU3ZrL0b9ncpNaTyZd6aVjo3hlZl4uNM+PkIlhgbCr1uSd3SLoc2/SxMbO
+         ek40b+hi4wl1ntX4/BedfttjuNCwT0BHNonlcBzocOe7ccfATXjGxb1Qfgd7hIken0P2
+         2PIw==
+X-Forwarded-Encrypted: i=1; AFNElJ/EiEvCKrG70IY5WZxQM7RZ6smPRvvlXn3DxwieJ3mT726SXMtAKZiL0nTYD2Yk1qfEXhJ7jLE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxe1qu9tUC559raJVGYbYOhOAWRwKLYziq1+X2gIQoDA8aYgHE+
+	5uDWW0z6GUj66ZuriemxfxmUHp87M3DHrdn91eoSMrPViUFCaPhxLyce
+X-Gm-Gg: AeBDieuf2V2LPwr5g/SKtCJv8UN4oYjIIPvHA0mQN+XnYpjD5V5Ixa36XiEdnl1e6Yp
+	ASH7eGOpNd8A6MezNCZoG0GI4+n+165eefTzbJ8dcTvlmPVfMsqlIvpX/s0xKrq6qt9jvilnFpU
+	Z/kqMEDqfYEXb5ndRs0DlYiy6g7XD92O9mMnSoxyEi1SmXXjcV1uxt1iYrriD2QqWSzkUXj2fSR
+	I9eBo2nBvmdZpQSgWMkafwyClnOjBy3r/GysQ5bex32qWP+bkcfAZk3fg7Th7NVVlODs261RLW+
+	kXE6Bh/+ntJfGzLTrAY11vGMD/TdAzmMglTZlLllebzAwqnSVJwsVMsduA4ZzIzsOzQNEH88hNP
+	kRNemcMteb1RqrxpNeri43eHa/itGGcBUCAk6gb76z4Muoa1CR1wspWDfl6NAg4CM/HXpJQJv99
+	jmaeYFPkF6xjn5Bl+PnLPSic61j1Xi16a7P9C/BWrROWJOHyo=
+X-Received: by 2002:a05:7022:fa8:b0:128:d2a5:709c with SMTP id a92af1059eb24-12c34f18363mr12935629c88.33.1776273810099;
+        Wed, 15 Apr 2026 10:23:30 -0700 (PDT)
+Received: from [10.0.0.2] ([169.235.25.186])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2de8f65fc42sm3485269eec.23.2026.04.15.10.22.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 15 Apr 2026 10:23:29 -0700 (PDT)
+Message-ID: <2fbe2fc5-0e4d-4a87-93b7-9b23f8b3a16b@gmail.com>
+Date: Wed, 15 Apr 2026 10:22:06 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Cc: yuantan098@gmail.com, magnus.karlsson@intel.com,
+ maciej.fijalkowski@intel.com, netdev@vger.kernel.org, bpf@vger.kernel.org,
+ sdf@fomichev.me, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, ast@kernel.org, daniel@iogearbox.net,
+ hawk@kernel.org, john.fastabend@gmail.com, bjorn@kernel.org,
+ linux-kernel@vger.kernel.org, yifanwucs@gmail.com
+Subject: Re: [PATCH 1/1] xskmap: reject TX-only AF_XDP sockets
+To: Jason Xing <kerneljasonxing@gmail.com>, Linpu Yu <linpu5433@gmail.com>
+References: <cover.1774701288.git.linpu5433@gmail.com>
+ <6584463e576b7bb3619dc302cfecfb8ca56bc86a.1774701288.git.linpu5433@gmail.com>
+ <CAL+tcoAy5WQRsL6z=YinPaiBNvd_=WB7qsR4amf1x4=qVw7AAg@mail.gmail.com>
+From: Yuan Tan <yuantan098@gmail.com>
+In-Reply-To: <CAL+tcoAy5WQRsL6z=YinPaiBNvd_=WB7qsR4amf1x4=qVw7AAg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-278846-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[davemloft.net,vger.kernel.org,kernel.org,redhat.com,google.com,strlen.de,nvidia.com,joshtriplett.org,gmail.com,goodmis.org,efficios.com,linux.dev];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[netfilter.org];
+	TAGGED_FROM(0.00)[bounces-278847-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	DKIM_TRACE(0.00)[netfilter.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[gmail.com,intel.com,vger.kernel.org,fomichev.me,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[yuantan098@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.999];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[netfilter.org:email,netfilter.org:dkim,netfilter.org:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 10984406C84
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lzu.edu.cn:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 87AF4406D0E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This patch adds a helper function, list_splice_rcu(), to safely splice
-a private (non-RCU-protected) list into an RCU-protected list.
 
-The function ensures that only the pointer visible to RCU readers
-(prev->next) is updated using rcu_assign_pointer(), while the rest of
-the list manipulations are performed with regular assignments, as the
-source list is private and not visible to concurrent RCU readers.
+On 4/15/2026 1:43 AM, Jason Xing wrote:
+> On Mon, Mar 30, 2026 at 3:33 AM Linpu Yu <linpu5433@gmail.com> wrote:
+>> Reject TX-only AF_XDP sockets from XSKMAP updates. Redirected
+>> packets always enter the Rx path, where the kernel expects the
+>> selected socket to have an Rx ring. A TX-only socket can
+>> currently be inserted into an XSKMAP, and redirecting a packet
+>> to it crashes the kernel in xsk_generic_rcv().
+>>
+>> Keep TX-only AF_XDP sockets valid for pure Tx use, but prevent
+>> them from being published through XSKMAP.
+>>
+>> Fixes: fbfc504a24f5 ("bpf: introduce new bpf AF_XDP map type BPF_MAP_TYPE_XSKMAP")
+>> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+>> Reported-by: Yuan Tan <yuantan098@gmail.com>
+>> Signed-off-by: Xin Liu <bird@lzu.edu.cn>
+>> Signed-off-by: Yifan Wu <yifanwucs@gmail.com>
+>> Signed-off-by: Linpu Yu <linpu5433@gmail.com>
+> Hi Linpu,
+>
+> Any plan to post a v2 with our questions resolved?
+>
+> Thanks,
+> Jason
 
-This is useful for moving elements from a private list into a global
-RCU-protected list, ensuring safe publication for RCU readers.
-Subsystems with some sort of batching mechanism from userspace can
-benefit from this new function.
+Hi Jason, Linpu has an exam to take this week. He told he can try
+preparing the v2 patch this weekend. Best,
 
-The function __list_splice_rcu() has been added for clarity and to
-follow the same pattern as in the existing list_splice*() interfaces,
-where there is a check to ensure that that the list to splice is not
-empty. Note that __list_splice_rcu() has no documentation for this
-reason.
-
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
----
-v2: including comments by Paul McKenney.
-
-    Except, I have deliberately keep back the suggestion to squash
-    __list_splice_rcu() into list_splice_rcu(), I instead removed
-    the documentation for __list_splice_rcu(). I am looking
-    at other existing list_splice*() function in list.h and rculist.h
-    to get this aligned with __list_splice(), which also has no users
-    in the tree and no documentation. I find it easier to read with
-    __list_splice(), but if this explaination is not sound so...
-
-    @Paul: I can post v3 squashing __list_splice_rcu(), just let me
-           know.
-
-    Thanks!
-
- include/linux/rculist.h | 29 +++++++++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
-
-diff --git a/include/linux/rculist.h b/include/linux/rculist.h
-index 2abba7552605..e3bc44225692 100644
---- a/include/linux/rculist.h
-+++ b/include/linux/rculist.h
-@@ -261,6 +261,35 @@ static inline void list_replace_rcu(struct list_head *old,
- 	old->prev = LIST_POISON2;
- }
- 
-+static inline void __list_splice_rcu(struct list_head *list,
-+				     struct list_head *prev,
-+				     struct list_head *next)
-+{
-+	struct list_head *first = list->next;
-+	struct list_head *last = list->prev;
-+
-+	last->next = next;
-+	first->prev = prev;
-+	next->prev = last;
-+	rcu_assign_pointer(list_next_rcu(prev), first);
-+}
-+
-+/**
-+ * list_splice_rcu - splice a non-RCU list into an RCU-protected list,
-+ *                   designed for stacks.
-+ * @list:	the non RCU-protected list to splice
-+ * @head:	the place in the existing RCU-protected list to splice
-+ *
-+ * The list pointed to by @head can be RCU-read traversed concurrently with
-+ * this function.
-+ */
-+static inline void list_splice_rcu(struct list_head *list,
-+				   struct list_head *head)
-+{
-+	if (!list_empty(list))
-+		__list_splice_rcu(list, head, head->next);
-+}
-+
- /**
-  * __list_splice_init_rcu - join an RCU-protected list into an existing list.
-  * @list:	the RCU-protected list to splice
--- 
-2.47.3
+Yuan
 
 
