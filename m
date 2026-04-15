@@ -1,162 +1,268 @@
-Return-Path: <netdev+bounces-278848-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278849-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uFdqCKHL32nVYwAAu9opvQ
-	(envelope-from <netdev+bounces-278848-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 19:32:17 +0200
+	id oAnVMCjN32lwZAAAu9opvQ
+	(envelope-from <netdev+bounces-278849-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 19:38:48 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 367AC406D25
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 19:32:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A015406DA9
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 19:38:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2F15F3006B38
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 17:32:15 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 353C5302689F
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 17:38:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 171043EC2FF;
-	Wed, 15 Apr 2026 17:32:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FC743DFC85;
+	Wed, 15 Apr 2026 17:38:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="hDOnBqER"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BkJFzCy7"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DBAA3ED10A
-	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 17:32:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776274333; cv=none; b=BH7psHk7GaoPIy+h22+S09NxqWK8h8XM2gVL5QYFfDg9kXdGvKzo5s32wb7XiZ1ZnwX4JSGIuWSLEUNBeKhOqNcHHDEEvzGoxTTqNAcPKptXa9ELrj9tGtpqPMtenlow/gX8I+lfkeTEa1QJIb4sW6gwkNwRlv+Dtsit8Vfv5H8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776274333; c=relaxed/simple;
-	bh=1I1KmVFUZ5qSJm4NxYrqYBOrSRz2EsAkrxr7eQWclx4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iNm7o8qR2vHk0JzXvhb/WagF6qo/YUx5rOvnIqCxbiBPnFT+vIU8Rm51ZJFWW2q1oXdm+aHYN36o2sXfDr7UHfuodWQuUKj41Qk5jacDLM+z2MtUorMaqi6AvIoE8DBJ60oW9gvR4prXbfvQ7gJWHQMKlLZilEKOfuU/xtUgYkI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=hDOnBqER; arc=none smtp.client-ip=91.218.175.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Wed, 15 Apr 2026 10:31:42 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1776274315;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1E9SNK8votdUUiELWyxRQ1UqK27dc1Rr/hhOeHUwdoA=;
-	b=hDOnBqERvoCMz08Ir2a3RtH+hTMsuZ4BHDTcoUHor1IZRAhPilXWIUhAICj9zqewdfmNRc
-	CxDxjRzmrJWSzPAUsBdiRx4ADUm0M9s1W+KRe9Opybqq+1xWD0G5y9tVAifm2xnEKIMSdT
-	DqIHDxj21hZEfv2aLmnCLD0AfpZB6Xg=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-To: KaFai Wan <kafai.wan@linux.dev>
-Cc: edumazet@google.com, ncardwell@google.com, kuniyu@google.com, 
-	davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, 
-	horms@kernel.org, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
-	eddyz87@gmail.com, memxor@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
-	jolsa@kernel.org, shuah@kernel.org, sdf@fomichev.me, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	Quan Sun <2022090917019@std.uestc.edu.cn>, Yinhao Hu <dddddd@hust.edu.cn>, 
-	Kaiyan Mei <M202472210@hust.edu.cn>
-Subject: Re: [PATCH bpf-next 1/2] bpf: tcp: Reject TCP_NODELAY from BPF hdr
- opt callbacks
-Message-ID: <2026415171036.QLi9.martin.lau@linux.dev>
-References: <20260414112310.1285783-1-kafai.wan@linux.dev>
- <20260414112310.1285783-2-kafai.wan@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AD5B314B9A
+	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 17:38:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.41
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776274725; cv=pass; b=u/jMWTYGTdgGhqmeK4v6c9YC21FfEyJPM6/Z1jwxaz7uqyZ3q6WcTFCoGBdJ7kjX6qaOeE/tRMjRgpVlvQ3zBsADXCupieFsM8MiumOdcUojzsfnwb0H3dUGDIUlZ524gIM5l06fAadAoYelxPeEXgMhX9W70kT/DlbVjktHyNU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776274725; c=relaxed/simple;
+	bh=KHv/gxEwI20U718wg2muzGZhRAj4yw3xXpPOajzOexY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IRU2BL8phVVXTCrtp9jVuy2+w2s9oGKGYwfB98YRM+OAqHIE+rC/HubMvTOjRZaTDso9yqRE9anT48qBGVh8sm79SFRwswlzFztxRrVec8S43jYgyMvz02M1LZfZr6va+gzqSa+PaR0CdTE38jedYyBNK1JwsRcNKkkgZFJ7Ib8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BkJFzCy7; arc=pass smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-488a4bc360bso39523705e9.0
+        for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 10:38:43 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776274722; cv=none;
+        d=google.com; s=arc-20240605;
+        b=R3mPYsrVdX7Ze2YHWjjVo24CUBcnV+7NXwgdR9Dp6M9cU4TzJc6IWxg7xlKpRJ6IgA
+         4/b+wVs5QqJ8J3D5d/WedubL2htMDa1RsnyjG1URN+zq1r7walNzdNaUu/U7kNouR8Hr
+         4gxmn8c0AlEZ3xEkDFMhb7Iv4v6bEQuaC/E3WIlayAUZ5yKCHtuGskKjeIxR1gR6mwjF
+         KyJQv61hPQLeP9r/EztAdsTqpyBRNdc/5fKr3E60Kg6KGsRComSu98x0B4Q9OO/YrZ91
+         rZdT+/8dWl4CkdR9W0uGF4ZBF62WmR2gzazLdkPVGiwB0HgY8SrQ5/iOvuX16vrz8ojW
+         WRig==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=zcbF3rKrTIYUlxquwtwJBdRMB8TU6zntVRfT41or7CA=;
+        fh=gcEaXBPRD8JzfaK9ZiGo9gbDZAHx3IScGWy6yOHyCyU=;
+        b=YVaYYIN0WTerSnEbWPjzfBxOioa+w2oI0LuKm3v+fDy3yzTTuexMhZJfQEsFZOP0bF
+         0xghkdgCkIy8UeCGc8qwjG7DXRLvHk4a1NjwymKtyDjVzSyTHXEvPdaDjmFZk2O6GPjA
+         hOsxKKyKOhkOdsAEftIymK9SU7AFjwNne/d2FHJXaq2LR/v9IqZ/iOax2FOuuFfU1DT1
+         Vqi3XaeCEK0VmupO/zAET7OBnDMJp6TNjN+3DWsjuUNGsBbCyhuoSfXaVhVOUdv4lP1O
+         N/Owgp8vwFieqMQxlETLfN+3LXq9Jk8PrD6r2pOiY3iWMx4j2K7Oy7PKc65mvYvkmeq+
+         HUxA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776274722; x=1776879522; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zcbF3rKrTIYUlxquwtwJBdRMB8TU6zntVRfT41or7CA=;
+        b=BkJFzCy717vpljN6YjOlcDkzpEJdhfaUDorWaAysrdlvVImV3nw22l5zYbE6bpug1f
+         IwZenYk2eZJIe9TSRF1aIir6SPIFclfhLk5hQgfc1ym2+NCmp60sBpqKIYXf2h+WBBPF
+         cFo0uJ6Rq7aDh3iVeYOmSVO14pzQgO7nY1hzFAtDAVFbijd2jbTw0xZy6ZYhAH9eDxsb
+         x1EVeu3fsny7qfTvZKPWng1MVXDBDCsnLx4nu/f0+OxIsK7U1CwCN7FUzSgVs9WVEnMV
+         4A94+nZRsaYLwnuAlz410p1VdQD2zNcLQ0gloTPZ3gAXpaVwho8EXf86W0yWkOuXDDLU
+         c0xw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776274722; x=1776879522;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=zcbF3rKrTIYUlxquwtwJBdRMB8TU6zntVRfT41or7CA=;
+        b=GL5f1zMBdrkjxKd9IYQl6Gs1Ov7Fe83RPwQ66XB6wKVumKLIM/abeimUUAIE5AuoRc
+         Pephi1y2dPM1lI5iDdSk2Yx1GZxJ6amaxXrptLvjzmAaz27YFFsaQ2txUAY1zYYsJHVn
+         Ge1Qxp2JMzjuYHV6vVaZFecjehl67sAZkTfB80QCm2UNc24RIeMnb9wSVCxGpiCGFeOK
+         DbBjQzeA6yFriswaQQgFrqOvzAnHu3/wJ0zx5g0Al3TrjdgKRM9OfojtnMsw50wdy6vy
+         TThxkLxC/chTt4sD6HJOzCL1MhzNUiydM6JIttCXzB1xEaq/S/hcklC49/QdEyOKweqp
+         ELKA==
+X-Forwarded-Encrypted: i=1; AFNElJ/peIsgQ6LTmH3+Z7q3y3MQ81hrLzthFf39cwIUTblJT2yN+8at1d28H6HCT1OLPmFTOO07jbw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxnxpfFHkfSVyIbJydbbTuTTei5Af2OdI9OVufYKRngI8wnGRbZ
+	0fBJX8ratRzHIgkOVON0Xy4h/cV+cEJgfIEWvtaCvBfbbOInx0cULE/zGCpqejGORDHftiKJmfP
+	Yx/wIeN0Lbs68/eokhjhdJv0J/A23fMo=
+X-Gm-Gg: AeBDies1vwFYwi4grpZ/8D8Ps/zQw8ENQO0vxVzgtzOf6bNhiU3HOUDZeqBDHng7ldx
+	RttVIgeqPCYMl6RWLJqRp9jj8dWkbblafvUsmsG3HycLJ0wdttKFaajwp7IGbHO1vA7B+Rxakx2
+	VsIrTdJUUifOewnT1WJN1XClL/vT5pYjgdJvpAUADmVSf2ANM3sCl52jy72oInwAKn5RfnHDbw6
+	sh10yO3EyRRYMxsaCcunIDn9+BFovZZ2RZQm9kvPOAr4QxUutkUYwO7phxgOhNlDWC1NhYizZwf
+	8b14V7rkLfBCcN5mOxV7ZgjH+u+ggB8JLAVXtjT6lRXX7PBlozk=
+X-Received: by 2002:a05:600c:c0c9:b0:487:1826:d89b with SMTP id
+ 5b1f17b1804b1-488d67e262cmr213788065e9.9.1776274721328; Wed, 15 Apr 2026
+ 10:38:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260414112310.1285783-2-kafai.wan@linux.dev>
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [4.34 / 15.00];
-	SEM_URIBL(3.50)[uestc.edu.cn:email];
-	MID_CONTAINS_FROM(1.00)[];
+References: <E1wBBaR-0000000GZHR-1dbM@rmk-PC.armlinux.org.uk>
+ <20260413110222.49fc3759@kernel.org> <ad06yiZZbLC9k3jY@shell.armlinux.org.uk>
+ <CAH5Ym4i7VV53hQGY3AjAUW3B8g_ffgmw69kPhPrk2CmcRbguuQ@mail.gmail.com>
+ <ad5LlXzeQ8j14Mjg@shell.armlinux.org.uk> <ad7nsUQvksJF7JFK@shell.armlinux.org.uk>
+ <CAH5Ym4jA8w9=UxMT4vKJpnXkuDHtkFtMcg4u2sy_0S+8wgy-9w@mail.gmail.com> <ad-ID2WaPgPJqdsa@shell.armlinux.org.uk>
+In-Reply-To: <ad-ID2WaPgPJqdsa@shell.armlinux.org.uk>
+From: Sam Edwards <cfsworks@gmail.com>
+Date: Wed, 15 Apr 2026 10:38:29 -0700
+X-Gm-Features: AQROBzAqIK7tccp5Nve5YPfldbVfMbcjsC1bB4J1LveWBztJraYfNbIwTcXSd7s
+Message-ID: <CAH5Ym4jKdzDeYwCfkMLmUz0FsiD2vFwfuAvqFE=uvMtPmakeMQ@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: stmmac: enable RPS and RBU interrupts
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	"moderated list:BROADCOM BCM2711/BCM2835 ARM ARCHITECTURE" <linux-arm-kernel@lists.infradead.org>, 
+	linux-stm32@st-md-mailman.stormreply.com, 
+	Linux Network Development Mailing List <netdev@vger.kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	BAD_REP_POLICIES(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278848-lists,netdev=lfdr.de];
-	R_DKIM_ALLOW(0.00)[linux.dev:s=key1];
-	GREYLIST(0.00)[pass,meta];
-	FREEMAIL_CC(0.00)[google.com,davemloft.net,kernel.org,redhat.com,iogearbox.net,gmail.com,linux.dev,fomichev.me,vger.kernel.org,std.uestc.edu.cn,hust.edu.cn];
-	RCPT_COUNT_TWELVE(0.00)[26];
-	RCVD_COUNT_THREE(0.00)[3];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-278849-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	R_SPF_ALLOW(0.00)[+ip4:172.105.105.114:c];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[martin.lau@linux.dev,netdev@vger.kernel.org];
-	DMARC_POLICY_ALLOW(0.00)[linux.dev,none];
-	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[cfsworks@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_SPAM(0.00)[0.492];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,linux.dev:dkim,linux.dev:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,hust.edu.cn:email]
-X-Rspamd-Queue-Id: 367AC406D25
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3A015406DA9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Apr 14, 2026 at 07:23:09PM +0800, KaFai Wan wrote:
-> A BPF_SOCK_OPS program can enable
-> BPF_SOCK_OPS_WRITE_HDR_OPT_CB_FLAG and then call
-> bpf_setsockopt(TCP_NODELAY) from BPF_SOCK_OPS_HDR_OPT_LEN_CB.
-> 
-> That reaches __tcp_sock_set_nodelay(), which may call
-> tcp_push_pending_frames(). The transmit path then computes TCP
-> options again, re-enters bpf_skops_hdr_opt_len(), and invokes the
-> same BPF callback recursively. This can loop until the kernel
-> stack overflows.
-> 
-> TCP_NODELAY is not safe from the header option callback context.
-> Reject it with -EOPNOTSUPP when TCP header option callbacks are
-> enabled on the socket, so the callback cannot recurse back into
-> tcp_push_pending_frames() through do_tcp_setsockopt().
-> 
-> Reported-by: Quan Sun <2022090917019@std.uestc.edu.cn>
-> Reported-by: Yinhao Hu <dddddd@hust.edu.cn>
-> Reported-by: Kaiyan Mei <M202472210@hust.edu.cn>
-> Closes: https://lore.kernel.org/bpf/d1d523c9-6901-4454-a183-94462b8f3e4e@std.uestc.edu.cn/
-> Fixes: 7e41df5dbba2 ("bpf: Add a few optnames to bpf_setsockopt")
-> Signed-off-by: KaFai Wan <kafai.wan@linux.dev>
-> ---
->  net/ipv4/tcp.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> index 202a4e57a218..7ac4c98be19d 100644
-> --- a/net/ipv4/tcp.c
-> +++ b/net/ipv4/tcp.c
-> @@ -4004,7 +4004,10 @@ int do_tcp_setsockopt(struct sock *sk, int level, int optname,
->  
->  	switch (optname) {
->  	case TCP_NODELAY:
-> -		__tcp_sock_set_nodelay(sk, val);
-> +		if (val && BPF_SOCK_OPS_TEST_FLAG(tp, BPF_SOCK_OPS_WRITE_HDR_OPT_CB_FLAG))
+On Wed, Apr 15, 2026 at 5:44=E2=80=AFAM Russell King (Oracle)
+<linux@armlinux.org.uk> wrote:
+>
+> On Tue, Apr 14, 2026 at 07:12:34PM -0700, Sam Edwards wrote:
+> > On Tue, Apr 14, 2026 at 6:19=E2=80=AFPM Russell King (Oracle)
+> > <linux@armlinux.org.uk> wrote:
+> > > Okay, just a quick note to say that nvidia's 5.10.216-tegra kernel
+> > > survives iperf3 -c -R to the imx6.
+> >
+> > Hi Russell,
+> >
+> > Aw, you beat me to it! I was about to report that 5.10.104-tegra is
+> > unaffected. And my iperf3 server is a multi-GbE amd64 machine.
+> >
+> > > Dumping the registers and comparing, and then forcing the RQS and TQS
+> > > values to 0x23 (+1 =3D 36, *256 =3D 9216 bytes) and 0x8f (+1 =3D 144,
+> > > *256 =3D 36864 ytes) respectively seems to solve the problem. Under
+> > > net-next, these both end up being 0xff (+1 =3D 256, *256 =3D 65536 by=
+tes.)
+> > > Suspiciously, 36 * 4 =3D 144, and I also see that this kernel program=
+s
+> > > all four of the MTL receive operation mode registers, but only the
+> > > first MTL transmit operation mode register. However, DMA channels 1-3
+> > > aren't initialised.
+> >
+> > Wow, great! I wonder if the problem is that the MTL FIFOs are smaller
+> > than that, so when the DMA suffers a momentary hiccup, the FIFOs are
+> > allowed to overflow, putting the hardware in a bad state.
+> >
+> > Though I suspect this is only half of the problem: do you still see
+> > RBUs? Everything you've shared so far suggests the DMA failures are
+> > _not_ because the rx ring is drying up.
+>
+> Yes. Note that RBUs will happen not because of DMA failures, but if
+> the kernel fails to keep up with the packet rate. RBU means "we read
+> the next descriptor, and it wasn't owned by hardware".
 
-It will break the syscall setsockopt and also break the existing bpf prog
-that calls bpf_setsockopt(TCP_NODELAY) in CB other than the
-BPF_SOCK_OPS_HDR_OPT_LEN_CB/BPF_SOCK_OPS_WRITE_HDR_OPT_CB.
+Are you speaking from observation, documentation, or understanding?
+I'd define RBU the same way, but you reported:
 
-Lets brainstorm other options suggested on the list that have smaller
-blast radius.
+```
+[   55.766199] dwc-eth-dwmac 2490000.ethernet eth0: q0: receive buffer
+unavailable: cur_rx=3D309 dirty_rx=3D309 last_cur_rx=3D245
+last_cur_rx_post=3D309 last_dirty_rx=3D245 count=3D64 budget=3D64
 
-pw-bot: cr
+cur_rx =3D=3D dirty_rx _should_ mean that we fully refilled the ring. [...]
+[...]
+Every ring entry contains the same RDES3 value, so it really is
+completely full at the point RBU fires (bit 31 clear means software
+owns the descriptor, and it's basically saying first/last segment,
+RDES1 valid, buffer 1 length of 1518.
+```
 
-> +			err = -EOPNOTSUPP;
-> +		else
-> +			__tcp_sock_set_nodelay(sk, val);
->  		break;
->  
->  	case TCP_THIN_LINEAR_TIMEOUTS:
-> -- 
-> 2.43.0
-> 
+It would seem* that the kernel isn't really failing to keep up with
+the packet rate. If RBU is firing with a ring that's not even close to
+empty, that tells me there's another way for it to fire. So I suspect
+the hardware designers implemented it to mean:
+"We couldn't read the next descriptor, _or_ it wasn't owned by hardware."
+
+(* However, if bit 31 is clear everywhere, wouldn't that mean the ring
+is actually completely depleted, not full? If count=3D=3Dbudget, wouldn't
+that mean the whole ring hasn't been visited, so we only refilled 64
+entries and not necessarily the entire ring? Maybe the kernel isn't
+keeping up after all.)
+
+> That has:
+>
+>         const nveu32_t rx_fifo_sz[2U][OSI_EQOS_MAX_NUM_QUEUES] =3D {
+>                 { FIFO_SZ(9U), FIFO_SZ(9U), FIFO_SZ(9U), FIFO_SZ(9U),
+>                   FIFO_SZ(1U), FIFO_SZ(1U), FIFO_SZ(1U), FIFO_SZ(1U) },
+>                 { FIFO_SZ(36U), FIFO_SZ(2U), FIFO_SZ(2U), FIFO_SZ(2U),
+>                   FIFO_SZ(2U), FIFO_SZ(2U), FIFO_SZ(2U), FIFO_SZ(16U) },
+>         };
+>         const nveu32_t tx_fifo_sz[2U][OSI_EQOS_MAX_NUM_QUEUES] =3D {
+>                 { FIFO_SZ(9U), FIFO_SZ(9U), FIFO_SZ(9U), FIFO_SZ(9U),
+>                   FIFO_SZ(1U), FIFO_SZ(1U), FIFO_SZ(1U), FIFO_SZ(1U) },
+>                 { FIFO_SZ(8U), FIFO_SZ(8U), FIFO_SZ(8U), FIFO_SZ(8U),
+>                   FIFO_SZ(8U), FIFO_SZ(8U), FIFO_SZ(8U), FIFO_SZ(8U) },
+>         };
+>
+> where each of those values is the RQS/TQS value to use in KiB:
+>
+> #define FIFO_SZ(x)              ((((x) * 1024U) / 256U) - 1U)
+>
+> This doesn't correspond with the values I'm seeing programmed into
+> the hardware under the 5.10.216-tegra kernel. I'm seeing TQS =3D 143
+> (36KiB), and RQS =3D 35 (9KiB). Yes, these values exist in the tables
+> above from a quick look, but they're not in the right place!
+
+True, but:
+a) I doubt 5.10.216-tegra includes exactly the same version of the
+driver found in this random GitHub mirror. (My intent was only to
+point out that they don't use 5.10's stmmac; I should have been more
+clear that I wasn't trying to link the same version, sorry!)
+b) This is vendor code; I don't know how good their testing/review
+process is. It might not run the way it looks. The intent seems to be
+for RQS > TQS (which makes intuitive sense), but as you're seeing the
+registers programmed the other way 'round, they might have gotten them
+subtly mixed up.
+
+> Now, as for FIFO sizes, if we sum up all the entries, then we
+> get:
+>
+> SUM(rx_fifo_size[0][]) =3D 60KiB
+> SUM(rx_fifo_size[1][]) =3D 64KiB
+> SUM(tx_fifo_size[0][]) =3D 60KiB
+> SUM(tx_fifo_size[1][]) =3D 64KiB
+
+I follow the math with 64KiB, but surely the 60KiB should be
+9+9+9+9+1+1+1+1=3D40KiB? This seems to me that the "legacy EQOS" simply
+shifts with smaller FIFOs. Since dwmac is licensed as a soft IP core,
+perhaps the FIFO size is an elaboration parameter? That would mean
+this isn't an issue with dwmac 5.0 broadly, but with Nvidia's specific
+instantiation of it.
 
