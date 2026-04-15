@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-278799-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278800-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uGylCOKh32mBXAAAu9opvQ
-	(envelope-from <netdev+bounces-278799-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 16:34:10 +0200
+	id KDRlBwKi32mBXAAAu9opvQ
+	(envelope-from <netdev+bounces-278800-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 16:34:42 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66580405553
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 16:34:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6854C405571
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 16:34:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D8A4C312BBDC
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 14:28:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 00443313927A
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 14:28:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3182E3D47A9;
-	Wed, 15 Apr 2026 14:28:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1741D3D413D;
+	Wed, 15 Apr 2026 14:28:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b="afValf8V"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b="XWj7bgZ1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f182.google.com (mail-dy1-f182.google.com [74.125.82.182])
+Received: from mail-dy1-f173.google.com (mail-dy1-f173.google.com [74.125.82.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFC0930C631
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 958823D3CFB
 	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 14:28:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.182
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776263317; cv=none; b=KTRZcpbUykUrDSyhdVQJlulYk+7bzjmGZmbAmBtZ5rb4iBxtyD65zgq2Q3gdcifjX/VqBWWloRfcChNkvYpyUyaKphCdpeA47tQTHQ9mi4lpL7gE8PzxCUU3LWFGLdh4vvwudxQaJJhceGyVBDm+54at0h5YUAJkFMoNfs8FXOE=
+	t=1776263318; cv=none; b=kce+CHZhx0iXyXiFCHA3QMrT55vXV10VLCsDCKCcsIv2n93pv8t8O/Wuc53dZIzfGc0htVwVWi90RRxgRjqYfSzD6Eht/YayArQWezAEtbTle3Nq0DJE0Mos5MANMcj8T8cg4kRnESagcfKZ2iJiHgY03rjIf4KgTj+WnCUE4+s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776263317; c=relaxed/simple;
-	bh=FZvQ5dp3yny1rhDpsZzJK9XkQc0x4ErCdQQm08aaM6g=;
+	s=arc-20240116; t=1776263318; c=relaxed/simple;
+	bh=ofaAbqx2czVon4Zjr9AEkQANDqZ/drbpS6x/Vapo7H4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=p7Ptj3KC+8oksyDq87GYJsTsmwHU9kWBWFPYuKNV0+oTA2z2i3sem2kBj6fHApcKxyBgMQGyUTmB9s/q4IWM7uiPfPXYCkSGjdPWlpHRzUsjhA/94SYVF9S2cHE/BC0Ulv3Vkq3d6qHV+KyE2Jg8Y1V5suEanOTkQHybQ/Rclqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b=afValf8V; arc=none smtp.client-ip=74.125.82.182
+	 MIME-Version; b=lDfONwFQenL8knNNUDcu97MB1apfhz/s3cRBfHod7V1zozaBUM2DWd8n5FcRQXcRsYyttjGgvBpullMc9eb94mXahPiXJNYGQmmi3/+1LFDrAE+ldJWn6EJHt0uKenvL8KoWnQxDfcokqBNzcx59h5I6Afvbh9O1rnEXEhv28Ng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b=XWj7bgZ1; arc=none smtp.client-ip=74.125.82.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-dy1-f182.google.com with SMTP id 5a478bee46e88-2dbb4ad19a5so548755eec.0
+Received: by mail-dy1-f173.google.com with SMTP id 5a478bee46e88-2ba895adfeaso7219929eec.0
         for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 07:28:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20251104.gappssmtp.com; s=20251104; t=1776263311; x=1776868111; darn=vger.kernel.org;
+        d=networkplumber-org.20251104.gappssmtp.com; s=20251104; t=1776263313; x=1776868113; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=i9vAI0tP5MX31d4eW36YGF4ATSl3Z0+fZABgVczZ6Ag=;
-        b=afValf8VSDZepa3VK7GXg511rKqunqxTwd+PWSydGYaBl0RHHe6yL4owlkivUbeJHK
-         djVAXa6xHNbFlPCWZFZZXf4SyP/yuq1gHC8vxC2U/ypvDL8lYw6XcqOf3vsVNzTpZGOt
-         0MTtQgllkHud1fB9J3nCUYOZYV+kfuBsna2yv/Ru02m9rXYmphHcYQD7ELdveYSeCPuN
-         pA7wR8MPXWdGm49M9zUysU0zHN0niEF53M5x5LqPOefPlhvwviUD6p4zM2o07cfwSd6I
-         +t/boUa9xVRtmTRQ0N8FicZr392RkCW6bIkjuwp7HPuBSkNyitgOqM8njohZq6F7ACOQ
-         /pQw==
+        bh=o4nxWpPJd0zdXl12qY8AdbxQWZgfliKAONcy/KEnN70=;
+        b=XWj7bgZ1H4CaOOUxf22qv0ebik8H7YiZI/iqK3INYW7rc4V5cUxzK4pQ6QUboUKKPb
+         PIawld2QDKvnrg3u3OUw4GctytyI9y8CqpMAA7Po6lviT/bFjUxQH/3aZQGcseRhWLv4
+         dWnf1qNKJzu9C0R1eePKmbM/lxUXZjW4fqXKY9zF/OgiONtbKD8wIgnF/IoeG79YJQ7y
+         vM3CYsrJyrIc8nZdACYEES6BUAQrbf8jd59AdGxQLI5YuhOWng091TjbgH/foPgFP49y
+         wd/QCUbN/qd5fCyfAcqqLBv78uMIO1u51i9Yw/rzmhxvSsA/LvfPcogcHwmcJcNeqt5m
+         aouQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776263311; x=1776868111;
+        d=1e100.net; s=20251104; t=1776263313; x=1776868113;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=i9vAI0tP5MX31d4eW36YGF4ATSl3Z0+fZABgVczZ6Ag=;
-        b=VW0vMyn3Ua5Suotw6advvKzO/VyrQ9nfG39ltfyzM++qXBuUTwC6bjWjHWGPdakXKo
-         O6wB+5fFGP+/V/YrpvQtnLNFHSh8VS/A8c0vyXxST6ThkfJfmtqU891JGLgjW4Mt2hLT
-         N921QDkHQ51Jbj0Hm3lPb9UNNDmaWEjb8ywwG2E/4VJec+vkV8mHUc7FqQQ0Z9ayIBJL
-         ydRcCz8Ja0oHGPmSGgo2x+xJVDfcEvSrcyuEwlK+mc1AAPB2J31+J+7pR11EL9S5DGaz
-         c+dmsVVA/Q4EI7/jjL5OErZ8NJ7QFM+HCUpXw0kh0bhUmohV2tlAuT15GCglFq5gGtO2
-         5bgw==
-X-Gm-Message-State: AOJu0YwJPn0slePDn8GQ1mGgPALp4dpnOZU4ssaSyf9hG5oAK8S7mnas
-	vb9ozuIW6Fv16oWSCp9KUh9FQsrt2UolBq6deez6UGMONtQkSc7YARbE+5xJ3spk5zgCVRPPttZ
-	92aln
-X-Gm-Gg: AeBDieuefEiTjjtZYJmXfP5B9WNGIxa7kSA2A8ep93KiBWBk1wW+O9WGvkLK+jwJN7h
-	DgK7mex6+0lJLrPlTfNFRGt9YirT/0NkdsQ3vbKNPodRVOwYdPHZCEBBgqykhKilbxsCVu9Bu2r
-	viV02k4PJtSfWW+7G115bygdhgQGrf4RxTq5Dto4PufHwJKN0emzboNLbj3FLbjMKFpsZJkOn/k
-	2nWb8SobgFCFWiKl4D3OxuY/g2O3j7CmmJM72rN510uiNCqruL6BSLLUdlLb9ODijvyZKwfC5yU
-	4kDYNKkbqRn15Y9nIwJitdWzjVESSrYXyzfQXzpBZaDLNi10CBUMdu67uu887kDYXnd5veGiHUb
-	y4tbgp05b/8WFS8Uc+4qLiOUQIab88q1H30+XD+3HqnsNq0WocDMEyH6jZ78syUsxeFXI3eJenl
-	Qv0msHSTJnazqJRH6p6gCvbLQAkQXiXFRkAjt5bwqxHl0=
-X-Received: by 2002:a05:7300:e614:b0:2be:142f:d499 with SMTP id 5a478bee46e88-2d589463d7bmr12192842eec.16.1776263311122;
-        Wed, 15 Apr 2026 07:28:31 -0700 (PDT)
+        bh=o4nxWpPJd0zdXl12qY8AdbxQWZgfliKAONcy/KEnN70=;
+        b=SJSwUo/Bs4EabTgOuKxv/YJOA5tcWAXNV5QM5zkT0DGUNO0IWY+wV0trecSYg/Q141
+         zMUb38YpQcgRYxr6sCEk3dnPgovueN0W/3of8VRULiM2UKib+2e9J03ot6Pm2AdU7USM
+         f4+TxGi0Ft4ZUMtTwGFqLFJRrcxkROL9x2t7UG8SsGD31HPRu5TIfKMYA3Xh+IIUHe2M
+         Fcj5weOMdJOsGRRcJwDAysTRkudKKO5Jjbwumn4I3MmLI2eTBei1SfsgLFZNolFykN8t
+         gUnZEzD30eapnvubtY18rnpkVCpy/NbmKyILQog0PLSqgjRvGhsyuwXIEezAHSIFgW3v
+         4b9A==
+X-Gm-Message-State: AOJu0YyAwu//nIhkAzNRadnRa/rrx+RNE46xq3RgFm3U8d4281Gl/fS2
+	6ZXKA9Dw+2x83zy74tqQdL/t+GPHQCdDPugivZ44mc5mgHTx5VbmAHqADqEaZj8dXx8F/MNs5Xn
+	sZzfR
+X-Gm-Gg: AeBDieuT908j0naEDU29Fj1YXiztmP21axu771HUzDye+wHnH/OPMIvOb8Z0Zizvadp
+	gw0csPf3Qwzc0tJZ9L+pVhxR62aRcenMwncKpc2e/6J9W7+u+pyaRzWSQYGRczwBHuqqsJrr5nI
+	YfwmcX/S7Z8QX25cDUYb7W3krZkyUgVRnDwz+HYZGuGyJvBBx2XnO4RhR0FnG56F5gr9Mr6Vri6
+	yxyOLRtx9vy26IZ06bE4i3bRqG4xQKyGXk8lYuiOqrRJjCSXF1WXQgKdLzIxx3TWigRkbUnki0r
+	iX1OTX0W7aGQ3ZueKxjT1dc3kkXNo4Gj4zO6TW6JXIZdBxx7qlL/PYP9rnsZDAz3+/J+fo/XzOE
+	CnaXJgs/aNQY09O4yXms80U+l31E8x4ALk32LuzKEO5eTHCO2T/mbumTybdw5gS+UT0K8gYRNba
+	ucS8SzeE/GTV1k/OuM/0vXJc4WS5/rs9ZN2UsqtD023Pu69i/L3hN3zw==
+X-Received: by 2002:a05:7301:18a6:b0:2d9:a799:3c4f with SMTP id 5a478bee46e88-2d9a79961f3mr4013649eec.24.1776263312569;
+        Wed, 15 Apr 2026 07:28:32 -0700 (PDT)
 Received: from phoenix.lan ([104.202.41.210])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2de8eb84813sm2751347eec.18.2026.04.15.07.28.29
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2de8eb84813sm2751347eec.18.2026.04.15.07.28.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Apr 2026 07:28:30 -0700 (PDT)
+        Wed, 15 Apr 2026 07:28:32 -0700 (PDT)
 From: Stephen Hemminger <stephen@networkplumber.org>
 To: netdev@vger.kernel.org
 Cc: Stephen Hemminger <stephen@networkplumber.org>,
@@ -89,9 +89,9 @@ Cc: Stephen Hemminger <stephen@networkplumber.org>,
 	Yousuk Seung <ysseung@google.com>,
 	Neal Cardwell <ncardwell@google.com>,
 	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH v7 4/5] net/sched: netem: check for invalid slot range
-Date: Wed, 15 Apr 2026 07:27:07 -0700
-Message-ID: <20260415142822.133241-5-stephen@networkplumber.org>
+Subject: [PATCH v7 5/5] net/sched: netem: fix slot delay calculation overflow
+Date: Wed, 15 Apr 2026 07:27:08 -0700
+Message-ID: <20260415142822.133241-6-stephen@networkplumber.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260415142822.133241-1-stephen@networkplumber.org>
 References: <20260415142822.133241-1-stephen@networkplumber.org>
@@ -106,7 +106,7 @@ X-Spamd-Result: default: False [-0.06 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[networkplumber-org.20251104.gappssmtp.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
@@ -116,7 +116,7 @@ X-Spamd-Result: default: False [-0.06 / 15.00];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-278799-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-278800-lists,netdev=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[12];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -129,58 +129,46 @@ X-Spamd-Result: default: False [-0.06 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[networkplumber-org.20251104.gappssmtp.com:dkim,networkplumber.org:mid,networkplumber.org:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 66580405553
+X-Rspamd-Queue-Id: 6854C405571
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Reject slot configuration where min_delay exceeds max_delay.
-The delay range computation in get_slot_next() underflows in
-this case, producing bogus results.
+get_slot_next() computes a random delay between min_delay and
+max_delay using:
+
+  get_random_u32() * (max_delay - min_delay) >> 32
+
+This overflows signed 64-bit arithmetic when the delay range exceeds
+approximately 2.1 seconds (2^31 nanoseconds), producing a negative
+result that effectively disables slot-based pacing. This is a
+realistic configuration for WAN emulation (e.g., slot 1s 5s).
+
+Use mul_u64_u32_shr() which handles the widening multiply without
+overflow.
 
 Fixes: 0a9fe5c375b5 ("netem: slotting with non-uniform distribution")
 Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
 Reviewed-by: Simon Horman <horms@kernel.org>
 ---
- net/sched/sch_netem.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ net/sched/sch_netem.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
 diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
-index 556f9747f0e7..8593e62f3c6a 100644
+index 8593e62f3c6a..41e56908ab0c 100644
 --- a/net/sched/sch_netem.c
 +++ b/net/sched/sch_netem.c
-@@ -827,6 +827,19 @@ static int get_dist_table(struct disttable **tbl, const struct nlattr *attr)
- 	return 0;
- }
+@@ -659,9 +659,8 @@ static void get_slot_next(struct netem_sched_data *q, u64 now)
  
-+static int validate_slot(const struct nlattr *attr,
-+			 struct netlink_ext_ack *extack)
-+{
-+	const struct tc_netem_slot *c = nla_data(attr);
-+
-+	if (c->min_delay > c->max_delay) {
-+		NL_SET_ERR_MSG_ATTR(extack, attr,
-+				    "slot min delay greater than max delay");
-+		return -EINVAL;
-+	}
-+	return 0;
-+}
-+
- static void get_slot(struct netem_sched_data *q, const struct nlattr *attr)
- {
- 	const struct tc_netem_slot *c = nla_data(attr);
-@@ -1040,6 +1053,12 @@ static int netem_change(struct Qdisc *sch, struct nlattr *opt,
- 			goto table_free;
- 	}
- 
-+	if (tb[TCA_NETEM_SLOT]) {
-+		ret = validate_slot(tb[TCA_NETEM_SLOT], extack);
-+		if (ret)
-+			goto table_free;
-+	}
-+
- 	sch_tree_lock(sch);
- 	/* backup q->clg and q->loss_model */
- 	old_clg = q->clg;
+ 	if (!q->slot_dist)
+ 		next_delay = q->slot_config.min_delay +
+-				(get_random_u32() *
+-				 (q->slot_config.max_delay -
+-				  q->slot_config.min_delay) >> 32);
++			mul_u64_u32_shr(q->slot_config.max_delay - q->slot_config.min_delay,
++					get_random_u32(), 32);
+ 	else
+ 		next_delay = tabledist(q->slot_config.dist_delay,
+ 				       (s32)(q->slot_config.dist_jitter),
 -- 
 2.53.0
 
