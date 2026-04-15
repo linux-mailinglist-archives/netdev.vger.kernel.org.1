@@ -1,140 +1,129 @@
-Return-Path: <netdev+bounces-278734-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278736-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mI5WGTth32k0SQAAu9opvQ
-	(envelope-from <netdev+bounces-278734-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 11:58:19 +0200
+	id GAtTEepi32mKSQAAu9opvQ
+	(envelope-from <netdev+bounces-278736-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 12:05:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B933402FEB
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 11:58:18 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 974F24031CC
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 12:05:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id B4A4A307EF36
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 09:44:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 83E3A3077E19
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 10:00:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2949D33B974;
-	Wed, 15 Apr 2026 09:44:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39C5D33F8B7;
+	Wed, 15 Apr 2026 10:00:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="hwekWwft"
+	dkim=pass (1024-bit key) header.d=ruc.edu.cn header.i=@ruc.edu.cn header.b="OQpLPh3z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from mail-m3271.qiye.163.com (mail-m3271.qiye.163.com [220.197.32.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE81E33B6DB;
-	Wed, 15 Apr 2026 09:44:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE00833B6D0;
+	Wed, 15 Apr 2026 10:00:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.32.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776246258; cv=none; b=UJNMjr3xj6qTIdaNHVRcgIbaaC6LN71nYo0I2OUkRsl0cUc6xOTUIcenoWHsP8VkQRK1S+RiskIV6Z9cXdZT6tUNvovxS/pTb1NJwpe+cRADo6R8YwpixrKx1NWMLa9Bv3VwPNmoogfQ8PRiURbIDAZILEhbjlxZ/ILeNGmJIeA=
+	t=1776247212; cv=none; b=hG490IdPUeraG5nupTwNH8mk0qmQvgwqabfpaaJikbs9lHTi6a7Z2TucnDY/8CNvOZWI934uBkj1tWZL7V4NZl3EZMcWbJlNijFM9g6Ocs0KP5Bls+oB+1KObckTbctw8aLZYBXB4pezysHd73j6AKiH+oRhOjS9dAcb2zn4nR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776246258; c=relaxed/simple;
-	bh=rOaTC09KLz2LhzbM8oeVZ2ALb3gBx9o6prroLYDDQpY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RQ6fcqyRm6KUuRk7vPuGnlN2r0GnoEoqjp95Imo7RNcgY+y/gGgLGYmaqryENtZAI6GVW5exh6P18de0MIFnPhsFU3mcJdY2/CvMtraNulKJBLKEdsFkmEjJvo2yNtvSIHLB0m31weFuEd37QGzc8YXevnThhFZ6Ovx/PWQX5Ko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=hwekWwft; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: from netfilter.org (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with UTF8SMTPSA id 1B6B160177;
-	Wed, 15 Apr 2026 11:44:15 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1776246255;
-	bh=rCXP0KvTyTOh92l8pVnRCgE133x+jHf1nmXM5XnPCDQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hwekWwftUzl6EH27hi+kJY+aPfble88N1tr4IuCf9x9PKPvL9KfoAP3gIdIkhtHeU
-	 jAY1pTsU80jMUrPth75/AlGKiQG7el3kcdIP2JJAbUGPAzDoLU4c8MC2q/mWh3OD71
-	 w/lPTQRauhpTwOx6Ms1ZhyZlGZAoNDznC713kT9+LfhemPxDoAra3bCzHMkiSZpuV2
-	 AhhBqCqPwviukkm5RuJwAZFNJvNrYOCjSL7jVeFfn1V2jQGV/rAlTh8ZgJBJ6BgAPb
-	 huZFn3sREhLG6YnH+uRzQgeGV5t+Fy3PZWlNuLE2DX/hBKkEuysr7S3vwDoVySiuuX
-	 gSC2BHz3poUGQ==
-Date: Wed, 15 Apr 2026 11:44:12 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Florian Westphal <fw@strlen.de>
-Cc: "Kito Xu (veritas501)" <hxzene@gmail.com>, phil@nwl.cc,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, jengelh@medozas.de,
-	kaber@trash.net, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] netfilter: xt_realm: fix null-ptr-deref in realm_mt()
-Message-ID: <ad9d7CqrSLYQ8gyA@chamomile>
-References: <20260415034343.107920-1-hxzene@gmail.com>
- <ad9UF5Cr12YGJnbi@strlen.de>
- <ad9aDziQEBR0h3U8@chamomile>
+	s=arc-20240116; t=1776247212; c=relaxed/simple;
+	bh=O6IvF4GwgYA4+wYZIFFKHdwmCG9gbbqj+oKdjbBxl0c=;
+	h=Content-Type:Message-ID:To:Cc:Subject:MIME-Version:From:Date; b=BWl70gWem884kH7ZnykkdgRRrdLKTY7JVPqBRmbmVGWfIgK/BPvQ0OF/g4MMkT1mbY0MIvivsAeW6VJAuFtZG4ikSSdNvwfAeMt0NXIU37q301haChfBXB5eeozLM++5rCZezDAOQNvJev2K1WALdZ/p+Id+lKDKgTp+ceNKxPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ruc.edu.cn; spf=pass smtp.mailfrom=ruc.edu.cn; dkim=pass (1024-bit key) header.d=ruc.edu.cn header.i=@ruc.edu.cn header.b=OQpLPh3z; arc=none smtp.client-ip=220.197.32.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ruc.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ruc.edu.cn
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
+Message-ID: <AFkAcAA-KLHz8L2oAyS3qqrb.1.1776247198201.Hmail.2023000929@ruc.edu.cn>
+To: andrew@lunn.ch, hkallweit1@gmail.com, fujita.tomonori@gmail.com
+Cc: linux@armlinux.org.uk, tmgross@umich.edu, ojeda@kernel.org, 
+	netdev@vger.kernel.org, rust-for-linux@vger.kernel.org
+Subject: =?UTF-8?B?cnVzdDogbmV0OiBwaHk6IGludGVudCBmb3IgTUFFMDYyMUEgKG91dC1vZi10cmVlIEMgLT4gUnVzdCksIHJlcXVlc3QgZm9yIHRhcmdldCBndWlkYW5jZQ==?=
+X-Priority: 3
+X-Mailer: HMail Webmail Server V2.0 Copyright (c) 2016-163.com web
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <ad9aDziQEBR0h3U8@chamomile>
-X-Spamd-Result: default: False [-1.16 / 15.00];
+Received: from 2023000929@ruc.edu.cn( [43.207.144.59] ) by ajax-webmail ( [127.0.0.1] ) ; Wed, 15 Apr 2026 17:59:58 +0800 (GMT+08:00)
+From: wenzhaoliao <wenzhaoliao@ruc.edu.cn>
+Date: Wed, 15 Apr 2026 17:59:58 +0800 (GMT+08:00)
+X-HM-Tid: 0a9d9094db9f09bdkunm82eff6e44396
+X-HM-MType: 1
+X-HM-NTES-SC: AL0_4z5B86Wr4Tz9jdMF+bhXMf2U5gprSpllrVBCJYClE3duRf49djg1aYGfsM
+	uZDiMwIZbJJzEITi5UpU1qCUKJBAcnLOrwmhWBBKk+LmmRmQaEx1IEpHrbZMNjdVF3W8j9rAe932
+	Nl8EjSkm0izNSNpUuWxVBaR/AKTYFMShDXN+Q=
+X-HM-Spam-Status: e1kfGhgUHx5ZQUtXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFITzdXWS1ZQUlXWQ8JGhUIEh9ZQVkaGUxIVkxCQx5NSU9OTx5LHlYVFAkWGhdVEwETFh
+	oSFyQUDg9ZV1kYEgtZQVlPSFVJS0xVSk9PVU5CWVdZFhoPEhUdFFlBWUtVS1VLVUtZBg++
+DKIM-Signature: a=rsa-sha256;
+	b=OQpLPh3zKEOMUgVDKIlypldlJkN/dIICu8DrkQjmDilhHfcZ9R/RfBXyGI77NmeQI4F6EPLxRqeRXNnYjuj+puWgt97pBwKD34ynB0e8LemEZxljyodCcFsM1iR2d0fIfR3sC4PA7wJc9IHSHkaXuRGhI/39TSG/L/2Eu3xcG0Y=; c=relaxed/relaxed; s=default; d=ruc.edu.cn; v=1;
+	bh=O6IvF4GwgYA4+wYZIFFKHdwmCG9gbbqj+oKdjbBxl0c=;
+	h=date:mime-version:subject:message-id:from;
+X-Spamd-Result: default: False [0.94 / 15.00];
+	SUBJ_EXCESS_BASE64(1.50)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[ruc.edu.cn,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[ruc.edu.cn:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	HAS_X_PRIO_THREE(0.00)[3];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[lunn.ch,gmail.com];
+	TAGGED_FROM(0.00)[bounces-278736-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[netfilter.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-278734-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[netfilter.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[gmail.com,nwl.cc,davemloft.net,google.com,kernel.org,redhat.com,medozas.de,trash.net,vger.kernel.org,netfilter.org];
+	FROM_NEQ_ENVFROM(0.00)[wenzhaoliao@ruc.edu.cn,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[ruc.edu.cn:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,netfilter.org:dkim]
-X-Rspamd-Queue-Id: 0B933402FEB
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 974F24031CC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Apr 15, 2026 at 11:27:43AM +0200, Pablo Neira Ayuso wrote:
-> On Wed, Apr 15, 2026 at 11:02:15AM +0200, Florian Westphal wrote:
-> > Kito Xu (veritas501) <hxzene@gmail.com> wrote:
-> > > realm_mt() unconditionally dereferences skb_dst(skb) without a NULL
-> > > check. The xt_realm match registers with .family = NFPROTO_UNSPEC,
-> > > making it available to all netfilter protocol families. Through the
-> > > nftables compat layer (nft_compat), an unprivileged user inside a
-> > > user/net namespace can load this match into a bridge-family chain.
-> > 
-> > I do not think this bug is related to nft_compat.
-> > You can also use ebtables setsockopt api to request xt_realm, no?
-> > 
-> > > Fixes: ab4f21e6fb1c ("netfilter: xtables: use NFPROTO_UNSPEC in more extensions")
-> > 
-> > Looks correct.  Alternatively we could revert the xt_realm.c change.
-> > But I don't have a strong opinion here, patch looks correct.
-> 
-> Maybe partial revert makes sense, since in ab4f21e6fb1c:
-> 
-> - xt_MARK: OK
-> - xt_NOTRACK: OK
-> - xt_comment: OK
-> - xt_mac: There is a better way to do this in bridge.
-> - xt_owner, no sockets in bridge.
-> - xt_physdev, which makes no sense in bridge, this is for br_netfilter
->   only.
-> - xt_realm (as already mentioned).
-> 
-> That is, a partial revert of this patch for:
-> 
-> - xt_mac
-> - xt_owner
-> - xt_physdev
-> - xt_realm
-
-"this patch" refers to ab4f21e6fb1c 
+CkhlbGxvIFBIWSBhbmQgUnVzdCBtYWludGFpbmVycywKCgpJIGFtIGEgUGhEIHN0dWRlbnQgd29y
+a2luZyBvbiBhIEMtdG8tUnVzdCBtaWdyYXRpb24gdG9vbCBmb3Igc3lzdGVtcyBjb2RlLgpXZSB3
+b3VsZCBsaWtlIHRvIHZhbGlkYXRlIGl0IGluIExpbnV4IHdpdGggb25lIGNvbmNyZXRlIFBIWSB0
+YXJnZXQgYW5kIHdvdWxkCmxpa2UgdG8gY29uZmlybSBkaXJlY3Rpb24gYmVmb3JlIHBvc3Rpbmcg
+YSBsYXJnZXIgUkZDIHNlcmllcy4KCgpTY29wZSBvZiB0aGlzIGludGVudDoKLSBJbml0aWFsIHRh
+cmdldDogTUFFMDYyMUEgKGN1cnJlbnRseSBvdXQtb2YtdHJlZSBDIGRyaXZlcikuCi0gV2UgZG8g
+Tk9UIGludGVuZCB0byBzdWJtaXQgYSBkdXBsaWNhdGUgUnVzdCByZXdyaXRlIG9mIGFuIGV4aXN0
+aW5nIGluLXRyZWUgQyBQSFkgZHJpdmVyLgotIEdvYWw6IGV2YWx1YXRlIGEgc2VtaS1hdXRvbWF0
+aWMgYWJzdHJhY3Rpb24gY29tcGxldGlvbiB3b3JrZmxvdzoKwqAgcmV1c2UgZXhpc3RpbmcgUnVz
+dCBQSFkgYWJzdHJhY3Rpb25zIHdoZXJlIHBvc3NpYmxlLCBhbmQgYWRkIG9ubHkgbWluaW1hbCBt
+aXNzaW5nIGFic3RyYWN0aW9ucy4KCgpQbGFubmVkIGRlbGl2ZXJhYmxlczoKLSBBIGdhcCBhbmFs
+eXNpcyBiZXR3ZWVuIE1BRTA2MjFBIEMgY2FsbGJhY2tzIGFuZCBjdXJyZW50IHJ1c3Qva2VybmVs
+L25ldC9waHkucnMgY292ZXJhZ2UuCi0gQSBzbWFsbCBSRkMgcGF0Y2ggc2VyaWVzIHdpdGggbWlu
+aW1hbCBhYnN0cmFjdGlvbiBhZGRpdGlvbnMgKGlmIG5lZWRlZCkuCi0gQSBNQUUwNjIxQSBSdXN0
+IGRyaXZlciBwcm90b3R5cGUgb24gdG9wIG9mIHRob3NlIGFic3RyYWN0aW9ucyBmb3IgbGludXgt
+bmV4dC9ydXN0LW5leHQgZXZhbHVhdGlvbi4KCgpRdWFsaXR5IGFuZCBwcm9jZXNzIGNvbW1pdG1l
+bnRzOgotIEZ1bGwgaHVtYW4gcmV2aWV3IGJ5IHN1Ym1pdHRlcnM7IHdlIGNhbiBleHBsYWluIGFs
+bCBzdWJtaXR0ZWQgY29kZS4KLSBUcmFuc3BhcmVudCBkaXNjbG9zdXJlIG9mIHRvb2wgYXNzaXN0
+YW5jZSBpbiBjb3ZlciBsZXR0ZXJzL2NoYW5nZWxvZ3MuCi0gSGFyZHdhcmUtYmFja2VkIHRlc3Qg
+cmVzdWx0cyBhbmQgZXhwbGljaXQgbGltaXRhdGlvbnMgaW4gZWFjaCBwb3N0aW5nLgoKClF1ZXN0
+aW9uczoKMS4gSXMgTUFFMDYyMUEgYW4gYWNjZXB0YWJsZSBmaXJzdCB0YXJnZXQgZm9yIHRoaXMg
+ZGlyZWN0aW9uPwoyLiBJZiBNQUUwNjIxQSBpcyBub3Qgc3VpdGFibGUsIGNvdWxkIHlvdSByZWNv
+bW1lbmQgb25lIG9yIHR3byBiZXR0ZXIgb3V0LW9mLXRyZWUgUEhZIGRyaXZlcnMgZm9yIGEgZmly
+c3QgUnVzdCBzdWJtaXNzaW9uPwozLiBGb3IgcmV2aWV3IGZsb3csIGRvIHlvdSBwcmVmZXI6CsKg
+IMKgKGEpIGFic3RyYWN0aW9ucy1maXJzdCBSRkMsIHRoZW4gZHJpdmVyLCBvcgrCoCDCoChiKSBt
+aW5pbWFsIGFic3RyYWN0aW9ucyArIGNvbmNyZXRlIGRyaXZlciBpbiBvbmUgUkZDIHNlcmllcz8K
+CgpJZiB0aGVyZSBhcmUgbm8gb2JqZWN0aW9ucywgd2UgcGxhbiB0byBwb3N0IGFuIFJGQyAwL04g
+aW4gYWJvdXQgMiB3ZWVrcy4KCgpUaGFua3MgZm9yIHlvdXIgZ3VpZGFuY2UuCgoKQmVzdCByZWdh
+cmRzLApMaWFvIFdlbnpoYW8KUmVubWluIFVuaXZlcnNpdHkgb2YgQ2hpbmEKCg==
 
