@@ -1,90 +1,69 @@
-Return-Path: <netdev+bounces-278860-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278861-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cBm2LmTe32kaZwAAu9opvQ
-	(envelope-from <netdev+bounces-278860-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 20:52:20 +0200
+	id gKU+GYvg32kzZwAAu9opvQ
+	(envelope-from <netdev+bounces-278861-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 21:01:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2730B407358
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 20:52:20 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB06A407418
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 21:01:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E4DCF3030D5F
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 18:52:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 34DD2315F674
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 18:55:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3257F3644A3;
-	Wed, 15 Apr 2026 18:52:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44C09384246;
+	Wed, 15 Apr 2026 18:55:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c2aubf1o"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fzYxV+y4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92551277C9E
-	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 18:52:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFFD0367F3C;
+	Wed, 15 Apr 2026 18:55:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776279136; cv=none; b=aHjznu7oQ5x/u33VUyxguUZHloVv7cZVPZYj7B1Sdc4dokiZRuVxqQaXcPHoP6rOerbXKK/1YTErfgmso/nWB/hMzT1iilVQMI8gRAa1XBiCgk/xOdpNGI/kJWszi6AZPKZ6bX7VfXKUBIdRWyZBpRn7hOtEqczLnWfJ8hAe8AE=
+	t=1776279358; cv=none; b=e6PFUD5FARqF9aY+jaPBLUl6JD7tuU1qkz6QIp8iAZmP6VOKGE9kZaS+R9RkMw0a7O4v/ZMjliiGtx2LlTIymsixeuHpItldyPjIwLvUySO6uIZZs98s5eUis0Ezgbt/wXZwFb+9sxt3+0C+qnCAvRd8cHtUFzdVWytqCr42sPY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776279136; c=relaxed/simple;
-	bh=2NBoU68MoEb6tabflloQxM4Y0+PZOEURSqv8hhh6XWk=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=etgLQJa/qKUHOIBGvaN//GmQvtoUYZEhTfUehUWoR4XSg6wmNOhhZ3RSuKUdEZIPWnDzfNulPrJq6BsVWJlV+N7YaRrRoQgVvWeVZVLmS25gfMKFgXEDPfsAq88ForajqEm7/vO236zUJCi22aVjXSn0GWi0DuisrykycQ+5FNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c2aubf1o; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-48334ee0aeaso70511825e9.1
-        for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 11:52:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776279133; x=1776883933; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=eQhlpKS2BSyq0738gAtdb37OSAxAE8MeKj2xvPQlbfc=;
-        b=c2aubf1olYkpFt8BbV1z01QoXGxHOWlZ8+jLzjkCi2Xj9m+whUbgf0NLUJsyHc09b0
-         WBnPdAYJdLpGoVJSYeUY98Ig0LwuZtVSwhw4GiJILSbtoJTcAF2dOck1Ye6HQ2+p3d+E
-         I2XInjz+u/rJDiEvQmd5rtKUcxDiA7mEzlvIpzELjjLmpJHsiPbWPXZsgExQoY6rj2GB
-         cvFACXDFp9rOOaH2JOgp6eWfitkwjnCJ1OIhHt+4+U7viwbRollVAGMfPXkWqorAUy4x
-         A+9FI67xSMzCoRw0bv0vUXuZFWLmzjxJzKTxWU6cg0tv2GfqGNpF1pd1Z6Iw/WT+EzZB
-         aUqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776279133; x=1776883933;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eQhlpKS2BSyq0738gAtdb37OSAxAE8MeKj2xvPQlbfc=;
-        b=TKoPju0mG8NWNYZV4oD8KiLZgZOf4+sXAnJm2aA/oVNFnf9L2XxNDVSh5vmI57sTw/
-         wAJt3pjT/S17CERSjJIfp7Wm6LFIbX1BW0NkgjLMXgv1kPyuLRgwEV+SCvs+U8tdU1QE
-         A3t0ARv9bZiWa4fUKdxWkG4WJnckTfCSGoTA3snl4bv6505uJKNBKwRu30g9aZgTRCO8
-         v578e147cbQ9kMdAVTC5cquJEhYE98kEtrbGufCnrSewffG0a1V97p7LreP+CTM0KdxT
-         htncpDlo3aFHKPPf9+JqmAqqryDVdSycn7azewumvXHeN1ZV5ESFrI1Dmd3vfA2ahm9H
-         zEnQ==
-X-Gm-Message-State: AOJu0YyTuhZsZV4r8Xcf4Rk6qoRvY1wDt6DOWMh3kfVgEsj0dsoB96DU
-	jMG78ifAVibFBmbSzymtRMC0r7ykuDPualYJgYXKyZrvnhc7tPguLUMMH1E6gu+c
-X-Gm-Gg: AeBDiesc3Vz1uk4GlqQEu2SRjhVesRTSuwwR0D5WFrfxuwlZ7GoJVkN3222mFpmEgfh
-	cdzqcmleZAYO+K/ILInJRwriM398627W+lcwAT/9rn6X2WMOJHTd09/FfEzx3C1M3jVP3uTkgO3
-	I1YXkt8CQLoMnBrYOGTBdEw/6DaZTVIJDn/p5XyhKPxmnZDx/haJx7/N7y1m52WxJe4JJUr/waX
-	L+Sk8hfSgz/1RarN7j1Ytof/qsDTQe1VB+GLWJwoUNI6wMZ7TXiCO6Ya0T5AY519ZvFMXwP9Fhg
-	rCkjTu8UoOlLKZVFteLJwomzTnYUkV9oggI618vPH//Tg9WeI2dP9Z2cPwZWtghufp3Eh75FLJI
-	+P66kJKPqC2U6QVcZjoMKCWeFikvD+MTSlErj2Kz4aJGNKmT0GG79zrVcZJLXVCHO2EJbhDT4sd
-	ERmVp0mcLg2k6L1cBXshWQ3Za4x1U26RiQWMT1j5TrCGL9txCHWUMKf5aJ03mD6zH2qiCS48xAZ
-	R0=
-X-Received: by 2002:a05:600c:8b27:b0:486:f634:ef1 with SMTP id 5b1f17b1804b1-488d687664emr298405715e9.17.1776279132500;
-        Wed, 15 Apr 2026 11:52:12 -0700 (PDT)
-Received: from dau-home-pc ([89.222.123.78])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43ead3d5f11sm7760661f8f.18.2026.04.15.11.52.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Apr 2026 11:52:11 -0700 (PDT)
-Date: Wed, 15 Apr 2026 21:52:08 +0300
-From: Anton Danilov <littlesmilingcloud@gmail.com>
-To: netdev@vger.kernel.org
-Cc: willemdebruijn.kernel@gmail.com, davem@davemloft.net,
-	dsahern@kernel.org, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, shuah@kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [RFC PATCH net-next v2 2/2] selftests: net: add FOU multicast
- encapsulation resubmit test
-Message-ID: <ad_eWBo76OLcgPSA@dau-home-pc>
+	s=arc-20240116; t=1776279358; c=relaxed/simple;
+	bh=d7HDCHlfPHMSEJBcmaZKe18Vvx67Ei5xQjkmXpACwf4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=crbNK+L3QovsmdvoNb922HSUhdL8h2RC+0w2scRaCd9IMP6tu+F/TcCz2sehTuvXyUR1214dHvM5jMKNfyt6GwfWNk1McIVb8rEH5Y2WOMaB49hqmcbcM3c8ShKV/y+qhZ0qkKy6S6YejdcQe1S1XNhlD8dz8mDCwvP6bA8ehLY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fzYxV+y4; arc=none smtp.client-ip=95.215.58.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Wed, 15 Apr 2026 11:55:21 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1776279353;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tHMuDGDqeRqZTISBkfQrfUInooZ5oSER0Tkzkf4P5Pc=;
+	b=fzYxV+y4RadUsTRwF1/2GBnbPHyGieoAH0rO8okhzSU0soXIw0qYxW0SKH4lR7diZRFZ1I
+	LNshEC6Duel7JiG/WFrETZLnE1c9HKSUadudH5h9zwfDJ8yuDLcwevEJTNaqljtoQ+LYIN
+	zu4NFl3fFmX3s6RsryakztldT+J1+XA=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+To: Jiayuan Chen <jiayuan.chen@linux.dev>
+Cc: bpf@vger.kernel.org, Quan Sun <2022090917019@std.uestc.edu.cn>, 
+	Yinhao Hu <dddddd@hust.edu.cn>, Kaiyan Mei <M202472210@hust.edu.cn>, 
+	Dongliang Mu <dzm91@hust.edu.cn>, Eric Dumazet <edumazet@google.com>, 
+	Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, 
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, David Ahern <dsahern@kernel.org>, 
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH bpf] bpf,tcp: avoid infinite recursion in
+ BPF_SOCK_OPS_HDR_OPT_LEN_CB
+Message-ID: <2026415181939.1bue.martin.lau@linux.dev>
+References: <20260414105702.248310-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,283 +72,97 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ad_dal164gVmImWl@dau-home-pc>
-X-Spamd-Result: default: False [-0.16 / 15.00];
+In-Reply-To: <20260414105702.248310-1-jiayuan.chen@linux.dev>
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [5.84 / 15.00];
+	SEM_URIBL(3.50)[uestc.edu.cn:email];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	MID_CONTAINS_FROM(1.00)[];
 	MAILLIST(-0.15)[generic];
+	BAD_REP_POLICIES(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,kernel.org,google.com,redhat.com,vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TAGGED_FROM(0.00)[bounces-278860-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-278861-lists,netdev=lfdr.de];
+	R_DKIM_ALLOW(0.00)[linux.dev:s=key1];
+	RCVD_COUNT_THREE(0.00)[3];
+	GREYLIST(0.00)[pass,body];
+	RCPT_COUNT_TWELVE(0.00)[30];
+	FREEMAIL_CC(0.00)[vger.kernel.org,std.uestc.edu.cn,hust.edu.cn,google.com,davemloft.net,kernel.org,redhat.com,lwn.net,linuxfoundation.org,iogearbox.net,gmail.com,linux.dev,fomichev.me];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[littlesmilingcloud@gmail.com,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,fou_mcast_encap.py:url]
-X-Rspamd-Queue-Id: 2730B407358
+	R_SPF_ALLOW(0.00)[+ip4:172.234.253.10:c];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[martin.lau@linux.dev,netdev@vger.kernel.org];
+	DMARC_POLICY_ALLOW(0.00)[linux.dev,none];
+	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_SPAM(0.00)[0.811];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:dkim,linux.dev:mid,uestc.edu.cn:email,hust.edu.cn:email]
+X-Rspamd-Queue-Id: AB06A407418
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add a selftest to verify that FOU-encapsulated packets addressed to a
-multicast destination are correctly resubmitted to the inner protocol
-handler (GRE) via the UDP multicast delivery path.
+On Tue, Apr 14, 2026 at 06:57:00PM +0800, Jiayuan Chen wrote:
+> A BPF_PROG_TYPE_SOCK_OPS program can set BPF_SOCK_OPS_WRITE_HDR_OPT_CB_FLAG
+> to inject custom TCP header options. When the kernel builds a TCP packet,
+> it calls tcp_established_options() to calculate the header size, which
+> invokes bpf_skops_hdr_opt_len() to trigger the BPF_SOCK_OPS_HDR_OPT_LEN_CB
+> callback.
+> 
+> If the BPF program calls bpf_setsockopt(TCP_NODELAY) inside this callback,
+> __tcp_sock_set_nodelay() will call tcp_push_pending_frames(), which calls
+> tcp_current_mss(), which calls tcp_established_options() again,
+> re-triggering the same BPF callback. This creates an infinite recursion
+> that exhausts the kernel stack and causes a panic.
+> 
+> BPF_SOCK_OPS_HDR_OPT_LEN_CB
+>   -> bpf_setsockopt(TCP_NODELAY)
+> 	-> tcp_push_pending_frames()
+> 	  -> tcp_current_mss()
+> 		-> tcp_established_options()
+> 		  -> bpf_skops_hdr_opt_len()
+>                            /* infinite recursion */
+> 			-> BPF_SOCK_OPS_HDR_OPT_LEN_CB
+> 
+> A similar reentrancy issue exists for TCP congestion control, which is
+> guarded by tp->bpf_chg_cc_inprogress. Adopt the same approach: introduce
+> tp->bpf_hdr_opt_len_cb_inprogress, set it before invoking the callback in
+> bpf_skops_hdr_opt_len(), and check it in sol_tcp_sockopt() to reject
+> bpf_setsockopt(TCP_NODELAY) calls that would trigger
+> tcp_push_pending_frames() and cause the recursion.
+> 
+> Reported-by: Quan Sun <2022090917019@std.uestc.edu.cn>
+> Reported-by: Yinhao Hu <dddddd@hust.edu.cn>
+> Reported-by: Kaiyan Mei <M202472210@hust.edu.cn>
+> Reported-by: Dongliang Mu <dzm91@hust.edu.cn>
+> Closes: https://lore.kernel.org/bpf/d1d523c9-6901-4454-a183-94462b8f3e4e@std.uestc.edu.cn/
 
-The test creates two network namespaces connected by a veth pair. The
-receiver namespace has a FOU/GRETAP tunnel with a multicast remote
-address (239.0.0.1). A Python helper script (fou_mcast_encap.py)
-crafts GRE-over-UDP packets and sends them to the multicast address.
+Thanks for the report and fixes suggested across different threads.
 
-The early demux optimization (net.ipv4.ip_early_demux) is disabled on
-the receiver to force packets through __udp4_lib_mcast_deliver(),
-which is the code path that was previously broken.
+Using has_current_bpf_ctx() to avoid tcp_push_pending_frames() should
+work but it may change the expectation for bpf_setsockopt(TCP_NODELAY).
+e.g. A bpf_tcp_iter does bpf_setsockopt(TCP_NODELAY).
 
-Signed-off-by: Anton Danilov <littlesmilingcloud@gmail.com>
-Assisted-by: Claude:claude-opus-4-6
----
- tools/testing/selftests/net/Makefile          |   2 +
- .../testing/selftests/net/fou_mcast_encap.py  |  81 ++++++++++++++
- .../testing/selftests/net/fou_mcast_encap.sh  | 105 ++++++++++++++++++
- 3 files changed, 188 insertions(+)
- create mode 100755 tools/testing/selftests/net/fou_mcast_encap.py
- create mode 100755 tools/testing/selftests/net/fou_mcast_encap.sh
+Adding another bit in the tcp_sock is not ideal either. I agree with
+Alexei that it is better to reuse the existing bit if we go down this path.
+We also need to audit more closely if there are cases that two different
+type of bpf progs may call bpf_setsockopt(). e.g.
+bpf_tcp_iter does bpf_setsockopt(TCP_CONGESTION) to switch
+to a bpf_tcp_cc and the new bpf_tcp_cc->init() will also do
+bpf_setsockopt(xxx) which then will be rejected.
 
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index a275ed584026..2b463dda5ac6 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -38,6 +38,7 @@ TEST_PROGS := \
- 	fib_rule_tests.sh \
- 	fib_tests.sh \
- 	fin_ack_lat.sh \
-+	fou_mcast_encap.sh \
- 	fq_band_pktlimit.sh \
- 	gre_gso.sh \
- 	gre_ipv6_lladdr.sh \
-@@ -195,6 +196,7 @@ TEST_GEN_PROGS := \
- 
- TEST_FILES := \
- 	fcnal-test.sh \
-+	fou_mcast_encap.py \
- 	in_netns.sh \
- 	lib.sh \
- 	settings \
-diff --git a/tools/testing/selftests/net/fou_mcast_encap.py b/tools/testing/selftests/net/fou_mcast_encap.py
-new file mode 100755
-index 000000000000..0fd836c454a8
---- /dev/null
-+++ b/tools/testing/selftests/net/fou_mcast_encap.py
-@@ -0,0 +1,81 @@
-+#!/usr/bin/env python3
-+# SPDX-License-Identifier: GPL-2.0
-+"""Send FOU/GRE encapsulated packets to a multicast destination.
-+
-+Build and send GRE-over-UDP (FOU) packets with a multicast outer
-+destination IP. Used by fou_mcast_encap.sh to test that the UDP
-+multicast delivery path correctly resubmits encapsulated packets
-+to the inner protocol handler.
-+"""
-+
-+import argparse
-+import socket
-+import struct
-+
-+
-+def checksum(data):
-+    """Compute Internet checksum (RFC 1071)."""
-+    csum = 0
-+    for i in range(0, len(data) - 1, 2):
-+        csum += (data[i] << 8) + data[i + 1]
-+    if len(data) % 2:
-+        csum += data[-1] << 8
-+    while csum >> 16:
-+        csum = (csum & 0xFFFF) + (csum >> 16)
-+    return ~csum & 0xFFFF
-+
-+
-+def build_gre_encap_packet(dst_addr):
-+    """Build a GRE/Ethernet/IP/ICMP payload for FOU encapsulation."""
-+    gre_key = socket.inet_aton(dst_addr)
-+    gre_hdr = struct.pack("!HH", 0x2000, 0x6558) + gre_key
-+
-+    dst_mac = b"\xff\xff\xff\xff\xff\xff"
-+    src_mac = b"\x02\x00\x00\x00\x00\x01"
-+    eth_hdr = dst_mac + src_mac + struct.pack("!H", 0x0800)
-+
-+    inner_ip_src = socket.inet_aton("192.168.99.1")
-+    inner_ip_dst = socket.inet_aton("192.168.99.2")
-+
-+    icmp_payload = b"TESTFOU!" * 4
-+    icmp_hdr = struct.pack("!BBHHH", 8, 0, 0, 0x1234, 1) + icmp_payload
-+    icmp_csum = checksum(icmp_hdr)
-+    icmp_hdr = struct.pack("!BBHHH", 8, 0, icmp_csum, 0x1234, 1) + icmp_payload
-+
-+    ip_len = 20 + len(icmp_hdr)
-+    ip_hdr = struct.pack("!BBHHHBBH", 0x45, 0, ip_len, 0x1234, 0, 64, 1, 0)
-+    ip_hdr += inner_ip_src + inner_ip_dst
-+    ip_csum = checksum(ip_hdr)
-+    ip_hdr = ip_hdr[:10] + struct.pack("!H", ip_csum) + ip_hdr[12:]
-+
-+    return gre_hdr + eth_hdr + ip_hdr + icmp_hdr
-+
-+
-+def main():
-+    parser = argparse.ArgumentParser(
-+        description="Send FOU/GRE encapsulated packets to a multicast address"
-+    )
-+    parser.add_argument(
-+        "-c", "--count", type=int, required=True,
-+        help="number of packets to send",
-+    )
-+    parser.add_argument(
-+        "-d", "--dst", default="239.0.0.1",
-+        help="destination multicast address (default: 239.0.0.1)",
-+    )
-+    parser.add_argument(
-+        "-p", "--port", type=int, default=4797,
-+        help="destination UDP port (default: 4797)",
-+    )
-+    args = parser.parse_args()
-+
-+    payload = build_gre_encap_packet(args.dst)
-+
-+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-+    for _ in range(args.count):
-+        sock.sendto(payload, (args.dst, args.port))
-+    sock.close()
-+
-+
-+if __name__ == "__main__":
-+    main()
-diff --git a/tools/testing/selftests/net/fou_mcast_encap.sh b/tools/testing/selftests/net/fou_mcast_encap.sh
-new file mode 100755
-index 000000000000..1f9dbe7092f3
---- /dev/null
-+++ b/tools/testing/selftests/net/fou_mcast_encap.sh
-@@ -0,0 +1,105 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# Test that UDP encapsulation (FOU) correctly handles packet resubmit
-+# when packets are delivered via the multicast UDP delivery path.
-+#
-+# When a FOU-encapsulated packet arrives with a multicast destination IP,
-+# __udp4_lib_mcast_deliver() must resubmit it to the inner protocol
-+# handler (e.g., GRE) rather than consuming it. This test verifies that
-+# by creating a FOU/GRETAP tunnel with a multicast remote address, sending
-+# encapsulated packets, and checking that they are correctly decapsulated.
-+#
-+# The early demux optimization can mask this issue by routing packets via
-+# the unicast path (udp_unicast_rcv_skb), so we disable it to force
-+# packets through __udp4_lib_mcast_deliver().
-+
-+source lib.sh
-+
-+NSENDER=""
-+NRECV=""
-+
-+cleanup() {
-+	cleanup_all_ns
-+}
-+
-+trap cleanup EXIT
-+
-+setup() {
-+	setup_ns NSENDER NRECV
-+
-+	ip link add veth_s type veth peer name veth_r
-+	ip link set veth_s netns "$NSENDER"
-+	ip link set veth_r netns "$NRECV"
-+
-+	ip -n "$NSENDER" addr add 10.0.0.1/24 dev veth_s
-+	ip -n "$NSENDER" link set veth_s up
-+
-+	ip -n "$NRECV" addr add 10.0.0.2/24 dev veth_r
-+	ip -n "$NRECV" link set veth_r up
-+
-+	# Disable early demux to force multicast delivery path
-+	ip netns exec "$NRECV" sysctl -wq net.ipv4.ip_early_demux=0
-+
-+	# Join multicast group on receiver
-+	ip -n "$NRECV" addr add 239.0.0.1/32 dev veth_r autojoin
-+
-+	# Multicast routes
-+	ip -n "$NRECV" route add 239.0.0.0/8 dev veth_r
-+	ip -n "$NSENDER" route add 239.0.0.0/8 dev veth_s
-+
-+	# FOU listener
-+	ip netns exec "$NRECV" ip fou add port 4797 ipproto 47
-+
-+	# GRETAP with multicast remote - this triggers __udp4_lib_mcast_deliver
-+	ip -n "$NRECV" link add eoudp0 type gretap \
-+		remote 239.0.0.1 local 10.0.0.2 \
-+		encap fou encap-sport 4797 encap-dport 4797 \
-+		key 239.0.0.1
-+	ip -n "$NRECV" link set eoudp0 up
-+	ip -n "$NRECV" addr add 192.168.99.2/24 dev eoudp0
-+}
-+
-+send_fou_gre_packets() {
-+	local count=$1
-+	local script_dir
-+	script_dir=$(dirname "$(readlink -f "$0")")
-+
-+	ip netns exec "$NSENDER" python3 "$script_dir/fou_mcast_encap.py" \
-+		-c "$count" -d 239.0.0.1 -p 4797
-+}
-+
-+get_rx_packets() {
-+	ip -n "$NRECV" -s link show eoudp0 | awk '/RX:/{getline; print $2}'
-+}
-+
-+test_fou_mcast_encap() {
-+	local count=100
-+	local rx_before
-+	local rx_after
-+	local rx_delta
-+
-+	rx_before=$(get_rx_packets)
-+	send_fou_gre_packets $count
-+	sleep 1
-+	rx_after=$(get_rx_packets)
-+
-+	rx_delta=$((rx_after - rx_before))
-+
-+	if [ "$rx_delta" -ge "$count" ]; then
-+		echo "PASS: received $rx_delta/$count packets via multicast FOU/GRETAP"
-+		return "$ksft_pass"
-+	elif [ "$rx_delta" -gt 0 ]; then
-+		echo "FAIL: only $rx_delta/$count packets received (partial delivery)"
-+		return "$ksft_fail"
-+	else
-+		echo "FAIL: 0/$count packets received (multicast encap resubmit broken)"
-+		return "$ksft_fail"
-+	fi
-+}
-+
-+echo "TEST: FOU/GRETAP multicast encapsulation resubmit"
-+
-+setup
-+test_fou_mcast_encap
-+exit $?
--- 
-2.47.3
-
+Another fix could be, the bpf_setsockopt(TCP_NODELAY) is always broken
+for BPF_SOCK_OPS_HDR_OPT_LEN_CB and BPF_SOCK_OPS_WRITE_HDR_OPT_CB unless
+the bpf prog is doing some maneuver to avoid the recursion. Thus,
+this use case is basically broken as is and I don't see a use case
+for bpf_setsockopt(TCP_NODELAY) when writing header also.
+How about checking the bpf_sock->op, level, and optname in
+bpf_sock_ops_setsockopt() and return -EOPNOTSUPP?
 
