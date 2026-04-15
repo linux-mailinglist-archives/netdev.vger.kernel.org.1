@@ -1,266 +1,252 @@
-Return-Path: <netdev+bounces-278714-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278715-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mNFfJyBN32mFRQAAu9opvQ
-	(envelope-from <netdev+bounces-278714-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 10:32:32 +0200
+	id AOAmK2pN32mFRQAAu9opvQ
+	(envelope-from <netdev+bounces-278715-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 10:33:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0BCF402028
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 10:32:31 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17E91402065
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 10:33:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id AC8FF3042C9C
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 08:28:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DDF5D300D45D
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 08:30:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEBCA3D47BF;
-	Wed, 15 Apr 2026 08:28:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FzqOqvwh"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BF88321457;
+	Wed, 15 Apr 2026 08:30:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out28-109.mail.aliyun.com (out28-109.mail.aliyun.com [115.124.28.109])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A0B33CFF65
-	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 08:28:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 299602F1FC9;
+	Wed, 15 Apr 2026 08:30:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.28.109
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776241718; cv=none; b=jwJ5h8T/bIADoI0Oy6ZokPanEden1NwkHB9Y3cu0l0r3GH/xFTsBLN5fc8kYrCcApBABbhDeFiTG4gdGUsUo1iY+sxGRrKN6zo3tadyatSp9c37wxDYKCpyN/BNq3efoomQutHnOkU/TsYAGlG33/5c3p0ntGSyJI2tXVpt0mTE=
+	t=1776241825; cv=none; b=ZNud1cNpSRibFa72ayXIX5BAxhAO3GujYinHWFADWwZGcrmIxtVWP+omKhbbaJXV51O+bZ1NjNOwcsswwNvPbxHKMvNyG1KQqv+BvwlBIS2Zp/tCi8Bk/fa0Ak2KNXzPjNnAV/L6d2Ul/tc+aHKOB+HnXKDm9/Pjgn8nabIIHs4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776241718; c=relaxed/simple;
-	bh=ZUvWTrIxNz70VSezRKFX4blS66wvJCWytkqwkeJwkLE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=GZwegsatuxwQ5lnisT0HDyFWW6z7V3gXT++V/VFlfA1mMSMslsKe1pp5xengGET/ZY90OAJwWRjErYaQmdHeGu5W2dPARYh8C8Bx/X0lifnYXpSErvX6tJ2sDoNbXBhEmUWYhivqWVEZRsG8NdWI/o6CsER9gyMN9icKPcs02po=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FzqOqvwh; arc=none smtp.client-ip=209.85.215.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-c6e2355739dso2920218a12.2
-        for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 01:28:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776241717; x=1776846517; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OCwTbhoxO2es8i0LbayXcV+D6Aj0lOcdld/MQ+SztSQ=;
-        b=FzqOqvwhWKFeSQ/ZdOfhKI6yxd1El5L/rMkbv0LmeDT18j0XT++byCJn89iVyF7IL0
-         ZYp7X4RGJh9JSwM0TUe9toZlfRfHluSofQY73gdxs3ivwzCq19BOFIIVabdhYGbiIly5
-         +xc2szXtnTSxNc/O2ee0ceIaPkp5fEbFtmug3fruc5cQdZsa5ybei6gk5ON2FSTglZnL
-         1aZ8dtW9P9PU3GflLxL5QQm+NYX7JDSMMDn2WV09e/0xSfhpv+T9daVGqskZnMd4GzbR
-         1ddGgo8HLq2tS5Cf0EZ8lo2qKP/ct0slZm+zrWaGgHsoN50NFwFYH+/pAD0HMCR/T5P6
-         8StA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776241717; x=1776846517;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=OCwTbhoxO2es8i0LbayXcV+D6Aj0lOcdld/MQ+SztSQ=;
-        b=X5SgwZEube/Va/twOyLdi2ayy7AtW0puFYDJ+FIibCHftFC9k5+Vo202INh7t6SyIE
-         s3DDAzM3ytlS9hiZb6ltTfzrn+FJTWHNqUZJCDm1+y9oJia4W4NbSWCvuRj1Oj6ygDKx
-         9aYNrQz7+TyMSvIwaZCrbuFct5XS6mrsoyuEWN0ct1vakVo5Ew+x6nTBGmFo1ulE4iZt
-         WAZfqsrtz6UjYLRcjTqoi5CKZo/E1aAV2kjnla7BiVzXt4jaXSalNvZTUbmvnnpvqmlW
-         Uha6vDCwtznITPepCKQnZRxsXjdVOEJlLjNTudD2eW8B1PolutOZPNycOxJ8n8+80HYO
-         gBrg==
-X-Forwarded-Encrypted: i=1; AFNElJ+rG/zHmLP64QwSnYWzXPq4volb5qGpG9cpJC1Hcm2WZcshhjdsjwhzwNn2iTr0FC/xoIcpL4E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyHSrCpwMM4qJXEso6EYp+d7VY9esBKZZiVP41eqjHct6Q9i5W6
-	Huex7BD63O47WqmhDQvGIQwJR+C8hRG2eLzNaYvbHPXIjUn0JV0MHyXSWGjQ7ZsfKAhBig==
-X-Gm-Gg: AeBDiet5l1eDe7cirX2TV5dIKhOC2nvBii91znPvCH+930TodasSA/VO3kyJe9PFO6B
-	oguUdudFwVVXueR8nB1l7klAp8PVOjVgSRze4XB9xQXSzLgsHvhslEyCyVKBAIPAHKwXm4DPcCJ
-	x7dGJxM2M228/hmQhoeSse9jDgjqxnLUjVbhYMc88SGFpGI79HScyNLdWsTfc7V4Q9sKGxZTGQ/
-	7e/3RXLoiiB9Vw9hLInKZ3iE6rGnc9aPuT0Ik8utQNfzC/NakMZjx+aRzg8HfTn8+mKoWNzNT8H
-	NQQLalzXxs8T+Ovzqi8DApWzEcQyrtFnBUG6/AnHQncWexuwvaDH3XXj8T9jVBn07+umh1oXud1
-	c5gLdY6uTpofBc90QhoMV7DkphlpQi26HxLuAU8xyslzLXxz5szQfoxIeu5YUIo8DD5fCvZRR3J
-	Un67WSdxayhzNZKWDvPu7ykoVX/oWD7yLvti7rnSgGrfTYn+HpKCB8BDrekAGGN4Q3yh94WMUcl
-	g+C2CCI
-X-Received: by 2002:a17:903:3c27:b0:2b4:696b:7bb7 with SMTP id d9443c01a7336-2b4696b7c10mr77559355ad.15.1776241716629;
-        Wed, 15 Apr 2026 01:28:36 -0700 (PDT)
-Received: from KERNELXING-MB0.tencent.com ([43.132.141.25])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b4782a93c7sm12174215ad.62.2026.04.15.01.28.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Apr 2026 01:28:35 -0700 (PDT)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	bjorn@kernel.org,
-	magnus.karlsson@intel.com,
-	maciej.fijalkowski@intel.com,
-	jonathan.lemon@gmail.com,
-	sdf@fomichev.me,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	hawk@kernel.org,
-	john.fastabend@gmail.com
-Cc: bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH RFC net-next v4 14/14] xsk: optimize xsk_build_skb for batch copy-mode fast path
-Date: Wed, 15 Apr 2026 16:26:54 +0800
-Message-Id: <20260415082654.21026-15-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20260415082654.21026-1-kerneljasonxing@gmail.com>
-References: <20260415082654.21026-1-kerneljasonxing@gmail.com>
+	s=arc-20240116; t=1776241825; c=relaxed/simple;
+	bh=ZFWNY7o1gS8U/ryZVFGW84W4xPzvZ1rSWcQxubmrT+I=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nTFUYoIqX2Cdrg17awyF4n3owMzBuLMFp+QeMJExB4T4ktRmGYYrkLsUWDu+f7Hb/SVpSPVSkUL/bmaHUbSZ4ckpwl/JOE1MCzjCT6sH3mzxoLUj7p6cedCQbQaeA1Pls62dkOFKvN9BLOQNmFxzt2MaP3xFPEOcoomNu3/6t1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nebula-matrix.com; spf=pass smtp.mailfrom=nebula-matrix.com; arc=none smtp.client-ip=115.124.28.109
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nebula-matrix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nebula-matrix.com
+X-Alimail-AntiSpam:AC=SUSPECT;BC=0.6694804|-1;BR=01201311R191b1;CH=blue;DM=|SUSPECT|false|;DS=CONTINUE|ham_alarm|0.114224-0.0105365-0.87524;FP=5076060736871470642|2|1|10|0|-1|-1|-1;HT=maildocker-contentspam033037006180;MF=illusion.wang@nebula-matrix.com;NM=1;PH=DS;RN=3;RT=3;SR=0;TI=SMTPD_---.hCYiVa._1776241812;
+Received: from localhost.localdomain(mailfrom:illusion.wang@nebula-matrix.com fp:SMTPD_---.hCYiVa._1776241812 cluster:ay29)
+          by smtp.aliyun-inc.com;
+          Wed, 15 Apr 2026 16:30:13 +0800
+From: "illusion.wang" <illusion.wang@nebula-matrix.com>
+To: netdev@vger.kernel.org
+Cc: "illusion.wang" <illusion.wang@nebula-matrix.com>,
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH v12 net-next 00/11] nbl driver for Nebulamatrix NICs
+Date: Wed, 15 Apr 2026 16:29:59 +0800
+Message-ID: <20260415033608.2438-1-illusion.wang@nebula-matrix.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260415033608.2438-2-illusion.wang@nebula-matrix.com>
+References: 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278714-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[davemloft.net,google.com,kernel.org,redhat.com,intel.com,gmail.com,fomichev.me,iogearbox.net];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kerneljasonxing@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_THREE(0.00)[4];
 	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: E0BCF402028
+	R_DKIM_NA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[illusion.wang@nebula-matrix.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[nebula-matrix.com];
+	PRECEDENCE_BULK(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-278715-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_THREE(0.00)[3]
+X-Rspamd-Queue-Id: 17E91402065
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Jason Xing <kernelxing@tencent.com>
+This patch series represents the first phase. We plan to integrate it in
+two phases: the first phase covers mailbox and chip configuration,
+while the second phase involves net dev configuration.
+Together, they will provide basic PF-based Ethernet port transmission and
+reception capabilities.
 
-Three targeted optimizations for the batch copy-mode TX hot path:
+After that, we will consider other features, such as ethtool support,
+flow management, adminq messaging, VF support, debugfs support, etc.
 
-Replace skb_store_bits() with memcpy() for single-buffer first-desc
-path.  After skb_reserve() + skb_put(), the SKB is freshly allocated
-with all data in the linear area and no frags, so skb_store_bits()
-degenerates to memcpy(skb->data, buffer, len) but carries unnecessary
-function call overhead, offset validation, and frag iteration logic.
+changes v11->v12
+Link to v10:https://lore.kernel.org/netdev/20260408093739.56001-1-illusion.wang@nebula-matrix.com/
+AI review issues
+changes v10->v11
+Link to v10:https://lore.kernel.org/netdev/20260401022318.28550-1-illusion.wang@nebula-matrix.com/
+1.Issues found by Mohsin
+2.AI review issues
+changes v9->v10
+Link to v9:https://lore.kernel.org/netdev/20260325040048.2313-1-illusion.wang@nebula-matrix.com/
+1.Issues found by Jakub
+2.AI review issue
+changes v8->v9
+Link to v8:https://lore.kernel.org/netdev/20260317034533.5600-1-illusion.wang@nebula-matrix.com/
+1.Issues found by Jakub
+2.AI review issue
+Changes v7→v8
+Link to v7:https://lore.kernel.org/netdev/20260310120959.22015-1-illusion.wang@nebula-matrix.com/
+1.Issues found by Paolo
+Changes v6->v7
+Link to v6:https://lore.kernel.org/netdev/20260306033451.5196-1-illusion.wang@nebula-matrix.com/
+1.Issue found by Jakub
+2.AI review issue
+Changes v5->v6
+Link to V5:https://lore.kernel.org/netdev/20260226073840.3222-1-illusion.wang@nebula-matrix.com/
+1.put all standard linux includes files the .c file which needs it & others
+--Andrew
+2.AI review issue
+Changes v4->v5
+Link to V4:https://lore.kernel.org/netdev/20260206021608.85381-1-illusion.wang@nebula-matrix.com/
+1.change nbl_core to nbl & change ** pointers to *pointers & others
+--Andrew
+2.AI review issue
+Changes v3->v4
+Link to v3: https://lore.kernel.org/netdev/20260123011804.31263-1-illusion.wang@nebula-matrix.com
+1.cut down to part of a mini driver(mailbox and chip init)
+--Jakub Kicinski Simon Horman(some sort of staged approached)
+2.modify issues found by ai.
+3. Reverse Christmas tree/nbl_err/devm_kfree/remove some macros/
+void type to real type/others
+--Andrew Lunn
+4.change deprecated pci_enable_msix_range to pci_alloc_irq_vectors
+5.delete service layer
+6.the style of kconfig---Randy Dunlap
+7.add to Documentation/networking/device_drivers/ethernet/index.rst
+--Simon Horman
+Changes v2 →v3
+Link to v2: https://lore.kernel.org/netdev/20260109100146.63569-1-illusion.wang@nebula-matrix.com/
+1.cut down to a mini driver:
+    delete vf support
+    use promisc mode to cut down flow management
+    drop patch15 in v2
+    delete adminq msg
+    delete abnormal handling
+    delete some unimportant interfaces
+2.modify issues found by ai review
+Changes v1->v2
+Link to v1: https://lore.kernel.org/netdev/20251223035113.31122-1-illusion.wang@nebula-matrix.com/
+1.Format Issues and Compilation Issues
+- Paolo Abeni
+2.add sysfs patch and drop coexisting patch
+- Andrew Lunn
+3.delete some unimportant ndo operations
+4.add machine generated headers patch
+5.Modify the issues found in patch1-2 and apply the same fixes to other
+patches
+6.modify issues found by nipa
 
-Inline UMEM address computation in Phase 3 and pass the pre-computed
-buffer pointer to xsk_build_skb(), avoiding the per-packet non-inlined
-xp_raw_get_data() (EXPORT_SYMBOL) call chain:
-xsk_buff_raw_get_data -> xp_raw_get_data -> __xp_raw_get_addr +
-__xp_raw_get_data.
-In the batch loop the pool->addrs and pool->unaligned are invariant,
-so we cache them once and compute each buffer address inline.
+illusion.wang (11):
+  net/nebula-matrix: add minimum nbl build framework
+  net/nebula-matrix: add our driver architecture
+  net/nebula-matrix: add chip related definitions
+  net/nebula-matrix: channel msg value and msg struct
+  net/nebula-matrix: add channel layer
+  net/nebula-matrix: add common resource implementation
+  net/nebula-matrix: add intr resource implementation
+  net/nebula-matrix: add vsi resource implementation
+  net/nebula-matrix: add Dispatch layer implementation
+  net/nebula-matrix: add common/ctrl dev init/reinit operation
+  net/nebula-matrix: add common dev start/stop operation
 
-Prefetch the *next* descriptor's UMEM data buffer at the top of the
-Phase 3 loop, hiding the memory latency of the upcoming memcpy.
+ .../device_drivers/ethernet/index.rst         |    1 +
+ .../ethernet/nebula-matrix/nbl.rst            |   27 +
+ MAINTAINERS                                   |   10 +
+ drivers/net/ethernet/Kconfig                  |    1 +
+ drivers/net/ethernet/Makefile                 |    1 +
+ drivers/net/ethernet/nebula-matrix/Kconfig    |   34 +
+ drivers/net/ethernet/nebula-matrix/Makefile   |    6 +
+ .../net/ethernet/nebula-matrix/nbl/Makefile   |   16 +
+ .../nbl/nbl_channel/nbl_channel.c             |  843 +++++
+ .../nbl/nbl_channel/nbl_channel.h             |  163 +
+ .../nebula-matrix/nbl/nbl_common/nbl_common.c |  214 ++
+ .../nebula-matrix/nbl/nbl_common/nbl_common.h |   33 +
+ .../net/ethernet/nebula-matrix/nbl/nbl_core.h |   59 +
+ .../nebula-matrix/nbl/nbl_core/nbl_dev.c      |  441 +++
+ .../nebula-matrix/nbl/nbl_core/nbl_dev.h      |   58 +
+ .../nebula-matrix/nbl/nbl_core/nbl_dispatch.c |  487 +++
+ .../nebula-matrix/nbl/nbl_core/nbl_dispatch.h |   56 +
+ .../nbl/nbl_hw/nbl_hw_leonis/nbl_hw_leonis.c  |  797 +++++
+ .../nbl/nbl_hw/nbl_hw_leonis/nbl_hw_leonis.h  |  493 +++
+ .../nbl_hw/nbl_hw_leonis/nbl_hw_leonis_regs.c | 2901 +++++++++++++++++
+ .../nbl_hw/nbl_hw_leonis/nbl_hw_leonis_regs.h |   11 +
+ .../nbl_hw_leonis/nbl_resource_leonis.c       |  264 ++
+ .../nbl_hw_leonis/nbl_resource_leonis.h       |   10 +
+ .../nebula-matrix/nbl/nbl_hw/nbl_hw_reg.h     |   68 +
+ .../nebula-matrix/nbl/nbl_hw/nbl_interrupt.c  |  246 ++
+ .../nebula-matrix/nbl/nbl_hw/nbl_interrupt.h  |   12 +
+ .../nebula-matrix/nbl/nbl_hw/nbl_resource.c   |  118 +
+ .../nebula-matrix/nbl/nbl_hw/nbl_resource.h   |  116 +
+ .../nebula-matrix/nbl/nbl_hw/nbl_vsi.c        |   51 +
+ .../nebula-matrix/nbl/nbl_hw/nbl_vsi.h        |   11 +
+ .../nbl/nbl_include/nbl_def_channel.h         |  362 ++
+ .../nbl/nbl_include/nbl_def_common.h          |   80 +
+ .../nbl/nbl_include/nbl_def_dev.h             |   16 +
+ .../nbl/nbl_include/nbl_def_dispatch.h        |   42 +
+ .../nbl/nbl_include/nbl_def_hw.h              |   54 +
+ .../nbl/nbl_include/nbl_def_resource.h        |   37 +
+ .../nbl/nbl_include/nbl_include.h             |   79 +
+ .../nbl/nbl_include/nbl_product_base.h        |   19 +
+ .../net/ethernet/nebula-matrix/nbl/nbl_main.c |  329 ++
+ 39 files changed, 8566 insertions(+)
+ create mode 100644 Documentation/networking/device_drivers/ethernet/nebula-matrix/nbl.rst
+ create mode 100644 drivers/net/ethernet/nebula-matrix/Kconfig
+ create mode 100644 drivers/net/ethernet/nebula-matrix/Makefile
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/Makefile
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_channel/nbl_channel.c
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_channel/nbl_channel.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_common/nbl_common.c
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_common/nbl_common.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_core.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_core/nbl_dev.c
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_core/nbl_dev.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_core/nbl_dispatch.c
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_core/nbl_dispatch.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_hw_leonis/nbl_hw_leonis.c
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_hw_leonis/nbl_hw_leonis.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_hw_leonis/nbl_hw_leonis_regs.c
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_hw_leonis/nbl_hw_leonis_regs.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_hw_leonis/nbl_resource_leonis.c
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_hw_leonis/nbl_resource_leonis.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_hw_reg.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_interrupt.c
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_interrupt.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_resource.c
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_resource.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_vsi.c
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_hw/nbl_vsi.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_def_channel.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_def_common.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_def_dev.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_def_dispatch.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_def_hw.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_def_resource.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_include.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_product_base.h
+ create mode 100644 drivers/net/ethernet/nebula-matrix/nbl/nbl_main.c
 
-It improves 3-4% performance stably.
-
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
----
- include/net/xdp_sock.h |  3 ++-
- net/core/skbuff.c      | 18 ++++++++++++++++--
- net/xdp/xsk.c          | 15 ++++++---------
- 3 files changed, 24 insertions(+), 12 deletions(-)
-
-diff --git a/include/net/xdp_sock.h b/include/net/xdp_sock.h
-index 0609e3b04279..5e05236c7fba 100644
---- a/include/net/xdp_sock.h
-+++ b/include/net/xdp_sock.h
-@@ -139,7 +139,8 @@ void __xsk_map_flush(struct list_head *flush_list);
- INDIRECT_CALLABLE_DECLARE(void xsk_destruct_skb(struct sk_buff *));
- struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
- 			      struct sk_buff *allocated_skb,
--			      struct xdp_desc *desc);
-+			      struct xdp_desc *desc,
-+			      void *buffer);
- int xsk_alloc_batch_skb(struct xdp_sock *xs, u32 nb_pkts, u32 nb_descs, int *err);
- int xsk_direct_xmit_batch(struct xdp_sock *xs, struct net_device *dev);
- 
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 5726b1566b2b..bef5270e6332 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -752,14 +752,28 @@ int xsk_alloc_batch_skb(struct xdp_sock *xs, u32 nb_pkts, u32 nb_descs, int *err
- 	if (total_truesize)
- 		refcount_add(total_truesize, &xs->sk.sk_wmem_alloc);
- 
--	/* Phase 3: Build SKBs with packet data */
-+	/* Phase 3: Build SKBs with packet data. */
-+	struct xsk_buff_pool *pool = xs->pool;
-+	void *pool_addrs = pool->addrs;
-+	bool unaligned = pool->unaligned;
-+
- 	for (j = 0; j < alloc_descs; j++) {
-+		u64 addr = descs[j].addr;
-+		void *buffer;
-+
-+		if (unaligned)
-+			addr = xp_unaligned_add_offset_to_addr(addr);
-+		buffer = pool_addrs + addr;
-+
-+		if (j + 1 < alloc_descs)
-+			prefetch(pool_addrs + descs[j + 1].addr);
-+
- 		if (!xs->skb) {
- 			skb = skbs[skb_count - 1 - k];
- 			k++;
- 		}
- 
--		skb = xsk_build_skb(xs, skb, &descs[j]);
-+		skb = xsk_build_skb(xs, skb, &descs[j], buffer);
- 		if (IS_ERR(skb)) {
- 			*err = PTR_ERR(skb);
- 			break;
-diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-index be341290e42c..3bf81b838075 100644
---- a/net/xdp/xsk.c
-+++ b/net/xdp/xsk.c
-@@ -811,7 +811,8 @@ static struct sk_buff *xsk_build_skb_zerocopy(struct xdp_sock *xs,
- 
- struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
- 			      struct sk_buff *allocated_skb,
--			      struct xdp_desc *desc)
-+			      struct xdp_desc *desc,
-+			      void *buffer)
- {
- 	struct net_device *dev = xs->dev;
- 	struct sk_buff *skb = xs->skb;
-@@ -825,11 +826,10 @@ struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
- 			goto free_err;
- 		}
- 	} else {
--		u32 hr, tr, len;
--		void *buffer;
-+		u32 hr, tr, len = desc->len;
- 
--		buffer = xsk_buff_raw_get_data(xs->pool, desc->addr);
--		len = desc->len;
-+		if (!buffer)
-+			buffer = xsk_buff_raw_get_data(xs->pool, desc->addr);
- 
- 		if (!skb) {
- 			hr = max(NET_SKB_PAD, L1_CACHE_ALIGN(dev->needed_headroom));
-@@ -844,10 +844,7 @@ struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
- 
- 			skb_reserve(skb, hr);
- 			skb_put(skb, len);
--
--			err = skb_store_bits(skb, 0, buffer, len);
--			if (unlikely(err))
--				goto free_err;
-+			memcpy(skb->data, buffer, len);
- 
- 			xsk_skb_init_misc(skb, xs, desc->addr);
- 			if (desc->options & XDP_TX_METADATA) {
 -- 
-2.41.3
+2.47.3
 
 
