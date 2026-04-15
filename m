@@ -1,142 +1,119 @@
-Return-Path: <netdev+bounces-278739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278740-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gEWgNT1n32lSSgAAu9opvQ
-	(envelope-from <netdev+bounces-278739-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 12:23:57 +0200
+	id uBBHNhdo32lSSgAAu9opvQ
+	(envelope-from <netdev+bounces-278740-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 12:27:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A2B04033AB
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 12:23:57 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAB49403476
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 12:27:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 110D23030CBF
-	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 10:23:56 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id DA02A3004CAC
+	for <lists+netdev@lfdr.de>; Wed, 15 Apr 2026 10:26:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 513873446AB;
-	Wed, 15 Apr 2026 10:23:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0BFC322B8B;
+	Wed, 15 Apr 2026 10:26:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KbFqk5jQ"
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="OU3amlUQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6652B329E6A
-	for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 10:23:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78B12314B9D;
+	Wed, 15 Apr 2026 10:26:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776248635; cv=none; b=SiZGHqtkho+35nuCy3VCgP4awJcZBS6k1qGmJpbkcTDQf1Ez2LLmeVDwTZv8mKp3dbxiOgkZ6TcMXI/Riw8dmOWjl8SReYuYsuGlidTBVeOAHo6Mm83ZNJfe4JSKsBXquyZrlXaznQypIpIM3ZUKp7DX5CPrZjixC/VgYCjqZM0=
+	t=1776248777; cv=none; b=u6jkHrnyS513l274F9wJLNL5cdLQ9a/d7/vM6bgZ0081K81ujqFU6aVA465mY/byqNWRccZ+SpUSsSj22eVUhDiP0sd8J+sVZHmqnXud4Gij1mWMpA2nK4iXukOVtwwx4355Mgz/o9XhQgUmNsO0R07Kj0O+BhIyxqwJoLcdrmU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776248635; c=relaxed/simple;
-	bh=RI7GZLwAPyKhQuIOqJMMLP8rUZ4YP6XPSWVDe77lQyM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fIHPZGoY+IJgB+vigWRzdE0poF4fYxbdIlUpbzCDNzG/fOq11OcWPkPX2vNfQ355EISbvT9jn2nAe1amf6m04isBTyqYM065u1DrM0fqyRal4Xy8KXI0NueQ0Yfjp1y7F2dFv/RWnKdiFNLzLLzTePmDuT97+m1CEhEm/Cdb8rg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KbFqk5jQ; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1776248633; x=1807784633;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=RI7GZLwAPyKhQuIOqJMMLP8rUZ4YP6XPSWVDe77lQyM=;
-  b=KbFqk5jQWPwZwoQCPQmOg0aZ4O/VN4QjYUzsMFwRSY/Zj/RxLZlEpuvw
-   9SI1vtobDzwriTtsiWVW1F40WcrIg+HPujfXUdM8ByG/MhPdUoOo803Vn
-   /N9SW8SNUE2uldAcf2tiTaWaq4gI5HPodHgqoFmucwrfleYbYtVQvjxV9
-   EKd4bSfE2dtHgRMEcfXeDMU4cc4Dxld27QUb1D0RT5oiT4RKPJPSkDAhk
-   3aSnNdAwd87jJMqwCxDlyABe2ran8AL08p04Gkhg4zC4MbrG3SvngApxq
-   358q6KVmMs8XFKwy43FY3SmC+Bp0NLf8JiDo577Y7/lxFVZCoMcXUDl/d
-   Q==;
-X-CSE-ConnectionGUID: w95UjW4NQIe4cSUKl5axqg==
-X-CSE-MsgGUID: 9ZlmkPecRB6n41xIUye6DQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11759"; a="76253154"
-X-IronPort-AV: E=Sophos;i="6.23,179,1770624000"; 
-   d="scan'208";a="76253154"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2026 03:23:53 -0700
-X-CSE-ConnectionGUID: 34/ajm2JRGOTrYgteCUN6g==
-X-CSE-MsgGUID: 7zUJ4OEwQZys7s3FOThcKA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,179,1770624000"; 
-   d="scan'208";a="227195533"
-Received: from pae-d-dell-r7525-263.igk.intel.com ([172.28.191.240])
-  by fmviesa007.fm.intel.com with ESMTP; 15 Apr 2026 03:23:51 -0700
-From: Przemyslaw Korba <przemyslaw.korba@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	Przemyslaw Korba <przemyslaw.korba@intel.com>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Subject: [PATCH iwl-net] i40e: set supported_extts_flags for rising edge
-Date: Wed, 15 Apr 2026 12:25:05 +0200
-Message-ID: <20260415102511.1560665-1-przemyslaw.korba@intel.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1776248777; c=relaxed/simple;
+	bh=WUnFtqMqBwiQmUTfjICkfjVtSGlHuFpTjc9sHdxlaxs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JpGDAS/i1z+tp6g5eil1jR0NGU8WtKI35t18KnRlUc7iVviKnw+Z24Vy6Q38OCPJNl2148TO/C1j/+yXcqGeRPlr88nFUaJYsDp++fzbvRsZO11yRFIWYpOuGPdIEAfbRmbLyI5xfKyoaLSHcs1YxL85HKkvFU94f6VOoImiOYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=OU3amlUQ; arc=none smtp.client-ip=82.195.75.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=mrD7p6MJhVAVx6u8xXz0QG9VMVnUTAIfPFAq0M1Vv6Q=; b=OU3amlUQTKjS37WD9mYssvvkZZ
+	0+9Cv+jy23UrYrkx53/mISbJpY1iSgsdXrU/d+uXN5Bs00FM8Wp4pcvSiIXPMqKCCJXJOZyFU7rFD
+	3ZUWmXD3pbIK74+VfbdF4dZmXXpfpqPyeGPAG2AMBSk98MKQk/RvQEU5w/laMhI/JwtU56PojDrXF
+	NVGiUR/KBSZHYzhlczDkA0zE3NdWbANIYQ99GVohe7hTuOIDH3PbUiXur1cr2B0MuAZ6dvSMQccpM
+	t+ofSABY8r/rU+u6vP09RTYh9sT9e50PuAxQZdpbWE/98aVZV0RvgaiXyLN5B7DGxscjEm2UG8k7i
+	Xi9yrgoQ==;
+Received: from authenticated user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.96)
+	(envelope-from <leitao@debian.org>)
+	id 1wCxRd-00DlvM-0M;
+	Wed, 15 Apr 2026 10:26:05 +0000
+Date: Wed, 15 Apr 2026 03:25:59 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Anton Danilov <littlesmilingcloud@gmail.com>
+Cc: netdev@vger.kernel.org, willemdebruijn.kernel@gmail.com, 
+	davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, horms@kernel.org, shuah@kernel.org, 
+	linux-kselftest@vger.kernel.org
+Subject: Re: [RFC PATCH net-next 2/2] selftests: net: add FOU multicast
+ encapsulation resubmit test
+Message-ID: <ad9hkJXAnlv2ZUm6@gmail.com>
+References: <ad7MsSJOuUU6EGwS@dau-home-pc>
+ <ad7NhoxmrFJAsXe7@dau-home-pc>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ad7NhoxmrFJAsXe7@dau-home-pc>
+X-Debian-User: leitao
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_RHS_MATCH_TO(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278739-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-278740-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[debian.org];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,davemloft.net,kernel.org,google.com,redhat.com];
 	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[przemyslaw.korba@intel.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
 	NEURAL_HAM(-0.00)[-0.999];
-	DKIM_TRACE(0.00)[intel.com:+];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[debian.org:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,intel.com:mid]
-X-Rspamd-Queue-Id: 1A2B04033AB
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: DAB49403476
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The i40e driver always supported only rising edge detection, so
-advertise PTP_RISING_EDGE, and PTP_STRICT_FLAGS to ensure the
-PTP core properly validates user requests.
+On Wed, Apr 15, 2026 at 02:28:06AM +0300, Anton Danilov wrote:
+> +send_fou_gre_packets() {
+> +	local count=$1
+> +
+> +	ip netns exec "$NSENDER" python3 -c "
 
-Fixes: 7c571ac57d9d ("net: ptp: introduce .supported_extts_flags to ptp_clock_info")
-Signed-off-by: Przemyslaw Korba <przemyslaw.korba@intel.com>
-Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
----
- drivers/net/ethernet/intel/i40e/i40e_ptp.c | 2 ++
- 1 file changed, 2 insertions(+)
+Having Python code embedded directly in the shell function makes this
+difficult to review and maintain. Could you extract the Python script to
+a separate file? This would simplify the code to just:
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_ptp.c b/drivers/net/ethernet/intel/i40e/i40e_ptp.c
-index 7d07c389bb23..c4525bfab09c 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_ptp.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_ptp.c
-@@ -1344,6 +1344,8 @@ static int i40e_init_pin_config(struct i40e_pf *pf)
- 	pf->ptp_caps.n_ext_ts = 2;
- 	pf->ptp_caps.pps = 1;
- 	pf->ptp_caps.n_per_out = 2;
-+	pf->ptp_caps.supported_extts_flags = PTP_RISING_EDGE |
-+					     PTP_STRICT_FLAGS;
- 
- 	pf->ptp_caps.pin_config = kzalloc_objs(*pf->ptp_caps.pin_config,
- 					       pf->ptp_caps.n_pins);
-
-base-commit: d4999456017dd09ff5f7a34e236c471560d8f8e4
--- 
-2.43.0
-
+	ip netns exec "$NSENDER" python3 my_python_script.py
 
