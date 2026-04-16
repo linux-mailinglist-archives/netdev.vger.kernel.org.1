@@ -1,232 +1,138 @@
-Return-Path: <netdev+bounces-278949-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278950-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yCPxNtKP4Gl6jwAAu9opvQ
-	(envelope-from <netdev+bounces-278949-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 09:29:22 +0200
+	id OOyEJEiQ4GmsjwAAu9opvQ
+	(envelope-from <netdev+bounces-278950-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 09:31:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8312340B090
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 09:29:21 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC76F40B0EE
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 09:31:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 50F26302204F
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 07:26:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id ABC34300EF7B
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 07:27:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA453381B1B;
-	Thu, 16 Apr 2026 07:26:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AC69381B1B;
+	Thu, 16 Apr 2026 07:27:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="FvxadmrQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i/hLLrjx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91598379EFE;
-	Thu, 16 Apr 2026 07:26:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58214324B23
+	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 07:27:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776324366; cv=none; b=jcQAoEEjJq6hQhiOyuFWaxfPKWn9J/vM2tGGyJJjvo7eqsw0bk67ZR+vEWV5tm1h/CSv8sqg9nVgAm8isrUKxooRrNfgKmnyMV0HwNneUyHTagMMk/LNXLYljCF0Xm1cHbIfZnmGjC98+lyZoM8pNjzBB18KAL1i9Ct7xrvDgqQ=
+	t=1776324472; cv=none; b=j61mDPJMoNDNu1eziFzvNk/Y9fW8Lte2gx5XyVFiAirORgjqX0SJVXADM2fwfY3GnjwlUFQrSiUs2TBmbCaQxfjDsg/bbADhkJZK0W+VFEpiiGQ4j9eUnoXFyaYKNZeLCZqI2U6kn36GBudCqIWfIv98lvkG7SUEzp5RiFuce/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776324366; c=relaxed/simple;
-	bh=8XOGHuG7DL0SKI+wzf4TpVXG791hIIaFSOk5D96MHNg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WvkpDnf4Fw/uWcSZKS9hhiPu5GX8mDAKncwb4PUsxCmdw9wGZss6uz/j5sWtWXWj+pxu5RHJbp6Vg94+Yej15ByLZFobvFI4MPYCl9kj9QIRJZvZ+iLYxr1NYt1ngVEYhubgl9v8npqXaQDbm7ClzylmTQZl/rib1St9n3b2AXA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=FvxadmrQ; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: from netfilter.org (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with UTF8SMTPSA id 2DCDA60177;
-	Thu, 16 Apr 2026 09:26:02 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1776324362;
-	bh=iK2gR/+LE4a4ZAYal36ygKmYu5CbrxnT6MXmEhNpe2Y=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=FvxadmrQ7iZeKJgVUh/qpqmqdNY2EE9AlvB4RXlUokEFWXtcalLjfCGITmT9DP21b
-	 fhG0h5EAzfPeQIGftW/8/SWTAr15Xl28SfZwNAnCVBij/wCjR2DXF+JmPoY3jGydbm
-	 t9vVYXnsj9KQ6jQ0lZWS0FhhPv8z4kjBWeXdqn2uuegm4xPUqw2BucBlvPRRe/3mvM
-	 lethOs/WwN7YQAwDILs8YowkZ4XdBkj3rmCXMOFvt6urOQ5W+uCwm6/19w4z9jhTTV
-	 KfDMcoc3KdcXAbbBpgy1mKAdF8HiECHTmJGPXovL7lSOBxz3i/NXRVuZUB9k2Nm1jI
-	 6u2g4neBv818g==
-Date: Thu, 16 Apr 2026 09:25:59 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net, netdev@vger.kernel.org, kuba@kernel.org,
-	pabeni@redhat.com, edumazet@google.com, fw@strlen.de,
-	horms@kernel.org
-Subject: Re: [PATCH net 00/14] Netfilter/IPVS fixes for net
-Message-ID: <aeCPB1_WaFOX-Xos@chamomile>
-References: <20260416013101.221555-1-pablo@netfilter.org>
+	s=arc-20240116; t=1776324472; c=relaxed/simple;
+	bh=mJpU45QimDn5hC6G2LUQKcDSNMK6k2YS8eyW01woreA=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=hDaFdRqmdnzLAdVmRcfdMiGGZtEDYVBnShT3oHFe9P8vwPokTnzFaxDcJ67iYgL6P8Bw8BbLuEp+3EPh6ZjWtMrK3hx4CCcYTmtgsIPrasmWCo68jEfbb6IES7Sr3n8GgR7XEzVqg4WxilgjqnWQGYfxeoWAS73Paf9i/eeB3bo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i/hLLrjx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A282CC2BCB5;
+	Thu, 16 Apr 2026 07:27:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776324472;
+	bh=mJpU45QimDn5hC6G2LUQKcDSNMK6k2YS8eyW01woreA=;
+	h=From:Subject:Date:To:Cc:From;
+	b=i/hLLrjxuanYYYEH1jbzdlaUiozopn8AI/z7i7q0nN8ttc5fZWadm2FHnw4R7MTFT
+	 Xb+lJMDfGOscV1EbDc3mL6v67cyF/kbxDN57lAhnqhTiXEnCBOHKFFyLuAzbYj8Yft
+	 0jx27iGrcj7rLVmERMKHtHlB9KapGQczj8EnLRHBV6rd/t747ML1/cmHBtQoWvOfF9
+	 kwMv/N6q42gJJlsJGj43lxj6v2mUKW303OIs4ZQlsQin1iSLj4KszxYgw+1geFWngM
+	 XYQljeAQrbwIQVcz0E1iR2pP/orKnX0xwaGcnF53Vx5O2E/F8UFCqTTQW+b7WLK+bl
+	 Q2yTFXyddHb9Q==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Subject: [PATCH net v3 0/3] net: airoha: Fix airoha_qdma_cleanup_tx_queue()
+ processing
+Date: Thu, 16 Apr 2026 09:27:38 +0200
+Message-Id: <20260416-airoha_qdma_cleanup_tx_queue-fix-net-v3-0-2b69f5788580@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260416013101.221555-1-pablo@netfilter.org>
-X-Spamd-Result: default: False [-1.16 / 15.00];
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/5WN3Q6CIBiGb6VxHA1QgjrqPlpjhB/KMlRQZ3Pee
+ 4yjOqvD92fPs6IIwUFE592KAswuus6nUOx3yDTa14BdlTJihB1JSQnWLnSNVkP11Mq0oP3Uq3F
+ RwwQTYOsW7GHEp6IQ3HIASSxKqD5AmrLmitIB3VLZuDh24ZXVM83Tf5aZYorvggpqpKUg5OUBw
+ UN76EKdDTP7pJY/UlmiSsEr4MIYwtgXddu2NyEPrIQ0AQAA
+X-Change-ID: 20260410-airoha_qdma_cleanup_tx_queue-fix-net-93375f5ee80f
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Lorenzo Bianconi <lorenzo@kernel.org>, Simon Horman <horms@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+X-Mailer: b4 0.14.3
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-278950-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[netfilter.org];
 	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-278949-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[netfilter.org:+];
-	MISSING_XM_UA(0.00)[];
-	ASN_FAIL(0.00)[1.2.3.5.c.f.2.1.0.0.0.0.0.0.0.0.b.d.0.0.1.0.0.e.a.0.c.3.0.0.6.2.asn6.rspamd.com:server fail];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN_FAIL(0.00)[10.253.234.172.asn.rspamd.com:server fail];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[netfilter.org:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8312340B090
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: BC76F40B0EE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi,
+Add missing bits in airoha_qdma_cleanup_tx_queue routine.
+Fix airoha_qdma_cleanup_tx_queue processing errors intorduced in commit
+'3f47e67dff1f7 ("net: airoha: Add the capability to consume out-of-order
+DMA tx descriptors")'.
 
-I am preparing a v2 to address so AI generated comment, I should be
-ready in a few hours.
+---
+Changes in v3:
+- Move ndesc initialization fix in a dedicated patch.
+- Add patch 2/3 to move entries to queue head in case of DMA mapping
+  failure in airoha_dev_xmit().
+- Cosmetics.
+- Link to v2: https://lore.kernel.org/r/20260414-airoha_qdma_cleanup_tx_queue-fix-net-v2-1-875de57cc022@kernel.org
 
-Thanks.
+Changes in v2:
+- Move q->ndesc initialization at end of airoha_qdma_init_tx routine in
+  order to avoid any possible NULL pointer dereference in
+  airoha_qdma_cleanup_tx_queue()
+- Check if q->tx_list is empty in airoha_qdma_cleanup_tx_queue()
+- Link to v1: https://lore.kernel.org/r/20260410-airoha_qdma_cleanup_tx_queue-fix-net-v1-1-b7171c8f1e78@kernel.org
 
-On Thu, Apr 16, 2026 at 03:30:47AM +0200, Pablo Neira Ayuso wrote:
-> Hi,
-> 
-> The following patchset contains Netfilter/IPVS fixes for net: Mostly
-> addressing very old bugs in the SIP conntrack helper string parser,
-> unsafe arp_tables match support with legacy IEEE1394, restrict xt_realm
-> to IPv4 and incorrect use of RCU lists in nat core and nftables. This
-> batch also includes one IPVS MTU fix. The exception is a fix for a
-> recent issue related to broken double-tagged vlan in the flowtable.
-> 
-> 1) Fix possible stack recursion in nft_fwd_netdev from egress path,
->    from Weiming Shi.
-> 
-> 2) Fix unsafe port parser in SIP helper, from Jenny Guanni Qu.
-> 
-> 3) Fix arp_tables match with IEEE1394 ARP payload, allowing to
->    reach bytes off the skb boundary, from Weiming Shi.
-> 
-> 4) Reject unsafe nfnetlink_osf configurations from control plane,
->    this is addressing a possible division by zero, from Xiang Mei.
-> 
-> 5) nft_osf actually only supports IPv4, restrict it.
-> 
-> 6) Fix double-tagged-vlan support (again) in the flowtable, from
->    Eric Woudstra.
-> 
-> 7) Remove unsafe use of sprintf to fix possible buffer overflow
->    in the SIP NAT helper, from Florian Westphal.
-> 
-> 8) Restrict xt_mac, xt_owner and xt_physdev to inet families only;
->    xt_realm is only for ipv4, otherwise null-pointer-deref is possible.
-> 
-> 9) Use kfree_rcu() in nat core to release hooks, this can be an issue
->    once nfnetlink_hook gets support to dump NAT hook information,
->    not currently a real issue but better fix it now.
-> 
-> 10) Fix MTU checks in IPVS, from Yingnan Zhang.
-> 
-> 11) Use list_del_rcu() in chain and flowtable hook unregistration,
->     concurrent RCU reader could be walking over the hook list,
->     from Florian Westphal.
-> 
-> 12) Add list_splice_rcu(), this is required to fix unsafe
->     splice to RCU protected hook list. Reviewed by Paul McKenney.
-> 
-> 13) Use list_splice_rcu() to splice new chain and flowtable hooks.
-> 
-> 14) Add shim nft_trans_hook object to track chain and flowtable
->     hook deletions and flag them as removed, instead of unsafely
->     moving around hooks in the RCU-protected hook list. This allows
->     to restore the previous state from the abort path.
-> 
-> Please, pull these changes from:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git nf-26-04-16
-> 
-> Thanks.
-> 
-> ----------------------------------------------------------------
-> 
-> The following changes since commit 2dddb34dd0d07b01fa770eca89480a4da4f13153:
-> 
->   net: ethernet: mtk_eth_soc: initialize PPE per-tag-layer MTU registers (2026-04-12 15:22:58 -0700)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git tags/nf-26-04-16
-> 
-> for you to fetch changes up to e349f90da812aeddd22c3914a2cc639b51e4eb48:
-> 
->   netfilter: nf_tables: add hook transactions for device deletions (2026-04-16 02:47:58 +0200)
-> 
-> ----------------------------------------------------------------
-> netfilter pull request 26-04-16
-> 
-> ----------------------------------------------------------------
-> Eric Woudstra (1):
->       netfilter: nf_flow_table_ip: Introduce nf_flow_vlan_push()
-> 
-> Florian Westphal (2):
->       netfilter: conntrack: remove sprintf usage
->       netfilter: nf_tables: use list_del_rcu for netlink hooks
-> 
-> Jenny Guanni Qu (1):
->       netfilter: nf_conntrack_sip: add bounds-checked port parsing helper
-> 
-> Pablo Neira Ayuso (6):
->       netfilter: nft_osf: restrict it to ipv4
->       netfilter: xtables: restrict several matches to inet family
->       netfilter: nat: use kfree_rcu to release ops
->       rculist: add list_splice_rcu() for private lists
->       netfilter: nf_tables: join hook list via splice_list_rcu() in commit phase
->       netfilter: nf_tables: add hook transactions for device deletions
-> 
-> Weiming Shi (2):
->       netfilter: nft_fwd_netdev: use recursion counter in neigh egress path
->       netfilter: arp_tables: fix IEEE1394 ARP payload parsing in arp_packet_match()
-> 
-> Xiang Mei (1):
->       netfilter: nfnetlink_osf: fix divide-by-zero in OSF_WSS_MODULO
-> 
-> Yingnan Zhang (1):
->       ipvs: fix MTU check for GSO packets in tunnel mode
-> 
->  include/linux/rculist.h               |  29 ++++++
->  include/net/netfilter/nf_dup_netdev.h |  13 +++
->  include/net/netfilter/nf_tables.h     |  13 +++
->  net/ipv4/netfilter/arp_tables.c       |  14 ++-
->  net/ipv4/netfilter/iptable_nat.c      |   2 +-
->  net/ipv6/netfilter/ip6table_nat.c     |   2 +-
->  net/netfilter/ipvs/ip_vs_xmit.c       |  19 +++-
->  net/netfilter/nf_conntrack_sip.c      |  80 +++++++++++-----
->  net/netfilter/nf_dup_netdev.c         |  16 ----
->  net/netfilter/nf_flow_table_ip.c      |  25 ++++-
->  net/netfilter/nf_nat_amanda.c         |   2 +-
->  net/netfilter/nf_nat_core.c           |  10 +-
->  net/netfilter/nf_nat_sip.c            |  33 ++++---
->  net/netfilter/nf_tables_api.c         | 168 ++++++++++++++++++++++++----------
->  net/netfilter/nfnetlink_osf.c         |   4 +
->  net/netfilter/nft_fwd_netdev.c        |   7 ++
->  net/netfilter/nft_osf.c               |   6 +-
->  net/netfilter/xt_mac.c                |  34 ++++---
->  net/netfilter/xt_owner.c              |  37 +++++---
->  net/netfilter/xt_physdev.c            |  29 ++++--
->  net/netfilter/xt_realm.c              |   2 +-
->  21 files changed, 393 insertions(+), 152 deletions(-)
-> 
+---
+Lorenzo Bianconi (3):
+      net: airoha: Move ndesc initialization at end of airoha_qdma_init_tx()
+      net: airoha: Move entries to queue head in case of DMA mapping failure in airoha_dev_xmit()
+      net: airoha: Add missing bits in airoha_qdma_cleanup_tx_queue()
+
+ drivers/net/ethernet/airoha/airoha_eth.c | 42 ++++++++++++++++++++++++++------
+ 1 file changed, 35 insertions(+), 7 deletions(-)
+---
+base-commit: 3f20012a3964f487ae1e9ff942e2f35d4e9595bf
+change-id: 20260410-airoha_qdma_cleanup_tx_queue-fix-net-93375f5ee80f
+
+Best regards,
+-- 
+Lorenzo Bianconi <lorenzo@kernel.org>
+
 
