@@ -1,143 +1,131 @@
-Return-Path: <netdev+bounces-278888-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278889-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EHVLG5o04GnbdQAAu9opvQ
-	(envelope-from <netdev+bounces-278888-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 03:00:10 +0200
+	id aIIGGd814GkFdgAAu9opvQ
+	(envelope-from <netdev+bounces-278889-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 03:05:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36FC94095F9
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 03:00:09 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FFE1409624
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 03:05:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E37C230D4C47
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 01:00:05 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5F5D430166C5
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 01:04:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0644B1F5842;
-	Thu, 16 Apr 2026 01:00:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9B7721B905;
+	Thu, 16 Apr 2026 01:04:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="3B9OOmlm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o4BaxWxQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A5763B1B3;
-	Thu, 16 Apr 2026 01:00:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95BA61A317D;
+	Thu, 16 Apr 2026 01:04:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776301204; cv=none; b=AiPBz1uMKrwntujXylDPjvH+0RcD2UwLzfc9rc85eT5cWQcbS/9rxQ5k1dS4eV0kXc1il5kXneKAX/zaKJWCqy2xdFr3D5OOxiBIx8pIQpadLfr0s37VS1JdGpMoaQndcdsQo2rJwExcWPnOvLoozv6XvKIIpDIGapXvZY2UNEw=
+	t=1776301486; cv=none; b=RcVQzP/ek7tFTcRey6QgQmsOOsu30SP5P1+l3lF2d1p9pDmKLlfNaY5LLZ77US2feWFpNkVoIrJw/M0axFA5yqGBl2KDR2HyrohvIqaCacyU1yw9EJ56Vu3mJYR2fCAQbLNgAEt6jSGBTDfeFIydJiCSO56fpvnAbuR4Wnr0uOg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776301204; c=relaxed/simple;
-	bh=iU0DwoZ+SxeK2Nw5LXlna/1Yc8q9gelYmwSDcS+gaHg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VEFuCI11ZgoAaSjIZEKNEf8WbYs5QHVVyxfU5+vzs3anPA5g2/jsfancFY3jqoofVmZ0NihmA1nWHbjOVgRKShbomxv9X4SWvsmUqIBuW4MKjfiqHOvzng1Sn7fsttcdvMHbo2LTlmu3b3XQU93BMVXMlccErqjOt02Q1pwPFn4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=3B9OOmlm; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=FUceXjd8N3oLV2aVukNVBUzRUd/Cx5ROPr6kA4QdZoo=; b=3B9OOmlmiEdntmaMFmrwIn9UPF
-	yW2EWnldk1VsRMKi6pyT8rKOOCrRF09uEp8WPcI4VbtnGjbqycUZyZNch0eKw2mua2HgYs4kPKEXF
-	2mpH2II96q2soRiZYrEEsE/mkIW6RGgdbZXdSR6y6pbImucQHxpt/uRdYbRcUi3A3EO4=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wDB5G-00GEJF-Fx; Thu, 16 Apr 2026 02:59:54 +0200
-Date: Thu, 16 Apr 2026 02:59:54 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: davem@davemloft.net, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
-	Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
-	Romain Gantois <romain.gantois@bootlin.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-Subject: Re: [PATCH net-next v9 04/10] net: phy: Create SFP phy_port before
- registering upstream
-Message-ID: <93540a3b-1a69-40fe-9b48-5d8609d497e7@lunn.ch>
-References: <20260403123755.175742-1-maxime.chevallier@bootlin.com>
- <20260403123755.175742-5-maxime.chevallier@bootlin.com>
- <2bdd6224-6acf-49db-955a-5552e64d4b73@lunn.ch>
- <e4f6503c-6514-46f1-bf4f-a38c12903c16@bootlin.com>
+	s=arc-20240116; t=1776301486; c=relaxed/simple;
+	bh=ylw3EBQB5bmUDkGUqiM6coiGIfTgnOFrvFHg3T3UN9Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PvnywYe9pIHLz0OULIWrdivO3i/E4+Xji1d35rLykvqYWk7EzwolIq06Io/jgjRmumiQwsAVLMWF/CXAFd6jsrGbPWEVyxUw2ZzN+CUHS7wmorgrGemnQaTHR/g8PxhXH1HDZmTvFOFng1A561xMVzoAqRY1AtQFKRBojY8+SRk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o4BaxWxQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86D20C19424;
+	Thu, 16 Apr 2026 01:04:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776301486;
+	bh=ylw3EBQB5bmUDkGUqiM6coiGIfTgnOFrvFHg3T3UN9Y=;
+	h=From:To:Cc:Subject:Date:From;
+	b=o4BaxWxQ0HIJd8iD4ra97DcWoqxIOk3TeU7cy2cJX+5SCQ9WqxwSGw0xLtDFThUe7
+	 3xqm3Pv2CyQH3TDbvKIEFxbURr8qmsu0CSVjTkw9hko5z9PJ9pN+klRD52nbpW5rel
+	 RqucbUo8QVH9eN0iDN6SxjTKbg0kq/4XTBDKQK00XlagD7pqTivokR43v1SUOUXo5b
+	 sqKMNfu3euvd96/WxjUKWo3CDBnxd0rgXXP2kYrFSx4qS7E0+AqaSyi+3zwOBH81vA
+	 t0dUQ5aBBJQIx20RiovwarMMWN9rORRBCN6FZFtlOn7N5fxqPjVozrjHf8z0qYInXV
+	 3D7gS1Kllv/zg==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	shuah@kernel.org,
+	fw@strlen.de,
+	antonio@openvpn.net,
+	matttbe@kernel.org,
+	phil@nwl.cc,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net] selftests: net: add missing CMAC to tcp_ao config
+Date: Wed, 15 Apr 2026 18:04:39 -0700
+Message-ID: <20260416010439.1053587-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e4f6503c-6514-46f1-bf4f-a38c12903c16@bootlin.com>
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278888-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-278889-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	ASN_FAIL(0.00)[114.105.105.172.asn.rspamd.com:server fail];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	ASN_FAIL(0.00)[1.2.3.5.c.f.2.1.0.0.0.0.0.0.0.0.c.6.3.0.1.0.0.e.4.0.c.3.0.0.6.2.asn6.rspamd.com:server fail];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,google.com,redhat.com,armlinux.org.uk,gmail.com,vger.kernel.org,bootlin.com,csgroup.eu,nxp.com,pengutronix.de,chromium.org,makrotopia.org,liebherr.com];
-	MID_RHS_MATCH_FROM(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:dkim,lunn.ch:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 36FC94095F9
+	PRECEDENCE_BULK(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,nwl.cc:email]
+X-Rspamd-Queue-Id: 3FFE1409624
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Apr 15, 2026 at 09:19:45AM +0200, Maxime Chevallier wrote:
-> Hi Andrew,
-> 
-> On 15/04/2026 01:46, Andrew Lunn wrote:
-> > On Fri, Apr 03, 2026 at 02:37:48PM +0200, Maxime Chevallier wrote:
-> >> When dealing with PHY-driven SFP, we create a phy_port representing the
-> >> SFP bus when we know we have such a bus.
-> > 
-> > I'm missing the big picture here.
-> > 
-> > Do we have three different things represented in the topology:
-> > 
-> > SFP bus-> SFP cage-> SFP module
-> > 
-> > 	Andrew
-> 
-> Ah by bad, this is a wording issue, this is the port for the cage indeed.
-> 
-> The model I ended-up with is to represent the SFP cage itself as a PHY
-> port, but I've been calling that the "sfp bus port" in the code so far :/
+Recent changes to crypto and wifi made CMAC no longer
+selected by default on x86 and tcp_ao needs it.
+Add the missing config.
 
-I know we have sfp-bus.c, but i think most people think in terms of
-cage and module. So unless we need some concepts from sfp-bus, i think
-it would be better if we use phylink->sfp_cage_port and
-phylink->mod_port. 
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: shuah@kernel.org
+CC: fw@strlen.de
+CC: antonio@openvpn.net
+CC: matttbe@kernel.org
+CC: phil@nwl.cc
+CC: linux-kselftest@vger.kernel.org
+---
+ tools/testing/selftests/net/tcp_ao/config | 1 +
+ 1 file changed, 1 insertion(+)
 
-	Andrew
+diff --git a/tools/testing/selftests/net/tcp_ao/config b/tools/testing/selftests/net/tcp_ao/config
+index 971cb6fa2d63..f22148512365 100644
+--- a/tools/testing/selftests/net/tcp_ao/config
++++ b/tools/testing/selftests/net/tcp_ao/config
+@@ -1,3 +1,4 @@
++CONFIG_CRYPTO_CMAC=y
+ CONFIG_CRYPTO_HMAC=y
+ CONFIG_CRYPTO_RMD160=y
+ CONFIG_CRYPTO_SHA1=y
+-- 
+2.53.0
+
 
