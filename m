@@ -1,357 +1,159 @@
-Return-Path: <netdev+bounces-278981-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278982-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wOicMj6n4GlZkgAAu9opvQ
-	(envelope-from <netdev+bounces-278981-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 11:09:18 +0200
+	id 2CKxJuyr4GkCkwAAu9opvQ
+	(envelope-from <netdev+bounces-278982-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 11:29:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F90140C036
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 11:09:16 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07FEC40C5D3
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 11:29:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4335C313927B
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 09:05:49 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 66C9B3153756
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 09:21:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D35B437FF6D;
-	Thu, 16 Apr 2026 09:05:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C0AA391E46;
+	Thu, 16 Apr 2026 09:21:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Bw3qbd3N"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nRRXTGCY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 748C8303CB0;
-	Thu, 16 Apr 2026 09:05:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776330348; cv=fail; b=YhqATVUeCPLaxjRIb8vPT7i+BoTFgVzztskqiJwXDIbbp8YWan5MLOnCmQxl00lv9QZog48FFrLK0VGXopC3eHJynWsgsxM4KwcBDtWTSRd1iMl3507uxXjwUUMHN86eCQJgh+IgO8aMs7ePa3PMY4DP/7EKnowCUgS9W/kvB/U=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776330348; c=relaxed/simple;
-	bh=2wZs0VmgoKPqooZrROD+aysXOH9tpVqoGNc5k22bqAQ=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=mk8k5L7yKCuSZBPmCrZAvp1pEp0zNbuDlM77WEtdVoBV/mZM1nTutgT8b4pwYmzdJ39PvVBl5rOo8xW1FftirxWJfxmfdMbgYEOnTiuytb4IIl6Y9INkvvnnBBrRjBYCHZZamEu80SvZREZ8LpVX5qAkUGBJyrkfXLn4ivOxlQk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Bw3qbd3N; arc=fail smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1776330348; x=1807866348;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=2wZs0VmgoKPqooZrROD+aysXOH9tpVqoGNc5k22bqAQ=;
-  b=Bw3qbd3NtGPvFZu0ZBDFjxaXNpAbB8eZvq7a0bBC0g3V2IP2Qi/mrDeu
-   vm8TA+876wx1NKgxJHnIkT8gKABNfVh6WGYGhn5o5afQXcv3IxKXSZAA/
-   u/ZXhF301l0eY/O0wXog60gHuaIWkuZbOQTRksDUqXqISRgVgV/3H6weh
-   LtiLlCxzAG8YLL+4lD+iVjV7CI8tlYxevQ4AW6NEBr6kFOoMe9QoNDB/1
-   x+Yc1YOCYUriNMQht8hcuv7j/xSEMVOUnYXqhv3QN2E5l0pLuZhi1VNeF
-   YfG0SxZeLZNaW9Q9wdIbMr1xtW0jVMY+RGOyTBAdX4cCA0kzGBb6ZEpAr
-   w==;
-X-CSE-ConnectionGUID: BODNvAmdQQCBRz64yuwY3A==
-X-CSE-MsgGUID: 9b2kITqFTiGUcnrv7oFQLA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11760"; a="77299198"
-X-IronPort-AV: E=Sophos;i="6.23,181,1770624000"; 
-   d="scan'208";a="77299198"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2026 02:05:47 -0700
-X-CSE-ConnectionGUID: 1l/nD6StQt6nxZiVjjL6+g==
-X-CSE-MsgGUID: Z4P/Zz4hQMyXOLPNmnTi7w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,181,1770624000"; 
-   d="scan'208";a="226342155"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by fmviesa010.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2026 02:05:45 -0700
-Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Thu, 16 Apr 2026 02:05:45 -0700
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Thu, 16 Apr 2026 02:05:45 -0700
-Received: from CH5PR02CU005.outbound.protection.outlook.com (40.107.200.22) by
- edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Thu, 16 Apr 2026 02:05:46 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=K0EtxCV1aZ9VaiX8udd88+zmSouJaAVDKPG35yxdbyFVHLFMcxKUnK/W+14ZqgV+7BoitpfRuGtdeenmUWRxpyqr68ZhNAgs/1i5Uk+HfbSJGK3DfiQg5Sj3Mg9AXm7Pst8ei5BtJTibRoGw792NBdmF5B1HTK9oPbZKrFOwXCm2Inzyye0r9D9bmb0lchrG568ryU1i9iDlseVk4XRdS6ke5Cv3nk1rAKv39FJB9K2QXP3+DV0dC5q70kkS7Nl3wCImLz3EdOATQ3StZCioO/hsJurrclBaMXf3UPFA1y6YgpLLAucf7Cv7bMI2aBHx3D/JTzIU6zXxgGQNGjEYFA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=aMWjFtAwvh05P54+jsbiO0MlgwD4Eoy4DyzA+vGQKlY=;
- b=TrYbLa1IYoBzr+zbCxRbUeqenZDZ1xeuMJ3OXu/Ap3D41RjRRpxoPt9XV9gzguFhPZSEEjG7eFUk1lDIMUzb9xW5170oC115oldOd7+nr9WTVxa2yG0Nlj9c5Drec/cNKYZW5I/c+rfXMGXdMvqZCWoE6b764Zg1PXKxjFP1uYQFfBg0vQaY0LIstSR+PMA9K0G2CPxnsNwPHv/wdPGuHx9AKEj+/N8MqSIhizDh6BiRuKrQHNf+Mmp3XvJtcJ+PQM1tgTpfBI/V/ofL1gXNRhpVtMczt0E0m/sbrUkA4twOqfj4NcwfndKO7/T9qPJ3bFTEhlQS5mbO//FS3JarLA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
- by PH0PR11MB4998.namprd11.prod.outlook.com (2603:10b6:510:32::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9818.25; Thu, 16 Apr
- 2026 09:05:41 +0000
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::e6f0:6afb:6ef9:ab5c]) by IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::e6f0:6afb:6ef9:ab5c%5]) with mapi id 15.20.9818.017; Thu, 16 Apr 2026
- 09:05:41 +0000
-From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
-To: KhaiWenTan <khai.wen.tan@linux.intel.com>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, "andrew+netdev@lunn.ch"
-	<andrew+netdev@lunn.ch>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>
-CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Abdul Rahim,
- Faizal" <faizal.abdul.rahim@intel.com>, "Looi, Hong Aun"
-	<hong.aun.looi@intel.com>, "Tan, Khai Wen" <khai.wen.tan@intel.com>, "Faizal
- Rahim" <faizal.abdul.rahim@linux.intel.com>, "Looi, Alan Chia Wei"
-	<alan.chia.wei.looi@intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-next v2 2/3] igc: move
- autoneg-enabled settings into igc_handle_autoneg_enabled()
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v2 2/3] igc: move
- autoneg-enabled settings into igc_handle_autoneg_enabled()
-Thread-Index: AQHczUdidN1z1jWSu0KNazCuWSAS/7XhZcHQ
-Date: Thu, 16 Apr 2026 09:05:40 +0000
-Message-ID: <IA3PR11MB8986F372515790F3D6F4D03EE5232@IA3PR11MB8986.namprd11.prod.outlook.com>
-References: <20260416015520.6090-1-khai.wen.tan@linux.intel.com>
- <20260416015520.6090-3-khai.wen.tan@linux.intel.com>
-In-Reply-To: <20260416015520.6090-3-khai.wen.tan@linux.intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|PH0PR11MB4998:EE_
-x-ms-office365-filtering-correlation-id: 49a27a6f-11e1-40b3-10c0-08de9b975586
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|7416014|376014|1800799024|38070700021|921020|18002099003|22082099003|56012099003;
-x-microsoft-antispam-message-info: 6FXPxZMB+u7hNJbNeD6UKd0Xn7iVzvn39XiPZavdqsyY1ek6jf3Tk0XMzRX/aBycEPln0bCvCsEWm2lhrP/lcS2VxXrQ0bzCyowGLO0fSgBqkjgtRpzBsguW5+jyZIjuEGRKzxbASj9tlI7Ba1SWbaGcF9aakvuNdRJkvKtiPOTQN5THuUg7a7GDWBOGrQwnS8dauw4RQnRQTJyZ1+ptPVU9JLoc/wDiqPRchr0z3JmtFSqO5Py9VuWnYQ3/RfqZM+H6irHZAJzeQOby+2e0A0ihmZBu9P5kmYfbDfl9ZuGa6w8qyCusnS6jfCRXtdrfpwyraMSE7ieVH7pa64aw4IK2xf0hX1yIQyqzALGojGjjsodej8F10Z2/XxFaNB3/Bi2h+yIkGuEdtaPiKRUYanlmZ/qVYC3bl3oBytcORE9N7V9OHNui+Myyr26xl4bX3xmxSrYDUuZy41AD+PP8wSAHOZeTqWTmsQF/iTRYUFsRgOyK4YcFTOAb4aKp9+6o78FUZ48cXNFxFDit9mWJrelxn027VBohkO2NdVYgxsvVmRFVJezLiyGvIrwdSY6p5BYv5u+Kchral6eRi7J+GNvvoEwAXeLi5EDd4R6LVIvZ9c6PNt3gnrwdboATmSLo2Yj8DFGagL7mhgLOo0o8uCDsdSO33UAZcXin+hiQMRBWAl1jyx18YtK5eYnSXqzIgF2AQRS0GY6IiNgrdmxQ+mxTFG55GMNbaGZu8z3OMEJNsm/yQkDh8RNkffmPNeCfOkZ8297Kud0ofeLTO98KI9kuJ+36NO+HV42Etn2uK7c=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024)(38070700021)(921020)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?t2LhPx91HP2vqgE3EX3CE0GwvqemOepVfI6T4wrYjPxt+oF5pBlxEKUtJRr8?=
- =?us-ascii?Q?cRXYAA3sEQ4ulbNEZP7z4LhNNsFhCakvj1nBusVhXEJX3WGb4Ty+Zm18lVaj?=
- =?us-ascii?Q?hbxCDrN3ZMW1UdshJIRv2sn5sykRLlGSlHDB1BT6kXj9PhUQ1gt3kEmwo4jo?=
- =?us-ascii?Q?01BC3TLv3JAOlgRG2UdU0LrH828r3kNoKvdEHmsls2FJ3TR9gjpw3vu5pDsh?=
- =?us-ascii?Q?MPW/0bH5uYUZrx/uYj7q0JNc+RoAuYqOt0ugfX/GmHcOX/hoUy/uMkxKldky?=
- =?us-ascii?Q?UJb2t/mgK5w87GHDeGl7X3VimeawBoYokK+wF9KRJ8vKGNT2B7GKAj94+K/+?=
- =?us-ascii?Q?uQYo/ETpJC/73LAaZYkKDq5TgDNEff1l8669UD5F1FpvQyUny5TZZ7MMCMpJ?=
- =?us-ascii?Q?lLMVN56o8BTfHau2Uulr2RqZ3NGlDv9LbYunLyRo+oXwFhmUvI60YHX2LkIQ?=
- =?us-ascii?Q?LcrG3yR0VctUVswHFPdD4nQel55RmD7Bym/6ogVev3nrQbm0urNhS+WGm974?=
- =?us-ascii?Q?3rlFlhbnI+ojK79Yj7VfpzdH/mz/1Gi+y5yL+qRUGNxz9limhNppFbSYkw/E?=
- =?us-ascii?Q?8wV6K5B1V4GEtO5y+jomuaM5Fq9/RZsij0rLXDhvqGIcu3CZrkxC0HrTqdDz?=
- =?us-ascii?Q?cU6beca+2snptAK9musWjWtwRX914gXtnJ9ErnfOmj77Wz9lmbpMttbyfUT4?=
- =?us-ascii?Q?XJR3nZsyRDYyMtS/nl+63cLvtyDJ+1xXnAnGr/izFau8c2TdjTvDQiowVFQq?=
- =?us-ascii?Q?3cwrtsxzUOZwVnLXCbhuL9ZpRi118ln+TfBEjSDAwPElbllR/aiWNnErxaC6?=
- =?us-ascii?Q?IvfjZINBKIwCz3LoDhTchAw9AD3coss+UxPphT7t+z9Cum+1t9Ar7g13U6Ks?=
- =?us-ascii?Q?TA4uQla/TJ2xhRoy0wkPibuHozC8pZ/a8rP3cIN5Lvdcq2uqu/qHGAvmJE4u?=
- =?us-ascii?Q?zdF7blY+e/rWcvV4q6wyVkufHrA0ABz7yyO6pjVfG+vXgZd7L+jM8JjV2TQn?=
- =?us-ascii?Q?h7iViC4Jq5VRyXKkviVh1HCbZ0cxWA2uXvJZnP+5UViPGd5b5m6Jcg1q3MF8?=
- =?us-ascii?Q?MGSlh2TAa0Ui8DFUmJ9FJgO1mxScwSEgHmwH02X+RQXo6Sr1i3KsH8Ulc+1l?=
- =?us-ascii?Q?qJU3qGz8M1l/Ktl1zQyniVIlgs5GFhDDPWc4EWwLK7STQfygpqMCiZVWpGQT?=
- =?us-ascii?Q?Elck+GW8D6UTPlzmV3PVIrQBl1toaBw5sn3yHA4km38kaxwDybm3+VvKyJ5e?=
- =?us-ascii?Q?xEQGpjqOiyFdCY+leu/GLvhfc5Z7AwN/xR+/o4FmH2qyk7YdWaO7voJcvjku?=
- =?us-ascii?Q?xMYTDDnnz/HAExFl8AAz9cc5et9tHO9qslemq30xLIcu+SQejvxlzTziZNN2?=
- =?us-ascii?Q?7I4ubSTF7yzfSNvA8V5P+kG+uynrS/uOhl0yHrRIzLet0lszt8ZRQ2tgcGa9?=
- =?us-ascii?Q?qhRpY1bxgH5tguRGcPI1BPosOgmvfxnXKCUL++54HoIEce4CZIiNH9aA5hH4?=
- =?us-ascii?Q?AmgKQR5m3mOehUR+ujSK+J8t8/ulnOOCGrF8SkldOq7qjJCewDlP+K1x62iv?=
- =?us-ascii?Q?EQO79DL0YXCl/FyeA7htSEAItII+r+5jwLqdbALsBdftA26gIax9xmxGi0RH?=
- =?us-ascii?Q?qRbpwgjXJaCpe14BVlskpqRKZ4MmuKzfRsdRUYnI0qGk0g89hah4iUn3S9ml?=
- =?us-ascii?Q?2IJOeSn+N4/8pjSWo7QCISiqK5KcTMzm05gaGsA8aANGurXqIXU/wWtY8vvP?=
- =?us-ascii?Q?XN1nkZJjTLwV53Ji4+MAej3BZ6rasTU=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BFA838BF63
+	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 09:21:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776331302; cv=none; b=uX2o5OwlQIM8v1oqj7AYKMGduqGMDnwXkbfRBznLH6QV0G6SMFFHYaKKXUVGXa1T3m58bo6TXJzW1Vnzy1yjqAe8x3n/VN+OcytZuYqBW+roFNGRqNr8YHsRvAQv3O8aZuTcOCHxwU2/LOl7rAUNIMEtCpKVfFG+p9rpMutwRRk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776331302; c=relaxed/simple;
+	bh=e57nDf5tJn8pmI6DL/EqYWuRO62Bk6bXtzpM6Y09P7o=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bzI0yCZg7p0Rz8sU3s/1VbBX+ufFbi2iohQJOWuB+oFweVLDO4/PCSxF5liuHUqwll2ZfC6bD/mVJ0wsqFjxhg1adyvtM1mAYoToYBPHSOe3Z1EyOUYbsvN4mI6bUQpTBYyiw9X4byYEO3OlGSeXDtEcoetfBuZhQgRwdjgwjxU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nRRXTGCY; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-488971db0fdso77412675e9.0
+        for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 02:21:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776331299; x=1776936099; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lJ4uoEfFYWjSIYr4YjUAeTcpQFLjt1x9S0J2zuFA2jc=;
+        b=nRRXTGCYpfFZ+ZvzXtRXgsrWHh3rj9RLqWr2VHxfRBp3i4MpsB9gW+YgY+i19AivpO
+         jyW3N97NdNyl5HMED7SrNf4taVqZCiqO9Msm9RQx/GgATGKZXlLEyUwigDul0Ulpq5Tv
+         BDK6qdMYE80iImRH+BP4mSlDiI2fQ8N6vuMa2OY3VDb1T5fojSNEPuSiUxEyKiiFkCZj
+         3bJAzAW+XXhC8cnwFQet78pse9KGlbAGlsxj76wqkSVAF1/wuW6fQezr5mp0W/sYTpzs
+         zMHpoMkvtYUjWaCr7DZxocROnPKBJGjcRIgeGEjwLQilvoF/xiKGGpFibZuvf/754Eeo
+         w07A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776331299; x=1776936099;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=lJ4uoEfFYWjSIYr4YjUAeTcpQFLjt1x9S0J2zuFA2jc=;
+        b=QEMo06K3yK6qlRE+rxO1VQ/209ZFtXSMmEnhdTxdaTgo5SjFv73jMbs+uWyVTPFPnx
+         fue70IsYgz0ZYStR130LFszrStGpjxaz6n69INXFcFo9QFkOcB78hsfTQpc7Y6nshh0K
+         B+XvzsCsQ8l6Oy16dnugjRF84hZanS6pc+8H0FryS/5DYgbcOmH3QFzyzUjQwiZ5VwBS
+         ESF2+ikstKfostll0nftUy1nF8DHOOOIKSCjumvp9EiWjPRTqxtNBAfsBPpBZr0gdHAO
+         o9nBqac2Eogz9YDMWoB4TM5QpvS07GjQ3L4p81dOS8lWvkzNQv+V7O4TAv/YtEHsXl7W
+         4kWQ==
+X-Gm-Message-State: AOJu0Yw9vSZw53azfDpDZRvr2udQ5xfscOqoh+y3QdA6HT+1iTHXmY64
+	e0dSRDqsKyUMP/HPpCgWareeOl4VO09fU31cXWPoqCEdEjcqUdBChVs2
+X-Gm-Gg: AeBDieteQCAGCXh5JFpRG2M9YMoIjIQdJqWyf5iUtSIOo8C78zHFbVO8dCShYwwF0/B
+	0656yB88sm1bOe9vJ09wSLPRa1gob7Id5k+QEs2VydUcN2AxLY8XNqIFxb8TLz0SELSAWC312i/
+	MX4M1fE6tn68cq6vbWwywDhvyXb+ZPz/e9pEGFXDv8zL4vuLdPl8jCawfTue8WXWpiVlFlFtkNn
+	8ziGKDUtBdBoIVjFtAFesDh12a5kTF9iBmDYjeYSShascKbKnvQ1QCGWaBjU7/yujrexZDth/5s
+	FyK/d/gUawwPTIp1+rBI1EZzCp9XVgSnAXGuyDix8KZjmIeJVlhWrj2QSyYM0GWziIw1D0wdn1W
+	ysrI67/9ykAB2K0gNEEWsHFw+uMBALjjFit6FP4U7oJAgHiri16vHCNtzSJxEGNFAlSaTsplhz1
+	hhbgNk7ShV5u5Kvr2CmCljX/RMyy10sJ5xvGX4USZmJ5aHDIx0/DZEgxW3XTXBq5KA
+X-Received: by 2002:a05:600c:8b6d:b0:485:9a50:3384 with SMTP id 5b1f17b1804b1-488d688209dmr322411545e9.25.1776331299391;
+        Thu, 16 Apr 2026 02:21:39 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43ead33d65asm12155424f8f.4.2026.04.16.02.21.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Apr 2026 02:21:39 -0700 (PDT)
+Date: Thu, 16 Apr 2026 10:21:37 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: Ashutosh Desai <ashutoshdesai993@gmail.com>
+Cc: netdev@vger.kernel.org, linux-hams@vger.kernel.org, jreuter@yaina.de,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, stable@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 net] ax25: fix OOB read after address header strip in
+ ax25_rcv()
+Message-ID: <20260416102137.4e7264c4@pumpkin>
+In-Reply-To: <69e07601.c80a0220.2f9024.1e0b@mx.google.com>
+References: <20260415063654.3831353-1-ashutoshdesai993@gmail.com>
+	<20260415085921.757b48a0@pumpkin>
+	<69e07601.c80a0220.2f9024.1e0b@mx.google.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: ZtF1CAfuoJRvqTacySY/COXEGcTEMwRq7QVrMxYpgYV3hAIDFEsZ2dPO8HGjd8mKijeKmB78L4QlieX1uQHXqYBsmYuI0ETlf8BNY3nLmNU+AMmkC9DtfnpVARY0wu1SQsLhDWC8fyx+tHpPF3WuJHxMfzGZIvCsZ0bUwnLmwJDVJL37iAW5o1TZZm1sfkbv1flvUFb4OuiIPEIBdAJV1Bvf4DXFn4WSXBgrFnRqPz6d+dLrWsDOm5FtHvyyoixSmZ/TDhfVWDTy8u896TICKGRfk2DnehXkDTxmLBrmi2oGb8UH8Anqi25ilyiNq/dSArwtDIQ2MYVK8hhfi1nIpw==
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 49a27a6f-11e1-40b3-10c0-08de9b975586
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Apr 2026 09:05:40.9697
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: CJWi71BO08NLUAVZXGEQksFfx+BloGi6nQJrVmhNm7q1SC9Uohid/ZGkbxlF8gZSbmg7S74qzFxIPrRuvuTwSzCpcA2LRizbY965q+Zz464=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB4998
-X-OriginatorOrg: intel.com
-X-Spamd-Result: default: False [1.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-278981-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	ASN_FAIL(0.00)[10.253.234.172.asn.rspamd.com:server fail];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[10];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-278982-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,IA3PR11MB8986.namprd11.prod.outlook.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,osuosl.org:email,lunn.ch:email,davemloft.net:email]
-X-Rspamd-Queue-Id: 3F90140C036
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 07FEC40C5D3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+On Wed, 15 Apr 2026 22:39:13 -0700 (PDT)
+Ashutosh Desai <ashutoshdesai993@gmail.com> wrote:
 
+> On Wed, 15 Apr 2026 08:59:21 +0100, David Laight wrote:
+> > Is it just worth linearising the skb on entry to all this code?  
+> 
+> Thanks for the feedback, David.
+> 
+> skb_linearize() on entry is a nice idea for simplifying sanity checks
+> overall, but it wouldn't fix this particular bug on its own - the issue
+> is skb->len dropping to zero after skb_pull(), not non-linear data. We'd
+> still need a length check regardless. pskb_may_pull(skb, 2) handles both
+> in one call.
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
-> Of KhaiWenTan
-> Sent: Thursday, April 16, 2026 3:55 AM
-> To: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitszel,
-> Przemyslaw <przemyslaw.kitszel@intel.com>; andrew+netdev@lunn.ch;
-> davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
-> pabeni@redhat.com
-> Cc: intel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org; linux-
-> kernel@vger.kernel.org; Abdul Rahim, Faizal
-> <faizal.abdul.rahim@intel.com>; Looi, Hong Aun
-> <hong.aun.looi@intel.com>; Tan, Khai Wen <khai.wen.tan@intel.com>;
-> Faizal Rahim <faizal.abdul.rahim@linux.intel.com>; Looi; KhaiWenTan
-> <khai.wen.tan@linux.intel.com>
-> Subject: [Intel-wired-lan] [PATCH iwl-next v2 2/3] igc: move autoneg-
-> enabled settings into igc_handle_autoneg_enabled()
->=20
-> From: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
->=20
-> Move the advertised link modes and flow control configuration from
-> igc_ethtool_set_link_ksettings() into igc_handle_autoneg_enabled().
->=20
-> No functional change.
->=20
-> Reviewed-by: Looi, Hong Aun <hong.aun.looi@intel.com>
-> Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
-> Signed-off-by: KhaiWenTan <khai.wen.tan@linux.intel.com>
-> ---
->  drivers/net/ethernet/intel/igc/igc_ethtool.c | 72 ++++++++++++-------
-> -
->  1 file changed, 44 insertions(+), 28 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/intel/igc/igc_ethtool.c
-> b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-> index 0122009bedd0..cfcbf2fdad6e 100644
-> --- a/drivers/net/ethernet/intel/igc/igc_ethtool.c
-> +++ b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-> @@ -2000,6 +2000,49 @@ static int
-> igc_ethtool_get_link_ksettings(struct net_device *netdev,
->  	return 0;
->  }
->=20
-> +/**
-> + * igc_handle_autoneg_enabled - Configure autonegotiation
-> advertisement
-> + * @adapter: private driver structure
-> + * @cmd: ethtool link ksettings from user
-> + *
-> + * Records advertised speeds and flow control settings when autoneg
-> + * is enabled.
-> + */
-> +static void igc_handle_autoneg_enabled(struct igc_adapter *adapter,
-> +				       const struct ethtool_link_ksettings
-> *cmd) {
-> +	struct igc_hw *hw =3D &adapter->hw;
-> +	u16 advertised =3D 0;
-> +
-> +	if (ethtool_link_ksettings_test_link_mode(cmd, advertising,
-> +						  2500baseT_Full))
-> +		advertised |=3D ADVERTISE_2500_FULL;
-> +
-> +	if (ethtool_link_ksettings_test_link_mode(cmd, advertising,
-> +						  1000baseT_Full))
-> +		advertised |=3D ADVERTISE_1000_FULL;
-> +
-> +	if (ethtool_link_ksettings_test_link_mode(cmd, advertising,
-> +						  100baseT_Full))
-> +		advertised |=3D ADVERTISE_100_FULL;
-> +
-> +	if (ethtool_link_ksettings_test_link_mode(cmd, advertising,
-> +						  100baseT_Half))
-> +		advertised |=3D ADVERTISE_100_HALF;
-> +
-> +	if (ethtool_link_ksettings_test_link_mode(cmd, advertising,
-> +						  10baseT_Full))
-> +		advertised |=3D ADVERTISE_10_FULL;
-> +
-> +	if (ethtool_link_ksettings_test_link_mode(cmd, advertising,
-> +						  10baseT_Half))
-> +		advertised |=3D ADVERTISE_10_HALF;
-> +
-> +	hw->phy.autoneg_advertised =3D advertised;
-> +	if (adapter->fc_autoneg)
-> +		hw->fc.requested_mode =3D igc_fc_default; }
-> +
->  static int
->  igc_ethtool_set_link_ksettings(struct net_device *netdev,
->  			       const struct ethtool_link_ksettings *cmd)
-> @@ -2007,7 +2050,6 @@ igc_ethtool_set_link_ksettings(struct net_device
-> *netdev,
->  	struct igc_adapter *adapter =3D netdev_priv(netdev);
->  	struct net_device *dev =3D adapter->netdev;
->  	struct igc_hw *hw =3D &adapter->hw;
-> -	u16 advertised =3D 0;
->=20
->  	/* When adapter in resetting mode, autoneg/speed/duplex
->  	 * cannot be changed
-> @@ -2032,34 +2074,8 @@ igc_ethtool_set_link_ksettings(struct
-> net_device *netdev,
->  	while (test_and_set_bit(__IGC_RESETTING, &adapter->state))
->  		usleep_range(1000, 2000);
->=20
-> -	if (ethtool_link_ksettings_test_link_mode(cmd, advertising,
-> -						  2500baseT_Full))
-> -		advertised |=3D ADVERTISE_2500_FULL;
-> -
-> -	if (ethtool_link_ksettings_test_link_mode(cmd, advertising,
-> -						  1000baseT_Full))
-> -		advertised |=3D ADVERTISE_1000_FULL;
-> -
-> -	if (ethtool_link_ksettings_test_link_mode(cmd, advertising,
-> -						  100baseT_Full))
-> -		advertised |=3D ADVERTISE_100_FULL;
-> -
-> -	if (ethtool_link_ksettings_test_link_mode(cmd, advertising,
-> -						  100baseT_Half))
-> -		advertised |=3D ADVERTISE_100_HALF;
-> -
-> -	if (ethtool_link_ksettings_test_link_mode(cmd, advertising,
-> -						  10baseT_Full))
-> -		advertised |=3D ADVERTISE_10_FULL;
-> -
-> -	if (ethtool_link_ksettings_test_link_mode(cmd, advertising,
-> -						  10baseT_Half))
-> -		advertised |=3D ADVERTISE_10_HALF;
-> -
->  	if (cmd->base.autoneg =3D=3D AUTONEG_ENABLE) {
-> -		hw->phy.autoneg_advertised =3D advertised;
-> -		if (adapter->fc_autoneg)
-> -			hw->fc.requested_mode =3D igc_fc_default;
-> +		igc_handle_autoneg_enabled(adapter, cmd);
->  	} else {
->  		netdev_info(dev, "Force mode currently not
-> supported\n");
->  	}
-> --
-> 2.43.0
+The skb->len >= 2 check will be a lot cheaper/smaller.
 
+> That said, linearizing on entry to ax25_rcv() as a cleanup to simplify
+> future checks sounds worthwhile - happy to send that as a separate
+> net-next patch.
 
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+I think you proposed just checking skb->len in an earlier version
+and it was pointed out that the skb may not be linear.
+So perhaps linearize as part of this fix and leave the simplifcation
+of any other checks to later.
+
+	David
 
