@@ -1,251 +1,164 @@
-Return-Path: <netdev+bounces-279015-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279016-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YG92D+fI4GkdmAAAu9opvQ
-	(envelope-from <netdev+bounces-279015-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 13:32:55 +0200
+	id iHhiGqDK4GmFmAAAu9opvQ
+	(envelope-from <netdev+bounces-279016-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 13:40:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9F0940D70D
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 13:32:54 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D761E40D86B
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 13:40:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id F39FF302240A
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 11:32:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8DBF1305D14D
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 11:36:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 613B03AA518;
-	Thu, 16 Apr 2026 11:32:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03ADD3815F8;
+	Thu, 16 Apr 2026 11:36:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LqfbuVGR"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L1/22gGF";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jx/g9tNB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12C8B396B79
-	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 11:32:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA27C39A05C
+	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 11:36:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776339171; cv=none; b=dt0xZtvYtO5hoKu6qa32tx1z25VeYbPSieo2RQWxFSnEfVZHHF1wF5tEEZB3g777+4SccAMjrJzRHoZ47N0zRrR6optzwCDKnh0JNMX+RZKPNEsIF30kba4Bm5/38p5kL0O0huGIepc883yhXijzA2vnpu+yfAEzGeNH7S6Qeuk=
+	t=1776339378; cv=none; b=OMLbDks8EY/alyIGQl+gD6RqY18tkrupYdOuDhweP010ofJUfc7cqqfTJPcvxrIDa/FGbGpM5KgZWdoTlW/5d9Ld2SWpdEI7tE+G92xq4pcJQcOP+tOvhLf2LkGZvK1tQLd+7NoFoAujKswBlPf0wFk+LDkxYJque2Ea+fmVHlA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776339171; c=relaxed/simple;
-	bh=LthEZFquLxYnf3eWuf9b/raQUnsAIxOokNNsZ6zhLcQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fkjqfVwS4cv51qjPHot6+sxOzcgRfbZcQrUHtsHb8Ot19Zv8rosWfFWGV3sktSesTLqwavf+6dJ+B7WwcBU9lOpsWA6WYFTi/ptiX0DwHqUuVxCHmN221bh7L1zsq8CFbyK+RrXysjpZDmSy8rLJpGCnV2i/7qIAuJV6wpOsWVA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LqfbuVGR; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2a3e79fe2b8so5586705ad.1
-        for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 04:32:49 -0700 (PDT)
+	s=arc-20240116; t=1776339378; c=relaxed/simple;
+	bh=ATPXPRSUwMhlt8ECwRArkbXzpHSbMy5MlkubYNi7w9s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IreRV75HcYthUNTBnsnWYUB/D50drqc0RWFyCZvJpppdx//1GtGAeZAfUVaW94ajjz+tt2ZKn0cq4RIdszqoT2PBm3dFyujt4Mo/DlL4lULNdKyfQ0UKSwzEBoxcnuie2XuRzSZSVNsHBCQeOwogKXy9ElNdXcbyMiRKTP/1rEI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=L1/22gGF; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Jx/g9tNB; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1776339376;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gwhKAmoYjds9QSiVSsV9iNgED3v7mL/c4iVZV29Op3E=;
+	b=L1/22gGF6nPVw1e/mCWysQeTHGeqV++uZ0EALF2ysOnkVKi/1AMUMVYKO3eFcbFpaK1ZHb
+	RLiBLcG5TuvHIisTnqUntAnxpgGkZcXqEd8+hndxj2fTW0lNxn8n5pRIGhY2e2WpfqU4uZ
+	Muk7WLzD1iMFPcgWNGtc9bmTqweHsCQ=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-662-KQo-Tn5oNXabYMRSmX5YBQ-1; Thu, 16 Apr 2026 07:36:14 -0400
+X-MC-Unique: KQo-Tn5oNXabYMRSmX5YBQ-1
+X-Mimecast-MFC-AGG-ID: KQo-Tn5oNXabYMRSmX5YBQ_1776339373
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-488d56f87e8so51188225e9.0
+        for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 04:36:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776339169; x=1776943969; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GkJWBH61iYRdnXJ2r0XjRioP0rvUjxtyWtkR0Sw12W8=;
-        b=LqfbuVGRN4tKOLo+re9EjEGBl1qDT8zAuCKO8M0swFjDgKL6RNd1gCfLrWS3ygcZJF
-         Tsf5WGjxPUpIs85vEOB/m2xJ1TD6P3XeYF1Exjk7QAVSMVDHUXvEY8QlCHGS36SLMTzk
-         VrZG+wZ6kmoX5/4lCN7r4RzRskvTgT43pf5UCbuKO0TyK4fRkzbDMYJ1mc6+/RGIPG1U
-         4Av68kK/f1tFnOQJcFvh+FO3zbEKQmGuZpad9Gh14W9SU/sc0MBhgKxlr5Q10pAcyn5v
-         Uc429B//wvSxtSAmXP12XbchzlDJFo1t7pqu06+AUvj/QqXdy77XZQhAAENUI5OXqFpY
-         gpjA==
+        d=redhat.com; s=google; t=1776339373; x=1776944173; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=gwhKAmoYjds9QSiVSsV9iNgED3v7mL/c4iVZV29Op3E=;
+        b=Jx/g9tNBMqQi/0CCFeq0Cu0mvKaxMyk6pS9vZlHJEoSG0PDbMimi3OuNdFpwiq+4C0
+         lrAqsndP3gbbpCkhKRAeFk+BPtTt5dSZAK28niw6t5g/DVW6bDUIq7mSPkJ7OlZkMeur
+         sN8yQzjBzVpFBebIMUMHA0iGBRbHf4YvT66VaECDkWBrqOvq23V6obS5miZLbQjwcRzV
+         MNHwjEIcwvQBjCnSpJ6p2LBOuMm1tvD52vdpVRcl4bP4q+s82ZpNNR8lzcVPCOGcTNGm
+         Bp9n6C/rnaZ7qhQcnk5VPH+qwArUZxE8yIM+a1dPp6sctLNFzvUiMF6Xhs2uA1mDPIel
+         bAkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776339169; x=1776943969;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=GkJWBH61iYRdnXJ2r0XjRioP0rvUjxtyWtkR0Sw12W8=;
-        b=iLoucM/FKJpk5QU2roYf3Bu7so784TR40olxLn4eZu0WprGJPa0CuOFPkRnTkXW5YB
-         G5OyZBEQmGUzidrxAwFcWTUrxEnxcb+ptfMTLpcz8TDCmWI6TiAoMOtRRpTu9x5fzwtS
-         r18PnSGaqNXOBPgyWxNQOUuKkL1IziTQMVIyNGovfbgjKS6wfLl5FmgUzv1AjQDpHLLC
-         JY5gdR9ToRroSh2+Ch9Xb2D/cYhle38kRKPb7Q6ts/zLA0MbqxdYY9szp29K0PUnh7Xc
-         btxkhdmo+bxuwpIsDWZ7j4FEfSEC0Jt25vkaOcaG6yCgoArojYUJK8bZEhPPcb4Bb9XB
-         L2FQ==
-X-Forwarded-Encrypted: i=1; AFNElJ+EY2XpD1UNASgZ2ad9MYMblxLF+JkT441hEISISQv3jX4TsXS13Wh0FXDJSDE2k/dkYVcNR/A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyI/73L76v4+BrlZy/GFo5rMqmBfMtCzx0IyGYwBHEbOEpcm7ut
-	jK6uNNb997M4y5U3M/z3ygT9nz5wDzSGszdKU0i6R+jh2g6RMC+nndLo
-X-Gm-Gg: AeBDieu9zwB0lAuxxWXFnIwIOf08BhpD5wVoZOqtWR2tIrEFKaoKfpM+75/YKDkHpwY
-	hIQvFBLsZ4ZROo3EvTRrpv80Cuje64xP8cFzC/2cMmfeRdANfkEIIGG/XnxObmBawS7figrngCE
-	wx2YdtYaLtf4NIEEK1aW9BVd81EKOncjXlsEyELgOS04M+Zl5P4r5YqM9jEMSojkwnm3CW4cOFV
-	GaP1vPQ8rFZLmauMJvRN/yk2TtWj9M9C0fji6g55dqHJiXFKhTAoTErK7hVRNSHtAaGeju0KDpY
-	ydqE8qOIJo5XJq+ZRXaC69TuZ8HyAbjFz+a3Uc9PHgKg72p1iTYMfafP1H+Wylww+fWbTtbfUan
-	bbF4ttRaDcCRm4NrgEbXV0rmURVsOADOjMCrBAx0oYvo+yHqma8Nap58YiJincurbHB3a1oBw4J
-	rD0CjK0EDFP2ancVkTMrjhO3WanHM=
-X-Received: by 2002:a17:903:2284:b0:2b0:4d17:4d6e with SMTP id d9443c01a7336-2b5ed9c944cmr14013835ad.3.1776339169437;
-        Thu, 16 Apr 2026 04:32:49 -0700 (PDT)
-Received: from kali ([2402:e280:3d7c:a2:536a:b505:93f5:9d5d])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b47810ae96sm68463125ad.21.2026.04.16.04.32.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Apr 2026 04:32:49 -0700 (PDT)
-From: Pavitra Jha <jhapavitra98@gmail.com>
-To: w@1wt.eu
-Cc: pabeni@redhat.com,
-	chandrashekar.devegowda@intel.com,
-	linux-wwan@lists.linux.dev,
-	netdev@vger.kernel.org,
-	stable@vger.kernel.org,
-	Pavitra Jha <jhapavitra98@gmail.com>
-Subject: [PATCH v4] net: wwan: t7xx: validate port_count against message length in t7xx_port_enum_msg_handler
-Date: Thu, 16 Apr 2026 07:32:05 -0400
-Message-ID: <20260416113205.1789319-1-jhapavitra98@gmail.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <ad5p7XlSOKoaQC5D@1wt.eu>
-References: <ad5p7XlSOKoaQC5D@1wt.eu>
+        d=1e100.net; s=20251104; t=1776339373; x=1776944173;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gwhKAmoYjds9QSiVSsV9iNgED3v7mL/c4iVZV29Op3E=;
+        b=c4Y/jeDEM/Nk/z6xp+47suOURQPrjbvJHNCT4HS57UV3tKLiuYgF11Q6hpcd+OQt/9
+         9+5bh8Xev/YjQhidgWyZRgzDosZKktQxjlOc5/BKzYCGFeUTnU/2N2dqPqzRGkLhp4EJ
+         Cvh56eaIPWjDc5EH05lrsxVW/HwPQe+KGerNrFp99XFY+up1TZAkGMx3uQJAnpzyk+vB
+         Y2WnqzGEdqk8vQNFHKkkukRtyA7Un6fEJAYXFkBtUdPQM1BJo6Wt3MzriKy8u52OxDnI
+         K+ZCuDk7A3+fFOUn3LOn+XUvTP0BKfHadE2J5CSdhEH4NS/qw/jiOJ4YnDvoDVAnPhWt
+         CjgQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/7d25fFvI5L2wcV7jjv57EEdzAc79iGEn2UUlAgDrOGr4ydfCzhVgfYQlJRn6Ebxw6B2O6qmc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJZSDMNYeNJ7eQU9oRvbXBYZw/j8mtpuS/O6vx+ns+KMvl3pcD
+	zOu9518fDrVZmkQFaK0K2gVxBejgMKr33VRKzK63IbkNPf5vyggfxSZZ89QLANF864KpUVzmZXt
+	T+M10uqhlTWW0z1EBnWunBRDtzUb6hqGAmlbk+KI3ywMPN5fWhetclnEAvQ==
+X-Gm-Gg: AeBDiesK9yO8dffmMvauYPyZiHhKgsS5k5dtpC8NqclFNRBG4jpTJ/bnemtGtWWRXHS
+	XgpoajaGlKTg0biVI1xUORWe1h+T2EvtGUW5HC5Jy2Fz9dx1TwUu4aaI9xX9viT/CH1TewmYiY0
+	JTkjC0aeAa7nmoNxd6+yimg0r16x+2/PkRgsldYO8S3XZXi9ubCtT7KZXysoeIoDlyv+Jg4dIRQ
+	xjZPzfgVai+g0TQKaoL0UvIr9QoPN/UIwuwWmfvoKbdbmeJFmT1rTRF3AT8vtZHJ0bviwpKORca
+	CFPNYG9nRF7mZm+aCMs/dX/NRk1F2uZ4oOM+q1GNeNPs548tf/rg4tP2nOEzceB0dCf5uszFPAJ
+	c9ADx+zVOLXqDhmwxqrtjZIIyJ2vgvKF3YyIoZ7O/OBQN96qi5b03eEAxREkkcjsiMZ4=
+X-Received: by 2002:a05:600c:5249:b0:480:1d0b:2d32 with SMTP id 5b1f17b1804b1-488d67fcf67mr326261735e9.12.1776339373369;
+        Thu, 16 Apr 2026 04:36:13 -0700 (PDT)
+X-Received: by 2002:a05:600c:5249:b0:480:1d0b:2d32 with SMTP id 5b1f17b1804b1-488d67fcf67mr326261255e9.12.1776339372865;
+        Thu, 16 Apr 2026 04:36:12 -0700 (PDT)
+Received: from [192.168.88.32] ([150.228.93.122])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488f582368dsm56423145e9.11.2026.04.16.04.36.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Apr 2026 04:36:12 -0700 (PDT)
+Message-ID: <46239684-3c91-42d9-b7e1-5d90c3169053@redhat.com>
+Date: Thu, 16 Apr 2026 13:36:10 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 14/14] netfilter: nf_tables: add hook transactions for
+ device deletions
+To: Pablo Neira Ayuso <pablo@netfilter.org>, netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net, netdev@vger.kernel.org, kuba@kernel.org,
+ edumazet@google.com, fw@strlen.de, horms@kernel.org
+References: <20260416013101.221555-1-pablo@netfilter.org>
+ <20260416013101.221555-15-pablo@netfilter.org>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20260416013101.221555-15-pablo@netfilter.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[redhat.com,intel.com,lists.linux.dev,vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-279015-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jhapavitra98@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	NEURAL_HAM(-0.00)[-0.998];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-279016-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B9F0940D70D
+	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D761E40D86B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-t7xx_port_enum_msg_handler() uses the modem-supplied port_count field as
-a loop bound over port_msg->data[] without checking that the message buffer
-contains sufficient data. A modem sending port_count=65535 in a 12-byte
-buffer triggers a slab-out-of-bounds read of up to 262140 bytes.
+On 4/16/26 3:31 AM, Pablo Neira Ayuso wrote:
+> @@ -10920,9 +11007,8 @@ static int nf_tables_commit(struct net *net, struct sk_buff *skb)
+>  				nf_tables_chain_notify(&ctx, NFT_MSG_DELCHAIN,
+>  						       &nft_trans_chain_hooks(trans));
 
-Add a struct_size() check after extracting port_count and before the loop.
-Pass msg_len to t7xx_port_enum_msg_handler() and use it to validate
-the message size before accessing port_msg->data[].
-Pass msg_len from both call sites: skb->len at the DPMAIF path after
-skb_pull(), and the captured rt_feature->data_len at the handshake path.
+AI notes that nf_tables_chain_notify() can now receive struct
+nft_trans_hook arguments and it ends up calling nft_dump_basechain_hook
+which expects nft_hook, possibly causing out-of-bounds slab read when
+accessing hook->ifname.
 
-Fixes: 39d439047f1d ("net: wwan: t7xx: Add control DMA interface")
-Cc: stable@vger.kernel.org
-Signed-off-by: Pavitra Jha <jhapavitra98@gmail.com>
----
- drivers/net/wwan/t7xx/t7xx_modem_ops.c     | 14 +++++++-------
- drivers/net/wwan/t7xx/t7xx_port_ctrl_msg.c | 12 +++++++++---
- drivers/net/wwan/t7xx/t7xx_port_proxy.h    |  2 +-
- 3 files changed, 17 insertions(+), 11 deletions(-)
+It looks real to me. Possibly worthy strip this patch from the PR?
 
-diff --git a/drivers/net/wwan/t7xx/t7xx_modem_ops.c b/drivers/net/wwan/t7xx/t7xx_modem_ops.c
-index 7968e208d..d0559fe16 100644
---- a/drivers/net/wwan/t7xx/t7xx_modem_ops.c
-+++ b/drivers/net/wwan/t7xx/t7xx_modem_ops.c
-@@ -453,25 +453,25 @@ static int t7xx_parse_host_rt_data(struct t7xx_fsm_ctl *ctl, struct t7xx_sys_inf
- {
- 	enum mtk_feature_support_type ft_spt_st, ft_spt_cfg;
- 	struct mtk_runtime_feature *rt_feature;
-+	size_t feat_data_len;
- 	int i, offset;
- 
- 	offset = sizeof(struct feature_query);
- 	for (i = 0; i < FEATURE_COUNT && offset < data_length; i++) {
- 		rt_feature = data + offset;
--		offset += sizeof(*rt_feature) + le32_to_cpu(rt_feature->data_len);
--
-+		feat_data_len = le32_to_cpu(rt_feature->data_len);
-+		offset += sizeof(*rt_feature) + feat_data_len;
- 		ft_spt_cfg = FIELD_GET(FEATURE_MSK, core->feature_set[i]);
- 		if (ft_spt_cfg != MTK_FEATURE_MUST_BE_SUPPORTED)
- 			continue;
- 
- 		ft_spt_st = FIELD_GET(FEATURE_MSK, rt_feature->support_info);
- 		if (ft_spt_st != MTK_FEATURE_MUST_BE_SUPPORTED)
- 			return -EINVAL;
- 
--		if (i == RT_ID_MD_PORT_ENUM || i == RT_ID_AP_PORT_ENUM)
--			t7xx_port_enum_msg_handler(ctl->md, rt_feature->data);
-+		if (i == RT_ID_MD_PORT_ENUM || i == RT_ID_AP_PORT_ENUM) {
-+			t7xx_port_enum_msg_handler(ctl->md, rt_feature->data,
-+						   feat_data_len);
-+		}
- 	}
- 
- 	return 0;
- }
- 
-diff --git a/drivers/net/wwan/t7xx/t7xx_port_ctrl_msg.c b/drivers/net/wwan/t7xx/t7xx_port_ctrl_msg.c
-index ae632ef96..d984a688d 100644
---- a/drivers/net/wwan/t7xx/t7xx_port_ctrl_msg.c
-+++ b/drivers/net/wwan/t7xx/t7xx_port_ctrl_msg.c
-@@ -124,8 +124,9 @@ static int fsm_ee_message_handler(struct t7xx_port *port, struct t7xx_fsm_ctl *c
-  * * 0		- Success.
-  * * -EFAULT	- Message check failure.
-+ * @msg_len: Length of @msg in bytes.
-  */
--int t7xx_port_enum_msg_handler(struct t7xx_modem *md, void *msg)
-+int t7xx_port_enum_msg_handler(struct t7xx_modem *md, void *msg, size_t msg_len)
- {
- 	struct device *dev = &md->t7xx_dev->pdev->dev;
- 	unsigned int version, port_count, i;
-@@ -141,6 +141,13 @@ int t7xx_port_enum_msg_handler(struct t7xx_modem *md, void *msg)
- 	}
- 
- 	port_count = FIELD_GET(PORT_MSG_PRT_CNT, le32_to_cpu(port_msg->info));
-+
-+	if (msg_len < struct_size(port_msg, data, port_count)) {
-+		dev_err(dev, "Port enum msg too short: need %zu, have %zu\n",
-+			struct_size(port_msg, data, port_count), msg_len);
-+		return -EINVAL;
-+	}
-+
- 	for (i = 0; i < port_count; i++) {
- 		u32 port_info = le32_to_cpu(port_msg->data[i]);
- 		unsigned int ch_id;
-@@ -154,7 +161,6 @@ int t7xx_port_enum_msg_handler(struct t7xx_modem *md, void *msg)
- 
- 	return 0;
- }
- 
- static int control_msg_handler(struct t7xx_port *port, struct sk_buff *skb)
- {
- 	const struct t7xx_port_conf *port_conf = port->port_conf;
-@@ -191,7 +197,7 @@ static int control_msg_handler(struct t7xx_port *port, struct sk_buff *skb)
- 
- 	case CTL_ID_PORT_ENUM:
- 		skb_pull(skb, sizeof(*ctrl_msg_h));
--		ret = t7xx_port_enum_msg_handler(ctl->md, (struct port_msg *)skb->data);
-+		ret = t7xx_port_enum_msg_handler(ctl->md, (struct port_msg *)skb->data, skb->len);
- 		if (!ret)
- 			ret = port_ctl_send_msg_to_md(port, CTL_ID_PORT_ENUM, 0);
- 		else
-diff --git a/drivers/net/wwan/t7xx/t7xx_port_proxy.h b/drivers/net/wwan/t7xx/t7xx_port_proxy.h
-index f0918b36e..7c3190bf0 100644
---- a/drivers/net/wwan/t7xx/t7xx_port_proxy.h
-+++ b/drivers/net/wwan/t7xx/t7xx_port_proxy.h
-@@ -103,7 +103,7 @@ void t7xx_port_proxy_reset(struct port_proxy *port_prox);
- void t7xx_port_proxy_uninit(struct port_proxy *port_prox);
- int t7xx_port_proxy_init(struct t7xx_modem *md);
- void t7xx_port_proxy_md_status_notify(struct port_proxy *port_prox, unsigned int state);
--int t7xx_port_enum_msg_handler(struct t7xx_modem *md, void *msg);
-+int t7xx_port_enum_msg_handler(struct t7xx_modem *md, void *msg, size_t msg_len);
- int t7xx_port_proxy_chl_enable_disable(struct port_proxy *port_prox, unsigned int ch_id,
- 				       bool en_flag);
- void t7xx_port_proxy_set_cfg(struct t7xx_modem *md, enum port_cfg_id cfg_id);
--- 
-2.53.0
+/P
 
 
