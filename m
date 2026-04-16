@@ -1,164 +1,164 @@
-Return-Path: <netdev+bounces-279016-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279017-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iHhiGqDK4GmFmAAAu9opvQ
-	(envelope-from <netdev+bounces-279016-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 13:40:16 +0200
+	id YKHXNWDL4GkdmAAAu9opvQ
+	(envelope-from <netdev+bounces-279017-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 13:43:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D761E40D86B
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 13:40:15 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CBE140D980
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 13:43:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8DBF1305D14D
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 11:36:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E599A3006B56
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 11:40:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03ADD3815F8;
-	Thu, 16 Apr 2026 11:36:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7954A396B73;
+	Thu, 16 Apr 2026 11:40:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L1/22gGF";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jx/g9tNB"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bfBTMqzU"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA27C39A05C
-	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 11:36:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D33A3932CE
+	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 11:40:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776339378; cv=none; b=OMLbDks8EY/alyIGQl+gD6RqY18tkrupYdOuDhweP010ofJUfc7cqqfTJPcvxrIDa/FGbGpM5KgZWdoTlW/5d9Ld2SWpdEI7tE+G92xq4pcJQcOP+tOvhLf2LkGZvK1tQLd+7NoFoAujKswBlPf0wFk+LDkxYJque2Ea+fmVHlA=
+	t=1776339609; cv=none; b=Cl184ERebxMRcXfI0IgyS3NGAX6Mc2UWcWAGMYU/2L/9S6KZ34LTdcXSORcAnou8urc94M5MjW8slMjbrW7h5dwORve4vzi9OmCG9AXQwx7ckBzF6tgx5t0f3loQaw6s1S+TmnuHvRbnETU48DbQajGsz7PFdzRo7M8T6sLrMg0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776339378; c=relaxed/simple;
-	bh=ATPXPRSUwMhlt8ECwRArkbXzpHSbMy5MlkubYNi7w9s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IreRV75HcYthUNTBnsnWYUB/D50drqc0RWFyCZvJpppdx//1GtGAeZAfUVaW94ajjz+tt2ZKn0cq4RIdszqoT2PBm3dFyujt4Mo/DlL4lULNdKyfQ0UKSwzEBoxcnuie2XuRzSZSVNsHBCQeOwogKXy9ElNdXcbyMiRKTP/1rEI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=L1/22gGF; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Jx/g9tNB; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1776339609; c=relaxed/simple;
+	bh=KsafRWYizcidBGwrwitp6VISrgMBgFfJMsgnRXQOr5M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=o4RxbWugcqGxISi6RAQ362fCw4L2GsYDlJD+XHRQfN96dar4jRfYr0xKSEtDEbVZyU+6rnQ5qxOemPlxJjl98r0h2E3pbul3YHJXSAwsdP23Bhk9w8Cf7GqXQFoyjIrN2NGvO2pRrBY1X0xtQn1o3X0W2QG+jBQ62nPl1zNo70g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bfBTMqzU; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1776339376;
+	s=mimecast20190719; t=1776339607;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gwhKAmoYjds9QSiVSsV9iNgED3v7mL/c4iVZV29Op3E=;
-	b=L1/22gGF6nPVw1e/mCWysQeTHGeqV++uZ0EALF2ysOnkVKi/1AMUMVYKO3eFcbFpaK1ZHb
-	RLiBLcG5TuvHIisTnqUntAnxpgGkZcXqEd8+hndxj2fTW0lNxn8n5pRIGhY2e2WpfqU4uZ
-	Muk7WLzD1iMFPcgWNGtc9bmTqweHsCQ=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-662-KQo-Tn5oNXabYMRSmX5YBQ-1; Thu, 16 Apr 2026 07:36:14 -0400
-X-MC-Unique: KQo-Tn5oNXabYMRSmX5YBQ-1
-X-Mimecast-MFC-AGG-ID: KQo-Tn5oNXabYMRSmX5YBQ_1776339373
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-488d56f87e8so51188225e9.0
-        for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 04:36:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1776339373; x=1776944173; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=gwhKAmoYjds9QSiVSsV9iNgED3v7mL/c4iVZV29Op3E=;
-        b=Jx/g9tNBMqQi/0CCFeq0Cu0mvKaxMyk6pS9vZlHJEoSG0PDbMimi3OuNdFpwiq+4C0
-         lrAqsndP3gbbpCkhKRAeFk+BPtTt5dSZAK28niw6t5g/DVW6bDUIq7mSPkJ7OlZkMeur
-         sN8yQzjBzVpFBebIMUMHA0iGBRbHf4YvT66VaECDkWBrqOvq23V6obS5miZLbQjwcRzV
-         MNHwjEIcwvQBjCnSpJ6p2LBOuMm1tvD52vdpVRcl4bP4q+s82ZpNNR8lzcVPCOGcTNGm
-         Bp9n6C/rnaZ7qhQcnk5VPH+qwArUZxE8yIM+a1dPp6sctLNFzvUiMF6Xhs2uA1mDPIel
-         bAkw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776339373; x=1776944173;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gwhKAmoYjds9QSiVSsV9iNgED3v7mL/c4iVZV29Op3E=;
-        b=c4Y/jeDEM/Nk/z6xp+47suOURQPrjbvJHNCT4HS57UV3tKLiuYgF11Q6hpcd+OQt/9
-         9+5bh8Xev/YjQhidgWyZRgzDosZKktQxjlOc5/BKzYCGFeUTnU/2N2dqPqzRGkLhp4EJ
-         Cvh56eaIPWjDc5EH05lrsxVW/HwPQe+KGerNrFp99XFY+up1TZAkGMx3uQJAnpzyk+vB
-         Y2WnqzGEdqk8vQNFHKkkukRtyA7Un6fEJAYXFkBtUdPQM1BJo6Wt3MzriKy8u52OxDnI
-         K+ZCuDk7A3+fFOUn3LOn+XUvTP0BKfHadE2J5CSdhEH4NS/qw/jiOJ4YnDvoDVAnPhWt
-         CjgQ==
-X-Forwarded-Encrypted: i=1; AFNElJ/7d25fFvI5L2wcV7jjv57EEdzAc79iGEn2UUlAgDrOGr4ydfCzhVgfYQlJRn6Ebxw6B2O6qmc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJZSDMNYeNJ7eQU9oRvbXBYZw/j8mtpuS/O6vx+ns+KMvl3pcD
-	zOu9518fDrVZmkQFaK0K2gVxBejgMKr33VRKzK63IbkNPf5vyggfxSZZ89QLANF864KpUVzmZXt
-	T+M10uqhlTWW0z1EBnWunBRDtzUb6hqGAmlbk+KI3ywMPN5fWhetclnEAvQ==
-X-Gm-Gg: AeBDiesK9yO8dffmMvauYPyZiHhKgsS5k5dtpC8NqclFNRBG4jpTJ/bnemtGtWWRXHS
-	XgpoajaGlKTg0biVI1xUORWe1h+T2EvtGUW5HC5Jy2Fz9dx1TwUu4aaI9xX9viT/CH1TewmYiY0
-	JTkjC0aeAa7nmoNxd6+yimg0r16x+2/PkRgsldYO8S3XZXi9ubCtT7KZXysoeIoDlyv+Jg4dIRQ
-	xjZPzfgVai+g0TQKaoL0UvIr9QoPN/UIwuwWmfvoKbdbmeJFmT1rTRF3AT8vtZHJ0bviwpKORca
-	CFPNYG9nRF7mZm+aCMs/dX/NRk1F2uZ4oOM+q1GNeNPs548tf/rg4tP2nOEzceB0dCf5uszFPAJ
-	c9ADx+zVOLXqDhmwxqrtjZIIyJ2vgvKF3YyIoZ7O/OBQN96qi5b03eEAxREkkcjsiMZ4=
-X-Received: by 2002:a05:600c:5249:b0:480:1d0b:2d32 with SMTP id 5b1f17b1804b1-488d67fcf67mr326261735e9.12.1776339373369;
-        Thu, 16 Apr 2026 04:36:13 -0700 (PDT)
-X-Received: by 2002:a05:600c:5249:b0:480:1d0b:2d32 with SMTP id 5b1f17b1804b1-488d67fcf67mr326261255e9.12.1776339372865;
-        Thu, 16 Apr 2026 04:36:12 -0700 (PDT)
-Received: from [192.168.88.32] ([150.228.93.122])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488f582368dsm56423145e9.11.2026.04.16.04.36.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 16 Apr 2026 04:36:12 -0700 (PDT)
-Message-ID: <46239684-3c91-42d9-b7e1-5d90c3169053@redhat.com>
-Date: Thu, 16 Apr 2026 13:36:10 +0200
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=gPELNDldpf97R0KV4JjuN3zxWJ7Io8gIfV7XUJjMv6c=;
+	b=bfBTMqzUY2FzAMCbx0D4/afeh3hFBt+l5hVkKjWkbok49/dO2WB/LSThLyfamjfRsTPR2T
+	cxQWwKps9unf/Z8Kgg7qpfC0t2XLxCr2rjz2LJRsjokHCwbFTtNtF5+jrkgc1tRdIpv4JM
+	UW4kjmecV4bXpzK9QCRrp7H9iZCbfRI=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-630-SaU8kfhZPKeGf_IKr-5oAA-1; Thu,
+ 16 Apr 2026 07:40:04 -0400
+X-MC-Unique: SaU8kfhZPKeGf_IKr-5oAA-1
+X-Mimecast-MFC-AGG-ID: SaU8kfhZPKeGf_IKr-5oAA_1776339602
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 54BAA1800473;
+	Thu, 16 Apr 2026 11:40:01 +0000 (UTC)
+Received: from ShadowPeak.redhat.com (unknown [10.44.32.76])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id AAAA21800577;
+	Thu, 16 Apr 2026 11:39:55 +0000 (UTC)
+From: Petr Oros <poros@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Petr Oros <poros@redhat.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	linux-kernel@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Ivan Vecera <ivecera@redhat.com>,
+	Rinitha S <sx.rinitha@intel.com>,
+	Michal Schmidt <mschmidt@redhat.com>,
+	Jacob Keller <jacob.e.keller@intel.com>
+Subject: [PATCH net v6 0/2] ice: fix missing dpll notifications for SW pins
+Date: Thu, 16 Apr 2026 13:39:50 +0200
+Message-ID: <20260416113952.389405-1-poros@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 14/14] netfilter: nf_tables: add hook transactions for
- device deletions
-To: Pablo Neira Ayuso <pablo@netfilter.org>, netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net, netdev@vger.kernel.org, kuba@kernel.org,
- edumazet@google.com, fw@strlen.de, horms@kernel.org
-References: <20260416013101.221555-1-pablo@netfilter.org>
- <20260416013101.221555-15-pablo@netfilter.org>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20260416013101.221555-15-pablo@netfilter.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279016-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[20];
 	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-279017-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[poros@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-0.996];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D761E40D86B
+X-Rspamd-Queue-Id: 3CBE140D980
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 4/16/26 3:31 AM, Pablo Neira Ayuso wrote:
-> @@ -10920,9 +11007,8 @@ static int nf_tables_commit(struct net *net, struct sk_buff *skb)
->  				nf_tables_chain_notify(&ctx, NFT_MSG_DELCHAIN,
->  						       &nft_trans_chain_hooks(trans));
+The SMA/U.FL pin redesign never propagated dpll notifications to the
+software-controlled pin wrappers.  This series fixes that by adding
+peer notification for paired SMA/U.FL pins and by wrapping
+dpll_pin_change_ntf() calls in the periodic work to also cover SW pins.
 
-AI notes that nf_tables_chain_notify() can now receive struct
-nft_trans_hook arguments and it ends up calling nft_dump_basechain_hook
-which expects nft_hook, possibly causing out-of-bounds slab read when
-accessing hook->ifname.
+Patch 1 exports __dpll_pin_change_ntf() so ice can send peer
+notifications from callback context where dpll_lock is already held.
 
-It looks real to me. Possibly worthy strip this patch from the PR?
+Patch 2 fixes the notification gaps: periodic work HW-to-SW
+propagation, SW-to-SW peer notification on PCA9575 routing changes,
+and SW pin phase offset reporting.
 
-/P
+Ivan Vecera (1):
+  dpll: export __dpll_pin_change_ntf() for use under dpll_lock
+
+Petr Oros (1):
+  ice: fix missing dpll notifications for SW pins
+
+ drivers/dpll/dpll_netlink.c               | 10 +++
+ drivers/dpll/dpll_netlink.h               |  2 -
+ drivers/net/ethernet/intel/ice/ice_dpll.c | 80 +++++++++++++++++++----
+ include/linux/dpll.h                      |  1 +
+ 4 files changed, 79 insertions(+), 14 deletions(-)
+
+---
+v6:
+ - fix deadlock reported by Michal Schmidt: dpll_pin_change_ntf() in
+   peer notification was called with dpll_lock held, causing deadlock.
+   Move the peer notification calls out of ice_dpll_sma_direction_set()
+   and ice_dpll_ufl_pin_state_set() into their dpll_pin_ops callback
+   wrappers, after pf->dplls.lock is released, and use
+   __dpll_pin_change_ntf() because dpll_lock is still held by the dpll
+   netlink layer (dpll_pin_pre_doit).
+v5: https://lore.kernel.org/all/20260409102501.1447628-1-poros@redhat.com/
+v4: https://lore.kernel.org/all/20260319205256.998876-1-poros@redhat.com/
+v3: https://lore.kernel.org/all/20260220140700.2910174-1-poros@redhat.com/
+v2: https://lore.kernel.org/all/20260219131500.2271897-1-poros@redhat.com/
+v1: https://lore.kernel.org/all/20260218211414.1411163-1-poros@redhat.com/
 
 
