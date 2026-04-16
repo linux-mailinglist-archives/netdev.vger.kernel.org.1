@@ -1,160 +1,258 @@
-Return-Path: <netdev+bounces-279064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279065-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gHyWCEfq4GmmnQAAu9opvQ
-	(envelope-from <netdev+bounces-279064-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 15:55:19 +0200
+	id IMjrDavo4GlInQAAu9opvQ
+	(envelope-from <netdev+bounces-279065-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 15:48:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D444B40F436
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 15:55:18 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9505F40F22B
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 15:48:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1F9A43042D09
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 13:47:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3EE2130022B3
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 13:48:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8641439DBDD;
-	Thu, 16 Apr 2026 13:47:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC9AF3A9D8C;
+	Thu, 16 Apr 2026 13:48:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aKJzmsdo"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="n6F771f7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 624AE38F635;
-	Thu, 16 Apr 2026 13:47:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A50913B7A8
+	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 13:48:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776347249; cv=none; b=R/L7eMNWTycVUdinQI3y220lWn94LbBuspzxATFAstEwNRLZKTjpiCDG4Azxyogz9gopcAsDdDHC/zgprfoDE7RfVEl+uUF9IT99rQhFQoBL714Ir7pWWFDp2ZKIRZvi/r3RGZjk+HxADM9bfSNET5XTfe0lreT2YYJNZXr3BnU=
+	t=1776347295; cv=none; b=YJTVTZlDpFfypyxxEptdLm0jnoFCiFKzNv/L505nAGumkREf37yNLGS9AEC127cSe76d6Ea5J1Se/cRtsvKx8qdYYFtxqcAuRio8/M0ST3nd7AbvPMRRd+e9enBFu5IeNuZgGsVyyQ0nwHyjYOYE3Gri/vav9QO0G20hy4+/VMk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776347249; c=relaxed/simple;
-	bh=0oPhK4aYcKricj1uxY7kKY/SjzHIOXndcz4fKLSJius=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JQuQ+VGsgkK+gkNL/uUeESvkcXX7vkvnkLRnxRcHDni79YFsFOMJ7gI1cqFBenvmWOVNvrXxRhtzI8V9XHRHjlcXxmX889qFftjyvyt8/3M0Ypg3Thj/UgnWlXqhqw4LjJ1TS3wtp4m7aWhNRWPwtJDxUhuaug+aa29UQ0AR75c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aKJzmsdo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80A3CC2BCAF;
-	Thu, 16 Apr 2026 13:47:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776347249;
-	bh=0oPhK4aYcKricj1uxY7kKY/SjzHIOXndcz4fKLSJius=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=aKJzmsdo0nLY72dM03i839OgIsGV+EUfMC5h2W85EJF+EgPkSt9T2H0vZCwfV71TF
-	 75S8hjl+PptQy7L/p/+mAbH59Nls8TTMLIR+3of4eVH4Y57GzaPazvimyiRIMtsfOT
-	 K80cWDLd48VsRxglu5ROj+8FsS6Vjs0kGyGwBXG5spSYmE4sNfrQEyxrj0qWIrLbD0
-	 dXZqtdpXUo+Ff2A2w6shF9FZfvu1WjkWzgalSiP5Ec6shOfAgvl7AbjpHHGgNorobO
-	 Ug7rUWMu9SdVqP//ZFExHAYra52x5wR7PESBHGPvbCDRN9QDMJcK3QevhcdYttIMnC
-	 NxQO5P7LOgODg==
-Message-ID: <8352ca55-0899-408a-a16e-59f5f2ed9250@kernel.org>
-Date: Thu, 16 Apr 2026 15:47:23 +0200
+	s=arc-20240116; t=1776347295; c=relaxed/simple;
+	bh=c1UXGR9PrQCSMu7xnY+0CAcp2tSZmeijtQ0vnLO21qE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NDUB/95nLpQlG2uuSDxaQvnn9oii74u1lkEBF4MAk+ebTQ7GVwgT6wzXJnAlpPtXZ325Zx/AdVvK3OXAA2yYooiOqP1rFnMpD6vP/cDWCTqPg4Z6D1+4rJ5oTPgboHXtGgfl1ActeKLtOI94T8FLtsAk+kZTvIbi5BRBri73K0M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=n6F771f7; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=zOnYPi75gzmQEwbyZJqH4NCjwCJ3I8rG438d8AQ1+0U=; b=n6F771f72013HJNfmIqPEmVhNi
+	QE0xN6gU/HImq42GSRXuZgq3TjaGa1aeKVavGBIdDNRHPsdHZUUoouucS9r/v2FuVAQlDW+l1Gv8N
+	Y7iaE43hAGc7wNNDYHUh3DapeKFaYEgnKAQxoGl46yX63qHZNyt0lSXLHMfSvnW/3JkUG6trNUN02
+	2C2B2POZuW7NtIFVdNXpYrAzp64+nhJpeK+1zaosi936fktn8foNbfBwpegMLNwxidI3r/bhg6mJT
+	mfmRxjueya3O/l0jhchVIxwIbwZvqG43tq/tjFuBe7SZC0njfOuEPPQhvmzqyfVv8OPtoV0TmrW6Z
+	/Rrnc21g==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:53316)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1wDN4b-000000003Gr-0UCP;
+	Thu, 16 Apr 2026 14:48:01 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1wDN4X-000000003FZ-3ckE;
+	Thu, 16 Apr 2026 14:47:57 +0100
+Date: Thu, 16 Apr 2026 14:47:57 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Alexander Stein <alexander.stein@ew.tq-group.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next 5/6] net: stmmac: move PHY handling out of
+ __stmmac_open()/release()
+Message-ID: <aeDojTdDTELfpT0X@shell.armlinux.org.uk>
+References: <aNKDqqI7aLsuDD52@shell.armlinux.org.uk>
+ <5987484.DvuYhMxLoT@steina-w>
+ <aeC-tc2CooYDoBok@shell.armlinux.org.uk>
+ <2410317.ElGaqSPkdT@steina-w>
+ <aeDSTIS9-TDSihbX@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net] selftests: net: add missing CMAC to tcp_ao config
-Content-Language: fr
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- andrew+netdev@lunn.ch, horms@kernel.org, shuah@kernel.org, fw@strlen.de,
- antonio@openvpn.net, phil@nwl.cc, linux-kselftest@vger.kernel.org
-References: <20260416010439.1053587-1-kuba@kernel.org>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20260416010439.1053587-1-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aeDSTIS9-TDSihbX@shell.armlinux.org.uk>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-279064-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	HAS_ORG_HEADER(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-279065-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,foss.st.com,davemloft.net,google.com,kernel.org,lists.infradead.org,st-md-mailman.stormreply.com,vger.kernel.org,redhat.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_SPAM(0.00)[0.081];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D444B40F436
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,armlinux.org.uk:url,shell.armlinux.org.uk:mid]
+X-Rspamd-Queue-Id: 9505F40F22B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Jakub,
+On Thu, Apr 16, 2026 at 01:13:00PM +0100, Russell King (Oracle) wrote:
+> On Thu, Apr 16, 2026 at 02:02:53PM +0200, Alexander Stein wrote:
+> > Hi Russel,
+> > 
+> > Am Donnerstag, 16. April 2026, 12:49:25 CEST schrieb Russell King (Oracle):
+> > > On Thu, Apr 16, 2026 at 08:20:13AM +0200, Alexander Stein wrote:
+> > > > Am Mittwoch, 15. April 2026, 14:59:32 CEST schrieb Russell King (Oracle):
+> > > > > On Wed, Apr 15, 2026 at 08:08:40AM +0200, Alexander Stein wrote:
+> > > > > > Hi,
+> > > > > > 
+> > > > > > Am Dienstag, 23. September 2025, 13:26:19 CEST schrieb Russell King (Oracle):
+> > > > > > > Move the PHY attachment/detachment from the network driver out of
+> > > > > > > __stmmac_open() and __stmmac_release() into stmmac_open() and
+> > > > > > > stmmac_release() where these actions will only happen when the
+> > > > > > > interface is administratively brought up or down. It does not make
+> > > > > > > sense to detach and re-attach the PHY during a change of MTU.
+> > > > > > 
+> > > > > > Sorry for coming up now. But I recently noticed this commit breaks changing
+> > > > > > the MTU on i.MX8MP. Once I simply change the MTU I run into some DMA error:
+> > > > > > $ ip link set dev end1 mtu 1400
+> > > > > > imx-dwmac 30bf0000.ethernet end1: Register MEM_TYPE_PAGE_POOL RxQ-0
+> > > > > > imx-dwmac 30bf0000.ethernet end1: Register MEM_TYPE_PAGE_POOL RxQ-1
+> > > > > > imx-dwmac 30bf0000.ethernet end1: Register MEM_TYPE_PAGE_POOL RxQ-2
+> > > > > > imx-dwmac 30bf0000.ethernet end1: Register MEM_TYPE_PAGE_POOL RxQ-3
+> > > > > > imx-dwmac 30bf0000.ethernet end1: Register MEM_TYPE_PAGE_POOL RxQ-4
+> > > > > > imx-dwmac 30bf0000.ethernet end1: Link is Down
+> > > > > > imx-dwmac 30bf0000.ethernet end1: Failed to reset the dma
+> > > > > > imx-dwmac 30bf0000.ethernet end1: stmmac_hw_setup: DMA engine initialization failed
+> > > > > 
+> > > > > This basically means that a clock is missing. Please provide more
+> > > > > information:
+> > > > > 
+> > > > > - what kernel version are you using?
+> > > > 
+> > > > Currently I am using v6.18.22.
+> > > > $ ethtool -i end1
+> > > > driver: st_gmac
+> > > > version: 6.18.22
+> > > > firmware-version: 
+> > > > expansion-rom-version: 
+> > > > bus-info: 30bf0000.ethernet
+> > > > supports-statistics: yes
+> > > > supports-test: no
+> > > > supports-eeprom-access: no
+> > > > supports-register-dump: yes
+> > > > supports-priv-flags: no
+> > > > 
+> > > > > - has EEE been negotiated?
+> > > > 
+> > > > No. It is marked as not supported
+> > > > 
+> > > > $ ethtool --show-eee end1
+> > > > EEE settings for end1:
+> > > >         EEE status: not supported
+> > > > 
+> > > > > - does the problem persist when EEE is disabled?
+> > > > 
+> > > > As EEE is not supported the problem occurs even with EEE disabled.
+> > > > 
+> > > > > - which PHY is attached to stmmac?
+> > > > 
+> > > > It is a TI DP83867.
+> > > > 
+> > > > imx-dwmac 30bf0000.ethernet eth1: PHY [stmmac-1:03] driver [TI DP83867] (irq=136)
+> > > > 
+> > > > > - which PHY interface mode is being used to connect the PHY to stmmac?
+> > > > 
+> > > > For this interface
+> > > > > phy-mode = "rgmii-id";
+> > > > is set.
+> > > > 
+> > > > In case it is helpful. My platform is arch/arm64/boot/dts/freescale/imx8mp-tqma8mpql-mba8mpxl.dts
+> > > > Thanks for assisting. If there a further questions, don't hesitate to ask.
+> > > 
+> > > Thanks.
+> > > 
+> > > So, as best I can determine at the moment, we end up with the following
+> > > sequence:
+> > > 
+> > > stmmac_change_mtu()
+> > >  __stmmac_release()
+> > >   phylink_stop()
+> > >    phy_stop()
+> > >     phy->state = PHY_HALTED
+> > >     _phy_state_machine() returns PHY_STATE_WORK_SUSPEND
+> > >     _phy_state_machine_post_work()
+> > >      phy_suspend()
+> > >       genphy_suspend()
+> > >        phy_set_bits(phydev, MII_BMCR, BMCR_PDOWN)
+> > > 
+> > > With the DP83867, this causes most of the PHY to be powered down, thus
+> > > stopping the clocks, and this causes the stmmac reset to time out.
+> > > 
+> > > Prior to this commit, we would have called phylink_disconnect_phy()
+> > > immediately after phylink_stop(), but I can see nothing that would
+> > > be affected by this change there (since that also calls
+> > > phy_suspend(), but as the PHY is already suspended, this becomes a
+> > > no-op.)
+> > > 
+> > > However, __stmmac_open() would have called stmmac_init_phy(), which
+> > > would reattach the PHY. This would have called phy_init_hw(), 
+> > > resetting the PHY, and phy_resume() which would ensure that the
+> > > PDOWN bit is clear - thus clocks would be running.
+> > > 
+> > > As a hack, please can you try calling phylink_prepare_resume()
+> > > between the __stmmac_release() and __stmmac_open() in
+> > > stmmac_change_mtu(). This should resume the PHY, thus restoring the
+> > > clocks necessary for stmmac to reset.
+> > 
+> > I tried the following patch. This works as you suspected.
+> 
+> Brilliant, thanks for proving the theory why it broke.
+> 
+> I'll have a think about the best way to solve this, because
+> phylink_prepare_resume() is supposed to be paired with phylink_resume()
+> and that isn't the case here.
+> 
+> Please bear with me as my availability for looking at the kernel is
+> very unpredictable at present (family health issues.)
 
-On 16/04/2026 03:04, Jakub Kicinski wrote:
-> Recent changes to crypto and wifi made CMAC no longer
-> selected by default on x86 and tcp_ao needs it.
-> Add the missing config.
+I have some patches which passed build testing, but more chaos means
+I can't post them nor test them. I'll do something when I'm next able
+to, whenever that will be.
 
-Thank you for the fix, I see that CMAC is the default algo used in the
-TCP AO selftests, and this modification fixes the recent issue.
+The next problem will be netdev's policy over reviews vs patches
+balance which I'm already in deficit, and I have *NO* *TIME*
+what so ever to review patches - let alone propose patches to
+fix people's problems.
 
-Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+So I'm going to say this plainly: if netdev wants to enforce that
+rule, then I won't be fixing people's problems.
 
-Cheers,
-Matt
 -- 
-Sponsored by the NGI0 Core fund.
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
