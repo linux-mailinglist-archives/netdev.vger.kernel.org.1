@@ -1,66 +1,69 @@
-Return-Path: <netdev+bounces-279017-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279018-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YKHXNWDL4GkdmAAAu9opvQ
-	(envelope-from <netdev+bounces-279017-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 13:43:28 +0200
+	id mG/WCJnL4GkdmAAAu9opvQ
+	(envelope-from <netdev+bounces-279018-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 13:44:25 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CBE140D980
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 13:43:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C80240D998
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 13:44:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E599A3006B56
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 11:40:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7804B3036ED2
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 11:40:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7954A396B73;
-	Thu, 16 Apr 2026 11:40:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FFE438F635;
+	Thu, 16 Apr 2026 11:40:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bfBTMqzU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ObCWFDUk"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D33A3932CE
-	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 11:40:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E66D386C12
+	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 11:40:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776339609; cv=none; b=Cl184ERebxMRcXfI0IgyS3NGAX6Mc2UWcWAGMYU/2L/9S6KZ34LTdcXSORcAnou8urc94M5MjW8slMjbrW7h5dwORve4vzi9OmCG9AXQwx7ckBzF6tgx5t0f3loQaw6s1S+TmnuHvRbnETU48DbQajGsz7PFdzRo7M8T6sLrMg0=
+	t=1776339619; cv=none; b=KIo++sNXVyoF0yKOUmpOi25Itp1pr6UYeo98NzHoLu2WZD6Fd6sWrCPzV2TCMEq+1Sy2w62rzXwUoQZq1w1F1ZwZ9LLk7pLW08li+kqv3WBLY/6ef3auZrPmtDRT7M/Vy1NBIgKlc3ZPT7aMZr6lf7Hx/v944Ex2OTqM2UoNd6o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776339609; c=relaxed/simple;
-	bh=KsafRWYizcidBGwrwitp6VISrgMBgFfJMsgnRXQOr5M=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=o4RxbWugcqGxISi6RAQ362fCw4L2GsYDlJD+XHRQfN96dar4jRfYr0xKSEtDEbVZyU+6rnQ5qxOemPlxJjl98r0h2E3pbul3YHJXSAwsdP23Bhk9w8Cf7GqXQFoyjIrN2NGvO2pRrBY1X0xtQn1o3X0W2QG+jBQ62nPl1zNo70g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bfBTMqzU; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1776339619; c=relaxed/simple;
+	bh=wU86KWvNjg9FKa6DyFcGe73DrgV3W3RlisnqLxitXx4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=W4f3GPiMlVbRS8L+ZPCju5czdUywGoZnVsT6ftlSbNk5KvUWyRs6C6/kAu134FdKk9Eo+Af777g7UKrn7C/MqeR5qJllvtssHsywzGwuA8RgQlpPJrZhplrVKaL4UvCDx6LKGcF6UJw/sLxLY92LUHELV8GAhYtdbMP2evkI/R8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ObCWFDUk; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1776339607;
+	s=mimecast20190719; t=1776339615;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=gPELNDldpf97R0KV4JjuN3zxWJ7Io8gIfV7XUJjMv6c=;
-	b=bfBTMqzUY2FzAMCbx0D4/afeh3hFBt+l5hVkKjWkbok49/dO2WB/LSThLyfamjfRsTPR2T
-	cxQWwKps9unf/Z8Kgg7qpfC0t2XLxCr2rjz2LJRsjokHCwbFTtNtF5+jrkgc1tRdIpv4JM
-	UW4kjmecV4bXpzK9QCRrp7H9iZCbfRI=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7y4RG+Ooy20ucTBsnvZrm2OADKlaSNt80O0jTVn3eCg=;
+	b=ObCWFDUkP2QO/ajr0gyfLRhpQiOXVuqAQcb10+te76exOKDP99eXKP22dl9iFTbYbH6YOz
+	iyWkOMrTadNKsIdPm17l83G7pikX+7/cqJIV38bPmNREQy5wSgwdyxsnBZEYTelUr9zYh/
+	V9LtNBj3qa/3st7T1feOEJ+3I24zENE=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-630-SaU8kfhZPKeGf_IKr-5oAA-1; Thu,
- 16 Apr 2026 07:40:04 -0400
-X-MC-Unique: SaU8kfhZPKeGf_IKr-5oAA-1
-X-Mimecast-MFC-AGG-ID: SaU8kfhZPKeGf_IKr-5oAA_1776339602
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-353-HRIe96FFPWqaQpJJXgMH5w-1; Thu,
+ 16 Apr 2026 07:40:09 -0400
+X-MC-Unique: HRIe96FFPWqaQpJJXgMH5w-1
+X-Mimecast-MFC-AGG-ID: HRIe96FFPWqaQpJJXgMH5w_1776339607
 Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 54BAA1800473;
-	Thu, 16 Apr 2026 11:40:01 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4110518005AB;
+	Thu, 16 Apr 2026 11:40:07 +0000 (UTC)
 Received: from ShadowPeak.redhat.com (unknown [10.44.32.76])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id AAAA21800577;
-	Thu, 16 Apr 2026 11:39:55 +0000 (UTC)
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id BB88D180047F;
+	Thu, 16 Apr 2026 11:40:01 +0000 (UTC)
 From: Petr Oros <poros@redhat.com>
 To: netdev@vger.kernel.org
-Cc: Petr Oros <poros@redhat.com>,
+Cc: Ivan Vecera <ivecera@redhat.com>,
+	Petr Oros <poros@redhat.com>,
 	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
 	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
 	Jiri Pirko <jiri@resnulli.us>,
@@ -75,13 +78,14 @@ Cc: Petr Oros <poros@redhat.com>,
 	linux-kernel@vger.kernel.org,
 	intel-wired-lan@lists.osuosl.org,
 	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Ivan Vecera <ivecera@redhat.com>,
 	Rinitha S <sx.rinitha@intel.com>,
 	Michal Schmidt <mschmidt@redhat.com>,
 	Jacob Keller <jacob.e.keller@intel.com>
-Subject: [PATCH net v6 0/2] ice: fix missing dpll notifications for SW pins
-Date: Thu, 16 Apr 2026 13:39:50 +0200
-Message-ID: <20260416113952.389405-1-poros@redhat.com>
+Subject: [PATCH net v6 1/2] dpll: export __dpll_pin_change_ntf() for use under dpll_lock
+Date: Thu, 16 Apr 2026 13:39:51 +0200
+Message-ID: <20260416113952.389405-2-poros@redhat.com>
+In-Reply-To: <20260416113952.389405-1-poros@redhat.com>
+References: <20260416113952.389405-1-poros@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -105,7 +109,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCPT_COUNT_TWELVE(0.00)[20];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279017-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-279018-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[redhat.com:+];
 	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -115,50 +119,79 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.996];
+	NEURAL_HAM(-0.00)[-0.994];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3CBE140D980
+X-Rspamd-Queue-Id: 9C80240D998
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The SMA/U.FL pin redesign never propagated dpll notifications to the
-software-controlled pin wrappers.  This series fixes that by adding
-peer notification for paired SMA/U.FL pins and by wrapping
-dpll_pin_change_ntf() calls in the periodic work to also cover SW pins.
+From: Ivan Vecera <ivecera@redhat.com>
 
-Patch 1 exports __dpll_pin_change_ntf() so ice can send peer
-notifications from callback context where dpll_lock is already held.
+Export __dpll_pin_change_ntf() so that drivers can send pin change
+notifications from within pin callbacks, which are already called
+under dpll_lock. Using dpll_pin_change_ntf() in that context would
+deadlock.
 
-Patch 2 fixes the notification gaps: periodic work HW-to-SW
-propagation, SW-to-SW peer notification on PCA9575 routing changes,
-and SW pin phase offset reporting.
+Add lockdep_assert_held() to catch misuse without the lock held.
 
-Ivan Vecera (1):
-  dpll: export __dpll_pin_change_ntf() for use under dpll_lock
-
-Petr Oros (1):
-  ice: fix missing dpll notifications for SW pins
-
- drivers/dpll/dpll_netlink.c               | 10 +++
- drivers/dpll/dpll_netlink.h               |  2 -
- drivers/net/ethernet/intel/ice/ice_dpll.c | 80 +++++++++++++++++++----
- include/linux/dpll.h                      |  1 +
- 4 files changed, 79 insertions(+), 14 deletions(-)
-
+Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+Signed-off-by: Petr Oros <poros@redhat.com>
 ---
-v6:
- - fix deadlock reported by Michal Schmidt: dpll_pin_change_ntf() in
-   peer notification was called with dpll_lock held, causing deadlock.
-   Move the peer notification calls out of ice_dpll_sma_direction_set()
-   and ice_dpll_ufl_pin_state_set() into their dpll_pin_ops callback
-   wrappers, after pf->dplls.lock is released, and use
-   __dpll_pin_change_ntf() because dpll_lock is still held by the dpll
-   netlink layer (dpll_pin_pre_doit).
-v5: https://lore.kernel.org/all/20260409102501.1447628-1-poros@redhat.com/
-v4: https://lore.kernel.org/all/20260319205256.998876-1-poros@redhat.com/
-v3: https://lore.kernel.org/all/20260220140700.2910174-1-poros@redhat.com/
-v2: https://lore.kernel.org/all/20260219131500.2271897-1-poros@redhat.com/
-v1: https://lore.kernel.org/all/20260218211414.1411163-1-poros@redhat.com/
+ drivers/dpll/dpll_netlink.c | 10 ++++++++++
+ drivers/dpll/dpll_netlink.h |  2 --
+ include/linux/dpll.h        |  1 +
+ 3 files changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/dpll/dpll_netlink.c b/drivers/dpll/dpll_netlink.c
+index 83cbd64abf5a47..95ae786e98aab3 100644
+--- a/drivers/dpll/dpll_netlink.c
++++ b/drivers/dpll/dpll_netlink.c
+@@ -842,11 +842,21 @@ int dpll_pin_delete_ntf(struct dpll_pin *pin)
+ 	return dpll_pin_event_send(DPLL_CMD_PIN_DELETE_NTF, pin);
+ }
+ 
++/**
++ * __dpll_pin_change_ntf - notify that the pin has been changed
++ * @pin: registered pin pointer
++ *
++ * Context: caller must hold dpll_lock. Suitable for use inside pin
++ *          callbacks which are already invoked under dpll_lock.
++ * Return: 0 if succeeds, error code otherwise.
++ */
+ int __dpll_pin_change_ntf(struct dpll_pin *pin)
+ {
++	lockdep_assert_held(&dpll_lock);
+ 	dpll_pin_notify(pin, DPLL_PIN_CHANGED);
+ 	return dpll_pin_event_send(DPLL_CMD_PIN_CHANGE_NTF, pin);
+ }
++EXPORT_SYMBOL_GPL(__dpll_pin_change_ntf);
+ 
+ /**
+  * dpll_pin_change_ntf - notify that the pin has been changed
+diff --git a/drivers/dpll/dpll_netlink.h b/drivers/dpll/dpll_netlink.h
+index dd28b56d27c56d..a9cfd55f57fc42 100644
+--- a/drivers/dpll/dpll_netlink.h
++++ b/drivers/dpll/dpll_netlink.h
+@@ -11,5 +11,3 @@ int dpll_device_delete_ntf(struct dpll_device *dpll);
+ int dpll_pin_create_ntf(struct dpll_pin *pin);
+ 
+ int dpll_pin_delete_ntf(struct dpll_pin *pin);
+-
+-int __dpll_pin_change_ntf(struct dpll_pin *pin);
+diff --git a/include/linux/dpll.h b/include/linux/dpll.h
+index 2ce295b46b8cdc..8f97120ee7b37d 100644
+--- a/include/linux/dpll.h
++++ b/include/linux/dpll.h
+@@ -276,6 +276,7 @@ int dpll_pin_ref_sync_pair_add(struct dpll_pin *pin,
+ 
+ int dpll_device_change_ntf(struct dpll_device *dpll);
+ 
++int __dpll_pin_change_ntf(struct dpll_pin *pin);
+ int dpll_pin_change_ntf(struct dpll_pin *pin);
+ 
+ int register_dpll_notifier(struct notifier_block *nb);
+-- 
+2.52.0
 
 
