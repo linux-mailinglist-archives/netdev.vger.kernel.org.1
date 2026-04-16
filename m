@@ -1,329 +1,250 @@
-Return-Path: <netdev+bounces-279178-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279179-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WNmGFQxm4WlyswAAu9opvQ
-	(envelope-from <netdev+bounces-279178-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 00:43:24 +0200
+	id cNCQEJlm4Wm/swAAu9opvQ
+	(envelope-from <netdev+bounces-279179-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 00:45:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7BE1415518
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 00:43:23 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB7EF415564
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 00:45:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id CA9A530FA60B
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 22:41:32 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4952A303DF45
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 22:44:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9852390C83;
-	Thu, 16 Apr 2026 22:41:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60505390982;
+	Thu, 16 Apr 2026 22:44:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b="boddJPt/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VeIywNGF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-43102.protonmail.ch (mail-43102.protonmail.ch [185.70.43.102])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F64D378D96;
-	Thu, 16 Apr 2026 22:41:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.102
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15A91371CE1
+	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 22:44:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776379281; cv=none; b=BavhuuKOg5x8kQZP+EWvTuiZuXE6PGOgyVbjdwSxk6/R4SjhUFChn8KQq2y4NKzIrEG/FD/46ubebnUq5muahMSH1xNWqE5dZRb/3/dOy0O+EGRiJkMSLtjATXyO+f8JSFcRJr7trLWFA4UKzF2zrCmJWJvtdlqR6KLsoj5Bsqw=
+	t=1776379494; cv=none; b=E512zmrsIdlGA2L3eKOfULHtoKB72bp3lqxU/CEuFlidm7LIxb6Izl7wkmwNKDBFv6in3dIvhCJutyFpg3mgMmD0WECi/hpB4OZJYttJu+pY67/lGmq+zx2qlmDrTThGTwz7LDQfJ/FHg4oD7NxzaHQPC6UxJvjhqcEwavudtlE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776379281; c=relaxed/simple;
-	bh=aUjWVaG/AsZGo9OOyhDKeH9Xa2AzjQV7a3xd7Aa7Wpo=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=i8tMMD+lfyCuITmIrHdg4g5JAhB5+M6ZsIIGllf/v0Kr0h4OTLLqSRDYIyczQMxsyFMVrxyEfEJLahrczmVcn0psaPhIUycSFJdc6+E0ftmHJPYqNxY5SX8qA36qDipTA1HhnSGeh69kEicBXOHvNMEgaGWk4EjlmCbIHVtf9bY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me; spf=pass smtp.mailfrom=pm.me; dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b=boddJPt/; arc=none smtp.client-ip=185.70.43.102
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pm.me
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pm.me;
-	s=protonmail3; t=1776379278; x=1776638478;
-	bh=6U3qpcWjGRGrSSH0rUcmatHH/KtvKsv8QjT4ZCqboJU=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=boddJPt/VoLwQLuGpu7sZVwn6K2TbAhKxOs9QYvG37DSmCX03K+I4F4fiKxJ92sDa
-	 UlfEt2/jHjpeZz14Xo51RhmKbBkGL2H24ryzExX7Ko60ZjYWDa6ow0xoh4/BSC1MRI
-	 pSmlZY3tT8nOqS22ri8xpIseWcx4vF8GdHPzrWTOg0OXKldCL4axgVzFDgWTxa5bsD
-	 +6qM5rKXhk1xoyTEn30plpXYpgIkcdqhRP5ZZcsmaLuTPjyMmhgkwCq6TgaRc6rz3/
-	 XCHeolzMInae2PZS/QQgCv4dcQBqpm3WQ1JOzkfF8c1B3oRgFEhnTCri8epKL46EEs
-	 elBsBhOVB+WAA==
-Date: Thu, 16 Apr 2026 22:41:13 +0000
-To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Alex Elder <elder@kernel.org>
-From: Alexander Koskovich <akoskovich@pm.me>
-Cc: linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, Alexander Koskovich <akoskovich@pm.me>
-Subject: [PATCH RFC 4/4] net: ipa: add Eliza configuration data
-Message-ID: <20260416-eliza-ipa-v1-4-f4109a8e43c4@pm.me>
-In-Reply-To: <20260416-eliza-ipa-v1-0-f4109a8e43c4@pm.me>
-References: <20260416-eliza-ipa-v1-0-f4109a8e43c4@pm.me>
-Feedback-ID: 37836894:user:proton
-X-Pm-Message-ID: fd2c3096340ea8f5b8bd3fd6d1288823295f0b50
+	s=arc-20240116; t=1776379494; c=relaxed/simple;
+	bh=QnH1vIimESyZ2peW1iohZ3MwmBA4oBxKLRs7rK4wSqQ=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=G+zHzTlwCCGP/tMQWKcqpRHt+TVAqR85YEhbvXxASs8/IOf0xE0TAST5/R721waas3kPIpntk3R/VPych2/czqAQM8CyRWhdb5/BWI6xFv2yUh4u08ivDynJ5+P2/8m2qmA33eq17/cjdB7XxfviHdYPt4k2XxR4rtNUvl3GR4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VeIywNGF; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-82f0f2b2641so54008b3a.3
+        for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 15:44:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1776379491; x=1776984291; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=UqyYEqZgyMpoZKxskZj0QRqQl7ttahHyrPikYOVHCGs=;
+        b=VeIywNGFDT898urzHsB6Lhv0CzlE8C3vn6rrp3ax65KnTTLVOjOmQaJ+bco7wSJcEK
+         Uy2LteuxTCZUjkfGmcCfIm4Fo2uEZTOoWx5DyDzyt9YbtQhMuczlsGBBysKy9fqF8fpu
+         KecMu0Mc4aRkDSV5sL7F5BhQtELHwHFx5LOSL/h6sLPYcGPdO68JwgPnKMwqygpU5OsU
+         wYtHN1iyi0qbTfX9FV81jWlwUJHqQnESeK1b9u3YR1ZmbdLLxZZNcW/3Swyvej0rCDDe
+         9ZQDd3gYL35i9oiaMKBf1YXy9Vm18CoXnTB4wWFJQSeoqAdWfBeUctSDwor4lSHE2cal
+         jfBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776379491; x=1776984291;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UqyYEqZgyMpoZKxskZj0QRqQl7ttahHyrPikYOVHCGs=;
+        b=gDcxqBMRsRMYRNzzyNjYaZlSXjmT1vkPKa2Hm9VUn/JwjE37ns9nYysD1ATWkOmpQ/
+         hr/CSJQoEc6728AYLJ4KRsK92W5dDEEaij4JPtaTwo4NUoeM8iBDbndj4vBRv8qSNJIJ
+         i/ojd3z0u6YhKQoKMUnpTu45ERk55XnPBZuiNify/o5HVPw6PP0mXc05dKbagDGIyECz
+         mHOjaTd/2vXdnZaHGXH+b+C82h+EXZMD7KfF38rc5RCCcOgVw4i9FioTC19Lizlw4uIS
+         eaIOpfUW2cTrw64fOPUkPrrmJwp3x9buFsSUKKLHC6MYVCEbA+EAEZ5eTdlm68Cm34G0
+         DYKg==
+X-Forwarded-Encrypted: i=1; AFNElJ90cnZKdqi8a9Qtb3dMEIYDmH2kJ+2v1DW66LSlNvgMsMwsWUiZxaa7+d5rd5/mo/2a7e/BuCw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzeMpVwZm6zExqVZwHduPnch+Hj6FsR5v9mh4spqpz/AuKAg6Ui
+	L6PvPe2rBYMb+bJExMAyZi0BLi19G8tN6iMPu1Q38X5ArlOJy/6F/V6PqwSAXi6Pd2aaLM87ToU
+	qC1kJRQ==
+X-Received: from pfbho13.prod.google.com ([2002:a05:6a00:880d:b0:7ba:8e68:3140])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:439b:b0:82f:8696:5a75
+ with SMTP id d2e1a72fcca58-82f8c8bb700mr145981b3a.28.1776379491191; Thu, 16
+ Apr 2026 15:44:51 -0700 (PDT)
+Date: Thu, 16 Apr 2026 15:44:49 -0700
+In-Reply-To: <20260414-vmscape-bhb-v10-8-efa924abae5f@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Mime-Version: 1.0
+References: <20260414-vmscape-bhb-v10-0-efa924abae5f@linux.intel.com> <20260414-vmscape-bhb-v10-8-efa924abae5f@linux.intel.com>
+Message-ID: <aeFmYd1ybZnVlAYW@google.com>
+Subject: Re: [PATCH v10 08/12] kvm: Define EXPORT_STATIC_CALL_FOR_KVM()
+From: Sean Christopherson <seanjc@google.com>
+To: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+Cc: x86@kernel.org, Jon Kohler <jon@nutanix.com>, Nikolay Borisov <nik.borisov@suse.com>, 
+	"H. Peter Anvin" <hpa@zytor.com>, Josh Poimboeuf <jpoimboe@kernel.org>, David Kaplan <david.kaplan@amd.com>, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, KP Singh <kpsingh@kernel.org>, 
+	Jiri Olsa <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	David Laight <david.laight.linux@gmail.com>, Andy Lutomirski <luto@kernel.org>, 
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, David Ahern <dsahern@kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	Asit Mallick <asit.k.mallick@intel.com>, Tao Zhang <tao1.zhang@intel.com>, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[pm.me,quarantine];
-	R_DKIM_ALLOW(-0.20)[pm.me:s=protonmail3];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279178-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-279179-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_CC(0.00)[kernel.org,nutanix.com,suse.com,zytor.com,amd.com,alien8.de,linux.intel.com,infradead.org,iogearbox.net,davemloft.net,gmail.com,redhat.com,linux.dev,fomichev.me,google.com,lwn.net,vger.kernel.org,intel.com];
+	RCPT_COUNT_TWELVE(0.00)[37];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[akoskovich@pm.me,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[pm.me:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[pm.me:email,pm.me:dkim,pm.me:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B7BE1415518
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: AB7EF415564
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add the configuration data required for Eliza, which uses IPA v5.5. The
-difference over other platforms that use IPA 5.5 is the Q6 FnR counters
-have been increased on the firmware version it uses, which results in a
-different memory layout.
+On Tue, Apr 14, 2026, Pawan Gupta wrote:
+> EXPORT_SYMBOL_FOR_KVM() exists to export symbols to KVM modules. Static
+> calls need the same treatment when the core kernel defines a static_call
+> that KVM needs access to (e.g. from a VM-exit path).
+> 
+> Define EXPORT_STATIC_CALL_FOR_KVM() as the static_call analogue of
+> EXPORT_SYMBOL_FOR_KVM(). The same three-way logic applies:
+> 
+>   - KVM_SUB_MODULES defined: export to "kvm," plus all sub-modules
+>   - KVM=m, no sub-modules: export to "kvm" only
+>   - KVM built-in: no export needed (noop)
+> 
+> As with EXPORT_SYMBOL_FOR_KVM(), allow architectures to override the
+> definition (e.g. to suppress the export when kvm.ko itself will not be
+> built despite CONFIG_KVM=m). Add the x86 no-op override in
+> arch/x86/include/asm/kvm_types.h for that case.
+> 
+> Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+> ---
+>  arch/x86/include/asm/kvm_types.h |  1 +
+>  include/linux/kvm_types.h        | 13 ++++++++++++-
+>  2 files changed, 13 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm_types.h b/arch/x86/include/asm/kvm_types.h
+> index d7c704ed1be9..bceeaed2940e 100644
+> --- a/arch/x86/include/asm/kvm_types.h
+> +++ b/arch/x86/include/asm/kvm_types.h
+> @@ -15,6 +15,7 @@
+>   * at least one vendor module is enabled.
+>   */
+>  #define EXPORT_SYMBOL_FOR_KVM(symbol)
+> +#define EXPORT_STATIC_CALL_FOR_KVM(symbol)
+>  #endif
+>  
+>  #define KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE 40
+> diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
+> index a568d8e6f4e8..c81f4fdba625 100644
+> --- a/include/linux/kvm_types.h
+> +++ b/include/linux/kvm_types.h
+> @@ -13,6 +13,8 @@
+>  	EXPORT_SYMBOL_FOR_MODULES(symbol, __stringify(KVM_SUB_MODULES))
+>  #define EXPORT_SYMBOL_FOR_KVM(symbol) \
+>  	EXPORT_SYMBOL_FOR_MODULES(symbol, "kvm," __stringify(KVM_SUB_MODULES))
+> +#define EXPORT_STATIC_CALL_FOR_KVM(symbol) \
+> +	EXPORT_STATIC_CALL_FOR_MODULES(symbol, "kvm," __stringify(KVM_SUB_MODULES))
+>  #else
+>  #define EXPORT_SYMBOL_FOR_KVM_INTERNAL(symbol)
+>  /*
+> @@ -27,7 +29,16 @@
+>  #define EXPORT_SYMBOL_FOR_KVM(symbol)
+>  #endif /* IS_MODULE(CONFIG_KVM) */
+>  #endif /* EXPORT_SYMBOL_FOR_KVM */
+> -#endif
+> +
+> +#ifndef EXPORT_STATIC_CALL_FOR_KVM
+> +#if IS_MODULE(CONFIG_KVM)
+> +#define EXPORT_STATIC_CALL_FOR_KVM(symbol) EXPORT_STATIC_CALL_FOR_MODULES(symbol, "kvm")
+> +#else
+> +#define EXPORT_STATIC_CALL_FOR_KVM(symbol)
+> +#endif /* IS_MODULE(CONFIG_KVM) */
+> +#endif /* EXPORT_STATIC_CALL_FOR_KVM */
+> +
+> +#endif /* KVM_SUB_MODULES */
 
-Signed-off-by: Alexander Koskovich <akoskovich@pm.me>
+I think I'd prefer to require EXPORT_SYMBOL_FOR_KVM and EXPORT_STATIC_CALL_FOR_KVM
+to come as a pair from arch code.  I can't think of a scenario where arch code
+should override one but not the other.  The end result is slightly less ugly :-)
+
 ---
- drivers/net/ipa/data/ipa_data-v5.5.c | 163 +++++++++++++++++++++++++++++++=
-++++
- drivers/net/ipa/ipa_data.h           |   1 +
- drivers/net/ipa/ipa_main.c           |   4 +
- 3 files changed, 168 insertions(+)
+ arch/x86/include/asm/kvm_types.h |  1 +
+ include/linux/kvm_types.h        | 10 +++++++++-
+ 2 files changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ipa/data/ipa_data-v5.5.c b/drivers/net/ipa/data/ip=
-a_data-v5.5.c
-index 44a9df7346b7..e1454454bde9 100644
---- a/drivers/net/ipa/data/ipa_data-v5.5.c
-+++ b/drivers/net/ipa/data/ipa_data-v5.5.c
-@@ -288,6 +288,148 @@ static const struct ipa_resource_data ipa_resource_da=
-ta =3D {
- =09.resource_dst=09=09=3D ipa_resource_dst,
- };
-=20
-+/* IPA-resident memory region data for the Eliza SoC */
-+static const struct ipa_mem ipa_mem_local_data_eliza[] =3D {
-+=09{
-+=09=09.id=09=09=3D IPA_MEM_UC_EVENT_RING,
-+=09=09.offset=09=09=3D 0x0000,
-+=09=09.size=09=09=3D 0x1000,
-+=09=09.canary_count=09=3D 0,
-+=09},
-+=09{
-+=09=09.id=09=09=3D IPA_MEM_UC_SHARED,
-+=09=09.offset=09=09=3D 0x1000,
-+=09=09.size=09=09=3D 0x0080,
-+=09=09.canary_count=09=3D 0,
-+=09},
-+=09{
-+=09=09.id=09=09=3D IPA_MEM_UC_INFO,
-+=09=09.offset=09=09=3D 0x1080,
-+=09=09.size=09=09=3D 0x0200,
-+=09=09.canary_count=09=3D 0,
-+=09},
-+=09{
-+=09=09.id=09=09=3D IPA_MEM_V4_FILTER_HASHED,
-+=09=09.offset=09=09=3D 0x1288,
-+=09=09.size=09=09=3D 0x0078,
-+=09=09.canary_count=09=3D 2,
-+=09},
-+=09{
-+=09=09.id=09=09=3D IPA_MEM_V4_FILTER,
-+=09=09.offset=09=09=3D 0x1308,
-+=09=09.size=09=09=3D 0x0078,
-+=09=09.canary_count=09=3D 2,
-+=09},
-+=09{
-+=09=09.id=09=09=3D IPA_MEM_V6_FILTER_HASHED,
-+=09=09.offset=09=09=3D 0x1388,
-+=09=09.size=09=09=3D 0x0078,
-+=09=09.canary_count=09=3D 2,
-+=09},
-+=09{
-+=09=09.id=09=09=3D IPA_MEM_V6_FILTER,
-+=09=09.offset=09=09=3D 0x1408,
-+=09=09.size=09=09=3D 0x0078,
-+=09=09.canary_count=09=3D 2,
-+=09},
-+=09{
-+=09=09.id=09=09=3D IPA_MEM_V4_ROUTE_HASHED,
-+=09=09.offset=09=09=3D 0x1488,
-+=09=09.size=09=09=3D 0x0098,
-+=09=09.canary_count=09=3D 2,
-+=09},
-+=09{
-+=09=09.id=09=09=3D IPA_MEM_V4_ROUTE,
-+=09=09.offset=09=09=3D 0x1528,
-+=09=09.size=09=09=3D 0x0098,
-+=09=09.canary_count=09=3D 2,
-+=09},
-+=09{
-+=09=09.id=09=09=3D IPA_MEM_V6_ROUTE_HASHED,
-+=09=09.offset=09=09=3D 0x15c8,
-+=09=09.size=09=09=3D 0x0098,
-+=09=09.canary_count=09=3D 2,
-+=09},
-+=09{
-+=09=09.id=09=09=3D IPA_MEM_V6_ROUTE,
-+=09=09.offset=09=09=3D 0x1668,
-+=09=09.size=09=09=3D 0x0098,
-+=09=09.canary_count=09=3D 2,
-+=09},
-+=09{
-+=09=09.id=09=09=3D IPA_MEM_MODEM_HEADER,
-+=09=09.offset=09=09=3D 0x1708,
-+=09=09.size=09=09=3D 0x0240,
-+=09=09.canary_count=09=3D 2,
-+=09},
-+=09{
-+=09=09.id=09=09=3D IPA_MEM_AP_HEADER,
-+=09=09.offset=09=09=3D 0x1948,
-+=09=09.size=09=09=3D 0x01e0,
-+=09=09.canary_count=09=3D 0,
-+=09},
-+=09{
-+=09=09.id=09=09=3D IPA_MEM_MODEM_PROC_CTX,
-+=09=09.offset=09=09=3D 0x1b40,
-+=09=09.size=09=09=3D 0x0b20,
-+=09=09.canary_count=09=3D 2,
-+=09},
-+=09{
-+=09=09.id=09=09=3D IPA_MEM_AP_PROC_CTX,
-+=09=09.offset=09=09=3D 0x2660,
-+=09=09.size=09=09=3D 0x0200,
-+=09=09.canary_count=09=3D 0,
-+=09},
-+=09{
-+=09=09.id=09=09=3D IPA_MEM_STATS_QUOTA_MODEM,
-+=09=09.offset=09=09=3D 0x2868,
-+=09=09.size=09=09=3D 0x0060,
-+=09=09.canary_count=09=3D 2,
-+=09},
-+=09{
-+=09=09.id=09=09=3D IPA_MEM_STATS_QUOTA_AP,
-+=09=09.offset=09=09=3D 0x28c8,
-+=09=09.size=09=09=3D 0x0048,
-+=09=09.canary_count=09=3D 0,
-+=09},
-+=09{
-+=09=09.id=09=09=3D IPA_MEM_STATS_TETHERING,
-+=09=09.offset=09=09=3D 0x2910,
-+=09=09.size=09=09=3D 0x03c0,
-+=09=09.canary_count=09=3D 0,
-+=09},
-+=09{
-+=09=09.id=09=09=3D IPA_MEM_STATS_FILTER_ROUTE,
-+=09=09.offset=09=09=3D 0x2cd0,
-+=09=09.size=09=09=3D 0x0c40,
-+=09=09.canary_count=09=3D 2,
-+=09},
-+=09{
-+=09=09.id=09=09=3D IPA_MEM_STATS_DROP,
-+=09=09.offset=09=09=3D 0x3910,
-+=09=09.size=09=09=3D 0x0020,
-+=09=09.canary_count=09=3D 0,
-+=09},
-+=09{
-+=09=09.id=09=09=3D IPA_MEM_MODEM,
-+=09=09.offset=09=09=3D 0x3938,
-+=09=09.size=09=09=3D 0x0d48,
-+=09=09.canary_count=09=3D 2,
-+=09},
-+=09{
-+=09=09.id=09=09=3D IPA_MEM_NAT_TABLE,
-+=09=09.offset=09=09=3D 0x4680,
-+=09=09.size=09=09=3D 0x0900,
-+=09=09.canary_count=09=3D 0,
-+=09},
-+=09{
-+=09=09.id=09=09=3D IPA_MEM_PDN_CONFIG,
-+=09=09.offset=09=09=3D 0x4f88,
-+=09=09.size=09=09=3D 0x0050,
-+=09=09.canary_count=09=3D 2,
-+=09},
-+};
-+
- /* IPA-resident memory region data for an SoC having IPA v5.5 */
- static const struct ipa_mem ipa_mem_local_data[] =3D {
- =09{
-@@ -442,6 +584,14 @@ static const struct ipa_mem ipa_mem_local_data[] =3D {
- =09},
- };
-=20
-+/* Memory configuration data for the Eliza SoC */
-+static const struct ipa_mem_data ipa_mem_data_eliza =3D {
-+=09.local_count=09=3D ARRAY_SIZE(ipa_mem_local_data_eliza),
-+=09.local=09=09=3D ipa_mem_local_data_eliza,
-+=09.smem_size=09=3D 0x0000b000,
-+=09.fnr_idx_cnt=09=3D 68,
-+};
-+
- /* Memory configuration data for an SoC having IPA v5.5 */
- static const struct ipa_mem_data ipa_mem_data =3D {
- =09.local_count=09=3D ARRAY_SIZE(ipa_mem_local_data),
-@@ -486,3 +636,16 @@ const struct ipa_data ipa_data_v5_5 =3D {
- =09.mem_data=09=09=3D &ipa_mem_data,
- =09.power_data=09=09=3D &ipa_power_data,
- };
-+
-+/* Configuration data for the Eliza SoC (IPA v5.5). */
-+const struct ipa_data ipa_data_v5_5_eliza =3D {
-+=09.version=09=09=3D IPA_VERSION_5_5,
-+=09.qsb_count=09=09=3D ARRAY_SIZE(ipa_qsb_data),
-+=09.qsb_data=09=09=3D ipa_qsb_data,
-+=09.modem_route_count=09=3D 11,
-+=09.endpoint_count=09=09=3D ARRAY_SIZE(ipa_gsi_endpoint_data),
-+=09.endpoint_data=09=09=3D ipa_gsi_endpoint_data,
-+=09.resource_data=09=09=3D &ipa_resource_data,
-+=09.mem_data=09=09=3D &ipa_mem_data_eliza,
-+=09.power_data=09=09=3D &ipa_power_data,
-+};
-diff --git a/drivers/net/ipa/ipa_data.h b/drivers/net/ipa/ipa_data.h
-index f7566c8edabd..da01fc84edac 100644
---- a/drivers/net/ipa/ipa_data.h
-+++ b/drivers/net/ipa/ipa_data.h
-@@ -258,5 +258,6 @@ extern const struct ipa_data ipa_data_v4_11;
- extern const struct ipa_data ipa_data_v5_0;
- extern const struct ipa_data ipa_data_v5_2;
- extern const struct ipa_data ipa_data_v5_5;
-+extern const struct ipa_data ipa_data_v5_5_eliza;
-=20
- #endif /* _IPA_DATA_H_ */
-diff --git a/drivers/net/ipa/ipa_main.c b/drivers/net/ipa/ipa_main.c
-index 788dd99af2a4..981be8b538d0 100644
---- a/drivers/net/ipa/ipa_main.c
-+++ b/drivers/net/ipa/ipa_main.c
-@@ -637,6 +637,10 @@ static int ipa_firmware_load(struct device *dev)
- }
-=20
- static const struct of_device_id ipa_match[] =3D {
-+=09{
-+=09=09.compatible=09=3D "qcom,eliza-ipa",
-+=09=09.data=09=09=3D &ipa_data_v5_5_eliza,
-+=09},
- =09{
- =09=09.compatible=09=3D "qcom,msm8998-ipa",
- =09=09.data=09=09=3D &ipa_data_v3_1,
+diff --git a/arch/x86/include/asm/kvm_types.h b/arch/x86/include/asm/kvm_types.h
+index d7c704ed1be9..bceeaed2940e 100644
+--- a/arch/x86/include/asm/kvm_types.h
++++ b/arch/x86/include/asm/kvm_types.h
+@@ -15,6 +15,7 @@
+  * at least one vendor module is enabled.
+  */
+ #define EXPORT_SYMBOL_FOR_KVM(symbol)
++#define EXPORT_STATIC_CALL_FOR_KVM(symbol)
+ #endif
+ 
+ #define KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE 40
+diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
+index a568d8e6f4e8..be602d3f287e 100644
+--- a/include/linux/kvm_types.h
++++ b/include/linux/kvm_types.h
+@@ -13,6 +13,8 @@
+ 	EXPORT_SYMBOL_FOR_MODULES(symbol, __stringify(KVM_SUB_MODULES))
+ #define EXPORT_SYMBOL_FOR_KVM(symbol) \
+ 	EXPORT_SYMBOL_FOR_MODULES(symbol, "kvm," __stringify(KVM_SUB_MODULES))
++#define EXPORT_STATIC_CALL_FOR_KVM(symbol) \
++	EXPORT_STATIC_CALL_FOR_MODULES(symbol, "kvm," __stringify(KVM_SUB_MODULES))
+ #else
+ #define EXPORT_SYMBOL_FOR_KVM_INTERNAL(symbol)
+ /*
+@@ -23,11 +25,17 @@
+ #ifndef EXPORT_SYMBOL_FOR_KVM
+ #if IS_MODULE(CONFIG_KVM)
+ #define EXPORT_SYMBOL_FOR_KVM(symbol) EXPORT_SYMBOL_FOR_MODULES(symbol, "kvm")
++#define EXPORT_STATIC_CALL_FOR_KVM(symbol) EXPORT_STATIC_CALL_FOR_MODULES(symbol, "kvm")
+ #else
+ #define EXPORT_SYMBOL_FOR_KVM(symbol)
++#define EXPORT_STATIC_CALL_FOR_KVM(symbol)
+ #endif /* IS_MODULE(CONFIG_KVM) */
++#else
++#ifndef EXPORT_STATIC_CALL_FOR_KVM
++#error Must #define EXPORT_STATIC_CALL_FOR_KVM if #defining EXPORT_SYMBOL_FOR_KVM
++#endif
+ #endif /* EXPORT_SYMBOL_FOR_KVM */
+-#endif
++#endif /* KVM_SUB_MODULES */
+ 
+ #ifndef __ASSEMBLER__
+ 
 
---=20
-2.53.0
-
-
+base-commit: 56b7ace84970ff647b095849e80bc36c094760aa
+--
 
