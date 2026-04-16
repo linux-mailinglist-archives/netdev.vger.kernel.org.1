@@ -1,277 +1,207 @@
-Return-Path: <netdev+bounces-278990-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278986-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +BVwIvS54GmIlAAAu9opvQ
-	(envelope-from <netdev+bounces-278990-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 12:29:08 +0200
+	id KGeOHqC14GlClAAAu9opvQ
+	(envelope-from <netdev+bounces-278986-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 12:10:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E730140CEA8
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 12:29:07 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD7D340CC11
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 12:10:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 029863065D91
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 10:27:49 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 159F9303339D
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 10:09:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50144396567;
-	Thu, 16 Apr 2026 10:27:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5DA339D6D6;
+	Thu, 16 Apr 2026 10:09:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XGSnr5KA"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FKRSjiLv";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="c359IVp7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0721B391859
-	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 10:27:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 684B939DBCB
+	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 10:09:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776335268; cv=none; b=CvHGIhdYn9uQ6oSp/vLjprHVgbJId/8sV3cW8oyq2zJOQSZrTEYtPhNw+vtWCEB8qh7qaJoo89mVnyr48Vkk0SKgvAGDW5pZd2N6myelZhGLXy1XjqZpF7g469PyryLB2F2h4q9Hlr/OKo3fgrXFNK8JAopCphX0z/uU74j5law=
+	t=1776334196; cv=none; b=pN5EwOfLeurdeFY+LzgBZ7c6A8N6UrFSo/bFeLnq/zMnTmsjVlX0JCMrMjrHCCoIY9Rwfvx7v3yInp0z2DcybTy8OihYT8Q+pddaSvpD5HcWl1oA4IgB+HUjepd17o4Tl2cZsz3zhy7Xgeye0Kr/Omq2PC7czeC/N+VW7aEVHuI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776335268; c=relaxed/simple;
-	bh=eVMfaS9Htr2NWHGAP5A6Gykmh2FgdSVZeiEjlkQqUTE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DiVAVv2ReffKlJCfkcRMBA7mgmmx9pnyolCCq4UmDcuTGTWDHmyO6yNnts2i/v2W7k0O6MtgbGUOP5QoZxSks0t52B3FivgR8EB364BOeQ7IfcgykitDybZN8ApWgzDKKvacanmzycDP8BPqZlquAB5kvcsgot4wEpDIt2sT1Xs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XGSnr5KA; arc=none smtp.client-ip=209.85.216.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-35691a231a7so4984863a91.3
-        for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 03:27:46 -0700 (PDT)
+	s=arc-20240116; t=1776334196; c=relaxed/simple;
+	bh=z6kd+nKQicYvDY3CUkmgWTERBKk+ndyaPYBRpyWXIEY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=o9X9+CL+m1vQy8NiHXAj4gi7pNdR6i/VftV0WMftRbDTwaWH6BRgVCwFbwJabjCqmz7q7QyrC59pLab7LLtw3mzLGaok2l5grd2Z7X9CAtKnX3IKY0DpkEVAyZZBY0YbRQJuIG+wxW/d6ox92YORg4/vmkWjEIa2R0r6DGOXyKA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FKRSjiLv; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=c359IVp7; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1776334194;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1cV7q2j+uSEe+DAeD9qB2jVzt4SquMZBCuxmlDEB6Vg=;
+	b=FKRSjiLvn2Ln+4VffUmQl0XDxeSIxlGOeo1nI+lTTswG3MAQ/5cfNxrPftOjPpq9fRqz/y
+	lF3HwGfGaiqwbCLNbqMvF0ninGDRo5Dzg5XJA90En6Y1cSSsvo7d0zmM5OQtr9fEymx08U
+	qjhsvWEy1x6ob1763lW0Wo67khvRTV4=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-152-gZKdrRQLPaqe0NACwP87bA-1; Thu, 16 Apr 2026 06:09:51 -0400
+X-MC-Unique: gZKdrRQLPaqe0NACwP87bA-1
+X-Mimecast-MFC-AGG-ID: gZKdrRQLPaqe0NACwP87bA_1776334191
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-488c2cc0cbaso45248285e9.3
+        for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 03:09:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776335266; x=1776940066; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=UPEANDp2uS/rJVgdIpcE1PpwteF+KYA4VRqUQwVyjdI=;
-        b=XGSnr5KAnSTyGIwZD0DRbo9aaiSNloKA/DewRAA90WHu9CoTf88LPZQvNJTrNqD2aL
-         W5uyGvEnyBtxmRevbHXDSAXdk+b4AmtM5cTdPq5CB86wbHNkI6erSCd4oMGqN8CK2S0x
-         ef1uOQwYPMUDq23cN8ivjTtvLK0KMH8JDGlqMX7MeLWns/wGcYcEJJA8X2SlON1OqlXI
-         11EQZDuW6+1j6V9MYeQVSRZuRciifHQM+QDDOWHBPnxsvSUWKUpV6Jrm5C6D0oFchyvF
-         QEyaucNXYujTEMP0luVAULlF96Z/ugLhxv2P/H/y4EDhZzsCxeOS5Gu3arUAeinZoTTb
-         XV3Q==
+        d=redhat.com; s=google; t=1776334190; x=1776938990; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1cV7q2j+uSEe+DAeD9qB2jVzt4SquMZBCuxmlDEB6Vg=;
+        b=c359IVp7gA11Oc3qzyHXzpH0x5bGs0Ht9uRRvmb0cgeXb1kqbpOd+oPzanNhmTpO1d
+         vdXBrCuAwrSg6Oca8GjQRpgx3rOE/T2F5ycH5E6jyTGKKQjgl72mJAKS1ntS9RDoAePy
+         k2hRL+zjH//o/KKyZD6zCYbPpv655LtvEkB+oXa1AccvFk1UDeymiLjOM1ve81vaOdNF
+         AKELMCSh/VGDzkI2a/qdg9onZpYOWlB/mVW7+1JHJwmw4usLt5x/YT9hgGbd4a2gKO2W
+         OjWfMtdu4oDWX0bt/y3IS0eKalJ32o48pb4NBEj06GsyroI4cVtspk7SQWVH98tojLHu
+         bPXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776335266; x=1776940066;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UPEANDp2uS/rJVgdIpcE1PpwteF+KYA4VRqUQwVyjdI=;
-        b=WLecjOA2k3SC86lZkkjhF7qYJVtg+xzxUBQVf9tf8FTcc0UWsGyLoYuH7ik8sFhXd/
-         qwmjLiAHQfsgrEMRgcN7VZU07jHDRXXgu0GiSjfMbp79XHLEEfaqVC+cXT9XKn6czyuN
-         vscQ2zocaJjcoY6IGqQ7gTm3wf/XC45cIjTcOZdMQMvv7fkElU3hgmps/2U41bKMZW1n
-         qsnnvyyLwhFK5L/iKhPVt3dATQguBpyXTHn2u3YD0kXoZ4HqzmrOV2OXLQdhEFOQO2pU
-         azR97zYVFL8363oWjvmL274VPyzSw5qnMFJRFF5c0o3etfntbXPL2xIvPYFKB+s6gujc
-         MR+A==
-X-Forwarded-Encrypted: i=1; AFNElJ91VDr+OVFq7u0O7HvZRZNk8Wdn/Ab+keyc6UkxD8piJQ0vHHBJxRLbv6jzWRtXsL8RNNFN2go=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy1g1/Qfi9QZ7zd1Ta71/Vfu/xlwkzTnWi4t8MQ+oAzyNeUVUmZ
-	djTdtxwCsKjXpnr06f7Zs7bbtE5ZgC5JRpoTepMV42sCKMUMis9xLX9u
-X-Gm-Gg: AeBDiet/Oq04tCaobbn8kAdoeuaJ458alN/Xh9/CtzutMwukBL5BHMOlCjJJYlbm239
-	cEWszg5n8XJ2KVvcuFjV3SulIHdUrnMkJCo61DFMGcE34qNJ8fjI8awI6SDMrVk8oYcb7yw5sun
-	/hm2V+S7rHjnDTLGUd7m0rv6yTvM0uGyYDXqHhfXSIMWkWZ4Q0CRub+mEDUg23T76YPlRWy7VyL
-	6CjfIFlqovfLkZge4ndV1IFySJgM6UE+ImnvcKrvtMIKdAirqpp9MOEwpmhEJxiNSLy/cNSAzd9
-	vGRYREVuK9/s1Yc75UvWXEfje/wFHlp1P0BNSKSfVBK+jszHe+TLBXzaY7b5Ph1uGjqR6CTXLkw
-	mgok903/3udr41erg2m26YsKmlwcFqIpibrHbmPgdoLEguflBwLXZxNT7/eaQxKWi0UcliiFlG3
-	XEhZtPS8y/V6GZoY7EWuSV+HKbrNccb+SEKP7f+MWffA/3edOEXmdOBFZEIgDr7plCB1yOc+NgZ
-	NdS8Q8EpIRp
-X-Received: by 2002:a17:90b:3d0e:b0:35f:c5cd:cc5 with SMTP id 98e67ed59e1d1-35fc5cd0f11mr10611198a91.24.1776335266245;
-        Thu, 16 Apr 2026 03:27:46 -0700 (PDT)
-Received: from SLSGDTSWING002.tail0ac356.ts.net ([129.126.109.177])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-35fce809648sm1918941a91.1.2026.04.16.03.27.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Apr 2026 03:27:45 -0700 (PDT)
-From: Weiming Shi <bestswngs@gmail.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	Weiming Shi <bestswngs@gmail.com>
-Subject: [PATCH net] slip: bound decode() reads against the compressed packet length
-Date: Thu, 16 Apr 2026 18:01:51 +0800
-Message-ID: <20260416100147.531855-5-bestswngs@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20251104; t=1776334190; x=1776938990;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1cV7q2j+uSEe+DAeD9qB2jVzt4SquMZBCuxmlDEB6Vg=;
+        b=ajoZfBxTZbMsQ25rJ4H14TiBKzOoK1yOm3hi04Oi3GCBv+PrLwz5bvzfWCf++J3sP0
+         uFRJfbvL/RJHvA93iT7X089hhvPdyYWPzuhjr0E/FiAerJV96VMX0vuVhjmH8/gJMVml
+         T/IcLOaF7F5D5Znwco7+f/5/c21TElrjW3cjacJ+/0wxDY6hzKTm4YRlNKZ/4YzqM6ZC
+         O1bsTlSEBeFf6qEEMNnlPw++jjg9PbRQ+xSEj2fjQaviIXfcr4KE2Lz4nhsfkTEJqJNF
+         x8mc4KT7CwWKPMToTrRFQO9QIq7dyO2i7EeIBV/E4RlBVqwEv22FI5MIY/wKTgVfHEGo
+         Pmdg==
+X-Forwarded-Encrypted: i=1; AFNElJ+oNEKMhHj8nirY+mToQQTHCV21YKB+Y5wqIFU9HlVqjV61s6rIJK1s5g35G32BdLiMjUB7o8k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzfYi3sl7K/r/j8natrGDIuyqqaA7NySh8enfFeUnymyRqcE1mO
+	JvEneARX6gsd9pK1eRlzPKyiK8MuPZAd/0y5qAvVI0iZoPhHMOlVGX+hrIeSMNG+OxCzuHKRG4K
+	VwaEHxYRF5xEdmN10GQ2ON6gw8z9PotWKt9IFE8cUhLAJ14W3uKSeszZTKg==
+X-Gm-Gg: AeBDieuCOqT49swJD06hnFlhhHl4Sc5iDi7fwXTsEk9yx0ODn+BsJZmR5T5aoUQTdTq
+	1g5dTALwTl3xqKcCtqk5o0/raQ7zyLxvttyOjq9RIIgD3NH7c9mrgJtYWNsDpKI9zSx8MO39GBM
+	xjlJoQf2nMyXRaLNo4qqcjGIH1qNKM3mhFH9Yol2ZKldBFLsEt/LD5QPjnyIeJxbA+2trSoZUOA
+	cvgq2dNNxomw9JhnTtEJEPYkNMBj+xkDFUNoiEQiLRGceYioGWJtyJ+DY7UDCrCAAwSNdolaMXg
+	9dTo8i75pr7Q3cdxIEiItrBsU7TQP6YcL4K9sVy/XCljaNSRQhSLXm91Wbq2ZwWdU3AvaCTTdkH
+	Io5gtLB0N2+ry0B67Ww+xpXJhol2eHhuz99G+ZWpeFaYCP5nThGwG95JEnWzNqDNVKuU=
+X-Received: by 2002:a05:600c:3b24:b0:488:aa33:dcbd with SMTP id 5b1f17b1804b1-488d687a645mr349028125e9.26.1776334190392;
+        Thu, 16 Apr 2026 03:09:50 -0700 (PDT)
+X-Received: by 2002:a05:600c:3b24:b0:488:aa33:dcbd with SMTP id 5b1f17b1804b1-488d687a645mr349027665e9.26.1776334189852;
+        Thu, 16 Apr 2026 03:09:49 -0700 (PDT)
+Received: from [192.168.88.32] ([150.228.93.122])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488f5813665sm43475935e9.2.2026.04.16.03.09.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Apr 2026 03:09:49 -0700 (PDT)
+Message-ID: <d49d5804-96b8-4e84-b693-b51a7e1cca15@redhat.com>
+Date: Thu, 16 Apr 2026 12:09:47 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: dsa: sja1105: fix division by zero in
+ sja1105_tas_set_runtime_params()
+To: Alexander.Chesnokov@kaspersky.com, olteanv@gmail.com
+Cc: lvc-project@linuxtesting.org, Oleg.Kazakov@kaspersky.com,
+ Pavel.Zhigulin@kaspersky.com, stable@vger.kernel.org,
+ Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20260413085140.33138-1-Alexander.Chesnokov@kaspersky.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20260413085140.33138-1-Alexander.Chesnokov@kaspersky.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-278986-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[kaspersky.com,gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278990-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[linuxtesting.org,kaspersky.com,vger.kernel.org,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	NEURAL_HAM(-0.00)[-0.996];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E730140CEA8
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[kaspersky.com:email,linuxtesting.org:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: DD7D340CC11
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-slhc_uncompress() parses a VJ-compressed TCP header by advancing a
-pointer through the packet via decode() and pull16(). Neither helper
-bounds-checks against isize, and decode() masks its return with
-& 0xffff so it can never return the -1 that callers test for -- those
-error paths are dead code.
+On 4/13/26 10:51 AM, Alexander.Chesnokov@kaspersky.com wrote:
+> From: Alexander Chesnokov <Alexander.Chesnokov@kaspersky.com>
+> 
+> If taprio offload is configured such that none of the ports' base_time
+> is less than S64_MAX (the initial value of earliest_base_time), then
+> its_cycle_time remains zero and is passed to future_base_time() as
+> cycle_time, causing division by zero in div_s64().
+> 
+> Add a check for its_cycle_time being zero before calling
+> future_base_time() and return -EINVAL.
+> 
+> Found by Linux Verification Center (linuxtesting.org) with SVACE.
+> 
+> Fixes: 86db36a347b4 ("net: dsa: sja1105: Implement state machine for TAS with PTP clock source")
+> Cc: stable@vger.kernel.org
+> 
 
-A short compressed frame whose change byte requests optional fields
-lets decode() read past the end of the packet. The over-read bytes
-are folded into the cached cstate and reflected into subsequent
-reconstructed packets.
+No empty lines in the tag area.
 
-Make decode() and pull16() take the packet end pointer and return -1
-when exhausted. Add a bounds check before the TCP-checksum read.
-The existing == -1 tests now do what they were always meant to.
+> Signed-off-by: Alexander Chesnokov <Alexander.Chesnokov@kaspersky.com>
+> ---
+>  drivers/net/dsa/sja1105/sja1105_tas.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/drivers/net/dsa/sja1105/sja1105_tas.c b/drivers/net/dsa/sja1105/sja1105_tas.c
+> index e6153848a950..ce4b544a2b9c 100644
+> --- a/drivers/net/dsa/sja1105/sja1105_tas.c
+> +++ b/drivers/net/dsa/sja1105/sja1105_tas.c
+> @@ -62,6 +62,9 @@ static int sja1105_tas_set_runtime_params(struct sja1105_private *priv)
+>  	if (!tas_data->enabled)
+>  		return 0;
+>  
+> +	if (!its_cycle_time)
+> +		return -EINVAL;
 
-Fixes: b5451d783ade ("slip: Move the SLIP drivers")
-Reported-by: Simon Horman <horms@kernel.org>
-Closes: https://lore.kernel.org/netdev/20260414134126.758795-2-horms@kernel.org/
-Signed-off-by: Weiming Shi <bestswngs@gmail.com>
----
- drivers/net/slip/slhc.c | 43 ++++++++++++++++++++++++-----------------
- 1 file changed, 25 insertions(+), 18 deletions(-)
+Sashiko says:
 
-diff --git a/drivers/net/slip/slhc.c b/drivers/net/slip/slhc.c
-index e3c785da3eef3..d1c0523085d3a 100644
---- a/drivers/net/slip/slhc.c
-+++ b/drivers/net/slip/slhc.c
-@@ -80,9 +80,9 @@
- #include <linux/unaligned.h>
- 
- static unsigned char *encode(unsigned char *cp, unsigned short n);
--static long decode(unsigned char **cpp);
-+static long decode(unsigned char **cpp, const unsigned char *end);
- static unsigned char * put16(unsigned char *cp, unsigned short x);
--static unsigned short pull16(unsigned char **cpp);
-+static long pull16(unsigned char **cpp, const unsigned char *end);
- 
- /* Allocate compression data structure
-  *	slots must be in range 0 to 255 (zero meaning no compression)
-@@ -190,30 +190,34 @@ encode(unsigned char *cp, unsigned short n)
- 	return cp;
- }
- 
--/* Pull a 16-bit integer in host order from buffer in network byte order */
--static unsigned short
--pull16(unsigned char **cpp)
-+/* Pull a 16-bit integer in host order from buffer in network byte order.
-+ * Returns -1 if the buffer is exhausted, otherwise the 16-bit value.
-+ */
-+static long
-+pull16(unsigned char **cpp, const unsigned char *end)
- {
--	short rval;
-+	long rval;
- 
-+	if (*cpp + 2 > end)
-+		return -1;
- 	rval = *(*cpp)++;
- 	rval <<= 8;
- 	rval |= *(*cpp)++;
- 	return rval;
- }
- 
--/* Decode a number */
-+/* Decode a number. Returns -1 if the buffer is exhausted. */
- static long
--decode(unsigned char **cpp)
-+decode(unsigned char **cpp, const unsigned char *end)
- {
- 	int x;
- 
-+	if (*cpp >= end)
-+		return -1;
- 	x = *(*cpp)++;
--	if(x == 0){
--		return pull16(cpp) & 0xffff;	/* pull16 returns -1 on error */
--	} else {
--		return x & 0xff;		/* -1 if PULLCHAR returned error */
--	}
-+	if (x == 0)
-+		return pull16(cpp, end);
-+	return x & 0xff;
- }
- 
- /*
-@@ -499,6 +503,7 @@ slhc_uncompress(struct slcompress *comp, unsigned char *icp, int isize)
- 	struct cstate *cs;
- 	int len, hdrlen;
- 	unsigned char *cp = icp;
-+	const unsigned char *end = icp + isize;
- 
- 	/* We've got a compressed packet; read the change byte */
- 	comp->sls_i_compressed++;
-@@ -534,6 +539,8 @@ slhc_uncompress(struct slcompress *comp, unsigned char *icp, int isize)
- 	thp = &cs->cs_tcp;
- 	ip = &cs->cs_ip;
- 
-+	if (cp + 2 > end)
-+		goto bad;
- 	thp->check = *(__sum16 *)cp;
- 	cp += 2;
- 
-@@ -564,26 +571,26 @@ slhc_uncompress(struct slcompress *comp, unsigned char *icp, int isize)
- 	default:
- 		if(changes & NEW_U){
- 			thp->urg = 1;
--			if((x = decode(&cp)) == -1) {
-+			if((x = decode(&cp, end)) == -1) {
- 				goto bad;
- 			}
- 			thp->urg_ptr = htons(x);
- 		} else
- 			thp->urg = 0;
- 		if(changes & NEW_W){
--			if((x = decode(&cp)) == -1) {
-+			if((x = decode(&cp, end)) == -1) {
- 				goto bad;
- 			}
- 			thp->window = htons( ntohs(thp->window) + x);
- 		}
- 		if(changes & NEW_A){
--			if((x = decode(&cp)) == -1) {
-+			if((x = decode(&cp, end)) == -1) {
- 				goto bad;
- 			}
- 			thp->ack_seq = htonl( ntohl(thp->ack_seq) + x);
- 		}
- 		if(changes & NEW_S){
--			if((x = decode(&cp)) == -1) {
-+			if((x = decode(&cp, end)) == -1) {
- 				goto bad;
- 			}
- 			thp->seq = htonl( ntohl(thp->seq) + x);
-@@ -591,7 +598,7 @@ slhc_uncompress(struct slcompress *comp, unsigned char *icp, int isize)
- 		break;
- 	}
- 	if(changes & NEW_I){
--		if((x = decode(&cp)) == -1) {
-+		if((x = decode(&cp, end)) == -1) {
- 			goto bad;
- 		}
- 		ip->id = htons (ntohs (ip->id) + x);
--- 
-2.43.0
+Is this division by zero reachable without this check?
+When all ports have base_time == S64_MAX, earliest_base_time and
+latest_base_time are both S64_MAX. When future_base_time(S64_MAX, 0,
+S64_MAX) is called, it returns early because base_time >= now (S64_MAX
+>= S64_MAX), avoiding the division.
+Could this new error path cause an actual division by zero later?
+When returning -EINVAL here, tas_data->enabled is already set to true,
+but tas_data->max_cycle_time is left uninitialized (0).
+If sja1105_tas_state_machine() runs later, it will pass this
+max_cycle_time as the cycle_time argument to future_base_time(). Since 0
+>= now + 1s is false, it proceeds to call div_s64() with a zero divisor.
+
+/P
 
 
