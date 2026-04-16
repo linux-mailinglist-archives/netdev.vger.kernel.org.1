@@ -1,208 +1,140 @@
-Return-Path: <netdev+bounces-278943-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278944-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qFFKAj+A4GlJiQAAu9opvQ
-	(envelope-from <netdev+bounces-278943-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 08:22:55 +0200
+	id sE3PCoqA4GmdiQAAu9opvQ
+	(envelope-from <netdev+bounces-278944-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 08:24:10 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BDA740AA0F
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 08:22:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BC09440AA45
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 08:24:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 26F6E307AA6C
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 06:20:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E895131335D1
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 06:22:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EFC135F5E4;
-	Thu, 16 Apr 2026 06:20:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36CF9378D9E;
+	Thu, 16 Apr 2026 06:22:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="R//Cr3VV"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="JGlQOhpC";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="DYCNXtQa"
 X-Original-To: netdev@vger.kernel.org
-Received: from www537.your-server.de (www537.your-server.de [188.40.3.216])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BB4919D8BC
-	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 06:20:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.40.3.216
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE25C3E47B;
+	Thu, 16 Apr 2026 06:22:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776320428; cv=none; b=IiRYSkif1hzCyToNXL1lzDxCeqK7vNSrzPqXvdkj4ucYU9a+eq/qwVsqyCplco1CTkX/Xl1spWYCVUxtkgF119F82HRMWhXHuI3uCdFs+XSTu6k/20zoEIYxkpojxfjR4HLFfXgeFxp96L6yYYxmjYm7gCJgNynbqP/PmGLHWcE=
+	t=1776320530; cv=none; b=KMFmJ/wbr6VHa11DBik+8ZHT6fBAFhSpfF0kiznGknsHZQi8PsbAgrR8aOC3vPcilKzHN3ilnlikeCmzuRuO+n0h2fIfcI54ElY4FI1MBv6ODZkgmPkFbspPqb/EpX1LI9ZBeCDebnz+auhVeDe8H/YyGz69gTYRxjoEWNSzRjk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776320428; c=relaxed/simple;
-	bh=bh8msoz4EI4a/BdUDMFy3bVSmNNJFCpl0CsanK230Ts=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oU6NZ4+nwSXN5QnaxXsZThXVCpFrugmqMMBPMd//6tswwtmJgHtemAy5Ue75PE1oF5qaZNstUV1rr9Fpe7qlHaC+KrbusoCZ4tz37N7inuA75GjixMbbpvM886yjIqq/+EPjUXnamZzoORR2koOwTt3MA42p0B8+xZkbzxeDhLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=R//Cr3VV; arc=none smtp.client-ip=188.40.3.216
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ew.tq-group.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=ew.tq-group.com; s=default2602; h=Content-Type:Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=QVEWApQ8SGzvLOzKWrNmtTuBW8dEI9SRhim1vQtgHE4=; b=R//Cr3VV3lQasZ26REI5zhDcVn
-	v2b0sJZIvov1K3dg/i6Mbv2ra5hbvuM4Kn7jhhiynrNDyeyUWf2kQArF2zxZo0iMAQahMd3fDQShK
-	XBtyVxMXMzJKXAuDMTeZAw4SRrqDPiGUOXAWCJiQLZVDZ7mwPt7/m0I/967IM177d+hrj9UglRasE
-	hSk525hrA9eRobjS535sMqEu+eyU8VbObLJ5XvgCwbUM6yp/TI8p+rbBF4BAWTm7fAQhymLZFAOPK
-	XABd8Vltp37V3mjgBRNu4UEUvILxywBP8r5AWchJ16yhhzRnZKFwNUx+L40V3E+rkfW1sLb7Ffpbd
-	ZvF4K7Ug==;
-Received: from sslproxy06.your-server.de ([78.46.172.3])
-	by www537.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <alexander.stein@ew.tq-group.com>)
-	id 1wDG5G-000Fp1-21;
-	Thu, 16 Apr 2026 08:20:14 +0200
-Received: from localhost ([127.0.0.1])
-	by sslproxy06.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <alexander.stein@ew.tq-group.com>)
-	id 1wDG4i-000Oj6-2s;
-	Thu, 16 Apr 2026 08:20:14 +0200
-From: Alexander Stein <alexander.stein@ew.tq-group.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- linux-arm-kernel@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
- Paolo Abeni <pabeni@redhat.com>
-Subject:
- Re: [PATCH net-next 5/6] net: stmmac: move PHY handling out of
- __stmmac_open()/release()
-Date: Thu, 16 Apr 2026 08:20:13 +0200
-Message-ID: <5987484.DvuYhMxLoT@steina-w>
-Organization: TQ-Systems GmbH
-In-Reply-To: <ad-LtOBrKREM1tCk@shell.armlinux.org.uk>
-References:
- <aNKDqqI7aLsuDD52@shell.armlinux.org.uk> <8409022.LvFx2qVVIh@steina-w>
- <ad-LtOBrKREM1tCk@shell.armlinux.org.uk>
+	s=arc-20240116; t=1776320530; c=relaxed/simple;
+	bh=L03K7wgv0HG3lp+inFLDMx7vtTcPsOMgCaTopreSxt8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WzCjWbzm9dWXwtkLF2+AOMC5Smuzws0iysUIR71lc8Ctu+xf++AjKBT6WsGU5eY3u/z9cV8JEFKh93oMHkFwdqwZfZaKJSH8Omz1EB8I3FCH+k8JA7lq2pQJ5uqPJFXUu0bdoMGeQDlmjCWQfPX0FbmGMLmJbVQ6mBc4b6hY4Ks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=JGlQOhpC; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=DYCNXtQa; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Thu, 16 Apr 2026 08:21:59 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1776320520;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=L03K7wgv0HG3lp+inFLDMx7vtTcPsOMgCaTopreSxt8=;
+	b=JGlQOhpCttHrTVGoh/Gin7OP8xVbnJaZ1oa0t6/Ob6aAUCHkGmfPDsDcqUy7GdW8tiX164
+	ChpFaKfFqd3iPIKHvPNZqcv7bOYnzTmubn6QvPkhVnNigsNnvIN3RvUnYAu9AK6B6IlocY
+	I829e9tkcSA8oSDuMBeBfSXU9gxeY5uHMMLU6wQ7WvgSoNbcoTdnYjD9M6xioW/gM3c3+P
+	XHRhKPGozlxtCiTz3T4wdBzaRVDGdqQ3SfhN19kq8kGmG7AUBIEe2Tk0haryeIba/TDEWo
+	lBOkgjanZWmBJzxFdnN1+YXSB1s9/sqRhLYvFy3T6QVqLbIbUEOY+cg3xIrCqg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1776320520;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=L03K7wgv0HG3lp+inFLDMx7vtTcPsOMgCaTopreSxt8=;
+	b=DYCNXtQaJi3GaDQgG8vnwfptTcyYwoS89pEjawunYcmF2OUGGXhIAQU196GqugZlqe8Pgl
+	VXHAebvshabDOqBg==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Marek Vasut <marex@nabladev.com>
+Cc: netdev@vger.kernel.org, stable@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Nicolai Buchwitz <nb@tipi-net.de>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Ronald Wahl <ronald.wahl@raritan.com>,
+	Yicong Hui <yiconghui@gmail.com>, linux-kernel@vger.kernel.org
+Subject: Re: [net,PATCH v3 1/2] net: ks8851: Reinstate disabling of BHs
+ around IRQ handler
+Message-ID: <20260416062159.fPxqc52X@linutronix.de>
+References: <20260414103327.113500-1-marex@nabladev.com>
+ <20260414125753.Im6GAIHn@linutronix.de>
+ <2fcfb84f-69f6-493e-94d6-95d85d8000f6@nabladev.com>
+ <20260414145218.lsNpdAJI@linutronix.de>
+ <7734527a-d08b-49fa-b258-c37c5ae2da55@nabladev.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="iso-8859-1"
-X-Virus-Scanned: Clear (ClamAV 1.4.3/27972/Wed Apr 15 08:24:27 2026)
-X-Spamd-Result: default: False [-0.16 / 15.00];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <7734527a-d08b-49fa-b258-c37c5ae2da55@nabladev.com>
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[ew.tq-group.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[ew.tq-group.com:s=default2602];
+	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
+	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-278943-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-278944-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	HAS_ORG_HEADER(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	ASN_FAIL(0.00)[1.2.3.5.c.f.2.1.0.0.0.0.0.0.0.0.b.d.0.0.1.0.0.e.a.0.c.3.0.0.6.2.asn6.rspamd.com:server fail];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,foss.st.com,davemloft.net,google.com,kernel.org,lists.infradead.org,st-md-mailman.stormreply.com,vger.kernel.org,redhat.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alexander.stein@ew.tq-group.com,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[ew.tq-group.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[linutronix.de:+];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,lunn.ch,google.com,kernel.org,tipi-net.de,redhat.com,raritan.com,gmail.com];
+	MID_RHS_MATCH_FROM(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 9BDA740AA0F
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linutronix.de:dkim,linutronix.de:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: BC09440AA45
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Am Mittwoch, 15. April 2026, 14:59:32 CEST schrieb Russell King (Oracle):
-> On Wed, Apr 15, 2026 at 08:08:40AM +0200, Alexander Stein wrote:
-> > Hi,
-> >=20
-> > Am Dienstag, 23. September 2025, 13:26:19 CEST schrieb Russell King (Or=
-acle):
-> > > Move the PHY attachment/detachment from the network driver out of
-> > > __stmmac_open() and __stmmac_release() into stmmac_open() and
-> > > stmmac_release() where these actions will only happen when the
-> > > interface is administratively brought up or down. It does not make
-> > > sense to detach and re-attach the PHY during a change of MTU.
-> >=20
-> > Sorry for coming up now. But I recently noticed this commit breaks chan=
-ging
-> > the MTU on i.MX8MP. Once I simply change the MTU I run into some DMA er=
-ror:
-> > $ ip link set dev end1 mtu 1400
-> > imx-dwmac 30bf0000.ethernet end1: Register MEM_TYPE_PAGE_POOL RxQ-0
-> > imx-dwmac 30bf0000.ethernet end1: Register MEM_TYPE_PAGE_POOL RxQ-1
-> > imx-dwmac 30bf0000.ethernet end1: Register MEM_TYPE_PAGE_POOL RxQ-2
-> > imx-dwmac 30bf0000.ethernet end1: Register MEM_TYPE_PAGE_POOL RxQ-3
-> > imx-dwmac 30bf0000.ethernet end1: Register MEM_TYPE_PAGE_POOL RxQ-4
-> > imx-dwmac 30bf0000.ethernet end1: Link is Down
-> > imx-dwmac 30bf0000.ethernet end1: Failed to reset the dma
-> > imx-dwmac 30bf0000.ethernet end1: stmmac_hw_setup: DMA engine initializ=
-ation failed
->=20
-> This basically means that a clock is missing. Please provide more
-> information:
->=20
-> - what kernel version are you using?
+On 2026-04-16 01:14:35 [+0200], Marek Vasut wrote:
+> > spin_unlock_bh(&ks->statelock)? After that unlock, the softirq must be
+> > processed and __netdev_alloc_skb() _could_ observe pending softirqs but
+> > not from ks8851.
+> Because __netdev_alloc_skb() also enables/disables BH , see the "else"
 
-Currently I am using v6.18.22.
-$ ethtool -i end1
-driver: st_gmac
-version: 6.18.22
-firmware-version:=20
-expansion-rom-version:=20
-bus-info: 30bf0000.ethernet
-supports-statistics: yes
-supports-test: no
-supports-eeprom-access: no
-supports-register-dump: yes
-supports-priv-flags: no
+Yes. But there is no softirq raised in that part. That softirq is raised
+by netif_wake_queue() within a bh disabled section. Therefore upon the
+unlock the softirq must be invoked.
+After that, rhe allocation later on may invoke softirqs which were
+raised but I don't see how ks8851 can be part of it.
+Before commit 0913ec336a6c0 ("net: ks8851: Fix deadlock with the SPI
+chip variant") there was no _bh around it meaning the softirq was raised
+but not invoked immediately. This happened on the bh unlock during
+memory allocation. Therefore I am saying this backtrace is from an older
+kernel.
 
-> - has EEE been negotiated?
+If there is a flaw in my the theory please explain _how_ you managed
+that get that backtrace. I am sure it must have from an older kernel and
+_now_ this lockup also happens on !RT kernels (except for the SPI
+platform).
 
-No. It is marked as not supported
-
-$ ethtool --show-eee end1
-EEE settings for end1:
-        EEE status: not supported
-
-> - does the problem persist when EEE is disabled?
-
-As EEE is not supported the problem occurs even with EEE disabled.
-
-> - which PHY is attached to stmmac?
-
-It is a TI DP83867.
-
-imx-dwmac 30bf0000.ethernet eth1: PHY [stmmac-1:03] driver [TI DP83867] (ir=
-q=3D136)
-
-> - which PHY interface mode is being used to connect the PHY to stmmac?
-
-=46or this interface
-> phy-mode =3D "rgmii-id";
-is set.
-
-In case it is helpful. My platform is arch/arm64/boot/dts/freescale/imx8mp-=
-tqma8mpql-mba8mpxl.dts
-Thanks for assisting. If there a further questions, don't hesitate to ask.
-
-Thanks and best regards
-Alexander
-=2D-=20
-TQ-Systems GmbH | M=FChlstra=DFe 2, Gut Delling | 82229 Seefeld, Germany
-Amtsgericht M=FCnchen, HRB 105018
-Gesch=E4ftsf=FChrer: Detlef Schneider, R=FCdiger Stahl, Stefan Schneider
-http://www.tq-group.com/
-
-
-
+Sebastian
 
