@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-279175-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279176-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8AOhH5ll4WlyswAAu9opvQ
-	(envelope-from <netdev+bounces-279175-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 00:41:29 +0200
+	id gMOFNqFl4WlyswAAu9opvQ
+	(envelope-from <netdev+bounces-279176-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 00:41:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C76641548C
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 00:41:29 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8714C415493
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 00:41:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 46E593087748
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 22:41:03 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 48020306FF57
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 22:41:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF5AD3932C2;
-	Thu, 16 Apr 2026 22:40:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCD5738E5C5;
+	Thu, 16 Apr 2026 22:41:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b="RCK1HdBg"
+	dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b="MpN50Jyr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-4322.protonmail.ch (mail-4322.protonmail.ch [185.70.43.22])
+Received: from mail-244121.protonmail.ch (mail-244121.protonmail.ch [109.224.244.121])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 786663876C4;
-	Thu, 16 Apr 2026 22:40:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F1B9382396;
+	Thu, 16 Apr 2026 22:41:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.121
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776379253; cv=none; b=F0dNzm9+mzc5mN23lNz6lU5/+HIOa7WH1Erq6IxtccbxrkI0ibcuYX8DAEerfB+9KEPavXKa5PyvqUTQXAFbaS6Yd59iDn3vHqgoMv+GGb2NkWkuS/CAC64IQLeDPl2h96UCt+W28DL7Cyppys/dk+nqFqfWwTG6eZgtn1q+D3A=
+	t=1776379263; cv=none; b=aWWBRjO6rSCARB1bIUX+HU5nkmebiOk9nrftB8UPO3NyvAyZdrybhWEvDBzlKiBUyf121jZskg0loziJn9Uq8XiQD3o0ml1BHXzS4V05s0JSpaJ6SSgE9VBDrecs7duQQDq/qdYgPfnaGKBkFTZmOniwJGCNEHdHWqQYyaT/W14=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776379253; c=relaxed/simple;
-	bh=sC+zcrByO+PGlqBAQ8rYqYYaIL1rr++mYDDrX4PXZgs=;
+	s=arc-20240116; t=1776379263; c=relaxed/simple;
+	bh=nHmEjiaEYFAIVEc4iIy6Jn/r7ND952ytTcb3N2rDNvE=;
 	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=H+onEJEA7u2vI35gfkOT4bPPwiZcs/ADvGajc7fvr57HNOLm5bBKr2ly0JCfzJgW65jyxNrIFRXtWXTxsoWs8CGNHZ0Y6PTX70yoAvdCeIQr1ZTDUXVaSSZUYKdkvgZvLKaVeuDKWdZC9RbKmYzFlK30GnyJS3jYCPfEgt4I0eE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me; spf=pass smtp.mailfrom=pm.me; dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b=RCK1HdBg; arc=none smtp.client-ip=185.70.43.22
+	 MIME-Version:Content-Type; b=UjyX7O9Hdtc9X6F9ArU25RkEGNfMjGZne5Wjun+0bNgS+VgXk8a2DqRQbTxG/B8iz+GDJ2k0JXLVbfzUCX0DuZRT4A2hpGtyoDOcyaMPvlctIS33eKowV4+sBv6Wy2umbinJ1cr3fLPMrvZuNu6aQ3rkTyvUzAXE7ByedPGaSlo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me; spf=pass smtp.mailfrom=pm.me; dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b=MpN50Jyr; arc=none smtp.client-ip=109.224.244.121
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pm.me
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pm.me;
-	s=protonmail3; t=1776379250; x=1776638450;
-	bh=+hcirqWTitm0iG+vWSxCcCrg9AcXPeBecN4cQG5hBU0=;
+	s=protonmail3; t=1776379259; x=1776638459;
+	bh=o0AMJv9mAwYEESX7/0Q0ql9BjisVYh0Mr/rNKfBIFWk=;
 	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
 	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
 	 Message-ID:BIMI-Selector;
-	b=RCK1HdBgleK7OAkuLRCOP6pIHQVCGyf+HYKXEmAOCrBdVLq4MoJZY9KIrwsEByXjm
-	 xWQsUeQWBG09dTeGHYfYDEqIHPiKZcNR/2r+hShkyihRPcWFsvtFQUaor4U8vIqfoe
-	 5beR5ELzUD3LyExV48e/RTHsiGr3lwxg0qyShXHHXBJxXRR9rHV+JRgtf9Zj8BXdIg
-	 Ff0heUIb0kGTzfBjpYzRCxHbcNAPuC2hlso11kKyTku8GKgo6Jik4zwvNNGz6fdszz
-	 LVTH3dBD1/s48ofVYpAi2dAYQCpzk57vGTjqIVSqYrbxZn1AaDDOqlJvnjy2sMmABZ
-	 10VeXGHNxRJ0g==
-Date: Thu, 16 Apr 2026 22:40:48 +0000
+	b=MpN50Jyr9Mn2xANj8zghyNjFShSrzKuw7nLTdRSwt6DYcVfhApn/IqnHMSC1rLDmC
+	 cNi1LN2PW/TkQHp9j3rbIrzX593qmD0uttxNtSLN1ZJvsDwLmnNTN0hCnQDL97nb/u
+	 iLSPjTeq9Nd9/TDIgwhXgDeFUjmn6J6tn7rwKL96HYTRlos+n8Vz5ZTJfRlJxoxOCo
+	 1TKoeVNoTrEB9n+HjbNNwm2zVVhwr9xYFPK68pPT0NSYoZ9AacYacH0iBbws3fd/QW
+	 V057CsTfGetkg2hFB/YRBcVOzvkMg8bw4LzFnoZhDlTNiaZNVeYcEullpcz3aPHejS
+	 de5HKOw8V2nbQ==
+Date: Thu, 16 Apr 2026 22:40:55 +0000
 To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Alex Elder <elder@kernel.org>
 From: Alexander Koskovich <akoskovich@pm.me>
 Cc: linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, Alexander Koskovich <akoskovich@pm.me>
-Subject: [PATCH RFC 1/4] dt-bindings: net: qcom,ipa: document Eliza compatible
-Message-ID: <20260416-eliza-ipa-v1-1-f4109a8e43c4@pm.me>
+Subject: [PATCH RFC 2/4] net: ipa: fix IPA v5.5 configuration data
+Message-ID: <20260416-eliza-ipa-v1-2-f4109a8e43c4@pm.me>
 In-Reply-To: <20260416-eliza-ipa-v1-0-f4109a8e43c4@pm.me>
 References: <20260416-eliza-ipa-v1-0-f4109a8e43c4@pm.me>
 Feedback-ID: 37836894:user:proton
-X-Pm-Message-ID: b1235ab0014dab494a1ff26196651d0f34457f5b
+X-Pm-Message-ID: 2b8256ccebaa33980c3767e22e9f09f664f9440a
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,12 +69,12 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[pm.me,quarantine];
 	R_DKIM_ALLOW(-0.20)[pm.me:s=protonmail3];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279175-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-279176-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[3];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -87,37 +87,111 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[akoskovich@pm.me,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[pm.me:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev,dt];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3C76641548C
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 8714C415493
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Document the IPA on the Eliza Platform which uses version 5.5.1,
-which is a minor revision of v5.5 found on SM8550, thus we can
-use the SM8550 bindings as fallback since it shares the same
-register mappings.
+struct ipa_qmb_outstanding {
+        u16 ot_reads;
+        u16 ot_writes;
+        u16 ot_read_beats;
+};
+[IPA_5_5][IPA_QMB_INSTANCE_DDR] =3D {16, 12, 0},
+[IPA_5_5][IPA_QMB_INSTANCE_PCIE] =3D {16, 8, 0},
+
+IPA_ENDPOINT_AP_LAN_RX:
+        [IPA_5_5][IPA_CLIENT_APPS_LAN_CONS] =3D {
+                        true, IPA_v5_5_GROUP_UL,
+                        false,
+                        IPA_DPS_HPS_SEQ_TYPE_INVALID,
+                        QMB_MASTER_SELECT_DDR,
+                        { 17, 14, 9, 9, IPA_EE_AP, GSI_ESCAPE_BUF_ONLY, 0  =
+     },
+                        IPA_TX_INSTANCE_UL },
+
+IPA_ENDPOINT_AP_MODEM_RX:
+        [IPA_5_5][IPA_CLIENT_APPS_WAN_CONS] =3D {
+                        true, IPA_v5_5_GROUP_DL,
+                        false,
+                        IPA_DPS_HPS_SEQ_TYPE_INVALID,
+                        QMB_MASTER_SELECT_DDR,
+                        { 24, 1, 9, 9, IPA_EE_AP, GSI_SMART_PRE_FETCH, 3   =
+     },
+                        IPA_TX_INSTANCE_DL },
+
+IPA_ENDPOINT_MODEM_AP_RX:
+        [IPA_5_5][IPA_CLIENT_Q6_WAN_CONS]         =3D {
+                        true, IPA_v5_5_GROUP_UL,
+                        false,
+                        IPA_DPS_HPS_SEQ_TYPE_INVALID,
+                        QMB_MASTER_SELECT_DDR,
+                        { 22, 7, 9, 9, IPA_EE_Q6, GSI_ESCAPE_BUF_ONLY, 0 },
+                        IPA_TX_INSTANCE_UL },
 
 Signed-off-by: Alexander Koskovich <akoskovich@pm.me>
 ---
- Documentation/devicetree/bindings/net/qcom,ipa.yaml | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/net/ipa/data/ipa_data-v5.5.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/net/qcom,ipa.yaml b/Document=
-ation/devicetree/bindings/net/qcom,ipa.yaml
-index fdeaa81b9645..38a5a337c34f 100644
---- a/Documentation/devicetree/bindings/net/qcom,ipa.yaml
-+++ b/Documentation/devicetree/bindings/net/qcom,ipa.yaml
-@@ -60,6 +60,7 @@ properties:
-           - const: qcom,sc7180-ipa
-       - items:
-           - enum:
-+              - qcom,eliza-ipa
-               - qcom,sm8650-ipa
-           - const: qcom,sm8550-ipa
-=20
+diff --git a/drivers/net/ipa/data/ipa_data-v5.5.c b/drivers/net/ipa/data/ip=
+a_data-v5.5.c
+index 741ae21d9d78..f6ba3b944700 100644
+--- a/drivers/net/ipa/data/ipa_data-v5.5.c
++++ b/drivers/net/ipa/data/ipa_data-v5.5.c
+@@ -50,13 +50,13 @@ enum ipa_rsrc_group_id {
+ /* QSB configuration data for an SoC having IPA v5.5 */
+ static const struct ipa_qsb_data ipa_qsb_data[] =3D {
+ =09[IPA_QSB_MASTER_DDR] =3D {
+-=09=09.max_writes=09=09=3D 0,=09/* Unlimited */
+-=09=09.max_reads=09=09=3D 12,
++=09=09.max_writes=09=09=3D 12,
++=09=09.max_reads=09=09=3D 0,=09/* Unlimited */
+ =09=09.max_reads_beats=09=3D 0,
+ =09},
+ =09[IPA_QSB_MASTER_PCIE] =3D {
+-=09=09.max_writes=09=09=3D 0,=09/* Unlimited */
+-=09=09.max_reads=09=09=3D 8,
++=09=09.max_writes=09=09=3D 8,
++=09=09.max_reads=09=09=3D 0,=09/* Unlimited */
+ =09=09.max_reads_beats=09=3D 0,
+ =09},
+ };
+@@ -86,8 +86,8 @@ static const struct ipa_gsi_endpoint_data ipa_gsi_endpoin=
+t_data[] =3D {
+ =09},
+ =09[IPA_ENDPOINT_AP_LAN_RX] =3D {
+ =09=09.ee_id=09=09=3D GSI_EE_AP,
+-=09=09.channel_id=09=3D 13,
+-=09=09.endpoint_id=09=3D 16,
++=09=09.channel_id=09=3D 14,
++=09=09.endpoint_id=09=3D 17,
+ =09=09.toward_ipa=09=3D false,
+ =09=09.channel =3D {
+ =09=09=09.tre_count=09=3D 256,
+@@ -135,7 +135,7 @@ static const struct ipa_gsi_endpoint_data ipa_gsi_endpo=
+int_data[] =3D {
+ =09[IPA_ENDPOINT_AP_MODEM_RX] =3D {
+ =09=09.ee_id=09=09=3D GSI_EE_AP,
+ =09=09.channel_id=09=3D 1,
+-=09=09.endpoint_id=09=3D 23,
++=09=09.endpoint_id=09=3D 24,
+ =09=09.toward_ipa=09=3D false,
+ =09=09.channel =3D {
+ =09=09=09.tre_count=09=3D 256,
+@@ -168,7 +168,7 @@ static const struct ipa_gsi_endpoint_data ipa_gsi_endpo=
+int_data[] =3D {
+ =09[IPA_ENDPOINT_MODEM_AP_RX] =3D {
+ =09=09.ee_id=09=09=3D GSI_EE_MODEM,
+ =09=09.channel_id=09=3D 7,
+-=09=09.endpoint_id=09=3D 21,
++=09=09.endpoint_id=09=3D 22,
+ =09=09.toward_ipa=09=3D false,
+ =09},
+ =09[IPA_ENDPOINT_MODEM_DL_NLO_TX] =3D {
 
 --=20
 2.53.0
