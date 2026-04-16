@@ -1,175 +1,227 @@
-Return-Path: <netdev+bounces-279131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279132-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6G5tGHUz4Wm4qQAAu9opvQ
-	(envelope-from <netdev+bounces-279131-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 21:07:33 +0200
+	id wLwWEoA04WkEqgAAu9opvQ
+	(envelope-from <netdev+bounces-279132-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 21:12:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FB8A413FB0
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 21:07:32 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B9FC413FEE
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 21:11:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 755DB305F7F1
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 19:06:33 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 41425301A3D1
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 19:11:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3252930F927;
-	Thu, 16 Apr 2026 19:06:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB84C34A76B;
+	Thu, 16 Apr 2026 19:11:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="uYpWJ3Av"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="avrXiipw"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6D282FF672
-	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 19:06:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7637032D452;
+	Thu, 16 Apr 2026 19:11:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776366392; cv=none; b=T1yhgEz4MOnp3gXpYYjxrna7iGLqK4uK43rErc8TNZH7Lw56kIguU17W3cekpZfUtM2LqjaxbLK8Sz30ngc3T6A5V3UNKlgCIeDS3Gn5zEMEtYRuqg772174+1oURCGtEAqko0LQIxNBaPVt1H49VAeDOb67qNTCIkGrR7RTFhQ=
+	t=1776366714; cv=none; b=bGWjKdXDrwT6uRKWQZkjL1AeTL74l7KkgFgE/Pc9zvyqr5MCf7Y2nnB0QG2ADBum4ZdK/QZ9pa/TUHVhhKsyDsSVeIxZpYmAr0C+dyrVWxBTXPKnz7YvhAUUSGnGOtEk2R2rfFmmzotjlrL0v6rs8lbTSCzrHFp0EopNj14Zk7k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776366392; c=relaxed/simple;
-	bh=t2BU4POuNqnQHfs1v7jsAchuyRFNIXmVxb2kXc0/Yr4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dI0QFGOfuvTWqpC/wR4mvE5tKvZB9RtBNPw7Ivwhhmt6s+f/wKzRfZEk4UwZasNbS6yUUJibFUEexmFTUcZ1fWBsGva1NCa6tpr8oUbICZORdEkLrsfXRRIJB8hlgUlR6Aq0n2+Y++3jQfsmh+PzmHkHk19FIrXoLM8p3z8G9JE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=uYpWJ3Av; arc=none smtp.client-ip=91.218.175.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Thu, 16 Apr 2026 12:06:16 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1776366387;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KKcufqME6AclWOFSO2Pn6FBNuFdVFsZOL3F1tIQrun8=;
-	b=uYpWJ3AvnglL9gowTEPCFHr5rS3M/bKDfOJc6Zt7jlmhEMLTVSQ1Kn1x+DyimYbmr615FE
-	b4aoy+ytRdu1mZKA53vfSV5V/PnW2CBvxGXWtf5B0oe9AHL/DV4MDqAvfMgTGiJg3aDdNT
-	wqbz7hytcBdUoegyOeZiNizyxMENf20=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-To: KaFai Wan <kafai.wan@linux.dev>
-Cc: daniel@iogearbox.net, john.fastabend@gmail.com, sdf@fomichev.me, 
-	ast@kernel.org, andrii@kernel.org, eddyz87@gmail.com, memxor@gmail.com, 
-	song@kernel.org, yonghong.song@linux.dev, jolsa@kernel.org, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	shuah@kernel.org, jiayuan.chen@linux.dev, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH bpf v2 2/2] selftests/bpf: Test TCP_NODELAY in TCP hdr
- opt callbacks
-Message-ID: <2026416184330.-HAW.martin.lau@linux.dev>
-References: <20260416112308.1820332-1-kafai.wan@linux.dev>
- <20260416112308.1820332-3-kafai.wan@linux.dev>
+	s=arc-20240116; t=1776366714; c=relaxed/simple;
+	bh=B6xSAx8JSc/Bajp82iyFtpg6koqkgXux7LiVaC3vkKg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ge3STqyqX4MBMu7WU7u5HIXFqw/js2gy5aU0yoIb13Ms9dPnMXK01cMgd5O4GT6zrLLotu5/vlWqG2p0ryN34UUKDUwZXJfh069e106Hz2t8Z10UzhfuG9wpLqAmVFV/aKCdYa7pOx4ZveVutkTIotG4WYOQpFcXgh6gd/oXwMo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=avrXiipw; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63G89wLk1860612;
+	Thu, 16 Apr 2026 19:11:36 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=z9f2WoTgIfJ4Lt/PFrfw/gZW2lqfBvsWodpCT/WHv
+	kY=; b=avrXiipwGhKKmW39TcCPg30LkOG54f34muqRGm9PQKGD3U4qYiolw8S74
+	/k738qXbVJfx+lTJK2Q1yYZsIvx7F1ZLikPKddSDPwNdayFAwAUM4cNoAsYX5DtD
+	oNSUiH8jcfvUhUtuKGtA5Hb5+wVxXn1/hXaEXXpPjzNNLBAKUQcVc0akBIGLh4Rn
+	thZslDrb/jILDxPwh9KneWVRBKJiARvQMG7rSrpcnPKWYlTU1FC97enDc/aCjYJU
+	EI/OAh0fkOG0+VIhUz62GYPchdG4vrkoJFj4+Qw8aK5fVDAR7gJESRXvUNo650ix
+	uVlLj8tZl3LMYpgZfFZqL7rKFQ1Dg==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4dh89pp78q-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 16 Apr 2026 19:11:35 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 63GF6lAJ015164;
+	Thu, 16 Apr 2026 19:11:35 GMT
+Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4dg0msvfam-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 16 Apr 2026 19:11:35 +0000
+Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
+	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 63GJBW3W7078640
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 16 Apr 2026 19:11:32 GMT
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 32CF35805C;
+	Thu, 16 Apr 2026 19:11:32 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A5E5C58058;
+	Thu, 16 Apr 2026 19:11:30 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.61.12.189])
+	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 16 Apr 2026 19:11:30 +0000 (GMT)
+From: Mingming Cao <mmc@linux.ibm.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
+        pabeni@redhat.com, horms@kernel.org, bjking1@linux.ibm.com,
+        haren@linux.ibm.com, ricklind@linux.ibm.com, maddy@linux.ibm.com,
+        mpe@ellerman.id.au, linuxppc-dev@lists.ozlabs.org,
+        stable@vger.kernel.org, Mingming Cao <mmc@linux.ibm.com>,
+        Shaik Abdulla <shaik.abdulla1@ibm.com>,
+        Naveed Ahmed <naveedaus@in.ibm.com>
+Subject: [PATCH net] ibmveth: Disable GSO for packets with small MSS
+Date: Thu, 16 Apr 2026 12:11:26 -0700
+Message-Id: <20260416191126.95336-1-mmc@linux.ibm.com>
+X-Mailer: git-send-email 2.39.3 (Apple Git-146)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260416112308.1820332-3-kafai.wan@linux.dev>
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-GUID: ioZ6CX6QVo8vsH9VSgrCPNanekD26vNx
+X-Proofpoint-ORIG-GUID: k_DCrsCbumqLIMI8Bp7BTxOvzEMclNFT
+X-Authority-Analysis: v=2.4 cv=WbE8rUhX c=1 sm=1 tr=0 ts=69e13468 cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
+ a=A5OVakUREuEA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
+ a=Y2IxJ9c9Rs8Kov3niI8_:22 a=VwQbUJbxAAAA:8 a=VnNF1IyMAAAA:8
+ a=13N5Qnvyu_7Mey2fMVwA:9
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDE2MDE3OSBTYWx0ZWRfX/0y1W4SeUqxY
+ 51RRBnHeeKIcG81i5wocxedY6jBrgo9Eq2WgPnFZEHJKc+gf9KbJyxQ8Z6Pg3xXKcA/5WxcGoBu
+ BldGT2AeBY79mo2pccex8AyuIh7dFSmu4p1fJXb1VxWucqq/LHLI2hUIU8ASvH4KlW07SgqrYFQ
+ SNTkSepegJSMDSRvVqVj6fYLA21lKiqwX/lbuQfFSlMdYKzRYChCodN9okvq6YAMCgXyaL+rQZu
+ Z/rnurdgpRTKR9k1Pb4hx7xjMU4tO/jTepCJOMs8A2cqxRux43CPKWpVkPBt2ipD/RMatO0OhY/
+ vm/a2g0Z9/8tHOLznicT4Y7LnrlNMZ7IdwpjPy2oIo4PLgqjcVw5pf4BxGM6jGrjD+y/3++F3wC
+ TUtjY+9p/15t2NutPp2Bn/F2Lozu3h1vz7JbaQv82nEcqzgXEVOjRk8qXTy47YIk57F6Jyr4CSb
+ EdIS3DFDK2qRRnc3RGQ==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-04-16_03,2026-04-16_03,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ suspectscore=0 bulkscore=0 priorityscore=1501 spamscore=0 clxscore=1011
+ phishscore=0 impostorscore=0 adultscore=0 malwarescore=0 lowpriorityscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2604070000 definitions=main-2604160179
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
+	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279131-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	RCPT_COUNT_TWELVE(0.00)[22];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[iogearbox.net,gmail.com,fomichev.me,kernel.org,linux.dev,davemloft.net,google.com,redhat.com,vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-279132-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[ibm.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mmc@linux.ibm.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[martin.lau@linux.dev,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 9FB8A413FB0
+	RCVD_COUNT_SEVEN(0.00)[11]
+X-Rspamd-Queue-Id: 3B9FC413FEE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Apr 16, 2026 at 07:23:08PM +0800, KaFai Wan wrote:
-> index 56685fc03c7e..2d738c0c4259 100644
-> --- a/tools/testing/selftests/bpf/prog_tests/tcp_hdr_options.c
-> +++ b/tools/testing/selftests/bpf/prog_tests/tcp_hdr_options.c
-> @@ -513,6 +513,59 @@ static void misc(void)
->  	bpf_link__destroy(link);
->  }
->  
-> +static void hdr_sockopt(void)
-> +{
-> +	const char send_msg[] = "MISC!!!";
-> +	char recv_msg[sizeof(send_msg)];
-> +	const unsigned int nr_data = 2;
-> +	struct bpf_link *link;
-> +	struct sk_fds sk_fds;
-> +	int i, ret, true_val = 1;
-> +
-> +	lport_linum_map_fd = bpf_map__fd(misc_skel->maps.lport_linum_map);
-> +
-> +	link = bpf_program__attach_cgroup(misc_skel->progs.misc_hdr_sockopt, cg_fd);
-> +	if (!ASSERT_OK_PTR(link, "attach_cgroup(misc_hdr_sockopt)"))
-> +		return;
-> +
-> +	if (sk_fds_connect(&sk_fds, false)) {
-> +		bpf_link__destroy(link);
-> +		return;
-> +	}
-> +
-> +	ret = setsockopt(sk_fds.active_fd, SOL_TCP, TCP_NODELAY, &true_val, sizeof(true_val));
-> +	if (!ASSERT_OK(ret, "setsockopt(TCP_NODELAY) active"))
-> +		goto check_linum;
-> +
-> +	ret = setsockopt(sk_fds.passive_fd, SOL_TCP, TCP_NODELAY, &true_val, sizeof(true_val));
+Some physical adapters on Power systems do not support segmentation
+offload when the MSS is less than 224 bytes. Attempting to send such
+packets causes the adapter to freeze, stopping all traffic until
+manually reset.
 
-Why are these two setsockopt(TCP_NODELAY) calls needed?
+Implement ndo_features_check to disable GSO for packets with small MSS
+values. The network stack will perform software segmentation instead.
 
-Instead of creating a new "void hdr_sockopt(void)", can the test be done in the
-existing "void misc(void)" by doing bpf_setsockopt(TCP_NODELAY) in the
-misc_estab() bpf prog?
+The 224-byte minimum matches ibmvnic
+commit <f10b09ef687f> ("ibmvnic: Enforce stronger sanity checks
+on GSO packets")
+which uses the same physical adapters in SEA configurations.
 
-The PASSIVE_ESTABLISHED_CB can do the bpf_setsockopt(TCP_NODELAY, 0)
-if it wants to keep the same expectation on Nagle. The
-BPF_SOCK_OPS_HDR_OPT_LEN_CB and BPF_SOCK_OPS_WRITE_HDR_OPT_CB
-can do bpf_setsockopt(TCP_NODELAY, 1) to test recursion and
-the error return value.
+Validated using iptables to force small MSS values. Without the fix,
+the adapter freezes. With the fix, packets are segmented in software
+and transmission succeeds.
 
->  void test_tcp_hdr_options(void)
-> diff --git a/tools/testing/selftests/bpf/progs/test_misc_tcp_hdr_options.c b/tools/testing/selftests/bpf/progs/test_misc_tcp_hdr_options.c
-> index d487153a839d..a8cf7c4e7ed2 100644
-> --- a/tools/testing/selftests/bpf/progs/test_misc_tcp_hdr_options.c
-> +++ b/tools/testing/selftests/bpf/progs/test_misc_tcp_hdr_options.c
-> @@ -28,6 +28,12 @@ unsigned int nr_data = 0;
->  unsigned int nr_syn = 0;
->  unsigned int nr_fin = 0;
->  unsigned int nr_hwtstamp = 0;
-> +unsigned int nr_hdr_sockopt_estab = 0;
-> +unsigned int nr_hdr_sockopt_estab_err = 0;
-> +unsigned int nr_hdr_sockopt_len = 0;
-> +unsigned int nr_hdr_sockopt_len_err = 0;
-> +unsigned int nr_hdr_sockopt_write = 0;
-> +unsigned int nr_hdr_sockopt_write_err = 0;
+Cc: stable@vger.kernel.org
+Reviewed-by: Brian King <bjking1@linux.ibm.com>
+Tested-by: Shaik Abdulla <shaik.abdulla1@ibm.com>
+Tested-by: Naveed Ahmed <naveedaus@in.ibm.com>
+Signed-off-by: Mingming Cao <mmc@linux.ibm.com>
+---
+ drivers/net/ethernet/ibm/ibmveth.c | 20 ++++++++++++++++++++
+ drivers/net/ethernet/ibm/ibmveth.h |  1 +
+ 2 files changed, 21 insertions(+)
 
-nr_hdr_sockopt_estab, nr_hdr_sockopt_len, and nr_hdr_sockopt_write
-are unnecessary. These tests have already been covered in some ways.
+diff --git a/drivers/net/ethernet/ibm/ibmveth.c b/drivers/net/ethernet/ibm/ibmveth.c
+index 58cc3147afe2..7935c9384ef4 100644
+--- a/drivers/net/ethernet/ibm/ibmveth.c
++++ b/drivers/net/ethernet/ibm/ibmveth.c
+@@ -1756,6 +1756,25 @@ static int ibmveth_set_mac_addr(struct net_device *dev, void *p)
+ 	return 0;
+ }
+ 
++static netdev_features_t ibmveth_features_check(struct sk_buff *skb,
++						struct net_device *dev,
++						netdev_features_t features)
++{
++	/* Some physical adapters do not support segmentation offload with
++	 * MSS < 224. Disable GSO for such packets to avoid adapter freeze.
++	 */
++	if (skb_is_gso(skb)) {
++		if (skb_shinfo(skb)->gso_size < IBMVETH_MIN_LSO_MSS) {
++			netdev_warn_once(dev,
++					 "MSS %u too small for LSO, disabling GSO\n",
++					 skb_shinfo(skb)->gso_size);
++			features &= ~NETIF_F_GSO_MASK;
++		}
++	}
++
++	return features;
++}
++
+ static const struct net_device_ops ibmveth_netdev_ops = {
+ 	.ndo_open		= ibmveth_open,
+ 	.ndo_stop		= ibmveth_close,
+@@ -1767,6 +1786,7 @@ static const struct net_device_ops ibmveth_netdev_ops = {
+ 	.ndo_set_features	= ibmveth_set_features,
+ 	.ndo_validate_addr	= eth_validate_addr,
+ 	.ndo_set_mac_address    = ibmveth_set_mac_addr,
++	.ndo_features_check	= ibmveth_features_check,
+ #ifdef CONFIG_NET_POLL_CONTROLLER
+ 	.ndo_poll_controller	= ibmveth_poll_controller,
+ #endif
+diff --git a/drivers/net/ethernet/ibm/ibmveth.h b/drivers/net/ethernet/ibm/ibmveth.h
+index 068f99df133e..d87713668ed3 100644
+--- a/drivers/net/ethernet/ibm/ibmveth.h
++++ b/drivers/net/ethernet/ibm/ibmveth.h
+@@ -37,6 +37,7 @@
+ #define IBMVETH_ILLAN_IPV4_TCP_CSUM		0x0000000000000002UL
+ #define IBMVETH_ILLAN_ACTIVE_TRUNK		0x0000000000000001UL
+ 
++#define IBMVETH_MIN_LSO_MSS		224	/* Minimum MSS for LSO */
+ /* hcall macros */
+ #define h_register_logical_lan(ua, buflst, rxq, fltlst, mac) \
+   plpar_hcall_norets(H_REGISTER_LOGICAL_LAN, ua, buflst, rxq, fltlst, mac)
+-- 
+2.39.3 (Apple Git-146)
 
-Mostly a nit. The new counters are used in both connections. Note the
-existing nr_xxx is exclusively used in either active or passive,
-so there is no parallel counting in practice.
-
-Instead of counting, just use a bool nodelay_est_ok,
-nodelay_hdr_len_err, nodelay_write_err and assert them
-to be true in userspace.
 
