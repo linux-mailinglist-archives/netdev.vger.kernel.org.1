@@ -1,184 +1,151 @@
-Return-Path: <netdev+bounces-279134-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279135-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GLRYCN014WkEqgAAu9opvQ
-	(envelope-from <netdev+bounces-279134-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 21:17:49 +0200
+	id oGopCAU74WmaqgAAu9opvQ
+	(envelope-from <netdev+bounces-279135-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 21:39:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC1D9414066
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 21:17:48 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1516E41437A
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 21:39:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4B4E930ED31D
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 19:15:48 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 65EE6300BC85
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 19:29:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E42E535B65E;
-	Thu, 16 Apr 2026 19:15:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD03139F179;
+	Thu, 16 Apr 2026 19:29:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QY8Id/xC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TjiRJ3JY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AA4C359A81
-	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 19:15:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F29713328E6;
+	Thu, 16 Apr 2026 19:29:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776366947; cv=none; b=iJrnI1qobwOhFo4vj3xpRXiPnnyoJqEdEWnej6nhg42t2w8OUVcn/bifM+vNxvUTadg3/MOz2h6YorIqi2gWm/OwvMNET9Tr9CNdNX2boBfw57khAuYymuPTHRVBoZYvcyamuNITCtwxFDav8Gblv7aqWj2YWkfDdgekLoK6qB4=
+	t=1776367791; cv=none; b=h99ZDiJjYePB6WtQ8oWD3oqwwTUfRnVzJ5XuXct2fHa9i9vyWZ8jvAuAhgyEvTA+87KWCQv19M4PFjm6qqpD8fVc1tfCAUWxg3JGyQ3SJGpw2a7ebmq4BWp3AXvDMnbkoVs9bpseVbSlZwae1juTZZ2ESuAnDW3s4SU4M5rRYik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776366947; c=relaxed/simple;
-	bh=OJeI+3mV9W6ncnLD1OqQ+pA6ULnbFdUSlKq0JT7njbc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JWcJIcaAEADSXJXMKNA3N0h0OTLNVisFQdXuWgQQDeFjLVWcavJVtgN3MrqoPEUwL9PKWQJz3eYRXnTrUgqMdT9YxNgxF2DujZfyAwhMyvxqiZR4EqdT4n0H+3mfbTGcQ24jadlTz+5x8s+InLeC97gWMgYmh4VoHvoB7u40OqY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QY8Id/xC; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-488a4bc360bso46846785e9.0
-        for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 12:15:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776366942; x=1776971742; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GI2dSkxrwqhQpR5uFXP6GxtJ/asEeAYI1RS8A1ZzV9c=;
-        b=QY8Id/xCkNSDyRp/6Ia+IhGODB81KC4sCUqlBNfTsAhr60CKClN3QAh6bbWUbx9w0F
-         bowURat77zHN+ZHlfvOuP63DWSZJLS9CB67JIgVAKCi6+vwdDnB0WCbS+mhqXyCZvNgH
-         3LgovKTZOOZSrowianOqjoxUQU00rBtvbO969KTtzDkyjg4GJlw/bqQS1tjsfKG/nQPm
-         ogEfTFcSlOlyCQukZYVXoZ8VBq3hePPIvwrDjEotzfkKEEGQrm4PF/3sJRfFVVsqc4hv
-         U3krfzau87CZFEd4MdPgtiuytDHml1jLJtOQsqDYRuR1b6pukPY/ROgrGM7JVAH/3WFp
-         ckmQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776366942; x=1776971742;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=GI2dSkxrwqhQpR5uFXP6GxtJ/asEeAYI1RS8A1ZzV9c=;
-        b=ISBWevaddR7gbhcWSKLUKocc0UDF60eWROKOYraZ68vcLWP2CxDo0BZnwNcHKQoCiJ
-         ZpQyT5BxtEdrFleMufvZHdDSW9SD33P64IcFnrlKcFgqEHgcyFrNrnSqgiea2ZF4yItJ
-         bmiRRRpGemD1rUca8XhWM+Q6ogKIC0BfaPWl3lwpShMtoJJPehCkEbb8RURp+o//fRf1
-         Dk7zHM2n1ySErpOpjQpGz94jKy/5wRwUHSjC7w38CFaokXA2VaTsk6VUnz4XZYkkPMOr
-         Ix+JXlgtX8LdcdvQHfMvPmxl2SxkOnPyopxpnEKkvaRyYRexovWsIC3hmxa+B+lFK/Wd
-         cbsw==
-X-Forwarded-Encrypted: i=1; AFNElJ8YPga0NmLCXjZVZ59XaXwqY1j7TlfvlC7iMNw8FBYDARSrm8ozqfWjKXdr0rRVrgPWAIHS0OM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy42NNAZ2LChFCqwy12sHAIXZQ0ksIrPhctaNzsFpw6l+80dcod
-	yFSSBWbob0Den3jbsAqgmnpqPpwLJtIUiSQFCAS6xNFPcarfI9RW91XS
-X-Gm-Gg: AeBDiev+et8/sXjs+DdUgh7m1bP/Ba2RLFueOaMOGrNqFAwMlRuX4WUVQtPevMTI+Qj
-	ijL1/xDqLo8wJXAGNja88XpfO/nHHZY4X7o4o6Q1AudvCurC8Z+1jLTX5AolbeONx4CrlbWi839
-	v32KWioEPAJoUhWLiRjtw9P4gl2uwEvjZtuFPodPh5W0rfqMNzTkGps3/MN0FA956vPB5BQGaCX
-	woi5++FoPG9+rKcuEns00zunHDH4AgOdCojkgr1aNNMJd6ZSx9NA3324yuu+u3FkqT1BgEAEbnW
-	LJgT8H7ebgeSkuLcBp05vhA1FAeA+TNmlYN7OFvO9H243F31wrnBhEcf9wuLrDTlmIZZb4s9KeE
-	72TrgKK5j9gK03a9wa12393Lk/zUd36tKqnXzNvhCWSvoQpSZ5MWYUp2bfFXn5H5AXNklNvMx93
-	IIkskQaTvRsMSj7MCSpVvMkJxdUr222cn/EUiR8AFufkGlAWKKjFIowCnSCtjfNui1dXpFHjVf3
-	oY=
-X-Received: by 2002:a05:600c:a415:b0:485:419c:4eba with SMTP id 5b1f17b1804b1-488fb26d43fmr1783635e9.1.1776366941546;
-        Thu, 16 Apr 2026 12:15:41 -0700 (PDT)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43ead3d5f06sm16561608f8f.17.2026.04.16.12.15.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Apr 2026 12:15:41 -0700 (PDT)
-Date: Thu, 16 Apr 2026 20:15:39 +0100
-From: David Laight <david.laight.linux@gmail.com>
-To: Petr Mladek <pmladek@suse.com>
-Cc: chensong_2000@189.cn, rafael@kernel.org, lenb@kernel.org,
- mturquette@baylibre.com, sboyd@kernel.org, viresh.kumar@linaro.org,
- agk@redhat.com, snitzer@kernel.org, mpatocka@redhat.com,
- bmarzins@redhat.com, song@kernel.org, yukuai@fnnas.com,
- linan122@huawei.com, jason.wessel@windriver.com, danielt@kernel.org,
- dianders@chromium.org, horms@kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- paulmck@kernel.org, frederic@kernel.org, mcgrof@kernel.org,
- petr.pavlu@suse.com, da.gomez@kernel.org, samitolvanen@google.com,
- atomlin@atomlin.com, jpoimboe@kernel.org, jikos@kernel.org, mbenes@suse.cz,
- joe.lawrence@redhat.com, rostedt@goodmis.org, mhiramat@kernel.org,
- mark.rutland@arm.com, mathieu.desnoyers@efficios.com,
- linux-modules@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org, linux-acpi@vger.kernel.org,
- linux-clk@vger.kernel.org, linux-pm@vger.kernel.org,
- live-patching@vger.kernel.org, dm-devel@lists.linux.dev,
- linux-raid@vger.kernel.org, kgdb-bugreport@lists.sourceforge.net,
- netdev@vger.kernel.org
-Subject: Re: [RFC PATCH 1/2] kernel/notifier: replace single-linked list
- with double-linked list for reverse traversal
-Message-ID: <20260416201539.2cee3b99@pumpkin>
-In-Reply-To: <aeD4H8P1DiPQoM8V@pathway.suse.cz>
-References: <20260415070137.17860-1-chensong_2000@189.cn>
-	<20260416133004.07bd2886@pumpkin>
-	<aeD4H8P1DiPQoM8V@pathway.suse.cz>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	s=arc-20240116; t=1776367791; c=relaxed/simple;
+	bh=IYYhpzvOPkjnKmWSOWOV2gjFmCyUK20pzUwsrPCl5+c=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=qazqREEbkyQ2aUEUQzePNtMduFMBhFC4Jjy/K/gssK+BvWQIoy4aEylTzmD53RkSRgKqtGpfKEt/I4dtzes5XLmH/40YAWthemsbZIAgFqM+4rHeHfMyAcuuQk8G3H5YiQJilMyqW4geXA4qRdjHWlbFkeVIbin+CnKAMUOIl0o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TjiRJ3JY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55F0EC2BCAF;
+	Thu, 16 Apr 2026 19:29:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776367790;
+	bh=IYYhpzvOPkjnKmWSOWOV2gjFmCyUK20pzUwsrPCl5+c=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=TjiRJ3JYC6H6QODlRe73weMWqu2ToVyxgZaKwDYZeUuXvTFyEukiq8tmP1ejDxYzD
+	 rmrx12vxM0g7ZC9obrRxDAfB+VnhJNvbWfFDZNFPe0bmQhLp4LsxxAr5syn+ysbEnb
+	 CJFNwSq3IzVphxzvT3UyUKOg1K7FQt/yAeF/6TILljylkaralKACrM4Mn6BgOOeIKv
+	 wGHlIow7JIanfsrwpPNBBsFvw34FcmmRQCfrRZvueDO/yyXUoANoGReW/3j6l4sYGi
+	 SDFU6WZgysyVavWZIkFYQOfBKcrZOljXUSUoxloeAjzhJrasftfXxGpcy4vC+O3xsf
+	 ay/dWzrcNvMPQ==
+From: Thomas Gleixner <tglx@kernel.org>
+To: Heiko Carstens <hca@linux.ibm.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, linux-s390@vger.kernel.org, Arnd
+ Bergmann <arnd@arndb.de>, x86@kernel.org, Lu Baolu
+ <baolu.lu@linux.intel.com>, iommu@lists.linux.dev, Michael Grzeschik
+ <m.grzeschik@pengutronix.de>, netdev@vger.kernel.org,
+ linux-wireless@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
+ linux-crypto@vger.kernel.org, Vlastimil Babka <vbabka@kernel.org>,
+ linux-mm@kvack.org, David Woodhouse <dwmw2@infradead.org>, Bernie Thompson
+ <bernie@plugable.com>, linux-fbdev@vger.kernel.org, Theodore Tso
+ <tytso@mit.edu>, linux-ext4@vger.kernel.org, Andrew Morton
+ <akpm@linux-foundation.org>, Uladzislau Rezki <urezki@gmail.com>, Marco
+ Elver <elver@google.com>, Dmitry Vyukov <dvyukov@google.com>,
+ kasan-dev@googlegroups.com, Andrey Ryabinin <ryabinin.a.a@gmail.com>,
+ Thomas Sailer <t.sailer@alumni.ethz.ch>, linux-hams@vger.kernel.org,
+ "Jason A. Donenfeld" <Jason@zx2c4.com>, Richard Henderson
+ <richard.henderson@linaro.org>, linux-alpha@vger.kernel.org, Russell King
+ <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org, Catalin
+ Marinas <catalin.marinas@arm.com>, Huacai Chen <chenhuacai@kernel.org>,
+ loongarch@lists.linux.dev, Geert Uytterhoeven <geert@linux-m68k.org>,
+ linux-m68k@lists.linux-m68k.org, Dinh Nguyen <dinguyen@kernel.org>, Jonas
+ Bonn <jonas@southpole.se>, linux-openrisc@vger.kernel.org, Helge Deller
+ <deller@gmx.de>, linux-parisc@vger.kernel.org, Michael Ellerman
+ <mpe@ellerman.id.au>, linuxppc-dev@lists.ozlabs.org, Paul Walmsley
+ <pjw@kernel.org>, linux-riscv@lists.infradead.org, "David S. Miller"
+ <davem@davemloft.net>, sparclinux@vger.kernel.org
+Subject: Re: [patch 35/38] s390: Select ARCH_HAS_RANDOM_ENTROPY
+In-Reply-To: <20260416134238.9230Ba6-hca@linux.ibm.com>
+References: <20260410120044.031381086@kernel.org>
+ <20260410120319.924028412@kernel.org>
+ <20260416134238.9230Ba6-hca@linux.ibm.com>
+Date: Thu, 16 Apr 2026 21:29:46 +0200
+Message-ID: <87y0imemad.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Content-Type: text/plain
+X-Spamd-Result: default: False [4.34 / 15.00];
+	MID_END_EQ_FROM_USER_PART(4.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279134-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-279135-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[189.cn,kernel.org,baylibre.com,linaro.org,redhat.com,fnnas.com,huawei.com,windriver.com,chromium.org,davemloft.net,google.com,suse.com,atomlin.com,suse.cz,goodmis.org,arm.com,efficios.com,vger.kernel.org,lists.linux.dev,lists.sourceforge.net];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	GREYLIST(0.00)[pass,body];
 	RCPT_COUNT_TWELVE(0.00)[48];
-	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,arndb.de,kernel.org,linux.intel.com,lists.linux.dev,pengutronix.de,gondor.apana.org.au,kvack.org,infradead.org,plugable.com,mit.edu,linux-foundation.org,gmail.com,google.com,googlegroups.com,alumni.ethz.ch,zx2c4.com,linaro.org,armlinux.org.uk,lists.infradead.org,arm.com,linux-m68k.org,lists.linux-m68k.org,southpole.se,gmx.de,ellerman.id.au,lists.ozlabs.org,davemloft.net];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[tglx@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,suse.com:email,189.cn:email]
-X-Rspamd-Queue-Id: BC1D9414066
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 1516E41437A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, 16 Apr 2026 16:54:23 +0200
-Petr Mladek <pmladek@suse.com> wrote:
+On Thu, Apr 16 2026 at 15:42, Heiko Carstens wrote:
+> On Fri, Apr 10, 2026 at 02:21:19PM +0200, Thomas Gleixner wrote:
+>> The only remaining non-architecture usage of get_cycles() is to provide
+>> random_get_entropy().
+>> 
+>> Switch s390 over to the new scheme of selecting ARCH_HAS_RANDOM_ENTROPY and
+>> providing random_get_entropy() in asm/random.h.
+>> 
+>> Add 'asm/timex.h' includes to the relevant files, so the global include can
+>> be removed once all architectures are converted over.
+>> 
+>> Signed-off-by: Thomas Gleixner <tglx@kernel.org>
+>> Cc: Heiko Carstens <hca@linux.ibm.com>
+>> Cc: linux-s390@vger.kernel.org
+>> ---
+>>  arch/s390/Kconfig              |    1 +
+>>  arch/s390/include/asm/random.h |   12 ++++++++++++
+>>  arch/s390/include/asm/timex.h  |    6 ------
+>>  arch/s390/kernel/time.c        |    1 +
+>>  arch/s390/kernel/vtime.c       |    1 +
+>>  5 files changed, 15 insertions(+), 6 deletions(-)
+>
+> Acked-by: Heiko Carstens <hca@linux.ibm.com>
+>
+> Thomas, would you mind adding the below as minor improvement to this
+> series?
 
-> On Thu 2026-04-16 13:30:04, David Laight wrote:
-> > On Wed, 15 Apr 2026 15:01:37 +0800
-> > chensong_2000@189.cn wrote:
-> >   
-> > > From: Song Chen <chensong_2000@189.cn>
-> > > 
-> > > The current notifier chain implementation uses a single-linked list
-> > > (struct notifier_block *next), which only supports forward traversal
-> > > in priority order. This makes it difficult to handle cleanup/teardown
-> > > scenarios that require notifiers to be called in reverse priority order.  
-> > 
-> > If it is only cleanup/teardown then the list can be order-reversed
-> > as part of that process at the same time as the list is deleted.  
-> 
-> Interesting idea. But it won't work in all situations.
-
-It is useful for things like locklessy queuing a request to be processed later.
-Items can be added with a cmpxchg and the list grabbed by xchg of NULL.
-The only downside is that reversing a list isn't cache friendly.
-Thinks... although that may not be any worse than accessing the current 'tail'
-to add to the end of a doubly linked (or singly linked with a tail ptr) list.
-
-	David
-
-> 
-> Note that the motivation for this update are the module loader
-> notifiers which are called several times for each loaded/removed module.
-> 
-> Best Regards,
-> Petr
-> 
-
+Sure. I'll respin it next week.
 
