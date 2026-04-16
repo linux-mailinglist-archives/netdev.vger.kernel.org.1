@@ -1,278 +1,434 @@
-Return-Path: <netdev+bounces-279080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279079-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YMBTHUn/4GkSoQAAu9opvQ
-	(envelope-from <netdev+bounces-279080-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 17:24:57 +0200
+	id mI68CLv/4Gk7oQAAu9opvQ
+	(envelope-from <netdev+bounces-279079-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 17:26:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 089F4410AD2
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 17:24:56 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7ED1B410B9B
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 17:26:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3973C302C570
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 15:24:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C0FA13012C6D
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 15:24:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 439323E2767;
-	Thu, 16 Apr 2026 15:24:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60C5022A80D;
+	Thu, 16 Apr 2026 15:24:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Z83q4zx2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G3GI0mFX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2453C257423
-	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 15:24:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.21
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776353094; cv=fail; b=akPmJJfhhqloUXzSSJJODVrwjG2DSVmCxPeI594v5Cm4tH/0TlC7kd0BKAxMLy25S7TTxWBAK6HHfjmH9/+win//YcB/UElub+yrW2xNM2EhYR31WEFp8ZvlPK7AM4dSZ8AYa7eMEMQZ6WKmzKSsABmLWn9+93PNlP4yzOJmXQE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776353094; c=relaxed/simple;
-	bh=T1E1sfj3QR0ZUsW7sOcLz3l0Bd/NcQ+Queee1xpBZO8=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=NJzrdVTyfNk98q6Y6Jqw2ONPggzrqcAnrsLBpQNnp6jhjALODlhX9ZY3+1Bmw0et2ZkbOMDkGteR4qm0MD3Pm6UXL/AF18d3hpWcy6SqF9BfB/3t8COY+n+AFemE/XJ2eDjteLr9Iu0pqdLWUp39b3iEicjLaMDNtjG+013cPys=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Z83q4zx2; arc=fail smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1776353090; x=1807889090;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=T1E1sfj3QR0ZUsW7sOcLz3l0Bd/NcQ+Queee1xpBZO8=;
-  b=Z83q4zx2FhSfihGiXNW7BavQ88szM9wyBt3E0xMaoj/Fmvj6aa/TRApm
-   jncmg/0RVFPNiw7TKXrZdlcq88cRCizSgQwHRzSx9sFK/0BHElsnr0Qjs
-   qKFfaQ3IXmuV5uQqpB4Ow0E47RiMTuWehvBL4u1yYXTePYDu651QuZWXC
-   lfTCgadpc1Mkce233h7+SKe7CR+XIrP56kWQawI4SseW+A5zz6fZMHkbD
-   gzGAIE+/bmEHEp6bVI3wFYCv8s0Tq1cWNkAqIZTa1xQcZv/aOW83NaXCk
-   L3gXLl2cBfSU7CMdOsfvoftIS/NSmFBr4OIs8nvaTqZEfIoY14WQ+2a4S
-   g==;
-X-CSE-ConnectionGUID: dZ0pQJVHSfmUEVoG/H3RiA==
-X-CSE-MsgGUID: HCVKLIQiSp6GxWmfPT5Y2A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11760"; a="77231453"
-X-IronPort-AV: E=Sophos;i="6.23,181,1770624000"; 
-   d="scan'208";a="77231453"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2026 08:24:49 -0700
-X-CSE-ConnectionGUID: 1tYs67IcRiKspki9X2vwTg==
-X-CSE-MsgGUID: pe3qjCd7TziLVxQsKHOKWA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,181,1770624000"; 
-   d="scan'208";a="235729297"
-Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
-  by fmviesa005.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2026 08:24:49 -0700
-Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
- fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Thu, 16 Apr 2026 08:24:48 -0700
-Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
- FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Thu, 16 Apr 2026 08:24:48 -0700
-Received: from PH0PR06CU001.outbound.protection.outlook.com (40.107.208.55) by
- edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Thu, 16 Apr 2026 08:24:44 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=kBKTai4wIrMH+Hrq3b0fOlKMo+H5LUf9ZpkG+eeExnHeli0v+TKJOVd7k1Ws5HB6YSTT8pXlpZTjeQN72XGaNOSg1DvnbQfkNyGz4PCC/l5basqQgQv/0gkTlMdlg+bG9esU6YDHQkFfX3dZa1+htms/IQD+wVmk8CLH8BrPeLt8xCExSk0VnFeUBUlZn7QAABtEi58oCg3trpdxWkDb+rFoBI4twwjEO2IDLAl2ClJtfszoEnLANsFgvkbkch+C19VCgToNPTU4AsW+K3iM4pqNWiokwC9/5uPfmzRKhACaFrUS7sIduZEeuylCw7h8zjjfMIj/Z3HFWnoc9dhWoA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=fziFKi7A2NKNbblZ6JzNOupZuvanWBzzVHBvcXwrrMc=;
- b=bRs4SXiC38I547NUH7/8P5A9GehlzK+sCBkiRRFatPJJCnjoOE/Z+nDGYkcvlpll2YMn6KmjZ2pUlVfexbBR0sm8/K29EuxHoPoJJo+h9E6U5bHiWOEc1/q/CdR6qwJh5kkvh0F0wC7SePH50aGAm6vjH3yiTtFS71iL4ubnzXtsJ5vLj4nuXx69RqFEoE+hu/nAqy3Ev7wGc0GQTpTWqb3EarCa4qJYuGT9k4MvyOu2l1XbDyZGbAUMZF39rRivibGjaqVWq70vUUsQH5pozsSj5iAEpZ/TMQyxYAFxZHsSz7ScZUvBD9UN/Yx6SC3vGIwdbaxN7JaOzJp8t1ci/A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from SJ1PR11MB6297.namprd11.prod.outlook.com (2603:10b6:a03:458::8)
- by IA1PR11MB7318.namprd11.prod.outlook.com (2603:10b6:208:426::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.48; Thu, 16 Apr
- 2026 15:24:35 +0000
-Received: from SJ1PR11MB6297.namprd11.prod.outlook.com
- ([fe80::6f05:5b37:2440:556e]) by SJ1PR11MB6297.namprd11.prod.outlook.com
- ([fe80::6f05:5b37:2440:556e%5]) with mapi id 15.20.9818.017; Thu, 16 Apr 2026
- 15:24:35 +0000
-From: "Salin, Samuel" <samuel.salin@intel.com>
-To: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>, "Hay, Joshua A"
-	<joshua.a.hay@intel.com>, "intel-wired-lan@lists.osuosl.org"
-	<intel-wired-lan@lists.osuosl.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-net 2/2] idpf: fix skb datapath
- queue based scheduling crashes and timeouts
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-net 2/2] idpf: fix skb datapath
- queue based scheduling crashes and timeouts
-Thread-Index: AQHcxhwtnTQn18/NY0OgLL+Y+AWyUbXUuAoAgA0ltBA=
-Date: Thu, 16 Apr 2026 15:24:35 +0000
-Message-ID: <SJ1PR11MB62974C8A1EBDD28A421F82F59B232@SJ1PR11MB6297.namprd11.prod.outlook.com>
-References: <20260406233236.3585504-1-joshua.a.hay@intel.com>
- <20260406233236.3585504-3-joshua.a.hay@intel.com>
- <IA3PR11MB8986B2581A07EC756D0D9186E55BA@IA3PR11MB8986.namprd11.prod.outlook.com>
-In-Reply-To: <IA3PR11MB8986B2581A07EC756D0D9186E55BA@IA3PR11MB8986.namprd11.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SJ1PR11MB6297:EE_|IA1PR11MB7318:EE_
-x-ms-office365-filtering-correlation-id: e09db44d-41cc-44c2-35de-08de9bcc4445
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|56012099003|22082099003|18002099003|38070700021;
-x-microsoft-antispam-message-info: 5T8WLl/q3S4MG9oUwCwy5umMVoeDb9ADHwWz746RdDL2gLhib+e8BwnmFpoEXGtvr0Dad7iabAEz5uFvZKC/hmJgisRBJfJMPsX8MjaAGH3smizH3DTmxMVVcx9icPQy3iurUoEKHfKzfqXUd2LJ4C7HA/ynI4CKr/W+ggwNxEYyMMJlr3YU5zcemVtSCQKfO0Ovjk+oqIXTA7o/r/vFz0h7qYWGVesE2yJuBbP0olSQiEz++LPcUwKw40VjazEqVR7A7Ao2tWybzetlI51XlNxDAatf2hlB4s3zj0NYMD9Vm5S4bMohJmQ3gsWQDZBRy8iGNMcBeM9eavX5HuMtkmygDAskMrQ4EzKWQ7uj5wiMQzbJatVAZRgwvyq1J9ny3wgv+djNZNPMrrAkYXgcdv8thDPe7B9+b9Qfbfx08ZANPgi2v+BvHV7X38ZiV8rl1UixZ4pgSiT82wTpp5zUWJydc/gJS89FNTlZMdAypRzUTZIKzgD2bgFTHcrjtf7yshn1wF8QFLLDv+0CIDYsxWzSQYpCHA8eJ/We0GSYSEsI6pO2A7j71vVc2fZtfqGNnqfYxaypo5pN7339DVUZvtD6/exIgpxtTgUIatEuJ80QoCf3Ixc2hnkCeKBLM3RbqjHQ4LMDjAdaoQgyqgE2pzyBGw4OQjgTK7/qfskn4zBIbCR+K40HmLTDto20vDiPEVGqeEswr1SOE6jfuq0RIYq711dkD+efKvK++emTrmVkVsUmuFFMbJnV5sTyW47EsgwWHZuzQkFpZOee3BBQD1QsWKpRAUU8db6KZZpWDdA=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ1PR11MB6297.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(56012099003)(22082099003)(18002099003)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?tqjC96dDrbXlDYkJwv9FDes2HCS1FRgFJqGPYGoigGyqxs7QkLnK2w6pzrtu?=
- =?us-ascii?Q?no0SJHuiUD8GsHSW2D1NAuvWtmpWszkaiD35B+pAdvp29xzmchV0LQuPjOJQ?=
- =?us-ascii?Q?zv4UmipNOrJEmLgHZzcktX1IJd5uyMfK1vE1U40bQzVWGaaYf9+qwgNfEYXY?=
- =?us-ascii?Q?K3+5s5qk2ScL9lDR6rg2Zy8g6e5HztvSUQqyoFWoNkWRfv0G7pTVfShiAkBg?=
- =?us-ascii?Q?9GpQi9zXLR2o8lM3Re+i9UgjuW1LoZGu3TEvEqq2YWAFWRbdFur0d+leob/r?=
- =?us-ascii?Q?XHodFcnC0xNAWLT8v0ydC0vcqW2iUEL8FPCD8ZRiteINycPaHIwLKuqxtiqw?=
- =?us-ascii?Q?ZPRw0tBmUJKs60oroXYzbNS0fyD/Be2dxm4r4CgP4E6uPTBPI7FM2GrNukXJ?=
- =?us-ascii?Q?kT0NSgTRRE5g6dSIaoH6thwoASBxVMxdCaK0aLv7NcW0UmmEuNsPYqSjxFxj?=
- =?us-ascii?Q?rcCGVLk+mAaYG2WOPIN6JZRPDHrDOF8Y8ET2G7jrWn+ClgM1EwWfwKk26y0i?=
- =?us-ascii?Q?7qiyxtBGCJcX2E1chZDiBRiId9XUiNgO87jxg2bLpkCSNj/iN2evtlq1ZKPB?=
- =?us-ascii?Q?G+KyMwbplndeeEWy6uqlt+eQiiMxjbZ/QVkyPH5s78JBNV7SlBjKjDfnKGWo?=
- =?us-ascii?Q?JNGYEvIoHLSRuXuobvcsvfvcoW97L6/E9MnhlNAbignIRlRqitAffjRxBpBf?=
- =?us-ascii?Q?GRmx4z38hhEKOY/8VIWMzVdqWdo+k/vEEwmNLZr7VBLeMI/hX+LV1Lq0dyuL?=
- =?us-ascii?Q?iNtSTfRf16ZmCNaRs8L5drKovhRbIIG7bWjcARpF+FS1Xa6VWKZ+GNk3yFPp?=
- =?us-ascii?Q?2qWW0zrg8Pj/BmNvoRRu64VMG4usIeybEQBRByX1jbGBBCrg+jnc9dFmbhe7?=
- =?us-ascii?Q?8xB7CTlDanETVDdFZvmY/aCdxl3qYbmeYrGQuFaiN80uFr629VUElcIZ82+p?=
- =?us-ascii?Q?s/bjs0wH7OEj7kL0UVC5uPbaaEumAP0uutNY4MVydtrENvRN1W5r1pXzYPbl?=
- =?us-ascii?Q?G40fxwjrkExMRvNknKem4L70oeulTRJweseSZKggWRj/ZrdzlqCP17x2cPgh?=
- =?us-ascii?Q?AGjExbjpcQxLexJs7RJrE3JVDRHG3J9/84bzCSkda6v0a6aXN9Ua77qUN2u2?=
- =?us-ascii?Q?fnImWY64ozEZcV6BsC62N+Xyxzqrmfo/+9WExI4/C+t8cXb2GzAvw2AGUFU/?=
- =?us-ascii?Q?TaDpQQHHUcYUI4tW4c5YTjKZwwLRNMiu9GTkrU8gaF6Dwf15rcY1GHBkG7nD?=
- =?us-ascii?Q?yAFz1AF5oVATBaVZOPras157E22v5wwDvaNL79rP3cOU+IKxAYPraabyD+CR?=
- =?us-ascii?Q?W1ujAv1FnaskYFAZQuwym2M0bccusmMeK4Ustpjw2D2Oo4YqHykd3J44UEg5?=
- =?us-ascii?Q?PiJgjP6Au6RH9weB0zd86ovgSWAnISWzkRaTqTkFu2Ha3kVkNaq+KVwUKaPj?=
- =?us-ascii?Q?LieaC7b27OE+WcL4mAmwxEzaurcUNoR6Tp9+sV9UG4vBJ1bsuNztbSfztN5i?=
- =?us-ascii?Q?gzbhX6j/Mr8wmtBoF0OXLdp6eq1zbr2VJAn5lJQtrqDFt8PLCR7yG/6S0JT0?=
- =?us-ascii?Q?Obb/sOaGret+P9rFgNpHjgmlZ+kFE0gIc6XKKVMDhOFLF3tUb+nhSmSDIQ0t?=
- =?us-ascii?Q?wVKetowLioG2jZndfL5ZmuN+Nzim8kZrQdo9z5D4TrOVDZjxMUSlZLy08tlV?=
- =?us-ascii?Q?t57ixMonfG+nwHW4PwtsPP3+7N1vCV5MuazT/4w4C6gx61Aq?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2E842E2852
+	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 15:24:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776353087; cv=none; b=WhUaEfvnGhq8t/Ni42rx2zOd8BJI1CRSPC3nX9R1CuUN20F1nCk9DZ0Sl8n6PQBiS8C4B1Umeck2dov1Fm4zs6caLOrtun/X0kfiObAjXBh969FgJQ8D57/LNGOVu3/8lWLnOJLfDj16rS+QvoWZp5F7jT2ivXDBX6oWhH9spOw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776353087; c=relaxed/simple;
+	bh=4DeLBmD1OSKMnPIdsxTE7sOiplVTnV+dW0Mi0n77Jag=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=owuWPQcIgX3VoOxu7vRbWA8Ma/H3PiMjlpTcscTNHn5iiERBjnVSrYyogblRcx5UwhZ8gLCGwdxrqaMZVmlYgwX9/ThjEB+3b9hCYtS6HdHYjoJpXKDFBBU4TYWJL3XCe1R9HyMxiVzGIpWBA318Y2iwf/rqCB+A4PHGlxqbcM8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G3GI0mFX; arc=none smtp.client-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-823c56765fdso4533923b3a.1
+        for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 08:24:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776353085; x=1776957885; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=H+34z2zcygJjLXaoojeshR97PIrdaKevh+94pYFmkcE=;
+        b=G3GI0mFXEU0cXUysoXGJl5SBUg5exPfMxqQSBmoAbMMTXz9ZXSaSofmm6bbNbeSAJQ
+         jtNmUIWppupHKS02hj7hYZBDqLhR+KUuZ53IOgsnDtAuvnCRp8FdcU0KRQZT4onLrmoA
+         TxCnnTD2dDsoMwfG82McrzRzXXjAvgtOoazZNnW3Me/yCXMaX8kCXmTzRuw3/6t4GTHR
+         HTNqNfgpdnNGFS6LlyyVfMfvfgsLgENo660mHtZOEp4ovdj0lruiFGaGnx6NyzQNHbpl
+         b2F581IECgltJagusP+id6L31M+6jZqMr5ngo2YWrZzA2kp11mJrp/qsqHcgTTYpYme4
+         dIbw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776353085; x=1776957885;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=H+34z2zcygJjLXaoojeshR97PIrdaKevh+94pYFmkcE=;
+        b=J9A2GVDDWIc9NZe/NhgNr3deyI3Jk1JKWAuayaVv0xtG+S0u8PUIWMOCfwb5NsXg7c
+         qXIrp7mfnESlzD57j8Mlfn5Bd3ZqM3nQ3RASAz8DhPNeY0neuIAhzyGDHaeHDEx1LjB+
+         h+e3KottwNxmXzeYMGohGYf7DEp/5jyp63058MniP7t4PuigUKpe59MOogOsggLQjPtu
+         CddkmMXnBxXR27iy1LiMmadignyvE+UwPUEjv7d9fbua5A4hqncGq4iwFjI4fcwKX8la
+         6Gtlj/V+ej3jmPdwQayjz7mSdjvWBGslEgaaPJ+ghkvv5j0Um9LcmsX7x+m3RnHYBfP3
+         sTRA==
+X-Forwarded-Encrypted: i=1; AFNElJ9Y2nKH8FDcnNrFch75Ubyhr0F2E8ZOxIAaGAWjRKEudJKaQQEWHpZDVIZggdUIl9BWe12ylFg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx309nNww3H5ldNizCbwjASStvd2OBo1C9fQaXTKx+yDHLk4+uQ
+	533/0r6lYicPVnDzi1vEbvSByeCF4NVUYcfWUkk0sbvoJGzdHl44MJsY
+X-Gm-Gg: AeBDiesn/6aiBhuqQ+KoOaEJzsjK7VSPbtKGG6VcycCKkyGqZQj51TxOyZ2bgznMCpK
+	hbMEQc0h9m5lyqGgggkxWvKbGcuvgK+nG++HTcGcaEIMYBT3ogDc4s6s9yCB0qguurmNjKpMVc1
+	VP7Labgfd+fAsbnnnj9PqhtOcn3xfD1oCiz3nl4rFKnd36/lzpdmJMOVt4ORYxm/ppvaunDdQ2R
+	B29POlMxPr7BeGxw9v+xc8QmCH5kagvHBt/6uJfCVNMwQEpI5GA/Fcw3emhPcOPRKqIR14GpzZm
+	JNqarorfrHYZZIl1En7Dbsa1ksB+np9e2bYTmI0FIHDEUBW/7NrokpPdYy/OcqFZ3SQs7e6I88q
+	kkN+egOt65Yakc8jJBTDkaU7XxU2fKvSlZpzPXCs6QbWZza2lRPNRgUMcD4EUw9FHExW5Wl7Yj/
+	PKXEVfCzfs4AiPTm8JBijqvD2G9UcngCadju3U1MqJVlcEzFeUhwqWnsKilMQMTDhJQtm+efjq3
+	zs+Z1IIYiE0hI/lhN/6Ag==
+X-Received: by 2002:a05:6a00:bd8a:b0:82a:5d55:5807 with SMTP id d2e1a72fcca58-82f0c1c8bbdmr25895974b3a.6.1776353084917;
+        Thu, 16 Apr 2026 08:24:44 -0700 (PDT)
+Received: from [192.168.0.5] (124-218-201-66.cm.dynamic.apol.com.tw. [124.218.201.66])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82f67085562sm6075675b3a.24.2026.04.16.08.24.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Apr 2026 08:24:44 -0700 (PDT)
+Message-ID: <b44c8f7c-edd6-4d82-ad7d-df8ea907d682@gmail.com>
+Date: Thu, 16 Apr 2026 23:24:38 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: vcQzKb603Ui9DQ3I5PnzfBFkqw9HMnFq2o6tBsu9ZtpYqOqzfSyGWn9Z1mj0QjD0niYMpCXVATLz7f5+BOe4NCHvndwedeF/wjkgIq0j6R5ZM+B/a7JNZmgrScZCBN28fZnIdHTMDl3QAW7vCK9aVnG67uVpKXX3KjlPxlh7vBzuRB8yftkePBWLVNFzi9KP539PONHE8bFT1cJTVk1hmz+Zsoy8BYuYhPdkwXj7aq/RyeBNJh/Zl1KxFj/uu+2x3c82lckn+XhN7jj8v9AW0VepgHqRArr1jmu4e9UHd8jX4cTsk9cbn8vgnKqnPkFBd/e5cjbLm5qtUkI63W8YDQ==
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SJ1PR11MB6297.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e09db44d-41cc-44c2-35de-08de9bcc4445
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Apr 2026 15:24:35.4104
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: B5MURcD22igrPEKV167uJiJ8UZsg0D9biblsK0JQacilSegn9p/55oa4qVcl8PnhB7R8EggkNDG06Xjy1rfVlw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB7318
-X-OriginatorOrg: intel.com
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] net: phy: air_en8811h: add AN8811HB MCU
+ assert/deassert support
+From: "Lucien.Jheng" <lucienzx159@gmail.com>
+To: Eric Woudstra <ericwouds@gmail.com>, andrew@lunn.ch,
+ hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bjorn@mork.no
+Cc: frank-w@public-files.de, daniel@makrotopia.org, lucien.jheng@airoha.com
+References: <20260326153518.8387-1-lucienzx159@gmail.com>
+ <edeee8e5-0de3-48ea-aeb5-cc705fdcd469@gmail.com>
+ <5de3f9ca-ffe7-40ca-93a7-fb7e8e513ec2@gmail.com>
+Content-Language: en-US
+In-Reply-To: <5de3f9ca-ffe7-40ca-93a7-fb7e8e513ec2@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-279080-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,intel.com:dkim,intel.com:email,SJ1PR11MB6297.namprd11.prod.outlook.com:mid];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-279079-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[samuel.salin@intel.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[public-files.de,makrotopia.org,airoha.com];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_TO(0.00)[gmail.com,lunn.ch,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,mork.no];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lucienzx159@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[10]
-X-Rspamd-Queue-Id: 089F4410AD2
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 7ED1B410B9B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
-> Loktionov, Aleksandr
-> Sent: Tuesday, April 7, 2026 11:37 PM
-> To: Hay, Joshua A <joshua.a.hay@intel.com>; intel-wired-lan@lists.osuosl.=
-org
-> Cc: netdev@vger.kernel.org
-> Subject: Re: [Intel-wired-lan] [PATCH iwl-net 2/2] idpf: fix skb datapath=
- queue
-> based scheduling crashes and timeouts
->=20
->=20
->=20
-> > -----Original Message-----
-> > From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
-> > Of Joshua Hay
-> > Sent: Tuesday, April 7, 2026 1:33 AM
-> > To: intel-wired-lan@lists.osuosl.org
-> > Cc: netdev@vger.kernel.org
-> > Subject: [Intel-wired-lan] [PATCH iwl-net 2/2] idpf: fix skb datapath
-> > queue based scheduling crashes and timeouts
-> >
-> > The splitq Tx resource checks were assuming that the queues were using
-> > flow based scheduling and checking the refillqs for free buffers.
-> > However, the Tx refillqs are not allocated when using queue based
-> > scheduling resulting in a NULL ptr dereference. Adjust the Tx resource
-> > checks to only check available descriptor resources when using queue
-> > based scheduling. Because queue based scheduling does not have any
-> > notion of descriptor only completions, there cannot be any packets in
-> > flight, meaning there is no need to check for pending completions.
-> >
-> > The driver also only supported 8 byte completion descriptors in the
-> > skb datapath previously. However, currently the FW only supports 4
-> > byte completion descriptors when using queue based scheduling. This
-> > meant we were skipping over completions, resulting in Tx timeouts.
-> > Add support to process both 4 and 8 byte completion descriptors,
-> > depending on the scheduling mode. Cache the next_to_clean completion
-> > descriptor in the completion queue struct, and fetch this descriptor
-> > before the start of each cleaning loop. Access the next descriptor in
-> > the loop by calculating the index based on raw byte count.
-> >
-> > Fixes: 0c3f135e840d ("idpf: stop Tx if there are insufficient buffer
-> > resources")
-> > Fixes: 1c325aac10a8 ("idpf: configure resources for TX queues")
-> > Signed-off-by: Joshua Hay <joshua.a.hay@intel.com>
-> > Reviewed-by: Madhu Chittim <madhu.chittim@intel.com>
-> > ---
-> >  drivers/net/ethernet/intel/idpf/idpf_txrx.c | 49 +++++++++++++-------
-> > -  drivers/net/ethernet/intel/idpf/idpf_txrx.h |  6 ++-
-> >  2 files changed, 36 insertions(+), 19 deletions(-)
-> >
-> > diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-> > b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-> > index f6b3b15364ff..4fc0bb14c5b1 100644
-> > --- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-> > +++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-> > @@ -270,11 +270,9 @@ static int idpf_tx_desc_alloc(const struct
-> > idpf_vport *vport,  static int idpf_compl_desc_alloc(const struct
-> > idpf_vport *vport,
-> >  				 struct idpf_compl_queue *complq)  {
->=20
-> ...
->=20
-> >
-> >  /**
-> >   * struct idpf_sw_queue
-> > --
-> > 2.39.2
->=20
->=20
-> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Hi Eric
 
-Tested-by: Samuel Salin <Samuel.salin@intel.com>
+Lucien.Jheng 於 2026/3/29 下午 01:04 寫道:
+>
+> Eric Woudstra 於 2026/3/27 下午 12:41 寫道:
+>>
+>> On 3/26/26 4:35 PM, Lucien.Jheng wrote:
+>>> AN8811HB needs a MCU soft-reset cycle before firmware loading begins.
+>>> Assert the MCU (hold it in reset) and immediately deassert (release)
+>>> via a dedicated PBUS register pair (0x5cf9f8 / 0x5cf9fc), accessed
+>>> through the PHY-addr+8 MDIO bus node rather than the BUCKPBUS indirect
+>>> path.  This clears the MCU state before the firmware loading sequence
+>>> starts.
+>>>
+>>> Add __air_pbus_reg_write() as a low-level helper for this access, then
+>>> implement an8811hb_mcu_assert() / _deassert() on top of it. Wire both
+>>> into an8811hb_load_firmware() and en8811h_restart_mcu() so every
+>>> firmware load or MCU restart on AN8811HB correctly sequences the reset
+>>> control registers.
+>>>
+>>> Fixes: 0a55766b7711 ("net: phy: air_en8811h: add Airoha AN8811HB 
+>>> support")
+>>> Signed-off-by: Lucien Jheng <lucienzx159@gmail.com>
+>>> ---
+>>> Changes in v2:
+>>> - Rewrite commit message: The previous wording was ambiguous,
+>>>    as it suggested the MCU remains asserted during the entire
+>>>    firmware loading process, rather than a quick reset cycle
+>>>    before it starts.
+>>>    Clarify that assert and deassert is an immediate soft-reset
+>>>    cycle to clear MCU state before firmware loading begins.
+>>> - Add Fixes: 0a55766b7711 ("net: phy: air_en8811h: add Airoha AN8811HB
+>>>    support").
+>>> - Change phydev_info() to phydev_dbg() in an8811hb_mcu_assert() and
+>>>    an8811hb_mcu_deassert() to avoid noise during normal boot.
+>>>
+>>>   drivers/net/phy/air_en8811h.c | 105 
+>>> ++++++++++++++++++++++++++++++++++
+>>>   1 file changed, 105 insertions(+)
+>>>
+>>> diff --git a/drivers/net/phy/air_en8811h.c 
+>>> b/drivers/net/phy/air_en8811h.c
+>>> index 29ae73e65caa..01fce1b93618 100644
+>>> --- a/drivers/net/phy/air_en8811h.c
+>>> +++ b/drivers/net/phy/air_en8811h.c
+>>> @@ -170,6 +170,16 @@
+>>>   #define   AN8811HB_CLK_DRV_CKO_LDPWD        BIT(13)
+>>>   #define   AN8811HB_CLK_DRV_CKO_LPPWD        BIT(14)
+>>>
+>>> +#define AN8811HB_MCU_SW_RST        0x5cf9f8
+>>> +#define   AN8811HB_MCU_SW_RST_HOLD        BIT(16)
+>>> +#define   AN8811HB_MCU_SW_RST_RUN        (BIT(16) | BIT(0))
+>>> +#define AN8811HB_MCU_SW_START        0x5cf9fc
+>>> +#define   AN8811HB_MCU_SW_START_EN        BIT(16)
+>>> +
+>>> +/* MII register constants for PBUS access (PHY addr + 8) */
+>>> +#define AIR_PBUS_ADDR_HIGH        0x1c
+>>> +#define AIR_PBUS_DATA_HIGH        0x10
+>>> +
+>>>   /* Led definitions */
+>>>   #define EN8811H_LED_COUNT    3
+>>>
+>>> @@ -254,6 +264,36 @@ static int air_phy_write_page(struct phy_device 
+>>> *phydev, int page)
+>>>       return __phy_write(phydev, AIR_EXT_PAGE_ACCESS, page);
+>>>   }
+>>>
+>>> +static int __air_pbus_reg_write(struct phy_device *phydev,
+>>> +                u32 pbus_reg, u32 pbus_data)
+>>> +{
+>>> +    struct mii_bus *bus = phydev->mdio.bus;
+>>> +    int pbus_addr = phydev->mdio.addr + 8;
+>>> +    int ret;
+>>> +
+>>> +    ret = __mdiobus_write(bus, pbus_addr, AIR_EXT_PAGE_ACCESS,
+>>> +                  upper_16_bits(pbus_reg));
+>>> +    if (ret < 0)
+>>> +        return ret;
+>>> +
+>>> +    ret = __mdiobus_write(bus, pbus_addr, AIR_PBUS_ADDR_HIGH,
+>>> +                  (pbus_reg & GENMASK(15, 6)) >> 6);
+>>> +    if (ret < 0)
+>>> +        return ret;
+>>> +
+>>> +    ret = __mdiobus_write(bus, pbus_addr, (pbus_reg & GENMASK(5, 
+>>> 2)) >> 2,
+>>> +                  lower_16_bits(pbus_data));
+>>> +    if (ret < 0)
+>>> +        return ret;
+>>> +
+>>> +    ret = __mdiobus_write(bus, pbus_addr, AIR_PBUS_DATA_HIGH,
+>>> +                  upper_16_bits(pbus_data));
+>>> +    if (ret < 0)
+>>> +        return ret;
+>>> +
+>>> +    return 0;
+>>> +}
+>>> +
+>> Maybe you can use mutex_lock() and mutex_unlock() here also, like so:
+
+After checking, I decided not to implement mutex_lock in pbus_read/write.
+
+This is because these functions are only used within 
+an8811hb_mcu_assert/deassert.
+
+Since these sequences cannot be interrupted, a mutex lock is not required.
+
+Thanks
+
+>>
+>> static int __air_pbus_reg_write(struct mdio_device *mdio, u32 
+>> pbus_address,
+>>                 u32 pbus_data)
+>> {
+>>     int ret;
+>>
+>>     ret = __mdiobus_write(mdio->bus, mdio->addr, AIR_EXT_PAGE_ACCESS,
+>>                   (u16)(pbus_address >> 6));
+>>     if (ret < 0)
+>>         return ret;
+>>
+>>     ret = __mdiobus_write(mdio->bus, mdio->addr, (pbus_address >> 2) 
+>> & 0xf,
+>>                   (u16)pbus_data);
+>>     if (ret < 0)
+>>         return ret;
+>>
+>>     ret = __mdiobus_write(mdio->bus, mdio->addr, AIR_PBUS_DATA_HIGH,
+>>                   (u16)(pbus_data >> 16));
+>>     if (ret < 0)
+>>         return ret;
+>>
+>>     return 0;
+>> }
+>>
+>> static int air_pbus_reg_write(struct mdio_device *mdio, u32 
+>> pbus_address,
+>>                   u32 pbus_data)
+>> {
+>>     int ret;
+>>
+>>     mutex_lock(&mdio->bus->mdio_lock);
+>>
+>>     ret = __air_pbus_reg_write(mdio, pbus_address, pbus_data);
+>>     if (ret < 0)
+>>         dev_err(&mdio->dev, "%s 0x%08x failed: %d\n", __func__,
+>>             pbus_address, ret);
+>>
+>>     mutex_unlock(&mdio->bus->mdio_lock);
+>>
+>>     return ret;
+>> }
+>>
+>> static int __air_pbus_reg_read(struct mdio_device *mdio, u32 
+>> pbus_address,
+>>                    u32 *pbus_data)
+>> {
+>>     int ret, pbus_data_low;
+>>
+>>     ret = __mdiobus_write(mdio->bus, mdio->addr, AIR_EXT_PAGE_ACCESS,
+>>                   (u16)(pbus_address >> 6));
+>>     if (ret < 0)
+>>         return ret;
+>>
+>>     ret = __mdiobus_read(mdio->bus, mdio->addr, (pbus_address >> 2) & 
+>> 0xf);
+>>     if (ret < 0)
+>>         return ret;
+>>     pbus_data_low = ret;
+>>
+>>     ret = __mdiobus_read(mdio->bus, mdio->addr, AIR_PBUS_DATA_HIGH);
+>>     if (ret < 0)
+>>         return ret;
+>>
+>>     *pbus_data = (ret << 16) + pbus_data_low;
+>>
+>>     return 0;
+>> }
+>>
+>> static int air_pbus_reg_read(struct mdio_device *mdio, u32 pbus_address,
+>>                  u32 *pbus_data)
+>> {
+>>     int ret;
+>>
+>>     mutex_lock(&mdio->bus->mdio_lock);
+>>
+>>     ret = __air_pbus_reg_read(mdio, pbus_address, pbus_data);
+>>     if (ret < 0)
+>>         dev_err(&mdio->dev, "%s 0x%08x failed: %d\n", __func__,
+>>             pbus_address, ret);
+>>
+>>     mutex_unlock(&mdio->bus->mdio_lock);
+>>
+>>     return ret;
+>> }
+>>
+>> With:
+>>
+>> #define AIR_PBUS_DATA_HIGH        0x10
+>>
+> Thank you for your feedback.
+>
+> I should add mutex_lock() and mutex_unlock() to protect these operations.
+>
+> I will include this in the next version.
+>
+>>>   static int __air_buckpbus_reg_write(struct phy_device *phydev,
+>>>                       u32 pbus_address, u32 pbus_data)
+>>>   {
+>>> @@ -570,10 +610,65 @@ static int an8811hb_load_file(struct 
+>>> phy_device *phydev, const char *name,
+>>>       return ret;
+>>>   }
+>>>
+>>> +static int an8811hb_mcu_assert(struct phy_device *phydev)
+>>> +{
+>>> +    int ret;
+>>> +
+>>> +    phy_lock_mdio_bus(phydev);
+>>> +
+>>> +    ret = __air_pbus_reg_write(phydev, AN8811HB_MCU_SW_RST,
+>>> +                   AN8811HB_MCU_SW_RST_HOLD);
+>>> +    if (ret < 0)
+>>> +        goto unlock;
+>>> +
+>>> +    ret = __air_pbus_reg_write(phydev, AN8811HB_MCU_SW_START, 0);
+>>> +    if (ret < 0)
+>>> +        goto unlock;
+>>> +
+>>> +    msleep(50);
+>>> +    phydev_dbg(phydev, "MCU asserted\n");
+>>> +
+>>> +unlock:
+>>> +    phy_unlock_mdio_bus(phydev);
+>>> +    return ret;
+>>> +}
+>>> +
+>>> +static int an8811hb_mcu_deassert(struct phy_device *phydev)
+>>> +{
+>>> +    int ret;
+>>> +
+>>> +    phy_lock_mdio_bus(phydev);
+>>> +
+>>> +    ret = __air_pbus_reg_write(phydev, AN8811HB_MCU_SW_START,
+>>> +                   AN8811HB_MCU_SW_START_EN);
+>>> +    if (ret < 0)
+>>> +        goto unlock;
+>>> +
+>>> +    ret = __air_pbus_reg_write(phydev, AN8811HB_MCU_SW_RST,
+>>> +                   AN8811HB_MCU_SW_RST_RUN);
+>>> +    if (ret < 0)
+>>> +        goto unlock;
+>>> +
+>>> +    msleep(50);
+>>> +    phydev_dbg(phydev, "MCU deasserted\n");
+>>> +
+>>> +unlock:
+>>> +    phy_unlock_mdio_bus(phydev);
+>>> +    return ret;
+>>> +}
+>>> +
+>>>   static int an8811hb_load_firmware(struct phy_device *phydev)
+>>>   {
+>>>       int ret;
+>>>
+>>> +    ret = an8811hb_mcu_assert(phydev);
+>>> +    if (ret < 0)
+>>> +        return ret;
+>>> +
+>>> +    ret = an8811hb_mcu_deassert(phydev);
+>>> +    if (ret < 0)
+>>> +        return ret;
+>>> +
+>>>       ret = air_buckpbus_reg_write(phydev, EN8811H_FW_CTRL_1,
+>>>                        EN8811H_FW_CTRL_1_START);
+>>>       if (ret < 0)
+>>> @@ -662,6 +757,16 @@ static int en8811h_restart_mcu(struct 
+>>> phy_device *phydev)
+>>>   {
+>>>       int ret;
+>>>
+>>> +    if (phy_id_compare_model(phydev->phy_id, AN8811HB_PHY_ID)) {
+>>> +        ret = an8811hb_mcu_assert(phydev);
+>>> +        if (ret < 0)
+>>> +            return ret;
+>>> +
+>>> +        ret = an8811hb_mcu_deassert(phydev);
+>>> +        if (ret < 0)
+>>> +            return ret;
+>>> +    }
+>>> +
+>>>       ret = air_buckpbus_reg_write(phydev, EN8811H_FW_CTRL_1,
+>>>                        EN8811H_FW_CTRL_1_START);
+>>>       if (ret < 0)
+>>> -- 
+>>> 2.34.1
+>>>
 
