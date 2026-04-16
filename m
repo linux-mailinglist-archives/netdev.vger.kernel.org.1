@@ -1,128 +1,244 @@
-Return-Path: <netdev+bounces-278987-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278988-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kLx2HlK44GmIlAAAu9opvQ
-	(envelope-from <netdev+bounces-278987-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 12:22:10 +0200
+	id eEj1IYu44GmIlAAAu9opvQ
+	(envelope-from <netdev+bounces-278988-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 12:23:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC8B240CDCA
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 12:22:09 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id F39F240CDDA
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 12:23:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4B67F3049977
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 10:20:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7ED95300879C
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 10:21:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25CAF39E17C;
-	Thu, 16 Apr 2026 10:20:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE4D839E178;
+	Thu, 16 Apr 2026 10:21:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TYaseN5b"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="B1V86eNZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 020A839D6E6
-	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 10:20:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DA5238F628;
+	Thu, 16 Apr 2026 10:21:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776334837; cv=none; b=IC6f/5+5J1lxUe3rtH4YwU7tz82YX9iBTwYUCna25cDlVeXhi2MkLfphKDcbeG4+21dACh9CNzPIZWUA83S9BNMXFVK+AGxiMLav3iakElwAuY7txoZbariXbErg+Wy5C1XvlMxuolzJBK/gkk582jRsC8byMOoA/cKJIjaVrIw=
+	t=1776334863; cv=none; b=sSlZbwOz/ZsJuro6nzblgCdd5lrf2GKaZd14M95GvO1Qtq/sUMamyycChUVSHr2a2FhfU45EwsZtv8aRUkbsfMUa5niKVuB4JOrOb/u1m9pPOZKzRPM9BM6NrBNcVeyacHkwLx4lWma9b5CpdC2nwC/sT25qs6bLy2ktmxVQrU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776334837; c=relaxed/simple;
-	bh=3fkZP5+gmMNBxSRR06WR7MiCqP0W09tOeUHiU+dKsw4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ViBvkjbPWZIeV5HeHo77EGvPYpPffnuXjaOvQE8mh86impwnPYV8nQc6IXNOwpXYG7/aWZ09/Nyt3oIBu2yTQzheeDMTlwR6WB2Huhy3Gukk7KdPfuGfU7y9Uvw+PmGW88GuV68k+xAbo2n38jmsAMcs8sJY6hV1huzS7SFlJCQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TYaseN5b; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84468C2BCB0;
-	Thu, 16 Apr 2026 10:20:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776334836;
-	bh=3fkZP5+gmMNBxSRR06WR7MiCqP0W09tOeUHiU+dKsw4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=TYaseN5b2LnPkVHLe7Kc/wPb6Y1TiTLmSP54WryKnHynr1mvHMZJXlOSttopiI5gN
-	 cmCeDFq3qsY/lzPaVSMUadk15ZP9XNmjVSrIlWcimX+Y4cHnghL1nab4GkqwYNGCjg
-	 uqAyv+4VUg8H9Yj6O9GYqWmKTB4QczGecvOwXFgH2oTQy2AryklX587gIhJZpTgHoP
-	 +uBPtmHoEG8A50iet4+8qVXLNmaGrjyWMYyC9kzM1uBU6DVZYttzI1w+w8aoubBUqx
-	 N54UBIs061k3QsPiSIn5J8Gbxz2ZQDw+jAyjO16pybewu3lVQ16ULwBOQThC4fpJJv
-	 H6Lf7q5vB5zHw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CE70380A97D;
-	Thu, 16 Apr 2026 10:20:06 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1776334863; c=relaxed/simple;
+	bh=UBwjMmb3d0N7nhsPymOSuOfL3WowxIg4cO+l6i3QfqA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sCEd6fLlRdiy7EVQvwxEYv7g39IPZ9lC2TI4p8XNPTWmeTgk/+wbujtsGMHzSg3L+ppRYSnozvd/OIyyq+qW1eSQsGAN0cO4Wqv182KF1Ic8QQKA1C3rcjY7piKZGUJgZsBIE5SsU772d0jN3SnxJANvrOzTkQ+RnYs7bm/8DlA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=B1V86eNZ; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with UTF8SMTPSA id CE1AB60177;
+	Thu, 16 Apr 2026 12:20:53 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1776334854;
+	bh=8kWmeUkIG6VdxXPuXZVqzvlOjP1jcfRwLlbL55d4FM4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=B1V86eNZeWVCAdONB9vSBNgIMV7v3MSQ0UB2bcZhblXrh6A5vmBVpEo10FEYWZmZR
+	 xXrYt3Ldz1J1OEIhIR9h87GbjTBLHEuJaLhlOgu4WaeWCPM4PGezvNFtOqQR7KVS34
+	 FzRVFV4H0+912Hof2dcAIswnh2rTKFql0w6hh40yiN2F1OqOgP4ChHiiuaKxNz9ESg
+	 rdmeNB4l6rK1xKRzwBQzHQl7LXOJkM17c7NG5uGUZHc2i5bKEWqDv+nmJcQ3rxR6gx
+	 qpfvOrHhm+nVOLwR+KZzrqBbjtp6+a2qrVG2Y01RSyPVQd9voNSfvku6jfEu/dHqhx
+	 clMwswCoZSQeA==
+Date: Thu, 16 Apr 2026 12:20:51 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net, netdev@vger.kernel.org, kuba@kernel.org,
+	pabeni@redhat.com, edumazet@google.com, fw@strlen.de,
+	horms@kernel.org
+Subject: Re: [PATCH net 00/14] Netfilter/IPVS fixes for net
+Message-ID: <aeC4A75gYD9qT5OR@chamomile>
+References: <20260416013101.221555-1-pablo@netfilter.org>
+ <aeCPB1_WaFOX-Xos@chamomile>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] macvlan: fix macvlan_get_size() not reserving space for
- IFLA_MACVLAN_BC_CUTOFF
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177633480530.2723350.2222193902436957628.git-patchwork-notify@kernel.org>
-Date: Thu, 16 Apr 2026 10:20:05 +0000
-References: <20260413085349.73977-1-phx0fer@gmail.com>
-In-Reply-To: <20260413085349.73977-1-phx0fer@gmail.com>
-To: Dudu Lu <phx0fer@gmail.com>
-Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <aeCPB1_WaFOX-Xos@chamomile>
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-278987-lists,netdev=lfdr.de,netdevbpf];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-278988-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[netfilter.org:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
+	DMARC_NA(0.00)[netfilter.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FROM_NO_DN(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: DC8B240CDCA
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,netfilter.org:dkim]
+X-Rspamd-Queue-Id: F39F240CDDA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello:
+Hi,
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Mon, 13 Apr 2026 16:53:49 +0800 you wrote:
-> macvlan_get_size() does not account for IFLA_MACVLAN_BC_CUTOFF, but
-> macvlan_fill_info() conditionally includes it when port->bc_cutoff != 1.
-> This causes nla_put_s32() to fail with -EMSGSIZE when the netlink skb
-> runs out of space, triggering a WARN_ON in rtnetlink and preventing the
-> interface from being dumped.
+On Thu, Apr 16, 2026 at 09:25:59AM +0200, Pablo Neira Ayuso wrote:
+> Hi,
 > 
-> The bug can be reproduced with:
+> I am preparing a v2 to address so AI generated comment, I should be
+> ready in a few hours.
+
+Just a quick follow up.
+
+I cannot send a batch before 16h my local time, I need a bit more
+time.
+
+Sorry.
+
+> Thanks.
 > 
-> [...]
-
-Here is the summary with links:
-  - macvlan: fix macvlan_get_size() not reserving space for IFLA_MACVLAN_BC_CUTOFF
-    https://git.kernel.org/netdev/net/c/fa92a77b0ed4
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+> On Thu, Apr 16, 2026 at 03:30:47AM +0200, Pablo Neira Ayuso wrote:
+> > Hi,
+> > 
+> > The following patchset contains Netfilter/IPVS fixes for net: Mostly
+> > addressing very old bugs in the SIP conntrack helper string parser,
+> > unsafe arp_tables match support with legacy IEEE1394, restrict xt_realm
+> > to IPv4 and incorrect use of RCU lists in nat core and nftables. This
+> > batch also includes one IPVS MTU fix. The exception is a fix for a
+> > recent issue related to broken double-tagged vlan in the flowtable.
+> > 
+> > 1) Fix possible stack recursion in nft_fwd_netdev from egress path,
+> >    from Weiming Shi.
+> > 
+> > 2) Fix unsafe port parser in SIP helper, from Jenny Guanni Qu.
+> > 
+> > 3) Fix arp_tables match with IEEE1394 ARP payload, allowing to
+> >    reach bytes off the skb boundary, from Weiming Shi.
+> > 
+> > 4) Reject unsafe nfnetlink_osf configurations from control plane,
+> >    this is addressing a possible division by zero, from Xiang Mei.
+> > 
+> > 5) nft_osf actually only supports IPv4, restrict it.
+> > 
+> > 6) Fix double-tagged-vlan support (again) in the flowtable, from
+> >    Eric Woudstra.
+> > 
+> > 7) Remove unsafe use of sprintf to fix possible buffer overflow
+> >    in the SIP NAT helper, from Florian Westphal.
+> > 
+> > 8) Restrict xt_mac, xt_owner and xt_physdev to inet families only;
+> >    xt_realm is only for ipv4, otherwise null-pointer-deref is possible.
+> > 
+> > 9) Use kfree_rcu() in nat core to release hooks, this can be an issue
+> >    once nfnetlink_hook gets support to dump NAT hook information,
+> >    not currently a real issue but better fix it now.
+> > 
+> > 10) Fix MTU checks in IPVS, from Yingnan Zhang.
+> > 
+> > 11) Use list_del_rcu() in chain and flowtable hook unregistration,
+> >     concurrent RCU reader could be walking over the hook list,
+> >     from Florian Westphal.
+> > 
+> > 12) Add list_splice_rcu(), this is required to fix unsafe
+> >     splice to RCU protected hook list. Reviewed by Paul McKenney.
+> > 
+> > 13) Use list_splice_rcu() to splice new chain and flowtable hooks.
+> > 
+> > 14) Add shim nft_trans_hook object to track chain and flowtable
+> >     hook deletions and flag them as removed, instead of unsafely
+> >     moving around hooks in the RCU-protected hook list. This allows
+> >     to restore the previous state from the abort path.
+> > 
+> > Please, pull these changes from:
+> > 
+> >   git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git nf-26-04-16
+> > 
+> > Thanks.
+> > 
+> > ----------------------------------------------------------------
+> > 
+> > The following changes since commit 2dddb34dd0d07b01fa770eca89480a4da4f13153:
+> > 
+> >   net: ethernet: mtk_eth_soc: initialize PPE per-tag-layer MTU registers (2026-04-12 15:22:58 -0700)
+> > 
+> > are available in the Git repository at:
+> > 
+> >   git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git tags/nf-26-04-16
+> > 
+> > for you to fetch changes up to e349f90da812aeddd22c3914a2cc639b51e4eb48:
+> > 
+> >   netfilter: nf_tables: add hook transactions for device deletions (2026-04-16 02:47:58 +0200)
+> > 
+> > ----------------------------------------------------------------
+> > netfilter pull request 26-04-16
+> > 
+> > ----------------------------------------------------------------
+> > Eric Woudstra (1):
+> >       netfilter: nf_flow_table_ip: Introduce nf_flow_vlan_push()
+> > 
+> > Florian Westphal (2):
+> >       netfilter: conntrack: remove sprintf usage
+> >       netfilter: nf_tables: use list_del_rcu for netlink hooks
+> > 
+> > Jenny Guanni Qu (1):
+> >       netfilter: nf_conntrack_sip: add bounds-checked port parsing helper
+> > 
+> > Pablo Neira Ayuso (6):
+> >       netfilter: nft_osf: restrict it to ipv4
+> >       netfilter: xtables: restrict several matches to inet family
+> >       netfilter: nat: use kfree_rcu to release ops
+> >       rculist: add list_splice_rcu() for private lists
+> >       netfilter: nf_tables: join hook list via splice_list_rcu() in commit phase
+> >       netfilter: nf_tables: add hook transactions for device deletions
+> > 
+> > Weiming Shi (2):
+> >       netfilter: nft_fwd_netdev: use recursion counter in neigh egress path
+> >       netfilter: arp_tables: fix IEEE1394 ARP payload parsing in arp_packet_match()
+> > 
+> > Xiang Mei (1):
+> >       netfilter: nfnetlink_osf: fix divide-by-zero in OSF_WSS_MODULO
+> > 
+> > Yingnan Zhang (1):
+> >       ipvs: fix MTU check for GSO packets in tunnel mode
+> > 
+> >  include/linux/rculist.h               |  29 ++++++
+> >  include/net/netfilter/nf_dup_netdev.h |  13 +++
+> >  include/net/netfilter/nf_tables.h     |  13 +++
+> >  net/ipv4/netfilter/arp_tables.c       |  14 ++-
+> >  net/ipv4/netfilter/iptable_nat.c      |   2 +-
+> >  net/ipv6/netfilter/ip6table_nat.c     |   2 +-
+> >  net/netfilter/ipvs/ip_vs_xmit.c       |  19 +++-
+> >  net/netfilter/nf_conntrack_sip.c      |  80 +++++++++++-----
+> >  net/netfilter/nf_dup_netdev.c         |  16 ----
+> >  net/netfilter/nf_flow_table_ip.c      |  25 ++++-
+> >  net/netfilter/nf_nat_amanda.c         |   2 +-
+> >  net/netfilter/nf_nat_core.c           |  10 +-
+> >  net/netfilter/nf_nat_sip.c            |  33 ++++---
+> >  net/netfilter/nf_tables_api.c         | 168 ++++++++++++++++++++++++----------
+> >  net/netfilter/nfnetlink_osf.c         |   4 +
+> >  net/netfilter/nft_fwd_netdev.c        |   7 ++
+> >  net/netfilter/nft_osf.c               |   6 +-
+> >  net/netfilter/xt_mac.c                |  34 ++++---
+> >  net/netfilter/xt_owner.c              |  37 +++++---
+> >  net/netfilter/xt_physdev.c            |  29 ++++--
+> >  net/netfilter/xt_realm.c              |   2 +-
+> >  21 files changed, 393 insertions(+), 152 deletions(-)
+> > 
+> 
 
