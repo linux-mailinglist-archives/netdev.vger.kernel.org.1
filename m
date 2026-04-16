@@ -1,267 +1,527 @@
-Return-Path: <netdev+bounces-278914-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278919-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +CzEApJd4GkcfgAAu9opvQ
-	(envelope-from <netdev+bounces-278914-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 05:54:58 +0200
+	id 6Go/BA5e4GkcfgAAu9opvQ
+	(envelope-from <netdev+bounces-278919-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 05:57:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3888040A186
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 05:54:56 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D71840A1B2
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 05:57:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 4B8983009389
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 03:54:51 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 3467A3016177
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 03:55:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E279527AC4C;
-	Thu, 16 Apr 2026 03:54:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00A68275848;
+	Thu, 16 Apr 2026 03:55:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YuP+c+uD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DfkKJwKw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f53.google.com (mail-oa1-f53.google.com [209.85.160.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 862E32F8BC3;
-	Thu, 16 Apr 2026 03:54:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30B1C27AC4C
+	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 03:55:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.53
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776311689; cv=fail; b=uoK/mwuVVVd65xj7f6lZR04mK1V0sGVRZB/kYjukJ+LJhcNbs9nZQHljI52kUB39XLCF9aqp2MmkaVgJ1JUWk4gC//yFpapo6tu/ZoRw5VFsUFDcMqFOE8i55M2MN+AjszC4kwBEqA/qhV7GGFZqkz9OIK6p9U0sGhxyhGQuI0s=
+	t=1776311752; cv=pass; b=sNL+n+18TXgpkU9s9XvaTm/zA+ZehwjVCXp2KXAq+DzZ49BA1P9JIulAHJnDS1Yh0mUwMzSjUclziGPSz7aKDLY1yeLUCfB+vjE30tElraezuzsXon9OZvEEwjtnAIYejGVLKfGmUmgRrJrv9eZuf7rHNzjNy1eDmIsk70TvB7c=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776311689; c=relaxed/simple;
-	bh=KCp48touOvhhGtj5zVSmtk7NdOtWp88H+43G2Rey8zs=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=GoOrT+FFklW+3FPgboC2lhTwmm3pM5AkUwJUQOfiUDkkINqdNCvsiwKhBk/eTs3oNahrpBQalw7rZhoRdNg9jNb4tSBpNbETyVS5eh+qU3EWywcM/EuKxunyZYPQWr02Q5ynBell1ezuwGasbYHqRpoDr7+AQK8V+goACU03hSk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YuP+c+uD; arc=fail smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1776311688; x=1807847688;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=KCp48touOvhhGtj5zVSmtk7NdOtWp88H+43G2Rey8zs=;
-  b=YuP+c+uDXn17TDfu92qdUuHO0egpvUuYANTkELQUpH89YOBoRflreFFw
-   nScUh8wnOkLfViilcNwN4JEjREJlCt/a8eE1IFeNVa3ax5cX1uFfIbtkt
-   j85Zfzme/DCWZtrOPyF2XOZ5rq/McOd1ZPcJ5o+qQEZE/UlxL+/wQlwYG
-   iBeGxBLZzHVj35Hvldz9J/3wWNl8Lmb9C9/RZfnq2lMvh2A3kQZGnmeOZ
-   QvEk3tp4TpcadeqJ2zUuCvtsJNz9BlBwDxnwNIta0cGeyYoo64YRD0z4c
-   C4t8ChukD6+A4pgNqXIqSXnevIHHrcmbY0swdNDjeZ7qbNWwPr/1+1fBo
-   w==;
-X-CSE-ConnectionGUID: 6W9uiykaR5GdMNLyDbh7LQ==
-X-CSE-MsgGUID: MUvmVZ0ZT+SigTRwxDY2bA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11760"; a="88000366"
-X-IronPort-AV: E=Sophos;i="6.23,181,1770624000"; 
-   d="scan'208";a="88000366"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2026 20:54:48 -0700
-X-CSE-ConnectionGUID: CM49DsgjQy608mUD4eMC7w==
-X-CSE-MsgGUID: sGyPi4GxTU60T93MmVojQA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,181,1770624000"; 
-   d="scan'208";a="227456665"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by fmviesa007.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2026 20:54:48 -0700
-Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Wed, 15 Apr 2026 20:54:47 -0700
-Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Wed, 15 Apr 2026 20:54:47 -0700
-Received: from PH0PR06CU001.outbound.protection.outlook.com (40.107.208.35) by
- edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Wed, 15 Apr 2026 20:54:47 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=CNLDpwbLBPVEsrf9pSjGc8BrdjkJ0T/NOB6EVn6YyoUR0lbCuU1VimU3SH5WzYk2J62YSgQTrz9dCMvv9Or7AO52OwAfsch+nF8xCubatQBz83L/wD8yLRxUgijlx2QdKZHblS6hSHlMdsx96VV44v5NOAhH40djB3oup4isBJri0djN36MaoneHtBZh8v3UqMpdupQyF274JJZxpR8zvFPoKULvnxuofOVvqyv7dLDoiSeyN1owxPwkfhOfp5QpSmm/Q9IJxpHD+sdGzOvA/i0ODYL6wwlqao4lhRaJDQXZJAC9JV1JVzSGvpTY8oR2zQggEbPDsn0SIM+3Y/L+fA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=VboUehOG6hLjjyR6LOY5VWBmDR1aTtjjLHHt+JrSJus=;
- b=ESiJpUAT50Yk1raEmIkfJEb7v45oJe1GUTnQKHY3ISOWGn98OCz81KBchRo5WUpTIh1ykEp6/bjskUPYexaFw49BvKjYN3ee4ku8QBqTXu1inIX5HpmSKDQ6V7UeyKLAjG34ZJVINiebyJDX4giGb/Hyw3oXV/xL5isxdOX1miFa2tTkTX1nBXRBYIgtT21UYvd5DH5mLvGFArVW3jDwpjf6eXvdaoJgxBBqmvkHr/LV9avQQUmf2K4GUilDNSkxEhJ+/JAL7cCxIGzB145IA5636MtxnlTIUPiiigX4D23x/peTu1Wt8V8eA2ZAoXFCWD42f7z1aLnoxV9ypyuqUw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
- by SA1PR11MB8809.namprd11.prod.outlook.com (2603:10b6:806:46a::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9818.20; Thu, 16 Apr
- 2026 03:54:44 +0000
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::8d98:e538:8d7:6311]) by MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::8d98:e538:8d7:6311%5]) with mapi id 15.20.9818.017; Thu, 16 Apr 2026
- 03:54:44 +0000
-Message-ID: <b2735cbf-34ac-4ad8-b524-2aa0f57511f8@intel.com>
-Date: Thu, 16 Apr 2026 05:54:38 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 2/2] bnge: remove unsupported backing store type
-To: Vikas Gupta <vikas.gupta@broadcom.com>, <dharmender.garg@broadcom.com>
-CC: <netdev@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
-	<horms@kernel.org>, <linux-kernel@vger.kernel.org>,
-	<vsrama-krishna.nemani@broadcom.com>, <bhargava.marreddy@broadcom.com>,
-	<rajashekar.hudumula@broadcom.com>, <ajit.khaparde@broadcom.com>,
-	<rahul-rg.gupta@broadcom.com>
-References: <20260415151621.1104956-1-vikas.gupta@broadcom.com>
- <20260415151621.1104956-3-vikas.gupta@broadcom.com>
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Content-Language: en-US
-In-Reply-To: <20260415151621.1104956-3-vikas.gupta@broadcom.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DUZPR01CA0010.eurprd01.prod.exchangelabs.com
- (2603:10a6:10:3c3::12) To MN6PR11MB8102.namprd11.prod.outlook.com
- (2603:10b6:208:46d::9)
+	s=arc-20240116; t=1776311752; c=relaxed/simple;
+	bh=OcYN5IGXghYWFoAIchFWJw3FkppmQylxuBo9OALWQYA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GOrqjQtuNMaN2f9DFkmCK4LB1K38f0Jxu22BR6aZDiwTRHRBlLsqmXYTK1/PriBJVK06b/Km8ZCxJvHrvzxS3ZzHWbL2/dL30/gdZ5DhYrcrIRg3HLuTBGUPS/iyvo4mpMCyJ4o6wUC8o/IWVeIjgPZLsfq5VpFEReXrHDMoIIE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DfkKJwKw; arc=pass smtp.client-ip=209.85.160.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oa1-f53.google.com with SMTP id 586e51a60fabf-40947c81b31so343181fac.1
+        for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 20:55:50 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776311750; cv=none;
+        d=google.com; s=arc-20240605;
+        b=dwBVem+VNmVxmEIHAo0MVEtsC2dVPcD+b0H74sPriBJ4oCBKK8v47MgmWPjzNlztdA
+         6dHWCPFLiOcTfoDO9w87NxFSuhbohtFWj7aHI810MjXx0T5xH8wpHfVhfB/gK6P8OOjC
+         E0Bea8MdUKZX6knOZ4BhEpB4HX2rgrN+CEQDSmmmJVHYoIih3d93G6EBof30zwbEgulD
+         rZCaTeBaiEM7kTEnNwSPfWyrKZkZaLQ4WIKqpucb1CvSFAGgpMytRS0qR2nnZlDK3n2K
+         zQHrGgQpbSCDbUM6mOUVCFR2H/QML2CPvB5U8E6h//88ZijDDJFaEUZnmH3msdZeTVGy
+         m7Fg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=UnflnbGtuYVuzyIj7FT4Da3iZhZDEzJCKiZl3ehn6uI=;
+        fh=h8JSi214CggotktuzEst9ijuHrMAI0LoQ4aepkxzokU=;
+        b=DyOULXUoYTZNt6r9oN5G1hXorSeN1CtY8wjcFbHr1OrB5JdRtJJ64B2LG2mMlKAHkB
+         ZdhmZiE3XTyZ98YVTG+IjXdQPE7s7sRlV5lQLCvmLnvId36qirOscdxBqTzfkGnbUTVl
+         8WLBnOoE+aAO/Nh0ZZGiwwbkB6c9n6XTsSHFS4gM+e58GegOTViAKThD1plRDlEo76W2
+         BsG1PHARArMqLw/kgx5Kfn28Jxw001TRhEQKDWZIxT3RejKuZ6gJ5jZMX2cy7se3jJCn
+         0/2O+Cnx+l62wJbs/2jJljNw/M6QsOJ8n5KtiJffzCKq5SE1U2ksauFojLVZYDBhNCF+
+         aitg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776311750; x=1776916550; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UnflnbGtuYVuzyIj7FT4Da3iZhZDEzJCKiZl3ehn6uI=;
+        b=DfkKJwKwqACQ1YjW8Gz2+zv+g4F0oHeHcqjIyvWxqoPtoMHx/mfdbnRRR3Qk9DvVw3
+         0VJq3zVl8bHGOJVwgDiI7gcXICKpZA7yxOMRHebSDlgom2LUZ3KmBvtr9ksSRXbdUOnN
+         z6glMLXsyBJzM1ocAscYDLWd8xbA/ypfgCFjc/vpMcoR/O3mj/VaQ5YyCtRkGfOdSNQC
+         ahe4afRZgSbvtf1rcEO8DfZakcrqHk196p61bpE1Ozoy6Lbdugdy/1whYACvWp/ylH3S
+         43ll0u6xNG4Kn2l2q69lME/KgxAtjF4xeHH6F3cX+km0j6GD0G4/E+ZyoWaRstG2cutf
+         agCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776311750; x=1776916550;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=UnflnbGtuYVuzyIj7FT4Da3iZhZDEzJCKiZl3ehn6uI=;
+        b=SCEI7td/+r884LtoikjKn0bsLmlZ4JUOVkrXtXmzBkfyMaDsdbk95Jr/OZUokgjNKy
+         OoUhB1Wbe8yFLVLYygyJX90K8+QXa7hFJCwuaad67iuDGUVSAD6WG3xiSV7AMytiagpj
+         V+3A9Rs/Y9tmFBt9WiepLFRpbV/3tsxaczd9/hArxC/baFEcbLqseM8xuitzEWxsadfk
+         HDcOB+K9lb+LEfgUJWU5tqKkdUXR8W7ygsvZVqWtod+3eFLj9qE63rysF+KgpCYxmlNC
+         23RZKCRiiMtrSvGGiTA2N8Hv/MUnOEcWAQ0+C0d/y2o4aKOYaTQPsi5uZyZs3UosaPT3
+         +/ig==
+X-Gm-Message-State: AOJu0YyDRVJJV14xcA8gNdc9t7X9dAiB1W50EwUuSPzMFR6ftgjv4DV+
+	rDbeqazcLl4uZpaOYViWlUbtd+4RdS9Ig7GTh0vbpzMB+9zOXlsYvcxAADjPt4sJ/BS7eDs+ZmC
+	c2TT3k58q+CYJyAT9LHA4zHSxi8t0MKo=
+X-Gm-Gg: AeBDiesFBPqxAhPiiGwEauVzOaJmRh9k8YUIGIO7efhBrAGWMb/sWnT0dhuwoOS2T98
+	ZPfTlt4o9rhXWY/o+L8uha+S685azTmMZ0XXd58tTubdZhG9P+IcjJ88vcr081VZg+8XQLCzijr
+	xi+E6JLHunhnp5AcOWAjdDxxSbyFtHsrCNWZFcvZz3m39EXKoufxCrS6SloeCdkMvWMhNfcjABr
+	dD6+eNxuNcfyYcmnuXFPwEaFMB2ctM4TSm2LlQ8jSFWha+Y081RNmUXSLVfx4T1jEwHdJMk9c5w
+	fiL5luEKmalARlub
+X-Received: by 2002:a05:6808:bc2:b0:46e:df55:240f with SMTP id
+ 5614622812f47-479890b9538mr286612b6e.7.1776311749765; Wed, 15 Apr 2026
+ 20:55:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|SA1PR11MB8809:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0d2cbca0-25fe-4706-bf51-08de9b6be4e7
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024|56012099003|22082099003|18002099003;
-X-Microsoft-Antispam-Message-Info: R9EcRAazrhUcWDE0ozvawfx4x7vnSlClGo0lenSnj+bFjB+co17QjaaOZjdv9kZVOKTwBUmIhoPattck+djduX2vjfz1L24/olx4fwQ9bxKpKpTmPjGpSJa9mKmg9klbAJtVDWyGZj/w3v3MCc3xm61dzrW8gJkyu9ZKU2BqvBVM6Gjb8F2zjiY4CtDNuKGq+FhSFSAjIZ4tY3R5GQlvQnu+yF7NnnKlx147FEQi7X2W/2FUokQtzJobYgNoCzzG/nGIR+8iR1CjO5oK0xac56XCwwigsdhQtCnj96JrVxzVgKqknB1A1XqGlu4X0+rlWqqz4YuTRslrKRANHmt7/7HwVFh2vBCpyfWXxmh7YY2bQUzY61FwKrhTugctn+Fgb906WQBunmgqTG4F5EViMZ8vWigHlt2jvfdmZnSMx6JMb0Dn8xhOLWn6sMBZyNr+wKSSohQBEBOX2wk3e/RRV5zho1xTvEdBrhP7I9pmB+9Ezh6QQ5Pb9OAu/DZFM82X1vY8Vgf7epYPzqQwm6DP4gesZuoQ22jpg4nCCUvXU33+IfMDdowWSBFT9xz0OGfK6whyHi4FXMMt5Mncqr5b5FnXdsZPU/7pjCERinh9muXvvh5HAM9F5aLvS8yicE4srsVb+zLkeLSU28trPsAuV3q88hRjR8OPg9y4X7VYy3V89bDY9r9NzMAH7NRTNMoOgtxG9Lyr0OTQY/mR+wStgupJwH/0WO6aSJBiX7+gu0c=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?WGNCcUZSdVlaTHFPall3Q1psK1NCN09OZWQ0TURGdHNaUVdFVDcyYWllcmRS?=
- =?utf-8?B?UTVSa3o3d0xqNGhVT01LY0M0OWo1c0F4NWo4NGRRVjM4ZVMvMUJiY3VTbXpK?=
- =?utf-8?B?Q3d2Q0h3YmxySFpqa2lBdmtLUnlrZG1DVC81eUM3bnQ4UGxhby80bDFHcjlm?=
- =?utf-8?B?dFdDdDE0S1MxQnhMQmlyQjlWbzlHcmdvelp0aDZpNDZTMm9sN2IrV0VEdkFH?=
- =?utf-8?B?SzFra2NLQ1JnVjNra0NLR2QzZm9RdzI4UFhnWHZQSDNkOTNVVXYxRFlhTGk5?=
- =?utf-8?B?TmMxYnQycXBBZkk2dGpsWlVPUmw5enhreTA0ZzhISWNyam5oVURxWUxYUWIx?=
- =?utf-8?B?UEVYanZQZFRhTkdrNFh6T21sSjJuWmltSTRIZE5SRU9lMmJYYnpvMDhHSE9y?=
- =?utf-8?B?ejFyNXE2eXc2WmlCOUd4YWU4N0dGcERCRmNRVjg5UWFBUzFNUlJnbmxHT0RV?=
- =?utf-8?B?RzA4a1JzQW55czZ3MUUwZ2xlVy9VNnF0dHBwVDZPUUtHenQ5RDhMcHRmbkFy?=
- =?utf-8?B?Ym5FaWxVSEhHeVZ6Y0FPNXJMaE5sMENleVZjL3RVWWlFcE54VTU1d2w3bFFi?=
- =?utf-8?B?SlY5bFZmVmNjVmwxY2Q5QVNTbXlnNkI2QVZMZ205M3U5NGFmZklaeGJ0OTVu?=
- =?utf-8?B?aCtadGlCS09uTzh4VEQwTjNPdm5aNkRXdUlULzZiV3R3ZE5rTldSRDM1S3NO?=
- =?utf-8?B?dzJTSkFNYnZYYTZzN3NucGQ5N2Y3WGFicE1GZlltQkNoMWhCZ29iMlFwNVNC?=
- =?utf-8?B?ZU5QOWVJN0kzVGYwaEUyU0xIdkU1d2MrVEEzdWU2eTlWSjMwTmIveFA1Zi9O?=
- =?utf-8?B?Y3ZTd3U1L3Q5QnZyVmxYT2VITHdDdWl0U0dsQVZTYnkzZWY3NnpFdWdlempQ?=
- =?utf-8?B?YnNBcWN6ODNSbGZHWGVQNEZWbGw4VGJMKytpWWpTb0FxTmtwVzMxaXE2UWxq?=
- =?utf-8?B?Yit2YTZPL1pNMFgrNllyckdGdmY0cE43OUpEdXJGSXJ1c255RWJpa1htV1Q3?=
- =?utf-8?B?MUJPd3pndElMdytWYXA2VGFJWFVUQjlmYUFmemVJNDlrWEtSV1UvUHNoVE1G?=
- =?utf-8?B?N2t0b1IyWklSN2xqZUJMd3lLeXB2d29vNWN2Y0h6VC9MTGFpWkVoUkp5RkNS?=
- =?utf-8?B?eHIrdlUvaUlBNmNKVlZDc0szWUhmOEtvS3pJVER3MW9xUWMwSVkvamZ3aEZt?=
- =?utf-8?B?TFNVYVVRaXE0aWxWTmZDNjVJNWhxRm50WHNNK1RScDEvMGlFU1dUUmg5YW5F?=
- =?utf-8?B?dWljeGIycFR5emZEM01zZjF4a2lIOEtQNCtSYjA3c01hS0YyVWJZZzA4THJl?=
- =?utf-8?B?eHRCdGVlajFuL0p4VjZQeDFISDUzK3AwWCtYQ3dOeVZNeUpWN2I0UklxZisw?=
- =?utf-8?B?dlN5YzJUVU01enpBRDV3SU42cEJnYkdHRTZCcm0wb1hjajFFc0lPZUo4bVpQ?=
- =?utf-8?B?ZGZPZXpaZ3Rha2xoSDFWT1FJYkU1a1huRHRNSXNxZ3FqOE03Ym03enFkdTUv?=
- =?utf-8?B?YmwzMVVpSjIzNkVMWjBNRGs2aktTMG1hSU0ySFpHdi9OVkp0VU5zMzBIcGRD?=
- =?utf-8?B?YVhXNE1pL3RPc01FdklkWG1vdTM5bnp3OGFPRXppWU9hSkRBTWVyeTh2TmdD?=
- =?utf-8?B?azVldkFnRFY0N01JT1lxZ3NNNExOQk9iTXFxdStvaDJJQWJQWU9yRkwzVEFJ?=
- =?utf-8?B?eHNuS29aUXluS1htNG9QcFZOYTFJZ0FVb3RkZ3d2U0dRL1IxRERaaG1sdkFw?=
- =?utf-8?B?em8xbUlYZHJ6S2NpeG1tYjUrUDdZdU1GSVgvTGZ5RE1Edi9ZZkpIMFBlSzc4?=
- =?utf-8?B?anVNZWFLY3BVWG5YQTlXU1lQT1dKdFZ2RWpXaVhjZGprU2tGdmNLOW9LRFhW?=
- =?utf-8?B?UUt6bjRucGZ2S0FvRGY2TlppRzFzYjk2Z2VCT0NaelBBZUJVOW5aYnY5Vzda?=
- =?utf-8?B?WmZWSXIwbkJhTkwyT056VFB6VG9iMmljdG52N1R5Ym5ieVdqb21HMjJPOGxY?=
- =?utf-8?B?K1hPdGE5OUZlcjRLcC9nMEZSQytqSXVxQTlXUVFqT1B5V2poYkFIN3NXbzJa?=
- =?utf-8?B?NU9NczBvL1NzRERWbjB3MkNwai8wK3YyZGxEVjRGZmNIWE5yOTl2WEhRSTNh?=
- =?utf-8?B?VzFZNXVnZ0UwTCtuVzRHL0ROUGtJYldvTXpVSkZKMCtrWGlkM01EMlp5ZTdr?=
- =?utf-8?B?OHJwSCtXNmtlMjRyTmJabUZqbW1BRFllbmlXcStGR2RsQ0pLdldMeis2WXFt?=
- =?utf-8?B?R2NCcFlHbXEya0M2ajRxVGVPdCsyMEpsNVNURzA1aVJRMG5GY2Y4Y3pSNGVz?=
- =?utf-8?B?Yzd3ZkVMbFQxRFd0UGh5QmFuS2luQW5ET1FMejBBSE9TcFNBOStremdUVkpo?=
- =?utf-8?Q?QP88JevMr5SgnE9Q=3D?=
-X-Exchange-RoutingPolicyChecked: Id0TuQvS//TrHF4Dipg8mWMmxFvpcAaBOGEJG4l5HxLR8/xXSGAN9Mty+VAyTqGKIvRGOsPtF9olSaI9kZBK80acs8Kp5YyAV7nHj610ceqtqTDBeKMMTkvu3g8HMQOJsKpSUF2yIXNYFWgsxnGcBIr5UuDKJQ0mOYJXjTKowCu3XRUzuZb5nAKuIlTTT8HXkWyhj3b2lMXstnnWt0TShjn8OP/hBrilx5KVCHaIyR52J9M7jgDRzTM3pbGcr3veeUdMe77WCIl2Pc0Zm4gDvpqsNslyO0wRQg+vC/SAcxvGL4zBfY/It6rTJaLDlMpqMvBBBNDAHu7H+sxPtfiJfA==
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0d2cbca0-25fe-4706-bf51-08de9b6be4e7
-X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Apr 2026 03:54:43.9943
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Zv6FY2N8Zonx5CPXbT+ZljgclNAQoDVmCPSntqtZyJKJZymPZshnhkU65zfDZjzPD4tyQLhVQj5VpvGybfqRil70vZD0RG49UUZl/mLkW3A=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB8809
-X-OriginatorOrg: intel.com
-X-Spamd-Result: default: False [1.34 / 15.00];
+References: <20260408231415.522691-1-weibunny.kernel@gmail.com>
+ <20260408231415.522691-3-weibunny.kernel@gmail.com> <bc8ef831-a4ea-4d85-ab7c-a287c9b80e61@redhat.com>
+In-Reply-To: <bc8ef831-a4ea-4d85-ab7c-a287c9b80e61@redhat.com>
+From: Wei Wang <weibunny.kernel@gmail.com>
+Date: Wed, 15 Apr 2026 20:55:38 -0700
+X-Gm-Features: AQROBzDI51ysVVr5tP_HvjmVXjXbnScXYJu5Za1jfWmMoEA3M8rM4efnTQiEEoo
+Message-ID: <CAGqc4nVZA+XSPbeO5_0OUvXzG1TMtqScrzNaUpuK0rVnR2ZFng@mail.gmail.com>
+Subject: Re: [PATCH v11 net-next 2/5] psp: add new netlink cmd for dev-assoc
+ and dev-disassoc
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
+	Daniel Zahka <daniel.zahka@gmail.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+	David Wei <dw@davidwei.uk>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Simon Horman <horms@kernel.org>, Wei Wang <weibunny@fb.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-278914-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN_FAIL(0.00)[4.211.64.104.asn.rspamd.com:server fail];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	RCVD_COUNT_SEVEN(0.00)[10];
-	DKIM_TRACE(0.00)[intel.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-278919-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	ASN_FAIL(0.00)[1.2.3.5.c.f.2.1.0.0.0.0.0.0.0.0.5.7.0.0.1.0.0.e.5.1.c.3.0.0.6.2.asn6.rspamd.com:server fail];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,gmail.com,davidwei.uk,lunn.ch,davemloft.net,google.com,fb.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[przemyslaw.kitszel@intel.com,netdev@vger.kernel.org];
-	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[weibunnykernel@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3888040A186
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 7D71840A1B2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 4/15/26 17:16, Vikas Gupta wrote:
-> The backing store type, BNGE_CTX_MRAV, is not applicable in Thor Ultra
-> devices. Remove it from the backing store configuration, as the firmware
+On Mon, Apr 13, 2026 at 3:37=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
+te:
+>
+>
+>
+> On 4/9/26 1:14 AM, Wei Wang wrote:
+> > From: Wei Wang <weibunny@fb.com>
+> >
+> > The main purpose of this cmd is to be able to associate a
+> > non-psp-capable device (e.g. veth or netkit) with a psp device.
+> > One use case is if we create a pair of veth/netkit, and assign 1 end
+> > inside a netns, while leaving the other end within the default netns,
+> > with a real PSP device, e.g. netdevsim or a physical PSP-capable NIC.
+> > With this command, we could associate the veth/netkit inside the netns
+> > with PSP device, so the virtual device could act as PSP-capable device
+> > to initiate PSP connections, and performs PSP encryption/decryption on
+> > the real PSP device.
+> >
+> > Signed-off-by: Wei Wang <weibunny@fb.com>
+> > Reviewed-by: Daniel Zahka <daniel.zahka@gmail.com>
+> > ---
+> >  Documentation/netlink/specs/psp.yaml |  67 +++++-
+> >  include/net/psp/types.h              |  15 ++
+> >  include/uapi/linux/psp.h             |  13 ++
+> >  net/psp/psp-nl-gen.c                 |  32 +++
+> >  net/psp/psp-nl-gen.h                 |   2 +
+> >  net/psp/psp_main.c                   |  20 ++
+> >  net/psp/psp_nl.c                     | 325 ++++++++++++++++++++++++++-
+> >  7 files changed, 462 insertions(+), 12 deletions(-)
+> >
+> > diff --git a/Documentation/netlink/specs/psp.yaml b/Documentation/netli=
+nk/specs/psp.yaml
+> > index c54e1202cbe0..3d1b7223e084 100644
+> > --- a/Documentation/netlink/specs/psp.yaml
+> > +++ b/Documentation/netlink/specs/psp.yaml
+> > @@ -13,6 +13,17 @@ definitions:
+> >                hdr0-aes-gmac-128, hdr0-aes-gmac-256]
+> >
+> >  attribute-sets:
+> > +  -
+> > +    name: assoc-dev-info
+> > +    attributes:
+> > +      -
+> > +        name: ifindex
+> > +        doc: ifindex of an associated network device.
+> > +        type: u32
+> > +      -
+> > +        name: nsid
+> > +        doc: Network namespace ID of the associated device.
+> > +        type: s32
+> >    -
+> >      name: dev
+> >      attributes:
+> > @@ -24,7 +35,9 @@ attribute-sets:
+> >            min: 1
+> >        -
+> >          name: ifindex
+> > -        doc: ifindex of the main netdevice linked to the PSP device.
+> > +        doc: |
+> > +          ifindex of the main netdevice linked to the PSP device,
+> > +          or the ifindex to associate with the PSP device.
+> >          type: u32
+> >        -
+> >          name: psp-versions-cap
+> > @@ -38,6 +51,28 @@ attribute-sets:
+> >          type: u32
+> >          enum: version
+> >          enum-as-flags: true
+> > +      -
+> > +        name: assoc-list
+> > +        doc: List of associated virtual devices.
+> > +        type: nest
+> > +        nested-attributes: assoc-dev-info
+> > +        multi-attr: true
+> > +      -
+> > +        name: nsid
+> > +        doc: |
+> > +          Network namespace ID for the device to associate/disassociat=
+e.
+> > +          Optional for dev-assoc and dev-disassoc; if not present, the
+> > +          device is looked up in the caller's network namespace.
+> > +        type: s32
+> > +      -
+> > +        name: by-association
+> > +        doc: |
+> > +          Flag indicating the PSP device is an associated device from =
+a
+> > +          different network namespace.
+> > +          Present when in associated namespace, absent when in primary=
+/host
+> > +          namespace.
+> > +        type: flag
+> > +
+> >    -
+> >      name: assoc
+> >      attributes:
+> > @@ -170,6 +205,8 @@ operations:
+> >              - ifindex
+> >              - psp-versions-cap
+> >              - psp-versions-ena
+> > +            - assoc-list
+> > +            - by-association
+> >          pre: psp-device-get-locked
+> >          post: psp-device-unlock
+> >        dump:
+> > @@ -279,6 +316,34 @@ operations:
+> >          post: psp-device-unlock
+> >        dump:
+> >          reply: *stats-all
+> > +    -
+> > +      name: dev-assoc
+> > +      doc: Associate a network device with a PSP device.
+> > +      attribute-set: dev
+> > +      do:
+> > +        request:
+> > +          attributes:
+> > +            - id
+> > +            - ifindex
+> > +            - nsid
+> > +        reply:
+> > +          attributes: []
+> > +        pre: psp-device-get-locked
+> > +        post: psp-device-unlock
+> > +    -
+> > +      name: dev-disassoc
+> > +      doc: Disassociate a network device from a PSP device.
+> > +      attribute-set: dev
+> > +      do:
+> > +        request:
+> > +          attributes:
+> > +            - id
+> > +            - ifindex
+> > +            - nsid
+> > +        reply:
+> > +          attributes: []
+> > +        pre: psp-device-get-locked
+> > +        post: psp-device-unlock
+> >
+> >  mcast-groups:
+> >    list:
+> > diff --git a/include/net/psp/types.h b/include/net/psp/types.h
+> > index 25a9096d4e7d..4bd432ed107a 100644
+> > --- a/include/net/psp/types.h
+> > +++ b/include/net/psp/types.h
+> > @@ -5,6 +5,7 @@
+> >
+> >  #include <linux/mutex.h>
+> >  #include <linux/refcount.h>
+> > +#include <net/net_trackers.h>
+> >
+> >  struct netlink_ext_ack;
+> >
+> > @@ -43,9 +44,22 @@ struct psp_dev_config {
+> >       u32 versions;
+> >  };
+> >
+> > +/**
+> > + * struct psp_assoc_dev - wrapper for associated net_device
+> > + * @dev_list: list node for psp_dev::assoc_dev_list
+> > + * @assoc_dev: the associated net_device
+> > + * @dev_tracker: tracker for the net_device reference
+> > + */
+> > +struct psp_assoc_dev {
+> > +     struct list_head dev_list;
+> > +     struct net_device *assoc_dev;
+> > +     netdevice_tracker dev_tracker;
+> > +};
+> > +
+> >  /**
+> >   * struct psp_dev - PSP device struct
+> >   * @main_netdev: original netdevice of this PSP device
+> > + * @assoc_dev_list: list of psp_assoc_dev entries associated with this=
+ PSP device
+> >   * @ops:     driver callbacks
+> >   * @caps:    device capabilities
+> >   * @drv_priv:        driver priv pointer
+> > @@ -67,6 +81,7 @@ struct psp_dev_config {
+> >   */
+> >  struct psp_dev {
+> >       struct net_device *main_netdev;
+> > +     struct list_head assoc_dev_list;
+> >
+> >       struct psp_dev_ops *ops;
+> >       struct psp_dev_caps *caps;
+> > diff --git a/include/uapi/linux/psp.h b/include/uapi/linux/psp.h
+> > index a3a336488dc3..1c8899cd4da5 100644
+> > --- a/include/uapi/linux/psp.h
+> > +++ b/include/uapi/linux/psp.h
+> > @@ -17,11 +17,22 @@ enum psp_version {
+> >       PSP_VERSION_HDR0_AES_GMAC_256,
+> >  };
+> >
+> > +enum {
+> > +     PSP_A_ASSOC_DEV_INFO_IFINDEX =3D 1,
+> > +     PSP_A_ASSOC_DEV_INFO_NSID,
+> > +
+> > +     __PSP_A_ASSOC_DEV_INFO_MAX,
+> > +     PSP_A_ASSOC_DEV_INFO_MAX =3D (__PSP_A_ASSOC_DEV_INFO_MAX - 1)
+> > +};
+> > +
+> >  enum {
+> >       PSP_A_DEV_ID =3D 1,
+> >       PSP_A_DEV_IFINDEX,
+> >       PSP_A_DEV_PSP_VERSIONS_CAP,
+> >       PSP_A_DEV_PSP_VERSIONS_ENA,
+> > +     PSP_A_DEV_ASSOC_LIST,
+> > +     PSP_A_DEV_NSID,
+> > +     PSP_A_DEV_BY_ASSOCIATION,
+> >
+> >       __PSP_A_DEV_MAX,
+> >       PSP_A_DEV_MAX =3D (__PSP_A_DEV_MAX - 1)
+> > @@ -74,6 +85,8 @@ enum {
+> >       PSP_CMD_RX_ASSOC,
+> >       PSP_CMD_TX_ASSOC,
+> >       PSP_CMD_GET_STATS,
+> > +     PSP_CMD_DEV_ASSOC,
+> > +     PSP_CMD_DEV_DISASSOC,
+> >
+> >       __PSP_CMD_MAX,
+> >       PSP_CMD_MAX =3D (__PSP_CMD_MAX - 1)
+> > diff --git a/net/psp/psp-nl-gen.c b/net/psp/psp-nl-gen.c
+> > index 1f5e73e7ccc1..114299c64423 100644
+> > --- a/net/psp/psp-nl-gen.c
+> > +++ b/net/psp/psp-nl-gen.c
+> > @@ -53,6 +53,20 @@ static const struct nla_policy psp_get_stats_nl_poli=
+cy[PSP_A_STATS_DEV_ID + 1] =3D
+> >       [PSP_A_STATS_DEV_ID] =3D NLA_POLICY_MIN(NLA_U32, 1),
+> >  };
+> >
+> > +/* PSP_CMD_DEV_ASSOC - do */
+> > +static const struct nla_policy psp_dev_assoc_nl_policy[PSP_A_DEV_NSID =
++ 1] =3D {
+> > +     [PSP_A_DEV_ID] =3D NLA_POLICY_MIN(NLA_U32, 1),
+> > +     [PSP_A_DEV_IFINDEX] =3D { .type =3D NLA_U32, },
+> > +     [PSP_A_DEV_NSID] =3D { .type =3D NLA_S32, },
+> > +};
+> > +
+> > +/* PSP_CMD_DEV_DISASSOC - do */
+> > +static const struct nla_policy psp_dev_disassoc_nl_policy[PSP_A_DEV_NS=
+ID + 1] =3D {
+> > +     [PSP_A_DEV_ID] =3D NLA_POLICY_MIN(NLA_U32, 1),
+> > +     [PSP_A_DEV_IFINDEX] =3D { .type =3D NLA_U32, },
+> > +     [PSP_A_DEV_NSID] =3D { .type =3D NLA_S32, },
+> > +};
+> > +
+> >  /* Ops table for psp */
+> >  static const struct genl_split_ops psp_nl_ops[] =3D {
+> >       {
+> > @@ -119,6 +133,24 @@ static const struct genl_split_ops psp_nl_ops[] =
+=3D {
+> >               .dumpit =3D psp_nl_get_stats_dumpit,
+> >               .flags  =3D GENL_CMD_CAP_DUMP,
+> >       },
+> > +     {
+> > +             .cmd            =3D PSP_CMD_DEV_ASSOC,
+> > +             .pre_doit       =3D psp_device_get_locked,
+> > +             .doit           =3D psp_nl_dev_assoc_doit,
+> > +             .post_doit      =3D psp_device_unlock,
+> > +             .policy         =3D psp_dev_assoc_nl_policy,
+> > +             .maxattr        =3D PSP_A_DEV_NSID,
+> > +             .flags          =3D GENL_CMD_CAP_DO,
+> > +     },
+> > +     {
+> > +             .cmd            =3D PSP_CMD_DEV_DISASSOC,
+> > +             .pre_doit       =3D psp_device_get_locked,
+> > +             .doit           =3D psp_nl_dev_disassoc_doit,
+> > +             .post_doit      =3D psp_device_unlock,
+> > +             .policy         =3D psp_dev_disassoc_nl_policy,
+> > +             .maxattr        =3D PSP_A_DEV_NSID,
+> > +             .flags          =3D GENL_CMD_CAP_DO,
+>
+> Sashiko notes that the above allows deleteing an associations bypassing
+> the netns boundaries. Do you need ADMIN_PERM flag or exlicit checks in
+> the doit cb?
 
-I guess the removed code was needed for previous devices, what is the
-impact for them?
+I think the concern is if we are calling this from an assoc_dev's
+netns, it should not allow it to delete any assoc_dev from other
+assoc_dev's netns. Right?
+I will add a check to only allow deletion of assoc_dev from its own
+netns.  (except main_dev's netns).
 
-> will not populate entities in this backing store type, due to which the
-> driver load fails.
-> 
-> Fixes: 29c5b358f385 ("bng_en: Add backing store support")
-> Signed-off-by: Vikas Gupta <vikas.gupta@broadcom.com>
-> Reviewed-by: Dharmender Garg <dharmender.garg@broadcom.com>
+>
+> > @@ -292,6 +455,145 @@ int psp_nl_key_rotate_doit(struct sk_buff *skb, s=
+truct genl_info *info)
+> >       return err;
+> >  }
+> >
+> > +int psp_nl_dev_assoc_doit(struct sk_buff *skb, struct genl_info *info)
+> > +{
+> > +     struct psp_dev *psd =3D info->user_ptr[0];
+> > +     struct psp_assoc_dev *psp_assoc_dev;
+> > +     struct net_device *assoc_dev;
+> > +     struct sk_buff *rsp;
+> > +     u32 assoc_ifindex;
+> > +     struct net *net;
+> > +     int nsid, err;
+> > +
+> > +     if (GENL_REQ_ATTR_CHECK(info, PSP_A_DEV_IFINDEX))
+> > +             return -EINVAL;
+> > +
+> > +     if (info->attrs[PSP_A_DEV_NSID]) {
+> > +             nsid =3D nla_get_s32(info->attrs[PSP_A_DEV_NSID]);
+> > +
+> > +             net =3D get_net_ns_by_id(genl_info_net(info), nsid);
+> > +             if (!net) {
+> > +                     NL_SET_BAD_ATTR(info->extack,
+> > +                                     info->attrs[PSP_A_DEV_NSID]);
+> > +                     return -EINVAL;
+> > +             }
+> > +     } else {
+> > +             net =3D get_net(genl_info_net(info));
+> > +     }
+>
+> psp_nl_dev_disassoc_doit() has the same code; perhaps it would be worthy
+> move it in a common helper, called via pre_doit()? It should also
+> simplify the cleanup paths.
+>
+
+Ack.
+
+> > +
+> > +     psp_assoc_dev =3D kzalloc(sizeof(*psp_assoc_dev), GFP_KERNEL);
+> > +     if (!psp_assoc_dev) {
+> > +             err =3D -ENOMEM;
+> > +             goto alloc_err;
+> > +     }
+> > +
+> > +     assoc_ifindex =3D nla_get_u32(info->attrs[PSP_A_DEV_IFINDEX]);
+> > +     assoc_dev =3D netdev_get_by_index(net, assoc_ifindex,
+> > +                                     &psp_assoc_dev->dev_tracker,
+> > +                                     GFP_KERNEL);
+> > +     if (!assoc_dev) {
+> > +             NL_SET_BAD_ATTR(info->extack, info->attrs[PSP_A_DEV_IFIND=
+EX]);
+> > +             err =3D -ENODEV;
+> > +             goto assoc_dev_err;
+> > +     }
+> > +
+> > +     /* Check if device is already associated with a PSP device */
+> > +     if (cmpxchg(&assoc_dev->psp_dev, NULL, RCU_INITIALIZER(psd))) {
+> > +             NL_SET_ERR_MSG(info->extack,
+> > +                            "Device already associated with a PSP devi=
+ce");
+> > +             err =3D -EBUSY;
+> > +             goto cmpxchg_err;
+> > +     }
+> > +
+> > +     psp_assoc_dev->assoc_dev =3D assoc_dev;
+> > +     rsp =3D psp_nl_reply_new(info);
+> > +     if (!rsp) {
+> > +             err =3D -ENOMEM;
+> > +             goto rsp_err;
+> > +     }
+> > +
+> > +     list_add_tail(&psp_assoc_dev->dev_list, &psd->assoc_dev_list);
+>
+> Sashiko says:
+>
 > ---
->   drivers/net/ethernet/broadcom/bnge/bnge_rmem.c | 16 ----------------
->   1 file changed, 16 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_rmem.c b/drivers/net/ethernet/broadcom/bnge/bnge_rmem.c
-> index 94f15e08a88c..b066ee887a09 100644
-> --- a/drivers/net/ethernet/broadcom/bnge/bnge_rmem.c
-> +++ b/drivers/net/ethernet/broadcom/bnge/bnge_rmem.c
-> @@ -324,7 +324,6 @@ int bnge_alloc_ctx_mem(struct bnge_dev *bd)
->   	u32 l2_qps, qp1_qps, max_qps;
->   	u32 ena, entries_sp, entries;
->   	u32 srqs, max_srqs, min;
-> -	u32 num_mr, num_ah;
->   	u32 extra_srqs = 0;
->   	u32 extra_qps = 0;
->   	u32 fast_qpmd_qps;
-> @@ -390,21 +389,6 @@ int bnge_alloc_ctx_mem(struct bnge_dev *bd)
->   	if (!bnge_is_roce_en(bd))
->   		goto skip_rdma;
->   
-> -	ctxm = &ctx->ctx_arr[BNGE_CTX_MRAV];
-> -	/* 128K extra is needed to accommodate static AH context
-> -	 * allocation by f/w.
-> -	 */
-> -	num_mr = min_t(u32, ctxm->max_entries / 2, 1024 * 256);
-> -	num_ah = min_t(u32, num_mr, 1024 * 128);
-> -	ctxm->split_entry_cnt = BNGE_CTX_MRAV_AV_SPLIT_ENTRY + 1;
-> -	if (!ctxm->mrav_av_entries || ctxm->mrav_av_entries > num_ah)
-> -		ctxm->mrav_av_entries = num_ah;
-> -
-> -	rc = bnge_setup_ctxm_pg_tbls(bd, ctxm, num_mr + num_ah, 2);
-> -	if (rc)
-> -		return rc;
-> -	ena |= FUNC_BACKING_STORE_CFG_REQ_ENABLES_MRAV;
-> -
->   	ctxm = &ctx->ctx_arr[BNGE_CTX_TIM];
->   	rc = bnge_setup_ctxm_pg_tbls(bd, ctxm, l2_qps + qp1_qps + extra_qps, 1);
->   	if (rc)
+> list_add_tail(&psp_assoc_dev->dev_list, &psd->assoc_dev_list);
+> There doesn't seem to be a limit on the number of devices that can be
+> associated with a single PSP device.
+> If a user repeatedly associates devices, could the generated netlink mess=
+age
+> in psp_nl_dev_fill() exceed the maximum allowed size (GENLMSG_DEFAULT_SIZ=
+E),
+> causing it to fail with -EMSGSIZE and permanently break PSP_CMD_DEV_GET
+> and management notifications for the device?
+> --
 
+Ack. Will enforce a max allowed number on the assoc_dev_list to fit
+into GENLMSG_DEFAULT_SIZE.
+
+>
+> /P
+>
 
