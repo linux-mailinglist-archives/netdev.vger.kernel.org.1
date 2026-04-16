@@ -1,226 +1,138 @@
-Return-Path: <netdev+bounces-278954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278955-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6NM1Ii6R4GmsjwAAu9opvQ
-	(envelope-from <netdev+bounces-278954-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 09:35:10 +0200
+	id 0F8JA9mU4Gn/jwAAu9opvQ
+	(envelope-from <netdev+bounces-278955-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 09:50:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59E9940B15E
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 09:35:08 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id CEC0C40B315
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 09:50:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 6541A30086A9
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 07:35:05 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E42673037923
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 07:50:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 527AE274658;
-	Thu, 16 Apr 2026 07:35:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8220F22FF22;
+	Thu, 16 Apr 2026 07:50:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="QcOzEF8V"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xV8yrVIJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB11E33D503
-	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 07:34:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17867340A46
+	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 07:50:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776324902; cv=none; b=BzYvq+3XNQvIfd2fXFnvoZo+Ex2K7nJFZepf+UzJtErPgEAfoqJKvywJY1VWPl8PNyt3SwpiZ6j0ndMg8OGfIk9NgZqCRYbVKQEuR7F6pcrEWr6w94pzWFn4nzVG4FEZ/zFdOq6UfoxiLQoUFp3oHeC06zCe3ypFw+jXvxLc3xI=
+	t=1776325823; cv=none; b=o+vqJQ7sTcD8mDNBYJYqa4IzQH855bqlR6N47ZYJKE0fU446ONJXhN6I8pH3Pm6SE++Xd746M2JNgIYuUm109byTmf30SbD05oi+84vVVNkBmvLkvjUvEp7ZHzLt+tubRMxPxuZNL12lC0d9locUEnfhtU1U3c5Ro9PvubxbzM0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776324902; c=relaxed/simple;
-	bh=DbITn4yr2PYB7C90npq5IbcWOoFWiYzVBsq36wB4obk=;
+	s=arc-20240116; t=1776325823; c=relaxed/simple;
+	bh=KxuNWQ2a3a9rgfOr9Cf2/P6mQx3czM9m0lYSOzgROec=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Km+coJlPFnK/EistqnYHTRZn2F47avnv0VWiuEW0s1Tdtv1QcBZic4EfP6NQUW4zO34aC/zsZNrUwA4cDzSh9ue3wVJnysnUOaOHcuRiUOSsVqg2pyR/zboBOAerEoG7UOmZSlIXbb1FichvvI3ltvQn5/ZgGGr92Pk2rBP2F5g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=QcOzEF8V; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id D8540C5C3C4;
-	Thu, 16 Apr 2026 07:35:34 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id CEB565FDEB;
-	Thu, 16 Apr 2026 07:34:56 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 20A9D1045A117;
-	Thu, 16 Apr 2026 09:34:50 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1776324895; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=+lfcMBvb5fZjSzrarf6sFor1f0wiPhHjUUQenVDV4z4=;
-	b=QcOzEF8V2WRZYk27ja3Q4K//Of0QvufX0GXMKJqEVtT4hLl9RMMYCW0KKAAkLN0moKTC3O
-	2cKBgRYsy0y0egvMqHNDZvneU1X0rAQ0si+Vnb9I76Py9ikC6Srn6FPHayFF52iKzfGN1s
-	NoWvTyHMB2buJix/1UKX5rY3yp9IdF0jPnXbTlXcrZKrJgY9ADTKbYLs8txbAoUGNvrpOb
-	xXNGP5+L6lvCXTi14nMGuxoQvp87PmOXbopoPh1t/8Aj1ypCi/QpUK01NxtDSLPYw7Ezks
-	VktUlV5hNw96BQZF1qKa7lF2j3Ttl1/HvZPsAiTSJLRYhFXZy5XhE9PCu1r50g==
-Message-ID: <9d4e0575-e063-4fe5-b8ce-7053efa8ec2f@bootlin.com>
-Date: Thu, 16 Apr 2026 09:34:50 +0200
+	 In-Reply-To:Content-Type; b=pqgwwiPAcJup0BHLb5XyhlPbo/8WTaO9rvoafOB35pROkQc7luEuZBjTo8mcLwHqRTqPEKHVZLFo6V/IE0jDCQ9VUTAC7ugT6cdz78xjhKGQJdMXbmd1/08fiKFSkp3OYt0TnqX+s0yX3/5m6ykQp2RmUY3K0GaGXUQH+RTz+JI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xV8yrVIJ; arc=none smtp.client-ip=91.218.175.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <0e579779-f38b-4db3-936b-5d7add12d15e@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1776325810;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=11cyg0mvKQwNL/9Dn8fT/UbJkY9yFbzdNgRtigL8718=;
+	b=xV8yrVIJm3m5Eoss2vL0r2ithRXeQ2KtK434zYXzyj821InVMuKPvhtIAiiq97KeX74jy2
+	aQ5sO2zvfEmCMT38NiYa7kearyrZSbsBqK8OLrW8edfRIbMwqBUVWpSEyNFXOVUaKCgAw1
+	lwC+YEu1sL7qITn6zMdDMvpvsr7NNa8=
+Date: Thu, 16 Apr 2026 15:49:58 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: dsa: remove redundant netdev_lock_ops() from
- conduit ethtool ops
-To: Stanislav Fomichev <sdf.kernel@gmail.com>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, andrew@lunn.ch, olteanv@gmail.com, horms@kernel.org,
- sdf@fomichev.me, linux-kernel@vger.kernel.org
-References: <20260414231035.1917035-1-sdf@fomichev.me>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <20260414231035.1917035-1-sdf@fomichev.me>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Subject: Re: [syzbot ci] Re: net: tunnel: fix stale transport header after
+ GRE/TEB decap
+To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, pabeni@redhat.com, pshelar@nicira.com,
+ syzbot@syzkaller.appspotmail.com, tom@herbertland.com
+Cc: syzkaller-bugs@googlegroups.com
+References: <69e08a0a.a70a0220.259bc5.0019.GAE@google.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+In-Reply-To: <69e08a0a.a70a0220.259bc5.0019.GAE@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-278955-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278954-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
-	ASN_FAIL(0.00)[4.211.64.104.asn.rspamd.com:server fail];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,lunn.ch,gmail.com,fomichev.me,vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[3];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	ASN_FAIL(0.00)[114.105.105.172.asn.rspamd.com:server fail];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_NONE(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,fomichev.me:email,bootlin.com:email,bootlin.com:dkim,bootlin.com:mid]
-X-Rspamd-Queue-Id: 59E9940B15E
+	DBL_BLOCKED_OPENRESOLVER(0.00)[googlesource.com:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,syzbot.org:url,linux.dev:dkim,linux.dev:mid]
+X-Rspamd-Queue-Id: CEC0C40B315
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Stanislav,
 
-On 15/04/2026 01:10, Stanislav Fomichev wrote:
-> DSA replaces the conduit (master) device's ethtool_ops with its own
-> wrappers that aggregate stats from both the conduit and DSA switch
-> ports. Taking the lock again inside the DSA wrappers causes a deadlock.
-> 
-> Stumbled upon this when booting qemu with fbnic and CONFIG_NET_DSA_LOOP=y
-> (which looks like some kind of testing device that auto-populates the ports
-> of eth0). `ethtool -i` is enough to deadlock. This means we have basically zero
-> coverage for DSA stuff with real ops locked devs.
+On 4/16/26 3:04 PM, syzbot ci wrote:
+> syzbot ci has tested the following series
+>
+> [v1] net: tunnel: fix stale transport header after GRE/TEB decap
+> https://lore.kernel.org/all/20260416034610.8873-1-jiayuan.chen@linux.dev
+> * [PATCH net v1 1/2] net: tunnel: fix stale transport header after GRE/TEB decap
+> * [PATCH net-next v1 2/2] net: add DEBUG_NET_WARN_ON_ONCE for negative transport offset
+>
+> and found the following issue:
+> WARNING in udpv6_err
+>
+> Full report is available here:
+> https://ci.syzbot.org/series/3886f2f1-a6d5-4c5c-8dc8-bc1cec577567
+>
+> ***
+>
+> WARNING in udpv6_err
+>
+> tree:      net
+> URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net.git
+> base:      1f5ffc672165ff851063a5fd044b727ab2517ae3
+> arch:      amd64
+> compiler:  Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+> config:    https://ci.syzbot.org/builds/06cf41a2-60fe-4f9b-8f68-57eb6d1e48cc/config
+>
+> ------------[ cut here ]------------
+> off < 0
+> WARNING: ./include/linux/skbuff.h:3239 at udpv6_err+0x1521/0x16d0, CPU#0: kworker/u9:2/51
+> Modules linked in:
 
-True, indeed I don't have physical devices here with locked ops, looking
-at the current devices that use it (fbnic, bnxt, gve, mlx5, bnge) that's
-not too surprising, I don't think these are often used with DSA.
 
-> 
-> Remove the redundant netdev_lock_ops()/netdev_unlock_ops() calls from
-> the DSA conduit ethtool wrappers.
-> 
-> Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> Fixes: 2bcf4772e45a ("net: ethtool: try to protect all callback with netdev instance lock")
-> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
-> (cherry picked from commit 1538c00ab3212273240112bd53692d54d95f2dd5)
+icmpv6_rcv
+   pskb_pull ==> skb_transport_offset() = -8
+   icmpv6_notify
+     udpv6_err
+       __udp6_lib_err_encap(skb) ==> WARNING
 
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-
-Maxime
-> ---
->  net/dsa/conduit.c | 16 +---------------
->  1 file changed, 1 insertion(+), 15 deletions(-)
-> 
-> diff --git a/net/dsa/conduit.c b/net/dsa/conduit.c
-> index a1b044467bd6..8398d72d7e4d 100644
-> --- a/net/dsa/conduit.c
-> +++ b/net/dsa/conduit.c
-> @@ -27,9 +27,7 @@ static int dsa_conduit_get_regs_len(struct net_device *dev)
->  	int len;
->  
->  	if (ops && ops->get_regs_len) {
-> -		netdev_lock_ops(dev);
->  		len = ops->get_regs_len(dev);
-> -		netdev_unlock_ops(dev);
->  		if (len < 0)
->  			return len;
->  		ret += len;
-> @@ -60,15 +58,11 @@ static void dsa_conduit_get_regs(struct net_device *dev,
->  	int len;
->  
->  	if (ops && ops->get_regs_len && ops->get_regs) {
-> -		netdev_lock_ops(dev);
->  		len = ops->get_regs_len(dev);
-> -		if (len < 0) {
-> -			netdev_unlock_ops(dev);
-> +		if (len < 0)
->  			return;
-> -		}
->  		regs->len = len;
->  		ops->get_regs(dev, regs, data);
-> -		netdev_unlock_ops(dev);
->  		data += regs->len;
->  	}
->  
-> @@ -115,10 +109,8 @@ static void dsa_conduit_get_ethtool_stats(struct net_device *dev,
->  	int count, mcount = 0;
->  
->  	if (ops && ops->get_sset_count && ops->get_ethtool_stats) {
-> -		netdev_lock_ops(dev);
->  		mcount = ops->get_sset_count(dev, ETH_SS_STATS);
->  		ops->get_ethtool_stats(dev, stats, data);
-> -		netdev_unlock_ops(dev);
->  	}
->  
->  	list_for_each_entry(dp, &dst->ports, list) {
-> @@ -149,10 +141,8 @@ static void dsa_conduit_get_ethtool_phy_stats(struct net_device *dev,
->  		if (count >= 0)
->  			phy_ethtool_get_stats(dev->phydev, stats, data);
->  	} else if (ops && ops->get_sset_count && ops->get_ethtool_phy_stats) {
-> -		netdev_lock_ops(dev);
->  		count = ops->get_sset_count(dev, ETH_SS_PHY_STATS);
->  		ops->get_ethtool_phy_stats(dev, stats, data);
-> -		netdev_unlock_ops(dev);
->  	}
->  
->  	if (count < 0)
-> @@ -176,13 +166,11 @@ static int dsa_conduit_get_sset_count(struct net_device *dev, int sset)
->  	struct dsa_switch_tree *dst = cpu_dp->dst;
->  	int count = 0;
->  
-> -	netdev_lock_ops(dev);
->  	if (sset == ETH_SS_PHY_STATS && dev->phydev &&
->  	    (!ops || !ops->get_ethtool_phy_stats))
->  		count = phy_ethtool_get_sset_count(dev->phydev);
->  	else if (ops && ops->get_sset_count)
->  		count = ops->get_sset_count(dev, sset);
-> -	netdev_unlock_ops(dev);
->  
->  	if (count < 0)
->  		count = 0;
-> @@ -239,7 +227,6 @@ static void dsa_conduit_get_strings(struct net_device *dev, u32 stringset,
->  	struct dsa_switch_tree *dst = cpu_dp->dst;
->  	int count, mcount = 0;
->  
-> -	netdev_lock_ops(dev);
->  	if (stringset == ETH_SS_PHY_STATS && dev->phydev &&
->  	    !ops->get_ethtool_phy_stats) {
->  		mcount = phy_ethtool_get_sset_count(dev->phydev);
-> @@ -253,7 +240,6 @@ static void dsa_conduit_get_strings(struct net_device *dev, u32 stringset,
->  			mcount = 0;
->  		ops->get_strings(dev, stringset, data);
->  	}
-> -	netdev_unlock_ops(dev);
->  
->  	list_for_each_entry(dp, &dst->ports, list) {
->  		if (!dsa_port_is_dsa(dp) && !dsa_port_is_cpu(dp))
 
 
