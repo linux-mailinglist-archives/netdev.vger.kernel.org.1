@@ -1,81 +1,121 @@
-Return-Path: <netdev+bounces-279000-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279001-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iCsrDci+4GnQlQAAu9opvQ
-	(envelope-from <netdev+bounces-279000-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 12:49:44 +0200
+	id uBxSH3+/4GnQlQAAu9opvQ
+	(envelope-from <netdev+bounces-279001-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 12:52:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4C0A40D0A5
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 12:49:43 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5E2F40D0E7
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 12:52:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 314DA3011168
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 10:49:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AEA26309D1D1
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 10:52:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F6C637BE93;
-	Thu, 16 Apr 2026 10:49:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BA553A6B88;
+	Thu, 16 Apr 2026 10:52:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="hS+zERdx"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OXTiiG+l";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="YJCV6YH8"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 188C937E2FF
-	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 10:49:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D99EA3A6B63
+	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 10:52:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776336582; cv=none; b=Ejg5iJFZ0PTodPHsrsNSZReT9GNwF1Tosd07o/wvEFYg1Dj3x55EWur2WOTiGq6stZmB/fFKgO3S/JiSG/jRD46gMy0VOWDlw+f5J2MG4CXno73qo4+Re0DMuwgHOb4LkW68yDId5LUSKz/Cm1/B5txJdrn8GMJQevvlHQjHUK0=
+	t=1776336726; cv=none; b=B1f1gJ3lcYiIgCqVLfgXj/bvA/ccZ9XdOS7MwSciBzey509I4lw7KMhC0Is0yoTCrK4Eu+VX8KeWJBYuyK5GM1wjJjp2nn+cnZ6dVg4o7r7o0GqgxUX4NaVZlDyZt065fFEiQW0wJ1yl4n8boMggwCzIcVdc8s/q0ODbW8tlFfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776336582; c=relaxed/simple;
-	bh=Ym4lYSZIrhwxg5ZbteYROPayQT8vptaheDLqdakxvNw=;
+	s=arc-20240116; t=1776336726; c=relaxed/simple;
+	bh=EixB+VBYELB9QZou2WcR2YRGdtQyBm7qn3tnBBWJdDY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Yv+/zegRd5dOWLLZXYQFFmRjuASMk88fSWRjXmEFnZajWOhXFx+0XfccFvpPKwqG/jMMVkVNgGgTj2Kb1WhFkrvGFTIYDnH6Wy7GZUbO4HGS6nYObne8INMM2Jnsu8Wkyy6ssrDcb5ZsKQIbk6MmAzBuIf7g+BA+hcFLZKfpRb4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=hS+zERdx; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=iTecCTUOjCT2Rh+35c/jBL17rubrlvWXt7j7t5fyE4A=; b=hS+zERdx785E7w8JuVhIqIUjqo
-	rfTzzmGwWX/PzAGKN9P/mq5ofpIaokW6Naxsd3Ouod8CcSBoL8YWAadvltn2AtDOzWPioFgM3W23v
-	Q5V2vsauwwB7RZ2YexHer3u5vyh7euHUKU2rzvgV9PdVtbEJLLuJicgrkCOfdvGGVSY9FQEmuT38O
-	81dAcc0BC83k8bFEmZOvAW7fKXhSVgEb7U0L1T5zR/uJpFRUP321srKZKF/YHgCOLflE8d09edYbj
-	fBA/wHJ3iQWgZOYuYhy15KCeJUdJ6s+4ZH/aBdCVzE0WtuP0TEUB7ihUZzfk17611Ex3gsTduFa57
-	pydTVpKg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:60888)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1wDKHp-0000000035z-1EzG;
-	Thu, 16 Apr 2026 11:49:29 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1wDKHl-0000000038b-3rco;
-	Thu, 16 Apr 2026 11:49:25 +0100
-Date: Thu, 16 Apr 2026 11:49:25 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Alexander Stein <alexander.stein@ew.tq-group.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next 5/6] net: stmmac: move PHY handling out of
- __stmmac_open()/release()
-Message-ID: <aeC-tc2CooYDoBok@shell.armlinux.org.uk>
-References: <aNKDqqI7aLsuDD52@shell.armlinux.org.uk>
- <8409022.LvFx2qVVIh@steina-w>
- <ad-LtOBrKREM1tCk@shell.armlinux.org.uk>
- <5987484.DvuYhMxLoT@steina-w>
+	 Content-Type:Content-Disposition:In-Reply-To; b=olbq4wNo29Ay1CkPIK5hz7r5XGIFThwo2Rp+V/7NkBtmse9INMdYEfKf5AV35YaD0hv3VrDneopoUV8rtQ4oswFtXKYFZrEqUHwEoP0thOZys2/NM9lKUQQvw1G/5ONpCPTQCJuH1sPQKDgpB5hO30W/T7IO23WL5z0B/ZhNZhE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OXTiiG+l; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=YJCV6YH8; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1776336724;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RWWOQAJEN/95l4X8m42iXJycRGuqxRmfK0Cq2b139G8=;
+	b=OXTiiG+l99NyvBV50lHidVRCDyDsMQa0AFkSgkbJVMHcqgkOjxM2Jc7IdHJn0ibT7XYl6g
+	t1z0UD1IOyrQKZfSOgoWYSX//aG5awgliIxBLeo4s11Yj3STvAYe0CPRBcWO93o7nemQCi
+	6RnGD0/7WfebMvRuG9fVDwMz6vvuYvU=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-609-WA9iABgDP8uttgF51jgxag-1; Thu, 16 Apr 2026 06:52:00 -0400
+X-MC-Unique: WA9iABgDP8uttgF51jgxag-1
+X-Mimecast-MFC-AGG-ID: WA9iABgDP8uttgF51jgxag_1776336720
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-43d1dea12aaso5758349f8f.1
+        for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 03:52:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1776336719; x=1776941519; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=RWWOQAJEN/95l4X8m42iXJycRGuqxRmfK0Cq2b139G8=;
+        b=YJCV6YH8KDAOF/LgNXM5zZEOM2M7B/vyyNQMVv/YYHuZkXmk+uj+mT28cljJ2xz3Te
+         I9zJZ6dKdbfNRkZgHxy8UBHsHlJAjseoz+t+BfoIdTnLfhlNeX/nEplu4hzyt9eXueiR
+         K5+u7qpLKzxJ1LglBxA4qnDSqIJ99z/jjQBGv5Eek9Ns+WUPwhV5WJ2Pgd1mWjSSzdG6
+         UElY11WIU2bm+og2DeWSWzgboOevGZsjaZLoQpRhcA/1lNglJQMpLul/KxsYeMJ2YQN5
+         VlqoP4UI9++fVVrn3WhsAR7l5lTufOC5t1wT9kFg6QlnLcj6CIIYRiomgrZqMCxcABSD
+         969A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776336719; x=1776941519;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RWWOQAJEN/95l4X8m42iXJycRGuqxRmfK0Cq2b139G8=;
+        b=N3z991HspLME2e7WOMjGDsROjNEi5fA08Uta9JNp+qyjV61ZA55NlZ43o25xPUWKLm
+         arm/jOlKyYLTpFFh9/M4PQGRsocyaHHa6KykxjN9uWFYEiPVNzyxvPPxXDFjF+Fujw4f
+         I7UXsa96EPjqk+a5ZXc4enpU0FeiFsCqNJQZk3b+dY3EQkV9eKB3XH/rJa6EQuS+nfvr
+         c4Z289EN46X6fo800uSb/hYlwdRSmF46xpZI1jZIiFKB/ilbTU+aGLYqUc5t3SE+wxhT
+         o/rI9u038hkEGZ27TCjzfKmUfiaSMCBYCWFy+Ir9x9THOdVvh32FXemGxAKcTXkq/4Fh
+         FF+w==
+X-Forwarded-Encrypted: i=1; AFNElJ8Sw5RYZezoehRF/aUJipBiB/9hBc1Sz+zx79caetV7kx3BQ9zPcSS4Q/vBFvOE7fZ5TWUR1fo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxLpATcoshTmQhkRxzaBaxMrLav2bsNp0PqeoLsEb+9D1g/bRX6
+	zhBgP9vMk6vBjm3FkaJ1f6iCqFEu+PgDWla5U0FTnfNOZyLmKf+JKY6yt5lLA5B6TFhT6Z9dOiJ
+	bP/O04Jv9pFIQay82ByZpY/ksGz11hkZ6JsgRJcVI2C9+4J4WnA/Kcn+NsA==
+X-Gm-Gg: AeBDiesPuKm+nddfhYX+TFaNqNk8vN2ktHhF9QcwtUBPVauIc01Khj+plKwQSFFtMfr
+	z2CB3crYwtTwT+A7VK1WEqQDOYOzZ2AgJpAcVa7zBPt0Go1Mf6FPE2uMAXuJ5gj1RcLJBt4/SWd
+	Bzk6lOWyXrV2gQW1MOMf+Bn/NPcE3qxL2gDDbuGN/AoW4UbhNDGtXb8mhVRbZe403JrHgZYjrcR
+	8qn0wZxaf//NeeV5wmkOnEyZheznuv/0Yt7as04r2MY1GcUjW1q2w3JS+oWjGIK58NkBe0E/ZUW
+	HJWtv+UFFt+3mmp7kTi9/Z2U5pid0vbBmxcO+RDHm1u3NNiXlXa+KP6fIHKk3/Q+XxPLHV4ghw2
+	41aKmNJLJTVT+5WAhNHDkqe0ZRATgmUlR9FiyljdzFOo=
+X-Received: by 2002:a05:600c:c08b:b0:488:bc6a:528d with SMTP id 5b1f17b1804b1-488d68867a0mr252350585e9.22.1776336719543;
+        Thu, 16 Apr 2026 03:51:59 -0700 (PDT)
+X-Received: by 2002:a05:600c:c08b:b0:488:bc6a:528d with SMTP id 5b1f17b1804b1-488d68867a0mr252350285e9.22.1776336718976;
+        Thu, 16 Apr 2026 03:51:58 -0700 (PDT)
+Received: from redhat.com (IGLD-80-230-25-21.inter.net.il. [80.230.25.21])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488f5818d70sm73936565e9.4.2026.04.16.03.51.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Apr 2026 03:51:58 -0700 (PDT)
+Date: Thu, 16 Apr 2026 06:51:54 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Simon Schippers <simon.schippers@tu-dortmund.de>
+Cc: Jason Wang <jasowang@redhat.com>, willemdebruijn.kernel@gmail.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, eperezma@redhat.com,
+	leiyang@redhat.com, stephen@networkplumber.org, jon@nutanix.com,
+	tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	virtualization@lists.linux.dev
+Subject: Re: [PATCH net-next v8 4/4] tun/tap & vhost-net: avoid ptr_ring
+ tail-drop when a qdisc is present
+Message-ID: <20260416065132-mutt-send-email-mst@kernel.org>
+References: <20260312130639.138988-1-simon.schippers@tu-dortmund.de>
+ <20260312130639.138988-5-simon.schippers@tu-dortmund.de>
+ <CACGkMEtN9XgYPGHQg4TEWEsa_UcMbcnzO=VaTFT=0Tn4BayMDw@mail.gmail.com>
+ <0908392d-6314-4141-b908-6c9a880ba0a4@tu-dortmund.de>
+ <cda710f8-033a-4772-b5ce-a2cfddf42bea@tu-dortmund.de>
+ <CACGkMEuLqxnz=GtdKp3-u0egkGT_eZUgBBwvvtHcgAYpLJv-UA@mail.gmail.com>
+ <3d3274b4-f274-4cf9-9d0f-989d05148604@tu-dortmund.de>
+ <CACGkMEsUag4zNZG+aYipHv_PirbKb_rs7DzSOr-NF8ckhUaJOQ@mail.gmail.com>
+ <b9d84d88-46d5-4fd3-a5b2-d914f54766f6@tu-dortmund.de>
+ <73033bfc-4da3-4057-9480-bd977a66ecef@tu-dortmund.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,148 +124,65 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5987484.DvuYhMxLoT@steina-w>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spamd-Result: default: False [1.14 / 15.00];
+In-Reply-To: <73033bfc-4da3-4057-9480-bd977a66ecef@tu-dortmund.de>
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-279000-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-279001-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[redhat.com,gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,networkplumber.org,nutanix.com,tu-dortmund.de,vger.kernel.org,lists.linux.dev];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,foss.st.com,davemloft.net,google.com,kernel.org,lists.infradead.org,st-md-mailman.stormreply.com,vger.kernel.org,redhat.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_SPAM(0.00)[0.140];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[shell.armlinux.org.uk:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,armlinux.org.uk:url]
-X-Rspamd-Queue-Id: C4C0A40D0A5
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D5E2F40D0E7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Apr 16, 2026 at 08:20:13AM +0200, Alexander Stein wrote:
-> Am Mittwoch, 15. April 2026, 14:59:32 CEST schrieb Russell King (Oracle):
-> > On Wed, Apr 15, 2026 at 08:08:40AM +0200, Alexander Stein wrote:
-> > > Hi,
-> > > 
-> > > Am Dienstag, 23. September 2025, 13:26:19 CEST schrieb Russell King (Oracle):
-> > > > Move the PHY attachment/detachment from the network driver out of
-> > > > __stmmac_open() and __stmmac_release() into stmmac_open() and
-> > > > stmmac_release() where these actions will only happen when the
-> > > > interface is administratively brought up or down. It does not make
-> > > > sense to detach and re-attach the PHY during a change of MTU.
-> > > 
-> > > Sorry for coming up now. But I recently noticed this commit breaks changing
-> > > the MTU on i.MX8MP. Once I simply change the MTU I run into some DMA error:
-> > > $ ip link set dev end1 mtu 1400
-> > > imx-dwmac 30bf0000.ethernet end1: Register MEM_TYPE_PAGE_POOL RxQ-0
-> > > imx-dwmac 30bf0000.ethernet end1: Register MEM_TYPE_PAGE_POOL RxQ-1
-> > > imx-dwmac 30bf0000.ethernet end1: Register MEM_TYPE_PAGE_POOL RxQ-2
-> > > imx-dwmac 30bf0000.ethernet end1: Register MEM_TYPE_PAGE_POOL RxQ-3
-> > > imx-dwmac 30bf0000.ethernet end1: Register MEM_TYPE_PAGE_POOL RxQ-4
-> > > imx-dwmac 30bf0000.ethernet end1: Link is Down
-> > > imx-dwmac 30bf0000.ethernet end1: Failed to reset the dma
-> > > imx-dwmac 30bf0000.ethernet end1: stmmac_hw_setup: DMA engine initialization failed
-> > 
-> > This basically means that a clock is missing. Please provide more
-> > information:
-> > 
-> > - what kernel version are you using?
+On Thu, Apr 16, 2026 at 10:54:45AM +0200, Simon Schippers wrote:
+> To summarize the discussion from my POV:
 > 
-> Currently I am using v6.18.22.
-> $ ethtool -i end1
-> driver: st_gmac
-> version: 6.18.22
-> firmware-version: 
-> expansion-rom-version: 
-> bus-info: 30bf0000.ethernet
-> supports-statistics: yes
-> supports-test: no
-> supports-eeprom-access: no
-> supports-register-dump: yes
-> supports-priv-flags: no
+> Open point: __ptr_ring_zero_tail() is only called after
+>             consuming ring.batch elements.
+> 1) Consumer wakes up the producer but the slot is not cleaned.
+> --> I disagree, the consumer only wakes after consuming ring.size/2.
+>     Then __ptr_ring_zero_tail() was called at least once.
+> 2) Producer is woken up but see the ring is full, so it need to
+>    drop the packet.
+> --> I disagree, because then NETDEV_TX_BUSY is returned. This is
+>     noticeable as qdisc requeue and only happens very rarely.
 > 
-> > - has EEE been negotiated?
-> 
-> No. It is marked as not supported
-> 
-> $ ethtool --show-eee end1
-> EEE settings for end1:
->         EEE status: not supported
-> 
-> > - does the problem persist when EEE is disabled?
-> 
-> As EEE is not supported the problem occurs even with EEE disabled.
-> 
-> > - which PHY is attached to stmmac?
-> 
-> It is a TI DP83867.
-> 
-> imx-dwmac 30bf0000.ethernet eth1: PHY [stmmac-1:03] driver [TI DP83867] (irq=136)
-> 
-> > - which PHY interface mode is being used to connect the PHY to stmmac?
-> 
-> For this interface
-> > phy-mode = "rgmii-id";
-> is set.
-> 
-> In case it is helpful. My platform is arch/arm64/boot/dts/freescale/imx8mp-tqma8mpql-mba8mpxl.dts
-> Thanks for assisting. If there a further questions, don't hesitate to ask.
+> Points I will address:
+> - Minor nit on patch 2 by MST.
+> - Rebase patch 3 because of commit d748047
+>   ("ptr_ring: disable KCSAN warnings").
+> - Document the pair of the smp_mb__after_atomic() in tun_net_xmit
+>   with tun_ring_consume().
+> - Use 1 ptr_ring spinlock instead of 2 (currently used for consume
+>   and empty check), not sure how to implement it pretty rn.
+> - Run pktgen benchmarks with pg_set SHARED.
 
-Thanks.
-
-So, as best I can determine at the moment, we end up with the following
-sequence:
-
-stmmac_change_mtu()
- __stmmac_release()
-  phylink_stop()
-   phy_stop()
-    phy->state = PHY_HALTED
-    _phy_state_machine() returns PHY_STATE_WORK_SUSPEND
-    _phy_state_machine_post_work()
-     phy_suspend()
-      genphy_suspend()
-       phy_set_bits(phydev, MII_BMCR, BMCR_PDOWN)
-
-With the DP83867, this causes most of the PHY to be powered down, thus
-stopping the clocks, and this causes the stmmac reset to time out.
-
-Prior to this commit, we would have called phylink_disconnect_phy()
-immediately after phylink_stop(), but I can see nothing that would
-be affected by this change there (since that also calls
-phy_suspend(), but as the PHY is already suspended, this becomes a
-no-op.)
-
-However, __stmmac_open() would have called stmmac_init_phy(), which
-would reattach the PHY. This would have called phy_init_hw(), 
-resetting the PHY, and phy_resume() which would ensure that the
-PDOWN bit is clear - thus clocks would be running.
-
-As a hack, please can you try calling phylink_prepare_resume()
-between the __stmmac_release() and __stmmac_open() in
-stmmac_change_mtu(). This should resume the PHY, thus restoring the
-clocks necessary for stmmac to reset.
-
-Thanks.
+Thanks! The plan makes sense to me.
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+MST
+
 
