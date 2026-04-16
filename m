@@ -1,82 +1,82 @@
-Return-Path: <netdev+bounces-279179-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279180-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cNCQEJlm4Wm/swAAu9opvQ
-	(envelope-from <netdev+bounces-279179-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 00:45:45 +0200
+	id cPZCFaRm4Wm/swAAu9opvQ
+	(envelope-from <netdev+bounces-279180-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 00:45:56 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB7EF415564
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 00:45:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CFB2D41556B
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 00:45:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4952A303DF45
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 22:44:56 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C79D530285DE
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 22:45:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60505390982;
-	Thu, 16 Apr 2026 22:44:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB783382396;
+	Thu, 16 Apr 2026 22:45:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VeIywNGF"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oD2Q4702"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15A91371CE1
-	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 22:44:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE971366074
+	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 22:45:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776379494; cv=none; b=E512zmrsIdlGA2L3eKOfULHtoKB72bp3lqxU/CEuFlidm7LIxb6Izl7wkmwNKDBFv6in3dIvhCJutyFpg3mgMmD0WECi/hpB4OZJYttJu+pY67/lGmq+zx2qlmDrTThGTwz7LDQfJ/FHg4oD7NxzaHQPC6UxJvjhqcEwavudtlE=
+	t=1776379531; cv=none; b=uv16vpuqqrVIr943BIDC0Xv+eCJLGFBvBh9ADSpEzgf0+OjHriOmHdReHv3KHVubp5IhPD5yKxQW6AIyuoSPBXA298P2olSTV9N7VsMq1gEdpooG1qR/ZusLcIzCrgTF+DBXgmj9OQxRbxAToZw2jrKCRSS6Y7jent/cFPHsvQk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776379494; c=relaxed/simple;
-	bh=QnH1vIimESyZ2peW1iohZ3MwmBA4oBxKLRs7rK4wSqQ=;
+	s=arc-20240116; t=1776379531; c=relaxed/simple;
+	bh=ZdK1a4wtfo6i5zxop3WmUHjbFCExnKakE+Bz0u8FlGs=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=G+zHzTlwCCGP/tMQWKcqpRHt+TVAqR85YEhbvXxASs8/IOf0xE0TAST5/R721waas3kPIpntk3R/VPych2/czqAQM8CyRWhdb5/BWI6xFv2yUh4u08ivDynJ5+P2/8m2qmA33eq17/cjdB7XxfviHdYPt4k2XxR4rtNUvl3GR4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VeIywNGF; arc=none smtp.client-ip=209.85.210.201
+	 To:Cc:Content-Type; b=prXPxfhbd2T0Jk9VypfD9ArsCrJrp+ZGFS9Pqcktk5YNZa77JKRPUjaG7LlY1ug2QA8Zzy7xFBoPs6x1uGFfCIpc8PuBxilJrQvu65SHtuROjfoydwl61XdJ2M3v9llW1dBGrwaAHw2vcdlz5fH4Iq5ekJ0Ol47AiguVRh3acIY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oD2Q4702; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-82f0f2b2641so54008b3a.3
-        for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 15:44:51 -0700 (PDT)
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-82f5f48458eso40086b3a.3
+        for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 15:45:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1776379491; x=1776984291; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1776379529; x=1776984329; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=UqyYEqZgyMpoZKxskZj0QRqQl7ttahHyrPikYOVHCGs=;
-        b=VeIywNGFDT898urzHsB6Lhv0CzlE8C3vn6rrp3ax65KnTTLVOjOmQaJ+bco7wSJcEK
-         Uy2LteuxTCZUjkfGmcCfIm4Fo2uEZTOoWx5DyDzyt9YbtQhMuczlsGBBysKy9fqF8fpu
-         KecMu0Mc4aRkDSV5sL7F5BhQtELHwHFx5LOSL/h6sLPYcGPdO68JwgPnKMwqygpU5OsU
-         wYtHN1iyi0qbTfX9FV81jWlwUJHqQnESeK1b9u3YR1ZmbdLLxZZNcW/3Swyvej0rCDDe
-         9ZQDd3gYL35i9oiaMKBf1YXy9Vm18CoXnTB4wWFJQSeoqAdWfBeUctSDwor4lSHE2cal
-         jfBw==
+        bh=Sx0IUbv8zstyDUBxyHbJwQtyJ++166gxIFGlq89qnlY=;
+        b=oD2Q4702I7BSwNuCN9gviJkqII58feIyTGV4IS4oBltdYOC/Q3A9c1P8TaiAUOrIP3
+         EVJeizfDfbB7UQ+og3yB9nLAcx6e0dP15MgEthMcQHrvROh/YjifaOlUyvIVVeksJ5kz
+         dtl0YZTOBcUBMSlFtQiUXp/PbzMkzwjKMoZTurguZRFRFZgiPxbwnsoCx0Vl2f9/M/5c
+         uzRHU9intoNYo+EKRayFpDEbRLy4NQ6FyiOxeyv+2sAhy+Q1hlHL3GsEEIFnZxJ1+IWb
+         4iGmNUrYWlI2PqKVIB75p+knrafvxc63ueKpIR+XzK/u0gWCk1ciBp9/CM2WymSDF830
+         9XAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776379491; x=1776984291;
+        d=1e100.net; s=20251104; t=1776379529; x=1776984329;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UqyYEqZgyMpoZKxskZj0QRqQl7ttahHyrPikYOVHCGs=;
-        b=gDcxqBMRsRMYRNzzyNjYaZlSXjmT1vkPKa2Hm9VUn/JwjE37ns9nYysD1ATWkOmpQ/
-         hr/CSJQoEc6728AYLJ4KRsK92W5dDEEaij4JPtaTwo4NUoeM8iBDbndj4vBRv8qSNJIJ
-         i/ojd3z0u6YhKQoKMUnpTu45ERk55XnPBZuiNify/o5HVPw6PP0mXc05dKbagDGIyECz
-         mHOjaTd/2vXdnZaHGXH+b+C82h+EXZMD7KfF38rc5RCCcOgVw4i9FioTC19Lizlw4uIS
-         eaIOpfUW2cTrw64fOPUkPrrmJwp3x9buFsSUKKLHC6MYVCEbA+EAEZ5eTdlm68Cm34G0
-         DYKg==
-X-Forwarded-Encrypted: i=1; AFNElJ90cnZKdqi8a9Qtb3dMEIYDmH2kJ+2v1DW66LSlNvgMsMwsWUiZxaa7+d5rd5/mo/2a7e/BuCw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzeMpVwZm6zExqVZwHduPnch+Hj6FsR5v9mh4spqpz/AuKAg6Ui
-	L6PvPe2rBYMb+bJExMAyZi0BLi19G8tN6iMPu1Q38X5ArlOJy/6F/V6PqwSAXi6Pd2aaLM87ToU
-	qC1kJRQ==
-X-Received: from pfbho13.prod.google.com ([2002:a05:6a00:880d:b0:7ba:8e68:3140])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:439b:b0:82f:8696:5a75
- with SMTP id d2e1a72fcca58-82f8c8bb700mr145981b3a.28.1776379491191; Thu, 16
- Apr 2026 15:44:51 -0700 (PDT)
-Date: Thu, 16 Apr 2026 15:44:49 -0700
-In-Reply-To: <20260414-vmscape-bhb-v10-8-efa924abae5f@linux.intel.com>
+        bh=Sx0IUbv8zstyDUBxyHbJwQtyJ++166gxIFGlq89qnlY=;
+        b=eO1VMgR/C4Bc/MqO7mrMOW6+8CCsPIZ57Fhi0RN3ojl1f9B51kWK1+Oqs4SBE5L4hF
+         NwbpUsdXB6iQgnyRs4rnxVSOnXhlUsswtFf3ObGuJVJ23ELiEupESZeB2OMwdwI0lJwq
+         K2bhvWoPK5lbQfTsiL24kvwGqUH1kJZUv57Y1YaEwKqSproKkfNtm70O2h4g9hXooPbA
+         W5QAFmY1+an6RzA3UZ4b6eZ8QdTp9pFr/sORsd4zkHknfJFCfYniOrnj5741av/sY7mh
+         DaQCaAQKooDhsR7OkPKZ9zbcclAbgZcMYi7gZxsBfxuKezvY1H4LFhKOqURcQGt3AWw+
+         yipw==
+X-Forwarded-Encrypted: i=1; AFNElJ+2rWvKFhqB09c6GS2oPdyT5IjbYD7oOYtkSMAvuKsnrl+F60uZ+k/zYoZ5rtLWIm8atfRq1aw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzKa/BStDqu/go3f3py4wI2cN1rZbFwdKSCnxQ4WSC/FXv6jCJY
+	i8UTx99eH07aR5SAeGzS8z4gV7QNjPEt5t8VJfk9HWgABz/UFoviSakZ6C9Bk0b1RzS5O3E/ylL
+	8Wm8sQg==
+X-Received: from pfbjw37.prod.google.com ([2002:a05:6a00:92a5:b0:82a:5e62:7b95])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:2d87:b0:82a:ea3:c172
+ with SMTP id d2e1a72fcca58-82f8c9341f5mr143500b3a.46.1776379529104; Thu, 16
+ Apr 2026 15:45:29 -0700 (PDT)
+Date: Thu, 16 Apr 2026 15:45:27 -0700
+In-Reply-To: <20260414-vmscape-bhb-v10-9-efa924abae5f@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20260414-vmscape-bhb-v10-0-efa924abae5f@linux.intel.com> <20260414-vmscape-bhb-v10-8-efa924abae5f@linux.intel.com>
-Message-ID: <aeFmYd1ybZnVlAYW@google.com>
-Subject: Re: [PATCH v10 08/12] kvm: Define EXPORT_STATIC_CALL_FOR_KVM()
+References: <20260414-vmscape-bhb-v10-0-efa924abae5f@linux.intel.com> <20260414-vmscape-bhb-v10-9-efa924abae5f@linux.intel.com>
+Message-ID: <aeFmh8Fz6xzkfQKb@google.com>
+Subject: Re: [PATCH v10 09/12] x86/vmscape: Use static_call() for predictor flush
 From: Sean Christopherson <seanjc@google.com>
 To: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
 Cc: x86@kernel.org, Jon Kohler <jon@nutanix.com>, Nikolay Borisov <nik.borisov@suse.com>, 
@@ -105,7 +105,7 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279179-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-279180-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_CC(0.00)[kernel.org,nutanix.com,suse.com,zytor.com,amd.com,alien8.de,linux.intel.com,infradead.org,iogearbox.net,davemloft.net,gmail.com,redhat.com,linux.dev,fomichev.me,google.com,lwn.net,vger.kernel.org,intel.com];
@@ -123,128 +123,40 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: AB7EF415564
+X-Rspamd-Queue-Id: CFB2D41556B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 On Tue, Apr 14, 2026, Pawan Gupta wrote:
-> EXPORT_SYMBOL_FOR_KVM() exists to export symbols to KVM modules. Static
-> calls need the same treatment when the core kernel defines a static_call
-> that KVM needs access to (e.g. from a VM-exit path).
+> Adding more mitigation options at exit-to-userspace for VMSCAPE would
+> usually require a series of checks to decide which mitigation to use. In
+> this case, the mitigation is done by calling a function, which is decided
+> at boot. So, adding more feature flags and multiple checks can be avoided
+> by using static_call() to the mitigating function.
 > 
-> Define EXPORT_STATIC_CALL_FOR_KVM() as the static_call analogue of
-> EXPORT_SYMBOL_FOR_KVM(). The same three-way logic applies:
+> Replace the flag-based mitigation selector with a static_call(). This also
+> frees the existing X86_FEATURE_IBPB_EXIT_TO_USER.
 > 
->   - KVM_SUB_MODULES defined: export to "kvm," plus all sub-modules
->   - KVM=m, no sub-modules: export to "kvm" only
->   - KVM built-in: no export needed (noop)
-> 
-> As with EXPORT_SYMBOL_FOR_KVM(), allow architectures to override the
-> definition (e.g. to suppress the export when kvm.ko itself will not be
-> built despite CONFIG_KVM=m). Add the x86 no-op override in
-> arch/x86/include/asm/kvm_types.h for that case.
-> 
+> Suggested-by: Dave Hansen <dave.hansen@linux.intel.com>
+> Tested-by: Jon Kohler <jon@nutanix.com>
 > Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
 > ---
->  arch/x86/include/asm/kvm_types.h |  1 +
->  include/linux/kvm_types.h        | 13 ++++++++++++-
->  2 files changed, 13 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm_types.h b/arch/x86/include/asm/kvm_types.h
-> index d7c704ed1be9..bceeaed2940e 100644
-> --- a/arch/x86/include/asm/kvm_types.h
-> +++ b/arch/x86/include/asm/kvm_types.h
-> @@ -15,6 +15,7 @@
->   * at least one vendor module is enabled.
->   */
->  #define EXPORT_SYMBOL_FOR_KVM(symbol)
-> +#define EXPORT_STATIC_CALL_FOR_KVM(symbol)
->  #endif
+
+For the KVM change,
+
+Acked-by: Sean Christopherson <seanjc@google.com>
+
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 45d7cfedc507..5582056b2fa1 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -11463,7 +11463,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+>  	 * set for the CPU that actually ran the guest, and not the CPU that it
+>  	 * may migrate to.
+>  	 */
+> -	if (cpu_feature_enabled(X86_FEATURE_IBPB_EXIT_TO_USER))
+> +	if (static_call_query(vmscape_predictor_flush))
+>  		this_cpu_write(x86_predictor_flush_exit_to_user, true);
 >  
->  #define KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE 40
-> diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
-> index a568d8e6f4e8..c81f4fdba625 100644
-> --- a/include/linux/kvm_types.h
-> +++ b/include/linux/kvm_types.h
-> @@ -13,6 +13,8 @@
->  	EXPORT_SYMBOL_FOR_MODULES(symbol, __stringify(KVM_SUB_MODULES))
->  #define EXPORT_SYMBOL_FOR_KVM(symbol) \
->  	EXPORT_SYMBOL_FOR_MODULES(symbol, "kvm," __stringify(KVM_SUB_MODULES))
-> +#define EXPORT_STATIC_CALL_FOR_KVM(symbol) \
-> +	EXPORT_STATIC_CALL_FOR_MODULES(symbol, "kvm," __stringify(KVM_SUB_MODULES))
->  #else
->  #define EXPORT_SYMBOL_FOR_KVM_INTERNAL(symbol)
->  /*
-> @@ -27,7 +29,16 @@
->  #define EXPORT_SYMBOL_FOR_KVM(symbol)
->  #endif /* IS_MODULE(CONFIG_KVM) */
->  #endif /* EXPORT_SYMBOL_FOR_KVM */
-> -#endif
-> +
-> +#ifndef EXPORT_STATIC_CALL_FOR_KVM
-> +#if IS_MODULE(CONFIG_KVM)
-> +#define EXPORT_STATIC_CALL_FOR_KVM(symbol) EXPORT_STATIC_CALL_FOR_MODULES(symbol, "kvm")
-> +#else
-> +#define EXPORT_STATIC_CALL_FOR_KVM(symbol)
-> +#endif /* IS_MODULE(CONFIG_KVM) */
-> +#endif /* EXPORT_STATIC_CALL_FOR_KVM */
-> +
-> +#endif /* KVM_SUB_MODULES */
-
-I think I'd prefer to require EXPORT_SYMBOL_FOR_KVM and EXPORT_STATIC_CALL_FOR_KVM
-to come as a pair from arch code.  I can't think of a scenario where arch code
-should override one but not the other.  The end result is slightly less ugly :-)
-
----
- arch/x86/include/asm/kvm_types.h |  1 +
- include/linux/kvm_types.h        | 10 +++++++++-
- 2 files changed, 10 insertions(+), 1 deletion(-)
-
-diff --git a/arch/x86/include/asm/kvm_types.h b/arch/x86/include/asm/kvm_types.h
-index d7c704ed1be9..bceeaed2940e 100644
---- a/arch/x86/include/asm/kvm_types.h
-+++ b/arch/x86/include/asm/kvm_types.h
-@@ -15,6 +15,7 @@
-  * at least one vendor module is enabled.
-  */
- #define EXPORT_SYMBOL_FOR_KVM(symbol)
-+#define EXPORT_STATIC_CALL_FOR_KVM(symbol)
- #endif
- 
- #define KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE 40
-diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
-index a568d8e6f4e8..be602d3f287e 100644
---- a/include/linux/kvm_types.h
-+++ b/include/linux/kvm_types.h
-@@ -13,6 +13,8 @@
- 	EXPORT_SYMBOL_FOR_MODULES(symbol, __stringify(KVM_SUB_MODULES))
- #define EXPORT_SYMBOL_FOR_KVM(symbol) \
- 	EXPORT_SYMBOL_FOR_MODULES(symbol, "kvm," __stringify(KVM_SUB_MODULES))
-+#define EXPORT_STATIC_CALL_FOR_KVM(symbol) \
-+	EXPORT_STATIC_CALL_FOR_MODULES(symbol, "kvm," __stringify(KVM_SUB_MODULES))
- #else
- #define EXPORT_SYMBOL_FOR_KVM_INTERNAL(symbol)
- /*
-@@ -23,11 +25,17 @@
- #ifndef EXPORT_SYMBOL_FOR_KVM
- #if IS_MODULE(CONFIG_KVM)
- #define EXPORT_SYMBOL_FOR_KVM(symbol) EXPORT_SYMBOL_FOR_MODULES(symbol, "kvm")
-+#define EXPORT_STATIC_CALL_FOR_KVM(symbol) EXPORT_STATIC_CALL_FOR_MODULES(symbol, "kvm")
- #else
- #define EXPORT_SYMBOL_FOR_KVM(symbol)
-+#define EXPORT_STATIC_CALL_FOR_KVM(symbol)
- #endif /* IS_MODULE(CONFIG_KVM) */
-+#else
-+#ifndef EXPORT_STATIC_CALL_FOR_KVM
-+#error Must #define EXPORT_STATIC_CALL_FOR_KVM if #defining EXPORT_SYMBOL_FOR_KVM
-+#endif
- #endif /* EXPORT_SYMBOL_FOR_KVM */
--#endif
-+#endif /* KVM_SUB_MODULES */
- 
- #ifndef __ASSEMBLER__
- 
-
-base-commit: 56b7ace84970ff647b095849e80bc36c094760aa
---
+>  	/*
 
