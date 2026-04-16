@@ -1,333 +1,224 @@
-Return-Path: <netdev+bounces-279085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279086-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6CaWKKcD4WmJoQAAu9opvQ
-	(envelope-from <netdev+bounces-279085-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 17:43:35 +0200
+	id 6OBrKkMF4WkuogAAu9opvQ
+	(envelope-from <netdev+bounces-279086-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 17:50:27 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51D55411244
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 17:43:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 55B864113AB
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 17:50:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 6402430362D6
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 15:43:33 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B9EAE30251A5
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 15:50:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6233E3E1210;
-	Thu, 16 Apr 2026 15:43:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E16ED274B37;
+	Thu, 16 Apr 2026 15:50:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b="JfIyCbD5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kjENUUmO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+Received: from mail-ot1-f54.google.com (mail-ot1-f54.google.com [209.85.210.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C08AF3E277D
-	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 15:43:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8821419D093
+	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 15:50:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.54
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776354210; cv=pass; b=cYe1P52c0Jq985tSOX80fyOJmXqPPsBZQeNRcX/n1byvrcczmSmjlUxx0N1EDHfVQmQy2yef8DRptr/Eohd1EJgvXsBRV1hzgKWDlBJjB3wksGWyY7DPFSBl1ajya2mET7RObw7lgVJIiV1fIX+zQ34waVwoquugSmt8LmhgC0I=
+	t=1776354623; cv=pass; b=pJu1Lu0vwxI+ujw3qw959nUOgRbuQdlhC0XpqKSOSfoXIK1K1/WUBBOO+uCpOhRgfHmmCPADnYZ1M80TgmB6Jk3abCXWAh47xDRyN+Ki1ItAiASBjbj0qsVot8r8wLBUKhAxn5xr2gMDd1QIRPDutAVyK8/IFsbZigBZcN3LygU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776354210; c=relaxed/simple;
-	bh=0VCyFrzdlI8DAB9rJRvqOT1dzdyqklfkGuaVmllUeUg=;
+	s=arc-20240116; t=1776354623; c=relaxed/simple;
+	bh=cj9y8wYErxUXR8Wk4lHjJhFXX4qW4UHdcZmQEcLql4I=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EAT6PkSo+ahyGAVo+3eswqCQzlre8kITT2GLt12SQUmoOdkNMdvJrjJKyGZjvcmKa7+fkFhbXFfrqzjAALUbS4/KdiPtjG3LOBPrbg5AL4cRyGQt1RjRr9WUfITxU9EmyQaFdfbJo5hcCRCCByxoCy5K2mnwtSJPgL8vw/u24aU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b=JfIyCbD5; arc=pass smtp.client-ip=209.85.210.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-82f7c7ee9b8so416925b3a.0
-        for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 08:43:28 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776354208; cv=none;
+	 To:Cc:Content-Type; b=WuyCbsp1elUcvy41Hm40YS2oKKdvMBsCA2gF94g79prANlpJ3GoGN5/XG94UEGA+PDwLQ1AGVSvFYKR2Q28kMCa3XvmsmpRqFLca/Bh5P/v2vPa3U/paun/L74b0z+aMdog8gQPFHM+4O//ivhJZEdXaBfAggSl0CjZKH8tFoP4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kjENUUmO; arc=pass smtp.client-ip=209.85.210.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f54.google.com with SMTP id 46e09a7af769-7dbbe726c8fso990554a34.3
+        for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 08:50:22 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776354621; cv=none;
         d=google.com; s=arc-20240605;
-        b=efJoNq+tlLGEFyDLwC3aTldxEviCPv+InpPG+3pD8rwv8STh2CBBx0+yD1OvaAJAdP
-         HPHH7MHmrUghZU+rO7FulsTgomrL5q7WaMghAL4Mue+X6tCC0tJeovqGwXgior0YAaWI
-         W3P6Id8tuEwH3btZiopT2V91g44MS4S0nUhJVrb1+xv6FO8TGKn+vNqKbMwQ187stMkK
-         au/N7YuOv6ZwjD2gh2ZXdsZlQeYjhJXwqwqgkOcy7erECIH+oWhqX+MLcdXbsbF0AbTB
-         quJmQJ6xM3yHfd/fndfP2TwvQtFAo9VTwLkTX1iwhaYf2G4fA0YUT4wHYW2iBL79EIVo
-         NqKg==
+        b=b+6kdJ3ze/HtWrllYX5GLMnNWjqED7sC2y0F5GPPiowEmRoqCXZAiJilNSAPYcEcxK
+         UBkilXSyoafU3Hpj5Yi3zwsECjz6wWndBgqCZCXqyLwEmL/5QYa7+9mq1xgxN24e3Ter
+         chVH/ItpsC75vO7BA/XwAIOr/Jsv7k3usVGBN+hbSK+4runlEf71Mn3/iiub9B9i9nEN
+         NSuRCMoRkblNOsd/8OlEmmT9Bc9JKM7+Ib3kv6B+mrPnZr9lLYjfUUUTqV2PSd3W+L1L
+         rGLiYCB7+P7qUmCYB4Wih6JtE21BveNQbSE85AGtRUCqu7/unmsDrFGQJL0ON3ZpQe7J
+         WyJQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=xILTL/bJwXqDhSjdlnz0vT3CFIMLB6bOGmZs24Ns6rM=;
-        fh=3g3CmyZowwM4gdoaWVjxCV9mgfR8iYKMV/o9ewongrA=;
-        b=CgMcaxfuAyj+csiJAKKninAMMJs92UjE6z619x4cYE0gAMWa2aLNQEMPzbT3ZF4ugv
-         s1K6+jzJ/VKX2obu/MsPTgVZyEqQ7WZCrwFNDah6peVRKlRHqCcuuplJ3aCuFhFcdFxs
-         KyVXDSD/LxO3Z40cLei8/y6ky/04ukLfN3qzwH4Hi1LLzRZI7Geoi9jHx7uTBMTeNZxp
-         pAwgpSmcQt88VAiNNr8wCnQ7cBp4clYFjKOOQ3vlVHKMgKgkfTvGUKRrOXFsqNuNUrg7
-         KKQACnuf22BxJ2dZ9MmbcPqcfQRrCEPOhcON/yZzzl5NLKKKRbrD5kpBywysT+YCVlIu
-         VfhQ==;
+        bh=Ad/Cu4uRbEKvepgBt9xYrbQZAhl16aA9n6Nbb/sU6oQ=;
+        fh=h8JSi214CggotktuzEst9ijuHrMAI0LoQ4aepkxzokU=;
+        b=PTz7UT83u9fuCiFblZagjmosULHXWXNKQ29ufZBjxaAtMEVMw64VnvkuhNbawLh35M
+         cEoaG1EYNgiDtLnZJzzWGuJdDisNa9XR+yHN3M7v58rV2E0hfDdaH8Ywa4gFP0LjgZyt
+         ZXhVjebOnyArbqxqIEpdMIaLc3pPXtsTQjI/h/twx5FlOfkDWArqW6rU3oCWn1ncGZSc
+         zu8Gbt0N7u5q4nF+zhnAsEuBTJm2h1AestEv8xKCHsFuXREzCig2W5rsFvQHBft90RhY
+         vO3aLaOXS3OMXh117KMHBb8CcrHTPA5DAr/a+aO0LCQEybLcszoHZWGI1ejuVonitFmO
+         WW8A==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20251104.gappssmtp.com; s=20251104; t=1776354208; x=1776959008; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1776354621; x=1776959421; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xILTL/bJwXqDhSjdlnz0vT3CFIMLB6bOGmZs24Ns6rM=;
-        b=JfIyCbD5CCdRbyaO4s1jcpEbTS6vbg8Qtn1EbImCoZJnx2jsA0+dk4ZqhfGTqGcoAk
-         bdDtKAFQtP5OT1XEHdoJNYLFANbbLhEPAOEnWcHRsLWe/YLkZmxwqAhxkTLT3QdQ4zQd
-         unZrAzdCQ7e88PGOobKFGAzSYaO3JnVrhNvVvt9cjZUSw/lnoAlejgLYkAheneMisl0Q
-         Ch6ACaFOhXIYX/u5lU9+lVQXutj7iMETxmk9jItXMd9AgrQ9Z2FJ+OSPfYis3sdmIJVe
-         byd0HstRMvqcX9FNtsjCKUkK77iPeBs0nuT//tgEqB0EnyZjeC9k05QfEZZ4jHxnPj9M
-         64QA==
+        bh=Ad/Cu4uRbEKvepgBt9xYrbQZAhl16aA9n6Nbb/sU6oQ=;
+        b=kjENUUmOdwcmxxMOSuBZS0FzgCJL0V+xDofRQJNnj1wpYQfL/Y3DDe9cRJy8RtgiDW
+         qpTa5eqH7dl9vU6v9ThQFa4zA19/DI4S6cjDlvxUEFzTBCOYq2uwKn2eIzFdfeOT5jst
+         VCa4patbS3I6nGSEsAG7blLBEe5BT9Mbi+uSc173uFSEtfpI6sdnBTCFLYtpR+y1PB0A
+         c5zW9xFswIEdTQaq3Xj6PPHcG89DfY+hFOkmxa5IwZRL4aCmA/ELRFCq8vAT3E1QfXqh
+         JFAFGVuw/ZxMQ+A8d7qWEIM+Z8h8Ft9cuQNeEX4+Moz6EdsKvQNmGnkn/2rWaFrehieG
+         ewAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776354208; x=1776959008;
+        d=1e100.net; s=20251104; t=1776354621; x=1776959421;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=xILTL/bJwXqDhSjdlnz0vT3CFIMLB6bOGmZs24Ns6rM=;
-        b=YH1tShaQS8mMuzZ4YZD8HpTSUIf8Nwyo74p5wuSUPdEYHER+XdXRxzHLKw7MeHyIZs
-         /6RkxqwQNmaFWdGYXXJVGq4jglt9t6T+Bj1GHupNNIfEz8mU+EMprz+jJkO+7eqM1Y3h
-         Zsv/llpGdZF9csCGz6fw8Tr36Sith6eRzfzKtjuL8AGFOWLd+7ElJ5U53/TWBL+Wa3oR
-         ZANM5++6ZAbEWsBVy2E3dai8FFcCV+zI0tn6VI4tXmfR24sB/xco6gtFT2opKf+wWAHy
-         ST9yVB6xr2lfEYleZnKqeDafgeGCP6fb5HKLtSqBhDnojyCYtkKapnLPtcfyp/tgeEwv
-         3pRQ==
-X-Forwarded-Encrypted: i=1; AFNElJ9W7lEei4dVj6DZQGDmWqVtXRKoMJgUHmbmnMpCpxNCdeiXmWKk9SRCQ7AbJP8pRZCKF5jsrz4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwWDhrm1TssgXWee9qsrxc6H7DI8i+RvHRhIKA7yb+jjo7LyYRO
-	Wscw0JfdG1WdU6oqSYPZDWWuCWHlgqxGaxGFONlS++I5XHGJ0us08bVZny/s1VCg4zuU8Buaeu9
-	kFrtM9IQPtIfLt7AM5Mn03YosiUQ4uq19n8O2Uadg
-X-Gm-Gg: AeBDieudlnO7etBrTJBYsQOgpIgE1I1sAM5v1U4OmZo7ZGwOMydSdmARSejZdLRaHVu
-	86jZaIorhFgsgp1ulQOW7UcU9vqswC2WDyDG5tdqQSiUWHRlzAh8xvAxx1KqZ1ym+Hj+UI+m6xh
-	mIDoNI1cfyuHLR82PkFnkyRvtJQpJg7OFZU2zR2YAc0mTqKHBOqfs2DNbS74OC6WYA00gCau2Sv
-	IpRbsqRU/fp3r87K3MJvid0wPKvF+cBFTZyb22sPWZJS154GFP6Xjbtn3vJMvyilLjelwpndYt0
-	F9GIx57t8kT9Y9KNm38=
-X-Received: by 2002:a05:6a00:a223:b0:82f:6e7:1527 with SMTP id
- d2e1a72fcca58-82f0c18957amr25112917b3a.23.1776354208026; Thu, 16 Apr 2026
- 08:43:28 -0700 (PDT)
+        bh=Ad/Cu4uRbEKvepgBt9xYrbQZAhl16aA9n6Nbb/sU6oQ=;
+        b=PUcMrNhtaZa/HPZhvtubhsPiKVsLEMlSOgPTuxrYUVzH1LJ++EyXUvCAF/2RC6FLph
+         D3JRNz/yHM79XlNLD+eCVO9vYKydRKl4ln4FyO/vwHusvetgc8zm5YU5ApePFzNNAJ6F
+         F8fA5S8WmRuPehvoqXC5L/YLh8Eac/Bp5MGrKiMHUXQILQHB6C7Ndi3CNc8OoPkrMUj4
+         nGDAmEX/VsQ7RLQxsYy9/FolLnz/T0+aciz0hIBUPQQ5UCp+nkUNak3VrpB3lo0zXgPe
+         A4v4csRRE2wpOEr5972kdcRdfmzd+/tACKgtGdaCijmLQgQbEaQ+xod/uGSb+3ebVCPi
+         pfbw==
+X-Gm-Message-State: AOJu0YwAbv5OTmAx2FmYyvXm8KrtHYANWIQDgD0dk0XuiCnsebLf5Noz
+	B+Cks5GcSms6UuvAqTs582gsmZ0bH1vZV2ZhHdsJAhOED1vWEKpvGYGIADAGpIucIlCZ2eDn6Mh
+	t36EaEETTDGk8I0CFVmX9Przn6ciMsAI=
+X-Gm-Gg: AeBDies+ar1dZK2+vLbRfX01wD3/YMaoPUr2XnWemeY9ddDVABJRIi93GPpxCxDgsIB
+	7odlDBstvLq/EkHuSUhcDUYO0I7fdjsdwxBDoOUgOh3GrZN9fD6SV/R0vMmR0LxN9H9tc9xacUy
+	ZQkeTmbxrpVX1qdUv7vJsNlDdyfR4kd8pjHj6UHDHv15Lt35GYhA4XIzHIZKWxx1lkGtVPWS/a7
+	XhCfE8Y4VdMs3fayHUrH+HOT/dp0E+i3KugTXgEzrx8ZKNh/jzr7iPZgwkxb0Liq1Ouy+Cb8uHk
+	uRJFFvQNO/ahE0jp
+X-Received: by 2002:a05:6808:220d:b0:46e:c1cd:865b with SMTP id
+ 5614622812f47-47978b78765mr2170677b6e.2.1776354621365; Thu, 16 Apr 2026
+ 08:50:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260413094448.2263828-1-hxzene@gmail.com>
-In-Reply-To: <20260413094448.2263828-1-hxzene@gmail.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Thu, 16 Apr 2026 11:43:16 -0400
-X-Gm-Features: AQROBzC9xgboFKA_w7CsTLMJW7KHNWZnJyMUf6vlstEC3LDqYv4MjeJWBGIGu5A
-Message-ID: <CAM0EoMndFM=JtsuP4ffM-YDphZ3gvW_=a5aTZmD62xPpCZY90w@mail.gmail.com>
-Subject: Re: [PATCH] net: sched: teql: fix use-after-free in teql_master_xmit
-To: "Kito Xu (veritas501)" <hxzene@gmail.com>
-Cc: Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260408231415.522691-1-weibunny.kernel@gmail.com>
+ <20260408231415.522691-4-weibunny.kernel@gmail.com> <cb5bf340-e5fa-4866-b5c6-565709ba633c@redhat.com>
+In-Reply-To: <cb5bf340-e5fa-4866-b5c6-565709ba633c@redhat.com>
+From: Wei Wang <weibunny.kernel@gmail.com>
+Date: Thu, 16 Apr 2026 08:50:09 -0700
+X-Gm-Features: AQROBzDv-q221VlTuAk7mmYfNvhww8zIGor7VOjoMT0Hf2E7EXkGOlgCmOoPJ1g
+Message-ID: <CAGqc4nVKDAdBrjO23Hv2nKccU81LNnsTSxtr3k-TuQf5smF_4A@mail.gmail.com>
+Subject: Re: [PATCH v11 net-next 3/5] psp: add a new netdev event for dev unregister
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
+	Daniel Zahka <daniel.zahka@gmail.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+	David Wei <dw@davidwei.uk>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Simon Horman <horms@kernel.org>, Wei Wang <weibunny@fb.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_DKIM_ALLOW(-0.20)[mojatatu-com.20251104.gappssmtp.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-279086-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	DMARC_NA(0.00)[mojatatu.com];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-279085-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[mojatatu-com.20251104.gappssmtp.com:+];
-	MISSING_XM_UA(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,gmail.com,davidwei.uk,lunn.ch,davemloft.net,google.com,fb.com];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[weibunnykernel@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mojatatu-com.20251104.gappssmtp.com:dkim]
-X-Rspamd-Queue-Id: 51D55411244
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 55B864113AB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Apr 13, 2026 at 5:44=E2=80=AFAM Kito Xu (veritas501) <hxzene@gmail.=
-com> wrote:
+On Mon, Apr 13, 2026 at 3:48=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
+te:
 >
-> teql_destroy() traverses the circular slave list to unlink a slave
-> qdisc. It reads master->slaves as both the starting point and the
-> do-while termination sentinel. However, the data-path writers
-> teql_dequeue() and teql_master_xmit() concurrently modify
-> master->slaves without holding RTNL, running in softirq or process
-> context respectively. If master->slaves is overwritten to an
-> already-visited node mid-traversal, the loop exits early without
-> finding the target slave. The slave is never unlinked, but its memory
-> is freed by call_rcu() -- leaving a dangling pointer in the circular
-> list. The next teql_master_xmit() traversal dereferences freed memory.
+> On 4/9/26 1:14 AM, Wei Wang wrote:
+> > +static int psp_netdev_event(struct notifier_block *nb, unsigned long e=
+vent,
+> > +                         void *ptr)
+> > +{
+> > +     struct net_device *dev =3D netdev_notifier_info_to_dev(ptr);
+> > +     struct psp_dev *psd;
+> > +
+> > +     if (event !=3D NETDEV_UNREGISTER)
+> > +             return NOTIFY_DONE;
+> > +
+> > +     rcu_read_lock();
+> > +     psd =3D rcu_dereference(dev->psp_dev);
+> > +     if (psd && psp_dev_tryget(psd)) {
+> > +             rcu_read_unlock();
+> > +             mutex_lock(&psd->lock);
+> > +             psp_dev_disassoc_one(psd, dev);
+> > +             mutex_unlock(&psd->lock);
+> > +             psp_dev_put(psd);
 >
-
-
-Do you have a reproducer?
-And it would be nice to get a tdc test from you.
-
-Also, please use assisted-by: or even suggested-by if this patch was
-suggested by AI.
-
-cheers,
-jamal
-
-> race condition:
+> Sashiko notes that the above is racy:
 >
->   CPU 0 (teql_destroy, RTNL held)       CPU 1 (teql_dequeue, softirq)
->   -----------------------------------   -----------------------------
->   prev =3D master->slaves;  // =3D A
->   q =3D NEXT_SLAVE(A);      // =3D B
->   B =3D=3D A? No.
->   prev =3D B;
->                                          /* slave C's queue drains */
->                                          skb =3D=3D NULL ->
->                                          dat->m->slaves =3D C; /* write! =
-*/
->
->   q =3D NEXT_SLAVE(B);      // =3D C
->   C =3D=3D A? No.
->   prev =3D C;
->   /* check: (prev=3DC) !=3D master->slaves(C)?
->      FALSE -> loop exits! */
->   /* A never unlinked, freed by call_rcu */
->
->   CPU 0 (teql_master_xmit, later)
->   -----------------------------------
->   q =3D NEXT_SLAVE(C);      // =3D A (freed!)
->   slave =3D qdisc_dev(A);   // UAF!
->
-> Fix this by saving master->slaves into a local `head` variable at the
-> start of teql_destroy() and using it as a stable sentinel for the
-> entire traversal. Also annotate all data-path accesses to
-> master->slaves with READ_ONCE/WRITE_ONCE to prevent store-tearing and
-> compiler-introduced re-reads.
->
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> BUG: KASAN: slab-use-after-free in teql_master_xmit+0xeae/0x14a0
-> Read of size 8 at addr ffff888018074040 by task poc/162
->
-> CPU: 2 UID: 0 PID: 162 Comm: poc Not tainted 7.0.0-rc7-next-20260410 #10 =
-PREEMPTLAZY
-> Call Trace:
->  <TASK>
->  dump_stack_lvl+0x64/0x80
->  print_report+0xd0/0x5e0
->  kasan_report+0xce/0x100
->  teql_master_xmit+0xeae/0x14a0
->  dev_hard_start_xmit+0xcd/0x5b0
->  sch_direct_xmit+0x12e/0xac0
->  __qdisc_run+0x3b1/0x1a70
->  __dev_queue_xmit+0x2257/0x3100
->  ip_finish_output2+0x615/0x19c0
->  ip_output+0x158/0x2b0
->  ip_send_skb+0x11b/0x160
->  udp_send_skb+0x64b/0xd80
->  udp_sendmsg+0x138c/0x1ec0
->  __sys_sendto+0x331/0x3a0
->  __x64_sys_sendto+0xe0/0x1c0
->  do_syscall_64+0x64/0x680
->  entry_SYSCALL_64_after_hwframe+0x76/0x7e
->
-> The buggy address belongs to the object at ffff888018074000
->  which belongs to the cache kmalloc-512 of size 512
-> The buggy address is located 64 bytes inside of
->  freed 512-byte region [ffff888018074000, ffff888018074200)
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Signed-off-by: Kito Xu (veritas501) <hxzene@gmail.com>
 > ---
->  net/sched/sch_teql.c | 24 ++++++++++++++----------
->  1 file changed, 14 insertions(+), 10 deletions(-)
+> Can this code race with psp_nl_dev_assoc_doit() and permanently leak a
+> net_device reference?
+> If CPU1 is executing psp_nl_dev_assoc_doit() and CPU2 is unregistering th=
+e
+> device, the following interleaving could happen:
+> CPU1 (psp_nl_dev_assoc_doit)
+>     assoc_dev =3D dev_get_by_index(...) // acquires a reference
+> CPU2 (unregister_netdevice)
+>     psp_netdev_event()
+>         psd =3D rcu_dereference(dev->psp_dev); // sees NULL, returns
+> NOTIFY_DONE
+> CPU1 (psp_nl_dev_assoc_doit)
+>     cmpxchg(&assoc_dev->psp_dev, NULL, psd); // succeeds!
+>     list_add(...) // adds to psd->assoc_dev_list
+> If this occurs, the notifier misses the unregistration event since it run=
+s
+> before the device is fully associated. The unregistering thread will then
+> enter netdev_wait_allrefs() and wait indefinitely because the reference
+> held in assoc_dev_list is never released.
+> ---
 >
-> diff --git a/net/sched/sch_teql.c b/net/sched/sch_teql.c
-> index ec4039a201a2..2e86397a5219 100644
-> --- a/net/sched/sch_teql.c
-> +++ b/net/sched/sch_teql.c
-> @@ -101,7 +101,7 @@ teql_dequeue(struct Qdisc *sch)
->         if (skb =3D=3D NULL) {
->                 struct net_device *m =3D qdisc_dev(q);
->                 if (m) {
-> -                       dat->m->slaves =3D sch;
-> +                       WRITE_ONCE(dat->m->slaves, sch);
->                         netif_wake_queue(m);
->                 }
->         } else {
-> @@ -136,19 +136,23 @@ teql_destroy(struct Qdisc *sch)
->         if (!master)
->                 return;
->
-> -       prev =3D master->slaves;
-> +       prev =3D READ_ONCE(master->slaves);
->         if (prev) {
-> +               struct Qdisc *head =3D prev;
-> +
->                 do {
->                         q =3D NEXT_SLAVE(prev);
->                         if (q =3D=3D sch) {
->                                 NEXT_SLAVE(prev) =3D NEXT_SLAVE(q);
-> -                               if (q =3D=3D master->slaves) {
-> -                                       master->slaves =3D NEXT_SLAVE(q);
-> -                                       if (q =3D=3D master->slaves) {
-> +                               if (q =3D=3D head) {
-> +                                       WRITE_ONCE(master->slaves,
-> +                                                  NEXT_SLAVE(q));
-> +                                       if (q =3D=3D NEXT_SLAVE(q)) {
->                                                 struct netdev_queue *txq;
->
->                                                 txq =3D netdev_get_tx_que=
-ue(master->dev, 0);
-> -                                               master->slaves =3D NULL;
-> +                                               WRITE_ONCE(master->slaves=
-,
-> +                                                          NULL);
->
->                                                 dev_reset_queue(master->d=
-ev,
->                                                                 txq, NULL=
-);
-> @@ -158,7 +162,7 @@ teql_destroy(struct Qdisc *sch)
->                                 break;
->                         }
->
-> -               } while ((prev =3D q) !=3D master->slaves);
-> +               } while ((prev =3D q) !=3D head);
->         }
->  }
->
-> @@ -285,7 +289,7 @@ static netdev_tx_t teql_master_xmit(struct sk_buff *s=
-kb, struct net_device *dev)
->         int subq =3D skb_get_queue_mapping(skb);
->         struct sk_buff *skb_res =3D NULL;
->
-> -       start =3D master->slaves;
-> +       start =3D READ_ONCE(master->slaves);
->
->  restart:
->         nores =3D 0;
-> @@ -317,7 +321,7 @@ static netdev_tx_t teql_master_xmit(struct sk_buff *s=
-kb, struct net_device *dev)
->                                     netdev_start_xmit(skb, slave, slave_t=
-xq, false) =3D=3D
->                                     NETDEV_TX_OK) {
->                                         __netif_tx_unlock(slave_txq);
-> -                                       master->slaves =3D NEXT_SLAVE(q);
-> +                                       WRITE_ONCE(master->slaves, NEXT_S=
-LAVE(q));
->                                         netif_wake_queue(dev);
->                                         master->tx_packets++;
->                                         master->tx_bytes +=3D length;
-> @@ -329,7 +333,7 @@ static netdev_tx_t teql_master_xmit(struct sk_buff *s=
-kb, struct net_device *dev)
->                                 busy =3D 1;
->                         break;
->                 case 1:
-> -                       master->slaves =3D NEXT_SLAVE(q);
-> +                       WRITE_ONCE(master->slaves, NEXT_SLAVE(q));
->                         return NETDEV_TX_OK;
->                 default:
->                         nores =3D 1;
-> --
-> 2.43.0
+
+Hmm... Good catch. I think I could do the following to fix this:
+
+On psp_nl_dev_assoc_doit():
+- grab psd->lock
+- Do cmpxchg(&assoc_dev->psp_dev, NULL, psd)
+- Do if (READ_ONCE(assoc_dev->reg_state) !=3D NETREG_REGISTERED) {
+          err =3D -ENODEV;
+          goto cleanup;
+       }
+
+On unregister_netdevice side, the sequence of calls are as follows in
+unregister_netdevice_many_notify():
+- WRITE_ONCE(reg_state, NETREG_UNREGISTERING);
+- synchronize_net()
+- call_netdevice_notifiers(NETDEV_UNREGISTER, dev) =3D>
+psp_netdev_event() =3D> Read psd =3D> grab psd->lock and do clean up if
+psd !=3D NULL
+
+With this logic, at least 1 side would do the cleanup. And the clean
+up path is guarded by psd->lock so it is also sequenced and should not
+have double free issue.
+Let me know what you think.
+
+
+> /P
 >
 
