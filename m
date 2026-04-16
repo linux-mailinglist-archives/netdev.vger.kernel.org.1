@@ -1,150 +1,170 @@
-Return-Path: <netdev+bounces-278885-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278886-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +MorJZou4GnmdAAAu9opvQ
-	(envelope-from <netdev+bounces-278885-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 02:34:34 +0200
+	id /OiEA7kw4GlWdQAAu9opvQ
+	(envelope-from <netdev+bounces-278886-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 02:43:37 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47C044094D0
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 02:34:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C2C41409525
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 02:43:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3FC4130FF3C5
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 00:30:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D5A1D3034672
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 00:43:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 882F21DD889;
-	Thu, 16 Apr 2026 00:30:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1F4917AE11;
+	Thu, 16 Apr 2026 00:43:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IXqGhRxh"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Rd6bH6pb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60DF31A6805;
-	Thu, 16 Apr 2026 00:30:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FE501C695;
+	Thu, 16 Apr 2026 00:43:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776299446; cv=none; b=Cpud+2nHukp33Z84gJw1fSUBxEwMm1+BegtrBOnGMgtNM1YgbKkbnOHUnc2NNsxshb589/VI32d38rXPzyBo9Sqyr87zeIrz3d510CsKoW48AotqDuUgDVPOVACjOEb3IfaKVOL6M9aOdEBtYZO8qcrFYVpivTyUEIiEp8v4JQs=
+	t=1776300203; cv=none; b=Rcz1rf3XvKnLxcIrF1Q5RsJVW2Ksf6Iycw1YdAclWC6MI+ds7FdnGOKBKswTGCgw2J2/ufnplDYea0c+s45QmOrKW8P6a46Xm1IMI4WYSyQnzqIEMNi1yA5vWwBFKnHjSVTDnjuwXzWgDSJUFp+7BBd3PgOAD4dDYrm8Xc6LLzA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776299446; c=relaxed/simple;
-	bh=8hdB6viDEMIXDVmOzuuRHuVAjFMysD7iScx0KyZBz4g=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=rB8/RiNsINatG8aVQ1ELwU7WX2UZ3R+ZHEsO7GX2AMfYBui35Kgewpls34YxinV5seQH8yfFrgkLLQhb2bjK4N47fCEwvLsOJActM0TVxEXEF+hZLjk9jpdBsF69dFAamJad28tP3OnwQieevsl8vDoRsgijTEHBQuhcMz4qXU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IXqGhRxh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D89E9C19424;
-	Thu, 16 Apr 2026 00:30:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776299445;
-	bh=8hdB6viDEMIXDVmOzuuRHuVAjFMysD7iScx0KyZBz4g=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=IXqGhRxhTM5WD/LJvpHMQqA4sgum8mSVOrXSXxiSfXdrNhD50Pjb939jdVpJ74A5g
-	 d9oERdEYIsQEntckzwwJ2soI7OPdosgwv7n3/4tIwLIBPSGd3GFz118YskPSjRE7wP
-	 Oxb91Yzpmxz1uhBcepA5FGTh5ttSa+liL7S2eFEi3dupdjjzalSDsTMZdlI6UsKQ/6
-	 nNbYbbNWLo+AX9wlU1qHDKlHofl9YEdpZwOkuFst36N97nGN95N7xjNbC354Y2/4B5
-	 DF/3+MpuiTUyJexfGMYFaGs5T2tceq1MPvLHoUvdO/TuG6RRNdaDF8eexwQUD+gUOM
-	 /r8JdYxO+51og==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FD24380A964;
-	Thu, 16 Apr 2026 00:30:16 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1776300203; c=relaxed/simple;
+	bh=lQv0RrnnKjrsrz3OfpAB7H9RZq1x1kFzHaHJw9VDgVw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lNts5G3XOIHMZj4M2rKo+BclOuc/I5LINJ3vIs41NM4hAqHmJ1zLRLXQqxiymIUwbeEu9C2xRy6C9zy08BaOyYK7+0GUCRd8Kkiftdw9NlpgvnBkF9yqw8UsTENEoTI/50kN4AkOdQ4i+FSuM8uo/CuT22zD19ZjplWaipPoD98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Rd6bH6pb; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=QwwpPMeXcqgVS3p4zP/MvEBTtT1TcMx4mqU6gSoWG44=; b=Rd6bH6pbTu/TXQmeEjPzoeYA4f
+	bKKjflY+DmB/3kutQngE653je1dDqjLiAqBG/MvyzKAmx0Ve4SFst6NYUrwA+nUo6ivQGuIL+xHdA
+	TurvxQAa7VnTt+Xa4NOU+ShgXPc2WCci+ragGgHsRp3Z05ydWySP/Ff4pza+hk2xvA8g=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wDAoq-00GEEl-LQ; Thu, 16 Apr 2026 02:42:56 +0200
+Date: Thu, 16 Apr 2026 02:42:56 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Alice Ryhl <aliceryhl@google.com>
+Cc: Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>,
+	Gary Guo <gary@garyguo.net>,
+	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
+	Benno Lossin <lossin@kernel.org>,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Trevor Gross <tmgross@umich.edu>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Arve =?iso-8859-1?B?SGr4bm5lduVn?= <arve@android.com>,
+	Todd Kjos <tkjos@android.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Carlos Llamas <cmllamas@google.com>, linux-kernel@vger.kernel.org,
+	rust-for-linux@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v3 1/4] rust: netlink: add raw netlink abstraction
+Message-ID: <e8875c97-ddc1-4eb2-85cf-27f34e0d9e08@lunn.ch>
+References: <20260415-binder-netlink-v3-0-84be9ba63ee2@google.com>
+ <20260415-binder-netlink-v3-1-84be9ba63ee2@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf v4 0/5] bpf, sockmap: Fix af_unix null-ptr-deref in
- proto update
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177629941504.2543974.17636062196868674829.git-patchwork-notify@kernel.org>
-Date: Thu, 16 Apr 2026 00:30:15 +0000
-References: 
- <20260414-unix-proto-update-null-ptr-deref-v4-0-2af6fe97918e@rbox.co>
-In-Reply-To: 
- <20260414-unix-proto-update-null-ptr-deref-v4-0-2af6fe97918e@rbox.co>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: john.fastabend@gmail.com, jakub@cloudflare.com, edumazet@google.com,
- kuniyu@google.com, pabeni@redhat.com, willemb@google.com,
- davem@davemloft.net, kuba@kernel.org, horms@kernel.org, yhs@fb.com,
- andrii@kernel.org, ast@kernel.org, daniel@iogearbox.net,
- martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
- yonghong.song@linux.dev, kpsingh@kernel.org, sdf@fomichev.me,
- haoluo@google.com, jolsa@kernel.org, shuah@kernel.org,
- cong.wang@bytedance.com, netdev@vger.kernel.org, bpf@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- jiayuan.chen@linux.dev, yimingqian591@gmail.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260415-binder-netlink-v3-1-84be9ba63ee2@google.com>
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-278885-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-278886-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[gmail.com,cloudflare.com,google.com,redhat.com,davemloft.net,kernel.org,fb.com,iogearbox.net,linux.dev,fomichev.me,bytedance.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[30];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[23];
 	ASN_FAIL(0.00)[1.2.3.5.c.f.2.1.0.0.0.0.0.0.0.0.b.d.0.0.1.0.0.e.a.0.c.3.0.0.6.2.asn6.rspamd.com:server fail];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	TO_DN_SOME(0.00)[];
-	FROM_NO_DN(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,rbox.co:email]
-X-Rspamd-Queue-Id: 47C044094D0
+	NEURAL_HAM(-0.00)[-0.998];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,garyguo.net,protonmail.com,umich.edu,gmail.com,davemloft.net,google.com,redhat.com,linuxfoundation.org,android.com,vger.kernel.org];
+	MID_RHS_MATCH_FROM(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C2C41409525
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello:
+> diff --git a/rust/helpers/genetlink.c b/rust/helpers/genetlink.c
+> new file mode 100644
+> index 000000000000..3530b69f6cf7
+> --- /dev/null
+> +++ b/rust/helpers/genetlink.c
+> @@ -0,0 +1,46 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +
+> +/*
+> + * Copyright (C) 2026 Google LLC.
+> + */
+> +
+> +#include <net/genetlink.h>
+> +
+> +#ifdef CONFIG_NET
+> +
+> +__rust_helper struct sk_buff *rust_helper_genlmsg_new(size_t payload, gfp_t flags)
+> +{
+> +	return genlmsg_new(payload, flags);
+> +}
+> +
+> +__rust_helper
+> +int rust_helper_genlmsg_multicast(const struct genl_family *family,
+> +				  struct sk_buff *skb, u32 portid,
+> +				  unsigned int group, gfp_t flags)
+> +{
+> +	return genlmsg_multicast(family, skb, portid, group, flags);
+> +}
+> +
+> +__rust_helper void rust_helper_genlmsg_cancel(struct sk_buff *skb, void *hdr)
+> +{
+> +	genlmsg_cancel(skb, hdr);
+> +}
+> +
+> +__rust_helper void rust_helper_genlmsg_end(struct sk_buff *skb, void *hdr)
+> +{
+> +	genlmsg_end(skb, hdr);
+> +}
+> +
+> +__rust_helper void rust_helper_nlmsg_free(struct sk_buff *skb)
+> +{
+> +	nlmsg_free(skb);
+> +}
+> +
+> +__rust_helper
+> +int rust_helper_genl_has_listeners(const struct genl_family *family,
+> +				   struct net *net, unsigned int group)
+> +{
+> +	return genl_has_listeners(family, net, group);
+> +}
 
-This series was applied to bpf/bpf.git (master)
-by Martin KaFai Lau <martin.lau@kernel.org>:
+The C part looks sensible now. For this bit only:
 
-On Tue, 14 Apr 2026 16:13:14 +0200 you wrote:
-> Updating sockmap/sockhash using a unix sock races unix_stream_connect():
-> when sock_map_sk_state_allowed() passes (sk_state == TCP_ESTABLISHED),
-> unix_peer(sk) in unix_stream_bpf_update_proto() may still return NULL.
-> 
-> Signed-off-by: Michal Luczaj <mhal@rbox.co>
-> ---
-> Changes in v4:
-> - Circle back to v1 approach
-> - More details in commit messages [Martin]
-> - Make unix iter take the state lock [Kaniyuki]
-> - Link to v3: https://lore.kernel.org/r/20260306-unix-proto-update-null-ptr-deref-v3-0-2f0c7410c523@rbox.co
-> 
-> [...]
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-Here is the summary with links:
-  - [bpf,v4,1/5] bpf, sockmap: Annotate af_unix sock::sk_state data-races
-    https://git.kernel.org/bpf/bpf/c/a25566084e39
-  - [bpf,v4,2/5] bpf, sockmap: Fix af_unix iter deadlock
-    https://git.kernel.org/bpf/bpf/c/4d328dd69538
-  - [bpf,v4,3/5] selftests/bpf: Extend bpf_iter_unix to attempt deadlocking
-    https://git.kernel.org/bpf/bpf/c/997b8483d44c
-  - [bpf,v4,4/5] bpf, sockmap: Fix af_unix null-ptr-deref in proto update
-    https://git.kernel.org/bpf/bpf/c/dca38b7734d2
-  - [bpf,v4,5/5] bpf, sockmap: Take state lock for af_unix iter
-    https://git.kernel.org/bpf/bpf/c/64c2f93fc325
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+    Andrew
 
