@@ -1,96 +1,64 @@
-Return-Path: <netdev+bounces-278911-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278912-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 1KFdN0FV4Gl5fAAAu9opvQ
-	(envelope-from <netdev+bounces-278911-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 05:19:29 +0200
+	id wPYpKadb4GmsfQAAu9opvQ
+	(envelope-from <netdev+bounces-278912-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 05:46:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC9ED409E5E
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 05:19:28 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FBE640A0BF
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 05:46:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 97066306E364
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 03:19:27 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 751F73018B6A
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 03:46:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D2F827AC57;
-	Thu, 16 Apr 2026 03:19:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2BD21F94F;
+	Thu, 16 Apr 2026 03:46:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VaPreFgq"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CqOiWfFh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5A2522541C
-	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 03:19:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47AD43093BB
+	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 03:46:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776309563; cv=none; b=iqdpzfaFLm5ja43MZ+vAQBGqa+eR5NNEbqTEdA5sHWbhYbXYMrEA1NOz43l5DQpTdvjwZNPangmSlhqUEfqFXQSeMzOLM6HAQn5ky+xViSNrdbTeo/JJkbv0PL8JvhHM/c7xaBZOL02/N+YSdi4oVC/pyrRiXNkbdaeS+N0W9EU=
+	t=1776311196; cv=none; b=bK3oE+jj9ermnDT7wdzlW8/ugPffzFeQwwmcwCNd1P/AAMZogArwOYcLGzNFUEbUHJCiYhQ/Lo5mWvFQsDCkKk9KovToaYBeV7s/YBx7FXeAajEWyay+Jdc8XqCcgyllZ/geHl5J2rDiuFzlMbKyOx/0fE3Byu8h8DFXE+8UbKU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776309563; c=relaxed/simple;
-	bh=6gffQwVrZbWmmoZmS6ntD3kXVEXf3L650/1kWkyePIs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YYgGBY1J8sKtuS/q2u9wlL6mVzbqOWH+ztarmoGpRmpGHPy0oaNr2Y/4IlBdiWOKHpDunCccS1iTI2LZRguxp+6s8jm2QZ2t9zxxQ5T5k/2vmWj6LxX+JSYL5HmEfyUiSHh6YlBYkAUG2jbMmFhMVRm8BgKQ4Q/tyP0ewlQLfR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VaPreFgq; arc=none smtp.client-ip=209.85.222.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-8cb40149037so695585985a.2
-        for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 20:19:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776309560; x=1776914360; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=GgBzs6EKzyDLWZ+aqE87/ScBh1gHb7gMVIBVANVXsG8=;
-        b=VaPreFgqvH6YxdHi7lpfMyQ8zQHsFSai9T1koCoIkNPxbjCkYMK/NNaRkJYWC79mpk
-         XcU29drJP427G9fYkn0q/U7P5v51t3MNzKYGskE2ShwIvZ464bXMlVzg3WbrD5s5qo4r
-         iuuZQHh2EufS1CQIiGqyNnk+de0K5c6DIjsbcaBAuVRJ3Lq4IPM/hwcUuyQn8dNpC0zv
-         eZfFRpzS4DWJX2PRsr13c6Gs5fOECcA9vmzjq5lvqMX8U0julgXQqm1NzJl1ph1ShERi
-         BpbMxDgN30zBimN6LircLEgTNU98k+Lw58NB7poGNl/Dzna8dYplLnG3U24w0bJYiboR
-         Lv1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776309560; x=1776914360;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GgBzs6EKzyDLWZ+aqE87/ScBh1gHb7gMVIBVANVXsG8=;
-        b=o7WXJMpd2783VP1lnbjn3b/lmv25SM0jvhT6lZ3zsp+RlVYWkzj9s6PaGFAL/6O8kd
-         +q36twKNHx+7+ecHy8CjS9trshGp11NYWuUq5Dlicha573jy+r5yCn/Nv+O5r/uI9FMc
-         4VzT+1J+39oXwxn0sJ65bOsa+LTJMmt2Qd5D3/Wr4oZ6ETsKt3NwTLuvFJbYEZBDIh2K
-         fTTUI4kPpkxMvRGAMGaG2Mzz9NRekZjJRlUR/HDtJogAfONhRYryXa2k8XfnUAdb3d8O
-         mNJwloc4d0kFofCbw0X4ParCUwqaiIICAOpXicf31lgp6aZfcGex2gGfYyBerXpF8i0d
-         /ZLQ==
-X-Forwarded-Encrypted: i=1; AFNElJ/yW7nGP4G2xvz60wvQFerlS5YoYdFI/X15qzPPgHvgS9S5cio70H66RaTXRgo5+3ccX1EU1ws=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy/nmmLS/4pLqICSDpExvZUUGM38AcEut03Ylmn2AVuakh4CnJS
-	SC+p/qclAcJdeTgxxJEmXVgpJ+biZlSVvLFU6ejHSwqXoI1f025xre9W
-X-Gm-Gg: AeBDiesb9MDzK7rACY/rOAee3Jbyz8LocuybeY6KOGvpHV5ARPcbW0xeIr5LaIPyLOW
-	Yfv+H0esQwNdhp0xQdBNTX53E9QYC3qD59m9pGuRTKAk6B9HgTYPUzPBOQTOcrauHtpqMiVd3IP
-	RPvlyRcWwGWvWU+wyGmTojxVJspjCtAOpzT59gUN2qy0F8eEjKfoz9X9RDu/EQ9a0Zm2Vzc7jHC
-	2CoyaLRwXjnit3L6s6xDcq7lMC+HP703OL2wl2vGfszJj0IFEpYJav5v1VnOT8iox9QmXkpQtSV
-	P9H52DZdz999QlA/4/HpAWXiFysoYnViA7e1gi+C0FS7cWuF6xYz/3Ul5sugGgeX6aCaMQ4Q/YW
-	Lo+CEBQpz2xAXNxpUiYv2pjpHpKlQSELLTJSAVGUp440FuDV81J2T5FxJPrMh64ZM3BaFmBZSER
-	gufN3wU1JFnZBlTqsyrocEdJsZsf8chtERLU1Bg5Mk9b0pMx6tf+XQa1Gv30le/d5uHSmx6C0XK
-	OoGEOUn4eAZUenCh/dPtGL0SH0crHnb+dusTNqIrXzyXr3/pLvzFA==
-X-Received: by 2002:a05:620a:29d1:b0:8dc:eca0:35bd with SMTP id af79cd13be357-8ddcd11942bmr3421071185a.5.1776309560487;
-        Wed, 15 Apr 2026 20:19:20 -0700 (PDT)
-Received: from server0.tail6e7dd.ts.net (c-68-48-65-54.hsd1.mi.comcast.net. [68.48.65.54])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8e4eed6eef3sm297805585a.2.2026.04.15.20.19.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Apr 2026 20:19:19 -0700 (PDT)
-From: Michael Bommarito <michael.bommarito@gmail.com>
-To: linux-sctp@vger.kernel.org,
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-	Xin Long <lucien.xin@gmail.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1776311196; c=relaxed/simple;
+	bh=ATB3acJJRcv7+vkNRw2cemvMEX8EAkhws6dD/5PhPYU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ViTw53R2LxF3xfW87qUzgiRpmdF2q2BeMUCuPo5bG5URtA8S/fYIBtwTkqyWJkbg9oOn+dUXoG9b3A9jjq06ZTIn2HEfFtPq5ydIo97BYyCt3RFp6nn0UkA0ZXHUBiPIYXVJKU59YrcWhMFhbzzCQ8fKoTUpw1Aki3kBXu9qaXE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CqOiWfFh; arc=none smtp.client-ip=95.215.58.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1776311192;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=STy5fptl4kDA0hxRdge2uXtZILjqvQ9NCE82yGpau2k=;
+	b=CqOiWfFhUGltgYgb/bc9YecNLk0MSWip6Rq+DGMCFgwsNMXym8r2n7UT8vWQl2erCtgGgG
+	/qbPpLroimBemnX59n8k0s5/NHDgAtEQdX+g3XWDBMwlzs3WnChgDZ+F1CXKGxe2mHA/H4
+	MST7Rpui1CGRKxl0cN6CAoKeb93zOLE=
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+To: netdev@vger.kernel.org
+Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
+	syzbot+83181a31faf9455499c5@syzkaller.appspotmail.com,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH net] sctp: fix OOB write to userspace in sctp_getsockopt_peer_auth_chunks
-Date: Wed, 15 Apr 2026 23:19:03 -0400
-Message-ID: <20260416031903.1447072-1-michael.bommarito@gmail.com>
-X-Mailer: git-send-email 2.53.0
+	David Ahern <dsahern@kernel.org>,
+	Pravin B Shelar <pshelar@nicira.com>,
+	Tom Herbert <tom@herbertland.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net v1 1/2] net: tunnel: fix stale transport header after GRE/TEB decap
+Date: Thu, 16 Apr 2026 11:46:06 +0800
+Message-ID: <20260416034610.8873-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,94 +66,140 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_TO(0.00)[vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-278912-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-278911-lists,netdev=lfdr.de];
+	ASN_FAIL(0.00)[74.135.232.172.asn.rspamd.com:server fail];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	ASN_FAIL(0.00)[1.2.3.5.c.f.2.1.0.0.0.0.0.0.0.0.7.a.0.0.1.0.0.e.9.0.c.3.0.0.6.2.asn6.rspamd.com:server fail];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
-	FROM_NEQ_ENVFROM(0.00)[michaelbommarito@gmail.com,netdev@vger.kernel.org];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[3];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: DC9ED409E5E
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,83181a31faf9455499c5];
+	NEURAL_HAM(-0.00)[-0.996];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,linux.dev:dkim,linux.dev:mid,syzkaller.appspot.com:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,appspotmail.com:email]
+X-Rspamd-Queue-Id: 4FBE640A0BF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-sctp_getsockopt_peer_auth_chunks() checks that the caller's optval
-buffer is large enough for the peer AUTH chunk list with
+syzbot reported a BUG.
 
-    if (len < num_chunks)
-            return -EINVAL;
+I found that after GRE decapsulation in gretap/ip6gretap paths, the
+transport_header becomes stale with a negative offset. The sequence is:
 
-but then writes num_chunks bytes to p->gauth_chunks, which lives
-at offset offsetof(struct sctp_authchunks, gauth_chunks) == 8
-inside optval.  The check is missing the sizeof(struct
-sctp_authchunks) = 8-byte header.  When the caller supplies
-len == num_chunks (for any num_chunks > 0) the test passes but
-copy_to_user() writes sizeof(struct sctp_authchunks) = 8 bytes
-past the declared buffer.
+1. Before decap, transport_header points to the outer L4 (GRE) header.
+2. __iptunnel_pull_header() calls skb_pull_rcsum() to advance skb->data
+   past the GRE header, but does not update transport_header.
+3. For TEB (gretap/ip6gretap), eth_type_trans() in ip_tunnel_rcv() /
+   __ip6_tnl_rcv() further pulls ETH_HLEN (14 bytes) from skb->data.
 
-The sibling function sctp_getsockopt_local_auth_chunks() at the
-next line already has the correct check:
+After these two pulls, skb->data has moved forward while transport_header
+still points to the old (now behind skb->data) position, resulting in a
+negative skb_transport_offset(): typically -4 after GRE pull alone, or
+-18 after GRE + inner Ethernet pull.
 
-    if (len < sizeof(struct sctp_authchunks) + num_chunks)
-            return -EINVAL;
+In the normal case where the inner frame is a recognizable protocol
+(e.g., IPv4/TCP), inet_gro_receive() in net/ipv4/af_inet.c corrects the
+transport_header via skb_set_transport_header() during GRO processing.
+However, if the inner frame cannot be parsed (e.g., eth_type_trans()
+classifies it as ETH_P_802_2 due to a zero/invalid inner Ethernet
+header), no GRO callback resets the transport_header, and the stale
+offset persists into __netif_receive_skb_core().
 
-Align the peer variant with its sibling.
+When this stale offset is combined with contradictory GSO metadata (e.g.,
+SKB_GSO_TCPV4 injected via virtio_net_hdr from a tun device),
+qdisc_pkt_len_segs_init() trusts the negative offset: the unsigned
+wraparound makes pskb_may_pull() effectively a no-op, and __tcp_hdrlen()
+then reads from an invalid memory location, causing a use-after-free.
 
-Reproducer confirms on v7.0-13-generic: an unprivileged userspace
-caller that opens a loopback SCTP association with AUTH enabled,
-queries num_chunks with a short optval, then issues the real
-getsockopt with len == num_chunks and sentinel bytes painted past
-the buffer observes those sentinel bytes overwritten with the
-peer's AUTH chunk type.  The bytes written are under the peer's
-control but land in the caller's own userspace; this is not a
-kernel memory corruption, but it is a kernel-side contract
-violation that can silently corrupt adjacent userspace data.
+Fix this by introducing iptunnel_rebuild_transport_header() which resets
+and re-probes the transport header after tunnel decapsulation. If the
+transport header cannot be rebuilt and the skb carries GSO metadata, the
+inconsistent GSO fields are cleared to prevent downstream consumers from
+trusting stale offsets.
 
-Fixes: 65b07e5d0d09 ("[SCTP]: API updates to suport SCTP-AUTH extensions.")
-Cc: stable@vger.kernel.org
-Assisted-by: Claude:claude-opus-4-6
-Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
+reproducer: https://gist.github.com/mrpre/5ba943fd86367af748b70de99263da4b
+
+Link: https://syzkaller.appspot.com/bug?extid=83181a31faf9455499c5
+Fixes: c54419321455 ("GRE: Refactor GRE tunneling code.")
+Fixes: 0d3c703a9d17 ("ipv6: Cleanup IPv6 tunnel receive path")
+Reported-by: syzbot+83181a31faf9455499c5@syzkaller.appspotmail.com
+Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
 ---
- net/sctp/socket.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/net/ip_tunnels.h | 14 ++++++++++++++
+ net/ipv4/ip_tunnel.c     |  2 ++
+ net/ipv6/ip6_tunnel.c    |  2 ++
+ 3 files changed, 18 insertions(+)
 
-diff --git a/net/sctp/socket.c b/net/sctp/socket.c
-index 05fb00c9c335..f5d442753dc9 100644
---- a/net/sctp/socket.c
-+++ b/net/sctp/socket.c
-@@ -7033,7 +7033,7 @@ static int sctp_getsockopt_peer_auth_chunks(struct sock *sk, int len,
+diff --git a/include/net/ip_tunnels.h b/include/net/ip_tunnels.h
+index d708b66e55cd..f160d82e6196 100644
+--- a/include/net/ip_tunnels.h
++++ b/include/net/ip_tunnels.h
+@@ -662,6 +662,20 @@ static inline int iptunnel_pull_offloads(struct sk_buff *skb)
+ 	return 0;
+ }
  
- 	/* See if the user provided enough room for all the data */
- 	num_chunks = ntohs(ch->param_hdr.length) - sizeof(struct sctp_paramhdr);
--	if (len < num_chunks)
-+	if (len < sizeof(struct sctp_authchunks) + num_chunks)
- 		return -EINVAL;
++static inline void iptunnel_rebuild_transport_header(struct sk_buff *skb)
++{
++	skb->transport_header = (typeof(skb->transport_header))~0U;
++	skb_probe_transport_header(skb);
++
++	if (!skb_transport_header_was_set(skb) && skb_is_gso(skb)) {
++		struct skb_shared_info *shinfo = skb_shinfo(skb);
++
++		shinfo->gso_type = 0;
++		shinfo->gso_size = 0;
++		shinfo->gso_segs = 0;
++	}
++}
++
+ static inline void iptunnel_xmit_stats(struct net_device *dev, int pkt_len)
+ {
+ 	if (pkt_len > 0) {
+diff --git a/net/ipv4/ip_tunnel.c b/net/ipv4/ip_tunnel.c
+index 50d0f5fe4e4c..c46be68cfafa 100644
+--- a/net/ipv4/ip_tunnel.c
++++ b/net/ipv4/ip_tunnel.c
+@@ -445,6 +445,8 @@ int ip_tunnel_rcv(struct ip_tunnel *tunnel, struct sk_buff *skb,
+ 	if (tun_dst)
+ 		skb_dst_set(skb, (struct dst_entry *)tun_dst);
  
- 	if (copy_to_user(to, ch->chunks, num_chunks))
++	iptunnel_rebuild_transport_header(skb);
++
+ 	gro_cells_receive(&tunnel->gro_cells, skb);
+ 	return 0;
+ 
+diff --git a/net/ipv6/ip6_tunnel.c b/net/ipv6/ip6_tunnel.c
+index 46bc06506470..f95348cf3c77 100644
+--- a/net/ipv6/ip6_tunnel.c
++++ b/net/ipv6/ip6_tunnel.c
+@@ -879,6 +879,8 @@ static int __ip6_tnl_rcv(struct ip6_tnl *tunnel, struct sk_buff *skb,
+ 	if (tun_dst)
+ 		skb_dst_set(skb, (struct dst_entry *)tun_dst);
+ 
++	iptunnel_rebuild_transport_header(skb);
++
+ 	gro_cells_receive(&tunnel->gro_cells, skb);
+ 	return 0;
+ 
 -- 
-2.53.0
+2.43.0
 
 
