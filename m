@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-278952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278953-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IJhLKXuQ4GmsjwAAu9opvQ
-	(envelope-from <netdev+bounces-278952-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 09:32:11 +0200
+	id yDpQKpqP4Gl6jwAAu9opvQ
+	(envelope-from <netdev+bounces-278953-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 09:28:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F8C340B10B
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 09:32:09 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12AC940B079
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 09:28:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E3D3B31789A0
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 07:27:58 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 9AEFA301F271
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 07:28:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF76138A712;
-	Thu, 16 Apr 2026 07:27:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 958D338A72D;
+	Thu, 16 Apr 2026 07:28:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d3ZXGZj0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pMZ+Vgaw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD32238AC70
-	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 07:27:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 732AC38A716
+	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 07:28:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776324477; cv=none; b=S74DbXwB6m4oc4b/AB8oMqgJYmKhupORMQ76ME+JHrPiJH/PtA8BzfrYnVueeD9EXajrGKgEBEaVSkJ73qacWRUJmxWTlytCu67FEPkzcyxmruCa6Ck75pQhnRf8+JtRAJdMsD8gpRF5BAqMHDPSESQjnQb3H2UnjLpxoCz7QVM=
+	t=1776324480; cv=none; b=AILRR4q3u25K+tVccKA/qYw1RVbQ2w8bZX2OcU9Z0L7HcXrtO400Ye+yqtz+G1sOtYsb1r47pi9HJaYYbMRJklC9alUPJ7uOZpVel4ALqawYzTbV7fAzrQRTlwW1Iutf8WxIovHhk9LDd48THUeCsa+K1RpNFnn1KQPgJ8oGHm0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776324477; c=relaxed/simple;
-	bh=1RyKXEg9w7ciA1MUXVCuKlalb/RGHXZGMtXCmpwPV5I=;
+	s=arc-20240116; t=1776324480; c=relaxed/simple;
+	bh=D7Cxemf7toPxHK5bmLoIZKJO9NzRia6nXorlx/QM1yM=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=murlsHmQEXuufc8HmLiq81TtQWyjqe9TUd21YOPSeztc36Zn9LQxUOuU1YHEFe7r3fYXq6VLEIYojruWZl7LbWvGYkkcDTIbO8MGt3EdJU1N21jolSGvvhwaa4fGid4dmNsct9I9NER/Ce97dVXDJFQcZP9bwDJyfO5oIMqtdOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d3ZXGZj0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 206C4C2BCB8;
-	Thu, 16 Apr 2026 07:27:56 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=bQOawX36K8N9xekQBk7gDGBGkvB+HQ2cmFeQHh3cvkHOK7AI29xdFYh+YepUa/D5N8jYpdnOFdkkbMNW4klobRSoiKYTwWEzTwKkD/Nf/DnRWX99gvHNx9OrwIwDAjYhaM2Z/eGlajdgkjf9DQpDTkctSVMyCLNQzA0qnjKVjAE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pMZ+Vgaw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9A3DC2BCAF;
+	Thu, 16 Apr 2026 07:27:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776324477;
-	bh=1RyKXEg9w7ciA1MUXVCuKlalb/RGHXZGMtXCmpwPV5I=;
+	s=k20201202; t=1776324480;
+	bh=D7Cxemf7toPxHK5bmLoIZKJO9NzRia6nXorlx/QM1yM=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=d3ZXGZj0peE+uz8kz7teFb70pJG5LKSZIOqwTPYFraq9qwcA8WNw0yYvyP9JjZuC+
-	 Cx9osbM7qzALaIrpuwZ/Z9RfWNq0JFM1OR5OcPszOAPvlTMQ7THeZZEvd6nWp103JX
-	 wEt9fGdimjaO0nwTXWhDaO0vNOfaUbN1HL2cKSoFKVd3WcVfzEbxgA5nPOe2CQdpl/
-	 9jPgGoP4QdpExjCUgl4AuNTcIqPQYYjYWr3Zree0F7NBmQ8YTI1lZWcH2O6KGQNBeE
-	 kEAB2jcxYbdatNBN/yjSsvwcfhBr25QVsJoyljreehQmU4eXZuithSByrAxc/Mjzx4
-	 fRtOuids4Dd9A==
+	b=pMZ+VgawOTwpxLLbUPzBSsn8UUzFu8NUhlB/JTY2bnilIutmv46GU5hWQ8cvmMtO8
+	 z6iUaDDP+oBBhfMj54PT9rIXZa3xaviy9PyJSF1tkDXNEQtFG9cA4Rn5F9q6WiKMc5
+	 qwPue8wIX540PNPNXNzvEqrmqvmHfUmXDIcKrIYStq0k4W+nuf1p++/g+wwjKQwZBg
+	 W8EaJBZiDfXt/TQO5YbNTYk3H0t46+2iUEUPnsH0Fy/G24KDzTvJ4Suw7MABYgNMa/
+	 ew2QjgZFDgoWJLN532YQvd6AjjyCddDGNjzgXvyxqxADvUblD3mvfhUkFeDBuL2QzH
+	 TbdpHVzzCbo6w==
 From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Thu, 16 Apr 2026 09:27:40 +0200
-Subject: [PATCH net v3 2/3] net: airoha: Move entries to queue head in case
- of DMA mapping failure in airoha_dev_xmit()
+Date: Thu, 16 Apr 2026 09:27:41 +0200
+Subject: [PATCH net v3 3/3] net: airoha: Add missing bits in
+ airoha_qdma_cleanup_tx_queue()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,7 +56,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260416-airoha_qdma_cleanup_tx_queue-fix-net-v3-2-2b69f5788580@kernel.org>
+Message-Id: <20260416-airoha_qdma_cleanup_tx_queue-fix-net-v3-3-2b69f5788580@kernel.org>
 References: <20260416-airoha_qdma_cleanup_tx_queue-fix-net-v3-0-2b69f5788580@kernel.org>
 In-Reply-To: <20260416-airoha_qdma_cleanup_tx_queue-fix-net-v3-0-2b69f5788580@kernel.org>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -70,57 +70,99 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-278952-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-278953-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN_FAIL(0.00)[1.2.3.5.c.f.2.1.0.0.0.0.0.0.0.0.b.d.0.0.1.0.0.e.a.0.c.3.0.0.6.2.asn6.rspamd.com:server fail];
+	ASN_FAIL(0.00)[4.211.64.104.asn.rspamd.com:server fail];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 2F8C340B10B
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 12AC940B079
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-In order to respect the original descriptor order and avoid any
-potential IOMMU fault or memory corruption, move pending queue entries
-to the head of hw queue tx_list if the DMA mapping of current inflight
-packet fails in airoha_dev_xmit routine.
+Similar to airoha_qdma_cleanup_rx_queue(), reset DMA TX descriptors in
+airoha_qdma_cleanup_tx_queue routine. Moreover, reset TX_DMA_IDX to
+TX_CPU_IDX to notify the NIC the QDMA TX ring is empty.
 
-Fixes: 3f47e67dff1f7 ("net: airoha: Add the capability to consume out-of-order DMA tx descriptors")
+Fixes: 23020f0493270 ("net: airoha: Introduce ethernet support for EN7581 SoC")
 Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 ---
- drivers/net/ethernet/airoha/airoha_eth.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/airoha/airoha_eth.c | 32 ++++++++++++++++++++++++++++++--
+ 1 file changed, 30 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-index 690bfaf8d7d9..dfe8a0bd2abd 100644
+index dfe8a0bd2abd..903682e88e89 100644
 --- a/drivers/net/ethernet/airoha/airoha_eth.c
 +++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -2053,7 +2053,7 @@ static netdev_tx_t airoha_dev_xmit(struct sk_buff *skb,
- 		dma_unmap_single(dev->dev.parent, e->dma_addr, e->dma_len,
- 				 DMA_TO_DEVICE);
- 		e->dma_addr = 0;
--		list_move_tail(&e->list, &q->tx_list);
-+		list_move(&e->list, &q->tx_list);
- 	}
+@@ -1039,12 +1039,15 @@ static int airoha_qdma_init_tx(struct airoha_qdma *qdma)
  
+ static void airoha_qdma_cleanup_tx_queue(struct airoha_queue *q)
+ {
+-	struct airoha_eth *eth = q->qdma->eth;
+-	int i;
++	struct airoha_qdma *qdma = q->qdma;
++	struct airoha_eth *eth = qdma->eth;
++	int i, qid = q - &qdma->q_tx[0];
++	u16 index = 0;
+ 
+ 	spin_lock_bh(&q->lock);
+ 	for (i = 0; i < q->ndesc; i++) {
+ 		struct airoha_queue_entry *e = &q->entry[i];
++		struct airoha_qdma_desc *desc = &q->desc[i];
+ 
+ 		if (!e->dma_addr)
+ 			continue;
+@@ -1055,8 +1058,33 @@ static void airoha_qdma_cleanup_tx_queue(struct airoha_queue *q)
+ 		e->dma_addr = 0;
+ 		e->skb = NULL;
+ 		list_add_tail(&e->list, &q->tx_list);
++
++		/* Reset DMA descriptor */
++		WRITE_ONCE(desc->ctrl, 0);
++		WRITE_ONCE(desc->addr, 0);
++		WRITE_ONCE(desc->data, 0);
++		WRITE_ONCE(desc->msg0, 0);
++		WRITE_ONCE(desc->msg1, 0);
++		WRITE_ONCE(desc->msg2, 0);
++
+ 		q->queued--;
+ 	}
++
++	if (!list_empty(&q->tx_list)) {
++		struct airoha_queue_entry *e;
++
++		e = list_first_entry(&q->tx_list, struct airoha_queue_entry,
++				     list);
++		index = e - q->entry;
++	}
++	/* Set TX_DMA_IDX to TX_CPU_IDX to notify the hw the QDMA TX ring is
++	 * empty.
++	 */
++	airoha_qdma_rmw(qdma, REG_TX_CPU_IDX(qid), TX_RING_CPU_IDX_MASK,
++			FIELD_PREP(TX_RING_CPU_IDX_MASK, index));
++	airoha_qdma_rmw(qdma, REG_TX_DMA_IDX(qid), TX_RING_DMA_IDX_MASK,
++			FIELD_PREP(TX_RING_DMA_IDX_MASK, index));
++
  	spin_unlock_bh(&q->lock);
+ }
+ 
 
 -- 
 2.53.0
