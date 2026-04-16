@@ -1,182 +1,212 @@
-Return-Path: <netdev+bounces-278970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278971-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SPndCJ+e4GlukQAAu9opvQ
-	(envelope-from <netdev+bounces-278970-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 10:32:31 +0200
+	id mFK/Hk2f4GlukQAAu9opvQ
+	(envelope-from <netdev+bounces-278971-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 10:35:25 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A273340B956
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 10:32:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 11A4040BA34
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 10:35:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C2EA33182342
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 08:27:35 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2B4CF301C91E
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 08:30:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2B6B3921CA;
-	Thu, 16 Apr 2026 08:27:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A604392831;
+	Thu, 16 Apr 2026 08:30:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="IzYa+5vX"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CP5gIDlM";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="GsTsjsWY"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCDBC391856
-	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 08:27:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AF083921E6
+	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 08:30:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776328052; cv=none; b=n2i/SulfFhfEtN205RAtfkhf9WFIIIawln1cKvPwSI12hZQJXAxwT4b4M6Cn3TjLyc40GxiRPuMn8ZEocMVcBBcbBusSAOY3JJhADzrbIT6Miod1c2+KlbM6yg4TFGL+slWH0G4gBnUXC4OYDtOqnUGaiNFjhmOX6JC2mZj/kZw=
+	t=1776328225; cv=none; b=OhetdVgB3wZjrbZpUTpqh0DQI2+0g82jGkKu+0CF6MIcnJkyTjzA8mcDg1W58Yiy+wlxSe2rdH3aknA/IsDt2FclGCh9Dx+ocei5WLg2cQjKGnxlYwc4d3gn9AeuyA1KP/RDzc+UDmeeR3VX+VeDgfmyKcLRTeWlgs0lbA23Au4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776328052; c=relaxed/simple;
-	bh=O0kNZNME6liz/PDiFhx17G1oocdPgEZotIhQ2QvF/Sw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=svUVPCmj0DzefaGIBS5SqaEgJvtIRowvk8hPsaioHkO8ZFAxXUnyzVXhhuA9/37U1obVW/PJS7BwpUKnuzKoHXK/RxlFmSlwoP6nchP6htoCJhrogwG9jOlgtEjpmQ5Z6VIku7mSvnh+rsRhj9U+MzJXOAHIYmS5v9Qz7VO96GI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=IzYa+5vX; arc=none smtp.client-ip=91.218.175.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1776328049;
+	s=arc-20240116; t=1776328225; c=relaxed/simple;
+	bh=MgB84sI+aPQk6PJENbmbPfGksdVTNyZGfOgLktludpU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=luAyznb2gorz5L8f5rKGCqcWqS0ND67pKgDMQ3H+zxs+P89zxOaM0wOu33ULxk9TPWoVuG4pAsfFY0yrliYRpUnB7SErIlXHzJ+wxZSIBx4HGcaPinwTtu2Zg8upv1/DteB3ZoRZyWJKPbViezO86yAUFYg8bym5yqWd5P9cFjQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CP5gIDlM; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=GsTsjsWY; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1776328221;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=psV3t89J4TYPxkXy1/CDffDJ8IP5u3Jv6+y4DGwPsJ4=;
-	b=IzYa+5vX+NubPHSqYuQNur+6QVDn2L8utATLZdFuy2xbwDKVEyhUc3rzmZL9Bm9FfvDfL2
-	oJVZvPgDhtEIuNEoX69PGyBy11dCJoHv5peGPIQgSuqqwwcElr0vUiMU8daHOqbqC1U8uL
-	1yEnstsXcUT4cFkWv/VutHtrwJ5D3wY=
-From: Qingfang Deng <qingfang.deng@linux.dev>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Paul Mackerras <paulus@ozlabs.org>,
-	linux-ppp@vger.kernel.org,
-	Jaco Kroon <jaco@uls.co.za>,
-	James Carlson <carlsonj@workingcode.com>,
-	Qingfang Deng <qingfang.deng@linux.dev>
-Subject: [RFC net-next 3/3] docs: update ppp_generic.rst for API changes
-Date: Thu, 16 Apr 2026 16:26:46 +0800
-Message-ID: <20260416082656.86963-3-qingfang.deng@linux.dev>
-In-Reply-To: <20260416082656.86963-1-qingfang.deng@linux.dev>
-References: <20260416082656.86963-1-qingfang.deng@linux.dev>
+	bh=Ok2jOImuVFQ7GtPJheZIafb+EzCFhJ0KF74mw1kUE3Q=;
+	b=CP5gIDlMF3ioldvSXc22QZ6f6e2AkkViWWg1BdyYy4+QW8qXzMzW9WMPRidq/uJhZxe47y
+	juDG9UUd/18U8xgqrM9IymDCNEgPl/FA7arq56QiP0omsSMVf2LZiQSPgFvaYknBw3YZY4
+	hNr9AbJSAZ7WPpQEMMTvsPspb9yHwUo=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-668-jz1U_X9jMmi4havYsojmwg-1; Thu, 16 Apr 2026 04:30:19 -0400
+X-MC-Unique: jz1U_X9jMmi4havYsojmwg-1
+X-Mimecast-MFC-AGG-ID: jz1U_X9jMmi4havYsojmwg_1776328219
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-488c2a4e257so50166535e9.3
+        for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 01:30:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1776328218; x=1776933018; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Ok2jOImuVFQ7GtPJheZIafb+EzCFhJ0KF74mw1kUE3Q=;
+        b=GsTsjsWYvCqTjYSGDS4NRo2x3Wun6ihelUxEyvSGH9EfZ/LqeuIHn8QKC1bpyeO1JQ
+         a0x7pgYYKlSK5PCn9XGK1I4yRiG6/qyqE2Df0m5y75Zc6IYT/i2ijWKy6r84ftcWgmsF
+         iiNbdIJ0hLnGPdOKGjpmZr4nkZZrlLFbafuuAXuOFk1yRtJlwTVvwlV+wVcaEhTFZ6yd
+         LnPnfQcFte11pH+++k/vl6WlStqccpxu37AqmSes/TkdXcuxODKpUBTbV3BqpPiKMI6u
+         chwBaNrlUSVdVgXPyqlvlw6X27u55xQaMeB1960vJm6T0fJZZtbaXrc/awuMasG58Zce
+         5ZJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776328218; x=1776933018;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Ok2jOImuVFQ7GtPJheZIafb+EzCFhJ0KF74mw1kUE3Q=;
+        b=FN5Ypgb79uzpvJ3k3HjExYYKKPqFK7UxOf8iPRP0sOe1m9NobcmDM0OM8UE2ztP8IO
+         PJXyZDw6Ugvnh8VSuD1EOVpocYrnVUOXV1TR8IU8iAkShJVr6iPGwCNeGfwoyvxNB4I5
+         FWNXXHxVbor5u8svLEoKsIZ/ZSHhEZkcgtWgYHOwrTrx6CUksNAES/YT6Bw+xoTQwOmV
+         SpEh12xZKRdtOO7hZQXjHfTn0YQYQELq3rIg9FQazx2aRT3I6QuSyuJ/ZGT2tvy8Mr1J
+         YjyHGMltPrNk1oDy8TeLfFYd3oJR+k9o+nzhOjLaaxpdsQeXm7/9UEtoHMS1Bmatst5+
+         kfpQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+nvP+ZTSa/D5f8i7Mz4Co1S9fjn0eanPgH6/G7GhGyZPaJyms+SPKEFOvDJHktjbjDUj8AJNE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz9uQlv8P3E5bl/L5gZWVUduD7m4gpmXqA85Yfo2yZLSeXsTb/F
+	tDMz/xE2Nw2JThQiAb3lWQdgOXJEjywhQhEasat9q6DU1dZ9e9wgu1t+9fTErCfB6FEozBLaeoq
+	o56uVMujsy1Gp2BHr0jOTuAgQEI3z5qSOFV6r5b1I2D0gAbC8tzszSMXUxg==
+X-Gm-Gg: AeBDievGhF+eOnpSo3l5Kd2AxNuIbzWliGc2md2zYS0gqNS8P3EajdTyWsT8KEbyjkU
+	WPEVcL/PmZcPlwaGM6jcMmU8QIQU2znoWcp5z9GFtR6EpBZ9wD0aFiPDUswFOXIU99fDFF86Gjt
+	/hU1vY45E9mF4QMGYS/9N+Eqn83icD/1wEUWvepiwhTieJnlDGn65fb+H4HmfY/UWluXnRXYTq+
+	MYTbakRxcZI46I6ZSSZzRX+nHcPhDzrKlbkdmONjQ4Ap/Ma8TIWOm6756eEe/GWiZIK6SbgMAfx
+	uYjcW6UjdXL0SbxFTWzqvTrgST+lhKeOamAxkF8eMgbu654Pr5jX/1C6cYafMAujSNufKvp7WeD
+	b5Us9j8SWoJ+X6NZzEhxjwqu7PY81VIbak+wtbb125drC3yP+Qxj2M3ZuoFAHKAsF/i8=
+X-Received: by 2002:a05:600c:460a:b0:488:a824:fdff with SMTP id 5b1f17b1804b1-488e00fdbc3mr164789595e9.22.1776328218457;
+        Thu, 16 Apr 2026 01:30:18 -0700 (PDT)
+X-Received: by 2002:a05:600c:460a:b0:488:a824:fdff with SMTP id 5b1f17b1804b1-488e00fdbc3mr164789225e9.22.1776328217972;
+        Thu, 16 Apr 2026 01:30:17 -0700 (PDT)
+Received: from [192.168.88.32] ([150.228.93.122])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488f5813970sm34344045e9.1.2026.04.16.01.30.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Apr 2026 01:30:17 -0700 (PDT)
+Message-ID: <acd54f40-fcd7-44df-9fe6-0b278f4a3476@redhat.com>
+Date: Thu, 16 Apr 2026 10:30:16 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3] net: mctp: don't require received header
+ reserved bits to be zero
+To: wit_yuan <yuanzhaoming901030@126.com>, jk@codeconstruct.com.au
+Cc: yuanzm2@lenovo.com, matt@codeconstruct.com.au, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260413080333.73086-1-yuanzhaoming901030@126.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20260413080333.73086-1-yuanzhaoming901030@126.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-278970-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	ASN_FAIL(0.00)[114.105.105.172.asn.rspamd.com:server fail];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	FROM_NEQ_ENVFROM(0.00)[qingfang.deng@linux.dev,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-278971-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[126.com,codeconstruct.com.au];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN_FAIL(0.00)[114.105.105.172.asn.rspamd.com:server fail];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.999];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:email,linux.dev:dkim,linux.dev:mid]
-X-Rspamd-Queue-Id: A273340B956
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lenovo.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 11A4040BA34
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Document the new ppp_channel_conf struct and ppp_channel lifecycle
-management changes.
+On 4/13/26 10:03 AM, wit_yuan wrote:
+> From: Yuan Zhaoming <yuanzm2@lenovo.com>
+> 
+> From the MCTP Base specification (DSP0236 v1.2.1), the first byte of
+> the MCTP header contains a 4 bit reserved field, and 4 bit version.
+> 
+> On our current receive path, we require those 4 reserved bits to be
+> zero, but the 9500-8i card is non-conformant, and may set these
+> reserved bits.
+> 
+> DSP0236 states that the reserved bits must be written as zero, and
+> ignored when read. While the device might not conform to the former,
+> we should accept these message to conform to the latter.
+> 
+> Relax our check on the MCTP version byte to allow non-zero bits in the
+> reserved field.
+> 
+> Signed-off-by: Yuan Zhaoming <yuanzm2@lenovo.com>
 
-Assisted-by: Gemini:gemini-3-flash
-Signed-off-by: Qingfang Deng <qingfang.deng@linux.dev>
----
- Documentation/networking/ppp_generic.rst | 33 ++++++++++--------------
- 1 file changed, 13 insertions(+), 20 deletions(-)
+The net-next tree is currently closed for the merge window, but IMHO
+this change could be considered a fix. Please repost for 'net' and add a
+suitable fixes tag.
 
-diff --git a/Documentation/networking/ppp_generic.rst b/Documentation/networking/ppp_generic.rst
-index 5a10abce5964..8d63f997fb3f 100644
---- a/Documentation/networking/ppp_generic.rst
-+++ b/Documentation/networking/ppp_generic.rst
-@@ -124,18 +124,19 @@ presented to the start_xmit() function contain only the 2-byte
- protocol number and the data, and the skbuffs presented to ppp_input()
- must be in the same format.
- 
--The channel must provide an instance of a ppp_channel struct to
--represent the channel.  The channel is free to use the ``private`` field
--however it wishes.  The channel should initialize the ``mtu`` and
--``hdrlen`` fields before calling ppp_register_channel() and not change
--them until after ppp_unregister_channel() returns.  The ``mtu`` field
--represents the maximum size of the data part of the PPP frames, that
--is, it does not include the 2-byte protocol number.
-+The channel must provide an instance of a ppp_channel_conf struct to
-+describe the channel during registration.  The generic layer will
-+allocate a ppp_channel struct and return a pointer to it.  The
-+ppp_channel struct is opaque to the channel driver.  The ``mtu`` field
-+(if multilink is enabled) represents the maximum size of the data part
-+of the PPP frames, that is, it does not include the 2-byte protocol
-+number.  ppp_channel_update_mtu() can be called by the channel driver
-+to update the ``mtu`` field once LCP MRU negotiation is complete.
- 
- If the channel needs some headroom in the skbuffs presented to it for
- transmission (i.e., some space free in the skbuff data area before the
- start of the PPP frame), it should set the ``hdrlen`` field of the
--ppp_channel struct to the amount of headroom required.  The generic
-+ppp_channel_conf struct to the amount of headroom required.  The generic
- PPP layer will attempt to provide that much headroom but the channel
- should still check if there is sufficient headroom and copy the skbuff
- if there isn't.
-@@ -199,20 +200,12 @@ The PPP generic layer has been designed to be SMP-safe.  Locks are
- used around accesses to the internal data structures where necessary
- to ensure their integrity.  As part of this, the generic layer
- requires that the channels adhere to certain requirements and in turn
--provides certain guarantees to the channels.  Essentially the channels
--are required to provide the appropriate locking on the ppp_channel
--structures that form the basis of the communication between the
--channel and the generic layer.  This is because the channel provides
--the storage for the ppp_channel structure, and so the channel is
--required to provide the guarantee that this storage exists and is
--valid at the appropriate times.
-+provides certain guarantees to the channels.  The generic layer manages
-+the ppp_channel object, ensuring it exists and is valid while the
-+channel is registered.
- 
- The generic layer requires these guarantees from the channel:
- 
--* The ppp_channel object must exist from the time that
--  ppp_register_channel() is called until after the call to
--  ppp_unregister_channel() returns.
--
- * No thread may be in a call to any of ppp_input(), ppp_input_error(),
-   ppp_output_wakeup(), ppp_channel_index() or ppp_unit_number() for a
-   channel at the time that ppp_unregister_channel() is called for that
-@@ -453,4 +446,4 @@ an interface unit are:
-   fragments is disabled.  This ioctl is only available if the
-   CONFIG_PPP_MULTILINK option is selected.
- 
--Last modified: 7-feb-2002
-+Last modified: 16-apr-2026
--- 
-2.43.0
+> ---
+> v2: https://lore.kernel.org/netdev/20260410144339.0d1b289a@kernel.org/T/#t
+> v1: https://lore.kernel.org/netdev/ff147a3f0d27ef2aa6026cc86f9113d56a8c61ac.camel@codeconstruct.com.au/T/#t
+> ---
+>  include/net/mctp.h | 3 +++
+>  net/mctp/route.c   | 8 ++++++--
+>  2 files changed, 9 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/net/mctp.h b/include/net/mctp.h
+> index e1e0a69..d8bf907 100644
+> --- a/include/net/mctp.h
+> +++ b/include/net/mctp.h
+> @@ -26,6 +26,9 @@ struct mctp_hdr {
+>  #define MCTP_VER_MIN	1
+>  #define MCTP_VER_MAX	1
+>  
+> +/* Definitions for ver field */
+> +#define MCTP_HDR_VER_MASK	GENMASK(3, 0)
+> +
+>  /* Definitions for flags_seq_tag field */
+>  #define MCTP_HDR_FLAG_SOM	BIT(7)
+>  #define MCTP_HDR_FLAG_EOM	BIT(6)
+> diff --git a/net/mctp/route.c b/net/mctp/route.c
+> index e69c6f7..62517c9 100644
+> --- a/net/mctp/route.c
+> +++ b/net/mctp/route.c
+> @@ -439,6 +439,7 @@ static int mctp_dst_input(struct mctp_dst *dst, struct sk_buff *skb)
+>  	struct mctp_hdr *mh;
+>  	unsigned int netid;
+>  	unsigned long f;
+> +	u8 ver;
+>  	u8 tag, flags;
+>  	int rc;
+
+Please respect the reverse christmas tree order above.
+
+/P
 
 
