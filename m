@@ -1,301 +1,173 @@
-Return-Path: <netdev+bounces-278992-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278993-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2B64HrG74GmIlAAAu9opvQ
-	(envelope-from <netdev+bounces-278992-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 12:36:33 +0200
+	id sKSSMfu74GlXlQAAu9opvQ
+	(envelope-from <netdev+bounces-278993-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 12:37:47 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF42E40CF82
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 12:36:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E62540CFEF
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 12:37:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 41559304AAD5
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 10:33:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 66C22301C5B2
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 10:35:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DD4B15665C;
-	Thu, 16 Apr 2026 10:33:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C7D23A5445;
+	Thu, 16 Apr 2026 10:35:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Yw99Yy5m"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MgxpBpcj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 429A83A5E7A
-	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 10:33:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EB77386564
+	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 10:35:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776335634; cv=none; b=c8s0wz4XUt/FPoyH+BS9dbE33C5SRXzAgG2c2wrQjrMcLGCioch1OA4cSAaaL6EKssFH9x7qlO9liGh8gOQPkesq97P2SZlmn1Dx+2gjqQPrr7pkLJCKnF6sgG0HZRteJMLYLo9jh7D1W6J5jQzO10fLWdpRdIMUgqmpjgA3ccU=
+	t=1776335710; cv=none; b=joIuIr7k9pIxir41F79DA4st735382OMxukk4Na2ucmwvfA/fiB7V3bJHMGFbpN2psIzuoA3S//XBtEvh2z5tyY9Kd2dtmQBAz4a90NkUBPw5jjV3YfDJKLt4DkK4QzodkhofDO8JB+cpQVmT0uJ5aNQN45xVYACWg+wiLwjSJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776335634; c=relaxed/simple;
-	bh=PnkhtnPlWqR69u9/G7kOgPwF0gnYlgcUF1nrMIPg0fc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e8YiN9s99PKVsrLBcGO3a6sg8BpF9sPBfQZagp4bUh8xv6/GewHa48gj4WIr2iclZO3zlRlaorwWfGbD1yMk1FxXW+UFdQeFY5yTHwOSZhtB5O2P0t4irYk8Z9/tuVMDat/FVlmMJvo+d8ZsqmdiJuyoSt6KBaJVBiUHzP0GNFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Yw99Yy5m; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-483487335c2so85991955e9.2
-        for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 03:33:48 -0700 (PDT)
+	s=arc-20240116; t=1776335710; c=relaxed/simple;
+	bh=EXNMw0HSZecs5aR97l8OuW+waOl4Uk2lUn8fu7c6IQw=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=FpXol5WJg95ott7quMwEFs/EqdzrgacvKvQlz7mdPvMt9GA+HsCV/b/oSJZqrD8S63PNbjDX2qNzqpdRPqquah3XkVE7F1BsXF7FWSk+YlcUVfdL+4PBFM4ag3fLnPX3i2UJqDw+oijjcEIRIM7mXVOt/4qsFwAU+utjUPzwEhI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MgxpBpcj; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-7986c067508so217882897b3.2
+        for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 03:35:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1776335627; x=1776940427; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PFX0kfy1JVc6bVB6CE0bGMq+YH6jFLY5/9CO0YM6hrU=;
-        b=Yw99Yy5m7kvN1KSa9pxCJ+rj4LVOuiacf7mjAZ1+hedrfUk5JyPIN6zYHYbyElzPIe
-         x9JebNsVvvlrV/hoQwDjPkr/KB/PctEr7qKlO6OLJoafdSkZB9jeLeiL/a4vvE1M0t3/
-         om3eA/uaTfwen6E5V1J4ngTZ+wAbgwElWypa4jFVmTWBptmpaTJTIPBbe6XRWVKrTzwu
-         tebPL2lxwUgYQLNII1kDn9OyLAGJsxMAwVBH4Hvo76H6AxeHISu9mKkqAdAa5je+hRlh
-         rg54EVzzcMHE6qqQpg2GAWy6DRWd74af5HXg0FkOYrlGVCqvUn9fRdyfGdcpNr1UxK7W
-         J7gg==
+        d=google.com; s=20251104; t=1776335708; x=1776940508; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=4bselSbtWCFVwv2HV9rtGtzcog/A2R/lACnbLxTSYp0=;
+        b=MgxpBpcjlH4XJyXjnHbSo2AjPrPqGYOqDJis693vCkDyCj3yBi+qMXtQ4GqSHw+rkG
+         3NWFm0xkjnlngFraTRLZp6r2BIP4O/lQJH7iHQyDJ8LBo8K4zBxKZhWGXKmUu5U+VWOk
+         ERb8Qy7yA79i5P6Md4d8SxErQyqveXt2X0j9qibuXvfXhaNcgdt1QlD7/lJXSqUOr7ty
+         uKt3h7BLM6qCgtJlYsUWIEPV7iqmJw99vFeJKruTKl4jgZLE9UuwoKwvbAvbE2n7lqgl
+         ZHL7/kmAjBpfkb4Ig+83adyfZXUJuQ7mNX+UhtsuuTLrBbVHsRvTOyHOdxzddljXjTzJ
+         hz4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776335627; x=1776940427;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PFX0kfy1JVc6bVB6CE0bGMq+YH6jFLY5/9CO0YM6hrU=;
-        b=OaILqFwQTxi0q9IxSxJug4jE0lLp5j6zqCspeU7C5tLsE7vO7rAZGLxSMkwBENXAHZ
-         uhYXNT+TyZI/BclHrUsCt5dJKj8tgBWFmLnCK4bTRL0pC/nkfyaoHQtU+90ZE+7rkUix
-         0rD8HEvvqtsarSC9bzlQtgc1Kid7x4KCu+w6gDk4jlWr3jqQBMezlWUzXMzJtEaTRwBA
-         Ye82YcnBUfzLGeq1kY3Vg4MOPaWUR+CaCwWQh7MoU0jfn0PCQaNP16kcfaFC3YBZLkve
-         G/yG/1ptiZbX2nIWLQobv63mu4Iyi/wc5DGDI/2E3mni4RxWjJjV6b0Tkm/7dHDUrvs4
-         9vwA==
-X-Forwarded-Encrypted: i=1; AFNElJ/gwtpfXGGeNsqs/3tLtlU7a+1fvPqJaghievpjCAzKqU/Q16AViqEtQysen2A599uPPWNcRBg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzRKnqsA4bS1wL/nxMy2ELuJXRMNLZ20ip9NRILHVomnqsONGuk
-	9liI9cII1WuHbyLOr5FHx60UbfnFAXAN8z3ssGVngltYQYW865xOlEVSPPblY9l6rP4=
-X-Gm-Gg: AeBDieuzV4G+NfvTGpj2PksZmzdW64Nghsdp/91EigK+aLn6Qd6sLhLsOXWY3TatoRJ
-	tFEev7xKYcZcfAaom8W5DiOACerDGI+kRL3jLoUN++1Uue/+4S6/opu4R+FkUvd7PxPm0rTpFco
-	gjXhjWrN7Kgr9zQ+JLl/CoeUSSGA4icD6wDSP0aLROR4x4B5cPRvelq1DOP+z9mUfUUTPKXfI0b
-	4WbOjXipmJ5U+EEaaOoxak1MsH5ykBeJG+PDxYxm7ZGd8elAYICztOl4DQESv594PkkwwCLrdFc
-	r1GeP0mG1j1iSwRLzqcLbLpjU3lVj9yLgXLfunKdlfFouk0DbCE00BDSVz4drrVogxplSZBNz5k
-	IUfaNk5T+ddbOC8Mll7ArwIl9jVCTG3AeJD9iRdp3HSTnk0zJkyDmywTSdUlSXXUfj0Hi50bPK7
-	0oXz+Y2T/08BZRaZAkBUOBr0bMsA==
-X-Received: by 2002:a05:600c:3b96:b0:488:b098:b653 with SMTP id 5b1f17b1804b1-488d67f0a8amr350880245e9.13.1776335626808;
-        Thu, 16 Apr 2026 03:33:46 -0700 (PDT)
-Received: from pathway.suse.cz ([176.114.240.130])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43ead402ee8sm12369872f8f.37.2026.04.16.03.33.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Apr 2026 03:33:46 -0700 (PDT)
-Date: Thu, 16 Apr 2026 12:33:43 +0200
-From: Petr Mladek <pmladek@suse.com>
-To: chensong_2000@189.cn
-Cc: rafael@kernel.org, lenb@kernel.org, mturquette@baylibre.com,
-	sboyd@kernel.org, viresh.kumar@linaro.org, agk@redhat.com,
-	snitzer@kernel.org, mpatocka@redhat.com, bmarzins@redhat.com,
-	song@kernel.org, yukuai@fnnas.com, linan122@huawei.com,
-	jason.wessel@windriver.com, danielt@kernel.org,
-	dianders@chromium.org, horms@kernel.org, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	paulmck@kernel.org, frederic@kernel.org, mcgrof@kernel.org,
-	petr.pavlu@suse.com, da.gomez@kernel.org, samitolvanen@google.com,
-	atomlin@atomlin.com, jpoimboe@kernel.org, jikos@kernel.org,
-	mbenes@suse.cz, joe.lawrence@redhat.com, rostedt@goodmis.org,
-	mhiramat@kernel.org, mark.rutland@arm.com,
-	mathieu.desnoyers@efficios.com, linux-modules@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
-	linux-acpi@vger.kernel.org, linux-clk@vger.kernel.org,
-	linux-pm@vger.kernel.org, live-patching@vger.kernel.org,
-	dm-devel@lists.linux.dev, linux-raid@vger.kernel.org,
-	kgdb-bugreport@lists.sourceforge.net, netdev@vger.kernel.org
-Subject: Re: [RFC PATCH 1/2] kernel/notifier: replace single-linked list with
- double-linked list for reverse traversal
-Message-ID: <aeC7ByGA5MHBcGQR@pathway.suse.cz>
-References: <20260415070137.17860-1-chensong_2000@189.cn>
+        d=1e100.net; s=20251104; t=1776335708; x=1776940508;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=4bselSbtWCFVwv2HV9rtGtzcog/A2R/lACnbLxTSYp0=;
+        b=dzO8zNi8f6RxI1xHYMS5P4alM2lgMdnhn0jZ1U1/y/5ZWDBzIoVRK1/lGGIVqJh85M
+         pV8RoGHg2PTmP5anHjpdAcn11BNVebe2PI113R9CJZ2tJAD/tJe8YbIlfl76CCSVGWdA
+         3YxOqAZfTJhHvZFGbU0BgzQPnsYm8NmTxj5c44l0mfqWq5cA6zxqUOpOrkkWCKWsDeob
+         C5L2LTk7Dy4WT+WOxpfw1WrqHP1+z5kD+Hs1uJ+43pcTlqmj8WVANSnbx8HqxV6e2w4P
+         vFPLs/L1NHOpz+VMja5y4MaUQhHXHq204sT8A1fEWqntXW20boqxL90cUoXjidDC4Oq4
+         +PIg==
+X-Forwarded-Encrypted: i=1; AFNElJ+LOlHdufPDNqNDIMRzgLzhW0uimEdo66Yk72bFO/TPJSF9Jd+q6Ph9SAqUiaxeMpWLpHR/EyY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxfv0JMXVkwwPo6GoBJZkKlJcZvcNb8RWOhcJDd+pDchE9LrEib
+	c8kEPdNPsJKbiR3KwpeYn8g6x0e6Cp3C2X2PlRQmddca0YsaZ2buFI7lSdgj/QHWL1+qQ9mo2C8
+	aYiNJMDGZI8w3mg==
+X-Received: from yxac24.prod.google.com ([2002:a05:690e:15d8:b0:651:be12:1fda])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:690e:1448:b0:64e:e380:c83f with SMTP id 956f58d0204a3-65198b9712cmr22086197d50.46.1776335707971;
+ Thu, 16 Apr 2026 03:35:07 -0700 (PDT)
+Date: Thu, 16 Apr 2026 10:35:05 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260415070137.17860-1-chensong_2000@189.cn>
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.rc1.513.gad8abe7a5a-goog
+Message-ID: <20260416103505.2380753-1-edumazet@google.com>
+Subject: [PATCH net] ipv6: fix possible UAF in icmpv6_rcv()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, 
+	Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[kernel.org,nvidia.com,vger.kernel.org,gmail.com,google.com];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[suse.com:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278992-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[189.cn];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-278993-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[47];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pmladek@suse.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_NONE(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-0.995];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[189.cn:email,suse.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,fhfr.pm:email]
-X-Rspamd-Queue-Id: BF42E40CF82
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 2E62540CFEF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed 2026-04-15 15:01:37, chensong_2000@189.cn wrote:
-> From: Song Chen <chensong_2000@189.cn>
-> 
-> The current notifier chain implementation uses a single-linked list
-> (struct notifier_block *next), which only supports forward traversal
-> in priority order. This makes it difficult to handle cleanup/teardown
-> scenarios that require notifiers to be called in reverse priority order.
-> 
-> A concrete example is the ordering dependency between ftrace and
-> livepatch during module load/unload. see the detail here [1].
-> 
-> This patch replaces the single-linked list in struct notifier_block
-> with a struct list_head, converting the notifier chain into a
-> doubly-linked list sorted in descending priority order. Based on
-> this, a new function notifier_call_chain_reverse() is introduced,
-> which traverses the chain in reverse (ascending priority order).
-> The corresponding blocking_notifier_call_chain_reverse() is also
-> added as the locking wrapper for blocking notifier chains.
-> 
-> The internal notifier_call_chain_robust() is updated to use
-> notifier_call_chain_reverse() for rollback: on error, it records
-> the failing notifier (last_nb) and the count of successfully called
-> notifiers (nr), then rolls back exactly those nr-1 notifiers in
-> reverse order starting from last_nb's predecessor, without needing
-> to know the total length of the chain.
-> 
-> With this change, subsystems with symmetric setup/teardown ordering
-> requirements can register a single notifier_block with one priority
-> value, and rely on blocking_notifier_call_chain() for forward
-> traversal and blocking_notifier_call_chain_reverse() for reverse
-> traversal, without needing hard-coded call sequences or separate
-> notifier registrations for each direction.
-> 
-> [1]:https://lore.kernel.org/all
-> 	/alpine.LNX.2.00.1602172216491.22700@cbobk.fhfr.pm/
-> 
-> --- a/include/linux/notifier.h
-> +++ b/include/linux/notifier.h
-> @@ -53,41 +53,41 @@ typedef	int (*notifier_fn_t)(struct notifier_block *nb,
-[...]
->  struct notifier_block {
->  	notifier_fn_t notifier_call;
-> -	struct notifier_block __rcu *next;
-> +	struct list_head __rcu entry;
->  	int priority;
->  };
-[...]
->  #define ATOMIC_INIT_NOTIFIER_HEAD(name) do {	\
->  		spin_lock_init(&(name)->lock);	\
-> -		(name)->head = NULL;		\
-> +		INIT_LIST_HEAD(&(name)->head);		\
+Caching saddr and daddr before pskb_pull() is problematic
+since skb->head can change.
 
-I would expect the RCU variant here, aka INIT_LIST_HEAD_RCU().
+Remove these temporary variables:
 
-> --- a/kernel/notifier.c
-> +++ b/kernel/notifier.c
-> @@ -14,39 +14,47 @@
->   *	are layered on top of these, with appropriate locking added.
->   */
->  
-> -static int notifier_chain_register(struct notifier_block **nl,
-> +static int notifier_chain_register(struct list_head *nl,
->  				   struct notifier_block *n,
->  				   bool unique_priority)
->  {
-> -	while ((*nl) != NULL) {
-> -		if (unlikely((*nl) == n)) {
-> +	struct notifier_block *cur;
-> +
-> +	list_for_each_entry(cur, nl, entry) {
-> +		if (unlikely(cur == n)) {
->  			WARN(1, "notifier callback %ps already registered",
->  			     n->notifier_call);
->  			return -EEXIST;
->  		}
-> -		if (n->priority > (*nl)->priority)
-> -			break;
-> -		if (n->priority == (*nl)->priority && unique_priority)
-> +
-> +		if (n->priority == cur->priority && unique_priority)
->  			return -EBUSY;
-> -		nl = &((*nl)->next);
-> +
-> +		if (n->priority > cur->priority) {
-> +			list_add_tail(&n->entry, &cur->entry);
-> +			goto out;
-> +		}
->  	}
-> -	n->next = *nl;
-> -	rcu_assign_pointer(*nl, n);
-> +
-> +	list_add_tail(&n->entry, nl);
+- We only access &ipv6_hdr(skb)->saddr and &ipv6_hdr(skb)->daddr
+  when net_dbg_ratelimited() is called in the slow path.
 
-I would expect list_add_tail_rcu() here.
+- Avoid potential future misuse after pskb_pull() call.
 
-> @@ -59,25 +67,25 @@ static int notifier_chain_unregister(struct notifier_block **nl,
->   *			value of this parameter is -1.
->   *	@nr_calls:	Records the number of notifications sent. Don't care
->   *			value of this field is NULL.
-> + *	@last_nb:  Records the last called notifier block for rolling back
->   *	Return:		notifier_call_chain returns the value returned by the
->   *			last notifier function called.
->   */
-> -static int notifier_call_chain(struct notifier_block **nl,
-> +static int notifier_call_chain(struct list_head *nl,
->  			       unsigned long val, void *v,
-> -			       int nr_to_call, int *nr_calls)
-> +			       int nr_to_call, int *nr_calls,
-> +				   struct notifier_block **last_nb)
->  {
->  	int ret = NOTIFY_DONE;
-> -	struct notifier_block *nb, *next_nb;
-> -
-> -	nb = rcu_dereference_raw(*nl);
-> +	struct notifier_block *nb;
->  
-> -	while (nb && nr_to_call) {
-> -		next_nb = rcu_dereference_raw(nb->next);
-> +	if (!nr_to_call)
-> +		return ret;
->  
-> +	list_for_each_entry(nb, nl, entry) {
+Fixes: 4b3418fba0fe ("ipv6: icmp: include addresses in debug messages")
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ net/ipv6/icmp.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
-I would expect the RCU variant here, aka list_for_each_rcu()
+diff --git a/net/ipv6/icmp.c b/net/ipv6/icmp.c
+index 799d9e9ac45d11f7b460da7d8a7aeeaf0eb50f2f..efb23807a0262e8d68aa1afc8d96ee94eab89d50 100644
+--- a/net/ipv6/icmp.c
++++ b/net/ipv6/icmp.c
+@@ -1104,7 +1104,6 @@ static int icmpv6_rcv(struct sk_buff *skb)
+ 	struct net *net = dev_net_rcu(skb->dev);
+ 	struct net_device *dev = icmp6_dev(skb);
+ 	struct inet6_dev *idev = __in6_dev_get(dev);
+-	const struct in6_addr *saddr, *daddr;
+ 	struct icmp6hdr *hdr;
+ 	u8 type;
+ 
+@@ -1135,12 +1134,10 @@ static int icmpv6_rcv(struct sk_buff *skb)
+ 
+ 	__ICMP6_INC_STATS(dev_net_rcu(dev), idev, ICMP6_MIB_INMSGS);
+ 
+-	saddr = &ipv6_hdr(skb)->saddr;
+-	daddr = &ipv6_hdr(skb)->daddr;
+-
+ 	if (skb_checksum_validate(skb, IPPROTO_ICMPV6, ip6_compute_pseudo)) {
+ 		net_dbg_ratelimited("ICMPv6 checksum failed [%pI6c > %pI6c]\n",
+-				    saddr, daddr);
++				    &ipv6_hdr(skb)->saddr,
++				    &ipv6_hdr(skb)->daddr);
+ 		goto csum_error;
+ 	}
+ 
+@@ -1220,7 +1217,8 @@ static int icmpv6_rcv(struct sk_buff *skb)
+ 			break;
+ 
+ 		net_dbg_ratelimited("icmpv6: msg of unknown type [%pI6c > %pI6c]\n",
+-				    saddr, daddr);
++				    &ipv6_hdr(skb)->saddr,
++				    &ipv6_hdr(skb)->daddr);
+ 
+ 		/*
+ 		 * error of unknown type.
+-- 
+2.54.0.rc1.513.gad8abe7a5a-goog
 
-These are just two random examples which I found by a quick look.
-
-I guess that the notifier API is very old and it does not use all
-the RCU API features which allow to track safety when
-CONFIG_PROVE_RCU and CONFIG_PROVE_RCU_LIST are enabled.
-
-It actually might be worth to audit the code and make it right.
-
->  #ifdef CONFIG_DEBUG_NOTIFIERS
->  		if (unlikely(!func_ptr_is_kernel_text(nb->notifier_call))) {
->  			WARN(1, "Invalid notifier called!");
-> -			nb = next_nb;
->  			continue;
->  		}
->  #endif
-
-That said, I am not sure if the ftrace/livepatching handlers are
-the right motivation for this. Especially when I see the
-complexity of the 2nd patch [*]
-
-After thinking more about it. I am not even sure that the ftrace and
-livepatching callbacks are good candidates for generic notifiers.
-They are too special. It is not only about ordering them against
-each other. But it is also about ordering them against other
-notifiers. The ftrace/livepatching callbacks must be the first/last
-during module load/release.
-
-[*] The 2nd patch is not archived by lore for some reason.
-    I have found only a review but it gives a good picture, see
-    https://lore.kernel.org/all/1191caf5-6a61-4622-a15e-854d3701f4fc@suse.com/
-
-Best Regards,
-Petr
 
