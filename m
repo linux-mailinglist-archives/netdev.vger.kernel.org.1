@@ -1,163 +1,340 @@
-Return-Path: <netdev+bounces-279041-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279042-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YI0oMM3d4Gm9mwAAu9opvQ
-	(envelope-from <netdev+bounces-279041-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 15:02:05 +0200
+	id GGNsO5Tf4GkEnAAAu9opvQ
+	(envelope-from <netdev+bounces-279042-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 15:09:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82DE940E719
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 15:02:00 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E41540E86F
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 15:09:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5C2E6303C507
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 13:01:52 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E798F3012237
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 13:09:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA34139657E;
-	Thu, 16 Apr 2026 13:01:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAA973B7B64;
+	Thu, 16 Apr 2026 13:09:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FCsjSVVw"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="gWVkabXn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C3E8221540
-	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 13:01:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 912E33BA248
+	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 13:09:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776344511; cv=none; b=CprAE3WuiJMb8bRQREMuSFyncYSS7Y2kr3yWPXGip6kSPw2yf3BtSyUuXzZztabZzBEYNqsTdtY+cDH/2z+7pQB30FEMQkRXCOQwL06OQn24jHyhKNn5W1H+Swfz3GXZDnqb2C2qTG66xAIrpdvCoAvsFSAV/nQrcci4ZfIJbG4=
+	t=1776344978; cv=none; b=rsqpcZukhckDI4Y8ErbZP+hHXoxP7/9CZM/JlpKpt3Da3u1GbnYLNIZpH3x5o1rq4+otwqAmmVMoMMvFkiquQkq8yHGZk1v4b8EbtHWJASybjXAP0lxCFxGU2EnbJYElZlGWLjbb/hbBelvQxayVZAQZvJdIaMsR5j7ztg23jS4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776344511; c=relaxed/simple;
-	bh=7ht94Fw+bGb8Bi/o+TEbwNrSYveP128tm1XEzRyNZfY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Pb+9lVdZUafJDW5gtInWrcmD/pZa8KfIdlTubjBGUeoXx4jSjAIyBQbqSEOmochwweqs94YgS3dGwz26kCZWN6n8JGcQw36An25rjwogl4eMVWG1blUWKVNCbimQBY+xF8FBV/bQ1klAbX4UUbnceOrK8NoFAz+RQxsYqiF8PJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FCsjSVVw; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2b23fcf90b2so75628985ad.3
-        for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 06:01:50 -0700 (PDT)
+	s=arc-20240116; t=1776344978; c=relaxed/simple;
+	bh=eVmjde+k93xycVxx5TzpLj5SCL1rx1KrvC1l3ql6brE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BTaIiZkusQHeGXHnaXIE33SKEVP3eYPSc0CKK1mTENnLecbixPXn2kCeF2nfG6la8GuAiaZyBhybkNTo9GZeEPa0N7hQHjqZv5dCFGVy8JwXVPUHNamOUIDS6HvFyqmescwaQNVngvFEoi+wQIlt+TazmpvgSpxACqoe2XQd50o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=gWVkabXn; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-488ba840146so79001745e9.1
+        for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 06:09:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776344509; x=1776949309; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=g/EDEcaRnyc+WK2SyOnB3p8PfKP/h3U3xc4KOW8/lP0=;
-        b=FCsjSVVwyBfDFa7q3Xs3WLoX0NewUMRk2JESsTJ+deSvd2Y3DkwQ9sFq/p4BNm/9U9
-         sQlEJIYeQE+OyFCQb3WPrxxM3zKI4D76A+XmI3+TohoLP+mTJUE0GRxRYtuDX0Ea4GFc
-         b/PLV+1TNTV+6uyzzoc6/gYKAFtU5Ne40nvokE10DfWEQtmzwEPrwNyOLHl6c4Vn0bcI
-         U6Mm7uW5Ym8r0ObxtJ5BLgOhTsFGPrtyejc6pgbR05s4fEmaSM5bfN1+grdrpjPX+x56
-         lLF8E5CrFPxBVM55gIrLex6knqNCGgQpGJLk60s96c0xnhDv9G3FzWswsofjOVUzgUrH
-         yXVg==
+        d=suse.com; s=google; t=1776344975; x=1776949775; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=m3piWCtfpN3U6w8bKY3YeNvzMYnQTdnw3h4KjP2i/sk=;
+        b=gWVkabXnsOnvoM3GUthhg8haRYPkHddoedkvckM6BiaWRjb06CqxgY1ZFpHCK6p2WQ
+         FeqGPchIhpZXb0+i22atTHjtQiVxh/L3GaX0sweeDZNZh0F0BqZNyig0cvTJIlkZOWrU
+         iafVJOHGilIbYuSWy9/9iW9WyzDmm/DAkiMmIoAp3Kr55fvy4h49B0CstsHsF0gAOsMP
+         k2vDVLT3F5J56OpiQi1aRT8PZh7o1ZnusmrX9FtcSuPjXgt4jpR7uV6jXUFW+6bTdZK+
+         bfmF+CPLNC4k007+B1ngA7VPideyNIXpDY5g7gjNDJuM/JGoIeOAqBG39/Z81HGf0hxO
+         cXOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776344509; x=1776949309;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=g/EDEcaRnyc+WK2SyOnB3p8PfKP/h3U3xc4KOW8/lP0=;
-        b=l5THTmgXyxovX2IGsm4TsiPUgYHfy0XHSl5Njfdnrw3cq7OvHRYQ0SKfqb+mh0xL13
-         GE9ZdDmgtjTEQfN7UTyQTdqkiWW/HIinGKC1q4cPLOhGAI0w1awh1KrfB53+XU4ybRQm
-         ynd3IhpiDRweiX6qO3BU693UCztFjbsGv63k18g7+9MNSEChO7mGXP9iaFMXQ9Rl8fxI
-         ywOM5bKs1EpkE812SGmm4uI8rv7ZL4e0VnZvN6e2ymaDd0bKa1NSOsls0N9u/CodWhu6
-         gf2avMMKYaY8zLIje7TJGOErfCQYbqWsPzERDOjF12imaEap4923cX3gxg0Vd3H+i6ed
-         UGAg==
-X-Gm-Message-State: AOJu0YznXTfrcmm8HIFrJ2RQjnYDiIpdCZHQQWvh8RjQb8ayXKL/2y2o
-	KhDJA9ej6ICxdNVg0Me+BsXaNXKE0eXikqgvNHWisoz06VXBxWX4qMvGnRbYtQ==
-X-Gm-Gg: AeBDiestwWLf6nbQBWTKX7kO96puOsB/+Sln/wSjBS38S/PvWX5NRmREOWDXunmmyzi
-	kenFGiTnPEgORhrpbiJQ//AaxDPanErvBW2FcfVnJ/P4sF1m/1TR0S8jfbGnZgKSPl3ZEiOURNg
-	b/F27d41b79LQhhefLJjz1x4qmiFYGaDTSJuQgn0RNM1heozTjsv72KnSdZYtpUM3ZCo6gYGjNe
-	ryqVud1RR70/d5i+CwY5j1xEw4CyKh9q+nm8/Q8AO4cVamSrEMT/PBqsNAzlU8HXRKznH3hY4RT
-	qB4KusWR1vx0je1Hc/6PaRwDfANjkZ83Zi8SFF6i8K7XKnFWUcgdqgb50I82gNdKKg+JRjyHI7C
-	LGB2HalQx7UhqMsHy8iL4MMuJ5IfwXjxgRa6SANtYB5/mdtYWPV8sWSilie3CvP21pFwkrGMAYa
-	d2WQrSN9KuoIIbNC53TquZwm0WygpG5bmN4mKW0wYDn2AnwbgIEm8xo2H2gWja
-X-Received: by 2002:a17:903:4502:b0:2b2:53f5:4627 with SMTP id d9443c01a7336-2b2d5939409mr194302435ad.4.1776344509180;
-        Thu, 16 Apr 2026 06:01:49 -0700 (PDT)
-Received: from localhost.localdomain ([218.253.131.218])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b47826e110sm68783985ad.43.2026.04.16.06.01.42
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 16 Apr 2026 06:01:44 -0700 (PDT)
-From: Dudu Lu <phx0fer@gmail.com>
-To: netdev@vger.kernel.org
-Cc: jhs@mojatatu.com,
-	jiri@resnulli.us,
-	horms@kernel.org,
-	Dudu Lu <phx0fer@gmail.com>
-Subject: [PATCH net] net/sched: act_ct: fix skb leak on fragment check failure
-Date: Thu, 16 Apr 2026 21:01:38 +0800
-Message-Id: <20260416130138.38050-1-phx0fer@gmail.com>
-X-Mailer: git-send-email 2.39.3 (Apple Git-145)
+        d=1e100.net; s=20251104; t=1776344975; x=1776949775;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=m3piWCtfpN3U6w8bKY3YeNvzMYnQTdnw3h4KjP2i/sk=;
+        b=WRty7u7mmSlPqBOtfzV/+HS+gew030h+rXU8+nLia5OftNxlDF6N1RdaFYaWu4zssJ
+         eDAWtp9gtl/QmFWzDWV4Q4Pz0sq7CtY6o5Jx9+IiB24mGFs5BKESNlgQTb6i0zgFP3rC
+         bQT25pnuNxqDS5K6oCD5T6sBjmu7h7hGwRE6+szl/23BTmvAkeOH5yf/bD9UhK+1gsgP
+         N4kgt7yZPc8kJ1aAyUiV/38TxmzgCd7I83qI5dXLvuPSzGcGoxDTR8MbWrmq4kE8mvpT
+         L8dma4cWd8Dwy1puvlo019QA8VpEYcP/9ZcjZq4n02zH0Ic/lCrCBuEjFvRJIsOV7p60
+         WZng==
+X-Forwarded-Encrypted: i=1; AFNElJ8hIrsFm/tpHF5QhZzUpcl3UehnKN+H9vG9BK6OyAUW+LH/mwiU0iCsnamwi0wWbbdB+qKlWSM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwHpVTmmPk9mho061jNiaVZ/OGYoYpsuD3K/MZMf8anJH4z909t
+	GksZQFPcmLBUQM1Rmaq6FmIGj9kIt1znfCwJ5qndUr5O7P+E0U1zx9UULfGW+tTN564=
+X-Gm-Gg: AeBDievKDM3TGkGyta8swmG43qQLGXo33aXVfnHAgbo18xu6IYfqV/dANsCZ9H8aRc/
+	TPnRnehF6/1X077XYBZFa8VDFneloPPjnbYBnK7Gbp5qEzT1wTQDmrRkue1gYGMUyHjatqBQ6Wl
+	Km4zpffKt6H4olpNENaEk8DZD3Ni/Y/yJEuLGxiJyfKiXIzH/VkLWter2WyOkXKqUPTeQS+93lA
+	cwQOQcd5Rg/HX7vuAVe1lcr/cTPi3OmtfJ3GhjZcpcaagmDmxtZxm/zxGnTndYbDWEVBwF0v1Gs
+	qfLRmZkVLkY0OdrSxW4TSI08tH+2l4pj1PxOcC8WXTQf7+z8bGnTkbFNAO5npgoj4FuZs1xicOH
+	41R3gXuJtN8d103NkzjJGeMdUE1vHSgSWPVcD5vqlfhennkPdffWzV4UEHTRbfiJRnOno4tr1Zo
+	XvJ6LYuYJYUxwobX8+2Cg7kJZjiA==
+X-Received: by 2002:a05:600d:8449:b0:487:55c:e0c1 with SMTP id 5b1f17b1804b1-488d68364fdmr279402625e9.14.1776344974877;
+        Thu, 16 Apr 2026 06:09:34 -0700 (PDT)
+Received: from pathway.suse.cz ([176.114.240.130])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488f585cefdsm53796665e9.14.2026.04.16.06.09.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Apr 2026 06:09:34 -0700 (PDT)
+Date: Thu, 16 Apr 2026 15:09:31 +0200
+From: Petr Mladek <pmladek@suse.com>
+To: Song Chen <chensong_2000@189.cn>
+Cc: Petr Pavlu <petr.pavlu@suse.com>, rafael@kernel.org, lenb@kernel.org,
+	mturquette@baylibre.com, sboyd@kernel.org, viresh.kumar@linaro.org,
+	agk@redhat.com, snitzer@kernel.org, mpatocka@redhat.com,
+	bmarzins@redhat.com, song@kernel.org, yukuai@fnnas.com,
+	linan122@huawei.com, jason.wessel@windriver.com, danielt@kernel.org,
+	dianders@chromium.org, horms@kernel.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	paulmck@kernel.org, frederic@kernel.org, mcgrof@kernel.org,
+	da.gomez@kernel.org, samitolvanen@google.com, atomlin@atomlin.com,
+	jpoimboe@kernel.org, jikos@kernel.org, mbenes@suse.cz,
+	joe.lawrence@redhat.com, rostedt@goodmis.org, mhiramat@kernel.org,
+	mark.rutland@arm.com, mathieu.desnoyers@efficios.com,
+	linux-modules@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org, linux-acpi@vger.kernel.org,
+	linux-clk@vger.kernel.org, linux-pm@vger.kernel.org,
+	live-patching@vger.kernel.org, dm-devel@lists.linux.dev,
+	linux-raid@vger.kernel.org, kgdb-bugreport@lists.sourceforge.net,
+	netdev@vger.kernel.org
+Subject: Re: [RFC PATCH 2/2] kernel/module: Decouple klp and ftrace from
+ load_module
+Message-ID: <aeDfi98xpnKcAJx5@pathway.suse.cz>
+References: <20260413080701.180976-1-chensong_2000@189.cn>
+ <1191caf5-6a61-4622-a15e-854d3701f4fc@suse.com>
+ <a35f5f94-7d5a-4347-974b-b270c89ef241@189.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a35f5f94-7d5a-4347-974b-b270c89ef241@189.cn>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[mojatatu.com,resnulli.us,kernel.org,gmail.com];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-279041-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-279042-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[189.cn];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RSPAMD_EMAILBL_FAIL(0.00)[phx0fer.gmail.com:query timed out];
-	RCPT_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[phx0fer@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[47];
+	DKIM_TRACE(0.00)[suse.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.997];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pmladek@suse.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 82DE940E719
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,189.cn:email,suse.com:dkim]
+X-Rspamd-Queue-Id: 8E41540E86F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-When tcf_ct_handle_fragments() returns an error other than -EINPROGRESS
-(e.g. -EINVAL from malformed fragments), tcf_ct_act() jumps to out_frag
-which unconditionally returns TC_ACT_CONSUMED. This tells the caller the
-skb was consumed, but it was not freed, leaking one skb per malformed
-fragment.
+On Wed 2026-04-15 14:43:53, Song Chen wrote:
+> Hi,
+> 
+> On 4/14/26 22:33, Petr Pavlu wrote:
+> > On 4/13/26 10:07 AM, chensong_2000@189.cn wrote:
+> > > From: Song Chen <chensong_2000@189.cn>
+> > > 
+> > > ftrace and livepatch currently have their module load/unload callbacks
+> > > hard-coded in the module loader as direct function calls to
+> > > ftrace_module_enable(), klp_module_coming(), klp_module_going()
+> > > and ftrace_release_mod(). This tight coupling was originally introduced
+> > > to enforce strict call ordering that could not be guaranteed by the
+> > > module notifier chain, which only supported forward traversal. Their
+> > > notifiers were moved in and out back and forth. see [1] and [2].
+> > 
+> > I'm unclear about what is meant by the notifiers being moved back and
+> > forth. The links point to patches that converted ftrace+klp from using
+> > module notifiers to explicit callbacks due to ordering issues, but this
+> > switch occurred only once. Have there been other attempts to use
+> > notifiers again?
+> > 
+> > > diff --git a/include/linux/module.h b/include/linux/module.h
+> > > index 14f391b186c6..0bdd56f9defd 100644
+> > > --- a/include/linux/module.h
+> > > +++ b/include/linux/module.h
+> > > @@ -308,6 +308,14 @@ enum module_state {
+> > >   	MODULE_STATE_COMING,	/* Full formed, running module_init. */
+> > >   	MODULE_STATE_GOING,	/* Going away. */
+> > >   	MODULE_STATE_UNFORMED,	/* Still setting it up. */
+> > > +	MODULE_STATE_FORMED,
+> > 
+> > I don't see a reason to add a new module state. Why is it necessary and
+> > how does it fit with the existing states?
+> > 
+> because once notifier fails in state MODULE_STATE_UNFORMED (now only ftrace
+> has someting to do in this state), notifier chain will roll back by calling
+> blocking_notifier_call_chain_robust, i'm afraid MODULE_STATE_GOING is going
+> to jeopardise the notifers which don't handle it appropriately, like:
+> 
+> case MODULE_STATE_COMING:
+>      kmalloc();
+> case MODULE_STATE_GOING:
+>      kfree();
+> 
+> 
+> > > +};
+> > > +
+> > > +enum module_notifier_prio {
+> > > +	MODULE_NOTIFIER_PRIO_LOW = INT_MIN,	/* Low prioroty, coming last, going first */
+> > > +	MODULE_NOTIFIER_PRIO_MID = 0,	/* Normal priority. */
+> > > +	MODULE_NOTIFIER_PRIO_SECOND_HIGH = INT_MAX - 1,	/* Second high priorigy, coming second*/
+> > > +	MODULE_NOTIFIER_PRIO_HIGH = INT_MAX,	/* High priorigy, coming first, going late. */
+> > 
+> > I suggest being explicit about how the notifiers are ordered. For
+> > example:
+> > 
+> > enum module_notifier_prio {
+> > 	MODULE_NOTIFIER_PRIO_NORMAL,	/* Normal priority, coming last, going first. */
+> > 	MODULE_NOTIFIER_PRIO_LIVEPATCH,
+> > 	MODULE_NOTIFIER_PRIO_FTRACE,	/* High priority, coming first, going late. */
+> > };
+> > 
 
-TC_ACT_CONSUMED is only correct for -EINPROGRESS, where defragmentation
-is genuinely in progress and the skb has been queued. For all other
-errors the skb is still owned by the caller and must be freed via
-TC_ACT_SHOT.
+I like the explicit PRIO_LIVEPATCH/FTRACE names.
 
-Fixes: 3f14b377d01d ("net/sched: act_ct: fix skb leak and crash on ooo frags")
-Signed-off-by: Dudu Lu <phx0fer@gmail.com>
----
- net/sched/act_ct.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+But I would keep the INT_MAX - 1 and INT_MAX priorities. I believe
+that ftrace/livepatching will always be the first/last to call.
+And INT_MAX would help to preserve kABI when PRIO_NORMAL is not
+enough for the rest of notifiers.
 
-diff --git a/net/sched/act_ct.c b/net/sched/act_ct.c
-index 7d5e50c921a0..870655f682bd 100644
---- a/net/sched/act_ct.c
-+++ b/net/sched/act_ct.c
-@@ -1107,8 +1107,10 @@ TC_INDIRECT_SCOPE int tcf_ct_act(struct sk_buff *skb, const struct tc_action *a,
- 	return retval;
- 
- out_frag:
--	if (err != -EINPROGRESS)
-+	if (err != -EINPROGRESS) {
- 		tcf_action_inc_drop_qstats(&c->common);
-+		return TC_ACT_SHOT;
-+	}
- 	return TC_ACT_CONSUMED;
- 
- drop:
--- 
-2.39.3 (Apple Git-145)
+That said, I am not sure whether this is worth the effort.
+This patch tries to move the explicit callbacks in a generic
+notifiers API. But it will still need to use some explictly
+defined (reserved) priorities. And it will
+not guarantee a misuse. Also it requires the double linked
+list which complicates the notifiers code.
 
+
+> > >   };
+> > >   struct mod_tree_node {
+> > > --- a/kernel/module/main.c
+> > > +++ b/kernel/module/main.c
+> > > @@ -3281,20 +3277,14 @@ static int complete_formation(struct module *mod, struct load_info *info)
+> > >   	return err;
+> > >   }
+> > > -static int prepare_coming_module(struct module *mod)
+> > > +static int prepare_module_state_transaction(struct module *mod,
+> > > +			unsigned long val_up, unsigned long val_down)
+> > >   {
+> > >   	int err;
+> > > -	ftrace_module_enable(mod);
+> > > -	err = klp_module_coming(mod);
+> > > -	if (err)
+> > > -		return err;
+> > > -
+> > >   	err = blocking_notifier_call_chain_robust(&module_notify_list,
+> > > -			MODULE_STATE_COMING, MODULE_STATE_GOING, mod);
+> > > +			val_up, val_down, mod);
+> > >   	err = notifier_to_errno(err);
+> > > -	if (err)
+> > > -		klp_module_going(mod);
+> > >   	return err;
+> > >   }
+
+I personally find the name "prepare_module_state_transaction"
+misleading. What is the "transaction" here? If this was a "preparation"
+step then where is the transaction done/finished?
+
+It might be better to just opencode the
+blocking_notifier_call_chain_robust() instead.
+
+> > > @@ -3468,14 +3458,21 @@ static int load_module(struct load_info *info, const char __user *uargs,
+> > >   	init_build_id(mod, info);
+> > >   	/* Ftrace init must be called in the MODULE_STATE_UNFORMED state */
+> > > -	ftrace_module_init(mod);
+> > > +	err = prepare_module_state_transaction(mod,
+> > > +				MODULE_STATE_UNFORMED, MODULE_STATE_FORMED);
+> > 
+> > I believe val_down should be MODULE_STATE_GOING to reverse the
+> > operation. Why is the new state MODULE_STATE_FORMED needed here?
+> to avoid this:
+> 
+> case MODULE_STATE_COMING:
+>      kmalloc();
+> case MODULE_STATE_GOING:
+>      kfree();
+
+Hmm, the module is in "FORMED" state here.
+
+> > > +	if (err)
+> > > +		goto ddebug_cleanup;
+> > >   	/* Finally it's fully formed, ready to start executing. */
+> > >   	err = complete_formation(mod, info);
+
+And we call "complete_formation()" function. This sounds like
+it was not really "FORMED" before. => It is confusing and nono.
+
+Please, try to avoid the new state if possible. My experience
+with reading the module loader code is that any new state
+brings a lot of complexity. You need to take it into account
+when checking correctness of other changes, features, ...
+
+Something tells me that if the state was not needed before
+then we could avoid it.
+
+> > > -	if (err)
+> > > +	if (err) {
+> > > +		blocking_notifier_call_chain_reverse(&module_notify_list,
+> > > +				MODULE_STATE_FORMED, mod);
+> > >   		goto ddebug_cleanup;
+> > > +	}
+> > > -	err = prepare_coming_module(mod);
+> > > +	err = prepare_module_state_transaction(mod,
+> > > +				MODULE_STATE_COMING, MODULE_STATE_GOING);
+> > >   	if (err)
+> > >   		goto bug_cleanup;
+> > > --- a/kernel/trace/ftrace.c
+> > > +++ b/kernel/trace/ftrace.c
+> > > @@ -5241,6 +5241,44 @@ static int __init ftrace_mod_cmd_init(void)
+> > >   }
+> > >   core_initcall(ftrace_mod_cmd_init);
+> > > +static int ftrace_module_callback(struct notifier_block *nb, unsigned long op,
+> > > +			void *module)
+> > > +{
+> > > +	struct module *mod = module;
+> > > +
+> > > +	switch (op) {
+> > > +	case MODULE_STATE_UNFORMED:
+> > > +		ftrace_module_init(mod);
+> > > +		break;
+> > > +	case MODULE_STATE_COMING:
+> > > +		ftrace_module_enable(mod);
+> > > +		break;
+> > > +	case MODULE_STATE_LIVE:
+> > > +		ftrace_free_mem(mod, mod->mem[MOD_INIT_TEXT].base,
+> > > +				mod->mem[MOD_INIT_TEXT].base + mod->mem[MOD_INIT_TEXT].size);
+> > > +		break;
+> > > +	case MODULE_STATE_GOING:
+> > > +	case MODULE_STATE_FORMED:
+> > > +		ftrace_release_mod(mod);
+
+This calls "release" in a "FORMED" state. It does not make any
+sense. Something looks fishy, either the code or the naming.
+
+> > > +		break;
+> > > +	default:
+> > > +		break;
+> > > +	}
+> > 
+
+I am sorry for being so picky about names. I believe that good names
+help to prevent bugs and reduce headaches.
+
+Best Regards,
+Petr
 
