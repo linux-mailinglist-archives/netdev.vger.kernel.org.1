@@ -1,181 +1,236 @@
-Return-Path: <netdev+bounces-279061-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279062-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uF9jAhfm4GlhnAAAu9opvQ
-	(envelope-from <netdev+bounces-279061-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 15:37:27 +0200
+	id KMaMNJ7n4GnhnAAAu9opvQ
+	(envelope-from <netdev+bounces-279062-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 15:43:58 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79A1440EEF8
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 15:37:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B44740F070
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 15:43:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id BEA643012B70
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 13:37:25 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id DF853301A0BC
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 13:43:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 956D938BF63;
-	Thu, 16 Apr 2026 13:37:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD6913CBE69;
+	Thu, 16 Apr 2026 13:43:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="EqsAWePZ";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Ir4XLzWd";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="EqsAWePZ";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Ir4XLzWd"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="oxq0L3dy"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 501DE26560B
-	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 13:37:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 155233B9604;
+	Thu, 16 Apr 2026 13:43:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776346644; cv=none; b=selYUpyXsmE9F5eegUn5ri3GNLYuQDR8SropluWz1PNgUqm14cnzzJhZFU/E/y2YvhWTKrzS+Yj0RUDTWGHLxK42alKCukbqtOJZ5pekqgUH+JWz3aqNYKjAbWH9ox4UDvQgkCIFTSSFBKr6DySUxsSwLkzS8HyTAI9uOpwR1nY=
+	t=1776347032; cv=none; b=PcHaUbA5u+B5panF8cJ4UKspzn9lwthbdsGPbhfenTH5cIB2Mv3SsU1JdAoGLGpCQAp4RUD0+pZVk17UWEty0LqiPw7VLs67G3dU0lL+pTYYScmI0/e4DHJMs9rDvPhWcDunWcfs3FOsZjyCGg43uuojv6oUWN8kIzCV/BtJvmQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776346644; c=relaxed/simple;
-	bh=y1LMAIBn6cQUT1VjzIm14sKBb4UWR5l0RHmKhq5OhqU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fXcQ0MFafavOY/AzEu/dliyQ9jERQvbdqR1jkWV+4vJOHp0iSUwhBTCeu+4oDmlFrYzD5n1v4u9segCEpenEi//q4M0B/dcgXkU+jDGhFZQ9NFbFc3s9EiLcTZ8OFIu+2h80+ChzULerOdWRS1i0yjwTz5aWvAFecfBGOTYc29w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=EqsAWePZ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Ir4XLzWd; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=EqsAWePZ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Ir4XLzWd; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 98B425BD31;
-	Thu, 16 Apr 2026 13:37:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1776346641; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mI0DI4a4b+BC3Hi1tXZE76HVZxPr63eTcG+E02Ebi1E=;
-	b=EqsAWePZG8+i4p9Ath9fSV1e6LNT6gtarepdjQoRUNC9EitMgXWiVJZBkeaIGd7yIj45Xf
-	9tFVoqWeKvp+IqpvHmMEGRlepURrVKyq4OmCEi+m4ZnNctTOBecWA4BmVsxvxHliiNRe7i
-	cY71kLDhnU2Bh96J0rl3SErOtJx/ZlU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1776346641;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mI0DI4a4b+BC3Hi1tXZE76HVZxPr63eTcG+E02Ebi1E=;
-	b=Ir4XLzWdNvpRaVl2rWQZVXuRqz0aghqN7mNpMTnQRy8YBsmMIi1VR95Sfzaae2CqomkHye
-	TALZhlpEaaHhlVAQ==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=EqsAWePZ;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=Ir4XLzWd
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1776346641; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mI0DI4a4b+BC3Hi1tXZE76HVZxPr63eTcG+E02Ebi1E=;
-	b=EqsAWePZG8+i4p9Ath9fSV1e6LNT6gtarepdjQoRUNC9EitMgXWiVJZBkeaIGd7yIj45Xf
-	9tFVoqWeKvp+IqpvHmMEGRlepURrVKyq4OmCEi+m4ZnNctTOBecWA4BmVsxvxHliiNRe7i
-	cY71kLDhnU2Bh96J0rl3SErOtJx/ZlU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1776346641;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mI0DI4a4b+BC3Hi1tXZE76HVZxPr63eTcG+E02Ebi1E=;
-	b=Ir4XLzWdNvpRaVl2rWQZVXuRqz0aghqN7mNpMTnQRy8YBsmMIi1VR95Sfzaae2CqomkHye
-	TALZhlpEaaHhlVAQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 201EE593A3;
-	Thu, 16 Apr 2026 13:37:21 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id UwHdBBHm4GlDYQAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Thu, 16 Apr 2026 13:37:21 +0000
-Message-ID: <0a4b74fc-732c-4842-b2af-e2dde658319e@suse.de>
-Date: Thu, 16 Apr 2026 15:37:20 +0200
+	s=arc-20240116; t=1776347032; c=relaxed/simple;
+	bh=qfia6f7p2mrxliu/5Lfsw6GThkGbZSkpMOlHgUNain4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IIQak6107BgehRD3qJ7hx87fn+1NZuQQAkkz+SZ4Jcnhz3CIIsQuuV0vL+5LWCL/7M6wuGjCn60eBCe179ny4HkwMPOIsZKyNQYJLTOQ2+tGiVm9hGdTDjyYUkkV8L4+l2y5jADH/3U62tCE1VoIwFdC9Hf/xdp+RXMN6MEYv7w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=oxq0L3dy; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63G7sGgI1833152;
+	Thu, 16 Apr 2026 13:42:46 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=f/UjitU2IRDQkjyHmpVEhuknZxwT4y
+	OWmcb/zMeZnjE=; b=oxq0L3dyylrzBDUlyV4jJBA8jSxvo6zyTFu2eZGBSWIf1F
+	0ksXNAaZF1WFKO90vuj3ti8LrXkR4WMFD+veRWCanALiSvqIPx5mj6AiZqVUTeh6
+	tnOUDFD8eG7uVm2ujOQXyKpmzLTf5Owa4nae6JyebU1il+cvOG4GPAishf31nirE
+	QHj8T3NZ/YPFd6hNRv9PVtfbIxtnQmC5vDBXeXZfk1L1NOqO7IX91VEsi/on5hTf
+	swPZjWAsNymtPrfj22h1nP6023klHtGdpOwHkZzHB+qFWDGTjvfilGSiiCmKXonp
+	ZKuwp6xlgpdmgU9LP0G+HpY0nEqSmz/YWYI5xffQ==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4dh89rnpks-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 16 Apr 2026 13:42:45 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 63GCrstO003393;
+	Thu, 16 Apr 2026 13:42:44 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4djbh94p47-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 16 Apr 2026 13:42:44 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 63GDggEf46530868
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 16 Apr 2026 13:42:42 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6D9BD20040;
+	Thu, 16 Apr 2026 13:42:42 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E411920043;
+	Thu, 16 Apr 2026 13:42:41 +0000 (GMT)
+Received: from osiris (unknown [9.52.214.206])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Thu, 16 Apr 2026 13:42:41 +0000 (GMT)
+Date: Thu, 16 Apr 2026 15:42:38 +0200
+From: Heiko Carstens <hca@linux.ibm.com>
+To: Thomas Gleixner <tglx@kernel.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, linux-s390@vger.kernel.org,
+        Arnd Bergmann <arnd@arndb.de>, x86@kernel.org,
+        Lu Baolu <baolu.lu@linux.intel.com>, iommu@lists.linux.dev,
+        Michael Grzeschik <m.grzeschik@pengutronix.de>, netdev@vger.kernel.org,
+        linux-wireless@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>, linux-crypto@vger.kernel.org,
+        Vlastimil Babka <vbabka@kernel.org>, linux-mm@kvack.org,
+        David Woodhouse <dwmw2@infradead.org>,
+        Bernie Thompson <bernie@plugable.com>, linux-fbdev@vger.kernel.org,
+        Theodore Tso <tytso@mit.edu>, linux-ext4@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Uladzislau Rezki <urezki@gmail.com>, Marco Elver <elver@google.com>,
+        Dmitry Vyukov <dvyukov@google.com>, kasan-dev@googlegroups.com,
+        Andrey Ryabinin <ryabinin.a.a@gmail.com>,
+        Thomas Sailer <t.sailer@alumni.ethz.ch>, linux-hams@vger.kernel.org,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        linux-alpha@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
+        linux-arm-kernel@lists.infradead.org,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Huacai Chen <chenhuacai@kernel.org>, loongarch@lists.linux.dev,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        linux-m68k@lists.linux-m68k.org, Dinh Nguyen <dinguyen@kernel.org>,
+        Jonas Bonn <jonas@southpole.se>, linux-openrisc@vger.kernel.org,
+        Helge Deller <deller@gmx.de>, linux-parisc@vger.kernel.org,
+        Michael Ellerman <mpe@ellerman.id.au>, linuxppc-dev@lists.ozlabs.org,
+        Paul Walmsley <pjw@kernel.org>, linux-riscv@lists.infradead.org,
+        "David S. Miller" <davem@davemloft.net>, sparclinux@vger.kernel.org
+Subject: Re: [patch 35/38] s390: Select ARCH_HAS_RANDOM_ENTROPY
+Message-ID: <20260416134238.9230Ba6-hca@linux.ibm.com>
+References: <20260410120044.031381086@kernel.org>
+ <20260410120319.924028412@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 00/14] Netfilter/IPVS fixes for net
-To: Florian Westphal <fw@strlen.de>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>, netfilter-devel@vger.kernel.org,
- davem@davemloft.net, netdev@vger.kernel.org, kuba@kernel.org,
- pabeni@redhat.com, edumazet@google.com, horms@kernel.org
-References: <20260416013101.221555-1-pablo@netfilter.org>
- <aeCPB1_WaFOX-Xos@chamomile> <aeC4A75gYD9qT5OR@chamomile>
- <aeC8hyj6IFW7UvUG@strlen.de> <36ccd420-25f2-43e9-89bf-088fcad40f81@suse.de>
- <aeDgvwlyuGF4HnWK@strlen.de>
-Content-Language: en-US
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-In-Reply-To: <aeDgvwlyuGF4HnWK@strlen.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Flag: NO
-X-Spam-Score: -4.51
-X-Spam-Level: 
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260410120319.924028412@kernel.org>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDE2MDEyNyBTYWx0ZWRfX8JpaMjFpMFNj
+ wT/gcAkcZviN6PAKMrtow2zaUGLfcmRJE1Hmlajk6nmzRCOPN3b0RjfUSbBfZ4kcpBQKzFkFpH2
+ rBdoNFGP+ENma7o4H4KbJVfdl551lLtrUhXHjq9OwNJzXZ+me9M1v1uiIYgnebcgn173Z5tfoDR
+ wlQdz0La24p7XZm2254oSjajXGSASA40rSmgRE/jrWjf8LX+uVSsnpdh3XNIiRv8V/PTkKj6EBp
+ iBYTVRyCnznRY5uSBKmAQ36JyfUCJkrEoSNgw47/6thxuZYcD3Vho/t2EjbWxo9/yoIVwBhLMiA
+ KDHNz3gXJ52J3z8Lw3ApjdhxznJ9LyQJp5nCQBfITC+W8sZcyql8UU+3NCgtkDEKALiOvDUmzX8
+ cTJk9dj+/qvxdwTfyZTWoW7vy+HckV57wQs+QYABEOJZttft9F9OCKr+PfGIpmBZixsJntlLk+Y
+ lz3L+7/h8eZbcTrAKmg==
+X-Proofpoint-ORIG-GUID: rje87_dJEfU9HQ1lSMRsbGj9D9EjeiT6
+X-Proofpoint-GUID: mvWCwZrNw9W7TL82vJ98uT3DrwWfuFPP
+X-Authority-Analysis: v=2.4 cv=fYidDUQF c=1 sm=1 tr=0 ts=69e0e756 cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+ a=kj9zAlcOel0A:10 a=A5OVakUREuEA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=U7nrCbtTmkRpXpFmAIza:22 a=VwQbUJbxAAAA:8
+ a=VnNF1IyMAAAA:8 a=1gfdoSPoDaBUdwTi8XQA:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-04-16_03,2026-04-16_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 impostorscore=0 clxscore=1011 malwarescore=0 phishscore=0
+ bulkscore=0 priorityscore=1501 spamscore=0 suspectscore=0 lowpriorityscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2604070000 definitions=main-2604160127
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
-	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[48];
+	FREEMAIL_CC(0.00)[vger.kernel.org,arndb.de,kernel.org,linux.intel.com,lists.linux.dev,pengutronix.de,gondor.apana.org.au,kvack.org,infradead.org,plugable.com,mit.edu,linux-foundation.org,gmail.com,google.com,googlegroups.com,alumni.ethz.ch,zx2c4.com,linaro.org,armlinux.org.uk,lists.infradead.org,arm.com,linux-m68k.org,lists.linux-m68k.org,southpole.se,gmx.de,ellerman.id.au,lists.ozlabs.org,davemloft.net];
+	TAGGED_FROM(0.00)[bounces-279062-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279061-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.ibm.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:dkim,suse.de:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,sashiko.dev:url]
-X-Rspamd-Queue-Id: 79A1440EEF8
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hca@linux.ibm.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[ibm.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[11]
+X-Rspamd-Queue-Id: 7B44740F070
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 4/16/26 3:14 PM, Florian Westphal wrote:
-> Fernando Fernandez Mancera <fmancera@suse.de> wrote:
->> I would like to propose to add netfilter-devel mailing list to
->> sashiko.dev and also to Netdev CI.. I think Jakub mentioned it was
->> possible on a previous situation.
+On Fri, Apr 10, 2026 at 02:21:19PM +0200, Thomas Gleixner wrote:
+> The only remaining non-architecture usage of get_cycles() is to provide
+> random_get_entropy().
 > 
-> I already run all my pull requests through most of NIPAs test, with
-> additional netfilter-specific tests.
+> Switch s390 over to the new scheme of selecting ARCH_HAS_RANDOM_ENTROPY and
+> providing random_get_entropy() in asm/random.h.
 > 
->> I think it isn't sustainable to review and address the AI/LLM comments
->> when sending the pull request to for net/net-next.
+> Add 'asm/timex.h' includes to the relevant files, so the global include can
+> be removed once all architectures are converted over.
 > 
-> The current bug report influx is already unsustainable for us.
-> 
+> Signed-off-by: Thomas Gleixner <tglx@kernel.org>
+> Cc: Heiko Carstens <hca@linux.ibm.com>
+> Cc: linux-s390@vger.kernel.org
+> ---
+>  arch/s390/Kconfig              |    1 +
+>  arch/s390/include/asm/random.h |   12 ++++++++++++
+>  arch/s390/include/asm/timex.h  |    6 ------
+>  arch/s390/kernel/time.c        |    1 +
+>  arch/s390/kernel/vtime.c       |    1 +
+>  5 files changed, 15 insertions(+), 6 deletions(-)
 
-Yes, it isn't. It should be fine to just delay everything. The resources 
-are limited and if the influx of LLM/AI generated reports increases, it 
-will just take more time to get through them.
+Acked-by: Heiko Carstens <hca@linux.ibm.com>
 
->> If you agree I could help moving this forward.
-> 
-> If you know who to contact to make sashiko also digest netfilter-devel
-> that would be good to have.
-> 
+Thomas, would you mind adding the below as minor improvement to this
+series?
 
-Yes, I can reach out to Roman Gushchin regarding it.
+From 7072e5d66b99a7fa666d17c6ad8cb254f2d8f473 Mon Sep 17 00:00:00 2001
+From: Heiko Carstens <hca@linux.ibm.com>
+Date: Thu, 16 Apr 2026 15:08:15 +0200
+Subject: [PATCH] s390: Use get_tod_clock_fast() for random_get_entropy()
 
-Thanks,
-Fernando.
+Use get_tod_clock_fast() instead of get_tod_clock_monotonic() to implement
+random_get_entropy().
+
+There is no need for random_get_entropy() to provide monotonic increasing
+values, nor is there any need to provide (close to) nanosecond granularity
+timestamps by shifting the result.
+
+This slightly reduces the execution time of random_get_entropy() and adds
+two bits of randomness.
+
+Signed-off-by: Heiko Carstens <hca@linux.ibm.com>
+---
+ arch/s390/include/asm/random.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/s390/include/asm/random.h b/arch/s390/include/asm/random.h
+index 7daf42dbed32..f6d9312efdbf 100644
+--- a/arch/s390/include/asm/random.h
++++ b/arch/s390/include/asm/random.h
+@@ -6,7 +6,7 @@
+ 
+ static inline unsigned long random_get_entropy(void)
+ {
+-	return (unsigned long)get_tod_clock_monotonic() >> 2;
++	return get_tod_clock_fast();
+ }
+ 
+ #endif
+-- 
+2.51.0
 
 
