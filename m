@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-279129-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279130-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cPHmIOcx4WlGqQAAu9opvQ
-	(envelope-from <netdev+bounces-279129-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 21:00:55 +0200
+	id EO/MEEYx4WlGqQAAu9opvQ
+	(envelope-from <netdev+bounces-279130-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 20:58:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D64C413F04
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 21:00:54 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4298F413EAF
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 20:58:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8DBF0301E21D
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 18:57:35 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id EA1D1303BAD9
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 18:57:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F89C3314B7;
-	Thu, 16 Apr 2026 18:57:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 304B534BA50;
+	Thu, 16 Apr 2026 18:57:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k07cdnqk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oiVh+/S9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f68.google.com (mail-ot1-f68.google.com [209.85.210.68])
+Received: from mail-ot1-f67.google.com (mail-ot1-f67.google.com [209.85.210.67])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8619834A796
-	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 18:57:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC4DF34B1B4
+	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 18:57:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.67
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776365853; cv=none; b=a3+Ye1hN7BRMjgEg4D8UafBE+yA0hXoDMzm+mSy/ayP0cdh/ES+oqu8UUtxwoVfgibtJRO99kyx6hjKmndnux1g8FyRGsfEynxLVe5MDErx7bLWHq4iTl6bV7tPLfsThrLe+E7tDbj0n1kF6sF1kfpyWbbgI2n28noucc7cN9Uo=
+	t=1776365856; cv=none; b=ZLSOInBgp06shMDwFJ1mmN/tZ9s8av4QyhES7CaXoSfteAjPpMZ7vf8FTCGxLLT4J88CJGEt2xuJHV9JiRgkMTzMMSEwedw+YRWkyXwiA6CACwsz9Lzj6xHyE3gLqM0ta/3BNCsC7qfgkjfHqf3k2aiddCBVff0rpBUZEvdVSk0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776365853; c=relaxed/simple;
-	bh=9yM82H15LaS4PL0QdJhZZbqNUFw5SHxVGY1b1VI+wY8=;
+	s=arc-20240116; t=1776365856; c=relaxed/simple;
+	bh=LYvErWUSfRBBnY3NCG9Fg5akGZb3pRfcAuHlM3FU5GQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bZGj4iQTeN/jOrJ43I+oQdkGDqQZd6DLi8/A4ZKxN6uw0xW6O2fd4xFlnfy6uD2ox1ukfxAG/6fb6W94Ek0VW7Eqznqxt4ojWeOgdsWXTKAWdvPfxl5s6LXp1gDpdQEYx8Nbk8DoxOUbwE7hX7WmMRrN51Q0QHnY/uvzbpLnp6Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k07cdnqk; arc=none smtp.client-ip=209.85.210.68
+	 MIME-Version; b=WYdhfT1R33jC8pBjkKF0yR8C7nHRDOY4IYi7By6XFBPUXY3LUE3XlYH/xGdd+Lb7y5fAntPYJM4APJpbt2r5NXT/mCU+Egp5Ko51vEh/a9DOEGOuEp4vO3A8erWu2aTFPBqaHgx9rLRf/AIRC6ehy6KLAO7dluqfDdadwV5J5gI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=oiVh+/S9; arc=none smtp.client-ip=209.85.210.67
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f68.google.com with SMTP id 46e09a7af769-7dbff3ea81fso4154834a34.1
-        for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 11:57:27 -0700 (PDT)
+Received: by mail-ot1-f67.google.com with SMTP id 46e09a7af769-7dbcd92eda5so6046577a34.2
+        for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 11:57:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776365846; x=1776970646; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1776365847; x=1776970647; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=1/itwDadjKsEHXnJjcB7eAlPzcUecWydhhEt9GoPtsU=;
-        b=k07cdnqkGHEVv3Bb2wQGByUYDHqXBZaiSL5blWqhuHQ8u9F8lyRvQseLtRR9dse3cn
-         /M5J42yhAEu2Wx4F571KPi9Q0VDaPyiN/CF8ru0CPLlct6Kj/T6ykx8DA/PG8FYt+zWB
-         hIbrwZWfmS5C9UAjs/ogmr8PlLSQmmsHuRwQG1wLwcIK+8XGju5e8TN9upOd0lypBcg+
-         Cj+oF1pysaDVP5RgYScVCrp/whtTJcSWzIFgJM2P5jAlKO3NAxXrwL2aTEIBgwz60NS8
-         JYmTKKsUjms9WJZtV1GCoztQnH8030995sPfM5jqETXp187ZufzBnKJzcuJsJFUUrbNF
-         RvvA==
+        bh=RJHe2LlEDIEncmhqBEcupdpPTOhgj3b45k8NdbW9fgk=;
+        b=oiVh+/S96p4iuLLPovi7cwx4PEnBCsXl8cvGx1LprMremmFdvBvXpu1aRoX6rdvJ42
+         y+xYKHAV/y0HzLe9flXiLcv4fLk/x5P1rPnc63Gz4KxjVQN8+b/tcyiO0Fbd0caHpuzC
+         xMI5YZg+LIowB36JD70MHYC9mQ9cfidVQ5mxqbAV1m4EU+5nGMRsrubP/58Coe/KqaKo
+         woUMfCDwn5nDGG710UdWukKAVEAIPLViiV0sTsF0VC18tvjXUWlJQ8FZ/0oTwvyXEz0n
+         UXAuXQ+SCqQLmXUvQAatvXEwlYUnH4YCnjc87Zr/aw/BPwPkcnTEdmQeJ0JtVNYkKEn+
+         Izng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776365846; x=1776970646;
+        d=1e100.net; s=20251104; t=1776365847; x=1776970647;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=1/itwDadjKsEHXnJjcB7eAlPzcUecWydhhEt9GoPtsU=;
-        b=HqGh59TuAr+hbJJfHfaZ00Y9yAui1tuY+dPIO7WGS5kj274Z/b8VmjoHJ3SFMMwUH8
-         unixKF+o16PgLNfuAGUwqqSdXvSFVvC86htdTT6G/Bm1o0GN69eReXENAk25WphBC88z
-         Q6dC8l/mdGQPpyQihsbnXk75iYbQPH9WIrQOpfyX7AhEeDJ37Vfi7q9Mm2WTAMXxFmQT
-         bWvW2911ppup0obCupK6lGXNROKxOQPKpKiw3GTr//JVmYTuY6bdm3Lp7M2vwggwtIUW
-         3IzA5CXxSsmlUWbm4hFPGc7HB1kMvaJC7/4PLrEOZLW8Am8xsfkhnEvH0YhoRaddd8xK
-         /6Dg==
-X-Gm-Message-State: AOJu0Yz+/rUHe//EzllHrlrgC+f8Cg/Dvg0yYYpBYYFypko9wSFwKhcR
-	vXpYDX7iBQwP0G4dHO0sm97tRhEYlewZAmYRyGS/wbNZ3qHQqjRdBX4nLfjtVg0d
-X-Gm-Gg: AeBDieuWVZMRPFpLfuY9kXMIE35yuINd1OZ6CNlHpxdTj1nxl5Mdn3LjYLk4unp+bQT
-	u1dSadq3+sfQK3huAgymD1aijcPcMxX0LJSZk3iME77Vehzq9W+65vaCA+96r8Owz36jETSnUFC
-	6tUjrd8sNGRJvf0lkr7fuoGipNwnKBiwfB6UG08G1OHOzhf/Sul/o66On38oI7GPllczpZwn0KZ
-	shFiCO5SVs+FALVk8JPUyHRFSv5qqpFBkSPPOGsTV/D1MTGC5wF9iLk3L2bgHXD2k3ocVQRyR/S
-	vgZ2od8nCUIdMpvciVpUkYKqURXqIASYBxHaii0kX1c9vOxiBCfyHwkWkYp90tguuRq+XsSRzjV
-	/AsT3Ry0iomva2U3o2ZzVL7liuVPuBG4VbtFBFTbRLuugSa/IDSBLm02bikUxc52/ymxHTC7SWn
-	z8Hlgn3Citx8DROo5y+qfYejeSW1Q=
-X-Received: by 2002:a05:6820:1885:b0:67b:bc25:2670 with SMTP id 006d021491bc7-69461a98bb0mr243130eaf.26.1776365846478;
-        Thu, 16 Apr 2026 11:57:26 -0700 (PDT)
-Received: from localhost ([2a03:2880:12ff:6::])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-6946041f726sm417555eaf.10.2026.04.16.11.57.26
+        bh=RJHe2LlEDIEncmhqBEcupdpPTOhgj3b45k8NdbW9fgk=;
+        b=kX0V69wAkNS3+b8/tpRTFZwNALqTUL3fDDQr2BA0unYeUpnrgrfJZboJkjxHZoIaj/
+         dY9lUCt1+Xqwj2LNv52qSbOfvpN5ea9uTyBxHhDxMfir7vrC6l3VYlnKD+ZNQ+z/Te24
+         K8+hfA67NBNwt6G0hCiOaxIAXgjnfoXMycppQ/6zgRLCf4OHGEIYL7q7E7p/YxfuYsXV
+         ueONXawRETyOSrIgcWn09ID5PXY0EnOm6cRJa1mt2So1XOw1p8uRQmPQ0VVOpNdlPZ4L
+         yMLG7711xH8KFLgF9A8rYAkT313FXmOk7SxvnEVc/+KvL9PAHS7whNiJfFpZ7t2GTAch
+         wpTw==
+X-Gm-Message-State: AOJu0YwBnh+LJtAW6GzsJC00US9L0BUgGhru5LngeRFoeNF2x731fbMU
+	4fS4QVqmbFrnZklyw9zFEP+f+0xXgGYCouwedr3MQ5+CuzU7PPq54m2SrSpEBDQg
+X-Gm-Gg: AeBDieu5aoCQs0ig+EHQEgWiFr6RyC6rk3dRkdGViTb8XnALWENfKMtEMoNYlWba+fQ
+	4bb/cCH3h1/R4eAboI/AwTApXTIIKubPu96nk2aNpryYCiUL70npW4TU7xyNgNCqiOLpQXXtiRZ
+	8bvSccE7Fw08+DwTFIKzM2XNWmumOou20BkDdXIEA33LQhye/3Waewi/1a5vx0emC9ykO/TYi5G
+	7CuS4ZkYdwFklIiAflDgWLN4EkWnAxM3eMFmy8ghi4Q1BLm57Yud36nzp98WCVIJy9HIZ2foJXK
+	dfeDxDH++M5T3Xt6OrlAe/jBgeDIrr+n1zivnL1RgEbBEgfpvifN7y4iiJLuMu7VmauucrDZurE
+	SWtjZULf3ryy98lPFt+wycSkao/wso6MBmKv9cvUhyzm1hbBi6ajcocoQqzUg54QZrdBDew3QpV
+	tihrMsMSVENuQAlO5wHDGu9NxQecRr
+X-Received: by 2002:a05:6830:2b10:b0:7d7:ddc2:540e with SMTP id 46e09a7af769-7dc9230f0b5mr379616a34.6.1776365847603;
+        Thu, 16 Apr 2026 11:57:27 -0700 (PDT)
+Received: from localhost ([2a03:2880:12ff:72::])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7dc90a35c85sm504737a34.3.2026.04.16.11.57.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Apr 2026 11:57:26 -0700 (PDT)
+        Thu, 16 Apr 2026 11:57:27 -0700 (PDT)
 From: Stanislav Fomichev <sdf.kernel@gmail.com>
 X-Google-Original-From: Stanislav Fomichev <sdf@fomichev.me>
 To: netdev@vger.kernel.org
@@ -82,10 +82,10 @@ Cc: davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Subject: [PATCH net v8 13/15] net: warn ops-locked drivers still using ndo_set_rx_mode
-Date: Thu, 16 Apr 2026 11:57:10 -0700
-Message-ID: <20260416185712.2155425-14-sdf@fomichev.me>
+	Breno Leitao <leitao@debian.org>
+Subject: [PATCH net v8 14/15] selftests: net: add team_bridge_macvlan rx_mode test
+Date: Thu, 16 Apr 2026 11:57:11 -0700
+Message-ID: <20260416185712.2155425-15-sdf@fomichev.me>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260416185712.2155425-1-sdf@fomichev.me>
 References: <20260416185712.2155425-1-sdf@fomichev.me>
@@ -101,19 +101,19 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279129-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-279130-lists,netdev=lfdr.de];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	TO_DN_SOME(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	RCPT_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[sdfkernel@gmail.com,netdev@vger.kernel.org];
@@ -121,60 +121,100 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.999];
+	NEURAL_HAM(-0.00)[-0.998];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email,fomichev.me:mid,fomichev.me:email]
-X-Rspamd-Queue-Id: 7D64C413F04
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,fomichev.me:mid,fomichev.me:email]
+X-Rspamd-Queue-Id: 4298F413EAF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Now that all in-tree ops-locked drivers have been converted to
-ndo_set_rx_mode_async, add a warning in register_netdevice to catch
-any remaining or newly added drivers that use ndo_set_rx_mode with
-ops locking. This ensures future driver authors are guided toward
-the async path.
+Add a test that exercises the ndo_change_rx_flags path through a
+macvlan -> bridge -> team -> dummy stack. This triggers dev_uc_add
+under addr_list_lock which flips promiscuity on the lower device.
+With the new work queue approach, this must not deadlock.
 
-Also route ops-locked devices through netdev_rx_mode_work even if they
-lack rx_mode NDOs, to ensure netdev_ops_assert_locked() does not fire
-on the legacy path where only RTNL is held.
-
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Link: https://lore.kernel.org/netdev/20260214033859.43857-1-jiayuan.chen@linux.dev/
+Reviewed-by: Breno Leitao <leitao@debian.org>
 Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
 ---
- net/core/dev.c            | 5 +++++
- net/core/dev_addr_lists.c | 3 ++-
- 2 files changed, 7 insertions(+), 1 deletion(-)
+ tools/testing/selftests/net/config       |  1 +
+ tools/testing/selftests/net/rtnetlink.sh | 44 ++++++++++++++++++++++++
+ 2 files changed, 45 insertions(+)
 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 8a69aed56fca..d426c1beeb76 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -11360,6 +11360,11 @@ int register_netdevice(struct net_device *dev)
- 		goto err_uninit;
- 	}
+diff --git a/tools/testing/selftests/net/config b/tools/testing/selftests/net/config
+index 2a390cae41bf..94d722770420 100644
+--- a/tools/testing/selftests/net/config
++++ b/tools/testing/selftests/net/config
+@@ -101,6 +101,7 @@ CONFIG_NET_SCH_HTB=m
+ CONFIG_NET_SCH_INGRESS=m
+ CONFIG_NET_SCH_NETEM=y
+ CONFIG_NET_SCH_PRIO=m
++CONFIG_NET_TEAM=y
+ CONFIG_NET_VRF=y
+ CONFIG_NF_CONNTRACK=m
+ CONFIG_NF_CONNTRACK_OVS=y
+diff --git a/tools/testing/selftests/net/rtnetlink.sh b/tools/testing/selftests/net/rtnetlink.sh
+index 5a5ff88321d5..c499953d4885 100755
+--- a/tools/testing/selftests/net/rtnetlink.sh
++++ b/tools/testing/selftests/net/rtnetlink.sh
+@@ -23,6 +23,7 @@ ALL_TESTS="
+ 	kci_test_encap
+ 	kci_test_macsec
+ 	kci_test_macsec_vlan
++	kci_test_team_bridge_macvlan
+ 	kci_test_ipsec
+ 	kci_test_ipsec_offload
+ 	kci_test_fdb_get
+@@ -636,6 +637,49 @@ kci_test_macsec_vlan()
+ 	end_test "PASS: macsec_vlan"
+ }
  
-+	if (netdev_need_ops_lock(dev) &&
-+	    dev->netdev_ops->ndo_set_rx_mode &&
-+	    !dev->netdev_ops->ndo_set_rx_mode_async)
-+		netdev_WARN(dev, "ops-locked drivers should use ndo_set_rx_mode_async\n");
++# Test ndo_change_rx_flags call from dev_uc_add under addr_list_lock spinlock.
++# When we are flipping the promisc, make sure it runs on the work queue.
++#
++# https://lore.kernel.org/netdev/20260214033859.43857-1-jiayuan.chen@linux.dev/
++# With (more conventional) macvlan instead of macsec.
++# macvlan -> bridge -> team -> dummy
++kci_test_team_bridge_macvlan()
++{
++	local vlan="test_macv1"
++	local bridge="test_br1"
++	local team="test_team1"
++	local dummy="test_dummy1"
++	local ret=0
 +
- 	ret = netdev_do_alloc_pcpu_stats(dev);
- 	if (ret)
- 		goto err_uninit;
-diff --git a/net/core/dev_addr_lists.c b/net/core/dev_addr_lists.c
-index 4c9e8a69493f..d73fcb0c6785 100644
---- a/net/core/dev_addr_lists.c
-+++ b/net/core/dev_addr_lists.c
-@@ -1370,7 +1370,8 @@ void __dev_set_rx_mode(struct net_device *dev)
- 	if (!netif_device_present(dev))
- 		return;
- 
--	if (ops->ndo_set_rx_mode_async || ops->ndo_change_rx_flags) {
-+	if (ops->ndo_set_rx_mode_async || ops->ndo_change_rx_flags ||
-+	    netdev_need_ops_lock(dev)) {
- 		netif_rx_mode_queue(dev);
- 		return;
- 	}
++	run_cmd ip link add $team type team
++	if [ $ret -ne 0 ]; then
++		end_test "SKIP: team_bridge_macvlan: can't add team interface"
++		return $ksft_skip
++	fi
++
++	run_cmd ip link add $dummy type dummy
++	run_cmd ip link set $dummy master $team
++	run_cmd ip link set $team up
++	run_cmd ip link add $bridge type bridge vlan_filtering 1
++	run_cmd ip link set $bridge up
++	run_cmd ip link set $team master $bridge
++	run_cmd ip link add link $bridge name $vlan \
++		address 00:aa:bb:cc:dd:ee type macvlan mode bridge
++	run_cmd ip link set $vlan up
++
++	run_cmd ip link del $vlan
++	run_cmd ip link del $bridge
++	run_cmd ip link del $team
++	run_cmd ip link del $dummy
++
++	if [ $ret -ne 0 ]; then
++		end_test "FAIL: team_bridge_macvlan"
++		return 1
++	fi
++
++	end_test "PASS: team_bridge_macvlan"
++}
++
+ #-------------------------------------------------------------------
+ # Example commands
+ #   ip x s add proto esp src 14.0.0.52 dst 14.0.0.70 \
 -- 
 2.52.0
 
