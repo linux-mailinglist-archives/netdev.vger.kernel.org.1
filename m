@@ -1,294 +1,171 @@
-Return-Path: <netdev+bounces-279073-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279074-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iNK9Mgb34GmInwAAu9opvQ
-	(envelope-from <netdev+bounces-279073-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 16:49:42 +0200
+	id sH6sC0L34GnZnwAAu9opvQ
+	(envelope-from <netdev+bounces-279074-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 16:50:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80CCE40FCBF
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 16:49:42 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E9A840FD0F
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 16:50:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 9CB223034587
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 14:49:41 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 7ACE0300622E
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 14:50:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E20E3E1CEF;
-	Thu, 16 Apr 2026 14:49:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 397823BAD89;
+	Thu, 16 Apr 2026 14:50:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Lo0S5bUs"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YNVNWIJl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-vs1-f54.google.com (mail-vs1-f54.google.com [209.85.217.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 909D43E0258
-	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 14:49:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776350980; cv=none; b=guoPbDGs9lFdMIhFKYPgPvlGbMnZRGK2h0GON5tx8R2ZplJCBG/C+qEem2O/bpQS7a5j0NeDHZxZM2StDthKmRagASWimgp8FWdiJFM4RAf7eTltxzAu6t4lMDmDP12DdtlKENa1typoefGiDNriaZWx1+TjhERS2xV8C7mOKKo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776350980; c=relaxed/simple;
-	bh=qWFuADgouw7Y28f8Ks2Rqs0pWL1FBVPTXx/dspPKr4g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kpeP8qWV6QU0CDV/A6nGoIYFMAuMhqP1V1iYphjY39vjNvSmIS9PscuWFHY8WcheyLFDHriqbBydAgWdcrlKtUZdrA5o0Tei8+zZFMx0AxJFlYfJNXjRRThE9ZgeA0udLjMaquG8Vk4PNGGftfr88RDg02QzZRsh00FVXTgZkCU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Lo0S5bUs; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-488ad135063so78310895e9.0
-        for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 07:49:37 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E93CA2750ED
+	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 14:50:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.217.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776351024; cv=pass; b=emkt6zShCyTntgm6KHQtBSLTfKJHFTj6lH+d9HZNIMhV8Y2kexHl0BrEUbwWKTknJhD9FWI+NxfZWpng9za03r0yn0WGKxYcgmyf1umq0/1iSWu0ADwFUXS94PjwSYrTcKvdVKprC/F2pi3M0AgpXOFMyZxy3sfDKOyxNmAZG20=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776351024; c=relaxed/simple;
+	bh=fg6ea/cTyU3kXAWhy5uORHT0C9/0VDP8VOBhB1dTXh4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rH7+h/atvtCgwqRnnXEtlAT2LCVC8nJRzTdC0GLGJ3Z8e4Sjf9nBAF3NlDdjc4sCwGrIUpzH9Gx0fhYJNOLdG11rDKOBGJqQgwv3Rf0uhx4dXqlkgJ6QODWgYKLmcI0fNXc/MODFI3T0f0TOQOh2Eii1FdWvWiAUx1B5LTtjXsw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YNVNWIJl; arc=pass smtp.client-ip=209.85.217.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vs1-f54.google.com with SMTP id ada2fe7eead31-60fce51aa55so1431371137.3
+        for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 07:50:22 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776351022; cv=none;
+        d=google.com; s=arc-20240605;
+        b=OQgPjwXKGMuCpi+6kKX1arZ19NCSC/UATMa0lAoSQfrQOnuabhMcMIMWwMYGHU+AW0
+         wrry+fUCIxvfdYLPSRs+4MSbdnB9Vw/pe/3fjDDQ3E7CzFGUw0X9axqARpc9QKdZ7Tdt
+         eVE5XIKpnbyMHcdsTjigc756NzMtcClUmRAbxAvofQ/rBNpw0E7YEv7WWu/8Uc0PN9q2
+         ydnT6D7OO/THgCaQ1DNFE9XDgpsDLvoxmIK9HkLIFYTF34p+w4lsiW0gQOZ5VR/TNd+0
+         bM4/Rn1aA93pYqtYlqMkQiTR2ENzkbNLZy6SsOGGEDmrD3zEubY+DizqROwcGhd4Q/OO
+         3sig==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=fg6ea/cTyU3kXAWhy5uORHT0C9/0VDP8VOBhB1dTXh4=;
+        fh=b3bTXQB2IE16fQ7hBKFchkrZfYYt50w0humVHDHmII8=;
+        b=Y9RD2Eui2ezacBDWZp/AK6sTAKmmAqFTvO2d0QR12Utr7xAW+GJ9OrkJD1MYmb9xAL
+         J4TlHEwEifnnEROob84+wofLC4c3L/Zhxg5jn4rWuCIToU9omukG6x0tf/XPwYKU97Ya
+         UC/6lP9fGgbHF/5wVJGiLUgMBjCGLLC1pkXYndEk66ce4SKJP2PSA6Wa/fpjkoX1/ENZ
+         nv0QnU2iNw9VvM3WbUV5gbpa9WpjwJogqyYWtXrhSMoZM3OIkcsLunapQwih9tMCYaB8
+         gFdopzXtqDXnc7xwpFEJYGLnnqQtQFqD7q7s0J+Pu5dJ+s8BO+SwzoM1kOAo7AXy3LdR
+         l35Q==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1776350976; x=1776955776; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tXwMjFpu/xE0paqzhDs94eqBbHdGY9DRyzE65FFhgNk=;
-        b=Lo0S5bUsorsa2EhvKSEGUWW7+50RKG/1eB+lWtByeYAXgBOBBMOXr6Bfc85/ah8XG5
-         hpjjV9Amogif+o5ANdx/MhPZBlvaXZQLm/sjsWiuax7JXjKs75B6kjIQy7yVOdAliXHE
-         SG2gE5C2VUr3due1blQsoQ6RhJ/sm3RfpSEW0kJiAVQwpYaJyDKpB0W7G0LrmIH32Y9q
-         Cm2jDTxYgMMHxXqL1xvch7hp5HlqL4LT0w1sOuDAOlQL0ygybgABc1A2oEMBR7T55eou
-         +KlNH6iN+L28qcJSd+J0AuHrmCCs30UFG7C1bWDBkPKiEBcKOzz1gn35RIw/FN+gvNsv
-         5cGA==
+        d=gmail.com; s=20251104; t=1776351022; x=1776955822; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=fg6ea/cTyU3kXAWhy5uORHT0C9/0VDP8VOBhB1dTXh4=;
+        b=YNVNWIJlOeGYZCxnDZ77DH+4U8WE0NKShV9yueLwjKjIzRrgJGDe2uDFSURn1It9TG
+         0Hp9Msil1B6m2VNNRVgKkVWGnS4ZaVMM9kNAD2fmw07Av1TeXa6hZKRHLmdzK5rsQJyr
+         5DeThEt889EVoKKfVRjm2Q8DWeiTcqo18cWRGd/rzYhbO3eqIGT0zYwqi6JiaF5hxZYS
+         33yQiAPNDYZpMU2UKvZlSo/lYq6D9zN02U0I3eaQbTxVl7rxvohCOyD6o0gE7S5ABx4K
+         jHIQkbh4qwDaLhg4ChLJpU+O1EI9SOyjKyTnFUzZvJBoaI8rNon/4HFgUI/MaDIFt3Im
+         /kJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776350976; x=1776955776;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tXwMjFpu/xE0paqzhDs94eqBbHdGY9DRyzE65FFhgNk=;
-        b=A2oGODF7F1HUg0eTz3g7G75MsDzQsD34sL/Q2hQXOGeNYa493CxETq4eocBmz4Fqy+
-         /Wb869Z62TVw0p+ClBC/ErAEQVnfP34PSWYBlOD3y2HwUxQj5du+0TfAl093syNXNXZV
-         cHD9RiNgNVsxq7kPYTr6vf29rbcVIbrczTfWI9q9oJHzeLYKsDITeaoHvZrgaMzES0Vh
-         KxxF56DkkzkwiooFFTDCfCZwYedF+H5pM6sx42HPOeABZkDZNHhHGzb+sg+9tbX+mmTU
-         OpQbByS+RBXyAGotQYi6n4FpeDdjZEt+R08IXJ/NHZH+toHXsaao+0v86gkOCr3pa2PM
-         W3PA==
-X-Forwarded-Encrypted: i=1; AFNElJ+r4gM6joRm4jEETu1gdrFdzeu+nOLl3d54mqUYUaqhpsuTS0XTP6DLPNRza4BNFE11E0Gngik=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwVtj15ryRLGl93DnsPxKvP5cLu+0DeantYb6xRYMBkjF7ALzIW
-	HIFdyDO+WfQfedl7to7Nww3B7yoIX8IHaSqWz64t7oxNeiRc4gEnqEtOVlhGWOTI0Zo=
-X-Gm-Gg: AeBDietgG2i3aQcAaoxwwD9VrwrTkuWkIH+kgidIhXCvtgTVM61Uad8JwA+aNWDDcEC
-	Gbz+ff890RcWbOwvhBWO/xxuwdr6JwGKDH5cLGv/Mg1fTsLMB4M2KB5r45fmld9GPkNiyEofw5y
-	fAEfp2ZZ3oRGmBQf1qX/eseCXtIDNzJkc6eNJER5HtNqi2Qb9UnUeFsHuhGHDcHIV9xRgGzJrpV
-	86BWO8AephglVDmUNPaB8sHgBeCujnqnE2gNNr2FgFGcB6JI96OB7cbcyWGvOJpLhSEN/nrYl+t
-	Ch3tK0Td8fkbVioedutvwmA67V+jwlRpc4T3hPhbihLT9CdcGbyePv+0JVZVLkyOa4P1t7/qMF7
-	r8lhbGNhxDecvvBxayjVRWfJA6kp+GCC55gn4YAsgeL3wNUmuP53KpZV1UaiB4gX4AeWcO/bYJc
-	K74H5ixLuIl3tShKsz5kjRjo4ytOXe53Iwvubi
-X-Received: by 2002:a05:600c:8904:b0:487:1c2:6a56 with SMTP id 5b1f17b1804b1-488d67ec89amr276975035e9.3.1776350975981;
-        Thu, 16 Apr 2026 07:49:35 -0700 (PDT)
-Received: from pathway.suse.cz ([176.114.240.130])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488f5818e51sm95699055e9.5.2026.04.16.07.49.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Apr 2026 07:49:35 -0700 (PDT)
-Date: Thu, 16 Apr 2026 16:49:32 +0200
-From: Petr Mladek <pmladek@suse.com>
-To: Petr Pavlu <petr.pavlu@suse.com>
-Cc: Song Chen <chensong_2000@189.cn>, rafael@kernel.org, lenb@kernel.org,
-	mturquette@baylibre.com, sboyd@kernel.org, viresh.kumar@linaro.org,
-	agk@redhat.com, snitzer@kernel.org, mpatocka@redhat.com,
-	bmarzins@redhat.com, song@kernel.org, yukuai@fnnas.com,
-	linan122@huawei.com, jason.wessel@windriver.com, danielt@kernel.org,
-	dianders@chromium.org, horms@kernel.org, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	paulmck@kernel.org, frederic@kernel.org, mcgrof@kernel.org,
-	da.gomez@kernel.org, samitolvanen@google.com, atomlin@atomlin.com,
-	jpoimboe@kernel.org, jikos@kernel.org, mbenes@suse.cz,
-	joe.lawrence@redhat.com, rostedt@goodmis.org, mhiramat@kernel.org,
-	mark.rutland@arm.com, mathieu.desnoyers@efficios.com,
-	linux-modules@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org, linux-acpi@vger.kernel.org,
-	linux-clk@vger.kernel.org, linux-pm@vger.kernel.org,
-	live-patching@vger.kernel.org, dm-devel@lists.linux.dev,
-	linux-raid@vger.kernel.org, kgdb-bugreport@lists.sourceforge.net,
-	netdev@vger.kernel.org
-Subject: Re: [RFC PATCH 2/2] kernel/module: Decouple klp and ftrace from
- load_module
-Message-ID: <aeD2_FrFL6E3dbAC@pathway.suse.cz>
-References: <20260413080701.180976-1-chensong_2000@189.cn>
- <1191caf5-6a61-4622-a15e-854d3701f4fc@suse.com>
- <a35f5f94-7d5a-4347-974b-b270c89ef241@189.cn>
- <1db425bf-58a9-4768-8c38-3ae25d7662a5@suse.com>
+        d=1e100.net; s=20251104; t=1776351022; x=1776955822;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fg6ea/cTyU3kXAWhy5uORHT0C9/0VDP8VOBhB1dTXh4=;
+        b=SO0eVc8zGlUdagA+zW1+VIPQvLD2wf/gjwm+jxsSkrrRLoL/YeEUtl57B5wUsYRHas
+         9FuKUVi4sKrGZiNjQLpo/tEeEJ5I+VYYKKVz2bA5Ay2xj7l85OEpSbcTsJcz2RtY7lmj
+         8DOMmylKjyhP0WgdDpxkh1iWxdIUmJTtxsaYtW37ab1kFj72+AOagFzaMKcVf+7zojow
+         MEmCH+//m1CYMFeImM1Pf4/S28Z42e2nSXMtIeAcfq1abqkoQLBFdUgtn5I8GlZr5GfP
+         cHUQ1NzLmRQ5k7ak662nbFqmC+piVXZysocPS9uqzbrcAE2102afZIFp7tu/bkdziErz
+         ga4w==
+X-Gm-Message-State: AOJu0Yw5Qrd/WWOfvOCh34CaE4+UgTnCbNvOJW3uviaz+SUPt+TrPPWu
+	KESAXflLw4V+L3LCSRyzKLDCkomzYT+v4S4qhMyo+r8N6ez2EV+LzbnCJI6UylYlYornn3yjBuT
+	oCmLcs5fb+3KmgYKp6IVcYY+uyGUYtzc=
+X-Gm-Gg: AeBDies6PYlTcOgIMKbkXFdDWUlQ3PwcgN42YQfe29h3DxXiJBfrYR+ZDdXip8Jo8Mh
+	ZJ0tbKfl+BBXj72lMHHWLHINOxnA66hTxhZ0RyuQwT7YfInfka3Sqlb/AWdBbIGy9BfFjhgS1ZU
+	zco4oGnuv61yWerrjgvM/jwJpKnacADnZvO87CGLYMa9nbOzjWrRSaWhtZUZZP3pOz/krkvvvVh
+	nIEiorkUSbhAU/W62i1EAxosvTKci34XbCbc6IJl+IjYq4VLOtHf/Mi0EXzrzfUYugU32z4dMTb
+	PX9Avh31gEGLStV8eITebVAtFlZUPMHr2yvXTg==
+X-Received: by 2002:a05:6102:8555:20b0:60f:c9ba:b999 with SMTP id
+ ada2fe7eead31-60fc9badaebmr5674668137.21.1776351021341; Thu, 16 Apr 2026
+ 07:50:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1db425bf-58a9-4768-8c38-3ae25d7662a5@suse.com>
+References: <20260414071322.30851-1-shuvampandey1@gmail.com> <20260416125029.851168-2-horms@kernel.org>
+In-Reply-To: <20260416125029.851168-2-horms@kernel.org>
+From: Shuvam Pandey <shuvampandey1@gmail.com>
+Date: Thu, 16 Apr 2026 20:35:10 +0545
+X-Gm-Features: AQROBzD5-qJVtSAuUoc2qU7aEWEuYGtgrjxEcQ85ta_cQmevCyPzvkSJyxBLIgY
+Message-ID: <CANAAWHJg7z0_ZtP97Fzb6XKRYUCR6EnEbymu9_WFyYEXmaPcXg@mail.gmail.com>
+Subject: Re: [PATCH] mISDN: socket: drop device references acquired by get_mdevice()
+To: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-279073-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[189.cn,kernel.org,baylibre.com,linaro.org,redhat.com,fnnas.com,huawei.com,windriver.com,chromium.org,davemloft.net,google.com,atomlin.com,suse.cz,goodmis.org,arm.com,efficios.com,vger.kernel.org,lists.linux.dev,lists.sourceforge.net];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-279074-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[47];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[suse.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pmladek@suse.com,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:dkim,pathway.suse.cz:mid]
-X-Rspamd-Queue-Id: 80CCE40FCBF
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_THREE(0.00)[3];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[shuvampandey1@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 1E9A840FD0F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu 2026-04-16 13:18:30, Petr Pavlu wrote:
-> On 4/15/26 8:43 AM, Song Chen wrote:
-> > On 4/14/26 22:33, Petr Pavlu wrote:
-> >> On 4/13/26 10:07 AM, chensong_2000@189.cn wrote:
-> >>> diff --git a/include/linux/module.h b/include/linux/module.h
-> >>> index 14f391b186c6..0bdd56f9defd 100644
-> >>> --- a/include/linux/module.h
-> >>> +++ b/include/linux/module.h
-> >>> @@ -308,6 +308,14 @@ enum module_state {
-> >>>       MODULE_STATE_COMING,    /* Full formed, running module_init. */
-> >>>       MODULE_STATE_GOING,    /* Going away. */
-> >>>       MODULE_STATE_UNFORMED,    /* Still setting it up. */
-> >>> +    MODULE_STATE_FORMED,
-> >>
-> >> I don't see a reason to add a new module state. Why is it necessary and
-> >> how does it fit with the existing states?
-> >>
-> > because once notifier fails in state MODULE_STATE_UNFORMED (now only ftrace has someting to do in this state), notifier chain will roll back by calling blocking_notifier_call_chain_robust, i'm afraid MODULE_STATE_GOING is going to jeopardise the notifers which don't handle it appropriately, like:
-> > 
-> > case MODULE_STATE_COMING:
-> >      kmalloc();
-> > case MODULE_STATE_GOING:
-> >      kfree();
-> 
-> My understanding is that the current module "state machine" operates as
-> follows. Transitions marked with an asterisk (*) are announced via the
-> module notifier.
-> 
-> ---> UNFORMED --*> COMING --*> LIVE --*> GOING -.
->         ^            |                     ^    |
->         |            '---------------------*    |
->         '---------------------------------------'
-> 
-> The new code aims to replace the current ftrace_module_init() call in
-> load_module(). To achieve this, it adds a notification for the UNFORMED
-> state (only when loading a module) and introduces a new FORMED state for
-> rollback. FORMED is purely a fake state because it never appears in
-> module::state. The new structure is as follows:
-> 
->         ,--*> (FORMED)
->         |
-> --*> UNFORMED --*> COMING --*> LIVE --*> GOING -.
->         ^            |                     ^    |
->         |            '---------------------*    |
->         '---------------------------------------'
-> 
-> I'm afraid this is quite complex and inconsistent. Unless it can be kept
-> simple, we would be just replacing one special handling with a different
-> complexity, which is not worth it.
+> Could this introduce a use-after-free regression if the underlying
+> hardware is removed before the socket is closed?
+>
+> [...]
+>
+> This isn't a regression, but is there a use-after-free in the stack
+> teardown when the hardware is removed?
 
-> >>
-> >>> +    if (err)
-> >>> +        goto ddebug_cleanup;
-> >>>         /* Finally it's fully formed, ready to start executing. */
-> >>>       err = complete_formation(mod, info);
-> >>> -    if (err)
-> >>> +    if (err) {
-> >>> +        blocking_notifier_call_chain_reverse(&module_notify_list,
-> >>> +                MODULE_STATE_FORMED, mod);
-> >>>           goto ddebug_cleanup;
-> >>> +    }
-> >>>   -    err = prepare_coming_module(mod);
-> >>> +    err = prepare_module_state_transaction(mod,
-> >>> +                MODULE_STATE_COMING, MODULE_STATE_GOING);
-> >>>       if (err)
-> >>>           goto bug_cleanup;
-> >>>   @@ -3522,7 +3519,6 @@ static int load_module(struct load_info *info, const char __user *uargs,
-> >>>       destroy_params(mod->kp, mod->num_kp);
-> >>>       blocking_notifier_call_chain(&module_notify_list,
-> >>>                        MODULE_STATE_GOING, mod);
-> >>
-> >> My understanding is that all notifier chains for MODULE_STATE_GOING
-> >> should be reversed.
-> > yes, all, from lowest priority notifier to highest.
-> > I will resend patch 1 which was failed due to my proxy setting.
-> 
-> What I meant here is that the call:
-> 
-> blocking_notifier_call_chain(&module_notify_list, MODULE_STATE_GOING, mod);
-> 
-> should be replaced with:
-> 
-> blocking_notifier_call_chain_reverse(&module_notify_list, MODULE_STATE_GOING, mod);
-> 
-> > 
-> >>
-> >>> -    klp_module_going(mod);
-> >>>    bug_cleanup:
-> >>>       mod->state = MODULE_STATE_GOING;
-> >>>       /* module_bug_cleanup needs module_mutex protection */
-> >>
-> >> The patch removes the klp_module_going() cleanup call in load_module().
-> >> Similarly, the ftrace_release_mod() call under the ddebug_cleanup label
-> >> should be removed and appropriately replaced with a cleanup via
-> >> a notifier.
-> >>
-> >     err = prepare_module_state_transaction(mod,
-> >                 MODULE_STATE_UNFORMED, MODULE_STATE_FORMED);
-> >     if (err)
-> >         goto ddebug_cleanup;
-> > 
-> > ftrace will be cleanup in blocking_notifier_call_chain_robust rolling back.
-> > 
-> >     err = prepare_module_state_transaction(mod,
-> >                 MODULE_STATE_COMING, MODULE_STATE_GOING);
-> > 
-> > each notifier including ftrace and klp will be cleanup in blocking_notifier_call_chain_robust rolling back.
-> > 
-> > if all notifiers are successful in MODULE_STATE_COMING, they all will be clean up in
-> >  coming_cleanup:
-> >     mod->state = MODULE_STATE_GOING;
-> >     destroy_params(mod->kp, mod->num_kp);
-> >     blocking_notifier_call_chain(&module_notify_list,
-> >                      MODULE_STATE_GOING, mod);
-> > 
-> > if  something wrong underneath.
-> 
-> My point is that the patch leaves a call to ftrace_release_mod() in
-> load_module(), which I expected to be handled via a notifier.
+Thanks for the review.
 
-I think that I have got it. The ftrace code needs two notifiers when
-the module is being loaded and two when it is going.
+Looking at it more closely, I agree the close-path part of this patch is
+not safe as posted.
 
-This is why Sond added the new state. But I think that we would
-need two new states to call:
+While get_mdevice() does return a referenced device, the sockets also
+keep raw mISDNdevice / mISDNstack pointers across bind, and
+mISDN_unregister_device() tears the stack down while those pointers can
+still be reached later from socket release. In addition, several mISDN
+drivers free the enclosing allocation immediately after
+mISDN_unregister_device() returns, so adding put_device() in the socket
+release paths can turn this into a close-time UAF. The delete_channel()
+/ ch->st case on the data-socket side is the same underlying lifetime
+problem.
 
-    + ftrace_module_init() in MODULE_STATE_UNFORMED
-    + ftrace_module_enable() in MODULE_STATE_FORMED
+I'll drop this version and revisit it after reworking the unregister /
+socket lifetime handling first. I also want to re-check whether the
+temporary get_mdevice() lookup references should be fixed separately or
+only once that lifetime side is addressed.
 
-and
-
-    + ftrace_free_mem() in MODULE_STATE_PRE_GOING
-    + ftrace_free_mem() in MODULE_STATE_GOING
-
-
-By using the ascii art:
-
- -*> UNFORMED -*> FORMED -> COMING -*> LIVE -*> PRE_GOING -*> GOING -.
-              |          |         |                ^           ^    ^
-              |          |         '----------------'           |    |
-              |          '--------------------------------------'    |
-              '------------------------------------------------------'
-
-
-But I think that this is not worth it.
-
-Best Regards,
-Petr
+Thanks,
+Shuvam
 
