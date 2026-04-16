@@ -1,127 +1,244 @@
-Return-Path: <netdev+bounces-279077-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279078-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QKx+MGX74GlloAAAu9opvQ
-	(envelope-from <netdev+bounces-279077-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 17:08:21 +0200
+	id 0OfeNiH/4GkSoQAAu9opvQ
+	(envelope-from <netdev+bounces-279078-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 17:24:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5990141041D
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 17:08:21 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id D29D3410A4F
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 17:24:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id B0E47307C744
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 15:06:28 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id ACCD130060AE
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 15:24:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C1E73BD64D;
-	Thu, 16 Apr 2026 15:06:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AD3C379EF6;
+	Thu, 16 Apr 2026 15:24:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b="UjoO77VF"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b="FRXbDfQR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.nabladev.com (mx.nabladev.com [178.251.229.89])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94D46390C90;
-	Thu, 16 Apr 2026 15:06:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.251.229.89
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776351962; cv=none; b=oYyxGTdmRQpUL+iENhY075f+mBTJIVNsqLCJQndtwiAXZSLSUjitT10dv6HHRuHeteZ+JDbr9wfCWC5NIpNuKHXSngNo31FfIgQEQiAO8Rtvw0l/XY8ozFs6wMmFVYdS3VVanmVyugO8f5sRMv11TiLX3Xtz5vZEURQnXCXMZVk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776351962; c=relaxed/simple;
-	bh=RYjBsaCX5FGRMbHo2IU+rN/Vf34PxfelZn5maBghzhY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ILKuvvYD4jYs6qdndTwtptoCmuZ3ePlRK1FI8WsQ3SYWSc9+IKowDMdoxY6zNghd3cbeCR+1FExroc+QqHYIgCL7+OmzOVjZAP6mvMUMiOpEOa+y9lBqu6Jn19h/2OZ7LFt+H9VlsL2Um54kUFOmBCQJhWnqC8o1v40ENy6ukA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com; spf=pass smtp.mailfrom=nabladev.com; dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b=UjoO77VF; arc=none smtp.client-ip=178.251.229.89
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nabladev.com
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 1C318112C78;
-	Thu, 16 Apr 2026 17:05:54 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nabladev.com;
-	s=dkim; t=1776351957;
-	h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=YLtivqoKoPv08JBjkQ13scRaWTkbK1xbtNELG4btNs8=;
-	b=UjoO77VF0Z0XwLHzPsMx4AsQSRsEJwdWuNep1KvB37f0l3lKmiRvxHWpspKCx6gV/wcl1B
-	POZIp2OMm0G/G9hBn7wP+Ze48cBEwrtnUkgE4UiHFX+c+QTspDN6W5DMBYPFDwv9+CCjhB
-	QaOw/xQDUFYRGpjvBbHImt5VGzOeVRCpt2hIuzPNw7X9WzRrOfohElREWYNxmCv9A4QVXd
-	pt1u4HfrHyt0TyHssD5TmebKGkUEAvH/ooNvN3c0YrHNSS5EseoeXwhNW/ikOgwCt7HH4k
-	2KB3YgagFWmIHGU7brHhdTisH+jsyfgLAztuNlOq+gMwnJkHFIzIzApEBiqFaA==
-Message-ID: <22518939-c1ef-46ba-943d-256e135f74ca@nabladev.com>
-Date: Thu, 16 Apr 2026 17:05:54 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACF77264614
+	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 15:24:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.170
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776353044; cv=pass; b=EB4TiZkzoksYETK/5tBpml+qhzI3sgNh/RTOuSOVp1SAHfpVcHUsIJYADT31ic+KdcQV77N9Fggtyw3Q2Rr76Af0DevBUWn8MtIw70WcnayH+kF2nL562i1bgzqtx5KMvfmHqeGQ5s5sJzTebHWKCW01tPmR6D3snRwfPZ503AA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776353044; c=relaxed/simple;
+	bh=U52NaOQKzIQpvFnuwyftfzqzX7X55EDlwl+M7r6fR9Y=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=aBdtvYd8pRW2POC7MzeUu2wBTKmQiuk/OvAbRxNrdMi437leaMzpyb0i3NG1aFdbji0e9kJZOwvdBotJZtLBKZU24NRpnTIRXhoPwJWpNiJnni+m7jHKgpBskeuPY0peRkivS6u7AHrIu/OHldBy0ySDOOYAVALAw9Oa0pio1fY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b=FRXbDfQR; arc=pass smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-82f206f2b54so2340383b3a.0
+        for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 08:24:02 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776353042; cv=none;
+        d=google.com; s=arc-20240605;
+        b=dqfup4QPUoeZw8bomSQlttVOI9/RT9d7db0XdHla1ibnZLNXsifxVCtH3/Wh+WCbBm
+         uQbQU+AGQXa91gqmFow7gjjXTSgJbfovOWIL2aqCxoCECMy511CjlbXOxAZEjtyDmCgW
+         tv2sbg+p+k/mM5EpzO9ZTbIGDeQH59TFJ3EtsQIUA2aGDW/hH7/HjPscDfhcW8gwmwi8
+         gCJ4XtpBfvBXAEfxGXLMNv1t8mN39bjvdf3gJEWt2N1CstWPOfasrbLbNbatAKYk8VOG
+         +ZB5SzqHByPvZtt2XowjV/VTTR6+vhd4OCVrVTO8RWcvXNzY1cIvJml6KrxY8E/6zRZt
+         y+sQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=QlmMSGcub4gRsEzR0kt1jLplgPMUnhz1kWFWpi1RFSY=;
+        fh=XN4St5FOnN+qK+EsHAwCJvkqcZ8mi3HjwNzoCXsbOy0=;
+        b=EkD5t4SKVmmG7laV1Z4ROSBELfoP8InigME2/SzUMTJa9UMhvvZQKweRvOfjPlBGFg
+         a1AxkRCHwjS6oik338ZBEjEXQlJjuGcFkuNKaBaMHqJ5BU9CtQrkUmAF48N4KtktjoKJ
+         lRl4no7Umj8vHjoGW32wD9G68Py/vOewaK368Oqm/9op97Jnmn7vSKyDwQ7T5KbXxYQ7
+         wB2YWIR6v7e7bWgRg0xcHQk9kd5qRIT34NozI0QZoleRuwaEnw8YYo6GaGxxeJ8sPU2v
+         Zd88NRMm+QPE137DteSEGqo47qS+vhBOcF66rooK1/SKd9K3noEog14rXEK9LZuccs9i
+         zijA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20251104.gappssmtp.com; s=20251104; t=1776353042; x=1776957842; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QlmMSGcub4gRsEzR0kt1jLplgPMUnhz1kWFWpi1RFSY=;
+        b=FRXbDfQR4/wEb9GWbj/EPWHqSU0Jq7Mr005bPjf7wUGDDsFG/cqPkoriQR9ADXrSzq
+         gD/Y30SCtYqdxymiv0vX0FSvZZ1U/4/smpsEAvXjQWeLeDInPYW5/XanPp6FHhi9B37L
+         pxwgfZhLQsLc1hsm7KdV9gqqrHVy5As3MP1+zBtuwp+G0DcomYexE173sQZ95K4fbGWs
+         T7EOcGqtWgUMldjL1sdE7h7JGHEWqu21DEhbh4DipEEyx/6ZbFj44To4h/d8Up5w9j46
+         /taRI2lTNZ11JiC4F5O0DB7sqo34+XvWbqrF33FAlhyxsbewN6TGlwwauaVzEGLJYDHn
+         w7lA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776353042; x=1776957842;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=QlmMSGcub4gRsEzR0kt1jLplgPMUnhz1kWFWpi1RFSY=;
+        b=s3dtt0AuLNBRs+QDhXwj8a2sCohEPQppY5iqGka/4YQ04So+9FhCoutzxeghuh5GPt
+         QmwAerexlVxm9EwznIE9TffK0vozkZz/rQi3ZPV+KwUMDwh+6RZS9gLDyyjBLU4OcZ8L
+         TQ4wfHyDpTiZGwVo8nQiZdsjgIyzya8GYafmMKJarkaNL+8ebgQwEorhWg8t22KoOcEl
+         GHuwc8yFrxe983d8rvjmYtpcTOYoBk92jhe3/+lEnCJF2qtVUWxkmb0hWvDYPkECpS82
+         HR0zUCzDqqkZajaPyn8Dljpk6mM8jwnv0uyF3kiLjnpZGnSrfOWNZkrB/2SAjjPZzIOn
+         578A==
+X-Forwarded-Encrypted: i=1; AFNElJ89gP4FaZlFD9R3Xj/pWJWQG0doipO7fSHWt22qI0Gb5kb7CmbwHDug01AOj4uN+J7poRtIfZY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwX2G3/pb10AC50FamQgRN/6cRKyuGDbwCNCCJTjImxHJrrAAn2
+	00fsAD84JpZwMxxAPw4DWEGYnMhM8NrkHtemEsnUaa1HLLzIobDrXqD06aqnMefp+BBaChyAUvU
+	kD10YPsfBeUREMaNumM9YoU1A/MCA4Akp54f+vx4H
+X-Gm-Gg: AeBDiesitET+Gabq6P1vN937M2VQmnvwSSYzYQG0rmVxLmc2Mq6+7LQZk6OvoUxRiAC
+	nLVsKoTJ1zKAk99w1+YTGFM1KvfczXFSfQXgHyqSA/b+D6XpT9ADFRo1J9yRhEB6cwhmPVMLf1a
+	Gu7eDXb6pmuHG1cNM59ygiK+TpLC542aFEGPJkyMcWe9M2KpUrXwemLc+tTNsb8E38p/SAureJd
+	DrseQQzERvobpD0tgf0r6p/U8VRjMoITWThIyocuVC/loGbNM9V5INY9LOXvsb+1+YFH3L+rYri
+	tUBlWGfYjRf347jBQMA=
+X-Received: by 2002:a05:6a00:4293:b0:82c:7eb1:4d61 with SMTP id
+ d2e1a72fcca58-82f0c298d87mr26612801b3a.32.1776353041876; Thu, 16 Apr 2026
+ 08:24:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 1/3] net: dsa: microchip: implement KSZ87xx Module 3
- low-loss cable errata
-To: Andrew Lunn <andrew@lunn.ch>, Fidelio LAWSON <lawson.fidelio@gmail.com>
-Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Maxime Chevallier <maxime.chevallier@bootlin.com>,
- Simon Horman <horms@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Fidelio Lawson <fidelio.lawson@exotec.com>
-References: <20260414-ksz87xx_errata_low_loss_connections-v3-0-0e3838ca98c9@exotec.com>
- <20260414-ksz87xx_errata_low_loss_connections-v3-1-0e3838ca98c9@exotec.com>
- <ea90a671-70be-4d89-b842-1e54d687336f@nabladev.com>
- <d9b161dd-f698-4d7e-8ccb-9ec12411bf87@lunn.ch>
- <712cc46a-5ceb-4f0f-88bb-fa0a47002258@nabladev.com>
- <84e24758-2f59-44ca-a9b8-a46094578f83@gmail.com>
- <03040421-89e7-4422-9fb5-0367a34323e4@lunn.ch>
- <bf93f620-1288-46a3-8798-6d70aeb2c7c6@gmail.com>
- <6a8fc2e6-830f-4f57-869b-41efe70557e5@lunn.ch>
-Content-Language: en-US
-From: Marek Vasut <marex@nabladev.com>
-In-Reply-To: <6a8fc2e6-830f-4f57-869b-41efe70557e5@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[nabladev.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[nabladev.com:s=dkim];
+References: <20260413082027.2244884-1-hxzene@gmail.com> <20260415141931.808383-1-horms@kernel.org>
+In-Reply-To: <20260415141931.808383-1-horms@kernel.org>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Thu, 16 Apr 2026 11:23:50 -0400
+X-Gm-Features: AQROBzAoYN_pQSmU0S7wggClue8YCVZcBNFzYwWYioiHKnrRUV89OYXAWAbMKVw
+Message-ID: <CAM0EoMkchMeE8cyycJ7qqKOQz_Y8y7AsdVp1pUUFXa2+NRbviw@mail.gmail.com>
+Subject: Re: [PATCH] net/sched: act_mirred: Fix blockcast recursion bypass
+ leading to stack overflow
+To: Simon Horman <horms@kernel.org>
+Cc: hxzene@gmail.com, jiri@resnulli.us, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, victor@mojatatu.com, 
+	pctammela@mojatatu.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Stephen Hemminger <stephen@networkplumber.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_DKIM_ALLOW(-0.20)[mojatatu-com.20251104.gappssmtp.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-279077-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
 	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[lunn.ch,gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[nabladev.com:+];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[marex@nabladev.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[microchip.com,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com,armlinux.org.uk,vger.kernel.org,exotec.com];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	DMARC_NA(0.00)[mojatatu.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-279078-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[gmail.com,resnulli.us,davemloft.net,google.com,kernel.org,redhat.com,mojatatu.com,vger.kernel.org,networkplumber.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,nabladev.com:dkim,nabladev.com:mid]
-X-Rspamd-Queue-Id: 5990141041D
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[mojatatu-com.20251104.gappssmtp.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: D29D3410A4F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 4/16/26 4:30 PM, Andrew Lunn wrote:
->> With this model, we don’t need to return -EINVAL for combinations or
->> ordering, and userspace does not need detailed error reporting. The
->> tunables behave more like simple setters than a mode switch, which
->> keeps the API predictable and avoids the need for extack or netlink
->> ethtool support at this point.
-> 
-> Sounds good.
-Fine by me too.
+On Wed, Apr 15, 2026 at 10:19=E2=80=AFAM Simon Horman <horms@kernel.org> wr=
+ote:
+>
+> From: 'Simon Horman' <horms@kernel.org>
+>
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+> Full review at: https://sashiko.dev
+> ---
+> net/sched: act_mirred: Fix blockcast recursion bypass leading to stack ov=
+erflow
+>
+> This patch fixes a stack overflow bug where mirred blockcast actions woul=
+d
+> bypass the recursion limit check because the recursion counter was not
+> incremented for blockcast actions.
+>
+> > diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
+> > index 05e0b14b57731..5928fcf3e6514 100644
+> > --- a/net/sched/act_mirred.c
+> > +++ b/net/sched/act_mirred.c
+> > @@ -444,8 +444,12 @@ TC_INDIRECT_SCOPE int tcf_mirred_act(struct sk_buf=
+f *skb,
+> >       tcf_action_update_bstats(&m->common, skb);
+> >
+> >       blockid =3D READ_ONCE(m->tcfm_blockid);
+> > -     if (blockid)
+> > -             return tcf_blockcast(skb, m, blockid, res, retval);
+> > +     if (blockid) {
+> > +             xmit->sched_mirred_nest++;
+>
+> Could this leave a stale pointer in sched_mirred_dev since netdev_xmit is
+> persistent per-CPU (or per-task in PREEMPT_RT) memory?
+>
+> If a nested mirred action later iterates over sched_mirred_dev up to the =
+new
+> nesting depth to detect routing loops, could it match a stale pointer fro=
+m
+> whatever unrelated packet previously reached this nesting level?
+>
+> This might cause a false-positive loop detection and incorrectly drop a v=
+alid
+> packet. Should we set xmit->sched_mirred_dev[xmit->sched_mirred_nest] =3D=
+ NULL
+> before incrementing the counter?
+>
+> > +             retval =3D tcf_blockcast(skb, m, blockid, res, retval);
+>
+> This isn't a regression introduced by this patch, but it exists in the ea=
+rly
+> error returns of tcf_mirred_act() (e.g., when the target device is gone, =
+or a
+> routing loop is detected) and in tcf_blockcast() (e.g., when
+> xa_empty(&block->ports) is true).
+>
+> In these error paths, the functions simply return retval. For mirred redi=
+rect
+> actions, retval is initialized to m->tcf_action, which is typically
+> TC_ACT_STOLEN.
+>
+> When TC_ACT_STOLEN is returned, the TC framework assumes the action has t=
+aken
+> ownership of the packet and will not free the sk_buff. Since the code doe=
+s
+> not free the sk_buff before returning in these error paths, does this lea=
+k
+> the sk_buff?
+>
+> Could an unprivileged user inside a network namespace trigger this
+> intentionally by creating a routing loop with mirred redirect rules, lead=
+ing
+> to continuous sk_buff leaks and system memory exhaustion?
+>
+> Should these error paths ensure the sk_buff is freed or force the return =
+value
+> to TC_ACT_SHOT if the action is a redirect, mirroring the existing behavi=
+or in
+> tcf_mirred_to_dev()?
+>
+> > +             xmit->sched_mirred_nest--;
+> > +             return retval;
+> > +     }
+
+There's a dependency with the skb bits patch[1] with this one.
+Stephen, I will take this set and consider what Sashiko is saying here
+[2]. I just became aware of this - but it seems to have some merit.
+I will also review this patch and sashiko's input from that
+perspective. If it merits it, I will resend the set incorporating this
+fix and Sashiko's suggestions.
+
+cheers,
+jamal
+
+[1]https://lore.kernel.org/netdev/20260326181701.308275-1-stephen@networkpl=
+umber.org/
+[2] https://sashiko.dev/#/patchset/20260326181701.308275-1-stephen%40networ=
+kplumber.org
 
