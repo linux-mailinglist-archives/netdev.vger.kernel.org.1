@@ -1,144 +1,127 @@
-Return-Path: <netdev+bounces-279076-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279077-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mz6UO/z54GlloAAAu9opvQ
-	(envelope-from <netdev+bounces-279076-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 17:02:21 +0200
+	id QKx+MGX74GlloAAAu9opvQ
+	(envelope-from <netdev+bounces-279077-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 17:08:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80B53410179
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 17:02:20 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5990141041D
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 17:08:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id DE5B030164D5
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 15:02:19 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B0E47307C744
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 15:06:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2FD7242D6B;
-	Thu, 16 Apr 2026 15:02:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C1E73BD64D;
+	Thu, 16 Apr 2026 15:06:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qhrioTF/"
+	dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b="UjoO77VF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx.nabladev.com (mx.nabladev.com [178.251.229.89])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD7DA86331;
-	Thu, 16 Apr 2026 15:02:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94D46390C90;
+	Thu, 16 Apr 2026 15:06:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.251.229.89
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776351736; cv=none; b=A74JTDYcwxDxK2rQMA5YvIzB8AqJm309pgHDN1pREx5By5Jnu+v4w3gCZYU+5egStpgym9W9q8IyTTglDX4RKxwjlMmQ1aI2JcwlKNmYq26QvoxOi8/pendXcJvhEg8AmV7PK0lQwzw+PCaJ3yEilLRIAQeGbK6k0aMe4J+ksPg=
+	t=1776351962; cv=none; b=oYyxGTdmRQpUL+iENhY075f+mBTJIVNsqLCJQndtwiAXZSLSUjitT10dv6HHRuHeteZ+JDbr9wfCWC5NIpNuKHXSngNo31FfIgQEQiAO8Rtvw0l/XY8ozFs6wMmFVYdS3VVanmVyugO8f5sRMv11TiLX3Xtz5vZEURQnXCXMZVk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776351736; c=relaxed/simple;
-	bh=LajyyeXFg0XU7KHL5KLjvwU6v+hIuEgmiN/u26dKcZQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RoQV8vr66YIKI+k5gTw6VIySor1rhVPfOVxueEdadtj/bBwFnBXOlqPkCm5PTTaZTrZJz5UIKYSMMPFaZP1y5+kHckQ/+M5Q6h89oXAo20gtiydR7hGkIAwqskO7KGICq/SYxmluI505Ubmiw60xb0LHMMJtjHfOBhj3DVrcxe8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qhrioTF/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1577C2BCAF;
-	Thu, 16 Apr 2026 15:02:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776351736;
-	bh=LajyyeXFg0XU7KHL5KLjvwU6v+hIuEgmiN/u26dKcZQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qhrioTF/nUjIILQb/3ks6P0iT3MY7XHIdCg5esBsxcB9DKnAPPpVrJPlX3sD5gUKA
-	 r1stjtKNE7NEaVw92sCphwGdE1kEG7RU6HK7IWwLM5zpB4cN/eOYx/YdtWIGkq+DEo
-	 ZtiZ65/wa/OHPGfVLNyY7C+5m+2NXaWuTX0H2RJ3/ekra7k+OrgzmLOl5779IlP6P6
-	 ZnDxgbM3U0VKyzMs22S510AJBtZCWhZCHl4u0YMfbUHaY1S3y79rWag7tfg8FhRb3O
-	 n0wYxe3r1UIlVCveqjjNdOtww3HUnZl1OTfGgGINPFruG2qjku8oZkI7DSeq4m6RNk
-	 +eOg0KAns6Trw==
-Date: Thu, 16 Apr 2026 18:02:11 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Keith Busch <kbusch@kernel.org>
-Cc: Zhiping Zhang <zhipingz@meta.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Bjorn Helgaas <bhelgaas@google.com>, linux-rdma@vger.kernel.org,
-	linux-pci@vger.kernel.org, netdev@vger.kernel.org,
-	dri-devel@lists.freedesktop.org, Yochai Cohen <yochai@nvidia.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Bjorn Helgaas <helgaas@kernel.org>
-Subject: Re: [RFC v2 1/2] vfio: add callback to get tph info for dmabuf
-Message-ID: <20260416150211.GG361495@unreal>
-References: <20260331083758.GA814676@unreal>
- <acvFV8c5QVxnt3Em@kbusch-mbp>
- <20260331132942.GC814676@unreal>
- <acvNsvS5ShlQlrox@kbusch-mbp>
- <20260331140309.GH814676@unreal>
- <acvWplw67b3Gwlkc@kbusch-mbp>
- <20260331190220.GI814676@unreal>
- <acwkAo2k41xaxdTS@kbusch-mbp>
- <20260409120415.GF86584@unreal>
- <ad56liSM4zI2SWWp@kbusch-mbp>
+	s=arc-20240116; t=1776351962; c=relaxed/simple;
+	bh=RYjBsaCX5FGRMbHo2IU+rN/Vf34PxfelZn5maBghzhY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ILKuvvYD4jYs6qdndTwtptoCmuZ3ePlRK1FI8WsQ3SYWSc9+IKowDMdoxY6zNghd3cbeCR+1FExroc+QqHYIgCL7+OmzOVjZAP6mvMUMiOpEOa+y9lBqu6Jn19h/2OZ7LFt+H9VlsL2Um54kUFOmBCQJhWnqC8o1v40ENy6ukA0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com; spf=pass smtp.mailfrom=nabladev.com; dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b=UjoO77VF; arc=none smtp.client-ip=178.251.229.89
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nabladev.com
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 1C318112C78;
+	Thu, 16 Apr 2026 17:05:54 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nabladev.com;
+	s=dkim; t=1776351957;
+	h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=YLtivqoKoPv08JBjkQ13scRaWTkbK1xbtNELG4btNs8=;
+	b=UjoO77VF0Z0XwLHzPsMx4AsQSRsEJwdWuNep1KvB37f0l3lKmiRvxHWpspKCx6gV/wcl1B
+	POZIp2OMm0G/G9hBn7wP+Ze48cBEwrtnUkgE4UiHFX+c+QTspDN6W5DMBYPFDwv9+CCjhB
+	QaOw/xQDUFYRGpjvBbHImt5VGzOeVRCpt2hIuzPNw7X9WzRrOfohElREWYNxmCv9A4QVXd
+	pt1u4HfrHyt0TyHssD5TmebKGkUEAvH/ooNvN3c0YrHNSS5EseoeXwhNW/ikOgwCt7HH4k
+	2KB3YgagFWmIHGU7brHhdTisH+jsyfgLAztuNlOq+gMwnJkHFIzIzApEBiqFaA==
+Message-ID: <22518939-c1ef-46ba-943d-256e135f74ca@nabladev.com>
+Date: Thu, 16 Apr 2026 17:05:54 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ad56liSM4zI2SWWp@kbusch-mbp>
-X-Spamd-Result: default: False [-1.66 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 1/3] net: dsa: microchip: implement KSZ87xx Module 3
+ low-loss cable errata
+To: Andrew Lunn <andrew@lunn.ch>, Fidelio LAWSON <lawson.fidelio@gmail.com>
+Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
+ Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ Simon Horman <horms@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Fidelio Lawson <fidelio.lawson@exotec.com>
+References: <20260414-ksz87xx_errata_low_loss_connections-v3-0-0e3838ca98c9@exotec.com>
+ <20260414-ksz87xx_errata_low_loss_connections-v3-1-0e3838ca98c9@exotec.com>
+ <ea90a671-70be-4d89-b842-1e54d687336f@nabladev.com>
+ <d9b161dd-f698-4d7e-8ccb-9ec12411bf87@lunn.ch>
+ <712cc46a-5ceb-4f0f-88bb-fa0a47002258@nabladev.com>
+ <84e24758-2f59-44ca-a9b8-a46094578f83@gmail.com>
+ <03040421-89e7-4422-9fb5-0367a34323e4@lunn.ch>
+ <bf93f620-1288-46a3-8798-6d70aeb2c7c6@gmail.com>
+ <6a8fc2e6-830f-4f57-869b-41efe70557e5@lunn.ch>
+Content-Language: en-US
+From: Marek Vasut <marex@nabladev.com>
+In-Reply-To: <6a8fc2e6-830f-4f57-869b-41efe70557e5@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[nabladev.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[nabladev.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-279077-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279076-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[lunn.ch,gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[nabladev.com:+];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	FROM_NEQ_ENVFROM(0.00)[marex@nabladev.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[microchip.com,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com,armlinux.org.uk,vger.kernel.org,exotec.com];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 80B53410179
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,nabladev.com:dkim,nabladev.com:mid]
+X-Rspamd-Queue-Id: 5990141041D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Apr 14, 2026 at 11:34:14AM -0600, Keith Busch wrote:
-> On Thu, Apr 09, 2026 at 03:04:15PM +0300, Leon Romanovsky wrote:
-> > Something like that, on top of this proposal:
+On 4/16/26 4:30 PM, Andrew Lunn wrote:
+>> With this model, we don’t need to return -EINVAL for combinations or
+>> ordering, and userspace does not need detailed error reporting. The
+>> tunables behave more like simple setters than a mode switch, which
+>> keeps the API predictable and avoids the need for extack or netlink
+>> ethtool support at this point.
 > 
-> ...
->   
-> > +struct vfio_region_dma_tph {
-> > +	u16 tag;
-> > +	u8 ph;
-> > +};
-> > +
-> >  struct vfio_region_dma_range {
-> > -	__u64 offset;
-> > -	__u64 length;
-> > +	union {
-> > +		__u64 offset;
-> > +		struct vfio_region_dma_tph tph;
-> > +	};
-> > +	union {
-> > +		__u64 length;
-> > +		__u64 reserved;
-> > +	};
-> > +};
-> > +
-> > +enum {
-> > +	VFIO_DMABUF_FLAG_TPH = 1 << 0,
-> >  };
-> 
-> Okay, so you have the hints as a separate action from the dmabuf
-> creation. 
-
-I'm not sure I fully understood your point, but in my proposal the entire
-operation is done in one pass, with the hints provided as the final entry in
-the dma_range array.
-
-Thanks
+> Sounds good.
+Fine by me too.
 
