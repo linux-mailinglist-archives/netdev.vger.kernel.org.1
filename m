@@ -1,177 +1,215 @@
-Return-Path: <netdev+bounces-278999-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278991-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +Iv2OeS+4GnQlQAAu9opvQ
-	(envelope-from <netdev+bounces-278999-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 12:50:12 +0200
+	id sNuAL8u64GmIlAAAu9opvQ
+	(envelope-from <netdev+bounces-278991-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 12:32:43 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B97740D0AC
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 12:50:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2930440CF3C
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 12:32:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3FA803031CE5
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 10:48:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2D107305F7FC
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 10:30:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A609F39FCCA;
-	Thu, 16 Apr 2026 10:48:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C99B5390207;
+	Thu, 16 Apr 2026 10:30:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="adn6IMBN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="axKAaQ/c"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4936C39D6CA;
-	Thu, 16 Apr 2026 10:48:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15D3D3A4F59
+	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 10:30:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776336538; cv=none; b=VhgPXpuWcWWV/tx3N0/6NMyBi2EXFjZRg9qCsDbZcM6t9457zwK2ctSGsbHKp9F4V7tgbmQc6hj+4Hw0QJ+clIs6pPOexl6UAzybK/J5tMVYboV2i8I/gjQBjYtshtYbC775PkpffTl3FKkxDGvW2jMZOcrzClgaEzQ+Siz8c8M=
+	t=1776335443; cv=none; b=Flk6yYoXbvHnZgKWzF7RiUsz+TcGaXHAVlJluiVkXwRS2h6+8irUAsqSJPTA31g65iFS+QIukq+4bZ/0UAKOW0S612VpJNkj7aYgs2sQZLTaZlyzFDIiFa91SjKyxllyiuwLarofH86I6/sRlr6LvppTtuULWR0bgQCgG3EFMCU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776336538; c=relaxed/simple;
-	bh=wXkfIYpS6b/Rm6RISVw0uD+Z7OPzR8Gm6AByQPr0xkc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GBGVaWUAE5E8+atCZsfIT7SaGqiski29Uy8/lCB75xefg7jyfruC18cavGk32GHmu2c23yqHyjjopAY1gil8/xOhG/zHVEWvOuQODGeGS6btpoYraZfS5L4kydVwJe3s1hsWmeBjOKURbPqGd+RxncIjunyivS2Kb2KiOtcgn+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=adn6IMBN; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1776336537; x=1807872537;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=wXkfIYpS6b/Rm6RISVw0uD+Z7OPzR8Gm6AByQPr0xkc=;
-  b=adn6IMBNgwoE38eXpM/fL5MzHhLTRioM/1ClF1yxwcxqaraiggw54xWl
-   rHWOmngT5CwAWJsojVHbrUqvWcI13o28G7l0xWJKy4NGnyE1kfs9MgQlF
-   iTGmO/6u1OiSfX0fHWUpDhJ4hnjSiZe/un3rKgmC5AyKOg1e4i/vRYk8r
-   RDmltPorebFP4sjNPDhh9k7E2H8PZsVhjTeaZVI4jcINZAYqSAeoCvAew
-   yO7Eag+A2PMogHW9OChetZ2ktHtkcjcGiyDoWnseGvD60OKVuRCQwhO2+
-   JEQq2OFeygwIZSOQhNYw32gp4AIX9PLe8tXLI5bQHazHmffjGLnShlczF
-   g==;
-X-CSE-ConnectionGUID: PRX0WXwxTvWAYSZAuSOXHA==
-X-CSE-MsgGUID: x0+k3bjFQvuzV4ZuVlo3Ow==
-X-IronPort-AV: E=McAfee;i="6800,10657,11760"; a="88410753"
-X-IronPort-AV: E=Sophos;i="6.23,181,1770624000"; 
-   d="scan'208";a="88410753"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2026 03:48:56 -0700
-X-CSE-ConnectionGUID: EuPlTi58RSGNxq0lcRmGWQ==
-X-CSE-MsgGUID: imgnVKh1QGqItlImdg15EQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,181,1770624000"; 
-   d="scan'208";a="235076890"
-Received: from unknown (HELO localhost.png.intel.com) ([10.107.255.31])
-  by orviesa004.jf.intel.com with ESMTP; 16 Apr 2026 03:48:52 -0700
-From: KhaiWenTan <khai.wen.tan@intel.com>
-To: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	mcoquelin.stm32@gmail.com,
-	alexandre.torgue@foss.st.com,
-	rmk+kernel@armlinux.org.uk,
-	maxime.chevallier@bootlin.com
-Cc: netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	yoong.siang.song@intel.com,
-	hong.aun.looi@intel.com,
-	khai.wen.tan@intel.com,
-	KhaiWenTan <khai.wen.tan@linux.intel.com>
-Subject: [PATCH net,v3 1/1] net: stmmac: Update default_an_inband before passing value to phylink_config
-Date: Thu, 16 Apr 2026 18:26:09 +0800
-Message-ID: <20260416102609.7953-1-khai.wen.tan@intel.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1776335443; c=relaxed/simple;
+	bh=NPcDG1Ottrtk5BiLjOdCbSSnt84O39ClqPxApC6Xue0=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=KGMiMHmp5vpKGzBxG6F7VPHZlXJlKLqCaULiqV7DoutbuuHM//Xk38Ljx7/oeAzkOuTz3CvgGcZmPJ30zeR6GR6+AjOgxiqBy/g7H+RFRiTsgddZRazsthBRFcmBQxte9cbouvdred1V7R/LOtsmU8Um8ArrAyJtC1dsoG0Q5p0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=axKAaQ/c; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14229C2BCAF;
+	Thu, 16 Apr 2026 10:30:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776335442;
+	bh=NPcDG1Ottrtk5BiLjOdCbSSnt84O39ClqPxApC6Xue0=;
+	h=From:Date:Subject:To:Cc:From;
+	b=axKAaQ/cj+oRnXUPg2U9dgZZO6H568/ZDENKG0RSgGEwGz+otgjG8DEeyc37bD370
+	 YHZGJ+ZsLvNeAilM/hP+EDvmDR1H9Lzfpfm7BMNqlmf56GCJAOLEHj3lMPI+DDBv7/
+	 0uQqU1AQIOzYgzOv7lTR5SI0DbJru4RTODwrOMDaYHelOY2sImomAzsVBnSOPmUkWr
+	 yyy47t/pSfJ8ihdKOrABSvRHIuhfKG7JH0nVtgdhUd7FdJEsb44A75EwUzQpeZXCXv
+	 y3xR95gB5AHBtU0sDq9tI5Xp9iw0Jnga77xVWoamJUgkRy3RyFZ9hUfPQ/HuaKQ0un
+	 3qHUANfOHEesA==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Date: Thu, 16 Apr 2026 12:30:12 +0200
+Subject: [PATCH net v2] net: airoha: Fix possible TX queue stall in
+ airoha_qdma_tx_napi_poll()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260416-airoha-txq-potential-stall-v2-1-42c732074540@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/33NzQ6CMBAE4Fche3ZNf/jTk+9hOFRYYWPTYtsQD
+ OHdbfDucWaSbzaIFJgiXIsNAi0c2bsc1KmAfjJuJOQhZ1BC1aIUDRoOfjKY1jfOPpFLbCzGZKx
+ FM1Sqr7S4lNRCBuZAT14P/A6OEnS5nDgmHz7H4SKP6WdL/c9eJEpsWi10rR+yKvXtRcGRPfswQ
+ rfv+xeYqI5cygAAAA==
+X-Change-ID: 20260407-airoha-txq-potential-stall-ad52c53094e8
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+X-Mailer: b4 0.14.3
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,bootlin.com];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278999-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-278991-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[khai.wen.tan@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev,kernel];
-	NEURAL_HAM(-0.00)[-0.998];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,intel.com:mid]
-X-Rspamd-Queue-Id: 4B97740D0AC
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 2930440CF3C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: KhaiWenTan <khai.wen.tan@linux.intel.com>
+Since multiple net_device TX queues can share the same hw QDMA TX queue,
+there is no guarantee we have inflight packets queued in hw belonging to a
+net_device TX queue stopped in the xmit path because hw QDMA TX queue
+can be full. In this corner case the net_device TX queue will never be
+re-activated. In order to avoid any potential net_device TX queue stall,
+we need to wake all the net_device TX queues feeding the same hw QDMA TX
+queue in airoha_qdma_tx_napi_poll routine.
 
-get_interfaces() will update both the plat->phy_interfaces and
-mdio_bus_data->default_an_inband based on reading a SERDES register. As
-get_interfaces() will be called after default_an_inband had already been
-read, dwmac-intel regressed as a result with incorrect default_an_inband
-value in phylink_config.
-
-Therefore, we moved the priv->plat->get_interfaces() to be executed first
-before assigning priv->plat->default_an_inband to config->default_an_inband
-to ensure default_an_inband is in correct value.
-
-Fixes: d3836052fe09 ("net: stmmac: intel: convert speed_mode_2500() to get_interfaces()")
-Signed-off-by: KhaiWenTan <khai.wen.tan@linux.intel.com>
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Fixes: 23020f0493270 ("net: airoha: Introduce ethernet support for EN7581 SoC")
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 ---
-v3:
-  - rebase on the latest net tree (Paolo Abeni)
-
-v2: https://patchwork.kernel.org/project/netdevbpf/patch/20260413020339.68426-1-khai.wen.tan@linux.intel.com/
-  - update commit message for better understanding (Russell King)
-  - corrected the blamed commit (Russell King)
-
-v1: https://patchwork.kernel.org/project/netdevbpf/patch/20260410020735.327590-1-khai.wen.tan@linux.intel.com/
+Changes in v2:
+- Add txq_stopped parameter to avoid any possible corner cases where the
+  netdev queue stalls.
+- Link to v1: https://lore.kernel.org/r/20260413-airoha-txq-potential-stall-v1-1-7830363b1543@kernel.org
 ---
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/airoha/airoha_eth.c | 37 +++++++++++++++++++++++++++-----
+ drivers/net/ethernet/airoha/airoha_eth.h |  1 +
+ 2 files changed, 33 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 01a983001ab4..ca68248dbc78 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -1410,8 +1410,6 @@ static int stmmac_phylink_setup(struct stmmac_priv *priv)
- 	priv->tx_lpi_clk_stop = priv->plat->flags &
- 				STMMAC_FLAG_EN_TX_LPI_CLOCKGATING;
+diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
+index e1ab15f1ee7d..19f67c7dd8e1 100644
+--- a/drivers/net/ethernet/airoha/airoha_eth.c
++++ b/drivers/net/ethernet/airoha/airoha_eth.c
+@@ -843,6 +843,21 @@ static int airoha_qdma_init_rx(struct airoha_qdma *qdma)
+ 	return 0;
+ }
  
--	config->default_an_inband = priv->plat->default_an_inband;
--
- 	/* Get the PHY interface modes (at the PHY end of the link) that
- 	 * are supported by the platform.
- 	 */
-@@ -1419,6 +1417,8 @@ static int stmmac_phylink_setup(struct stmmac_priv *priv)
- 		priv->plat->get_interfaces(priv, priv->plat->bsp_priv,
- 					   config->supported_interfaces);
- 
-+	config->default_an_inband = priv->plat->default_an_inband;
++static void airoha_qdma_wake_netdev_txqs(struct airoha_queue *q)
++{
++	struct airoha_qdma *qdma = q->qdma;
++	struct airoha_eth *eth = qdma->eth;
++	int i;
 +
- 	/* Set the platform/firmware specified interface mode if the
- 	 * supported interfaces have not already been provided using
- 	 * phy_interface as a last resort.
++	for (i = 0; i < ARRAY_SIZE(eth->ports); i++) {
++		struct airoha_gdm_port *port = eth->ports[i];
++
++		if (port && port->qdma == qdma)
++			netif_tx_wake_all_queues(port->dev);
++	}
++	q->txq_stopped = false;
++}
++
+ static int airoha_qdma_tx_napi_poll(struct napi_struct *napi, int budget)
+ {
+ 	struct airoha_tx_irq_queue *irq_q;
+@@ -919,12 +934,21 @@ static int airoha_qdma_tx_napi_poll(struct napi_struct *napi, int budget)
+ 
+ 			txq = netdev_get_tx_queue(skb->dev, queue);
+ 			netdev_tx_completed_queue(txq, 1, skb->len);
+-			if (netif_tx_queue_stopped(txq) &&
+-			    q->ndesc - q->queued >= q->free_thr)
+-				netif_tx_wake_queue(txq);
+-
+ 			dev_kfree_skb_any(skb);
+ 		}
++
++		if (q->txq_stopped && q->ndesc - q->queued >= q->free_thr) {
++			/* Since multiple net_device TX queues can share the
++			 * same hw QDMA TX queue, there is no guarantee we have
++			 * inflight packets queued in hw belonging to a
++			 * net_device TX queue stopped in the xmit path.
++			 * In order to avoid any potential net_device TX queue
++			 * stall, we need to wake all the net_device TX queues
++			 * feeding the same hw QDMA TX queue.
++			 */
++			airoha_qdma_wake_netdev_txqs(q);
++		}
++
+ unlock:
+ 		spin_unlock_bh(&q->lock);
+ 	}
+@@ -1984,6 +2008,7 @@ static netdev_tx_t airoha_dev_xmit(struct sk_buff *skb,
+ 	if (q->queued + nr_frags >= q->ndesc) {
+ 		/* not enough space in the queue */
+ 		netif_tx_stop_queue(txq);
++		q->txq_stopped = true;
+ 		spin_unlock_bh(&q->lock);
+ 		return NETDEV_TX_BUSY;
+ 	}
+@@ -2039,8 +2064,10 @@ static netdev_tx_t airoha_dev_xmit(struct sk_buff *skb,
+ 				TX_RING_CPU_IDX_MASK,
+ 				FIELD_PREP(TX_RING_CPU_IDX_MASK, index));
+ 
+-	if (q->ndesc - q->queued < q->free_thr)
++	if (q->ndesc - q->queued < q->free_thr) {
+ 		netif_tx_stop_queue(txq);
++		q->txq_stopped = true;
++	}
+ 
+ 	spin_unlock_bh(&q->lock);
+ 
+diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ethernet/airoha/airoha_eth.h
+index 95e557638617..87b328cfefb0 100644
+--- a/drivers/net/ethernet/airoha/airoha_eth.h
++++ b/drivers/net/ethernet/airoha/airoha_eth.h
+@@ -193,6 +193,7 @@ struct airoha_queue {
+ 	int ndesc;
+ 	int free_thr;
+ 	int buf_size;
++	bool txq_stopped;
+ 
+ 	struct napi_struct napi;
+ 	struct page_pool *page_pool;
+
+---
+base-commit: 1f5ffc672165ff851063a5fd044b727ab2517ae3
+change-id: 20260407-airoha-txq-potential-stall-ad52c53094e8
+
+Best regards,
 -- 
-2.43.0
+Lorenzo Bianconi <lorenzo@kernel.org>
 
 
