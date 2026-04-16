@@ -1,194 +1,168 @@
-Return-Path: <netdev+bounces-279170-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279171-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ugf5KV9b4WmusQAAu9opvQ
-	(envelope-from <netdev+bounces-279170-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 23:57:51 +0200
+	id COLVF2Vb4WmusQAAu9opvQ
+	(envelope-from <netdev+bounces-279171-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 23:57:57 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05B66415206
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 23:57:50 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E47141520D
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 23:57:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EC885306EC45
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 21:54:43 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 76D5E3047DC7
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 21:57:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 974CF390218;
-	Thu, 16 Apr 2026 21:54:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33128374758;
+	Thu, 16 Apr 2026 21:57:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="diofJIMe"
+	dkim=pass (2048-bit key) header.d=joshtriplett.org header.i=@joshtriplett.org header.b="MHv1d7Ur";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="mde2NloG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-a8-smtp.messagingengine.com (fout-a8-smtp.messagingengine.com [103.168.172.151])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D3E9371D15
-	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 21:54:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 583263264F9;
+	Thu, 16 Apr 2026 21:57:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776376482; cv=none; b=MmaNi9TbS45NwMP3bzrZRLEm3r1sVBnFm/GOapFb5YPUe+VchP8567wReYPSFlcDrcqlC9Ey7LcDPuTn8JAwvkKts4gNT94D3/C93mvFgCdSnohJfY4RbWWq37f9hcps9Q1XC32NGGUzElBG9he+PlZHA52kTA4WdhlV8Xgeles=
+	t=1776376674; cv=none; b=shCXKxkJ5x3oiDWg0G6SdyOpWgHKteI+ghj37501lBF3wodd768RvWBWuPMoqYGA8K0TbWVuKyiGZDKjU5sxqSNNh4/nQHxKZuBm8NTNdEJCnZFMKCh4Ei6gD7UzIu4mUoNBSlTjQquWzDU52Qp4gRUls0moYQX1/eTAZvyX+mw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776376482; c=relaxed/simple;
-	bh=Cy6Nfnfi+P8iX9g7jNh19cVxNF8CkAafEy+lOjd5iFc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oNwhOYxTIq70HLmsjbU6z9w2mRMctWf+U5WgKR3tE5TpeoOfMv3AdnLWdj1qPSxGudVP+MoB3VBl0fFiKFI9b2PbMz1q51SSSbT7RvWpmERmTmPFL1QHbH05RPMCe+7aKf8ZDlxOj6kkTmecg2VvV42ajdXxE/bXmzHo3PtsbXo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=diofJIMe; arc=none smtp.client-ip=209.85.210.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-82f1bfc9b8fso24550b3a.1
-        for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 14:54:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776376480; x=1776981280; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JxrR95B6yVnEMSSdGvsY4facZH188kLZA69tYhhuh5c=;
-        b=diofJIMe0h38jEBKzeHvibs2d808M4/LlddQF9/t90SMb2NvxJM9smrQP30doLCk6h
-         qSZMrNtGr0nnqUFehl+TKTGswlVkgtBQFAMlaXKcQ+6yW8OXsGqLQ6W5Ik8EhrcySvXu
-         DraWXJRGsjvhWzjspIGzWZRRX1pguYOU8q0Qtl7KnKCPd24+tOVUtX5yBovHuQNlXDgj
-         nPYqqCMa4dhHiH2azLtl/XSusCmAjeM+yQtPXnGZaQrLbZ0kFXWjEaPKVafjs/IFWSGl
-         6Df2jwuvBKUz+7j3yAplfGfMEQtEXWGiUSH+ThRwqIxy97IgFEYr7N2LWvBE7zec4zPD
-         uo0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776376480; x=1776981280;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JxrR95B6yVnEMSSdGvsY4facZH188kLZA69tYhhuh5c=;
-        b=Xmb/yz2UtmpoWwulxUfLinTyyj+9DhApirRcRdQeQ4HpfNuEhKq1LGyfgA2W20dGOA
-         3rf/9/6nSNaaHtVXtbvvh03ci/PpETcQgtoyllREpfahuuuMTQb1XFJEuFQMUKuY/tL8
-         HjStQ80H99ToCWNF80QV1MtygZBiw5SJvOt6+DnD+0Fnmc3MbCmTDMVWhyVTH4L0QluR
-         03+W5QGb9JeOVr1DaYoNcWsq68yZ9RDDh+70GmFXjPYSjwPWIoAmW8zUnPMOdiHry4B/
-         BmwU1eWOJN+ZY6wOuJ17MNSj23yacmOpbI0xJefdpAKJWMhJ6cbL65HVoziN9DUSUarf
-         VfUw==
-X-Forwarded-Encrypted: i=1; AFNElJ8T95YBrh5DWynbtnlDFnafoqyhCvbEwaGar+Olbb3JCVZnTm5jujMFMHsZZB+u/cniy82mUGs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywe2m3b+Jwp8/BcRs7U+YiiX7BF2MOePuVdicgiRXYY+clB3s2n
-	9faXJyktU1yztQ9/VShMOVd5+lfZIWljb/KvIoCsg+lpWqf5+q5+QUET
-X-Gm-Gg: AeBDietkXtwSiyDaEFsEkgMW/xpHK0mm3mKk+jm2PLaD9aCGRJp+K1zBBQ91DEVqowy
-	JtcuZ+z2EX4YwFGRCvQX2gRv7gGEYiS6D5F4lK05Q7KURPYvktnBKmML1wEwcFpig+URLoKOrTm
-	Md9CuFqcT82Um/QRKzjU8w4uihq7qcFhSzHi+OBmBV392fGCk6IBz5lvRlskOY3OzPOxdukvofD
-	OfbBTOTePzpbV+yNQKKzN4UzJWKvIYEfKKgGLQkNiRyA00ITSNilqQZQ5ZmTH1GXEsHaC1u3VtU
-	ObMKKihngNhp+L+7sISuAPEnKbLlqnXmTrUnw8yKemtut/WRS3OkEKXfqFHiqeX+UNkHzqprM6y
-	osFDZp2CUvaBi4H1qF7abrFSGqgoOV3ODNf36kM8wZ9tnyviXsjPJ9JQc/ltc+d/weNZsllx7RR
-	Dp4Wn5W7a1HFCWpeNhqeiivYR6TZLecUXeM4CywP/UlPqMWRSlezju6Bbc8sQzFAvCwA==
-X-Received: by 2002:a05:6a00:3e07:b0:82f:29fe:7239 with SMTP id d2e1a72fcca58-82f8c93aa0amr11326b3a.50.1776376480513;
-        Thu, 16 Apr 2026 14:54:40 -0700 (PDT)
-Received: from devvm29614.prn0.facebook.com ([2a03:2880:ff:71::])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82f67449c3asm6315498b3a.53.2026.04.16.14.54.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Apr 2026 14:54:39 -0700 (PDT)
-Date: Thu, 16 Apr 2026 14:54:35 -0700
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Alexander Duyck <alexanderduyck@fb.com>,
-	Jakub Kicinski <kuba@kernel.org>, kernel-team@meta.com,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net] eth: fbnic: fix double-free of PCS on phylink
- creation failure
-Message-ID: <aeFam/KxhZSMl6xq@devvm29614.prn0.facebook.com>
-References: <20260416-fbnic-pcs-fix-v1-1-ac4b6badeac0@meta.com>
- <1873b5ba-419f-4247-ab92-1b5e899458e8@lunn.ch>
+	s=arc-20240116; t=1776376674; c=relaxed/simple;
+	bh=dNZsYqoRYEIKF8O8YFn1/84Xuu6i4Pb5xDdWa/+SRAk=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=U7hPqLgJfVCgHy3KY64506oDx3pbf2coOfxf7Jh3TuVuE2CHuPJXJUJIoFlCR3U78jTXihrJLVNxMTnuz9hW3XUxDOGeUF0Vu98fDlZmreyHRVmgf+r7R933pICrnyU1TYdUnzKhpVPw8jc9k7DQXkEoImYh8WfTdgiGVLDcjoI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=joshtriplett.org; spf=pass smtp.mailfrom=joshtriplett.org; dkim=pass (2048-bit key) header.d=joshtriplett.org header.i=@joshtriplett.org header.b=MHv1d7Ur; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=mde2NloG; arc=none smtp.client-ip=103.168.172.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=joshtriplett.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=joshtriplett.org
+Received: from phl-compute-07.internal (phl-compute-07.internal [10.202.2.47])
+	by mailfout.phl.internal (Postfix) with ESMTP id 7AC46EC01BD;
+	Thu, 16 Apr 2026 17:57:51 -0400 (EDT)
+Received: from phl-imap-03 ([10.202.2.93])
+  by phl-compute-07.internal (MEProxy); Thu, 16 Apr 2026 17:57:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	joshtriplett.org; h=cc:cc:content-type:content-type:date:date
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1776376671;
+	 x=1776463071; bh=ieN5wLxIK3X06jaDDAZPc2NCX8fUUVaqyIu/FVopEBw=; b=
+	MHv1d7Ur688i6WxkwEwiowcY2SwEIfcOiboScY7fCW1zX4gDD03wm2v/1eg7wsrk
+	8rpOgkX+gVA9JUkqNMN7MPNNiOKbwfnZtNA8zhWOYGVmGAiTjD3WEM6iUhejmbnR
+	1Vb4xi7YCK92R6CO+JysPoydwod1U+35wdzVWl7N9L/cIATC8vzw2KHHdJK54i68
+	h7Ash+g9gp3x7hlKWtr4kZv4iwPmqB9RlTJNFh/z9886VIYw6MtAy04yONLJjopR
+	CHYrmGgSemMevWhUJgNEhqgIt0EPCeY0zod34lFi3IqpkZb0gzD8bHn99ujWI8qv
+	SvRpVah89vyFHagVyxt0vA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1776376671; x=1776463071; bh=ieN5wLxIK3X06jaDDAZPc2NCX8fUUVaqyIu
+	/FVopEBw=; b=mde2NloG494kUYTOLf3jZNqnODCZe+off7GTK0Y5HiO9V26mD3F
+	e0m0tNr5Mt7r/s/uuQoW+l5RCUspZVGc7PcV8y4aMQOqLPV/gioi4CrxMzWSQS99
+	o76xjb/1jh7Rq+W+7e+OPy/4ga7r6fjNBVdQymZitw29iH+ZkhpBrGSXY49zZm92
+	sEu58TV5aQCEBzOIjBa7W45E/aS65sbwSxcRiYLDIBYp7GWNWBKafm8q2T5jCvQJ
+	kOiUyjJCOXIBR4/Ckcaf7bG/zwJEtbXMLe2MN+hx/t+SKuTowvig4NreYKHVRbCt
+	aesj9QvTyxg9xiecHbhGcTXhCRHTcw4IIrQ==
+X-ME-Sender: <xms:X1vhaZ3HLUAjHFN0dVWmRd5dce5nwdI6EFZEAdmaNULwrv50cV4vcQ>
+    <xme:X1vhaa7fH3s0tmcs_n1AU7T8jovt2FkOhTKLMbK5ApoybxpofMMZl-NxiNWHnWXfr
+    CcjjBAYwLnK0UG1RsyOl0cLjZ5DAaaFGnVoNxKgSq675w9G8QJXnlyq>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdegkedugecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecunecujfgurhepofggfffhvfevkfgjfhfutgesmhdtreerre
+    dttdenucfhrhhomhepfdflohhshhcuvfhrihhplhgvthhtfdcuoehjohhshhesjhhoshhh
+    thhrihhplhgvthhtrdhorhhgqeenucggtffrrghtthgvrhhnpeehlefgudelvedutefgtd
+    fhfeduudfgvdekgfdvkedtudetudfhkeffleejgfevkeenucevlhhushhtvghrufhiiigv
+    pedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehjohhshhesjhhoshhhthhrihhplhgvth
+    htrdhorhhgpdhnsggprhgtphhtthhopeefpdhmohguvgepshhmthhpohhuthdprhgtphht
+    thhopegrlhigsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhmrghnse
+    hvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdr
+    khgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:X1vhaZZmaa8V-Tau0XJdu6nqcPgT6kOSFghKPZYYFdWdCmnWl5gNFg>
+    <xmx:X1vhaQjz5BKjEjtB1lPNnbBErl1QF9PPA2741o1-WuTEFuM-BKFwsg>
+    <xmx:X1vhaT60Byf_kIS4CPrEtEXeCiiKLmw0hzBzgfTYwWDVXB5bP7DD2w>
+    <xmx:X1vhaf4yjtp395-_0hKLViohX_5rf0eiD89rMINzkCwFtC9r0kQM-A>
+    <xmx:X1vhaeGzUWYsa1qMFVAuB_PiK98Y3iVcl0n-llxdAmvQmYq4vPdRedDW>
+Feedback-ID: i83e94755:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 0C50F18E006C; Thu, 16 Apr 2026 17:57:51 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1873b5ba-419f-4247-ab92-1b5e899458e8@lunn.ch>
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Date: Thu, 16 Apr 2026 14:57:19 -0700
+From: "Josh Triplett" <josh@joshtriplett.org>
+To: "Alejandro Colomar" <alx@kernel.org>
+Cc: linux-man@vger.kernel.org, netdev@vger.kernel.org
+Message-Id: <43b64cba-a7c5-41ed-8e45-c0508f482687@app.fastmail.com>
+In-Reply-To: <aeAAXdBe1f2THR2N@devuan>
+References: <ad50CQgF_gNtB1Kr@localhost> <aeAAXdBe1f2THR2N@devuan>
+Subject: [PATCH] Document TCP_DEFER_ACCEPT rounding
+Content-Type: multipart/mixed;
+ boundary=a97c3acb8bde2f7a508a69f0f65635f1d3fe6e0d
+X-Spamd-Result: default: False [-0.55 / 15.00];
+	MIME_BASE64_TEXT_BOGUS(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_DKIM_ALLOW(-0.20)[joshtriplett.org:s=fm2,messagingengine.com:s=fm2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
+	MIME_GOOD(-0.10)[multipart/mixed,text/plain,text/x-patch];
+	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279170-lists,netdev=lfdr.de];
+	XM_UA_NO_VERSION(0.01)[];
 	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[joshtriplett.org];
+	TAGGED_FROM(0.00)[bounces-279171-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+,1:+,2:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[joshtriplett.org:+,messagingengine.com:+];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[josh@joshtriplett.org,netdev@vger.kernel.org];
+	HAS_ATTACHMENT(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 05B66415206
+	RCPT_COUNT_THREE(0.00)[3];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,messagingengine.com:dkim,app.fastmail.com:mid]
+X-Rspamd-Queue-Id: 9E47141520D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Apr 16, 2026 at 11:00:01PM +0200, Andrew Lunn wrote:
-> On Thu, Apr 16, 2026 at 12:31:39PM -0700, Bobby Eshleman wrote:
-> > From: Bobby Eshleman <bobbyeshleman@meta.com>
-> > 
-> > fbnic_phylink_create() stores the newly allocated PCS in fbn->pcs before
-> > calling phylink_create(). When phylink_create() fails the error path
-> > calls xpcs_destroy_pcs(pcs) to release the PCS, but neglects to clear
-> > fbn->pcs.
-> > 
-> > The caller, fbnic_netdev_alloc(), responds to the failure by calling
-> > fbnic_netdev_free() which in turn calls fbnic_phylink_destroy().
-> 
-> Isn't the real problem here? fbnic_phylink_create() failed, and it
-> correctly did its cleanup. Because it failed, you should not be
-> calling fbnic_phylink_destroy(). You only call the _destroy() if the
-> previous _create() was successful.
-> 
->     Andrew
-> 
-> ---
-> pw-bot: cr
+--a97c3acb8bde2f7a508a69f0f65635f1d3fe6e0d
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-True, the real issue is the _create/_destroy call asymmetry.
+Patch attached.
+--a97c3acb8bde2f7a508a69f0f65635f1d3fe6e0d
+Content-Disposition: attachment;
+	filename*0="0001-Document-TCP_DEFER_ACCEPT-rounding.patch"
+Content-Type: text/x-patch;
+	name="=?UTF-8?Q?0001-Document-TCP=5FDEFER=5FACCEPT-rounding.patch?="
+Content-Transfer-Encoding: base64
 
-How about something like this (untested)?:
+RnJvbSBhZDJiNzk4Mzc2MzI2ZDQwOTQ0ZjY5OTgyNzBhNzU1ZjYxYzU3ODE1IE1vbiBTZXAg
+MTcgMDA6MDA6MDAgMjAwMQpNZXNzYWdlLUlEOiA8YWQyYjc5ODM3NjMyNmQ0MDk0NGY2OTk4
+MjcwYTc1NWY2MWM1NzgxNS4xNzc2Mzc0NTM5LmdpdC5qb3NoQGpvc2h0cmlwbGV0dC5vcmc+
+CkZyb206IEpvc2ggVHJpcGxldHQgPGpvc2hAam9zaHRyaXBsZXR0Lm9yZz4KRGF0ZTogVGh1
+LCAxNiBBcHIgMjAyNiAxNDoyMTozNCAtMDcwMApTdWJqZWN0OiBbUEFUQ0hdIERvY3VtZW50
+IGBUQ1BfREVGRVJfQUNDRVBUYCByb3VuZGluZwoKU2lnbmVkLW9mZi1ieTogSm9zaCBUcmlw
+bGV0dCA8am9zaEBqb3NodHJpcGxldHQub3JnPgotLS0KIG1hbi9tYW43L3RjcC43IHwgMiAr
+KwogMSBmaWxlIGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygrKQoKZGlmZiAtLWdpdCBhL21hbi9t
+YW43L3RjcC43IGIvbWFuL21hbjcvdGNwLjcKaW5kZXggZmY0NmVhN2JjLi4yNmE5OWI4Nzkg
+MTAwNjQ0Ci0tLSBhL21hbi9tYW43L3RjcC43CisrKyBiL21hbi9tYW43L3RjcC43CkBAIC0x
+MDkxLDYgKzEwOTEsOCBAQCBBbGxvdyBhIGxpc3RlbmVyIHRvIGJlIGF3YWtlbmVkIG9ubHkg
+d2hlbiBkYXRhIGFycml2ZXMgb24gdGhlIHNvY2tldC4KIFRha2VzIGFuIGludGVnZXIgdmFs
+dWUgKHNlY29uZHMpLCB0aGlzIGNhbgogYm91bmQgdGhlIG1heGltdW0gbnVtYmVyIG9mIGF0
+dGVtcHRzIFRDUCB3aWxsIG1ha2UgdG8KIGNvbXBsZXRlIHRoZSBjb25uZWN0aW9uLgorVGhl
+IGtlcm5lbCB3aWxsIHJvdW5kIHRoaXMgdmFsdWUgdXAgdG8gdGhlIG5leHQgbGFyZ2VyIFRD
+UCByZXRyYW5zbWl0CitkdXJhdGlvbi4KIC5JUAogT24gYSBjbGllbnQgc29ja2V0LAogaWYg
+bm9uemVybywKLS0gCjIuNTMuMAoK
 
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-index e3ca5fcfabef..2a6a73393732 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-@@ -818,7 +818,8 @@ struct net_device *fbnic_netdev_alloc(struct fbnic_dev *fbd)
- 	netif_tx_stop_all_queues(netdev);
- 
- 	if (fbnic_phylink_create(netdev)) {
--		fbnic_netdev_free(fbd);
-+		free_netdev(netdev);
-+		fbd->netdev = NULL;
- 		return NULL;
- 	}
- 
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c b/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
-index 09c5225111be..50240e6c2ee9 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
-@@ -237,6 +237,7 @@ int fbnic_phylink_create(struct net_device *netdev)
- 		dev_err(netdev->dev.parent,
- 			"Failed to create Phylink interface, err: %d\n", err);
- 		xpcs_destroy_pcs(pcs);
-+		fbn->pcs = NULL;
- 		return err;
- 	}
- 
-
-
-I think we still probably want to be NULL-ing the pcs, even if it won't
-necessarily matter anymore.
-
-Best,
-Bobby
+--a97c3acb8bde2f7a508a69f0f65635f1d3fe6e0d--
 
