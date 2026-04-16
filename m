@@ -1,194 +1,175 @@
-Return-Path: <netdev+bounces-279128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279131-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WM6XD8gx4WlGqQAAu9opvQ
-	(envelope-from <netdev+bounces-279128-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 21:00:24 +0200
+	id 6G5tGHUz4Wm4qQAAu9opvQ
+	(envelope-from <netdev+bounces-279131-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 21:07:33 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FD1E413EFC
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 21:00:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FB8A413FB0
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 21:07:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4904430557D8
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 18:57:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 755DB305F7F1
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 19:06:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F7F234A786;
-	Thu, 16 Apr 2026 18:57:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3252930F927;
+	Thu, 16 Apr 2026 19:06:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WjMSWclM"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="uYpWJ3Av"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f65.google.com (mail-ot1-f65.google.com [209.85.210.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C679D20C029
-	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 18:57:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6D282FF672
+	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 19:06:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776365851; cv=none; b=pBEx/+CEUvWjqaZNTBxoKWEWw4aB3gJhJ/k/hkvYS48IlW0RPqIWDh8AE1VKFLB36B3yxpn6NjJ0URtEl1SSuoIKAGEOeqGiOC2oJ+dpOLOaQN/4JBSVAFcxAn9IxRYFk7fVWpxWm67yYM5YAV96dRIONfg8TM+jZ62TY+TzocA=
+	t=1776366392; cv=none; b=T1yhgEz4MOnp3gXpYYjxrna7iGLqK4uK43rErc8TNZH7Lw56kIguU17W3cekpZfUtM2LqjaxbLK8Sz30ngc3T6A5V3UNKlgCIeDS3Gn5zEMEtYRuqg772174+1oURCGtEAqko0LQIxNBaPVt1H49VAeDOb67qNTCIkGrR7RTFhQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776365851; c=relaxed/simple;
-	bh=ErwOnT0JgTTw7vhCQZp+f8jltSpFdP+zGg2SkB2ZJU8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=g6QKgysfTGSc4vYURkbyYEMq6Z2UxIu39udM26yEh98Zo1JjkGKKil+l5WjZAk+CXrsbRdtMARUvQIkbxSMHYMOHhfXevkso9e9TRVTxE1csReXvTY2Pymun7vyQ0OB5Pu/K3FdrevIsuQdyz/xx0/Z4LNsH2zcgPqvU1cDR3Zg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WjMSWclM; arc=none smtp.client-ip=209.85.210.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f65.google.com with SMTP id 46e09a7af769-7dc35728a57so5285091a34.0
-        for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 11:57:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776365848; x=1776970648; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Hi026evQFCdtftLRIl+IFDB1TLnlqPPKmYddAHJGBWk=;
-        b=WjMSWclMkPRC6tBlIUF7ILhoWx/QVqr50/TZ4hZRk/p0UVUlAA0y15epFhT0n2Ulyf
-         TvQSyhNui1Teu58yW0IG1OqDS0f1KA4pb96ymxxU0EfsbjO3ITluoNYhANn6zJ7CbfEn
-         BCc2vgaazFTGj7GosEqHOEQof9pTKEpGstHBZ2nH1YRo9QLhV85pKqxantlkcadAukKH
-         buzWmZ1SQyVc7/4NVvG1eeq0DGwp799SqIerbpXpLc7NGSjcnKp+hn02LX2rJzXaLiWi
-         XZnu29mYXx7Pyubzz0Up1jQc4+78XZYL0rYT8cc/2tT4zW6/6Iv7PMyB9R7iP8yMOIfe
-         CkYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776365848; x=1776970648;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Hi026evQFCdtftLRIl+IFDB1TLnlqPPKmYddAHJGBWk=;
-        b=UIH0RiuI/rDeQTR+6vTIlKRU1aelbhc7msTTVAuX1gm7jIOEbs0tQC+MzQwSl4VqGe
-         3voP6+jBv2T7ym5TmWsh2NYyrp6RITIBgX80BbLkGHvUEIV7tbeDLNCsz2xI1QAp6Ve7
-         v0uKDgnVfNDwu/wO5CSXa6RkQQiU2WcPJDcr19UmjbdmOi6eFRC4ySeO1ypOApos09q8
-         8RhenjXTHtbm2keIEDbcJcg89baYTFhY/+BsMp0qPREsWdcUFNhqo7xgrTEAQ05gbk4P
-         L9D/Vpi5Ukv0mTaavix+bPoRxZzo1+V8Cf1fz2SouVT35Fl4Q3AwGGLOKgm8PDuJXNmV
-         eywg==
-X-Gm-Message-State: AOJu0YxliCi/jzzFU6KqtCk63dqYN2Te0YW9QDnmEwbxMJxqceZurIby
-	A2Xhfuyn6S+7VzLrg0l0rlkiJWf7rlNl1XeG290SMF4DSrM1Wxnpi0ES0pB7jEDb
-X-Gm-Gg: AeBDieso7w38AXGoAjIddjc4IW8ABdmT8eP0gquT0EY6cSdzGhsj8eDTC2pfUaG728i
-	4rwq56h8KjmuhZza8IynqyWUst+PGZsWzjZ3mjKvjRbRP9ggD1fL8N5wMsX+qfDoZ+QPuEh/rP7
-	92YtHqaaptL9mg/PPNlClpRG5Nuh9CW1Jjf/5DVtEv0gIHym34YUHwU/nZUp91NiixyboKpdx65
-	f3jjCUOtrtDqFuCvElfgZeccSZk/CUcz7x3skZLyIcCPkens8gNmevtWZPoM0xTS1RTPYwW2tLt
-	j8P1xa8P0ukOBCy8uP1L2FsaRmp4s74uQrzorvi6oG2MoKjWRyq/k5vn4Bl+6j2+qu0bkzTkie6
-	VTBFUW0+0gMXbLDqrrwnuUPnT5m9ur3PeSDUPjC64BdldV1uGoh29DFoVdNfSSZQ4FK9Sjc84KG
-	w79pRjtvhAbhYfcK2E7G3bGISZuvzI
-X-Received: by 2002:a05:6830:67f4:b0:7d7:cd20:fc86 with SMTP id 46e09a7af769-7dc9272d923mr345102a34.25.1776365848621;
-        Thu, 16 Apr 2026 11:57:28 -0700 (PDT)
-Received: from localhost ([2a03:2880:12ff:40::])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7dc90c90896sm504965a34.25.2026.04.16.11.57.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Apr 2026 11:57:28 -0700 (PDT)
-From: Stanislav Fomichev <sdf.kernel@gmail.com>
-X-Google-Original-From: Stanislav Fomichev <sdf@fomichev.me>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	Jiri Pirko <jiri@resnulli.us>,
-	Jay Vosburgh <jv@jvosburgh.net>
-Subject: [PATCH net v8 15/15] selftests: net: use ip commands instead of teamd in team rx_mode test
-Date: Thu, 16 Apr 2026 11:57:12 -0700
-Message-ID: <20260416185712.2155425-16-sdf@fomichev.me>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260416185712.2155425-1-sdf@fomichev.me>
-References: <20260416185712.2155425-1-sdf@fomichev.me>
+	s=arc-20240116; t=1776366392; c=relaxed/simple;
+	bh=t2BU4POuNqnQHfs1v7jsAchuyRFNIXmVxb2kXc0/Yr4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dI0QFGOfuvTWqpC/wR4mvE5tKvZB9RtBNPw7Ivwhhmt6s+f/wKzRfZEk4UwZasNbS6yUUJibFUEexmFTUcZ1fWBsGva1NCa6tpr8oUbICZORdEkLrsfXRRIJB8hlgUlR6Aq0n2+Y++3jQfsmh+PzmHkHk19FIrXoLM8p3z8G9JE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=uYpWJ3Av; arc=none smtp.client-ip=91.218.175.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Thu, 16 Apr 2026 12:06:16 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1776366387;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=KKcufqME6AclWOFSO2Pn6FBNuFdVFsZOL3F1tIQrun8=;
+	b=uYpWJ3AvnglL9gowTEPCFHr5rS3M/bKDfOJc6Zt7jlmhEMLTVSQ1Kn1x+DyimYbmr615FE
+	b4aoy+ytRdu1mZKA53vfSV5V/PnW2CBvxGXWtf5B0oe9AHL/DV4MDqAvfMgTGiJg3aDdNT
+	wqbz7hytcBdUoegyOeZiNizyxMENf20=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+To: KaFai Wan <kafai.wan@linux.dev>
+Cc: daniel@iogearbox.net, john.fastabend@gmail.com, sdf@fomichev.me, 
+	ast@kernel.org, andrii@kernel.org, eddyz87@gmail.com, memxor@gmail.com, 
+	song@kernel.org, yonghong.song@linux.dev, jolsa@kernel.org, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	shuah@kernel.org, jiayuan.chen@linux.dev, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH bpf v2 2/2] selftests/bpf: Test TCP_NODELAY in TCP hdr
+ opt callbacks
+Message-ID: <2026416184330.-HAW.martin.lau@linux.dev>
+References: <20260416112308.1820332-1-kafai.wan@linux.dev>
+ <20260416112308.1820332-3-kafai.wan@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260416112308.1820332-3-kafai.wan@linux.dev>
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-279128-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-279131-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCPT_COUNT_TWELVE(0.00)[22];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FROM_NEQ_ENVFROM(0.00)[sdfkernel@gmail.com,netdev@vger.kernel.org];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FREEMAIL_CC(0.00)[iogearbox.net,gmail.com,fomichev.me,kernel.org,linux.dev,davemloft.net,google.com,redhat.com,vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[martin.lau@linux.dev,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[fomichev.me:mid,fomichev.me:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,jvosburgh.net:email]
-X-Rspamd-Queue-Id: 6FD1E413EFC
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9FB8A413FB0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Replace teamd daemon usage with ip link commands for team device
-setup. teamd -d daemonizes and returns to the shell before port
-addition completes, creating a race: the test may create the macvlan
-(and check for its address on a slave) before teamd has finished
-adding ports. This makes the test inherently dependent on scheduling
-timing.
+On Thu, Apr 16, 2026 at 07:23:08PM +0800, KaFai Wan wrote:
+> index 56685fc03c7e..2d738c0c4259 100644
+> --- a/tools/testing/selftests/bpf/prog_tests/tcp_hdr_options.c
+> +++ b/tools/testing/selftests/bpf/prog_tests/tcp_hdr_options.c
+> @@ -513,6 +513,59 @@ static void misc(void)
+>  	bpf_link__destroy(link);
+>  }
+>  
+> +static void hdr_sockopt(void)
+> +{
+> +	const char send_msg[] = "MISC!!!";
+> +	char recv_msg[sizeof(send_msg)];
+> +	const unsigned int nr_data = 2;
+> +	struct bpf_link *link;
+> +	struct sk_fds sk_fds;
+> +	int i, ret, true_val = 1;
+> +
+> +	lport_linum_map_fd = bpf_map__fd(misc_skel->maps.lport_linum_map);
+> +
+> +	link = bpf_program__attach_cgroup(misc_skel->progs.misc_hdr_sockopt, cg_fd);
+> +	if (!ASSERT_OK_PTR(link, "attach_cgroup(misc_hdr_sockopt)"))
+> +		return;
+> +
+> +	if (sk_fds_connect(&sk_fds, false)) {
+> +		bpf_link__destroy(link);
+> +		return;
+> +	}
+> +
+> +	ret = setsockopt(sk_fds.active_fd, SOL_TCP, TCP_NODELAY, &true_val, sizeof(true_val));
+> +	if (!ASSERT_OK(ret, "setsockopt(TCP_NODELAY) active"))
+> +		goto check_linum;
+> +
+> +	ret = setsockopt(sk_fds.passive_fd, SOL_TCP, TCP_NODELAY, &true_val, sizeof(true_val));
 
-Using ip commands makes port addition synchronous, removing the race
-and making the test deterministic.
+Why are these two setsockopt(TCP_NODELAY) calls needed?
 
-Cc: Jiri Pirko <jiri@resnulli.us>
-Cc: Jay Vosburgh <jv@jvosburgh.net>
-Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
----
- .../selftests/drivers/net/bonding/lag_lib.sh    | 17 +++--------------
- .../drivers/net/team/dev_addr_lists.sh          |  2 --
- 2 files changed, 3 insertions(+), 16 deletions(-)
+Instead of creating a new "void hdr_sockopt(void)", can the test be done in the
+existing "void misc(void)" by doing bpf_setsockopt(TCP_NODELAY) in the
+misc_estab() bpf prog?
 
-diff --git a/tools/testing/selftests/drivers/net/bonding/lag_lib.sh b/tools/testing/selftests/drivers/net/bonding/lag_lib.sh
-index bf9bcd1b5ec0..f2e43b6c4c81 100644
---- a/tools/testing/selftests/drivers/net/bonding/lag_lib.sh
-+++ b/tools/testing/selftests/drivers/net/bonding/lag_lib.sh
-@@ -23,20 +23,9 @@ test_LAG_cleanup()
- 		ip link set dev dummy2 master "$name"
- 	elif [ "$driver" = "team" ]; then
- 		name="team0"
--		teamd -d -c '
--			{
--				"device": "'"$name"'",
--				"runner": {
--					"name": "'"$mode"'"
--				},
--				"ports": {
--					"dummy1":
--						{},
--					"dummy2":
--						{}
--				}
--			}
--		'
-+		ip link add "$name" type team
-+		ip link set dev dummy1 master "$name"
-+		ip link set dev dummy2 master "$name"
- 		ip link set dev "$name" up
- 	else
- 		check_err 1
-diff --git a/tools/testing/selftests/drivers/net/team/dev_addr_lists.sh b/tools/testing/selftests/drivers/net/team/dev_addr_lists.sh
-index b1ec7755b783..26469f3be022 100755
---- a/tools/testing/selftests/drivers/net/team/dev_addr_lists.sh
-+++ b/tools/testing/selftests/drivers/net/team/dev_addr_lists.sh
-@@ -42,8 +42,6 @@ team_cleanup()
- }
- 
- 
--require_command teamd
--
- trap cleanup EXIT
- 
- tests_run
--- 
-2.52.0
+The PASSIVE_ESTABLISHED_CB can do the bpf_setsockopt(TCP_NODELAY, 0)
+if it wants to keep the same expectation on Nagle. The
+BPF_SOCK_OPS_HDR_OPT_LEN_CB and BPF_SOCK_OPS_WRITE_HDR_OPT_CB
+can do bpf_setsockopt(TCP_NODELAY, 1) to test recursion and
+the error return value.
 
+>  void test_tcp_hdr_options(void)
+> diff --git a/tools/testing/selftests/bpf/progs/test_misc_tcp_hdr_options.c b/tools/testing/selftests/bpf/progs/test_misc_tcp_hdr_options.c
+> index d487153a839d..a8cf7c4e7ed2 100644
+> --- a/tools/testing/selftests/bpf/progs/test_misc_tcp_hdr_options.c
+> +++ b/tools/testing/selftests/bpf/progs/test_misc_tcp_hdr_options.c
+> @@ -28,6 +28,12 @@ unsigned int nr_data = 0;
+>  unsigned int nr_syn = 0;
+>  unsigned int nr_fin = 0;
+>  unsigned int nr_hwtstamp = 0;
+> +unsigned int nr_hdr_sockopt_estab = 0;
+> +unsigned int nr_hdr_sockopt_estab_err = 0;
+> +unsigned int nr_hdr_sockopt_len = 0;
+> +unsigned int nr_hdr_sockopt_len_err = 0;
+> +unsigned int nr_hdr_sockopt_write = 0;
+> +unsigned int nr_hdr_sockopt_write_err = 0;
+
+nr_hdr_sockopt_estab, nr_hdr_sockopt_len, and nr_hdr_sockopt_write
+are unnecessary. These tests have already been covered in some ways.
+
+Mostly a nit. The new counters are used in both connections. Note the
+existing nr_xxx is exclusively used in either active or passive,
+so there is no parallel counting in practice.
+
+Instead of counting, just use a bool nodelay_est_ok,
+nodelay_hdr_len_err, nodelay_write_err and assert them
+to be true in userspace.
 
