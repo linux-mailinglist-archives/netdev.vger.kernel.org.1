@@ -1,168 +1,154 @@
-Return-Path: <netdev+bounces-279171-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279172-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id COLVF2Vb4WmusQAAu9opvQ
-	(envelope-from <netdev+bounces-279171-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 23:57:57 +0200
+	id EPtSJCJg4WmysgAAu9opvQ
+	(envelope-from <netdev+bounces-279172-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 00:18:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E47141520D
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 23:57:56 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E26D3415310
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 00:18:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 76D5E3047DC7
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 21:57:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9410030382BB
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 22:18:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33128374758;
-	Thu, 16 Apr 2026 21:57:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE51C3537D7;
+	Thu, 16 Apr 2026 22:18:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=joshtriplett.org header.i=@joshtriplett.org header.b="MHv1d7Ur";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="mde2NloG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hbZ6xJQx"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a8-smtp.messagingengine.com (fout-a8-smtp.messagingengine.com [103.168.172.151])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 583263264F9;
-	Thu, 16 Apr 2026 21:57:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB0B03002B3;
+	Thu, 16 Apr 2026 22:18:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776376674; cv=none; b=shCXKxkJ5x3oiDWg0G6SdyOpWgHKteI+ghj37501lBF3wodd768RvWBWuPMoqYGA8K0TbWVuKyiGZDKjU5sxqSNNh4/nQHxKZuBm8NTNdEJCnZFMKCh4Ei6gD7UzIu4mUoNBSlTjQquWzDU52Qp4gRUls0moYQX1/eTAZvyX+mw=
+	t=1776377887; cv=none; b=sNO4FZOTsbPW5Jo+yLn4vqfLDfTSOGrloqaC30tDwzFbLZ5Qt6Vx97MM/73mHpjIe/5w6l+TZMuv18Aur/V/pstbVCD6S4s3dIV8bkAcIryRichUU+dAFQd6dux/2pGFwfFTnIT2cdcEQVHiNbO+PgBCVRQF3HM382S5K0fxKLU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776376674; c=relaxed/simple;
-	bh=dNZsYqoRYEIKF8O8YFn1/84Xuu6i4Pb5xDdWa/+SRAk=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=U7hPqLgJfVCgHy3KY64506oDx3pbf2coOfxf7Jh3TuVuE2CHuPJXJUJIoFlCR3U78jTXihrJLVNxMTnuz9hW3XUxDOGeUF0Vu98fDlZmreyHRVmgf+r7R933pICrnyU1TYdUnzKhpVPw8jc9k7DQXkEoImYh8WfTdgiGVLDcjoI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=joshtriplett.org; spf=pass smtp.mailfrom=joshtriplett.org; dkim=pass (2048-bit key) header.d=joshtriplett.org header.i=@joshtriplett.org header.b=MHv1d7Ur; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=mde2NloG; arc=none smtp.client-ip=103.168.172.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=joshtriplett.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=joshtriplett.org
-Received: from phl-compute-07.internal (phl-compute-07.internal [10.202.2.47])
-	by mailfout.phl.internal (Postfix) with ESMTP id 7AC46EC01BD;
-	Thu, 16 Apr 2026 17:57:51 -0400 (EDT)
-Received: from phl-imap-03 ([10.202.2.93])
-  by phl-compute-07.internal (MEProxy); Thu, 16 Apr 2026 17:57:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	joshtriplett.org; h=cc:cc:content-type:content-type:date:date
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1776376671;
-	 x=1776463071; bh=ieN5wLxIK3X06jaDDAZPc2NCX8fUUVaqyIu/FVopEBw=; b=
-	MHv1d7Ur688i6WxkwEwiowcY2SwEIfcOiboScY7fCW1zX4gDD03wm2v/1eg7wsrk
-	8rpOgkX+gVA9JUkqNMN7MPNNiOKbwfnZtNA8zhWOYGVmGAiTjD3WEM6iUhejmbnR
-	1Vb4xi7YCK92R6CO+JysPoydwod1U+35wdzVWl7N9L/cIATC8vzw2KHHdJK54i68
-	h7Ash+g9gp3x7hlKWtr4kZv4iwPmqB9RlTJNFh/z9886VIYw6MtAy04yONLJjopR
-	CHYrmGgSemMevWhUJgNEhqgIt0EPCeY0zod34lFi3IqpkZb0gzD8bHn99ujWI8qv
-	SvRpVah89vyFHagVyxt0vA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1776376671; x=1776463071; bh=ieN5wLxIK3X06jaDDAZPc2NCX8fUUVaqyIu
-	/FVopEBw=; b=mde2NloG494kUYTOLf3jZNqnODCZe+off7GTK0Y5HiO9V26mD3F
-	e0m0tNr5Mt7r/s/uuQoW+l5RCUspZVGc7PcV8y4aMQOqLPV/gioi4CrxMzWSQS99
-	o76xjb/1jh7Rq+W+7e+OPy/4ga7r6fjNBVdQymZitw29iH+ZkhpBrGSXY49zZm92
-	sEu58TV5aQCEBzOIjBa7W45E/aS65sbwSxcRiYLDIBYp7GWNWBKafm8q2T5jCvQJ
-	kOiUyjJCOXIBR4/Ckcaf7bG/zwJEtbXMLe2MN+hx/t+SKuTowvig4NreYKHVRbCt
-	aesj9QvTyxg9xiecHbhGcTXhCRHTcw4IIrQ==
-X-ME-Sender: <xms:X1vhaZ3HLUAjHFN0dVWmRd5dce5nwdI6EFZEAdmaNULwrv50cV4vcQ>
-    <xme:X1vhaa7fH3s0tmcs_n1AU7T8jovt2FkOhTKLMbK5ApoybxpofMMZl-NxiNWHnWXfr
-    CcjjBAYwLnK0UG1RsyOl0cLjZ5DAaaFGnVoNxKgSq675w9G8QJXnlyq>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdegkedugecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecunecujfgurhepofggfffhvfevkfgjfhfutgesmhdtreerre
-    dttdenucfhrhhomhepfdflohhshhcuvfhrihhplhgvthhtfdcuoehjohhshhesjhhoshhh
-    thhrihhplhgvthhtrdhorhhgqeenucggtffrrghtthgvrhhnpeehlefgudelvedutefgtd
-    fhfeduudfgvdekgfdvkedtudetudfhkeffleejgfevkeenucevlhhushhtvghrufhiiigv
-    pedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehjohhshhesjhhoshhhthhrihhplhgvth
-    htrdhorhhgpdhnsggprhgtphhtthhopeefpdhmohguvgepshhmthhpohhuthdprhgtphht
-    thhopegrlhigsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhmrghnse
-    hvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdr
-    khgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:X1vhaZZmaa8V-Tau0XJdu6nqcPgT6kOSFghKPZYYFdWdCmnWl5gNFg>
-    <xmx:X1vhaQjz5BKjEjtB1lPNnbBErl1QF9PPA2741o1-WuTEFuM-BKFwsg>
-    <xmx:X1vhaT60Byf_kIS4CPrEtEXeCiiKLmw0hzBzgfTYwWDVXB5bP7DD2w>
-    <xmx:X1vhaf4yjtp395-_0hKLViohX_5rf0eiD89rMINzkCwFtC9r0kQM-A>
-    <xmx:X1vhaeGzUWYsa1qMFVAuB_PiK98Y3iVcl0n-llxdAmvQmYq4vPdRedDW>
-Feedback-ID: i83e94755:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 0C50F18E006C; Thu, 16 Apr 2026 17:57:51 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1776377887; c=relaxed/simple;
+	bh=rdbqAcea2bPOghKecjij3X2YtJQEorGpdyp2Altmn+Q=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=jcNdixp/1qXm8o5/crYORchQ6jawYRgA9R0RkdLJJoYM0zWsb8ClKSquzoJRg+zmTN1VVhU+qCSHo4Pus/D2R16rAQTGc/Nf82PZENqKA7kri/ncf9jKoV6x9LvDwtyfQOA1Wi3I0MYX1hOSEWHi+BXophF+LjyxjZRGOZMXUl0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hbZ6xJQx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2BF5C2BCAF;
+	Thu, 16 Apr 2026 22:18:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776377887;
+	bh=rdbqAcea2bPOghKecjij3X2YtJQEorGpdyp2Altmn+Q=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=hbZ6xJQx2qwzmR4PWUUytEZ0fc+38tvleLjQ3tIO7XEPwbJDKPPQmr5XacYnAqCkW
+	 ZdncbCBpB8kGmRIW3sw1bUOBQnF2qL+EzrPPE0r8E6jtdMAlwdr6xW6Ru+CH6QqleL
+	 hEkXeFs9D+L3Cw2HWbMa/3C4mHixZZPwe7tOzk4JCcckfJ3K7zcz1kdFdHJYgGZ7fL
+	 PwY5sHwWVB4G/FtQ20encCFM0TtFQFZDwkgsPZMZMe1biSuN9Z3gLZLW6Wr5HamCgr
+	 iICBZhQub9rSSSNH28BiajymXVHydnfKfDW5GtrlGbXDh0bKoixku2ZRgccIlNFkAT
+	 3dzrz0I9rA7hQ==
+Message-ID: <8d25047d6fe36dda1a872ea710c5ce69adcfe2b9.camel@kernel.org>
+Subject: Re: [PATCH net v2] RDS: Fix memory leak in rds_rdma_extra_size()
+From: Allison Henderson <achender@kernel.org>
+To: Xiaobo Liu <cppcoffee@gmail.com>, Paolo Abeni <pabeni@redhat.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>, Simon Horman
+ <horms@kernel.org>, netdev@vger.kernel.org,  linux-rdma@vger.kernel.org,
+ rds-devel@oss.oracle.com,  linux-kernel@vger.kernel.org
+Date: Thu, 16 Apr 2026 15:18:05 -0700
+In-Reply-To: <CAJeqHv+kCScdMLYgOPG0TaRwTH5-Vo-=HEPs+oX24OprbmtbwA@mail.gmail.com>
+References: <20260413070005.15272-1-cppcoffee@gmail.com>
+	 <d0e820ce-2a79-4443-ade5-a03d16f712bb@redhat.com>
+	 <CAJeqHv+kCScdMLYgOPG0TaRwTH5-Vo-=HEPs+oX24OprbmtbwA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.3-0ubuntu1.1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Thu, 16 Apr 2026 14:57:19 -0700
-From: "Josh Triplett" <josh@joshtriplett.org>
-To: "Alejandro Colomar" <alx@kernel.org>
-Cc: linux-man@vger.kernel.org, netdev@vger.kernel.org
-Message-Id: <43b64cba-a7c5-41ed-8e45-c0508f482687@app.fastmail.com>
-In-Reply-To: <aeAAXdBe1f2THR2N@devuan>
-References: <ad50CQgF_gNtB1Kr@localhost> <aeAAXdBe1f2THR2N@devuan>
-Subject: [PATCH] Document TCP_DEFER_ACCEPT rounding
-Content-Type: multipart/mixed;
- boundary=a97c3acb8bde2f7a508a69f0f65635f1d3fe6e0d
-X-Spamd-Result: default: False [-0.55 / 15.00];
-	MIME_BASE64_TEXT_BOGUS(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[joshtriplett.org:s=fm2,messagingengine.com:s=fm2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[multipart/mixed,text/plain,text/x-patch];
-	MIME_BASE64_TEXT(0.10)[];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	XM_UA_NO_VERSION(0.01)[];
+	TAGGED_FROM(0.00)[bounces-279172-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[joshtriplett.org];
-	TAGGED_FROM(0.00)[bounces-279171-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+,1:+,2:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com,redhat.com];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[joshtriplett.org:+,messagingengine.com:+];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[josh@joshtriplett.org,netdev@vger.kernel.org];
-	HAS_ATTACHMENT(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[achender@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_THREE(0.00)[3];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,messagingengine.com:dkim,app.fastmail.com:mid]
-X-Rspamd-Queue-Id: 9E47141520D
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E26D3415310
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
---a97c3acb8bde2f7a508a69f0f65635f1d3fe6e0d
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+On Thu, 2026-04-16 at 18:00 +0800, Xiaobo Liu wrote:
+> The internal addition of kfree and setting the pointer to NULL in
+> rds_rdma_extra_size makes the function more self=E2=80=91consistent and s=
+ecure.
+> After applying this patch, kfree(NULL) in rds_sendmsg is also safe and wi=
+ll
+> not cause a double=E2=80=91free.
 
-Patch attached.
---a97c3acb8bde2f7a508a69f0f65635f1d3fe6e0d
-Content-Disposition: attachment;
-	filename*0="0001-Document-TCP_DEFER_ACCEPT-rounding.patch"
-Content-Type: text/x-patch;
-	name="=?UTF-8?Q?0001-Document-TCP=5FDEFER=5FACCEPT-rounding.patch?="
-Content-Transfer-Encoding: base64
+Hi Xiaobo,                                                                 =
+             =20
+                 =20
+Paolo makes a good point that I had missed in that rds_sendmsg owns the
+cleanup. So even though iov->iov isn't freed here, it isn't leaked
+either. Self-consistency is fair as a style point, but it's not
+strong enough to justify the change on its own since it isn't a bug
+fix. That said, thank you for taking the time to look at this area;
+we appreciate the effort to help track down and fix bugs.
 
-RnJvbSBhZDJiNzk4Mzc2MzI2ZDQwOTQ0ZjY5OTgyNzBhNzU1ZjYxYzU3ODE1IE1vbiBTZXAg
-MTcgMDA6MDA6MDAgMjAwMQpNZXNzYWdlLUlEOiA8YWQyYjc5ODM3NjMyNmQ0MDk0NGY2OTk4
-MjcwYTc1NWY2MWM1NzgxNS4xNzc2Mzc0NTM5LmdpdC5qb3NoQGpvc2h0cmlwbGV0dC5vcmc+
-CkZyb206IEpvc2ggVHJpcGxldHQgPGpvc2hAam9zaHRyaXBsZXR0Lm9yZz4KRGF0ZTogVGh1
-LCAxNiBBcHIgMjAyNiAxNDoyMTozNCAtMDcwMApTdWJqZWN0OiBbUEFUQ0hdIERvY3VtZW50
-IGBUQ1BfREVGRVJfQUNDRVBUYCByb3VuZGluZwoKU2lnbmVkLW9mZi1ieTogSm9zaCBUcmlw
-bGV0dCA8am9zaEBqb3NodHJpcGxldHQub3JnPgotLS0KIG1hbi9tYW43L3RjcC43IHwgMiAr
-KwogMSBmaWxlIGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygrKQoKZGlmZiAtLWdpdCBhL21hbi9t
-YW43L3RjcC43IGIvbWFuL21hbjcvdGNwLjcKaW5kZXggZmY0NmVhN2JjLi4yNmE5OWI4Nzkg
-MTAwNjQ0Ci0tLSBhL21hbi9tYW43L3RjcC43CisrKyBiL21hbi9tYW43L3RjcC43CkBAIC0x
-MDkxLDYgKzEwOTEsOCBAQCBBbGxvdyBhIGxpc3RlbmVyIHRvIGJlIGF3YWtlbmVkIG9ubHkg
-d2hlbiBkYXRhIGFycml2ZXMgb24gdGhlIHNvY2tldC4KIFRha2VzIGFuIGludGVnZXIgdmFs
-dWUgKHNlY29uZHMpLCB0aGlzIGNhbgogYm91bmQgdGhlIG1heGltdW0gbnVtYmVyIG9mIGF0
-dGVtcHRzIFRDUCB3aWxsIG1ha2UgdG8KIGNvbXBsZXRlIHRoZSBjb25uZWN0aW9uLgorVGhl
-IGtlcm5lbCB3aWxsIHJvdW5kIHRoaXMgdmFsdWUgdXAgdG8gdGhlIG5leHQgbGFyZ2VyIFRD
-UCByZXRyYW5zbWl0CitkdXJhdGlvbi4KIC5JUAogT24gYSBjbGllbnQgc29ja2V0LAogaWYg
-bm9uemVybywKLS0gCjIuNTMuMAoK
+Thanks,        =20
+Allison
 
---a97c3acb8bde2f7a508a69f0f65635f1d3fe6e0d--
+>=20
+> On 4/16/2616:20 Paolo Abeni <pabeni@redhat.com> wrote:
+> >=20
+> > On 4/13/26 9:00 AM, Xiaobo Liu wrote:
+> > > @@ -595,11 +600,20 @@ int rds_rdma_extra_size(struct rds_rdma_args
+> *args,
+> > >                * nr_pages for one entry is limited to
+> (UINT_MAX>>PAGE_SHIFT)+1,
+> > >                * so tot_pages cannot overflow without first going
+> negative.
+> > >                */
+> > > -             if (tot_pages < 0)
+> > > -                     return -EINVAL;
+> > > +             if (tot_pages < 0) {
+> > > +                     ret =3D -EINVAL;
+> > > +                     goto out;
+> > > +             }
+> > >       }
+> > >=20
+> > > -     return tot_pages * sizeof(struct scatterlist);
+> > > +     ret =3D tot_pages * sizeof(struct scatterlist);
+> > > +
+> > > +out:
+> > > +     if (ret < 0) {
+> > > +             kfree(iov->iov);
+> > > +             iov->iov =3D NULL;
+> >=20
+> > Is this really needed?!? AFAICS rds_rdma_extra_size() is invoked only
+> > via: rds_sendmsg() -> rds_rm_size() -> rds_rdma_extra_size(), and the
+> > rds_sendmsg() error path already frees any non NULL iov.
+> >=20
+> > /P
+
 
