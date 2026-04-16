@@ -1,146 +1,132 @@
-Return-Path: <netdev+bounces-278984-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278985-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yB72HVqs4GkCkwAAu9opvQ
-	(envelope-from <netdev+bounces-278984-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 11:31:06 +0200
+	id OGXaD8Ov4GkRkwAAu9opvQ
+	(envelope-from <netdev+bounces-278985-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 11:45:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3D1840C644
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 11:31:05 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id B344F40C933
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 11:45:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B8A14303FF30
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 09:26:09 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 61C9C31521D2
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 09:40:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 210FA3921CA;
-	Thu, 16 Apr 2026 09:26:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88D7A37C108;
+	Thu, 16 Apr 2026 09:40:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b="J4DulUyI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QGp4wFNy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.nabladev.com (mx.nabladev.com [178.251.229.89])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A1DA3921D7;
-	Thu, 16 Apr 2026 09:26:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.251.229.89
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66D251EF091
+	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 09:40:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776331569; cv=none; b=ltMSP1sTwE1BBb6Ut3nnacc6ueUBmYFOtiH/KrQN+i/g5cIe8Jemy4UDbIn5U/ybQTrWjrIkMpGgwzP+gJvvfxItfiIBUq2HFY+bLIF8hPGQKYmkNCbA2VWcufeB4aKoJssejDozP3bCunkp//pzsmakS0F6Jh3nlenDXjZfUv0=
+	t=1776332437; cv=none; b=u7WEYyo+7Ge7Yv6C+lCbd/T1ABcRMo8W7FD9/5cZ0mlKprYVI055Cy7ukG8aPYi+SpJqX0WRwKE2oYg71jEBT6QM139ELTz3VwgktcnHoj6W83R4keAg9BZ1ONRBaHgbk3H9CQEP9FoIr1XT8A5yKlKa8UeyOFJ1Dc+ACJOq/Pw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776331569; c=relaxed/simple;
-	bh=Toi/ExDBfyTrjWM2U7MV0tQpQPeL2fa13Z+umrNeJ9Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Qmzwokinz8/4BZd+UBkKqTnuIzXgU2CS/lV4dZofouS8SgGn+CGGfqv3dZzX2crkGx1RoiAH9lz7tZpQem8EDlso5qTbZokv+WDKyGmYpzYavFhkq5l8Y8nCtXz6HWLwv2eHwpGQjLB/ahWQrJG/QH6VoBP+nOYGt8GDqnCfMYc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com; spf=pass smtp.mailfrom=nabladev.com; dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b=J4DulUyI; arc=none smtp.client-ip=178.251.229.89
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nabladev.com
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 7BC9E1134E5;
-	Thu, 16 Apr 2026 11:26:01 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nabladev.com;
-	s=dkim; t=1776331564;
-	h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=oIlLjStCPp+YGdDq1HhDSCSzp/k/RTMW/4RqUFAa/AQ=;
-	b=J4DulUyIR6XJw1wn+SxuBkcPb/tn8epuU3yvkhDlh8N93t4h6S7ghIytknFyRiuxlPSC+s
-	+x2YUJKQL5J8yeFBEyVlYuMYRZYKmttYi8DrjZ7VhBSxBcnRfAdd+zaSmqT9ThuIF80VFm
-	dUMXBtq9uj023AGRnOB/iM2peMjJpxuPFO7jBRAxiJWrDvisBNJCyKtr+mOYsJeKpXbQhG
-	S8I9yIlbMznbHRVUkdo1nAkVWcB/PdrpeDRlTWfcL+UcDuWXDRDQ7o6w8t8ovL+p+BpPMD
-	oaUVABAbsCeuITZtO5q1CIBYqDKw5gl/u26/XiJ6qQ8Cs0JER3ZzNM2PlwTasA==
-Message-ID: <afe7ed2c-4434-4394-9d87-a4bdf5a15ec1@nabladev.com>
-Date: Thu, 16 Apr 2026 11:26:00 +0200
+	s=arc-20240116; t=1776332437; c=relaxed/simple;
+	bh=4cm7N4+2KetiOTDMzw3C8XcqQyKC6SnW0eiww7y1F/0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=nCR1djIkPvRucK6Z4dY8Xs97kEO4BsdDT3Pt7a6CFF7TeBjhE1J+kCIYw7QfDjMFTG4JB15v43asgc2CM11KfN8MQ9SMmTB5rDDY0hyl5cEiBYE9olRxdh5tDZcIA5DDY8LSoo1e2nNXQB/tKtrS6IlfH2IdRKOERN5qv/DsyLs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QGp4wFNy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02BF4C2BCAF;
+	Thu, 16 Apr 2026 09:40:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776332437;
+	bh=4cm7N4+2KetiOTDMzw3C8XcqQyKC6SnW0eiww7y1F/0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=QGp4wFNyqA98U2Xp7kM/O6Z8Jfvt/PEHi8hPJ2Cxrapj1jzuQosESQBvDGHwQcIKg
+	 rdjooxaKDZQkAYUQETUl+zirgToXceeuCLmmH/9iYoW5aHKlf+ZEPLnnmT/GPm7Q67
+	 OVoKsnn4kapS6bl0gfzYavvJbAYb2MLi49bR21mJllzHCywr31cMhH6XZQFYB4UwmS
+	 GbqhKXspnyjrW+/vh4yGhg1Rl2EiXGHPzAmj1UKFQfBwa2TsGkajOrgW3dGl8eZwL4
+	 N4qX0vPlB85lA4YMnWc3LqIg98QO+iPz0gsnnsNXZDzqH1Jgi05RNr9FHiEN1dDVHZ
+	 bG3E5mpOOPWDw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02C54380A979;
+	Thu, 16 Apr 2026 09:40:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net,PATCH v3 1/2] net: ks8851: Reinstate disabling of BHs around
- IRQ handler
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: netdev@vger.kernel.org, stable@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Nicolai Buchwitz <nb@tipi-net.de>,
- Paolo Abeni <pabeni@redhat.com>, Ronald Wahl <ronald.wahl@raritan.com>,
- Yicong Hui <yiconghui@gmail.com>, linux-kernel@vger.kernel.org
-References: <20260414103327.113500-1-marex@nabladev.com>
- <20260414125753.Im6GAIHn@linutronix.de>
- <2fcfb84f-69f6-493e-94d6-95d85d8000f6@nabladev.com>
- <20260414145218.lsNpdAJI@linutronix.de>
- <7734527a-d08b-49fa-b258-c37c5ae2da55@nabladev.com>
- <20260416062159.fPxqc52X@linutronix.de>
-Content-Language: en-US
-From: Marek Vasut <marex@nabladev.com>
-In-Reply-To: <20260416062159.fPxqc52X@linutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] net/sched: act_mirred: fix wrong device for
+ mac_header_xmit
+ check in tcf_blockcast_redir
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177633240555.2710724.8790736448507828329.git-patchwork-notify@kernel.org>
+Date: Thu, 16 Apr 2026 09:40:05 +0000
+References: <20260413084927.71353-1-phx0fer@gmail.com>
+In-Reply-To: <20260413084927.71353-1-phx0fer@gmail.com>
+To: Dudu Lu <phx0fer@gmail.com>
+Cc: netdev@vger.kernel.org, jhs@mojatatu.com, jiri@resnulli.us
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[nabladev.com,reject];
-	R_DKIM_ALLOW(-0.20)[nabladev.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278984-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,lunn.ch,google.com,kernel.org,tipi-net.de,redhat.com,raritan.com,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-278985-lists,netdev=lfdr.de,netdevbpf];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_THREE(0.00)[4];
+	FROM_NO_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[marex@nabladev.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[nabladev.com:+];
+	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nabladev.com:dkim,nabladev.com:mid]
-X-Rspamd-Queue-Id: F3D1840C644
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B344F40C933
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 4/16/26 8:21 AM, Sebastian Andrzej Siewior wrote:
-> On 2026-04-16 01:14:35 [+0200], Marek Vasut wrote:
->>> spin_unlock_bh(&ks->statelock)? After that unlock, the softirq must be
->>> processed and __netdev_alloc_skb() _could_ observe pending softirqs but
->>> not from ks8851.
->> Because __netdev_alloc_skb() also enables/disables BH , see the "else"
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Mon, 13 Apr 2026 16:49:27 +0800 you wrote:
+> In tcf_blockcast_redir(), when iterating block ports to redirect
+> packets to multiple devices, the mac_header_xmit flag is queried
+> from the wrong device. The loop sends to dev_prev but queries
+> dev_is_mac_header_xmit(dev) — which is the NEXT device in the
+> iteration, not the one being sent to.
 > 
-> Yes. But there is no softirq raised in that part. That softirq is raised
-> by netif_wake_queue() within a bh disabled section. Therefore upon the
-> unlock the softirq must be invoked.
-> After that, rhe allocation later on may invoke softirqs which were
-> raised but I don't see how ks8851 can be part of it.
-> Before commit 0913ec336a6c0 ("net: ks8851: Fix deadlock with the SPI
-> chip variant") there was no _bh around it meaning the softirq was raised
-> but not invoked immediately. This happened on the bh unlock during
-> memory allocation. Therefore I am saying this backtrace is from an older
-> kernel.
+> This causes tcf_mirred_to_dev() to make incorrect decisions about
+> whether to push or pull the MAC header. When the block contains
+> mixed device types (e.g., an ethernet veth and a tunnel device),
+> intermediate devices get the wrong mac_header_xmit flag, leading to
+> skb header corruption. In the worst case, skb_push_rcsum with an
+> incorrect mac_len can exhaust headroom and panic.
+> 
+> [...]
 
-I actually did update the backtrace in V3 with the one from next 
-20260413 that contained b44596ffe1b4 ("ARM: Allow to enable RT") from 
-stable-rt/v6.12-rt-rebase branch [1] .
+Here is the summary with links:
+  - net/sched: act_mirred: fix wrong device for mac_header_xmit check in tcf_blockcast_redir
+    https://git.kernel.org/netdev/net/c/4510d140524c
 
-I think I misunderstood the usage of "softirq is raised" vs. "softirq is 
-invoked" above . Is it possible that there was an already raised softirq 
-before the threaded IRQ handler was invoked, and __netdev_alloc_skb() is 
-what invoked that softirq ?
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-> If there is a flaw in my the theory please explain _how_ you managed
-> that get that backtrace. I am sure it must have from an older kernel and
-> _now_ this lockup also happens on !RT kernels (except for the SPI
-> platform).
-I used [1] , with PREEMPT_RT enabled , on stm32mp157c SoC . I ran iperf3 
--s on the stm32 side, iperf3 -c 192.168.1.2 -t 0 --bidir on the hostpc 
-side. The backtrace happened shortly after.
+
 
