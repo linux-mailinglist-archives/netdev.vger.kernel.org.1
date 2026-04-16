@@ -1,137 +1,162 @@
-Return-Path: <netdev+bounces-279034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279035-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iLb/DMzV4GmMmgAAu9opvQ
-	(envelope-from <netdev+bounces-279034-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 14:27:56 +0200
+	id 2LNbGJXW4GlymgAAu9opvQ
+	(envelope-from <netdev+bounces-279035-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 14:31:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A603C40E213
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 14:27:55 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6195B40E349
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 14:31:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C913D30724D0
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 12:27:31 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E7533300C361
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 12:30:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C4D13B6342;
-	Thu, 16 Apr 2026 12:27:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E6223B8BB6;
+	Thu, 16 Apr 2026 12:30:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="azmFppuX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SMyIhcMB"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8DED37C924;
-	Thu, 16 Apr 2026 12:27:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E12BA3B7B9E
+	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 12:30:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776342451; cv=none; b=QwVa6Z7IZ4l1gwqIMG8lK09VjvT69SW58Qa8vUcT8qU/ryu33oKuTD3uloLV6Wm2hyHRsT+CjzVdKy4IL6SQMKTI0cnbunfAz+ObcxCBG3fEfca3HY7Y2zugXutrfWBtGR2ZNS41ZJrxxi4yOZlQJz7BukzBYef1rdr97vq8suQ=
+	t=1776342610; cv=none; b=jJdJ5yx7lcKySyE3+3S3YtchnYpU+RG/aFTpb650hw/rZBb5+XBcMGwV3XUM6EE3eQ0hUSFLf1GWQndf1bdi++A0trSc17GeYz3uU2AFhhGRYiCn7jJfcVn6VIF1G8dyJBOA+eeKBrHlJFG22Y8mHX3W1lwqvGj7Q4YNS8di8KU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776342451; c=relaxed/simple;
-	bh=Fnra5qsBCr1ftQm105ZSYM+D0zJ7L+SRwxnkwFAJpoY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KOTKrngE59Dls2Lb0FPCqj4HFr6E/oTZsI53NYYI2TdBR2Jm/g/jP0887+tFapKGfuS3ASiY7RnLzEwNu57V2wYfqRYVovIgKK0aDQ7xsdNp/mL1JPyPcm0h4NTM9VhLUVEkVjXZp64ugI/cVR3m5UTy8zsftUsPiyepmVauKSc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=azmFppuX; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
-	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References;
-	bh=g3IoSnLHf3c7m8lpmywYWg24E1za4lFs3bvdoX3kcPk=; b=azmFppuXNPdamvwTFe0xE9qbD9
-	c3r3u3imBt/Xa1KPGpRrOE9Sq51I4WwxCnRjg+XAWOdCh+jSq4rd5FRYEtt8usntnXJMTpVXijFS4
-	5t+ZNERMTTUXWc1tUBltTUY7CZ5fnHAzUwi+SXVLFaWeWg8Dhi2pVS6+ZzOMSVw2iwb0Z9s5Hwb1W
-	6gq4psznTbFBorMwIhUuclo0ySl24uLbH+mEjcYa4xns6dw8SBHxMyQ1QeAG92Bn5f44JfIGGnwnf
-	GbBn4PVCVLaFLxEsfNFfVk5FEGaSHWGULJPx1x6X7vIMcBenov71MxZIwCgUUxM4ddlJPWsAMZPV9
-	OQZoS10A==;
-Received: from localhost ([127.0.0.1])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1wDLoV-000Ftl-2p;
-	Thu, 16 Apr 2026 14:27:20 +0200
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	willemdebruijn.kernel@gmail.com
-Subject: [PATCH bpf] bpf: Fix precedence bug in convert_bpf_ld_abs alignment check
-Date: Thu, 16 Apr 2026 14:27:19 +0200
-Message-ID: <20260416122719.661033-1-daniel@iogearbox.net>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1776342610; c=relaxed/simple;
+	bh=K/4afwQ5p31SSvbXjWdzi0L0oqupXfEEFTghGQ4JcSM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=N/WT4z7UWPl5Q1qqoJ1FOVmxyg9rkph/NH8oiq3TItpJrVIf5wmqZ3OxN101Gt2HKYr7DyRymAO5n6dOeeV1QQ+PEj6NN21+Iwb5zcsZwrdO9cTDahRRflJ9BX+hIdWpXeWjtv/n05Bq5HRQHmda+Q7ly3TQst+dA63hHt/rV2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SMyIhcMB; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-488b0e1b870so122430225e9.2
+        for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 05:30:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776342607; x=1776947407; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wD5n29vJmomxS6DITZYPjUM6os1Itf/93DfNIu2KPog=;
+        b=SMyIhcMBhud7E9S0oZfY4dPtDZqiIEqLPYjB6s4KMU/0r83YLgF5ZbDmBOKyocj9ZY
+         qrYE7AXH6tRIrCBZ2stUl3Qi0p1ekSMzV/bw635qeh1plkYWcNycJtCcJhUXvLmdYZkQ
+         ak84/JBnez1KRfcmlMpgZ++CuFvu085GXxYYRhr73LFU4mA8rLyuOYJFvhMOOSuhDheC
+         cVlzWB5L4UqeH/Dt9xlmzSUVQmUeJPE5kIcqSfdNeq+fT/ncidGLUeITziIc3LIGoSlb
+         mIEymQGy7PCqcWSexrvq+2z77t5rI8LX0YHsKA3o8o949yKU9SPV8ckeT8kyG1heRNFK
+         DfaQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776342607; x=1776947407;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=wD5n29vJmomxS6DITZYPjUM6os1Itf/93DfNIu2KPog=;
+        b=B/4emDmTlK0S9QYojX4pBHmlftf36wxS8aYaoEB0xgNI+Q6rdliiBw4+hsCrmUPidh
+         K5X/0bj83YyRVRou5xDAztWQTBuzKiFSDLukThm/y88ud8ZhJvhi0M+ggY5DweJwPF6o
+         8KQw1B3ohvt6rd9kP3L5ENSffbyWAvAm9fYJJxPaJN9gfe4z4H4m70B6qQnF8/7ehQ4Z
+         JXNe+7MmJX42PyrQx1MvvLatSdKxq5OE0EznyQ//I/1+DDFbUVpXKgDf3qD6/KuBYNcu
+         P7i4oSnFlGSS2dd5e6OA5XDcqAmdBYSmskNGc0bg9GbN2QI1qY3Cu1GEsIcXQLjdicGg
+         BQGQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+nYdrPJyr6Ebxxfz1ajG8ui7wCr3Z9xTQ4avmT6Q9uVMqjm3jtVAk1LIgYIjTTmYkt4FNerlE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz07TNtXTj52JCDZcSvwGuG6HU4uNh2vPxLyyibwRKBWacBpQFS
+	KJkxRvyUWJKInHwZooT1dUYWF7HgyHF2bIiAy+3XFwz0N7Sul+jsgC9s
+X-Gm-Gg: AeBDiesavddyYrB4HqNj0dC/scTRPdP2UMV2hdDcQKmKeLd4iKReIHnMLCgbprBqu79
+	cDQwkvt7NqKzzC+TvlP1iLT8Sy+Et42JITvWRhV9fd5QK4VFYR2BXCFM+oSiaHXm0Y8ruh11iSe
+	OYQV2p+aOimMfsPoHzuYpeQvUPRWPgCK48t2veg55cdljbFD9NkB35NaDrEVrAopz6BHhN+L46y
+	kc9yHTcAqJgTBjO8sPXyjlTocmQ5yfsMC5nsgT+7fFDI8byBftnE7xIVjD8QqSGEBDSuk3rIone
+	aoM5GAXA4TaGaKzglCnyFWc7YRxzcm1jh2KnepALcueg495mMXZE2NkgpE4cEN6+HVdPX8OENRP
+	ipX5IeWgLwAkNeblc5QhyAv5K7WWSvyyzl3fgNx8HgSI4+EpK4cAU5U8Xc3rSJa48bMM2tKdn9U
+	zElWqC8PVP4dDgLCq1YvOQECGMpGaLzPx85rRyAlgoGhKiOH5UnGVomoQdf1LjmX1S
+X-Received: by 2002:a05:600c:45ce:b0:485:3e19:9e01 with SMTP id 5b1f17b1804b1-488d6890c9dmr355637165e9.28.1776342606991;
+        Thu, 16 Apr 2026 05:30:06 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488f0e9c668sm69981255e9.4.2026.04.16.05.30.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Apr 2026 05:30:06 -0700 (PDT)
+Date: Thu, 16 Apr 2026 13:30:04 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: chensong_2000@189.cn
+Cc: rafael@kernel.org, lenb@kernel.org, mturquette@baylibre.com,
+ sboyd@kernel.org, viresh.kumar@linaro.org, agk@redhat.com,
+ snitzer@kernel.org, mpatocka@redhat.com, bmarzins@redhat.com,
+ song@kernel.org, yukuai@fnnas.com, linan122@huawei.com,
+ jason.wessel@windriver.com, danielt@kernel.org, dianders@chromium.org,
+ horms@kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, paulmck@kernel.org,
+ frederic@kernel.org, mcgrof@kernel.org, petr.pavlu@suse.com,
+ da.gomez@kernel.org, samitolvanen@google.com, atomlin@atomlin.com,
+ jpoimboe@kernel.org, jikos@kernel.org, mbenes@suse.cz, pmladek@suse.com,
+ joe.lawrence@redhat.com, rostedt@goodmis.org, mhiramat@kernel.org,
+ mark.rutland@arm.com, mathieu.desnoyers@efficios.com,
+ linux-modules@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, linux-acpi@vger.kernel.org,
+ linux-clk@vger.kernel.org, linux-pm@vger.kernel.org,
+ live-patching@vger.kernel.org, dm-devel@lists.linux.dev,
+ linux-raid@vger.kernel.org, kgdb-bugreport@lists.sourceforge.net,
+ netdev@vger.kernel.org
+Subject: Re: [RFC PATCH 1/2] kernel/notifier: replace single-linked list
+ with double-linked list for reverse traversal
+Message-ID: <20260416133004.07bd2886@pumpkin>
+In-Reply-To: <20260415070137.17860-1-chensong_2000@189.cn>
+References: <20260415070137.17860-1-chensong_2000@189.cn>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: Clear (ClamAV 1.4.3/27973/Thu Apr 16 08:24:10 2026)
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[iogearbox.net,reject];
-	R_DKIM_ALLOW(-0.20)[iogearbox.net:s=default2302];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,gmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279034-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_THREE(0.00)[4];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-279035-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[iogearbox.net:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[189.cn];
+	RCPT_COUNT_TWELVE(0.00)[48];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.996];
-	MIME_TRACE(0.00)[0:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A603C40E213
+	DBL_BLOCKED_OPENRESOLVER(0.00)[189.cn:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6195B40E349
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Fix an operator precedence issue in convert_bpf_ld_abs() where the
-expression offset + ip_align % size evaluates as offset + (ip_align % size)
-due to % having higher precedence than +. That latter evaluation does
-not make any sense. The intended check is (offset + ip_align) % size == 0
-to verify that the packet load offset is properly aligned for direct
-access.
+On Wed, 15 Apr 2026 15:01:37 +0800
+chensong_2000@189.cn wrote:
 
-With NET_IP_ALIGN == 2, the bug causes the inline fast-path for direct
-packet loads to almost never be taken on !CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
-platforms. This forces nearly all cBPF BPF_LD_ABS packet loads through
-the bpf_skb_load_helper slow path on the affected archs.
+> From: Song Chen <chensong_2000@189.cn>
+> 
+> The current notifier chain implementation uses a single-linked list
+> (struct notifier_block *next), which only supports forward traversal
+> in priority order. This makes it difficult to handle cleanup/teardown
+> scenarios that require notifiers to be called in reverse priority order.
 
-Fixes: e0cea7ce988c ("bpf: implement ld_abs/ld_ind in native bpf")
-Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
----
- net/core/filter.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+If it is only cleanup/teardown then the list can be order-reversed
+as part of that process at the same time as the list is deleted.
 
-diff --git a/net/core/filter.c b/net/core/filter.c
-index a10cdcb7103e..35f5ee7af64e 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -508,7 +508,7 @@ static bool convert_bpf_ld_abs(struct sock_filter *fp, struct bpf_insn **insnp)
- 	    ((unaligned_ok && offset >= 0) ||
- 	     (!unaligned_ok && offset >= 0 &&
- 	      offset + ip_align >= 0 &&
--	      offset + ip_align % size == 0))) {
-+	      (offset + ip_align) % size == 0))) {
- 		bool ldx_off_ok = offset <= S16_MAX;
- 
- 		*insn++ = BPF_MOV64_REG(BPF_REG_TMP, BPF_REG_H);
--- 
-2.43.0
+	David
+
 
 
