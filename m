@@ -1,354 +1,272 @@
-Return-Path: <netdev+bounces-279005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279006-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iIekGSrF4GlelwAAu9opvQ
-	(envelope-from <netdev+bounces-279005-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 13:16:58 +0200
+	id EAFvNKHG4GmjlwAAu9opvQ
+	(envelope-from <netdev+bounces-279006-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 13:23:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0F3A40D3B2
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 13:16:57 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4589140D517
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 13:23:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8FF30312DF35
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 11:14:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 376F93067064
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 11:18:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4A9D3A7581;
-	Thu, 16 Apr 2026 11:14:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC1BD392C4A;
+	Thu, 16 Apr 2026 11:18:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SRDlAvvf"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="QPsa6x4S"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A32423A6F03
-	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 11:14:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.19
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776338046; cv=fail; b=Qio+aUHJtYjFX74w3bliQepWwaksWNsCq05V3lsYhkM4eKhcFSdlQ1xp21ul6RHQTJHrjHEPqkwpssGIApFPuiBuICAzTlCugJsU/X6LH7tGJ2KvLpkEr8HeJUqw4LwBUkxUWVlNoy8/GON5EDtCfak7ws1CQ9qUyFJvKgys2yg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776338046; c=relaxed/simple;
-	bh=fG5Vfw13J/9oPhqCc8vNHsQqeRItOK7Xq1QKJkbJVJM=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=hYMTYRte0ottJZUmOZuJ9Dcx+IEd8BTOPxvlQR3gFuQHCfXSYwZ2P2IiLtF3QgA6SgvEbiDb3uwdpHBtDfE7+C2hcQjjJLgmttcM9HDm8J6EHPSLoMJIYUda4cDqiHL0uVqIedE1VRGuMCtNULwUW8WDci0chlBa1jskJYHXNII=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SRDlAvvf; arc=fail smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1776338044; x=1807874044;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=fG5Vfw13J/9oPhqCc8vNHsQqeRItOK7Xq1QKJkbJVJM=;
-  b=SRDlAvvfYbBA4pytFlzsCbzdzZQrhEG5XlEQ6p/RGcUtM5vFNG2gyFi2
-   sFKGsnkE/fLJVcWytY065LGMibQFgymdY992wiIxUK3wOB8fBl5MdI30Q
-   y85fDbPqNECZOJCMuRlbyJTAp/HWzNi9QF/W5wsK5H4nxh8cBpJXdHi8S
-   NIsrMIW4mJF3mXhFKWBf7BeOGizcLzYgMBvm/BcqEko4buIy3vanCDu/5
-   j817TtI6P5QuDppRy/uyBQXHbWjlNl6pVl8XBd4KTfG9fes7p9zduuS2f
-   WPMBmoboeAFjr43eo0OtLatWLyTp3jhEEBX8zlhh5Vv8S8LjXmsaxIfG7
-   Q==;
-X-CSE-ConnectionGUID: rWHnjxTnS1ujCAzk7WvxIg==
-X-CSE-MsgGUID: OifLm/fcQSqBtl4OOXqs5g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11760"; a="76366288"
-X-IronPort-AV: E=Sophos;i="6.23,181,1770624000"; 
-   d="scan'208";a="76366288"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2026 04:14:03 -0700
-X-CSE-ConnectionGUID: vzb7v9CDSVOxl1ucuMrV7Q==
-X-CSE-MsgGUID: bkdOizJIRgqj+5HLfvfWBg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,181,1770624000"; 
-   d="scan'208";a="230948002"
-Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
-  by orviesa007.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2026 04:14:04 -0700
-Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
- fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Thu, 16 Apr 2026 04:14:02 -0700
-Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
- FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Thu, 16 Apr 2026 04:14:02 -0700
-Received: from MW6PR02CU001.outbound.protection.outlook.com (52.101.48.8) by
- edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Thu, 16 Apr 2026 04:13:05 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=SuuVmqHOeJGfsY7hAnsmbIBeXkF072H4MhGY2SmxQw7K2wXGxhHJM2joyqcunx2yN6d54JmEE3dX5ItyKPwQhmg1rlBa4T7Mi0rkmZdbt74LuH3V1SLMjzBa5ivnsdIfAT9VZzmemlOSq5Xmfu2zLnzNC64d9IkhIAtdMIDWuO7mfI82UuVa4qZ6z4L5QzUAaeUGm8y0XyAWCjwXA1xbXBSfGtmecNUiF8StVarf8rlLNCF4I8+28GH6RBERMGdduyGuYfDEYz0Rq0Q3jnwOfyqTTafcdIcMABJBQMWC38KGiNsQ+iCHzkFLowYjnIl6YBhyG1A59j2uUhu2OK8cqg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cDPf5RyN1LaUkFaXyWPMMCuUbTcJBwHEcedIqiWCBoY=;
- b=LBFEGMROF5pThB6g2G7+zZmsfQUMJ2W7gJGSDAJRi9oXhb2JcmJBfFwQmvCJ3N7mJkVZ8IeC047/nR0ZquD0XS9IosgcyqkiYdyGs71XaHWnC6fTAcs7BXAtYzXjzok2L0Xt5007MFNN7GQh0esIX5llygcygOLt6/k8ZHp6R8WZzVHmVCU95w1K4koLrSx5vhuSzouzVh6ney3VIl16up4jdXKacGitIyGxWuk9JYg+fgD986B7yxcWX77tNJrSgiPY+lkSW/LcciR7yyBcNjaLp5eZGLgz20rPrCZeUl+b/J7sWDjoE1w8CeQmOBdEW1Y7A6DvLflqJF85rwhfgQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
- PH7PR11MB5818.namprd11.prod.outlook.com (2603:10b6:510:132::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.48; Thu, 16 Apr
- 2026 11:13:02 +0000
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::d9b3:e942:2686:3cdd]) by DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::d9b3:e942:2686:3cdd%6]) with mapi id 15.20.9818.014; Thu, 16 Apr 2026
- 11:13:02 +0000
-Date: Thu, 16 Apr 2026 13:12:53 +0200
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-To: <intel-wired-lan@lists.osuosl.org>
-CC: <netdev@vger.kernel.org>, <magnus.karlsson@intel.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <horms@kernel.org>, <przemyslaw.kitszel@intel.com>,
-	<jacob.e.keller@intel.com>
-Subject: Re: [PATCH iwl-net] i40e: keep q_vectors array in sync with channel
- count changes
-Message-ID: <aeDENQXk8Mz1elXb@boxer>
-References: <20260414121405.631092-1-maciej.fijalkowski@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20260414121405.631092-1-maciej.fijalkowski@intel.com>
-X-ClientProxiedBy: TL0P290CA0011.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:5::13) To DM4PR11MB6117.namprd11.prod.outlook.com
- (2603:10b6:8:b3::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF2FE3909B0
+	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 11:18:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776338315; cv=none; b=JSmsNDbnefL+b8ei3iN/hUEr/BzGhDOghhk1h0ER9wphylbAhYguV68b3WtqKcXKhWO3MN2uDSM0p2pTfegapBY+zCGLwThEtB4r//MLQfx6UJW1/hroleEqe+bZAXjFT9nuLvuExL+IWasDFBf305uZUGr7iuJZniOdvDhnnAM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776338315; c=relaxed/simple;
+	bh=0I1hQQOfuGn7nbMyH5rccfAqTH9pDQIfcJ5oxQD7bhU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=E4EQYIpPDKe6SMSFkykYL4inXo5iFGk6ONGzGfTU4zmaVZleSi+2IblQ+qqhVhnXr5OSHJaokh7yvRRcqR0pQQuptZl4yJ3tAG61uWuZibW7vtI/R6mFJpR/BWrTIQdjr3+rvlQ5/Zmh4dO8UpNePrvHJwNe6LoZkKufGWCjhzo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=QPsa6x4S; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-488b8efed61so5957565e9.1
+        for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 04:18:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1776338312; x=1776943112; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Qd1VopekJz5FiTxyx67UMNjXFF9UUIXLsOl680XCCf0=;
+        b=QPsa6x4SOVHFIcDZBLBIeYk2JTeQWGgH1I/3lTPPEg1m3CfUzXMuqkg1W7krRJmT8j
+         9PXwgbaKw1ChOtXp26dqLlViRMzLu2DIJH1nHlwCGOHuo0AorVSeI1xTup0gRAjK2bQq
+         h2BSS8KanKLcEwhgMrGj/RBly7Hb6Evel3xOgFrrlH8ZgdGbtI87vgHZknkFSC6QYc0y
+         d55RgDHO4PWB//XwatZe0m+EOVhgp3plLy2baygOj2HBXeeG0OwHFIqcV8WGnHEDVEXZ
+         v1AnAsdtZ6KLTgLiH/Fejvk9cpuu1fdVQ3GsqGpmBMFw9AxIVSFKWzwDj2V/vREOJjHz
+         /XlA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776338312; x=1776943112;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Qd1VopekJz5FiTxyx67UMNjXFF9UUIXLsOl680XCCf0=;
+        b=XFfrpji/aPjAWvFjPmsjYBwutM1DslJ84daozozAyboeaDE19U1eTLEUP8QzoPb2xo
+         xwx4FNPjJj7OqsXS8h4FJxTVXFdnMj2dpp3M4cagRmX6vPaFXi59/X8TRzTz1yBss9C7
+         RKUElvzAqvzvfZDxYgWsyQlYGnqN3RSiy222X/+ikQkFpYUgcEi3NBiWhcf8XQr0+0ra
+         CSFdm6r2KjMZHmq94wl1CScS5wg316AZlinzKnzkhP4nOqOmY4CA2lu/ar+wdG/aMPlT
+         x6oW+yWgl3ZKy7InzgkU8diw5LX6UZVEHRH8M6S2Ny88UsQ8+XHs0oGofM1xkLSHpAOw
+         SwDw==
+X-Forwarded-Encrypted: i=1; AFNElJ/b/tymuaqbkGbDv+Wfkxtqjm7vq+f3TzdXI9Z7S3/68djTMkaq5yrIx6q1hjhSQKKH3381Pic=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw8NI/qlQ8IehSdCi3YyXbmqwu0OkAt7kkgMnljM+dwfxYlkXBT
+	MCayDb6gkWIe97BjDbuLi+vAbJEnU4aJIdx/NNWfEvUiqexxfEXKTrYVatUuRI+WDk0=
+X-Gm-Gg: AeBDiesswM5HusVqmcxSdrxhcUwl57jE0c64uMX78vKDOcPkKK39n11nDQ9/10qobPy
+	7dxvVZfgSeRF+j3vpDBrqO5mXWBIQsp1+vQuLMIYPj+zWB1TRP702FGcAU8TZ+E8nmADbXksOhn
+	+iRatQEVUPkXlDqO+kmw7Qa1coWh87KykM1BO/6l5Wzsxpdgp3stYlelwiSHDVUsdA9d5tHivS+
+	QwGnv+Nphk0lr8gOxbdV3l/nOcHRWR1A6ZjWRq7cQGMTNsL8aYxHfulQcSg8+UhJaZ+pkaQBgij
+	ZYXM50kaOypy2RARtCzDVTAZaFGWyh1Q2cn6vI4AE0gADSJvKORXCMyUOOv9sBGL2pZRF1hAysN
+	IQdsT9Kbs8xF4OTtVoky4NJPoHHtqQSV6OJM+utyzUlJPQhx/4yHEJ6mgvYbwiW801SGF9GisX+
+	OmOxdmtQnk4kMurRWk+b0OYizKtqkha25afrYracCZw9dEek1aqAhVWwwO/2VfVEHzg0SvWLazu
+	PJQcSQOFf8asgyEoRrnMg5cd1G2EC3h4yndqevx6Cj6RLoAA+u1XpiieARZg6LkDOoK+S1w+GjU
+	TYxZ
+X-Received: by 2002:a05:600c:31a9:b0:485:3038:72c2 with SMTP id 5b1f17b1804b1-488f4804d19mr27439205e9.17.1776338312207;
+        Thu, 16 Apr 2026 04:18:32 -0700 (PDT)
+Received: from ?IPV6:2a00:1028:838d:271e:8e3b:4aff:fe4c:a100? (dynamic-2a00-1028-838d-271e-8e3b-4aff-fe4c-a100.ipv6.o2.cz. [2a00:1028:838d:271e:8e3b:4aff:fe4c:a100])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43ead3d5ea9sm13089525f8f.21.2026.04.16.04.18.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Apr 2026 04:18:31 -0700 (PDT)
+Message-ID: <1db425bf-58a9-4768-8c38-3ae25d7662a5@suse.com>
+Date: Thu, 16 Apr 2026 13:18:30 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|PH7PR11MB5818:EE_
-X-MS-Office365-Filtering-Correlation-Id: a5a782fb-e190-491a-4f65-08de9ba91fd4
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|18002099003|22082099003|56012099003;
-X-Microsoft-Antispam-Message-Info: wbmnWN6sDlUQy3BRBQyDO7aeGLkuA5LVkCH+9MHnj94w3/HJOkGKbGtvVCa6pxzUPIaX1BmuojJhoJmCn4oy4kmocmhI+Fd4w+uIeos8evpcHDHnbn9NJU0BO5OPyenNY05fsg/FTRpQJkx4Hmd1OkdrpWPfr+ZsGrz9i/dAJk6MYcMQ8L4zjMBbQfUuRMTsbrPK3GZAYc90khOGGjMcW8JOoVPKpmG2XU2OiPDSaotD1L9pS6i5wOjtcSU29BmPrar0q0RC51RgcbhOp+m2sWlG3QX0bbb7eeXeTBrBxHSX97Bt6vQl70oIeq3CSrqaft3DLwwzMhY8P3TgZFluUba8/Z6h2/ienjsWhdwseTKYHykXF9jxf9b/RzLwjTX5PT3H7Z4ziFDAGILEsmONZFtLV27v5hXNDpHXs7lupEaHL9JiM2oYaNVDZCv4mzIMv/i+vuGKN+pjHZwzGi3Updi8GtJaHeLXrJ9ObQCBkzikI0m6/JyvhUUQcyXi27Fs1eKdO9Hr+IxY1WFcn6F//4NVq7TPAQRrZzGwbId+ZeiKAaEp732G+/nbsLqvAOTvK4fM4aRN2FIm2/FBlm8J9E6cZjmtLDeqrAbtJLIAeB5bEgMbLOnfOKaOmcefN8e/ljfm4MPy4vMLg0FRy6DBf56qwrXjyDF0ZHFfL2csnaprJygwWCODGO8OWvciOKLaVl/iPbiqj1jbYx4iLa34Lu7iXvQ/SVSHrSpzEa4h4I/MLDxZIW4iJ3c/T20r10mk
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?DY6MVmYc5ajLiKlxg9wHKI77TJPnG9c+0+NNELqw9aYRkNyyheIsHu9YYzlX?=
- =?us-ascii?Q?mxeYWoIQFx5Sh5JiHlFIzjxis3MN7Na/+tiNQ6jkPAX6/R7h2+kv1YtozVyi?=
- =?us-ascii?Q?TMODaIGVDPC6wBEuj4jBO2k9AzcDsOtCd9PQ00HiMmcgXShnjqazc77hCCNx?=
- =?us-ascii?Q?qvcPQ1bp0ksDqQDnynbTtTlU2x+aBVDAx2FjIvyz0kBwDtwA4Urq9NggKbYM?=
- =?us-ascii?Q?GTVJV19xCD7XYoR+wNn0vhs1VBQ7neBKZoePTc+WHJ2YTq0PRo5QyfmOi48u?=
- =?us-ascii?Q?7k1Pl+/2Zpu8KzhQvNlTAq2j1cc3D7p+8SBnVKeQajkl6Xd3pdJb2r/Ki53Y?=
- =?us-ascii?Q?Khx0rHCQvxyWinSMVSh3iwonCwMP+WN0/tkegFly1lPQWQj4jH6WspoMIzpZ?=
- =?us-ascii?Q?pKqYcg0D+xdcTXwx8kENFeugwalzG/m1lTHXo1i1Pwr5B7aMzgb1zNmabSZm?=
- =?us-ascii?Q?f2la31Ahaogsq3aczazL+hl6RCWBTvYkWuX9zvnRiSF1/JJjp22gZCuRT6yl?=
- =?us-ascii?Q?lgUO6out0ruXmkD1f7oa4s7gHz5yJVkRcpA2ye9zf1XsNRCK/hOPcqNNqBUb?=
- =?us-ascii?Q?ho33seZ2vwenKc9htWw9ArwbFALIwCo12oJkLjMFYtJLKzzMGTC85nxmCj4I?=
- =?us-ascii?Q?d37Lk7unJpxseBhJnWS9+SqwomlS29jm77way1O2UAMy2M3SKC0RYnWQeCTe?=
- =?us-ascii?Q?Wg559lTwgzgibH61mr3w3gs/xLLkcQxSbmvve3AMs4E294bBbz1/REhBVHBp?=
- =?us-ascii?Q?A7CT6bCx4E/4aO+CzUriwEDfp6zLKJ2X2Hp6H7ev8+qyLnWceteNrubFV9W0?=
- =?us-ascii?Q?i/kRiR509Bc1Yx9vqWobOtjtppHWgulKVzm/MP84R1FYWpIYFKiAKc/NsHar?=
- =?us-ascii?Q?mRt9ABF/Y6wyLHWURZ7iFFDOYFvbROELCSL0XZxup6rL+PoU48FJ1JzNoDa4?=
- =?us-ascii?Q?Pfm2wO4UFcuG9m2Wz8bTXGpGVZ1te+1kT3EAG2MDO6rSgNaoJMWXxTkCiRut?=
- =?us-ascii?Q?aeYiejMMe+qDOKewZlU7WuKV/9F6BWof7FimFXw2Yro81nQ38/ortIXFcdLK?=
- =?us-ascii?Q?1MoDP4fAvRIospHZR/cNQcfCmBNum0AFgKutJVJFZ0sIEM2QJidQWcQWg0dn?=
- =?us-ascii?Q?VjluTUMcLKZOIme5QnwaEM+rY0ArVLtrkjXB09oWyuUmfEDY/ia4cyWW/kJr?=
- =?us-ascii?Q?y0VrhVcP1f0uJ286N7Z1PZoV1LSwzonA/pHK3QNT5ClPCZZl190on5Kwv/dv?=
- =?us-ascii?Q?0hXdl58I3RcXtSi7qFdZB6M4QeFKz4oZwCzWoxslUDTaLlMzfhBSTx9/Cqab?=
- =?us-ascii?Q?MWj1VIr2gPEYDdb+x//ijO06IOgrG8PUR8dD5xoKwX2PwwZYXvfgvzxO9aoS?=
- =?us-ascii?Q?IgDUKWJ0XlH+3Lhx+mQnYkJafOho9JnLUmBD8Z6Nq2vkATCBhQr8uC4mIxkG?=
- =?us-ascii?Q?Pvaind7hAlZG+MIIwgFn51fgSQVFk6ScOUo5hHbrA5srfAY1j4BVNk+OGe3j?=
- =?us-ascii?Q?smHivLcZ1V8o5cK3ikZq2hjxKc9upsjJnrJVgYuB8hZ4REJuvQobwrAJ/vyx?=
- =?us-ascii?Q?2GXN8N0zZpB0KcZ+s2bK+foexFiEOYbVa9TaBuoPo8sQ5BNLkKFCQB3VTZm/?=
- =?us-ascii?Q?qDY5lFsLQzUdCCjxSbK7BSoGGA6sKZVtx7rvsDgUiQZNewa65hqK/whv3phm?=
- =?us-ascii?Q?2LSyX1N/R/2LBfbaVSY+gCqkS757zywPZgJrJxObThMnfd3Gqf0owehe/u9G?=
- =?us-ascii?Q?DWUkNueVemoAvK5uJ8ofqR1P4NnT0QU=3D?=
-X-Exchange-RoutingPolicyChecked: c2XvotGXWm7z2JW3ITh+OPWz6jTFieOjT/w0JBfVmCtjta67iNVz/uvFFA3Q1JMb72nc4WepLiCp8cOYVBJ8twX6pYXHUlICIvWPUiXk3fg9JXaLJn1f171yeoEB20kdki08uY7iEQE7EsJFs/UxM5zlMkcHKlDr3OTrI0lRApSltHC/Wd04Fk/jjEGKsqFsgmP0Bmrdisk8URlFTXKxf150HERLD8gB9oX0QeHUE7EwuaG47g97We9AwL7fbpzK00kGGL5W8c+3lvljM3CAXFvy4ljkEEgSGkVXS8tOI0BdE7WpTK+EDXEmlEhTLnNdROq5H2e7O8/pSqJMvynHTA==
-X-MS-Exchange-CrossTenant-Network-Message-Id: a5a782fb-e190-491a-4f65-08de9ba91fd4
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Apr 2026 11:13:02.4747
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: cbl/xgPzWbsUxTQ3UD+NsIu+h/m7PFufZhAP8Tvn2hDHjK2d9E5gFrK1Gzlns0ERBbgJWNFFuyTYG4Qw2ocZj5tmWWRIjuWPHeXdQRzZ6kY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB5818
-X-OriginatorOrg: intel.com
-X-Spamd-Result: default: False [0.34 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 2/2] kernel/module: Decouple klp and ftrace from
+ load_module
+To: Song Chen <chensong_2000@189.cn>
+Cc: rafael@kernel.org, lenb@kernel.org, mturquette@baylibre.com,
+ sboyd@kernel.org, viresh.kumar@linaro.org, agk@redhat.com,
+ snitzer@kernel.org, mpatocka@redhat.com, bmarzins@redhat.com,
+ song@kernel.org, yukuai@fnnas.com, linan122@huawei.com,
+ jason.wessel@windriver.com, danielt@kernel.org, dianders@chromium.org,
+ horms@kernel.org, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, paulmck@kernel.org, frederic@kernel.org,
+ mcgrof@kernel.org, da.gomez@kernel.org, samitolvanen@google.com,
+ atomlin@atomlin.com, jpoimboe@kernel.org, jikos@kernel.org, mbenes@suse.cz,
+ pmladek@suse.com, joe.lawrence@redhat.com, rostedt@goodmis.org,
+ mhiramat@kernel.org, mark.rutland@arm.com, mathieu.desnoyers@efficios.com,
+ linux-modules@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, linux-acpi@vger.kernel.org,
+ linux-clk@vger.kernel.org, linux-pm@vger.kernel.org,
+ live-patching@vger.kernel.org, dm-devel@lists.linux.dev,
+ linux-raid@vger.kernel.org, kgdb-bugreport@lists.sourceforge.net,
+ netdev@vger.kernel.org
+References: <20260413080701.180976-1-chensong_2000@189.cn>
+ <1191caf5-6a61-4622-a15e-854d3701f4fc@suse.com>
+ <a35f5f94-7d5a-4347-974b-b270c89ef241@189.cn>
+Content-Language: en-US
+From: Petr Pavlu <petr.pavlu@suse.com>
+In-Reply-To: <a35f5f94-7d5a-4347-974b-b270c89ef241@189.cn>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-279005-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,napi_threaded.py:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
+	TAGGED_FROM(0.00)[bounces-279006-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
+	FREEMAIL_TO(0.00)[189.cn];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DKIM_TRACE(0.00)[suse.com:+];
+	RCPT_COUNT_TWELVE(0.00)[47];
 	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maciej.fijalkowski@intel.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[petr.pavlu@suse.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[10]
-X-Rspamd-Queue-Id: D0F3A40D3B2
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[189.cn:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,suse.com:dkim,suse.com:mid]
+X-Rspamd-Queue-Id: 4589140D517
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Apr 14, 2026 at 02:14:05PM +0200, Maciej Fijalkowski wrote:
-> For the main VSI, i40e_set_num_rings_in_vsi() always derives
-> num_q_vectors from pf->num_lan_msix. At the same time, ethtool -L stores
-> the user requested channel count in vsi->req_queue_pairs and the queue
-> setup path uses that value for the effective number of queue pairs.
+On 4/15/26 8:43 AM, Song Chen wrote:
+> On 4/14/26 22:33, Petr Pavlu wrote:
+>> On 4/13/26 10:07 AM, chensong_2000@189.cn wrote:
+>>> diff --git a/include/linux/module.h b/include/linux/module.h
+>>> index 14f391b186c6..0bdd56f9defd 100644
+>>> --- a/include/linux/module.h
+>>> +++ b/include/linux/module.h
+>>> @@ -308,6 +308,14 @@ enum module_state {
+>>>       MODULE_STATE_COMING,    /* Full formed, running module_init. */
+>>>       MODULE_STATE_GOING,    /* Going away. */
+>>>       MODULE_STATE_UNFORMED,    /* Still setting it up. */
+>>> +    MODULE_STATE_FORMED,
+>>
+>> I don't see a reason to add a new module state. Why is it necessary and
+>> how does it fit with the existing states?
+>>
+> because once notifier fails in state MODULE_STATE_UNFORMED (now only ftrace has someting to do in this state), notifier chain will roll back by calling blocking_notifier_call_chain_robust, i'm afraid MODULE_STATE_GOING is going to jeopardise the notifers which don't handle it appropriately, like:
 > 
-> This leaves queue and vector counts out of sync after shrinking channel
-> count via ethtool -L. The active queue configuration is reduced, but the
-> VSI still keeps the full PF-sized q_vector topology.
-> 
-> That mismatch breaks reconfiguration flows which rely on vector/NAPI
-> state matching the effective channel configuration. In particular,
-> toggling /sys/class/net/<dev>/threaded after reducing the channel count
-> can hang, and later channel-count changes can fail because VSI reinit
-> does not rebuild q_vectors to match the new vector count.
-> 
-> Fix this by making the main VSI num_q_vectors follow the effective
-> requested channel count, capped by the available MSI-X vectors. Update
-> i40e_vsi_reinit_setup() to rebuild q_vectors during VSI reinit so the
-> vector topology is refreshed together with the ring arrays when channel
-> count changes.
-> 
-> Keep alloc_queue_pairs unchanged and based on pf->num_lan_qps so the VSI
-> retains its full queue capacity.
-> 
-> Selftest napi_threaded.py was originally used when Jakub reported hang
-> on /sys/class/net/<dev>/threaded toggle. In order to make it pass on
-> i40e, use persistent NAPI configuration for q_vector NAPIs so NAPI
-> identity and threaded settings survive q_vector reallocation across
-> channel-count changes. This is achieved by using netif_napi_add_config()
-> when configuring q_vectors.
-> 
-> $ export NETIF=ens259f1np1
-> $ sudo -E env PATH="$PATH" ./tools/testing/selftests/drivers/net/napi_threaded.py
-> TAP version 13
-> 1..3
-> ok 1 napi_threaded.napi_init
-> ok 2 napi_threaded.change_num_queues
-> ok 3 napi_threaded.enable_dev_threaded_disable_napi_threaded
-> Totals: pass:3 fail:0 xfail:0 xpass:0 skip:0 error:0
-> 
-> Reported-by: Jakub Kicinski <kuba@kernel.org>
-> Closes: https://lore.kernel.org/intel-wired-lan/20260316133100.6054a11f@kernel.org/
-> Fixes: d2a69fefd756 ("i40e: Fix changing previously set num_queue_pairs for PFs")
-> Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-> ---
->  drivers/net/ethernet/intel/i40e/i40e_main.c | 34 +++++++++++++++++----
->  1 file changed, 28 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-> index 926d001b2150..5636ad71f940 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-> @@ -11403,10 +11403,14 @@ static void i40e_service_timer(struct timer_list *t)
->  static int i40e_set_num_rings_in_vsi(struct i40e_vsi *vsi)
->  {
->  	struct i40e_pf *pf = vsi->back;
-> +	u16 qps;
->  
->  	switch (vsi->type) {
->  	case I40E_VSI_MAIN:
->  		vsi->alloc_queue_pairs = pf->num_lan_qps;
-> +		qps = vsi->req_queue_pairs ?
-> +		      min_t(u16, vsi->req_queue_pairs, pf->num_lan_qps) :
-> +		      pf->num_lan_qps;
->  		if (!vsi->num_tx_desc)
->  			vsi->num_tx_desc = ALIGN(I40E_DEFAULT_NUM_DESCRIPTORS,
->  						 I40E_REQ_DESCRIPTOR_MULTIPLE);
-> @@ -11414,7 +11418,8 @@ static int i40e_set_num_rings_in_vsi(struct i40e_vsi *vsi)
->  			vsi->num_rx_desc = ALIGN(I40E_DEFAULT_NUM_DESCRIPTORS,
->  						 I40E_REQ_DESCRIPTOR_MULTIPLE);
->  		if (test_bit(I40E_FLAG_MSIX_ENA, pf->flags))
-> -			vsi->num_q_vectors = pf->num_lan_msix;
-> +			vsi->num_q_vectors = max_t(int, 1,
-> +						   min_t(int, qps, pf->num_lan_msix));
->  		else
->  			vsi->num_q_vectors = 1;
->  
-> @@ -12043,7 +12048,8 @@ static int i40e_vsi_alloc_q_vector(struct i40e_vsi *vsi, int v_idx)
->  	cpumask_copy(&q_vector->affinity_mask, cpu_possible_mask);
->  
->  	if (vsi->netdev)
-> -		netif_napi_add(vsi->netdev, &q_vector->napi, i40e_napi_poll);
-> +		netif_napi_add_config(vsi->netdev, &q_vector->napi,
-> +				      i40e_napi_poll, v_idx);
->  
->  	/* tie q_vector and vsi together */
->  	vsi->q_vectors[v_idx] = q_vector;
-> @@ -14265,12 +14271,27 @@ static struct i40e_vsi *i40e_vsi_reinit_setup(struct i40e_vsi *vsi)
->  
->  	pf = vsi->back;
->  
-> +	if (test_bit(I40E_FLAG_MSIX_ENA, pf->flags)) {
-> +		i40e_put_lump(pf->irq_pile, vsi->base_vector, vsi->idx);
-> +		vsi->base_vector = 0;
-> +	}
-> +
->  	i40e_put_lump(pf->qp_pile, vsi->base_queue, vsi->idx);
->  	i40e_vsi_clear_rings(vsi);
->  
-> -	i40e_vsi_free_arrays(vsi, false);
-> +	i40e_vsi_free_q_vectors(vsi);
-> +	i40e_vsi_free_arrays(vsi, true);
->  	i40e_set_num_rings_in_vsi(vsi);
-> -	ret = i40e_vsi_alloc_arrays(vsi, false);
-> +
-> +	ret = i40e_vsi_alloc_arrays(vsi, true);
-> +	if (ret)
-> +		goto err_vsi;
+> case MODULE_STATE_COMING:
+>      kmalloc();
+> case MODULE_STATE_GOING:
+>      kfree();
 
-Sashiko warns about potential double-free on vsi->tx_rings. I will send a
-v2 where I include NULLing this ptr in i40e_vsi_alloc_arrays().
+My understanding is that the current module "state machine" operates as
+follows. Transitions marked with an asterisk (*) are announced via the
+module notifier.
 
+---> UNFORMED --*> COMING --*> LIVE --*> GOING -.
+        ^            |                     ^    |
+        |            '---------------------*    |
+        '---------------------------------------'
+
+The new code aims to replace the current ftrace_module_init() call in
+load_module(). To achieve this, it adds a notification for the UNFORMED
+state (only when loading a module) and introduces a new FORMED state for
+rollback. FORMED is purely a fake state because it never appears in
+module::state. The new structure is as follows:
+
+        ,--*> (FORMED)
+        |
+--*> UNFORMED --*> COMING --*> LIVE --*> GOING -.
+        ^            |                     ^    |
+        |            '---------------------*    |
+        '---------------------------------------'
+
+I'm afraid this is quite complex and inconsistent. Unless it can be kept
+simple, we would be just replacing one special handling with a different
+complexity, which is not worth it.
+
+>>
+>>> +    if (err)
+>>> +        goto ddebug_cleanup;
+>>>         /* Finally it's fully formed, ready to start executing. */
+>>>       err = complete_formation(mod, info);
+>>> -    if (err)
+>>> +    if (err) {
+>>> +        blocking_notifier_call_chain_reverse(&module_notify_list,
+>>> +                MODULE_STATE_FORMED, mod);
+>>>           goto ddebug_cleanup;
+>>> +    }
+>>>   -    err = prepare_coming_module(mod);
+>>> +    err = prepare_module_state_transaction(mod,
+>>> +                MODULE_STATE_COMING, MODULE_STATE_GOING);
+>>>       if (err)
+>>>           goto bug_cleanup;
+>>>   @@ -3522,7 +3519,6 @@ static int load_module(struct load_info *info, const char __user *uargs,
+>>>       destroy_params(mod->kp, mod->num_kp);
+>>>       blocking_notifier_call_chain(&module_notify_list,
+>>>                        MODULE_STATE_GOING, mod);
+>>
+>> My understanding is that all notifier chains for MODULE_STATE_GOING
+>> should be reversed.
+> yes, all, from lowest priority notifier to highest.
+> I will resend patch 1 which was failed due to my proxy setting.
+
+What I meant here is that the call:
+
+blocking_notifier_call_chain(&module_notify_list, MODULE_STATE_GOING, mod);
+
+should be replaced with:
+
+blocking_notifier_call_chain_reverse(&module_notify_list, MODULE_STATE_GOING, mod);
+
+> 
+>>
+>>> -    klp_module_going(mod);
+>>>    bug_cleanup:
+>>>       mod->state = MODULE_STATE_GOING;
+>>>       /* module_bug_cleanup needs module_mutex protection */
+>>
+>> The patch removes the klp_module_going() cleanup call in load_module().
+>> Similarly, the ftrace_release_mod() call under the ddebug_cleanup label
+>> should be removed and appropriately replaced with a cleanup via
+>> a notifier.
+>>
+>     err = prepare_module_state_transaction(mod,
+>                 MODULE_STATE_UNFORMED, MODULE_STATE_FORMED);
+>     if (err)
+>         goto ddebug_cleanup;
+> 
+> ftrace will be cleanup in blocking_notifier_call_chain_robust rolling back.
+> 
+>     err = prepare_module_state_transaction(mod,
+>                 MODULE_STATE_COMING, MODULE_STATE_GOING);
+> 
+> each notifier including ftrace and klp will be cleanup in blocking_notifier_call_chain_robust rolling back.
+> 
+> if all notifiers are successful in MODULE_STATE_COMING, they all will be clean up in
+>  coming_cleanup:
+>     mod->state = MODULE_STATE_GOING;
+>     destroy_params(mod->kp, mod->num_kp);
+>     blocking_notifier_call_chain(&module_notify_list,
+>                      MODULE_STATE_GOING, mod);
+> 
+> if  something wrong underneath.
+
+My point is that the patch leaves a call to ftrace_release_mod() in
+load_module(), which I expected to be handled via a notifier.
+
+-- 
 Thanks,
-Maciej
-
-> +
-> +	/* Rebuild q_vectors during VSI reinit because the effective channel
-> +	 * count may change num_q_vectors. Keep vector topology aligned with the
-> +	 * queue configuration after ethtool's .set_channels() callback.
-> +	 */
-> +	ret = i40e_vsi_setup_vectors(vsi);
->  	if (ret)
->  		goto err_vsi;
->  
-> @@ -14282,7 +14303,7 @@ static struct i40e_vsi *i40e_vsi_reinit_setup(struct i40e_vsi *vsi)
->  		dev_info(&pf->pdev->dev,
->  			 "failed to get tracking for %d queues for VSI %d err %d\n",
->  			 alloc_queue_pairs, vsi->seid, ret);
-> -		goto err_vsi;
-> +		goto err_lump;
->  	}
->  	vsi->base_queue = ret;
->  
-> @@ -14306,7 +14327,6 @@ static struct i40e_vsi *i40e_vsi_reinit_setup(struct i40e_vsi *vsi)
->  	return vsi;
->  
->  err_rings:
-> -	i40e_vsi_free_q_vectors(vsi);
->  	if (vsi->netdev_registered) {
->  		vsi->netdev_registered = false;
->  		unregister_netdev(vsi->netdev);
-> @@ -14316,6 +14336,8 @@ static struct i40e_vsi *i40e_vsi_reinit_setup(struct i40e_vsi *vsi)
->  	if (vsi->type == I40E_VSI_MAIN)
->  		i40e_devlink_destroy_port(pf);
->  	i40e_aq_delete_element(&pf->hw, vsi->seid, NULL);
-> +err_lump:
-> +	i40e_vsi_free_q_vectors(vsi);
->  err_vsi:
->  	i40e_vsi_clear(vsi);
->  	return NULL;
-> -- 
-> 2.43.0
-> 
+Petr
 
