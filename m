@@ -1,527 +1,271 @@
-Return-Path: <netdev+bounces-278919-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-278920-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6Go/BA5e4GkcfgAAu9opvQ
-	(envelope-from <netdev+bounces-278919-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 05:57:02 +0200
+	id eK4lLLpj4GmFfwAAu9opvQ
+	(envelope-from <netdev+bounces-278920-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 06:21:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D71840A1B2
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 05:57:00 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 554C340A299
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 06:21:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 3467A3016177
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 03:55:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DB5A1306EB4B
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 04:21:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00A68275848;
-	Thu, 16 Apr 2026 03:55:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E39CE279DCC;
+	Thu, 16 Apr 2026 04:21:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DfkKJwKw"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Xkqy4QqW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f53.google.com (mail-oa1-f53.google.com [209.85.160.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30B1C27AC4C
-	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 03:55:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44E06224F3;
+	Thu, 16 Apr 2026 04:21:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.17
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776311752; cv=pass; b=sNL+n+18TXgpkU9s9XvaTm/zA+ZehwjVCXp2KXAq+DzZ49BA1P9JIulAHJnDS1Yh0mUwMzSjUclziGPSz7aKDLY1yeLUCfB+vjE30tElraezuzsXon9OZvEEwjtnAIYejGVLKfGmUmgRrJrv9eZuf7rHNzjNy1eDmIsk70TvB7c=
+	t=1776313269; cv=fail; b=QsfS9c+czex2cLQ/IJszDWkGZCuNq3Wl2VnZ7XppIp0ok1n3DVNUuYrjQWI1dj0HuHrd6eGFYQtnXkZqVijN/mn0LWO9aaLxU71CiTXkaCsLysV/GVw7byMvx0MVoYkBT2IEvFdAdnhwQ/mQWXhzyShESXx+522J75RVgAgXZgk=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776311752; c=relaxed/simple;
-	bh=OcYN5IGXghYWFoAIchFWJw3FkppmQylxuBo9OALWQYA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GOrqjQtuNMaN2f9DFkmCK4LB1K38f0Jxu22BR6aZDiwTRHRBlLsqmXYTK1/PriBJVK06b/Km8ZCxJvHrvzxS3ZzHWbL2/dL30/gdZ5DhYrcrIRg3HLuTBGUPS/iyvo4mpMCyJ4o6wUC8o/IWVeIjgPZLsfq5VpFEReXrHDMoIIE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DfkKJwKw; arc=pass smtp.client-ip=209.85.160.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f53.google.com with SMTP id 586e51a60fabf-40947c81b31so343181fac.1
-        for <netdev@vger.kernel.org>; Wed, 15 Apr 2026 20:55:50 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776311750; cv=none;
-        d=google.com; s=arc-20240605;
-        b=dwBVem+VNmVxmEIHAo0MVEtsC2dVPcD+b0H74sPriBJ4oCBKK8v47MgmWPjzNlztdA
-         6dHWCPFLiOcTfoDO9w87NxFSuhbohtFWj7aHI810MjXx0T5xH8wpHfVhfB/gK6P8OOjC
-         E0Bea8MdUKZX6knOZ4BhEpB4HX2rgrN+CEQDSmmmJVHYoIih3d93G6EBof30zwbEgulD
-         rZCaTeBaiEM7kTEnNwSPfWyrKZkZaLQ4WIKqpucb1CvSFAGgpMytRS0qR2nnZlDK3n2K
-         zQHrGgQpbSCDbUM6mOUVCFR2H/QML2CPvB5U8E6h//88ZijDDJFaEUZnmH3msdZeTVGy
-         m7Fg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=UnflnbGtuYVuzyIj7FT4Da3iZhZDEzJCKiZl3ehn6uI=;
-        fh=h8JSi214CggotktuzEst9ijuHrMAI0LoQ4aepkxzokU=;
-        b=DyOULXUoYTZNt6r9oN5G1hXorSeN1CtY8wjcFbHr1OrB5JdRtJJ64B2LG2mMlKAHkB
-         ZdhmZiE3XTyZ98YVTG+IjXdQPE7s7sRlV5lQLCvmLnvId36qirOscdxBqTzfkGnbUTVl
-         8WLBnOoE+aAO/Nh0ZZGiwwbkB6c9n6XTsSHFS4gM+e58GegOTViAKThD1plRDlEo76W2
-         BsG1PHARArMqLw/kgx5Kfn28Jxw001TRhEQKDWZIxT3RejKuZ6gJ5jZMX2cy7se3jJCn
-         0/2O+Cnx+l62wJbs/2jJljNw/M6QsOJ8n5KtiJffzCKq5SE1U2ksauFojLVZYDBhNCF+
-         aitg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776311750; x=1776916550; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UnflnbGtuYVuzyIj7FT4Da3iZhZDEzJCKiZl3ehn6uI=;
-        b=DfkKJwKwqACQ1YjW8Gz2+zv+g4F0oHeHcqjIyvWxqoPtoMHx/mfdbnRRR3Qk9DvVw3
-         0VJq3zVl8bHGOJVwgDiI7gcXICKpZA7yxOMRHebSDlgom2LUZ3KmBvtr9ksSRXbdUOnN
-         z6glMLXsyBJzM1ocAscYDLWd8xbA/ypfgCFjc/vpMcoR/O3mj/VaQ5YyCtRkGfOdSNQC
-         ahe4afRZgSbvtf1rcEO8DfZakcrqHk196p61bpE1Ozoy6Lbdugdy/1whYACvWp/ylH3S
-         43ll0u6xNG4Kn2l2q69lME/KgxAtjF4xeHH6F3cX+km0j6GD0G4/E+ZyoWaRstG2cutf
-         agCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776311750; x=1776916550;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=UnflnbGtuYVuzyIj7FT4Da3iZhZDEzJCKiZl3ehn6uI=;
-        b=SCEI7td/+r884LtoikjKn0bsLmlZ4JUOVkrXtXmzBkfyMaDsdbk95Jr/OZUokgjNKy
-         OoUhB1Wbe8yFLVLYygyJX90K8+QXa7hFJCwuaad67iuDGUVSAD6WG3xiSV7AMytiagpj
-         V+3A9Rs/Y9tmFBt9WiepLFRpbV/3tsxaczd9/hArxC/baFEcbLqseM8xuitzEWxsadfk
-         HDcOB+K9lb+LEfgUJWU5tqKkdUXR8W7ygsvZVqWtod+3eFLj9qE63rysF+KgpCYxmlNC
-         23RZKCRiiMtrSvGGiTA2N8Hv/MUnOEcWAQ0+C0d/y2o4aKOYaTQPsi5uZyZs3UosaPT3
-         +/ig==
-X-Gm-Message-State: AOJu0YyDRVJJV14xcA8gNdc9t7X9dAiB1W50EwUuSPzMFR6ftgjv4DV+
-	rDbeqazcLl4uZpaOYViWlUbtd+4RdS9Ig7GTh0vbpzMB+9zOXlsYvcxAADjPt4sJ/BS7eDs+ZmC
-	c2TT3k58q+CYJyAT9LHA4zHSxi8t0MKo=
-X-Gm-Gg: AeBDiesFBPqxAhPiiGwEauVzOaJmRh9k8YUIGIO7efhBrAGWMb/sWnT0dhuwoOS2T98
-	ZPfTlt4o9rhXWY/o+L8uha+S685azTmMZ0XXd58tTubdZhG9P+IcjJ88vcr081VZg+8XQLCzijr
-	xi+E6JLHunhnp5AcOWAjdDxxSbyFtHsrCNWZFcvZz3m39EXKoufxCrS6SloeCdkMvWMhNfcjABr
-	dD6+eNxuNcfyYcmnuXFPwEaFMB2ctM4TSm2LlQ8jSFWha+Y081RNmUXSLVfx4T1jEwHdJMk9c5w
-	fiL5luEKmalARlub
-X-Received: by 2002:a05:6808:bc2:b0:46e:df55:240f with SMTP id
- 5614622812f47-479890b9538mr286612b6e.7.1776311749765; Wed, 15 Apr 2026
- 20:55:49 -0700 (PDT)
+	s=arc-20240116; t=1776313269; c=relaxed/simple;
+	bh=ryynU5lGkjJkhoyjBTDWy1shM/dsYbX/XpqqvIzlQI4=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=icBFkbiF0ddHp90yrTeTJddqGs3/AThYtKgKOWcgGwALYeO2FUSABW4NUoXqJ1ifHHN/rbmEhU5Ygvz1mGk62PALdvcYTMEjys9qXx4eEDyHN3qdNDxEFSbR8TBf8OQOpsCDgUTUau/9C66LWf+kBVow6LogWY9aL9rUyk9zZx8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Xkqy4QqW; arc=fail smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1776313268; x=1807849268;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=ryynU5lGkjJkhoyjBTDWy1shM/dsYbX/XpqqvIzlQI4=;
+  b=Xkqy4QqWHohyvQK7cfIDVQFwUlvWyYK8fLxfXlnTj17MCBlllbQ3LJig
+   LSTj28Vyh3nahs7LRNsJRLrVAE0cjJz+CM2HU59nVJAxroolcV1W3dns7
+   /Wu3z6MfPiJmE0VtVCVtUYfEIzQiPplajCP0NysTNkrI59+XvqwPM4E2e
+   dQOk1vSgXcZlZHJ7wauf94DGTXBbrbmK5z5MjOx9Ppc1WV5sdUXlYHi2M
+   1JvmUMfIbf4eIqLyIU+DlAuuywuHrw49DY7Frtr2hY6pdG6I1RV4fRDbN
+   wi4eXuasVnaFGB9oE3Xvex314C3Brs4hkRNUOtVAhUhpBiwQaCeRRW5Zp
+   Q==;
+X-CSE-ConnectionGUID: +NzcAJa0RvK6Jy57fd1Rsw==
+X-CSE-MsgGUID: lapHcpPJRMC4Kx82jTWviw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11760"; a="77179460"
+X-IronPort-AV: E=Sophos;i="6.23,181,1770624000"; 
+   d="scan'208";a="77179460"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2026 21:21:07 -0700
+X-CSE-ConnectionGUID: c4Po3WZ9Rt6x5OiZwITjYw==
+X-CSE-MsgGUID: Rkoxz/NgS2a6pd40UMGHyg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,181,1770624000"; 
+   d="scan'208";a="235564586"
+Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
+  by orviesa005.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2026 21:21:07 -0700
+Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Wed, 15 Apr 2026 21:21:06 -0700
+Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
+ FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Wed, 15 Apr 2026 21:21:06 -0700
+Received: from SJ2PR03CU001.outbound.protection.outlook.com (52.101.43.49) by
+ edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Wed, 15 Apr 2026 21:20:58 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=aNGk1xOIbWwBDwnFKurnl/Wt+Fetl7TRqu2k7L3S/nnQN6JJRntdzP+fiO5ZxlfzQURHHpOwkIe+OgPB5SHqQFYt8+lcIlQ7TJxrKSQLrKvOIdGdAsmxb503ozGZR3+mkV8+a+bHhvyTEEn3k0xXrzBV2lHKVxzcMcvDLZPh/nTGfnzXKgy+D/Ey3QJBqZWHTA5Cew4CA7/J2bi+3/wylMrWEvimsJCN+mNFBAglqNSgOuR7k1/wwoU04yKbZTLqfZn8ibak/Uff0oDT+VtmTuetcb7/ScmyLBSr3MgntexQr3vz7KOt++sY9Y3ElkkRankd4O4qHVpl7x2rd5lrYg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=BpbHjGekf5oLOPX7cHNpsseUJb78I8tQKgLTrKaFlLM=;
+ b=mEzIPWuDuQxynt/DJt6/PdG0G00p08QwPfDt2oo/b4VjY0/iR4XkloqwQ93gnfDOfbzecTiPf7JKSS4GjaXtZsLMKUw5ZRcaVg2K9gRiOC5Qmx3abaC5Xg2YxPHs1T9/tELU5IU0cwvHzB1tLW0Hrp9NRG2WjAMsJvAwo7geeOCbOsmnHzZ8RUg/wZQSV1Zicu6eyBG9mYp4fPJB4Rigf0/1CegAOazDaRqKDeRbrELeWCe0joDBx5QPpfkEF1zJRnNOVuZDGOT0cixL9L3qhCgWC63UieEQnd6GWUwqdTNEnZQ8f8mdU6xSuuVdvpJZTPI9rInB8fzQiXkGWSOUvQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
+ by MW3PR11MB4569.namprd11.prod.outlook.com (2603:10b6:303:54::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9818.20; Thu, 16 Apr
+ 2026 04:20:56 +0000
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::8d98:e538:8d7:6311]) by MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::8d98:e538:8d7:6311%5]) with mapi id 15.20.9818.017; Thu, 16 Apr 2026
+ 04:20:56 +0000
+Message-ID: <6cc3c5b2-fb71-42a4-8d5b-57cd85de2f02@intel.com>
+Date: Thu, 16 Apr 2026 06:20:51 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 10/13] i40e: fix napi_enable/disable skipping ringless
+ q_vectors
+To: Jacob Keller <jacob.e.keller@intel.com>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, Aleksandr Loktionov
+	<aleksandr.loktionov@intel.com>, <stable@vger.kernel.org>, Sunitha Mekala
+	<sunithax.d.mekala@intel.com>, Maciej Fijalkowski
+	<maciej.fijalkowski@intel.com>
+References: <20260414-iwl-net-submission-2026-04-14-v1-0-852f38e7da39@intel.com>
+ <20260414-iwl-net-submission-2026-04-14-v1-10-852f38e7da39@intel.com>
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Content-Language: en-US
+In-Reply-To: <20260414-iwl-net-submission-2026-04-14-v1-10-852f38e7da39@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DU2PR04CA0063.eurprd04.prod.outlook.com
+ (2603:10a6:10:232::8) To MN6PR11MB8102.namprd11.prod.outlook.com
+ (2603:10b6:208:46d::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260408231415.522691-1-weibunny.kernel@gmail.com>
- <20260408231415.522691-3-weibunny.kernel@gmail.com> <bc8ef831-a4ea-4d85-ab7c-a287c9b80e61@redhat.com>
-In-Reply-To: <bc8ef831-a4ea-4d85-ab7c-a287c9b80e61@redhat.com>
-From: Wei Wang <weibunny.kernel@gmail.com>
-Date: Wed, 15 Apr 2026 20:55:38 -0700
-X-Gm-Features: AQROBzDI51ysVVr5tP_HvjmVXjXbnScXYJu5Za1jfWmMoEA3M8rM4efnTQiEEoo
-Message-ID: <CAGqc4nVZA+XSPbeO5_0OUvXzG1TMtqScrzNaUpuK0rVnR2ZFng@mail.gmail.com>
-Subject: Re: [PATCH v11 net-next 2/5] psp: add new netlink cmd for dev-assoc
- and dev-disassoc
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
-	Daniel Zahka <daniel.zahka@gmail.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	David Wei <dw@davidwei.uk>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Simon Horman <horms@kernel.org>, Wei Wang <weibunny@fb.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|MW3PR11MB4569:EE_
+X-MS-Office365-Filtering-Correlation-Id: d78fd426-9c69-404f-94a6-08de9b6f8e04
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|22082099003|18002099003|56012099003;
+X-Microsoft-Antispam-Message-Info: UTuO3w/e+kD9nTKDwYM+sw0DSmZnLEixuNPyhIKPckMddzPA1xpmzL1LFxyib9mEVVTFUt2VWDAwimzKyPmAoRmiln3Q1sS1zhNfowGdLTTmjYOewqGzOHsFeGwT9fXeH/XIM9WkDltSEAx+S2I6ipppwOqGJte25XC1FfKyWgrZerHF4jGUmgpEqYXpRw8NgVhsMgypXjLgvc/dgjUML10CRGQ9RARamo9IP4GlKMjIyijb1ooGW/h6DU2LtFopLVNZzB3JtZMZx2sTgKA+3SLt9JyjCizLvyDnX+E/sy7AkhNTPyJZtKXDgmCu9YUyYspOaWZ9xyss7V1mVFyWxjbskMhL7NJA9yyGK0pVCrBcvdpqeTzv7kS+h8qQ1fXxl5YjTTLe9HNZSyTUwEoJhSx83weRsXMJLYZf2+8vZgUfLtBWjJpsYCk3iq4qlGl9ndU7wmy6ubINPm4z81/qAFjCbaWEAW3FsNK64qPYzKmjYQrt3DkQBbYyRcOtCUkvhkLYBUwEY7MPjmc8sQdLHtMhi0BUwFmwwJ3Oy/nPj1sM1+CEeut8/cjMMPFe9Fl5twmQQwgHdBwCGXWEAhia+btK3QuI/rxCkMfbB94gxbZYuCijlAvDmyaTUtlPzMTwB/chLni38Yo10f9Uk6u84MDkSPousIhqaZ1ewYDJ9MqVWLt87bCTfZUoM5Zk6dH7
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UklybEorK1VTbFZreHBMdFRWb1VWNGRuVW5DUE52YjdCYzJ6T2d6eUZaU3d1?=
+ =?utf-8?B?VDlZQ0xrV0Exc1VTVVJMMnRpKzVNRHA5eTB1bFcwUitqN2hyK2JnVXNNVHNm?=
+ =?utf-8?B?UXFLVnRQYlltWlpLYmdKTXlGY2NiRk9KVy9PMkNHVjlCUit0MmFTaE5oN0Zr?=
+ =?utf-8?B?OEJJUWRLK3pPVnhRKzNxZU8xcXBPU050SzZVeGUrQzlZWWZtVExmWE5nMHZy?=
+ =?utf-8?B?dDlpNzdEcnE5aE44OU5wSThTRVRLdUV6Y2VWa0FOT3R3R0UvaVE5amtsTHdn?=
+ =?utf-8?B?dFlwMjhPMGhzM1ZwQ1FqNVNIdEZqUWMzL3lXamxYU2lNMVgzSGFXR3YyWFNI?=
+ =?utf-8?B?Ujd3WE5pTnpuMXhsQjh0ajVZemZyQy9lcWJWRmltbi9XbUdxTXpwWnBqSm5O?=
+ =?utf-8?B?TkxhaXJNQ0ZjUHVtYUtsVlBIbzhMbHZiNzh5UHlRZTMrdWNOTVBLRG1RWUdS?=
+ =?utf-8?B?ek1tUDgvQitmVS83a2FLY2Vmd3JpYVB2YWVhOEV2U3BuWVkzWjF5MGdNZ0Zv?=
+ =?utf-8?B?Rms5N1krT1lyRG9yRmNKcEZHaTVVYW9NbjJjcU5QK3NvWHpsRU56Q1hnVXY4?=
+ =?utf-8?B?WkxEZjR3OEdzWW9uQWdrY1NvRWZiaERBVEVFQ3pTMjZjZm5KUlhXdy9WT1Iz?=
+ =?utf-8?B?amhTMGhTZ0VCMG9JbTZPUFVNNnMvMUN0b1N4SjV6UHlZMHFuUUlnT3Nqbjdx?=
+ =?utf-8?B?UlZDU0tWVmVNTldEUytkZ3ZGaGYzc1d0SVZtQURSazZMdk9oUlZ2UjI2R29s?=
+ =?utf-8?B?aVM2RmpsRjVJR1loSjFIcnhEa01pNVY2ZHgraGIrNG9CQ001b1p1b3dESUtW?=
+ =?utf-8?B?MStaWnVLZ0J0SXB6Z3lUTGx6UjdtNHo2ZlowbTE0RW9HVjU3U3RLZ3FlSmJl?=
+ =?utf-8?B?YWpqaG9UMEVUQ0YyT2ord09yR2EvZzZaUGFkaFllbUlmZ1BnWS81UVYrUklF?=
+ =?utf-8?B?SHJ3T2FBeVNFM3dscjc3L2tXUzdyTnBlNmxlZFhTWUFZeFRNTnFhOEROZjlF?=
+ =?utf-8?B?TStsdnRXdUVkSUhiMlJ2VWRVdFhiV2JndDB2NXliWHpnUW81bVlEY1VpUzFp?=
+ =?utf-8?B?eWJ4Q0NDRVpON3ppVXZoMEgwT1FRc0pCUnpOSGkrOHkyRkVNcHdWdHc3Mmd0?=
+ =?utf-8?B?SlgxVml3MjRyWTJoQVV0NTdRM2YxSytSVDNRT0U4UkQ3bXVTcFZvL0JnWGxr?=
+ =?utf-8?B?bXN4b1BwaC8zRHNYTHkzUHdXTm9XWndJQmlyL3lORG5jR1g2WU85UHBsM2Ny?=
+ =?utf-8?B?MVZPVUl0djJ0MHJuT0xaQy81MmVlVnAyL1pTMlpKejNSK2JlSEE5TWFXWkd5?=
+ =?utf-8?B?MVdWWjlnSzZNMFdkQk5saG5JUE0vcDlQTERUOU1wMWZyTHVleUJ1YzZqY1FB?=
+ =?utf-8?B?Wnc5MlZUcmkxeWdXWmVob2tBakc2dXpUQWhXMlpBa0M5b3dMQmRRdk13QVg0?=
+ =?utf-8?B?RmcrdGlHUWN0dU1BNWhMS2tYanRacDQxdVJmUVEwZEN1VjR6ZlNLcDZZUzhj?=
+ =?utf-8?B?MnlLMDMyN1dBMklPSEo3cVlSRVNFSFVhbERtNDlmRmZLbGhvQUgzMlRvYlN3?=
+ =?utf-8?B?MW80Wkp4aDEyNlZxck1xa010VHVmeWtHVTRZb3hsZ2FMY3M2ellkdVEwYzF4?=
+ =?utf-8?B?RlhHVERIWDlIK3ZZWFF2LzlYRVhqc2lQZG1zVHNTN2FpTDhYMFBYRythR2J6?=
+ =?utf-8?B?QlYxNVl0SW8vSWVGdnp5dDNMeklBOHRpRy9Fb0tZV0szYm8vR1lweWJVaFg3?=
+ =?utf-8?B?OUIreXk0YUxhaDBHQ0JEUDBiMUdwZ1NNV1dtWG4rdkxmMVUyb1VKUStIYWVy?=
+ =?utf-8?B?ckFsUU00azlBT0V6cTdmei9qbndZZzJiMlR0S05KalZ0aWdZZ1pIbDJ0N21x?=
+ =?utf-8?B?WFhENUNqNTV4dUw2UWdmbWppWXN3a05SaUd4R1dpM1h6YW9HSDViOGNsRUha?=
+ =?utf-8?B?Tzh4VkNGZ0FXY3c2NlB0bEN3M3dtMm4rdjZYdC96MlYvL0kyYWUxMnpEQXNY?=
+ =?utf-8?B?aDhBV0R5ZmtHTmNOSmhGNVJoeUpTWjJrajV5MjgzN3c4YXUvZkNpZ2lxNXU2?=
+ =?utf-8?B?QXJsWlB3aURWTExFR3FzRHFCSUFPRFdjNHVmcThnSUgrTGl6azZQMDFlV3pH?=
+ =?utf-8?B?NkhsdjQzcG9Ea1gzdXhrVjUxdnlhblp0SUhTdTVuZnI3RUV5ZDR2WE9vY1Ey?=
+ =?utf-8?B?T01xaW9jVmtCTWtEUEk0WDlNL2x5bjNwcktwQ0pwa1Y5QVJ3SndvNVpiU2JH?=
+ =?utf-8?B?Y1VMQlpNTzBmY2krVXQ1S2JKc084djQ2NmhYMnJ4S1B0YVNmK0xYM09DMmRn?=
+ =?utf-8?B?UWd3QjUzdG1IQnYvbTlzWlVlUXU3Z1k3SDZRa2pKMWY3d3BhbnlqOVVTcDdo?=
+ =?utf-8?Q?ZhhJKMcg4uHf6waM=3D?=
+X-Exchange-RoutingPolicyChecked: gJzcEBq8MtClreQKL6/kqd0N3wGfp64DSjfz9squWl8elHN4nAjxAaLyExdvgJe+MkxdDXQXo4PJRrCxVU2jdac14VxudIRIau358PCTGQFzLbj81OMrIsnKRdDr/sNKYjKNMqO8RNmCg0VqB/R4fNTIB6EY3QiVtyGKcnn+j2yo1BYB1HwxFNHr5FuWC3VjPUY7A42aPssacKjuQIi/TjY9kAS2w/um8rkvZdx9sO65U4CjqwUHUF9yfp4fQorIzuvTlDJmFT8JCanoDHlIJEISbAIGUEAsFlr04MWnyMbI+6a2XSuwQqrw/okuQ4McSW11yhvfrs2VLnNjxWVUHg==
+X-MS-Exchange-CrossTenant-Network-Message-Id: d78fd426-9c69-404f-94a6-08de9b6f8e04
+X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Apr 2026 04:20:56.3491
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 5omN/Iok2YBzGb4ID9yzkmTMb+P43fk0GjPFhQ548nwYqOYjzfoT1vBf8GV1NxRW0gwyL62qQUg4ZPpOn6YVmVt+LuhzZAj7zPUM8DpbHE0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR11MB4569
+X-OriginatorOrg: intel.com
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-278919-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
+	ASN_FAIL(0.00)[1.2.3.5.c.f.2.1.0.0.0.0.0.0.0.0.b.d.0.0.1.0.0.e.a.0.c.3.0.0.6.2.asn6.rspamd.com:server fail];
+	TAGGED_FROM(0.00)[bounces-278920-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	ASN_FAIL(0.00)[1.2.3.5.c.f.2.1.0.0.0.0.0.0.0.0.5.7.0.0.1.0.0.e.5.1.c.3.0.0.6.2.asn6.rspamd.com:server fail];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,gmail.com,davidwei.uk,lunn.ch,davemloft.net,google.com,fb.com];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[10];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[weibunnykernel@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[przemyslaw.kitszel@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCPT_COUNT_SEVEN(0.00)[11];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7D71840A1B2
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,intel.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 554C340A299
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Apr 13, 2026 at 3:37=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
->
->
-> On 4/9/26 1:14 AM, Wei Wang wrote:
-> > From: Wei Wang <weibunny@fb.com>
-> >
-> > The main purpose of this cmd is to be able to associate a
-> > non-psp-capable device (e.g. veth or netkit) with a psp device.
-> > One use case is if we create a pair of veth/netkit, and assign 1 end
-> > inside a netns, while leaving the other end within the default netns,
-> > with a real PSP device, e.g. netdevsim or a physical PSP-capable NIC.
-> > With this command, we could associate the veth/netkit inside the netns
-> > with PSP device, so the virtual device could act as PSP-capable device
-> > to initiate PSP connections, and performs PSP encryption/decryption on
-> > the real PSP device.
-> >
-> > Signed-off-by: Wei Wang <weibunny@fb.com>
-> > Reviewed-by: Daniel Zahka <daniel.zahka@gmail.com>
-> > ---
-> >  Documentation/netlink/specs/psp.yaml |  67 +++++-
-> >  include/net/psp/types.h              |  15 ++
-> >  include/uapi/linux/psp.h             |  13 ++
-> >  net/psp/psp-nl-gen.c                 |  32 +++
-> >  net/psp/psp-nl-gen.h                 |   2 +
-> >  net/psp/psp_main.c                   |  20 ++
-> >  net/psp/psp_nl.c                     | 325 ++++++++++++++++++++++++++-
-> >  7 files changed, 462 insertions(+), 12 deletions(-)
-> >
-> > diff --git a/Documentation/netlink/specs/psp.yaml b/Documentation/netli=
-nk/specs/psp.yaml
-> > index c54e1202cbe0..3d1b7223e084 100644
-> > --- a/Documentation/netlink/specs/psp.yaml
-> > +++ b/Documentation/netlink/specs/psp.yaml
-> > @@ -13,6 +13,17 @@ definitions:
-> >                hdr0-aes-gmac-128, hdr0-aes-gmac-256]
-> >
-> >  attribute-sets:
-> > +  -
-> > +    name: assoc-dev-info
-> > +    attributes:
-> > +      -
-> > +        name: ifindex
-> > +        doc: ifindex of an associated network device.
-> > +        type: u32
-> > +      -
-> > +        name: nsid
-> > +        doc: Network namespace ID of the associated device.
-> > +        type: s32
-> >    -
-> >      name: dev
-> >      attributes:
-> > @@ -24,7 +35,9 @@ attribute-sets:
-> >            min: 1
-> >        -
-> >          name: ifindex
-> > -        doc: ifindex of the main netdevice linked to the PSP device.
-> > +        doc: |
-> > +          ifindex of the main netdevice linked to the PSP device,
-> > +          or the ifindex to associate with the PSP device.
-> >          type: u32
-> >        -
-> >          name: psp-versions-cap
-> > @@ -38,6 +51,28 @@ attribute-sets:
-> >          type: u32
-> >          enum: version
-> >          enum-as-flags: true
-> > +      -
-> > +        name: assoc-list
-> > +        doc: List of associated virtual devices.
-> > +        type: nest
-> > +        nested-attributes: assoc-dev-info
-> > +        multi-attr: true
-> > +      -
-> > +        name: nsid
-> > +        doc: |
-> > +          Network namespace ID for the device to associate/disassociat=
-e.
-> > +          Optional for dev-assoc and dev-disassoc; if not present, the
-> > +          device is looked up in the caller's network namespace.
-> > +        type: s32
-> > +      -
-> > +        name: by-association
-> > +        doc: |
-> > +          Flag indicating the PSP device is an associated device from =
-a
-> > +          different network namespace.
-> > +          Present when in associated namespace, absent when in primary=
-/host
-> > +          namespace.
-> > +        type: flag
-> > +
-> >    -
-> >      name: assoc
-> >      attributes:
-> > @@ -170,6 +205,8 @@ operations:
-> >              - ifindex
-> >              - psp-versions-cap
-> >              - psp-versions-ena
-> > +            - assoc-list
-> > +            - by-association
-> >          pre: psp-device-get-locked
-> >          post: psp-device-unlock
-> >        dump:
-> > @@ -279,6 +316,34 @@ operations:
-> >          post: psp-device-unlock
-> >        dump:
-> >          reply: *stats-all
-> > +    -
-> > +      name: dev-assoc
-> > +      doc: Associate a network device with a PSP device.
-> > +      attribute-set: dev
-> > +      do:
-> > +        request:
-> > +          attributes:
-> > +            - id
-> > +            - ifindex
-> > +            - nsid
-> > +        reply:
-> > +          attributes: []
-> > +        pre: psp-device-get-locked
-> > +        post: psp-device-unlock
-> > +    -
-> > +      name: dev-disassoc
-> > +      doc: Disassociate a network device from a PSP device.
-> > +      attribute-set: dev
-> > +      do:
-> > +        request:
-> > +          attributes:
-> > +            - id
-> > +            - ifindex
-> > +            - nsid
-> > +        reply:
-> > +          attributes: []
-> > +        pre: psp-device-get-locked
-> > +        post: psp-device-unlock
-> >
-> >  mcast-groups:
-> >    list:
-> > diff --git a/include/net/psp/types.h b/include/net/psp/types.h
-> > index 25a9096d4e7d..4bd432ed107a 100644
-> > --- a/include/net/psp/types.h
-> > +++ b/include/net/psp/types.h
-> > @@ -5,6 +5,7 @@
-> >
-> >  #include <linux/mutex.h>
-> >  #include <linux/refcount.h>
-> > +#include <net/net_trackers.h>
-> >
-> >  struct netlink_ext_ack;
-> >
-> > @@ -43,9 +44,22 @@ struct psp_dev_config {
-> >       u32 versions;
-> >  };
-> >
-> > +/**
-> > + * struct psp_assoc_dev - wrapper for associated net_device
-> > + * @dev_list: list node for psp_dev::assoc_dev_list
-> > + * @assoc_dev: the associated net_device
-> > + * @dev_tracker: tracker for the net_device reference
-> > + */
-> > +struct psp_assoc_dev {
-> > +     struct list_head dev_list;
-> > +     struct net_device *assoc_dev;
-> > +     netdevice_tracker dev_tracker;
-> > +};
-> > +
-> >  /**
-> >   * struct psp_dev - PSP device struct
-> >   * @main_netdev: original netdevice of this PSP device
-> > + * @assoc_dev_list: list of psp_assoc_dev entries associated with this=
- PSP device
-> >   * @ops:     driver callbacks
-> >   * @caps:    device capabilities
-> >   * @drv_priv:        driver priv pointer
-> > @@ -67,6 +81,7 @@ struct psp_dev_config {
-> >   */
-> >  struct psp_dev {
-> >       struct net_device *main_netdev;
-> > +     struct list_head assoc_dev_list;
-> >
-> >       struct psp_dev_ops *ops;
-> >       struct psp_dev_caps *caps;
-> > diff --git a/include/uapi/linux/psp.h b/include/uapi/linux/psp.h
-> > index a3a336488dc3..1c8899cd4da5 100644
-> > --- a/include/uapi/linux/psp.h
-> > +++ b/include/uapi/linux/psp.h
-> > @@ -17,11 +17,22 @@ enum psp_version {
-> >       PSP_VERSION_HDR0_AES_GMAC_256,
-> >  };
-> >
-> > +enum {
-> > +     PSP_A_ASSOC_DEV_INFO_IFINDEX =3D 1,
-> > +     PSP_A_ASSOC_DEV_INFO_NSID,
-> > +
-> > +     __PSP_A_ASSOC_DEV_INFO_MAX,
-> > +     PSP_A_ASSOC_DEV_INFO_MAX =3D (__PSP_A_ASSOC_DEV_INFO_MAX - 1)
-> > +};
-> > +
-> >  enum {
-> >       PSP_A_DEV_ID =3D 1,
-> >       PSP_A_DEV_IFINDEX,
-> >       PSP_A_DEV_PSP_VERSIONS_CAP,
-> >       PSP_A_DEV_PSP_VERSIONS_ENA,
-> > +     PSP_A_DEV_ASSOC_LIST,
-> > +     PSP_A_DEV_NSID,
-> > +     PSP_A_DEV_BY_ASSOCIATION,
-> >
-> >       __PSP_A_DEV_MAX,
-> >       PSP_A_DEV_MAX =3D (__PSP_A_DEV_MAX - 1)
-> > @@ -74,6 +85,8 @@ enum {
-> >       PSP_CMD_RX_ASSOC,
-> >       PSP_CMD_TX_ASSOC,
-> >       PSP_CMD_GET_STATS,
-> > +     PSP_CMD_DEV_ASSOC,
-> > +     PSP_CMD_DEV_DISASSOC,
-> >
-> >       __PSP_CMD_MAX,
-> >       PSP_CMD_MAX =3D (__PSP_CMD_MAX - 1)
-> > diff --git a/net/psp/psp-nl-gen.c b/net/psp/psp-nl-gen.c
-> > index 1f5e73e7ccc1..114299c64423 100644
-> > --- a/net/psp/psp-nl-gen.c
-> > +++ b/net/psp/psp-nl-gen.c
-> > @@ -53,6 +53,20 @@ static const struct nla_policy psp_get_stats_nl_poli=
-cy[PSP_A_STATS_DEV_ID + 1] =3D
-> >       [PSP_A_STATS_DEV_ID] =3D NLA_POLICY_MIN(NLA_U32, 1),
-> >  };
-> >
-> > +/* PSP_CMD_DEV_ASSOC - do */
-> > +static const struct nla_policy psp_dev_assoc_nl_policy[PSP_A_DEV_NSID =
-+ 1] =3D {
-> > +     [PSP_A_DEV_ID] =3D NLA_POLICY_MIN(NLA_U32, 1),
-> > +     [PSP_A_DEV_IFINDEX] =3D { .type =3D NLA_U32, },
-> > +     [PSP_A_DEV_NSID] =3D { .type =3D NLA_S32, },
-> > +};
-> > +
-> > +/* PSP_CMD_DEV_DISASSOC - do */
-> > +static const struct nla_policy psp_dev_disassoc_nl_policy[PSP_A_DEV_NS=
-ID + 1] =3D {
-> > +     [PSP_A_DEV_ID] =3D NLA_POLICY_MIN(NLA_U32, 1),
-> > +     [PSP_A_DEV_IFINDEX] =3D { .type =3D NLA_U32, },
-> > +     [PSP_A_DEV_NSID] =3D { .type =3D NLA_S32, },
-> > +};
-> > +
-> >  /* Ops table for psp */
-> >  static const struct genl_split_ops psp_nl_ops[] =3D {
-> >       {
-> > @@ -119,6 +133,24 @@ static const struct genl_split_ops psp_nl_ops[] =
-=3D {
-> >               .dumpit =3D psp_nl_get_stats_dumpit,
-> >               .flags  =3D GENL_CMD_CAP_DUMP,
-> >       },
-> > +     {
-> > +             .cmd            =3D PSP_CMD_DEV_ASSOC,
-> > +             .pre_doit       =3D psp_device_get_locked,
-> > +             .doit           =3D psp_nl_dev_assoc_doit,
-> > +             .post_doit      =3D psp_device_unlock,
-> > +             .policy         =3D psp_dev_assoc_nl_policy,
-> > +             .maxattr        =3D PSP_A_DEV_NSID,
-> > +             .flags          =3D GENL_CMD_CAP_DO,
-> > +     },
-> > +     {
-> > +             .cmd            =3D PSP_CMD_DEV_DISASSOC,
-> > +             .pre_doit       =3D psp_device_get_locked,
-> > +             .doit           =3D psp_nl_dev_disassoc_doit,
-> > +             .post_doit      =3D psp_device_unlock,
-> > +             .policy         =3D psp_dev_disassoc_nl_policy,
-> > +             .maxattr        =3D PSP_A_DEV_NSID,
-> > +             .flags          =3D GENL_CMD_CAP_DO,
->
-> Sashiko notes that the above allows deleteing an associations bypassing
-> the netns boundaries. Do you need ADMIN_PERM flag or exlicit checks in
-> the doit cb?
+On 4/15/26 07:48, Jacob Keller wrote:
+> From: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> 
+> After ethtool -L reduces the queue count, i40e_napi_disable_all() sets
+> NAPI_STATE_SCHED on all q_vectors, then i40e_vsi_map_rings_to_vectors()
+> clears ring pointers on the excess ones.  i40e_napi_enable_all() skips
+> those with:
+> 
+> 	if (q_vector->rx.ring || q_vector->tx.ring)
+> 		napi_enable(&q_vector->napi);
+> 
+> leaving them on dev->napi_list with NAPI_STATE_SCHED permanently set.
+> 
+> Writing to /sys/class/net/<iface>/threaded calls napi_stop_kthread()
+> on every entry in dev->napi_list.  The function loops on msleep(20)
+> waiting for NAPI_STATE_SCHED to clear -- which never happens for the
+> stale q_vectors.  The task hangs in D state forever; a concurrent write
+> deadlocks on dev->lock held by the first.
+> 
+> Commit 13a8cd191a2b ("i40e: Do not enable NAPI on q_vectors that have no
+> rings") added the guard to prevent a divide-by-zero in i40e_napi_poll()
+> when epoll busy-poll iterated all device NAPIs (4.x era). Since
+> 7adc3d57fe2b ("net: Introduce preferred busy-polling"), from v5.11,
+> napi_busy_loop() polls by napi_id keyed to the socket, so ringless
+> q_vectors are never selected.  i40e_msix_clean_rings() also independently
+> avoids scheduling NAPI for them.  The guard is safe to remove.
+> 
+> Add an early return in i40e_napi_poll() for num_ringpairs == 0 so the
+> function is self-defending against a NULL tx.ring dereference at the
+> WB_ON_ITR check, should the NAPI ever fire through an unexpected path.
+> 
+> Reported-by: Jakub Kicinski <kuba@kernel.org>
+> Closes: https://lore.kernel.org/intel-wired-lan/20260316133100.6054a11f@kernel.org/
 
-I think the concern is if we are calling this from an assoc_dev's
-netns, it should not allow it to delete any assoc_dev from other
-assoc_dev's netns. Right?
-I will add a check to only allow deletion of assoc_dev from its own
-netns.  (except main_dev's netns).
+Maciej developed a better fix for the problem, and he explicitly asked
+to not include this patch. Please drop it from this series.
 
->
-> > @@ -292,6 +455,145 @@ int psp_nl_key_rotate_doit(struct sk_buff *skb, s=
-truct genl_info *info)
-> >       return err;
-> >  }
-> >
-> > +int psp_nl_dev_assoc_doit(struct sk_buff *skb, struct genl_info *info)
-> > +{
-> > +     struct psp_dev *psd =3D info->user_ptr[0];
-> > +     struct psp_assoc_dev *psp_assoc_dev;
-> > +     struct net_device *assoc_dev;
-> > +     struct sk_buff *rsp;
-> > +     u32 assoc_ifindex;
-> > +     struct net *net;
-> > +     int nsid, err;
-> > +
-> > +     if (GENL_REQ_ATTR_CHECK(info, PSP_A_DEV_IFINDEX))
-> > +             return -EINVAL;
-> > +
-> > +     if (info->attrs[PSP_A_DEV_NSID]) {
-> > +             nsid =3D nla_get_s32(info->attrs[PSP_A_DEV_NSID]);
-> > +
-> > +             net =3D get_net_ns_by_id(genl_info_net(info), nsid);
-> > +             if (!net) {
-> > +                     NL_SET_BAD_ATTR(info->extack,
-> > +                                     info->attrs[PSP_A_DEV_NSID]);
-> > +                     return -EINVAL;
-> > +             }
-> > +     } else {
-> > +             net =3D get_net(genl_info_net(info));
-> > +     }
->
-> psp_nl_dev_disassoc_doit() has the same code; perhaps it would be worthy
-> move it in a common helper, called via pre_doit()? It should also
-> simplify the cleanup paths.
->
+Maciej's fix:
+https://lore.kernel.org/intel-wired-lan/20260414121405.631092-1-maciej.fijalkowski@intel.com/T/#u
 
-Ack.
+ask for reject:
+https://lore.kernel.org/intel-wired-lan/PH0PR11MB75223C8A00C3183C5082A096A0252@PH0PR11MB7522.namprd11.prod.outlook.com/T/#mbac55f7219d7855a2e5d1527904b2da43ad080cb
 
-> > +
-> > +     psp_assoc_dev =3D kzalloc(sizeof(*psp_assoc_dev), GFP_KERNEL);
-> > +     if (!psp_assoc_dev) {
-> > +             err =3D -ENOMEM;
-> > +             goto alloc_err;
-> > +     }
-> > +
-> > +     assoc_ifindex =3D nla_get_u32(info->attrs[PSP_A_DEV_IFINDEX]);
-> > +     assoc_dev =3D netdev_get_by_index(net, assoc_ifindex,
-> > +                                     &psp_assoc_dev->dev_tracker,
-> > +                                     GFP_KERNEL);
-> > +     if (!assoc_dev) {
-> > +             NL_SET_BAD_ATTR(info->extack, info->attrs[PSP_A_DEV_IFIND=
-EX]);
-> > +             err =3D -ENODEV;
-> > +             goto assoc_dev_err;
-> > +     }
-> > +
-> > +     /* Check if device is already associated with a PSP device */
-> > +     if (cmpxchg(&assoc_dev->psp_dev, NULL, RCU_INITIALIZER(psd))) {
-> > +             NL_SET_ERR_MSG(info->extack,
-> > +                            "Device already associated with a PSP devi=
-ce");
-> > +             err =3D -EBUSY;
-> > +             goto cmpxchg_err;
-> > +     }
-> > +
-> > +     psp_assoc_dev->assoc_dev =3D assoc_dev;
-> > +     rsp =3D psp_nl_reply_new(info);
-> > +     if (!rsp) {
-> > +             err =3D -ENOMEM;
-> > +             goto rsp_err;
-> > +     }
-> > +
-> > +     list_add_tail(&psp_assoc_dev->dev_list, &psd->assoc_dev_list);
->
-> Sashiko says:
->
+> Fixes: 13a8cd191a2b ("i40e: Do not enable NAPI on q_vectors that have no rings")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> Tested-by: Sunitha Mekala <sunithax.d.mekala@intel.com>
+> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 > ---
-> list_add_tail(&psp_assoc_dev->dev_list, &psd->assoc_dev_list);
-> There doesn't seem to be a limit on the number of devices that can be
-> associated with a single PSP device.
-> If a user repeatedly associates devices, could the generated netlink mess=
-age
-> in psp_nl_dev_fill() exceed the maximum allowed size (GENLMSG_DEFAULT_SIZ=
-E),
-> causing it to fail with -EMSGSIZE and permanently break PSP_CMD_DEV_GET
-> and management notifications for the device?
-> --
+>   drivers/net/ethernet/intel/i40e/i40e_main.c | 28 ++++++++++++++++------------
+>   drivers/net/ethernet/intel/i40e/i40e_txrx.c | 10 ++++++++++
+>   2 files changed, 26 insertions(+), 12 deletions(-)
+> 
 
-Ack. Will enforce a max allowed number on the assoc_dev_list to fit
-into GENLMSG_DEFAULT_SIZE.
-
->
-> /P
->
 
