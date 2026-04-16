@@ -1,168 +1,251 @@
-Return-Path: <netdev+bounces-279012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279015-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QNG8NkTI4GnjlwAAu9opvQ
-	(envelope-from <netdev+bounces-279012-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 13:30:12 +0200
+	id YG92D+fI4GkdmAAAu9opvQ
+	(envelope-from <netdev+bounces-279015-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 13:32:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2666E40D6E6
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 13:30:12 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9F0940D70D
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 13:32:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CB41830EE8F5
-	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 11:25:34 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id F39FF302240A
+	for <lists+netdev@lfdr.de>; Thu, 16 Apr 2026 11:32:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E4D5396D2E;
-	Thu, 16 Apr 2026 11:25:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 613B03AA518;
+	Thu, 16 Apr 2026 11:32:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="XfAAfkit";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="429nCgNW";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="XfAAfkit";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="429nCgNW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LqfbuVGR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0205839FCB4
-	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 11:25:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12C8B396B79
+	for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 11:32:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776338734; cv=none; b=YVu9FU8ckUf6MwXuTsPGBd3+rtzdl7eCcc3nX98z4L2ChOxOsTYXQSelkGrBAPMCH950nuZmo01qWstdUpTHTgwJibalsFQwGuaRk11dYoSzK37pSSCXj4ph3ZSAQOTDNA5aUZMcBSzKn0tS2QB7nFKEMPwfKlAXwUVSKdnNYqc=
+	t=1776339171; cv=none; b=dt0xZtvYtO5hoKu6qa32tx1z25VeYbPSieo2RQWxFSnEfVZHHF1wF5tEEZB3g777+4SccAMjrJzRHoZ47N0zRrR6optzwCDKnh0JNMX+RZKPNEsIF30kba4Bm5/38p5kL0O0huGIepc883yhXijzA2vnpu+yfAEzGeNH7S6Qeuk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776338734; c=relaxed/simple;
-	bh=MDT0EpxI7FYj3XC7ziE+as+s2FSA367oMU36RFoC930=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BFFbIaWvBOj1nqf84//u4YpGtPdU+ddgAS7wvOHHLWb4g3IgtX1j5dOjGH2a8L/wC5te7LacQEpXhXRJBBmI0OFEgWoXHoNBLdm+IOpo8VBHxBEjDZ7Qf4CHplXebXUaFLuPPM7mjfwRoNfHuDJ6Q8U8OGhukbK/9+Xc5EJ1esA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=XfAAfkit; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=429nCgNW; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=XfAAfkit; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=429nCgNW; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 3DA7C5BE53;
-	Thu, 16 Apr 2026 11:25:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1776338731; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hKaq1Gag/E7c4D6ZKnA1WevGKpgHO+6fri2e2955kF8=;
-	b=XfAAfkit6o/17ymBcAzkF3pLyc8Eq1v2mTaQeGZ6ZXnyUqVuJB+BcZov1wH5A1Xk5AsM7H
-	4NaWCqotxsMUwv0NrM/noNbEEofneBpa3zEqB8qLHrR3IHKQnRGVuH3TKchQhcIs7LTzn2
-	E3HcjgRHSuUfD2rZhEXCoMamCsFU3b4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1776338731;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hKaq1Gag/E7c4D6ZKnA1WevGKpgHO+6fri2e2955kF8=;
-	b=429nCgNWpjslEElsIuc6qH1VO4o2NTzQ5wTf1CTWDLQsWO0cOg9eBD4Gd72j9omUNCJ8X9
-	hNC5SYjD72lLy+Aw==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1776338731; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hKaq1Gag/E7c4D6ZKnA1WevGKpgHO+6fri2e2955kF8=;
-	b=XfAAfkit6o/17ymBcAzkF3pLyc8Eq1v2mTaQeGZ6ZXnyUqVuJB+BcZov1wH5A1Xk5AsM7H
-	4NaWCqotxsMUwv0NrM/noNbEEofneBpa3zEqB8qLHrR3IHKQnRGVuH3TKchQhcIs7LTzn2
-	E3HcjgRHSuUfD2rZhEXCoMamCsFU3b4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1776338731;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hKaq1Gag/E7c4D6ZKnA1WevGKpgHO+6fri2e2955kF8=;
-	b=429nCgNWpjslEElsIuc6qH1VO4o2NTzQ5wTf1CTWDLQsWO0cOg9eBD4Gd72j9omUNCJ8X9
-	hNC5SYjD72lLy+Aw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id B6D89593A3;
-	Thu, 16 Apr 2026 11:25:30 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 3fa6KSrH4GkiXgAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Thu, 16 Apr 2026 11:25:30 +0000
-Message-ID: <f9bb16ac-a392-4cd0-a290-035c7e692e77@suse.de>
-Date: Thu, 16 Apr 2026 13:25:08 +0200
+	s=arc-20240116; t=1776339171; c=relaxed/simple;
+	bh=LthEZFquLxYnf3eWuf9b/raQUnsAIxOokNNsZ6zhLcQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=fkjqfVwS4cv51qjPHot6+sxOzcgRfbZcQrUHtsHb8Ot19Zv8rosWfFWGV3sktSesTLqwavf+6dJ+B7WwcBU9lOpsWA6WYFTi/ptiX0DwHqUuVxCHmN221bh7L1zsq8CFbyK+RrXysjpZDmSy8rLJpGCnV2i/7qIAuJV6wpOsWVA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LqfbuVGR; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2a3e79fe2b8so5586705ad.1
+        for <netdev@vger.kernel.org>; Thu, 16 Apr 2026 04:32:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776339169; x=1776943969; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GkJWBH61iYRdnXJ2r0XjRioP0rvUjxtyWtkR0Sw12W8=;
+        b=LqfbuVGRN4tKOLo+re9EjEGBl1qDT8zAuCKO8M0swFjDgKL6RNd1gCfLrWS3ygcZJF
+         Tsf5WGjxPUpIs85vEOB/m2xJ1TD6P3XeYF1Exjk7QAVSMVDHUXvEY8QlCHGS36SLMTzk
+         VrZG+wZ6kmoX5/4lCN7r4RzRskvTgT43pf5UCbuKO0TyK4fRkzbDMYJ1mc6+/RGIPG1U
+         4Av68kK/f1tFnOQJcFvh+FO3zbEKQmGuZpad9Gh14W9SU/sc0MBhgKxlr5Q10pAcyn5v
+         Uc429B//wvSxtSAmXP12XbchzlDJFo1t7pqu06+AUvj/QqXdy77XZQhAAENUI5OXqFpY
+         gpjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776339169; x=1776943969;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=GkJWBH61iYRdnXJ2r0XjRioP0rvUjxtyWtkR0Sw12W8=;
+        b=iLoucM/FKJpk5QU2roYf3Bu7so784TR40olxLn4eZu0WprGJPa0CuOFPkRnTkXW5YB
+         G5OyZBEQmGUzidrxAwFcWTUrxEnxcb+ptfMTLpcz8TDCmWI6TiAoMOtRRpTu9x5fzwtS
+         r18PnSGaqNXOBPgyWxNQOUuKkL1IziTQMVIyNGovfbgjKS6wfLl5FmgUzv1AjQDpHLLC
+         JY5gdR9ToRroSh2+Ch9Xb2D/cYhle38kRKPb7Q6ts/zLA0MbqxdYY9szp29K0PUnh7Xc
+         btxkhdmo+bxuwpIsDWZ7j4FEfSEC0Jt25vkaOcaG6yCgoArojYUJK8bZEhPPcb4Bb9XB
+         L2FQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+EY2XpD1UNASgZ2ad9MYMblxLF+JkT441hEISISQv3jX4TsXS13Wh0FXDJSDE2k/dkYVcNR/A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyI/73L76v4+BrlZy/GFo5rMqmBfMtCzx0IyGYwBHEbOEpcm7ut
+	jK6uNNb997M4y5U3M/z3ygT9nz5wDzSGszdKU0i6R+jh2g6RMC+nndLo
+X-Gm-Gg: AeBDieu9zwB0lAuxxWXFnIwIOf08BhpD5wVoZOqtWR2tIrEFKaoKfpM+75/YKDkHpwY
+	hIQvFBLsZ4ZROo3EvTRrpv80Cuje64xP8cFzC/2cMmfeRdANfkEIIGG/XnxObmBawS7figrngCE
+	wx2YdtYaLtf4NIEEK1aW9BVd81EKOncjXlsEyELgOS04M+Zl5P4r5YqM9jEMSojkwnm3CW4cOFV
+	GaP1vPQ8rFZLmauMJvRN/yk2TtWj9M9C0fji6g55dqHJiXFKhTAoTErK7hVRNSHtAaGeju0KDpY
+	ydqE8qOIJo5XJq+ZRXaC69TuZ8HyAbjFz+a3Uc9PHgKg72p1iTYMfafP1H+Wylww+fWbTtbfUan
+	bbF4ttRaDcCRm4NrgEbXV0rmURVsOADOjMCrBAx0oYvo+yHqma8Nap58YiJincurbHB3a1oBw4J
+	rD0CjK0EDFP2ancVkTMrjhO3WanHM=
+X-Received: by 2002:a17:903:2284:b0:2b0:4d17:4d6e with SMTP id d9443c01a7336-2b5ed9c944cmr14013835ad.3.1776339169437;
+        Thu, 16 Apr 2026 04:32:49 -0700 (PDT)
+Received: from kali ([2402:e280:3d7c:a2:536a:b505:93f5:9d5d])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b47810ae96sm68463125ad.21.2026.04.16.04.32.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Apr 2026 04:32:49 -0700 (PDT)
+From: Pavitra Jha <jhapavitra98@gmail.com>
+To: w@1wt.eu
+Cc: pabeni@redhat.com,
+	chandrashekar.devegowda@intel.com,
+	linux-wwan@lists.linux.dev,
+	netdev@vger.kernel.org,
+	stable@vger.kernel.org,
+	Pavitra Jha <jhapavitra98@gmail.com>
+Subject: [PATCH v4] net: wwan: t7xx: validate port_count against message length in t7xx_port_enum_msg_handler
+Date: Thu, 16 Apr 2026 07:32:05 -0400
+Message-ID: <20260416113205.1789319-1-jhapavitra98@gmail.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <ad5p7XlSOKoaQC5D@1wt.eu>
+References: <ad5p7XlSOKoaQC5D@1wt.eu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] ipv6: fix possible UAF in icmpv6_rcv()
-To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>,
- Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org,
- eric.dumazet@gmail.com
-References: <20260416103505.2380753-1-edumazet@google.com>
-Content-Language: en-US
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-In-Reply-To: <20260416103505.2380753-1-edumazet@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Flag: NO
-X-Spam-Score: -2.80
-X-Spam-Level: 
+Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,nvidia.com,vger.kernel.org,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
-	TAGGED_FROM(0.00)[bounces-279012-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[redhat.com,intel.com,lists.linux.dev,vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-279015-lists,netdev=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FROM_NEQ_ENVFROM(0.00)[jhapavitra98@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	NEURAL_HAM(-0.00)[-0.998];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,suse.de:email,suse.de:dkim,suse.de:mid]
-X-Rspamd-Queue-Id: 2666E40D6E6
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B9F0940D70D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 4/16/26 12:35 PM, Eric Dumazet wrote:
-> Caching saddr and daddr before pskb_pull() is problematic
-> since skb->head can change.
-> 
-> Remove these temporary variables:
-> 
-> - We only access &ipv6_hdr(skb)->saddr and &ipv6_hdr(skb)->daddr
->    when net_dbg_ratelimited() is called in the slow path.
-> 
-> - Avoid potential future misuse after pskb_pull() call.
-> 
-> Fixes: 4b3418fba0fe ("ipv6: icmp: include addresses in debug messages")
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+t7xx_port_enum_msg_handler() uses the modem-supplied port_count field as
+a loop bound over port_msg->data[] without checking that the message buffer
+contains sufficient data. A modem sending port_count=65535 in a 12-byte
+buffer triggers a slab-out-of-bounds read of up to 262140 bytes.
 
-Reviewed-by: Fernando Fernandez Mancera <fmancera@suse.de>
+Add a struct_size() check after extracting port_count and before the loop.
+Pass msg_len to t7xx_port_enum_msg_handler() and use it to validate
+the message size before accessing port_msg->data[].
+Pass msg_len from both call sites: skb->len at the DPMAIF path after
+skb_pull(), and the captured rt_feature->data_len at the handshake path.
 
-Thanks!
+Fixes: 39d439047f1d ("net: wwan: t7xx: Add control DMA interface")
+Cc: stable@vger.kernel.org
+Signed-off-by: Pavitra Jha <jhapavitra98@gmail.com>
+---
+ drivers/net/wwan/t7xx/t7xx_modem_ops.c     | 14 +++++++-------
+ drivers/net/wwan/t7xx/t7xx_port_ctrl_msg.c | 12 +++++++++---
+ drivers/net/wwan/t7xx/t7xx_port_proxy.h    |  2 +-
+ 3 files changed, 17 insertions(+), 11 deletions(-)
+
+diff --git a/drivers/net/wwan/t7xx/t7xx_modem_ops.c b/drivers/net/wwan/t7xx/t7xx_modem_ops.c
+index 7968e208d..d0559fe16 100644
+--- a/drivers/net/wwan/t7xx/t7xx_modem_ops.c
++++ b/drivers/net/wwan/t7xx/t7xx_modem_ops.c
+@@ -453,25 +453,25 @@ static int t7xx_parse_host_rt_data(struct t7xx_fsm_ctl *ctl, struct t7xx_sys_inf
+ {
+ 	enum mtk_feature_support_type ft_spt_st, ft_spt_cfg;
+ 	struct mtk_runtime_feature *rt_feature;
++	size_t feat_data_len;
+ 	int i, offset;
+ 
+ 	offset = sizeof(struct feature_query);
+ 	for (i = 0; i < FEATURE_COUNT && offset < data_length; i++) {
+ 		rt_feature = data + offset;
+-		offset += sizeof(*rt_feature) + le32_to_cpu(rt_feature->data_len);
+-
++		feat_data_len = le32_to_cpu(rt_feature->data_len);
++		offset += sizeof(*rt_feature) + feat_data_len;
+ 		ft_spt_cfg = FIELD_GET(FEATURE_MSK, core->feature_set[i]);
+ 		if (ft_spt_cfg != MTK_FEATURE_MUST_BE_SUPPORTED)
+ 			continue;
+ 
+ 		ft_spt_st = FIELD_GET(FEATURE_MSK, rt_feature->support_info);
+ 		if (ft_spt_st != MTK_FEATURE_MUST_BE_SUPPORTED)
+ 			return -EINVAL;
+ 
+-		if (i == RT_ID_MD_PORT_ENUM || i == RT_ID_AP_PORT_ENUM)
+-			t7xx_port_enum_msg_handler(ctl->md, rt_feature->data);
++		if (i == RT_ID_MD_PORT_ENUM || i == RT_ID_AP_PORT_ENUM) {
++			t7xx_port_enum_msg_handler(ctl->md, rt_feature->data,
++						   feat_data_len);
++		}
+ 	}
+ 
+ 	return 0;
+ }
+ 
+diff --git a/drivers/net/wwan/t7xx/t7xx_port_ctrl_msg.c b/drivers/net/wwan/t7xx/t7xx_port_ctrl_msg.c
+index ae632ef96..d984a688d 100644
+--- a/drivers/net/wwan/t7xx/t7xx_port_ctrl_msg.c
++++ b/drivers/net/wwan/t7xx/t7xx_port_ctrl_msg.c
+@@ -124,8 +124,9 @@ static int fsm_ee_message_handler(struct t7xx_port *port, struct t7xx_fsm_ctl *c
+  * * 0		- Success.
+  * * -EFAULT	- Message check failure.
++ * @msg_len: Length of @msg in bytes.
+  */
+-int t7xx_port_enum_msg_handler(struct t7xx_modem *md, void *msg)
++int t7xx_port_enum_msg_handler(struct t7xx_modem *md, void *msg, size_t msg_len)
+ {
+ 	struct device *dev = &md->t7xx_dev->pdev->dev;
+ 	unsigned int version, port_count, i;
+@@ -141,6 +141,13 @@ int t7xx_port_enum_msg_handler(struct t7xx_modem *md, void *msg)
+ 	}
+ 
+ 	port_count = FIELD_GET(PORT_MSG_PRT_CNT, le32_to_cpu(port_msg->info));
++
++	if (msg_len < struct_size(port_msg, data, port_count)) {
++		dev_err(dev, "Port enum msg too short: need %zu, have %zu\n",
++			struct_size(port_msg, data, port_count), msg_len);
++		return -EINVAL;
++	}
++
+ 	for (i = 0; i < port_count; i++) {
+ 		u32 port_info = le32_to_cpu(port_msg->data[i]);
+ 		unsigned int ch_id;
+@@ -154,7 +161,6 @@ int t7xx_port_enum_msg_handler(struct t7xx_modem *md, void *msg)
+ 
+ 	return 0;
+ }
+ 
+ static int control_msg_handler(struct t7xx_port *port, struct sk_buff *skb)
+ {
+ 	const struct t7xx_port_conf *port_conf = port->port_conf;
+@@ -191,7 +197,7 @@ static int control_msg_handler(struct t7xx_port *port, struct sk_buff *skb)
+ 
+ 	case CTL_ID_PORT_ENUM:
+ 		skb_pull(skb, sizeof(*ctrl_msg_h));
+-		ret = t7xx_port_enum_msg_handler(ctl->md, (struct port_msg *)skb->data);
++		ret = t7xx_port_enum_msg_handler(ctl->md, (struct port_msg *)skb->data, skb->len);
+ 		if (!ret)
+ 			ret = port_ctl_send_msg_to_md(port, CTL_ID_PORT_ENUM, 0);
+ 		else
+diff --git a/drivers/net/wwan/t7xx/t7xx_port_proxy.h b/drivers/net/wwan/t7xx/t7xx_port_proxy.h
+index f0918b36e..7c3190bf0 100644
+--- a/drivers/net/wwan/t7xx/t7xx_port_proxy.h
++++ b/drivers/net/wwan/t7xx/t7xx_port_proxy.h
+@@ -103,7 +103,7 @@ void t7xx_port_proxy_reset(struct port_proxy *port_prox);
+ void t7xx_port_proxy_uninit(struct port_proxy *port_prox);
+ int t7xx_port_proxy_init(struct t7xx_modem *md);
+ void t7xx_port_proxy_md_status_notify(struct port_proxy *port_prox, unsigned int state);
+-int t7xx_port_enum_msg_handler(struct t7xx_modem *md, void *msg);
++int t7xx_port_enum_msg_handler(struct t7xx_modem *md, void *msg, size_t msg_len);
+ int t7xx_port_proxy_chl_enable_disable(struct port_proxy *port_prox, unsigned int ch_id,
+ 				       bool en_flag);
+ void t7xx_port_proxy_set_cfg(struct t7xx_modem *md, enum port_cfg_id cfg_id);
+-- 
+2.53.0
+
 
