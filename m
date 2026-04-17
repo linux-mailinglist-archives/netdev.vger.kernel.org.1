@@ -1,214 +1,181 @@
-Return-Path: <netdev+bounces-279348-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279349-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WNHlNlhM4mnx4QAAu9opvQ
-	(envelope-from <netdev+bounces-279348-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 17:06:00 +0200
+	id iMOgGG5Q4mnx4QAAu9opvQ
+	(envelope-from <netdev+bounces-279349-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 17:23:26 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E12141C5E1
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 17:05:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D439F41C8B3
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 17:23:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 16AB23138F01
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 15:00:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 56936309B987
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 15:21:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1753D3C342F;
-	Fri, 17 Apr 2026 14:59:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 630512FB084;
+	Fri, 17 Apr 2026 15:21:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cjDLnWO3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P5hO/iyY"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25D203CA49D
-	for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 14:59:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3D2E2E7179
+	for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 15:21:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776437990; cv=none; b=gkv8GHDf32lBrEnx0DR1qntrbcU4eDr1UYrYJhJb4pLm3MbNqL9NDw+aNg4ZWCUd15jdzH12jWGPXM4uDkWOiEyKJHwfxWwG9OyjmhPQ0L1JcVjCJIBdOKaFmcHUKBrlfdwFExXctkjbsoeVLk0sO32qJxKfNunqpZEjxSYTV7k=
+	t=1776439267; cv=none; b=adJfuVqBJawWNBkhsVPgQ/7DJVxHuCTPauP5lbCzrWfJ4sBaJejmgZ9bHFtqh5bXCAgFhqrif685sbtR/ovfqmrYuyP5zNEfCh80PUtNzMs4XTIq5LnyF74UASTgzp8mfYI+0bnhuIhXG7DvR2f/hNqloa3l+79na0Es4+8wvXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776437990; c=relaxed/simple;
-	bh=lJir21s5Hydt73Y7X1XPRxcxORH5MsJsFf8DeMd2H98=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=J/QT+oxEptF6u7/C61KflLFZno8bveGEehOsEIn1gjQPDFCkrh+n4ngG/AZ/0quEgg91Y8U0gfmNOoaoXN+5yJrA1ijuNNF47PxPR4RdroBefQ9v+XtU6zjSYI/BBsWl+/tDPb6d0hokZGCM8xWUWntcNGy8iPIq5j6aC/fJ63E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cjDLnWO3; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1776437984;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gbpFvcWrWZxCHOudUuz8MQpAoKeJ9RTgsaIS867Lomg=;
-	b=cjDLnWO33lVJ8S1KNR5yaLK6IBhJ9jAvEWYlvuzc9EYKLU+NSn6XnnuBnUFpAumJnY7Jxo
-	UYL5WyA/TlwXEsakTOTaBMXfJSGrl5sQiNPdSUKBaBfUo+boDZK3sfO0JNHr2AgCLn/bKj
-	/BTCrUmrVMDGvhHZUiHGzW/F6U7S+iY=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-367-ewrOrWXhNW-TpdYCXsSPuA-1; Fri,
- 17 Apr 2026 10:59:38 -0400
-X-MC-Unique: ewrOrWXhNW-TpdYCXsSPuA-1
-X-Mimecast-MFC-AGG-ID: ewrOrWXhNW-TpdYCXsSPuA_1776437975
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C187119560B1;
-	Fri, 17 Apr 2026 14:59:34 +0000 (UTC)
-Received: from ShadowPeak.redhat.com (unknown [10.44.32.76])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7F13E3000C1E;
-	Fri, 17 Apr 2026 14:59:29 +0000 (UTC)
-From: Petr Oros <poros@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Petr Oros <poros@redhat.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Ivan Vecera <ivecera@redhat.com>,
-	Michal Schmidt <mschmidt@redhat.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Rinitha S <sx.rinitha@intel.com>,
-	intel-wired-lan@lists.osuosl.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH iwl-net v7 3/3] ice: add dpll peer notification for paired SMA and U.FL pins
-Date: Fri, 17 Apr 2026 16:59:07 +0200
-Message-ID: <20260417145907.696307-4-poros@redhat.com>
-In-Reply-To: <20260417145907.696307-1-poros@redhat.com>
-References: <20260417145907.696307-1-poros@redhat.com>
+	s=arc-20240116; t=1776439267; c=relaxed/simple;
+	bh=4fCv9WUuJ2WzPc7sBFFOqX1mzOC6kIlREVQBRVyz25I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=h34KVf0DiSLc3ItaAgJTXRvLZfBPs5EW15L8FYjCLfG/4vbX6e1pgGvc3eOrqIy/rcNPLWuykQX31E/NM505L2xYORtFodvwNfHAgl1L4TsT5ssQrbkYABhVFVGacC5NZGDDTIPwYLGQqu5UW5GEYDnDZVTb7Z/+9bjO7jy5c84=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P5hO/iyY; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-488ad135063so8038365e9.0
+        for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 08:21:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776439264; x=1777044064; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/U/CbRT2z3A4yG6akec4gYSLr/zQxiO2KM+Ee2yWyIU=;
+        b=P5hO/iyYwGY4CULlkff52T9BbVXIb0d2kgrwX2QNL0srNV8Flzv4+4q+qH8f9fWhJq
+         r53s/ooyYwXijklSfR9tngSvs3rNWYEASXjzFoUm5m8GW1Y7ssSAaBKo8SZjcJ80C79K
+         dInmdXJUc9Jz32PCcydFkV5T7haY3jq8wsXvAZ78i5PpbN0IyXyrhECOQbtAyYSlAGJ+
+         QObwAegV1kcDH/mUtjTACJ3++tXA5ObsiU3ji98dzZjoD4WIspYLyBNFfe7Rzzyet4T+
+         ru4/Sp1snfvsCU9l8m+gCLIVT/4jlTYZV/Nkrrbj863pDu+renZvmKC9Poa/IvhKxPac
+         ZUYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776439264; x=1777044064;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/U/CbRT2z3A4yG6akec4gYSLr/zQxiO2KM+Ee2yWyIU=;
+        b=qO+O8VDvi+AeZiKB/CWwU6560X5ykmspVuedNRQZPWHFIbi8C1rm2dHezyyOeIMHh0
+         +bSwSoEOAV6ieeo4O6dCfb3I6XabNDM4OzYELSCRzEdPIVz+nDqOqVVWtI+MNQJ8xfVW
+         ODkQt8SmOhHT8OyHidGymT/NeXEZcVsyTG/xeWSy5MHVNoDVxQyymoIYWBcNEy+FUWkl
+         jkNfppmZPaIV3tkhSUDa2bESJPyd71whzOlo8OfFYUVGuW6FhQjH6P7cfx2PhalDGpqG
+         EtunQkeOL+ILvDZDWQfcniZuOKw4AdtTZ4OgddUEI29K/VgI0taoXuvtFzawMC4Dxggs
+         4new==
+X-Gm-Message-State: AOJu0YxJwHAUsmGvRlOCALQelemyPk2hxWJWki44mNpUIccWqALMz9aL
+	4+Xc1yWk67Q8ITAucs7+FKjkoCc9m2NECJI3CzaVycckPNPEMbYuIZJi
+X-Gm-Gg: AeBDieuSxZcPM3NwiX2GklKg6MxZTia8oh5fGgCaKdIJAt87ET07XTEJTF9Nf+XfM/Y
+	e2eyjS/N/tOWTrGXGdBYHWOpmdBwsSGG2JgA5qtDopp+EX2vAbdbgj2guOp2/engA1nTVa31sn2
+	AaS/PPHgLJ+Iybvn6jUf6/Ouxr78Bdqv7Hki5ioOH2bpYwgvWveOhpXUarTNJnG72BCWf3tTO8L
+	Ur99SrdbM0v0L3TdkHQ3Z4ZPeZeNLGqrz2I2u65VZw39p5+mhi1bVuUxXOzN0LhJrlEwtNryXrh
+	UaPVRFZipNDBl0YsscuPaEg/xEIw+4p03Wlcf3Z6sLJ4dQBR7h9Vh0IPgStW2VHh3BHxvjP8vIX
+	97SNI7cZES/xFUO7lKiMgJr5sax5Z1surIlwQ59XNJewIRkPl6jHm6qctd/pKRFuQ6jUm95CP3J
+	LJceZb+nlTJpO8Fyu0uIDeFouqtuY24Ucx2LhRI0+nMsJCiPpia3Bp5wu4X2KA+B/xYT1ii2Hqj
+	aWngLKC8XKHTGaIy551
+X-Received: by 2002:a05:600c:4711:b0:485:6e40:5584 with SMTP id 5b1f17b1804b1-488fb745261mr49761335e9.6.1776439264093;
+        Fri, 17 Apr 2026 08:21:04 -0700 (PDT)
+Received: from [10.1.4.108] (cust-east-par-46-193-119-166.cust.wifirst.net. [46.193.119.166])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488fb7a06f3sm23099115e9.22.2026.04.17.08.21.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 17 Apr 2026 08:21:03 -0700 (PDT)
+Message-ID: <56034c9c-fede-4ede-b68d-5ecc484a64cd@gmail.com>
+Date: Fri, 17 Apr 2026 17:20:57 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 1/3] net: dsa: microchip: implement KSZ87xx Module 3
+ low-loss cable errata
+To: Marek Vasut <marex@nabladev.com>, Woojung Huh
+ <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
+ Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Marek Vasut <marex@denx.de>,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ Simon Horman <horms@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Fidelio Lawson <fidelio.lawson@exotec.com>
+References: <20260417-ksz87xx_errata_low_loss_connections-v4-0-6c7044ec4363@exotec.com>
+ <20260417-ksz87xx_errata_low_loss_connections-v4-1-6c7044ec4363@exotec.com>
+ <10e325c0-aeb0-47b1-b758-e4f47ff7b004@nabladev.com>
+Content-Language: en-US
+From: Fidelio LAWSON <lawson.fidelio@gmail.com>
+In-Reply-To: <10e325c0-aeb0-47b1-b758-e4f47ff7b004@nabladev.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-279349-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279348-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[poros@redhat.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[nabladev.com,microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,denx.de,bootlin.com,armlinux.org.uk];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lawsonfidelio@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5E12141C5E1
+X-Rspamd-Queue-Id: D439F41C8B3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-SMA and U.FL pins share physical signal paths in pairs (SMA1/U.FL1 and
-SMA2/U.FL2).  When one pin's state changes via a PCA9575 GPIO write,
-the paired pin's state also changes, but no notification is sent for
-the peer pin.  Userspace consumers monitoring the peer via dpll netlink
-subscribe never learn about the update.
+On 4/17/26 16:35, Marek Vasut wrote:
+> On 4/17/26 2:44 PM, Fidelio Lawson wrote:
+> 
+> [...]
+> 
+>> @@ -1271,6 +1287,29 @@ int ksz8_w_phy(struct ksz_device *dev, u16 phy, 
+>> u16 reg, u16 val)
+>>           if (ret)
+>>               return ret;
+>>           break;
+>> +    case PHY_REG_KSZ87XX_SHORT_CABLE:
+>> +        if (!ksz_is_ksz87xx(dev))
+>> +            return -EOPNOTSUPP;
+>> +        ret = ksz87xx_apply_low_loss_preset(dev, !!val);
+>> +        if (ret)
+>> +            return ret;
+>> +        break;
+>> +    case PHY_REG_KSZ87XX_LPF_BW:
+>> +        if (!ksz_is_ksz87xx(dev))
+>> +            return -EOPNOTSUPP;
+>> +        ret = ksz8_ind_write8(dev, TABLE_LINK_MD, 
+>> KSZ87XX_REG_PHY_LPF, (u8)val);
+>> +        if (ret)
+>> +            return ret;
+>> +        dev->lpf_bw = val;
+>> +        break;
+>> +    case PHY_REG_KSZ87XX_EQ_INIT:
+>> +        if (!ksz_is_ksz87xx(dev))
+>> +            return -EOPNOTSUPP;
+>> +        ret = ksz8_ind_write8(dev, TABLE_LINK_MD, KSZ87XX_REG_DSP_EQ, 
+>> (u8)val);
+> Do these values need some check, so they would be in the correct 
+> range(s) / in the correct bitfields before being written into those 
+> registers ?
 
-Add ice_dpll_sw_pin_notify_peer() which sends a change notification for
-the paired SW pin.  Call it from ice_dpll_pin_sma_direction_set(),
-ice_dpll_sma_pin_state_set(), and ice_dpll_ufl_pin_state_set() after
-pf->dplls.lock is released.  Use __dpll_pin_change_ntf() because
-dpll_lock is still held by the dpll netlink layer (dpll_pin_pre_doit).
-
-Fixes: 2dd5d03c77e2 ("ice: redesign dpll sma/u.fl pins control")
-Signed-off-by: Petr Oros <poros@redhat.com>
----
- drivers/net/ethernet/intel/ice/ice_dpll.c | 32 +++++++++++++++++++++++
- 1 file changed, 32 insertions(+)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.c b/drivers/net/ethernet/intel/ice/ice_dpll.c
-index 11b942b83500fb..be72a076f7a15c 100644
---- a/drivers/net/ethernet/intel/ice/ice_dpll.c
-+++ b/drivers/net/ethernet/intel/ice/ice_dpll.c
-@@ -1154,6 +1154,32 @@ ice_dpll_input_state_get(const struct dpll_pin *pin, void *pin_priv,
- 				      extack, ICE_DPLL_PIN_TYPE_INPUT);
- }
- 
-+/**
-+ * ice_dpll_sw_pin_notify_peer - notify the paired SW pin after a state change
-+ * @d: pointer to dplls struct
-+ * @changed: the SW pin that was explicitly changed (already notified by dpll core)
-+ *
-+ * SMA and U.FL pins share physical signal paths in pairs (SMA1/U.FL1 and
-+ * SMA2/U.FL2).  When one pin's routing changes via the PCA9575 GPIO
-+ * expander, the paired pin's state may also change.  Send a change
-+ * notification for the peer pin so userspace consumers monitoring the
-+ * peer via dpll netlink learn about the update.
-+ *
-+ * Context: Called from dpll_pin_ops callbacks after pf->dplls.lock is
-+ *          released.  Uses __dpll_pin_change_ntf() because dpll_lock is
-+ *          still held by the dpll netlink layer.
-+ */
-+static void ice_dpll_sw_pin_notify_peer(struct ice_dplls *d,
-+					struct ice_dpll_pin *changed)
-+{
-+	struct ice_dpll_pin *peer;
-+
-+	peer = (changed >= d->sma && changed < d->sma + ICE_DPLL_PIN_SW_NUM) ?
-+		&d->ufl[changed->idx] : &d->sma[changed->idx];
-+	if (peer->pin)
-+		__dpll_pin_change_ntf(peer->pin);
-+}
-+
- /**
-  * ice_dpll_sma_direction_set - set direction of SMA pin
-  * @p: pointer to a pin
-@@ -1344,6 +1370,8 @@ ice_dpll_ufl_pin_state_set(const struct dpll_pin *pin, void *pin_priv,
- 
- unlock:
- 	mutex_unlock(&pf->dplls.lock);
-+	if (!ret)
-+		ice_dpll_sw_pin_notify_peer(&pf->dplls, p);
- 
- 	return ret;
- }
-@@ -1462,6 +1490,8 @@ ice_dpll_sma_pin_state_set(const struct dpll_pin *pin, void *pin_priv,
- 
- unlock:
- 	mutex_unlock(&pf->dplls.lock);
-+	if (!ret)
-+		ice_dpll_sw_pin_notify_peer(&pf->dplls, sma);
- 
- 	return ret;
- }
-@@ -1657,6 +1687,8 @@ ice_dpll_pin_sma_direction_set(const struct dpll_pin *pin, void *pin_priv,
- 	mutex_lock(&pf->dplls.lock);
- 	ret = ice_dpll_sma_direction_set(p, direction, extack);
- 	mutex_unlock(&pf->dplls.lock);
-+	if (!ret)
-+		ice_dpll_sw_pin_notify_peer(&pf->dplls, p);
- 
- 	return ret;
- }
--- 
-2.52.0
+Yes, I can add validation to ensure that only the documented bitfields 
+are accepted before writing the registers, (bits [7:6] for the LPF 
+bandwidth and bits [5:0] for the DSP EQ initial value).
 
 
