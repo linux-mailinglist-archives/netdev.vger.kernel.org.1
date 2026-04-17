@@ -1,118 +1,157 @@
-Return-Path: <netdev+bounces-279361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279362-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kAu6IgBa4mn65AAAu9opvQ
-	(envelope-from <netdev+bounces-279361-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 18:04:16 +0200
+	id GBOZE2la4mn65AAAu9opvQ
+	(envelope-from <netdev+bounces-279362-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 18:06:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBB2141CE31
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 18:04:15 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBB8541CE6A
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 18:05:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 46251308C952
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 16:02:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A5B13307AE4F
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 16:04:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 920EA32D0D4;
-	Fri, 17 Apr 2026 16:02:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A58F3446CB;
+	Fri, 17 Apr 2026 16:04:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uaiehw6S"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KtX3uirh"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 700CE317165
-	for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 16:02:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 675C933F597;
+	Fri, 17 Apr 2026 16:04:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776441731; cv=none; b=NPRUbnZiaKBsCFnoYk5A1SdPtzJ6zaLDudeOKAMuSeN1Vfkga1Gn3xns8emLilVMiFKW8ZdzS3QYK71tZSHIQSCdQuiFlbc/uFwq972IWj0Kci9NB78MVaprjSSwPoJeLC5THWz2jF5OVJYIs3fd3XyopKP/RR5DjHg1ncZScpc=
+	t=1776441883; cv=none; b=gKHzN1b/p/hybVqGXLqAwgEaJH/nhOeXWWxNpqC3iMDzMI3Yz/6RjlSpeb8851hX62fWwEHwkV1T+1LVbi8MVUEmPt1SXZhBkg4D+WqTCSDcEfs29SxmzqzqgLM8kyQqSMBHS+d0gnxtqpmAyUZa79CsiPgZeLksqY6YPA8jGus=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776441731; c=relaxed/simple;
-	bh=G97aeQhu9k9+mvxexehf0ox0XpdO5ES48kn44W4EJpE=;
+	s=arc-20240116; t=1776441883; c=relaxed/simple;
+	bh=eoOHNTLXUuxqHa7GYHnN9Zwr2758O72sKIxIKArJBIM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OKXcKN0tBthPozjj3q3KgsqGWR7KSVmBEV3K81LdljE6/s/DSfwTyvymmNbzathvLjmjdqFkf2BheA/jkjdCBPBot1AnkuNkYxJW8j5DXxcUdzSCkCdAilPCfWxr/0MhOatrTtHVKlB4sFR6QtmA/VIB3eZNFcs7NPpt5oZbh/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uaiehw6S; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AF3DC2BCB4;
-	Fri, 17 Apr 2026 16:02:10 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=Hk9KudJqc8qXn4tH6Dr1jckXSOXUev695v0JEGEPcLXs4tgFtMNPLYlkhwD+eNI1d3SlXiDqo6T+1CmGhPwZ6gXX3uWbbL2+jFp/gMozpZz6BAl0Vmiort9Kir5gYVOXAKfE4qZPsEU5RKvnImhp48QZdQFvnRKXbLR8ziNL39Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KtX3uirh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62D91C19425;
+	Fri, 17 Apr 2026 16:04:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776441731;
-	bh=G97aeQhu9k9+mvxexehf0ox0XpdO5ES48kn44W4EJpE=;
+	s=k20201202; t=1776441883;
+	bh=eoOHNTLXUuxqHa7GYHnN9Zwr2758O72sKIxIKArJBIM=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Uaiehw6Sl709tM6vIxFunnvZ5N5wUHuTN7pBxXEEB1ZuGWUxIyaklikzPVjNooMJ4
-	 /Wd2juOGI9n1/2siOCuf/LZdMJ5KFSU1z6XaqMobMHe/TTu0D98yEjWNw/qWzhqaWy
-	 mp5rfGuwE/6Fia7RzLjUmbXJBFBEjv19kdBqyVzygHTOnETHR6Hpfid7LJ/lniReHC
-	 ENN9BogMUcc/aTB58z0q/44VqGPMl6pTZPUjg5VavEZuuRyfCD80sY8pR836hhuFAn
-	 My3msWGzffIo7J82c2PN532dDfusgEO0Fj7mqS7b3KwwPN4H+U7NbsLYf7FiQk7fao
-	 lOoMHi1ETCtsg==
-Date: Fri, 17 Apr 2026 17:02:08 +0100
+	b=KtX3uirhW9fpWjIycPD5JAaW3aJgAtxCrbsRGXTVJv7w2dV4GuQJ7uydCiHkg9AC8
+	 2CNIoTSBvAHY7u2bpZDQZZBO686KN+wno/YKCHatdDGKQzD+r/ZSfPYVMmG/7Sh3n4
+	 AYUxKJv9gxE8WyldqefJutDHoR87ZUsekuSHQBOVEvyDG2I1vRSztw63X44UnfAjEm
+	 dTFn7eGvhmjbRovJ5dP3cM8AWhnI8Pws2hs7KveK4dUj6jDrUhJ/+/Wx8AIJIJX8jQ
+	 OcvjgBXaCccNBi99Ql+NhxSOzhZxDpaImW63pVnSBY6GXLjIQK1b0ejv1TLVMM/VbY
+	 KZW2wkvWj+ySA==
+Date: Fri, 17 Apr 2026 17:04:38 +0100
 From: Simon Horman <horms@kernel.org>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH v7 0/5] netem: bug fixes
-Message-ID: <20260417160208.GG31784@horms.kernel.org>
-References: <20260415142822.133241-1-stephen@networkplumber.org>
+To: =?utf-8?B?TGVrw6sgSGFww6dpdQ==?= <snowwlake@icloud.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org,
+	=?utf-8?B?TGVrw6sgSGFww6dpdQ==?= <framemain@outlook.com>
+Subject: Re: [PATCH net v3 2/4] nfc: llcp: fix TLV parsing in parse_gb_tlv
+ and parse_connection_tlv
+Message-ID: <20260417160438.GH31784@horms.kernel.org>
+References: <20260414233534.55973-3-snowwlake@icloud.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260415142822.133241-1-stephen@networkplumber.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260414233534.55973-3-snowwlake@icloud.com>
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279361-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-279362-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,outlook.com];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWO(0.00)[2];
+	FREEMAIL_TO(0.00)[icloud.com];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: DBB2141CE31
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[outlook.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,horms.kernel.org:mid]
+X-Rspamd-Queue-Id: CBB8541CE6A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Apr 15, 2026 at 07:27:03AM -0700, Stephen Hemminger wrote:
-> These bugs were found when doing AI assisted  review of sch_netem.c
-> during investigation of the packet duplication recursion problem
-> addressed in Jamal's series.
+On Wed, Apr 15, 2026 at 01:35:31AM +0200, Lekë Hapçiu wrote:
+> From: Lekë Hapçiu <framemain@outlook.com>
 > 
-> The fixes cover:
+> nfc_llcp_parse_gb_tlv() and nfc_llcp_parse_connection_tlv() walk TLV
+> arrays whose length and content come from a peer-supplied frame.  The
+> parsing loop has three weaknesses:
 > 
->  - probability gaps in the 4-state Markov loss model
->  - queue limit not accounting for reordered packets
->  - PRNG reseeded on every tc change, breaking reproducibility
->  - slot delay configuration not validated for inverted ranges
->  - slot delay arithmetic overflow for ranges above ~2.1 seconds
+>  1. `offset` is declared u8 while `tlv_array_len` is u16.  In
+>     parse_connection_tlv() the TLV array can reach ~2173 bytes (MIUX
+>     up to 0x7FF), so 128 zero-length TLVs wrap `offset` back to 0 and
+>     the loop never terminates while `tlv` advances past the buffer.
 > 
-> v7 - queue limit check Fixes: goes back further to earlier change
->    - use NL_SET_ERR_MSG_ATTR
+>  2. The guard `offset < tlv_array_len` only proves one byte is
+>     available, but the body reads tlv[0] (type) and tlv[1] (length).
+>     When one byte remains, tlv[1] is out of bounds.
 > 
-> Stephen Hemminger (5):
->   net/sched: netem: fix probability gaps in 4-state loss model
->   net/sched: netem: fix queue limit check to include reordered packets
->   net/sched: netem: only reseed PRNG when seed is explicitly provided
->   net/sched: netem: check for invalid slot range
->   net/sched: netem: fix slot delay calculation overflow
+>  3. `length` is read from peer data and used to advance `tlv` without
+>     being checked against the remaining array space.  A crafted length
+>     walks `tlv` past the buffer; the next iteration reads tlv[0]/tlv[1]
+>     from adjacent memory.
+> 
+> The llcp_tlv8() and llcp_tlv16() accessors additionally read tlv[2]
+> and tlv[2..3]; a zero-length TLV makes those reads out of bounds.
+> 
+> Fix: promote `offset` to u16; add two per-iteration guards, one for
+> the TLV header and one for the TLV value; require length >= 1 for all
+> TLVs before the type dispatch and length >= 2 for the llcp_tlv16()
+> accessors (MIUX, WKS).  Return -EINVAL on malformed input.
+> 
+> Reached on ATR_RES (parse_gb_tlv) and on CONNECT/CC PDUs before a
+> connection is established (parse_connection_tlv).  Both are
+> triggerable from any NFC peer within ~4 cm, without authentication.
 
-To the maintainers: I'd like to ask for more time to complete review of this.
+As per my comment on patch 1/4, I don't understand the relationship
+between the last sentence above and this patch.
+
+> 
+> Reported-by: Simon Horman <horms@kernel.org>
+> Fixes: d646960f7986 ("NFC: Add LLCP sockets")
+
+I think the hash but not the subject is correct in the fixes line.
+IOW, I think this should be:
+
+Fixes: d646960f7986 ("NFC: Initial LLCP support")
+
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Lekë Hapçiu <framemain@outlook.com>
+
+Otherwise, looks good to me.
+
+
+While looking over this I noticed that nfc_llcp_connect_sn() seems
+to have the same kind of problem. You may wish to address that as
+a follow-up.
+
+...
 
