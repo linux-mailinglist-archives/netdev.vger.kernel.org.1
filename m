@@ -1,133 +1,169 @@
-Return-Path: <netdev+bounces-279393-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279394-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mLBQIF1y4mnR5wAAu9opvQ
-	(envelope-from <netdev+bounces-279393-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 19:48:13 +0200
+	id cCw7ALty4mnR5wAAu9opvQ
+	(envelope-from <netdev+bounces-279394-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 19:49:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0960941DACD
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 19:48:08 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id B42DA41DAFA
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 19:49:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 015BB300B9A2
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 17:47:02 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id BA29C300C0CB
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 17:49:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB85234EF17;
-	Fri, 17 Apr 2026 17:46:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EC513AEF33;
+	Fri, 17 Apr 2026 17:49:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="G8ioTg1P"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="do47RhCS"
 X-Original-To: netdev@vger.kernel.org
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67BDF2FFDC4;
-	Fri, 17 Apr 2026 17:46:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 623EE2FFDC4
+	for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 17:49:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776448018; cv=none; b=BKwZQneNI4xoh4J/hkW6Z8p6zpW+uTgQqzPdMxfIuFtaIIULff9iGExxiIC96LXjk/LxNcYicOuZ5OE6dldlJ3unjx+6SColCWX43deqhvt1XBR2bSZzKhbA71h7LJyJElsqSzmDdWeKe7aTOQSpTCPRUi+d179uP7EOZL+Fn3c=
+	t=1776448177; cv=none; b=lrAYcK6MeHY9/VIZDn1svcBaqYEaWjIgrNJKmHkzeiI8mUX1PuAscn7zfCh2Pv5jeCnEwNMlabU+Mudc0OKz68ddZxPwyJKFH0rcWK8XSgp4GYrl2De8ToEzf5qD5TL+HkWLrnJ8+YKQtjvog5UIQMzFVGqfSnK2pBc1l+g08Dg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776448018; c=relaxed/simple;
-	bh=LqpISmas26GAA+eigkPeHlqbzpTvgtAgzvLgkNHtNUY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Maq49Xp7xfzGlXi+ftk3YIsxlzwYAs0X5HcTgVFe4OZ2HeDmuVyFNrndmHWs99AtLf0HmzEd+Ui6crGejOGuxw5NdvWrZ3c+e1C2X5a+SwrOxw3B0GwbXFebi40H9jmmU6lN3y7qT+q7sDldxJ064cFGVGp2LlfPqP90KVvakyE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=G8ioTg1P; arc=none smtp.client-ip=82.195.75.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=k8m/KTTmnq5PY9ru1DsdH08IpJYZRyWyKs1/HT27WEs=; b=G8ioTg1PqKwL/Klcpomt6dE9Xa
-	JPpL9IJjXkGPag8r3o9xajKGIy4+9OeXkj2D8YjNECvgQYyIqbGBNLkfK8n0v2zLaNpkkzbUeWsIO
-	UdQ7d8v4rw1Tr9oyOhpJcCg2Is/sNrdSW4x9Tl3TeSuoaCOxBHZbd+3k5tlxVQdswdWacHoXN71uh
-	uO3smsPJZN8s46HtaAOfNz6/wHDxoox2OaYKSBtgqw3khAoHH6vZ2xn7YAMFylVphR5FxO6N7ya/A
-	EgTsq2S/5sPLv3+4mXLX6Jn1Tg0EvE9JbVMvk5LXYzKaqRYWvmB2KYPhd1F1GQxm7Fpa772McW2xo
-	klQbWTaQ==;
-Received: from authenticated user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.96)
-	(envelope-from <leitao@debian.org>)
-	id 1wDnH2-00FY4p-1L;
-	Fri, 17 Apr 2026 17:46:36 +0000
-Date: Fri, 17 Apr 2026 10:46:29 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: "Chester A. Unal" <chester.a.unal@arinc9.com>, 
-	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Russell King <linux@armlinux.org.uk>, 
-	Christian Marangi <ansuelsmth@gmail.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
-	Frank Wunderlich <frank-w@public-files.de>, John Crispin <john@phrozen.org>
-Subject: Re: [PATCH net] net: dsa: mt7530: fix .get_stats64 sleeping in
- atomic context
-Message-ID: <aeJjcoHyezEgUG_Q@gmail.com>
-References: <79dc0ec5b6be698b14cb66339d6f63033ca2934a.1776397542.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1776448177; c=relaxed/simple;
+	bh=Y5gGVtPUQWWV9DgXubawA41gEn2jv0Fyb1w6SaJul4Y=;
+	h=Message-ID:In-Reply-To:References:From:Date:Subject:To:Cc; b=RjvENE7ZZt7CNM8avPYMZX4IQPOwBdhQpXFy84OB2Szzq/wZqbXGPjH46hmpjKEeaHs9uoVCVD8i8V/889z+iv1VxV16qA1Ewgtu1/yy/D62Sdv5nSOWKbztBOCBKJ2RtAK/2upxKjRKzKiWtC6Zf/DghKZtfdEkJUuGr1eIvfk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=do47RhCS; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-82d0b68837aso650327b3a.2
+        for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 10:49:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776448170; x=1777052970; darn=vger.kernel.org;
+        h=cc:to:subject:date:from:references:in-reply-to:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=EY6Kxrq1+okn9a1kU1LHUIX3F/DntU2kfVrB9AkbALc=;
+        b=do47RhCStnn/9/vsRCby6oMNJzZRM+LRzrTp/9iIJh7I8MumC1X9xrTLXQFSV/8GRN
+         yvMYedxv9D5ox0sCfrEHTKoKDANSlI86VwrrxUETSKIfhNISUwPGflp/WSvSUkraKTZP
+         TXKTUAik9JFo7mJVQpGy8wXBaMW6pNQptnV9YDtL6JVQNFbDFi1KzdgOg1EVCsgqdswI
+         QIYuBdGIvGO8FUx/QepfyHBjt+IXTNmD4lALR3Qo3I2OReV+B1kW7POyoPquhisUkA06
+         8lnrK0/vTZbM+axNatdx9m6azt6Nfc/1jV4iPj9nmCZYd0RKdEYlLHD0XM7wdO4MyGuv
+         Vsmg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776448170; x=1777052970;
+        h=cc:to:subject:date:from:references:in-reply-to:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EY6Kxrq1+okn9a1kU1LHUIX3F/DntU2kfVrB9AkbALc=;
+        b=H8tgaHw1QOnjfjPGflMGHrIWxAk1Aix3VEm/kWhzKsg54/V7k7q5504K1TW4U/jG9k
+         QShEagP3+y9kcRKXRDiS4Ns0gGfzkR3QsFGnWz9WLDzJ1UHviItrUVbvT0TVDbbr3EMQ
+         ZkrJLLq5H34ANohsODQPfl3Xqj6muFRNW0//szmG3bl7GNK3hH1MBhEXLQTR5ZN0WOtL
+         812l5xoQ8qUB3wXRC4dmke5iKi6wPM+G+4OuZQ9ju0HvR5SFOB7etB1Zj7SBMH9ww06H
+         uoZSzy3Bu8TAryjTLx2epjR0ScIYW9hW8Tu3tzLq/io69w1XXJG1SJJ7y2nHUhl3NLIB
+         MADg==
+X-Gm-Message-State: AOJu0YyOxz6e7edahk+J3V8/B54ClpdGwny9fK8wfepkmWIzXv4dzh5O
+	1unbPB2rL191670Q3I9fpgOdakr+r1MUnSg0shD6VjbtsPKWgGmklXZ00FEQ/g==
+X-Gm-Gg: AeBDiessZvGCj8Trw27lE2CUy4jrXHpDA3n1czgeFqbWWgrF7pL2u2uSGN8WcRkrPWZ
+	Bgv8maOAnEEyVUs14c/T5+f0LINYihgRa7GbRZ8HgZfmZJUXFu0eTtNb7uNhb52XgwJ2zA0ZtwB
+	9W1ClmDg5WdMKdq/QMxyeHn/RIftqTDnhZz/UaKs2TKsUcQbFVWAVa9ALrjsYmP9AwEZEzZpqe1
+	aCYjZNkuFLvCGj21oIyolFlH73RHtni4I5xP9Pw0VB/EW2BHhTYXj7Rc4OIUeHWNfxyxKiiADCu
+	RbGWs4AprMoRAMug1L7nE+VBzrvlNv4GSM1HiRAgAnMlCpP9q1tUom03BB2jZSgDxvNbiD+GwiQ
+	6tIIB3Z7qlRxHpWHfeO5JOln80eFDHAjbUEXmV8uGaJHzT9GE2EuGK3iZbF4GnX/nf9KQ1PIW7a
+	XkOoO0v5oqYIlVK2Ib8f4FjMee790+P2adMLRzc9Fx8/cIqx8vwb83LR7hUsuOrQUGqxKUF5tFl
+	bSo09Zk4hX73zpZmX+cMGjwFDI=
+X-Received: by 2002:a05:6a00:bb0d:b0:82c:e60c:f376 with SMTP id d2e1a72fcca58-82f8c934432mr4531401b3a.47.1776448169406;
+        Fri, 17 Apr 2026 10:49:29 -0700 (PDT)
+Received: from Shuvs-MacBook-Air.local ([43.245.86.86])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82f8ec23b19sm2949913b3a.59.2026.04.17.10.49.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Apr 2026 10:49:29 -0700 (PDT)
+Message-ID: <cover.1776446840.git.shuvampandey1@gmail.com>
+In-Reply-To: <20260414071322.30851-1-shuvampandey1@gmail.com>
+References: <20260414071322.30851-1-shuvampandey1@gmail.com>
+From: Shuvam Pandey <shuvampandey1@gmail.com>
+Date: Fri, 17 Apr 2026 23:34:25 +0545
+Subject: [PATCH v2 0/3] mISDN: fix socket/device lifetime and naming races
+To: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Simon Horman <horms@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <79dc0ec5b6be698b14cb66339d6f63033ca2934a.1776397542.git.daniel@makrotopia.org>
-X-Debian-User: leitao
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[debian.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279393-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[18];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[debian.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[arinc9.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,collabora.com,armlinux.org.uk,vger.kernel.org,lists.infradead.org,public-files.de,phrozen.org];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 0960941DACD
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-279394-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[shuvampandey1@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_THREE(0.00)[3];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B42DA41DAFA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Apr 17, 2026 at 04:55:57AM +0100, Daniel Golle wrote:
-> @@ -3404,6 +3449,9 @@ EXPORT_SYMBOL_GPL(mt7530_probe_common);
->  void
->  mt7530_remove_common(struct mt7530_priv *priv)
->  {
-> +	if (priv->bus)
-> +		cancel_delayed_work_sync(&priv->stats_work);
-> +
+This is a respin of the original get_mdevice() reference leak fix.
 
-Shouldn't you cancel the work later, after dsa_unregister_switch()?
+Patch 1 makes unregister wait for the last device reference and closes
+sockets that still point at the device before delete_stack() runs. It
+also serializes bind against unregister so a new socket cannot attach
+once teardown has started.
 
-I am wondering if the following race cannot happen:
+Patch 2 drops the temporary get_mdevice() references from IMGETDEVINFO
+and IMSETDEVNAME, and serializes those ioctl paths against unregister.
 
- mt7530_remove_common()                  someone reading /proc/net/dev
-    cancel_delayed_work_sync()
-      /* returns: work neither pending
-         nor executing - true at this
-         instant */
-                                          mt7530_get_stats64()
-                                            mod_delayed_work(...)
-                                            /* work is queued again */
-    dsa_unregister_switch()
-    return
+Patch 3 keeps an mISDN-owned copy of the device name so ioctl, sysfs, and
+debug paths no longer depend on the kobject name storage remaining stable
+across device_rename().
+
+Previous discussion:
+https://lore.kernel.org/r/20260414071322.30851-1-shuvampandey1@gmail.com
+
+This series was developed with AI assistance. I reviewed, revised, and
+tested it, and I take responsibility for the submission.
+
+---
+Changes in v2:
+- split the fix into three focused patches
+- close sockets before delete_stack() and wait for the final device release
+- serialize bind and ioctl lookup/rename paths against unregister
+- cache stable device names for mISDN paths outside the kobject
+- keep existing debug behavior while switching layer1 name reads to the cached name
+- document the device_lock(dev) -> lock_sock(sk) ordering
+- build-test the series on arm64 with W=1 for drivers/isdn/mISDN and
+  drivers/isdn/hardware/mISDN
+
+Shuvam Pandey (3):
+  mISDN: serialize socket teardown against device unregister
+  mISDN: socket: drop temporary references from get_mdevice()
+  mISDN: cache stable device names outside the kobject
+
+ drivers/isdn/mISDN/core.c   |  37 ++++-
+ drivers/isdn/mISDN/core.h   |   1 +
+ drivers/isdn/mISDN/layer1.c |   2 +-
+ drivers/isdn/mISDN/socket.c | 263 +++++++++++++++++++++++++++++++-----
+ drivers/isdn/mISDN/stack.c  |  36 ++---
+ drivers/isdn/mISDN/tei.c    |   2 +-
+ include/linux/mISDNif.h     |   2 +
+ 7 files changed, 284 insertions(+), 59 deletions(-)
+
+-- 
+2.50.1 (Apple Git-155)
 
