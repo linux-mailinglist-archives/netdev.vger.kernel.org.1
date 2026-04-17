@@ -1,170 +1,176 @@
-Return-Path: <netdev+bounces-279307-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279309-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cAWtNyYk4mlX1wAAu9opvQ
-	(envelope-from <netdev+bounces-279307-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 14:14:30 +0200
+	id cQt6Mrsm4mkY2QAAu9opvQ
+	(envelope-from <netdev+bounces-279309-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 14:25:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3609F41B23A
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 14:14:30 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9086041B31E
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 14:25:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6175E3088F75
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 12:08:47 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A66023030B37
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 12:25:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AE63377EBA;
-	Fri, 17 Apr 2026 12:08:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72BDE3563CD;
+	Fri, 17 Apr 2026 12:25:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=ixit.cz header.i=@ixit.cz header.b="bMeNO7rt"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from ixit.cz (ixit.cz [185.100.197.86])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64F723101BC;
-	Fri, 17 Apr 2026 12:08:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1ADF3101BC
+	for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 12:25:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.100.197.86
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776427726; cv=none; b=W8pZpzaDjXQq9Pnpb1uFhwYAW0eMgXbWmFSBVV0oSS7xjtE1VdOg8ZSsBvTn5KCODEAaORU2CPx9xwK1D6Dj2brFmmkcnuPv/kTnisYP/fO+HV2rrD/yPbIxWExdnLosoyaD0N57znI8+POVvOWYkcucAn/pbvGEBsLSmzxStOc=
+	t=1776428724; cv=none; b=RROZ9ZlAiCs8BkOKu8AD848bPMGdtSJ4WmTNfJCnwmAU3IZrifG+oTivA1Z0s5Rff1cqNv6xYdctfAzg5e1DSyuM+IAIfd7mMZCe3h5O4Jk4x+cM3opx7zuZS6hbB1K7ida9ILw7ZfR6kp0IyF9ZQkkttUciGyn7+//xnvaKUsc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776427726; c=relaxed/simple;
-	bh=Fu7cBTVm4EUD/2LDczIxEyrLvsmxg0Mr0T2osrZ0MyI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Wce1yNdBqXAxgEh6ciSsiFgFTTyWF76ZMEBQL6MMcG2NT+JLdBko5iHLMM03UvgA6Ww/YIVUJsDAuqKUCHGGClHlJtwpHEs+M1r0qsTTdgK6EFTKK/pQt5m513nzBl2kNhhQ8+z0FX1rifjRSmNiVnJIQOBruyXM8TuUd5tAEvU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.99)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1wDhzt-000000004Gm-0SZ7;
-	Fri, 17 Apr 2026 12:08:33 +0000
-Date: Fri, 17 Apr 2026 13:08:29 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: "Chester A. Unal" <chester.a.unal@arinc9.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Christian Marangi <ansuelsmth@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Frank Wunderlich <frank-w@public-files.de>,
-	John Crispin <john@phrozen.org>
-Subject: Re: [PATCH net] net: dsa: mt7530: fix .get_stats64 sleeping in
- atomic context
-Message-ID: <aeIivb0AwRoCOezc@makrotopia.org>
-References: <79dc0ec5b6be698b14cb66339d6f63033ca2934a.1776397542.git.daniel@makrotopia.org>
- <C88911FE-2012-4D29-B7F2-6BEA28122854@arinc9.com>
+	s=arc-20240116; t=1776428724; c=relaxed/simple;
+	bh=YhtO9ikvWgH4qhTsPHgD2AIfbCHsAlfCwk9jWc9Z4yc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=i6PecIHqckwlMRelVSUf63h58RZHuxOWJL8QEA5tqYXARLxXcU8nShVVtZ5FS62l/6zDcG9HWcO3GjVbRlu3AVpTQWcofd9VWobhmDYePielk0uPnzE8Ud+1/hZjNSnOZo2i0G6+aTylyolQyyLBifRN9DQDzfUYbvwx2gHBWO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ixit.cz; spf=pass smtp.mailfrom=ixit.cz; dkim=pass (1024-bit key) header.d=ixit.cz header.i=@ixit.cz header.b=bMeNO7rt; arc=none smtp.client-ip=185.100.197.86
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ixit.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ixit.cz
+Received: from [10.65.3.135] (unknown [87.58.112.183])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by ixit.cz (Postfix) with ESMTPSA id BFE6D53406D8;
+	Fri, 17 Apr 2026 14:16:15 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ixit.cz; s=dkim;
+	t=1776428176;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=aLy4jipEDAFy1pGjgP0Fga/d1yzGVUBb8+GDphK2JWA=;
+	b=bMeNO7rtFdMvV/Wvelkp9msAHjeKFynwFi8sNxpMEZFnXyicIvvA2cBsVy8BA859Z6qdfv
+	+H1agLuUIHUQm3zDNH56+aCWdtsEtPRJoURUzVc515ZnzAO27TZG4HY8EPoTiXNefWIDTX
+	Ju2WtX1Ke6h2AQBcVAIZpKzeZ+YkXA4=
+Message-ID: <4ff7da97-3c85-4b05-aa6d-6d2c7b9bd97f@ixit.cz>
+Date: Fri, 17 Apr 2026 14:16:14 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <C88911FE-2012-4D29-B7F2-6BEA28122854@arinc9.com>
-X-Spamd-Result: default: False [0.04 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+User-Agent: Mozilla Thunderbird
+Subject: Re: Path forward for NFC in the kernel
+To: Michael Walle <michael@walle.cc>, Krzysztof Kozlowski <krzk@kernel.org>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Michael Thalmeier <michael.thalmeier@hale.at>,
+ Raymond Hackley <raymondhackley@protonmail.com>,
+ Bongsu Jeon <bongsu.jeon@samsung.com>, Mark Greer <mgreer@animalcreek.com>
+Cc: netdev@vger.kernel.org
+References: <20260416101041.4c533306@kernel.org>
+ <9c4a4acf-b4f1-4e84-93bf-cdf080cb9970@kernel.org>
+ <DHVAXU7E031H.1CPZZA6ELD2DN@walle.cc>
+Content-Language: en-US
+From: David Heidelberg <david@ixit.cz>
+Autocrypt: addr=david@ixit.cz; keydata=
+ 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
+In-Reply-To: <DHVAXU7E031H.1CPZZA6ELD2DN@walle.cc>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[ixit.cz,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[ixit.cz:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-279307-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-279309-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,collabora.com,armlinux.org.uk,vger.kernel.org,lists.infradead.org,public-files.de,phrozen.org];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	DMARC_NA(0.00)[makrotopia.org];
+	FREEMAIL_TO(0.00)[walle.cc,kernel.org,hale.at,protonmail.com,samsung.com,animalcreek.com];
+	DKIM_TRACE(0.00)[ixit.cz:+];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel@makrotopia.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	R_DKIM_NA(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[david@ixit.cz,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,makrotopia.org:mid,makrotopia.org:email]
-X-Rspamd-Queue-Id: 3609F41B23A
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,ixit.cz:dkim,ixit.cz:mid]
+X-Rspamd-Queue-Id: 9086041B31E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Apr 17, 2026 at 07:35:46AM +0000, Chester A. Unal wrote:
-> On 17 April 2026 04:55:57 WEST, Daniel Golle <daniel@makrotopia.org> wrote:
-> >The .get_stats64 callback runs in atomic context, but on
-> >MDIO-connected switches every register read acquires the MDIO bus
-> >mutex, which can sleep:
-> >[   12.645973] BUG: sleeping function called from invalid context at kernel/locking/mutex.c:609
-> >[   12.654442] in_atomic(): 0, irqs_disabled(): 0, non_block: 0, pid: 759, name: grep
-> >[   12.663377] preempt_count: 0, expected: 0
-> >[   12.667410] RCU nest depth: 1, expected: 0
-> >[   12.671511] INFO: lockdep is turned off.
-> >[   12.675441] CPU: 0 UID: 0 PID: 759 Comm: grep Tainted: G S      W           7.0.0+ #0 PREEMPT
-> >[   12.675453] Tainted: [S]=CPU_OUT_OF_SPEC, [W]=WARN
-> >[   12.675456] Hardware name: Bananapi BPI-R64 (DT)
-> >[   12.675459] Call trace:
-> >[   12.675462]  show_stack+0x14/0x1c (C)
-> >[   12.675477]  dump_stack_lvl+0x68/0x8c
-> >[   12.675487]  dump_stack+0x14/0x1c
-> >[   12.675495]  __might_resched+0x14c/0x220
-> >[   12.675504]  __might_sleep+0x44/0x80
-> >[   12.675511]  __mutex_lock+0x50/0xb10
-> >[   12.675523]  mutex_lock_nested+0x20/0x30
-> >[   12.675532]  mt7530_get_stats64+0x40/0x2ac
-> >[   12.675542]  dsa_user_get_stats64+0x2c/0x40
-> >[   12.675553]  dev_get_stats+0x44/0x1e0
-> >[   12.675564]  dev_seq_printf_stats+0x24/0xe0
-> >[   12.675575]  dev_seq_show+0x14/0x3c
-> >[   12.675583]  seq_read_iter+0x37c/0x480
-> >[   12.675595]  seq_read+0xd0/0xec
-> >[   12.675605]  proc_reg_read+0x94/0xe4
-> >[   12.675615]  vfs_read+0x98/0x29c
-> >[   12.675625]  ksys_read+0x54/0xdc
-> >[   12.675633]  __arm64_sys_read+0x18/0x20
-> >[   12.675642]  invoke_syscall.constprop.0+0x54/0xec
-> >[   12.675653]  do_el0_svc+0x3c/0xb4
-> >[   12.675662]  el0_svc+0x38/0x200
-> >[   12.675670]  el0t_64_sync_handler+0x98/0xdc
-> >[   12.675679]  el0t_64_sync+0x158/0x15c
-> >
-> >For MDIO-connected switches, poll MIB counters asynchronously using a
-> >delayed workqueue every second and let .get_stats64 return the cached
-> >values under a per-port spinlock. A mod_delayed_work() call on each
-                 ^^^^^^^^^^^^^^^^^^^
-Just noticed I forgot to update the commit message when changing the
-implementation to use a single shared spinlock for all ports...
-
-I'll send v2 tomorrow fixing that, and what ever else comes up, if
-anything.
-
-> >read triggers an immediate refresh so counters stay responsive when
-> >queried more frequently.
-> >
-> >MMIO-connected switches (MT7988, EN7581, AN7583) are not affected
-> >because their regmap does not sleep, so they continue to read MIB
-> >counters directly in .get_stats64.
-> >
-> >Fixes: 88c810f35ed5 ("net: dsa: mt7530: implement .get_stats64")
-> >Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> >---
-> >This bug highlights a bigger problem and the actual cause:
-> >Locking in the mt7530 driver deserves a cleanup, and refactoring
-> >towards cleanly and directly using the regmap API.
-> >I've prepared this already and am going to submit a series doing
-> >most of that using Coccinelle semantic patches once net-next opens
-> >again.
+On 17/04/2026 10:54, Michael Walle wrote:
+> On Fri Apr 17, 2026 at 9:18 AM CEST, Krzysztof Kozlowski wrote:
+>> Does anyone knows if the NFC stack/drivers actually works fine? Did
+>> anyone test actual devices?
 > 
-> Acked-by: Chester A. Unal <chester.a.unal@arinc9.com>
+> I was working on a product which used an NFC part from NXP. We
+> started with the upstream driver and libnfc and we did some
+> bugfixes, that's also probably the reason I'm in the loop here ;).
 > 
-> Chester A.
+> But eventually it was decided to switch to the libs provided by the
+> vendor, because that at least somehow worked reliably (and you'll
+> get support from the vendor).
+
+So what we need is show vendor how wonderful Linux kernel is, thus he should 
+contribute to it and then switch to it (when nVidia can understand it's 
+beneficial to them, why not NXP).
+
+David
+
+> 
+> -michael
+
+-- 
+David Heidelberg
+
 
