@@ -1,199 +1,246 @@
-Return-Path: <netdev+bounces-279247-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279248-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OEGdL+bb4WkXzAAAu9opvQ
-	(envelope-from <netdev+bounces-279247-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 09:06:14 +0200
+	id eJanF9Pd4WklzQAAu9opvQ
+	(envelope-from <netdev+bounces-279248-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 09:14:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 557B0417A75
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 09:06:10 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EB97417C7F
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 09:14:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E2AC5302C928
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 07:01:22 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E8B9F304D9B9
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 07:12:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80B193254A0;
-	Fri, 17 Apr 2026 07:01:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD0F5332EA2;
+	Fri, 17 Apr 2026 07:12:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nFc0iIO1"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="1qZcnU3F"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f48.google.com (mail-ua1-f48.google.com [209.85.222.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 194A431F9B9
-	for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 07:01:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.48
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776409282; cv=pass; b=dMCMoNATXiAhBLuu3wyKb8QVlDRjH1o2sC4NlfEugX97eGNMhxamszgb5U9+O7iwQ3w7VXk20uOyh/LkuUgjasizeBBiD1TRUGeQRgALDhE8bQwszHmy+R14+jKMpdlZgO0Ph4LSetgglKmRBDo1Y9RAciD74SO83HmhD1GznRE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776409282; c=relaxed/simple;
-	bh=CqEfDEULqCUK0Xs6W590UUKHGlvposw/hPiDYEQNGFI=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=IsQssFR1U23+mFkcx+7KJPE6L3BxXcs5YGPHj26A/Ksan7OVHroPZ9DgWILtcnbZrITrmskG8bzIAsgbLOiBDWgjnsvrI5ndsJ8FyUk+Sj/E1NJrH4yX7n8W5qgOytmUNtQxWn0yrFri9N/DDy7WlOaIo5gOiug7mOaKm2cU3ac=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nFc0iIO1; arc=pass smtp.client-ip=209.85.222.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f48.google.com with SMTP id a1e0cc1a2514c-94de664b541so76035241.1
-        for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 00:01:20 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776409280; cv=none;
-        d=google.com; s=arc-20240605;
-        b=NU8Q5Gfk3kUWwri+hO4NA2cI0u5Y2T2qACxtEHAz2nWdp1MdQiPKbNGDNg/2dKXAra
-         SoATaZujrBFbwg1vMCL2lQwlW75p7P5j1+aJYj4h5H+trWC5newQMqdwMiKZB4d5GB8E
-         hzHTXMB3U7YE3ql0SRQppbn6WMkbstbSo7J5yZjm6/bvMzc0clZrcrImgi7KW3/pgmS0
-         iLJ7QZWFkncETjHCOmbbYlED/tDSgKye+O9HPMFXcJT3OT0FZu+9HXUl7ddKtJni2PfB
-         /uZQpjKFpWEBqHD9Q3uil5KhScEFumuUP76QRK7voo/j5xEoLlj6I2Uey6GgnoqGagd5
-         Xx+g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
-        bh=L/UaHskfSyg0E4oE6Z4pYmSOvjeGIm6HpWCOupmCDW0=;
-        fh=N16f6VWqN+9nXH3lJ3qEP+Wl+cS9hwLuZCXuQFK4EZw=;
-        b=ZKP21ScDAvV0W7Ix5h/yELg6plZ2ujicObigIiqjNN9QyZhoDgYzUSvuPLnr1k5ftA
-         OEn/ulAZ1IxdizfXZfcJNwa6SRgTBLevUH0Ln8hNmXn+MD0dJa6LDiObDaRpS8I+rpDN
-         fLEHJhN1qW7X10Kj3Tr3K2EeYlQOtVDSKXYFdVDqcp+2AbkZWxUaLIkry7hyejqkxux0
-         hIS+8DZPqVUvbtToi8eURYDXpUxBHf+H2KbvZWgkSoTSuOnZV+5BWT2Tnvb3O67VxoOJ
-         INoZcz9ZNPAIOkoIsgowTmSPbOzBtUyp5yPAHwNbJo5MrqPjt7ycLkEu7GTN4Tpn67nv
-         YwnA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776409280; x=1777014080; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=L/UaHskfSyg0E4oE6Z4pYmSOvjeGIm6HpWCOupmCDW0=;
-        b=nFc0iIO1k7ULPnN9hYpsrbq0ryOvT4I0HN2BTxeMjgd4c4gg+NB3GxIYsJ/pKZybJE
-         /ySI0EDrDSrc/ge0aue9/8tomTQnbIVEGPzopm37Hp0cwkPl76dkRzXdzSIb6gs2l1Ol
-         VRa/CM2bpwkasURSR07QF5idNUi7/FdVVl8IXpnYiWiE3PZm88XsHxx+OyQi54p60sq8
-         XTyGSBh9YbdcFxwCyX1muTi9jyFfaKa78odfBDmaIty1ZsTzkp1M/zgam+D+RkbmigAB
-         NAbCUbyX1YR2Je0rkuxaS15GtcI1GybTkFpb2KCSz4jxvb1ykYcFxtOatblwZuO/mUFL
-         ++rA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776409280; x=1777014080;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=L/UaHskfSyg0E4oE6Z4pYmSOvjeGIm6HpWCOupmCDW0=;
-        b=bOU2ORbBgZ9wR24iWdS+Kc/usel9fjJvm8TW0dVhmIqrUbrf6RdNNOkDMnaUcNgdfV
-         XMx/D1qDgT9IDAgHSbBMas6hczZR+bh6ihdxHblybmlw0B27RAdXYGVee7xpLzDNN/m3
-         C3wj7drJBjJ2c8YElgf6PFQu+L5HIUkFu+KQtqb3sXgHEhNTOVoEanhoisi7XwOPXU0h
-         w0ma+8GGSpCXGTqDK+94bTPyjir4qqwHVPfQLsFKO+RvrSgWNNe7GgV0S1fRtDmjB0+E
-         Ok8/h1w+2eXg0zcsePJbTYAC/DpIVmhuzIRiGucLALbEjUSz0fzHNFV7zrAoHNL3COeV
-         IBLw==
-X-Gm-Message-State: AOJu0Yx33u4OJfm7zm99VnCfJQ2adY9E/a+zRBSPA/CXKCrwy4Y+znxN
-	PaPHdJ2pDB7M33qpxy+qZdqzuiVPlXl8vUFUzZdqYgRXkXn2XACCzS+UiUrw3d79rLhijIqIWPw
-	GlpU27RtHluN6xc5uJr9+SD8IiVdL0m0=
-X-Gm-Gg: AeBDieuOlczubkIFgpRUWEecXfmiiRIx9T1EYoe+CZPrPQBVFWa7fxV21osTTZ56J99
-	7qhGZ3/SQYgMqbI2oW0AMOtSOnDVtbBYSVM8YyUCJysxQ1U3IBPpaXChivqngMlRhMBOjjqNmeY
-	UZAjvgEMSFHupZjDTJj0UxG3MOUrbtP409uf7HbT3xy/MIX5FsWmeoYic4bN3GMtdLW0BwqipgV
-	hRPtx3EwoagOZfjKdGFwN39KC/OsReftVChQ0b8QPZVkPVEuIapXP8Cwguj1XuHOX30i/KZpglA
-	QOMAxPcKZoaAT0sP+Q==
-X-Received: by 2002:a05:6102:6f06:b0:5ff:ea33:2be with SMTP id
- ada2fe7eead31-616f68d36ecmr453833137.19.1776409280004; Fri, 17 Apr 2026
- 00:01:20 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C7C333B6EA
+	for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 07:12:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776409937; cv=none; b=P1hiWcsOxe8eDuNd8wJdcMK+rmlYWazb5uOOIA3OAMPojbwkFImWrL1ffSYKpW6RLUQx5HAjLLw6bZdHZsIYVZB+zVdJS3oHan+2WznTWQqiArGTdOfVHZI/SNSItgyU9lYsRaM3ZzpDA6/8BkkC6K+J7FU0hgNgmzsmmPLZqgQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776409937; c=relaxed/simple;
+	bh=Glf6m3+Hn5qEjZ9pj5xG2qpDwZac+wqxTio6gk3uADk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cxI98cd0ecHpjZJgO7F2HgGHb4EYdxa3LgJdvMXKP6mwVhIAs8KqM47EKbOKw9uRuF+xllR/xJFHO89he/02ivWwvC8RhgPz9m77SDjufZZpFhycoKkEeznPPjtqsaWJIlIiSC0ZRDdPWFS64TZQy6uQ7qfiZfNpoX43PFS+n2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=1qZcnU3F; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 34E7F4E42A22;
+	Fri, 17 Apr 2026 07:12:12 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id F3C4F60497;
+	Fri, 17 Apr 2026 07:12:11 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 722BA10460946;
+	Fri, 17 Apr 2026 09:12:00 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1776409931; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=IBacLVtaDD+BG01rHO7esJaLs6bAfvaO0ht5I5JeJ5A=;
+	b=1qZcnU3FfRAWiLLrD9RvQE+7jqFv5N4MZhKuMyPs+eKII4hMWEOQgP0ZKUhr7VlDVEQXQl
+	+r63/8FS6j054YsoP9zacr6dF9+AX2D2U1plFSffabMCcn6XjMmjJx7SQ85e4sNdjhb72a
+	Fd1NB40UEspXATaGNYE+s3Sbumr8TA7M0bwLbfy9rvwJUXc6jqko3Lv8fZZCqAfZJOso11
+	s8NAL8gvRFvyKD6KhFa9IdrxzYweb+RhIi37cX+rrpborQe1GGPL0mILxVpNLoX8OBph6g
+	+FFRILrQPDXucWndO02cJI09Jvzk1QsnCHlrf8mUsxi7P6Wo5x/wl6CC0P7rJQ==
+Message-ID: <680c384c-135f-44cd-a2cd-7e4fd0ec4bf7@bootlin.com>
+Date: Fri, 17 Apr 2026 09:11:59 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: plantegg ren <renxijun@gmail.com>
-Date: Fri, 17 Apr 2026 15:01:08 +0800
-X-Gm-Features: AQROBzBiRMFumQRyduGZZ6JGrBV0rqOHeZdeeOLP-uOsgf1OR3RDDCfLstKe5cY
-Message-ID: <CAMrUUotdnC+Gv3oud75Ns3BMiOCEo+_fNYX4_L=r=YhtyzZ0Qw@mail.gmail.com>
-Subject: Re: TCP default settings (bugzilla)
-To: stephen@networkplumber.org
-Cc: netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	FAKE_REPLY(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 5/6] net: stmmac: move PHY handling out of
+ __stmmac_open()/release()
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+ Alexander Stein <alexander.stein@ew.tq-group.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+ Paolo Abeni <pabeni@redhat.com>
+References: <aNKDqqI7aLsuDD52@shell.armlinux.org.uk>
+ <5987484.DvuYhMxLoT@steina-w> <aeC-tc2CooYDoBok@shell.armlinux.org.uk>
+ <2410317.ElGaqSPkdT@steina-w> <aeDSTIS9-TDSihbX@shell.armlinux.org.uk>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <aeDSTIS9-TDSihbX@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279247-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,foss.st.com,davemloft.net,google.com,kernel.org,lists.infradead.org,st-md-mailman.stormreply.com,vger.kernel.org,redhat.com];
+	TAGGED_FROM(0.00)[bounces-279248-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWO(0.00)[2];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MISSING_XM_UA(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TO_DN_NONE(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[renxijun@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 557B0417A75
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 6EB97417C7F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 Hi,
 
-One more real-world data point that just happened two weeks ago,
-directly related to tcp_keepalive_time.
+On 16/04/2026 14:13, Russell King (Oracle) wrote:
+> On Thu, Apr 16, 2026 at 02:02:53PM +0200, Alexander Stein wrote:
+>> Hi Russel,
+>>
+>> Am Donnerstag, 16. April 2026, 12:49:25 CEST schrieb Russell King (Oracle):
+>>> On Thu, Apr 16, 2026 at 08:20:13AM +0200, Alexander Stein wrote:
+>>>> Am Mittwoch, 15. April 2026, 14:59:32 CEST schrieb Russell King (Oracle):
+>>>>> On Wed, Apr 15, 2026 at 08:08:40AM +0200, Alexander Stein wrote:
+>>>>>> Hi,
+>>>>>>
+>>>>>> Am Dienstag, 23. September 2025, 13:26:19 CEST schrieb Russell King (Oracle):
+>>>>>>> Move the PHY attachment/detachment from the network driver out of
+>>>>>>> __stmmac_open() and __stmmac_release() into stmmac_open() and
+>>>>>>> stmmac_release() where these actions will only happen when the
+>>>>>>> interface is administratively brought up or down. It does not make
+>>>>>>> sense to detach and re-attach the PHY during a change of MTU.
+>>>>>>
+>>>>>> Sorry for coming up now. But I recently noticed this commit breaks changing
+>>>>>> the MTU on i.MX8MP. Once I simply change the MTU I run into some DMA error:
+>>>>>> $ ip link set dev end1 mtu 1400
+>>>>>> imx-dwmac 30bf0000.ethernet end1: Register MEM_TYPE_PAGE_POOL RxQ-0
+>>>>>> imx-dwmac 30bf0000.ethernet end1: Register MEM_TYPE_PAGE_POOL RxQ-1
+>>>>>> imx-dwmac 30bf0000.ethernet end1: Register MEM_TYPE_PAGE_POOL RxQ-2
+>>>>>> imx-dwmac 30bf0000.ethernet end1: Register MEM_TYPE_PAGE_POOL RxQ-3
+>>>>>> imx-dwmac 30bf0000.ethernet end1: Register MEM_TYPE_PAGE_POOL RxQ-4
+>>>>>> imx-dwmac 30bf0000.ethernet end1: Link is Down
+>>>>>> imx-dwmac 30bf0000.ethernet end1: Failed to reset the dma
+>>>>>> imx-dwmac 30bf0000.ethernet end1: stmmac_hw_setup: DMA engine initialization failed
+>>>>>
+>>>>> This basically means that a clock is missing. Please provide more
+>>>>> information:
+>>>>>
+>>>>> - what kernel version are you using?
+>>>>
+>>>> Currently I am using v6.18.22.
+>>>> $ ethtool -i end1
+>>>> driver: st_gmac
+>>>> version: 6.18.22
+>>>> firmware-version: 
+>>>> expansion-rom-version: 
+>>>> bus-info: 30bf0000.ethernet
+>>>> supports-statistics: yes
+>>>> supports-test: no
+>>>> supports-eeprom-access: no
+>>>> supports-register-dump: yes
+>>>> supports-priv-flags: no
+>>>>
+>>>>> - has EEE been negotiated?
+>>>>
+>>>> No. It is marked as not supported
+>>>>
+>>>> $ ethtool --show-eee end1
+>>>> EEE settings for end1:
+>>>>         EEE status: not supported
+>>>>
+>>>>> - does the problem persist when EEE is disabled?
+>>>>
+>>>> As EEE is not supported the problem occurs even with EEE disabled.
+>>>>
+>>>>> - which PHY is attached to stmmac?
+>>>>
+>>>> It is a TI DP83867.
+>>>>
+>>>> imx-dwmac 30bf0000.ethernet eth1: PHY [stmmac-1:03] driver [TI DP83867] (irq=136)
+>>>>
+>>>>> - which PHY interface mode is being used to connect the PHY to stmmac?
+>>>>
+>>>> For this interface
+>>>>> phy-mode = "rgmii-id";
+>>>> is set.
+>>>>
+>>>> In case it is helpful. My platform is arch/arm64/boot/dts/freescale/imx8mp-tqma8mpql-mba8mpxl.dts
+>>>> Thanks for assisting. If there a further questions, don't hesitate to ask.
+>>>
+>>> Thanks.
+>>>
+>>> So, as best I can determine at the moment, we end up with the following
+>>> sequence:
+>>>
+>>> stmmac_change_mtu()
+>>>  __stmmac_release()
+>>>   phylink_stop()
+>>>    phy_stop()
+>>>     phy->state = PHY_HALTED
+>>>     _phy_state_machine() returns PHY_STATE_WORK_SUSPEND
+>>>     _phy_state_machine_post_work()
+>>>      phy_suspend()
+>>>       genphy_suspend()
+>>>        phy_set_bits(phydev, MII_BMCR, BMCR_PDOWN)
+>>>
+>>> With the DP83867, this causes most of the PHY to be powered down, thus
+>>> stopping the clocks, and this causes the stmmac reset to time out.
+>>>
+>>> Prior to this commit, we would have called phylink_disconnect_phy()
+>>> immediately after phylink_stop(), but I can see nothing that would
+>>> be affected by this change there (since that also calls
+>>> phy_suspend(), but as the PHY is already suspended, this becomes a
+>>> no-op.)
+>>>
+>>> However, __stmmac_open() would have called stmmac_init_phy(), which
+>>> would reattach the PHY. This would have called phy_init_hw(), 
+>>> resetting the PHY, and phy_resume() which would ensure that the
+>>> PDOWN bit is clear - thus clocks would be running.
+>>>
+>>> As a hack, please can you try calling phylink_prepare_resume()
+>>> between the __stmmac_release() and __stmmac_open() in
+>>> stmmac_change_mtu(). This should resume the PHY, thus restoring the
+>>> clocks necessary for stmmac to reset.
+>>
+>> I tried the following patch. This works as you suspected.
+> 
+> Brilliant, thanks for proving the theory why it broke.
+> 
+> I'll have a think about the best way to solve this, because
+> phylink_prepare_resume() is supposed to be paired with phylink_resume()
+> and that isn't the case here.
+> 
+> Please bear with me as my availability for looking at the kernel is
+> very unpredictable at present (family health issues.)
 
-AWS recently rolled out Nitro V6 (8th-gen EC2 instances) which reduced
-the ENI connection tracking timeout from 432000 seconds (5 days) to
-just 350 seconds:
+FWIW I am able to reproduce this with imx8mp + ksz9131
 
-  https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/security-group-connection-tracking.html
+I can give this a try as Russell isn't available.
 
-Our MySQL/HikariCP connection pools started seeing intermittent timeout
-errors every 20-30 minutes after migrating to 8th-gen instances. We
-captured packets on both client and server simultaneously. Here is what
-we found on a single connection (idle for 818 seconds, well past the
-350-second ENI timeout):
+Maxime
 
-Server side -- MySQL receives the request and sends responses normally:
+> 
 
-  #270  71.51s  10.23.99.71 -> 172.20.64.240  [ACK]     last activity
-                  ~~~ connection idle for 818 seconds ~~~
-  #271 889.94s  10.23.99.71 -> 172.20.64.240  [PSH,ACK] len=5  client
-request arrives
-  #272 889.94s  172.20.64.240 -> 10.23.99.71  [PSH,ACK] len=11 server
-responds OK
-  #275 890.15s  172.20.64.240 -> 10.23.99.71  [PSH,ACK] len=11 server
-retransmits
-  #278 890.59s  172.20.64.240 -> 10.23.99.71  [PSH,ACK] len=11 server
-retransmits
-  #281 891.02s  172.20.64.240 -> 10.23.99.71  [PSH,ACK] len=11 server
-retransmits
-    ... (server keeps retransmitting, client never ACKs)
-
-Client side -- sends request, but NEVER receives any server response:
-
-  #267  71.51s  10.23.99.71 -> 172.20.64.240  [ACK]     last activity
-                  ~~~ connection idle for 818 seconds ~~~
-  #268 889.94s  10.23.99.71 -> 172.20.64.240  [PSH,ACK] len=5  sends request
-  #269 890.15s  10.23.99.71 -> 172.20.64.240  [PSH,ACK] len=5  retransmit 1
-  #270 890.37s  10.23.99.71 -> 172.20.64.240  [PSH,ACK] len=5  retransmit 2
-  #271 890.79s  10.23.99.71 -> 172.20.64.240  [PSH,ACK] len=5  retransmit 3
-  #272 891.65s  10.23.99.71 -> 172.20.64.240  [PSH,ACK] len=5  retransmit 4
-  #273 893.38s  10.23.99.71 -> 172.20.64.240  [PSH,ACK] len=5  retransmit 5
-  #274 894.94s  10.23.99.71 -> 172.20.64.240  [FIN,ACK]         gives up
-
-  Zero packets from 172.20.64.240 after the idle gap. Zero RSTs.
-
-The ENI silently drops all inbound packets (server -> client) because
-the connection tracking entry expired after 350 seconds. Outbound
-packets (client -> server) still pass through, so the server receives
-the request and responds -- but its responses are black-holed by the
-ENI. No RST is sent, so both sides are completely unaware.
-
-If tcp_keepalive_time were lower than 350 seconds, the keepalive probes
-would have kept the ENI tracking entry alive, and none of this would
-have happened.
-
-The trend is clear -- middlebox idle timeouts are getting shorter (AWS
-went from 432000s to 350s overnight), while tcp_keepalive_time has
-stayed at 7200 seconds for decades. The gap is widening.
-
-Xijun
 
