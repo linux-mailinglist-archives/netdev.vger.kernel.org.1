@@ -1,173 +1,253 @@
-Return-Path: <netdev+bounces-279341-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279342-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YKyGHN1G4mlh4AAAu9opvQ
-	(envelope-from <netdev+bounces-279341-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 16:42:37 +0200
+	id iE7zAyxG4mlh4AAAu9opvQ
+	(envelope-from <netdev+bounces-279342-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 16:39:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4F2141C2F0
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 16:42:36 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DD5841C279
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 16:39:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0E741315672D
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 14:36:14 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 26A9A301BAD6
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 14:39:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BE4A3B27F6;
-	Fri, 17 Apr 2026 14:36:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C655339F166;
+	Fri, 17 Apr 2026 14:39:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b="b2hht9rM"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RtPjwMNO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.nabladev.com (mx.nabladev.com [178.251.229.89])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE4212ED846;
-	Fri, 17 Apr 2026 14:36:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.251.229.89
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776436573; cv=none; b=ifvXy89uJGZLT2EvTXXiszJz4AjB9704nmrk2Y13N1Xjjvaw4Y8EGQnWwb780GRFAIp5DKiLyBNpyc5vUrsr3FQwG58gtAiTZFA/WidB8HSi4LDkX1pzBGt40vGlwOuZ4H9YyquNowX4dV6mmqgkKsWI2wjmZfP5UiF0iLJR2BI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776436573; c=relaxed/simple;
-	bh=4K5xCDOrsqfdBbbfs66l499I5HBzF3VQLwoV69MrSsA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JjulK08AEuBUE/Xk4Xar879aZCXx5lcKpSyBnPK3YWvgjaA1G8wkdNPbiQpmz0SSHj+dvsr2UOhQ1vGEfUq1d+gkjkSCg6wEU2UXvweK5/In/c4bszJvJ1oEmfau4BS7uv1M/dyI68fz7IFOkx6397l/mGLsqRGT0J56AI/y2fM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com; spf=pass smtp.mailfrom=nabladev.com; dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b=b2hht9rM; arc=none smtp.client-ip=178.251.229.89
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nabladev.com
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 30DF911385C;
-	Fri, 17 Apr 2026 16:36:05 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nabladev.com;
-	s=dkim; t=1776436566;
-	h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=LGnDlQ1kXzbMWy8rPGEeELExDvbX+Y5f+N9yBoi3r40=;
-	b=b2hht9rMJUvcGZUPLWaWpBdmYK3jONk/Msf40JSOA8a2AkRfqA9bxTgOYSbxE1wna82SdU
-	Q/QPFYu/vXkxrq5nTvzFC3SPi9O7VXf8aKFtFyHJ97H/49zJ+ocA2tf1PIxUxkCQ4j+2iY
-	tv2d1+NA9E9343+Rm72PJftBZFuxbpbk2KXAGon6qBcXA+DiqdUl9XoPU3ns8YGCqKnBW+
-	g2GkbwZ/BOu+qomMFylm72T2Eu0kOKSZKIz7u0qTDNhvBWLp3wltqTYHNfFMlPqNHs311D
-	UYHoeSbcdL/s57uRyBCXOmnH74bAsXjk/TgeD5vWCPa3yfCrT30JVXiDnrrLqA==
-Message-ID: <fdb7bac5-1edd-475e-b869-000e827e69ea@nabladev.com>
-Date: Fri, 17 Apr 2026 16:36:04 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68D09383C64
+	for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 14:39:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.18
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776436773; cv=fail; b=WU/4hefskT4XyExG4tEG4aHbjjM3Fe+uL+ZWWz8pdUkhzJOevXjBoFIk7kRET7BJMJFLHh0NOaMdbYC5yMGQVOcfBQrvJ4cbmAO9iZUlpz8s1XIE2Pn04VOcuO6oJ1RED7zN7xnIONq29arNUqbnYBXcZNhzMdGKrl1wSJeVOSw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776436773; c=relaxed/simple;
+	bh=FMndtSY7EJvL0J/kHCfhv47O1f2QCSSNvf67FEiUHY8=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=duZ/9GsKihhsWgP9nO6GyAqqVX9PRb9swDvlV3MEwpkPTBG4+GMX+TgpI19d8c9boy+9kzo5obg/lbLuK7CDFCz+4dFU2yveG2Qw1335PIO48NydciLkFgoZSiPBaWP/pZdLjETxQ0Iwr9k6vZWdtTwFMlCylMtq1fmp81o43F8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RtPjwMNO; arc=fail smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1776436772; x=1807972772;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=FMndtSY7EJvL0J/kHCfhv47O1f2QCSSNvf67FEiUHY8=;
+  b=RtPjwMNOFhSRIrV8e4B5bHPmpcBuDcyu2iKEuFUBFq5xnWdAfxiO4iw1
+   aT2688UWtX0SVNupr1VCMR81pIgnWCbArxjmJLv4DP6BovNop4JTd/+4p
+   53lJw9Fc/K2boZfiy9mbT40CmGML7NuQ9hHLr6AOVj8Sy4hyxrMxzB4SA
+   V9jmIJD5apdPrXvSN2JvA2vzLxJallu9UrjDU1V5qCQjPrXz58xSlWwx6
+   +b3OH7PRHdE3D68EI3vOKiVTZkcYoQ8rhVfcflJZXCbfulx4vwbvBo0EH
+   jci7ZrHhA4FdG5TVO905/ztAOoYyitA3h3G0XTkUb2/oH7lWvq+yT2z4t
+   Q==;
+X-CSE-ConnectionGUID: byBcOtKjQ7WCgISdL+OQGw==
+X-CSE-MsgGUID: z9g2kT6iRzK0ngfulStlag==
+X-IronPort-AV: E=McAfee;i="6800,10657,11762"; a="77461479"
+X-IronPort-AV: E=Sophos;i="6.23,184,1770624000"; 
+   d="scan'208";a="77461479"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2026 07:39:32 -0700
+X-CSE-ConnectionGUID: g+QXn0jYSpS/ALjgeErGqA==
+X-CSE-MsgGUID: +D4J8PNuTUip0OazyorgoA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,184,1770624000"; 
+   d="scan'208";a="230931950"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by orviesa009.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2026 07:39:31 -0700
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Fri, 17 Apr 2026 07:39:31 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Fri, 17 Apr 2026 07:39:31 -0700
+Received: from SN4PR2101CU001.outbound.protection.outlook.com (40.93.195.39)
+ by edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Fri, 17 Apr 2026 07:39:30 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=W+DmMrnXWQKif4Ib4aaTqqwgR3O+Igd1rIpN08g0/dpucBDoo7jFV7V53UDASY1u2/5FLOexeNqnElWJdQLJa152uYFHIgxZeyTkQ/0/xrt47FEZ0plqsMyDSQK9UbDN0ON7ZvGQbPJ42oR+n7OjpqIJ3GIXH/PhIrabCLiCjCdJUDcpcpg6MqsBugPrxXl6/TFUHfr72s89zBZqYed7Td88Tf7D38At5t4oa5r0Z2NKZlmusB53xy/HieN/j96cNVvBxzBd6qegityfcMajsz347DgxWNu2yBXJddo9fi8tEG2nq/TH2nWGmoLZBt6aL1xwiZOk2fzzhCdKbFeTiw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=4pCasmez9UaY8bg0TObNOxgkx+d4pPws5ZL7udBKs2w=;
+ b=VBCbROSqjdouiqC+jYmgMdB4Gtte2674IE3JodCfZFtILXScTfbgOFqVvsjgGpQi0YDbQDWtaoGcIw4QnfN/OYMGpJrUyadGbDlSeRnY62Zv/4CRMNEGFobLQvLADgDIcZz1K3q7/z8GGe+jCm/+AQb0qv9s9/ZsRgJOsO0qQoeHeup1rWSoiTwujfiMFiPsoXZUX7R5pnqEaBDYlhXoBpz3zoKn6nWyQftF0y7iIwnthIT4Salnq7qOATL+liDlMFfiVsBOU9S99EaZqbMKU6ORiBszmJuB0T/SuMvsuPdhTtQLNqAdVbKIU2LinsZg6xfNEsDX0KFf/OmTMDgDBw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
+ by DS0PR11MB6400.namprd11.prod.outlook.com (2603:10b6:8:c7::6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9818.25; Fri, 17 Apr 2026 14:39:28 +0000
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::8d98:e538:8d7:6311]) by MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::8d98:e538:8d7:6311%5]) with mapi id 15.20.9818.017; Fri, 17 Apr 2026
+ 14:39:28 +0000
+Message-ID: <dd884d10-1a7e-4227-baaa-afa8b4b264ce@intel.com>
+Date: Fri, 17 Apr 2026 16:38:09 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH net v3 1/5] iavf: return EBUSY if reset
+ in progress or not ready during MAC change
+To: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
+	<anthony.l.nguyen@intel.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>
+References: <20260414110006.124286-1-jtornosm@redhat.com>
+ <20260414110006.124286-2-jtornosm@redhat.com>
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Content-Language: en-US
+In-Reply-To: <20260414110006.124286-2-jtornosm@redhat.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DU7P195CA0003.EURP195.PROD.OUTLOOK.COM
+ (2603:10a6:10:54d::19) To MN6PR11MB8102.namprd11.prod.outlook.com
+ (2603:10b6:208:46d::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 0/3] ksz87xx: add support for low-loss cable equalizer
- errata
-To: Fidelio Lawson <lawson.fidelio@gmail.com>,
- Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
- Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Marek Vasut <marex@denx.de>,
- Maxime Chevallier <maxime.chevallier@bootlin.com>,
- Simon Horman <horms@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Fidelio Lawson <fidelio.lawson@exotec.com>
-References: <20260417-ksz87xx_errata_low_loss_connections-v4-0-6c7044ec4363@exotec.com>
-Content-Language: en-US
-From: Marek Vasut <marex@nabladev.com>
-In-Reply-To: <20260417-ksz87xx_errata_low_loss_connections-v4-0-6c7044ec4363@exotec.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[nabladev.com,reject];
-	R_DKIM_ALLOW(-0.20)[nabladev.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|DS0PR11MB6400:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6093155a-36f4-42e4-85c0-08de9c8f20d8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024|18002099003|56012099003|22082099003;
+X-Microsoft-Antispam-Message-Info: VseSN6S+ZsEwrZwEgo/MMHwHV6BRmaeJRWDN2M3SygXytxzJkdiUvoLJb8uuqWK4XzkO4LCEgN3z56zodukNlXawN+8Es38YN5Vbeg+af5gg7146jkOC9VlCh7QfMcWUGj/MbK31MHuPjn7l3tkZJH3WNB1Jakd49Vv3jijYPq8s404DHocqOz04gAgky/qrwjA8XZaB4ee9ovEVPFUMtxMXAwGU7qJpRnwtnFHBMeeZELlLCvs6F+55xkMHT/cRmdWNMQ1pe1oblLUa6cwJAaxPzfQQdmMCS9OlRtyL79v8C49GywY29+3TfWjDz9WE5mCPi4rLwNtxlheSnYjlmLemJfB29gd34jiaS6YREEQ2NVcDxqQVIjgPVWIvaB7auOfEI/ZgJcmMuhOIjE6cISSxjwpqry0zidlyJQZAqLcodQQMcw84AK2r+AIhnDhtWvLzwc0iz966DfFjUYqcKHNU63sAoRy6BpWHzneg4aAysWEu2JQ08IK1dMN8Z37m00t4NnL+QbFBHlFc4ofW1wdd9Rm7u2M6usnHNxWjTX2BkyCqzMuhl9zAtlL21EV2RzZDj8zrbRoGVM6JqcDJq9fXB9sUpmp577C6XttwBgOfCOyp5TjrHw6WkzuwupgS1Py4OFFLrWXEqxbogeB7ePfjFF/Sf9PmYBP3FK8yh39q87dxQ7y70oPwiKh09/NK/ju/p52Y0GkpXDHyPA9Nzfq0v0aCNIlqNxm/LEzEmMA=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(18002099003)(56012099003)(22082099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?YklGQ29CZG92M09QRkQ0ZjBZV0E4NkFENVRIS2psTm8wd0FwQUd2MHRGS3NI?=
+ =?utf-8?B?LzRHUzVXUVRBYmNsZXcwdnc4ZkVFcnVhbnhlRWVJdEdOZmxkaFFmZzhZVXpY?=
+ =?utf-8?B?cGlDeURSK0swdFhFU2FOQWt3ZUt0WjB1R2I0R1prWXBPMks0aVM3RTVVV0gr?=
+ =?utf-8?B?Z0xsUGUzM0xCWXFGb0h4alI3ZVBiVjFxeUNIcnhjVnh2U0hPdkRKL0pOd2RP?=
+ =?utf-8?B?bGRoc2h2bTl5ZWJYUENGd1pZQjd3SlYzWTNMaUNaVWlCQXdRR3A4RTRuZzBa?=
+ =?utf-8?B?WGg1d2hZNFBuMDN5UC9zNHN5TjBMY2FsVjY3eW4ybWlMMlNmcXZBZTVId2Z4?=
+ =?utf-8?B?S2o3NFpUQjR6aE41VGhHLzZsemRqbW42YUNCRVBRS2JYNGRpeDYyNGNUbGEx?=
+ =?utf-8?B?YXRvbHFHdFpXWEk3UnVuT05GblVjQ28vNHdnbDFmdWlDWk5DL0RvUkJESElv?=
+ =?utf-8?B?MlpUN0xvZ1draXlTeDBmMHQ3SVk4cDNjTkYvYmtsTzNSVHp4WUh5ZWpNRy80?=
+ =?utf-8?B?SGs2ZzF4T0lkZWZuWTA5aUhCNlE2eVpqYTVUa0p0bGdiaUcyckc4VzFlbXlS?=
+ =?utf-8?B?MTM1bGt1bTRkemorY3ExalFoQ0VjVXFuc2xYTFlPUm9JenBPdUM4RHNZQlpW?=
+ =?utf-8?B?cWJpZlRHZ2ZaNVgzbHovMUI4dHFrZ3d1elRXdkJBczRqWTlDajEzcjdWU01n?=
+ =?utf-8?B?VEFvNCtUa2NwV3dFYTNzS2JjajBHR24vYklab1UxY0xPRytXb1ZLOThZakkw?=
+ =?utf-8?B?UHNPTDd2ajRURWJ4ZWpjVVJwdGZERjdZYkhUNytiQWRLLzF3MTNCNWdNK2V6?=
+ =?utf-8?B?T0hzaXJuN0dhMmlTUFNwbmtUSWZqbFhCWFpKS0VGWkEwcXVGSkk2bHhYMjVX?=
+ =?utf-8?B?TVBlRFkzWFJ5MWtzaDJHTkRzK205R1JCbFp6VDNCNVlsdDdFdUN1UjczdzJ1?=
+ =?utf-8?B?KzI5Z2Rla2hWVVp6OE84R0w1Nm44ZW9xWWZVR3ZlN2M1ZUtQVGlSL0Q2Qzg2?=
+ =?utf-8?B?S3hCYmhiUE1jTmlMS2VGanpjQ0lkWElKVGpnaGxIS0t5RDBKZ3FuM2RXSytj?=
+ =?utf-8?B?S3FUcmJkMVR3L0ZjSmEya0FXTkJRTjd0azIwNFppVTBBalVQVml6OWZyYjhr?=
+ =?utf-8?B?WUsySVQzREY5MER5TFNjUk14OXVCVEJoY1V6Wmh6c3lPNkhqY1g0L2xxakwx?=
+ =?utf-8?B?bFB5cHliVm5sTVpQWktvaTgvbG0zbVVqQnYrK0ZmdjlRbFFNNjdUTU5pbnB2?=
+ =?utf-8?B?cDBuMTFsZEl2SkhJUkxSUGtOS01LcDRxTXFNQndRUG95U1FUSW4wR25EY3Fs?=
+ =?utf-8?B?L3FZcmZTZlhZNmd4ZVlqeWNGbDFoUERoWTFuWGJRdXhIekg0ZUs4NjA3U2Iy?=
+ =?utf-8?B?eng1UGJ2OTVrcFVzL3p2aisvc1R0M1hZb2RPa1ljS2w4WmJlY2ZWMGRieGZL?=
+ =?utf-8?B?WXBZczVJRCtrc0dtZVJra0dycnJoc1pOQ1RwNnlpRlBoZkRFZHZEcVM4cHRL?=
+ =?utf-8?B?blR2YjBKS3p1alRLeVpKSlhCZHRUZDBJVTl0UC9zT3lnU05zWThjRFYzVURj?=
+ =?utf-8?B?SzBHNUY1N01idkNEZ1VKNWFhOTcyT3N1ZGxPUVNLKzJtSkpLcjI1Q3pxdTdR?=
+ =?utf-8?B?YmMvdkN0UElXTTBRdGl6WkhLSzVVVXVNZTVYMjJ5NXB6dy83a2pRTUlxM1BX?=
+ =?utf-8?B?ZVFYd1VyMFhyeFN5VWVSZUUvV2FRSDVudUVQOTB0UGFUcHpWcGpSakoyeEZ0?=
+ =?utf-8?B?TmFka2o2K29EaVdXemxzWFM3ckJ4ZGx0NWFjWm9XN1N3UHVwVy9ickE1b0xY?=
+ =?utf-8?B?UHpDWkpKcTAvcTRMSXdhVVRqYVhycjA5bkNnQUpTUjYxTEtSc2tuYmdHNXQ3?=
+ =?utf-8?B?MStlcTFWdjVTYUhSbWQxbzJsUld3TkxXOFRHZTlwTnM4Mm5jMm9ScW5wWkxT?=
+ =?utf-8?B?UHRCeXhmN3dJZDNPZTcyRllWNGxCN3JqUjhNZm9oZE9VUGtYaWZQc29ySWtw?=
+ =?utf-8?B?R0tVZ3BldkpKNGhjT1YxMUErQkVxMDVzUFhpRThzNklBZ1dnTWVHN1BscEwy?=
+ =?utf-8?B?bVpWTmN3OUVCcXp6MEdMdGR0enpNbmtXcCt2cU5TbWFxbG85UGJhNGlwZ3pt?=
+ =?utf-8?B?bHJsSm1hNVdjdGJFdXpnUGVVZGNBejB2dmVERWVMZHI1dlBTSVovRGY5dTRk?=
+ =?utf-8?B?aUsxd2g5ZzhVdTNqbEZtaEtxeC9kdW5SdER1bExNYWh3MVpLSFJPM2FTQ2w4?=
+ =?utf-8?B?S3RpNzh1Y0tVelRTWmNXVk4vNklzLzR1ZldLQ1E3Nm9oSXdtYVdQT0hIOUY4?=
+ =?utf-8?B?OWRKS2didEgxQllWcURrc3hmT0ZZMWMxbG5ZVUxEeloxejZ5N0I0Mmlpa1Vq?=
+ =?utf-8?Q?v1fH6HFxtcClszxA=3D?=
+X-Exchange-RoutingPolicyChecked: pqeO0Q3xh0GB3h1HSALfPx0LyW6TrOL36Zj5V3CQl3fQvi4bHWjgzVbG2QYvsqq7pDhdDDehzOx6AkpZ1zc/3FCt8A5VFQm6r/nNlxByNxSfDc8PquU9xMJbrvTGUoZg8+ls3YJLSrhD6Or7VntHt4xXFe1Q6gkqrWlyX6Q4Ofw9H5LT7+d6rkZoHXDjzm9K8gRbZHtSr3Ne3f3wp4A9c17fjbaAHC0n/7ea4Tj8WFLaH+zk3dmnib16Sz/8ybCLNWbANuddVHgsR26hVLa6Jl+ShGDTbz2vXyTy+oYQKPOtaBVcZvMseR0wDa7gcbkuTQS5jcqWjKoIptgn/g8/bA==
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6093155a-36f4-42e4-85c0-08de9c8f20d8
+X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Apr 2026 14:39:28.0722
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 8b5Sl3Qeu3coP7q7jwZ6zZmUIS4pO1OiMHSmsSvCisfyJyUfwtl5hj3hLATYbVfX9gqmYJ6ZaOJu75WTjIevXNj2SbMZslwNq/J/sdFk6Q0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB6400
+X-OriginatorOrg: intel.com
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279341-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,denx.de,bootlin.com,armlinux.org.uk];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	URIBL_MULTI_FAIL(0.00)[nabladev.com:server fail,sea.lore.kernel.org:server fail,exotec.com:server fail];
-	DKIM_TRACE(0.00)[nabladev.com:+];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-279342-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[intel.com:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[marex@nabladev.com,netdev@vger.kernel.org];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,intel.com:mid];
 	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[przemyslaw.kitszel@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nabladev.com:dkim,nabladev.com:mid]
-X-Rspamd-Queue-Id: C4F2141C2F0
+	RCVD_COUNT_SEVEN(0.00)[10]
+X-Rspamd-Queue-Id: 0DD5841C279
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 4/17/26 2:44 PM, Fidelio Lawson wrote:
-> Hello,
+On 4/14/26 13:00, Jose Ignacio Tornos Martinez wrote:
+> When a MAC address change is requested while the VF is resetting or still
+> initializing, return -EBUSY immediately instead of attempting the
+> operation.
 > 
-> This patch implements the “Module 3: Equalizer fix for short cables” erratum
-> described in Microchip document DS80000687C for KSZ87xx switches.
+> Additionally, during early initialization states (before __IAVF_DOWN),
+> the PF may be slow to respond to MAC change requests, causing long
+> delays. Only allow MAC changes once the VF reaches __IAVF_DOWN state or
+> later, when the watchdog is running and the VF is ready for operations.
 > 
-> According to the erratum, the embedded PHY receiver in KSZ87xx switches is
-> tuned by default for long, high-loss Ethernet cables. When operating with
-> short or low-loss cables (for example CAT5e or CAT6), the PHY equalizer may
-> over-amplify the incoming signal, leading to internal distortion and link
-> establishment failures.
+> After commit ad7c7b2172c3 ("net: hold netdev instance lock
+> during sysfs operations"), MAC changes are called with the netdev lock
+> held, so we should not wait with the lock held during reset or
+> initialization. This allows the caller to retry or handle the busy state
+> appropriately without blocking other operations.
+
+that makes sense, but that could break user scripts, OTOH, with netdev
+lock taken here, user could be blocked forever, so I think this is a net
+positive change,
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+
 > 
-> Microchip documents two independent mechanisms to mitigate this issue:
-> adjusting the receiver low‑pass filter bandwidth and reducing the DSP
-> equalizer initial value. These registers are located in the switch’s
-> internal LinkMD table and cannot be accessed directly through a
-> stand‑alone PHY driver.
+> Signed-off-by: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
 > 
-> To keep the PHY‑facing API clean, this series models the erratum handling
-> as vendor‑specific Clause 22 PHY registers, virtualized by the KSZ8 DSA
-> driver. Accesses are intercepted by ksz8_r_phy() / ksz8_w_phy() and
-> translated into the appropriate indirect LinkMD register writes. The
-> erratum affects the shared PHY analog front‑end and therefore applies
-> globally to the switch.
+>   drivers/net/ethernet/intel/iavf/iavf_main.c | 3 +++
+>   1 file changed, 3 insertions(+)
 > 
-> Based on review feedback, the user‑visible interface is kept deliberately
-> simple and predictable:
-> 
-> - A boolean “short‑cable” PHY tunable applies a documented and
->    conservative preset (LPF bandwidth 62MHz, DSP EQ initial value 0).
->    This is the recommended KISS interface for the common short‑cable
->    scenario.
-> 
-> - Two additional integer PHY tunables allow advanced or experimental
->    tuning of the LPF bandwidth and the DSP EQ initial value. These
->    controls are orthogonal, have no ordering requirements, and simply
->    override the corresponding setting when written.
-> 
-> The tunables act as simple setters with no implicit state machine or
-> invalid combinations, avoiding surprises for userspace and not relying
-> on extended error reporting or netlink ethtool support.
-> 
-> This series contains:
-> 
->    1. Support for the KSZ87xx low‑loss cable erratum in the KSZ8 DSA driver,
->       including the short‑cable preset and orthogonal tuning controls.
-> 
->    2. Addition of vendor‑specific PHY tunable identifiers for the
->       short‑cable preset, LPF bandwidth, and DSP EQ initial value.
-> 
->    3. Exposure of these tunables through the Micrel PHY driver via
->       get_tunable / set_tunable callbacks.
-> 
-> This version follows the design agreed upon during v3 review and
-> reworks the interface accordingly.
-> 
-> This series is based on Linux v7.0-rc1.
-> 
-> Signed-off-by: Fidelio Lawson <fidelio.lawson@exotec.com>
-Thank you for working on this, except for that one nitpick on 1/3, this 
-looks really good !
+> diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
+> index dad001abc908..67aa14350b1b 100644
+> --- a/drivers/net/ethernet/intel/iavf/iavf_main.c
+> +++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
+> @@ -1060,6 +1060,9 @@ static int iavf_set_mac(struct net_device *netdev, void *p)
+>   	struct sockaddr *addr = p;
+>   	int ret;
+>   
+> +	if (iavf_is_reset_in_progress(adapter) || adapter->state < __IAVF_DOWN)
+> +		return -EBUSY;
+> +
+>   	if (!is_valid_ether_addr(addr->sa_data))
+>   		return -EADDRNOTAVAIL;
+>   
+
 
