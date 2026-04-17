@@ -1,58 +1,51 @@
-Return-Path: <netdev+bounces-279248-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279249-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eJanF9Pd4WklzQAAu9opvQ
-	(envelope-from <netdev+bounces-279248-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 09:14:27 +0200
+	id CJ7zBt3e4WklzQAAu9opvQ
+	(envelope-from <netdev+bounces-279249-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 09:18:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EB97417C7F
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 09:14:26 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1ADA5417D64
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 09:18:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E8B9F304D9B9
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 07:12:33 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 26E9F3016177
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 07:18:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD0F5332EA2;
-	Fri, 17 Apr 2026 07:12:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78D19273803;
+	Fri, 17 Apr 2026 07:18:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="1qZcnU3F"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j6hDWLfL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C7C333B6EA
-	for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 07:12:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 553D622D7B5
+	for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 07:18:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776409937; cv=none; b=P1hiWcsOxe8eDuNd8wJdcMK+rmlYWazb5uOOIA3OAMPojbwkFImWrL1ffSYKpW6RLUQx5HAjLLw6bZdHZsIYVZB+zVdJS3oHan+2WznTWQqiArGTdOfVHZI/SNSItgyU9lYsRaM3ZzpDA6/8BkkC6K+J7FU0hgNgmzsmmPLZqgQ=
+	t=1776410326; cv=none; b=V+tSTlgptnahRHec0dYvqeBUQzaQcQGg292RwoGuHWCdkkmwFuQAR3vES9FznU71WTpr57gWD25/XPWktwlRmDEwu7NMWX9L+1994iqWEYmLCTFCQVU6mYtNfqy2lQYI5EKO9WU/ibR9l0GKonjKmkNM8fu9grzbI7bKZWuGw98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776409937; c=relaxed/simple;
-	bh=Glf6m3+Hn5qEjZ9pj5xG2qpDwZac+wqxTio6gk3uADk=;
+	s=arc-20240116; t=1776410326; c=relaxed/simple;
+	bh=SbkQOqnlJMUyvn6jeGoIt9IAjUY6lWSbGX25S380vrI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cxI98cd0ecHpjZJgO7F2HgGHb4EYdxa3LgJdvMXKP6mwVhIAs8KqM47EKbOKw9uRuF+xllR/xJFHO89he/02ivWwvC8RhgPz9m77SDjufZZpFhycoKkEeznPPjtqsaWJIlIiSC0ZRDdPWFS64TZQy6uQ7qfiZfNpoX43PFS+n2M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=1qZcnU3F; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 34E7F4E42A22;
-	Fri, 17 Apr 2026 07:12:12 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id F3C4F60497;
-	Fri, 17 Apr 2026 07:12:11 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 722BA10460946;
-	Fri, 17 Apr 2026 09:12:00 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1776409931; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=IBacLVtaDD+BG01rHO7esJaLs6bAfvaO0ht5I5JeJ5A=;
-	b=1qZcnU3FfRAWiLLrD9RvQE+7jqFv5N4MZhKuMyPs+eKII4hMWEOQgP0ZKUhr7VlDVEQXQl
-	+r63/8FS6j054YsoP9zacr6dF9+AX2D2U1plFSffabMCcn6XjMmjJx7SQ85e4sNdjhb72a
-	Fd1NB40UEspXATaGNYE+s3Sbumr8TA7M0bwLbfy9rvwJUXc6jqko3Lv8fZZCqAfZJOso11
-	s8NAL8gvRFvyKD6KhFa9IdrxzYweb+RhIi37cX+rrpborQe1GGPL0mILxVpNLoX8OBph6g
-	+FFRILrQPDXucWndO02cJI09Jvzk1QsnCHlrf8mUsxi7P6Wo5x/wl6CC0P7rJQ==
-Message-ID: <680c384c-135f-44cd-a2cd-7e4fd0ec4bf7@bootlin.com>
-Date: Fri, 17 Apr 2026 09:11:59 +0200
+	 In-Reply-To:Content-Type; b=ODCx6gC542tgvJCwmrQ1toDz7lPsgqxClmitqCIOf2gb0eQOq6NZX4G4CPBDVxAtIuRrD65WBGA3LlcJ+Fmqadkxnc8obeVioslPpR7mwbaZDt9z91k9gQZcF6ZbAzYDzKBdaiYTZRwiQOtWX7eSX9vAGtny64UchM7DndpEjX4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j6hDWLfL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B03AC19425;
+	Fri, 17 Apr 2026 07:18:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776410326;
+	bh=SbkQOqnlJMUyvn6jeGoIt9IAjUY6lWSbGX25S380vrI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=j6hDWLfLnVB3avzara6y7yvBqQBNd+w1mVreP5hKZn/Asx6pjBRVyrQ8/Q5K4xwHb
+	 zXkS5WOyCWqT3hBNK1YnsKEMQlUOeFasgtwTnLRAiNW3KyCqhtSQWxiPSUP2vdCimp
+	 Ym8omEm5uojYclDB0bpJxuk9IjRBkiIaI19TcK6gYk6Nz2mr9cj/ozGpyMbsPJ184Q
+	 8KUcEaLlAWzRIg1PVj5eFcQDceDngKAMvR8Vfc7kgz8wP8wYbYBD27j7YAANh1Mf5m
+	 sngOOS9lYxuEgo45J5sAC/ddATL8MddALk6qSKfIlCiZtYtAAJDvjq2fXoZspkgjuv
+	 T/Z6cz9HCgCoA==
+Message-ID: <9c4a4acf-b4f1-4e84-93bf-cdf080cb9970@kernel.org>
+Date: Fri, 17 Apr 2026 09:18:42 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,187 +53,134 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 5/6] net: stmmac: move PHY handling out of
- __stmmac_open()/release()
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
- Alexander Stein <alexander.stein@ew.tq-group.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
- Paolo Abeni <pabeni@redhat.com>
-References: <aNKDqqI7aLsuDD52@shell.armlinux.org.uk>
- <5987484.DvuYhMxLoT@steina-w> <aeC-tc2CooYDoBok@shell.armlinux.org.uk>
- <2410317.ElGaqSPkdT@steina-w> <aeDSTIS9-TDSihbX@shell.armlinux.org.uk>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Subject: Re: Path forward for NFC in the kernel
+To: Jakub Kicinski <kuba@kernel.org>,
+ Michael Thalmeier <michael.thalmeier@hale.at>,
+ Raymond Hackley <raymondhackley@protonmail.com>,
+ Michael Walle <michael@walle.cc>, Bongsu Jeon <bongsu.jeon@samsung.com>,
+ Mark Greer <mgreer@animalcreek.com>, David Heidelberg <david@ixit.cz>
+Cc: netdev@vger.kernel.org
+References: <20260416101041.4c533306@kernel.org>
+From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
-In-Reply-To: <aeDSTIS9-TDSihbX@shell.armlinux.org.uk>
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <20260416101041.4c533306@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,foss.st.com,davemloft.net,google.com,kernel.org,lists.infradead.org,st-md-mailman.stormreply.com,vger.kernel.org,redhat.com];
-	TAGGED_FROM(0.00)[bounces-279248-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-279249-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[kernel.org,hale.at,protonmail.com,walle.cc,samsung.com,animalcreek.com,ixit.cz];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 6EB97417C7F
+X-Rspamd-Queue-Id: 1ADA5417D64
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi,
-
-On 16/04/2026 14:13, Russell King (Oracle) wrote:
-> On Thu, Apr 16, 2026 at 02:02:53PM +0200, Alexander Stein wrote:
->> Hi Russel,
->>
->> Am Donnerstag, 16. April 2026, 12:49:25 CEST schrieb Russell King (Oracle):
->>> On Thu, Apr 16, 2026 at 08:20:13AM +0200, Alexander Stein wrote:
->>>> Am Mittwoch, 15. April 2026, 14:59:32 CEST schrieb Russell King (Oracle):
->>>>> On Wed, Apr 15, 2026 at 08:08:40AM +0200, Alexander Stein wrote:
->>>>>> Hi,
->>>>>>
->>>>>> Am Dienstag, 23. September 2025, 13:26:19 CEST schrieb Russell King (Oracle):
->>>>>>> Move the PHY attachment/detachment from the network driver out of
->>>>>>> __stmmac_open() and __stmmac_release() into stmmac_open() and
->>>>>>> stmmac_release() where these actions will only happen when the
->>>>>>> interface is administratively brought up or down. It does not make
->>>>>>> sense to detach and re-attach the PHY during a change of MTU.
->>>>>>
->>>>>> Sorry for coming up now. But I recently noticed this commit breaks changing
->>>>>> the MTU on i.MX8MP. Once I simply change the MTU I run into some DMA error:
->>>>>> $ ip link set dev end1 mtu 1400
->>>>>> imx-dwmac 30bf0000.ethernet end1: Register MEM_TYPE_PAGE_POOL RxQ-0
->>>>>> imx-dwmac 30bf0000.ethernet end1: Register MEM_TYPE_PAGE_POOL RxQ-1
->>>>>> imx-dwmac 30bf0000.ethernet end1: Register MEM_TYPE_PAGE_POOL RxQ-2
->>>>>> imx-dwmac 30bf0000.ethernet end1: Register MEM_TYPE_PAGE_POOL RxQ-3
->>>>>> imx-dwmac 30bf0000.ethernet end1: Register MEM_TYPE_PAGE_POOL RxQ-4
->>>>>> imx-dwmac 30bf0000.ethernet end1: Link is Down
->>>>>> imx-dwmac 30bf0000.ethernet end1: Failed to reset the dma
->>>>>> imx-dwmac 30bf0000.ethernet end1: stmmac_hw_setup: DMA engine initialization failed
->>>>>
->>>>> This basically means that a clock is missing. Please provide more
->>>>> information:
->>>>>
->>>>> - what kernel version are you using?
->>>>
->>>> Currently I am using v6.18.22.
->>>> $ ethtool -i end1
->>>> driver: st_gmac
->>>> version: 6.18.22
->>>> firmware-version: 
->>>> expansion-rom-version: 
->>>> bus-info: 30bf0000.ethernet
->>>> supports-statistics: yes
->>>> supports-test: no
->>>> supports-eeprom-access: no
->>>> supports-register-dump: yes
->>>> supports-priv-flags: no
->>>>
->>>>> - has EEE been negotiated?
->>>>
->>>> No. It is marked as not supported
->>>>
->>>> $ ethtool --show-eee end1
->>>> EEE settings for end1:
->>>>         EEE status: not supported
->>>>
->>>>> - does the problem persist when EEE is disabled?
->>>>
->>>> As EEE is not supported the problem occurs even with EEE disabled.
->>>>
->>>>> - which PHY is attached to stmmac?
->>>>
->>>> It is a TI DP83867.
->>>>
->>>> imx-dwmac 30bf0000.ethernet eth1: PHY [stmmac-1:03] driver [TI DP83867] (irq=136)
->>>>
->>>>> - which PHY interface mode is being used to connect the PHY to stmmac?
->>>>
->>>> For this interface
->>>>> phy-mode = "rgmii-id";
->>>> is set.
->>>>
->>>> In case it is helpful. My platform is arch/arm64/boot/dts/freescale/imx8mp-tqma8mpql-mba8mpxl.dts
->>>> Thanks for assisting. If there a further questions, don't hesitate to ask.
->>>
->>> Thanks.
->>>
->>> So, as best I can determine at the moment, we end up with the following
->>> sequence:
->>>
->>> stmmac_change_mtu()
->>>  __stmmac_release()
->>>   phylink_stop()
->>>    phy_stop()
->>>     phy->state = PHY_HALTED
->>>     _phy_state_machine() returns PHY_STATE_WORK_SUSPEND
->>>     _phy_state_machine_post_work()
->>>      phy_suspend()
->>>       genphy_suspend()
->>>        phy_set_bits(phydev, MII_BMCR, BMCR_PDOWN)
->>>
->>> With the DP83867, this causes most of the PHY to be powered down, thus
->>> stopping the clocks, and this causes the stmmac reset to time out.
->>>
->>> Prior to this commit, we would have called phylink_disconnect_phy()
->>> immediately after phylink_stop(), but I can see nothing that would
->>> be affected by this change there (since that also calls
->>> phy_suspend(), but as the PHY is already suspended, this becomes a
->>> no-op.)
->>>
->>> However, __stmmac_open() would have called stmmac_init_phy(), which
->>> would reattach the PHY. This would have called phy_init_hw(), 
->>> resetting the PHY, and phy_resume() which would ensure that the
->>> PDOWN bit is clear - thus clocks would be running.
->>>
->>> As a hack, please can you try calling phylink_prepare_resume()
->>> between the __stmmac_release() and __stmmac_open() in
->>> stmmac_change_mtu(). This should resume the PHY, thus restoring the
->>> clocks necessary for stmmac to reset.
->>
->> I tried the following patch. This works as you suspected.
+On 16/04/2026 19:10, Jakub Kicinski wrote:
+> Hi folks!
 > 
-> Brilliant, thanks for proving the theory why it broke.
+> We are struggling to keep up with the number of security reports and AI
+> generated patches in the kernel. NFC is infamous for being a huge CVE
+> magnet. We need someone to step up as a maintainer, create an NFC tree
+> and handle all the incoming submissions. Send us (or Linus if you
+> prefer) periodic PRs, like WiFi, Bluetooth etc. do. If that does not
+> happen I'm afraid we'll have to move the NFC code out of the tree, 
+> put it up on GH or some such, and let it accumulate CVEs there..
 > 
-> I'll have a think about the best way to solve this, because
-> phylink_prepare_resume() is supposed to be paired with phylink_resume()
-> and that isn't the case here.
-> 
-> Please bear with me as my availability for looking at the kernel is
-> very unpredictable at present (family health issues.)
+> I'm planning to send a PR to Linus to shed the unmaintained code early
+> next week. We need to have a maintainer established by then.
 
-FWIW I am able to reproduce this with imx8mp + ksz9131
++Cc David Heidelberg recently trying to use Linux NFC stack,
 
-I can give this a try as Russell isn't available.
+Just "collecting" patches is not a big deal, I could do this, but
+actually reviewing the patches with necessary due diligence is the
+effort I could not provide in a reasonable time frame. And picking up
+patches without proper review feels risky...
 
-Maxime
+NFC has a long history of issues, first mostly pointed out by syzbot but
+now apparently by AI tools. The code base is quite old, with no major
+improvements or testings happening but not in a way "oh, it's stable and
+working like 'cp' command" but rather "no one knows how many bugs are on
+top of each other and if it actually still works".
 
-> 
+Syzbot and AI reported bugs encourage random drive-by fixes by people
+not testing the code, thus particular bug report might be fixed, but for
+example NFC stops working and no one knows that.
 
+Does anyone knows if the NFC stack/drivers actually works fine? Did
+anyone test actual devices?
+
+If not, then moving to Github would be even more reasonable.
+
+Another point is that AFAIU, most of real world devices, like
+Android-based phones, don't use the Linux NFC stack but their custom
+HAL/user-space based libraries and drivers. Some other non-Android
+projects use libnfc userspace, which seems to be maintained only as
+bugfix (https://github.com/nfc-tools/libnfc/commits/master/).
+
+Best regards,
+Krzysztof
 
