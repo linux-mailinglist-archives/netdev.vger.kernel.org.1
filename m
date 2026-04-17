@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-279194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279193-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6LG/BfyE4WkiuQAAu9opvQ
-	(envelope-from <netdev+bounces-279194-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 02:55:24 +0200
+	id sMpGDPmE4WkiuQAAu9opvQ
+	(envelope-from <netdev+bounces-279193-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 02:55:21 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00CFC415E06
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 02:55:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C33F2415DFF
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 02:55:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D96553064C22
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 00:54:55 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5554A304A66D
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 00:54:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B170126ED35;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 409F826CE2C;
 	Fri, 17 Apr 2026 00:54:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="C/a7xBsT"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EwNicI/P"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0155E23183B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0A0F2116F4
 	for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 00:54:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776387277; cv=none; b=ZY4vON2DDP9sWvD6KN3z14WPQ2yLE4JjOCXnRJY2jo6emE8fNd7D7LfhOvBHNma3Vnd6sjrX5CMwGGXOpAFha6U1TFZ+MAB1cIjPb7yJk6SnE2butJzt63dy61fZTL7Otxxlbeb1iQfM2JX4Cy3QDkMoFOnmvK3lXzPeKZRDYmo=
+	t=1776387277; cv=none; b=SU4Hn9eAyCH9yRF9Lz+IuIzQehDH3OeLMetF/4g6EVyt8gI9hYf+zUd4Nv7F9hIbAgjS9Xq1VjBA3pIPtHB+Bf7lS2Z65FonIQQ3+mD+cc5baQyHATwQ2R4/cQrHGcDRRrtVDJZ47VieP3nr41X1wHGiLqpqrsMBCsBLWhngJ88=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1776387277; c=relaxed/simple;
-	bh=Yk+xwsbR7g+z83jicg9eFXVP4Q1sEUpOYzEHIpwLX0E=;
+	bh=AfsOMwPMhFztQq0jtVZM5IPfFTIRh6tWiC++969mejQ=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=BYF6QpN2aARTO+Yppo6DRhrztxBYmxwCRLgGBOJZlZyn4jFHdlC76kxDOgKRXDxlAmxyWOjWXvE3ylMQmHoYoYcHtqyv2VY3eSH1OJhA2EvnfPnvRobT4c3B5324NJVztpRxRL1bKVEa0hcZ1Wnf2oNUXo6FWFJjDb5Sk7i062U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=C/a7xBsT; arc=none smtp.client-ip=198.175.65.15
+	 In-Reply-To:To:Cc; b=diuGJOoq9v2DinsZlYgD0l/QxSJyR6jFoDF5NfLXkj6v6CjfLq/Z67EjrLMysB7OvvqLDzpabbUSpiEnNHRnPxPPOLaJaXLlnlJxbrKP/UxzkCpdOvo9C0ud9aZHvOxz+ZXuUw0Gx3qFRm4CuYBpMKFcTWmxrHc/iwWGrl2XIZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EwNicI/P; arc=none smtp.client-ip=198.175.65.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
@@ -39,32 +39,31 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   t=1776387276; x=1807923276;
   h=from:date:subject:mime-version:content-transfer-encoding:
    message-id:references:in-reply-to:to:cc;
-  bh=Yk+xwsbR7g+z83jicg9eFXVP4Q1sEUpOYzEHIpwLX0E=;
-  b=C/a7xBsTiCKvnkkX8ejd6cRD+TkCEuP5wUxi2K8Fx+4+1Te5ektKuEr+
-   BIJHBSzQcDpab3MnPWKtpb1jX6lI49hWXd2W8sK3pSReom6VBbS2xxjGO
-   1E21HH1Ov+dqL1wSgDShUzlB7f3STYfmVibvC/Jnq80P1E/+1dqAcjjWM
-   K60v1pvD3Vv7f8kkKZ9EjJxmW76FtFJLSDa6pKc3aPK7bDvdAQ/+7RMqe
-   HbXQKtRn50sKzcXiGVhrHn5U+vwKFNN3VNeTxseX6f/hqjXieAflxM3In
-   UTme0upHdPCy45XaT8oEBSL2SFkxdLCcBKVoxzUNxqDZHFiK/pQtm9/0X
-   g==;
-X-CSE-ConnectionGUID: SRY33CZBSwWRWUD611/W/A==
-X-CSE-MsgGUID: 1R0c5aDDRY+2Z466DLXCsg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11761"; a="81000569"
+  bh=AfsOMwPMhFztQq0jtVZM5IPfFTIRh6tWiC++969mejQ=;
+  b=EwNicI/PxMnOXDI+ey42SzxADkHPAzJEUm8K2AhqV44zp+YjpiAGJiMQ
+   aitA7c7n24cxOLCQQRulK2KjXXvFQPxrvenz3hWDJXVpN+MvzCCNkVDww
+   NLFNJr9vPYT2ArEln2AgNVCmeUjcjHJ5HFvKA4aNdsf0pNxcbOI3wA5Nw
+   y92E4D5vq1t/v8TkQDu07AzoZsDdqJiXpAwaEqTTLCxdxCq3Cman76J6T
+   pz2L9rlFobnY/2ZdZ3U9+WyfuMniAVHEUPpSoH7cmU2sgYib2wY9btUFq
+   1wq5DWLKmysJ1QwSaOmatYRpaOuULrRngpbYQxjwKvxUDuADsDd8XRjdX
+   w==;
+X-CSE-ConnectionGUID: Uy53zsWVSfKRS+Fj+pHFVA==
+X-CSE-MsgGUID: y6BItZPBQOG6tXg0YH4sMg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11761"; a="81000567"
 X-IronPort-AV: E=Sophos;i="6.23,183,1770624000"; 
-   d="scan'208";a="81000569"
+   d="scan'208";a="81000567"
 Received: from fmviesa010.fm.intel.com ([10.60.135.150])
   by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2026 17:54:32 -0700
-X-CSE-ConnectionGUID: jrp/y5hHSQqL9grsnyP/ag==
-X-CSE-MsgGUID: jnqpyzBRR/q5qBDGArvmEw==
+X-CSE-ConnectionGUID: MPUgLQC4RJ6+xP5ScIaACQ==
+X-CSE-MsgGUID: Y8SB+wkVSsuLFsoH2bLtew==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,183,1770624000"; 
-   d="scan'208";a="226539879"
+   d="scan'208";a="226539882"
 Received: from orcnseosdtjek.jf.intel.com (HELO [10.166.28.109]) ([10.166.28.109])
   by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2026 17:54:30 -0700
 From: Jacob Keller <jacob.e.keller@intel.com>
-Date: Thu, 16 Apr 2026 17:53:32 -0700
-Subject: [PATCH net v2 08/12] ice: fix potential NULL pointer deref in
- error path of ice_set_ringparam()
+Date: Thu, 16 Apr 2026 17:53:33 -0700
+Subject: [PATCH net v2 09/12] i40e: don't advertise IFF_SUPP_NOFCS
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,23 +72,24 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260416-iwl-net-submission-2026-04-14-v2-8-686c33c9828d@intel.com>
+Message-Id: <20260416-iwl-net-submission-2026-04-14-v2-9-686c33c9828d@intel.com>
 References: <20260416-iwl-net-submission-2026-04-14-v2-0-686c33c9828d@intel.com>
 In-Reply-To: <20260416-iwl-net-submission-2026-04-14-v2-0-686c33c9828d@intel.com>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
 Cc: netdev@vger.kernel.org, Jacob Keller <jacob.e.keller@intel.com>, 
- Kohei Enju <kohei@enjuk.jp>, Paul Greenwalt <paul.greenwalt@intel.com>, 
- Rinitha S <sx.rinitha@intel.com>
+ Kohei Enju <kohei@enjuk.jp>, 
+ Aleksandr Loktionov <aleksandr.loktionov@intel.com>, 
+ Sunitha Mekala <sunithax.d.mekala@intel.com>
 X-Mailer: b4 0.16-dev-ea14f
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1679;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1604;
  i=jacob.e.keller@intel.com; h=from:subject:message-id;
- bh=B38rD2o57ID3hQ9n6rDNKePBSCdTt3WGeaHWI99EIug=;
- b=owGbwMvMwCWWNS3WLp9f4wXjabUkhsyHLYfm8NzU3Ne1wF3s8PLO4KL/Sj99Fjy2KW/n2t909
- khYdtGbjlIWBjEuBlkxRRYFh5CV140nhGm9cZaDmcPKBDKEgYtTACYyoZ7hD8/i7WK/rf8tFBK7
- P6Fa5n/IxGnMVza9n1Gar/Xzrp0+RzQjw6KjzV4CaSLzDtz+YaDS7XDC5cezxM6lPfHz/k8uYrl
- uygwA
+ bh=YtVAfrysES6hprO6wXd2h5tU/oKCxOctBUIkERrfzaQ=;
+ b=owGbwMvMwCWWNS3WLp9f4wXjabUkhsyHLYe/XZGtFe5wM6iY42CilNxwTeXVzYPZknPrLyVf3
+ B3Yc/NRRykLgxgXg6yYIouCQ8jK68YTwrTeOMvBzGFlAhnCwMUpABPZuILhf1oqx/eg1YeYP3VI
+ yvwXulf+/PelW4IfU94UXNISubp3nTsjw4IlMnO/cC3dmS80h+XXEVa3056mntdetxYtSFJv+dJ
+ mwg0A
 X-Developer-Key: i=jacob.e.keller@intel.com; a=openpgp;
  fpr=204054A9D73390562AEC431E6A965D3E6F0F28E8
 X-Spamd-Result: default: False [-0.66 / 15.00];
@@ -105,7 +105,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[intel.com:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279194-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-279193-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -117,51 +117,51 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[10];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[enjuk.jp:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,intel.com:mid]
-X-Rspamd-Queue-Id: 00CFC415E06
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,intel.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,enjuk.jp:email]
+X-Rspamd-Queue-Id: C33F2415DFF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 From: Kohei Enju <kohei@enjuk.jp>
 
-ice_set_ringparam nullifies tstamp_ring of temporary tx_rings, without
-clearing ICE_TX_RING_FLAGS_TXTIME bit.
-When ICE_TX_RING_FLAGS_TXTIME is set and the subsequent
-ice_setup_tx_ring() call fails, a NULL pointer dereference could happen
-in the unwinding sequence:
+i40e advertises IFF_SUPP_NOFCS, allowing users to use the SO_NOFCS
+socket option. However, this option is silently ignored, as the driver
+does not check skb->no_fcs, and always enables FCS insertion offload.
 
-ice_clean_tx_ring()
--> ice_is_txtime_cfg() == true (ICE_TX_RING_FLAGS_TXTIME is set)
--> ice_free_tx_tstamp_ring()
-  -> ice_free_tstamp_ring()
-    -> tstamp_ring->desc (NULL deref)
+Fix this by removing the advertisement of IFF_SUPP_NOFCS.
 
-Clear ICE_TX_RING_FLAGS_TXTIME bit to avoid the potential issue.
+This behavior can be reproduced with a simple AF_PACKET socket:
 
-Note that this potential issue is found by manual code review.
-Compile test only since unfortunately I don't have E830 devices.
+  import socket
+  s = socket.socket(socket.AF_PACKET, socket.SOCK_RAW)
+  s.setsockopt(socket.SOL_SOCKET, 43, 1) # SO_NOFCS
+  s.bind(("eth0", 0))
+  s.send(b'\xff' * 64)
 
-Fixes: ccde82e90946 ("ice: add E830 Earliest TxTime First Offload support")
+Previously, send() succeeds but the driver ignores SO_NOFCS.
+With this change, send() fails with -EPROTONOSUPPORT, as expected.
+
+Fixes: 41c445ff0f48 ("i40e: main driver core")
 Signed-off-by: Kohei Enju <kohei@enjuk.jp>
-Reviewed-by: Paul Greenwalt <paul.greenwalt@intel.com>
-Tested-by: Rinitha S <sx.rinitha@intel.com>
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Tested-by: Sunitha Mekala <sunithax.d.mekala@intel.com>
 Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_ethtool.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/net/ethernet/intel/i40e/i40e_main.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-index e6a20af6f63d..f28416a707d7 100644
---- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-@@ -3290,6 +3290,7 @@ ice_set_ringparam(struct net_device *netdev, struct ethtool_ringparam *ring,
- 		tx_rings[i].desc = NULL;
- 		tx_rings[i].tx_buf = NULL;
- 		tx_rings[i].tstamp_ring = NULL;
-+		clear_bit(ICE_TX_RING_FLAGS_TXTIME, tx_rings[i].flags);
- 		tx_rings[i].tx_tstamps = &pf->ptp.port.tx;
- 		err = ice_setup_tx_ring(&tx_rings[i]);
- 		if (err) {
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
+index 926d001b2150..028bd500603a 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_main.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
+@@ -13783,7 +13783,6 @@ static int i40e_config_netdev(struct i40e_vsi *vsi)
+ 	netdev->neigh_priv_len = sizeof(u32) * 4;
+ 
+ 	netdev->priv_flags |= IFF_UNICAST_FLT;
+-	netdev->priv_flags |= IFF_SUPP_NOFCS;
+ 	/* Setup netdev TC information */
+ 	i40e_vsi_config_netdev_tc(vsi, vsi->tc_config.enabled_tc);
+ 
 
 -- 
 2.54.0.rc2.531.gaf818d63126a
