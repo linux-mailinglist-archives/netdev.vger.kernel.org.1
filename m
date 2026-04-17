@@ -1,166 +1,139 @@
-Return-Path: <netdev+bounces-279418-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279420-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WDKIAeWh4mmv8QAAu9opvQ
-	(envelope-from <netdev+bounces-279418-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 23:11:01 +0200
+	id aJyPOVei4mmv8QAAu9opvQ
+	(envelope-from <netdev+bounces-279420-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 23:12:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 899D641E9DC
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 23:10:56 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CE1B41EA02
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 23:12:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 45D5F30398A2
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 21:09:45 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 282203025A72
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 21:12:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF6C0332909;
-	Fri, 17 Apr 2026 21:09:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9809E33AD9D;
+	Fri, 17 Apr 2026 21:12:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lMyqQ1xy"
+	dkim=pass (1024-bit key) header.d=mpiricsoftware.com header.i=shardul.b@mpiricsoftware.com header.b="p9+xHT23"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sender4-of-o52.zoho.com (sender4-of-o52.zoho.com [136.143.188.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B87632BEFFF
-	for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 21:09:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776460184; cv=none; b=j/Or0FudyLqQ8n2ocdux5E9YlVjOjFv796wvNgzuZwCNCDIvE5haLzj2rng/pxcDzNPbBd55tlY5WtWUFLpodGJihJr6XHT1eqSyonXMH0/YBBP81ma76shs+05fOciiLSzckm+ap0EUy4GMTRBzmQ+KJwFdL2aju/unkeH5R5E=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776460184; c=relaxed/simple;
-	bh=Ojb9tsYidH7+XlNxOvXN5yHkq9jgOnNphzNBOPjr5SI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kkuwl0Bly7lT8VrP//lrAStR6A9fFRJ9jc21TkmkYhwHzgQSKrMwd6UJ6+zZGbEBA24UL3seZxg/+afmlTFhEMDEyPlxauudhPJZWmghWRhap19ntIK0l7INu85G/iPgICAvaYUaKOS9EUKqlNSdGVBfiAFBWjFOWOHtWdRxqh8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lMyqQ1xy; arc=none smtp.client-ip=209.85.219.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-8a068db9989so20175686d6.0
-        for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 14:09:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776460182; x=1777064982; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=G/ceKS4zZANLPnvM8/t1TovHGT4+al4Wc8t9XoY5Y70=;
-        b=lMyqQ1xyBiiBwVz/jLChmAAAu746gjNC7YXUltblMKgdUMfNedQz0PMc3am6cmykLH
-         xFeHmQR8ZUTn8jyiM3GxnHe80mVgVRx9fasP9GQBgZPhINmWv+Jh13MRxS1Nah3+/fpi
-         XSysG5/vs7VOqLg/zWfGUsrWnu5X3YZlJHzzr3CyumkRP2oBh7EwDFPqmchasOBMNbrE
-         7p1ULqgdKSsePj8Ts+EbEi2emC3a9Puqvr2tjp2qOU62h84qpyeTb/XB8sjpk/Xqkm9q
-         11U9sSN1SXPO/uby8vOKYEeFqjpAWhdfNcV5otzP2oh16hCbK8elLCS4f/prHz8LILrR
-         jXFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776460182; x=1777064982;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=G/ceKS4zZANLPnvM8/t1TovHGT4+al4Wc8t9XoY5Y70=;
-        b=nEfe6BDIc3W1kOk1QdskqC+Tg60KMSHA/6lxCWQPx6yBYjCEJoFC/NeuPWKol9ISm2
-         kB+senDmOg+BQKYIsb2HRFmdbJdpGMmxeH202BKF9zYqLCqRV4o446l9J6Q3/2Lw2Gg8
-         fNWf8WAdWvPjxWML2GjLnv5Bm0d+ZMvih0ds21OQdRuUP+tshbG1RAhGUMOoLXjTqCeB
-         VFl6L2fdFKWx2Evj8v6LuhGpIqZugSYHTKMYLg+oJQjhnKUBbWiXO0A7L8CVxMu7uKK9
-         jFTdlKreW7e5wmFUe2qj1qEpU7rj3fXl+4mqlm0jwOG+JdBEWn4ZWG3vypJF9WnQMQu1
-         nrig==
-X-Gm-Message-State: AOJu0YwEnjZvEKwoPkJGvt1BZ6sbrxg4WMrutx2fru9NP5sJTWZLe/K9
-	P9ANYblHmKWbFeyAGbc4/TsdpffY6Lens669wdxLAbDTeN2Frm5NTYOflgO4OQ==
-X-Gm-Gg: AeBDieu/uuf9wrdgXme/Ao/2VGZyJf7y5jfPQzSnsJtZX2ICD/7vxXoYIMQf7iV1vw6
-	9c+FIrpm8ujPtfh2J1Wbd2Ai/wAiZtFmBosdsfuqQ/hXcPlZPKywhHLf/1ULp1Hw5JuEr4kMz8M
-	sOrMLu4ANo6/Qoz5sAAXXRNoSJ0qzfM7H2tRnBnAB5fwm0VBawQ2y3aigAzQcnNOsHc5u1cjB3V
-	H/h6d42SnstPu8YHMKeW+gZE6Yc/2Yl9V8/+kFvs3sA/WwnS+y9CHVGZmA6dDI/EjrYvRrJQsPs
-	XRxspkj0XiMdUquoh1B97KkIIj4TTXS4TRLTgM7ymXloFNsmlqcv4638fCP3JHsQWXkQfPMbIM/
-	TtrwiiZMubIP4Ekk7pTutvkmTxmW3L6E9OGU8Eii6QJqcbY8/0FpAd7EVVfTfGoq8OEwc+FZh4i
-	hiozRNJFCecLbDcgEz32UnO2TTR1Bxw1VLM1cdREk41ia1pQfWn+JZOey9VnBd/NLUZQN73rsbb
-	pBCFLVy5WVjtDjgpCyt7+eKHg1TZPNU1if42ouP8DBy4O7JMwG0JcO4q+vOHMr/H847hwxa9nzG
-	pKwxsMLSyZI=
-X-Received: by 2002:ad4:576b:0:b0:8ac:b0d8:65f3 with SMTP id 6a1803df08f44-8b0287779f3mr62616686d6.21.1776460182211;
-        Fri, 17 Apr 2026 14:09:42 -0700 (PDT)
-Received: from wsfd-netdev58.anl.eng.rdu2.dc.redhat.com ([66.187.232.140])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8b02ac4260bsm19087246d6.4.2026.04.17.14.09.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Apr 2026 14:09:41 -0700 (PDT)
-From: Xin Long <lucien.xin@gmail.com>
-To: network dev <netdev@vger.kernel.org>,
-	linux-sctp@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>
-Subject: [PATCH net] sctp: fix sockets_allocated imbalance after sk_clone()
-Date: Fri, 17 Apr 2026 17:09:40 -0400
-Message-ID: <af8d66f928dec3e9fcbee8d4a85b7d5a6b86f515.1776460180.git.lucien.xin@gmail.com>
-X-Mailer: git-send-email 2.47.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFFFD32143F;
+	Fri, 17 Apr 2026 21:12:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.52
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776460367; cv=pass; b=ZCIEUflOP0MiepGl0ZM9/HvB80SB3eLEYKEsF7UXYXSpSw/WcwOBiTRWCgaRLmoZv5bRmXGxdxZmQmFyXjPoKntEynRw8VzliZFeUQYqj4uyAz9xxon1klsSZtov0fSTwbPRpJdI5Zxv/FzS19gCK6ekxPZ10ktoYCzWS25Pfx0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776460367; c=relaxed/simple;
+	bh=9LCzNWgbQjoLV75dv3g3As9+0rxowGEUuHkmxZX+8UI=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=J1nHz0mzzXTEIgymwAIoPHemTwHGCuav7rGSbszJidhbrgxTc6JuMua71bVGX/aP7UxYoo1Ec8afZ8BFOMpVg/QVQuk9xOhPY6XoVz5MCqXWEpM25bs+0CYSOhAoJTtbpWh4S5pyqODuAOyBqMJrfNHFaxZEC6KBUzaaNJIZhaA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mpiricsoftware.com; spf=pass smtp.mailfrom=mpiricsoftware.com; dkim=pass (1024-bit key) header.d=mpiricsoftware.com header.i=shardul.b@mpiricsoftware.com header.b=p9+xHT23; arc=pass smtp.client-ip=136.143.188.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mpiricsoftware.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mpiricsoftware.com
+ARC-Seal: i=1; a=rsa-sha256; t=1776460334; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=lBkknkYSDWUpMh4yCullM4m8jxJtEffFFW0cI1hmyzpkQ0XgUrvB79GaJYwHUowwsAGerlQxVQAxCnAfA5JqZ85KxLOe0SCB32Ec11EqwUszVvKiw4MjgnNLqCTaBvzyqUX8VzrAnLArNBKNJh5XzebOp1zS8LNue9O9hUr6vPI=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1776460334; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=xg/IxZ6rKsza+ZIWkxEOo6kiEkolK46uyRinQ6V2VhE=; 
+	b=H/1CccVpzrhcIQC2fjba1auKj4yv/fe4xbtb3lFqe4BCLBc5uGY0b23DXb55MaxlOrVls1DJ1OiX7YZxzTne4C57B3c7uDqKOVe7MkzbXUAIrGxU5kWU1JBjfu7dl7UdAQkVjcz2eZilWcTuz9YjZmppdeV4oow+p47cGVKokUo=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=mpiricsoftware.com;
+	spf=pass  smtp.mailfrom=shardul.b@mpiricsoftware.com;
+	dmarc=pass header.from=<shardul.b@mpiricsoftware.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1776460334;
+	s=mpiric; d=mpiricsoftware.com; i=shardul.b@mpiricsoftware.com;
+	h=Message-ID:Subject:Subject:From:From:To:To:Cc:Cc:Date:Date:In-Reply-To:References:Content-Type:Content-Transfer-Encoding:MIME-Version:Message-Id:Reply-To;
+	bh=xg/IxZ6rKsza+ZIWkxEOo6kiEkolK46uyRinQ6V2VhE=;
+	b=p9+xHT23+y0/WKC4/n779Jj8+ANxYulpVnPIjC6/JUHZk8lVXqdQXwZC9qIWa+4f
+	7OrxHZyWLny62Fu32XBbQDbNl6m6SmfjUwEbKPyGqK6Ma33309/4tEYY+aDowBxDMWV
+	juDiAV5br4KMYGcOO3uaq0T3QukFfenzAgupxvdE=
+Received: by mx.zohomail.com with SMTPS id 1776460331316854.0983054491305;
+	Fri, 17 Apr 2026 14:12:11 -0700 (PDT)
+Message-ID: <08c2189f7bb66d81c1fc8feff1a56dd7250958d3.camel@mpiricsoftware.com>
+Subject: Re: [PATCH] net: hsr: avoid synchronize_net() in hsr_del_port()
+ under rtnl_mutex
+From: Shardul Bankar <shardul.b@mpiricsoftware.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ horms@kernel.org,  netdev@vger.kernel.org, liuhangbin@gmail.com,
+ lukma@nabladev.com,  acsjakub@amazon.de, kees@kernel.org,
+ xiaoliang.yang_1@nxp.com, fmancera@suse.de,  linux-kernel@vger.kernel.org,
+ janak@mpiric.us, kalpan.jani@mpiricsoftware.com, 
+ syzbot+f2fbf7478a35a94c8b7c@syzkaller.appspotmail.com
+Date: Sat, 18 Apr 2026 02:42:03 +0530
+In-Reply-To: <CANn89i+Yug-M2HFnoz5LrffTaB4AHtC74sPKjLWA7cJ2fKF4-w@mail.gmail.com>
+References: <20260417175322.2701465-1-shardul.b@mpiricsoftware.com>
+	 <CANn89i+Yug-M2HFnoz5LrffTaB4AHtC74sPKjLWA7cJ2fKF4-w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.4-0ubuntu2.1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-ZohoMailClient: External
+X-Spamd-Result: default: False [0.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279418-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_FROM(0.00)[bounces-279420-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,vger.kernel.org,gmail.com,nabladev.com,amazon.de,nxp.com,suse.de,mpiric.us,mpiricsoftware.com,syzkaller.appspotmail.com];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,google.com,redhat.com,gmail.com];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[mpiricsoftware.com:?];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	NEURAL_SPAM(0.00)[0.333];
+	DMARC_DNSFAIL(0.00)[mpiricsoftware.com : SPF/DKIM temp error,quarantine];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	FROM_NEQ_ENVFROM(0.00)[shardul.b@mpiricsoftware.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 899D641E9DC
+	R_DKIM_TEMPFAIL(0.00)[mpiricsoftware.com:s=mpiric];
+	TAGGED_RCPT(0.00)[netdev,f2fbf7478a35a94c8b7c];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 8CE1B41EA02
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-sk_clone() increments sockets_allocated and sets the socket refcount to 2.
-SCTP performs additional accounting in sctp_clone_sock(), so the clone-time
-increment must be undone to avoid double counting.
+On Fri, 2026-04-17 at 11:18 -0700, Eric Dumazet wrote:
+> On Fri, Apr 17, 2026 at 10:53=E2=80=AFAM Shardul Bankar
+> <shardulsb08@gmail.com> wrote:
+> >=20
+>=20
+> =C2=A0synchronize_rcu_expedited() should be quite fast...
 
-Note we cannot simply remove the SCTP-side increment, because the SCTP
-destroy path in sctp_destroy_sock() only decrements sockets_allocated when
-sp->ep is set, which may not be true for all failure paths in
-sctp_clone_sock().
+Confirmed.  I ran a targeted HSR-only teardown stress on current
+mainline (many HSR-bearing netns torn down concurrently, no WireGuard,
+no syzkaller harness).  At N=3D1000, patched-vs-baseline cleanup_net
+wall time is within run-to-run noise- the patch has no measurable
+benefit on the workload it was meant to address.
 
-Fixes: 16942cf4d3e3 ("sctp: Use sk_clone() in sctp_accept().")
-Signed-off-by: Xin Long <lucien.xin@gmail.com>
----
- net/sctp/socket.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/net/sctp/socket.c b/net/sctp/socket.c
-index d2665bbd41a2..d0e7048230c0 100644
---- a/net/sctp/socket.c
-+++ b/net/sctp/socket.c
-@@ -4855,8 +4855,9 @@ static struct sock *sctp_clone_sock(struct sock *sk,
- 	if (!newsk)
- 		return ERR_PTR(err);
- 
--	/* sk_clone() sets refcnt to 2 */
-+	/* sk_clone() sets refcnt to 2 and increments sockets_allocated */
- 	sock_put(newsk);
-+	sk_sockets_allocated_dec(newsk);
- 
- 	newinet = inet_sk(newsk);
- 	newsp = sctp_sk(newsk);
--- 
-2.47.1
+> Signature looks like bug fixed recently in wireguard.
+>=20
+> commit 60a25ef8dacb3566b1a8c4de00572a498e2a3bf9
 
+Agreed.  60a25ef8dacb covers what I was actually observing, and
+standalone evidence for the HSR path on current mainline is not
+strong enough to justify this change.
+
+Please drop this patch.
+
+Thanks,
+Shardul
 
