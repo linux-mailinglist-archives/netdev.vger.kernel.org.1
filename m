@@ -1,177 +1,118 @@
-Return-Path: <netdev+bounces-279360-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279361-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sBjgGr1X4mm25AAAu9opvQ
-	(envelope-from <netdev+bounces-279360-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 17:54:37 +0200
+	id kAu6IgBa4mn65AAAu9opvQ
+	(envelope-from <netdev+bounces-279361-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 18:04:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB34F41CD66
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 17:54:36 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBB2141CE31
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 18:04:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4E65330C6EB9
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 15:52:12 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 46251308C952
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 16:02:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77A97314A86;
-	Fri, 17 Apr 2026 15:52:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 920EA32D0D4;
+	Fri, 17 Apr 2026 16:02:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jgNe/BM8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uaiehw6S"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2F503358B8
-	for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 15:52:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 700CE317165
+	for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 16:02:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776441131; cv=none; b=jz0dDA/LXm/5XrEKF36F5r8Gq7bfyRtwp05lCHXkw1jnEpzk0krVaVi/yS0iiGeTObnv0UOxg+7OqDeE0Io1Ka7rM3XMwvAxRHYQv161fkoHKY4idDhDTaVdrp2Bu/fUmY49Jss85Y/HjUWAbnKBmJu3Yy+fUgfD8T0JGdw9v/Q=
+	t=1776441731; cv=none; b=NPRUbnZiaKBsCFnoYk5A1SdPtzJ6zaLDudeOKAMuSeN1Vfkga1Gn3xns8emLilVMiFKW8ZdzS3QYK71tZSHIQSCdQuiFlbc/uFwq972IWj0Kci9NB78MVaprjSSwPoJeLC5THWz2jF5OVJYIs3fd3XyopKP/RR5DjHg1ncZScpc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776441131; c=relaxed/simple;
-	bh=mhVDE5oC2WyEUUzwIicNY08+79uEn8dNX7oL7LdIvTY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gVoF8bmGjzintz2PB/YJiEpX0IZha2aRGtfJyb3g2BF0Uo3oU2JTL3OeB4K0oDUl9IQSQHCTgOPZ8Q5u6/LkS2mk9Qmz0/QFuNP6POfuAtSIwMPbrpxvX48u2t4lSvn3yUmTVUFsFEa8K3/qiqzSbR52Ho0valX6MI6W2FkoT08=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jgNe/BM8; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-488afb0427eso10603985e9.1
-        for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 08:52:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776441128; x=1777045928; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YG5pS9TWxmqTf918rKN1KswMtbzf96uqUuOjHSHvBmc=;
-        b=jgNe/BM8apRtD0rI0MSJjWp+tCZXf0JUqeWxJskIvHgvvn3+kxqN33vm39KDJ2lrnn
-         g1PiKysJXUdL+q+Rv97Gqwh1tAcm2oi9VntV6k/FARBNSCpnlOCKEdRlY4y/ZdYd0swy
-         4R+xC0cr/zx+2H24KFU+NGgr593DUKajYRAeXQcirNzss/YoJld+QMPGsuK/zx+eHEj1
-         0Ntva/bG1/GpLKNYHkLwP4uG5Z209e6nD30Ei49OYHbX7DlfGkPcvbK65C0WmqaBMfV6
-         Sjc6r+KhobpW8PanRaLscreTRMAdBeiYEdKw2cUu9GXa5U7A0AqlaNP29WsKCOqw3sP0
-         IwIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776441128; x=1777045928;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=YG5pS9TWxmqTf918rKN1KswMtbzf96uqUuOjHSHvBmc=;
-        b=DhxPOqtP8UwlievnmaeehCp69E4Ne0jaXWJ6dibrqMf9MIVWjcD0Nnu1AozgISFQAs
-         5UO9c3pFZn+1kMwxQEhRJTcTmnNY+LyFnZySQ20m3GqdIQmje0RfsRs75CHIGPf74M8r
-         54jMwCp75KMfVukcRlGV8eMJBXABpfJQDin2y1FDyQq3Q9MnM9iPWrpkRgTAum0bj+qO
-         eNZFex7rCVQ2KaKPxO5iq+XpfjzGijgwsfenpE+99ghokv8i2F4HVNO8tQzIaplYLPF/
-         MbqBH4czaBftO8+3Sti0VKpAAuzo1reRT4r9yOpd/jsdH4wLd8Gl0uZB867/Vf6dTpbh
-         wtaQ==
-X-Gm-Message-State: AOJu0YznuKc/j6prCXHcVbWXn54Q+ZSRf5gB5TaLdsMiKZgXUQaut5ay
-	fyvQGyDZNj8svGoaJ3Jhg7VtvqAODvnyWvyBYz3AR2VdN46GVAmc75EWdWr79myUE1E=
-X-Gm-Gg: AeBDieuYqnr3MkvWjoZzsSVVPadVA45oRymcoXVGAeVvASBVYZ1jMPLgbASux3itCjj
-	fuk57ckfpTHtLjDCFdnrDRRDE3jXZaX+De0QlHxQMQxAj2AA+fgEaFwGYNKzvGZ/ggOHiMIVe5+
-	DeYIIijghKG4mKCvq5TzcTRa47Iziyg6kcPbOQFPC2RUGYrGgdMhL1bAuNU2jeocCJSV7OYfADN
-	69DYy2oBpNexRZS3H5liYL5iNFw9e1DGNFKU5xyk34G2RaR7CvcuprmhcO+5YRyjp5MblkE0M4A
-	HTuFTJerLLDee8ypVoPZtLGAp34hNTCyJXlS49vNGFMzG+7BCJz19W+mVK//oqiPO1KbE96MALN
-	d9qTXWr0OEOjasMLjgH0lglIqF9Q93yMRBETMee017p1K0MAcUc2W8RTplefOeHt2plDXfKYMlu
-	RpOMSeXL3Ecg4/DFEJ/h434HeXA1okZAmd0ZBy1nY+sDS8NavvcB1WjelCLdMXnlD8VSI6fmU34
-	7Sbrpukervzt9aYL8lrSpTNN0nbrEWbiuw=
-X-Received: by 2002:a05:600c:674f:b0:488:be21:54ae with SMTP id 5b1f17b1804b1-488fb6e9cecmr54910425e9.0.1776441127809;
-        Fri, 17 Apr 2026 08:52:07 -0700 (PDT)
-Received: from fidelio-Precision-7670 (cust-east-par-46-193-119-166.cust.wifirst.net. [46.193.119.166])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488fc181c6dsm51035345e9.6.2026.04.17.08.52.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Apr 2026 08:52:07 -0700 (PDT)
-From: Fidelio Lawson <lawson.fidelio@gmail.com>
-X-Google-Original-From: Fidelio Lawson <fidelio.lawson@exotec.com>
-To: netdev@vger.kernel.org
-Cc: Marek Vasut <marex@nabladev.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Fidelio Lawson <fidelio.lawson@exotec.com>
-Subject: [PATCH] fixup! net: dsa: microchip: implement KSZ87xx Module 3 low-loss cable errata
-Date: Fri, 17 Apr 2026 17:50:25 +0200
-Message-ID: <20260417155025.488290-1-fidelio.lawson@exotec.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260417-ksz87xx_errata_low_loss_connections-v4-1-6c7044ec4363@exotec.com>
-References: <20260417-ksz87xx_errata_low_loss_connections-v4-1-6c7044ec4363@exotec.com>
+	s=arc-20240116; t=1776441731; c=relaxed/simple;
+	bh=G97aeQhu9k9+mvxexehf0ox0XpdO5ES48kn44W4EJpE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OKXcKN0tBthPozjj3q3KgsqGWR7KSVmBEV3K81LdljE6/s/DSfwTyvymmNbzathvLjmjdqFkf2BheA/jkjdCBPBot1AnkuNkYxJW8j5DXxcUdzSCkCdAilPCfWxr/0MhOatrTtHVKlB4sFR6QtmA/VIB3eZNFcs7NPpt5oZbh/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uaiehw6S; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AF3DC2BCB4;
+	Fri, 17 Apr 2026 16:02:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776441731;
+	bh=G97aeQhu9k9+mvxexehf0ox0XpdO5ES48kn44W4EJpE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Uaiehw6Sl709tM6vIxFunnvZ5N5wUHuTN7pBxXEEB1ZuGWUxIyaklikzPVjNooMJ4
+	 /Wd2juOGI9n1/2siOCuf/LZdMJ5KFSU1z6XaqMobMHe/TTu0D98yEjWNw/qWzhqaWy
+	 mp5rfGuwE/6Fia7RzLjUmbXJBFBEjv19kdBqyVzygHTOnETHR6Hpfid7LJ/lniReHC
+	 ENN9BogMUcc/aTB58z0q/44VqGPMl6pTZPUjg5VavEZuuRyfCD80sY8pR836hhuFAn
+	 My3msWGzffIo7J82c2PN532dDfusgEO0Fj7mqS7b3KwwPN4H+U7NbsLYf7FiQk7fao
+	 lOoMHi1ETCtsg==
+Date: Fri, 17 Apr 2026 17:02:08 +0100
+From: Simon Horman <horms@kernel.org>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH v7 0/5] netem: bug fixes
+Message-ID: <20260417160208.GG31784@horms.kernel.org>
+References: <20260415142822.133241-1-stephen@networkplumber.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260415142822.133241-1-stephen@networkplumber.org>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279360-lists,netdev=lfdr.de];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
-	SUBJECT_HAS_EXCLAIM(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lawsonfidelio@gmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-279361-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWO(0.00)[2];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,exotec.com:mid]
-X-Rspamd-Queue-Id: BB34F41CD66
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: DBB2141CE31
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
----
- drivers/net/dsa/microchip/ksz8.c     | 6 ++++++
- drivers/net/dsa/microchip/ksz8_reg.h | 3 +++
- 2 files changed, 9 insertions(+)
+On Wed, Apr 15, 2026 at 07:27:03AM -0700, Stephen Hemminger wrote:
+> These bugs were found when doing AI assisted  review of sch_netem.c
+> during investigation of the packet duplication recursion problem
+> addressed in Jamal's series.
+> 
+> The fixes cover:
+> 
+>  - probability gaps in the 4-state Markov loss model
+>  - queue limit not accounting for reordered packets
+>  - PRNG reseeded on every tc change, breaking reproducibility
+>  - slot delay configuration not validated for inverted ranges
+>  - slot delay arithmetic overflow for ranges above ~2.1 seconds
+> 
+> v7 - queue limit check Fixes: goes back further to earlier change
+>    - use NL_SET_ERR_MSG_ATTR
+> 
+> Stephen Hemminger (5):
+>   net/sched: netem: fix probability gaps in 4-state loss model
+>   net/sched: netem: fix queue limit check to include reordered packets
+>   net/sched: netem: only reseed PRNG when seed is explicitly provided
+>   net/sched: netem: check for invalid slot range
+>   net/sched: netem: fix slot delay calculation overflow
 
-diff --git a/drivers/net/dsa/microchip/ksz8.c b/drivers/net/dsa/microchip/ksz8.c
-index 0f2b8acee80f..62fc59c3da7e 100644
---- a/drivers/net/dsa/microchip/ksz8.c
-+++ b/drivers/net/dsa/microchip/ksz8.c
-@@ -1297,6 +1297,9 @@ int ksz8_w_phy(struct ksz_device *dev, u16 phy, u16 reg, u16 val)
- 	case PHY_REG_KSZ87XX_LPF_BW:
- 		if (!ksz_is_ksz87xx(dev))
- 			return -EOPNOTSUPP;
-+		/* Only accept LPF bandwidth bits [7:6] */
-+		if (val & ~KSZ87XX_LPF_VALID_MASK)
-+			return -EINVAL;
- 		ret = ksz8_ind_write8(dev, TABLE_LINK_MD, KSZ87XX_REG_PHY_LPF, (u8)val);
- 		if (ret)
- 			return ret;
-@@ -1305,6 +1308,9 @@ int ksz8_w_phy(struct ksz_device *dev, u16 phy, u16 reg, u16 val)
- 	case PHY_REG_KSZ87XX_EQ_INIT:
- 		if (!ksz_is_ksz87xx(dev))
- 			return -EOPNOTSUPP;
-+		/* Only accept DSP EQ initial value bits [5:0] */
-+		if (val & ~KSZ87XX_DSP_EQ_VALID_MASK)
-+			return -EINVAL;
- 		ret = ksz8_ind_write8(dev, TABLE_LINK_MD, KSZ87XX_REG_DSP_EQ, (u8)val);
- 		if (ret)
- 			return ret;
-diff --git a/drivers/net/dsa/microchip/ksz8_reg.h b/drivers/net/dsa/microchip/ksz8_reg.h
-index 5df17c463f7c..cd41214f874e 100644
---- a/drivers/net/dsa/microchip/ksz8_reg.h
-+++ b/drivers/net/dsa/microchip/ksz8_reg.h
-@@ -206,6 +206,9 @@
- #define KSZ87XX_REG_DSP_EQ			0x08   /* DSP EQ initial value */
- #define KSZ87XX_REG_PHY_LPF			0x4C   /* RX LPF bandwidth */
- 
-+#define KSZ87XX_DSP_EQ_VALID_MASK	GENMASK(5, 0)
-+#define KSZ87XX_LPF_VALID_MASK		GENMASK(7, 6)
-+
- /* For KSZ8765. */
- #define PORT_REMOTE_ASYM_PAUSE		BIT(5)
- #define PORT_REMOTE_SYM_PAUSE		BIT(4)
--- 
-2.53.0
-
+To the maintainers: I'd like to ask for more time to complete review of this.
 
