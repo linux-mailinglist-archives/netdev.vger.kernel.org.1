@@ -1,180 +1,217 @@
-Return-Path: <netdev+bounces-279317-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279319-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GKslMOs24mm13QAAu9opvQ
-	(envelope-from <netdev+bounces-279317-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 15:34:35 +0200
+	id WICSEoE34mm13QAAu9opvQ
+	(envelope-from <netdev+bounces-279319-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 15:37:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2026241BB4C
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 15:34:35 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id E088541BBA0
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 15:37:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D7897309C273
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 13:32:57 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1D1B830164CD
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 13:37:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 536DD38F933;
-	Fri, 17 Apr 2026 13:32:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 417732D8DBB;
+	Fri, 17 Apr 2026 13:37:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ixit.cz header.i=@ixit.cz header.b="dUvwKJeT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bnK1R9Tu"
 X-Original-To: netdev@vger.kernel.org
-Received: from ixit.cz (ixit.cz [185.100.197.86])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C263C358388
-	for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 13:32:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.100.197.86
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC73A384250
+	for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 13:36:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776432777; cv=none; b=AYnQWRSpF4hat0E8xd03BTNVN6QOAxjvsQm9NZc61QA6j2EvYalG4Sni8+P+PPtDkWo7VnG+W4yQqlkKcItDC5gl/saoq8DnKkhCnvQfHhYHT4tSZCf5d5SzLIjjkivm8N0uxg3ggLNjlLszM5Azyghr4c3OnW5gn8uI7WYbCc8=
+	t=1776433020; cv=none; b=se9vzj0j9kTmLHouucJJF7nyr2KAyfI4Zax5dr3tVhvCJpiirOad9sPD5CSp/niErIoIhgI+c29lS7teXlBn7bNPSNO7/It4XiwJFs9pgPEbiiD4m6awUmIVw2m1G4bI27LNOzALZlUYn4HLZSCSjhEjKXsfmJ+PBL1DAMMOFIw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776432777; c=relaxed/simple;
-	bh=Q3j0StUsDshMT52GRH33fV1J3GfINAZPP7VmDmu+NCU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=scjHtFagRiCXAb0/iBVbUMb4O2yuyYRmRBJsOP+MFnGbWIdRbBZyF7QifzY0XmhSG4wUmIHDmETKM8zNoU7tu0bTMVLk5bCAO1ih+dNkibGJpQ2IpWaILvOyBcdZH8Wsw+jKMvsQszGUyf/bbJS+3WzuiFb97GRzldeUHvwtxA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ixit.cz; spf=pass smtp.mailfrom=ixit.cz; dkim=pass (1024-bit key) header.d=ixit.cz header.i=@ixit.cz header.b=dUvwKJeT; arc=none smtp.client-ip=185.100.197.86
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ixit.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ixit.cz
-Received: from [10.65.3.135] (unknown [87.58.112.183])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by ixit.cz (Postfix) with ESMTPSA id 9B403534128F;
-	Fri, 17 Apr 2026 15:32:49 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ixit.cz; s=dkim;
-	t=1776432770;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=UX3lXlxJv8wPtZp+mZzJl0W3CJQc7YoN0yKX0aGKEmk=;
-	b=dUvwKJeTyux1yQ0Zo/uSpzswmzPvgIK5W2i3iX7w/RVOHCLdcE7kinzARUhHOgKm5GZNbD
-	eV54TmL28lk095E6rRc2BRed1ZyI0gwLXkFDVvSk20mre4eqLHOyt+yRAcg/DRqlunsMhP
-	Ivvx6Sv7juzKTKzdGcGL922abNglDks=
-Message-ID: <316ae06b-ed7f-4fa6-9b91-fa45f088dc43@ixit.cz>
-Date: Fri, 17 Apr 2026 15:32:48 +0200
+	s=arc-20240116; t=1776433020; c=relaxed/simple;
+	bh=o6nRsoHRbabeUEx5FRlO1E1P9PR4iGXFvxod9XNvcs4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=J0h2sGWC5tbEkwAwmms/SokjpS09jK0uDvcujGCGdogZEyUjsW84LWRg/wVV9dx8GNM6lbCyYLVv6t/oR7nCGZ3OuK0zaY4pFf9rAGvvpnCh2R0bdNKdADUmGNgPL+r4b0Kq7nO68DS7uB0EkJKSxMRJv/lu/cr170HfkUG7oFE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bnK1R9Tu; arc=none smtp.client-ip=209.85.222.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-8c70b5594f4so76201285a.1
+        for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 06:36:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776433018; x=1777037818; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qN1Vl2vCUK3z1yjVhJuVnrXRp0s++5jKB8Kqq1WFb3A=;
+        b=bnK1R9Tu3Y0PCx9TRvY6GNO4jAlF7YmIEWfmrvOpT0Pu/p4UVVvFMcFg0IyhL2nJq1
+         cg3LBbDmOCw3ZFx1nFJOZsibq8qHtj2JUXKuRBHTee6g/lwsgHzzyRjo3TColWJt9tmP
+         XW0siS5TksbdgAO8u+12t1hX7LpafHOnvCwcqEWHJJ0Xu9M3U8bgnqcNM22v0jzWe6f5
+         BbfCfJfsynD6ucOCCPrNJ97aVVL0Cxng+HqUhDHREf73TG2VIh090Fni7z+nui0DTVwR
+         s8cKl1TqmOHwg18/GiRpDw5f6n8Tv1cxXZuwKCwbTG8uDhJ7RTWVxpeonKETEZXbHg7f
+         qrvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776433018; x=1777037818;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=qN1Vl2vCUK3z1yjVhJuVnrXRp0s++5jKB8Kqq1WFb3A=;
+        b=IamI+6t9kNuNRKDrvduRBTtkebMl76Q6XwzAM8ks4PZHd82mspzlxmMzwo9PcRnJv6
+         h+sSw3zWUz2ELO+5oGvH4ZWkIr9WZV1GsWcoj4Mt/X+/kCY9ksoK6HUM4rySOe53NFQm
+         k0e47erH83i6orDV3KQ8h44VkGlWvE6I+SRJi+wGfGqdFbazGDzRNttKOZ7C/8vdpsWt
+         oiZo+xahyKY1tK00JUUwskVzbsUmCG+bd5SSesyhR8QIpeMt14zWnKqiePBBVqQggzY1
+         ptgx7cF7iRi2zDZkQ+XkHXi3QQ69iRNdAwDrdN6+tvmefBg0vkGZDIJMLMHqd9Y5s607
+         FmYw==
+X-Forwarded-Encrypted: i=1; AFNElJ8paZb+BIHU3GPPCjESucg7vgsgwGkvZvqbpNdcQUR8N4TXGk/3i0WrInZEVv++BVwy1lBsBfo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyLR+EnT4vns6eCyQoB5zj5SaqULdKJSHQDfPxj8S/Iv/8j5pS1
+	mNJ/Ml7kxkHIgOSVLAnj/NABrlHZwx/aaF82qNM0UZxK2XW0fNAkidKICYZk/tJG1xI=
+X-Gm-Gg: AeBDiets2n15JnSOB28zHQon6OsdVP1VLv9U2ULXy04jo7u2nNOR7Esg3sje0lhJ5Ev
+	hkQPvhUQQoIejOyso8/7TIgR6mUSe6pobstmBY4+JvfCCPkiHG5C9UHY7jUqTHbRy9ZT5VQ66W5
+	UTX6W1JWIctt22SK5DjAuHSdiwR6ghaREOHEdkaiHgPTxVXn/zaW9gDBLZb1WJMEb5h1dumvzBB
+	rwjyffutXtK61IfNS1ZA17Rp/heP93qa1pP8kcvVymclw5TblmiMmHk8PheMBlPS3wb9Sp4oyMb
+	8RuQeInKOjvfEGPTWEPVCKqcpNAogpDpEz2faSx3n4LVlFQV1IcZ4n3LMz4J56H4LdRnDhFnWna
+	TXajDzTzErh7fTyu69MdzJqAo2WfN+U0Ecm8mXaNk/uIgbS6dxiLG8nBWd+kdfqgqdbwjhkNnpE
+	xw8sMByDOmFCHalCzgiGkN44Z+XM3Z0NP9UK3YCyqfWb2z2ZdAGkFF16MO1sw9SgJIRSYAmCYbK
+	QldLLE=
+X-Received: by 2002:a05:620a:4690:b0:8d5:8815:ffbf with SMTP id af79cd13be357-8e789874c59mr324492085a.2.1776433017630;
+        Fri, 17 Apr 2026 06:36:57 -0700 (PDT)
+Received: from localhost.localdomain ([104.128.58.21])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8e7d93c2fffsm106948785a.36.2026.04.17.06.36.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Apr 2026 06:36:57 -0700 (PDT)
+From: Zero Mark <patzilla007@gmail.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: security@kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	netdev@vger.kernel.org,
+	Zero Mark <patzilla007@gmail.com>
+Subject: [PATCH net] net/packet: fix TOCTOU race on mmap'd vnet_hdr in tpacket_snd()
+Date: Fri, 17 Apr 2026 21:36:10 +0800
+Message-ID: <20260417133610.88158-1-patzilla007@gmail.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <willemdebruijn.kernel.1683671b10e8@gmail.com>
+References: <willemdebruijn.kernel.1683671b10e8@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Path forward for NFC in the kernel
-To: Krzysztof Kozlowski <krzk@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
- Michael Thalmeier <michael.thalmeier@hale.at>,
- Raymond Hackley <raymondhackley@protonmail.com>,
- Michael Walle <michael@walle.cc>, Bongsu Jeon <bongsu.jeon@samsung.com>,
- Mark Greer <mgreer@animalcreek.com>
-Cc: netdev@vger.kernel.org, oe-linux-nfc@lists.linux.dev
-References: <20260416101041.4c533306@kernel.org>
- <9c4a4acf-b4f1-4e84-93bf-cdf080cb9970@kernel.org>
-Content-Language: en-US
-From: David Heidelberg <david@ixit.cz>
-Autocrypt: addr=david@ixit.cz; keydata=
- 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
-In-Reply-To: <9c4a4acf-b4f1-4e84-93bf-cdf080cb9970@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ixit.cz,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[ixit.cz:s=dkim];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-279317-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,google.com,vger.kernel.org,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[kernel.org,hale.at,protonmail.com,walle.cc,samsung.com,animalcreek.com];
-	DKIM_TRACE(0.00)[ixit.cz:+];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-279319-lists,netdev=lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[david@ixit.cz,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[patzilla007@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ixit.cz:dkim,ixit.cz:mid]
-X-Rspamd-Queue-Id: 2026241BB4C
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E088541BBA0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 17/04/2026 09:18, Krzysztof Kozlowski wrote:
-> On 16/04/2026 19:10, Jakub Kicinski wrote:
->> Hi folks!
->>
->> We are struggling to keep up with the number of security reports and AI
->> generated patches in the kernel. NFC is infamous for being a huge CVE
->> magnet. We need someone to step up as a maintainer, create an NFC tree
->> and handle all the incoming submissions. Send us (or Linus if you
->> prefer) periodic PRs, like WiFi, Bluetooth etc. do. If that does not
->> happen I'm afraid we'll have to move the NFC code out of the tree,
->> put it up on GH or some such, and let it accumulate CVEs there..
->>
->> I'm planning to send a PR to Linus to shed the unmaintained code early
->> next week. We need to have a maintainer established by then.
-> 
-> +Cc David Heidelberg recently trying to use Linux NFC stack,
-> 
-+Cc oe-linux-nfc@lists.linux.dev
+In tpacket_snd(), when PACKET_VNET_HDR is enabled, vnet_hdr points
+directly into the mmap'd TX ring buffer shared with userspace. The
+kernel validates the header via __packet_snd_vnet_parse() but then
+re-reads all fields later in virtio_net_hdr_to_skb(). A concurrent
+userspace thread can modify the vnet_hdr fields between validation
+and use, bypassing all safety checks.
 
-For now we had NFC related discussion in our sdm845-next channel, but I brought 
-Matrix channel [1] for the kernel, neard, user-space discussion, so people can 
-share and interact in real-time (the chat content is public without needing to 
-join the room).
+The non-TPACKET path (packet_snd()) already correctly copies vnet_hdr
+to a stack-local variable. All other vnet_hdr consumers in the kernel
+(tun.c, tap.c, virtio_net.c) also use stack copies. The TPACKET TX
+path is the only caller of virtio_net_hdr_to_skb() that reads directly
+from user-controlled shared memory.
 
-David
+Fix this by copying vnet_hdr from the mmap'd ring buffer to a
+stack-local variable before validation and use, consistent with the
+approach used in packet_snd() and all other callers.
 
+Fixes: 1d036d25e560 ("packet: tpacket_snd gso and checksum offload")
+Signed-off-by: Zero Mark <patzilla007@gmail.com>
+---
+ net/packet/af_packet.c | 21 +++++++++++++--------
+ 1 file changed, 13 insertions(+), 8 deletions(-)
 
-[1] https://matrix.to/#/#linux-nfc:ixit.cz
+diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
+index 4b043241fd56..8e6f3a734ba0 100644
+--- a/net/packet/af_packet.c
++++ b/net/packet/af_packet.c
+@@ -2718,7 +2718,8 @@ static int tpacket_snd(struct packet_sock *po, struct msghdr *msg)
+ {
+ 	struct sk_buff *skb = NULL;
+ 	struct net_device *dev;
+-	struct virtio_net_hdr *vnet_hdr = NULL;
++	struct virtio_net_hdr vnet_hdr;
++	bool has_vnet_hdr = false;
+ 	struct sockcm_cookie sockc;
+ 	__be16 proto;
+ 	int err, reserve = 0;
+@@ -2819,16 +2820,20 @@ static int tpacket_snd(struct packet_sock *po, struct msghdr *msg)
+ 		hlen = LL_RESERVED_SPACE(dev);
+ 		tlen = dev->needed_tailroom;
+ 		if (vnet_hdr_sz) {
+-			vnet_hdr = data;
+ 			data += vnet_hdr_sz;
+ 			tp_len -= vnet_hdr_sz;
+-			if (tp_len < 0 ||
+-			    __packet_snd_vnet_parse(vnet_hdr, tp_len)) {
++			if (tp_len < 0) {
++				tp_len = -EINVAL;
++				goto tpacket_error;
++			}
++			memcpy(&vnet_hdr, data - vnet_hdr_sz, sizeof(vnet_hdr));
++			if (__packet_snd_vnet_parse(&vnet_hdr, tp_len)) {
+ 				tp_len = -EINVAL;
+ 				goto tpacket_error;
+ 			}
+ 			copylen = __virtio16_to_cpu(vio_le(),
+-						    vnet_hdr->hdr_len);
++						    vnet_hdr.hdr_len);
++			has_vnet_hdr = true;
+ 		}
+ 		copylen = max_t(int, copylen, dev->hard_header_len);
+ 		skb = sock_alloc_send_skb(&po->sk,
+@@ -2865,12 +2870,12 @@ static int tpacket_snd(struct packet_sock *po, struct msghdr *msg)
+ 			}
+ 		}
+ 
+-		if (vnet_hdr_sz) {
+-			if (virtio_net_hdr_to_skb(skb, vnet_hdr, vio_le())) {
++		if (has_vnet_hdr) {
++			if (virtio_net_hdr_to_skb(skb, &vnet_hdr, vio_le())) {
+ 				tp_len = -EINVAL;
+ 				goto tpacket_error;
+ 			}
+-			virtio_net_hdr_set_proto(skb, vnet_hdr);
++			virtio_net_hdr_set_proto(skb, &vnet_hdr);
+ 		}
+ 
+ 		skb->destructor = tpacket_destruct_skb;
+-- 
+2.53.0
 
-...
 
