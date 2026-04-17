@@ -1,70 +1,69 @@
-Return-Path: <netdev+bounces-279195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279197-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oJnFBYmF4WkiuQAAu9opvQ
-	(envelope-from <netdev+bounces-279195-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 02:57:45 +0200
+	id 6DbWD5yF4WkiuQAAu9opvQ
+	(envelope-from <netdev+bounces-279197-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 02:58:04 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F1FE415E42
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 02:57:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B148F415E4A
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 02:58:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2C96630C64CE
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 00:54:58 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id EC48730E03AD
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 00:55:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45CFD2737F8;
-	Fri, 17 Apr 2026 00:54:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12F83238171;
+	Fri, 17 Apr 2026 00:54:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NvIogpkX"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jPZ+ufO1"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 553F1259C80
-	for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 00:54:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2A5E26ED45;
+	Fri, 17 Apr 2026 00:54:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776387278; cv=none; b=HBkc5uJhnbFzLABhcTFVCDiDiig8TvtjtuDZ3KCCjBwRgSPDUIARs2ufHr2rAGnNDVWE4UVAaXA17/XF8hhGb7/hWeq2KnjJnJ5SxYtQBoy2ELAZnCp5OOhWlXlu+P5X9SXETPnKXU+C+3Jm8+jSMTmC7QOrk/LPdgwuiCNfH7w=
+	t=1776387279; cv=none; b=KHKfdASppoWpup9PYM5rDlT3YumIaZjG0YkEGPu1FoSA7vVEcWgOrq5YcrkWAEstqHiqEqBdsmLvlk4gLdv6OFSRHvER3Od4xLOY6j672lL3mRzsy4kdIZ9bZ7Bn8nQCYvwOXbeV5Xrcb73c6y8tP8Wm8WyRAD3CXsuBmp5SCQ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776387278; c=relaxed/simple;
-	bh=7nbI3Z3OuV1GlQk2HFTVmWNSfUO3aW9Qru/iFkgJy0w=;
+	s=arc-20240116; t=1776387279; c=relaxed/simple;
+	bh=d3DTf2B3KIUeGsyUCVNb0eXOyOe0Afw+3XyYV8iudyQ=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=PlBJIBtKYvY7ySPOP+d8HsfgFoTDwX25UgP/QZEWboOcpUcHIFwKasFv2IBYeZl5/Y/9uGlzBsu7kKV92WQ4O/Wlx8U75/Yr7qtvGXsWpWMYWRin2FRSCJ+3PPC0UgqYFN6R7EnhckStABQLQXCsYBQSrhq55vCIiRQnmmxCV5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NvIogpkX; arc=none smtp.client-ip=198.175.65.15
+	 In-Reply-To:To:Cc; b=cYBg+V7ZBLZYD2b8sMaknQmT9Y16nSam4fcjDcYPnOk/R+0bwzK7DFvvRsHz7KKLK5VxGFGY3BnFCGJqHfyw1o03wQIyqg7/arbJSdc0Dq9I92BcMMNyiGhdjC1f5b7PHAHRbDJqGCKrZIhoGeR23dRWADEzgIhmETfrl0AMdqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jPZ+ufO1; arc=none smtp.client-ip=198.175.65.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1776387277; x=1807923277;
+  t=1776387278; x=1807923278;
   h=from:date:subject:mime-version:content-transfer-encoding:
    message-id:references:in-reply-to:to:cc;
-  bh=7nbI3Z3OuV1GlQk2HFTVmWNSfUO3aW9Qru/iFkgJy0w=;
-  b=NvIogpkXCIAeROK7bC4gCZBQyxKzD7VSzOvqpGZXMpXRKmca7bWSfsOw
-   Xb8tpXM016ZTFcUyw3CnqTcmHa0CFeZ1m8cRSiIkrk/99y2MhGpnLIO+X
-   Bs56nN6Bw/gksLAoSSEnzLBhr8JFLrvd7xhJwxvTpHEwIlE73Y0YcFNaE
-   0wOdrFZD8uwAWof0AxPxlDTKgY1Ci/SglriQqFuRPZ3mrwAJ2518O3Vrb
-   h0LQwtcHjTUMY/d2mjc591mfWIBBaJaEwnoljJDvWPmCG1PwxFuVUnH87
-   iHZm/HsAVd/A0S3+77KDo+6ZrZ6H40lN6wgPrrto4m2osCzL0qKbOznT2
-   A==;
-X-CSE-ConnectionGUID: O7yRygJgTxG+Z2qEBEQuqg==
-X-CSE-MsgGUID: a13OX4Q3So2I44vJ1XzO8Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11761"; a="81000583"
+  bh=d3DTf2B3KIUeGsyUCVNb0eXOyOe0Afw+3XyYV8iudyQ=;
+  b=jPZ+ufO1dpcImjAtPZrEa2IO+at+GzezxxEVK4xy7auqOqhfhLTNSmN7
+   scZ869e5+h/ukAD+Ty9Snajs1EumqC59VsWaTmEMTeLPMgJ7TpUsEhZ40
+   QUTlJ834035nAOaPIEsae9WCpDfkUYnEcNzfIYb/f60r4DOkpDLzlUogi
+   lOB85MsBm1A1uQCsqi9NqDfKaDOSRjCg5KcMOTYOO9BJIVOh8WIzSxAZX
+   F6KTS0NF9jicvl/L33omcZmRLb/NDL0zPmVP+aD5vKmTOUgufPz5oZkwf
+   KCDhLTeJumoqEhbozjXoyIskBvGqOf2PWwO9pKanPWJrF9rX2vIP1pPuI
+   w==;
+X-CSE-ConnectionGUID: hiq6jaOJSoy7vSyam99E1Q==
+X-CSE-MsgGUID: UJfdxtf+S8m5J7CYKjQDSA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11761"; a="81000586"
 X-IronPort-AV: E=Sophos;i="6.23,183,1770624000"; 
-   d="scan'208";a="81000583"
+   d="scan'208";a="81000586"
 Received: from fmviesa010.fm.intel.com ([10.60.135.150])
   by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2026 17:54:32 -0700
-X-CSE-ConnectionGUID: H4KoaoXTTXyKiErrhGpOfA==
-X-CSE-MsgGUID: l8U6qjJlS0KxSeQkMbix7g==
+X-CSE-ConnectionGUID: 6EG8BZeZSQ2ubx0f9QSGxg==
+X-CSE-MsgGUID: 6LD1MH6qQkGb0QNdHQpcng==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,183,1770624000"; 
-   d="scan'208";a="226539886"
+   d="scan'208";a="226539891"
 Received: from orcnseosdtjek.jf.intel.com (HELO [10.166.28.109]) ([10.166.28.109])
   by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2026 17:54:30 -0700
 From: Jacob Keller <jacob.e.keller@intel.com>
-Date: Thu, 16 Apr 2026 17:53:34 -0700
-Subject: [PATCH net v2 10/12] iavf: fix wrong VLAN mask for legacy Rx
- descriptors L2TAG2
+Date: Thu, 16 Apr 2026 17:53:35 -0700
+Subject: [PATCH net v2 11/12] idpf: fix xdp crash in soft reset error path
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,25 +72,24 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260416-iwl-net-submission-2026-04-14-v2-10-686c33c9828d@intel.com>
+Message-Id: <20260416-iwl-net-submission-2026-04-14-v2-11-686c33c9828d@intel.com>
 References: <20260416-iwl-net-submission-2026-04-14-v2-0-686c33c9828d@intel.com>
 In-Reply-To: <20260416-iwl-net-submission-2026-04-14-v2-0-686c33c9828d@intel.com>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
 Cc: netdev@vger.kernel.org, Jacob Keller <jacob.e.keller@intel.com>, 
- Petr Oros <poros@redhat.com>, 
+ Emil Tantilov <emil.s.tantilov@intel.com>, stable@vger.kernel.org, 
  Aleksandr Loktionov <aleksandr.loktionov@intel.com>, 
- Paul Menzel <pmenzel@molgen.mpg.de>, 
- Rafal Romanowski <rafal.romanowski@intel.com>
+ Patryk Holda <patryk.holda@intel.com>
 X-Mailer: b4 0.16-dev-ea14f
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3448;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3631;
  i=jacob.e.keller@intel.com; h=from:subject:message-id;
- bh=sljQYx/DTKk4J1LOP9TeTx4KxGQQeN3wXxgCJTyaS28=;
- b=owGbwMvMwCWWNS3WLp9f4wXjabUkhsyHLYfDZvt/WL97V/WcXtd6RXfHM3HXlZW9XR/0eaxrN
- inekLGuo5SFQYyLQVZMkUXBIWTldeMJYVpvnOVg5rAygQxh4OIUgIl0tjL891OWCfXx2BpkJ6fz
- gTlXTrIs8cz9yqWzXiR/P7VsxZ+5wowM1283bDieJWp54eNrL9mo1lqtrVOWfv3wJ+jcsVt7Yn9
- f4gYA
+ bh=3zpMmZta/kwFomkNUDrroXhAQzE+15KxTGyGKM3+q8M=;
+ b=owGbwMvMwCWWNS3WLp9f4wXjabUkhsyHLYf1s6qvrf3f+feP6Kn/6er/Hk4/mXCLd3mTvrTT6
+ 2ydWwbzOkpZGMS4GGTFFFkUHEJWXjeeEKb1xlkOZg4rE8gQBi5OAZhI1W6G/8XTVW5NWRpw4tOb
+ OzbfSnZOmxd3wOiIhMLOfd3f9h0t/K7NyPBe5rtkTtKPSHnDa6GGK0NiFi76vG5KclSHYt/el7X
+ y79kA
 X-Developer-Key: i=jacob.e.keller@intel.com; a=openpgp;
  fpr=204054A9D73390562AEC431E6A965D3E6F0F28E8
 X-Spamd-Result: default: False [-0.66 / 15.00];
@@ -107,7 +105,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[intel.com:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279195-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-279197-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -120,83 +118,99 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,intel.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7F1FE415E42
+X-Rspamd-Queue-Id: B148F415E4A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Petr Oros <poros@redhat.com>
+From: Emil Tantilov <emil.s.tantilov@intel.com>
 
-The IAVF_RXD_LEGACY_L2TAG2_M mask was incorrectly defined as
-GENMASK_ULL(63, 32), extracting 32 bits from qw2 instead of the
-16-bit VLAN tag. In the legacy Rx descriptor layout, the 2nd L2TAG2
-(VLAN tag) occupies bits 63:48 of qw2, not 63:32.
+NULL pointer dereference is reported in cases where idpf_vport_open()
+fails during soft reset:
 
-The oversized mask causes FIELD_GET to return a 32-bit value where the
-actual VLAN tag sits in bits 31:16. When this value is passed to
-iavf_receive_skb() as a u16 parameter, it gets truncated to the lower
-16 bits (which contain the 1st L2TAG2, typically zero). As a result,
-__vlan_hwaccel_put_tag() is never called and software VLAN interfaces
-on VFs receive no traffic.
+./xdpsock -i <inf> -q -r -N
 
-This affects VFs behind ice PF (VIRTCHNL VLAN v2) when the PF
-advertises VLAN stripping into L2TAG2_2 and legacy descriptors are
-used.
+[ 3179.186687] idpf 0000:83:00.0: Failed to initialize queue ids for vport 0: -12
+[ 3179.276739] BUG: kernel NULL pointer dereference, address: 0000000000000010
+[ 3179.277636] #PF: supervisor read access in kernel mode
+[ 3179.278470] #PF: error_code(0x0000) - not-present page
+[ 3179.279285] PGD 0
+[ 3179.280083] Oops: Oops: 0000 [#1] SMP NOPTI
+...
+[ 3179.283997] Workqueue: events xp_release_deferred
+[ 3179.284770] RIP: 0010:idpf_find_rxq_vec+0x17/0x30 [idpf]
+...
+[ 3179.291937] Call Trace:
+[ 3179.292392]  <TASK>
+[ 3179.292843]  idpf_qp_switch+0x25/0x820 [idpf]
+[ 3179.293325]  idpf_xsk_pool_setup+0x7c/0x520 [idpf]
+[ 3179.293803]  idpf_xdp+0x59/0x240 [idpf]
+[ 3179.294275]  xp_disable_drv_zc+0x62/0xb0
+[ 3179.294743]  xp_clear_dev+0x40/0xb0
+[ 3179.295198]  xp_release_deferred+0x1f/0xa0
+[ 3179.295648]  process_one_work+0x226/0x730
+[ 3179.296106]  worker_thread+0x19e/0x340
+[ 3179.296557]  ? __pfx_worker_thread+0x10/0x10
+[ 3179.297009]  kthread+0xf4/0x130
+[ 3179.297459]  ? __pfx_kthread+0x10/0x10
+[ 3179.297910]  ret_from_fork+0x32c/0x410
+[ 3179.298361]  ? __pfx_kthread+0x10/0x10
+[ 3179.298702]  ret_from_fork_asm+0x1a/0x30
 
-The flex descriptor path already uses the correct mask
-(IAVF_RXD_FLEX_L2TAG2_2_M = GENMASK_ULL(63, 48)).
+Fix the error handling of the soft reset in idpf_xdp_setup_prog() by
+restoring the vport->xdp_prog to the old value. This avoids referencing
+the orphaned prog that was copied to vport->xdp_prog in the soft reset
+and prevents subsequent false positive by idpf_xdp_enabled().
 
-Reproducer:
- 1. Create 2 VFs on ice PF (echo 2 > sriov_numvfs)
- 2. Disable spoofchk on both VFs
- 3. Move each VF into a separate network namespace
- 4. On each VF: create VLAN interface (e.g. vlan 198), assign IP,
-    bring up
- 5. Set rx-vlan-offload OFF on both VFs
- 6. Ping between VLAN interfaces -> expect PASS
-    (VLAN tag stays in packet data, kernel matches in-band)
- 7. Set rx-vlan-offload ON on both VFs
- 8. Ping between VLAN interfaces -> expect FAIL if bug present
-    (HW strips VLAN tag into descriptor L2TAG2 field, wrong mask
-    extracts bits 47:32 instead of 63:48, truncated to u16 -> zero,
-    __vlan_hwaccel_put_tag() never called, packet delivered to parent
-    interface, not VLAN interface)
+Update the restart check in idpf_xsk_pool_setup() to use IDPF_VPORT_UP bit
+instead of netif_running(). The idpf_vport_stop/start() calls will not
+update the __LINK_STATE_START bit, making this test a false positive
+should the soft reset fail.
 
-The reproducer requires legacy Rx descriptors. On modern ice + iavf
-with full PTP support, flex descriptors are always negotiated and the
-buggy legacy path is never reached. Flex descriptors require all of:
- - CONFIG_PTP_1588_CLOCK enabled
- - VIRTCHNL_VF_OFFLOAD_RX_FLEX_DESC granted by PF
- - PTP capabilities negotiated (VIRTCHNL_VF_CAP_PTP)
- - VIRTCHNL_1588_PTP_CAP_RX_TSTAMP supported
- - VIRTCHNL_RXDID_2_FLEX_SQ_NIC present in DDP profile
-
-If any condition is not met, iavf_select_rx_desc_format() falls back
-to legacy descriptors (RXDID=1) and the wrong L2TAG2 mask is hit.
-
-Fixes: 2dc8e7c36d80 ("iavf: refactor iavf_clean_rx_irq to support legacy and flex descriptors")
-Signed-off-by: Petr Oros <poros@redhat.com>
+Fixes: 3d57b2c00f09 ("idpf: add XSk pool initialization")
+Cc: stable@vger.kernel.org
+Signed-off-by: Emil Tantilov <emil.s.tantilov@intel.com>
 Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
+Tested-by: Patryk Holda <patryk.holda@intel.com>
 Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 ---
- drivers/net/ethernet/intel/iavf/iavf_type.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/intel/idpf/xdp.c | 1 +
+ drivers/net/ethernet/intel/idpf/xsk.c | 4 +++-
+ 2 files changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_type.h b/drivers/net/ethernet/intel/iavf/iavf_type.h
-index 1d8cf29cb65a..5bb1de1cfd33 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_type.h
-+++ b/drivers/net/ethernet/intel/iavf/iavf_type.h
-@@ -277,7 +277,7 @@ struct iavf_rx_desc {
- /* L2 Tag 2 Presence */
- #define IAVF_RXD_LEGACY_L2TAG2P_M		BIT(0)
- /* Stripped S-TAG VLAN from the receive packet */
--#define IAVF_RXD_LEGACY_L2TAG2_M		GENMASK_ULL(63, 32)
-+#define IAVF_RXD_LEGACY_L2TAG2_M		GENMASK_ULL(63, 48)
- /* Stripped S-TAG VLAN from the receive packet */
- #define IAVF_RXD_FLEX_L2TAG2_2_M		GENMASK_ULL(63, 48)
- /* The packet is a UDP tunneled packet */
+diff --git a/drivers/net/ethernet/intel/idpf/xdp.c b/drivers/net/ethernet/intel/idpf/xdp.c
+index cbccd4546768..18a6e7062863 100644
+--- a/drivers/net/ethernet/intel/idpf/xdp.c
++++ b/drivers/net/ethernet/intel/idpf/xdp.c
+@@ -488,6 +488,7 @@ static int idpf_xdp_setup_prog(struct idpf_vport *vport,
+ 				   "Could not reopen the vport after XDP setup");
+ 
+ 		cfg->user_config.xdp_prog = old;
++		vport->xdp_prog = old;
+ 		old = prog;
+ 	}
+ 
+diff --git a/drivers/net/ethernet/intel/idpf/xsk.c b/drivers/net/ethernet/intel/idpf/xsk.c
+index d95d3efdfd36..3d8c430efd2b 100644
+--- a/drivers/net/ethernet/intel/idpf/xsk.c
++++ b/drivers/net/ethernet/intel/idpf/xsk.c
+@@ -553,6 +553,7 @@ int idpf_xskrq_poll(struct idpf_rx_queue *rxq, u32 budget)
+ 
+ int idpf_xsk_pool_setup(struct idpf_vport *vport, struct netdev_bpf *bpf)
+ {
++	const struct idpf_netdev_priv *np = netdev_priv(vport->netdev);
+ 	struct xsk_buff_pool *pool = bpf->xsk.pool;
+ 	u32 qid = bpf->xsk.queue_id;
+ 	bool restart;
+@@ -568,7 +569,8 @@ int idpf_xsk_pool_setup(struct idpf_vport *vport, struct netdev_bpf *bpf)
+ 		return -EINVAL;
+ 	}
+ 
+-	restart = idpf_xdp_enabled(vport) && netif_running(vport->netdev);
++	restart = idpf_xdp_enabled(vport) &&
++		  test_bit(IDPF_VPORT_UP, np->state);
+ 	if (!restart)
+ 		goto pool;
+ 
 
 -- 
 2.54.0.rc2.531.gaf818d63126a
