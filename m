@@ -1,158 +1,178 @@
-Return-Path: <netdev+bounces-279369-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279370-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WEAMOL5g4mnI5QAAu9opvQ
-	(envelope-from <netdev+bounces-279369-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 18:33:02 +0200
+	id uGoFANtj4mk+5gAAu9opvQ
+	(envelope-from <netdev+bounces-279370-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 18:46:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0D5541D270
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 18:33:00 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5025241D52B
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 18:46:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C91E53069600
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 16:30:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DD16F301C5BD
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 16:40:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85BCE34F24A;
-	Fri, 17 Apr 2026 16:30:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EFF63537F1;
+	Fri, 17 Apr 2026 16:40:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BzW1jFkr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hAOH2MOq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CF3440DFBB
-	for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 16:30:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 057DE2FFFA5
+	for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 16:39:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776443458; cv=none; b=bDifspcbp6Jmdl0EDUopQfHrydASGt9aPjps08SZ0OrRt4InCakG2IlussL6TwicfXvaNbXBGXD81d670nGyclLRx0/v0PD5Hl8THR7gM9fR7diBmHasjJSbenpzOonyHLxZ4WQFVPM92XLUUItpM5N668ZuPharJm7M2S3XftY=
+	t=1776444002; cv=none; b=Wen86EMlJn/G8Tl0Xc0AqIOWlnzSlig2UE3DTV5Yy1ORMcXTu1nbo6IbDqtWEMi0SvUPkeHK1xiJqdOIG3DBqgfyeyZ7RjvROfiKfi47gzFHg2bCbqiR6uAGQPQu4EE1+eunl0uKyb2OmoCV7CBlFqKBth2lbWYZnd1ozDorqUM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776443458; c=relaxed/simple;
-	bh=E4ar9NUvc2qWGLJIF7uCSrM/JvkMwP4AzXksTc2k7IA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ARwcUJaFs/H8tPar1dqMKWckU51g8nm8UcHqoLr/P2QxB8D4a5SqvBU8YcmAWb/hp/IinYUwsqjBDNyNFkCdnq4zi1QTW2LHZ9boZlmTIDqfS4I828GABJTNnOAWEW1sUGqPRqEtkDlOPNA2SEdyqcRadA7WwxggpN8FJGCLc+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BzW1jFkr; arc=none smtp.client-ip=209.85.221.54
+	s=arc-20240116; t=1776444002; c=relaxed/simple;
+	bh=KY11bjZPevOR4T7c4eutcQnimCvcv3BRtRMZteo366Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=f+yhU8qDtJLvSlS7JhiReqD02QoyXBm3Uwm4XKGdRDHHQx5s0O7Ua4ThTf/+izL3uaia29/gOIK5NMt33eJpXC7tDQ+i1Mcz5ppjOhMwGZF3jGuPoRCz624VRcpWMCwIGHp1sf4Zzswx8AkjyMS+GG8C2IiWIutgQGBRuqnROAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hAOH2MOq; arc=none smtp.client-ip=209.85.128.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-43eb012ac4fso552863f8f.0
-        for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 09:30:56 -0700 (PDT)
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-488b3f8fa2bso17764825e9.1
+        for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 09:39:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776443455; x=1777048255; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=koXM2wPhQ8UAG5DcL1KIuDkPbaO7I5Fq9oLj0In1fHw=;
-        b=BzW1jFkrAxQZhwa+/N5ag3W9SwhTfmsqjGD3p0d+PJQC5LaR1weMjKEjC69RtvQ5dc
-         21xjD2r4Mtd5ESEU5/AovZhRGQI9u+7ElElCpegZT0xHbgEcsRMniAHlFWCZ4xc+cuta
-         QUrBTdiQ2nssGLVQETgSSFCWdtEB/PEOsbowr6/fxzbJjLrs1QQKOcURX6S4LPB1dvhd
-         USr/Ryfjy+yXhPaSN+6rXO1AgBQG7FPruYzivqiiBU2Fxy5Kq9om7nyeMGrcGv2cbKAM
-         KXvJRWR1QXRbxP1ET0efkJ3jsvlwVeWVLCLD55vBriwNk6ZrKzIqFkA4UIFejh/j8tGG
-         TTDg==
+        d=gmail.com; s=20251104; t=1776443993; x=1777048793; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=M8YRzMFZREsb0af4wE6lxlU4lB/UrrNAdoAuSDGNDsg=;
+        b=hAOH2MOqLgNQLEItE8oc9BRnWQ+hhJiJpelE8niVtduXsD5ny/JaZGcqw5haMA1Qfi
+         ffeTRGRY1l7A8MvuOpC7K5/ajk9weyoKUz+kxK8sPxa5WYGd2IdVpZVbKlVupue+UuDY
+         xWKqsB5zBia3ZaSEFVuSh8hNxVsBQNWb45qQvBv/wb66ZnBDFBSmQoHGkQCdxVdbZjbq
+         KypQgo/aL6GnHof7wsAhTXq+Z1FY8WtlQmhTabBksc02miQd6BExvkY3/xUv4skGDDw5
+         RsCUv5OVsIl54C0brLqkg+8G6wErba35sf+XRkRMQHCvMQaeB6PAIYnZtR8fRRwrq8aa
+         L94A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776443455; x=1777048255;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=koXM2wPhQ8UAG5DcL1KIuDkPbaO7I5Fq9oLj0In1fHw=;
-        b=lhicYcetFBMn1AlGb3fetQ50MkUTcMycLemokLwIhx9ciFyRZGumuiDp4cCnBA//Sp
-         qoebnWfllcAk72g7GU9B7LdmtnFx+o6fZm1ipchksyNV8mCSXZapzLQE4s4QAoaALOFG
-         LKEHqIC52h0E6PjZVLsLbqX0VEb2zqunKgqn+T8nYhg/7UJ37UWlBCvCX3qZstIJtwuv
-         +HsR02ebmanzgy5fmK55FuCisf/lv099oFrR79dXKhDIBL0DdPfHo7HtgCupgLfLTAt6
-         c0tmMtjMTHgr/vGr6KGhAMpFT41ANgAocuFACYVU2RoNvKYySWuXF1SWiOpWJjVdBxB6
-         VFzg==
-X-Forwarded-Encrypted: i=1; AFNElJ+0+LgIghfHB8xjWvL6oC5LZt4b3MI1Sd2QKowfI7FDbFxK3P+tVpF+1lQ8sYV9HXcm1bEL+uo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw0Z7yvJwul/lbmahxY8eyUQn0+pQ2GC0lZsUFCDWVUWTownnfu
-	DOfW2uQnWmsNR+WbbbPAe2ntCbV6hnhATYw/GBGq8jZZlruo+2JWgfyB
-X-Gm-Gg: AeBDieuzS72rxHDwImMIK+mvEPAxFHgizKpwPA6NG3bT/Ix97+yUrIB+XTDOkGg3cCb
-	jAYO/EyjSmKA/l/OWobSYbimrgvlHakoMJQIVxB9+WpoVHoYNSA1znZQtFDfX5XCidQHpbkNUOy
-	0F1oONEkC5G3jdloU8oGSxE9TwqRsnRCw14CqZZKowE4KP/+BeK8iOxeEAwtnDVdpz1iCB77eP7
-	nU79Y8iStkUQBeaM8uI39UIOn+GPAgkGIt5F7+1KuxJSF7qRslyIROcspj0LbFj5VJS0uCf3qeT
-	t59NNFVDoIe/Jt+T4mrPujjbHq8GeLcw2N39CbIQ9L0dVM/PI2mRmugjHTUEarHTgsF9gAe/FEu
-	h9ZkTvpkOranIrmX4G3TuYuENpfqfoaEqtbMbqZQipN/VAy8S+PUJALl2U/F0YSheBPvHh45KND
-	atrTOv4vg0J5knHzZ7dOId9l8Ot8yaBLDnauJg6pehEdRXppXjfVV045eWoH7x4qKxdt5x4YnsI
-	HSBSol0NCHzparaTxEy
-X-Received: by 2002:a05:6000:2308:b0:43f:e9e2:efac with SMTP id ffacd0b85a97d-43fe9e2f02amr144741f8f.5.1776443453186;
-        Fri, 17 Apr 2026 09:30:53 -0700 (PDT)
-Received: from [10.1.4.108] (cust-east-par-46-193-119-166.cust.wifirst.net. [46.193.119.166])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43fe4cc2cacsm5675179f8f.13.2026.04.17.09.30.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Apr 2026 09:30:52 -0700 (PDT)
-Message-ID: <18cfeb86-9879-4644-b2f8-ab7775287b1e@gmail.com>
-Date: Fri, 17 Apr 2026 18:30:52 +0200
+        d=1e100.net; s=20251104; t=1776443993; x=1777048793;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=M8YRzMFZREsb0af4wE6lxlU4lB/UrrNAdoAuSDGNDsg=;
+        b=AWGpG2JFqNK/BaAcLyUhATpwqd8uZLwY6aV5FI4xJLROEu//gLnVLCNP8B3+vyzXvB
+         cQUc3Kv0w2kf9yPWYpOyzChW2MDIUFDmD+EUcMOGRmCEIDqg8FXK4R1DzCUFMMWljHwk
+         o6st8Zl95DBdVDmoVNLZI98asZrLcds4Ah/u9FLYDMQgei9l8az+gXic6cJw6vLF2t5W
+         xHkTI4BpoHA1med/Ev5eKr9SaMpfUiu7WRjUQ5Q/cCx+KzKM3Civ08tLNEba8menJeND
+         J0ZoEM9ok7pEpPji5gBSlv7DFic3bfmMOOXlbF7JXjKeTHS26vOwRaQG9spQUTOWlRRq
+         riIg==
+X-Gm-Message-State: AOJu0YwHQXPfzNM/YY9QS2dDEJDDSQ4p1wQ/9nz7k28wfGM6wWUwLDpS
+	ceAkqnBtGYY85vI6JChKswcTf/RqKxz0V8zuIeC7EiEyyt2DVnpmOyiY9IaGpLmgX/Y=
+X-Gm-Gg: AeBDievCq4JLCqbwI0fTBcS3wfnsdJl9qf0nLPkrn8954hIqAlaHia46rGCWQLLTnuE
+	qLg+yDBYFoGS0kyqikzeX3BCa+mV9j5a5wVVnBR/SR0fd92m4yjLt1bxhksL5Z5sWO1lOP575tG
+	Gacju0W4H6CP3D+eABmN9/Hngt23eQZEvndFGvj1jWmYvFc4NkMvc79iS2rTwE+f41lzGFIgDaF
+	OgflBVYUAFSQcyChTi0WpOYD4HKnQSbj7F6wiRnoMisapkC5cub1L7bUNneWY2QYgrGwtxjarWj
+	EkXlK1IkiSOOcT7tzuX45sS39NR+UnwoX/aJbTAojPMhps2wyAH4iU+H9pvIS/irL/f73e304Ss
+	QfO1W0IvIvSFs7AICudQdnfVbw/sjTuY//q2O0sYNFOvHik95yfDvKeo4Oyts3arWW9KmBG8Ddd
+	8XR9H+etxWU4yjsPYGYu8N2weOKH81SHmvIBVA7Wt9yHOTSUdaLY+I93OQoly2QpNmlGg7opqRC
+	4ylt29HEQskihaVzWf4i1CQq4VkE9WvIvE=
+X-Received: by 2002:a05:600c:628b:b0:485:3e00:944a with SMTP id 5b1f17b1804b1-488fb8afffcmr48860005e9.9.1776443992555;
+        Fri, 17 Apr 2026 09:39:52 -0700 (PDT)
+Received: from fidelio-Precision-7670 (cust-east-par-46-193-119-166.cust.wifirst.net. [46.193.119.166])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488fc10019bsm61358655e9.4.2026.04.17.09.39.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Apr 2026 09:39:52 -0700 (PDT)
+From: Fidelio Lawson <lawson.fidelio@gmail.com>
+X-Google-Original-From: Fidelio Lawson <fidelio.lawson@exotec.com>
+To: netdev@vger.kernel.org
+Cc: Marek Vasut <marex@nabladev.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Fidelio Lawson <fidelio.lawson@exotec.com>
+Subject: [PATCH] fixup! net: dsa: microchip: implement KSZ87xx Module 3 low-loss cable errata
+Date: Fri, 17 Apr 2026 18:39:36 +0200
+Message-ID: <20260417163936.540873-1-fidelio.lawson@exotec.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260417-ksz87xx_errata_low_loss_connections-v4-1-6c7044ec4363@exotec.com>
+References: <20260417-ksz87xx_errata_low_loss_connections-v4-1-6c7044ec4363@exotec.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] fixup! net: dsa: microchip: implement KSZ87xx Module 3
- low-loss cable errata
-To: Sai Krishna Gajula <saikrishnag@marvell.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Cc: Marek Vasut <marex@nabladev.com>, Andrew Lunn <andrew@lunn.ch>,
- Woojung Huh <woojung.huh@microchip.com>,
- Fidelio Lawson <fidelio.lawson@exotec.com>
-References: <20260417-ksz87xx_errata_low_loss_connections-v4-1-6c7044ec4363@exotec.com>
- <20260417155025.488290-1-fidelio.lawson@exotec.com>
- <BYAPR18MB3735885B13017500E153FEA2A0202@BYAPR18MB3735.namprd18.prod.outlook.com>
-Content-Language: en-US
-From: Fidelio LAWSON <lawson.fidelio@gmail.com>
-In-Reply-To: <BYAPR18MB3735885B13017500E153FEA2A0202@BYAPR18MB3735.namprd18.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	SUBJECT_HAS_EXCLAIM(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-279369-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-279370-lists,netdev=lfdr.de];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	TO_DN_SOME(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	SUBJECT_HAS_EXCLAIM(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[lawsonfidelio@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[microchip.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,exotec.com:email]
-X-Rspamd-Queue-Id: F0D5541D270
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,exotec.com:mid]
+X-Rspamd-Queue-Id: 5025241D52B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 4/17/26 18:10, Sai Krishna Gajula wrote:
->> -----Original Message-----
->> From: Fidelio Lawson <lawson.fidelio@gmail.com>
->> Sent: Friday, April 17, 2026 9:20 PM
->> To: netdev@vger.kernel.org
->> Cc: Marek Vasut <marex@nabladev.com>; Andrew Lunn <andrew@lunn.ch>;
->> Woojung Huh <woojung.huh@microchip.com>; Fidelio Lawson
->> <fidelio.lawson@exotec.com>
->> Subject: [PATCH] fixup! net: dsa: microchip: implement KSZ87xx
->> Module 3 low-loss cable errata
-> 
-> Since this errata is a fix and pushed to "net", adding fixes tag may be required.
-> 
+Fixes: e66f840c08a2 ("net: dsa: ksz: Add Microchip KSZ8795 DSA driver")
+---
+ drivers/net/dsa/microchip/ksz8.c     | 6 ++++++
+ drivers/net/dsa/microchip/ksz8_reg.h | 3 +++
+ 2 files changed, 9 insertions(+)
 
-Good point, thanks for spotting this.
-I’ll add an appropriate fixes tag referencing the commit that introduced
-the KSZ87xx support, and follow up with an updated fixup.
-
-Thanks
+diff --git a/drivers/net/dsa/microchip/ksz8.c b/drivers/net/dsa/microchip/ksz8.c
+index 0f2b8acee80f..62fc59c3da7e 100644
+--- a/drivers/net/dsa/microchip/ksz8.c
++++ b/drivers/net/dsa/microchip/ksz8.c
+@@ -1297,6 +1297,9 @@ int ksz8_w_phy(struct ksz_device *dev, u16 phy, u16 reg, u16 val)
+ 	case PHY_REG_KSZ87XX_LPF_BW:
+ 		if (!ksz_is_ksz87xx(dev))
+ 			return -EOPNOTSUPP;
++		/* Only accept LPF bandwidth bits [7:6] */
++		if (val & ~KSZ87XX_LPF_VALID_MASK)
++			return -EINVAL;
+ 		ret = ksz8_ind_write8(dev, TABLE_LINK_MD, KSZ87XX_REG_PHY_LPF, (u8)val);
+ 		if (ret)
+ 			return ret;
+@@ -1305,6 +1308,9 @@ int ksz8_w_phy(struct ksz_device *dev, u16 phy, u16 reg, u16 val)
+ 	case PHY_REG_KSZ87XX_EQ_INIT:
+ 		if (!ksz_is_ksz87xx(dev))
+ 			return -EOPNOTSUPP;
++		/* Only accept DSP EQ initial value bits [5:0] */
++		if (val & ~KSZ87XX_DSP_EQ_VALID_MASK)
++			return -EINVAL;
+ 		ret = ksz8_ind_write8(dev, TABLE_LINK_MD, KSZ87XX_REG_DSP_EQ, (u8)val);
+ 		if (ret)
+ 			return ret;
+diff --git a/drivers/net/dsa/microchip/ksz8_reg.h b/drivers/net/dsa/microchip/ksz8_reg.h
+index 5df17c463f7c..cd41214f874e 100644
+--- a/drivers/net/dsa/microchip/ksz8_reg.h
++++ b/drivers/net/dsa/microchip/ksz8_reg.h
+@@ -206,6 +206,9 @@
+ #define KSZ87XX_REG_DSP_EQ			0x08   /* DSP EQ initial value */
+ #define KSZ87XX_REG_PHY_LPF			0x4C   /* RX LPF bandwidth */
+ 
++#define KSZ87XX_DSP_EQ_VALID_MASK	GENMASK(5, 0)
++#define KSZ87XX_LPF_VALID_MASK		GENMASK(7, 6)
++
+ /* For KSZ8765. */
+ #define PORT_REMOTE_ASYM_PAUSE		BIT(5)
+ #define PORT_REMOTE_SYM_PAUSE		BIT(4)
+-- 
+2.53.0
 
 
