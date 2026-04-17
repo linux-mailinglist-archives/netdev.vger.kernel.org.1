@@ -1,122 +1,164 @@
-Return-Path: <netdev+bounces-279344-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279345-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WLg7GGFK4mnx4QAAu9opvQ
-	(envelope-from <netdev+bounces-279344-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 16:57:37 +0200
+	id iBTpKQ5L4mnx4QAAu9opvQ
+	(envelope-from <netdev+bounces-279345-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 17:00:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A704441C4EB
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 16:57:36 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2763C41C56E
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 17:00:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6F0923082695
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 14:55:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BC3103038A66
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 14:59:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A48C33AEF23;
-	Fri, 17 Apr 2026 14:55:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CC073A168D;
+	Fri, 17 Apr 2026 14:59:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="1NPGVzsD"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Elu1zkZf"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8F4E2882CD;
-	Fri, 17 Apr 2026 14:55:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DF6F27A133
+	for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 14:59:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776437712; cv=none; b=Z4/MgnBShDxJ8USSrtzkCYhtA7CB0tB9ENTb/My4WLZ2/W2csyMTiqKms7e3qTycMPgnr2XKunqhXOM7SHQRDAf4Vd/u4UG/CHB+yzhEnL/KofJ9TphJWES3PmBhDJQ2c5HDke/bdiQMaMDE8QRDAUEeX4NMRM5eBV0BW6JYaqQ=
+	t=1776437966; cv=none; b=WIK5J5/ZlLMHkhKOZlRAwxH5GR5M5PHwPaVSEH3/Ykx4hcLlJqybZjyfKTxsLrnhn41Q3bUe06ULw8BBSY6wJvZEkzLED0RQxZ5JLBQvs4vBKg1V4qZypF295m9+5BCvlsyjktAqtPYbfPsYECAN81el9Uv+T4f2l/RK84aTIJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776437712; c=relaxed/simple;
-	bh=TYlSqOszeeYSwrMoI/JAgYy7vYiPOoFhR+pIxbvSuvE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JLu0SOHueyi3IpQYbRIpVgNYterp+kBS8gVHbZ7cNuNBzs0Z/rByeQBPpauS4Atb5+Kmg9Ehzc8L93nynpuxVVIBMuDunhXqA4pdTv2g8CzGJ/cW8xHDeBuM96lSIWpFhJdxzvyY7xYxNbn0lrClQdYnqWR/TSiPGBtD7MwcD4I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=1NPGVzsD; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=F0v/lr1RlyvCfC0Fcoq03DcmH0KJc601cMR3ZELVMN8=; b=1NPGVzsDzrUAiCb5DHMS9YM/r5
-	mJkgVXVKCck1TZ5q+P7b+7O4/deMM85qN0DwnI92Vqlt7jS9H4C1Q4jNzMdmpTK0bMD4f8dp8G233
-	2uAywm3sHNp+Vm8QLR6cyFuEBRaBult2zUGAKRuhYPa9BPC5UiCroWqJfgUS9wnCl5d4=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wDkas-00GQBf-5h; Fri, 17 Apr 2026 16:54:54 +0200
-Date: Fri, 17 Apr 2026 16:54:54 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Minda Chen <minda.chen@starfivetech.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	s=arc-20240116; t=1776437966; c=relaxed/simple;
+	bh=8/ShQI2tcr1+jH//wB7FQS8Aj4RICVbyp4dVyOFeW4Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oDdqepbCsAhQaHLIxlra8DUepCF10RY8JsFdIBVHuz3Ol7Of3IPZlNmGW/Ds2ZgaAgWdW9Ye1Z3sp2ZTK++tYaXtiMmxoiAps9vY7wD+qH+vKj1F5WMVH21XtcLLpWeenPzZHqpi+d1HyqiLUitBjYnalLVuQHYFZgtR5Tu2jkE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Elu1zkZf; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1776437963;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=9Ttb12HYWY7Ea82iFBVHynj+VUTRAVF7RCJbsh2p51M=;
+	b=Elu1zkZf3oOlVOuYKkuMpxGg6NUns8Fn/WU4TtlXT0Sa24UyhrIxX9vx5ryqtnAbtNW7bU
+	QWSTjmyIkUDqeU1Oeya7/rF//qPBYSSOGLnjmuIxFA87aGng9n+1kj3B1zh8zm+yFucrgI
+	rObkHoaRDdlyKPYDJtIMT3bV39jipik=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-122-8Tn1GChdNhGF9RphoU8yiA-1; Fri,
+ 17 Apr 2026 10:59:20 -0400
+X-MC-Unique: 8Tn1GChdNhGF9RphoU8yiA-1
+X-Mimecast-MFC-AGG-ID: 8Tn1GChdNhGF9RphoU8yiA_1776437957
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 51AB8195607B;
+	Fri, 17 Apr 2026 14:59:17 +0000 (UTC)
+Received: from ShadowPeak.redhat.com (unknown [10.44.32.76])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 8FD9930001BE;
+	Fri, 17 Apr 2026 14:59:10 +0000 (UTC)
+From: Petr Oros <poros@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Petr Oros <poros@redhat.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Emil Renner Berthing <emil.renner.berthing@canonical.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	devicetree@vger.kernel.org
-Subject: Re: [net-next v2 1/5] dt-bindings: net: starfive,jh7110-dwmac:
- Remove JH8100
-Message-ID: <27151bd8-6a3b-411f-94fd-7b1b932b9aa9@lunn.ch>
-References: <20260417024523.107786-1-minda.chen@starfivetech.com>
- <20260417024523.107786-2-minda.chen@starfivetech.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Ivan Vecera <ivecera@redhat.com>,
+	Michal Schmidt <mschmidt@redhat.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Rinitha S <sx.rinitha@intel.com>,
+	intel-wired-lan@lists.osuosl.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH iwl-net v7 0/3] ice: fix missing dpll notifications for SW pins
+Date: Fri, 17 Apr 2026 16:59:04 +0200
+Message-ID: <20260417145907.696307-1-poros@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260417024523.107786-2-minda.chen@starfivetech.com>
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279344-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[foss.st.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,canonical.com,vger.kernel.org,st-md-mailman.stormreply.com];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	RCPT_COUNT_TWELVE(0.00)[20];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-279345-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[poros@redhat.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A704441C4EB
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 2763C41C56E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Apr 17, 2026 at 10:45:19AM +0800, Minda Chen wrote:
-> Remove JH8100 dt-bindings because do not support it now.
+The SMA/U.FL pin redesign never propagated dpll notifications to the
+software-controlled pin wrappers.  This series fixes that in two steps
+plus a prerequisite dpll core change.
 
-> StarFive have stopped JH8100 developing and will release it
-> outside.
+Patch 1 exports __dpll_pin_change_ntf() so ice can send peer
+notifications from callback context where dpll_lock is already held.
 
-Is there a missing "not" in that sentence?
+Patch 2 fixes HW-to-SW notification propagation: periodic work now
+notifies SW wrappers when their backing CGU input changes, and
+phase_offset reporting for SW pins reads the backing pin's value.
 
-    Andrew
+Patch 3 adds SW-to-SW peer notification: when SMA or U.FL pin state
+changes via PCA9575 routing, the paired pin gets a dpll change event.
+
+Ivan Vecera (1):
+  dpll: export __dpll_pin_change_ntf() for use under dpll_lock
+
+Petr Oros (2):
+  ice: fix missing dpll notifications for SW pins
+  ice: add dpll peer notification for paired SMA and U.FL pins
+
+ drivers/dpll/dpll_netlink.c               | 10 +++
+ drivers/dpll/dpll_netlink.h               |  2 -
+ drivers/net/ethernet/intel/ice/ice_dpll.c | 79 +++++++++++++++++++----
+ include/linux/dpll.h                      |  1 +
+ 4 files changed, 79 insertions(+), 13 deletions(-)
 
 ---
-pw-bot: cr
+v7:
+ - split ice patch into two: HW-to-SW notification propagation and
+   SW-to-SW peer notification (requested by Jiri Pirko)
+ - drop spurious blank line removal in ice_dpll_sma_direction_set()
+v6: https://lore.kernel.org/all/20260416113952.389405-1-poros@redhat.com/
+v5: https://lore.kernel.org/all/20260409102501.1447628-1-poros@redhat.com/
+v4: https://lore.kernel.org/all/20260319205256.998876-1-poros@redhat.com/
+v3: https://lore.kernel.org/all/20260220140700.2910174-1-poros@redhat.com/
+v2: https://lore.kernel.org/all/20260219131500.2271897-1-poros@redhat.com/
+v1: https://lore.kernel.org/all/20260218211414.1411163-1-poros@redhat.com/
+
 
