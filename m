@@ -1,215 +1,182 @@
-Return-Path: <netdev+bounces-279415-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279416-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iKXfODST4mkt7gAAu9opvQ
-	(envelope-from <netdev+bounces-279415-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 22:08:20 +0200
+	id UHHdFaOX4mlS7wAAu9opvQ
+	(envelope-from <netdev+bounces-279416-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 22:27:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 519E541E726
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 22:08:19 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3C7A41E7D1
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 22:27:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CAA5F3026C05
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 20:07:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 74C813055E9F
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 20:25:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D80D30E84D;
-	Fri, 17 Apr 2026 20:07:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E38D3033E3;
+	Fri, 17 Apr 2026 20:25:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cMbvrqAH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="n4DERvOx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09B672E2DDD;
-	Fri, 17 Apr 2026 20:07:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1216E2FF17A
+	for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 20:25:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776456479; cv=none; b=F/ozciWucZQ7RG00SuzZAveo9xIPxd8VSap+r1CHil7JjG34c2gTqM8TqxNf3R493yR8RRwsd+bM4H5G4IxXehIWp0DW/EGOwxSCquPjhuJUXda2n+ySfC6+2lfgUFpmLvt0z94H9V93oc/gqQ7hLFGvR6zzwQcy+dSlJauzdEI=
+	t=1776457542; cv=none; b=PYuH6X1SK7S06pWVq7PWUQV0xE9e6zUqyMwfC7qQRHGUcl4E9K7VveLD8jBftfXucryoqy4JR8LbJKwkdfP6196d/LWg3ONNdqe2WDgBq5pfV9tO3d5UDQESMSW5o1WCHg5WGA8z1qqVPubSDtydgvIH17pAq+HKdy9xxISw/rk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776456479; c=relaxed/simple;
-	bh=bisWL2qqSYUYacd8xHtjBdVVCXmH5lYC3aeC9TX92yA=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ryo63dHMg3sjTb2KmGbDmUMS0tUyqwUwDFgqSt6p2caDu/7uodz+JjkLyVgvah71YX/rDrkYTUVmt9BQqXZQTuylhv+cEYRI9lKVUvAsKaM4j32KNnx0kYPuUIH5m7SuUqwJ0B+YoufeuNt2YWG8Dgzd1A2LAmxb68yTylhyiVI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cMbvrqAH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BF29C19425;
-	Fri, 17 Apr 2026 20:07:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776456478;
-	bh=bisWL2qqSYUYacd8xHtjBdVVCXmH5lYC3aeC9TX92yA=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=cMbvrqAHld7I6ZAeNpIOHVCEANrvuHkt/dmyeiEnf42S606HWjCqUOmLbgHUdtpws
-	 T4Y3HWjoc71p4+dQ/1eJGajT2vX3TiV/QkCT942uEr73n1kbdIY8N6fje9SLr/mk7n
-	 xxx36K1EFdXSYL6fc1UYIrq5sBGJQ7XuaniJ5kX0ockP67BExZuZCItxN4j6Zc0EVB
-	 Qrs3vT4oh/TZ1kbDRQ87lJmqKTXqnQ/E3GjTvPix26j6K0mZBCxcSPdiwYYIsAi139
-	 YxZAmjSpQobalxncNukq2iKpQoeOuOkRD+EobAca6D7Rm47JXgutUGAsmvtLG6l9pT
-	 6zbQaq2KBiSTg==
-Message-ID: <a30638c3498f5b12a0824211d942b1e97fd1a084.camel@kernel.org>
-Subject: Re: [PATCH] rds: zero per-item info buffer before handing it to
- visitors
-From: Allison Henderson <achender@kernel.org>
-To: Michael Bommarito <michael.bommarito@gmail.com>, "David S . Miller"
-	 <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	 <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com, 
-	linux-kernel@vger.kernel.org
-Date: Fri, 17 Apr 2026 13:07:56 -0700
-In-Reply-To: <20260417141916.494761-1-michael.bommarito@gmail.com>
-References: <20260417141916.494761-1-michael.bommarito@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.3-0ubuntu1.1 
+	s=arc-20240116; t=1776457542; c=relaxed/simple;
+	bh=aj1AWvC8XbRVZ84THDbjAbLYwcPNCY8pg/zxBAkidcY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=s6WdZMjwuxxunTAKwkFwe/zq94v7UPO1ld8PbK3RAAS0oEwVkgC5w48s5TRzkDOeJYqAvzAg+2/yzMk36IO9GLjIJF4uGfgok7OyuX92Q/5N+gcfIUgXwq3N9SGu8qC/HNicUrcBKQ7m43zz+CJTbIXgdaXLdTOBM+RYGtQpdA4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=n4DERvOx; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-43d7645adbdso646893f8f.1
+        for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 13:25:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776457539; x=1777062339; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=XdlRI90tG77ZcO4PzgXRbhAv78/rObSf67pj3SzFeiA=;
+        b=n4DERvOxFodb2N/tkbprUyJKRKZld+2UklsHd6jQTHAoNxNTe2YkQsmiHDX8+2JTQ3
+         5aFU8nYgcEpAdRw1JMxaIrOfHXOaUVwPLTudmZ+Gc+dlxxsO+s0EzUr6WUkTkQmPoObl
+         67zgSDveTxlNrfYPaiuXdGk7ytGDS/mwoGgqmCdfBXpItFoOhnrffudG1ieGMosAD7e9
+         gTUwEltAIn97GFLqlPqihMhhq3+okKTZ452Kecv+9X/cTpQEpn+Gz7pom5oyovH7kjB9
+         56JhC2cVciEfUvqfsO2/3QqFCo+VbISLFIkNHBo6NdFKRGfn8OohcBLZUr+f3KrP5ybB
+         PGuQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776457539; x=1777062339;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XdlRI90tG77ZcO4PzgXRbhAv78/rObSf67pj3SzFeiA=;
+        b=s9F5vb4p8GcGIm6RPBiXi5NXi3zC2tOrj+3scAgKs19pH8WgCjmJjT4BfXdoNfZZMS
+         Eced45RTW3Mv1oliZhLA6Crr/HN51NnowJ3v0HoyK34BQ4UEHdH3NeqE0lpLa0jTiY4O
+         J+Pcwka0zXHV/DTsnhAmlv17IXV+KlaST4j4D0uuxWh7UM9IAbybqvg+Cr37Aengq6/D
+         veNPm69EzaasOaUgJTSZucB3BMGdG1nqYvytzj9+36gnIfUkpAmVVxll5mviTDJRIP1K
+         WEnF7KWAwCsPavEWYxzFVqquqzfGpH+EYTENIVLJCVoNyxZ8fcfcjOuEQUvbKCN5oUnE
+         vDAg==
+X-Gm-Message-State: AOJu0Yz3ez3SvBWmD3I3fMnzahDaN8NPst2Mx9YdmKGS75OgGHMzjO8x
+	0Gu/x5RnycCFtetCFr2QQ4iGj+vWuNnXBbrpjumzq80c3j9rZefbuhvu/6YulIQgB74=
+X-Gm-Gg: AeBDietElm7qUJQ3SU1pS9EP809X/PktW5v3raeW/aeAz40OkDdqTajPFqQEMbDttMS
+	cKo9McA5d95XfgbZJt622JVMO0UueCP1P4VKLUcJ1puXoK0ge4kRKdWJTOLKpmCvepH2zYlSZcz
+	l4/SH9sYDAoIIuBQUFHdkK616/Zc+ltGUUTJ34cpK1C9nXQ/3Q+6G87hbLSQQZsgA7A2DHTDmyv
+	kV12RYaYOg1EBZFS7HZrDzwwrdQrP9CGBrZWtLDOLWilBbLDYGb6YG9hjTVqVlj2RNLAwd3VJJD
+	gVV0gQgRwYEa3j6rj55KoPQmlKUizaHWKwLm59nGjsb7OOeFdChLm2MZT9bFbyKxaFvyeXifalK
+	0cHomUxjgKHQRVqpGLXkLLyG4EzSWi/hXSTWyxxeLSClJo6xrdXoxtcqWhsurzIRbGtKO2h0xwQ
+	h/JaybXgV4CWOJeGGLJcgogb3BgW7A9qxFUTzs
+X-Received: by 2002:a05:6000:2383:b0:439:a95b:3c43 with SMTP id ffacd0b85a97d-43fe3dc0e4fmr6610154f8f.21.1776457538949;
+        Fri, 17 Apr 2026 13:25:38 -0700 (PDT)
+Received: from i3.local ([2a02:3035:bed:c6a6:3d8a:5cd4:13d1:48e3])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43fe4e4d5b1sm7455830f8f.30.2026.04.17.13.25.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Apr 2026 13:25:38 -0700 (PDT)
+From: RubenKelevra <rubenkelevra@gmail.com>
+To: netdev@vger.kernel.org,
+	edumazet@google.com,
+	ncardwell@google.com
+Cc: kuniyu@google.com,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	RubenKelevra <rubenkelevra@gmail.com>
+Subject: [PATCH] tcp: fix orphan count order in __tcp_close()
+Date: Fri, 17 Apr 2026 22:25:18 +0200
+Message-ID: <20260417202518.1354891-1-rubenkelevra@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-279415-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[google.com,davemloft.net,kernel.org,redhat.com,gmail.com];
+	TAGGED_FROM(0.00)[bounces-279416-lists,netdev=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[achender@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[rubenkelevra@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[10];
+	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 519E541E726
+X-Rspamd-Queue-Id: D3C7A41E7D1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, 2026-04-17 at 10:19 -0400, Michael Bommarito wrote:
-> Yet another from my "clanker."  This only applies to people who
-> don't use CONFIG_INIT_STACK_ALL_ZERO, but I presume that's
-> still enough people that it's worth backporting since it can
-> be chained through leaked addresses to defeat KASLR.
->=20
-> rds_for_each_conn_info() and rds_walk_conn_path_info() both hand a
-> caller-allocated on-stack u64 buffer to a per-connection visitor and
-> then copy the full item_len bytes back to user space via
-> rds_info_copy() regardless of how much of the buffer the visitor
-> actually wrote.
->=20
-> rds_ib_conn_info_visitor() and rds6_ib_conn_info_visitor() only
-> write a subset of their output struct when the underlying
-> rds_connection is not in state RDS_CONN_UP (src/dst addr, tos, sl
-> and the two GIDs via explicit memsets).  Several u32 fields
-> (max_send_wr, max_recv_wr, max_send_sge, rdma_mr_max, rdma_mr_size,
-> cache_allocs) and the 2-byte alignment hole between sl and
-> cache_allocs remain as whatever stack contents preceded the visitor
-> call and are then memcpy_to_user()'d out to user space.
->=20
-> struct rds_info_rdma_connection and struct rds6_info_rdma_connection
-> are the only rds_info_* structs in include/uapi/linux/rds.h that are
-> not marked __attribute__((packed)), so they have a real alignment
-> hole.  The other info visitors (rds_conn_info_visitor,
-> rds6_conn_info_visitor, rds_tcp_tc_info, ...) write all fields of
-> their packed output struct today and are not known to be vulnerable,
-> but a future visitor that adds a conditional write-path would have
-> the same bug.
->=20
-> Reproduction on a kernel built without CONFIG_INIT_STACK_ALL_ZERO=3Dy:
-> a local unprivileged user opens AF_RDS, sets SO_RDS_TRANSPORT=3DIB,
-> binds to a local address on an RDMA-capable netdev (rxe soft-RoCE on
-> any netdev is sufficient), sendto()'s any peer on the same subnet
-> (fails cleanly but installs an rds_connection in the global hash in
-> RDS_CONN_CONNECTING), then calls getsockopt(SOL_RDS,
-> RDS_INFO_IB_CONNECTIONS).  The returned 68-byte item contains 26
-> bytes of stack garbage including kernel text/data pointers:
->=20
->     0..7   0a 63 00 01 0a 63 00 02     src=3D10.99.0.1 dst=3D10.99.0.2
->     8..39  00 ...                      gids (memset-zeroed)
->     40..47 e0 92 a3 81 ff ff ff ff     kernel pointer (max_send_wr)
->     48..55 7f 37 b5 81 ff ff ff ff     kernel pointer (rdma_mr_max)
->     56..59 01 00 08 00                 rdma_mr_size (garbage)
->     60..61 00 00                       tos, sl
->     62..63 00 00                       alignment padding
->     64..67 18 00 00 00                 cache_allocs (garbage)
->=20
-> Fix by zeroing the per-item buffer in both rds_for_each_conn_info()
-> and rds_walk_conn_path_info() before invoking the visitor.  This
-> covers the IPv4/IPv6 IB visitors and hardens all current and future
-> visitors against the same class of bug.
->=20
-> No functional change for visitors that fully populate their output.
->=20
-> Fixes: ec16227e1414 ("RDS/IB: Infiniband transport")
-> Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
-> Assisted-by: Claude:claude-opus-4-7
+__tcp_close() calls sock_orphan(sk) first and drains the backlog with
+__release_sock(sk), which might call tcp_done() which decrements the
+tcp_orphan_count. After which we will increment tcp_orphan_count again.
 
-Hi Micheal,
+Since tcp_orphan_count is an unsigned int, we underflow to uint_max if we
+started with a 0 - at least on all current supported platforms.
 
-The change looks fine to me.  Since this is a bug fix, you'll want to cc st=
-able
-tree stable@vger.kernel.org, and note the target tree and component in the
-subject line like this: =C2=A0
+I could not locate a direct user of this value, and in
+tcp_orphan_count_sum() this underflow is contained by adding the unsigned
+int value into a signed int sum, causing it to behave like -1 on current
+supported platforms and then get clamped by max(n, 0) to 0.
 
-[PATCH net v2] net/rds: zero per-item info buffer before handing it to visi=
-tors
+The impact therefore is currently limited to e.g. tcp_too_many_orphans()
+checking an artificially low value, if the cached sum is refreshed within
+this timeframe.
 
-Other than that, the patch looks good to me.  Thanks Micheal.
+This fix mirrors the previous fix I found while investigating: commit
+75c2d9077c63 ("[TCP]: Fix sock_orphan dead lock")
 
-Reviewed-by: Allison Henderson <achender@kernel.org>
+Later commit eb4dea585304 ("net: Fix percpu counters deadlock") moved the
+increment down for old percpu_counter reasons. commit 19757cebf0c5 ("tcp:
+switch orphan_count to bare per-cpu counters") changed orphan accounting to
+plain per-cpu counters, so that old reason no longer applies the same way
+now.
 
-Allison
+Fixes: 19757cebf0c5 ("tcp: switch orphan_count to bare per-cpu counters")
+Signed-off-by: RubenKelevra <rubenkelevra@gmail.com>
+---
+ net/ipv4/tcp.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-> ---
->  net/rds/connection.c | 14 ++++++++++++++
->  1 file changed, 14 insertions(+)
->=20
-> diff --git a/net/rds/connection.c b/net/rds/connection.c
-> index 412441aaa298..c10b7ed06c49 100644
-> --- a/net/rds/connection.c
-> +++ b/net/rds/connection.c
-> @@ -701,6 +701,13 @@ void rds_for_each_conn_info(struct socket *sock, uns=
-igned int len,
->  	     i++, head++) {
->  		hlist_for_each_entry_rcu(conn, head, c_hash_node) {
-> =20
-> +			/* Zero the per-item buffer before handing it to the
-> +			 * visitor so any field the visitor does not write -
-> +			 * including implicit alignment padding - cannot leak
-> +			 * stack contents to user space via rds_info_copy().
-> +			 */
-> +			memset(buffer, 0, item_len);
-> +
->  			/* XXX no c_lock usage.. */
->  			if (!visitor(conn, buffer))
->  				continue;
-> @@ -750,6 +757,13 @@ static void rds_walk_conn_path_info(struct socket *s=
-ock, unsigned int len,
->  			 */
->  			cp =3D conn->c_path;
-> =20
-> +			/* Zero the per-item buffer for the same reason as
-> +			 * rds_for_each_conn_info(): any byte the visitor
-> +			 * does not write (including alignment padding) must
-> +			 * not leak stack contents via rds_info_copy().
-> +			 */
-> +			memset(buffer, 0, item_len);
-> +
->  			/* XXX no cp_lock usage.. */
->  			if (!visitor(cp, buffer))
->  				continue;
+diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+index 2014a6408e93..1a91cb31b02f 100644
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@ -3234,11 +3234,10 @@ void __tcp_close(struct sock *sk, long timeout)
+ 
+ 	local_bh_disable();
+ 	bh_lock_sock(sk);
++	tcp_orphan_count_inc();
+ 	/* remove backlog if any, without releasing ownership. */
+ 	__release_sock(sk);
+ 
+-	tcp_orphan_count_inc();
+-
+ 	/* Have we already been destroyed by a softirq or backlog? */
+ 	if (state != TCP_CLOSE && sk->sk_state == TCP_CLOSE)
+ 		goto out;
+-- 
+2.53.0
 
 
