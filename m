@@ -1,162 +1,201 @@
-Return-Path: <netdev+bounces-279293-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279294-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YP2mCqwH4mna0QAAu9opvQ
-	(envelope-from <netdev+bounces-279293-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 12:13:00 +0200
+	id 2JDcAGYH4mna0QAAu9opvQ
+	(envelope-from <netdev+bounces-279294-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 12:11:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F29F419F2E
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 12:12:59 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id B844F419EFE
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 12:11:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0896B3018585
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 10:10:03 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A4C05300B456
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 10:11:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF65C3AB281;
-	Fri, 17 Apr 2026 10:10:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38A9A390C80;
+	Fri, 17 Apr 2026 10:11:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MgLmOHsn"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="rOoMEw6r"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA32733B6C6;
-	Fri, 17 Apr 2026 10:10:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E151A35F607;
+	Fri, 17 Apr 2026 10:11:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776420601; cv=none; b=ELEzST0B5L1B39psrunKLBVoovmvk01fJ7f6QT6HYqAzNW5CEI318urqHHirm0uUQBgkqFSzGxADJowcFvMOAl6jUi50FmGV+d3C2LU+A0mAWYNCW/1dOO6tWrKhNjXA4Z67kRbWkrqi8EvFzp/Cc1anPqPmM3GL+3SKmNVwxV0=
+	t=1776420701; cv=none; b=LKi1PnzwnKgHSIe2QmB9EgYKhaBWHrZ6aUOxZ24id218RjjRjrKuyMLHD7r+9ZOLAyoHudcn0EHkBaC6UuN0F8WdFQNCKu++Ot3ZbEMDc2oy2c36ui3guQGBwvdCSb6EAaVJ8wbB0sT2fJ7/cqPih+0vQexsiMJoJ+O4LedXYxY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776420601; c=relaxed/simple;
-	bh=DS/BrD9NVZLl9n2YbrPgzBv+89D0hS++LNwbEDuReb4=;
-	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
-	 Subject:From:To:Cc:Date; b=r1ikt+E+eRIwx7Lf7HDyoUzRnNBN3vEW78563sp7WyugyFS0g5pXNRn7QphpqORkVFhkoB18+vABoe4pUfd0iW19IgruBgpBZsBOf5K5aN03Ci8au8wdQg8XxDKKDhbLAIvST/vIfQD0NoDkzmExf4QVqPl+wTvET3PU5fn3txo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MgLmOHsn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF93BC19425;
-	Fri, 17 Apr 2026 10:10:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776420601;
-	bh=DS/BrD9NVZLl9n2YbrPgzBv+89D0hS++LNwbEDuReb4=;
-	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
-	b=MgLmOHsn31f2/5kSsyRZ+2nkau6AuWbUQYpMsN7UxWp1HHueq8DES7KlS8Gpc6R4q
-	 /4KVz3Ff+MngDdZlthzn88qTd2V+m0LGFdmgqwD4shNZeKrHgBlxl40QllUHZfI+aC
-	 DvB+kX3Wj5T6uvGkyzQqY8VRVhKO62aux6p0Gcd3L9bZ9upFXrFkeJ5CDCnSK05hKm
-	 ZLW0xNeQuvDsx2dlgrHG1b/eNeX/yhgz8BxR9LPjP5QOMCEgJ+JVMuj1n4aBNLvqLI
-	 +KdjESuQwldMAYJ3ASoRHMwAsvPqyqL4bE7EJz3jJVEcwUHeezUj7aYS1afCqS7tw3
-	 9BINj2Y2a98ng==
-Content-Type: multipart/mixed; boundary="===============6727964678341861361=="
+	s=arc-20240116; t=1776420701; c=relaxed/simple;
+	bh=VSVBMYgTh7yu/qZ8OnzwxDKi0m+ZaB2uzb2sWCnqc84=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oD81+5eALUNnqJJngqQFOOnrOOpuZmDnLF5hLAHm5hgDMYz4MnJbcJnuUnFAa8HWY5IcN1j83WnBuo2NZED1dCmqk5PcoYvX3v4i+4pDiFoBsBVgvVNyWpVdrMQscI/D1cKa1J1U9Dvz26lOHix7gMJb1BtIONvmQu3chR+CW3c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=rOoMEw6r; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: from localhost.localdomain (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with ESMTPSA id 68ADB600B9;
+	Fri, 17 Apr 2026 12:11:37 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1776420697;
+	bh=lx/+8I9WrQ7x3ADcx8lsBTwsCsblZH2vLM2Lr48dTmc=;
+	h=From:To:Cc:Subject:Date:From;
+	b=rOoMEw6rrqL9GUp17rAxtnf4kLQodlGVMVQNjOva69EGIkMWY592wu/SUIt1RHN/8
+	 3Y7lCubsryItA7LqrCGvWW0HjXKvAXv6v/fYoVPUNAdwVz4KADuP/2XNti6gFLIgku
+	 hBJ7NJ+Ux7F5GQA2C8X8mO3CxGuSIqqDMhtv4ZWvwx6ZqlgJJtiVRHM0LD/Nj32NJi
+	 ugNLgUIBGnmAky+EVM/T4zsCGRonUEvgTtYCaBVqWN0FRSSN/mUC3Y4vcheeESKlZ6
+	 28dogWvW5WP+rVAS7Q9TJ2cseW18go2WB9w+PXBS3RcCd4q5IVWcX6hiymbY+yl81Y
+	 uI4zmZ6Yr8X3Q==
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: netfilter-devel@vger.kernel.org
+Cc: fw@strlen.de,
+	netdev@vger.kernel.org
+Subject: [PATCH nf,v3] netfilter: nat: use kfree_rcu to release ops
+Date: Fri, 17 Apr 2026 12:11:31 +0200
+Message-ID: <20260417101132.379848-1-pablo@netfilter.org>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <5fea6b5e9d1a13e72edf8222a8ebe50cbb660b37e62b87b65dab6f6f317943ec@mail.kernel.org>
-In-Reply-To: <20260417092035.2299913-2-kafai.wan@linux.dev>
-References: <20260417092035.2299913-2-kafai.wan@linux.dev>
-Subject: Re: [PATCH bpf v3 1/2] bpf: Reject TCP_NODELAY in TCP header option callbacks
-From: bot+bpf-ci@kernel.org
-To: kafai.wan@linux.dev,martin.lau@linux.dev,daniel@iogearbox.net,john.fastabend@gmail.com,sdf@fomichev.me,ast@kernel.org,andrii@kernel.org,eddyz87@gmail.com,memxor@gmail.com,song@kernel.org,yonghong.song@linux.dev,jolsa@kernel.org,davem@davemloft.net,edumazet@google.com,kuba@kernel.org,pabeni@redhat.com,horms@kernel.org,shuah@kernel.org,jiayuan.chen@linux.dev,kafai.wan@linux.dev,bpf@vger.kernel.org,netdev@vger.kernel.org,linux-kernel@vger.kernel.org,linux-kselftest@vger.kernel.org
-Cc: 2022090917019@std.uestc.edu.cn,dddddd@hust.edu.cn,M202472210@hust.edu.cn,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
-Date: Fri, 17 Apr 2026 10:10:00 +0000 (UTC)
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	CTYPE_MIXED_BOGUS(1.00)[];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-279293-lists,netdev=lfdr.de,bpf-ci];
-	FREEMAIL_CC(0.00)[std.uestc.edu.cn,hust.edu.cn,kernel.org,iogearbox.net,gmail.com,linux.dev,meta.com];
-	FROM_NEQ_ENVFROM(0.00)[bot@kernel.org,netdev@vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+,1:+];
+	TAGGED_FROM(0.00)[bounces-279294-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[netfilter.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[linux.dev,iogearbox.net,gmail.com,fomichev.me,kernel.org,davemloft.net,google.com,redhat.com,vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NO_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[35];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_THREE(0.00)[3];
+	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
 	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[netfilter.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8F29F419F2E
+	MIME_TRACE(0.00)[0:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[netfilter.org:email,netfilter.org:dkim,netfilter.org:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B844F419EFE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
---===============6727964678341861361==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Florian Westphal says:
 
-> diff --git a/net/core/filter.c b/net/core/filter.c
-> index 5fa9189eb772..96849f4c1fbc 100644
-> --- a/net/core/filter.c
-> +++ b/net/core/filter.c
-> @@ -5833,6 +5833,12 @@ BPF_CALL_5(bpf_sock_ops_setsockopt, struct bpf_sock_ops_kern *, bpf_sock,
->  	if (!is_locked_tcp_sock_ops(bpf_sock))
->  		return -EOPNOTSUPP;
->
-> +	/* TCP_NODELAY triggers tcp_push_pending_frames() and re-enters these callbacks. */
-> +	if ((bpf_sock->op == BPF_SOCK_OPS_HDR_OPT_LEN_CB ||
-> +	     bpf_sock->op == BPF_SOCK_OPS_WRITE_HDR_OPT_CB) &&
-> +	    level == SOL_TCP && optname == TCP_NODELAY)
-> +		return -EOPNOTSUPP;
-> +
+"Historically this is not an issue, even for normal base hooks: the data
+path doesn't use the original nf_hook_ops that are used to register the
+callbacks.
 
-Does this fix also need to block TCP_CORK? When bpf_setsockopt() is called
-with SOL_TCP and TCP_CORK where the value is 0 (disabling cork), the call
-path goes through:
+However, in v5.14 I added the ability to dump the active netfilter
+hooks from userspace.
 
-bpf_sock_ops_setsockopt()
-  -> _bpf_setsockopt()
-    -> __bpf_setsockopt()
-      -> sol_tcp_sockopt()
-        -> do_tcp_setsockopt()
-          -> __tcp_sock_set_cork(sk, false)
+This code will peek back into the nf_hook_ops that are available
+at the tail of the pointer-array blob used by the datapath.
 
-In __tcp_sock_set_cork() at net/ipv4/tcp.c, when cork is disabled, it
-unconditionally calls tcp_push_pending_frames(sk):
+The nat hooks are special, because they are called indirectly from
+the central nat dispatcher hook. They are currently invisible to
+the nfnl hook dump subsystem though.
 
-net/ipv4/tcp.c:__tcp_sock_set_cork() {
-    ...
-    tcp->nonagle |= TCP_NAGLE_OFF|TCP_NAGLE_PUSH;
+But once that changes the nat ops structures have to be deferred too."
 
-    tcp_push_pending_frames(sk);
-}
+Update nf_nat_register_fn() to deal with partial exposition of the hooks
+from error path which can be also an issue for nfnetlink_hook.
 
-This triggers the same recursion chain described in the commit message:
-
-tcp_push_pending_frames()
-  -> tcp_current_mss()
-    -> tcp_established_options()
-      -> bpf_skops_hdr_opt_len()
-        -> BPF_CGROUP_RUN_PROG_SOCK_OPS_SK (re-enters with
-           op=BPF_SOCK_OPS_HDR_OPT_LEN_CB)
-
-causing unbounded recursion and kernel stack overflow. Note that enabling
-TCP_CORK (val=1) is safe since it doesn't call tcp_push_pending_frames(),
-only disabling it (val=0) does.
-
-
->  	return _bpf_setsockopt(bpf_sock->sk, level, optname, optval, optlen);
->  }
-
-
+Fixes: e2cf17d3774c ("netfilter: add new hook nfnl subsystem")
+Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
 ---
-AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+v3: use kfree_rcu as suggested by AI in ip{6}tables_nat.
 
-CI run summary: https://github.com/kernel-patches/bpf/actions/runs/24558395229
---===============6727964678341861361==--
+ net/ipv4/netfilter/iptable_nat.c  |  4 ++--
+ net/ipv6/netfilter/ip6table_nat.c |  4 ++--
+ net/netfilter/nf_nat_core.c       | 10 ++++++----
+ 3 files changed, 10 insertions(+), 8 deletions(-)
+
+diff --git a/net/ipv4/netfilter/iptable_nat.c b/net/ipv4/netfilter/iptable_nat.c
+index a5db7c67d61b..625a1ca13b1b 100644
+--- a/net/ipv4/netfilter/iptable_nat.c
++++ b/net/ipv4/netfilter/iptable_nat.c
+@@ -79,7 +79,7 @@ static int ipt_nat_register_lookups(struct net *net)
+ 			while (i)
+ 				nf_nat_ipv4_unregister_fn(net, &ops[--i]);
+ 
+-			kfree(ops);
++			kfree_rcu(ops, rcu);
+ 			return ret;
+ 		}
+ 	}
+@@ -100,7 +100,7 @@ static void ipt_nat_unregister_lookups(struct net *net)
+ 	for (i = 0; i < ARRAY_SIZE(nf_nat_ipv4_ops); i++)
+ 		nf_nat_ipv4_unregister_fn(net, &ops[i]);
+ 
+-	kfree(ops);
++	kfree_rcu(ops, rcu);
+ }
+ 
+ static int iptable_nat_table_init(struct net *net)
+diff --git a/net/ipv6/netfilter/ip6table_nat.c b/net/ipv6/netfilter/ip6table_nat.c
+index e119d4f090cc..5be723232df8 100644
+--- a/net/ipv6/netfilter/ip6table_nat.c
++++ b/net/ipv6/netfilter/ip6table_nat.c
+@@ -81,7 +81,7 @@ static int ip6t_nat_register_lookups(struct net *net)
+ 			while (i)
+ 				nf_nat_ipv6_unregister_fn(net, &ops[--i]);
+ 
+-			kfree(ops);
++			kfree_rcu(ops, rcu);
+ 			return ret;
+ 		}
+ 	}
+@@ -102,7 +102,7 @@ static void ip6t_nat_unregister_lookups(struct net *net)
+ 	for (i = 0; i < ARRAY_SIZE(nf_nat_ipv6_ops); i++)
+ 		nf_nat_ipv6_unregister_fn(net, &ops[i]);
+ 
+-	kfree(ops);
++	kfree_rcu(ops, rcu);
+ }
+ 
+ static int ip6table_nat_table_init(struct net *net)
+diff --git a/net/netfilter/nf_nat_core.c b/net/netfilter/nf_nat_core.c
+index 83b2b5e9759a..74ec224ce0d6 100644
+--- a/net/netfilter/nf_nat_core.c
++++ b/net/netfilter/nf_nat_core.c
+@@ -1222,9 +1222,11 @@ int nf_nat_register_fn(struct net *net, u8 pf, const struct nf_hook_ops *ops,
+ 		ret = nf_register_net_hooks(net, nat_ops, ops_count);
+ 		if (ret < 0) {
+ 			mutex_unlock(&nf_nat_proto_mutex);
+-			for (i = 0; i < ops_count; i++)
+-				kfree(nat_ops[i].priv);
+-			kfree(nat_ops);
++			for (i = 0; i < ops_count; i++) {
++				priv = nat_ops[i].priv;
++				kfree_rcu(priv, rcu_head);
++			}
++			kfree_rcu(nat_ops, rcu);
+ 			return ret;
+ 		}
+ 
+@@ -1288,7 +1290,7 @@ void nf_nat_unregister_fn(struct net *net, u8 pf, const struct nf_hook_ops *ops,
+ 		}
+ 
+ 		nat_proto_net->nat_hook_ops = NULL;
+-		kfree(nat_ops);
++		kfree_rcu(nat_ops, rcu);
+ 	}
+ unlock:
+ 	mutex_unlock(&nf_nat_proto_mutex);
+-- 
+2.47.3
+
 
