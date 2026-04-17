@@ -1,154 +1,109 @@
-Return-Path: <netdev+bounces-279331-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279332-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kB5hGKhA4mn93wAAu9opvQ
-	(envelope-from <netdev+bounces-279331-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 16:16:08 +0200
+	id iNTuDiVB4mn93wAAu9opvQ
+	(envelope-from <netdev+bounces-279332-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 16:18:13 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D256841BF29
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 16:16:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AC2C241BF7C
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 16:18:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 290DE304C94C
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 14:10:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5FEA730E53CC
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 14:12:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 617023A6B86;
-	Fri, 17 Apr 2026 14:10:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3DB63A6B61;
+	Fri, 17 Apr 2026 14:12:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oWuJdSIy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ClTow22D"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CF16371876;
-	Fri, 17 Apr 2026 14:10:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 860C43B19CA
+	for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 14:12:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776435030; cv=none; b=PUzcHgki49kCNaPnhvefgotzMekch3lT1yW/G0eed1wM4upNugFkyD6cklMFciFxaPhQ2ZomBG+TMiVvFElOKsx4clim6QEljx8oiC0krXUfkgdawbLcEh40qYO8qas5tE0JRwPuIIhCA2a315/5Br9w6c8PdYqg9CcI2S5X+9c=
+	t=1776435150; cv=none; b=TZeKs4tEojdTxc0q8qTyYSM1Ac2F+8hiQ0B++0SEsQlAe6L5duyM6QATHCI6B5sHmiiwG6IbHolBM99UzpistDSai9x7Jq214F+Fmgt2gJvPoEpeWEKQnZO0+d2WNjYkY4spjdlPzycSqiCkhtVhTxnO6eCVcCNZ1UQPO+xj11c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776435030; c=relaxed/simple;
-	bh=8SQMGs8IWZBtfCQwHQf5nFYIse/C/NhBhMykySPb1Pw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qzWhDkJhN+WcWCcSkYkKLNH2M5/qPGNpsWHOnGW8VCKubtSKAOh34Ge2FNYLiIVnAsyMkgeT6XVo9SjziooiOaadPnmKYGBYJ2XMnkrZ+RU7BkvfA3tPbEMzOUfahvBvyU5tEj5DH2Uu5IHAftqRDrDK/WvyRimlhFhw0wHiXZg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oWuJdSIy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0DDC2C2BCB0;
-	Fri, 17 Apr 2026 14:10:24 +0000 (UTC)
+	s=arc-20240116; t=1776435150; c=relaxed/simple;
+	bh=LPMz+wvVSpzcjh14fUZJ2kJ+IffLKQsd9VxWmRRI0n8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RdZpcz1CVKjJUMfcZJOT3D5D9J100vhLDaLIuTvE6NVAY25U/vTtXTqycLzXYOxVkJkC4ibflEh/oWGdtjOBKQ9Ey4SdeFbyUPzm+wtCQzI179DCAeh5lmxgV8Tv2WLFqN1IAYMV61nUGv9Zru2DvXW+u+JeDA0yXvNXz/eIbro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ClTow22D; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AABB3C19425;
+	Fri, 17 Apr 2026 14:12:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776435029;
-	bh=8SQMGs8IWZBtfCQwHQf5nFYIse/C/NhBhMykySPb1Pw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=oWuJdSIyOIMeesi/u0QxMeqg949poLCxbCiPwfj4Ja1juqgi0XzciaCep1oF/KVc1
-	 /gpoeScvEpAX52iIZnMvnnKE3aG1S6WOaSufG2+cjrLPtSBDL2PZmqW7/LmMTZShyb
-	 KNHOBDgRZEQ6NY06NOWYoHk9rr1lUOUUwpSx3k79QxEdqEVPSxSAzrj6CL/qUwBSSb
-	 1Ey1sLAyPKg/QZqw8gsEEX90HXQEVAKi8G7w9EYWo35gaUhreo6Dph8xLreeqO22JQ
-	 Vp5BN14i5y8bJy0ZmH6EaZ42SIPiOYEXL+ApbcHJdbsWHMM/X/3m/27POm/0Lzhq6X
-	 R9AlBweeL6+/Q==
+	s=k20201202; t=1776435150;
+	bh=LPMz+wvVSpzcjh14fUZJ2kJ+IffLKQsd9VxWmRRI0n8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ClTow22DVaBwTimMV8DHetTUvp7mCeucU4ZJ+VkxVMIi/zc2PY40S+L0YmAlftSXm
+	 ZGLWBqUpypDz/SYjedkVL43tIR9XvPdV8ekidacuL3XNtLJFmm8/22zPPCa14ir3bA
+	 Tvnf7wK/+XHQbPQzO1BKyFJlKskv8Js8QVCcqfVeffso5INtzLqvJMzBVcEYzUGa5o
+	 ii+z/yNloQF1ippW3VwmQot17MXnLjd/sQuzUVkNM1QzO9ySiXKmHCuser4ERoTwkR
+	 UQa/PXddFaArajmTQX3i1VHmzCtfhyJwo5aTEvYwaLASZnTJmxFMTMfILVyMOCE8eb
+	 sdZ/exf+9m6GA==
+Date: Fri, 17 Apr 2026 15:12:26 +0100
 From: Simon Horman <horms@kernel.org>
-To: ernis@linux.microsoft.com
-Cc: Simon Horman <horms@kernel.org>,
-	haiyangz@microsoft.com,
-	davem@davemloft.net,
-	longli@microsoft.com,
-	ssengar@linux.microsoft.com,
-	linux-kernel@vger.kernel.org,
-	kuba@kernel.org,
-	kotaranov@microsoft.com,
-	stephen@networkplumber.org,
-	andrew+netdev@lunn.ch,
-	kys@microsoft.com,
-	wei.liu@kernel.org,
-	shirazsaleem@microsoft.com,
-	kees@kernel.org,
-	pabeni@redhat.com,
-	linux-hyperv@vger.kernel.org,
-	edumazet@google.com,
-	decui@microsoft.com,
-	leon@kernel.org,
-	gargaditya@linux.microsoft.com,
-	dipayanroy@linux.microsoft.com,
-	netdev@vger.kernel.org,
-	shacharr@microsoft.com
-Subject: Re: [PATCH net v3 4/5] net: mana: Don't overwrite port probe error with add_adev result
-Date: Fri, 17 Apr 2026 15:10:14 +0100
-Message-ID: <20260417141014.218936-1-horms@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260415080944.732901-5-ernis@linux.microsoft.com>
-References: <20260415080944.732901-5-ernis@linux.microsoft.com>
+To: Przemyslaw Korba <przemyslaw.korba@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Subject: Re: [PATCH iwl-net] i40e: set supported_extts_flags for rising edge
+Message-ID: <20260417141226.GF31784@horms.kernel.org>
+References: <20260415102511.1560665-1-przemyslaw.korba@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260415102511.1560665-1-przemyslaw.korba@intel.com>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	TAGGED_FROM(0.00)[bounces-279331-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-279332-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.994];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D256841BF29
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[horms.kernel.org:mid,intel.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: AC2C241BF7C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+On Wed, Apr 15, 2026 at 12:25:05PM +0200, Przemyslaw Korba wrote:
+> The i40e driver always supported only rising edge detection, so
+> advertise PTP_RISING_EDGE, and PTP_STRICT_FLAGS to ensure the
+> PTP core properly validates user requests.
+> 
+> Fixes: 7c571ac57d9d ("net: ptp: introduce .supported_extts_flags to ptp_clock_info")
+> Signed-off-by: Przemyslaw Korba <przemyslaw.korba@intel.com>
+> Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
----
-net: mana: Don't overwrite port probe error with add_adev result
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-In mana_probe(), if mana_probe_port() fails for any port, the error
-is stored in 'err' and the loop breaks. However, the subsequent
-unconditional 'err = add_adev(gd, "eth")' overwrites this error.
-If add_adev() succeeds, mana_probe() returns success despite ports
-being left in a partially initialized state (ac->ports[i] == NULL).
-Only call add_adev() when there is no prior error, so the probe
-correctly fails and triggers mana_remove() cleanup.
-
-> In mana_probe(), if mana_probe_port() fails for any port, the error
-> is stored in 'err' and the loop breaks. However, the subsequent
-> unconditional 'err = add_adev(gd, "eth")' overwrites this error.
-> If add_adev() succeeds, mana_probe() returns success despite ports
-> being left in a partially initialized state (ac->ports[i] == NULL).
->
-> Only call add_adev() when there is no prior error, so the probe
-> correctly fails and triggers mana_remove() cleanup.
->
-> Fixes: ced82fce77e9 ("net: mana: Probe rdma device in mana driver")
-
-The existing Fixes: tag points to commit ced82fce77e9 ("net: mana: Probe
-rdma device in mana driver"), but was the bug actually introduced there?
-
-Looking at the commit history, commit a69839d4327d ("net: mana: Add support
-for auxiliary device") added the unconditional 'err = add_adev(gd);' call
-that overwrites the error from mana_probe_port(). Commit ced82fce77e9 only
-modified the add_adev signature from add_adev(gd) to add_adev(gd, "eth")
-but did not introduce the buggy pattern.
-
-Should the Fixes: tag be:
-    Fixes: a69839d4327d ("net: mana: Add support for auxiliary device")
 
