@@ -1,65 +1,58 @@
-Return-Path: <netdev+bounces-279303-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279304-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IAs8Ja0f4mlX1wAAu9opvQ
-	(envelope-from <netdev+bounces-279303-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 13:55:25 +0200
+	id EB7fJMMi4mlX1wAAu9opvQ
+	(envelope-from <netdev+bounces-279304-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 14:08:35 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41B5641AF78
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 13:55:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B1F241B1A0
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 14:08:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C9929301AF54
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 11:51:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8AADC30E3601
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 12:02:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59AAB32AADE;
-	Fri, 17 Apr 2026 11:51:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBA373939A9;
+	Fri, 17 Apr 2026 12:02:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GWWhQdIW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q0jNKhVT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35F3E12B94;
-	Fri, 17 Apr 2026 11:51:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9809F3101BC;
+	Fri, 17 Apr 2026 12:02:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776426689; cv=none; b=g/2P6wO0zrSRubwwgTgrTqyziUJddpL5GIHaaX3SxUjvNu6N4o1HnRyOv4Dj5fH1pAFpBSqYo8O/BaFHB5ATCgkA6GGMg9WG4pHKU6vbTasZG6Puh/m/RQEWARJBBlrIYB/R44+ZZeZk61ZoDDuF2T94FKw+1ECZOr29+7pY0O8=
+	t=1776427368; cv=none; b=aHAI8ZMWTyJqLwpN4KKQXEayKX5wfNK1OUIr2OPHRObphzjrMAiDBKO7wOE+bRcSSy9fRQ27+9CGMV0XY2mUWLHgWkt748rCXJIz/QhDmiwnArmTxtRrPUZfy39j6xyqs5GcjNXvTC0JrRksBhw+cdhf3DdcGs0K5kcvxvAAt6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776426689; c=relaxed/simple;
-	bh=rAXyLT5RLfyphcv1d83h3XEBAAHlPAV0dBZp35OPm0I=;
+	s=arc-20240116; t=1776427368; c=relaxed/simple;
+	bh=wWaIRV1MIS1xv8UznMgFsqd6IKogDq+9sT1tvV5zs1Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=duLBSuOXHDRv0Sc5DlG0e/d5TAYgRs9tDOHLWcHrgQuBFCqyfNJkOrwc+GOUTFcLswRkzUr7pjdEuCdxkANBkTuqt/NxHwDHYYl4+fepdW9C1/iLYm+TsFtH7+oszO48yiho6hiIQ8E3+LSlGPQUTi7dkC+ZgF2FDpm1vQ23ocE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GWWhQdIW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D92BCC19425;
-	Fri, 17 Apr 2026 11:51:25 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=ExMLIK33Zy+cK0OWz2OJL/m2BXRV94j+QR+Tey9NAuJFxjFkN1OHNtzoAy+rafkXNaJWnwLUnfSDeiqbSz5UW1k6djc0wsOisY60tk+FJ8SYnOldjUMioL8lKpvvDQcUuPaX0RrmTHC5SeWOsQljIcjedgs/XAa4Sehg2LCeq7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q0jNKhVT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F748C19425;
+	Fri, 17 Apr 2026 12:02:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776426688;
-	bh=rAXyLT5RLfyphcv1d83h3XEBAAHlPAV0dBZp35OPm0I=;
+	s=k20201202; t=1776427368;
+	bh=wWaIRV1MIS1xv8UznMgFsqd6IKogDq+9sT1tvV5zs1Q=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GWWhQdIWdYicGc8rjEfFApwQQ+vyljQ7WmK9K7RlPn9NGJURPJ1tCWClR1V7WaZ6U
-	 owzPnxJCDENKSUiyrTS1zBbuELUUCKMVQQmlB114vq85MFkzdOHJ5QeVuJWCXShi9g
-	 iDNg3Uy+B4ptYuzKAeIwn/V4v7UMxODwIl2GHDAQbevpBVa3WumJREEh8XVuKjEUel
-	 d5NhrPviXJrtSgqBxxVWLWg5T0ZVkKcdNXJWZyYwapcyLcjhYxUwOIwEZ369YTKOZX
-	 U5elaBkIoufQN7a/nGJY+QqERUq2fj3Lqgf4YGrdBNgftZax8/3UCrP1ckDYq7rQ/3
-	 vWUHcLTk8YJ7Q==
-Date: Fri, 17 Apr 2026 12:51:22 +0100
+	b=q0jNKhVTxtgSdQPTKlNVssTUZIBC5LZhP3I5A65p0MWfzYr5e8Awix7AOv4lqEZQ0
+	 9uu6fC4RDNfSHXh4ihKPdpAlsMC35haibUTNe6isOx9p6kA4yX9N7+66h54azRhHxa
+	 zD9i5xfRYhCHLQXNXz66JzQQupsCsRDzTAtwypvD7WscEi6Tx27/YcrIxLOwRQ8M+f
+	 jZplGtQV2iAZtkmFbwZGYIKlSDKCtaGJ1/oIccx+QCr83T8dN1K6B8Io3dlterQhus
+	 EUvfr+6lDeXD8TdezYzx3C903UYDyfxV8u8qE49gh0WYoTh5aOg9ynI+aNOMbpYkFB
+	 4dAL8EJm9n7WA==
+Date: Fri, 17 Apr 2026 13:02:43 +0100
 From: Simon Horman <horms@kernel.org>
-To: Kohei Enju <kohei@enjuk.jp>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Faizal Rahim <faizal.abdul.rahim@linux.intel.com>,
-	kohei.enju@gmail.com, stable@vger.kernel.org
-Subject: Re: [PATCH iwl-net v2] igc: fix potential skb leak in
- igc_fpe_xmit_smd_frame()
-Message-ID: <20260417115122.GA31784@horms.kernel.org>
-References: <20260415025226.114115-1-kohei@enjuk.jp>
+To: Ashutosh Desai <ashutoshdesai993@gmail.com>
+Cc: netdev@vger.kernel.org, linux-hams@vger.kernel.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	stable@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 net] rose: fix OOB reads on short CLEAR REQUEST frames
+Message-ID: <20260417120243.GB31784@horms.kernel.org>
+References: <20260415055756.3825584-1-ashutoshdesai993@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,76 +61,75 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260415025226.114115-1-kohei@enjuk.jp>
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+In-Reply-To: <20260415055756.3825584-1-ashutoshdesai993@gmail.com>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-279303-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-279304-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[lists.osuosl.org,vger.kernel.org,intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,linux.intel.com,gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	FREEMAIL_TO(0.00)[gmail.com];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[horms.kernel.org:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 41B5641AF78
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,horms.kernel.org:mid]
+X-Rspamd-Queue-Id: 1B1F241B1A0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Apr 15, 2026 at 02:52:18AM +0000, Kohei Enju wrote:
-> When igc_fpe_init_tx_descriptor() fails, no one takes care of an
-> allocated skb, leaking it. [1]
-> Use dev_kfree_skb_any() on failure.
+On Wed, Apr 15, 2026 at 05:57:56AM +0000, Ashutosh Desai wrote:
+> rose_process_rx_frame() calls rose_decode() which reads skb->data[2]
+> without any prior length check. For CLEAR REQUEST frames the state
+> machines then read skb->data[3] and skb->data[4] as the cause and
+> diagnostic bytes.
 > 
-> Tested on an I226 adapter with the following command, while injecting
-> faults in igc_fpe_init_tx_descriptor() to trigger the error path.
->  # ethtool --set-mm $DEV verify-enabled on tx-enabled on pmac-enabled on
+> A crafted 3-byte ROSE CLEAR REQUEST frame passes the minimum length
+> gate in rose_route_frame() and reaches rose_process_rx_frame(), where
+> rose_decode() reads one byte past the header and the state machines
+> read two bytes past the valid buffer. A remote peer can exploit this
+> to leak kernel memory contents or trigger a kernel panic.
 > 
-> [1]
-> unreferenced object 0xffff888113c6cdc0 (size 224):
-> ...
->   backtrace (crc be3d3fda):
->     kmem_cache_alloc_node_noprof+0x3b1/0x410
->     __alloc_skb+0xde/0x830
->     igc_fpe_xmit_smd_frame.isra.0+0xad/0x1b0
->     igc_fpe_send_mpacket+0x37/0x90
->     ethtool_mmsv_verify_timer+0x15e/0x300
+> Add a pskb_may_pull(skb, 3) check before rose_decode() to cover its
+> skb->data[2] access, and a pskb_may_pull(skb, 5) check afterwards for
+> the CLEAR REQUEST path to cover the cause and diagnostic reads.
 > 
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
 > Cc: stable@vger.kernel.org
-> Fixes: 5422570c0010 ("igc: add support for frame preemption verification")
-> Signed-off-by: Kohei Enju <kohei@enjuk.jp>
+> Signed-off-by: Ashutosh Desai <ashutoshdesai993@gmail.com>
 > ---
-> Changes:
->   v2:
->     - change to idiomatic style with goto (Simon)
->     - add Cc to stable (Alex)
->     - add reprodunction steps (Alex)
->   v1: https://lore.kernel.org/all/20260329145122.126040-1-kohei@enjuk.jp/
+> V2 -> V3: drop kfree_skb() calls to fix double-free; add end-user
+>           visible symptom to commit log; use [net] subject prefix
+> V1 -> V2: switch skb->len check to pskb_may_pull; add pskb_may_pull(skb, 3)
+>           before rose_decode() to cover its skb->data[2] access
+> 
+> v2: https://lore.kernel.org/netdev/177614667427.3606651.8700070406932922261@gmail.com/
+> v1: https://lore.kernel.org/netdev/20260409013246.2051746-1-ashutoshdesai993@gmail.com/
 
-Thanks for the update.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Unfortunately this conflicts with a recent commit, which I believe
+addresses the same problem: commit 2835750dd647 ("net: rose: reject
+truncated CLEAR_REQUEST frames in state machines")
 
-Sashiko has comments about a potential existing bug in the same code path.
-I'd appreciate it if, as a follow-up, you could look over that.
+I do, however, note that commit doesn't use pskb_may_pull.
+So perhaps you could make an incremental change to add that.
 
-Thanks!
+Also, FTR, Sashiko has quite a few things to say about other problems
+in this and adjacent code.
 
