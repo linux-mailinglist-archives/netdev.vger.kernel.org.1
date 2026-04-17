@@ -1,158 +1,199 @@
-Return-Path: <netdev+bounces-279413-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279352-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0NwHLf+Q4mmX7QAAu9opvQ
-	(envelope-from <netdev+bounces-279413-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 21:58:55 +0200
+	id aKE5ITtS4mnx4QAAu9opvQ
+	(envelope-from <netdev+bounces-279352-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 17:31:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D65E841E676
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 21:58:50 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D91E341CA12
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 17:31:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 675433009F1A
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 19:58:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BAEB8302497C
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 15:25:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7C4C3CEB82;
-	Fri, 17 Apr 2026 19:58:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39FDC2E7179;
+	Fri, 17 Apr 2026 15:25:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=post.pl header.i=@post.pl header.b="UoyOEifw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SMvjzMlj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.post.pl (mx.post.pl [89.161.251.167])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 621123CE497
-	for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 19:58:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.161.251.167
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16B1C54654
+	for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 15:25:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776455925; cv=none; b=ZoC3IuLcAXz7u7lLhTx4wH3L5TSqDUmnYVtPLxR8vJmRpZU5nbPYyZRBGfcMCi+nfc35LVaAM9CeOFrG4a6RNehr9mRTPSe/nTrLUiT7UbuE3TQ26UixGqO2aL07gr14zSnsW8aDUHjtqd58U/LNSiVxi5LkHfcJVjVY6/TBz+s=
+	t=1776439520; cv=none; b=IJ9AZd3ZHXqaoirPjykn1ojapc7zSrSrixEjUZTBOLh7d2nGeVTCF8dBbutOsxfgmvbtrs/70uwUzOnjOta8Rl1mWUPzvU44QfbJUk5nAwJR9I6o25aw5/p/ZCPypU/vFhI0VY5WmGrzgVsn9BdqNRD9GNvD1kyGvrKcKJUDGjs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776455925; c=relaxed/simple;
-	bh=H/iI76JkhAImR+TSgSrZwFHNhVlwHzll3YW26I2BFeI=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Lv7eMYIx4VYtNW2GZhnkFt9k+78WPRh1LpR9KDoLeWVuWNN45MJalYTdPO5o1unkRkBy1WAsYzfLWuaXhNzsD3Kefxptzdhal4fQ8I5DPxcfiYplHqpu36few8JrikPUu9DAk+0yi/VuZa4TZe6wwuB8xYDqr/chH6kC8psxYeQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=post.pl; spf=pass smtp.mailfrom=post.pl; dkim=pass (1024-bit key) header.d=post.pl header.i=@post.pl header.b=UoyOEifw; arc=none smtp.client-ip=89.161.251.167
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=post.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=post.pl
-Received: from localhost (79.184.237.149.ipv4.supernova.orange.pl [79.184.237.149])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx.post.pl (Postfix) with UTF8SMTPSA id 496FF3AAFD;
-	Fri, 17 Apr 2026 17:23:34 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=post.pl; s=dkim;
-	t=1776439414; bh=H/iI76JkhAImR+TSgSrZwFHNhVlwHzll3YW26I2BFeI=;
-	h=From:Subject:Date;
-	b=UoyOEifwb8UsrJnqjW7AUNGYHHmGmAyNT0/dG4oZXdf5BtBUnbQo4RC4i6k8Mk+8C
-	 PDbV61hqY/403Oikr1GyxGwmJDYiALGi6im23AhVQZbyq5u6ItxuV/D0ZHvwtkK7vh
-	 eI5hBm9LzDBoMffIM3/nNtCly7P60dNfzW11AFVg=
-From: =?utf-8?Q?=C5=81ukasz_Stelmach?= <steelman@post.pl>
-To: netdev@vger.kernel.org
-Subject: [BUG] some temporary IPv6 address don't get regenerated
-X-Hashcash: 1:24:260417:netdev@vger.kernel.org::av+vsVVC0X3nSM0a:0Mdun
-Date: Fri, 17 Apr 2026 17:23:33 +0200
-Message-ID: <87340td30q.fsf%steelman@post.pl>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1776439520; c=relaxed/simple;
+	bh=MoXDICb71/sK4BHUlXqttpDfMwpW49pJQj3fKijhdDA=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=ViIST9V5gS1thdib1RVWJ/u/nTIeiW9jpUTYqyVyPW9PZtJj8ugziv5J+RcKKHSNzgQ2+RONKNhWcJ4mHbeSJRgtc9ZqZ1iPujkKIq/n75NDL4vavDJnUN7S/colIBra7wfEtp/IAIwPxIgUX02naqLt4Sod1ZVHw9T02lEPl5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SMvjzMlj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27025C19425;
+	Fri, 17 Apr 2026 15:25:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776439519;
+	bh=MoXDICb71/sK4BHUlXqttpDfMwpW49pJQj3fKijhdDA=;
+	h=From:Date:Subject:To:Cc:From;
+	b=SMvjzMljAZHauG6gD0bNqhWYyjuipEdsveuZypTmI1dB586xX3HPhKbRGExqAPnjg
+	 L2eDN+HgK4QL40hNV4HtfgrhHUPxxBTmbBx8DkQuBbvox6JYfVjVEQ2GCHxRSF5Fr2
+	 Wb5MGyM48jRrLEBquhS5lPSNTaLdwg9AU0+9dAAfWbByfKfefKQcNy7IGzEOXD7U6M
+	 IB41S0mMZFiu4vxHqPTv1uSrc+LNEKgwIIGeNP9IxC94fAdzwbPUOuciqJZ8bu+ALw
+	 ZE575ZLkwfNdzg2qYGkrnKapWAsP0pir1swtq4RFLzhQ+v4ntTAeXLlFKQ2eUT1UMM
+	 Xa/4lVdPNTegQ==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Date: Fri, 17 Apr 2026 17:24:41 +0200
+Subject: [PATCH net] net: airoha: Fix PPE cpu port configuration for GDM2
+ loopback path
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-CLIENT-IP: 79.184.237.149
-X-CLIENT-HOSTNAME: 79.184.237.149.ipv4.supernova.orange.pl
-X-VADE-SPAMSTATE: clean
-X-VADE-SPAMCAUSE: dmFkZTFyHUTBW7Yz1Q4VXsmIvNxEYgAC0gi5NqUn/Ju9THrCuwumkhCOJg3oJZBp+iSMxTFDXVxZRdtsb35tT9OdOAz4EEsC0Do2nstZw4j0Ri9IdWrTgi5Gwv3Em4y5/h5yQQx8S63ZbnMbKRyQS+2VkNfmcDfaDigVoYDvX9wLaNmh0B1bQV6bHdAbhO4iDfkLRH6cQZQrdrag0WnBFvlxz+PUm1EgKUSFuNEk95uSL01mc43Au/gZo9CJKUj4hBYYHyZytt314x7Zi6XBFSMj5x3maVTNkAxNnkatsczq0VvZ+TrHKLhmLqtoPyGhJPgdzhZNpXQ28jxzs8EfLtOuEC4hWBsxLWa/lx3EhzFJlJrd9PXIjMtP/5yv+uq1oktGi1An0cSEitpa52HmO1AL+N/vQpbL70OMDzjH2nM5zxg3thv3pG6uGnzKHuKgO4GgYpsHV6uxnjDkrSjV4YTN6xxDCWlwK9giz8H8GDTk4x/Aks8ktuSbbR/+GnZp01lJnDKut35ceQuXr9BwodY3NU3QfyBbkFM0cySNWCCinyL/xoREj95kIHuZSeOjuYM+/7zbuQnJ5nIjP8pf7QosiPI4TqgXrWJ/mgRZQKSiGEuVNGaVkyWOBOK7JZOjRc4+3JWuX59cuzQS+1tLtgF2MfUSCv2XWnNOG90wQYR/G/Jolw
-X-DCC--Metrics: mail02.home.net.pl 1024; Body=2 Fuz1=2 Fuz2=2
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260417-airoha-ppe-cpu-port-for-gdm2-loopback-v1-1-c7a9de0f6f57@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x3NwQrCMAyA4VcZORtYi27UVxEPbZdtQW1COkUYe
+ 3eLx+/y/ztUMqYK124How9XltLgTh3kNZaFkKdm8L0f+rMbMbLJGlGVMOsbVWzDWQyX6eXxKaI
+ p5geGIYV08W4M2UFrqdHM3//nBoU2uB/HDzmgfZB8AAAA
+X-Change-ID: 20260417-airoha-ppe-cpu-port-for-gdm2-loopback-96b9b52179c1
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Simon Horman <horms@kernel.org>, linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+X-Mailer: b4 0.14.3
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[post.pl,quarantine];
-	R_DKIM_ALLOW(-0.20)[post.pl:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279413-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_ONE(0.00)[1];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[steelman@post.pl,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[post.pl:+];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	TAGGED_FROM(0.00)[bounces-279352-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[post.pl:dkim,post.pl:mid]
-X-Rspamd-Queue-Id: D65E841E676
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D91E341CA12
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi,
+When QoS loopback is enabled for GDM3 or GDM4, incoming packets are
+forwarded to GDM2. However, the PPE cpu port for GDM2 is not configured
+in this path, causing traffic originating from GDM3/GDM4, which may
+be set up as WAN ports backed by QDMA1, to be incorrectly directed
+to QDMA0 instead.
+Configure the PPE cpu port for GDM2 when QoS loopback is active on
+GDM3 or GDM4 to ensure traffic is routed to the correct QDMA instance.
 
-Apparently, something in addrconf.c can go wrong and a temporary
-addresses may not get regenerated leaving users who wish to use them
-with only the stable ones. Below, 2a01:110f:4321:1002:abcc:78d7:2055:94ec
-while still valid is not preferred anymore. Even if it's not the only
-global temporary address it is the only usable to contact hosts on the
-Internet because the other temporary addresses are ULA.
+Fixes: 9cd451d414f6 ("net: airoha: Add loopback support for GDM2")
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+---
+ drivers/net/ethernet/airoha/airoha_eth.c | 8 ++++++--
+ drivers/net/ethernet/airoha/airoha_eth.h | 3 ++-
+ drivers/net/ethernet/airoha/airoha_ppe.c | 6 +++---
+ 3 files changed, 11 insertions(+), 6 deletions(-)
 
-Neither received RAs nor adding and removing an address manually (one
-with a different prefix unrelated to these below) which as far as I
-understand, should trigger address maintenance code.
+diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
+index e1ab15f1ee7d..d2b7c437a782 100644
+--- a/drivers/net/ethernet/airoha/airoha_eth.c
++++ b/drivers/net/ethernet/airoha/airoha_eth.c
+@@ -1727,7 +1727,7 @@ static int airoha_set_gdm2_loopback(struct airoha_gdm_port *port)
+ {
+ 	struct airoha_eth *eth = port->qdma->eth;
+ 	u32 val, pse_port, chan;
+-	int src_port;
++	int i, src_port;
+ 
+ 	/* Forward the traffic to the proper GDM port */
+ 	pse_port = port->id == AIROHA_GDM3_IDX ? FE_PSE_PORT_GDM3
+@@ -1769,6 +1769,9 @@ static int airoha_set_gdm2_loopback(struct airoha_gdm_port *port)
+ 		      SP_CPORT_MASK(val),
+ 		      __field_prep(SP_CPORT_MASK(val), FE_PSE_PORT_CDM2));
+ 
++	for (i = 0; i < eth->soc->num_ppe; i++)
++		airoha_ppe_set_cpu_port(port, i, AIROHA_GDM2_IDX);
++
+ 	if (port->id == AIROHA_GDM4_IDX && airoha_is_7581(eth)) {
+ 		u32 mask = FC_ID_OF_SRC_PORT_MASK(port->nbq);
+ 
+@@ -1807,7 +1810,8 @@ static int airoha_dev_init(struct net_device *dev)
+ 	}
+ 
+ 	for (i = 0; i < eth->soc->num_ppe; i++)
+-		airoha_ppe_set_cpu_port(port, i);
++		airoha_ppe_set_cpu_port(port, i,
++					airoha_get_fe_port(port));
+ 
+ 	return 0;
+ }
+diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ethernet/airoha/airoha_eth.h
+index 95e557638617..715aa26cbac8 100644
+--- a/drivers/net/ethernet/airoha/airoha_eth.h
++++ b/drivers/net/ethernet/airoha/airoha_eth.h
+@@ -653,7 +653,8 @@ int airoha_get_fe_port(struct airoha_gdm_port *port);
+ bool airoha_is_valid_gdm_port(struct airoha_eth *eth,
+ 			      struct airoha_gdm_port *port);
+ 
+-void airoha_ppe_set_cpu_port(struct airoha_gdm_port *port, u8 ppe_id);
++void airoha_ppe_set_cpu_port(struct airoha_gdm_port *port, u8 ppe_id,
++			     u8 fport);
+ bool airoha_ppe_is_enabled(struct airoha_eth *eth, int index);
+ void airoha_ppe_check_skb(struct airoha_ppe_dev *dev, struct sk_buff *skb,
+ 			  u16 hash, bool rx_wlan);
+diff --git a/drivers/net/ethernet/airoha/airoha_ppe.c b/drivers/net/ethernet/airoha/airoha_ppe.c
+index 859818676b69..5c9dff6bccd1 100644
+--- a/drivers/net/ethernet/airoha/airoha_ppe.c
++++ b/drivers/net/ethernet/airoha/airoha_ppe.c
+@@ -85,10 +85,9 @@ static u32 airoha_ppe_get_timestamp(struct airoha_ppe *ppe)
+ 	return FIELD_GET(AIROHA_FOE_IB1_BIND_TIMESTAMP, timestamp);
+ }
+ 
+-void airoha_ppe_set_cpu_port(struct airoha_gdm_port *port, u8 ppe_id)
++void airoha_ppe_set_cpu_port(struct airoha_gdm_port *port, u8 ppe_id, u8 fport)
+ {
+ 	struct airoha_qdma *qdma = port->qdma;
+-	u8 fport = airoha_get_fe_port(port);
+ 	struct airoha_eth *eth = qdma->eth;
+ 	u8 qdma_id = qdma - &eth->qdma[0];
+ 	u32 fe_cpu_port;
+@@ -182,7 +181,8 @@ static void airoha_ppe_hw_init(struct airoha_ppe *ppe)
+ 			if (!port)
+ 				continue;
+ 
+-			airoha_ppe_set_cpu_port(port, i);
++			airoha_ppe_set_cpu_port(port, i,
++						airoha_get_fe_port(port));
+ 		}
+ 	}
+ }
 
-I noticed this phenomenon once or twice before. It seems to be very
-rare, yet quite undesirable I'd say. What might have triggered it today
-is a reboot of my router and (possible?) change in lifetime values it
-announced.
+---
+base-commit: 82c21069028c5db3463f851ae8ac9cc2e38a3827
+change-id: 20260417-airoha-ppe-cpu-port-for-gdm2-loopback-96b9b52179c1
 
-Even stranger is that there is a preferred fd89:: (ULA), but not 2a01::.
+Best regards,
+-- 
+Lorenzo Bianconi <lorenzo@kernel.org>
 
-accept_ra as well as use_tempaddr are set to 2.
-
-Of course, this ma be get fixed by a suspend/resume (no, it may not) or
-manual ifdown/ifup (of course it helped), but nevertheless I thought it
-was worth reporting.
-
---8<---------------cut here---------------start------------->8---
-107: bond0: <BROADCAST,MULTICAST,MASTER,UP,LOWER_UP> mtu 1500 qdisc noqueue=
- state UP group default qlen 1000
-    link/ether b8:ca:3a:d4:1e:97 brd ff:ff:ff:ff:ff:ff
-    inet 192.168.2.122/24 brd 192.168.2.255 scope global dynamic bond0
-       valid_lft 165585sec preferred_lft 165585sec
-
-    inet6 fd89:82bb:420:2:cab3:d2d6:aeeb:e250/64 scope global temporary dyn=
-amic=20
-       valid_lft 597079sec preferred_lft 78177sec
-
-    inet6 2a01:110f:4321:1002:abcc:78d7:2055:94ec/64 scope global temporary=
- deprecated dynamic=20
-       valid_lft 60815sec preferred_lft 0sec
-
-    inet6 2a01:110f:4321:1002:abac:3aff:fed4:beef/64 scope global dynamic m=
-ngtmpaddr proto kernel_ra=20
-       valid_lft 60815sec preferred_lft 60815sec
-
-    inet6 fd89:82bb:420:2:24bf:fe8f:5c9c:c753/64 scope global temporary dep=
-recated dynamic=20
-       valid_lft 511186sec preferred_lft 0sec
-
-    inet6 fd89:82bb:420:2:abac:3aff:fed4:beef/64 scope global dynamic mngtm=
-paddr proto kernel_ra=20
-       valid_lft 2591805sec preferred_lft 604605sec
-
-    inet6 fe80::abac:3aff:fed4:beef/64 scope link proto kernel_ll=20
-       valid_lft forever preferred_lft forever
---8<---------------cut here---------------end--------------->8---
-
---=20
-Kind regards,
-=C5=81ukasz Stelmach
 
