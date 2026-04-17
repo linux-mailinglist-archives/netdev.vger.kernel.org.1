@@ -1,143 +1,194 @@
-Return-Path: <netdev+bounces-279296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279297-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YMkCC+AM4mkg1AAAu9opvQ
-	(envelope-from <netdev+bounces-279296-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 12:35:12 +0200
+	id MJ3ZNWkP4mkg1AAAu9opvQ
+	(envelope-from <netdev+bounces-279297-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 12:46:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B53A041A2A0
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 12:35:07 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9C7641A5C9
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 12:45:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EEC3A300C598
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 10:30:51 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 09677300A309
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 10:45:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26AD3349B02;
-	Fri, 17 Apr 2026 10:30:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E59203BA220;
+	Fri, 17 Apr 2026 10:45:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IKMJnEpG"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="l/DWVYQV"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C94873B6C05
-	for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 10:30:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 414643B6354
+	for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 10:45:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776421851; cv=none; b=uCFRqojYAMYURus2tB+3Db5ISiKSkWtO403WL1hbXW6qmLSu8xkbiR1ngajt39iBV0YCq9/izcDhysV6k53aiKCSAZ69RKZOBSc0NfU6XAjTWH2OZ+2cEoxzFvR3EXRond7OCt3IDpq0OxM28/1Uh1W2KMjJc4PFCP+6FA2kQ44=
+	t=1776422755; cv=none; b=U0hcjsOtnWAslP4ySy3poTfSdje2Mi4IhN8PvPIQ1faQmP5S/U6iG9e6bGG8xbD5eYeItCsNJY58s/mBmFD7pPBHX5Z7x9uR/pAUwplMT5JwpyOe0xpQOv2u067RU2BBh5cDlQZLWRr8qiunJGZcFmfkee7DeTL8MMDAIUVM5CU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776421851; c=relaxed/simple;
-	bh=+Hls5wp1UWuzMI1mKYe2+ioDcWRk7O3VpaEdD4sGj5g=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XnbscSrO5IEXznolhlS3zFeBd+H+l9AbIO7B5+Rx/s0KhdcvvdTuMNVOLSwZMZIk/iZ/cN1hggbhEJ1CX4Bdc3dgbaV0UFrcNcoJdGJdZ1hY6NXqkRBVflvo1XTbfaUirb9CYU3tgQL0dIu1J/GRhfmPfufTpqOVwMNgOp+DuqM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IKMJnEpG; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1776421847;
+	s=arc-20240116; t=1776422755; c=relaxed/simple;
+	bh=0VRL0cpLJ+qES0oZbNjlAL/FiePH+bQn1HvWNYQ7Fz8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=jN6fYiuwreeapzE9qF7n7Kzse6WSkx82KMp6Q7iVshvOp37gi0KnEgYoxn1iU6SR+HnIkjOzsQ+cnC9KlknNt+/NkXOdfwzlD9U+eKYFYICrEEP1GuOLWYq1Y/SmBHaw/fc1Svrj1Nf7nSDYjBNHgjMeHafNcdDTa77CtusL+mo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=l/DWVYQV; arc=none smtp.client-ip=95.215.58.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <9d8f345e-e3aa-428d-8484-8127387bb4a4@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1776422741;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=+Hls5wp1UWuzMI1mKYe2+ioDcWRk7O3VpaEdD4sGj5g=;
-	b=IKMJnEpGSddifEwiMFNiBECyv9i4chf0lHhyNNdmQjfOxQ/JvWjU5ouhxT7uDR6w9iqkcF
-	DYX8Xh8ZJ6gz+CxNvaob5klXhljetJFZ0LuVTT2nEl99fIkjKRLamdol8tgmqUD/Qxcp3H
-	JUjzp15+/BiN/YiJ7D3yMk+HcCRsbBQ=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-267-qNIUl2R5Pe-oMBRDvXqfkA-1; Fri,
- 17 Apr 2026 06:30:43 -0400
-X-MC-Unique: qNIUl2R5Pe-oMBRDvXqfkA-1
-X-Mimecast-MFC-AGG-ID: qNIUl2R5Pe-oMBRDvXqfkA_1776421842
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0292418002D1;
-	Fri, 17 Apr 2026 10:30:42 +0000 (UTC)
-Received: from fedora.redhat.com (unknown [10.44.32.3])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E86BE180036E;
-	Fri, 17 Apr 2026 10:30:36 +0000 (UTC)
-From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
-To: jacob.e.keller@intel.com
-Cc: aleksandr.loktionov@intel.com,
-	anthony.l.nguyen@intel.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	intel-wired-lan@lists.osuosl.org,
-	jesse.brandeburg@intel.com,
-	jtornosm@redhat.com,
-	kuba@kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	przemyslaw.kitszel@intel.com,
-	horms@kernel.org
-Subject: Re: [Intel-wired-lan] [PATCH net v3 5/5] iavf: refactor virtchnl polling into single function
-Date: Fri, 17 Apr 2026 12:30:35 +0200
-Message-ID: <20260417103035.152583-1-jtornosm@redhat.com>
-In-Reply-To: <6539cc33-9294-4312-aa1b-5df311dce79f@intel.com>
-References: <6539cc33-9294-4312-aa1b-5df311dce79f@intel.com>
+	bh=TX419zoOiGLPA/HkUNw0XGLgQfe+SD1cqA8DukbVfYA=;
+	b=l/DWVYQV/EMiKjrRUIH1rDNxFlRC62ccAcD9M3jpilGTVBLiGKOkFHMGahAuxby3XNgdwh
+	fmf8HkF9S5ONFOjHvmqq2c3OEa33cnmZ1D4SIQeUvv/19zfqN/RftnlUZ1cX/Ygakeo6c8
+	NlbPQI/G+Lm1OJE124oh4JAqX+5DPsA=
+Date: Fri, 17 Apr 2026 18:45:07 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+Subject: Re: [PATCH bpf v3 2/2] selftests/bpf: Test TCP_NODELAY in TCP hdr opt
+ callbacks
+To: KaFai Wan <kafai.wan@linux.dev>, martin.lau@linux.dev,
+ daniel@iogearbox.net, john.fastabend@gmail.com, sdf@fomichev.me,
+ ast@kernel.org, andrii@kernel.org, eddyz87@gmail.com, memxor@gmail.com,
+ song@kernel.org, yonghong.song@linux.dev, jolsa@kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, shuah@kernel.org,
+ jiayuan.chen@linux.dev, bpf@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20260417092035.2299913-1-kafai.wan@linux.dev>
+ <20260417092035.2299913-3-kafai.wan@linux.dev>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+In-Reply-To: <20260417092035.2299913-3-kafai.wan@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279296-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_FROM(0.00)[bounces-279297-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[linux.dev,iogearbox.net,gmail.com,fomichev.me,kernel.org,davemloft.net,google.com,redhat.com,vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jtornosm@redhat.com,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCPT_COUNT_TWELVE(0.00)[23];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B53A041A2A0
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux.dev:email,linux.dev:dkim,linux.dev:mid]
+X-Rspamd-Queue-Id: A9C7641A5C9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello Jacob,
 
-> The cleanup makes sense as next material, but the other patches fix bugs
-> that could (should?) still target net, right?
-Yes, I think so and that is my intention.
-Unless Przemek has another opinion and/or better idea and since
-"iavf: add iavf_poll_virtchnl_response()" has not yet landed in any public
-repository, I can include "iavf: add iavf_poll_virtchnl_response()" patch
-like it is in my next version (to drop when the commented one is landed)
-and in the meantime allow to progress the rest of the patches for net.
-I will take into account the interesting comments from Simon and his
-AI-generated review too in my next version.
-If it is ok, later on I can proceed with this patch for the refactoring.
+On 4/17/26 5:20 PM, KaFai Wan wrote:
+> Add a sockops selftest for the TCP_NODELAY restriction in
+> BPF_SOCK_OPS_HDR_OPT_LEN_CB and BPF_SOCK_OPS_WRITE_HDR_OPT_CB.
+>
+> With BPF_SOCK_OPS_WRITE_HDR_OPT_CB_FLAG enabled,
+> bpf_setsockopt(TCP_NODELAY) returns -EOPNOTSUPP from
+> BPF_SOCK_OPS_HDR_OPT_LEN_CB and BPF_SOCK_OPS_WRITE_HDR_OPT_CB, avoiding
+> unbounded recursion and kernel stack overflow.
+>
+> Other cases continue to work as before, including
+> BPF_SOCK_OPS_PASSIVE_ESTABLISHED_CB and user space
+> setsockopt(TCP_NODELAY).
+>
+> Signed-off-by: KaFai Wan <kafai.wan@linux.dev>
 
-> I'll drop this version from the Intel Wired LAN patchwork then.
-Ok
 
-Thanks
+Reviewed-by: Jiayuan Chen <jiayuan.chen@linux.dev>
 
-Best regards
-Jose Ignacio
+
+A little nit below, no need to resend.
+
+> ---
+>   .../selftests/bpf/prog_tests/tcp_hdr_options.c    | 12 +++++++++++-
+>   .../bpf/progs/test_misc_tcp_hdr_options.c         | 15 ++++++++++++++-
+>   2 files changed, 25 insertions(+), 2 deletions(-)
+>
+> diff --git a/tools/testing/selftests/bpf/prog_tests/tcp_hdr_options.c b/tools/testing/selftests/bpf/prog_tests/tcp_hdr_options.c
+> index 56685fc03c7e..7b9dbbb84316 100644
+> --- a/tools/testing/selftests/bpf/prog_tests/tcp_hdr_options.c
+> +++ b/tools/testing/selftests/bpf/prog_tests/tcp_hdr_options.c
+> @@ -461,7 +461,7 @@ static void misc(void)
+>   	const unsigned int nr_data = 2;
+>   	struct bpf_link *link;
+>   	struct sk_fds sk_fds;
+> -	int i, ret;
+> +	int i, ret, true_val = 1;
+>   
+
+NIT: please follow the reverse xmas tree variable ordering
+
+
+>   	lport_linum_map_fd = bpf_map__fd(misc_skel->maps.lport_linum_map);
+>   
+> @@ -477,6 +477,10 @@ static void misc(void)
+>   		return;
+>   	}
+>   
+> +	ret = setsockopt(sk_fds.active_fd, SOL_TCP, TCP_NODELAY, &true_val, sizeof(true_val));
+> +	if (!ASSERT_OK(ret, "setsockopt(TCP_NODELAY)"))
+> +		goto check_linum;
+> +
+>   	for (i = 0; i < nr_data; i++) {
+>   		/* MSG_EOR to ensure skb will not be combined */
+>   		ret = send(sk_fds.active_fd, send_msg, sizeof(send_msg),
+> @@ -507,6 +511,12 @@ static void misc(void)
+>   
+>   	ASSERT_EQ(misc_skel->bss->nr_hwtstamp, 0, "nr_hwtstamp");
+>   
+> +	ASSERT_TRUE(misc_skel->data->nodelay_est_ok, "unexpected nodelay_est_ok");
+> +
+> +	ASSERT_TRUE(misc_skel->data->nodelay_hdr_len_err, "unexpected nodelay_hdr_len_err");
+> +
+> +	ASSERT_TRUE(misc_skel->data->nodelay_write_hdr_err, "unexpected nodelay_write_hdr_err");
+> +
+
+NIT: It's would be misleading if you run ./test_progs with "-v"
+misc:PASS:unexpected nodelay_est_ok 0 nsec
+
+"PASS:unexpected" ?
+
+>   check_linum:
+>   	ASSERT_FALSE(check_error_linum(&sk_fds), "check_error_linum");
+>   	sk_fds_close(&sk_fds);
+> diff --git a/tools/testing/selftests/bpf/progs/test_misc_tcp_hdr_options.c b/tools/testing/selftests/bpf/progs/test_misc_tcp_hdr_options.c
+> index d487153a839d..a02e28d9db2e 100644
+> --- a/tools/testing/selftests/bpf/progs/test_misc_tcp_hdr_options.c
+> +++ b/tools/testing/selftests/bpf/progs/test_misc_tcp_hdr_options.c
+> @@ -29,6 +29,10 @@ unsigned int nr_syn = 0;
+>   unsigned int nr_fin = 0;
+>   unsigned int nr_hwtstamp = 0;
+>   
+> +bool nodelay_est_ok = true;
+> +bool nodelay_hdr_len_err = true;
+> +bool nodelay_write_hdr_err = true;
+
+I prefer "nodelay_hdr_len_reject"
+
 
 
