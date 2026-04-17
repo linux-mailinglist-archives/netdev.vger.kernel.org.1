@@ -1,130 +1,122 @@
-Return-Path: <netdev+bounces-279343-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279344-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QLcCM/dG4mlh4AAAu9opvQ
-	(envelope-from <netdev+bounces-279343-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 16:43:03 +0200
+	id WLg7GGFK4mnx4QAAu9opvQ
+	(envelope-from <netdev+bounces-279344-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 16:57:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A56341C2FE
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 16:42:59 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id A704441C4EB
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 16:57:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E154430211FA
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 14:42:58 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6F0923082695
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 14:55:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32E8A397E91;
-	Fri, 17 Apr 2026 14:42:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A48C33AEF23;
+	Fri, 17 Apr 2026 14:55:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WIAFWcVX"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="1NPGVzsD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10B8526AA91;
-	Fri, 17 Apr 2026 14:42:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8F4E2882CD;
+	Fri, 17 Apr 2026 14:55:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776436976; cv=none; b=Tb03SsoJPy/q0uwRL5P4CrqCo0yu28EIlmUi9jGiq3LwuSD9LnFtYSkdtPmjBAHmgve4f2j1/Pz3OgjMIYtNXkEwJLDSNYbAhRz9dcZY3CGJSkgNJaEP0PvNWfeqJyIBHZXhd9411vMJ1B7P7bdXVps6LlNKoUfko0kUV9ym2Ek=
+	t=1776437712; cv=none; b=Z4/MgnBShDxJ8USSrtzkCYhtA7CB0tB9ENTb/My4WLZ2/W2csyMTiqKms7e3qTycMPgnr2XKunqhXOM7SHQRDAf4Vd/u4UG/CHB+yzhEnL/KofJ9TphJWES3PmBhDJQ2c5HDke/bdiQMaMDE8QRDAUEeX4NMRM5eBV0BW6JYaqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776436976; c=relaxed/simple;
-	bh=8KFLICfcE1WXv7AuEFY/UpyQ2o9z9BQQPKpgSn0MhMY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AssHRk1uf0mlysw4X4I3FKRZJAypT7Wt3TlnNHOTQIj8D8WTZuRIenKx0VkOximuZ+LiErYL/gYW17OwCNzb35N4rdvikBt621XrVPJj8O1VlbkhZ33XuBCPv9ETnyMBPT/wP8C/1LXQ/iN/Cl1IfhT/eTj3FK0vOEhW0NPUdp8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WIAFWcVX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 104B6C19425;
-	Fri, 17 Apr 2026 14:42:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776436975;
-	bh=8KFLICfcE1WXv7AuEFY/UpyQ2o9z9BQQPKpgSn0MhMY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=WIAFWcVXiEbDNV/6pUvNtUtYCsdfPyaWnpZ+S3N5zWqFzb/QmJgUaL6I9xFAF+wK2
-	 Z54YIVaDfSvMCxDl8vxpme7FsyqO7IVO6MBiLtkHyUsI09/9bRZQNPGS6YYnT3y4AM
-	 oZkmyy34C1pPVUmS/R613dS/oKlsqMZVusZCT1JwsroKww+C6z4pQO4U88e7CYmUGV
-	 IupbU0MfnuZtzupGV+i4QYiXkmHQiukaG6xQTLvpKPJBBBQYKz2m6pAbqJWXuuO6ni
-	 lvXkXLqlS1G7l4ouvSLwT+32p044zs/SqVjO2wv9pQJYYuDCovpNNlOGKytgbKcBnH
-	 tkhosNTWBfhEg==
-Date: Fri, 17 Apr 2026 07:42:54 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Vikas Gupta <vikas.gupta@broadcom.com>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- andrew+netdev@lunn.ch, horms@kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, vsrama-krishna.nemani@broadcom.com,
- bhargava.marreddy@broadcom.com, rajashekar.hudumula@broadcom.com,
- ajit.khaparde@broadcom.com, dharmender.garg@broadcom.com,
- rahul-rg.gupta@broadcom.com
-Subject: Re: [PATCH net v2 1/2] bnge: fix initial HWRM sequence
-Message-ID: <20260417074254.42f01fa7@kernel.org>
-In-Reply-To: <CAHLZf_voEPTrfkuO6pJcchaQaOqJin8m7j-+hwMrjJcGFmJv0A@mail.gmail.com>
-References: <20260415151621.1104956-2-vikas.gupta@broadcom.com>
-	<20260417022201.1807745-1-kuba@kernel.org>
-	<CAHLZf_voEPTrfkuO6pJcchaQaOqJin8m7j-+hwMrjJcGFmJv0A@mail.gmail.com>
+	s=arc-20240116; t=1776437712; c=relaxed/simple;
+	bh=TYlSqOszeeYSwrMoI/JAgYy7vYiPOoFhR+pIxbvSuvE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JLu0SOHueyi3IpQYbRIpVgNYterp+kBS8gVHbZ7cNuNBzs0Z/rByeQBPpauS4Atb5+Kmg9Ehzc8L93nynpuxVVIBMuDunhXqA4pdTv2g8CzGJ/cW8xHDeBuM96lSIWpFhJdxzvyY7xYxNbn0lrClQdYnqWR/TSiPGBtD7MwcD4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=1NPGVzsD; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=F0v/lr1RlyvCfC0Fcoq03DcmH0KJc601cMR3ZELVMN8=; b=1NPGVzsDzrUAiCb5DHMS9YM/r5
+	mJkgVXVKCck1TZ5q+P7b+7O4/deMM85qN0DwnI92Vqlt7jS9H4C1Q4jNzMdmpTK0bMD4f8dp8G233
+	2uAywm3sHNp+Vm8QLR6cyFuEBRaBult2zUGAKRuhYPa9BPC5UiCroWqJfgUS9wnCl5d4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wDkas-00GQBf-5h; Fri, 17 Apr 2026 16:54:54 +0200
+Date: Fri, 17 Apr 2026 16:54:54 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Minda Chen <minda.chen@starfivetech.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Emil Renner Berthing <emil.renner.berthing@canonical.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	devicetree@vger.kernel.org
+Subject: Re: [net-next v2 1/5] dt-bindings: net: starfive,jh7110-dwmac:
+ Remove JH8100
+Message-ID: <27151bd8-6a3b-411f-94fd-7b1b932b9aa9@lunn.ch>
+References: <20260417024523.107786-1-minda.chen@starfivetech.com>
+ <20260417024523.107786-2-minda.chen@starfivetech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260417024523.107786-2-minda.chen@starfivetech.com>
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-279343-lists,netdev=lfdr.de];
-	URIBL_MULTI_FAIL(0.00)[sto.lore.kernel.org:server fail];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-279344-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_CC(0.00)[foss.st.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,canonical.com,vger.kernel.org,st-md-mailman.stormreply.com];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 8A56341C2FE
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A704441C4EB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, 17 Apr 2026 11:46:08 +0530 Vikas Gupta wrote:
-> > > -err_func_unrgtr:
-> > > -     bnge_fw_unregister_dev(bd);
-> > > +err_free_ctx_mem:
-> > > +     bnge_free_ctx_mem(bd);
-> > >       return rc;
-> > >  }  
-> >
-> > This error path appears to have the same regression. If
-> > bnge_hwrm_func_drv_rgtr() fails after bnge_func_qcaps() has already
-> > configured the backing store, freeing the context memory directly without
-> > unregistering might allow the hardware to access freed memory.  
-> 
-> Even if bnge_hwrm_func_drv_rgtr() fails, it is still safe to free the context
-> memory at the host because the driver unloads from this point.
+On Fri, Apr 17, 2026 at 10:45:19AM +0800, Minda Chen wrote:
+> Remove JH8100 dt-bindings because do not support it now.
 
-Looking closer, indeed, the way bnge_hwrm_func_drv_unrgtr() is written
-the AI suggestion is pointless. Hopefully you're right cause debugging
-FW corrupting host memory after reboot on bnxt is not fun.
+> StarFive have stopped JH8100 developing and will release it
+> outside.
 
-> AI reviews appear to ignore logic related to handling context memory
-> in the patch.
-> I see no valid comments on the patch.
+Is there a missing "not" in that sentence?
 
-Why is bnge_func_qcaps() allocating context mem? It may be the case
-that context mem has to be allocated but bnge_func_qcaps() doesn't
-sound like a function that'd perform such key part of init.
-Why not just move the alloc earlier in bnge_fw_register_dev() ?
+    Andrew
+
+---
+pw-bot: cr
 
