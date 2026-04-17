@@ -1,342 +1,309 @@
-Return-Path: <netdev+bounces-279378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279379-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MAaYCclm4mmT5gAAu9opvQ
-	(envelope-from <netdev+bounces-279378-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 18:58:49 +0200
+	id ePdeHYVr4mkf5wAAu9opvQ
+	(envelope-from <netdev+bounces-279379-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 19:19:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9846541D625
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 18:58:48 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id D069941D73D
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 19:19:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0265A3059300
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 16:54:50 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9CD1D3085EBD
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 17:18:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19976293B5F;
-	Fri, 17 Apr 2026 16:54:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3327A3A1A42;
+	Fri, 17 Apr 2026 17:18:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="dmsTJDaN";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="0RVhLaO/"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="FfCHPmpQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C0442628D;
-	Fri, 17 Apr 2026 16:54:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776444889; cv=fail; b=oFRKww2rdpg2h93J/5jS5XXYF/IwLDm76j2DptihgCXAJYuyfvhkgl07q5fMjCEiM/3vIlDOHEjXoYV9vp8h+W9E/ZF0tkUD29drcCwY4MsmEIPyCJM3g7LgOJhwnQ+TR1SEkwQnsqs8BlX9tEoXaDMpGiIBYINuquO/chKC1QA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776444889; c=relaxed/simple;
-	bh=EIGcXaICJfK639zVSg+sae6OHmvd4DrjsRlmCWBdi8c=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=HpIkWyBB+mhv6GogC8pMKfkIBWng8mm0j6J+Q5epnS6cxnctRlfypoWzq5tyRIsODFnoqzANpsilGWRPFdN7Utk9c16Xo1yl7OZfO1aPVssS3Mnb3V2FLWV3Li+iH6+4r5qxHt6R1GV6IfhvQSDO6tN3dAfdtlz3s9VBz5KJuWg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=dmsTJDaN; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=0RVhLaO/; arc=fail smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63HCJ99O3333884;
-	Fri, 17 Apr 2026 16:54:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=
-	corp-2025-04-25; bh=EPO/Kh85UhsCY6LETNPV60E3h/LlZusNXuMldTT5Bd4=; b=
-	dmsTJDaNyW92Wi1feRzs4uFk0v81dTYXLOUDlKq5X920zvm7Qevy0jgpoGu+7m8z
-	5IOAecEP6jQX2Rg+d9Bdzq3Jrtuvv/OR7Kx/VxPfuLu+ja4h/rm2ym9wgNHHwSBW
-	cUDvKAkTr1t0/BCoN9fa5qvoZRrBDCcPUd3waAM/KiNx6vxtlVO35MeTTxwr6wjd
-	FyO9tuXwzyPdfPeYbXqGn4GkwE+S8hgWXb/dvlyYhhZzhPMrgwFSHt7IXl1MlZjO
-	YOejozRKwFt722FzbLXmyfUaJlD3pX5dZpPS/Sy4je7dsKOcy50lVCAPZU6pqZ5v
-	0cxe9LJn/hxemWr1GQsfew==
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4dh85qj68s-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 17 Apr 2026 16:54:33 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.7/8.18.1.7) with ESMTP id 63HGsR0M022060;
-	Fri, 17 Apr 2026 16:54:32 GMT
-Received: from bl0pr03cu003.outbound.protection.outlook.com (mail-eastusazon11012014.outbound.protection.outlook.com [52.101.53.14])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 4dh7nr1axc-2
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 17 Apr 2026 16:54:30 +0000 (GMT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ZljExaGIeuwN3PE0EhLvFNN96e1ABWjEbm+yOTo3vjFK4O2FIGcHUi/KwMFUbwXD2RmDD5mBnk9A+BkW7GBVpIBAVOnP8T1If9UYiomRERM2cc1E0kPzihnbz8TjrdFKc996QO3kOwjlUaMEUarXxKmvYmI0ihxLp/DoDd8VFcNRQD6bJQ6cXatBl+mDSxUlECYYGlj5I3ysQFbCuRV2IvE4eT++b1fJXzLLtO89t7UP7vxQttk8qQY7cZGXp4z2cgVneXpyT8lc7OJOV21qQ+Jnqn1dpvoE0lv0qVl8AirkTRqjGuCCXv8zpYRnmk705TSQITo7Um5BBsfykWcbHQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=EPO/Kh85UhsCY6LETNPV60E3h/LlZusNXuMldTT5Bd4=;
- b=Ke4JAE9xmU21IQHO883joowPYYLWvcqUc7GiwayyisFbITm0+TPxocuPry/mjF1nDHi1u+vKDZk3iCydSxMvDXRVFZcDtgCjVDDjGsOJNMxMsD6XArpyelprnieZgk1g2zbea1lX/5iHBi3vXwDiGf8Q/TvMW/8j/B6oIHruk9fpvbuphBznRjklP9+YEi04Ih8vmfvbycGxVal/BAUZbvpkmvBBPMGeItq7sKrMQB06djaRQK+8w6CCPut506VMTr8nPQmAi8UD9Hfu9do6VxLxPHA45aV3wiw350ODRfaHOXfahsBBsxo8sbFFYJkNAkcvIQfoIWxHPDaK0Ci6Cg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=EPO/Kh85UhsCY6LETNPV60E3h/LlZusNXuMldTT5Bd4=;
- b=0RVhLaO/+7SMI/qlqQeDFz4HJFy1AxxsdfjLUQp513oPmXaXKDmmJl9JEvI02ttvQSWP3dRjvDKOq6uWRVlWdWpd3u0HsUrufQ42COSJNz8zYiQn1bEf0xOai5Xf+QQ34SHG2O3/puTAWtYp1o3j01bxIRIQf2/O+aKNoW5Rx9w=
-Received: from PH3PPFD88A49DCD.namprd10.prod.outlook.com
- (2603:10b6:518:1::7c9) by PH0PR10MB7027.namprd10.prod.outlook.com
- (2603:10b6:510:280::6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9818.25; Fri, 17 Apr
- 2026 16:53:58 +0000
-Received: from PH3PPFD88A49DCD.namprd10.prod.outlook.com
- ([fe80::bc8b:3c62:9c11:f95b]) by PH3PPFD88A49DCD.namprd10.prod.outlook.com
- ([fe80::bc8b:3c62:9c11:f95b%6]) with mapi id 15.20.9818.017; Fri, 17 Apr 2026
- 16:53:57 +0000
-Message-ID: <feddd108-998d-4514-aa51-75e3cc0f3cb9@oracle.com>
-Date: Fri, 17 Apr 2026 09:53:52 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] rds: zero per-item info buffer before handing it to
- visitors
-To: Michael Bommarito <michael.bommarito@gmail.com>,
-        Allison Henderson <achender@kernel.org>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-        linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com,
-        linux-kernel@vger.kernel.org
-References: <20260417141916.494761-1-michael.bommarito@gmail.com>
-Content-Language: en-US
-From: Sharath Srinivasan <sharath.srinivasan@oracle.com>
-In-Reply-To: <20260417141916.494761-1-michael.bommarito@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PH5P220CA0012.NAMP220.PROD.OUTLOOK.COM
- (2603:10b6:510:34a::9) To PH3PPFD88A49DCD.namprd10.prod.outlook.com
- (2603:10b6:518:1::7c9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 262E4397680
+	for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 17:18:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776446335; cv=none; b=kkQtQ00l5sfNyqnJGWF5z9ZvwScLFeUKQZT69jge3pW8j1p5kO9ubPJJ28QNHstJZL65/9IkVHoagbGc9MDOGmsR4CAuNeR4nUc18Z/1G1+Pr/tgRayl9N2e434UvraMZD2bp7Taw8mIDnxgxQ6XQZwthGZR3ZE6DNq7dgrYivc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776446335; c=relaxed/simple;
+	bh=z8u6t67rEtqOmMgDkP0y+Xtdn2TUCsW6a2uvyzmdBxY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fH39QMbgSgrxDfH+paz+R33GW3Bhob+ls527+SvzYfK8d2ztbVN8GITb6tlnHF0hSZy0CyP3wJzpnvJjG9p+2okStcKBYe+SD5qtXrHPk3DFRevIZ7Zrw1zeN+RzPglRjG49SWhKezDD6cdlUPSbAWbQDMnjQzBXZiCKmLDyawA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=FfCHPmpQ; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=4Eu/Nmy9RBp394Fay93CwfFWHMTG9W++HwH4+v2qyo0=; b=FfCHPmpQSvWkvspEUw6Iy5jKZc
+	Ylmnth5FmXZIaWad0DvLKoDC9zsb3qTTNKArnXE/D5JXcCypU71wdDuOiNkM/n1LY4Hzy2fKwVxk1
+	zQdzcv+OUj4TqW0IN9Wrh3r3+WuM+7M5bqDCreAdt0/Ofhm4Xl6Zi1dA66dGIqF0rMuUVACp23Yld
+	LW++i9DiZ3Ww42i9tZSizejzhcMqArjrxzP6krhr8HkAeksy+AT4eiL3gnkQbipDeNSQWN/u1o4Uj
+	/zMS3e/sBvN/vKA1+9uEEud3MEf0AI80kksK8j2yLLiyHo6lD+R+HbDjhqbOHM7bXeh2r/UT4rTcD
+	/FOWqhqg==;
+Received: from localhost ([127.0.0.1])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1wDmps-000Oa5-0q;
+	Fri, 17 Apr 2026 19:18:32 +0200
+From: Daniel Borkmann <daniel@iogearbox.net>
+To: kuba@kernel.org
+Cc: edumazet@google.com,
+	dsahern@kernel.org,
+	tom@herbertland.com,
+	willemdebruijn.kernel@gmail.com,
+	idosch@nvidia.com,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org
+Subject: [PATCH net] ipv6: Implement limits on extension header parsing
+Date: Fri, 17 Apr 2026 19:18:31 +0200
+Message-ID: <20260417171831.687053-1-daniel@iogearbox.net>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH3PPFD88A49DCD:EE_|PH0PR10MB7027:EE_
-X-MS-Office365-Filtering-Correlation-Id: 12aaa086-b106-4e1d-186b-08de9ca1e9a5
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|376014|1800799024|366016|56012099003|18002099003|22082099003;
-X-Microsoft-Antispam-Message-Info:
-	TRsZ6FQxiU3c49KZo42RbUV8oJaiooLZlm0rAkjgzTUf8N+yH0Rwba5GOo000eTyoPIFctY8drCtc5YeJINlbjV/QoQ+5tjbFcQf+/KRfaoKnCMNV1fVm7tyMomUxRdNMfbI7+HVlsBlOD8TB1q8tFzcOMMQxu/iqsqzWHiP6ztk/cb78U0TdHyI+k5spi/0BjxnB3Mcp7QOsLgu/IydO2meQTHbQhHjo3UoCNjOsCnNXqSz1+4yLhIgY0B4lz3gYVCzKOlQwld0xOJqP3RwA+uUSnFomgEAj6dyU3T/E8Rz1DGDW+86pYTM5Vw6x7XxqEsMbez9LzCzs5YslzBSC8nxNe8oRqqsgmEM/IWQItbewyyK6wmtkryUtNwSD9WjzqyWMQWd1iPjowI4Q2KPR/9/8ah2XIqWTIuFxa/0P4RxFmIjDT7kiRM86U1VYejbuyPsybKwd2P7GnRzAew38WkhzW3WHA27nWHPvK0xGKb9JjT+C/SBeurdtf3d7fcydlxqyDIG+nI5VL1pJpP70V9pMPCfPaHLnpzFZMSng6gizlYEhvoqJC8pRcL06Yb0SO6wCi/0TBeIWBe4gfYXbhftGi79Y4ZOpqyjqJjEpzu7oH+1mPdkncsjGoUUqLzJX1u+MllDGRDiFWbIGP1+DT61jQIF7oW15+1uMAaRrmDvtY7GbKVRBhUI7CYOwGih+eZDc3uOezRaI31mI8uGrd2eevJvNUZFkhDpj9FegjM=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH3PPFD88A49DCD.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016)(56012099003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?OHhMdW54RGNuNnFhWkVXL1Q5T0p5K0c5ZDdwb0pTaDlzREVMc1ZNNlZzMHpZ?=
- =?utf-8?B?Qk5oaG5oZ3RwK09DbFVkNW9uY3dBTllkakp5Y3JpT3Q2RmloRklvTUFDRTM2?=
- =?utf-8?B?WUdQb1hYb3h5TFU3SWJVZU1RU2RhY3pHOE9jUHZzNU9wb01WbDR5KzVsWWRu?=
- =?utf-8?B?Vlk3cUlOWVdLQ0RRSDFmeWV1cVU2YnpyRmdqYzFwV05pK2NPdnYxT0I2OEFS?=
- =?utf-8?B?MmpMR1VWdTVFOUJockNFa0hoUkhXQ0RjUmhrT25YelY4MTVic3l2T2JqOFl1?=
- =?utf-8?B?Zk9xRHN2Rk1HQmxRWUhXcGZ4R3ZxZCtQUGpxaFJuVEtyRDBFK0xETldUczdj?=
- =?utf-8?B?akcwemhpRkRtUFZvVHhkNHhDRDhTZ0taZDNHSzVvelZRLzltaUtRZ2VYMHlx?=
- =?utf-8?B?cktaM3Z1cVV1TWVtRWRpa3dLVG96aTRLK2tyVzFoTFp5emhiT1dNUlNuM0ZS?=
- =?utf-8?B?dTRRai9BanRodm9zWlJBZ1JENUdVZ2VSSmlFU1k5bW5wYThZV0QwU1NiWi9x?=
- =?utf-8?B?cHZSZGRxUVZ3R2wzYklGSTI3R25GWU9RSHNIZUdLTkQvZzM5VjVpVnJTa3F6?=
- =?utf-8?B?WlBvcGJJdHpzaDUzR09VZ3lOWEFoL0dJbFV3eG42YStBem4yYXcyT1BaRk1q?=
- =?utf-8?B?TGZ5YVNSRmZSQjM3Y0h6RGJqRjRCZlpYMnVGL2FsRHJuejJabHFMZ04wOTM0?=
- =?utf-8?B?ZVdjcXNtV0ZVTHZSSTVNK3JKZ3BpajFPc2ZJSGRaYjVJTzlxYjRpL3hGU1Jp?=
- =?utf-8?B?blZ4ODY5ZDVzSFVFMDA0ZWVraGdpbjAwaThRVDA5UlFsbzZ4OHJiMWh5YzdV?=
- =?utf-8?B?d0s0K2F4NC9PWktOdkQ1OWR2eTV6QURRNm8yR1VCc1RNRDN5ME9JWllZOThG?=
- =?utf-8?B?dTBGQzVWb3hRMXFLSGZBVitNUjZWTWJGVkl2YWtVSnA2bXdPcVpWM0Qrbjc3?=
- =?utf-8?B?OFR4NmNkbEcveU1xdDZaOXZ1dEMvZzBlZXo0WWhZYllRZmU2Snc2eFM2aUlK?=
- =?utf-8?B?UHZMUmNOUkJIT3Y3Y3hWR2tXOWlVZEhzSzJoREtzaDdUazV1M3FlcThGcDM4?=
- =?utf-8?B?YzdqZWh6MTl5WWI2THkxOG9rd1JVRDd1aFUweFNPYlY4eXFDUUJwaTM4YVFT?=
- =?utf-8?B?dnRCajY4TDlZNEJBeGwyV0tZNnU3ZzJTRUNiaXFqenNCRXQrQWVEcVloV0ZB?=
- =?utf-8?B?OVFSdE9MYSt0cTA4dzIzcC9aU3AwRkdvWEZKaFdabXlWOEFDNlVMRWErRncr?=
- =?utf-8?B?aGpyQ3kwZ3hOVkdXQ0JhQWFrL2lxOW9BWFNqU3JScHo5SGJsZWlITXZPSmli?=
- =?utf-8?B?WVlNUFdKSFVuVUpHd3pra0xpNVZWdlI4YVdaeDRHdTRVemUrampCelcyaVNs?=
- =?utf-8?B?ZFVzMzhJZDJYeFBoZkZHSjBXR3o3cWJBMEp0ZTl0a3hRYkNaaXRvUUVjamVU?=
- =?utf-8?B?aDRRVXhCcDJmaURwMVBjWi9CaTNhekUrQ3hRc1k3RmxiRGxpVDROSS9LTEZw?=
- =?utf-8?B?OTk5N3FxQzFBNGxnaWdQOHVxS1U5WFA0THBTZXBXdWNVeHV6bGZkSkx2VGc2?=
- =?utf-8?B?UktsWGFqd1NlWDYxVENBNlRjZzAwRXI5OU5rRUZwaHpzdWtKZUI1VjVQVFhH?=
- =?utf-8?B?MENvY1pPWnZTSGx4Z2VHQ3BSMWs4Q2UwZlZUbFFDVXBoYUthTE5MY0VPM1gy?=
- =?utf-8?B?MmhaVmhibnlTYVhCWERRYkZmcmpNVkhSc3RkTGdWRWI3eG1OTEJRZ013Tjl3?=
- =?utf-8?B?U0U5bFhDYnZKSVdGOWNvc3A4SHRjTlVGTGcwcGk0eGVtRERrVmVRc0xmQkZl?=
- =?utf-8?B?YkJJVjFrRDFwdFBDaFV1WGZEeTRvdGxzOUVybnl0Mm1SbUZicjBYaCs2TDBs?=
- =?utf-8?B?b0IyUkN6ZmFkc2ZXWjgzNnJiV29LcWtEd1NxMGNXU044Nm1hTmpwWmpjQXdC?=
- =?utf-8?B?T0tHYTQvMU83SUcyQUpnenRHQ3hrWDQ1VlpiNDVCR2ZuYUlnZThCRVBHZlNo?=
- =?utf-8?B?NmI3WHZQbVdEL0hEYUFMNUg3RTZqVXRDTFlXN1IzTGIweURFbWpsWHFvd1Y0?=
- =?utf-8?B?bHJGODZjVHBweHlSZldsR2pQRTRCMW8reUNnRGNseFppeDlnYU80SHRJRTRC?=
- =?utf-8?B?VzIxUWFtUDRsYmozWHdQRk9nRzhReDQ4YXQvbDZDbmo3UEZSbHpNayttM2xh?=
- =?utf-8?B?bGdtRzNjV01pUm4yNGVFbjhBb0lJRld6Z3ZFTDZ5eWRSWnRXaG9EanJ2N2I2?=
- =?utf-8?B?Y0JFMDFHWFlxcnh0VVQ3ckNYRHU2c1l2RFdqcTdmMGRyd0pTWmxPRUViZm41?=
- =?utf-8?B?TUgraU53bW9pMnEzMEtrSjdxcm9SRmlaOFhrM1ZlWnlvRm01cmJrWUVKdzJu?=
- =?utf-8?Q?wBuleNssd2SioCyA=3D?=
-X-Exchange-RoutingPolicyChecked:
-	b7YPuezQF/swtLYeng96BqDp9Jk9DNSLXKpiBQYpOEjBs+9HNPIFmSreW3FOdDUTTpUeTkmDiUR1/nnLU8Yyp5VXUjjrbvZnX7WObVB6dl5HNg0NlSQQh7M/Edraml9SMTpQ2rq+jNKATVlDAoz5fcOxqBKEYWM29OXKefZYo6DVvfqjnsz4I6wed+2cE3OOH5oH5fWPkxXEvWjyZ5RXauEeda7qz5rfjpzluT2zJ2ElRx0zfm9F71vP4vhve79SocuEsgbIVeF3jE7ScCsQHL2sM05Fx7QhntjxQZvwSi8a1eG0N05hnz94WJ7hd9ZxHywFdHYZYa+vxghKkksciw==
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	GqyxR1kdDhcpYxG5MhYGhRPLZUAOy3rbhqKKBkvFvel3shsJbrvyeJy1RLjy8XcSPau6Ttn+DAmS2a0cvi9eRDMFNAceKqzWRLzeoYP0y9/SBNsaxdisElk7kwV4EKKO67X9ZGQt3LxdApoyuWuKPO9bw2hBhGnXr9wulshUW04T8ZrvD/naBzChRXIJbrIgD49MXNqt+W8w2RByt3fYeEu5uXDUDlvzd1/sJjFEwTgeDgVrlLj3u6wxTW1SoHbNPzqLUfyP3rMkDR74NsffY+lGddojbM8H+FR+51LLq7u7QeZz5aFw6T18oFJbcUuTrPedyCChQt7rWnyYVBQuJPp+9/39Ui6ZUS112b2VyACBduYUDQ5CstUJ44Yxa6m81C1eJCnRi6+uNYUsFP/E1oOyiWA16Rq8qZN6Ix1vAUs7uX0lJeB8ftgZ3Dpj14kkQbyJPXwjXkybv95EK8oVcmcUdh/q3KfqF5drqaY9YkdNmh3nNVSF2xHdSob6NKtef/SPUmIqd3coIJcpXp4yFmbXJxVZPxVAbCKExGM4sVRXF0NyKaNV+HxvIN+4dx1fde5IhNQRGx9xiG3NNo1hStE6WRDa8AyL8IJib1yr9TY=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 12aaa086-b106-4e1d-186b-08de9ca1e9a5
-X-MS-Exchange-CrossTenant-AuthSource: PH3PPFD88A49DCD.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Apr 2026 16:53:57.4339
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: RHHUOaoz5pu9wm0ghV/zBW9BupTiBIm8kVhkjujQ+OhjYp17qqm/8Vf6XJLkth4TlfHHVARs4BCSbFLbcWiiFzy5KYgn0lgAJkS1iY6rgPg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR10MB7027
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-04-17_01,2026-04-17_04,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- mlxlogscore=999 mlxscore=0 phishscore=0 adultscore=0 bulkscore=0
- lowpriorityscore=0 malwarescore=0 spamscore=0 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.19.0-2604070000 definitions=main-2604170170
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDE3MDE3MCBTYWx0ZWRfXwUHrnEFIidiI
- igAC77r1Zc2hplqedZz9LGXwSW64gKbn6x3RplL/nazQYOk7413NPX33xOxapcrHo7FkB7iXiSV
- yl1O+4v4KZ6ftHghs1Z1BslL1SnkkYH4iEByuGNZCWdx38pZ25D9XWEsqwIrBhDJr0HXm333Tfh
- P2nygSDGztLdrd1KelKLaRCKrKXzXNSWLMtCLG9t7V/vJChf+ospYGQP8utMV95LR5StmcGc0Pk
- zd5D+zLl85RGAUKN9/2F7xOmyHMpKF/zC0N0zkmoKG1xdj+skOHDqUgb8BMdSImUKPEZU3VOEBV
- voiSfWj7mBWZ+V8yMdlt7hZV5oq9wX8d8qwBX/JNAS3lsztfFC0CiUy74z11yPal3LFKIAYSLEi
- m8bDIW00DRSCjPlxWUqSAVdvpca+umy664tGRJ1mVGVZ/p7fQlTmoaA9yUL7uOEsWW8PfXp24Qn
- 1P+8hS1gJrFpRcz2RdWGeBh/1tblpFBJGOzW60iQ=
-X-Proofpoint-GUID: zw-87A9rIgKcRmxzbk13tuEUpSUQBTLG
-X-Authority-Analysis: v=2.4 cv=V49NF+ni c=1 sm=1 tr=0 ts=69e265c9 b=1 cx=c_pps
- a=qoll8+KPOyaMroiJ2sR5sw==:117 a=qoll8+KPOyaMroiJ2sR5sw==:17
- a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
- a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
- a=A5OVakUREuEA:10 a=GoEa3M9JfhUA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=jiCTI4zE5U7BLdzWsZGv:22 a=RD47p0oAkeU5bO7t-o6f:22 a=yPCof4ZbAAAA:8
- a=pGLkceISAAAA:8 a=IGy2Jv0T9ZIs4tJZkWwA:9 a=QEXdDO2ut3YA:10 cc=ntf
- awl=host:12292
-X-Proofpoint-ORIG-GUID: zw-87A9rIgKcRmxzbk13tuEUpSUQBTLG
-X-Spamd-Result: default: False [1.34 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: Clear (ClamAV 1.4.3/27974/Fri Apr 17 08:24:08 2026)
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[oracle.com,reject];
-	R_DKIM_ALLOW(-0.20)[oracle.com:s=corp-2025-04-25,oracle.onmicrosoft.com:s=selector2-oracle-onmicrosoft-com];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[iogearbox.net,reject];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[iogearbox.net:s=default2302];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-279378-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[oracle.com:email,oracle.com:dkim,oracle.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,oracle.onmicrosoft.com:dkim];
-	FREEMAIL_TO(0.00)[gmail.com,kernel.org,davemloft.net,google.com,redhat.com];
+	FREEMAIL_CC(0.00)[google.com,kernel.org,herbertland.com,gmail.com,nvidia.com,redhat.com,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-279379-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[oracle.com:+,oracle.onmicrosoft.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[iogearbox.net:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MIME_TRACE(0.00)[0:+];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sharath.srinivasan@oracle.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[9]
-X-Rspamd-Queue-Id: 9846541D625
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,iogearbox.net:email,iogearbox.net:dkim,iogearbox.net:mid]
+X-Rspamd-Queue-Id: D069941D73D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+ipv6_{skip_exthdr,find_hdr}() and ip6_tnl_parse_tlv_enc_lim() iterate
+over IPv6 extension headers until they find a non-extension-header
+protocol or run out of packet data. The loops have no iteration counter,
+relying solely on the packet length to bound them. For a crafted packet
+with 8-byte extension headers filling a 64KB jumbogram, this means a
+worst case of up to ~8k iterations with a skb_header_pointer call each.
+ipv6_skip_exthdr(), for example, is used where it parses the inner
+quoted packet inside an incoming ICMPv6 error:
 
-On 2026-04-17 7:19 a.m., Michael Bommarito wrote:
-> Yet another from my "clanker."  This only applies to people who
-> don't use CONFIG_INIT_STACK_ALL_ZERO, but I presume that's
-> still enough people that it's worth backporting since it can
-> be chained through leaked addresses to defeat KASLR.
-> 
-> rds_for_each_conn_info() and rds_walk_conn_path_info() both hand a
-> caller-allocated on-stack u64 buffer to a per-connection visitor and
-> then copy the full item_len bytes back to user space via
-> rds_info_copy() regardless of how much of the buffer the visitor
-> actually wrote.
-> 
-> rds_ib_conn_info_visitor() and rds6_ib_conn_info_visitor() only
-> write a subset of their output struct when the underlying
-> rds_connection is not in state RDS_CONN_UP (src/dst addr, tos, sl
-> and the two GIDs via explicit memsets).  Several u32 fields
-> (max_send_wr, max_recv_wr, max_send_sge, rdma_mr_max, rdma_mr_size,
-> cache_allocs) and the 2-byte alignment hole between sl and
-> cache_allocs remain as whatever stack contents preceded the visitor
-> call and are then memcpy_to_user()'d out to user space.
-> 
-> struct rds_info_rdma_connection and struct rds6_info_rdma_connection
-> are the only rds_info_* structs in include/uapi/linux/rds.h that are
-> not marked __attribute__((packed)), so they have a real alignment
-> hole.  The other info visitors (rds_conn_info_visitor,
-> rds6_conn_info_visitor, rds_tcp_tc_info, ...) write all fields of
-> their packed output struct today and are not known to be vulnerable,
-> but a future visitor that adds a conditional write-path would have
-> the same bug.
-> 
-> Reproduction on a kernel built without CONFIG_INIT_STACK_ALL_ZERO=y:
-> a local unprivileged user opens AF_RDS, sets SO_RDS_TRANSPORT=IB,
-> binds to a local address on an RDMA-capable netdev (rxe soft-RoCE on
-> any netdev is sufficient), sendto()'s any peer on the same subnet
-> (fails cleanly but installs an rds_connection in the global hash in
-> RDS_CONN_CONNECTING), then calls getsockopt(SOL_RDS,
-> RDS_INFO_IB_CONNECTIONS).  The returned 68-byte item contains 26
-> bytes of stack garbage including kernel text/data pointers:
-> 
->     0..7   0a 63 00 01 0a 63 00 02     src=10.99.0.1 dst=10.99.0.2
->     8..39  00 ...                      gids (memset-zeroed)
->     40..47 e0 92 a3 81 ff ff ff ff     kernel pointer (max_send_wr)
->     48..55 7f 37 b5 81 ff ff ff ff     kernel pointer (rdma_mr_max)
->     56..59 01 00 08 00                 rdma_mr_size (garbage)
->     60..61 00 00                       tos, sl
->     62..63 00 00                       alignment padding
->     64..67 18 00 00 00                 cache_allocs (garbage)
-> 
-> Fix by zeroing the per-item buffer in both rds_for_each_conn_info()
-> and rds_walk_conn_path_info() before invoking the visitor.  This
-> covers the IPv4/IPv6 IB visitors and hardens all current and future
-> visitors against the same class of bug.
-> 
-> No functional change for visitors that fully populate their output.
-> 
-> Fixes: ec16227e1414 ("RDS/IB: Infiniband transport")
+  - icmpv6_rcv
+    - checksum validation
+    - case ICMPV6_DEST_UNREACH
+      - icmpv6_notify
+        - pskb_may_pull()       <- pull inner IPv6 header
+        - ipv6_skip_exthdr()    <- iterates here
+        - pskb_may_pull()
+        - ipprot->err_handler() <- sk lookup (matching sk not required)
 
-LGTM. Reviewed-by: Sharath Srinivasan <sharath.srinivasan@oracle.com>
+The per-iteration cost of ipv6_skip_exthdr itself is generally light,
+but skb_header_pointer becomes more costly on reassembled packets: the
+first ~1KB of the inner packet are in the skb's linear area, but the
+remaining ~63KB are in the frag_list where skb_copy_bits is needed to
+read data.
 
-Thanks,
-Sharath
+Add a configurable limit via a new sysctl net.ipv6.max_ext_hdrs_number
+(default 32, minimum 1). All three extension header walking functions
+are bound by this limit. The sysctl is in line with commit 47d3d7ac656a
+("ipv6: Implement limits on Hop-by-Hop and Destination options"). The
+init_net is used since plumbing a struct net * through all helpers
+would touch a lot of callsites.
 
-> Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
-> Assisted-by: Claude:claude-opus-4-7
-> ---
->  net/rds/connection.c | 14 ++++++++++++++
->  1 file changed, 14 insertions(+)
-> 
-> diff --git a/net/rds/connection.c b/net/rds/connection.c
-> index 412441aaa298..c10b7ed06c49 100644
-> --- a/net/rds/connection.c
-> +++ b/net/rds/connection.c
-> @@ -701,6 +701,13 @@ void rds_for_each_conn_info(struct socket *sock, unsigned int len,
->  	     i++, head++) {
->  		hlist_for_each_entry_rcu(conn, head, c_hash_node) {
->  
-> +			/* Zero the per-item buffer before handing it to the
-> +			 * visitor so any field the visitor does not write -
-> +			 * including implicit alignment padding - cannot leak
-> +			 * stack contents to user space via rds_info_copy().
-> +			 */
-> +			memset(buffer, 0, item_len);
-> +
->  			/* XXX no c_lock usage.. */
->  			if (!visitor(conn, buffer))
->  				continue;
-> @@ -750,6 +757,13 @@ static void rds_walk_conn_path_info(struct socket *sock, unsigned int len,
->  			 */
->  			cp = conn->c_path;
->  
-> +			/* Zero the per-item buffer for the same reason as
-> +			 * rds_for_each_conn_info(): any byte the visitor
-> +			 * does not write (including alignment padding) must
-> +			 * not leak stack contents via rds_info_copy().
-> +			 */
-> +			memset(buffer, 0, item_len);
-> +
->  			/* XXX no cp_lock usage.. */
->  			if (!visitor(cp, buffer))
->  				continue;
+There's an ongoing IETF draft-ietf-6man-eh-limits-18 that states that
+8 extension headers before the transport header is the baseline which
+routers MUST handle; section 7 details also why limits are needed.
+
+Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+---
+ Documentation/networking/ip-sysctl.rst |  7 +++++++
+ include/net/ipv6.h                     |  2 ++
+ include/net/netns/ipv6.h               |  1 +
+ net/ipv6/af_inet6.c                    |  1 +
+ net/ipv6/exthdrs_core.c                | 11 +++++++++++
+ net/ipv6/ip6_tunnel.c                  |  5 +++++
+ net/ipv6/sysctl_net_ipv6.c             |  8 ++++++++
+ 7 files changed, 35 insertions(+)
+
+diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
+index 6921d8594b84..4559a956bbd9 100644
+--- a/Documentation/networking/ip-sysctl.rst
++++ b/Documentation/networking/ip-sysctl.rst
+@@ -2503,6 +2503,13 @@ max_hbh_length - INTEGER
+ 
+ 	Default: INT_MAX (unlimited)
+ 
++max_ext_hdrs_number - INTEGER
++	Maximum number of IPv6 extension headers allowed in a packet.
++	Limits how many extension headers will be traversed. The value
++	is read from the initial netns.
++
++	Default: 32
++
+ skip_notify_on_dev_down - BOOLEAN
+ 	Controls whether an RTM_DELROUTE message is generated for routes
+ 	removed when a device is taken down or deleted. IPv4 does not
+diff --git a/include/net/ipv6.h b/include/net/ipv6.h
+index 53c5056508be..d7f0d55e6918 100644
+--- a/include/net/ipv6.h
++++ b/include/net/ipv6.h
+@@ -90,6 +90,8 @@ struct ip_tunnel_info;
+ #define IP6_DEFAULT_MAX_DST_OPTS_LEN	 INT_MAX /* No limit */
+ #define IP6_DEFAULT_MAX_HBH_OPTS_LEN	 INT_MAX /* No limit */
+ 
++#define IP6_DEFAULT_MAX_EXT_HDRS_CNT	 32
++
+ /*
+  *	Addr type
+  *	
+diff --git a/include/net/netns/ipv6.h b/include/net/netns/ipv6.h
+index 34bdb1308e8f..5be4dd1c9ae8 100644
+--- a/include/net/netns/ipv6.h
++++ b/include/net/netns/ipv6.h
+@@ -54,6 +54,7 @@ struct netns_sysctl_ipv6 {
+ 	int max_hbh_opts_cnt;
+ 	int max_dst_opts_len;
+ 	int max_hbh_opts_len;
++	int max_ext_hdrs_cnt;
+ 	int seg6_flowlabel;
+ 	u32 ioam6_id;
+ 	u64 ioam6_id_wide;
+diff --git a/net/ipv6/af_inet6.c b/net/ipv6/af_inet6.c
+index 4cbd45b68088..ed7fe6e4a6bd 100644
+--- a/net/ipv6/af_inet6.c
++++ b/net/ipv6/af_inet6.c
+@@ -965,6 +965,7 @@ static int __net_init inet6_net_init(struct net *net)
+ 	net->ipv6.sysctl.flowlabel_state_ranges = 0;
+ 	net->ipv6.sysctl.max_dst_opts_cnt = IP6_DEFAULT_MAX_DST_OPTS_CNT;
+ 	net->ipv6.sysctl.max_hbh_opts_cnt = IP6_DEFAULT_MAX_HBH_OPTS_CNT;
++	net->ipv6.sysctl.max_ext_hdrs_cnt = IP6_DEFAULT_MAX_EXT_HDRS_CNT;
+ 	net->ipv6.sysctl.max_dst_opts_len = IP6_DEFAULT_MAX_DST_OPTS_LEN;
+ 	net->ipv6.sysctl.max_hbh_opts_len = IP6_DEFAULT_MAX_HBH_OPTS_LEN;
+ 	net->ipv6.sysctl.fib_notify_on_flag_change = 0;
+diff --git a/net/ipv6/exthdrs_core.c b/net/ipv6/exthdrs_core.c
+index 49e31e4ae7b7..917307877cbb 100644
+--- a/net/ipv6/exthdrs_core.c
++++ b/net/ipv6/exthdrs_core.c
+@@ -4,6 +4,8 @@
+  * not configured or static.
+  */
+ #include <linux/export.h>
++
++#include <net/net_namespace.h>
+ #include <net/ipv6.h>
+ 
+ /*
+@@ -72,7 +74,9 @@ EXPORT_SYMBOL(ipv6_ext_hdr);
+ int ipv6_skip_exthdr(const struct sk_buff *skb, int start, u8 *nexthdrp,
+ 		     __be16 *frag_offp)
+ {
++	int exthdr_max = READ_ONCE(init_net.ipv6.sysctl.max_ext_hdrs_cnt);
+ 	u8 nexthdr = *nexthdrp;
++	int exthdr_cnt = 0;
+ 
+ 	*frag_offp = 0;
+ 
+@@ -80,6 +84,8 @@ int ipv6_skip_exthdr(const struct sk_buff *skb, int start, u8 *nexthdrp,
+ 		struct ipv6_opt_hdr _hdr, *hp;
+ 		int hdrlen;
+ 
++		if (unlikely(exthdr_cnt++ >= exthdr_max))
++			return -1;
+ 		if (nexthdr == NEXTHDR_NONE)
+ 			return -1;
+ 		hp = skb_header_pointer(skb, start, sizeof(_hdr), &_hdr);
+@@ -188,8 +194,10 @@ EXPORT_SYMBOL_GPL(ipv6_find_tlv);
+ int ipv6_find_hdr(const struct sk_buff *skb, unsigned int *offset,
+ 		  int target, unsigned short *fragoff, int *flags)
+ {
++	int exthdr_max = READ_ONCE(init_net.ipv6.sysctl.max_ext_hdrs_cnt);
+ 	unsigned int start = skb_network_offset(skb) + sizeof(struct ipv6hdr);
+ 	u8 nexthdr = ipv6_hdr(skb)->nexthdr;
++	int exthdr_cnt = 0;
+ 	bool found;
+ 
+ 	if (fragoff)
+@@ -216,6 +224,9 @@ int ipv6_find_hdr(const struct sk_buff *skb, unsigned int *offset,
+ 			return -ENOENT;
+ 		}
+ 
++		if (unlikely(exthdr_cnt++ >= exthdr_max))
++			return -EBADMSG;
++
+ 		hp = skb_header_pointer(skb, start, sizeof(_hdr), &_hdr);
+ 		if (!hp)
+ 			return -EBADMSG;
+diff --git a/net/ipv6/ip6_tunnel.c b/net/ipv6/ip6_tunnel.c
+index 0b53488a9229..78e849e167ca 100644
+--- a/net/ipv6/ip6_tunnel.c
++++ b/net/ipv6/ip6_tunnel.c
+@@ -396,15 +396,20 @@ ip6_tnl_dev_uninit(struct net_device *dev)
+ 
+ __u16 ip6_tnl_parse_tlv_enc_lim(struct sk_buff *skb, __u8 *raw)
+ {
++	int exthdr_max = READ_ONCE(init_net.ipv6.sysctl.max_ext_hdrs_cnt);
+ 	const struct ipv6hdr *ipv6h = (const struct ipv6hdr *)raw;
+ 	unsigned int nhoff = raw - skb->data;
+ 	unsigned int off = nhoff + sizeof(*ipv6h);
+ 	u8 nexthdr = ipv6h->nexthdr;
++	int exthdr_cnt = 0;
+ 
+ 	while (ipv6_ext_hdr(nexthdr) && nexthdr != NEXTHDR_NONE) {
+ 		struct ipv6_opt_hdr *hdr;
+ 		u16 optlen;
+ 
++		if (unlikely(exthdr_cnt++ >= exthdr_max))
++			break;
++
+ 		if (!pskb_may_pull(skb, off + sizeof(*hdr)))
+ 			break;
+ 
+diff --git a/net/ipv6/sysctl_net_ipv6.c b/net/ipv6/sysctl_net_ipv6.c
+index d2cd33e2698d..93f865545a7c 100644
+--- a/net/ipv6/sysctl_net_ipv6.c
++++ b/net/ipv6/sysctl_net_ipv6.c
+@@ -135,6 +135,14 @@ static struct ctl_table ipv6_table_template[] = {
+ 		.extra1		= SYSCTL_ZERO,
+ 		.extra2		= &flowlabel_reflect_max,
+ 	},
++	{
++		.procname	= "max_ext_hdrs_number",
++		.data		= &init_net.ipv6.sysctl.max_ext_hdrs_cnt,
++		.maxlen		= sizeof(int),
++		.mode		= 0644,
++		.proc_handler	= proc_dointvec_minmax,
++		.extra1		= SYSCTL_ONE,
++	},
+ 	{
+ 		.procname	= "max_dst_opts_number",
+ 		.data		= &init_net.ipv6.sysctl.max_dst_opts_cnt,
+-- 
+2.43.0
 
 
