@@ -1,230 +1,148 @@
-Return-Path: <netdev+bounces-279380-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279381-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YVSqDgZu4mmp5wAAu9opvQ
-	(envelope-from <netdev+bounces-279380-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 19:29:42 +0200
+	id 4FkMI05u4mmp5wAAu9opvQ
+	(envelope-from <netdev+bounces-279381-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 19:30:54 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8739641D7D6
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 19:29:41 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5BFB41D7F4
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 19:30:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3682130071F7
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 17:29:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9DB06300E720
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 17:30:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 939011B4156;
-	Fri, 17 Apr 2026 17:29:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01E6E2BE03C;
+	Fri, 17 Apr 2026 17:30:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Jtian54t"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="y73whGyi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3666D27E049;
-	Fri, 17 Apr 2026 17:29:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA0B42FC037
+	for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 17:30:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776446979; cv=none; b=cDdnsNt7hXhpOgJsvNK0oRqQfSqhIGisf3GYUUZ8zgSbE8dJVAdUvQMX5qKIX6bVIrTELr4eop0SPV6zSGExMYM82o0qtJuK22xYeSVEM6aNLqfETtK3mJaik2B4w5y9NhUAWEL7qUGd/rI4Doiu94HrcS8lTtUFOAFgQ1dAQ+8=
+	t=1776447051; cv=none; b=VLKVJYrTsx3VBxtBj5p/M90bSEvNNC3VYHGL0+ExUtVT6JIgg8VJobhgCiMJOfcDfYphNwAIBYqbLXxrPri+kLmdl9i6ta0fGV8s7uFBxzJ3ij8OLs4EObvwz4XgcJAvCKZmHfNe89c3lhyjkVuatKorEKAZrXLewlXyFINGuCA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776446979; c=relaxed/simple;
-	bh=TRBcaNfkHHAR+2jWAULG7pJOWRZmEcJutS3QqXdMTRY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=H450vJYJzNlYlmSPV62Z6NiigQzYWDLMSdbLfRJrISCbGPh3C16kEDBPHf69f22zn20g5gU2lMNPtyYAlU2xf1E3CAGom11P8bECl+Nus5XnW05iPn9EEkLEGuKJSuoQyg8eDz4UsSDNr4G1NK0v1ns5ZOoerZhO8X0Z4dqnsug=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Jtian54t; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63H6kPlM087621;
-	Fri, 17 Apr 2026 17:29:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=pp1; bh=2dbA6caidxJZX0dCD8ua5pXOUPnLEIhqNDVBBkrNV
-	SQ=; b=Jtian54t588ILvtuz4ILgwp08/gYivJfxOTl6mHRugtEBW1h6zUE1bIFV
-	YkocqqNl85byZrOeY/ytvklJEUOY7DmZI9W9xTViFXbFL4AQnFsxrY1zpa6WIvQe
-	UWlN4I6nOvxO6AE9/VA1lnlYBKf7HmMP5usepl/fZxOrxeYYfUwirf6OtL6FlZJG
-	Y4hCIFE/RX7IVpLK1j1eWPFzZC9mQsy9S2LhBeELvRooBkCm5McUS78v86+O35K8
-	lvW6K6RaqyPrQ7oJlyPZjeCdUO/gBg/qU3Zm5Z78VGakC//dMVDL4U6Aza75Jzfd
-	+Evb3IoDe5QgLPPyY/sNmEJavH5TA==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4dh89rurnp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 17 Apr 2026 17:29:21 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 63HHRcHv005103;
-	Fri, 17 Apr 2026 17:29:20 GMT
-Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4dkrucr43h-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 17 Apr 2026 17:29:20 +0000 (GMT)
-Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
-	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 63HHTFGq23069438
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 17 Apr 2026 17:29:15 GMT
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7466758057;
-	Fri, 17 Apr 2026 17:29:15 +0000 (GMT)
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 11F8258061;
-	Fri, 17 Apr 2026 17:29:14 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.61.173.165])
-	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 17 Apr 2026 17:29:13 +0000 (GMT)
-From: Mingming Cao <mmc@linux.ibm.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
-        pabeni@redhat.com, horms@kernel.org, bjking1@linux.ibm.com,
-        haren@linux.ibm.com, ricklind@linux.ibm.com, maddy@linux.ibm.com,
-        mpe@ellerman.id.au, linuxppc-dev@lists.ozlabs.org,
-        stable@vger.kernel.org, Mingming Cao <mmc@linux.ibm.com>,
-        Shaik Abdulla <shaik.abdulla1@ibm.com>,
-        Naveed Ahmed <naveedaus@in.ibm.com>
-Subject: [PATCH net v2] ibmveth: Disable GSO for packets with small MSS
-Date: Fri, 17 Apr 2026 10:29:10 -0700
-Message-Id: <20260417172910.81433-1-mmc@linux.ibm.com>
-X-Mailer: git-send-email 2.39.3 (Apple Git-146)
+	s=arc-20240116; t=1776447051; c=relaxed/simple;
+	bh=ycybKBC08oXR9ME0KHALVkiM6mQfe8XZvDSZtlzc91U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EwXFoMMz7+L8J8RQexUztv1cTCOemK89xdCMAj4VgMb9iYq6MR47J5LZ2wvo6HS3enLrjJYb+5FBnJJmGYBkANtyo5yS6qw9TE6tKUjrRkXaqm2eowHb+QSMtUv8o/QIIj8LlAN7NlABTjxGs+CExqCgP1cF7g+F9U9eYugDVuU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=y73whGyi; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=TGZoyyU5mHFyfI81hgTycgiqWkmpexYhWMgVjzucmMY=; b=y73whGyibXvyVYNDNyPFnQAyMd
+	eNY9QgXr6vi7KyuFwRNlaDo8k5tV+c+1/UEylcCLSaqrJP2gNkA8zSOSyey5havYeGQa4Vsy8QmX4
+	0918cQy7oZdGrMy6KAypTjdiQtI9bC4T2/zcsWEp1a5TKgSl7pjvvLfFUEkvcrpA2yNM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wDn1R-00GRAd-By; Fri, 17 Apr 2026 19:30:29 +0200
+Date: Fri, 17 Apr 2026 19:30:29 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Alexander Stein <alexander.stein@ew.tq-group.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next 5/6] net: stmmac: move PHY handling out of
+ __stmmac_open()/release()
+Message-ID: <01f5e05f-31ab-4051-bc2a-9c331fcd9a95@lunn.ch>
+References: <aNKDqqI7aLsuDD52@shell.armlinux.org.uk>
+ <aeDSTIS9-TDSihbX@shell.armlinux.org.uk>
+ <680c384c-135f-44cd-a2cd-7e4fd0ec4bf7@bootlin.com>
+ <13939918.O9o76ZdvQC@steina-w>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDE3MDE3NCBTYWx0ZWRfX9zSfBUfj1NHh
- Sjwzop2iUZkCfxFWX0z4p+JIj9pk1JJ3YY4Q63AENqPWpkjukTpBdfGWLPqQt5baquLGOi9+Tm5
- 2B+MAWE/fYt1id/EQ/k0D6pAhDbZ7qbd/xp57WHGPk8UwzRnWzUr3cS3BKj6CJ01s2V9RFTZ21P
- 3AHhKdKf6Bolp7nBCrYapfviQjuVjah+vwC98YDtdW5oWBKdrvyADOBD0s5hIFNncI8kf8L+xTU
- 9ZQSb3QfyO1CsBAn1k9zMnbj5o+UceXeMrMvFPAoGeSRqIpKum+RSrTOMO3N0N0kQYwTMlEwHb+
- OQUXBluWHoXOGapiDZqggHFl5B89H7vPsRvPZXnG/qQcUTVTSqLRh7THcXYEwGbu0+gDlxLUpCI
- BI2G0v9GfmT+cer6dor3n9bs1NoevTwIppmQsUC6NV/KkFDWx3i6pDEkvzxPwxvwJqDvnOtKjgJ
- RTtFk9FeEpnzH60G79Q==
-X-Proofpoint-ORIG-GUID: aBHJLVuFWYbfzP9VVzdQ9gDuZEjV3tIB
-X-Proofpoint-GUID: 9FTDNG4RccCHvMAhTrywhBTS6D84Jnnt
-X-Authority-Analysis: v=2.4 cv=fYidDUQF c=1 sm=1 tr=0 ts=69e26df1 cx=c_pps
- a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
- a=A5OVakUREuEA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
- a=U7nrCbtTmkRpXpFmAIza:22 a=VwQbUJbxAAAA:8 a=VnNF1IyMAAAA:8
- a=0DtoxFBozvEr3AFqBbAA:9
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-04-17_01,2026-04-17_04,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 impostorscore=0 clxscore=1015 malwarescore=0 phishscore=0
- bulkscore=0 priorityscore=1501 spamscore=0 suspectscore=0 lowpriorityscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2604070000 definitions=main-2604170174
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <13939918.O9o76ZdvQC@steina-w>
 X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
-	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279380-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[ibm.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mmc@linux.ibm.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-279381-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[armlinux.org.uk,bootlin.com,gmail.com,foss.st.com,lunn.ch,davemloft.net,google.com,kernel.org,lists.infradead.org,st-md-mailman.stormreply.com,vger.kernel.org,redhat.com];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.ibm.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[11]
-X-Rspamd-Queue-Id: 8739641D7D6
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E5BFB41D7F4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Some physical adapters on Power systems do not support segmentation
-offload when the MSS is less than 224 bytes. Attempting to send such
-packets causes the adapter to freeze, stopping all traffic until
-manually reset.
+> Thanks for conforming this for another PHY. What I'm wondering right now:
+> Why is the PHY stopped in the first place? We are just changing the MTU, no?
 
-Implement ndo_features_check to disable GSO for packets with small MSS
-values. The network stack will perform software segmentation instead.
+It is not too uncommon to see an MTU change destroying everything and
+rebuilding it, especially when it was retrofitted into an older driver
+which had fixed MTU.
 
-The 224-byte minimum matches ibmvnic
-commit <f10b09ef687f> ("ibmvnic: Enforce stronger sanity checks
-on GSO packets")
-which uses the same physical adapters in SEA configurations.
+> I have a proof of concept running, but it needs more cleanup due
+> to code duplication.
 
-Validated using iptables to force small MSS values. Without the fix,
-the adapter freezes. With the fix, packets are segmented in software
-and transmission succeeds.
+You probably also want to take a look at the ethtool code for
+configuring rings. Oh, it is even worse:
 
-Fixes: 8641dd85799f ("ibmveth: Add support for TSO")
-Cc: stable@vger.kernel.org
-Reviewed-by: Brian King <bjking1@linux.ibm.com>
-Tested-by: Shaik Abdulla <shaik.abdulla1@ibm.com>
-Tested-by: Naveed Ahmed <naveedaus@in.ibm.com>
-Signed-off-by: Mingming Cao <mmc@linux.ibm.com>
----
-v2: Add Fixes tag as requested by automated checks 
+int stmmac_reinit_ringparam(struct net_device *dev, u32 rx_size, u32 tx_size)
+{
+        struct stmmac_priv *priv = netdev_priv(dev);
+        int ret = 0;
 
- drivers/net/ethernet/ibm/ibmveth.c | 20 ++++++++++++++++++++
- drivers/net/ethernet/ibm/ibmveth.h |  1 +
- 2 files changed, 21 insertions(+)
+        if (netif_running(dev))
+                stmmac_release(dev);
 
-diff --git a/drivers/net/ethernet/ibm/ibmveth.c b/drivers/net/ethernet/ibm/ibmveth.c
-index 58cc3147afe2..7935c9384ef4 100644
---- a/drivers/net/ethernet/ibm/ibmveth.c
-+++ b/drivers/net/ethernet/ibm/ibmveth.c
-@@ -1756,6 +1756,25 @@ static int ibmveth_set_mac_addr(struct net_device *dev, void *p)
- 	return 0;
- }
- 
-+static netdev_features_t ibmveth_features_check(struct sk_buff *skb,
-+						struct net_device *dev,
-+						netdev_features_t features)
-+{
-+	/* Some physical adapters do not support segmentation offload with
-+	 * MSS < 224. Disable GSO for such packets to avoid adapter freeze.
-+	 */
-+	if (skb_is_gso(skb)) {
-+		if (skb_shinfo(skb)->gso_size < IBMVETH_MIN_LSO_MSS) {
-+			netdev_warn_once(dev,
-+					 "MSS %u too small for LSO, disabling GSO\n",
-+					 skb_shinfo(skb)->gso_size);
-+			features &= ~NETIF_F_GSO_MASK;
-+		}
-+	}
-+
-+	return features;
-+}
-+
- static const struct net_device_ops ibmveth_netdev_ops = {
- 	.ndo_open		= ibmveth_open,
- 	.ndo_stop		= ibmveth_close,
-@@ -1767,6 +1786,7 @@ static const struct net_device_ops ibmveth_netdev_ops = {
- 	.ndo_set_features	= ibmveth_set_features,
- 	.ndo_validate_addr	= eth_validate_addr,
- 	.ndo_set_mac_address    = ibmveth_set_mac_addr,
-+	.ndo_features_check	= ibmveth_features_check,
- #ifdef CONFIG_NET_POLL_CONTROLLER
- 	.ndo_poll_controller	= ibmveth_poll_controller,
- #endif
-diff --git a/drivers/net/ethernet/ibm/ibmveth.h b/drivers/net/ethernet/ibm/ibmveth.h
-index 068f99df133e..d87713668ed3 100644
---- a/drivers/net/ethernet/ibm/ibmveth.h
-+++ b/drivers/net/ethernet/ibm/ibmveth.h
-@@ -37,6 +37,7 @@
- #define IBMVETH_ILLAN_IPV4_TCP_CSUM		0x0000000000000002UL
- #define IBMVETH_ILLAN_ACTIVE_TRUNK		0x0000000000000001UL
- 
-+#define IBMVETH_MIN_LSO_MSS		224	/* Minimum MSS for LSO */
- /* hcall macros */
- #define h_register_logical_lan(ua, buflst, rxq, fltlst, mac) \
-   plpar_hcall_norets(H_REGISTER_LOGICAL_LAN, ua, buflst, rxq, fltlst, mac)
--- 
-2.39.3 (Apple Git-146)
+        priv->dma_conf.dma_rx_size = rx_size;
+        priv->dma_conf.dma_tx_size = tx_size;
 
+        if (netif_running(dev))
+                ret = stmmac_open(dev);
+
+        return ret;
+}
+
+So not even using __stmmac_release() or __stmmac_open(), and leaving
+you with a dead interface if there is not enough memory to allocate
+the rings.
+
+These paths should really share the same code.
+
+      Andrew
 
