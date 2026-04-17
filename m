@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-279347-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279348-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SBpHAeJK4mnx4QAAu9opvQ
-	(envelope-from <netdev+bounces-279347-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 16:59:46 +0200
+	id WNHlNlhM4mnx4QAAu9opvQ
+	(envelope-from <netdev+bounces-279348-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 17:06:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1AAB41C55D
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 16:59:45 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E12141C5E1
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 17:05:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 37AEC302E4C0
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 14:59:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 16AB23138F01
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 15:00:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C62E3C3C02;
-	Fri, 17 Apr 2026 14:59:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1753D3C342F;
+	Fri, 17 Apr 2026 14:59:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q1Y+vpf1"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cjDLnWO3"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 976503B8D7B
-	for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 14:59:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25D203CA49D
+	for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 14:59:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776437979; cv=none; b=DyTXENxXPH7+nBpPzA6b5CIxABQ8cofIqSxsDXNYgfNE3Xtte71qMzlETMTHH0n41/ETQraUov/+EQwdiTgu2mxYq2H5bhMwfHWqN8W6lTYONVFvf32dLdlAfjJ7xb2XeRTIFTe4+Kf4KEzpjm+GkxsyyQg2C2fGSj3q9sbrrMY=
+	t=1776437990; cv=none; b=gkv8GHDf32lBrEnx0DR1qntrbcU4eDr1UYrYJhJb4pLm3MbNqL9NDw+aNg4ZWCUd15jdzH12jWGPXM4uDkWOiEyKJHwfxWwG9OyjmhPQ0L1JcVjCJIBdOKaFmcHUKBrlfdwFExXctkjbsoeVLk0sO32qJxKfNunqpZEjxSYTV7k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776437979; c=relaxed/simple;
-	bh=U9v7yjnTehJh/xdHuBMwMeMMQWCt3zp6D5P1WM7JGUc=;
+	s=arc-20240116; t=1776437990; c=relaxed/simple;
+	bh=lJir21s5Hydt73Y7X1XPRxcxORH5MsJsFf8DeMd2H98=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PqxXlULSqippp6FWi5+GbDFDmMl4KuCZ5kt7iP4xzUbe4f3buBCK4SLzof4pvQdLlT4IE1jY7jMVnpuIy305yl4T8+rScQkU5KFAs/nPcgVNe8Wj7GMgyHwrt6dji+BGYFQeWy4T1bHsJsPwsEdelyQKO72yxjUOjtgG+rpb35U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Q1Y+vpf1; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=J/QT+oxEptF6u7/C61KflLFZno8bveGEehOsEIn1gjQPDFCkrh+n4ngG/AZ/0quEgg91Y8U0gfmNOoaoXN+5yJrA1ijuNNF47PxPR4RdroBefQ9v+XtU6zjSYI/BBsWl+/tDPb6d0hokZGCM8xWUWntcNGy8iPIq5j6aC/fJ63E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cjDLnWO3; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1776437974;
+	s=mimecast20190719; t=1776437984;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=HEPdyw6AatoRW7dZ87XoM4QrLpIsuCA3Ya6pp2WqSW0=;
-	b=Q1Y+vpf1bS+Ay2pfj+ut9pJZXVjxV+b2h6enuM4mVYQq20LMbKzUOIOVvw0Gz9Jv1OSswO
-	cb9UlJz1HMdQV3ztppqnZPtjaW0oEh08xmUqrs3YUff4F7zsf18lfp6wZoGhPDJXx4nd7w
-	BFB7XNrV3/O9szksD8Rte2IYwZSvMic=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+	bh=gbpFvcWrWZxCHOudUuz8MQpAoKeJ9RTgsaIS867Lomg=;
+	b=cjDLnWO33lVJ8S1KNR5yaLK6IBhJ9jAvEWYlvuzc9EYKLU+NSn6XnnuBnUFpAumJnY7Jxo
+	UYL5WyA/TlwXEsakTOTaBMXfJSGrl5sQiNPdSUKBaBfUo+boDZK3sfO0JNHr2AgCLn/bKj
+	/BTCrUmrVMDGvhHZUiHGzW/F6U7S+iY=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-588-ZQ7uMKMdOJO3sSbQVQ9QGQ-1; Fri,
- 17 Apr 2026 10:59:31 -0400
-X-MC-Unique: ZQ7uMKMdOJO3sSbQVQ9QGQ-1
-X-Mimecast-MFC-AGG-ID: ZQ7uMKMdOJO3sSbQVQ9QGQ_1776437969
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-367-ewrOrWXhNW-TpdYCXsSPuA-1; Fri,
+ 17 Apr 2026 10:59:38 -0400
+X-MC-Unique: ewrOrWXhNW-TpdYCXsSPuA-1
+X-Mimecast-MFC-AGG-ID: ewrOrWXhNW-TpdYCXsSPuA_1776437975
 Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 15302195608B;
-	Fri, 17 Apr 2026 14:59:29 +0000 (UTC)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C187119560B1;
+	Fri, 17 Apr 2026 14:59:34 +0000 (UTC)
 Received: from ShadowPeak.redhat.com (unknown [10.44.32.76])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A8D9E3000C1C;
-	Fri, 17 Apr 2026 14:59:23 +0000 (UTC)
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7F13E3000C1E;
+	Fri, 17 Apr 2026 14:59:29 +0000 (UTC)
 From: Petr Oros <poros@redhat.com>
 To: netdev@vger.kernel.org
 Cc: Petr Oros <poros@redhat.com>,
@@ -81,9 +81,9 @@ Cc: Petr Oros <poros@redhat.com>,
 	Rinitha S <sx.rinitha@intel.com>,
 	intel-wired-lan@lists.osuosl.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH iwl-net v7 2/3] ice: fix missing dpll notifications for SW pins
-Date: Fri, 17 Apr 2026 16:59:06 +0200
-Message-ID: <20260417145907.696307-3-poros@redhat.com>
+Subject: [PATCH iwl-net v7 3/3] ice: add dpll peer notification for paired SMA and U.FL pins
+Date: Fri, 17 Apr 2026 16:59:07 +0200
+Message-ID: <20260417145907.696307-4-poros@redhat.com>
 In-Reply-To: <20260417145907.696307-1-poros@redhat.com>
 References: <20260417145907.696307-1-poros@redhat.com>
 Precedence: bulk
@@ -100,7 +100,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -109,7 +109,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCPT_COUNT_TWELVE(0.00)[20];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279347-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-279348-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[redhat.com:+];
 	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -120,149 +120,94 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E1AAB41C55D
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5E12141C5E1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The SMA/U.FL pin redesign (commit 2dd5d03c77e2 ("ice: redesign dpll
-sma/u.fl pins control")) introduced software-controlled pins that wrap
-backing CGU input/output pins, but never updated the notification and
-data paths to propagate pin events to these SW wrappers.
+SMA and U.FL pins share physical signal paths in pairs (SMA1/U.FL1 and
+SMA2/U.FL2).  When one pin's state changes via a PCA9575 GPIO write,
+the paired pin's state also changes, but no notification is sent for
+the peer pin.  Userspace consumers monitoring the peer via dpll netlink
+subscribe never learn about the update.
 
-The periodic work sends dpll_pin_change_ntf() only for direct CGU input
-pins.  SW pins that wrap these inputs never receive change or phase
-offset notifications, so userspace consumers such as synce4l monitoring
-SMA pins via dpll netlink never learn about state transitions or phase
-offset updates.  Similarly, ice_dpll_phase_offset_get() reads the SW
-pin's own phase_offset field which is never updated; the PPS monitor
-writes to the backing CGU input's field instead.
-
-Fix by introducing ice_dpll_pin_ntf(), a wrapper around
-dpll_pin_change_ntf() that also notifies any registered SMA/U.FL pin
-whose backing CGU input matches.  Replace all direct
-dpll_pin_change_ntf() calls in the periodic notification paths with
-this wrapper.  Fix ice_dpll_phase_offset_get() to return the backing
-CGU input's phase_offset for input-direction SW pins.
+Add ice_dpll_sw_pin_notify_peer() which sends a change notification for
+the paired SW pin.  Call it from ice_dpll_pin_sma_direction_set(),
+ice_dpll_sma_pin_state_set(), and ice_dpll_ufl_pin_state_set() after
+pf->dplls.lock is released.  Use __dpll_pin_change_ntf() because
+dpll_lock is still held by the dpll netlink layer (dpll_pin_pre_doit).
 
 Fixes: 2dd5d03c77e2 ("ice: redesign dpll sma/u.fl pins control")
 Signed-off-by: Petr Oros <poros@redhat.com>
 ---
- drivers/net/ethernet/intel/ice/ice_dpll.c | 47 +++++++++++++++++------
- 1 file changed, 36 insertions(+), 11 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_dpll.c | 32 +++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
 
 diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.c b/drivers/net/ethernet/intel/ice/ice_dpll.c
-index 3a90a2940fdc6e..11b942b83500fb 100644
+index 11b942b83500fb..be72a076f7a15c 100644
 --- a/drivers/net/ethernet/intel/ice/ice_dpll.c
 +++ b/drivers/net/ethernet/intel/ice/ice_dpll.c
-@@ -1963,7 +1963,10 @@ ice_dpll_phase_offset_get(const struct dpll_pin *pin, void *pin_priv,
- 				       d->active_input == p->input->pin))
- 		*phase_offset = d->phase_offset * ICE_DPLL_PHASE_OFFSET_FACTOR;
- 	else if (d->phase_offset_monitor_period)
--		*phase_offset = p->phase_offset * ICE_DPLL_PHASE_OFFSET_FACTOR;
-+		*phase_offset = (p->input &&
-+				 p->direction == DPLL_PIN_DIRECTION_INPUT ?
-+				 p->input->phase_offset :
-+				 p->phase_offset) * ICE_DPLL_PHASE_OFFSET_FACTOR;
- 	else
- 		*phase_offset = 0;
- 	mutex_unlock(&pf->dplls.lock);
-@@ -2659,6 +2662,27 @@ static u64 ice_generate_clock_id(struct ice_pf *pf)
- 	return pci_get_dsn(pf->pdev);
+@@ -1154,6 +1154,32 @@ ice_dpll_input_state_get(const struct dpll_pin *pin, void *pin_priv,
+ 				      extack, ICE_DPLL_PIN_TYPE_INPUT);
  }
  
 +/**
-+ * ice_dpll_pin_ntf - notify pin change including any SW pin wrappers
-+ * @dplls: pointer to dplls struct
-+ * @pin: the dpll_pin that changed
++ * ice_dpll_sw_pin_notify_peer - notify the paired SW pin after a state change
++ * @d: pointer to dplls struct
++ * @changed: the SW pin that was explicitly changed (already notified by dpll core)
 + *
-+ * Send a change notification for @pin and for any registered SMA/U.FL pin
-+ * whose backing CGU input matches @pin.
++ * SMA and U.FL pins share physical signal paths in pairs (SMA1/U.FL1 and
++ * SMA2/U.FL2).  When one pin's routing changes via the PCA9575 GPIO
++ * expander, the paired pin's state may also change.  Send a change
++ * notification for the peer pin so userspace consumers monitoring the
++ * peer via dpll netlink learn about the update.
++ *
++ * Context: Called from dpll_pin_ops callbacks after pf->dplls.lock is
++ *          released.  Uses __dpll_pin_change_ntf() because dpll_lock is
++ *          still held by the dpll netlink layer.
 + */
-+static void ice_dpll_pin_ntf(struct ice_dplls *dplls, struct dpll_pin *pin)
++static void ice_dpll_sw_pin_notify_peer(struct ice_dplls *d,
++					struct ice_dpll_pin *changed)
 +{
-+	dpll_pin_change_ntf(pin);
-+	for (int i = 0; i < ICE_DPLL_PIN_SW_NUM; i++) {
-+		if (dplls->sma[i].pin && dplls->sma[i].input &&
-+		    dplls->sma[i].input->pin == pin)
-+			dpll_pin_change_ntf(dplls->sma[i].pin);
-+		if (dplls->ufl[i].pin && dplls->ufl[i].input &&
-+		    dplls->ufl[i].input->pin == pin)
-+			dpll_pin_change_ntf(dplls->ufl[i].pin);
-+	}
++	struct ice_dpll_pin *peer;
++
++	peer = (changed >= d->sma && changed < d->sma + ICE_DPLL_PIN_SW_NUM) ?
++		&d->ufl[changed->idx] : &d->sma[changed->idx];
++	if (peer->pin)
++		__dpll_pin_change_ntf(peer->pin);
 +}
 +
  /**
-  * ice_dpll_notify_changes - notify dpll subsystem about changes
-  * @d: pointer do dpll
-@@ -2667,6 +2691,7 @@ static u64 ice_generate_clock_id(struct ice_pf *pf)
-  */
- static void ice_dpll_notify_changes(struct ice_dpll *d)
- {
-+	struct ice_dplls *dplls = &d->pf->dplls;
- 	bool pin_notified = false;
+  * ice_dpll_sma_direction_set - set direction of SMA pin
+  * @p: pointer to a pin
+@@ -1344,6 +1370,8 @@ ice_dpll_ufl_pin_state_set(const struct dpll_pin *pin, void *pin_priv,
  
- 	if (d->prev_dpll_state != d->dpll_state) {
-@@ -2675,17 +2700,17 @@ static void ice_dpll_notify_changes(struct ice_dpll *d)
- 	}
- 	if (d->prev_input != d->active_input) {
- 		if (d->prev_input)
--			dpll_pin_change_ntf(d->prev_input);
-+			ice_dpll_pin_ntf(dplls, d->prev_input);
- 		d->prev_input = d->active_input;
- 		if (d->active_input) {
--			dpll_pin_change_ntf(d->active_input);
-+			ice_dpll_pin_ntf(dplls, d->active_input);
- 			pin_notified = true;
- 		}
- 	}
- 	if (d->prev_phase_offset != d->phase_offset) {
- 		d->prev_phase_offset = d->phase_offset;
- 		if (!pin_notified && d->active_input)
--			dpll_pin_change_ntf(d->active_input);
-+			ice_dpll_pin_ntf(dplls, d->active_input);
- 	}
+ unlock:
+ 	mutex_unlock(&pf->dplls.lock);
++	if (!ret)
++		ice_dpll_sw_pin_notify_peer(&pf->dplls, p);
+ 
+ 	return ret;
  }
+@@ -1462,6 +1490,8 @@ ice_dpll_sma_pin_state_set(const struct dpll_pin *pin, void *pin_priv,
  
-@@ -2714,6 +2739,7 @@ static bool ice_dpll_is_pps_phase_monitor(struct ice_pf *pf)
+ unlock:
+ 	mutex_unlock(&pf->dplls.lock);
++	if (!ret)
++		ice_dpll_sw_pin_notify_peer(&pf->dplls, sma);
  
- /**
-  * ice_dpll_pins_notify_mask - notify dpll subsystem about bulk pin changes
-+ * @dplls: pointer to dplls struct
-  * @pins: array of ice_dpll_pin pointers registered within dpll subsystem
-  * @pin_num: number of pins
-  * @phase_offset_ntf_mask: bitmask of pin indexes to notify
-@@ -2723,15 +2749,14 @@ static bool ice_dpll_is_pps_phase_monitor(struct ice_pf *pf)
-  *
-  * Context: Must be called while pf->dplls.lock is released.
-  */
--static void ice_dpll_pins_notify_mask(struct ice_dpll_pin *pins,
-+static void ice_dpll_pins_notify_mask(struct ice_dplls *dplls,
-+				      struct ice_dpll_pin *pins,
- 				      u8 pin_num,
- 				      u32 phase_offset_ntf_mask)
- {
--	int i = 0;
--
--	for (i = 0; i < pin_num; i++)
--		if (phase_offset_ntf_mask & (1 << i))
--			dpll_pin_change_ntf(pins[i].pin);
-+	for (int i = 0; i < pin_num; i++)
-+		if (phase_offset_ntf_mask & BIT(i))
-+			ice_dpll_pin_ntf(dplls, pins[i].pin);
+ 	return ret;
  }
+@@ -1657,6 +1687,8 @@ ice_dpll_pin_sma_direction_set(const struct dpll_pin *pin, void *pin_priv,
+ 	mutex_lock(&pf->dplls.lock);
+ 	ret = ice_dpll_sma_direction_set(p, direction, extack);
+ 	mutex_unlock(&pf->dplls.lock);
++	if (!ret)
++		ice_dpll_sw_pin_notify_peer(&pf->dplls, p);
  
- /**
-@@ -2907,7 +2932,7 @@ static void ice_dpll_periodic_work(struct kthread_work *work)
- 	ice_dpll_notify_changes(de);
- 	ice_dpll_notify_changes(dp);
- 	if (phase_offset_ntf)
--		ice_dpll_pins_notify_mask(d->inputs, d->num_inputs,
-+		ice_dpll_pins_notify_mask(d, d->inputs, d->num_inputs,
- 					  phase_offset_ntf);
- 
- resched:
+ 	return ret;
+ }
 -- 
 2.52.0
 
