@@ -1,149 +1,142 @@
-Return-Path: <netdev+bounces-279241-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279242-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uE+TMonT4Wl+ygAAu9opvQ
-	(envelope-from <netdev+bounces-279241-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 08:30:33 +0200
+	id wJqpMgLV4WnQyQAAu9opvQ
+	(envelope-from <netdev+bounces-279242-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 08:36:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 085B84176EE
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 08:30:32 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CCE94177AD
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 08:36:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 0E6ED3030AC6
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 06:30:06 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id AA14F30EC894
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 06:35:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E930736E48B;
-	Fri, 17 Apr 2026 06:30:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36E7536606C;
+	Fri, 17 Apr 2026 06:35:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UwrdpX4K"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wi/oaEJ2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A756B2E173B
-	for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 06:30:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14661363C51
+	for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 06:35:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776407404; cv=none; b=fhECn3/5dHbqPAjLhKeJQc6AKHgERw2HFcCXz90yUzQQsy9GTozYLf5mNXzQe2xn6KJmzxjmsh8rlDRD9NvmkHbuYnnNOyVnkg2kqXBdWHnkWGyWB8sGAFAAOJM7cmB0q2ufysiFMf5uxDeZgHj6U4m4J9KI5pDASQC1ohN1+wc=
+	t=1776407746; cv=none; b=rwOLwp1sloDAqYwKIaD6Z0fAVjzvWtp7WuBIGmvfgoeakSETerCpR8I9EIlWy/ItbyTrk1QBTNYRjuhKqewSd37eLYjAOzbSsqFYdIdSrHNGTNV6kfKvK5qdT9Lmr1NIMQViijnqde3pG9co4yGEpCHePasGZXiYe+PlfUV62dk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776407404; c=relaxed/simple;
-	bh=NtB753eXsLk4+qxyJOoMbmx22XzwyHTBNlffDqorEjs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=m5XUU4Uvub2Mt9mBnerKevLaCoSFQBTBM883lLCgQ3Z8ChpeFrvDW2JXh4MwnZ5EVg7yLHOjG5W2HMXwl6FcFqSBWsLJlbGjSjSpiZNF48wNDSxtadFb8io60nhiCvzuxdsLBM92Rxkpp+NT7jH0NrbNiA4eg59k51s/PLKfU1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UwrdpX4K; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1776407403; x=1807943403;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=NtB753eXsLk4+qxyJOoMbmx22XzwyHTBNlffDqorEjs=;
-  b=UwrdpX4KMQSJle34+8SCLsGP/UFn7N0Z8vKyHqdu2/x3FySiAKlO4q96
-   eyaZfwLOOIdTl25oq3mqjTHDFahHFej5zU2cHcQIaFZVr7r6OEC1jDpYr
-   gsy6MPnbepEQ67ASfuxr6pAYucK0ZdSHTFvi1P6InAWy7COeg+6VOI1CT
-   QtiZ3wIxl2iznC64aFsusa+D+jpqluiO4n8Kyjp0d8ZkTAqR0W0QtDjsR
-   uZTY6yPO1Po0GeSA0REG4kJpRquNuh06fVe+l2ZgUHpkSgPELglD9BzPF
-   gfnNizlbKhRjv1y9iZLCfAsEdRLeR/rYmQNFb2wxyoQTQcjcwu5Ntn3TA
-   A==;
-X-CSE-ConnectionGUID: TC071SBQRqC6aUSEbmRiDQ==
-X-CSE-MsgGUID: tR0tPNRrTT6rSbHYRXDXiw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11761"; a="94987412"
-X-IronPort-AV: E=Sophos;i="6.23,183,1770624000"; 
-   d="scan'208";a="94987412"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2026 23:30:03 -0700
-X-CSE-ConnectionGUID: 5YymVZ47SJy22yljnjz78w==
-X-CSE-MsgGUID: kbhWPzO0R0CEJgxzkM5zIw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,183,1770624000"; 
-   d="scan'208";a="235329594"
-Received: from amlin-019-225.igk.intel.com ([10.102.19.225])
-  by orviesa004.jf.intel.com with ESMTP; 16 Apr 2026 23:30:02 -0700
-From: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-To: intel-wired-lan@lists.osuosl.org,
-	anthony.l.nguyen@intel.com,
-	aleksandr.loktionov@intel.com
-Cc: netdev@vger.kernel.org,
-	Jan Glaza <jan.glaza@intel.com>
-Subject: [PATCH iwl-net 4/4] ice: report EIPE checksum errors to the OS on E830
-Date: Fri, 17 Apr 2026 08:29:54 +0200
-Message-ID: <20260417062954.1241900-5-aleksandr.loktionov@intel.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260417062954.1241900-1-aleksandr.loktionov@intel.com>
-References: <20260417062954.1241900-1-aleksandr.loktionov@intel.com>
+	s=arc-20240116; t=1776407746; c=relaxed/simple;
+	bh=+h2JPILIrzNLN8u1NARqjUeaXnNBvYVVk5Aknn7p9kQ=;
+	h=Mime-Version:Content-Type:Date:Message-Id:To:Subject:Cc:From:
+	 References:In-Reply-To; b=qkacSyGF9KYt/758FsF0oHvbIjL1VWND2yfvAiX4FZoMjXHS1Cxz69RdbYInPbIzbHTHD/wq5mfTHIdSnCETUNjAsj0o61xOrGuVBkLXWhAUbaeMUoC3vrybw4f/8OfZrkbv0H4JYqOne+W6Idj/CKb+1FTscCzXRXUDXCmvFkM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Wi/oaEJ2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27DC2C2BCB4;
+	Fri, 17 Apr 2026 06:35:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776407745;
+	bh=+h2JPILIrzNLN8u1NARqjUeaXnNBvYVVk5Aknn7p9kQ=;
+	h=Date:To:Subject:Cc:From:References:In-Reply-To:From;
+	b=Wi/oaEJ2CXivwdvy3Fw57s4o8992ng50ukMyHNfElH294COY3t06Xf1OtzXp8ihRJ
+	 zeaIlyg9gAAj+/5rH0z7860aQISdt0LrFrSaf3ItCQUTCq1QSMiZ0wvCx+7BZmv+kI
+	 z8XqN79QSuGLtjj1vSex7U6rGTYzY7OFGc1lcZtbiZsR/CJBEDm74YyS/ZcZw6f4US
+	 iT35xW7yR1u23B0ecbjHouw0sr6SkB7GoFWn3y1sU7NQL+OaTnxi2MMQZnxe0Mh2Iq
+	 P15A3qktiVgZtylmO5hZhHvndBfQ7uArZpXF0atCAvyuywWAvbF7GdZ7G2cq5l45qb
+	 axTlt+FfyNZ9w==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Mime-Version: 1.0
+Content-Type: multipart/signed;
+ boundary=560c4b5666bbe89eb39f2ef496bc820d022cbe73297389acd79dc6ec9b8d;
+ micalg=pgp-sha384; protocol="application/pgp-signature"
+Date: Fri, 17 Apr 2026 08:35:41 +0200
+Message-Id: <DHV7ZMEI94AT.3O3RRPYOM7LPI@kernel.org>
+To: "Jakub Kicinski" <kuba@kernel.org>, "Michael Thalmeier"
+ <michael.thalmeier@hale.at>, "Raymond Hackley"
+ <raymondhackley@protonmail.com>, "Bongsu Jeon" <bongsu.jeon@samsung.com>,
+ "Krzysztof Kozlowski" <krzk@kernel.org>, "Mark Greer"
+ <mgreer@animalcreek.com>
+Subject: Re: Path forward for NFC in the kernel
+Cc: <netdev@vger.kernel.org>
+From: "Michael Walle" <mwalle@kernel.org>
+X-Mailer: aerc 0.20.0
+References: <20260416101041.4c533306@kernel.org>
+In-Reply-To: <20260416101041.4c533306@kernel.org>
+X-Spamd-Result: default: False [-3.76 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279241-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[intel.com:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	RCPT_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
+	URIBL_MULTI_FAIL(0.00)[tor.lore.kernel.org:server fail];
+	TAGGED_FROM(0.00)[bounces-279242-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[kernel.org,hale.at,protonmail.com,samsung.com,animalcreek.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mwalle@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,intel.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 085B84176EE
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 1CCE94177AD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Jan Glaza <jan.glaza@intel.com>
+--560c4b5666bbe89eb39f2ef496bc820d022cbe73297389acd79dc6ec9b8d
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
 
-For E830 adapters the hardware-reported EIPE (Ethernet Inline IPsec
-Engine) error is a reliable indication that a received packet failed
-decryption and has a bad checksum. Route EIPE errors through the
-generic checksum error path on E830 so the error is visible via
-standard ethtool statistics (rx_csum_bad).
+Hi,
 
-On previous devices (E810, E82X) the EIPE flag can be spuriously set
-on encapsulated packets with inner L2 padding, so those adapters only
-increment the driver-private hw_rx_eipe_error counter without routing
-through the checksum error path.
+On Thu Apr 16, 2026 at 7:10 PM CEST, Jakub Kicinski wrote:
+> Hi folks!
+>
+> We are struggling to keep up with the number of security reports and AI
+> generated patches in the kernel. NFC is infamous for being a huge CVE
+> magnet. We need someone to step up as a maintainer, create an NFC tree
+> and handle all the incoming submissions. Send us (or Linus if you
+> prefer) periodic PRs, like WiFi, Bluetooth etc. do. If that does not
+> happen I'm afraid we'll have to move the NFC code out of the tree,=20
+> put it up on GH or some such, and let it accumulate CVEs there..
+>
+> I'm planning to send a PR to Linus to shed the unmaintained code early
+> next week. We need to have a maintainer established by then.
 
-Fixes: 0ca6755f3cc2 ("ice: Add a new counter for Rx EIPE errors")
-Signed-off-by: Jan Glaza <jan.glaza@intel.com>
-Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_txrx_lib.c | 2 ++
- 1 file changed, 2 insertions(+)
+Thanks for asking, but I'm busy renovating my house, sorry. I
+couldn't put much work into that. The former is already stressful
+enough :)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c b/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
-index e695a66..82d9d2c4 100644
---- a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
-@@ -140,6 +140,8 @@ ice_rx_csum(struct ice_rx_ring *ring, struct sk_buff *skb,
+-michael
 
- 	if (ipv4 && (rx_status0 & (BIT(ICE_RX_FLEX_DESC_STATUS0_XSUM_EIPE_S)))) {
- 		ring->vsi->back->hw_rx_eipe_error++;
-+		if (ring->vsi->back->hw.mac_type == ICE_MAC_E830)
-+			goto checksum_fail;
- 		return;
- 	}
+--560c4b5666bbe89eb39f2ef496bc820d022cbe73297389acd79dc6ec9b8d
+Content-Type: application/pgp-signature; name="signature.asc"
 
---
-2.52.0
+-----BEGIN PGP SIGNATURE-----
 
+iKgEABMJADAWIQTIVZIcOo5wfU/AngkSJzzuPgIf+AUCaeHUvRIcbXdhbGxlQGtl
+cm5lbC5vcmcACgkQEic87j4CH/iVrgF/SxUZ2vB4XFUFCpYoMdQehshhCkbso9Ci
+HG4A2EFiru4hN893eLJDBPJ01cux0Nc0AX48mgaUGvBL4+nqtqtGDh1yrxKYZCIg
+Fw58i9qJcXhVyGNOgddGSY+5/kh2ej7OkRc=
+=XaVJ
+-----END PGP SIGNATURE-----
+
+--560c4b5666bbe89eb39f2ef496bc820d022cbe73297389acd79dc6ec9b8d--
 
