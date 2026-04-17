@@ -1,203 +1,253 @@
-Return-Path: <netdev+bounces-279299-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279300-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MH2XM5kU4mnZ1QAAu9opvQ
-	(envelope-from <netdev+bounces-279299-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 13:08:09 +0200
+	id EOatC9AY4mm61gAAu9opvQ
+	(envelope-from <netdev+bounces-279300-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 13:26:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6676741AB2F
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 13:08:05 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2BA141AC90
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 13:26:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A85C630849A5
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 11:06:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4F8C0303FFB1
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 11:26:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB6773B7B7D;
-	Fri, 17 Apr 2026 11:06:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6B4D38E5F5;
+	Fri, 17 Apr 2026 11:26:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=est.tech header.i=@est.tech header.b="y2Y11RDx"
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [52.175.55.52])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A76A3BADB8;
-	Fri, 17 Apr 2026 11:06:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.175.55.52
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776423985; cv=none; b=GmracWzNb2q+GSDyySUshw3i3bsVq297z2QXyb1oEPVmmeYRjErKqK3wqp7RmjFLXDi32rNdlJpB6sL3w6Bg8gbexiAJFPezEu4ljulBVRXjjEv8admE3owyTfzMLr67fRMkXNgti5dK1YksaiMS56jKVWO1FusDzzpqobZ7k6s=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776423985; c=relaxed/simple;
-	bh=HkLSyeiNCmaZ/eTzP/RNGQFO3wuTTAdkzPbmhyHUJKU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YJVo/A2k5wxJaPK6pwDZkGC5Ld7qx2uLGe/d83JnwOBdoz/9HJzlpgoHN2LVvmQgVgwmBGhqSi/VymBOc2jV8k+xLHnsZv8+Kt9PdoYnl1i34jrbMNS9Zv2yC6uvjh9zZj1aThnO0eOLGvkPCLILEwrdeusDgD52wID/bHENh3I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=52.175.55.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
-Received: from enjou-Legion-Y7000P-2019.coin-barley.ts.net (unknown [172.23.56.36])
-	by app2 (Coremail) with SMTP id zQmowACHHoX4E+Jp+bk+AA--.31247S3;
-	Fri, 17 Apr 2026 19:05:36 +0800 (CST)
-From: Ren Wei <n05ec@lzu.edu.cn>
-To: linux-hams@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	kees@kernel.org,
-	takamitz@amazon.co.jp,
-	kuniyu@google.com,
-	jiayuan.chen@shopee.com,
-	mingo@kernel.org,
-	stanksal@purdue.edu,
-	jlayton@kernel.org,
-	yifanwucs@gmail.com,
-	tomapufckgml@gmail.com,
-	bird@lzu.edu.cn,
-	yuantan098@gmail.com,
-	tonanli66@gmail.com,
-	n05ec@lzu.edu.cn
-Subject: [PATCH net 1/1] net/rose: hold listener socket during call request handling
-Date: Fri, 17 Apr 2026 19:01:51 +0800
-Message-ID: <52776256bf0fc38de92fe3edf39434538b672b69.1776327338.git.tonanli66@gmail.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <cover.1776327338.git.tonanli66@gmail.com>
-References: <cover.1776327338.git.tonanli66@gmail.com>
+Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11012018.outbound.protection.outlook.com [52.101.66.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A46238C421;
+	Fri, 17 Apr 2026 11:25:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.66.18
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776425161; cv=fail; b=I9JjE6wdY8F0pYYj3RWPPFpTfd/uWWtHVWH7M3hYENfT5Lb8IjGSQkZ7QUzhAoiLToWkKlMj7603SSYr6oZDZGSBu0qXjIv2+nSgO/sbxUo9jyZDqriPZAsdJwAokQCwgZIBgw4FbBfxyeB49cJfFtsbkUyjvSUBrDEX4Q0c1z0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776425161; c=relaxed/simple;
+	bh=gJcRXTkekf54sCkHBiNRNGEOsDJmcEPEu8mccUtGxX4=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=CoN6p4/auAIf6A+OCZ2WTtEdZyfF3A0rktyNLOq+DjRJnKiv+Ex/DoUgkvJYZdbYNHgq1Km6fI67eUR/oGpJlbIPLpL86nTcbk+UuINxEY4l2Xhkq30yMdLxPf/jyJa/aubo+5zVlrDIdIiwwb5CflrakRVIVpMiAGW0RT+xO2E=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=est.tech; spf=pass smtp.mailfrom=est.tech; dkim=pass (2048-bit key) header.d=est.tech header.i=@est.tech header.b=y2Y11RDx; arc=fail smtp.client-ip=52.101.66.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=est.tech
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=est.tech
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=K+A8u/BbreyMbiRdqsUnZonuuD30+icAfExfJtXeNxNrirKNj3Qc+qjyhyHVCjZv4vos6jUVeUkU5ccRaHy8lPkJFBiGL5bXYdqhuhclvtnT61GkmoytfYvhGMGw/IZq+Mvgs+bSL9S+afPE+YymSI+F9e/QYQCgax/jisM1G2RbbCKHhBXVofintvAiD/aNGJf2WoIucilVargv2mzjbB+hf+RCQCrXPmpCEcm2oNa932QhzkraK96Nb17FOUr6VtdP07vtGGdXW94Z8vgC0YxPXX/Lzn9o4W+a6xF4FDpg8juwlso/L83jWTgJ7BkU1EN5ns3GGdpAbgL3ukpy7Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=cCMwMa+CCtKKDAdILAIJo6LXwzuC6gTtF9fmG7iM/rI=;
+ b=cD2Jgj8PS6RfI1w664j52D10ioERnMrjzWwET9t2qRg+JGYQv4oX1CWwZcO+0JcQtmiWdhD8DV/e22krdoQCQcyYsXvViTUM3Yd1RQSEfZP7u3owyTCnpZ2YPO6cmuDcEs/osc12S/5DC+MUqfNautn5yZT4IgrICkOAHmX/pcmkKNfeb2b3byLNIbXqnT8RQq3kpmn7wv1e9yI7ocTqM62F4pmh8L22W64h9G+0M2sR7pFiYNFNgOFshNRCMldCWlOORs4zKHbot5FKFijs+Fpsz9OSPhSpE1BTByNqhg3MIWdZLP7isREsA92R0dodrBM81Vp2AByXkv983Z5r4A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=est.tech; dmarc=pass action=none header.from=est.tech;
+ dkim=pass header.d=est.tech; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=est.tech; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=cCMwMa+CCtKKDAdILAIJo6LXwzuC6gTtF9fmG7iM/rI=;
+ b=y2Y11RDxwFUfPdyfmHa+gikGWoBLWZxtZngccVW0DGokpNXrw7jlo/YrIor2wzjly4dkm12bcT2dzqGqwFgz17qJMJDY0NU0yCUUZzzPn7yK2E3Sd2F7FSXXWOEqruVYatEy39GV0mPV2L0RE1Y/tOfsVTfx6y8Ldteb16gTMRERiOJO/BiTL5gHWEYnAANlNEz+ZQYKhCcQlhxawy3YOMsfgzF9hCRGinu2L83X7OTlcZxWdXs9M4m3/JgA2h7fIRujto6M0Sv+oYbheVBe/bp0n3v5evtREsKFMGzTUVjYwlpc6XerOWxCA6nPOOdw6TmkZUzYMP/aD9+noU5sNw==
+Received: from GV1P189MB1988.EURP189.PROD.OUTLOOK.COM (2603:10a6:150:63::5) by
+ PRAP189MB1876.EURP189.PROD.OUTLOOK.COM (2603:10a6:102:299::10) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9818.25; Fri, 17 Apr 2026 11:25:56 +0000
+Received: from GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
+ ([fe80::bfff:5391:8a49:21b7]) by GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
+ ([fe80::bfff:5391:8a49:21b7%5]) with mapi id 15.20.9818.023; Fri, 17 Apr 2026
+ 11:25:55 +0000
+From: Tung Quang Nguyen <tung.quang.nguyen@est.tech>
+To: Pengpeng Hou <pengpeng@iscas.ac.cn>
+CC: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"tipc-discussion@lists.sourceforge.net"
+	<tipc-discussion@lists.sourceforge.net>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "stable@vger.kernel.org"
+	<stable@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, Jon Maloy
+	<jmaloy@redhat.com>
+Subject: RE: [PATCH] tipc: crypto: require a NUL-terminated AEAD algorithm
+ name
+Thread-Topic: [PATCH] tipc: crypto: require a NUL-terminated AEAD algorithm
+ name
+Thread-Index: AQHczj9n26pdW82ZQUe8x1AdZMXpmbXjGl6Q
+Date: Fri, 17 Apr 2026 11:25:55 +0000
+Message-ID:
+ <GV1P189MB19889C5578B81060154B7B3EC6202@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
+References: <20260417075353.30662-1-pengpeng@iscas.ac.cn>
+In-Reply-To: <20260417075353.30662-1-pengpeng@iscas.ac.cn>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=est.tech;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: GV1P189MB1988:EE_|PRAP189MB1876:EE_
+x-ms-office365-filtering-correlation-id: 4e47e36c-e399-42a7-3556-08de9c74173b
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|376014|7416014|1800799024|366016|38070700021|56012099003|18002099003|22082099003;
+x-microsoft-antispam-message-info:
+ 3ZaP4NLFdmo6egpw+0LD3r6wL3ZINxn/KP2TOhJ/HQU7tMCIagVsh1xWX+83VgKnT/tUuPBmUlduqgZpvHbNcIl4rjBQluGN3EjxU3c4NIBZ9xA6GZpN6Ylj6/SA9ZsIlb4mz+Hirae6w4tiUJU0J2HJuzzcv1DvQQZCNOzvY9rnxaQJ9r/XibG99dbP95EIoW2e4CqnG+sneehpOQcHayR0C3zIkFa3ypF4CKf9Lc4gSfmvk3MFPZinL3UNKn6/Q0HAP4ybV38jNQB6EZhyPD8p4hrpeUZlh/6yWZT7PGHMpEkkhg3rO+ob/LZzIzVpaae2s8NPwmZ3HhPIMUm0CThT6+vVssmOQBX8bquIGkGDPjVBquFswbbPGD6NV9wrUqTb/m9iOZfFSC3aa4F9VB2eDa8zbuIrvglrnn0MPVVXuWhv+Kdkv+eX52IRFlxqk7b+1libGB1t3PR5JEbypIC+Y0fbIfAr9hTiGiIoaeK5SAeDTn/1PNv0bMpUqTqak9ThfWmv6709eSOzg7zD7ZeD0v5ce8N7Tg0frUaPsb6yp1yled+uopznsNeQxDgMUX8p39Ikr8Mo6PcmgT1e8Xbl6cXnzZ2ZRGEJPgzIZMjhUdfaJGmBUZ/SepDzNIhQNqLGyA2VugmjZ2V5Rxr87bw8YJF3wuyBozCRdopdOk3SOUTqBV524iD0zCtzZJPe4T+7U0aOfZSXRD9yPfS9UEcXf7Onteladcyg2auht2tD2zWHFEH6ynDGpsBNuJT83G6ZWL3lP0p0sE8jClLoSk6u5cpoWEposdu+EZKl+eU=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1P189MB1988.EURP189.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016)(38070700021)(56012099003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?N60wdKcLLCs5X8HwEd/2UUiFiU8kTa1aLojX4AA6CCUU4KVBiN6jQjhQkuvN?=
+ =?us-ascii?Q?HbGkEFJdabdqgA7DWEdY/umPAT7DB91jVDJugRUmYkfg5KgucFD7rBefxGQa?=
+ =?us-ascii?Q?o6Qw0c3udSPvHrYC3FHM8M+YK8szmQJ/rXRVkSoA615EiXkOExikCn2tJf0c?=
+ =?us-ascii?Q?BIED0+8nC/zWD0vCbqRK04lZlzfUy3yym2plXy+grovmC6Dm8vPmWvwTEwjG?=
+ =?us-ascii?Q?u2eyh7CaZiEYCq0f6UN6X4/qWduissprGOzvo8vDMYh26arxbdLYU+VBA1Fv?=
+ =?us-ascii?Q?/zBu94NMwYNyk1T/2MFHYBKg6y4gPV2svIUPnvzYtT+9l/aTSlwjX1iBgxt6?=
+ =?us-ascii?Q?Yuhdqr2y47v2HYA6qjeE9mxZeMa62QQ3FInhUSF2K4bNGH+O7eIBtmpRTK18?=
+ =?us-ascii?Q?h1rcspUbZzxJ9WLhy02CtJm09N+kCmNsO9lRgwbhhaC9xwSaTEFzPG2lSG4E?=
+ =?us-ascii?Q?0F8zJxcS2KzJK42ylMXT5yOhxPUe2n6M3iVEHqWTS8sV3iYzxpGnAu/TonK6?=
+ =?us-ascii?Q?EnMpufGx2yyENMvPt7TJEjiy4O3X1t9hsQLKBo4C7721SR8LmLP6cFODExj7?=
+ =?us-ascii?Q?pGmmSIGe6E1zpUHHxJ7/pBXwFNnth4TYKUl3Ftmh+pP/83KheCaUVpsyWkfm?=
+ =?us-ascii?Q?CJ/c+yFz1aVO5aLncqX6cF1Y1VhN4g4oSBYfoGE73u8V8SDZXtY9om+MrbZJ?=
+ =?us-ascii?Q?mvRDID1EhD6y5Ctj4szena4EL0euXjLkUeXwPv8rxpXxGYSHcPo0/JWmMPT8?=
+ =?us-ascii?Q?w/I3ex4PUwH0NUqyJT0rEjM7+GlfbInxKsL+evB+k7+gP9PX/v0O+OIF7dpF?=
+ =?us-ascii?Q?oqGdHUtS9rQkBVLohfD31ctztGVxz7Un9ITvPm2hfD9KaYSjlLFeoNMhPE17?=
+ =?us-ascii?Q?7dm4kGNqX+w3D6dSEQqDt5xb6qZYS3NvKWJIj9pkO81Gy6lD9U/zrGCESxDB?=
+ =?us-ascii?Q?aUh6Y8g7T/SYJp+7i429nzHuBaDbv4P7gjazXba1lHWN4CQwTZgMnNwB3w1V?=
+ =?us-ascii?Q?kWxnyITrQHEVXygZC+0IdWkmGXL2PZBJj/FhcdZY0pAMPSB46QMoPAb1j5h8?=
+ =?us-ascii?Q?iBmUBGEYvaLTWIuhAz+7ULSq5WOOMmH3my1i98cQMQ/2vXVVNzDwHaTlMYQv?=
+ =?us-ascii?Q?vBysHthpJn/9l4zQaFGjJrA4GljsuDpkkAcZFcLVqNUoiPvsETSdxLsqAP2W?=
+ =?us-ascii?Q?84KcEblM/4WnPVcj0lJhFgguxctgIXYIF6wO9RrrTiShtWFKqORLUrFzT49K?=
+ =?us-ascii?Q?yPW+i85fFNLAzLBE8Xumo3aGdSpV5tPgub3rdgCCX7RD68u52BDO69SO1R/T?=
+ =?us-ascii?Q?CsDxM8SfFqL8eDhmRXNqWmuiDnP2Ir7XHlsAJeze5RKxR87DN8evhIbQt2M4?=
+ =?us-ascii?Q?dnaSiJuXwTo1TR6sOeH+JgcDkfD9typ0HZgIzhVU0YJLdgZbTzKYFfzd3YXK?=
+ =?us-ascii?Q?+MyHA6fE4+j4damv7Lhf/n4tYQZnJnIaytIbZJVJIcCZ4lvjD93AofdS6b5T?=
+ =?us-ascii?Q?gSgg2R4/MAUHandhwhRpdboCZ/yAZHUIxNdWsQuUoTBKTIfit+hyamZMJ5xQ?=
+ =?us-ascii?Q?QhwbKOV4SgzqZrTJoWrIMlIfXivLLI39a9X65ZW5S3s/ggqRV3/uhz89QFYs?=
+ =?us-ascii?Q?RCHF5nTp2uwVAYfdUxeWp8oa7LOmsJrORIDUjNjx4djIuOFF+wNaBKeMpXyb?=
+ =?us-ascii?Q?GuCm+q8aR1H7Xxah0YiQbC7cX9wE+QrOgU4CjAk3JxahsLQBw/VLWRuKTuHZ?=
+ =?us-ascii?Q?xM6bWqjvlA=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zQmowACHHoX4E+Jp+bk+AA--.31247S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxWryruF43tr13WF4rWryDZFb_yoW5Xr45pF
-	Wakay3Jry8Xw1v9Fs3tryUZrnxA3Z7J39rGrW5G3Z3CrnFqrZ3Aa4jqa4DXrnxAFWkWFW5
-	tr1DZFW09rsrurDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBY1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
-	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
-	IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2
-	z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcV
-	Aq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j
-	6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64
-	vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0E
-	n4kS14v26r4a6rW5MxkIecxEwVCm-wCF04k20xvY0x0EwIxGrwCF04k20xvE74AGY7Cv6c
-	x26r48MxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
-	r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6x
-	IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAI
-	w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x
-	0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7sRi_HU3UUUUU==
-X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQAACWnh8+ADoQAAsx
-X-Spamd-Result: default: False [-0.96 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+X-OriginatorOrg: est.tech
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4e47e36c-e399-42a7-3556-08de9c74173b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Apr 2026 11:25:55.2842
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: d2585e63-66b9-44b6-a76e-4f4b217d97fd
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: EJKuXfyfWalBV0XexoZJ93Zlw9lxwo+q8/fbq6aRC+ihov2vstPLPkFf08fxcoJnrFQDwxSlQEY9Qerdw2060X5dierC5mC7uHYQtyYx4xk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PRAP189MB1876
+X-Spamd-Result: default: False [0.34 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	R_DKIM_ALLOW(-0.20)[est.tech:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-279300-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279299-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[lzu.edu.cn];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,amazon.co.jp,shopee.com,purdue.edu,gmail.com,lzu.edu.cn];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FROM_HAS_DN(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	TO_DN_NONE(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
-	R_DKIM_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	DMARC_NA(0.00)[est.tech];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[est.tech:+];
+	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[tung.quang.nguyen@est.tech,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6676741AB2F
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,iscas.ac.cn:email]
+X-Rspamd-Queue-Id: A2BA141AC90
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Nan Li <tonanli66@gmail.com>
-
-The call request receive path keeps using the listener socket after the
-lookup lock has been dropped. Keep the listener alive across the
-remaining validation and child socket setup by taking a reference in the
-lookup path and releasing it once request handling is finished.
-
-This makes listener lifetime handling explicit and avoids races with
-concurrent socket teardown.
-
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Cc: stable@kernel.org
-Reported-by: Yifan Wu <yifanwucs@gmail.com>
-Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-Reported-by: Xin Liu <bird@lzu.edu.cn>
-Co-developed-by: Yuan Tan <yuantan098@gmail.com>
-Signed-off-by: Yuan Tan <yuantan098@gmail.com>
-Signed-off-by: Nan Li <tonanli66@gmail.com>
-Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
----
- net/rose/af_rose.c | 24 +++++++++++++++++++-----
- 1 file changed, 19 insertions(+), 5 deletions(-)
-
-diff --git a/net/rose/af_rose.c b/net/rose/af_rose.c
-index d5032840ee48..c96325e54a86 100644
---- a/net/rose/af_rose.c
-+++ b/net/rose/af_rose.c
-@@ -277,8 +277,10 @@ static struct sock *rose_find_listener(rose_address *addr, ax25_address *call)
- 
- 		if (!rosecmp(&rose->source_addr, addr) &&
- 		    !ax25cmp(&rose->source_call, call) &&
--		    !rose->source_ndigis && s->sk_state == TCP_LISTEN)
-+		    !rose->source_ndigis && s->sk_state == TCP_LISTEN) {
-+			sock_hold(s);
- 			goto found;
-+		}
- 	}
- 
- 	sk_for_each(s, &rose_list) {
-@@ -286,8 +288,10 @@ static struct sock *rose_find_listener(rose_address *addr, ax25_address *call)
- 
- 		if (!rosecmp(&rose->source_addr, addr) &&
- 		    !ax25cmp(&rose->source_call, &null_ax25_address) &&
--		    s->sk_state == TCP_LISTEN)
-+		    s->sk_state == TCP_LISTEN) {
-+			sock_hold(s);
- 			goto found;
-+		}
- 	}
- 	s = NULL;
- found:
-@@ -1056,10 +1060,13 @@ int rose_rx_call_request(struct sk_buff *skb, struct net_device *dev, struct ros
- 	/*
- 	 * We can't accept the Call Request.
- 	 */
--	if (sk == NULL || sk_acceptq_is_full(sk) ||
-+	if (sk == NULL)
-+		goto out_clear_request;
-+
-+	if (sk_acceptq_is_full(sk) ||
- 	    (make = rose_make_new(sk)) == NULL) {
--		rose_transmit_clear_request(neigh, lci, ROSE_NETWORK_CONGESTION, 120);
--		return 0;
-+		sock_put(sk);
-+		goto out_clear_request;
- 	}
- 
- 	skb->sk     = make;
-@@ -1110,7 +1117,14 @@ int rose_rx_call_request(struct sk_buff *skb, struct net_device *dev, struct ros
- 	if (!sock_flag(sk, SOCK_DEAD))
- 		sk->sk_data_ready(sk);
- 
-+	sock_put(sk);
-+
- 	return 1;
-+
-+out_clear_request:
-+	rose_transmit_clear_request(neigh, lci, ROSE_NETWORK_CONGESTION, 120);
-+
-+	return 0;
- }
- 
- static int rose_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
--- 
-2.43.0
+>Subject: [PATCH] tipc: crypto: require a NUL-terminated AEAD algorithm nam=
+e
+>
+>struct tipc_aead_key carries alg_name in a fixed 32-byte field, but both t=
+he
+>generic netlink validation path and the MSG_CRYPTO receive path pass that
+>field straight to crypto_has_alg(), strcmp(), and
+>crypto_alloc_aead() without first proving that it contains a terminating N=
+UL.
+>
+This is not correct. TIPC guarantees the algorithm string is nul-terminated=
+ one.
+>Reject locally supplied and received keys whose algorithm name fills the e=
+ntire
+>fixed-width field without a terminator.
+>
+>Fixes: fc1b6d6de220 ("tipc: introduce TIPC encryption & authentication")
+>Cc: stable@vger.kernel.org
+>
+>Signed-off-by: Pengpeng Hou <pengpeng@iscas.ac.cn>
+>---
+> net/tipc/crypto.c | 14 ++++++++++++++
+> 1 file changed, 14 insertions(+)
+>
+>diff --git a/net/tipc/crypto.c b/net/tipc/crypto.c index
+>6d3b6b89b1d1..60110ea0fe7c 100644
+>--- a/net/tipc/crypto.c
+>+++ b/net/tipc/crypto.c
+>@@ -307,6 +307,11 @@ static void tipc_crypto_work_tx(struct work_struct
+>*work);  static void tipc_crypto_work_rx(struct work_struct *work);  stati=
+c int
+>tipc_aead_key_generate(struct tipc_aead_key *skey);
+>
+>+static bool tipc_aead_alg_name_valid(const char *alg_name) {
+>+	return strnlen(alg_name, TIPC_AEAD_ALG_NAME) <
+>TIPC_AEAD_ALG_NAME; }
+>+
+This is not needed because TIPC only supports one algorithm name "gcm(aes)"=
+ which is 8-byte length.
+> #define is_tx(crypto) (!(crypto)->node)  #define is_rx(crypto) (!is_tx(cr=
+ypto))
+>
+>@@ -335,6 +340,11 @@ int tipc_aead_key_validate(struct tipc_aead_key
+>*ukey, struct genl_info *info)  {
+> 	int keylen;
+>
+>+	if (unlikely(!tipc_aead_alg_name_valid(ukey->alg_name))) {
+>+		GENL_SET_ERR_MSG(info, "algorithm name is not NUL-
+>terminated");
+>+		return -EINVAL;
+>+	}
+>+
+This is not needed because the system guarantees that the string passed fro=
+m user-space is nul-terminated one.
+> 	/* Check if algorithm exists */
+> 	if (unlikely(!crypto_has_alg(ukey->alg_name, 0, 0))) {
+> 		GENL_SET_ERR_MSG(info, "unable to load the algorithm
+>(module existed?)"); @@ -2298,6 +2308,10 @@ static bool
+>tipc_crypto_key_rcv(struct tipc_crypto *rx, struct tipc_msg *hdr)
+> 		pr_debug("%s: invalid MSG_CRYPTO key size\n", rx->name);
+> 		goto exit;
+> 	}
+>+	if (unlikely(!tipc_aead_alg_name_valid(data))) {
+>+		pr_debug("%s: invalid MSG_CRYPTO algorithm name\n", rx-
+>>name);
+>+		goto exit;
+>+	}
+This is not needed as explained above.
+>
+> 	spin_lock(&rx->lock);
+> 	if (unlikely(rx->skey || (key_gen =3D=3D rx->key_gen && rx->key.keys))) =
+{
+>--
+>2.50.1 (Apple Git-155)
+>
 
 
