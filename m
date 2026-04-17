@@ -1,182 +1,180 @@
-Return-Path: <netdev+bounces-279416-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279417-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UHHdFaOX4mlS7wAAu9opvQ
-	(envelope-from <netdev+bounces-279416-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 22:27:15 +0200
+	id cBh+JiOe4mn/8AAAu9opvQ
+	(envelope-from <netdev+bounces-279417-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 22:54:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3C7A41E7D1
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 22:27:10 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F04841E935
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 22:54:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 74C813055E9F
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 20:25:43 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 737A63002D7F
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 20:54:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E38D3033E3;
-	Fri, 17 Apr 2026 20:25:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B48332143F;
+	Fri, 17 Apr 2026 20:54:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="n4DERvOx"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B9swe/mZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1216E2FF17A
-	for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 20:25:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776457542; cv=none; b=PYuH6X1SK7S06pWVq7PWUQV0xE9e6zUqyMwfC7qQRHGUcl4E9K7VveLD8jBftfXucryoqy4JR8LbJKwkdfP6196d/LWg3ONNdqe2WDgBq5pfV9tO3d5UDQESMSW5o1WCHg5WGA8z1qqVPubSDtydgvIH17pAq+HKdy9xxISw/rk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776457542; c=relaxed/simple;
-	bh=aj1AWvC8XbRVZ84THDbjAbLYwcPNCY8pg/zxBAkidcY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=s6WdZMjwuxxunTAKwkFwe/zq94v7UPO1ld8PbK3RAAS0oEwVkgC5w48s5TRzkDOeJYqAvzAg+2/yzMk36IO9GLjIJF4uGfgok7OyuX92Q/5N+gcfIUgXwq3N9SGu8qC/HNicUrcBKQ7m43zz+CJTbIXgdaXLdTOBM+RYGtQpdA4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=n4DERvOx; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-43d7645adbdso646893f8f.1
-        for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 13:25:40 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9E5A13C918
+	for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 20:54:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.48
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776459279; cv=pass; b=dJbJuul/jXTrI1AwMB2iMsNbWcrplbLU8kbgIhV6buzAREFpTQ/FCTEw8aIK7pifZyYr65NDrC6Xfx8Q8uPocGQyqkCRT995x9GJlk6cfrjGZbLve6hZxBFdjGkSmgxnebWq66cojbJfo9/9osZ3lr+f+KY2powqaqvfKV9ivIY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776459279; c=relaxed/simple;
+	bh=UyMR4aiAgkMAWZ4GY+7KEQYdTDpRSP89oKKHuw3OD98=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Rib7jat9ItkY7CmZSaNHSaYX/GLUTYe6K83xbFZHxN7ExQxArkEhgPmp2huKXB/b3PCBcneUYtnutxLYFRDgc6K8Jzd+m2v3rttIzYsVPKKV5XrCiKfdTH76o6ETxPnDMTQ6Xp5NQtGgyqruypf3/v4NQ11fS7pyouVq+6IgMNM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=B9swe/mZ; arc=pass smtp.client-ip=209.85.219.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-8a4b8c3a30bso11644806d6.3
+        for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 13:54:37 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776459277; cv=none;
+        d=google.com; s=arc-20240605;
+        b=ixcrMOQyDt9q+PCcny4qu4xmti6BP0kLINgzkOVRUsyznWhoQJ/2HCtW5erdNcR4q2
+         LcLsNt5ltWbYicYzQYw+KePdAIpuw66Cw2AzwSGm5kfYSkOKRM9n782X4XsM7l8c856B
+         n75P7D+DgShAVaxfvxh77NFTVgHrXrlR2DP4PwwVDvNyjEKHZB5s9eBOrxxESo+EAwp0
+         LXaoaQFGvKhipsFi3gGLEOMlT+j/JCgwww8/6G5NpIKu+waADa7724360UEVfimPewNk
+         obiYxg+mYPDijZvCEikzk0rrPYcIs71Inxom88Mv0wrVztkjv97zywjVnddykx5owJTk
+         LjHw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=UyMR4aiAgkMAWZ4GY+7KEQYdTDpRSP89oKKHuw3OD98=;
+        fh=nzF1hwpu8O/+NKGbT4qL1o74xkH6317EDoa5oeI+hTc=;
+        b=h6wiVkS21NO9xu/ahEq+qgVdwM3D780lYkgNqYvVB2X2GmPjdbYiXkcn/Lk0vWWZv4
+         5vKfUEN+CJIanIZiYAJ7Bn8Ww5S+Q/3+7C19xovOso2ZJ/LTE+chm0cncEhh6iLheq89
+         RWi0Cs7+4OTORuiWHFgFnh9sFbepHikeQzThJBGphx1zt6z43V9e5ui+Ck4Ie/nVUjsE
+         bYM2EVUxIzF1/sOQYVHQPqi1cHPALsZ4QF5UPuShwq44/8/BR/Mpwv4WFC1Cf6J3szwT
+         e+lWYADtk6eZhgDKpEI7+9am4/ku45JepeGMF93JSJbBFNxC86EDQ3PQoiIw7C7GuMSy
+         l5aA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776457539; x=1777062339; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=XdlRI90tG77ZcO4PzgXRbhAv78/rObSf67pj3SzFeiA=;
-        b=n4DERvOxFodb2N/tkbprUyJKRKZld+2UklsHd6jQTHAoNxNTe2YkQsmiHDX8+2JTQ3
-         5aFU8nYgcEpAdRw1JMxaIrOfHXOaUVwPLTudmZ+Gc+dlxxsO+s0EzUr6WUkTkQmPoObl
-         67zgSDveTxlNrfYPaiuXdGk7ytGDS/mwoGgqmCdfBXpItFoOhnrffudG1ieGMosAD7e9
-         gTUwEltAIn97GFLqlPqihMhhq3+okKTZ452Kecv+9X/cTpQEpn+Gz7pom5oyovH7kjB9
-         56JhC2cVciEfUvqfsO2/3QqFCo+VbISLFIkNHBo6NdFKRGfn8OohcBLZUr+f3KrP5ybB
-         PGuQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776457539; x=1777062339;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20251104; t=1776459277; x=1777064077; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XdlRI90tG77ZcO4PzgXRbhAv78/rObSf67pj3SzFeiA=;
-        b=s9F5vb4p8GcGIm6RPBiXi5NXi3zC2tOrj+3scAgKs19pH8WgCjmJjT4BfXdoNfZZMS
-         Eced45RTW3Mv1oliZhLA6Crr/HN51NnowJ3v0HoyK34BQ4UEHdH3NeqE0lpLa0jTiY4O
-         J+Pcwka0zXHV/DTsnhAmlv17IXV+KlaST4j4D0uuxWh7UM9IAbybqvg+Cr37Aengq6/D
-         veNPm69EzaasOaUgJTSZucB3BMGdG1nqYvytzj9+36gnIfUkpAmVVxll5mviTDJRIP1K
-         WEnF7KWAwCsPavEWYxzFVqquqzfGpH+EYTENIVLJCVoNyxZ8fcfcjOuEQUvbKCN5oUnE
-         vDAg==
-X-Gm-Message-State: AOJu0Yz3ez3SvBWmD3I3fMnzahDaN8NPst2Mx9YdmKGS75OgGHMzjO8x
-	0Gu/x5RnycCFtetCFr2QQ4iGj+vWuNnXBbrpjumzq80c3j9rZefbuhvu/6YulIQgB74=
-X-Gm-Gg: AeBDietElm7qUJQ3SU1pS9EP809X/PktW5v3raeW/aeAz40OkDdqTajPFqQEMbDttMS
-	cKo9McA5d95XfgbZJt622JVMO0UueCP1P4VKLUcJ1puXoK0ge4kRKdWJTOLKpmCvepH2zYlSZcz
-	l4/SH9sYDAoIIuBQUFHdkK616/Zc+ltGUUTJ34cpK1C9nXQ/3Q+6G87hbLSQQZsgA7A2DHTDmyv
-	kV12RYaYOg1EBZFS7HZrDzwwrdQrP9CGBrZWtLDOLWilBbLDYGb6YG9hjTVqVlj2RNLAwd3VJJD
-	gVV0gQgRwYEa3j6rj55KoPQmlKUizaHWKwLm59nGjsb7OOeFdChLm2MZT9bFbyKxaFvyeXifalK
-	0cHomUxjgKHQRVqpGLXkLLyG4EzSWi/hXSTWyxxeLSClJo6xrdXoxtcqWhsurzIRbGtKO2h0xwQ
-	h/JaybXgV4CWOJeGGLJcgogb3BgW7A9qxFUTzs
-X-Received: by 2002:a05:6000:2383:b0:439:a95b:3c43 with SMTP id ffacd0b85a97d-43fe3dc0e4fmr6610154f8f.21.1776457538949;
-        Fri, 17 Apr 2026 13:25:38 -0700 (PDT)
-Received: from i3.local ([2a02:3035:bed:c6a6:3d8a:5cd4:13d1:48e3])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43fe4e4d5b1sm7455830f8f.30.2026.04.17.13.25.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Apr 2026 13:25:38 -0700 (PDT)
-From: RubenKelevra <rubenkelevra@gmail.com>
-To: netdev@vger.kernel.org,
-	edumazet@google.com,
-	ncardwell@google.com
-Cc: kuniyu@google.com,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	RubenKelevra <rubenkelevra@gmail.com>
-Subject: [PATCH] tcp: fix orphan count order in __tcp_close()
-Date: Fri, 17 Apr 2026 22:25:18 +0200
-Message-ID: <20260417202518.1354891-1-rubenkelevra@gmail.com>
-X-Mailer: git-send-email 2.53.0
+        bh=UyMR4aiAgkMAWZ4GY+7KEQYdTDpRSP89oKKHuw3OD98=;
+        b=B9swe/mZB0OhoeZmWI1XvVyPw5DgNyHG2n47XyZoBILyo/X0kJb3zyPmEc1lpGOHym
+         hASdGk5iL7YnFsJBRXdoQLQ2PXO/BJANQZde0h4VuYf16wPyK0tzIasEuwrPrzf0d2xJ
+         pgjSomAYzeDoSFYrwekxp/R6yGR5FGG1F2nWGDAS3VJD4RHQnzjcWXrn1roTWsoB9E34
+         UGVAA9pifzBIJEqmhTBDUXHJ9Bq6mfaddmOWrwFt9Vq8jebcjdfRmFY2MzLYOTPguXFr
+         b4gVLziPyXRT7o+vII6ar5w003wVquK8JXxug5K3GkzK6y2tWxzrZ1nmfXnMKV8HG1da
+         0eYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776459277; x=1777064077;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=UyMR4aiAgkMAWZ4GY+7KEQYdTDpRSP89oKKHuw3OD98=;
+        b=pTILc/KRU7sJ8dzxsBcpKYg64SkCgtFUU2ITjkxOAT5IjybJsQ5+JBcDz9Bpt04kK2
+         orvpib/OpUDyqNWoGnzipJHE3THtSuhOFLV64GA0ltZgdhA3kBXPJRj92UcoCp5K2JnQ
+         Y9uRJsfVYEtymK5BWe44OiOVW9KHexjniDGBwerarp4nn8rDU6TTiuzlbQ1sHwLYFz1p
+         HQEmD2S5C1IAybE3H8fSjKtn5ysPHUHRClsCPGU9D7om6X16RgdgnGPjTEDGyso5mb1l
+         O3F60s7lweS3LTcpBjHi8hHcEIHr+bPcyN61hYfIXHSbGYRK2ImkACtP9KuOFyY8soQA
+         zRVg==
+X-Gm-Message-State: AOJu0YwTJE0TGgccR2ow7zfLF2phQxHqEOSBjun8duxK1tLOFYdNV12f
+	djlQ2rNRlg+1/+Z0cUT5F2uPqAT2h0OD2wB7pzEcvWcVMkuiZPgz7qzA7YP7vih1Q+aDbU0NvO6
+	2uJDsvpncAR0CrZ8IjsQPA3nc4aZb8Gq9qNMVkxK8rY9D+cpwoJBBw0f+WIo=
+X-Gm-Gg: AeBDieuNfqM7UOw7/qXD+glElN/H8amrMhs1LSwajUDOXf+YgQ08GccBxJ60IeqLv85
+	P/vFownYYh9awYD+efew1mzspUFc5faIQOTL07KPeZIBuCX9hjL3jjc9NZ8UrRn92ti6UHN03VC
+	HxhH3o9cGGD71wLOc5U4wtp+H+rUVSimFJ2vQn88R8uP81YajAptWhFZMichHQ+t1g4aynvDpxa
+	OD3vqTyJTtGb3EPUxS4ql/q+n4u0HNy8ELWfzevvFDeZEoVS3xiNpABx++vRmosPezyr88zGtfN
+	ZUPT3Z/1uq1DSHce/+GZnpee4A5GbsAyHc6DEC/UQOQ7mkXtNkVqVZr8/GSUUEYJgPP+n/J7Ge/
+	rLaBgnsC/
+X-Received: by 2002:ad4:5d65:0:b0:8ae:6282:df2e with SMTP id
+ 6a1803df08f44-8b02822456emr73810786d6.44.1776459276431; Fri, 17 Apr 2026
+ 13:54:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+References: <20260417202518.1354891-1-rubenkelevra@gmail.com>
+In-Reply-To: <20260417202518.1354891-1-rubenkelevra@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 17 Apr 2026 13:54:25 -0700
+X-Gm-Features: AQROBzATJJtS0KmIK0a4Z1QPtKoyGtuhuhSyn8CckO_lBwlXzz5vQewr34lZio8
+Message-ID: <CANn89i+zy=YttsDesBzvtSrkdY+==L_L6j4O7EFjYKEggcXbGA@mail.gmail.com>
+Subject: Re: [PATCH] tcp: fix orphan count order in __tcp_close()
+To: RubenKelevra <rubenkelevra@gmail.com>
+Cc: netdev@vger.kernel.org, ncardwell@google.com, kuniyu@google.com, 
+	davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, 
+	horms@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[google.com,davemloft.net,kernel.org,redhat.com,gmail.com];
-	TAGGED_FROM(0.00)[bounces-279416-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-279417-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rubenkelevra@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D3C7A41E7D1
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 3F04841E935
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-__tcp_close() calls sock_orphan(sk) first and drains the backlog with
-__release_sock(sk), which might call tcp_done() which decrements the
-tcp_orphan_count. After which we will increment tcp_orphan_count again.
+On Fri, Apr 17, 2026 at 1:25=E2=80=AFPM RubenKelevra <rubenkelevra@gmail.co=
+m> wrote:
+>
+> __tcp_close() calls sock_orphan(sk) first and drains the backlog with
+> __release_sock(sk), which might call tcp_done() which decrements the
+> tcp_orphan_count. After which we will increment tcp_orphan_count again.
+>
+> Since tcp_orphan_count is an unsigned int, we underflow to uint_max if we
+> started with a 0 - at least on all current supported platforms.
+>
+> I could not locate a direct user of this value, and in
+> tcp_orphan_count_sum() this underflow is contained by adding the unsigned
+> int value into a signed int sum, causing it to behave like -1 on current
+> supported platforms and then get clamped by max(n, 0) to 0.
+>
+> The impact therefore is currently limited to e.g. tcp_too_many_orphans()
+> checking an artificially low value, if the cached sum is refreshed within
+> this timeframe.
+>
+> This fix mirrors the previous fix I found while investigating: commit
+> 75c2d9077c63 ("[TCP]: Fix sock_orphan dead lock")
+>
+> Later commit eb4dea585304 ("net: Fix percpu counters deadlock") moved the
+> increment down for old percpu_counter reasons. commit 19757cebf0c5 ("tcp:
+> switch orphan_count to bare per-cpu counters") changed orphan accounting =
+to
+> plain per-cpu counters, so that old reason no longer applies the same way
+> now.
 
-Since tcp_orphan_count is an unsigned int, we underflow to uint_max if we
-started with a 0 - at least on all current supported platforms.
+I find this patch rather confusing. Have you used an LLM to generate it?
 
-I could not locate a direct user of this value, and in
-tcp_orphan_count_sum() this underflow is contained by adding the unsigned
-int value into a signed int sum, causing it to behave like -1 on current
-supported platforms and then get clamped by max(n, 0) to 0.
+You are mentioning old patches that are not relevant (bh disable/enable).
 
-The impact therefore is currently limited to e.g. tcp_too_many_orphans()
-checking an artificially low value, if the cached sum is refreshed within
-this timeframe.
-
-This fix mirrors the previous fix I found while investigating: commit
-75c2d9077c63 ("[TCP]: Fix sock_orphan dead lock")
-
-Later commit eb4dea585304 ("net: Fix percpu counters deadlock") moved the
-increment down for old percpu_counter reasons. commit 19757cebf0c5 ("tcp:
-switch orphan_count to bare per-cpu counters") changed orphan accounting to
-plain per-cpu counters, so that old reason no longer applies the same way
-now.
-
-Fixes: 19757cebf0c5 ("tcp: switch orphan_count to bare per-cpu counters")
-Signed-off-by: RubenKelevra <rubenkelevra@gmail.com>
----
- net/ipv4/tcp.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 2014a6408e93..1a91cb31b02f 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -3234,11 +3234,10 @@ void __tcp_close(struct sock *sk, long timeout)
- 
- 	local_bh_disable();
- 	bh_lock_sock(sk);
-+	tcp_orphan_count_inc();
- 	/* remove backlog if any, without releasing ownership. */
- 	__release_sock(sk);
- 
--	tcp_orphan_count_inc();
--
- 	/* Have we already been destroyed by a softirq or backlog? */
- 	if (state != TCP_CLOSE && sk->sk_state == TCP_CLOSE)
- 		goto out;
--- 
-2.53.0
-
+Given we advise only increasing tcp_max_orphans value (default being
+262144 on modern hosts),
+your patch has really no effect.
 
