@@ -1,214 +1,249 @@
-Return-Path: <netdev+bounces-279287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279288-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wHSlEZT/4Wna0QAAu9opvQ
-	(envelope-from <netdev+bounces-279287-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 11:38:28 +0200
+	id aNtaDO3/4Wna0QAAu9opvQ
+	(envelope-from <netdev+bounces-279288-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 11:39:57 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5DBF41962E
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 11:38:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C890B419698
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 11:39:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3320C30C17F9
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 09:32:04 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 7EDB730D5BE8
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 09:33:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DE953BC675;
-	Fri, 17 Apr 2026 09:28:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 136983B47C6;
+	Fri, 17 Apr 2026 09:31:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lu/fJe4q"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i+SaMp0D"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70F8D3BB9E4
-	for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 09:28:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E477D3B3BEB
+	for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 09:31:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776418086; cv=none; b=BRZg1rxDETjPHGMDimfDviaPk6GCAD81cWUR6ZeNYaY03tbE9X3yCI/sszWzyl57F50SGWTFOqn7XGf3nvLmGcL1GBuM100TbgmKa7WHrh+e3UL2uBDpjFqD4O+FTtTGSyf9zhQg0e/xB/axdpssa5+7A5iTU+oLmWwQJ5QI0MY=
+	t=1776418287; cv=none; b=LxUkmmsxxZhX//rftLZbAn7EcpuXrwjGWY1JWzfrSMsKYpeYWVvK0USySu5NP66QRM6RdWkw5syAbEOxtYwqfKHd+qFLqyuzZaSkwkI5OmGKuejzud3cYDAke6ItDA5H0QUD8cJhsEZnNrAZVEuUxx67phllhpDjdPUfa3aEwkE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776418086; c=relaxed/simple;
-	bh=LzAJF/FmkAqdlVvZY2fTdc22L5n729dJwqViP4n+Eyk=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=BATA89FvOGzK5W1kiwniC6rEBPbxPWifaZxZ8gI+DWTxBAccFHohOY7IaE3+cYlHbY4WeWo+bT6cV1/SXLJ11yEYytiMFCyO47EJ2w/S5TZPqI//n9gfuagWCSDXNViQH1qhw4SbROvKZJGr3cCxByo5FxuDz2eqLUkRhEzu9SM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lu/fJe4q; arc=none smtp.client-ip=95.215.58.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <d1d87bf52477d0170366ca83694dc9f7755ccdec.camel@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1776418071;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=i7InGljGZEKZAmpSEkbXjkOBCSclolAPEwl4w3xfvzc=;
-	b=lu/fJe4qghAYGUbAqPoKARQP91hI1335ELyfUsJhpgNqiVEFFe5IIxgkGrOyZ26hRswwJz
-	5C5uE1xtO7ELW2KN2/fwezgEDaWXwuO6DR/w6LZs+48uWBPCVLTgbmVjwBMQ0Jr4UWFRMn
-	tK828SMLs6vK+bh/PQKo1gjg9MHA6bw=
-Subject: Re: [PATCH bpf v2 1/2] bpf: Reject TCP_NODELAY in TCP header option
- callbacks
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: KaFai Wan <kafai.wan@linux.dev>
-To: Jiayuan Chen <jiayuan.chen@linux.dev>, martin.lau@linux.dev, 
- daniel@iogearbox.net, john.fastabend@gmail.com, sdf@fomichev.me,
- ast@kernel.org,  andrii@kernel.org, eddyz87@gmail.com, memxor@gmail.com,
- song@kernel.org,  yonghong.song@linux.dev, jolsa@kernel.org,
- davem@davemloft.net,  edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org,  shuah@kernel.org,
- bpf@vger.kernel.org, netdev@vger.kernel.org,  linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-Cc: Quan Sun <2022090917019@std.uestc.edu.cn>, Yinhao Hu
- <dddddd@hust.edu.cn>,  Kaiyan Mei <M202472210@hust.edu.cn>
-Date: Fri, 17 Apr 2026 17:27:11 +0800
-In-Reply-To: <ce2019d0-c127-4c0a-8d2a-f373a68d1bd2@linux.dev>
-References: <20260416112308.1820332-1-kafai.wan@linux.dev>
-	 <20260416112308.1820332-2-kafai.wan@linux.dev>
-	 <ce2019d0-c127-4c0a-8d2a-f373a68d1bd2@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1776418287; c=relaxed/simple;
+	bh=wHJYU1iKI6iAbC5ISchoRkeWmMX7820CTrVZUNdaN4U=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=QyUFHKyoBTCU8gDxDiYhRSwu8fwARdjoM4qzIUng1Q1yC3XBWedXLqcFTyfLSYIebBbMxe1zWwYKTpoSues0VVtm7aEXhi+OpFOmETdOg7/XfYGgRmOEOggaw6iNVd0ezfqBjetubJLr/szRaE48/rH8/pO5G4hqTE3M7RUKka0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i+SaMp0D; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E438FC19425;
+	Fri, 17 Apr 2026 09:31:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776418286;
+	bh=wHJYU1iKI6iAbC5ISchoRkeWmMX7820CTrVZUNdaN4U=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=i+SaMp0D3QmY5OFztuvoXob/+d3M6isW2YfhVXDigP0FPISULl39HyMK12gdeCzwG
+	 8vOjhlickEeBiRsQtl0J5ov+z+BpH4L49F13k4gO5E3yzNeUtADtbPEvZcBiYRZeJQ
+	 GuY3VQUrwJk3noHDinPfuUN60xvMz5FjuDqZZwk5Dh9vA+VYas5wuyWAnoQVGhUldS
+	 a3rZTC8ZaE5OXQ5mjj7fFgQ+xt3iGQ42ZTurl+5AF3KcHEjsbISssDWeFesc4pgueW
+	 HmieKLMjrc1SPfz6fcF2reakS5Bajq9A7My83yqYuAd6U+Rbsfud5jNrlZcP6/jsVa
+	 oqyL/86S+mCZA==
+From: Simon Horman <horms@kernel.org>
+To: jtornosm@redhat.com
+Cc: 'Simon Horman' <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org,
+	jesse.brandeburg@intel.com,
+	anthony.l.nguyen@intel.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	przemyslaw.kitszel@intel.com
+Subject: Re: [PATCH net v3 3/5] iavf: send MAC change request synchronously
+Date: Fri, 17 Apr 2026 10:31:05 +0100
+Message-ID: <20260417093104.51561-2-horms@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260414110006.124286-4-jtornosm@redhat.com>
+References: <20260414110006.124286-4-jtornosm@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [4.84 / 15.00];
-	SEM_URIBL(3.50)[uestc.edu.cn:email];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
-	BAD_REP_POLICIES(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279287-lists,netdev=lfdr.de];
-	R_DKIM_ALLOW(0.00)[linux.dev:s=key1];
-	FREEMAIL_TO(0.00)[linux.dev,iogearbox.net,gmail.com,fomichev.me,kernel.org,davemloft.net,google.com,redhat.com,vger.kernel.org];
-	GREYLIST(0.00)[pass,meta];
-	RCPT_COUNT_TWELVE(0.00)[25];
-	RCVD_COUNT_THREE(0.00)[3];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-279288-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_POLICY_ALLOW(0.00)[linux.dev,none];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kafai.wan@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	R_SPF_ALLOW(0.00)[+ip4:172.232.135.74:c];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	NEURAL_SPAM(0.00)[0.584];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,linux.dev:dkim,linux.dev:mid,hust.edu.cn:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,uestc.edu.cn:email]
-X-Rspamd-Queue-Id: D5DBF41962E
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C890B419698
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, 2026-04-17 at 10:43 +0800, Jiayuan Chen wrote:
->=20
-> On 4/16/26 7:23 PM, KaFai Wan wrote:
-> > A BPF_SOCK_OPS program can enable
-> > BPF_SOCK_OPS_WRITE_HDR_OPT_CB_FLAG and then call
-> > bpf_setsockopt(TCP_NODELAY) from BPF_SOCK_OPS_HDR_OPT_LEN_CB or
-> > BPF_SOCK_OPS_WRITE_HDR_OPT_CB.
-> >=20
-> > In these callbacks, bpf_setsockopt(TCP_NODELAY) can reach
-> > __tcp_sock_set_nodelay(), which can call tcp_push_pending_frames().
-> >=20
-> > =C2=A0From BPF_SOCK_OPS_HDR_OPT_LEN_CB, tcp_push_pending_frames() can c=
-all
-> > tcp_current_mss(), which calls tcp_established_options() and re-enters
-> > bpf_skops_hdr_opt_len().
-> >=20
-> > BPF_SOCK_OPS_HDR_OPT_LEN_CB
-> > =C2=A0=C2=A0 -> bpf_setsockopt(TCP_NODELAY)
-> > =C2=A0=C2=A0=C2=A0=C2=A0 -> tcp_push_pending_frames()
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -> tcp_current_mss()
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -> tcp_established_opt=
-ions()
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -> bpf_sko=
-ps_hdr_opt_len()
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 -> BPF_SOCK_OPS_HDR_OPT_LEN_CB
-> >=20
-> > =C2=A0From BPF_SOCK_OPS_WRITE_HDR_OPT_CB, tcp_push_pending_frames() can=
- call
-> > tcp_write_xmit(), which calls tcp_transmit_skb().=C2=A0 That path recom=
-putes
-> > header option length through tcp_established_options() and
-> > bpf_skops_hdr_opt_len() before re-entering bpf_skops_write_hdr_opt().
-> >=20
-> > BPF_SOCK_OPS_WRITE_HDR_OPT_CB
-> > =C2=A0=C2=A0 -> bpf_setsockopt(TCP_NODELAY)
-> > =C2=A0=C2=A0=C2=A0=C2=A0 -> tcp_push_pending_frames()
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -> tcp_write_xmit()
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -> tcp_transmit_skb()
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -> tcp_est=
-ablished_options()
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 -> bpf_skops_hdr_opt_len()
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -> bpf_sko=
-ps_write_hdr_opt()
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 -> BPF_SOCK_OPS_WRITE_HDR_OPT_CB
-> >=20
-> > This leads to unbounded recursion and can overflow the kernel stack.
-> >=20
-> > Reject TCP_NODELAY with -EOPNOTSUPP in bpf_sock_ops_setsockopt()
-> > when bpf_setsockopt() is called from
-> > BPF_SOCK_OPS_HDR_OPT_LEN_CB or BPF_SOCK_OPS_WRITE_HDR_OPT_CB.
-> >=20
-> > Reported-by: Quan Sun <2022090917019@std.uestc.edu.cn>
-> > Reported-by: Yinhao Hu <dddddd@hust.edu.cn>
-> > Reported-by: Kaiyan Mei <M202472210@hust.edu.cn>
-> > Closes: https://lore.kernel.org/bpf/d1d523c9-6901-4454-a183-94462b8f3e4=
-e@std.uestc.edu.cn/
-> > Fixes: 7e41df5dbba2 ("bpf: Add a few optnames to bpf_setsockopt")
-> > Signed-off-by: KaFai Wan <kafai.wan@linux.dev>
-> > ---
-> > =C2=A0 net/core/filter.c | 5 +++++
-> > =C2=A0 1 file changed, 5 insertions(+)
-> >=20
-> > diff --git a/net/core/filter.c b/net/core/filter.c
-> > index fcfcb72663ca..911ff04bca5a 100644
-> > --- a/net/core/filter.c
-> > +++ b/net/core/filter.c
-> > @@ -5833,6 +5833,11 @@ BPF_CALL_5(bpf_sock_ops_setsockopt, struct bpf_s=
-ock_ops_kern *, bpf_sock,
-> > =C2=A0=C2=A0	if (!is_locked_tcp_sock_ops(bpf_sock))
-> > =C2=A0=C2=A0		return -EOPNOTSUPP;
-> > =C2=A0=20
-> > +	if ((bpf_sock->op =3D=3D BPF_SOCK_OPS_HDR_OPT_LEN_CB ||
-> > +	=C2=A0=C2=A0=C2=A0=C2=A0 bpf_sock->op =3D=3D BPF_SOCK_OPS_WRITE_HDR_O=
-PT_CB) &&
-> > +	=C2=A0=C2=A0=C2=A0 IS_ENABLED(CONFIG_INET) && level =3D=3D SOL_TCP &&=
- optname =3D=3D TCP_NODELAY)
-> > +		return -EOPNOTSUPP;
-> > +
-> > =C2=A0=C2=A0	return _bpf_setsockopt(bpf_sock->sk, level, optname, optva=
-l, optlen);
-> > =C2=A0 }
-> > =C2=A0=20
->=20
-> A simple comment is recommended:
->=20
-> /* TCP_NODELAY triggers tcp_push_pending_frames() and re-enters these=20
-> callbacks. */
->=20
-ok. Added in new version.
->=20
-> Also like Martin pointed before, BPF_SOCK_OPS_HDR_OPT_LEN_CB /=20
-> BPF_SOCK_OPS_WRITE_HDR_OPT_CB
->=20
-> can only be produced under CONFIG_INET so IS_ENABLED(CONFIG_INET) is dead=
-.
->=20
+From: 'Simon Horman' <horms@kernel.org>
 
---=20
-Thanks,
-KaFai
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://sashiko.dev
+---
+iavf: send MAC change request synchronously
+
+This commit attempts to fix a deadlock scenario during MAC address
+changes by sending the ADD_ETH_ADDR message directly and polling the
+admin queue synchronously, avoiding reliance on the watchdog task.
+
+> --- a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+> +++ b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+[ ... ]
+> -void iavf_add_ether_addrs(struct iavf_adapter *adapter)
+> +int iavf_add_ether_addrs(struct iavf_adapter *adapter)
+>  {
+[ ... ]
+>  	adapter->current_op = VIRTCHNL_OP_ADD_ETH_ADDR;
+>  
+>  	len = virtchnl_struct_size(veal, list, count);
+[ ... ]
+>  	veal = kzalloc(len, GFP_ATOMIC);
+>  	if (!veal) {
+>  		spin_unlock_bh(&adapter->mac_vlan_list_lock);
+> -		return;
+> +		return -ENOMEM;
+>  	}
+
+If kzalloc() fails here, the function returns -ENOMEM but leaves 
+adapter->current_op set to VIRTCHNL_OP_ADD_ETH_ADDR. Does this permanently
+prevent any future virtchnl operations from running, as they will all
+immediately fail with -EBUSY checks?
+
+> +int iavf_poll_virtchnl_response(struct iavf_adapter *adapter,
+[ ... ]
+> +	do {
+[ ... ]
+> +		ret = iavf_clean_arq_element(hw, &event, &pending);
+> +		if (!ret) {
+> +			v_op = (enum virtchnl_ops)le32_to_cpu(event.desc.cookie_high);
+> +			v_ret = (enum iavf_status)le32_to_cpu(event.desc.cookie_low);
+> +
+> +			iavf_virtchnl_completion(adapter, v_op, v_ret,
+> +						 event.msg_buf, event.msg_len);
+
+Unlike the legacy iavf_adminq_task() which explicitly checked for v_op == 0
+before processing, this code appears to pass a 0 opcode directly to
+iavf_virtchnl_completion() when fetching non-virtchnl admin queue events.
+
+When v_op is 0, the completion handler hits the default switch case and
+unconditionally clears adapter->current_op. Could this corrupt the state
+machine by clearing the current operation state while a valid operation is
+still pending?
+
+[ ... ]
+> +		usleep_range(50, 75);
+> +	} while (time_before(jiffies, timeout));
+> +
+> +	if (iavf_virtchnl_done(adapter, condition, cond_data, v_opcode))
+> +		ret = 0;
+> +	else
+> +		ret = -EAGAIN;
+> +
+> +out:
+> +	kfree(event.msg_buf);
+> +	return ret;
+> +}
+
+Similarly, if this polling loop times out, it returns -EAGAIN but does not
+clear adapter->current_op. Will this also permanently block the control path
+for the VF?
+
+> --- a/drivers/net/ethernet/intel/iavf/iavf_main.c
+> +++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
+> @@ -1047,6 +1047,46 @@ static bool iavf_is_mac_set_handled(struct net_device *netdev,
+[ ... ]
+> +static bool iavf_mac_change_done(struct iavf_adapter *adapter, const void *data)
+> +{
+> +	const u8 *addr = data;
+> +
+> +	return iavf_is_mac_set_handled(adapter->netdev, addr);
+> +}
+
+When promoting an existing secondary MAC to be the primary MAC,
+iavf_replace_primary_mac() retrieves the existing filter which already has
+f->add_handled set to true.
+
+iavf_add_ether_addrs() sets f->add = false before dispatching. Because
+iavf_is_mac_set_handled() checks (!f->add && f->add_handled), will this
+cause iavf_mac_change_done() to immediately return true before the hardware
+actually responds?
+
+If so, this would cause iavf_set_mac() to prematurely evaluate the 
+ether_addr_equal() check and fail with -EACCES.
+
+> +static int iavf_set_mac_sync(struct iavf_adapter *adapter, const u8 *addr)
+> +{
+> +	int ret;
+> +
+> +	netdev_assert_locked(adapter->netdev);
+> +
+> +	ret = iavf_add_ether_addrs(adapter);
+> +	if (ret)
+> +		return ret;
+> +
+> +	return iavf_poll_virtchnl_response(adapter, iavf_mac_change_done, addr,
+> +					   VIRTCHNL_OP_UNKNOWN, 2500);
+> +}
+
+If the MAC filter list has many pending filters, iavf_add_ether_addrs()
+stops at IAVF_MAX_AQ_BUF_SIZE and sets "more = true", meaning the newly
+requested MAC at the tail of the list might not be sent in the first chunk.
+
+Since this function holds the netdev lock, the watchdog task cannot run to
+send the remaining chunks. Does this cause the polling loop to wait
+2.5 seconds and time out waiting for a MAC address that was never sent?
+
+Additionally, this function exclusively dispatches iavf_add_ether_addrs().
+If changing the MAC requires deleting the old one first, such as in
+environments with a strict 1-MAC limit, the deletion is left for the
+asynchronous watchdog. Does this cause the synchronous addition to fail
+because the hardware rejects the new MAC before the old one is deleted?
+
+> @@ -1067,26 +1107,13 @@ static int iavf_set_mac(struct net_device *netdev, void *p)
+[ ... ]
+>  	ret = iavf_replace_primary_mac(adapter, addr->sa_data);
+> -
+>  	if (ret)
+>  		return ret;
+>  
+> -	ret = wait_event_interruptible_timeout(adapter->vc_waitqueue,
+[ ... ]
+> +	ret = iavf_set_mac_sync(adapter, addr->sa_data);
+> +	if (ret)
+>  		return ret;
+
+If a background watchdog operation is active, iavf_set_mac_sync() will
+immediately return -EBUSY because current_op is not VIRTCHNL_OP_UNKNOWN.
+
+This causes iavf_set_mac() to return -EBUSY to the user. However,
+iavf_replace_primary_mac() already successfully updated the software filter
+lists. Won't the watchdog task eventually wake up and asynchronously change
+the MAC address on the hardware, leaving the system in an inconsistent state
+where a failed syscall still executes in the background?
 
