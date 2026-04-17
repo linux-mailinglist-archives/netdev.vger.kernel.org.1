@@ -1,67 +1,59 @@
-Return-Path: <netdev+bounces-279288-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279289-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aNtaDO3/4Wna0QAAu9opvQ
-	(envelope-from <netdev+bounces-279288-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 11:39:57 +0200
+	id GNX7IBEC4mna0QAAu9opvQ
+	(envelope-from <netdev+bounces-279289-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 11:49:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id C890B419698
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 11:39:56 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19FEF4198CF
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 11:49:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 7EDB730D5BE8
-	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 09:33:19 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 0A6C930B8F7A
+	for <lists+netdev@lfdr.de>; Fri, 17 Apr 2026 09:40:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 136983B47C6;
-	Fri, 17 Apr 2026 09:31:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41CB63B47D2;
+	Fri, 17 Apr 2026 09:39:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i+SaMp0D"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="TWDUfoM7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E477D3B3BEB
-	for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 09:31:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C84BE39FCD7;
+	Fri, 17 Apr 2026 09:39:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776418287; cv=none; b=LxUkmmsxxZhX//rftLZbAn7EcpuXrwjGWY1JWzfrSMsKYpeYWVvK0USySu5NP66QRM6RdWkw5syAbEOxtYwqfKHd+qFLqyuzZaSkwkI5OmGKuejzud3cYDAke6ItDA5H0QUD8cJhsEZnNrAZVEuUxx67phllhpDjdPUfa3aEwkE=
+	t=1776418791; cv=none; b=CJmtxu2SGjPiGeLIHsq4XkbLITywKY/wMjOQ/63rZI0uSeZQgHZExQPsBV7f2TEjSxJOBFOKzpq6Dh49y4aIBgS2J7zMhw5Xt6ObSe09LucFZvLJp6ecm3MdpZE4pA6DH8OfevpVohdLWFkRY6OocJfwXHcoWYdU1qBBf/oe5Do=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776418287; c=relaxed/simple;
-	bh=wHJYU1iKI6iAbC5ISchoRkeWmMX7820CTrVZUNdaN4U=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QyUFHKyoBTCU8gDxDiYhRSwu8fwARdjoM4qzIUng1Q1yC3XBWedXLqcFTyfLSYIebBbMxe1zWwYKTpoSues0VVtm7aEXhi+OpFOmETdOg7/XfYGgRmOEOggaw6iNVd0ezfqBjetubJLr/szRaE48/rH8/pO5G4hqTE3M7RUKka0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i+SaMp0D; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E438FC19425;
-	Fri, 17 Apr 2026 09:31:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776418286;
-	bh=wHJYU1iKI6iAbC5ISchoRkeWmMX7820CTrVZUNdaN4U=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=i+SaMp0D3QmY5OFztuvoXob/+d3M6isW2YfhVXDigP0FPISULl39HyMK12gdeCzwG
-	 8vOjhlickEeBiRsQtl0J5ov+z+BpH4L49F13k4gO5E3yzNeUtADtbPEvZcBiYRZeJQ
-	 GuY3VQUrwJk3noHDinPfuUN60xvMz5FjuDqZZwk5Dh9vA+VYas5wuyWAnoQVGhUldS
-	 a3rZTC8ZaE5OXQ5mjj7fFgQ+xt3iGQ42ZTurl+5AF3KcHEjsbISssDWeFesc4pgueW
-	 HmieKLMjrc1SPfz6fcF2reakS5Bajq9A7My83yqYuAd6U+Rbsfud5jNrlZcP6/jsVa
-	 oqyL/86S+mCZA==
-From: Simon Horman <horms@kernel.org>
-To: jtornosm@redhat.com
-Cc: 'Simon Horman' <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org,
-	jesse.brandeburg@intel.com,
-	anthony.l.nguyen@intel.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	przemyslaw.kitszel@intel.com
-Subject: Re: [PATCH net v3 3/5] iavf: send MAC change request synchronously
-Date: Fri, 17 Apr 2026 10:31:05 +0100
-Message-ID: <20260417093104.51561-2-horms@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260414110006.124286-4-jtornosm@redhat.com>
-References: <20260414110006.124286-4-jtornosm@redhat.com>
+	s=arc-20240116; t=1776418791; c=relaxed/simple;
+	bh=xmd2hzciTwVzSqbHDFMrGp3srlpG4qtDYgLqOaimVyM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cdYPoxhf1Zv3UzvVSGMTcOfUth07JhVgf5hM9z9Nrnh2BR4lApwzOv0yP9q1R07w1gGGexOJ+DvJ0jor72aO/qmGYXLTKJwshGuuIq1QOkJnwx2EUimNmFLp8jG6UKaYQSpBHvJGF3qzC/N4ivbW0LULIksCEDL9X2XGftRn1L0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=TWDUfoM7; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: from localhost.localdomain (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with ESMTPSA id 64B4E600B5;
+	Fri, 17 Apr 2026 11:39:47 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1776418787;
+	bh=h2MWbITL9VolBoQW8hM9drqz63UdDNLY6Jnn4Sz2JYc=;
+	h=From:To:Cc:Subject:Date:From;
+	b=TWDUfoM7jZiB7Ak7G1bNeTnpqfDpHlioK60clSZg0bcAZiLsqMtNcT1lxZUlo56Ik
+	 yuKtRXdPFPofY9AMoXCayu2Becl7yFLuxCOhQtLuLDVw+Ls//AiO/RwTQ4YTO10U42
+	 diG+enJrkQ+SQLoV5Xp6OpBDtKDHArBkiEeQWl0Gd1PLfm5KGVxMINhaIW7q6uGXnt
+	 3jQI61kG1qimieG4Xrsnib8Y2TtzO6PBGpWM5X7uyH17eEvsneYwnca16uFO6gOIJZ
+	 IU7wSp1c7LDK0Z1/AX1MVl1SG3Wk3zaIlZ8lZheRRhXP+/uw0uQ4OfEZ3m9PEcMJCA
+	 I/BuUp7TiThDw==
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: netfilter-devel@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	fw@strlen.de
+Subject: [PATCH nf,v6 1/4] netfilter: nf_tables: use list_del_rcu for netlink hooks
+Date: Fri, 17 Apr 2026 11:39:39 +0200
+Message-ID: <20260417093942.373885-1-pablo@netfilter.org>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,181 +61,167 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-279289-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279288-lists,netdev=lfdr.de];
+	PRECEDENCE_BULK(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[netfilter.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	RCPT_COUNT_THREE(0.00)[3];
+	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
 	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	TO_DN_NONE(0.00)[];
+	DKIM_TRACE(0.00)[netfilter.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C890B419698
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[netfilter.org:email,netfilter.org:dkim,netfilter.org:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,strlen.de:email]
+X-Rspamd-Queue-Id: 19FEF4198CF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: 'Simon Horman' <horms@kernel.org>
+From: Florian Westphal <fw@strlen.de>
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev
+nft_netdev_unregister_hooks and __nft_unregister_flowtable_net_hooks need
+to use list_del_rcu(), this list can be walked by concurrent dumpers.
+
+Add a new helper and use it consistently.
+
+Fixes: f9a43007d3f7 ("netfilter: nf_tables: double hook unregistration in netns path")
+Signed-off-by: Florian Westphal <fw@strlen.de>
+Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
 ---
-iavf: send MAC change request synchronously
+v6: - missing fundamental patch dependency in v5
+    - just a rebase on top of net-next, net is still behind.
 
-This commit attempts to fix a deadlock scenario during MAC address
-changes by sending the ADD_ETH_ADDR message directly and polling the
-admin queue synchronously, avoiding reliance on the watchdog task.
+ net/netfilter/nf_tables_api.c | 44 ++++++++++++++---------------------
+ 1 file changed, 18 insertions(+), 26 deletions(-)
 
-> --- a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
-> +++ b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
-[ ... ]
-> -void iavf_add_ether_addrs(struct iavf_adapter *adapter)
-> +int iavf_add_ether_addrs(struct iavf_adapter *adapter)
->  {
-[ ... ]
->  	adapter->current_op = VIRTCHNL_OP_ADD_ETH_ADDR;
->  
->  	len = virtchnl_struct_size(veal, list, count);
-[ ... ]
->  	veal = kzalloc(len, GFP_ATOMIC);
->  	if (!veal) {
->  		spin_unlock_bh(&adapter->mac_vlan_list_lock);
-> -		return;
-> +		return -ENOMEM;
->  	}
+diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
+index 8537b94653d3..07e151245765 100644
+--- a/net/netfilter/nf_tables_api.c
++++ b/net/netfilter/nf_tables_api.c
+@@ -374,6 +374,12 @@ static void nft_netdev_hook_free_rcu(struct nft_hook *hook)
+ 	call_rcu(&hook->rcu, __nft_netdev_hook_free_rcu);
+ }
+ 
++static void nft_netdev_hook_unlink_free_rcu(struct nft_hook *hook)
++{
++	list_del_rcu(&hook->list);
++	nft_netdev_hook_free_rcu(hook);
++}
++
+ static void nft_netdev_unregister_hooks(struct net *net,
+ 					struct list_head *hook_list,
+ 					bool release_netdev)
+@@ -384,10 +390,8 @@ static void nft_netdev_unregister_hooks(struct net *net,
+ 	list_for_each_entry_safe(hook, next, hook_list, list) {
+ 		list_for_each_entry(ops, &hook->ops_list, list)
+ 			nf_unregister_net_hook(net, ops);
+-		if (release_netdev) {
+-			list_del(&hook->list);
+-			nft_netdev_hook_free_rcu(hook);
+-		}
++		if (release_netdev)
++			nft_netdev_hook_unlink_free_rcu(hook);
+ 	}
+ }
+ 
+@@ -2271,10 +2275,8 @@ void nf_tables_chain_destroy(struct nft_chain *chain)
+ 
+ 		if (nft_base_chain_netdev(table->family, basechain->ops.hooknum)) {
+ 			list_for_each_entry_safe(hook, next,
+-						 &basechain->hook_list, list) {
+-				list_del_rcu(&hook->list);
+-				nft_netdev_hook_free_rcu(hook);
+-			}
++						 &basechain->hook_list, list)
++				nft_netdev_hook_unlink_free_rcu(hook);
+ 		}
+ 		module_put(basechain->type->owner);
+ 		if (rcu_access_pointer(basechain->stats)) {
+@@ -2974,6 +2976,7 @@ static int nf_tables_updchain(struct nft_ctx *ctx, u8 genmask, u8 policy,
+ 				list_for_each_entry(ops, &h->ops_list, list)
+ 					nf_unregister_net_hook(ctx->net, ops);
+ 			}
++			/* hook.list is on stack, no need for list_del_rcu() */
+ 			list_del(&h->list);
+ 			nft_netdev_hook_free_rcu(h);
+ 		}
+@@ -8852,10 +8855,8 @@ static void __nft_unregister_flowtable_net_hooks(struct net *net,
+ 	list_for_each_entry_safe(hook, next, hook_list, list) {
+ 		list_for_each_entry(ops, &hook->ops_list, list)
+ 			nft_unregister_flowtable_ops(net, flowtable, ops);
+-		if (release_netdev) {
+-			list_del(&hook->list);
+-			nft_netdev_hook_free_rcu(hook);
+-		}
++		if (release_netdev)
++			nft_netdev_hook_unlink_free_rcu(hook);
+ 	}
+ }
+ 
+@@ -8926,8 +8927,7 @@ static int nft_register_flowtable_net_hooks(struct net *net,
+ 
+ 			nft_unregister_flowtable_ops(net, flowtable, ops);
+ 		}
+-		list_del_rcu(&hook->list);
+-		nft_netdev_hook_free_rcu(hook);
++		nft_netdev_hook_unlink_free_rcu(hook);
+ 	}
+ 
+ 	return err;
+@@ -8937,10 +8937,8 @@ static void nft_hooks_destroy(struct list_head *hook_list)
+ {
+ 	struct nft_hook *hook, *next;
+ 
+-	list_for_each_entry_safe(hook, next, hook_list, list) {
+-		list_del_rcu(&hook->list);
+-		nft_netdev_hook_free_rcu(hook);
+-	}
++	list_for_each_entry_safe(hook, next, hook_list, list)
++		nft_netdev_hook_unlink_free_rcu(hook);
+ }
+ 
+ static int nft_flowtable_update(struct nft_ctx *ctx, const struct nlmsghdr *nlh,
+@@ -9028,8 +9026,7 @@ static int nft_flowtable_update(struct nft_ctx *ctx, const struct nlmsghdr *nlh,
+ 				nft_unregister_flowtable_ops(ctx->net,
+ 							     flowtable, ops);
+ 		}
+-		list_del_rcu(&hook->list);
+-		nft_netdev_hook_free_rcu(hook);
++		nft_netdev_hook_unlink_free_rcu(hook);
+ 	}
+ 
+ 	return err;
+@@ -9535,13 +9532,8 @@ static void nf_tables_flowtable_notify(struct nft_ctx *ctx,
+ 
+ static void nf_tables_flowtable_destroy(struct nft_flowtable *flowtable)
+ {
+-	struct nft_hook *hook, *next;
+-
+ 	flowtable->data.type->free(&flowtable->data);
+-	list_for_each_entry_safe(hook, next, &flowtable->hook_list, list) {
+-		list_del_rcu(&hook->list);
+-		nft_netdev_hook_free_rcu(hook);
+-	}
++	nft_hooks_destroy(&flowtable->hook_list);
+ 	kfree(flowtable->name);
+ 	module_put(flowtable->data.type->owner);
+ 	kfree(flowtable);
+-- 
+2.47.3
 
-If kzalloc() fails here, the function returns -ENOMEM but leaves 
-adapter->current_op set to VIRTCHNL_OP_ADD_ETH_ADDR. Does this permanently
-prevent any future virtchnl operations from running, as they will all
-immediately fail with -EBUSY checks?
-
-> +int iavf_poll_virtchnl_response(struct iavf_adapter *adapter,
-[ ... ]
-> +	do {
-[ ... ]
-> +		ret = iavf_clean_arq_element(hw, &event, &pending);
-> +		if (!ret) {
-> +			v_op = (enum virtchnl_ops)le32_to_cpu(event.desc.cookie_high);
-> +			v_ret = (enum iavf_status)le32_to_cpu(event.desc.cookie_low);
-> +
-> +			iavf_virtchnl_completion(adapter, v_op, v_ret,
-> +						 event.msg_buf, event.msg_len);
-
-Unlike the legacy iavf_adminq_task() which explicitly checked for v_op == 0
-before processing, this code appears to pass a 0 opcode directly to
-iavf_virtchnl_completion() when fetching non-virtchnl admin queue events.
-
-When v_op is 0, the completion handler hits the default switch case and
-unconditionally clears adapter->current_op. Could this corrupt the state
-machine by clearing the current operation state while a valid operation is
-still pending?
-
-[ ... ]
-> +		usleep_range(50, 75);
-> +	} while (time_before(jiffies, timeout));
-> +
-> +	if (iavf_virtchnl_done(adapter, condition, cond_data, v_opcode))
-> +		ret = 0;
-> +	else
-> +		ret = -EAGAIN;
-> +
-> +out:
-> +	kfree(event.msg_buf);
-> +	return ret;
-> +}
-
-Similarly, if this polling loop times out, it returns -EAGAIN but does not
-clear adapter->current_op. Will this also permanently block the control path
-for the VF?
-
-> --- a/drivers/net/ethernet/intel/iavf/iavf_main.c
-> +++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
-> @@ -1047,6 +1047,46 @@ static bool iavf_is_mac_set_handled(struct net_device *netdev,
-[ ... ]
-> +static bool iavf_mac_change_done(struct iavf_adapter *adapter, const void *data)
-> +{
-> +	const u8 *addr = data;
-> +
-> +	return iavf_is_mac_set_handled(adapter->netdev, addr);
-> +}
-
-When promoting an existing secondary MAC to be the primary MAC,
-iavf_replace_primary_mac() retrieves the existing filter which already has
-f->add_handled set to true.
-
-iavf_add_ether_addrs() sets f->add = false before dispatching. Because
-iavf_is_mac_set_handled() checks (!f->add && f->add_handled), will this
-cause iavf_mac_change_done() to immediately return true before the hardware
-actually responds?
-
-If so, this would cause iavf_set_mac() to prematurely evaluate the 
-ether_addr_equal() check and fail with -EACCES.
-
-> +static int iavf_set_mac_sync(struct iavf_adapter *adapter, const u8 *addr)
-> +{
-> +	int ret;
-> +
-> +	netdev_assert_locked(adapter->netdev);
-> +
-> +	ret = iavf_add_ether_addrs(adapter);
-> +	if (ret)
-> +		return ret;
-> +
-> +	return iavf_poll_virtchnl_response(adapter, iavf_mac_change_done, addr,
-> +					   VIRTCHNL_OP_UNKNOWN, 2500);
-> +}
-
-If the MAC filter list has many pending filters, iavf_add_ether_addrs()
-stops at IAVF_MAX_AQ_BUF_SIZE and sets "more = true", meaning the newly
-requested MAC at the tail of the list might not be sent in the first chunk.
-
-Since this function holds the netdev lock, the watchdog task cannot run to
-send the remaining chunks. Does this cause the polling loop to wait
-2.5 seconds and time out waiting for a MAC address that was never sent?
-
-Additionally, this function exclusively dispatches iavf_add_ether_addrs().
-If changing the MAC requires deleting the old one first, such as in
-environments with a strict 1-MAC limit, the deletion is left for the
-asynchronous watchdog. Does this cause the synchronous addition to fail
-because the hardware rejects the new MAC before the old one is deleted?
-
-> @@ -1067,26 +1107,13 @@ static int iavf_set_mac(struct net_device *netdev, void *p)
-[ ... ]
->  	ret = iavf_replace_primary_mac(adapter, addr->sa_data);
-> -
->  	if (ret)
->  		return ret;
->  
-> -	ret = wait_event_interruptible_timeout(adapter->vc_waitqueue,
-[ ... ]
-> +	ret = iavf_set_mac_sync(adapter, addr->sa_data);
-> +	if (ret)
->  		return ret;
-
-If a background watchdog operation is active, iavf_set_mac_sync() will
-immediately return -EBUSY because current_op is not VIRTCHNL_OP_UNKNOWN.
-
-This causes iavf_set_mac() to return -EBUSY to the user. However,
-iavf_replace_primary_mac() already successfully updated the software filter
-lists. Won't the watchdog task eventually wake up and asynchronously change
-the MAC address on the hardware, leaving the system in an inconsistent state
-where a failed syscall still executes in the background?
 
