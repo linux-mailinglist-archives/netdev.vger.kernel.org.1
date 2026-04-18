@@ -1,255 +1,205 @@
-Return-Path: <netdev+bounces-279504-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279505-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aBe6OeOH42nAIAEAu9opvQ
-	(envelope-from <netdev+bounces-279504-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 15:32:19 +0200
+	id 2IMgOFSL42lbIQEAu9opvQ
+	(envelope-from <netdev+bounces-279505-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 15:47:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78664421338
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 15:32:19 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 472DB421402
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 15:47:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 080E9302ED52
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 13:31:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D2387300F5E4
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 13:46:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 671D237D119;
-	Sat, 18 Apr 2026 13:31:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BA9B288517;
+	Sat, 18 Apr 2026 13:46:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nqe4POKP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g0/qo2VY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D380137CD3D
-	for <netdev@vger.kernel.org>; Sat, 18 Apr 2026 13:31:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.48
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776519074; cv=pass; b=ssf54ln7QCSL9mlUpf21rmYSdH7nMvoxhIPu4asi/AmX7U6d1ItgYwWta184blSkxjsfznjp4g29/PsrqMUyTYgZ2qphh4ILQq0FgVdkFtVQhjddOJhPwt2xrE+Kli7SIR1cV4izNrN40oKp+w/q0QoDfhI0PNIMgNPaYs9oez8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776519074; c=relaxed/simple;
-	bh=bCwZZOAmrkF68yCBfWzlCLDNALt2LE2uQMq0wLsUN6Q=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aAWMQFm2VqVC/pkTteGgtmO5wQPclj+1NX4lwNz335546l1uCOCotJHNen2h8GoYOfYJvWA6TkGF5arhJ5c1Dxs/cYf20TB+fBADs2ByJmijjj1RO4oFywscgZ0VzbxZkgwsuOeSnQf6lPqAapodF82SUA9mb9wsusDSqT7JCmg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nqe4POKP; arc=pass smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B03A12CD8B
+	for <netdev@vger.kernel.org>; Sat, 18 Apr 2026 13:46:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776520018; cv=none; b=m70W/D9F7mxuZaWQPOomECQUN+VLL67S1n7YlcRDxQ2VA6HWgAXdhs1fQ98ffrcZ56KkUVJAmvAzY1d0xjd/cdoJITB5y3G80pF7rzi4nQ6ChcTRnRujZQr0KIlzoPFE5nqc3aAUYK7aee+npcD/fznQsEDkfE+MdlrbnR6oNyE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776520018; c=relaxed/simple;
+	bh=/GE2h6pIcUFHsCAkC9Y5NQGn+nlHTF2BZ0r4HxmVlJ4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XJZfcon7n/SAaSZd8xD0SVQDiSmOa2VM9gOS5iLTAm3rx2SUP7FBECmG1XSVFcd01BQ1r2b//7qnsYamODsdl83yCNq7XHhxm98Xn+VmvKa5jtKzQYPFq/0jGTeym7OqPJa1P2pA3AkH+4j+qtROtFMFFnQzkUveJgjlyIcfxhw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g0/qo2VY; arc=none smtp.client-ip=209.85.128.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-488a9033b2cso16939485e9.2
-        for <netdev@vger.kernel.org>; Sat, 18 Apr 2026 06:31:12 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776519071; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Wk0YQLpw2A63XuBNJTP3QFtstBTeI2cu8+JvNi4hZCBRnOMk1yLNVnLY0wAIhvHpVW
-         3gk7hRifTFW3s0PGZP5s6ZyU94hUnpZ1fobV26r7dA7p3PkbwbZnzI7FratlwPTs09E+
-         xt9do5W7PcCYQZmF6MHcZg95Iub/XM84urpcXkKvAHbCLHLbRoJulgiAqCa9S1XajB9U
-         Ey6sGjz29rbRYTPRiiVoDD3v8JgPdpSw0Rc5uoB3RZoiPFfhoLfMfdk3WPEElE4D0X27
-         TUFjxpJwCdEMFu1lT0GL6amTu04c4U981DJdpRa4XXeaA5Neg79DHlseihfR8RyGKBTQ
-         x+Iw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=oPxDtIL/dHAuVmHL3LN6nRPtuUfUzQdagiPbu8rpFsA=;
-        fh=5qF9RFhSU6FIg9J3BGaZxzqOdyRuzQ9ScHV8CsufMmw=;
-        b=aMrcvPG1+ewjddr5pcAe5n1dCaLM6VT9gm4p1NKeR45Wvnikb7a37cuz/r37XAGCJl
-         fLlyHOWh++nuvmAjaK7RLqPIqhydiytVcLYLQsqHJHlWpIcTXOU6PJ2oINp+3b30HlVi
-         mCPJgHWfPbHsM8o+pmXBGMW/98M3ijDEInTw4QlzRkKgXUMgdxxV8WRskVjYKSsfNytL
-         PKZNEhgXCUzjRVECJl8Wh4zz4/gWt4mWTMR1URLA27v1D8vdnopndla84ICW0ZRLduYH
-         ZJ5O2riIGXGvFK/029cAgJipQ/0bzx8wjvDlvrDDyhPKb8AuPymb2+1aUWcEGt9F1Qfm
-         A0WQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-48909558b3aso1990785e9.0
+        for <netdev@vger.kernel.org>; Sat, 18 Apr 2026 06:46:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776519071; x=1777123871; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oPxDtIL/dHAuVmHL3LN6nRPtuUfUzQdagiPbu8rpFsA=;
-        b=nqe4POKP7hoaHZ8oWFfDPaz142h+NbFtqH1qbrCD9UaeVjceH3DFvvFVb0SZLddFRu
-         tdJMv88aj3YnsKkhQg3VuZdHxMbQtDoEhjFy0wGp2Wr3pmxKM6iMX244fjXew+BHThLF
-         4GUQOycULtcyXDWRi8XtMUYQ3FyS1nx4/old23+QyBAB1lkd3lpRrNYyTcSD845kYrcP
-         SmEEPpWr1NiX+ypuC9YRqKQwxE9D5+QTLF78WVcZyB4834e0X6Z3eWcDLOP0op6JR+jK
-         Dg1VOSnAPK9k/KACbDawDVpVIQOSyWXTJkB6kGLN2UzJ5B0GWcLPOYKS8/atD68RQSzb
-         b+mA==
+        d=gmail.com; s=20251104; t=1776520015; x=1777124815; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Q2e4G/AFBNXmY50o2x5RV8tR64rvCCfZoxyprNIdgU4=;
+        b=g0/qo2VY6vCcyjilIc86ego5oP5T49A7ZvMkjOvoLeFbixRLY5xwtBe9bFE0vSTW/c
+         PGXu34/2wpreO38EJKZmocuTmSsh+g0qXXmJGRy1QlCptYAB/2PxnbyGzEaTAo8FkNma
+         oLSXkBRU19gywPF9NUVGTlvcR1dILvrD18mXC+RkU0uueb2excfcq00G3ohUg1OMO+Hh
+         6JAQVMem9xSOKMGe7e86BFFomluSEKw9+IkI0RNC9jTRFgp7MFCg+q5cmdGCu1sf7IPC
+         z/Tunga8x46HDqZnktlREWfCjn8pxZ5JmbvK3MJwqPeu+SbM1jJbSIiVjjmy4uaA/GoV
+         Pziw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776519071; x=1777123871;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=oPxDtIL/dHAuVmHL3LN6nRPtuUfUzQdagiPbu8rpFsA=;
-        b=azjMN7XGN9eRa9BzNkAfIFqk59yjiikFl23rn9NYiInudX6xDD8aRNA8Vt/6Jwh+FA
-         exqVhRM17LAIUq06SwKdYuVrbVBwv04TFNZucBmOsNEv24w5ZPurLJeFvxBRVUAy1PP4
-         5B+O6sgDVV4w9Ah53Qodzlb9huTkScPyGmF060ZXSgIEn6ieh3UUr7i9vFGafTRnUnXg
-         D56xxQZKV0xc3d4HwmfsbEFJAYYge16QjzyuSzyjRt2he0dyD/myGJc8/JVQc2XhPXEH
-         p32tSBbvWNI4sNgWoOzeofz8K4Tw2P4BnqGCgaR4atEsPX272I6TuxPYojtUl2TRiu2N
-         C0xw==
-X-Gm-Message-State: AOJu0YyeoWCOeFzoH8ekjDvIv6vME1ydiA8SnUfZpQbu++OfpnZmGljW
-	XS5kqkCMNjL4SUCGCtWJdEMcbphDut0HSoA3jSZ6YG0VWhwer5dO+oBT7zbndnNqEQOHfKgp4oB
-	6DnhNu+teC9+N/h9fZ+gd0eof9nK87T4=
-X-Gm-Gg: AeBDieup6qc/GS9itQcphnZ7yHItBSvB+p4X52i/FXC1G73LQVJ6TS/YouwtfaJHY7h
-	ErgrMEC//9mO9ol9nUDYeL5SYDIDYibX8VjDxW/xIlEYFBqozc26UTYcdTWgRH5gTuUr7eJ03i4
-	VBuKWbZqUliH85mO095MEz4hez/0hdk+5JrZzpLgC+eetNqXZmTfiNpm9t/yBuv5KTJxq/1Ey91
-	Ex+A3RO/BWdnmdMaXSszVGxh8RxHzbvcee0EE7YHpa73PHZB4shAI3nZ+0QruwpnDmOPkj5bGkD
-	amhlKBR7p5UTzK+XafPC
-X-Received: by 2002:a05:600c:c090:b0:488:c744:49b with SMTP id
- 5b1f17b1804b1-488fb74a53dmr69112185e9.7.1776519070984; Sat, 18 Apr 2026
- 06:31:10 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1776520015; x=1777124815;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Q2e4G/AFBNXmY50o2x5RV8tR64rvCCfZoxyprNIdgU4=;
+        b=U+Ij8sLPZyDvikPlj1+mbC9p3jNSQvOCyHtRRfYsghmIv+/6fEc1ZlQAbMVxyJzx8d
+         UFfzLaKClpNrF/7WRXO+HuQv22ru1JF7cZlVQYRjrxH279aKor6p40uCPviQolOfHPgz
+         peJsbT5iVR7/y0sEBd4qpc4GHn4tdlfi7RsvXoaOQoBIVVqcnflVNQQ90TYP4CBkd0EH
+         CAl/QEGci2axjfjr5F8WOGGViSvy/UwZ1NYdFrYu9qSvAGoFLJwbe9aVUi384p3KSeAk
+         B7uN6nTDJ8Dgk74zXgkv+h56H3j48jKPZE7FH89RJO83VUsyk5k23vLyEFyWviBlYS9F
+         C5pA==
+X-Forwarded-Encrypted: i=1; AFNElJ8lyQBUMHMoWJvdIA4yjcKb6dHNjjDR7vodWwCW36YUqSwCxqvU8whV3WSlJK7ctSTKXfzWhgM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxzYfBFFyczcqGn/F1tqWpENe0AOmddfxJSut4vYvP86m/mo36m
+	XCkNzSbkfwEblhWHRA2RR4QuEZHNEYFxLcJME8GwRLv069GRNNK1gCZX
+X-Gm-Gg: AeBDietXRFLajcIRl8OLGhZcRqOvCszSilXSrBJ0CVC37C6VewBdWdt5d9QX9YyB24v
+	VWYDenC5df7gGqnzfX2VkiC44PEEXnLagCCNJZQHWqYLc7prfAWJ2XkyFGKoOUjlcvJuhG/L/nZ
+	GapzlUTD4dDDLssHs5Pv9pk0JMSMOrh3xjvFKXhSPkY++GWozrImvQxw5m9HuwFj/5zg+SZp2gm
+	d6LyOK89rpKyuJx/AffmONUb7w9fAX/TFILzfQ8pn2S/NZqpNl8HwZ56lKci+7E0/YV/a3CQ32z
+	7UHqzPoR/wybz4TVBBKo7BEfNqH4blrQ4M/ibeD6dX40QNuvwqZI8F/VOwTNhuUcuV58z/GuXQy
+	yuvXsJ2Khk4xE/HU7DHlwVGYcPPpUnV2Qr2I4VzwoxWjfVwQoLDh+AlJ/G/9WM1VkTrTYMJj86D
+	RDLYVlw6QVZtFMf1CyF3Zx2XSgKXGHQyMyde445Zzhhqk6v9x2UlhDxab8/8rzHczenqHLkC8Ni
+	A0gYPNfJVeScLFw
+X-Received: by 2002:a05:600c:890c:b0:487:1108:48af with SMTP id 5b1f17b1804b1-488fb7389a6mr73881855e9.4.1776520015347;
+        Sat, 18 Apr 2026 06:46:55 -0700 (PDT)
+Received: from ?IPV6:2a02:a03f:a75e:9a00:5273:4380:96ab:9087? ([2a02:a03f:a75e:9a00:5273:4380:96ab:9087])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488fc140c82sm119501635e9.12.2026.04.18.06.46.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 18 Apr 2026 06:46:55 -0700 (PDT)
+Message-ID: <75d98880-afcd-43f9-8bd5-b874fa5690f5@gmail.com>
+Date: Sat, 18 Apr 2026 15:46:53 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260418041633.691435-1-jt26wzz@gmail.com> <20260418041633.691435-2-jt26wzz@gmail.com>
- <CANn89iJOfDB+5oORjWPbP7Z1SyqUhMzVR8u8i+8P8MPDgg_EGA@mail.gmail.com>
-In-Reply-To: <CANn89iJOfDB+5oORjWPbP7Z1SyqUhMzVR8u8i+8P8MPDgg_EGA@mail.gmail.com>
-From: =?UTF-8?B?5LiK5Yu+5ouz?= <jt26wzz@gmail.com>
-Date: Sat, 18 Apr 2026 21:30:58 +0800
-X-Gm-Features: AQROBzC_Q-GZ8-zgpzaaVdMpWl_DnGJZTBYhOtWPKNJNKNL5h8rrfVmdaVjYoyo
-Message-ID: <CALgi0XnEePV0WukxhkYr5-anFRTAQFMEGKOGX7pHa-g+56O37w@mail.gmail.com>
-Subject: Re: [PATCH net 1/2] tcp: call sk_data_ready() after listener migration
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] ipv6: Implement limits on extension header parsing
 To: Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, ncardwell@google.com, kuniyu@google.com, 
-	davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, 
-	horms@kernel.org, shuah@kernel.org, tamird@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+Cc: Daniel Borkmann <daniel@iogearbox.net>, kuba@kernel.org,
+ dsahern@kernel.org, tom@herbertland.com, willemdebruijn.kernel@gmail.com,
+ idosch@nvidia.com, pabeni@redhat.com, netdev@vger.kernel.org
+References: <20260417171831.687053-1-daniel@iogearbox.net>
+ <60b47924-dae4-4a10-b977-75b92e1094c0@gmail.com>
+ <ae053593-907e-4891-90fb-03b4c5d8f5e1@iogearbox.net>
+ <b57f31a2-456e-4727-839a-bc2f0fb07855@gmail.com>
+ <CANn89i+Y0jctj8=tCHFP5jDSJBAWR=RvNfagammc-WqU6EdPRw@mail.gmail.com>
+Content-Language: en-US
+From: Justin Iurman <justin.iurman@gmail.com>
+In-Reply-To: <CANn89i+Y0jctj8=tCHFP5jDSJBAWR=RvNfagammc-WqU6EdPRw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[iogearbox.net,kernel.org,herbertland.com,gmail.com,nvidia.com,redhat.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-279504-lists,netdev=lfdr.de];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jt26wzz@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 78664421338
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-279505-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[justiniurman@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 472DB421402
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Thanks Eric, you're right.
+On 4/18/26 15:15, Eric Dumazet wrote:
+> On Sat, Apr 18, 2026 at 5:50 AM Justin Iurman <justin.iurman@gmail.com> wrote:
+>>
+>> On 4/18/26 14:26, Daniel Borkmann wrote:
+>>> Hi Justin,
+>>>
+>>> On 4/18/26 1:45 PM, Justin Iurman wrote:
+>>>> On 4/17/26 19:18, Daniel Borkmann wrote:
+>>> [...]
+>>>>> diff --git a/net/ipv6/sysctl_net_ipv6.c b/net/ipv6/sysctl_net_ipv6.c
+>>>>> index d2cd33e2698d..93f865545a7c 100644
+>>>>> --- a/net/ipv6/sysctl_net_ipv6.c
+>>>>> +++ b/net/ipv6/sysctl_net_ipv6.c
+>>>>> @@ -135,6 +135,14 @@ static struct ctl_table ipv6_table_template[] = {
+>>>>>            .extra1        = SYSCTL_ZERO,
+>>>>>            .extra2        = &flowlabel_reflect_max,
+>>>>>        },
+>>>>> +    {
+>>>>> +        .procname    = "max_ext_hdrs_number",
+>>>>> +        .data        = &init_net.ipv6.sysctl.max_ext_hdrs_cnt,
+>>>>> +        .maxlen        = sizeof(int),
+>>>>> +        .mode        = 0644,
+>>>>> +        .proc_handler    = proc_dointvec_minmax,
+>>>>> +        .extra1        = SYSCTL_ONE,
+>>>>> +    },
+>>>>>        {
+>>>>>            .procname    = "max_dst_opts_number",
+>>>>>            .data        = &init_net.ipv6.sysctl.max_dst_opts_cnt,
+>>>>
+>>>> NACKed-by: Justin Iurman <justin.iurman@gmail.com>
+>>>>
+>>>> +1000 on the need, but NAK on the way it is done. IMO, we don't want
+>>>> yet-another-sysctl for that. Instead, we have (well, not yet, but it's
+>>>> about time) this series [1] to enforce ordering and occurrences of
+>>>> Extension Headers, which is based on an IETF draft [2] (FYI, draft-
+>>>> ietf-6man-eh-limits is dead). I think we should enforce ordering and
+>>>> occurrences in this code path too, instead of relying on a sysctl.
+>>>> Let's keep both code paths consistent.
+>>
+>> Hi Daniel,
+>>
+>>> Hm, that series [1] should probably go to net instead of net-next, but atm
+>>
+>> +1, would make sense.
+>>
+>>> hasn't moved since a month. I'd still think max_ext_hdrs_number would be
+>>> useful given it has less complexity also for stable, but I guess ultimately
+>>> up to maintainers..
+>>
+>> In the short term, I agree. What worries me is that we end up with a
+>> redundant, or even useless, sysctl once the other series is applied,
+>> which will only increase user confusion.
+> 
+> Given the amount of bugs in this code, a sysctl is safe and quire reasonable.
+> 
+> No one will object when it is eventually removed (or has no action)
+> 
+> For the record,  I approve Daniel patch.
 
-After inet_csk_reqsk_queue_add() succeeds, the ref acquired in
-reuseport_migrate_sock() is effectively transferred to
-nreq->rsk_listener. Another CPU can then dequeue nreq (via
-accept() or listener shutdown), hit reqsk_put(), and drop that
-listener ref.
+Fair enough. If there is consensus on this patch, then let me just 
+suggest two changes:
 
-Since listeners are SOCK_RCU_FREE, the post-queue_add()
-dereferences of nsk should be under rcu_read_lock()/
-rcu_read_unlock(), which also covers the existing sock_net(nsk)
-access in that path.
+- make it clear in the sysctl description that it mainly applies to TX 
+(as opposed to the other series [1] discussed earlier that applies to RX)
 
-I also checked reqsk_timer_handler(): reqsk_queue_migrated()
-there is only accounting, and once nreq becomes visible via
-inet_ehash_insert(), the handler no longer appears to
-dereference nsk.
-
-I'll fold this into v2.
-
-
-Eric Dumazet <edumazet@google.com> =E4=BA=8E2026=E5=B9=B44=E6=9C=8818=E6=97=
-=A5=E5=91=A8=E5=85=AD 14:02=E5=86=99=E9=81=93=EF=BC=9A
->
-> On Fri, Apr 17, 2026 at 9:17=E2=80=AFPM Zhenzhong Wu <jt26wzz@gmail.com> =
-wrote:
-> >
-> > When inet_csk_listen_stop() migrates an established child socket from
-> > a closing listener to another socket in the same SO_REUSEPORT group,
-> > the target listener gets a new accept-queue entry via
-> > inet_csk_reqsk_queue_add(), but that path never notifies the target
-> > listener's waiters.
-> >
-> > As a result, a nonblocking accept() still succeeds because it checks
-> > the accept queue directly, but waiters that sleep for listener
-> > readiness can remain asleep until another connection generates a
-> > wakeup. This affects poll()/epoll_wait()-based waiters, and can also
-> > leave a blocking accept() asleep after migration even though the
-> > child is already in the target listener's accept queue.
-> >
-> > This was observed in a local test where listener A completed the
-> > handshake, queued the child, and was closed before userspace called
-> > accept(). The child was migrated to listener B, but listener B never
-> > received a wakeup for the migrated accept-queue entry.
-> >
-> > Call READ_ONCE(nsk->sk_data_ready)(nsk) after a successful migration
-> > in inet_csk_listen_stop().
-> >
-> > The reqsk_timer_handler() path does not need the same change:
-> > half-open requests only become readable to userspace when the final
-> > ACK completes the handshake, and tcp_child_process() already wakes
-> > the listener in that case.
-> >
-> > Fixes: 54b92e841937 ("tcp: Migrate TCP_ESTABLISHED/TCP_SYN_RECV sockets=
- in accept queues.")
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Zhenzhong Wu <jt26wzz@gmail.com>
-> > ---
-> >  net/ipv4/inet_connection_sock.c | 1 +
-> >  1 file changed, 1 insertion(+)
-> >
-> > diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection=
-_sock.c
-> > index 4ac3ae1bc..da1ce082f 100644
-> > --- a/net/ipv4/inet_connection_sock.c
-> > +++ b/net/ipv4/inet_connection_sock.c
-> > @@ -1483,6 +1483,7 @@ void inet_csk_listen_stop(struct sock *sk)
-> >                                         __NET_INC_STATS(sock_net(nsk),
-> >                                                         LINUX_MIB_TCPMI=
-GRATEREQSUCCESS);
-> >                                         reqsk_migrate_reset(req);
-> > +                                       READ_ONCE(nsk->sk_data_ready)(n=
-sk);
->
-> I think this is adding a potential UAF (Use Afte Free).
-> @nsk might have been freed already by another thread/cpu.
-> Note the existing code already has similar issues.
->
-> Untested patch:
->
-> diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_s=
-ock.c
-> index 4ac3ae1bc1afc3a39f2790e39b4dda877dc3272b..287b6e01c4f71bfec3dd2a708=
-f316224d9eb4a64
-> 100644
-> --- a/net/ipv4/inet_connection_sock.c
-> +++ b/net/ipv4/inet_connection_sock.c
-> @@ -1479,6 +1479,7 @@ void inet_csk_listen_stop(struct sock *sk)
->                         if (nreq) {
->                                 refcount_set(&nreq->rsk_refcnt, 1);
->
-> +                               rcu_read_lock();
->                                 if (inet_csk_reqsk_queue_add(nsk,
-> nreq, child)) {
->                                         __NET_INC_STATS(sock_net(nsk),
->
-> LINUX_MIB_TCPMIGRATEREQSUCCESS);
-> @@ -1489,7 +1490,7 @@ void inet_csk_listen_stop(struct sock *sk)
->                                         reqsk_migrate_reset(nreq);
->                                         __reqsk_free(nreq);
->                                 }
-> -
-> +                               rcu_read_unlock();
->                                 /* inet_csk_reqsk_queue_add() has already
->                                  * called inet_child_forget() on failure =
-case.
->                                  */
+- set the default to 8 (which should be the max value) instead of 32, as 
+per RFC8200, Sec. 4.1
 
