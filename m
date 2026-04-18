@@ -1,136 +1,198 @@
-Return-Path: <netdev+bounces-279523-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279525-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GK+POoS142mVKAEAu9opvQ
-	(envelope-from <netdev+bounces-279523-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 18:47:00 +0200
+	id AIrVLLe242mVKAEAu9opvQ
+	(envelope-from <netdev+bounces-279525-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 18:52:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58ADC421AD5
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 18:46:59 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14AB8421B22
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 18:52:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id EE8B7302444A
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 16:46:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AC83830131E5
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 16:52:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FF1C26ED33;
-	Sat, 18 Apr 2026 16:46:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA6DC30BF69;
+	Sat, 18 Apr 2026 16:52:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b="Cgqvm8Fj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rKzdxscK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.nabladev.com (mx.nabladev.com [178.251.229.89])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 378491547C0;
-	Sat, 18 Apr 2026 16:46:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.251.229.89
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5F3A282F30;
+	Sat, 18 Apr 2026 16:52:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776530818; cv=none; b=GnhiN77PM7C5pFVjLUrxERz7m0upknaid8HtoZdo+zaF7zN9KEkgQN2+oocA1z+rbi/jSNLQYGELgbhiYsSHxddufkiW7VOjC15cOT40K3zSEZfiwuHQHg1N/B2nyZBBMC0DuWvHbsnwt1hTZrrWLymI+vgwhlioJvBUEXmmziU=
+	t=1776531124; cv=none; b=tICtZv/Z379VA24uekwfEaP0FU/YlIzKJimmNjq3tAZ7HDvsoMzympib6nIvXlAgKpOCbQAlu0j9RrRDMmpIoDABSy4TyCS/1i7dyP3O4QYbgbuJhCiV0BhAmptHATJr+KfTZjQa1skm5qXNyHNUEgCElOut9D+k78TXIThzm3A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776530818; c=relaxed/simple;
-	bh=79g8Cj0aVvxyvk8Zpsm1NfOTZskgvZcrJiNve829PM0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XG/puPEZonEJMrN3FmotVXaYse28fLQjODVPxSIh5wwCdJoYW8e7hkoQn2UPWSACY5wsg3Z15N2x2E43O1SB85KciJl8+nuuMOkLAK0dKr9/VJ4ycEQjunwrXwUPlnHUOk73uwDdTNRkUwXaNVleymvz0sP2Pdbai5qu18ETjpg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com; spf=pass smtp.mailfrom=nabladev.com; dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b=Cgqvm8Fj; arc=none smtp.client-ip=178.251.229.89
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nabladev.com
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id D11B31143A3;
-	Sat, 18 Apr 2026 18:46:44 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nabladev.com;
-	s=dkim; t=1776530807;
-	h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=jwxsjqC6odbloW4RnZUq7a7489g9YY4pbiBKr6i/Ls4=;
-	b=Cgqvm8Fj4anJr5bp47idXk4Lz9yQ3o5gIgyoLoav2L2hhUvyYqzLZy9SlJ1OmyYO+svfdO
-	xD7OQyb5jC0klVf4qw6eT9sigJa3lesqJHSlhjLK7J1bcZ7yBNT2ZLH6x/XUjD+VrAu431
-	R0lhBQ7/+I8dSKhmDPb3pml/aDRBVcjYcXPBhew8+49hb/ldb7wBpYlbKVfMuernFgLneR
-	3VI9gLj5heKhAItCecOIi+GkKXWIXZN3ChG2js/Mr9KbGCzuVzhEHoymmSuQb6rhGyCqP6
-	R6PaoWTrCvirYF3OeL5lMOX0U9ick9zMNkuG+fhlR8DXnwzo9WneYemxFyBSaw==
-Message-ID: <c75c4b73-b7e9-4403-94a1-d4967ec7a299@nabladev.com>
-Date: Sat, 18 Apr 2026 18:46:44 +0200
+	s=arc-20240116; t=1776531124; c=relaxed/simple;
+	bh=XMTZj1YxPkY22L6vssswSQjk4oTxVG3RPZgGbSOfif8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=teJToStFOHRKNTVDs98M9V3nK7RuzxHK32kQapbneVSqTY9G8apJnj2s3Ji5sBAMBqWh5p9ik6MME2MPi1M6uENhf4yL/A5lP7nt5uZ8v7U4dwCCJCJR6JgLCCjYEZF9IF3yXs0AVZpqNGA68akefKbPf6Vf7mCNLQSQ0rSX55I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rKzdxscK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0DB15C19424;
+	Sat, 18 Apr 2026 16:52:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776531124;
+	bh=XMTZj1YxPkY22L6vssswSQjk4oTxVG3RPZgGbSOfif8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=rKzdxscKKp1giWSsuSCO3jKQUC4b8sL/u/GsH00AIPnDBiOFJoqb+6gaZ64Cr6ODv
+	 K4N1QExtkRpDDRwGOlvYHPsn+kQOOUeOFYwtQza7gw7DCyUCcQQltn08GGsU8FNvX9
+	 XFH4j7PYOg+Mg4sCJDgKFHcgbadra4WCrK94J4fAkuf8JCj0ow8UCP1ehX1OCtAgT/
+	 dSf1NBAr93ssqP8u0Z7P8dOZ1mFG3FAivCr/GSgm2zRV8CJE4MpIsnM1ATPPng9N68
+	 xtinbU1VIwcPW6/o2Jqq708tUrlauGyQ7aipfDdgZ4LnQrCcJG7lco/Bhk63vOq04c
+	 TZ5P6Z7j6yNsg==
+From: Simon Horman <horms@kernel.org>
+To: khai.wen.tan@linux.intel.com
+Cc: 'Simon Horman' <horms@kernel.org>,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	faizal.abdul.rahim@intel.com,
+	hong.aun.looi@intel.com,
+	khai.wen.tan@intel.com,
+	faizal.abdul.rahim@linux.intel.com
+Subject: Re: [PATCH iwl-next v2 3/3] igc: add support for forcing link speed without autonegotiation
+Date: Sat, 18 Apr 2026 17:48:38 +0100
+Message-ID: <20260418164837.380985-2-horms@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260416015520.6090-4-khai.wen.tan@linux.intel.com>
+References: <20260416015520.6090-4-khai.wen.tan@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net,PATCH v3 1/2] net: ks8851: Reinstate disabling of BHs around
- IRQ handler
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: netdev@vger.kernel.org, stable@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Nicolai Buchwitz <nb@tipi-net.de>,
- Paolo Abeni <pabeni@redhat.com>, Ronald Wahl <ronald.wahl@raritan.com>,
- Yicong Hui <yiconghui@gmail.com>, linux-kernel@vger.kernel.org
-References: <20260414103327.113500-1-marex@nabladev.com>
- <20260414125753.Im6GAIHn@linutronix.de>
- <2fcfb84f-69f6-493e-94d6-95d85d8000f6@nabladev.com>
- <20260414145218.lsNpdAJI@linutronix.de>
- <7734527a-d08b-49fa-b258-c37c5ae2da55@nabladev.com>
- <20260416062159.fPxqc52X@linutronix.de>
- <afe7ed2c-4434-4394-9d87-a4bdf5a15ec1@nabladev.com>
- <20260416104818._EDbo9hA@linutronix.de>
-Content-Language: en-US
-From: Marek Vasut <marex@nabladev.com>
-In-Reply-To: <20260416104818._EDbo9hA@linutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[nabladev.com,reject];
-	R_DKIM_ALLOW(-0.20)[nabladev.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	TAGGED_FROM(0.00)[bounces-279525-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279523-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,lunn.ch,google.com,kernel.org,tipi-net.de,redhat.com,raritan.com,gmail.com];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[marex@nabladev.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[nabladev.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-0.994];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 58ADC421AD5
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sashiko.dev:url]
+X-Rspamd-Queue-Id: 14AB8421B22
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 4/16/26 12:48 PM, Sebastian Andrzej Siewior wrote:
-> On 2026-04-16 11:26:00 [+0200], Marek Vasut wrote:
->>> memory allocation. Therefore I am saying this backtrace is from an older
->>> kernel.
->>
->> I actually did update the backtrace in V3 with the one from next 20260413
->> that contained b44596ffe1b4 ("ARM: Allow to enable RT") from
->> stable-rt/v6.12-rt-rebase branch [1] .
->>
->> I think I misunderstood the usage of "softirq is raised" vs. "softirq is
->> invoked" above . Is it possible that there was an already raised softirq
->> before the threaded IRQ handler was invoked, and __netdev_alloc_skb() is
->> what invoked that softirq ?
-> 
-> It is not impossible. Something needs to netif_wake_queue() and
-> ks8851_irq() must only report IRQ_RXI (not IRQ_TXI). Then it can happen.
-> But usually the driver "stops" the queue if it can't process any new
-> packets and resumes it once a packet has been sent so it has room again.
-This driver .start_xmit is very simple, if there is space in the 6 kiB 
-TX FIFO, then the packet is written into it, otherwise the .start_xmit 
-returns NETDEV_TX_BUSY . There does not seem to be any 
-netif_{start,stop,wake}_queue() in the .start_xmit path.
+From: 'Simon Horman' <horms@kernel.org>
+
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://sashiko.dev
+---
+igc: add support for forcing link speed without autonegotiation
+
+This commit adds support to allow users to force 10/100 Mb/s link speed
+and duplex via ethtool when autonegotiation is disabled.
+
+> diff --git a/drivers/net/ethernet/intel/igc/igc_ethtool.c b/drivers/net/ethernet/intel/igc/igc_ethtool.c
+> index cfcbf2fdad6ea..5bd37d1be1688 100644
+> --- a/drivers/net/ethernet/intel/igc/igc_ethtool.c
+> +++ b/drivers/net/ethernet/intel/igc/igc_ethtool.c
+
+[ ... ]
+
+> @@ -2000,6 +2013,41 @@ static int igc_ethtool_get_link_ksettings(struct net_device *netdev,
+>  	return 0;
+>  }
+>  
+> +/**
+> + * igc_handle_autoneg_disabled - Configure forced speed/duplex settings
+> + * @adapter: private driver structure
+> + * @speed: requested speed (must be SPEED_10 or SPEED_100)
+> + * @duplex: requested duplex
+> + *
+> + * Records forced speed/duplex when autoneg is disabled.
+> + * Caller must validate speed before calling this function.
+> + */
+> +static void igc_handle_autoneg_disabled(struct igc_adapter *adapter, u32 speed,
+> +					u8 duplex)
+> +{
+> +	struct igc_mac_info *mac = &adapter->hw.mac;
+> +
+> +	switch (speed) {
+> +	case SPEED_10:
+> +		mac->forced_speed_duplex = (duplex == DUPLEX_FULL) ?
+> +			IGC_FORCED_10F : IGC_FORCED_10H;
+> +		break;
+> +	case SPEED_100:
+> +		mac->forced_speed_duplex = (duplex == DUPLEX_FULL) ?
+> +			IGC_FORCED_100F : IGC_FORCED_100H;
+> +		break;
+> +	default:
+> +		WARN_ONCE(1, "Unsupported speed %u\n", speed);
+> +		return;
+> +	}
+> +
+> +	mac->autoneg_enabled = false;
+> +
+> +	/* Half-duplex cannot support flow control per IEEE 802.3 */
+> +	if (duplex == DUPLEX_HALF)
+> +		adapter->hw.fc.requested_mode = igc_fc_none;
+> +}
+
+If userspace issues an ethtool command without specifying duplex, the duplex
+value can be DUPLEX_UNKNOWN. In this case, forced_speed_duplex correctly
+defaults to half-duplex since duplex == DUPLEX_FULL evaluates to false. 
+
+However, since DUPLEX_UNKNOWN is not equal to DUPLEX_HALF, the check above
+fails, and the requested flow control mode remains unchanged. Could this leave
+flow control enabled on a forced half-duplex link, violating IEEE 802.3?
+Should this check be based on the resolved mac->forced_speed_duplex state
+instead?
+
+[ ... ]
+
+> @@ -2071,14 +2120,20 @@ igc_ethtool_set_link_ksettings(struct net_device *netdev,
+>  		}
+>  	}
+>  
+> +	if (cmd->base.autoneg == AUTONEG_DISABLE &&
+> +	    cmd->base.speed != SPEED_10 && cmd->base.speed != SPEED_100) {
+> +		netdev_info(dev, "Unsupported speed for forced link\n");
+> +		return -EINVAL;
+> +	}
+> +
+>  	while (test_and_set_bit(__IGC_RESETTING, &adapter->state))
+>  		usleep_range(1000, 2000);
+
+This isn't a bug introduced by this patch, but does this ad-hoc
+synchronization using bit flags circumvent proper locking guarantees? The
+networking subsystem guidelines forbid using bit flags as ad-hoc locks. 
+
+Using a bit flag in a polling loop bypasses lockdep analysis, fairness, and
+strict memory ordering. Could this be replaced with a real synchronization
+mechanism like a mutex?
 
