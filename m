@@ -1,121 +1,134 @@
-Return-Path: <netdev+bounces-279522-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279520-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QAkyG2uy42kQKAEAu9opvQ
-	(envelope-from <netdev+bounces-279522-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 18:33:47 +0200
+	id 0LGtFrWx42kQKAEAu9opvQ
+	(envelope-from <netdev+bounces-279520-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 18:30:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C08B14219E5
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 18:33:46 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACA274219AA
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 18:30:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 620BB300CBF3
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 16:33:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 17ACB300BC87
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 16:30:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B60F82F745D;
-	Sat, 18 Apr 2026 16:33:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C7A82FFDEA;
+	Sat, 18 Apr 2026 16:30:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f7uKLCcL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.uniroma2.it (smtp.uniroma2.it [160.80.4.32])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 122CF282F30;
-	Sat, 18 Apr 2026 16:33:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.80.4.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38F7B2B9B7;
+	Sat, 18 Apr 2026 16:30:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776529999; cv=none; b=A/LKuQhFKBLZLoNxMQqrk+1B1z9w1SpeA24Qa77Cgz6dI5tthN4anb9vrqiJZpNEE4TIaEM31nlvqy2KIH8l7ekNTpIZk+24yqgl3we4c2VD4ghlCP9lZOn7Q5N4zDP3QNDGXCNZbVrNIiYORpkstFWlnzRIQd/pEe0iLGoA0lE=
+	t=1776529829; cv=none; b=YaoVJox0ar74XSA50Ex1YuOMWRaPe1I+hsehCEmN9WjTSov/zT5RDFk5zndE0Dz/hwGpzg8SeJGdp0xPmuCGRp072C/C7ks9+xhmWY9M04H8tKTWdRLNxZTIL57QezG2xIjIi6jMZxcaBlQMQIiN65q9u1MaRZn2iEM+zps4ibQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776529999; c=relaxed/simple;
-	bh=RxtbJPFmePB3AI5A99iJ/FCP4n2fPOmkN+DLYenzYqM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Y4r1GT9TeKV5WHx73W/nUtll8sgD7o463Mso3d/nMkXGZUE32uRrX9cQ2h/T2fs9KEc0CTQRpM6290Anf6XDqIyKM4I/gsLo94NF1A7fR6MDTAJ2rTlg2X/q2iODvGx4NlAkEiLJ5KMbXpuVW41MnZ8ld4jXiT1mWOel8nGAvJI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it; spf=pass smtp.mailfrom=uniroma2.it; arc=none smtp.client-ip=160.80.4.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniroma2.it
-Received: from localhost.localdomain ([160.80.103.126])
-	by smtp-2015.uniroma2.it (8.14.4/8.14.4/Debian-8) with ESMTP id 63IGT3oi010419;
-	Sat, 18 Apr 2026 18:29:08 +0200
-From: Andrea Mayer <andrea.mayer@uniroma2.it>
-To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
-Cc: anton.makarov11235@gmail.com, stefano.salsano@uniroma2.it,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Andrea Mayer <andrea.mayer@uniroma2.it>, stable@vger.kernel.org
-Subject: [PATCH net] seg6: fix seg6 lwtunnel output redirect for L2 reduced encap mode
-Date: Sat, 18 Apr 2026 18:28:38 +0200
-Message-Id: <20260418162838.31979-1-andrea.mayer@uniroma2.it>
-X-Mailer: git-send-email 2.20.1
+	s=arc-20240116; t=1776529829; c=relaxed/simple;
+	bh=W7O5PbCRUz8QfAQcbD7i1/n5mpJXzGzl/oLb9BuD2R0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ojjHcpV6Rm263waozz7JeCSIoIfkgGdCwv51l/OdxO8aQV6Bf2n+vuuiKnZekVV9g7yrJ0B45OqmJB16EOT7CHFyP9Fbpmr72J1nByw0kBlDvk3P25nyVQqZ3SMITUsc1s4yCxoqzJ2ayzpWsl9paitlQl2l7HMYFHFiIhWOnw4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f7uKLCcL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0DB49C19424;
+	Sat, 18 Apr 2026 16:30:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776529828;
+	bh=W7O5PbCRUz8QfAQcbD7i1/n5mpJXzGzl/oLb9BuD2R0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=f7uKLCcLQyAozXCkFH7fmEXV0/WF0tdYSM4YsWyNuAEEH06HnzBAK3vocI6kBwnPf
+	 r4IR15jdd229vxnCMkTPCcHYVXmIaTog8x6cp9sFSO8oFEF+5S8wSC9/VGWNwj82WV
+	 nWqxBbqZ0LQ68D6xshLVhC/CEcoEhhCNOFQUZfk7OEJNtpmslVVWB69ksA1SnSUyS8
+	 rVApZk5AcCyT1qVGO8DnKPvVSEulsUomHDffCMtFpuftkKhnnMz3jj+DtO+7HPno4X
+	 GQs4H4//WlajW7Y7MxZX0PeyZ9owo7tCmNO1kHjvPYkK8jDKTnxB3QkIVXDj6ynYYV
+	 MCL6+X8cXKtkA==
+Date: Sat, 18 Apr 2026 17:30:24 +0100
+From: Simon Horman <horms@kernel.org>
+To: Ashutosh Desai <ashutoshdesai993@gmail.com>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, edumazet@google.com,
+	davem@davemloft.net, pabeni@redhat.com, stable@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 net] nfc: hci: fix out-of-bounds read in HCP header
+ parsing
+Message-ID: <20260418163024.GH280379@horms.kernel.org>
+References: <20260416051522.4154698-1-ashutoshdesai993@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: clamav-milter 0.100.0 at smtp-2015
-X-Virus-Status: Clean
-X-Spamd-Result: default: False [1.64 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260416051522.4154698-1-ashutoshdesai993@gmail.com>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[uniroma2.it : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-279522-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[gmail.com,uniroma2.it,vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrea.mayer@uniroma2.it,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-279520-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.867];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[l2encaps.red:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C08B14219E5
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,horms.kernel.org:mid]
+X-Rspamd-Queue-Id: ACA274219AA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-When SEG6_IPTUN_MODE_L2ENCAP_RED (L2ENCAP_RED) was introduced, the
-condition in seg6_build_state() that excludes L2 encap modes from
-setting LWTUNNEL_STATE_OUTPUT_REDIRECT was not updated to account for
-the new mode.
-As a consequence, L2ENCAP_RED routes incorrectly trigger seg6_output()
-on the output path, where the packet is silently dropped because
-skb_mac_header_was_set() fails on L3 packets.
+On Thu, Apr 16, 2026 at 05:15:22AM +0000, Ashutosh Desai wrote:
+> nfc_hci_recv_from_llc() and nci_hci_data_received_cb() cast skb->data
+> to struct hcp_packet and read the message header byte without checking
+> that enough data is present in the linear sk_buff area. A malicious NFC
+> peer can send a 1-byte HCP frame that passes through the SHDLC layer
+> and reaches these functions, causing an out-of-bounds heap read.
+> 
+> Fix this by adding pskb_may_pull() before each cast to ensure the full
+> 2-byte HCP header is pulled into the linear area before it is accessed.
+> 
+> Fixes: 8b8d2e08bf0d ("NFC: HCI support")
+> Fixes: 11f54f228643 ("NFC: nci: Add HCI over NCI protocol support")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Ashutosh Desai <ashutoshdesai993@gmail.com>
+> ---
+> V4 -> V5: fix whitespace damage
+> V3 -> V4: add Fixes tags
+> V2 -> V3: drop redundant checks from nfc_hci_msg_rx_work/nci_hci_msg_rx_work;
+>           remove incorrect Suggested-by tag
+> V1 -> V2: use pskb_may_pull() instead of skb->len check
+> 
+> v4: https://lore.kernel.org/netdev/177614425081.3600288.2536320552978506086@gmail.com/
+> v3: https://lore.kernel.org/netdev/20260413024329.3293075-1-ashutoshdesai993@gmail.com/
+> v2: https://lore.kernel.org/netdev/20260409150825.2217133-1-ashutoshdesai993@gmail.com/
+> v1: https://lore.kernel.org/netdev/20260408223113.2009304-1-ashutoshdesai993@gmail.com/
+> 
+>  net/nfc/hci/core.c | 5 +++++
+>  net/nfc/nci/hci.c  | 5 +++++
+>  2 files changed, 10 insertions(+)
 
-Extend the check to also exclude L2ENCAP_RED, consistent with L2ENCAP.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-Fixes: 13f0296be8ec ("seg6: add support for SRv6 H.L2Encaps.Red behavior")
-Cc: stable@vger.kernel.org
-Signed-off-by: Andrea Mayer <andrea.mayer@uniroma2.it>
----
- net/ipv6/seg6_iptunnel.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/net/ipv6/seg6_iptunnel.c b/net/ipv6/seg6_iptunnel.c
-index 97b50d9b1365..9b64343ebad6 100644
---- a/net/ipv6/seg6_iptunnel.c
-+++ b/net/ipv6/seg6_iptunnel.c
-@@ -746,7 +746,8 @@ static int seg6_build_state(struct net *net, struct nlattr *nla,
- 	newts->type = LWTUNNEL_ENCAP_SEG6;
- 	newts->flags |= LWTUNNEL_STATE_INPUT_REDIRECT;
- 
--	if (tuninfo->mode != SEG6_IPTUN_MODE_L2ENCAP)
-+	if (tuninfo->mode != SEG6_IPTUN_MODE_L2ENCAP &&
-+	    tuninfo->mode != SEG6_IPTUN_MODE_L2ENCAP_RED)
- 		newts->flags |= LWTUNNEL_STATE_OUTPUT_REDIRECT;
- 
- 	newts->headroom = seg6_lwt_headroom(tuninfo);
--- 
-2.20.1
+Review of this patch at Sashiko.dev flags a number of related problems in
+this code. I believe none of them introduced by this patch. And that
+they can all be treated as area for possible follow-up.
 
 
