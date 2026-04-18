@@ -1,233 +1,208 @@
-Return-Path: <netdev+bounces-279508-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279509-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eJuRHjGX42muIwEAu9opvQ
-	(envelope-from <netdev+bounces-279508-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 16:37:37 +0200
+	id smcYB7ia42lhJAEAu9opvQ
+	(envelope-from <netdev+bounces-279509-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 16:52:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF460421532
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 16:37:36 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55D76421621
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 16:52:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8946F3031AF4
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 14:37:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BAFE13026587
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 14:50:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 624C1395DBC;
-	Sat, 18 Apr 2026 14:37:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FB613939B1;
+	Sat, 18 Apr 2026 14:50:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ym3L3pbo"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="GMzJ10aS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CH5PR02CU005.outbound.protection.outlook.com (mail-northcentralusazon11012017.outbound.protection.outlook.com [40.107.200.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08DB82E413
-	for <netdev@vger.kernel.org>; Sat, 18 Apr 2026 14:37:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776523053; cv=none; b=UFbJL5SH/PEu6qVTVoLWhK3koU5Rpbuz2c18epoWKOp9PzXTo0VTSI/2xMcSil4piv6r6CCi+pqExZJp/VdEM2CjIWE/EO6YKKdWTW5+n0a7Uh3yb0DIyWsk1nDw+vgDL7sCfKo9ntYlWzebPxqpnXLi4byYTvZvAe5fEGjxzW0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776523053; c=relaxed/simple;
-	bh=iTNeU9cM3xV2CYH2iSVxdzqeKxIAvyl4ZeNii1rFs2A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D/l2CX6rHaDRBu9fKqsUKVGAuzhXhwdDBcguCOyszm6Nh/HtlgYZOFnf+YyYa/Enm30zUSDTomSNbVmWobexGFGdQZARn+5eF/1BTkQuMSWMpTbrnfZ4HCFJq9XRLJm80lg9H8fLFWiG6n41VAZwxqWFpWSkuSW/oFQM+NZdKPc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ym3L3pbo; arc=none smtp.client-ip=209.85.215.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-c7973bbc16dso1133233a12.0
-        for <netdev@vger.kernel.org>; Sat, 18 Apr 2026 07:37:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776523051; x=1777127851; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dbsMozQj477A2w2XnCGVvsxlPcZaVihW+fwe2arVXt4=;
-        b=Ym3L3pboYo0n8GJ/dB62R9AMcroJpqWesZRC9DOJLQsvlxcBITVJ2xzwoxaoLQOXaT
-         Y8ay54sfJ/NTYk2iAq6okZy0PT5+LiryP2NT3F1987D4SElMfixMrOCEWyAHLLNAHZC+
-         HMXL9S5NC1Vaw/g5ZCr5E2j9pz01dJE/FdaW/2mirDiESAeQJMQlkwkS4oibbSZRTYSQ
-         wE1h0ci+OARXMwRjjHg4vNKDFL7j2WoxNfFPMfOFum0+2RcL7OK1kiY2hUEDvCIlfM3Y
-         KAjzfXp0y9cFu6Zw4tTsi4wRKrH/iST3kCcnBM40f8JrwG4A3k0QL5xnDRoNng3NheSW
-         9CBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776523051; x=1777127851;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dbsMozQj477A2w2XnCGVvsxlPcZaVihW+fwe2arVXt4=;
-        b=C3WDPWOkYiaqTxyyCX11zU2Q9osGGrC560JmRwxRqkD7PaVCPnFL/kqFio6etAFZpi
-         aesO47WPFnDLXV7Gjh1rZBDcJG/yxxB4dSiFiFFiXmeTa/yM9+4zDHAVEQ9z4XcHVjQL
-         LJiqk2WBHc3+6X0WygPlHPGQlUHTvTSHwhd8HvXBDX69OhxvyZ7JWYuWVmMKSJvVbAyE
-         cI1haulyHWODV1Btt3KvfLak07cIaWjq+gwhvr0yYjYSjqggm8V8zhLucb7tbEb+Es4m
-         XYdPDvqVT0PqcVx5rqr9XqwNupRCLhUzn0jKJSQ4rN6wrgrXlc57EUwe4wIOU6AKAMLw
-         PNVw==
-X-Forwarded-Encrypted: i=1; AFNElJ/yIV7SkKoiAaE4LHSX9DB/5sqU6m14HQoscYzRD1KBPESuIovYUtVwuofn1Q4jdRTleY6yw0s=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzf8Ym+MXnYsL4DzuAZ+I2ONO9FeZnm5QyGqndr58rhnlkJxwA7
-	cYYPai86ALo1bPd7zvNly2gx4U/QH3adx4YMHLfmaddNc8aoeSDyvoziafPsjLmUua8=
-X-Gm-Gg: AeBDiet6J3sYBFmS54IsoCWgcDMOUN7lZAkSdMRE7Nf4NVtKJV8HseYevz4TtC/71w1
-	eps6pA1YyT8yWi4svoJcwjCGjg5kK9WZhsZ6+KRDTeInzhNTdMdYgqghSOHTNY0VmlNpVkbD/iH
-	2Okq73oZrdnh9KX9mv++E7/JkWQBq4Aj94cktspmznU/e+mwSn97gqliW/UeRpk0wfl4bdndouc
-	gfgr7cG4Srv3nLxsNV4ZsbPdMX8Ck90ygif1pHU9R28NQB0vPef4HY1E0y5LYpiQMzuFa1ooJX8
-	l3azoVt4hHz8BARDsSC3dtnQ03tvswBfveq3Qqt30a2zIi7kLWDIrH9aAtuPYOzEJLgMxDqvNoE
-	0wEzjTBrP1qdt6aGCK5wxrQP9pgXM757Ya3Mp1EJVYgZlFrWVtVmmzSCMtjzIQLY655jEWnl1rm
-	O9C5AlEGFqOct6H+HwBcZLpZZAcECQwKnkJbajW+dsmb+c+tOV9ibuBMAbw3reSFEazu+7Ub/Pn
-	8YF+eDLTw==
-X-Received: by 2002:a05:6a20:6a08:b0:39f:2b9e:e48f with SMTP id adf61e73a8af0-3a08d8a88c2mr8335023637.33.1776523051279;
-        Sat, 18 Apr 2026 07:37:31 -0700 (PDT)
-Received: from SLSGDTSWING002 ([129.126.109.177])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c79770587c1sm4004320a12.32.2026.04.18.07.37.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 18 Apr 2026 07:37:30 -0700 (PDT)
-Date: Sat, 18 Apr 2026 22:37:26 +0800
-From: Weiming Shi <bestswngs@gmail.com>
-To: Simon Horman <horms@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 596C5397694;
+	Sat, 18 Apr 2026 14:50:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.200.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776523814; cv=fail; b=QBnGfnALCYIgfonAgKEnhH3JC2KNGSK6DDZQcHE9u0VFOIEIvN3dNKbIPRuxJZ82KKbbkrmBd4SElS22SyYKEQ6YFHbmkS0D/dKsDjc2Xj9F23kfHG4jyqb1uziTVmdR0yDUr7lwL8vwDi0dvnKpqqmHwSPTkL7SHngevf0Kg8c=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776523814; c=relaxed/simple;
+	bh=4Oac5h/PAct5oCCBWs7NTE4sgjwwr4Vo071Ohc+0SEY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=TmtDP3OKY+JjzUy6x52ljKaRJMkhY/J4DpUqQ+078k0CT0DHMzvoa18u01elUG6XZ9Nk4LH+tFrw/edsLpMB7KRc6TC7JHMnlYESCIpfFHevUOevzipsNOyD93KnYCJ8kLS0VTG4AJsY1HVBjCMyx7FJ8ouZx+Xxn4KBV06WgGk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=GMzJ10aS; arc=fail smtp.client-ip=40.107.200.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=wE4A7c38DL5kyDVOG2z26ayX9dEtKJjkyx01lmjBJQQleR3W/S3vbi84RLumoACl4ZZMYMUcfF2uyAd/CwHYBqlpGqABx9DWHUS+Nu3TjhXtxNZtpwmS88TzTp8lzYQ+k+3eLUtJK39+X1YBtx3rJTKmBGKI2roRziDB/ZMBrbwYv+4g/oRpEPWGjzl2iPu6hKpGRMo6w0eGBZ2HJUqiCesy7bKmf+Iifi2AvPnQIgi7+z4NQ7kocq5TY85VHEfZb6d1dgBLCkPiCt1pnYxzZ8uduDxF0UKszkJ7prlPo2qIfNbEAjRE1ojvp93Z4zXpXZ+9NJO0Q7n0Y0VFGEwzGQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=PEQ6fs7rjRjy+MzhfZL8CyKNQAnXSE3ijfvDxUQpoIQ=;
+ b=scRe17n11b3OTkXNA2zFo2CzFjlhxEU1wLwmo9Rv0rzWg/D7jXHix53p3Sq1/aHMCUljGhoEJBX4t3hd+i2FZvrNRyYV80jDiuTzVdNtjfJNy5Y9bwweNF5pjBg0w3EojAn6wLWq+aOd1x0FZSbvD4lpDycVkd4Wz3C5DRldsymVYMN3HmhwBG1pAReXf/dape58YefgNVTNpskqAJKYflPBbjhmWB43SFtU34AXTcS5b5o7183WSbjVCXQ8LDZw3MCG1eoBMG7gqWC49jPUzWF6caAEsN1RqmTEeu5CC7Yv8jpzeffFFUHMPkL/B8pdgxHWApKCH/dl5M3Vgo9weA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=PEQ6fs7rjRjy+MzhfZL8CyKNQAnXSE3ijfvDxUQpoIQ=;
+ b=GMzJ10aSaidZslxF8lp/fqktHWiPj108mzVn9kL1Fn0YvgzhwiineK4DDowLbeEUbNyeiGCp3HjX+xt8gH9sEa79lzCKgPB/SVnNWboMislpuW+eqR205luruFkl6JDbsbq8CLbt+Uhmq1IiL7SQYJ6Maykm4VRaykf8MPn6SlIrQcnrWD6F4Yr7vp12VkLORyGWDBlZd//RQT1K8tDcXdiLNI6Es4hixmNr9fdUV4yudROVdqaV/qv3D4xLeqwNaLAutvisfygrUVJkNd7+nEIuWj+sqydSgFo0fMLZq5Az1+B8uc1ppXWsMPDdyDNn3G7BAFy3kqHDOn9XLw2hog==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
+ by LV2PR12MB6015.namprd12.prod.outlook.com (2603:10b6:408:14f::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9818.25; Sat, 18 Apr
+ 2026 14:50:08 +0000
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2]) by SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2%6]) with mapi id 15.20.9846.007; Sat, 18 Apr 2026
+ 14:50:08 +0000
+Date: Sat, 18 Apr 2026 17:49:57 +0300
+From: Ido Schimmel <idosch@nvidia.com>
+To: Ujjal Roy <royujjal@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, Xiang Mei <xmei5@asu.edu>
-Subject: Re: [PATCH net v2] slip: reject VJ receive packets on instances with
- no rstate array
-Message-ID: <aeOXJoeq6VkCnqAH@SLSGDTSWING002>
-References: <20260415204130.258866-2-bestswngs@gmail.com>
- <20260418123929.GE280379@horms.kernel.org>
+	Simon Horman <horms@kernel.org>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	David Ahern <dsahern@kernel.org>, Shuah Khan <shuah@kernel.org>,
+	Andy Roulin <aroulin@nvidia.com>, Yong Wang <yongwang@nvidia.com>,
+	Petr Machata <petrm@nvidia.com>, Ujjal Roy <ujjal@alumnux.com>,
+	bridge@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v4 5/5] selftests: net: bridge: add MRC and QQIC
+ field encoding tests
+Message-ID: <20260418144957.GA798825@shredder>
+References: <20260412111047.1326-1-royujjal@gmail.com>
+ <20260412111047.1326-6-royujjal@gmail.com>
+ <20260413084752.GD209364@shredder>
+ <CAE2MWkmvdAVMBvJ9xKgEzjJZ010=oY_ZoG==FBjHEisHEMrS8Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAE2MWkmvdAVMBvJ9xKgEzjJZ010=oY_ZoG==FBjHEisHEMrS8Q@mail.gmail.com>
+X-ClientProxiedBy: FR4P281CA0373.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:f8::20) To SA3PR12MB7901.namprd12.prod.outlook.com
+ (2603:10b6:806:306::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260418123929.GE280379@horms.kernel.org>
-X-Spamd-Result: default: False [5.34 / 15.00];
-	SEM_URIBL(3.50)[asu.edu:email];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|LV2PR12MB6015:EE_
+X-MS-Office365-Filtering-Correlation-Id: eac95ba7-8321-4ebf-a39b-08de9d59c8c4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|376014|366016|1800799024|56012099003|22082099003|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	dMzCaVP/hLC4g51Q8LTzW6rzpYEaUOhRaNbqy15Dx+DFwt4znhNLP/gk2fQDW2toJrgbcDQEZesRLO6tRzd4kly6UDqDMAtPk64oV+k5qkxTPdXHGvmbV11r+DGirKlTf7zqGNadZw+CMwHsTl8I5STnuub5pdfE71uOLUj+IYmuaFNMphjqTMjwz8e6Bi+S18fbaT5NSis6gvEVAuduTPFmrFKKXfsbZgzJYsctMJnQqr5qQ4F6owA1ywpUDqat3LO1aaN/pJx54NpVoiK0nUsyOdYYLxu8v8MxPMiStVPdy8fg5AEnpjlwiQj/93dvHGtgfm7ELuHjIl2FBO2w/ZhV8QYpznlE/06nNE/b7bswVv1doKiqu+PuekhNPNDLA02i8Lhd4Bb/kkYeWa9QPYQvEX9+a89oMwfUXbfoTs2q2N6U2wRkDr7qRkxRWNofsRHoxL1CqAp7u/+7HiYxLN71C8oTSogUxLlnuOBJ9vDcSZHs4tbN4n+IEQCb1IMMJRnvKQWCasHeQvy2KO3E+Mj9Z7ah8fU2VCE+Wg5YyuC/yATZwML8xZz1XV1Y/DwGPwaEI8SEDa+1lxb7ymV9KGrcjH+R4chCF5UhxhqQ5fqGbxiI4c7LdwNn/G/T0h+m0BUSEzurBHtJJYhMCNb0V8q/hgwz/uqAckEMavZGr9Pr1ItCU8ERxdwL10iXcfmeuale0kTdBVWv2t0+tOn11COygvTQ+62h8nMwJyo+bzA=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?cXM4OGpGbkI2Si94VEdwbnhKTkZiTWZzSlUrWTk2cGpta0gzVlRUcnNoSzBo?=
+ =?utf-8?B?TlRqc3JUc1YrMjdPcm1XRUJkeXlxcFY5VkhHNGNUcmdtdVcyb3NFWWx4a3NI?=
+ =?utf-8?B?MUR6RWRpVlMwUmRpanVOejR3MitVTGZ3RUVrTUo5L0I3Z0l0eXVycGYzWXJh?=
+ =?utf-8?B?aDBSTTVhMjNoOUJ0czFJVURlNnVMajh0SEZLQXg2VDJqandYeDdrbWcvaTM5?=
+ =?utf-8?B?UlFQNUJPSTRCemxYNW04VGR1cGZKOERNb0ZwRDYyWm53QjZlOVY3MFlERzVh?=
+ =?utf-8?B?TkJWazVyeGZ0dVRuRDdqNnVOWWRnTmt0OEwySm9iSXFHdEw1cTkyWUE3L1pt?=
+ =?utf-8?B?QkVYVzRDRlNYU0tvdkE0Tm96SmYxaTJZV2Znd085UUtrY1NheVhHZHVLRVIz?=
+ =?utf-8?B?M05hK1lHTGtkWnQ1eS85Tm5UUG5zTFhmMXp2bUZiY1RPZHFneVZRTEx1b3k0?=
+ =?utf-8?B?KzR6WXk1TkNheXB3Q3ZZK21uYkdKWk1rNmZCMU5ZNWRNbGJaUWhXOFB3aFc0?=
+ =?utf-8?B?U2Q1bzBhNnMyOFNvRnp5Uit6WE1OWkxndkhvaTUwRFF5NkN2VnhCVEwvU2RZ?=
+ =?utf-8?B?a3pUclUzcHAvSDU2TFJPN3JMZjVDbDlpM3YyOTB1ZzVyRTVCQXdnL1FjcjIv?=
+ =?utf-8?B?VlRTTHg0WFpTV0ZGeXhvaU5sNnNrMUc2MHBsY0V3UHJXSlMvOTVFNUZYcVh2?=
+ =?utf-8?B?KytVRFhlcGM5Qk9zUXhjVEtyU1VYdzVXN2RURjFvbTJzaWdBbDZYMHFRb3hO?=
+ =?utf-8?B?Y2krTW5EbHFZRGZ2RXJ1QUxzc1RzNzhGaXVlL05idXpVbnFTelhCeWR6eTBF?=
+ =?utf-8?B?NFF3RHQxVWc4TnhML0JHandqVDVHYXZTek1uUEtpMzFEYS90MFg4VlhCQTJ0?=
+ =?utf-8?B?YXNQeFl0NVFud0NVQnZGVEFrN0lpa3kyQUxBVFkrUWRFeW1YRTFkUmhvMVEx?=
+ =?utf-8?B?UDQvQWRjMkptV2FRL3ZnRmllVVJMUzc0Sy9mRjl4Nmd5ZGNsYjRkRjZjOUxw?=
+ =?utf-8?B?bEJKT2NqKzZ3bTZQWkc1YS9Nem80aUVNZ01lRmJEdm5OUVVpRHQ5WDc4QURF?=
+ =?utf-8?B?dDhlZjVic3kvOGtxd1pTdzhjRzlWYjR4aFN0SVZlQStqTzdzZjBEUDhoR2FK?=
+ =?utf-8?B?aDBONDFwTFVpVkdBM2FlMk5mVnFTc2xCNGNVclFKV0VvTVEyUnpYU0o3L3VM?=
+ =?utf-8?B?ejB2bXljbDVMSkdaQ08vQ3cvajlJNmhvazRxV3EycmRsSzY5WFBDdzBQc3k4?=
+ =?utf-8?B?dmxsTTJqanFYa3FrbkdKQU9DY0o1RWZkcUtIaVJlUnFzTjVrcmd3VHRsNUc2?=
+ =?utf-8?B?d3B0TXVweUN2elllNEZyaTUxb2V4SDR0MUZWYVVKamV4c1M1KzFJVjUwamtN?=
+ =?utf-8?B?bkRPOHl4U2wwSDFNbno2OStLN0VPZEw1ZmM3b3NQMUtiY1RWWnhNUUswSUVZ?=
+ =?utf-8?B?bmUxQXpDTjBrUFY3VUdNTG10ZFdOQ3dKeFBFMDFVSHNTQ0Nmc0tpWkxGTXVG?=
+ =?utf-8?B?MS9NQ2RjcC9SUW8vb2FWeUZYdkZPbXV3QmlqSFZPdktUSnQ3YVViQnhyT0NO?=
+ =?utf-8?B?NmwzMmtQcEFDRFR1cW1KeWxKMWhQOW96V0FjWVhmUkwxNXg2SXEwbUJFUXlG?=
+ =?utf-8?B?MU5xUDk5U2RTU0xsWEFQdk55QkxTYTRpRnlkaS9OOVQxQVVXbndzNzB5eTlu?=
+ =?utf-8?B?VEtML1c5MEpYYmJtUHBhcDkvMFNZRkpYME5uai9QbFNJQlVHWWxVWmtzUjJl?=
+ =?utf-8?B?QngxcUlBTm5KSk8rem9wVE5SNFEwOXdYZ2srMFlnbzJVK2h6TVh6aU9OMzA1?=
+ =?utf-8?B?Tzk5K3FwckJiU1hnSEM0ejVHKzNuZERxVlFmMldFRmY3M2hucEszR2tmMmNy?=
+ =?utf-8?B?TldFVkdTS2dzaGlGVHhrSlRHd0JqQkF0ZU8zbjJJNFNkdEFucGQvYWFJZHFl?=
+ =?utf-8?B?bWFPMW56VUNUZjMycE5GUzlLUGhiajU2OWNqSHVYaVY1L0h3NVFJSE9oK0dR?=
+ =?utf-8?B?R2JkOTNxNXBjd2dzeWcxNkhzMEw0SHFGQ2NIaWFSRktQUUNBenVsZjdkMEY0?=
+ =?utf-8?B?ZXJDNXB1TEN0ZTdTK0MxRng3MEoyQkRsN1NSWkFCY2dDbkhWZzFDSUVyUWQw?=
+ =?utf-8?B?QzNGbHVMc2dHcmpFdW85U25nODhZTmdwVWpxSWJiVTl4d2hnbi92UWhnY09G?=
+ =?utf-8?B?SUV3TUYvZm10d3BaNE40Skk5Y0RodzMwMlNwL3pUWnYyNTFVaU1HTGpCMmov?=
+ =?utf-8?B?MlB1Y25lOXBPSEc5ak1xb2p2SFpOdWdpMlBuQjNWQ2l5TjZCQVVySnY1L1dV?=
+ =?utf-8?B?VG1iRGlBcFJkZDNxdUlYNlB3dThrM3RjSmVFK2M5L1ZUNVU2c3FPQT09?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: eac95ba7-8321-4ebf-a39b-08de9d59c8c4
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Apr 2026 14:50:08.1874
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: eR6DEhydTaHBzaWkzhvEILD/sjyOGIusNlkU/mRKTHIiA0TDf7gdZ5cmNUyCO6AwiW3V5RdIbBHmFNFvx2yDFQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB6015
+X-Spamd-Result: default: False [0.34 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
 	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
-	BAD_REP_POLICIES(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-279508-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	R_DKIM_ALLOW(0.00)[gmail.com:s=20251104];
-	GREYLIST(0.00)[pass,meta];
-	TO_DN_SOME(0.00)[];
-	DMARC_POLICY_ALLOW(0.00)[gmail.com,none];
+	TAGGED_FROM(0.00)[bounces-279509-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_SPAM(0.00)[0.967];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	R_SPF_ALLOW(0.00)[+ip6:2600:3c04:e001:36c::/64:c];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: BF460421532
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,Nvidia.com:dkim]
+X-Rspamd-Queue-Id: 55D76421621
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 26-04-18 13:39, Simon Horman wrote:
-> On Thu, Apr 16, 2026 at 04:41:31AM +0800, Weiming Shi wrote:
-> > slhc_init() accepts rslots == 0 as a valid configuration, with the
-> > documented meaning of 'no receive compression'. In that case the
-> > allocation loop in slhc_init() is skipped, so comp->rstate stays
-> > NULL and comp->rslot_limit stays 0 (from the kzalloc of struct
-> > slcompress).
-> > 
-> > The receive helpers do not defend against that configuration.
-> > slhc_uncompress() dereferences comp->rstate[x] when the VJ header
-> > carries an explicit connection ID, and slhc_remember() later assigns
-> > cs = &comp->rstate[...] after only comparing the packet's slot number
-> > to comp->rslot_limit. Because rslot_limit is 0, slot 0 passes the
-> > range check, and the code dereferences a NULL rstate.
-> > 
-> > The configuration is reachable in-tree through PPP. PPPIOCSMAXCID
-> > stores its argument in a signed int, and (val >> 16) uses arithmetic
-> > shift. Passing 0xffff0000 therefore sign-extends to -1, so val2 + 1
-> > is 0 and ppp_generic.c ends up calling slhc_init(0, 1). Because
-> > /dev/ppp open is gated by ns_capable(CAP_NET_ADMIN), the whole path
-> > is reachable from an unprivileged user namespace. Once the malformed
-> > VJ state is installed, any inbound VJ-compressed or VJ-uncompressed
-> > frame that selects slot 0 crashes the kernel in softirq context:
-> > 
-> >  Oops: general protection fault, probably for non-canonical
-> >        address 0xdffffc0000000000: 0000 [#1] SMP KASAN NOPTI
-> >  KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
-> >  RIP: 0010:slhc_uncompress (drivers/net/slip/slhc.c:519)
-> >  Call Trace:
-> >   <TASK>
-> >   ppp_receive_nonmp_frame (drivers/net/ppp/ppp_generic.c:2466)
-> >   ppp_input (drivers/net/ppp/ppp_generic.c:2359)
-> >   ppp_async_process (drivers/net/ppp/ppp_async.c:492)
-> >   tasklet_action_common (kernel/softirq.c:926)
-> >   handle_softirqs (kernel/softirq.c:623)
-> >   run_ksoftirqd (kernel/softirq.c:1055)
-> >   smpboot_thread_fn (kernel/smpboot.c:160)
-> >   kthread (kernel/kthread.c:436)
-> >   ret_from_fork (arch/x86/kernel/process.c:164)
-> >   </TASK>
-> > 
-> > Reject the receive side on such instances instead of touching rstate.
-> > slhc_uncompress() falls through to its existing 'bad' label, which
-> > bumps sls_i_error and enters the toss state. slhc_remember() mirrors
-> > that with an explicit sls_i_error increment followed by slhc_toss();
-> > the sls_i_runt counter is not used here because a missing rstate is
-> > an internal configuration state, not a runt packet.
-> > 
-> > The transmit path is unaffected: the only in-tree caller that picks
-> > rslots from userspace (ppp_generic.c) still supplies tslots >= 1, and
-> > slip.c always calls slhc_init(16, 16), so comp->tstate remains valid
-> > and slhc_compress() continues to work.
-> > 
-> > Fixes: b5451d783ade ("slip: Move the SLIP drivers")
+On Fri, Apr 17, 2026 at 11:27:06AM +0530, Ujjal Roy wrote:
+> On Mon, Apr 13, 2026 at 2:18 PM Ido Schimmel <idosch@nvidia.com> wrote:
+> >
+> > See some comments below, but note that net-next is closed:
+> >
+> > https://lore.kernel.org/netdev/20260412142250.131bf997@kernel.org/
+> >
+> > So you can either wait with v5 until it is open again or post it as RFC
+> > so that we can at least review (but not merge) it while net-next is
+> > closed.
 > 
-> AI review points out that the cited commit moves code but doesn't
-> add this bug.
-> 
-> It seems to me that this bug has existed since the beginning of git
-> history. If so, the Fixes tag should be:
-> 
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> 
-> > Reported-by: Xiang Mei <xmei5@asu.edu>
-> > Signed-off-by: Weiming Shi <bestswngs@gmail.com>
-> > ---
-> > v2:
-> > - slhc_remember(): use sls_i_error instead of sls_i_runt for the
-> >   missing-rstate case; it is a configuration error, not a runt packet
-> >   (Simon).
-> > - slhc_uncompress(): goto bad instead of returning 0, so the instance
-> >   also enters SLF_TOSS on the first rejected frame.
-> 
-> Otherwise this looks good to me:
-> 
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> 
-> 
-> I do note that Sashiko flags some other problems in this code.
-> I do not think that needs to delay progress of this patch.
-> But you may wish to look into them as follow-up work.
+> Let me clear the changes asked here inline, so that I will be prepared
+> with v5 until net-next is open. You can ask me to send it as RFC v5,
+> if you have doubts about inline answers.
 
-Thanks for your review. 
+I checked the proposed changes and they look fine to me.
 
-I've already sent two follow-up patches for the decode()/pull16() 
-bounds-checking issues:
-
-    [PATCH net] slip: fix slab-out-of-bounds write in slhc_uncompress()
-    https://lore.kernel.org/netdev/20260415213359.335657-2-bestswngs@gmail.com/
-
-    [PATCH net] slip: bound decode() reads against the compressed packet length
-    https://lore.kernel.org/netdev/20260416100147.531855-5-bestswngs@gmail.com/
-
-Best regards,
-Weiming Shi
-
+Thanks
 
