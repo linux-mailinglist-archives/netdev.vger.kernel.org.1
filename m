@@ -1,199 +1,129 @@
-Return-Path: <netdev+bounces-279495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279496-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UP7/AWR442lHHQEAu9opvQ
-	(envelope-from <netdev+bounces-279495-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 14:26:12 +0200
+	id SEd8K3J442lHHQEAu9opvQ
+	(envelope-from <netdev+bounces-279496-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 14:26:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64B41421141
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 14:26:11 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADFB0421148
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 14:26:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EE6C03026C2E
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 12:26:09 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id AD406300B523
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 12:26:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5000035838B;
-	Sat, 18 Apr 2026 12:26:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8857935F170;
+	Sat, 18 Apr 2026 12:26:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="Tdc0rO+9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ozWhwrOF"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7A0B1F5437
-	for <netdev@vger.kernel.org>; Sat, 18 Apr 2026 12:26:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 664791F5437
+	for <netdev@vger.kernel.org>; Sat, 18 Apr 2026 12:26:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776515169; cv=none; b=puIuZP1UJXSiuPA5JvtSpzuxTI0n1/6TvJ3ExkNb4yu/8iWlCRrv9RjQzBW0XXoypscU/VhHJgWCf9Mm0upVFwgZlI571grZmT1u4PdhnzMqx5r4U9zUsf3FqQt250OFyOyRygYaXmvB8SO9vBcAR07QYUuj161N2l01Hc2Lbx8=
+	t=1776515181; cv=none; b=EOmemJQNx58Gr5zE5x18q/1L0QErPUK767AZ8mkqDDM7zMfZfiD7pGNCod394VYXsKeKO0Mr4eViLVonzLm3YVbzencjEfVeXeRtImexpSeBa+89C5yzGKFI4VJneOoz+GdmhDVvAS9qs3XUEAPsJrVBj6TybZOnlTDYHBqBmx4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776515169; c=relaxed/simple;
-	bh=iiAF2+7luyXhBaU/eNkYc/0TN2UXdU0c45SfdZB5K0E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XcHPn54kn+nGc62857nsSiGKFhmIODRUSuuKe68Og9fxIOSZPOfx+YlP1DFiFSIhQjmR15SmxcWT5mLAriydqHV3mWdSAGveesb3I7deRP2VB3uJxnFqR/ep4hAgo4DBkLNTGNX9jzXFVpZWakThSoTx8wn0TEnaz5tN01xbYMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=Tdc0rO+9; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=XjfK12M3iWLrDtJ3WdvL5Z9ej5JuySckD922EDTM7O8=; b=Tdc0rO+9prFCr7Av7gTCgxDngm
-	A/YgnrtVOCb1R5baEd1bURctRmMoyXvNdPYCT5B+P24o1w4/jNj2flqRq1pBSkvMfKONb0nU/4Mda
-	j30hVg5RH8pbhNLO6Ckii00G54UR7aKvqn577qklIwzsYSmBbh0ocP5dYLWuxz67QSThwBPYHnkRe
-	j7cTOjT59rXbh8UiCSo0EjrXtO96ftvG9ihUObqGIYcmmS+qVNHO7c3cgbnHZdq44f2O/8wWD+4DV
-	YsHEFrmyTLI3kQcphw3oH6cllpms5JsPsSpnT4aPcKUNxLpRsxeDiqpfo2DM6gYv3j3RVk8EnkX2o
-	xHUoAAdw==;
-Received: from sslproxy06.your-server.de ([78.46.172.3])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1wE4kP-00093M-2S;
-	Sat, 18 Apr 2026 14:26:05 +0200
-Received: from localhost ([127.0.0.1])
-	by sslproxy06.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1wE4jr-000KB2-2w;
-	Sat, 18 Apr 2026 14:26:05 +0200
-Message-ID: <ae053593-907e-4891-90fb-03b4c5d8f5e1@iogearbox.net>
-Date: Sat, 18 Apr 2026 14:26:04 +0200
+	s=arc-20240116; t=1776515181; c=relaxed/simple;
+	bh=HWqdLCoCTZqiCrLr9u4qrUUcnDgqwBoxhU21yZ6mtlI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gBpe3FnTfetsjtg0z5844fGR4wNG4zTIhtX3/ZKzL9J8fpgGxLit5ylRESN1s8NYKoobgxCOGDJooj/EGlv/FrrBCnXE/yH6aPhGN9rfP21umHpWc1566xlPbPzH1G/FhbfoHLcoNX431l+Cu4ZXPQwOhrlH8zKq5cEB3pjc0AE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ozWhwrOF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91DDEC19424;
+	Sat, 18 Apr 2026 12:26:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776515180;
+	bh=HWqdLCoCTZqiCrLr9u4qrUUcnDgqwBoxhU21yZ6mtlI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ozWhwrOFH1J0gopSPh/j36j8gnog6t9LlP644uOsvC6YNbcK6BddYXLvld5NLJabP
+	 17R7bcOzeoBodoNVESMX7cDZV+j+/uyvU6CLCR8k6LQ+riyH17PUFzjK2lvpfPcrDb
+	 jdnJjvIkxij5xc0dFqo4Weyv0g/IbbfmrJ2u3AOF4Xor39+1KYm/AF0JwY2GdffUXU
+	 Zje7Tt4Z1GNUXdK0CWdeUdXIsppS5QOZ3Ybvbr1fDx5IxcD0JByjP2/ZwRymbuqS/V
+	 Kx/+imAe95ENuVisPa5DqwHimzd33gQ8iuq1/mX/+hUSs+/mwWiVh/+kthBqnUdCIz
+	 UKesces87sREA==
+Date: Sat, 18 Apr 2026 13:26:16 +0100
+From: Simon Horman <horms@kernel.org>
+To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH iwl-net v3 5/6] ixgbe: fix ITR value overflow in adaptive
+ interrupt throttling
+Message-ID: <20260418122616.GC280379@horms.kernel.org>
+References: <20260415142841.3222399-1-aleksandr.loktionov@intel.com>
+ <20260415142841.3222399-6-aleksandr.loktionov@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] ipv6: Implement limits on extension header parsing
-To: Justin Iurman <justin.iurman@gmail.com>, kuba@kernel.org
-Cc: edumazet@google.com, dsahern@kernel.org, tom@herbertland.com,
- willemdebruijn.kernel@gmail.com, idosch@nvidia.com, pabeni@redhat.com,
- netdev@vger.kernel.org
-References: <20260417171831.687053-1-daniel@iogearbox.net>
- <60b47924-dae4-4a10-b977-75b92e1094c0@gmail.com>
-Content-Language: en-US
-From: Daniel Borkmann <daniel@iogearbox.net>
-Autocrypt: addr=daniel@iogearbox.net; keydata=
- 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
-In-Reply-To: <60b47924-dae4-4a10-b977-75b92e1094c0@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: Clear (ClamAV 1.4.3/27975/Sat Apr 18 08:26:10 2026)
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260415142841.3222399-6-aleksandr.loktionov@intel.com>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[iogearbox.net,reject];
-	R_DKIM_ALLOW(-0.20)[iogearbox.net:s=default2302];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[google.com,kernel.org,herbertland.com,gmail.com,nvidia.com,redhat.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-279495-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,kernel.org];
-	DKIM_TRACE(0.00)[iogearbox.net:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-279496-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_THREE(0.00)[4];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ietf.org:url]
-X-Rspamd-Queue-Id: 64B41421141
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email]
+X-Rspamd-Queue-Id: ADFB0421148
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Justin,
-
-On 4/18/26 1:45 PM, Justin Iurman wrote:
-> On 4/17/26 19:18, Daniel Borkmann wrote:
-[...]
->> diff --git a/net/ipv6/sysctl_net_ipv6.c b/net/ipv6/sysctl_net_ipv6.c
->> index d2cd33e2698d..93f865545a7c 100644
->> --- a/net/ipv6/sysctl_net_ipv6.c
->> +++ b/net/ipv6/sysctl_net_ipv6.c
->> @@ -135,6 +135,14 @@ static struct ctl_table ipv6_table_template[] = {
->>           .extra1        = SYSCTL_ZERO,
->>           .extra2        = &flowlabel_reflect_max,
->>       },
->> +    {
->> +        .procname    = "max_ext_hdrs_number",
->> +        .data        = &init_net.ipv6.sysctl.max_ext_hdrs_cnt,
->> +        .maxlen        = sizeof(int),
->> +        .mode        = 0644,
->> +        .proc_handler    = proc_dointvec_minmax,
->> +        .extra1        = SYSCTL_ONE,
->> +    },
->>       {
->>           .procname    = "max_dst_opts_number",
->>           .data        = &init_net.ipv6.sysctl.max_dst_opts_cnt,
+On Wed, Apr 15, 2026 at 04:28:40PM +0200, Aleksandr Loktionov wrote:
+> ixgbe_update_itr() packs a mode flag (IXGBE_ITR_ADAPTIVE_LATENCY,
+> bit 7) and a usecs delay (bits [6:0]) into an unsigned int, then
+> stores the combined value in ring_container->itr which is declared as
+> u8.  Values above 0xFF wrap on truncation, corrupting both the delay
+> and the mode flag on the next readback.
 > 
-> NACKed-by: Justin Iurman <justin.iurman@gmail.com>
+> Keep the mode bit (IXGBE_ITR_ADAPTIVE_LATENCY) and the usec delay as
+> separate operands in the final store expression.  Clamp only the usecs
+> portion to [IXGBE_ITR_ADAPTIVE_MIN_USECS, IXGBE_ITR_ADAPTIVE_MAX_USECS]
+> using clamp_val() so that:
+>  - overflow cannot bleed into the mode bit (bit 7),
+>  - the delay cannot exceed 126 us (IXGBE_ITR_ADAPTIVE_MAX_USECS),
+>  - the delay cannot drop below 10 us (IXGBE_ITR_ADAPTIVE_MIN_USECS).
 > 
-> +1000 on the need, but NAK on the way it is done. IMO, we don't want yet-another-sysctl for that. Instead, we have (well, not yet, but it's about time) this series [1] to enforce ordering and occurrences of Extension Headers, which is based on an IETF draft [2] (FYI, draft-ietf-6man-eh-limits is dead). I think we should enforce ordering and occurrences in this code path too, instead of relying on a sysctl. Let's keep both code paths consistent.
+> Fixes: b4ded8327fea ("ixgbe: Update adaptive ITR algorithm")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> ---
+> v2 -> v3:
+>  - Use clamp_val() instead of min_t() to also guard the lower bound
+>    (IXGBE_ITR_ADAPTIVE_MIN_USECS); keep mode and delay as separate
+>    operands until final store; use IXGBE_ITR_ADAPTIVE_MAX_USECS (126)
+>    as upper bound instead of IXGBE_ITR_ADAPTIVE_LATENCY - 1 (127)
+>    (Simon Horman).
 
-Hm, that series [1] should probably go to net instead of net-next, but atm
-hasn't moved since a month. I'd still think max_ext_hdrs_number would be
-useful given it has less complexity also for stable, but I guess ultimately
-up to maintainers..
+FTR: I think the code would be easier to reason with if
+mode and delay were kept separate during earlier calculation
+of itr. But I also think that can be handled as a follow-up.
+as this patch does improve things.
 
-Thanks,
-Daniel
-
->   [1] https://lore.kernel.org/netdev/20260314175124.47010-1-tom@herbertland.com/#t
->   [2] https://datatracker.ietf.org/doc/draft-iurman-6man-eh-occurrences/
-
+Reviewed-by: Simon Horman <horms@kernel.org>
 
