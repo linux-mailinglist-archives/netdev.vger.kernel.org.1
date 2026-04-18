@@ -1,230 +1,176 @@
-Return-Path: <netdev+bounces-279476-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279477-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id PMZUBm4e42nOCAEAu9opvQ
-	(envelope-from <netdev+bounces-279476-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 08:02:22 +0200
+	id SKj3Oo0k42naCQEAu9opvQ
+	(envelope-from <netdev+bounces-279477-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 08:28:29 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C990420167
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 08:02:21 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87CCF4202AD
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 08:28:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E1BB5302A681
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 06:02:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 740B73047513
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 06:27:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F236727AC45;
-	Sat, 18 Apr 2026 06:02:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E4B334F48E;
+	Sat, 18 Apr 2026 06:27:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rK84Jq0F"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XGBaHZPF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89A8D2475E3
-	for <netdev@vger.kernel.org>; Sat, 18 Apr 2026 06:02:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3457F33CE80
+	for <netdev@vger.kernel.org>; Sat, 18 Apr 2026 06:27:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.173
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776492138; cv=pass; b=TYmPjTA79Govs2vXF+ittrzpUTQW9aUWhqnJuzUnD+ejZUJcDhq5DaTxAq+dOFm1aCv8pZ42hlZ5DOffVHMH3GsbbfzZEAMDd4aL85PU6fuuvQNk0gEUl4lFMgM0IEgxReqVrsze/VClEYjC8gG5/oEwBI8n33l42CUVd9E2FPE=
+	t=1776493677; cv=pass; b=R7X2GVHeBTaRq2PWVdXmZ80UjqIJXIbBewSFD66mN/cXixE7MCouG8v0XbJEEYt1rWRVQqpXVN8VMBHiMoS7e3QZ3bZJbmbAqOFOADp71/mzxSR07Kytlsv5Tuc91Q9dBUCqoPglPGPNESgZsyWgBEMWmj1d30YY1T3BSuv/Dao=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776492138; c=relaxed/simple;
-	bh=+DxAgjOGYsbq78L0ygJnRzmXFkqF5BzidbIYSSplQ98=;
+	s=arc-20240116; t=1776493677; c=relaxed/simple;
+	bh=hxCjzk4K0sPjhYyblUWrxUR/OH0u3SE421/QOr9YvLY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uhSizKgfV6sr/pGqEzipSE6Vla/3OWQqhlYOY5Nf/MddkS3KmBFo9k4bKcQ3lDPuv1gvJySdsCa3qxa3S6UeR0HyqF052SaRxQJxK0DPWeCqL/eSzXoW4K2em3FsFhCChwihDqMAgxV/UU5RfQ8oWKm6nD+N9mE8/vkC9dDmx20=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rK84Jq0F; arc=pass smtp.client-ip=209.85.219.47
+	 To:Cc:Content-Type; b=e2OoejLHf+HPhlN8XRXjZ78eiHjs14xo/D/JGosBiWfM6sEPTACtAKfIZ1058UAn8aDuOWQT/1N/wnZ3MAMsRLTAYoIhBY1OYzg/FLTEn5Hq+83coFyQopcMdZ9V4dO/MyJ56y5R6Cq3XubTIBamdOmO4ujMcA4g0BO9EVTexIc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XGBaHZPF; arc=pass smtp.client-ip=209.85.160.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-8aca0469204so15426906d6.2
-        for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 23:02:17 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776492136; cv=none;
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-50bbc41677dso19807141cf.0
+        for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 23:27:55 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776493674; cv=none;
         d=google.com; s=arc-20240605;
-        b=PLZ4QVm18ZqPCmvkP8SNUaJfRXPSuxqmvUMdwwixrHfuIQewaZWwy4bJI9OCjtBUnW
-         CCJw0I1ikylZMTVwU677lJmb5Syhd24gbf5j57LvYkc9U8aK9bcpRJhTLgDPsBpbPOrI
-         38/h9nkmzsym/pyB04c9ZNqKukf7FyyybrHVpqIk4QodL0e5XOUM4bFKzIVIk7AjRvtM
-         kaEeckPG8qLVXgpEC5X+xnlg6ytAeYRUH268L+R0Ga7ywpcmZMZovhVGOxtySkQrGBt/
-         vEMyAGlJ9mSOKj02vdjFCY9+DnA28rKJmrF3NUkZLr33im1ujd0oqOua42pFXdU2e+Cn
-         0jng==
+        b=Ja5p3wFbQV/wuHegDLwQhUFfEmMF/7MAnKuJyQ/oRssQt5YQW3HlVh45MbVJIkogAE
+         0OtvJ9uGBb/rx/29ZdvGwlNTtB6jkgUUgS8wZcqu4gRPJ0KbKh6lkR9lw6ErElK+5x+4
+         ti5MZTr6q1PGUJlk0acilfu6DTlO7FynyFFqchdv9vLA8DX9TrOCffL7Q/4UzMeveVEk
+         uIomv7t5+WdRBPhjs4dcB2IareNYtbIb24xts/zfY+vYF8K+kfTnKCbN3WwJBbAMaP7c
+         o9g5FrU1kQl/VVBoboB6Lorvp1RtU9yEOXhe0I8WBk6ecSoxNwni+a26TrZIRV9Ah87l
+         4e0g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=D8Cw2/LxkFW8q0BKiXupLWBPBKSpdwnTq/LIei0Fzfc=;
-        fh=Awrco3dRq6rRba0geolah6bcgAgwGukE+i0cFcadf3U=;
-        b=hfExQg76dJ4p0zjYupKe4jz9fXUBXmDP2cecjl0WBRLe98VT1Z82yNhPaqUuhezXbi
-         5drM1kPPBaAOELLUSEMHQZ+7hX8nBp34i6QevCOPFtu/uXBsqGhVguPpe/Zhwv2lX+BG
-         Yy66mdX8apm7/D50SCZG7ptEKL2aEosEYxFeerxKOe17DrfX88IkvFxcldbpjPdmdXKL
-         DXA3XI6WtATq0MYvhwnQLaAAuO+9yyibXoFOaVQBQDxc9BdMlHxDPtP6cZrF/dTZKcP9
-         svktU8FXx7zsr8JJj+p1rc2UrVJlCjCdIw2+uXchkJ35EeEphRmTMTfvwqWKLRf/0OnW
-         RwAA==;
+        bh=hxCjzk4K0sPjhYyblUWrxUR/OH0u3SE421/QOr9YvLY=;
+        fh=feIr15ItyZJOSx80UKdLwgAY/Bf+/TwEWj3702ebsTU=;
+        b=IHEoogbR5m7GBBA2Uo2vDS9+v5I0eNOTaBfqNJjffUuVYqrJ45rnnn+VUYem7G+bjj
+         jp0f8EcSJXKG54teHyWVZ4uhuHAliHex/XSIC28/TD7T/WvqVj5XEb5gQKF+m3GLJ6+1
+         1Mvq/b2utIMpV6ux4PfMLTeKektjpfod9kB6ZaThy1pvO8MzuqqqPBRut2F6Tz5LhDG2
+         cVnwbBonjusES5xM/wtvGBIdTXZipLIz8Xw2aEgWkNkZnsohLmqms6HhyqHLiG/Od0b/
+         w1nLK7LNIlo0k4XmelWyVYandYlGdSBqyE8v0hdIMvFLATSJGS9lHyIcCSOZY/jGmbet
+         +VJg==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1776492136; x=1777096936; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1776493674; x=1777098474; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=D8Cw2/LxkFW8q0BKiXupLWBPBKSpdwnTq/LIei0Fzfc=;
-        b=rK84Jq0FT1tYluOd8vbtfXAC10Qs9byzVsz6z0XwZdY0qmt0Q7SDK8sw4Hc2tfiweP
-         sXTUgDzb5H8kpMCOGQooa8XvvELGL0txWrO9CP7gyVimrDL6Ov05YAKYABm/6LIuSPm4
-         1drGyZdMz6XLmgLVZt1hIpWgF7k0y3bjllAkWiQhxzcO8nS5MMtxMB0LlQNhgdiH6AuW
-         dai/E4nVrgioJWmlHOZWXUp5CPOEUTxLgUYj0g/F455C4jcQTh6gQOQbb7nLvUqIMzGf
-         wjXiCigFI0iYIWyTyG2iBG0QPUeNP3QSzDfi1rCp5Kr78IXp9RWZ5l1kYFHmT99su8Md
-         ESDg==
+        bh=hxCjzk4K0sPjhYyblUWrxUR/OH0u3SE421/QOr9YvLY=;
+        b=XGBaHZPFJjCttSD4cSZ5myNbrWAcCEfK0ZpGyIiIIvaGv3U+nckRK3UACbNC0FyTAw
+         8hWrtY8IvSrvKxbfkJKTrWPAsPEE+EUCTunxQ9TvTHSjPx9EJxlWU20h51gSygJ4swca
+         OmBioNNvwBOyLOyTImBeoyhdf1vZNGxj2K/vZULrdzTH3sCjZyXFYW99phpfTgwVH0Nv
+         Hs6JGai9nv1ceWDamEroVul0BdIRbXJSYDtE2q4ZJleSlwfqCujozJnI8siA4MP4epue
+         kLp9i5f4qLacLoXlWpbrpsj9De/x2Cv0pVir3mcmGO9V5Prp7Tm5oH+gzjD2aAa60TyH
+         SRng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776492136; x=1777096936;
+        d=1e100.net; s=20251104; t=1776493674; x=1777098474;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=D8Cw2/LxkFW8q0BKiXupLWBPBKSpdwnTq/LIei0Fzfc=;
-        b=de765P0pCAjJllD1RB45ihsrdOVWWsZbDKe12GQAYAup40V+XN9rOsYxYEAxlq4uCw
-         7KCfAUN/oGXcpEzptoEB2/DC0jSyGHWnaCW9Q1Ujo2dybAmwvP6R0rb4ZFWoF5JhtbFq
-         3Z05w5ae72+y5DF90k9TEYlXe3tKKx4kFLPKj4KrO3kBtFjQkN1bFElteqSYcX8eBBPY
-         UahYBD3Ku1dz6yni1ue9jKvRaWoOQR/rG+Vpyq8dpXhfMdBfqc8cHOSuV7PztC9z7fe5
-         3W9BxhFGJoK3eHl4XURmzqX5SwGV9P/sqCVm0GbPJSBTgFf7V5NUv8ucWOJD+Lx/Dx4E
-         3/Dw==
-X-Gm-Message-State: AOJu0YzVPVuMmRW8RQMMlaOSsqp+AwHJOkyeF2wUtdO8vF1ib2+O4xiT
-	n9xDvU73kkvZaUr3A2G4iuV0XEjdFqwIeIta+E1jQttuglyC4011BhuStCUE2SRQ3RKWEpsumaI
-	n66wRJ6Ksd2yZCpirUPJIhwjOYkZ9EEW0Tk4umLgl
-X-Gm-Gg: AeBDiesQNyCSQm7hfaqyFDa/fGefyBJi04of50CqJqllgTrrwMcovQoN8nRTZxvlpIK
-	VumLpqtAsY++hQTfkcjD+tyRb3hNKccv9+V95EmMkm0l4yFzXMB1gbrURY4/vQ0KLjqdZk1+AEI
-	0SQuimQoJaQq84LvzECs22TvqsFgknggUEsXIm4DHmU30wYY0x5ShkhOplnu+V0vJxF/41iyEOc
-	QLnafIg4WHaK+DeGid/oo3S9BApuldqo1IBYju3erkO/s04LuGpp3fgIdRJUUMBPlQQ8x8LBJQ6
-	kuIEvfgctjZTte2WJkqsOF4byPzkusLCxAy/28Dm/0wqLWbgr1dU6JUEa1uIHN6Uhkjw9TD4VaO
-	GHaazsObk
-X-Received: by 2002:a05:6214:4e14:b0:89c:eabb:f58d with SMTP id
- 6a1803df08f44-8b02813b256mr81180536d6.47.1776492136072; Fri, 17 Apr 2026
- 23:02:16 -0700 (PDT)
+        bh=hxCjzk4K0sPjhYyblUWrxUR/OH0u3SE421/QOr9YvLY=;
+        b=gG3TPaJtjRASEqzlgGAw+Hyagr7cNrfE8wQH3n+Nz9YDWdvZBJyiHCp+nN6udroH5J
+         spxhqG2rHpv5PRUJXeDc/lJkz8BQhhSsYy/FNMJVoEZz7bjAv63XegZDPCqJqWf8ZdWK
+         cXXhRCbR7JkVTV0Y/uv1zjM2xicwDrWV47Eco62KJ2NZfcA6mzE5ARdUZHqo8X9/os2V
+         FYMUtjOKjlm4X4FkETKp7/ReYFBRopcpQHWlDujL/YfHY2F4QGWb9/MlTZIa5Gx6y/f0
+         /b6gKA8YVfHKCOBjbh7nIA26DMbum08EulNbbz5mrxh9oba2VCDWU/zrFHqys31Ht/eU
+         vSSg==
+X-Forwarded-Encrypted: i=1; AFNElJ/zhW0jUZBUMLleFGxGWfSSpKeZhbyiNOh9pd6XvPuDFQZv+hp2H83vUOCWJipZ8ngRRz1Dico=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwbWDDjzNwifTx2CPUeaxGatWveX8ZSs0v0uGWudUqgVIQmX5Gz
+	nP0U7ThhXeZOwaVBYzJbvI6PsdxbEAI1ZT1WPlGHi85/zFDrfel6cppKpRvE4XcRbhybNAieiGE
+	73a+vD+F5Xo7B/OybT4x67oCjoSrdShxUxKYLA7Zl
+X-Gm-Gg: AeBDies8vsXJ1OzcB/UDQXYzazukN3g9jSAWnX3FO7GXsC5JqItDtukd0HMdcDcSj5U
+	Gzc+5zfABrUGO6IXRKqdwL46wEGQY+NQMVJrOuA2EypPR7nV/0Kdmo8Jx9BWon4zIAyuzSKqTMc
+	Yh8uvfRH6sUOPwiqg/13dC2HJFxpXsVu/xrOCzvAXTI67aQni3xao2acKCqt6LumSAJl3GR+n1R
+	P47iyaGrkJkqTjQKaB4fHz2AGdmbIUQeqZrmVClIXLXgSBXtJB0JwuXsnBRj+LTLrAfz1Dc7YuD
+	Q00rNHl9+K7CKV16wh2goeE3q5gjAkleXCFlJez11/g+e8GyW7uB7YbUD2jRRcaefp6w5tvGvOx
+	joA5LPAgi
+X-Received: by 2002:a05:622a:1e14:b0:50b:6cc1:38c6 with SMTP id
+ d75a77b69052e-50e36e9aad0mr87674471cf.55.1776493673735; Fri, 17 Apr 2026
+ 23:27:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260418041633.691435-1-jt26wzz@gmail.com> <20260418041633.691435-2-jt26wzz@gmail.com>
-In-Reply-To: <20260418041633.691435-2-jt26wzz@gmail.com>
+References: <20260418021232.5425-1-dev.gustavoa@gmail.com>
+In-Reply-To: <20260418021232.5425-1-dev.gustavoa@gmail.com>
 From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 17 Apr 2026 23:02:04 -0700
-X-Gm-Features: AQROBzA36i8s0WTRa6QsFOr6av2JTG94HxbtoID-4rUHJyFb0GkqUURu9fQz6kk
-Message-ID: <CANn89iJOfDB+5oORjWPbP7Z1SyqUhMzVR8u8i+8P8MPDgg_EGA@mail.gmail.com>
-Subject: Re: [PATCH net 1/2] tcp: call sk_data_ready() after listener migration
-To: Zhenzhong Wu <jt26wzz@gmail.com>
-Cc: netdev@vger.kernel.org, ncardwell@google.com, kuniyu@google.com, 
-	davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, 
-	horms@kernel.org, shuah@kernel.org, tamird@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	stable@vger.kernel.org
+Date: Fri, 17 Apr 2026 23:27:42 -0700
+X-Gm-Features: AQROBzDDt3oVFKU2-Tm1qAl0VPNwWJoaTvqHgPIKohE20cwRP4JPWSmPiPoeHzk
+Message-ID: <CANn89iLVSU=2=Gs70RK93ostNUBgyrqyhEdcZo3YsbuLVer+gA@mail.gmail.com>
+Subject: Re: [PATCH net-next] r8169: report per-queue statistics through
+ netdev qstats
+To: Gustavo Arantes <dev.gustavoa@gmail.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, nic_swsd@realtek.com, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-279477-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279476-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_CC(0.00)[gmail.com,realtek.com,lunn.ch,davemloft.net,kernel.org,redhat.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 5C990420167
+X-Rspamd-Queue-Id: 87CCF4202AD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Apr 17, 2026 at 9:17=E2=80=AFPM Zhenzhong Wu <jt26wzz@gmail.com> wr=
-ote:
+On Fri, Apr 17, 2026 at 7:12=E2=80=AFPM Gustavo Arantes <dev.gustavoa@gmail=
+.com> wrote:
 >
-> When inet_csk_listen_stop() migrates an established child socket from
-> a closing listener to another socket in the same SO_REUSEPORT group,
-> the target listener gets a new accept-queue entry via
-> inet_csk_reqsk_queue_add(), but that path never notifies the target
-> listener's waiters.
+> r8169 maintains synchronized per-CPU software counters for packet and byt=
+e
+> accounting, but does not expose them through the netdev qstats interface.
 >
-> As a result, a nonblocking accept() still succeeds because it checks
-> the accept queue directly, but waiters that sleep for listener
-> readiness can remain asleep until another connection generates a
-> wakeup. This affects poll()/epoll_wait()-based waiters, and can also
-> leave a blocking accept() asleep after migration even though the
-> child is already in the target listener's accept queue.
+> Add netdev_stat_ops callbacks and report the existing software counters
+> through queue 0 for both Rx and Tx. Provide zero base stats so device-sco=
+pe
+> qstats report the packet and byte counters as supported and match the
+> existing RTNL statistics.
 >
-> This was observed in a local test where listener A completed the
-> handshake, queued the child, and was closed before userspace called
-> accept(). The child was migrated to listener B, but listener B never
-> received a wakeup for the migrated accept-queue entry.
->
-> Call READ_ONCE(nsk->sk_data_ready)(nsk) after a successful migration
-> in inet_csk_listen_stop().
->
-> The reqsk_timer_handler() path does not need the same change:
-> half-open requests only become readable to userspace when the final
-> ACK completes the handshake, and tcp_child_process() already wakes
-> the listener in that case.
->
-> Fixes: 54b92e841937 ("tcp: Migrate TCP_ESTABLISHED/TCP_SYN_RECV sockets i=
-n accept queues.")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Zhenzhong Wu <jt26wzz@gmail.com>
-> ---
->  net/ipv4/inet_connection_sock.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_s=
-ock.c
-> index 4ac3ae1bc..da1ce082f 100644
-> --- a/net/ipv4/inet_connection_sock.c
-> +++ b/net/ipv4/inet_connection_sock.c
-> @@ -1483,6 +1483,7 @@ void inet_csk_listen_stop(struct sock *sk)
->                                         __NET_INC_STATS(sock_net(nsk),
->                                                         LINUX_MIB_TCPMIGR=
-ATEREQSUCCESS);
->                                         reqsk_migrate_reset(req);
-> +                                       READ_ONCE(nsk->sk_data_ready)(nsk=
-);
+> Signed-off-by: Gustavo Arantes <dev.gustavoa@gmail.com>
 
-I think this is adding a potential UAF (Use Afte Free).
-@nsk might have been freed already by another thread/cpu.
-Note the existing code already has similar issues.
+## Form letter - net-next-closed
 
-Untested patch:
+Please repost when net-next reopens after Apr 27th.
 
-diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_soc=
-k.c
-index 4ac3ae1bc1afc3a39f2790e39b4dda877dc3272b..287b6e01c4f71bfec3dd2a708f3=
-16224d9eb4a64
-100644
---- a/net/ipv4/inet_connection_sock.c
-+++ b/net/ipv4/inet_connection_sock.c
-@@ -1479,6 +1479,7 @@ void inet_csk_listen_stop(struct sock *sk)
-                        if (nreq) {
-                                refcount_set(&nreq->rsk_refcnt, 1);
+RFC patches sent for review only are obviously welcome at any time.
 
-+                               rcu_read_lock();
-                                if (inet_csk_reqsk_queue_add(nsk,
-nreq, child)) {
-                                        __NET_INC_STATS(sock_net(nsk),
+See:
+https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#develop=
+ment-cycle
 
-LINUX_MIB_TCPMIGRATEREQSUCCESS);
-@@ -1489,7 +1490,7 @@ void inet_csk_listen_stop(struct sock *sk)
-                                        reqsk_migrate_reset(nreq);
-                                        __reqsk_free(nreq);
-                                }
--
-+                               rcu_read_unlock();
-                                /* inet_csk_reqsk_queue_add() has already
-                                 * called inet_child_forget() on failure ca=
-se.
-                                 */
+pw-bot: cr
 
