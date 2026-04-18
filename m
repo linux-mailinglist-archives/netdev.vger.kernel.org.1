@@ -1,216 +1,233 @@
-Return-Path: <netdev+bounces-279507-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279508-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GOVjKyeS42nSIgEAu9opvQ
-	(envelope-from <netdev+bounces-279507-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 16:16:07 +0200
+	id eJuRHjGX42muIwEAu9opvQ
+	(envelope-from <netdev+bounces-279508-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 16:37:37 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46C8B4214E9
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 16:16:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BF460421532
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 16:37:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id CD721302A183
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 14:15:54 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8946F3031AF4
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 14:37:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69FB7389102;
-	Sat, 18 Apr 2026 14:15:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 624C1395DBC;
+	Sat, 18 Apr 2026 14:37:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bdn1q+sf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ym3L3pbo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA8D62BAF7
-	for <netdev@vger.kernel.org>; Sat, 18 Apr 2026 14:15:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08DB82E413
+	for <netdev@vger.kernel.org>; Sat, 18 Apr 2026 14:37:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776521754; cv=none; b=NNJ9E/BpMIDvBz4iDDlbdjg7+eMwxFwb10lARXOLbnHOKJh+zDYbiEaVAaHo255YXvA5Dd+51K+wwx6K5rBR8gfjOQstGt6o1VYnOamu7lUYo5uFt43ONdwQDeuU9efuhWSxQLDiYabCcV7TQU26Vi2VGoFYFvklEvQfR3Fypbo=
+	t=1776523053; cv=none; b=UFbJL5SH/PEu6qVTVoLWhK3koU5Rpbuz2c18epoWKOp9PzXTo0VTSI/2xMcSil4piv6r6CCi+pqExZJp/VdEM2CjIWE/EO6YKKdWTW5+n0a7Uh3yb0DIyWsk1nDw+vgDL7sCfKo9ntYlWzebPxqpnXLi4byYTvZvAe5fEGjxzW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776521754; c=relaxed/simple;
-	bh=z1Z9va+k5oiXolg0K6b+9VtA1bb0HW1IKLOpAaeXFc4=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=HuoFHG54HTyc8aFhb3Plzb9185HROe1KWmuyqqbEcTEGgrjyGvUIEoWQVMMrjyXBeNa7Uwd8D0F+onh0K5JbFtig0U/mPrj0gaX2enfrflNguZTC7I+hh5ePAwuapwkSjhY5MGM4gg40d+HKgO8dwGKgK1WFoq1VioC5m5MAtEc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bdn1q+sf; arc=none smtp.client-ip=209.85.128.42
+	s=arc-20240116; t=1776523053; c=relaxed/simple;
+	bh=iTNeU9cM3xV2CYH2iSVxdzqeKxIAvyl4ZeNii1rFs2A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=D/l2CX6rHaDRBu9fKqsUKVGAuzhXhwdDBcguCOyszm6Nh/HtlgYZOFnf+YyYa/Enm30zUSDTomSNbVmWobexGFGdQZARn+5eF/1BTkQuMSWMpTbrnfZ4HCFJq9XRLJm80lg9H8fLFWiG6n41VAZwxqWFpWSkuSW/oFQM+NZdKPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ym3L3pbo; arc=none smtp.client-ip=209.85.215.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-488e1a8ac40so22450225e9.2
-        for <netdev@vger.kernel.org>; Sat, 18 Apr 2026 07:15:52 -0700 (PDT)
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-c7973bbc16dso1133233a12.0
+        for <netdev@vger.kernel.org>; Sat, 18 Apr 2026 07:37:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776521751; x=1777126551; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=+xLRaFcPXM43gqcq/eDY0E3lFTDPiIJY+IePpFdU9D8=;
-        b=bdn1q+sfEZQmdJiexKCkxg484f1aYrLVBMJgzCh0Tq/402pBXT0Tn0PvxaVrZ+d/QJ
-         GcnsHy/tntWpAQbCTulvSxfbVe8wEQic/hfar/AipQF9cITqG3LPQ8nCQUtF7ywO9SZB
-         ZEekFLv/K27vKRCYq4un9yAh8amcnT1gKIg68418ox2t/NkQkSkjzflsr5vUoCgUVvxR
-         581DK7xeNxIVEj/JRs87vht77V4KxRl3N7x/FVMR2Rl/wtKgz+rJzD3I5qWL/4pOfJ1M
-         CfsXAXBPddeuIAvrFh88OO4FtP4PqygxE6V0K3GbflDRBcbmLCFI/RlykM67oxMHhg10
-         jP+Q==
+        d=gmail.com; s=20251104; t=1776523051; x=1777127851; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=dbsMozQj477A2w2XnCGVvsxlPcZaVihW+fwe2arVXt4=;
+        b=Ym3L3pboYo0n8GJ/dB62R9AMcroJpqWesZRC9DOJLQsvlxcBITVJ2xzwoxaoLQOXaT
+         Y8ay54sfJ/NTYk2iAq6okZy0PT5+LiryP2NT3F1987D4SElMfixMrOCEWyAHLLNAHZC+
+         HMXL9S5NC1Vaw/g5ZCr5E2j9pz01dJE/FdaW/2mirDiESAeQJMQlkwkS4oibbSZRTYSQ
+         wE1h0ci+OARXMwRjjHg4vNKDFL7j2WoxNfFPMfOFum0+2RcL7OK1kiY2hUEDvCIlfM3Y
+         KAjzfXp0y9cFu6Zw4tTsi4wRKrH/iST3kCcnBM40f8JrwG4A3k0QL5xnDRoNng3NheSW
+         9CBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776521751; x=1777126551;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+xLRaFcPXM43gqcq/eDY0E3lFTDPiIJY+IePpFdU9D8=;
-        b=BYCLemL6VkkyybMo7Fjnf7unHiVHyPc1n0mSkSxyeopQmvXDY1kpK1l3AnPfC+UXcT
-         HhrgvJcCLx5f2G07xtejDBXN6y2VUGznEZdOcF1I8xYVyi0W2DtnHEg8XdrwDnGj7cH/
-         auFmHLoVLe950AEiumXry0lFMUpSNriaySPb8uRxBw2Q5CRVRJMWxq/j+QP9ZZJ8iqdw
-         WsDg1IC3Bbr5klgIFsAhOIHcyY2JeRLqyDcEAKYdfW5i65ky7oQtMvxFK7/f6oolN1yE
-         nDn6WcKAlfF3pPu3NccXBxeaKAS8YsK0ZhCiRqrGddNMuOD3yVq66VgmF4D5SvxCDtSv
-         Opag==
-X-Forwarded-Encrypted: i=1; AFNElJ9ZlIezDd14gqo45XwGS9seq4NmbyV/1J5CHo0PtFbI83TJgefoHiwvMClo8ghi0ZRFxhTWivQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzy2YUqDuzjhNliIzs6YUJz6eRt7kPvLEAYNLpUxVx3sMg5B+j1
-	9q5cS9dcCwPV6ojTX3S5+TjgO1ApgIoW+oYNC/VldJuU7cF7xRYKu4YK
-X-Gm-Gg: AeBDies5vS/JukqUP4IZkBXWqPWFdSnPaY1dxbLCZri+ZsuglEw9Y6DpGzTkaYB36Tu
-	xo5us6Io0BDes9gJhhJVFHjheQXUz0RGqJlHVNtA2kTSqQmtyonZyBZXisDMNDmOrRe76tMTzAL
-	ybJg9UDqd6FWjlkTX+/vHyzInCqYxrlbr45YuB96lSbQMEh/v+eLRiwQYieFDShyY7KGmB14Aur
-	+Y2o5MaOnbqSWpf7sU5ofJNcPdqxndJDwm+yyBJk6R4hMUDrugoWIyt4VXwQVOYQTIuyWyw/87j
-	kIGYfTZbFoTBTc58KGbs0T8AmODlGcL1Rn0ESoJ+w1x+gjSGyaSRs9TLF0A8dy14A6pLRfVahKl
-	5H74oGxPJLAlttw6BaC95hY6p28eJqd28yhu8I4UgJjf7ImVJHlHDPxvSRhtCy+1gAyhn5VWszA
-	wgRuEkmNDlgsYXpe6rhP5tpu9ti/5zVyRHTzlFj7ZdtJuF3JTyok52w5unfUhMETRwzw31eQfKH
-	YljtWZ7YPrRK9HTP6hJMJZzpdc=
-X-Received: by 2002:a05:600c:154e:b0:488:9ed3:1492 with SMTP id 5b1f17b1804b1-488fb74fc02mr103657105e9.10.1776521751124;
-        Sat, 18 Apr 2026 07:15:51 -0700 (PDT)
-Received: from ?IPV6:2a02:a03f:a75e:9a00:5273:4380:96ab:9087? ([2a02:a03f:a75e:9a00:5273:4380:96ab:9087])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488fc16f93dsm202408585e9.3.2026.04.18.07.15.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 18 Apr 2026 07:15:50 -0700 (PDT)
-Message-ID: <e084bf5d-99bf-4e23-8dc1-3e7e13c58a2e@gmail.com>
-Date: Sat, 18 Apr 2026 16:15:49 +0200
+        d=1e100.net; s=20251104; t=1776523051; x=1777127851;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dbsMozQj477A2w2XnCGVvsxlPcZaVihW+fwe2arVXt4=;
+        b=C3WDPWOkYiaqTxyyCX11zU2Q9osGGrC560JmRwxRqkD7PaVCPnFL/kqFio6etAFZpi
+         aesO47WPFnDLXV7Gjh1rZBDcJG/yxxB4dSiFiFFiXmeTa/yM9+4zDHAVEQ9z4XcHVjQL
+         LJiqk2WBHc3+6X0WygPlHPGQlUHTvTSHwhd8HvXBDX69OhxvyZ7JWYuWVmMKSJvVbAyE
+         cI1haulyHWODV1Btt3KvfLak07cIaWjq+gwhvr0yYjYSjqggm8V8zhLucb7tbEb+Es4m
+         XYdPDvqVT0PqcVx5rqr9XqwNupRCLhUzn0jKJSQ4rN6wrgrXlc57EUwe4wIOU6AKAMLw
+         PNVw==
+X-Forwarded-Encrypted: i=1; AFNElJ/yIV7SkKoiAaE4LHSX9DB/5sqU6m14HQoscYzRD1KBPESuIovYUtVwuofn1Q4jdRTleY6yw0s=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzf8Ym+MXnYsL4DzuAZ+I2ONO9FeZnm5QyGqndr58rhnlkJxwA7
+	cYYPai86ALo1bPd7zvNly2gx4U/QH3adx4YMHLfmaddNc8aoeSDyvoziafPsjLmUua8=
+X-Gm-Gg: AeBDiet6J3sYBFmS54IsoCWgcDMOUN7lZAkSdMRE7Nf4NVtKJV8HseYevz4TtC/71w1
+	eps6pA1YyT8yWi4svoJcwjCGjg5kK9WZhsZ6+KRDTeInzhNTdMdYgqghSOHTNY0VmlNpVkbD/iH
+	2Okq73oZrdnh9KX9mv++E7/JkWQBq4Aj94cktspmznU/e+mwSn97gqliW/UeRpk0wfl4bdndouc
+	gfgr7cG4Srv3nLxsNV4ZsbPdMX8Ck90ygif1pHU9R28NQB0vPef4HY1E0y5LYpiQMzuFa1ooJX8
+	l3azoVt4hHz8BARDsSC3dtnQ03tvswBfveq3Qqt30a2zIi7kLWDIrH9aAtuPYOzEJLgMxDqvNoE
+	0wEzjTBrP1qdt6aGCK5wxrQP9pgXM757Ya3Mp1EJVYgZlFrWVtVmmzSCMtjzIQLY655jEWnl1rm
+	O9C5AlEGFqOct6H+HwBcZLpZZAcECQwKnkJbajW+dsmb+c+tOV9ibuBMAbw3reSFEazu+7Ub/Pn
+	8YF+eDLTw==
+X-Received: by 2002:a05:6a20:6a08:b0:39f:2b9e:e48f with SMTP id adf61e73a8af0-3a08d8a88c2mr8335023637.33.1776523051279;
+        Sat, 18 Apr 2026 07:37:31 -0700 (PDT)
+Received: from SLSGDTSWING002 ([129.126.109.177])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c79770587c1sm4004320a12.32.2026.04.18.07.37.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 18 Apr 2026 07:37:30 -0700 (PDT)
+Date: Sat, 18 Apr 2026 22:37:26 +0800
+From: Weiming Shi <bestswngs@gmail.com>
+To: Simon Horman <horms@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, Xiang Mei <xmei5@asu.edu>
+Subject: Re: [PATCH net v2] slip: reject VJ receive packets on instances with
+ no rstate array
+Message-ID: <aeOXJoeq6VkCnqAH@SLSGDTSWING002>
+References: <20260415204130.258866-2-bestswngs@gmail.com>
+ <20260418123929.GE280379@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] ipv6: Implement limits on extension header parsing
-From: Justin Iurman <justin.iurman@gmail.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Daniel Borkmann <daniel@iogearbox.net>, kuba@kernel.org,
- dsahern@kernel.org, tom@herbertland.com, willemdebruijn.kernel@gmail.com,
- idosch@nvidia.com, pabeni@redhat.com, netdev@vger.kernel.org
-References: <20260417171831.687053-1-daniel@iogearbox.net>
- <60b47924-dae4-4a10-b977-75b92e1094c0@gmail.com>
- <ae053593-907e-4891-90fb-03b4c5d8f5e1@iogearbox.net>
- <b57f31a2-456e-4727-839a-bc2f0fb07855@gmail.com>
- <CANn89i+Y0jctj8=tCHFP5jDSJBAWR=RvNfagammc-WqU6EdPRw@mail.gmail.com>
- <75d98880-afcd-43f9-8bd5-b874fa5690f5@gmail.com>
-Content-Language: en-US
-In-Reply-To: <75d98880-afcd-43f9-8bd5-b874fa5690f5@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260418123929.GE280379@horms.kernel.org>
+X-Spamd-Result: default: False [5.34 / 15.00];
+	SEM_URIBL(3.50)[asu.edu:email];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	MID_RHS_NOT_FQDN(0.50)[];
 	MAILLIST(-0.15)[generic];
+	BAD_REP_POLICIES(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[iogearbox.net,kernel.org,herbertland.com,gmail.com,nvidia.com,redhat.com,vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-279508-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279507-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	R_DKIM_ALLOW(0.00)[gmail.com:s=20251104];
+	GREYLIST(0.00)[pass,meta];
+	TO_DN_SOME(0.00)[];
+	DMARC_POLICY_ALLOW(0.00)[gmail.com,none];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_SPAM(0.00)[0.967];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[justiniurman@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	R_SPF_ALLOW(0.00)[+ip6:2600:3c04:e001:36c::/64:c];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 46C8B4214E9
+X-Rspamd-Queue-Id: BF460421532
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 4/18/26 15:46, Justin Iurman wrote:
-> On 4/18/26 15:15, Eric Dumazet wrote:
->> On Sat, Apr 18, 2026 at 5:50 AM Justin Iurman 
->> <justin.iurman@gmail.com> wrote:
->>>
->>> On 4/18/26 14:26, Daniel Borkmann wrote:
->>>> Hi Justin,
->>>>
->>>> On 4/18/26 1:45 PM, Justin Iurman wrote:
->>>>> On 4/17/26 19:18, Daniel Borkmann wrote:
->>>> [...]
->>>>>> diff --git a/net/ipv6/sysctl_net_ipv6.c b/net/ipv6/sysctl_net_ipv6.c
->>>>>> index d2cd33e2698d..93f865545a7c 100644
->>>>>> --- a/net/ipv6/sysctl_net_ipv6.c
->>>>>> +++ b/net/ipv6/sysctl_net_ipv6.c
->>>>>> @@ -135,6 +135,14 @@ static struct ctl_table ipv6_table_template[] 
->>>>>> = {
->>>>>>            .extra1        = SYSCTL_ZERO,
->>>>>>            .extra2        = &flowlabel_reflect_max,
->>>>>>        },
->>>>>> +    {
->>>>>> +        .procname    = "max_ext_hdrs_number",
->>>>>> +        .data        = &init_net.ipv6.sysctl.max_ext_hdrs_cnt,
->>>>>> +        .maxlen        = sizeof(int),
->>>>>> +        .mode        = 0644,
->>>>>> +        .proc_handler    = proc_dointvec_minmax,
->>>>>> +        .extra1        = SYSCTL_ONE,
->>>>>> +    },
->>>>>>        {
->>>>>>            .procname    = "max_dst_opts_number",
->>>>>>            .data        = &init_net.ipv6.sysctl.max_dst_opts_cnt,
->>>>>
->>>>> NACKed-by: Justin Iurman <justin.iurman@gmail.com>
->>>>>
->>>>> +1000 on the need, but NAK on the way it is done. IMO, we don't want
->>>>> yet-another-sysctl for that. Instead, we have (well, not yet, but it's
->>>>> about time) this series [1] to enforce ordering and occurrences of
->>>>> Extension Headers, which is based on an IETF draft [2] (FYI, draft-
->>>>> ietf-6man-eh-limits is dead). I think we should enforce ordering and
->>>>> occurrences in this code path too, instead of relying on a sysctl.
->>>>> Let's keep both code paths consistent.
->>>
->>> Hi Daniel,
->>>
->>>> Hm, that series [1] should probably go to net instead of net-next, 
->>>> but atm
->>>
->>> +1, would make sense.
->>>
->>>> hasn't moved since a month. I'd still think max_ext_hdrs_number 
->>>> would be
->>>> useful given it has less complexity also for stable, but I guess 
->>>> ultimately
->>>> up to maintainers..
->>>
->>> In the short term, I agree. What worries me is that we end up with a
->>> redundant, or even useless, sysctl once the other series is applied,
->>> which will only increase user confusion.
->>
->> Given the amount of bugs in this code, a sysctl is safe and quire 
->> reasonable.
->>
->> No one will object when it is eventually removed (or has no action)
->>
->> For the record,  I approve Daniel patch.
+On 26-04-18 13:39, Simon Horman wrote:
+> On Thu, Apr 16, 2026 at 04:41:31AM +0800, Weiming Shi wrote:
+> > slhc_init() accepts rslots == 0 as a valid configuration, with the
+> > documented meaning of 'no receive compression'. In that case the
+> > allocation loop in slhc_init() is skipped, so comp->rstate stays
+> > NULL and comp->rslot_limit stays 0 (from the kzalloc of struct
+> > slcompress).
+> > 
+> > The receive helpers do not defend against that configuration.
+> > slhc_uncompress() dereferences comp->rstate[x] when the VJ header
+> > carries an explicit connection ID, and slhc_remember() later assigns
+> > cs = &comp->rstate[...] after only comparing the packet's slot number
+> > to comp->rslot_limit. Because rslot_limit is 0, slot 0 passes the
+> > range check, and the code dereferences a NULL rstate.
+> > 
+> > The configuration is reachable in-tree through PPP. PPPIOCSMAXCID
+> > stores its argument in a signed int, and (val >> 16) uses arithmetic
+> > shift. Passing 0xffff0000 therefore sign-extends to -1, so val2 + 1
+> > is 0 and ppp_generic.c ends up calling slhc_init(0, 1). Because
+> > /dev/ppp open is gated by ns_capable(CAP_NET_ADMIN), the whole path
+> > is reachable from an unprivileged user namespace. Once the malformed
+> > VJ state is installed, any inbound VJ-compressed or VJ-uncompressed
+> > frame that selects slot 0 crashes the kernel in softirq context:
+> > 
+> >  Oops: general protection fault, probably for non-canonical
+> >        address 0xdffffc0000000000: 0000 [#1] SMP KASAN NOPTI
+> >  KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
+> >  RIP: 0010:slhc_uncompress (drivers/net/slip/slhc.c:519)
+> >  Call Trace:
+> >   <TASK>
+> >   ppp_receive_nonmp_frame (drivers/net/ppp/ppp_generic.c:2466)
+> >   ppp_input (drivers/net/ppp/ppp_generic.c:2359)
+> >   ppp_async_process (drivers/net/ppp/ppp_async.c:492)
+> >   tasklet_action_common (kernel/softirq.c:926)
+> >   handle_softirqs (kernel/softirq.c:623)
+> >   run_ksoftirqd (kernel/softirq.c:1055)
+> >   smpboot_thread_fn (kernel/smpboot.c:160)
+> >   kthread (kernel/kthread.c:436)
+> >   ret_from_fork (arch/x86/kernel/process.c:164)
+> >   </TASK>
+> > 
+> > Reject the receive side on such instances instead of touching rstate.
+> > slhc_uncompress() falls through to its existing 'bad' label, which
+> > bumps sls_i_error and enters the toss state. slhc_remember() mirrors
+> > that with an explicit sls_i_error increment followed by slhc_toss();
+> > the sls_i_runt counter is not used here because a missing rstate is
+> > an internal configuration state, not a runt packet.
+> > 
+> > The transmit path is unaffected: the only in-tree caller that picks
+> > rslots from userspace (ppp_generic.c) still supplies tslots >= 1, and
+> > slip.c always calls slhc_init(16, 16), so comp->tstate remains valid
+> > and slhc_compress() continues to work.
+> > 
+> > Fixes: b5451d783ade ("slip: Move the SLIP drivers")
 > 
-> Fair enough. If there is consensus on this patch, then let me just 
-> suggest two changes:
+> AI review points out that the cited commit moves code but doesn't
+> add this bug.
 > 
-> - make it clear in the sysctl description that it mainly applies to TX 
-> (as opposed to the other series [1] discussed earlier that applies to RX)
+> It seems to me that this bug has existed since the beginning of git
+> history. If so, the Fixes tag should be:
+> 
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> 
+> > Reported-by: Xiang Mei <xmei5@asu.edu>
+> > Signed-off-by: Weiming Shi <bestswngs@gmail.com>
+> > ---
+> > v2:
+> > - slhc_remember(): use sls_i_error instead of sls_i_runt for the
+> >   missing-rstate case; it is a configuration error, not a runt packet
+> >   (Simon).
+> > - slhc_uncompress(): goto bad instead of returning 0, so the instance
+> >   also enters SLF_TOSS on the first rejected frame.
+> 
+> Otherwise this looks good to me:
+> 
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> 
+> 
+> I do note that Sashiko flags some other problems in this code.
+> I do not think that needs to delay progress of this patch.
+> But you may wish to look into them as follow-up work.
 
-Sorry, I meant it does not apply to core RX (ip6_rcv()), which is what 
-series [1] does.
+Thanks for your review. 
 
-> - set the default to 8 (which should be the max value) instead of 32, as 
-> per RFC8200, Sec. 4.1
+I've already sent two follow-up patches for the decode()/pull16() 
+bounds-checking issues:
+
+    [PATCH net] slip: fix slab-out-of-bounds write in slhc_uncompress()
+    https://lore.kernel.org/netdev/20260415213359.335657-2-bestswngs@gmail.com/
+
+    [PATCH net] slip: bound decode() reads against the compressed packet length
+    https://lore.kernel.org/netdev/20260416100147.531855-5-bestswngs@gmail.com/
+
+Best regards,
+Weiming Shi
 
 
