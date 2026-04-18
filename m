@@ -1,184 +1,161 @@
-Return-Path: <netdev+bounces-279493-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279494-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sTE7DVJ242nvHAEAu9opvQ
-	(envelope-from <netdev+bounces-279493-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 14:17:22 +0200
+	id OMI3Mkx442lHHQEAu9opvQ
+	(envelope-from <netdev+bounces-279494-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 14:25:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A9CF421115
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 14:17:21 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45A5D421138
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 14:25:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 3989E300B440
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 12:17:18 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E0AF730242AF
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 12:18:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D434233FE12;
-	Sat, 18 Apr 2026 12:17:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2580435DA63;
+	Sat, 18 Apr 2026 12:18:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="NO2BX0u6"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=stu.xidian.edu.cn header.i=@stu.xidian.edu.cn header.b="0IUMzExT"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 420AB261B8D
-	for <netdev@vger.kernel.org>; Sat, 18 Apr 2026 12:17:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22FBF34DCCD;
+	Sat, 18 Apr 2026 12:18:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.243.164.118
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776514635; cv=none; b=Qll0LhM31SNgDqpXthi45296MKv5sVA1pS2WHCwSqOGwC9yrkPkHtmsTvOZcZyZmvMDcIQkBrV6RPHXSYPv3EwuvGeHC8Vy+qCJxrYslXbspDMAsyCAte+O0TRElramZeMxNayiheevJrKhfAqoGWIMYT6lWkevFuPzaTIatnx8=
+	t=1776514715; cv=none; b=fBHjZuD+x2tRHP4AQAhWcEINBTluWVuEb3K1olSLfRAKGDLN1hO8Cgst1uRnB73eNqCjZr/0jfpOCbn8FRXXIgTObFlTce7IGkSWDwZGEBwsREPElTwxuS94JuHgTWifDcsX0A2m9ZroJLqd5BeX/5RACLPsbX4O3j+khW0YYHA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776514635; c=relaxed/simple;
-	bh=q2KPwf7Vkm1aC4I5dE3h/a6fQSEUvqVXju5h89I1Mdw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bHnhqegtbzzDNjRsg62/UwHEvK3Stlp9AmW+sII4jCT0UP2HXvXNh1MwGY/z73e/BOY0QEbK6dTcjxfnxV5G23mwkz4iAU8aXOqUQWAyl6PVw6qe0n5+A5a6gJt0OC89YxjwqCBViVH66XoBQ5CTzHVA8IrIZfw7EfIDwP5irtI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=NO2BX0u6; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=hfo00+CDfBE3OfbvdKNoAq5JIBOaINlI17CcJGUOejk=; b=NO2BX0u64gBDQ6I4xdeQGRz/Qc
-	+E3poe483OaLPaBBxdvomPyPhKxj06kzFtUQF0Iv25LKCr2iAcACLec7Iq3l47oy20C4xmygIDqLC
-	zzFCraKPok5ErGU9zr5Py4e4z/Kjo8anPId98HcBVTuQTkOx2PWXtNZt7BtkY+9KLRL4eaLxgz4qq
-	ZCqkq2pPq9tLRL0WRMEbc22pk8+/VTbn3K6mn3xOMM4zgMwLh2vqd01IZiw30LhkhAOTZR1+E6r9j
-	vN/b6sKK1pd/Cdi61b1m29FZ0X1W1XAM6GqmJUvzBEF32BQshDzJx2sxkwnzFN82TktxKXmmiPsEc
-	pvxlR6qA==;
-Received: from sslproxy07.your-server.de ([78.47.199.104])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1wE4bo-0007ya-0r;
-	Sat, 18 Apr 2026 14:17:12 +0200
-Received: from localhost ([127.0.0.1])
-	by sslproxy07.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1wE4bn-000ISy-2g;
-	Sat, 18 Apr 2026 14:17:11 +0200
-Message-ID: <7b7dd842-d38a-4af4-bb0d-49b7a20756ed@iogearbox.net>
-Date: Sat, 18 Apr 2026 14:17:10 +0200
+	s=arc-20240116; t=1776514715; c=relaxed/simple;
+	bh=wDzbXZhLh94RRVK+pCs9UkrM63fbj82TLjhru0A71Ro=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=k7EYvA0rCtAljALkAcZJKgav9OsChSfoIjUtgPPNkvoEK7wikPtyQ1rAWUtiyphMmYLPO7GfD6XsJ185Y+DnD9Ykvh7kSKgXuNe41wQJ+IUiH2CvGWEabinREEh35VrLktO2v/VGcOB4Jkq8auf9xc8eps7N2s7Vc2XWQjzndGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=stu.xidian.edu.cn; spf=pass smtp.mailfrom=stu.xidian.edu.cn; dkim=fail (0-bit key) header.d=stu.xidian.edu.cn header.i=@stu.xidian.edu.cn header.b=0IUMzExT reason="key not found in DNS"; arc=none smtp.client-ip=162.243.164.118
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=stu.xidian.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=stu.xidian.edu.cn
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=stu.xidian.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:Date:
+	Message-Id:MIME-Version:Content-Transfer-Encoding; bh=TEpmaqV2cr
+	73O2zRkCteMaRgSagJzIImAOJtTOjMaGE=; b=0IUMzExT3uKWkafGlqieWb7HZX
+	F/32E08vJ2joEIijYZcasmfiaIrKfFOjIqZ3WdsZRVMq69WcSNMtaVTlaL334Iua
+	lKPETqP9wBGcVMPZq/ESXL9Aqr/5EEfP2OXgpjaSvKChfnKyEbt2xb7iC1DLjhlh
+	az+ecsgyLhNZm71is=
+Received: from wmy.localdomain (unknown [113.200.174.100])
+	by hzbj-edu-front-4.icoremail.net (Coremail) with SMTP id BrQMCkBW_rl+duNpzfihAQ--.24054S2;
+	Sat, 18 Apr 2026 20:18:16 +0800 (CST)
+From: Mingyu Wang <25181214217@stu.xidian.edu.cn>
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: tglx@kernel.org,
+	mingo@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Mingyu Wang <25181214217@stu.xidian.edu.cn>
+Subject: [PATCH] net: hamachi: fix divide by zero in hamachi_init_one
+Date: Sat, 18 Apr 2026 20:18:04 +0800
+Message-Id: <20260418121804.149171-1-25181214217@stu.xidian.edu.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] ipv6: Apply max_dst_opts_cnt to
- ip6_tnl_parse_tlv_enc_lim
-To: Justin Iurman <justin.iurman@gmail.com>, kuba@kernel.org
-Cc: edumazet@google.com, dsahern@kernel.org, tom@herbertland.com,
- willemdebruijn.kernel@gmail.com, idosch@nvidia.com, pabeni@redhat.com,
- netdev@vger.kernel.org
-References: <20260417220358.693101-1-daniel@iogearbox.net>
- <acee197f-1821-4304-8759-a02ac1d5c808@gmail.com>
-Content-Language: en-US
-From: Daniel Borkmann <daniel@iogearbox.net>
-Autocrypt: addr=daniel@iogearbox.net; keydata=
- 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
-In-Reply-To: <acee197f-1821-4304-8759-a02ac1d5c808@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: Clear (ClamAV 1.4.3/27975/Sat Apr 18 08:26:10 2026)
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-CM-TRANSID:BrQMCkBW_rl+duNpzfihAQ--.24054S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7try8uFW5tF1xuF1kCrWfXwb_yoW8uFy8pF
+	WYk34vyw4DKwn0q3Z7trWxAFn8uay3t3y5uF95Jw1a93s8CFyrtr15KFWj9a43CFWrCw40
+	yrWvyFy7uFn8tw7anT9S1TB71UUUUUDqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUPF14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r1j6r1xM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gr
+	1j6F4UJwAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40E
+	FcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUXVWUAwAv7VC2z280aVAFwI0_Gr
+	0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8v
+	x2IErcIFxwACI402YVCY1x02628vn2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCY02Avz4
+	vE14v_Xr1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG
+	67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MI
+	IYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E
+	14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJV
+	W8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfU0yCJ
+	DUUUU
+X-CM-SenderInfo: qsvrmiqsrujiux6v33wo0lvxldqovvfxof0/1tbiAgUHEWniTmNg3AAEsP
+X-Spamd-Result: default: False [7.84 / 15.00];
+	SEM_URIBL(3.50)[xidian.edu.cn:email];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[iogearbox.net,reject];
-	R_DKIM_ALLOW(-0.20)[iogearbox.net:s=default2302];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
+	DMARC_POLICY_QUARANTINE(1.50)[xidian.edu.cn : SPF not aligned (relaxed),quarantine];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	BAD_REP_POLICIES(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[google.com,kernel.org,herbertland.com,gmail.com,nvidia.com,redhat.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-279493-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-279494-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,kernel.org];
-	DKIM_TRACE(0.00)[iogearbox.net:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCVD_COUNT_THREE(0.00)[4];
+	R_DKIM_PERMFAIL(0.00)[stu.xidian.edu.cn:s=dkim];
+	GREYLIST(0.00)[pass,body];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[stu.xidian.edu.cn:~];
+	NEURAL_SPAM(0.00)[0.999];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[25181214217@stu.xidian.edu.cn,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	R_SPF_ALLOW(0.00)[+ip6:2600:3c04:e001:36c::/64:c];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[iogearbox.net:dkim,iogearbox.net:mid]
-X-Rspamd-Queue-Id: 2A9CF421115
-X-Rspamd-Action: no action
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,stu.xidian.edu.cn:mid,xidian.edu.cn:email]
+X-Rspamd-Queue-Id: 45A5D421138
+X-Rspamd-Action: add header
 X-Rspamd-Server: lfdr
+X-Spam: Yes
 
-Hi Justin,
+During the hardware initialization phase in hamachi_init_one(), the driver
+reads the PCIClkMeas register to calculate the PCI bus frequency.
 
-On 4/18/26 12:59 PM, Justin Iurman wrote:
-[...]
-> Good point on reusing max_dst_opts_cnt in ip6_tnl_parse_tlv_enc_lim(), but this patch is not ready yet.
-> 
-> We need to be careful: max_dst_opts_cnt can be negative. If this is the case, ip6_tnl_parse_tlv_enc_lim() would probably return 0, which is not what we want here. From the doc:
-> 
-> max_dst_opts_number - INTEGER
->          Maximum number of non-padding TLVs allowed in a Destination
->          options extension header. If this value is less than zero
->          then unknown options are disallowed and the number of known
->          TLVs allowed is the absolute value of this number.
-> 
->          Default: 8
-> 
-> Since ip6_tnl_parse_tlv_enc_lim() does not check for specific option types (e.g., Pad1, PadN, you-name-it) and does not differentiate known from unknown options during parsing, I would simply use the absolute value of max_dst_opts_cnt by default.
-> 
-> Also, I wouldn't use unlikely() because it could harm us more than it helps in this specific context (consistent with ip6_parse_tlv()).
+The current code attempts to prevent a divide-by-zero error using a ternary
+operator: `i ? 2000/(i&0x7f) : 0`. However, this check is flawed. The highest
+bit of `i` (0x80) acts as a ready flag. If unreliable hardware or a malicious
+virtual device returns a value where the ready bit is set but the lower 7 bits
+are zero (e.g., 0x80), the condition `i` evaluates to true, but `(i & 0x7f)`
+evaluates to 0. This results in a fatal divide-by-zero exception.
 
-Thanks for the review, the suggestions make sense, and I've updated them in a v2.
+This bug was discovered during an automated virtual device fuzzing campaign
+testing the hardware-software trust boundary. When the hardware returns 0x80,
+it bypassed the readiness while-loop but triggered the divide error. In our
+tests, this panic interrupted the module loading process, further triggering
+a KASAN slab-out-of-bounds in the module error path, and ultimately leading
+to a multi-core soft lockup and RCU stall.
 
-Cheers,
-Daniel
+This patch fixes the issue by explicitly checking the divisor `(i & 0x7f)`
+instead of the entire register value `i` before performing the division.
+
+Signed-off-by: Mingyu Wang <25181214217@stu.xidian.edu.cn>
+---
+ drivers/net/ethernet/packetengines/hamachi.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/packetengines/hamachi.c b/drivers/net/ethernet/packetengines/hamachi.c
+index b0de7e9f12a5..1d7206dd18fd 100644
+--- a/drivers/net/ethernet/packetengines/hamachi.c
++++ b/drivers/net/ethernet/packetengines/hamachi.c
+@@ -748,7 +748,7 @@ static int hamachi_init_one(struct pci_dev *pdev,
+ 	printk(KERN_INFO "%s:  %d-bit %d Mhz PCI bus (%d), Virtual Jumpers "
+ 		   "%2.2x, LPA %4.4x.\n",
+ 		   dev->name, readw(ioaddr + MiscStatus) & 1 ? 64 : 32,
+-		   i ? 2000/(i&0x7f) : 0, i&0x7f, (int)readb(ioaddr + VirtualJumpers),
++		   (i & 0x7f) ? 2000 / (i & 0x7f) : 0, i & 0x7f, (int)readb(ioaddr + VirtualJumpers),
+ 		   readw(ioaddr + ANLinkPartnerAbility));
+ 
+ 	if (chip_tbl[hmp->chip_id].flags & CanHaveMII) {
+-- 
+2.34.1
+
 
