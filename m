@@ -1,152 +1,183 @@
-Return-Path: <netdev+bounces-279447-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279448-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KBE2NmDq4mm7AAEAu9opvQ
-	(envelope-from <netdev+bounces-279447-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 04:20:16 +0200
+	id WKEqGB3u4mlLAQEAu9opvQ
+	(envelope-from <netdev+bounces-279448-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 04:36:13 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F21441FACC
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 04:20:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C5F0541FB1D
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 04:36:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1B72B3057AB0
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 02:20:15 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A96963018C2B
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 02:34:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A47F2741B5;
-	Sat, 18 Apr 2026 02:20:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E67F22C3259;
+	Sat, 18 Apr 2026 02:34:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CYcclKBh"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="U9fLSatL"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f99.google.com (mail-yx1-f99.google.com [74.125.224.99])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01B9A244675
-	for <netdev@vger.kernel.org>; Sat, 18 Apr 2026 02:20:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9B5526056C
+	for <netdev@vger.kernel.org>; Sat, 18 Apr 2026 02:34:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776478814; cv=none; b=Y/GbRNzQG76roLutJooBTkx2cj0NQtFEkqC2TTwbnhU0e+jlzAGt6SkQkccF5iTfm/k3zqmMjmAl5Y53uC+eLCbv2nkYzgfZWUzuPYzK7kD+KpQvKFKZvgEXbgHclfuFr6ZVmc/+DjeNTU61bcrJEqyzVrKBPfd+d/ZA9wf14Cw=
+	t=1776479692; cv=none; b=WHewWLTCUfkmctIStsHvyio+EbG7mAhxTiK/bbPBhd1egybCy2ITHyjadAf7+D1qGHCzjCO7ugBFHTVszkv9rMel8dL13jIuMVsZlr0kjB9lw1LiAx5G3rVUX27SiDnWDIS+NBZVNHsEBHTqwMIayozNXhHcq5NxxtPgLo/cjDk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776478814; c=relaxed/simple;
-	bh=krIL5LliMFqBdamlfABzrQ1vaROj27CelBXXXZaKlUE=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=gKpXOWKN0Lx70RXEpQkJJ7krm7Q126LKymC8sGxrLFC7zhSnMsWEWmkSRMf6lFQulTrEvG5MQeK0kHe+bm2i1tlk6cgvAmO/+O9CnKIJ94lxLMyIyt1iKEt3+v8TJB1QQNPKtON0QRTHdmkqBP5VaixbRzPHpWcReDNN/L2+tT4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CYcclKBh; arc=none smtp.client-ip=91.218.175.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <9b3e7c118f5b9105b92f53b66034c1b7884c1372.camel@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1776478800;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SA5yDEc0vpjcomraIWzfWrwgltOn9HBRTiz9ZPZCEuU=;
-	b=CYcclKBh5JweSIQkZS6zq+Q6FHigJgl82BGBIKHjF13EzxDWkw2wB483gTS1fxkhpUNH74
-	50eE18xI84dV5rYG8oXuGZzsPQrEGhRd01WtisVhdOdYdtYHOmE03KMfrCf5IVKq9oAlnE
-	xtg2sQFeRjxXy275XfVRiVBKMbc10qw=
-Subject: Re: [PATCH bpf v3 2/2] selftests/bpf: Test TCP_NODELAY in TCP hdr
- opt callbacks
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: KaFai Wan <kafai.wan@linux.dev>
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: daniel@iogearbox.net, john.fastabend@gmail.com, sdf@fomichev.me, 
- ast@kernel.org, andrii@kernel.org, eddyz87@gmail.com, memxor@gmail.com, 
- song@kernel.org, yonghong.song@linux.dev, jolsa@kernel.org,
- davem@davemloft.net,  edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org,  shuah@kernel.org,
- jiayuan.chen@linux.dev, bpf@vger.kernel.org,  netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org,  linux-kselftest@vger.kernel.org
-Date: Sat, 18 Apr 2026 10:19:47 +0800
-In-Reply-To: <2026417162132.9MRI.martin.lau@linux.dev>
-References: <20260417092035.2299913-1-kafai.wan@linux.dev>
-	 <20260417092035.2299913-3-kafai.wan@linux.dev>
-	 <2026417162132.9MRI.martin.lau@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1776479692; c=relaxed/simple;
+	bh=kDXsxeNKiEEQNs/OfT/AW9W1/NpXdP+bhO6RDjpfseQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mzbtTrpQ9E8sMCgKej1BkR/qAGGp8mSSUaWKowF+JtSUm90yp3XBAtS9x1qNbKffvk/oVPKGNm8Q8UlohM2HoRqq19QDdyu+sxVBXA0chUU1cJFvxk+fxAgPkVSCpN5rgrRZ2ZlThX82M4DfX3P2t3apInHbIY3bchl/mTHSuTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=U9fLSatL; arc=none smtp.client-ip=74.125.224.99
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-yx1-f99.google.com with SMTP id 956f58d0204a3-652fcd5a6d7so1755846d50.2
+        for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 19:34:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776479690; x=1777084490;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7tePCcQ4//A5gm4gf0LFviYsHlnWZ1evZmw/Ul79JIk=;
+        b=ntATIk9wiQ2vIufonFpDPjlrbbmrIXEM4a830Bt2XDYB5QPSeKhn7bxMwVh3GGhPmD
+         v1l4QwpYpiQI87mSqua7em+x1LJSIhSWILVpNrrVcA7SXXaUDyI7e4mvLbj14+KzfFFn
+         kht37Kvx+irvsSAhB+3+r5/jvtCsz6o21pWt/ZkfKO0XPsZn9htdX1j9ujxx33AmjOAK
+         3mWx4DmuPR4dYJjjzrCrG27Gc3Gq6bztky84jI/CENS8+h24b9++T7htYlbIMtRHkU55
+         B5HGa4VL2ZfJE+XcZKQITYK+xCqMaq9c91vO/g4w+p479yuOwJ6yiJEmcuXwC6n00ljq
+         ObgQ==
+X-Gm-Message-State: AOJu0Yz4XqAFoKtcaJsG9f4OaQi6mwgbQPqj4YZp34ZAnQw7u6fg6M4Y
+	7SADQVtGG2SHBqbnuXTrZkeLabqV7WPFkNdu3bE7Ac4vFa2smVxcJ8Qad2Tzyo4Mm/SNlpLEJyQ
+	8Ld3GEk1Z7SpMjWxOA88amadFejs1/FvFwy1baNqLTiCHXSOVJbCeToDYhk7bwPzpDqaYfFNRu2
+	ct/wYtEN1/qmck9ZDPwk3yS+yk6pkjDjMVUqM2ssjw7AN/Vg88dNk9I9dtH4h7pDNbmyvE37SIX
+	LF6xL5p5g==
+X-Gm-Gg: AeBDietLIKfgGgBt2s9ZRePvrXKtQHxM1oh8dgEvFRgGctLIxfqxd4DofrCIn5fbjs+
+	NACMnziZS28VfedQm2V8oJRZALrn6aq5kppGRxFNGPgEAp8oz+odQxUSwwq3z3Atryc44AtwRO8
+	jSayJtDgWfH2PJWogsGA8SURJcqtEk+bufeerPhoK1XR7i2pu/FVEsIAE6DyV0BFQxF6SQWXLEL
+	86k+rVqTyT8owpOBpIFmnO1eMizQ6QtIAo274zrZRrx1XM/qC6KHBJu2+91ZszVE4AyjM51oLnV
+	vE6JFRP2KEzxh/IHyVVyvHS/mpmIgSn/ga6yN64GSa3y5JZljSLNnjFmK9vstwEQAkvjQIZaRP0
+	YhQ+BnFuD+5l+08aC1ytLGYfIqiRgpKakiU0iNhPd1gSjYMcjL/bJe63l+/v817v2Rl6wKnvbJA
+	e5g7pT5e8FloIgDUgg3qxYm+nMNRngSvdDDQf0BwiIxThiSl/THeqyN2Jau23kKEOqFg==
+X-Received: by 2002:a05:690c:e04f:b0:799:3a3:2f25 with SMTP id 00721157ae682-7b9ecfda739mr43754417b3.38.1776479689946;
+        Fri, 17 Apr 2026 19:34:49 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-15.dlp.protect.broadcom.com. [144.49.247.15])
+        by smtp-relay.gmail.com with ESMTPS id 00721157ae682-7b9ee78c861sm2547167b3.0.2026.04.17.19.34.49
+        for <netdev@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 17 Apr 2026 19:34:49 -0700 (PDT)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-2b249541063so11173305ad.3
+        for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 19:34:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1776479689; x=1777084489; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=7tePCcQ4//A5gm4gf0LFviYsHlnWZ1evZmw/Ul79JIk=;
+        b=U9fLSatLSOryokL8NmmVXDexj0t4B6sbZMaK5WllFK/KzsY/ZLUiy6PbATiCKrGRQj
+         /JtF2RJiJpirI2mkZUsihfrbOXnTGH5QqXZJCWmB8k2b556YD5XO4UNWf3ziX+DzKBqW
+         IgrFy2rhZJnZNkF+axzOQw8DfuMewWCsNgWpA=
+X-Received: by 2002:a17:903:3c43:b0:2ae:6259:5aff with SMTP id d9443c01a7336-2b5f9e77400mr56341585ad.6.1776479688633;
+        Fri, 17 Apr 2026 19:34:48 -0700 (PDT)
+X-Received: by 2002:a17:903:3c43:b0:2ae:6259:5aff with SMTP id d9443c01a7336-2b5f9e77400mr56341305ad.6.1776479688232;
+        Fri, 17 Apr 2026 19:34:48 -0700 (PDT)
+Received: from localhost.localdomain ([192.19.203.250])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b5faa176e9sm33427715ad.20.2026.04.17.19.34.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Apr 2026 19:34:47 -0700 (PDT)
+From: Vikas Gupta <vikas.gupta@broadcom.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	vsrama-krishna.nemani@broadcom.com,
+	bhargava.marreddy@broadcom.com,
+	rajashekar.hudumula@broadcom.com,
+	ajit.khaparde@broadcom.com,
+	dharmender.garg@broadcom.com,
+	rahul-rg.gupta@broadcom.com,
+	Vikas Gupta <vikas.gupta@broadcom.com>
+Subject: [PATCH net v3 0/2] bnge fixes 
+Date: Sat, 18 Apr 2026 08:04:36 +0530
+Message-ID: <20260418023438.1597876-1-vikas.gupta@broadcom.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
+	SUBJECT_ENDS_SPACES(0.50)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[iogearbox.net,gmail.com,fomichev.me,kernel.org,linux.dev,davemloft.net,google.com,redhat.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-279447-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
+	TAGGED_FROM(0.00)[bounces-279448-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[broadcom.com:dkim,broadcom.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FROM_NEQ_ENVFROM(0.00)[vikas.gupta@broadcom.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[broadcom.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kafai.wan@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 4F21441FACC
+	NEURAL_HAM(-0.00)[-0.995];
+	PRECEDENCE_BULK(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: C5F0541FB1D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, 2026-04-17 at 09:25 -0700, Martin KaFai Lau wrote:
-> On Fri, Apr 17, 2026 at 05:20:35PM +0800, KaFai Wan wrote:
-> > diff --git a/tools/testing/selftests/bpf/prog_tests/tcp_hdr_options.c
-> > b/tools/testing/selftests/bpf/prog_tests/tcp_hdr_options.c
-> > index 56685fc03c7e..7b9dbbb84316 100644
-> > --- a/tools/testing/selftests/bpf/prog_tests/tcp_hdr_options.c
-> > +++ b/tools/testing/selftests/bpf/prog_tests/tcp_hdr_options.c
-> > @@ -461,7 +461,7 @@ static void misc(void)
-> > =C2=A0	const unsigned int nr_data =3D 2;
-> > =C2=A0	struct bpf_link *link;
-> > =C2=A0	struct sk_fds sk_fds;
-> > -	int i, ret;
-> > +	int i, ret, true_val =3D 1;
-> > =C2=A0
-> > =C2=A0	lport_linum_map_fd =3D bpf_map__fd(misc_skel->maps.lport_linum_m=
-ap);
-> > =C2=A0
-> > @@ -477,6 +477,10 @@ static void misc(void)
-> > =C2=A0		return;
-> > =C2=A0	}
-> > =C2=A0
-> > +	ret =3D setsockopt(sk_fds.active_fd, SOL_TCP, TCP_NODELAY, &true_val,=
- sizeof(true_val));
->=20
-> Same comment as in v2. Why this setsockopt is needed?
+Hi,
+ This series fix two issues.
 
-Sorry I miss this.=C2=A0It's from the review of v1, my first version would =
-break the syscall setsockopt
-and other CB besides HDR_OPT_LEN/WRITE_HDR_OPT. So in the test I check sets=
-ockopt() and
-bpf_setsockopt() in PASSIVE_ESTABLISHED_CB to make sure patch#1 would not b=
-reak=C2=A0user space and other
-CB.
+Patch-1: 
+    Due to wrong HWRM sequence, driver do not get the correct
+    information regarding resources and capabilities.
+    The patch fixes the initial HWRM sequence.
+Patch-2:
+    Remove the unsupported backing store type initialization, which is
+    not supported in Thor Ultra devices.
 
-> The setsockopt in userspace is unnecessary.=C2=A0
-
-Is bpf_setsockopt() in PASSIVE_ESTABLISHED_CB also unnecessary? I'll respin=
- if they are unnecessary.
-
-> In the future,
-> we may need to understand why it is needed here in the first place.
-
-Okay, I'll remember that. Thanks for the review and guidance.
-
---=20
 Thanks,
-KaFai
+Vikas
+
+v2->v3:
+  Addressed Jakub Kicinski's comments.
+https://lore.kernel.org/netdev/CAHLZf_uARgZzoTPnnPjxRu5AGeHEOw3yyTEbNHYP3brfwuW0Sw@mail.gmail.com/
+
+v1->v2: 
+   Include Fixes tags.
+
+
+Vikas Gupta (2):
+  bnge: fix initial HWRM sequence
+  bnge: remove unsupported backing store type
+
+ .../net/ethernet/broadcom/bnge/bnge_core.c    | 30 ++++++++++++++-----
+ .../net/ethernet/broadcom/bnge/bnge_rmem.c    | 16 ----------
+ 2 files changed, 22 insertions(+), 24 deletions(-)
+
+-- 
+2.47.1
+
 
