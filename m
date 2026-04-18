@@ -1,167 +1,97 @@
-Return-Path: <netdev+bounces-279534-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279535-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iOx5DHbF42l1KgEAu9opvQ
-	(envelope-from <netdev+bounces-279534-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 19:55:02 +0200
+	id FlDfJbXG42mzKgEAu9opvQ
+	(envelope-from <netdev+bounces-279535-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 20:00:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5842421E18
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 19:55:01 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BD50421E73
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 20:00:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 04BF530312D6
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 17:54:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D68BC300C902
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 17:58:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CF9D336885;
-	Sat, 18 Apr 2026 17:54:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B3BD31352A;
+	Sat, 18 Apr 2026 17:58:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="byRpm4Lh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N4dB0/Dl"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16CB23203B6;
-	Sat, 18 Apr 2026 17:54:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 583E325771;
+	Sat, 18 Apr 2026 17:58:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776534894; cv=none; b=Ok5lnDW8x1e3WedSlkFSA6WpTDZ1XQ0EghQaJyJL0ZH6eAe8LwCo5/5DSWMDPyk1cj8exzrrF1jRVeo5Z70CaCfKGFBoDJZ4sHm3mEDxqpmkgKqF0CPF4EGD8uHzW5Alg5ZxF2oPy6frDFgk4RjJr07cUQV3pZHkirFgdCCZ4gg=
+	t=1776535127; cv=none; b=Cq5timh5ewcc+uhOMnPlf6xX1x+zLI6z/SYaeKsPjRwzXxBftuP2H2cAJV3LctgUqKjdA6l9Oqfsb+HAqxC040BlPhHglOUQQ4smsfywQcYdgpa3FPCB/PrILby8445P7DRE9/Jb01pJTtLhyNyoq6oSM//yYsI7q0aP+JsoF4g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776534894; c=relaxed/simple;
-	bh=JdtPqroOunoZJu87mhf+doIJHBz2KVjK3UTYJVQ+Dx0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=h4uupu0zNL59frx3kuJPIphQJ2F9EAJg3yH8SHpQHBk5PMzjFTDMbN7ZzGVpoafjmZwavpgcZ9giX0WIveA3pLPHi59gQ5FP63D4hOTC2lOcD3n/X7443T86V9WjF3VjqV2T2/SHUV6DObYWdJZYJSmds04qH5IEDx9oZADupYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=byRpm4Lh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9C4EC19424;
-	Sat, 18 Apr 2026 17:54:52 +0000 (UTC)
+	s=arc-20240116; t=1776535127; c=relaxed/simple;
+	bh=3EuEzZbNe/CJZ9WIbq4EPTr80qkPWv+jN9qdUIWvo9s=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MmhBuK1rOxHj1KY3giSvrCppxoS17+sxJ1biuhgg6nYt7vkUKPbtaQtp/KV23peuKYNe6uzhoaluoEnRE26OJzdroL1w2COcOXuDhTr8yYNtXyMYrO6mZwwbwe3xyyh3ouwFkDwvY+rhivZviVrBjOizuI6lKrFA6g/NJRgtyO4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N4dB0/Dl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC322C19424;
+	Sat, 18 Apr 2026 17:58:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776534893;
-	bh=JdtPqroOunoZJu87mhf+doIJHBz2KVjK3UTYJVQ+Dx0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=byRpm4LhvpTnr4z1ujO4rvTYg14RRwjOPCtVBK2ePT6tNfd2XetfFVMOqVNpdyo3k
-	 85Zn4Rn/GxNywlyeYkZ23LgYxOnemg8Ao32+2+/WiLNgRg9tIE+RFepAjTsVo1u4e8
-	 MkG9hxLzN8eRSS2exa1EdrQRHMw3N7AbY58HSoFLy6vl4JfuGVQkJTNzr6a2PkFrpz
-	 IaznN6CWkWej/KhEjU4SemcsL476+UpkhGzJYPFDeVtmjUXMZP8TzZvVCNy+1kQ6tP
-	 nYCa07ePIXyNIAKvnIRGV7PLkZTf+Js9zFnFU11IBmLN7T8SpKmR1RQACLrAXhShnt
-	 OPxq38yEmLbXQ==
+	s=k20201202; t=1776535127;
+	bh=3EuEzZbNe/CJZ9WIbq4EPTr80qkPWv+jN9qdUIWvo9s=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=N4dB0/DlYy1d8GxHD85ki2VRe+jp8+IV9WudfhuRp7qc4QAYtpCHZ9sUmC5XKlX6G
+	 fAWRW9MvOwbfuErcjo2K/FPtUnAPkdTNub3VUzvfv9e1dKD2pkzzw5cPGiDqH4UYl+
+	 m43uD+EmOlRKJ8okRS1D+HTHRhWT9s6h5Zh9LcI1cHZSHew0fJDWSOmrpxQQ6YB3ip
+	 DjxVXtDF7C8eiz27mz438Zpe/YAhCt/DbnnnHgeqvV2OOcVsPQVRMv0KIyyO/1rZrL
+	 2IV4hwIn6elq+ITzP3O/oG+kQZ5CeaxMq1Ib9Ths3xhhAmc1lsPwSwFnAP8j8s+pKD
+	 vsY0zKIBvt1Rw==
+Date: Sat, 18 Apr 2026 10:58:46 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: mmc@linux.ibm.com
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	bjking1@linux.ibm.com,
-	haren@linux.ibm.com,
-	ricklind@linux.ibm.com,
-	maddy@linux.ibm.com,
-	mpe@ellerman.id.au,
-	linuxppc-dev@lists.ozlabs.org,
-	stable@vger.kernel.org,
-	shaik.abdulla1@ibm.com,
-	naveedaus@in.ibm.com
-Subject: Re: [PATCH net v2] ibmveth: Disable GSO for packets with small MSS
-Date: Sat, 18 Apr 2026 10:54:51 -0700
-Message-ID: <20260418175451.122193-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260417172910.81433-1-mmc@linux.ibm.com>
-References: <20260417172910.81433-1-mmc@linux.ibm.com>
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: netfilter-devel@vger.kernel.org, fw@strlen.de, netdev@vger.kernel.org
+Subject: Re: [PATCH nf,v3] netfilter: nat: use kfree_rcu to release ops
+Message-ID: <20260418105846.399bfc45@kernel.org>
+In-Reply-To: <20260417101132.379848-1-pablo@netfilter.org>
+References: <20260417101132.379848-1-pablo@netfilter.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279534-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-279535-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E5842421E18
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 1BD50421E73
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
----
-ibmveth: Disable GSO for packets with small MSS
+On Fri, 17 Apr 2026 12:11:31 +0200 Pablo Neira Ayuso wrote:
+> Subject: [PATCH nf,v3] netfilter: nat: use kfree_rcu to release ops
 
-This commit adds an ndo_features_check callback to the ibmveth driver to
-disable segmentation offload when the MSS is less than 224 bytes. This
-prevents physical adapters in SEA configurations from freezing when given
-small MSS packets.
-
-> diff --git a/drivers/net/ethernet/ibm/ibmveth.c b/drivers/net/ethernet/ibm/ibmveth.c
-> --- a/drivers/net/ethernet/ibm/ibmveth.c
-> +++ b/drivers/net/ethernet/ibm/ibmveth.c
-
-[ ... ]
-
-> @@ -1756,6 +1756,25 @@ static int ibmveth_set_mac_addr(struct net_device *dev, void *p)
->  	return 0;
->  }
->  
-> +static netdev_features_t ibmveth_features_check(struct sk_buff *skb,
-> +						struct net_device *dev,
-> +						netdev_features_t features)
-> +{
-> +	/* Some physical adapters do not support segmentation offload with
-> +	 * MSS < 224. Disable GSO for such packets to avoid adapter freeze.
-> +	 */
-> +	if (skb_is_gso(skb)) {
-
-The commit message mentions this matches the ibmvnic hardware errata from
-commit f10b09ef687f. That commit disabled GSO for both gso_size < 224 and
-gso_segs == 1.
-
-By omitting the check for skb_shinfo(skb)->gso_segs == 1, could a
-single-segment GSO packet still cause the adapter to freeze?
-
-> +		if (skb_shinfo(skb)->gso_size < IBMVETH_MIN_LSO_MSS) {
-> +			netdev_warn_once(dev,
-> +					 "MSS %u too small for LSO, disabling GSO\n",
-> +					 skb_shinfo(skb)->gso_size);
-> +			features &= ~NETIF_F_GSO_MASK;
-> +		}
-> +	}
-> +
-> +	return features;
-
-When implementing a custom ndo_features_check callback, netif_skb_features()
-will bypass the standard dflt_features_check() function. Does this mean
-vlan_features_check() is no longer called for this driver?
-
-If vlan_features_check() is skipped, multi-tagged (QinQ) VLAN packets
-might retain GSO and protocol-specific checksum offloads that the hardware
-parser cannot handle.
-
-Should this return vlan_features_check(skb, features) instead?
-
-> +}
--- 
-pw-bot: cr
+Out of curiosity - why are you CCing netdev on this?
 
