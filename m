@@ -1,330 +1,193 @@
-Return-Path: <netdev+bounces-279443-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279444-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aCi1KB7Z4mnB/AAAu9opvQ
-	(envelope-from <netdev+bounces-279443-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 03:06:38 +0200
+	id MMsfMKTg4mmy/gAAu9opvQ
+	(envelope-from <netdev+bounces-279444-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 03:38:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FE0A41F8E9
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 03:06:38 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC59B41F9D1
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 03:38:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A26EB3031AC2
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 01:06:21 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 84E7A3037C05
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 01:38:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 357A123EAB8;
-	Sat, 18 Apr 2026 01:06:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BC22285CB6;
+	Sat, 18 Apr 2026 01:38:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bWmBFDe8"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="ltFk2qqu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f49.google.com (mail-dl1-f49.google.com [74.125.82.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B345D175A77
-	for <netdev@vger.kernel.org>; Sat, 18 Apr 2026 01:06:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.49
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776474381; cv=pass; b=oXq3C0TGaqRZPJtDg5xw/GKBHulzaSt2HZ5HmHmhPGYEIOIPHOeitpbZwph2N36jna/66NxbP/sm93CTxE8D9OKcUy/kqZArsSQ3T9oTw4jes4759H2KVAc19UHpbJ7p5EXCesPngURpqAwphFe/uprrRwjXmetUeSfge+5cvqU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776474381; c=relaxed/simple;
-	bh=MbJYuLV62yQM19c6dC9DtbHde8fn9mzXMYXm24tfU1A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Gcwl8gFaMNHOlTFUgf4DfOGK87wnGx+KyqfE0CB7jS8PSnQPGtZfo7JRPqbzrwYr1AQ92cWtphrFkzfTmqCES5OEzdRZGrTrDeQlUGkVxa9AZEMDHOmRR+c8diJNliRwkXwEWycWncAN8yJdpAq37hTq79FvyMaH0iNW6Vj/8/A=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bWmBFDe8; arc=pass smtp.client-ip=74.125.82.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-dl1-f49.google.com with SMTP id a92af1059eb24-12c637089ccso3022658c88.1
-        for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 18:06:19 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776474379; cv=none;
-        d=google.com; s=arc-20240605;
-        b=dS8uq2z3/gFm34PaEWKgLpGPXUWfp+Kul5CHxtcTihp0V6jdH5BM2Xu4U/uPm9lC7y
-         WXIpoSROBMvdA0mWmDLhVsol5MnohSlj2y20zimxIMHj9Ml6cwSpNv6er2TrgZv6853Z
-         VbNYfxRtSpB1502sIKcaP0+KsOy26jfCGOVZiZ3eaZ/XVEmOKY+FKhpLjOJlJ2yRjnln
-         uWCQYUQAZuR4SYPO4PDZj2hirvTDnE7Z2mzQDaPv7U6cEsT4iCdunlNMwuwLoL5ACQT1
-         LfGoVCtkrlw+av8n6pllUSFmqtw26AiLeMvgFk8Qx0JfDAnUIzCzdFIXVwpEig3AH7DG
-         V76A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=aJtzeCKdAvR+EBp3Q9RY8pglCClr3YzbEiQaHvpvF0E=;
-        fh=lkIwV34RzVSDHwGuOkYQUbcb5R3BgxSMO7poIeciMF4=;
-        b=jryYR4AQiqXZGR1AVMVMU+8Yz4f6EA96Soo7iTK9ybd0j9owGb3JsapLSrQxrv9wHt
-         cnD+v7m+ZK9A3rCQH6IyMRSWNPf2kGniG4HCuqjZ9RxEFKPdKhuNtx/3n8u7lYUDhzei
-         syNoT82sXk+kwlEIGUShn08pVL2W30gDsG/cbZGucjE+LDzQUxZBc+8LzLxdXMjYq+Qi
-         odVNC4/Nuly9QEdQPVoxht0VBtXJwk5q4b24Ynp2puU+rNoiOU7nViKviTp+BoqTFFlD
-         KX/N+91DKD+51S80JzzcdDJXbM0aKAZMda4/+16UHmSzHlvT5b6nan0ApHDsnv1VfkVB
-         tBSQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1776474379; x=1777079179; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aJtzeCKdAvR+EBp3Q9RY8pglCClr3YzbEiQaHvpvF0E=;
-        b=bWmBFDe8TPAgdIkqnhrI2L2M9JUCB2U/YmtNDhyhDwB4nFZoCpf0maWtZCXLyl9NVZ
-         72L8icwvTEAU/sDwRvnO+tW74FOStnw1tUaKUHk6ewJR3a7lLmpV/ywVmBixwZ7al6pA
-         1rAyB8DuIEFGNyDbUzIZR6cRLOky+rFEVWd0OLQxgv5x0hOjA0DK/JekuL49oTvTMvry
-         8PNgd1+mxGMuEPXbK9kIwfNvK15kl5cNCxiMk/Y/WAEgxJ+ask2TOT654mP6ny08uHBV
-         ukqAY4zJY4mYLc4pAFo2n/5O/IgMJdIHvAT6ePB7Nf1IX3ZXm+WvWNZzbyaLlre1DOh1
-         8pQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776474379; x=1777079179;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=aJtzeCKdAvR+EBp3Q9RY8pglCClr3YzbEiQaHvpvF0E=;
-        b=i7EZczWLiWCSqFOYZpJITn6GhCyEJKTsn1XQbow2HpNlaDPBoLM5rizoE2GyuEmNAw
-         5Ux2dQMk8vAmq3YsRaut2VgGWmlUGfvoBfyBtyQCSybV6l8qYPsgBzgWWMrOALFTkIBg
-         PDlOEUke+u4n0xWFRBaDqd74xNSP8T/9fi9jg3mFIGw2kVEP3nvg/BnKkkcQTId+LRhn
-         /o7vOEsp6sQ2I5eSI4UMbU8kT6OUPADJgRADuTHJWo649sGfsB8b31Yj9WK25UQz6gDu
-         ay6VqAGXtVA6C3FFLWEXdH3hq4NH4/Sty2PoDCGiOY0/jyVFgGZO0XB4QtXdKQ7ffakj
-         KjZA==
-X-Forwarded-Encrypted: i=1; AFNElJ//FGKdnRD/GSxLSpYzyx9/qttKlc5pjCC73nI6vBsBPxZqAkZpVPx4FONhZA6k4RjGnZqkBXM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YylYhVlECiqH3RELraM7x+h/K2HdULoXIhbPq7HhM1EkczX/TjA
-	vq98XbwaPSXei3Yo9cvOfM6pFqq3aqHBTJ1H349Sw5EXhap3lpmiN/0YAty+06vJJnIl5GzPzUZ
-	d2KVptMVM5p0KV3uJtkTz6ULd3J6J5jis+l2ID4Fe
-X-Gm-Gg: AeBDievEWZgg2NoI2MezfB3/Bn6+P7eaW1eH+BBHH6PKoumj+w4DJE8b8AKRerApfH7
-	OFqbPKiPJ6dUnJ/pHewTD6D0nABqbbB1Dl+M4U9ZVO699KJ/8FI33Wk/TqMTDFhtcyk7r2BwasT
-	yy0N87OEb7VLE3GrjFdWK/HJg3efTBo/lQxBdTmkTaiDs1czaRzSxKK8uP6auCWytHaAe7373td
-	HdOV1We6yY7iQ8nz9tFzBRq3MwrdRPNLkskfKm96qp5Ic4a911Zg7LYT102ayK8PMKHCz2xyiQa
-	ORYiP0OsAbKQ7LOmt4nCLkMtCnv39RNfeQaqHZPx8j27YOYNu9ITxzGxx+8dmjPctMoCJpok/C8
-	osAbxyH2fsqwFMhwS/d2RfcIExjmUDm6tZG5B0DrF/+yBIJpdQwcvH7dxIMgz8DH8MJm2vvRAeA
-	==
-X-Received: by 2002:a05:7022:6085:b0:128:d7a7:5261 with SMTP id
- a92af1059eb24-12c73fa6408mr2590847c88.30.1776474378110; Fri, 17 Apr 2026
- 18:06:18 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46A3528466C;
+	Sat, 18 Apr 2026 01:38:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776476319; cv=none; b=RkCs9ZXSquFfPdFgEbfJw/BdXEvZj9NmTLKatcqPq1EMQSN5ib7tO9WIVN83b40v6VB6mAQJKZtgrHLpVpiKSl/rKP9ueii8Gg4S6ILKGbI6MgCbuld/5WChJwcjPSdOTHAMO0gIbwAvgonChP5tE/6jYVsfhe/AMvSz5YEJgz4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776476319; c=relaxed/simple;
+	bh=/aNmjqf6EvkJP4ECg2FcVs4BvEpojMzJKwfiqkfzVuA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lnFV3P5PZHpQ0/YkorwzYo9ls8fBQ+NEzvq+zqTs/x4PEtJ+XEoHhh3FRv+nu9XmCmAQ7mhejg+1ouU5xjGpQxt1JJD6UYK147/kgonCNtLUJJVe3kby3eeurntMY4x0ov3nvL5R77J0Oohk1RXlber2QDEhZK92H5ppWjRL7oo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=ltFk2qqu; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=1kOeSpjI0RlgPhVeNdHhHtVDLezjB3cfliHkX3ITdPU=; 
+	b=ltFk2qqu9dBx4OWYOUscoecqlZVrGByV314KSR/ecadt44h6TVLgEDlSLjV3MJbymfj2yFUGY0z
+	ywWwjonn2mHwGzpjyrMR3wgk8N482YtX1NSfDs4hnHSAirFPWtGWR3WmejtfdARIAx5y2C2Jss2hf
+	vrYXX7VPecZCfzvWdWzniDS88dZXEUYyRtAtcXTNY0H7kYOYONXNpDemB/KzBMeRD9oHzlUTJrhKt
+	OirQNOMsMZAP3s6WZVoF2vMAkOMFeOGmK1PNtchSjl2Bk+p0lRuB1783tfqc1VJz4WCR0wwgXjfSc
+	oIB+d0IMRPKmFbbas8jUtZ9TUVxQIwuCDH2w==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1wDudY-006wAf-28;
+	Sat, 18 Apr 2026 09:38:21 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 18 Apr 2026 09:38:20 +0800
+Date: Sat, 18 Apr 2026 09:38:20 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Tejun Heo <tj@kernel.org>
+Cc: Thomas Graf <tgraf@suug.ch>, David Vernet <void@manifault.com>,
+	Andrea Righi <arighi@nvidia.com>,
+	Changwoo Min <changwoo@igalia.com>,
+	Emil Tsalapatis <emil@etsalapatis.com>,
+	linux-crypto@vger.kernel.org, sched-ext@lists.linux.dev,
+	linux-kernel@vger.kernel.org, Florian Westphal <fw@strlen.de>,
+	netdev@vger.kernel.org, NeilBrown <neil@brown.name>
+Subject: [PATCH] rhashtable: Restore insecure_elasticity toggle
+Message-ID: <aeLgjAeJuidWNy3N@gondor.apana.org.au>
+References: <20260417002449.2290577-1-tj@kernel.org>
+ <aeGCMkdg5Fgv8UMS@gondor.apana.org.au>
+ <aeGElQ-TcCclEHwo@slm.duckdns.org>
+ <aeGIsGi9fBqu9EZT@gondor.apana.org.au>
+ <aeHjjGEhlikSsxCX@slm.duckdns.org>
+ <aeHmeAz-Z-Rx2MqX@gondor.apana.org.au>
+ <aeJe8oIyYUi-NtCQ@slm.duckdns.org>
+ <aeLT8eB_xfzLxqbI@gondor.apana.org.au>
+ <aeLV6aDhM0-S4oQ1@slm.duckdns.org>
+ <aeLWH_HgSHF4buiJ@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <48BADABE-4DFB-4DAD-8248-E94D8F5238D2@amazon.com> <CAAVpQUCfMsWBpPpywbwBLRCdHUqWqFBoDK=17dwDkG6T0dQxzw@mail.gmail.com>
-In-Reply-To: <CAAVpQUCfMsWBpPpywbwBLRCdHUqWqFBoDK=17dwDkG6T0dQxzw@mail.gmail.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Fri, 17 Apr 2026 18:06:06 -0700
-X-Gm-Features: AQROBzAOzl4NDI37MDHb3Ki8sa2fZpf7yMu6HwGCVtU9lB0D-1xhB2T9BL_jaLE
-Message-ID: <CAAVpQUDj13+MEz8HJTRyAcBYwUa6a2t7PNx_7qJRkjbihYk2Tg@mail.gmail.com>
-Subject: Re: [BUG] net: tcp: SO_LINGER with l_linger=0 leaks memory when
- closing sockets with pending send data
-To: "Ahmed, Aaron" <aarnahmd@amazon.com>
-Cc: "stable@vger.kernel.org" <stable@vger.kernel.org>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "ncardwell@google.com" <ncardwell@google.com>, 
-	"edumazet@google.com" <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aeLWH_HgSHF4buiJ@gondor.apana.org.au>
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[apana.org.au,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[gondor.apana.org.au:s=h01];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-279444-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279443-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2600:3c0a:e001:db::12fc:5321:from];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gondor.apana.org.au:+];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[100.90.174.1:received,74.125.82.49:received];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[herbert@gondor.apana.org.au,netdev@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 1FE0A41F8E9
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: DC59B41F9D1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Apr 17, 2026 at 5:44=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google.co=
-m> wrote:
->
-> Hi Aaron :)
->
-> Thanks for the report.
->
-> On Fri, Apr 17, 2026 at 5:20=E2=80=AFPM Ahmed, Aaron <aarnahmd@amazon.com=
-> wrote:
-> >
-> > Hi,
-> >
-> > We have identified a TCP memory leak issue on Amazon Linux with kernel =
-versions 5.15.168 through 6.18.20 that occurs when closing sockets with SO_=
-LINGER set to l_onoff=3D1, l_linger=3D0, on servers handling many persisten=
-t connections with full write buffers.
-> >
-> > Overview:
-> >
-> > The issue was discovered on a public-facing non-blocking TCP server tha=
-t maintains many persistent connections and streams data to clients. When a=
- client cannot read fast enough, the TCP write socket buffer on the server =
-side fills up and send() returns EAGAIN. At that point, the server applicat=
-ion disconnects the slow client by setting SO_LINGER to l_onoff=3D1, l_ling=
-er=3D0 and calling close(). This is intended to immediately reset the conne=
-ction and release all associated kernel resources. However, while the socke=
-t disappears from netstat and sockstat (TCP inuse drops), the write buffer =
-memory is not properly reclaimed. /proc/net/sockstat shows TCP mem pages ac=
-cumulating with no owning sockets, causing the leaked memory to grow past t=
-he tcp_mem limits. Setting SO_LINGER to l_onoff=3D1, l_linger=3D1 instead d=
-oes not leak. With l_linger=3D1, the connection goes through FIN_WAIT1 =E2=
-=86=92 FIN_WAIT2 =E2=86=92 CLOSE (confirmed with BPF tcpstates), and all me=
-mory is freed properly. With l_linger=3D0, the connection transitions direc=
-tly from ESTABLISHED =E2=86=92 CLOSE via RST, bypassing the FIN states enti=
-rely.
-> >
-> > Reproducer:
-> > ```
-> > /* tcp_linger_memleak.c - SO_LINGER(0) TCP memory leak reproducer
-> >  *
-> >  * Build:  gcc -O2 -o tcp_linger_memleak tcp_linger_memleak.c
-> >  * Run:    sudo sysctl -w net.core.wmem_max=3D4194304
-> >  *         sudo sysctl -w net.ipv4.tcp_rmem=3D"4096 8192 16384"
-> >  *         ./tcp_linger_memleak
-> >  */
-> > #include <stdio.h>
-> > #include <stdlib.h>
-> > #include <string.h>
-> > #include <unistd.h>
-> > #include <errno.h>
-> > #include <fcntl.h>
-> > #include <signal.h>
-> > #include <sys/socket.h>
-> > #include <sys/wait.h>
-> > #include <netinet/in.h>
-> >
-> > #define NUM_CONNS 5000
-> > #define PORT      6666
-> >
-> > static void print_mem(const char *label) {
-> >     FILE *f;
-> >     char line[256];
-> >     f =3D fopen("/proc/meminfo", "r");
-> >     while (fgets(line, sizeof(line), f))
-> >         if (strncmp(line, "MemAvailable:", 13) =3D=3D 0)
-> >             printf("%s: %s", label, line);
-> >     fclose(f);
-> >     f =3D fopen("/proc/net/sockstat", "r");
-> >     while (fgets(line, sizeof(line), f))
-> >         if (strncmp(line, "TCP:", 4) =3D=3D 0)
-> >             printf("%s: %s", label, line);
-> >     fclose(f);
-> > }
-> >
-> > int main(void) {
-> >     struct sockaddr_in addr =3D {
-> >         .sin_family =3D AF_INET,
-> >         .sin_port =3D htons(PORT),
-> >         .sin_addr.s_addr =3D htonl(INADDR_LOOPBACK)
-> >     };
-> >     int opt =3D 1;
-> >     signal(SIGPIPE, SIG_IGN);
-> >
-> >     int lsn =3D socket(AF_INET, SOCK_STREAM, 0);
-> >     setsockopt(lsn, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
-> >     bind(lsn, (struct sockaddr *)&addr, sizeof(addr));
-> >     listen(lsn, NUM_CONNS);
-> >
-> >     /* Fork client: connect N times, never read */
-> >     pid_t child =3D fork();
-> >     if (child =3D=3D 0) {
-> >         int fds[NUM_CONNS];
-> >         for (int i =3D 0; i < NUM_CONNS; i++) {
-> >             fds[i] =3D socket(AF_INET, SOCK_STREAM, 0);
-> >             connect(fds[i], (struct sockaddr *)&addr, sizeof(addr));
-> >         }
-> >         pause(); /* sit forever, never read */
-> >         _exit(0);
-> >     }
-> >
-> >     /* Accept all connections */
-> >     int clients[NUM_CONNS];
-> >     for (int i =3D 0; i < NUM_CONNS; i++)
-> >         clients[i] =3D accept(lsn, NULL, NULL);
-> >
-> >     /* Freeze client so it stops reading */
-> >     kill(child, SIGSTOP);
-> >     printf("=3D=3D=3D %d connections established, client frozen =3D=3D=
-=3D\n", NUM_CONNS);
-> >     print_mem("BEFORE");
-> >
-> >     /* Fill buffers and close with SO_LINGER(1,0) */
-> >     char buf[2048];
-> >     memset(buf, 'A', sizeof(buf));
-> >     for (int i =3D 0; i < NUM_CONNS; i++) {
-> >         int flags =3D fcntl(clients[i], F_GETFL, 0);
-> >         fcntl(clients[i], F_SETFL, flags | O_NONBLOCK);
-> >         while (send(clients[i], buf, sizeof(buf), MSG_NOSIGNAL) > 0);
-> >         struct linger lg =3D { .l_onoff =3D 1, .l_linger =3D 0 };
-> >         setsockopt(clients[i], SOL_SOCKET, SO_LINGER, &lg, sizeof(lg));
-> >         close(clients[i]);
-> >     }
-> >
-> >     sleep(2);
-> >     printf("\n=3D=3D=3D All sockets closed with SO_LINGER(1,0) =3D=3D=
-=3D\n");
-> >     print_mem("AFTER");
-> >     kill(child, SIGKILL);
-> >     waitpid(child, NULL, 0);
-> >     close(lsn);
-> >     return 0;
-> > }
-> > ```
-> > Output (Tested on 6.18.20):
-> > ```
-> > =3D=3D=3D 5000 connections established, client frozen =3D=3D=3D
-> > BEFORE: MemAvailable:   95491288 kB
-> > BEFORE: TCP: inuse 10005 orphan 0 tw 5 alloc 10006 mem 0
-> >
-> > =3D=3D=3D All sockets closed with SO_LINGER(1,0) =3D=3D=3D
-> > AFTER: MemAvailable:   95321800 kB
-> > AFTER: TCP: inuse 5 orphan 0 tw 5 alloc 5006 mem 8300
-> > ```
->
-> Unfortunately, it dies immediately on my end.
->
-> =3D=3D=3D 5000 connections established, client frozen =3D=3D=3D
-> Segmentation fault         (core dumped) ./linux/tcp_linger
+Some users of rhashtable cannot handle insertion failures, and
+are happy to accept the consequences of a hash table that having
+very long chains.
 
-This was due to small ulimit -n and fopen() returned
-NULL being passed to fgets().
+Restore the insecure_elasticity toggle for these users.  In
+addition to disabling the chain length checks, this also removes
+the emergency resize that would otherwise occur when the hash
+table occupancy hits 100% (an async resize is still scheduled
+at 75%).
 
-But I don't see any leak of memory nor counter after
-the repro.
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Note that the tcp_mem counter could be cached in
-per-cpu counters, see proto_memory_pcpu_drain() etc.
-
----8<---
-[root@fedora ~]# unshare -n
-[root@fedora ~]# ip link set lo up
-[root@fedora ~]# echo clear > /sys/kernel/debug/kmemleak
-[root@fedora ~]# ulimit -n 100000 && ./linux/tcp_linger
-=3D=3D=3D 5000 connections established, client frozen =3D=3D=3D
-BEFORE: MemAvailable:   54683048 kB
-BEFORE: TCP: inuse 10001 orphan 0 tw 0 alloc 10008 mem 0
-=3D=3D=3D All sockets closed with SO_LINGER(1,0) =3D=3D=3D
-AFTER: MemAvailable:   54616304 kB
-AFTER: TCP: inuse 1 orphan 0 tw 0 alloc 5008 mem 3842
-[root@fedora ~]# cat /proc/net/sockstat
-sockets: used 0
-TCP: inuse 0 orphan 0 tw 0 alloc 7 mem 0
-UDP: inuse 0 mem 0
-RAW: inuse 0
-FRAG: inuse 0 memory 0
-[root@fedora ~]# cat /proc/meminfo | grep Available
-MemAvailable:   54732456 kB
-[root@fedora ~]# echo scan > /sys/kernel/debug/kmemleak
-[root@fedora ~]#
----8<---
+diff --git a/include/linux/rhashtable-types.h b/include/linux/rhashtable-types.h
+index 015c8298bebc..72082428d6c6 100644
+--- a/include/linux/rhashtable-types.h
++++ b/include/linux/rhashtable-types.h
+@@ -49,6 +49,7 @@ typedef int (*rht_obj_cmpfn_t)(struct rhashtable_compare_arg *arg,
+  * @head_offset: Offset of rhash_head in struct to be hashed
+  * @max_size: Maximum size while expanding
+  * @min_size: Minimum size while shrinking
++ * @insecure_elasticity: Set to true to disable chain length checks
+  * @automatic_shrinking: Enable automatic shrinking of tables
+  * @hashfn: Hash function (default: jhash2 if !(key_len % 4), or jhash)
+  * @obj_hashfn: Function to hash object
+@@ -61,6 +62,7 @@ struct rhashtable_params {
+ 	u16			head_offset;
+ 	unsigned int		max_size;
+ 	u16			min_size;
++	bool			insecure_elasticity;
+ 	bool			automatic_shrinking;
+ 	rht_hashfn_t		hashfn;
+ 	rht_obj_hashfn_t	obj_hashfn;
+diff --git a/include/linux/rhashtable.h b/include/linux/rhashtable.h
+index 0480509a6339..c793849d3f61 100644
+--- a/include/linux/rhashtable.h
++++ b/include/linux/rhashtable.h
+@@ -821,14 +821,15 @@ static __always_inline void *__rhashtable_insert_fast(
+ 		goto out;
+ 	}
+ 
+-	if (elasticity <= 0)
++	if (elasticity <= 0 && !params->insecure_elasticity)
+ 		goto slow_path;
+ 
+ 	data = ERR_PTR(-E2BIG);
+ 	if (unlikely(rht_grow_above_max(ht, tbl)))
+ 		goto out_unlock;
+ 
+-	if (unlikely(rht_grow_above_100(ht, tbl)))
++	if (unlikely(rht_grow_above_100(ht, tbl)) &&
++	    !params->insecure_elasticity)
+ 		goto slow_path;
+ 
+ 	/* Inserting at head of list makes unlocking free. */
+diff --git a/lib/rhashtable.c b/lib/rhashtable.c
+index 6074ed5f66f3..b60d55e5b19b 100644
+--- a/lib/rhashtable.c
++++ b/lib/rhashtable.c
+@@ -538,7 +538,7 @@ static void *rhashtable_lookup_one(struct rhashtable *ht,
+ 		return NULL;
+ 	}
+ 
+-	if (elasticity <= 0)
++	if (elasticity <= 0 && !ht->p->insecure_elasticity)
+ 		return ERR_PTR(-EAGAIN);
+ 
+ 	return ERR_PTR(-ENOENT);
+@@ -568,7 +568,8 @@ static struct bucket_table *rhashtable_insert_one(
+ 	if (unlikely(rht_grow_above_max(ht, tbl)))
+ 		return ERR_PTR(-E2BIG);
+ 
+-	if (unlikely(rht_grow_above_100(ht, tbl)))
++	if (unlikely(rht_grow_above_100(ht, tbl)) &&
++	    !ht->p->insecure_elasticity)
+ 		return ERR_PTR(-EAGAIN);
+ 
+ 	head = rht_ptr(bkt, tbl, hash);
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 
