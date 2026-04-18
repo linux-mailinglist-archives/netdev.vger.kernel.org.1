@@ -1,174 +1,202 @@
-Return-Path: <netdev+bounces-279485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279487-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WPwGGBpR42njEwEAu9opvQ
-	(envelope-from <netdev+bounces-279485-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 11:38:34 +0200
+	id 0LGWBX5k42n5GAEAu9opvQ
+	(envelope-from <netdev+bounces-279487-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 13:01:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2347420956
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 11:38:33 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7461420CE2
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 13:01:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 088C23026A8F
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 09:38:05 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A4F77304729B
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 10:59:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92A7033E35B;
-	Sat, 18 Apr 2026 09:38:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CF3235F18F;
+	Sat, 18 Apr 2026 10:59:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="GrTgxmv5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gsytzas8"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout03.his.huawei.com (canpmsgout03.his.huawei.com [113.46.200.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB5843358B0;
-	Sat, 18 Apr 2026 09:38:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0C2C35CB6B
+	for <netdev@vger.kernel.org>; Sat, 18 Apr 2026 10:59:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776505084; cv=none; b=P2ty1ph9xIObVQ3CAYPxzuKKMJgobPSk6rlqyHH3Z0K/WcmPERY0PxEVohFPjnq0aCyP8GntLUGRfCUCX2xgpBU9vHMTWK8vtchPTon2k2K1I+ixXhJHOzM1mHzWWWbVcTfIvecBOXUWuwhSDdn4ji/Znf3zrrRemt/NuUvMyhU=
+	t=1776509947; cv=none; b=IVd+cAYk/os5vF8aJecZ9wXJiH9fVLXIT2Mdk1pGsSO4xejrkFvbIOkD20+eYPZHnz54qTAmhQ/FuF466kXc+AIH8Ivy7YWtbc/LBuF2zNTyL36uLbmj0EwiTlHyS4kEK0LBh5QOCJN5xtT1+mvZhDsL5kdwyoGMfbtHWmT0d0k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776505084; c=relaxed/simple;
-	bh=qbdpTmviNKQu9uGaS/FOU7Lxhbq6Nv5eTgL9/1CIMuQ=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=naonlvZRUiApzjvK9paN8BTN/NBdUVQJZ9pDhwUE6jSybRRGTyktyRQvnr7QMR6lqVGruE0+uuCg+nt2vedDGOX0ZMEPWBymOOfb4wfWXA7M3YNS4ZSFaTYNs0AMR9P6T5kyv9uUFB699LyLB7oeMMCwrLRMC0p3W+oEmhTQN40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=GrTgxmv5; arc=none smtp.client-ip=113.46.200.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=/LuDX7dTR/T6ZicW0wxZOd0IZ9ZolIpDU6m296Bo570=;
-	b=GrTgxmv5gXcCAJEs2Npo/UICfj4EGrwpIXWzYL9eFedp8iglxfocmPi8h6guCopX6ihHLzh4y
-	B3Lx1BUzmCBocZai9PaqYkZoK81bq4A9MIZTwBp7dxGLVWils+4ZXtKS6Hhf/0EQhFUkXo4Dz8l
-	wFAQnWfn83PmImGRPBv4caM=
-Received: from mail.maildlp.com (unknown [172.19.163.104])
-	by canpmsgout03.his.huawei.com (SkyGuard) with ESMTPS id 4fyRMq2NxVzpSvH;
-	Sat, 18 Apr 2026 17:31:35 +0800 (CST)
-Received: from kwepemj500018.china.huawei.com (unknown [7.202.194.48])
-	by mail.maildlp.com (Postfix) with ESMTPS id 0F9AE4048F;
-	Sat, 18 Apr 2026 17:37:53 +0800 (CST)
-Received: from huawei.com (10.50.85.128) by kwepemj500018.china.huawei.com
- (7.202.194.48) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Sat, 18 Apr
- 2026 17:37:52 +0800
-From: Li Xiasong <lixiasong1@huawei.com>
-To: Matthieu Baerts <matttbe@kernel.org>, Mat Martineau
-	<martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>
-CC: <netdev@vger.kernel.org>, <mptcp@lists.linux.dev>,
-	<linux-kernel@vger.kernel.org>, <yuehaibing@huawei.com>,
-	<zhangchangzhong@huawei.com>, <weiyongjun1@huawei.com>
-Subject: [RFC PATCH net] mptcp: pm: fix ADD_ADDR timer infinite retry on option space insufficient
-Date: Sat, 18 Apr 2026 18:00:18 +0800
-Message-ID: <20260418100018.2219500-1-lixiasong1@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1776509947; c=relaxed/simple;
+	bh=GEfn2cvUXCZYu8R3K/hHuva9mqWVpe6oUwR+lZao2Gw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BeaDxWMrV3Lz91b013LS6ExXhkg8RLzrOMnJ3F/nHWdR6U3x2N4T+PCZKyo4cU/Y2bN25HowTyTk7xCKMb5ZZFcIt3Le2og5EyzfrStBiyK6GBaujWawFRZXcCq0pYf1ekGkYE7hpthfU0MuAYs0k9k1oMk+Yn/hGHLodHFE3jU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gsytzas8; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4838c15e3cbso13844265e9.3
+        for <netdev@vger.kernel.org>; Sat, 18 Apr 2026 03:59:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776509944; x=1777114744; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=vnBuFIUCfikb5ub/f9rRSioO6vPlb9VFmQqFga+l/6Y=;
+        b=gsytzas85Am8f+juTKEPhjE/xOwLHKMssq46OGtn9GxMCl2smuDYgipttJV7W5ugvd
+         FonhKvFIxbiK1xH3N4GRYW5uXrNb1RhuWgncZn63PUBbAFTOAZmI11Ld0lZFYPuGj4L8
+         W5pkcd9u7pcEtOsTWYNy17mAV04Z9JjJ6Ye/w++WCxzd4S7HUfoxaO5ry0JfvJlhyB0I
+         D3hFUZX0prsf4nMkxzeCOAxrFzSTHDD/q2pCr0R55XquMSuJ6/E9a3dx+otSx9CuK0wp
+         xkctcS/b/nH8kYO9xWIu+aaqXFj6zZKwpWT2NJWnVmQ1WR2dRJAq8WwWWlxmsKfpTjna
+         cT7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776509944; x=1777114744;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vnBuFIUCfikb5ub/f9rRSioO6vPlb9VFmQqFga+l/6Y=;
+        b=Jd5khyQesYO6ntaoQD0LiAGBwzPYAtfPtz8benIR9Mn8SXeaEzFfki8rh7LBxWI/q/
+         keKouqYqDpYByOwJ90mATCh20kV0pIpM+vsF03bYuQISb3UPVvlB6RHcf1LwUy7dyO64
+         32SAQ6a5TwRkvjlRgFZBLq22YwwCGzkvST4BqZrM7o4NYCN5EDKGV4YXlq3oWvVG2eIj
+         yb+R80ncHSomrV6lsx8UGFLmaCkbErhrh/xQvdpBkb7faw1SSemFPlZGJ6Or49d1e58E
+         ehk68zmjExX9I5nhn9o7EvU+0yHz7/7LM/hq3L+RDUjCyC+s8IEA79HTqoSGwFyCWj5+
+         JOnQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9p1tEvT5WW+yuCZWZhEYipZl3kff+FNr7d/OwJFE8kbO8R65lp+hF1sMc1Ua7b+OXKxCWRb9I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwqphOGmSHzoDkbZuCF4H6x+OGs8wnB6+c/tJG0/0nRPah0qRRT
+	5hFxhXZzVBQMLJIMUdQNLJL+s4R2H54OwtK7HZYJxSrzDadksNnCvkGv
+X-Gm-Gg: AeBDieuVPaw63tFYPiGgiq2uQKR5sOCUhqrmJMOW4D+SKbKyVzKbm4+n6o6j7hIEvap
+	bhtQI0m5Hy/yyBPK4+qy+K2hB7zoeaDons6HfN2ODNh7pnidlq8e5t0mebYwLRobhE/LQOZoTLo
+	ZO/XI1AKbA3g74AEMRHsQYJCNn2CbZavwo7vxf709mNRFQtZPMnIdS7UArtjjNsL8LX3V4Oza0o
+	NWtgJ1oGOD5bgHLzUXzoPgfgn8zKZQN+DzMOrKwkvZmira6eso+Ijp205Pj82edc1jxEf9J7mH2
+	d8qIrAoEK3JQlNiI3J4950LuXgZQ8cMQJkQoBlEuVDEj89HrczR2FfSccii95SD35/4RjmGM2Rz
+	r95tR41Ir8tpKkf2V0UIhTx+nCIgmETXCm7n3syuolhYGwd6yZtoZtRl4xP/diI9Qtu13ZZlDMt
+	0ueZgUfpjbsHyOE440cum93eLupa3KnOd6mybt9HGgGPUmYkgelHunw3Lw+3EAfrzIoOAJPIGwV
+	gbNyvuwr1rnelzR
+X-Received: by 2002:a05:600c:a413:b0:485:419c:4eba with SMTP id 5b1f17b1804b1-488fb73d229mr67979495e9.1.1776509943863;
+        Sat, 18 Apr 2026 03:59:03 -0700 (PDT)
+Received: from ?IPV6:2a02:a03f:a75e:9a00:5273:4380:96ab:9087? ([2a02:a03f:a75e:9a00:5273:4380:96ab:9087])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43fe4e3a341sm13236059f8f.24.2026.04.18.03.59.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 18 Apr 2026 03:59:03 -0700 (PDT)
+Message-ID: <acee197f-1821-4304-8759-a02ac1d5c808@gmail.com>
+Date: Sat, 18 Apr 2026 12:59:02 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
- kwepemj500018.china.huawei.com (7.202.194.48)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] ipv6: Apply max_dst_opts_cnt to
+ ip6_tnl_parse_tlv_enc_lim
+To: Daniel Borkmann <daniel@iogearbox.net>, kuba@kernel.org
+Cc: edumazet@google.com, dsahern@kernel.org, tom@herbertland.com,
+ willemdebruijn.kernel@gmail.com, idosch@nvidia.com, pabeni@redhat.com,
+ netdev@vger.kernel.org
+References: <20260417220358.693101-1-daniel@iogearbox.net>
+Content-Language: en-US
+From: Justin Iurman <justin.iurman@gmail.com>
+In-Reply-To: <20260417220358.693101-1-daniel@iogearbox.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[google.com,kernel.org,herbertland.com,gmail.com,nvidia.com,redhat.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279485-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[huawei.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lixiasong1@huawei.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-279487-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[justiniurman@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[huawei.com:email,huawei.com:dkim,huawei.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B2347420956
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,iogearbox.net:email]
+X-Rspamd-Queue-Id: A7461420CE2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-When TCP option space is insufficient (e.g., IPv6 with tcp_timestamps
-enabled), the original code jumped to out_unlock without clearing the
-addr_signal flag. This caused mptcp_pm_add_timer to keep rescheduling
-indefinitely without sending ADD_ADDR, preventing the endpoint list from
-being traversed.
+On 4/18/26 00:03, Daniel Borkmann wrote:
+> Commit 47d3d7ac656a ("ipv6: Implement limits on Hop-by-Hop and
+> Destination options") added net.ipv6.max_{hbh,dst}_opts_{cnt,len}
+> and applied them in ip6_parse_tlv(), the generic TLV walker
+> invoked from ipv6_destopt_rcv() and ipv6_parse_hopopts().
+> 
+> ip6_tnl_parse_tlv_enc_lim() does not go through ip6_parse_tlv();
+> it has its own hand-rolled TLV scanner inside its NEXTHDR_DEST
+> branch which looks for IPV6_TLV_TNL_ENCAP_LIMIT. That inner
+> loop is bounded only by optlen, which can be up to 2048 bytes.
+> Stuffing the Destination Options header with 2046 Pad1 (type=0)
+> entries advances the scanner a single byte at a time, yielding
+> ~2000 TLV iterations per extension header.
+> 
+> Reuse max_dst_opts_cnt to bound the TLV iterations, matching
+> the semantics from 47d3d7ac656a.
+> 
+> Fixes: 47d3d7ac656a ("ipv6: Implement limits on Hop-by-Hop and Destination options")
+> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+> ---
+>   net/ipv6/ip6_tunnel.c | 5 +++++
+>   1 file changed, 5 insertions(+)
+> 
+> diff --git a/net/ipv6/ip6_tunnel.c b/net/ipv6/ip6_tunnel.c
+> index 907c6a2af331..0ab76f93c136 100644
+> --- a/net/ipv6/ip6_tunnel.c
+> +++ b/net/ipv6/ip6_tunnel.c
+> @@ -430,11 +430,16 @@ __u16 ip6_tnl_parse_tlv_enc_lim(struct sk_buff *skb, __u8 *raw)
+>   				break;
+>   		}
+>   		if (nexthdr == NEXTHDR_DEST) {
+> +			int tlv_max = READ_ONCE(init_net.ipv6.sysctl.max_dst_opts_cnt);
+> +			int tlv_cnt = 0;
+>   			u16 i = 2;
+>   
+>   			while (1) {
+>   				struct ipv6_tlv_tnl_enc_lim *tel;
+>   
+> +				if (unlikely(tlv_cnt++ >= tlv_max))
+> +					break;
+> +
+>   				/* No more room for encapsulation limit */
+>   				if (i + sizeof(*tel) > optlen)
+>   					break;
 
-In a pure ACK scenario (indicated by drop_other_suboptions=true), if
-the option space is insufficient to carry the ADD_ADDR suboption, it
-is appropriate to drop this address signal to allow the timer handler
-to move on to other addresses.
+Good point on reusing max_dst_opts_cnt in ip6_tnl_parse_tlv_enc_lim(), 
+but this patch is not ready yet.
 
-Fixes: 00cfd77b9063 ("mptcp: retransmit ADD_ADDR when timeout")
-Signed-off-by: Li Xiasong <lixiasong1@huawei.com>
----
+We need to be careful: max_dst_opts_cnt can be negative. If this is the 
+case, ip6_tnl_parse_tlv_enc_lim() would probably return 0, which is not 
+what we want here. From the doc:
 
-Seeking feedback on:
+max_dst_opts_number - INTEGER
+         Maximum number of non-padding TLVs allowed in a Destination
+         options extension header. If this value is less than zero
+         then unknown options are disallowed and the number of known
+         TLVs allowed is the absolute value of this number.
 
-When announcing addresses to the peer, MPTCP sends a pure ACK packet
-to carry MPTCP options (ADD_ADDR). In this scenario, if the option space
-is insufficient for ADD_ADDR, clearing addr_signal would:
+         Default: 8
 
-  - Prevent the timer from retrying infinitely
-  - Allow the timer to continue traversing and processing other addresses
-  - Not block other subflow creation or address announcement operations
+Since ip6_tnl_parse_tlv_enc_lim() does not check for specific option 
+types (e.g., Pad1, PadN, you-name-it) and does not differentiate known 
+from unknown options during parsing, I would simply use the absolute 
+value of max_dst_opts_cnt by default.
 
-Is there any scenario where we should retry later instead of clearing
-the address signal/echo flag? However, if a pure ACK doesn't have
-enough space for the flag, subsequent packets won't either.
-
----
- net/mptcp/pm.c | 17 ++++++++---------
- 1 file changed, 8 insertions(+), 9 deletions(-)
-
-diff --git a/net/mptcp/pm.c b/net/mptcp/pm.c
-index 57a456690406..1d49779c6a1f 100644
---- a/net/mptcp/pm.c
-+++ b/net/mptcp/pm.c
-@@ -881,19 +881,18 @@ bool mptcp_pm_add_addr_signal(struct mptcp_sock *msk, const struct sk_buff *skb,
- 	}
- 
- 	*echo = mptcp_pm_should_add_signal_echo(msk);
-+	add_addr = msk->pm.addr_signal &
-+		~(*echo ? BIT(MPTCP_ADD_ADDR_ECHO) : BIT(MPTCP_ADD_ADDR_SIGNAL));
- 	port = !!(*echo ? msk->pm.remote.port : msk->pm.local.port);
--
- 	family = *echo ? msk->pm.remote.family : msk->pm.local.family;
--	if (remaining < mptcp_add_addr_len(family, *echo, port))
--		goto out_unlock;
- 
--	if (*echo) {
--		*addr = msk->pm.remote;
--		add_addr = msk->pm.addr_signal & ~BIT(MPTCP_ADD_ADDR_ECHO);
--	} else {
--		*addr = msk->pm.local;
--		add_addr = msk->pm.addr_signal & ~BIT(MPTCP_ADD_ADDR_SIGNAL);
-+	if (remaining < mptcp_add_addr_len(family, *echo, port)) {
-+		if (*drop_other_suboptions)
-+			WRITE_ONCE(msk->pm.addr_signal, add_addr);
-+		goto out_unlock;
- 	}
-+
-+	*addr = *echo ? msk->pm.remote : msk->pm.local;
- 	WRITE_ONCE(msk->pm.addr_signal, add_addr);
- 	ret = true;
- 
--- 
-2.34.1
-
+Also, I wouldn't use unlikely() because it could harm us more than it 
+helps in this specific context (consistent with ip6_parse_tlv()).
 
