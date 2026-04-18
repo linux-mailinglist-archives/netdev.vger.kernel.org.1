@@ -1,195 +1,236 @@
-Return-Path: <netdev+bounces-279445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279446-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id xBSrNVLh4mnl/gAAu9opvQ
-	(envelope-from <netdev+bounces-279445-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 03:41:38 +0200
+	id prkGM5zo4mlrAAEAu9opvQ
+	(envelope-from <netdev+bounces-279446-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 04:12:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D67841F9EB
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 03:41:37 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10C8541FAAE
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 04:12:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 58130300C330
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 01:41:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2DC6E303A251
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 02:12:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03429285CBC;
-	Sat, 18 Apr 2026 01:41:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC734271A71;
+	Sat, 18 Apr 2026 02:12:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="RlxsR6Xp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RNJ3/bl/"
 X-Original-To: netdev@vger.kernel.org
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f44.google.com (mail-ua1-f44.google.com [209.85.222.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 055981482E8;
-	Sat, 18 Apr 2026 01:41:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DF8A199E89
+	for <netdev@vger.kernel.org>; Sat, 18 Apr 2026 02:12:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776476495; cv=none; b=CHAXF5A4nuI3iLsYmsfuI3OrCldFhbpScU5W6MLJTTBiKvsfP9VaP+XvTmA1lqnIfaeOAmRb18NiR2/JpwwZNhdALB3wtqoTw2xf4TYnrfay3StwpXSOuOAuBlII3ajJv6j+eF/ezTkw9yxQWaF1rkt7k/uFUnpskuR0hz/xMZY=
+	t=1776478361; cv=none; b=YtgICiSibW86k0j45P0FbzxJpv1pHqe5R18mSkvq6Dd9Qv/nrkE6o6zq0Ioh2R7JQZiVrNFodcEYDRLv7vAILQ2AUFype8IYbCYLDolXiLLz/SrtulKBLT5UQvsY5IgvYWVGjCDH1TEZvebJi7qbOlGbpJMFz+fgL0UPkcnic7o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776476495; c=relaxed/simple;
-	bh=4Xq/cJ44OWUumZgX9+G0hWRKks70N9NUDwCz6AXZO0s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SCuUCiVQm6TlmtgiKJbzTLyEtnCAmy7BUdWQBCL8TRrPid5jeaOFIuHceMV11Sx+CsjSweI0fLooOQsIdecWh66iF/LgutkJmD39LtxfJj8x3KXMnG51HmpKGAHgPC70U9JofQGLU5+DF2y82Sq7igXJTim54WUSo/7PfLISHXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=RlxsR6Xp; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=fiDBBu8GV/YzXljOLTx4bQ8tBIaNQqliR7ja2BAoEG8=; 
-	b=RlxsR6XpHCrPOsfn0YizHn4lPoG5Gey6/RiARcLFHCoa0IiE416XkYBhi44XtUdutB3j9gYWC/T
-	kTjGkQO6pM3cv8cr+16qZa6eu6elOWEbLl5+B3ZGbz4GsvDTIfQioXZTG2Eu5Ldcm5OFkwem9AsCh
-	P+SPOeEjD36DwOhDXHhf6EhWOzIIuwI1b4UJcW2+kDbWOEXs96g64uqerXmhZ1LpMry/hbPDkhuRW
-	I97TlZ7vlce5nSdUJikEyU/I0JjKyRp0ZGGU8ytgDGtmN4CLkRHpa0zExnFmH3S5v4NWSzS7absEC
-	uzNcNRAoX1n4kji3NR/R8+vl/iMwBTIB3X6Q==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1wDugT-006wBY-2b;
-	Sat, 18 Apr 2026 09:41:22 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 18 Apr 2026 09:41:21 +0800
-Date: Sat, 18 Apr 2026 09:41:21 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Tejun Heo <tj@kernel.org>
-Cc: Thomas Graf <tgraf@suug.ch>, David Vernet <void@manifault.com>,
-	Andrea Righi <arighi@nvidia.com>,
-	Changwoo Min <changwoo@igalia.com>,
-	Emil Tsalapatis <emil@etsalapatis.com>,
-	linux-crypto@vger.kernel.org, sched-ext@lists.linux.dev,
-	linux-kernel@vger.kernel.org, Florian Westphal <fw@strlen.de>,
-	netdev@vger.kernel.org, NeilBrown <neil@brown.name>
-Subject: [v2 PATCH] rhashtable: Restore insecure_elasticity toggle
-Message-ID: <aeLhQRFPEY24ySIq@gondor.apana.org.au>
-References: <aeGCMkdg5Fgv8UMS@gondor.apana.org.au>
- <aeGElQ-TcCclEHwo@slm.duckdns.org>
- <aeGIsGi9fBqu9EZT@gondor.apana.org.au>
- <aeHjjGEhlikSsxCX@slm.duckdns.org>
- <aeHmeAz-Z-Rx2MqX@gondor.apana.org.au>
- <aeJe8oIyYUi-NtCQ@slm.duckdns.org>
- <aeLT8eB_xfzLxqbI@gondor.apana.org.au>
- <aeLV6aDhM0-S4oQ1@slm.duckdns.org>
- <aeLWH_HgSHF4buiJ@gondor.apana.org.au>
- <aeLgjAeJuidWNy3N@gondor.apana.org.au>
+	s=arc-20240116; t=1776478361; c=relaxed/simple;
+	bh=rhiyBegILqA56v+BQgWvBziQDat7coaEwK1s5vvGJuE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MmS1lF2oa2q0lzAcqjlb6yNnmaQsmIhBUyDrLTOG/p3D0grYL07nlizGezA/m8510JAphwwCc4xTZrAW1/zN8y/KSamu04QlZyqQSxNAJF0wKqM7BBvOA1YEC4/tuVCfhys8InRv0nzTivwCcLmlWO6hFLpbmjXwVrhNRU30mZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RNJ3/bl/; arc=none smtp.client-ip=209.85.222.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ua1-f44.google.com with SMTP id a1e0cc1a2514c-94aaa5d3bfcso774009241.3
+        for <netdev@vger.kernel.org>; Fri, 17 Apr 2026 19:12:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776478359; x=1777083159; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=qtENGTAsRspA6IxTYSLNva2FaUMU08Xqs7csgDMJzvc=;
+        b=RNJ3/bl/FCAdkzi+WRMCbSbYAwURhtQ/eStF49wBcWARfXIDNYidqNrHlp5fviDFWe
+         rDJKUbPdORNWKUp2jda635/yVWMQ7b0Q3Xr+azyf924GMxA9ztFajwsYwGanG9/qPByt
+         aMZlbASpGOnL3dFF6IUnr4KSOFnkp+fytwZwahXq18GWwnyc6wgFPbi5C2RVumha6V6+
+         cYQdWpmCM+ZuGdf0dyC35V5urUSUmvCl5b3lZGsOrsEcppdn6kFOA5H0Oo96eYkl0Asn
+         pkUP9xTi4NGEoZBHghKdGoRW+S2I1fttAX5W+mpqitoXaOIKcsnBnVbdfGiAyOf6gAUQ
+         O7UA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776478359; x=1777083159;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qtENGTAsRspA6IxTYSLNva2FaUMU08Xqs7csgDMJzvc=;
+        b=awFR694YdXA2p9RZNXMlwNFK/e+ooL/CctEobwI7n9uu6Xbp3YM4iyyFXLBZ6KYq4f
+         6oO8Xx0wyHjYYHSnbCM+3abk7/nxbEhWufRpk6PqMGqabg5Zybq4/I4OCkR4ok8s8S+w
+         9KUTaHVCIAxFQe9452/0cjOPyZDpZoIlvPVYvLXIW75nnVsTJ80JXjwvm50pHyf6AMfw
+         odSLKdrLU49DJtW5LxvUGrZqthXutNVJh5sGt/jSHJD7TYCZt/kOBONVNbvBzSSkgLQp
+         GWEAxpDvCzMpUpEPMoTAX+vF00oYGZ0UbwKa1K5lWfvsRSTBsxwskUJTsth/ePTparpt
+         sRhQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/GDcVh7Ct73V4og+rwl8xLmLGd/yTqH38nD0wWHYnbrQTwoE00aG1INoNQZZ4yEs0Ptf2NrFY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw3jBqi3MwwyGbdjUSF+d1/hGDFfI37T93X8fpkCLRRnjorAxV2
+	qIDo183RWpeZI5moxrPpFYj208bQI6B+scZD1BGEFzMSEgsqw1x9Rljv
+X-Gm-Gg: AeBDieswAkJG3VRjwjR2OLo799dLSjnJ8qIahNRKati7QHfW54/29BS2/pTEw2yIl3u
+	gM9lb/DWcwp8guYxCBxY1FECQS+Bojdjq1PyJADk23j8sNr8WggXcvz0T9/GZ0wrA2O0qZJsEMx
+	lB0WvBXN6x8/uPsdS8fCxCMbB3QhdIXyE7zMyGoVOyuTEJJxWVLLEeo1tvFQnmPbjgG4boP29rL
+	0XBs+MpI6QU6hK4YSt4vfUfvQHD1l2+iVHmwUmixFzX9bNXrEHMLbPc47auvi6t4b21R4GPVLmg
+	+aBtNwaPOWOc3o/Mr56wA070KNsJ2HxuArX1G9XXylpjgw+G9tRldJR1gOhTY2twOtZ2ZJcYybu
+	Ui9qu8Bmbei7mnGiiI5Ll3CDFphQRVKt8leotVtkuRgODU7G7EPvVJAs+UHgnHl74PgXpMwBENR
+	8J6FJE/o2Qadvv/3x81yaaVeShL7QQud/i
+X-Received: by 2002:a05:6102:f9e:b0:609:4d86:77b with SMTP id ada2fe7eead31-616f73fb077mr2761601137.24.1776478359242;
+        Fri, 17 Apr 2026 19:12:39 -0700 (PDT)
+Received: from nixos ([2804:d59:7f1c:1e00:868c:c43d:f565:df5b])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-95890bcbbc7sm1614597241.9.2026.04.17.19.12.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Apr 2026 19:12:38 -0700 (PDT)
+From: Gustavo Arantes <dev.gustavoa@gmail.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>,
+	nic_swsd@realtek.com
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] r8169: report per-queue statistics through netdev qstats
+Date: Fri, 17 Apr 2026 23:12:32 -0300
+Message-ID: <20260418021232.5425-1-dev.gustavoa@gmail.com>
+X-Mailer: git-send-email 2.51.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aeLgjAeJuidWNy3N@gondor.apana.org.au>
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[apana.org.au,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[gondor.apana.org.au:s=h01];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-279445-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gondor.apana.org.au:+];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[herbert@gondor.apana.org.au,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-279446-lists,netdev=lfdr.de];
 	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,realtek.com];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_NEQ_ENVFROM(0.00)[devgustavoa@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	NEURAL_HAM(-0.00)[-0.993];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[gondor.apana.org.au:dkim,gondor.apana.org.au:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6D67841F9EB
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 10C8541FAAE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This one actually compiles.
----8<---
-Some users of rhashtable cannot handle insertion failures, and
-are happy to accept the consequences of a hash table that having
-very long chains.
+r8169 maintains synchronized per-CPU software counters for packet and byte
+accounting, but does not expose them through the netdev qstats interface.
 
-Restore the insecure_elasticity toggle for these users.  In
-addition to disabling the chain length checks, this also removes
-the emergency resize that would otherwise occur when the hash
-table occupancy hits 100% (an async resize is still scheduled
-at 75%).
+Add netdev_stat_ops callbacks and report the existing software counters
+through queue 0 for both Rx and Tx. Provide zero base stats so device-scope
+qstats report the packet and byte counters as supported and match the
+existing RTNL statistics.
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Gustavo Arantes <dev.gustavoa@gmail.com>
+---
+ drivers/net/ethernet/realtek/r8169_main.c | 70 +++++++++++++++++++++++
+ 1 file changed, 70 insertions(+)
 
-diff --git a/include/linux/rhashtable-types.h b/include/linux/rhashtable-types.h
-index 015c8298bebc..72082428d6c6 100644
---- a/include/linux/rhashtable-types.h
-+++ b/include/linux/rhashtable-types.h
-@@ -49,6 +49,7 @@ typedef int (*rht_obj_cmpfn_t)(struct rhashtable_compare_arg *arg,
-  * @head_offset: Offset of rhash_head in struct to be hashed
-  * @max_size: Maximum size while expanding
-  * @min_size: Minimum size while shrinking
-+ * @insecure_elasticity: Set to true to disable chain length checks
-  * @automatic_shrinking: Enable automatic shrinking of tables
-  * @hashfn: Hash function (default: jhash2 if !(key_len % 4), or jhash)
-  * @obj_hashfn: Function to hash object
-@@ -61,6 +62,7 @@ struct rhashtable_params {
- 	u16			head_offset;
- 	unsigned int		max_size;
- 	u16			min_size;
-+	bool			insecure_elasticity;
- 	bool			automatic_shrinking;
- 	rht_hashfn_t		hashfn;
- 	rht_obj_hashfn_t	obj_hashfn;
-diff --git a/include/linux/rhashtable.h b/include/linux/rhashtable.h
-index 0480509a6339..7def3f0f556b 100644
---- a/include/linux/rhashtable.h
-+++ b/include/linux/rhashtable.h
-@@ -821,14 +821,15 @@ static __always_inline void *__rhashtable_insert_fast(
- 		goto out;
- 	}
+diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+index 791277e750ba..9d833b446383 100644
+--- a/drivers/net/ethernet/realtek/r8169_main.c
++++ b/drivers/net/ethernet/realtek/r8169_main.c
+@@ -5175,6 +5175,75 @@ rtl8169_get_stats64(struct net_device *dev, struct rtnl_link_stats64 *stats)
+ 	pm_runtime_put_noidle(&pdev->dev);
+ }
  
--	if (elasticity <= 0)
-+	if (elasticity <= 0 && !params.insecure_elasticity)
- 		goto slow_path;
++static void rtl8169_fetch_sw_stats(struct net_device *dev,
++				   struct netdev_queue_stats_rx *rx,
++				   struct netdev_queue_stats_tx *tx)
++{
++	const struct pcpu_sw_netstats *stats;
++	unsigned int start;
++	int cpu;
++
++	for_each_possible_cpu(cpu) {
++		u64 rx_packets, rx_bytes, tx_packets, tx_bytes;
++
++		stats = per_cpu_ptr(dev->tstats, cpu);
++		do {
++			start = u64_stats_fetch_begin(&stats->syncp);
++			rx_packets = u64_stats_read(&stats->rx_packets);
++			rx_bytes = u64_stats_read(&stats->rx_bytes);
++			tx_packets = u64_stats_read(&stats->tx_packets);
++			tx_bytes = u64_stats_read(&stats->tx_bytes);
++		} while (u64_stats_fetch_retry(&stats->syncp, start));
++
++		rx->packets += rx_packets;
++		rx->bytes += rx_bytes;
++		tx->packets += tx_packets;
++		tx->bytes += tx_bytes;
++	}
++}
++
++static void rtl8169_get_queue_stats_rx(struct net_device *dev, int idx,
++				       struct netdev_queue_stats_rx *rx)
++{
++	struct netdev_queue_stats_tx tx = {};
++
++	if (idx)
++		return;
++
++	rx->packets = 0;
++	rx->bytes = 0;
++	rtl8169_fetch_sw_stats(dev, rx, &tx);
++}
++
++static void rtl8169_get_queue_stats_tx(struct net_device *dev, int idx,
++				       struct netdev_queue_stats_tx *tx)
++{
++	struct netdev_queue_stats_rx rx = {};
++
++	if (idx)
++		return;
++
++	tx->packets = 0;
++	tx->bytes = 0;
++	rtl8169_fetch_sw_stats(dev, &rx, tx);
++}
++
++static void rtl8169_get_base_stats(struct net_device *dev,
++				   struct netdev_queue_stats_rx *rx,
++				   struct netdev_queue_stats_tx *tx)
++{
++	rx->packets = 0;
++	rx->bytes = 0;
++	tx->packets = 0;
++	tx->bytes = 0;
++}
++
++static const struct netdev_stat_ops rtl8169_stat_ops = {
++	.get_queue_stats_rx	= rtl8169_get_queue_stats_rx,
++	.get_queue_stats_tx	= rtl8169_get_queue_stats_tx,
++	.get_base_stats		= rtl8169_get_base_stats,
++};
++
+ static void rtl8169_net_suspend(struct rtl8169_private *tp)
+ {
+ 	netif_device_detach(tp->dev);
+@@ -5615,6 +5684,7 @@ static int rtl_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
  
- 	data = ERR_PTR(-E2BIG);
- 	if (unlikely(rht_grow_above_max(ht, tbl)))
- 		goto out_unlock;
- 
--	if (unlikely(rht_grow_above_100(ht, tbl)))
-+	if (unlikely(rht_grow_above_100(ht, tbl)) &&
-+	    !params.insecure_elasticity)
- 		goto slow_path;
- 
- 	/* Inserting at head of list makes unlocking free. */
-diff --git a/lib/rhashtable.c b/lib/rhashtable.c
-index 6074ed5f66f3..fb2b7bc137ba 100644
---- a/lib/rhashtable.c
-+++ b/lib/rhashtable.c
-@@ -538,7 +538,7 @@ static void *rhashtable_lookup_one(struct rhashtable *ht,
- 		return NULL;
- 	}
- 
--	if (elasticity <= 0)
-+	if (elasticity <= 0 && !ht->p.insecure_elasticity)
- 		return ERR_PTR(-EAGAIN);
- 
- 	return ERR_PTR(-ENOENT);
-@@ -568,7 +568,8 @@ static struct bucket_table *rhashtable_insert_one(
- 	if (unlikely(rht_grow_above_max(ht, tbl)))
- 		return ERR_PTR(-E2BIG);
- 
--	if (unlikely(rht_grow_above_100(ht, tbl)))
-+	if (unlikely(rht_grow_above_100(ht, tbl)) &&
-+	    !ht->p.insecure_elasticity)
- 		return ERR_PTR(-EAGAIN);
- 
- 	head = rht_ptr(bkt, tbl, hash);
+ 	SET_NETDEV_DEV(dev, &pdev->dev);
+ 	dev->netdev_ops = &rtl_netdev_ops;
++	dev->stat_ops = &rtl8169_stat_ops;
+ 	tp = netdev_priv(dev);
+ 	tp->dev = dev;
+ 	tp->pci_dev = pdev;
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.51.2
+
 
