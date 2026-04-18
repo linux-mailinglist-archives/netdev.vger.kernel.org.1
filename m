@@ -1,53 +1,78 @@
-Return-Path: <netdev+bounces-279545-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279551-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ULGdEH7X42krLQEAu9opvQ
-	(envelope-from <netdev+bounces-279545-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 21:11:58 +0200
+	id eOf1J/ra42l2LgEAu9opvQ
+	(envelope-from <netdev+bounces-279551-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 21:26:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5A50422072
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 21:11:57 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDDF2422157
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 21:26:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 17BF4302C6C7
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 19:10:55 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 2C6C83001F94
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 19:26:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 980A62F5A36;
-	Sat, 18 Apr 2026 19:10:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB63231AA8F;
+	Sat, 18 Apr 2026 19:26:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IOdHL59l"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ByZsa5nj"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7482113C918;
-	Sat, 18 Apr 2026 19:10:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B88B72233A;
+	Sat, 18 Apr 2026 19:26:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776539453; cv=none; b=l24OD5krh1unx3Hn7TwM9wYsof2eLATV/Mz7F10Xv9UGGx9NYzFNYWXDP8nOCZAcDCvrgR6iJSXww4w/Kh6CQGTvbqyw1way3QnDzN6jIay2MEfsyhPl19eqn04q7ITuxC1ET4qlKM9bVaEN83Wh2GGPE02uG3le5Sx5ZADWWFA=
+	t=1776540403; cv=none; b=kP7HARvsnae4Tg3h1F+KB7c51xIbqF4Kou1hkPCRyE5ClI2pG0UvgfbHbpibM7mSt1wxmVZGMrc37gveq1wirSbiST8sd4Sz+VX92lQg1FMSflLFFwptxziihgUdh/yR8M0KUZAwAfIjysvW/E5I6lJsymTKnHm6XMDodwjT9/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776539453; c=relaxed/simple;
-	bh=Sj5+wnQtM7E3xt0RnneBSPmJDWwVxa0EjawWxitKEM8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=m1l/rFjy/A7gpzEWsIOF25Vy6hCPQWcDDzBYjNOxf87/DcKA/Fy3fTHpiLUyhMMKJEckvSqmvhGBLLRjFHfGswr8N5oW20zu2LTmK1/hCN3QaLzXdk4jRJbMmXZbaWhRqOyX/3pUa9t9y2lHTiWEOWR7B+VXz2P13Ne6AkKQFkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IOdHL59l; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11DDCC19424;
-	Sat, 18 Apr 2026 19:10:53 +0000 (UTC)
+	s=arc-20240116; t=1776540403; c=relaxed/simple;
+	bh=DHrtp6rAT2XyegdBwkwqlJVeG5TU31X9Y2DK5NUH0N8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=dO5uggOYtaykuSd+PYZP4wPpRQKBU02SW90PpsIg0eIxCMQ4u63pta93YJt3lGSLtxKV9elTTYSvANO+o1GWMQgG8tIYMdY+K4LANykkERHE05kTCyJxFlwtsYyqK02jkERTc2wrOdcHZc8pJOQk0XOL09hhcikJwFoWXUiVNAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ByZsa5nj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99F08C19424;
+	Sat, 18 Apr 2026 19:26:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776539453;
-	bh=Sj5+wnQtM7E3xt0RnneBSPmJDWwVxa0EjawWxitKEM8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=IOdHL59lxtRAHMWVAPQCap8c8LhP0xmgFDTC1UlfDakZmeRVdzsPN7UbqxqNOzxnK
-	 3O8qjr3UDqFIhmu6CqjB9wxmXzptRv8TwzIjSSAKhlNwXXaoYU9QyIeNqsr1xqhCQn
-	 Tn1PI+D6/7GQtsNHqSOxcbZeQ9uB4c460EIT/iW+5VFpH/gJOtrdfxBEGeYf6SxhfH
-	 bMk130GiIoNzuhSuBXmC8K24etXPJDmuFetEY8eskDmbJYNZ4W8YmdpozlW7a7V/vy
-	 gGpFvM5lnZkWhaKPwt1jktFL3Rzeu3SL3S5IpSf139bdxpXIJcH8NRz7DXd3lDM8Lu
-	 TiYQQ+P+CReYw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id BA0FF380CEDD;
-	Sat, 18 Apr 2026 19:10:20 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1776540403;
+	bh=DHrtp6rAT2XyegdBwkwqlJVeG5TU31X9Y2DK5NUH0N8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=ByZsa5njLnQGk1HcrvEhP8ZtOa8XAFSNbXisIjUD9ZieDOR6ZovSZZsK1GVmFOs6j
+	 Ccv9vOzjqJZ33+st0Nrp/W1f7Wu2LKYzCXDLzs84oY/9wks5FlC0BTuLFoPtTyvH+Y
+	 ZcZQdftpYUb7vabTrbhsgrBzBxciIStY8sy3tKtjnctYfu3eYMuC2wgacguqKs/J1l
+	 tH5e+bCC5878vLcOXrTpE+EKClCQx/ewvOobz85RnCXTIzeqNV4nTIa9P5QTkU1rAh
+	 Z0v0Ye85NkjueIGGw6fI/Bicd0lqCRyTlfLaqBVa8PDcahH5YUOOSHA4QAiuxlr0bG
+	 3+cwJcawFUpFA==
+From: Jakub Kicinski <kuba@kernel.org>
+To: qingfang.deng@linux.dev
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	linux-ppp@vger.kernel.org,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	hataegu0826@gmail.com,
+	horms@kernel.org,
+	kees@kernel.org,
+	kuniyu@google.com,
+	bigeasy@linutronix.de,
+	gnault@redhat.com,
+	ericwouds@gmail.com,
+	semen.protsenko@linaro.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	paulus@ozlabs.org,
+	jaco@uls.co.za,
+	carlsonj@workingcode.com,
+	wojciech.drewek@intel.com,
+	marcin.szycik@linux.intel.com
+Subject: Re: [PATCH net v6 2/2] pppoe: drop PFC frames
+Date: Sat, 18 Apr 2026 12:11:45 -0700
+Message-ID: <20260418191145.213625-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260415022456.141758-2-qingfang.deng@linux.dev>
+References: <20260415022456.141758-2-qingfang.deng@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,104 +80,91 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2 00/12] Intel Wired LAN Driver Updates 2026-04-14
- (ice, i40e, iavf, idpf, e1000e)
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177653941955.506354.7945438888789009201.git-patchwork-notify@kernel.org>
-Date: Sat, 18 Apr 2026 19:10:19 +0000
-References: 
- <20260416-iwl-net-submission-2026-04-14-v2-0-686c33c9828d@intel.com>
-In-Reply-To: 
- <20260416-iwl-net-submission-2026-04-14-v2-0-686c33c9828d@intel.com>
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- grzegorz.nitka@intel.com, aleksandr.loktionov@intel.com, horms@kernel.org,
- sx.rinitha@intel.com, zoltan.fodor@intel.com, sunithax.d.mekala@intel.com,
- lgs201920130244@gmail.com, stable@vger.kernel.org, mschmidt@redhat.com,
- paul.greenwalt@intel.com, przemyslaw.kitszel@intel.com, kmta1236@gmail.com,
- kohei@enjuk.jp, poros@redhat.com, pmenzel@molgen.mpg.de,
- rafal.romanowski@intel.com, emil.s.tantilov@intel.com,
- patryk.holda@intel.com, tactii@gmail.com, avigailx.dahan@intel.com
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-279545-lists,netdev=lfdr.de,netdevbpf];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,intel.com,gmail.com,enjuk.jp,molgen.mpg.de];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,linutronix.de,linaro.org,ozlabs.org,uls.co.za,workingcode.com,intel.com,linux.intel.com];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	TAGGED_FROM(0.00)[bounces-279551-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[27];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NO_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B5A50422072
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: EDDF2422157
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello:
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+---
+pppoe: drop PFC frames
 
-This series was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+This commit drops Protocol Field Compression (PFC) frames for PPPoE to avoid
+unaligned access exceptions caused by the network header being shifted. A
+helper function is introduced to identify compressed protocol fields.
 
-On Thu, 16 Apr 2026 17:53:24 -0700 you wrote:
-> Grzegorz updates the logic for adjusting the PTP hardware clock on E830,
-> fixing a bug that prevented adjustments below S32_MAX/MIN nanoseconds.
-> 
-> Grzegorz and Zoli update the PCS latency settings for E825 devices at 10GbE
-> and 25GbE, improving the accuracy of timestamps based on data from
-> production hardware.
-> 
-> [...]
+> diff --git a/drivers/net/ppp/pppoe.c b/drivers/net/ppp/pppoe.c
+> --- a/drivers/net/ppp/pppoe.c
+> +++ b/drivers/net/ppp/pppoe.c
+[ ... ]
+> @@ -434,6 +434,12 @@ static int pppoe_rcv(struct sk_buff *skb, struct net_device *dev,
+>  	if (skb->len < len)
+>  		goto drop;
+>  
+> +	/* skb->data points to the PPP protocol header after skb_pull_rcsum.
+> +	 * Drop PFC frames.
+> +	 */
+> +	if (ppp_skb_is_compressed_proto(skb))
 
-Here is the summary with links:
-  - [net,v2,01/12] ice: fix 'adjust' timer programming for E830 devices
-    https://git.kernel.org/netdev/net/c/885c5e57924d
-  - [net,v2,02/12] ice: update PCS latency settings for E825 10G/25Gb modes
-    https://git.kernel.org/netdev/net/c/05567e405273
-  - [net,v2,03/12] ice: fix double free in ice_sf_eth_activate() error path
-    https://git.kernel.org/netdev/net/c/9aab1c3d7299
-  - [net,v2,04/12] ice: fix double-free of tx_buf skb
-    https://git.kernel.org/netdev/net/c/1a303baa715e
-  - [net,v2,05/12] ice: fix PHY config on media change with link-down-on-close
-    https://git.kernel.org/netdev/net/c/55e74f9ea7fe
-  - [net,v2,06/12] ice: fix ICE_AQ_LINK_SPEED_M for 200G
-    https://git.kernel.org/netdev/net/c/4a3a940059e9
-  - [net,v2,07/12] ice: fix race condition in TX timestamp ring cleanup
-    https://git.kernel.org/netdev/net/c/7c72ec18c2a4
-  - [net,v2,08/12] ice: fix potential NULL pointer deref in error path of ice_set_ringparam()
-    https://git.kernel.org/netdev/net/c/fa28351f970f
-  - [net,v2,09/12] i40e: don't advertise IFF_SUPP_NOFCS
-    https://git.kernel.org/netdev/net/c/a24162f18825
-  - [net,v2,10/12] iavf: fix wrong VLAN mask for legacy Rx descriptors L2TAG2
-    https://git.kernel.org/netdev/net/c/496d9f91062f
-  - [net,v2,11/12] idpf: fix xdp crash in soft reset error path
-    (no matching commit)
-  - [net,v2,12/12] e1000e: Unroll PTP in probe error handling
-    https://git.kernel.org/netdev/net/c/aa3f7fe40935
+Does this code safely access the PPP protocol byte?
 
-You are awesome, thank you!
+After pulling the PPPoE header, skb->data points to the inner payload.
+However, the new ppp_skb_is_compressed_proto() helper unconditionally
+dereferences skb->data[0].
+
+If a crafted PPPoE packet is received with an inner length of 0 and no
+Ethernet padding, the linear buffer might end exactly after the PPPoE header.
+In that scenario, this would read past the allocated linear buffer.
+
+Even if the inner length is greater than 0, could the payload reside entirely
+in non-linear paged fragments, causing an out-of-bounds read?
+
+Would it be safer to verify the packet has at least 1 byte and use
+pskb_may_pull() to ensure the protocol byte is in the linear region before
+inspecting it, perhaps after the pskb_trim_rcsum() call?
+
+> +		goto drop;
+> +
+>  	if (pskb_trim_rcsum(skb, len))
+>  		goto drop;
+[ ... ]
+> diff --git a/include/linux/ppp_defs.h b/include/linux/ppp_defs.h
+> --- a/include/linux/ppp_defs.h
+> +++ b/include/linux/ppp_defs.h
+[ ... ]
+> +static inline bool ppp_skb_is_compressed_proto(const struct sk_buff *skb)
+> +{
+> +	return unlikely(skb->data[0] & 0x01);
+> +}
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
