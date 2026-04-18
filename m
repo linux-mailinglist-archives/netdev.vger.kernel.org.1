@@ -1,170 +1,196 @@
-Return-Path: <netdev+bounces-279489-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279490-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6FDoLhJr42lrGgEAu9opvQ
-	(envelope-from <netdev+bounces-279489-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 13:29:22 +0200
+	id kR6cAbhw42m7GwEAu9opvQ
+	(envelope-from <netdev+bounces-279490-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 13:53:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB25C420F95
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 13:29:21 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E4AB421054
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 13:53:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 95F19300BC49
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 11:29:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 39D193029AF3
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 11:41:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDA0B34572F;
-	Sat, 18 Apr 2026 11:29:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B31CE351C10;
+	Sat, 18 Apr 2026 11:41:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i0Sibr8p"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f174.google.com (mail-dy1-f174.google.com [74.125.82.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99CD12E4274;
-	Sat, 18 Apr 2026 11:29:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7487F3446CC
+	for <netdev@vger.kernel.org>; Sat, 18 Apr 2026 11:41:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776511754; cv=none; b=iNyQ29/pgcxDI0SZ9hMpY5PC3T5dj/Sej4Brg9BiPH9S0Z61bJ5YV0nwihsIfX+i3Nb/KbHwJMag/jDovUq+QnTdgKIADk0l8wmbwfW1+xWwI4Wxj/ghWIcOYuMG5EcAWYpMTSv1TUQFQK62rFTvI1R9wTj+UXvZyt8DN/Oo9Lc=
+	t=1776512518; cv=none; b=pN7pX2luommwuDcX1PEdLdLDX4xBLIExdDCC7YEI8rojyN0EhhI4oBomuMd1/JII4JjLQWSUnTssLTBrmNkL9zbQHAL2m/lXzZxipqOyyIEq9F/xdItdbKR87w57m230OYOYzdaeEEGofoCUlbERdOr8G8iTYbSbks4E6xjQbGc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776511754; c=relaxed/simple;
-	bh=6O/pb8vvHaHRxbC+obPeX028Zh1XWHYTz00dyoHREA4=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
-	 In-Reply-To:Content-Type; b=b+MueW45HNmUaV0wxg0G7oSW09woKEgv7N/bKo1aEI2xHfHL9bDMVkbOeTjdZyrrzBmX9dZxl+e9QPwkqHtOaV9hxCYAFczlkMPSeBnaVT6oh3b8znsyyvn9SqVLqKyTDJuV3d/AHntyhOTjIK9bHXynEVWS2kyaAPwTV+hYxes=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
-Received: from mail.maildlp.com (unknown [172.18.224.107])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4fyTyX5Xc9zJ467k;
-	Sat, 18 Apr 2026 19:28:20 +0800 (CST)
-Received: from mscpeml500004.china.huawei.com (unknown [7.188.26.250])
-	by mail.maildlp.com (Postfix) with ESMTPS id BAB6C4058B;
-	Sat, 18 Apr 2026 19:29:08 +0800 (CST)
-Received: from [10.123.123.159] (10.123.123.159) by
- mscpeml500004.china.huawei.com (7.188.26.250) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Sat, 18 Apr 2026 14:29:06 +0300
-Message-ID: <d7b3a4ed-034e-a0a3-4a68-9bc5fdc6e2ff@huawei-partners.com>
-Date: Sat, 18 Apr 2026 14:29:04 +0300
+	s=arc-20240116; t=1776512518; c=relaxed/simple;
+	bh=azYuKobJHMocnVLpYPQCzIrwBdMbdZ3xLCQTUG7+zdY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EGkhu8cvwHEvkEQVFOw8ospMKJRI1WzzK8s9lCuK4Ldb0K8InqVjOMCQoKImBixSkpuD50BUr+WeiCVRh/ToiBmer39EGKo/YaloYRttdPlCwFYI4WmtuZ4uJVp/L1zQDWGRsX62COsnj1nx7KQXuTXqepBYUdFeRxKLlqqLwJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i0Sibr8p; arc=none smtp.client-ip=74.125.82.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dy1-f174.google.com with SMTP id 5a478bee46e88-2e622a9da9cso1935205eec.0
+        for <netdev@vger.kernel.org>; Sat, 18 Apr 2026 04:41:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776512516; x=1777117316; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=FBwq4gD1bEo3EkFOewwDd2AazgW/xP0JZQJa4s0yC7k=;
+        b=i0Sibr8peUSaAOSEdfBAHCCClyrG124hmRiNeIxu8niqhLazgQyL6vY+/BTxCZHWt1
+         GSVmBHgFoqxATbaVu6Y0K9hxhZFMMFAgD7aqTe/KQWCETwiPioMY7u46yzDCN9i+4y7Q
+         pV500NhEfLReec/uJulBT9l54JqQihIN57dkvNhUZyYlrBQfrLfCAZGHfOIjc2AmNOLt
+         P1zEbkbW4sPox1Njjsi5J9VaOUPxEQ7m/PNcHtk+R7WJlGDq5o7WQVdemOVQ41BO0CGe
+         JuPlIqQGpAmmFIUJJmcHq7fhWu1cnFRYeWHDgzYIac1sRMmr/bs5CXoAC3QZTyf1nrYT
+         XfGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776512516; x=1777117316;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FBwq4gD1bEo3EkFOewwDd2AazgW/xP0JZQJa4s0yC7k=;
+        b=o8P8AeBA6YAhRo+rplsEOjYKJAVBY2or0riO7OJGHC7oAfPwhXK0bwJuXQWWH/ctMQ
+         mg0pzEcyp7uSpADpkLB8Iqr0TREaUZMFj19xKe44o9ZK8Q2dxdg+2B9BNr8jR1vG8lIf
+         ICsr7q4Jhy7gEUkuWkb9XtZGX9Z9AiM8dSGlAOBQK3I44usJElugkq6v73HaMfvXWs0R
+         ukFoYyVdeBAffdFRVaBonJYxQsw+nndoJouQ0kPQp0DUfxo1ZFzvt1jTpeJ6rc8796Hc
+         j2IyizJ/PyByR46uh33ufsjodjZEKc702NNPuY5Zsf2PWV7pMuzdSQC3wdpDEQRZU1tJ
+         IAcw==
+X-Forwarded-Encrypted: i=1; AFNElJ+wMJD9lGSXcw0EG7MgW0qfkGo5W7XuGC7viGbBr7eSyMP6+lBZ9pzUfIpjpoo3Omo0lLACsjA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YznkD9jxZeNaXsBmO/iBANsxNrXteLB7egc+ADSxfoQvoN9ibZP
+	6A41HS2gAgMr/pYBXBXMnYnCFOIbqTXwomw7hVMyKotVNKczYBjdQ10H
+X-Gm-Gg: AeBDietxw6X3uBsUiXHjLA/kbDCQLr6KzkHyZmYKRcT8Qb2AC3tJ001Qktdnxi9Dhyu
+	KTAC7RIZTQljHAi7HYtLxmpl6GGYO1yKKQzsBR+UQ+Keaf/QBggCJCJLjtwdJN/9WFOD1uRa0IO
+	g7bDjpndnXmFq81jR5xnpehkfcPV+kPe3KkyH+PdRRenXeIJdvx8h5qDyszRaEJpymxiWh6Q6Mb
+	uiyLIQlml/UDYsR/GHF5CxhSn1zNFYLuopMNZqO5jI1SYMzE45bF5KpZ+i5G2ertIJlWunGUyyi
+	4gzD6hEoEuRR7tjL58kzbF+BRe46n2ZszPRKhKpLljlXMX50VYoOk4gqn6xIBtEZTm27Xhzmpfb
+	zAm0QOlfgyO+cPiXKkmFU8b9DrGvvahglT+J9Yp9Y97pIl+lmwnrje2IYxUwbsWFJgg25ZlmScX
+	kQEiYoUyqNTDH+dp8SR443YzljrmiJKd9937Qd8siFEhOvv6BpW7aOpEZJw0Y7jcm0pf149LjBz
+	cFZUOFgJYew+QIn7qf5joVy/6Hu73U=
+X-Received: by 2002:a05:7301:6085:b0:2e2:4979:eba with SMTP id 5a478bee46e88-2e465770d9fmr3277839eec.7.1776512516474;
+        Sat, 18 Apr 2026 04:41:56 -0700 (PDT)
+Received: from efaec68ba852.tailc0aff1.ts.net ([206.206.192.132])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2e53d9b056fsm8162284eec.29.2026.04.18.04.41.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 18 Apr 2026 04:41:55 -0700 (PDT)
+From: Weiming Shi <bestswngs@gmail.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Roopa Prabhu <roopa@nvidia.com>,
+	netdev@vger.kernel.org,
+	Xiang Mei <xmei5@asu.edu>,
+	Weiming Shi <bestswngs@gmail.com>
+Subject: [PATCH net v2] vxlan: fix NULL vn6_sock dereference in vxlan_igmp_join() and vxlan_igmp_leave()
+Date: Sat, 18 Apr 2026 04:41:12 -0700
+Message-ID: <20260418114110.2602784-3-bestswngs@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v4 01/19] landlock: Support socket access-control
-Content-Language: ru
-From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-To: =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack3000@gmail.com>
-CC: <mic@digikod.net>, <gnoack@google.com>, <willemdebruijn.kernel@gmail.com>,
-	<matthieu@buffet.re>, <linux-security-module@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <netfilter-devel@vger.kernel.org>,
-	<yusongping@huawei.com>, <artem.kuzin@huawei.com>,
-	<konstantin.meskhidze@huawei.com>
-References: <20251118134639.3314803-1-ivanov.mikhail1@huawei-partners.com>
- <20251118134639.3314803-2-ivanov.mikhail1@huawei-partners.com>
- <20251122.e645d2f1b8a1@gnoack.org>
- <af464773-b01b-f3a4-474d-0efb2cfae142@huawei-partners.com>
-In-Reply-To: <af464773-b01b-f3a4-474d-0efb2cfae142@huawei-partners.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: lhrpeml100010.china.huawei.com (7.191.174.197) To
- mscpeml500004.china.huawei.com (7.188.26.250)
-X-Spamd-Result: default: False [1.54 / 15.00];
+X-Spamd-Result: default: False [6.34 / 15.00];
+	SEM_URIBL(3.50)[asu.edu:email];
 	SUSPICIOUS_RECIPS(1.50)[];
-	DMARC_POLICY_QUARANTINE(1.50)[huawei-partners.com : SPF not aligned (relaxed), No valid DKIM,quarantine];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
 	MAILLIST(-0.15)[generic];
+	BAD_REP_POLICIES(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-279489-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-279490-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[nvidia.com,vger.kernel.org,asu.edu,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[digikod.net,google.com,gmail.com,buffet.re,vger.kernel.org,huawei.com];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ivanov.mikhail1@huawei-partners.com,netdev@vger.kernel.org];
+	R_DKIM_ALLOW(0.00)[gmail.com:s=20251104];
+	GREYLIST(0.00)[pass,body];
+	TO_DN_SOME(0.00)[];
+	DMARC_POLICY_ALLOW(0.00)[gmail.com,none];
 	MIME_TRACE(0.00)[0:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	R_DKIM_NA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: BB25C420F95
-X-Rspamd-Action: no action
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_SPAM(0.00)[0.963];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	PRECEDENCE_BULK(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	R_SPF_ALLOW(0.00)[+ip6:2600:3c0a:e001:db::/64:c];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[asu.edu:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 4E4AB421054
+X-Rspamd-Action: add header
 X-Rspamd-Server: lfdr
+X-Spam: Yes
 
-On 11/22/2025 2:13 PM, Mikhail Ivanov wrote:
-> On 11/22/2025 1:49 PM, Günther Noack wrote:
->> On Tue, Nov 18, 2025 at 09:46:21PM +0800, Mikhail Ivanov wrote:
->>> +/**
->>> + * struct landlock_socket_attr - Socket protocol definition
->>> + *
->>> + * Argument of sys_landlock_add_rule().
->>> + */
->>> +struct landlock_socket_attr {
->>> +    /**
->>> +     * @allowed_access: Bitmask of allowed access for a socket protocol
->>> +     * (cf. `Socket flags`_).
->>> +     */
->>> +    __u64 allowed_access;
->>> +    /**
->>> +     * @family: Protocol family used for communication
->>> +     * (cf. include/linux/socket.h).
->>> +     */
->>> +    __s32 family;
->>> +    /**
->>> +     * @type: Socket type (cf. include/linux/net.h)
->>> +     */
->>> +    __s32 type;
->>> +    /**
->>> +     * @protocol: Communication protocol specific to protocol family 
->>> set in
->>> +     * @family field.
->>
->> This is specific to both the @family and the @type, not just the @family.
->>
->>> From socket(2):
->>
->>    Normally only a single protocol exists to support a particular
->>    socket type within a given protocol family.
->>
->> For instance, in your commit message above the protocol in the example
->> is IPPROTO_TCP, which would imply the type SOCK_STREAM, but not work
->> with SOCK_DGRAM.
-> 
-> You're right.
-> 
+vxlan_sock_add() tolerates IPv6 socket creation failure with
+-EAFNOSUPPORT (e.g. ipv6.disable=1), leaving vn6_sock as NULL while
+successfully creating vn4_sock. vxlan_igmp_join() and
+vxlan_igmp_leave() then crash when they dereference the NULL vn6_sock
+for VNI filter entries with IPv6 multicast groups:
 
-I revised the socket(2) semantics and this part is about that kernel
-maps (family, type, 0) to the default protocol of given family and type.
-Eg. (AF_INET, SOCK_STREAM, 0) is mapped to (AF_INET, SOCK_STREAM,
-IPPROTO_TCP). I would like to clarify that such mapping is taking place
-in landlock_socket_attr.protocol field doc.
+ Oops: general protection fault, probably for non-canonical address
+      0xdffffc0000000002: 0000 [#1] SMP KASAN NOPTI
+ KASAN: null-ptr-deref in range [0x0000000000000010-0x0000000000000017]
+ RIP: 0010:vxlan_igmp_join (drivers/net/vxlan/vxlan_multicast.c:40)
+ Call Trace:
+  vxlan_multicast_join (drivers/net/vxlan/vxlan_multicast.c:195)
+  vxlan_open (drivers/net/vxlan/vxlan_core.c:2965)
+  __dev_open (net/core/dev.c:1704)
+  __dev_change_flags (net/core/dev.c:9781)
+  do_setlink.isra.0 (net/core/rtnetlink.c:3180)
+  rtnl_newlink (net/core/rtnetlink.c:4238)
+  rtnetlink_rcv_msg (net/core/rtnetlink.c:6921)
 
-There should be list of protocols defined per protocol family. From
-socket(2):
-	The domain argument specifies a communication domain.
-	...
-	The protocol number to use is specific to the “communication
-	domain” in which communication is to take place.
+Skip the IPv6 multicast join/leave when vn6_sock is NULL, consistent
+with how vxlan_sock_add() tolerates missing IPv6 support.
 
-Such mapping allows to define strange socket rules if setting @type=-1.
-For example:
-	struct landlock_socket_attr attr = {
-		.family = AF_INET,
-		.type = -1,
-		.protocol = 0,
-	};
+Fixes: f9c4bb0b245c ("vxlan: vni filtering support on collect metadata device")
+Reported-by: Xiang Mei <xmei5@asu.edu>
+Signed-off-by: Weiming Shi <bestswngs@gmail.com>
+---
+v2:
+  - drop sock4 NULL checks 
 
-This definition corresponds to (AF_INET, SOCK_STREAM, 0->IPPROTO_TCP)
-and to (AF_INET, SOCK_DGRAM, 0->IPPROTO_UDP).
+ drivers/net/vxlan/vxlan_multicast.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-I don't see this as a bad thing as far as there is proper documentation
-for landlock_socket_attr.
+diff --git a/drivers/net/vxlan/vxlan_multicast.c b/drivers/net/vxlan/vxlan_multicast.c
+index a7f2d67dc61b..e6aa5ab1c939 100644
+--- a/drivers/net/vxlan/vxlan_multicast.c
++++ b/drivers/net/vxlan/vxlan_multicast.c
+@@ -37,6 +37,9 @@ int vxlan_igmp_join(struct vxlan_dev *vxlan, union vxlan_addr *rip,
+ 	} else {
+ 		struct vxlan_sock *sock6 = rtnl_dereference(vxlan->vn6_sock);
+ 
++		if (!sock6)
++			return 0;
++
+ 		sk = sock6->sock->sk;
+ 		lock_sock(sk);
+ 		ret = ipv6_stub->ipv6_sock_mc_join(sk, ifindex,
+@@ -71,6 +74,9 @@ int vxlan_igmp_leave(struct vxlan_dev *vxlan, union vxlan_addr *rip,
+ 	} else {
+ 		struct vxlan_sock *sock6 = rtnl_dereference(vxlan->vn6_sock);
+ 
++		if (!sock6)
++			return 0;
++
+ 		sk = sock6->sock->sk;
+ 		lock_sock(sk);
+ 		ret = ipv6_stub->ipv6_sock_mc_drop(sk, ifindex,
+-- 
+2.43.0
+
 
