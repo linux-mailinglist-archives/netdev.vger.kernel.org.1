@@ -1,205 +1,239 @@
-Return-Path: <netdev+bounces-279505-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279506-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2IMgOFSL42lbIQEAu9opvQ
-	(envelope-from <netdev+bounces-279505-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 15:47:00 +0200
+	id KHDSCBSR42mvIgEAu9opvQ
+	(envelope-from <netdev+bounces-279506-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 16:11:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 472DB421402
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 15:47:00 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16A7442149B
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 16:11:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D2387300F5E4
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 13:46:58 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id EBBC23007AD6
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 14:11:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BA9B288517;
-	Sat, 18 Apr 2026 13:46:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACC44386C19;
+	Sat, 18 Apr 2026 14:11:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g0/qo2VY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eZyEL/1F"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B03A12CD8B
-	for <netdev@vger.kernel.org>; Sat, 18 Apr 2026 13:46:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3310B386C04
+	for <netdev@vger.kernel.org>; Sat, 18 Apr 2026 14:11:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776520018; cv=none; b=m70W/D9F7mxuZaWQPOomECQUN+VLL67S1n7YlcRDxQ2VA6HWgAXdhs1fQ98ffrcZ56KkUVJAmvAzY1d0xjd/cdoJITB5y3G80pF7rzi4nQ6ChcTRnRujZQr0KIlzoPFE5nqc3aAUYK7aee+npcD/fznQsEDkfE+MdlrbnR6oNyE=
+	t=1776521484; cv=none; b=kn+2d5/U5GvDVcY9p+5gfX1lJeAn4yi5WodEs1eON3w6G8xlZb7XGyTQ8ZTr6oTjjDQ9/1yGOrCpHPoQTqnOFoiLN1rQlqfVih+SsB5arStA0zU8f2Ck1YoJml1N8oGH/iiZXRBV/LCbKdrLaA6aCHWnxKQkOHNarAqDmNSAffM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776520018; c=relaxed/simple;
-	bh=/GE2h6pIcUFHsCAkC9Y5NQGn+nlHTF2BZ0r4HxmVlJ4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XJZfcon7n/SAaSZd8xD0SVQDiSmOa2VM9gOS5iLTAm3rx2SUP7FBECmG1XSVFcd01BQ1r2b//7qnsYamODsdl83yCNq7XHhxm98Xn+VmvKa5jtKzQYPFq/0jGTeym7OqPJa1P2pA3AkH+4j+qtROtFMFFnQzkUveJgjlyIcfxhw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g0/qo2VY; arc=none smtp.client-ip=209.85.128.49
+	s=arc-20240116; t=1776521484; c=relaxed/simple;
+	bh=I0az/gxWNWRojxzwlp4c7cgSeHVy/+2ZpNHP43t2+TU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=gfzcDA/ZxgZ27J8IEYquhR6aaHKLaX56FJO/UXKUBZ58h/bCXv0Qju1dabatY+SDkgEwFvbdmXseECSpuxkTxi+a+Vuoyal6L6EFUBP6T2+hP63WtCeRoB76t5SKAnuf0LdRHRk87Q74XkwqE8WtCrszJC8r5iiumCjRzp7YBTg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eZyEL/1F; arc=none smtp.client-ip=209.85.222.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-48909558b3aso1990785e9.0
-        for <netdev@vger.kernel.org>; Sat, 18 Apr 2026 06:46:56 -0700 (PDT)
+Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-8cfd122d78fso252192585a.3
+        for <netdev@vger.kernel.org>; Sat, 18 Apr 2026 07:11:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776520015; x=1777124815; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Q2e4G/AFBNXmY50o2x5RV8tR64rvCCfZoxyprNIdgU4=;
-        b=g0/qo2VY6vCcyjilIc86ego5oP5T49A7ZvMkjOvoLeFbixRLY5xwtBe9bFE0vSTW/c
-         PGXu34/2wpreO38EJKZmocuTmSsh+g0qXXmJGRy1QlCptYAB/2PxnbyGzEaTAo8FkNma
-         oLSXkBRU19gywPF9NUVGTlvcR1dILvrD18mXC+RkU0uueb2excfcq00G3ohUg1OMO+Hh
-         6JAQVMem9xSOKMGe7e86BFFomluSEKw9+IkI0RNC9jTRFgp7MFCg+q5cmdGCu1sf7IPC
-         z/Tunga8x46HDqZnktlREWfCjn8pxZ5JmbvK3MJwqPeu+SbM1jJbSIiVjjmy4uaA/GoV
-         Pziw==
+        d=gmail.com; s=20251104; t=1776521482; x=1777126282; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6smO5yl2bUfwH7kRsW449RY4L+N7gHn/VFYMUm3A7uY=;
+        b=eZyEL/1FWlG2DyxEAhqoFgPh5NAQBvm2HH0bBHYA4uCXok3dz/VqXuUnDqMfGoMzeP
+         THgHQ0YzKe7ADXAsk7/J70qP5tomDHlEkGMWW9pHqp49/2gwH1c3OssYEgL3gHLG/RhZ
+         Zcup9X0pNa5AczOpr11wGTl/6fK7pPpt35/7abdobvuUiob+uF2xOM8AvnFNzexeTNf2
+         0xzEOwjjHNIyM2X2nmbLpQYFI0chuklcI5qHwaEbJYVMm/QOPlFXQynSHxOvdX6CyGsg
+         yQDROhNBERyb3W/KkkIHIvsIb6jiTTJenRiROrVSy2DfMgq+X2vS+i1hun72plbh3Ppe
+         c5Mg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776520015; x=1777124815;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Q2e4G/AFBNXmY50o2x5RV8tR64rvCCfZoxyprNIdgU4=;
-        b=U+Ij8sLPZyDvikPlj1+mbC9p3jNSQvOCyHtRRfYsghmIv+/6fEc1ZlQAbMVxyJzx8d
-         UFfzLaKClpNrF/7WRXO+HuQv22ru1JF7cZlVQYRjrxH279aKor6p40uCPviQolOfHPgz
-         peJsbT5iVR7/y0sEBd4qpc4GHn4tdlfi7RsvXoaOQoBIVVqcnflVNQQ90TYP4CBkd0EH
-         CAl/QEGci2axjfjr5F8WOGGViSvy/UwZ1NYdFrYu9qSvAGoFLJwbe9aVUi384p3KSeAk
-         B7uN6nTDJ8Dgk74zXgkv+h56H3j48jKPZE7FH89RJO83VUsyk5k23vLyEFyWviBlYS9F
-         C5pA==
-X-Forwarded-Encrypted: i=1; AFNElJ8lyQBUMHMoWJvdIA4yjcKb6dHNjjDR7vodWwCW36YUqSwCxqvU8whV3WSlJK7ctSTKXfzWhgM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxzYfBFFyczcqGn/F1tqWpENe0AOmddfxJSut4vYvP86m/mo36m
-	XCkNzSbkfwEblhWHRA2RR4QuEZHNEYFxLcJME8GwRLv069GRNNK1gCZX
-X-Gm-Gg: AeBDietXRFLajcIRl8OLGhZcRqOvCszSilXSrBJ0CVC37C6VewBdWdt5d9QX9YyB24v
-	VWYDenC5df7gGqnzfX2VkiC44PEEXnLagCCNJZQHWqYLc7prfAWJ2XkyFGKoOUjlcvJuhG/L/nZ
-	GapzlUTD4dDDLssHs5Pv9pk0JMSMOrh3xjvFKXhSPkY++GWozrImvQxw5m9HuwFj/5zg+SZp2gm
-	d6LyOK89rpKyuJx/AffmONUb7w9fAX/TFILzfQ8pn2S/NZqpNl8HwZ56lKci+7E0/YV/a3CQ32z
-	7UHqzPoR/wybz4TVBBKo7BEfNqH4blrQ4M/ibeD6dX40QNuvwqZI8F/VOwTNhuUcuV58z/GuXQy
-	yuvXsJ2Khk4xE/HU7DHlwVGYcPPpUnV2Qr2I4VzwoxWjfVwQoLDh+AlJ/G/9WM1VkTrTYMJj86D
-	RDLYVlw6QVZtFMf1CyF3Zx2XSgKXGHQyMyde445Zzhhqk6v9x2UlhDxab8/8rzHczenqHLkC8Ni
-	A0gYPNfJVeScLFw
-X-Received: by 2002:a05:600c:890c:b0:487:1108:48af with SMTP id 5b1f17b1804b1-488fb7389a6mr73881855e9.4.1776520015347;
-        Sat, 18 Apr 2026 06:46:55 -0700 (PDT)
-Received: from ?IPV6:2a02:a03f:a75e:9a00:5273:4380:96ab:9087? ([2a02:a03f:a75e:9a00:5273:4380:96ab:9087])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488fc140c82sm119501635e9.12.2026.04.18.06.46.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 18 Apr 2026 06:46:55 -0700 (PDT)
-Message-ID: <75d98880-afcd-43f9-8bd5-b874fa5690f5@gmail.com>
-Date: Sat, 18 Apr 2026 15:46:53 +0200
+        d=1e100.net; s=20251104; t=1776521482; x=1777126282;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=6smO5yl2bUfwH7kRsW449RY4L+N7gHn/VFYMUm3A7uY=;
+        b=ipzpF30YZT4ey6tSb/N7w9sK/+8WDHf3/L2SMxcBHDCRb0yzjbtzBR0LIGZd7BHMz8
+         VMao4qo6IHkBHipF84RnAVPfgam7sH22VLW0WcUOLOpaNytADk2HCzcC4lBkEsYVZ5MY
+         MwTPeTB/znwCPa/SThJGxDDZMV48xO7OVMRspWYPahNBF4/rV/AoTsVqb0baY5JkWQGl
+         C+rPZArtxxJ0jJXW9JB5u2dX2PYkh0GEeIhuXnQUIsGqEB+xwbDzIBcDAzjLrcrhMFqy
+         J86foRvJIVvuY8s2EbnF6TEGeJXT3tAVjpOSkark7LT5NTFQMqtvHBywbvXDAEswJ7tR
+         3Ubw==
+X-Forwarded-Encrypted: i=1; AFNElJ8vS7spKsrfeFQdw2Gew9uzsEZsbx2sfJgEPZ0URwH68y4FrdDQNNhKzWht5Jp2l+66RKL1BH4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzgEaF3AllhgeAbTJmq2BJGetS/FuO1BvdtsY9UGI0I6LQ8GVFd
+	XtueJjot9c2GMNSK0F8eL/cmtCFyCMhUMIrQtLeBPLaktWg3PfFWrC22
+X-Gm-Gg: AeBDieta2GWOf7/xVV+MLgYdN43iq8xI6FjoXQyZDXHW/0qs8XET8rpp7L1BTC3H1z8
+	J+QSOQ5vhsJe2KwD8YnPnrI/t77F+S4965x8etkzHhOw7/jBz7LFUOtIQOWF1rhNDd0BixCeRsT
+	8n2uvFCqIgSfB8dQFoD6agpA2KfstHRDGuR7I60lmcN0Y1Xq/PVCYCWQWq4vmWy3j9kNo/93WDM
+	wOSgvvhMtQaxIVzWsIo3wwob8LBT/a0v5FdQHGbelUcFbPov18NJ8aStdgsvN6eEfOCd9OVwThs
+	bFkxwDLaBYi4To7v4o9RGY58HeXT7KYlea+6BQVAfl1lJ3bKV1YwXJ5cg8YMWrAqPHkFaFw3n6q
+	rhj4DqrRkE98JJp9TQKF0bYhSSnCcPw6SUSRbqxOt3h91Zu1tIDtbQMiuwo9tp0kHa86Y37qAHQ
+	eKBDBduDlocTf1HqWvoMGW1DvM0BBYuRWS0Is0G+ikSkwD1Zoj5ikhriERERA9uV+LyOH8GV6Vd
+	jdCuAurvC+pegPVzSq4Yol5uBJ+Psw=
+X-Received: by 2002:a05:620a:469e:b0:8d4:5ae1:633a with SMTP id af79cd13be357-8e791d8710dmr959218385a.42.1776521482156;
+        Sat, 18 Apr 2026 07:11:22 -0700 (PDT)
+Received: from server0 (c-68-48-65-54.hsd1.mi.comcast.net. [68.48.65.54])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8e7d94d2efcsm350046485a.38.2026.04.18.07.11.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 18 Apr 2026 07:11:21 -0700 (PDT)
+From: Michael Bommarito <michael.bommarito@gmail.com>
+To: Allison Henderson <achender@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Sharath Srinivasan <sharath.srinivasan@oracle.com>,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	rds-devel@oss.oracle.com,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH net v2] net/rds: zero per-item info buffer before handing it to visitors
+Date: Sat, 18 Apr 2026 10:10:47 -0400
+Message-ID: <20260418141047.3398203-1-michael.bommarito@gmail.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260417141916.494761-1-michael.bommarito@gmail.com>
+References: <20260417141916.494761-1-michael.bommarito@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] ipv6: Implement limits on extension header parsing
-To: Eric Dumazet <edumazet@google.com>
-Cc: Daniel Borkmann <daniel@iogearbox.net>, kuba@kernel.org,
- dsahern@kernel.org, tom@herbertland.com, willemdebruijn.kernel@gmail.com,
- idosch@nvidia.com, pabeni@redhat.com, netdev@vger.kernel.org
-References: <20260417171831.687053-1-daniel@iogearbox.net>
- <60b47924-dae4-4a10-b977-75b92e1094c0@gmail.com>
- <ae053593-907e-4891-90fb-03b4c5d8f5e1@iogearbox.net>
- <b57f31a2-456e-4727-839a-bc2f0fb07855@gmail.com>
- <CANn89i+Y0jctj8=tCHFP5jDSJBAWR=RvNfagammc-WqU6EdPRw@mail.gmail.com>
-Content-Language: en-US
-From: Justin Iurman <justin.iurman@gmail.com>
-In-Reply-To: <CANn89i+Y0jctj8=tCHFP5jDSJBAWR=RvNfagammc-WqU6EdPRw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[iogearbox.net,kernel.org,herbertland.com,gmail.com,nvidia.com,redhat.com,vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-279506-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279505-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[justiniurman@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[michaelbommarito@gmail.com,netdev@vger.kernel.org];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 472DB421402
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[oracle.com:email]
+X-Rspamd-Queue-Id: 16A7442149B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 4/18/26 15:15, Eric Dumazet wrote:
-> On Sat, Apr 18, 2026 at 5:50 AM Justin Iurman <justin.iurman@gmail.com> wrote:
->>
->> On 4/18/26 14:26, Daniel Borkmann wrote:
->>> Hi Justin,
->>>
->>> On 4/18/26 1:45 PM, Justin Iurman wrote:
->>>> On 4/17/26 19:18, Daniel Borkmann wrote:
->>> [...]
->>>>> diff --git a/net/ipv6/sysctl_net_ipv6.c b/net/ipv6/sysctl_net_ipv6.c
->>>>> index d2cd33e2698d..93f865545a7c 100644
->>>>> --- a/net/ipv6/sysctl_net_ipv6.c
->>>>> +++ b/net/ipv6/sysctl_net_ipv6.c
->>>>> @@ -135,6 +135,14 @@ static struct ctl_table ipv6_table_template[] = {
->>>>>            .extra1        = SYSCTL_ZERO,
->>>>>            .extra2        = &flowlabel_reflect_max,
->>>>>        },
->>>>> +    {
->>>>> +        .procname    = "max_ext_hdrs_number",
->>>>> +        .data        = &init_net.ipv6.sysctl.max_ext_hdrs_cnt,
->>>>> +        .maxlen        = sizeof(int),
->>>>> +        .mode        = 0644,
->>>>> +        .proc_handler    = proc_dointvec_minmax,
->>>>> +        .extra1        = SYSCTL_ONE,
->>>>> +    },
->>>>>        {
->>>>>            .procname    = "max_dst_opts_number",
->>>>>            .data        = &init_net.ipv6.sysctl.max_dst_opts_cnt,
->>>>
->>>> NACKed-by: Justin Iurman <justin.iurman@gmail.com>
->>>>
->>>> +1000 on the need, but NAK on the way it is done. IMO, we don't want
->>>> yet-another-sysctl for that. Instead, we have (well, not yet, but it's
->>>> about time) this series [1] to enforce ordering and occurrences of
->>>> Extension Headers, which is based on an IETF draft [2] (FYI, draft-
->>>> ietf-6man-eh-limits is dead). I think we should enforce ordering and
->>>> occurrences in this code path too, instead of relying on a sysctl.
->>>> Let's keep both code paths consistent.
->>
->> Hi Daniel,
->>
->>> Hm, that series [1] should probably go to net instead of net-next, but atm
->>
->> +1, would make sense.
->>
->>> hasn't moved since a month. I'd still think max_ext_hdrs_number would be
->>> useful given it has less complexity also for stable, but I guess ultimately
->>> up to maintainers..
->>
->> In the short term, I agree. What worries me is that we end up with a
->> redundant, or even useless, sysctl once the other series is applied,
->> which will only increase user confusion.
-> 
-> Given the amount of bugs in this code, a sysctl is safe and quire reasonable.
-> 
-> No one will object when it is eventually removed (or has no action)
-> 
-> For the record,  I approve Daniel patch.
+rds_for_each_conn_info() and rds_walk_conn_path_info() both hand a
+caller-allocated on-stack u64 buffer to a per-connection visitor and
+then copy the full item_len bytes back to user space via
+rds_info_copy() regardless of how much of the buffer the visitor
+actually wrote.
 
-Fair enough. If there is consensus on this patch, then let me just 
-suggest two changes:
+rds_ib_conn_info_visitor() and rds6_ib_conn_info_visitor() only
+write a subset of their output struct when the underlying
+rds_connection is not in state RDS_CONN_UP (src/dst addr, tos, sl
+and the two GIDs via explicit memsets). Several u32 fields
+(max_send_wr, max_recv_wr, max_send_sge, rdma_mr_max, rdma_mr_size,
+cache_allocs) and the 2-byte alignment hole between sl and
+cache_allocs remain as whatever stack contents preceded the visitor
+call and are then memcpy_to_user()'d out to user space.
 
-- make it clear in the sysctl description that it mainly applies to TX 
-(as opposed to the other series [1] discussed earlier that applies to RX)
+struct rds_info_rdma_connection and struct rds6_info_rdma_connection
+are the only rds_info_* structs in include/uapi/linux/rds.h that are
+not marked __attribute__((packed)), so they have a real alignment
+hole. The other info visitors (rds_conn_info_visitor,
+rds6_conn_info_visitor, rds_tcp_tc_info, ...) write all fields of
+their packed output struct today and are not known to be vulnerable,
+but a future visitor that adds a conditional write-path would have
+the same bug.
 
-- set the default to 8 (which should be the max value) instead of 32, as 
-per RFC8200, Sec. 4.1
+Reproduction on a kernel built without CONFIG_INIT_STACK_ALL_ZERO=y:
+a local unprivileged user opens AF_RDS, sets SO_RDS_TRANSPORT=IB,
+binds to a local address on an RDMA-capable netdev (rxe soft-RoCE on
+any netdev is sufficient), sendto()'s any peer on the same subnet
+(fails cleanly but installs an rds_connection in the global hash in
+RDS_CONN_CONNECTING), then calls getsockopt(SOL_RDS,
+RDS_INFO_IB_CONNECTIONS). The returned 68-byte item contains 26
+bytes of stack garbage including kernel text/data pointers:
+
+    0..7   0a 63 00 01 0a 63 00 02     src=10.99.0.1 dst=10.99.0.2
+    8..39  00 ...                      gids (memset-zeroed)
+    40..47 e0 92 a3 81 ff ff ff ff     kernel pointer (max_send_wr)
+    48..55 7f 37 b5 81 ff ff ff ff     kernel pointer (rdma_mr_max)
+    56..59 01 00 08 00                 rdma_mr_size (garbage)
+    60..61 00 00                       tos, sl
+    62..63 00 00                       alignment padding
+    64..67 18 00 00 00                 cache_allocs (garbage)
+
+Fix by zeroing the per-item buffer in both rds_for_each_conn_info()
+and rds_walk_conn_path_info() before invoking the visitor. This
+covers the IPv4/IPv6 IB visitors and hardens all current and future
+visitors against the same class of bug.
+
+No functional change for visitors that fully populate their output.
+
+Changes in v2:
+- retarget at the net tree (subject prefix "[PATCH net v2]",
+  net/rds: prefix in the title)
+- add Cc: stable@vger.kernel.org
+- pick up Reviewed-by tags from Sharath Srinivasan and
+  Allison Henderson
+
+Fixes: ec16227e1414 ("RDS/IB: Infiniband transport")
+Cc: stable@vger.kernel.org
+Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
+Reviewed-by: Sharath Srinivasan <sharath.srinivasan@oracle.com>
+Reviewed-by: Allison Henderson <achender@kernel.org>
+Assisted-by: Claude:claude-opus-4-7
+---
+ net/rds/connection.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/net/rds/connection.c b/net/rds/connection.c
+index 412441aaa298..c10b7ed06c49 100644
+--- a/net/rds/connection.c
++++ b/net/rds/connection.c
+@@ -701,6 +701,13 @@ void rds_for_each_conn_info(struct socket *sock, unsigned int len,
+ 	     i++, head++) {
+ 		hlist_for_each_entry_rcu(conn, head, c_hash_node) {
+ 
++			/* Zero the per-item buffer before handing it to the
++			 * visitor so any field the visitor does not write -
++			 * including implicit alignment padding - cannot leak
++			 * stack contents to user space via rds_info_copy().
++			 */
++			memset(buffer, 0, item_len);
++
+ 			/* XXX no c_lock usage.. */
+ 			if (!visitor(conn, buffer))
+ 				continue;
+@@ -750,6 +757,13 @@ static void rds_walk_conn_path_info(struct socket *sock, unsigned int len,
+ 			 */
+ 			cp = conn->c_path;
+ 
++			/* Zero the per-item buffer for the same reason as
++			 * rds_for_each_conn_info(): any byte the visitor
++			 * does not write (including alignment padding) must
++			 * not leak stack contents via rds_info_copy().
++			 */
++			memset(buffer, 0, item_len);
++
+ 			/* XXX no cp_lock usage.. */
+ 			if (!visitor(cp, buffer))
+ 				continue;
+-- 
+2.53.0
+
 
