@@ -1,85 +1,64 @@
-Return-Path: <netdev+bounces-279500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279501-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 3rbEEAp+42nPHgEAu9opvQ
-	(envelope-from <netdev+bounces-279500-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 14:50:18 +0200
+	id MFHuA7KA42kFHwEAu9opvQ
+	(envelope-from <netdev+bounces-279501-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 15:01:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A05FB4211B2
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 14:50:17 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5338C4211FA
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 15:01:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 40E1A302307E
-	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 12:50:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 277A0304D422
+	for <lists+netdev@lfdr.de>; Sat, 18 Apr 2026 12:59:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E195332EA2;
-	Sat, 18 Apr 2026 12:50:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA9443612FE;
+	Sat, 18 Apr 2026 12:59:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aUTQfnFD"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="oh6D9G4K"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F11103264DA
-	for <netdev@vger.kernel.org>; Sat, 18 Apr 2026 12:50:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96C59360751
+	for <netdev@vger.kernel.org>; Sat, 18 Apr 2026 12:59:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776516615; cv=none; b=mguw7abbYlfZ/GyWn4mvITtuyAnWweYr5aCGzZY/XWQ2RFmDHKRirEMaX6k3C+fbq7yOEWmtv/0P09h4k3sGSdg/6b8CbkXBALv+anc+baNPZs1+rqn9N7cr7abPo9aizxUU1sy3L1oiBMNf/RJpeNPIvRbslmKeoJk6VUvsu2o=
+	t=1776517151; cv=none; b=K4KGKu5HuRLtpucHx3e1kwdsUia4cseYwRwrlL8of8BO2dgZaB5ZqKIPlkwZDLfVW6pamenHlTMM0+GbGjlf6j7Z3PpCUfYix07zi04rjyKq/U+csJSuROflCGqCWxKU7ixU7QRv5AilHm99MQWIQzaig9O44x4vHdFeE1NQCEg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776516615; c=relaxed/simple;
-	bh=M0tXSfT7JM044VXBCzuzKbh8vX5g2KQq9XAi4sUhsAI=;
+	s=arc-20240116; t=1776517151; c=relaxed/simple;
+	bh=NACCEhgMB0fi3KwjcL+tN0Fu1vQMiLUW+qExAieSYjo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cgaZnozYM3Av92XXxCfLtlC2jvCEZFaRVUrM9/0+YtuoeJyhWl5+Na1uUB1Cag5AgVH5pNNE7+YdG1r3u3XddOUcwCKEOm+0Ns1N8FqubHV0yMzjtkScxOLFnllbVwObsAWocnJv4m3AhEfL5hiXs0Xk+C05rqh3RncejM0/e10=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aUTQfnFD; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-48909558b3aso1496745e9.0
-        for <netdev@vger.kernel.org>; Sat, 18 Apr 2026 05:50:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776516612; x=1777121412; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=HcAorhwCpH8XF2HjpZdeJJq6NDSEecmHHFm7IXbwBws=;
-        b=aUTQfnFD8LcgfaVIKdYkfkIQCj1fOGmax9AH8qlLJGXK6THfbU4mVrF6x/yztxqp6Q
-         hqsLKfumQfR+XZlbHQomG5NiWykzuRvj8yrJc/p7RWiFpgWHf1ign+DOoj4w57qpUH6T
-         +zSPjcYbHLXLKTGSgoR5KjjuJ3AQO+wyaFTPe9c3vUcLa9YxqEiNJIZiDJfsxCiYk4qO
-         lYU2xdSzwUbjIHV2GGSsPDtD48Rv/Ou52RimoTcxEf+b1f2x2KjhcemK5PtpkJ7Uvdvu
-         Q/60FFtwAhMmdaENmxejwulS3tT6aX8C5ZSGUmiL/RmRHM4QGADGh5iIl5Jey2mWZjTj
-         67BQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776516612; x=1777121412;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=HcAorhwCpH8XF2HjpZdeJJq6NDSEecmHHFm7IXbwBws=;
-        b=SXO5hR164CxP6602+P9KdxFRKM3GibzzpzejJjbO534DU8HS5DVLb5FLYVl3XthWwE
-         A/J1O0oBzxNPwkEZ7qbIj07zXVZo7le0k0BgTOyTb8ehso0M/gfeGY6n6tbRYEYNeaNZ
-         qJ22zAqvXX3WuqC/rIldiffT3FFSziYuvp2WNgZ/yZqj0tRfNN7NaiQFaG07kQ/1iZ+P
-         Vtb/BGaYXTqyeiP+loAVzX4OGLtDlrcQtm+yMcq/8KFDcNJTXfwuWAicXD5947cI3HuK
-         z7w0E5grWJ0FiR5Ud2oCkOXNEeRSWRxIFdGHrQd/VvlEauYxyeBTkoyh/nSyIx3BG4T7
-         mcpg==
-X-Forwarded-Encrypted: i=1; AFNElJ9P0HJfjO9BLwLUks/0FZI5ykJi86Lxyr6x9ybNXd0XPuvw7RGonPY48Iirdt930IwmayoZUGk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyp6S91TPmHskUFIY4jy3cF4DagQjB35J/mkzc5FIp3zILuebaW
-	Ni9Ih+BVnWEGdQQAV2JEauhnnZk3Evi7YXin/vbwioXvQaJQc9Cx6jVR
-X-Gm-Gg: AeBDies0QwMXQiszWDEXQIpuXPwHDTP71qcjq8tyOaLAhZywRASDoGONMusaekVpo3A
-	0nGxz2Ep67Td9e2SRE3k2MrE6V6MjE1o1ybEOMrelmwU5Tjo7fAvrdy8HO+Dit208PXEIQXnMKs
-	pdrBh76NhTGYHq6RYHY/XbxNv0wYtWq4UdRFsJwPzWKoHewWtc9Zu0/Y5IpN9cqE6Rqm6tjWdnp
-	9vYOh+B+MuRSr1oI+3FrKxKrQ09mxmZyr41Zs+RG8IU+ftJE9iKsEFOqRp2zlOPwbh4fPB2EcoC
-	9jApVNgilQjV4peK1YfDsiE1Nygr2vPmRNa5CE+3TwNzrLObIZmVw+pENImqZ4u743y9j3uPwda
-	LnNasga8qDJA/POEs7A7jmbr8Jf4FSEBGDm3/F+FxbH3zJlycTHdpRzWNIUo2GmawfYz9XVnouH
-	smP9R388Hyt4xl1MCF6UQBj8g38u61PS/htpakDdIornbUx8EtyuQ6PXB62Ld/z28CdZvtrm5F0
-	+L7Ye4ZQWAOWKVZ
-X-Received: by 2002:a05:600c:5252:b0:486:f9d0:aac8 with SMTP id 5b1f17b1804b1-488fb768483mr105189905e9.18.1776516612109;
-        Sat, 18 Apr 2026 05:50:12 -0700 (PDT)
-Received: from ?IPV6:2a02:a03f:a75e:9a00:5273:4380:96ab:9087? ([2a02:a03f:a75e:9a00:5273:4380:96ab:9087])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488fc0f82bbsm203612145e9.3.2026.04.18.05.50.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 18 Apr 2026 05:50:11 -0700 (PDT)
-Message-ID: <b57f31a2-456e-4727-839a-bc2f0fb07855@gmail.com>
-Date: Sat, 18 Apr 2026 14:50:11 +0200
+	 In-Reply-To:Content-Type; b=e3nIV/vAALUVo20A8Lf4aZts4rFaS/ZOE7CErkPGoq9vtZXeG9N4tzYSOSYY92b6ktus7Gqpej4PF1jTcen1M19dobeKdEJQpy5zyhrxYg0IHk5t0zD6yo7vG9aqjDa6wOUo64B6ToXzg5PTryzAErDYvkkPza9jamxwRyb3LN0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=oh6D9G4K; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=Hb/OQb50dQR9oEezvreYZuE7Wc7pCcqweV6KumSEwG0=; b=oh6D9G4KpJdlsQMcAsyRgBU97D
+	5XFDbUF8v91h19mkDwd0kJr8CytirXDikGG5IDgZBaD6KcOgTac3NizS6M5qD3OThKPHWmRjNqUmp
+	65KqIP34nR6KSX/RLUd01+sRHzDGmcJ9F/8gXZqO6NuGsEm4X2Vp9kkkhnT3JQElewrpTP06Qgnhe
+	I+StsutjP1ThuEZkmEX5CwjU+JvwXX40HQv3nEzfrhYpcn2pcfRJJHE5RX20RDB6BLkjUXxptCNAE
+	vbszFuQvWHO+B/NwKrbbBcRvLVKAoG3NTHdHxwEBIAA1XUG9eDW7CR82RDpUaKU0Gj3Db2HJKWd1f
+	4TmVi4nA==;
+Received: from sslproxy08.your-server.de ([78.47.166.52])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1wE5GO-000CgE-2H;
+	Sat, 18 Apr 2026 14:59:08 +0200
+Received: from localhost ([127.0.0.1])
+	by sslproxy08.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1wE5GN-000BLb-18;
+	Sat, 18 Apr 2026 14:59:08 +0200
+Message-ID: <d4c72730-2d74-4efe-8ede-50e3fe9658c8@iogearbox.net>
+Date: Sat, 18 Apr 2026 14:59:07 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,110 +67,142 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH net] ipv6: Implement limits on extension header parsing
-To: Daniel Borkmann <daniel@iogearbox.net>, kuba@kernel.org
+To: Justin Iurman <justin.iurman@gmail.com>, kuba@kernel.org
 Cc: edumazet@google.com, dsahern@kernel.org, tom@herbertland.com,
  willemdebruijn.kernel@gmail.com, idosch@nvidia.com, pabeni@redhat.com,
  netdev@vger.kernel.org
 References: <20260417171831.687053-1-daniel@iogearbox.net>
  <60b47924-dae4-4a10-b977-75b92e1094c0@gmail.com>
  <ae053593-907e-4891-90fb-03b4c5d8f5e1@iogearbox.net>
+ <b57f31a2-456e-4727-839a-bc2f0fb07855@gmail.com>
 Content-Language: en-US
-From: Justin Iurman <justin.iurman@gmail.com>
-In-Reply-To: <ae053593-907e-4891-90fb-03b4c5d8f5e1@iogearbox.net>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Autocrypt: addr=daniel@iogearbox.net; keydata=
+ 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
+In-Reply-To: <b57f31a2-456e-4727-839a-bc2f0fb07855@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: Clear (ClamAV 1.4.3/27975/Sat Apr 18 08:26:10 2026)
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[iogearbox.net,reject];
+	R_DKIM_ALLOW(-0.20)[iogearbox.net:s=default2302];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[google.com,kernel.org,herbertland.com,gmail.com,nvidia.com,redhat.com,vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279500-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-279501-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,kernel.org];
+	DKIM_TRACE(0.00)[iogearbox.net:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[justiniurman@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCPT_COUNT_SEVEN(0.00)[9];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,ietf.org:url]
-X-Rspamd-Queue-Id: A05FB4211B2
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5338C4211FA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 4/18/26 14:26, Daniel Borkmann wrote:
-> Hi Justin,
+On 4/18/26 2:50 PM, Justin Iurman wrote:
+> On 4/18/26 14:26, Daniel Borkmann wrote:
+>> On 4/18/26 1:45 PM, Justin Iurman wrote:
+>>> On 4/17/26 19:18, Daniel Borkmann wrote:
+>> [...]
+>>>> diff --git a/net/ipv6/sysctl_net_ipv6.c b/net/ipv6/sysctl_net_ipv6.c
+>>>> index d2cd33e2698d..93f865545a7c 100644
+>>>> --- a/net/ipv6/sysctl_net_ipv6.c
+>>>> +++ b/net/ipv6/sysctl_net_ipv6.c
+>>>> @@ -135,6 +135,14 @@ static struct ctl_table ipv6_table_template[] = {
+>>>>           .extra1        = SYSCTL_ZERO,
+>>>>           .extra2        = &flowlabel_reflect_max,
+>>>>       },
+>>>> +    {
+>>>> +        .procname    = "max_ext_hdrs_number",
+>>>> +        .data        = &init_net.ipv6.sysctl.max_ext_hdrs_cnt,
+>>>> +        .maxlen        = sizeof(int),
+>>>> +        .mode        = 0644,
+>>>> +        .proc_handler    = proc_dointvec_minmax,
+>>>> +        .extra1        = SYSCTL_ONE,
+>>>> +    },
+>>>>       {
+>>>>           .procname    = "max_dst_opts_number",
+>>>>           .data        = &init_net.ipv6.sysctl.max_dst_opts_cnt,
+>>>
+>>> NACKed-by: Justin Iurman <justin.iurman@gmail.com>
+>>>
+>>> +1000 on the need, but NAK on the way it is done. IMO, we don't want yet-another-sysctl for that. Instead, we have (well, not yet, but it's about time) this series [1] to enforce ordering and occurrences of Extension Headers, which is based on an IETF draft [2] (FYI, draft- ietf-6man-eh-limits is dead). I think we should enforce ordering and occurrences in this code path too, instead of relying on a sysctl. Let's keep both code paths consistent.
 > 
-> On 4/18/26 1:45 PM, Justin Iurman wrote:
->> On 4/17/26 19:18, Daniel Borkmann wrote:
-> [...]
->>> diff --git a/net/ipv6/sysctl_net_ipv6.c b/net/ipv6/sysctl_net_ipv6.c
->>> index d2cd33e2698d..93f865545a7c 100644
->>> --- a/net/ipv6/sysctl_net_ipv6.c
->>> +++ b/net/ipv6/sysctl_net_ipv6.c
->>> @@ -135,6 +135,14 @@ static struct ctl_table ipv6_table_template[] = {
->>>           .extra1        = SYSCTL_ZERO,
->>>           .extra2        = &flowlabel_reflect_max,
->>>       },
->>> +    {
->>> +        .procname    = "max_ext_hdrs_number",
->>> +        .data        = &init_net.ipv6.sysctl.max_ext_hdrs_cnt,
->>> +        .maxlen        = sizeof(int),
->>> +        .mode        = 0644,
->>> +        .proc_handler    = proc_dointvec_minmax,
->>> +        .extra1        = SYSCTL_ONE,
->>> +    },
->>>       {
->>>           .procname    = "max_dst_opts_number",
->>>           .data        = &init_net.ipv6.sysctl.max_dst_opts_cnt,
->>
->> NACKed-by: Justin Iurman <justin.iurman@gmail.com>
->>
->> +1000 on the need, but NAK on the way it is done. IMO, we don't want 
->> yet-another-sysctl for that. Instead, we have (well, not yet, but it's 
->> about time) this series [1] to enforce ordering and occurrences of 
->> Extension Headers, which is based on an IETF draft [2] (FYI, draft- 
->> ietf-6man-eh-limits is dead). I think we should enforce ordering and 
->> occurrences in this code path too, instead of relying on a sysctl. 
->> Let's keep both code paths consistent.
-
-Hi Daniel,
-
-> Hm, that series [1] should probably go to net instead of net-next, but atm
-
-+1, would make sense.
-
-> hasn't moved since a month. I'd still think max_ext_hdrs_number would be
-> useful given it has less complexity also for stable, but I guess ultimately
-> up to maintainers..
-
-In the short term, I agree. What worries me is that we end up with a 
-redundant, or even useless, sysctl once the other series is applied, 
-which will only increase user confusion.
+> Hi Daniel,
+> 
+>> Hm, that series [1] should probably go to net instead of net-next, but atm
+> 
+> +1, would make sense.
+> 
+>> hasn't moved since a month. I'd still think max_ext_hdrs_number would be
+>> useful given it has less complexity also for stable, but I guess ultimately
+>> up to maintainers..
+> 
+> In the short term, I agree. What worries me is that we end up with a redundant, or even useless, sysctl once the other series is applied, which will only increase user confusion.
+I'm thinking even if that series lands, and there is still odd hw out there
+where the enforcement of ordering is not in place, and users might be forced
+to disable net.ipv6.enforce_ext_hdr_order, then the limit would still apply
+and protect them.
 
 Cheers,
-Justin
-
-> Thanks,
-> Daniel
-> 
->>   [1] https://lore.kernel.org/netdev/20260314175124.47010-1- 
->> tom@herbertland.com/#t
->>   [2] https://datatracker.ietf.org/doc/draft-iurman-6man-eh-occurrences/
-> 
-
+Daniel
 
