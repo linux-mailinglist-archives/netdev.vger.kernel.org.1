@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-279589-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279590-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4CruEEvm5GnObgEAu9opvQ
-	(envelope-from <netdev+bounces-279589-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 19 Apr 2026 16:27:23 +0200
+	id CBaAFojm5GnObgEAu9opvQ
+	(envelope-from <netdev+bounces-279590-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 19 Apr 2026 16:28:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E41042459F
-	for <lists+netdev@lfdr.de>; Sun, 19 Apr 2026 16:27:22 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D98C4245B6
+	for <lists+netdev@lfdr.de>; Sun, 19 Apr 2026 16:28:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 25DB1300383B
-	for <lists+netdev@lfdr.de>; Sun, 19 Apr 2026 14:27:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2363F3013A7B
+	for <lists+netdev@lfdr.de>; Sun, 19 Apr 2026 14:27:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65C4237BE76;
-	Sun, 19 Apr 2026 14:27:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE96C37BE87;
+	Sun, 19 Apr 2026 14:27:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="auHq+FVa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ipyDdfA/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42BA1350A1F
-	for <netdev@vger.kernel.org>; Sun, 19 Apr 2026 14:27:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC1E8350A1F
+	for <netdev@vger.kernel.org>; Sun, 19 Apr 2026 14:27:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776608837; cv=none; b=NTL/+Cb/s4tkKhWeYvzNgVsZuXoGtPF9UAsMbGlYgqR9q2PyaeKMdkd/uGQj0EA01/07ewOBueiuU1x2SESXEke3aOuMZz/KYyCFJ9bGBN3Ncoy478oBh1qbYDNxiwbs52chOJfc1OSxOlRjnHt71a1kiUiLHkVERDPXJDP3Ejg=
+	t=1776608846; cv=none; b=mhSHFRlSOeWyuSmny5CkQRjX31HIws5hxXR8zR80TvoBAi318nw+eAYskxNh8OzEVVgurXDBkrMyswapUQ3jc8zhktBViMCogi8GmJm/qF4W1wCXVmS3MWmelBZX50Q/Vd/68Kmwaj+m3h/ZtmUwS6aWVR4JLuzFh7dA5AywQus=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776608837; c=relaxed/simple;
-	bh=AB4jVQsgi7uqedE2FJNh4SDnHnZrL+5MT3pzKz6LHPE=;
+	s=arc-20240116; t=1776608846; c=relaxed/simple;
+	bh=s2gMblZeAzDupssGDahxpIBxVS2I27a2cO8kefDoF7c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s/+osJlq6ZhAZZZ/cnw5lhifVgZPbvRY+c5tq4aleQe/KuX0pNFWag5BCimZAbfbPF+w7vi+AbKulNPiGXsieKwYd/e203esAZFkXyor2eVpD36pocM+nT8dyhPfUBxk6cs5dWG+t9k2+buIa+5Slz2lSkwVDIr/+u8Eew3Td8c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=auHq+FVa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A95AFC2BCAF;
-	Sun, 19 Apr 2026 14:27:13 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=j1Hddf+u5Gr55VHR5ojTrFnmydgcQXFdflW5cEsFiq6komzjYRZkVx37NhSPXZ8J1eicdybrnCM0i2nOfUfUYspPLk3tZ3cglXXN1DwP/lZ9m6pCv0Ky7CHno1SkhS72/0G7zvspUZl/uIQxu44hi+q1xZ5B2tUjAmgR9+0DDSc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ipyDdfA/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CDF1C2BCAF;
+	Sun, 19 Apr 2026 14:27:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776608836;
-	bh=AB4jVQsgi7uqedE2FJNh4SDnHnZrL+5MT3pzKz6LHPE=;
+	s=k20201202; t=1776608846;
+	bh=s2gMblZeAzDupssGDahxpIBxVS2I27a2cO8kefDoF7c=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=auHq+FVaTc97w3+YJDioNbU4QZ+HB/NBiUswCvTKGnaXMC1iH4UNKa2jZcXT3uyDA
-	 PS3Kk/v39AALwOjKnYdysdUKM14g5BpwpHLlx6GNLhKG87nLm67Faquzr0CSkzSv4V
-	 BkVvNkG3ip+N25e04ajjf3JgXwKwZKHbZCdrxov1rAInnhgmJ1wDUTy32e+7sJRuG8
-	 L7mWVo61q/H7IhUtlaVV/kI5IIyMuzaR8bx+QCrDiUVe3piOowNhRNes2VLEyzocs4
-	 PR609Kl2Q+/A9fNUWUBErlhxH86SZb9BxhLcEOipxaBzIbHTwTn6Eb5D4ZUa28CqXm
-	 TuuHugG4Rj4PQ==
-Date: Sun, 19 Apr 2026 15:27:10 +0100
+	b=ipyDdfA/zvgMVTZzdEzFV/v0EWF8UatxqesyHAXKNnRb764GAi2PyhH+PtPZCSh82
+	 molAwAp+hGY/vxn9Y/BKWYY1hli/OKLCpwuTrUebC7jb4R4yH+0vXklXEbBtbmAYGf
+	 qcVAuDE2WkTabUCpr1e+5dDGNfQHZTLYBU00CE7pJGeQyuD7DqD0B7sijl0lG+coC4
+	 9qkfNIeeuUK07fNGvuLbLPffAGUmWHV64uRu40oMup3FG5BXdkz09+VsDm6ZR5Gx2l
+	 s2Cm3Y5TZHXXYlLlvbk7lDpMK3b3D2O8KIoTarXOgDzUF1xYtBVFAtBJXuPB+v0Tx4
+	 hmMc8noJQuAgg==
+Date: Sun, 19 Apr 2026 15:27:20 +0100
 From: Simon Horman <horms@kernel.org>
 To: Weiming Shi <bestswngs@gmail.com>
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -60,7 +60,7 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	Alan Cox <alan@linux.intel.com>, netdev@vger.kernel.org
 Subject: Re: [PATCH net] slip: fix slab-out-of-bounds write in
  slhc_uncompress()
-Message-ID: <20260419142710.GI280379@horms.kernel.org>
+Message-ID: <20260419142720.GJ280379@horms.kernel.org>
 References: <20260415213359.335657-2-bestswngs@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,12 +76,12 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279589-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-279590-lists,netdev=lfdr.de];
 	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
@@ -98,9 +98,9 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,cisco];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 2E41042459F
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,horms.kernel.org:mid]
+X-Rspamd-Queue-Id: 9D98C4245B6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
@@ -130,22 +130,30 @@ On Thu, Apr 16, 2026 at 05:34:00AM +0800, Weiming Shi wrote:
 > Fixes: b5451d783ade ("slip: Move the SLIP drivers")
 > Reported-by: Simon Horman <horms@kernel.org>
 
-FTR, I was mainly passing on a review generated by Sashiko
+FTR, I was mainly passing on information flagged by Sashiko.
 
 > Signed-off-by: Weiming Shi <bestswngs@gmail.com>
 
 Reviewed-by: Simon Horman <horms@kernel.org>
 
-As usual I'll comment on the review of this patch by Sashiko.
+Let me summarise my understanding of Sashiko's review of this patch.
 
-TL;DR: I don't think it should block progress of this patch.
+TL;DR: I don't think that review should block progress of this patch.
 
-The review by Sashiko flags out of bounds errors. However,
-these are addressed by one of your other patches:
+1. The issue wrt concurrent MTU changes appears to be a separate,
+   pre-existing problem. Maybe you've looked into it already,
+   if not, you may wish to.
 
-- [PATCH net] slip: bound decode() reads against the compressed packet length
-  https://lore.kernel.org/netdev/20260416100147.531855-5-bestswngs@gmail.com/
+2. The bounds checking problems are addressed by other patches in flight.
 
-As noted in my review of that patch, while it seems too late for these
-patches, please consider bundling related patches in a patchset in future.
+   - [PATCH net v2] slip: reject VJ receive packets on instances with no rstate array
+     https://lore.kernel.org/netdev/20260415204130.258866-2-bestswngs@gmail.com/
+
+   - [PATCH net] slip: fix slab-out-of-bounds write in slhc_uncompress()
+     https://lore.kernel.org/netdev/20260415213359.335657-2-bestswngs@gmail.com/
+
+   In future you might want to consider creating patch sets for related
+   patches. But I think it's too late in the case of these patches.
+
+...
 
