@@ -1,135 +1,142 @@
-Return-Path: <netdev+bounces-279567-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279568-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IPjyLfxa5GlLUQEAu9opvQ
-	(envelope-from <netdev+bounces-279567-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 19 Apr 2026 06:33:00 +0200
+	id THsyEzhg5GlpUgEAu9opvQ
+	(envelope-from <netdev+bounces-279568-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 19 Apr 2026 06:55:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05F0B4231A3
-	for <lists+netdev@lfdr.de>; Sun, 19 Apr 2026 06:32:59 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id AEF25423207
+	for <lists+netdev@lfdr.de>; Sun, 19 Apr 2026 06:55:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0AB3F301AA6B
-	for <lists+netdev@lfdr.de>; Sun, 19 Apr 2026 04:32:57 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id CE196300E3C3
+	for <lists+netdev@lfdr.de>; Sun, 19 Apr 2026 04:55:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 312FB27FB25;
-	Sun, 19 Apr 2026 04:32:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F50C371056;
+	Sun, 19 Apr 2026 04:55:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qoAUslfA"
+	dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b="jW8akn7l"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from www2881.sakura.ne.jp (www2881.sakura.ne.jp [49.212.198.91])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A7E33BB4A;
-	Sun, 19 Apr 2026 04:32:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 308C23559E1
+	for <netdev@vger.kernel.org>; Sun, 19 Apr 2026 04:55:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.198.91
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776573176; cv=none; b=gx4Ka0mWTedd0X2EpYTmsP52MWEi+Nvan2VU/Xe88Jzc8BODnxhPgsdpaUfj8T+ake8zrF8Vu3Q386kFITShLPESeBjTB4iiz9d/yWG1nMsz2UzgsSiiIAGyJGETV14qnwJ5cHwfa0O8Gm80bCuCM11UYsnBfaTnGhYYwXN/xIs=
+	t=1776574511; cv=none; b=dmW3aeE7TcTbb9jR/70FrTL4R7FxQq0M71wggReViuKDlMVr9xyQBmLsg21byssJHn3ZAeHZG+Av9AdYwhO5ljMliLfBQBCCIbMTkqGdIuo7Rpjp2nhWOk41cEeRQhxEWVFHWfbbB1dhqPAEOwhLreQxTt1fJRDGvi6GCn84ikU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776573176; c=relaxed/simple;
-	bh=L8BeoMR/S1J5cJhw4dhL2I8MvOSmN9iYYujOLMiNCiQ=;
-	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
-	 Subject:From:To:Cc:Date; b=l7e7pKMEZCsjhB7pTG6wbFRy6qLqxtFefVSl8ozt+SoOkVN2OJKzm9847qBgxW0PMPMLBGqveGaf3qoJe9X0l/wdmQ7KD0rt3fyq9tC4gFiVqXjaBtbueoHVtqQnEJItXpgOUrRTsnf2NHH7yHlQ3utGlPEMxEpxnEEXlZFK9Io=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qoAUslfA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D983C2BCAF;
-	Sun, 19 Apr 2026 04:32:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776573175;
-	bh=L8BeoMR/S1J5cJhw4dhL2I8MvOSmN9iYYujOLMiNCiQ=;
-	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
-	b=qoAUslfA26yZanvgnKMgcjEebz5WRTxortbnChaH4CFl3VgjM6QsIsYg62VCh58ZL
-	 Gi5BJJexe/xFvBb5ThEutagyWVVf2LDiDECYiFUq/nWimPhHHABuOiNGVp5/KKvCik
-	 WyAUAeEyRfcCwHxa1GfIRCrQkHF9Y36ur+YvLoPZZDyTEzadaBLgVyupMt2VbsOSup
-	 8alno2egypdkbaN4TQG33Cg6pA+i8EkdgknGeGK3rdTXRYwsqlnLvmRBa3wkOGyKve
-	 pdq+NjwWfw/BJ12GEUDppIH8wsCST8+/mIkhzmGfG92KTgrl25T/AmpAYax5btGIW3
-	 bJ20tmlnGK7ng==
-Content-Type: multipart/mixed; boundary="===============5059097281938462969=="
+	s=arc-20240116; t=1776574511; c=relaxed/simple;
+	bh=aWwkkO/dK7+4Ij0ZtbCQR5qJUncR5rTmloO/+65ixYc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=C4AyMjzoxDDiWNTOlbxqTr0hoACWk8VB3rkbR1+ZEBzsWQDGX8Pm53il8N8sXY2Zv1D3lUrNmSC7biTbt6a978ZkUY0qsFXLVURJxDzVcXwpSDoUMO7Vwg63BvV3GhHC01MhfZJHMfZP3fI40nvqoWCCWi83vVaESdIwkvHZvG8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp; spf=pass smtp.mailfrom=enjuk.jp; dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b=jW8akn7l; arc=none smtp.client-ip=49.212.198.91
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enjuk.jp
+Received: from x1 (232.154.13.160.dy.iij4u.or.jp [160.13.154.232])
+	(authenticated bits=0)
+	by www2881.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 63J4sw77096849
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Sun, 19 Apr 2026 13:54:59 +0900 (JST)
+	(envelope-from kohei@enjuk.jp)
+DKIM-Signature: a=rsa-sha256; bh=+miTzbzmAeJTvCc4KYsQeM1c0jUtDrPE4GIVDyvf1jY=;
+        c=relaxed/relaxed; d=enjuk.jp;
+        h=From:Message-ID:To:Subject:Date;
+        s=rs20251215; t=1776574499; v=1;
+        b=jW8akn7lx0SeR4Xr8DtlFzFOUiNqna7GBvGf3ZTAeuOoq/fd1Af+xjsziN0xcavV
+         d981jL2tYemcz/Gujawl5SaTI1crHME0d4RRbBs3i4spsDYEMwAG8v9aHF4qL+MH
+         N393zTl83fltpAlR9CBDFrY7hWLuzWEK/N+maX3b2r3ZD/FoWf+7lH8C1HtoQQnI
+         VwvhTxf/BqwrA3+bOOTrtc/LUcaf5FIzTbKGDXiBO+baTCi7XS9VO88ARtuZo/8n
+         o87GiN/W021spC2dG0nGzurGC48Xs7fFhkVkjdiaJFaUhuGt9blBj6PwcMzUfpyQ
+         in38zhSL1TTGEKkboA+H/A==
+Date: Sun, 19 Apr 2026 13:54:57 +0900
+From: Kohei Enju <kohei@enjuk.jp>
+To: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+        Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, dima.ruinskiy@intel.com,
+        kohei.enju@gmail.com
+Subject: Re: [PATCH iwl-next v2 0/2] igc: enable build_skb path
+Message-ID: <aeRejyttAu4EO0HW@x1>
+References: <20260317062205.39406-1-kohei@enjuk.jp>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <557b90e63fb85b646de7ae4792eb2c06d6be251dcd95dabe9ed99435c82b85e0@mail.kernel.org>
-In-Reply-To: <20260419040426.9672-1-avinashpal441@gmail.com>
-References: <20260419040426.9672-1-avinashpal441@gmail.com>
-Subject: Re: [PATCH] bpf: verifier: fix NULL deref in map_kptr_match_type() for scalar regs
-From: bot+bpf-ci@kernel.org
-To: avinashpal441@gmail.com,bpf@vger.kernel.org
-Cc: ast@kernel.org,daniel@iogearbox.net,andrii@kernel.org,netdev@vger.kernel.org,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
-Date: Sun, 19 Apr 2026 04:32:55 +0000 (UTC)
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	CTYPE_MIXED_BOGUS(1.00)[];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260317062205.39406-1-kohei@enjuk.jp>
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	DMARC_POLICY_ALLOW(-0.50)[enjuk.jp,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+	R_DKIM_ALLOW(-0.20)[enjuk.jp:s=rs20251215];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-279567-lists,netdev=lfdr.de,bpf-ci];
-	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,vger.kernel.org,gmail.com,linux.dev,meta.com];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bot@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+,1:+];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-279568-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NO_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kohei@enjuk.jp,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[enjuk.jp:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 05F0B4231A3
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,sashiko.dev:url,enjuk.jp:dkim]
+X-Rspamd-Queue-Id: AEF25423207
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
---===============5059097281938462969==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On 03/17 06:21, Kohei Enju wrote:
+> This series enables the build_skb RX path in igc, which is currently not
+> enabled in any configuration.
+> 
+> Patch 1/2 adds missing RX hardware timestamp handling in the build_skb
+> path.
+> Patch 2/2 enables the build_skb path when XDP is inactive and other
+> conditions are met.
+> 
+> Tested on Intel Corporation Ethernet Controller I226-V (rev 04).
+> 
+> Changes:
+>   v2:
+>     - don't insist on reverse christmas tree, reducing net diff in the
+>       patch 1/2 (Dima)
+>   v1: https://lore.kernel.org/intel-wired-lan/20260307182808.155027-1-kohei@enjuk.jp/
+> 
+> Kohei Enju (2):
+>   igc: set RX hardware timestamps in igc_build_skb()
+>   igc: enable build_skb on the non-XDP small-frame RX path
 
+Hi Tony,
 
-commit 6c1cde9635b1379ee40c94c5ecc8a7d09507c0c9
-Author: Avinash Pal <avinashpal441@gmail.com>
+Could you drop this series from Intel's queue?
 
-bpf: verifier: fix NULL deref in map_kptr_match_type() for scalar regs
+Sashiko pointed out a potential use-after-free when dereferencing RX
+hardware timestamps with build_skb enabled, and I believe this concern
+is valid.
+https://sashiko.dev/#/patchset/20260317062205.39406-1-kohei%40enjuk.jp
 
-A NULL pointer dereference occurs in map_kptr_match_type() when a BPF
-program attempts to store a scalar value (non-pointer register) into a
-map slot annotated as a kptr (kernel pointer).
+I'm working on a new series to address this problem.
 
-Link: https://bugzilla.kernel.org/show_bug.cgi?id=221372
-
-This commit appears to fix a bug introduced in an earlier commit.
-Should this include a Fixes: tag?
-
-The fix guards against NULL reg->btf before calling btf_is_kernel(),
-which suggests the vulnerability was introduced when map_kptr_match_type()
-started using btf_is_kernel() without checking if reg->btf is NULL first.
-
-Looking at the git history, commit 61df10c7799e ("bpf: Allow storing
-unreferenced kptr in map") introduced map_kptr_match_type() and the call
-to btf_is_kernel(reg->btf) without a NULL check.
-
-Consider adding:
-
-Fixes: 61df10c7799e ("bpf: Allow storing unreferenced kptr in map")
-
-
----
-AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
-
-CI run summary: https://github.com/kernel-patches/bpf/actions/runs/24620726038
---===============5059097281938462969==--
+Thanks,
+Kohei
 
