@@ -1,181 +1,255 @@
-Return-Path: <netdev+bounces-279596-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279598-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SFV7D0bt5GlPcAEAu9opvQ
-	(envelope-from <netdev+bounces-279596-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 19 Apr 2026 16:57:10 +0200
+	id VxMQC9zu5GnLcAEAu9opvQ
+	(envelope-from <netdev+bounces-279598-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 19 Apr 2026 17:03:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93CAE4246AF
-	for <lists+netdev@lfdr.de>; Sun, 19 Apr 2026 16:57:09 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 967BF4246DB
+	for <lists+netdev@lfdr.de>; Sun, 19 Apr 2026 17:03:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 434AC300879B
-	for <lists+netdev@lfdr.de>; Sun, 19 Apr 2026 14:57:08 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 795F23004637
+	for <lists+netdev@lfdr.de>; Sun, 19 Apr 2026 15:03:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAC2D33DEF9;
-	Sun, 19 Apr 2026 14:57:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 889BA34FF40;
+	Sun, 19 Apr 2026 15:03:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KoLzxxgg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nRB9Ho07"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f182.google.com (mail-dy1-f182.google.com [74.125.82.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98648330328
-	for <netdev@vger.kernel.org>; Sun, 19 Apr 2026 14:57:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 278432D7DCF
+	for <netdev@vger.kernel.org>; Sun, 19 Apr 2026 15:03:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776610627; cv=none; b=dSkY90eqJWQ1iyrv19xDp+9xwGVptjTTPeITBUY8R1h4szJSYxvjxtEqiMYhaXkhGphp8y98Crol7o+EAOdQ3BiKInG13TE+KFNRERecIWAHwDsG+2sppIgn2o+2TkJb+4i5fnizkjd9vpPtqyNKq+PhzwLKGvUtCZ8VAUYE1lI=
+	t=1776611032; cv=none; b=AnDj3rSlO1cufxSyV9rZHOpmYFAhxR3+ZkrZmLKpDwrLEt85ofJc3pk++eJRAdd0GxOhP+Xf33TDjIs3VGI2gPnevNZ7AzB4LppNF+s60OzUn5Gkiprf+aHOQa2iuYKXnYGpnfDi+WZKZK2I2sjHgvLFBWmcobfTSfb88OVMQco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776610627; c=relaxed/simple;
-	bh=V2qDMKrOkZVIzeS2nBlFF8hmVwcH10mFAHizgJfehqg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kqQOpXF6xtU4vc07Tt8CbooNzl0bEUTj6A8yNK03a6uiGSw/G1snjwHDp+06+3CxpBj/qAtWVTX249QNUDf//OrJYPdtHcD/TJPxJpdcMPrC/tRAH2g6PA3PMrzjfaoqxb8iurdtrWjYGwIpB0PY+w7i/VMknaGke4z5EuULM/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KoLzxxgg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA2FBC2BCAF;
-	Sun, 19 Apr 2026 14:57:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776610627;
-	bh=V2qDMKrOkZVIzeS2nBlFF8hmVwcH10mFAHizgJfehqg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=KoLzxxggqL5onZy+0ttBS01Mn4CKCV/SPTQwiHPdac1Bo1sqizaaUb+/g+Zkowy5s
-	 pW/5Boc/UBUhzTu9nPloANTHGOnYjP1rO/oorMwOgC5l2lMm47NE+nPf9+0YFEEIar
-	 AuZ6fAqccozhMjZ6ec/9QR3cJ+x69JiE0FyrZhVKdFKGQC0AI4JML0W4vTX7uXbpAA
-	 TEa1K+x9ooaEG2rPjh8zXvDjr6hBBUFzJBd8qfNH+sSbhN0pQVNbmCcc8YSsWrH+mb
-	 CnOjhh2LHaar+e9dJeKcqhelPP2wyVSHgHSAf+RbxcSfe8ADz9UoNhe1972sIft6bq
-	 bNu1Py6PSxvzQ==
-Date: Sun, 19 Apr 2026 15:57:00 +0100
-From: Simon Horman <horms@kernel.org>
-To: Weiming Shi <bestswngs@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Hans Verkuil <hverkuil+cisco@kernel.org>,
-	Alex Deucher <alexander.deucher@amd.com>,
-	Ian Rogers <irogers@google.com>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Kees Cook <kees@kernel.org>, Ingo Molnar <mingo@kernel.org>,
-	Alan Cox <alan@linux.intel.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH net] slip: fix slab-out-of-bounds write in
- slhc_uncompress()
-Message-ID: <20260419145700.GN280379@horms.kernel.org>
-References: <20260415213359.335657-2-bestswngs@gmail.com>
- <20260419142720.GJ280379@horms.kernel.org>
- <20260419143233.GK280379@horms.kernel.org>
+	s=arc-20240116; t=1776611032; c=relaxed/simple;
+	bh=7F60SSrHJuuj37siQvsAm+ufPyPi/yXV0jfkLdlJBjE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JQ0UjPkvNVJjN11FW6HFEBf7f0kwUPrC165IHT2K9cXPDFViuVQ71F1SPtS+OM2FfaNpu/4sO/M6wGSyyNXwoxFC1XqSvDJRn10xuaF9Bcs/zr+Tuqlh1Z//1bUuDtgBVNUfPC8RdtcBSy9kahtjsrDYkxdyvO/OmET0hXWPLaA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nRB9Ho07; arc=none smtp.client-ip=74.125.82.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dy1-f182.google.com with SMTP id 5a478bee46e88-2b4520f6b32so2576887eec.0
+        for <netdev@vger.kernel.org>; Sun, 19 Apr 2026 08:03:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776611030; x=1777215830; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=nkEaXmTj5uTg/vFgKNlji8gUN80AsQRcCUMNvFtX7zk=;
+        b=nRB9Ho07tLMbWimYjBwgWax/G8+LLlRMuRji1sXMmRdfyOu048pj9G96eWPC+X5Vh0
+         OJ/UfXk2GWVAoZm55801D1phTH9y+UdWyz4EdZGWJWCQ1jJyvO5Qb5/VjtFPJZA/QJ7/
+         OJwbtLu5MIp5L6ENXFkoSV3o7MzytTwiPA6IzGoUcKc7ZHCgWKpnFrWx8EdSo+Mqj2jl
+         nZmo8+Ce5y3jRMDGPXneLHJbIShSJFebfpteHEkHl6y7d9XVsI2lgJxD9irYHtFySCMh
+         fmvbHMKmGUR9lmz5YzagVsDQHsXCtzmFJotiSUUkFmtysZToyGr2IU1UjTd1O5nQtFzr
+         HfVw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776611030; x=1777215830;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nkEaXmTj5uTg/vFgKNlji8gUN80AsQRcCUMNvFtX7zk=;
+        b=tVPA7V6g582JUS29I/qZ7zZ9D6ZyBCl9M1mN0Cq0EBtNjyyUEd8mhqbz3CnJcfdDom
+         m1IZ/qLOOK53kTWoqFFAot90h2O9dK67Q5icfavmKEyP1SXlSeJWB+g+VhSk4pMrm1/C
+         rj6gCotF52MkXOLdsly0YUEW2ByZMamiDfsuMJxydvni3i1I9k9kmFDopvXvH2jYTaG+
+         BxxlhyPITr27YbwykfJqKVcGdTxSQPzbga0JhneQiikxw15z7tLNNxmfvM6VbdpYYwOx
+         fUF1W76uy3xgFaJaL+A7hcSHUzWRthjI8BmMCK6PqZWN0eyolO1lfnwDLFH643X1x8Qs
+         wCjg==
+X-Gm-Message-State: AOJu0Ywh0YPjVGSP7F2+Xb6dyjn1p6QbEIXwLPLeUL3QGgZ8ccxD9KSV
+	ajXldWOBlSb31rXViRsuvMIBojnSd1gP8BWHAozwlcIoEZIiwpBtZSmL
+X-Gm-Gg: AeBDievEyX4PhFhMJEfrQISwpe3gACyheEzA9ZX9MCH845wJOeRBYUvT9Efvlhj+NDa
+	4QCt3kk58SMwWOXwOtGx+qc/DQbmeiCHsfyK6+kjCXz3xLEwmpTLc0DR4YN+UXxsRMaACzkfjxp
+	GyiKdLzInBkust4Odl224qZ6ERDIht8ViZfVT54VAWgsDOPmFjHhtRM8d+nw1sDYjuRvha2b5WQ
+	mx+l14DIPhdy74HR4XX8o3nK5EKGNP+DRaRKHjtM1D+dLfozoiI9Vs5vqQVP7mEUeEnGk9+zXHy
+	LpIsv9r/LIvpU5dB+D5p/gBo9yPJrkiGKSxOOBTRZU1C2o9l5WTxsvZ87EtmMsgU1na7Yh7TrYl
+	WWVXYxQwPg95MQ9sG/dtDBjOtPn+6sxuhqLRUBEVaRFcHlPUgKOgyVTGHOwZFed+lrLHgTlVKdX
+	Oz7qGnx2oYxlZZh4q4N0mxOsrP0ldg9f822XZFuEwBB9AiQPO+QNbH
+X-Received: by 2002:a05:7300:1351:b0:2de:2f38:a7cb with SMTP id 5a478bee46e88-2e4788392f0mr4693613eec.18.1776611030108;
+        Sun, 19 Apr 2026 08:03:50 -0700 (PDT)
+Received: from teatimelab.tailcd024.ts.net ([148.135.103.3])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2e53a4a8018sm12350791eec.8.2026.04.19.08.03.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 19 Apr 2026 08:03:49 -0700 (PDT)
+From: Qi Tang <tpluszz77@gmail.com>
+To: davem@davemloft.net,
+	dsahern@kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Qi Tang <tpluszz77@gmail.com>
+Subject: [PATCH net] ipv6: validate extension header length before copying to cmsg
+Date: Sun, 19 Apr 2026 23:03:44 +0800
+Message-ID: <20260419150344.624673-1-tpluszz77@gmail.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260419143233.GK280379@horms.kernel.org>
+Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279596-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-279598-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[tpluszz77@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,cisco];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[horms.kernel.org:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 93CAE4246AF
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: 967BF4246DB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun, Apr 19, 2026 at 03:32:33PM +0100, Simon Horman wrote:
-> On Sun, Apr 19, 2026 at 03:27:26PM +0100, Simon Horman wrote:
-> > On Thu, Apr 16, 2026 at 05:34:00AM +0800, Weiming Shi wrote:
-> > > sl_bump() reserves only 80 bytes of expansion headroom before calling
-> > > slhc_uncompress(), but the reconstructed IP + TCP header is up to
-> > > ip->ihl*4 + thp->doff*4 bytes. IHL and TCP doff are 4-bit fields and
-> > > both can legitimately reach 15, so the header can grow to 2*15*4 =
-> > > 120 bytes. A VJ-uncompressed primer with ihl=15, doff=15 followed by
-> > > a compressed frame of size buffsize - 80 therefore writes up to
-> > > 33 bytes past the kmalloc(buffsize + 4) rbuff allocation, with
-> > > attacker-controlled content:
-> > > 
-> > >  BUG: KASAN: slab-out-of-bounds in slhc_uncompress
-> > >  Write of size 1069 at addr ffff88800ba93078 by task kworker/u8:1/32
-> > >  Workqueue: events_unbound flush_to_ldisc
-> > >  Call Trace:
-> > >   __asan_memmove+0x3f/0x70
-> > >   slhc_uncompress (drivers/net/slip/slhc.c:614)
-> > >   slip_receive_buf (drivers/net/slip/slip.c:342)
-> > >   tty_ldisc_receive_buf
-> > >   flush_to_ldisc
-> > > 
-> > > Raise the reservation to match the real worst case. The ppp_generic
-> > > receive path already enforces skb_tailroom >= 124 and is unaffected.
-> > > 
-> > > Fixes: b5451d783ade ("slip: Move the SLIP drivers")
+ip6_datagram_recv_specific_ctl() builds IPV6_{HOPOPTS,DSTOPTS,RTHDR}
+cmsgs (and their IPV6_2292* legacy counterparts) by trusting the
+on-wire hdrlen byte (ptr[1]) when computing the put_cmsg() length.
+The length was validated only at parse time (ipv6_parse_hopopts(),
+etc.). An nftables payload-write expression can rewrite hdrlen after
+parsing and before the skb reaches recvmsg; the write itself is
+in-bounds but put_cmsg() then reads up to ((hdrlen+1) << 3) = 2040
+bytes from an 8-byte header. nftables is reachable from an unprivi-
+leged user namespace, so this is an unprivileged slab-out-of-bounds
+read:
 
-AI review flags that this patch moved the code, rather than
-adding the bug. It suggests the bug has been present since the
-beginning of git history, so:
+  BUG: KASAN: slab-out-of-bounds in put_cmsg+0x3ac/0x540
+   put_cmsg+0x3ac/0x540
+   udpv6_recvmsg+0xca0/0x1250
+   sock_recvmsg+0xdf/0x190
+   ____sys_recvmsg+0x1b1/0x620
+
+Clamp each cmsg length against skb_tail_pointer(skb) before calling
+put_cmsg(). Extension headers are kept in the linear skb area by
+pskb_may_pull() during input, so skb_tail_pointer() is the correct
+bound. The check is replicated at each call site (one HbH, four
+RFC2292 sites, and four switch cases in the DSTOPTS/RTHDR/AH walk)
+rather than hoisted out of the switch, to keep the fix minimal and
+backportable; a follow-up cleanup can factor it out. In the walk
+loop a failed check also aborts the walk, since subsequent offsets
+depend on the tampered length.
 
 Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Signed-off-by: Qi Tang <tpluszz77@gmail.com>
+---
+ net/ipv6/datagram.c | 35 ++++++++++++++++++++++++++++++-----
+ 1 file changed, 30 insertions(+), 5 deletions(-)
 
-> > > Reported-by: Simon Horman <horms@kernel.org>
-> > 
-> > FTR, I was mainly passing on information flagged by Sashiko.
-> > 
-> > > Signed-off-by: Weiming Shi <bestswngs@gmail.com>
-> > 
-> > Reviewed-by: Simon Horman <horms@kernel.org>
-> 
-> I'm very sorry but the text below below was for a different,
-> albeit related, patch:
-> 
-> - [PATCH net] slip: bound decode() reads against the compressed packet length
->   https://lore.kernel.org/netdev/20260416100147.531855-5-bestswngs@gmail.com/
-> 
-> The corresponding text relating to this patch was posted as:
-> 
-> https://lore.kernel.org/netdev/20260419142710.GI280379@horms.kernel.org/
-> 
-> Sorry for the mix up!
+diff --git a/net/ipv6/datagram.c b/net/ipv6/datagram.c
+index ca3605acb..a7b9f5a24 100644
+--- a/net/ipv6/datagram.c
++++ b/net/ipv6/datagram.c
+@@ -643,7 +643,10 @@ void ip6_datagram_recv_specific_ctl(struct sock *sk, struct msghdr *msg,
+ 	/* HbH is allowed only once */
+ 	if (np->rxopt.bits.hopopts && (opt->flags & IP6SKB_HOPBYHOP)) {
+ 		u8 *ptr = nh + sizeof(struct ipv6hdr);
+-		put_cmsg(msg, SOL_IPV6, IPV6_HOPOPTS, (ptr[1]+1)<<3, ptr);
++		u16 hbhlen = (ptr[1] + 1) << 3;
++
++		if (ptr + hbhlen <= skb_tail_pointer(skb))
++			put_cmsg(msg, SOL_IPV6, IPV6_HOPOPTS, hbhlen, ptr);
+ 	}
+ 
+ 	if (opt->lastopt &&
+@@ -668,27 +671,37 @@ void ip6_datagram_recv_specific_ctl(struct sock *sk, struct msghdr *msg,
+ 			case IPPROTO_DSTOPTS:
+ 				nexthdr = ptr[0];
+ 				len = (ptr[1] + 1) << 3;
++				if (ptr + len > skb_tail_pointer(skb))
++					goto ext_hdr_done;
+ 				if (np->rxopt.bits.dstopts)
+ 					put_cmsg(msg, SOL_IPV6, IPV6_DSTOPTS, len, ptr);
+ 				break;
+ 			case IPPROTO_ROUTING:
+ 				nexthdr = ptr[0];
+ 				len = (ptr[1] + 1) << 3;
++				if (ptr + len > skb_tail_pointer(skb))
++					goto ext_hdr_done;
+ 				if (np->rxopt.bits.srcrt)
+ 					put_cmsg(msg, SOL_IPV6, IPV6_RTHDR, len, ptr);
+ 				break;
+ 			case IPPROTO_AH:
+ 				nexthdr = ptr[0];
+ 				len = (ptr[1] + 2) << 2;
++				if (ptr + len > skb_tail_pointer(skb))
++					goto ext_hdr_done;
+ 				break;
+ 			default:
+ 				nexthdr = ptr[0];
+ 				len = (ptr[1] + 1) << 3;
++				if (ptr + len > skb_tail_pointer(skb))
++					goto ext_hdr_done;
+ 				break;
+ 			}
+ 
+ 			off += len;
+ 		}
++ext_hdr_done:
++		;
+ 	}
+ 
+ 	/* socket options in old style */
+@@ -705,19 +718,31 @@ void ip6_datagram_recv_specific_ctl(struct sock *sk, struct msghdr *msg,
+ 	}
+ 	if (np->rxopt.bits.ohopopts && (opt->flags & IP6SKB_HOPBYHOP)) {
+ 		u8 *ptr = nh + sizeof(struct ipv6hdr);
+-		put_cmsg(msg, SOL_IPV6, IPV6_2292HOPOPTS, (ptr[1]+1)<<3, ptr);
++		u16 hbhlen = (ptr[1] + 1) << 3;
++
++		if (ptr + hbhlen <= skb_tail_pointer(skb))
++			put_cmsg(msg, SOL_IPV6, IPV6_2292HOPOPTS, hbhlen, ptr);
+ 	}
+ 	if (np->rxopt.bits.odstopts && opt->dst0) {
+ 		u8 *ptr = nh + opt->dst0;
+-		put_cmsg(msg, SOL_IPV6, IPV6_2292DSTOPTS, (ptr[1]+1)<<3, ptr);
++		u16 doptlen = (ptr[1] + 1) << 3;
++
++		if (ptr + doptlen <= skb_tail_pointer(skb))
++			put_cmsg(msg, SOL_IPV6, IPV6_2292DSTOPTS, doptlen, ptr);
+ 	}
+ 	if (np->rxopt.bits.osrcrt && opt->srcrt) {
+ 		struct ipv6_rt_hdr *rthdr = (struct ipv6_rt_hdr *)(nh + opt->srcrt);
+-		put_cmsg(msg, SOL_IPV6, IPV6_2292RTHDR, (rthdr->hdrlen+1) << 3, rthdr);
++		u16 rtlen = (rthdr->hdrlen + 1) << 3;
++
++		if ((u8 *)rthdr + rtlen <= skb_tail_pointer(skb))
++			put_cmsg(msg, SOL_IPV6, IPV6_2292RTHDR, rtlen, rthdr);
+ 	}
+ 	if (np->rxopt.bits.odstopts && opt->dst1) {
+ 		u8 *ptr = nh + opt->dst1;
+-		put_cmsg(msg, SOL_IPV6, IPV6_2292DSTOPTS, (ptr[1]+1)<<3, ptr);
++		u16 doptlen = (ptr[1] + 1) << 3;
++
++		if (ptr + doptlen <= skb_tail_pointer(skb))
++			put_cmsg(msg, SOL_IPV6, IPV6_2292DSTOPTS, doptlen, ptr);
+ 	}
+ 	if (np->rxopt.bits.rxorigdstaddr) {
+ 		struct sockaddr_in6 sin6;
+-- 
+2.47.3
 
-Actually, that's not right either.
-I will try one more time:
-
-TL;DR: I don't think that review should block progress of this patch.
-
-1. The issue wrt concurrent MTU changes appears to be a separate,
-   pre-existing problem. Maybe you've looked into it already,
-   if not, you may wish to.
-
-2. The bounds checking problems are addressed by other patches in flight.
-
-   - [PATCH net v2] slip: reject VJ receive packets on instances with no rstate array
-     https://lore.kernel.org/netdev/20260415204130.258866-2-bestswngs@gmail.com/
-
-   - [PATCH net] slip: bound decode() reads against the compressed packet length
-     https://lore.kernel.org/netdev/20260416100147.531855-5-bestswngs@gmail.com/
-
-   In future you might want to consider creating patch sets for related
-   patches. But I think it's too late in the case of these patches.
 
