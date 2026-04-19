@@ -1,239 +1,265 @@
-Return-Path: <netdev+bounces-279575-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279576-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cIzQI66f5GkmXgEAu9opvQ
-	(envelope-from <netdev+bounces-279575-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 19 Apr 2026 11:26:06 +0200
+	id UgAmI8+l5GlSXwEAu9opvQ
+	(envelope-from <netdev+bounces-279576-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 19 Apr 2026 11:52:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFCA44237FF
-	for <lists+netdev@lfdr.de>; Sun, 19 Apr 2026 11:26:05 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64A7E42393A
+	for <lists+netdev@lfdr.de>; Sun, 19 Apr 2026 11:52:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2EC9E3010521
-	for <lists+netdev@lfdr.de>; Sun, 19 Apr 2026 09:26:01 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 380C43002B50
+	for <lists+netdev@lfdr.de>; Sun, 19 Apr 2026 09:52:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52B5B37268C;
-	Sun, 19 Apr 2026 09:26:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F40D22D6409;
+	Sun, 19 Apr 2026 09:52:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GarnT5AS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HY65m+fa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+Received: from mail-dy1-f169.google.com (mail-dy1-f169.google.com [74.125.82.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48DFD33689C
-	for <netdev@vger.kernel.org>; Sun, 19 Apr 2026 09:25:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.178
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776590760; cv=pass; b=mMBtr1RLnq1GGSXTgpoKAbcgBi2PcDBTHgl/yF8ucqwYhlL9b5Necsd+4bllxcjZFrhf+COLJr1UqnjwTMq57JlW+UdboPW+Gl619xqgWXmoe1Yf7kNzcWQCpa8lVf9xE1Py85nb2YJrPrTQdRiQDC5LNdvNGK29IKZVZjmgTks=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776590760; c=relaxed/simple;
-	bh=KA2eaj1KTMF7JiURFIArjk9hCqPJILQRp+sBxV8Rwlk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=L5YT2IyYdq7GmRuwMB+NhilG41vUCtMRMEU8DkxL9UeMZnCDJ4ZMtqLMyveJNtH8nyjVm82b56CxtdVLclDfcbESonwZo/sJwwvvv4m+wi9NX4OK4GRghU1gCx6jyulc0YkaJRD1hTepKRJVrQRFv0u9rqnA3Cwnd2QfPRYb4nw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GarnT5AS; arc=pass smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-50d7c12e48eso23462291cf.1
-        for <netdev@vger.kernel.org>; Sun, 19 Apr 2026 02:25:58 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776590757; cv=none;
-        d=google.com; s=arc-20240605;
-        b=f9MY2tVFXYz/Zw8vtH10zd+HGOiBdeeXPEtpq6+6BCZ8Lz2JDKU2S+0N+9i/1I2dPt
-         xJgtPxxab27iRPBy5Zmdoop4CW3RKmQv7LX0upgP6UzrVsuYRgOBwcZv28JTydE0qT9W
-         IFMFX7CWo0WK0rfpQTgHSJNYBsTfCTozMa9oNMg1qGAWu79txMNDSYIGG4xV3yK/48Yt
-         KStY+8HybuoTRBbHqV39b8/u/VOlhQlJ4Zzc7SGix2X4E8BKKYDYvQYkOysCmxpMqlnC
-         hmV5J1Bd7mElh81EGou5EtfxEF1ZJzuAz47DP7FLeUelVnKzCwdVw/hD2aMtH2DXF/2H
-         JhNg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=Ns0EhvXKOFhY1hex9eB+EUZJkcV6nA7fGQgrXRO+R4Y=;
-        fh=Nq+TKXw3vmmY1L8vl8vOk05zSjpX9Ti3YoeH5OY7VlE=;
-        b=SixoyFQWbnvliG5btK2BiuWRowXHEOahkcihpxAbTXS1ABKhKC1k4MsvvkLC0FM3pz
-         O+wq1jL5AbtWXr5FLR0LHHaN56IILr0CuPaUJ7BLkGIkGg/NNY3bErrCCuBhNpRwI5pj
-         ze2qjiRYMi/1hOLfAcyx8JaOBz7q8ecScqh/b0v8rTiHGcPbd5b8r3B7Go6f6P433/js
-         +eNVB1/sDb0/vXpAjxe9MyT5mlWLN21kbkOZ9tBdagGedtjeMBC+6U75YQFC/YmGClpC
-         pxVu3gxr+U6AEEazp+xOMlvIi+I5KnwcT5E2sTtVviTW35YT/iu4u+98bN8stqHM17Pq
-         3bwQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99772227B8E
+	for <netdev@vger.kernel.org>; Sun, 19 Apr 2026 09:52:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.169
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776592329; cv=none; b=haUYIBG3nmfAZ3VTu1OELoIHohD02hhbxrdZ6YHRgkFejYHHH5fdCzTkhO/V8Iti5fgPJMW2kQQJlSXkb0dLasWnZKpKo5Pg9Ftoj1jHAU78l59V2K//xH251ozVBnYqf6lpqzpgGluQa02kxpPb8bWZfRa5nwBfeM/NeMs60J8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776592329; c=relaxed/simple;
+	bh=x5IouHTJtW3DfdyihFAOCdEe97drV7RtXJLrh8Dbmq8=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=fvAm4wXODQZtBSuqNZLuk418exSesaFTi0Dl5lnT+CKCmtAGtrkSvIAeNh4sgNePcRMoiGZxigY3DRNZSUgw7PjnE603pBNh92IezOk50XQqb6OLiLVT2pBnCSYy3cnKrBeb10qF2joXP94z9nDS3BMwx28W9mK/DAWLd6zdmlA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HY65m+fa; arc=none smtp.client-ip=74.125.82.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dy1-f169.google.com with SMTP id 5a478bee46e88-2d832f2f44cso2310399eec.0
+        for <netdev@vger.kernel.org>; Sun, 19 Apr 2026 02:52:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1776590757; x=1777195557; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1776592328; x=1777197128; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:to:subject:cc
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Ns0EhvXKOFhY1hex9eB+EUZJkcV6nA7fGQgrXRO+R4Y=;
-        b=GarnT5ASxGSo8StNSNyxnLnYyfdOEHDntBeO/54wfLCoQw+oRxPmiS6XED9VV/P7wo
-         zNcjwh+eYpfAUUJauv4KofHgtpcDcaPgGGNuWq6YdkURmT0Ng6yor/9xedhSYL1c5nVF
-         pVDs8+yo6MMQt7DXfPJ+eqH58EtrWXr66fhVFsQVdCfzuI3iqWUIniF/atAvHEk1mfH4
-         hmFLsnk8oLbF8OsOPttD5mNEWtqvuRwhUrrSTTqBgg40j4Cp/eBvVRbHHLPcyDEyDxKQ
-         dKj1K4wSx0XACPtrMTokDyBadq1nFhJ9l6hCWJNj9UZXEJSVCIwchi68ZVydRbeTcQFI
-         5yeg==
+        bh=xNbDpXxBmda7i9Siqc5i89PbvpK5U76PasTjM+CK90c=;
+        b=HY65m+fav+FT95aJFcWjAYVEG+fbdk4/PC+ArfN3gjYNopgedG+N3A6jpHUkgP4yW0
+         F5vjuyfV5eCwsRYYDlWH5jD42hijtW48dEasC+r6Y/QwHRzxkzC5KXmnG8HmdFLPMTw0
+         zkX7vlWPLgfkQibSYPbOcvNFmrobcMNm59fh6lxCIQyUZIPHJKwbqyxyRbl7rjIdoMAE
+         ZdblAUR1eBiw93PimYM3YlMAnT3VE/EnReBo+BNbpiHqCtq/Ov29JiSC8CBpxV1HUjZl
+         EvWHpUS3wBp+mEyN2wd6SHTY01HNFHAb+riSWaEQERaM57FMUb0UIpqbGk6TFn3XRKoF
+         nidg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776590757; x=1777195557;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Ns0EhvXKOFhY1hex9eB+EUZJkcV6nA7fGQgrXRO+R4Y=;
-        b=lVvtKcyRTMJ2D9UBRuWTFgyce9V+JNFBQ88cl657BbHdFSf/RGmxr1ZE/kVVj7tex3
-         E/ay1205u3W03FhRRrCJRYU4+4aBOWT8dE3LSxZiNnBW3eAan6kt7edf9Swz8wz5xMq4
-         XtfSfUbdk2woHzugdqVdR/qVQR2L8hZKT0oWo0U+JeoxOOK6yxcfJd17qsj93bNcASZI
-         dn9caT7EeS9bHHzq/AEw+Pt7tynaj58L+zvyOOMM1JDGZA6rQbNB0FWaYr8Q6PS3WP5d
-         PwEuBnHHK15D/HHq5fsMR8iEd45XvspZ/Ryx0taP/xezQvTrLRLx0etderY77B1dFYKI
-         IPnQ==
-X-Gm-Message-State: AOJu0YzboPxJZjicBXzkWS9m8CHR93qGggOeaZE0TXY7JUUE3Yhgmbll
-	cx3JqkZoeFqtZ7SddJtLKMMtG3qdhQ/fJzv/6Lzk31Ch4xKnu1ED9P2Xio5XuqA/zY3T3xYvluT
-	yRVjpoqjinjzrlZ7gYtfJWjbR260dIna6vRRJoeqB
-X-Gm-Gg: AeBDiesupcR/6XlWp6RBS9e82xLomYjafc2qz8eYzinBXIfHVruYaf/7mBGSiEor+hS
-	ZGMqqt3hzrr4y91r5gurVV9A/Vkp+G8irYUFO1J1sk0M/OXXdslqXJsEl1vwB5FDu/E27+xdcKv
-	A33cyLYdctIRFXPMPN9lmOpO1p0baNa+7cf3Pvpgqfn+1bmJWAYPxkYpiMnrUjSwoVvPVDS1n7I
-	ly5b/x6A1kJh9RREI9n687ex3bqH6u2dCBRvqxr69AlTPtfc7GFLFGCZZmS2Spxr8ZS0h+6Xxkn
-	vRm5qAUa9fCOnNQxeZGdDOpcSRsFSDjbfTs32CjDIVe5o+FLt2g5q11uoLZB+eiDP/FNpQzc35C
-	wcPf1pY0=
-X-Received: by 2002:a05:622a:6846:20b0:509:20aa:49ea with SMTP id
- d75a77b69052e-50e42635c9cmr53038471cf.18.1776590756870; Sun, 19 Apr 2026
- 02:25:56 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1776592328; x=1777197128;
+        h=content-transfer-encoding:in-reply-to:from:references:to:subject:cc
+         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xNbDpXxBmda7i9Siqc5i89PbvpK5U76PasTjM+CK90c=;
+        b=JjxbOWVvnjJfBbkcI4klL6I6KcEPUZFUSFO3U7sJ01uYPP1gkzKAhEh+akV7Oruau+
+         kbEkS4FlD1XLiYnJMA7XzfDHsG2iNJMqvmqnlUHduwtRlB5bxPuGsXJU1PUrJS81RC5/
+         z+ebxX9X4U7WAahXlhqJJI/2vRMv8mSXVYltf+LDZuZQdNLyWZImt+p4jzE+KcRv9JLx
+         XYypJWRAqiOSYtYx8uoQnmsv1gFvdF/Lnxc0ulSQIgoCSmMPyF10fM6ve9Mm+w+rNuMK
+         6f67TnQf23CAybKpzyVI1Y5ngQkgFiOxrwJRb//phl8kxEi4ADw2PFFjW3e9EsDXzem5
+         Iu8Q==
+X-Forwarded-Encrypted: i=1; AFNElJ+pPF+7g5eNE7rDDiEb9O+dKV3qu7c5mXwbp9OYQHv0ceVv7ZjhfBmGBI+34tOPBvEVZFIdws8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzKs6qZp0E4CqoLQYaR191yFXw461l80iZ00Gz/0C/ngtQ3jJ+o
+	RyU2alb6E6L6m9/4fMaIzdU/SBZFR0QomUyRS9Suq/0C5H5m4ZMrC45w
+X-Gm-Gg: AeBDiesZ9VGp5Vcpkv6KgnJnyWNWVkGQ19S3Ra9296JQGECcA3Hx5r3zVUV/oa7ZSwx
+	obYDWMCFG5glg9LjuH+tsM3EocfwWBuq1V3F8jtVPE7b2lb1LtiQTCibyY5+UBY/5IXhF2T5zcB
+	V47+osRW4jmRSmtg8TYIGIiquHTg0ZlAfB0cHlMo6Ntj/PMk/Csi3tFzyGywTOxwm8d5gPmRlCL
+	7HV8wNKkq+kc3Wp1pvwIiY33qXnu/Vp5CzNRB6eJuPE5Ee7XmiPl2nAk6BvAqXZTGWr8uJrF1WU
+	gpkOXKs6YXSo8Lwu9jnclvmcM0vlsDfztXP/q+E7eHFK8lMHokW9JifgGq8/bd7kAfFKFiGKIyf
+	w26hsW0x8UtyIKFQquMCHa1kDwy9YWUGqOmHSGJz+Xv7Zq4/Bp1/Gjh6WDaWMp9rHESBbzkV/an
+	duyuV7BVgQ2M5Vj7OUrrWKC3CGK1hXTlkFs1ZRvBBbjmL2R9w=
+X-Received: by 2002:a05:7022:12b:b0:128:d2f2:5cf8 with SMTP id a92af1059eb24-12c73fa8d16mr4469503c88.34.1776592327435;
+        Sun, 19 Apr 2026 02:52:07 -0700 (PDT)
+Received: from [10.0.0.2] ([169.235.25.186])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12c749c422csm9967262c88.3.2026.04.19.02.52.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 19 Apr 2026 02:52:07 -0700 (PDT)
+Message-ID: <05a19f8d-360e-41d1-bc8a-0b4caab3d354@gmail.com>
+Date: Sun, 19 Apr 2026 02:51:50 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260419090817.127334-1-jiayuan.chen@linux.dev>
-In-Reply-To: <20260419090817.127334-1-jiayuan.chen@linux.dev>
-From: Eric Dumazet <edumazet@google.com>
-Date: Sun, 19 Apr 2026 02:25:45 -0700
-X-Gm-Features: AQROBzBbVkrtAdeym8XHtzeCjrZpomGYTVx6hfQK67CeyjEtIH-hi3w7tEP_Rx8
-Message-ID: <CANn89iKJFCw9gPdQN4hYZ94j-0Ua84N+DyYjPjwBTRLveK-j7g@mail.gmail.com>
-Subject: Re: [PATCH net v2] net: iptunnel: fix stale transport header after
- GRE/TEB decap
-To: Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: netdev@vger.kernel.org, 
-	syzbot+83181a31faf9455499c5@syzkaller.appspotmail.com, 
-	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Pravin B Shelar <pshelar@nicira.com>, Tom Herbert <tom@herbertland.com>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+User-Agent: Mozilla Thunderbird
+Cc: yuantan098@gmail.com, Ren Wei <n05ec@lzu.edu.cn>, netdev@vger.kernel.org,
+ mptcp@lists.linux.dev, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, ncardwell@google.com,
+ dsahern@kernel.org, martineau@kernel.org, geliang@kernel.org,
+ daniel@iogearbox.net, kafai@fb.com, yifanwucs@gmail.com,
+ tomapufckgml@gmail.com, bird@lzu.edu.cn, caoruide123@gmail.com,
+ enjou1224z@gmail.com
+Subject: Re: [PATCH net 1/1] mptcp: hold subflow request owners when cloning
+ reqsk
+To: Kuniyuki Iwashima <kuniyu@google.com>,
+ Matthieu Baerts <matttbe@kernel.org>
+References: <cover.1776149210.git.caoruide123@gmail.com>
+ <86e2514b533bf4d55d4aa2fdbf1404022e8c9430.1776149210.git.caoruide123@gmail.com>
+ <5f06a4e8-0b49-4119-94f9-3a8a1e430e0d@kernel.org>
+ <CAAVpQUDzh-dGsQpBCZjN3rUsoDc2QjzWh-o5yVWoBWDQNXbjmQ@mail.gmail.com>
+From: Yuan Tan <yuantan098@gmail.com>
+In-Reply-To: <CAAVpQUDzh-dGsQpBCZjN3rUsoDc2QjzWh-o5yVWoBWDQNXbjmQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-279575-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	FREEMAIL_CC(0.00)[gmail.com,lzu.edu.cn,vger.kernel.org,lists.linux.dev,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,fb.com];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-279576-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[yuantan098@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,83181a31faf9455499c5];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: DFCA44237FF
+X-Rspamd-Queue-Id: 64A7E42393A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun, Apr 19, 2026 at 2:08=E2=80=AFAM Jiayuan Chen <jiayuan.chen@linux.de=
-v> wrote:
->
-> syzbot reported a BUG.
->
-> I found that after GRE decapsulation in gretap/ip6gretap paths, the
-> transport_header becomes stale with a negative offset. The sequence is:
->
-> 1. Before decap, transport_header points to the outer L4 (GRE) header.
-> 2. __iptunnel_pull_header() calls skb_pull_rcsum() to advance skb->data
->    past the GRE header, but does not update transport_header.
-> 3. For TEB (gretap/ip6gretap), eth_type_trans() in ip_tunnel_rcv() /
->    __ip6_tnl_rcv() further pulls ETH_HLEN (14 bytes) from skb->data.
->
-> After these two pulls, skb->data has moved forward while transport_header
-> still points to the old (now behind skb->data) position, resulting in a
-> negative skb_transport_offset(): typically -4 after GRE pull alone, or
-> -18 after GRE + inner Ethernet pull.
->
-> In the normal case where the inner frame is a recognizable protocol
-> (e.g., IPv4/TCP), the transport_header is subsequently overwritten by
-> ip_rcv_core() (or inet_gro_receive() on the GRO path) via
-> skb_set_transport_header(), and the stale value never reaches downstream
-> consumers. However, if the inner frame cannot be parsed (e.g.,
-> eth_type_trans() classifies it as ETH_P_802_2 due to a zero/invalid
-> inner Ethernet header), neither rescue runs, and the stale offset
-> persists into __netif_receive_skb_core().
->
-> When this stale offset is combined with contradictory GSO metadata (e.g.,
-> SKB_GSO_TCPV4 injected via virtio_net_hdr from a tun device),
-> qdisc_pkt_len_segs_init() trusts the negative offset: the unsigned
-> wraparound makes pskb_may_pull() effectively a no-op, and __tcp_hdrlen()
-> then reads from an invalid memory location, causing a use-after-free.
->
-> The UAF only triggers on the GSO path, where qdisc_pkt_len_segs_init()
-> dereferences the transport header to compute per-segment length. Fix
-> this by introducing iptunnel_rebuild_transport_header(), which is a
-> no-op for non-GSO packets and otherwise re-probes the transport header
-> via the flow dissector. If re-probing fails, the contradictory GSO
-> metadata is cleared via skb_gso_reset() so downstream consumers cannot
-> trust stale offsets. Restricting the rebuild to GSO packets keeps the
-> flow-dissector cost off the common rx fast path.
->
-> reproducer: https://gist.github.com/mrpre/5ba943fd86367af748b70de99263da4=
-b
->
-> Link: https://syzkaller.appspot.com/bug?extid=3D83181a31faf9455499c5
-> Fixes: c54419321455 ("GRE: Refactor GRE tunneling code.")
-> Fixes: 0d3c703a9d17 ("ipv6: Cleanup IPv6 tunnel receive path")
-> Reported-by: syzbot+83181a31faf9455499c5@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/all/69de2bee.a00a0220.475f0.0041.GAE@goog=
-le.com/T/
-> Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
-> ---
->
-> As a follow-up for production reliability, I am wondering whether we
-> can extend the existing safety net in __netif_receive_skb_core() to
-> also handle set-but-negative transport_header:
->
->         if (!skb_transport_header_was_set(skb) ||
->             skb_transport_offset(skb) < 0)
->                 skb_reset_transport_header(skb);
-> ---
->  include/net/ip_tunnels.h | 12 ++++++++++++
->  net/ipv4/ip_tunnel.c     |  2 ++
->  net/ipv6/ip6_tunnel.c    |  2 ++
->  3 files changed, 16 insertions(+)
->
-> diff --git a/include/net/ip_tunnels.h b/include/net/ip_tunnels.h
-> index d708b66e55cd..9b4e662833a1 100644
-> --- a/include/net/ip_tunnels.h
-> +++ b/include/net/ip_tunnels.h
-> @@ -662,6 +662,18 @@ static inline int iptunnel_pull_offloads(struct sk_b=
-uff *skb)
->         return 0;
->  }
->
-> +static inline void iptunnel_rebuild_transport_header(struct sk_buff *skb=
-)
-> +{
-> +       if (!skb_is_gso(skb))
-> +               return;
-> +
-> +       skb->transport_header =3D (typeof(skb->transport_header))~0U;
-> +       skb_probe_transport_header(skb);
-> +
-> +       if (!skb_transport_header_was_set(skb))
-> +               skb_gso_reset(skb);
 
-I do not think this makes sense.
-What is a valid case for this packet being processed further?
-The buggy packet must be dropped, instead of being mangled like this.
+On 4/16/2026 11:48 AM, Kuniyuki Iwashima wrote:
+> On Thu, Apr 16, 2026 at 10:45 AM Matthieu Baerts <matttbe@kernel.org> wrote:
+>> Hi Ren,
+>>
+>> On 15/04/2026 11:31, Ren Wei wrote:
+>>> From: Ruide Cao <caoruide123@gmail.com>
+>>>
+>>> TCP request migration clones pending request sockets with
+>>> inet_reqsk_clone(). For MPTCP MP_JOIN requests this raw-copies
+>>> subflow_req->msk, but the cloned request does not take a new reference.
+>>>
+>>> Both the original and the cloned request can later drop the same msk in
+>>> subflow_req_destructor(), and a migrated request may keep a dangling msk
+>>> pointer after the original owner has already been released.
+>>>
+>>> Add a request_sock clone callback and let MPTCP grab a reference for cloned
+>>> subflow requests that carry an msk. This keeps ownership balanced across
+>>> both successful migrations and failed clone/insert paths without changing
+>>> other protocols.
+>> Thank you for this patch!
+>>
+>> Indeed, it looks like this path has not been covered by the MPTCP test
+>> suite so far.
+>>
+>> By chance, do you have any simpler reproducer using packetdrill? (the
+>> MPTCP fork)
+>>
+>>   https://github.com/multipath-tcp/packetdrill
+>>
+>> Also, I see Sashiko is pointing to a potential issue with MP_CAPABLE and
+>> the token, also only visible with net.ipv4.tcp_migrate_req=1:
+>>
+>> https://sashiko.dev/#/patchset/86e2514b533bf4d55d4aa2fdbf1404022e8c9430.1776149210.git.caoruide123%40gmail.com
+>>
+>> Are you also looking at that?
+>>
+>>> Fixes: c905dee62232 ("tcp: Migrate TCP_NEW_SYN_RECV requests at retransmitting SYN+ACKs.")
+>>> Cc: stable@kernel.org
+>>> Reported-by: Yuan Tan <yuantan098@gmail.com>
+>>> Reported-by: Yifan Wu <yifanwucs@gmail.com>
+>>> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+>>> Reported-by: Xin Liu <bird@lzu.edu.cn>
+>>> Signed-off-by: Ruide Cao <caoruide123@gmail.com>
+>>> Tested-by: Ren Wei <enjou1224z@gmail.com>
+>>> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+>>> ---
+>>>  include/net/request_sock.h      |  2 ++
+>>>  net/ipv4/inet_connection_sock.c |  3 +++
+>>>  net/mptcp/subflow.c             | 13 +++++++++++++
+>>>  3 files changed, 18 insertions(+)
+>>>
+>>> diff --git a/include/net/request_sock.h b/include/net/request_sock.h
+>>> index 5a9c826a7092..560e464c400f 100644
+>>> --- a/include/net/request_sock.h
+>>> +++ b/include/net/request_sock.h
+>>> @@ -36,6 +36,8 @@ struct request_sock_ops {
+>>>                                     struct sk_buff *skb,
+>>>                                     enum sk_rst_reason reason);
+>>>       void            (*destructor)(struct request_sock *req);
+>>> +     void            (*init_clone)(const struct request_sock *req,
+>>> +                                   struct request_sock *new_req);
+>> @TCP/INET maintainers: are you OK with this new function pointer?
+>>
+>> Currently, MPTCP is the only user, and "req" is not used, see below.
+>>
+>>>  };
+>>>
+>>>  struct saved_syn {
+>>> diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_sock.c
+>>> index e961936b6be7..140a9e96ad58 100644
+>>> --- a/net/ipv4/inet_connection_sock.c
+>>> +++ b/net/ipv4/inet_connection_sock.c
+>>> @@ -954,6 +954,9 @@ static struct request_sock *inet_reqsk_clone(struct request_sock *req,
+>>>       if (sk->sk_protocol == IPPROTO_TCP && tcp_rsk(nreq)->tfo_listener)
+>>>               rcu_assign_pointer(tcp_sk(nreq->sk)->fastopen_rsk, nreq);
+>> (Maybe TCP with fastopen could be this other user to call
+>> rcu_assign_pointer()? (net-next material))
+>>
+>>> +     if (req->rsk_ops->init_clone)
+>>> +             req->rsk_ops->init_clone(req, nreq);
+> I think a simple direct call is better.
+>
+> #ifdef CONFIG_MPTCP
+>     if (tcp_rsk(req)->is_mptcp)
+>         mptcp_reqsk_clone(nreq);
+> #endif
+>
+ Thank you very much for your suggestion. We will use this approach in
+the next version of the patch. Would you like us to add your
+Suggested-by tag?
+
+
+>>> +
+>>>       return nreq;
+>>>  }
+>>>
+>>> diff --git a/net/mptcp/subflow.c b/net/mptcp/subflow.c
+>>> index 4ff5863aa9fd..5f4069647822 100644
+>>> --- a/net/mptcp/subflow.c
+>>> +++ b/net/mptcp/subflow.c
+>>> @@ -47,6 +47,17 @@ static void subflow_req_destructor(struct request_sock *req)
+>>>       mptcp_token_destroy_request(req);
+>>>  }
+>>>
+>>> +static void subflow_req_clone(const struct request_sock *req,
+>>> +                           struct request_sock *new_req)
+>>> +{
+>>> +     struct mptcp_subflow_request_sock *subflow_req = mptcp_subflow_rsk(new_req);
+>>> +
+>>> +     (void)req;
+>>
+>> Note: if 'req' is not used, and MPTCP is currently the only user of this
+>> new init_clone() callback, perhaps enough to pass only 'new_req' for the
+>> moment? 'req' can be added later if other users need it, no?
+>>
+>> With only init_close(nreq) in a v2, or if TCP maintainers prefer to keep
+>> it, feel free to add:
+>>
+>> Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+>>
+>>
+>> Cheers,
+>> Matt
+>> --
+>> Sponsored by the NGI0 Core fund.
+>>
 
