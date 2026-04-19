@@ -1,267 +1,155 @@
-Return-Path: <netdev+bounces-279605-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279608-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aB2YAHMs5WkEfAEAu9opvQ
-	(envelope-from <netdev+bounces-279605-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 19 Apr 2026 21:26:43 +0200
+	id wK4jLMY75WmTfwEAu9opvQ
+	(envelope-from <netdev+bounces-279608-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 19 Apr 2026 22:32:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52941425403
-	for <lists+netdev@lfdr.de>; Sun, 19 Apr 2026 21:26:41 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E7F7425760
+	for <lists+netdev@lfdr.de>; Sun, 19 Apr 2026 22:32:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E93663020A64
-	for <lists+netdev@lfdr.de>; Sun, 19 Apr 2026 19:26:30 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id AADA8300461F
+	for <lists+netdev@lfdr.de>; Sun, 19 Apr 2026 20:32:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A55DD2FF170;
-	Sun, 19 Apr 2026 19:26:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3588328850C;
+	Sun, 19 Apr 2026 20:32:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fJo7bLQP"
+	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="jWQI6Vwo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f201.google.com (mail-dy1-f201.google.com [74.125.82.201])
+Received: from sonic310-24.consmr.mail.ne1.yahoo.com (sonic310-24.consmr.mail.ne1.yahoo.com [66.163.186.205])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F28632E1EF4
-	for <netdev@vger.kernel.org>; Sun, 19 Apr 2026 19:26:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9D651D86DC
+	for <netdev@vger.kernel.org>; Sun, 19 Apr 2026 20:31:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.163.186.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776626789; cv=none; b=pfvOKDvrMcVrH72W3wltF3ZFIcCKSH5altZ5KjPBbJw8eTp4xqh8nHby28ss8WSFIT2KzztW5OF2v8FbJu7SZ2RpmQoHAEKXxs36Tm7HBVq9rA3nzhG6Lh3OOGfiSFfPgutVWcofbKUo5NkgCT61wBCZ45oE47Y+Su7iBIwjjNw=
+	t=1776630720; cv=none; b=LAhj58B1yUhanl/Pc8x5CIquRTREkXXdDelEzeqTfiPl8z3oAPIxo4f9vmgbvWnC4j3pyFMJx1qov5pC9QmxR+PVcdUGDC9Vh5pQCTHCg6MhwjTnduEkxXj+h1h7sn9di4tXQjWuF0/zTem9aOMuQFUQlVCe1anGQ7NEtCcxCG0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776626789; c=relaxed/simple;
-	bh=m8DcrGxrZc9awjTMCxUkOTUB79YPdqd40L3PhS6dwaA=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=BQL7UxRTnCxkJaAC3jISGFOoHzul2ibarrMl1T9l1DSxzHO8r2tpZ0tvtaFtpa8qnVWfkKMOaG6sySqLKdiIvyOoxPO1g36DYD5/Suy9J9nxOb8H79JkN3pwoKuyzUzKabmz0n2cRDVLnq0vtCSzceowVN7gnav6CfkA6/OWuDk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--boolli.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fJo7bLQP; arc=none smtp.client-ip=74.125.82.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--boolli.bounces.google.com
-Received: by mail-dy1-f201.google.com with SMTP id 5a478bee46e88-2c0f6593ef5so2441503eec.1
-        for <netdev@vger.kernel.org>; Sun, 19 Apr 2026 12:26:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1776626786; x=1777231586; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=YmTe5QrSAhWmElkBtUPNEfvUQd8uWx+pL52ZTzPTjRg=;
-        b=fJo7bLQP4sHAbr/iBkMAeXQR4etPZZLhdUgDbCkRkfTTMw3HdcX6ABJmPRvk9oyhtw
-         lbzvDHC6x97JloUtw5GIUoO2phrd+kAh8QTB8RyFVXSDFufhwA7XauDZRCHKzRvsR1Bg
-         KG0cpMdpxm8U9rUSOmEdxWckIT+LQmf9Piq0IiKQWLHWPs1ivlV92R6DaJ8X2AaxLYm2
-         bepkbVDTNsE/FlbOMcp6cHARbcNs4Pv5qoaCN5pzWbudaCqf99mVOScHiUANs1ATBrVm
-         QeoJxymWQk7Z+DWrVVtG5mypfjIJY77Nd7ASB5cDzYBhcqKGHZNR22kSQ/B6docDQDMH
-         3QZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776626786; x=1777231586;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=YmTe5QrSAhWmElkBtUPNEfvUQd8uWx+pL52ZTzPTjRg=;
-        b=Q4ifQ1h1G4xv3Iwo+LcZM68aOSZygrkVazGiA7bZmIAENsyTVJmVvxnOMrCrxgp09y
-         Sbr/Z74hUptXeSpwYBbd7R3QOup9iwNVA8pzpAyhAupKKCFt08I2Duv9tzxjWM8XbOx2
-         DOuiJ2Jas/pbMIhG8BKiOd7MZWix6XfNNE1edCD2vQt0YsMWwux//CjjIgRDGMuxunwt
-         qkTjlJwptiOCJHI7BOmVh5aDRy+HgnmHxfOdmtutimGd55/Cnrc12wcyJtiyyhUBrOZm
-         67M8pza8sslb811coG/VB33u8L8Qfrx5vVDNvyUEsz4o7uq/gzEMr8aX5sf0INUSM2gi
-         uGXQ==
-X-Gm-Message-State: AOJu0YwLukrxi7GBDaP/3p1VTHCcSE1HxIwbIZRAqZhPHT3JGY3Y1vyv
-	Njy9fO4YPQWSGPGEYI1DVIDfyzW1cJf4nUq7N8x1cmg0HQeBK23/li5IAa5kN3HZ8KZ/I9XpcZJ
-	Rv1EGPg==
-X-Received: from dybtv6.prod.google.com ([2002:a05:7300:f486:b0:2d8:5b05:964b])
- (user=boolli job=prod-delivery.src-stubby-dispatcher) by 2002:a05:7300:6c05:b0:2c7:3a7:c792
- with SMTP id 5a478bee46e88-2e47a1027ecmr5364749eec.20.1776626785796; Sun, 19
- Apr 2026 12:26:25 -0700 (PDT)
-Date: Sun, 19 Apr 2026 19:25:55 +0000
+	s=arc-20240116; t=1776630720; c=relaxed/simple;
+	bh=Jx2VwIRlLkTnogfoJs6usTI0xVAZFxC6T8CEvlXZSqk=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type:
+	 References; b=tmtJ1kv+DvYqL1XOsDkYeWOZR7SvNcFDe6B/kJ9lAtW2frMJhCChgGpjhtR9QECN0aXjNlcl3/oMB4uSjN6CEjKID3cJGvxiE/TM2bBMtKMRjy5RpG0K4/flZbDUqIHj2ETTRVzg9Tv87xc/OjpnzfT46EzaaQHQ2cZVkQAKfLA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=jWQI6Vwo; arc=none smtp.client-ip=66.163.186.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1776630718; bh=C6P01coV17raI675X3Tjs6EKGGKw8wcIYoqXJRLzz+Y=; h=Date:To:From:Subject:References:From:Subject:Reply-To; b=jWQI6VwoiorSQSoHCnURX6DGx6yijZu76zbE+rqrUYnanNO87QRM6u8XdwWvHSev8elGf2VIU4WbdCwhkjjCVzS2sqmQVwV9JVb1K7el/PXTA83uIaqSUey8QrnNgr1hCH8LBm4nTD4YuEY1U3dVhpkalYGfiMov/BEdrDwO/anD6w9w04+EowqoFrDmCj4nOxwyZfrx50yjzUCVs8bnMVRSdgVR9bQWu+azR2Gw0hz0+18vAdB1Ge5tRiiF60fSNT3HA7Np9INEGd0x1YOqIMy7JYLc46y59ohA0OOHFZz/OAr9hZjfgn1GD/41Tz9jP6yhdXX+9+kt10oV1k7OTA==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1776630718; bh=SYNbPQkiqrWwW7fS6OnsoxIQYJpqDhtnNR0DmqHFulc=; h=X-Sonic-MF:Date:To:From:Subject:From:Subject; b=trEv3j/4AEmR3nnwNhDbhXra2MI5Zqnj9ZIh4Rn8bl4tX02KGdF6OTn01f3Wmz0CBPwmXWYgrcZxxo4mvXeu0nDmgmDzaDzkEc2cK7rajUsVK8HTPCGuzU1CoWOuSIm1d176Dg7q/D+VZE6EwuCkSS4OZNSNPyknjksveMCtL06Y1fi+ZUgibv85P71+J9cVuOra9H9el2HDqtGiMNfqh4cZQEyVFxTB6d849Bq0DW/3EoT+hucyAKd99xIv/R/poZriiHO0bqxexFOZPiF316OiF5YzliMJkBSQhfhpoIpDDLBwxXWzy/TZYar9BpESZDaPq+z+lWN7SRh4bIOGlA==
+X-YMail-OSG: f1KolfcVM1nr94iZDWkjQmrURG4O8UQlqjUhnYtrSUdflz2XFx6r2pK4sR5.Il9
+ E7yOjIdcwjLDJ.kBCSr8doA8avXuSAtVM3FAfXj1KMxecgwYE3AD4i0WbthQ38Vq6huYTvW2FJ0p
+ Oy7I1AYuHTrvl6JXKiBZ459waK0b0f52wXEh_2dnnZ5M5Q.Zp5zZoy0zrcP2NdgHcp5OSBKCfGJP
+ H1RZyZ46x1ryHfKjG6gT7ETHFeTlj0tbM0LL6nE0gc4BqUMWwBd6jFMKR5x_u6ptrrBzE1Y3lnrO
+ wCekc1mYGr870D7h5BLYR1Czpw9.32u992L3WLwoP38ICSzAXo2UIDovhnV_xVUz9htIyh_P3ixn
+ X1MnoqBcofpRit_F3b_P5uEw56MAK.dDMj684xZEZ15l.y._cbeqM6X6bGma.Pf.B0p6kXs3kYwe
+ wI4dYhtr8iLn4_3s.qLk0KV2HBRqrq.JYHJSyv7iT8tyDhJr115yTij7Bf.IRQ29HLEjs0v5tk6u
+ ieSyMzYWHNY2MDokD3JI3wAIAl0u.U_kgIoUgJyOiOXj1ZnHuQjNDXRYqU8sj9ASg0jmZjkC_isU
+ 24UL72IdccKzCgiltj3lN5phFEJjTxfN1VPEmo7So9Sh_Fd2vQ.NEs3MXtF87dtTAqp7d93Mki2v
+ DeyO7QO_54f0Gx0tyJ5FF1reLKR5it2tWSiu7ZBV_1TlXTjYPDDnAH3fTRBp6TeD8S0Dc_M23yn4
+ sNdDTSs11zh79CEOQQM7VDGy2a1gSK6C784LZEUPTxCYvUxM4dRHWNJL8bNlNfN9EZKxas_slatd
+ TG0nRrpAOLrzzn0xOUXzNphpebdY2eWS.vVNqiK.px1RlWVBXCnuGTdzwnl9keS9YB8b2fsEd5u4
+ oKHceBX_63XcSPXQZgZ4GIeGhaUZQNG.LcTW5LMzPTlmPJpSDKMQNKxJuZ60hbww21s7iZiOoZFY
+ 9VYQ1V1oUCwf7H3nOtpK.9FWA39LIt4C4vF5eRJ2bsgOEvBCxKfOWspq00eZQuDES3o1kpwxBkwW
+ DLkdqOAXiUfLUt0DN.3ljtOJ7WPOKQ9YRUA2aG7uUz45fskbevhFRBKVE20tP.deVuuxpcSgWJOo
+ tjrlPW1AKDJKE3_pTtjBRQX4NZji4XAa9CMrj9XQPWwQz.Vjx2ehNVjBm_vywDC1ft5aCU6l8_Qv
+ xUcu1hJ1JL9mLbxWLRz9RpNmLqkG_RFWcGiouq9BQnfk.9i0l_p1gQl.bguuAxb29p8nDPJebxWy
+ TqHIKTtLVKkw15JKrKo.tls2vSB8THIFpgjFWMv0oLwTsNV.o4Q8s25E39m.cRq6BJ3hzqdnBAsE
+ NusKRdj2.V.T1cqkm6R_4LTDGTz9NP6ZoGTB5LDmgnY1SB7pxAp0KQuVBMBaD8OjAsZ9Erh758Sf
+ Fm_34lq4omGCvNf_oFqHrUpxYEgipydz59DjaiYMFWSSMCijsQiE9Il5KUquORPwxpTc6rhF0TXW
+ _rk2CTlyJAfLXnV9q_jRWc.zjem7c.3HpEAe5SDvDm6kR0MeO_h7po6oFzeH3yBeopjGUokHkgwH
+ 1jm03mHqAuT7.x4cql0BFKqMXct8Wj0vHzmPISGl3HY0usvd4ltJdK.L7XARFeXlfGmHnNdKM2kW
+ ZVX1uLNBEmGhsdP9Al5lDTCzbonLIgqylv53GZjOWeXFRyN2oAK0Q1uqgC_IJWtnDTPLenT7l3bi
+ U5bUC76ZoXik8X7jSCyv0h9LU6dv7xZw4XBYloRSXKuHKG3vg3xGyzpv8J.QzGqpyf8BRIKExdzr
+ 8CI6xtcDmRSArRB0CKNMLLkPtXM7kZSwHK.pIvNAHdDFlCmYqAC7VvPL2VGhvpW.HUg74m8ab8aR
+ IaexkPUufa.loX__8pGYoqTl8OWxXRD3kJ9sQk0FqODlEHDfW7lyDwbsZsbAjLJfgx5FtDxLuTkh
+ mxkC04sm2ZMLdIrAEwTKflo48tRz9Nnjo8f.vq9drkhGXAVPre3_v4JzawJd4M8bP77AXIEcxuPD
+ 7dUUw5q7z3tpqBHi2.hn_ID31iVQqYOX_4F6G.3Gx8pFSSIION5r9sYtmzUi5cCPQipqij_no7Al
+ B5QwJpgqN9Iwpd6hg237ZT2Bc8V_2oAfvH_yjgbOc0iJvSJw..baZYu9HApt.ihLRyH6Lw6fcLSO
+ .wpWiIuHiMAKBUzrBK.F3rxQeG5YaxzasGdrFmMOuwoDCfa_wTxHI9_OjbjV0KG2tLqV3Y2SFYlz
+ nIbIjOI7sreA1hy7pHWhFCB9FQfBwkus8fWNuQf4Tm84AZYLl57CnCdLuSyqtwTA7Wrpvlbc9v0R
+ HM4ttDrMEBA--
+X-Sonic-MF: <namiltd@yahoo.com>
+X-Sonic-ID: 39802d2e-324e-486c-b7ce-139a897358d5
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic310.consmr.mail.ne1.yahoo.com with HTTP; Sun, 19 Apr 2026 20:31:58 +0000
+Received: by hermes--production-ir2-bbcfb4457-sdst2 (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 637eb63aae13c21f297f7071f341247a;
+          Sun, 19 Apr 2026 19:37:11 +0000 (UTC)
+Message-ID: <400a6387-a444-4576-af6d-26be5410bce3@yahoo.com>
+Date: Sun, 19 Apr 2026 21:37:07 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.54.0.rc1.513.gad8abe7a5a-goog
-Message-ID: <20260419192555.3631327-1-boolli@google.com>
-Subject: [PATCH] idpf: do not perform flow ops when netdev is detached
-From: Li Li <boolli@google.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	David Decotigny <decot@google.com>, Anjali Singhai <anjali.singhai@intel.com>, 
-	Sridhar Samudrala <sridhar.samudrala@intel.com>, Brian Vazquez <brianvv@google.com>, 
-	Li Li <boolli@google.com>, emil.s.tantilov@intel.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Content-Language: pl
+To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+From: Mieczyslaw Nalewaj <namiltd@yahoo.com>
+Subject: [PATCH v2] net: dsa: realtek: rtl8365mb: fix mode mask calculation
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+References: <400a6387-a444-4576-af6d-26be5410bce3.ref@yahoo.com>
+X-Mailer: WebService/1.1.25559 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[yahoo.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[yahoo.com:s=s2048];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-279605-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[yahoo.com];
+	TO_DN_EQ_ADDR_ALL(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-279608-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_ONE(0.00)[1];
+	DKIM_TRACE(0.00)[yahoo.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[boolli@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
+	FROM_NEQ_ENVFROM(0.00)[namiltd@yahoo.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 52941425403
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 7E7F7425760
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Even though commit 2e281e1155fc ("idpf: detach and close netdevs while
-handling a reset") prevents ethtool -N/-n operations to operate on
-detached netdevs, we found that out-of-tree workflows like OpenOnload
-can bypass ethtool core locks and call idpf_set_rxnfc directly during
-an idpf HW reset. When this happens, we could get kernel crashes like
-the following:
+The RTL8365MB_DIGITAL_INTERFACE_SELECT_MODE_MASK macro was shifting
+the 4-bit mask (0xF) by only (_extint % 2) bits instead of
+(_extint % 2) * 4. This caused the mask to overlap with the adjacent
+nibble when configuring odd-numbered external interfaces, selecting
+the wrong bits entirely.
 
-[ 4045.787439] BUG: kernel NULL pointer dereference, address: 0000000000000070
-[ 4045.794420] #PF: supervisor read access in kernel mode
-[ 4045.799580] #PF: error_code(0x0000) - not-present page
-[ 4045.804739] PGD 0
-[ 4045.806772] Oops: Oops: 0000 [#1] SMP NOPTI
-...
-[ 4045.836425] Workqueue: onload-wqueue oof_do_deferred_work_fn [onload]
-[ 4045.842926] RIP: 0010:idpf_del_flow_steer+0x24/0x170 [idpf]
-...
-[ 4045.946323] Call Trace:
-[ 4045.948796]  <TASK>
-[ 4045.950915]  ? show_trace_log_lvl+0x1b0/0x2f0
-[ 4045.955293]  ? show_trace_log_lvl+0x1b0/0x2f0
-[ 4045.959672]  ? idpf_set_rxnfc+0x6f/0x80 [idpf]
-[ 4045.964142]  ? __die_body.cold+0x8/0x12
-[ 4045.968000]  ? page_fault_oops+0x148/0x160
-[ 4045.972117]  ? exc_page_fault+0x6f/0x160
-[ 4045.976060]  ? asm_exc_page_fault+0x22/0x30
-[ 4045.980262]  ? idpf_del_flow_steer+0x24/0x170 [idpf]
-[ 4045.985245]  idpf_set_rxnfc+0x6f/0x80 [idpf]
-[ 4045.989535]  af_xdp_filter_remove+0x7c/0xb0 [sfc_resource]
-[ 4045.995069]  oo_hw_filter_clear_hwports+0x6f/0xa0 [onload]
-[ 4046.000589]  oo_hw_filter_update+0x65/0x210 [onload]
-[ 4046.005587]  oof_hw_filter_update.constprop.0+0xe7/0x140 [onload]
-[ 4046.011716]  oof_manager_update_all_filters+0xad/0x270 [onload]
-[ 4046.017671]  __oof_do_deferred_work+0x15e/0x190 [onload]
-[ 4046.023014]  oof_do_deferred_work+0x2c/0x40 [onload]
-[ 4046.028018]  oof_do_deferred_work_fn+0x12/0x30 [onload]
-[ 4046.033277]  process_one_work+0x174/0x330
-[ 4046.037304]  worker_thread+0x246/0x390
-[ 4046.041074]  ? __pfx_worker_thread+0x10/0x10
-[ 4046.045364]  kthread+0xf6/0x240
-[ 4046.048530]  ? __pfx_kthread+0x10/0x10
-[ 4046.052297]  ret_from_fork+0x2d/0x50
-[ 4046.055896]  ? __pfx_kthread+0x10/0x10
-[ 4046.059664]  ret_from_fork_asm+0x1a/0x30
-[ 4046.063613]  </TASK>
+Align the shift calculation with the existing ...MODE_OFFSET macro.
 
-To prevent this, we need to add checks in idpf_set_rxnfc and
-idpf_get_rxnfc to error out if the netdev is already detached.
-
-Tested: implemented the following patch to synthetically force idpf into
-a HW reset:
-
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-index 4fc0bb14c5b1..27476d57bcf0 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-@@ -10,6 +10,9 @@
- #define idpf_tx_buf_next(buf)		(*(u32 *)&(buf)->priv)
- LIBETH_SQE_CHECK_PRIV(u32);
-
-+static bool SIMULATE_TX_TIMEOUT;
-+module_param(SIMULATE_TX_TIMEOUT, bool, 0644);
-+
- /**
-  * idpf_chk_linearize - Check if skb exceeds max descriptors per packet
-  * @skb: send buffer
-@@ -46,6 +49,8 @@ void idpf_tx_timeout(struct net_device *netdev, unsigned int txqueue)
-
- 	adapter->tx_timeout_count++;
-
-+	SIMULATE_TX_TIMEOUT = false;
-+
- 	netdev_err(netdev, "Detected Tx timeout: Count %d, Queue %d\n",
- 		   adapter->tx_timeout_count, txqueue);
- 	if (!idpf_is_reset_in_prog(adapter)) {
-@@ -2225,6 +2230,8 @@ static bool idpf_tx_clean_complq(struct idpf_compl_queue *complq, int budget,
- 			goto fetch_next_desc;
- 		}
- 		tx_q = complq->txq_grp->txqs[rel_tx_qid];
-+		if (unlikely(SIMULATE_TX_TIMEOUT && (tx_q->idx % 2 == 1)))
-+			goto fetch_next_desc;
-
- 		/* Determine completion type */
- 		ctype = le16_get_bits(tx_desc->common.qid_comptype_gen,
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-index be66f9b2e101..ba5da2a86c15 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-@@ -8,6 +8,9 @@
- #include "idpf_virtchnl.h"
- #include "idpf_ptp.h"
-
-+static bool VIRTCHNL_FAILED;
-+module_param(VIRTCHNL_FAILED, bool, 0644);
-+
- /**
-  * struct idpf_vc_xn_manager - Manager for tracking transactions
-  * @ring: backing and lookup for transactions
-@@ -3496,6 +3499,11 @@ int idpf_vc_core_init(struct idpf_adapter *adapter)
- 		switch (adapter->state) {
- 		case __IDPF_VER_CHECK:
- 			err = idpf_send_ver_msg(adapter);
-+
-+			if (unlikely(VIRTCHNL_FAILED)) {
-+				err = -EIO;
-+			}
-+
- 			switch (err) {
- 			case 0:
- 				/* success, move state machine forward */
-
-And tested by writing 1 to /sys/module/idpf/parameters/VIRTCHNL_FAILED
-and /sys/module/idpf/parameters/SIMULATE_TX_TIMEOUT, and running
-idpf_get_rxnfc() right after the HW reset.
-
-Without the patch: encountered NULL pointer and kernel crash.
-
-With the patch: no crashes.
-
-Fixes: 2e281e1155fc ("idpf: detach and close netdevs while handling a reset")
-Signed-off-by: Li Li <boolli@google.com>
+Fixes: 4af2950c50c8 ("net: dsa: realtek-smi: add rtl8365mb subdriver for RTL8365MB-VC")
+Signed-off-by: Abdulkader Alrezej <alrazj.abdulkader@gmail.com>
+Signed-off-by: Mieczyslaw Nalewaj <namiltd@yahoo.com>
+Reviewed-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
 ---
- drivers/net/ethernet/intel/idpf/idpf_ethtool.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ drivers/net/dsa/realtek/rtl8365mb.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_ethtool.c b/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
-index bb99d9e7c65d..8368a7e6a754 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
-@@ -43,6 +43,9 @@ static int idpf_get_rxnfc(struct net_device *netdev, struct ethtool_rxnfc *cmd,
- 	unsigned int cnt = 0;
- 	int err = 0;
+diff --git a/drivers/net/dsa/realtek/rtl8365mb.c b/drivers/net/dsa/realtek/rtl8365mb.c
+index ad7044b295ec..b85c99216648 100644
+--- a/drivers/net/dsa/realtek/rtl8365mb.c
++++ b/drivers/net/dsa/realtek/rtl8365mb.c
+@@ -216,7 +216,7 @@
+ 		 (_extint) == 2 ? RTL8365MB_DIGITAL_INTERFACE_SELECT_REG1 : \
+ 		 0x0)
+ #define   RTL8365MB_DIGITAL_INTERFACE_SELECT_MODE_MASK(_extint) \
+-		(0xF << (((_extint) % 2)))
++		(0xF << (((_extint) % 2) * 4))
+ #define   RTL8365MB_DIGITAL_INTERFACE_SELECT_MODE_OFFSET(_extint) \
+ 		(((_extint) % 2) * 4)
  
-+	if (!netdev || !netif_device_present(netdev))
-+		return -ENODEV;
-+
- 	idpf_vport_ctrl_lock(netdev);
- 	vport = idpf_netdev_to_vport(netdev);
- 	vport_config = np->adapter->vport_config[np->vport_idx];
-@@ -349,6 +352,9 @@ static int idpf_set_rxnfc(struct net_device *netdev, struct ethtool_rxnfc *cmd)
- {
- 	int ret = -EOPNOTSUPP;
- 
-+	if (!netdev || !netif_device_present(netdev))
-+		return -ENODEV;
-+
- 	idpf_vport_ctrl_lock(netdev);
- 	switch (cmd->cmd) {
- 	case ETHTOOL_SRXCLSRLINS:
 -- 
-2.54.0.rc1.513.gad8abe7a5a-goog
-
+2.53.0
 
