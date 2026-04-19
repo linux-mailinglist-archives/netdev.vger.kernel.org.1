@@ -1,139 +1,138 @@
-Return-Path: <netdev+bounces-279571-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279572-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id dEBiGBaK5GkmWgEAu9opvQ
-	(envelope-from <netdev+bounces-279571-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 19 Apr 2026 09:53:58 +0200
+	id MP9mAKuL5GmBWgEAu9opvQ
+	(envelope-from <netdev+bounces-279572-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 19 Apr 2026 10:00:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B75114235A6
-	for <lists+netdev@lfdr.de>; Sun, 19 Apr 2026 09:53:57 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59C0C4235C4
+	for <lists+netdev@lfdr.de>; Sun, 19 Apr 2026 10:00:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D28A73015869
-	for <lists+netdev@lfdr.de>; Sun, 19 Apr 2026 07:53:55 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 64561300B84E
+	for <lists+netdev@lfdr.de>; Sun, 19 Apr 2026 08:00:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E85762DCF61;
-	Sun, 19 Apr 2026 07:53:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Hdm/DIl0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 681312E6CC0;
+	Sun, 19 Apr 2026 08:00:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC7111FB1
-	for <netdev@vger.kernel.org>; Sun, 19 Apr 2026 07:53:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BD9333987;
+	Sun, 19 Apr 2026 08:00:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776585232; cv=none; b=XQfNZb+HoHgfjIpxt5a3/cSuJ3kywzMtuECXjbWh6qN6yzo2jfz6OTnN25nGToLCm8fcfH3O8Rn/1EUzMpypzjH5TkB4yNGPN0vRkl1EL4t3e+7u8IKj+OVupQPtVpFU4+tVKojdyrzNTo1TMPhbAeG1sDjQMMjnKKvtyl1s2ew=
+	t=1776585638; cv=none; b=LBqtXD2RaneOIjDy5cf0okaXdMmaqWzLGfb5Py7a/xDRODUu08WprerB9iOykI/5AQadqWLKUXKnI+YOT4OxXFp+OSiCxHWrzzC9SlAz9gDRda9WmGkKA/Dyl4zWVYq3pLu9dxigbCkDd+TIiDvuZzUgHnW8TYwNQRodPrcQ4ng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776585232; c=relaxed/simple;
-	bh=E51XdivgXYIY5zPsosfCq0DsVtrQFYIvPrKAyxTDIaM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WmM/ThVVy8ifmBrFulMpEMS4lrlO970cNfTvJ2Njtpj9UjcQfg6SAcDbegYH1llUbP3CRSJ7lu11gyrnJxEB4soR00ptKCyGxdHxC6GEEx8Xjw+d6dpxGdEZIAF1SWRhLTifK8tkDTfE8gyqe3pdbx0bi/94cVfz6nkLb8e/JmE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Hdm/DIl0; arc=none smtp.client-ip=91.218.175.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <50806e49-c3a1-4188-bd73-85e0ad688ebf@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1776585228;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+NhmQ0fyExbe9oLesQZIQSK20oXCEDZCPnnUDMZ+R6I=;
-	b=Hdm/DIl0gB9Oer2IyAnav8h+Vby2J4nL5q9duVVTyEkdn3H5bQKJauSZx8H3LP+MZamlaP
-	CKz3uNB41o5rzASzHusSe7xMxBFr8FVJmFTQHL7QNRZ4BJReHFl8iF57eRa9p9nIGblJ+r
-	D3HfeQqFGqYR6hgHrehJ+r903uwHw6o=
-Date: Sun, 19 Apr 2026 15:53:36 +0800
+	s=arc-20240116; t=1776585638; c=relaxed/simple;
+	bh=Z/bcn2OK8NOgU6UH+vEzzrrUVNXWK29iBoH9LmnHRUo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rNH4La7aDnT88AuCdquBHkSxMR4T5mTi9cjtKGgbioReo/H+Nm+j3YsakRCb2vpFxeLtGGiVfXvXHTbmBtvMQGlmHXnEYQqPYoYdBvZVirupxusePLH7csufuBdv9wBwpXLjkpNMyl1kqeW++yIg5pF4kzAHD8J9fUl12FX+Q18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id 2891B60420; Sun, 19 Apr 2026 10:00:34 +0200 (CEST)
+Date: Sun, 19 Apr 2026 10:00:33 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Weiming Shi <bestswngs@gmail.com>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Phil Sutter <phil@nwl.cc>, Simon Horman <horms@kernel.org>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, Xiang Mei <xmei5@asu.edu>
+Subject: Re: [PATCH nf] netfilter: xt_TCPMSS: check skb_dst before path-MTU
+ clamping
+Message-ID: <aeSLoQis9-cUGsvE@strlen.de>
+References: <20260418163057.2611503-2-bestswngs@gmail.com>
+ <aePiSwmP6YEQ4mNE@strlen.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net v6 2/2] pppoe: drop PFC frames
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: linux-ppp@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, hataegu0826@gmail.com,
- horms@kernel.org, kees@kernel.org, kuniyu@google.com, bigeasy@linutronix.de,
- gnault@redhat.com, ericwouds@gmail.com, semen.protsenko@linaro.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, paulus@ozlabs.org,
- jaco@uls.co.za, carlsonj@workingcode.com, wojciech.drewek@intel.com,
- marcin.szycik@linux.intel.com
-References: <20260415022456.141758-2-qingfang.deng@linux.dev>
- <20260418191145.213625-1-kuba@kernel.org>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Qingfang Deng <qingfang.deng@linux.dev>
-In-Reply-To: <20260418191145.213625-1-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aePiSwmP6YEQ4mNE@strlen.de>
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279571-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,kernel.org,linutronix.de,linaro.org,ozlabs.org,uls.co.za,workingcode.com,intel.com,linux.intel.com];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[strlen.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-279572-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[qingfang.deng@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:dkim,linux.dev:mid]
-X-Rspamd-Queue-Id: B75114235A6
+	NEURAL_HAM(-0.00)[-1.000];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[strlen.de:mid,strlen.de:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 59C0C4235C4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi,
+Florian Westphal <fw@strlen.de> wrote:
+> Weiming Shi <bestswngs@gmail.com> wrote:
+> > When TCPMSS with CLAMP_PMTU is used via nft_compat in a non-base
+> > chain, par->hook_mask is set to 0, bypassing the checkentry hook
+> > validation. The target can then run at PRE_ROUTING where skb_dst is
+> > NULL, causing a null-ptr-deref in tcpmss_mangle_packet():
+> > 
+> >  KASAN: null-ptr-deref in range [0x0000000000000008-0x000000000000000f]
+> >  RIP: 0010:tcpmss_mangle_packet (include/net/dst.h:219 net/netfilter/xt_TCPMSS.c:105)
+> >   tcpmss_tg4 (net/netfilter/xt_TCPMSS.c:202)
+> >   nft_target_eval_xt (net/netfilter/nft_compat.c:87)
+> >   nft_do_chain (net/netfilter/nf_tables_core.c:287)
+> >   nf_hook_slow (net/netfilter/core.c:623)
+> > 
+> > Check skb_dst() for NULL before calling dst_mtu().
+> 
+> FWIW I will apply this patch even though its wrong.
+> 
+> nft_compat.c is just too broken, I don't see how it can be
+> fixed in any reasonable amount of time.
 
-On 4/19/2026 3:11 AM, Jakub Kicinski wrote:
-> [ ... ]
->> @@ -434,6 +434,12 @@ static int pppoe_rcv(struct sk_buff *skb, struct net_device *dev,
->>   	if (skb->len < len)
->>   		goto drop;
->>   
->> +	/* skb->data points to the PPP protocol header after skb_pull_rcsum.
->> +	 * Drop PFC frames.
->> +	 */
->> +	if (ppp_skb_is_compressed_proto(skb))
-> 
-> Does this code safely access the PPP protocol byte?
-> 
-> After pulling the PPPoE header, skb->data points to the inner payload.
-> However, the new ppp_skb_is_compressed_proto() helper unconditionally
-> dereferences skb->data[0].
-> 
-> If a crafted PPPoE packet is received with an inner length of 0 and no
-> Ethernet padding, the linear buffer might end exactly after the PPPoE header.
-> In that scenario, this would read past the allocated linear buffer.
-> 
-> Even if the inner length is greater than 0, could the payload reside entirely
-> in non-linear paged fragments, causing an out-of-bounds read?
-> 
-> Would it be safer to verify the packet has at least 1 byte and use
-> pskb_may_pull() to ensure the protocol byte is in the linear region before
-> inspecting it, perhaps after the pskb_trim_rcsum() call?
-I already updated the pskb_may_pull() above, from struct pppoe_hdr (6) 
-to PPPOE_SES_HLEN (8), to ensure that.
+net/netfilter/xt_TCPMSS.c:          (par->hook_mask & ~((1 << NF_INET_FORWARD) |
+net/netfilter/xt_addrtype.c:    if (par->hook_mask & ((1 << NF_INET_PRE_ROUTING) |
+net/netfilter/xt_devgroup.c:        par->hook_mask & ~((1 << NF_INET_PRE_ROUTING) |
+net/netfilter/xt_physdev.c:         par->hook_mask & (1 << NF_INET_LOCAL_OUT)) {
+net/netfilter/xt_policy.c:      if (par->hook_mask & ((1 << NF_INET_POST_ROUTING) |
+net/netfilter/xt_set.c:              (par->hook_mask & ~(1 << NF_INET_FORWARD |
 
-Regards,
-Qingfang
+Look at this I don't see an alternative to mixing nft specific bits into
+x_tables, i.e.:
+
+diff --git a/include/linux/netfilter/x_tables.h b/include/linux/netfilter/x_tables.h
+--- a/include/linux/netfilter/x_tables.h
++++ b/include/linux/netfilter/x_tables.h
+@@ -187,6 +187,8 @@ struct xt_target {
+        /* Should return 0 on success or an error code otherwise (-Exxxx). */
+        int (*checkentry)(const struct xt_tgchk_param *);
+ 
++       int (*nft_validate_chain)(const void *targinfo, unsigned int hook_mask);
++
+        /* Called when entry of this type deleted. */
+        void (*destroy)(const struct xt_tgdtor_param *);
+ #ifdef CONFIG_NETFILTER_XTABLES_COMPAT
+
+.. and then call that from nft_compat.c for TCPSS.
+Same for matches.
+
 
