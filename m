@@ -1,233 +1,205 @@
-Return-Path: <netdev+bounces-279593-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279597-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mFD+BAjp5Gl0bwEAu9opvQ
-	(envelope-from <netdev+bounces-279593-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 19 Apr 2026 16:39:04 +0200
+	id 1fFjMrXt5GltcAEAu9opvQ
+	(envelope-from <netdev+bounces-279597-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 19 Apr 2026 16:59:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85CCC424642
-	for <lists+netdev@lfdr.de>; Sun, 19 Apr 2026 16:39:03 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87DA74246B9
+	for <lists+netdev@lfdr.de>; Sun, 19 Apr 2026 16:59:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id AB0CB300491B
-	for <lists+netdev@lfdr.de>; Sun, 19 Apr 2026 14:39:02 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 21C4430028FF
+	for <lists+netdev@lfdr.de>; Sun, 19 Apr 2026 14:58:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C49E21D3E4;
-	Sun, 19 Apr 2026 14:39:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q/EpLyPT"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDB9933DEF9;
+	Sun, 19 Apr 2026 14:58:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f68.google.com (mail-pj1-f68.google.com [209.85.216.68])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A859E1C3C1F
-	for <netdev@vger.kernel.org>; Sun, 19 Apr 2026 14:38:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.68
+Received: from zg8tmja2lje4os4yms4ymjma.icoremail.net (zg8tmja2lje4os4yms4ymjma.icoremail.net [206.189.21.223])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02AF315B0EC
+	for <netdev@vger.kernel.org>; Sun, 19 Apr 2026 14:58:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=206.189.21.223
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776609539; cv=none; b=A5zfbz9iw7kw32j8FlRLhCmi54sg7rZT06ORRYcI93w67SddjzS6TpNPAJZNWFaia0vCqP0ag3Zy2i1tEyGROB9xv8Bhfa2qhv9avIWoc9j8uY7TqqUJm9ww64iMUm9fRiLyCF0pYa3/t7tUWHQEmUQWH1oXC9jjVSV67ptAYJg=
+	t=1776610735; cv=none; b=DsM40LPcLFoWClPuHuMgfohH/PIIuvDSWY3hnWiRYT74tTNyh2GyThFIHZ8FdB4RBnv6gavaOW47EEy683YjCda3zAiDbpI6zuysj0bAR/llLrFggUOwRJYv24PFQgiVvZZdIxeGmJqCIkohBIQSeo5HB5E8QdTLKHR22ebEdvY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776609539; c=relaxed/simple;
-	bh=tlcXlm1EGYPdgH/RDjYPwhioWoT2JMM98ERnPGLKYAQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cZw8HGtY/0BLfaf3QgndZemoWRZDAfPkZEGNFZnbneP4QyMODsp88OBQ1AZtjSv4JsDvJVO3uSIg3yF407Q1CYWABkG6LVNN4kX8M68r06yAiS0Ngy2DBq8lsPS/6ZO21rYnJCpEHqnT3mkwNNMF8A3ZEKPivpD9czriALUG9uc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=q/EpLyPT; arc=none smtp.client-ip=209.85.216.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f68.google.com with SMTP id 98e67ed59e1d1-35da9c0c007so2175532a91.2
-        for <netdev@vger.kernel.org>; Sun, 19 Apr 2026 07:38:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776609538; x=1777214338; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FXbYtnWhywSmr0JMKJvb407oewKcBkKpjTSErT+Dy40=;
-        b=q/EpLyPT9Wbe0IfoVtGNb7tFa+//HVgmb5LFmnvlzrNRqtFFhtMKTkiIVlO3LI5MZJ
-         1MGNO6zvkHJ0xFjwCbLCUgtsxmKdjcppWSABQ2Nibf7m0DhI1mBDyv0bC1qXgmvK1Fqj
-         iuiPq/qJTlPlMtGDLa4T/2S04C32MVR8Pdxcd+CQaRee6KEG65HStZkxg/1alAHTbJk7
-         rJjkSz9T9NZtoi3RWyKW4BbMLiiSPW1fcn33gTmaWfO9UQVej4Mr5AUmt3RHM8jDXVbL
-         wo+H9X7le9xMu3URsWXKnsRF/ld9c9QongPqzVH8AqUbo+3aZVbxJ0QC53P7Wuru+dNY
-         Hcfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776609538; x=1777214338;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=FXbYtnWhywSmr0JMKJvb407oewKcBkKpjTSErT+Dy40=;
-        b=K0s4j2ou0wRpfpKKxO3/ujM0v4vXbyqYfokn8Bn4NZNuJwCu7NpCqbCFbZSp7F1Q86
-         VS6dvD8jd8VZZp60Gn9KjXdpB9yrwh+beSnpTXh5dvkTbnn1KsufRg46OSk7dB0vHR2T
-         PZSLfGjcyufIiektPeE8U/IsNB+eUe9Wr2v722cOk4pMo5PhgplbAfnPpnisHgBQdEWs
-         9SYDtbwi0EjkVu3yeB7Gm/ikRbLGgAwoOGhqzMlc/AGqio/YvVbULz/caI0XZJE+dpMj
-         AxcV6inNIcLDc0F6ajqZEiAc+QgsAIfQQ27v20YRdV2CMqYOzJhNtAaffloSXiOzb988
-         +IZA==
-X-Gm-Message-State: AOJu0YygQePmDYZyBPmny3p3N/uOdcOSk03G8/He6cyer1E7wfqVjxhC
-	OZugHYqH/+/Bd24BbgwtPkzLFB4In5/O1CdnwhnNEjsld256G/M5Ghbp
-X-Gm-Gg: AeBDieuDAZDgfJ80LsyimfvddALGaQ+SGXd0KEieQd81KMLQ7Flnhs5v8bLO2nHMFXK
-	2mLy6tnwf95ahiKTc+iGAgwxDsK6qQFVHLMSYXjFkgqsrj2uC8zXx6VAS9Q6GSiZNNF7DFHCwKT
-	jOrbPHBLsIS1aPCZOq69qpZWmLq/CgyzdLXFRom8TFZQQ5sh3k2p9VAJAVRh3ItLndMAlERWo2D
-	ga/VK0wIdF4pqULfFQDgt3OkfZrLjx8bTcUXBNoU6NZXDDzhdtLdj5iFEj35hn+WjzxIQ8jYRr+
-	KOqlekweXP0LOaQHEaGJUPRMa7ylwaiXyPq1BDYfuiVelSgHhEroxCoXyXRk79dSXZ2uXPX2UhT
-	2F60HkL4gEQJ0YxrgkWowk95CBdRug3HIBzGrVIC9xha8u21ZsqFjB3ks2eXECbJLeL1m7W0e3I
-	f1QNLaUdWAaABceFSHJzOYbjziVSHhXPbnIWmXbBIaOeWZN9dRHMf9QLlXl3k=
-X-Received: by 2002:a17:903:2283:b0:2b0:54dc:63e with SMTP id d9443c01a7336-2b5f9fadcd4mr114205915ad.33.1776609538020;
-        Sun, 19 Apr 2026 07:38:58 -0700 (PDT)
-Received: from [0.0.0.0] (42-3-10-232.ptr.netvigator.com. [42.3.10.232])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b5fab55062sm75684205ad.84.2026.04.19.07.38.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 19 Apr 2026 07:38:57 -0700 (PDT)
-Message-ID: <289e65da-a7db-4b6f-b099-7bb9b95c5b59@gmail.com>
-Date: Sun, 19 Apr 2026 22:38:49 +0800
+	s=arc-20240116; t=1776610735; c=relaxed/simple;
+	bh=hnlFzATkkgCC02qpd+UPA+Wp8tCFSdfpfbR4i+Hd7hw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kvVdia6X1mXgsS50tDHO/HLiKMTJXE2y8sJVKHyqYXkFb/+BvGijTxUwngGyMc9UzcA3XIWlvcgGcMBM/S68ix/3sUA4cUmpGYJZod+Y/PzzvZA4yjV5zgMw3GPZ6o0J8rSL8L4idoRu2skg4rBAiIW/mcpacbQ/6hxHv31Wh3g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=206.189.21.223
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
+Received: from enjou-Legion-Y7000P-2019.coin-barley.ts.net (unknown [172.23.56.36])
+	by app1 (Coremail) with SMTP id ygmowACXDwCX7eRpcI3UAA--.14510S2;
+	Sun, 19 Apr 2026 22:58:31 +0800 (CST)
+From: Ren Wei <n05ec@lzu.edu.cn>
+To: netdev@vger.kernel.org,
+	idosch@mellanox.com
+Cc: dsahern@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	jiri@resnulli.us,
+	yifanwucs@gmail.com,
+	tomapufckgml@gmail.com,
+	yuantan098@gmail.com,
+	bird@lzu.edu.cn,
+	royenheart@gmail.com,
+	n05ec@lzu.edu.cn
+Subject: [PATCH net v3 1/1] net: l3mdev: Reject non-L3 uppers in slave helpers
+Date: Sun, 19 Apr 2026 22:53:32 +0800
+Message-ID: <20260419145332.3988923-1-n05ec@lzu.edu.cn>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 1/1] net: l3mdev: Ignore non-L3 uppers in
- l3mdev_fib_table_rcu
-To: Ido Schimmel <idosch@nvidia.com>, Ao Zhou <n05ec@lzu.edu.cn>
-Cc: netdev@vger.kernel.org, David Ahern <dsahern@kernel.org>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Ido Schimmel <idosch@mellanox.com>, Jiri Pirko <jiri@resnulli.us>,
- Yifan Wu <yifanwucs@gmail.com>, Juefei Pu <tomapufckgml@gmail.com>,
- Yuan Tan <yuantan098@gmail.com>, Xin Liu <bird@lzu.edu.cn>,
- royenheart@gmail.com
-References: <cover.1775062214.git.royenheart@gmail.com>
- <429dd4a81d4ca5624ab9f6d7b53c5fe08552c734.1775443332.git.royenheart@gmail.com>
- <20260406154808.GA714138@shredder>
- <6eb15ec6-6994-4b24-9a53-48a653b96860@gmail.com>
-From: Haoze Xie <royenheart@gmail.com>
-In-Reply-To: <6eb15ec6-6994-4b24-9a53-48a653b96860@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:ygmowACXDwCX7eRpcI3UAA--.14510S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxWryktw4xKF4fCryxGw18AFb_yoWrGr15pa
+	y7Ca4fKF48Gry7A348A3W7uFyqkrs5Kry7CayrJr45WFWDAr1DXryft3yjvFy7J39YkF13
+	Xr129390g345ur7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUB01xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
+	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
+	IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E
+	87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c
+	8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_
+	Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwI
+	xGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAa
+	w2AFwI0_Jw0_GFylc2xSY4AK6svPMxAIw28IcxkI7VAKI48JMxAIw28IcVCjz48v1sIEY2
+	0_Gr4l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
+	jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2I
+	x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK
+	8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
+	0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUonmRUUUUU
+X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQECCWnkluADMgAMsN
+X-Spamd-Result: default: False [0.04 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,davemloft.net,google.com,redhat.com,mellanox.com,resnulli.us,gmail.com,lzu.edu.cn];
-	TAGGED_FROM(0.00)[bounces-279593-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[royenheart@gmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-279597-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[lzu.edu.cn];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	URIBL_MULTI_FAIL(0.00)[lzu.edu.cn:server fail,sin.lore.kernel.org:server fail];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,google.com,redhat.com,resnulli.us,gmail.com,lzu.edu.cn];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
+	NEURAL_HAM(-0.00)[-0.999];
+	TO_DN_NONE(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	R_DKIM_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,lzu.edu.cn:email]
-X-Rspamd-Queue-Id: 85CCC424642
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lzu.edu.cn:mid,lzu.edu.cn:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 87DA74246B9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+From: Haoze Xie <royenheart@gmail.com>
 
-On 4/19/2026 11:49 AM, Haoze Xie wrote:
-> 
-> On 4/6/2026 11:48 PM, Ido Schimmel wrote:
->> On Mon, Apr 06, 2026 at 09:28:16PM +0800, Ao Zhou wrote:
->>> From: Haoze Xie <royenheart@gmail.com>
->>>
->>> l3mdev_fib_table_rcu() assumes that any upper device observed for
->>> an IFF_L3MDEV_SLAVE device is an L3 master and dereferences
->>> master->l3mdev_ops unconditionally.
->>>
->>> VRF slave setup sets IFF_L3MDEV_SLAVE before the upper link is fully
->>> switched, so readers can transiently observe a non-L3 upper such as a
->>> bridge and follow a NULL l3mdev_ops pointer. Require the current upper
->>> to still be an L3 master before consulting its FIB table.
->>>
->>> Fixes: fdeea7be88b1 ("net: vrf: Set slave's private flag before linking")
->>> Reported-by: Yifan Wu <yifanwucs@gmail.com>
->>> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
->>> Co-developed-by: Yuan Tan <yuantan098@gmail.com>
->>> Signed-off-by: Yuan Tan <yuantan098@gmail.com>
->>> Suggested-by: Xin Liu <bird@lzu.edu.cn>
->>> Reviewed-by: David Ahern <dsahern@kernel.org>
->>> Signed-off-by: Haoze Xie <royenheart@gmail.com>
->>> Signed-off-by: Ao Zhou <n05ec@lzu.edu.cn>
->>> ---
->>> changes in v2:
->>> - point Fixes to the VRF slave ordering change identified by David Ahern
->>> - add David Ahern's Reviewed-by trailer
->>>
->>>  net/l3mdev/l3mdev.c | 2 +-
->>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/net/l3mdev/l3mdev.c b/net/l3mdev/l3mdev.c
->>> index 5432a5f2dfc8..b8a3030cb2c4 100644
->>> --- a/net/l3mdev/l3mdev.c
->>> +++ b/net/l3mdev/l3mdev.c
->>> @@ -177,7 +177,7 @@ u32 l3mdev_fib_table_rcu(const struct net_device *dev)
->>>  		const struct net_device *master;
->>>  
->>>  		master = netdev_master_upper_dev_get_rcu(_dev);
->>> -		if (master &&
->>> +		if (master && netif_is_l3_master(master) &&
->>>  		    master->l3mdev_ops->l3mdev_fib_table)
->>
->> Don't we have the same problem in l3mdev_l3_rcv() and l3mdev_l3_out()?
->> If so, please check if I missed more places and include them in v3.
->>
-> 
-> I checked the same pattern in the other slave-side helpers, and v3 now
-> extends the fix to both `l3mdev_l3_rcv()` and `l3mdev_l3_out()` in
-> addition to `l3mdev_fib_table_rcu()`.
-> 
-> All three helpers resolve the current upper with
-> `netdev_master_upper_dev_get_rcu()` and then use `master->l3mdev_ops`.
-> So v3 consistently requires the resolved upper to still satisfy
-> `netif_is_l3_master(master)` before dereferencing `l3mdev_ops`.
-> 
+Several l3mdev slave-side helpers resolve an upper device and then use
+l3mdev_ops without first proving that the resolved device is still a
+valid L3 master.
 
-While updating the patch, I found that `l3mdev_l3_rcv()` must keep
-working for existing `IFF_L3MDEV_RX_HANDLER` users such as
-`ipvlan_l3s`. The v3 patch keeps that direct RX-handler path
-intact and applies the extra master check only to the slave-resolved
-upper case.
+During slave transition, an RCU reader can transiently observe an upper
+that is not an L3 master. Guard the affected slave-resolved paths by
+requiring the resolved upper to still be an L3 master before using
+l3mdev_ops, while keeping existing L3 RX handler providers intact.
 
-the smoke test, it should ping succeffully:
+Fixes: fdeea7be88b1 ("net: vrf: Set slave's private flag before linking")
+Cc: stable@kernel.org
+Reported-by: Yifan Wu <yifanwucs@gmail.com>
+Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+Co-developed-by: Yuan Tan <yuantan098@gmail.com>
+Signed-off-by: Yuan Tan <yuantan098@gmail.com>
+Suggested-by: Xin Liu <bird@lzu.edu.cn>
+Tested-by: Haoze Xie <royenheart@gmail.com>
+Signed-off-by: Haoze Xie <royenheart@gmail.com>
+Signed-off-by: Ao Zhou <n05ec@lzu.edu.cn>
+---
+Changes in v3:
+- Extend the same guard to l3mdev_l3_rcv() and l3mdev_l3_out().
+- Keep existing IFF_L3MDEV_RX_HANDLER providers such as ipvlan_l3s
+  working by only applying the extra master check to the slave-resolved
+  upper case in l3mdev_l3_rcv().
+- v2 Link:
+  https://lore.kernel.org/all/429dd4a81d4ca5624ab9f6d7b53c5fe08552c734.1775443332.git.royenheart@gmail.com/
 
-===> BEGIN smoke test cmd <===
-ip netns add ipvl_ns
-ip link add ipvl_host type veth peer name ipvl_peer
-ip link set ipvl_peer netns ipvl_ns
+Changes in v2:
+- Point Fixes to the VRF slave ordering change identified in review.
+- Add David Ahern's Reviewed-by trailer in that revision.
+- v1 Link:
+  https://lore.kernel.org/all/b3b88cddc7e79d4b43756b26ae5db965678f3ba9.1775062214.git.royenheart@gmail.com/
 
-ip link set ipvl_host up
-ip link add link ipvl_host name ipvl0 type ipvlan mode l3s
-ip addr add 198.51.100.1/24 dev ipvl0
-ip link set ipvl0 up
+ include/net/l3mdev.h | 18 +++++++++++-------
+ net/l3mdev/l3mdev.c  |  2 +-
+ 2 files changed, 12 insertions(+), 8 deletions(-)
 
-ip netns exec ipvl_ns ip link set lo up
-ip netns exec ipvl_ns ip link set ipvl_peer up
-ip netns exec ipvl_ns ip addr add 198.51.100.2/24 dev ipvl_peer
-ip netns exec ipvl_ns ping -c 3 198.51.100.1
-===> END smoke test cmd <===
-
->> And I think that the part that I was missing earlier is that we don't
->> have RCU synchronization in the unslaving path, so an RCU reader can
->> either see the original master, NULL or a new master (e.g., bridge
->> instead of the original VRF master).
->>
->>>  			tb_id = master->l3mdev_ops->l3mdev_fib_table(master);
->>>  	}
->>> -- 
->>> 2.53.0
->>>
-> 
+diff --git a/include/net/l3mdev.h b/include/net/l3mdev.h
+index 710e98665eb3..aed52bf03956 100644
+--- a/include/net/l3mdev.h
++++ b/include/net/l3mdev.h
+@@ -180,14 +180,17 @@ struct sk_buff *l3mdev_l3_rcv(struct sk_buff *skb, u16 proto)
+ {
+ 	struct net_device *master = NULL;
+ 
+-	if (netif_is_l3_slave(skb->dev))
++	if (netif_is_l3_slave(skb->dev)) {
+ 		master = netdev_master_upper_dev_get_rcu(skb->dev);
+-	else if (netif_is_l3_master(skb->dev) ||
+-		 netif_has_l3_rx_handler(skb->dev))
++		if (master && netif_is_l3_master(master) &&
++		    master->l3mdev_ops->l3mdev_l3_rcv)
++			skb = master->l3mdev_ops->l3mdev_l3_rcv(master, skb, proto);
++	} else if (netif_is_l3_master(skb->dev) ||
++		   netif_has_l3_rx_handler(skb->dev)) {
+ 		master = skb->dev;
+-
+-	if (master && master->l3mdev_ops->l3mdev_l3_rcv)
+-		skb = master->l3mdev_ops->l3mdev_l3_rcv(master, skb, proto);
++		if (master->l3mdev_ops->l3mdev_l3_rcv)
++			skb = master->l3mdev_ops->l3mdev_l3_rcv(master, skb, proto);
++	}
+ 
+ 	return skb;
+ }
+@@ -215,7 +218,8 @@ struct sk_buff *l3mdev_l3_out(struct sock *sk, struct sk_buff *skb, u16 proto)
+ 		struct net_device *master;
+ 
+ 		master = netdev_master_upper_dev_get_rcu(dev);
+-		if (master && master->l3mdev_ops->l3mdev_l3_out)
++		if (master && netif_is_l3_master(master) &&
++		    master->l3mdev_ops->l3mdev_l3_out)
+ 			skb = master->l3mdev_ops->l3mdev_l3_out(master, sk,
+ 								skb, proto);
+ 	}
+diff --git a/net/l3mdev/l3mdev.c b/net/l3mdev/l3mdev.c
+index 5432a5f2dfc8..b8a3030cb2c4 100644
+--- a/net/l3mdev/l3mdev.c
++++ b/net/l3mdev/l3mdev.c
+@@ -177,7 +177,7 @@ u32 l3mdev_fib_table_rcu(const struct net_device *dev)
+ 		const struct net_device *master;
+ 
+ 		master = netdev_master_upper_dev_get_rcu(_dev);
+-		if (master &&
++		if (master && netif_is_l3_master(master) &&
+ 		    master->l3mdev_ops->l3mdev_fib_table)
+ 			tb_id = master->l3mdev_ops->l3mdev_fib_table(master);
+ 	}
+-- 
+2.53.0
 
 
