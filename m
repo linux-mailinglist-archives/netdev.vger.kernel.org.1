@@ -1,71 +1,66 @@
-Return-Path: <netdev+bounces-279781-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279782-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kENdKX5K5mnSuQEAu9opvQ
-	(envelope-from <netdev+bounces-279781-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 17:47:10 +0200
+	id OMlwECk15mmOtQEAu9opvQ
+	(envelope-from <netdev+bounces-279782-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 16:16:09 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B81842E942
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 17:47:09 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63D2442CD2D
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 16:16:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BCB42348DE91
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 13:58:35 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id ABF14313BFC8
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 13:59:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 894173FE678;
-	Mon, 20 Apr 2026 13:26:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5217C3FFAD3;
+	Mon, 20 Apr 2026 13:26:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LKqZ9uDu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TZC/spHX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 633B83A63E8;
-	Mon, 20 Apr 2026 13:26:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 294233FF889;
+	Mon, 20 Apr 2026 13:26:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776691600; cv=none; b=oz31HK4gGDQPcQ3QZkRKe5tZnkkHIeef7MWjeL7QbYYpNkkuadM+9egtbyzlWue2Oe7/ZPab63fSIi9TKHWtGL0aulddUv80iGudJYxkqiHr3gjuCBrj6JAnWfYDGQrUM8N7d5KlF6vOTsJq0rHwcmX6977XcdxN29li8USdQfs=
+	t=1776691607; cv=none; b=fiDC3fTrs+QKj6Ia7sAUNSKr/R282ckzhvjqg2eFyqyoADKDdjzulPR0nZTU0yoUveJ77bzbdfqVtPFUaGwVtaOqr6bhCfLCCCGBCSRceavBA2MNWROzdlshQ9A3UVYevbmhrC8VHv5CUmPzYQdNSbif4YpdPuR6KrFFeZFWlxc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776691600; c=relaxed/simple;
-	bh=k43V/qSmU7C+NtBAQOUmZaioCpCS405F2aNaLv2Pv2c=;
+	s=arc-20240116; t=1776691607; c=relaxed/simple;
+	bh=UHLRDX+Y9thW65UscxtaegbS8wUYxWaOBUi2OjbpDDA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cf6IxPwNYiZu1VSavpPdlopdquuH0ttpfpRLylX5l3Xzpc6M/2pTZixF+KGgWX9UpvafYuBjbC1gF5nYWnVKKQTJ64Dg4JS14G4DZDWa6MGICcSc7DLBEleFtFPla2C+np0Jv78m4mopkjXUXZ/RQZ4/fB++Bj/K9CRYjWZUULU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LKqZ9uDu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 555A8C2BCB9;
-	Mon, 20 Apr 2026 13:26:38 +0000 (UTC)
+	 MIME-Version; b=E6MSfAOOP4hM6PDIYa3pQL72MAXNYupuEJ3+biIdBybScKzsRNzc2/SJfuQlFIBW4n8+ebEKemYeeE1bTyLf4McHAZUuc7wPRqKjjCuUSfFWWOdYiwNX2e/O6kYv1kWA44rIGrNzZdT/vaGltYG1B9/rW01MVRStpWfENzkpTwA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TZC/spHX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2E78C2BCB4;
+	Mon, 20 Apr 2026 13:26:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776691600;
-	bh=k43V/qSmU7C+NtBAQOUmZaioCpCS405F2aNaLv2Pv2c=;
+	s=k20201202; t=1776691606;
+	bh=UHLRDX+Y9thW65UscxtaegbS8wUYxWaOBUi2OjbpDDA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=LKqZ9uDu9W19ShroGAzPcXdARXWx2+j0DrkIFEgHsbXuL0+Fe2cZgKgREv+Lbdy6q
-	 xAiqN7rJYzyUFb+P+Mhef/Za35sh6rHHDXn13p7mPiPooGQgwmpzhQS9d1Wy5MsBzp
-	 6EohYkWCurybDKJQwzxMe25YlKCfA0847+FRXOkSWL1OngCbyt+9vtp670g/wZKgLF
-	 5g2vj49qmQHXiznZt5QB1IaMzPleN2lbMQu3PjutxFH5tIkdB910SiGY8WyBfHaJlD
-	 sMCNhP/siYg+/4NcMlN4ZN8mo2rUGyxlq1MPsvrYh9jiDb9WrHvv4ZG67NWf0MVC3o
-	 lMkaeeBolnreQ==
+	b=TZC/spHXOFPsYoC9907SZPAU2m4Y+NjGZliOSymRA+ETLVXg41uNceKKDG9WU0E1b
+	 x70jHGqzjY1yY1tCpHes0+SDKNYUb5DDYnndr851QLAHbwoQrBZzskL1Je5eIsBelL
+	 4nljiL6IwfDV0esifAI/57wLJNX1xeJMFh6J2lG9u4cQpVxxdVzXk9pmVtSD2PaWR/
+	 ZApbB08VknUo3c1rluZyNE4bv3zA0ZLGN4uWqaszEUcyqk6JM8swaO0bSAbDROZ6lY
+	 pK1IFsLYYw5x37CcLRVGV+ubrD51fse5SPmpSq/cLMZXEcL2BRAnV1b2UxfTP5Np+6
+	 Wwzx40U1SsVBA==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Jiexun Wang <wangjiexun2025@gmail.com>,
-	Yifan Wu <yifanwucs@gmail.com>,
-	Juefei Pu <tomapufckgml@gmail.com>,
-	Yuan Tan <yuantan098@gmail.com>,
-	Xin Liu <bird@lzu.edu.cn>,
-	Ren Wei <enjou1224z@gmail.com>,
-	Ren Wei <n05ec@lzu.edu.cn>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
+Cc: Fernando Fernandez Mancera <fmancera@suse.de>,
+	Yiming Qian <yimingqian591@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Ido Schimmel <idosch@nvidia.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
+	dsahern@kernel.org,
 	davem@davemloft.net,
-	edumazet@google.com,
 	pabeni@redhat.com,
-	xemul@parallels.com,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.18] af_unix: read UNIX_DIAG_VFS data under unix_state_lock
-Date: Mon, 20 Apr 2026 09:18:38 -0400
-Message-ID: <20260420132314.1023554-124-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.18] ipv4: nexthop: allocate skb dynamically in rtm_get_nexthop()
+Date: Mon, 20 Apr 2026 09:18:42 -0400
+Message-ID: <20260420132314.1023554-128-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260420132314.1023554-1-sashal@kernel.org>
 References: <20260420132314.1023554-1-sashal@kernel.org>
@@ -84,17 +79,17 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,lzu.edu.cn,google.com,kernel.org,davemloft.net,redhat.com,parallels.com,vger.kernel.org];
+	FREEMAIL_CC(0.00)[suse.de,gmail.com,google.com,nvidia.com,kernel.org,davemloft.net,redhat.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-279781-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-279782-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -105,37 +100,58 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,msgid.link:url]
-X-Rspamd-Queue-Id: 0B81842E942
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,msgid.link:url,suse.de:email]
+X-Rspamd-Queue-Id: 63D2442CD2D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Jiexun Wang <wangjiexun2025@gmail.com>
+From: Fernando Fernandez Mancera <fmancera@suse.de>
 
-[ Upstream commit 39897df386376912d561d4946499379effa1e7ef ]
+[ Upstream commit 14cf0cd35361f4e94824bf8a42f72713d7702a73 ]
 
-Exact UNIX diag lookups hold a reference to the socket, but not to
-u->path. Meanwhile, unix_release_sock() clears u->path under
-unix_state_lock() and drops the path reference after unlocking.
+When querying a nexthop object via RTM_GETNEXTHOP, the kernel currently
+allocates a fixed-size skb using NLMSG_GOODSIZE. While sufficient for
+single nexthops and small Equal-Cost Multi-Path groups, this fixed
+allocation fails for large nexthop groups like 512 nexthops.
 
-Read the inode and device numbers for UNIX_DIAG_VFS while holding
-unix_state_lock(), then emit the netlink attribute after dropping the
-lock.
+This results in the following warning splat:
 
-This keeps the VFS data stable while the reply is being built.
+ WARNING: net/ipv4/nexthop.c:3395 at rtm_get_nexthop+0x176/0x1c0, CPU#20: rep/4608
+ [...]
+ RIP: 0010:rtm_get_nexthop (net/ipv4/nexthop.c:3395)
+ [...]
+ Call Trace:
+  <TASK>
+  rtnetlink_rcv_msg (net/core/rtnetlink.c:6989)
+  netlink_rcv_skb (net/netlink/af_netlink.c:2550)
+  netlink_unicast (net/netlink/af_netlink.c:1319 net/netlink/af_netlink.c:1344)
+  netlink_sendmsg (net/netlink/af_netlink.c:1894)
+  ____sys_sendmsg (net/socket.c:721 net/socket.c:736 net/socket.c:2585)
+  ___sys_sendmsg (net/socket.c:2641)
+  __sys_sendmsg (net/socket.c:2671)
+  do_syscall_64 (arch/x86/entry/syscall_64.c:63 arch/x86/entry/syscall_64.c:94)
+  entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
+  </TASK>
 
-Fixes: 5f7b0569460b ("unix_diag: Unix inode info NLA")
-Reported-by: Yifan Wu <yifanwucs@gmail.com>
-Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-Co-developed-by: Yuan Tan <yuantan098@gmail.com>
-Signed-off-by: Yuan Tan <yuantan098@gmail.com>
-Suggested-by: Xin Liu <bird@lzu.edu.cn>
-Tested-by: Ren Wei <enjou1224z@gmail.com>
-Signed-off-by: Jiexun Wang <wangjiexun2025@gmail.com>
-Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
-Link: https://patch.msgid.link/20260407080015.1744197-1-n05ec@lzu.edu.cn
+Fix this by allocating the size dynamically using nh_nlmsg_size() and
+using nlmsg_new(), this is consistent with nexthop_notify() behavior. In
+addition, adjust nh_nlmsg_size_grp() so it calculates the size needed
+based on flags passed. While at it, also add the size of NHA_FDB for
+nexthop group size calculation as it was missing too.
+
+This cannot be reproduced via iproute2 as the group size is currently
+limited and the command fails as follows:
+
+addattr_l ERROR: message exceeded bound of 1048
+
+Fixes: 430a049190de ("nexthop: Add support for nexthop groups")
+Reported-by: Yiming Qian <yimingqian591@gmail.com>
+Closes: https://lore.kernel.org/netdev/CAL_bE8Li2h4KO+AQFXW4S6Yb_u5X4oSKnkywW+LPFjuErhqELA@mail.gmail.com/
+Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
+Reviewed-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+Link: https://patch.msgid.link/20260402072613.25262-2-fmancera@suse.de
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
@@ -144,45 +160,96 @@ LLM Generated explanations, may be completely bogus:
 
 Error: Failed to generate final synthesis
 
- net/unix/diag.c | 21 +++++++++++++--------
- 1 file changed, 13 insertions(+), 8 deletions(-)
+ net/ipv4/nexthop.c | 38 +++++++++++++++++++++++++++-----------
+ 1 file changed, 27 insertions(+), 11 deletions(-)
 
-diff --git a/net/unix/diag.c b/net/unix/diag.c
-index ca34730261510..c9c1e51c44196 100644
---- a/net/unix/diag.c
-+++ b/net/unix/diag.c
-@@ -28,18 +28,23 @@ static int sk_diag_dump_name(struct sock *sk, struct sk_buff *nlskb)
- 
- static int sk_diag_dump_vfs(struct sock *sk, struct sk_buff *nlskb)
- {
--	struct dentry *dentry = unix_sk(sk)->path.dentry;
-+	struct unix_diag_vfs uv;
-+	struct dentry *dentry;
-+	bool have_vfs = false;
- 
-+	unix_state_lock(sk);
-+	dentry = unix_sk(sk)->path.dentry;
- 	if (dentry) {
--		struct unix_diag_vfs uv = {
--			.udiag_vfs_ino = d_backing_inode(dentry)->i_ino,
--			.udiag_vfs_dev = dentry->d_sb->s_dev,
--		};
--
--		return nla_put(nlskb, UNIX_DIAG_VFS, sizeof(uv), &uv);
-+		uv.udiag_vfs_ino = d_backing_inode(dentry)->i_ino;
-+		uv.udiag_vfs_dev = dentry->d_sb->s_dev;
-+		have_vfs = true;
- 	}
-+	unix_state_unlock(sk);
- 
--	return 0;
-+	if (!have_vfs)
-+		return 0;
-+
-+	return nla_put(nlskb, UNIX_DIAG_VFS, sizeof(uv), &uv);
+diff --git a/net/ipv4/nexthop.c b/net/ipv4/nexthop.c
+index aa53a74ac2389..c958b8edfe540 100644
+--- a/net/ipv4/nexthop.c
++++ b/net/ipv4/nexthop.c
+@@ -1006,16 +1006,32 @@ static size_t nh_nlmsg_size_grp_res(struct nh_group *nhg)
+ 		nla_total_size_64bit(8);/* NHA_RES_GROUP_UNBALANCED_TIME */
  }
  
- static int sk_diag_dump_peer(struct sock *sk, struct sk_buff *nlskb)
+-static size_t nh_nlmsg_size_grp(struct nexthop *nh)
++static size_t nh_nlmsg_size_grp(struct nexthop *nh, u32 op_flags)
+ {
+ 	struct nh_group *nhg = rtnl_dereference(nh->nh_grp);
+ 	size_t sz = sizeof(struct nexthop_grp) * nhg->num_nh;
+ 	size_t tot = nla_total_size(sz) +
+-		nla_total_size(2); /* NHA_GROUP_TYPE */
++		nla_total_size(2) +	/* NHA_GROUP_TYPE */
++		nla_total_size(0);	/* NHA_FDB */
+ 
+ 	if (nhg->resilient)
+ 		tot += nh_nlmsg_size_grp_res(nhg);
+ 
++	if (op_flags & NHA_OP_FLAG_DUMP_STATS) {
++		tot += nla_total_size(0) +	  /* NHA_GROUP_STATS */
++		       nla_total_size(4);	  /* NHA_HW_STATS_ENABLE */
++		tot += nhg->num_nh *
++		       (nla_total_size(0) +	  /* NHA_GROUP_STATS_ENTRY */
++			nla_total_size(4) +	  /* NHA_GROUP_STATS_ENTRY_ID */
++			nla_total_size_64bit(8)); /* NHA_GROUP_STATS_ENTRY_PACKETS */
++
++		if (op_flags & NHA_OP_FLAG_DUMP_HW_STATS) {
++			tot += nhg->num_nh *
++			       nla_total_size_64bit(8); /* NHA_GROUP_STATS_ENTRY_PACKETS_HW */
++			tot += nla_total_size(4);	/* NHA_HW_STATS_USED */
++		}
++	}
++
+ 	return tot;
+ }
+ 
+@@ -1050,14 +1066,14 @@ static size_t nh_nlmsg_size_single(struct nexthop *nh)
+ 	return sz;
+ }
+ 
+-static size_t nh_nlmsg_size(struct nexthop *nh)
++static size_t nh_nlmsg_size(struct nexthop *nh, u32 op_flags)
+ {
+ 	size_t sz = NLMSG_ALIGN(sizeof(struct nhmsg));
+ 
+ 	sz += nla_total_size(4); /* NHA_ID */
+ 
+ 	if (nh->is_group)
+-		sz += nh_nlmsg_size_grp(nh) +
++		sz += nh_nlmsg_size_grp(nh, op_flags) +
+ 		      nla_total_size(4) +	/* NHA_OP_FLAGS */
+ 		      0;
+ 	else
+@@ -1073,7 +1089,7 @@ static void nexthop_notify(int event, struct nexthop *nh, struct nl_info *info)
+ 	struct sk_buff *skb;
+ 	int err = -ENOBUFS;
+ 
+-	skb = nlmsg_new(nh_nlmsg_size(nh), gfp_any());
++	skb = nlmsg_new(nh_nlmsg_size(nh, 0), gfp_any());
+ 	if (!skb)
+ 		goto errout;
+ 
+@@ -3379,15 +3395,15 @@ static int rtm_get_nexthop(struct sk_buff *in_skb, struct nlmsghdr *nlh,
+ 	if (err)
+ 		return err;
+ 
+-	err = -ENOBUFS;
+-	skb = alloc_skb(NLMSG_GOODSIZE, GFP_KERNEL);
+-	if (!skb)
+-		goto out;
+-
+ 	err = -ENOENT;
+ 	nh = nexthop_find_by_id(net, id);
+ 	if (!nh)
+-		goto errout_free;
++		goto out;
++
++	err = -ENOBUFS;
++	skb = nlmsg_new(nh_nlmsg_size(nh, op_flags), GFP_KERNEL);
++	if (!skb)
++		goto out;
+ 
+ 	err = nh_fill_node(skb, nh, RTM_NEWNEXTHOP, NETLINK_CB(in_skb).portid,
+ 			   nlh->nlmsg_seq, 0, op_flags);
 -- 
 2.53.0
 
