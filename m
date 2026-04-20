@@ -1,168 +1,164 @@
-Return-Path: <netdev+bounces-279953-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279954-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gPxKHwOx5mlDzwEAu9opvQ
-	(envelope-from <netdev+bounces-279953-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 01:04:35 +0200
+	id Yg3VLX+x5mldzwEAu9opvQ
+	(envelope-from <netdev+bounces-279954-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 01:06:39 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9D6F434C90
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 01:04:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1973F434CA1
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 01:06:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6160C3009B37
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 23:04:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 423F13008799
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 23:06:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A0FC3D3319;
-	Mon, 20 Apr 2026 23:04:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67BC8378807;
+	Mon, 20 Apr 2026 23:06:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=layalina-io.20251104.gappssmtp.com header.i=@layalina-io.20251104.gappssmtp.com header.b="tFBQWOVD"
+	dkim=pass (2048-bit key) header.d=layalina-io.20251104.gappssmtp.com header.i=@layalina-io.20251104.gappssmtp.com header.b="O4w8IPPp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B9B53A6B97
-	for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 23:04:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 116C3175A89
+	for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 23:06:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776726269; cv=none; b=Rr7H+Jmr4lqXUp39tY0j5bHnBf0+1u6IqUv9dz/L2KX6UunFHjCWe2PZK9L9PSd587ho2+J3/iP35hObOht5br8+8eRp7su41Lxk/RluFBsnNEMcqqRXJ9xxS/GBWrn+hRsbhcRSGoxQ7axiD/LDnfr2utzuN2lq/z2JcS+O6hQ=
+	t=1776726396; cv=none; b=tuKWCJb3IdEgkwPseasWUktnmdRMJYEAqEVYPeQlNYgn/lw8wHYs1GgAFlnl4eiJxUM7gKlmK5or8Eb57WUsNIBzDXwbFTa4Y6o/yI00xLZFULEt6qTp7JR+HGCOqUqzuQDgJheV6r49deN+PMz7VQYlT2BcgNZIqhf6efmFE1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776726269; c=relaxed/simple;
-	bh=WsgQP6q8FcpLQu9XggQp2iqVoQxjSZH+TF9xExnwkqI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XRpyWoxODE6JJVYRVAN+g6PmK9KV70xpxXxy4xD95Wx0CsiCEy040/+5MSQ+W4CFk4276fjirNTc12p5n9vgORddGYjC+nWlVbLDMpfFidh4OIimjW/SRufKCdXO78rcfv0ZES0DLde+E8nWR/fBTP6SRzUvl3nOEWOE4xPLCKo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=layalina.io; spf=pass smtp.mailfrom=layalina.io; dkim=pass (2048-bit key) header.d=layalina-io.20251104.gappssmtp.com header.i=@layalina-io.20251104.gappssmtp.com header.b=tFBQWOVD; arc=none smtp.client-ip=209.85.218.49
+	s=arc-20240116; t=1776726396; c=relaxed/simple;
+	bh=pXp2o7ykhMdz8onvKJbZ3+CNj0qoao3WpLDwMtvLCQY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Rpzh7TvC0BJRmOaIM0YjK8zqDbq0Prmgctut4gUESLiZZS5XOP2H9C7c2zk45ZbguFXTpJDLlgia7xzybZIFV8h9/yUE8FgvRDbQxjCDDFPOFi3IVNpVxCADefn6cYWUepKCWSJt1huRIPT35sIJuOByn97415V+4a0gO9AKYZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=layalina.io; spf=pass smtp.mailfrom=layalina.io; dkim=pass (2048-bit key) header.d=layalina-io.20251104.gappssmtp.com header.i=@layalina-io.20251104.gappssmtp.com header.b=O4w8IPPp; arc=none smtp.client-ip=209.85.208.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=layalina.io
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=layalina.io
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-b79f8f7ea43so505395666b.2
-        for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 16:04:26 -0700 (PDT)
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-6745a88eec7so4568733a12.2
+        for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 16:06:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=layalina-io.20251104.gappssmtp.com; s=20251104; t=1776726265; x=1777331065; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=k1Ugsr5aor2hHamUiRPHM175EjJyXQfoFJRoWwmyq8I=;
-        b=tFBQWOVDYZNBoEfaRZMRhN+P9Ehzc+gGNEODFUu5CkaYFGhEdwTJHF2hokAaD3wJnV
-         0FKRT3CPs+RBsVhx1oTzsBMYvkagbmv/3ILPa/PmwAMNmgv6U72pOsYk4x4RWANaoRo1
-         aa6x1cREBXiHcoePmccD7It1vTzVJZ0XLtL9raQuhvg2BoxVnwO/oA0IqFd77GhjffoX
-         I5UX9NuCSjB7LzePFtvoidOuL2uzmg6rXiF5IOTJqQiF6SB2KkcGL48lnhOLKBN21FfJ
-         IBivfj1dX4Q+IWU0rXCT29jYfn7IXo552qZgkzQXAeLK1oryitYNCOKg2fMTB29vM7MR
-         v1nQ==
+        d=layalina-io.20251104.gappssmtp.com; s=20251104; t=1776726393; x=1777331193; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hpRjN4cuiWAUZ2C57RWT8FrmEMcVyFUy6yGU1zLq6fs=;
+        b=O4w8IPPpyEq/5yUiUbw049Fm42JLWl3yVrUPVhtBBfvnMTm3n9xi4iJlbygEUuQVAC
+         M1tu0qkm3zQ/RZWeIhvMJMzZT2LkWoCmzHGFGMMu2u5xEMqUawQiU21XjyGtd6N6Yxsv
+         wfFfevqXd4UFrUYWTRqb9SDHPJcZJrG+W0WZiR26hC3W2NSwYQgEJ7gQWfZ7syUixxp5
+         XACugeu3Ah65iAb+6mDCym+9Xub0HjWISwiiylf0dvnSGMbxPOEvTOgpJNzE2SG1KnjP
+         x0Y88Fko9Dd4PwIWo08trfvNVJIeB52lIEnqKQ9bY8alGpb3DowGzO7YnEN4+VaCdkxm
+         idQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776726265; x=1777331065;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=k1Ugsr5aor2hHamUiRPHM175EjJyXQfoFJRoWwmyq8I=;
-        b=Z8GSULhBQztHLVXOXNy1Huz0nBkkg/ky6XL6ECs4pyr1g7HS0lAXU30PQhPU+z0xVT
-         gTEdTmjV3DekIgOzG5GuZyc3gagVy/JM8icLkGDxRCaYqA7QysnV/7NLLDL0sPmhbeLu
-         glF/a7k0UqhHNDNpjQrye5Y51DrreUhWc7TrZ0WfT5y+2cycIfBV+Ikn4lpnloOdjib3
-         TT4cu6MIGemnPWhjclmstPjHALkBH+Yeq9nDzX3rKWDrMQgkJtkHjhSO6wlfU1/DsFQY
-         0TjE/CdQShs0+87JbHpP4L9Hd9E7h66rAah2khr/fXhr47ryOmgYBGTjRCCN3blIw71B
-         vCDQ==
-X-Forwarded-Encrypted: i=1; AFNElJ+AXsXRvXC39ag5I8DUegIZEmOj2xzcuHxlr3Qm+djUA71kZ70oRpy9LWf2E/ikESvIfh49fOE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwFAWAG51HH745IRjWl9Twl8Rozfgj3NH2VazzD63gOkqYKIXMN
-	PswWDGy4jGQ5UmaHKREVX88KrMip/YLxEAvY2QpzE08uixpzG2yZTHzBlpgFNNhAsAJbyhKrf9j
-	x5KQx
-X-Gm-Gg: AeBDievVDOMpFzSVkub7+QJUnf949rYjJeKHhF/h7yLDkb1t13xOSz8EubYjDgRyyyk
-	/22gboL7QH26BJIfejKxUnHnype6xgyjcJpai2LWUNcvNV2TMgTp6dd6aDyXecZznO2dAQiXF+D
-	3spOLmksAPFFnuUnGeYa7HAEQ5xpk1BiEj31tXCP2xgxy5fKsLOzDtU6wb80Q+w3x1Mub7kGgXl
-	i+6CDjkAMwbz6oYG6Y92WVMdz/CaqGOqaPGaSuPtijLhHnSeIE+OPJq6+anv4JGQ0Uk/WbPSGYn
-	z1WxHaJGWLGlfeF9CatMrr9+hjNJpxibaIEAU6W/ebA9fTAoq8OWvQxUu85t0o+DX4BUkyScQ4B
-	9ja1vK9K2rTzjVO2UJ7BCc7YFuuvY2EsqkqONy8y+MbNTgiYEZJ/cq86bHgW7x/hYoCPMnvbcw7
-	lD40FkuW0sPWqCtuQ11WlprVRfFiGl
-X-Received: by 2002:a17:907:748:b0:ba3:e99e:18dd with SMTP id a640c23a62f3a-ba41aef07c6mr729681066b.35.1776726264946;
-        Mon, 20 Apr 2026 16:04:24 -0700 (PDT)
-Received: from airbuntu ([146.70.179.103])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ba5498b3ddesm319994766b.22.2026.04.20.16.04.23
+        d=1e100.net; s=20251104; t=1776726393; x=1777331193;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hpRjN4cuiWAUZ2C57RWT8FrmEMcVyFUy6yGU1zLq6fs=;
+        b=WQFnc8nhlZ5WCVvivYxSn0UV0itdxvws+Gd3iI93rS3iNrnQ/sNSBkyLLJbI2eED3p
+         3xwg5gBMBkWHCcMtoFRUpYfpo/1OrAQmEVbf6ySfuKeSlRQG2/8XwL5ELo4a7j5mxxoy
+         8Bf+ix/L/+hZZZ64U7rD9AivQLblrbB2JnIPizmklJ4qOc2phYmpw5QEMmbLQkku5Y0e
+         vJnfKgjehahALdAfHiYS/fJIA9id4v91YV2hsmt95me3Pb05EqzL5RkUwlhx6Gma19hx
+         DTgWUskxQbjEYRPXmYSESKOsM0SZngda7IqyvZH+to5mXE2fH5NUmQ8TIOe86zpGz+qO
+         kJ5Q==
+X-Forwarded-Encrypted: i=1; AFNElJ8/uQ2TsWsCb5jEQBhX1H5IjmTP3D/ewwVTVE84tNH9V81nFEhJk39CO4vtj8Zmz98ezRss6nw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzdwGM5kLPdrw+o+Q8IKgCfPOs87IDE6w+jaQrSeaNKhg6N3nVA
+	p7IOYwRtO+ZPgWtELGZ1nz5TQn46bvr42XONl9Z/h6ONNXRVvgYx7l47iw3C7s5vQbk=
+X-Gm-Gg: AeBDievnHedjDEXdSvqZnVmiZsTNLgm2N2vkSUTDs4hFHF9+2gD3DXLDTsJ/2TIK3N5
+	0cenzZNYtfhPbpK2L8L6wifnesZrOFZWhaUuJs2Q4IMJXMGmFzzIOjKOieBQZaVPu7sVDJtK0Bo
+	DO0fWYI1MyxrpgicsLHEx1TVf8kgJfS3yzxXr6vRiw8dAbIiGtBqc+tdASS2ZeReUgBY7LyAJwO
+	cq9cSSjAK2fVLccbqThGpOuMt772tsyFQmCyEe96IbFZDkuyl/vQu8P3CTW61TDwrSKYMJhiSa0
+	XXPEo8NvV+6B73hRcHHwle2tQySBVX28hmoCPN+0kDWlsT/iAIXQxmSTUcUPEGLaf7kFRfAukMZ
+	oPquK/bd303ewKfIdrP4J0vx6Zx9S00vj7MJNSwyqAr6fAM46BnXfWR2aOU9G24sRblO8Cio0nI
+	IbtlWumU87K8TybzrsWhGMo/U2i8vZ+aA=
+X-Received: by 2002:a17:907:6e8c:b0:ba6:e18f:1568 with SMTP id a640c23a62f3a-ba6e18f1a53mr360000066b.32.1776726393443;
+        Mon, 20 Apr 2026 16:06:33 -0700 (PDT)
+Received: from airbuntu.. ([146.70.179.103])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ba454d1bd24sm382729166b.32.2026.04.20.16.06.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Apr 2026 16:04:24 -0700 (PDT)
-Date: Tue, 21 Apr 2026 00:04:22 +0100
+        Mon, 20 Apr 2026 16:06:33 -0700 (PDT)
 From: Qais Yousef <qyousef@layalina.io>
-To: Jakub Kicinski <kuba@kernel.org>
+To: Ingo Molnar <mingo@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
 	Vincent Guittot <vincent.guittot@linaro.org>,
 	John Stultz <jstultz@google.com>,
 	Steven Rostedt <rostedt@goodmis.org>,
-	Ingo Molnar <mingo@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>
-Subject: Re: [PATCH] connector/Kconfig: Enable CONFIG_CONNECTOR by default
-Message-ID: <20260420230422.mdfy4icsuhjh7fe3@airbuntu>
-References: <20260419214217.108901-1-qyousef@layalina.io>
- <20260420131847.75248693@kernel.org>
+	Qais Yousef <qyousef@layalina.io>
+Subject: [RESEND PATCH] connector/Kconfig: Enable CONFIG_CONNECTOR by default
+Date: Tue, 21 Apr 2026 00:06:30 +0100
+Message-Id: <20260420230630.205527-1-qyousef@layalina.io>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260420131847.75248693@kernel.org>
-X-Spamd-Result: default: False [0.34 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	R_DKIM_ALLOW(-0.20)[layalina-io.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279953-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[layalina.io];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	TAGGED_FROM(0.00)[bounces-279954-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[layalina.io];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[layalina-io.20251104.gappssmtp.com:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[qyousef@layalina.io,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[layalina-io.20251104.gappssmtp.com:+];
+	NEURAL_HAM(-0.00)[-0.997];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: A9D6F434C90
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: 1973F434CA1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-+Ingo and Peter
+To make new tools that depend on it like schedqos [1] more reliable, it
+is important to ensure users can find it by default on all system.
 
-On 04/20/26 13:18, Jakub Kicinski wrote:
-> On Sun, 19 Apr 2026 22:42:17 +0100 Qais Yousef wrote:
-> > To make new tools that depend on it like schedqos [1] more reliable, it
-> > is important to ensure users can find it by default on all system.
-> 
-> If scheduler maintainers think this is appropriate they should take
-> this patch via their tree (please). connector falls under networking 
-> for historical reasons (it's Netlink based) but we lack the context
-> necessary to apply a "default y" patch of this nature.
+[1] https://lore.kernel.org/lkml/20260415000910.2h5misvwc45bdumu@airbuntu/
 
-I see, I didn't add them, but I'll resend with them added.
+Signed-off-by: Qais Yousef <qyousef@layalina.io>
+---
 
-> 
-> default y should be used if the symbol is necessary for most Linux
-> users across use cases and architectures. It's not obvious to me
+Resending with sched maintainers as requested by Jacub
 
-Hmm I am not aware of such rules. It should be generally is useful and doesn't
-have a drawback - which what I understood this is. What is the cost of enabling
-this? This seems widely enabled feature by distro in general.
+	https://lore.kernel.org/lkml/20260420230422.mdfy4icsuhjh7fe3@airbuntu/T/#mea6edb96570c5d5aa2af43a5d11f7c775d0c4dca
 
-> that that is the case here. The commit message links to a tool 
-> which is less than a week old?
+ drivers/connector/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
 
-It is chicken an egg. We want to add sched qos support and it relies on netlink
-to monitor tasks as they are created and tag them with QoS. If we can't make
-sure this is available on all systems by default (ie: users must consciously
-opt-out of this option), we will end up with inconsistencies.
+diff --git a/drivers/connector/Kconfig b/drivers/connector/Kconfig
+index 0c2d2aa82d8c..bad247d47146 100644
+--- a/drivers/connector/Kconfig
++++ b/drivers/connector/Kconfig
+@@ -3,6 +3,7 @@
+ menuconfig CONNECTOR
+ 	tristate "Connector - unified userspace <-> kernelspace linker"
+ 	depends on NET
++	default y
+ 	help
+ 	  This is unified userspace <-> kernelspace connector working on top
+ 	  of the netlink socket protocol.
+-- 
+2.34.1
 
-I've hit this when we added UCLAMP and it took debian two years (approx) to
-decide to enable it by default after making a feature request.
 
