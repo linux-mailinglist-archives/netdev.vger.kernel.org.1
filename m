@@ -1,144 +1,144 @@
-Return-Path: <netdev+bounces-279718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279719-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uKo6Jg8N5mluqwEAu9opvQ
-	(envelope-from <netdev+bounces-279718-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 13:25:03 +0200
+	id 0MJJALkN5mkGrAEAu9opvQ
+	(envelope-from <netdev+bounces-279719-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 13:27:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CB57429E72
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 13:25:03 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93C98429EA2
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 13:27:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C76C3303098C
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 11:24:46 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A0FCB300E03F
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 11:27:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4D4C39769F;
-	Mon, 20 Apr 2026 11:24:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDBDB346FA6;
+	Mon, 20 Apr 2026 11:27:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="EYRazRQ+"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="MNrR7gOj"
 X-Original-To: netdev@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E035343D7F;
-	Mon, 20 Apr 2026 11:24:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A403C19C54E;
+	Mon, 20 Apr 2026 11:27:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776684283; cv=none; b=SESyLVNxphjGnNpn9nyTFCWOzyIKKpwFsHLrgLL79FS1Nei5zUjwI2AFcMEkjrRIn78uz25cClOyUGVXnQZ59OqnY2tibzoafXaIlkponPH4olAocKDFowI50FZkp7rd99kGmqkm8VfB427hIciKnP+Mow61O9aAQF50EEj3aXU=
+	t=1776684468; cv=none; b=BU74M2v7NjoqC8C+orDXjeO58a4RF4U4aoCUimPIalhxD2ml+7SH5v9LNva0JGKax/lbrzlr/LIoZLMjDeq+f31ib3FDFWSe9D3ZAe3Yjd4IWjR+s9uLNfidsKUv6O3uKzwAkMsYE2UJJtCpFxS3oIi8o0zmMkqhj230ihJi44Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776684283; c=relaxed/simple;
-	bh=47W35rh/mMCLQXPRDwYAG5PUe6RYoYdQ6G/0S2HxWEo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Fo9k6FflkGHlqP6iqb5TvHIB56TJVZicxfiHoENEMKOPOxHsUbE5n7IQcJ2w7q/dgzxV1i9cs1vJ4hqUOlFsb2fLXZQUAvqSm8+3zjF1qufDXu6sZLazSFVQR7JqcTv/rhzHrwqaKfVoCWgVg+irg4ql2sr2L9eGSWTl2Yv9hKk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=EYRazRQ+; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=HFCHZ2mGNLNZ9GU5z2Bd294rO8tmj5ZIpPj/CtmDgZk=; b=EYRazRQ+Fn5BbeISOIIdwweLLo
-	vfT8i7CWpZNYbXDUrWs12QFZ3Jc0JawhcffPxYy3vtTu642xmoyyalRW39DkTyouk7MCuuGOPy2pB
-	4JlAP84EQbux+YzlWETVTr/Z7w5U/wTCdZFbUR2PrvocdDO1NK04tvUauizdFIQlRB7FnpwgkgkxV
-	bS6ODPz4Zfy3+L0ncclRSNek27FU1MZX4Y4p9GRY5HoaKZZSmLINWjJDbVpYeUPHzt5bwp7J30xxY
-	/3zbrQBGMVOLqstuCke/xoEPm6jznL5xaW/KjTco9TOqtwLXIGFVUubk6wlEIYmmqNwJiWoZnY4Wd
-	oOHDwVoA==;
-Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
-	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1wEmjt-00000007p0p-0dW8;
-	Mon, 20 Apr 2026 11:24:29 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 9690B3021A4; Mon, 20 Apr 2026 13:24:28 +0200 (CEST)
-Date: Mon, 20 Apr 2026 13:24:28 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-To: Yury Norov <ynorov@nvidia.com>
-Cc: Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>,
-	Jonathan Cameron <jic23@kernel.org>,
-	David Lechner <dlechner@baylibre.com>,
-	Nuno =?iso-8859-1?Q?S=E1?= <nuno.sa@analog.com>,
-	Andy Shevchenko <andy@kernel.org>,
-	Ping-Ke Shih <pkshih@realtek.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Yury Norov <yury.norov@gmail.com>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Hans de Goede <hansg@kernel.org>, Linus Walleij <linusw@kernel.org>,
-	Sakari Ailus <sakari.ailus@linux.intel.com>,
-	Salah Triki <salah.triki@gmail.com>,
-	Achim Gratz <Achim.Gratz@stromeko.de>,
-	Ben Collins <bcollins@watter.com>, linux-kernel@vger.kernel.org,
-	linux-iio@vger.kernel.org, linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org, linux-rtc@vger.kernel.org
-Subject: Re: [PATCH 2/9] x86/extable: switch to using FIELD_GET_SIGNED()
-Message-ID: <20260420112428.GF3102624@noisy.programming.kicks-ass.net>
-References: <20260417173621.368914-1-ynorov@nvidia.com>
- <20260417173621.368914-3-ynorov@nvidia.com>
+	s=arc-20240116; t=1776684468; c=relaxed/simple;
+	bh=lcuhLiK78fnxGY3DsHsyrjbNY2/wp+/JiF3BASxfRPk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fzRpkcpNtlgqS0xIcf9jxpEMLwWoRCai2e4bCQkYkXqiu65oyD32L5uoErmsY2fkOvtynjSBAraas+qsBU6XfDfXEEsumavNtNWKEPSv2QBvdpSOqqm9+KY+HilVZSKO1pDFUPZ5DocLbZUiNdL/mYWNUgzoSIdzsRT7IsfFLNE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=MNrR7gOj; arc=none smtp.client-ip=91.218.175.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <b943ec1e-417c-4157-ab19-b34aa6d63688@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1776684462;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7FmNftTmL2q6GdFEvWpth7ujw9QbRkrMDpo5qvEDDvQ=;
+	b=MNrR7gOj5MqmSHqSUcTnOT6xTypK/4X418TSV2T6ZdN0Egh3Jpy12vF7Dzv48x0MXpNSi9
+	nk4VPQUq7HdR6WM7zw+L2yenHqNKxkLOMlf41LZUzlNJsnSzpLax2eF5lj1Wj6vSE+anXT
+	xXqdM7Vw/sOocj99V197a/KmexXKAjU=
+Date: Mon, 20 Apr 2026 19:27:33 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260417173621.368914-3-ynorov@nvidia.com>
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Subject: Re: [PATCH net v1] net: validate skb->napi_id in RX tracepoints
+To: Kohei Enju <kohei@enjuk.jp>, netdev@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
+ <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+References: <20260420105427.162816-1-kohei@enjuk.jp>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+In-Reply-To: <20260420105427.162816-1-kohei@enjuk.jp>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
-	R_DKIM_ALLOW(-0.20)[infradead.org:s=desiato.20200630];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-279718-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[kernel.org,redhat.com,alien8.de,linux.intel.com,zytor.com,baylibre.com,analog.com,realtek.com,gmail.com,lunn.ch,davemloft.net,google.com,bootlin.com,rasmusvillemoes.dk,stromeko.de,watter.com,vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-279719-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[33];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[infradead.org:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[peterz@infradead.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[noisy.programming.kicks-ass.net:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,infradead.org:dkim]
-X-Rspamd-Queue-Id: 5CB57429E72
+	DBL_BLOCKED_OPENRESOLVER(0.00)[enjuk.jp:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux.dev:dkim,linux.dev:mid]
+X-Rspamd-Queue-Id: 93C98429EA2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Apr 17, 2026 at 01:36:13PM -0400, Yury Norov wrote:
-> The EX_DATA register is laid out such that EX_DATA_IMM occupied MSB.
-> It's done to make sure that FIELD_GET() will sign-extend the IMM
-> field during extraction.
-> 
-> To enforce that, all EX_DATA masks are made signed integers. This
-> works, but relies on the particular implementation of FIELD_GET(),
-> i.e. masking then shifting, not vice versa; and the particular
-> placement of the fields in the register.
 
-I don't think the order of the mask and shift matters in this case. If
-we were to first shift down and then mask, it would still work (after
-all, the mask would also need to be shifted and would also get sign
-extended, effectively ending up as -1).
-
-But yes, this very much depends on the signed field being the topmost
-field and including the MSB.
-
-
+On 4/20/26 6:54 PM, Kohei Enju wrote:
+> Since commit 2bd82484bb4c ("xps: fix xps for stacked devices"),
+> skb->napi_id shares storage with sender_cpu. RX tracepoints using
+> net_dev_rx_verbose_template read skb->napi_id directly and can therefore
+> report sender_cpu values as if they were NAPI IDs.
+>
+> For example, on the loopback path this can report 1 as napi_id, where 1
+So I think veth_forward_skb->__netif_rx could be affected as well?
+> comes from raw_smp_processor_id() + 1 in the XPS path:
+>
+>    # bpftrace -e 'tracepoint:net:netif_rx_entry{ print(args->napi_id); }'
+>    # taskset -c 0 ping -c 1 ::1
+>
+> Report only valid NAPI IDs in these tracepoints and use 0 otherwise.
+>
+> Fixes: 2bd82484bb4c ("xps: fix xps for stacked devices")
+> Signed-off-by: Kohei Enju <kohei@enjuk.jp>
+> ---
+>   include/trace/events/net.h | 4 +++-
+>   1 file changed, 3 insertions(+), 1 deletion(-)
+>
+> diff --git a/include/trace/events/net.h b/include/trace/events/net.h
+> index fdd9ad474ce3..dbc2c5598e35 100644
+> --- a/include/trace/events/net.h
+> +++ b/include/trace/events/net.h
+> @@ -10,6 +10,7 @@
+>   #include <linux/if_vlan.h>
+>   #include <linux/ip.h>
+>   #include <linux/tracepoint.h>
+> +#include <net/busy_poll.h>
+>   
+>   TRACE_EVENT(net_dev_start_xmit,
+>   
+> @@ -208,7 +209,8 @@ DECLARE_EVENT_CLASS(net_dev_rx_verbose_template,
+>   	TP_fast_assign(
+>   		__assign_str(name);
+>   #ifdef CONFIG_NET_RX_BUSY_POLL
+> -		__entry->napi_id = skb->napi_id;
+> +		__entry->napi_id = napi_id_valid(skb->napi_id) ?
+> +				   skb->napi_id : 0;
+>   #else
+>   		__entry->napi_id = 0;
+>   #endif
 
