@@ -1,176 +1,242 @@
-Return-Path: <netdev+bounces-279906-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279907-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UDmxEHx65mkHxAEAu9opvQ
-	(envelope-from <netdev+bounces-279906-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 21:11:56 +0200
+	id eGQTOIV95mkHxAEAu9opvQ
+	(envelope-from <netdev+bounces-279907-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 21:24:53 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9003C4332E5
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 21:11:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C2C1433434
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 21:24:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4037E300D162
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 19:11:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9CF2D30166FB
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 19:23:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8782B3ACF10;
-	Mon, 20 Apr 2026 19:11:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B0173C2768;
+	Mon, 20 Apr 2026 19:23:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iy2gEmPx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B3VVBkaC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f173.google.com (mail-dy1-f173.google.com [74.125.82.173])
+Received: from mail-yx1-f42.google.com (mail-yx1-f42.google.com [74.125.224.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D942382F0A
-	for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 19:11:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.173
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776712313; cv=none; b=QBioU1PPR9+REWvPFEHe5OM00mGWJcryD9n8pakUXxRM8SjiXFYGqHOUPriPAO+tanB+dLFu4c+sfJl4LsXj1hGHTePmwOMFMYBbZqZrOlBXjy8ovbztOnXTl8Di2S2hA5lkunPjbQwy8OrooG8Di7pRdBp9ih63juaNbxXswZ4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776712313; c=relaxed/simple;
-	bh=sxZ00doArFEGSbugWyjUCS2Weg3XpDc7Tf55R5uMTOE=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=hqnRYeadFm4xsEmA6IHfW0ubkRiEq520XlfEfOdBcVELlm+kEFKiPm7kjdUxHzySFcg8+f3oLotY7GWpS3DxV+k6REV+k9hA8jdRz50n0e1VA/O2Kv1BL2O7Uv48SVnnYiwvaf8Xf4f4gNB+9S3CUM6sg08Hk151QbzZdHQutf8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iy2gEmPx; arc=none smtp.client-ip=74.125.82.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5604282F04
+	for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 19:23:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776712999; cv=pass; b=cvzmyi9gDHuQsNhkO8xSCRVHBBUVmDRnFEyKeufVnWtzAZq5b36aURbzZJc4wdVXr3nQl8jSI1ckUOMiMmYBTCeiIa5WouQU7frOnKM+K8uF05hM7P9uyi6o9Ud4OcZSW/UYzp6SxfGeCWU/oi2IDvI8a24waCP33O3L4S6bKKY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776712999; c=relaxed/simple;
+	bh=Urc4fTcbbk2a40JtrOyUlkKJdjhGu8/jYnZtRKrjbmw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Cel0FNRH/OBJoVgmTaedlVqcj1ozaRHaBJ/OlPMtr4ojiumW1FEnSSLfwqOuBE53HZDGYTdnSGNuSMJ6ODhCyYNecLDB6/Ud1+o6A4d5BHKhtxENKZksfVw0fVv5K/OguWZpFIR/B5CyPxo1UYUYTYZwKRpL+tWAbQB4DLsumRE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B3VVBkaC; arc=pass smtp.client-ip=74.125.224.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dy1-f173.google.com with SMTP id 5a478bee46e88-2bdd40d3c61so3186752eec.1
-        for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 12:11:52 -0700 (PDT)
+Received: by mail-yx1-f42.google.com with SMTP id 956f58d0204a3-64e87a81639so3250852d50.0
+        for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 12:23:17 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776712997; cv=none;
+        d=google.com; s=arc-20240605;
+        b=ewHw9Ec+gfiTQnPmkbXZnjOW3zXDKTxLy974RO5QID1fA4SvvYf36TpDrQbiuzY5uK
+         y0Evg/cY8xIVxBSrHVCuoO14sCYZ8WgVwVFZQlCXGRQ3IbBdM7QE+MqOZw+wsyVEnCCn
+         29+w/QHxY+7JHy2vdX21J286lHqgOHVnoA9yQ/Eewh/+dcKRMcRrmP0bMzaUa/FbHLwi
+         b6ol9D1m6dWENx1j0iDrmhcSB4UUR9olHWIpio6oEySG1TARk242rKZRnEsibVNNBOP9
+         NJ1ZDTf/ydmyLSP+VcFYb21hlfnSxd40bgJ472Ral6ZGccOXNZjY63e0ORzYqVZBSUOq
+         gxsw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=lUIn3hEw6JYFkddfNv6BL46EZAbPO+C2iSOKicXTGNM=;
+        fh=H6B6LtTjpEZctxx6wntle2EBB1LMlFMmLnTfz/31f/I=;
+        b=P874HxMXHvnHP5d15DjTZ1sTnMuqWS47IF2/gnpn30oenD8nunJcIYnMM1ZR+uTTNG
+         XyhPZloix5BHUZKvsosVVIL9wMgdPMD1r66/o2Ylwf1M5viUHRKJRkFbov6WGiO5vQU7
+         ml1JwGavPyOpeSrQh6BJRlLFFP+c5sfhvOHZzZCQkXuVpSFBc3cqImdWhj5vFY/eLE54
+         eKwXvlH8d8yBfA/0PzVgV+cKotwHlVFUHiK5iJUb1rhU5QyIV571TMip9Anjz+1Evu5s
+         AtF5Mjihbi9HFbGpE8EgGhY5I62+oS/+wjfYhUwNwhwa58+RnU+tsQK65+vKSClfsxX/
+         /9tQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776712311; x=1777317111; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:to:subject:cc
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1776712997; x=1777317797; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=j2BLM5ame3A0aMHerconHeaLCipS0GCxKfF5pU6TgVE=;
-        b=iy2gEmPxl+1OSXicRpAxYTeMiBmIItu0qVgzd251mlaO8inUdXHhSxDpcXfC1GMG+P
-         y9XWAffmkTLi7i8WjjLiM9Hb/iw98pVQVIWamLALxHkjtsTov9EjalYqFRehmRIKgrxe
-         d2+DFZP0QmiAZcq5N0u/U2baVGcabcWnL345whdjXkOkZi88FL4mL7VUCYUQxZI48n2b
-         LImZESBrPIPEIkggjKm85DYTi1MkEuaCJEH/kBjyi9saATQsXcK41HfBvolO6mkNJjwu
-         NAxGO7oeHi1pSOyiXXAZKSLSHYXLWNSiwOwF592m3h/5XAvKwh8C9urp4XF43enL1i+0
-         6zIQ==
+        bh=lUIn3hEw6JYFkddfNv6BL46EZAbPO+C2iSOKicXTGNM=;
+        b=B3VVBkaCz0DSlWRysjem6+2RdUQ1uDcVpfWW9kubqOGtWORcANAPRm2cEpFdWmsk+x
+         INcPoxDnEkQ8L8+K0W+BKn5N16jIBq8goQHNh1FfJtEU6w2ewgO4487OSTvlcwfulW/W
+         KUxzwhMNrBvka9XiPINFr3NxJ/6X1j1JXQLFTjoMNcWvm1T+/EoH1iQbl9gBe2bpMWJM
+         6tzY+mdKpKVvhfBYXeMD6H0L+2in/EMyRWpdyUcaJE6+nx/EUQhYHOnTEb86dAVOedq5
+         wQd/q+yWw/KdH4JylXtP7EIFztCmikzOqGZG8zqGxqBqHlhmiJjvRsoeNiFFQV2lMd2s
+         Ph+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776712311; x=1777317111;
-        h=content-transfer-encoding:in-reply-to:from:references:to:subject:cc
-         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=j2BLM5ame3A0aMHerconHeaLCipS0GCxKfF5pU6TgVE=;
-        b=VU+iL/HxxLksxWPY8db61AM6eU5PDP8NCHWK3CnyQkeY52PeQr0VkhWa53/+LTQb1e
-         bD5jmKijyLFg1YqVrmO4Qw8nDGscN6lsfzHBgGSOnIrIVsj0KIHqVHewfmDGJKlpOajp
-         RUi43NYbJ0d2JMoPybBJ0PVgEFaXFZWwx45kA8ZxYnEr1s+v2XAtYL0MZeah3pytvc9U
-         +N04LHfhllVArsBLkYCq8t6UXtZtx5wxx+Qi0TxXqAHHssx2wuKrCZpKJASdGazRu7XX
-         oe6Ei6l95Q5HGo4HYTvMum818EUkZyX/VPOVXAHQb365UYgqbOiRLaVaMsvdRnP/GmJd
-         gxsg==
-X-Forwarded-Encrypted: i=1; AFNElJ9mqRkIA9DbBOD2+EZCWi9snwoB+qxUbjqSmAabbraIXvo0QsicGMX701lGGck1rb30xabsPyQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwqwjZWceoeljE++h2HzG/HD/Plxwe5rfGSfJqANw7da31iOwJh
-	cgiXkj8VDRs0TUnvdWdMUz55UMLZ/fwJ6P1Mui+gUBc8xcdqmNik55+p
-X-Gm-Gg: AeBDiesdUBJJupJVvffa8wl5cRm/vvxZMAS/tDoWtwa3LSTeEKUDu25Jp2UXI1OHBrL
-	9mh6dG6+lrXQlrjfXkZITdOVj5+ubzQi+rVtxt5lsrHQufSYzsewvX61WwuYGmWDtnKAH+X4/wS
-	rMjfC5wAiGm2WioAFl3yoB3IQ6gA+czPA2FM/j5jrPEOC4n0Pz4oeXHicEwyUaMRX6J0eWz/4WU
-	b1G1yvUjV0SlZY/9hm1CgU0VhrO9vw+yaxztPDARRjGhRMtVmEwUFPhtsR2hCvVOxb1P3fasqD+
-	J+RtZUBRpiT8JqXqr8FnNcKgx293Ot8jpcShpGlPjdSC3gxyT+fFnu0fqVcmZ0dLfbRsCSepDrY
-	T/AyIGBI2IADBXFbeuJEr8V1YRJAcxeIMA2jipykNHYt6+BJxAf4iu3HwsnSOLLh0g/Frlb9mDU
-	LKDGjyzkaGQzHhhBHhB2+fhuY3TQXjUrtDjQp6T6FSkSGC+o281SDSz+8Bhg==
-X-Received: by 2002:a05:7300:ca4:b0:2e1:e5c0:7992 with SMTP id 5a478bee46e88-2e477c9aa7fmr6734109eec.8.1776712311175;
-        Mon, 20 Apr 2026 12:11:51 -0700 (PDT)
-Received: from [10.0.0.2] ([169.235.25.186])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2e539fa5c38sm15348215eec.5.2026.04.20.12.11.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 20 Apr 2026 12:11:50 -0700 (PDT)
-Message-ID: <828acc6d-9ee2-4ac0-96a8-4414be68b36b@gmail.com>
-Date: Mon, 20 Apr 2026 12:11:33 -0700
+        d=1e100.net; s=20251104; t=1776712997; x=1777317797;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=lUIn3hEw6JYFkddfNv6BL46EZAbPO+C2iSOKicXTGNM=;
+        b=hqbJFy/ZoUblyNKAKM9RAp1i/lDiWjsP1zv97585nISlPTxn4HqXc1JAeeES1zcmZn
+         ZxG+s7RJHg8YFhd4Uc1X++ubCgg6Rw6rTuAtMitvuNfcsP1wsSFt0OHQQ2+lMoM8+zHe
+         HfbvZ8UfYTicSWmuxBoAM7inqdX625w2TpJqHtcqBfUUpdIhpzSIEwftt7V4Ipn5a4CC
+         QD+ZLYQLJqOQiwZsETQtc/D0QWoTktFZcYQytJ0L9r2ITAoukE7ai5ZIMyJmFGALJM3x
+         y3ujvFezt6L66YG+3zoA55l5LYQHiMgRsaTJmo2gJ9m3QZOFoQXdLbK95GrvOWGQR5Ku
+         Q5bQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9zZGmOGyN2y2qMIgLMp3/k/wFxGNhtOHblaa8LKDFxqNrltt0DtuJGDKRUaGwtsPFxIbFpxzg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzhwzuXVAWtT5Rf4bYmLTtYdrQXxQyl9iA9+Om5Jc2CU5RODBTd
+	JKe/9/aE4kGqw7m6QmevPSQcyryS5xIofsnEBLpzq22QK9nEs9YIQndzNiR/xG4fEtTxGHgGKI2
+	/KDjktV9w7U9iRovLgCdEL930SF1Khfk=
+X-Gm-Gg: AeBDietl8P2Q/7rMYkWzkkm/IpiOZgkx4exwIun+BHxdGscKaB48wUB9+V3bqqb84qc
+	UZQz2pSpTjU3JyFPaRja4ivY7ys7eE+wVf6vyLmchHbyXeoOcYNZUp5z8u87lqRK1dE0JDWxOCi
+	jPnkCeKSovSv7gdXXypiPXB2zwcNfaFW1bN7Uxb5g1q8VhyVRZgUZ86cdZUYXE3ETu8ODiZcSje
+	FXOFhmSgE/eVJKZEjFksG6DOI152RSrrlVeE86k3AaDG5xREf4DRpbImAHkA/b8I7VlHEGqi08h
+	4ymD9Mf1YiytVELivJ8uqu4P8ZrJqz9dtIl5hO+/ymqcRd7AtET7pWBHFrI2SOows5HfBhYtATx
+	DFA==
+X-Received: by 2002:a53:cf44:0:b0:651:b86f:3657 with SMTP id
+ 956f58d0204a3-65310a0bde6mr9520237d50.36.1776712996801; Mon, 20 Apr 2026
+ 12:23:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: yuantan098@gmail.com, linux-hams@vger.kernel.org, netdev@vger.kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, kees@kernel.org, takamitz@amazon.co.jp,
- kuniyu@google.com, jiayuan.chen@shopee.com, mingo@kernel.org,
- stanksal@purdue.edu, jlayton@kernel.org, yifanwucs@gmail.com,
- tomapufckgml@gmail.com, bird@lzu.edu.cn, tonanli66@gmail.com
-Subject: Re: [PATCH net 1/1] net/rose: hold listener socket during call
- request handling
-To: Simon Horman <horms@kernel.org>, Ren Wei <n05ec@lzu.edu.cn>
-References: <cover.1776327338.git.tonanli66@gmail.com>
- <52776256bf0fc38de92fe3edf39434538b672b69.1776327338.git.tonanli66@gmail.com>
- <20260420162605.GV280379@horms.kernel.org>
-From: Yuan Tan <yuantan098@gmail.com>
-In-Reply-To: <20260420162605.GV280379@horms.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20260418053401.128483-1-suunj1331@gmail.com> <20260418053401.128483-2-suunj1331@gmail.com>
+In-Reply-To: <20260418053401.128483-2-suunj1331@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 20 Apr 2026 15:23:04 -0400
+X-Gm-Features: AQROBzCElDRvhVtJbXCcMB4PIv35kNLuKPjgXleuneDJqn-BnYQgD22cYaV6t4o
+Message-ID: <CABBYNZLBoU3byfK_G+=sTkBx3wNwEh2X6_7dG4+4LFtrc3Skpw@mail.gmail.com>
+Subject: Re: [PATCH 1/2] Bluetooth: ISO: Fix data-race on dst in iso_sock_connect()
+To: SeungJu Cheon <suunj1331@gmail.com>
+Cc: marcel@holtmann.org, linux-bluetooth@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, me@brighamcampbell.com, 
+	skhan@linuxfoundation.org, linux-kernel-mentees@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,amazon.co.jp,shopee.com,purdue.edu,lzu.edu.cn];
-	TAGGED_FROM(0.00)[bounces-279906-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_FROM(0.00)[bounces-279907-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yuantan098@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MISSING_XM_UA(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[luizdentz@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lzu.edu.cn:email]
-X-Rspamd-Queue-Id: 9003C4332E5
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sashiko.dev:url]
+X-Rspamd-Queue-Id: 3C2C1433434
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+Hi SeungJu,
 
-On 4/20/2026 9:26 AM, Simon Horman wrote:
-> On Fri, Apr 17, 2026 at 07:01:51PM +0800, Ren Wei wrote:
->> From: Nan Li <tonanli66@gmail.com>
->>
->> The call request receive path keeps using the listener socket after the
->> lookup lock has been dropped. Keep the listener alive across the
->> remaining validation and child socket setup by taking a reference in the
->> lookup path and releasing it once request handling is finished.
->>
->> This makes listener lifetime handling explicit and avoids races with
->> concurrent socket teardown.
->>
->> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
->> Cc: stable@kernel.org
->> Reported-by: Yifan Wu <yifanwucs@gmail.com>
->> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
->> Reported-by: Xin Liu <bird@lzu.edu.cn>
->> Co-developed-by: Yuan Tan <yuantan098@gmail.com>
->> Signed-off-by: Yuan Tan <yuantan098@gmail.com>
->> Signed-off-by: Nan Li <tonanli66@gmail.com>
->> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
->> ---
->>  net/rose/af_rose.c | 24 +++++++++++++++++++-----
->>  1 file changed, 19 insertions(+), 5 deletions(-)
-> Reviewed-by: Simon Horman <horms@kernel.org>
+On Sat, Apr 18, 2026 at 1:34=E2=80=AFAM SeungJu Cheon <suunj1331@gmail.com>=
+ wrote:
 >
-> Sachiko has provided some feedback on this patch.
-> I do not believe they relate to shortcomings in this patch,
-> and I do not believe they should block progress of this patch.
-> You may want to look over them for areas to investigate as follow-up
-> (maybe you already did :)
+> iso_sock_connect() copies the destination address into
+> iso_pi(sk)->dst under lock_sock, then releases the lock and reads
+> it back with bacmp() to decide between the CIS and BIS connect
+> paths:
 >
-> ...
+>     lock_sock(sk);
+>     bacpy(&iso_pi(sk)->dst, &sa->iso_bdaddr);
+>     iso_pi(sk)->dst_type =3D sa->iso_bdaddr_type;
+>     release_sock(sk);
+>
+>     if (bacmp(&iso_pi(sk)->dst, BDADDR_ANY))  // <- no lock held
+>
+> This read after release_sock() races with any concurrent write to
+> iso_pi(sk)->dst on the same socket.
+>
+> Fix by performing the bacmp() inside the lock_sock critical section
+> and caching the result in a local variable.
+>
+> This patch addresses only the bacmp() race in iso_sock_connect();
+> other unprotected iso_pi(sk) accesses are fixed separately in the
+> next patch.
+>
+> KCSAN report:
+>
+> BUG: KCSAN: data-race in memcmp+0x39/0xb0
+>
+> race at unknown origin, with read to 0xffff8f96ea66dde3 of 1 bytes by tas=
+k 549 on cpu 1:
+>  memcmp+0x39/0xb0
+>  iso_sock_connect+0x275/0xb40
+>  __sys_connect_file+0xbd/0xe0
+>  __sys_connect+0xe0/0x110
+>  __x64_sys_connect+0x40/0x50
+>  x64_sys_call+0xcad/0x1c60
+>  do_syscall_64+0x133/0x590
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>
+> value changed: 0x00 -> 0xee
+>
+> Reported by Kernel Concurrency Sanitizer on:
+> CPU: 1 UID: 0 PID: 549 Comm: iso_race_combin Not tainted 7.0.0-08391-g1d5=
+1b370a0f8 #40 PREEMPT(lazy)
+>
+> Fixes: ccf74f2390d6 ("Bluetooth: Add BTPROTO_ISO socket type")
+> Signed-off-by: SeungJu Cheon <suunj1331@gmail.com>
+> ---
+>  net/bluetooth/iso.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+>
+> diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+> index be145e2736b7..14963ba68597 100644
+> --- a/net/bluetooth/iso.c
+> +++ b/net/bluetooth/iso.c
+> @@ -1169,6 +1169,7 @@ static int iso_sock_connect(struct socket *sock, st=
+ruct sockaddr_unsized *addr,
+>         struct sockaddr_iso *sa =3D (struct sockaddr_iso *)addr;
+>         struct sock *sk =3D sock->sk;
+>         int err;
+> +       bool bcast;
+>
+>         BT_DBG("sk %p", sk);
+>
+> @@ -1191,9 +1192,11 @@ static int iso_sock_connect(struct socket *sock, s=
+truct sockaddr_unsized *addr,
+>         bacpy(&iso_pi(sk)->dst, &sa->iso_bdaddr);
+>         iso_pi(sk)->dst_type =3D sa->iso_bdaddr_type;
+>
+> +       bcast =3D !bacmp(&iso_pi(sk)->dst, BDADDR_ANY);
+> +
+>         release_sock(sk);
+>
+> -       if (bacmp(&iso_pi(sk)->dst, BDADDR_ANY))
+> +       if (!bcast)
+>                 err =3D iso_connect_cis(sk);
+>         else
+>                 err =3D iso_connect_bis(sk);
+> --
+> 2.52.0
+>
 
+https://sashiko.dev/#/patchset/20260418053401.128483-1-suunj1331%40gmail.co=
+m
 
-Thanks for your review! Yes this module still has other issues that
-haven't been fixed. We'll finish what we're currently working on and
-then take a look :)
+Seems valid, so we migth just use sa in the place of iso_pi(sk) to
+avoid using it without sk being locked. Other problems it may reveal
+need to be addressed in separate patches.
 
+--=20
+Luiz Augusto von Dentz
 
