@@ -1,66 +1,65 @@
-Return-Path: <netdev+bounces-279782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279783-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OMlwECk15mmOtQEAu9opvQ
-	(envelope-from <netdev+bounces-279782-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 16:16:09 +0200
+	id 2OY3J2I65mlutgEAu9opvQ
+	(envelope-from <netdev+bounces-279783-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 16:38:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63D2442CD2D
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 16:16:08 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49DAE42D46A
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 16:38:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id ABF14313BFC8
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 13:59:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 82AE734E2068
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 14:00:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5217C3FFAD3;
-	Mon, 20 Apr 2026 13:26:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07B06402458;
+	Mon, 20 Apr 2026 13:26:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TZC/spHX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qV+V6Icz"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 294233FF889;
-	Mon, 20 Apr 2026 13:26:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6747402454;
+	Mon, 20 Apr 2026 13:26:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776691607; cv=none; b=fiDC3fTrs+QKj6Ia7sAUNSKr/R282ckzhvjqg2eFyqyoADKDdjzulPR0nZTU0yoUveJ77bzbdfqVtPFUaGwVtaOqr6bhCfLCCCGBCSRceavBA2MNWROzdlshQ9A3UVYevbmhrC8VHv5CUmPzYQdNSbif4YpdPuR6KrFFeZFWlxc=
+	t=1776691618; cv=none; b=Tax8yOeUXTgiSjz708JEjfmAiDB8+rVI2gNvE1TSOlGgtLFFLutuEf0ceD7zC/NN+fUpfPTG4W5syGe7cdQ7W6y4gB9vVyezlrXWhmp4eSeSzNFI/udtvrP+lgdDpSbsux7AKeCWbLn9fPwBSKMHblBjFUX8ij0pNNlk1fANNcc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776691607; c=relaxed/simple;
-	bh=UHLRDX+Y9thW65UscxtaegbS8wUYxWaOBUi2OjbpDDA=;
+	s=arc-20240116; t=1776691618; c=relaxed/simple;
+	bh=PfINNR3aHiNxGQtu6IFd7pGGh8hTgwFWzdqY76JFzAY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=E6MSfAOOP4hM6PDIYa3pQL72MAXNYupuEJ3+biIdBybScKzsRNzc2/SJfuQlFIBW4n8+ebEKemYeeE1bTyLf4McHAZUuc7wPRqKjjCuUSfFWWOdYiwNX2e/O6kYv1kWA44rIGrNzZdT/vaGltYG1B9/rW01MVRStpWfENzkpTwA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TZC/spHX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2E78C2BCB4;
-	Mon, 20 Apr 2026 13:26:45 +0000 (UTC)
+	 MIME-Version; b=EjJGg/WHb7OpCWn5IE/ftKg3FLiUS/7AtmkQepss7wF5piAY2f6fXXGROYy2FisHlWLEHPWBmpsM0lzKIOl14Dkfm/jrSXuvJKfsj36OHw/i/K6vX89Mw4dTJSODQjsG5oG+6bXAXtiALqKnugcWswJdarvqkQZzSKQyvqZbezc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qV+V6Icz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53BE0C2BCB8;
+	Mon, 20 Apr 2026 13:26:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776691606;
-	bh=UHLRDX+Y9thW65UscxtaegbS8wUYxWaOBUi2OjbpDDA=;
+	s=k20201202; t=1776691618;
+	bh=PfINNR3aHiNxGQtu6IFd7pGGh8hTgwFWzdqY76JFzAY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=TZC/spHXOFPsYoC9907SZPAU2m4Y+NjGZliOSymRA+ETLVXg41uNceKKDG9WU0E1b
-	 x70jHGqzjY1yY1tCpHes0+SDKNYUb5DDYnndr851QLAHbwoQrBZzskL1Je5eIsBelL
-	 4nljiL6IwfDV0esifAI/57wLJNX1xeJMFh6J2lG9u4cQpVxxdVzXk9pmVtSD2PaWR/
-	 ZApbB08VknUo3c1rluZyNE4bv3zA0ZLGN4uWqaszEUcyqk6JM8swaO0bSAbDROZ6lY
-	 pK1IFsLYYw5x37CcLRVGV+ubrD51fse5SPmpSq/cLMZXEcL2BRAnV1b2UxfTP5Np+6
-	 Wwzx40U1SsVBA==
+	b=qV+V6IczhDl95f/NDGrp18tZiZwuXrQKPwugUQChPSpA5cdZPhFRZdMvikcLe2Ugy
+	 4m0b1+J9OYK6Z0Bo8EtMvXLpOWOkhpdD8/LKTZU9GI5s5GGI8ktpNPWiyRH3VwlPnt
+	 M9NO0eFFhww0Y5MwxdGNlc1wfbCGS+FGDBN1RJ7NWbEIfRB0DbzqhAcX1v7MU3bsSg
+	 AYSmJ3te8pDiR+HWPBh41TXfUaZE+IoUYwFJ3MLNtdLllWldl2ZzEvSGksOeu9iq+f
+	 OTB+o/pmQIn3mWYSyZEJdZXupDQdWEXT9zIz3MWdm5/jSQkIetoouSs8jpG0SHOlWV
+	 teG3yaMt3JlQQ==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Fernando Fernandez Mancera <fmancera@suse.de>,
-	Yiming Qian <yimingqian591@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Ido Schimmel <idosch@nvidia.com>,
-	Jakub Kicinski <kuba@kernel.org>,
+Cc: Kotlyarov Mihail <mihailkotlyarow@gmail.com>,
+	Florian Westphal <fw@strlen.de>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
 	Sasha Levin <sashal@kernel.org>,
-	dsahern@kernel.org,
 	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
 	pabeni@redhat.com,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.18] ipv4: nexthop: allocate skb dynamically in rtm_get_nexthop()
-Date: Mon, 20 Apr 2026 09:18:42 -0400
-Message-ID: <20260420132314.1023554-128-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.18] xfrm: fix refcount leak in xfrm_migrate_policy_find
+Date: Mon, 20 Apr 2026 09:18:49 -0400
+Message-ID: <20260420132314.1023554-135-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260420132314.1023554-1-sashal@kernel.org>
 References: <20260420132314.1023554-1-sashal@kernel.org>
@@ -79,80 +78,59 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[suse.de,gmail.com,google.com,nvidia.com,kernel.org,davemloft.net,redhat.com,vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-279782-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FREEMAIL_CC(0.00)[gmail.com,strlen.de,secunet.com,kernel.org,davemloft.net,google.com,redhat.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-279783-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RBL_SEM_FAIL(0.00)[172.234.253.10:query timed out];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,msgid.link:url,suse.de:email]
-X-Rspamd-Queue-Id: 63D2442CD2D
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linuxtesting.org:url,secunet.com:email]
+X-Rspamd-Queue-Id: 49DAE42D46A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Fernando Fernandez Mancera <fmancera@suse.de>
+From: Kotlyarov Mihail <mihailkotlyarow@gmail.com>
 
-[ Upstream commit 14cf0cd35361f4e94824bf8a42f72713d7702a73 ]
+[ Upstream commit 83317cce60a032c49480dcdabe146435bd689d03 ]
 
-When querying a nexthop object via RTM_GETNEXTHOP, the kernel currently
-allocates a fixed-size skb using NLMSG_GOODSIZE. While sufficient for
-single nexthops and small Equal-Cost Multi-Path groups, this fixed
-allocation fails for large nexthop groups like 512 nexthops.
+syzkaller reported a memory leak in xfrm_policy_alloc:
 
-This results in the following warning splat:
+  BUG: memory leak
+  unreferenced object 0xffff888114d79000 (size 1024):
+    comm "syz.1.17", pid 931
+    ...
+    xfrm_policy_alloc+0xb3/0x4b0 net/xfrm/xfrm_policy.c:432
 
- WARNING: net/ipv4/nexthop.c:3395 at rtm_get_nexthop+0x176/0x1c0, CPU#20: rep/4608
- [...]
- RIP: 0010:rtm_get_nexthop (net/ipv4/nexthop.c:3395)
- [...]
- Call Trace:
-  <TASK>
-  rtnetlink_rcv_msg (net/core/rtnetlink.c:6989)
-  netlink_rcv_skb (net/netlink/af_netlink.c:2550)
-  netlink_unicast (net/netlink/af_netlink.c:1319 net/netlink/af_netlink.c:1344)
-  netlink_sendmsg (net/netlink/af_netlink.c:1894)
-  ____sys_sendmsg (net/socket.c:721 net/socket.c:736 net/socket.c:2585)
-  ___sys_sendmsg (net/socket.c:2641)
-  __sys_sendmsg (net/socket.c:2671)
-  do_syscall_64 (arch/x86/entry/syscall_64.c:63 arch/x86/entry/syscall_64.c:94)
-  entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
-  </TASK>
+The root cause is a double call to xfrm_pol_hold_rcu() in
+xfrm_migrate_policy_find(). The lookup function already returns
+a policy with held reference, making the second call redundant.
 
-Fix this by allocating the size dynamically using nh_nlmsg_size() and
-using nlmsg_new(), this is consistent with nexthop_notify() behavior. In
-addition, adjust nh_nlmsg_size_grp() so it calculates the size needed
-based on flags passed. While at it, also add the size of NHA_FDB for
-nexthop group size calculation as it was missing too.
+Remove the redundant xfrm_pol_hold_rcu() call to fix the refcount
+imbalance and prevent the memory leak.
 
-This cannot be reproduced via iproute2 as the group size is currently
-limited and the command fails as follows:
+Found by Linux Verification Center (linuxtesting.org) with Syzkaller.
 
-addattr_l ERROR: message exceeded bound of 1048
-
-Fixes: 430a049190de ("nexthop: Add support for nexthop groups")
-Reported-by: Yiming Qian <yimingqian591@gmail.com>
-Closes: https://lore.kernel.org/netdev/CAL_bE8Li2h4KO+AQFXW4S6Yb_u5X4oSKnkywW+LPFjuErhqELA@mail.gmail.com/
-Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
-Reviewed-by: Eric Dumazet <edumazet@google.com>
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
-Link: https://patch.msgid.link/20260402072613.25262-2-fmancera@suse.de
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Fixes: 563d5ca93e88 ("xfrm: switch migrate to xfrm_policy_lookup_bytype")
+Signed-off-by: Kotlyarov Mihail <mihailkotlyarow@gmail.com>
+Reviewed-by: Florian Westphal <fw@strlen.de>
+Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
@@ -160,96 +138,23 @@ LLM Generated explanations, may be completely bogus:
 
 Error: Failed to generate final synthesis
 
- net/ipv4/nexthop.c | 38 +++++++++++++++++++++++++++-----------
- 1 file changed, 27 insertions(+), 11 deletions(-)
+ net/xfrm/xfrm_policy.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/net/ipv4/nexthop.c b/net/ipv4/nexthop.c
-index aa53a74ac2389..c958b8edfe540 100644
---- a/net/ipv4/nexthop.c
-+++ b/net/ipv4/nexthop.c
-@@ -1006,16 +1006,32 @@ static size_t nh_nlmsg_size_grp_res(struct nh_group *nhg)
- 		nla_total_size_64bit(8);/* NHA_RES_GROUP_UNBALANCED_TIME */
- }
- 
--static size_t nh_nlmsg_size_grp(struct nexthop *nh)
-+static size_t nh_nlmsg_size_grp(struct nexthop *nh, u32 op_flags)
- {
- 	struct nh_group *nhg = rtnl_dereference(nh->nh_grp);
- 	size_t sz = sizeof(struct nexthop_grp) * nhg->num_nh;
- 	size_t tot = nla_total_size(sz) +
--		nla_total_size(2); /* NHA_GROUP_TYPE */
-+		nla_total_size(2) +	/* NHA_GROUP_TYPE */
-+		nla_total_size(0);	/* NHA_FDB */
- 
- 	if (nhg->resilient)
- 		tot += nh_nlmsg_size_grp_res(nhg);
- 
-+	if (op_flags & NHA_OP_FLAG_DUMP_STATS) {
-+		tot += nla_total_size(0) +	  /* NHA_GROUP_STATS */
-+		       nla_total_size(4);	  /* NHA_HW_STATS_ENABLE */
-+		tot += nhg->num_nh *
-+		       (nla_total_size(0) +	  /* NHA_GROUP_STATS_ENTRY */
-+			nla_total_size(4) +	  /* NHA_GROUP_STATS_ENTRY_ID */
-+			nla_total_size_64bit(8)); /* NHA_GROUP_STATS_ENTRY_PACKETS */
-+
-+		if (op_flags & NHA_OP_FLAG_DUMP_HW_STATS) {
-+			tot += nhg->num_nh *
-+			       nla_total_size_64bit(8); /* NHA_GROUP_STATS_ENTRY_PACKETS_HW */
-+			tot += nla_total_size(4);	/* NHA_HW_STATS_USED */
-+		}
-+	}
-+
- 	return tot;
- }
- 
-@@ -1050,14 +1066,14 @@ static size_t nh_nlmsg_size_single(struct nexthop *nh)
- 	return sz;
- }
- 
--static size_t nh_nlmsg_size(struct nexthop *nh)
-+static size_t nh_nlmsg_size(struct nexthop *nh, u32 op_flags)
- {
- 	size_t sz = NLMSG_ALIGN(sizeof(struct nhmsg));
- 
- 	sz += nla_total_size(4); /* NHA_ID */
- 
- 	if (nh->is_group)
--		sz += nh_nlmsg_size_grp(nh) +
-+		sz += nh_nlmsg_size_grp(nh, op_flags) +
- 		      nla_total_size(4) +	/* NHA_OP_FLAGS */
- 		      0;
- 	else
-@@ -1073,7 +1089,7 @@ static void nexthop_notify(int event, struct nexthop *nh, struct nl_info *info)
- 	struct sk_buff *skb;
- 	int err = -ENOBUFS;
- 
--	skb = nlmsg_new(nh_nlmsg_size(nh), gfp_any());
-+	skb = nlmsg_new(nh_nlmsg_size(nh, 0), gfp_any());
- 	if (!skb)
- 		goto errout;
- 
-@@ -3379,15 +3395,15 @@ static int rtm_get_nexthop(struct sk_buff *in_skb, struct nlmsghdr *nlh,
- 	if (err)
- 		return err;
- 
--	err = -ENOBUFS;
--	skb = alloc_skb(NLMSG_GOODSIZE, GFP_KERNEL);
--	if (!skb)
--		goto out;
+diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
+index 4526c9078b136..29c94ee0ceb25 100644
+--- a/net/xfrm/xfrm_policy.c
++++ b/net/xfrm/xfrm_policy.c
+@@ -4528,9 +4528,6 @@ static struct xfrm_policy *xfrm_migrate_policy_find(const struct xfrm_selector *
+ 	pol = xfrm_policy_lookup_bytype(net, type, &fl, sel->family, dir, if_id);
+ 	if (IS_ERR_OR_NULL(pol))
+ 		goto out_unlock;
 -
- 	err = -ENOENT;
- 	nh = nexthop_find_by_id(net, id);
- 	if (!nh)
--		goto errout_free;
-+		goto out;
-+
-+	err = -ENOBUFS;
-+	skb = nlmsg_new(nh_nlmsg_size(nh, op_flags), GFP_KERNEL);
-+	if (!skb)
-+		goto out;
- 
- 	err = nh_fill_node(skb, nh, RTM_NEWNEXTHOP, NETLINK_CB(in_skb).portid,
- 			   nlh->nlmsg_seq, 0, op_flags);
+-	if (!xfrm_pol_hold_rcu(pol))
+-		pol = NULL;
+ out_unlock:
+ 	rcu_read_unlock();
+ 	return pol;
 -- 
 2.53.0
 
