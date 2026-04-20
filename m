@@ -1,64 +1,63 @@
-Return-Path: <netdev+bounces-279770-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279771-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0D3lAgUy5mkGtQEAu9opvQ
-	(envelope-from <netdev+bounces-279770-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 16:02:45 +0200
+	id mJK0JSgy5ml6tAEAu9opvQ
+	(envelope-from <netdev+bounces-279771-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 16:03:20 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C729842C8EA
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 16:02:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F54C42C90F
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 16:03:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 95C8C3094CA9
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 13:43:24 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1424631CC379
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 13:43:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8711E3E0C61;
-	Mon, 20 Apr 2026 13:24:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7EAF3E1CEF;
+	Mon, 20 Apr 2026 13:24:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kpsLKZrU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FmI32t3N"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61ED83E0C56;
-	Mon, 20 Apr 2026 13:24:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 928FD3E1CEA;
+	Mon, 20 Apr 2026 13:24:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776691470; cv=none; b=VXpLp6wkoejowfyAi1Keb5xtQsYlv9a0Q0/FVd7i4QXLZbYYAq+CWv5xkvUXlYh49Y4Kd3EmzI960rjv37Stkfe2YtJf3svYZbUOaYPID2rTI7NNCkiD26I0VNDZ+SrCfT3Vbx3FNANwQrSB+x0SvJU7K6EJKOsMoEob/jT8DhQ=
+	t=1776691473; cv=none; b=gkM1H6dgHC7NdpGau/6+MVM5NxTULePqv7EouU5izmiH60cwT1X28gGZzHIVfRcnMIWSwcXniDtsW9nUbpNKf2Ez0sp4FtoCd3bTE5iC1lAE1cd1GoOyhxe+yP84uj/isp0+qkbb4nGjqbdG5gAYZTwRvMYa7Hy46rmSIoqoX5k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776691470; c=relaxed/simple;
-	bh=f6QPOIIGf0z10Meo2LBJgjPd1cjbcB4hiFCPNOlNWSI=;
+	s=arc-20240116; t=1776691473; c=relaxed/simple;
+	bh=+27N1xGHeU6Dmf1YeZVJF54/zCyaS9Z9RMo0NGp5aiM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=peHjqHvcOa/5Xru25cx7Hzc+c+ByRXqUAJvBzv9OptPhFTFunAHt954O3EFjW1ilR55OOYsPfhZBOrtkc5QnxjlitvkWUpackOjdNe8DrSm2aWRgcMmkFqEAuEtHWZzA13/e/FCvufz8fCvsVAiJ6s390JNjF2YLcB0E6+ki2XA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kpsLKZrU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31939C19425;
-	Mon, 20 Apr 2026 13:24:29 +0000 (UTC)
+	 MIME-Version; b=aagR+lqgWyTDdAfwt0oyyabkCmVe7+jbdw5ha5sG9TM7UVXWgci5pbQWYe2Mu+g7uvZawAc9OjbUEiaZg8kJIaMSKH/7qJvhOD4Tb2vmFSCZWX3ab2QnvX8/ZTFLnXu484tIt4bSaXSJb+SK8N1c8RRhVB/bsoTSsK7jzmKZM4s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FmI32t3N; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67E02C2BCB8;
+	Mon, 20 Apr 2026 13:24:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776691470;
-	bh=f6QPOIIGf0z10Meo2LBJgjPd1cjbcB4hiFCPNOlNWSI=;
+	s=k20201202; t=1776691473;
+	bh=+27N1xGHeU6Dmf1YeZVJF54/zCyaS9Z9RMo0NGp5aiM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=kpsLKZrU3QmVjM9SPESUqLMSlZUYcMQykUmiqQV9bjzV+S+PjEbi2AOVgW9facCKA
-	 9QzrBMao8qdH9ky4jdc0PibBvSG8GsPCPJuGqHvvhVc6mm/xC6HnKdCbOyQab+VAeT
-	 yxGEXiqmdJIaK4S8t2rAajyhRmlpCSaEGjq7vzrao5DAmya1yO97XI3GmgX0oP8Fpp
-	 AuBiTknendveR69CS9ha49hSWuMsXdilpm5e0T3YrXhlxM+kniLDz3PSe/E9t/zN2M
-	 Yz65LWlSrZo6eLfrVxzcWpLAqieR6zq1nORtWiEPKwxMlJZu6x////3cMXBNF6l96X
-	 JV3UKKEHxlBKA==
+	b=FmI32t3NtflQ1piDTJ5uR5YeC+hLydS6f5ExTOCpLsOEWGor27s+O7PufS7O/RmdL
+	 qrA/GWrN6kQyu5rc7m3lNhhG1jRndb1EFNrVMn53DYA7LxEin+OR/5ioqA8VImL4vW
+	 xoo425jriLW2PbKXGoP5I5gl7xYvh4HqC+Ob9CH6h4Zax7udKgi5GmlTaiXHshgFvP
+	 Fuw3Dk5Wxe2SYgGmkXTD4NR1fOaw6B0GuD/4wicB6s2uRcoY59JChrEF3m1eJq9Nxo
+	 jpT1IOe2jAHSNxAuCsGGvkaBv+6hW+Q/9yggJdENHykAExcko6ZYlHlFkBIBAAlHcD
+	 Z5ZM+mhoG62Iw==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Satish Kharat <satishkh@cisco.com>,
+Cc: Paolo Abeni <pabeni@redhat.com>,
+	David Ahern <dsahern@kernel.org>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
-	pabeni@redhat.com,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 7.0-5.10] enic: add V2 SR-IOV VF device ID
-Date: Mon, 20 Apr 2026 09:17:22 -0400
-Message-ID: <20260420132314.1023554-48-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 7.0-6.6] ipv6: move IFA_F_PERMANENT percpu allocation in process scope
+Date: Mon, 20 Apr 2026 09:17:24 -0400
+Message-ID: <20260420132314.1023554-50-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260420132314.1023554-1-sashal@kernel.org>
 References: <20260420132314.1023554-1-sashal@kernel.org>
@@ -71,368 +70,519 @@ MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 7.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279770-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-279771-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	NEURAL_HAM(-0.00)[-1.000];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,msgid.link:url,cisco.com:email]
-X-Rspamd-Queue-Id: C729842C8EA
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3F54C42C90F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Satish Kharat <satishkh@cisco.com>
+From: Paolo Abeni <pabeni@redhat.com>
 
-[ Upstream commit 803a1b02027918450b58803190aa7cacb8056265 ]
+[ Upstream commit 8e6405f8218b3f412d36b772318e94d589513eba ]
 
-Register the V2 VF PCI device ID (0x02b7) so the driver binds to V2
-virtual functions created via sriov_configure. Update enic_is_sriov_vf()
-to recognize V2 VFs alongside the existing V1 type.
+Observed at boot time:
 
-Signed-off-by: Satish Kharat <satishkh@cisco.com>
-Link: https://patch.msgid.link/20260401-enic-sriov-v2-prep-v4-2-d5834b2ef1b9@cisco.com
+ CPU: 43 UID: 0 PID: 3595 Comm: (t-daemon) Not tainted 6.12.0 #1
+ Call Trace:
+  <TASK>
+  dump_stack_lvl+0x4e/0x70
+  pcpu_alloc_noprof.cold+0x1f/0x4b
+  fib_nh_common_init+0x4c/0x110
+  fib6_nh_init+0x387/0x740
+  ip6_route_info_create+0x46d/0x640
+  addrconf_f6i_alloc+0x13b/0x180
+  addrconf_permanent_addr+0xd0/0x220
+  addrconf_notify+0x93/0x540
+  notifier_call_chain+0x5a/0xd0
+  __dev_notify_flags+0x5c/0xf0
+  dev_change_flags+0x54/0x70
+  do_setlink+0x36c/0xce0
+  rtnl_setlink+0x11f/0x1d0
+  rtnetlink_rcv_msg+0x142/0x3f0
+  netlink_rcv_skb+0x50/0x100
+  netlink_unicast+0x242/0x390
+  netlink_sendmsg+0x21b/0x470
+  __sys_sendto+0x1dc/0x1f0
+  __x64_sys_sendto+0x24/0x30
+  do_syscall_64+0x7d/0x160
+  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+ RIP: 0033:0x7f5c3852f127
+ Code: 0c 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b8 0f 1f 00 f3 0f 1e fa 80 3d 85 ef 0c 00 00 41 89 ca 74 10 b8 2c 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 71 c3 55 48 83 ec 30 44 89 4c 24 2c 4c 89 44
+ RSP: 002b:00007ffe86caf4c8 EFLAGS: 00000202 ORIG_RAX: 000000000000002c
+ RAX: ffffffffffffffda RBX: 0000556c5cd93210 RCX: 00007f5c3852f127
+ RDX: 0000000000000020 RSI: 0000556c5cd938b0 RDI: 0000000000000003
+ RBP: 00007ffe86caf5a0 R08: 00007ffe86caf4e0 R09: 0000000000000080
+ R10: 0000000000000000 R11: 0000000000000202 R12: 0000556c5cd932d0
+ R13: 00000000021d05d1 R14: 00000000021d05d1 R15: 0000000000000001
+
+IFA_F_PERMANENT addresses require the allocation of a bunch of percpu
+pointers, currently in atomic scope.
+
+Similar to commit 51454ea42c1a ("ipv6: fix locking issues with loops
+over idev->addr_list"), move fixup_permanent_addr() outside the
+&idev->lock scope, and do the allocations with GFP_KERNEL. With such
+change fixup_permanent_addr() is invoked with the BH enabled, and the
+ifp lock acquired there needs the BH variant.
+
+Note that we don't need to acquire a reference to the permanent
+addresses before releasing the mentioned write lock, because
+addrconf_permanent_addr() runs under RTNL and ifa removal always happens
+under RTNL, too.
+
+Also the PERMANENT flag is constant in the relevant scope, as it can be
+cleared only by inet6_addr_modify() under the RTNL lock.
+
+Reviewed-by: David Ahern <dsahern@kernel.org>
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Link: https://patch.msgid.link/46a7a030727e236af2dc7752994cd4f04f4a91d2.1775658924.git.pabeni@redhat.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
-Now I have all the information needed for a comprehensive analysis. Let
-me compile the full assessment.
+Now I have all the information needed. Let me compile my analysis.
 
 ---
 
 ## PHASE 1: COMMIT MESSAGE FORENSICS
 
-### Step 1.1: Subject Line
-- **Subsystem**: `enic` (Cisco VIC Ethernet NIC driver,
-  `drivers/net/ethernet/cisco/enic/`)
-- **Action verb**: "add" — adding a new device ID
-- **Summary**: Add V2 SR-IOV VF PCI device ID to the enic driver
+### Step 1.1: PARSE THE SUBJECT LINE
+- **Subsystem**: ipv6 (networking)
+- **Action verb**: "move" - restructuring allocation scope
+- **Summary**: Move IFA_F_PERMANENT percpu allocation from atomic to
+  process (GFP_KERNEL) scope
+- Record: [ipv6] [move] [Change percpu allocation from GFP_ATOMIC to
+  GFP_KERNEL by restructuring lock scope]
 
-### Step 1.2: Tags
-- **Signed-off-by**: Satish Kharat `<satishkh@cisco.com>` (author, Cisco
-  employee — the hardware vendor)
-- **Link**: `https://patch.msgid.link/20260401-enic-
-  sriov-v2-prep-v4-2-d5834b2ef1b9@cisco.com` — patch 2 of series "enic-
-  sriov-v2-prep", version 4
-- **Signed-off-by**: Jakub Kicinski `<kuba@kernel.org>` (networking
-  subsystem maintainer)
-- No Fixes: tag, no Reported-by:, no Cc: stable — expected for this
-  review pipeline.
+### Step 1.2: PARSE ALL COMMIT MESSAGE TAGS
+- **Reviewed-by**: David Ahern <dsahern@kernel.org> - former networking
+  subsystem maintainer, very authoritative
+- **Signed-off-by**: Paolo Abeni <pabeni@redhat.com> - current net-next
+  maintainer, author
+- **Link**: https://patch.msgid.link/46a7a030727e236af2dc7752994cd4f04f4
+  a91d2.1775658924.git.pabeni@redhat.com
+- **Signed-off-by**: Jakub Kicinski <kuba@kernel.org> - committer,
+  net/net-next maintainer
+- No Fixes: tag (expected for candidates)
+- No Cc: stable (expected)
+- Record: Reviewed by David Ahern, authored by Paolo Abeni (net-next co-
+  maintainer), committed by Jakub Kicinski. Applied to net-next (not
+  net).
 
-### Step 1.3: Commit Body
-The commit body states: Register the V2 VF PCI device ID (0x02b7) so the
-driver binds to V2 virtual functions created via `sriov_configure`.
-Update `enic_is_sriov_vf()` to recognize V2 VFs alongside the existing
-V1 type. Without this change, V2 VFs exposed by the hardware will not be
-claimed by the enic driver at all.
+### Step 1.3: ANALYZE THE COMMIT BODY TEXT
+- **Bug described**: At boot time, `pcpu_alloc_noprof.cold` is triggered
+  during IPv6 permanent address route setup. This is the cold
+  (warning/failure) path of per-cpu allocation.
+- **Symptom**: GFP_ATOMIC percpu allocation failure when setting up
+  permanent IPv6 addresses during NETDEV_UP handling. The call trace
+  shows: `addrconf_permanent_addr -> fixup_permanent_addr ->
+  addrconf_f6i_alloc -> ip6_route_info_create -> fib6_nh_init ->
+  fib_nh_common_init -> pcpu_alloc_noprof.cold`
+- **Root cause**: `addrconf_permanent_addr()` holds `idev->lock` (write
+  spinlock with BH disabled) while calling `fixup_permanent_addr()`,
+  forcing GFP_ATOMIC for all allocations inside. Per-cpu allocations
+  with GFP_ATOMIC are unreliable, especially on systems with many CPUs.
+- **Kernel version**: Observed on 6.12.0 with 43+ CPUs
+- Record: Real boot-time allocation failure. IPv6 permanent address
+  setup fails when percpu allocation with GFP_ATOMIC fails, causing the
+  address to be dropped.
 
-### Step 1.4: Hidden Bug Fix Detection
-This is a **device ID addition** — a well-known exception category.
-Without this ID, users with V2 VF hardware cannot use SR-IOV on their
-Cisco VIC adapters. This is a hardware enablement fix.
-
-Record: [Device ID addition for hardware that the driver already
-supports] [Not disguised — clearly a device ID add]
-
----
+### Step 1.4: DETECT HIDDEN BUG FIXES
+This IS a bug fix despite being described as "move". When GFP_ATOMIC
+percpu allocation fails, `fixup_permanent_addr()` returns an error, and
+`addrconf_permanent_addr()` then DROPS the IPv6 address
+(`ipv6_del_addr`). Users lose permanent IPv6 addresses at boot.
+- Record: Yes, this is a real bug fix. The "move" language hides the
+  fact that GFP_ATOMIC failures cause IPv6 addresses to be lost.
 
 ## PHASE 2: DIFF ANALYSIS
 
-### Step 2.1: Inventory
-- **File changed**: `drivers/net/ethernet/cisco/enic/enic_main.c`
-  (single file)
-- **Lines added**: 3 functional lines
-  1. `#define PCI_DEVICE_ID_CISCO_VIC_ENET_VF_V2   0x02b7`
-  2. `{ PCI_VDEVICE(CISCO, PCI_DEVICE_ID_CISCO_VIC_ENET_VF_V2) },` in
-     the PCI ID table
-  3. `|| enic->pdev->device == PCI_DEVICE_ID_CISCO_VIC_ENET_VF_V2` in
-     `enic_is_sriov_vf()`
-- **Scope**: Single-file, surgical, 3-line addition
+### Step 2.1: INVENTORY THE CHANGES
+- **File**: `net/ipv6/addrconf.c` - 19 lines added, 12 removed (net +7)
+- **Functions modified**: `fixup_permanent_addr()` and
+  `addrconf_permanent_addr()`
+- **Scope**: Single-file, well-contained change in two related functions
+- Record: Single file, ~31 lines total change, two functions in same
+  call chain.
 
-### Step 2.2: Code Flow
-- **Before**: Driver only recognized PCI device 0x0071 as an SR-IOV VF.
-  V2 VFs (0x02b7) were unrecognized.
-- **After**: Driver recognizes both 0x0071 (V1) and 0x02b7 (V2) as SR-
-  IOV VFs. V2 VFs get identical treatment as V1 VFs.
-- `enic_is_sriov_vf()` is called in 6 places throughout the driver to
-  branch behavior for VFs (MTU handling, MAC address, station address,
-  netdev_ops selection). All behave correctly with V2 VFs after this
-  change.
+### Step 2.2: UNDERSTAND THE CODE FLOW CHANGE
+**Hunk 1** (`fixup_permanent_addr`):
+- Before: GFP_ATOMIC for route allocation, plain spin_lock/unlock for
+  ifp->lock
+- After: GFP_KERNEL for route allocation, spin_lock_bh/unlock_bh (needed
+  because BH is now enabled)
+- GFP_ATOMIC -> GFP_KERNEL in both `addrconf_f6i_alloc()` and
+  `addrconf_prefix_route()` calls
 
-### Step 2.3: Bug Mechanism
-- **Category**: Hardware workaround / Device ID addition (category h)
-- Without the ID in `enic_id_table`, the PCI core won't bind the enic
-  driver to V2 VFs at all
-- Without the `enic_is_sriov_vf()` update, even if bound, V2 VFs would
-  get incorrect PF (physical function) code paths
+**Hunk 2** (`addrconf_permanent_addr`):
+- Before: Holds `idev->lock` throughout iteration and calls
+  `fixup_permanent_addr()` inside the lock
+- After: Builds temporary list of PERMANENT addresses while holding
+  lock, releases lock, then iterates temporary list calling
+  `fixup_permanent_addr()` without lock held
+- Uses existing `if_list_aux` infrastructure (same pattern as commit
+  51454ea42c1a)
+- Adds ASSERT_RTNL() for safety
 
-### Step 2.4: Fix Quality
-- Obviously correct: mirrors the existing V1 VF pattern exactly
-- Minimal and surgical: 3 lines
-- Zero regression risk: only affects devices with PCI ID 0x02b7
-- No API changes, no lock changes, no memory management changes
+### Step 2.3: IDENTIFY THE BUG MECHANISM
+**Category**: Allocation failure in atomic context / resource setup
+failure
+- The bug is that percpu allocations (via `alloc_percpu_gfp()` in
+  `fib_nh_common_init()`) with GFP_ATOMIC can fail, especially on high-
+  CPU-count systems
+- When the allocation fails, the permanent IPv6 address is dropped
+- The fix moves the work outside the spinlock so GFP_KERNEL can be used
+- Record: Allocation failure bug. GFP_ATOMIC percpu allocation in
+  fib_nh_common_init fails -> route creation fails -> permanent IPv6
+  address dropped.
 
----
+### Step 2.4: ASSESS THE FIX QUALITY
+- **Obviously correct**: Yes - the if_list_aux pattern is proven
+  (already used in `addrconf_ifdown` and `dev_forward_change`)
+- **Minimal/surgical**: Yes - single file, two functions, well-contained
+- **Regression risk**: Low - the lock restructuring is safe per RTNL
+  protection. The spin_lock -> spin_lock_bh change is correct because BH
+  is now enabled.
+- **Red flags**: None. The locking argument is well-explained in the
+  commit message (RTNL protects against concurrent ifa removal).
+- Record: High quality fix. Proven pattern, correct BH handling, well-
+  documented safety argument.
 
-## PHASE 3: GIT HISTORY
+## PHASE 3: GIT HISTORY INVESTIGATION
 
-### Step 3.1: Blame
-- The original V1 VF support (PCI ID 0x0071) was added in commit
-  `3a4adef5c0adbb` by Roopa Prabhu in January 2012, over 14 years ago.
-- The `enic_is_sriov_vf()` function and PCI ID table entry have been
-  untouched since then.
-- The enic driver itself dates to 2008 (commit `01f2e4ead2c512`).
+### Step 3.1: BLAME THE CHANGED LINES
+- `fixup_permanent_addr()` introduced by f1705ec197e7 (Feb 2016, "net:
+  ipv6: Make address flushing on ifdown optional") in v4.5
+- The buggy GFP_ATOMIC has been present since this code was created
+- `addrconf_permanent_addr()` also from the same commit
+- Record: Buggy code introduced in v4.5 (f1705ec197e7, 2016). Present in
+  ALL stable trees.
 
-### Step 3.2: Fixes Tag
-- No Fixes: tag (expected for device ID additions).
+### Step 3.2: FOLLOW THE FIXES TAG
+No Fixes: tag present (expected).
 
-### Step 3.3: File History
-- Recent commits to `enic_main.c` are mostly cleanup/refactoring
-  (kmalloc conversion, timer rename, page pool API). No conflicting
-  changes around the PCI ID table or `enic_is_sriov_vf()`.
+### Step 3.3: CHECK FILE HISTORY
+- fd63f185979b0 ("ipv6: prevent possible UaF in
+  addrconf_permanent_addr()") is a prerequisite - already in v7.0
+- 51454ea42c1a ("ipv6: fix locking issues with loops over
+  idev->addr_list") introduced the if_list_aux pattern - in v5.19+
+- Record: Two prerequisites identified, both present in v7.0.
 
-### Step 3.4: Author
-- Satish Kharat is a Cisco employee listed in MAINTAINERS for enic
-  (commit `9b8eeccd7110d` updates enic maintainers). He is a regular
-  contributor and domain expert for this driver.
+### Step 3.4: CHECK THE AUTHOR
+- Paolo Abeni is the net-next co-maintainer - maximum authority for
+  networking code
+- David Ahern reviewed it - he's the original author of much of this
+  code
+- Record: Author is subsystem co-maintainer. Reviewer is the original
+  code author.
 
-### Step 3.5: Dependencies
-- This is patch 2 of the "enic-sriov-v2-prep" series. However, the diff
-  is **completely self-contained**: it only adds a `#define`, a table
-  entry, and an OR condition. None of these reference anything
-  introduced by patch 1 of the series.
-- The code applies cleanly to the current v7.0 tree — the PCI ID table
-  and `enic_is_sriov_vf()` are unchanged from when this patch was
-  written.
+### Step 3.5: CHECK FOR DEPENDENCIES
+- Requires `if_list_aux` field in `inet6_ifaddr` (from commit
+  51454ea42c1a, v5.19+) - present in v7.0
+- Requires fd63f185979b0 UaF fix (already in v7.0)
+- Requires `d465bd07d16e3` gfp_flags passdown through
+  `ip6_route_info_create_nh()` - present in v7.0
+- The diff applies cleanly against v7.0 (verified)
+- Record: All dependencies satisfied in v7.0. Clean apply confirmed.
 
-Record: [Self-contained, no dependencies on other patches]
+## PHASE 4: MAILING LIST RESEARCH
 
----
+### Step 4.1: ORIGINAL PATCH DISCUSSION
+- Found via b4 am: Applied to netdev/net-next.git (main) as commit
+  8e6405f8218b
+- This is v2 of the patch (v1 was the initial UaF fix that became
+  fd63f185979b0)
+- Applied by Jakub Kicinski
+- Submitted to net-next, not net
+- Record: v2 patch, applied to net-next. Upstream commit is
+  8e6405f8218b.
 
-## PHASE 4: MAILING LIST
+### Step 4.2: REVIEWERS
+- Paolo Abeni (author, net-next co-maintainer)
+- David Ahern (reviewer, original code author)
+- Jakub Kicinski (committer, net maintainer)
+- All key networking maintainers involved
+- Record: Maximum authority review chain.
 
-### Step 4.1-4.5
-- b4 dig was unable to match directly (the commit isn't in this tree's
-  history). Lore.kernel.org returned anti-scraping pages.
-- The Link tag shows this is **v4** of the series, meaning it went
-  through 4 rounds of review. Applied by Jakub Kicinski (net-next
-  maintainer).
-- The earlier v2 series from the same author
-  (`v2_20260223_satishkh_net_ethernet_enic_add_vic_ids_and_link_modes`)
-  shows the author was actively contributing VIC subsystem ID and link
-  mode support around the same timeframe.
+### Step 4.3: BUG REPORT
+- The stack trace in the commit is from a real system (6.12.0, 43+ CPUs)
+- `pcpu_alloc_noprof.cold` is the failure/warning path for percpu
+  allocations
+- Record: Real-world observation on production system.
 
-Record: [Patch went through v4 review, applied by net-next maintainer
-Jakub Kicinski]
+### Step 4.4: SERIES CONTEXT
+- This is standalone (v2 of a single patch), not part of a multi-patch
+  series
+- Record: Standalone fix.
 
----
+### Step 4.5: STABLE DISCUSSION
+- No specific stable discussion found
+- Note: applied to net-next, not net, suggesting author didn't consider
+  it urgent
 
 ## PHASE 5: CODE SEMANTIC ANALYSIS
 
-### Step 5.1-5.4: Function Impact
-`enic_is_sriov_vf()` is called in 6 locations:
-1. **Line 365**: MTU change notification handling (VFs schedule work vs
-   warn)
-2. **Line 1010**: MAC address setting (VFs accept zero MAC)
-3. **Line 1736**: Open path (VFs skip station addr add)
-4. **Line 1804**: Close path (VFs skip station addr del)
-5. **Line 1864**: MTU change (VFs return -EOPNOTSUPP)
-6. **Line 2831**: Probe path (VFs get `enic_netdev_dynamic_ops`)
-
-All 6 call sites already handle VFs correctly — they just need the VF
-detection to work for V2 devices. The change in `enic_is_sriov_vf()`
-propagates the correct behavior automatically.
-
-### Step 5.5: Similar Patterns
-The original V1 VF ID addition (commit `3a4adef5c0adbb` from 2012)
-followed the exact same pattern: define + table + function. This V2
-addition mirrors it exactly.
-
----
+### Step 5.1-5.4: FUNCTION ANALYSIS
+- `addrconf_permanent_addr()` is called from `addrconf_notify()` on
+  `NETDEV_UP` events
+- This is the boot-time path for restoring permanent IPv6 addresses when
+  interfaces come up
+- Call chain: `addrconf_notify() -> addrconf_permanent_addr() ->
+  fixup_permanent_addr() -> addrconf_f6i_alloc() -> ... ->
+  fib_nh_common_init() -> alloc_percpu_gfp()`
+- The allocation in `fib_nh_common_init()` is `alloc_percpu_gfp(struct
+  rtable __rcu *, gfp_flags)` - this allocates per-CPU pointers
+- On high-CPU systems, percpu allocations are larger and more likely to
+  fail with GFP_ATOMIC
+- This path runs on every NETDEV_UP event for every interface
+- Record: Code is in a common boot path. Allocation failure causes
+  permanent address loss.
 
 ## PHASE 6: STABLE TREE ANALYSIS
 
-### Step 6.1: Code Existence in Stable
-- Current HEAD is `v7.0`. The enic driver code is identical to mainline
-  at the branch point.
-- The PCI ID table, `enic_is_sriov_vf()`, and all call sites exist
-  unchanged in this tree.
-- This code has been present since 2012 (kernel 3.3+), so it exists in
-  ALL active stable trees.
+### Step 6.1: BUGGY CODE IN STABLE TREES
+- The buggy GFP_ATOMIC code exists since v4.5 (f1705ec197e7)
+- Present in ALL active stable trees
+- Record: Bug present in all stable trees from v4.5 onward.
 
-### Step 6.2: Backport Complications
-- The diff applies cleanly — no intermediate changes to the PCI ID table
-  or `enic_is_sriov_vf()`.
-- No conflicts expected.
+### Step 6.2: BACKPORT COMPLICATIONS
+- For 7.0: Clean apply (verified via `git diff v7.0 8e6405f8218b`)
+- For 6.12 and older: Would need checking for gfp_flags passdown chain
+- Record: Clean apply for 7.0.y. May need adjustment for older trees.
 
-### Step 6.3: Related Fixes
-- No other fixes for V2 VF support exist in stable.
-
----
+### Step 6.3: RELATED FIXES IN STABLE
+- None found for this specific GFP_ATOMIC issue
+- Record: No related fix already in stable.
 
 ## PHASE 7: SUBSYSTEM CONTEXT
 
-### Step 7.1: Subsystem
-- **Subsystem**: Network drivers / Cisco VIC Ethernet
-- **Criticality**: IMPORTANT — Cisco VIC adapters are used in enterprise
-  data centers (UCS servers)
+### Step 7.1: SUBSYSTEM CRITICALITY
+- **Subsystem**: net/ipv6 (networking, IPv6 address configuration)
+- **Criticality**: IMPORTANT - IPv6 connectivity affects many users,
+  especially on servers
+- Record: IMPORTANT subsystem. IPv6 permanent address loss at boot
+  affects server connectivity.
 
-### Step 7.2: Activity
-- The enic driver receives periodic updates. The maintainer (from Cisco)
-  is actively contributing.
+### Step 7.2: SUBSYSTEM ACTIVITY
+- `net/ipv6/addrconf.c` has 106+ commits between v6.6 and v7.0
+- Actively maintained area
+- Record: Very active subsystem.
 
----
+## PHASE 8: IMPACT AND RISK ASSESSMENT
 
-## PHASE 8: IMPACT AND RISK
+### Step 8.1: WHO IS AFFECTED
+- Systems with many CPUs (43+ shown in trace) using IPv6 permanent
+  addresses
+- More likely on servers/enterprise systems
+- Record: Affects multi-CPU systems with IPv6, primarily servers.
 
-### Step 8.1: Affected Users
-- Users with Cisco VIC adapters that create V2 SR-IOV virtual functions.
-  This is enterprise/data center hardware.
+### Step 8.2: TRIGGER CONDITIONS
+- Triggered at boot time during interface bring-up (NETDEV_UP)
+- Also triggered whenever `rtnl_setlink` brings an interface up
+- More likely under memory pressure or on high-CPU-count systems
+- Record: Triggered at boot/interface-up. More common on high-CPU
+  systems.
 
-### Step 8.2: Trigger
-- Any user enabling SR-IOV on a Cisco VIC that produces V2 VFs (PCI ID
-  0x02b7). Without this patch, VFs simply don't work.
+### Step 8.3: FAILURE MODE SEVERITY
+- When triggered: permanent IPv6 address is DROPPED from the interface
+- This means IPv6 connectivity loss for that address
+- Not a crash, but an operational failure (lost connectivity)
+- Record: Severity HIGH - IPv6 address loss leads to connectivity
+  failure.
 
-### Step 8.3: Severity
-- Without this patch: V2 VFs are **completely non-functional** (driver
-  won't bind). Severity: HIGH for affected users.
-
-### Step 8.4: Risk-Benefit
-- **Benefit**: HIGH — enables SR-IOV V2 VF functionality for Cisco VIC
-  users
-- **Risk**: VERY LOW — 3 lines, only affects devices with PCI ID 0x02b7,
-  mirrors existing V1 pattern exactly
-- **Ratio**: Excellent — high benefit, near-zero risk
-
----
+### Step 8.4: RISK-BENEFIT RATIO
+- **Benefit**: Prevents IPv6 address loss on multi-CPU systems at boot
+- **Risk**: Low - proven pattern (if_list_aux), well-reviewed, single
+  file
+- Record: Benefit HIGH / Risk LOW = favorable ratio.
 
 ## PHASE 9: FINAL SYNTHESIS
 
-### Step 9.1: Evidence Summary
+### Step 9.1: EVIDENCE COMPILATION
+
 **FOR backporting:**
-- Classic PCI device ID addition — explicitly allowed exception in
-  stable rules
-- Only 3 functional lines of code
-- Self-contained, no dependencies
-- Applies cleanly to v7.0 tree
-- Author is Cisco engineer / enic maintainer
-- Applied by net-next maintainer (Jakub Kicinski)
-- Went through v4 review cycle
-- Mirrors existing V1 VF pattern from 2012
-- Enables hardware that is completely non-functional without this change
-- Zero regression risk (only affects new PCI device ID)
+- Fixes real boot-time IPv6 address loss on multi-CPU systems
+- Stack trace from a real 6.12.0 deployment
+- Written by net-next co-maintainer, reviewed by original code author
+- Uses proven if_list_aux pattern already in the same file
+- Single file, ~31 lines, well-contained
+- Bug present since v4.5 - affects all stable trees
+- Clean apply against v7.0
 
 **AGAINST backporting:**
-- Part of a multi-patch series — but this patch is self-contained
-- No Fixes: tag — expected for device ID additions
+- Applied to net-next, not net (author didn't consider it critical)
+- No Fixes: tag or Cc: stable from author
+- Structural change (lock restructuring), not a one-line fix
+- Not a crash - "just" drops IPv6 addresses when allocation fails
 
-### Step 9.2: Stable Rules Checklist
-1. Obviously correct and tested? **YES** — mirrors existing V1 pattern
-   exactly, v4 review, from vendor
-2. Fixes a real bug? **YES** — V2 VFs don't work without this
-3. Important issue? **YES** — complete hardware non-functionality
-4. Small and contained? **YES** — 3 lines, 1 file
-5. No new features or APIs? **YES** — just adds device ID to existing
-   driver
-6. Can apply to stable? **YES** — clean apply expected
+**UNRESOLVED:**
+- Exact failure rate on real systems unknown (depends on CPU count and
+  memory state)
+- Could not access lore.kernel.org for full review discussion (Anubis
+  protection)
 
-### Step 9.3: Exception Category
-**PCI Device ID addition to existing driver** — this is a canonical
-example of the exception category.
+### Step 9.2: STABLE RULES CHECKLIST
+1. Obviously correct and tested? **YES** - proven pattern, reviewed by
+   original code author and subsystem maintainer
+2. Fixes a real bug? **YES** - GFP_ATOMIC percpu allocation failure
+   causes IPv6 address loss
+3. Important issue? **YES** - IPv6 connectivity loss at boot on multi-
+   CPU systems
+4. Small and contained? **YES** - single file, ~31 lines, two functions
+   in same call chain
+5. No new features or APIs? **YES** - pure internal restructuring
+6. Can apply to stable? **YES** - clean apply to v7.0 verified
 
-### Step 9.4: Decision
-This is a textbook PCI device ID addition: 3 lines, single file, from
-the hardware vendor, enables V2 SR-IOV VFs on Cisco VIC adapters. It
-meets all stable criteria and falls into the explicit "new device IDs"
-exception category.
+### Step 9.3: EXCEPTION CATEGORIES
+Not an exception category - this is a standard bug fix.
 
----
+### Step 9.4: DECISION
+The fix addresses a real operational issue (IPv6 permanent address loss
+at boot due to GFP_ATOMIC percpu allocation failure). While it was
+routed to net-next rather than net, the bug has real-world impact on
+multi-CPU systems. The fix is well-reviewed by the most authoritative
+people for this code, uses a proven pattern, and applies cleanly to
+v7.0.
 
 ## Verification
 
-- [Phase 1] Parsed tags: Signed-off-by from Cisco author and net-next
-  maintainer; Link to v4 patch 2
-- [Phase 2] Diff analysis: 3 lines — 1 define, 1 PCI table entry, 1 OR
-  condition in `enic_is_sriov_vf()`
-- [Phase 3] git blame: Original VF support (0x0071) added by
-  `3a4adef5c0adbb` (2012, kernel 3.3); unchanged since
-- [Phase 3] git show `3a4adef5c0adbb`: Confirmed identical pattern for
-  V1 VF
-- [Phase 3] git log: No conflicting recent changes to PCI ID table or
-  `enic_is_sriov_vf()`
-- [Phase 3] Author: Satish Kharat (Cisco), listed in MAINTAINERS update
-  commit `9b8eeccd7110d`
-- [Phase 4] b4 dig: Could not match commit (not in tree's history); Lore
-  blocked by anti-scraping
-- [Phase 4] Series context: v4 series "enic-sriov-v2-prep", applied by
-  Jakub Kicinski
-- [Phase 5] grep `enic_is_sriov_vf`: 6 call sites — all branch VF/PF
-  behavior correctly; V2 VFs get same treatment
-- [Phase 6] HEAD is v7.0; enic PCI table unchanged; clean apply
-  confirmed
-- [Phase 8] Failure mode: V2 VFs completely non-functional (driver won't
-  bind), severity HIGH for affected users
-- [Phase 8] Risk: Near-zero — new PCI ID only affects matching hardware
+- [Phase 1] Parsed tags: Reviewed-by David Ahern, Signed-off-by Paolo
+  Abeni and Jakub Kicinski. No Fixes/Cc-stable (expected).
+- [Phase 2] Diff analysis: GFP_ATOMIC -> GFP_KERNEL in
+  fixup_permanent_addr(), lock restructuring in
+  addrconf_permanent_addr() using proven if_list_aux pattern.
+- [Phase 3] git blame: Code introduced by f1705ec197e7 (v4.5, 2016). Bug
+  present since v4.5.
+- [Phase 3] git merge-base: 51454ea42c1a (if_list_aux) in v5.19+,
+  fd63f185979b0 (UaF fix) in v7.0, d465bd07d16e3 (gfp passdown) in v7.0.
+- [Phase 3] git diff v7.0 8e6405f8218b: Clean apply confirmed.
+- [Phase 4] b4 am: Found upstream commit 8e6405f8218b, applied to net-
+  next by Jakub Kicinski. v2 patch.
+- [Phase 4] Mailing list thread: Confirmed patchwork-bot shows clean
+  application to netdev/net-next.git.
+- [Phase 4] b4 dig -w on related commit: Confirmed all key networking
+  maintainers were involved.
+- [Phase 5] Call chain: addrconf_notify -> addrconf_permanent_addr ->
+  fixup_permanent_addr -> addrconf_f6i_alloc -> ... ->
+  fib_nh_common_init -> alloc_percpu_gfp with GFP_ATOMIC fails.
+- [Phase 5] fib_nh_common_init: Verified it does alloc_percpu_gfp() at
+  line 619-620 of fib_semantics.c.
+- [Phase 6] v7.0: All dependencies present, clean apply verified.
+- [Phase 8] Failure mode: IPv6 permanent address dropped (ipv6_del_addr
+  called) when allocation fails - HIGH severity.
+- UNVERIFIED: Could not access lore.kernel.org review comments due to
+  Anubis bot protection. The full reviewer feedback on v1->v2 evolution
+  could not be examined.
 
 **YES**
 
- drivers/net/ethernet/cisco/enic/enic_main.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ net/ipv6/addrconf.c | 31 +++++++++++++++++++------------
+ 1 file changed, 19 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/net/ethernet/cisco/enic/enic_main.c b/drivers/net/ethernet/cisco/enic/enic_main.c
-index e839081f9ee44..e16dfbcd2c229 100644
---- a/drivers/net/ethernet/cisco/enic/enic_main.c
-+++ b/drivers/net/ethernet/cisco/enic/enic_main.c
-@@ -66,12 +66,14 @@
- #define PCI_DEVICE_ID_CISCO_VIC_ENET         0x0043  /* ethernet vnic */
- #define PCI_DEVICE_ID_CISCO_VIC_ENET_DYN     0x0044  /* enet dynamic vnic */
- #define PCI_DEVICE_ID_CISCO_VIC_ENET_VF      0x0071  /* enet SRIOV VF */
-+#define PCI_DEVICE_ID_CISCO_VIC_ENET_VF_V2   0x02b7  /* enet SRIOV V2 VF */
+diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+index dd0b4d80e0f84..77c77e843c96c 100644
+--- a/net/ipv6/addrconf.c
++++ b/net/ipv6/addrconf.c
+@@ -3585,15 +3585,15 @@ static int fixup_permanent_addr(struct net *net,
+ 		struct fib6_info *f6i, *prev;
  
- /* Supported devices */
- static const struct pci_device_id enic_id_table[] = {
- 	{ PCI_VDEVICE(CISCO, PCI_DEVICE_ID_CISCO_VIC_ENET) },
- 	{ PCI_VDEVICE(CISCO, PCI_DEVICE_ID_CISCO_VIC_ENET_DYN) },
- 	{ PCI_VDEVICE(CISCO, PCI_DEVICE_ID_CISCO_VIC_ENET_VF) },
-+	{ PCI_VDEVICE(CISCO, PCI_DEVICE_ID_CISCO_VIC_ENET_VF_V2) },
- 	{ 0, }	/* end of table */
- };
+ 		f6i = addrconf_f6i_alloc(net, idev, &ifp->addr, false,
+-					 GFP_ATOMIC, NULL);
++					 GFP_KERNEL, NULL);
+ 		if (IS_ERR(f6i))
+ 			return PTR_ERR(f6i);
  
-@@ -307,7 +309,8 @@ int enic_sriov_enabled(struct enic *enic)
+ 		/* ifp->rt can be accessed outside of rtnl */
+-		spin_lock(&ifp->lock);
++		spin_lock_bh(&ifp->lock);
+ 		prev = ifp->rt;
+ 		ifp->rt = f6i;
+-		spin_unlock(&ifp->lock);
++		spin_unlock_bh(&ifp->lock);
  
- static int enic_is_sriov_vf(struct enic *enic)
+ 		fib6_info_release(prev);
+ 	}
+@@ -3601,7 +3601,7 @@ static int fixup_permanent_addr(struct net *net,
+ 	if (!(ifp->flags & IFA_F_NOPREFIXROUTE)) {
+ 		addrconf_prefix_route(&ifp->addr, ifp->prefix_len,
+ 				      ifp->rt_priority, idev->dev, 0, 0,
+-				      GFP_ATOMIC);
++				      GFP_KERNEL);
+ 	}
+ 
+ 	if (ifp->state == INET6_IFADDR_STATE_PREDAD)
+@@ -3612,29 +3612,36 @@ static int fixup_permanent_addr(struct net *net,
+ 
+ static void addrconf_permanent_addr(struct net *net, struct net_device *dev)
  {
--	return enic->pdev->device == PCI_DEVICE_ID_CISCO_VIC_ENET_VF;
-+	return enic->pdev->device == PCI_DEVICE_ID_CISCO_VIC_ENET_VF ||
-+	       enic->pdev->device == PCI_DEVICE_ID_CISCO_VIC_ENET_VF_V2;
+-	struct inet6_ifaddr *ifp, *tmp;
++	struct inet6_ifaddr *ifp;
++	LIST_HEAD(tmp_addr_list);
+ 	struct inet6_dev *idev;
+ 
++	/* Mutual exclusion with other if_list_aux users. */
++	ASSERT_RTNL();
++
+ 	idev = __in6_dev_get(dev);
+ 	if (!idev)
+ 		return;
+ 
+ 	write_lock_bh(&idev->lock);
++	list_for_each_entry(ifp, &idev->addr_list, if_list) {
++		if (ifp->flags & IFA_F_PERMANENT)
++			list_add_tail(&ifp->if_list_aux, &tmp_addr_list);
++	}
++	write_unlock_bh(&idev->lock);
+ 
+-	list_for_each_entry_safe(ifp, tmp, &idev->addr_list, if_list) {
+-		if ((ifp->flags & IFA_F_PERMANENT) &&
+-		    fixup_permanent_addr(net, idev, ifp) < 0) {
+-			write_unlock_bh(&idev->lock);
++	while (!list_empty(&tmp_addr_list)) {
++		ifp = list_first_entry(&tmp_addr_list,
++				       struct inet6_ifaddr, if_list_aux);
++		list_del(&ifp->if_list_aux);
+ 
++		if (fixup_permanent_addr(net, idev, ifp) < 0) {
+ 			net_info_ratelimited("%s: Failed to add prefix route for address %pI6c; dropping\n",
+ 					     idev->dev->name, &ifp->addr);
+ 			in6_ifa_hold(ifp);
+ 			ipv6_del_addr(ifp);
+-			write_lock_bh(&idev->lock);
+ 		}
+ 	}
+-
+-	write_unlock_bh(&idev->lock);
  }
  
- int enic_is_valid_vf(struct enic *enic, int vf)
+ static int addrconf_notify(struct notifier_block *this, unsigned long event,
 -- 
 2.53.0
 
