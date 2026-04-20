@@ -1,66 +1,73 @@
-Return-Path: <netdev+bounces-279817-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279818-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uCGtKAA/5mlutgEAu9opvQ
-	(envelope-from <netdev+bounces-279817-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 16:58:08 +0200
+	id ODCrAMdR5mlduwEAu9opvQ
+	(envelope-from <netdev+bounces-279818-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 18:18:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91C2D42DAA3
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 16:58:07 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 932D842F486
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 18:18:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 325483023059
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 14:30:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A8BAD330F914
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 14:31:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDF354A1382;
-	Mon, 20 Apr 2026 13:32:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 086C14A3400;
+	Mon, 20 Apr 2026 13:32:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rc0qW+pS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PPmNAD7T"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8F7049691D;
-	Mon, 20 Apr 2026 13:32:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D203D4A33F8;
+	Mon, 20 Apr 2026 13:32:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776691957; cv=none; b=TkOVAgIoawOGDRFQmn59bU5U0rCeqNmRxua8HsdmgrZRQplOcdkb6PkkAfQGz9rXhZlr76lVw0v3lVgRstcjqu7CxTly163o0vU3XsXEzuPTM6T3sIZND5ajtP2Mgb2R37BfykKrPiuaktpMIU4gSFPHfKg0Hxhj4OC+d1Bi2Ro=
+	t=1776691966; cv=none; b=mrHrbVt/JVXZ5y6Ln33NWYq3S9uS783slx66lH4EDUThSFSykdxpKL5714SPTWQ//3atlcTfneVxqeuV+OW4iQ51MKOIi6U7/DGzSc4xiiNR/+xVNmVx/51Ky/QsV7EYl7W8oOYMJ0brWjJQKC8Uy2cVdiazsR7QdprGs15RTZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776691957; c=relaxed/simple;
-	bh=yqcxUtB/nKOk115s5moCJVayDci/jQHuuFf6AK0cv5A=;
+	s=arc-20240116; t=1776691966; c=relaxed/simple;
+	bh=DIGKo2zsA17VauZZiZ1xLrJA3DEHB2BiyBYge1MHuEA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ixlN7AM6NFP7f7MiwTTlXX95Q2Sh1PkSWVB5LaRZIn+a1/J2V3zNyBdwBWpja5LUVD3ZVyBN0z3rEAAkExLvnBVcdhpI/KTvYC7G+mK2ndx6hf4q1+TTUT6yXmPW2vP3uYvjLPB4qWABT3ogapDNpcma3mvtu+RdcJo1zsXMJWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rc0qW+pS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38FF2C19425;
-	Mon, 20 Apr 2026 13:32:36 +0000 (UTC)
+	 MIME-Version; b=ALeaIh8sgATRL39YDfIansLZ3IMykCx571DglxQnaVBAPyWwmYj0+C+FvINYX1bTN90RJ8J7Bo0UYA8eQlMuZ2AYD7z1vlTrzN/MT+zcdZSOB6rZucZcV1sthyAyuTcV5MepYzELHoCJCrzt3FV+5ff1OiZT8QOfaZ/WCmijHWQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PPmNAD7T; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF5D1C2BCB8;
+	Mon, 20 Apr 2026 13:32:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776691957;
-	bh=yqcxUtB/nKOk115s5moCJVayDci/jQHuuFf6AK0cv5A=;
+	s=k20201202; t=1776691966;
+	bh=DIGKo2zsA17VauZZiZ1xLrJA3DEHB2BiyBYge1MHuEA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Rc0qW+pS9mFqbrstcnJyZLs0gRmqweLgCV8axu2FZb3SKeD6EQ6mQWyCRd+nAURxK
-	 YykNRYCVK80jGSxSa8f2uXt8BksaEvoPWn9AF1KlsitU/+uxPrV11JNpUmftMxHx4C
-	 aOzoG58XcVyxyj8jMmtZXCJQUVFc5i3HI5EO/Ly+4qj7qLIefvKcGqyFccl8Oz68QR
-	 RKXgvHlIfWvGkWHiENvXjF+pCeiRqeT0vU+5SmPMhCB9pcGoOlmZFS03orcovOLOyU
-	 k9gaU5iiBP+sQMk1YVONKJ649cZmgnoMbvHjLdH0D0rdNXERvxTjqkAOzbnYC/x4eY
-	 Av/HRhN1C4WFw==
+	b=PPmNAD7Tkl1tRvmu9fzY98Fea2atYmuiAIqTrOEcozAgJN6ZuLsQCt50LUG2VH61Z
+	 b4h2PscPhnbvQ4JPrZ1wVsBkIqWSOi/yWSkAOG5Zb1Eo+wMyeu/Qi+6nPTLBG2QPzs
+	 1u7D+diuPfMWoV4Em2bn7EZvVZv+iOZoakgsbu8z6WOHLDyeDsj4fjYpN5yzTkYB0V
+	 1WOD8BFrF9aCtf9HB96Kmo3DRoPB3WGXonPGA9cwcK6Ep5eGwHCHdxPxkWq2Qh9RMV
+	 fd64xsc5/cYW/BQTXOe1cXj6yCsBsGRmy/zYB/uF/jndjXIzgiwY2DVB2ohtsY+omb
+	 vTitmzFwMz4YQ==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Alexander Koskovich <akoskovich@pm.me>,
-	Luca Weiss <luca.weiss@fairphone.com>,
-	Simon Horman <horms@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
+Cc: Jon Hunter <jonathanh@nvidia.com>,
+	Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
 	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
-	kuba@kernel.org,
+	pabeni@redhat.com,
+	robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	thierry.reding@kernel.org,
+	treding@nvidia.com,
+	vbhadram@nvidia.com,
 	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-tegra@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.18] net: ipa: fix GENERIC_CMD register field masks for IPA v5.0+
-Date: Mon, 20 Apr 2026 09:21:24 -0400
-Message-ID: <20260420132314.1023554-290-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.18] dt-bindings: net: Fix Tegra234 MGBE PTP clock
+Date: Mon, 20 Apr 2026 09:21:29 -0400
+Message-ID: <20260420132314.1023554-295-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260420132314.1023554-1-sashal@kernel.org>
 References: <20260420132314.1023554-1-sashal@kernel.org>
@@ -81,12 +88,12 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-279817-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	TAGGED_FROM(0.00)[bounces-279818-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -97,31 +104,39 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.987];
+	NEURAL_HAM(-0.00)[-0.983];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,msgid.link:url,fairphone.com:email,pm.me:email]
-X-Rspamd-Queue-Id: 91C2D42DAA3
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,msgid.link:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:email]
+X-Rspamd-Queue-Id: 932D842F486
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Alexander Koskovich <akoskovich@pm.me>
+From: Jon Hunter <jonathanh@nvidia.com>
 
-[ Upstream commit 9709b56d908acc120fe8b4ae250b3c9d749ea832 ]
+[ Upstream commit fb22b1fc5bca3c0aad95388933497ceb30f1fb26 ]
 
-Fix the field masks to match the hardware layout documented in
-downstream GSI (GSI_V3_0_EE_n_GSI_EE_GENERIC_CMD_*).
+The PTP clock for the Tegra234 MGBE device is incorrectly named
+'ptp-ref' and should be 'ptp_ref'. This is causing the following
+warning to be observed on Tegra234 platforms that use this device:
 
-Notably this fixes a WARN I was seeing when I tried to send "stop"
-to the MPSS remoteproc while IPA was up.
+ ERR KERN tegra-mgbe 6800000.ethernet eth0: Invalid PTP clock rate
+ WARNING KERN tegra-mgbe 6800000.ethernet eth0: PTP init failed
 
-Fixes: faf0678ec8a0 ("net: ipa: add IPA v5.0 GSI register definitions")
-Signed-off-by: Alexander Koskovich <akoskovich@pm.me>
-Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Link: https://patch.msgid.link/20260403-milos-ipa-v1-1-01e9e4e03d3e@fairphone.com
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Although this constitutes an ABI breakage in the binding for this
+device, PTP support has clearly never worked and so fix this now
+so we can correct the device-tree for this device. Note that the
+MGBE driver still supports the legacy 'ptp-ref' clock name and so
+older/existing device-trees will still work, but given that this
+is not the correct name, there is no point to advertise this in the
+binding.
+
+Fixes: 189c2e5c7669 ("dt-bindings: net: Add Tegra234 MGBE")
+Signed-off-by: Jon Hunter <jonathanh@nvidia.com>
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
+Link: https://patch.msgid.link/20260401102941.17466-3-jonathanh@nvidia.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
@@ -129,27 +144,31 @@ LLM Generated explanations, may be completely bogus:
 
 Error: Failed to generate final synthesis
 
- drivers/net/ipa/reg/gsi_reg-v5.0.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ .../devicetree/bindings/net/nvidia,tegra234-mgbe.yaml         | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ipa/reg/gsi_reg-v5.0.c b/drivers/net/ipa/reg/gsi_reg-v5.0.c
-index 36d1e65df71bb..3334d8e20ad28 100644
---- a/drivers/net/ipa/reg/gsi_reg-v5.0.c
-+++ b/drivers/net/ipa/reg/gsi_reg-v5.0.c
-@@ -156,9 +156,10 @@ REG_FIELDS(EV_CH_CMD, ev_ch_cmd, 0x00025010 + 0x12000 * GSI_EE_AP);
- 
- static const u32 reg_generic_cmd_fmask[] = {
- 	[GENERIC_OPCODE]				= GENMASK(4, 0),
--	[GENERIC_CHID]					= GENMASK(9, 5),
--	[GENERIC_EE]					= GENMASK(13, 10),
--						/* Bits 14-31 reserved */
-+	[GENERIC_CHID]					= GENMASK(12, 5),
-+	[GENERIC_EE]					= GENMASK(16, 13),
-+						/* Bits 17-23 reserved */
-+	[GENERIC_PARAMS]				= GENMASK(31, 24),
- };
- 
- REG_FIELDS(GENERIC_CMD, generic_cmd, 0x00025018 + 0x12000 * GSI_EE_AP);
+diff --git a/Documentation/devicetree/bindings/net/nvidia,tegra234-mgbe.yaml b/Documentation/devicetree/bindings/net/nvidia,tegra234-mgbe.yaml
+index 2bd3efff2485e..215f14d1897d2 100644
+--- a/Documentation/devicetree/bindings/net/nvidia,tegra234-mgbe.yaml
++++ b/Documentation/devicetree/bindings/net/nvidia,tegra234-mgbe.yaml
+@@ -42,7 +42,7 @@ properties:
+       - const: mgbe
+       - const: mac
+       - const: mac-divider
+-      - const: ptp-ref
++      - const: ptp_ref
+       - const: rx-input-m
+       - const: rx-input
+       - const: tx
+@@ -133,7 +133,7 @@ examples:
+                  <&bpmp TEGRA234_CLK_MGBE0_RX_PCS_M>,
+                  <&bpmp TEGRA234_CLK_MGBE0_RX_PCS>,
+                  <&bpmp TEGRA234_CLK_MGBE0_TX_PCS>;
+-        clock-names = "mgbe", "mac", "mac-divider", "ptp-ref", "rx-input-m",
++        clock-names = "mgbe", "mac", "mac-divider", "ptp_ref", "rx-input-m",
+                       "rx-input", "tx", "eee-pcs", "rx-pcs-input", "rx-pcs-m",
+                       "rx-pcs", "tx-pcs";
+         resets = <&bpmp TEGRA234_RESET_MGBE0_MAC>,
 -- 
 2.53.0
 
