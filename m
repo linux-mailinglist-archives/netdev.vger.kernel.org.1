@@ -1,68 +1,65 @@
-Return-Path: <netdev+bounces-279798-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279799-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id COl+DUc95mlutgEAu9opvQ
-	(envelope-from <netdev+bounces-279798-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 16:50:47 +0200
+	id 4KZ0E7k35mkmtgEAu9opvQ
+	(envelope-from <netdev+bounces-279799-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 16:27:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FB3242D87F
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 16:50:46 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17FCB42D0CF
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 16:27:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 21A5F31E620D
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 14:11:45 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id AFA6030B5757
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 14:12:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDD0F42EEC3;
-	Mon, 20 Apr 2026 13:29:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9059443C05D;
+	Mon, 20 Apr 2026 13:29:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W5ZDOasb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DzKp3L8c"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FD743CF68D;
-	Mon, 20 Apr 2026 13:29:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CF3043C04D;
+	Mon, 20 Apr 2026 13:29:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776691781; cv=none; b=ZsIAt3Ldur6qAJKW+umBoM0bCP06Rf3Mf5OP793fdgtelfwrevjZEurGNPuEEf7Lco40VzbVMECIlL/8uezNjGymvmnEZ+2W6pNYGMZde8PsHkiXFmdcqR/u+lRhNW4J0YQVHhaRiCraWchbirY5wU0Lo1vyKHHiR1rCKtHEq1o=
+	t=1776691790; cv=none; b=M8O2xOPLMuE2a426ciiYdpaqxCencbMJExm5LppAdsJ9HMXeE408OrIbh91u9vObriptJdrqi5BX82GBZShP6MeuvyFg+in68+ZoKJO2+NDS+kP8Zrnt9pAAG+/Egfx19BeTedk15othxLFF/i/+Jkewi9crqi0lnAqzDco7Efo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776691781; c=relaxed/simple;
-	bh=1jstWT2rpcxsIUBuWdC1TD24bJamUKDjb2CzjzxhRhk=;
+	s=arc-20240116; t=1776691790; c=relaxed/simple;
+	bh=ENPWtoaRZ6I1Cp8jOxId7RI33mNaSVg5gJ18TA5yeBg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RP6bt7XtpoCaCyoQnxA9w+kw0NQVo60aLGToeURSmdxK+agQysiB19lW6ZQqRCXTqnIeqkpASTFHn8ZmYxly6ErXLItXdTgWfZSg2SEI1i6jPEgKII5x7Rqf470LbWs0Z0mPrM0yB7qtC5FHYoQ3fYadZo4Oj3Es9y+TVa6lLic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W5ZDOasb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9A73C2BCB7;
-	Mon, 20 Apr 2026 13:29:39 +0000 (UTC)
+	 MIME-Version; b=ZQqBFkLTLmWtww6lAwkVEOirufFkK7Z/P0UUBd50VhN222ISXNkyCbxY/mcpI+l46E8aC+Tq9HM15XndatPcmn+kXI5jbYi6Oouyw76aKcohvt90NwwS7s0TwYCgz8NxByrcQNfxM0FRtE6O6l62DB4FyZRkww6JTS2FJ0Mimqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DzKp3L8c; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C084BC2BCB9;
+	Mon, 20 Apr 2026 13:29:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776691781;
-	bh=1jstWT2rpcxsIUBuWdC1TD24bJamUKDjb2CzjzxhRhk=;
+	s=k20201202; t=1776691790;
+	bh=ENPWtoaRZ6I1Cp8jOxId7RI33mNaSVg5gJ18TA5yeBg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=W5ZDOasbJx9WchWO22g6UU2z69d6+QFggPfYKjjI6PLlroosVryCGMPPkL6rT8lmN
-	 laPBSa4aZefHyXy2Ro9WqSF40jErISG962qhMmc4i8AK2La6KmynQZHNm8vbyXckxB
-	 8FBB4FlprK7dG4yZ8ApN9e+uUTQdWiD4cFsWF3z9q2NzSF6mkyrAd/egBxb5V8Bys5
-	 g1OAGrThtT/7FgZ74TpwUsdi39S0WK7oERwevV6NsJXtA0Tst1tWEmHmkhBmUtvHqp
-	 +UTqa3RUSi6MhZ02cZuIDlKxeU1cgBWsaY7T7jzhmNCctrnJ+ml74c2ZB2+FzR8Znm
-	 m6cf84GmLJeEQ==
+	b=DzKp3L8cxI799QzVEJgkXb4+w/TcsVeu1B9DdT8Wwo0yRlFodZBbxz4jkhA8ciza4
+	 t2V9ACVsmKz8HGOopEgBQ1aK9kvkNTFz0pRTbTl/e86m5wG1Ar9/Ld2VnM06D/epTL
+	 8mqSMQQ7cCM2ue+M5nG1Aomm3Ri0nsnev7zlB6v4RvZuv68ZUYFZiJS8JZmsY2gzYv
+	 TYF1KqGax+E7xmqH4VYlG/WmqvddYWIRd4Nb3ESwGJm+k4TnbPsB/LXNeb4p2YpCZK
+	 vyW4xDDrWU6Yu4Exst4mmsJ95cL56WuLtDYmRxtmQOR+vQuXI26uXUiHWd76EFfsq7
+	 EnTg57jEtaIXA==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Florian Westphal <fw@strlen.de>,
-	Hyunwoo Kim <imv4bel@gmail.com>,
+Cc: Nikolaos Gkarlis <nickgarlis@gmail.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	pablo@netfilter.org,
 	davem@davemloft.net,
 	edumazet@google.com,
-	kuba@kernel.org,
 	pabeni@redhat.com,
-	kaber@trash.net,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
+	ebiederm@aristanetworks.com,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.18] netfilter: conntrack: add missing netlink policy validations
-Date: Mon, 20 Apr 2026 09:19:44 -0400
-Message-ID: <20260420132314.1023554-190-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.18] rtnetlink: add missing netlink_ns_capable() check for peer netns
+Date: Mon, 20 Apr 2026 09:19:49 -0400
+Message-ID: <20260420132314.1023554-195-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260420132314.1023554-1-sashal@kernel.org>
 References: <20260420132314.1023554-1-sashal@kernel.org>
@@ -81,17 +78,17 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[strlen.de,gmail.com,kernel.org,netfilter.org,davemloft.net,google.com,redhat.com,trash.net,vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,google.com,kernel.org,davemloft.net,redhat.com,aristanetworks.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-279798-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-279799-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -102,68 +99,108 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[strlen.de:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8FB3242D87F
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 17FCB42D0CF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Florian Westphal <fw@strlen.de>
+From: Nikolaos Gkarlis <nickgarlis@gmail.com>
 
-[ Upstream commit f900e1d77ee0ef87bfb5ab3fe60f0b3d8ad5ba05 ]
+[ Upstream commit 7b735ef81286007794a227ce2539419479c02a5f ]
 
-Hyunwoo Kim reports out-of-bounds access in sctp and ctnetlink.
+rtnl_newlink() lacks a CAP_NET_ADMIN capability check on the peer
+network namespace when creating paired devices (veth, vxcan,
+netkit). This allows an unprivileged user with a user namespace
+to create interfaces in arbitrary network namespaces, including
+init_net.
 
-These attributes are used by the kernel without any validation.
-Extend the netlink policies accordingly.
+Add a netlink_ns_capable() check for CAP_NET_ADMIN in the peer
+namespace before allowing device creation to proceed.
 
-Quoting the reporter:
-  nlattr_to_sctp() assigns the user-supplied CTA_PROTOINFO_SCTP_STATE
-  value directly to ct->proto.sctp.state without checking that it is
-  within the valid range. [..]
-
-  and: ... with exp->dir = 100, the access at
-  ct->master->tuplehash[100] reads 5600 bytes past the start of a
-  320-byte nf_conn object, causing a slab-out-of-bounds read confirmed by
-  UBSAN.
-
-Fixes: 076a0ca02644 ("netfilter: ctnetlink: add NAT support for expectations")
-Fixes: a258860e01b8 ("netfilter: ctnetlink: add full support for SCTP to ctnetlink")
-Reported-by: Hyunwoo Kim <imv4bel@gmail.com>
-Signed-off-by: Florian Westphal <fw@strlen.de>
+Fixes: 81adee47dfb6 ("net: Support specifying the network namespace upon device creation.")
+Signed-off-by: Nikolaos Gkarlis <nickgarlis@gmail.com>
+Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+Link: https://patch.msgid.link/20260402181432.4126920-1-nickgarlis@gmail.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/netfilter/nf_conntrack_netlink.c    | 2 +-
- net/netfilter/nf_conntrack_proto_sctp.c | 3 ++-
- 2 files changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/net/netfilter/nf_conntrack_netlink.c b/net/netfilter/nf_conntrack_netlink.c
-index becffc15e7579..fbe9e3f1036f8 100644
---- a/net/netfilter/nf_conntrack_netlink.c
-+++ b/net/netfilter/nf_conntrack_netlink.c
-@@ -3475,7 +3475,7 @@ ctnetlink_change_expect(struct nf_conntrack_expect *x,
- 
- #if IS_ENABLED(CONFIG_NF_NAT)
- static const struct nla_policy exp_nat_nla_policy[CTA_EXPECT_NAT_MAX+1] = {
--	[CTA_EXPECT_NAT_DIR]	= { .type = NLA_U32 },
-+	[CTA_EXPECT_NAT_DIR]	= NLA_POLICY_MAX(NLA_BE32, IP_CT_DIR_REPLY),
- 	[CTA_EXPECT_NAT_TUPLE]	= { .type = NLA_NESTED },
- };
- #endif
-diff --git a/net/netfilter/nf_conntrack_proto_sctp.c b/net/netfilter/nf_conntrack_proto_sctp.c
-index 7c6f7c9f73320..645d2c43ebf7a 100644
---- a/net/netfilter/nf_conntrack_proto_sctp.c
-+++ b/net/netfilter/nf_conntrack_proto_sctp.c
-@@ -582,7 +582,8 @@ static int sctp_to_nlattr(struct sk_buff *skb, struct nlattr *nla,
+LLM Generated explanations, may be completely bogus:
+
+Error: Failed to generate final synthesis
+
+ net/core/rtnetlink.c | 40 +++++++++++++++++++++++++++-------------
+ 1 file changed, 27 insertions(+), 13 deletions(-)
+
+diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+index f3b22d5526fe6..f4ed60bd9a256 100644
+--- a/net/core/rtnetlink.c
++++ b/net/core/rtnetlink.c
+@@ -3887,28 +3887,42 @@ static int rtnl_newlink_create(struct sk_buff *skb, struct ifinfomsg *ifm,
+ 	goto out;
  }
  
- static const struct nla_policy sctp_nla_policy[CTA_PROTOINFO_SCTP_MAX+1] = {
--	[CTA_PROTOINFO_SCTP_STATE]	    = { .type = NLA_U8 },
-+	[CTA_PROTOINFO_SCTP_STATE]	    = NLA_POLICY_MAX(NLA_U8,
-+							 SCTP_CONNTRACK_HEARTBEAT_SENT),
- 	[CTA_PROTOINFO_SCTP_VTAG_ORIGINAL]  = { .type = NLA_U32 },
- 	[CTA_PROTOINFO_SCTP_VTAG_REPLY]     = { .type = NLA_U32 },
- };
+-static struct net *rtnl_get_peer_net(const struct rtnl_link_ops *ops,
++static struct net *rtnl_get_peer_net(struct sk_buff *skb,
++				     const struct rtnl_link_ops *ops,
+ 				     struct nlattr *tbp[],
+ 				     struct nlattr *data[],
+ 				     struct netlink_ext_ack *extack)
+ {
+-	struct nlattr *tb[IFLA_MAX + 1];
++	struct nlattr *tb[IFLA_MAX + 1], **attrs;
++	struct net *net;
+ 	int err;
+ 
+-	if (!data || !data[ops->peer_type])
+-		return rtnl_link_get_net_ifla(tbp);
+-
+-	err = rtnl_nla_parse_ifinfomsg(tb, data[ops->peer_type], extack);
+-	if (err < 0)
+-		return ERR_PTR(err);
+-
+-	if (ops->validate) {
+-		err = ops->validate(tb, NULL, extack);
++	if (!data || !data[ops->peer_type]) {
++		attrs = tbp;
++	} else {
++		err = rtnl_nla_parse_ifinfomsg(tb, data[ops->peer_type], extack);
+ 		if (err < 0)
+ 			return ERR_PTR(err);
++
++		if (ops->validate) {
++			err = ops->validate(tb, NULL, extack);
++			if (err < 0)
++				return ERR_PTR(err);
++		}
++
++		attrs = tb;
+ 	}
+ 
+-	return rtnl_link_get_net_ifla(tb);
++	net = rtnl_link_get_net_ifla(attrs);
++	if (IS_ERR_OR_NULL(net))
++		return net;
++
++	if (!netlink_ns_capable(skb, net->user_ns, CAP_NET_ADMIN)) {
++		put_net(net);
++		return ERR_PTR(-EPERM);
++	}
++
++	return net;
+ }
+ 
+ static int __rtnl_newlink(struct sk_buff *skb, struct nlmsghdr *nlh,
+@@ -4047,7 +4061,7 @@ static int rtnl_newlink(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 		}
+ 
+ 		if (ops->peer_type) {
+-			peer_net = rtnl_get_peer_net(ops, tb, data, extack);
++			peer_net = rtnl_get_peer_net(skb, ops, tb, data, extack);
+ 			if (IS_ERR(peer_net)) {
+ 				ret = PTR_ERR(peer_net);
+ 				goto put_ops;
 -- 
 2.53.0
 
