@@ -1,163 +1,175 @@
-Return-Path: <netdev+bounces-279672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279673-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MJvIKkLU5WmmoQEAu9opvQ
-	(envelope-from <netdev+bounces-279672-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 09:22:42 +0200
+	id KO9ZKvba5WnNogEAu9opvQ
+	(envelope-from <netdev+bounces-279673-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 09:51:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4ABA4427AF3
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 09:22:42 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55A9C427E70
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 09:51:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 81FB13001321
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 07:22:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B9CDE3009B30
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 07:51:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49898382F18;
-	Mon, 20 Apr 2026 07:22:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A09738238C;
+	Mon, 20 Apr 2026 07:51:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UBFHCkDw"
+	dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b="I18c0eqs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED7CC2D738A
-	for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 07:22:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.182
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776669759; cv=pass; b=Go4wvf++fakJCQ7NTbbII6PdLg76eoTO9jR3Fun66xb619wbVLGCIbxWvPM7iF1C0+v6r9co6D2rmdR/BKdGMbrLwOkyyoE8EklF83ZmW4cfh4cinQkIT6tM4DQcveaeCvEqZ8GROjjd5ukpcGf8QdvzJu6sJUG9l/Wp38Teomg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776669759; c=relaxed/simple;
-	bh=z6RjGPSiK8r0oWXY5W6DEUzXSooC04ggiIIVzrIwlyE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CZThx/msKoEs1fwCz3PJheAiRpzzJN12uiX5WQfOpJG7IpJ7zPvWeUW3gvXP2UGDbIfBXhrMj4FX4PJRCpeq9in+xByHH2gJSP2MhiqXCjkRKWmYtwckeFHjl13cXKRx+dqJOIFVrfdVcUk732HL9xuln0+enlVNuHMJ2os8oJY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UBFHCkDw; arc=pass smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-50d75bfb259so20363251cf.1
-        for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 00:22:37 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776669757; cv=none;
-        d=google.com; s=arc-20240605;
-        b=DNEMKYGSMwyxSTQEGs+FuxM6BSfPdYwG+MGOIEHsGjrXMLu/d5UvBsLrMt2CBXTwD3
-         gkCo4J2sw3Abr7v6RGJfIxcucCfHi79i4AwoygeX7YAH5dlMU4vKgULdlEn7HiI57WCI
-         W9nUAhcFpuEDM6Kkkkti36fjJuF2ZcRM7PMbHAZ6fy1khsSkwsQcRAQ70VPh6EE+F1SM
-         QjZ8q0ewKeRTi5lOT8uHq/Cw0p+7ge29YnPCw7VPFMF0AQYt+4/nEjGuixnxocUr1r8Z
-         5+smmrccbtyhtf5nE/7HQaZQzH7VdkYCFG/ZflN/CUordAPKEYdG38tU6LGuRGGSHgki
-         Sevw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=KVOChXZq0zoMztJw+hJ88VSw+ye8042PpZuah7BunBU=;
-        fh=lWxYg71sBwlmJGiZ/9eG/kV0juEdXfosdQwBgDF0kzk=;
-        b=NhTRv3FocImPS50M86RWid7poiYvGxFi3GaN03pnw/LsQUVUY7MV4oYiJq+SJr05T2
-         3rq8HGPm/KpxWX6khg0+XcxRnF1kywDPUJnwqJwDKykkmhw82yQMDVxL6QkjViFrQoxZ
-         3S2GhIGGNn0OeSttehCrxNSJ1RWkfyGNh2qEGnnoL4t5l1qU2OPmljXKgxzdDxZO23a6
-         fPfyHnpbBA5+z8R+wbLqZY2jZRvYWNGgwkTMIAfDNBzGdbfzTPtTSgVGXtacfdovv+vS
-         BIUNQexwx79wNw4h+KFwJaEAcnbeAAPku5fIOhx2wcSI5iRDKzExpN4nJTsl0/gtBv1p
-         UdMw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1776669757; x=1777274557; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KVOChXZq0zoMztJw+hJ88VSw+ye8042PpZuah7BunBU=;
-        b=UBFHCkDwTHXb/dR8rzW28LgFTvbprdGUXDCFAdiGBymsgYRkIfpHE1C3RrCXLshQ96
-         G73xr/Az/0nFi5t6WERBEFRG9uWqGnGRhQfisGFwn/oPmd95cxStLzX0m4wpcqo+Dy1s
-         l14CrJ7CSHpDMPiUY+YVURsSfDATuIXQMIwzMx2djpIXP+sZCPJ7QvvgOb3/2O0lNK2p
-         LoaKPPbfae3GJr/5VAxpMOEMvT6U62+uasKkQwbSpfEQzoa0DUUpnpYsoJqeIZV4SnhV
-         Pe670EKs7HkgLatZKlLBXLArtQWYoSrSaiAe1irIJ0lIqgLGwfbY6jHhwXnXNbz0A5up
-         f0DA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776669757; x=1777274557;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=KVOChXZq0zoMztJw+hJ88VSw+ye8042PpZuah7BunBU=;
-        b=CPMFVll16xRrO4NgReHJTQN8+9tSPHC8DH0J72nmzcwjAPV4T140HCg/bRE1dBquII
-         YlzoJrJuKjJnue23DyZ8PpDRND8V62QyueK0qJbBl2KcaYl7PVyZjwPo0DeRVa+eA0QS
-         0Y0mGrD44AlLZvZ1QIgkl/8vec5/5Gci8n7qvJwrmp9ZO9PtkzIVfkwhucUVrKSl5/j0
-         C6OCxj4gD7kaxKoVjhZgeHTWK0MhGklDoGrMq0VcnlvB3gPYC0Hejj9VEslCtOqftqd5
-         ow9BdVR0rxC6oUOh0HXREu26madK43DY767+K1jnpgMOOd0y+D5SYmNEfjLhdmC49FH9
-         gsVw==
-X-Gm-Message-State: AOJu0YxMj7hyNpLjtCexeNCs7AYVnJ3JjFVCPEobIIWxqJ/6j35FKvSv
-	NLV6nkOppJ8VrcNV5QAecbPKjS9dsDRUkoklxH5zJzIkI/gUEHdprX3eejY40Y0ol3+s+47pP5x
-	uPbR4owJkz3TGx6wStrYId1OABIUu5Lu4G3u0YNnZ
-X-Gm-Gg: AeBDieuhbJ8gVn6agYZxPqrdNkyFdk1m5w98GRfoz3XxZLdsV8LWIQwKtdVTTcV/1Ez
-	uq3hVNLPWtSNv5VXePR9KGzK+Gp4sqDb7fFqJSZSpwy/nBzNDNQStY03hVW+QHc6uGizJcb5kGL
-	5EnEm4SfZdmea9hYYgRvlMvikAkGt4tIaNKpKBOt0qVzCGM4X0vX/K60lfiYu+G10zoadNQrL3i
-	CVvnPQOgvk/REzrmARHJzfQs0W16y3C2toZk4hmlGmkxMBMAzLgg7xo1rrL9Coy4VIVmf5XTMMw
-	nKqOma+wndzuHxztsN+ZTtZ8dNL+3mEoYEVlD6P/EjsfbBaVDr0N4pqMGRSdj/mHoqycex27mXc
-	6QDXD0jog
-X-Received: by 2002:a05:622a:13ca:b0:509:1470:d3b2 with SMTP id
- d75a77b69052e-50e36ca15abmr179564361cf.60.1776669756390; Mon, 20 Apr 2026
- 00:22:36 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BA1128DC4;
+	Mon, 20 Apr 2026 07:51:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776671470; cv=none; b=pxThMrYqUNIKnquIqcJVVaXeUzKvVnY7xGxDSsAyPbhuFZOOTnCjTPHvCvS/Xw/qXmNEcGad315bV3qPy1BfloBvY6n7ttBpNw/sZvL0asqwxn48NCIJ1L9Sx8Q5gZ8Okzm7yHNixfM6YZ9f5d20sSiZ/94dwaxaSd92l0baW1I=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776671470; c=relaxed/simple;
+	bh=CbEsitcqb/HUj/EQh8wD8dgv+0oz4+eeSGoADGzxeUw=;
+	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Eie18wemJxvXUf2XFX7JKzEj/uVybNK51ZaxnkaydMYqkIdmPNSPDtpUjWgDP1oyRV6JS/tDffn8cRrBMu46X5oPBj+VRCNDuf9nh/OKCHJr/6E5m0HtHkNKgLf/IcKgFZgnQ4tPMDw5J5G/vkovTK8WseVgcaAlhAmBpmzAVTs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b=I18c0eqs; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 63K7nKesD784553, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realtek.com; s=dkim;
+	t=1776671361; bh=iTrcvdEfWfEz2XhL4B7ye1ces+LHHZwvPoft0o6/g4I=;
+	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:MIME-Version;
+	b=I18c0eqsRDPmrDEz5xKizQdO5hhNZpedoAMWN2IfOQtEIyQQJmnZN3EDLYNp6ownA
+	 u7IMbQ2dS3H/4ftwOjK/6MyJjYW99mVUWdxYjjUgpAAOBVaauC/NMP5Flvj29PgG92
+	 GEy8a+4xWXkPvVDpMEDBDwRnLkrNPBYxoBJ669HVMmN8qFMUekY5B22xMY4Z6iBUEQ
+	 yzEpVI+D32y2x/h1Wf9J7Dkv3FRXuOrWswep5SJar17z2fDCiU5DwkALkXva8A+pr1
+	 XOOGhRZkcp2Jh678zQZjmlZJzeP1m+AQU6r+sB6/MbirMNPX5jEKnZCNnqj1tBASLc
+	 z6Fa/EDZXRnoA==
+Received: from mail.realtek.com (rtkexhmbs02.realtek.com.tw[172.21.6.41])
+	by rtits2.realtek.com.tw (8.15.2/3.26/5.94) with ESMTPS id 63K7nKesD784553
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 20 Apr 2026 15:49:21 +0800
+Received: from RTKEXHMBS06.realtek.com.tw (10.21.1.56) by
+ RTKEXHMBS02.realtek.com.tw (172.21.6.41) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.10; Mon, 20 Apr 2026 15:49:19 +0800
+Received: from RTKEXHMBS06.realtek.com.tw ([fe80::ed72:3015:2840:4458]) by
+ RTKEXHMBS06.realtek.com.tw ([fe80::ed72:3015:2840:4458%10]) with mapi id
+ 15.02.1748.010; Mon, 20 Apr 2026 15:49:19 +0800
+From: Ping-Ke Shih <pkshih@realtek.com>
+To: Yury Norov <ynorov@nvidia.com>, Thomas Gleixner <tglx@kernel.org>,
+        "Ingo
+ Molnar" <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen
+	<dave.hansen@linux.intel.com>,
+        "x86@kernel.org" <x86@kernel.org>, "H. Peter
+ Anvin" <hpa@zytor.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra
+	<peterz@infradead.org>,
+        Jonathan Cameron <jic23@kernel.org>,
+        David Lechner
+	<dlechner@baylibre.com>,
+        =?iso-8859-1?Q?Nuno_S=E1?= <nuno.sa@analog.com>,
+        Andy Shevchenko <andy@kernel.org>,
+        Richard Cochran
+	<richardcochran@gmail.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S.
+ Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        "Alexandre
+ Belloni" <alexandre.belloni@bootlin.com>,
+        Yury Norov <yury.norov@gmail.com>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Hans de Goede
+	<hansg@kernel.org>, Linus Walleij <linusw@kernel.org>,
+        Sakari Ailus
+	<sakari.ailus@linux.intel.com>,
+        Salah Triki <salah.triki@gmail.com>,
+        "Achim
+ Gratz" <Achim.Gratz@Stromeko.DE>,
+        Ben Collins <bcollins@watter.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-iio@vger.kernel.org" <linux-iio@vger.kernel.org>,
+        "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-rtc@vger.kernel.org" <linux-rtc@vger.kernel.org>
+Subject: RE: [PATCH 7/9] wifi: rtw89: switch to using FIELD_GET_SIGNED()
+Thread-Topic: [PATCH 7/9] wifi: rtw89: switch to using FIELD_GET_SIGNED()
+Thread-Index: AQHczpDF3glizZDnPk2GjSkm0YYWlrXnljqQ
+Date: Mon, 20 Apr 2026 07:49:19 +0000
+Message-ID: <5fea4ea146404b55919037594ab85f1a@realtek.com>
+References: <20260417173621.368914-1-ynorov@nvidia.com>
+ <20260417173621.368914-8-ynorov@nvidia.com>
+In-Reply-To: <20260417173621.368914-8-ynorov@nvidia.com>
+Accept-Language: en-US, zh-TW
+Content-Language: zh-TW
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260420025428.101192-1-jiayuan.chen@linux.dev> <20260420025428.101192-3-jiayuan.chen@linux.dev>
-In-Reply-To: <20260420025428.101192-3-jiayuan.chen@linux.dev>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 20 Apr 2026 00:22:25 -0700
-X-Gm-Features: AQROBzDC74EX5M4Dk7Jdn6RBQi37Kbrc-y7UEen5QduIBRs6mrCuXqesYzBzsmw
-Message-ID: <CANn89iJhHZH69ShAS5_V5RdgPgvfz19dZn7wsb_N3EAScVoR2w@mail.gmail.com>
-Subject: Re: [PATCH net 2/2] selftests/net: packetdrill: cover challenge ACK
- on SEG.ACK > SND.NXT
-To: Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: netdev@vger.kernel.org, Neal Cardwell <ncardwell@google.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[realtek.com,none];
+	R_DKIM_ALLOW(-0.20)[realtek.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-279673-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279672-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FREEMAIL_TO(0.00)[nvidia.com,kernel.org,redhat.com,alien8.de,linux.intel.com,zytor.com,infradead.org,baylibre.com,analog.com,gmail.com,lunn.ch,davemloft.net,google.com,bootlin.com,rasmusvillemoes.dk,Stromeko.DE,watter.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[33];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[realtek.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
+	FROM_NEQ_ENVFROM(0.00)[pkshih@realtek.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,mail.gmail.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 4ABA4427AF3
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[realtek.com:dkim,realtek.com:mid,nvidia.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 55A9C427E70
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun, Apr 19, 2026 at 7:55=E2=80=AFPM Jiayuan Chen <jiayuan.chen@linux.de=
-v> wrote:
->
-> Exercise the RFC 5961 Section 5.2 / RFC 793 Section 3.9 requirement
-> on the upper edge of the acceptable ACK range, mirroring the existing
-> coverage of the SEG.ACK < SND.UNA - MAX.SND.WND case.
->
-> After the peer ACKs data the receiver has never sent, the receiver
-> must respond with <SEQ =3D SND.NXT, ACK =3D RCV.NXT, CTL =3D ACK> and dro=
-p
-> the offending segment.  The script validates this exact response.
->
-> Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+Yury Norov <ynorov@nvidia.com> wrote:
+> --- a/drivers/net/wireless/realtek/rtw89/rtw8852b_common.c
+> +++ b/drivers/net/wireless/realtek/rtw89/rtw8852b_common.c
+> @@ -206,9 +206,9 @@ static void rtw8852bx_efuse_parsing_tssi(struct rtw89=
+_dev *rtwdev,
+>  static bool _decode_efuse_gain(u8 data, s8 *high, s8 *low)
+>  {
+>         if (high)
+> -               *high =3D sign_extend32(FIELD_GET(GENMASK(7,  4), data), =
+3);
+> +               *high =3D FIELD_GET_SIGNED(GENMASK(7,  4), data);
+>         if (low)
+> -               *low =3D sign_extend32(FIELD_GET(GENMASK(3,  0), data), 3=
+);
+> +               *low =3D FIELD_GET(GENMASK(3,  0), data);
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
-Thanks!
+FIELD_GET_SIGNED()?
+
+>=20
+>         return data !=3D 0xff;
+>  }
+
+
+
 
