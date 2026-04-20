@@ -1,186 +1,135 @@
-Return-Path: <netdev+bounces-279868-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279869-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MN4xKdFU5mkDuwEAu9opvQ
-	(envelope-from <netdev+bounces-279868-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 18:31:13 +0200
+	id GGY5OS1n5mmlvwEAu9opvQ
+	(envelope-from <netdev+bounces-279869-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 19:49:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5688F42F919
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 18:31:13 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECAAF432244
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 19:49:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id F07BC306D2F8
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 16:24:51 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id ACB9B301A3E4
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 16:26:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AE6A3431F2;
-	Mon, 20 Apr 2026 16:24:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CE8334B19A;
+	Mon, 20 Apr 2026 16:26:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IatpSvzN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mhHhWNK1"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2196233DEFE
-	for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 16:24:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A6E7341ADF;
+	Mon, 20 Apr 2026 16:26:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776702291; cv=none; b=AsaeMhGOHzVO3xNmrfr1FZsqmpbZ51s0Q+EnevL40X8A6etperuJfBIqRf+c4qlu3xGWEW3yuKdfW+Tx0E5vn7JuxBeyPFYIxxLx15puQRbKD7IrBYBb7GMYhKU3IXoAU5g+2RBrjcSfLf7QiP7k4xoO+wTWOulOUs88MDZJyB8=
+	t=1776702372; cv=none; b=Xf2kLBZrSSXbMeOMb5czMtlSnC1WjycEt8L9yqUc9MszlYYkEp8pGQMVpUafZnT6CnRYTB8fnP+sKZa+wlNAyryWTrQy943xOutk1yjHhf0A7fTpJJ6AXQuA717M4N8gCwRSgmPdtH1dGPnMmejJvDh+41Dbm9hUR6sS04JceGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776702291; c=relaxed/simple;
-	bh=SCUAHsTfk//sPwYyZpAY2IDbHPbtNBdBbxKcnzsf4LE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TaNSdsUg65rN795BepJPEI0So9b8mPVPcq0684Ad12e452W3DK02HyfVFPHOGGRZA66Uxj9qw0GQYLA2MxIugCd4JZbGjBxCs+MGYLK6B3IRN/yHX6o9DPyWI3uqlRlLit3YZbTHMFsVZTz/VycKLuCCpNz/nH68bCgYVHsFExQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IatpSvzN; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1776702289;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+ONUEBsaSjlb643VNLT8SxeI2rJ7DFKrz+q+1kB/Dzw=;
-	b=IatpSvzNhYbH24JNwFoMWcbPQfJNbtX03G0x9bOD/QDlWMlmYQ/7rtmTNHxKNM3JrgwYt4
-	Zwf2+2Onw4Jsz5FARLD7gjWu121YDwOCgtQp5hQfgQUIFs5HtA089yHu6XhJrZIgpc7cYh
-	5TZsW0DGcCmZbB+wpfMNqdlM3OzsQJg=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-570-9VaBhAjGNZWvm9vTTJu7hw-1; Mon,
- 20 Apr 2026 12:24:45 -0400
-X-MC-Unique: 9VaBhAjGNZWvm9vTTJu7hw-1
-X-Mimecast-MFC-AGG-ID: 9VaBhAjGNZWvm9vTTJu7hw_1776702283
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DBF701944F0E;
-	Mon, 20 Apr 2026 16:24:37 +0000 (UTC)
-Received: from [10.44.32.172] (unknown [10.44.32.172])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 56A0A1800351;
-	Mon, 20 Apr 2026 16:24:35 +0000 (UTC)
-Message-ID: <fda7883e-b502-44dc-97b3-af658a035d0b@redhat.com>
-Date: Mon, 20 Apr 2026 18:24:34 +0200
+	s=arc-20240116; t=1776702372; c=relaxed/simple;
+	bh=8TBBzd4psxVantp6vJky0hd1cE0JzmC/OkNgHSc7h3U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=g9JiKjZS6KaCs2bY/A+r5+GbtonEJ3qmpGIQWBj+2u8/Q9OMQXRWNCOzGvNam89Skut8awWBLm412xK9tYGWfaqJRL0GiqTopgQ4gshuFjrklksfq8grai+8+iHGXQdkAL056wargaTnlGnx6wSLRgGyIPqeJh6psqeEIXFo+eA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mhHhWNK1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65939C19425;
+	Mon, 20 Apr 2026 16:26:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776702372;
+	bh=8TBBzd4psxVantp6vJky0hd1cE0JzmC/OkNgHSc7h3U=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=mhHhWNK17NbXRtEYL0MtVmVmvG2WDmHxMoDQM6w9Ymk2NSohHlUXwXF/LKArB9KJK
+	 oyvQCXfP1JtlS32ve7SWCIu2getR8+NDhWry91zMDD+HJeop4nW1/z3dx8mHSN+ql5
+	 QVvP5eEC07X+oH1X8gPrptIirATS4E/Nfre4S0d3RO6u7RMXSwzIvXKLaUcat/2y5q
+	 5kl5O6UpFXiCj8EssJXZawdtq3be2k9+7JYXrPQH+1MV0xROA/1BL/dWUL18wRu2cD
+	 +DelkLVSWPE0azL3hNlYAyyp95c0xGha/3W7M5W5Ao6sibqzkQDd2YSWf8sqWF1LrY
+	 KjfNiCtGoTYzw==
+Date: Mon, 20 Apr 2026 17:26:05 +0100
+From: Simon Horman <horms@kernel.org>
+To: Ren Wei <n05ec@lzu.edu.cn>
+Cc: linux-hams@vger.kernel.org, netdev@vger.kernel.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	kees@kernel.org, takamitz@amazon.co.jp, kuniyu@google.com,
+	jiayuan.chen@shopee.com, mingo@kernel.org, stanksal@purdue.edu,
+	jlayton@kernel.org, yifanwucs@gmail.com, tomapufckgml@gmail.com,
+	bird@lzu.edu.cn, yuantan098@gmail.com, tonanli66@gmail.com
+Subject: Re: [PATCH net 1/1] net/rose: hold listener socket during call
+ request handling
+Message-ID: <20260420162605.GV280379@horms.kernel.org>
+References: <cover.1776327338.git.tonanli66@gmail.com>
+ <52776256bf0fc38de92fe3edf39434538b672b69.1776327338.git.tonanli66@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Question/proposal for DPLL NCO (DCO) mode
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
- Vadim Fedorenko <vadim.fedorenko@linux.dev>, Jakub Kicinski <kuba@kernel.org>
-References: <21cce17b-9a79-41b5-8363-faee2378aa37@redhat.com>
- <3rgm35qzwvzdrubvtdrccl3sb5cx2ufiy7b5wnjun223bosi45@2bnbfrlqnsbk>
-Content-Language: en-US
-From: Ivan Vecera <ivecera@redhat.com>
-In-Reply-To: <3rgm35qzwvzdrubvtdrccl3sb5cx2ufiy7b5wnjun223bosi45@2bnbfrlqnsbk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <52776256bf0fc38de92fe3edf39434538b672b69.1776327338.git.tonanli66@gmail.com>
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279868-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,amazon.co.jp,shopee.com,purdue.edu,gmail.com,lzu.edu.cn];
+	TAGGED_FROM(0.00)[bounces-279869-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCPT_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5688F42F919
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lzu.edu.cn:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,horms.kernel.org:mid]
+X-Rspamd-Queue-Id: ECAAF432244
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-
-
-On 4/20/26 3:43 PM, Jiri Pirko wrote:
-> Mon, Apr 20, 2026 at 01:42:29PM +0200, ivecera@redhat.com wrote:
->> Hi all,
->>
->> I am currently working on adding PTP clock support (PHC) to the ZL3073x
->> driver, and I would like to discuss an architectural addition to the
->> DPLL subsystem enum dpll_mode before sending the formal patch series.
->>
->> To support IEEE 1588 PTP, the hardware DPLL must be decoupled from
->> tracking physical reference pins. Instead, its output frequency needs to
->> be continuously steered by a software PTP stack (e.g., linuxptp) using
->> the .adjfine() callback. In the industry, this specific hardware state
->> is widely known as NCO (Numerically Controlled Oscillator) or DCO
->> (Digitally Controlled Oscillator) mode.
->>
->> Currently, the DPLL subsystem defines two modes in enum dpll_mode:
->>
->> MANUAL: The user explicitly selects a physical input pin to track.
->>
->> AUTOMATIC: The hardware automatically selects the best physical input pin
->> based on priorities.
->>
->> Neither of these accurately represents the NCO/DCO state, where physical
->> pins are ignored, and the loop is fully software-steered.
+On Fri, Apr 17, 2026 at 07:01:51PM +0800, Ren Wei wrote:
+> From: Nan Li <tonanli66@gmail.com>
 > 
-> The manual/automatic mode is defining strategy/behaviour about how the
-> input pins are selected.
+> The call request receive path keeps using the listener socket after the
+> lookup lock has been dropped. Keep the listener alive across the
+> remaining validation and child socket setup by taking a reference in the
+> lookup path and releasing it once request handling is finished.
 > 
-> <header_quote>
->   * enum dpll_mode - working modes a dpll can support, differentiates if and how
->   *   dpll selects one of its inputs to syntonize with it
-> </header_quote>
+> This makes listener lifetime handling explicit and avoids races with
+> concurrent socket teardown.
 > 
-> You don't want to change the strategy. You just
-> don't want that/don't care. Why it make sense to add a mode then?
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Cc: stable@kernel.org
+> Reported-by: Yifan Wu <yifanwucs@gmail.com>
+> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+> Reported-by: Xin Liu <bird@lzu.edu.cn>
+> Co-developed-by: Yuan Tan <yuantan098@gmail.com>
+> Signed-off-by: Yuan Tan <yuantan098@gmail.com>
+> Signed-off-by: Nan Li <tonanli66@gmail.com>
+> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+> ---
+>  net/rose/af_rose.c | 24 +++++++++++++++++++-----
+>  1 file changed, 19 insertions(+), 5 deletions(-)
 
-It depends on the perspective. NCO is a selection strategy where the
-DPLL does not lock onto an input reference (select nothing); instead,
-its frequency is software-driven.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-Btw. we’ve included DPLL_MODE_DETACHED in the documentation, which could
-describe this use case.
+Sachiko has provided some feedback on this patch.
+I do not believe they relate to shortcomings in this patch,
+and I do not believe they should block progress of this patch.
+You may want to look over them for areas to investigate as follow-up
+(maybe you already did :)
 
-But...
-
-> I was thinking exposing this over STATUS. We have:
-> UNLOCKED (free running)
-> LOCKED
-> LOCKED_HO_ACQ
-> HOLDOVER
-> 
-> So something maybe like SW_STEERED? But:
-> 
-> The problem is you need to do selection. Perhaps we can have a
-> "magic pin" to select for this :S ? We have pin of type
-> DPLL_PIN_TYPE_INT_OSCILLATOR already. Perhaps we can have
-> DPLL_PIN_TYPE_INT_NCO/NDO? It's a source.
-> 
-> Makes sense?
-
-Yes, this makes sense from a selection standpoint, and I have to say I
-like the idea. It also has an additional benefit: if we have an NCO pin
-type, that pin's frequency can be used to configure the delta frequency
-offset of the DPLL device itself.
-
-I’ll proceed this way. Thanks for the advice!
-
-Ivan
-
+...
 
