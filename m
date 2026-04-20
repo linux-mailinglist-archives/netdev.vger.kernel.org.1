@@ -1,207 +1,176 @@
-Return-Path: <netdev+bounces-279883-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279884-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KLHCNkhh5mmavgEAu9opvQ
-	(envelope-from <netdev+bounces-279883-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 19:24:24 +0200
+	id 6FT0HuBi5mmavgEAu9opvQ
+	(envelope-from <netdev+bounces-279884-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 19:31:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BFA2431204
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 19:24:24 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B6B543152D
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 19:31:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 204AE301CA91
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 17:23:36 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C7E7E30394CC
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 17:25:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 656EE2FE057;
-	Mon, 20 Apr 2026 17:23:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CF2A3A3E82;
+	Mon, 20 Apr 2026 17:25:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ECDDwu7E"
+	dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b="qJQQ/vam"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from mx.ssi.bg (mx.ssi.bg [193.238.174.39])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 156363A2561;
-	Mon, 20 Apr 2026 17:23:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C55A63A4F5E;
+	Mon, 20 Apr 2026 17:25:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.238.174.39
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776705814; cv=none; b=kfPl92tpB1yWs90IFPe74z6o6ptRJM2rbiw6HhPjZnolriKum9MlSD/KVKNAElySTFA7r8T+Z4U4/fa+frFQv0fXOldOxWhaKub8nXS68ypNA8b2FD25BcD+3HQabg52aEeXLeDbdulLWE6XsAUbajAPSudN5pB89M4uwU2fhM8=
+	t=1776705904; cv=none; b=KkYanUOsSEtqRDUtq0qQcOs5mu2VVTmNtGGUaIPeoaFSrIixEFnlAJUvkVQZk0/LXWwdygqsZAGSWgO8zNci3+Z2u1uk/B1A9FRmK3GSfUhEWsuiKtCCAb6T2LLlTjOfzgPKpfKjJF9CFwwpmnHIlW3qIXI86H6UrzU3fczexQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776705814; c=relaxed/simple;
-	bh=rBE/AEervawb8RdmDWSRWgLIOT5De76UJOpmVhQNgc4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bQSqCwJ9GPrQB2YLVBIOJpMkRdbD9f1nKthxatIbfpZSpFHVVVZfp4aNP0uE8hwgF6q9s3Brlo/MfWH5oj2ncTP88e58xEJvcYDKSLt3gxai2IuUtLWH3T20kb4JtWGGprLFLgI10STmDEDLogs4SWGXtgTjZCTHS8D4SqZ6msg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ECDDwu7E; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1776705812; x=1808241812;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=rBE/AEervawb8RdmDWSRWgLIOT5De76UJOpmVhQNgc4=;
-  b=ECDDwu7EXhgEoWlKDHOG50Ut6tkuyAQg2WgaTzOOCnCTOTVLQsBMzmQF
-   B9Xiu0D14RQvqVlxn0ePMnM7YZdonhdm9nDUedLVnR0q2BjNGqPbMBIoT
-   /Q5P6MDakbsPAJD+RO/TFrGbpjPLbpdM4XruPtC2eWYP/H6xn7Mds/Yhp
-   1m6t5B6j8ux+7Vd6eQAViPzSQ40+xy7Y6bNHaA3Et5cbAMxmqrJKdOWtd
-   YWeff++3EoGZcK7Rg9NSB/RDcbuVaTQGwZ9zToS1/9pt+k7fFUlJB3IHm
-   4GcZZFdpMOy4ZmJAaBnRUHHbcA0pBUKnUfMy26JKuJ8rSNMLrbx+/q2Ww
-   g==;
-X-CSE-ConnectionGUID: bjmRNRDDRkSCtX/rxe064g==
-X-CSE-MsgGUID: BE5raz5jRa6rWJL4VuDeDg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11762"; a="89097990"
-X-IronPort-AV: E=Sophos;i="6.23,190,1770624000"; 
-   d="scan'208";a="89097990"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Apr 2026 10:23:32 -0700
-X-CSE-ConnectionGUID: ErK47NMFRKevGid/FVva5A==
-X-CSE-MsgGUID: YYr8FaJxT8OabMGTyJSi9w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,190,1770624000"; 
-   d="scan'208";a="255039477"
-Received: from lkp-server01.sh.intel.com (HELO 7e48d0ff8e22) ([10.239.97.150])
-  by fmviesa002.fm.intel.com with ESMTP; 20 Apr 2026 10:23:28 -0700
-Received: from kbuild by 7e48d0ff8e22 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1wEsLE-000000002hQ-49Ob;
-	Mon, 20 Apr 2026 17:23:24 +0000
-Date: Tue, 21 Apr 2026 01:22:36 +0800
-From: kernel test robot <lkp@intel.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>, Tejun Heo <tj@kernel.org>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Thomas Graf <tgraf@suug.ch>, David Vernet <void@manifault.com>,
-	Andrea Righi <arighi@nvidia.com>,
-	Changwoo Min <changwoo@igalia.com>,
-	Emil Tsalapatis <emil@etsalapatis.com>,
-	linux-crypto@vger.kernel.org, sched-ext@lists.linux.dev,
-	linux-kernel@vger.kernel.org, Florian Westphal <fw@strlen.de>,
-	netdev@vger.kernel.org, NeilBrown <neil@brown.name>
-Subject: Re: [PATCH] rhashtable: Restore insecure_elasticity toggle
-Message-ID: <202604210112.4dByOk9v-lkp@intel.com>
-References: <aeLgjAeJuidWNy3N@gondor.apana.org.au>
+	s=arc-20240116; t=1776705904; c=relaxed/simple;
+	bh=TkNIMoXK/7emKBB+Tva2Xpc9OFl608h0/Yc1KdtCpGM=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=QcgSFuQXN+sKxMjcAN+UdW6zFmhUMML0JJo9P/bC8CNjIAZpGXgL/V0b0B8fCykqtwfM7ZcamvqWSZUn9q5o0JQ0mSkx4N3yfQXXNcFz6H/3buI5/y5Iyg+J4RouXUHO0vThAfYek2bn2GJdag/nk0qtBO0HEQMNSSuL7Vbm5QU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=qJQQ/vam; arc=none smtp.client-ip=193.238.174.39
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ssi.bg
+Received: from mx.ssi.bg (localhost [127.0.0.1])
+	by mx.ssi.bg (Potsfix) with ESMTP id 8B017210DF;
+	Mon, 20 Apr 2026 20:25:00 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ssi.bg; h=cc:cc
+	:content-type:content-type:date:from:from:in-reply-to:message-id
+	:mime-version:references:reply-to:subject:subject:to:to; s=ssi;
+	 bh=Eu2bW7WNFuuIEdpLyNA9bfyD9Dbu8t5W3z4YwWtWRb0=; b=qJQQ/vamjJmZ
+	9N0AtKyV5TiaHgZDQRFQjblchPX/WtlLaWBUSeEW/neOR5MkuLj/yynqjz6HXdtn
+	HlmjlqFbZ1pbqAgHxaL4hJZ/gP5fsxHfCnb67sapamieNieade8Gfs1VjhW4+mwq
+	cHQs333YT8fjZRWwtv46303UB4w1XJg+l++R6vP/z5DgFi+tSoZAxD4borkv6hON
+	wddv++UPU1e7fwz2H4NNOtmE8kR3bsJycXv+9XO8esgDgDxMkaFvkPwGBKCZjlw+
+	EIaoI5QvOZ/AV/Tsqd3aEltcRjO0gc7qWaf4ps2Nq5Lax5Hbcx1btp64wDPEZ7+f
+	HJEr7L6yZHgwGXgnrrSSjtAqHhhM0rlCGXkvc0dhqdvapA7IHxCh9fCgnfMWc4Ku
+	aYfpq0I56jkaiqw3tCp3NCWyWKNNekolONb6xySqF0OxKtPPw3h1xgnoK46sfnh3
+	53FR+neWI6Pu6NWjJt8fgsi84u7ux7ZfEX+gfk5yLGF2z4FLZRWugRy9Ib4qZJf3
+	+XYcAT2l/zwTQ0j3FNBh2+ca7pTs1lFbzqqu453eJwsZ9BndxVAUT6mBh3DoTOH4
+	qM/Qn0vFEoehkFKtJuploMnD4e0hLk3DPPB8OqwKafZ1fpU4oX/tE6PbdjoPLBTT
+	lkhA4YrQWbmFJ1X6T0N00onwqnn8Vto=
+Received: from box.ssi.bg (box.ssi.bg [193.238.174.46])
+	by mx.ssi.bg (Potsfix) with ESMTPS;
+	Mon, 20 Apr 2026 20:24:59 +0300 (EEST)
+Received: from ja.ssi.bg (unknown [213.16.62.126])
+	by box.ssi.bg (Potsfix) with ESMTPSA id C6959628C8;
+	Mon, 20 Apr 2026 20:24:57 +0300 (EEST)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by ja.ssi.bg (8.18.1/8.18.1) with ESMTP id 63KHOuZV088012;
+	Mon, 20 Apr 2026 20:24:56 +0300
+Date: Mon, 20 Apr 2026 20:24:56 +0300 (EEST)
+From: Julian Anastasov <ja@ssi.bg>
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+cc: Waiman Long <longman@redhat.com>, Simon Horman <horms@verge.net.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
+        Frederic Weisbecker <frederic@kernel.org>,
+        Chen Ridong <chenridong@huawei.com>, Phil Auld <pauld@redhat.com>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        lvs-devel@vger.kernel.org, netfilter-devel@vger.kernel.org,
+        coreteam@netfilter.org, sheviks <sheviks@gmail.com>
+Subject: Re: [PATCH-next v2 0/2] ipvs: Fix incorrect use of HK_TYPE_KTHREAD
+ housekeeping cpumask
+In-Reply-To: <ac_OscBPYRwt73ic@lemonverbena>
+Message-ID: <097db82c-c9d1-4532-694a-b7ecbdd67532@ssi.bg>
+References: <20260331165015.2777765-1-longman@redhat.com> <cd9afe18-9862-6005-f7d9-d69425b7d4cf@ssi.bg> <ac_OscBPYRwt73ic@lemonverbena>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aeLgjAeJuidWNy3N@gondor.apana.org.au>
-X-Spamd-Result: default: False [-1.16 / 15.00];
+Content-Type: text/plain; charset=US-ASCII
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[ssi.bg,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[ssi.bg:s=ssi];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-279883-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[redhat.com,verge.net.au,davemloft.net,kernel.org,google.com,strlen.de,nwl.cc,huawei.com,vger.kernel.org,netfilter.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-279884-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,ssi.bg:email,ssi.bg:dkim,ssi.bg:mid];
+	DKIM_TRACE(0.00)[ssi.bg:+];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[intel.com:+];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[ja@ssi.bg,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[git-scm.com:url,01.org:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,intel.com:mid]
-X-Rspamd-Queue-Id: 9BFA2431204
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 3B6B543152D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Herbert,
 
-kernel test robot noticed the following build warnings:
+	Hello,
 
-[auto build test WARNING on akpm-mm/mm-nonmm-unstable]
-[also build test WARNING on net/main net-next/main linus/master v7.0]
-[cannot apply to next-20260420]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+On Fri, 3 Apr 2026, Pablo Neira Ayuso wrote:
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Herbert-Xu/rhashtable-Restore-insecure_elasticity-toggle/20260418-233732
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/akpm/mm.git mm-nonmm-unstable
-patch link:    https://lore.kernel.org/r/aeLgjAeJuidWNy3N%40gondor.apana.org.au
-patch subject: [PATCH] rhashtable: Restore insecure_elasticity toggle
-config: sparc64-allmodconfig (https://download.01.org/0day-ci/archive/20260421/202604210112.4dByOk9v-lkp@intel.com/config)
-compiler: clang version 23.0.0git (https://github.com/llvm/llvm-project 5bac06718f502014fade905512f1d26d578a18f3)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260421/202604210112.4dByOk9v-lkp@intel.com/reproduce)
+> On Fri, Apr 03, 2026 at 05:15:50PM +0300, Julian Anastasov wrote:
+> > 
+> > 	Hello,
+> > 
+> > On Tue, 31 Mar 2026, Waiman Long wrote:
+> > 
+> > >  v2:
+> > >   - Rebased on top of linux-next
+> > > 
+> > > Since commit 041ee6f3727a ("kthread: Rely on HK_TYPE_DOMAIN for preferred
+> > > affinity management"), the HK_TYPE_KTHREAD housekeeping cpumask may no
+> > > longer be correct in showing the actual CPU affinity of kthreads that
+> > > have no predefined CPU affinity. As the ipvs networking code is still
+> > > using HK_TYPE_KTHREAD, we need to make HK_TYPE_KTHREAD reflect the
+> > > reality.
+> > > 
+> > > This patch series makes HK_TYPE_KTHREAD an alias of HK_TYPE_DOMAIN
+> > > and uses RCU to protect access to the HK_TYPE_KTHREAD housekeeping
+> > > cpumask.
+> > > 
+> > > Waiman Long (2):
+> > >   sched/isolation: Make HK_TYPE_KTHREAD an alias of HK_TYPE_DOMAIN
+> > >   ipvs: Guard access of HK_TYPE_KTHREAD cpumask with RCU
+> > 
+> > 	The patchset looks good to me for nf-next, thanks!
+> > 
+> > Acked-by: Julian Anastasov <ja@ssi.bg>
+> > 
+> > 	Pablo, Florian, as a bugfix this patchset missed
+> > the chance to be applied before the changes that are in
+> > nf-next in ip_vs.h, there is little fuzz there. If there
+> > is no chance to resolve it somehow, we can apply it
+> > on top of nf-next where it now applies successfully.
+> 
+> One way to handle this is to follow up with nf-next as you suggest,
+> then send a backport that applies cleanly for -stable once it is
+> released.
+> 
+> Else, let me know if I am misunderstanding.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202604210112.4dByOk9v-lkp@intel.com/
+	This patchset is now material for the net tree. To help it,
+I just posted patch "ipvs: fix races around est_mutex and est_cpulist"
+that can be applied before this patchset to the net tree.
+Can we get this patchset for the net tree?
 
-All warnings (new ones prefixed by >>):
+Regards
 
-   In file included from net/mac80211/s1g.c:9:
-   In file included from net/mac80211/ieee80211_i.h:27:
-   include/linux/rhashtable.h:831:32: error: member reference type 'struct rhashtable_params' is not a pointer; did you mean to use '.'?
-     831 |         if (elasticity <= 0 && !params->insecure_elasticity)
-         |                                 ~~~~~~^~
-         |                                       .
-   include/linux/rhashtable.h:839:13: error: member reference type 'struct rhashtable_params' is not a pointer; did you mean to use '.'?
-     839 |             !params->insecure_elasticity)
-         |              ~~~~~~^~
-         |                    .
->> net/mac80211/s1g.c:104:36: warning: implicit conversion from 'unsigned long' to '__u16' (aka 'unsigned short') changes value from 18446744073709551614 to 65534 [-Wconstant-conversion]
-     104 |         twt_agrt->req_type &= cpu_to_le16(~IEEE80211_TWT_REQTYPE_REQUEST);
-         |                               ~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/byteorder/generic.h:90:21: note: expanded from macro 'cpu_to_le16'
-      90 | #define cpu_to_le16 __cpu_to_le16
-         |                     ^
-   include/uapi/linux/byteorder/big_endian.h:36:53: note: expanded from macro '__cpu_to_le16'
-      36 | #define __cpu_to_le16(x) ((__force __le16)__swab16((x)))
-         |                                           ~~~~~~~~~~^~~
-   include/uapi/linux/swab.h:107:12: note: expanded from macro '__swab16'
-     107 |         __fswab16(x))
-         |         ~~~~~~~~~ ^
-   1 warning and 2 errors generated.
+--
+Julian Anastasov <ja@ssi.bg>
 
-
-vim +104 net/mac80211/s1g.c
-
-f5a4c24e689f54e Lorenzo Bianconi 2021-08-23   95  
-f5a4c24e689f54e Lorenzo Bianconi 2021-08-23   96  static void
-f5a4c24e689f54e Lorenzo Bianconi 2021-08-23   97  ieee80211_s1g_rx_twt_setup(struct ieee80211_sub_if_data *sdata,
-f5a4c24e689f54e Lorenzo Bianconi 2021-08-23   98  			   struct sta_info *sta, struct sk_buff *skb)
-f5a4c24e689f54e Lorenzo Bianconi 2021-08-23   99  {
-f5a4c24e689f54e Lorenzo Bianconi 2021-08-23  100  	struct ieee80211_mgmt *mgmt = (void *)skb->data;
-f5a4c24e689f54e Lorenzo Bianconi 2021-08-23  101  	struct ieee80211_twt_setup *twt = (void *)mgmt->u.action.u.s1g.variable;
-f5a4c24e689f54e Lorenzo Bianconi 2021-08-23  102  	struct ieee80211_twt_params *twt_agrt = (void *)twt->params;
-f5a4c24e689f54e Lorenzo Bianconi 2021-08-23  103  
-f5a4c24e689f54e Lorenzo Bianconi 2021-08-23 @104  	twt_agrt->req_type &= cpu_to_le16(~IEEE80211_TWT_REQTYPE_REQUEST);
-f5a4c24e689f54e Lorenzo Bianconi 2021-08-23  105  
-f5a4c24e689f54e Lorenzo Bianconi 2021-08-23  106  	/* broadcast TWT not supported yet */
-f5a4c24e689f54e Lorenzo Bianconi 2021-08-23  107  	if (twt->control & IEEE80211_TWT_CONTROL_NEG_TYPE_BROADCAST) {
-7ff379ba2d4b7b2 Johannes Berg    2021-09-27  108  		twt_agrt->req_type &=
-7ff379ba2d4b7b2 Johannes Berg    2021-09-27  109  			~cpu_to_le16(IEEE80211_TWT_REQTYPE_SETUP_CMD);
-7ff379ba2d4b7b2 Johannes Berg    2021-09-27  110  		twt_agrt->req_type |=
-7ff379ba2d4b7b2 Johannes Berg    2021-09-27  111  			le16_encode_bits(TWT_SETUP_CMD_REJECT,
-f5a4c24e689f54e Lorenzo Bianconi 2021-08-23  112  					 IEEE80211_TWT_REQTYPE_SETUP_CMD);
-f5a4c24e689f54e Lorenzo Bianconi 2021-08-23  113  		goto out;
-f5a4c24e689f54e Lorenzo Bianconi 2021-08-23  114  	}
-f5a4c24e689f54e Lorenzo Bianconi 2021-08-23  115  
-30ac96f7cc973bb Howard Hsu       2022-10-27  116  	/* TWT Information not supported yet */
-30ac96f7cc973bb Howard Hsu       2022-10-27  117  	twt->control |= IEEE80211_TWT_CONTROL_RX_DISABLED;
-30ac96f7cc973bb Howard Hsu       2022-10-27  118  
-f5a4c24e689f54e Lorenzo Bianconi 2021-08-23  119  	drv_add_twt_setup(sdata->local, sdata, &sta->sta, twt);
-f5a4c24e689f54e Lorenzo Bianconi 2021-08-23  120  out:
-f5a4c24e689f54e Lorenzo Bianconi 2021-08-23  121  	ieee80211_s1g_send_twt_setup(sdata, mgmt->sa, sdata->vif.addr, twt);
-f5a4c24e689f54e Lorenzo Bianconi 2021-08-23  122  }
-f5a4c24e689f54e Lorenzo Bianconi 2021-08-23  123  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
