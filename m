@@ -1,372 +1,232 @@
-Return-Path: <netdev+bounces-279669-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279670-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4B80F0PQ5WkfoQEAu9opvQ
-	(envelope-from <netdev+bounces-279669-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 09:05:39 +0200
+	id davHFN3T5WnEoQEAu9opvQ
+	(envelope-from <netdev+bounces-279670-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 09:21:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AD9A42799E
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 09:05:38 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4028427AB6
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 09:21:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EDEBD3003EC4
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 07:05:34 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D22EE300D72B
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 07:20:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26AC3382F39;
-	Mon, 20 Apr 2026 07:05:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D50AC3783C4;
+	Mon, 20 Apr 2026 07:20:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MwBbCURP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f80.google.com (mail-ot1-f80.google.com [209.85.210.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FCCA35F5E6
-	for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 07:05:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2582296BCF
+	for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 07:20:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776668734; cv=none; b=sdmOU25aLkfk6eZRwtSN5HVZvmJR2DmJu1sMkQPA/Io7wv/U0e0dUMPyDiGfPQBXNrKKPabqPUUwP+WyKNeQw8MH8p9Poh+mBYlfDgHsIyF3KHguiX8kpkEU43oUgsIqWys9jGesIcbAN+M8VObyopQLFrujt+IdZwuRfxIqqx0=
+	t=1776669655; cv=none; b=tABM7Ew0G0vQLtC6IjL8eNwozsE0bkFpvZs180i/vA1x/zS6R+lTYQCkbF99lVHbnghbU/g3szk+I+T29BC8/ue/MXAeNg00WlPsQPvNys0dOUY1LzMR1pwq6ktaFLA4p4mSmQErPL4x/igj6rMuktpJCF8HuqQQgqnQkfchOy4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776668734; c=relaxed/simple;
-	bh=aUTOVM6G4NvJT53QHzhoeCouEVUPy8Fsdm+YMT0UJWo=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=o9D7adw/TaYM0f5rrEu5r7aPwLQyz+S9ibF8LsJb/6M13G0VDzI2JCxxqwJw3zdTCBVlAmF9wIfpHJ3VbP/5N7szeuC7EAG2mVJP7WisBa3p0YWAjptcpdMXk6kEcJ1J0nTUoBx+kRoInXFLKxJoI8k7pfOFfA2CjXFhZs05i6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-ot1-f80.google.com with SMTP id 46e09a7af769-7dbe76e3abcso6064850a34.0
-        for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 00:05:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776668731; x=1777273531;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=m9V+hZJSDFNrj/Adh6z+KspVvdr/WxX8LwsFTS0B8es=;
-        b=pkuh2+CiVovsXXYsz+K7Vs3y1xlSxJfJv/UsDMBsMrXKx0VLDHeZmsdfkJQvifxdXQ
-         86imHdMS1Log6RkboWhhQ5xjqLccxXyzT8QpP/3/yNJhm5NB7ummVxvywq4f2hmgs0cF
-         VRQigOJdvBs3IW9pjxM3nUnuA0jE5iSNWW1XxZc6hVK3b1F8h85iSIqQJEJjFrSfJTgi
-         wOJ5ngodjRFPGqt6P7SnA8KLIaArhK0ziqWJno0hv8FsRUjCWK6hXAcMYQuEBMXey6qT
-         4GE8gmx/14auFMobrlGA6Clz+k58IX6EQ/yJzjrLRKesygwzmEm742jTDn0Y5V1UHthg
-         AV8w==
-X-Forwarded-Encrypted: i=1; AFNElJ/4hWBHxUctjshwu117RnNU3Iosx4xuXMwTsortfpNd7mTBHli/kDUBvOn+NJHoGgbM2p2z3n4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzvmKYqDApe8jbwT2dB9LIzXg5SqeyGmdXJmIhT/Lc5u4YGcSsQ
-	nprAkJrwtRvMHa3fM28zYF/1jb4p/K3BEqmzSSRICrnlIGc34BIzEaRfIfqbyymiVnDYetCSIV3
-	vlPo5G6zjw2GA8PJb2bBSS2wp9P0jSJRUaJ4PcH6jrxPEZZa4n/qGx1sxXRE=
+	s=arc-20240116; t=1776669655; c=relaxed/simple;
+	bh=xDlIjLHGAoKn1DuIwoxmC7n5/0GRJIGPQDQkQQ26XZc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UR4U463HZbWX6DJxjO32sGtEodCqv24gVcyWWw6415gdscdi2Vk1Ac7KPv3fWeENWG2/PkrWK+pZ+CxjgBiDt/Wx1+Jzc1711hDTWiSYfk6s5jY0r4RKtWTHbNM3mRcOtsQftamGoPRLUO7Gkv3DAQwVfnoQDru7J6j8yqe2UfY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MwBbCURP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C2C9C2BCB3;
+	Mon, 20 Apr 2026 07:20:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776669655;
+	bh=xDlIjLHGAoKn1DuIwoxmC7n5/0GRJIGPQDQkQQ26XZc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=MwBbCURPXqrGD6Y9j2/rkAyKYBLYphz6v41HmH9c6GV+aaRSMss4KU8Q3FV+eqRa9
+	 ZaDhMZVhnEQY6Krjb27xW9ttVH9l7L5S8vwUV86/2OxShpWcPfJBNw28pnJaKwU2IT
+	 OhC6cNZ5MSLAcaw9exOeYtEzW/W3VYFlo4LJVCj3BGRZww444U/4eDuOotLsIGi3mU
+	 uG4XO543jLui8+8Mp/8WDGFXUmEK4Njy4Pp3akJcrVaihWCslAP+4uQOQFsJKVEMUH
+	 X2+DIODPqdv1bos6WYTZMrDxZf1BTXzcC8m84zKAwSXHhHL/k2QuiOQ2gQxsi4UJ1U
+	 DqWLw8ACbUeUw==
+Date: Mon, 20 Apr 2026 08:20:50 +0100
+From: Simon Horman <horms@kernel.org>
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	magnus.karlsson@intel.com, kuba@kernel.org, pabeni@redhat.com,
+	przemyslaw.kitszel@intel.com, jacob.e.keller@intel.com
+Subject: Re: [PATCH v2 iwl-net] i40e: keep q_vectors array in sync with
+ channel count changes
+Message-ID: <20260420072050.GP280379@horms.kernel.org>
+References: <20260416114046.642171-1-maciej.fijalkowski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:6ac5:b0:68b:b62a:a4eb with SMTP id
- 006d021491bc7-69462e756a8mr6476414eaf.24.1776668731292; Mon, 20 Apr 2026
- 00:05:31 -0700 (PDT)
-Date: Mon, 20 Apr 2026 00:05:31 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69e5d03b.a00a0220.1bd0ca.0064.GAE@google.com>
-Subject: [syzbot] [wireless?] KASAN: slab-use-after-free Write in rsi_91x_deinit
-From: syzbot <syzbot+5de83f57cd8531f55596@syzkaller.appspotmail.com>
-To: linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [-0.36 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260416114046.642171-1-maciej.fijalkowski@intel.com>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=2056c1e3f6d3b0bc];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-279669-lists,netdev=lfdr.de,5de83f57cd8531f55596];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-279670-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	SUBJECT_HAS_QUESTION(0.00)[];
-	REDIRECTOR_URL(0.00)[goo.gl];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[syzkaller.appspot.com:url,storage.googleapis.com:url,goo.gl:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,googlegroups.com:email,appspotmail.com:email]
-X-Rspamd-Queue-Id: 6AD9A42799E
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:email,napi_threaded.py:url]
+X-Rspamd-Queue-Id: B4028427AB6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello,
+On Thu, Apr 16, 2026 at 01:40:46PM +0200, Maciej Fijalkowski wrote:
+> For the main VSI, i40e_set_num_rings_in_vsi() always derives
+> num_q_vectors from pf->num_lan_msix. At the same time, ethtool -L stores
+> the user requested channel count in vsi->req_queue_pairs and the queue
+> setup path uses that value for the effective number of queue pairs.
+> 
+> This leaves queue and vector counts out of sync after shrinking channel
+> count via ethtool -L. The active queue configuration is reduced, but the
+> VSI still keeps the full PF-sized q_vector topology.
+> 
+> That mismatch breaks reconfiguration flows which rely on vector/NAPI
+> state matching the effective channel configuration. In particular,
+> toggling /sys/class/net/<dev>/threaded after reducing the channel count
+> can hang, and later channel-count changes can fail because VSI reinit
+> does not rebuild q_vectors to match the new vector count.
+> 
+> Fix this by making the main VSI num_q_vectors follow the effective
+> requested channel count, capped by the available MSI-X vectors. Update
+> i40e_vsi_reinit_setup() to rebuild q_vectors during VSI reinit so the
+> vector topology is refreshed together with the ring arrays when channel
+> count changes.
+> 
+> Keep alloc_queue_pairs unchanged and based on pf->num_lan_qps so the VSI
+> retains its full queue capacity.
+> 
+> Selftest napi_threaded.py was originally used when Jakub reported hang
+> on /sys/class/net/<dev>/threaded toggle. In order to make it pass on
+> i40e, use persistent NAPI configuration for q_vector NAPIs so NAPI
+> identity and threaded settings survive q_vector reallocation across
+> channel-count changes. This is achieved by using netif_napi_add_config()
+> when configuring q_vectors.
+> 
+> $ export NETIF=ens259f1np1
+> $ sudo -E env PATH="$PATH" ./tools/testing/selftests/drivers/net/napi_threaded.py
+> TAP version 13
+> 1..3
+> ok 1 napi_threaded.napi_init
+> ok 2 napi_threaded.change_num_queues
+> ok 3 napi_threaded.enable_dev_threaded_disable_napi_threaded
+> Totals: pass:3 fail:0 xfail:0 xpass:0 skip:0 error:0
+> 
+> Reported-by: Jakub Kicinski <kuba@kernel.org>
+> Closes: https://lore.kernel.org/intel-wired-lan/20260316133100.6054a11f@kernel.org/
+> Fixes: d2a69fefd756 ("i40e: Fix changing previously set num_queue_pairs for PFs")
+> Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+> ---
+> v2:
+> - NULL vsi->tx_rings in i40e_vsi_alloc_arrays() (Sashiko)
 
-syzbot found the following issue on:
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-HEAD commit:    87117347a0e7 usb: dwc3: starfive: Add JHB100 USB 2.0 DRD c..
-git tree:       https://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb.git usb-testing
-console output: https://syzkaller.appspot.com/x/log.txt?x=171b04ce580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=2056c1e3f6d3b0bc
-dashboard link: https://syzkaller.appspot.com/bug?extid=5de83f57cd8531f55596
-compiler:       gcc (Debian 14.2.0-19) 14.2.0, GNU ld (GNU Binutils for Debian) 2.44
+> ---
+>  drivers/net/ethernet/intel/i40e/i40e_main.c | 35 +++++++++++++++++----
+>  1 file changed, 29 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
+> index 926d001b2150..1d2a4181966f 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_main.c
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
+> @@ -11403,10 +11403,14 @@ static void i40e_service_timer(struct timer_list *t)
+>  static int i40e_set_num_rings_in_vsi(struct i40e_vsi *vsi)
+>  {
+>  	struct i40e_pf *pf = vsi->back;
+> +	u16 qps;
+>  
+>  	switch (vsi->type) {
+>  	case I40E_VSI_MAIN:
+>  		vsi->alloc_queue_pairs = pf->num_lan_qps;
+> +		qps = vsi->req_queue_pairs ?
+> +		      min_t(u16, vsi->req_queue_pairs, pf->num_lan_qps) :
 
-Unfortunately, I don't have any reproducer for this issue yet.
+nit: It looks all the variables involved here u16.
+     So min() can be used instead of min_t().
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/6168cf3e4727/disk-87117347.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/36e554f1750a/vmlinux-87117347.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/7aa92e741f66/bzImage-87117347.xz
+> +		      pf->num_lan_qps;
+>  		if (!vsi->num_tx_desc)
+>  			vsi->num_tx_desc = ALIGN(I40E_DEFAULT_NUM_DESCRIPTORS,
+>  						 I40E_REQ_DESCRIPTOR_MULTIPLE);
+> @@ -11414,7 +11418,8 @@ static int i40e_set_num_rings_in_vsi(struct i40e_vsi *vsi)
+>  			vsi->num_rx_desc = ALIGN(I40E_DEFAULT_NUM_DESCRIPTORS,
+>  						 I40E_REQ_DESCRIPTOR_MULTIPLE);
+>  		if (test_bit(I40E_FLAG_MSIX_ENA, pf->flags))
+> -			vsi->num_q_vectors = pf->num_lan_msix;
+> +			vsi->num_q_vectors = max_t(int, 1,
+> +						   min_t(int, qps, pf->num_lan_msix));
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+5de83f57cd8531f55596@syzkaller.appspotmail.com
+nit: On the left side, all values seem to be either constants or u16.
+     So I think you can use clamp() here, and simply assign the resulting
+     value to num_q_vectors, which is an int.
 
-rsi_91x: rsi_probe: Failed to init usb interface
-==================================================================
-BUG: KASAN: slab-use-after-free in instrument_atomic_read_write include/linux/instrumented.h:112 [inline]
-BUG: KASAN: slab-use-after-free in atomic_fetch_add_relaxed include/linux/atomic/atomic-instrumented.h:252 [inline]
-BUG: KASAN: slab-use-after-free in __refcount_add include/linux/refcount.h:283 [inline]
-BUG: KASAN: slab-use-after-free in __refcount_inc include/linux/refcount.h:366 [inline]
-BUG: KASAN: slab-use-after-free in refcount_inc include/linux/refcount.h:383 [inline]
-BUG: KASAN: slab-use-after-free in get_task_struct include/linux/sched/task.h:116 [inline]
-BUG: KASAN: slab-use-after-free in kthread_stop+0x8f/0x680 kernel/kthread.c:754
-Write of size 4 at addr ffff88813d339da8 by task kworker/0:3/10583
+>  		else
+>  			vsi->num_q_vectors = 1;
+>  
 
-CPU: 0 UID: 0 PID: 10583 Comm: kworker/0:3 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/18/2026
-Workqueue: usb_hub_wq hub_event
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x100/0x190 lib/dump_stack.c:120
- print_address_description mm/kasan/report.c:378 [inline]
- print_report+0x156/0x4c9 mm/kasan/report.c:482
- kasan_report+0xdf/0x1e0 mm/kasan/report.c:595
- check_region_inline mm/kasan/generic.c:186 [inline]
- kasan_check_range+0x10f/0x1e0 mm/kasan/generic.c:200
- instrument_atomic_read_write include/linux/instrumented.h:112 [inline]
- atomic_fetch_add_relaxed include/linux/atomic/atomic-instrumented.h:252 [inline]
- __refcount_add include/linux/refcount.h:283 [inline]
- __refcount_inc include/linux/refcount.h:366 [inline]
- refcount_inc include/linux/refcount.h:383 [inline]
- get_task_struct include/linux/sched/task.h:116 [inline]
- kthread_stop+0x8f/0x680 kernel/kthread.c:754
- rsi_kill_thread drivers/net/wireless/rsi/rsi_common.h:78 [inline]
- rsi_91x_deinit+0x102/0x1f0 drivers/net/wireless/rsi/rsi_91x_main.c:405
- rsi_probe+0xd27/0x1aa0 drivers/net/wireless/rsi/rsi_91x_usb.c:861
- usb_probe_interface+0x303/0x8f0 drivers/usb/core/driver.c:396
- call_driver_probe drivers/base/dd.c:643 [inline]
- really_probe+0x241/0xa60 drivers/base/dd.c:721
- __driver_probe_device+0x1de/0x400 drivers/base/dd.c:863
- driver_probe_device+0x4c/0x1b0 drivers/base/dd.c:893
- __device_attach_driver+0x1df/0x340 drivers/base/dd.c:1021
- bus_for_each_drv+0x159/0x1e0 drivers/base/bus.c:500
- __device_attach+0x1e4/0x4d0 drivers/base/dd.c:1093
- device_initial_probe+0xaf/0xd0 drivers/base/dd.c:1148
- bus_probe_device+0x64/0x160 drivers/base/bus.c:613
- device_add+0x11d9/0x1950 drivers/base/core.c:3691
- usb_set_configuration+0xd97/0x1c60 drivers/usb/core/message.c:2268
- usb_generic_driver_probe+0xa1/0xe0 drivers/usb/core/generic.c:250
- usb_probe_device+0xef/0x400 drivers/usb/core/driver.c:291
- call_driver_probe drivers/base/dd.c:643 [inline]
- really_probe+0x241/0xa60 drivers/base/dd.c:721
- __driver_probe_device+0x1de/0x400 drivers/base/dd.c:863
- driver_probe_device+0x4c/0x1b0 drivers/base/dd.c:893
- __device_attach_driver+0x1df/0x340 drivers/base/dd.c:1021
- bus_for_each_drv+0x159/0x1e0 drivers/base/bus.c:500
- __device_attach+0x1e4/0x4d0 drivers/base/dd.c:1093
- device_initial_probe+0xaf/0xd0 drivers/base/dd.c:1148
- bus_probe_device+0x64/0x160 drivers/base/bus.c:613
- device_add+0x11d9/0x1950 drivers/base/core.c:3691
- usb_new_device.cold+0x685/0x115c drivers/usb/core/hub.c:2695
- hub_port_connect drivers/usb/core/hub.c:5567 [inline]
- hub_port_connect_change drivers/usb/core/hub.c:5707 [inline]
- port_event drivers/usb/core/hub.c:5871 [inline]
- hub_event+0x314d/0x4af0 drivers/usb/core/hub.c:5953
- process_one_work+0xa23/0x19a0 kernel/workqueue.c:3276
- process_scheduled_works kernel/workqueue.c:3359 [inline]
- worker_thread+0x5ef/0xe50 kernel/workqueue.c:3440
- kthread+0x370/0x450 kernel/kthread.c:436
- ret_from_fork+0x6c3/0xcb0 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
+...
 
-Allocated by task 2:
- kasan_save_stack+0x30/0x50 mm/kasan/common.c:57
- kasan_save_track+0x14/0x30 mm/kasan/common.c:78
- unpoison_slab_object mm/kasan/common.c:340 [inline]
- __kasan_slab_alloc+0x6e/0x70 mm/kasan/common.c:366
- kasan_slab_alloc include/linux/kasan.h:253 [inline]
- slab_post_alloc_hook mm/slub.c:4538 [inline]
- slab_alloc_node mm/slub.c:4866 [inline]
- kmem_cache_alloc_node_noprof+0x26b/0x6b0 mm/slub.c:4918
- alloc_task_struct_node kernel/fork.c:185 [inline]
- dup_task_struct kernel/fork.c:916 [inline]
- copy_process+0x48b/0x7820 kernel/fork.c:2050
- kernel_clone+0xfc/0x9a0 kernel/fork.c:2653
- kernel_thread+0xdb/0x120 kernel/fork.c:2714
- create_kthread kernel/kthread.c:459 [inline]
- kthreadd+0x498/0x7a0 kernel/kthread.c:817
- ret_from_fork+0x6c3/0xcb0 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+> @@ -14265,12 +14272,27 @@ static struct i40e_vsi *i40e_vsi_reinit_setup(struct i40e_vsi *vsi)
+>  
+>  	pf = vsi->back;
+>  
+> +	if (test_bit(I40E_FLAG_MSIX_ENA, pf->flags)) {
+> +		i40e_put_lump(pf->irq_pile, vsi->base_vector, vsi->idx);
+> +		vsi->base_vector = 0;
+> +	}
+> +
+>  	i40e_put_lump(pf->qp_pile, vsi->base_queue, vsi->idx);
+>  	i40e_vsi_clear_rings(vsi);
+>  
+> -	i40e_vsi_free_arrays(vsi, false);
+> +	i40e_vsi_free_q_vectors(vsi);
+> +	i40e_vsi_free_arrays(vsi, true);
 
-Freed by task 14:
- kasan_save_stack+0x30/0x50 mm/kasan/common.c:57
- kasan_save_track+0x14/0x30 mm/kasan/common.c:78
- kasan_save_free_info+0x3b/0x70 mm/kasan/generic.c:584
- poison_slab_object mm/kasan/common.c:253 [inline]
- __kasan_slab_free+0x43/0x70 mm/kasan/common.c:285
- kasan_slab_free include/linux/kasan.h:235 [inline]
- slab_free_hook mm/slub.c:2685 [inline]
- slab_free mm/slub.c:6165 [inline]
- kmem_cache_free+0x105/0x640 mm/slub.c:6295
- rcu_do_batch kernel/rcu/tree.c:2617 [inline]
- rcu_core+0x5a2/0x10d0 kernel/rcu/tree.c:2869
- handle_softirqs+0x1de/0x9d0 kernel/softirq.c:622
- run_ksoftirqd kernel/softirq.c:1063 [inline]
- run_ksoftirqd+0x38/0x60 kernel/softirq.c:1055
- smpboot_thread_fn+0x3d3/0xaa0 kernel/smpboot.c:160
- kthread+0x370/0x450 kernel/kthread.c:436
- ret_from_fork+0x6c3/0xcb0 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+nit: with this patch applied the free_vectors argument (the 2nd parameter)
+     of i40e_vsi_free_arrays is always passed as true by callers.
+     So I think that, as a follow-up, it can be removed.
 
-Last potentially related work creation:
- kasan_save_stack+0x30/0x50 mm/kasan/common.c:57
- kasan_record_aux_stack+0x8c/0xa0 mm/kasan/generic.c:556
- __call_rcu_common.constprop.0+0xa5/0x9b0 kernel/rcu/tree.c:3131
- put_task_struct include/linux/sched/task.h:159 [inline]
- put_task_struct include/linux/sched/task.h:128 [inline]
- delayed_put_task_struct+0xe4/0x2e0 kernel/exit.c:231
- rcu_do_batch kernel/rcu/tree.c:2617 [inline]
- rcu_core+0x5a2/0x10d0 kernel/rcu/tree.c:2869
- handle_softirqs+0x1de/0x9d0 kernel/softirq.c:622
- __do_softirq kernel/softirq.c:656 [inline]
- invoke_softirq kernel/softirq.c:496 [inline]
- __irq_exit_rcu+0xed/0x150 kernel/softirq.c:723
- irq_exit_rcu+0x9/0x30 kernel/softirq.c:739
- instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1056 [inline]
- sysvec_apic_timer_interrupt+0x8f/0xb0 arch/x86/kernel/apic/apic.c:1056
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:697
+     Similarly for i40e_vsi_alloc_arrays.
 
-Second to last potentially related work creation:
- kasan_save_stack+0x30/0x50 mm/kasan/common.c:57
- kasan_record_aux_stack+0x8c/0xa0 mm/kasan/generic.c:556
- __call_rcu_common.constprop.0+0xa5/0x9b0 kernel/rcu/tree.c:3131
- put_task_struct_rcu_user kernel/exit.c:237 [inline]
- put_task_struct_rcu_user+0x6c/0xc0 kernel/exit.c:234
- context_switch kernel/sched/core.c:5301 [inline]
- __schedule+0xeb9/0x4220 kernel/sched/core.c:6911
- preempt_schedule_common+0x42/0xc0 kernel/sched/core.c:7095
- preempt_schedule_thunk+0x16/0x30 arch/x86/entry/thunk.S:12
- __raw_spin_unlock include/linux/spinlock_api_smp.h:169 [inline]
- _raw_spin_unlock+0x3e/0x50 kernel/locking/spinlock.c:186
- spin_unlock include/linux/spinlock.h:389 [inline]
- filemap_map_pages+0x130f/0x1e50 mm/filemap.c:3936
- do_fault_around mm/memory.c:5757 [inline]
- do_read_fault mm/memory.c:5790 [inline]
- do_fault mm/memory.c:5933 [inline]
- do_pte_missing mm/memory.c:4477 [inline]
- handle_pte_fault mm/memory.c:6317 [inline]
- __handle_mm_fault+0x1e2e/0x2d60 mm/memory.c:6455
- handle_mm_fault+0x36d/0xa20 mm/memory.c:6624
- do_user_addr_fault+0x5ae/0x11d0 arch/x86/mm/fault.c:1334
- handle_page_fault arch/x86/mm/fault.c:1474 [inline]
- exc_page_fault+0x66/0xc0 arch/x86/mm/fault.c:1527
- asm_exc_page_fault+0x26/0x30 arch/x86/include/asm/idtentry.h:618
+>  	i40e_set_num_rings_in_vsi(vsi);
+> -	ret = i40e_vsi_alloc_arrays(vsi, false);
+> +
+> +	ret = i40e_vsi_alloc_arrays(vsi, true);
+> +	if (ret)
+> +		goto err_vsi;
+> +
+> +	/* Rebuild q_vectors during VSI reinit because the effective channel
+> +	 * count may change num_q_vectors. Keep vector topology aligned with the
+> +	 * queue configuration after ethtool's .set_channels() callback.
+> +	 */
+> +	ret = i40e_vsi_setup_vectors(vsi);
+>  	if (ret)
+>  		goto err_vsi;
+>  
 
-The buggy address belongs to the object at ffff88813d339d80
- which belongs to the cache task_struct of size 7296
-The buggy address is located 40 bytes inside of
- freed 7296-byte region [ffff88813d339d80, ffff88813d33ba00)
-
-The buggy address belongs to the physical page:
-page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x13d338
-head: order:3 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-memcg:ffff88813d33f601
-flags: 0x200000000000040(head|node=0|zone=2)
-page_type: f5(slab)
-raw: 0200000000000040 ffff8881012d9500 dead000000000100 dead000000000122
-raw: 0000000000000000 0000000800040004 00000000f5000000 ffff88813d33f601
-head: 0200000000000040 ffff8881012d9500 dead000000000100 dead000000000122
-head: 0000000000000000 0000000800040004 00000000f5000000 ffff88813d33f601
-head: 0200000000000003 ffffea0004f4ce01 00000000ffffffff 00000000ffffffff
-head: 0000000000000000 0000000000000000 00000000ffffffff 0000000000000008
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 3, migratetype Unmovable, gfp_mask 0xd20c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 5914, tgid 5914 (dhcpcd-run-hook), ts 193584350604, free_ts 193494512770
- set_page_owner include/linux/page_owner.h:32 [inline]
- post_alloc_hook+0x153/0x170 mm/page_alloc.c:1889
- prep_new_page mm/page_alloc.c:1897 [inline]
- get_page_from_freelist+0xf10/0x39f0 mm/page_alloc.c:3962
- __alloc_frozen_pages_noprof+0x273/0x2860 mm/page_alloc.c:5250
- alloc_slab_page mm/slub.c:3292 [inline]
- allocate_slab mm/slub.c:3481 [inline]
- new_slab+0xa6/0x6c0 mm/slub.c:3539
- refill_objects+0x26b/0x400 mm/slub.c:7175
- refill_sheaf mm/slub.c:2812 [inline]
- __pcs_replace_empty_main+0x1ab/0x660 mm/slub.c:4615
- alloc_from_pcs mm/slub.c:4717 [inline]
- slab_alloc_node mm/slub.c:4851 [inline]
- kmem_cache_alloc_node_noprof+0x4e9/0x6b0 mm/slub.c:4918
- alloc_task_struct_node kernel/fork.c:185 [inline]
- dup_task_struct kernel/fork.c:916 [inline]
- copy_process+0x48b/0x7820 kernel/fork.c:2050
- kernel_clone+0xfc/0x9a0 kernel/fork.c:2653
- __do_sys_clone+0xd9/0x120 kernel/fork.c:2794
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x106/0x7b0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-page last free pid 2861 tgid 2861 stack trace:
- reset_page_owner include/linux/page_owner.h:25 [inline]
- __free_pages_prepare mm/page_alloc.c:1433 [inline]
- __free_frozen_pages+0x7b1/0xfb0 mm/page_alloc.c:2978
- qlink_free mm/kasan/quarantine.c:163 [inline]
- qlist_free_all+0x47/0xe0 mm/kasan/quarantine.c:179
- kasan_quarantine_reduce+0x1a0/0x1f0 mm/kasan/quarantine.c:286
- __kasan_slab_alloc+0x4e/0x70 mm/kasan/common.c:350
- kasan_slab_alloc include/linux/kasan.h:253 [inline]
- slab_post_alloc_hook mm/slub.c:4538 [inline]
- slab_alloc_node mm/slub.c:4866 [inline]
- kmem_cache_alloc_noprof+0x2e7/0x6a0 mm/slub.c:4873
- alloc_filename fs/namei.c:142 [inline]
- do_getname+0x35/0x390 fs/namei.c:182
- getname include/linux/fs.h:2512 [inline]
- class_filename_constructor include/linux/fs.h:2539 [inline]
- do_sys_openat2+0xc5/0x1e0 fs/open.c:1365
- do_sys_open fs/open.c:1372 [inline]
- __do_sys_openat fs/open.c:1388 [inline]
- __se_sys_openat fs/open.c:1383 [inline]
- __x64_sys_openat+0x12d/0x210 fs/open.c:1383
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x106/0x7b0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Memory state around the buggy address:
- ffff88813d339c80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
- ffff88813d339d00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
->ffff88813d339d80: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                                  ^
- ffff88813d339e00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff88813d339e80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+...
 
