@@ -1,204 +1,189 @@
-Return-Path: <netdev+bounces-279935-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279936-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6FKPIRuj5mmfzAEAu9opvQ
-	(envelope-from <netdev+bounces-279935-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 00:05:15 +0200
+	id 4L0qN4Ki5mmfzAEAu9opvQ
+	(envelope-from <netdev+bounces-279936-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 00:02:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26BCD4347DF
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 00:05:15 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85D2A43470D
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 00:02:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C9CDA3068483
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 22:00:44 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8F476301453B
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 22:02:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9367B3A1E70;
-	Mon, 20 Apr 2026 22:00:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8862B3A7F61;
+	Mon, 20 Apr 2026 22:02:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kAReCENy"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="gDKqIOsD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07358387374
-	for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 22:00:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E4B82147F9;
+	Mon, 20 Apr 2026 22:02:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776722443; cv=none; b=OAwfCqSgh6hDq6+kp/zvsbcZJezcEN3rSxf1burWL27PRtYmMfQb4QAtR5wS5/FgP6K8EdndxFCjZ22CMdbtMeh9o9vaQbDFpk13F1/g5OBguziRU84VRlX/AyLMuirotbtMViNZ2NkeTC1fnDcDcjMZnp5n4INkoYOAcC146bI=
+	t=1776722543; cv=none; b=QNENfDiY4Q6ub9EnIlklN4VOH5JdgoL0/PpAGrAmE8RTFwojwLb79fv600Mt/nzxb1ABg3gt+2oU7jfvbJMnEI9Kp+M6/vVwiL3Wjna/HM4Wk8B4Kz7NxyOwACEV6vcdXObnHRVw3Aig/EDmvjX8J9IzO6Q9ZHAF++8bbuv8cy0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776722443; c=relaxed/simple;
-	bh=zcIuX44FQ4JZplZlzPi2l4ZSnMwkpRIbGnceAVAp6cg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kPS9QDzMiwoUoZlg3gd71hkKHiHpdF3a+o6VBikqtyFfVDA0kj6A1CjnEcIvkMOB5FRjDV3W7Q5WbrqLf7Jf/keFQK0bis9pTA/xxxiV7otpkCUSU4Ao7IU9ufzAKYtYwbCm5PmCo2eYQLHrslRzs6OSH6KzjK+BSyxSeqfhReI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kAReCENy; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-43d74086e5bso3522887f8f.0
-        for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 15:00:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776722440; x=1777327240; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+7JO2f/xlDpOxtBT93GnNbMq3RmdZ9DsCL97xFYueTk=;
-        b=kAReCENyQnUWaL/fzwM1HV0Iz4JNWHfQYDT+hEHCcnneS2miPKABJqXU6DBOguxZKS
-         T+owt/hFSTq799Zq6ejr8MfRapAGqczgxrn/8/FSKbE4KmN2ecbAPCxl0IncFGwJTXxJ
-         nLKB7sB3vG6SkQH2/xRRbRyCNxGQLGcXSEM/lZ3EydQTt+k/28Voi4lzCueMszLE9MQU
-         MNmU/BmLUUxnUGI5vDtsusUgwIOBaCNde5y2QQ8c3lQ0RVjTWmuoH5l+htPqfA6o0t9v
-         VEcoOG5uXV5v1ERu+jg2x5BELqnbOExZVcrhsQF9tEDo8NaLFrZbDn2mXtDgg+BpshvP
-         X1Vg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776722440; x=1777327240;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=+7JO2f/xlDpOxtBT93GnNbMq3RmdZ9DsCL97xFYueTk=;
-        b=KlD8yB7HxAJwunqFqjSNCUmRACLCNBSl3UNfkbZxhc7Za6HkcVzcB1MOQ1RZjdPx0Z
-         Pgl61XcVjs6o+WvATNqESgO6K2Q+sISCi3FbgrlfPnxEPshrRwYCXsct8/SQAIyKqJ1A
-         cXQngPzKhZpwKSbe2m240KCEDWCJKOlX06ZGhBfMMwA9zpntX7S+7uIhXDOpmAvepWvp
-         z56OY1TRsSIJz9bWjAULi0BgVlu5PDkKJWoUyAEo6EOtdtMHMNnB3z0XGi+/DcFhcbGp
-         Jb9m34LonETLIL07aLEBxNWfRvmmdz1PB3aTrRad2+TeBPCzIvPzGzql8z2uLQRb38r9
-         K/VA==
-X-Forwarded-Encrypted: i=1; AFNElJ8HHD3BYF1BVowYbIR1Jd2/2FfJTjZT+3zj+8wGjKo/p5i44+aINkJ7Hzjj8ByG0iMp6vJ16ec=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwxNC17fnL+9AaDIVQZ15XQUQv2kQhdCFRsMVvSa9ObgeXbj12M
-	e5afPjRbKRaZYBHHqCNDTG1xfatUOh4By0GDLWJEsg6xMwbi4JaEzIhm
-X-Gm-Gg: AeBDiesJF/4lhIRT1/Qxg2VclrFoztBpBBnM0CdsT5wNLuNizWq1hASHt9+wMmeIdKU
-	NhWO1Phbz1jCVgQ7cayHwZdCIsac9DemNM008moLAqfz5wctMXSh4dPDrUPHhBCm9TS1enX/DeW
-	srLCbCeRsEsR059qOp8PvaAw0tR9EyHegsYTqJ6RznV9pYASjC+7AaR3GDQp0u6iqGPjPRKZlKD
-	KMbu8+Aeoh9na9Erk8hOZwtFXnBGZeZUURS/nyUA40GXe/YTemcuAxsx1Pa5IvPzXiiW7K1ZcYZ
-	4HCI70tZmAPStRrkzwd4QfmuClDHKa6cE/9hgTHB5nN87Q0aPeN/5nJdFP/+qO0xU71a/ykB6CK
-	90oZCrqObxxjnL5YZr1+KPuM1b/zfSPGhqzic11tY+V/zsWxMf/PIYzXvMEGeHoD3CCIH/KYceW
-	57NwW1XItOAwusTSkw6g4POouyyMgTOWMklpAtB20IS2343FjhPKICI59c63plYgV2WGjGdkqBU
-	I0=
-X-Received: by 2002:a05:6000:2303:b0:43e:b020:f8a2 with SMTP id ffacd0b85a97d-43fe3dd5208mr22198611f8f.19.1776722440147;
-        Mon, 20 Apr 2026 15:00:40 -0700 (PDT)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43fe4dc26a3sm36471952f8f.15.2026.04.20.15.00.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Apr 2026 15:00:39 -0700 (PDT)
-Date: Mon, 20 Apr 2026 23:00:37 +0100
-From: David Laight <david.laight.linux@gmail.com>
-To: Yury Norov <ynorov@nvidia.com>
-Cc: Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner
- <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov
- <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
- "H. Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>,
- Jonathan Cameron <jic23@kernel.org>, David Lechner <dlechner@baylibre.com>,
- Nuno =?UTF-8?B?U8Oh?= <nuno.sa@analog.com>, Andy Shevchenko
- <andy@kernel.org>, Ping-Ke Shih <pkshih@realtek.com>, Richard Cochran
- <richardcochran@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexandre
- Belloni <alexandre.belloni@bootlin.com>, Yury Norov <yury.norov@gmail.com>,
- Rasmus Villemoes <linux@rasmusvillemoes.dk>, Hans de Goede
- <hansg@kernel.org>, Linus Walleij <linusw@kernel.org>, Sakari Ailus
- <sakari.ailus@linux.intel.com>, Salah Triki <salah.triki@gmail.com>, Achim
- Gratz <Achim.Gratz@stromeko.de>, Ben Collins <bcollins@watter.com>,
- linux-kernel@vger.kernel.org, linux-iio@vger.kernel.org,
- linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
- linux-rtc@vger.kernel.org
-Subject: Re: [PATCH 2/9] x86/extable: switch to using FIELD_GET_SIGNED()
-Message-ID: <20260420230037.21fb4758@pumpkin>
-In-Reply-To: <aeZf98xjbxdHvZOS@yury>
-References: <20260417173621.368914-1-ynorov@nvidia.com>
-	<20260417173621.368914-3-ynorov@nvidia.com>
-	<20260420112428.GF3102624@noisy.programming.kicks-ass.net>
-	<aeZf98xjbxdHvZOS@yury>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	s=arc-20240116; t=1776722543; c=relaxed/simple;
+	bh=62x1WzfEb0ccT7e3EvMGCt9289fKT2axCIwUEPqFv/w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=l3KsJTLbYALHFjfMmCMozoockRy/xrP0m4aevbv0EZ4g2yx05jnpv9FfrPhgnSi5AgTZzUVUKwLhcgtqf4T9e879oX+gKYkkST13NfCyjDAcLiJUPyJ9Og3IXX2fRWSkNTdYo4AWJI5OuS9dqj8Ebl27dyvdOcpjwaOslNtFBNY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=gDKqIOsD; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: from localhost.localdomain (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with ESMTPSA id CAB5C6017E;
+	Tue, 21 Apr 2026 00:02:18 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1776722539;
+	bh=EVrBbQ74Psqq42IjC9L/dsxq9oV3R/lVXUOfHOqhevo=;
+	h=From:To:Cc:Subject:Date:From;
+	b=gDKqIOsDaJGVIKHJQWd+DY9oem6cJhkpgU0xUkaLtPnODgixBV8GMQzmSx9isldhX
+	 8kSF+MOsfjlr6OoI0MHQCifp0MTz0Gtfg23Q7k6SjUdUQYZR87iAigdgjY4htSUe/p
+	 NO7nNh/QvK41KkIINggq7gY7pNzPtK0PdUzuJ32p8XxW+0ZzUJFgZp6Cju55ebaCmR
+	 EqI2JHY3z9aAxz2ls0BeIhzFcquQxGf5eXTgcYtCzhurnrEFfGeNYyDLsct7JpYE5W
+	 4Z+4ysS8RDO2NEouwazpA25uE9dbfVSpDO2W8pjn1HgXXt0ECgXSui4LcsJyzCLAuv
+	 E7byAgy1Ba/LQ==
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net,
+	netdev@vger.kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	fw@strlen.de,
+	horms@kernel.org
+Subject: [PATCH net 0/8] Netfilter/IPVS fixes for net
+Date: Tue, 21 Apr 2026 00:02:07 +0200
+Message-ID: <20260420220215.111510-1-pablo@netfilter.org>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-279936-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279935-lists,netdev=lfdr.de];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[34];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[infradead.org,kernel.org,redhat.com,alien8.de,linux.intel.com,zytor.com,baylibre.com,analog.com,realtek.com,gmail.com,lunn.ch,davemloft.net,google.com,bootlin.com,rasmusvillemoes.dk,stromeko.de,watter.com,vger.kernel.org];
+	DMARC_NA(0.00)[netfilter.org];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	DKIM_TRACE(0.00)[netfilter.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
 	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_NONE(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 26BCD4347DF
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[netfilter.org:dkim,netfilter.org:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 85D2A43470D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, 20 Apr 2026 13:18:47 -0400
-Yury Norov <ynorov@nvidia.com> wrote:
+Hi,
 
-> On Mon, Apr 20, 2026 at 01:24:28PM +0200, Peter Zijlstra wrote:
-> > On Fri, Apr 17, 2026 at 01:36:13PM -0400, Yury Norov wrote:  
-> > > The EX_DATA register is laid out such that EX_DATA_IMM occupied MSB.
-> > > It's done to make sure that FIELD_GET() will sign-extend the IMM
-> > > field during extraction.
-> > > 
-> > > To enforce that, all EX_DATA masks are made signed integers. This
-> > > works, but relies on the particular implementation of FIELD_GET(),
-> > > i.e. masking then shifting, not vice versa; and the particular
-> > > placement of the fields in the register.  
-> > 
-> > I don't think the order of the mask and shift matters in this case. If
-> > we were to first shift down and then mask, it would still work (after
-> > all, the mask would also need to be shifted and would also get sign
-> > extended, effectively ending up as -1).  
->  
-> FIELD_GET() doesn't require mask to be signed when a reg is signed, so
-> shifting mask may become zero-extended in an alternative implementation:
-> 
->         (reg >> __bf_shf(mask)) & (mask >> __bf_shf(mask)
-> 
-> This all is hypothetical, anyways.
-> 
-> > But yes, this very much depends on the signed field being the topmost
-> > field and including the MSB.  
-> 
-> This is the part I dislike mostly. This would look just like undefined
-> behavior for the API user: depending on fields placement or type of the
-> inputs, sometimes FIELD_GET() sign-extendeds the field, and sometimes
-> not. 
-> 
-> We could likely force FIELD_GET() to treat both reg and mask as unsigned
-> types, and state that explicitly in the documentation.
-> 
+The following batch contains Netfilter/IPVS fixes for net:
 
-There is already a BUILD_BUG_ON((_mask) == 0), changing it to >= 0
-will detect negative masks.
-I think the only one is the x86 exception table.
-FIELD_GET() casts the result to typeof(_mask) so the sign of 'reg'
-shouldn't matter.
-I just tried building with a compile-time check for reg being negative.
-But there are too many false positives from FIELD_GET(mask, readl(addr))
-and FIELD_GET(mask, READ_ONCE(var)).
-The pre-processor expansions of those don't bear thinking about.
+1) nft_osf actually only supports IPv4, restrict it.
 
-It's late now, but I will check how __unsigned_scalar_typeof() handles
-variables with const or volatile qualifiers.
-I think they do though the 'default' the same at bitfields.
+2) Address possible division by zero in nfnetlink_osf, from Xiang Mei.
 
-	David
+3) Remove unsafe use of sprintf to fix possible buffer overflow
+   in the SIP NAT helper, from Florian Westphal.
+
+4) Restrict xt_mac, xt_owner and xt_physdev to inet families only;
+   xt_realm is only for ipv4, otherwise null-pointer-deref is possible.
+
+5) Use kfree_rcu() in nat core to release hooks, this can be an issue
+   once nfnetlink_hook gets support to dump NAT hook information, not
+   currently a real issue but better fix it now. From Florian Westphal.
+
+6) Fix MTU checks in IPVS, from Yingnan Zhang.
+
+7) Fix possible out-of-bounds when matching TCP options in
+   nfnetlink_osf, from Fernando Fernandez Mancera.
+
+8) Fix potential nul-ptr-deref in ttl check in nfnetlink_osf,
+   remove useless loop to fix this, also from Fernando.
+
+This is a smaller batch, there are more patches pending in the queue
+to arm another pull request as soon as this is considered good enough.
+
+AI might complain again about one more issue regarding osf and
+big-endian arches in osf but this batch is targetting crash fixes for
+osf at this stage.
+
+Please, pull these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git nf-26-04-20
+
+Thanks.
+
+----------------------------------------------------------------
+
+The following changes since commit a663bac71a2f0b3ac6c373168ca57b2a6e6381aa:
+
+  net: mctp: fix don't require received header reserved bits to be zero (2026-04-20 11:46:57 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git tags/nf-26-04-20
+
+for you to fetch changes up to 711987ba281fd806322a7cd244e98e2a81903114:
+
+  netfilter: nfnetlink_osf: fix potential NULL dereference in ttl check (2026-04-20 23:45:44 +0200)
+
+----------------------------------------------------------------
+netfilter pull request 26-04-20
+
+----------------------------------------------------------------
+Fernando Fernandez Mancera (2):
+      netfilter: nfnetlink_osf: fix out-of-bounds read on option matching
+      netfilter: nfnetlink_osf: fix potential NULL dereference in ttl check
+
+Florian Westphal (1):
+      netfilter: conntrack: remove sprintf usage
+
+Pablo Neira Ayuso (3):
+      netfilter: nft_osf: restrict it to ipv4
+      netfilter: xtables: restrict several matches to inet family
+      netfilter: nat: use kfree_rcu to release ops
+
+Xiang Mei (1):
+      netfilter: nfnetlink_osf: fix divide-by-zero in OSF_WSS_MODULO
+
+Yingnan Zhang (1):
+      ipvs: fix MTU check for GSO packets in tunnel mode
+
+ net/ipv4/netfilter/iptable_nat.c  |  4 ++--
+ net/ipv6/netfilter/ip6table_nat.c |  4 ++--
+ net/netfilter/ipvs/ip_vs_xmit.c   | 19 +++++++++++++----
+ net/netfilter/nf_nat_amanda.c     |  2 +-
+ net/netfilter/nf_nat_core.c       | 10 +++++----
+ net/netfilter/nf_nat_sip.c        | 33 +++++++++++++++-------------
+ net/netfilter/nfnetlink_osf.c     | 45 +++++++++++++++++----------------------
+ net/netfilter/nft_osf.c           |  6 +++++-
+ net/netfilter/xt_mac.c            | 34 +++++++++++++++++++----------
+ net/netfilter/xt_owner.c          | 37 +++++++++++++++++++++-----------
+ net/netfilter/xt_physdev.c        | 29 ++++++++++++++++---------
+ net/netfilter/xt_realm.c          |  2 +-
+ 12 files changed, 136 insertions(+), 89 deletions(-)
 
