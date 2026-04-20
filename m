@@ -1,231 +1,260 @@
-Return-Path: <netdev+bounces-279651-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279654-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aCxtJnab5WlvmAEAu9opvQ
-	(envelope-from <netdev+bounces-279651-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 05:20:22 +0200
+	id 4LM5Gemc5Wm1mAEAu9opvQ
+	(envelope-from <netdev+bounces-279654-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 05:26:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2E75426890
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 05:20:21 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B99B54268C2
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 05:26:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id AD5753001CCD
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 03:20:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 88A8F300B117
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 03:25:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7A3137648D;
-	Mon, 20 Apr 2026 03:20:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="c5ohoV2t"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D25637F8CC;
+	Mon, 20 Apr 2026 03:25:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp25.cstnet.cn [159.226.251.25])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74B2433EF;
-	Mon, 20 Apr 2026 03:20:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF04B35C185;
+	Mon, 20 Apr 2026 03:25:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776655216; cv=none; b=Q3cwiPu6QgpDoJpoNNz7kgo1pgkyNqwqhXWt8tPf86rV4J6j+vHMT+eoqO9MMZvP4nRwj1f7rD/hvgY5zC097XDmT9/u8UumJCMXD99d80W8mH2i8+rsXRTx1Ceiwl2Qt3Va+yISa9UvwQ4xVRRLJtc5ktNcoxARHxw91+yw/Xw=
+	t=1776655524; cv=none; b=NfRzBotACsQSc++4If0u/vazVRMxAH0zXqMFdtjRpxtdpeez3Z7dE97QCK6qzbq2jfrSdnKmRxOgBKhGUzVJ0NGW60X++o+ovYw+T8WpiT5tEiX7JKFGLismg+N4uBp4cNksgJ/m54HBQ1T9SB8mI938LbHWvSrbmpSs6yFKIUg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776655216; c=relaxed/simple;
-	bh=I96x05WWbxNDXdYnL1sEhcmWSmBoa7yu/uYaLcjrTYE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WqDYWm+5Bcn3S9fFb+b7coR7NmgB7mbtSvaz2WhrYw3/I6suCOaLuQHeW61aFYvK+PlcJLkqIxN5+/GkIuTp8cPfFB95s3s2f53sOac1zsSKxIuxNR0BhmYrdwxgDqb/rDtSsAiTbG25QW+OecxAQBW0ehvQnfC999agYG2i+KQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=c5ohoV2t; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1776655215; x=1808191215;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=I96x05WWbxNDXdYnL1sEhcmWSmBoa7yu/uYaLcjrTYE=;
-  b=c5ohoV2t7xy9Z10H112j+R/FUXTB37pSBt0uoV5jNLiDhnXfYmpqGxX5
-   gkMGMoFK5i36KViAR2sxQ1fjQAf3SJyYuUTVQLS6TLB7Q0+Ql0/P2rDCT
-   HCKEo1nW40BCJtEQ2tUj7H+7DwZW5dDP6Yy6ajtndwB6eyx9DL70pkr2D
-   W38AkoNPDny9x0RmVWHqLjDISjK2Gs3KLrL0J+mpf1DOgTqWu856Jau+o
-   LeUGmEhsSK7dfQN+l352ldwTWP/doyScWQW3TNLQG8KEet8+mV1X0q71/
-   ONfBONM0u/wpbTH5Eh9vHgDsmyHQUQL8fPe/kgMLWb79UKEG7P4243Te9
-   w==;
-X-CSE-ConnectionGUID: cgkVj5cfTd+TTbFnxBDHWQ==
-X-CSE-MsgGUID: MeezGUq2SwqRSvtRhFYKQg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11762"; a="89032154"
-X-IronPort-AV: E=Sophos;i="6.23,189,1770624000"; 
-   d="scan'208";a="89032154"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2026 20:20:14 -0700
-X-CSE-ConnectionGUID: qPAi+K2FSGeq+PDZXEyAuw==
-X-CSE-MsgGUID: eNtEGU/+Shq84y5c6COEFw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,189,1770624000"; 
-   d="scan'208";a="231880747"
-Received: from mohdfai2-mobl.gar.corp.intel.com (HELO [10.247.8.237]) ([10.247.8.237])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2026 20:20:11 -0700
-Message-ID: <3481ae84-5c36-4591-94c1-78b70fff4d7b@linux.intel.com>
-Date: Mon, 20 Apr 2026 11:20:07 +0800
+	s=arc-20240116; t=1776655524; c=relaxed/simple;
+	bh=o6WC5778xZWcRTJECjjLQorMrFwgvz0nLDUSBYqAmIU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=NAwHVFyqvsFFBivZh0jkGj1q6UzInxN/QI9tz5PRmG/Aiuz7tqKNUbgzr/x/h1svdEd271Ke5YXCn3ZyD5aPDX0QtFysT2k+xesCF600XBaN6CVvh0lRsWCJMgi/uPDq1aAO1Cr5ti1v7s+BSb1p8pyL4sZFT6Xjx3+056Sjrh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from ubuntu.. (unknown [202.112.113.208])
+	by APP-05 (Coremail) with SMTP id zQCowADndwt9nOVpj2cbDg--.31217S2;
+	Mon, 20 Apr 2026 11:24:54 +0800 (CST)
+From: Ma Ke <make24@iscas.ac.cn>
+To: vz@mleia.com
+Cc: alexandre.belloni@bootlin.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	make24@iscas.ac.cn,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	piotr.wojtaszczyk@timesys.com,
+	stable@vger.kernel.org
+Subject: Re: [PATCH] net: lpc_eth: Fix a possible memory leak in lpc_mii_probe()
+Date: Mon, 20 Apr 2026 11:24:45 +0800
+Message-ID: <20260420032445.2209758-1-make24@iscas.ac.cn>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <60dea9e5-9890-49ab-b806-713c388d6e08@mleia.com>
+References: <60dea9e5-9890-49ab-b806-713c388d6e08@mleia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-next v2 3/3] igc: add support for forcing link speed
- without autonegotiation
-To: Simon Horman <horms@kernel.org>, khai.wen.tan@linux.intel.com
-Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, intel-wired-lan@lists.osuosl.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- faizal.abdul.rahim@intel.com, hong.aun.looi@intel.com, khai.wen.tan@intel.com
-References: <20260416015520.6090-4-khai.wen.tan@linux.intel.com>
- <20260418164837.380985-2-horms@kernel.org>
-Content-Language: en-US
-From: "Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com>
-In-Reply-To: <20260418164837.380985-2-horms@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-CM-TRANSID:zQCowADndwt9nOVpj2cbDg--.31217S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxtF15Cr43Xr48Ar17urWDCFg_yoW7Zr47p3
+	yUGa4SkFykGr17Gw4vv3WUAryYvw42yw1rWFyjya45Wrn0qryfAry8trWY9r95CFZ7J3W0
+	vryakFZ3ZaykXaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUB214x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+	6r4UJwA2z4x0Y4vEx4A2jsIE14v26F4UJVW0owA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xv
+	F2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r
+	4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I
+	648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2
+	Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s02
+	6x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0x
+	vE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE
+	42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6x
+	kF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUOmhFUUUUU
+X-CM-SenderInfo: ppdnvj2u6l2u1dvotugofq/
+X-Spamd-Result: default: False [1.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-279651-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[intel.com:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[faizal.abdul.rahim@linux.intel.com,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-279654-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[iscas.ac.cn];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FROM_NEQ_ENVFROM(0.00)[make24@iscas.ac.cn,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	NEURAL_SPAM(0.00)[0.269];
+	PRECEDENCE_BULK(0.00)[];
+	R_DKIM_NA(0.00)[];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.intel.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,intel.com:dkim]
-X-Rspamd-Queue-Id: A2E75426890
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,iscas.ac.cn:mid,iscas.ac.cn:email]
+X-Rspamd-Queue-Id: B99B54268C2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-
-
-On 19/4/2026 12:48 am, Simon Horman wrote:
-> From: 'Simon Horman' <horms@kernel.org>
-> 
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
-> Full review at: https://sashiko.dev
-> ---
-> igc: add support for forcing link speed without autonegotiation
-> 
-> This commit adds support to allow users to force 10/100 Mb/s link speed
-> and duplex via ethtool when autonegotiation is disabled.
-> 
->> diff --git a/drivers/net/ethernet/intel/igc/igc_ethtool.c b/drivers/net/ethernet/intel/igc/igc_ethtool.c
->> index cfcbf2fdad6ea..5bd37d1be1688 100644
->> --- a/drivers/net/ethernet/intel/igc/igc_ethtool.c
->> +++ b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-> 
-> [ ... ]
-> 
->> @@ -2000,6 +2013,41 @@ static int igc_ethtool_get_link_ksettings(struct net_device *netdev,
->>   	return 0;
->>   }
->>   
->> +/**
->> + * igc_handle_autoneg_disabled - Configure forced speed/duplex settings
->> + * @adapter: private driver structure
->> + * @speed: requested speed (must be SPEED_10 or SPEED_100)
->> + * @duplex: requested duplex
->> + *
->> + * Records forced speed/duplex when autoneg is disabled.
->> + * Caller must validate speed before calling this function.
->> + */
->> +static void igc_handle_autoneg_disabled(struct igc_adapter *adapter, u32 speed,
->> +					u8 duplex)
->> +{
->> +	struct igc_mac_info *mac = &adapter->hw.mac;
->> +
->> +	switch (speed) {
->> +	case SPEED_10:
->> +		mac->forced_speed_duplex = (duplex == DUPLEX_FULL) ?
->> +			IGC_FORCED_10F : IGC_FORCED_10H;
->> +		break;
->> +	case SPEED_100:
->> +		mac->forced_speed_duplex = (duplex == DUPLEX_FULL) ?
->> +			IGC_FORCED_100F : IGC_FORCED_100H;
->> +		break;
->> +	default:
->> +		WARN_ONCE(1, "Unsupported speed %u\n", speed);
->> +		return;
->> +	}
->> +
->> +	mac->autoneg_enabled = false;
->> +
->> +	/* Half-duplex cannot support flow control per IEEE 802.3 */
->> +	if (duplex == DUPLEX_HALF)
->> +		adapter->hw.fc.requested_mode = igc_fc_none;
->> +}
-> 
-> If userspace issues an ethtool command without specifying duplex, the duplex
-> value can be DUPLEX_UNKNOWN. In this case, forced_speed_duplex correctly
-> defaults to half-duplex since duplex == DUPLEX_FULL evaluates to false.
-> 
-> However, since DUPLEX_UNKNOWN is not equal to DUPLEX_HALF, the check above
-> fails, and the requested flow control mode remains unchanged. Could this leave
-> flow control enabled on a forced half-duplex link, violating IEEE 802.3?
-> Should this check be based on the resolved mac->forced_speed_duplex state
-> instead?
+>Hello Ma Ke.
 >
+>On 4/1/26 16:18, Ma Ke wrote:
+>> On 3/30/26 13:04, Vladimir Zapolskiy wrote:
+>>> On 3/30/26 11:16, Ma Ke wrote:
+>>>> lpc_mii_probe() calls of_phy_find_device() to obtain a phy_device
+>>>> pointer. of_phy_find_device() increments the refcount of the device.
+>>>> The current implementation does not decrement the refcount after using
+>>>> the pointer, which leads to a memory leak.
+>>>
+>>> this is correct, there is an actual detected bug.
+>>>
+>>>>
+>>>> Add phy_device_free() to balance the refcount.
+>>>
+>>> But this does not sound right, you shoud use of_node_put(pldat->phy_node).
+>>>
+>>>>
+>>>> Found by code review.
+>>>>
+>>>> Signed-off-by: Ma Ke <make24@iscas.ac.cn>
+>>>> Cc: stable@vger.kernel.org
+>>>> Fixes: 3503bf024b3e ("net: lpc_eth: parse phy nodes from device tree")
+>>>> ---
+>>>>    drivers/net/ethernet/nxp/lpc_eth.c | 11 ++++++-----
+>>>>    1 file changed, 6 insertions(+), 5 deletions(-)
+>>>>
+>>>> diff --git a/drivers/net/ethernet/nxp/lpc_eth.c b/drivers/net/ethernet/nxp/lpc_eth.c
+>>>> index 8b9a3e3bba30..8ce7c9bb6dd6 100644
+>>>> --- a/drivers/net/ethernet/nxp/lpc_eth.c
+>>>> +++ b/drivers/net/ethernet/nxp/lpc_eth.c
+>>>> @@ -751,7 +751,7 @@ static void lpc_handle_link_change(struct net_device *ndev)
+>>>>    static int lpc_mii_probe(struct net_device *ndev)
+>>>>    {
+>>>>    	struct netdata_local *pldat = netdev_priv(ndev);
+>>>> -	struct phy_device *phydev;
+>>>> +	struct phy_device *phydev, *phydev_tmp;
+>>>>    
+>>>>    	/* Attach to the PHY */
+>>>>    	if (lpc_phy_interface_mode(&pldat->pdev->dev) == PHY_INTERFACE_MODE_MII)
+>>>> @@ -760,17 +760,18 @@ static int lpc_mii_probe(struct net_device *ndev)
+>>>>    		netdev_info(ndev, "using RMII interface\n");
+>>>>    
+>>>>    	if (pldat->phy_node)
+>>>> -		phydev =  of_phy_find_device(pldat->phy_node);
+>>>> +		phydev_tmp =  of_phy_find_device(pldat->phy_node);
+>>>>    	else
+>>>> -		phydev = phy_find_first(pldat->mii_bus);
+>>>> -	if (!phydev) {
+>>>> +		phydev_tmp = phy_find_first(pldat->mii_bus);
+>>>> +	if (!phydev_tmp) {
+>>>
+>>> I didn't get it, why the new phydev_tmp is needed above, please
+>>> restore the original code above.
+>>>
+>>>>    		netdev_err(ndev, "no PHY found\n");
+>>>>    		return -ENODEV;
+>>>>    	}
+>>>>    
+>>>> -	phydev = phy_connect(ndev, phydev_name(phydev),
+>>>> +	phydev = phy_connect(ndev, phydev_name(phydev_tmp),
+>>>>    			     &lpc_handle_link_change,
+>>>>    			     lpc_phy_interface_mode(&pldat->pdev->dev));
+>>>> +	phy_device_free(phydev_tmp);
+>>>
+>>> This is plainly wrong and has to be dropped or changed to
+>>>
+>>> 	if (pldat->phy_node)
+>>> 		of_node_put(pldat->phy_node);
+>>>
+>>>>    	if (IS_ERR(phydev)) {
+>>>>    		netdev_err(ndev, "Could not attach to PHY\n");
+>>>>    		return PTR_ERR(phydev);
+>>>
+>>> Is it AI generated fix or what?.. The change looks bad, it introduces
+>>> more severe issues than it fixes.
+>>>
+>>> If you think you cannot create a proper change, let me know.
+>>>
+>> Thank you very much for your detailed review and guidance.
+>> 
+>> Now I think your point probably is: you are saying that the real leak
+>> is not from of_phy_find_device(), but from the device node
+>
+>I was pretty indelicate in my comment, let's split the change into parts.
+>
+>1) I still do not understand, why phydev_tmp is introduced, please explain
+>or remove this part of the change;
+>
+>2) phydev = of_phy_find_device() requires phy_device_free(phydev), but
+>I do not see why phy_find_first() requires it, while it was added in your
+>change.
+>
+>Let's start from resolving these two points.
+>
+>> pldat->phy_node which was obtained earlier (probably by
+>> of_parse_phandle()) and never freed by of_node_put(). And you suggest
+>> to add of_node_put(pldat->phy_node) instead of my wrong
+>> phy_device_free().
+>> 
+>> However, I am still a little confused. In lpc_mii_probe(),
+>> of_phy_find_device() is called. From my understanding, this function
+>> increases the reference count of the device. To balance it, I thought
+>> phy_device_free() (which calls put_device()) should be used.
+>> 
+>> Could you please kindly advise the correct patch? I will follow your
+>> guidance and submit a proper fix.
+>> 
+>> I apologize again for my previous wrong patch. Thank you very much for
+>> your help.
+>
+> -- 
+> Best wishes,
+> Vladimir
+Hello Vladimir,
 
-You're right, thanks for pointing that out.
+Thank you for the detailed explanation and for pointing out my mistakes.
 
-That said, it feels simpler to address it with [1]:
-if (duplex != DUPLEX_FULL)
-     adapter->hw.fc.requested_mode = igc_fc_none;
+> 1) I still do not understand, why phydev_tmp is introduced, please explain
+> or remove this part of the change;
 
-Rather than [2]:
-  if (mac->forced_speed_duplex == IGC_FORCED_10H ||
-         mac->forced_speed_duplex == IGC_FORCED_100H)
-         adapter->hw.fc.requested_mode = igc_fc_none;
+I added phydev_tmp because I thought I needed to keep the original 
+phy_device pointer for releasing after phy_connect(). But as you 
+implied, it's perhaps unnecessary and only makes the code less 
+readable. I will drop this change completely in the next version.
 
-Are you okay with [1] ?
+> 2) phydev = of_phy_find_device() requires phy_device_free(phydev), but
+> I do not see why phy_find_first() requires it, while it was added in your
+> change.
 
-> [ ... ]
-> 
->> @@ -2071,14 +2120,20 @@ igc_ethtool_set_link_ksettings(struct net_device *netdev,
->>   		}
->>   	}
->>   
->> +	if (cmd->base.autoneg == AUTONEG_DISABLE &&
->> +	    cmd->base.speed != SPEED_10 && cmd->base.speed != SPEED_100) {
->> +		netdev_info(dev, "Unsupported speed for forced link\n");
->> +		return -EINVAL;
->> +	}
->> +
->>   	while (test_and_set_bit(__IGC_RESETTING, &adapter->state))
->>   		usleep_range(1000, 2000);
-> 
-> This isn't a bug introduced by this patch, but does this ad-hoc
-> synchronization using bit flags circumvent proper locking guarantees? The
-> networking subsystem guidelines forbid using bit flags as ad-hoc locks.
-> 
-> Using a bit flag in a polling loop bypasses lockdep analysis, fairness, and
-> strict memory ordering. Could this be replaced with a real synchronization
-> mechanism like a mutex?
+You are absolutely right. I mistakenly assumed that both functions 
+return a reference-counted pointer. phy_find_first() does not 
+increment the refcount, so calling phy_device_free() on it is wrong 
+and dangerous. My patch introduced a new bug there.
 
-It looks like a worthwhile cleanup. However, it likely doesn’t belong in 
-this series, since the synchronization pattern predates these patches and 
-is used throughout the igc driver (set_ringparam, set_pauseparam, 
-set_channels, etc.). We could address it in different patch series and 
-align the other code paths at the same time ?
+Now I understand that only the of_phy_find_device() branch needs a 
+corresponding put_device(). I will prepare a corrected patch that only
+releases the reference in that specific path (including on the error 
+path after phy_connect() failure). I will also look at the phy_node 
+reference leak you hinted at.
+
+Thank you again for your guidance. I will send a v2 after fixing it 
+properly.
+
+Best regards,
+Ma Ke
 
 
