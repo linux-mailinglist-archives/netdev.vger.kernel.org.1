@@ -1,205 +1,194 @@
-Return-Path: <netdev+bounces-279677-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279678-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0Pg4K07f5Wk1owEAu9opvQ
-	(envelope-from <netdev+bounces-279677-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 10:09:50 +0200
+	id pZlCHv3f5WmlowEAu9opvQ
+	(envelope-from <netdev+bounces-279678-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 10:12:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51975428056
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 10:09:49 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1633428076
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 10:12:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 5C5DD30089A7
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 08:09:49 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8D41530048DB
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 08:12:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62EAE386426;
-	Mon, 20 Apr 2026 08:09:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gRWduUQg"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10C6E3148C9;
+	Mon, 20 Apr 2026 08:12:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+Received: from mail-oo1-f71.google.com (mail-oo1-f71.google.com [209.85.161.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF18D3845C8
-	for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 08:09:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.172
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776672588; cv=pass; b=Dl4tTNiE0hdgFi1OlED4MTz4+bqJ8PLgW3E1KA6FI6Wd8pDwzzMOvpzIekLvJV0Q2BVpfuOrSwSMOn9Dvd1BtS/WNqwqE+y8i/xNOHQesvcV/WVcrXKqa+mRwzgdSiD8HoyTP4MYNl9z1qt5XnBZ2M5ZZ6VxPvaTRV00hZ+o6vE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776672588; c=relaxed/simple;
-	bh=LVEP0scsmITC0MJJGvwyPcEMuMmnB92hZivB/DSnqko=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZfJLIO/NHeSYrjFPGcUjIepF42OX0jSBnatNCyl+KmLl+uAM/hBfutFFZLU/RYPrv7N0spXPww/AJ2RCbpqpaVFzYUChk5OEGenBDM9E1Wa0lZ5MzYsrl44pJ5hYGRyTbSqOI7uEegkgK0GzaQZBZEMNltlPmcscDWnL70OHVZw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gRWduUQg; arc=pass smtp.client-ip=209.85.208.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-38e68e4389cso28604161fa.3
-        for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 01:09:46 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776672585; cv=none;
-        d=google.com; s=arc-20240605;
-        b=PxJRWQ4GK0xMAK/pAbbBMVB4MT2VvDX2yjLd3+WNNqh89elCMYdnEzrpw3JlZj/19j
-         O4vga3eSlHBZ/YQCgvUtNCR9zhvrU9PsdhL/2wF5SSmoYC5OAUgBYaXc5FJgaDQMKCqA
-         VZ2edcT5yTwMl5CjkFdPa5z6zHbbXcWm152vx3bl5pZp/pF57XDX41w7a6MWbz6/C62f
-         6z/SPbR2o7eYv249sr6gxioqrVC0amYhDM1zl440KBePHB20BD8LkvTBgVJjuzh6wIts
-         qKe1liH/98dyLW3vrklt1nHb1VdlPWpdRbaWiT2sqqYhuKB4NN4euAhPEl8M4dCwRtQN
-         6k2Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=4Oby7Bx0gK5ynnasEbalEDWMKwfDNOligTGO8x/b0ik=;
-        fh=JFsQ93LvTDSqUZTagbxrytryNzlioAR3ZCFwSOWJKcs=;
-        b=kyceMjotW1fnE48W2Lxw3USwnhgieZ2XakUHMgVJTEVAO75VD0Re8XLukdL343ZScm
-         PL7dWhj5KXhOiYUzJmzpBvudUriu1eQTUXKPQOa1dBXZBkoLC0oXwJLFXtqs01m1LigC
-         Vjz5G5m4AaU7Gs74sH79oa3YX1FThXTvxl1Vq4zGAH62RLRK9UCnLY2+hEW1UdFivfMP
-         OFOTx/FwoclvxVOgnMnQgoecstIedW3YxY9gXdZya04ru7SwsQ0c1JnTq9xuUaSg5uCO
-         3EDjS7WwC4pMB50XZGUhRTSyNsaYkDdGjNPK4RVs1EVfdWJGCIMAs/EnUR6ohXkUGatZ
-         1jgw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776672585; x=1777277385; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4Oby7Bx0gK5ynnasEbalEDWMKwfDNOligTGO8x/b0ik=;
-        b=gRWduUQg96VobcTkwI/x7t/xd8INJ1k+DNN7vHnMPaLiJUOx6WQw3eJlFsTY1ni9v/
-         n6WXNkxCTwBbJ/N0UOvq4MffNbjA++YviC3WpIbLrvAzCFn6TmrNY3D1dgWbG11WjYg0
-         tKCPsgZsA5GC3wdohvsPg02Y2gn951CFFWH62XPTONZItpA4U7W753AFKZgYbch7cxD3
-         m3XJ38o63PkSgE+5O2ieNbvnfsO8FoWL6O/GAPolDLSgds53AYGtjzEDB24h8y86MuIv
-         TpQTGZA+AQU7n2bRaZ1nZyb+UiV4M6VCzGvtPpLveol/APRcjjSxxbQGeiLt4hae8Z/L
-         B3vQ==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FB95385537
+	for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 08:12:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.71
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776672761; cv=none; b=kTgdN3xAwfbsR1pFf5XrQz3jYZfX3cT2/evSVpoXpk8zCQmcZDeIrLapAzyCBgr1lXdxCYJPo5MTVZekl30mBlCCACxagvpSTORkNSKrvQxoeEwQ8r17pgdIOGgHgCCEYSGAMlsPzS07qcXM749EXL/Ir7Wyvzvvdmv6lbO6qcI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776672761; c=relaxed/simple;
+	bh=GQTy+ZBSq9aEMmo6nMHZ4n4nx2xyjOOsbDMz7J6AKBk=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=aNnbXTEZeHsPgTL/RQdc4808H08BHTG3VLSXCiOig5wYZptMabbBWvPdsjQWKwCFClQL3kR0JXjs4pWFc47moyvqJQDygbUAD7vaoja78z9iY1z0oI/UIifrZhTYGXilfX+dUydv+oQi8iafrNmA8ml5Rp3NjhuNy1R/WtDVkuw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f71.google.com with SMTP id 006d021491bc7-6853c2438b9so4663876eaf.3
+        for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 01:12:39 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776672585; x=1777277385;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=4Oby7Bx0gK5ynnasEbalEDWMKwfDNOligTGO8x/b0ik=;
-        b=AB31RzbOJUQTwF83jnve1zYIAsqlFM7hxqHjqe7DqXDUZ1ceROj2LH22KGG7S0VH3j
-         dutioxTMYcAG+1b22V6S1ZNrdglMcE6llMamXR+cS2CtQO5IPp7s77umZa9IGMHUSy/P
-         KNJ7fxqlVcLo3JzajGrcCcZG2cWAVl6ZHGYMQJttYt8rm09EKC0sPj0YhUhGkyCm/ErB
-         gXEj0BvYetHWlNj0Z4EyEI3bZ9BFNeW6vKlb58TnnC/6/PMhse6cSdHYERTBY8uC6DTb
-         IslcNPlL/jOcCiyFCLRrGxWjlkbi7EvlZjq7oRk3sOADuPYPurTDwfjvxp+v3GXtS8OB
-         tX2g==
-X-Forwarded-Encrypted: i=1; AFNElJ+qx/dGshsn5tOk44zmOzHVTndct0LVocKIHWNDe9EpAHjRUhvCzLT5ZR6zmNQ5Z3RvbcrDYV8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy9Jx0nPI7aSBVQG20G2risy8pL3kg+8rJnsZynIaFaQuvlc3Oa
-	hRWgs2BFFZ9L5pef8rAD+sxNSrKEx57Fsj3bgaZcmVu6XxfQ9gJjmi8KSqRqvRMrdtTSddEPUjD
-	Txm/fIPUg3RbwG93hn2HfO9DoT8LQeIU=
-X-Gm-Gg: AeBDiesXBi3GL3E289EwwbkjsqXwaXnK6Nttdu7vuCJa8K+rK438sI+1vn+bL17N9oP
-	73r+RL1V47ILsLwAf+GsFrDgbnDn+Ky7V+t1OwqZkEFcZe4b4Xk5PMTwFevwrTos6e0tEqOPDPH
-	a2szcAGL4pY1nP0K4T8E6+pJ/nTIuRIapSJGnjfN1msE2QhECXWcmGboVbi/x/jXHMX0T/4kwSs
-	IrGXrd7YnirFrUCpnsbsS+D4htkz4IUpEuGRBv/nGs6E2mP5e1hJa8VBqn6nvazguxCHohpZmlS
-	atp+ce+Bg67ANt9G
-X-Received: by 2002:a05:651c:1b97:b0:38e:9eb1:6949 with SMTP id
- 38308e7fff4ca-38ec7a4340cmr38995391fa.14.1776672584503; Mon, 20 Apr 2026
- 01:09:44 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1776672758; x=1777277558;
+        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=QrnYfIYXXYam0VZDYj4/7kC54JxgeVUDla9fg6DopKQ=;
+        b=JdhmlvmM44OLi0p0DGH6QNJmjU8CM0VbtaMV/FktSey+/Ma+tR/ucZyB/jetLpg1cX
+         BWxxHhJN+KdIaphvWV1PPcAzu5a0nVXKQLiagXC2M/QMwRYH03eoxNVKjMsOjaMcr7aW
+         uTC8EuUbHU/xEuN0q1lPdpkFpXpto2nhTGNU3oUjxRHW6Nl6LlRysQfNqX9pCqxeSd+1
+         7XTO/EpHF7yCrWe0sc35E0uhA7EGt/PrZf4lE2Hc4VAubOKZD2sElN/ppW446n6jpn2X
+         szJKpQ9jDp3jvm2skrDDK4C4Fr/Cb0L82zz+H6YCM2vvYR/53AMaFojNXvb0+Bk34QBN
+         CX9g==
+X-Forwarded-Encrypted: i=1; AFNElJ+6jIGEJ47E3CXCT4zpj/XkkRVNGijtDWUXhaW3cI3po9lUSjKt4WF3nS7qtmq7qdnRreZBcO4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywj1p7QvQgrMcwI2QZINOCfZTCepTA6fbQYxFinZ7BnJ7vnytGl
+	GXZKKUDQrk+IEvtiWrxjGO2elJtm8JZDKjpwLfJ+GBVd0X6XrkM131riTCLINLt9lw159znbiKj
+	2hkZtlpDebcqurcMNxT/w8RT1UMLLaKmaqhOpai4zSJGFhIx89ROD0NhwML4=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <0f9e9d4e-8083-4297-91d3-10d0f614c87c@redhat.com>
- <20260408125333.38489-1-xiaoguai0992@gmail.com> <20260412135743.GK469338@kernel.org>
- <255224dc-0a55-4a0c-95f3-b84d4c6b3897@redhat.com> <20260414112951.GD469338@kernel.org>
-In-Reply-To: <20260414112951.GD469338@kernel.org>
-From: Kangzheng Gu <xiaoguai0992@gmail.com>
-Date: Mon, 20 Apr 2026 16:09:31 +0800
-X-Gm-Features: AQROBzCGapSVEfgxkUaxukutheG4b1zMtlvabc9F8b6CSvfsjnb81jK3l8njad4
-Message-ID: <CAKvcANPEa91paujTQjpW2hZhpXEhwfOjjy6CsN=OJ32iXYXdTA@mail.gmail.com>
-Subject: Re: [PATCH v5] net: caif: fix stack out-of-bounds write in cfctrl_link_setup()
-To: Simon Horman <horms@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, kees@kernel.org, thorsten.blum@linux.dev, arnd@arndb.de, 
-	sjur.brandeland@stericsson.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+X-Received: by 2002:a05:6820:8c3:b0:692:ef5b:ad46 with SMTP id
+ 006d021491bc7-69462e20417mr6110472eaf.1.1776672758742; Mon, 20 Apr 2026
+ 01:12:38 -0700 (PDT)
+Date: Mon, 20 Apr 2026 01:12:38 -0700
+In-Reply-To: <6112cce99b4e3571444a616d0fb19e91e2fcca72.1776597598.git.caoruide123@gmail.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69e5dff6.a00a0220.9259.0001.GAE@google.com>
+Subject: [syzbot ci] Re: net: nsh: handle nested NSH headers during GSO
+From: syzbot ci <syzbot+ci38a89a871d631008@syzkaller.appspotmail.com>
+To: bird@lzu.edu.cn, caoruide123@gmail.com, davem@davemloft.net, 
+	edumazet@google.com, horms@kernel.org, jbenc@redhat.com, kuba@kernel.org, 
+	lx24@stu.ynu.edu.cn, n05ec@lzu.edu.cn, netdev@vger.kernel.org, 
+	pabeni@redhat.com, tomapufckgml@gmail.com, yifanwucs@gmail.com, 
+	yuantan098@gmail.com
+Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
+X-Spamd-Result: default: False [-1.36 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-279678-lists,netdev=lfdr.de,ci38a89a871d631008];
 	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[lzu.edu.cn,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,stu.ynu.edu.cn,vger.kernel.org];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-279677-lists,netdev=lfdr.de];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xiaoguai0992@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 51975428056
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,googlegroups.com:email,googlesource.com:url]
+X-Rspamd-Queue-Id: D1633428076
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Thanks for all of your advice, I am preparing a new version of patch now.
+syzbot ci has tested the following series
 
-Simon Horman <horms@kernel.org> =E4=BA=8E2026=E5=B9=B44=E6=9C=8814=E6=97=A5=
-=E5=91=A8=E4=BA=8C 19:29=E5=86=99=E9=81=93=EF=BC=9A
->
-> On Mon, Apr 13, 2026 at 11:30:53AM +0200, Paolo Abeni wrote:
-> > On 4/12/26 3:57 PM, Simon Horman wrote:
-> > > I am wondering if it would be best to follow the pattern for
-> > > writing linkparam.u.utility.name elsewhere in this function.
-> > > That:
-> > > 1. Uses a somewhat more succinct loop control structure
-> > > 2. Silently truncates input without updating cmdrsp if overrun would =
-occur
-> > >
-> > > Something like this (compile tested only!):
-> > >
-> > > diff --git a/net/caif/cfctrl.c b/net/caif/cfctrl.c
-> > > index c6cc2bfed65d..ba184c11386e 100644
-> > > --- a/net/caif/cfctrl.c
-> > > +++ b/net/caif/cfctrl.c
-> > > @@ -15,6 +15,7 @@
-> > >  #include <net/caif/cfctrl.h>
-> > >
-> > >  #define container_obj(layr) container_of(layr, struct cfctrl, serv.l=
-ayer)
-> > > +#define RFM_VOLUME_LEN 20
-> > >  #define UTILITY_NAME_LENGTH 16
-> > >  #define CFPKT_CTRL_PKT_LEN 20
-> > >
-> > > @@ -414,10 +415,11 @@ static int cfctrl_link_setup(struct cfctrl *cfc=
-trl, struct cfpkt *pkt, u8 cmdrsp
-> > >              */
-> > >             linkparam.u.rfm.connid =3D cfpkt_extr_head_u32(pkt);
-> > >             cp =3D (u8 *) linkparam.u.rfm.volume;
-> > > -           for (tmp =3D cfpkt_extr_head_u8(pkt);
-> > > -                cfpkt_more(pkt) && tmp !=3D '\0';
-> > > -                tmp =3D cfpkt_extr_head_u8(pkt))
-> > > +           caif_assert(sizeof(linkparam.u.rfm.volume) >=3D RFM_VOLUM=
-E_LEN);
-> > > +           for(i =3D 0; i < RFM_VOLUME_LEN - 1 && cfpkt_more(pkt); i=
-++) {
-> > > +                   tmp =3D cfpkt_extr_head_u8(pkt);
-> > >                     *cp++ =3D tmp;
-> > > +           }
-> > >             *cp =3D '\0';
-> > >
-> > >             if (CFCTRL_ERR_BIT & cmdrsp)
-> >
-> > I agree that the code suggested by Simon is clearer. Note that AFAICS i=
-t
-> > lacks an additional `tmp!=3D '\0'` check to break the loop, but even wi=
-th
-> > that added it should be preferable.
->
-> Sorry, I left out the `tmp!=3D '\0' check.
-> That was unintentional and I agree it should be there.
+[v1] net: nsh: handle nested NSH headers during GSO
+https://lore.kernel.org/all/6112cce99b4e3571444a616d0fb19e91e2fcca72.1776597598.git.caoruide123@gmail.com
+* [PATCH net 1/1] net: nsh: handle nested NSH headers during GSO
+
+and found the following issue:
+WARNING in nsh_gso_segment
+
+Full report is available here:
+https://ci.syzbot.org/series/13f77bac-014d-4059-9187-fbdbcb6a6540
+
+***
+
+WARNING in nsh_gso_segment
+
+tree:      net
+URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net.git
+base:      0cf004ffb61cd32d140531c3a84afe975f9fc7ea
+arch:      amd64
+compiler:  Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+config:    https://ci.syzbot.org/builds/193058cd-cd88-4bb0-a6e6-b43b6179fcd9/config
+syz repro: https://ci.syzbot.org/findings/446db72d-a630-471c-b369-2ef1f7b3b6ed/syz_repro
+
+------------[ cut here ]------------
+offset != (typeof(skb->mac_header))offset
+WARNING: ./include/linux/skbuff.h:3173 at skb_reset_mac_header include/linux/skbuff.h:3173 [inline], CPU#1: syz.1.20/5978
+WARNING: ./include/linux/skbuff.h:3173 at nsh_gso_segment+0x833/0x12d0 net/nsh/nsh.c:107, CPU#1: syz.1.20/5978
+Modules linked in:
+CPU: 1 UID: 0 PID: 5978 Comm: syz.1.20 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+RIP: 0010:skb_reset_mac_header include/linux/skbuff.h:3173 [inline]
+RIP: 0010:nsh_gso_segment+0x833/0x12d0 net/nsh/nsh.c:107
+Code: 2f 08 00 00 48 8b 7c 24 60 44 89 f6 e8 46 83 e4 fd 48 85 c0 0f 84 20 08 00 00 e8 48 af 31 f6 e9 ab fb ff ff e8 3e af 31 f6 90 <0f> 0b 90 e9 43 fd ff ff e8 30 af 31 f6 90 0f 0b 90 e9 39 fe ff ff
+RSP: 0018:ffffc90004847220 EFLAGS: 00010293
+RAX: ffffffff8b93aeb2 RBX: ffff88817362a6d8 RCX: ffff88810f088000
+RDX: 0000000000000000 RSI: 0000000000010040 RDI: 0000000000010000
+RBP: ffffc90004847390 R08: ffff88810f088000 R09: 0000000000000005
+R10: 0000000000000005 R11: 0000000000000000 R12: 0000000000000000
+R13: 0000000000010040 R14: dffffc0000000000 R15: 0000000000000074
+FS:  00007f28e9ed36c0(0000) GS:ffff8882a9245000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000200000010000 CR3: 0000000170f06000 CR4: 00000000000006f0
+Call Trace:
+ <TASK>
+ skb_mac_gso_segment+0x31c/0x690 net/core/gso.c:53
+ __skb_gso_segment+0x376/0x540 net/core/gso.c:124
+ skb_gso_segment include/net/gso.h:83 [inline]
+ validate_xmit_skb+0xa21/0x14a0 net/core/dev.c:4039
+ validate_xmit_skb_list+0x84/0x120 net/core/dev.c:4089
+ sch_direct_xmit+0xdf/0x4c0 net/sched/sch_generic.c:357
+ __dev_xmit_skb net/core/dev.c:4209 [inline]
+ __dev_queue_xmit+0x180f/0x3950 net/core/dev.c:4831
+ packet_snd net/packet/af_packet.c:3077 [inline]
+ packet_sendmsg+0x3ebc/0x50f0 net/packet/af_packet.c:3109
+ sock_sendmsg_nosec net/socket.c:787 [inline]
+ __sock_sendmsg net/socket.c:802 [inline]
+ __sys_sendto+0x672/0x710 net/socket.c:2265
+ __do_sys_sendto net/socket.c:2272 [inline]
+ __se_sys_sendto net/socket.c:2268 [inline]
+ __x64_sys_sendto+0xde/0x100 net/socket.c:2268
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x15f/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f28e8f9c819
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f28e9ed3028 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
+RAX: ffffffffffffffda RBX: 00007f28e9216090 RCX: 00007f28e8f9c819
+RDX: 00000000000100a6 RSI: 0000200000000180 RDI: 0000000000000005
+RBP: 00007f28e9032c91 R08: 0000200000000140 R09: 0000000000000014
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f28e9216128 R14: 00007f28e9216090 R15: 00007ffd50249d78
+ </TASK>
+
+
+***
+
+If these findings have caused you to resend the series or submit a
+separate fix, please add the following tag to your commit message:
+  Tested-by: syzbot@syzkaller.appspotmail.com
+
+---
+This report is generated by a bot. It may contain errors.
+syzbot ci engineers can be reached at syzkaller@googlegroups.com.
+
+To test a patch for this bug, please reply with `#syz test`
+(should be on a separate line).
+
+The patch should be attached to the email.
+Note: arguments like custom git repos and branches are not supported.
 
