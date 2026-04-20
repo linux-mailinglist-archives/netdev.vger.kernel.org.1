@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-279647-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279649-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cCUzBZmV5WnrlgEAu9opvQ
-	(envelope-from <netdev+bounces-279647-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 04:55:21 +0200
+	id 8GP9DZuV5WnrlgEAu9opvQ
+	(envelope-from <netdev+bounces-279649-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 04:55:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E4F94266D5
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 04:55:20 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C94854266DC
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 04:55:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 61103300BD9D
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 02:55:13 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 0729F3003347
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 02:55:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27DC237EFE1;
-	Mon, 20 Apr 2026 02:55:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE64337E30B;
+	Mon, 20 Apr 2026 02:55:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="IZXfd27q"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="wmMB/PyV"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 986EE379EEF
-	for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 02:55:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EE1337E309
+	for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 02:55:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776653712; cv=none; b=o8tHZHV4/AtA8fSk6U56pYBPsgYmtCBLk7TA8SCoMRh9HCPg16JFln/ed36SGM8j0LO5eiXUrdsVGxQmFGfhjKp9mFzacHh52AkZUgXr/Fqve+ROMtis7SAU/plWXAQs6HFPNwuSbm7DD5jYmClKUW/KN0A/1WjkQIQ06HUb96U=
+	t=1776653720; cv=none; b=kRbU6QlLTdnCmrwgGtucbBVkwkHuk4zSYB3GQNBzDurmyYbVBx54oem3ld0u4M7yHxHQSdTFcZJuU2p3DeSdQSsWIC2Ajqssh2p7rI+s9VQIrjUKmQD6jCoSuJUsUQEKVZl+PWk3PR4BfPVdKwhEgN3TNQveAUe6M9z0GLmBzMg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776653712; c=relaxed/simple;
-	bh=w3BdPvi/Jz4+gcnHj6clAvv6EsW4nU1EWAOTj9aOP1s=;
+	s=arc-20240116; t=1776653720; c=relaxed/simple;
+	bh=W+YhvuHhs0tpeD/R6Thui+aVfpVb/wJM8LJx2eu4Ffw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nTyVnQFQCeUnQcqbZYDsQBMaXw0mlo952GwQW1mqeF+q9jXTsHUgDgBDC7xAOIAzFrCHJSLNfKBGszpUpFlWdZjkBojlv/Y+8nL1Ui+kyJ2jYxbDsaUXr5N1nCTdfOzvo8Ajqczusj3i/7r9j5L5LOMVCVmpcj9faBZB7iX73PE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=IZXfd27q; arc=none smtp.client-ip=95.215.58.189
+	 MIME-Version; b=ZfcgEQTMx05sowYO5yKAumQ3+gLOYQV5julXgREwsUm3QdtHWSK4gk6FI6WYV/3+yFunAJzKfI3xrF3KLm2o3G0ZQ1TPIc6LRUcPJs/aOOrJdGZxHMGL77p5uhnhJHmgIWv7NgLdnWzXyVsjuvkwoIqICEZ5t7HYsLhX375Eb10=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=wmMB/PyV; arc=none smtp.client-ip=95.215.58.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1776653708;
+	t=1776653717;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=SCtCvf3ayKtZjSmTn8PWNgrzYbPuvCHKcbiDdI520S4=;
-	b=IZXfd27qlXE3Xb7O2r6HT7h5fCetFMQImJ4hR5HFlw3q/ZOv6QR6+emOVqIGpXFiGFlRog
-	8+7iuDRR4pwlha8/ZhZsUMN9s9ksFDfwxx9J5yRnkFUHllrNAKpR3m5ntb36sV/ms5SxIZ
-	aDfuUVEw+6gW6GNxJfl3umm5115GeBw=
+	bh=wp8FZznvlQ3LIkoMDFeNKqv6fbtzOk5vOjQ3wvKUWag=;
+	b=wmMB/PyVmIOoQtSfg4u3z1sUPnRt1IG9m3PmxFhbZmpeAYSQk2Eaz/IjQzU1niRXtx/T+q
+	01ucqJMe7QeqwNF83mXLa4hFipj0ped2Ybwae5spy597bc2139w6uNsdKJz7k267AZc45u
+	0h5Dy8ApLfF0o8acel5xKbUg0i3vUT0=
 From: Jiayuan Chen <jiayuan.chen@linux.dev>
 To: netdev@vger.kernel.org
 Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
@@ -59,9 +59,9 @@ Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
 	Shuah Khan <shuah@kernel.org>,
 	linux-kernel@vger.kernel.org,
 	linux-kselftest@vger.kernel.org
-Subject: [PATCH net 1/2] tcp: send a challenge ACK on SEG.ACK > SND.NXT
-Date: Mon, 20 Apr 2026 10:54:08 +0800
-Message-ID: <20260420025428.101192-2-jiayuan.chen@linux.dev>
+Subject: [PATCH net 2/2] selftests/net: packetdrill: cover challenge ACK on SEG.ACK > SND.NXT
+Date: Mon, 20 Apr 2026 10:54:09 +0800
+Message-ID: <20260420025428.101192-3-jiayuan.chen@linux.dev>
 In-Reply-To: <20260420025428.101192-1-jiayuan.chen@linux.dev>
 References: <20260420025428.101192-1-jiayuan.chen@linux.dev>
 Precedence: bulk
@@ -77,13 +77,13 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279647-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-279649-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[13];
@@ -95,71 +95,65 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[linux.dev:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,linux.dev:dkim,linux.dev:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5E4F94266D5
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,linux.dev:dkim,linux.dev:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C94854266DC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-RFC 5961 Section 5.2 validates an incoming segment's ACK value
-against the range [SND.UNA - MAX.SND.WND, SND.NXT] and states:
+Exercise the RFC 5961 Section 5.2 / RFC 793 Section 3.9 requirement
+on the upper edge of the acceptable ACK range, mirroring the existing
+coverage of the SEG.ACK < SND.UNA - MAX.SND.WND case.
 
-  "All incoming segments whose ACK value doesn't satisfy the above
-   condition MUST be discarded and an ACK sent back."
+After the peer ACKs data the receiver has never sent, the receiver
+must respond with <SEQ = SND.NXT, ACK = RCV.NXT, CTL = ACK> and drop
+the offending segment.  The script validates this exact response.
 
-Commit 354e4aa391ed ("tcp: RFC 5961 5.2 Blind Data Injection Attack
-Mitigation") opted Linux into this mitigation and implements the
-challenge ACK on the lower side (SEG.ACK < SND.UNA - MAX.SND.WND),
-but the symmetric upper side (SEG.ACK > SND.NXT) still takes the
-pre-RFC-5961 path and silently returns
-SKB_DROP_REASON_TCP_ACK_UNSENT_DATA, even though RFC 793 Section 3.9
-(now RFC 9293 Section 3.10.7.4) has always required:
-
-  "If the ACK acknowledges something not yet sent (SEG.ACK > SND.NXT)
-   then send an ACK, drop the segment, and return."
-
-Complete the mitigation by sending a challenge ACK on that branch,
-reusing the existing tcp_send_challenge_ack() path which already
-enforces the per-socket RFC 5961 Section 7 rate limit via
-__tcp_oow_rate_limited().  FLAG_NO_CHALLENGE_ACK is honoured for
-symmetry with the lower-edge case.
-
-Fixes: 354e4aa391ed ("tcp: RFC 5961 5.2 Blind Data Injection Attack Mitigation")
 Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
-
 ---
-I'm not sure if 'blamed commit' is appropriate, because I think
-it's due to missing parts of the implementation, or it might be
-directly targeted to net-next.
----
- net/ipv4/tcp_input.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+ .../tcp_rfc5961_ack-beyond-snd-nxt.pkt        | 31 +++++++++++++++++++
+ 1 file changed, 31 insertions(+)
+ create mode 100644 tools/testing/selftests/net/packetdrill/tcp_rfc5961_ack-beyond-snd-nxt.pkt
 
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index 021f745747c5..c2b6f05acdfa 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -4284,11 +4284,15 @@ static int tcp_ack(struct sock *sk, const struct sk_buff *skb, int flag)
- 		goto old_ack;
- 	}
- 
--	/* If the ack includes data we haven't sent yet, discard
--	 * this segment (RFC793 Section 3.9).
-+	/* If the ack includes data we haven't sent yet, drop the
-+	 * segment.  RFC 793 Section 3.9 and RFC 5961 Section 5.2
-+	 * require us to send an ACK back in that case.
- 	 */
--	if (after(ack, tp->snd_nxt))
-+	if (after(ack, tp->snd_nxt)) {
-+		if (!(flag & FLAG_NO_CHALLENGE_ACK))
-+			tcp_send_challenge_ack(sk, false);
- 		return -SKB_DROP_REASON_TCP_ACK_UNSENT_DATA;
-+	}
- 
- 	if (after(ack, prior_snd_una)) {
- 		flag |= FLAG_SND_UNA_ADVANCED;
+diff --git a/tools/testing/selftests/net/packetdrill/tcp_rfc5961_ack-beyond-snd-nxt.pkt b/tools/testing/selftests/net/packetdrill/tcp_rfc5961_ack-beyond-snd-nxt.pkt
+new file mode 100644
+index 000000000000..29d61a98d5ef
+--- /dev/null
++++ b/tools/testing/selftests/net/packetdrill/tcp_rfc5961_ack-beyond-snd-nxt.pkt
+@@ -0,0 +1,31 @@
++// SPDX-License-Identifier: GPL-2.0
++//
++// RFC 5961 Section 5.2 / RFC 793 Section 3.9: when a received
++// segment's SEG.ACK acknowledges data we have never sent
++// (SEG.ACK > SND.NXT), the receiver MUST discard the segment and
++// send a challenge ACK back.
++//
++// Complement the existing mitigation for the symmetric
++// (SEG.ACK < SND.UNA - MAX.SND.WND) case.
++
++`./defaults.sh`
++
++   // Open listener socket
++    0 socket(..., SOCK_STREAM, IPPROTO_TCP) = 3
++   +0 setsockopt(3, SOL_SOCKET, SO_REUSEADDR, [1], 4) = 0
++   +0 bind(3, ..., ...) = 0
++   +0 listen(3, 1) = 0
++
++   // Three-way handshake
++   +0 < S 0:0(0) win 32792 <mss 1000,sackOK,nop,nop,nop,wscale 7>
++   +0 > S. 0:0(0) ack 1 <...>
++ +.1 < . 1:1(0) ack 1 win 257
++   +0 accept(3, ..., ...) = 4
++
++   // Server has sent no data yet: SND.UNA = SND.NXT = 1, RCV.NXT = 1.
++   // Peer sends a pure ACK with SEG.ACK = 2, which is > SND.NXT.
++   +0 < . 1:1(0) ack 2 win 257
++
++   // Expect an immediate challenge ACK:
++   //   <SEQ = SND.NXT = 1, ACK = RCV.NXT = 1, CTL = ACK>
++   +0 > . 1:1(0) ack 1
 -- 
 2.43.0
 
