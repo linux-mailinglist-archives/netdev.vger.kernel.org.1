@@ -1,115 +1,139 @@
-Return-Path: <netdev+bounces-279838-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279842-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MH7hOBhN5ml2ugEAu9opvQ
-	(envelope-from <netdev+bounces-279838-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 17:58:16 +0200
+	id WAXxEHtK5mnSuAEAu9opvQ
+	(envelope-from <netdev+bounces-279842-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 17:47:07 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5994F42EC37
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 17:58:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DB4D42E93B
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 17:47:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2FAC23262228
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 15:07:33 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4E2B13408761
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 15:13:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87CB03DA5C0;
-	Mon, 20 Apr 2026 14:33:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F35E32E137;
+	Mon, 20 Apr 2026 14:56:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="0pRKIpyv"
+	dkim=pass (2048-bit key) header.d=amicon.ru header.i=@amicon.ru header.b="KQJX//ou"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mail.amicon.ru (unknown [77.108.111.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C70283ACA5D;
-	Mon, 20 Apr 2026 14:33:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D50B32D0CC;
+	Mon, 20 Apr 2026 14:56:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=77.108.111.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776695626; cv=none; b=mK9oEgIYzKqxNtM1duj0OtIUB9rd2RkKqhx4X+iWOXXuk84F9M8EMxCfQ6hRDYpSumPz5Cf+4ebhuFCKSQs5FvUg6WrVFKqpAaFAuxFZRG6cWTFhYcZ4cCaU3TVZCLMNEEeDujubDpnJsol/xZqPzJGXb8H3izs1d+PMbYVrt+4=
+	t=1776696972; cv=none; b=Y8skR3CTXbowEkrfClTYA5pNvDjUaCSTq6p3T2epu8enBt0RvJcQg1Yxkgh7b65jPey8Z8GLtBG/0zx0Yp3oj5EFwhwcUj+iZiYtFZSpldf5pbN5+B5/NYk5LKLCjJGittFSpOA8jowWlg/W0F30Nnshf/SePA1VhaNyqgxwUgk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776695626; c=relaxed/simple;
-	bh=5VNt5d/Rj3TQtbF/G929i6xQ263tWkNbpDHl42ZoGPc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=j6sZfWQ5K1cIcEBM7D6p+tVvgMz50muWS3G7QT2Ty+Cp+6nL5jErpPmNye2VdtgdvlHznhiJcppEP/kLiZyFb/I9ekBiadF+wxINXs6Uc1FewU1GoTwceqFhp/GlEqkHN+X7RQjLmIp0yNKGaBAb7JZZZ5ThMMmGokXFRMjZdDQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=0pRKIpyv; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=HJKWn6JSj62WtPK8ZMsBh+npt0ENGYrQyvDCJMS4J+o=; b=0pRKIpyv76Ha6w9TKCNUOG6Dwj
-	1nC9nhFjRtZN+EnXnQBLbh4NxViydJO6a03XKL7s8tsZQpN8ggndCUOlUacR65c7YJRhyozKkzQRx
-	iWtPpbJKCgkaVPsz6Ce19qpvaL0WVyRG2hFcbxjymy/u4UV8ier/y/XNpDRaSSVJUc1g=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wEpgq-00GlJd-4A; Mon, 20 Apr 2026 16:33:32 +0200
-Date: Mon, 20 Apr 2026 16:33:32 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: javen <javen_xu@realsil.com.cn>
-Cc: hkallweit1@gmail.com, nic_swsd@realtek.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC Patch net-next v1 8/9] r8169: move struct ethtool_ops
-Message-ID: <58e35713-1403-48fa-bc49-efc4e9995b0a@lunn.ch>
-References: <20260420021957.1756-1-javen_xu@realsil.com.cn>
- <20260420021957.1756-9-javen_xu@realsil.com.cn>
+	s=arc-20240116; t=1776696972; c=relaxed/simple;
+	bh=W3Ademaxen8c5af2e5ytDiNGEPnepJMp1zk69Ol564E=;
+	h=Content-Type:From:To:CC:Subject:Date:Message-ID:MIME-Version; b=SKTG90Sb2FssGEHjCWWDCApYzZtuRE/5w/bA7gE9cx/Kv1Mh12niMNRJPO5uO4MZPO4ak5nzRAOkKAv0XmtF3KotuIcik+3CpK1AhvJrbT4KoDE3Y3ZLd7T1ZnqHTbxlL7uhwH0G8nJX5JqL7LW2FmxooveCAKkG4eoUsTr9th8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amicon.ru; spf=pass smtp.mailfrom=amicon.ru; dkim=pass (2048-bit key) header.d=amicon.ru header.i=@amicon.ru header.b=KQJX//ou; arc=none smtp.client-ip=77.108.111.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amicon.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amicon.ru
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+DKIM-Signature: v=1; a=rsa-sha256; d=amicon.ru; s=mail; c=simple/simple;
+	t=1776696058; h=from:subject:to:date:message-id;
+	bh=W3Ademaxen8c5af2e5ytDiNGEPnepJMp1zk69Ol564E=;
+	b=KQJX//ouTYPJwVUbewhzHpFEQEjY6gRvu5XJUMBawMfpr9/3qTdo4IGALb593JfeXBxWUhNz+wB
+	9PbhIRKg6I6H9O1Sb1VUSJoRzkuDDTybcYiqZgRzsBgGl9xcXxXvQxtAWCLudU5ZJdWm+XhQQOBQQ
+	PShU88H8t64dwLFYWhJ40WCrkAQ9a5CbVzYIDuu3MvINdk9IZIOX+en8O8/VbtH8F/9ub7CKl6GbA
+	Ur3eEKaTuYr/g00eWQGQ8CCArMSg2Twonky1o8gPPZljGoJjBYpwjd/SKoRfR9Xv8X0MrE2J7ddvx
+	KZclQrrcuRcCoouPIIEYzKtb/+0jFQVHgA6w==
+Received: from example.com (172.16.2.46) by mail.amicon.lan (192.168.0.59)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.27; Mon, 20 Apr
+ 2026 17:40:57 +0300
+From: Agalakov Daniil <ade@amicon.ru>
+To: Jian Shen <shenjian15@huawei.com>
+CC: Agalakov Daniil <ade@amicon.ru>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<lvc-project@linuxtesting.org>, Roman Razov <rrv@amicon.ru>
+Subject: [PATCH net-next] net: hns: use u32 for register offset in RCB TX coalescing
+Date: Mon, 20 Apr 2026 17:40:19 +0300
+Message-ID: <20260420144047.2846673-1-ade@amicon.ru>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260420021957.1756-9-javen_xu@realsil.com.cn>
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-ClientProxiedBy: mail.amicon.lan (192.168.0.59) To mail.amicon.lan
+ (192.168.0.59)
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[amicon.ru,quarantine];
+	R_DKIM_ALLOW(-0.20)[amicon.ru:s=mail];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-279838-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-279842-lists,netdev=lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ade@amicon.ru,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[amicon.ru:+];
+	NEURAL_HAM(-0.00)[-0.979];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,realsil.com.cn:email,lunn.ch:dkim,lunn.ch:mid]
-X-Rspamd-Queue-Id: 5994F42EC37
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[amicon.ru:email,amicon.ru:dkim,amicon.ru:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linuxtesting.org:url]
+X-Rspamd-Queue-Id: 9DB4D42E93B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Apr 20, 2026 at 10:19:56AM +0800, javen wrote:
-> From: Javen Xu <javen_xu@realsil.com.cn>
-> 
-> This patch move struct ethtool_ops, no changes. Prepare for next patch.
+The local variable reg in hns_rcb_get_tx_coalesced_frames() and
+hns_rcb_set_tx_coalesced_frames() holds a register offset passed to
+dsaf_read_dev()/dsaf_write_dev(). Register offsets on this hardware
+are 32-bit values; using u64 was misleading.
 
-Commit messages are all about "Why?". You normally move code because a
-local function is after where it will be called from. I assume your
-next patch is going to add a function which will be listed in the
-ethtool ops, and it calls a function which is currently after the
-ethtool ops. Please name names.
+Change the type to u32, consistent with the hardware.
 
-    Andrew
+Found by Linux Verification Center (linuxtesting.org) with SVACE.
 
+Signed-off-by: Agalakov Daniil <ade@amicon.ru>
 ---
-pw-bot: cr
+ drivers/net/ethernet/hisilicon/hns/hns_dsaf_rcb.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/hisilicon/hns/hns_dsaf_rcb.c b/drivers/net/ethernet/hisilicon/hns/hns_dsaf_rcb.c
+index 635b3a95dd82..3c4e4e8ca140 100644
+--- a/drivers/net/ethernet/hisilicon/hns/hns_dsaf_rcb.c
++++ b/drivers/net/ethernet/hisilicon/hns/hns_dsaf_rcb.c
+@@ -563,7 +563,7 @@ u32 hns_rcb_get_rx_coalesced_frames(
+ u32 hns_rcb_get_tx_coalesced_frames(
+ 	struct rcb_common_cb *rcb_common, u32 port_idx)
+ {
+-	u64 reg;
++	u32 reg;
+ 
+ 	reg = RCB_CFG_PKTLINE_REG + (port_idx + HNS_RCB_TX_PKTLINE_OFFSET) * 4;
+ 	return dsaf_read_dev(rcb_common, reg);
+@@ -634,7 +634,7 @@ int hns_rcb_set_tx_coalesced_frames(
+ {
+ 	u32 old_waterline =
+ 		hns_rcb_get_tx_coalesced_frames(rcb_common, port_idx);
+-	u64 reg;
++	u32 reg;
+ 
+ 	if (coalesced_frames == old_waterline)
+ 		return 0;
+-- 
+2.51.0
+
 
