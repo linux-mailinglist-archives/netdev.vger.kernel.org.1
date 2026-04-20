@@ -1,128 +1,199 @@
-Return-Path: <netdev+bounces-279835-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279836-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WEauCOVD5ml/twEAu9opvQ
-	(envelope-from <netdev+bounces-279835-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 17:19:01 +0200
+	id wMEeFBRZ5mlQvAEAu9opvQ
+	(envelope-from <netdev+bounces-279836-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 18:49:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88A7642E095
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 17:19:00 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE81F430125
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 18:49:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3D12330A0021
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 15:05:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 225BB3417FF7
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 15:05:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E01783A875F;
-	Mon, 20 Apr 2026 14:26:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 832503A9623;
+	Mon, 20 Apr 2026 14:27:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mork.no header.i=@mork.no header.b="eCAl0Tn5"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="cQx3iAWh"
 X-Original-To: netdev@vger.kernel.org
-Received: from dilbert.mork.no (dilbert.mork.no [65.108.154.246])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 604F93A875A;
-	Mon, 20 Apr 2026 14:26:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.108.154.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E26F3A1A5F;
+	Mon, 20 Apr 2026 14:27:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776695188; cv=none; b=r7KN09wPUx4jhCvIWYR1wKphD+wMB6Q2FX195s8ISjR/nB/W1syfiqcAKQC06P9GoF5UOvPVy3KjqZ5JuY5X62caeElNa1Glk3q9lj6gZExJ0rWoCG/tYjHbp0rF8fUK0ePilznH5Za/8IdD1YNjj6xJTVLgkmQJIbhHEtzddqs=
+	t=1776695257; cv=none; b=FNab4GkmlWuc2ZG72qRz6G4+SZAQsBBQEJSmojBpacUB11vWHJkNvHHi7w/HLCxs0hOsELwPmF7ZtVlxD+d2odKE+fuWLV8VQq5a7RcxIpB3jG3wQPHvcXpmckNyAGQfuaLB8xAui9AUJDGduavvb/l9OEp8eWcO3U/Zd9LhiJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776695188; c=relaxed/simple;
-	bh=MXNjwz8DeRWo73w8E0VQYjWQbOWp5j+rveE9IpnRlMo=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=fT0dsBat4oopiK32dvqgzKQDA19AEzFtKzi4EBcuu7c/csFGAyy4ohXe+sV8cFRV3Qxa91fya6thpUS8XKMNkeV0rjXypKygzF7c8j3/KGlASjE2agcnVAn6vGb1pRl8HlOJD1NGzJWgy79aNsajHF/tLjfBWu+uq+xkIi2IdHg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mork.no; spf=pass smtp.mailfrom=miraculix.mork.no; dkim=pass (1024-bit key) header.d=mork.no header.i=@mork.no header.b=eCAl0Tn5; arc=none smtp.client-ip=65.108.154.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mork.no
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=miraculix.mork.no
-Authentication-Results: dilbert.mork.no;
-	dkim=pass (1024-bit key; secure) header.d=mork.no header.i=@mork.no header.a=rsa-sha256 header.s=b header.b=eCAl0Tn5;
-	dkim-atps=neutral
-Received: from canardo.dyn.mork.no ([IPv6:2a01:799:10e2:d900:0:0:0:1])
-	(authenticated bits=0)
-	by dilbert.mork.no (8.18.1/8.18.1) with ESMTPSA id 63KEPKK62792785
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
-	Mon, 20 Apr 2026 15:25:21 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mork.no; s=b;
-	t=1776695120; bh=oslg2wOvWNrDwV3tASfHPGU0tjIxphyCc+dh/D7VjA4=;
-	h=From:To:Cc:Subject:References:Date:Message-ID:From;
-	b=eCAl0Tn5M9fFpQLQw3XCdrgxdMRcI+0wrZlMwsXXRqzm1EVnEp5O+FhUgOkaGDYaM
-	 ZgJF61oYO896LJ/OAYNtUhJUkR6YHWNtq4jgxGWw3/+76CzCNcw5i2VvyK25la+nVR
-	 fmfH5h5CWe49bl/8XkF0l0WjLHheCw+BuEpldsM8=
-Received: from miraculix.mork.no ([IPv6:2a01:799:10e2:d90a:6f50:7559:681d:630c])
-	(authenticated bits=0)
-	by canardo.dyn.mork.no (8.18.1/8.18.1) with ESMTPSA id 63KEPKJV2780929
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
-	Mon, 20 Apr 2026 16:25:20 +0200
-Received: (nullmailer pid 2893984 invoked by uid 1000);
-	Mon, 20 Apr 2026 14:25:20 -0000
-From: =?utf-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>
-To: "Lucien.Jheng" <lucienzx159@gmail.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, ericwouds@gmail.com,
-        frank-w@public-files.de, daniel@makrotopia.org,
-        lucien.jheng@airoha.com, albert-al.lee@airoha.com
-Subject: Re: [PATCH v3] net: phy: air_en8811h: add AN8811HB MCU
- assert/deassert support
-In-Reply-To: <20260420134506.35164-1-lucienzx159@gmail.com> (Lucien Jheng's
-	message of "Mon, 20 Apr 2026 21:45:06 +0800")
-Organization: m
-References: <20260420134506.35164-1-lucienzx159@gmail.com>
-Date: Mon, 20 Apr 2026 16:25:20 +0200
-Message-ID: <87cxztr9nz.fsf@miraculix.mork.no>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1776695257; c=relaxed/simple;
+	bh=7iZB9lVR4tjlUQWISf4C9RaUtnMV6A5tolEZjLKPmq0=;
+	h=Mime-Version:Content-Type:Date:Message-Id:From:To:Subject:Cc:
+	 References:In-Reply-To; b=MusF8iwW64mgnR/q0PuO72hAW3Q32MsJkOWybXfMxHvzTZ4lHctawTF3BdRO5Whykz5riDgFd8/z5MFkiiDKaLg/qTPModZdPX25iOy0Ab6d22JsJNqiZwodo8v1zq85egH/k6uWtIEsWLoiQguTd7294v81oHnib3JqzFn9Zuc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=cQx3iAWh; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 7518B4E42A74;
+	Mon, 20 Apr 2026 14:27:33 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 4520E5FFA5;
+	Mon, 20 Apr 2026 14:27:33 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id D76FA104609E1;
+	Mon, 20 Apr 2026 16:27:19 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1776695251; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=7iZB9lVR4tjlUQWISf4C9RaUtnMV6A5tolEZjLKPmq0=;
+	b=cQx3iAWhs/KPT6ZKsayEJ77QUJ33XBAG/t0wnqcTpu3msayl+KXgWefDzyP6FHZbfakEkZ
+	mUR9idudII95auF9BStFdEyg/ZfrWZJCELMf6aEJ9nJnKcF3lYW4yWiIbwvmeXqGWTpGmf
+	6EF//PlEz9TgQjwnfV7Im08Tdi8PN2MJhTmQrHK3ZcYqVN+h4i1NR1PcJfySN2cwnhClDq
+	928UAmnD/sIgSbP085aDV8aYk/2N8juRaUClIP5Mya/PjkZy+fiJZcnNXxg9mz4R2m4w41
+	IRTL6ZhZmOioqx+JmCYgjuunP3yDG68/rxphRxpBvUN8z7Kr2df9dCBqhog1xw==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-Virus-Scanned: clamav-milter 1.4.3 at canardo.mork.no
-X-Virus-Status: Clean
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset=UTF-8
+Date: Mon, 20 Apr 2026 16:27:19 +0200
+Message-Id: <DHY1WD3EUHEE.2R8PQXVKW6FO4@bootlin.com>
+From: =?utf-8?q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
+To: "Alexei Starovoitov" <alexei.starovoitov@gmail.com>, "Andrey Konovalov"
+ <andreyknvl@gmail.com>
+Subject: Re: [PATCH RFC bpf-next 1/8] kasan: expose generic kasan helpers
+Cc: =?utf-8?q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>, "Alexei
+ Starovoitov" <ast@kernel.org>, "Daniel Borkmann" <daniel@iogearbox.net>,
+ "Andrii Nakryiko" <andrii@kernel.org>, "Martin KaFai Lau"
+ <martin.lau@linux.dev>, "Eduard Zingerman" <eddyz87@gmail.com>, "Kumar
+ Kartikeya Dwivedi" <memxor@gmail.com>, "Song Liu" <song@kernel.org>,
+ "Yonghong Song" <yonghong.song@linux.dev>, "Jiri Olsa" <jolsa@kernel.org>,
+ "John Fastabend" <john.fastabend@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, "David Ahern" <dsahern@kernel.org>, "Thomas
+ Gleixner" <tglx@kernel.org>, "Ingo Molnar" <mingo@redhat.com>, "Borislav
+ Petkov" <bp@alien8.de>, "Dave Hansen" <dave.hansen@linux.intel.com>, "X86
+ ML" <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>, "Shuah Khan"
+ <shuah@kernel.org>, "Maxime Coquelin" <mcoquelin.stm32@gmail.com>,
+ "Alexandre Torgue" <alexandre.torgue@foss.st.com>, "Andrey Ryabinin"
+ <ryabinin.a.a@gmail.com>, "Alexander Potapenko" <glider@google.com>,
+ "Dmitry Vyukov" <dvyukov@google.com>, "Vincenzo Frascino"
+ <vincenzo.frascino@arm.com>, "Andrew Morton" <akpm@linux-foundation.org>,
+ <ebpf@linuxfoundation.org>, "Bastien Curutchet"
+ <bastien.curutchet@bootlin.com>, "Thomas Petazzoni"
+ <thomas.petazzoni@bootlin.com>, "Xu Kuohai" <xukuohai@huawei.com>, "bpf"
+ <bpf@vger.kernel.org>, "LKML" <linux-kernel@vger.kernel.org>, "Network
+ Development" <netdev@vger.kernel.org>, "open list:KERNEL SELFTEST
+ FRAMEWORK" <linux-kselftest@vger.kernel.org>,
+ <linux-stm32@st-md-mailman.stormreply.com>, "linux-arm-kernel"
+ <linux-arm-kernel@lists.infradead.org>, "kasan-dev"
+ <kasan-dev@googlegroups.com>, "linux-mm" <linux-mm@kvack.org>
+X-Mailer: aerc 0.21.0-0-g5549850facc2
+References: <20260413-kasan-v1-0-1a5831230821@bootlin.com>
+ <20260413-kasan-v1-1-1a5831230821@bootlin.com>
+ <CA+fCnZfubV6LgRjO3NQvhrG2Q5o0ftkFFupLWVYS50XDnmCaog@mail.gmail.com>
+ <DHSWK17EZUDP.GIJ6BX2NFR6U@bootlin.com>
+ <CAADnVQLJ=fJ7t1i2+_RYqU1gqYqiLP9Zrwo4vdZsgzjK_yzJTQ@mail.gmail.com>
+ <CA+fCnZd31GzdpEqR8VhfK4JtUKyyRMgbBoAbeGACJgm7WvB6Vw@mail.gmail.com>
+ <CAADnVQKv5y+gq=TnOAEXSqgBRpmHNjwqCfxpLaw5XkcbQ+23bg@mail.gmail.com>
+ <CA+fCnZe-b0Qqbo5gGv3HN20twquQETDfYYkE1r9tPr9zUFbW9Q@mail.gmail.com>
+ <CAADnVQKuptG_opA12O=Xb9_+cHf3f=ycAZdfUp17P2HBYQzdsg@mail.gmail.com>
+In-Reply-To: <CAADnVQKuptG_opA12O=Xb9_+cHf3f=ycAZdfUp17P2HBYQzdsg@mail.gmail.com>
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[mork.no,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[mork.no:s=b];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,public-files.de,makrotopia.org,airoha.com];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-279835-lists,netdev=lfdr.de];
-	HAS_ORG_HEADER(0.00)[];
+	TAGGED_FROM(0.00)[bounces-279836-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[mork.no:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[bootlin.com,kernel.org,iogearbox.net,linux.dev,gmail.com,davemloft.net,redhat.com,alien8.de,linux.intel.com,zytor.com,foss.st.com,google.com,arm.com,linux-foundation.org,linuxfoundation.org,huawei.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org,googlegroups.com,kvack.org];
+	RCPT_COUNT_TWELVE(0.00)[41];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bjorn@mork.no,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alexis.lothore@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 88A7642E095
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,bootlin.com:mid,bootlin.com:dkim,bootlin.com:url]
+X-Rspamd-Queue-Id: AE81F430125
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-"Lucien.Jheng" <lucienzx159@gmail.com> writes:
+On Mon Apr 20, 2026 at 12:51 AM CEST, Alexei Starovoitov wrote:
+> On Sun, Apr 19, 2026 at 2:49=E2=80=AFPM Andrey Konovalov <andreyknvl@gmai=
+l.com> wrote:
+>>
+>> On Tue, Apr 14, 2026 at 5:58=E2=80=AFPM Alexei Starovoitov
+>> <alexei.starovoitov@gmail.com> wrote:
+>> >
+>> > I think we're talking past each other.
+>> > We're not interested in KASAN_SW_TAGS or KASAN_HW_TAGS.
+>> > We're not going to modify arm64 JIT at all.
+>> >
+>> > This is purely KASAN_GENRIC and only on x86-64.
+>> > JIT will emit exactly what compilers emit for generic
+>> > which is __asan_load/store. This is as stable ABI as it can get
+>> > and we don't want to deviate from it.
+>>
+>> OK, I supposed that's fair. You did throw me off point with your
+>> performance comment. But if you decide to add SW_TAGS support at some
+>> point, I think this discussion needs to be revisited.
+>>
+>> But please add a comment saying that those functions are only exposed
+>> for BPF JIT and they are not supposed to be used by other parts of the
+>> kernel. And in case you do end up adding a new config option, guard
+>> the public declarations by a corresponding ifdef.
+>
+> I feel concerns of misuse are overblown.
+> Being in include/linux/kasan.h doesn't make them free-for-all
+> all of a sudden, but if you prefer we can just copy paste:
+> +void __asan_load1(void *p);
+> +void __asan_store1(void *p);
+> into bpf_jit_comp.c
 
-> AN8811HB needs a MCU soft-reset cycle before firmware loading begins.
+That's actually what I initially went with when working on this, but it
+did look a bit fragile, and suspected that I would rather be asked to expor=
+t
+them properly through a dedicated header. I'm fine with putting back the
+manual declarations in jit comp, though.
 
-Sorry for having missed that.  I assume it explains a rare issue I've
-observed where a link down/up sometimes was necessary after a cold boot.
-I've been running with your v2 patch for a while, and cannot reproduce
-this issue anymore.
+>
+>> > The goal here is to find bugs in the verifier.
+>> > If something got past it, that shouldn't have,
+>> > kasan generic on x86-64 is enough.
+>>
+>> FWIW, I suspect HW_TAGS KASAN already just works with JITed BPF code.
+>
+> Ohh. Good point. Looks like modern arm64 cpus in public clouds
+> don't have that enabled, so one would need pixel phone to
+> catch verifier bugs via hw_tags.
+> So we still need this x86-specific jit kasan.
+> I guess eventually it can be removed when hw_tags support is widespread.
 
-Tested-by: Bj=C3=B8rn Mork <bjorn@mork.no>
+
+
+
+--=20
+Alexis Lothor=C3=A9, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
+
 
