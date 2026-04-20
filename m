@@ -1,251 +1,204 @@
-Return-Path: <netdev+bounces-279895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279896-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sON1AKBv5mmBwAEAu9opvQ
-	(envelope-from <netdev+bounces-279895-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 20:25:36 +0200
+	id gC4eMyBy5mlgwgEAu9opvQ
+	(envelope-from <netdev+bounces-279896-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 20:36:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66ADB432CD9
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 20:25:35 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2890432EF3
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 20:36:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9EC0C300AC3D
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 18:25:19 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 939163002B68
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 18:26:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C30B3A7F41;
-	Mon, 20 Apr 2026 18:25:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBB783AE1AF;
+	Mon, 20 Apr 2026 18:26:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="XTQFDTIQ"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="cm24McTT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CY7PR03CU001.outbound.protection.outlook.com (mail-westcentralusazon11010020.outbound.protection.outlook.com [40.93.198.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C60113A875C
-	for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 18:25:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B8573A7F41
+	for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 18:26:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.198.20
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776709517; cv=pass; b=lJ13gLYh3mMm0yMxnxdO8S4W/amLy/0o2T7nf7z+sQvmHYNjqNPNvZx0C22rJeu8CVQ5Si4bmMltNaj6D1rWr4EE3u0s62iDCacfbq+lydRwS+xnn1Yel3JwZYtIrnZbupZyZb7tFIjE4jj5g8DJuVivy07biyDENJ7ApPeC1lg=
+	t=1776709616; cv=fail; b=Ds8IodRWt1Fm3TtsNRPQbBwipXeae0JhikB20/k4+nQNQiioLu56K73oK0/0FCe+zdOiMrsMVwwLeLCJBQwZ1UOYDOFqDIIwHG/JMyxpa5R8rtfsRi+DSDICtoBZN/zJOtjjol5EF7k+8mt8Ai3PP6Ya4veOW3u9Ce9L9LezTvk=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776709517; c=relaxed/simple;
-	bh=oxZPjGLVDhKaoxyys+5R9s2592VJu6PeQN2sS3Vxxtk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LlJw42CpRyNCG4lXfM74WW6BAQhVXYxuCE+4ugLvRMYah+NoNAk4P44suRxRskI3GgYQAzK+KtELSF4yoJZ6umJQusWXCKsRpFvO5/2wgYN9dNq+9Ro8ninzkY5PZ5SeSj0QglpwrhPOpj+gYAvTZv69TCEM6o9m0Y1hRjPJNvs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=XTQFDTIQ; arc=pass smtp.client-ip=209.85.167.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=herbertland.com
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-5a40b2bc96dso4162052e87.3
-        for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 11:25:15 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776709514; cv=none;
-        d=google.com; s=arc-20240605;
-        b=YbLHJnHdkpSOTHsOZvycKr8L5gnF26hh/v6wCMVMOzaqPhESbPKqnBvOFhwqCYm1WF
-         NKRnTAzFf68Sdpo7plh8Zl/CDVkIMtkE5hXvJpz5DhrOcdE3saikj9AoOWKNSvcZoNcd
-         2u0lF3wFdztipSBoZf516wLlDlPQwirxLMx4muTTtxEYswcOtxBbrEA3PyHINq+ScvTA
-         8F9+WjcvHsxZenNpImUKExkdzO4ecqsJRWpo8k3P7nfI114t5OzzgcpVvTUdXaMGbgVI
-         W/w3wvOjehhSEFe7aZS96uTmJm1xHBHtJvj1yv88jEQFO31JtYc19c0lvRM0KT/mfzxi
-         xHgQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=OtMRuRL7lX8YXL4zldb2SG1xf6d/lUejkE0wC1TYBmI=;
-        fh=akcQenVqQyqN8dDIGKO75rBMNjbDAJOrC4OZSF+bT0M=;
-        b=XseHyVPCGIOUyGAtx1OO9ytGrt3geoFwevGIk8xyvnbRiGOWRMGrfBUWRz6sd6TcFR
-         k8qGEtblZTfdMGFC5UAQMMCvB1DUQqjM8Y32/AI1lPhdGCW5kbFz8wyrE4q/Ru2cNY0w
-         9Gq9LBXSF2b5KeUCRuDCKD1Kb5y59MqVvX8seaQRXpYuhAF4AAwvUfaIbugn+TR8k4zh
-         6DW5YX200DarK9DBjkgWV2/jOmmUxx4ShCAkx8JFVAyxN8bF5y11c49FWxA2zX2qyRHA
-         iVUzQmvM3axYd2kvr/4N7lrJc591z7cQQq24F4SG3QQ2dgA/OSl0CE1pm4+3cEVRZpxP
-         rjng==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=herbertland.com; s=google; t=1776709514; x=1777314314; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OtMRuRL7lX8YXL4zldb2SG1xf6d/lUejkE0wC1TYBmI=;
-        b=XTQFDTIQQI1aqsxcnCNt30nHUv7EEnu6aFIGE/rBDqpSiJSzEkjkBbElWHzLBr87uG
-         tmnp/T9b//GamGw/+p8Gz1wXjL04jjVMLAmsJkhEDIG90KrvNoP/xswGC+iHr5Wxcxse
-         dLA26KugcX70EbOd6JGcbPJWO+U1oH98bVOF9ekmTt3vlSZ58PS/M9cZy3PTxbfyo9A3
-         C4M8fd4EOYJ4MBEGOx0wfBlCrfgMWvSm4ZLFyn7vcdLNT/ecUvZC/XuoVIOyYW2VgWYN
-         H49vIHJJ+6KrGYe/EazfBsZFWZG5S5xRv+faew7v0Dq1ec+7ZArMCDApCxglMW5EUPbX
-         axGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776709514; x=1777314314;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=OtMRuRL7lX8YXL4zldb2SG1xf6d/lUejkE0wC1TYBmI=;
-        b=HjGs0qBHZS7u7mDcEECuSceZm2KJyYqkzFv3tEagiMjVhtWeAnIS40hQwNaFhTkSL2
-         QX4ATsHt4FcRFHHgowhicFsu3QX8G9XRLRipFYsYg5unk/PIhqtVT4nIGtuWp2oDwOu+
-         Gk9narRPdt1pxy6fsewOZ9oAHxBHo1cfxF5yx3hsTOi8CuWqPRbV/4UV2mugjApgwFFB
-         YduY41jC02X3FBHhozPekvCt82D278KIX9IiXlxLRLtB6TpVzfWAnA47kRIhe8nH995Y
-         /j3iduEgzi1oSOZgZMMGd1JIAqkN4eNG+pesxp+RJNIax9mFEGXetPsmGJNwqT5eyNgw
-         k9hw==
-X-Gm-Message-State: AOJu0YyP3ECVzEHm31avaS+QYKs2VaD/bsyj1/WiFA/smq2MC+ZUPQY3
-	KcLSsOPNgEexvMnOU/gxI25M3Olsrrr9oNOuloIGC9Ka5kwPYmO7h8uObN54KuHYG0zJ22Zjj3J
-	PYi1Q4pbExICQc+hkdqiVIpCy3lHHBU2qb33dXwy7h395ZY7r5gbSow==
-X-Gm-Gg: AeBDievYXjGZpfohg06auyHoHkpMHLonly3/bqYyKajW9OBrvXSwecY/F1bZkv7OuS9
-	YPQGXi9ntPIfWV5e0VbRkxHS0L88E+Vt1FzAAnBDEQL6lB3YAnfEZPNS9BgwPwsGgUqxGAvywpT
-	U09xcSMF82RkNSfOCEfTX8zzDEaml1ZY31QV5hSS099RTJQKhz6yFOTDi9Dg+ZM02ZI9jUDQet0
-	Jtm4DJ/YXH0og7ekPs6C8arQvGo+ZwbFBohjh0PggdMduFeW/mMtz6ozGst0jmTTsGzTwdTLnUQ
-	4kPz/4A1b/Mws0WDtzdoohbg0RhR89JgC3YP8BW3VP3vVNPqLI+i8PndoqZZgeGe//ut0YylDIL
-	9ECXfc/I=
-X-Received: by 2002:a05:6512:3b2b:b0:5a2:bc5d:c675 with SMTP id
- 2adb3069b0e04-5a4172dcd63mr4332615e87.28.1776709513935; Mon, 20 Apr 2026
- 11:25:13 -0700 (PDT)
+	s=arc-20240116; t=1776709616; c=relaxed/simple;
+	bh=+fcOM0aLTEDWjJ5hsLtzlk/ciuzgAPG3VQjlx1jsW80=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=cahFtYNN+h88NzScnO2Ulbyg1T5I+CcYtnf2G3iR64jaLQOBDJJ4QySRZd40buareIBtjYfA0BPQJbziieykUoP1L67XPbJe9M1J3ez/CbnqnlF+jZlOvyoV81PL81dxTjiI36AIVvmcA4JwStcc4uQ0iUe+EmhRAFkUsCKqrN0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=cm24McTT; arc=fail smtp.client-ip=40.93.198.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=cBARyo4ZwY2cyH2K74ArDfJqkXrjM33uexRfK7aGdRz3yQaRr9Gfqyu0zg+UPgFRiTL8tJD1kbqEMVCw42e011uiRnDh/ShdpFo1c/+v8qf7Tuig3R1c3yVykh7pB6QtnALUIE+87YhlTtkizBD7j5us+zYXQmWbGstenLuN/Z06KwOAnqZXWh4nqm6Vd9xPfBUv0cLIRbiAJ5c+sBud+fZTD97r77lHp7IE/wO3aRVhrjwCLlYRGM7DyKQWCA+KECWBs9nSM8HSo/36ZKlHr+N+tKU1CaoQKomEy0AxVyDwfCIILmf/OmdDdrb1RK2DH+xgFAJ/3uETWoxLy+wnKg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=UkM1Wkjvv+Pp8SI1tns72BQUZiHxusSDJaqSL+G7l8Q=;
+ b=jeUn8ymuFVJ7ThabVFTvMQ1eTe8DBOfn4a/nyjJY1H9IceXI/+TdujWIWpEokVWY8EDkMJXBs/6pd2KD86FyAU5fOgxDe+z/VrHOl6FMyNLYDS038LILS7DovXLm6Sspx3GfAVFSvIWBU2f+5icq9KqQZN1DPusc4Q4utcwF0Y1Zxe0gQ2jBef2IDjgrzfg90CI3hBfYNZ3TD92TtnHfjtWC9yiVoYM4uDQJRrMF1TeE49KErMzgxlsIHCzPpQBg/TCOKLZ9uuouzphXkeHcnv6+3Yak8ReKwJiCeDTu8UTwFfBwvI2+7NQLvNA+qDJxwudM5NKhdQo6+oCX/Qc0Fw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UkM1Wkjvv+Pp8SI1tns72BQUZiHxusSDJaqSL+G7l8Q=;
+ b=cm24McTT81qMCMWzOkpI0XZ+qvYl2XRFtFQAwDgsq+1keURDH2MwtsiF3bLNrZSHoZB5yJdwZxBADaoqh9ZEwdGyocWVFBuAzCvVa9ZXgxeL9aXj+nkkFaYOtuSHYlI5Ua3ztqLhc9JsJ4oZ6xdb74n++ECb5TeY709V4b5HcMVfj90oll7hmm6K4sbBSC7iR4RDuDQCk05PIR7eUj2J62nBZ30zlCVDEjwggQjz5FSFEVnpMTsCNZRxQlVvp76vy9HdYt4f4aAFU0do6inAkOnz+eJpAKBz1mNZgjUpsK77zjqQ6agvZu1+TbH6hKmGk1tnztHDxmFdIxN4XlKypQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
+ by CH3PR12MB7524.namprd12.prod.outlook.com (2603:10b6:610:146::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9846.15; Mon, 20 Apr
+ 2026 18:26:50 +0000
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2]) by SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2%6]) with mapi id 15.20.9846.014; Mon, 20 Apr 2026
+ 18:26:50 +0000
+Date: Mon, 20 Apr 2026 21:26:40 +0300
+From: Ido Schimmel <idosch@nvidia.com>
+To: Ren Wei <n05ec@lzu.edu.cn>
+Cc: netdev@vger.kernel.org, idosch@mellanox.com, dsahern@kernel.org,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, jiri@resnulli.us,
+	yifanwucs@gmail.com, tomapufckgml@gmail.com, yuantan098@gmail.com,
+	bird@lzu.edu.cn, royenheart@gmail.com
+Subject: Re: [PATCH net v3 1/1] net: l3mdev: Reject non-L3 uppers in slave
+ helpers
+Message-ID: <20260420182640.GA1027405@shredder>
+References: <20260419145332.3988923-1-n05ec@lzu.edu.cn>
+ <20260420113208.GA972415@shredder>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260420113208.GA972415@shredder>
+X-ClientProxiedBy: TL0P290CA0002.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:5::10) To SA3PR12MB7901.namprd12.prod.outlook.com
+ (2603:10b6:806:306::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260314175124.47010-10-tom@herbertland.com> <20260317152456.1742468-3-horms@kernel.org>
-In-Reply-To: <20260317152456.1742468-3-horms@kernel.org>
-From: Tom Herbert <tom@herbertland.com>
-Date: Mon, 20 Apr 2026 11:25:02 -0700
-X-Gm-Features: AQROBzB3pjeE-Rs5d8EZeie30Y3l4tSm-cYStdgGKX0TNInIbdlYEH3A7O7z4AE
-Message-ID: <CALx6S36TUctuC_oftBV3nUPMXkCdsBHjpJC+gtx+iuQ0R93CDw@mail.gmail.com>
-Subject: Re: [net-next,v9,09/10] test: Add ext_hdr.py in networking selftests
-To: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, justin.iurman@uliege.be, 
-	willemdebruijn.kernel@gmail.com, pabeni@redhat.com, willemb@google.com, 
-	davem@davemloft.net, kuba@kernel.org, justin.iurman@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[herbertland.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[herbertland.com:s=google];
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|CH3PR12MB7524:EE_
+X-MS-Office365-Filtering-Correlation-Id: e638fbec-26b9-4b90-137a-08de9f0a633f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|366016|1800799024|22082099003|18002099003|56012099003;
+X-Microsoft-Antispam-Message-Info:
+	X7pxr1C34XBap03dXU2gDXgHN7EH5u9x7O8zoG0fhtR7s32TOR+Dg58LifWqyTwVr7KgEwx7MxTqkX27RCNufdmClreQP0dAi1qWjW04u5M7m8ieU2yv/D7ljhtQicrEmnwWJB+0JImGWVNjuhR4L6kevz4S4OzuRXXoKHW5YpZ1FtwU/QmdhxYLLwUO6+sxPOCDuvjzcdVClytw0o7DUWkruBTSbXbM+voR0BIlaDKciIyIfm79m2/h1mxjNeO+mmFGgLkYpxJI5381uDkEcxQ7WyMWXtPEt3ko0+Ah52B3JkrYTGvizd5weFQp7gypI6z5UKuG7tzj1l8zsbrt7cIb6voGSbFzOokBZ78v1c/mOpnPWsufVTCaWE00NZRJgAYZ8I79QiCGeGytqcV6dhgTi6p2RsByWsdIypciAKi0xGUk4E4c7aFhZVaYKI7fCM3LqjC4jOVP2YY21elY6ePdjsVXLw72AYJZ6EfQ649Wt+e0Xf3pbB55IGSBxJYDaUDMP4iUuRHTJZUT/7nJC/u2V63EFxlzhvxEKRsgdiRtCs1NH4NvPYK+PTT9ByrJK7GHzsaR3QbA9GihAS/Ds4cVHZ0GgrJPclDzKMaodcrWgj0MChgd61NgNeD1GBXxS0hnZ9mYBBJiprjGbQ8vbk9W4zASolOm8/RvnWKbSYx9xxSfVGgmKvlSN6G22oN9gtoqJiYOCtC/Fg01xhhIGBxKn6Jt75mpvj+d8nH7Xrg=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?VqYn/E0KFbb0EnpOWT+fqqUp6cT8BB0DlEO9csOv7AcUlb2ydeTwHVSq16eW?=
+ =?us-ascii?Q?ByrHJ4vmC/T5SUh9T9U4EPtik4s7XHToZ2rEN2x1Tr4lAj1a3FHOhYsULepR?=
+ =?us-ascii?Q?mSW3zNM8PaxDuTwZgQXeHE6NMu+vPm5L2Scx/596jLvJB6/KRSeAFQpBsY2X?=
+ =?us-ascii?Q?8lZOWZbkgHOFJgb3vW6yeSH1CzDb4JSrllAJYKoaa4Rdjqlv7eJ++CP434Uw?=
+ =?us-ascii?Q?LToxey7hqodnt999IwPk2W1PRsh4Te2Ov+XMaux1xSwG8YOwU7OCZUZ2uEfV?=
+ =?us-ascii?Q?ld0KfRqSzHn+KauxlZPwgDzuQfUZLKHNnDWOahRwHHsIgoE/qc58++Q+zQj/?=
+ =?us-ascii?Q?vIyWj9Wa7iH70Dl/7eXh69ZB9IxOqABpRR9JI0b6i+rQOYIycyZAnP6HSX+S?=
+ =?us-ascii?Q?e/5kRXsIHO3AhqY6yw96dtTESgvpFrN78Sl/KfOIbNaO24vmYALl17uSyP4Q?=
+ =?us-ascii?Q?KT41n2nx60ukgI8haQONG2YEyqahOZs33sICZeOEzoGhQNq8UxgdaODTUgdj?=
+ =?us-ascii?Q?RADC3/GaD8KVa5s8VrfdYLIvOAPtIdcVrnA7ZnBK+TidkbvShF6h/7kGUbz7?=
+ =?us-ascii?Q?vG6NPaiLmQiTHiuKunI0moqEIK5w/FnSdUOKYOIB8uPVdJba0RRMWvQrAG/9?=
+ =?us-ascii?Q?OokMgWQ9obcGTJa6S3g/xroxT1SM4UKwysBSMN0FIgYFcWTLTXDNZe/Jk4r0?=
+ =?us-ascii?Q?hNofgtGNfbMfZef+vJ7Jl9uI3FGMaRW8IE3tk4c6WS25pvHiRVYH/Ce6FsBu?=
+ =?us-ascii?Q?pubNn9AX0jaXdunJfEWN9nk6+j780OirdyDyMok5uUUUUmlQ3xripY++gl1g?=
+ =?us-ascii?Q?1n8qHK53biWT5bOExw06Nz1rL7LPpXS1FkYgZjGeNPSCVS+oDV8+8TmTZIQW?=
+ =?us-ascii?Q?NI2mgXqAXqp6Gf9kg9CH6t1ZY/mf5GNQ2dIhbzqbpOKQAJ48uvYVGkqKcr8R?=
+ =?us-ascii?Q?OiTqhBeFGyQyddlP44yus7cZ/to0DxC7GX93q9YGcTIQVKekm4fLuo5GEM2Y?=
+ =?us-ascii?Q?9gvZGWqGinLuFIC4TF50sz0fYsd3pNOx8ZDCdkVAbpfFLsbVcaud9vOJ2iRS?=
+ =?us-ascii?Q?hDHDb1qyju+azNPBpyRDLPIFI/Ilq99JXca3iJJY6ChDDe3dXhulXCh2g7RI?=
+ =?us-ascii?Q?6WMFpcHrHlUkfF43oE9OQSNDEVU6b6rovs7a1qzWykH/XNT0UbLf0bTQtXf9?=
+ =?us-ascii?Q?Tv2vIyUaF8rWG8m5E0drqG93tM6n8UNhQgd72i8C4a6wuiwZgRydqhqKDh5b?=
+ =?us-ascii?Q?utQhbVJq0cNJUYyno0lmAgkhACbBbISFJ8CBzyBLaeNz+1lxGoR+T7zdoTr0?=
+ =?us-ascii?Q?WLSeq+2VVJAb8ZzvDf44sMeYGEe+hamwbuGZjzg7AtB8gYXUPbzvgvi1vIMT?=
+ =?us-ascii?Q?kxwITcDb9tbgsj5nP3KaWKuEnJ0ae+8NNLi2wmS13OUTD2T7t2xeC3Vnl7Ux?=
+ =?us-ascii?Q?uCCBiWVxiitUIOh7DkeM0wRcVCWBx1BuCOQ5bwYkE972g4/mONscrvwuN5XZ?=
+ =?us-ascii?Q?hbGHmOas4VR/GwSqnY9kMzcdJSa12jCmfn/UevDSyTXefbhWFNxWt8w+C53Z?=
+ =?us-ascii?Q?bw8Xw5IRkaieHTjC5IH9GHserrDsa2bo9xG49RPJdbWN37t3C0PyDp+WQeH7?=
+ =?us-ascii?Q?/9Ic16y96pm5RKcdoTarzQdra4q/mffSIY6XIc70IFepuUIlrTRiXZHIcB5N?=
+ =?us-ascii?Q?aU9am/R6DBF6v1jKJqYYgvx703yGuG8p43OgfzlvshMPFO+bBH1W3ZDmsUgs?=
+ =?us-ascii?Q?eWsjXfvCHA=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e638fbec-26b9-4b90-137a-08de9f0a633f
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Apr 2026 18:26:49.9130
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: HdonnNtkVlvfFYgsi+qziTt//lF7Be3/apNC9pX/FvH3FyvusgUHhzvPONEj3+f1ENappcaHaeWhnRowoLdweQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB7524
+X-Spamd-Result: default: False [0.34 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-279896-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,uliege.be,gmail.com,redhat.com,google.com,davemloft.net,kernel.org];
-	TAGGED_FROM(0.00)[bounces-279895-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[vger.kernel.org,mellanox.com,kernel.org,davemloft.net,google.com,redhat.com,resnulli.us,gmail.com,lzu.edu.cn];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tom@herbertland.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[herbertland.com:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:url,mail.gmail.com:mid,herbertland.com:dkim,ext_hdr.py:url,shlex.split:url]
-X-Rspamd-Queue-Id: 66ADB432CD9
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,Nvidia.com:dkim,lzu.edu.cn:email]
+X-Rspamd-Queue-Id: D2890432EF3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Mar 17, 2026 at 8:26=E2=80=AFAM Simon Horman <horms@kernel.org> wro=
-te:
->
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
->
-> For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-loca=
-l.html
->
-> Simon says: pylint also has quite a lot to say about this patch. I'm
-> assuming it is all minor stuff. But could you look into addressing the
-> issues it flags?
+On Mon, Apr 20, 2026 at 02:32:08PM +0300, Ido Schimmel wrote:
+> On Sun, Apr 19, 2026 at 10:53:32PM +0800, Ren Wei wrote:
+> > From: Haoze Xie <royenheart@gmail.com>
+> > 
+> > Several l3mdev slave-side helpers resolve an upper device and then use
+> > l3mdev_ops without first proving that the resolved device is still a
+> > valid L3 master.
+> > 
+> > During slave transition, an RCU reader can transiently observe an upper
+> > that is not an L3 master. Guard the affected slave-resolved paths by
+> > requiring the resolved upper to still be an L3 master before using
+> > l3mdev_ops, while keeping existing L3 RX handler providers intact.
+> > 
+> > Fixes: fdeea7be88b1 ("net: vrf: Set slave's private flag before linking")
+> > Cc: stable@kernel.org
+> > Reported-by: Yifan Wu <yifanwucs@gmail.com>
+> > Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+> > Co-developed-by: Yuan Tan <yuantan098@gmail.com>
+> > Signed-off-by: Yuan Tan <yuantan098@gmail.com>
+> > Suggested-by: Xin Liu <bird@lzu.edu.cn>
+> > Tested-by: Haoze Xie <royenheart@gmail.com>
+> > Signed-off-by: Haoze Xie <royenheart@gmail.com>
+> > Signed-off-by: Ao Zhou <n05ec@lzu.edu.cn>
+> 
+> I think it's fine for net:
+> 
+> Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 
-Yes, it's all minor and score is good.
-
->
-> ---
-> test: Add ext_hdr.py in networking selftests
->
-> This commit adds a new Python helper file that contains Extension Header
-> format definitions and related functions for building IPv6 extension
-> header chains in networking selftests.
->
-> > diff --git a/tools/testing/selftests/net/ext_hdr.py b/tools/testing/sel=
-ftests/net/ext_hdr.py
-> > new file mode 100755
-> > index 000000000000..bfb7da4a7c88
-> > --- /dev/null
-> > +++ b/tools/testing/selftests/net/ext_hdr.py
-> > @@ -0,0 +1,385 @@
-> > +#!/usr/bin/env python3
-> > +# SPDX-License-Identifier: GPL-2.0
-> > +
-> > +# Helper functions for creating extension headers using scapy
-> > +
-> > +import ctypes
-> > +import shlex
-> > +import socket
-> > +import sys
-> > +import subprocess
-> > +import scapy
-> > +import proto_nums
-> > +
-> > +
-> > +# Read a sysctl
-> > +def sysctl_read(name):
-> > +    try:
-> > +        # shlex.split helps handle arguments correctly
-> > +        command =3D shlex.split(f"sysctl -n {name}")
-> > +        # Use check=3DTrue to raise an exception if the command fails
-> > +        result =3D subprocess.run(command, check=3DTrue,
-> > +                    capture_output=3DTrue, text=3DTrue)
-> > +        value =3D result.stdout.strip()
-> > +    except subprocess.CalledProcessError as ex:
-> > +        print(f"Error reading sysctl: {ex.stderr}")
-> > +    except FileNotFoundError:
-> > +        print("The 'sysctl' command was not found. "
-> > +              "Check your system's PATH.")
-> > +
-> > +    return int(value)
->
-> What happens when an exception is caught here? When either
-> subprocess.CalledProcessError or FileNotFoundError occurs, the exception
-> handlers print an error message but don't set 'value'. The function then
-> reaches the 'return int(value)' statement, which will raise
-> UnboundLocalError.
->
-> This will crash the test in several places:
->
-> tools/testing/selftests/net/ext_hdr.py:check_eh_order() uses the return:
->     do_check =3D sysctl_read("net.ipv6.enforce_ext_hdr_order")
->
-> tools/testing/selftests/net/ext_hdr.py:make_eh_chain() uses the return:
->     pair =3D make_full_hbh_dst_options_list(nnext_hdr, args,
->         sysctl_read("net.ipv6.max_hbh_opts_number"),
->         sysctl_read("net.ipv6.max_hbh_length"))
->
-> and:
->     pair =3D make_full_hbh_dst_options_list(nnext_hdr, args,
->         sysctl_read("net.ipv6.max_dst_opts_number"),
->         sysctl_read("net.ipv6.max_dst_opts_length"))
->
-> Should the exception handlers return a default value or re-raise to let
-> callers handle it?
->
-> > +
-> > +# Common definitions for Destination and Hop-by-Hop options
->
-> [ ... ]
->
-> Should ext_hdr.py be added to TEST_FILES in the Makefile? The selftests
-> build system documentation requires that any file imported by test script=
-s
-> must be added to TEST_FILES. Without this, tests will work in the source
-> tree but fail after 'make install' with ModuleNotFoundError.
-
-Yes, I will add missing files
-
->
-> The file is imported at line 12 ('import proto_nums'), and appears to be
-> a library meant for import rather than direct execution. Both ext_hdr.py
-> and proto_nums.py need to be added to TEST_FILES in
-> tools/testing/selftests/net/Makefile.
-
-Yes, will do
+Thought about this again. I would like to check another approach
+(synchronize_net() after clearing IFF_L3MDEV_SLAVE). Will update
+tomorrow.
 
