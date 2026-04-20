@@ -1,68 +1,68 @@
-Return-Path: <netdev+bounces-279801-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279802-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6DK3N0495mlutgEAu9opvQ
-	(envelope-from <netdev+bounces-279801-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 16:50:54 +0200
+	id gDzaNlJO5mkgugEAu9opvQ
+	(envelope-from <netdev+bounces-279802-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 18:03:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC05142D895
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 16:50:53 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41FF242EE4D
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 18:03:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 0660C308D60C
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 14:16:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 34E38322ACED
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 14:16:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5CA244D695;
-	Mon, 20 Apr 2026 13:30:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EC7044E05A;
+	Mon, 20 Apr 2026 13:30:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aNmb1DSE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NC1NljNk"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91E8044D686;
-	Mon, 20 Apr 2026 13:30:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07C3144E051;
+	Mon, 20 Apr 2026 13:30:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776691821; cv=none; b=q34MKhrUm1rrxalfOg2dbg/9VtsPaEwJ3uetH8ex03/Uv18J/rUaEEWnJ4suBnSsW5aagAVLqaZ+r/oFI0fa1ZonhZ6JuAfxLUVp+2X6/IsrQCuVo9Ds4xVjxiX/Txgo5nL8OeA02GIk7iIWCqxQZqfAf/Cg7sl+c/Tyr4S4l/k=
+	t=1776691825; cv=none; b=N4Kf9uezsOR8CCDkAWgZEkRIDMDBi5I6GH8zdnL3M3+hIZrBW/yzkwKluIZpC5H0MvBjBQtkLr4vKhYnMU+6IGJFb+kw+Tt24lxqM22Uo/B3EX/Vfn6qBlBNb8AEjk03YlU4KldzftmEtHa1qSNN6iUtt4A5FQ5TA6RlvEaDwTc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776691821; c=relaxed/simple;
-	bh=2KKVT61x7r0VNCbNk+Z/K7EtDoMDG2szqH3H4yR+pt0=;
+	s=arc-20240116; t=1776691825; c=relaxed/simple;
+	bh=BI1YHBvxx0psCwKgZnSNZa5v757c9p7GY5OgqaLg/W8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UZvuTYjv1IEzDfchNHPywUT+522czXGnD8AhUxAiuKyaBq6oHb7RTtPnaQLDjTZuP0DmBusnNUh7mEXjLu1lNgpEOaOKQj+66SwBdX49DpFi3QltX7zXuACEV35mLmWStcieswKbUcNHahezUSUcNzGJb/LVHRV+SxlbpWf0DdU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aNmb1DSE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6AB34C2BCB4;
-	Mon, 20 Apr 2026 13:30:19 +0000 (UTC)
+	 MIME-Version:Content-Type; b=mlgnqunqfC0OniZuEjZqhqQszvaSd5NwILnuEuXBNByyksxC8iOvybLC8e3S3TpjoCoMSKRYuqbiL4YWnXZ+YqFiEfU3edRKz7jUK50jxxj4Z5D3TuGdzeCEh6oDYlyDy/IclnDdpDQ1oI0/Cl63ii3zaGGFdCmBF+HOx+UE8R4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NC1NljNk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3BEE6C2BCB8;
+	Mon, 20 Apr 2026 13:30:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776691821;
-	bh=2KKVT61x7r0VNCbNk+Z/K7EtDoMDG2szqH3H4yR+pt0=;
+	s=k20201202; t=1776691824;
+	bh=BI1YHBvxx0psCwKgZnSNZa5v757c9p7GY5OgqaLg/W8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=aNmb1DSE3oYgyQbB/QFJf/vbmnXRxGmuyj85BF3rjK3NfBS6dvrinrrsPIKQt6KYk
-	 7WOqi+Hrd3oKL/wtlEnr4dA2Zqd0fGhb2R8erlr+fW2u2IUjAVj5k7Q7BqizEKjCx5
-	 yP2Grz/MXB73f85Ta/NXecfzHw78Eg7iZfvuhuN759/lngK1Rb2Wyunmv1GuBkllpL
-	 nhQrq0ORifgYyiA7l2+WP45IFIEhttu0HsWRJPRBZzL0m9JRi1AYBNGWEED/VTmto+
-	 1m29yWUOIqqRQd79uEWyoaiFckm8nxhwB/3d4zKTdfMdxGGAPbiwOgzAqdzsfi3eQZ
-	 kMkaGqIVZb5gQ==
+	b=NC1NljNksNh45cW4rd/A/xuQ0i9fHzSrksjfZwFcK3Mb6Uk4O/mjX8yNLnnieh6fM
+	 4dqyGuBG/Wa0p5Bhp3QXry871gpfNdIL5efHi7vAW86smkeOFfvnNB1PNBbTla+aJY
+	 Yv954J594xPOUEU52O1mjBlSQ/d1252OqcXSIQdh0vpKFlVOqq5AkZJpihqy9ifuTy
+	 +Jd2GlZn2kHb0pTfLe/3fIAFDiCVrORxjLoT13mAfLBU7jWf/gw4JNqua/BTPUQbnN
+	 fFYGYsHnYlIr/uPLgUGkT83TDjvOysFrT2qHIrseAAWUJWyR5QRZTId3d8R/BCXndw
+	 Vf86O5PmkqZ3A==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Jiayuan Chen <jiayuan.chen@shopee.com>,
-	syzbot+d5ace703ed883df56e42@syzkaller.appspotmail.com,
-	Simon Horman <horms@kernel.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	=?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	jhs@mojatatu.com,
-	jiri@resnulli.us,
+	magnus.karlsson@intel.com,
 	davem@davemloft.net,
 	edumazet@google.com,
 	pabeni@redhat.com,
+	ast@kernel.org,
 	netdev@vger.kernel.org,
+	bpf@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 7.0-6.1] net: sched: cls_u32: Avoid memcpy() false-positive warning in u32_init_knode()
-Date: Mon, 20 Apr 2026 09:20:08 -0400
-Message-ID: <20260420132314.1023554-214-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.18] xsk: respect tailroom for ZC setups
+Date: Mon, 20 Apr 2026 09:20:10 -0400
+Message-ID: <20260420132314.1023554-216-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260420132314.1023554-1-sashal@kernel.org>
 References: <20260420132314.1023554-1-sashal@kernel.org>
@@ -72,23 +72,22 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 7.0
-Content-Type: text/plain; charset=UTF-8
+X-stable-base: Linux 6.18.23
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-279801-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-279802-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -101,338 +100,130 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,d5ace703ed883df56e42];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,linux.dev:email,syzkaller.appspot.com:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,msgid.link:url,shopee.com:email]
-X-Rspamd-Queue-Id: CC05142D895
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,fomichev.me:email,msgid.link:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 41FF242EE4D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Jiayuan Chen <jiayuan.chen@shopee.com>
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
 
-[ Upstream commit 34bd3c6b0bd383a76d987c8c45c4f309b681b255 ]
+[ Upstream commit 1ee1605138fc94cc8f8f273321dd2471c64977f9 ]
 
-Syzbot reported a warning in u32_init_knode() [1].
+Multi-buffer XDP stores information about frags in skb_shared_info that
+sits at the tailroom of a packet. The storage space is reserved via
+xdp_data_hard_end():
 
-Similar to commit 7cba18332e36 ("net: sched: cls_u32: Avoid memcpy()
-false-positive warning") which addressed the same issue in u32_change(),
-use unsafe_memcpy() in u32_init_knode() to work around the compiler's
-inability to see into composite flexible array structs.
+	((xdp)->data_hard_start + (xdp)->frame_sz -	\
+	 SKB_DATA_ALIGN(sizeof(struct skb_shared_info)))
 
-This silences the false-positive reported by syzbot:
+and then we refer to it via macro below:
 
-  memcpy: detected field-spanning write (size 32) of single field
-  "&new->sel" at net/sched/cls_u32.c:855 (size 16)
+static inline struct skb_shared_info *
+xdp_get_shared_info_from_buff(const struct xdp_buff *xdp)
+{
+        return (struct skb_shared_info *)xdp_data_hard_end(xdp);
+}
 
-Since the memory is correctly allocated with kzalloc_flex() using
-s->nkeys, this is purely a false positive and does not need a Fixes tag.
+Currently we do not respect this tailroom space in multi-buffer AF_XDP
+ZC scenario. To address this, introduce xsk_pool_get_tailroom() and use
+it within xsk_pool_get_rx_frame_size() which is used in ZC drivers to
+configure length of HW Rx buffer.
 
-[1] https://syzkaller.appspot.com/bug?extid=d5ace703ed883df56e42
+Typically drivers on Rx Hw buffers side work on 128 byte alignment so
+let us align the value returned by xsk_pool_get_rx_frame_size() in order
+to avoid addressing this on driver's side. This addresses the fact that
+idpf uses mentioned function *before* pool->dev being set so we were at
+risk that after subtracting tailroom we would not provide 128-byte
+aligned value to HW.
 
-Reported-by: syzbot+d5ace703ed883df56e42@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/all/69a811b9.a70a0220.b118c.0019.GAE@google.com/T/
-Reviewed-by: Simon Horman <horms@kernel.org>
-Acked-by: Gustavo A. R. Silva <gustavoars@kernel.org>
-Signed-off-by: Jiayuan Chen <jiayuan.chen@shopee.com>
-Link: https://patch.msgid.link/20260309123917.402183-1-jiayuan.chen@linux.dev
+Since xsk_pool_get_rx_frame_size() is actively used in xsk_rcv_check()
+and __xsk_rcv(), add a variant of this routine that will not include 128
+byte alignment and therefore old behavior is preserved.
+
+Reviewed-by: Björn Töpel <bjorn@kernel.org>
+Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+Fixes: 24ea50127ecf ("xsk: support mbuf on ZC RX")
+Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Link: https://patch.msgid.link/20260402154958.562179-3-maciej.fijalkowski@intel.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
-Now I have all the information needed for a complete analysis. Let me
-compile the findings.
+Error: Failed to generate final synthesis
 
----
+ include/net/xdp_sock_drv.h | 23 ++++++++++++++++++++++-
+ net/xdp/xsk.c              |  4 ++--
+ 2 files changed, 24 insertions(+), 3 deletions(-)
 
-## PHASE 1: COMMIT MESSAGE FORENSICS
-
-**Step 1.1: Subject Line**
-- Subsystem: `net: sched: cls_u32`
-- Action verb: "Avoid" (suggesting a workaround, not a direct bug fix)
-- Summary: Avoids a false-positive memcpy warning in `u32_init_knode()`
-
-**Step 1.2: Tags**
-- Reported-by: `syzbot+d5ace703ed883df56e42@syzkaller.appspotmail.com`
-  (syzbot-reported)
-- Closes: `https://lore.kernel.org/all/69a811b9.a70a0220.b118c.0019.GAE@
-  google.com/T/`
-- Reviewed-by: Simon Horman `<horms@kernel.org>` (netdev
-  maintainer/reviewer)
-- Acked-by: Gustavo A. R. Silva `<gustavoars@kernel.org>`
-  (FORTIFY_SOURCE / flexible array expert)
-- Signed-off-by: Jakub Kicinski `<kuba@kernel.org>` (net maintainer)
-- No Fixes: tag, no Cc: stable (expected)
-- Author explicitly states: "does not need a Fixes tag"
-
-**Step 1.3: Commit Body**
-- References prior commit 7cba18332e36 that fixed the **identical**
-  issue in `u32_change()`
-- The warning: `memcpy: detected field-spanning write (size 32) of
-  single field "&new->sel" at net/sched/cls_u32.c:855 (size 16)`
-- Root cause: FORTIFY_SOURCE's `memcpy` hardening can't see that the
-  flexible array struct was correctly allocated to hold the extra keys.
-- Author explicitly says: "this is purely a false positive"
-
-**Step 1.4: Hidden Bug Fix?**
-This is NOT a hidden bug fix. It is genuinely a false-positive warning
-suppression. The `memcpy` operation is correct; the compiler's bounds
-checking is overly conservative for composite flexible array structures.
-
-## PHASE 2: DIFF ANALYSIS
-
-**Step 2.1: Inventory**
-- 1 file changed: `net/sched/cls_u32.c`
-- 1 line removed, 4 lines added (net +3 lines)
-- Function modified: `u32_init_knode()`
-- Scope: single-file, surgical fix
-
-**Step 2.2: Code Flow Change**
-- Before: `memcpy(&new->sel, s, struct_size(s, keys, s->nkeys));`
-- After: `unsafe_memcpy(&new->sel, s, struct_size(s, keys, s->nkeys), /*
-  justification comment */);`
-- `unsafe_memcpy` is defined in `include/linux/fortify-string.h` as
-  `__underlying_memcpy(dst, src, bytes)` — it simply bypasses the
-  FORTIFY_SOURCE field-spanning write check. The actual memory operation
-  is identical.
-
-**Step 2.3: Bug Mechanism**
-- Category: Warning suppression / false positive from FORTIFY_SOURCE
-- No actual memory safety bug. The `new` structure is allocated with
-  `kzalloc_flex(*new, sel.keys, s->nkeys)` which correctly sizes the
-  allocation for the flexible array.
-
-**Step 2.4: Fix Quality**
-- Obviously correct — same pattern as existing fix at line 1122 in the
-  same file
-- Zero regression risk — `unsafe_memcpy` produces identical machine code
-  to `memcpy`, just without the compile-time/runtime bounds check
-- Minimal change
-
-## PHASE 3: GIT HISTORY INVESTIGATION
-
-**Step 3.1: Blame**
-- The `memcpy` line was introduced by commit `e512fcf0280ae` (Gustavo A.
-  R. Silva, 2019, v5.2) which converted it from open-coded `sizeof()` to
-  `struct_size()`.
-- The underlying memcpy in `u32_init_knode()` predates that and goes
-  back to the function's original creation.
-
-**Step 3.2: Prior Fix (7cba18332e36)**
-- Commit 7cba18332e36 (Kees Cook, Sep 2022) fixed the identical false-
-  positive in `u32_change()`.
-- First appeared in v6.1. Present in all stable trees from v6.1 onward.
-- This commit is the direct analog for `u32_init_knode()`.
-
-**Step 3.3: File History**
-- Recent changes to cls_u32.c are mostly treewide allocation API changes
-  (kzalloc_flex, kmalloc_obj).
-- This patch is standalone — no dependencies on other patches.
-
-**Step 3.4: Author**
-- Jiayuan Chen is a contributor with multiple net subsystem fixes (UAF,
-  NULL deref, memory leaks).
-- Not the subsystem maintainer, but the patch was accepted by Jakub
-  Kicinski (netdev maintainer).
-
-**Step 3.5: Dependencies**
-- The `unsafe_memcpy` macro was introduced by commit `43213daed6d6cb`
-  (Kees Cook, May 2022), present since v5.19.
-- In stable trees, the allocation function is different (not
-  `kzalloc_flex`), but the `memcpy` line with `struct_size` exists since
-  v5.2.
-- This can apply standalone. Minor context differences in stable trees
-  won't affect the single-line change.
-
-## PHASE 4: MAILING LIST AND EXTERNAL RESEARCH
-
-**Step 4.1: Patch Discussion**
-- b4 dig found the submission: `https://patch.msgid.link/20260309123917.
-  402183-1-jiayuan.chen@linux.dev`
-- Two versions: v1 and v2 (v2 dropped unnecessary commit message content
-  per reviewer feedback)
-- No NAKs. Reviewed-by from Simon Horman, Acked-by from Gustavo A. R.
-  Silva.
-
-**Step 4.2: Reviewers**
-- Simon Horman (netdev reviewer) — Reviewed-by
-- Gustavo A. R. Silva (flexible array / FORTIFY expert, he wrote the
-  original struct_size conversion) — Acked-by
-- Jakub Kicinski (netdev maintainer) — committed the patch
-
-**Step 4.3: Bug Report**
-- Syzbot page at
-  `https://syzkaller.appspot.com/bug?extid=d5ace703ed883df56e42`
-  confirms:
-  - WARNING fires at runtime in `u32_init_knode()` at cls_u32.c:855
-  - Reproducible with C reproducer
-  - Similar bugs exist on linux-6.1 and linux-6.6 (0 of 2 and 0 of 3
-    patched, respectively)
-  - Crash type: WARNING (FORTIFY_SOURCE field-spanning write detection)
-  - Triggerable via syscall path: `sendmmsg → tc_new_tfilter →
-    u32_change → u32_init_knode`
-
-**Step 4.4/4.5: No explicit stable nomination in any discussion.**
-
-## PHASE 5: CODE SEMANTIC ANALYSIS
-
-**Step 5.1: Function Modified**
-- `u32_init_knode()` — creates a new knode by cloning an existing one
-  during u32 filter update
-
-**Step 5.2: Callers**
-- `u32_init_knode()` is called from `u32_change()` (line ~921), which is
-  the TC filter update path
-- `u32_change()` is called via `tc_new_tfilter()` → rtnetlink → netlink
-  syscall path
-- This is reachable from unprivileged userspace (with appropriate
-  network namespace capabilities)
-
-**Step 5.4: Call Chain**
-- `sendmmsg` → `netlink_sendmsg` → `rtnetlink_rcv_msg` →
-  `tc_new_tfilter` → `u32_change` → `u32_init_knode` → WARNING
-
-## PHASE 6: CROSS-REFERENCING AND STABLE TREE ANALYSIS
-
-**Step 6.1: Buggy Code in Stable Trees**
-- The `memcpy(&new->sel, s, struct_size(s, keys, s->nkeys))` line exists
-  since v5.2 (commit e512fcf0280ae).
-- Present in all active stable trees (5.15.y, 6.1.y, 6.6.y, 6.12.y).
-- `unsafe_memcpy` is available since v5.19 (commit 43213daed6d6cb).
-- So this fix is applicable to 6.1.y and later.
-- Syzbot confirms the warning fires on 6.1 and 6.6 stable trees.
-
-**Step 6.2: Backport Complications**
-- The single-line change (`memcpy` → `unsafe_memcpy`) should apply
-  cleanly or with trivial context adjustment.
-- The comment references `kzalloc_flex()` which doesn't exist in stable
-  trees (it's a 7.0 API), but that's just a comment in the
-  `unsafe_memcpy` justification parameter — functionally irrelevant.
-
-## PHASE 7: SUBSYSTEM AND MAINTAINER CONTEXT
-
-**Step 7.1: Subsystem**
-- `net/sched` — Traffic Control (TC) classifier, specifically cls_u32
-- Criticality: IMPORTANT — TC is widely used in networking, QoS,
-  container networking
-
-**Step 7.2: Activity**
-- Active subsystem with regular fixes and updates.
-
-## PHASE 8: IMPACT AND RISK ASSESSMENT
-
-**Step 8.1: Who Is Affected**
-- Any user with `CONFIG_FORTIFY_SOURCE=y` (default on most distros)
-  using TC u32 classifier
-- The WARNING fires during filter updates via netlink
-
-**Step 8.2: Trigger Conditions**
-- Triggered when updating a u32 TC filter with >0 keys (common
-  operation)
-- Reachable from userspace via netlink/rtnetlink
-- Reliably reproducible (syzbot has C reproducer)
-
-**Step 8.3: Failure Mode**
-- Primary: WARN at runtime — log noise, `panic_on_warn` configurations
-  would crash
-- No data corruption, no memory safety issue (the memcpy is correct)
-- Severity: MEDIUM (WARNING only, no functional impact unless
-  `panic_on_warn=1`)
-
-**Step 8.4: Risk-Benefit**
-- BENEFIT: Silences a false-positive WARNING on stable trees, eliminates
-  syzbot CI noise, prevents crashes with `panic_on_warn=1`
-- RISK: Essentially zero — `unsafe_memcpy` produces identical code to
-  `memcpy` minus the check
-- Ratio: Favorable (small benefit, near-zero risk)
-
-## PHASE 9: FINAL SYNTHESIS
-
-**Evidence FOR backporting:**
-1. The WARNING actively fires on stable trees (6.1, 6.6) — confirmed by
-   syzbot
-2. The fix is trivially correct (1 functional line changed), zero
-   regression risk
-3. Same exact pattern as commit 7cba18332e36 already in stable since
-   v6.1
-4. Reviewed by Simon Horman, Acked by Gustavo A. R. Silva (the FORTIFY
-   expert), committed by Jakub Kicinski
-5. With `panic_on_warn=1` (common in security-hardened deployments),
-   this is a crash
-6. Reachable from userspace via standard TC netlink operations
-
-**Evidence AGAINST backporting:**
-1. Author explicitly says "this is purely a false positive and does not
-   need a Fixes tag"
-2. Not a real memory safety bug — the memcpy operation is correct
-3. Without `panic_on_warn`, only produces log noise
-4. Comment in the fix references `kzalloc_flex()` which doesn't exist in
-   stable trees (cosmetic issue only)
-
-**Stable Rules Checklist:**
-1. Obviously correct and tested? **YES** — identical pattern to existing
-   fix in same file
-2. Fixes a real bug? **BORDERLINE** — it's a false-positive warning, but
-   it does fire at runtime and causes problems with `panic_on_warn`
-3. Important issue? **MEDIUM** — WARNING severity, but crash with
-   `panic_on_warn=1`
-4. Small and contained? **YES** — 1 file, +4/-1 lines
-5. No new features? **YES**
-6. Applies to stable? **YES** — with minor context differences
-
-The decisive factor: syzbot confirms this WARNING actively fires on 6.1
-and 6.6 stable trees, the fix follows a proven pattern already in
-stable, and the risk is essentially zero. While the author says it's a
-false positive (and it is), the runtime WARNING is a real issue for
-production systems, especially those with `panic_on_warn=1`.
-
-## Verification
-
-- [Phase 1] Parsed tags: Reported-by syzbot, Reviewed-by Simon Horman,
-  Acked-by Gustavo A. R. Silva, committed by Jakub Kicinski
-- [Phase 2] Diff analysis: single line `memcpy` → `unsafe_memcpy` with
-  justification comment in `u32_init_knode()`
-- [Phase 3] git blame: memcpy line introduced by e512fcf0280ae (v5.2,
-  2019), present in all stable trees
-- [Phase 3] git show 7cba18332e36: confirmed identical prior fix for
-  u32_change(), present since v6.1
-- [Phase 3] git tag --contains 43213daed6d6cb: `unsafe_memcpy` available
-  since v5.19
-- [Phase 4] b4 dig -c 34bd3c6b0bd3: found submission at lore, v1→v2, no
-  NAKs
-- [Phase 4] b4 dig -w: netdev maintainers and linux-hardening list were
-  CC'd
-- [Phase 4] syzbot page: confirmed WARNING fires on 6.1 and 6.6 stable,
-  reproducible with C repro
-- [Phase 5] Call chain: sendmmsg → netlink → tc_new_tfilter → u32_change
-  → u32_init_knode (userspace reachable)
-- [Phase 6] Code exists in all active stable trees; unsafe_memcpy
-  available in 6.1+
-- [Phase 8] Failure mode: WARN at runtime, MEDIUM severity (crash with
-  panic_on_warn)
-
-**YES**
-
- net/sched/cls_u32.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/net/sched/cls_u32.c b/net/sched/cls_u32.c
-index 9241c025aa741..8f30cc82181d9 100644
---- a/net/sched/cls_u32.c
-+++ b/net/sched/cls_u32.c
-@@ -852,7 +852,10 @@ static struct tc_u_knode *u32_init_knode(struct net *net, struct tcf_proto *tp,
- 	/* Similarly success statistics must be moved as pointers */
- 	new->pcpu_success = n->pcpu_success;
- #endif
--	memcpy(&new->sel, s, struct_size(s, keys, s->nkeys));
-+	unsafe_memcpy(&new->sel, s, struct_size(s, keys, s->nkeys),
-+		      /* A composite flex-array structure destination,
-+		       * which was correctly sized with kzalloc_flex(),
-+		       * above. */);
+diff --git a/include/net/xdp_sock_drv.h b/include/net/xdp_sock_drv.h
+index 33e072768de9d..dd1d3a6e1b780 100644
+--- a/include/net/xdp_sock_drv.h
++++ b/include/net/xdp_sock_drv.h
+@@ -37,16 +37,37 @@ static inline u32 xsk_pool_get_headroom(struct xsk_buff_pool *pool)
+ 	return XDP_PACKET_HEADROOM + pool->headroom;
+ }
  
- 	if (tcf_exts_init(&new->exts, net, TCA_U32_ACT, TCA_U32_POLICE)) {
- 		kfree(new);
++static inline u32 xsk_pool_get_tailroom(bool mbuf)
++{
++	return mbuf ? SKB_DATA_ALIGN(sizeof(struct skb_shared_info)) : 0;
++}
++
+ static inline u32 xsk_pool_get_chunk_size(struct xsk_buff_pool *pool)
+ {
+ 	return pool->chunk_size;
+ }
+ 
+-static inline u32 xsk_pool_get_rx_frame_size(struct xsk_buff_pool *pool)
++static inline u32 __xsk_pool_get_rx_frame_size(struct xsk_buff_pool *pool)
+ {
+ 	return xsk_pool_get_chunk_size(pool) - xsk_pool_get_headroom(pool);
+ }
+ 
++static inline u32 xsk_pool_get_rx_frame_size(struct xsk_buff_pool *pool)
++{
++	u32 frame_size =  __xsk_pool_get_rx_frame_size(pool);
++	struct xdp_umem *umem = pool->umem;
++	bool mbuf;
++
++	/* Reserve tailroom only for zero-copy pools that opted into
++	 * multi-buffer. The reserved area is used for skb_shared_info,
++	 * matching the XDP core's xdp_data_hard_end() layout.
++	 */
++	mbuf = pool->dev && (umem->flags & XDP_UMEM_SG_FLAG);
++	frame_size -= xsk_pool_get_tailroom(mbuf);
++
++	return ALIGN_DOWN(frame_size, 128);
++}
++
+ static inline u32 xsk_pool_get_rx_frag_step(struct xsk_buff_pool *pool)
+ {
+ 	return pool->unaligned ? 0 : xsk_pool_get_chunk_size(pool);
+diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+index a78cdc3356937..259ad9a3abcc4 100644
+--- a/net/xdp/xsk.c
++++ b/net/xdp/xsk.c
+@@ -239,7 +239,7 @@ static u32 xsk_copy_xdp(void *to, void **from, u32 to_len,
+ 
+ static int __xsk_rcv(struct xdp_sock *xs, struct xdp_buff *xdp, u32 len)
+ {
+-	u32 frame_size = xsk_pool_get_rx_frame_size(xs->pool);
++	u32 frame_size = __xsk_pool_get_rx_frame_size(xs->pool);
+ 	void *copy_from = xsk_copy_xdp_start(xdp), *copy_to;
+ 	u32 from_len, meta_len, rem, num_desc;
+ 	struct xdp_buff_xsk *xskb;
+@@ -338,7 +338,7 @@ static int xsk_rcv_check(struct xdp_sock *xs, struct xdp_buff *xdp, u32 len)
+ 	if (xs->dev != xdp->rxq->dev || xs->queue_id != xdp->rxq->queue_index)
+ 		return -EINVAL;
+ 
+-	if (len > xsk_pool_get_rx_frame_size(xs->pool) && !xs->sg) {
++	if (len > __xsk_pool_get_rx_frame_size(xs->pool) && !xs->sg) {
+ 		xs->rx_dropped++;
+ 		return -ENOSPC;
+ 	}
 -- 
 2.53.0
 
