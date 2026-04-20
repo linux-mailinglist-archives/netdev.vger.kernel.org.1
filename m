@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-279819-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279820-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yAinD1g75mlutgEAu9opvQ
-	(envelope-from <netdev+bounces-279819-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 16:42:32 +0200
+	id QC+7ETpS5mkDuwEAu9opvQ
+	(envelope-from <netdev+bounces-279820-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 18:20:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5F9C42D5B4
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 16:42:31 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B848D42F529
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 18:20:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 6737C303EEC4
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 14:33:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CA4E730ECCCC
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 14:33:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3821E4BCAAB;
-	Mon, 20 Apr 2026 13:32:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B556E4C0410;
+	Mon, 20 Apr 2026 13:32:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SH9Qmr9g"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="otaEeozZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12E3C4BC023;
-	Mon, 20 Apr 2026 13:32:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 918C33ACEFE;
+	Mon, 20 Apr 2026 13:32:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776691975; cv=none; b=HDdOmSfZ1oqSaO2gInL+bnglqdgCbK4/eTgO/tGPKt2xgXOFDk1tvtP0gX6w3y09xmYnLajGbcwA65nIHvNMwq8hvwQ7yr/iwfOsgdO5yQfWfOtlh3xOB3ROAP/nSOsNgksN2Ty2zLPeCCQQVKXmKlh813US2jjbj9e8kAKTHV0=
+	t=1776691978; cv=none; b=ezyUh7LPXrx80tpZ4x4+qVjCxMSKDbBWJTCXFDTDgn0oho/i1axdJykbKnLrKLoN2QUnQgcdA9PwOOzQjXp6w9n7KHMjME7v62ugqr9LCcpGBCMMRt2tiKSvZAfH/BzqHG312kQijsZpmlcfTKjI7vcx0uiQzwlPB/ztHe/q6BE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776691975; c=relaxed/simple;
-	bh=QZGRzo0jnTbhPPd+/ZY0zfEDwZtH05XVa3owuElNTLo=;
+	s=arc-20240116; t=1776691978; c=relaxed/simple;
+	bh=ttQ8PnNXHOtrHcw+2MBiuWE0BJAaVmcJQ5d7CZvwKJY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IgJRYYlvCwqnxZ0RFjL4rURouQvIT3dGpdEoUGtvTnsV/5MRig1Ga2s47yjrEvVe/IRc3MnMYg+E1CswnNemgBDXTTXpGd8bsXffHPjkKNGxgbT42CHR5jr6zoyePJY0tH3lmzxOnvVoLB43ys8F72/W8Q6NyO23+frUai2ue2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SH9Qmr9g; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78A9EC19425;
-	Mon, 20 Apr 2026 13:32:53 +0000 (UTC)
+	 MIME-Version; b=t4vI29FQ6+nKle2pSt3NZUwyLQ2gg9wtaRKQo8uHmu/KwtCcFtjJLBns+LuM/S3qQTtyl8a9QGkLagKIfS+ELDGu935ZjWRnfPU8D0zDbdcw5nuQK0UGWloXGDouY0YBAY5mqH0aPIPQ5PSk3tkAMSUG3uh/CZFcOzo5XOWcUN8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=otaEeozZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21CB4C19425;
+	Mon, 20 Apr 2026 13:32:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776691974;
-	bh=QZGRzo0jnTbhPPd+/ZY0zfEDwZtH05XVa3owuElNTLo=;
+	s=k20201202; t=1776691978;
+	bh=ttQ8PnNXHOtrHcw+2MBiuWE0BJAaVmcJQ5d7CZvwKJY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=SH9Qmr9gX7S3WQF2WHHdOvBPiYiBg+ZJ9dEM+SMKCeGxleKCM2rbMsSPv0/VBnDbh
-	 k4YnBNd0ON8wxDjxbZJBWLmpuUQnSpRJV6iAgG/R/AsPXNkMZ5IJ8iGo5i7OWroVkA
-	 kj1aATZumJtZnbX4ncAFa2blyAy5+686O8pRl7Qe2Q3822DSgEuG1OlPr3hU1I02wp
-	 nnsTJxCxw3IFVA8n7jnZqhgLBTrRl/VNZWA+P2xaJtsT8EpC+6JHHOVro+BMQQwWeV
-	 WjZJ7EJ0Vu2iLs2jrFDqlhOzQnsnx/UVjQ5zgqwLGwqPhLNvOTPiXeWRwjPpqwA3CT
-	 wRwbknLTAJNig==
+	b=otaEeozZ7lD3Vvuscru43KchNQR0JYEHw0UICQpcbb85qtL0jh6w5MoBSFhuSn4ZC
+	 7ksaxKYORptncDKTOFZB7NN1z7ItKpmbFNuRJ+qhrVg6fc36wQqPeoz4sFuOoEm3wP
+	 6vCcj9vbs2g772TUvUH+PgKe2TMQiooku7C6zPg9j6Y8LXKPg8IVjJdS6x0kXG53ii
+	 z0qcR7Nm+Ui+SXgm76ECwQPuXJR6F49tdzuFSUnsSyWHsEKXDB3/FsO7y5HyTLstRj
+	 gi9Ys3nMqJfmdxUOFSnTighwsrB2gmWfbafXJSHhDcJSRjI3X7tkOg/JNbKDibbXoJ
+	 Ob+Eaifa+KHLw==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Justin Iurman <justin.iurman@gmail.com>,
+Cc: Yiqi Sun <sunyiqixm@gmail.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
 	davem@davemloft.net,
 	dsahern@kernel.org,
 	edumazet@google.com,
 	pabeni@redhat.com,
-	idosch@nvidia.com,
+	andreas.a.roeseler@gmail.com,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.18] net: ioam6: fix OOB and missing lock
-Date: Mon, 20 Apr 2026 09:21:34 -0400
-Message-ID: <20260420132314.1023554-300-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.18] ipv4: icmp: fix null-ptr-deref in icmp_build_probe()
+Date: Mon, 20 Apr 2026 09:21:36 -0400
+Message-ID: <20260420132314.1023554-302-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260420132314.1023554-1-sashal@kernel.org>
 References: <20260420132314.1023554-1-sashal@kernel.org>
@@ -80,14 +80,14 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,davemloft.net,google.com,redhat.com,nvidia.com,vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,kernel.org,davemloft.net,google.com,redhat.com,vger.kernel.org];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-279819-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-279820-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -97,44 +97,33 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.999];
+	NEURAL_HAM(-0.00)[-0.996];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,msgid.link:url]
-X-Rspamd-Queue-Id: D5F9C42D5B4
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B848D42F529
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Justin Iurman <justin.iurman@gmail.com>
+From: Yiqi Sun <sunyiqixm@gmail.com>
 
-[ Upstream commit b30b1675aa2bcf0491fd3830b051df4e08a7c8ca ]
+[ Upstream commit fde29fd9349327acc50d19a0b5f3d5a6c964dfd8 ]
 
-When trace->type.bit6 is set:
+ipv6_stub->ipv6_dev_find() may return ERR_PTR(-EAFNOSUPPORT) when the
+IPv6 stack is not active (CONFIG_IPV6=m and not loaded), and passing
+this error pointer to dev_hold() will cause a kernel crash with
+null-ptr-deref.
 
-    if (trace->type.bit6) {
-        ...
-        queue = skb_get_tx_queue(dev, skb);
-        qdisc = rcu_dereference(queue->qdisc);
+Instead, silently discard the request. RFC 8335 does not appear to
+define a specific response for the case where an IPv6 interface
+identifier is syntactically valid but the implementation cannot perform
+the lookup at runtime, and silently dropping the request may safer than
+misreporting "No Such Interface".
 
-This code can lead to an out-of-bounds access of the dev->_tx[] array
-when is_input is true. In such a case, the packet is on the RX path and
-skb->queue_mapping contains the RX queue index of the ingress device. If
-the ingress device has more RX queues than the egress device (dev) has
-TX queues, skb_get_queue_mapping(skb) will exceed dev->num_tx_queues.
-Add a check to avoid this situation since skb_get_tx_queue() does not
-clamp the index. This issue has also revealed that per queue visibility
-cannot be accurate and will be replaced later as a new feature.
-
-While at it, add missing lock around qdisc_qstats_qlen_backlog(). The
-function __ioam6_fill_trace_data() is called from both softirq and
-process contexts, hence the use of spin_lock_bh() here.
-
-Fixes: b63c5478e9cb ("ipv6: ioam: Support for Queue depth data field")
-Reported-by: Jakub Kicinski <kuba@kernel.org>
-Closes: https://lore.kernel.org/netdev/20260403214418.2233266-2-kuba@kernel.org/
-Signed-off-by: Justin Iurman <justin.iurman@gmail.com>
-Link: https://patch.msgid.link/20260404134137.24553-1-justin.iurman@gmail.com
+Fixes: d329ea5bd884 ("icmp: add response to RFC 8335 PROBE messages")
+Signed-off-by: Yiqi Sun <sunyiqixm@gmail.com>
+Link: https://patch.msgid.link/20260402070419.2291578-1-sunyiqixm@gmail.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
@@ -143,31 +132,27 @@ LLM Generated explanations, may be completely bogus:
 
 Error: Failed to generate final synthesis
 
- net/ipv6/ioam6.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ net/ipv4/icmp.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/net/ipv6/ioam6.c b/net/ipv6/ioam6.c
-index 12350e1e18bde..b91de51ffa9ea 100644
---- a/net/ipv6/ioam6.c
-+++ b/net/ipv6/ioam6.c
-@@ -803,12 +803,16 @@ static void __ioam6_fill_trace_data(struct sk_buff *skb,
- 		struct Qdisc *qdisc;
- 		__u32 qlen, backlog;
- 
--		if (dev->flags & IFF_LOOPBACK) {
-+		if (dev->flags & IFF_LOOPBACK ||
-+		    skb_get_queue_mapping(skb) >= dev->num_tx_queues) {
- 			*(__be32 *)data = cpu_to_be32(IOAM6_U32_UNAVAILABLE);
- 		} else {
- 			queue = skb_get_tx_queue(dev, skb);
- 			qdisc = rcu_dereference(queue->qdisc);
+diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
+index b39176b620785..980aa17f3534d 100644
+--- a/net/ipv4/icmp.c
++++ b/net/ipv4/icmp.c
+@@ -1145,6 +1145,13 @@ bool icmp_build_probe(struct sk_buff *skb, struct icmphdr *icmphdr)
+ 			if (iio->ident.addr.ctype3_hdr.addrlen != sizeof(struct in6_addr))
+ 				goto send_mal_query;
+ 			dev = ipv6_stub->ipv6_dev_find(net, &iio->ident.addr.ip_addr.ipv6_addr, dev);
++			/*
++			 * If IPv6 identifier lookup is unavailable, silently
++			 * discard the request instead of misreporting NO_IF.
++			 */
++			if (IS_ERR(dev))
++				return false;
 +
-+			spin_lock_bh(qdisc_lock(qdisc));
- 			qdisc_qstats_qlen_backlog(qdisc, &qlen, &backlog);
-+			spin_unlock_bh(qdisc_lock(qdisc));
- 
- 			*(__be32 *)data = cpu_to_be32(backlog);
- 		}
+ 			dev_hold(dev);
+ 			break;
+ #endif
 -- 
 2.53.0
 
