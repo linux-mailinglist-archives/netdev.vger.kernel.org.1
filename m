@@ -1,204 +1,412 @@
-Return-Path: <netdev+bounces-279831-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279832-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aFpfLtVU5mkDuwEAu9opvQ
-	(envelope-from <netdev+bounces-279831-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 18:31:17 +0200
+	id cC0UAxdV5mkDuwEAu9opvQ
+	(envelope-from <netdev+bounces-279832-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 18:32:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB22442F920
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 18:31:15 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89E7942F978
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 18:32:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9C3653232B5C
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 14:44:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9F2AF35F1914
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 14:45:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 353293A4F5F;
-	Mon, 20 Apr 2026 13:43:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C14526F2AF;
+	Mon, 20 Apr 2026 13:46:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b="voH4XLzD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WDZrgNrb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 931913A4F54
-	for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 13:43:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9161F273D8D
+	for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 13:46:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776692605; cv=none; b=RdIJcGJUHNWKXMRctDhDlFWUO/6qyiS3KqRCkxA7sX1FPniMMhAiFl9ejWZwu8jWmDgeBCmBP72FLctGQZ8DYtcgXmN5JvzeC5xeKZ12/+7UJ5VVFAIEq8tnZSO1Olk0E/REo5SxjOb26oDDJoNvzW9pbWzu4RNGOnsHX0JehVI=
+	t=1776692797; cv=none; b=BqmlhQWLwJgg2Kr8oJXFAVrCWWczi8pIZQmKYUUbDeEuuL/UZ4EDb3VvSdnRsfqGiMaf0msezmc29Yp2mNTMTHEsrN7zp60x8kR5Q1UEoyfBYZFK9wxxUYHqz47oGd+gWnJZm84HoxME8t+4lgynufuFpyL9GIJt7CmUTzSa2rU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776692605; c=relaxed/simple;
-	bh=rogRs0ykHyeyXK7tUMRLku3jZarBPsH1cV9YIgcNcts=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IiO/wWdeLhgb7qSH1DOnb3s/G9/OBRMA9C4B5piVFbT6IgE43y8yd6eXK96uMAn6kAol9BAORhoD7ETcbEAfe3I2NsO7+67M456jwQnF1b5mbATUPTwv3fNgYMqd6uL5VfqgfEiyTrL+T6GqUAe+lruFCEQPVpfkm1K1flvBIFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b=voH4XLzD; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-48374014a77so40037395e9.3
-        for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 06:43:20 -0700 (PDT)
+	s=arc-20240116; t=1776692797; c=relaxed/simple;
+	bh=TAKQch0k/gLwdRuXwgsAoqCakhctFdtQD4H4GTZg2Xo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Fbup5qpnOOn1oxHDHKly8FGQOQFF/p3iZjKhWgfz40zCp6qAWMlkRa7goT/W+U6IHO6TPv9gvpZi8PpYijUplHh9WpWno6Ikmj2CIWKQT7xWm79VBRheksRbRWnlDS/L01a7NQ71qQNWbAsGiUuq0MDqpa2vtZY8a3wQJZ5E/c4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WDZrgNrb; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2b45cb89f7eso22254245ad.0
+        for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 06:46:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20251104.gappssmtp.com; s=20251104; t=1776692599; x=1777297399; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Xr1T1QwU2AXk21k476IBhpXqaT0faBSmximda28oq1w=;
-        b=voH4XLzDtKJQmCbHJ+3NirTZz5XFHLjePkFcZOh92Qg4f441kF+3LM6RCJE/E9+vyK
-         LEdz1ik5FNcqVcZ1NooCoe2TIAsIouj87XvQyuQ9yZUC8K6za7caKdKdgddd/lSotzcE
-         WQFhnaVxSi+dUwxK5QjBSc9+fmV7QqMIuD5OUZw32/26zgJqpeFQvsNkysIJXpGREPsd
-         kooJ5NX41kVR+UWymqXuVAYNl8ITANIpZ/dv0QLbXPRaVtye6pAUu4alziDhHap6aOhE
-         1Ds+Sn0E32gWS1KvK/EiBh4LrSzh/0OMM6USs2B8OfAKaOatjuePZAN+gjhgl/Q9E3Eg
-         UR/w==
+        d=gmail.com; s=20251104; t=1776692796; x=1777297596; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=RuyqHPkXyghrYyVcdsd1ZI8DKLjrheorYnay2citIT8=;
+        b=WDZrgNrbLG69LwNjvc6jI0KvofvhfEeTtVg+/XDnM6jOQ3fu5j92HKgT0h6Ekekmj8
+         YvCEnVqx/pqkuFA7BBz7uUj2NY2VDq9Rv4FGly/7MbeqWSH6kXRdSMBqr8R7nxHUCznp
+         8JGA4jbO33cZ8O7GY5VP6cjHEJgxA7oqx/nw1Rmyj6K0c7pCN3YSrExVzQvRTg4T0iYI
+         G+KQPXiB6I2QdEKNU70zRNwIYV7c4D97IERdi0mN9eGJy7J0hd0j279eXiJpg21q4cVI
+         J7+20s8ZkafRBTu9nY7jAsdM0A8tPO8FiVuSi5hrWg+Ac4OLjWWEm5V/YdFSGw/V4iCz
+         ddvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776692599; x=1777297399;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Xr1T1QwU2AXk21k476IBhpXqaT0faBSmximda28oq1w=;
-        b=sBCA8Sa4uQAXz3IIP56ye7I6i4FqAOFB3f7cK99ua6R15hv41e/xZkVPdQCRmoGtuK
-         R/QBEhoHS2pgOKYTz3eqQeTqbRO1v2iv7+RVtCpGRQmlNTCjAFaJVaBbRemltw7DJQi0
-         k1iBeBmjyNyVxKpIAt3h5nXBqCRnjm1aOEBYiefaBcMjHzJD6OCWw4s5gkxSCzdjvGVZ
-         LpCg+r5ALw/D8fXU7Fu/fPr++UBhkX/yENQqg6lQgFeRirePGiYp3/WbJcruoRhuwsZt
-         EBYsh3v1CRNyPCERDgUw0GCaV17NymLPKvcP2HYAR7flLshg/nION83cHDFP8TJdPwUz
-         dlfQ==
-X-Gm-Message-State: AOJu0YyxbdLKplAFqygA0ra8poXg7Yf56hT7zqi6DqtYi1dJRDg9PiWK
-	P5L01TYZQCedfX3NKCjnlrKC1rBmXUgHBxbFuElxtBFpKYDAiLDdIjgRKMZRG9XnseY=
-X-Gm-Gg: AeBDiesShYFBO8Ze1mD0riQ0T+BfvEl6G/A1Uy1lqX6DoIEIyZULmCUXvYCTLw32hMH
-	Pc/SFn64phSvGXXXXRxJhWe7cdCp95M9HLuSzef0M0X5zJGExpFJuBA35FOMtdT5gmg71VKQhGE
-	iEoy7hzWsUOyd1VVQJBaVZOnCSDDZKLoOTnc17vJP7ZZgrzUhQsi8bEX62/xMUzhNX3GJSJm2/A
-	TJLNl7GiHdiWgn2M20n4ngusSzVG1CPeMGecr/1nwjF9EGd/MSHAJHLmzKY184djohQgeNvPovN
-	zhvMQj0hODJMiYaQUD4syxSHKQVNdzFwbBmN3ksKQGtUr6xamDVZivT4hYE2wzxKFPVgselVLld
-	HCH6aTSnjEsNCFO9eNbdp36pkorToud9MRuL+bkXkyWjR66TJD6Q6v8HMWXTdr/3TgCyACVCl5q
-	d7Rfic6UAjlMbkZPgTSpZIzj56MAIDNhuCI2wZEw7MM384Og==
-X-Received: by 2002:a05:600c:8483:b0:488:7ff6:1f75 with SMTP id 5b1f17b1804b1-488fb782d91mr193865265e9.21.1776692598743;
-        Mon, 20 Apr 2026 06:43:18 -0700 (PDT)
-Received: from FV6GYCPJ69 ([140.209.217.211])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43fe4e44f69sm31239443f8f.25.2026.04.20.06.43.17
+        d=1e100.net; s=20251104; t=1776692796; x=1777297596;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RuyqHPkXyghrYyVcdsd1ZI8DKLjrheorYnay2citIT8=;
+        b=KnvY8XaWZEWQ8mLVabI0Ruz1pOIvAKL5na7F93cxqjYilky97wrw2keacXuJ026V97
+         9qatsyyM19/GrI0vk+baDKGkU/5gn98z0NCKcw5ER/DKoTZhK4qcsyClpExl/eHdfjT4
+         NsVNbHC57Ho3KzWTe5UWkYB78pr4YOTcKEmGePTgG9mJCref5JlKKGGht+H1Biq+hP2r
+         LWRYrpX13fvQoy5zisN5BUqQQGPW+NCUO9IRZ/yLWF+J3AvxhI2jqpo0Mc+aQe3ZV6Xi
+         IMVg+GOXawp3qEc4F8xH+Yk7vJ+yk6Uq0yWbOyYwOpup/pldSrAHTq1v3QcMBOoMbSv+
+         ssww==
+X-Forwarded-Encrypted: i=1; AFNElJ9y2bc9LFzZRymuscPChoTEToGt8exwzb1H18r4Wo3DLOJqiYSUJNwitQb/M6/DRtYfCuqX708=@vger.kernel.org
+X-Gm-Message-State: AOJu0YySCKcDT33bCzXo+4GhzWQy8aPoXbTSQtGQYWJbcn9xG7tucA/T
+	8qVrIxDRiIBz8Aa1OWz0oHXo2Y4L8xDRn0vq5UcmZrga48cngRl1z5lK
+X-Gm-Gg: AeBDietFVqv3HHyC33VoDwO6ZHRyuIsn/uyfFDvMtxolsY2zb1vKW/R0I1Wicw5ZVB9
+	5NcwJmdLBXewtFSJTHJbhsWI52gndFb550o6yecXzm0KWeeoD0R2if+V+58afF3IwsotmkSZ6TV
+	bvxAtngdBAdxrDZ0Pxmb+lU5AcevJ8kRATtI+gS9YvbXZ3Hlek4b6+YQGpCo+iGweR+kyg0wgPi
+	OSXtXLBdgBa+RzJwlbAfmmwjr1pHJpriUQYkOVwwP2By46to+vaZk8+eKKzsH+spRvCSJqsSSjn
+	yRcN/Z6+4sPBFk/azAxbhb1ixy73HCBJZKIUT6Gysi740yZuNVuU5gFJcSAaSsS7kzHo/Te/7bv
+	oK3FytJW1gSCWFPPU7nydmJzxaxLag/7SVX6ypwTJ60gr5PhIPlkdFJ3lN92t51ZfWTnInPvWMr
+	+3KUlr73kpZdT7bpys2hJIsDe8GN/pyNHY1OC7VRn0OUNIqCu2s6xBQD73LbpzuJCxkRb/uLSAb
+	K0HRr4TyWdZ3EMcKHCSClSLXx4ZBmwu
+X-Received: by 2002:a17:902:c9c4:b0:2b2:712c:61be with SMTP id d9443c01a7336-2b5f9ed0b48mr97460005ad.18.1776692795592;
+        Mon, 20 Apr 2026 06:46:35 -0700 (PDT)
+Received: from localhost.localdomain (124-218-201-66.cm.dynamic.apol.com.tw. [124.218.201.66])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b5faa494e1sm101960195ad.35.2026.04.20.06.46.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Apr 2026 06:43:18 -0700 (PDT)
-Date: Mon, 20 Apr 2026 15:43:14 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
-	Jakub Kicinski <kuba@kernel.org>
-Subject: Re: Question/proposal for DPLL NCO (DCO) mode
-Message-ID: <3rgm35qzwvzdrubvtdrccl3sb5cx2ufiy7b5wnjun223bosi45@2bnbfrlqnsbk>
-References: <21cce17b-9a79-41b5-8363-faee2378aa37@redhat.com>
+        Mon, 20 Apr 2026 06:46:35 -0700 (PDT)
+From: "Lucien.Jheng" <lucienzx159@gmail.com>
+To: andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bjorn@mork.no
+Cc: ericwouds@gmail.com,
+	frank-w@public-files.de,
+	daniel@makrotopia.org,
+	lucien.jheng@airoha.com,
+	albert-al.lee@airoha.com,
+	"Lucien.Jheng" <lucienzx159@gmail.com>
+Subject: [PATCH v3] net: phy: air_en8811h: add AN8811HB MCU assert/deassert support
+Date: Mon, 20 Apr 2026 21:45:06 +0800
+Message-Id: <20260420134506.35164-1-lucienzx159@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <21cce17b-9a79-41b5-8363-faee2378aa37@redhat.com>
-X-Spamd-Result: default: False [-1.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[resnulli-us.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279831-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-279832-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,public-files.de,makrotopia.org,airoha.com];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[resnulli.us];
-	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[resnulli-us.20251104.gappssmtp.com:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,mork.no];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lucienzx159@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: EB22442F920
+X-Rspamd-Queue-Id: 89E7942F978
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Mon, Apr 20, 2026 at 01:42:29PM +0200, ivecera@redhat.com wrote:
->Hi all,
->
->I am currently working on adding PTP clock support (PHC) to the ZL3073x
->driver, and I would like to discuss an architectural addition to the
->DPLL subsystem enum dpll_mode before sending the formal patch series.
->
->To support IEEE 1588 PTP, the hardware DPLL must be decoupled from
->tracking physical reference pins. Instead, its output frequency needs to
->be continuously steered by a software PTP stack (e.g., linuxptp) using
->the .adjfine() callback. In the industry, this specific hardware state
->is widely known as NCO (Numerically Controlled Oscillator) or DCO
->(Digitally Controlled Oscillator) mode.
->
->Currently, the DPLL subsystem defines two modes in enum dpll_mode:
->
->MANUAL: The user explicitly selects a physical input pin to track.
->
->AUTOMATIC: The hardware automatically selects the best physical input pin
->based on priorities.
->
->Neither of these accurately represents the NCO/DCO state, where physical
->pins are ignored, and the loop is fully software-steered.
+AN8811HB needs a MCU soft-reset cycle before firmware loading begins.
+Assert the MCU (hold it in reset) and immediately deassert (release)
+via a dedicated PBUS register pair (0x5cf9f8 / 0x5cf9fc), accessed
+through a registered mdio_device at PHY-addr+8.
 
-The manual/automatic mode is defining strategy/behaviour about how the
-input pins are selected.
+Add __air_pbus_reg_write() as a low-level helper taking a struct
+mdio_device *, create and register the PBUS mdio_device in
+an8811hb_probe() and store it in priv->pbusdev, then implement
+an8811hb_mcu_assert() / _deassert() on top of it. Add
+an8811hb_remove() to unregister the PBUS device on teardown. Wire
+both calls into an8811hb_load_firmware() and en8811h_restart_mcu()
+so every firmware load or MCU restart on AN8811HB correctly sequences
+the reset control registers.
 
-<header_quote>
- * enum dpll_mode - working modes a dpll can support, differentiates if and how
- *   dpll selects one of its inputs to syntonize with it
-</header_quote>
+Fixes: 0a55766b7711 ("net: phy: air_en8811h: add Airoha AN8811HB support")
+Signed-off-by: Lucien Jheng <lucienzx159@gmail.com>
+---
+Changes in v3:
+- Register a dedicated mdio_device for the PBUS node (addr+8) in
+  an8811hb_probe() and store it in priv->pbusdev, replacing the
+  inline addr+8 computation in v2.
+- Change __air_pbus_reg_write() to take struct mdio_device * instead
+  of struct phy_device *.
+- Add an8811hb_remove() to unregister and free the PBUS device.
+- Fix error handling in an8811hb_probe() with goto error paths to
+  ensure the PBUS device is always cleaned up on failure.
 
-You don't want to change the strategy. You just
-don't want that/don't care. Why it make sense to add a mode then?
+ drivers/net/phy/air_en8811h.c | 142 +++++++++++++++++++++++++++++++++-
+ 1 file changed, 138 insertions(+), 4 deletions(-)
 
-I was thinking exposing this over STATUS. We have:
-UNLOCKED (free running)
-LOCKED
-LOCKED_HO_ACQ
-HOLDOVER
+diff --git a/drivers/net/phy/air_en8811h.c b/drivers/net/phy/air_en8811h.c
+index 29ae73e65..1fe2d8bec 100644
+--- a/drivers/net/phy/air_en8811h.c
++++ b/drivers/net/phy/air_en8811h.c
+@@ -170,9 +170,21 @@
+ #define   AN8811HB_CLK_DRV_CKO_LDPWD		BIT(13)
+ #define   AN8811HB_CLK_DRV_CKO_LPPWD		BIT(14)
+ 
++#define AN8811HB_MCU_SW_RST		0x5cf9f8
++#define   AN8811HB_MCU_SW_RST_HOLD		BIT(16)
++#define   AN8811HB_MCU_SW_RST_RUN		(BIT(16) | BIT(0))
++#define AN8811HB_MCU_SW_START		0x5cf9fc
++#define   AN8811HB_MCU_SW_START_EN		BIT(16)
++
++/* MII register constants for PBUS access (PHY addr + 8) */
++#define AIR_PBUS_ADDR_HIGH		0x1c
++#define AIR_PBUS_DATA_HIGH		0x10
++
+ /* Led definitions */
+ #define EN8811H_LED_COUNT	3
+ 
++#define EN8811H_PBUS_ADDR_OFFS	8
++
+ /* Default LED setup:
+  * GPIO5 <-> LED0  On: Link detected, blink Rx/Tx
+  * GPIO4 <-> LED1  On: Link detected at 2500 or 1000 Mbps
+@@ -201,6 +213,7 @@ struct en8811h_priv {
+ 	struct clk_hw		hw;
+ 	struct phy_device	*phydev;
+ 	unsigned int		cko_is_enabled;
++	struct mdio_device	*pbusdev;
+ };
+ 
+ enum {
+@@ -254,6 +267,31 @@ static int air_phy_write_page(struct phy_device *phydev, int page)
+ 	return __phy_write(phydev, AIR_EXT_PAGE_ACCESS, page);
+ }
+ 
++static int __air_pbus_reg_write(struct mdio_device *mdiodev,
++				u32 pbus_reg, u32 pbus_data)
++{
++	int ret;
++
++	ret = __mdiobus_write(mdiodev->bus, mdiodev->addr, AIR_EXT_PAGE_ACCESS,
++			      upper_16_bits(pbus_reg));
++	if (ret < 0)
++		return ret;
++
++	ret = __mdiobus_write(mdiodev->bus, mdiodev->addr, AIR_PBUS_ADDR_HIGH,
++			      (pbus_reg & GENMASK(15, 6)) >> 6);
++	if (ret < 0)
++		return ret;
++
++	ret = __mdiobus_write(mdiodev->bus, mdiodev->addr,
++			      (pbus_reg & GENMASK(5, 2)) >> 2,
++			      lower_16_bits(pbus_data));
++	if (ret < 0)
++		return ret;
++
++	return __mdiobus_write(mdiodev->bus, mdiodev->addr, AIR_PBUS_DATA_HIGH,
++			       upper_16_bits(pbus_data));
++}
++
+ static int __air_buckpbus_reg_write(struct phy_device *phydev,
+ 				    u32 pbus_address, u32 pbus_data)
+ {
+@@ -570,10 +608,67 @@ static int an8811hb_load_file(struct phy_device *phydev, const char *name,
+ 	return ret;
+ }
+ 
++static int an8811hb_mcu_assert(struct phy_device *phydev)
++{
++	struct en8811h_priv *priv = phydev->priv;
++	int ret;
++
++	phy_lock_mdio_bus(phydev);
++
++	ret = __air_pbus_reg_write(priv->pbusdev, AN8811HB_MCU_SW_RST,
++				   AN8811HB_MCU_SW_RST_HOLD);
++	if (ret < 0)
++		goto unlock;
++
++	ret = __air_pbus_reg_write(priv->pbusdev, AN8811HB_MCU_SW_START, 0);
++	if (ret < 0)
++		goto unlock;
++
++	msleep(50);
++	phydev_dbg(phydev, "MCU asserted\n");
++
++unlock:
++	phy_unlock_mdio_bus(phydev);
++	return ret;
++}
++
++static int an8811hb_mcu_deassert(struct phy_device *phydev)
++{
++	struct en8811h_priv *priv = phydev->priv;
++	int ret;
++
++	phy_lock_mdio_bus(phydev);
++
++	ret = __air_pbus_reg_write(priv->pbusdev, AN8811HB_MCU_SW_START,
++				   AN8811HB_MCU_SW_START_EN);
++	if (ret < 0)
++		goto unlock;
++
++	ret = __air_pbus_reg_write(priv->pbusdev, AN8811HB_MCU_SW_RST,
++				   AN8811HB_MCU_SW_RST_RUN);
++	if (ret < 0)
++		goto unlock;
++
++	msleep(50);
++	phydev_dbg(phydev, "MCU deasserted\n");
++
++unlock:
++	phy_unlock_mdio_bus(phydev);
++	return ret;
++}
++
+ static int an8811hb_load_firmware(struct phy_device *phydev)
+ {
+ 	int ret;
+ 
++	ret = an8811hb_mcu_assert(phydev);
++	if (ret < 0)
++		return ret;
++
++	ret = an8811hb_mcu_deassert(phydev);
++	if (ret < 0)
++		return ret;
++
+ 	ret = air_buckpbus_reg_write(phydev, EN8811H_FW_CTRL_1,
+ 				     EN8811H_FW_CTRL_1_START);
+ 	if (ret < 0)
+@@ -662,6 +757,16 @@ static int en8811h_restart_mcu(struct phy_device *phydev)
+ {
+ 	int ret;
+ 
++	if (phy_id_compare_model(phydev->phy_id, AN8811HB_PHY_ID)) {
++		ret = an8811hb_mcu_assert(phydev);
++		if (ret < 0)
++			return ret;
++
++		ret = an8811hb_mcu_deassert(phydev);
++		if (ret < 0)
++			return ret;
++	}
++
+ 	ret = air_buckpbus_reg_write(phydev, EN8811H_FW_CTRL_1,
+ 				     EN8811H_FW_CTRL_1_START);
+ 	if (ret < 0)
+@@ -1166,6 +1271,7 @@ static int en8811h_leds_setup(struct phy_device *phydev)
+ 
+ static int an8811hb_probe(struct phy_device *phydev)
+ {
++	struct mdio_device *mdiodev;
+ 	struct en8811h_priv *priv;
+ 	int ret;
+ 
+@@ -1175,10 +1281,22 @@ static int an8811hb_probe(struct phy_device *phydev)
+ 		return -ENOMEM;
+ 	phydev->priv = priv;
+ 
++	mdiodev = mdio_device_create(phydev->mdio.bus,
++				     phydev->mdio.addr + EN8811H_PBUS_ADDR_OFFS);
++	if (IS_ERR(mdiodev))
++		return PTR_ERR(mdiodev);
++
++	ret = mdio_device_register(mdiodev);
++	if (ret) {
++		mdio_device_free(mdiodev);
++		return ret;
++	}
++	priv->pbusdev = mdiodev;
++
+ 	ret = an8811hb_load_firmware(phydev);
+ 	if (ret < 0) {
+ 		phydev_err(phydev, "Load firmware failed: %d\n", ret);
+-		return ret;
++		goto error;
+ 	}
+ 
+ 	en8811h_print_fw_version(phydev);
+@@ -1191,22 +1309,27 @@ static int an8811hb_probe(struct phy_device *phydev)
+ 
+ 	ret = en8811h_leds_setup(phydev);
+ 	if (ret < 0)
+-		return ret;
++		goto error;
+ 
+ 	priv->phydev = phydev;
+ 	/* Co-Clock Output */
+ 	ret = an8811hb_clk_provider_setup(&phydev->mdio.dev, &priv->hw);
+ 	if (ret)
+-		return ret;
++		goto error;
+ 
+ 	/* Configure led gpio pins as output */
+ 	ret = air_buckpbus_reg_modify(phydev, AN8811HB_GPIO_OUTPUT,
+ 				      AN8811HB_GPIO_OUTPUT_345,
+ 				      AN8811HB_GPIO_OUTPUT_345);
+ 	if (ret < 0)
+-		return ret;
++		goto error;
+ 
+ 	return 0;
++
++error:
++	mdio_device_remove(priv->pbusdev);
++	mdio_device_free(priv->pbusdev);
++	return ret;
+ }
+ 
+ static int en8811h_probe(struct phy_device *phydev)
+@@ -1561,6 +1684,16 @@ static int en8811h_suspend(struct phy_device *phydev)
+ 	return genphy_suspend(phydev);
+ }
+ 
++static void an8811hb_remove(struct phy_device *phydev)
++{
++	struct en8811h_priv *priv = phydev->priv;
++
++	if (priv->pbusdev) {
++		mdio_device_remove(priv->pbusdev);
++		mdio_device_free(priv->pbusdev);
++	}
++}
++
+ static struct phy_driver en8811h_driver[] = {
+ {
+ 	PHY_ID_MATCH_MODEL(EN8811H_PHY_ID),
+@@ -1587,6 +1720,7 @@ static struct phy_driver en8811h_driver[] = {
+ 	PHY_ID_MATCH_MODEL(AN8811HB_PHY_ID),
+ 	.name			= "Airoha AN8811HB",
+ 	.probe			= an8811hb_probe,
++	.remove			= an8811hb_remove,
+ 	.get_features		= en8811h_get_features,
+ 	.config_init		= an8811hb_config_init,
+ 	.get_rate_matching	= en8811h_get_rate_matching,
+-- 
+2.34.1
 
-So something maybe like SW_STEERED? But:
-
-The problem is you need to do selection. Perhaps we can have a
-"magic pin" to select for this :S ? We have pin of type
-DPLL_PIN_TYPE_INT_OSCILLATOR already. Perhaps we can have
-DPLL_PIN_TYPE_INT_NCO/NDO? It's a source.
-
-Makes sense?
-
-
->
->Without a dedicated mode, drivers are forced into "automagic"
->workarounds. A driver might implicitly switch the hardware to NCO mode
->in the background as soon as .adjfine() is called, while misreporting
->its mode as MANUAL to the DPLL subsystem.
->
->I strongly believe this hidden "automagic" behavior is a bad design. The
->user-space should have full visibility and explicit control over what
->the DPLL state machine is actually doing.
->
->The Proposal:
->I would like to propose adding a new mode: DPLL_MODE_NCO (or
->DPLL_MODE_DCO, I am open to suggestions regarding the terminology).
->
->The expected workflow would be explicit:
->If a user wants to actively steer the DPLL frequency via software (for
->PTP or other Time-over-Packet applications), they must explicitly set
->the DPLL device to this mode via Netlink first. Only then will the
->hardware accept frequency adjustments via .adjfine().
->
->I would appreciate any feedback from the DPLL subsystem maintainers and
->the community on this approach.
->
->Thanks,
->Ivan
->
 
