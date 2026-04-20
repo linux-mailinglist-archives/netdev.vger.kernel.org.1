@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-279799-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279800-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4KZ0E7k35mkmtgEAu9opvQ
-	(envelope-from <netdev+bounces-279799-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 16:27:05 +0200
+	id cERlIqJN5mkgugEAu9opvQ
+	(envelope-from <netdev+bounces-279800-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 18:00:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17FCB42D0CF
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 16:27:04 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDFB442ED25
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 18:00:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id AFA6030B5757
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 14:12:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CDD1B3688030
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 14:13:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9059443C05D;
-	Mon, 20 Apr 2026 13:29:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6C9943DA4F;
+	Mon, 20 Apr 2026 13:30:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DzKp3L8c"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CZC7rsRp"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CF3043C04D;
-	Mon, 20 Apr 2026 13:29:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80EC743DA48;
+	Mon, 20 Apr 2026 13:30:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776691790; cv=none; b=M8O2xOPLMuE2a426ciiYdpaqxCencbMJExm5LppAdsJ9HMXeE408OrIbh91u9vObriptJdrqi5BX82GBZShP6MeuvyFg+in68+ZoKJO2+NDS+kP8Zrnt9pAAG+/Egfx19BeTedk15othxLFF/i/+Jkewi9crqi0lnAqzDco7Efo=
+	t=1776691800; cv=none; b=bkNaDJKgimmBdx2DdKFxGo4c6e8g5ta5lXghT87TrQe+T9B03Z5ZxGlOWwkGUHwQfF6bSlu1YHPwuDhLtCkjSy29WGCW9ilyL01X3e3n6LgkBhNz4g9Wjw9l+7Zn2/+3yY3ViUACPNivcNNOlBSxJq50xYMCSenOh4125An5Xo8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776691790; c=relaxed/simple;
-	bh=ENPWtoaRZ6I1Cp8jOxId7RI33mNaSVg5gJ18TA5yeBg=;
+	s=arc-20240116; t=1776691800; c=relaxed/simple;
+	bh=9gmm8hE1FEqgRq6dxa1smE9VP0HArrH4lZWol0kVoBQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZQqBFkLTLmWtww6lAwkVEOirufFkK7Z/P0UUBd50VhN222ISXNkyCbxY/mcpI+l46E8aC+Tq9HM15XndatPcmn+kXI5jbYi6Oouyw76aKcohvt90NwwS7s0TwYCgz8NxByrcQNfxM0FRtE6O6l62DB4FyZRkww6JTS2FJ0Mimqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DzKp3L8c; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C084BC2BCB9;
-	Mon, 20 Apr 2026 13:29:48 +0000 (UTC)
+	 MIME-Version; b=oa2v4lNjtv8ed8kXS1j7eQSJXRwJ3QqaWJwQ9x5nLfivDHUWvknp3JJjW3uB31hZEX8XK3IbH2cW383+CgCVNY+WY3fvsJjr61/QFnmFRVst0ryT0FbtSHFxXsCSgFSgg2UDCSONyLOlg5Y+Ttw3Ye/xe5ddWB7qmyy6t7qhPKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CZC7rsRp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2795FC2BCB7;
+	Mon, 20 Apr 2026 13:29:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776691790;
-	bh=ENPWtoaRZ6I1Cp8jOxId7RI33mNaSVg5gJ18TA5yeBg=;
+	s=k20201202; t=1776691800;
+	bh=9gmm8hE1FEqgRq6dxa1smE9VP0HArrH4lZWol0kVoBQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=DzKp3L8cxI799QzVEJgkXb4+w/TcsVeu1B9DdT8Wwo0yRlFodZBbxz4jkhA8ciza4
-	 t2V9ACVsmKz8HGOopEgBQ1aK9kvkNTFz0pRTbTl/e86m5wG1Ar9/Ld2VnM06D/epTL
-	 8mqSMQQ7cCM2ue+M5nG1Aomm3Ri0nsnev7zlB6v4RvZuv68ZUYFZiJS8JZmsY2gzYv
-	 TYF1KqGax+E7xmqH4VYlG/WmqvddYWIRd4Nb3ESwGJm+k4TnbPsB/LXNeb4p2YpCZK
-	 vyW4xDDrWU6Yu4Exst4mmsJ95cL56WuLtDYmRxtmQOR+vQuXI26uXUiHWd76EFfsq7
-	 EnTg57jEtaIXA==
+	b=CZC7rsRpp4kR7W1uWS2fvSPp2BpSFCNG0of0kKwwJNIK+RwysAf0/boeH4znnUqm2
+	 bIJd2QcGMtHk6kZnnRAmOK4wSAmtrk8PEQHvRjw40ULAdzeEepLtXCVr0/0noeED5P
+	 RQpysUNYU8khSsZahtQFgczSmOhvV5HcRcpKQCB9yiaZD0tDi0XbmRH4WChqfI8Ndh
+	 TjuRL5qKBOHkReLNvzAbgDLK+36CmRaWVAWtCJEqeozrOPu0VKBDp0PUKzA6pRnbif
+	 XP6IJe9vreQlUNp4BrtVesT6Pue/G/VZO2fY67WxsL2mSjhmegwNgIOMiA3qRnN1Mv
+	 3H3k254vDv//Q==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Nikolaos Gkarlis <nickgarlis@gmail.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
+Cc: Eric Dumazet <edumazet@google.com>,
+	Yiming Qian <yimingqian591@gmail.com>,
+	Justin Iurman <justin.iurman@gmail.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
 	davem@davemloft.net,
-	edumazet@google.com,
+	dsahern@kernel.org,
 	pabeni@redhat.com,
-	ebiederm@aristanetworks.com,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.18] rtnetlink: add missing netlink_ns_capable() check for peer netns
-Date: Mon, 20 Apr 2026 09:19:49 -0400
-Message-ID: <20260420132314.1023554-195-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.18] ipv6: ioam: fix potential NULL dereferences in __ioam6_fill_trace_data()
+Date: Mon, 20 Apr 2026 09:19:55 -0400
+Message-ID: <20260420132314.1023554-201-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260420132314.1023554-1-sashal@kernel.org>
 References: <20260420132314.1023554-1-sashal@kernel.org>
@@ -73,55 +73,56 @@ X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.18.23
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,google.com,kernel.org,davemloft.net,redhat.com,aristanetworks.com,vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-279799-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	FREEMAIL_CC(0.00)[google.com,gmail.com,kernel.org,davemloft.net,redhat.com,vger.kernel.org];
 	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-279800-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	NEURAL_HAM(-0.00)[-0.996];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 17FCB42D0CF
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: DDFB442ED25
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Nikolaos Gkarlis <nickgarlis@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
 
-[ Upstream commit 7b735ef81286007794a227ce2539419479c02a5f ]
+[ Upstream commit 4e65a8b8daa18d63255ec58964dd192c7fdd9f8b ]
 
-rtnl_newlink() lacks a CAP_NET_ADMIN capability check on the peer
-network namespace when creating paired devices (veth, vxcan,
-netkit). This allows an unprivileged user with a user namespace
-to create interfaces in arbitrary network namespaces, including
-init_net.
+We need to check __in6_dev_get() for possible NULL value, as
+suggested by Yiming Qian.
 
-Add a netlink_ns_capable() check for CAP_NET_ADMIN in the peer
-namespace before allowing device creation to proceed.
+Also add skb_dst_dev_rcu() instead of skb_dst_dev(),
+and two missing READ_ONCE().
 
-Fixes: 81adee47dfb6 ("net: Support specifying the network namespace upon device creation.")
-Signed-off-by: Nikolaos Gkarlis <nickgarlis@gmail.com>
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
-Link: https://patch.msgid.link/20260402181432.4126920-1-nickgarlis@gmail.com
+Note that @dev can't be NULL.
+
+Fixes: 9ee11f0fff20 ("ipv6: ioam: Data plane support for Pre-allocated Trace")
+Reported-by: Yiming Qian <yimingqian591@gmail.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: Justin Iurman <justin.iurman@gmail.com>
+Link: https://patch.msgid.link/20260402101732.1188059-1-edumazet@google.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
@@ -130,77 +131,97 @@ LLM Generated explanations, may be completely bogus:
 
 Error: Failed to generate final synthesis
 
- net/core/rtnetlink.c | 40 +++++++++++++++++++++++++++-------------
- 1 file changed, 27 insertions(+), 13 deletions(-)
+ net/ipv6/ioam6.c | 27 ++++++++++++++++-----------
+ 1 file changed, 16 insertions(+), 11 deletions(-)
 
-diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index f3b22d5526fe6..f4ed60bd9a256 100644
---- a/net/core/rtnetlink.c
-+++ b/net/core/rtnetlink.c
-@@ -3887,28 +3887,42 @@ static int rtnl_newlink_create(struct sk_buff *skb, struct ifinfomsg *ifm,
- 	goto out;
- }
- 
--static struct net *rtnl_get_peer_net(const struct rtnl_link_ops *ops,
-+static struct net *rtnl_get_peer_net(struct sk_buff *skb,
-+				     const struct rtnl_link_ops *ops,
- 				     struct nlattr *tbp[],
- 				     struct nlattr *data[],
- 				     struct netlink_ext_ack *extack)
+diff --git a/net/ipv6/ioam6.c b/net/ipv6/ioam6.c
+index 8db7f965696aa..12350e1e18bde 100644
+--- a/net/ipv6/ioam6.c
++++ b/net/ipv6/ioam6.c
+@@ -710,7 +710,9 @@ static void __ioam6_fill_trace_data(struct sk_buff *skb,
+ 				    struct ioam6_schema *sc,
+ 				    unsigned int sclen, bool is_input)
  {
--	struct nlattr *tb[IFLA_MAX + 1];
-+	struct nlattr *tb[IFLA_MAX + 1], **attrs;
-+	struct net *net;
- 	int err;
+-	struct net_device *dev = skb_dst_dev(skb);
++	/* Note: skb_dst_dev_rcu() can't be NULL at this point. */
++	struct net_device *dev = skb_dst_dev_rcu(skb);
++	struct inet6_dev *i_skb_dev, *idev;
+ 	struct timespec64 ts;
+ 	ktime_t tstamp;
+ 	u64 raw64;
+@@ -721,13 +723,16 @@ static void __ioam6_fill_trace_data(struct sk_buff *skb,
  
--	if (!data || !data[ops->peer_type])
--		return rtnl_link_get_net_ifla(tbp);
--
--	err = rtnl_nla_parse_ifinfomsg(tb, data[ops->peer_type], extack);
--	if (err < 0)
--		return ERR_PTR(err);
--
--	if (ops->validate) {
--		err = ops->validate(tb, NULL, extack);
-+	if (!data || !data[ops->peer_type]) {
-+		attrs = tbp;
-+	} else {
-+		err = rtnl_nla_parse_ifinfomsg(tb, data[ops->peer_type], extack);
- 		if (err < 0)
- 			return ERR_PTR(err);
-+
-+		if (ops->validate) {
-+			err = ops->validate(tb, NULL, extack);
-+			if (err < 0)
-+				return ERR_PTR(err);
-+		}
-+
-+		attrs = tb;
- 	}
+ 	data = trace->data + trace->remlen * 4 - trace->nodelen * 4 - sclen * 4;
  
--	return rtnl_link_get_net_ifla(tb);
-+	net = rtnl_link_get_net_ifla(attrs);
-+	if (IS_ERR_OR_NULL(net))
-+		return net;
++	i_skb_dev = skb->dev ? __in6_dev_get(skb->dev) : NULL;
++	idev = __in6_dev_get(dev);
 +
-+	if (!netlink_ns_capable(skb, net->user_ns, CAP_NET_ADMIN)) {
-+		put_net(net);
-+		return ERR_PTR(-EPERM);
-+	}
-+
-+	return net;
- }
+ 	/* hop_lim and node_id */
+ 	if (trace->type.bit0) {
+ 		byte = ipv6_hdr(skb)->hop_limit;
+ 		if (is_input)
+ 			byte--;
  
- static int __rtnl_newlink(struct sk_buff *skb, struct nlmsghdr *nlh,
-@@ -4047,7 +4061,7 @@ static int rtnl_newlink(struct sk_buff *skb, struct nlmsghdr *nlh,
- 		}
+-		raw32 = dev_net(dev)->ipv6.sysctl.ioam6_id;
++		raw32 = READ_ONCE(dev_net(dev)->ipv6.sysctl.ioam6_id);
  
- 		if (ops->peer_type) {
--			peer_net = rtnl_get_peer_net(ops, tb, data, extack);
-+			peer_net = rtnl_get_peer_net(skb, ops, tb, data, extack);
- 			if (IS_ERR(peer_net)) {
- 				ret = PTR_ERR(peer_net);
- 				goto put_ops;
+ 		*(__be32 *)data = cpu_to_be32((byte << 24) | raw32);
+ 		data += sizeof(__be32);
+@@ -735,18 +740,18 @@ static void __ioam6_fill_trace_data(struct sk_buff *skb,
+ 
+ 	/* ingress_if_id and egress_if_id */
+ 	if (trace->type.bit1) {
+-		if (!skb->dev)
++		if (!i_skb_dev)
+ 			raw16 = IOAM6_U16_UNAVAILABLE;
+ 		else
+-			raw16 = (__force u16)READ_ONCE(__in6_dev_get(skb->dev)->cnf.ioam6_id);
++			raw16 = (__force u16)READ_ONCE(i_skb_dev->cnf.ioam6_id);
+ 
+ 		*(__be16 *)data = cpu_to_be16(raw16);
+ 		data += sizeof(__be16);
+ 
+-		if (dev->flags & IFF_LOOPBACK)
++		if ((dev->flags & IFF_LOOPBACK) || !idev)
+ 			raw16 = IOAM6_U16_UNAVAILABLE;
+ 		else
+-			raw16 = (__force u16)READ_ONCE(__in6_dev_get(dev)->cnf.ioam6_id);
++			raw16 = (__force u16)READ_ONCE(idev->cnf.ioam6_id);
+ 
+ 		*(__be16 *)data = cpu_to_be16(raw16);
+ 		data += sizeof(__be16);
+@@ -822,7 +827,7 @@ static void __ioam6_fill_trace_data(struct sk_buff *skb,
+ 		if (is_input)
+ 			byte--;
+ 
+-		raw64 = dev_net(dev)->ipv6.sysctl.ioam6_id_wide;
++		raw64 = READ_ONCE(dev_net(dev)->ipv6.sysctl.ioam6_id_wide);
+ 
+ 		*(__be64 *)data = cpu_to_be64(((u64)byte << 56) | raw64);
+ 		data += sizeof(__be64);
+@@ -830,18 +835,18 @@ static void __ioam6_fill_trace_data(struct sk_buff *skb,
+ 
+ 	/* ingress_if_id and egress_if_id (wide) */
+ 	if (trace->type.bit9) {
+-		if (!skb->dev)
++		if (!i_skb_dev)
+ 			raw32 = IOAM6_U32_UNAVAILABLE;
+ 		else
+-			raw32 = READ_ONCE(__in6_dev_get(skb->dev)->cnf.ioam6_id_wide);
++			raw32 = READ_ONCE(i_skb_dev->cnf.ioam6_id_wide);
+ 
+ 		*(__be32 *)data = cpu_to_be32(raw32);
+ 		data += sizeof(__be32);
+ 
+-		if (dev->flags & IFF_LOOPBACK)
++		if ((dev->flags & IFF_LOOPBACK) || !idev)
+ 			raw32 = IOAM6_U32_UNAVAILABLE;
+ 		else
+-			raw32 = READ_ONCE(__in6_dev_get(dev)->cnf.ioam6_id_wide);
++			raw32 = READ_ONCE(idev->cnf.ioam6_id_wide);
+ 
+ 		*(__be32 *)data = cpu_to_be32(raw32);
+ 		data += sizeof(__be32);
 -- 
 2.53.0
 
