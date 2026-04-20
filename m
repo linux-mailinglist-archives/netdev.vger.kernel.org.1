@@ -1,183 +1,136 @@
-Return-Path: <netdev+bounces-279858-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279859-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KPA/Fq1h5mm6vgEAu9opvQ
-	(envelope-from <netdev+bounces-279858-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 19:26:05 +0200
+	id SBvuNT5l5mlmvwEAu9opvQ
+	(envelope-from <netdev+bounces-279859-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 19:41:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87398431309
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 19:26:04 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 686EE431D29
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 19:41:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AC0783697FC4
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 15:44:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 995C532280CB
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 15:54:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9F1B33DEF2;
-	Mon, 20 Apr 2026 15:44:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A314D3396EE;
+	Mon, 20 Apr 2026 15:54:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ddaCCu1m"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="md5E8DjZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f68.google.com (mail-ot1-f68.google.com [209.85.210.68])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F73D336EE1
-	for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 15:44:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80C19329C6D
+	for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 15:54:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776699847; cv=none; b=ZQDrxkNBY3+hhG5gwVnG/m+keP09ecHkFR+RMkkgksIglH9xDf6Caxcj5hhismxINQ1OHQocdMUixzuwNV32+zOjayrTanu2ikLDMD5iizemeS2j0MWll9RYP4MbObczfn2hfcCxIKjBwac5eOzEMPIONFCu7h2iX3Nsb7cHhtU=
+	t=1776700453; cv=none; b=JpyU+7TVDwVsQFE0QHqJH1hZ6W5bQwWZmHFZ+ez8UowdYSzUhg8nkbsOaHD34Q5Y1Au9CPz4m3w3cvDCmNmbDxUitAqfdmBrwGlO362an+6oDS8qFSa6IV1mRua85y+Am9UtV/yCfOxF4juSCUigROc2v2CyDv0sZWzZFQO3+R8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776699847; c=relaxed/simple;
-	bh=1k1hp7u43c9TkJzzlgOWfZ4UDE8HfeeU5PBzOa6ytCs=;
+	s=arc-20240116; t=1776700453; c=relaxed/simple;
+	bh=KjHyxxjPDBim6sQ9KYPdRWv3pfyjQHkMzJZQEGKI5R0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DyDCPqAQwopoYxx5YjHOYfmIN7L3z1f4WQvNeixvbMt8Es2VnwJN2o6GlKgdATqlpupDTOpMSsDV4b7TWypMbfQrEb9ho0TJSIDzH6D3dATyo0nTZEsinmz4luNOG4Ccs09z7KrZYzsb3q8ZjzEOiZdQ6y9uZ1sXGX58CW5lDgg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ddaCCu1m; arc=none smtp.client-ip=209.85.210.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f68.google.com with SMTP id 46e09a7af769-7dca4debedaso2036676a34.2
-        for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 08:44:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776699845; x=1777304645; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HMCNN46uzvkkx+pdzNFwcf4+qGVUVpMcwYXyw94YpJA=;
-        b=ddaCCu1mxfBzDYB2X/p0fburKPAT65PTMdudfokAeUhIlkTD4afM8MFwjvCsf3Cs6U
-         iZYZJqq8dpZwcIJvzVdqYE0SoifFK+oFiSasZoVVXVT0ozrc+/pBG6lkhAYjjPgIwD8G
-         2yTjPsH/2nlHlQ38YI3F15Q+fO4BMWE9aYHS4UTpgXDnq/oLWxCxfuXDcoathnrmCSrr
-         SP0Z0F7/6mGnqoGNbjPR2yXwp8jNpu3SJMjv0SJj6oQBRoC3pXI5Xn4Jj5/7fiydOzF4
-         f661Go+L7Po5qbqE4r30R+Oz0MK4ZjDNS3oFzRRfzscNdS1f0Zaw3GQwiAxSNKbUGXsu
-         nBzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776699845; x=1777304645;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HMCNN46uzvkkx+pdzNFwcf4+qGVUVpMcwYXyw94YpJA=;
-        b=ClBL/0FhTlKORkitqXsY4/1Gl7BfHctPx+kLBOkAg35fqTkLsRACAGQCRtZ9GUHzOg
-         PVsZ1bPlq3G0hpz4MWwJygabhwJKri6n5YYma0Cm6bu2NKzOgyhim8K622EDYidKDRjT
-         0sP2Nh73vBhuDHvjmwpCCyddkaOAk4JUe9ZHu8p4FvUKTo2PDs44KJIYmtrhdR3cTNPY
-         6dJbio7WAscGWC5d7O2u6aNVq6FurmsZJ4Bo2PKgvh9gGXwJqHFVJUf+DuZsAYWsMp00
-         e5NHjTYSw/T+0pBaxVN/w41Vw85UjBKbtbxzD1G4s+VMl659uZrKqMkDHz64Fk69mStt
-         Dj0w==
-X-Forwarded-Encrypted: i=1; AFNElJ8R42pcRHnfKikRBiUz9p6u4lokWk6rJgydW1mzCNC4nmlX0RshwJyByh2PFArY3Kz+r4R6tuM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzdPmM2/LfnMdSTjc9WCsnwS+5Xe1SN02N+KqX1QA6pjYZJf6Jl
-	ot56Sn64JwYHOPEYdgGQqOhhn7O/86+yoQsaUnlEcX3GLwiPbIkZ5J5Q
-X-Gm-Gg: AeBDieuoxW4+ik90ZYSEJgFjoFmrr+FSQfzl/I/MkYYdu7j2mb+ntRvKX78lNpP1vQX
-	rTWC6lwii1jUi8yFkD8hjiNR1DlUUP0SS/7ZNfOSB3ROSOuZ5CUj7WtGkrRO+xBDzur3ee/g7p6
-	6MhF4T7FDzdnMG0CXpiZCo2uonZiWC8+n9KfYtWu1tUyID4GTzw5cYClxlWqSNf5A2hx5TVqfpW
-	8/jDCPP43hI8/0hLQ7Wyb0iUJm1vxUUzCK3f+3eHysss1Ajvhh7g+nZbJ5NR3lA35MykLPwnMNk
-	2wcqSg8WpwuiEAVMJUuNSFoSHYyxjQdL+N88YCNmx8I/39Ldl7dKm1Az4XzBdE9QUXrwUBg5u9b
-	PSD//IC1zc9tDFnJ1Z32jFcFg7UJ7f6EDNpha13if4HWKas4wYHTx52UweRPRGoASjA6Nx2T0Gy
-	YWpAB4h2tN8muQOcT00ZDs0rOutnVIZG417gPWZw==
-X-Received: by 2002:a05:6830:310d:b0:7dc:283:8988 with SMTP id 46e09a7af769-7dc951f3503mr8846792a34.19.1776699845320;
-        Mon, 20 Apr 2026 08:44:05 -0700 (PDT)
-Received: from localhost ([2a03:2880:12ff:7::])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7dc975034e7sm8780521a34.6.2026.04.20.08.44.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Apr 2026 08:44:04 -0700 (PDT)
-Date: Mon, 20 Apr 2026 08:44:04 -0700
-From: Stanislav Fomichev <sdf.kernel@gmail.com>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com, 
-	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org, 
-	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com, horms@kernel.org, 
-	andrew+netdev@lunn.ch, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Subject: Re: [PATCH net 2/4] xsk: free the skb when hitting the upper bound
- MAX_SKB_FRAGS
-Message-ID: <aeZJh5O7oWG6zYXt@devvm17672.vll0.facebook.com>
-References: <20260418045644.28612-1-kerneljasonxing@gmail.com>
- <20260418045644.28612-3-kerneljasonxing@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=kGPUBWuIDYuizAtzZ+RgyO6Qyf7MjQ/eghi/k617VsK8D5uqDXYhcyFBuN6yvX6gtFEr6gjLopHPfUXlLBQThLZ81qQYYcN4EHodfhXSSBA5X7116u2i5KpuA2n7L8XtfFkRuIPUTNlL+u0kRuR7muWgZboyRIm3HWvvvK56hWo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=md5E8DjZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10939C19425;
+	Mon, 20 Apr 2026 15:54:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776700453;
+	bh=KjHyxxjPDBim6sQ9KYPdRWv3pfyjQHkMzJZQEGKI5R0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=md5E8DjZIOSFg8J9sBuryhu60e/wjXlftP7tYt1NXoHXTc9pfr9SQohuJfb3bmkM2
+	 ftBxgWfg9FHJtRzqdQTWfijvvXCDRWQe0TGGpSCktRyA24k3A49qAhiL32mlYT9Mt5
+	 MvjhQcGoccQLUkUEnxtyZHTy+XA5hK66+4w8Lc6NiVPpIDM3gj4zrbleVx8MQbFJ57
+	 dKZI5TB6U1h2q/GmhVwdQf+4rbrOCD7SqkIe6y5bCwPN/HEmIqTn9zywFZQg2o6VT9
+	 d7TzPUtNFhnyVG84SCeAKDgKrIxUjFErptquIX8jI/uBn5UC3l77XSJUOFjOBu5B0I
+	 m572eY2mik9KQ==
+Date: Mon, 20 Apr 2026 16:54:09 +0100
+From: Simon Horman <horms@kernel.org>
+To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
+	netdev@vger.kernel.org, Konrad Knitter <konrad.knitter@intel.com>
+Subject: Re: [PATCH iwl-net 2/4] ice: fix autoneg disable when link partner
+ doesn't support AN
+Message-ID: <20260420155409.GT280379@horms.kernel.org>
+References: <20260417062954.1241900-1-aleksandr.loktionov@intel.com>
+ <20260417062954.1241900-3-aleksandr.loktionov@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260418045644.28612-3-kerneljasonxing@gmail.com>
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+In-Reply-To: <20260417062954.1241900-3-aleksandr.loktionov@intel.com>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279858-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-279859-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,intel.com,gmail.com,fomichev.me,iogearbox.net,lunn.ch,vger.kernel.org,tencent.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sdfkernel@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tencent.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,devvm17672.vll0.facebook.com:mid]
-X-Rspamd-Queue-Id: 87398431309
+	RCPT_COUNT_FIVE(0.00)[5];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,horms.kernel.org:mid,intel.com:email]
+X-Rspamd-Queue-Id: 686EE431D29
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 04/18, Jason Xing wrote:
-> From: Jason Xing <kernelxing@tencent.com>
+On Fri, Apr 17, 2026 at 08:29:52AM +0200, Aleksandr Loktionov wrote:
+> From: Konrad Knitter <konrad.knitter@intel.com>
 > 
-> Fix it by explicitly adding kfree_skb() before returning back to its
-> caller.
+> Disabling autonegotiation was silently ignored when autoneg had not yet
+> completed (ICE_AQ_AN_COMPLETED was not set), leaving the configuration
+> unchanged with no error. This could prevent link from forming if the
+> link partner requires non-autoneg mode.
 > 
-> How to reproduce it in virtio_net:
-> 1. the current skb is the first one (which means xs->skb is NULL) and
->    hit the limit MAX_SKB_FRAGS.
-> 2. xsk_build_skb_zerocopy() returns -EOVERFLOW.
-> 3. the caller xsk_build_skb() clears skb by using 'skb = NULL;'. This
->    is why bug can be triggered.
-> 4. there is no chance to free this skb anymore.
+> Extend the condition to also allow disabling autoneg when the link
+> partner reports no AN ability (ICE_AQ_LP_AN_ABILITY clear). Gate the
+> ICE_AQ_LP_AN_ABILITY check on the link being up so that stale or
+> zeroed an_info when link is down does not produce a false positive.
+> Introduce the helper ice_autoneg_disable_allowed() to make the check
+> explicit.
 > 
-> Note that if in this case the xs->skb is not NULL, xsk_build_skb() will
-> call xsk_drop_skb(xs->skb) to do the right thing.
-> 
-> Fixes: cf24f5a5feea ("xsk: add support for AF_XDP multi-buffer on Tx path")
-> Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> ---
->  net/xdp/xsk.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-> index 8fcde34aec7b..5d3dbb118730 100644
-> --- a/net/xdp/xsk.c
-> +++ b/net/xdp/xsk.c
-> @@ -778,8 +778,11 @@ static struct sk_buff *xsk_build_skb_zerocopy(struct xdp_sock *xs,
->  	addr = buffer - pool->addrs;
->  
->  	for (copied = 0, i = skb_shinfo(skb)->nr_frags; copied < len; i++) {
-> -		if (unlikely(i >= MAX_SKB_FRAGS))
-> +		if (unlikely(i >= MAX_SKB_FRAGS)) {
-> +			if (!xs->skb)
-> +				kfree_skb(skb);
->  			return ERR_PTR(-EOVERFLOW);
-> +		}
->  
->  		page = pool->umem->pgs[addr >> PAGE_SHIFT];
->  		get_page(page);
-> -- 
-> 2.41.3
-> 
+> Fixes: f1a4a66d2310 ("ice: fix set pause param autoneg check")
 
-As mentioned for patch 1, need to do something with that
-xsk_skb_init_misc... Otherwise we hit destructor with xsk_cq_submit_addr_locked
-here as well
+AI generated code review [1] flags that this does not seem to be
+the right Fixes tag and that the following seems more appropriate:
+
+Fixes: 48cb27f2fd18 ("ice: Implement handlers for ethtool PHY/link operations")
+
+[1] https://netdev-ai.bots.linux.dev/ai-local.html
+
+> Signed-off-by: Konrad Knitter <konrad.knitter@intel.com>
+> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+
+The above not withstanding, this looks looks to me:
+
+Reviewed-by: Simon Horman <horms@kernel.org>
+
+
+I somehow feel obliged to acknowledge that Sashiko has provided
+review of this patch. However, I don't believe any of the
+issues flagged there should block progress of this patch.
+
+You may wish to look over that review for possible follow-up activity.
+
+...
 
