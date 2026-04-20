@@ -1,194 +1,165 @@
-Return-Path: <netdev+bounces-279678-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279679-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id pZlCHv3f5WmlowEAu9opvQ
-	(envelope-from <netdev+bounces-279678-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 10:12:45 +0200
+	id YD/jE3Dg5WmlowEAu9opvQ
+	(envelope-from <netdev+bounces-279679-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 10:14:40 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1633428076
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 10:12:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 39BD0428086
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 10:14:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8D41530048DB
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 08:12:43 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BB29B3005142
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 08:14:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10C6E3148C9;
-	Mon, 20 Apr 2026 08:12:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65EEF38836F;
+	Mon, 20 Apr 2026 08:14:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="WvnYgycS";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="HPqBEWla"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f71.google.com (mail-oo1-f71.google.com [209.85.161.71])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-a8-smtp.messagingengine.com (fhigh-a8-smtp.messagingengine.com [103.168.172.159])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FB95385537
-	for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 08:12:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC6703876C0;
+	Mon, 20 Apr 2026 08:14:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.159
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776672761; cv=none; b=kTgdN3xAwfbsR1pFf5XrQz3jYZfX3cT2/evSVpoXpk8zCQmcZDeIrLapAzyCBgr1lXdxCYJPo5MTVZekl30mBlCCACxagvpSTORkNSKrvQxoeEwQ8r17pgdIOGgHgCCEYSGAMlsPzS07qcXM749EXL/Ir7Wyvzvvdmv6lbO6qcI=
+	t=1776672875; cv=none; b=MUvdre/gpAAWSLZlYF4LfHD/5rqjNCoUbyU9vRmR3bvpxGhwBFntYAC1kmaWCStPVKh4uocPHwSNcbxnE+oHLupp57woKtDZiyJy9nWYjVOd5qQet8vhv87tfU9G/lBNiOtLuTyYyyc40khSBIcG6Ddn5wTiAQxwCJIjAkbhD+I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776672761; c=relaxed/simple;
-	bh=GQTy+ZBSq9aEMmo6nMHZ4n4nx2xyjOOsbDMz7J6AKBk=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=aNnbXTEZeHsPgTL/RQdc4808H08BHTG3VLSXCiOig5wYZptMabbBWvPdsjQWKwCFClQL3kR0JXjs4pWFc47moyvqJQDygbUAD7vaoja78z9iY1z0oI/UIifrZhTYGXilfX+dUydv+oQi8iafrNmA8ml5Rp3NjhuNy1R/WtDVkuw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f71.google.com with SMTP id 006d021491bc7-6853c2438b9so4663876eaf.3
-        for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 01:12:39 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776672758; x=1777277558;
-        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QrnYfIYXXYam0VZDYj4/7kC54JxgeVUDla9fg6DopKQ=;
-        b=JdhmlvmM44OLi0p0DGH6QNJmjU8CM0VbtaMV/FktSey+/Ma+tR/ucZyB/jetLpg1cX
-         BWxxHhJN+KdIaphvWV1PPcAzu5a0nVXKQLiagXC2M/QMwRYH03eoxNVKjMsOjaMcr7aW
-         uTC8EuUbHU/xEuN0q1lPdpkFpXpto2nhTGNU3oUjxRHW6Nl6LlRysQfNqX9pCqxeSd+1
-         7XTO/EpHF7yCrWe0sc35E0uhA7EGt/PrZf4lE2Hc4VAubOKZD2sElN/ppW446n6jpn2X
-         szJKpQ9jDp3jvm2skrDDK4C4Fr/Cb0L82zz+H6YCM2vvYR/53AMaFojNXvb0+Bk34QBN
-         CX9g==
-X-Forwarded-Encrypted: i=1; AFNElJ+6jIGEJ47E3CXCT4zpj/XkkRVNGijtDWUXhaW3cI3po9lUSjKt4WF3nS7qtmq7qdnRreZBcO4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywj1p7QvQgrMcwI2QZINOCfZTCepTA6fbQYxFinZ7BnJ7vnytGl
-	GXZKKUDQrk+IEvtiWrxjGO2elJtm8JZDKjpwLfJ+GBVd0X6XrkM131riTCLINLt9lw159znbiKj
-	2hkZtlpDebcqurcMNxT/w8RT1UMLLaKmaqhOpai4zSJGFhIx89ROD0NhwML4=
+	s=arc-20240116; t=1776672875; c=relaxed/simple;
+	bh=Sv83K/Ryrmzulm9brumEpwXAOUjC02md5peR3zyQU1Y=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=pMcfuayXflLRosqg8VMO2aSYugTycsAqaoJ1VQ6b4yJIAmbpS8gSJE+vjfzal9egdJT2o+CWfIraN/8plxHSPYE6P4+HAvaUGbK870q/XaPyXtkUQtpvniYqk5Je22m3H0cI6onf5IT5VnxiReG/9uBrmiVFIama0laivH9VADc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=WvnYgycS; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=HPqBEWla; arc=none smtp.client-ip=103.168.172.159
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id EB96A1400074;
+	Mon, 20 Apr 2026 04:14:32 -0400 (EDT)
+Received: from phl-imap-02 ([10.202.2.81])
+  by phl-compute-04.internal (MEProxy); Mon, 20 Apr 2026 04:14:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm1; t=1776672872;
+	 x=1776759272; bh=aPJEIrQen864YDv1MGyH5g83G2kcjKMSTtyhwJANOdY=; b=
+	WvnYgycSta+9DZfNsQsijzt7BOGYIiobvk0v6S7xzGM7o9jWvC+AFsyntJ6uQF8n
+	wuLCMUeoqOvo/pGspr3EdWX9kwfgWtxYKrvMRmUHYaXmFzO51QHCrmimn11SEtYN
+	Gc79rurUvJqBJdGbDB706HHvCvfXFYHe58tyUft1y/50bMzHAgzAyij/n+Mxzx9N
+	cfdCM9LfKExFyk6yMuz1EbbZASJRx71YLZRZdEc/PpK3kPzRqfV10rLR37qScpFz
+	ialgnznA79ldjuzGjOr7RSjo7i8CiZquzZPDv7wmJNTaM+ypfJ2BuX9bMjDnCPOH
+	xzUdIigvB+Jz+IHvW4ZQDA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1776672872; x=
+	1776759272; bh=aPJEIrQen864YDv1MGyH5g83G2kcjKMSTtyhwJANOdY=; b=H
+	PqBEWlazUA2llTO8/oFwfkQH6zOLKqReT4IUqAiYYikyXagJ0D1rlUzCm2QId9u3
+	6KmbnKhAtnR4Jp0B7E88Sy1Vzwzpwk+ym9QWgoztASIHXlWpdd8w83W921Sqsuut
+	xPTn7xuY38id0T5j+f0hId2ni3FEHD5fr78CA+KoSmaFDSVn0Mgbwx4i567m4gjw
+	10ze/gfbNNiEeW2Z9myTmcCWn7b9EoZVmqdaxKBZm/gbrgLBLcg3/9Mt7h26ERVy
+	Kr4onfTyPZAgBScc5lKz3b2j5Di5/EqCV8A9xTCeAigIbA7vxMriA8JE0jtOlb4U
+	rd8JZgMj/n1S7exCefHAQ==
+X-ME-Sender: <xms:aODlaXGLEUuI02P1STMBcZ4jwc3ImpQOhXgQBswqUUC4_RBZE4OEYQ>
+    <xme:aODlafK4eh9GA1QNuSw4lvDUlCA63pc-8qIZ2B2w_PuwisPtS-UDQQrJIc--dYEJs
+    zin9pwbkYZOsJn3J8D-xM76tlSgQtIYEDQtPBi4jt3fJctZf2kr4P4>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdehkedtudcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpefoggffhffvvefkjghfufgtgfesthejredtredttdenucfhrhhomhepfdetrhhnugcu
+    uegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrghtthgvrh
+    hnpeefhfehteffuddvgfeigefhjeetvdekteekjeefkeekleffjeetvedvgefhhfeihfen
+    ucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivgeptdenuc
+    frrghrrghmpehmrghilhhfrhhomheprghrnhgusegrrhhnuggsrdguvgdpnhgspghrtghp
+    thhtohepuddvpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegurghvvghmsegurg
+    hvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepgihirghoghhurghitdelledvsehgmhgr
+    ihhlrdgtohhmpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprh
+    gtphhtthhopehhohhrmhhssehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkvggvshes
+    khgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprh
+    gtphhtthhopehthhhorhhsthgvnhdrsghluhhmsehlihhnuhigrdguvghvpdhrtghpthht
+    ohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehsjhhurhdrsghrrg
+    hnuggvlhgrnhgusehsthgvrhhitghsshhonhdrtghomh
+X-ME-Proxy: <xmx:aODlafDTDsFQd8OM0iaLY92I070f6UXh10sahZhTlPPqLRGudjqmIw>
+    <xmx:aODlab5bZFn7uo3LRvzuceRklsDiIKZkeQ-VQie6GGg2TQCeJmdwXA>
+    <xmx:aODlaW3lPw63uKk8v6g3VizOc5lM5cBjlNoSQdVlocuP_mGddxVNbg>
+    <xmx:aODlafk8PuVMJTcqnTJ6i2LT9PL_iCgWPtRz_Wbf4JEpNCyR9ufAuA>
+    <xmx:aODlaW-yRaPp5TYtToyKFAlPfnzw5mIYmC4OEp8q4AKBPDoaPsvobMaF>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 85B72700069; Mon, 20 Apr 2026 04:14:32 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:8c3:b0:692:ef5b:ad46 with SMTP id
- 006d021491bc7-69462e20417mr6110472eaf.1.1776672758742; Mon, 20 Apr 2026
- 01:12:38 -0700 (PDT)
-Date: Mon, 20 Apr 2026 01:12:38 -0700
-In-Reply-To: <6112cce99b4e3571444a616d0fb19e91e2fcca72.1776597598.git.caoruide123@gmail.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69e5dff6.a00a0220.9259.0001.GAE@google.com>
-Subject: [syzbot ci] Re: net: nsh: handle nested NSH headers during GSO
-From: syzbot ci <syzbot+ci38a89a871d631008@syzkaller.appspotmail.com>
-To: bird@lzu.edu.cn, caoruide123@gmail.com, davem@davemloft.net, 
-	edumazet@google.com, horms@kernel.org, jbenc@redhat.com, kuba@kernel.org, 
-	lx24@stu.ynu.edu.cn, n05ec@lzu.edu.cn, netdev@vger.kernel.org, 
-	pabeni@redhat.com, tomapufckgml@gmail.com, yifanwucs@gmail.com, 
-	yuantan098@gmail.com
-Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [-1.36 / 15.00];
+X-ThreadId: AzSL-Zt2U7rV
+Date: Mon, 20 Apr 2026 10:14:12 +0200
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Kangzheng Gu" <xiaoguai0992@gmail.com>, "Simon Horman" <horms@kernel.org>
+Cc: "Paolo Abeni" <pabeni@redhat.com>,
+ "David S . Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Kees Cook" <kees@kernel.org>, "Thorsten Blum" <thorsten.blum@linux.dev>,
+ sjur.brandeland@stericsson.com, Netdev <netdev@vger.kernel.org>,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Message-Id: <85ec14af-bdd5-45ea-8c06-ebd769499bd1@app.fastmail.com>
+In-Reply-To: 
+ <CAKvcANPEa91paujTQjpW2hZhpXEhwfOjjy6CsN=OJ32iXYXdTA@mail.gmail.com>
+References: <0f9e9d4e-8083-4297-91d3-10d0f614c87c@redhat.com>
+ <20260408125333.38489-1-xiaoguai0992@gmail.com>
+ <20260412135743.GK469338@kernel.org>
+ <255224dc-0a55-4a0c-95f3-b84d4c6b3897@redhat.com>
+ <20260414112951.GD469338@kernel.org>
+ <CAKvcANPEa91paujTQjpW2hZhpXEhwfOjjy6CsN=OJ32iXYXdTA@mail.gmail.com>
+Subject: Re: [PATCH v5] net: caif: fix stack out-of-bounds write in cfctrl_link_setup()
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-2.15 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[arndb.de,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[arndb.de:s=fm1,messagingengine.com:s=fm2];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
+	XM_UA_NO_VERSION(0.01)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-279678-lists,netdev=lfdr.de,ci38a89a871d631008];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[lzu.edu.cn,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,stu.ynu.edu.cn,vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com,kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-279679-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[arnd@arndb.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[arndb.de:+,messagingengine.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,googlegroups.com:email,googlesource.com:url]
-X-Rspamd-Queue-Id: D1633428076
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[messagingengine.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,app.fastmail.com:mid]
+X-Rspamd-Queue-Id: 39BD0428086
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-syzbot ci has tested the following series
+On Mon, Apr 20, 2026, at 10:09, Kangzheng Gu wrote:
+> Thanks for all of your advice, I am preparing a new version of patch now.
 
-[v1] net: nsh: handle nested NSH headers during GSO
-https://lore.kernel.org/all/6112cce99b4e3571444a616d0fb19e91e2fcca72.1776597598.git.caoruide123@gmail.com
-* [PATCH net 1/1] net: nsh: handle nested NSH headers during GSO
+If you are actively using CAIF, please chime in at
 
-and found the following issue:
-WARNING in nsh_gso_segment
+https://lore.kernel.org/all/20260416182829.1440262-1-kuba@kernel.org/
 
-Full report is available here:
-https://ci.syzbot.org/series/13f77bac-014d-4059-9187-fbdbcb6a6540
+If you are not actually using CAIF, maybe wait a little bit before
+spending more time on it because the patches may no longer
+apply if it gets removed due to lack of users.
 
-***
-
-WARNING in nsh_gso_segment
-
-tree:      net
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net.git
-base:      0cf004ffb61cd32d140531c3a84afe975f9fc7ea
-arch:      amd64
-compiler:  Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
-config:    https://ci.syzbot.org/builds/193058cd-cd88-4bb0-a6e6-b43b6179fcd9/config
-syz repro: https://ci.syzbot.org/findings/446db72d-a630-471c-b369-2ef1f7b3b6ed/syz_repro
-
-------------[ cut here ]------------
-offset != (typeof(skb->mac_header))offset
-WARNING: ./include/linux/skbuff.h:3173 at skb_reset_mac_header include/linux/skbuff.h:3173 [inline], CPU#1: syz.1.20/5978
-WARNING: ./include/linux/skbuff.h:3173 at nsh_gso_segment+0x833/0x12d0 net/nsh/nsh.c:107, CPU#1: syz.1.20/5978
-Modules linked in:
-CPU: 1 UID: 0 PID: 5978 Comm: syz.1.20 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-RIP: 0010:skb_reset_mac_header include/linux/skbuff.h:3173 [inline]
-RIP: 0010:nsh_gso_segment+0x833/0x12d0 net/nsh/nsh.c:107
-Code: 2f 08 00 00 48 8b 7c 24 60 44 89 f6 e8 46 83 e4 fd 48 85 c0 0f 84 20 08 00 00 e8 48 af 31 f6 e9 ab fb ff ff e8 3e af 31 f6 90 <0f> 0b 90 e9 43 fd ff ff e8 30 af 31 f6 90 0f 0b 90 e9 39 fe ff ff
-RSP: 0018:ffffc90004847220 EFLAGS: 00010293
-RAX: ffffffff8b93aeb2 RBX: ffff88817362a6d8 RCX: ffff88810f088000
-RDX: 0000000000000000 RSI: 0000000000010040 RDI: 0000000000010000
-RBP: ffffc90004847390 R08: ffff88810f088000 R09: 0000000000000005
-R10: 0000000000000005 R11: 0000000000000000 R12: 0000000000000000
-R13: 0000000000010040 R14: dffffc0000000000 R15: 0000000000000074
-FS:  00007f28e9ed36c0(0000) GS:ffff8882a9245000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000200000010000 CR3: 0000000170f06000 CR4: 00000000000006f0
-Call Trace:
- <TASK>
- skb_mac_gso_segment+0x31c/0x690 net/core/gso.c:53
- __skb_gso_segment+0x376/0x540 net/core/gso.c:124
- skb_gso_segment include/net/gso.h:83 [inline]
- validate_xmit_skb+0xa21/0x14a0 net/core/dev.c:4039
- validate_xmit_skb_list+0x84/0x120 net/core/dev.c:4089
- sch_direct_xmit+0xdf/0x4c0 net/sched/sch_generic.c:357
- __dev_xmit_skb net/core/dev.c:4209 [inline]
- __dev_queue_xmit+0x180f/0x3950 net/core/dev.c:4831
- packet_snd net/packet/af_packet.c:3077 [inline]
- packet_sendmsg+0x3ebc/0x50f0 net/packet/af_packet.c:3109
- sock_sendmsg_nosec net/socket.c:787 [inline]
- __sock_sendmsg net/socket.c:802 [inline]
- __sys_sendto+0x672/0x710 net/socket.c:2265
- __do_sys_sendto net/socket.c:2272 [inline]
- __se_sys_sendto net/socket.c:2268 [inline]
- __x64_sys_sendto+0xde/0x100 net/socket.c:2268
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x15f/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f28e8f9c819
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f28e9ed3028 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
-RAX: ffffffffffffffda RBX: 00007f28e9216090 RCX: 00007f28e8f9c819
-RDX: 00000000000100a6 RSI: 0000200000000180 RDI: 0000000000000005
-RBP: 00007f28e9032c91 R08: 0000200000000140 R09: 0000000000000014
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f28e9216128 R14: 00007f28e9216090 R15: 00007ffd50249d78
- </TASK>
-
-
-***
-
-If these findings have caused you to resend the series or submit a
-separate fix, please add the following tag to your commit message:
-  Tested-by: syzbot@syzkaller.appspotmail.com
-
----
-This report is generated by a bot. It may contain errors.
-syzbot ci engineers can be reached at syzkaller@googlegroups.com.
-
-To test a patch for this bug, please reply with `#syz test`
-(should be on a separate line).
-
-The patch should be attached to the email.
-Note: arguments like custom git repos and branches are not supported.
+     Arnd
 
