@@ -1,69 +1,88 @@
-Return-Path: <netdev+bounces-279829-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279831-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UHxVGpBS5mmcuwEAu9opvQ
-	(envelope-from <netdev+bounces-279829-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 18:21:36 +0200
+	id aFpfLtVU5mkDuwEAu9opvQ
+	(envelope-from <netdev+bounces-279831-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 18:31:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8341B42F5C8
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 18:21:35 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB22442F920
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 18:31:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 1BFB23361B81
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 14:43:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9C3653232B5C
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 14:44:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E7793D75D0;
-	Mon, 20 Apr 2026 13:39:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 353293A4F5F;
+	Mon, 20 Apr 2026 13:43:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rUQr//4x"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b="voH4XLzD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF06D3D75AB;
-	Mon, 20 Apr 2026 13:39:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 931913A4F54
+	for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 13:43:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776692373; cv=none; b=ZQYAfJMORLJyEyS0AueC4mnpvj62zP2wGUq5owxnyyvOMmWG4SVlwJm0yQ1cnCj12m1T+ghkoy+y0nERUjbVzeAfWl1jrh0WVzt8ThlIKbnG2+ocJ39j55dn96mGcHk9T2JfK8EEHLU26T/kKZ1ol/TeDd/81/3JAXbxTWqDcZ0=
+	t=1776692605; cv=none; b=RdIJcGJUHNWKXMRctDhDlFWUO/6qyiS3KqRCkxA7sX1FPniMMhAiFl9ejWZwu8jWmDgeBCmBP72FLctGQZ8DYtcgXmN5JvzeC5xeKZ12/+7UJ5VVFAIEq8tnZSO1Olk0E/REo5SxjOb26oDDJoNvzW9pbWzu4RNGOnsHX0JehVI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776692373; c=relaxed/simple;
-	bh=QV3/kRtnuqUUDprxbWR5pkNW+yWztIYB+VtpAMRuffE=;
+	s=arc-20240116; t=1776692605; c=relaxed/simple;
+	bh=rogRs0ykHyeyXK7tUMRLku3jZarBPsH1cV9YIgcNcts=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WcBHUi4WDYg9qBm59Lt7CmWJGPlJvGDa4jFgulCdClI7IkMNhoN+ACoIdR+hDvCnZM5oLzaBR1aS0ebo+j2Hra4ZzsHgoO0Ieno5Xz/irJPOdUY6QtBzvvhtdPfdyAWpcwJlcrE+F9hI/q7izO2nvA7KvIUUeO/evFn8UmriGVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rUQr//4x; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E39AC19425;
-	Mon, 20 Apr 2026 13:39:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776692372;
-	bh=QV3/kRtnuqUUDprxbWR5pkNW+yWztIYB+VtpAMRuffE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rUQr//4xkxx3D3yKvPfqTimlbnn7kNSAHnCzfaA+MVn7i9x6JhtUGCIjUw+HuWcmt
-	 h6aAvjvD0mPG/N0e+PzQhtGppPOt1KmckMqNEY0BeyGZlcRD+G0sR54cBx8bWgFHTB
-	 Gawo27UIsUnhcFc1F0hDdyNHTzAbvEMI2wHTasyUALFhkJvHOEZk5pMi54TRLGu80O
-	 jTZEk0Fh5YgOdFwJZO+kBBXlMwD8aAhY7jog5Um60tHiHROvLj20imQ6ihSEfBZmP6
-	 ahYRbbtDPMuwsPmYCnZFdDf/ne3NQZECgijAQQPgP4qEBrR8zBU/9G/uebmMcmQ+HA
-	 bvtEWK4t6yU1Q==
-Date: Mon, 20 Apr 2026 08:39:30 -0500
-From: Rob Herring <robh@kernel.org>
-To: Minda Chen <minda.chen@starfivetech.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Emil Renner Berthing <emil.renner.berthing@canonical.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	devicetree@vger.kernel.org
-Subject: Re: [net-next v2 3/5] dt-bindings: net: starfive,jh7110-dwmac: Add
- JHB100 sgmii rx clk
-Message-ID: <20260420133930.GA2322456-robh@kernel.org>
-References: <20260417024523.107786-1-minda.chen@starfivetech.com>
- <20260417024523.107786-4-minda.chen@starfivetech.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=IiO/wWdeLhgb7qSH1DOnb3s/G9/OBRMA9C4B5piVFbT6IgE43y8yd6eXK96uMAn6kAol9BAORhoD7ETcbEAfe3I2NsO7+67M456jwQnF1b5mbATUPTwv3fNgYMqd6uL5VfqgfEiyTrL+T6GqUAe+lruFCEQPVpfkm1K1flvBIFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b=voH4XLzD; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-48374014a77so40037395e9.3
+        for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 06:43:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20251104.gappssmtp.com; s=20251104; t=1776692599; x=1777297399; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Xr1T1QwU2AXk21k476IBhpXqaT0faBSmximda28oq1w=;
+        b=voH4XLzDtKJQmCbHJ+3NirTZz5XFHLjePkFcZOh92Qg4f441kF+3LM6RCJE/E9+vyK
+         LEdz1ik5FNcqVcZ1NooCoe2TIAsIouj87XvQyuQ9yZUC8K6za7caKdKdgddd/lSotzcE
+         WQFhnaVxSi+dUwxK5QjBSc9+fmV7QqMIuD5OUZw32/26zgJqpeFQvsNkysIJXpGREPsd
+         kooJ5NX41kVR+UWymqXuVAYNl8ITANIpZ/dv0QLbXPRaVtye6pAUu4alziDhHap6aOhE
+         1Ds+Sn0E32gWS1KvK/EiBh4LrSzh/0OMM6USs2B8OfAKaOatjuePZAN+gjhgl/Q9E3Eg
+         UR/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776692599; x=1777297399;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Xr1T1QwU2AXk21k476IBhpXqaT0faBSmximda28oq1w=;
+        b=sBCA8Sa4uQAXz3IIP56ye7I6i4FqAOFB3f7cK99ua6R15hv41e/xZkVPdQCRmoGtuK
+         R/QBEhoHS2pgOKYTz3eqQeTqbRO1v2iv7+RVtCpGRQmlNTCjAFaJVaBbRemltw7DJQi0
+         k1iBeBmjyNyVxKpIAt3h5nXBqCRnjm1aOEBYiefaBcMjHzJD6OCWw4s5gkxSCzdjvGVZ
+         LpCg+r5ALw/D8fXU7Fu/fPr++UBhkX/yENQqg6lQgFeRirePGiYp3/WbJcruoRhuwsZt
+         EBYsh3v1CRNyPCERDgUw0GCaV17NymLPKvcP2HYAR7flLshg/nION83cHDFP8TJdPwUz
+         dlfQ==
+X-Gm-Message-State: AOJu0YyxbdLKplAFqygA0ra8poXg7Yf56hT7zqi6DqtYi1dJRDg9PiWK
+	P5L01TYZQCedfX3NKCjnlrKC1rBmXUgHBxbFuElxtBFpKYDAiLDdIjgRKMZRG9XnseY=
+X-Gm-Gg: AeBDiesShYFBO8Ze1mD0riQ0T+BfvEl6G/A1Uy1lqX6DoIEIyZULmCUXvYCTLw32hMH
+	Pc/SFn64phSvGXXXXRxJhWe7cdCp95M9HLuSzef0M0X5zJGExpFJuBA35FOMtdT5gmg71VKQhGE
+	iEoy7hzWsUOyd1VVQJBaVZOnCSDDZKLoOTnc17vJP7ZZgrzUhQsi8bEX62/xMUzhNX3GJSJm2/A
+	TJLNl7GiHdiWgn2M20n4ngusSzVG1CPeMGecr/1nwjF9EGd/MSHAJHLmzKY184djohQgeNvPovN
+	zhvMQj0hODJMiYaQUD4syxSHKQVNdzFwbBmN3ksKQGtUr6xamDVZivT4hYE2wzxKFPVgselVLld
+	HCH6aTSnjEsNCFO9eNbdp36pkorToud9MRuL+bkXkyWjR66TJD6Q6v8HMWXTdr/3TgCyACVCl5q
+	d7Rfic6UAjlMbkZPgTSpZIzj56MAIDNhuCI2wZEw7MM384Og==
+X-Received: by 2002:a05:600c:8483:b0:488:7ff6:1f75 with SMTP id 5b1f17b1804b1-488fb782d91mr193865265e9.21.1776692598743;
+        Mon, 20 Apr 2026 06:43:18 -0700 (PDT)
+Received: from FV6GYCPJ69 ([140.209.217.211])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43fe4e44f69sm31239443f8f.25.2026.04.20.06.43.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Apr 2026 06:43:18 -0700 (PDT)
+Date: Mon, 20 Apr 2026 15:43:14 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+	Jakub Kicinski <kuba@kernel.org>
+Subject: Re: Question/proposal for DPLL NCO (DCO) mode
+Message-ID: <3rgm35qzwvzdrubvtdrccl3sb5cx2ufiy7b5wnjun223bosi45@2bnbfrlqnsbk>
+References: <21cce17b-9a79-41b5-8363-faee2378aa37@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,86 +91,114 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260417024523.107786-4-minda.chen@starfivetech.com>
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+In-Reply-To: <21cce17b-9a79-41b5-8363-faee2378aa37@redhat.com>
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[resnulli-us.20251104.gappssmtp.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[foss.st.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,canonical.com,vger.kernel.org,st-md-mailman.stormreply.com];
-	TAGGED_FROM(0.00)[bounces-279829-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-279831-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[resnulli.us];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[robh@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[resnulli-us.20251104.gappssmtp.com:+];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8341B42F5C8
+	RCPT_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: EB22442F920
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Apr 17, 2026 at 10:45:21AM +0800, Minda Chen wrote:
-> JHB100 SGMII interface tx/rx mac clock is split and require to
-> set clock rate in 10M/100M/1000M speed. So dts need to add a
-> new rx clock in code, dts and dt binding doc.
-> 
-> Signed-off-by: Minda Chen <minda.chen@starfivetech.com>
-> ---
->  .../bindings/net/starfive,jh7110-dwmac.yaml   | 42 ++++++++++++++++---
->  1 file changed, 36 insertions(+), 6 deletions(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/starfive,jh7110-dwmac.yaml b/Documentation/devicetree/bindings/net/starfive,jh7110-dwmac.yaml
-> index edc246a71ce3..3802cdbf1848 100644
-> --- a/Documentation/devicetree/bindings/net/starfive,jh7110-dwmac.yaml
-> +++ b/Documentation/devicetree/bindings/net/starfive,jh7110-dwmac.yaml
-> @@ -39,20 +39,26 @@ properties:
->      maxItems: 1
->  
->    clocks:
-> +    minItems: 5
->      items:
->        - description: GMAC main clock
->        - description: GMAC AHB clock
->        - description: PTP clock
->        - description: TX clock
->        - description: GTX clock
-> +      - description: SGMII RX clock
->  
->    clock-names:
-> -    items:
-> -      - const: stmmaceth
-> -      - const: pclk
-> -      - const: ptp_ref
-> -      - const: tx
-> -      - const: gtx
-> +    minItems: 5
-> +    maxItems: 6
-> +    contains:
-> +      enum:
-> +       - stmmaceth
-> +       - pclk
-> +       - ptp_ref
-> +       - tx
-> +       - gtx
-> +       - sgmii_rx
+Mon, Apr 20, 2026 at 01:42:29PM +0200, ivecera@redhat.com wrote:
+>Hi all,
+>
+>I am currently working on adding PTP clock support (PHC) to the ZL3073x
+>driver, and I would like to discuss an architectural addition to the
+>DPLL subsystem enum dpll_mode before sending the formal patch series.
+>
+>To support IEEE 1588 PTP, the hardware DPLL must be decoupled from
+>tracking physical reference pins. Instead, its output frequency needs to
+>be continuously steered by a software PTP stack (e.g., linuxptp) using
+>the .adjfine() callback. In the industry, this specific hardware state
+>is widely known as NCO (Numerically Controlled Oscillator) or DCO
+>(Digitally Controlled Oscillator) mode.
+>
+>Currently, the DPLL subsystem defines two modes in enum dpll_mode:
+>
+>MANUAL: The user explicitly selects a physical input pin to track.
+>
+>AUTOMATIC: The hardware automatically selects the best physical input pin
+>based on priorities.
+>
+>Neither of these accurately represents the NCO/DCO state, where physical
+>pins are ignored, and the loop is fully software-steered.
 
-No, this allows any of the above strings plus any other random strings.
+The manual/automatic mode is defining strategy/behaviour about how the
+input pins are selected.
 
-Rob
+<header_quote>
+ * enum dpll_mode - working modes a dpll can support, differentiates if and how
+ *   dpll selects one of its inputs to syntonize with it
+</header_quote>
+
+You don't want to change the strategy. You just
+don't want that/don't care. Why it make sense to add a mode then?
+
+I was thinking exposing this over STATUS. We have:
+UNLOCKED (free running)
+LOCKED
+LOCKED_HO_ACQ
+HOLDOVER
+
+So something maybe like SW_STEERED? But:
+
+The problem is you need to do selection. Perhaps we can have a
+"magic pin" to select for this :S ? We have pin of type
+DPLL_PIN_TYPE_INT_OSCILLATOR already. Perhaps we can have
+DPLL_PIN_TYPE_INT_NCO/NDO? It's a source.
+
+Makes sense?
+
+
+>
+>Without a dedicated mode, drivers are forced into "automagic"
+>workarounds. A driver might implicitly switch the hardware to NCO mode
+>in the background as soon as .adjfine() is called, while misreporting
+>its mode as MANUAL to the DPLL subsystem.
+>
+>I strongly believe this hidden "automagic" behavior is a bad design. The
+>user-space should have full visibility and explicit control over what
+>the DPLL state machine is actually doing.
+>
+>The Proposal:
+>I would like to propose adding a new mode: DPLL_MODE_NCO (or
+>DPLL_MODE_DCO, I am open to suggestions regarding the terminology).
+>
+>The expected workflow would be explicit:
+>If a user wants to actively steer the DPLL frequency via software (for
+>PTP or other Time-over-Packet applications), they must explicitly set
+>the DPLL device to this mode via Netlink first. Only then will the
+>hardware accept frequency adjustments via .adjfine().
+>
+>I would appreciate any feedback from the DPLL subsystem maintainers and
+>the community on this approach.
+>
+>Thanks,
+>Ivan
+>
 
