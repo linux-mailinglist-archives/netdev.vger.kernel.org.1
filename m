@@ -1,125 +1,158 @@
-Return-Path: <netdev+bounces-279875-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279874-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4B6oHN1d5mm3vQEAu9opvQ
-	(envelope-from <netdev+bounces-279875-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 19:09:49 +0200
+	id iB9RByNx5mlgwgEAu9opvQ
+	(envelope-from <netdev+bounces-279874-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 20:32:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 069D1430A45
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 19:09:48 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EE14432E0F
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 20:32:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 345FF3005589
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 17:09:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CB86130597B7
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 17:09:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1F1D381B04;
-	Mon, 20 Apr 2026 17:09:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EF0837E2EF;
+	Mon, 20 Apr 2026 17:09:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jtrtsOvW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lwZ54zp2"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D38A73806BE
-	for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 17:09:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E050537AA99;
+	Mon, 20 Apr 2026 17:09:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776704984; cv=none; b=lhPhavu3ZDxn8btlQcNswHSredwVxqNvyf3ud/vDriMJn+D+pdF98XxbP29tInB2yfl10Rq/V38ZdyMPaT9vmBSonmT3QqmIyWg4ItKN8VQ3bJ2S5anx0vCJyKMSpMxSeZmzBU6XCso3IZJL2+mRKMQjPB4Setfxgpfhz3g9SPA=
+	t=1776704960; cv=none; b=uqX/N1O/K6ART4zg5E5h0qjggu/WErDE6yDpuarv4oeZ5qWw1BOKj2xhUlBDdTT0ODGEw68/YTObG6UcvWslroJ0NYwtUhxgUt8BQA+RPGao9UfwTzquptciYy6ED9w5aMZs0P8YsFVEAFRqk9pyOwb9gy1ZtrxM/21+r4U33OI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776704984; c=relaxed/simple;
-	bh=LUFhttCt6qq2eWwycDWvN0ipZrq6FSIlPoPYrMs4hRU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BZDn5H5Q5KgOIlP8VMi3McKogwa82ppWPKI23pUQaFjcXXLZ/0QKPlU8rnHUJN38y4K2FEQXdp3BcyJ/HuAum6Rq2q0TBXQqwlh0XkBeCmi9kRf2en+iO93wnVROPtURp3nF+SqiXn/1IUvys02M1jm58z7p8Rb0f73TVnQ1zRs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jtrtsOvW; arc=none smtp.client-ip=91.218.175.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Mon, 20 Apr 2026 10:09:16 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1776704967;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OWgmLMt7/TMrBm86Ew6P18FFPWPU3UwIA+bIKdihQo0=;
-	b=jtrtsOvWrdt0C55JuXEg9NM9xf0uMiN1Wlr83eo+8gIcDs5bL7Y7Oq0S/8ilLMbKr0o1qv
-	Rd1qVh0bMPrIxIPBnvZMJ7pIKCdD/+sw/xcElt2O105f3AnthA1tK5yF92+Ov/plG01zqj
-	SwavRzIw/SRsBPYVtlNcPUOqr6aTrFI=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-To: KaFai Wan <kafai.wan@linux.dev>
-Cc: daniel@iogearbox.net, john.fastabend@gmail.com, sdf@fomichev.me, 
-	ast@kernel.org, andrii@kernel.org, eddyz87@gmail.com, memxor@gmail.com, 
-	song@kernel.org, yonghong.song@linux.dev, jolsa@kernel.org, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	shuah@kernel.org, jiayuan.chen@linux.dev, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH bpf v3 2/2] selftests/bpf: Test TCP_NODELAY in TCP hdr
- opt callbacks
-Message-ID: <202642017513.aNTV.martin.lau@linux.dev>
-References: <20260417092035.2299913-1-kafai.wan@linux.dev>
- <20260417092035.2299913-3-kafai.wan@linux.dev>
- <2026417162132.9MRI.martin.lau@linux.dev>
- <9b3e7c118f5b9105b92f53b66034c1b7884c1372.camel@linux.dev>
+	s=arc-20240116; t=1776704960; c=relaxed/simple;
+	bh=DLukSzjKif0rd+z1DTc2dsEwnYvZX8jjHgLQdJFDodQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=dlbkU2frBCcCVEVFtsZT2+xXPMKYYxrg6JkHCoUrT7s9jLZKQKZ4nBsYmvQbbuzC714Cl8ee4sr1oXIMUUAebGqngmqsHBpV2MO4BLrwYowFt2FvidrVmaPh3PeKPyIvdxttP8nnh6/Tke+n3kK3ovr3GE+9oFB7aoiWEJslJhc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lwZ54zp2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F50FC19425;
+	Mon, 20 Apr 2026 17:09:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776704959;
+	bh=DLukSzjKif0rd+z1DTc2dsEwnYvZX8jjHgLQdJFDodQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=lwZ54zp2eGmwsW2UUBaM3dGojPNZCCDfSRnJMhYFJPaBOReJ+ERN4ftMws2H+P523
+	 RrVKDwaELhjMx5xtgYgmNqY3ncrQTOxUm9BQeOFASK8xBavnmferllDQwn49McryE3
+	 j947s2x+fg0JgQc8ctLZKVn6+6O4iJhtpz8TSPWM8ZKldRu4ryBAHuDS1bug/zg+nK
+	 i8XjWW5xtykE/GKQ3MpGjRj5Wy3eT3q6ilO6ZL5qMOS/190YFRKdlB8j5OHaeNh7xD
+	 MSaAoUuV0OCkx84QdbWRdv5G1wYTWaCqKUZDG5NfTwqUFjUD6YFwD92wxwZAa8rHq+
+	 vKwDRf+C96GjA==
+Date: Mon, 20 Apr 2026 10:09:17 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Cosmin Ratiu <cratiu@nvidia.com>
+Cc: Tariq Toukan <tariqt@nvidia.com>, Boris Pismenny <borisp@nvidia.com>,
+ "willemdebruijn.kernel@gmail.com" <willemdebruijn.kernel@gmail.com>,
+ "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "daniel.zahka@gmail.com"
+ <daniel.zahka@gmail.com>, "davem@davemloft.net" <davem@davemloft.net>,
+ "leon@kernel.org" <leon@kernel.org>, Rahul Rameshbabu
+ <rrameshbabu@nvidia.com>, "pabeni@redhat.com" <pabeni@redhat.com>,
+ "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Raed Salem
+ <raeds@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>, "kees@kernel.org"
+ <kees@kernel.org>, Mark Bloch <mbloch@nvidia.com>, "edumazet@google.com"
+ <edumazet@google.com>, Saeed Mahameed <saeedm@nvidia.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Gal Pressman
+ <gal@nvidia.com>
+Subject: Re: [PATCH net 1/2] net/mlx5e: psp: Fix invalid access on PSP dev
+ registration fail
+Message-ID: <20260420100917.1e4be22a@kernel.org>
+In-Reply-To: <d7e2d46769e120a16ce12d345c51a47349733828.camel@nvidia.com>
+References: <20260417050201.192070-2-tariqt@nvidia.com>
+	<20260418190848.204170-1-kuba@kernel.org>
+	<d7e2d46769e120a16ce12d345c51a47349733828.camel@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <9b3e7c118f5b9105b92f53b66034c1b7884c1372.camel@linux.dev>
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [0.34 / 15.00];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279875-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[nvidia.com,gmail.com,lunn.ch,davemloft.net,kernel.org,redhat.com,vger.kernel.org,google.com];
+	TAGGED_FROM(0.00)[bounces-279874-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	RCPT_COUNT_TWELVE(0.00)[22];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[iogearbox.net,gmail.com,fomichev.me,kernel.org,linux.dev,davemloft.net,google.com,redhat.com,vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[martin.lau@linux.dev,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux.dev:dkim,linux.dev:mid]
-X-Rspamd-Queue-Id: 069D1430A45
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6EE14432E0F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sat, Apr 18, 2026 at 10:19:47AM +0800, KaFai Wan wrote:
-> > > +	ret = setsockopt(sk_fds.active_fd, SOL_TCP, TCP_NODELAY, &true_val, sizeof(true_val));
+On Mon, 20 Apr 2026 10:30:46 +0000 Cosmin Ratiu wrote:
+> > When psp_dev_create() fails, this function now returns without
+> > setting
+> > psp->psp, leaving it as NULL. However, priv->psp remains allocated
+> > and
+> > non-NULL.
 > > 
-> > Same comment as in v2. Why this setsockopt is needed?
+> > Does this leave the RX datapath vulnerable to a NULL pointer
+> > dereference?
+> > 
+> > If priv->psp is non-NULL, the NIC RX initialization path can still
+> > call
+> > mlx5_accel_psp_fs_init_rx_tables(), which creates hardware flow
+> > steering
+> > rules to intercept UDP traffic.
+> > 
+> > If a UDP packet triggers these rules, the hardware flags the CQE with
+> > MLX5E_PSP_MARKER_BIT. The RX fast-path sees the marker and invokes
+> > mlx5e_psp_offload_handle_rx_skb(), which dereferences the pointer
+> > unconditionally:
+> > 
+> > u16 dev_id = priv->psp->psp->id;
+> > 
+> > Since priv->psp->psp is NULL, this will cause a kernel panic. Should
+> > priv->psp be cleaned up, or the error propagated, to prevent flow
+> > rules
+> > from being installed when registration fails?  
 > 
-> Sorry I miss this. It's from the review of v1, my first version would break the syscall setsockopt
-> and other CB besides HDR_OPT_LEN/WRITE_HDR_OPT. So in the test I check setsockopt() and
-> bpf_setsockopt() in PASSIVE_ESTABLISHED_CB to make sure patch#1 would not break user space and other
-> CB.
-
-ic. Yep, remove it since v3 is not changing the syscall setsockopt.
-
+> First, this is preexisting. But more importantly, it's impossible to
+> trigger:
+> - with no PSP devs, there can be no PSP SAs installed.
+> - with no SAs, PSP decryption cannot succeed.
+> - all unsuccessfully decrypted PSP packets are dropped by steering.
+> - the RX handler will not see any PSP packets with the marker set.
 > 
-> > The setsockopt in userspace is unnecessary. 
-> 
-> Is bpf_setsockopt() in PASSIVE_ESTABLISHED_CB also unnecessary? I'll respin if they are unnecessary.
+> This patch fixes the comparatively way more likely scenario of
+> psp_dev_register failing and then mlx5e_psp_unregister passing the
+> error pointer to psp_dev_unregister, which will do unpleasant things
+> with it.
 
-This one is fine. It checks if the bpf_setsockopt is not affectred in other CB.
+Sure but why are you leaving the priv->psp struct in place and whatever
+FS init has been done? IOW if you really want PSP init to not block
+probe why is mlx5e_psp_register() a void function rather than
+mlx5e_psp_init() ? Ignoring errors from psp_dev_create()
+makes no sense to me - what are you protecting from? kmalloc(GFP_KERNEL)
+failing?
 
