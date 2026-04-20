@@ -1,67 +1,67 @@
-Return-Path: <netdev+bounces-279810-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279811-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +PluHP8/5mlutgEAu9opvQ
-	(envelope-from <netdev+bounces-279810-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 17:02:23 +0200
+	id QEmYJC9Q5mkDuwEAu9opvQ
+	(envelope-from <netdev+bounces-279811-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 18:11:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4320A42DBC1
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 17:02:21 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E93742F1FE
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 18:11:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 26209344DDF0
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 14:25:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0738F333EA03
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 14:25:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDF0D481255;
-	Mon, 20 Apr 2026 13:31:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9864481AAC;
+	Mon, 20 Apr 2026 13:31:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="umE1FY00"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b6VS48p+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 997B748124E;
-	Mon, 20 Apr 2026 13:31:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85258481652;
+	Mon, 20 Apr 2026 13:31:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776691899; cv=none; b=u2PoNRFJmFGHp3Ri8Rj6H51ssadyQ0VoAZl3E4VYQkWbpXct12g+5vDipZ09Jmt8szUkzxGmJMsHxOCqX+OI2HnuzaqVn4+tjV3jTvV/sgK32cTiQQhC+WjPfTHl8eDUObka8K/RBzXEnCTGz2eaoGcnFwkEXxmQf54pj/5mQug=
+	t=1776691906; cv=none; b=JKdmWc1KAb9QfWQRYFnl4RDCs47imBR5Pvz+NcCKoN+SlOUScFj077bvQF+hriYB7d/G8rZQ/4Nocn8KUrQCu7IrKireNsziteae0EEJqdeMHJ0PmJg8V7xkvmO5rr7R5ZnADOrL5rYiSl9Hy3/P5X58vTTo52TvG0veK7ith4M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776691899; c=relaxed/simple;
-	bh=sUSLvh693OL3obP0CWu4hreToBFRqSn+nA03HkUj3Xw=;
+	s=arc-20240116; t=1776691906; c=relaxed/simple;
+	bh=B4Xzqt4Lv43VwlYDa91QCLcZ2QtZNuBo7FtpCh86sWM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GD4lkehWt7ZoRY8k0BRsE2cP3UQgigKiFkze7zncG06c6PWDXTkWjxmkENogO8/KmwTNNFc27jsZStDpFIbq9ZSsP7IHtfmr2zyjD+noYi/6I4pb8fcVk9t3+jkJNG4PrhYQVSAK5KEl12tyjvTvKkxDy3BN6kHhekLima25S7w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=umE1FY00; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1D58C19425;
-	Mon, 20 Apr 2026 13:31:37 +0000 (UTC)
+	 MIME-Version; b=i6ABg/+i6wAcoQcJe9mB1QTIxiS7ey042iCrgwWxLaXbaDcH8rYF4M6xlratGHMdMzpKU6+HOK3elvOMcTtLKNUUGMo+SURl+C1mmOKf1zb+3+2Wcm+FVQl34yVq8VOVhqSKbRhY2lnPJfUk/i+xgNwDrfcSJMODcHPHJe4S96s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b6VS48p+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 086FCC2BCB6;
+	Mon, 20 Apr 2026 13:31:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776691899;
-	bh=sUSLvh693OL3obP0CWu4hreToBFRqSn+nA03HkUj3Xw=;
+	s=k20201202; t=1776691906;
+	bh=B4Xzqt4Lv43VwlYDa91QCLcZ2QtZNuBo7FtpCh86sWM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=umE1FY00DD52eek2CQUkZCTL4eHBhDPujnxowvj0aM1Kx9n0mJQ1aNJ9BI8uH4D4l
-	 QcsaewJavw/0OXgySoTpZOVdxEf/UHPEmezGGonI+Rjw1D3yr6tfQlG4wx21s+Kur/
-	 j8E7eeYnYSKu+qxK0t98Byhq16/t1vWamfrEklYgw9/8Mcap2FhVmrPYjsfAl1oM7X
-	 wekIFtjOS3m6twU/Z0KC0yeLi+HXzWdQksBfW7pimOQA+Mmb0oyQeO8xIOuuww2o5/
-	 kcYc/ds62TqYgYHyjyu11Uhy5H1oErvS5D24LwTPH0ntxjo41hdMFzoE0s8WvQixnu
-	 b5e35cYSHwCxQ==
+	b=b6VS48p+8zFYs3FmNoYWZhX0XNqrc4tNb2+b3w8nb2peaHNHZkkW3iSCNoM9ZC3T0
+	 UeSWXGsqj0A/p23HNmQdf/eOVO7icpebi2+wLv+ROo03llApsluoAjX7Z2IbzfgP6e
+	 bNL9FP3OpgfTOksOAkMSwgsRRN5TWFCUkAjk2PfWy13tYW67MiAUQ1Cz2ObORw1eKr
+	 mywJ9MpC6E+ZbHFhjrO/zMMvVTsze003uOIa4mZgIZJeStVsi3A7aZqLa4req9COlJ
+	 UdYsDUPMAJZIe3Fi/0FNKqH45MqzcjAvAfeaL9TdN1dbF1F37BobS3SzkRHJ+gz5Q2
+	 Dh2SKe4T2dUrQ==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Florian Westphal <fw@strlen.de>,
-	Stefano Brivio <sbrivio@redhat.com>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
+Cc: Zijing Yin <yzjaurora@gmail.com>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
 	davem@davemloft.net,
 	edumazet@google.com,
-	kuba@kernel.org,
 	pabeni@redhat.com,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
+	petrm@nvidia.com,
+	bridge@lists.linux.dev,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.18] netfilter: nft_set_pipapo_avx2: don't return non-matching entry on expiry
-Date: Mon, 20 Apr 2026 09:20:52 -0400
-Message-ID: <20260420132314.1023554-258-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.18] bridge: guard local VLAN-0 FDB helpers against NULL vlan group
+Date: Mon, 20 Apr 2026 09:20:56 -0400
+Message-ID: <20260420132314.1023554-262-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260420132314.1023554-1-sashal@kernel.org>
 References: <20260420132314.1023554-1-sashal@kernel.org>
@@ -80,85 +80,70 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279810-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,nvidia.com,blackwall.org,kernel.org,davemloft.net,google.com,redhat.com,lists.linux.dev,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-279811-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.999];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[netfilter.org:email,strlen.de:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 4320A42DBC1
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[blackwall.org:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,msgid.link:url,nvidia.com:email]
+X-Rspamd-Queue-Id: 0E93742F1FE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Florian Westphal <fw@strlen.de>
+From: Zijing Yin <yzjaurora@gmail.com>
 
-[ Upstream commit d3c0037ffe1273fa1961e779ff6906234d6cf53c ]
+[ Upstream commit 1979645e1842cb7017525a61a0e0e0beb924d02a ]
 
-New test case fails unexpectedly when avx2 matching functions are used.
+When CONFIG_BRIDGE_VLAN_FILTERING is not set, br_vlan_group() and
+nbp_vlan_group() return NULL (br_private.h stub definitions). The
+BR_BOOLOPT_FDB_LOCAL_VLAN_0 toggle code is compiled unconditionally and
+reaches br_fdb_delete_locals_per_vlan_port() and
+br_fdb_insert_locals_per_vlan_port(), where the NULL vlan group pointer
+is dereferenced via list_for_each_entry(v, &vg->vlan_list, vlist).
 
-The test first loads a ranomly generated pipapo set
-with 'ipv4 . port' key, i.e.  nft -f foo.
+The observed crash is in the delete path, triggered when creating a
+bridge with IFLA_BR_MULTI_BOOLOPT containing BR_BOOLOPT_FDB_LOCAL_VLAN_0
+via RTM_NEWLINK. The insert helper has the same bug pattern.
 
-This works.  Then, it reloads the set after a flush:
-(echo flush set t s; cat foo) | nft -f -
+  Oops: general protection fault, probably for non-canonical address 0xdffffc0000000056: 0000 [#1] KASAN NOPTI
+  KASAN: null-ptr-deref in range [0x00000000000002b0-0x00000000000002b7]
+  RIP: 0010:br_fdb_delete_locals_per_vlan+0x2b9/0x310
+  Call Trace:
+   br_fdb_toggle_local_vlan_0+0x452/0x4c0
+   br_toggle_fdb_local_vlan_0+0x31/0x80 net/bridge/br.c:276
+   br_boolopt_toggle net/bridge/br.c:313
+   br_boolopt_multi_toggle net/bridge/br.c:364
+   br_changelink net/bridge/br_netlink.c:1542
+   br_dev_newlink net/bridge/br_netlink.c:1575
 
-This is expected to work, because its the same set after all and it was
-already loaded once.
+Add NULL checks for the vlan group pointer in both helpers, returning
+early when there are no VLANs to iterate. This matches the existing
+pattern used by other bridge FDB functions such as br_fdb_add() and
+br_fdb_delete().
 
-But with avx2, this fails: nft reports a clashing element.
-
-The reported clash is of following form:
-
-    We successfully re-inserted
-      a . b
-      c . d
-
-Then we try to insert a . d
-
-avx2 finds the already existing a . d, which (due to 'flush set') is marked
-as invalid in the new generation.  It skips the element and moves to next.
-
-Due to incorrect masking, the skip-step finds the next matching
-element *only considering the first field*,
-
-i.e. we return the already reinserted "a . b", even though the
-last field is different and the entry should not have been matched.
-
-No such error is reported for the generic c implementation (no avx2) or when
-the last field has to use the 'nft_pipapo_avx2_lookup_slow' fallback.
-
-Bisection points to
-7711f4bb4b36 ("netfilter: nft_set_pipapo: fix range overlap detection")
-but that fix merely uncovers this bug.
-
-Before this commit, the wrong element is returned, but erronously
-reported as a full, identical duplicate.
-
-The root-cause is too early return in the avx2 match functions.
-When we process the last field, we should continue to process data
-until the entire input size has been consumed to make sure no stale
-bits remain in the map.
-
-Link: https://lore.kernel.org/netfilter-devel/20260321152506.037f68c0@elisabeth/
-Signed-off-by: Florian Westphal <fw@strlen.de>
-Reviewed-by: Stefano Brivio <sbrivio@redhat.com>
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+Fixes: 21446c06b441 ("net: bridge: Introduce UAPI for BR_BOOLOPT_FDB_LOCAL_VLAN_0")
+Signed-off-by: Zijing Yin <yzjaurora@gmail.com>
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
+Link: https://patch.msgid.link/20260402140153.3925663-1-yzjaurora@gmail.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
@@ -166,103 +151,33 @@ LLM Generated explanations, may be completely bogus:
 
 Error: Failed to generate final synthesis
 
- net/netfilter/nft_set_pipapo_avx2.c | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+ net/bridge/br_fdb.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/net/netfilter/nft_set_pipapo_avx2.c b/net/netfilter/nft_set_pipapo_avx2.c
-index 7ff90325c97fa..6395982e4d95c 100644
---- a/net/netfilter/nft_set_pipapo_avx2.c
-+++ b/net/netfilter/nft_set_pipapo_avx2.c
-@@ -242,7 +242,7 @@ static int nft_pipapo_avx2_lookup_4b_2(unsigned long *map, unsigned long *fill,
+diff --git a/net/bridge/br_fdb.c b/net/bridge/br_fdb.c
+index 0501ffcb8a3dd..e2c17f620f009 100644
+--- a/net/bridge/br_fdb.c
++++ b/net/bridge/br_fdb.c
+@@ -597,6 +597,9 @@ static void br_fdb_delete_locals_per_vlan_port(struct net_bridge *br,
+ 		dev = br->dev;
+ 	}
  
- 		b = nft_pipapo_avx2_refill(i_ul, &map[i_ul], fill, f->mt, last);
- 		if (last)
--			return b;
-+			ret = b;
++	if (!vg)
++		return;
++
+ 	list_for_each_entry(v, &vg->vlan_list, vlist)
+ 		br_fdb_find_delete_local(br, p, dev->dev_addr, v->vid);
+ }
+@@ -630,6 +633,9 @@ static int br_fdb_insert_locals_per_vlan_port(struct net_bridge *br,
+ 		dev = br->dev;
+ 	}
  
- 		if (unlikely(ret == -1))
- 			ret = b / XSAVE_YMM_SIZE;
-@@ -319,7 +319,7 @@ static int nft_pipapo_avx2_lookup_4b_4(unsigned long *map, unsigned long *fill,
- 
- 		b = nft_pipapo_avx2_refill(i_ul, &map[i_ul], fill, f->mt, last);
- 		if (last)
--			return b;
-+			ret = b;
- 
- 		if (unlikely(ret == -1))
- 			ret = b / XSAVE_YMM_SIZE;
-@@ -414,7 +414,7 @@ static int nft_pipapo_avx2_lookup_4b_8(unsigned long *map, unsigned long *fill,
- 
- 		b = nft_pipapo_avx2_refill(i_ul, &map[i_ul], fill, f->mt, last);
- 		if (last)
--			return b;
-+			ret = b;
- 
- 		if (unlikely(ret == -1))
- 			ret = b / XSAVE_YMM_SIZE;
-@@ -505,7 +505,7 @@ static int nft_pipapo_avx2_lookup_4b_12(unsigned long *map, unsigned long *fill,
- 
- 		b = nft_pipapo_avx2_refill(i_ul, &map[i_ul], fill, f->mt, last);
- 		if (last)
--			return b;
-+			ret = b;
- 
- 		if (unlikely(ret == -1))
- 			ret = b / XSAVE_YMM_SIZE;
-@@ -641,7 +641,7 @@ static int nft_pipapo_avx2_lookup_4b_32(unsigned long *map, unsigned long *fill,
- 
- 		b = nft_pipapo_avx2_refill(i_ul, &map[i_ul], fill, f->mt, last);
- 		if (last)
--			return b;
-+			ret = b;
- 
- 		if (unlikely(ret == -1))
- 			ret = b / XSAVE_YMM_SIZE;
-@@ -699,7 +699,7 @@ static int nft_pipapo_avx2_lookup_8b_1(unsigned long *map, unsigned long *fill,
- 
- 		b = nft_pipapo_avx2_refill(i_ul, &map[i_ul], fill, f->mt, last);
- 		if (last)
--			return b;
-+			ret = b;
- 
- 		if (unlikely(ret == -1))
- 			ret = b / XSAVE_YMM_SIZE;
-@@ -764,7 +764,7 @@ static int nft_pipapo_avx2_lookup_8b_2(unsigned long *map, unsigned long *fill,
- 
- 		b = nft_pipapo_avx2_refill(i_ul, &map[i_ul], fill, f->mt, last);
- 		if (last)
--			return b;
-+			ret = b;
- 
- 		if (unlikely(ret == -1))
- 			ret = b / XSAVE_YMM_SIZE;
-@@ -839,7 +839,7 @@ static int nft_pipapo_avx2_lookup_8b_4(unsigned long *map, unsigned long *fill,
- 
- 		b = nft_pipapo_avx2_refill(i_ul, &map[i_ul], fill, f->mt, last);
- 		if (last)
--			return b;
-+			ret = b;
- 
- 		if (unlikely(ret == -1))
- 			ret = b / XSAVE_YMM_SIZE;
-@@ -925,7 +925,7 @@ static int nft_pipapo_avx2_lookup_8b_6(unsigned long *map, unsigned long *fill,
- 
- 		b = nft_pipapo_avx2_refill(i_ul, &map[i_ul], fill, f->mt, last);
- 		if (last)
--			return b;
-+			ret = b;
- 
- 		if (unlikely(ret == -1))
- 			ret = b / XSAVE_YMM_SIZE;
-@@ -1019,7 +1019,7 @@ static int nft_pipapo_avx2_lookup_8b_16(unsigned long *map, unsigned long *fill,
- 
- 		b = nft_pipapo_avx2_refill(i_ul, &map[i_ul], fill, f->mt, last);
- 		if (last)
--			return b;
-+			ret = b;
- 
- 		if (unlikely(ret == -1))
- 			ret = b / XSAVE_YMM_SIZE;
++	if (!vg)
++		return 0;
++
+ 	list_for_each_entry(v, &vg->vlan_list, vlist) {
+ 		if (!br_vlan_should_use(v))
+ 			continue;
 -- 
 2.53.0
 
