@@ -1,201 +1,177 @@
-Return-Path: <netdev+bounces-279852-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279853-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OCBMM85c5mmtvAEAu9opvQ
-	(envelope-from <netdev+bounces-279852-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 19:05:18 +0200
+	id 4IEXJ1hf5mkWvgEAu9opvQ
+	(envelope-from <netdev+bounces-279853-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 19:16:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95F7D430831
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 19:05:17 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1A61430D84
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 19:16:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 4F7E531E9013
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 15:32:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 864683187124
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 15:33:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7ABB3382DC;
-	Mon, 20 Apr 2026 15:31:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F25C4329C71;
+	Mon, 20 Apr 2026 15:33:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=animalcreek.com header.i=@animalcreek.com header.b="kZtsaVTz";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="HMl/DKAp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J11F5QCY"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b3-smtp.messagingengine.com (fout-b3-smtp.messagingengine.com [202.12.124.146])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82F19333439
-	for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 15:31:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.146
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFBF022A817;
+	Mon, 20 Apr 2026 15:33:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776699117; cv=none; b=RE7o/0cbEB+DkGYmxHLhp+/hIXWdfey2lRfmrXzoyxcJF9iQcOJIR1hheL+L8w/CVegHveEfpZeIy5WoxFwkFzecqq1HX8CcYEgPAoCQRLNtxrhR3Ci6+IUSHDfP3mWOt09TEXQwm0wopjn6Cx5Wz7GOy9nHCvIVLGxmAyxhBjI=
+	t=1776699217; cv=none; b=f65RuExYNbQoXKIvtyb7O0S9AOnb8Qr8zyFnLLvDnrOHzeLo3DgWCUAaewCrHOQ52IsG3yMfIR8ZZbR/UopJah5ll6S1O4hYw5OFomaGRg1MxruDiphAsQqLHfUB//sRC62YwBQcA9PIv84SgUo9jVly49xzQqs0GSyJBKuP2og=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776699117; c=relaxed/simple;
-	bh=Aw50v2OacGqCLnn9c0bXE2NQavt3GCguqKhcX160PXQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZzsPR0aryDIFj3v31LVW05hyOY/r/xJJXK3bDXcJuEzasrObve3gB5EEGo5daOWJ8DXAix0Gp5nSCj5dBMM8RpeYq6xhO2eTOEYbH6tbZOnszzpuTDS6JMqJvT83LZJlJ5ltqe1/E99AH6B+ONmzcswldtMHfIC6q8i2JRhBDQ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=animalcreek.com; spf=pass smtp.mailfrom=animalcreek.com; dkim=pass (2048-bit key) header.d=animalcreek.com header.i=@animalcreek.com header.b=kZtsaVTz; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=HMl/DKAp; arc=none smtp.client-ip=202.12.124.146
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=animalcreek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=animalcreek.com
-Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
-	by mailfout.stl.internal (Postfix) with ESMTP id 4CAF31D000A4;
-	Mon, 20 Apr 2026 11:31:54 -0400 (EDT)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-05.internal (MEProxy); Mon, 20 Apr 2026 11:31:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=animalcreek.com;
-	 h=cc:cc:content-transfer-encoding:content-type:content-type
-	:date:date:from:from:in-reply-to:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=fm3;
-	 t=1776699114; x=1776785514; bh=cbclFDjEh0+xZ8RsOX5grsGolKeQxd7u
-	YIt9WzBXa+c=; b=kZtsaVTzz0B9ukLmHvt8rcEJmFdYNrHV+KMRBF+MEWmFu3IZ
-	xP2y4WYXaMsx3V9Ob8OY3OAUygOCWmUuhhaOTi0OqGqz2RNTNo/hMLaJHTvdwND1
-	gwbdhUIQFM1IGE2/QTsHSs2buzhd8JNWZdypKcGpmoSIj7nwXLXUu5cCqwP8bI3v
-	ZQie3RBbuaLgO66WB3UQH8FkMy56ihZTEDt6HvMA8p3bYCezGPYFQXSvcrA9QBqR
-	56rNUw1d1uLH3QwCxc9uyXidoWT4iuc8W45lORTeLjEFw+C0YoNvOdMxdf6YLF4r
-	Qx1eNwpNIxFMmU1lvLDufFKszj7ftnn9hd4n3g==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1776699114; x=
-	1776785514; bh=cbclFDjEh0+xZ8RsOX5grsGolKeQxd7uYIt9WzBXa+c=; b=H
-	Ml/DKApoBcFuwpAAKGDTjLII0ScT9X3nmpfymYS6SMz0AAqsj5BRNrUBventfd5g
-	WqV7J/7x7GtbCZRDajPF9ybI4XKH1wNeNzMr/IriGX/hFwMM4UubEJc/JnR6z3gw
-	HJQTYO2mQewT6IUtSNFOg2ieeWCjWuVRDgosgcMDfQWrP3ZnwRCiHj1xQqn1lO6P
-	zXIvyb3S+u6HI+DOHo/v5zaxvNXUZvO+i7sHiKV0SptwzSUtYVC4RzojgpO79xnV
-	KriIM9AhviDLqefu5u4Tzd1Met+fsvvtHcEUshyJXI0dA50HfuDMXXTBs8409Fwo
-	Zh70Js0cCb3NaAE6kvQIA==
-X-ME-Sender: <xms:6UbmaU7IFH1YfmOtNdvOFJSp-bNSeESQrHNRBYul7Q1brKSo5q7irw>
-    <xme:6UbmaYc9a2z6sVx1Ag6XtfA6dZa_xljUa7I8q_26bEESck0qaUrJjgsC9pa64NgBW
-    JWBDCciRTztp2GDXOwz8A5mkQ8M1ALz6bTosseFUbszfk2jmeiBNjQ>
-X-ME-Received: <xmr:6UbmaXFRgtTjaIQxCO_tz9Svw4xITRsNJC_s5bb5BGHvy2zxZm2F2jsFEV3osVBUhkKwtOOJF-aR9RK-LThd-m-gCTiY>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdehkeeklecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpefkffggfgfuvfevfhfhohgjtgfgsehtkeertddtvdejnecuhfhrohhmpeforghrkhcu
-    ifhrvggvrhcuoehmghhrvggvrhesrghnihhmrghltghrvggvkhdrtghomheqnecuggftrf
-    grthhtvghrnhepgfduueeiffdtveejteetueeutdefhfdttdeuuefhleeiueefvdegvdeh
-    ieeukedtnecuffhomhgrihhnpehgihhthhhusgdrtghomhenucevlhhushhtvghrufhiii
-    gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehmghhrvggvrhesrghnihhmrghltghr
-    vggvkhdrtghomhdpnhgspghrtghpthhtohepledpmhhouggvpehsmhhtphhouhhtpdhrtg
-    hpthhtohepkhhriihksehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkuhgsrgeskhgv
-    rhhnvghlrdhorhhgpdhrtghpthhtohepmhhitghhrggvlhdrthhhrghlmhgvihgvrheshh
-    grlhgvrdgrthdprhgtphhtthhopehrrgihmhhonhguhhgrtghklhgvhiesphhrohhtohhn
-    mhgrihhlrdgtohhmpdhrtghpthhtohepmhhitghhrggvlhesfigrlhhlvgdrtggtpdhrtg
-    hpthhtohepsghonhhgshhurdhjvghonhesshgrmhhsuhhnghdrtghomhdprhgtphhtthho
-    pegurghvihgusehigihithdrtgiipdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkh
-    gvrhhnvghlrdhorhhgpdhrtghpthhtohepmhhgrhgvvghrsegrnhhimhgrlhgtrhgvvghk
-    rdgtohhm
-X-ME-Proxy: <xmx:6UbmaZToYLBGVNw52aZQ9ZHgGevRg5Ee8PuDHoFESjcxBPltF_Snhg>
-    <xmx:6UbmadYuKGzldB4MjnFm19GPVwwbKNA68_fVBPSR7fmI1XHPLVlMYQ>
-    <xmx:6UbmaU3rGfrTuog1T8DgFm5I8vdQfQS8HiSnhZPwH3kVt3E3b5bc8w>
-    <xmx:6UbmaQpac0Bh4_EBidAKuqjtb2j2JGpoH0JiIcHjqVM12n4C3g1XXA>
-    <xmx:6kbmaQ7AldniaFi_BQAjmAMNk4QW_Z_u10MwkZNsCi9aElN9iweue5lt>
-Feedback-ID: i9cc843c7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 20 Apr 2026 11:31:52 -0400 (EDT)
-Message-ID: <8491d513-7475-44a9-9262-7260cf52bc18@animalcreek.com>
-Date: Mon, 20 Apr 2026 08:31:52 -0700
+	s=arc-20240116; t=1776699217; c=relaxed/simple;
+	bh=Kjn532amPlaxRPE+ZdGcJATDJi/VPSFQUdv5WzNh3iQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oyYxSVzSmXBeX+AEfSSmtFWDUoXBl4+XMdI2yH9w+SgzRR4AyH+fqxm83+qdLmHccSziQ5zQ38sHGH/3ls9CLU0qGPdWL6T1usISvRRZXcAw3Uh6HJxBALOOCfnCoQQLTNajlp8NEI3EzJfSaWcdIF4+vY0x026gEMlURJKkkiY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J11F5QCY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB776C2BCB6;
+	Mon, 20 Apr 2026 15:33:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776699217;
+	bh=Kjn532amPlaxRPE+ZdGcJATDJi/VPSFQUdv5WzNh3iQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=J11F5QCYiqW9f+FhXzUDFhRkgicfaczvTTTau4KaRSn4neTbdcCd30wvVz/YZ1xCe
+	 oqPzbdI7kX/dtrKjpsCniam/m5IYQjV9mnNscDlUPk1jxAJf+XG2db3Q3W0JLWMigt
+	 tCfZHRso3vpYoNYVcPdfu2ZWNzQfmRpdjfabXCibgYFVndLyK+D49fJhW9hd6qbbzn
+	 LZtYOXco0BhQ2tuyTBhBreacs4LEtyimjQIUSdpkiNbl1uQb+WFncUtq/cm78GpJ8L
+	 orroCGJd+BUumTBtViNQ/EByhVV4NsxbKCyR5kzZywq3H5uWtys5+FDxtqotCSOmuk
+	 PquIH7zpKJr8g==
+Date: Mon, 20 Apr 2026 17:33:34 +0200
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Minda Chen <minda.chen@starfivetech.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	Emil Renner Berthing <emil.renner.berthing@canonical.com>, Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor@kernel.org>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	devicetree@vger.kernel.org
+Subject: Re: [net-next v2 2/5] dt-bindings: net: starfive,jh7110-dwmac: Add
+ JHB100 support
+Message-ID: <20260420-messy-elite-panther-a7ffbc@quoll>
+References: <20260417024523.107786-1-minda.chen@starfivetech.com>
+ <20260417024523.107786-3-minda.chen@starfivetech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Path forward for NFC in the kernel
-To: Krzysztof Kozlowski <krzk@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
- Michael Thalmeier <michael.thalmeier@hale.at>,
- Raymond Hackley <raymondhackley@protonmail.com>,
- Michael Walle <michael@walle.cc>, Bongsu Jeon <bongsu.jeon@samsung.com>,
- David Heidelberg <david@ixit.cz>
-Cc: netdev@vger.kernel.org
-References: <20260416101041.4c533306@kernel.org>
- <9c4a4acf-b4f1-4e84-93bf-cdf080cb9970@kernel.org>
-Content-Language: en-US
-From: Mark Greer <mgreer@animalcreek.com>
-Organization: Animal Creek Technologies, Inc.
-In-Reply-To: <9c4a4acf-b4f1-4e84-93bf-cdf080cb9970@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260417024523.107786-3-minda.chen@starfivetech.com>
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[animalcreek.com:s=fm3,messagingengine.com:s=fm2];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-279852-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-279853-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[animalcreek.com];
-	FREEMAIL_TO(0.00)[kernel.org,hale.at,protonmail.com,walle.cc,samsung.com,ixit.cz];
-	HAS_ORG_HEADER(0.00)[];
-	DKIM_TRACE(0.00)[animalcreek.com:+,messagingengine.com:+];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mgreer@animalcreek.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[foss.st.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,canonical.com,vger.kernel.org,st-md-mailman.stormreply.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[messagingengine.com:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 95F7D430831
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[starfivetech.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: F1A61430D84
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-[Trying this again hopefully without HTML.]
+On Fri, Apr 17, 2026 at 10:45:20AM +0800, Minda Chen wrote:
+> Add StarFive JHB100 dwmac support and compatible.
+> The JHB100 dwmac shares the same driver code as the JH7110 dwmac,
 
-On 4/17/26 12:18 AM, Krzysztof Kozlowski wrote:
-> On 16/04/2026 19:10, Jakub Kicinski wrote:
->> Hi folks! We are struggling to keep up with the number of security 
->> reports and AI generated patches in the kernel. NFC is infamous for 
->> being a huge CVE magnet. We need someone to step up as a maintainer, 
->> create an NFC tree and handle all the incoming submissions. Send us 
->> (or Linus if you prefer) periodic PRs, like WiFi, Bluetooth etc. do. 
->> If that does not happen I'm afraid we'll have to move the NFC code 
->> out of the tree, put it up on GH or some such, and let it accumulate 
->> CVEs there.. I'm planning to send a PR to Linus to shed the 
->> unmaintained code early next week. We need to have a maintainer 
->> established by then. 
-> +Cc David Heidelberg recently trying to use Linux NFC stack, Just 
-> "collecting" patches is not a big deal, I could do this, but actually 
-> reviewing the patches with necessary due diligence is the effort I 
-> could not provide in a reasonable time frame. And picking up patches 
-> without proper review feels risky... NFC has a long history of issues, 
-> first mostly pointed out by syzbot but now apparently by AI tools. The 
-> code base is quite old, with no major improvements or testings 
-> happening but not in a way "oh, it's stable and working like 'cp' 
-> command" but rather "no one knows how many bugs are on top of each 
-> other and if it actually still works". Syzbot and AI reported bugs 
-> encourage random drive-by fixes by people not testing the code, thus 
-> particular bug report might be fixed, but for example NFC stops 
-> working and no one knows that. Does anyone knows if the NFC 
-> stack/drivers actually works fine? Did anyone test actual devices? If 
-> not, then moving to Github would be even more reasonable. Another 
-> point is that AFAIU, most of real world devices, like Android-based 
-> phones, don't use the Linux NFC stack but their custom HAL/user-space 
-> based libraries and drivers. Some other non-Android projects use 
-> libnfc userspace, which seems to be maintained only as bugfix 
-> (https://github.com/nfc-tools/libnfc/commits/master/). Best regards, 
-> Krzysztof 
+Please describe the hardware or programming interface, not driver code.
 
-That is my understanding too.
+> which contains 2 SGMII interfaces, 1 RGMII/RMII interface and
+> 1 RMII interface.
+> JHB100 dwmac has only one reset signal and one main interrupt
+> line.
 
-I would love to take this on but I've been swamped for years with my 
-"day job" and I'm pretty burned out.
-Taking on something like this isn't possible for me. I also didn't 
-realize it was creating so many CVEs so,
-yeah, sounds like it should be removed then. Thanks for all of the work 
-you did on this, Krzysztof.
 
-Mark
--- 
+Drop all below, not relevant.
 
+> 
+> Please refer to below:
+> 
+> JHB100: reset-names = "stmmaceth";
+> 
+> Example usage of JHB100 in the device tree:
+> 
+> gmac0: ethernet@11b80000 {
+>         compatible = "starfive,jhb100-dwmac",
+>                      "snps,dwmac-5.20";
+>         interrupts = <225>;
+>         interrupt-names = "macirq";
+>         ...
+> };
+> 
+> Signed-off-by: Minda Chen <minda.chen@starfivetech.com>
+> ---
+>  .../devicetree/bindings/net/snps,dwmac.yaml   |  1 +
+>  .../bindings/net/starfive,jh7110-dwmac.yaml   | 23 +++++++++++++++++++
+>  2 files changed, 24 insertions(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> index 38bc34dc4f09..85cd3252e8b1 100644
+> --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> @@ -115,6 +115,7 @@ properties:
+>          - sophgo,sg2044-dwmac
+>          - starfive,jh7100-dwmac
+>          - starfive,jh7110-dwmac
+> +        - starfive,jhb100-dwmac
+>          - tesla,fsd-ethqos
+>          - thead,th1520-gmac
+>  
+> diff --git a/Documentation/devicetree/bindings/net/starfive,jh7110-dwmac.yaml b/Documentation/devicetree/bindings/net/starfive,jh7110-dwmac.yaml
+> index 0d1962980f57..edc246a71ce3 100644
+> --- a/Documentation/devicetree/bindings/net/starfive,jh7110-dwmac.yaml
+> +++ b/Documentation/devicetree/bindings/net/starfive,jh7110-dwmac.yaml
+> @@ -18,6 +18,7 @@ select:
+>          enum:
+>            - starfive,jh7100-dwmac
+>            - starfive,jh7110-dwmac
+> +          - starfive,jhb100-dwmac
+>    required:
+>      - compatible
+>  
+> @@ -30,6 +31,9 @@ properties:
+>        - items:
+>            - const: starfive,jh7110-dwmac
+>            - const: snps,dwmac-5.20
+> +      - items:
+> +          - const: starfive,jhb100-dwmac
+
+So that's an enum in previous "items" list.... but your commit msg said
+your devices are compatible, so confusing.
+
+Best regards,
+Krzysztof
 
 
