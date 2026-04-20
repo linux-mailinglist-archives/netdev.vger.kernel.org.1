@@ -1,153 +1,154 @@
-Return-Path: <netdev+bounces-279849-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279850-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CPr6Jcxc5mmtvAEAu9opvQ
-	(envelope-from <netdev+bounces-279849-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 19:05:16 +0200
+	id 0D9tD+dS5mkDuwEAu9opvQ
+	(envelope-from <netdev+bounces-279850-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 18:23:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC8A943082A
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 19:05:15 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A621042F646
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 18:23:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 672E037051E1
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 15:22:12 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D073D353534F
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 15:23:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A841247291;
-	Mon, 20 Apr 2026 15:22:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A351826F29B;
+	Mon, 20 Apr 2026 15:23:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EiwGyiA1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z4sex0i0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f67.google.com (mail-ot1-f67.google.com [209.85.210.67])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE34722259F
-	for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 15:22:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.67
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F8D4264612;
+	Mon, 20 Apr 2026 15:23:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776698532; cv=none; b=SUzS7mSe3iN9ed7VSo0IP3x71Apa1joT+Jc6dh1+qtsvCe+nKCGI+dBwqzfssBuBrlFghYAJ/Z/2UUHuwttvhh0uvx2DSY0fVAvsas+fNjFObLIFMRpBcummh+S+Sxx85ZOI9jTzFnNbFUZ/GYzj/vQK4ZSvKm3BpSkxKYUP4lw=
+	t=1776698616; cv=none; b=RSdQmBaIInQqcb9CXaIHT+mjAt85WiZCSfcElRaGjWub+/YFJqf7S+rum/kfG8OxeVxZ44ZdL7GN84lD2IScSItPqXxZxr3h53Q2xxEoYxAtoI+O1N1N8pLyOBRQYpqS5CfsIs8+FQuOkVxqlPWNm4J0LqujvYLPh5MJd8wL31U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776698532; c=relaxed/simple;
-	bh=AgRRhqr+xsgiNYhaHTvirxnepaiUqG3kn3v1saTxfJ0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=seWt2qPKre4f8AIeEax42YWlcTJu83Yh+SrKi6JWcOXcuWfazZGBPsZijGPYpyRqQJEyHiUInVHe0xepeAh58npsq8AS7K38NXxEr5qxuuVQoPKijH+hXOLIbamXf3TvWxvspTVFbPXEgP/hKnflU8lt4WS8uVBARc6l5EB92TE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EiwGyiA1; arc=none smtp.client-ip=209.85.210.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f67.google.com with SMTP id 46e09a7af769-7d9b21d1461so3378576a34.1
-        for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 08:22:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776698529; x=1777303329; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=CmHj4qLUk/zUhVqmDWix9lzF21N06q4cYXnz7D8gDJI=;
-        b=EiwGyiA1y831fauNR7yHPrVrXw/yLeg8qQFUlhLId50UO1bNl1YuNYOtRjB7bQx3yA
-         lkMqYbJaK+ROo7Evn9Ce+cNeHXpBYKu5Zn7Q+Tri+SygF11Gh0cF14N/jHT84u7Yk6CQ
-         7d5vNcKtl2WtgzlPiavTn6DL/xrxSy+tGUuSWUaDAdrK7BTSfoykR8Gr9BDpLNX1u9Np
-         ++CMT8dvFAXAKrN+dcrbh78KSgbugLZIeyQTvUV6k2kH3bucEdtjVePQ1UhXkqkvCzLx
-         +lHLnVMhLDo9ubmThfF0FmNr2i0fgiS1RNj9kRcYtE/1FMQwXi+j50h9RcJU0vijaEIw
-         SGsA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776698529; x=1777303329;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CmHj4qLUk/zUhVqmDWix9lzF21N06q4cYXnz7D8gDJI=;
-        b=jNKL024vOl+3PMYxgbIMcfALPatMUU1ELiHGjTvpPqbqLluyQjjq5ltmGTOpxpFLwL
-         ZW7Q3HaOHyCR7aYS+bE6jdpNCunJKJqVteakQRRuF0DYtBCpROiep1Bni1IAqHY38LJ/
-         oK4so1BwOFetisVoeJbKVjzFFrEunxP/6UUEMLYjWhnOnwt/m8m/3FYEi81SkdV7OPtD
-         vXMtp1mfUxZbONP/+gVCp/0GKx2EGwIRyP6RsPvMzEt96Awo/grZN7HJFimUFaEKQQzi
-         XBMCZpjQHr/7EbVnsrhJRr2JH7xhN2J552+h+utw+A2p0cDzngVmrad/2CQsAgIgPOzk
-         sNMw==
-X-Forwarded-Encrypted: i=1; AFNElJ/m7SxFekpJMYMgqPtTkdxXJE9AQIYmNOHDKg0ZWfuyKmjLMB4OCqL7FjNNmwmGabFdDsWTRis=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxRZ0hQbFtSd1vxGkm/bGt8QYrm04F5YjC9RvvsINnowsa39xaq
-	KLklqPZIOgTefRfyudulx2k9YvRtQ4nz7Zznz7II4FzP47jfqpygAxg+
-X-Gm-Gg: AeBDiesuBYh12ichzgkpA+68EUQ+l4ToQqNFwoOHKJNe83wJ4vd02hFxZQM+rWEaFdN
-	XGyk+OEJ3BqGtn3cYI6PsSNQlDd/7Xu9jJ7L8e4JntuFeBDqDCQXNDOYBQf7wQWnwxcp+7liHoK
-	X7T1/Hl1poBgsnF3nXAZL0a6YiwrCBjAmzWoo06s6Yt+D8eUzCz0pe6Q5fiSIQjjtV1LmVl9+/d
-	Zwz+xL1K96tJN5eH5CTCg7wh10su072v6L7auEOI7ixjfwTuM4tqyH32e0uxdiTGDy0bgGtimLm
-	vsceYOcQM3v6eS64NnoCc6kPi2D+Wu8B+4dmqAWYIFyjDCNLBR67hcXBoE63wQ+WmYH8YwE0aOC
-	Xr6KXWlG4dmXGxEl3HsHyIJCwCV9IwjmVSS3XqsCxhZ+kN7M10E+wxrgTBvs7jEGCOtFy8poxWE
-	68LUkAUB77MnCTV4cabr0OXbF2mh3D
-X-Received: by 2002:a9d:4006:0:b0:7dc:cb0d:9e02 with SMTP id 46e09a7af769-7dccb0da338mr855442a34.9.1776698529551;
-        Mon, 20 Apr 2026 08:22:09 -0700 (PDT)
-Received: from localhost ([2a03:2880:12ff:45::])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7dcc953e39asm1510189a34.15.2026.04.20.08.22.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Apr 2026 08:22:09 -0700 (PDT)
-Date: Mon, 20 Apr 2026 08:22:07 -0700
-From: Stanislav Fomichev <sdf.kernel@gmail.com>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com, 
-	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org, 
-	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com, horms@kernel.org, 
-	andrew+netdev@lunn.ch, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Subject: Re: [PATCH net 1/4] xsk: avoid skb leak in XDP_TX_METADATA case
-Message-ID: <aeZEjZSsVIdpcbFF@devvm17672.vll0.facebook.com>
-References: <20260418045644.28612-1-kerneljasonxing@gmail.com>
- <20260418045644.28612-2-kerneljasonxing@gmail.com>
+	s=arc-20240116; t=1776698616; c=relaxed/simple;
+	bh=Rt7p+f8035FwrglIyG/el9HvMHbr+wpImxFBHqJMTSs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=KNddmhYGlyffLGp8uVy/Dr6cl41CmLqgDOy48WRdhO99iMPJeu+V7f0XAnewjoqmj+Icw8nMnxb8CoJ1Ab4O0zglkcbdZpW3fzgaweP0etCXp+IsoL+FQJsJk6XVMjFiXl5abLbah45nhS7wZrZBWGZN5T47RQpUy3J3FfKiCvc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z4sex0i0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 949CDC2BCB4;
+	Mon, 20 Apr 2026 15:23:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776698616;
+	bh=Rt7p+f8035FwrglIyG/el9HvMHbr+wpImxFBHqJMTSs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Z4sex0i0zWSKoFotw7bLfFZLHBh637MQHPf1EejQCwYYCKxdG10vZ8N3GOO7lEOac
+	 96qjPzuN8ebdmcgO48coFKzp4MXm//Fa6/mVBojlvxL3C3npxMbIFIlmnBKyw41r2F
+	 JGfdNkYdYM/BfsKU2fdRe37gtAev3FTvjnYUiHQeoVz1ErY6MDRUKfJllbQv2M/s8H
+	 RlkSN2G86MbzB6PMzHgDcKHemgKYmxf/piBhQlzr6mZyq18+u37mRPR9mHKH4Uh4oD
+	 EuZVSJWbTJX2gi5j3gAjmU25p1o2/cPJ+Gvq87cNs7NjM5Zj6PhTt2JPeDv8V7fite
+	 d3dzkF0cYOxJA==
+Date: Mon, 20 Apr 2026 08:23:34 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Yi Chen <yiche.cy@gmail.com>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>, Florian Westphal
+ <fw@strlen.de>, Phil Sutter <phil@nwl.cc>, Long Xin <lucien.xin@gmail.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, coreteam@netfilter.org,
+ netfilter-devel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net v2] selftests: netfilter:
+ conntrack_sctp_collision.sh: Introduce SCTP INIT collision test
+Message-ID: <20260420082334.7db8cbf4@kernel.org>
+In-Reply-To: <20260418195843.303946-1-yiche.cy@gmail.com>
+References: <20260418195843.303946-1-yiche.cy@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260418045644.28612-2-kerneljasonxing@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279849-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-279850-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FREEMAIL_CC(0.00)[netfilter.org,strlen.de,nwl.cc,gmail.com,davemloft.net,google.com,redhat.com,kernel.org,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,intel.com,gmail.com,fomichev.me,iogearbox.net,lunn.ch,vger.kernel.org,tencent.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sdfkernel@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[devvm17672.vll0.facebook.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,tencent.com:email,fomichev.me:email]
-X-Rspamd-Queue-Id: CC8A943082A
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,conntrack_sctp_collision.sh:url]
+X-Rspamd-Queue-Id: A621042F646
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 04/18, Jason Xing wrote:
-> From: Jason Xing <kernelxing@tencent.com>
-> 
-> Fix it by explicitly adding kfree_skb() before returning back to its
-> caller.
-> 
-> How to reproduce it in virtio_net:
-> 1. the current skb is the first one (which means no frag and xs->skb is
->    NULL) and users enable metadata feature.
-> 2. xsk_skb_metadata() returns a error code.
-> 3. the caller xsk_build_skb() clears skb by using 'skb = NULL;'.
-> 4. there is no chance to free this skb anymore.
-> 
-> Closes: https://lore.kernel.org/all/20260415085204.3F87AC19424@smtp.kernel.org/
-> Fixes: 30c3055f9c0d ("xsk: wrap generic metadata handling onto separate function")
-> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+On Sun, 19 Apr 2026 03:58:43 +0800 Yi Chen wrote:
+> The existing test covered a scenario where a delayed INIT_ACK chunk
+> updates the vtag in conntrack after the association has already been
+> established.
 
-Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+AI says:
+
+The conntrack_sctp_collision.sh selftest is now failing in the NIPA CI on
+both the normal and debug kernel builds:
+
+  not ok 1 1 selftests: net/netfilter: conntrack_sctp_collision.sh # exit=1
+
+  # Test for SCTP INIT_ACK Collision in nf_conntrack:
+  # Invalid netns name ""
+  # Invalid netns name ""
+
+The root cause is a shell variable scoping bug introduced by this patch.
+The new test structure wraps `topo_setup` in a subshell:
+
+  (topo_setup && conf_delay $SERVER_NS link0 2) || exit $?
+  if ! do_test; then
+      ...
+  fi
+
+`topo_setup` calls `setup_ns CLIENT_NS SERVER_NS ROUTER_NS`, which sets
+those variables inside the subshell. Those assignments do not propagate
+back to the parent shell, so when `do_test` is called afterwards, both
+`$SERVER_NS` and `$CLIENT_NS` expand to empty strings. The `ip net exec ""`
+calls then fail with "Invalid netns name """.
+
+The second test case (SCTP INIT Collision) would have the same problem.
+
+The fix is to avoid the subshell or ensure the namespace variables are
+visible to `do_test`. The simplest approach is to remove the subshell
+wrapping and call `topo_setup`, `conf_delay`, and `do_test` in the same
+shell scope:
+
+  topo_setup && conf_delay "$SERVER_NS" link0 2 || exit $?
+  if ! do_test; then
+      exit $ksft_fail
+  fi
+
+  topo_setup && conf_delay "$CLIENT_NS" link3 1 || exit $?
+  if ! do_test; then
+      exit $ksft_fail
+  fi
+
+Please also note that `conf_delay` references `$ROUTER_NS` directly
+(not via a parameter), so it too requires that those variables be set
+in the same shell scope.
 
