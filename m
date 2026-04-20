@@ -1,157 +1,118 @@
-Return-Path: <netdev+bounces-279825-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279826-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aMQSKiJI5mnSuAEAu9opvQ
-	(envelope-from <netdev+bounces-279825-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 17:37:06 +0200
+	id YEW/BApE5ml/twEAu9opvQ
+	(envelope-from <netdev+bounces-279826-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 17:19:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6058342E67E
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 17:37:06 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FCFA42E0C3
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 17:19:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B3C5731C0804
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 14:40:14 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id EEBC33259ED5
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 14:40:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A96D4DD6EA;
-	Mon, 20 Apr 2026 13:33:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SO8niLhR"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E5C03B0ADD;
+	Mon, 20 Apr 2026 13:34:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36B734DD6E6;
-	Mon, 20 Apr 2026 13:33:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB07A3A3E69;
+	Mon, 20 Apr 2026 13:34:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776692035; cv=none; b=FWWZYQsmGEzGCtcNCEbqxXrngDbqkLFtDkUice4IXb/wpTo2d/to64Q9wsJq/KvCS+4Q/eQ8vTSs3tN3AUoQd5RZHnxF7INx6yzzSiWAFuNxT7NPswKAFAaPYIkjWDD6MWeP6KwdB5g0DuefT1Dup4OrsKiZXHCrhKp7ZEEntWw=
+	t=1776692092; cv=none; b=erUMzTGvbW9wu41vLZq65WWWRBbO8wk6wUewNoKlDZ+XvDgihGrHxucXYQ3ZCm8esk4YM0jMvoMyC5VWzuNsKuNd8U8bxcVnOahC3CeueQFzlDE2NQp7Z6mSTsbDsjeExfkzENxRFP2ok0KUKvxXYnnPSy318v3DlqfPE4hrh/4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776692035; c=relaxed/simple;
-	bh=i3rhWaKMYSrIbCXhEhMYTiNtIcwSGsFJBwm31q++mJY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OzQ0hCKSEnIrrEWs5NPxtUVUEeQPigoaFxteLOtwHa38EBY6BZR+bHXBB1kDWXeJ5+n7Y6d+JiY51yB/MCn+V6nFcEtck2ghjedeyx0d1LNP3g2J8Scs3H6TiCqFPq4oH3gG/27EfXax8EHd6ohYLTpMnFjWcIsNR945RVsMfAg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SO8niLhR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8263C2BCB6;
-	Mon, 20 Apr 2026 13:33:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776692035;
-	bh=i3rhWaKMYSrIbCXhEhMYTiNtIcwSGsFJBwm31q++mJY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=SO8niLhRl4/p2u024WoM113oBgra7Xun4h8QLhr0rqQ9bh34YcGR611Pu01jqRNBN
-	 XVBRQMdV7Xd7LBmlfWhGqPP7Y32KH8joxiGxMqVZCdTTi9+a1Ume7Ou9osBK89ZoEc
-	 FcJHNyx8DlR8lH83SHwU11WSDS3ECH1sLIqLL6Z9wzPokibUO0MTHuaZAGwKfrrDr0
-	 kCBB3S3XBR/X7iKYcx5E4UCIustFJYzTtTwxyB8gNLe1y8AYgVTywOpk7iphb5Pcyc
-	 K3NqBtECZfRGdvgvTDLZ9V+Ap3UPMzRzDDwZ2OBNBAyLJqs85hPkZafHq55pFXHXCL
-	 X+7FQgoN384XA==
-From: Sasha Levin <sashal@kernel.org>
-To: patches@lists.linux.dev,
-	stable@vger.kernel.org
-Cc: Lorenzo Bianconi <lorenzo@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Sasha Levin <sashal@kernel.org>,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.18] net: airoha: Fix memory leak in airoha_qdma_rx_process()
-Date: Mon, 20 Apr 2026 09:22:10 -0400
-Message-ID: <20260420132314.1023554-336-sashal@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260420132314.1023554-1-sashal@kernel.org>
+	s=arc-20240116; t=1776692092; c=relaxed/simple;
+	bh=BXJNeeqYsEYZqgGG8SiFkMFMyJjHkC/PEEsX69nzE3M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pXjEyKUDzH7ED0OUE7qmsy8nqE/k2XTIwASHNrmZJdyqGvN61IB36KxhFM4XL/p4eThK4ml8pjjbD5kvtfAkafv6SmWv78tTAJV+IMT0UH9DYc8KQLwMcfwAkwSiy7vhwog2tKRJY+GM28npJ6wQ1m/I0qWC9lVcQwiLm2hZp1g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.99)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1wEols-0000000085O-3P4h;
+	Mon, 20 Apr 2026 13:34:40 +0000
+Date: Mon, 20 Apr 2026 14:34:36 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Sasha Levin <sashal@kernel.org>
+Cc: patches@lists.linux.dev, stable@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>, andrew@lunn.ch, olteanv@gmail.com,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH AUTOSEL 7.0] dsa: tag_mxl862xx: set
+ dsa_default_offload_fwd_mark()
+Message-ID: <aeYrbNyGsx4mvo9J@makrotopia.org>
 References: <20260420132314.1023554-1-sashal@kernel.org>
+ <20260420132314.1023554-153-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.18.23
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260420132314.1023554-153-sashal@kernel.org>
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-279825-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[lists.linux.dev,vger.kernel.org,kernel.org,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.986];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-279826-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[makrotopia.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[daniel@makrotopia.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	R_DKIM_NA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6058342E67E
+	DBL_BLOCKED_OPENRESOLVER(0.00)[makrotopia.org:mid,makrotopia.org:email,msgid.link:url]
+X-Rspamd-Queue-Id: 6FCFA42E0C3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Lorenzo Bianconi <lorenzo@kernel.org>
+On Mon, Apr 20, 2026 at 09:19:07AM -0400, Sasha Levin wrote:
+> From: Daniel Golle <daniel@makrotopia.org>
+> 
+> [ Upstream commit 4250ff1640ea1ede99bfe02ca949acbcc6c0927f ]
+> 
+> The MxL862xx offloads bridge forwarding in hardware, so set
+> dsa_default_offload_fwd_mark() to avoid duplicate forwarding of
+> packets of (eg. flooded) frames arriving at the CPU port.
+> 
+> Link-local frames are directly trapped to the CPU port only, so don't
+> set dsa_default_offload_fwd_mark() on those.
+> 
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> Link: https://patch.msgid.link/e1161c90894ddc519c57dc0224b3a0f6bfa1d2d6.1775049897.git.daniel@makrotopia.org
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Sasha Levin <sashal@kernel.org>
+> ---
+> 
+> LLM Generated explanations, may be completely bogus:
+> 
+> Now I have all the information needed for a complete analysis.
 
-[ Upstream commit 285fa6b1e03cff78ead0383e1b259c44b95faf90 ]
-
-If an error occurs on the subsequents buffers belonging to the
-non-linear part of the skb (e.g. due to an error in the payload length
-reported by the NIC or if we consumed all the available fragments for
-the skb), the page_pool fragment will not be linked to the skb so it will
-not return to the pool in the airoha_qdma_rx_process() error path. Fix the
-memory leak partially reverting commit 'd6d2b0e1538d ("net: airoha: Fix
-page recycling in airoha_qdma_rx_process()")' and always running
-page_pool_put_full_page routine in the airoha_qdma_rx_process() error
-path.
-
-Fixes: d6d2b0e1538d ("net: airoha: Fix page recycling in airoha_qdma_rx_process()")
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Link: https://patch.msgid.link/20260402-airoha_qdma_rx_process-mem-leak-fix-v1-1-b5706f402d3c@kernel.org
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
-
-LLM Generated explanations, may be completely bogus:
-
-Error: Failed to generate final synthesis
-
- drivers/net/ethernet/airoha/airoha_eth.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-index 4fc6bd282b465..bdf600fea9508 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.c
-+++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -709,9 +709,8 @@ static int airoha_qdma_rx_process(struct airoha_queue *q, int budget)
- 		if (q->skb) {
- 			dev_kfree_skb(q->skb);
- 			q->skb = NULL;
--		} else {
--			page_pool_put_full_page(q->page_pool, page, true);
- 		}
-+		page_pool_put_full_page(q->page_pool, page, true);
- 	}
- 	airoha_qdma_fill_rx_queue(q);
- 
--- 
-2.53.0
-
+This commit should NOT be backported, it only makes sense with bridge
+offloading implemented, which only happened with commit 340bdf984613c
+("net: dsa: mxl862xx: implement bridge offloading").
 
