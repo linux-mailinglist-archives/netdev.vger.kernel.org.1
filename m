@@ -1,62 +1,67 @@
-Return-Path: <netdev+bounces-279821-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279822-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wBj1InJQ5mkDuwEAu9opvQ
-	(envelope-from <netdev+bounces-279821-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 18:12:34 +0200
+	id aHZ4ML9Q5mkDuwEAu9opvQ
+	(envelope-from <netdev+bounces-279822-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 18:13:51 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D77242F256
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 18:12:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FDF942F2BE
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 18:13:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 5EBE132FC81A
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 14:34:24 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 86C59330BD4E
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 14:35:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BE434C6EEF;
-	Mon, 20 Apr 2026 13:33:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 463B44C9544;
+	Mon, 20 Apr 2026 13:33:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bcarKyyC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NVyXIYdB"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 672B34C6EEC;
-	Mon, 20 Apr 2026 13:33:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 220864C901F;
+	Mon, 20 Apr 2026 13:33:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776691983; cv=none; b=OVM3VffyL8B7evL3n32x1u7LqdwWBA1vW9zgyhXBqz16kkPL0+iahLBkhci2wWaChHmQ/GSYuaowXMNt6jhokdAA1jPxztwz57dkAUcc1fFT8goeEQZgVjS9Xhx9AOkyYuhV5YIMBeKnZt2a2KGoezTADwgVqjsNdsuK2ULju9I=
+	t=1776691996; cv=none; b=CLxGxG+9q88snmFsPMY2FD0F0Tr33NlV4cTIltzDvYjz1CwbSsGkT9zD1HXjsFYsWrijw/N5E7axeKDqUAP4SbIXyyJz0O9vLmuX+PirQn8hVNWfGTMwgCnzuTPUQNrNes3PUlrZx2mmIyNqXxoNXzyF3YfMonO6xr9CyG8DDFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776691983; c=relaxed/simple;
-	bh=G4rr8t+cL1IGQWS7XAHaJ3u+HohH4a1o5NALoiHwlgY=;
+	s=arc-20240116; t=1776691996; c=relaxed/simple;
+	bh=8IuyPOdlgEEHqblmwh+5zj4LIO3kR3cdpVBKlbJTs9o=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=msd3W23el9kvyJ5G/wR5QE3A/QhQHX0oOt+wMrWzzlwIg9ms0miI2qe3siVzTyvV/+x8Lz+ymv8XSwxY3oDm6d+IRg6eLe8FubdPaXTpx/px4yIRqGLW3WKxbpECbFrIRcMEqP1HnIy/7YfXG5IpIDxaOi+Mb5DabNDYytZySPI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bcarKyyC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58804C2BCB4;
-	Mon, 20 Apr 2026 13:33:02 +0000 (UTC)
+	 MIME-Version:Content-Type; b=EkbKze04OqXyTcXob1Jgq8ynHZB2qADBrmRz20Cy+f1hYlhxecXDfTi/T0/+oamV5J8Ro8C9cyn4imEkiNII3+I6my9qnWIAHE8XbF38rR/rO7/ye2QZ/8SwJaQa7ZBR/L0zPqTPG0ZyXhDkjmehSUlpFrvCGrqUBpicTGn4S2I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NVyXIYdB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7243BC19425;
+	Mon, 20 Apr 2026 13:33:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776691983;
-	bh=G4rr8t+cL1IGQWS7XAHaJ3u+HohH4a1o5NALoiHwlgY=;
+	s=k20201202; t=1776691995;
+	bh=8IuyPOdlgEEHqblmwh+5zj4LIO3kR3cdpVBKlbJTs9o=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=bcarKyyC2bFbZ/0y7L340sLrPL+jfDV3xBkYb6wTGNV/RMTp43dDOAxTH4bUTjMVX
-	 teCU8IaojAE5VB7L13Gt5wTPZmR47lTqre4yZggr6sY5TVgJC4gROgL/H+2ML6RBoB
-	 jepQORGTc7caM3vr5PEXaSjl6SVyUTp7R1b3o3Q8efYFBx4Cf1NtLZ/d9PhL+/euyy
-	 nLJZVJWI9Z/JfPbGVapuhL/jQ7lVlUQv4RBNn7Cc5qpwggXiNMrbZplIRfEaweSXAk
-	 06VpY1aLNdQUs4P76B9li2ElM/F4+ypb5kPK4w4T2oaZz3KimIWMu2n91vg27NWKXG
-	 /pRlebxa5ghuQ==
+	b=NVyXIYdBhwaMtVH/RSJVuzCL1HP6I7ftf4G9+xxqvwrI/fAK0xl+qTqHZsdLhaXkX
+	 i60zE7PSSmQRqEznTv2sU/rzGx2H9w8FCU+Crnsju/w6TTp9FbyRYY/TdivGtV8Crg
+	 43Ci8rcFdfpD2x5L5ovPRf3q0er947MPNpvN4I050QbR/uIcmBDbAZBu7iQmQiIvVK
+	 p8rMXWEYaGMhvyyAh4cVkLf4r4oc2nLuCbEHY+5vlpeDwfaG+BukgDfyvkE+fsrc+I
+	 6ABU9cFaJDcuXv4wiKl12LkqZwMx4NeZ/tMbSSI2SDN5CXBcXmvQlAw4pLM5HWVteK
+	 WFk9PoCQ55lCQ==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Pengpeng Hou <pengpeng@iscas.ac.cn>,
+Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	=?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	krzk@kernel.org,
-	bongsu.jeon@samsung.com,
+	magnus.karlsson@intel.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	ast@kernel.org,
 	netdev@vger.kernel.org,
+	bpf@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.18] nfc: s3fwrn5: allocate rx skb before consuming bytes
-Date: Mon, 20 Apr 2026 09:21:39 -0400
-Message-ID: <20260420132314.1023554-305-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.18] xsk: validate MTU against usable frame size on bind
+Date: Mon, 20 Apr 2026 09:21:46 -0400
+Message-ID: <20260420132314.1023554-312-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260420132314.1023554-1-sashal@kernel.org>
 References: <20260420132314.1023554-1-sashal@kernel.org>
@@ -66,60 +71,61 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.18.23
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279821-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-279822-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-0.999];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[iscas.ac.cn:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,msgid.link:url]
-X-Rspamd-Queue-Id: 6D77242F256
+	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,intel.com:email]
+X-Rspamd-Queue-Id: 0FDF942F2BE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Pengpeng Hou <pengpeng@iscas.ac.cn>
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
 
-[ Upstream commit 5c14a19d5b1645cce1cb1252833d70b23635b632 ]
+[ Upstream commit 36ee60b569ba0dfb6f961333b90d19ab5b323fa9 ]
 
-s3fwrn82_uart_read() reports the number of accepted bytes to the serdev
-core. The current code consumes bytes into recv_skb and may already
-deliver a complete frame before allocating a fresh receive buffer.
+AF_XDP bind currently accepts zero-copy pool configurations without
+verifying that the device MTU fits into the usable frame space provided
+by the UMEM chunk.
 
-If that alloc_skb() fails, the callback returns 0 even though it has
-already consumed bytes, and it leaves recv_skb as NULL for the next
-receive callback. That breaks the receive_buf() accounting contract and
-can also lead to a NULL dereference on the next skb_put_u8().
+This becomes a problem since we started to respect tailroom which is
+subtracted from chunk_size (among with headroom). 2k chunk size might
+not provide enough space for standard 1500 MTU, so let us catch such
+settings at bind time. Furthermore, validate whether underlying HW will
+be able to satisfy configured MTU wrt XSK's frame size multiplied by
+supported Rx buffer chain length (that is exposed via
+net_device::xdp_zc_max_segs).
 
-Allocate the receive skb lazily before consuming the next byte instead.
-If allocation fails, return the number of bytes already accepted.
-
-Fixes: 3f52c2cb7e3a ("nfc: s3fwrn5: Support a UART interface")
-Signed-off-by: Pengpeng Hou <pengpeng@iscas.ac.cn>
-Link: https://patch.msgid.link/20260402042148.65236-1-pengpeng@iscas.ac.cn
+Fixes: 24ea50127ecf ("xsk: support mbuf on ZC RX")
+Reviewed-by: Björn Töpel <bjorn@kernel.org>
+Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Link: https://patch.msgid.link/20260402154958.562179-5-maciej.fijalkowski@intel.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
@@ -128,37 +134,71 @@ LLM Generated explanations, may be completely bogus:
 
 Error: Failed to generate final synthesis
 
- drivers/nfc/s3fwrn5/uart.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+ net/xdp/xsk_buff_pool.c | 28 +++++++++++++++++++++++++---
+ 1 file changed, 25 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/nfc/s3fwrn5/uart.c b/drivers/nfc/s3fwrn5/uart.c
-index 9c09c10c2a464..4ee481bd7e965 100644
---- a/drivers/nfc/s3fwrn5/uart.c
-+++ b/drivers/nfc/s3fwrn5/uart.c
-@@ -58,6 +58,12 @@ static size_t s3fwrn82_uart_read(struct serdev_device *serdev,
- 	size_t i;
+diff --git a/net/xdp/xsk_buff_pool.c b/net/xdp/xsk_buff_pool.c
+index 677c7d00f8c32..a129ce6f1c25f 100644
+--- a/net/xdp/xsk_buff_pool.c
++++ b/net/xdp/xsk_buff_pool.c
+@@ -10,6 +10,8 @@
+ #include "xdp_umem.h"
+ #include "xsk.h"
  
- 	for (i = 0; i < count; i++) {
-+		if (!phy->recv_skb) {
-+			phy->recv_skb = alloc_skb(NCI_SKB_BUFF_LEN, GFP_KERNEL);
-+			if (!phy->recv_skb)
-+				return i;
-+		}
++#define ETH_PAD_LEN (ETH_HLEN + 2 * VLAN_HLEN  + ETH_FCS_LEN)
 +
- 		skb_put_u8(phy->recv_skb, *data++);
+ void xp_add_xsk(struct xsk_buff_pool *pool, struct xdp_sock *xs)
+ {
+ 	unsigned long flags;
+@@ -165,8 +167,12 @@ static void xp_disable_drv_zc(struct xsk_buff_pool *pool)
+ int xp_assign_dev(struct xsk_buff_pool *pool,
+ 		  struct net_device *netdev, u16 queue_id, u16 flags)
+ {
++	u32 needed = netdev->mtu + ETH_PAD_LEN;
++	u32 segs = netdev->xdp_zc_max_segs;
++	bool mbuf = flags & XDP_USE_SG;
+ 	bool force_zc, force_copy;
+ 	struct netdev_bpf bpf;
++	u32 frame_size;
+ 	int err = 0;
  
- 		if (phy->recv_skb->len < S3FWRN82_NCI_HEADER)
-@@ -69,9 +75,7 @@ static size_t s3fwrn82_uart_read(struct serdev_device *serdev,
+ 	ASSERT_RTNL();
+@@ -186,7 +192,7 @@ int xp_assign_dev(struct xsk_buff_pool *pool,
+ 	if (err)
+ 		return err;
  
- 		s3fwrn5_recv_frame(phy->common.ndev, phy->recv_skb,
- 				   phy->common.mode);
--		phy->recv_skb = alloc_skb(NCI_SKB_BUFF_LEN, GFP_KERNEL);
--		if (!phy->recv_skb)
--			return 0;
-+		phy->recv_skb = NULL;
+-	if (flags & XDP_USE_SG)
++	if (mbuf)
+ 		pool->umem->flags |= XDP_UMEM_SG_FLAG;
+ 
+ 	if (flags & XDP_USE_NEED_WAKEUP)
+@@ -208,8 +214,24 @@ int xp_assign_dev(struct xsk_buff_pool *pool,
+ 		goto err_unreg_pool;
  	}
  
- 	return i;
+-	if (netdev->xdp_zc_max_segs == 1 && (flags & XDP_USE_SG)) {
+-		err = -EOPNOTSUPP;
++	if (mbuf) {
++		if (segs == 1) {
++			err = -EOPNOTSUPP;
++			goto err_unreg_pool;
++		}
++	} else {
++		segs = 1;
++	}
++
++	/* open-code xsk_pool_get_rx_frame_size() as pool->dev is not
++	 * set yet at this point; we are before getting down to driver
++	 */
++	frame_size = __xsk_pool_get_rx_frame_size(pool) -
++		     xsk_pool_get_tailroom(mbuf);
++	frame_size = ALIGN_DOWN(frame_size, 128);
++
++	if (needed > frame_size * segs) {
++		err = -EINVAL;
+ 		goto err_unreg_pool;
+ 	}
+ 
 -- 
 2.53.0
 
