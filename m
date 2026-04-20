@@ -1,60 +1,70 @@
-Return-Path: <netdev+bounces-279654-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279655-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4LM5Gemc5Wm1mAEAu9opvQ
-	(envelope-from <netdev+bounces-279654-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 05:26:33 +0200
+	id MNEYMZyd5WnLmAEAu9opvQ
+	(envelope-from <netdev+bounces-279655-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 05:29:32 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B99B54268C2
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 05:26:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 29B0B4268EF
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 05:29:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 88A8F300B117
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 03:25:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D0D54300EF9D
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 03:28:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D25637F8CC;
-	Mon, 20 Apr 2026 03:25:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4F0437FF4D;
+	Mon, 20 Apr 2026 03:28:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp25.cstnet.cn [159.226.251.25])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF04B35C185;
-	Mon, 20 Apr 2026 03:25:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CE6037FF43;
+	Mon, 20 Apr 2026 03:28:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776655524; cv=none; b=NfRzBotACsQSc++4If0u/vazVRMxAH0zXqMFdtjRpxtdpeez3Z7dE97QCK6qzbq2jfrSdnKmRxOgBKhGUzVJ0NGW60X++o+ovYw+T8WpiT5tEiX7JKFGLismg+N4uBp4cNksgJ/m54HBQ1T9SB8mI938LbHWvSrbmpSs6yFKIUg=
+	t=1776655734; cv=none; b=LHkrknF+IDXv9jCsD3sNjtbj10vpfjRZtlUNu/bDTJVa7busMCHEGRldSSaN/fJ7kqpyQf1vwGwa4maAXP+GgRuYu29FvXZGXMb62XYk62xsqikwQA1C5dJEUldCXUAwVsWGOVYvzZwXaOkQUe5++4/DvMjF2T9dGGX1NeWo/KI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776655524; c=relaxed/simple;
-	bh=o6WC5778xZWcRTJECjjLQorMrFwgvz0nLDUSBYqAmIU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NAwHVFyqvsFFBivZh0jkGj1q6UzInxN/QI9tz5PRmG/Aiuz7tqKNUbgzr/x/h1svdEd271Ke5YXCn3ZyD5aPDX0QtFysT2k+xesCF600XBaN6CVvh0lRsWCJMgi/uPDq1aAO1Cr5ti1v7s+BSb1p8pyL4sZFT6Xjx3+056Sjrh0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from ubuntu.. (unknown [202.112.113.208])
-	by APP-05 (Coremail) with SMTP id zQCowADndwt9nOVpj2cbDg--.31217S2;
-	Mon, 20 Apr 2026 11:24:54 +0800 (CST)
-From: Ma Ke <make24@iscas.ac.cn>
-To: vz@mleia.com
-Cc: alexandre.belloni@bootlin.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
+	s=arc-20240116; t=1776655734; c=relaxed/simple;
+	bh=Nv0sOyHGylTYMSmYdCuitXzs0jn7nV2QHj8+3s7nF+c=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=BI0l461oqs5dCwoZfeXMOzIU0y9IrQ9i/iQHg6rFfNH8dxgqgFcNUKlhgByYgkTbF1lLNfyAPcnZHiOE6ovlDDsiK5wDZZHfRBsaj+33OnHT1Nd9JlT5fPRld7P8JPMviPZroO3XDXWIf486zcZ2RiOxM1QQXxyvMhyIH398vVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 0a2489fa3c6911f1aa26b74ffac11d73-20260420
+X-CID-CACHE: Type:Local,Time:202604201115+08,HitQuantity:1
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.12,REQID:1bfbf80e-9ab9-4126-beb2-92fb118b84d2,IP:0,U
+	RL:0,TC:0,Content:0,EDM:-25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
+	N:release,TS:-25
+X-CID-META: VersionHash:e7bac3a,CLOUDID:6616c3197f7ca96d3a9f256850da7138,BulkI
+	D:nil,BulkQuantity:0,Recheck:0,SF:102|850|898,TC:nil,Content:0|15|50,EDM:2
+	,IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV
+	:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 0a2489fa3c6911f1aa26b74ffac11d73-20260420
+X-User: lilinmao@kylinos.cn
+Received: from localhost.localdomain [(10.44.16.150)] by mailgw.kylinos.cn
+	(envelope-from <lilinmao@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 1852436667; Mon, 20 Apr 2026 11:28:46 +0800
+From: Linmao Li <lilinmao@kylinos.cn>
+To: davem@davemloft.net,
+	dsahern@kernel.org,
 	edumazet@google.com,
 	kuba@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	make24@iscas.ac.cn,
+	pabeni@redhat.com
+Cc: horms@kernel.org,
 	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	piotr.wojtaszczyk@timesys.com,
-	stable@vger.kernel.org
-Subject: Re: [PATCH] net: lpc_eth: Fix a possible memory leak in lpc_mii_probe()
-Date: Mon, 20 Apr 2026 11:24:45 +0800
-Message-ID: <20260420032445.2209758-1-make24@iscas.ac.cn>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <60dea9e5-9890-49ab-b806-713c388d6e08@mleia.com>
-References: <60dea9e5-9890-49ab-b806-713c388d6e08@mleia.com>
+	linux-kernel@vger.kernel.org,
+	Linmao Li <lilinmao@kylinos.cn>
+Subject: [PATCH net] ipv6: addrconf: skip ERRDAD transition when address already DEAD
+Date: Mon, 20 Apr 2026 11:28:42 +0800
+Message-Id: <20260420032842.1063277-1-lilinmao@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,199 +72,85 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zQCowADndwt9nOVpj2cbDg--.31217S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxtF15Cr43Xr48Ar17urWDCFg_yoW7Zr47p3
-	yUGa4SkFykGr17Gw4vv3WUAryYvw42yw1rWFyjya45Wrn0qryfAry8trWY9r95CFZ7J3W0
-	vryakFZ3ZaykXaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUB214x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
-	6r4UJwA2z4x0Y4vEx4A2jsIE14v26F4UJVW0owA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xv
-	F2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r
-	4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I
-	648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2
-	Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s02
-	6x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0x
-	vE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE
-	42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6x
-	kF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUOmhFUUUUU
-X-CM-SenderInfo: ppdnvj2u6l2u1dvotugofq/
-X-Spamd-Result: default: False [1.54 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-279655-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279654-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[iscas.ac.cn];
+	DMARC_NA(0.00)[kylinos.cn];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FROM_NEQ_ENVFROM(0.00)[make24@iscas.ac.cn,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	NEURAL_SPAM(0.00)[0.269];
-	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lilinmao@kylinos.cn,netdev@vger.kernel.org];
 	R_DKIM_NA(0.00)[];
-	TO_DN_NONE(0.00)[];
+	NEURAL_HAM(-0.00)[-0.989];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,iscas.ac.cn:mid,iscas.ac.cn:email]
-X-Rspamd-Queue-Id: B99B54268C2
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,kylinos.cn:mid,kylinos.cn:email]
+X-Rspamd-Queue-Id: 29B0B4268EF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
->Hello Ma Ke.
->
->On 4/1/26 16:18, Ma Ke wrote:
->> On 3/30/26 13:04, Vladimir Zapolskiy wrote:
->>> On 3/30/26 11:16, Ma Ke wrote:
->>>> lpc_mii_probe() calls of_phy_find_device() to obtain a phy_device
->>>> pointer. of_phy_find_device() increments the refcount of the device.
->>>> The current implementation does not decrement the refcount after using
->>>> the pointer, which leads to a memory leak.
->>>
->>> this is correct, there is an actual detected bug.
->>>
->>>>
->>>> Add phy_device_free() to balance the refcount.
->>>
->>> But this does not sound right, you shoud use of_node_put(pldat->phy_node).
->>>
->>>>
->>>> Found by code review.
->>>>
->>>> Signed-off-by: Ma Ke <make24@iscas.ac.cn>
->>>> Cc: stable@vger.kernel.org
->>>> Fixes: 3503bf024b3e ("net: lpc_eth: parse phy nodes from device tree")
->>>> ---
->>>>    drivers/net/ethernet/nxp/lpc_eth.c | 11 ++++++-----
->>>>    1 file changed, 6 insertions(+), 5 deletions(-)
->>>>
->>>> diff --git a/drivers/net/ethernet/nxp/lpc_eth.c b/drivers/net/ethernet/nxp/lpc_eth.c
->>>> index 8b9a3e3bba30..8ce7c9bb6dd6 100644
->>>> --- a/drivers/net/ethernet/nxp/lpc_eth.c
->>>> +++ b/drivers/net/ethernet/nxp/lpc_eth.c
->>>> @@ -751,7 +751,7 @@ static void lpc_handle_link_change(struct net_device *ndev)
->>>>    static int lpc_mii_probe(struct net_device *ndev)
->>>>    {
->>>>    	struct netdata_local *pldat = netdev_priv(ndev);
->>>> -	struct phy_device *phydev;
->>>> +	struct phy_device *phydev, *phydev_tmp;
->>>>    
->>>>    	/* Attach to the PHY */
->>>>    	if (lpc_phy_interface_mode(&pldat->pdev->dev) == PHY_INTERFACE_MODE_MII)
->>>> @@ -760,17 +760,18 @@ static int lpc_mii_probe(struct net_device *ndev)
->>>>    		netdev_info(ndev, "using RMII interface\n");
->>>>    
->>>>    	if (pldat->phy_node)
->>>> -		phydev =  of_phy_find_device(pldat->phy_node);
->>>> +		phydev_tmp =  of_phy_find_device(pldat->phy_node);
->>>>    	else
->>>> -		phydev = phy_find_first(pldat->mii_bus);
->>>> -	if (!phydev) {
->>>> +		phydev_tmp = phy_find_first(pldat->mii_bus);
->>>> +	if (!phydev_tmp) {
->>>
->>> I didn't get it, why the new phydev_tmp is needed above, please
->>> restore the original code above.
->>>
->>>>    		netdev_err(ndev, "no PHY found\n");
->>>>    		return -ENODEV;
->>>>    	}
->>>>    
->>>> -	phydev = phy_connect(ndev, phydev_name(phydev),
->>>> +	phydev = phy_connect(ndev, phydev_name(phydev_tmp),
->>>>    			     &lpc_handle_link_change,
->>>>    			     lpc_phy_interface_mode(&pldat->pdev->dev));
->>>> +	phy_device_free(phydev_tmp);
->>>
->>> This is plainly wrong and has to be dropped or changed to
->>>
->>> 	if (pldat->phy_node)
->>> 		of_node_put(pldat->phy_node);
->>>
->>>>    	if (IS_ERR(phydev)) {
->>>>    		netdev_err(ndev, "Could not attach to PHY\n");
->>>>    		return PTR_ERR(phydev);
->>>
->>> Is it AI generated fix or what?.. The change looks bad, it introduces
->>> more severe issues than it fixes.
->>>
->>> If you think you cannot create a proper change, let me know.
->>>
->> Thank you very much for your detailed review and guidance.
->> 
->> Now I think your point probably is: you are saying that the real leak
->> is not from of_phy_find_device(), but from the device node
->
->I was pretty indelicate in my comment, let's split the change into parts.
->
->1) I still do not understand, why phydev_tmp is introduced, please explain
->or remove this part of the change;
->
->2) phydev = of_phy_find_device() requires phy_device_free(phydev), but
->I do not see why phy_find_first() requires it, while it was added in your
->change.
->
->Let's start from resolving these two points.
->
->> pldat->phy_node which was obtained earlier (probably by
->> of_parse_phandle()) and never freed by of_node_put(). And you suggest
->> to add of_node_put(pldat->phy_node) instead of my wrong
->> phy_device_free().
->> 
->> However, I am still a little confused. In lpc_mii_probe(),
->> of_phy_find_device() is called. From my understanding, this function
->> increases the reference count of the device. To balance it, I thought
->> phy_device_free() (which calls put_device()) should be used.
->> 
->> Could you please kindly advise the correct patch? I will follow your
->> guidance and submit a proper fix.
->> 
->> I apologize again for my previous wrong patch. Thank you very much for
->> your help.
->
-> -- 
-> Best wishes,
-> Vladimir
-Hello Vladimir,
+addrconf_dad_end() transitions ifp->state from DAD to POSTDAD under
+ifp->lock and releases the lock.  addrconf_dad_failure() takes
+ifp->lock again with the spin_lock_bh() following the
+net_info_ratelimited() duplicate-address log.  A concurrent
+ipv6_del_addr() can acquire the lock in that window, set ifp->state
+to DEAD and run list_del_rcu(&ifp->if_list).
 
-Thank you for the detailed explanation and for pointing out my mistakes.
+addrconf_dad_failure() then overwrites DEAD with ERRDAD at errdad:
+and schedules a new dad_work.  The work calls ipv6_del_addr() again,
+hitting the already-poisoned list entry:
 
-> 1) I still do not understand, why phydev_tmp is introduced, please explain
-> or remove this part of the change;
+  general protection fault: 0000 [#1] SMP NOPTI
+  CPU: 4 PID: 217 Comm: kworker/4:1
+  Workqueue: ipv6_addrconf addrconf_dad_work
+  RIP: 0010:ipv6_del_addr+0xe9/0x280
+  RAX: dead000000000122
+  Call Trace:
+   addrconf_dad_stop+0x113/0x140
+   addrconf_dad_work+0x28c/0x430
+   process_one_work+0x1eb/0x3b0
+   worker_thread+0x4d/0x400
+   kthread+0x104/0x140
+   ret_from_fork+0x35/0x40
 
-I added phydev_tmp because I thought I needed to keep the original 
-phy_device pointer for releasing after phy_connect(). But as you 
-implied, it's perhaps unnecessary and only makes the code less 
-readable. I will drop this change completely in the next version.
+Bail out at errdad: when ifp->state is already DEAD. The existing
+in6_ifa_put() releases the reference taken for this invocation.
 
-> 2) phydev = of_phy_find_device() requires phy_device_free(phydev), but
-> I do not see why phy_find_first() requires it, while it was added in your
-> change.
+Signed-off-by: Linmao Li <lilinmao@kylinos.cn>
+---
+ net/ipv6/addrconf.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-You are absolutely right. I mistakenly assumed that both functions 
-return a reference-counted pointer. phy_find_first() does not 
-increment the refcount, so calling phy_device_free() on it is wrong 
-and dangerous. My patch introduced a new bug there.
-
-Now I understand that only the of_phy_find_device() branch needs a 
-corresponding put_device(). I will prepare a corrected patch that only
-releases the reference in that specific path (including on the error 
-path after phy_connect() failure). I will also look at the phy_node 
-reference leak you hinted at.
-
-Thank you again for your guidance. I will send a v2 after fixing it 
-properly.
-
-Best regards,
-Ma Ke
+diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+index 5476b6536eb7..14b1ab43da87 100644
+--- a/net/ipv6/addrconf.c
++++ b/net/ipv6/addrconf.c
+@@ -2227,6 +2227,12 @@ void addrconf_dad_failure(struct sk_buff *skb, struct inet6_ifaddr *ifp)
+ 
+ errdad:
+ 	/* transition from _POSTDAD to _ERRDAD */
++	if (ifp->state == INET6_IFADDR_STATE_DEAD) {
++		/* ipv6_del_addr() already removed ifp while lock was dropped */
++		spin_unlock_bh(&ifp->lock);
++		in6_ifa_put(ifp);
++		return;
++	}
+ 	ifp->state = INET6_IFADDR_STATE_ERRDAD;
+ 	spin_unlock_bh(&ifp->lock);
+ 
+-- 
+2.25.1
 
 
