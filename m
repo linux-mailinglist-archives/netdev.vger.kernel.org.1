@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-279774-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279775-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kF0GG4U45mlutgEAu9opvQ
-	(envelope-from <netdev+bounces-279774-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 16:30:29 +0200
+	id YEDwN6Iz5mlqtQEAu9opvQ
+	(envelope-from <netdev+bounces-279775-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 16:09:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6CA542D219
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 16:30:28 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id AAAC542CB80
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 16:09:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2A42230C1C5E
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 13:48:44 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 00B55312EEB1
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 13:49:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 669B93ED5A5;
-	Mon, 20 Apr 2026 13:25:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0AC73EF0C3;
+	Mon, 20 Apr 2026 13:25:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CrtWnGtH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZG4eQ2ZF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 434393EC2FC;
-	Mon, 20 Apr 2026 13:25:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B86103EF0C2;
+	Mon, 20 Apr 2026 13:25:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776691512; cv=none; b=KT4ZxXhcwdLyrD+//4PtXME0k3dgRG/gBfiHJVHb6D5kgL3AX7ywH8CW3eikZBoN9CYCRQ/Xtd1ixT0Qj/vSqzF7ddPVo7OeyNMkZLQ8tex+fiHebYqUanKxFeVbxXFWXBklzXJpyEyykMUTIUMbhqOxye84PyLBVb7oKAa5R5w=
+	t=1776691523; cv=none; b=L5Ghpm0RZwXHjdSoxSCwS6mebvqTqCSX2OaQAuXKzv29PZ7PK7bOahwMKb8GiFKc06p+zNOeBtzevXu0WcqZedIjfzPWPD66p9GpAP3p/5Eq6/WJbPR9fsyktsK2ntxp2g0GL7C/g4dGpr04D3zZmpdw+gfDbKL+DbpvL88ZMhA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776691512; c=relaxed/simple;
-	bh=RJBmDKkGRFqbpmS57CnARzcMy+oYZRfEn69JCVkwEW4=;
+	s=arc-20240116; t=1776691523; c=relaxed/simple;
+	bh=y71kcRYQpao/17pO/wcWPCws9upPBl1PHmX/t/RFhHo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=szKlLwhWCp5YiewaWtakd7mMV6udHdjawx9gwK0sSz+jFb39aTWU6/8qLv06wmTeGCVmJLF4dqTRP5TwDdUtnKVTvO6Is9DdfCzBDlvpaFdpPI7kPOVXsxHmNYIbU+7vRA7uPXt/pjS+fItMmDoqK2oLMe0RxKW64DA4fNxLLJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CrtWnGtH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3805EC2BCB6;
-	Mon, 20 Apr 2026 13:25:10 +0000 (UTC)
+	 MIME-Version:Content-Type; b=ewcGFGQH0O49w0T7B+fVwQg10eUhoDqJYK42CcW7b0WRoo2xW5Q83CYtK76np+grMFDSMxzj34d8l6zKQIkirmo9ty93CMbERGqEzIJBqxLOm2OnmrDB5ywErQrCxno2YKiYC71vlVmnk0JAUsSnK3L57TY9xU847F3kVMx4wwg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZG4eQ2ZF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D2C4C19425;
+	Mon, 20 Apr 2026 13:25:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776691512;
-	bh=RJBmDKkGRFqbpmS57CnARzcMy+oYZRfEn69JCVkwEW4=;
+	s=k20201202; t=1776691523;
+	bh=y71kcRYQpao/17pO/wcWPCws9upPBl1PHmX/t/RFhHo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=CrtWnGtHK1GRlYckLjCylmkrBoGpBeMwk/fa0SjYqGAua2BLg+E8owI6V5ykFAl6L
-	 qtaw7aociuEpi2ZLjlGNxvvOe2ZGSFc4ZmUGL7W7R7oJqvNLO6RUOUVC8v4XcZVBp6
-	 11j4HgS/PbXj6NptVmdlMC8Rl2bCX3ln5Bx+oRJcD40PeTAONobp3GuBX1bTnr2O9t
-	 1weTkF97Lqe50JH64QRoqYhJJxl1b8heBibBZzBVauAtik5qZ2SOzALXPBwPzgAkCb
-	 9zR8VqH9aho2y1taHYuo87BCK6QsTYjWuaMI03nN3iduGbSrflksVY8LwvENCC+O20
-	 jRUL8Eo4IbDUQ==
+	b=ZG4eQ2ZFrYCB+xyUSv+QOrQjX5A34SgK0qtnr+5mwXUnVxv0tlLelpy/cIIvw1Ko/
+	 XqB4F/3oXX3VqKFKMYhEbzNllZUGvez+Lqa4eKu6+WbY9YIIOsbB3RD7kiPVJrJOox
+	 OBOLoZnvmoLKEoXIZ4LXtGWwPz+dUow4T6OisZeMbEb7bndx2KS2z5uSM6Z8h2cYDu
+	 L1V9eM61GdTllroPMG0yM549FXxSVdCDDu3en8UEYQMrRsoMy8FSipTtZpTUGGa0cR
+	 k6PwYWLt4glu6wCz+PImIEWRL006wgdjfewoD1JG8egIhzKdT1tQ3BIG5Tzs3ttbMH
+	 oe+hCzbtSxLrA==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Thangaraj Samynathan <thangaraj.s@microchip.com>,
+Cc: Aaron Tomlin <atomlin@atomlin.com>,
+	Jijie Shao <shaojijie@huawei.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	bryan.whitehead@microchip.com,
-	UNGLinuxDriver@microchip.com,
+	ronak.doshi@broadcom.com,
 	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
 	pabeni@redhat.com,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 7.0-6.1] net: lan743x: fix SGMII detection on PCI1xxxx B0+ during warm reset
-Date: Mon, 20 Apr 2026 09:17:47 -0400
-Message-ID: <20260420132314.1023554-73-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 7.0-5.10] vmxnet3: Suppress page allocation warning for massive Rx Data ring
+Date: Mon, 20 Apr 2026 09:17:53 -0400
+Message-ID: <20260420132314.1023554-79-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260420132314.1023554-1-sashal@kernel.org>
 References: <20260420132314.1023554-1-sashal@kernel.org>
@@ -73,377 +73,421 @@ MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 7.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-279774-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-279775-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.997];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[microchip.com:email,msgid.link:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B6CA542D219
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,huawei.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,atomlin.com:email]
+X-Rspamd-Queue-Id: AAAC542CB80
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Thangaraj Samynathan <thangaraj.s@microchip.com>
+From: Aaron Tomlin <atomlin@atomlin.com>
 
-[ Upstream commit e783e40fb689381caca31e03d28c39e10c82e722 ]
+[ Upstream commit c31770c49348fb019167fa95119f330597c99193 ]
 
-A warm reset on boards using an EEPROM-only strap configuration (where
-no MAC address is set in the image) can cause the driver to incorrectly
-revert to RGMII mode. This occurs because the ENET_CONFIG_LOAD_STARTED
-bit may not persist or behave as expected.
+The vmxnet3 driver supports an Rx Data ring (rx-mini) to optimise the
+processing of small packets. The size of this ring's DMA-coherent memory
+allocation is determined by the product of the primary Rx ring size and
+the data ring descriptor size:
 
-Update pci11x1x_strap_get_status() to use revision-specific validation:
+    sz = rq->rx_ring[0].size * rq->data_ring.desc_size;
 
-- For PCI11x1x A0: Continue using the legacy check (config load started
-  or reset protection) to validate the SGMII strap.
-- For PCI11x1x B0 and later: Use the newly available
-  STRAP_READ_USE_SGMII_EN_ bit in the upper strap register to validate
-  the lower SGMII_EN bit.
+When a user configures the maximum supported parameters via ethtool
+(rx_ring[0].size = 4096, data_ring.desc_size = 2048), the required
+contiguous memory allocation reaches 8 MB (8,388,608 bytes).
 
-This ensures the SGMII interface is correctly identified even after a
-warm reboot.
+In environments lacking Contiguous Memory Allocator (CMA),
+dma_alloc_coherent() falls back to the standard zone buddy allocator. An
+8 MB allocation translates to a page order of 11, which strictly exceeds
+the default MAX_PAGE_ORDER (10) on most architectures.
 
-Signed-off-by: Thangaraj Samynathan <thangaraj.s@microchip.com>
-Link: https://patch.msgid.link/20260318063228.17110-1-thangaraj.s@microchip.com
+Consequently, __alloc_pages_noprof() catches the oversize request and
+triggers a loud kernel warning stack trace:
+
+    WARN_ON_ONCE_GFP(order > MAX_PAGE_ORDER, gfp)
+
+This warning is unnecessary and alarming to system administrators because
+the vmxnet3 driver already handles this allocation failure gracefully.
+If dma_alloc_coherent() returns NULL, the driver safely disables the
+Rx Data ring (adapter->rxdataring_enabled = false) and falls back to
+standard, streaming DMA packet processing.
+
+To resolve this, append the __GFP_NOWARN flag to the dma_alloc_coherent()
+gfp_mask. This instructs the page allocator to silently fail the
+allocation if it exceeds order limits or memory is too fragmented,
+preventing the spurious warning stack trace.
+
+Furthermore, enhance the subsequent netdev_err() fallback message to
+include the requested allocation size. This provides critical debugging
+context to the administrator (e.g., revealing that an 8 MB allocation
+was attempted and failed) without making hardcoded assumptions about
+the state of the system's configurations.
+
+Reviewed-by: Jijie Shao <shaojijie@huawei.com>
+Signed-off-by: Aaron Tomlin <atomlin@atomlin.com>
+Link: https://patch.msgid.link/20260226163121.4045808-1-atomlin@atomlin.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
-Now I have all the information needed. Let me compile the full analysis.
+Now I have all the evidence needed for a comprehensive analysis.
 
 ---
 
 ## PHASE 1: COMMIT MESSAGE FORENSICS
 
 ### Step 1.1: PARSE THE SUBJECT LINE
-Record: [net: lan743x] [fix] SGMII detection on PCI1xxxx B0+ during warm
-reset. The verb "fix" directly indicates a bug fix.
+Record: [vmxnet3] [Suppress] Suppress page allocation warning for
+massive Rx Data ring allocation that exceeds MAX_PAGE_ORDER. The verb
+"Suppress" indicates removing a spurious warning, not adding a new
+feature.
 
 ### Step 1.2: PARSE ALL COMMIT MESSAGE TAGS
-- **Signed-off-by**: Thangaraj Samynathan (Microchip employee - device
-  vendor)
-- **Link**: https://patch.msgid.link/20260318063228.17110-1-
-  thangaraj.s@microchip.com
-- **Signed-off-by**: Jakub Kicinski (netdev maintainer - accepted the
-  patch)
-- No Fixes: tag (expected for candidates under review)
-- No Cc: stable tag (expected)
-- No Reported-by tag
+- **Reviewed-by:** Jijie Shao <shaojijie@huawei.com> - a networking
+  contributor (hns3 driver)
+- **Signed-off-by:** Aaron Tomlin <atomlin@atomlin.com> - the author, a
+  kernel contributor (modules, tracing subsystems)
+- **Link:**
+  https://patch.msgid.link/20260226163121.4045808-1-atomlin@atomlin.com
+- **Signed-off-by:** Jakub Kicinski <kuba@kernel.org> - the net tree
+  maintainer, committed it
+- No Fixes: tag (expected for candidates)
+- No Reported-by: tag
+- No Cc: stable tag
 
-Record: Patch from the device vendor (Microchip), accepted by the netdev
-maintainer. No explicit stable nomination.
+Record: Committed by the net maintainer (Jakub Kicinski). Reviewed by a
+networking contributor.
 
 ### Step 1.3: ANALYZE THE COMMIT BODY TEXT
-The commit describes a concrete bug: warm reset on boards with EEPROM-
-only strap config (no MAC in image) causes incorrect revert to RGMII
-mode. The root cause is that the `ENET_CONFIG_LOAD_STARTED` bit may not
-persist. The fix uses revision-specific validation: A0 keeps legacy
-check, B0+ uses `STRAP_READ_USE_SGMII_EN_` bit.
+The commit explains in detail:
+- When max ethtool parameters are set (rx_ring[0].size=4096,
+  data_ring.desc_size=2048), the DMA allocation is 8 MB
+- 8 MB requires page order 11, which exceeds MAX_PAGE_ORDER (10)
+- This triggers `WARN_ON_ONCE_GFP(order > MAX_PAGE_ORDER, gfp)` in
+  page_alloc.c
+- The driver already gracefully handles the failure (disables data ring
+  and falls back)
+- The warning is "unnecessary and alarming to system administrators"
 
-Record: Bug = SGMII interface misdetected as RGMII after warm reset.
-Symptom = network interface uses wrong PHY mode. Root cause = config
-load register bit doesn't persist across warm reset on B0+ with specific
-strap configuration.
+Record: Bug is a spurious WARN_ON_ONCE kernel stack trace when VMware
+users configure max ring parameters. Symptom is an alarming stack trace
+in dmesg. Driver handles the failure fine. Root cause: missing
+`__GFP_NOWARN` flag.
 
 ### Step 1.4: DETECT HIDDEN BUG FIXES
-This is an explicit bug fix, not disguised.
+This is a real bug fix disguised with "suppress" language. The
+`WARN_ON_ONCE_GFP` macro at line 5226 of `mm/page_alloc.c` was
+specifically designed to be suppressed by `__GFP_NOWARN`. The vmxnet3
+driver was missing this flag, causing the allocator to emit a warning
+the driver was designed to tolerate. This is a legitimate fix for an
+incorrect warning.
 
----
+Record: Yes, this is a real bug fix. The warning is spurious because the
+driver handles the failure gracefully.
 
 ## PHASE 2: DIFF ANALYSIS
 
 ### Step 2.1: INVENTORY THE CHANGES
-- `lan743x_main.c`: +13/-4 lines
-- `lan743x_main.h`: +1/-0 lines
-- New helper function: `pci11x1x_is_a0()` (4 lines)
-- Modified function: `pci11x1x_strap_get_status()`
-- New define: `ID_REV_CHIP_REV_PCI11X1X_A0_`
-- Scope: single-file surgical fix in a single driver
+- **File:** `drivers/net/vmxnet3/vmxnet3_drv.c`
+- **Lines changed:** 2 lines modified (net change: 0 added, 0 removed -
+  just modifications)
+- **Function modified:** `vmxnet3_rq_create()`
+- **Scope:** Single-file, surgical fix
+
+Record: 1 file, 2 lines changed, in `vmxnet3_rq_create()`. Extremely
+small scope.
 
 ### Step 2.2: UNDERSTAND THE CODE FLOW CHANGE
-**Before**: The condition checked `cfg_load &
-GEN_SYS_LOAD_STARTED_REG_ETH_ || hw_cfg & HW_CFG_RST_PROTECT_`. If
-either was set, it read the strap register and checked
-`STRAP_READ_SGMII_EN_`. Otherwise, it fell through to FPGA check, which
-for non-FPGA boards would set `is_sgmii_en = false`.
+- **Line 2271:** `GFP_KERNEL` → `GFP_KERNEL | __GFP_NOWARN` for the data
+  ring DMA allocation
+- **Line 2274:** `"rx data ring will be disabled\n"` → `"failed to
+  allocate %zu bytes, rx data ring will be disabled\n", sz` to include
+  the allocation size in the error message
 
-**After**: The condition now branches by revision:
-- A0: Same legacy check (config load or reset protect)
-- B0+: Checks `STRAP_READ_USE_SGMII_EN_` bit directly (the upper strap
-  register bit)
-- Also, `strap = lan743x_csr_read()` is moved outside the conditional
-  (unconditionally read)
+Before: allocation failure triggers WARN_ON_ONCE + generic log message.
+After: allocation failure is silent (no WARN) + informative log message
+with size.
+
+Record: Two hunks: (1) Add __GFP_NOWARN to suppress spurious warning;
+(2) Improve error message with allocation size.
 
 ### Step 2.3: IDENTIFY THE BUG MECHANISM
-Category: Logic/correctness fix. The hardware register
-(`ENET_CONFIG_LOAD_STARTED`) doesn't reliably persist on B0+ after warm
-reset in EEPROM-only configurations. This causes the conditional to
-fail, and the code falls through to the FPGA path which sets
-`is_sgmii_en = false`, making the driver use RGMII mode incorrectly.
+Category: **Logic/correctness fix** - The allocator's `WARN_ON_ONCE_GFP`
+macro at `mm/page_alloc.c:5226` is designed to suppress warnings when
+`__GFP_NOWARN` is passed. The vmxnet3 driver was missing this flag for
+an allocation that is expected to fail on systems without CMA, producing
+a scary but meaningless kernel warning.
+
+Record: Missing __GFP_NOWARN flag on an allocation expected to fail. The
+WARN_ON_ONCE_GFP macro specifically checks for this flag (verified in
+mm/internal.h:92-96).
 
 ### Step 2.4: ASSESS THE FIX QUALITY
-The fix is obviously correct: it restores the original check method
-(`STRAP_READ_USE_SGMII_EN_`) for B0+ hardware while preserving legacy
-behavior for A0. The new `pci11x1x_is_a0()` helper is trivial. Very low
-regression risk - A0 behavior unchanged, B0+ gets a more reliable
-detection method.
+- Obviously correct: `__GFP_NOWARN` is the standard kernel mechanism for
+  this exact purpose
+- Minimal: 2 lines changed
+- Regression risk: Zero - `__GFP_NOWARN` only affects the warning, not
+  allocation behavior
+- Pattern precedent: Same fix applied to r8152 (5cc33f139e11b), gtp
+  (bd5cd35b782ab), netdevsim (83cf4213bafc4)
 
----
+Record: Fix is trivially correct, minimal, and follows well-established
+kernel patterns. No regression risk.
 
 ## PHASE 3: GIT HISTORY INVESTIGATION
 
 ### Step 3.1: BLAME THE CHANGED LINES
-Verified via `git blame`: The buggy conditional (lines 51-52) was
-introduced by `46b777ad9a8c26` ("net: lan743x: Add support to SGMII 1G
-and 2.5G", Jun 2022). The original code in `a46d9d37c4f4fa` (Feb 2022)
-checked `STRAP_READ_USE_SGMII_EN_` directly, which was the correct
-approach for B0+.
+The affected code was introduced in commit `50a5ce3e7116a7` by
+Shrikrishna Khare on 2016-06-16 ("vmxnet3: add receive data ring
+support"). This was first included in v4.8-rc1, meaning the buggy code
+has been present since kernel 4.8 (~2016).
 
-Record: Bug introduced by `46b777ad9a8c26` (v5.19/v6.0). Original
-working code was in `a46d9d37c4f4fa` (v5.18).
+Record: Buggy code from commit 50a5ce3e7116a7 (v4.8-rc1, June 2016).
+Present in ALL active stable trees.
 
 ### Step 3.2: FOLLOW THE FIXES TAG
-No Fixes: tag, but the bug was clearly introduced by `46b777ad9a8c26`.
-This commit exists in stable trees v6.0+.
+No Fixes: tag present (expected).
 
 ### Step 3.3: CHECK FILE HISTORY
-The file has active development. The author (Thangaraj Samynathan) is a
-Microchip employee and a regular contributor to the lan743x driver with
-10+ commits.
+84 commits to vmxnet3_drv.c since the buggy code was introduced. The
+file is actively maintained. A closely related commit is `ffbe335b8d471`
+("vmxnet3: disable rx data ring on dma allocation failure") which fixed
+a BUG crash when the same allocation fails. This shows the allocation
+failure path is a known problem area.
 
-### Step 3.4: AUTHOR CONTEXT
-The author works at Microchip (the hardware vendor). They have deep
-knowledge of this hardware.
+Record: Active file. The data ring allocation failure path has had real
+bugs before (ffbe335b8d471 fixed a BUG/crash).
+
+### Step 3.4: CHECK AUTHOR
+Aaron Tomlin is a kernel contributor (primarily in modules, tracing
+subsystems). Jakub Kicinski (net maintainer) committed this.
+
+Record: Not a vmxnet3 maintainer, but committed by the net tree
+maintainer.
 
 ### Step 3.5: DEPENDENCIES
-The fix adds `ID_REV_CHIP_REV_PCI11X1X_A0_` define. The only nearby
-dependency is `ID_REV_CHIP_REV_PCI11X1X_B0_` (added in `e4a58989f5c839`,
-v6.10). For stable trees 6.1-6.9, the patch context would differ
-slightly and need minor adaptation. For 6.12+, it should apply cleanly.
+No dependencies. This is a standalone 2-line change that only adds a GFP
+flag and improves a log message. The code context exists in all stable
+trees since v4.8.
 
----
+Record: Fully standalone, no prerequisites.
 
-## PHASE 4: MAILING LIST AND EXTERNAL RESEARCH
+## PHASE 4: MAILING LIST RESEARCH
 
-### Step 4.1: ORIGINAL PATCH DISCUSSION
-Found via `b4 am`: The patch was submitted as "[PATCH v1]" and had 2
-messages in the thread. The v0->v1 changelog shows: "Added helpers to
-check if the device revision is a0". This was a single-patch submission
-(not part of a series).
+### Step 4.1-4.5
+Lore.kernel.org was unavailable (Anubis protection). However:
+- The Link: tag confirms submission via netdev mailing list
+- Jakub Kicinski (net maintainer) accepted and committed it
+- Jijie Shao provided a Reviewed-by
 
-### Step 4.2: REVIEWER CONTEXT
-The patch was accepted by Jakub Kicinski (netdev maintainer) directly.
-
-### Step 4.3-4.5: BUG REPORT / STABLE DISCUSSION
-No public bug report linked. The fix comes directly from the hardware
-vendor, suggesting it was found during internal testing.
-
----
+Record: Unable to fetch lore discussion due to anti-bot protection.
+UNVERIFIED: detailed mailing list discussion content. However, the
+commit was accepted by the net maintainer.
 
 ## PHASE 5: CODE SEMANTIC ANALYSIS
 
-### Step 5.1-5.2: FUNCTION ANALYSIS
-`pci11x1x_strap_get_status()` is called from `lan743x_hardware_init()`
-(line 3506), which is the main hardware initialization path. It's called
-once during device probe and determines whether SGMII or RGMII mode is
-used.
+### Step 5.1-5.4: FUNCTION ANALYSIS
+`vmxnet3_rq_create()` is called from:
+1. `vmxnet3_rq_create_all()` - called during adapter initialization
+2. Directly at line 3472 during queue reset/resize
+3. `vmxnet3_rq_create_all()` also called at line 3655 during MTU change
 
-### Step 5.3-5.4: IMPACT CHAIN
-`is_sgmii_en` controls:
-1. SGMII_CTL register configuration (lines 3511-3518) - enables/disables
-   SGMII
-2. PHY interface mode selection (line 1357-1358) -
-   `PHY_INTERFACE_MODE_SGMII` vs `RGMII`
-3. MDIO bus configuration (lines 3576-3595) - C45 vs C22 access
+The affected allocation is on the normal path (not error-only),
+triggered during device initialization and MTU changes. VMware vmxnet3
+is ubiquitous in VMware virtual machines.
 
-If `is_sgmii_en` is incorrectly set to `false` on SGMII hardware, the
-network interface will not work.
+Record: The function is called during normal device initialization and
+reconfiguration. Very common code path for VMware users.
 
----
+### Step 5.5: SIMILAR PATTERNS
+The vmxnet3 driver already uses `__GFP_NOWARN` in
+`vmxnet3_pp_get_buff()` at line 1425 for page pool allocations. Multiple
+other network drivers have applied the same fix pattern (r8152, gtp,
+netdevsim).
 
-## PHASE 6: CROSS-REFERENCING AND STABLE TREE ANALYSIS
+Record: Pattern is already used elsewhere in vmxnet3 itself, and widely
+across network drivers.
 
-### Step 6.1: BUGGY CODE IN STABLE TREES
-The buggy code from `46b777ad9a8c26` exists in all stable trees from
-v6.1+. The `ID_REV_CHIP_REV_PCI11X1X_B0_` prerequisite is in v6.10+, so
-for 6.12+ the patch applies cleanly.
+## PHASE 6: STABLE TREE ANALYSIS
+
+### Step 6.1: BUGGY CODE IN STABLE
+The buggy code (commit 50a5ce3e7116a7) has been present since v4.8. It
+exists in ALL active stable trees (5.10, 5.15, 6.1, 6.6, 6.12, etc.).
+
+Record: Code exists in all active stable trees.
 
 ### Step 6.2: BACKPORT COMPLICATIONS
-For 6.12+: should apply cleanly. For 6.1-6.9: minor context adjustment
-needed (the `B0_` define line won't be present).
+The code at line 2271 in the current tree is still `GFP_KERNEL` (no
+__GFP_NOWARN), and the context looks clean. The `%zu` format specifier
+for size_t is standard. Should apply cleanly to all stable trees.
 
----
+Record: Expected clean apply.
+
+### Step 6.3: RELATED FIXES IN STABLE
+No prior fix for this specific warning exists.
 
 ## PHASE 7: SUBSYSTEM AND MAINTAINER CONTEXT
 
 ### Step 7.1: SUBSYSTEM CRITICALITY
-Subsystem: Network driver (Ethernet) - IMPORTANT. The lan743x driver
-supports Microchip PCI11010/PCI11414 Ethernet controllers used in
-embedded and desktop systems.
+- **Subsystem:** drivers/net/vmxnet3 - VMware virtual network driver
+- **Criticality:** IMPORTANT - vmxnet3 is the standard NIC in VMware
+  environments, which powers a vast number of enterprise servers
 
----
+### Step 7.2: ACTIVITY
+The subsystem is actively developed (v9 protocol support recently
+added). 84 commits since the data ring feature.
 
 ## PHASE 8: IMPACT AND RISK ASSESSMENT
 
-### Step 8.1: AFFECTED USERS
-Users with PCI1xxxx B0+ hardware using EEPROM-only strap configuration
-(no MAC in image) who perform warm resets.
+### Step 8.1: WHO IS AFFECTED
+All VMware users running vmxnet3 who configure maximum ethtool ring
+parameters. VMware is extremely widespread in enterprise.
 
 ### Step 8.2: TRIGGER CONDITIONS
-Warm reset on affected hardware. This is a normal, common operation.
+Triggered when: (a) user sets ethtool `rx_ring[0].size=4096` and
+`data_ring.desc_size=2048` (both maximum values), and (b) system lacks
+CMA for large contiguous allocations. This is a realistic configuration
+for performance-tuned VMs.
 
 ### Step 8.3: FAILURE MODE SEVERITY
-Network interface uses wrong PHY mode -> network doesn't work after warm
-reboot. Severity: HIGH (complete loss of network connectivity).
+The `WARN_ON_ONCE` produces a full kernel stack trace in dmesg that
+looks like a kernel bug. While not a crash, it:
+- Alarms system administrators
+- Can trigger automated monitoring/alerting systems
+- May generate unnecessary bug reports
+- Severity: MEDIUM (no functional impact, but user-visible alarm)
 
 ### Step 8.4: RISK-BENEFIT RATIO
-- **Benefit**: HIGH - fixes complete network failure on warm reset for
-  affected hardware
-- **Risk**: VERY LOW - 13 lines added, surgical fix, chip revision-based
-  branching, no behavioral change for A0
-
----
+- **Benefit:** Eliminates spurious kernel warning in VMware
+  environments, improves log message quality
+- **Risk:** Essentially zero - `__GFP_NOWARN` only suppresses the
+  warning, doesn't change allocation behavior
+- **Size:** 2 lines, obviously correct
+- **Ratio:** HIGH benefit / ZERO risk
 
 ## PHASE 9: FINAL SYNTHESIS
 
 ### Step 9.1: EVIDENCE COMPILATION
 
-**FOR backporting**:
-- Fixes a real hardware bug: network failure after warm reset
-- From the device vendor (Microchip) with deep hardware knowledge
-- Small and surgical: ~16 lines total change
-- Accepted by netdev maintainer
-- Very low regression risk: preserves A0 behavior, fixes B0+ detection
-- Buggy code exists in stable trees 6.1+
-- Restores original proven detection method for B0+
+**FOR backporting:**
+- Fixes a real user-visible issue (spurious WARN_ON_ONCE stack trace)
+- Extremely small and obviously correct (2 lines)
+- Zero regression risk
+- Well-established pattern (r8152, gtp, netdevsim all did the same)
+- vmxnet3 already uses `__GFP_NOWARN` elsewhere in the driver
+- Buggy code has been present since v4.8, affects all stable trees
+- VMware vmxnet3 is widely used in enterprise
+- Accepted by net maintainer Jakub Kicinski
+- Improved error message provides better diagnostic information
+- Prior crash (ffbe335b8d471) shows this allocation failure path is a
+  real concern
 
-**AGAINST backporting**:
-- No Fixes: tag (expected)
-- No explicit stable nomination
-- Adds new defines (but these are trivial hardware register constants)
-- Minor context conflict possible in older stable trees
+**AGAINST backporting:**
+- Not a crash/security/corruption fix (it's a warning suppression)
+- No Fixes: tag or explicit stable nomination
+- WARN_ON_ONCE only fires once per boot (limited repeated impact)
 
 ### Step 9.2: STABLE RULES CHECKLIST
-1. Obviously correct and tested? **YES** - from hardware vendor,
-   accepted by maintainer
-2. Fixes a real bug? **YES** - SGMII misdetection causes network failure
-3. Important issue? **YES** - complete loss of network connectivity
-4. Small and contained? **YES** - ~16 lines, 2 files, single function
-5. No new features or APIs? **YES** - this is a bug fix, no new
-   functionality
-6. Can apply to stable trees? **YES** for 6.12+; needs minor adaptation
-   for 6.1-6.9
+1. Obviously correct and tested? **YES** - trivial `__GFP_NOWARN`
+   addition, standard pattern
+2. Fixes a real bug? **YES** - spurious kernel warning that alarms
+   admins
+3. Important issue? **MEDIUM** - not a crash, but affects many VMware
+   users
+4. Small and contained? **YES** - 2 lines in 1 file
+5. No new features? **YES** - no new features
+6. Can apply to stable? **YES** - clean apply expected
 
 ### Step 9.3: EXCEPTION CATEGORIES
-This is a hardware workaround (chip revision-specific fix) which is an
-accepted stable category.
+Not a standard exception category, but analogous to prior stable-
+backported `__GFP_NOWARN` fixes.
 
----
+### Step 9.4: DECISION
+The fix is tiny, obviously correct, zero-risk, follows well-established
+patterns, and eliminates a spurious kernel warning that can alarm VMware
+administrators. While not a crash fix, the WARN_ON_ONCE stack trace is
+user-visible and can trigger automated alerting systems. The bar is very
+low for risk vs. benefit here.
 
 ## Verification
 
-- [Phase 1] Parsed tags: Signed-off-by from Microchip (vendor), accepted
-  by Jakub Kicinski (netdev maintainer)
-- [Phase 2] Diff analysis: +13/-4 in .c, +1 in .h; adds
-  `pci11x1x_is_a0()` helper and revision-based conditional branching
-- [Phase 3] git blame: buggy conditional introduced by `46b777ad9a8c26`
-  (v5.19/v6.0, Jun 2022)
-- [Phase 3] git show `a46d9d37c4f4fa`: confirmed original code checked
-  `STRAP_READ_USE_SGMII_EN_` directly (the correct method for B0+)
-- [Phase 3] git show `46b777ad9a8c26`: confirmed this commit replaced
-  the direct check with `cfg_load`/`hw_cfg` check, introducing the
-  regression
-- [Phase 3] git tag: buggy code exists in v6.0+; prerequisite
-  `PCI11X1X_B0_` define exists in v6.10+
-- [Phase 4] b4 am: found original submission, v1 single patch, 2
-  messages in thread
-- [Phase 4] mbox read: changelog shows v0->v1 added the is_a0 helper
-  (review feedback addressed)
-- [Phase 5] Grep callers: `pci11x1x_strap_get_status()` called from
-  `lan743x_hardware_init()` (line 3506)
-- [Phase 5] Grep `is_sgmii_en`: controls PHY interface mode (line 1357),
-  SGMII_CTL register (line 3511), MDIO bus setup (line 3576)
-- [Phase 6] Code exists in stable trees v6.1+; clean apply expected for
-  v6.12+
-- [Phase 8] Failure mode: wrong PHY mode -> network failure; severity
-  HIGH
+- [Phase 1] Parsed tags: Reviewed-by Jijie Shao, committed by Jakub
+  Kicinski (net maintainer)
+- [Phase 2] Diff analysis: 2 lines changed in vmxnet3_rq_create(): adds
+  __GFP_NOWARN, improves log message
+- [Phase 2] Verified WARN_ON_ONCE_GFP at mm/internal.h:92-96
+  specifically checks __GFP_NOWARN flag
+- [Phase 2] Verified WARN_ON_ONCE_GFP at mm/page_alloc.c:5226 is
+  triggered when order > MAX_PAGE_ORDER
+- [Phase 3] git blame: buggy code introduced in commit 50a5ce3e7116a7
+  (v4.8-rc1, 2016), present in all stable trees
+- [Phase 3] git log: 84 commits to file since buggy code introduced;
+  active file
+- [Phase 3] Related fix ffbe335b8d471 confirms the data ring allocation
+  failure path has had real bugs
+- [Phase 4] UNVERIFIED: Full mailing list discussion (lore unavailable
+  due to anti-bot)
+- [Phase 5] Traced callers: vmxnet3_rq_create() called from
+  vmxnet3_rq_create_all() during init, MTU change, and queue reset
+- [Phase 5] Confirmed vmxnet3 already uses __GFP_NOWARN at line 1425
+  (vmxnet3_pp_get_buff)
+- [Phase 5] Similar pattern in r8152 (5cc33f139e11b), gtp
+  (bd5cd35b782ab), netdevsim (83cf4213bafc4)
+- [Phase 6] Code exists in all active stable trees (since v4.8)
+- [Phase 6] Current tree still has GFP_KERNEL at line 2271 - clean apply
+  expected
+- [Phase 8] Failure mode: spurious WARN_ON_ONCE stack trace, severity
+  MEDIUM
 
 **YES**
 
- drivers/net/ethernet/microchip/lan743x_main.c | 15 +++++++++++----
- drivers/net/ethernet/microchip/lan743x_main.h |  1 +
- 2 files changed, 12 insertions(+), 4 deletions(-)
+ drivers/net/vmxnet3/vmxnet3_drv.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/microchip/lan743x_main.c b/drivers/net/ethernet/microchip/lan743x_main.c
-index f0b5dd752f084..b4cabde6625a2 100644
---- a/drivers/net/ethernet/microchip/lan743x_main.c
-+++ b/drivers/net/ethernet/microchip/lan743x_main.c
-@@ -28,6 +28,12 @@
- 
- #define RFE_RD_FIFO_TH_3_DWORDS	0x3
- 
-+static bool pci11x1x_is_a0(struct lan743x_adapter *adapter)
-+{
-+	u32 dev_rev = adapter->csr.id_rev & ID_REV_CHIP_REV_MASK_;
-+	return dev_rev == ID_REV_CHIP_REV_PCI11X1X_A0_;
-+}
-+
- static void pci11x1x_strap_get_status(struct lan743x_adapter *adapter)
- {
- 	u32 chip_rev;
-@@ -47,10 +53,11 @@ static void pci11x1x_strap_get_status(struct lan743x_adapter *adapter)
- 	cfg_load = lan743x_csr_read(adapter, ETH_SYS_CONFIG_LOAD_STARTED_REG);
- 	lan743x_hs_syslock_release(adapter);
- 	hw_cfg = lan743x_csr_read(adapter, HW_CFG);
--
--	if (cfg_load & GEN_SYS_LOAD_STARTED_REG_ETH_ ||
--	    hw_cfg & HW_CFG_RST_PROTECT_) {
--		strap = lan743x_csr_read(adapter, STRAP_READ);
-+	strap = lan743x_csr_read(adapter, STRAP_READ);
-+	if ((pci11x1x_is_a0(adapter) &&
-+	     (cfg_load & GEN_SYS_LOAD_STARTED_REG_ETH_ ||
-+	      hw_cfg & HW_CFG_RST_PROTECT_)) ||
-+	    (strap & STRAP_READ_USE_SGMII_EN_)) {
- 		if (strap & STRAP_READ_SGMII_EN_)
- 			adapter->is_sgmii_en = true;
- 		else
-diff --git a/drivers/net/ethernet/microchip/lan743x_main.h b/drivers/net/ethernet/microchip/lan743x_main.h
-index 02a28b7091630..160d94a7cee66 100644
---- a/drivers/net/ethernet/microchip/lan743x_main.h
-+++ b/drivers/net/ethernet/microchip/lan743x_main.h
-@@ -27,6 +27,7 @@
- #define ID_REV_CHIP_REV_MASK_		(0x0000FFFF)
- #define ID_REV_CHIP_REV_A0_		(0x00000000)
- #define ID_REV_CHIP_REV_B0_		(0x00000010)
-+#define ID_REV_CHIP_REV_PCI11X1X_A0_	(0x000000A0)
- #define ID_REV_CHIP_REV_PCI11X1X_B0_	(0x000000B0)
- 
- #define FPGA_REV			(0x04)
+diff --git a/drivers/net/vmxnet3/vmxnet3_drv.c b/drivers/net/vmxnet3/vmxnet3_drv.c
+index 0572f6a9bdb62..40522afc05320 100644
+--- a/drivers/net/vmxnet3/vmxnet3_drv.c
++++ b/drivers/net/vmxnet3/vmxnet3_drv.c
+@@ -2268,10 +2268,10 @@ vmxnet3_rq_create(struct vmxnet3_rx_queue *rq, struct vmxnet3_adapter *adapter)
+ 		rq->data_ring.base =
+ 			dma_alloc_coherent(&adapter->pdev->dev, sz,
+ 					   &rq->data_ring.basePA,
+-					   GFP_KERNEL);
++					   GFP_KERNEL | __GFP_NOWARN);
+ 		if (!rq->data_ring.base) {
+ 			netdev_err(adapter->netdev,
+-				   "rx data ring will be disabled\n");
++				   "failed to allocate %zu bytes, rx data ring will be disabled\n", sz);
+ 			adapter->rxdataring_enabled = false;
+ 		}
+ 	} else {
 -- 
 2.53.0
 
