@@ -1,239 +1,331 @@
-Return-Path: <netdev+bounces-279872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279873-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cOjOBY9t5mmBwAEAu9opvQ
-	(envelope-from <netdev+bounces-279872-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 20:16:47 +0200
+	id YAAbAllw5mmBwAEAu9opvQ
+	(envelope-from <netdev+bounces-279873-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 20:28:41 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5888432A1A
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 20:16:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CD2A432D63
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 20:28:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 140D03272CEA
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 16:46:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D5C5431EC770
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 17:03:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DF40374726;
-	Mon, 20 Apr 2026 16:46:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED30937DEAB;
+	Mon, 20 Apr 2026 17:03:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="na9xfB9j"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fzdYUAzB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+Received: from mail-yx1-f51.google.com (mail-yx1-f51.google.com [74.125.224.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4520A372EF3
-	for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 16:46:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776703562; cv=none; b=tnMJ8d1HocvZo56rIUX+XwDZbuFBg5i7kdNzNH6074qtm/kZ2ZGQfesH4EKtG5eIVnw6IXF24oZQSvjxRlTIowKjuoYKw7GwzlFxTaa9d0IZxCDMC6Vc4Bp58iZ1A4z3TysS351Qx5uMWOyOR57z0ihf7B/1DxMd5Xbby1ha758=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776703562; c=relaxed/simple;
-	bh=8FNY7MbtkgjbsRoI1I6nx/707r+HF/T/RNrqqCg5fjw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pG26U/EiAtMy4Jf+LKseM+6aD3R3aA4EWhLLIUAMNEuz8QC7g8r3/inzeYH+OvVJfmsXejt4N8XRrCqab9jZ0fGWulkczvNQuiGC7GgfeLKH2G9NAI6SLu9RUlPn8NiNclZ4Bm9k+C0QIvInlWsTh/18hnEn6HMY+gYlKa7zkag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=na9xfB9j; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-43fe62837baso1990932f8f.3
-        for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 09:46:00 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17A5537CD53
+	for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 17:03:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776704606; cv=pass; b=CcaySUGUlKDy9ItNd97he5hXj1BHmrqDCjNkc5w9IE6je05BWNH+WOUW4vzC4+2J9mpITTsHcDIHkAwBpheP1KKUP2wGXrZviqa3FNzcZ7SsALDVz/9+WJ9PGSwsBAXd6Rg7dxFLIwukUbYbYHyEuABQqChp113pb12EhdEbFxE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776704606; c=relaxed/simple;
+	bh=MY8cWEKzzznpHqY2ZL9obKtvFQwLdK0P2oXtkA1iJr8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MtPZDkUy81Ug7qljuAKoMoRi6+cjPb+t9GSTkBLKO3EC4jMwdtx2eVtFlpURJUypGjjlb7EKTxxnyrse5361/e+Dx1g6FQ6B+QeQO0EjxtCbyhEoA84kd83EHoiD7NlCEZSpFP1qusjRjdWOxiwQ5iAeMrpTei75lf+uVR5nOOQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fzdYUAzB; arc=pass smtp.client-ip=74.125.224.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-yx1-f51.google.com with SMTP id 956f58d0204a3-6501418152cso2966178d50.0
+        for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 10:03:23 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776704603; cv=none;
+        d=google.com; s=arc-20240605;
+        b=HdgbxyAMTn3NVMXz5PvO58wkS4ZFyh0OlehbMYl8S0feGhANTQFIZp4X9fuoKou9qd
+         4t/932dawY6ZMkGYSMywiLenrfppu4uZrKQD2uYEKLLBvommHGDvxbpFkGa+0fQV+ylQ
+         +Of682i8/npsaDO7MlqebTc9tVw9fg6lLrNtzbsTOer4DqLaWrqPRZi96VyJt6HtnDh4
+         AFirK8Ee4kMZbB4ZO0su6MVsvMJGqR02h76lb+OBy3LR1GjKkY25FgJ82j7fkIVB2pmG
+         iNFKYYJZqZGVL1hWMSx8TejnsRV9n41VVeuHqTp4k+h0lbKbXskXUdUTmeWic4Jls/XM
+         /evA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=QuwHzur0DyTT6fAN7548X05vvqlUKr6sImf2XcXe9sE=;
+        fh=2PuVfai9Jgn126RKvOco0B4FvVxSLlNrE0I44YRVa8I=;
+        b=irXetQz4vj1mp1KG+EW1AxG5MA9KzdAeO0qE73FiR3YFF4nRULR9/56GhQCakjewZ9
+         s7DHKGtVaRMceyhZeP6chcvab+lka+V/DVhDB/q1raDvOnfbXcAMzk1AOavcjv3nxvbq
+         Ji+rMPy5hPAkEvVV0/nJCUudl7fEWMbyK/wk8TKGJVCOsijyW1dSKb05oL7l7mgrDQsW
+         r7nBrO+DqkFfGv4uHHVp2NrBx/3I/MwFpqJy9XVyqYbPHJCs8X/J/COoYc7wm/JQ/BD0
+         ZuRAD7AkG8CN3a+UIWexaOZUtTbWAhAPElHT5i1LDHVowt5X5m4Nn/1dGbAkrtkBWOmt
+         oCNA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776703559; x=1777308359; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5E+UKYZ+gXk3KKDw9hC2HFOEQBrHQpFIVrnj4wNYvlY=;
-        b=na9xfB9jpuFmJCc52HHYeE622o7SbJJRZ28mr/+yN1E3II021zrVR7B8EIIRf98THp
-         dtnJRY6CB4tHq5uVirkx2KSPii/nD1tCAi2KpyHCOfa/46xPwMT2UQo+c1F1JGVRVaBx
-         VAUFIeHFEOsOGkZ2B/8rtqByBqX4LCu3cWdyrSfFaYd2ouAgyy2Ho21ulFUy3/cnsa1r
-         dWJXBh9V8IXRNxXppP06aDB7rBhVxSuAezrbY2CcWSqVWbmLOHERo9cpvPnNnfCabiS8
-         GninTvkORT/UGZEMwE1BYzGEJEg1kmp3Q86ugdQ0L4xBEKK5bW2z/wyBmnz5tDMyuHvP
-         7QCA==
+        d=google.com; s=20251104; t=1776704603; x=1777309403; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QuwHzur0DyTT6fAN7548X05vvqlUKr6sImf2XcXe9sE=;
+        b=fzdYUAzB25VyAQUlM195lS0A5tRyWmxhZtCVRmSN+VymgpXmf+nfVmsXaGdueI+4ZN
+         cRDK/OmokmnXOjGkGBc/SAE4990vxc7KTiIrYSSLyS6ujv/kkvqUDaycunGU0JMwB4B5
+         ZlhfRi+TKqzD5yykXpyrKDag8B617STfvqhmehdi0COReaYHkha1pLhR45e258ZcQYGW
+         AHRQ7Ay1zvpwEqHnV+7tCzfSOM/PqJO0Eb2KV6OyKwuNrrw/Jm0imXqQaQaqwEhsr0bZ
+         PJ9IzHQWvAoLIDvrO+8Boz2O8vSU/I8X8Fya83JISHAF9xNkZb8aLl2/KzLjWnjbtMxj
+         un9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776703559; x=1777308359;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5E+UKYZ+gXk3KKDw9hC2HFOEQBrHQpFIVrnj4wNYvlY=;
-        b=hyfJExRn+emc+7JEucRV6QZ7eoDDpUegDSvyF4GGv7hsB027CozwxhK5frbbP3mrLr
-         3wmYqtTNWG0OsKoZInSysY11EdTao6HWxDjnU4FAmfJK4Dti/kUWiEf2qABgfWmqspJd
-         F9C/qS6K++R86T2N+qcSv4rc1R1dphDgwSDeVBF7seGAZXYySsYIT63tPUbnOZWsfqmV
-         PnK2slP3T82tk19BtKM2JB1db9hmllqGFTN0QE6jLwi/OuHisBI6jkTICd7+jZp9Nvyg
-         6ut2PH/h5O2Hy7gRjGjIzvTTYOdxyMGqtGWlAcvLd2NR9vNKBGJvtGVCRb4NSuup7a9D
-         5yPg==
-X-Forwarded-Encrypted: i=1; AFNElJ+nfQ+qyQvUWQJac2ZkOUUWTLNgywQaZmkV7zufeTkI9uraJ1q3ax1Vz0IHrm/90DHz9Rx1qwk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxbXiPsnJq2sNYnze1IUIKSvjlddzwwqedkdS4LeyLv/Cp7BHc+
-	knnYPTxH7aUJCtQ1WWUs4lSRE2zqgsiNfrda5EDliNrK8OzO9h1DploI
-X-Gm-Gg: AeBDieteptJ8bIWrVm08mWYD9Ga97CXlMy19Ett1dFG7ARL3ChRMXhnEZXyheB1B5f7
-	WaVcz1XasanCIXJnVVM/NHLWwvqBrF5CV/X11isLZjQicF/CqsHeLa7Sb1E+lRGG/RQeOpfeRyP
-	i23pWwSmeybuTNQPZ8l++atu0vvoDlEgzJvhA2Ob6wg3++Y5f4IvFEC0yp/htGEQ4EX2PfFcnk2
-	BOPj4r0sssglGWG0BmTQyLEohSWUOqARzTj8XcD7HmjR65wbfWDDR+n98yP2Js69tW2+7NCc+kT
-	empNl8U5WoXta27IvXzzG15XUZOWrCYA2HlE0YPfEs9NHXMaOhgcoaEps30K6w7JttsUaDWOZLq
-	pSjRNPfx/f98I9hF88SarAX0ce4YdDXoxWEaWU9f/lGWmxTr5rUKYrpApwV45H0hrATxT30XaXx
-	MSY8q7bDac4ncvP5hYJ6VMJ8TbNXcFgVohurSi02/G
-X-Received: by 2002:a5d:588f:0:b0:43d:2be:e54 with SMTP id ffacd0b85a97d-43fe3dfd4aemr21673354f8f.39.1776703558306;
-        Mon, 20 Apr 2026 09:45:58 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43fe4e3a79esm32560450f8f.17.2026.04.20.09.45.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Apr 2026 09:45:57 -0700 (PDT)
-Date: Mon, 20 Apr 2026 19:45:54 +0300
-From: Dan Carpenter <error27@gmail.com>
-To: Jared Kangas <jkangas@redhat.com>
-Cc: Chester Lin <chester62515@gmail.com>,
-	Matthias Brugger <mbrugger@suse.com>,
-	Ghennadi Procopciuc <ghennadi.procopciuc@oss.nxp.com>,
-	NXP S32 Linux Team <s32@nxp.com>, Frank Li <Frank.Li@nxp.com>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, imx@lists.linux.dev,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linaro-s32@linaro.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v6 3/3] dts: s32g: Add GPR syscon region
-Message-ID: <aeZYQp9b5aoV7Ihv@stanley.mountain>
-References: <cover.1769764941.git.dan.carpenter@linaro.org>
- <0e922537c02d1c47734142090f98eb78e921ed34.1769764941.git.dan.carpenter@linaro.org>
- <aeKn2dvOOO43zdev@jkangas-thinkpadp1gen3.rmtuswa.csb>
- <aeZOcCOgMy2g9wqp@rh-jkangas-kernel>
+        d=1e100.net; s=20251104; t=1776704603; x=1777309403;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=QuwHzur0DyTT6fAN7548X05vvqlUKr6sImf2XcXe9sE=;
+        b=N8Q1G/6aYkvIfPykzFL+QMuJ5STrS0osHUws9MSwUnAoqw3WuQ76/+8KRVveEwdFM/
+         Cj+4AkgiN1kTkzJF2p692lZaJRySNAnkveOiFoeRh8SDUtW5pd64ut/mxVJCnke+ytTR
+         adU3rlQeg8qOQtZV2vxEQHCQOPzp613apsmE6o5KspGUkd4f9dbOBKscV8KA7siL4/NM
+         bs+v/zLZ53fHqhZjK5n9iV/rIwZbijH11+2mJXS/ev7PFafDbGmctbGlLiv7M3krRofC
+         BgRtJRo8YLatV1yop0WKxrekBV7HwROzKe/60vQsN5fedcwazGFmLD/4Qr7thedcU+R4
+         0hOg==
+X-Forwarded-Encrypted: i=1; AFNElJ99VzJ/2kolaM/+r4XlW6dF67q2+B63GpDBPqFz6T1UFx3mZ+jG9qZiamjLOj28WnZBsJWwpu4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxx+Iq5UOMfIWDJch2gZ9Ut7bk5IKd7Ni2+NjshLVDRCE0DCT1M
+	/qDSaP7ODuDGqCF7akp6w6s03/Sxi7Fj87w9nnj+SZejRNXtJaIZW87O34TTpdcIBI4agu6yBvt
+	eueEezqr7PCVgI20v4YGNgUhzldwiW8XJYWXkZBmo
+X-Gm-Gg: AeBDietd31Ym3zql3agWo9BQ/f14Q/K6qgbB6BbPVfYyAsBSIEQBrnY1dhn+i7SQLwe
+	JmdWNUNFeA3evv454s2bHA5jEqzQ0QEZB0smoXVcT/JJUB02ZwkAog3XxxJCcEwjk6tcZKt9SD2
+	BOPeEWdAsbWh6ZwXstESxdKD3Eh9TL9C6VlI+GTNAdQjZGJsw+dErAhtRW7KCddtkVGTJg7lCKp
+	ilf4tnmnqFOmY9JlmZJv6AEM3uUzUZjA8HNSKO84pT4Mfq2Q1Krx6VDNMDc1a3B73/ZmO9GAuai
+	ktAWF9SvctJylwKUnRRe8nBrW86HPRUE/EgF7PnZ+F9e/z8w1njezFTwtS4=
+X-Received: by 2002:a05:690e:124a:b0:650:1bc2:7e18 with SMTP id
+ 956f58d0204a3-65310803466mr14402341d50.1.1776704601042; Mon, 20 Apr 2026
+ 10:03:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aeZOcCOgMy2g9wqp@rh-jkangas-kernel>
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+References: <20260419192555.3631327-1-boolli@google.com> <PH7PR11MB59834C3C7785D1E69B7E954EF32F2@PH7PR11MB5983.namprd11.prod.outlook.com>
+In-Reply-To: <PH7PR11MB59834C3C7785D1E69B7E954EF32F2@PH7PR11MB5983.namprd11.prod.outlook.com>
+From: Li Li <boolli@google.com>
+Date: Mon, 20 Apr 2026 10:03:08 -0700
+X-Gm-Features: AQROBzCRU8m1PocV3KnbRH0zjFz61ZPVhxSInF_uNWzvauXiSpZzp7JJjroMqgY
+Message-ID: <CAODvEq41VxdJ+nmM49eNo4d4VYBoDF69hzQUe8dUP9RoAuxxGA@mail.gmail.com>
+Subject: Re: [Intel-wired-lan] [PATCH] idpf: do not perform flow ops when
+ netdev is detached
+To: "Kwapulinski, Piotr" <piotr.kwapulinski@intel.com>
+Cc: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, 
+	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, 
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, David Decotigny <decot@google.com>, 
+	"Singhai, Anjali" <anjali.singhai@intel.com>, 
+	"Samudrala, Sridhar" <sridhar.samudrala@intel.com>, Brian Vazquez <brianvv@google.com>, 
+	"Tantilov, Emil S" <emil.s.tantilov@intel.com>, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [7.34 / 15.00];
+	URIBL_BLACK(7.50)[osuosl.org:email];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	BAD_REP_POLICIES(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279872-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[gmail.com,suse.com,oss.nxp.com,nxp.com,pengutronix.de,kernel.org,lists.infradead.org,lists.linux.dev,vger.kernel.org,linaro.org];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	RCVD_TLS_LAST(0.00)[];
+	R_DKIM_ALLOW(0.00)[google.com:s=20251104];
+	TAGGED_FROM(0.00)[bounces-279873-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	GREYLIST(0.00)[pass,meta];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	DMARC_POLICY_ALLOW(0.00)[google.com,reject];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[error27@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	NEURAL_HAM(-0.00)[-0.828];
+	FROM_NEQ_ENVFROM(0.00)[boolli@google.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
+	TAGGED_RCPT(0.00)[netdev];
+	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_SPF_ALLOW(0.00)[+ip6:2600:3c0a:e001:db::/64:c];
 	MISSING_XM_UA(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[400a4000:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linaro.org:email,64.7.192.0:email,4033c000:email]
-X-Rspamd-Queue-Id: B5888432A1A
-X-Rspamd-Action: no action
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,davemloft.net:email,mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5CD2A432D63
+X-Rspamd-Action: add header
 X-Rspamd-Server: lfdr
+X-Spam: Yes
 
-On Mon, Apr 20, 2026 at 09:04:00AM -0700, Jared Kangas wrote:
-> Fixing Dan's address based on mailmap update, sorry for the noise.
-> 
-> On Fri, Apr 17, 2026 at 02:36:25PM -0700, Jared Kangas wrote:
-> > Hi Dan,
-> > 
-> > On Fri, Jan 30, 2026 at 04:19:52PM +0300, Dan Carpenter wrote:
-> > > Add the GPR syscon region for the s32 chipset.
-> > > 
-> > > Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
-> > > ---
-> > >
-> > > [snip]
-> > >
-> > > diff --git a/arch/arm64/boot/dts/freescale/s32g3.dtsi b/arch/arm64/boot/dts/freescale/s32g3.dtsi
-> > > index e314f3c7d61d..be03db737384 100644
-> > > --- a/arch/arm64/boot/dts/freescale/s32g3.dtsi
-> > > +++ b/arch/arm64/boot/dts/freescale/s32g3.dtsi
-> > > @@ -383,6 +383,11 @@ usdhc0-200mhz-grp4 {
-> > >  			};
-> > >  		};
-> > >  
-> > > +		gpr: syscon@4007c000 {
-> > > +			compatible = "nxp,s32g3-gpr", "syscon";
-> > > +			reg = <0x4007c000 0x3000>;
-> > > +		};
-> > > +
-> > >  		ocotp: nvmem@400a4000 {
-> > >  			compatible = "nxp,s32g3-ocotp", "nxp,s32g2-ocotp";
-> > >  			reg = <0x400a4000 0x400>;
-> > > @@ -808,6 +813,7 @@ gmac0: ethernet@4033c000 {
-> > >  			compatible = "nxp,s32g2-dwmac";
-> > >  			reg = <0x4033c000 0x2000>, /* gmac IP */
-> > >  			      <0x4007c004 0x4>;    /* GMAC_0_CTRL_STS */
-> > > +			nxp,phy-sel = <&gpr 0x4>;
-> > >  			interrupt-parent = <&gic>;
-> > >  			interrupts = <GIC_SPI 57 IRQ_TYPE_LEVEL_HIGH>;
-> > >  			interrupt-names = "macirq";
-> > 
-> > I gave this a test on an S32G-VNP-RDB3 and didn't see any issues on the
-> > dwmac-s32 side, but this appears to trigger a panic when reading the new
-> > debugfs regmap/*/registers file for the syscon node:
-> > 
-> >     # grep 4007c000 /proc/vmallocinfo
-> >     0xffff800083da8000-0xffff800083dac000   16384 ioremap_prot+0x74/0xe0 phys=0x000000004007c000 ioremap
-> >     # cat /sys/kernel/debug/regmap/dummy-syscon@0x000000004007c000/registers
-> >     Internal error: synchronous external abort: 0000000096000210 [#1]  SMP
-> >     [...]
-> >     CPU: 0 UID: 0 PID: 4344 Comm: cat Tainted: G   M        E  X   ------  ---  6.12.0+ #226 PREEMPT_RT
-> >     Tainted: [M]=MACHINE_CHECK, [E]=UNSIGNED_MODULE, [X]=AUX
-> >     [...]
-> >     pc : regmap_mmio_read32le+0x44/0xa0
-> >     lr : regmap_mmio_read32le+0x44/0xa0
-> >     [...]
-> >     x23: ffff00080c080000 x22: ffff000802ac4c00 x21: ffff800087b13c9c
-> >     x20: ffff800080a46494 x19: ffff800083da810c x18: 0000000000000004
-> >     [...]
-> >     x5 : ffff800080a46448 x4 : ffff800083da8000 x3 : ffff800080a46494
-> >     x2 : ffff800080a47230 x1 : ffff800083da810c x0 : 0000000000000020
-> >     Call trace:
-> >      regmap_mmio_read32le+0x44/0xa0 (P)
-> >      regmap_mmio_read+0x4c/0x80
-> >      [...]
-> >     Code: 52800400 8b214093 aa1303e1 97f4caf0 (b9400275)
-> >     ---[ end trace 0000000000000000 ]---
-> >     Kernel panic - not syncing: synchronous external abort: Fatal exception
-> > 
-> > Running this through decodecode gives:
-> > 
-> >     All code
-> >     ========
-> >        0:   52800400        mov     w0, #0x20                       // #32
-> >        4:   8b214093        add     x19, x4, w1, uxtw
-> >        8:   aa1303e1        mov     x1, x19
-> >        c:   97f4caf0        bl      0xffffffffffd32bcc
-> >       10:*  b9400275        ldr     w21, [x19]              <-- trapping instruction
-> > 
-> >     Code starting with the faulting instruction
-> >     ===========================================
-> >        0:   b9400275        ldr     w21, [x19]
-> > 
-> > x19's offset from the base address in /proc/vmallocinfo is 0x10c, which
-> > points to a bad read at physical address 0x4007c10c; I also confirmed
-> > that the preceding memory reads back without issues:
+On Mon, Apr 20, 2026 at 1:23=E2=80=AFAM Kwapulinski, Piotr
+<piotr.kwapulinski@intel.com> wrote:
+>
+> >-----Original Message-----
+> >From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of =
+Li Li via Intel-wired-lan
+> >Sent: Sunday, April 19, 2026 9:26 PM
+> >To: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw =
+<przemyslaw.kitszel@intel.com>; David S. Miller <davem@davemloft.net>; Jaku=
+b Kicinski <kuba@kernel.org>; Eric Dumazet <edumazet@google.com>; intel-wir=
+ed-lan@lists.osuosl.org
+> >Cc: netdev@vger.kernel.org; linux-kernel@vger.kernel.org; David Decotign=
+y <decot@google.com>; Singhai, Anjali <anjali.singhai@intel.com>; Samudrala=
+, Sridhar <sridhar.samudrala@intel.com>; Brian Vazquez <brianvv@google.com>=
+; Li Li <boolli@google.com>; Tantilov, Emil S <emil.s.tantilov@intel.com>
+> >Subject: [Intel-wired-lan] [PATCH] idpf: do not perform flow ops when ne=
+tdev is detached
+> >
+> >Even though commit 2e281e1155fc ("idpf: detach and close netdevs while h=
+andling a reset") prevents ethtool -N/-n operations to operate on detached =
+netdevs, we found that out-of-tree workflows like OpenOnload can bypass eth=
+tool core locks and call idpf_set_rxnfc directly during an idpf HW reset. W=
+hen this happens, we could get kernel crashes like the following:
+> >
+> >[ 4045.787439] BUG: kernel NULL pointer dereference, address: 0000000000=
+000070 [ 4045.794420] #PF: supervisor read access in kernel mode [ 4045.799=
+580] #PF: error_code(0x0000) - not-present page [ 4045.804739] PGD 0 [ 4045=
+.806772] Oops: Oops: 0000 [#1] SMP NOPTI ...
+> >[ 4045.836425] Workqueue: onload-wqueue oof_do_deferred_work_fn [onload]=
+ [ 4045.842926] RIP: 0010:idpf_del_flow_steer+0x24/0x170 [idpf] ...
+> >[ 4045.946323] Call Trace:
+> >[ 4045.948796]  <TASK>
+> >[ 4045.950915]  ? show_trace_log_lvl+0x1b0/0x2f0 [ 4045.955293]  ? show_=
+trace_log_lvl+0x1b0/0x2f0 [ 4045.959672]  ? idpf_set_rxnfc+0x6f/0x80 [idpf]=
+ [ 4045.964142]  ? __die_body.cold+0x8/0x12 [ 4045.968000]  ? page_fault_oo=
+ps+0x148/0x160 [ 4045.972117]  ? exc_page_fault+0x6f/0x160 [ 4045.976060]  =
+? asm_exc_page_fault+0x22/0x30 [ 4045.980262]  ? idpf_del_flow_steer+0x24/0=
+x170 [idpf] [ 4045.985245]  idpf_set_rxnfc+0x6f/0x80 [idpf] [ 4045.989535] =
+ af_xdp_filter_remove+0x7c/0xb0 [sfc_resource] [ 4045.995069]  oo_hw_filter=
+_clear_hwports+0x6f/0xa0 [onload] [ 4046.000589]  oo_hw_filter_update+0x65/=
+0x210 [onload] [ 4046.005587]  oof_hw_filter_update.constprop.0+0xe7/0x140 =
+[onload] [ 4046.011716]  oof_manager_update_all_filters+0xad/0x270 [onload]=
+ [ 4046.017671]  __oof_do_deferred_work+0x15e/0x190 [onload] [ 4046.023014]=
+  oof_do_deferred_work+0x2c/0x40 [onload] [ 4046.028018]  oof_do_deferred_w=
+ork_fn+0x12/0x30 [onload] [ 4046.033277]  process_one_work+0x174/0x330 [ 40=
+46.037304]  worker_thread+0x246/0x390 [ 4046.041074]  ? __pfx_worker_thread=
++0x10/0x10 [ 4046.045364]  kthread+0xf6/0x240 [ 4046.048530]  ? __pfx_kthre=
+ad+0x10/0x10 [ 4046.052297]  ret_from_fork+0x2d/0x50 [ 4046.055896]  ? __pf=
+x_kthread+0x10/0x10 [ 4046.059664]  ret_from_fork_asm+0x1a/0x30 [ 4046.0636=
+13]  </TASK>
+> >
+> >To prevent this, we need to add checks in idpf_set_rxnfc and idpf_get_rx=
+nfc to error out if the netdev is already detached.
+> >
+> >Tested: implemented the following patch to synthetically force idpf into=
+ a HW reset:
+> >
+> >diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/e=
+thernet/intel/idpf/idpf_txrx.c
+> >index 4fc0bb14c5b1..27476d57bcf0 100644
+> >--- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+> >+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+> >@@ -10,6 +10,9 @@
+> > #define idpf_tx_buf_next(buf)         (*(u32 *)&(buf)->priv)
+> > LIBETH_SQE_CHECK_PRIV(u32);
+> >
+> >+static bool SIMULATE_TX_TIMEOUT;
+> >+module_param(SIMULATE_TX_TIMEOUT, bool, 0644);
+> >+
+> > /**
+> >  * idpf_chk_linearize - Check if skb exceeds max descriptors per packet
+> >  * @skb: send buffer
+> >@@ -46,6 +49,8 @@ void idpf_tx_timeout(struct net_device *netdev, unsign=
+ed int txqueue)
+> >
+> >       adapter->tx_timeout_count++;
+> >
+> >+      SIMULATE_TX_TIMEOUT =3D false;
+> >+
+> >       netdev_err(netdev, "Detected Tx timeout: Count %d, Queue %d\n",
+> >                  adapter->tx_timeout_count, txqueue);
+> >       if (!idpf_is_reset_in_prog(adapter)) { @@ -2225,6 +2230,8 @@ stat=
+ic bool idpf_tx_clean_complq(struct idpf_compl_queue *complq, int budget,
+> >                       goto fetch_next_desc;
+> >               }
+> >               tx_q =3D complq->txq_grp->txqs[rel_tx_qid];
+> >+              if (unlikely(SIMULATE_TX_TIMEOUT && (tx_q->idx % 2 =3D=3D=
+ 1)))
+> >+                      goto fetch_next_desc;
+> >
+> >               /* Determine completion type */
+> >               ctype =3D le16_get_bits(tx_desc->common.qid_comptype_gen,
+> >diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c b/drivers/n=
+et/ethernet/intel/idpf/idpf_virtchnl.c
+> >index be66f9b2e101..ba5da2a86c15 100644
+> >--- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+> >+++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+> >@@ -8,6 +8,9 @@
+> > #include "idpf_virtchnl.h"
+> > #include "idpf_ptp.h"
+> >
+> >+static bool VIRTCHNL_FAILED;
+> >+module_param(VIRTCHNL_FAILED, bool, 0644);
+> >+
+> > /**
+> >  * struct idpf_vc_xn_manager - Manager for tracking transactions
+> >  * @ring: backing and lookup for transactions @@ -3496,6 +3499,11 @@ in=
+t idpf_vc_core_init(struct idpf_adapter *adapter)
+> >               switch (adapter->state) {
+> >               case __IDPF_VER_CHECK:
+> >                       err =3D idpf_send_ver_msg(adapter);
+> >+
+> >+                      if (unlikely(VIRTCHNL_FAILED)) {
+> >+                              err =3D -EIO;
+> >+                      }
+> Please remove redundant parenthesis
+> Piotr
 
-Oh, ugh...  I didn't realize that this wasn't merged.  I don't have a
-way to test this any more.  The simplest fix would be to do change the
-0x3000 to 0x100.  The GPR63 register is at 0xFC.
+Hi Piotr,
 
-		reg = <0x4007c000 0x100>;
+The block you are commenting on is not part of the patch; it's just a
+block of test code in the commit message I used to reproduce the
+failures.
 
-That's probably the best fix as well.  The later register areas would
-be their own syscons.
+Thanks!
 
-regards,
-dan carpenter
-
+>
+> >+
+> >                       switch (err) {
+> >                       case 0:
+> >                               /* success, move state machine forward */
+> >
+> >And tested by writing 1 to /sys/module/idpf/parameters/VIRTCHNL_FAILED
+> >and /sys/module/idpf/parameters/SIMULATE_TX_TIMEOUT, and running
+> >idpf_get_rxnfc() right after the HW reset.
+> >
+> >Without the patch: encountered NULL pointer and kernel crash.
+> >
+> >With the patch: no crashes.
+> >
+> >Fixes: 2e281e1155fc ("idpf: detach and close netdevs while handling a re=
+set")
+> >Signed-off-by: Li Li <boolli@google.com>
+> >---
+> > drivers/net/ethernet/intel/idpf/idpf_ethtool.c | 6 ++++++
+> > 1 file changed, 6 insertions(+)
+> >
+> >diff --git a/drivers/net/ethernet/intel/idpf/idpf_ethtool.c b/drivers/ne=
+t/ethernet/intel/idpf/idpf_ethtool.c
+> >index bb99d9e7c65d..8368a7e6a754 100644
+> >--- a/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
+> >+++ b/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
+> >@@ -43,6 +43,9 @@ static int idpf_get_rxnfc(struct net_device *netdev, s=
+truct ethtool_rxnfc *cmd,
+> >       unsigned int cnt =3D 0;
+> >       int err =3D 0;
+> >
+> >+      if (!netdev || !netif_device_present(netdev))
+> >+              return -ENODEV;
+> >+
+> >       idpf_vport_ctrl_lock(netdev);
+> >       vport =3D idpf_netdev_to_vport(netdev);
+> >       vport_config =3D np->adapter->vport_config[np->vport_idx];
+> >@@ -349,6 +352,9 @@ static int idpf_set_rxnfc(struct net_device *netdev,=
+ struct ethtool_rxnfc *cmd)  {
+> >       int ret =3D -EOPNOTSUPP;
+> >
+> >+      if (!netdev || !netif_device_present(netdev))
+> >+              return -ENODEV;
+> >+
+> >       idpf_vport_ctrl_lock(netdev);
+> >       switch (cmd->cmd) {
+> >       case ETHTOOL_SRXCLSRLINS:
+> >--
+> >2.54.0.rc1.513.gad8abe7a5a-goog
 
