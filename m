@@ -1,241 +1,173 @@
-Return-Path: <netdev+bounces-279613-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279614-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iIW1Mplv5WmGjwEAu9opvQ
-	(envelope-from <netdev+bounces-279613-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 02:13:13 +0200
+	id WOW0DZl15WnIkAEAu9opvQ
+	(envelope-from <netdev+bounces-279614-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 02:38:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F634425E35
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 02:13:12 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A17A425EF8
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 02:38:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7A980300DDE7
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 00:13:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E55BE3014541
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 00:38:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAF5D347DD;
-	Mon, 20 Apr 2026 00:13:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AECBB2139C9;
+	Mon, 20 Apr 2026 00:38:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="YMCfY0nv"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SC2OQ2bE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f51.google.com (mail-dl1-f51.google.com [74.125.82.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76D5F27442;
-	Mon, 20 Apr 2026 00:13:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776643990; cv=none; b=PQvESL1NEltHbTE9+VkEu1g+3k+9UGS76fbZFPjrjrLmXgqH1i4zt+dj2Ws0S7Y6r4IqEs2wXESTJo8BpPPcj+3E8LyOgGkXwrez4QmNtd1kk3kRgQezQCJfMpTCgVlT4DKizDFbM9+Ntu+dzkC1XT3hIGyAUGEacfn08s3AnMg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776643990; c=relaxed/simple;
-	bh=miPJmafxGYa/0nBAUppkC8i1uJWsAyk0QLELmzPA81s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GVlj8gbZpeFROJ5G5w9kGnMpwMrnxsKQfQhrDs1oW2mEmb2g6NpX0LFiyQleEhjPO81TfBGmEHbQSOV4Qok2VEun6gqaINazwmA0wfys3gNdbAJ2ct4znCUTpZRgC1yUf3ozRUfCUIFNBD6soglDDJIjFV9HaIbijz+hT50muC8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=YMCfY0nv; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63JJjOLY2986195;
-	Mon, 20 Apr 2026 00:12:46 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=aZBdIt
-	kfAsnP3W4OIPRwFKg8WBJUd9YO47VwRzMsse4=; b=YMCfY0nvUOHNNv1jrxoaGT
-	HCdM/0wahsGi1rWOXRjIBLkUl6sfW84NefA+Q6ax5sIY9GgaxO2g3zF6yTBh6Lvz
-	/8m10na03tz6nLUl4rXq/FBOOJbWEbGhd8Rv7iRckYfBXf1csEREf1mUGgzILOTq
-	zT0BoAJqyJ4L6TZEQFjNVKJbfL2lOYQUzwFvrtsvaZI+NQwY+O13gSqDe3/BvdiC
-	KM5oZtUQGS5dB6AuQPWm9HeWoAzXURJFPrvSeu9NfPapm/TYmdtqeNCrlKvJUVI8
-	rxIFCoXFgaH1bvh2xYU8UHqlDZNg0v5a3V4h9EJLMqGPUs9826k3zryY8erlcV8g
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73CCA1EB1AA
+	for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 00:38:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776645525; cv=pass; b=mba+50hTERvFRuDv/EpMW0xvQjNxXofjJVSES3dkuEEJ7tQ8f+lQbMx8nGIA9UUvKNg6I/42dEDvM8521KlbHnt7fTM2dAoxMSGnUPj9/6uOGNnMk8CWDmSpnUDbR075pC9KtKy/zbz0yOZ1U5rN9MhNtdZXYKhqXk74xyZnKq4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776645525; c=relaxed/simple;
+	bh=V+Xc+gnGUSlatwR6xO+m6P3xuojSJkvgpNiZT2dRtjQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KFTZzqZgJcFjq4ctBgei6EHpnP+v6oHeY9ENhfC5Bz8lf7ZImAI33+OK5cVZmgB+I/0H3Oh1jdSFTswfNzdBTT2dBHAav4tjiAb7NKBRnJD1L+K+zH4+5meptcm8vkHOZt/G67kPR8ldOKtLNlVTNWjOHFCBfKVCNe4Nf75hITc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SC2OQ2bE; arc=pass smtp.client-ip=74.125.82.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-dl1-f51.google.com with SMTP id a92af1059eb24-12c565dd3a7so1134772c88.1
+        for <netdev@vger.kernel.org>; Sun, 19 Apr 2026 17:38:44 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776645523; cv=none;
+        d=google.com; s=arc-20240605;
+        b=XsWm3AoeGEeuRQDF4qE0cYWM4+rpXmAr1yeXuiEMzsSjpuao8WouPgAhOnysIz/u6r
+         wK3oNfZH5GZN9FKELReGj9F6Xd0CITJNgDrHFADuuwQocmqZZUGW+p8ab4IiR3lDp6Nk
+         o+yy3Alf2vow0DlVpAkBpNXiy/eZzlRmKe+JSA+4fP+/P8HL5cveUxfGJK7ssfjV1UXe
+         tDyLkeyfjcf43O7v3dZLAq24jOLHLa8umVx9Yx8wQEf9qSyujWuCTM+tbKZyDTZMFecY
+         ajsT9xSv7LnRCFVopaQ6BPlsqEuLQ+yAmM53tFRO+LmoZIYQn+mIj72XsuCxJFPppM2g
+         aDuQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=v2+NAjo9ccDDaJAJPnPpHZkJNF/Ek3gXxSOX8+9kURU=;
+        fh=paeiikkzxW+mX3mESrN/ZgmCMLso3K/L70dw59tAfqA=;
+        b=jbqVzcgaxb+Cyr3K19nMEVMHjhK6ijCDsh8D9EQTYFCqP/VGZCTpfsuKbFQTqgVIfZ
+         N8zJ5QQ9llTWpZcHa6bWwr6n+VMq/zAQNcOAWPXr6NYTo1fsG8Q0gWgq0zW8kpCREqEM
+         uplI34gF7QTxLvMjHWs7UlLYGULCmbifOz3NpWwPnLphiALtDYKN8Tn3VFGqHXSanuCU
+         wKU+2NtrC08iguTnfqGZE6kHTlp92zBcr2B4YAdxiCxE1waSDKLu82/w96sGLX8GOq5p
+         N5F4Xs0oOUCZqBRMDfyGZ8sBlHLzTcFNlpDqF6GiWYj3QG5pgBB1amo7WImnawFzri9o
+         3rSw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1776645523; x=1777250323; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=v2+NAjo9ccDDaJAJPnPpHZkJNF/Ek3gXxSOX8+9kURU=;
+        b=SC2OQ2bEKiP7e2J5gJMlNDxFxyArBRoEylARrBKCbgT658MNvj6rjA375HmYDgyNOs
+         4qa97ve1+We6RT/G6SF9aWmoS5UBVqxCuVJepopr34Um/Q/FkjRgDXm8Vt9neMc76TPY
+         mzaT1XNdgZaJSPZKuksdDEymoblulTfcl/9ZH3t2RV+uifN4mhh5TL8OiDDbDwIccTii
+         a2If691rDoxTjS1UfVCOUZFBnVSuNHpVJVC4fGmVg1a7PjJyojiZptkidgWEQgx4VK8t
+         KpcNbWqeNSES5qPEd3D63lVctqI4JHdlhj/1DwhGrDNJet0qqLvbqOEYkahQqT8cBFuV
+         ZMsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776645523; x=1777250323;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=v2+NAjo9ccDDaJAJPnPpHZkJNF/Ek3gXxSOX8+9kURU=;
+        b=jw14ooOB0dvNgW/+eFybjgFvTVY+ZoQ82jGiPEagEW6lglxrj+n5SZFAjtwRQeAOzS
+         7uAXWtrrIAIq884jM4jx8pwUYoC50EJqvEx4FM8+FcWuahnvXf1+Qtr8gS4LXbeEddBC
+         8QVIUbvTDhuSWTmv/OZIgv8C1DPl9X5lRgbJswYDICPM++5KDl08bm1RdIzsEd1367Rx
+         yTiFU1Icaa3U93GklmmyxTrEpcBPKv1Vagr8TjHFdIAjtEix8K04PbxkHj+XTCP3c6jL
+         tiYnrc/9qVLZXkq3MLiZ+/oKbIauYyUtT87IzJin2wzajtT4wSCsBta05R3KZ7HsSgEj
+         N08A==
+X-Gm-Message-State: AOJu0YyxX1YZC+FzkgnNfcpSZfzTs5DL06jr8rK8ki9b4jZCBE8M06Uh
+	uXwuvN58/NzY5dJEcx2Q4rf3qcXyow6pYMDdm9tZQsgs9kvfauyCALYwWSLfAjJeywr85a0y8cK
+	XamzcRKAeodMnE5TSpgPzUBUVL0O+3J7wn3H8XQmp
+X-Gm-Gg: AeBDietGRsSPtC4RvtoEyQNgL87SFcwnmWP8BOL7NTyZIKZvrc1gIs8XQQsrUfgpFuF
+	f7tMMf/cGeqPkg32vuJ27p09/yEWt9RCS0pK+vnxFBxgoZ/iyhV3ekhdq4KWSC623/uWq3x3QC8
+	6BLxMFy4b10zPAKH4OMCZNZD7Kdb0QO4U/z1nPYRdSGsPVAWZJgrz9b0hDgGNyLx+LQXdasDhnW
+	1lm1k7eBA2FWhsTboHIvvAq58BZbJ4way/ZBPFdvgPSzgIvoFnrL/qWX+w+XQZrlcivuj6Z5cTQ
+	N0rGexLv4rcAB8Ev+Mz6FGYC/9h+aBFNFPzxgguxfn4lpihBGdupy8UcOMTlT9gn9E+rAgZa7+s
+	zqIfmrQ3MYruX++F9PMKBbskECJivXfbVmgfrFvsH0sXsttgLMTDnNxM637NY4CR2YUYBIO/wzw
 	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4dm2j6dj2m-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 20 Apr 2026 00:12:45 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 63K05Ktf031623;
-	Mon, 20 Apr 2026 00:12:44 GMT
-Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4dmpgg2mms-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 20 Apr 2026 00:12:44 +0000 (GMT)
-Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
-	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 63K0CgYo27918956
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 20 Apr 2026 00:12:42 GMT
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3BE1B58058;
-	Mon, 20 Apr 2026 00:12:42 +0000 (GMT)
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7AB205805B;
-	Mon, 20 Apr 2026 00:12:40 +0000 (GMT)
-Received: from [9.61.89.198] (unknown [9.61.89.198])
-	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 20 Apr 2026 00:12:40 +0000 (GMT)
-Message-ID: <dcc2b7b2-47ac-475d-af6b-d5c2f2b812b6@linux.ibm.com>
-Date: Sun, 19 Apr 2026 17:12:39 -0700
+X-Received: by 2002:a05:7022:69a2:b0:128:cedb:33ba with SMTP id
+ a92af1059eb24-12c73f70ebfmr5674965c88.10.1776645522913; Sun, 19 Apr 2026
+ 17:38:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] ibmveth: Disable GSO for packets with small MSS
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-        pabeni@redhat.com, horms@kernel.org, bjking1@linux.ibm.com,
-        haren@linux.ibm.com, ricklind@linux.ibm.com, maddy@linux.ibm.com,
-        mpe@ellerman.id.au, linuxppc-dev@lists.ozlabs.org,
-        stable@vger.kernel.org, shaik.abdulla1@ibm.com, naveedaus@in.ibm.com
-References: <20260417172910.81433-1-mmc@linux.ibm.com>
- <20260418175451.122193-1-kuba@kernel.org>
-Content-Language: en-US
-From: mingming cao <mmc@linux.ibm.com>
-In-Reply-To: <20260418175451.122193-1-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDE5MDI1NSBTYWx0ZWRfXywkL4mbph7pn
- y9NDpS8ktWEK/Wt4Fwq5/CuAM97+q0nNiMhqGZaFuUiQw9x1UCKTP/kkMPoF7J1fRI9KDZWut9T
- P6MiRMGKehdZtNTgQLsvcMnwuWQDrOpTYJd8baM/IM5HZc7QQd4ojtHZTXuVNVHVYe0Y4LHkUy8
- NLXDUIQyljIQdV/2gUNYnMZnRxeV9F4/XSM3cTdU4uyborwffjqa3yZNNJ+REwSF8X0BXgHHV9D
- XURHdprmg7h/F8Lyp/aDfZN4bs547Ay8rRr/LF4UFwawjc0/8UfBU0kWrbasJrnjrLUhifaP5fo
- yZ3oB8TRpMysbe1KB3sdrIgAgH7raUfWm3i2SmhibM2HlOo2RxuwTzeE2HVK86A1TgDWoBud/Ck
- 2+Gnh8NnRboVZPUgCc6J5xTbI1lpjtjH+rGkQbUGfehvw0910gk2l0UApS1sayntunEe6ZKUeP5
- GxSKH4WS5DraFJaozAQ==
-X-Proofpoint-GUID: t6hNByzCcWjgl0WInHRfkkYPE8JpykPZ
-X-Authority-Analysis: v=2.4 cv=SOJykuvH c=1 sm=1 tr=0 ts=69e56f7d cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=IkcTkHD0fZMA:10 a=A5OVakUREuEA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=uAbxVGIbfxUO_5tXvNgY:22 a=sDADSKU7Kdt2IJdVO5YA:9
- a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
-X-Proofpoint-ORIG-GUID: e1yCFhD-mX4ZlgjEllJFepkfqH0W5lmS
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-04-19_07,2026-04-17_04,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 spamscore=0 priorityscore=1501 lowpriorityscore=0
- clxscore=1015 phishscore=0 suspectscore=0 adultscore=0 impostorscore=0
- bulkscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
- adjust=0 reason=mlx scancount=1 engine=8.22.0-2604070000
- definitions=main-2604190255
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
+References: <af8d66f928dec3e9fcbee8d4a85b7d5a6b86f515.1776460180.git.lucien.xin@gmail.com>
+In-Reply-To: <af8d66f928dec3e9fcbee8d4a85b7d5a6b86f515.1776460180.git.lucien.xin@gmail.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Sun, 19 Apr 2026 17:38:30 -0700
+X-Gm-Features: AQROBzDHytxBlqwozveGT6CDT-CRYyJYH_xWO4Xuf0Xb-n75HwRhJREtNelKaEw
+Message-ID: <CAAVpQUCdXJS_VNNjtq_oiygaMJiFMoaJ2kynRR+aEu=-3aahqQ@mail.gmail.com>
+Subject: Re: [PATCH net] sctp: fix sockets_allocated imbalance after sk_clone()
+To: Xin Long <lucien.xin@gmail.com>
+Cc: network dev <netdev@vger.kernel.org>, linux-sctp@vger.kernel.org, davem@davemloft.net, 
+	kuba@kernel.org, Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	TAGGED_FROM(0.00)[bounces-279613-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[ibm.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.ibm.com:mid];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mmc@linux.ibm.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-279614-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,kernel.org,google.com,redhat.com,gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	PRECEDENCE_BULK(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[11]
-X-Rspamd-Queue-Id: 2F634425E35
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 8A17A425EF8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-
-On 4/18/26 10:54 AM, Jakub Kicinski wrote:
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
-
-Thanks for the review and the questions!
-
-> ---
-> ibmveth: Disable GSO for packets with small MSS
+On Fri, Apr 17, 2026 at 2:09=E2=80=AFPM Xin Long <lucien.xin@gmail.com> wro=
+te:
 >
-> This commit adds an ndo_features_check callback to the ibmveth driver to
-> disable segmentation offload when the MSS is less than 224 bytes. This
-> prevents physical adapters in SEA configurations from freezing when given
-> small MSS packets.
+> sk_clone() increments sockets_allocated and sets the socket refcount to 2=
+.
+> SCTP performs additional accounting in sctp_clone_sock(), so the clone-ti=
+me
+> increment must be undone to avoid double counting.
 >
->> diff --git a/drivers/net/ethernet/ibm/ibmveth.c b/drivers/net/ethernet/ibm/ibmveth.c
->> --- a/drivers/net/ethernet/ibm/ibmveth.c
->> +++ b/drivers/net/ethernet/ibm/ibmveth.c
-> [ ... ]
+> Note we cannot simply remove the SCTP-side increment, because the SCTP
+> destroy path in sctp_destroy_sock() only decrements sockets_allocated whe=
+n
+> sp->ep is set, which may not be true for all failure paths in
+> sctp_clone_sock().
 >
->> @@ -1756,6 +1756,25 @@ static int ibmveth_set_mac_addr(struct net_device *dev, void *p)
->>   	return 0;
->>   }
->>   
->> +static netdev_features_t ibmveth_features_check(struct sk_buff *skb,
->> +						struct net_device *dev,
->> +						netdev_features_t features)
->> +{
->> +	/* Some physical adapters do not support segmentation offload with
->> +	 * MSS < 224. Disable GSO for such packets to avoid adapter freeze.
->> +	 */
->> +	if (skb_is_gso(skb)) {
-> The commit message mentions this matches the ibmvnic hardware errata from
-> commit f10b09ef687f. That commit disabled GSO for both gso_size < 224 and
-> gso_segs == 1.
->
-> By omitting the check for skb_shinfo(skb)->gso_segs == 1, could a
-> single-segment GSO packet still cause the adapter to freeze?
-Good question. Unlike ibmvnic, ibmveth does not need to check for 
-single-segment GSO packets (gso_segs == 1).
+> Fixes: 16942cf4d3e3 ("sctp: Use sk_clone() in sctp_accept().")
+> Signed-off-by: Xin Long <lucien.xin@gmail.com>
 
-In ibmvnic, the firmware processes all GSO packets, including 
-single-segment ones, through the same LSO code path. This means even 
-gso_segs == 1 packets can trigger the hardware errata.
+Thanks for the fix.
 
-In ibmveth, the PowerVM hypervisor intelligently bypasses the LSO path 
-for single-segment packets. When gso_segs == 1, the hypervisor treats 
-the packet as a regular (non-GSO) packet and transmits it directly 
-without invoking the problematic hardware segmentation logic. Therefore, 
-single-segment GSO packets never reach the code path that causes the freeze.
+Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
 
-This architectural difference is why ibmvnic needs the gso_segs check 
-but ibmveth does not.
->
->> +		if (skb_shinfo(skb)->gso_size < IBMVETH_MIN_LSO_MSS) {
->> +			netdev_warn_once(dev,
->> +					 "MSS %u too small for LSO, disabling GSO\n",
->> +					 skb_shinfo(skb)->gso_size);
->> +			features &= ~NETIF_F_GSO_MASK;
->> +		}
->> +	}
->> +
->> +	return features;
-> When implementing a custom ndo_features_check callback, netif_skb_features()
-> will bypass the standard dflt_features_check() function. Does this mean
-> vlan_features_check() is no longer called for this driver?
->
-> If vlan_features_check() is skipped, multi-tagged (QinQ) VLAN packets
-> might retain GSO and protocol-specific checksum offloads that the hardware
-> parser cannot handle.
->
-> Should this return vlan_features_check(skb, features) instead?
-
-You’re correct about the interaction with the default feature filtering. 
-With a custom ndo_features_check(), the standard dflt_features_check() 
-path is bypassed, so vlan_features_check() must be called explicitly to 
-preserve existing VLAN/QinQ and checksum handling.
-
-Thank you for catching this! I'll send v3 shortly with:
-1. The vlan_features_check() call added
-2. Updated commit message explaining why gso_segs check is not needed 
-for ibmveth
-
-Best regards,
-
-Mingming
-
-
->> +}
+I fixed a similar one in 622e8838a298.  We may want to
+perform inc/dec regardless of sp->ep and simplify the code
+once net-next opens.
 
