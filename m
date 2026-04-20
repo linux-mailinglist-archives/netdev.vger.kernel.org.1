@@ -1,64 +1,66 @@
-Return-Path: <netdev+bounces-279750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279751-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QHeMAscp5mnesgEAu9opvQ
-	(envelope-from <netdev+bounces-279750-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 15:27:35 +0200
+	id gK1tChgq5mkDswEAu9opvQ
+	(envelope-from <netdev+bounces-279751-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 15:28:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B96B842BC55
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 15:27:34 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id DFF9442BCC6
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 15:28:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id DC9083062709
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 13:21:14 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E51F230752EE
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 13:21:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 911E13B0AC4;
-	Mon, 20 Apr 2026 13:16:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56C413B27C9;
+	Mon, 20 Apr 2026 13:16:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DAHb/97m"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="csfSLa5i"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C8293AF67F;
-	Mon, 20 Apr 2026 13:16:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3048C3B19DE;
+	Mon, 20 Apr 2026 13:16:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776690998; cv=none; b=BPaeVc4qqGd774Cor/jPu0YHrra52y9cDhbKt63w1mCeJsI/Eu98yNLn0KJzqk3PbAzLVHAzZ/UZpHtNtYAebPsf7Yxs3qaF1YMyCVTtzfu0ZfKpk74Oe0VRlIbfCPTXItFHxUNncIN2Sn+wZZCHL4/FDbFIPnXwYbEtdkSFefs=
+	t=1776691002; cv=none; b=ObeSGuLhMcLo+B8HDlNVjMhfrHESeyFDLi8EncHQuvZhc3SADo4t92CqgVs5aXgeXxJuje6yez70cgIADo+0qaitnqLLyT562JUEvUWwDDOi/qIDAnlOzHV4wuNYJa9Ti+juJYJr/llkZ6RLkhIH4nJqVimVUEePpzy7/c75bjs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776690998; c=relaxed/simple;
-	bh=NMg2rKa1HaAOWIwLsFXh4XuSFfPxLBlUvtUg33DYntA=;
+	s=arc-20240116; t=1776691002; c=relaxed/simple;
+	bh=4fm3Gyb0p2DaPrFH/qZW5DbR/7n8ndjmgcuZvV4tNeA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AbZOf3KW3AZ/2je0vcD6bNCwCVmv5MVPLQUtipxl6a5uC/MrVUB201A/zFU863NxLxcRTrvzNbrUTuRT0K6ezJUPrnN4Us5OLazk5in3mwPs47uF5FxVYB+avBd4HxC9sehkHm/L20aDsmbADuycjd3qFBTA+kcmcZGyo8g4HqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DAHb/97m; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15679C19425;
-	Mon, 20 Apr 2026 13:16:37 +0000 (UTC)
+	 MIME-Version; b=qlwRQxLao82myxtnrWQmqiMs1CYZ5r+FNvBifR+V5jTo8AGqEFH6XOJBhFv2cSoBU5Ojm3rjQaEF456lHbsQGcNVLUwdD9REtxVG34FkDG6BDJwtGU46GmhOIlbCr1pRnNC4tRJwUVgYVlgCLvnca9WwtE2RGnpAQqGmchgx/3w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=csfSLa5i; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78FA2C19425;
+	Mon, 20 Apr 2026 13:16:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776690998;
-	bh=NMg2rKa1HaAOWIwLsFXh4XuSFfPxLBlUvtUg33DYntA=;
+	s=k20201202; t=1776691001;
+	bh=4fm3Gyb0p2DaPrFH/qZW5DbR/7n8ndjmgcuZvV4tNeA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=DAHb/97mr7U8aTsyu6CgvO0Z0rHWb5sV+2RyZba8nfAxL8BeGc2OK/iUxiazH3aUh
-	 VtDYTn+RwgJlVs9QTDTA78WAh1eoKau1NTEbx6YynSuYQFCHrzaALNccOoV5HQlTv2
-	 lcn8daQgn8hbuM8mHRIzrRvnCx840H9dPXWJLTA0Cufn5W5bxa/482AsCx5cht9Ywo
-	 omnIO3t4BBlyDE3gC+AKEt6+NQ8ydJkFJn4eCLNbXFMCKOP+6S3TrRNFeSTh+WezZF
-	 UvSm0sdCAWZGJVAqhGGEPyW0Ox5Q0+qwEtqWr4s4X0dIoQjR3soRV6fD3VQxuplXnv
-	 /rwGag6bLJfbQ==
+	b=csfSLa5iKXF6arfQcylvSOF0nKv2jGK4S9jhPl4AjQcg515JJu7f5gfRptF7g1oon
+	 ++fu0XkGIqGbHCprKkmaYBh+vHubTSlrVJUB5clKz2JwobLnX+g425En16rwP+cCf2
+	 36hwG+1CcGJhDjnkgEU44qbW7v3UVQVx0iJmwa4peABALj882iMm3cqbXDTISsNgN2
+	 lqkk6aiWJ/MS+GZx51bKRDw7vi3OZKJoO10jSEbQNW02Q8EOUNjUqGWHiZMNPdOoni
+	 dJl/V/WslP1kS7XDeyyLRQoO91HG8029WVVIjMPwx405/TYYOVelPiSPGR2lECrc3V
+	 LFOR5dYfDVVyg==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Jiawen Wu <jiawenwu@trustnetic.com>,
+Cc: Rosen Penev <rosenp@gmail.com>,
+	Simon Horman <horms@kernel.org>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	mengyuanlou@net-swift.com,
+	marcin.s.wojtas@gmail.com,
+	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
 	pabeni@redhat.com,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 7.0-6.18] net: wangxun: reorder timer and work sync cancellations
-Date: Mon, 20 Apr 2026 09:08:20 -0400
-Message-ID: <20260420131539.986432-34-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 7.0-5.15] net: mvneta: support EPROBE_DEFER when reading MAC address
+Date: Mon, 20 Apr 2026 09:08:22 -0400
+Message-ID: <20260420131539.986432-36-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260420131539.986432-1-sashal@kernel.org>
 References: <20260420131539.986432-1-sashal@kernel.org>
@@ -71,333 +73,389 @@ MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 7.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-279750-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-279751-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.995];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: B96B842BC55
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: DFF9442BCC6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Jiawen Wu <jiawenwu@trustnetic.com>
+From: Rosen Penev <rosenp@gmail.com>
 
-[ Upstream commit 58f6303572ec66e7c2967ac168125f444c9e880d ]
+[ Upstream commit 73a864352570fd30d942652f05bfe9340d7a2055 ]
 
-When removing the device, timer_delete_sync(&wx->service_timer) is
-called in .ndo_stop() after cancel_work_sync(&wx->service_task). This
-may cause new work to be queued after device down.
+If nvmem loads after the ethernet driver, mac address assignments will
+not take effect. of_get_ethdev_address returns EPROBE_DEFER in such a
+case so we need to handle that to avoid eth_hw_addr_random.
 
-Move unregister_netdev() before cancel_work_sync(), and use
-timer_shutdown_sync() to prevent the timer from being re-armed.
+Add extra goto section to just free stats as they are allocated right
+above.
 
-Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
-Link: https://patch.msgid.link/20260407025616.33652-7-jiawenwu@trustnetic.com
+Signed-off-by: Rosen Penev <rosenp@gmail.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Link: https://patch.msgid.link/20260307031709.640141-1-rosenp@gmail.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
-Now I have enough information for a complete analysis. Let me compile
-it.
+Now I have all the information needed for the full analysis.
 
 ---
 
 ## PHASE 1: COMMIT MESSAGE FORENSICS
 
-**Step 1.1: Subject Line**
-- Subsystem: `net: wangxun:` (Wangxun network driver)
-- Action verb: "reorder" - implies fixing incorrect ordering of
-  operations, suggesting a race condition fix
-- Summary: Reorders timer and work synchronization cancellations during
-  device removal
+### Step 1.1: Subject Line
+- **Subsystem**: `net: mvneta:` (Marvell NETA ethernet driver)
+- **Action verb**: "support" - enabling proper handling of an error
+  condition
+- **Summary**: Handle EPROBE_DEFER from `of_get_ethdev_address()` in
+  mvneta probe
 
-**Step 1.2: Tags**
-- `Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>` - author, primary
-  wangxun driver developer
-- `Link: https://patch.msgid.link/20260407025616.33652-7-
-  jiawenwu@trustnetic.com` - patch 7 of a series
-- `Signed-off-by: Jakub Kicinski <kuba@kernel.org>` - net maintainer
-  accepted the patch
-- No Fixes: tag (expected for this review process)
-- No Cc: stable tag (expected)
+Record: [net: mvneta] [support] [Handle EPROBE_DEFER to avoid incorrect
+random MAC assignment when nvmem loads after ethernet driver]
 
-**Step 1.3: Commit Body**
-The commit message clearly describes the bug: in `.ndo_stop()`,
-`timer_delete_sync()` is called AFTER `cancel_work_sync()`, meaning the
-timer can fire and re-queue work after the work cancellation. The fix
-moves `unregister_netdev()` before `cancel_work_sync()` and uses
-`timer_shutdown_sync()` to prevent re-arming.
+### Step 1.2: Tags
+- **Signed-off-by**: Rosen Penev (author), Jakub Kicinski (net
+  maintainer)
+- **Reviewed-by**: Simon Horman (networking reviewer) - strong quality
+  signal
+- **Link**:
+  https://patch.msgid.link/20260307031709.640141-1-rosenp@gmail.com
+  (lore blocked by Anubis)
+- No Fixes: tag (expected for this review pipeline)
+- No Cc: stable (expected)
 
-**Step 1.4: Hidden Bug Fix Detection**
-This IS a bug fix despite using "reorder" language. The reordering fixes
-a race condition where work can be queued after device teardown begins.
+Record: Reviewed by Simon Horman (experienced networking reviewer),
+committed by Jakub Kicinski (net maintainer). No syzbot, no multiple
+reporters.
+
+### Step 1.3: Body Text
+The commit explains that when nvmem loads after the ethernet driver,
+`of_get_ethdev_address()` returns `-EPROBE_DEFER`. Without handling
+this, the driver falls through to `eth_hw_addr_random`, assigning a
+random MAC address instead of deferring probe. The fix adds an
+`err_free_stats` goto section to properly clean up.
+
+Record: Bug: EPROBE_DEFER not handled, causing random MAC assignment
+instead of probe deferral. Symptom: Device gets a random MAC instead of
+its stored nvmem MAC. Root cause: Missing EPROBE_DEFER check after
+`of_get_ethdev_address()`.
+
+### Step 1.4: Hidden Bug Fix Detection
+This is a real bug fix despite using "support" rather than "fix".
+Without this, users get a non-deterministic MAC address that changes
+every boot, breaking network configurations.
+
+Record: YES - this is a real bug fix. The consequence is a random MAC
+address instead of the correct one from nvmem storage.
+
+---
 
 ## PHASE 2: DIFF ANALYSIS
 
-**Step 2.1: Inventory**
-- `drivers/net/ethernet/wangxun/libwx/wx_vf_common.c`: +3/-1 lines
-- `drivers/net/ethernet/wangxun/txgbe/txgbe_main.c`: +4/-2 lines
-- Total: ~7 lines changed, 2 functions modified (`wxvf_remove`,
-  `txgbe_remove`)
-- Classification: small, surgical fix
+### Step 2.1: Inventory
+- **Files changed**: 1 (`drivers/net/ethernet/marvell/mvneta.c`)
+- **Lines added**: 3 (2 lines for EPROBE_DEFER check + 1 label)
+- **Functions modified**: `mvneta_probe()` only
+- **Scope**: Single-file surgical fix
 
-**Step 2.2: Code Flow Changes**
+### Step 2.2: Code Flow Change
+**Hunk 1** (around line 5622): After `of_get_ethdev_address()`, adds
+check for EPROBE_DEFER to jump to cleanup.
+- Before: EPROBE_DEFER falls into the `else` branch and assigns a random
+  MAC.
+- After: EPROBE_DEFER causes probe to fail and return -EPROBE_DEFER.
 
-For `wxvf_remove()` - BEFORE:
-```
-cancel_work_sync(&wx->service_task);  // step 1: cancel work
-netdev = wx->netdev;
-unregister_netdev(netdev);            // step 2: unregister (stops timer
-via .ndo_stop)
-```
+**Hunk 2** (around line 5758): Adds `err_free_stats:` label before
+`free_percpu(pp->stats)`.
+- This provides a proper cleanup path that frees stats, ports, phylink,
+  clocks, and IRQ.
 
-AFTER:
-```
-netdev = wx->netdev;
-unregister_netdev(netdev);            // step 1: unregister (stops
-timer)
-timer_shutdown_sync(&wx->service_timer); // step 2: prevent timer re-arm
-cancel_work_sync(&wx->service_task);  // step 3: cancel work
-```
+### Step 2.3: Bug Mechanism
+Category: **Logic/correctness fix** - missing error path handling. The
+`of_get_ethdev_address()` call can return `-EPROBE_DEFER` when the nvmem
+provider isn't loaded yet. Without handling this specific error, the
+driver proceeds with a random MAC address. The fix returns the error so
+the driver framework retries probe later when nvmem is available.
 
-Same pattern for `txgbe_remove()`.
+### Step 2.4: Fix Quality
+- Obviously correct - follows established pattern used in macb,
+  ucc_geth, gianfar, airoha, mtk_eth_soc
+- Minimal (3 lines), surgical, well-contained
+- No regression risk - the new `err_free_stats` cleanup path correctly
+  unwinds only what was allocated (stats, ports, phylink, clocks, IRQ)
+- No red flags
 
-**Step 2.3: Bug Mechanism**
-Race condition. `wx_service_timer()` both re-arms itself via
-`mod_timer()` and queues `service_task` via
-`wx_service_event_schedule()`:
+---
 
-```3333:3343:drivers/net/ethernet/wangxun/libwx/wx_lib.c
-void wx_service_timer(struct timer_list *t)
-{
-        struct wx *wx = timer_container_of(wx, t, service_timer);
-        unsigned long next_event_offset = HZ * 2;
-        mod_timer(&wx->service_timer, next_event_offset + jiffies);
-        wx_service_event_schedule(wx);
-}
-```
+## PHASE 3: GIT HISTORY INVESTIGATION
 
-In the old code, after `cancel_work_sync()` returns, the timer fires and
-both re-arms itself AND queues new work. That work then runs during or
-after device teardown.
+### Step 3.1: Blame
+- `of_get_ethdev_address()` call was introduced by commit 9ca01b25dffffe
+  ("ethernet: use of_get_ethdev_address()") in v5.16
+- The original MAC address reading pattern has been present since commit
+  8cc3e439ab9207 (2013)
+- The nvmem path in `of_get_mac_address()` was present since ~v5.0
+  (`of_get_mac_address_nvmem()`)
+- Bug has been present since v5.16 when mvneta switched to
+  `of_get_ethdev_address()`
 
-**Step 2.4: Fix Quality**
-The fix is obviously correct: stop the timer first (via
-`unregister_netdev` calling `.ndo_stop`), prevent re-arming
-(`timer_shutdown_sync`), then cancel remaining work
-(`cancel_work_sync`). Very low regression risk.
+### Step 3.2: Fixes Tag
+No Fixes: tag present. The implicit "fixes" target would be
+9ca01b25dffffe (v5.16) which exists in all active stable trees (6.1,
+6.6, 6.12).
 
-## PHASE 3: GIT HISTORY
+### Step 3.3: Related Changes
+The author (Rosen Penev) has been systematically fixing this same
+pattern across drivers:
+- `b2d9544070d05` "net: gianfar: fix NVMEM mac address" (v6.12)
+- `2575897640328` "net: ucc_geth: fix usage with NVMEM MAC address"
+  (v6.13)
+- `be04024a24a93` "net: ag71xx: support probe deferral for getting MAC
+  address"
 
-**Step 3.1: Blame**
-- `cancel_work_sync` in `txgbe_remove` was added by `343929799ace12`
-  (v6.16, 2025-05-21) as part of AML GPIO IRQ support
-- `cancel_work_sync` in `wxvf_remove` was added by `bf68010acc4bc8`
-  (v6.17, 2025-07-04) as part of VF driver addition
-- `timer_delete_sync` in `.ndo_stop` paths has existed since the timer
-  mechanism was added
+This mvneta fix is standalone and does not depend on other patches.
 
-**Step 3.2: Fixes tag** - No Fixes: tag present.
+### Step 3.4: Author
+Rosen Penev is a regular contributor with multiple accepted patches in
+the networking subsystem, especially around nvmem MAC address handling.
+Not the subsystem maintainer but an experienced contributor.
 
-**Step 3.3: File History** - Both files have recent activity (feature
-additions), but `txgbe_remove()` structure has been stable since v6.0.
+### Step 3.5: Dependencies
+No dependencies. The fix uses existing infrastructure
+(`of_get_ethdev_address()` and error labels already in the function).
+Applies standalone.
 
-**Step 3.4: Author** - Jiawen Wu is the primary wangxun/txgbe driver
-developer with 15+ commits to this subsystem. This is the domain expert.
+---
 
-**Step 3.5: Dependencies** - `timer_shutdown_sync()` was added in v6.10
-(`f571faf6e443b`), available in all relevant stable trees. The patch
-applies standalone - no other patches needed.
+## PHASE 4: MAILING LIST AND EXTERNAL RESEARCH
 
-## PHASE 4: MAILING LIST RESEARCH
+### Step 4.1-4.5
+b4 dig did not find the submission. Lore was blocked by Anubis anti-
+scraping. However, the commit metadata is clear:
+- Reviewed by Simon Horman (experienced networking reviewer)
+- Accepted by Jakub Kicinski (netdev maintainer)
+- This is part of an established series by the same author fixing the
+  same pattern in multiple drivers
 
-**Step 4.1-4.2:** b4 dig confirmed the related commit `343929799ace12`
-was reviewed by Simon Horman and accepted by Paolo Abeni. The current
-commit was accepted by Jakub Kicinski. The patch is part 7 of a series
-(from message-id `33652-7`), but this specific fix is self-contained -
-it only changes the ordering of existing calls.
-
-**Step 4.3-4.5:** Lore is behind anti-bot protection; could not fetch
-discussion thread directly.
+---
 
 ## PHASE 5: CODE SEMANTIC ANALYSIS
 
-**Step 5.1-5.2:** Functions modified are `wxvf_remove()` and
-`txgbe_remove()` - PCI remove callbacks. They are called by the PCI
-subsystem during device removal (driver unload, device hot-unplug,
-system shutdown).
+### Step 5.1: Key Functions
+- `mvneta_probe()` - the sole modified function
 
-**Step 5.3-5.4:** The work function `txgbe_service_task()` /
-`wxvf_service_task()` accesses device state (link detection, SFP
-identification, reset subtasks). Running this work after device teardown
-begins can access freed resources.
+### Step 5.2: Callers
+`mvneta_probe()` is called by the platform driver framework during
+device enumeration. This is a standard probe path for all Marvell NETA
+Ethernet controllers.
 
-**Step 5.5:** The same pattern (`timer_delete_sync` + `cancel_work_sync`
-in error paths) exists in `txgbevf` and `ngbevf` probe error paths, but
-those are before the timer/work are active so the order is less
-critical.
+### Step 5.3-5.4: Call Chain
+`of_get_ethdev_address()` -> `of_get_mac_address()` ->
+`of_get_mac_address_nvmem()` -> `of_nvmem_cell_get()` which returns
+`-EPROBE_DEFER` when the nvmem provider hasn't been loaded yet. This is
+a standard Linux device model flow.
 
-## PHASE 6: STABLE TREE ANALYSIS
+### Step 5.5: Similar Patterns
+Multiple other drivers handle this pattern correctly:
+- `drivers/net/ethernet/mediatek/mtk_eth_soc.c` - handles EPROBE_DEFER
+- `drivers/net/ethernet/freescale/ucc_geth.c` - handles EPROBE_DEFER
+- `drivers/net/ethernet/cadence/macb_main.c` - handles EPROBE_DEFER
+- `drivers/net/ethernet/airoha/airoha_eth.c` - handles EPROBE_DEFER
 
-**Step 6.1:**
-- The `cancel_work_sync` in `txgbe_remove` exists since v6.16 (stable
-  6.16.y affected)
-- `wxvf_remove` exists since v6.17 (stable 6.17.y+ affected)
-- Earlier stable trees (6.12.y, 6.6.y, etc.) don't have the buggy code
+mvneta was an outlier in NOT handling it.
 
-**Step 6.2:** The patch should apply cleanly to 6.16.y and later. The
-`timer_shutdown_sync` API is available since v6.10.
+---
 
-**Step 6.3:** No related fixes already in stable.
+## PHASE 6: CROSS-REFERENCING AND STABLE TREE ANALYSIS
 
-## PHASE 7: SUBSYSTEM CONTEXT
+### Step 6.1: Buggy Code in Stable
+The `of_get_ethdev_address()` call in mvneta was introduced in v5.16
+(commit 9ca01b25dffffe). All active stable trees (6.1.y, 6.6.y, 6.12.y)
+contain this buggy code.
 
-**Step 7.1:** Network driver (PERIPHERAL criticality) - affects Wangxun
-10G/25G/40G NIC users.
+### Step 6.2: Backport Complications
+The fix is very small (3 lines) and only uses existing infrastructure.
+The error cleanup chain structure has been stable since 2022. Expected
+to apply cleanly.
 
-**Step 7.2:** Actively developed subsystem with recent feature
-additions.
+### Step 6.3: Related Fixes Already in Stable
+No prior fix for this specific issue in mvneta.
+
+---
+
+## PHASE 7: SUBSYSTEM AND MAINTAINER CONTEXT
+
+### Step 7.1: Subsystem
+- **Subsystem**: Network drivers (drivers/net/ethernet/marvell/)
+- **Criticality**: IMPORTANT - Marvell NETA is a widely used Ethernet
+  controller in Armada SoCs, common in embedded/networking appliances
+  (routers, NAS devices, network gateways)
+
+### Step 7.2: Subsystem Activity
+The mvneta driver is actively maintained with regular updates.
+
+---
 
 ## PHASE 8: IMPACT AND RISK ASSESSMENT
 
-**Step 8.1:** Affects users of Wangxun NICs (txgbe and txgbevf drivers).
+### Step 8.1: Who Is Affected
+Users with Marvell NETA Ethernet controllers whose MAC address is stored
+in nvmem (common in embedded devices). These are typically ARM-based
+platforms.
 
-**Step 8.2:** Trigger: device removal (driver unload, PCI hot-unplug,
-system shutdown). Common operation when managing network devices, though
-not a frequent hot path.
+### Step 8.2: Trigger Conditions
+Triggered when:
+- Device tree specifies MAC in nvmem (common configuration)
+- nvmem driver loads after mvneta driver (depends on module load order,
+  kernel config)
+- This is a real-world scenario, especially on systems with complex
+  device tree dependencies
 
-**Step 8.3:** Failure mode: Work task runs during/after device teardown.
-This can lead to use-after-free, accessing freed memory, or other
-undefined behavior. Severity: **HIGH** (potential UAF, crash during
-device removal).
+### Step 8.3: Failure Mode Severity
+- **Without fix**: Random MAC address assigned, networking may break
+  (DHCP gets new IP, static configs fail, MAC-based filtering fails)
+- **Severity**: HIGH for affected users - unstable MAC address across
+  reboots can cause network connectivity failures and operational issues
+  in embedded deployments
+- Not a crash, but a functional correctness issue with real-world impact
 
-**Step 8.4:**
-- BENEFIT: Prevents potential crash/UAF during device removal - medium-
-  high (device removal is common operation)
-- RISK: Very low - 7 lines, just reordering existing operations + adding
-  belt-and-suspenders `timer_shutdown_sync`
-- Ratio: Clearly favorable
+### Step 8.4: Risk-Benefit Ratio
+- **Benefit**: HIGH - restores correct MAC address behavior for embedded
+  users
+- **Risk**: VERY LOW - 3-line change, follows established pattern,
+  proper cleanup
+- **Ratio**: Strongly favorable
+
+---
 
 ## PHASE 9: FINAL SYNTHESIS
 
-**Evidence FOR:**
-- Fixes a real race condition (timer re-queuing work after cancellation)
-- Potential UAF/crash during device removal
-- Small, surgical fix (7 lines across 2 files)
-- Obviously correct - proper ordering of timer stop -> timer shutdown ->
-  work cancel
-- Written by the subsystem's primary developer
-- Accepted by net maintainer (Jakub Kicinski)
-- No dependencies on other patches
-- `timer_shutdown_sync` API available in all relevant stable trees
+### Step 9.1: Evidence Summary
 
-**Evidence AGAINST:**
-- No Reported-by (bug was found by code inspection, not user report)
-- Only affects newer stable trees (6.16.y+)
-- Device removal race may be hard to trigger in practice (small race
-  window)
+**FOR backporting:**
+- Fixes a real functional bug (wrong MAC address assignment)
+- Tiny change: 3 lines added
+- Follows an established pattern already used by 4+ other drivers
+- Same author has had identical fixes accepted in other drivers
+- Reviewed by Simon Horman, committed by Jakub Kicinski
+- Affects all stable trees (6.1+)
+- No dependencies, standalone fix
+- Proper cleanup path (no resource leaks)
+- Real-world impact on embedded/ARM devices using nvmem for MAC storage
 
-**Stable Rules Checklist:**
-1. Obviously correct? YES - proper ordering of teardown operations
-2. Fixes a real bug? YES - race condition in device removal
-3. Important issue? YES - potential UAF/crash
-4. Small and contained? YES - 7 lines, 2 files, same subsystem
-5. No new features? CORRECT - no new features
-6. Applies to stable? YES - for 6.16.y+ (txgbe) and 6.17.y+ (wxvf)
+**AGAINST backporting:**
+- Not a crash, security, or data corruption issue
+- Affects a specific hardware platform (Marvell NETA SoCs with nvmem
+  MAC)
+- Could be seen as "enabling a feature" (nvmem MAC support), but nvmem
+  support has been present since v5.0 - this just fixes the error
+  handling
 
-**Verification:**
-- [Phase 1] Parsed tags: Signed-off-by Jakub Kicinski (net maintainer),
-  Link to message-id
-- [Phase 2] Diff analysis: Reorders cancel_work_sync after
-  unregister_netdev, adds timer_shutdown_sync in wxvf_remove and
-  txgbe_remove
-- [Phase 2] Verified wx_service_timer() re-arms via mod_timer AND queues
-  work - confirms the race
-- [Phase 3] git blame: cancel_work_sync in txgbe_remove from
-  343929799ace12 (v6.16), wxvf_remove from bf68010acc4bc8 (v6.17)
-- [Phase 3] git tag --contains: confirmed affected stable trees are
-  6.16.y+ (txgbe) and 6.17.y+ (wxvf)
-- [Phase 3] git tag --contains f571faf6e443b: timer_shutdown_sync
-  available since v6.10
-- [Phase 4] b4 dig -c 343929799ace12: found original submission reviewed
-  by Simon Horman
-- [Phase 5] Verified work task wxvf_service_task/txgbe_service_task
-  accesses device state
-- [Phase 5] Verified txgbe_close → txgbe_down → txgbe_disable_device
-  calls timer_delete_sync (line 230)
-- [Phase 6] Confirmed buggy code only in 6.16.y+ for txgbe, 6.17.y+ for
-  wxvf
-- [Phase 8] Failure mode: work runs during teardown → potential UAF,
-  severity HIGH
-- UNVERIFIED: Could not access lore thread for the specific commit due
-  to anti-bot protection
+### Step 9.2: Stable Rules Checklist
+1. Obviously correct and tested? **YES** - trivial pattern, reviewed by
+   expert
+2. Fixes a real bug? **YES** - wrong MAC address when nvmem loads late
+3. Important issue? **YES** - networking breaks with wrong MAC
+4. Small and contained? **YES** - 3 lines, 1 file
+5. No new features? **CORRECT** - this enables existing nvmem MAC
+   feature to work correctly
+6. Can apply to stable? **YES** - no dependencies, clean apply expected
+
+### Step 9.3: Exception Categories
+Not strictly an exception category, but this is a straightforward
+correctness fix.
+
+### Step 9.4: Decision
+This is a small, obviously correct fix for a real functional bug. It
+follows an established pattern already used in multiple other drivers.
+The risk is minimal and the benefit is significant for embedded users
+with Marvell NETA hardware using nvmem MAC addresses.
+
+---
+
+## Verification
+
+- [Phase 1] Parsed tags: Reviewed-by Simon Horman, signed by Jakub
+  Kicinski. No Fixes: tag (expected).
+- [Phase 2] Diff analysis: 3 lines added - 2 lines for EPROBE_DEFER
+  check, 1 err_free_stats label in mvneta_probe()
+- [Phase 3] git blame: `of_get_ethdev_address()` call introduced by
+  9ca01b25dffffe (v5.16), present in all active stable trees
+- [Phase 3] git log author: Rosen Penev has multiple identical fixes
+  accepted (ucc_geth v6.13, gianfar v6.12)
+- [Phase 3] File history: no prerequisites or conflicts identified
+- [Phase 4] b4 dig: could not find match; lore blocked by Anubis
+- [Phase 5] Grep for similar patterns: confirmed 4+ other drivers handle
+  EPROBE_DEFER from of_get_ethdev_address() correctly (macb, ucc_geth,
+  airoha, mtk_eth_soc)
+- [Phase 5] of_get_ethdev_address() -> of_get_mac_address() ->
+  of_get_mac_address_nvmem() can return -EPROBE_DEFER (verified in
+  net/core/of_net.c lines 61-97, 126-147, 162-171)
+- [Phase 6] Code exists in all active stable trees (6.1+), verified via
+  git describe --contains for 9ca01b25dffffe (v5.16-rc1)
+- [Phase 6] Expected clean apply - fix uses only existing error labels
+  and infrastructure
+- [Phase 7] mvneta is a widely-used Marvell Armada SoC ethernet driver
+- [Phase 8] Failure mode: random MAC assignment instead of correct nvmem
+  MAC, severity HIGH for embedded users
+- UNVERIFIED: Could not access mailing list discussion due to Anubis
+  blocking
 
 **YES**
 
- drivers/net/ethernet/wangxun/libwx/wx_vf_common.c | 3 ++-
- drivers/net/ethernet/wangxun/txgbe/txgbe_main.c   | 5 +++--
- 2 files changed, 5 insertions(+), 3 deletions(-)
+ drivers/net/ethernet/marvell/mvneta.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_vf_common.c b/drivers/net/ethernet/wangxun/libwx/wx_vf_common.c
-index ade2bfe563aaa..e8a14aa066c69 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_vf_common.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_vf_common.c
-@@ -48,9 +48,10 @@ void wxvf_remove(struct pci_dev *pdev)
- 	struct wx *wx = pci_get_drvdata(pdev);
- 	struct net_device *netdev;
+diff --git a/drivers/net/ethernet/marvell/mvneta.c b/drivers/net/ethernet/marvell/mvneta.c
+index 9ba4aef7080c0..0c061fb0ed072 100644
+--- a/drivers/net/ethernet/marvell/mvneta.c
++++ b/drivers/net/ethernet/marvell/mvneta.c
+@@ -5620,6 +5620,8 @@ static int mvneta_probe(struct platform_device *pdev)
+ 	}
  
--	cancel_work_sync(&wx->service_task);
- 	netdev = wx->netdev;
- 	unregister_netdev(netdev);
-+	timer_shutdown_sync(&wx->service_timer);
-+	cancel_work_sync(&wx->service_task);
- 	kfree(wx->vfinfo);
- 	kfree(wx->rss_key);
- 	kfree(wx->mac_table);
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-index 0de051450a823..bc51a84d1b143 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-@@ -950,12 +950,13 @@ static void txgbe_remove(struct pci_dev *pdev)
- 	struct txgbe *txgbe = wx->priv;
- 	struct net_device *netdev;
- 
--	cancel_work_sync(&wx->service_task);
--
- 	netdev = wx->netdev;
- 	wx_disable_sriov(wx);
- 	unregister_netdev(netdev);
- 
-+	timer_shutdown_sync(&wx->service_timer);
-+	cancel_work_sync(&wx->service_task);
-+
- 	txgbe_remove_phy(txgbe);
- 	wx_free_isb_resources(wx);
- 
+ 	err = of_get_ethdev_address(dn, dev);
++	if (err == -EPROBE_DEFER)
++		goto err_free_stats;
+ 	if (!err) {
+ 		mac_from = "device tree";
+ 	} else {
+@@ -5755,6 +5757,7 @@ static int mvneta_probe(struct platform_device *pdev)
+ 				       1 << pp->id);
+ 		mvneta_bm_put(pp->bm_priv);
+ 	}
++err_free_stats:
+ 	free_percpu(pp->stats);
+ err_free_ports:
+ 	free_percpu(pp->ports);
 -- 
 2.53.0
 
