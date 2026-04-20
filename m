@@ -1,179 +1,425 @@
-Return-Path: <netdev+bounces-279741-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279754-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AIeMGWYl5mmOsgEAu9opvQ
-	(envelope-from <netdev+bounces-279741-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 15:08:54 +0200
+	id uLmNNxUs5mkDswEAu9opvQ
+	(envelope-from <netdev+bounces-279754-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 15:37:25 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38A2142B42E
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 15:08:54 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63A4242C0FE
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 15:37:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C0902301AA98
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 13:08:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B8DAB329B6B8
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 13:26:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6598839FCD6;
-	Mon, 20 Apr 2026 13:08:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F0AC3C2782;
+	Mon, 20 Apr 2026 13:17:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OGltjTc6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LTqLF4vV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E51513A1692
-	for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 13:08:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE7643C2769;
+	Mon, 20 Apr 2026 13:17:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776690520; cv=none; b=h7I66IwcZNA2HQdRxxiXEbM92beoVAvZDpmgVqz26jlph6PCWq6xv6N4XVHy6Oz6GlZUc9i9LYes8APSZeN8qQgF0jmV5vpzJQ08DgDUYjEWzzbCTLxXPUbY4Q6L/EDoH2cvpFJWRKXJsSkKtHmofI+VVQ80nXL+x64C8k62JO0=
+	t=1776691049; cv=none; b=GQhLg5K5pDE2Trnf5kFMCsPTXSc7Nq7LRuMTrRLD2zwVr1ObB7bElqlscEARSsAMreh6oMyhFSwSPZz9xISIDAbfTaxDHLkOK7M1wUFz8obD9EtTwiuaIb0GH4N2tlJUaBLen6eBrJxxOPNW6BLA1BuLtIHAtn7Wxl5u0ED00jw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776690520; c=relaxed/simple;
-	bh=WfdVss5pRtKxRJBglQrxBTFvd3jpqaaHpT5PTY30qcU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SYaX4Z/5O55IleJztmnOXIfoQSF03vmcx1g75UOv4wsBQ0L2c52ZyMPbGJSQo5BzHc7oVZt+AJA2zo4gOeRmZB/nvQ4dVl6ZoZcHQ7463bqIzTVWbtNhDCoGAzI+b1667f5S4FvgSwdJimDoyJJjiZw8VexbWjbLUm5o4PCerTM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OGltjTc6; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-488b0e1b870so46859465e9.2
-        for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 06:08:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776690517; x=1777295317; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2wEN4jEMCOiQ0Wb/rEfzmY335o62y1i/d8QKlDPNvdc=;
-        b=OGltjTc6So0lhKLVhds0TswoCWFDJLk1RyqcSpCHjngiDSXfD5qOTHXrYL2PTTDpO4
-         v83z+cMlwjEC0txBbh1a2dPjxP8+QpQBw1ra0IcEEaVFjav8uooyRRDJ4kIl8ifz5mZ+
-         0iNp9vcdp2fR9/OHUfh9qEWcj6f7224FKwuHzEjC/xCOLwHlLOca3Asl1iH9YJYWVHg5
-         3fKqSRVvq8ri7c7pvk/zUHTlAfggOHqjCUVBjTqUh0gO2Hinc4TAZ78PrSL0tG//FHFm
-         dmnkWl/uHG9tVclZ2rrwN4bGj9SDXe/mNO0Rv6nDsxLy9yoNA1IJfHCpSTeACMyxlcC/
-         haxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776690517; x=1777295317;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2wEN4jEMCOiQ0Wb/rEfzmY335o62y1i/d8QKlDPNvdc=;
-        b=MuejAdge7hq/rHLgDxDA48AbPl75krK+k/5g9/RUBYPsaB1p0dwg8Mep1CDK4izTqw
-         6crR97ZQfKw35tibG3WnT4CFJA6IrtrG9bqr2egopX3eDNWZENfjry6JaZS5xUIiyFDY
-         kxzfiJPVCcKWqN/kkVZNt9evyMhCHvxHVIH16SYZkpMOqi3T1zfpoL0jyQDgS0wWFJ7d
-         hg36lXsHruL/MTc80KtlVod+kHxYS8GCjGLCXHlf0TVaYdp8GQ4VsEDMJTMXbfaU+nDQ
-         lvZ9yjmeQH32aWvjeovdOigztjAU11M/glnf0RGctzaR74AAshU9zpxxbC8wcxrm02Pe
-         x9/w==
-X-Forwarded-Encrypted: i=1; AFNElJ8b3OljhzK+eWOrvXPIeDAnjV9YaTccgHaZ2wH2s4CCNUL6DoMiEnSx2zKqZjkszd/D5g5oRlo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyVKS2mUtpNZ7ILHpEhAW3duhTc89IHbl9zVzIDsdP2KCtGo5pj
-	rHl7huBFVVp6SCblBnWm5/NFP8DwdXmXAP7if7tyWBL0rtmUuzj6qEQC
-X-Gm-Gg: AeBDietyF6g53jfO0vi5aMcdS1AzwLck2k2UrPZPeak11dWDF8HNGDGMDij4IqFAWuy
-	NY5xryQybYlxCWP9ZPYw/asHGWdLV90pDjkDU4XxHsXu1zSE5BVZxkKVoAgH2+Zqp81dS8lcht3
-	vkaZp+BbgXa41MwtZd8kp06UfXpAmE6TDytfTm54+s7xm5YtxDAxKKbPoOIrI/wsPopxkIm6XA0
-	xbTUBdMOdtHg5OWqmce/f6+Y5BU/CeAt4/74mqOjw6ll2KeHaxcrxFCE/M6g5TcztlfU95yU3nA
-	jl1RcIcKK4m5BjpoMELZjzbHF70QV8RoRsMxvQ2j6KUbbgrQJPyFc6gmpk4soShvjrnwRumGk2N
-	3Jlu3yD7MzRUtJuhCiuHQJ28qDgb+RA0nnNgt5wi+59OGtRzSkhZWfcNBre95jJyJkhjp+E2Fo+
-	dx+kzCmpBJRabjnRcf0phio5uPsITImU/8HFS2L7YOiraafaWCHhFvlc35kB9cw2Kci3Ph1dMBZ
-	4Fq
-X-Received: by 2002:a05:600c:c09c:b0:48a:5363:8cac with SMTP id 5b1f17b1804b1-48a53638e07mr5220075e9.22.1776690517192;
-        Mon, 20 Apr 2026 06:08:37 -0700 (PDT)
-Received: from gmail.com (deskosmtp.auranext.com. [195.134.167.217])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a52583fe7sm21505945e9.13.2026.04.20.06.08.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Apr 2026 06:08:36 -0700 (PDT)
-Date: Mon, 20 Apr 2026 15:08:35 +0200
-From: Mahe Tardy <mahe.tardy@gmail.com>
-To: bot+bpf-ci@kernel.org
-Cc: alexei.starovoitov@gmail.com, andrii@kernel.org, ast@kernel.org,
-	bpf@vger.kernel.org, coreteam@netfilter.org, daniel@iogearbox.net,
-	fw@strlen.de, john.fastabend@gmail.com, lkp@intel.com,
-	martin.lau@linux.dev, netdev@vger.kernel.org,
-	netfilter-devel@vger.kernel.org, oe-kbuild-all@lists.linux.dev,
-	pablo@netfilter.org, martin.lau@kernel.org, eddyz87@gmail.com,
-	yonghong.song@linux.dev, clm@meta.com, ihor.solodrai@linux.dev
-Subject: Re: [PATCH bpf-next v4 4/6] selftests/bpf: add icmp_send_unreach
- kfunc tests
-Message-ID: <aeYlU9r1ZyQ7rcgs@gmail.com>
-References: <20260420105816.72168-5-mahe.tardy@gmail.com>
- <4cfe307cc6b1197fc7bb3a11e79382764ac1d269a42eb4e4ffec9e991e6868e6@mail.kernel.org>
+	s=arc-20240116; t=1776691049; c=relaxed/simple;
+	bh=9aPVkcRuTSgqcTqdXSJQNUbhuhgr30ISjyLMfNdWJGc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=J4B8wZqkuR69hkJhPsZYI84X953c7tnLidjhezkoNdq3UPMblAVVlxrgm0OttQJObYs2GRGTU0vWVsUfhMwFnWytBave+fDI5Gf5qq2vLsX1S4Ny2FEVXonicZd5N68xfhU3FQQqy0OA0s0zg0CpEYZjBhXjcw/vWY0xeDZ0SV8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LTqLF4vV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6AD75C2BCB6;
+	Mon, 20 Apr 2026 13:17:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776691049;
+	bh=9aPVkcRuTSgqcTqdXSJQNUbhuhgr30ISjyLMfNdWJGc=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=LTqLF4vV3/Sne7oYCJWMEG6rfbDUDxx81+X7XczzK5acB16PJOxXj7KI3ngX/2Eqh
+	 PRlTlsRQppYZzv4o0UNC/9ugIwe3oloIiiuOzSOjm87MFgs78B0Oxxaw5snTcEoPvt
+	 8LRL+AYNOO3vql9B3PVZ6cXAubt0atv2VaNgRqUBFcB7dUylrEOXRsgTKFhzGbv4VW
+	 k6sN2hMZ7biEERBwEmj66cFkcb8nVUgnGuQ3miH5wdaCGF8xNSoZNtKtD8G+geT6WK
+	 yReR2BER6bKHaHTkGIxg0HD0Hqyf3gIRgQ0MEkj4Ook+oVAEOfUgYHpSL3pM7WLEta
+	 nmMYUUgFGiZTw==
+From: Sasha Levin <sashal@kernel.org>
+To: patches@lists.linux.dev,
+	stable@vger.kernel.org
+Cc: Florian Westphal <fw@strlen.de>,
+	Scott Mitchell <scott.k.mitch1@gmail.com>,
+	Sasha Levin <sashal@kernel.org>,
+	pablo@netfilter.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.18] netfilter: nfnetlink_queue: make hash table per queue
+Date: Mon, 20 Apr 2026 09:08:50 -0400
+Message-ID: <20260420131539.986432-64-sashal@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260420131539.986432-1-sashal@kernel.org>
+References: <20260420131539.986432-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4cfe307cc6b1197fc7bb3a11e79382764ac1d269a42eb4e4ffec9e991e6868e6@mail.kernel.org>
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.18.23
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FREEMAIL_CC(0.00)[strlen.de,gmail.com,kernel.org,netfilter.org,davemloft.net,google.com,redhat.com,vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-279754-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,vger.kernel.org,netfilter.org,iogearbox.net,strlen.de,intel.com,linux.dev,lists.linux.dev,meta.com];
-	TAGGED_FROM(0.00)[bounces-279741-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mahetardy@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TO_DN_NONE(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,bpf-ci];
-	FREEMAIL_FROM(0.00)[gmail.com]
-X-Rspamd-Queue-Id: 38A2142B42E
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[strlen.de:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 63A4242C0FE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Apr 20, 2026 at 11:36:13AM +0000, bot+bpf-ci@kernel.org wrote:
-> > diff --git a/tools/testing/selftests/bpf/prog_tests/icmp_send_unreach_kfunc.c b/tools/testing/selftests/bpf/prog_tests/icmp_send_unreach_kfunc.c
-> > new file mode 100644
-> > index 000000000000..24d5e01cfe80
-> > --- /dev/null
-> > +++ b/tools/testing/selftests/bpf/prog_tests/icmp_send_unreach_kfunc.c
-> > @@ -0,0 +1,136 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> > +#include <test_progs.h>
-> > +#include <network_helpers.h>
-> > +#include <linux/errqueue.h>
-> > +#include "icmp_send_unreach.skel.h"
-> > +
-> > +#define TIMEOUT_MS 1000
-> > +#define SRV_PORT 54321
-> > +
-> > +#define ICMP_DEST_UNREACH 3
-> > +
-> > +#define ICMP_FRAG_NEEDED 4
-> > +#define NR_ICMP_UNREACH 15
-> 
-> Jordan Rife previously suggested in v3 that these ICMP constants should be
-> imported from <linux/icmp.h> rather than redefined here. Would it be cleaner
-> to include the header and avoid the redefinitions?
+From: Florian Westphal <fw@strlen.de>
 
-Yes it would be cleaner, but looks like I can't do it simply, maybe
-there's a solution, see the answer from the cover-letter:
+[ Upstream commit 936206e3f6ff411581e615e930263d6f8b78df9d ]
 
-to Jordan: I couldn't include <linux/icmp.h> because of redefines from
-<network_helpers.h>.
+Sharing a global hash table among all queues is tempting, but
+it can cause crash:
 
-> 
-> Reference: https://lore.kernel.org/bpf/usz5bhydsiejr37owgt3zypckzh7fa7ygmhsyaaiprsljx7iy5@ipopnr5n4ds7/
-> 
-> [ ... ]
-> 
-> 
-> ---
-> AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-> See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
-> 
-> CI run summary: https://github.com/kernel-patches/bpf/actions/runs/24663313503
+BUG: KASAN: slab-use-after-free in nfqnl_recv_verdict+0x11ac/0x15e0 [nfnetlink_queue]
+[..]
+ nfqnl_recv_verdict+0x11ac/0x15e0 [nfnetlink_queue]
+ nfnetlink_rcv_msg+0x46a/0x930
+ kmem_cache_alloc_node_noprof+0x11e/0x450
+
+struct nf_queue_entry is freed via kfree, but parallel cpu can still
+encounter such an nf_queue_entry when walking the list.
+
+Alternative fix is to free the nf_queue_entry via kfree_rcu() instead,
+but as we have to alloc/free for each skb this will cause more mem
+pressure.
+
+Cc: Scott Mitchell <scott.k.mitch1@gmail.com>
+Fixes: e19079adcd26 ("netfilter: nfnetlink_queue: optimize verdict lookup with hash table")
+Signed-off-by: Florian Westphal <fw@strlen.de>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+
+LLM Generated explanations, may be completely bogus:
+
+Error: Failed to generate final synthesis
+
+ include/net/netfilter/nf_queue.h |   1 -
+ net/netfilter/nfnetlink_queue.c  | 139 +++++++++++--------------------
+ 2 files changed, 49 insertions(+), 91 deletions(-)
+
+diff --git a/include/net/netfilter/nf_queue.h b/include/net/netfilter/nf_queue.h
+index 45eb26b2e95b3..d17035d14d96c 100644
+--- a/include/net/netfilter/nf_queue.h
++++ b/include/net/netfilter/nf_queue.h
+@@ -23,7 +23,6 @@ struct nf_queue_entry {
+ 	struct nf_hook_state	state;
+ 	bool			nf_ct_is_unconfirmed;
+ 	u16			size; /* sizeof(entry) + saved route keys */
+-	u16			queue_num;
+ 
+ 	/* extra space to store route keys */
+ };
+diff --git a/net/netfilter/nfnetlink_queue.c b/net/netfilter/nfnetlink_queue.c
+index a39d3b989063c..fe5942535245d 100644
+--- a/net/netfilter/nfnetlink_queue.c
++++ b/net/netfilter/nfnetlink_queue.c
+@@ -49,8 +49,8 @@
+ #endif
+ 
+ #define NFQNL_QMAX_DEFAULT 1024
+-#define NFQNL_HASH_MIN     1024
+-#define NFQNL_HASH_MAX     1048576
++#define NFQNL_HASH_MIN     8
++#define NFQNL_HASH_MAX     32768
+ 
+ /* We're using struct nlattr which has 16bit nla_len. Note that nla_len
+  * includes the header length. Thus, the maximum packet length that we
+@@ -60,29 +60,10 @@
+  */
+ #define NFQNL_MAX_COPY_RANGE (0xffff - NLA_HDRLEN)
+ 
+-/* Composite key for packet lookup: (net, queue_num, packet_id) */
+-struct nfqnl_packet_key {
+-	possible_net_t net;
+-	u32 packet_id;
+-	u16 queue_num;
+-} __aligned(sizeof(u32));  /* jhash2 requires 32-bit alignment */
+-
+-/* Global rhashtable - one for entire system, all netns */
+-static struct rhashtable nfqnl_packet_map __read_mostly;
+-
+-/* Helper to initialize composite key */
+-static inline void nfqnl_init_key(struct nfqnl_packet_key *key,
+-				  struct net *net, u32 packet_id, u16 queue_num)
+-{
+-	memset(key, 0, sizeof(*key));
+-	write_pnet(&key->net, net);
+-	key->packet_id = packet_id;
+-	key->queue_num = queue_num;
+-}
+-
+ struct nfqnl_instance {
+ 	struct hlist_node hlist;		/* global list of queues */
+-	struct rcu_head rcu;
++	struct rhashtable nfqnl_packet_map;
++	struct rcu_work	rwork;
+ 
+ 	u32 peer_portid;
+ 	unsigned int queue_maxlen;
+@@ -106,6 +87,7 @@ struct nfqnl_instance {
+ 
+ typedef int (*nfqnl_cmpfn)(struct nf_queue_entry *, unsigned long);
+ 
++static struct workqueue_struct *nfq_cleanup_wq __read_mostly;
+ static unsigned int nfnl_queue_net_id __read_mostly;
+ 
+ #define INSTANCE_BUCKETS	16
+@@ -124,34 +106,10 @@ static inline u_int8_t instance_hashfn(u_int16_t queue_num)
+ 	return ((queue_num >> 8) ^ queue_num) % INSTANCE_BUCKETS;
+ }
+ 
+-/* Extract composite key from nf_queue_entry for hashing */
+-static u32 nfqnl_packet_obj_hashfn(const void *data, u32 len, u32 seed)
+-{
+-	const struct nf_queue_entry *entry = data;
+-	struct nfqnl_packet_key key;
+-
+-	nfqnl_init_key(&key, entry->state.net, entry->id, entry->queue_num);
+-
+-	return jhash2((u32 *)&key, sizeof(key) / sizeof(u32), seed);
+-}
+-
+-/* Compare stack-allocated key against entry */
+-static int nfqnl_packet_obj_cmpfn(struct rhashtable_compare_arg *arg,
+-				  const void *obj)
+-{
+-	const struct nfqnl_packet_key *key = arg->key;
+-	const struct nf_queue_entry *entry = obj;
+-
+-	return !net_eq(entry->state.net, read_pnet(&key->net)) ||
+-	       entry->queue_num != key->queue_num ||
+-	       entry->id != key->packet_id;
+-}
+-
+ static const struct rhashtable_params nfqnl_rhashtable_params = {
+ 	.head_offset = offsetof(struct nf_queue_entry, hash_node),
+-	.key_len = sizeof(struct nfqnl_packet_key),
+-	.obj_hashfn = nfqnl_packet_obj_hashfn,
+-	.obj_cmpfn = nfqnl_packet_obj_cmpfn,
++	.key_offset = offsetof(struct nf_queue_entry, id),
++	.key_len = sizeof(u32),
+ 	.automatic_shrinking = true,
+ 	.min_size = NFQNL_HASH_MIN,
+ 	.max_size = NFQNL_HASH_MAX,
+@@ -190,6 +148,10 @@ instance_create(struct nfnl_queue_net *q, u_int16_t queue_num, u32 portid)
+ 	spin_lock_init(&inst->lock);
+ 	INIT_LIST_HEAD(&inst->queue_list);
+ 
++	err = rhashtable_init(&inst->nfqnl_packet_map, &nfqnl_rhashtable_params);
++	if (err < 0)
++		goto out_free;
++
+ 	spin_lock(&q->instances_lock);
+ 	if (instance_lookup(q, queue_num)) {
+ 		err = -EEXIST;
+@@ -210,6 +172,8 @@ instance_create(struct nfnl_queue_net *q, u_int16_t queue_num, u32 portid)
+ 
+ out_unlock:
+ 	spin_unlock(&q->instances_lock);
++	rhashtable_destroy(&inst->nfqnl_packet_map);
++out_free:
+ 	kfree(inst);
+ 	return ERR_PTR(err);
+ }
+@@ -217,15 +181,18 @@ instance_create(struct nfnl_queue_net *q, u_int16_t queue_num, u32 portid)
+ static void nfqnl_flush(struct nfqnl_instance *queue, nfqnl_cmpfn cmpfn,
+ 			unsigned long data);
+ 
+-static void
+-instance_destroy_rcu(struct rcu_head *head)
++static void instance_destroy_work(struct work_struct *work)
+ {
+-	struct nfqnl_instance *inst = container_of(head, struct nfqnl_instance,
+-						   rcu);
++	struct nfqnl_instance *inst;
+ 
++	inst = container_of(to_rcu_work(work), struct nfqnl_instance,
++			    rwork);
+ 	rcu_read_lock();
+ 	nfqnl_flush(inst, NULL, 0);
+ 	rcu_read_unlock();
++
++	rhashtable_destroy(&inst->nfqnl_packet_map);
++
+ 	kfree(inst);
+ 	module_put(THIS_MODULE);
+ }
+@@ -234,7 +201,9 @@ static void
+ __instance_destroy(struct nfqnl_instance *inst)
+ {
+ 	hlist_del_rcu(&inst->hlist);
+-	call_rcu(&inst->rcu, instance_destroy_rcu);
++
++	INIT_RCU_WORK(&inst->rwork, instance_destroy_work);
++	queue_rcu_work(nfq_cleanup_wq, &inst->rwork);
+ }
+ 
+ static void
+@@ -250,9 +219,7 @@ __enqueue_entry(struct nfqnl_instance *queue, struct nf_queue_entry *entry)
+ {
+ 	int err;
+ 
+-	entry->queue_num = queue->queue_num;
+-
+-	err = rhashtable_insert_fast(&nfqnl_packet_map, &entry->hash_node,
++	err = rhashtable_insert_fast(&queue->nfqnl_packet_map, &entry->hash_node,
+ 				     nfqnl_rhashtable_params);
+ 	if (unlikely(err))
+ 		return err;
+@@ -266,23 +233,19 @@ __enqueue_entry(struct nfqnl_instance *queue, struct nf_queue_entry *entry)
+ static void
+ __dequeue_entry(struct nfqnl_instance *queue, struct nf_queue_entry *entry)
+ {
+-	rhashtable_remove_fast(&nfqnl_packet_map, &entry->hash_node,
++	rhashtable_remove_fast(&queue->nfqnl_packet_map, &entry->hash_node,
+ 			       nfqnl_rhashtable_params);
+ 	list_del(&entry->list);
+ 	queue->queue_total--;
+ }
+ 
+ static struct nf_queue_entry *
+-find_dequeue_entry(struct nfqnl_instance *queue, unsigned int id,
+-		   struct net *net)
++find_dequeue_entry(struct nfqnl_instance *queue, unsigned int id)
+ {
+-	struct nfqnl_packet_key key;
+ 	struct nf_queue_entry *entry;
+ 
+-	nfqnl_init_key(&key, net, id, queue->queue_num);
+-
+ 	spin_lock_bh(&queue->lock);
+-	entry = rhashtable_lookup_fast(&nfqnl_packet_map, &key,
++	entry = rhashtable_lookup_fast(&queue->nfqnl_packet_map, &id,
+ 				       nfqnl_rhashtable_params);
+ 
+ 	if (entry)
+@@ -1531,7 +1494,7 @@ static int nfqnl_recv_verdict(struct sk_buff *skb, const struct nfnl_info *info,
+ 
+ 	verdict = ntohl(vhdr->verdict);
+ 
+-	entry = find_dequeue_entry(queue, ntohl(vhdr->id), info->net);
++	entry = find_dequeue_entry(queue, ntohl(vhdr->id));
+ 	if (entry == NULL)
+ 		return -ENOENT;
+ 
+@@ -1880,40 +1843,38 @@ static int __init nfnetlink_queue_init(void)
+ {
+ 	int status;
+ 
+-	status = rhashtable_init(&nfqnl_packet_map, &nfqnl_rhashtable_params);
+-	if (status < 0)
+-		return status;
++	nfq_cleanup_wq = alloc_ordered_workqueue("nfq_workqueue", 0);
++	if (!nfq_cleanup_wq)
++		return -ENOMEM;
+ 
+ 	status = register_pernet_subsys(&nfnl_queue_net_ops);
+-	if (status < 0) {
+-		pr_err("failed to register pernet ops\n");
+-		goto cleanup_rhashtable;
+-	}
++	if (status < 0)
++		goto cleanup_pernet_subsys;
+ 
+-	netlink_register_notifier(&nfqnl_rtnl_notifier);
+-	status = nfnetlink_subsys_register(&nfqnl_subsys);
+-	if (status < 0) {
+-		pr_err("failed to create netlink socket\n");
+-		goto cleanup_netlink_notifier;
+-	}
++	status = netlink_register_notifier(&nfqnl_rtnl_notifier);
++	if (status < 0)
++	       goto cleanup_rtnl_notifier;
+ 
+ 	status = register_netdevice_notifier(&nfqnl_dev_notifier);
+-	if (status < 0) {
+-		pr_err("failed to register netdevice notifier\n");
+-		goto cleanup_netlink_subsys;
+-	}
++	if (status < 0)
++		goto cleanup_dev_notifier;
++
++	status = nfnetlink_subsys_register(&nfqnl_subsys);
++	if (status < 0)
++		goto cleanup_nfqnl_subsys;
+ 
+ 	nf_register_queue_handler(&nfqh);
+ 
+ 	return status;
+ 
+-cleanup_netlink_subsys:
+-	nfnetlink_subsys_unregister(&nfqnl_subsys);
+-cleanup_netlink_notifier:
++cleanup_nfqnl_subsys:
++	unregister_netdevice_notifier(&nfqnl_dev_notifier);
++cleanup_dev_notifier:
+ 	netlink_unregister_notifier(&nfqnl_rtnl_notifier);
++cleanup_rtnl_notifier:
+ 	unregister_pernet_subsys(&nfnl_queue_net_ops);
+-cleanup_rhashtable:
+-	rhashtable_destroy(&nfqnl_packet_map);
++cleanup_pernet_subsys:
++	destroy_workqueue(nfq_cleanup_wq);
+ 	return status;
+ }
+ 
+@@ -1924,9 +1885,7 @@ static void __exit nfnetlink_queue_fini(void)
+ 	nfnetlink_subsys_unregister(&nfqnl_subsys);
+ 	netlink_unregister_notifier(&nfqnl_rtnl_notifier);
+ 	unregister_pernet_subsys(&nfnl_queue_net_ops);
+-
+-	rhashtable_destroy(&nfqnl_packet_map);
+-
++	destroy_workqueue(nfq_cleanup_wq);
+ 	rcu_barrier(); /* Wait for completion of call_rcu()'s */
+ }
+ 
+-- 
+2.53.0
 
 
