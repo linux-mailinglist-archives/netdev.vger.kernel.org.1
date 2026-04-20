@@ -1,84 +1,62 @@
-Return-Path: <netdev+bounces-279884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279885-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6FT0HuBi5mmavgEAu9opvQ
-	(envelope-from <netdev+bounces-279884-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 19:31:12 +0200
+	id sARsIEVt5mmBwAEAu9opvQ
+	(envelope-from <netdev+bounces-279885-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 20:15:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B6B543152D
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 19:31:11 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FBE04329D8
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 20:15:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C7E7E30394CC
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 17:25:09 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 57D63301E3EB
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 17:37:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CF2A3A3E82;
-	Mon, 20 Apr 2026 17:25:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35E623A6EFA;
+	Mon, 20 Apr 2026 17:37:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b="qJQQ/vam"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LnyggAXE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.ssi.bg (mx.ssi.bg [193.238.174.39])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C55A63A4F5E;
-	Mon, 20 Apr 2026 17:25:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.238.174.39
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D8B43A6EE1;
+	Mon, 20 Apr 2026 17:37:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776705904; cv=none; b=KkYanUOsSEtqRDUtq0qQcOs5mu2VVTmNtGGUaIPeoaFSrIixEFnlAJUvkVQZk0/LXWwdygqsZAGSWgO8zNci3+Z2u1uk/B1A9FRmK3GSfUhEWsuiKtCCAb6T2LLlTjOfzgPKpfKjJF9CFwwpmnHIlW3qIXI86H6UrzU3fczexQY=
+	t=1776706637; cv=none; b=KX+rOmVKZitOdZPbPLHaloJZgsmv8eMQ70G18gHOAbJI5FI5+YSDzONgEIn+vmqSSakvwjAEeFpP9kkIe5r/ZtgWBz0Tm7PcZehDKorseh/op3JMHdce0JF1dLwCrvuV5qPFBfRKSqMHL4z87SnxroFmB1WP/HJKpIRCeu+MKig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776705904; c=relaxed/simple;
-	bh=TkNIMoXK/7emKBB+Tva2Xpc9OFl608h0/Yc1KdtCpGM=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=QcgSFuQXN+sKxMjcAN+UdW6zFmhUMML0JJo9P/bC8CNjIAZpGXgL/V0b0B8fCykqtwfM7ZcamvqWSZUn9q5o0JQ0mSkx4N3yfQXXNcFz6H/3buI5/y5Iyg+J4RouXUHO0vThAfYek2bn2GJdag/nk0qtBO0HEQMNSSuL7Vbm5QU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=qJQQ/vam; arc=none smtp.client-ip=193.238.174.39
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ssi.bg
-Received: from mx.ssi.bg (localhost [127.0.0.1])
-	by mx.ssi.bg (Potsfix) with ESMTP id 8B017210DF;
-	Mon, 20 Apr 2026 20:25:00 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ssi.bg; h=cc:cc
-	:content-type:content-type:date:from:from:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=ssi;
-	 bh=Eu2bW7WNFuuIEdpLyNA9bfyD9Dbu8t5W3z4YwWtWRb0=; b=qJQQ/vamjJmZ
-	9N0AtKyV5TiaHgZDQRFQjblchPX/WtlLaWBUSeEW/neOR5MkuLj/yynqjz6HXdtn
-	HlmjlqFbZ1pbqAgHxaL4hJZ/gP5fsxHfCnb67sapamieNieade8Gfs1VjhW4+mwq
-	cHQs333YT8fjZRWwtv46303UB4w1XJg+l++R6vP/z5DgFi+tSoZAxD4borkv6hON
-	wddv++UPU1e7fwz2H4NNOtmE8kR3bsJycXv+9XO8esgDgDxMkaFvkPwGBKCZjlw+
-	EIaoI5QvOZ/AV/Tsqd3aEltcRjO0gc7qWaf4ps2Nq5Lax5Hbcx1btp64wDPEZ7+f
-	HJEr7L6yZHgwGXgnrrSSjtAqHhhM0rlCGXkvc0dhqdvapA7IHxCh9fCgnfMWc4Ku
-	aYfpq0I56jkaiqw3tCp3NCWyWKNNekolONb6xySqF0OxKtPPw3h1xgnoK46sfnh3
-	53FR+neWI6Pu6NWjJt8fgsi84u7ux7ZfEX+gfk5yLGF2z4FLZRWugRy9Ib4qZJf3
-	+XYcAT2l/zwTQ0j3FNBh2+ca7pTs1lFbzqqu453eJwsZ9BndxVAUT6mBh3DoTOH4
-	qM/Qn0vFEoehkFKtJuploMnD4e0hLk3DPPB8OqwKafZ1fpU4oX/tE6PbdjoPLBTT
-	lkhA4YrQWbmFJ1X6T0N00onwqnn8Vto=
-Received: from box.ssi.bg (box.ssi.bg [193.238.174.46])
-	by mx.ssi.bg (Potsfix) with ESMTPS;
-	Mon, 20 Apr 2026 20:24:59 +0300 (EEST)
-Received: from ja.ssi.bg (unknown [213.16.62.126])
-	by box.ssi.bg (Potsfix) with ESMTPSA id C6959628C8;
-	Mon, 20 Apr 2026 20:24:57 +0300 (EEST)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by ja.ssi.bg (8.18.1/8.18.1) with ESMTP id 63KHOuZV088012;
-	Mon, 20 Apr 2026 20:24:56 +0300
-Date: Mon, 20 Apr 2026 20:24:56 +0300 (EEST)
-From: Julian Anastasov <ja@ssi.bg>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-cc: Waiman Long <longman@redhat.com>, Simon Horman <horms@verge.net.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
-        Frederic Weisbecker <frederic@kernel.org>,
-        Chen Ridong <chenridong@huawei.com>, Phil Auld <pauld@redhat.com>,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        lvs-devel@vger.kernel.org, netfilter-devel@vger.kernel.org,
-        coreteam@netfilter.org, sheviks <sheviks@gmail.com>
-Subject: Re: [PATCH-next v2 0/2] ipvs: Fix incorrect use of HK_TYPE_KTHREAD
- housekeeping cpumask
-In-Reply-To: <ac_OscBPYRwt73ic@lemonverbena>
-Message-ID: <097db82c-c9d1-4532-694a-b7ecbdd67532@ssi.bg>
-References: <20260331165015.2777765-1-longman@redhat.com> <cd9afe18-9862-6005-f7d9-d69425b7d4cf@ssi.bg> <ac_OscBPYRwt73ic@lemonverbena>
+	s=arc-20240116; t=1776706637; c=relaxed/simple;
+	bh=KqxQbOQ+N7Meg/QYWsIPuGwiBTXOMWIPiL0SLZyZIPQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FG+Oli/oOVM/9If7tadQ/yd7esG7RNf3y2i0aSl1ArovTOCiagohheUkYn6IChQUqw5jbMelN0TvvB6DXnryUbq1lonbgmeIwyRYxvIXSZ8dxaQNyKb2Rx1vlOc79MmdeDdmwC3b1H9wdANTfiimYWYsmOnA33j0Ht0NtM3Q52c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LnyggAXE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10638C19425;
+	Mon, 20 Apr 2026 17:37:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776706636;
+	bh=KqxQbOQ+N7Meg/QYWsIPuGwiBTXOMWIPiL0SLZyZIPQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=LnyggAXEOE94OSoiZ8rJ9sL0ZIF+z07SCfya9KwB4IJ7ny8X2aJH1NFAjHvb8kDl3
+	 +dWo6HL+VitOlSfSJHXNx6rOLYQZ3ya6/SZTmOpO0t5Sf7K9naWthJJ+UmumlSff9f
+	 taWGArtQ2Qtv0sHC66v5a5EZysgtE0NXJrxoTO8MJwF+W56ZmnkhYqF/FoKkrkYJ9J
+	 oBjC+m8q7OsDC8BhFNsEXsjoDL3vayy6V2kLGDEPSnlydhTdymHEdxvtCm3F6uC2zo
+	 TTn5lu0Mhq9urnpwJuBs3RS0a0fsvvWc7DD0QPEbEMWJbtmTNOnf1vFXNvYUgH28JO
+	 MHvKu0t51YbAA==
+Date: Mon, 20 Apr 2026 10:37:15 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Michael Bommarito <michael.bommarito@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, Kuniyuki Iwashima
+ <kuniyu@google.com>, Kees Cook <kees@kernel.org>, Feng Yang
+ <yangfeng@kylinos.cn>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] netlink: clean up failed initial dump-start
+ state
+Message-ID: <20260420103715.347fbd4a@kernel.org>
+In-Reply-To: <20260420162734.854587-1-michael.bommarito@gmail.com>
+References: <20260420162734.854587-1-michael.bommarito@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,91 +64,156 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ssi.bg,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[ssi.bg:s=ssi];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[redhat.com,verge.net.au,davemloft.net,kernel.org,google.com,strlen.de,nwl.cc,huawei.com,vger.kernel.org,netfilter.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-279884-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,ssi.bg:email,ssi.bg:dkim,ssi.bg:mid];
-	DKIM_TRACE(0.00)[ssi.bg:+];
-	RCPT_COUNT_TWELVE(0.00)[19];
+	TAGGED_FROM(0.00)[bounces-279885-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ja@ssi.bg,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 3B6B543152D
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 7FBE04329D8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+On Mon, 20 Apr 2026 12:27:34 -0400 Michael Bommarito wrote:
+> When __netlink_dump_start() has already installed cb->skb, taken the
+> module reference and set cb_running, a failure from the first
+> netlink_dump(sk, true) call returns via errout_skb without unwinding the
+> callback lifetime. That leaves cb_running set and defers module_put()
+> and consume_skb(cb->skb) until userspace drains the socket or closes it.
 
-	Hello,
+On a quick look I can't see which path clears the dump state in case we
+keep failing to allocate an skb. Could you add more info on that?
 
-On Fri, 3 Apr 2026, Pablo Neira Ayuso wrote:
-
-> On Fri, Apr 03, 2026 at 05:15:50PM +0300, Julian Anastasov wrote:
-> > 
-> > 	Hello,
-> > 
-> > On Tue, 31 Mar 2026, Waiman Long wrote:
-> > 
-> > >  v2:
-> > >   - Rebased on top of linux-next
-> > > 
-> > > Since commit 041ee6f3727a ("kthread: Rely on HK_TYPE_DOMAIN for preferred
-> > > affinity management"), the HK_TYPE_KTHREAD housekeeping cpumask may no
-> > > longer be correct in showing the actual CPU affinity of kthreads that
-> > > have no predefined CPU affinity. As the ipvs networking code is still
-> > > using HK_TYPE_KTHREAD, we need to make HK_TYPE_KTHREAD reflect the
-> > > reality.
-> > > 
-> > > This patch series makes HK_TYPE_KTHREAD an alias of HK_TYPE_DOMAIN
-> > > and uses RCU to protect access to the HK_TYPE_KTHREAD housekeeping
-> > > cpumask.
-> > > 
-> > > Waiman Long (2):
-> > >   sched/isolation: Make HK_TYPE_KTHREAD an alias of HK_TYPE_DOMAIN
-> > >   ipvs: Guard access of HK_TYPE_KTHREAD cpumask with RCU
-> > 
-> > 	The patchset looks good to me for nf-next, thanks!
-> > 
-> > Acked-by: Julian Anastasov <ja@ssi.bg>
-> > 
-> > 	Pablo, Florian, as a bugfix this patchset missed
-> > the chance to be applied before the changes that are in
-> > nf-next in ip_vs.h, there is little fuzz there. If there
-> > is no chance to resolve it somehow, we can apply it
-> > on top of nf-next where it now applies successfully.
+> Share the normal callback teardown in a helper and use it on successful
+> completion and on the initial lock_taken=true failure path. Keep the
+> lock_taken=false continuation path unchanged, because recvmsg()-driven
+> retries legitimately preserve cb_running when they run out of receive
+> room.
 > 
-> One way to handle this is to follow up with nf-next as you suggest,
-> then send a backport that applies cleanly for -stable once it is
-> released.
+> Fixes: 16b304f3404f ("netlink: Eliminate kmalloc in netlink dump operation.")
+> Assisted-by: Claude:claude-opus-4-6
+> Assisted-by: Codex:gpt-5-4
+> Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
+> ---
+> Validation inside a UML guest on current mainline:
 > 
-> Else, let me know if I am misunderstanding.
+>   - An unprivileged local task (uid=65534, no CAP_NET_ADMIN) opens a
+>     plain NETLINK_ROUTE socket, preloads sk_rmem_alloc with echoed
+>     NLMSG_ERROR replies from an unsupported rtnetlink type, then issues
+>     RTM_GETLINK | NLM_F_DUMP | NLM_F_ACK.
+>   - Stock kernel: the initial __netlink_dump_start() hits the rmem gate
+>     and returns via errout_skb with cb_running stuck at 1 until
+>     recvmsg() or close() drives forward progress.
+>   - Patched kernel: the same probe leaves cb_running clear immediately
+>     on the lock_taken=true failure, and the larger-rcvbuf continuation
+>     path (legitimate dump in progress) is unchanged.
+> 
+> A scaling pass on 3500 such wedged sockets in a 256M UML guest shows
+> about 3.8-3.9 MiB of extra unreclaimable slab (/proc/meminfo
+> SUnreclaim) beyond the visible queued rmem on the vulnerable kernel,
+> roughly 1.1 KiB/socket. Real accumulation, but the test hits
+> RLIMIT_NOFILE long before the guest approaches OOM, so this still
+> looks like a local availability cleanup rather than an exhaustion
+> primitive.
 
-	This patchset is now material for the net tree. To help it,
-I just posted patch "ipvs: fix races around est_mutex and est_cpulist"
-that can be applied before this patchset to the net tree.
-Can we get this patchset for the net tree?
+This should be part of the commit message, it's useful to understanding
+the problem. Actually more than the current commit msg TBH.
 
-Regards
+> No Cc: stable@ on the theory that the bug self-heals on
+> recvmsg()/close and the accumulation is mild. Happy to add it and
+> route to net if you'd rather see it backported.
+> 
+>  net/netlink/af_netlink.c | 30 +++++++++++++++++++-----------
+>  1 file changed, 19 insertions(+), 11 deletions(-)
+> 
+> diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
+> index 4d609d5cf406..7019c17e6879 100644
+> --- a/net/netlink/af_netlink.c
+> +++ b/net/netlink/af_netlink.c
+> @@ -2250,6 +2250,20 @@ static int netlink_dump_done(struct netlink_sock *nlk, struct sk_buff *skb,
+>  	return 0;
+>  }
+>  
+> +static void netlink_dump_cleanup(struct netlink_sock *nlk)
+> +{
+> +	struct module *module = nlk->cb.module;
+> +	struct sk_buff *skb = nlk->cb.skb;
+> +
+> +	if (nlk->cb.done)
+> +		nlk->cb.done(&nlk->cb);
+> +
+> +	WRITE_ONCE(nlk->cb_running, false);
+> +	mutex_unlock(&nlk->nl_cb_mutex);
+> +	module_put(module);
+> +	consume_skb(skb);
+> +}
 
---
-Julian Anastasov <ja@ssi.bg>
+It's probably better to create a helper that shares the code with 
+the release path as well. And try not to switch the skb freeing 
+to consume_skb().
 
+>  static int netlink_dump(struct sock *sk, bool lock_taken)
+>  {
+>  	struct netlink_sock *nlk = nlk_sk(sk);
+> @@ -2258,7 +2272,6 @@ static int netlink_dump(struct sock *sk, bool lock_taken)
+>  	struct sk_buff *skb = NULL;
+>  	unsigned int rmem, rcvbuf;
+>  	size_t max_recvmsg_len;
+> -	struct module *module;
+>  	int err = -ENOBUFS;
+>  	int alloc_min_size;
+>  	int alloc_size;
+> @@ -2366,19 +2379,14 @@ static int netlink_dump(struct sock *sk, bool lock_taken)
+>  	else
+>  		__netlink_sendskb(sk, skb);
+>  
+> -	if (cb->done)
+> -		cb->done(cb);
+> -
+> -	WRITE_ONCE(nlk->cb_running, false);
+> -	module = cb->module;
+> -	skb = cb->skb;
+> -	mutex_unlock(&nlk->nl_cb_mutex);
+> -	module_put(module);
+> -	consume_skb(skb);
+> +	netlink_dump_cleanup(nlk);
+>  	return 0;
+>  
+>  errout_skb:
+> -	mutex_unlock(&nlk->nl_cb_mutex);
+> +	if (lock_taken)
+> +		netlink_dump_cleanup(nlk);
+> +	else
+> +		mutex_unlock(&nlk->nl_cb_mutex);
+>  	kfree_skb(skb);
+>  	return err;
+>  }
+
+If you're planning to repost - please wait until tomorrow, we ask that
+revisions are at least 24h apart so that people across the timezones
+have a chance to chime in.
 
