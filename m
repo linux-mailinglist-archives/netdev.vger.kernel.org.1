@@ -1,306 +1,174 @@
-Return-Path: <netdev+bounces-279694-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279696-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WGfjBR7/5Wm0qAEAu9opvQ
-	(envelope-from <netdev+bounces-279694-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 12:25:34 +0200
+	id GokKHD8B5mkvqQEAu9opvQ
+	(envelope-from <netdev+bounces-279696-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 12:34:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41B04429546
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 12:25:32 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id C57784295EC
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 12:34:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A073D30097C5
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 10:25:31 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BEBBD3019806
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 10:34:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 323DC3939D7;
-	Mon, 20 Apr 2026 10:25:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAF84392C5B;
+	Mon, 20 Apr 2026 10:34:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="qaDmmnMp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-m49198.qiye.163.com (mail-m49198.qiye.163.com [45.254.49.198])
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 502E139768F;
-	Mon, 20 Apr 2026 10:25:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.49.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4787F2F260F;
+	Mon, 20 Apr 2026 10:34:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776680731; cv=none; b=FG1yMJOwU9jmGISUz5CFyFwAauHNMkNN0VNUNVy7FCWIlWRX1QkWfhNI891uTCAsFTFzZyrNX/9wJ3s7JptkrTBCr08yYZLICti7swZBb0m9dJFbXOCLBqnXBvafjRW33Fg/p/L8IVOrmQ2Lu2uEtHq+0cvWQbrAcnFQszwqli4=
+	t=1776681275; cv=none; b=hxEqvo/JTHFVF7IsZK8LAvJb9bsd9EtEaFQX06OhvC5Da88SV6+KhihX6w9rxDlJc/K4gDoBxFGebyeFvYGxMDIqz/We8pH9nWzOOpNug9DujuG6qjhzdg/vtm+vhjmRqEPU+oFUth4WQQuYIQC3JonGFc22d877UihMflp2yLU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776680731; c=relaxed/simple;
-	bh=OdSkxh8cqNNtfpHUMw7Smns4E7JVV9AIsG9m6JK+E9s=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=j8rnGiz6YdMmCREpXpM0I7wQkQYpSZZh8HJUPah4fWGcXAbyTDzDsD4k11Crg3K3Xe1GxN6RYfjbGbHieTCwzoZrWeIwOVF/NPAmABglAcRWnp4DfBdxdszbw3kQc2HfqbOK2lbh07oj9X19MHf9Hy0L1POcple/yMokvU86CZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jmu.edu.cn; spf=pass smtp.mailfrom=jmu.edu.cn; arc=none smtp.client-ip=45.254.49.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jmu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jmu.edu.cn
-Received: from Vostro-3710.lan (unknown [119.122.213.236])
-	by smtp.qiye.163.com (Hmail) with ESMTP id 3b6479ff4;
-	Mon, 20 Apr 2026 18:10:01 +0800 (GMT+08:00)
-From: Chukun Pan <amadeus@jmu.edu.cn>
-To: "David S . Miller" <davem@davemloft.net>
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Chukun Pan <amadeus@jmu.edu.cn>
-Subject: [PATCH v2 1/1] net: phy: realtek: Add support for PHY LEDs on RTL8221B
-Date: Mon, 20 Apr 2026 18:08:00 +0800
-Message-Id: <20260420100800.2435204-1-amadeus@jmu.edu.cn>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1776681275; c=relaxed/simple;
+	bh=Ix8P7RnF0Rfhthxt4kOBqZyLHhMN56JNwg+Whyvbb2M=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=bqaDs7mqxqRxMyu70iXaGHNOAxnCngow1c0rJfQvQyUBmsZ+rkdZFJGe8BczA6vSDpXYLWfrcvwOpqYN91dg6fNXxODfFRTVHq++xmSjZ9Q7bj0lzTGsEFqU0FBGJa6ljCwccDKHD16mb6QM1j5xhLi4jMjqA5ooFntqbrTrws8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=qaDmmnMp; arc=none smtp.client-ip=82.195.75.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:Cc:To:Message-Id:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From:
+	Reply-To:Content-ID:Content-Description:In-Reply-To:References;
+	bh=sSyq707cDYongcfhhlIcwCv7VZwPwVTCVWAelVSlF2g=; b=qaDmmnMpCBiLtph6bMABgKqdZt
+	XeeIgYSGHihFmxiSZrpm5tvC+CcL7n66dY98iVzr0KcLWY/3qo3a0vv75iNTOZVejoyanRR6HTHze
+	hn3vGQw83gtsnbT8f7VRXGa0Yb0JO5t5aOdS6aS/gI0VZ30JalR8QPQqdfxeVcD1x9uV3B81aeNe1
+	LK/SdN3Rx1J8LTa7SGG9E/+R+v9C7Hbx+HTxm8IvFHTcdvWXX1KtPshidl74mNy97lWdgD3w4TVzw
+	Fyx1uQjV+tuB1Tnuve4mQIqNhPl/rzVpJSIDmD25lfQ0KYtzWVrNZvgSUWldv0F2bOYARuLBIXLtN
+	Rm4ySZwg==;
+Received: from authenticated user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.96)
+	(envelope-from <leitao@debian.org>)
+	id 1wElxS-0001Sp-1A;
+	Mon, 20 Apr 2026 10:34:26 +0000
+From: Breno Leitao <leitao@debian.org>
+Date: Mon, 20 Apr 2026 03:18:36 -0700
+Subject: [PATCH net] netconsole: avoid out-of-bounds access on empty string
+ in trim_newline()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-HM-Tid: 0a9daa5e51d003a2kunm473b64fa2386f5
-X-HM-MType: 10
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFITzdXWS1ZQUlXWQ8JGhUIEh9ZQVkaH0kYVkpMTk1MHUpLGkxNSlYeHw5VEwETFhoSFy
-	QUDg9ZV1kYEgtZQVlKSkJVSklJVUlKSFVJSE1ZV1kWGg8SFR0UWUFZT0tIVUpLSEpOTE5VSktLVU
-	pCS0tZBg++
-X-Spamd-Result: default: False [4.94 / 15.00];
-	SEM_URIBL(3.50)[jmu.edu.cn:email];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260420-netcons_trim_newline-v1-1-dc35889aeedf@debian.org>
+X-B4-Tracking: v=1; b=H4sIAHv95WkC/yXMQQrCMBAF0KuEv24gpiVoriJSbPzVEZ1KErVQe
+ ndRt2/xFhRmYUE0CzJfUmRSRLNpDNLlqGdaOSEaeOeD67yzypomLX3Ncu+V75sobRvGwNQOu61
+ 3aAwemaPMv3YPZcXhj+U5XJnqN8S6fgDn09WxfQAAAA==
+X-Change-ID: 20260420-netcons_trim_newline-36f6ec3b9820
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Matthew Wood <thepacketgeek@gmail.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ kernel-team@meta.com, stable@vger.kernel.org, 
+ Breno Leitao <leitao@debian.org>
+X-Mailer: b4 0.16-dev-453a6
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1792; i=leitao@debian.org;
+ h=from:subject:message-id; bh=Ix8P7RnF0Rfhthxt4kOBqZyLHhMN56JNwg+Whyvbb2M=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBp5gEtYvbwBxczeM8ah4vitJErTLdkEfq5YVYQI
+ nSI9NF9ZvuJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaeYBLQAKCRA1o5Of/Hh3
+ bSL5D/0WjjJt67VmSp16xhSyQgB0xJRmAu3KIvJPFilkspfyRsL1uDD6JopHm2QZE0NDX5FO5LW
+ YO5i9djcvpAKsyEk5Ml26u9pK3c5ibEqe8yN4U57cW/TnbzxvvVCc5pMb+pUDgHhqhsmfnMlncW
+ b9OMCMpkLF6b84GufiVgU9ILODIbC8u5MFTN+NQdamBtbV3OHJM3boCQY6NBkBKteyqOj09Nuc4
+ VuofA+tLqvEsZ7ZSGSJAipEFBjxuYJWA/KhEFXJb0xyoGfT9eqjQjXpA3hlXz3xzLcVTKZuL1YE
+ RvoQ8k3AJd7fidPLHXX9qXswdIP6rw8Oi6TaPQk/vj7QMy2ajVTtyU0eEe8nm0hDZ7J6fEoC008
+ LMT8z2viLRCtluRkSeD6RCxaK4PyNH03RfEDY9HxRBlw9Re6H48gDG0GOmJQ1knX1TJAHMoByqc
+ AauTNDvZwPsaXeKb7rKB6PaFYyey6qC1xKA6ZmWXQg7o0xKugbWJ4ijaula/c371j0heo0lK/J0
+ ZVyhbHdFJE3l5IeN/T+ULag2mJ98BixKlVf+7V24/Z3d5btDmCeK78dpIgshlj+xxZ7RNrMoE9y
+ GhYymvNjeDx4aKNxraMqD8fIezfUcw5qtkbw/lw58b+dnkZfxjVScpdVvyoX2ksePWLgjcuUjE/
+ oXZ5sKXb3mQdZYw==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
+X-Debian-User: leitao
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[jmu.edu.cn : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
-	BAD_REP_POLICIES(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,redhat.com,kernel.org,google.com,armlinux.org.uk,makrotopia.org,gmail.com,vger.kernel.org,jmu.edu.cn];
-	TAGGED_FROM(0.00)[bounces-279694-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	GREYLIST(0.00)[pass,meta];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[debian.org];
+	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
+	TAGGED_FROM(0.00)[bounces-279696-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[amadeus@jmu.edu.cn,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	R_DKIM_NA(0.00)[];
-	R_SPF_ALLOW(0.00)[+ip6:2600:3c0a:e001:db::/64:c];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[debian.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 41B04429546
+	RCPT_COUNT_SEVEN(0.00)[11];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C57784295EC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Realtek RTL8221B Ethernet PHY supports three LED pins which are used to
-indicate link status and activity. Add netdev trigger support for them.
+trim_newline() unconditionally dereferences s[len - 1] after computing
+len = strnlen(s, maxlen). When the string is empty, len is 0 and the
+expression underflows to s[(size_t)-1], reading (and potentially
+writing) one byte before the buffer.
 
-Signed-off-by: Chukun Pan <amadeus@jmu.edu.cn>
----
-Changes in v2:
-- Invert the LED polarity in led_brightness_set to achieve LED_ON.
-- Link to v1: https://lore.kernel.org/all/20260401100010.3079700-1-amadeus@jmu.edu.cn/
----
- drivers/net/phy/realtek/realtek_main.c | 160 +++++++++++++++++++++++++
- 1 file changed, 160 insertions(+)
+The two callers feed trim_newline() with the result of strscpy() from
+configfs store callbacks (dev_name_store, userdatum_value_store).
+configfs guarantees count >= 1 reaches the callback, but the byte
+itself can be NUL: a userspace write(fd, "\0", 1) leaves the
+destination empty after strscpy() and triggers the underflow. The OOB
+write only fires if the adjacent byte happens to be '\n', so this is
+not a security issue, but the access is undefined behaviour either way.
 
-diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/realtek/realtek_main.c
-index 79c867ef64da..482dd154d479 100644
---- a/drivers/net/phy/realtek/realtek_main.c
-+++ b/drivers/net/phy/realtek/realtek_main.c
-@@ -165,6 +165,18 @@
+This pattern is commonly flagged by LLM-based code reviewers. While it
+is not a security fix, the underlying access is undefined behaviour and
+the change is small and self-contained, so it is a reasonable candidate
+for the stable trees.
+
+Guard the dereference on a non-zero length.
+
+Fixes: ae001dc67907 ("net: netconsole: move newline trimming to function")
+Cc: stable@vger.kernel.org
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+ drivers/net/netconsole.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
+index 3c9acd6e49e86..205384dab89a6 100644
+--- a/drivers/net/netconsole.c
++++ b/drivers/net/netconsole.c
+@@ -497,6 +497,8 @@ static void trim_newline(char *s, size_t maxlen)
+ 	size_t len;
  
- #define RTL8221B_VND2_INSR			0xa4d4
- 
-+#define RTL822X_VND2_LED(x)			(0xd032 + ((x) * 2))
-+#define RTL822X_VND2_LCR_LINK_10		BIT(0)
-+#define RTL822X_VND2_LCR_LINK_100		BIT(1)
-+#define RTL822X_VND2_LCR_LINK_1000		BIT(2)
-+#define RTL822X_VND2_LCR_LINK_2500		BIT(5)
-+
-+#define RTL822X_VND2_LCR6			0xd040
-+#define RTL822X_VND2_LED_ACT(x)			BIT(x)
-+
-+#define RTL822X_VND2_LCR7			0xd044
-+#define RTL822X_VND2_LED_POLAR(x)		BIT(x)
-+
- #define RTL8224_MII_RTCT			0x11
- #define RTL8224_MII_RTCT_ENABLE			BIT(0)
- #define RTL8224_MII_RTCT_PAIR_A			BIT(4)
-@@ -1797,6 +1809,146 @@ static int rtl822xb_c45_read_status(struct phy_device *phydev)
- 	return 0;
+ 	len = strnlen(s, maxlen);
++	if (!len)
++		return;
+ 	if (s[len - 1] == '\n')
+ 		s[len - 1] = '\0';
  }
- 
-+static int rtl822xb_led_brightness_set(struct phy_device *phydev, u8 index,
-+				       enum led_brightness value)
-+{
-+	int ret;
-+
-+	if (index >= RTL8211x_LED_COUNT)
-+		return -EINVAL;
-+
-+	/* clear HW LED setup */
-+	ret = phy_write_mmd(phydev, MDIO_MMD_VEND2,
-+			    RTL822X_VND2_LED(index), 0);
-+	if (ret < 0)
-+		return ret;
-+
-+	/* clear HW LED blink */
-+	ret = phy_clear_bits_mmd(phydev, MDIO_MMD_VEND2,
-+				 RTL822X_VND2_LCR6,
-+				 RTL822X_VND2_LED_ACT(index));
-+	if (ret < 0)
-+		return ret;
-+
-+	if (value != LED_OFF)
-+		return phy_set_bits_mmd(phydev, MDIO_MMD_VEND2,
-+					RTL822X_VND2_LCR7,
-+					RTL822X_VND2_LED_POLAR(index));
-+	else
-+		return phy_clear_bits_mmd(phydev, MDIO_MMD_VEND2,
-+					  RTL822X_VND2_LCR7,
-+					  RTL822X_VND2_LED_POLAR(index));
-+}
-+
-+static int rtl822xb_led_hw_is_supported(struct phy_device *phydev, u8 index,
-+					unsigned long rules)
-+{
-+	const unsigned long  act_mask = BIT(TRIGGER_NETDEV_RX) |
-+					BIT(TRIGGER_NETDEV_TX);
-+
-+	const unsigned long link_mask = BIT(TRIGGER_NETDEV_LINK) |
-+					BIT(TRIGGER_NETDEV_LINK_10) |
-+					BIT(TRIGGER_NETDEV_LINK_100) |
-+					BIT(TRIGGER_NETDEV_LINK_1000) |
-+					BIT(TRIGGER_NETDEV_LINK_2500);
-+
-+	if (index >= RTL8211x_LED_COUNT)
-+		return -EINVAL;
-+
-+	/* Filter out any other unsupported triggers. */
-+	if (rules & ~(link_mask | act_mask))
-+		return -EOPNOTSUPP;
-+
-+	/* RX and TX are not differentiated, they are not possible
-+	 * without combination with a link trigger.
-+	 */
-+	if ((rules & act_mask) && !(rules & link_mask))
-+		return -EOPNOTSUPP;
-+
-+	return 0;
-+}
-+
-+static int rtl822xb_led_hw_control_get(struct phy_device *phydev, u8 index,
-+				       unsigned long *rules)
-+{
-+	int val;
-+
-+	if (index >= RTL8211x_LED_COUNT)
-+		return -EINVAL;
-+
-+	val = phy_read_mmd(phydev, MDIO_MMD_VEND2, RTL822X_VND2_LED(index));
-+	if (val < 0)
-+		return val;
-+
-+	if (val & RTL822X_VND2_LCR_LINK_10)
-+		__set_bit(TRIGGER_NETDEV_LINK_10, rules);
-+
-+	if (val & RTL822X_VND2_LCR_LINK_100)
-+		__set_bit(TRIGGER_NETDEV_LINK_100, rules);
-+
-+	if (val & RTL822X_VND2_LCR_LINK_1000)
-+		__set_bit(TRIGGER_NETDEV_LINK_1000, rules);
-+
-+	if (val & RTL822X_VND2_LCR_LINK_2500)
-+		__set_bit(TRIGGER_NETDEV_LINK_2500, rules);
-+
-+	if ((val & RTL822X_VND2_LCR_LINK_10) &&
-+	    (val & RTL822X_VND2_LCR_LINK_100) &&
-+	    (val & RTL822X_VND2_LCR_LINK_1000) &&
-+	    (val & RTL822X_VND2_LCR_LINK_2500))
-+		__set_bit(TRIGGER_NETDEV_LINK, rules);
-+
-+	val = phy_read_mmd(phydev, MDIO_MMD_VEND2, RTL822X_VND2_LCR6);
-+	if (val < 0)
-+		return val;
-+
-+	if (val & RTL822X_VND2_LED_ACT(index)) {
-+		__set_bit(TRIGGER_NETDEV_RX, rules);
-+		__set_bit(TRIGGER_NETDEV_TX, rules);
-+	}
-+
-+	return 0;
-+}
-+
-+static int rtl822xb_led_hw_control_set(struct phy_device *phydev, u8 index,
-+				       unsigned long rules)
-+{
-+	u16 val = 0;
-+	bool act;
-+	int ret;
-+
-+	if (index >= RTL8211x_LED_COUNT)
-+		return -EINVAL;
-+
-+	if (test_bit(TRIGGER_NETDEV_LINK, &rules) ||
-+	    test_bit(TRIGGER_NETDEV_LINK_10, &rules))
-+		val |= RTL822X_VND2_LCR_LINK_10;
-+
-+	if (test_bit(TRIGGER_NETDEV_LINK, &rules) ||
-+	    test_bit(TRIGGER_NETDEV_LINK_100, &rules))
-+		val |= RTL822X_VND2_LCR_LINK_100;
-+
-+	if (test_bit(TRIGGER_NETDEV_LINK, &rules) ||
-+	    test_bit(TRIGGER_NETDEV_LINK_1000, &rules))
-+		val |= RTL822X_VND2_LCR_LINK_1000;
-+
-+	if (test_bit(TRIGGER_NETDEV_LINK, &rules) ||
-+	    test_bit(TRIGGER_NETDEV_LINK_2500, &rules))
-+		val |= RTL822X_VND2_LCR_LINK_2500;
-+
-+	ret = phy_write_mmd(phydev, MDIO_MMD_VEND2,
-+			    RTL822X_VND2_LED(index), val);
-+	if (ret < 0)
-+		return ret;
-+
-+	act = test_bit(TRIGGER_NETDEV_RX, &rules) ||
-+	      test_bit(TRIGGER_NETDEV_TX, &rules);
-+
-+	return phy_modify_mmd(phydev, MDIO_MMD_VEND2, RTL822X_VND2_LCR6,
-+			      RTL822X_VND2_LED_ACT(index), act ?
-+			      RTL822X_VND2_LED_ACT(index) : 0);
-+}
-+
- static int rtl8224_cable_test_start(struct phy_device *phydev)
- {
- 	u32 val;
-@@ -2565,6 +2717,10 @@ static struct phy_driver realtek_drvs[] = {
- 		.write_page	= rtl821x_write_page,
- 		.read_mmd	= rtl822xb_read_mmd,
- 		.write_mmd	= rtl822xb_write_mmd,
-+		.led_brightness_set = rtl822xb_led_brightness_set,
-+		.led_hw_is_supported = rtl822xb_led_hw_is_supported,
-+		.led_hw_control_get = rtl822xb_led_hw_control_get,
-+		.led_hw_control_set = rtl822xb_led_hw_control_set,
- 	}, {
- 		.match_phy_device = rtl8221b_vm_cg_match_phy_device,
- 		.name		= "RTL8221B-VM-CG 2.5Gbps PHY",
-@@ -2584,6 +2740,10 @@ static struct phy_driver realtek_drvs[] = {
- 		.write_page	= rtl821x_write_page,
- 		.read_mmd	= rtl822xb_read_mmd,
- 		.write_mmd	= rtl822xb_write_mmd,
-+		.led_brightness_set = rtl822xb_led_brightness_set,
-+		.led_hw_is_supported = rtl822xb_led_hw_is_supported,
-+		.led_hw_control_get = rtl822xb_led_hw_control_get,
-+		.led_hw_control_set = rtl822xb_led_hw_control_set,
- 	}, {
- 		.match_phy_device = rtl8251b_c45_match_phy_device,
- 		.name		= "RTL8251B 5Gbps PHY",
--- 
-2.34.1
+
+---
+base-commit: c7275b05bc428c7373d97aa2da02d3a7fa6b9f66
+change-id: 20260420-netcons_trim_newline-36f6ec3b9820
+
+Best regards,
+--  
+Breno Leitao <leitao@debian.org>
 
 
