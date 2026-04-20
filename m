@@ -1,73 +1,65 @@
-Return-Path: <netdev+bounces-279818-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279819-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ODCrAMdR5mlduwEAu9opvQ
-	(envelope-from <netdev+bounces-279818-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 18:18:15 +0200
+	id yAinD1g75mlutgEAu9opvQ
+	(envelope-from <netdev+bounces-279819-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 16:42:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 932D842F486
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 18:18:14 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5F9C42D5B4
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 16:42:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A8BAD330F914
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 14:31:59 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 6737C303EEC4
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 14:33:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 086C14A3400;
-	Mon, 20 Apr 2026 13:32:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3821E4BCAAB;
+	Mon, 20 Apr 2026 13:32:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PPmNAD7T"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SH9Qmr9g"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D203D4A33F8;
-	Mon, 20 Apr 2026 13:32:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12E3C4BC023;
+	Mon, 20 Apr 2026 13:32:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776691966; cv=none; b=mrHrbVt/JVXZ5y6Ln33NWYq3S9uS783slx66lH4EDUThSFSykdxpKL5714SPTWQ//3atlcTfneVxqeuV+OW4iQ51MKOIi6U7/DGzSc4xiiNR/+xVNmVx/51Ky/QsV7EYl7W8oOYMJ0brWjJQKC8Uy2cVdiazsR7QdprGs15RTZA=
+	t=1776691975; cv=none; b=HDdOmSfZ1oqSaO2gInL+bnglqdgCbK4/eTgO/tGPKt2xgXOFDk1tvtP0gX6w3y09xmYnLajGbcwA65nIHvNMwq8hvwQ7yr/iwfOsgdO5yQfWfOtlh3xOB3ROAP/nSOsNgksN2Ty2zLPeCCQQVKXmKlh813US2jjbj9e8kAKTHV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776691966; c=relaxed/simple;
-	bh=DIGKo2zsA17VauZZiZ1xLrJA3DEHB2BiyBYge1MHuEA=;
+	s=arc-20240116; t=1776691975; c=relaxed/simple;
+	bh=QZGRzo0jnTbhPPd+/ZY0zfEDwZtH05XVa3owuElNTLo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ALeaIh8sgATRL39YDfIansLZ3IMykCx571DglxQnaVBAPyWwmYj0+C+FvINYX1bTN90RJ8J7Bo0UYA8eQlMuZ2AYD7z1vlTrzN/MT+zcdZSOB6rZucZcV1sthyAyuTcV5MepYzELHoCJCrzt3FV+5ff1OiZT8QOfaZ/WCmijHWQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PPmNAD7T; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF5D1C2BCB8;
-	Mon, 20 Apr 2026 13:32:44 +0000 (UTC)
+	 MIME-Version; b=IgJRYYlvCwqnxZ0RFjL4rURouQvIT3dGpdEoUGtvTnsV/5MRig1Ga2s47yjrEvVe/IRc3MnMYg+E1CswnNemgBDXTTXpGd8bsXffHPjkKNGxgbT42CHR5jr6zoyePJY0tH3lmzxOnvVoLB43ys8F72/W8Q6NyO23+frUai2ue2o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SH9Qmr9g; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78A9EC19425;
+	Mon, 20 Apr 2026 13:32:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776691966;
-	bh=DIGKo2zsA17VauZZiZ1xLrJA3DEHB2BiyBYge1MHuEA=;
+	s=k20201202; t=1776691974;
+	bh=QZGRzo0jnTbhPPd+/ZY0zfEDwZtH05XVa3owuElNTLo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=PPmNAD7Tkl1tRvmu9fzY98Fea2atYmuiAIqTrOEcozAgJN6ZuLsQCt50LUG2VH61Z
-	 b4h2PscPhnbvQ4JPrZ1wVsBkIqWSOi/yWSkAOG5Zb1Eo+wMyeu/Qi+6nPTLBG2QPzs
-	 1u7D+diuPfMWoV4Em2bn7EZvVZv+iOZoakgsbu8z6WOHLDyeDsj4fjYpN5yzTkYB0V
-	 1WOD8BFrF9aCtf9HB96Kmo3DRoPB3WGXonPGA9cwcK6Ep5eGwHCHdxPxkWq2Qh9RMV
-	 fd64xsc5/cYW/BQTXOe1cXj6yCsBsGRmy/zYB/uF/jndjXIzgiwY2DVB2ohtsY+omb
-	 vTitmzFwMz4YQ==
+	b=SH9Qmr9gX7S3WQF2WHHdOvBPiYiBg+ZJ9dEM+SMKCeGxleKCM2rbMsSPv0/VBnDbh
+	 k4YnBNd0ON8wxDjxbZJBWLmpuUQnSpRJV6iAgG/R/AsPXNkMZ5IJ8iGo5i7OWroVkA
+	 kj1aATZumJtZnbX4ncAFa2blyAy5+686O8pRl7Qe2Q3822DSgEuG1OlPr3hU1I02wp
+	 nnsTJxCxw3IFVA8n7jnZqhgLBTrRl/VNZWA+P2xaJtsT8EpC+6JHHOVro+BMQQwWeV
+	 WjZJ7EJ0Vu2iLs2jrFDqlhOzQnsnx/UVjQ5zgqwLGwqPhLNvOTPiXeWRwjPpqwA3CT
+	 wRwbknLTAJNig==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Jon Hunter <jonathanh@nvidia.com>,
-	Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>,
+Cc: Justin Iurman <justin.iurman@gmail.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
+	dsahern@kernel.org,
 	edumazet@google.com,
 	pabeni@redhat.com,
-	robh@kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	thierry.reding@kernel.org,
-	treding@nvidia.com,
-	vbhadram@nvidia.com,
+	idosch@nvidia.com,
 	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-tegra@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.18] dt-bindings: net: Fix Tegra234 MGBE PTP clock
-Date: Mon, 20 Apr 2026 09:21:29 -0400
-Message-ID: <20260420132314.1023554-295-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.18] net: ioam6: fix OOB and missing lock
+Date: Mon, 20 Apr 2026 09:21:34 -0400
+Message-ID: <20260420132314.1023554-300-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260420132314.1023554-1-sashal@kernel.org>
 References: <20260420132314.1023554-1-sashal@kernel.org>
@@ -85,57 +77,64 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	TAGGED_FROM(0.00)[bounces-279818-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[gmail.com,kernel.org,davemloft.net,google.com,redhat.com,nvidia.com,vger.kernel.org];
 	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-279819-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.983];
+	NEURAL_HAM(-0.00)[-0.999];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,msgid.link:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:email]
-X-Rspamd-Queue-Id: 932D842F486
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,msgid.link:url]
+X-Rspamd-Queue-Id: D5F9C42D5B4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Jon Hunter <jonathanh@nvidia.com>
+From: Justin Iurman <justin.iurman@gmail.com>
 
-[ Upstream commit fb22b1fc5bca3c0aad95388933497ceb30f1fb26 ]
+[ Upstream commit b30b1675aa2bcf0491fd3830b051df4e08a7c8ca ]
 
-The PTP clock for the Tegra234 MGBE device is incorrectly named
-'ptp-ref' and should be 'ptp_ref'. This is causing the following
-warning to be observed on Tegra234 platforms that use this device:
+When trace->type.bit6 is set:
 
- ERR KERN tegra-mgbe 6800000.ethernet eth0: Invalid PTP clock rate
- WARNING KERN tegra-mgbe 6800000.ethernet eth0: PTP init failed
+    if (trace->type.bit6) {
+        ...
+        queue = skb_get_tx_queue(dev, skb);
+        qdisc = rcu_dereference(queue->qdisc);
 
-Although this constitutes an ABI breakage in the binding for this
-device, PTP support has clearly never worked and so fix this now
-so we can correct the device-tree for this device. Note that the
-MGBE driver still supports the legacy 'ptp-ref' clock name and so
-older/existing device-trees will still work, but given that this
-is not the correct name, there is no point to advertise this in the
-binding.
+This code can lead to an out-of-bounds access of the dev->_tx[] array
+when is_input is true. In such a case, the packet is on the RX path and
+skb->queue_mapping contains the RX queue index of the ingress device. If
+the ingress device has more RX queues than the egress device (dev) has
+TX queues, skb_get_queue_mapping(skb) will exceed dev->num_tx_queues.
+Add a check to avoid this situation since skb_get_tx_queue() does not
+clamp the index. This issue has also revealed that per queue visibility
+cannot be accurate and will be replaced later as a new feature.
 
-Fixes: 189c2e5c7669 ("dt-bindings: net: Add Tegra234 MGBE")
-Signed-off-by: Jon Hunter <jonathanh@nvidia.com>
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
-Link: https://patch.msgid.link/20260401102941.17466-3-jonathanh@nvidia.com
+While at it, add missing lock around qdisc_qstats_qlen_backlog(). The
+function __ioam6_fill_trace_data() is called from both softirq and
+process contexts, hence the use of spin_lock_bh() here.
+
+Fixes: b63c5478e9cb ("ipv6: ioam: Support for Queue depth data field")
+Reported-by: Jakub Kicinski <kuba@kernel.org>
+Closes: https://lore.kernel.org/netdev/20260403214418.2233266-2-kuba@kernel.org/
+Signed-off-by: Justin Iurman <justin.iurman@gmail.com>
+Link: https://patch.msgid.link/20260404134137.24553-1-justin.iurman@gmail.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
@@ -144,31 +143,31 @@ LLM Generated explanations, may be completely bogus:
 
 Error: Failed to generate final synthesis
 
- .../devicetree/bindings/net/nvidia,tegra234-mgbe.yaml         | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ net/ipv6/ioam6.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/Documentation/devicetree/bindings/net/nvidia,tegra234-mgbe.yaml b/Documentation/devicetree/bindings/net/nvidia,tegra234-mgbe.yaml
-index 2bd3efff2485e..215f14d1897d2 100644
---- a/Documentation/devicetree/bindings/net/nvidia,tegra234-mgbe.yaml
-+++ b/Documentation/devicetree/bindings/net/nvidia,tegra234-mgbe.yaml
-@@ -42,7 +42,7 @@ properties:
-       - const: mgbe
-       - const: mac
-       - const: mac-divider
--      - const: ptp-ref
-+      - const: ptp_ref
-       - const: rx-input-m
-       - const: rx-input
-       - const: tx
-@@ -133,7 +133,7 @@ examples:
-                  <&bpmp TEGRA234_CLK_MGBE0_RX_PCS_M>,
-                  <&bpmp TEGRA234_CLK_MGBE0_RX_PCS>,
-                  <&bpmp TEGRA234_CLK_MGBE0_TX_PCS>;
--        clock-names = "mgbe", "mac", "mac-divider", "ptp-ref", "rx-input-m",
-+        clock-names = "mgbe", "mac", "mac-divider", "ptp_ref", "rx-input-m",
-                       "rx-input", "tx", "eee-pcs", "rx-pcs-input", "rx-pcs-m",
-                       "rx-pcs", "tx-pcs";
-         resets = <&bpmp TEGRA234_RESET_MGBE0_MAC>,
+diff --git a/net/ipv6/ioam6.c b/net/ipv6/ioam6.c
+index 12350e1e18bde..b91de51ffa9ea 100644
+--- a/net/ipv6/ioam6.c
++++ b/net/ipv6/ioam6.c
+@@ -803,12 +803,16 @@ static void __ioam6_fill_trace_data(struct sk_buff *skb,
+ 		struct Qdisc *qdisc;
+ 		__u32 qlen, backlog;
+ 
+-		if (dev->flags & IFF_LOOPBACK) {
++		if (dev->flags & IFF_LOOPBACK ||
++		    skb_get_queue_mapping(skb) >= dev->num_tx_queues) {
+ 			*(__be32 *)data = cpu_to_be32(IOAM6_U32_UNAVAILABLE);
+ 		} else {
+ 			queue = skb_get_tx_queue(dev, skb);
+ 			qdisc = rcu_dereference(queue->qdisc);
++
++			spin_lock_bh(qdisc_lock(qdisc));
+ 			qdisc_qstats_qlen_backlog(qdisc, &qlen, &backlog);
++			spin_unlock_bh(qdisc_lock(qdisc));
+ 
+ 			*(__be32 *)data = cpu_to_be32(backlog);
+ 		}
 -- 
 2.53.0
 
