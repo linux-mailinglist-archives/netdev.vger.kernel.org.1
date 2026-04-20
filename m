@@ -1,306 +1,303 @@
-Return-Path: <netdev+bounces-279632-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279633-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id V+xIIgmP5WlNlgEAu9opvQ
-	(envelope-from <netdev+bounces-279632-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 04:27:21 +0200
+	id sOdyMdWR5WlNlgEAu9opvQ
+	(envelope-from <netdev+bounces-279633-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 04:39:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39E63426428
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 04:27:20 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A84A4265CB
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 04:39:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B6537300A532
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 02:27:19 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0B2E3300AC0A
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 02:33:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E2413783AD;
-	Mon, 20 Apr 2026 02:27:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 632D23019D6;
+	Mon, 20 Apr 2026 02:33:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q/f2q8Yr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FEnT0h/V"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6235F375F67;
-	Mon, 20 Apr 2026 02:27:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEC33192B75
+	for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 02:33:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776652038; cv=none; b=fEQM5S4BMg80tD6ejfOMMfLx5X/zVxz0N88ICrEhc72rFGjkVhUwmcSZiNP3g4Z+R51pZLuSwRMVoR/dfiKSBJupUb8De0c78zkZdxxO5z622dd3WerzgoyIBObKLyXE/yT1Fl7WVKWy2lTL0K2nn6rX9Jv7nAxJPlbGLhtJpEc=
+	t=1776652390; cv=none; b=Jt7+buUEEbZxpHbxiyTKB9Z6+kAPBh1UNZ7Za5ZfLXmIj0BJ8pLpNwdBBeld3YRfrTlx2tES8cZB0RGF61kgjpibh9MKqmwIsapPlTuI+1bVk0IjmGCwPUDxDpUrYuZlf6/xlU1WEDQ7Y8GKm8kuH79WO+RJSRCKjG6IxhSQxcA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776652038; c=relaxed/simple;
-	bh=ITFfxWVYZShfg8ObCYl+/A7sDctvchvGVKnsu2Q0ZLU=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=Gv2ejwE8Op1pVdr6ONsXyI0Z9V+AmHg6DPXJnZM8gJuP5vYmk3AADkiOgnmpfybVZ/adtzwLlI7gd1VBkxou9u39j6C2drD5/+4iH3P6uGY1k5XNpXR494DVhySCpfh55PwLzdYOxyVEfYPQxp0FQoJ6LQhF9SbpklQpJu1jDGo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q/f2q8Yr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39F54C2BCAF;
-	Mon, 20 Apr 2026 02:27:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776652038;
-	bh=ITFfxWVYZShfg8ObCYl+/A7sDctvchvGVKnsu2Q0ZLU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=q/f2q8YrNja2t4MOJ3XZm+daEZl1FcXY4nfOVvtrtjvqt5MbZxWUYOT3wirQo6FaB
-	 lOqgywkLPOjS1VIVUdoCXgyBgeqdQRzNwaylQtig4w+yS3qEz3gmO+SVZmZJKlQIS1
-	 5YnVfgyEXKpTOb6PrQd5kn+uZtfBKDFQ/8OCcifN8EDAPaZwjDRm8Zr0mh3XQALHBh
-	 Up6SdMQEWfpLr4yC73WCFbktXDXdQ7dXOqJfGS3V/MWdgRmzjD+Y1d8LwFkLfl9Ev0
-	 jN9uHYhQzEihNOM9Uulk+1xe1nQar6NN7XIMU3fvu8QzHpDFat9SPtxyteXUC9ijgd
-	 FqU1Wkd4FKflw==
-Date: Mon, 20 Apr 2026 11:27:07 +0900
-From: Masami Hiramatsu (Google) <mhiramat@kernel.org>
-To: Petr Mladek <pmladek@suse.com>
-Cc: Petr Pavlu <petr.pavlu@suse.com>, Song Chen <chensong_2000@189.cn>,
- rafael@kernel.org, lenb@kernel.org, mturquette@baylibre.com,
- sboyd@kernel.org, viresh.kumar@linaro.org, agk@redhat.com,
- snitzer@kernel.org, mpatocka@redhat.com, bmarzins@redhat.com,
- song@kernel.org, yukuai@fnnas.com, linan122@huawei.com,
- jason.wessel@windriver.com, danielt@kernel.org, dianders@chromium.org,
- horms@kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, paulmck@kernel.org,
- frederic@kernel.org, mcgrof@kernel.org, da.gomez@kernel.org,
- samitolvanen@google.com, atomlin@atomlin.com, jpoimboe@kernel.org,
- jikos@kernel.org, mbenes@suse.cz, joe.lawrence@redhat.com,
- rostedt@goodmis.org, mhiramat@kernel.org, mark.rutland@arm.com,
- mathieu.desnoyers@efficios.com, linux-modules@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- linux-acpi@vger.kernel.org, linux-clk@vger.kernel.org,
- linux-pm@vger.kernel.org, live-patching@vger.kernel.org,
- dm-devel@lists.linux.dev, linux-raid@vger.kernel.org,
- kgdb-bugreport@lists.sourceforge.net, netdev@vger.kernel.org
-Subject: Re: [RFC PATCH 2/2] kernel/module: Decouple klp and ftrace from
- load_module
-Message-Id: <20260420112707.aa3627ca9f975eeaf7d8ea0e@kernel.org>
-In-Reply-To: <aeD2_FrFL6E3dbAC@pathway.suse.cz>
-References: <20260413080701.180976-1-chensong_2000@189.cn>
-	<1191caf5-6a61-4622-a15e-854d3701f4fc@suse.com>
-	<a35f5f94-7d5a-4347-974b-b270c89ef241@189.cn>
-	<1db425bf-58a9-4768-8c38-3ae25d7662a5@suse.com>
-	<aeD2_FrFL6E3dbAC@pathway.suse.cz>
-X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1776652390; c=relaxed/simple;
+	bh=Bml+l/xoQu3lspBeiQRtAwS1uMa70Ja2oGVf758iAyA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=itwTIF8QWEdf+cioh0sgoFjTHzQEwg/h750i2KWBip3RE9Z/gOjvFTYG8Vlbi5i9qoKQL/9gogHSiG1Noh8U9tpjWTdICWdRsJ4nHUdsJV4Mo4ZogtUOK5TOxezXMBmxo0epYC3Ib3TNpU5GOndSc/Oan0Uqto2ZvTP3wq0oxOY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FEnT0h/V; arc=none smtp.client-ip=209.85.222.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-8dfb9139008so161834185a.1
+        for <netdev@vger.kernel.org>; Sun, 19 Apr 2026 19:33:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776652388; x=1777257188; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=RAIoe3m+p1YbUQs2TCR3bXdrCIGBFMyCnL0B01QqK1g=;
+        b=FEnT0h/VF4s6Nkqz6M70x8CVAqUDbs5nVOTgi1hFPp1lKL855V3REhQEssWDQiB4bQ
+         Nx0Rgg/xJMc/6qzTHVysJMzFBGkR2yQDlQEQbBy5LBT1DJDm7r6AJx58XEUMJAvHfWP0
+         AD1atmRUSY6DASo2YQytuk+UYqPKk5RW356/AwVpT/BciSqPq7YTH9Swr5/GNYYGprel
+         FlbWrjPJiDW/o2RHn0LiRJWsAo/r8msPSiF/sz84/4fi+k2jlyEFFw4hfMC2ZZUgFpma
+         zM6tow8TxdzE9eX1AhgYwYr+q92HQceaWGT6gkQ35JgZrdOzS28Do4q7XC/oX8KjbAys
+         ZsKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776652388; x=1777257188;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RAIoe3m+p1YbUQs2TCR3bXdrCIGBFMyCnL0B01QqK1g=;
+        b=EexMFYO/D5mzccOpB2sRTBC5Gt+4ujMplGaE7kWHCceoPD9X0gpT7QBSRTeqjIfURH
+         oAGPAtO7/xnmS+Ye5jBtAxTQu+LpT8q9bm4vevWzgCgcweJwmps3ICQ5n9JZ7NhEXVNo
+         su62yYTOIjdpG4R5nAo5J4d5VcZY2XXVqTvV7Y2RIWzfPMh4KvM6AQMZE0X364QahsK1
+         oPP5MCUyxxMGdoLetlSgZwySoMb2/0VP7SwD0AYGQJQeGT/bceVwnon20vS6kj9VFPQj
+         sGPsBCiEwFB5iMpI70K69SuFeptsFTsPqnakD5y/PnbLRXgTJqmV3QyxhuPnGJaG4axI
+         WoMw==
+X-Forwarded-Encrypted: i=1; AFNElJ+d+GajYV0wBoDN0qVfazt9HNmwdftUxK/rQ8N2AwTt8L7b/sspW0f/1WKFreNoJDiJoUz25Wk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz0YrxDZVOT0Q965mjnw84+jxPS1agZHt4CUkXrKH3jMb9U2rIV
+	OrK4PzQLOp4/JAE9Q9M4jLbXICGQR61qqIdfFEddI2VwZqMwkOB8tTr/zIinBGJwGC6gNw==
+X-Gm-Gg: AeBDieuGijsj/YV5NWO5gsoXZYDMyB+0YBEDeMplB0eeKmnsmTl0P3oaUTSuX8tRwZL
+	0mI/CNrfNw1y4d6hV9B3GpmVL1OV0cQab+A661wOZjvTCg8S4dCkmzqVkQE9bQdvKDMkJHRoUaq
+	nmgDSdRoJkbZFPmYUge+1LziQEu149q/zNVuU6zhUXWgwcxb3e6/kKq5nMS+ITs3Yv89p0e1EUf
+	Yb4ylfhqTqiUq4lJw6NoLoNukOckvAuvrWXXLOZS+tlUdNKIjaMkYHeFWKdoJfDr7z/C4Z62AW5
+	fMScP77aRd9hUqF291xfqur6cInv0mgNLDKwZ8OtA3syND59jUzR8uMCoWugvw6PhKdLoRL5JIN
+	TzR/36O5vTVQBjzqpxuK4AgoHhngso3wg5ZCzNrYCxSVMD/WJAVlVde4tBVcAnUi6nsH2f1lQiB
+	PuEC0ORDCCwNp62FdTtc85L40cQBlJXPPqxzWwdrH01w+ESOWnJMU88P48xjo=
+X-Received: by 2002:a05:620a:4044:b0:8cd:949e:5e31 with SMTP id af79cd13be357-8e792b5c9a4mr1812089585a.57.1776652387844;
+        Sun, 19 Apr 2026 19:33:07 -0700 (PDT)
+Received: from localhost.localdomain ([165.85.38.136])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8e7d94d2efcsm690175785a.38.2026.04.19.19.33.05
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Sun, 19 Apr 2026 19:33:07 -0700 (PDT)
+From: Yuho Choi <dbgh9129@gmail.com>
+To: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Marco Crivellari <marco.crivellari@suse.com>,
+	linux-kernel@vger.kernel.org,
+	Myeonghun Pak <mhun512@gmail.com>,
+	Ijae Kim <ae878000@gmail.com>,
+	Taegyu Kim <tmk5904@psu.edu>,
+	Yuho Choi <dbgh9129@gmail.com>
+Subject: [PATCH v1] net: liquidio: resolve VF pci_dev on demand for FLR requests
+Date: Sun, 19 Apr 2026 22:33:04 -0400
+Message-ID: <20260420023304.57105-1-dbgh9129@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [6.34 / 15.00];
+	SEM_URIBL(3.50)[psu.edu:email];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	BAD_REP_POLICIES(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-279632-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,google.com,bootlin.com,linux.dev,suse.com,vger.kernel.org,gmail.com,psu.edu];
+	TAGGED_FROM(0.00)[bounces-279633-lists,netdev=lfdr.de];
+	GREYLIST(0.00)[pass,body];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[suse.com,189.cn,kernel.org,baylibre.com,linaro.org,redhat.com,fnnas.com,huawei.com,windriver.com,chromium.org,davemloft.net,google.com,atomlin.com,suse.cz,goodmis.org,arm.com,efficios.com,vger.kernel.org,lists.linux.dev,lists.sourceforge.net];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[48];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	R_DKIM_ALLOW(0.00)[gmail.com:s=20251104];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DMARC_POLICY_ALLOW(0.00)[gmail.com,none];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mhiramat@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,189.cn:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 39E63426428
-X-Rspamd-Action: no action
+	PRECEDENCE_BULK(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[dbgh9129@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	NEURAL_SPAM(0.00)[0.956];
+	R_SPF_ALLOW(0.00)[+ip6:2600:3c04:e001:36c::/64:c];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,psu.edu:email]
+X-Rspamd-Queue-Id: 5A84A4265CB
+X-Rspamd-Action: add header
 X-Rspamd-Server: lfdr
+X-Spam: Yes
 
-On Thu, 16 Apr 2026 16:49:32 +0200
-Petr Mladek <pmladek@suse.com> wrote:
+The PF SR-IOV enable path caches VF pci_dev pointers in
+dpiring_to_vfpcidev_lut[] by iterating with pci_get_device(). Those
+entries do not own a reference, because the iterator drops the previous
+device reference on each step. The cached pointer is then dereferenced
+later when handling OCTEON_VF_FLR_REQUEST.
 
-> On Thu 2026-04-16 13:18:30, Petr Pavlu wrote:
-> > On 4/15/26 8:43 AM, Song Chen wrote:
-> > > On 4/14/26 22:33, Petr Pavlu wrote:
-> > >> On 4/13/26 10:07 AM, chensong_2000@189.cn wrote:
-> > >>> diff --git a/include/linux/module.h b/include/linux/module.h
-> > >>> index 14f391b186c6..0bdd56f9defd 100644
-> > >>> --- a/include/linux/module.h
-> > >>> +++ b/include/linux/module.h
-> > >>> @@ -308,6 +308,14 @@ enum module_state {
-> > >>>       MODULE_STATE_COMING,    /* Full formed, running module_init. */
-> > >>>       MODULE_STATE_GOING,    /* Going away. */
-> > >>>       MODULE_STATE_UNFORMED,    /* Still setting it up. */
-> > >>> +    MODULE_STATE_FORMED,
-> > >>
-> > >> I don't see a reason to add a new module state. Why is it necessary and
-> > >> how does it fit with the existing states?
-> > >>
-> > > because once notifier fails in state MODULE_STATE_UNFORMED (now only ftrace has someting to do in this state), notifier chain will roll back by calling blocking_notifier_call_chain_robust, i'm afraid MODULE_STATE_GOING is going to jeopardise the notifers which don't handle it appropriately, like:
-> > > 
-> > > case MODULE_STATE_COMING:
-> > >      kmalloc();
-> > > case MODULE_STATE_GOING:
-> > >      kfree();
-> > 
-> > My understanding is that the current module "state machine" operates as
-> > follows. Transitions marked with an asterisk (*) are announced via the
-> > module notifier.
-> > 
-> > ---> UNFORMED --*> COMING --*> LIVE --*> GOING -.
-> >         ^            |                     ^    |
-> >         |            '---------------------*    |
-> >         '---------------------------------------'
-> > 
-> > The new code aims to replace the current ftrace_module_init() call in
-> > load_module(). To achieve this, it adds a notification for the UNFORMED
-> > state (only when loading a module) and introduces a new FORMED state for
-> > rollback. FORMED is purely a fake state because it never appears in
-> > module::state. The new structure is as follows:
-> > 
-> >         ,--*> (FORMED)
-> >         |
-> > --*> UNFORMED --*> COMING --*> LIVE --*> GOING -.
-> >         ^            |                     ^    |
-> >         |            '---------------------*    |
-> >         '---------------------------------------'
-> > 
-> > I'm afraid this is quite complex and inconsistent. Unless it can be kept
-> > simple, we would be just replacing one special handling with a different
-> > complexity, which is not worth it.
-> 
-> > >>
-> > >>> +    if (err)
-> > >>> +        goto ddebug_cleanup;
-> > >>>         /* Finally it's fully formed, ready to start executing. */
-> > >>>       err = complete_formation(mod, info);
-> > >>> -    if (err)
-> > >>> +    if (err) {
-> > >>> +        blocking_notifier_call_chain_reverse(&module_notify_list,
-> > >>> +                MODULE_STATE_FORMED, mod);
-> > >>>           goto ddebug_cleanup;
-> > >>> +    }
-> > >>>   -    err = prepare_coming_module(mod);
-> > >>> +    err = prepare_module_state_transaction(mod,
-> > >>> +                MODULE_STATE_COMING, MODULE_STATE_GOING);
-> > >>>       if (err)
-> > >>>           goto bug_cleanup;
-> > >>>   @@ -3522,7 +3519,6 @@ static int load_module(struct load_info *info, const char __user *uargs,
-> > >>>       destroy_params(mod->kp, mod->num_kp);
-> > >>>       blocking_notifier_call_chain(&module_notify_list,
-> > >>>                        MODULE_STATE_GOING, mod);
-> > >>
-> > >> My understanding is that all notifier chains for MODULE_STATE_GOING
-> > >> should be reversed.
-> > > yes, all, from lowest priority notifier to highest.
-> > > I will resend patch 1 which was failed due to my proxy setting.
-> > 
-> > What I meant here is that the call:
-> > 
-> > blocking_notifier_call_chain(&module_notify_list, MODULE_STATE_GOING, mod);
-> > 
-> > should be replaced with:
-> > 
-> > blocking_notifier_call_chain_reverse(&module_notify_list, MODULE_STATE_GOING, mod);
-> > 
-> > > 
-> > >>
-> > >>> -    klp_module_going(mod);
-> > >>>    bug_cleanup:
-> > >>>       mod->state = MODULE_STATE_GOING;
-> > >>>       /* module_bug_cleanup needs module_mutex protection */
-> > >>
-> > >> The patch removes the klp_module_going() cleanup call in load_module().
-> > >> Similarly, the ftrace_release_mod() call under the ddebug_cleanup label
-> > >> should be removed and appropriately replaced with a cleanup via
-> > >> a notifier.
-> > >>
-> > >     err = prepare_module_state_transaction(mod,
-> > >                 MODULE_STATE_UNFORMED, MODULE_STATE_FORMED);
-> > >     if (err)
-> > >         goto ddebug_cleanup;
-> > > 
-> > > ftrace will be cleanup in blocking_notifier_call_chain_robust rolling back.
-> > > 
-> > >     err = prepare_module_state_transaction(mod,
-> > >                 MODULE_STATE_COMING, MODULE_STATE_GOING);
-> > > 
-> > > each notifier including ftrace and klp will be cleanup in blocking_notifier_call_chain_robust rolling back.
-> > > 
-> > > if all notifiers are successful in MODULE_STATE_COMING, they all will be clean up in
-> > >  coming_cleanup:
-> > >     mod->state = MODULE_STATE_GOING;
-> > >     destroy_params(mod->kp, mod->num_kp);
-> > >     blocking_notifier_call_chain(&module_notify_list,
-> > >                      MODULE_STATE_GOING, mod);
-> > > 
-> > > if  something wrong underneath.
-> > 
-> > My point is that the patch leaves a call to ftrace_release_mod() in
-> > load_module(), which I expected to be handled via a notifier.
-> 
-> I think that I have got it. The ftrace code needs two notifiers when
-> the module is being loaded and two when it is going.
-> 
-> This is why Sond added the new state. But I think that we would
-> need two new states to call:
-> 
->     + ftrace_module_init() in MODULE_STATE_UNFORMED
->     + ftrace_module_enable() in MODULE_STATE_FORMED
-> 
-> and
-> 
->     + ftrace_free_mem() in MODULE_STATE_PRE_GOING
->     + ftrace_free_mem() in MODULE_STATE_GOING
-> 
-> 
-> By using the ascii art:
-> 
->  -*> UNFORMED -*> FORMED -> COMING -*> LIVE -*> PRE_GOING -*> GOING -.
->               |          |         |                ^           ^    ^
->               |          |         '----------------'           |    |
->               |          '--------------------------------------'    |
->               '------------------------------------------------------'
-> 
-> 
-> But I think that this is not worth it.
+This can leave stale VF pci_dev pointers in the lookup table and makes
+the FLR path rely on a PCI device object whose lifetime is not pinned.
 
-Agree.
+Drop the long-lived lookup table and resolve the VF pci_dev only when an
+FLR request arrives. Use the PF's SR-IOV metadata to derive the VF's
+bus/devfn, get a referenced pci_dev for immediate use, issue the FLR,
+and then drop the reference.
 
-If this needs to be ordered so strictly, why we will use a "single"
-module notifier chain for this complex situation?
+Fixes: ca6139ffc67ee ("liquidio CN23XX: sysfs VF config support")
+Fixes: 8c978d059224 ("liquidio CN23XX: Mailbox support")
+Co-developed-by: Myeonghun Pak <mhun512@gmail.com>
+Signed-off-by: Myeonghun Pak <mhun512@gmail.com>
+Co-developed-by: Ijae Kim <ae878000@gmail.com>
+Signed-off-by: Ijae Kim <ae878000@gmail.com>
+Co-developed-by: Taegyu Kim <tmk5904@psu.edu>
+Signed-off-by: Taegyu Kim <tmk5904@psu.edu>
+Signed-off-by: Yuho Choi <dbgh9129@gmail.com>
+---
+ .../net/ethernet/cavium/liquidio/lio_main.c   | 27 ----------------
+ .../ethernet/cavium/liquidio/octeon_device.h  |  3 --
+ .../ethernet/cavium/liquidio/octeon_mailbox.c | 31 ++++++++++++++++++-
+ 3 files changed, 30 insertions(+), 31 deletions(-)
 
-I think the notifier call chain is just for notice a single signal,
-instead of sending several different signals, especially if there is
-any dependency among the callbacks.
-
-If notification callbacks need to be ordered, they are currently
-sorted by representing priority numerically, but this is quite
-fragile for updating. It has to look up other registered priorities
-and adjust the order among dependencies each time. For this reason,
-this mechanism is not suitable for global ordering. (It's like line
-numbers in BASIC.)
-It is probably only useful for representing dependencies between
-two components maintained by the same maintainer.
-
-I'm against a general-purpose system that makes everything modular.
-It unnecessarily complicates things. If there are processes that
-require strict ordering, especially processes that must be performed
-before each stage as part of the framework, they should be called
-directly from the framework, not via notification callbacks.
-
-This makes it simpler and more robust to maintain.
-
-Only the framework's end users should utilize notification callbacks.
-
-Thank you,
-
-
-> 
-> Best Regards,
-> Petr
-> 
-
-
+diff --git a/drivers/net/ethernet/cavium/liquidio/lio_main.c b/drivers/net/ethernet/cavium/liquidio/lio_main.c
+index c1a3df2252549..32dd9b25760e3 100644
+--- a/drivers/net/ethernet/cavium/liquidio/lio_main.c
++++ b/drivers/net/ethernet/cavium/liquidio/lio_main.c
+@@ -3781,9 +3781,7 @@ static int setup_nic_devices(struct octeon_device *octeon_dev)
+ static int octeon_enable_sriov(struct octeon_device *oct)
+ {
+ 	unsigned int num_vfs_alloced = oct->sriov_info.num_vfs_alloced;
+-	struct pci_dev *vfdev;
+ 	int err;
+-	u32 u;
+ 
+ 	if (OCTEON_CN23XX_PF(oct) && num_vfs_alloced) {
+ 		err = pci_enable_sriov(oct->pci_dev,
+@@ -3796,23 +3794,6 @@ static int octeon_enable_sriov(struct octeon_device *oct)
+ 			return err;
+ 		}
+ 		oct->sriov_info.sriov_enabled = 1;
+-
+-		/* init lookup table that maps DPI ring number to VF pci_dev
+-		 * struct pointer
+-		 */
+-		u = 0;
+-		vfdev = pci_get_device(PCI_VENDOR_ID_CAVIUM,
+-				       OCTEON_CN23XX_VF_VID, NULL);
+-		while (vfdev) {
+-			if (vfdev->is_virtfn &&
+-			    (vfdev->physfn == oct->pci_dev)) {
+-				oct->sriov_info.dpiring_to_vfpcidev_lut[u] =
+-					vfdev;
+-				u += oct->sriov_info.rings_per_vf;
+-			}
+-			vfdev = pci_get_device(PCI_VENDOR_ID_CAVIUM,
+-					       OCTEON_CN23XX_VF_VID, vfdev);
+-		}
+ 	}
+ 
+ 	return num_vfs_alloced;
+@@ -3820,8 +3801,6 @@ static int octeon_enable_sriov(struct octeon_device *oct)
+ 
+ static int lio_pci_sriov_disable(struct octeon_device *oct)
+ {
+-	int u;
+-
+ 	if (pci_vfs_assigned(oct->pci_dev)) {
+ 		dev_err(&oct->pci_dev->dev, "VFs are still assigned to VMs.\n");
+ 		return -EPERM;
+@@ -3829,12 +3808,6 @@ static int lio_pci_sriov_disable(struct octeon_device *oct)
+ 
+ 	pci_disable_sriov(oct->pci_dev);
+ 
+-	u = 0;
+-	while (u < MAX_POSSIBLE_VFS) {
+-		oct->sriov_info.dpiring_to_vfpcidev_lut[u] = NULL;
+-		u += oct->sriov_info.rings_per_vf;
+-	}
+-
+ 	oct->sriov_info.num_vfs_alloced = 0;
+ 	dev_info(&oct->pci_dev->dev, "oct->pf_num:%d disabled VFs\n",
+ 		 oct->pf_num);
+diff --git a/drivers/net/ethernet/cavium/liquidio/octeon_device.h b/drivers/net/ethernet/cavium/liquidio/octeon_device.h
+index 19344b21f8fb9..858a0fff2cc0b 100644
+--- a/drivers/net/ethernet/cavium/liquidio/octeon_device.h
++++ b/drivers/net/ethernet/cavium/liquidio/octeon_device.h
+@@ -390,9 +390,6 @@ struct octeon_sriov_info {
+ 
+ 	struct lio_trusted_vf	trusted_vf;
+ 
+-	/*lookup table that maps DPI ring number to VF pci_dev struct pointer*/
+-	struct pci_dev *dpiring_to_vfpcidev_lut[MAX_POSSIBLE_VFS];
+-
+ 	u64	vf_macaddr[MAX_POSSIBLE_VFS];
+ 
+ 	u16	vf_vlantci[MAX_POSSIBLE_VFS];
+diff --git a/drivers/net/ethernet/cavium/liquidio/octeon_mailbox.c b/drivers/net/ethernet/cavium/liquidio/octeon_mailbox.c
+index ad685f5d0a136..b967c7928b4a7 100644
+--- a/drivers/net/ethernet/cavium/liquidio/octeon_mailbox.c
++++ b/drivers/net/ethernet/cavium/liquidio/octeon_mailbox.c
+@@ -26,6 +26,29 @@
+ #include "octeon_mailbox.h"
+ #include "cn23xx_pf_device.h"
+ 
++static struct pci_dev *lio_vf_pci_dev_by_qno(struct octeon_device *oct, u32 q_no)
++{
++	int vfidx, bus, devfn;
++
++	if (!oct->sriov_info.rings_per_vf)
++		return NULL;
++
++	if (q_no % oct->sriov_info.rings_per_vf)
++		return NULL;
++
++	vfidx = q_no / oct->sriov_info.rings_per_vf;
++	if (vfidx >= oct->sriov_info.num_vfs_alloced)
++		return NULL;
++
++	bus = pci_iov_virtfn_bus(oct->pci_dev, vfidx);
++	devfn = pci_iov_virtfn_devfn(oct->pci_dev, vfidx);
++	if (bus < 0 || devfn < 0)
++		return NULL;
++
++	return pci_get_domain_bus_and_slot(pci_domain_nr(oct->pci_dev->bus),
++					   bus, devfn);
++}
++
+ /**
+  * octeon_mbox_read:
+  * @mbox: Pointer mailbox
+@@ -237,6 +260,7 @@ static int octeon_mbox_process_cmd(struct octeon_mbox *mbox,
+ 				   struct octeon_mbox_cmd *mbox_cmd)
+ {
+ 	struct octeon_device *oct = mbox->oct_dev;
++	struct pci_dev *vfdev;
+ 
+ 	switch (mbox_cmd->msg.s.cmd) {
+ 	case OCTEON_VF_ACTIVE:
+@@ -260,7 +284,12 @@ static int octeon_mbox_process_cmd(struct octeon_mbox *mbox,
+ 		dev_info(&oct->pci_dev->dev,
+ 			 "got a request for FLR from VF that owns DPI ring %u\n",
+ 			 mbox->q_no);
+-		pcie_flr(oct->sriov_info.dpiring_to_vfpcidev_lut[mbox->q_no]);
++		vfdev = lio_vf_pci_dev_by_qno(oct, mbox->q_no);
++		if (!vfdev)
++			break;
++
++		pcie_flr(vfdev);
++		pci_dev_put(vfdev);
+ 		break;
+ 
+ 	case OCTEON_PF_CHANGED_VF_MACADDR:
 -- 
-Masami Hiramatsu (Google) <mhiramat@kernel.org>
+2.50.1 (Apple Git-155)
+
 
