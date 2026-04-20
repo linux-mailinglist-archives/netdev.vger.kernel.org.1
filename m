@@ -1,221 +1,308 @@
-Return-Path: <netdev+bounces-279926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279927-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QIW4HRyS5mmwyQEAu9opvQ
-	(envelope-from <netdev+bounces-279926-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 22:52:44 +0200
+	id UKzVLfie5mmyywEAu9opvQ
+	(envelope-from <netdev+bounces-279927-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 23:47:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA04A433D37
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 22:52:43 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBAB74345B7
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 23:47:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3D86C300DF65
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 20:52:42 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 66F8A30069AE
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 21:47:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A40B83876CE;
-	Mon, 20 Apr 2026 20:52:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FjIZLrLI"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D512C3CF058;
+	Mon, 20 Apr 2026 21:47:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+Received: from mail-ot1-f79.google.com (mail-ot1-f79.google.com [209.85.210.79])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55BC334A79E
-	for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 20:52:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.180
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776718361; cv=pass; b=Vv3bDKF7e4vvVXGOQxYQYD8HdJhtQvAW9My+b57grnUvsG+KhdDkQB+Uac7nwys17+s/4BZDFOzIf63p+7SjN5BDs1lnzs27bCyWzrUFMAlBChWDRG2JwohpQJwCaEu2lNfy6Z8mOEHiUsdXOPuyd+RDgqZilKqHiv+27o0jKqM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776718361; c=relaxed/simple;
-	bh=Pnhnz1gyermNjSQP4+5/crpMQ9x95/YqL02Qcv52xEI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Dq5uhcGHMrAWOgTSLphCL0BN1AzcAa3E3pXHIzz3DjmUkZBqt+LdfdUvXvnFlh39dCye7BlgJQpCwV6hjMEFrMCUwvvFS6/i3mEI9G89pA6ep3FRuy8RSh1qX+w5CdJNCDRz6hDv1NO+Lu5Avr8XN22f5E9/DcZIm9oO7oecK4Y=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FjIZLrLI; arc=pass smtp.client-ip=209.85.210.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-82735a41920so1454311b3a.2
-        for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 13:52:40 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776718360; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Xyi5R+ghmjY93111xL4gY1B/XJVnk4fEXFkzOhUCo06IlKmBsb659twQfTFaQbO3VE
-         FkRPlqg32Rh/zmnIiDvwFy9w0VPVHRKgEX5GuSQcCCCdKKF3JDj24UBZUynpLqlgAVmE
-         NwPE17KokaELFoChp0HtDJ0uK/3+auqbh6RH/bnXXY4VZP7bHeLyH1reSfDwt/ItlIVQ
-         wjdzpKC9vtnyNwZTrWrd8EOoVnaKczL9nmoz2zqO36R8+ksB2mUDK4LH2t4/1D30L+rQ
-         Np8CwLviT/XPf2X3CGRt5/x7kpn7aFuQV45yVsi76VVdZLx2OD+KRQgnkWFLY9aTIKMB
-         GAXw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=MxdD42vr//ngF98PTX13azQKwSAEPSKYCuEqwcGgkfs=;
-        fh=Zp0LQiWjD5q9CJsxOG5W9hXV21UE/GyKhU+qOsfar+o=;
-        b=QFrE582CuETcWzpJxRZMGYgZsRhx1bjwvKqW+MYANY87evWjMIZ1TZHxtU51fxerwj
-         aRrydIzQpd7RNLfDx/DLNn8X8VhgzJpjPLzUT34M0mFn9rQpuD0hu8rh30cuxuC4awmW
-         rDj6nJ2vSuIP2ftaT/fUpcYTo9LJuPLouLObaTCrDou/XbP/YmrP4sugHuJ1SVugp1Dn
-         jD2OrU7OuS7RQ/J5nGDNSCwfg0cv2bLPi0ncJnf6bY7E/HLH/RMnSHfVL6N8yVrPMdWj
-         6nEZbaQ9KMmxoeF7nrRgWs9C8jbdaASiSIX0QCEDPiNahCdblPqu3E9xUMHIbzdfdmCN
-         x3jA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776718360; x=1777323160; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MxdD42vr//ngF98PTX13azQKwSAEPSKYCuEqwcGgkfs=;
-        b=FjIZLrLI3KSkP9dhCKwgfkTNIuXNaYPG/XVG89sZwWDi+Lg5mTU+TIeS7qL8fIlP5Z
-         9D2UZMCzGtnxdVpbyJp1cUEWpvLOIIoyUCMvzhyNSo8yRVJL3g2ToV1cBKEDM/aXg7gT
-         //LIV2svgvvzAyQR80Sp0BLBm+jwmv74bzfOKz1Uz8KB1FF8oE2PeNK8CXhCpKdm/tyR
-         Ehzm2Cr60Sr86eIQg3l/2mJogk6wZTBJgg1xtcAv2NQ6ocaOjEztzaMLlQjDz5AlO/E7
-         /r5We0LGgS2WTO66XnvyjgPVPEI3K4NiwoC4Mx9BOfBeR2pM5DpGdVa6wt7RLoTNS7ss
-         x5JA==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 274DD3C3425
+	for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 21:47:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.79
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776721644; cv=none; b=d46BkojqV8JEOC8QtQWJdLmHp6yVW4WuVukDI55/7LRi6DsnWf4YZcI4fzqEvKtbStJWYQI0FKQGjC9WV7iFR9VD96I/61/OEBpIkXZoANaxYqhNcbHMAeSMid1Hb0RFCDMG8QUMt5oIH4aOsyCttlhvqB9gFBV/fr4cB3snFXg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776721644; c=relaxed/simple;
+	bh=30oTKc/cluTM7EZtRjSa/q8KkzVYmAprKF2NnyBd718=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=l5Xl2gf1+Vr1GWajex2ZdPw/PXbU3iOX1aPu841hoC3HxkO1y/UHyLag8Ez+FQlWWHsesQ8BftSGPVWkbv9zr3cL11tlPQ518LrHwYlnZC8bWNls30nU+JWhcyKm8vCTTNJm+uZExMU3oXNN3MYGVJ62TiHNW3OtibWTj8HFhIY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.79
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-ot1-f79.google.com with SMTP id 46e09a7af769-7dcd603855aso1238682a34.0
+        for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 14:47:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776718360; x=1777323160;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=MxdD42vr//ngF98PTX13azQKwSAEPSKYCuEqwcGgkfs=;
-        b=hF08jYTMevRq8fiUpbU8GK3JqaiuYM2WHg4Dur3eLKNlQyT24PM9PpDBWRbTvXEjwb
-         UPHcvv87N2KnSozEojVZIg0YSpzYuEvBYSemSodkjRD+XBcHPqJBABaCZNuk1GN6FkD0
-         nchcCq3ll9CNGizaE4At99fkOmfifYKa38lED36hKn51hXoO47j0d7NeFbZq0hu48gBa
-         bsgPZwM/1Of8wIQS2nCMPtsrLDN/PSjVRRy+Z4i6OcrChwEPm10i/0swVyoubKD4nRY7
-         9px3VtpOf+rBV2ICr+gddo6AaUaB9Db1vGsjkbYkYLKKb7OsDx6A22JbMP5pG6pAr3+q
-         vqZw==
-X-Forwarded-Encrypted: i=1; AFNElJ/cD8toH5IFYVJLIWH8/saKswq7nUHmWMf6ticSCp0NDQyiFa6xUhU2dc54i5o86YQkAfrogU8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyhSy18kdMTBWW2mc6+SYBPDLzGejnak+3hGJEV4oaQzq+THN2C
-	W/wk6dhRMrcfl1di+PXxFmdf3nMgGE1SCnTuaFKyx0lL+G4ANlLaplDgIRl0h2qE8Hu5miJTA4j
-	/D+IRvY6BtzA1kqaA2V46Mo+KfRg1vp4=
-X-Gm-Gg: AeBDiesYHrPyCfhYBhGKPWKDWW/DqyKv6Dl7XO5VZXzKZhTHh3C4mmIg6zZj6FGTJ2f
-	Ewr6kSbVLgNNYq0RmwDYTm6SctzanRqZpJ/9r9Xt8VVEFEvIqarqtWUVHVmZi3xxX7MZncU0Otq
-	INBUvcKFiU3a40raruVgqgXHlPeNcyH7t+z+mMwg5hnbEMFYd7GUNu65aw9Sw7/pjdCjGMh7bTY
-	X61Bib7JNVzkq7S8DuNQ039I9TCzld8E1+O7fSHDjiwoxzh/EbmgRfQ/sI3aN7bDdpu0Egu0wxA
-	Kq5m+J/dregwrG9/B3j9e31NKbUlw3nbbKqX/azDwhkaesBo/Sq4ALWXCjotOGnXpLW+If1Ia2a
-	iP/MdMUHLLt2zyJxEbGhoeXR/w3AMUdsrviglqql2X2HR9EnE
-X-Received: by 2002:a05:6a00:2d1f:b0:82f:7252:38cf with SMTP id
- d2e1a72fcca58-82f8c82c396mr13602325b3a.16.1776718359711; Mon, 20 Apr 2026
- 13:52:39 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1776721640; x=1777326440;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=EpSebxuwISWBXtttRGllv6OThiDp0ScPrSL9/tEWrbc=;
+        b=D8UvsIHZOW+IA+oTFvAUgNDt8uYp7De/aSOXSbpcV9qvDm+ht+pSh6ASWei+RxW3c+
+         RLIgjGKdYmIkO+5emC4C+mcaOSruBDrMDAnQOVBg6IFnkuOUX/awRj3JsEeoa9aJ1uxW
+         PjeCM3VdxI9zlYaA8pv3K+CaNpTWk9W6hMJHqlaKGPNwScFVc7GnNxNYrG/IbYYDJ7S0
+         GI7o0hGIqvDGWVrWO5ZoHpn6cHfx08u8MdgEKmCJyZXPrsZpoh7NQabswF9oEPFB4QeL
+         vKV2ZH0CcDNAzLl6+ohPYBEJi721Kzwr8vrU1xV8GJOPDc6mAWoWeznlB+pHaf9l8LKf
+         0gKw==
+X-Forwarded-Encrypted: i=1; AFNElJ/XX5lAA1LYAU9sdt7EDx1vvuUCMt0StgSjxoJh8Hnj0djhYW+0KOrqdoEjNU8BojvZ/+cOhOA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxsMyWz3bg4x6WIM9w4rBd8hN5CkFmbLT3F9EtDkTYkNBsfpxdH
+	EtUXTjR2+6OJLD6fKFhIv9mT2q/FFBWijRLNCvz52zKNM68U4VMKLo28RJ4mz6HRBIhOOmvW9B5
+	FSoTugcc4UZKArTPzszBrTOGIhmW+U/VZOUpeOVU5t5UGI2lmTttMF+DBs4M=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260418195843.303946-1-yiche.cy@gmail.com> <20260420082334.7db8cbf4@kernel.org>
-In-Reply-To: <20260420082334.7db8cbf4@kernel.org>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Mon, 20 Apr 2026 16:52:27 -0400
-X-Gm-Features: AQROBzDGLUKJMnGtLHblO9Fg05E_lPRg8I9KEhfXLSlLZeyIegT3XxzFdfu_aUI
-Message-ID: <CADvbK_cmmdqxXJC1q-5gDTzhq_XH1ESgRZCD6pO4Ws4GoWooYQ@mail.gmail.com>
-Subject: Re: [PATCH net v2] selftests: netfilter: conntrack_sctp_collision.sh:
- Introduce SCTP INIT collision test
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Yi Chen <yiche.cy@gmail.com>, Pablo Neira Ayuso <pablo@netfilter.org>, 
-	Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Shuah Khan <shuah@kernel.org>, coreteam@netfilter.org, netfilter-devel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org
+X-Received: by 2002:a05:6820:840e:b0:694:9224:d78e with SMTP id
+ 006d021491bc7-6949224decfmr1023868eaf.9.1776721639860; Mon, 20 Apr 2026
+ 14:47:19 -0700 (PDT)
+Date: Mon, 20 Apr 2026 14:47:19 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69e69ee7.050a0220.24bfd3.002b.GAE@google.com>
+Subject: [syzbot] [net?] [usb?] KASAN: slab-use-after-free Read in rtl8150_start_xmit
+From: syzbot <syzbot+3f46c095ac0ca048cb71@syzkaller.appspotmail.com>
+To: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, petkan@nucleusys.com, 
+	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=547af2cd0df5277f];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279926-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FREEMAIL_CC(0.00)[gmail.com,netfilter.org,strlen.de,nwl.cc,davemloft.net,google.com,redhat.com,kernel.org,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,conntrack_sctp_collision.sh:url]
-X-Rspamd-Queue-Id: CA04A433D37
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-279927-lists,netdev=lfdr.de,3f46c095ac0ca048cb71];
+	RCVD_COUNT_THREE(0.00)[4];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[goo.gl:url,syzkaller.appspot.com:url,googlegroups.com:email,storage.googleapis.com:url,appspotmail.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns];
+	REDIRECTOR_URL(0.00)[goo.gl];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	SUBJECT_HAS_QUESTION(0.00)[]
+X-Rspamd-Queue-Id: BBAB74345B7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Apr 20, 2026 at 11:23=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
-rote:
->
-> On Sun, 19 Apr 2026 03:58:43 +0800 Yi Chen wrote:
-> > The existing test covered a scenario where a delayed INIT_ACK chunk
-> > updates the vtag in conntrack after the association has already been
-> > established.
->
-> AI says:
->
-> The conntrack_sctp_collision.sh selftest is now failing in the NIPA CI on
-> both the normal and debug kernel builds:
->
->   not ok 1 1 selftests: net/netfilter: conntrack_sctp_collision.sh # exit=
-=3D1
->
->   # Test for SCTP INIT_ACK Collision in nf_conntrack:
->   # Invalid netns name ""
->   # Invalid netns name ""
->
-> The root cause is a shell variable scoping bug introduced by this patch.
-> The new test structure wraps `topo_setup` in a subshell:
->
->   (topo_setup && conf_delay $SERVER_NS link0 2) || exit $?
-Better to change it to:
+Hello,
 
-topo_setup || exit $?
-conf_delay $SERVER_NS link0 2 || exit $?
+syzbot found the following issue on:
 
-Again, please do not post the patch until the fix gets merged into net.git:
+HEAD commit:    c1f49dea2b8f Merge tag 'mm-hotfixes-stable-2026-04-19-00-1..
+git tree:       https://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb.git usb-testing
+console output: https://syzkaller.appspot.com/x/log.txt?x=158822d2580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=547af2cd0df5277f
+dashboard link: https://syzkaller.appspot.com/bug?extid=3f46c095ac0ca048cb71
+compiler:       gcc (Debian 14.2.0-19) 14.2.0, GNU ld (GNU Binutils for Debian) 2.44
 
-https://lore.kernel.org/netdev/cover.1775847557.git.lucien.xin@gmail.com/
+Unfortunately, I don't have any reproducer for this issue yet.
 
-Otherwise, it will still be failing in the NIPA CI.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/b0b2d34cef3a/disk-c1f49dea.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/54e06fcfd92f/vmlinux-c1f49dea.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/0aa8d05931c2/bzImage-c1f49dea.xz
 
-Thanks.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+3f46c095ac0ca048cb71@syzkaller.appspotmail.com
 
->   if ! do_test; then
->       ...
->   fi
->
-> `topo_setup` calls `setup_ns CLIENT_NS SERVER_NS ROUTER_NS`, which sets
-> those variables inside the subshell. Those assignments do not propagate
-> back to the parent shell, so when `do_test` is called afterwards, both
-> `$SERVER_NS` and `$CLIENT_NS` expand to empty strings. The `ip net exec "=
-"`
-> calls then fail with "Invalid netns name """.
->
-> The second test case (SCTP INIT Collision) would have the same problem.
->
-> The fix is to avoid the subshell or ensure the namespace variables are
-> visible to `do_test`. The simplest approach is to remove the subshell
-> wrapping and call `topo_setup`, `conf_delay`, and `do_test` in the same
-> shell scope:
->
->   topo_setup && conf_delay "$SERVER_NS" link0 2 || exit $?
->   if ! do_test; then
->       exit $ksft_fail
->   fi
->
->   topo_setup && conf_delay "$CLIENT_NS" link3 1 || exit $?
->   if ! do_test; then
->       exit $ksft_fail
->   fi
->
-> Please also note that `conf_delay` references `$ROUTER_NS` directly
-> (not via a parameter), so it too requires that those variables be set
-> in the same shell scope.
+==================================================================
+BUG: KASAN: slab-use-after-free in rtl8150_start_xmit+0x71f/0x760 drivers/net/usb/rtl8150.c:712
+Read of size 4 at addr ffff88810eb7a930 by task kworker/0:4/5226
+
+CPU: 0 UID: 0 PID: 5226 Comm: kworker/0:4 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/18/2026
+Workqueue: mld mld_ifc_work
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x100/0x190 lib/dump_stack.c:120
+ print_address_description mm/kasan/report.c:378 [inline]
+ print_report+0x13d/0x4b0 mm/kasan/report.c:482
+ kasan_report+0xdf/0x1d0 mm/kasan/report.c:595
+ rtl8150_start_xmit+0x71f/0x760 drivers/net/usb/rtl8150.c:712
+ __netdev_start_xmit include/linux/netdevice.h:5343 [inline]
+ netdev_start_xmit include/linux/netdevice.h:5352 [inline]
+ xmit_one net/core/dev.c:3888 [inline]
+ dev_hard_start_xmit+0x128/0x7a0 net/core/dev.c:3904
+ sch_direct_xmit+0x194/0x890 net/sched/sch_generic.c:372
+ __dev_xmit_skb net/core/dev.c:4209 [inline]
+ __dev_queue_xmit+0x278a/0x4930 net/core/dev.c:4831
+ dev_queue_xmit include/linux/netdevice.h:3401 [inline]
+ neigh_resolve_output net/core/neighbour.c:1619 [inline]
+ neigh_resolve_output+0x51d/0x8f0 net/core/neighbour.c:1599
+ neigh_output include/net/neighbour.h:556 [inline]
+ ip6_finish_output2+0xa92/0x1f20 net/ipv6/ip6_output.c:136
+ __ip6_finish_output+0x359/0xd10 net/ipv6/ip6_output.c:208
+ ip6_finish_output net/ipv6/ip6_output.c:219 [inline]
+ NF_HOOK_COND include/linux/netfilter.h:307 [inline]
+ ip6_output+0x2a1/0xa50 net/ipv6/ip6_output.c:246
+ dst_output include/net/dst.h:470 [inline]
+ NF_HOOK.constprop.0+0x115/0x5a0 include/linux/netfilter.h:318
+ mld_sendpack+0x923/0xef0 net/ipv6/mcast.c:1855
+ mld_send_cr net/ipv6/mcast.c:2154 [inline]
+ mld_ifc_work+0x75a/0xc10 net/ipv6/mcast.c:2693
+ process_one_work+0xa0e/0x1980 kernel/workqueue.c:3302
+ process_scheduled_works kernel/workqueue.c:3385 [inline]
+ worker_thread+0x5ef/0xe50 kernel/workqueue.c:3466
+ kthread+0x370/0x450 kernel/kthread.c:436
+ ret_from_fork+0x69a/0xc80 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+
+Allocated by task 5226:
+ kasan_save_stack+0x30/0x50 mm/kasan/common.c:57
+ kasan_save_track+0x14/0x30 mm/kasan/common.c:78
+ unpoison_slab_object mm/kasan/common.c:340 [inline]
+ __kasan_slab_alloc+0x6e/0x70 mm/kasan/common.c:366
+ kasan_slab_alloc include/linux/kasan.h:253 [inline]
+ slab_post_alloc_hook mm/slub.c:4569 [inline]
+ slab_alloc_node mm/slub.c:4898 [inline]
+ kmem_cache_alloc_node_noprof+0x26b/0x6b0 mm/slub.c:4950
+ __alloc_skb+0x140/0x710 net/core/skbuff.c:702
+ alloc_skb include/linux/skbuff.h:1383 [inline]
+ mld_newpack.isra.0+0x18e/0xa30 net/ipv6/mcast.c:1775
+ add_grhead+0x299/0x340 net/ipv6/mcast.c:1886
+ add_grec+0x139a/0x1940 net/ipv6/mcast.c:2025
+ mld_send_cr net/ipv6/mcast.c:2148 [inline]
+ mld_ifc_work+0x3c5/0xc10 net/ipv6/mcast.c:2693
+ process_one_work+0xa0e/0x1980 kernel/workqueue.c:3302
+ process_scheduled_works kernel/workqueue.c:3385 [inline]
+ worker_thread+0x5ef/0xe50 kernel/workqueue.c:3466
+ kthread+0x370/0x450 kernel/kthread.c:436
+ ret_from_fork+0x69a/0xc80 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+Freed by task 2860:
+ kasan_save_stack+0x30/0x50 mm/kasan/common.c:57
+ kasan_save_track+0x14/0x30 mm/kasan/common.c:78
+ kasan_save_free_info+0x3b/0x70 mm/kasan/generic.c:584
+ poison_slab_object mm/kasan/common.c:253 [inline]
+ __kasan_mempool_poison_object+0x91/0x150 mm/kasan/common.c:539
+ kasan_mempool_poison_object include/linux/kasan.h:363 [inline]
+ napi_skb_cache_put+0x68/0x740 net/core/skbuff.c:1459
+ net_tx_action+0x2b0/0xf90 net/core/dev.c:5807
+ handle_softirqs+0x1dd/0x9e0 kernel/softirq.c:622
+ __do_softirq kernel/softirq.c:656 [inline]
+ invoke_softirq kernel/softirq.c:496 [inline]
+ __irq_exit_rcu+0x160/0x210 kernel/softirq.c:735
+ irq_exit_rcu+0x9/0x30 kernel/softirq.c:752
+ instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1061 [inline]
+ sysvec_apic_timer_interrupt+0x8f/0xb0 arch/x86/kernel/apic/apic.c:1061
+ asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:697
+
+The buggy address belongs to the object at ffff88810eb7a8c0
+ which belongs to the cache skbuff_head_cache of size 232
+The buggy address is located 112 bytes inside of
+ freed 232-byte region [ffff88810eb7a8c0, ffff88810eb7a9a8)
+
+The buggy address belongs to the physical page:
+page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x10eb7a
+flags: 0x200000000000000(node=0|zone=2)
+page_type: f5(slab)
+raw: 0200000000000000 ffff888102e8c8c0 dead000000000100 dead000000000122
+raw: 0000000000000000 00000008000c000c 00000000f5000000 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 0, migratetype Unmovable, gfp_mask 0xd2820(GFP_ATOMIC|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 2971, tgid 2971 (syz-executor), ts 110258130289, free_ts 109191008280
+ set_page_owner include/linux/page_owner.h:32 [inline]
+ post_alloc_hook+0x153/0x170 mm/page_alloc.c:1858
+ prep_new_page mm/page_alloc.c:1866 [inline]
+ get_page_from_freelist+0xf34/0x3a90 mm/page_alloc.c:3946
+ __alloc_frozen_pages_noprof+0x273/0x28a0 mm/page_alloc.c:5226
+ alloc_slab_page mm/slub.c:3278 [inline]
+ allocate_slab mm/slub.c:3467 [inline]
+ new_slab+0xa6/0x6b0 mm/slub.c:3525
+ refill_objects+0x277/0x420 mm/slub.c:7251
+ refill_sheaf mm/slub.c:2816 [inline]
+ __pcs_replace_empty_main+0x375/0x650 mm/slub.c:4651
+ alloc_from_pcs mm/slub.c:4749 [inline]
+ slab_alloc_node mm/slub.c:4883 [inline]
+ kmem_cache_alloc_noprof+0x520/0x6a0 mm/slub.c:4905
+ skb_clone+0x190/0x400 net/core/skbuff.c:2107
+ dev_queue_xmit_nit+0x255/0xa80 net/core/dev.c:2574
+ xmit_one net/core/dev.c:3884 [inline]
+ dev_hard_start_xmit+0x2fc/0x7a0 net/core/dev.c:3904
+ sch_direct_xmit+0x194/0x890 net/sched/sch_generic.c:372
+ __dev_xmit_skb net/core/dev.c:4209 [inline]
+ __dev_queue_xmit+0x278a/0x4930 net/core/dev.c:4831
+ dev_queue_xmit include/linux/netdevice.h:3401 [inline]
+ neigh_hh_output include/net/neighbour.h:540 [inline]
+ neigh_output include/net/neighbour.h:554 [inline]
+ ip_finish_output2+0xea0/0x2350 net/ipv4/ip_output.c:237
+ __ip_finish_output.part.0+0x1b4/0x350 net/ipv4/ip_output.c:315
+ __ip_finish_output net/ipv4/ip_output.c:303 [inline]
+ ip_finish_output net/ipv4/ip_output.c:325 [inline]
+ NF_HOOK_COND include/linux/netfilter.h:307 [inline]
+ ip_output+0x392/0xc00 net/ipv4/ip_output.c:438
+ dst_output include/net/dst.h:470 [inline]
+ ip_local_out+0x193/0x1f0 net/ipv4/ip_output.c:131
+page last free pid 5250 tgid 5248 stack trace:
+ reset_page_owner include/linux/page_owner.h:25 [inline]
+ __free_pages_prepare mm/page_alloc.c:1402 [inline]
+ __free_frozen_pages+0x692/0xf10 mm/page_alloc.c:2943
+ tlb_batch_list_free mm/mmu_gather.c:161 [inline]
+ tlb_finish_mmu+0x27d/0x810 mm/mmu_gather.c:552
+ exit_mmap+0x454/0xa10 mm/mmap.c:1313
+ __mmput kernel/fork.c:1178 [inline]
+ mmput+0xe0/0x430 kernel/fork.c:1201
+ exit_mm kernel/exit.c:581 [inline]
+ do_exit+0x833/0x2a60 kernel/exit.c:963
+ do_group_exit+0xd5/0x2a0 kernel/exit.c:1117
+ get_signal+0x1ec7/0x21e0 kernel/signal.c:3037
+ arch_do_signal_or_restart+0x91/0x7a0 arch/x86/kernel/signal.c:337
+ __exit_to_user_mode_loop kernel/entry/common.c:64 [inline]
+ exit_to_user_mode_loop+0x7e/0x430 kernel/entry/common.c:98
+ __exit_to_user_mode_prepare include/linux/irq-entry-common.h:207 [inline]
+ syscall_exit_to_user_mode_prepare include/linux/irq-entry-common.h:238 [inline]
+ syscall_exit_to_user_mode include/linux/entry-common.h:328 [inline]
+ do_syscall_64+0x682/0x7f0 arch/x86/entry/syscall_64.c:100
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Memory state around the buggy address:
+ ffff88810eb7a800: fb fb fb fb fb fb fb fb fb fb fb fb fb fc fc fc
+ ffff88810eb7a880: fc fc fc fc fc fc fc fc fa fb fb fb fb fb fb fb
+>ffff88810eb7a900: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                                     ^
+ ffff88810eb7a980: fb fb fb fb fb fc fc fc fc fc fc fc fc fc fc fc
+ ffff88810eb7aa00: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+==================================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
