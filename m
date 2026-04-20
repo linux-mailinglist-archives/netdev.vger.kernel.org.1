@@ -1,161 +1,190 @@
-Return-Path: <netdev+bounces-279713-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279714-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eED3E4AL5mluqwEAu9opvQ
-	(envelope-from <netdev+bounces-279713-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 13:18:24 +0200
+	id Hp7+FEYJ5mluqwEAu9opvQ
+	(envelope-from <netdev+bounces-279714-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 13:08:54 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3F43429DB1
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 13:18:23 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB719429C70
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 13:08:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 98A5C3047079
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 11:02:28 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 998E83038797
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 11:06:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2745E399368;
-	Mon, 20 Apr 2026 11:02:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="dW1pAJ5Q"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EE20389453;
+	Mon, 20 Apr 2026 11:06:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
+Received: from smtpbguseast1.qq.com (smtpbguseast1.qq.com [54.204.34.129])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88ADD2D8DC2
-	for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 11:02:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DD2F3815D6
+	for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 11:06:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.129
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776682948; cv=none; b=qZM8Wio8z18JUKMwIbVKRemg4eObGB6WWkEjX0iERrGuQ5wzuLLnuXcJnLJV9Q3uIReivSIEoMGPLmrFmO9qBuPwIufvp6AG9uQJAT99Z8PKPn6PhvB1Z5ZvPsbJori1V9BBOpPwdgaWe+A5U0I/dUJrGcDoBoacIT7bYd96IOM=
+	t=1776683198; cv=none; b=YIePoPQ7hbZ4RkPLF+QtEHVfREfZb+C/GmQY+ONZ/BYP5AjtDaWcMhGDKWzk8gJ0pilvifPMBnLmeWKEfId6a0i8S8U2K7vum7lseOWAYeCkKERgEOJCFyV+cv/KUtzVF5xYhTj0GF+fclcTFuy58yCNU1FBW9dWPyCBw9PBzjY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776682948; c=relaxed/simple;
-	bh=1aRttrrBP0iCZYc0rvz52hQkbSo7VxgBOO63EUEhW+U=;
+	s=arc-20240116; t=1776683198; c=relaxed/simple;
+	bh=89xYmaXYt54tONc+OPOCcPYXFx7Vh5odHwv7v2erGZc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Sl+s53PCD5QVyIWTzdc5gStczry753KBeTHjd/Vl9cK1vkb4PTGr/gSKCv6sA0w0XBey0tT2frqvGLn2oZ1c0ob3oUkU57PWEh1OQbDJ+fxVMsKSsXcMDPwKAhU9GOJkbe1amcMnSeGGWOsHiqTrUqxWVFRg6rcBvF+j3NyCFgk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dW1pAJ5Q; arc=none smtp.client-ip=95.215.58.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <e4d05627-875a-4d4f-9d58-ee049b711aa0@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1776682934;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2M+mBywnMu+XNm7UR9zjkEyZpd9/dF14yBgmIQ6PV5Q=;
-	b=dW1pAJ5QZWa418lIiNPagOPpCKEiCyzqD6onTfEjOSJGHx1494+cb3nVlO7S3Tjqxlu/FE
-	HyY80omAhUPqu+fT+GlvDwDooBY1H8WkX2jd8DIozb7V8b1lOUiFT2szSnNu1Ym+Pl1mYP
-	xYfP4+egEW4qmWo5jvWuo4+uTugXL68=
-Date: Mon, 20 Apr 2026 19:01:53 +0800
+	 In-Reply-To:Content-Type; b=ih531Sbn0/M3EiIqhV88JVWChwCl9Nn1MibdGPvrfO9ww/PnzoBXt/m0dqMzDiZLYo4kzqq1wM2/Hia+LpRHMx7e6pEGV6UWrIhNu8n9Hz0ygbwEcL0hsPv+clt38xaHII4ffCHYOA0s/FHwmtBENjmaXsrFvpXnBNtoV3eyy2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=radxa.com; spf=pass smtp.mailfrom=radxa.com; arc=none smtp.client-ip=54.204.34.129
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=radxa.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=radxa.com
+X-QQ-mid: esmtpgz15t1776683179t1882687e
+X-QQ-Originating-IP: lBnI0r0z5UO3nWnYZprl58R168gjJuMCcluZI13ZSsg=
+Received: from [192.168.254.128] ( [106.150.157.243])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Mon, 20 Apr 2026 19:06:15 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 4082574932268126283
+Message-ID: <0A5279953D81BB9C+f50c9b49-3e5d-467f-b69a-7e49ed223383@radxa.com>
+Date: Mon, 20 Apr 2026 20:06:15 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf] bpf: Fix NULL pointer dereference in
- bpf_skb_fib_lookup()
-To: Weiming Shi <bestswngs@gmail.com>, Martin KaFai Lau
- <martin.lau@linux.dev>, Daniel Borkmann <daniel@iogearbox.net>,
- Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
- KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Simon Horman <horms@kernel.org>,
- Jesper Dangaard Brouer <hawk@kernel.org>, bpf@vger.kernel.org,
- netdev@vger.kernel.org, Xiang Mei <xmei5@asu.edu>
-References: <20260419170131.3899757-2-bestswngs@gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-In-Reply-To: <20260419170131.3899757-2-bestswngs@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC Patch net-next v1 0/9] r8169: add RSS support for RTL8127
+To: javen <javen_xu@realsil.com.cn>, hkallweit1@gmail.com,
+ nic_swsd@realtek.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260420021957.1756-1-javen_xu@realsil.com.cn>
+Content-Language: en-US
+From: FUKAUMI Naoki <naoki@radxa.com>
+In-Reply-To: <20260420021957.1756-1-javen_xu@realsil.com.cn>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [4.84 / 15.00];
-	SEM_URIBL(3.50)[asu.edu:email];
+Content-Transfer-Encoding: 7bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpgz:radxa.com:qybglogicsvrsz:qybglogicsvrsz4b-0
+X-QQ-XMAILINFO: ND3CPZxVFFQcRd7WNkj049S4TcbgolNRguJYRHExv1AAJujqtztbJWuM
+	zO03n+qVyNjpgjtubv+I0dS7OZ/9fU5ixNvoww2byRCVMV0n+B8GnDB17ZeygytUhn4IX5Y
+	WON5hjPFuPBzuHAFKZOmj35wQAnN1p1COQp4b8btgQWAR+X3B0Y+iIfdvCRye+5SmhqrW1a
+	xXUsKZ/+4UTeBAUY6twicthsWCHhQOATvtSfoXCDLfm2LKysxaZWN9Z18Iq/Jl93YeepHs+
+	dWAvITdSX7xOVtvIo4TPXztmRXHtI4SIbsMuFKSkHuooslI2Du/U+JOCn3PPWZXW2lgLisl
+	QL0jI43nUoScdjfAuqsSOtyY3y6R/7cHYhkapOXSQ5BQCd29tmXzCF3jQPq1CkVGcP3jnCl
+	11VSopbv5i+cI8Q0gdPsJnDCSmWrhzgVpL9Lpjx0VlQPwusUvjDCEF7Z7Zgsz+4goUNECBm
+	3/xnqg78hUlONvNJwswS1EXzm8pJqXH2SuYsp0p/a4fw7HMKiHqGycv7eutdnpbPkfgAd96
+	Pkfvwo1AW8jz5mxB6nqtmZkn+MJjCL0KiL6zTcsQ/XQoCQILh0NNY2ObYAw7tTpZMeJPSv5
+	WSKeYM2dI+2rBqdh6lbalUtgf8CXLw+9N8Ut/L+cKDyNXbmYz4Wupi8TSUo0eu1H4NWLbva
+	AGblU9ceKbPuKStb2n3WGErvPpZTOJMrjgCBFHP0kmyrFe3O+/l7YOJdtnDGyULQ2QigmLc
+	wylshF1B0YtdwvJkKyeOYaM4cn8lKSzmtAqw42ij96BNf3ds+b35PC5PCg9uZwfQvuRVdXq
+	iMisIohimk+iWnhltIYxxmup7B8L2zEgSVVmm5NTfmfP05vdE3ckNjC7xrHu7RsoxdnA/FX
+	wRwVW+Ckrq6ppM/0t6hqkGiPGXFYpEDtWa0SV2QlDyBYud2ICGqUVCmhape/m/bS
+X-QQ-XMRINFO: Nq+8W0+stu50tPAe92KXseR0ZZmBTk3gLg==
+X-QQ-RECHKSPAM: 0
+X-Spamd-Result: default: False [0.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
-	BAD_REP_POLICIES(0.10)[];
+	DMARC_POLICY_SOFTFAIL(0.10)[radxa.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FORGED_MUA_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-279714-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[realsil.com.cn,gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279713-lists,netdev=lfdr.de];
-	R_DKIM_ALLOW(0.00)[linux.dev:s=key1];
-	FREEMAIL_TO(0.00)[gmail.com,linux.dev,iogearbox.net,kernel.org,davemloft.net,google.com,redhat.com];
-	GREYLIST(0.00)[pass,body];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	RCVD_COUNT_THREE(0.00)[3];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,fomichev.me,kernel.org,linux.dev,google.com,vger.kernel.org,asu.edu];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.866];
-	MID_RHS_MATCH_FROM(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	DMARC_POLICY_ALLOW(0.00)[linux.dev,none];
-	TAGGED_RCPT(0.00)[netdev];
-	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	R_SPF_ALLOW(0.00)[+ip6:2600:3c0a:e001:db::/64:c];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,asu.edu:email]
-X-Rspamd-Queue-Id: A3F43429DB1
+	FROM_NEQ_ENVFROM(0.00)[naoki@radxa.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	NEURAL_HAM(-0.00)[-0.891];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	R_DKIM_NA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: BB719429C70
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+Hi Javen,
 
-On 4/20/26 1:01 AM, Weiming Shi wrote:
-> When tot_len is not provided by the user, bpf_skb_fib_lookup()
-> resolves the FIB result's output device via dev_get_by_index_rcu()
-> to check skb forwardability and fill in mtu_result. The returned
-> pointer is dereferenced without a NULL check. If the device is
-> concurrently unregistered, dev_get_by_index_rcu() returns NULL and
-> is_skb_forwardable() crashes at dev->flags:
->
->   KASAN: null-ptr-deref in range
->    [0x00000000000000b0-0x00000000000000b7]
->   Call Trace:
->    is_skb_forwardable (include/linux/netdevice.h:4365)
->    bpf_skb_fib_lookup (net/core/filter.c:6446)
->    bpf_prog_test_run_skb (net/bpf/test_run.c)
->    __sys_bpf (kernel/bpf/syscall.c)
->
-> Add the missing NULL check, returning -ENODEV to be consistent
-> with how bpf_ipv4_fib_lookup() and bpf_ipv6_fib_lookup() handle
-> the same condition.
->
-> Fixes: e1850ea9bd9e ("bpf: bpf_fib_lookup return MTU value as output when looked up")
+Thank you very much for your nice work!
 
-Is it correct to blame  this commit?
+On 4/20/26 11:19, javen wrote:
+> From: Javen Xu <javen_xu@realsil.com.cn>
+> 
+> This series patch adds RSS support for RTL8127 in the r8169 driver.
+> 
+> Currently, without RSS support, a single CPU core handles all incoming
+> traffic. Under heavy loads, this single core becomes a bottleneck, causing
+> high softirq usage and leading to unstable and degraded network throughput.
+> 
+> As a result, we add rss support for RTL8127. This RFC patch is just for
+> discussing. And we do some experiments on AMD platform. Below is the
+> result.
+> 
+> Platform: AMD Ryzen Embedded R2514 with Radeon Graphics(4 Cores/8 Threads)
+> Arch: x86_64
+> Test command:
+>    Server: iperf3 -s
+>    Client: iperf3 -c 192.168.2.1 -P 20 -t 3600
+> Monitor: mpstat -P ALL 1
+> 
+> Before this patch (Without RSS):
+>    Throughput: Unstable, fluctuating between 3.76 Gbits/sec and
+>    8.2 Gbits/sec.
+>    CPU Usage: A single CPU core is fully occupied with softirq reaching
+>    up to 96%.
+> 
+> After this patch (With RSS enabled):
+>    Throughput: Stable at 9.42 Gbits/sec.
+>    CPU Usage: The traffic load is evenly distributed across multiple CPU
+>    cores. The maximum softirq on a single core dropped to 63%.
 
-I find such code block 'if (!is_skb_forwardable(dev, skb))' was 
-introduced by 4f74fede40df
+Platform: Radxa ROCK 5T (RK3588: 4x Cortex-A76, 4x Cortex-A55)
+Arch: aarch64
+Configuration: smp_affinity is set to use only the big cores.
 
+Vanilla Linux v7.0:
+Throughput: 5.5 Gbps (4.3 Gbps with -P 20)
+CPU Usage: ~100% on a single A76 core.
 
-> Reported-by: Xiang Mei <xmei5@asu.edu>
-> Signed-off-by: Weiming Shi <bestswngs@gmail.com>
-> ---
->   net/core/filter.c | 2 ++
->   1 file changed, 2 insertions(+)
->
-> diff --git a/net/core/filter.c b/net/core/filter.c
-> index 78b548158fb0..3e56b567bd18 100644
-> --- a/net/core/filter.c
-> +++ b/net/core/filter.c
-> @@ -6450,6 +6450,8 @@ BPF_CALL_4(bpf_skb_fib_lookup, struct sk_buff *, skb,
->   		 * against MTU of FIB lookup resulting net_device
->   		 */
->   		dev = dev_get_by_index_rcu(net, params->ifindex);
-> +		if (!dev)
-> +			return -ENODEV;
->   		if (!is_skb_forwardable(dev, skb))
->   			rc = BPF_FIB_LKUP_RET_FRAG_NEEDED;
->   
+Linux v7.0 + this patch series:
+Throughput: 9.4 Gbps with -P 20
+CPU Usage: distributed across all four A76 cores.
+
+Looks good to me!
+
+Feel free to use:
+Tested-by: FUKAUMI Naoki <naoki@radxa.com>
+
+Best regards,
+
+--
+FUKAUMI Naoki
+Radxa Computer (Shenzhen) Co., Ltd.
+
+> Patch summary:
+>    Patch 1: Adds necessary macro and register definitions for RSS.
+>    Patch 2-4: Support NAPI and multi RX/TX queues.
+>    Patch 5-6: Support MSI-X and enables it specifically for RTL8127.
+>    Patch 7: Enables RSS for RTL8127.
+>    Patch 8-9: Adds ethtool support to configure the number of RX queues.
+>    
+> Javen Xu (9):
+>    r8169: add some register definitions
+>    r8169: add napi and irq support
+>    r8169: add support for multi tx queues
+>    r8169: add support for multi rx queues
+>    r8169: add support for msix
+>    r8169: enable msix for RTL8127
+>    r8169: add support and enable rss
+>    r8169: move struct ethtool_ops
+>    r8169: add support for ethtool
+> 
+>   drivers/net/ethernet/realtek/r8169_main.c | 1437 ++++++++++++++++++---
+>   1 file changed, 1238 insertions(+), 199 deletions(-)
+
 
