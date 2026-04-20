@@ -1,165 +1,162 @@
-Return-Path: <netdev+bounces-279735-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279736-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aGJHFmMh5mkMsAEAu9opvQ
-	(envelope-from <netdev+bounces-279735-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 14:51:47 +0200
+	id OACtAfIk5ml1sgEAu9opvQ
+	(envelope-from <netdev+bounces-279736-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 15:06:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A912542AF7F
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 14:51:46 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 563A042B3A1
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 15:06:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A5CF530D00A8
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 12:47:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D7D3230AEEAC
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 12:56:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A94E93A2541;
-	Mon, 20 Apr 2026 12:47:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE0CF39EF1C;
+	Mon, 20 Apr 2026 12:55:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="I2ybQzdu"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="5I4a1zCb"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64BF33A16B3;
-	Mon, 20 Apr 2026 12:47:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90E7439BFEF;
+	Mon, 20 Apr 2026 12:55:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776689268; cv=none; b=A8WB+15A8R7DYOwhNhQSzAwtMpIkxqPVHFa9/aKKBVrdNjtoYi1EySiJdiauvfMlsUfwF3v8ycFUtLkPt2dqiIaLdtOtO9POaff+uLXoZp+sS6Xcwm/UD34Bj3JKexlYhs0cvELPM2/92WcAoTojXZ7N6pcKhqNtWKajvwqaMCA=
+	t=1776689738; cv=none; b=le5RVHVzE1vnFq4XIUDAeZ4Oobqw1CMWcZEwkETNkixwfZBJWlfppCLb7LbU1Oc6+hwXrPrhK06wEVDHVAr4H4WE17znWBGFbkp8Ii96fwSw17fv3CtoMwkMEwgJz6mgo0E0qnM8cRmMcGsP4eetkWYdESAu6DFoQPtTO3jdWcY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776689268; c=relaxed/simple;
-	bh=Ni6vx9SF49yxYhP3LbrjHOLdZht5SxkCYU2TLmQY4dY=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DEB93FGZlmc6ki8FpeyLRWnHAnHmbjNTP96wkcN27/gfPWK4ZyoALzOWqHJYwPen572ZiOINoVOQMRb+KWxT89x+NMNZ/zJznIpNMIbuM7vFBYZUs2xWd7mCebvW0D0HqmtO8pf/5QzA0WWynXGz3XyxMmQO5OMNsJ5MspHlnAg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=I2ybQzdu; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1173)
-	id B3E8720B6F21; Mon, 20 Apr 2026 05:47:47 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com B3E8720B6F21
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1776689267;
-	bh=BBxLSN6bc6KHGhDAGqcnT/zZk1brxAn7fdLjOWLSc1I=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=I2ybQzdurCAAABChs9YkdF1xaaWxTFXL1ZHhf60lEPChHzRBk0Zdm3hKB8zA5B8ZK
-	 5sN+G40Fw31HlcTeVi8Em1r3CqXT+Gytu/DSI7/g8Iykmh9/dW2QAz3oRyuk8IH4GA
-	 7yLekABiJpIbs2Z/awB2/MlM/fZANy2W8tUeOO/E=
-From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-To: kys@microsoft.com,
-	haiyangz@microsoft.com,
-	wei.liu@kernel.org,
-	decui@microsoft.com,
-	longli@microsoft.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	ernis@linux.microsoft.com,
-	ssengar@linux.microsoft.com,
-	dipayanroy@linux.microsoft.com,
-	gargaditya@linux.microsoft.com,
-	shirazsaleem@microsoft.com,
-	kees@kernel.org,
-	kotaranov@microsoft.com,
-	leon@kernel.org,
-	shacharr@microsoft.com,
-	stephen@networkplumber.org,
-	linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net v4 5/5] net: mana: Fix EQ leak in mana_remove on NULL port
-Date: Mon, 20 Apr 2026 05:47:39 -0700
-Message-ID: <20260420124741.1056179-6-ernis@linux.microsoft.com>
-X-Mailer: git-send-email 2.43.7
-In-Reply-To: <20260420124741.1056179-1-ernis@linux.microsoft.com>
-References: <20260420124741.1056179-1-ernis@linux.microsoft.com>
+	s=arc-20240116; t=1776689738; c=relaxed/simple;
+	bh=d45Xa2/GroMjYI6hcMvyw5rjVTXSny3hJGB9SMNsRD8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=klanM9IccQIWcrRHDBb4Gva0rAmfeAk+YpFzdXsuALwenXhmfBNEnA6HqzmF7yYdxgpBl6o1hxBQYTdqcIqQBOov4uNpBe96+UJcRE94s6UGnSstNC20zoDv8Ith8k9whhAcO/EudQlV1DZWi41qKy7pctw8Ffsfx23Ja+MSd8s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=5I4a1zCb; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=7k/G0mxDu1BDRg79O+iI7CDpqcKHLLmptJc15ZbXb3Q=; b=5I4a1zCbI0NK0BDPExyF8GLQsF
+	BUfSW0wmwEQRnHPY8gHW0EWjRWpHpnCZ4sXGfZNclCcglgialSjiNpXtt/NtPtBnag8kHODd2N5Sw
+	jaIBtGiHG3nqfxVea1Le5LoHgWRnYMKl60nwpqFmC68tW+NeylN3DUqHgUMzbMT5GTBM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wEo9p-00Gk6o-79; Mon, 20 Apr 2026 14:55:21 +0200
+Date: Mon, 20 Apr 2026 14:55:21 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Chukun Pan <amadeus@jmu.edu.cn>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v2 1/1] net: phy: realtek: Add support for PHY LEDs on
+ RTL8221B
+Message-ID: <92e843f7-aec2-4c6c-bc8f-a869c542fcb4@lunn.ch>
+References: <20260420100800.2435204-1-amadeus@jmu.edu.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
-	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260420100800.2435204-1-amadeus@jmu.edu.cn>
+X-Spamd-Result: default: False [3.34 / 15.00];
+	SEM_URIBL(3.50)[jmu.edu.cn:email];
 	MAILLIST(-0.15)[generic];
+	BAD_REP_POLICIES(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2600:3c0a:e001:db::12fc:5321:from];
-	TAGGED_FROM(0.00)[bounces-279735-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ernis@linux.microsoft.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[davemloft.net,redhat.com,kernel.org,google.com,armlinux.org.uk,makrotopia.org,gmail.com,vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.microsoft.com:+];
-	TO_DN_NONE(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[100.90.174.1:received,13.77.154.182:received];
-	NEURAL_HAM(-0.00)[-0.995];
-	RCPT_COUNT_TWELVE(0.00)[23];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	DMARC_POLICY_ALLOW(0.00)[lunn.ch,none];
+	TAGGED_FROM(0.00)[bounces-279736-lists,netdev=lfdr.de];
+	R_DKIM_ALLOW(0.00)[lunn.ch:s=20171124];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.999];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.microsoft.com:dkim,linux.microsoft.com:mid]
-X-Rspamd-Queue-Id: A912542AF7F
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(0.00)[+ip4:172.234.253.10:c];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:dkim,lunn.ch:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,jmu.edu.cn:email]
+X-Rspamd-Queue-Id: 563A042B3A1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-In mana_remove(), when a NULL port is encountered in the port iteration
-loop, 'goto out' skips the mana_destroy_eq(ac) call, leaking the event
-queues allocated earlier by mana_create_eq().
+On Mon, Apr 20, 2026 at 06:08:00PM +0800, Chukun Pan wrote:
+> Realtek RTL8221B Ethernet PHY supports three LED pins which are used to
+> indicate link status and activity. Add netdev trigger support for them.
+> 
+> Signed-off-by: Chukun Pan <amadeus@jmu.edu.cn>
+> ---
+> Changes in v2:
+> - Invert the LED polarity in led_brightness_set to achieve LED_ON.
 
-This can happen when mana_probe_port() fails for port 0, leaving
-ac->ports[0] as NULL. On driver unload or error cleanup, mana_remove()
-hits the NULL entry and jumps past mana_destroy_eq().
+Nice idea.
 
-Change 'goto out' to 'break' so the for-loop exits normally and
-mana_destroy_eq() is always reached. Remove the now-unreferenced out:
-label.
+> +static int rtl822xb_led_hw_control_set(struct phy_device *phydev, u8 index,
+> +				       unsigned long rules)
+> +{
+> +	u16 val = 0;
+> +	bool act;
+> +	int ret;
+> +
+> +	if (index >= RTL8211x_LED_COUNT)
+> +		return -EINVAL;
+> +
+> +	if (test_bit(TRIGGER_NETDEV_LINK, &rules) ||
+> +	    test_bit(TRIGGER_NETDEV_LINK_10, &rules))
+> +		val |= RTL822X_VND2_LCR_LINK_10;
+> +
+> +	if (test_bit(TRIGGER_NETDEV_LINK, &rules) ||
+> +	    test_bit(TRIGGER_NETDEV_LINK_100, &rules))
+> +		val |= RTL822X_VND2_LCR_LINK_100;
+> +
+> +	if (test_bit(TRIGGER_NETDEV_LINK, &rules) ||
+> +	    test_bit(TRIGGER_NETDEV_LINK_1000, &rules))
+> +		val |= RTL822X_VND2_LCR_LINK_1000;
+> +
+> +	if (test_bit(TRIGGER_NETDEV_LINK, &rules) ||
+> +	    test_bit(TRIGGER_NETDEV_LINK_2500, &rules))
+> +		val |= RTL822X_VND2_LCR_LINK_2500;
+> +
+> +	ret = phy_write_mmd(phydev, MDIO_MMD_VEND2,
+> +			    RTL822X_VND2_LED(index), val);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	act = test_bit(TRIGGER_NETDEV_RX, &rules) ||
+> +	      test_bit(TRIGGER_NETDEV_TX, &rules);
+> +
+> +	return phy_modify_mmd(phydev, MDIO_MMD_VEND2, RTL822X_VND2_LCR6,
+> +			      RTL822X_VND2_LED_ACT(index), act ?
+> +			      RTL822X_VND2_LED_ACT(index) : 0);
 
-Fixes: 1e2d0824a9c3 ("net: mana: Add support for EQ sharing")
-Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+I think to be safe, you probably should set the polarity back to its
+default. Or you need to add to the commit message that you have
+verified that ledtrig-netdev will always turn the LED off before
+offloading to hardware, so resetting the polarity.
+
+    Andrew
+
 ---
-Changes in v4:
-* No change
-Changes in v3;
-* Update Fixes tag to appropriate commit id.
-Changes in v2:
-* Apply the patch in net instead of net-next.
----
- drivers/net/ethernet/microsoft/mana/mana_en.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-index 39b18577fb51..98e2fcc797ca 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-@@ -3752,7 +3752,7 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
- 		if (!ndev) {
- 			if (i == 0)
- 				dev_err(dev, "No net device to remove\n");
--			goto out;
-+			break;
- 		}
- 
- 		apc = netdev_priv(ndev);
-@@ -3783,7 +3783,7 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
- 	}
- 
- 	mana_destroy_eq(ac);
--out:
-+
- 	if (ac->per_port_queue_reset_wq) {
- 		destroy_workqueue(ac->per_port_queue_reset_wq);
- 		ac->per_port_queue_reset_wq = NULL;
--- 
-2.34.1
-
+pw-bot: cr
 
