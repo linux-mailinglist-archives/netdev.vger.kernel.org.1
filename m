@@ -1,62 +1,63 @@
-Return-Path: <netdev+bounces-279760-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279761-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CMRWLbYt5mliswEAu9opvQ
-	(envelope-from <netdev+bounces-279760-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 15:44:22 +0200
+	id MPHLNcYt5mliswEAu9opvQ
+	(envelope-from <netdev+bounces-279761-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 15:44:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 803C042C354
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 15:44:22 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1C9E42C36B
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 15:44:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 71B8831F9676
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 13:32:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 467CB31FC364
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 13:32:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0AAE3AA4EF;
-	Mon, 20 Apr 2026 13:21:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D172E3AB27C;
+	Mon, 20 Apr 2026 13:21:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pAu0hTTs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aXWwGDws"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE5C63A380B;
-	Mon, 20 Apr 2026 13:21:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF1E73AB26E;
+	Mon, 20 Apr 2026 13:21:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776691284; cv=none; b=OwWPUV2nWj16oWT89Z+vcBj2aHpiS/yThgkcD+Z1C9/qAhBO5raJYgkNTMx/iP0SesHQbJafsSa9VUONMfAoH0Vsc2T5c1mbGEa+A2lTyxUSnwFkd6Gx8j0D4eItN5tmJRtnv5z5uiixWOmpg7vfWYMwGPjMlN0s/jAG0wjlB1U=
+	t=1776691286; cv=none; b=Y/5F4OGAn5Z1hM7cYbREwh2JNsCCXdI96CUPN+qLX5fKqHWfD82hUF0n4q+gcTXcCZaH1R/xUSjE9+mFEtxmDsDRJvNLZg5vHZY4ZpmhO4VGeWF2xM851sf5Ol95NlIjB2kqI3GXu7QhsUMb1Fi09Kl4KCDyGjQJ5TUAgcg6uQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776691284; c=relaxed/simple;
-	bh=cJAqQnfgPXa28vqoxI/T0p+NIPE7QoumqsMgAEtT2cg=;
+	s=arc-20240116; t=1776691286; c=relaxed/simple;
+	bh=DtaC9BBV2mp7K+i9tmB1F+t3t/28nMoUYoKHx1gzvVY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mFjoXVARHflfaSh0XT8l0AUpT5oJsTS2PYUq8phTwUQ7OX6VDcPVlbKzOxYntRiyQpexQyMNTGEzyRiYsEEr1aUfK3A+Ety8pfxzf6zjlxE5+qTJ8v2XRuhc9QfHcOGqBWB7XTT4pE05tGXjlOZFN+p3JvyMiHV9g+YWqYq685Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pAu0hTTs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11249C2BCB4;
-	Mon, 20 Apr 2026 13:21:23 +0000 (UTC)
+	 MIME-Version; b=iCYz9WsxXCoi3nfvEqwY1ybDN26hQwbMjWXkOp6YKRWmKTVD6d5pEq8bfs0o/cuYqsijM/Ch3min7qnE18MW/KWzGlefVJwouCd74ONekwLqwC1IIL2QNHcZszhAG8YEyr8eZtfZSYOe7ZZw1S9ySL90eVjABB11YLR+Vqfps9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aXWwGDws; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC881C19425;
+	Mon, 20 Apr 2026 13:21:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776691284;
-	bh=cJAqQnfgPXa28vqoxI/T0p+NIPE7QoumqsMgAEtT2cg=;
+	s=k20201202; t=1776691286;
+	bh=DtaC9BBV2mp7K+i9tmB1F+t3t/28nMoUYoKHx1gzvVY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=pAu0hTTsSWm9a96ekDPLeqXY7Iw2/rYkZ+Tx+Qd2/xcNf5nqQxJ3UqKbe3BoIXJTn
-	 VFxFtQvdONvHrnbqhYjv/GetWNaolVdcgtpjsS3kR46zAa2sORAsdSQR6HqXG6XzuK
-	 uz+s1bu1TrqtQTiDNcb32x5nMRe50bwBvsxGBFWrYAa85fUsgzExTYosGd/PbB5ktO
-	 Dfd2ZtGe9SkMOFQrRXR4QwgALYWCUnHCcg/aS7D3AkNlve1I/zwD8lEr9xC0dbHKqO
-	 PzmL+vM4SHlPavNjiQY/z+5jYktrGTDwSoqQdx3yPkAbhWUn1k1WAEcWMEnqB/c+Uf
-	 mwe1MdQE3KY+w==
+	b=aXWwGDws9FGBIM0pev0J+EvLpF2Cf5/DpYq1ITR/dU61DebMq8pnBrcgT9risoSE1
+	 yEUP8iADMS4aW+XUd1e+T46JffkKdcFNpCJAhYNxzRUB+mnKqOZxwKAszjYmGYfcaD
+	 738OChq17okKIC0tqgk6U8Fg6R/jX3AEcdfBHDoO/s1OsiPrdgp0Yx3paL8XwA5QFw
+	 Hm+MVbGMTHIgUwWEFCCXg+mEXLpiRbuycSOr2E5VCSMHu4w+sKC6GIWPvXZ5OHGy/1
+	 HgTXSHynFQW+G1pEIe5+9j6aiNr/OumjmNNIDLGKzBZ64ZClYO6N/sdk8YqaOCm3Y0
+	 rQM43Q9xJG7SQ==
 From: Sasha Levin <sashal@kernel.org>
-To: XiaoHua Wang <561399680@139.com>
+To: Chelsy Ratnawat <chelsyratnawat2001@gmail.com>
 Cc: Sasha Levin <sashal@kernel.org>,
 	stable@vger.kernel.org,
 	netdev@vger.kernel.org,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: Re: [PATCH 6.6.y/6.1.y] net: add proper RCU protection to /proc/net/ptype
-Date: Mon, 20 Apr 2026 09:21:05 -0400
-Message-ID: <20260420-stable-reply-net-ptype-6-6-6-1@kernel.org>
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>
+Subject: Re: [PATCH 6.12.y/6.6.y/6.1.y] net: sched: fix TCF_LAYER_TRANSPORT handling in tcf_get_base_ptr()
+Date: Mon, 20 Apr 2026 09:21:07 -0400
+Message-ID: <20260420-stable-reply-net-sched-tcf-layer@kernel.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260414121118.4227-1-561399680@139.com>
-References: <20260414121118.4227-1-561399680@139.com>
+In-Reply-To: <20260415214348.850171-1-chelsyratnawat2001@gmail.com>
+References: <20260415214348.850171-1-chelsyratnawat2001@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,43 +65,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279760-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[139.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,mojatatu.com,gmail.com,resnulli.us];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-279761-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_FIVE(0.00)[6];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[7];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 803C042C354
+X-Rspamd-Queue-Id: A1C9E42C36B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Apr 14, 2026, XiaoHua Wang wrote:
-> Backport of f613e8b4afea ("net: add proper RCU protection to
-> /proc/net/ptype") to 6.6.y and 6.1.y.
+On Wed, Apr 15, 2026, Chelsy Ratnawat wrote:
+> Backport of 4fe5a00ec707 ("net: sched: fix TCF_LAYER_TRANSPORT
+> handling in tcf_get_base_ptr()") to 6.12.y/6.6.y/6.1.y.
 
-Queued for 6.6 and 6.1, thanks.
+Queued for 6.12, 6.6, and 6.1, thanks.
 
 --
 Thanks,
