@@ -1,213 +1,241 @@
-Return-Path: <netdev+bounces-279612-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279613-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6KXfAIJc5WnjigEAu9opvQ
-	(envelope-from <netdev+bounces-279612-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 00:51:46 +0200
+	id iIW1Mplv5WmGjwEAu9opvQ
+	(envelope-from <netdev+bounces-279613-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 02:13:13 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E1A4425B84
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 00:51:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F634425E35
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 02:13:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9D4513014944
-	for <lists+netdev@lfdr.de>; Sun, 19 Apr 2026 22:51:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7A980300DDE7
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 00:13:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F26E730E84B;
-	Sun, 19 Apr 2026 22:51:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAF5D347DD;
+	Mon, 20 Apr 2026 00:13:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PIVyWv+N"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="YMCfY0nv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 869B7DF76
-	for <netdev@vger.kernel.org>; Sun, 19 Apr 2026 22:51:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.45
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776639102; cv=pass; b=EOiYasy2NZxSlDj3z9CoAuyxokpWw/ghA+lRcF3viP9t1aaqD1jlpPU5Net7R5m3hyslhUEFVIc6vr0SJV87jE/V0FPf1A22sGp5l7kCUeFboUcXvebQF5+/r7dXIa3BLPpkGAiaL9k7qVHKoGP5BRTzsiGkNMoXJixe1A37ioY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776639102; c=relaxed/simple;
-	bh=nGI8q1vIW2YCqL8DB2swQpMBunXNj9M7QpTu5vxe99c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Evk/p6VwDed7h1b411x57Odo26agFE13UpJkBB5S7xzuksfybEO0dBfq0VQfyE2fATsr59amRs2rJSs/tCk4BB0EP8kQEvzeeI0UbDx+074DIPyuq5nQ6Y6GwWGg77N/dVvNVf57D13TFMCHv0dDiNfmoO20aAB8je4hFa8+I88=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PIVyWv+N; arc=pass smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-43d7645adbdso1352568f8f.1
-        for <netdev@vger.kernel.org>; Sun, 19 Apr 2026 15:51:41 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776639100; cv=none;
-        d=google.com; s=arc-20240605;
-        b=NvoC6TBLepSsAcng6j4KcrZsy0THE1eHOYjymaS9OZBW8IK6VsBRqJ4uCVNH2ksG5F
-         qdwgbmUQhfZQbnT2XjjT2RSEF126+i69PsIr3xAuy3dBz8m/j21dEx6COnG1HmChZzfl
-         B83+fipkuYUmIvrvKLN36lbovaQY4e/gvEsI2e2etXaDMuyH07sXiW35oCJyXgFE1GGt
-         ZCMfCp8N8uwr8y6cqXB+1h5C/y/PA2AjAERrMLO6PMxMjcRfid3Uvn34hQS3kVg8KQg3
-         PidkVDDFR+5hmnfHpbsFLBhH5+/2VOjTlrwRZyTFHgM1n3eSHYpYpz0ck/RmKIq3uL77
-         JPzw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=nGI8q1vIW2YCqL8DB2swQpMBunXNj9M7QpTu5vxe99c=;
-        fh=WJBewR0FLTQOwROAYrDd01yaORTEtbasJa0KdWJOF5s=;
-        b=Z5BA0ziDRcUn4oFAkQ13khH4Wma93Ypl+qTbITEjWF8oqH+uQ8ryBIH47k0PXGuk9V
-         du63XupJ25BJIJuHeKO83wi3ZjS8PYCn1XBgUuw9yOEglBOYpJcw8ulbMoflmB+e+0fG
-         d85k+VBWYBuRH3sg70RO81aPSgZb/u0CtVHnZiqygonbjzCslAhJ/AyHwQHSgY9ihFkz
-         as7/yF93HVO2av9fWHFkj7CbBF74bA0cocGZseVWzhvW0d3+QDc8srPsowqvygixr45+
-         6t6nkqioGupAbctjfCi4KyXD15iAvaknD4vEF9MhYfoPhjFEfWwydT7gXDpLHgsknouC
-         gJQw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776639100; x=1777243900; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nGI8q1vIW2YCqL8DB2swQpMBunXNj9M7QpTu5vxe99c=;
-        b=PIVyWv+NVODk1fM6YRVoPCmpL9zUGbaduJRw4E4FoAIegZ+uqMEy9ajZ7vRe5i/8N+
-         RT36e8bOpdX9w73YACH/l0FcEzpiJaZbl7xGoROLu5Q/LnEJ8rZ3Mt8JKc5Pajbb+qnF
-         pHHG8o8xDfgi4ZgoAibFk2eVuMZf9wCPxXFBXKcgJsGLpAtCQg9jpRnSv7l0KGYzx9gc
-         mw0kJUbWR4s0+qaiBqMamkwWwAQrjkcbjRoQPeeYL9jTYaeelFQDGyXHhEijC3J2I8Cf
-         hwxUMXRFR1zLB6O0gi72EtXG75ami26eD2t1jPZW5QUxbx+Q8nPooW8yXDDOzwVJ67vH
-         kxSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776639100; x=1777243900;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=nGI8q1vIW2YCqL8DB2swQpMBunXNj9M7QpTu5vxe99c=;
-        b=qhbicr7SEQVSFxDyUxNAoU5NQthjnr5/A7PAy3eEMq3hUe78yOt+mdBmw0PcZS1rFb
-         WI3wR4qtPTR3NFGqoYhArfWRn0hbgu2ihfty8jzk+zos57kBbdmgFs8Xu2DVYrj7h1vO
-         e3KnYoCXG15D/E5IjKV82b37eXO1zYA0voqmCeX7bc3/ydRFtQwx+mN21WKSbMSp0AOR
-         d7SG6c2o/baUNGfr6k3M9GzygD8IdOTLlEeqOJmOqUXfKOS+hQ3uPjPMLUCtMFSWWNEC
-         7+vdwPO5G+NqhlWSmfr9GommRTFzFaOG6JiadDz3GmkqhvIxxNdNggB1DB18ehsM+rmd
-         uhAw==
-X-Forwarded-Encrypted: i=1; AFNElJ/vz0KmBJ2yEB+K8dhi3LjkBdVPlBo8nKl7kA0Lvz5qwdFQvfnPOBmfIN0ikxgIitIipPiRWg8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyzwB2uZVRiRXyuNjy6wVv3JXDFupHzpNKqwD0huu5SnVpWoGHV
-	LtPF1zaJ9TZcgNJ3tW3tfAK+8aInd2quZ0lmwuukCha6DSp4G/b+ZCCvIFsz3dofJ5A68ZymuHk
-	PlRSNe+hw5d0UH0j6Ia9hr+rFLajj8Qc=
-X-Gm-Gg: AeBDieuUlJ2aopJNGS4YJUK+6KRhFFgXxlBmjPJ6PV6P4yInOLBYi6CY9vic3mj0JNX
-	LSVMF1Y9Mt5iYIkf8xvwNKZaBpmY+6Fz9AvPepIc0KbRwwQSKuwmgcHin6vtix/hFr/n26M9k7B
-	rP8nh3F9m8PPqI909MUcbvdOPTVrjPWUgVdayA0RWMI5kgEOiTT1m6A/0+ZZb7dwaj0d2JiTbKd
-	yZoqWu9fqywN2egPpusCH9uKFe+fMuBwMur6/cgFM3jnB2Vuf4ydWrP8MJGtD9o8ogvplMrX6sg
-	PBFUo52c1g1N9v6QiATSCrlS+j99UR+HsGeEutMBnpolrLQtWWkEQ3X2EqwtC4AtMz0utJHyCQ/
-	8X8fmm0oR3/kkD7hg4sQOdF1x/wgncYlQuxZR
-X-Received: by 2002:a05:6000:22ca:b0:43d:7883:87ce with SMTP id
- ffacd0b85a97d-43fe3dfd265mr15420059f8f.34.1776639099627; Sun, 19 Apr 2026
- 15:51:39 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76D5F27442;
+	Mon, 20 Apr 2026 00:13:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776643990; cv=none; b=PQvESL1NEltHbTE9+VkEu1g+3k+9UGS76fbZFPjrjrLmXgqH1i4zt+dj2Ws0S7Y6r4IqEs2wXESTJo8BpPPcj+3E8LyOgGkXwrez4QmNtd1kk3kRgQezQCJfMpTCgVlT4DKizDFbM9+Ntu+dzkC1XT3hIGyAUGEacfn08s3AnMg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776643990; c=relaxed/simple;
+	bh=miPJmafxGYa/0nBAUppkC8i1uJWsAyk0QLELmzPA81s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GVlj8gbZpeFROJ5G5w9kGnMpwMrnxsKQfQhrDs1oW2mEmb2g6NpX0LFiyQleEhjPO81TfBGmEHbQSOV4Qok2VEun6gqaINazwmA0wfys3gNdbAJ2ct4znCUTpZRgC1yUf3ozRUfCUIFNBD6soglDDJIjFV9HaIbijz+hT50muC8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=YMCfY0nv; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63JJjOLY2986195;
+	Mon, 20 Apr 2026 00:12:46 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=aZBdIt
+	kfAsnP3W4OIPRwFKg8WBJUd9YO47VwRzMsse4=; b=YMCfY0nvUOHNNv1jrxoaGT
+	HCdM/0wahsGi1rWOXRjIBLkUl6sfW84NefA+Q6ax5sIY9GgaxO2g3zF6yTBh6Lvz
+	/8m10na03tz6nLUl4rXq/FBOOJbWEbGhd8Rv7iRckYfBXf1csEREf1mUGgzILOTq
+	zT0BoAJqyJ4L6TZEQFjNVKJbfL2lOYQUzwFvrtsvaZI+NQwY+O13gSqDe3/BvdiC
+	KM5oZtUQGS5dB6AuQPWm9HeWoAzXURJFPrvSeu9NfPapm/TYmdtqeNCrlKvJUVI8
+	rxIFCoXFgaH1bvh2xYU8UHqlDZNg0v5a3V4h9EJLMqGPUs9826k3zryY8erlcV8g
+	==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4dm2j6dj2m-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 20 Apr 2026 00:12:45 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 63K05Ktf031623;
+	Mon, 20 Apr 2026 00:12:44 GMT
+Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4dmpgg2mms-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 20 Apr 2026 00:12:44 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
+	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 63K0CgYo27918956
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 20 Apr 2026 00:12:42 GMT
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3BE1B58058;
+	Mon, 20 Apr 2026 00:12:42 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7AB205805B;
+	Mon, 20 Apr 2026 00:12:40 +0000 (GMT)
+Received: from [9.61.89.198] (unknown [9.61.89.198])
+	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 20 Apr 2026 00:12:40 +0000 (GMT)
+Message-ID: <dcc2b7b2-47ac-475d-af6b-d5c2f2b812b6@linux.ibm.com>
+Date: Sun, 19 Apr 2026 17:12:39 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260413-kasan-v1-0-1a5831230821@bootlin.com> <20260413-kasan-v1-1-1a5831230821@bootlin.com>
- <CA+fCnZfubV6LgRjO3NQvhrG2Q5o0ftkFFupLWVYS50XDnmCaog@mail.gmail.com>
- <DHSWK17EZUDP.GIJ6BX2NFR6U@bootlin.com> <CAADnVQLJ=fJ7t1i2+_RYqU1gqYqiLP9Zrwo4vdZsgzjK_yzJTQ@mail.gmail.com>
- <CA+fCnZd31GzdpEqR8VhfK4JtUKyyRMgbBoAbeGACJgm7WvB6Vw@mail.gmail.com>
- <CAADnVQKv5y+gq=TnOAEXSqgBRpmHNjwqCfxpLaw5XkcbQ+23bg@mail.gmail.com> <CA+fCnZe-b0Qqbo5gGv3HN20twquQETDfYYkE1r9tPr9zUFbW9Q@mail.gmail.com>
-In-Reply-To: <CA+fCnZe-b0Qqbo5gGv3HN20twquQETDfYYkE1r9tPr9zUFbW9Q@mail.gmail.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Sun, 19 Apr 2026 15:51:28 -0700
-X-Gm-Features: AQROBzDew-foTfJLq_z3E45rMJ3PdE7WT5G5Kb1cNLd7o7s_NLhMVNDGxKf8D94
-Message-ID: <CAADnVQKuptG_opA12O=Xb9_+cHf3f=ycAZdfUp17P2HBYQzdsg@mail.gmail.com>
-Subject: Re: [PATCH RFC bpf-next 1/8] kasan: expose generic kasan helpers
-To: Andrey Konovalov <andreyknvl@gmail.com>
-Cc: =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Kumar Kartikeya Dwivedi <memxor@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, Jiri Olsa <jolsa@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>, Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, X86 ML <x86@kernel.org>, 
-	"H. Peter Anvin" <hpa@zytor.com>, Shuah Khan <shuah@kernel.org>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Andrey Ryabinin <ryabinin.a.a@gmail.com>, Alexander Potapenko <glider@google.com>, 
-	Dmitry Vyukov <dvyukov@google.com>, Vincenzo Frascino <vincenzo.frascino@arm.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, ebpf@linuxfoundation.org, 
-	Bastien Curutchet <bastien.curutchet@bootlin.com>, 
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>, Xu Kuohai <xukuohai@huawei.com>, 
-	bpf <bpf@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
-	Network Development <netdev@vger.kernel.org>, 
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, 
-	kasan-dev <kasan-dev@googlegroups.com>, linux-mm <linux-mm@kvack.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2] ibmveth: Disable GSO for packets with small MSS
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+        pabeni@redhat.com, horms@kernel.org, bjking1@linux.ibm.com,
+        haren@linux.ibm.com, ricklind@linux.ibm.com, maddy@linux.ibm.com,
+        mpe@ellerman.id.au, linuxppc-dev@lists.ozlabs.org,
+        stable@vger.kernel.org, shaik.abdulla1@ibm.com, naveedaus@in.ibm.com
+References: <20260417172910.81433-1-mmc@linux.ibm.com>
+ <20260418175451.122193-1-kuba@kernel.org>
+Content-Language: en-US
+From: mingming cao <mmc@linux.ibm.com>
+In-Reply-To: <20260418175451.122193-1-kuba@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDE5MDI1NSBTYWx0ZWRfXywkL4mbph7pn
+ y9NDpS8ktWEK/Wt4Fwq5/CuAM97+q0nNiMhqGZaFuUiQw9x1UCKTP/kkMPoF7J1fRI9KDZWut9T
+ P6MiRMGKehdZtNTgQLsvcMnwuWQDrOpTYJd8baM/IM5HZc7QQd4ojtHZTXuVNVHVYe0Y4LHkUy8
+ NLXDUIQyljIQdV/2gUNYnMZnRxeV9F4/XSM3cTdU4uyborwffjqa3yZNNJ+REwSF8X0BXgHHV9D
+ XURHdprmg7h/F8Lyp/aDfZN4bs547Ay8rRr/LF4UFwawjc0/8UfBU0kWrbasJrnjrLUhifaP5fo
+ yZ3oB8TRpMysbe1KB3sdrIgAgH7raUfWm3i2SmhibM2HlOo2RxuwTzeE2HVK86A1TgDWoBud/Ck
+ 2+Gnh8NnRboVZPUgCc6J5xTbI1lpjtjH+rGkQbUGfehvw0910gk2l0UApS1sayntunEe6ZKUeP5
+ GxSKH4WS5DraFJaozAQ==
+X-Proofpoint-GUID: t6hNByzCcWjgl0WInHRfkkYPE8JpykPZ
+X-Authority-Analysis: v=2.4 cv=SOJykuvH c=1 sm=1 tr=0 ts=69e56f7d cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+ a=IkcTkHD0fZMA:10 a=A5OVakUREuEA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=uAbxVGIbfxUO_5tXvNgY:22 a=sDADSKU7Kdt2IJdVO5YA:9
+ a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: e1yCFhD-mX4ZlgjEllJFepkfqH0W5lmS
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-04-19_07,2026-04-17_04,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 spamscore=0 priorityscore=1501 lowpriorityscore=0
+ clxscore=1015 phishscore=0 suspectscore=0 adultscore=0 impostorscore=0
+ bulkscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
+ adjust=0 reason=mlx scancount=1 engine=8.22.0-2604070000
+ definitions=main-2604190255
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-279612-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	TAGGED_FROM(0.00)[bounces-279613-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[40];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alexeistarovoitov@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[bootlin.com,kernel.org,iogearbox.net,linux.dev,gmail.com,davemloft.net,redhat.com,alien8.de,linux.intel.com,zytor.com,foss.st.com,google.com,arm.com,linux-foundation.org,linuxfoundation.org,huawei.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org,googlegroups.com,kvack.org];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[ibm.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 5E1A4425B84
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.ibm.com:mid];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mmc@linux.ibm.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[11]
+X-Rspamd-Queue-Id: 2F634425E35
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun, Apr 19, 2026 at 2:49=E2=80=AFPM Andrey Konovalov <andreyknvl@gmail.=
-com> wrote:
->
-> On Tue, Apr 14, 2026 at 5:58=E2=80=AFPM Alexei Starovoitov
-> <alexei.starovoitov@gmail.com> wrote:
-> >
-> > I think we're talking past each other.
-> > We're not interested in KASAN_SW_TAGS or KASAN_HW_TAGS.
-> > We're not going to modify arm64 JIT at all.
-> >
-> > This is purely KASAN_GENRIC and only on x86-64.
-> > JIT will emit exactly what compilers emit for generic
-> > which is __asan_load/store. This is as stable ABI as it can get
-> > and we don't want to deviate from it.
->
-> OK, I supposed that's fair. You did throw me off point with your
-> performance comment. But if you decide to add SW_TAGS support at some
-> point, I think this discussion needs to be revisited.
->
-> But please add a comment saying that those functions are only exposed
-> for BPF JIT and they are not supposed to be used by other parts of the
-> kernel. And in case you do end up adding a new config option, guard
-> the public declarations by a corresponding ifdef.
 
-I feel concerns of misuse are overblown.
-Being in include/linux/kasan.h doesn't make them free-for-all
-all of a sudden, but if you prefer we can just copy paste:
-+void __asan_load1(void *p);
-+void __asan_store1(void *p);
-into bpf_jit_comp.c
+On 4/18/26 10:54 AM, Jakub Kicinski wrote:
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
 
-> > The goal here is to find bugs in the verifier.
-> > If something got past it, that shouldn't have,
-> > kasan generic on x86-64 is enough.
+Thanks for the review and the questions!
+
+> ---
+> ibmveth: Disable GSO for packets with small MSS
 >
-> FWIW, I suspect HW_TAGS KASAN already just works with JITed BPF code.
+> This commit adds an ndo_features_check callback to the ibmveth driver to
+> disable segmentation offload when the MSS is less than 224 bytes. This
+> prevents physical adapters in SEA configurations from freezing when given
+> small MSS packets.
+>
+>> diff --git a/drivers/net/ethernet/ibm/ibmveth.c b/drivers/net/ethernet/ibm/ibmveth.c
+>> --- a/drivers/net/ethernet/ibm/ibmveth.c
+>> +++ b/drivers/net/ethernet/ibm/ibmveth.c
+> [ ... ]
+>
+>> @@ -1756,6 +1756,25 @@ static int ibmveth_set_mac_addr(struct net_device *dev, void *p)
+>>   	return 0;
+>>   }
+>>   
+>> +static netdev_features_t ibmveth_features_check(struct sk_buff *skb,
+>> +						struct net_device *dev,
+>> +						netdev_features_t features)
+>> +{
+>> +	/* Some physical adapters do not support segmentation offload with
+>> +	 * MSS < 224. Disable GSO for such packets to avoid adapter freeze.
+>> +	 */
+>> +	if (skb_is_gso(skb)) {
+> The commit message mentions this matches the ibmvnic hardware errata from
+> commit f10b09ef687f. That commit disabled GSO for both gso_size < 224 and
+> gso_segs == 1.
+>
+> By omitting the check for skb_shinfo(skb)->gso_segs == 1, could a
+> single-segment GSO packet still cause the adapter to freeze?
+Good question. Unlike ibmvnic, ibmveth does not need to check for 
+single-segment GSO packets (gso_segs == 1).
 
-Ohh. Good point. Looks like modern arm64 cpus in public clouds
-don't have that enabled, so one would need pixel phone to
-catch verifier bugs via hw_tags.
-So we still need this x86-specific jit kasan.
-I guess eventually it can be removed when hw_tags support is widespread.
+In ibmvnic, the firmware processes all GSO packets, including 
+single-segment ones, through the same LSO code path. This means even 
+gso_segs == 1 packets can trigger the hardware errata.
+
+In ibmveth, the PowerVM hypervisor intelligently bypasses the LSO path 
+for single-segment packets. When gso_segs == 1, the hypervisor treats 
+the packet as a regular (non-GSO) packet and transmits it directly 
+without invoking the problematic hardware segmentation logic. Therefore, 
+single-segment GSO packets never reach the code path that causes the freeze.
+
+This architectural difference is why ibmvnic needs the gso_segs check 
+but ibmveth does not.
+>
+>> +		if (skb_shinfo(skb)->gso_size < IBMVETH_MIN_LSO_MSS) {
+>> +			netdev_warn_once(dev,
+>> +					 "MSS %u too small for LSO, disabling GSO\n",
+>> +					 skb_shinfo(skb)->gso_size);
+>> +			features &= ~NETIF_F_GSO_MASK;
+>> +		}
+>> +	}
+>> +
+>> +	return features;
+> When implementing a custom ndo_features_check callback, netif_skb_features()
+> will bypass the standard dflt_features_check() function. Does this mean
+> vlan_features_check() is no longer called for this driver?
+>
+> If vlan_features_check() is skipped, multi-tagged (QinQ) VLAN packets
+> might retain GSO and protocol-specific checksum offloads that the hardware
+> parser cannot handle.
+>
+> Should this return vlan_features_check(skb, features) instead?
+
+You’re correct about the interaction with the default feature filtering. 
+With a custom ndo_features_check(), the standard dflt_features_check() 
+path is bypassed, so vlan_features_check() must be called explicitly to 
+preserve existing VLAN/QinQ and checksum handling.
+
+Thank you for catching this! I'll send v3 shortly with:
+1. The vlan_features_check() call added
+2. Updated commit message explaining why gso_segs check is not needed 
+for ibmveth
+
+Best regards,
+
+Mingming
+
+
+>> +}
 
