@@ -1,350 +1,204 @@
-Return-Path: <netdev+bounces-279946-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279947-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QL+AAp2k5mkIzQEAu9opvQ
-	(envelope-from <netdev+bounces-279946-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 00:11:41 +0200
+	id F8dEIsKl5mlPzQEAu9opvQ
+	(envelope-from <netdev+bounces-279947-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 00:16:34 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73F7543484B
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 00:11:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D54AF43488B
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 00:16:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 269793007C98
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 22:10:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2680A3003604
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 22:16:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D60A738655B;
-	Mon, 20 Apr 2026 22:10:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 645E6382F10;
+	Mon, 20 Apr 2026 22:16:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ef1MJpxL"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=verivus.ai header.i=@verivus.ai header.b="dUhxPEyP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from SY5PR01CU010.outbound.protection.outlook.com (mail-australiaeastazon11022143.outbound.protection.outlook.com [40.107.40.143])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC706381B0D
-	for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 22:10:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D509418A93F;
+	Mon, 20 Apr 2026 22:16:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.40.143
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776723049; cv=fail; b=V1kvCWuWsYuPusy9NePRuT/TM/g+8NF5KhrHRaoDO6FkOA+9V5JkzslaPwMUF4fDWX2Teb7Sp92MGkio3sfWpCbjcnJeRadAJwVjp/8SuKKq38BOaUrn41WU8c032D9SiZIQIGDzfrlKDjl/El9GyNvQtJnKq3WZydN1M0K+lTs=
+	t=1776723391; cv=fail; b=My8HJnLaLNdbh1HQcSbfQpoPNupOeD2f9zCykqsrOHOSvlh1s9KYvevgbKnr98peX/tQyr7/qf6WQvq4yYkjeVoS5DZJ0dwJtrumZ9IMtiFzrsxhuWCOZWtVm9EIqDzBwtag68FcDkSBLFW26zUO4kerM4p0toPeocLbI9meOJs=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776723049; c=relaxed/simple;
-	bh=mnPCOs5stKyeAQeH5Sw0NITCBTvB40DqjnCwmu0jbkw=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=htbNS2WiTsBWD1V93NmI4UdTaqKIv9wAOoWtwXXTC61XmW+kInywmb294N1eZaf1hEIu9iMxDvIaqNJqJ2cnew54jF3kft54Xlxf/+XpYxsk/Aug+OAzjXSAHB2fl9qTI9GjyBUohCWjX1lE0HXgXk2tqPvNUNwpLHCkKGuNqwg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ef1MJpxL; arc=fail smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1776723048; x=1808259048;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=mnPCOs5stKyeAQeH5Sw0NITCBTvB40DqjnCwmu0jbkw=;
-  b=ef1MJpxLKM6ysY2WADCZz3pAGjdAFyR/mggBN2a1nhmXUG9Sn0Mu1eWF
-   rzHxoLfOznz3xsrUirY67WxyDeWmBgi0MNDyCiZFB/Z5u8uOchiZCBMS/
-   BP7VXAwma7OSJy/JLBT0ucf9aVUuhxU3p6oYtXqSkKLihD/y7j8on3nht
-   n1S8OtG4WMIRwwt0NFbOWSd6fypRkJ5kSZWWIousprcL4rDR8CzdvC/Tn
-   v+MskrLvheIlBkMVKLMnGfj6dr0vxN8H/OQGvduBP0UdSPdlWtD197o09
-   RI692Z29LTyC6axdGg8O/8mhVdFISyAlBUhJABmXaYPopwI1zz+RG/+Yn
-   g==;
-X-CSE-ConnectionGUID: bdgkmTY9QWCznF7YS5FF4A==
-X-CSE-MsgGUID: QgoF9WBNQIaRXnSGp3FdeQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11762"; a="87949939"
-X-IronPort-AV: E=Sophos;i="6.23,190,1770624000"; 
-   d="scan'208";a="87949939"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Apr 2026 15:10:47 -0700
-X-CSE-ConnectionGUID: dEK5G2eHT1q5NuXJ4gVs7A==
-X-CSE-MsgGUID: h+V1PACcR2OWfPg8hOzGHQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,190,1770624000"; 
-   d="scan'208";a="231721524"
-Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
-  by orviesa009.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Apr 2026 15:10:47 -0700
-Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
- fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Mon, 20 Apr 2026 15:10:46 -0700
-Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
- FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Mon, 20 Apr 2026 15:10:46 -0700
-Received: from BYAPR05CU005.outbound.protection.outlook.com (52.101.85.40) by
- edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Mon, 20 Apr 2026 15:10:45 -0700
+	s=arc-20240116; t=1776723391; c=relaxed/simple;
+	bh=AKOoItNo+SGHyGuSI29l2ATns/VH1jtmqayOXagb2K0=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=rRug9zy+H/ai/IDsMa0T+fk9GIfnO09P5BpEILXtcFjkhzvxqGDbr7+LtLNmOFl3l0FQUF//QX+GkHFHWWqmyamPZQ9L4clDFtAfbyG7kKFIkBx6rSR14XaFhgkhYEb6pzL6QRtijtMId1xMUL6ptMPlnvGNaBM4Fq5zUAj6zwI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=verivus.ai; spf=pass smtp.mailfrom=verivus.ai; dkim=fail (2048-bit key) header.d=verivus.ai header.i=@verivus.ai header.b=dUhxPEyP reason="signature verification failed"; arc=fail smtp.client-ip=40.107.40.143
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=verivus.ai
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=verivus.ai
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=DACUquxNgQQaggg/RxZnxkpFXSIHm52K9sJo1y7dV7OVbRVS/v9hFUHnM84HEDG1defmEpa9NKnSUxrXMxwcVtHMw9Lb5/qnska/9olxtGmzF/rTbi6cqjgXG/55D9DkO/qPv0IjjMG3rDHlMJyBlqWxq+/eKaPfg/mqn5xRHqufQ0yzSKffXka9582/ttFqZUNjc6fdd3Tu2heFCwt2Q/1Kk+URGNbqjq4ucGYbuvKPCk9O3UEObqW7yZ93UfwTtd6ZWLFcx1QNl1OnjlNxCKcHjP/puiGJayhrQuRwYsVGyd6cI+S3VLL4PSetjwPxidfsPD/5RV7O2OR2+gGlOQ==
+ b=QDa0ugMewFcZ0/wCCJm9X6vR5YqukBbMokn/mQnTbyo+HW36kopJrN8nJ9F+GfhJB1KurOXtW2sfSUL7Agr2pPSkdCQvcyrz1YS1Ful7Pb9vn3XAF0o2GdBZPbyrrAbEoa/IHANGim1/lsozaHj5/4mThdfEe8+p2xNU3HPwWBJNJgHBG6WxBzpiZr8VlkfaeU7+y9bT6x6Tm+Gyggvq7ML0RU8cZtMjfP7MPdAFQaxHKO3Tucr1LDVEBRuI826aNol4c230OP9pqO7cncOTBZ1ecBcHIoB0M688Q3ac6uqgMy+/aMNtS3SgUB6uOFk+OIPfwW93EeOO/qZAZxLSzA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1hUkCsS0cbs7OYBu47xTgjx/C3O5C6KGhIsTo/IsRl0=;
- b=K0IfW8aE9SbCV5e60dnr2zlmKNf/LpI9MtMvlVtkwbcR8//sIgErq8ZxgDEO4/8j+Yyb+dfg/gi1bF27+d3xoT2e3zUVu1Hyyoddp6CbUW4WTAe/LMkSR1CFJy/kgtBqIT0mzVIM/bjXzf9oZW5UeIHaRXypSqdvAyU7+juFyVWo34mJ50lVkmcumXPnZDagPfC23uFI9Y43vEDTbm7f3zMzCgAE3ytnKiAWYgwecFdJLYso1UQn5DqBOpZvbn6cihIIDxFeyUCVkTTM84K4+FxOc8A22LLiR6gvJN70sm6AqcqQfpufvtN+/oCbhzX1wMA7ZTjTfghtq1sDHybqFQ==
+ bh=pj7RnFLKdkMePmosKMVZ4lMz6KI+0gtMrJXgIfoUp/0=;
+ b=j4zZWV9kMPMgL6CZx38MoOVkzMToQ+Ar+RyBdJ6i1It2zbf/x3G7vqKTX1N83efkBNoMJubU8iKZHr4fvQrLhKdy+0piBSOASZsPA8IIGLKutKbwWqVZ5YTWYSNqZ+kqmDE9pLmkIkAOfX7n9HZ2XveidikQsf7cPSHw0t0C5QtXiZ+kmqiDp3cqoAod6ShyajPmwrbhHEyoAt8lSHekOlsXHR9XC/wuC6zFnub2SJURlApqlmEoz0fx7XadhLJTKDdluCISXM/MqGASyY8+Er7hFH+/GGkVfPNshP+hkVBdfXmstmuFsXxvo9wJ5CP8gH8vD9XpnywPNSvN40f/fw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB7579.namprd11.prod.outlook.com (2603:10b6:8:14d::5) by
- PH7PR11MB5916.namprd11.prod.outlook.com (2603:10b6:510:13d::11) with
+ smtp.mailfrom=verivus.ai; dmarc=pass action=none header.from=verivus.ai;
+ dkim=pass header.d=verivus.ai; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verivus.ai;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pj7RnFLKdkMePmosKMVZ4lMz6KI+0gtMrJXgIfoUp/0=;
+ b=dUhxPEyPQbyN0QFySQgri0HttveiHybudzjiWVfBC+0pFHK87FyqE6c/o2X0otQkf8Un082FpGYhqFlcUlcmJepvR0se5ivhhmcJPlBB9zgUMmzRwMQByt4i3YHYeX/rJCVBeH/NyXdtJuWO1cSzSMTdwMWW4WJYX873HGfx1zOK/ifs73W98xGs1GKg7kUy2T1mH3sMQsHutl7OGx83XQkoUqElNxkw2HzZql/60gmRTRNYdzLcecQMU/CCmNmErzcbWIGavAh82692nhoYRDVsydN2De4qZu/AuA2vncR445FvBzmbfAPID6zarJ51LkPh0HarMkba9xfD2UYH7A==
+Received: from ME0P300MB0853.AUSP300.PROD.OUTLOOK.COM (2603:10c6:220:22a::5)
+ by SY8P300MB0061.AUSP300.PROD.OUTLOOK.COM (2603:10c6:10:25f::9) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9846.15; Mon, 20 Apr
- 2026 22:10:43 +0000
-Received: from DS0PR11MB7579.namprd11.prod.outlook.com
- ([fe80::4199:4cb5:cf88:e79e]) by DS0PR11MB7579.namprd11.prod.outlook.com
- ([fe80::4199:4cb5:cf88:e79e%5]) with mapi id 15.20.9846.014; Mon, 20 Apr 2026
- 22:10:43 +0000
-Message-ID: <01f7d0c7-f7b5-4402-9636-db96e7555f86@intel.com>
-Date: Mon, 20 Apr 2026 15:10:41 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-net 3/4] ice: fix ready bitmap check for non-E822
- devices
-To: Anthony Nguyen <anthony.l.nguyen@intel.com>, Intel Wired LAN
-	<intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>, "Aleksandr
- Loktionov" <aleksandr.loktionov@intel.com>
-CC: Grzegorz Nitka <grzegorz.nitka@intel.com>, Timothy Miskell
-	<timothy.miskell@intel.com>, Aleksandr Loktionov
-	<aleksandr.loktionov@intel.com>
-References: <20260408-jk-even-more-e825c-fixes-v1-0-b959da91a81f@intel.com>
- <20260408-jk-even-more-e825c-fixes-v1-3-b959da91a81f@intel.com>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9846.16; Mon, 20 Apr
+ 2026 22:16:25 +0000
+Received: from ME0P300MB0853.AUSP300.PROD.OUTLOOK.COM
+ ([fe80::1e3f:9cb9:4a95:b5a2]) by ME0P300MB0853.AUSP300.PROD.OUTLOOK.COM
+ ([fe80::1e3f:9cb9:4a95:b5a2%5]) with mapi id 15.20.9846.016; Mon, 20 Apr 2026
+ 22:16:24 +0000
+From: Werner Kasselman <werner@verivus.ai>
+To: "bpf@vger.kernel.org" <bpf@vger.kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+CC: Werner Kasselman <werner@verivus.ai>
+Subject: [PATCH bpf v4 0/2] bpf: guard sock_ops rtt_min against non-locked
+ tcp_sock
+Thread-Topic: [PATCH bpf v4 0/2] bpf: guard sock_ops rtt_min against
+ non-locked tcp_sock
+Thread-Index: AQHc0RNThweEPstU0keOTfe8JlI3jw==
+Date: Mon, 20 Apr 2026 22:16:24 +0000
+Message-ID: <20260420221621.1441707-1-werner@verivus.com>
+References: <20260417023119.3830723-1-werner@verivus.com>
+In-Reply-To: <20260417023119.3830723-1-werner@verivus.com>
+Accept-Language: en-AU, en-AT, en-GB, en-US
 Content-Language: en-US
-From: Jacob Keller <jacob.e.keller@intel.com>
-In-Reply-To: <20260408-jk-even-more-e825c-fixes-v1-3-b959da91a81f@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR04CA0035.namprd04.prod.outlook.com
- (2603:10b6:303:6a::10) To DS0PR11MB7579.namprd11.prod.outlook.com
- (2603:10b6:8:14d::5)
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-mailer: git-send-email 2.43.0
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=verivus.ai;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: ME0P300MB0853:EE_|SY8P300MB0061:EE_
+x-ms-office365-filtering-correlation-id: 8b1c6e4b-97fe-4ea7-c399-08de9f2a75dd
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|366016|376014|38070700021|56012099003|18002099003|22082099003;
+x-microsoft-antispam-message-info:
+ UzRjwI/ZbVJk/hN+B/ohx3JKzvFslM92CibZpbs8+hJlkVkgIpeRTUy2WB/vgbL1HhLlaa6c6qSJY/zpTgCTzxHy+5a0Gf+INGZJ98ihp+ZE9Zlq2AxxR2idTzdYzcCezbQ6PIWYjG5rrMmaSjQWUWNe6NVo8hVBMnKW90A+vjq9ADKZSjDzOlCOd7zCSQmS8KCB7XOVqBaFKIyyK3tfMQbkD+sMQYOHVPdll6mc9RPpDKYHDKgQ1ud2RYk+wsa0iPvEA4DiTb0njWNGZQlJ8mOswTzv7ZUBK2/tTdu5U2O5lFBB612GqrxOZnSoE8+J4e2tH26A1P/P99tTWq3K/5LSiuTAwL5EK65ILqYle9kBYJ5iK6BQ8L93yYrUWTap3H6q2K1wiYDtmBftOU0qg3bD5WBJrgaSo6oOpMEi6a9IOAYDk7VY0HYiIPYwWQOGDyJ7Lsp04CC3kPiE/+4qDNwEeYxIFBMBfHB6TiRqxRj4XrMBoD5flwnaVvGdngM4FaSYYwzhXb4OOuyjwM3QHI9Y6+20DLBVzsJFLLkWVWLLLUJCLhDoyZe2DgmJ1XSXC7E0TRmJPQN4eBnE1isgtMPAr7N0Ym9dvZ/LLpT0gQG2nW6R5BnHZ0D/Zz8n4JOiKIjYdfr56oVIxs7i1nuurZw4zxaaVUJi3J0XgqFtM9j+T3KVFF8KMxkqBcU08WSH/sUuGLY20ERBtsIO6+Y5m+shjSxngn29m/X4qqPdjb2wvTdG3mRngl8agxFkkehzJsGg2mIfLR3EfkinYt2yQHfjSBLeqi5OizZFdcQnbf0=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:ME0P300MB0853.AUSP300.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(38070700021)(56012099003)(18002099003)(22082099003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?iso-8859-1?Q?ajxoWsl/Vet8NG2fuOprNqyRI2huJKoSDjPAhSuvarL4Q2/oWeHnnhMMqa?=
+ =?iso-8859-1?Q?ICr7IJhMWU0Z256rJeRiEfRhQalGcSRTKWAbiioHMnpeQjhvDT2U1ysRKR?=
+ =?iso-8859-1?Q?GbZvKe/LHXAKRBnYiy/iR5ZhOVklNmJyPWSKQVK8hrOo3XXGdBagbf1ihW?=
+ =?iso-8859-1?Q?H+/eOU2CkmO75KANnn2hgTc5J+gF+rP7xzajMhYEezBKqWEK31z0whICno?=
+ =?iso-8859-1?Q?2q10KlR8sKrlBQ3PiaV1Ja/yr1KqIEZCmUmgk8JCItpIVImkwzjcruC+sA?=
+ =?iso-8859-1?Q?wn66dM9zMgq/MJZbwdgztjOCnyxrQ0hl81n6/OhmeCZVR3cjvluhlWShyW?=
+ =?iso-8859-1?Q?rHxNNjLKg4YAmo/+8nT0rycRImvAi9xkz5JDpIkHOWsHd1+UCTPaF3M6KI?=
+ =?iso-8859-1?Q?1/0n7VCPL/XqWe651lolAUJwDh8P5IN9NH1pwi0gc60O6N8q3ulNdJCeJi?=
+ =?iso-8859-1?Q?X45d5jyNmqJOk/qIMvPJh/cLJhS8g2fnUgTcpetTQX0M8dLcvlHya//aJ7?=
+ =?iso-8859-1?Q?GhKMHtmjB69F25mYmUmznLYLCV/NM8myVZnEYfuKywp2cvhCwcUH2MiHlO?=
+ =?iso-8859-1?Q?4dYS7nWpvwfAeuGEWSEuMPh3XjiU8p2FnUvsLC/xRU2PgiVqWCeFW5+ZAp?=
+ =?iso-8859-1?Q?u1OyBy+chnfdy+4g35eaV95FgabDeLFIxTHWsDYiIiitS9XZrNrJO/qu9p?=
+ =?iso-8859-1?Q?/zjUvosiZ3+jZqmpEEstG7vRt5kUKKPFbxzgUqomLXMeCv2DD2w3rCSwcQ?=
+ =?iso-8859-1?Q?c1vFFBN9RBQqRf7WWIuL0NRt0MzbOQPt6Pzu3BB2RsxGGiJFsmObI6RGTD?=
+ =?iso-8859-1?Q?GSuR14+6ARIJLXc9sOql6v5jxC3wWCDQABDkIUBl74AaAoj432aGJ4PiUj?=
+ =?iso-8859-1?Q?AjTacqwN4Zdbyu+jwALy5Dbk8ewg5QiGXzn2KUIyCvZcdQkNYcA8BGk8fb?=
+ =?iso-8859-1?Q?QvwjwHoSBacx/1Obj3LKCklSu6smwa8cixCMFNnBnpqf/m27akmZ61kIsl?=
+ =?iso-8859-1?Q?PISBLcOZO9WstZsaJjjWUvMlz4MhJkio6aLptW/sjCQteLqERrCJ1NPWBj?=
+ =?iso-8859-1?Q?5a09tZWPXPb19gfbKmhqCbXZIXxpuwg9Lu6IFRaSp3dBGiecpF4I7ghz/C?=
+ =?iso-8859-1?Q?5E0jnTdGheM2iSg7EyftF/A3NoU3g+XcEdTop4Il5G+QnPLpmn3+FYO1n9?=
+ =?iso-8859-1?Q?KCKwJzSZh9W6MNto07P1qxISAtAKx5Ic5MzpcnDbJbYpVnJ6iKfCom06G3?=
+ =?iso-8859-1?Q?JhV2UoY8dWtH5RngBSbfksrOK2T4VlvLv8mADqN4X3c2urOkpRmdxoTZV2?=
+ =?iso-8859-1?Q?EdwpjIlCnAVZmIiTFlREDbL5QUva/9J0itmZrc9Xo71aLw2dyc6ManHeVF?=
+ =?iso-8859-1?Q?iHM0U3XrYt9O8rB30KGhnYJzIEfa6wN2CzbT4hx6o9ivZF3/kcs2ri1zBC?=
+ =?iso-8859-1?Q?NVW0MOlAPtakgnUT81SqmMc5bXChduaiHrRE/KJCE+OL4bGAwZRyWVbCjK?=
+ =?iso-8859-1?Q?ZJkmvrwPGOrfvgtkZtLMFqeI7wR2cwd6USM2+j5NdHT//DMVVcg+E3h4kL?=
+ =?iso-8859-1?Q?xXPjnJJVfigX56GIfB3JH8V77DYXDFmUmlLXL6S638XRzS/+6lTHc2Hqgv?=
+ =?iso-8859-1?Q?wkGKIu3WQ0WNzdDFjj9BcWhGEeMnPDuAPXiy4t3WbXm4LDv7gwMbT4Cj16?=
+ =?iso-8859-1?Q?U2K1PEhRKPvwBlMjsaJ/KmQb5wziKqLED629U6YBcqrB72aJVtftkxpRUS?=
+ =?iso-8859-1?Q?RHcHZ5Ue1Ztt47G6LXDlYBMOH0T6Uy2XTT2P0GOTxvEEwQSptQcL0t7waV?=
+ =?iso-8859-1?Q?ScXqaT68gQ=3D=3D?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB7579:EE_|PH7PR11MB5916:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4027d092-0045-4110-6dc1-08de9f29aa2f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|56012099003|18002099003|22082099003;
-X-Microsoft-Antispam-Message-Info: gdzq3FWyTY6Lw1uGCslkD3iuZtEdatoQnjbxAyLxd1xe1EmN2mqvSqOhOqay04f18XDbPeGOp+y+XsfvPyGkGumnaXqX5R9YAti8y/RJxobCO822BiQrfBm5ZIE3w5OyK0qvpcrNd9eOsIqe3IiY2+UtIlZizI/o+B8f0zHwfZD+jdyNOHP+DXhkwnR3cY6G0TWtx8ln+E+58K/lkDMPe9rQvCdmF29YNL/sUeLkJQPJFusTqW3j9Tb0WeZCh2fZwm07g55VvmNeLe5Pt8D8XesMkmM+C55U+LUHl08HQpEqvmkc+PFYwFNwfQpFmCKcJd6nr348iEHdjLT5wULlXK8gLRXnkEzPmoJ58ihmJWdhvp74Gw3J4tDqmFVtz27LUmf9UZ8dgruxD9u5YgTbfHlHZiOBHyEBRpHxz/4q8dv2kCTBw7w3eIwB7w5VLSzD9gzzmT6F1d0ZDKOKlQCfISfaSgcqzcjdnMaiQ1SOnoTbr9Pn9hKB8/TqeZPm5C99YEQqsN8yTBcdif6P+CrDjYoWJNopNRuIj4yRk54LKqHLzpAgYtrhjk9Gw7RyMUV5GfnNMDF7Ea9PaiRT1McyNS9Gdv1VuZ7N3pQsVLL9HMpLgQs6fN6XYdpYjUxj2kJkDEVo6V1f1tHaZAlaZOLaYaEag6Lf5BniZaI5NjFIN1Ed/HtRxVTfPWRkJeMXGDr+wQRTQh6Yt658ONmXHzLYWRQqZr3a+yt6Qt55b7cpuc4=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7579.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(56012099003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MWs2dll1d2R1d2g2NnhyVTI0U3daS1c4elZrUnhwS0xWZmlEcDNOUkNEc1hE?=
- =?utf-8?B?cjZjWHFoaEwvMmRzbFJ0MGRZM1MybVVDSENQS0N2ZjhZcExKdzYxRnpEUG4w?=
- =?utf-8?B?bGo2Vm5XditWL2s4Zk00Z3RGOENxWVEvTmRFMk10WHhIb1dIWm9TZEhwZXdB?=
- =?utf-8?B?UkNnR0ZrRzdlcWZjV0dzOFBLOHNwVVU0Q3gza3NXZFM4ak9kWDNHdGE2eU9q?=
- =?utf-8?B?OGZnaUFucjdTdmJrcjVCZTl5M2QwS0FzSEhtUHJWeG5uWFJiczhwN2p2a045?=
- =?utf-8?B?ME8wd004aEYyM0xYSnEzL20wS3FibGcyaGRnQWZlMXFnenQ5c0w0cVdBdTBJ?=
- =?utf-8?B?UTBodklzVWF0aElqMnZzSFovWVN6a3ExR3FxVTN5Tlc0YWUvL25JUFphcmVo?=
- =?utf-8?B?bDBqS3BMeXRpWHFpU1lYWDBaNnROMHp2WGhRYkE5ZzNvNmphZXF5d0Y1WFBw?=
- =?utf-8?B?QUdUc242VDROTmF4VW94alFOMlp0UHZnL2lYdmN6M1ZBTG5Wdm5qMjhHNFBX?=
- =?utf-8?B?T2w4Vjg1TnBCREZCYmRDdTdNeWVtRnhMOEdkRHlLeGxEVit1VkxZamxIR0lp?=
- =?utf-8?B?dWlWZUJQaElTeW9WZlM5MHExK3BwTWdlVEE4cUQraFJlaklXQTNmTVpyZ095?=
- =?utf-8?B?N0tpMDZldjFmaTBLTnB2SCt1aWtNQ2p6QkNwejk1MHlMb0ZLY1ZBU1VLNGs4?=
- =?utf-8?B?QjZOVVA0MXFOZ01WL1lzTStGRE1DeWw1U1VTSERLdlNsTnorVjBEa2hYRDRl?=
- =?utf-8?B?ZDVSTnhieVRWcG56M3pzcWdqVHhTQmQ0Z2J3U2RRbDkzMzMxbkF3UWV2Ynpy?=
- =?utf-8?B?Zmo4S2QweExOZ3VMaWhxUVkxdFFaOEE2TzBBMXExN0tNVlpkNUZZNEYzYmN1?=
- =?utf-8?B?YkE3dVJDZFZNbkFWcHZPSUFJTkYxMDQ0ODUvSEpzZXJDZ0NIQi85L3B3T0hh?=
- =?utf-8?B?ZCs0Q2pZR0tHdWRVQmF4Zi9WRHYzbHMyakpEK3ZqMWdHRHY5MlZ2QUtWbVg5?=
- =?utf-8?B?OVhoNSszV2owK1RldDRxb1JNeFFjdTlTUjdXQWNnMC9SZkR0Q3JIY1lXNUpQ?=
- =?utf-8?B?YzBwYTQrQnVJTDVWUzljeVE5cjMzWnJFZzFSZzVkTGErbVcyOUY0bHZOcHlH?=
- =?utf-8?B?VE9QTXdObmVjZmhPUjIwMXY3ME9lb3E0S3dSbGpncGtsbi9UYUJDbzFEeHRJ?=
- =?utf-8?B?UkdRYUJNeUFJaEtHVnJSb0Q0aHNXeTZRV1cvOXROMk1nTUMrYVBINE9jZjZC?=
- =?utf-8?B?UENmTlFpN1pQV0xyRm90ZTNEVFVSUEgzdW8xSWJDZVRnRExSUUhDSG9DcEcr?=
- =?utf-8?B?L1FFV0FBUm1TU0xpOUttS3hGTUg1eGhRalNxSDAyeklLckdMNGRXTWtzZ3p3?=
- =?utf-8?B?Q1ZwR0lHT0daSW80RDRrc3AwRUh2TGl4dVMvVk9MRjZHOG5vRno4QUNMRlNF?=
- =?utf-8?B?eWFkeWRGNVh1Mis3TlF2ZlZ2Um1Pb241eWF5QjNDTmZCUm5MU0QvNkJYUXVn?=
- =?utf-8?B?Q204TENraGN1a3licHV6QitPdER5dmVKWU1UdkVWT3k5MVU0MDlzUHkzT1VI?=
- =?utf-8?B?UGR6U3lHTlV1WXRQNWc1d1lZNlIvaXJkcXF5dk1TZ0x3SW1tMkpoMFFINzV3?=
- =?utf-8?B?Q2Q3bUQvcHlUZGFKR1h5MEdwdS90cHp3SXV2UjJJWlRVaXFhUitCUHBtbThN?=
- =?utf-8?B?QjFUZko4QnZHNEFzb0tzMDVMNFVYR0dNcUJncm1XcWhFdjlid01FOFpydWw5?=
- =?utf-8?B?dmVvMzRBUkVUWGhCR0oyQm1CaWx2N29hTWs2RHJDMUtJU0x3ZkxWL002LzRu?=
- =?utf-8?B?ZVhUekl0eDJlQlExcjNQRjhhaUlyZnRzMytHMXFGQVE0aU1PbVBiV1VJYnY3?=
- =?utf-8?B?citxVUhYVmlkZnQ5OU9tMXhhd2ltNUxBZFVJN1hPVkhVczNtc0dQZ2RPSkJW?=
- =?utf-8?B?ZUVNakdwUXVGSDlHRVpkZjFHaHh4b3FBUy9DV2FKY1dra0YyRUNmbmRXWlJ0?=
- =?utf-8?B?R2NmMDZoT1B1Q2QxSW9ubjV6b0NRZk5jRGtKbUVaZDhrUWptQ09nNHZEcWVv?=
- =?utf-8?B?NllUZzhKNnUrRm9ncFhwaDFQT3FsT05TM3pYS3YvcHM4QXZkSlZUQ1ZWclgv?=
- =?utf-8?B?U2luRCtjbGtNY3hnK2N2NU5zVGRqSWNBZXhZTlhyRFdkSzZlN1dyVGxWQXhz?=
- =?utf-8?B?OXBTVXNTR1FEcm5ESUdLOEIzMVNCSW1LSUlVOFpyc0VUVWpyYW1iSjJsRWZS?=
- =?utf-8?B?SWtmUkhRMStXMWY0UlBJMzc0RWwrTFBVL1JUbDAxWVFMSCt5SEhuL29hQklG?=
- =?utf-8?B?ZXBHOVZZV0lkTU1pMUlYSUJQbWREaWpFYXZJUEI4NWpWVlFWd3NLQT09?=
-X-Exchange-RoutingPolicyChecked: LWi2wH++Tw8Qe1Oec9TorGxRQHfF06BZul4ZJYVyIiJiXAa+ubpl8y+42m6SeJDyBwLYCq3zbHUdWTMSSxaDthTXuA0/G7FnR33mZF+o4fLB5EF7wfD7pl5Kc/XPpVEraXeEtIhfdc+9BvnNtZ11FPyAiazOW1wVTOgsktd7mXzL+XO42zCB7yzhTrJfifMA6E7e8foNNjyNNmBIwNKzv3SAGxUoq4Cr6TbzreImbhIDnvCsFDPo7JAvWAWV2QSJk48tsKw7gQp3WJow+nSvGen4rCFhzdsWGuY2NOvDZUD2IaXPL5vXfrIBqvb6F+9js+VSMop+Myz84QtLKvo5gw==
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4027d092-0045-4110-6dc1-08de9f29aa2f
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7579.namprd11.prod.outlook.com
+X-OriginatorOrg: verivus.ai
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Apr 2026 22:10:43.3014
+X-MS-Exchange-CrossTenant-AuthSource: ME0P300MB0853.AUSP300.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8b1c6e4b-97fe-4ea7-c399-08de9f2a75dd
+X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Apr 2026 22:16:24.3503
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: jT1fStPPneib4wqpavPKACZZvSdmlMNHyPaMxlysFOa9H057/YMoxemmt8ot4XytIo/yHYuDi1AgAJdCf9BijrIENkSLBkR8DpffXcam6a8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB5916
-X-OriginatorOrg: intel.com
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: ccdcedb0-4edc-4cc8-9791-c44ee6610030
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 8y8Oa6Tp4Col1SuNBcEH/UOkoN+mhjEO3Vo+/xj5vGfmf35EuZvceV5EKn7gFqWgB5WDw0RW9MNlbTEf4wouNQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SY8P300MB0061
+X-Spamd-Result: default: False [1.64 / 15.00];
+	R_DKIM_REJECT(1.00)[verivus.ai:s=selector1];
 	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[verivus.ai : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-279946-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,intel.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	TAGGED_FROM(0.00)[bounces-279947-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[intel.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_TLS_LAST(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jacob.e.keller@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_THREE(0.00)[3];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[werner@verivus.ai,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[verivus.ai:-];
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[10]
-X-Rspamd-Queue-Id: 73F7543484B
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,verivus.com:mid]
+X-Rspamd-Queue-Id: D54AF43488B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 4/8/2026 11:46 AM, Jacob Keller wrote:
-> The E800 hardware (apart from E810) has a ready bitmap for the PHY
-> indicating which timestamp slots currently have an outstanding timestamp
-> waiting to be read by software.
-> 
-> This bitmap is checked in multiple places using the
-> ice_get_phy_tx_tstamp_ready():
-> 
->  * ice_ptp_process_tx_tstamp() calls it to determine which timestamps to
->    attempt reading from the PHY
->  * ice_ptp_tx_tstamps_pending() calls it in a loop at the end of the
->    miscellaneous IRQ to check if new timestamps came in while the interrupt
->    handler was executing.
->  * ice_ptp_maybe_trigger_tx_interrupt() calls it in the auxiliary work task
->    to trigger a software interrupt in the event that the hardware logic
->    gets stuck.
-> 
-> For E82X devices, multiple PHYs share the same block, and the parameter
-> passed to the ready bitmap is a block number associated with the given
-> port. For E825-C devices, the PHYs have their own independent blocks and do
-> not share, so the parameter passed needs to be the port number. For E810
-> devices, the ice_get_phy_tx_tstamp_ready() always returns all 1s regardless
-> of what port, since this hardware does not have a ready bitmap. Finally,
-> for E830 devices, each PF has its own ready bitmap accessible via register,
-> and the block parameter is unused.
-> 
-> The first call correctly uses the Tx timestamp tracker block parameter to
-> check the appropriate timestamp block. This works because the tracker is
-> setup correctly for each timestamp device type.
-> 
-> The second two callers behave incorrectly for all device types other than
-> the older E822 devices. They both iterate in a loop using
-> ICE_GET_QUAD_NUM() which is a macro only used by E822 devices. This logic
-> is incorrect for devices other than the E822 devices.
-> 
-> For E810 the calls would always return true, causing E810 devices to always
-> attempt to trigger a software interrupt even when they have no reason to.
-> For E830, this results in duplicate work as the ready bitmap is checked
-> once per number of quads. Finally, for E825-C, this results in the pending
-> checks failing to detect timestamps on ports other than the first two.
-> 
-> Fix this by introducing a new hardware API function to ice_ptp_hw.c,
-> ice_check_phy_tx_tstamp_ready(). This function will check if any timestamps
-> are available and returns a positive value if any timestamps are pending.
-> For E810, the function always returns false, so that the re-trigger checks
-> never happen. For E830, check the ready bitmap just once. For E82x
-> hardware, check each quad. Finally, for E825-C, check every port.
-> 
-> The interface function returns an integer to enable reporting of error code
-> if the driver is unable read the ready bitmap. This enables callers to
-> handle this case properly. The previous implementation assumed that
-> timestamps are available if they failed to read the bitmap. This is
-> problematic as it could lead to continuous software IRQ triggering if the
-> PHY timestamp registers somehow become inaccessible.
-> 
-> This change is especially important for E825-C devices, as the missing
-> checks could leave a window open where a new timestamp could arrive while
-> the existing timestamps aren't completed. As a result, the hardware
-> threshold logic would not trigger a new interrupt. Without the check, the
-> timestamp is left unhandled, and new timestamps will not cause an interrupt
-> again until the timestamp is handled. Since both the interrupt check and
-> the backup check in the auxiliary task do not function properly, the device
-> may have Tx timestamps permanently stuck failing on a given port.
-> 
-> The faulty checks originate from commit d938a8cca88a ("ice: Auxbus devices
-> & driver for E822 TS") and commit 712e876371f8 ("ice: periodically kick Tx
-> timestamp interrupt"), however at the time of the original coding, both
-> functions only operated on E822 hardware. This is no longer the case, and
-> hasn't been since the introduction of the ETH56G PHY model in commit
-> 7cab44f1c35f ("ice: Introduce ETH56G PHY model for E825C products")
-> 
-> Fixes: 7cab44f1c35f ("ice: Introduce ETH56G PHY model for E825C products")
-> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-> ---
->  drivers/net/ethernet/intel/ice/ice_ptp_hw.h |   1 +
->  drivers/net/ethernet/intel/ice/ice_ptp.c    |  40 ++++------
->  drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 117 ++++++++++++++++++++++++++++
->  3 files changed, 132 insertions(+), 26 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-> index 9d7acc7eb2ce..1b58b054f4a5 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-> +++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-> @@ -300,6 +300,7 @@ void ice_ptp_reset_ts_memory(struct ice_hw *hw);
->  int ice_ptp_init_phc(struct ice_hw *hw);
->  void ice_ptp_init_hw(struct ice_hw *hw);
->  int ice_get_phy_tx_tstamp_ready(struct ice_hw *hw, u8 block, u64 *tstamp_ready);
-> +int ice_check_phy_tx_tstamp_ready(struct ice_hw *hw);
->  int ice_ptp_one_port_cmd(struct ice_hw *hw, u8 configured_port,
->  			 enum ice_ptp_tmr_cmd configured_cmd);
->  
-> diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-> index ada42bcc4d0b..34906f972d17 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-> @@ -2718,7 +2718,7 @@ static bool ice_any_port_has_timestamps(struct ice_pf *pf)
->  bool ice_ptp_tx_tstamps_pending(struct ice_pf *pf)
->  {
->  	struct ice_hw *hw = &pf->hw;
-> -	unsigned int i;
-> +	int ret;
->  
->  	/* Check software indicator */
->  	switch (pf->ptp.tx_interrupt_mode) {
-> @@ -2739,16 +2739,15 @@ bool ice_ptp_tx_tstamps_pending(struct ice_pf *pf)
->  	}
->  
->  	/* Check hardware indicator */
-> -	for (i = 0; i < ICE_GET_QUAD_NUM(hw->ptp.num_lports); i++) {
-> -		u64 tstamp_ready = 0;
-> -		int err;
-> -
-> -		err = ice_get_phy_tx_tstamp_ready(&pf->hw, i, &tstamp_ready);
-> -		if (err || tstamp_ready)
-> -			return true;
-> +	ret = ice_check_phy_tx_tstamp_ready(hw);
-> +	if (ret < 0) {
-> +		dev_dbg(ice_pf_to_dev(pf), "Unable to read PHY Tx timestamp ready bitmap, err %d\n",
-> +			ret);
-> +		/* Stop triggering IRQs if we're unable to read PHY */
-> +		return false;
->  	}
->  
-> -	return false;
-> +	return ret;
-
-Aleks requested that I clarify this return with a comment, since he
-feels the implicit conversion to bool may be confusing. We do already
-check if its less than 0 above, which excludes converting negative
-values to "true", but it may not be obvious. I am going to apply a minor
-fixup when sending this to add a comment and make this return an
-explicit boolean check with "ret > 0" which is equivalent.
-
-Thanks,
-Jake
+sock_ops ctx rewriting guards the direct tcp_sock field loads with=0A=
+is_locked_tcp_sock, but rtt_min still used a raw load sequence. On=0A=
+request_sock-backed sock_ops callbacks, that can read past the end of a=0A=
+tcp_request_sock allocation.=0A=
+=0A=
+This series switches rtt_min over to the shared guarded tcp_sock field=0A=
+load helper and adds a tcpbpf runtime test that exercises the=0A=
+same-register request_sock path.=0A=
+=0A=
+v3 -> v4:=0A=
+- reuse a shared guarded tcp_sock field load helper for rtt_min=0A=
+- preserve the dst_reg =3D=3D src_reg failure path that zeros the destinati=
+on=0A=
+  register when the guard fails=0A=
+- replace the weaker ctx_rewrite test with a runtime tcpbpf selftest that=
+=0A=
+  exercises same-register request_sock access=0A=
+=0A=
+Werner Kasselman (2):=0A=
+  bpf: guard sock_ops rtt_min against non-locked tcp_sock=0A=
+  selftests/bpf: cover same-reg sock_ops rtt_min request_sock access=0A=
+=0A=
+ net/core/filter.c                             | 39 ++++++++++---------=0A=
+ .../selftests/bpf/prog_tests/tcpbpf_user.c    |  4 ++=0A=
+ .../selftests/bpf/progs/test_tcpbpf_kern.c    | 14 +++++++=0A=
+ tools/testing/selftests/bpf/test_tcpbpf.h     |  2 +=0A=
+ 4 files changed, 40 insertions(+), 19 deletions(-)=0A=
+=0A=
+-- =0A=
+2.43.0=0A=
 
