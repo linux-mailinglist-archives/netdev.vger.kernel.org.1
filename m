@@ -1,147 +1,160 @@
-Return-Path: <netdev+bounces-279729-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279730-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AIEcF2cg5mkMsAEAu9opvQ
-	(envelope-from <netdev+bounces-279729-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 14:47:35 +0200
+	id gK0qKv0h5mkMsAEAu9opvQ
+	(envelope-from <netdev+bounces-279730-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 14:54:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62CF242AEA2
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 14:47:34 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0B5F42B02B
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 14:54:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 2D1893010733
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 12:46:26 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 288C03088369
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 12:47:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 596212D7DDD;
-	Mon, 20 Apr 2026 12:46:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5039638B7D5;
+	Mon, 20 Apr 2026 12:47:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="K6JyBKmb"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="M8oUTDqw"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F35442BD11;
-	Mon, 20 Apr 2026 12:46:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2027F2BD11;
+	Mon, 20 Apr 2026 12:47:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776689184; cv=none; b=sUeWMRI5eZK+HEf2we6tL2OQK3K5p/vgTUTfuGrmJ+dJ1RNOiWQrVppQ4MSuabMwxWXVQyXj5CsqNDxWiPbur8Qtv+LLIBmajmwxV26tcYhXuZtpzeLEi58QZfkPe/pjTztGg3S+aMw7PrZzJ03xjEwdLPrMBXE8A4iEvzQZ2Hk=
+	t=1776689264; cv=none; b=iTCHMmQiEjChgxwSJu/+IObY+9u3efEJTCtlnT+Hl/WI620LdH0/MXlAIG5yrzz6vYmlwmI5XFroXaVDW6iRlqrvfEWo4m5LGrrjBSgzqtou5kQnTfXweruJ5JSlu9OdUArIaKNfaLHIQEw9TG5vh1Ld7d2EJWeogySef6AGbdE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776689184; c=relaxed/simple;
-	bh=lxLsQbD1Kkcqnni8iApsDF5XQ1ROw/fxT+GNDupZLHQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I9uZmc4MeroNC1WSlRnmm7b2284L93O6lCF2ejJryP02Y3Kv/NHV8nlEP1cBYwjRY+P/MgvIE8RpH6eiDFXI22B0QT3PoW6fwXymV7CllYP0fByg43WUxlfyYciqyLFR12GweQ4pRCAJbXxevLFkSwtgVXICuhQt9ZBV5V22XFs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=K6JyBKmb; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=YXGOIIpEbeAk9/rcVFwREHyAE3XJQCKE4U994tpVsvY=; b=K6JyBKmbIdPE0Krs32QLqKQbE9
-	ApS739uceETfRGR4ZfABaxibC7ypUUnHsmeViXxjpfhRkJHmUMSYMFSEsRVM+jiZ1lFL3uB/kADeR
-	Ljmvcu3hLFIGeHyu5VhPde+w3GCNrop41C6oWqVRdhw17wQTnMvlR8IryUZVxfUk08k4=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wEo0p-00GjzM-CI; Mon, 20 Apr 2026 14:46:03 +0200
-Date: Mon, 20 Apr 2026 14:46:03 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: =?utf-8?B?546L5piO54Wc?= <25181214217@stu.xidian.edu.cn>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, tglx@kernel.org,
-	mingo@kernel.org, netdev@vger.kernel.org,
+	s=arc-20240116; t=1776689264; c=relaxed/simple;
+	bh=LJRK1Zzkg9Y4bYlO4dXh1GyGBKP1euk722rag48kPxE=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=UzzcanErQixVN1DprrobLshtS9oUusyiGjXpy0AdiwV71A2UO9aJLB5Qjdmg+6gBNCUfIfJ8KTLtAkWsftnO3HMP3fzIG+OwJijuF0/MbLCxna+AgczyHHGYUi2polBA4ffDRuquq1I6yvkBYyCHN7SggfCup0uN2f+rkus9RDU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=M8oUTDqw; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1173)
+	id 33FB720B7128; Mon, 20 Apr 2026 05:47:43 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 33FB720B7128
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1776689263;
+	bh=odg+DgKpZibXg812hmKhuOTXWE3+ZZ74FhZY0ieDRxI=;
+	h=From:To:Subject:Date:From;
+	b=M8oUTDqwhne/XeuFAsYkNLoAPnXHk0NVxj0MdYaS0hzUwCtQSB/kINB3mjnHnzdKX
+	 ZvzSbcai73lQ5+emHatxSXTs4BMWUTcTA0s3BQVT3rlPoEeBRUZgZDqCJSjmo6TXPd
+	 joviXskGuu2Erzi6z9llmXrLGwkqSfU01Aoqe3K0=
+From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+To: kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	longli@microsoft.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	ernis@linux.microsoft.com,
+	ssengar@linux.microsoft.com,
+	dipayanroy@linux.microsoft.com,
+	gargaditya@linux.microsoft.com,
+	shirazsaleem@microsoft.com,
+	kees@kernel.org,
+	kotaranov@microsoft.com,
+	leon@kernel.org,
+	shacharr@microsoft.com,
+	stephen@networkplumber.org,
+	linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: Re: [PATCH] net: hamachi: fix divide by zero in hamachi_init_one
-Message-ID: <ea469046-79dd-4a6e-905e-ea2251ff303b@lunn.ch>
-References: <20260418121804.149171-1-25181214217@stu.xidian.edu.cn>
- <e1d937ec-d909-4553-9f1e-c89f9b556d6a@lunn.ch>
- <2543c18f.5194.19da8c3b8d1.Coremail.25181214217@stu.xidian.edu.cn>
+Subject: [PATCH net v4 0/5] net: mana: Fix probe/remove error path bugs
+Date: Mon, 20 Apr 2026 05:47:34 -0700
+Message-ID: <20260420124741.1056179-1-ernis@linux.microsoft.com>
+X-Mailer: git-send-email 2.43.7
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2543c18f.5194.19da8c3b8d1.Coremail.25181214217@stu.xidian.edu.cn>
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
+	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-279729-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2600:3c04:e001:36c::12fc:5321:from];
+	TAGGED_FROM(0.00)[bounces-279730-lists,netdev=lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ernis@linux.microsoft.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.microsoft.com:+];
+	TO_DN_NONE(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[13.77.154.182:received,100.90.174.1:received];
+	NEURAL_HAM(-0.00)[-0.991];
+	RCPT_COUNT_TWELVE(0.00)[23];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:dkim,lunn.ch:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 62CF242AEA2
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.microsoft.com:dkim,linux.microsoft.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: F0B5F42B02B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-So what is your security model here? How did i get the hacked card
-into the machine? If i have physical access, isn't it already too
-late?
+Fix five bugs in mana_probe()/mana_remove() error handling that can
+cause warnings on uninitialized work structs, NULL pointer dereferences,
+masked errors, and resource leaks when early probe steps fail.
 
-As far as i can see, this devices does not load firmware. Even if it
-did load firmware from /lib/firmware, i need root to put a hacked
-version there.
+Patches 1-2 move work struct initialization (link_change_work and
+gf_stats_work) to before any error path that could trigger
+mana_remove(), preventing WARN_ON in __flush_work() or debug object
+warnings when sync cancellation runs on uninitialized work structs.
 
-The PacketEngine Hamachi was in use around year 2000. It needs a PCI
-slot. Not PCIe but PCI. Do they even exist any more? Both the card and
-a machine with a PCI slot?
+Patch 3 guards mana_remove() against double invocation. If PM resume
+fails, mana_probe() calls mana_remove() which sets gdma_context and
+driver_data to NULL. A failed resume does not unbind the driver, so
+when the device is eventually unbound, mana_remove() is called again
+and dereferences NULL, causing a kernel panic. An early return on
+NULL gdma_context or driver_data makes the second call harmless.
 
-Maybe, rather than fix this /0, you should look around and see if you
-can find any indication this hardware is still in use, and if not,
-submit a patch removing the whole driver?
+Patch 4 prevents add_adev() from overwriting a port probe error,
+which could leave the driver in a broken state with NULL ports while
+reporting success.
 
-> +++ b/drivers/net/ethernet/packetengines/hamachi.c
-> @@ -745,6 +745,14 @@ static int hamachi_init_one(struct pci_dev *pdev,
->  		   dev->name, chip_tbl[chip_id].name, readl(ioaddr + ChipRev),
->  		   ioaddr, dev->dev_addr, irq);
->  	i = readb(ioaddr + PCIClkMeas);
-> +
-> +	if ((i & 0x80) && !(i & 0x7f)) {
-> +		dev_err(&pdev->dev, "Invalid PCIClkMeas value (0x%02x), hardware untrusted.\n", i);
-> +		unregister_netdev(dev);
-> +		ret = -EIO;
-> +		goto err_out_unmap_rx;
-> +	}
-> +
->  	printk(KERN_INFO "%s:  %d-bit %d Mhz PCI bus (%d), Virtual Jumpers "
->  		   "%2.2x, LPA %4.4x.\n",
->  		   dev->name, readw(ioaddr + MiscStatus) & 1 ? 64 : 32,
-
-If you do decide it is worth keeping the driver, please add another
-label at the end of the function, and do the unregister_netdev there.
-
-Could i also suggest you consider more likely scenarios. It is much
-easier to produce a hacked USB dongle than a PCI card. Users plug in
-USB dongles without thinking, where as few users plug in a PCI
-card. You are more likely to fix security problems which affect real
-systems if you look at USB devices. I would also suggest that / 0 is
-not that important. But can you trigger a buffer overrun?
-
-    Andrew
-
+Patch 5 changes 'goto out' to 'break' in mana_remove()'s port loop
+so that mana_destroy_eq() is always reached, preventing EQ leaks when
+a NULL port is encountered.
 ---
-pw-bot: cr
+Changes in v4:
+* Correct Fixes tag from ca9c54d2d6a5 to 635096a86edb
+* Correct Fixes tag from ced82fce77e9 to a69839d4327d
+Changes in v3:
+* Add patch 3: net: mana: Guard mana_remove against double invocation.
+* Fix inaccurate comments.
+* Correct Fixes tag from ca9c54d2d6a5 to 1e2d0824a9c3.
+Changes in v2:
+* Apply the patchset in net instead of net-next.
+---
+
+Erni Sri Satya Vennela (5):
+  net: mana: Init link_change_work before potential error paths in probe
+  net: mana: Init gf_stats_work before potential error paths in probe
+  net: mana: Guard mana_remove against double invocation
+  net: mana: Don't overwrite port probe error with add_adev result
+  net: mana: Fix EQ leak in mana_remove on NULL port
+
+ drivers/net/ethernet/microsoft/mana/mana_en.c | 35 +++++++++++--------
+ 1 file changed, 20 insertions(+), 15 deletions(-)
+
+-- 
+2.34.1
+
 
