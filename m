@@ -1,170 +1,167 @@
-Return-Path: <netdev+bounces-279828-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279830-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AJ3mOntS5mkDuwEAu9opvQ
-	(envelope-from <netdev+bounces-279828-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 18:21:15 +0200
+	id qKfEDqBS5mmcuwEAu9opvQ
+	(envelope-from <netdev+bounces-279830-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 18:21:52 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E2A342F580
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 18:21:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 65A1B42F5E7
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 18:21:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C8FE530862A9
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 14:43:35 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 7E9D8303ABCB
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 14:44:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6129E3D6697;
-	Mon, 20 Apr 2026 13:39:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 894753D7D84;
+	Mon, 20 Apr 2026 13:39:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M6gO40bB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IG7gre5P"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 070A93D16E4
-	for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 13:39:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.181
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776692347; cv=pass; b=OjMwy9MTbQ2MhqHGzTgCwyEKRwFpgEg28sBU1l+g7SbRGFqOHAcPMsZyqQ7qYyQNYEUEHcDP6JAtbo92krXP5jtvsmKq5wXgXWz2uECSKdSJE6cbSYRSZ2o12/rvJd+ca2T7J3HDeXLQ+/QWOx6N+CPxnOlN44MglmXGEe/WUo8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776692347; c=relaxed/simple;
-	bh=/K9UOf5uqT2sQnqLd2oKoclnHJwSG4aPabyxOCos+4w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HT2AJRlX9TMJ0KQOU6HuadmvM4pRPaHPxvYEalAIsyPH0iEcX2NufUPT9+kE+8mbz9szAJ4w8fOdCsIulOQhRevgOhVgESYiC3iqiGNvqXCYdP0MKLGjB/yaqd2bu8zy+/VpoNEC1Lbe+jfNr31gWSD3nlE9GbPIDtrsRCwKrks=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M6gO40bB; arc=pass smtp.client-ip=209.85.208.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-38e7d984096so32529251fa.2
-        for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 06:39:05 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776692344; cv=none;
-        d=google.com; s=arc-20240605;
-        b=GE7+mtEtiHb7svVY1soRjO0IhIlCCJvh5nLVKeP5TNgdNdf0NxwNcikd8NeZr50lyD
-         /nQbiL7FitvlHpf+C0FbF/Z3QwR+nldFsNnMNBFDnIBvIMasPfJ+5NCxoUxsN7yck8Gd
-         sYYVVivvHlPh4LxhrmYRoo4lzKG1TVVn3JJpHwTaNWaMS1Lq95SbbEDUUXRb8Z25FCQR
-         9nXL8HPGV0H6696tIjTvtnB4MDW4E/br2HdARkJ9mHOLaiDWmCd+PFY3sXGw04glyYL3
-         CW17F3QGYJ+5L9FKOc/J7ej85NVcDgQQJc3ebb/6QZz7u6ajXghuyZzsb4mgo/O8wQyj
-         Fk0g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=G8DASL1EiWTXednHDBiz8AtRSsNePlCWQ5TEGU5yhf0=;
-        fh=dl/VDu+1D+6DrwWgRvv1G9ljrItkkNi6HVrZRrXak/w=;
-        b=Xa8TLFmmV+INQKuKmwnKxkV6lkTTod5qk8VzdhPy3sJ7BEobYpfcporflpszzPeYJa
-         pasTu5UjSfoUpNqag6XAhTMelAo3dWqIdHV+qXr82U4nAKbTauxxH1RVBEgMCp84vAPF
-         E1AmXZ87vhiFAM5jvDd/YITXS4PcKu96PvmKbiChUYrw+8SFEeZpjRO9UmOmVoG/+0BB
-         cJ337LlZv0G4eyfIHkgiYASEgKU4rBnMGCRdbXmwjv/MYuK5KRYV8E9/4k4xBcHyMIxp
-         v1pZz42eUso6044bBJZehbel/EVP87vNyvB2qkJH1NKqLzTh3Y288EY01UpWK9EGwd+N
-         /LxA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776692344; x=1777297144; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=G8DASL1EiWTXednHDBiz8AtRSsNePlCWQ5TEGU5yhf0=;
-        b=M6gO40bB9Yu14z9hBzVzmDeUAxkuDY8H3OhMvcv9NRGIWhphybdIno5XKNstnMMVa8
-         EHCGGoSsU0yyU+2PXbYGBKnG3GOq3x0D2As/UVmAgFFgnNqlBOXV3Iwn52XrwNgqhqSI
-         SZWuSA9Qts5+TWU68iEjV0UeYBhoawpbiEeBgRKOEt7HUpJrBhIbBXyiP8gShJZb8MQu
-         IN1TR0QVZux3Lpu5QgmECV+jun7/eW+V4fxQigKZp2kY8yWRDEjK/l+0rIoomsMrTMCa
-         hdSTqI25HTs2MXAHzldpoYwy6kKEbqXyMlhVXsC4G6XhzaPZvEvvXFII3gcelDfzJhA8
-         zmJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776692344; x=1777297144;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=G8DASL1EiWTXednHDBiz8AtRSsNePlCWQ5TEGU5yhf0=;
-        b=N8fgRJjp4XTvWyD2qA42YYrY5INJpv3AptCxGnSVXnIJvm5A8u/lDWBIx2R+N+EVv2
-         PpeBPYurA94APevbdORbenp1VwTmKVLl8HRCRvgW5V0gvbh5tbdUnBg7gX6/n4oWizEg
-         WBnRVaeUlp6j0RGZ0fiEVWElsj1CwE7kSJ/rVeJo5t6zI7v60GalhABukZYvBlV5dxSG
-         9QuZw72DQrONCeymvQr31zdLcZTOM/WhqqOyIIeaeoUkHOywC+Y6AqfmXCGBGNBd2B7x
-         tnes7+kPTSDPbc2s3XYmmlbHppe0SjlOunFCPI+Z48q2gR1QSes+SWZD0u8EFtlUQzRz
-         4gag==
-X-Forwarded-Encrypted: i=1; AFNElJ/RJ6Z21YqgYWn5A2TRR3yLySbBiwQdfL+C9hqjUv8N6bLKKfoejJjwVcm11fy2i7woLfu2xV8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyOBTeMhosqLbduzDsBBOhPfbKg0e+x2W3L4tY+mI8PepM4bsT1
-	OVNd7iPaY3+O64BGlJvxBdsgUO+iuhZnR5GNG8hTZPvd0hXnaAQY2/9E0NDVgur4r2tkc9n/zWi
-	QZ9V2Y1ho08+W2kahMKTTyQC68ze+r88=
-X-Gm-Gg: AeBDietPO2ifbmJjnfZKQEg/oFYSj8VENpQ51HKmZWswJCAy+h9DGoC4jNK5JwR+/35
-	IWdKv9q7NXE6XDY5VPDnrcngWtCKV9MlpZV8Hs47AOaeRJkG38NtIoHfVgqvh+E2ohjgjQpRHMU
-	3MYhso8bYs3P0FxpiK95wMNGWZl2ZTbjfrPPL0Jxy490ZzJ6A6CpORSC25PwcoYPx0g6TORKtcc
-	f3PUXbl2SYnQ2b5g7jpiZktBDxN2547Q6uRfM7GonojeaBrXN+L67TEj/gqPCAogJz3UqYKvwea
-	5pYBVctqgyXbd6TZ
-X-Received: by 2002:a05:651c:4208:b0:38e:7ed2:b63 with SMTP id
- 38308e7fff4ca-38ec7acfd31mr36038541fa.22.1776692343742; Mon, 20 Apr 2026
- 06:39:03 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6657C3D75AB;
+	Mon, 20 Apr 2026 13:39:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776692382; cv=none; b=dHxwylxrHAcBCfFqCNBr6Gfq1a4o6YR/G9vwlIQy6Qd336aBFbouzRlQuIfyLgshbkFl+27C+fFRINb4n1xvHUjetfHgBGLmyhQvOldECg0xvB9cPgb2nhg64PDeXszx3JHEE0Y7XEuZYmPfn+FeQtaIEzjcNJ4wqTu7cXe2t1U=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776692382; c=relaxed/simple;
+	bh=2apI9q1rG+ui2BIKoGC3UZUi3aOcHG39oSwEJgtXR/8=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=FRWpK/HdytxsWE3V9svvncNHKtnRpGJFpGZxMQnyqJkfXzf3hFkfR2pm0AxKMhHEMPSKOvuOnp/Lq88q6nKTG2Pnq08L2ILLR0NHemFYPoTs5J2rH6R/435kiSMcmZqCpK+ZPpA2pHXZbCxWkYJds2Wm0AtXtYcZ99+7wUzrDao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IG7gre5P; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB8FAC19425;
+	Mon, 20 Apr 2026 13:39:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776692382;
+	bh=2apI9q1rG+ui2BIKoGC3UZUi3aOcHG39oSwEJgtXR/8=;
+	h=From:Date:Subject:To:Cc:From;
+	b=IG7gre5P8zuhyokbHZF5eeCwOnhVF52IH1qPoY+vzbkkuOe72X5r/LtVSWi5CWimJ
+	 apA2vR5MBZXTvI4/35GuWdWP124+dOV9F3s/IXNOGEUKN79nDTFcrOCMO92GWnxnox
+	 aAKpYm6DEI5KR2RuCE57lYv+pGJMkcq05YDu6JDfrQe4o7voPauEtOtu2AeTzTWmUg
+	 P2vVINaKL528yX1SO5bi0cSBdQkqjDTKwB9yxEira7gGXvcNmIZqtPbtIzdogehUXv
+	 bzSXK+VsI/l2Kade+EVqKcy8JVik5R9HC25TsCqQ9SJGfqoYINIdZQvntKKKrnrlvV
+	 em1nlnxNbvG/A==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Date: Mon, 20 Apr 2026 15:39:08 +0200
+Subject: [PATCH RFC nf-next] netfilter: flowtable_offload: propagate CT
+ mark to hardware offload path
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <0f9e9d4e-8083-4297-91d3-10d0f614c87c@redhat.com>
- <20260408125333.38489-1-xiaoguai0992@gmail.com> <20260412135743.GK469338@kernel.org>
- <255224dc-0a55-4a0c-95f3-b84d4c6b3897@redhat.com> <20260414112951.GD469338@kernel.org>
- <CAKvcANPEa91paujTQjpW2hZhpXEhwfOjjy6CsN=OJ32iXYXdTA@mail.gmail.com> <85ec14af-bdd5-45ea-8c06-ebd769499bd1@app.fastmail.com>
-In-Reply-To: <85ec14af-bdd5-45ea-8c06-ebd769499bd1@app.fastmail.com>
-From: Kangzheng Gu <xiaoguai0992@gmail.com>
-Date: Mon, 20 Apr 2026 21:38:50 +0800
-X-Gm-Features: AQROBzBrhMAvRHsvT_Uh3_bh_6PBMT7vbMlO9R2BKmmLDZimLRkGEVK80HjiNtE
-Message-ID: <CAKvcANNyS=itNKW6LBAHb+iOV7v7fNt=rsbuLug8_cgfS85Eng@mail.gmail.com>
-Subject: Re: [PATCH v5] net: caif: fix stack out-of-bounds write in cfctrl_link_setup()
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Simon Horman <horms@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Kees Cook <kees@kernel.org>, 
-	Thorsten Blum <thorsten.blum@linux.dev>, sjur.brandeland@stericsson.com, 
-	Netdev <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org, 
-	stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260420-nft-flowtable-priority-v1-1-6603fbbf1366@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x3MwQrCMAyA4VcpORuowQ30KvgAXoeH6hINjHSkR
+ Sdj727x+B3+f4XCrlzgFFZwfmvRbA37XYDHK9mTUcdmoEh9PFBEk4oy5U9N94lxds2u9Ys9sxw
+ jjdR1CVo8O4su//EA18s5mKDxUuG2bT9Ch8j+dQAAAA==
+X-Change-ID: 20260420-nft-flowtable-priority-6eef902d255a
+To: Pablo Neira Ayuso <pablo@netfilter.org>, 
+ Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>
+Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+ netdev@vger.kernel.org, Lorenzo Bianconi <lorenzo@kernel.org>
+X-Mailer: b4 0.14.3
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-279828-lists,netdev=lfdr.de];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-279830-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xiaoguai0992@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,arndb.de:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 1E2A342F580
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 65A1B42F5E7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Ok, I would like to wait. I am just researching for security.
+When a user-space process sets the Connection Tracking (CT) mark on a
+flow via nft_ct or xt_CONNMARK, that mark should be visible to the
+hardware offload path when the flow is accelerated through the flowtable
+infrastructure.
+Extend the flowtable offload attribute set to include the ct mark field
+when it has been explicitly set on the conntrack entry.
 
-Arnd Bergmann <arnd@arndb.de> =E4=BA=8E2026=E5=B9=B44=E6=9C=8820=E6=97=A5=
-=E5=91=A8=E4=B8=80 16:14=E5=86=99=E9=81=93=EF=BC=9A
->
-> On Mon, Apr 20, 2026, at 10:09, Kangzheng Gu wrote:
-> > Thanks for all of your advice, I am preparing a new version of patch no=
-w.
->
-> If you are actively using CAIF, please chime in at
->
-> https://lore.kernel.org/all/20260416182829.1440262-1-kuba@kernel.org/
->
-> If you are not actually using CAIF, maybe wait a little bit before
-> spending more time on it because the patches may no longer
-> apply if it gets removed due to lack of users.
->
->      Arnd
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+---
+ net/netfilter/nf_flow_table_offload.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/net/netfilter/nf_flow_table_offload.c b/net/netfilter/nf_flow_table_offload.c
+index 002ec15d988b..d5fe35b1a647 100644
+--- a/net/netfilter/nf_flow_table_offload.c
++++ b/net/netfilter/nf_flow_table_offload.c
+@@ -679,6 +679,22 @@ static int flow_offload_decap_tunnel(const struct flow_offload *flow,
+ 	return 0;
+ }
+ 
++static void nf_flow_rule_ct_meta_mark(const struct flow_offload *flow,
++				      struct nf_flow_rule *flow_rule)
++{
++#if IS_ENABLED(CONFIG_NF_CONNTRACK_MARK)
++	u32 mark = flow->ct ? READ_ONCE(flow->ct->mark) : 0;
++
++	if (mark) {
++		struct flow_action_entry *entry;
++
++		entry = flow_action_entry_next(flow_rule);
++		entry->id = FLOW_ACTION_CT_METADATA;
++		entry->ct_metadata.mark = mark;
++	}
++#endif /* IS_ENABLED(CONFIG_NF_CONNTRACK_MARK) */
++}
++
+ static int
+ nf_flow_rule_route_common(struct net *net, const struct flow_offload *flow,
+ 			  enum flow_offload_tuple_dir dir,
+@@ -747,6 +763,8 @@ int nf_flow_rule_route_ipv4(struct net *net, struct flow_offload *flow,
+ 	if (nf_flow_rule_route_common(net, flow, dir, flow_rule) < 0)
+ 		return -1;
+ 
++	nf_flow_rule_ct_meta_mark(flow, flow_rule);
++
+ 	if (test_bit(NF_FLOW_SNAT, &flow->flags)) {
+ 		if (flow_offload_ipv4_snat(net, flow, dir, flow_rule) < 0 ||
+ 		    flow_offload_port_snat(net, flow, dir, flow_rule) < 0)
+@@ -776,6 +794,8 @@ int nf_flow_rule_route_ipv6(struct net *net, struct flow_offload *flow,
+ 	if (nf_flow_rule_route_common(net, flow, dir, flow_rule) < 0)
+ 		return -1;
+ 
++	nf_flow_rule_ct_meta_mark(flow, flow_rule);
++
+ 	if (test_bit(NF_FLOW_SNAT, &flow->flags)) {
+ 		if (flow_offload_ipv6_snat(net, flow, dir, flow_rule) < 0 ||
+ 		    flow_offload_port_snat(net, flow, dir, flow_rule) < 0)
+
+---
+base-commit: 3f3a2aefbc661b837c8e344f944982d61c2ae037
+change-id: 20260420-nft-flowtable-priority-6eef902d255a
+
+Best regards,
+-- 
+Lorenzo Bianconi <lorenzo@kernel.org>
+
 
