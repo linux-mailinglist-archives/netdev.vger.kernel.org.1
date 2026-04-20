@@ -1,238 +1,239 @@
-Return-Path: <netdev+bounces-279871-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279872-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8PySJfRq5mmBwAEAu9opvQ
-	(envelope-from <netdev+bounces-279871-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 20:05:40 +0200
+	id cOjOBY9t5mmBwAEAu9opvQ
+	(envelope-from <netdev+bounces-279872-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 20:16:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B93B43272E
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 20:05:40 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5888432A1A
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 20:16:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 01DAC314242E
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 16:27:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 140D03272CEA
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 16:46:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B964346E67;
-	Mon, 20 Apr 2026 16:27:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DF40374726;
+	Mon, 20 Apr 2026 16:46:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kUNMaSWz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="na9xfB9j"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A1AD34C9AC
-	for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 16:27:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4520A372EF3
+	for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 16:46:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776702469; cv=none; b=lmRQxkspZAljgrddSebh9MMsRbF8s1gQOkjwYy/3OOzc0k29ZIxyLz+HkR4TqFZ1BHscqXUtwi9K0+RVlrCahWBmGEd8e0Xc1GjXjiVexn9Cq9Obkg3mgHDdy2iI0XQK64iFVpXB9qIzgcNkWFW1psGVVrgWTzfcrx1YaLftfvY=
+	t=1776703562; cv=none; b=tnMJ8d1HocvZo56rIUX+XwDZbuFBg5i7kdNzNH6074qtm/kZ2ZGQfesH4EKtG5eIVnw6IXF24oZQSvjxRlTIowKjuoYKw7GwzlFxTaa9d0IZxCDMC6Vc4Bp58iZ1A4z3TysS351Qx5uMWOyOR57z0ihf7B/1DxMd5Xbby1ha758=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776702469; c=relaxed/simple;
-	bh=evayBaPrs6BX6HReooKQD8y9Hc6cu+bkyz671CEA814=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ethkk5gX9sa8FdbDGEXiO0kuqQE5hAdyxWypSHDYmKMEEc0tZBFS8lZXqgeZ0p9QvdhwWyj/ldwcQKJ6shpwsRf1AoRdRpLa4CdiZllfJB13MeedZ6eKjDSuDP3ZlwRmCo2VKLOnMVaOrV9Uwp1920Cw8fBYthc3oo498BWgJOs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kUNMaSWz; arc=none smtp.client-ip=209.85.222.176
+	s=arc-20240116; t=1776703562; c=relaxed/simple;
+	bh=8FNY7MbtkgjbsRoI1I6nx/707r+HF/T/RNrqqCg5fjw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pG26U/EiAtMy4Jf+LKseM+6aD3R3aA4EWhLLIUAMNEuz8QC7g8r3/inzeYH+OvVJfmsXejt4N8XRrCqab9jZ0fGWulkczvNQuiGC7GgfeLKH2G9NAI6SLu9RUlPn8NiNclZ4Bm9k+C0QIvInlWsTh/18hnEn6HMY+gYlKa7zkag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=na9xfB9j; arc=none smtp.client-ip=209.85.221.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-8eae9229110so189454185a.1
-        for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 09:27:47 -0700 (PDT)
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-43fe62837baso1990932f8f.3
+        for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 09:46:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776702467; x=1777307267; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=zRBP2HEpjTOd8VHWChKXQR5DE4JBIEeYnfAtHpEwptc=;
-        b=kUNMaSWzvqOefGfmV69yBh+UaQx6pfhSpZ8cVLDoScUyXMo6rB8YynkhhOzMCHulY7
-         M+Itd3Zm2V5vIq+lF0vxqvzeXr8Y/tYlUml1zw/zT9NHiIKCcp/fTDoj8EoMvkzFLZTJ
-         9XYBEAwV9LxmJjSOx2tJv2jg442henexsDlXKTqh2j+BidSgLrjWrXepuqFWfAzRznVN
-         ycKl6ukCJ0zUW8ompm44X8FkwSVv59y3c/WtUFVi/cjZYfVkx0/HZ9zaJAm0NPPaMqEc
-         D2cji66poGyhIxbu0QE6hLboaGan49+DO0y9sr02BBbT6mVBbuH9MQOrsEmyfgPhVaom
-         lyJw==
+        d=gmail.com; s=20251104; t=1776703559; x=1777308359; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5E+UKYZ+gXk3KKDw9hC2HFOEQBrHQpFIVrnj4wNYvlY=;
+        b=na9xfB9jpuFmJCc52HHYeE622o7SbJJRZ28mr/+yN1E3II021zrVR7B8EIIRf98THp
+         dtnJRY6CB4tHq5uVirkx2KSPii/nD1tCAi2KpyHCOfa/46xPwMT2UQo+c1F1JGVRVaBx
+         VAUFIeHFEOsOGkZ2B/8rtqByBqX4LCu3cWdyrSfFaYd2ouAgyy2Ho21ulFUy3/cnsa1r
+         dWJXBh9V8IXRNxXppP06aDB7rBhVxSuAezrbY2CcWSqVWbmLOHERo9cpvPnNnfCabiS8
+         GninTvkORT/UGZEMwE1BYzGEJEg1kmp3Q86ugdQ0L4xBEKK5bW2z/wyBmnz5tDMyuHvP
+         7QCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776702467; x=1777307267;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zRBP2HEpjTOd8VHWChKXQR5DE4JBIEeYnfAtHpEwptc=;
-        b=d86VyMmHQC/OQ7rUuxrdP1/p1XLbyoSsAY/hzXf5BqA1QGJ0BikayY6JEiyufVbkdj
-         o593BQCpTV1vuyRzAb4gQsgWNf9q4m9MNVFZiyn6Jm6rjIKhGXOT8BMrJp6iqohChpZL
-         Yepvsujc9Eiw2O0W+n71urKKiMRrJHu8PDKLxAb9gAmRZ2hDbiqWZN83HOSwlVSPQ6gO
-         WcUn9e29OpHbVNx+uHAkMfPAer42J0mr1RsvtTnoJ8CmnhNJ181dN+Ns35SRJ7sQnYh1
-         IaJ+N8g0Sd5iSekdnZCi4zU9nny4umEeYDq5XeqtRPNyhXbRh9z2vAxNvRIscvIQ820k
-         YFsg==
-X-Forwarded-Encrypted: i=1; AFNElJ9Hw/YrJ08+H68jj/LbpLVDqFSTVek38FJ4QR8PEsCxiLAlU0SWgAgnceLU6DBwv9DKmK4bQZ0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywc9qSIvFsQ/XkQT7BRfe6mS7rJwQk+byEtnVlwUncVMBtS8H7l
-	+BADc5Q+xdO883hJrpKueokkdAfTUIe34ri/SGAKDCij8wXStK5/8yO0
-X-Gm-Gg: AeBDievFdVqFPu5TOaMdxxLy8zgcJrxsnhRsaD1JQacVwRv3pS+ZPgVsBQB4PLswxQC
-	ySB6QrVEX2pzvsI/cl707Il4m2bF1/N3J4TFNMacdsr9t9CbbSofU0j6UoelUGXJ/UwBQl9j6tM
-	MvuLfcWox66BFKK4PW4gcd9kFJeE33WRYCKkiw1UK3QW7bL4Iyogvm+Z7GI3HMl9qjGh69557sZ
-	1PqpBgHP6kM8oodKC74aMoEIWXgDn3rZ27lqLiw9H+aL0q7x2aUFsNPOWEzaFuXhm2FRgVEbB6a
-	blxGH8Pyxh+KCtwVFj/phUMVvQCdg4WxBd6eACFce8iZEzzDI3kSaiHYM07XShMHcMW/aJ46N8N
-	fcsYZj2TiO+S4dOWwdf5S1ecDKsYDpbeXQNGJcQY/fynvxpJHJf2TPtbl18sUlOFJfdpEB5Nlt+
-	aidV1CI3O6EQ4a8c+hyTEmIsrPgkZx44SSbfUnMZ6+iBY7UvwS25NavLLRKc207f0ZulSPFStmN
-	TX/jzzARfnYZUiHen0ijCZ+JV7SDo0=
-X-Received: by 2002:a05:620a:4886:b0:8d6:9e5c:36c with SMTP id af79cd13be357-8e78f0584edmr2111339985a.6.1776702466795;
-        Mon, 20 Apr 2026 09:27:46 -0700 (PDT)
-Received: from server0 (c-68-48-65-54.hsd1.mi.comcast.net. [68.48.65.54])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8eb9becc6c3sm208655085a.39.2026.04.20.09.27.45
+        d=1e100.net; s=20251104; t=1776703559; x=1777308359;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5E+UKYZ+gXk3KKDw9hC2HFOEQBrHQpFIVrnj4wNYvlY=;
+        b=hyfJExRn+emc+7JEucRV6QZ7eoDDpUegDSvyF4GGv7hsB027CozwxhK5frbbP3mrLr
+         3wmYqtTNWG0OsKoZInSysY11EdTao6HWxDjnU4FAmfJK4Dti/kUWiEf2qABgfWmqspJd
+         F9C/qS6K++R86T2N+qcSv4rc1R1dphDgwSDeVBF7seGAZXYySsYIT63tPUbnOZWsfqmV
+         PnK2slP3T82tk19BtKM2JB1db9hmllqGFTN0QE6jLwi/OuHisBI6jkTICd7+jZp9Nvyg
+         6ut2PH/h5O2Hy7gRjGjIzvTTYOdxyMGqtGWlAcvLd2NR9vNKBGJvtGVCRb4NSuup7a9D
+         5yPg==
+X-Forwarded-Encrypted: i=1; AFNElJ+nfQ+qyQvUWQJac2ZkOUUWTLNgywQaZmkV7zufeTkI9uraJ1q3ax1Vz0IHrm/90DHz9Rx1qwk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxbXiPsnJq2sNYnze1IUIKSvjlddzwwqedkdS4LeyLv/Cp7BHc+
+	knnYPTxH7aUJCtQ1WWUs4lSRE2zqgsiNfrda5EDliNrK8OzO9h1DploI
+X-Gm-Gg: AeBDieteptJ8bIWrVm08mWYD9Ga97CXlMy19Ett1dFG7ARL3ChRMXhnEZXyheB1B5f7
+	WaVcz1XasanCIXJnVVM/NHLWwvqBrF5CV/X11isLZjQicF/CqsHeLa7Sb1E+lRGG/RQeOpfeRyP
+	i23pWwSmeybuTNQPZ8l++atu0vvoDlEgzJvhA2Ob6wg3++Y5f4IvFEC0yp/htGEQ4EX2PfFcnk2
+	BOPj4r0sssglGWG0BmTQyLEohSWUOqARzTj8XcD7HmjR65wbfWDDR+n98yP2Js69tW2+7NCc+kT
+	empNl8U5WoXta27IvXzzG15XUZOWrCYA2HlE0YPfEs9NHXMaOhgcoaEps30K6w7JttsUaDWOZLq
+	pSjRNPfx/f98I9hF88SarAX0ce4YdDXoxWEaWU9f/lGWmxTr5rUKYrpApwV45H0hrATxT30XaXx
+	MSY8q7bDac4ncvP5hYJ6VMJ8TbNXcFgVohurSi02/G
+X-Received: by 2002:a5d:588f:0:b0:43d:2be:e54 with SMTP id ffacd0b85a97d-43fe3dfd4aemr21673354f8f.39.1776703558306;
+        Mon, 20 Apr 2026 09:45:58 -0700 (PDT)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43fe4e3a79esm32560450f8f.17.2026.04.20.09.45.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Apr 2026 09:27:46 -0700 (PDT)
-From: Michael Bommarito <michael.bommarito@gmail.com>
-To: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Cc: Simon Horman <horms@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Kees Cook <kees@kernel.org>,
-	Feng Yang <yangfeng@kylinos.cn>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] netlink: clean up failed initial dump-start state
-Date: Mon, 20 Apr 2026 12:27:34 -0400
-Message-ID: <20260420162734.854587-1-michael.bommarito@gmail.com>
-X-Mailer: git-send-email 2.53.0
+        Mon, 20 Apr 2026 09:45:57 -0700 (PDT)
+Date: Mon, 20 Apr 2026 19:45:54 +0300
+From: Dan Carpenter <error27@gmail.com>
+To: Jared Kangas <jkangas@redhat.com>
+Cc: Chester Lin <chester62515@gmail.com>,
+	Matthias Brugger <mbrugger@suse.com>,
+	Ghennadi Procopciuc <ghennadi.procopciuc@oss.nxp.com>,
+	NXP S32 Linux Team <s32@nxp.com>, Frank Li <Frank.Li@nxp.com>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	linux-arm-kernel@lists.infradead.org, imx@lists.linux.dev,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linaro-s32@linaro.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v6 3/3] dts: s32g: Add GPR syscon region
+Message-ID: <aeZYQp9b5aoV7Ihv@stanley.mountain>
+References: <cover.1769764941.git.dan.carpenter@linaro.org>
+ <0e922537c02d1c47734142090f98eb78e921ed34.1769764941.git.dan.carpenter@linaro.org>
+ <aeKn2dvOOO43zdev@jkangas-thinkpadp1gen3.rmtuswa.csb>
+ <aeZOcCOgMy2g9wqp@rh-jkangas-kernel>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aeZOcCOgMy2g9wqp@rh-jkangas-kernel>
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-279872-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[gmail.com,suse.com,oss.nxp.com,nxp.com,pengutronix.de,kernel.org,lists.infradead.org,lists.linux.dev,vger.kernel.org,linaro.org];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279871-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[michaelbommarito@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[error27@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 1B93B43272E
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[400a4000:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linaro.org:email,64.7.192.0:email,4033c000:email]
+X-Rspamd-Queue-Id: B5888432A1A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-When __netlink_dump_start() has already installed cb->skb, taken the
-module reference and set cb_running, a failure from the first
-netlink_dump(sk, true) call returns via errout_skb without unwinding the
-callback lifetime. That leaves cb_running set and defers module_put()
-and consume_skb(cb->skb) until userspace drains the socket or closes it.
+On Mon, Apr 20, 2026 at 09:04:00AM -0700, Jared Kangas wrote:
+> Fixing Dan's address based on mailmap update, sorry for the noise.
+> 
+> On Fri, Apr 17, 2026 at 02:36:25PM -0700, Jared Kangas wrote:
+> > Hi Dan,
+> > 
+> > On Fri, Jan 30, 2026 at 04:19:52PM +0300, Dan Carpenter wrote:
+> > > Add the GPR syscon region for the s32 chipset.
+> > > 
+> > > Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+> > > ---
+> > >
+> > > [snip]
+> > >
+> > > diff --git a/arch/arm64/boot/dts/freescale/s32g3.dtsi b/arch/arm64/boot/dts/freescale/s32g3.dtsi
+> > > index e314f3c7d61d..be03db737384 100644
+> > > --- a/arch/arm64/boot/dts/freescale/s32g3.dtsi
+> > > +++ b/arch/arm64/boot/dts/freescale/s32g3.dtsi
+> > > @@ -383,6 +383,11 @@ usdhc0-200mhz-grp4 {
+> > >  			};
+> > >  		};
+> > >  
+> > > +		gpr: syscon@4007c000 {
+> > > +			compatible = "nxp,s32g3-gpr", "syscon";
+> > > +			reg = <0x4007c000 0x3000>;
+> > > +		};
+> > > +
+> > >  		ocotp: nvmem@400a4000 {
+> > >  			compatible = "nxp,s32g3-ocotp", "nxp,s32g2-ocotp";
+> > >  			reg = <0x400a4000 0x400>;
+> > > @@ -808,6 +813,7 @@ gmac0: ethernet@4033c000 {
+> > >  			compatible = "nxp,s32g2-dwmac";
+> > >  			reg = <0x4033c000 0x2000>, /* gmac IP */
+> > >  			      <0x4007c004 0x4>;    /* GMAC_0_CTRL_STS */
+> > > +			nxp,phy-sel = <&gpr 0x4>;
+> > >  			interrupt-parent = <&gic>;
+> > >  			interrupts = <GIC_SPI 57 IRQ_TYPE_LEVEL_HIGH>;
+> > >  			interrupt-names = "macirq";
+> > 
+> > I gave this a test on an S32G-VNP-RDB3 and didn't see any issues on the
+> > dwmac-s32 side, but this appears to trigger a panic when reading the new
+> > debugfs regmap/*/registers file for the syscon node:
+> > 
+> >     # grep 4007c000 /proc/vmallocinfo
+> >     0xffff800083da8000-0xffff800083dac000   16384 ioremap_prot+0x74/0xe0 phys=0x000000004007c000 ioremap
+> >     # cat /sys/kernel/debug/regmap/dummy-syscon@0x000000004007c000/registers
+> >     Internal error: synchronous external abort: 0000000096000210 [#1]  SMP
+> >     [...]
+> >     CPU: 0 UID: 0 PID: 4344 Comm: cat Tainted: G   M        E  X   ------  ---  6.12.0+ #226 PREEMPT_RT
+> >     Tainted: [M]=MACHINE_CHECK, [E]=UNSIGNED_MODULE, [X]=AUX
+> >     [...]
+> >     pc : regmap_mmio_read32le+0x44/0xa0
+> >     lr : regmap_mmio_read32le+0x44/0xa0
+> >     [...]
+> >     x23: ffff00080c080000 x22: ffff000802ac4c00 x21: ffff800087b13c9c
+> >     x20: ffff800080a46494 x19: ffff800083da810c x18: 0000000000000004
+> >     [...]
+> >     x5 : ffff800080a46448 x4 : ffff800083da8000 x3 : ffff800080a46494
+> >     x2 : ffff800080a47230 x1 : ffff800083da810c x0 : 0000000000000020
+> >     Call trace:
+> >      regmap_mmio_read32le+0x44/0xa0 (P)
+> >      regmap_mmio_read+0x4c/0x80
+> >      [...]
+> >     Code: 52800400 8b214093 aa1303e1 97f4caf0 (b9400275)
+> >     ---[ end trace 0000000000000000 ]---
+> >     Kernel panic - not syncing: synchronous external abort: Fatal exception
+> > 
+> > Running this through decodecode gives:
+> > 
+> >     All code
+> >     ========
+> >        0:   52800400        mov     w0, #0x20                       // #32
+> >        4:   8b214093        add     x19, x4, w1, uxtw
+> >        8:   aa1303e1        mov     x1, x19
+> >        c:   97f4caf0        bl      0xffffffffffd32bcc
+> >       10:*  b9400275        ldr     w21, [x19]              <-- trapping instruction
+> > 
+> >     Code starting with the faulting instruction
+> >     ===========================================
+> >        0:   b9400275        ldr     w21, [x19]
+> > 
+> > x19's offset from the base address in /proc/vmallocinfo is 0x10c, which
+> > points to a bad read at physical address 0x4007c10c; I also confirmed
+> > that the preceding memory reads back without issues:
 
-Share the normal callback teardown in a helper and use it on successful
-completion and on the initial lock_taken=true failure path. Keep the
-lock_taken=false continuation path unchanged, because recvmsg()-driven
-retries legitimately preserve cb_running when they run out of receive
-room.
+Oh, ugh...  I didn't realize that this wasn't merged.  I don't have a
+way to test this any more.  The simplest fix would be to do change the
+0x3000 to 0x100.  The GPR63 register is at 0xFC.
 
-Fixes: 16b304f3404f ("netlink: Eliminate kmalloc in netlink dump operation.")
-Assisted-by: Claude:claude-opus-4-6
-Assisted-by: Codex:gpt-5-4
-Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
----
-Validation inside a UML guest on current mainline:
+		reg = <0x4007c000 0x100>;
 
-  - An unprivileged local task (uid=65534, no CAP_NET_ADMIN) opens a
-    plain NETLINK_ROUTE socket, preloads sk_rmem_alloc with echoed
-    NLMSG_ERROR replies from an unsupported rtnetlink type, then issues
-    RTM_GETLINK | NLM_F_DUMP | NLM_F_ACK.
-  - Stock kernel: the initial __netlink_dump_start() hits the rmem gate
-    and returns via errout_skb with cb_running stuck at 1 until
-    recvmsg() or close() drives forward progress.
-  - Patched kernel: the same probe leaves cb_running clear immediately
-    on the lock_taken=true failure, and the larger-rcvbuf continuation
-    path (legitimate dump in progress) is unchanged.
+That's probably the best fix as well.  The later register areas would
+be their own syscons.
 
-A scaling pass on 3500 such wedged sockets in a 256M UML guest shows
-about 3.8-3.9 MiB of extra unreclaimable slab (/proc/meminfo
-SUnreclaim) beyond the visible queued rmem on the vulnerable kernel,
-roughly 1.1 KiB/socket. Real accumulation, but the test hits
-RLIMIT_NOFILE long before the guest approaches OOM, so this still
-looks like a local availability cleanup rather than an exhaustion
-primitive.
-
-No Cc: stable@ on the theory that the bug self-heals on
-recvmsg()/close and the accumulation is mild. Happy to add it and
-route to net if you'd rather see it backported.
-
- net/netlink/af_netlink.c | 30 +++++++++++++++++++-----------
- 1 file changed, 19 insertions(+), 11 deletions(-)
-
-diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
-index 4d609d5cf406..7019c17e6879 100644
---- a/net/netlink/af_netlink.c
-+++ b/net/netlink/af_netlink.c
-@@ -2250,6 +2250,20 @@ static int netlink_dump_done(struct netlink_sock *nlk, struct sk_buff *skb,
- 	return 0;
- }
- 
-+static void netlink_dump_cleanup(struct netlink_sock *nlk)
-+{
-+	struct module *module = nlk->cb.module;
-+	struct sk_buff *skb = nlk->cb.skb;
-+
-+	if (nlk->cb.done)
-+		nlk->cb.done(&nlk->cb);
-+
-+	WRITE_ONCE(nlk->cb_running, false);
-+	mutex_unlock(&nlk->nl_cb_mutex);
-+	module_put(module);
-+	consume_skb(skb);
-+}
-+
- static int netlink_dump(struct sock *sk, bool lock_taken)
- {
- 	struct netlink_sock *nlk = nlk_sk(sk);
-@@ -2258,7 +2272,6 @@ static int netlink_dump(struct sock *sk, bool lock_taken)
- 	struct sk_buff *skb = NULL;
- 	unsigned int rmem, rcvbuf;
- 	size_t max_recvmsg_len;
--	struct module *module;
- 	int err = -ENOBUFS;
- 	int alloc_min_size;
- 	int alloc_size;
-@@ -2366,19 +2379,14 @@ static int netlink_dump(struct sock *sk, bool lock_taken)
- 	else
- 		__netlink_sendskb(sk, skb);
- 
--	if (cb->done)
--		cb->done(cb);
--
--	WRITE_ONCE(nlk->cb_running, false);
--	module = cb->module;
--	skb = cb->skb;
--	mutex_unlock(&nlk->nl_cb_mutex);
--	module_put(module);
--	consume_skb(skb);
-+	netlink_dump_cleanup(nlk);
- 	return 0;
- 
- errout_skb:
--	mutex_unlock(&nlk->nl_cb_mutex);
-+	if (lock_taken)
-+		netlink_dump_cleanup(nlk);
-+	else
-+		mutex_unlock(&nlk->nl_cb_mutex);
- 	kfree_skb(skb);
- 	return err;
- }
--- 
-2.53.0
+regards,
+dan carpenter
 
 
