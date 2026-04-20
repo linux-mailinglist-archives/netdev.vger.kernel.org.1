@@ -1,65 +1,70 @@
-Return-Path: <netdev+bounces-279814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279815-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CCrRAYBF5mkfuAEAu9opvQ
-	(envelope-from <netdev+bounces-279814-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 17:25:52 +0200
+	id wNN5LodP5mkBuwEAu9opvQ
+	(envelope-from <netdev+bounces-279815-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 18:08:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7546E42E286
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 17:25:51 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id A226842F0F7
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 18:08:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DEE423469237
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 14:29:34 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 350CA302AE4E
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 14:30:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A92AF494A11;
-	Mon, 20 Apr 2026 13:32:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9430F4963BE;
+	Mon, 20 Apr 2026 13:32:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OkL8I2VY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P8TefFk7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80C74494A0B;
-	Mon, 20 Apr 2026 13:32:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 704A83AB287;
+	Mon, 20 Apr 2026 13:32:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776691944; cv=none; b=t51GkszyqyAVkqZ6W1cGqevb71Y6cHn47HQugFm/NkSiyYZJeS1yLRWR1eKowkSlZ69/2B8gCLEw0qjAgRrbYvCelFWAzE+ms+YKSnxIrQvutHj/LJkiDbI2r9ZdUyyo1SNyIBRzSI97DomCQh1eksKQlZATG2KxVJlfmZzw90I=
+	t=1776691952; cv=none; b=szt7dyzV4YYRRCsAkADGjKS56Q8tfALvygLuBBXPiD3Z/hUYncEjH+FqD2Ob38VcnhoWKbC9mLx0CQkJpJF8RHA8qYiQDbn6ELqXtlPG0svx91j16CWsLvLp+H9a1Akte+5thgfEjqeWqHpD37tkgoB2trU0f+pItC0JEV1G/8c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776691944; c=relaxed/simple;
-	bh=QODO6jEu4/gm2bWuxEvGoBqjXGkcqsfsx7FqQxxXZZ4=;
+	s=arc-20240116; t=1776691952; c=relaxed/simple;
+	bh=FMA63my38RNW107IWuRQRdh0Q1DqYFOwak1lRGCvc3s=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IKfkvnR8x2qrFMZECYjBj+H7WlKiuzPLRH1HN2BAPutqkIShh8BmnAud38Q5G4VXuBaIB+bojUYRujM4PcKkulJIxTB9TBNaDuLm6KRg79B3XHc0qzGRCcdsk4MQlAKec0cFpTTrUZoUFd2SGJEYyhlJSxthQlRHZY6dlR0sjeM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OkL8I2VY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87377C19425;
-	Mon, 20 Apr 2026 13:32:22 +0000 (UTC)
+	 MIME-Version; b=U4HGh/bEmZiKeADy/4J4OxpMYz8F3otqUgRv52V0f2b/lIWRSOyfLhHCm8YNIaT2vZteKE/2eOAQQb5XQTZXKlsp3FNq9fBNoM5C5iTIvi3A7CAarro5u14DRvcBNlz8nPqizuNkYFNRUuo9TdDeGJurlgBg01D2SlKSz7gcfic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P8TefFk7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2EC5BC19425;
+	Mon, 20 Apr 2026 13:32:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776691944;
-	bh=QODO6jEu4/gm2bWuxEvGoBqjXGkcqsfsx7FqQxxXZZ4=;
+	s=k20201202; t=1776691952;
+	bh=FMA63my38RNW107IWuRQRdh0Q1DqYFOwak1lRGCvc3s=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=OkL8I2VYRoo8TmIxRUKLmnbtE+9rxpUSJQUHP9vGNQyJIGJdQfppdDX1nRscIFTIk
-	 5lsfNHRMuTd+Xu73xnnTcanXrAxck6ZIIIzGs7ogrBt8Ep5GD1+EyzHivqqxA5vg80
-	 1X37SxIwcMta+1XeRRzfTHo3urAdvEAGpLxJVSef6o0Jt9+qhgjeszrXhtNo0K+M2j
-	 UMc5v+yuTYjAeBFRx6++Sf4M0z71u2hzl7jj3YqfL6Lx/Df25RWXbuWmLY1ix9Kd+o
-	 /a8Uw87iYFa8CFnRxxcZziXmO82uw4svillmjBhoaa1Ns8NWlQ1NcbAo740iAmhs+E
-	 RD5I0FE0d/VFw==
+	b=P8TefFk7FybC5UQQ7qZQb+Ij12KzLnwPq9penp0r3gAB+dTTN91p2V6oLEBSd63Rg
+	 R5yJ5BAVT7BQVEvtHoUHyI+piV6KVDDFpLR7axnFFM41FHyBAFM5ERTIiNxkoEvXmd
+	 MjNs7jyia8YgYlQeq1Sse3U735QycT9Lro75ZtRoTxj716FxD8+EciR8epsMOrH/M0
+	 FYqs24LM58f+0EqQjZRMAJfeqqXeu1wbx+6PGE0bMJ/uTluDq/RgDmxSOIXbBGCKcA
+	 oMPdxT7QH+u+xyLXxa62PYdqdQSilMMeWhbyGj+vnvo+iz0m+Wk5nmygC956NbifWg
+	 OQ4xiP3Y9aSKw==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Fan Gong <gongfan1@huawei.com>,
-	Zhu Yikai <zhuyikai1@h-partners.com>,
-	Paolo Abeni <pabeni@redhat.com>,
+Cc: Zhengchuan Liang <zcliangcn@gmail.com>,
+	Florian Westphal <fw@strlen.de>,
+	Ren Wei <enjou1224z@gmail.com>,
+	Ren Wei <n05ec@lzu.edu.cn>,
 	Sasha Levin <sashal@kernel.org>,
-	andrew+netdev@lunn.ch,
+	pablo@netfilter.org,
 	davem@davemloft.net,
+	dsahern@kernel.org,
 	edumazet@google.com,
 	kuba@kernel.org,
+	pabeni@redhat.com,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 7.0-6.18] hinic3: Add msg_send_lock for message sending concurrecy
-Date: Mon, 20 Apr 2026 09:21:17 -0400
-Message-ID: <20260420132314.1023554-283-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 7.0] netfilter: require Ethernet MAC header before using eth_hdr()
+Date: Mon, 20 Apr 2026 09:21:21 -0400
+Message-ID: <20260420132314.1023554-287-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260420132314.1023554-1-sashal@kernel.org>
 References: <20260420132314.1023554-1-sashal@kernel.org>
@@ -72,404 +77,525 @@ MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 7.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-279814-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,strlen.de,lzu.edu.cn,kernel.org,netfilter.org,davemloft.net,google.com,redhat.com,vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-279815-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 7546E42E286
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[strlen.de:email,lzu.edu.cn:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A226842F0F7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Fan Gong <gongfan1@huawei.com>
+From: Zhengchuan Liang <zcliangcn@gmail.com>
 
-[ Upstream commit 2a76f900d17dcb9e8322770ac9bcae34517805b3 ]
+[ Upstream commit 62443dc21114c0bbc476fa62973db89743f2f137 ]
 
-As send_mbox_msg is invoked by 3 functions: hinic3_send_mbox_to_mgmt,
-hinic3_response_mbox_to_mgmt and hinic3_send_mbox_to_mgmt_no_ack, only
-hinic3_response_mbox_to_mgmt does not has mutex and the other two has
-mbox->mbox_send_lock because their send actions are mutually exclusive.
-  As hinic3_response_mbox_to_mgmt does not conflict with them in send
-actions but in mailbox resources, add the new mutex(msg_send_lock) in
-send_mbox_msg to ensure message concurrency.
+`ip6t_eui64`, `xt_mac`, the `bitmap:ip,mac`, `hash:ip,mac`, and
+`hash:mac` ipset types, and `nf_log_syslog` access `eth_hdr(skb)`
+after either assuming that the skb is associated with an Ethernet
+device or checking only that the `ETH_HLEN` bytes at
+`skb_mac_header(skb)` lie between `skb->head` and `skb->data`.
 
-  Besdies, in mbox_send_seg change FIELD_PREP to FIELD_GET in
-MBOX_STATUS_FINISHED and MBOX_STATUS_SUCCESS to be more reasonable.
+Make these paths first verify that the skb is associated with an
+Ethernet device, that the MAC header was set, and that it spans at
+least a full Ethernet header before accessing `eth_hdr(skb)`.
 
-Co-developed-by: Zhu Yikai <zhuyikai1@h-partners.com>
-Signed-off-by: Zhu Yikai <zhuyikai1@h-partners.com>
-Signed-off-by: Fan Gong <gongfan1@huawei.com>
-Link: https://patch.msgid.link/d83f7f6eb4b5e94642a558fab75d61292c347e48.1773062356.git.zhuyikai1@h-partners.com
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Suggested-by: Florian Westphal <fw@strlen.de>
+Tested-by: Ren Wei <enjou1224z@gmail.com>
+Signed-off-by: Zhengchuan Liang <zcliangcn@gmail.com>
+Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+Signed-off-by: Florian Westphal <fw@strlen.de>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
-Now I have all the information needed. Let me compile the full analysis.
+`skb_mac_header_was_set` has been available since 2013, so it's
+available in all currently supported stable trees. `skb_mac_header_len`
+was introduced in 2017, also available in all supported stable trees
+(5.4+).
+
+Now I have all the information needed for the full analysis. Let me
+compile it.
 
 ---
 
 ## PHASE 1: COMMIT MESSAGE FORENSICS
 
 ### Step 1.1: Subject Line
-- **Subsystem:** `hinic3` (Huawei network driver)
-- **Action verb:** "Add" (a mutex for concurrency)
-- **Summary:** Adds `msg_send_lock` (actually `mbox_seg_send_lock`)
-  mutex to protect `send_mbox_msg()` from concurrent access
-- Record: [hinic3] [add/fix] [add mutex for message sending concurrency
-  protection]
+- **Subsystem**: netfilter (multiple files: ip6t_eui64, xt_mac, ipset
+  types, nf_log_syslog)
+- **Action verb**: "require" (ensuring precondition is met before use)
+- **Summary**: Require Ethernet MAC header validation before calling
+  `eth_hdr(skb)` across multiple netfilter modules
+
+Record: [netfilter] [require] [validate MAC header is Ethernet and
+properly set before accessing eth_hdr(skb)]
 
 ### Step 1.2: Tags
-- **Co-developed-by:** Zhu Yikai
-- **Signed-off-by:** Zhu Yikai, Fan Gong (primary author/submitter),
-  Paolo Abeni (net maintainer)
-- **Link:** to patch.msgid.link
-- No Fixes: tag (expected for candidates under review)
-- No Reported-by: tag (no bug report, but race found by code inspection)
+- **Suggested-by: Florian Westphal** - the netfilter subsystem co-
+  maintainer suggested this broader fix
+- **Tested-by: Ren Wei** - fix was tested
+- **Signed-off-by: Florian Westphal** - the netfilter maintainer signed
+  off and merged it
+- No Fixes: tag (expected - this is a broader hardening patch)
 - No Cc: stable tag (expected)
-- Record: Accepted by net maintainer (Paolo Abeni). No syzbot/reporter.
-  The author (Fan Gong) is a regular hinic3 driver developer with many
-  commits.
+
+Record: Florian Westphal (netfilter maintainer) suggested and signed off
+on this patch. Tested.
 
 ### Step 1.3: Commit Body
-- **Bug:** `send_mbox_msg()` is called by 3 functions. Two
-  (`hinic3_send_mbox_to_mgmt`, `hinic3_send_mbox_to_mgmt_no_ack`) hold
-  `mbox_send_lock`, but `hinic3_response_mbox_to_mgmt` does not. Since
-  `hinic3_response_mbox_to_mgmt` can run concurrently with the others
-  and they all share hardware mailbox resources, a race condition
-  exists.
-- **Also:** FIELD_PREP changed to FIELD_GET in two macros (cosmetic fix
-  for semantic correctness).
-- Record: Race condition in shared hardware mailbox resources. The
-  response function can run from a workqueue handler concurrently with
-  user-initiated sends.
+The commit explains that multiple netfilter modules access
+`eth_hdr(skb)` after either:
+1. Assuming the skb is associated with an Ethernet device, OR
+2. Only checking that ETH_HLEN bytes at `skb_mac_header(skb)` lie
+   between `skb->head` and `skb->data` (raw pointer arithmetic)
+
+The fix adds three-part validation: (1) device is Ethernet
+(`ARPHRD_ETHER`), (2) MAC header was set (`skb_mac_header_was_set`), (3)
+MAC header spans a full Ethernet header (`skb_mac_header_len >=
+ETH_HLEN`).
+
+Record: Bug: `eth_hdr(skb)` accessed without proper validation that skb
+has a valid Ethernet MAC header. Can lead to out-of-bounds reads. Root
+cause: inadequate validation before dereferencing the MAC header.
 
 ### Step 1.4: Hidden Bug Fix Detection
-- This is an explicit concurrency fix, not disguised. The commit message
-  openly describes the missing synchronization.
-- Record: Not a hidden fix; explicitly described race condition fix.
+This IS a memory safety fix. The commit message says "require...before
+using" which means the existing code accesses `eth_hdr()` without proper
+guards. Confirmed by KASAN report mentioned in the v2 changelog of patch
+1/2. Florian Westphal explicitly identified the other files as
+"suspicious spots."
+
+Record: Yes, this is a genuine memory safety bug fix - prevents out-of-
+bounds access on the MAC header.
 
 ## PHASE 2: DIFF ANALYSIS
 
 ### Step 2.1: Inventory
-- **Files:** `hinic3_mbox.c` (+4/-2), `hinic3_mbox.h` (+4/+0)
-- **Functions modified:** `MBOX_STATUS_FINISHED` macro,
-  `MBOX_STATUS_SUCCESS` macro, `hinic3_mbox_pre_init()`,
-  `send_mbox_msg()`
-- **Scope:** Small, single-subsystem, surgical fix. ~8 net new lines.
-- Record: 2 files, ~8 lines added, minimal scope.
+- **net/ipv6/netfilter/ip6t_eui64.c**: +5/-2 lines (adds ARPHRD_ETHER
+  check, uses `skb_mac_header_was_set`/`skb_mac_header_len`)
+- **net/netfilter/ipset/ip_set_bitmap_ipmac.c**: +3/-2 lines
+- **net/netfilter/ipset/ip_set_hash_ipmac.c**: +5/-4 lines (two
+  functions)
+- **net/netfilter/ipset/ip_set_hash_mac.c**: +3/-2 lines
+- **net/netfilter/nf_log_syslog.c**: +6/-1 lines (two functions)
+- **net/netfilter/xt_mac.c**: +1/-3 lines
 
-### Step 2.2: Code Flow Change
-1. **FIELD_PREP→FIELD_GET macros:** For mask 0xFF (starts at bit 0),
-   both produce `val & 0xFF`. No functional change — purely semantic
-   correctness.
-2. **`hinic3_mbox_pre_init()`:** Added
-   `mutex_init(&mbox->mbox_seg_send_lock)`.
-3. **`send_mbox_msg()`:** Wraps the entire message preparation and
-   segment send loop with
-   `mutex_lock/unlock(&mbox->mbox_seg_send_lock)`.
-- Record: Before: `send_mbox_msg()` had no internal locking. After:
-  Protected by `mbox_seg_send_lock`.
+Total: ~23 lines added, ~14 removed. Six files, all in netfilter
+subsystem.
+
+Record: Multi-file but mechanical/repetitive change. Each file gets the
+same validation pattern. Scope: contained to netfilter MAC header
+access.
+
+### Step 2.2: Code Flow Changes
+Each hunk follows the same pattern:
+- **Before**: Raw pointer arithmetic `skb_mac_header(skb) < skb->head ||
+  skb_mac_header(skb) + ETH_HLEN > skb->data`, or NO check at all
+- **After**: Proper three-part check: `!skb->dev || skb->dev->type !=
+  ARPHRD_ETHER || !skb_mac_header_was_set(skb) ||
+  skb_mac_header_len(skb) < ETH_HLEN`
 
 ### Step 2.3: Bug Mechanism
-- **Category:** Race condition / synchronization fix
-- **Mechanism:** `hinic3_response_mbox_to_mgmt()` calls
-  `send_mbox_msg()` without any lock. Concurrently,
-  `hinic3_send_mbox_to_mgmt()` or `hinic3_send_mbox_to_mgmt_no_ack()`
-  can also call `send_mbox_msg()`. Both paths access the shared hardware
-  mailbox area (`mbox->send_mbox`), including MMIO writes, DMA writeback
-  status, and hardware control registers. Without the new lock,
-  interleaved access corrupts mailbox state.
-- Record: Race condition on shared hardware mailbox resources between
-  response and send paths.
+**Category**: Memory safety (out-of-bounds read / invalid memory access)
+
+The old checks were insufficient:
+1. **ip6t_eui64.c**: Only checked pointer bounds, not device type
+2. **ipset files**: Only checked pointer bounds, not device type or
+   `skb_mac_header_was_set`
+3. **nf_log_syslog.c dump_arp_packet**: NO check at all before
+   `eth_hdr(skb)`
+4. **nf_log_syslog.c dump_mac_header**: Checked device type via switch
+   but not MAC header validity
+5. **xt_mac.c**: Already had ARPHRD_ETHER check but used raw pointer
+   comparison instead of proper API
+
+Without proper validation, if the MAC header isn't set or isn't
+Ethernet, `eth_hdr(skb)` returns a pointer to potentially uninitialized
+or out-of-bounds memory.
 
 ### Step 2.4: Fix Quality
-- The fix is obviously correct: adds a mutex around a shared critical
-  section.
-- The lock hierarchy is documented: `mbox_send_lock ->
-  mbox_seg_send_lock`.
-- No deadlock risk: `mbox_seg_send_lock` is always the innermost lock.
-- The FIELD_PREP→FIELD_GET change is a no-op for 0xFF mask but adds
-  clutter.
-- Record: Fix is correct, minimal, well-documented hierarchy. Low
-  regression risk.
+- **Obviously correct**: Yes. The pattern is simple and repeated
+  mechanically.
+- **Minimal/surgical**: Yes. Only replaces old check with new one; no
+  logic changes.
+- **Regression risk**: Very low. Adding validation before access can
+  only make the code safer. If device isn't Ethernet, these functions
+  should return early anyway.
+
+Record: High quality fix. Uses proper kernel APIs instead of raw pointer
+arithmetic.
 
 ## PHASE 3: GIT HISTORY
 
 ### Step 3.1: Blame
-- All of `send_mbox_msg()` and the macros were introduced by commit
-  `a8255ea56aee9` (Fan Gong, 2025-08-20) "hinic3: Mailbox management
-  interfaces".
-- `hinic3_response_mbox_to_mgmt()` was introduced by `a30cc9b277903`
-  (Fan Gong, 2026-01-14) "hinic3: Add PF management interfaces".
-- The race has existed since PF management was added (a30cc9b), which
-  first introduced the unprotected call path from a workqueue.
-- Record: Bug introduced in a30cc9b277903 (v6.19 timeframe), present in
-  7.0 tree.
+- The buggy code in ipset files dates from their initial introduction
+- `xt_mac.c` buggy check from 2010 (Jan Engelhardt, commit
+  1d1c397db95f1c)
+- `ip6t_eui64.c` dates back to Linux 2.6.12 (2005)
+- `nf_log_syslog.c` `dump_arp_packet` and `dump_mac_header` from the
+  nf_log consolidation era
 
-### Step 3.2: Fixes Tag
-- No Fixes: tag present. Expected for this review pipeline.
+Record: Bugs present since the code was written. Affects all stable
+trees.
 
-### Step 3.3: File History
-- hinic3 is a very new driver, first appearing in v6.16-rc1.
-- The mbox code has been stable since initial introduction, with only
-  minor style fixes.
-- Record: Standalone fix, no prerequisites needed beyond existing code.
+### Step 3.2: Fixes tag
+No Fixes: tag on this commit. Patch 1/2 has `Fixes: 1da177e4c3f41`
+("Linux-2.6.12-rc2").
+
+### Step 3.3: Prerequisites
+This commit (2/2) depends on commit fdce0b3590f72 (1/2) for the
+`ip6t_eui64.c` changes only. The other 5 files are independent.
+
+Record: `ip6t_eui64.c` hunk requires patch 1/2 first. Other files:
+standalone.
 
 ### Step 3.4: Author
-- Fan Gong is the primary hinic3 driver developer with 10+ commits.
-- Record: Author is the driver developer/maintainer.
+Written by Zhengchuan Liang, **suggested by and signed off by Florian
+Westphal** (netfilter maintainer). Very high confidence in the fix.
 
 ### Step 3.5: Dependencies
-- This patch is self-contained. It adds a new mutex field and uses it.
-  No other patches needed.
-- Record: No dependencies. Applies standalone.
+`skb_mac_header_was_set()` available since 2013. `skb_mac_header_len()`
+available since 2017. Both available in all supported stable trees.
 
-## PHASE 4: MAILING LIST
+## PHASE 4: MAILING LIST RESEARCH
 
-### Step 4.1-4.5
-- b4 dig could not find this specific commit (it may not be in the
-  current tree yet since it's a candidate).
-- The original mailbox commit series was found via b4 dig for the parent
-  commit.
-- lore.kernel.org was blocked by bot protection during fetch.
-- The patch was accepted by Paolo Abeni (net maintainer), giving it
-  strong review credibility.
-- Record: Accepted by net maintainer. Could not fetch full lore
-  discussion due to access restrictions.
+### Step 4.1-4.4: Patch Discussion
+- **v1** (March 31, 2026): Single-patch fixing only `ip6t_eui64.c`
+- Florian Westphal (netfilter maintainer) reviewed v1 and:
+  - Asked "why is net/netfilter/xt_mac.c safe?" - implying it isn't
+  - Suggested using `skb_mac_header_len()` instead of raw pointer checks
+  - Suggested adding `ARPHRD_ETHER` device type check
+  - Identified "other suspicious spots" in `nf_log_syslog.c` and ipset
+  - Asked the author to make a patch covering all of them
+- **v2** (April 4, 2026): Split into 2 patches. Patch 1/2 is the focused
+  eui64 fix, patch 2/2 (this commit) is the broader hardening suggested
+  by Florian.
+
+Record: This patch was directly suggested and shaped by the netfilter
+subsystem maintainer. Strong endorsement.
+
+### Step 4.5: Stable Discussion
+The v2 changelog mentions "KASAN report" with a PoC, indicating this is
+a confirmed memory safety issue, not theoretical.
 
 ## PHASE 5: CODE SEMANTIC ANALYSIS
 
 ### Step 5.1-5.4: Function Analysis
-- `send_mbox_msg()` is called from 3 places (confirmed by grep):
-  1. `hinic3_send_mbox_to_mgmt()` (line 815) - holds `mbox_send_lock`
-  2. `hinic3_response_mbox_to_mgmt()` (line 873) - NO lock held
-  3. `hinic3_send_mbox_to_mgmt_no_ack()` (line 886) - holds
-     `mbox_send_lock`
-- `hinic3_response_mbox_to_mgmt()` is called from
-  `hinic3_recv_mgmt_msg_work_handler()` in a workqueue, triggered by
-  incoming management messages from firmware.
-- `hinic3_send_mbox_to_mgmt()` is called from many places: RSS config,
-  NIC config, EQ setup, HW comm, command queue — any management
-  operation.
-- The race is easily triggerable: if the driver receives a management
-  message while simultaneously sending one (very common scenario during
-  initialization or config changes).
-- Record: Race is reachable from normal driver operation paths.
+- `eui64_mt6()`: Called from netfilter match evaluation (PRE_ROUTING,
+  LOCAL_IN, FORWARD hooks)
+- `bitmap_ipmac_kadt()`, `hash_ipmac4_kadt()`, `hash_ipmac6_kadt()`,
+  `hash_mac4_kadt()`: Called from ipset kernel-side operations
+- `dump_arp_packet()`, `dump_mac_header()`: Called from nf_log_syslog
+  packet logging
+- All are reachable from packet processing paths triggered by network
+  traffic
 
-### Step 5.5: Similar Patterns
-- The older hinic driver (drivers/net/ethernet/huawei/hinic/) uses
-  similar mbox locking patterns.
-- Record: Pattern is common in Huawei NIC drivers.
+Record: All affected functions are on hot packet processing paths,
+triggered by normal network traffic with appropriate netfilter rules
+configured.
 
 ## PHASE 6: STABLE TREE ANALYSIS
 
-### Step 6.1: Code in Stable Trees
-- hinic3 was introduced in v6.16-rc1. This commit is for v7.0 stable.
-- The buggy code exists in the 7.0 tree (confirmed by reading the
-  files).
-- The driver does NOT exist in older stable trees (6.12.y, 6.6.y, etc.).
-- Record: Code exists only in 7.0 stable tree.
+### Step 6.1: Code Existence
+- `xt_mac.c`: Unchanged since v5.4+ (will apply cleanly)
+- ipset files: Unchanged since v5.15+ (will apply cleanly)
+- `nf_log_syslog.c`: Has some churn but the relevant functions exist in
+  v5.15+
+- `ip6t_eui64.c`: Needs patch 1/2 as prerequisite
 
 ### Step 6.2: Backport Complications
-- The patch should apply cleanly to 7.0 — the files haven't changed
-  significantly.
-- Record: Clean apply expected.
-
-### Step 6.3: Related Fixes
-- No related fixes for this issue already in stable.
-- Record: No existing related fixes.
+For `ip6t_eui64.c`, patch 1/2 (fdce0b3590f72) must also be backported.
+Other files: clean apply expected.
 
 ## PHASE 7: SUBSYSTEM CONTEXT
 
-### Step 7.1: Subsystem Criticality
-- drivers/net/ethernet/ — network driver, IMPORTANT level
-- hinic3 is a Huawei enterprise NIC driver (used in Huawei server
-  platforms)
-- Record: [Network driver] [IMPORTANT — enterprise NIC used in Huawei
-  servers]
+### Step 7.1: Subsystem
+- **Subsystem**: Netfilter (net/netfilter/, net/ipv6/netfilter/)
+- **Criticality**: IMPORTANT - netfilter is the Linux firewall
+  subsystem, used by nearly all networked systems
 
-### Step 7.2: Subsystem Activity
-- Very active — new driver still being built out with many patches.
-- Record: Highly active.
+### Step 7.2: Activity
+Active subsystem with regular maintenance.
 
-## PHASE 8: IMPACT AND RISK
+## PHASE 8: IMPACT AND RISK ASSESSMENT
 
 ### Step 8.1: Affected Users
-- Users of Huawei hinic3 NICs (enterprise/datacenter environments).
-- Record: Driver-specific but enterprise users.
+Anyone using netfilter with MAC-address matching rules (iptables -m mac,
+ip6tables eui64 match, ipset with mac types) or logging with MACDECODE
+flag.
 
 ### Step 8.2: Trigger Conditions
-- Triggered when a management response from the workqueue coincides with
-  a management send. This is realistic during driver initialization,
-  configuration changes, or firmware events.
-- Record: Realistic trigger during normal NIC operation.
+- KASAN-confirmed: a PoC exists
+- Triggered by network traffic matching rules that use MAC header access
+- Could be triggered by non-Ethernet packets reaching netfilter rules
+  that assume Ethernet
 
-### Step 8.3: Failure Mode
-- Corrupted mailbox messages → firmware communication failure → garbled
-  responses, timeouts, potential driver malfunction.
-- Severity: HIGH (hardware communication failure, potential driver
-  instability)
-- Record: Hardware mailbox corruption, driver instability. Severity
-  HIGH.
+### Step 8.3: Severity
+- **Out-of-bounds read on MAC header**: Can cause kernel crash (oops),
+  potential info leak
+- **KASAN-confirmed**: Severity HIGH
 
 ### Step 8.4: Risk-Benefit
-- **Benefit:** Fixes a real race condition in hardware resource access.
-  Prevents mailbox corruption. HIGH.
-- **Risk:** ~8 lines, adds a well-understood mutex. VERY LOW.
-- Record: Excellent risk-benefit ratio.
+- **Benefit**: HIGH - prevents memory safety bugs across 6 netfilter
+  modules
+- **Risk**: VERY LOW - mechanical replacement of validation checks, each
+  change is 1-3 lines, obviously correct
+- **Ratio**: Strongly favorable
 
 ## PHASE 9: FINAL SYNTHESIS
 
-### Step 9.1: Evidence Summary
+### Step 9.1: Evidence
 **FOR backporting:**
-- Fixes a real race condition in concurrent access to shared hardware
-  mailbox resources
-- Small, surgical fix (~8 lines of real change)
-- Self-contained, no dependencies
-- Author is the driver developer, patch accepted by net maintainer
-- Code exists in 7.0 stable tree
-- Clean apply expected
-- Race is triggerable under normal operation (workqueue response vs.
-  user send)
+- KASAN-confirmed memory safety bug with PoC
+- Suggested and signed off by netfilter maintainer Florian Westphal
+- Tested
+- Small, mechanical, obviously correct changes
+- Uses proper kernel APIs
+- Affects widely-used netfilter modules
+- Buggy code present in all stable trees
+- Functions available since kernel 4.x/5.x
 
 **AGAINST backporting:**
-- No Fixes: tag, no Reported-by: (found by code inspection, not user
-  report)
-- Bundles a cosmetic change (FIELD_PREP→FIELD_GET) with the race fix
-- Very new driver (first in 6.16), limited user base
-- The FIELD_PREP→FIELD_GET change is functionally a no-op for mask 0xFF
+- Part of a 2-patch series (ip6t_eui64.c hunk depends on patch 1/2)
+- No explicit Cc: stable (expected)
+- Touches 6 files (but all changes are identical pattern)
 
 ### Step 9.2: Stable Rules Checklist
-1. Obviously correct and tested? **YES** — standard mutex addition,
-   accepted by maintainer
-2. Fixes real bug? **YES** — race condition in hardware resource access
-3. Important issue? **YES** — can cause driver/firmware communication
-   failure
-4. Small and contained? **YES** — ~8 lines, 2 files in same driver
-5. No new features? **Correct** — no new features
-6. Applies to stable? **YES** — should apply cleanly to 7.0
+1. Obviously correct? **YES** - mechanical pattern replacement,
+   maintainer-suggested
+2. Fixes real bug? **YES** - KASAN-confirmed out-of-bounds access
+3. Important issue? **YES** - memory safety / potential crash / info
+   leak
+4. Small and contained? **YES** - ~37 lines total across 6 files, all
+   same pattern
+5. No new features? **YES** - only tightens validation
+6. Can apply to stable? **YES** (with patch 1/2 for ip6t_eui64.c)
 
 ### Step 9.3: Exception Categories
-- Not an exception category; this is a standard race condition fix.
+Not an exception category - this is a straightforward bug fix.
 
-### Verification
-- [Phase 1] Parsed commit message: race condition described for
-  `send_mbox_msg()` concurrent access
-- [Phase 2] Diff: mutex_init + lock/unlock in `send_mbox_msg()`,
-  FIELD_PREP→FIELD_GET (no-op for 0xFF)
-- [Phase 3] git blame: `send_mbox_msg()` from a8255ea56aee9
-  (2025-08-20), response caller from a30cc9b277903 (2026-01-14)
-- [Phase 3] git describe: hinic3 first in v6.16-rc1, present in v7.0
-- [Phase 4] b4 dig: could not find this specific commit in local repo
-  (candidate not yet applied)
-- [Phase 4] Lore fetch blocked by bot protection
-- [Phase 5] grep confirmed 3 callers of `send_mbox_msg()`, only response
-  path is unprotected
-- [Phase 5] Confirmed `hinic3_response_mbox_to_mgmt()` called from
-  workqueue handler (`hinic3_recv_mgmt_msg_work_handler`)
-- [Phase 5] Confirmed shared resources: `mbox->send_mbox` (MMIO data
-  area), writeback status, HW registers
-- [Phase 6] Code exists in 7.0 tree, confirmed by reading files
-- [Phase 8] Race is triggerable during normal NIC operation when mgmt
-  response and send overlap
-- UNVERIFIED: Could not read full mailing list discussion due to lore
-  access restriction
+### Step 9.4: Decision
+This is a clear YES. Memory safety fix in the netfilter subsystem,
+KASAN-confirmed, suggested by the maintainer, obviously correct, small
+scope.
 
-The fix addresses a genuine race condition where concurrent calls to
-`send_mbox_msg()` from an unprotected response path and a locked send
-path can corrupt shared hardware mailbox resources. The fix is small,
-surgical, obviously correct, and self-contained. The bundled
-FIELD_PREP→FIELD_GET change is a no-op for the specific mask value (0xFF
-at bit position 0) and adds no risk.
+## Verification
+
+- [Phase 1] Parsed tags: Suggested-by and Signed-off-by Florian Westphal
+  (netfilter maintainer), Tested-by Ren Wei
+- [Phase 2] Diff analysis: 6 files modified, each replacing inadequate
+  MAC header validation with proper 3-part check (device type + header
+  set + header length)
+- [Phase 2] Confirmed `nf_log_syslog.c:dump_arp_packet()` had NO
+  validation before `eth_hdr(skb)` access (line 81-83 in current tree)
+- [Phase 2] Confirmed `nf_log_syslog.c:dump_mac_header()` entered
+  ARPHRD_ETHER case without MAC header validity check (line 791-793)
+- [Phase 3] git blame: buggy code in ip6t_eui64.c from Linux 2.6.12
+  (2005), xt_mac.c from 2010, ipset from initial introduction
+- [Phase 3] Confirmed patch 2/2 depends on patch 1/2 (fdce0b3590f72) for
+  ip6t_eui64.c hunk only
+- [Phase 3] Confirmed `skb_mac_header_was_set` available since 2013,
+  `skb_mac_header_len` since 2017 - both in all supported stable trees
+- [Phase 4] b4 dig found series at lore: v1->v2 evolution, v2 is [PATCH
+  nf v2 2/2]
+- [Phase 4] Mailing list: Florian Westphal explicitly asked for broader
+  fix covering nf_log_syslog.c and ipset
+- [Phase 4] v2 changelog mentions "KASAN report" with PoC confirming
+  real vulnerability
+- [Phase 5] All affected functions on packet processing paths (netfilter
+  hooks, ipset kadt, nf_log)
+- [Phase 6] xt_mac.c unchanged since v5.4, ipset files unchanged since
+  v5.15 - clean apply expected
+- [Phase 6] nf_log_syslog.c has more churn but relevant code sections
+  exist in v5.15+
+- [Phase 8] Failure mode: out-of-bounds memory read -> kernel oops or
+  info leak, severity HIGH
+- UNVERIFIED: Exact applicability to v5.10.y and v5.4.y for
+  nf_log_syslog.c (nf_log consolidation happened around v5.12) - does
+  not affect decision since most files apply cleanly
 
 **YES**
 
- drivers/net/ethernet/huawei/hinic3/hinic3_mbox.c | 9 +++++++--
- drivers/net/ethernet/huawei/hinic3/hinic3_mbox.h | 4 ++++
- 2 files changed, 11 insertions(+), 2 deletions(-)
+ net/ipv6/netfilter/ip6t_eui64.c           | 7 +++++--
+ net/netfilter/ipset/ip_set_bitmap_ipmac.c | 5 +++--
+ net/netfilter/ipset/ip_set_hash_ipmac.c   | 9 +++++----
+ net/netfilter/ipset/ip_set_hash_mac.c     | 5 +++--
+ net/netfilter/nf_log_syslog.c             | 8 +++++++-
+ net/netfilter/xt_mac.c                    | 4 +---
+ 6 files changed, 24 insertions(+), 14 deletions(-)
 
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_mbox.c b/drivers/net/ethernet/huawei/hinic3/hinic3_mbox.c
-index 826fa8879a113..65528b2a7b7c8 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_mbox.c
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_mbox.c
-@@ -50,9 +50,9 @@
- #define MBOX_WB_STATUS_NOT_FINISHED      0x00
+diff --git a/net/ipv6/netfilter/ip6t_eui64.c b/net/ipv6/netfilter/ip6t_eui64.c
+index da69a27e8332c..bbb684f9964c0 100644
+--- a/net/ipv6/netfilter/ip6t_eui64.c
++++ b/net/ipv6/netfilter/ip6t_eui64.c
+@@ -7,6 +7,7 @@
+ #include <linux/module.h>
+ #include <linux/skbuff.h>
+ #include <linux/ipv6.h>
++#include <linux/if_arp.h>
+ #include <linux/if_ether.h>
  
- #define MBOX_STATUS_FINISHED(wb)  \
--	((FIELD_PREP(MBOX_WB_STATUS_MASK, (wb))) != MBOX_WB_STATUS_NOT_FINISHED)
-+	((FIELD_GET(MBOX_WB_STATUS_MASK, (wb))) != MBOX_WB_STATUS_NOT_FINISHED)
- #define MBOX_STATUS_SUCCESS(wb)  \
--	((FIELD_PREP(MBOX_WB_STATUS_MASK, (wb))) ==  \
-+	((FIELD_GET(MBOX_WB_STATUS_MASK, (wb))) ==  \
- 	MBOX_WB_STATUS_FINISHED_SUCCESS)
- #define MBOX_STATUS_ERRCODE(wb)  \
- 	((wb) & MBOX_WB_ERROR_CODE_MASK)
-@@ -395,6 +395,7 @@ static int hinic3_mbox_pre_init(struct hinic3_hwdev *hwdev,
+ #include <linux/netfilter/x_tables.h>
+@@ -21,8 +22,10 @@ eui64_mt6(const struct sk_buff *skb, struct xt_action_param *par)
  {
- 	mbox->hwdev = hwdev;
- 	mutex_init(&mbox->mbox_send_lock);
-+	mutex_init(&mbox->mbox_seg_send_lock);
- 	spin_lock_init(&mbox->mbox_lock);
+ 	unsigned char eui64[8];
  
- 	mbox->workq = create_singlethread_workqueue(HINIC3_MBOX_WQ_NAME);
-@@ -706,6 +707,8 @@ static int send_mbox_msg(struct hinic3_mbox *mbox, u8 mod, u16 cmd,
- 	else
- 		rsp_aeq_id = 0;
- 
-+	mutex_lock(&mbox->mbox_seg_send_lock);
+-	if (!(skb_mac_header(skb) >= skb->head &&
+-	      skb_mac_header(skb) + ETH_HLEN <= skb->data)) {
++	if (!skb->dev || skb->dev->type != ARPHRD_ETHER)
++		return false;
 +
- 	if (dst_func == MBOX_MGMT_FUNC_ID &&
- 	    !(hwdev->features[0] & MBOX_COMM_F_MBOX_SEGMENT)) {
- 		err = mbox_prepare_dma_msg(mbox, ack_type, &dma_msg,
-@@ -759,6 +762,8 @@ static int send_mbox_msg(struct hinic3_mbox *mbox, u8 mod, u16 cmd,
++	if (!skb_mac_header_was_set(skb) || skb_mac_header_len(skb) < ETH_HLEN) {
+ 		par->hotdrop = true;
+ 		return false;
  	}
+diff --git a/net/netfilter/ipset/ip_set_bitmap_ipmac.c b/net/netfilter/ipset/ip_set_bitmap_ipmac.c
+index 2c625e0f49ec0..752f59ef87442 100644
+--- a/net/netfilter/ipset/ip_set_bitmap_ipmac.c
++++ b/net/netfilter/ipset/ip_set_bitmap_ipmac.c
+@@ -11,6 +11,7 @@
+ #include <linux/etherdevice.h>
+ #include <linux/skbuff.h>
+ #include <linux/errno.h>
++#include <linux/if_arp.h>
+ #include <linux/if_ether.h>
+ #include <linux/netlink.h>
+ #include <linux/jiffies.h>
+@@ -220,8 +221,8 @@ bitmap_ipmac_kadt(struct ip_set *set, const struct sk_buff *skb,
+ 		return -IPSET_ERR_BITMAP_RANGE;
  
- err_send:
-+	mutex_unlock(&mbox->mbox_seg_send_lock);
+ 	/* Backward compatibility: we don't check the second flag */
+-	if (skb_mac_header(skb) < skb->head ||
+-	    (skb_mac_header(skb) + ETH_HLEN) > skb->data)
++	if (!skb->dev || skb->dev->type != ARPHRD_ETHER ||
++	    !skb_mac_header_was_set(skb) || skb_mac_header_len(skb) < ETH_HLEN)
+ 		return -EINVAL;
+ 
+ 	e.id = ip_to_id(map, ip);
+diff --git a/net/netfilter/ipset/ip_set_hash_ipmac.c b/net/netfilter/ipset/ip_set_hash_ipmac.c
+index 467c59a83c0ab..b9a2681e24888 100644
+--- a/net/netfilter/ipset/ip_set_hash_ipmac.c
++++ b/net/netfilter/ipset/ip_set_hash_ipmac.c
+@@ -11,6 +11,7 @@
+ #include <linux/skbuff.h>
+ #include <linux/errno.h>
+ #include <linux/random.h>
++#include <linux/if_arp.h>
+ #include <linux/if_ether.h>
+ #include <net/ip.h>
+ #include <net/ipv6.h>
+@@ -89,8 +90,8 @@ hash_ipmac4_kadt(struct ip_set *set, const struct sk_buff *skb,
+ 	struct hash_ipmac4_elem e = { .ip = 0, { .foo[0] = 0, .foo[1] = 0 } };
+ 	struct ip_set_ext ext = IP_SET_INIT_KEXT(skb, opt, set);
+ 
+-	if (skb_mac_header(skb) < skb->head ||
+-	    (skb_mac_header(skb) + ETH_HLEN) > skb->data)
++	if (!skb->dev || skb->dev->type != ARPHRD_ETHER ||
++	    !skb_mac_header_was_set(skb) || skb_mac_header_len(skb) < ETH_HLEN)
+ 		return -EINVAL;
+ 
+ 	if (opt->flags & IPSET_DIM_TWO_SRC)
+@@ -205,8 +206,8 @@ hash_ipmac6_kadt(struct ip_set *set, const struct sk_buff *skb,
+ 	};
+ 	struct ip_set_ext ext = IP_SET_INIT_KEXT(skb, opt, set);
+ 
+-	if (skb_mac_header(skb) < skb->head ||
+-	    (skb_mac_header(skb) + ETH_HLEN) > skb->data)
++	if (!skb->dev || skb->dev->type != ARPHRD_ETHER ||
++	    !skb_mac_header_was_set(skb) || skb_mac_header_len(skb) < ETH_HLEN)
+ 		return -EINVAL;
+ 
+ 	if (opt->flags & IPSET_DIM_TWO_SRC)
+diff --git a/net/netfilter/ipset/ip_set_hash_mac.c b/net/netfilter/ipset/ip_set_hash_mac.c
+index 718814730acf6..41a122591fe24 100644
+--- a/net/netfilter/ipset/ip_set_hash_mac.c
++++ b/net/netfilter/ipset/ip_set_hash_mac.c
+@@ -8,6 +8,7 @@
+ #include <linux/etherdevice.h>
+ #include <linux/skbuff.h>
+ #include <linux/errno.h>
++#include <linux/if_arp.h>
+ #include <linux/if_ether.h>
+ #include <net/netlink.h>
+ 
+@@ -77,8 +78,8 @@ hash_mac4_kadt(struct ip_set *set, const struct sk_buff *skb,
+ 	struct hash_mac4_elem e = { { .foo[0] = 0, .foo[1] = 0 } };
+ 	struct ip_set_ext ext = IP_SET_INIT_KEXT(skb, opt, set);
+ 
+-	if (skb_mac_header(skb) < skb->head ||
+-	    (skb_mac_header(skb) + ETH_HLEN) > skb->data)
++	if (!skb->dev || skb->dev->type != ARPHRD_ETHER ||
++	    !skb_mac_header_was_set(skb) || skb_mac_header_len(skb) < ETH_HLEN)
+ 		return -EINVAL;
+ 
+ 	if (opt->flags & IPSET_DIM_ONE_SRC)
+diff --git a/net/netfilter/nf_log_syslog.c b/net/netfilter/nf_log_syslog.c
+index 41503847d9d7f..98d2b9db16efe 100644
+--- a/net/netfilter/nf_log_syslog.c
++++ b/net/netfilter/nf_log_syslog.c
+@@ -78,7 +78,10 @@ dump_arp_packet(struct nf_log_buf *m,
+ 	else
+ 		logflags = NF_LOG_DEFAULT_MASK;
+ 
+-	if (logflags & NF_LOG_MACDECODE) {
++	if ((logflags & NF_LOG_MACDECODE) &&
++	    skb->dev && skb->dev->type == ARPHRD_ETHER &&
++	    skb_mac_header_was_set(skb) &&
++	    skb_mac_header_len(skb) >= ETH_HLEN) {
+ 		nf_log_buf_add(m, "MACSRC=%pM MACDST=%pM ",
+ 			       eth_hdr(skb)->h_source, eth_hdr(skb)->h_dest);
+ 		nf_log_dump_vlan(m, skb);
+@@ -789,6 +792,9 @@ static void dump_mac_header(struct nf_log_buf *m,
+ 
+ 	switch (dev->type) {
+ 	case ARPHRD_ETHER:
++		if (!skb_mac_header_was_set(skb) || skb_mac_header_len(skb) < ETH_HLEN)
++			return;
 +
- 	return err;
- }
+ 		nf_log_buf_add(m, "MACSRC=%pM MACDST=%pM ",
+ 			       eth_hdr(skb)->h_source, eth_hdr(skb)->h_dest);
+ 		nf_log_dump_vlan(m, skb);
+diff --git a/net/netfilter/xt_mac.c b/net/netfilter/xt_mac.c
+index 81649da57ba5d..4798cd2ca26ed 100644
+--- a/net/netfilter/xt_mac.c
++++ b/net/netfilter/xt_mac.c
+@@ -29,9 +29,7 @@ static bool mac_mt(const struct sk_buff *skb, struct xt_action_param *par)
  
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_mbox.h b/drivers/net/ethernet/huawei/hinic3/hinic3_mbox.h
-index e26f22d1d5641..30de0c1295038 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_mbox.h
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_mbox.h
-@@ -114,6 +114,10 @@ struct hinic3_mbox {
- 	struct hinic3_hwdev       *hwdev;
- 	/* lock for send mbox message and ack message */
- 	struct mutex              mbox_send_lock;
-+	/* lock for send message transmission.
-+	 * The lock hierarchy is mbox_send_lock -> mbox_seg_send_lock.
-+	 */
-+	struct mutex              mbox_seg_send_lock;
- 	struct hinic3_send_mbox   send_mbox;
- 	struct mbox_dma_queue     sync_msg_queue;
- 	struct mbox_dma_queue     async_msg_queue;
+ 	if (skb->dev == NULL || skb->dev->type != ARPHRD_ETHER)
+ 		return false;
+-	if (skb_mac_header(skb) < skb->head)
+-		return false;
+-	if (skb_mac_header(skb) + ETH_HLEN > skb->data)
++	if (!skb_mac_header_was_set(skb) || skb_mac_header_len(skb) < ETH_HLEN)
+ 		return false;
+ 	ret  = ether_addr_equal(eth_hdr(skb)->h_source, info->srcaddr);
+ 	ret ^= info->invert;
 -- 
 2.53.0
 
