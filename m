@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-279627-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279625-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8ISEAfmN5WnXlQEAu9opvQ
-	(envelope-from <netdev+bounces-279627-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 04:22:49 +0200
+	id 8LTsGKqN5WnXlQEAu9opvQ
+	(envelope-from <netdev+bounces-279625-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 04:21:30 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62E36426373
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 04:22:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0687D426321
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 04:21:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EF079304149B
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 02:21:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5AEBD30293CA
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 02:21:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 692923793A6;
-	Mon, 20 Apr 2026 02:20:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C4803783C1;
+	Mon, 20 Apr 2026 02:20:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b="QUOmsics"
+	dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b="VMbPPDfc"
 X-Original-To: netdev@vger.kernel.org
 Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFA4E376BE4;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96D3F3019D6;
 	Mon, 20 Apr 2026 02:20:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776651658; cv=none; b=H1KWjnT00+Jk125DZvDP2mSm9OCzDQYEEGOurdM5vcL4uOs0/mRBEBlNLazRxb9r7Z+chpnjgpC+rsC8e4sEM21C7m5llDoYSH6KUIFF64oY/1Qo/XHWnGEh3vF4xjOqdBRTllNi+MFaOGbXkdWPd6vjUvI5I1C7aty5NbBUn+4=
+	t=1776651658; cv=none; b=mww0A96NtylLqg5VAozbh9Sny/WjlaXKxu41HOq2LaSM/azOUgwin7ppv7RA9oe5gYFlmJEyg1HFA6Jx4OS9RPLtNLbejlJRGo2w0BKmfZLwM2GGjSV/pwF7Rd3Xk1K/Y9khKnOfosNkiOpiW572hBBSMUySd/NJZVV/HDFn5Os=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1776651658; c=relaxed/simple;
-	bh=1wZQ3t9NfE6/sECQRrmQQyt4rS356oBCKyv4IVG0HWk=;
+	bh=ePze4zJ1Uk9m0WMzKuVyeHySU7hMX6g5CuvVMBWSnck=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JQqQMZXYc91wUGSXfa2RzY6vUSCVlArc9vzBp5xcGjdQTiYq0dZNVvOH0DV3VKyh4IlY2otFxJCDRItDitdZ6DBBfhmsPnrLcrg5yDfMHpbOCNd5RqwB3g0Mo+pZqIYLD15G29HlraYCC74l3WZU/ndoxukAy7pRyubADVWKYrU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=QUOmsics; arc=none smtp.client-ip=211.75.126.72
+	 MIME-Version:Content-Type; b=e2+eNSZd7p6x4ueAn92WumT6aQF56jtkMlRdTPMYJZsCePy95DtODFFi5i3SEiBSE8tl2JLu/bWP6HB91q0tkWhOwWsOYssA8WIsKEwe7POjh9I0p2rD2EC4fy52ZrRzP/0GCwbElYL1Z47zh+bd/sEDXL7iJd5V17usYy9jg88=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=VMbPPDfc; arc=none smtp.client-ip=211.75.126.72
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realsil.com.cn
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 63K2KFBn8277433, This message is accepted by code: ctloc85258
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 63K2KFBo8277433, This message is accepted by code: ctloc85258
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
-	s=dkim; t=1776651615;
-	bh=15jZdMzLqL1r1J17AOtoR/ouEzGiDYEmzXFKspDMQ4Y=;
+	s=dkim; t=1776651616;
+	bh=lCnJ0HzsmVanHdXoXYyB2eK67+h1t5JXKZg5w4gYH88=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
 	 MIME-Version:Content-Transfer-Encoding:Content-Type;
-	b=QUOmsics5mps8qiISOVdLHNvneoHx+XiLNF+nWK874Dvvbdg7QhJlegk3P84k+0ek
-	 crWxluKahv3ipZK7fymV+wlgYHkV6kTnIsCq/kPlDXskIsJAqkQtCHVaFHD4UbeyEi
-	 TZ6iVXxAc6/s2sD1J4qK7UlV7cLNLJ+K3Ww1oUxTKOwwMKQLzlw2Qp7HQTbxdHgB5G
-	 dDZKmxaz3E8Tk9CsPR8mHyevwmjY/cR0uahXswXVxqwWkd1P00jGVQnldoM4InBPUj
-	 VNPeuCaMXbyJrzD7V6VypeaY+EcpIhDURNKuDqKlJBst9zbQQkzwVDuwy4gY65jV5L
-	 O/hyvFu8bZQfw==
+	b=VMbPPDfcyyLs9JetwuNU5ifsUt2+8R6JLiZkDygoV/fNCXLfO3RAVbnH2y0wTU9Rz
+	 AJ1xbPAd38hM8xuxuh+sAEkPZLQtC7XovTzyfZjiTOvGv6s7qQDiszPjVm+rFNuMpM
+	 DGemU3QKlJ+It7Ia+orircl6gYXqVvYF6o38Srmg2OlHBXuTYyKmEaTPjt6LvxXP5f
+	 2qkfuDjukvyGTnMiflhSc4T5frsZlSQ/b+JrfG/hyFNR796y30/QcgopcyqJbNRn5h
+	 i4hlOekwiKGob3BIwarz3hzoe/2KJqQ3mwDTGzVKS1iLrKhE3joZ31k+uqSE/KHG3O
+	 bkYCr55zRQ7wA==
 Received: from RS-EX-MBS3.realsil.com.cn ([172.29.17.103])
-	by rtits2.realtek.com.tw (8.15.2/3.26/5.94) with ESMTPS id 63K2KFBn8277433
+	by rtits2.realtek.com.tw (8.15.2/3.26/5.94) with ESMTPS id 63K2KFBo8277433
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
 	Mon, 20 Apr 2026 10:20:15 +0800
 Received: from RS-EX-MBS1.realsil.com.cn (172.29.17.101) by
@@ -64,9 +64,9 @@ To: <hkallweit1@gmail.com>, <nic_swsd@realtek.com>, <andrew+netdev@lunn.ch>,
 CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         Javen Xu
 	<javen_xu@realsil.com.cn>
-Subject: [RFC Patch net-next v1 8/9] r8169: move struct ethtool_ops
-Date: Mon, 20 Apr 2026 10:19:56 +0800
-Message-ID: <20260420021957.1756-9-javen_xu@realsil.com.cn>
+Subject: [RFC Patch net-next v1 9/9] r8169: add support for ethtool
+Date: Mon, 20 Apr 2026 10:19:57 +0800
+Message-ID: <20260420021957.1756-10-javen_xu@realsil.com.cn>
 X-Mailer: git-send-email 2.50.1.windows.1
 In-Reply-To: <20260420021957.1756-1-javen_xu@realsil.com.cn>
 References: <20260420021957.1756-1-javen_xu@realsil.com.cn>
@@ -93,7 +93,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_TO(0.00)[gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
-	TAGGED_FROM(0.00)[bounces-279627-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-279625-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[realsil.com.cn:+];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
@@ -103,96 +103,109 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-1.000];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,realsil.com.cn:email,realsil.com.cn:dkim,realsil.com.cn:mid]
-X-Rspamd-Queue-Id: 62E36426373
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 0687D426321
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 From: Javen Xu <javen_xu@realsil.com.cn>
 
-This patch move struct ethtool_ops, no changes. Prepare for next patch.
+This patch add support for changing rx queues by ethtool. We can set rx
+1, 2, 4, 8 by ethtool -L eth1 rx num.
 
 Signed-off-by: Javen Xu <javen_xu@realsil.com.cn>
 ---
- drivers/net/ethernet/realtek/r8169_main.c | 56 +++++++++++------------
- 1 file changed, 28 insertions(+), 28 deletions(-)
+ drivers/net/ethernet/realtek/r8169_main.c | 68 +++++++++++++++++++++++
+ 1 file changed, 68 insertions(+)
 
 diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index b3f15e6fd5e9..6b574fc336d6 100644
+index 6b574fc336d6..57087abe7d88 100644
 --- a/drivers/net/ethernet/realtek/r8169_main.c
 +++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -2587,34 +2587,6 @@ static int rtl8169_set_link_ksettings(struct net_device *ndev,
- 	return 0;
- }
- 
--static const struct ethtool_ops rtl8169_ethtool_ops = {
--	.supported_coalesce_params = ETHTOOL_COALESCE_USECS |
--				     ETHTOOL_COALESCE_MAX_FRAMES,
--	.get_drvinfo		= rtl8169_get_drvinfo,
--	.get_regs_len		= rtl8169_get_regs_len,
--	.get_link		= ethtool_op_get_link,
--	.get_coalesce		= rtl_get_coalesce,
--	.set_coalesce		= rtl_set_coalesce,
--	.get_regs		= rtl8169_get_regs,
--	.get_wol		= rtl8169_get_wol,
--	.set_wol		= rtl8169_set_wol,
--	.get_strings		= rtl8169_get_strings,
--	.get_sset_count		= rtl8169_get_sset_count,
--	.get_ethtool_stats	= rtl8169_get_ethtool_stats,
--	.get_ts_info		= ethtool_op_get_ts_info,
--	.nway_reset		= phy_ethtool_nway_reset,
--	.get_eee		= rtl8169_get_eee,
--	.set_eee		= rtl8169_set_eee,
--	.get_link_ksettings	= phy_ethtool_get_link_ksettings,
--	.set_link_ksettings	= rtl8169_set_link_ksettings,
--	.get_ringparam		= rtl8169_get_ringparam,
--	.get_pause_stats	= rtl8169_get_pause_stats,
--	.get_pauseparam		= rtl8169_get_pauseparam,
--	.set_pauseparam		= rtl8169_set_pauseparam,
--	.get_eth_mac_stats	= rtl8169_get_eth_mac_stats,
--	.get_eth_ctrl_stats	= rtl8169_get_eth_ctrl_stats,
--};
--
- static const struct rtl_chip_info *rtl8169_get_chip_version(u32 xid, bool gmii)
- {
- 	/* Chips combining a 1Gbps MAC with a 100Mbps PHY */
-@@ -6546,6 +6518,34 @@ static void r8169_init_napi(struct rtl8169_private *tp)
+@@ -6518,6 +6518,72 @@ static void r8169_init_napi(struct rtl8169_private *tp)
  	}
  }
  
-+static const struct ethtool_ops rtl8169_ethtool_ops = {
-+	.supported_coalesce_params = ETHTOOL_COALESCE_USECS |
-+				     ETHTOOL_COALESCE_MAX_FRAMES,
-+	.get_drvinfo		= rtl8169_get_drvinfo,
-+	.get_regs_len		= rtl8169_get_regs_len,
-+	.get_link		= ethtool_op_get_link,
-+	.get_coalesce		= rtl_get_coalesce,
-+	.set_coalesce		= rtl_set_coalesce,
-+	.get_regs		= rtl8169_get_regs,
-+	.get_wol		= rtl8169_get_wol,
-+	.set_wol		= rtl8169_set_wol,
-+	.get_strings		= rtl8169_get_strings,
-+	.get_sset_count		= rtl8169_get_sset_count,
-+	.get_ethtool_stats	= rtl8169_get_ethtool_stats,
-+	.get_ts_info		= ethtool_op_get_ts_info,
-+	.nway_reset		= phy_ethtool_nway_reset,
-+	.get_eee		= rtl8169_get_eee,
-+	.set_eee		= rtl8169_set_eee,
-+	.get_link_ksettings	= phy_ethtool_get_link_ksettings,
-+	.set_link_ksettings	= rtl8169_set_link_ksettings,
-+	.get_ringparam		= rtl8169_get_ringparam,
-+	.get_pause_stats	= rtl8169_get_pause_stats,
-+	.get_pauseparam		= rtl8169_get_pauseparam,
-+	.set_pauseparam		= rtl8169_set_pauseparam,
-+	.get_eth_mac_stats	= rtl8169_get_eth_mac_stats,
-+	.get_eth_ctrl_stats	= rtl8169_get_eth_ctrl_stats,
-+};
++static void rtl8169_get_channels(struct net_device *dev,
++				 struct ethtool_channels *ch)
++{
++	struct rtl8169_private *tp = netdev_priv(dev);
 +
- static int rtl_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
- {
- 	const struct rtl_chip_info *chip;
++	ch->max_rx = tp->HwSuppNumRxQueues ? tp->HwSuppNumRxQueues : 1;
++	ch->max_tx = tp->HwSuppNumTxQueues ? tp->HwSuppNumTxQueues : 1;
++	ch->max_other = 0;
++	ch->max_combined = 0;
++
++	ch->rx_count = tp->num_rx_rings;
++	ch->tx_count = tp->num_tx_rings;
++	ch->other_count = 0;
++	ch->combined_count = 0;
++}
++
++static int rtl8169_set_channels(struct net_device *dev,
++				struct ethtool_channels *ch)
++{
++	struct rtl8169_private *tp = netdev_priv(dev);
++	bool if_running = netif_running(dev);
++	int i;
++
++	if (!tp->rss_support && (ch->rx_count > 1 || ch->tx_count > 1)) {
++		netdev_warn(dev, "This chip does not support multiple channels/RSS.\n");
++		return -EOPNOTSUPP;
++	}
++
++	if (ch->rx_count == 0 || ch->tx_count == 0)
++		return -EINVAL;
++	if (ch->rx_count > tp->HwSuppNumRxQueues ||
++	    ch->tx_count > tp->HwSuppNumTxQueues)
++		return -EINVAL;
++	if (ch->other_count || ch->combined_count)
++		return -EINVAL;
++
++	if (ch->rx_count == tp->num_rx_rings &&
++	    ch->tx_count == tp->num_tx_rings)
++		return 0;
++
++	if (if_running)
++		rtl8169_close(dev);
++
++	tp->num_rx_rings = ch->rx_count;
++	tp->num_tx_rings = ch->tx_count;
++
++	tp->rss_enable = (tp->num_rx_rings > 1 && tp->rss_support);
++
++	for (i = 0; i < tp->HwSuppIndirTblEntries; i++) {
++		if (tp->rss_enable)
++			tp->rss_indir_tbl[i] = ethtool_rxfh_indir_default(i, tp->num_rx_rings);
++		else
++			tp->rss_indir_tbl[i] = 0;
++	}
++
++	if (tp->rss_enable)
++		tp->InitRxDescType = RX_DESC_RING_TYPE_RSS;
++	else
++		tp->InitRxDescType = RX_DESC_RING_TYPE_DEAFULT;
++
++	if (if_running)
++		return rtl_open(dev);
++
++	return 0;
++}
++
+ static const struct ethtool_ops rtl8169_ethtool_ops = {
+ 	.supported_coalesce_params = ETHTOOL_COALESCE_USECS |
+ 				     ETHTOOL_COALESCE_MAX_FRAMES,
+@@ -6536,6 +6602,8 @@ static const struct ethtool_ops rtl8169_ethtool_ops = {
+ 	.nway_reset		= phy_ethtool_nway_reset,
+ 	.get_eee		= rtl8169_get_eee,
+ 	.set_eee		= rtl8169_set_eee,
++	.get_channels		= rtl8169_get_channels,
++	.set_channels		= rtl8169_set_channels,
+ 	.get_link_ksettings	= phy_ethtool_get_link_ksettings,
+ 	.set_link_ksettings	= rtl8169_set_link_ksettings,
+ 	.get_ringparam		= rtl8169_get_ringparam,
 -- 
 2.43.0
 
