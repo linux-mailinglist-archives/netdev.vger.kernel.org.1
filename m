@@ -1,168 +1,207 @@
-Return-Path: <netdev+bounces-279902-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279903-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MOvCDfZ35mmFwwEAu9opvQ
-	(envelope-from <netdev+bounces-279902-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 21:01:10 +0200
+	id u7sGFQJ55mkHxAEAu9opvQ
+	(envelope-from <netdev+bounces-279903-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 21:05:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06F4343323A
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 21:01:08 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9C39433266
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 21:05:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6FCBE3020A85
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 18:55:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 85B783029266
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 19:00:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 161113B6356;
-	Mon, 20 Apr 2026 18:55:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D10433BE65C;
+	Mon, 20 Apr 2026 19:00:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SIvoW29B"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gfKPRzWB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-oi1-f173.google.com (mail-oi1-f173.google.com [209.85.167.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEC473BB9E5
-	for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 18:55:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776711331; cv=none; b=L9vvM2/V6iC5ytdtzqzB17y+wz+3o+U4yUX33u6KtZgmK3vulxoE9Ro/MCMSunUvMZWvbHdSYkYD0Fq442OEMS6JXKloMiKvp9xFP6K8rxiY9MBzGWfw9H29uza2iZdfKEZlL9qN3kcGkVqSNvv+cP5DEURU0fYOt57tDkzDV4g=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776711331; c=relaxed/simple;
-	bh=ubgUX7BNuvKy9uoM6ebqr7kPkBbxP5jfsEyerQ8viyU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=u9TYAkw7YJOA9NBoQJQAm6fWM2Igi+2to6XUScU9b3AhEcbRlsJV/71ZZzM/XGXpHtks0KJv0dAvzcYo0BlnDKaBY9wkuq4dDLY3bYMEPVK3agdj5IYuby/LHYY7b4e7hDxkGQnM27W57QiYjjRZ7EmjTJRF53AM5pnrnEth9+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SIvoW29B; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B1123BE659
+	for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 19:00:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.173
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776711613; cv=pass; b=QH8GabaLU3O2c9Tz6OM5lEYZNHLNZXhjYdRST2r8ycvRpl1ZzV6YQ81FTAO2Q2yho8CNwtoIXHQ63yTLFLeuIjT47ZQIr6ax/u80+nk4ydOiTAj4DMwqupya0+fu+HmjwI1VtQLws5hW/JAgYMjkGks6zehM/8/fQrzCB+0psCc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776711613; c=relaxed/simple;
+	bh=1KRYYbOyUpMPEhs9FYDn2NwMRvQwpIj4t0lvICMQsqM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=A1/i9SbGpS3lUFNm2gaXu/ChWo8+bu8/UtxcKpwMF34ly+n0/6eEDmeut/HXetSAZr+1eq8bBiy2yr40Xl+VzLwmfMWBDAWdOIm0whwaWBtfvDLZyghGVSUsv3FZbHmWl7PJR0UZO+R6iuAuzFIKY3Q6nLz1sDsxp9YbYw1SKGc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gfKPRzWB; arc=pass smtp.client-ip=209.85.167.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4852b81c73aso29163315e9.3
-        for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 11:55:29 -0700 (PDT)
+Received: by mail-oi1-f173.google.com with SMTP id 5614622812f47-46fab5f4f59so109870b6e.1
+        for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 12:00:12 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776711611; cv=none;
+        d=google.com; s=arc-20240605;
+        b=cF0WV7NtHPR03rFLym+9YypQN2l37Ay7uxmbvkGr7KfGmMDfQbQfqbHhiGJ7FeBZPN
+         Fx+kl3qAVirkVBw6s9LEyj69+vHIMIcazbBSFki25x5iaojGtxSIT1oiuXM0JVrx+AlL
+         zHzky6SDjyavgFe+jZ8LE6eaeP1S+Wzstc0U3MhdIPDz256wm2RzZ4h+qgU5jADt3WBD
+         nlGxL0LYsr53Zk8/Z6RdvhCXHmY6lb6EkrRAZsCfdDpWda0zok9sp8SbzfChj/E+zoNS
+         MDz51XyCCh0HWhhiXMh45jp2aOW4TX25n5PbeHqThGXfYZ4myr80JOJm3TWWsHJnek1r
+         UxxQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=ZGQ8S6eo0NCGebeSoGAIcjWHTqx/TmEDZ0tG8HBGPxs=;
+        fh=Gs+7fzZc+0p8MBQsgfGBlx8FtEZkxEtlrHhLYDNtNlI=;
+        b=Fz3cgDbrjK30W+S/iCPNuLV3gASex7P4UcZlMwUZwbA4OgGW76/ZclqelE/JhnbKlY
+         9JsNtkPf5mLTXcMKCroD3B9oQnk33UhnlT0CmMiLZTEOCOmawktHXTZnbnAieaEwqjF/
+         kP0XXtZZdo1mdmZ2pe5sCb2hlisDOqFWG9ZI8Jmo4azv1XPij0Yx99uHiPdyETcahb7G
+         dKSOp3BQeO/rC8XIpY9tVVuGGfX2+icYYqSkLzNQoeJLJqwwaG59h/dEtyVrdAQaLi31
+         K5t629FTeYwX65UvnP2N88ClenPEuhn6rr6RhsWPdqXo23w113if4RD8PJTsBIGVuf09
+         iZkQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776711328; x=1777316128; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8/HVK11ntRH+XIcJMBV/Pz8SBCVICjVsqQ/5VvsFVlw=;
-        b=SIvoW29BJ5dmb4IX76NXEstzmGOvWD9UKAvsDeLr1J76H2UrHWnasq0b0i1kV6QpuS
-         1gjpwFNFb/Bo0SYf4oWQGby64Ipl3ZCHgWyj8GO8Ao+4rwGAnbvkMkuvM06kGrd22BdC
-         gF8I/jsebR2dM9vIRsPsvIS2yBudtL9G3raut3KL90C6VBcjdJGE6fQ+mnHlKMQia3pQ
-         JATCyXuNh9txVU0KAQjMbE0iwQvFqf/W2RhFRf1zxlcx6ot+4wJvO9h6dwEe5ja0XjNZ
-         GsU9+kTj++HIXp2fSDaMB55ENIhjuvfxuuv4JbOM4DXNbLpVQ9A9mJ8rkwRA8/y1s2YE
-         pFkg==
+        d=gmail.com; s=20251104; t=1776711611; x=1777316411; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZGQ8S6eo0NCGebeSoGAIcjWHTqx/TmEDZ0tG8HBGPxs=;
+        b=gfKPRzWBunsMh1EzMsH+FddpymT4E5HWqSGB9twTNQ5iCi1oJS/nbILC4fUiz8/9fr
+         afaapayoVzhx0E+MAw+zyntHxudgQKDu0w8uCd5FWpwgLutz/zvOsw7zQTfkjipby9Lt
+         16/8miW0U9xytFmLwIkJQYGoWAOrvc60CsqquVtTEvsFlp+qbvCtr9+VU2JPwyzjRJLg
+         JjQUw3uStuBa5/HkPDehGHseP/tmPr7F+zw4yopXQAlQw/u7fpGnWCA57Mc3sgivFht0
+         XY3A22E5X48NQO/n58qYvurOi94QyFQfhjhEoH9NtzexZbQlnMDNBuY2knIMdRyed+9C
+         F+aw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776711328; x=1777316128;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8/HVK11ntRH+XIcJMBV/Pz8SBCVICjVsqQ/5VvsFVlw=;
-        b=VDzwzOaG8RTEEJueksLpOEU1RQtcSeV8ibAjWn+8T4xPC337dSs5h++m7XJQgeaNXw
-         NRCyHUKIP2RJQ0AfPzGOcTq6IiBFImuSd2Cgh/Q8/dm1s8a9CFCljl3HxiqZKI2G59kX
-         glyrM6tJiOryxXSwPBfd4a6ZuffTmCBoY1yuy8fz5ebEYRmZx1lLi84st5HNbEuCNVer
-         JEAt96zj2xfnaMFCaOcQ57lCzovnVJUtxTP3y1B/tmpFEE2n+BpZPBsOYW/cvQsn31ES
-         Har3psW/aOv1G5YTMtAnJKsDu+eYt6kDhfDxk6EN5Yw77niiJQ4mP7dHRULjhJeRcCZy
-         txxA==
-X-Forwarded-Encrypted: i=1; AFNElJ8aAK2TmurrjgZh/JyBupQB9b10mocX1dQqWx+1u3UfxdU1pyM5FC2RUQRUcxQZ7A6R7lo3eRc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzBTudekOvndn6DveM1Vbqnmr4VecgGhOoml3gqRQkpnbYWdYff
-	ZDT3tDijN79d1u5yDvxgQLYKO4LRf4YXwAz2MAzPnucYz+3BeklOiFNq
-X-Gm-Gg: AeBDieuYUvZk3tydkFSM1k9MXxl1/sIpe2KYXFvnYeHUGJ6lpr4w0sXS+wjtvbwOHPx
-	q6sUMwwfUab3C385F7SI6npc2Ng0DYdZ/s3blVTYWaQDOcDq6/vVpvOiZvua4cs8gUnQt5u1N4i
-	+In28cTuxx0h9MZJqZr50mSLR+6vMKq5nmnYlnk0O4tCd+D6arzomj6NsJrH1NF0pU4yGetQJVJ
-	f283z4QQJ4ti1DoIMnZqijpJGalD6xLj88J1T8nr7mxbpDLY0V0okehnNqd90vGruYTu2mc4Ock
-	jH8ey+/W8Vey4w3fCzKb4uOUIlBPIqCPFBkK+U4RmtJNaCaXAx9VN0WEcIfc1mTbmpHylJ3w2yX
-	ui52ogiMONr0aUwZ99jip0nemmOnRMy/HM3H1U/xiWV7g1Qp6p+oKSfWJAS3PKmwwE3e4Tp9yXn
-	E6NU/hsB7wCPoxER635udPPLE2Dk71Zk2Vl8LrU9E9Mx0GEf+9MmiJwqxsWYkM4t8z4FVuRagoX
-	nbbO0ChAW9W8/TGNnEkD5XSnC4=
-X-Received: by 2002:a05:600c:c0d6:b0:489:ecee:c4ef with SMTP id 5b1f17b1804b1-489eceec9e3mr35706065e9.13.1776711327925;
-        Mon, 20 Apr 2026 11:55:27 -0700 (PDT)
-Received: from ?IPV6:2a02:a03f:a75e:9a00:98a0:d751:7986:3f62? ([2a02:a03f:a75e:9a00:98a0:d751:7986:3f62])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488ffc558f2sm181352375e9.1.2026.04.20.11.55.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 20 Apr 2026 11:55:27 -0700 (PDT)
-Message-ID: <524def33-63e1-47c0-be38-dee68d859332@gmail.com>
-Date: Mon, 20 Apr 2026 20:55:26 +0200
+        d=1e100.net; s=20251104; t=1776711611; x=1777316411;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=ZGQ8S6eo0NCGebeSoGAIcjWHTqx/TmEDZ0tG8HBGPxs=;
+        b=HahoWI3SzZncxDkH9oeXPFBj3Kdi2o03B2UkPzT4k3zZf5GUi7xVvXmr3H7tjIINL7
+         hG/eY/3MpU/A15yrbtBZHgzIlbWOLntkhzt4S6+bw4g+6TkUnnMu3/27ayoa8l3O1P4j
+         MpyAWUTsRQzKoTW3qe934BcPbqBHl1aUaJB7kKvDRrjGUP3lKe9irliIZ03hc9D+XTKZ
+         zzcmYldwOtucH0pB7OC++1klbhSGTq+z0fCGFlXaHB6lq+zsJQDzZO/p0jFQWpmf9t1F
+         MFQRPE3QsPIZxb+9WAxGH9ndnvmsA7Ay2GjEDhTOCRntCoQu4JfHCyX//6HG4/hM0hiV
+         TGQQ==
+X-Forwarded-Encrypted: i=1; AFNElJ8GAPyzqxSwZm0/Xzy2ynTCiNJ0MxVsqSO8oSOdebhkfLJjMHJAdPDl+lq0+IqMI8oz84nxh70=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzSjxhOqqRyeYC3ldKSsGANMqWCl46nHphKgAQ1OxnS8qItCuKN
+	lmHOnUVIFiqoi0k3l9iBIBw6vv4S3RGWwEE/0OV/BnnzV0dd3t0UKasefNGaVkP5uDE5SCKJhQX
+	6wVO2/5ZhCKxy9DVPA0bs2Jr5Kc3cziU=
+X-Gm-Gg: AeBDievTBrl2zhlb9TTM0UWU87iZDBccZj7fn9iNStD+V9x0+f4KK5nDYenagwGrja1
+	9MLTBAnZk1j4UGzLV+xDJcM1Xs97Od3l7EJkk9n/4xLwN1eCTaK79s3QvnNiHUMzCufBk2lnPvc
+	GLlrNbhRQYy9FgYy0oXmY3QatjhGvMx+VYMkXiwQksmHJgp/zByq4EEryFhcdr+j+/QBlC6rFDb
+	cD3n0Ey4F10RrNUTK33uveujkWlq3JrXZTjuqafBkylUWRefiiVJ1yOKbEgD5yY63rCVHP+6G9D
+	FyJi7uEDqD8GxkAq9rxzJVmgnE/9uzI5MD0VrZFBr2LI
+X-Received: by 2002:a05:6808:14c1:b0:479:dcb1:dcf7 with SMTP id
+ 5614622812f47-479dcb1ee58mr1165616b6e.7.1776711611034; Mon, 20 Apr 2026
+ 12:00:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] ipv6: Apply max_dst_opts_cnt to
- ip6_tnl_parse_tlv_enc_lim
-To: Ido Schimmel <idosch@nvidia.com>, daniel@iogearbox.net
-Cc: kuba@kernel.org, edumazet@google.com, dsahern@kernel.org,
- tom@herbertland.com, willemdebruijn.kernel@gmail.com, pabeni@redhat.com,
- netdev@vger.kernel.org
-References: <20260418121538.706095-1-daniel@iogearbox.net>
- <7c715640-5c20-4226-9c31-d2c5eef551db@gmail.com>
- <d8d60970-6f73-4b9d-8808-76f4f8023100@iogearbox.net>
- <8fdf517b-6217-4df6-8adf-0c79ce8d3be8@gmail.com>
- <20260419143137.GA885197@shredder>
-Content-Language: en-US
-From: Justin Iurman <justin.iurman@gmail.com>
-In-Reply-To: <20260419143137.GA885197@shredder>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20260420-netcons_trim_newline-v1-1-dc35889aeedf@debian.org>
+In-Reply-To: <20260420-netcons_trim_newline-v1-1-dc35889aeedf@debian.org>
+From: Gustavo Luiz Duarte <gustavold@gmail.com>
+Date: Mon, 20 Apr 2026 19:59:59 +0100
+X-Gm-Features: AQROBzC3Lo9dnnOH6fFmHSHn2qbQoBO1-4MGQQR1nIwU16VR4n-FB33Ywvch5Ms
+Message-ID: <CAGSyskVWo7C9K1k1nCjfiyUR4vz41uXMfjidVYfW8Gq72OT9CQ@mail.gmail.com>
+Subject: Re: [PATCH net] netconsole: avoid out-of-bounds access on empty
+ string in trim_newline()
+To: Breno Leitao <leitao@debian.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Matthew Wood <thepacketgeek@gmail.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, kernel-team@meta.com, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,herbertland.com,gmail.com,redhat.com,vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-279903-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279902-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,vger.kernel.org,meta.com];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[justiniurman@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[gustavold@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 06F4343323A
+	RCPT_COUNT_SEVEN(0.00)[11];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B9C39433266
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 4/19/26 16:31, Ido Schimmel wrote:
-> On Sun, Apr 19, 2026 at 12:37:35AM +0200, Justin Iurman wrote:
->> Nope. But if it happens, users would be confused as max_dst_opts_cnt would
->> not have the same meaning in two different code paths. OTOH, I agree that
->> such situation would look suspicious. I guess it's fine to keep your patch
->> as is and to not over-complicate things unnecessarily.
-> 
-> I agree that it's weird to reuse max_dst_opts_cnt here:
-> 
-> 1. The meaning is different from the Rx path.
-> 
-> 2. We only enforce max_dst_opts_cnt, but not max_dst_opts_len.
-> 
-> 3. The default is derived from the initial netns, unlike in the Rx path.
-> 
-> Given the above and that:
-> 
-> 1. We believe that 8 options until the tunnel encapsulation limit option
-> is liberal enough.
-> 
-> 2. We don't want to over-complicate things.
-> 
-> Can we go with an hard coded 8 and see if anyone complains? In the
-> unlikely case that someone complains we can at least gain some insight
-> into how this option is actually used with tunnels.
+On Mon, Apr 20, 2026 at 11:34=E2=80=AFAM Breno Leitao <leitao@debian.org> w=
+rote:
+>
+> trim_newline() unconditionally dereferences s[len - 1] after computing
+> len =3D strnlen(s, maxlen). When the string is empty, len is 0 and the
+> expression underflows to s[(size_t)-1], reading (and potentially
+> writing) one byte before the buffer.
+>
+> The two callers feed trim_newline() with the result of strscpy() from
+> configfs store callbacks (dev_name_store, userdatum_value_store).
+> configfs guarantees count >=3D 1 reaches the callback, but the byte
+> itself can be NUL: a userspace write(fd, "\0", 1) leaves the
+> destination empty after strscpy() and triggers the underflow. The OOB
+> write only fires if the adjacent byte happens to be '\n', so this is
+> not a security issue, but the access is undefined behaviour either way.
+>
+> This pattern is commonly flagged by LLM-based code reviewers. While it
+> is not a security fix, the underlying access is undefined behaviour and
+> the change is small and self-contained, so it is a reasonable candidate
+> for the stable trees.
+>
+> Guard the dereference on a non-zero length.
+>
+> Fixes: ae001dc67907 ("net: netconsole: move newline trimming to function"=
+)
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Breno Leitao <leitao@debian.org>
 
-In general, I'm not a big fan of hard-coded values, but I also think 
-that in this context it would make sense to do so. This is not a strong 
-+1, let's say it's more a "not against it".
+Reviewed-by: Gustavo Luiz Duarte <gustavold@gmail.com>
+
+> ---
+>  drivers/net/netconsole.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
+> index 3c9acd6e49e86..205384dab89a6 100644
+> --- a/drivers/net/netconsole.c
+> +++ b/drivers/net/netconsole.c
+> @@ -497,6 +497,8 @@ static void trim_newline(char *s, size_t maxlen)
+>         size_t len;
+>
+>         len =3D strnlen(s, maxlen);
+> +       if (!len)
+> +               return;
+>         if (s[len - 1] =3D=3D '\n')
+>                 s[len - 1] =3D '\0';
+>  }
+>
+> ---
+> base-commit: c7275b05bc428c7373d97aa2da02d3a7fa6b9f66
+> change-id: 20260420-netcons_trim_newline-36f6ec3b9820
+>
+> Best regards,
+> --
+> Breno Leitao <leitao@debian.org>
+>
+>
 
