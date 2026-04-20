@@ -1,67 +1,67 @@
-Return-Path: <netdev+bounces-279822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279823-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aHZ4ML9Q5mkDuwEAu9opvQ
-	(envelope-from <netdev+bounces-279822-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 18:13:51 +0200
+	id 2HUqFDFD5ml/twEAu9opvQ
+	(envelope-from <netdev+bounces-279823-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 17:16:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FDF942F2BE
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 18:13:50 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id A27F742DF9F
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 17:16:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 86C59330BD4E
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 14:35:40 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6218731893D7
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 14:36:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 463B44C9544;
-	Mon, 20 Apr 2026 13:33:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 966C44D2ED7;
+	Mon, 20 Apr 2026 13:33:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NVyXIYdB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pCJmUMXQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 220864C901F;
-	Mon, 20 Apr 2026 13:33:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AE124CA285;
+	Mon, 20 Apr 2026 13:33:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776691996; cv=none; b=CLxGxG+9q88snmFsPMY2FD0F0Tr33NlV4cTIltzDvYjz1CwbSsGkT9zD1HXjsFYsWrijw/N5E7axeKDqUAP4SbIXyyJz0O9vLmuX+PirQn8hVNWfGTMwgCnzuTPUQNrNes3PUlrZx2mmIyNqXxoNXzyF3YfMonO6xr9CyG8DDFc=
+	t=1776692005; cv=none; b=i46sw2b3Apf9VnrH4CoGnCIAZtfZ5lrVO+69jz7svAgHqE9fvsMnEYQstkm5ucGwBp7XxTPS0S0RkMop5jIHCLAFRNgzBqdgcpgShSecvUw6wK/hG4+9+w8WnCVYEPJXMCHS1I8bCp2vE1wP3n5yI7MnF43uubdW0qbuUTlkMss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776691996; c=relaxed/simple;
-	bh=8IuyPOdlgEEHqblmwh+5zj4LIO3kR3cdpVBKlbJTs9o=;
+	s=arc-20240116; t=1776692005; c=relaxed/simple;
+	bh=jWw+kjULLOINHtTCs/awCVSQNwIoMnd53DJYth8+OwQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EkbKze04OqXyTcXob1Jgq8ynHZB2qADBrmRz20Cy+f1hYlhxecXDfTi/T0/+oamV5J8Ro8C9cyn4imEkiNII3+I6my9qnWIAHE8XbF38rR/rO7/ye2QZ/8SwJaQa7ZBR/L0zPqTPG0ZyXhDkjmehSUlpFrvCGrqUBpicTGn4S2I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NVyXIYdB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7243BC19425;
-	Mon, 20 Apr 2026 13:33:14 +0000 (UTC)
+	 MIME-Version; b=jnLqRLxA0CYkoQeOFTnJcN1g1Cj0w6NL11aO5jssdXRmaJvdb8MdoZQhCbQnFEAzWUJO1z44TUjghmcixIQI5v170pFrPImhk1C5QF4YhwrHgY92/T4Db1gvXUCjYI1BJ5K9R+1ihdAYXvGUMapGaQTt4RXCkbOqKqK1qZx9fKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pCJmUMXQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76A89C19425;
+	Mon, 20 Apr 2026 13:33:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776691995;
-	bh=8IuyPOdlgEEHqblmwh+5zj4LIO3kR3cdpVBKlbJTs9o=;
+	s=k20201202; t=1776692005;
+	bh=jWw+kjULLOINHtTCs/awCVSQNwIoMnd53DJYth8+OwQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=NVyXIYdBhwaMtVH/RSJVuzCL1HP6I7ftf4G9+xxqvwrI/fAK0xl+qTqHZsdLhaXkX
-	 i60zE7PSSmQRqEznTv2sU/rzGx2H9w8FCU+Crnsju/w6TTp9FbyRYY/TdivGtV8Crg
-	 43Ci8rcFdfpD2x5L5ovPRf3q0er947MPNpvN4I050QbR/uIcmBDbAZBu7iQmQiIvVK
-	 p8rMXWEYaGMhvyyAh4cVkLf4r4oc2nLuCbEHY+5vlpeDwfaG+BukgDfyvkE+fsrc+I
-	 6ABU9cFaJDcuXv4wiKl12LkqZwMx4NeZ/tMbSSI2SDN5CXBcXmvQlAw4pLM5HWVteK
-	 WFk9PoCQ55lCQ==
+	b=pCJmUMXQOENZT3exzQGpkk0F7MJP203NaxPQcmEv2LIb4hWFoa/b9HJoHqRNkEMtK
+	 S3baUfzwgdI9zTktULULbDw4NwmDootOXbAIG9IETPvi6/oL2twypufBa8p8JemXM5
+	 cILGM2/ACNgUMtMGEohZp8xTEaVG+FQHpfUtK/tUt66DpSDnxH/5TurjA3ZTXIDxk8
+	 rHEErtB1b2jpvZpUDj8aSi8vHnMija86Q1BnkpLgP0WoSRt7n2I1g0idvJYSvVqKmY
+	 YZpTHR2XL0rEOaC14dZkR8gWv3uL1KH1BIm5F80IUdsDwpa3UNjWaGL+GpOTsesPkN
+	 /fZgbM08Aijig==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	=?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>,
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	magnus.karlsson@intel.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	ast@kernel.org,
+	martin@strongswan.org,
 	netdev@vger.kernel.org,
-	bpf@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.18] xsk: validate MTU against usable frame size on bind
-Date: Mon, 20 Apr 2026 09:21:46 -0400
-Message-ID: <20260420132314.1023554-312-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.18] xfrm_user: fix info leak in build_mapping()
+Date: Mon, 20 Apr 2026 09:21:51 -0400
+Message-ID: <20260420132314.1023554-317-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260420132314.1023554-1-sashal@kernel.org>
 References: <20260420132314.1023554-1-sashal@kernel.org>
@@ -71,62 +71,61 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.18.23
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279822-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-279823-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	RCPT_COUNT_TWELVE(0.00)[14];
-	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,intel.com:email]
-X-Rspamd-Queue-Id: 0FDF942F2BE
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linuxfoundation.org:email]
+X-Rspamd-Queue-Id: A27F742DF9F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
-[ Upstream commit 36ee60b569ba0dfb6f961333b90d19ab5b323fa9 ]
+[ Upstream commit 1beb76b2053b68c491b78370794b8ff63c8f8c02 ]
 
-AF_XDP bind currently accepts zero-copy pool configurations without
-verifying that the device MTU fits into the usable frame space provided
-by the UMEM chunk.
+struct xfrm_usersa_id has a one-byte padding hole after the proto
+field, which ends up never getting set to zero before copying out to
+userspace.  Fix that up by zeroing out the whole structure before
+setting individual variables.
 
-This becomes a problem since we started to respect tailroom which is
-subtracted from chunk_size (among with headroom). 2k chunk size might
-not provide enough space for standard 1500 MTU, so let us catch such
-settings at bind time. Furthermore, validate whether underlying HW will
-be able to satisfy configured MTU wrt XSK's frame size multiplied by
-supported Rx buffer chain length (that is exposed via
-net_device::xdp_zc_max_segs).
-
-Fixes: 24ea50127ecf ("xsk: support mbuf on ZC RX")
-Reviewed-by: Björn Töpel <bjorn@kernel.org>
-Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Link: https://patch.msgid.link/20260402154958.562179-5-maciej.fijalkowski@intel.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Fixes: 3a2dfbe8acb1 ("xfrm: Notify changes in UDP encapsulation via netlink")
+Cc: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>
+Assisted-by: gregkh_clanker_t1000
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
@@ -134,71 +133,21 @@ LLM Generated explanations, may be completely bogus:
 
 Error: Failed to generate final synthesis
 
- net/xdp/xsk_buff_pool.c | 28 +++++++++++++++++++++++++---
- 1 file changed, 25 insertions(+), 3 deletions(-)
+ net/xfrm/xfrm_user.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/net/xdp/xsk_buff_pool.c b/net/xdp/xsk_buff_pool.c
-index 677c7d00f8c32..a129ce6f1c25f 100644
---- a/net/xdp/xsk_buff_pool.c
-+++ b/net/xdp/xsk_buff_pool.c
-@@ -10,6 +10,8 @@
- #include "xdp_umem.h"
- #include "xsk.h"
+diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
+index 1ddcf2a1eff7a..b3f69c0760d4c 100644
+--- a/net/xfrm/xfrm_user.c
++++ b/net/xfrm/xfrm_user.c
+@@ -4164,6 +4164,7 @@ static int build_mapping(struct sk_buff *skb, struct xfrm_state *x,
  
-+#define ETH_PAD_LEN (ETH_HLEN + 2 * VLAN_HLEN  + ETH_FCS_LEN)
-+
- void xp_add_xsk(struct xsk_buff_pool *pool, struct xdp_sock *xs)
- {
- 	unsigned long flags;
-@@ -165,8 +167,12 @@ static void xp_disable_drv_zc(struct xsk_buff_pool *pool)
- int xp_assign_dev(struct xsk_buff_pool *pool,
- 		  struct net_device *netdev, u16 queue_id, u16 flags)
- {
-+	u32 needed = netdev->mtu + ETH_PAD_LEN;
-+	u32 segs = netdev->xdp_zc_max_segs;
-+	bool mbuf = flags & XDP_USE_SG;
- 	bool force_zc, force_copy;
- 	struct netdev_bpf bpf;
-+	u32 frame_size;
- 	int err = 0;
+ 	um = nlmsg_data(nlh);
  
- 	ASSERT_RTNL();
-@@ -186,7 +192,7 @@ int xp_assign_dev(struct xsk_buff_pool *pool,
- 	if (err)
- 		return err;
- 
--	if (flags & XDP_USE_SG)
-+	if (mbuf)
- 		pool->umem->flags |= XDP_UMEM_SG_FLAG;
- 
- 	if (flags & XDP_USE_NEED_WAKEUP)
-@@ -208,8 +214,24 @@ int xp_assign_dev(struct xsk_buff_pool *pool,
- 		goto err_unreg_pool;
- 	}
- 
--	if (netdev->xdp_zc_max_segs == 1 && (flags & XDP_USE_SG)) {
--		err = -EOPNOTSUPP;
-+	if (mbuf) {
-+		if (segs == 1) {
-+			err = -EOPNOTSUPP;
-+			goto err_unreg_pool;
-+		}
-+	} else {
-+		segs = 1;
-+	}
-+
-+	/* open-code xsk_pool_get_rx_frame_size() as pool->dev is not
-+	 * set yet at this point; we are before getting down to driver
-+	 */
-+	frame_size = __xsk_pool_get_rx_frame_size(pool) -
-+		     xsk_pool_get_tailroom(mbuf);
-+	frame_size = ALIGN_DOWN(frame_size, 128);
-+
-+	if (needed > frame_size * segs) {
-+		err = -EINVAL;
- 		goto err_unreg_pool;
- 	}
- 
++	memset(&um->id, 0, sizeof(um->id));
+ 	memcpy(&um->id.daddr, &x->id.daddr, sizeof(um->id.daddr));
+ 	um->id.spi = x->id.spi;
+ 	um->id.family = x->props.family;
 -- 
 2.53.0
 
