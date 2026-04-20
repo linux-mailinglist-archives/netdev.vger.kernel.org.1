@@ -1,67 +1,68 @@
-Return-Path: <netdev+bounces-279784-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279785-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mO79Ofg65mlutgEAu9opvQ
-	(envelope-from <netdev+bounces-279784-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 16:40:56 +0200
+	id ELIxL7865mlutgEAu9opvQ
+	(envelope-from <netdev+bounces-279785-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 16:39:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C12D42D51D
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 16:40:56 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20E7542D4D1
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 16:39:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A44DA31440B7
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 14:01:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 10576318348D
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 14:02:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EED5E402BB5;
-	Mon, 20 Apr 2026 13:27:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DF1D3C5DB8;
+	Mon, 20 Apr 2026 13:27:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jjR1yiFQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BPbWJhrc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CABE83C0624;
-	Mon, 20 Apr 2026 13:27:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C03A407594;
+	Mon, 20 Apr 2026 13:27:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776691622; cv=none; b=S4yCiRi006aXCX9Ih7Cfv2UF1So/pL5+FgDJ0lJgb51yoDpVqb88sziLNviSpoD76kt3O1a/ZY9spueB+n2E/6/AyVmBgSxX8BwiN6HVDZqO9WQuB5P24Y/vzmeQ/0x+k2KHQ6uyZMPI/pxyQ/eWt1nzOalYLGqsku5LDQidemY=
+	t=1776691633; cv=none; b=ReCdYbDtzSB3muqWfItB1rhZVCgqDIKVsIWDt04YbyiPyqnF214IZrb/8bxlC/7aiirNgJ1wm02jFLWEyvwjlqwxf40gNbOJ8bwqUU4TB9PsvcZ7CN4nlJJbSMksscst8jh/UFaQBaBYph4vMDtbdIy6M9xjeHmEVj2UchcAO2U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776691622; c=relaxed/simple;
-	bh=2HFDKDa+QYlTQ7jECX761lpR0rAZxZkBIpMTXWaLxk8=;
+	s=arc-20240116; t=1776691633; c=relaxed/simple;
+	bh=EtbMov6KIzXcNw5LizLdDoNZDbLQdqxksZ2tpEZYjdw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sjG10gtFWSiljityG3g4MJtfFuFuyZ1wsrGlDpp3nbfCjxJBLGPjd/6eYC5z9RiX2nV3zUpmbPtQoypJ55hv80zysjrveGVb8kK5h2g0NAdUqAuFWzuRMPy2GkDgDs81L0I8CEsFRStHHQoRGugCxdQeyp7FZhQB7W/UIm95JLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jjR1yiFQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D019C2BCB7;
-	Mon, 20 Apr 2026 13:27:01 +0000 (UTC)
+	 MIME-Version:Content-Type; b=mjnlTE+fOym5v3xpXhjqxqrmQ0kX4YTmvs3dKMZVVSPKw5hcLBbnw+d1aK2Xw28Gr0fETuiOAmQTmQe22VZBi9o+OVp4+/m28vLVKKzs8zd8yz8jI9H81OPg5E8wfFBdvwJMj0gJTxHxlt2i7o0WUB3bNT5+kTFKp45lXljYwIA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BPbWJhrc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B26EEC2BCB4;
+	Mon, 20 Apr 2026 13:27:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776691622;
-	bh=2HFDKDa+QYlTQ7jECX761lpR0rAZxZkBIpMTXWaLxk8=;
+	s=k20201202; t=1776691633;
+	bh=EtbMov6KIzXcNw5LizLdDoNZDbLQdqxksZ2tpEZYjdw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=jjR1yiFQmvgvbl0MaX6FNOeY5wctDyVfhMdSyIirW6I859uV+uFivP6rsbcMLpbBJ
-	 eMmrtnwo/O+wkJ/1LyGgGtJQdnwnEWR7lUHlMkLQDxcPqLpJ4uflgJaKXNa2xrze3H
-	 Vq8JqB3PP0Nf1XroKgBLpHBVilumLijzKt8Jd6iOb2U3CmelzIuTyN571mgWe9Ef48
-	 UrrhN2Tk2sO9pSbA515cdthqO2u8U7t93o+skRJ6ibVvX9fkdYtT1iTbRhIcFciDOW
-	 VqD0oCAmwKy9yYATxq/9wVLqqMN/ZM2co2sGW3E8cA5yQe2iaJ2DU3TvsVTNkV/FrG
-	 EcCepRH6Cf5RA==
+	b=BPbWJhrcMizaShOlUcriXfokMb3hxJvdHf8WhTGWHbGzyzQ+tyypwWuq5R3U+OZOQ
+	 0aF1AD+taw0RCoYPGXbGYwSnjbqecMWmRDjd4zBDnuNJIAEGgi75fZORABVfGXKb+K
+	 TpOJ8HwDHE2uV2t2slQ6QuXzPz/bQ7odvsGYwAOp+cOS+KaYIucX2+N/D/2H//i+OY
+	 OEpO48ko2okxAb72tcq4YTzIXcETV4OE3BQqga0JH1eaf8qyKmcFyaQu4Y+VRfaHOR
+	 SHezaApa02RPc1lQY+xQ/g5ripcJbKGKVmsCpBHFIc41c18xD56cYJpC4Bz4+RPYF3
+	 bVWXxzUP12DXA==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Daniel Golle <daniel@makrotopia.org>,
-	Alexander Sverdlin <alexander.sverdlin@siemens.com>,
+Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	=?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
+	magnus.karlsson@intel.com,
 	davem@davemloft.net,
 	edumazet@google.com,
 	pabeni@redhat.com,
-	shuah@kernel.org,
-	razor@blackwall.org,
+	daniel@iogearbox.net,
 	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
+	bpf@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.18] selftests: net: bridge_vlan_mcast: wait for h1 before querier check
-Date: Mon, 20 Apr 2026 09:18:51 -0400
-Message-ID: <20260420132314.1023554-137-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.18] xsk: tighten UMEM headroom validation to account for tailroom and min frame
+Date: Mon, 20 Apr 2026 09:18:57 -0400
+Message-ID: <20260420132314.1023554-143-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260420132314.1023554-1-sashal@kernel.org>
 References: <20260420132314.1023554-1-sashal@kernel.org>
@@ -71,60 +72,62 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.18.23
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279784-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[14];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-279785-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.999];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[siemens.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,msgid.link:url,makrotopia.org:email]
-X-Rspamd-Queue-Id: 5C12D42D51D
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email,msgid.link:url]
+X-Rspamd-Queue-Id: 20E7542D4D1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Daniel Golle <daniel@makrotopia.org>
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
 
-[ Upstream commit efaa71faf212324ecbf6d5339e9717fe53254f58 ]
+[ Upstream commit a315e022a72d95ef5f1d4e58e903cb492b0ad931 ]
 
-The querier-interval test adds h1 (currently a slave of the VRF created
-by simple_if_init) to a temporary bridge br1 acting as an outside IGMP
-querier. The kernel VRF driver (drivers/net/vrf.c) calls cycle_netdev()
-on every slave add and remove, toggling the interface admin-down then up.
-Phylink takes the PHY down during the admin-down half of that cycle.
-Since h1 and swp1 are cable-connected, swp1 also loses its link may need
-several seconds to re-negotiate.
+The current headroom validation in xdp_umem_reg() could leave us with
+insufficient space dedicated to even receive minimum-sized ethernet
+frame. Furthermore if multi-buffer would come to play then
+skb_shared_info stored at the end of XSK frame would be corrupted.
 
-Use setup_wait_dev $h1 0 which waits for h1 to return to UP state, so the
-test can rely on the link being back up at this point.
+HW typically works with 128-aligned sizes so let us provide this value
+as bare minimum.
 
-Fixes: 4d8610ee8bd77 ("selftests: net: bridge: add vlan mcast_querier_interval tests")
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-Reviewed-by: Alexander Sverdlin <alexander.sverdlin@siemens.com>
-Link: https://patch.msgid.link/c830f130860fd2efae08bfb9e5b25fd028e58ce5.1775424423.git.daniel@makrotopia.org
+Multi-buffer setting is known later in the configuration process so
+besides accounting for 128 bytes, let us also take care of tailroom space
+upfront.
+
+Reviewed-by: Björn Töpel <bjorn@kernel.org>
+Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+Fixes: 99e3a236dd43 ("xsk: Add missing check on user supplied headroom size")
+Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Link: https://patch.msgid.link/20260402154958.562179-2-maciej.fijalkowski@intel.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
@@ -133,21 +136,23 @@ LLM Generated explanations, may be completely bogus:
 
 Error: Failed to generate final synthesis
 
- tools/testing/selftests/net/forwarding/bridge_vlan_mcast.sh | 1 +
- 1 file changed, 1 insertion(+)
+ net/xdp/xdp_umem.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/net/forwarding/bridge_vlan_mcast.sh b/tools/testing/selftests/net/forwarding/bridge_vlan_mcast.sh
-index 72dfbeaf56b92..e8031f68200ad 100755
---- a/tools/testing/selftests/net/forwarding/bridge_vlan_mcast.sh
-+++ b/tools/testing/selftests/net/forwarding/bridge_vlan_mcast.sh
-@@ -414,6 +414,7 @@ vlmc_querier_intvl_test()
- 	bridge vlan add vid 10 dev br1 self pvid untagged
- 	ip link set dev $h1 master br1
- 	ip link set dev br1 up
-+	setup_wait_dev $h1 0
- 	bridge vlan add vid 10 dev $h1 master
- 	bridge vlan global set vid 10 dev br1 mcast_snooping 1 mcast_querier 1
- 	sleep 2
+diff --git a/net/xdp/xdp_umem.c b/net/xdp/xdp_umem.c
+index 9f76ca591d54f..9ec7bd948acc7 100644
+--- a/net/xdp/xdp_umem.c
++++ b/net/xdp/xdp_umem.c
+@@ -202,7 +202,8 @@ static int xdp_umem_reg(struct xdp_umem *umem, struct xdp_umem_reg *mr)
+ 	if (!unaligned_chunks && chunks_rem)
+ 		return -EINVAL;
+ 
+-	if (headroom >= chunk_size - XDP_PACKET_HEADROOM)
++	if (headroom > chunk_size - XDP_PACKET_HEADROOM -
++		       SKB_DATA_ALIGN(sizeof(struct skb_shared_info)) - 128)
+ 		return -EINVAL;
+ 
+ 	if (mr->flags & XDP_UMEM_TX_METADATA_LEN) {
 -- 
 2.53.0
 
