@@ -1,67 +1,69 @@
-Return-Path: <netdev+bounces-279823-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279824-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2HUqFDFD5ml/twEAu9opvQ
-	(envelope-from <netdev+bounces-279823-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 17:16:01 +0200
+	id mJTAHBVI5mkPuQEAu9opvQ
+	(envelope-from <netdev+bounces-279824-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 17:36:53 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A27F742DF9F
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 17:16:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A58442E661
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 17:36:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6218731893D7
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 14:36:41 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 784FC31BAB84
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 14:40:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 966C44D2ED7;
-	Mon, 20 Apr 2026 13:33:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2C444DD6CA;
+	Mon, 20 Apr 2026 13:33:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pCJmUMXQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X+wOa5VQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AE124CA285;
-	Mon, 20 Apr 2026 13:33:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE5554DD6C2;
+	Mon, 20 Apr 2026 13:33:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776692005; cv=none; b=i46sw2b3Apf9VnrH4CoGnCIAZtfZ5lrVO+69jz7svAgHqE9fvsMnEYQstkm5ucGwBp7XxTPS0S0RkMop5jIHCLAFRNgzBqdgcpgShSecvUw6wK/hG4+9+w8WnCVYEPJXMCHS1I8bCp2vE1wP3n5yI7MnF43uubdW0qbuUTlkMss=
+	t=1776692033; cv=none; b=TgLobpaGG50aKjy6U2/m8c/g22fCBnBvntvDkxadMtQpDygPXm9HHZlcpAoVUkO+x0cRLwnFD5Z48wyv/0KDtNPkQhoegtJchM+gCZzamYFz34LheK6TeMOvwal77TIvhfMHl55cn1a0pVNFXvEUsz89fWYYyiXeN8FS2vKFHRc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776692005; c=relaxed/simple;
-	bh=jWw+kjULLOINHtTCs/awCVSQNwIoMnd53DJYth8+OwQ=;
+	s=arc-20240116; t=1776692033; c=relaxed/simple;
+	bh=XrLkG7SvQztRlxCgLryK0uHbrxctmkqjcERdJExA110=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jnLqRLxA0CYkoQeOFTnJcN1g1Cj0w6NL11aO5jssdXRmaJvdb8MdoZQhCbQnFEAzWUJO1z44TUjghmcixIQI5v170pFrPImhk1C5QF4YhwrHgY92/T4Db1gvXUCjYI1BJ5K9R+1ihdAYXvGUMapGaQTt4RXCkbOqKqK1qZx9fKk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pCJmUMXQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76A89C19425;
-	Mon, 20 Apr 2026 13:33:23 +0000 (UTC)
+	 MIME-Version; b=ZA6IdpBAAnagTPV8wVbN7DSMzc/+yCn69W83yr1ZEqeTs0aiXRzQT5h537mOK3c/hbPqSlEiZZFATuWXWo9+KKVaar3VGFk93MzCOYJOfSxpHpJGQzU2EriT2JpNVElMPSfLH04jlFElpert8Fyj/8FC+wufoKhlhMcCJW9Hhrw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X+wOa5VQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D07FAC19425;
+	Mon, 20 Apr 2026 13:33:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776692005;
-	bh=jWw+kjULLOINHtTCs/awCVSQNwIoMnd53DJYth8+OwQ=;
+	s=k20201202; t=1776692033;
+	bh=XrLkG7SvQztRlxCgLryK0uHbrxctmkqjcERdJExA110=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=pCJmUMXQOENZT3exzQGpkk0F7MJP203NaxPQcmEv2LIb4hWFoa/b9HJoHqRNkEMtK
-	 S3baUfzwgdI9zTktULULbDw4NwmDootOXbAIG9IETPvi6/oL2twypufBa8p8JemXM5
-	 cILGM2/ACNgUMtMGEohZp8xTEaVG+FQHpfUtK/tUt66DpSDnxH/5TurjA3ZTXIDxk8
-	 rHEErtB1b2jpvZpUDj8aSi8vHnMija86Q1BnkpLgP0WoSRt7n2I1g0idvJYSvVqKmY
-	 YZpTHR2XL0rEOaC14dZkR8gWv3uL1KH1BIm5F80IUdsDwpa3UNjWaGL+GpOTsesPkN
-	 /fZgbM08Aijig==
+	b=X+wOa5VQAUTwWgbYRyykkA019oxLDiotijMb/jVT57sdDpYY+ieJgADyFeGEY8601
+	 qcSIgzmi3Ri3tCS52XjiANa91CpokT50kP5ZTpZ7k4wdeV7t8YUS3oa1t3XfcOv1/u
+	 j2bPn9LxCyQSUa/pF+hcATCUsqF6UjUN0AGNGq3icGyRgUzJbRPCq5pH7d8Zjjuzs8
+	 loXWbtMgUNMyP3U11uAZxmDjUaQNmGap5ALwMbgnYCN15PBoL4c8qMgYp/EeHGTzQd
+	 3zXfz31uFCCZpOCpyO5M88cy0SGZs3LgW6jcT5vUb2bQVlbzfej827vL3GuII8scHs
+	 5HVH9EnJziNlA==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
+Cc: Eric Dumazet <edumazet@google.com>,
+	syzbot+d8c285748fa7292580a9@syzkaller.appspotmail.com,
+	Martin Schiller <ms@dev.tdt.de>,
 	Simon Horman <horms@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	martin@strongswan.org,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	pabeni@redhat.com,
+	jeff@garzik.org,
+	fubar@us.ibm.com,
+	linux-x25@vger.kernel.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.18] xfrm_user: fix info leak in build_mapping()
-Date: Mon, 20 Apr 2026 09:21:51 -0400
-Message-ID: <20260420132314.1023554-317-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.18] net: lapbether: handle NETDEV_PRE_TYPE_CHANGE
+Date: Mon, 20 Apr 2026 09:22:09 -0400
+Message-ID: <20260420132314.1023554-335-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260420132314.1023554-1-sashal@kernel.org>
 References: <20260420132314.1023554-1-sashal@kernel.org>
@@ -75,57 +77,56 @@ X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.18.23
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279823-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	TAGGED_FROM(0.00)[bounces-279824-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	NEURAL_HAM(-0.00)[-0.997];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linuxfoundation.org:email]
-X-Rspamd-Queue-Id: A27F742DF9F
+	TAGGED_RCPT(0.00)[netdev,d8c285748fa7292580a9];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tdt.de:email,msgid.link:url,appspotmail.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 0A58442E661
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+From: Eric Dumazet <edumazet@google.com>
 
-[ Upstream commit 1beb76b2053b68c491b78370794b8ff63c8f8c02 ]
+[ Upstream commit b120e4432f9f56c7103133d6a11245e617695adb ]
 
-struct xfrm_usersa_id has a one-byte padding hole after the proto
-field, which ends up never getting set to zero before copying out to
-userspace.  Fix that up by zeroing out the whole structure before
-setting individual variables.
+lapbeth_data_transmit() expects the underlying device type
+to be ARPHRD_ETHER.
 
-Fixes: 3a2dfbe8acb1 ("xfrm: Notify changes in UDP encapsulation via netlink")
-Cc: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>
-Assisted-by: gregkh_clanker_t1000
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+Returning NOTIFY_BAD from lapbeth_device_event() makes sure
+bonding driver can not break this expectation.
+
+Fixes: 872254dd6b1f ("net/bonding: Enable bonding to enslave non ARPHRD_ETHER")
+Reported-by: syzbot+d8c285748fa7292580a9@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/netdev/69cd22a1.050a0220.70c3a.0002.GAE@google.com/T/#u
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Martin Schiller <ms@dev.tdt.de>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Link: https://patch.msgid.link/20260402103519.1201565-1-edumazet@google.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
@@ -133,21 +134,55 @@ LLM Generated explanations, may be completely bogus:
 
 Error: Failed to generate final synthesis
 
- net/xfrm/xfrm_user.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/net/wan/lapbether.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
 
-diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
-index 1ddcf2a1eff7a..b3f69c0760d4c 100644
---- a/net/xfrm/xfrm_user.c
-+++ b/net/xfrm/xfrm_user.c
-@@ -4164,6 +4164,7 @@ static int build_mapping(struct sk_buff *skb, struct xfrm_state *x,
+diff --git a/drivers/net/wan/lapbether.c b/drivers/net/wan/lapbether.c
+index f357a7ac70ac4..9861c99ea56c4 100644
+--- a/drivers/net/wan/lapbether.c
++++ b/drivers/net/wan/lapbether.c
+@@ -446,33 +446,36 @@ static void lapbeth_free_device(struct lapbethdev *lapbeth)
+ static int lapbeth_device_event(struct notifier_block *this,
+ 				unsigned long event, void *ptr)
+ {
+-	struct lapbethdev *lapbeth;
+ 	struct net_device *dev = netdev_notifier_info_to_dev(ptr);
++	struct lapbethdev *lapbeth;
  
- 	um = nlmsg_data(nlh);
+ 	if (dev_net(dev) != &init_net)
+ 		return NOTIFY_DONE;
  
-+	memset(&um->id, 0, sizeof(um->id));
- 	memcpy(&um->id.daddr, &x->id.daddr, sizeof(um->id.daddr));
- 	um->id.spi = x->id.spi;
- 	um->id.family = x->props.family;
+-	if (!dev_is_ethdev(dev) && !lapbeth_get_x25_dev(dev))
++	lapbeth = lapbeth_get_x25_dev(dev);
++	if (!dev_is_ethdev(dev) && !lapbeth)
+ 		return NOTIFY_DONE;
+ 
+ 	switch (event) {
+ 	case NETDEV_UP:
+ 		/* New ethernet device -> new LAPB interface	 */
+-		if (!lapbeth_get_x25_dev(dev))
++		if (!lapbeth)
+ 			lapbeth_new_device(dev);
+ 		break;
+ 	case NETDEV_GOING_DOWN:
+ 		/* ethernet device closes -> close LAPB interface */
+-		lapbeth = lapbeth_get_x25_dev(dev);
+ 		if (lapbeth)
+ 			dev_close(lapbeth->axdev);
+ 		break;
+ 	case NETDEV_UNREGISTER:
+ 		/* ethernet device disappears -> remove LAPB interface */
+-		lapbeth = lapbeth_get_x25_dev(dev);
+ 		if (lapbeth)
+ 			lapbeth_free_device(lapbeth);
+ 		break;
++	case NETDEV_PRE_TYPE_CHANGE:
++		/* Our underlying device type must not change. */
++		if (lapbeth)
++			return NOTIFY_BAD;
+ 	}
+ 
+ 	return NOTIFY_DONE;
 -- 
 2.53.0
 
