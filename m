@@ -1,170 +1,180 @@
-Return-Path: <netdev+bounces-279944-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279945-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AP4bLEej5mmfzAEAu9opvQ
-	(envelope-from <netdev+bounces-279944-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 00:05:59 +0200
+	id wF87BBmk5mkIzQEAu9opvQ
+	(envelope-from <netdev+bounces-279945-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 00:09:29 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F45F43480D
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 00:05:59 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4F14434831
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 00:09:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B7BFE3047BF0
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 22:02:57 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 7279A30065FE
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 22:09:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9FA53D1CAA;
-	Mon, 20 Apr 2026 22:02:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="OhmsNA/0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96A573A6F06;
+	Mon, 20 Apr 2026 22:09:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f79.google.com (mail-oo1-f79.google.com [209.85.161.79])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7880B3D1706;
-	Mon, 20 Apr 2026 22:02:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CB7735AC2C
+	for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 22:09:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.79
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776722552; cv=none; b=UuXtrmvGDb9VWjIsFqsEWAnFS83ACfhNBwyMIwfb/A3Sv/zZ9iOFfHJVwQqabdKLefOGutNkcgOzYdGazgfDT7WiUw1HhATbHjRqZxhY9gtl9sXQ/MhhlYjps/G/Get1ebtbrwREB0G9/Can5WdNd8t80IfgwTZSwtvcBA5MSro=
+	t=1776722966; cv=none; b=UmqWmo67htx7r8LH0/fEeG5MU5+MmoAjIOWNnIhwTsYA/3UeUCDbRO4EWLSKR7Ivkw+cgPeKqFPBya6lAv/yxmYuAF+ETgsBHTzESM+8v7EGpHBC7XHSEkuS9BtVsv9+3mdGDZyDfNUbtbHgK7wOVzruXu7r6t7KUFdwK/za/F0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776722552; c=relaxed/simple;
-	bh=kUfeTFZk5IgFgJ7dBcDAuHKs7DNUx3pWt+DeQ56Keao=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=f5wbYA7qrM2+uQufFuPSSNUK9FVLfGK0/gbpDB5DYoREiZi4wPnttn+WpdLizR9hnUmUX04nz5rYC09JnhB8QUJEajdihiehQ86/UvDh7LsU1dFhe470MZKjVie8ztCjE2j79u7l+p+H2RkfnrTE2EPveydU1irL6bKzr/T7fek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=OhmsNA/0; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: from localhost.localdomain (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with ESMTPSA id 5BBF660255;
-	Tue, 21 Apr 2026 00:02:29 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1776722549;
-	bh=y4oVjl5IwBD7c8hLHPmuW/Dp/NU6BKcOEDJo3EB03Ug=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=OhmsNA/0kIWioJeEG9T+2U5S55+5hkBhPCeWIyPOubKajBcUGjjbc6WZpSKzqZQyF
-	 4mKJn/wqDJeohJfS1qi0/gUBt1o2JrbTyx+EEjjauwqqR+xREtBFMfqCghkD4iGBev
-	 YKT8aawQGl3sgvAMhaBIsFtdeISvhiKzrtiZDAhxclKtWv9F4TMH44GGl0lRSLlBXJ
-	 WJqdL9UyEaBCLHXKPib7pexwLhXG9uY54bQeFGbA01pVId7fEtSLwwEp+6nWHUl8Vy
-	 9Os8XcOOnGLGIDG2CCkmmLlSTrjvOc5x3l9vCnUsKSx4IT5NDapfHE8YpiKMwGSEze
-	 al6U+caxK3c/g==
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net,
-	netdev@vger.kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	fw@strlen.de,
-	horms@kernel.org
-Subject: [PATCH net 8/8] netfilter: nfnetlink_osf: fix potential NULL dereference in ttl check
-Date: Tue, 21 Apr 2026 00:02:15 +0200
-Message-ID: <20260420220215.111510-9-pablo@netfilter.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260420220215.111510-1-pablo@netfilter.org>
-References: <20260420220215.111510-1-pablo@netfilter.org>
+	s=arc-20240116; t=1776722966; c=relaxed/simple;
+	bh=hrFHtqLbDq9M1V1QGwN0glJ8tclczOC6jmqxV/uNhYY=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=iy0Mf9pZQSYtfSYJ4M92DCDqEfFM6hd69gqdUkWyYBSeBbIsQzQ4X6aljwTcMyl48XOvKQmlESgJ1RcVHj31ldeODVSNlpk1k/0S8iaEfXu0rcwYexgm4tfC9arrBPiaxrnUyiNMfBisyZnMSM4CMpFhxagrkIWzdplknLseoD8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.79
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f79.google.com with SMTP id 006d021491bc7-68d5974b947so6937709eaf.1
+        for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 15:09:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776722964; x=1777327764;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=hCgfnVADftIsIAYtvNsVF78ADGo857Z72sg3ZFoPg9w=;
+        b=h70nVAxG863GTpebRxwZXntOHJ3YVLy1gaTxV6sxFzNBhz7Vx1kqBTQNGOz7ll9dVp
+         Ppdvkzgb5y0rdH/ekKMyyMOvi9gIj4LDKaJuUCVcAmv5JuNojK9yfoIIQyl0ssYMjeA3
+         QDsXQoyb5wvogcEZyh6D5IoVq4szkJLbRs5y1acHyPxODH3nlLxdtco+uzWswtdOvcWy
+         vikbGryDjoOuFSLZyk5JAfyz1BaywjByUqdTRNI0lEDy0V66QSqybSc7uH5KMo/QXvSl
+         GfRm6/dHuGolp7+pPaO1MvZFakasUaM/qcXFxhx1DCT/5TGO8Y9eewuJr/NxLZsIGyed
+         rd7A==
+X-Forwarded-Encrypted: i=1; AFNElJ+t+W5BZEmwRYUm02UPD5v09AeZFFaJavrLeSUkv5OlktfqApnQYIaRrhlkjO+xbYyaxkLuzvI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxwcAOzHx9FxgQIOA5yKsZWPnMVOxRnGHyc2apBCS0ALFG+wVqr
+	j3zobZzFWzr7Oj6VbLmKGoCoAhkp36//985f6sTlXhPz4MfPuSC2OwYO4nMJZcHecVyEnuWFuCF
+	gv57bvkr9KC2soMWmr9dB7cA9ppwUMmdOBiMZMjguNDG6xFvhCxesEmzaXhA=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Received: by 2002:a4a:ee05:0:b0:694:8b08:b916 with SMTP id
+ 006d021491bc7-6948b08bcb0mr2461508eaf.35.1776722964168; Mon, 20 Apr 2026
+ 15:09:24 -0700 (PDT)
+Date: Mon, 20 Apr 2026 15:09:24 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69e6a414.050a0220.24bfd3.002d.GAE@google.com>
+Subject: [syzbot] [kvm?] [net?] [virt?] BUG: sleeping function called from
+ invalid context in vhost_get_avail_idx
+From: syzbot <syzbot+6985cb8e543ea90ba8ee@syzkaller.appspotmail.com>
+To: eperezma@redhat.com, jasowang@redhat.com, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, mst@redhat.com, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com, virtualization@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [-0.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=7e54da1916e8d11f];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-279944-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	DMARC_NA(0.00)[netfilter.org];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	DKIM_TRACE(0.00)[netfilter.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
-	NEURAL_HAM(-0.00)[-0.999];
-	TO_DN_NONE(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	TAGGED_FROM(0.00)[bounces-279945-lists,netdev=lfdr.de,6985cb8e543ea90ba8ee];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_COUNT_THREE(0.00)[4];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[goo.gl:url,storage.googleapis.com:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,appspotmail.com:email];
+	REDIRECTOR_URL(0.00)[goo.gl];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,netfilter.org:email,netfilter.org:dkim,netfilter.org:mid,suse.de:email]
-X-Rspamd-Queue-Id: 2F45F43480D
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	SUBJECT_HAS_QUESTION(0.00)[]
+X-Rspamd-Queue-Id: A4F14434831
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Fernando Fernandez Mancera <fmancera@suse.de>
+Hello,
 
-The nf_osf_ttl() function accessed skb->dev to perform a local interface
-address lookup without verifying that the device pointer was valid.
+syzbot found the following issue on:
 
-Additionally, the implementation utilized an in_dev_for_each_ifa_rcu
-loop to match the packet source address against local interface
-addresses. It assumed that packets from the same subnet should not see a
-decrement on the initial TTL. A packet might appear it is from the same
-subnet but it actually isn't especially in modern environments with
-containers and virtual switching.
+HEAD commit:    8541d8f725c6 Merge tag 'mtd/for-7.1' of git://git.kernel.o..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=136454ce580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=7e54da1916e8d11f
+dashboard link: https://syzkaller.appspot.com/bug?extid=6985cb8e543ea90ba8ee
+compiler:       gcc (Debian 14.2.0-19) 14.2.0, GNU ld (GNU Binutils for Debian) 2.44
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15d264ce580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=143ec1ba580000
 
-Remove the device dereference and interface loop. Replace the logic with
-a switch statement that evaluates the TTL according to the ttl_check.
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-8541d8f7.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/22dfea2c37c2/vmlinux-8541d8f7.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/e2f93ad68fe3/bzImage-8541d8f7.xz
 
-Fixes: 11eeef41d5f6 ("netfilter: passive OS fingerprint xtables match")
-Reported-by: Kito Xu (veritas501) <hxzene@gmail.com>
-Closes: https://lore.kernel.org/netfilter-devel/20260414074556.2512750-1-hxzene@gmail.com/
-Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
-Reviewed-by: Pablo Neira Ayuso <pablo@netfilter.org>
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+6985cb8e543ea90ba8ee@syzkaller.appspotmail.com
+
+BUG: sleeping function called from invalid context at drivers/vhost/vhost.c:1527
+in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 6110, name: vhost-6109
+preempt_count: 1, expected: 0
+RCU nest depth: 0, expected: 0
+2 locks held by vhost-6109/6110:
+ #0: ffff888055624cb0 (&vq->mutex/1){+.+.}-{4:4}, at: handle_tx+0x2d/0x160 drivers/vhost/net.c:971
+ #1: ffff888055620248 (&vq->mutex){+.+.}-{4:4}, at: vhost_net_busy_poll+0x9c/0x730 drivers/vhost/net.c:554
+Preemption disabled at:
+[<ffffffff88f1a006>] vhost_net_busy_poll+0x1c6/0x730 drivers/vhost/net.c:563
+CPU: 0 UID: 0 PID: 6110 Comm: vhost-6109 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x100/0x190 lib/dump_stack.c:120
+ __might_resched.cold+0x1ec/0x232 kernel/sched/core.c:9162
+ __might_fault+0x8b/0x140 mm/memory.c:7322
+ vhost_get_avail_idx+0x31c/0x4f0 drivers/vhost/vhost.c:1527
+ vhost_vq_avail_empty drivers/vhost/vhost.c:3206 [inline]
+ vhost_vq_avail_empty+0xa9/0xe0 drivers/vhost/vhost.c:3199
+ vhost_net_busy_poll+0x297/0x730 drivers/vhost/net.c:574
+ vhost_net_tx_get_vq_desc drivers/vhost/net.c:610 [inline]
+ get_tx_bufs.constprop.0+0x338/0x600 drivers/vhost/net.c:650
+ handle_tx_copy+0x28c/0x12e0 drivers/vhost/net.c:778
+ handle_tx+0x139/0x160 drivers/vhost/net.c:985
+ vhost_run_work_list+0x183/0x220 drivers/vhost/vhost.c:454
+ vhost_task_fn+0x156/0x430 kernel/vhost_task.c:49
+ ret_from_fork+0x72b/0xd50 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+
+
 ---
- net/netfilter/nfnetlink_osf.c | 22 +++++++---------------
- 1 file changed, 7 insertions(+), 15 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/net/netfilter/nfnetlink_osf.c b/net/netfilter/nfnetlink_osf.c
-index 9b209241029b..acb753ec5697 100644
---- a/net/netfilter/nfnetlink_osf.c
-+++ b/net/netfilter/nfnetlink_osf.c
-@@ -31,26 +31,18 @@ EXPORT_SYMBOL_GPL(nf_osf_fingers);
- static inline int nf_osf_ttl(const struct sk_buff *skb,
- 			     int ttl_check, unsigned char f_ttl)
- {
--	struct in_device *in_dev = __in_dev_get_rcu(skb->dev);
- 	const struct iphdr *ip = ip_hdr(skb);
--	const struct in_ifaddr *ifa;
--	int ret = 0;
- 
--	if (ttl_check == NF_OSF_TTL_TRUE)
-+	switch (ttl_check) {
-+	case NF_OSF_TTL_TRUE:
- 		return ip->ttl == f_ttl;
--	if (ttl_check == NF_OSF_TTL_NOCHECK)
--		return 1;
--	else if (ip->ttl <= f_ttl)
-+		break;
-+	case NF_OSF_TTL_NOCHECK:
- 		return 1;
--
--	in_dev_for_each_ifa_rcu(ifa, in_dev) {
--		if (inet_ifa_match(ip->saddr, ifa)) {
--			ret = (ip->ttl == f_ttl);
--			break;
--		}
-+	case NF_OSF_TTL_LESS:
-+	default:
-+		return ip->ttl <= f_ttl;
- 	}
--
--	return ret;
- }
- 
- struct nf_osf_hdr_ctx {
--- 
-2.47.3
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
