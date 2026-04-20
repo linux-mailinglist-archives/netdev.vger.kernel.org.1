@@ -1,138 +1,206 @@
-Return-Path: <netdev+bounces-279739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279740-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UPrhFFsm5mmgsgEAu9opvQ
-	(envelope-from <netdev+bounces-279739-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 15:12:59 +0200
+	id QCnxHb0m5mmgsgEAu9opvQ
+	(envelope-from <netdev+bounces-279740-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 15:14:37 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1F9542B525
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 15:12:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 194DC42B686
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 15:14:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 03A813038F65
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 13:05:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DB31330AFB48
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 13:07:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF08B39FCD0;
-	Mon, 20 Apr 2026 13:05:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69E413A16A2;
+	Mon, 20 Apr 2026 13:07:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G2sAVYW5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZmsK9UBN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CAEC39E6FF;
-	Mon, 20 Apr 2026 13:05:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 624D139FCAD
+	for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 13:07:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776690334; cv=none; b=hnNfpC1+ExMSZBKZ7yVCT4MbFtrO26N+KkKvRN9+gm/U/tF48+EnLzsox9TkPq696iBgj0MB6m2mll+EKz0W/wHxczLg5Dk88zJ4zEct+I/2JveKJvhaGK8CCjVgR4vZ2VWrrASZuZIFTTUBgrlXydhRu4aKtIOOZfpwEc4hvGI=
+	t=1776690450; cv=none; b=WpizltNU0WyqPINJfORNKTU4FtKel8oU1QXJFsAlmAYax7Sfn46QOVaelVXGh8BOVfRMaU3Ic5WJHeuIUfaa56wD1ECdcYQEUJshyg4zenNDKzdj6n26pPv/tAd8xt60XaR1BsfBEsHGyyL1r5inGIaXv/layAaWT20kOGd0Lsw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776690334; c=relaxed/simple;
-	bh=2tdnNmWhva210aPxlaXggyu0lNkDimgucQTQrZ/IvEM=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=l4Nsc4ntRTNixwf48kNMjLTQRjgWhCYgpK7QwomO+zl2+CTtVX0adEo2fHzsYNA/P0SXQTyGnULV/Wsu2GwMnN1o1dQJj7JHpSVzaBN6K59QWFhC5X8tY9y19DvojqYAz8hBmAdj+WMvdvrLnBmQwdu+2GKTKhLUV3XCAlL8rjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G2sAVYW5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 651C8C19425;
-	Mon, 20 Apr 2026 13:05:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776690334;
-	bh=2tdnNmWhva210aPxlaXggyu0lNkDimgucQTQrZ/IvEM=;
-	h=From:To:Subject:Date:From;
-	b=G2sAVYW50VkKFXdKuo2+trfqqw7NUQ4emzjUSDFdplMP9eMNPc2ub1AMADKJ2bPPU
-	 3A8KrU4IgdjRv/ljhZthRuSOPQVmHURx/LxDOUE7ZqCDUcJewT2mH8LTNmZOVKEfXi
-	 iitaAHg/uDSmxmRPdqnf+hpBQ8Hs7Y6+7t/5pP0MHTRu6vMF+OOWcUHXEOk7r/YKSy
-	 QdZtOCWAPWGO8L9/CrritOG8IBrarReTXE/lC633fCndfeUXCsk+9cJRKVBiERs1/a
-	 rdju4Xvur+XCRqylgnaZ1JL7Na08wdeBwkmldZl9l2XS23v1k2nC4N0fMch2VyO0PC
-	 eGY0BkZiUC5bA==
-From: Lee Jones <lee@kernel.org>
-To: lee@kernel.org,
-	Jon Maloy <jmaloy@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Ying Xue <ying.xue@windriver.com>,
-	netdev@vger.kernel.org,
-	tipc-discussion@lists.sourceforge.net,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 1/1] tipc: fix double-free in tipc_buf_append()
-Date: Mon, 20 Apr 2026 14:05:23 +0100
-Message-ID: <20260420130524.3527420-1-lee@kernel.org>
-X-Mailer: git-send-email 2.54.0.rc1.513.gad8abe7a5a-goog
+	s=arc-20240116; t=1776690450; c=relaxed/simple;
+	bh=JLX0QIE+ZaB7zS+4hzCYPPCnUIvUgu+mL5VLldlw4/E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XYG8lQ+MbNgMRG+h6IXtrtBNstrKWk8kLCGSSkWnXQT4Vwvw83JUzi9JMGyKd+JUrf6nRAH8H2IbKnF+vTYmuZQJ3mOreHKTgqrHPm+HKOaaSd2UGfJJZRDb87ukqFPL5leWPdrlJ+1si6OxMhGuBn3ysn7aZNGDwcXDcQhc/QM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZmsK9UBN; arc=none smtp.client-ip=209.85.221.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-43fe8bda8e9so1463543f8f.1
+        for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 06:07:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776690445; x=1777295245; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/Ag56mmJk7Zmpm+f5Y09lyaEBE2YSArv7z93rWOQIdM=;
+        b=ZmsK9UBNEhonMgwHlY7RquBbKesfSJLglYPS0BN5a/HFrZzYxe+8PuUh4/t3/GwDeG
+         U2qXfV2DGAdQ5k+/6c6Cybp+rK8OKQWgXh5BjCPE2zIJ5JvEaIkXBjnovWB07due+OX6
+         NQLsFmQeK3JRKi1Ok6+GqM5H+45fahWB82mdzIEliC2MwqpOzttmvim3XoG7yuzvsc4o
+         WKCR28PLeNN0Jwvh/wW/L0/x9jY3C3bOFmhToRREM1MP0hoE0GMO1uGjH2E7RGmLn87T
+         H2SbmU7TH30b1nFfPyu/IgVr2MD32U7aycsE8+aMVCUDxgfiIY9FCWyiWIDzAh+XmG3N
+         iowg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776690445; x=1777295245;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/Ag56mmJk7Zmpm+f5Y09lyaEBE2YSArv7z93rWOQIdM=;
+        b=bK6dPRbtKwhyzHyrzfdJAzjLtzozrhP70JTCC2k/OLu6TILH0tLk+NhjwC3I92JKuU
+         k4AekujjYB8Y5MU6Mja+wwKT+DU+c4qOmgqgnzg3EVos7ra7cI4pds6uwvCAyA23646D
+         MTp1HOqmEIglDy441Sld4cVRvsWo4oZaoURfD6koDn+kBnqyyykg5bKqmGG0d796NRt3
+         /GpYDlwj4yXxA8Rw3JC7eEfpJjRFZQtu7rdlcqYNKxvTUEklm+HhB/Pf/KajUUYfVt+m
+         tPC6JiAhH26NkSw3KrRYftWPoY9l8+UPeaOwX/oGX0EyYhKpx4nG1193idkAiVWZOQF/
+         vm0A==
+X-Forwarded-Encrypted: i=1; AFNElJ8uivkE7FjZfbEFBDV+nXfh5mPj/LAuwZUH7qwUL83V0QWlnLnyCy/aa5B8Vl4esDl8wqyMyXg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxv0corskmQMyTlr+1vhAyzUFadujDTdTAfaE+n9RP8OCC4pBSe
+	BSWFv4uYp/CeDyHZa25yCqdeDQpTINv6Od7TXYJr86yuiliBfyOBxX8F
+X-Gm-Gg: AeBDiesiRVxUFFD+7gq6TH9tkNbSctk1RlW2Z9ghP4r5EnVTL/0yq63rGWKtoMhyr5L
+	wKU3zk9eT97C5iC4WrCgyZdL1w0IOhK0e/qTHXvntCS9et1VFg1I1B3j/Tj3wLvumX99zQiwQbv
+	YNyD4cRV/hYGLBIZyFx1RBhdf2n43yQuXR6CifidMNbL52GFuakhkIYwCGWYOKse12sRos+lwu3
+	EeIQv5QCOOeo3Rz18PiX7LW+AZPmWaOoKNAV20J8mT7kRTnPct2WF/YLatI4g/J41HoPbQD/oV4
+	sY89aYn105sQzgvSWRnCHLEDbgz1dla7vU6VilrdM1+xogCSeedYknxASJ/s94NWujYFzhqJxOn
+	qcxkZtfoRekgo21wGNRAOcYbrpgVXu5eK6EpukcDVvECNpDDozXod7ND/8CTE/RxS/CHY7p+fKC
+	XH2V1FnnU+dMaFfeuf+ZZmBxlfAc3/veD1gt6prZAQ5CvwavGRYya+3Ho4n0MqBloibw==
+X-Received: by 2002:a05:6000:4203:b0:43d:242:b9bb with SMTP id ffacd0b85a97d-43fe3dc5c80mr20542019f8f.18.1776690445002;
+        Mon, 20 Apr 2026 06:07:25 -0700 (PDT)
+Received: from gmail.com (deskosmtp.auranext.com. [195.134.167.217])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43fe4e4d525sm28070324f8f.31.2026.04.20.06.07.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Apr 2026 06:07:24 -0700 (PDT)
+Date: Mon, 20 Apr 2026 15:07:22 +0200
+From: Mahe Tardy <mahe.tardy@gmail.com>
+To: bot+bpf-ci@kernel.org
+Cc: alexei.starovoitov@gmail.com, andrii@kernel.org, ast@kernel.org,
+	bpf@vger.kernel.org, coreteam@netfilter.org, daniel@iogearbox.net,
+	fw@strlen.de, john.fastabend@gmail.com, lkp@intel.com,
+	martin.lau@linux.dev, netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org, oe-kbuild-all@lists.linux.dev,
+	pablo@netfilter.org, martin.lau@kernel.org, eddyz87@gmail.com,
+	yonghong.song@linux.dev, clm@meta.com, ihor.solodrai@linux.dev
+Subject: Re: [PATCH bpf-next v4 3/6] bpf: add bpf_icmp_send_unreach kfunc
+Message-ID: <aeYlCswvGdTHiAFp@gmail.com>
+References: <20260420105816.72168-4-mahe.tardy@gmail.com>
+ <c706a726c2e82dfc6162f96d7c04313301c24d1a4e36af5c421fda7a1c01b1a1@mail.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c706a726c2e82dfc6162f96d7c04313301c24d1a4e36af5c421fda7a1c01b1a1@mail.kernel.org>
 X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279739-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[gmail.com,kernel.org,vger.kernel.org,netfilter.org,iogearbox.net,strlen.de,intel.com,linux.dev,lists.linux.dev,meta.com];
+	TAGGED_FROM(0.00)[bounces-279740-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lee@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mahetardy@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_NONE(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: A1F9542B525
+	TAGGED_RCPT(0.00)[netdev,bpf-ci];
+	FREEMAIL_FROM(0.00)[gmail.com]
+X-Rspamd-Queue-Id: 194DC42B686
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The tipc_msg_validate() function can potentially reallocate the skb it
-is validating, freeing the old one.  In tipc_buf_append(), it was being
-called with a pointer to a local variable which was a copy of the
-caller's skb pointer.
+On Mon, Apr 20, 2026 at 11:36:15AM +0000, bot+bpf-ci@kernel.org wrote:
+> > diff --git a/net/core/filter.c b/net/core/filter.c
+> > --- a/net/core/filter.c
+> > +++ b/net/core/filter.c
+> 
+> [ ... ]
+> 
+> > +#if IS_ENABLED(CONFIG_IPV6)
+> > +	case htons(ETH_P_IPV6):
+> > +		if (code < 0 || code > ICMPV6_REJECT_ROUTE)
+> > +			return -EINVAL;
+> > +
+> > +		nskb = skb_clone(skb, GFP_ATOMIC);
+> > +		if (!nskb)
+> > +			return -ENOMEM;
+> > +
+> > +		if (!skb_dst(nskb) && ip6_route_reply_fetch_dst(nskb) < 0) {
+> > +			kfree_skb(nskb);
+> > +			return -EHOSTUNREACH;
+> > +		}
+> 
+> Is the route lookup needed here? Looking at icmpv6_send() in
+> net/ipv6/icmp.c, it fills fl6.{daddr,saddr} and passes them to
+> icmpv6_route_lookup() which performs its own route lookup. The function
+> doesn't appear to use skb_dst() from the original skb:
+> 
+> icmpv6_send() {
+>     ...
+>     fl6.daddr = hdr->saddr;
+>     fl6.saddr = saddr;
+>     ...
+>     dst = icmpv6_route_lookup(net, skb, sk, &fl6);
+>     ...
+> }
+> 
+> The same applies to the IPv4 path with icmp_send(). Additionally, at
+> cgroup/egress the skb->_skb_refdst should already be set, and the same
+> should be true for cgroup/ingress for inet proto.
+> 
+> Does the kfunc work without ip_route_reply_fetch_dst() and
+> ip6_route_reply_fetch_dst()? If so, can these calls be removed?
+> 
+> Reference: Martin KaFai Lau's comment in v3 review
+> https://lore.kernel.org/bpf/df4b0996-3e88-4ea4-983b-82866455a6fc@linux.dev/
 
-If the skb was reallocated and validation subsequently failed, the error
-handling path would free the original skb pointer, which had already
-been freed, leading to double-free.
+Same reply as https://lore.kernel.org/bpf/aeYkdKm7B4NQ3BDo@gmail.com/,
+too bad the LLM can't access the cover letter.
 
-Fix this by passing the caller's skb pointer-pointer directly to
-tipc_msg_validate(), ensuring any modification is reflected correctly.
-The local skb pointer is then updated from the (possibly modified)
-caller's pointer.
-
-Fixes: d618d09a68e4 ("tipc: enforce valid ratio between skb truesize and contents")
-Assisted-by: Gemini:gemini-3.1-pro-preview
-Signed-off-by: Lee Jones <lee@kernel.org>
----
- net/tipc/msg.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/net/tipc/msg.c b/net/tipc/msg.c
-index 76284fc538eb..9f4f612ee027 100644
---- a/net/tipc/msg.c
-+++ b/net/tipc/msg.c
-@@ -177,8 +177,9 @@ int tipc_buf_append(struct sk_buff **headbuf, struct sk_buff **buf)
- 
- 	if (fragid == LAST_FRAGMENT) {
- 		TIPC_SKB_CB(head)->validated = 0;
--		if (unlikely(!tipc_msg_validate(&head)))
-+		if (unlikely(!tipc_msg_validate(headbuf)))
- 			goto err;
-+		head = *headbuf;
- 		*buf = head;
- 		TIPC_SKB_CB(head)->tail = NULL;
- 		*headbuf = NULL;
--- 
-2.54.0.rc1.513.gad8abe7a5a-goog
+> 
+> > +
+> > +		*in_progress = true;
+> > +		icmpv6_send(nskb, ICMPV6_DEST_UNREACH, code, 0);
+> > +		*in_progress = false;
+> > +		kfree_skb(nskb);
+> > +		break;
+> > +#endif
+> > +	default:
+> > +		return -EPROTONOSUPPORT;
+> > +	}
+> > +
+> > +	return 0;
+> > +}
+> 
+> [ ... ]
+> 
+> 
+> ---
+> AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+> See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+> 
+> CI run summary: https://github.com/kernel-patches/bpf/actions/runs/24663313503
 
 
