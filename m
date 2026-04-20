@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-279880-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279879-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GHsnMV1y5mlgwgEAu9opvQ
-	(envelope-from <netdev+bounces-279880-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 20:37:17 +0200
+	id YLDlE0Rg5mkxvgEAu9opvQ
+	(envelope-from <netdev+bounces-279879-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 19:20:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C039432F26
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 20:37:17 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6AF0431020
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 19:20:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id ABC953218A07
-	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 17:19:22 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 251E1300D77D
+	for <lists+netdev@lfdr.de>; Mon, 20 Apr 2026 17:19:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B8D73A1E70;
-	Mon, 20 Apr 2026 17:18:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E43583A1D1C;
+	Mon, 20 Apr 2026 17:18:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BTiSw9by"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="s+/d1ek0"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBDA037E2E4
-	for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 17:18:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E4BA3A16A3
+	for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 17:18:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776705528; cv=none; b=J25lGzl0yCGOrYa7pYr72Itbscd9KLg5jMfZOV0i8c/MMafaLB6puM76aVCos2byQjr3ZWsGOp710wIYEh2vw0tX+Nvw/RTFJwyxjrHK1CwxpdpE3VM3+682SHRRSYkqQ55vhz3yOfP9EQ0zzAcJ8Fxfyuck3zAdAbrnGhR9v+A=
+	t=1776705527; cv=none; b=WRTTw073ZtF9tAxfYAbecu6Dp3JNAG9EdbKw7J3Db1YGpJGwsl+HHSYtdhVa1qk74LUemiQrLocqwMA/irSLeOBl9vbOt1OnDEYLE8gqX0y78hpam3L16ZwGfVzIoaOG2eNwhdw88vKBEkDOI7+tfrIGa/JzDW9ouJg8XO6en8c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776705528; c=relaxed/simple;
-	bh=mfLC8LTZIuyG6ptc24aCGPopepV3WDejBpAV0kIlZRA=;
+	s=arc-20240116; t=1776705527; c=relaxed/simple;
+	bh=8O3b3Qe7OMgCHoNg+DiP0hK3ss+m+yydWKT5V3D/PVg=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=eFR21tDAt52XLKhlaFLu0YkW4CJVz3LCvYhoIGeWCUvbB7KAuzc3qxUpxJmTyPpqrI4YmGmG6+fS5CBnb6Ib/karTA5+7eLzAak+Val/T9D8/QSw1S6UvRKMTSQm5o9azH5lyIehqFZAtNkW8Y9dgjMoDARGJHsIkwF1aXmi67E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BTiSw9by; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=kB7B6nDMWxeq6E/xLjk8ppgwsL51Rmf7Buy+ppcr+u16levoWCt1VdeuBHLAKLDmJhVfViSuYhC4gWSy7mBKWJo45FkFjgMdfnyao6kZpBr6lRagk31U3oYvugx7OCmAz47cfZfxGC23O+zviw2Zj87xZwwvVyjRcj9XkEuS70Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=s+/d1ek0; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-35d9e67f6dcso6671200a91.1
-        for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 10:18:44 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-35fbb5779e8so3807017a91.3
+        for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 10:18:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1776705524; x=1777310324; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1776705526; x=1777310326; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tLuGN9kj4clZ/u36KICID9IjU9wR4CZ3+lgYAeaav/4=;
-        b=BTiSw9by33WiI5fqw6Uwc3cxEzhm4xNDya3CFASYBWg87tj56fmixTvCh67kM0Y4Lf
-         kPUt/uxxnmj2yE6oLaPXWQO9xVvOrYX5Gabq3ywOcktzVNzN/VsHIMgMQ6hUK/q9Et0x
-         LHe2BZQLNKPeOPBIAbzqsw2ZYP3ihoP4PDkGdxH1R5f06UgnFouL06d63DRvgsAh8rr+
-         UoHxuxdiO6rO3cgWf+2KvbX8agSq15OyvtOrl4ih0+w/kI8l8BFnPJOUSud/yT5FMWaY
-         QbqWZOW0Ej/rhVnecjKBsnSV/40cE3xYsceJ3otIfYyi6EzZ52tgjLvlL5eZg1NPmRiF
-         PCBg==
+        bh=W2Wff/1M87WllLQ253qBp/0GFiYpAWG5OoBPum9csgI=;
+        b=s+/d1ek0eYWKyo9FlOJl6eodJwXQY176qnv47efPy9x8rtd0/whgzHB0FRj8nATz9J
+         CHbokX4bCrDScuJSQxO/WS6XEga6DuoVVqT1qIGdnhuytXsyhYyL5mOvxyidrgY47KvY
+         axyG3P4d9aCdFDaRi8iHLirIssUoewM3IRQBzQITiMVP/tBWKuZrFzNzXZvQ9QvhKahO
+         Q5UU8YLvE2c1q4CedpiaPk86Zhizn/vmGxe2g751E45OVaY2iO/AS20lwEBgbhW1SbNa
+         prOcZaRow0kWLvSFGiLk1dPKG1yq9f1omZI3QK8owZu5HzZqkwSZlfNL+Tk7T0UQOFAJ
+         TMYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776705524; x=1777310324;
+        d=1e100.net; s=20251104; t=1776705526; x=1777310326;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tLuGN9kj4clZ/u36KICID9IjU9wR4CZ3+lgYAeaav/4=;
-        b=OAPLcoJZbxbuFuISohriZJugD2sqbNuVhL0lInmPofKDSvhsIYZMZSAhRFz5ERGpfj
-         Cve7OBwlMTABYASeGIjzyN8ESjxedqMQBwrH+umAeZfE6dc1d373XNoWW8kxU39Fn00e
-         d3Xhd+SAzPRvXMrIGsRblecejbXY0WygwURts3QL+fPk7IFeyeqkJm8X6sybBd3v+mjk
-         we6T6xmn7OvebCD3jlBVJ7VwrXF9I3tzij389XYfhN2Dv88zm2reiyNVVuKu+B3+PZx3
-         +wWCySGcV921uqBhqklAFWp8JRGFVdnERyCTcsKtDmOQ09ecU0Ll4adwpTdYUcdC7hlf
-         h6gQ==
-X-Gm-Message-State: AOJu0YxHqjtsX+NQPAI/zzYy5kwu7+way0Yx2L81ivcKChhVLpqO1Rtl
-	wURtK4rOt7JjMtBArHNSLljzHSseu5t8+eSfzGjk6LFTznym+0QPJhmUw48frq6iUkwtRNYynJJ
-	uhmfXzXiO7PonW2zb4JYmitBdSW1XjlPWtnqOpQkb0beQm1XB2LGGF5nWqL6lHiXKpr4EwD3XST
-	QmgHukn75Nu0eMqVK8hrEmqS5phTjrNWum+V4Si2pI9GYOmwoH4PgxSR6WK9Mir0E=
-X-Received: from pjl8.prod.google.com ([2002:a17:90b:2f88:b0:35d:d5e0:fc1d])
+        bh=W2Wff/1M87WllLQ253qBp/0GFiYpAWG5OoBPum9csgI=;
+        b=PcxkjiynefY/M4u7S0lPKl5uZU0KQgXaL3i5jMcwfDiMqXoSI8nbq7CWKGR4/CKn39
+         y7K2X/cZ4sBZtpaDR5Cp1t85Iu0X/EtnS18DcWnJIS+8fjM2TwfI2jPD7D0iNVw92QZW
+         spEKiz8BNO4z4Rm6Q/TzopOjexrsGa7sEq+itRYWFuV/k9fgRNYxk2CEB5LmyFn6f7In
+         Cqy8BcXQlU/AZkEUAKDtzqGXIQ3sYxYnaB0Jdw9c63UvAz33s5KPaSkKWzDc4OkO5yi3
+         TPjrFvsqVejMr1SnmPLJmbhBveJ4jKt5lT1dz+SnR8Ms6WCscxcILgAyw9OenKI2Eckm
+         zCQw==
+X-Gm-Message-State: AOJu0Yw1saH7Bv3cBupYQ49H7lNmhvlYOTnOOPrrw4LZfX5LSwX15uoo
+	ssrMOJBtN/AGCxJrBZPIejUVTH28mK3vSwLmEiHqRLJnk4Rd1P7pcCGfsTYIhsLOYwRF33i/8CF
+	qT66ngppNi9pe52o8UjVI8WQfJVbKzXX4evX/jTqmGVgw9nTIWRiiiu6VgLIf4WR0PusElxr88s
+	1Q05j3tDTqQ37cD6GEEI3KvAXIo5TOFm5o2Wfz4MKEnIHxWiCh0w8CG3jt14xedzo=
+X-Received: from pjbge22.prod.google.com ([2002:a17:90b:e16:b0:35e:4617:916b])
  (user=hramamurthy job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:4e85:b0:35f:b5df:450 with SMTP id 98e67ed59e1d1-3614048a226mr15714705a91.19.1776705523871;
- Mon, 20 Apr 2026 10:18:43 -0700 (PDT)
-Date: Mon, 20 Apr 2026 17:18:35 +0000
+ 2002:a17:90a:e704:b0:35b:9896:cbcd with SMTP id 98e67ed59e1d1-361404b9b70mr13958806a91.27.1776705525487;
+ Mon, 20 Apr 2026 10:18:45 -0700 (PDT)
+Date: Mon, 20 Apr 2026 17:18:36 +0000
 In-Reply-To: <20260420171837.455487-1-hramamurthy@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,9 +76,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260420171837.455487-1-hramamurthy@google.com>
 X-Mailer: git-send-email 2.54.0.rc1.555.g9c883467ad-goog
-Message-ID: <20260420171837.455487-3-hramamurthy@google.com>
-Subject: [PATCH net 2/4] gve: Fix backward stats when interface goes down or
- configuration is adjusted
+Message-ID: <20260420171837.455487-4-hramamurthy@google.com>
+Subject: [PATCH net 3/4] gve: Use default min ring size when device option
+ values are 0
 From: Harshitha Ramamurthy <hramamurthy@google.com>
 To: netdev@vger.kernel.org
 Cc: joshwash@google.com, hramamurthy@google.com, andrew+netdev@lunn.ch, 
@@ -86,8 +86,7 @@ Cc: joshwash@google.com, hramamurthy@google.com, andrew+netdev@lunn.ch,
 	willemb@google.com, maolson@google.com, nktgrg@google.com, jfraker@google.com, 
 	ziweixiao@google.com, jacob.e.keller@intel.com, pkaligineedi@google.com, 
 	shailend@google.com, jordanrhee@google.com, stable@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Debarghya Kundu <debarghyak@google.com>, 
-	Pin-yen Lin <treapking@google.com>
+	linux-kernel@vger.kernel.org, Pin-yen Lin <treapking@google.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -95,17 +94,17 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-279880-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-279879-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[21];
+	RCPT_COUNT_TWELVE(0.00)[20];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -113,161 +112,51 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[hramamurthy@google.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 2C039432F26
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E6AF0431020
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Debarghya Kundu <debarghyak@google.com>
+From: Pin-yen Lin <treapking@google.com>
 
-gve_get_base_stats() sets all the stats to 0, so the stats go backwards
-when interface goes down or configuration is adjusted.
+On gvnic devices that support reporting minimum ring sizes, the device
+option always includes the min_(rx|tx)_ring_size fields, and the values
+will be 0 if they are not configured to be exposed. This makes the
+driver allow unexpected small ring size configurations from the
+userspace.
 
-Fix this by persisting baseline stats across interface down.
+Use the default ring size in the driver if the min ring sizes from the
+device option are 0.
 
-This was discovered by drivers/net/stats.py selftest.
+This was discovered by drivers/net/ring_reconfig.py selftest.
 
 Cc: stable@vger.kernel.org
-Fixes: 2e5e0932dff5 ("gve: add support for basic queue stats")
-Signed-off-by: Debarghya Kundu <debarghyak@google.com>
+Fixes: ed4fb326947d ("gve: add support to read ring size ranges from the device")
+Reviewed-by: Joshua Washington <joshwash@google.com>
+Reviewed-by: Jordan Rhee <jordanrhee@google.com>
 Signed-off-by: Pin-yen Lin <treapking@google.com>
 Signed-off-by: Harshitha Ramamurthy <hramamurthy@google.com>
 ---
- drivers/net/ethernet/google/gve/gve.h      |  6 ++
- drivers/net/ethernet/google/gve/gve_main.c | 64 +++++++++++++++++++---
- 2 files changed, 63 insertions(+), 7 deletions(-)
+ drivers/net/ethernet/google/gve/gve_adminq.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/google/gve/gve.h b/drivers/net/ethernet/google/gve/gve.h
-index cbdf3a842cfe..ff7797043908 100644
---- a/drivers/net/ethernet/google/gve/gve.h
-+++ b/drivers/net/ethernet/google/gve/gve.h
-@@ -794,6 +794,10 @@ struct gve_ptp {
- 	struct gve_priv *priv;
- };
+diff --git a/drivers/net/ethernet/google/gve/gve_adminq.c b/drivers/net/ethernet/google/gve/gve_adminq.c
+index b72cc0fa2ba2..57d898f6fa82 100644
+--- a/drivers/net/ethernet/google/gve/gve_adminq.c
++++ b/drivers/net/ethernet/google/gve/gve_adminq.c
+@@ -189,7 +189,9 @@ void gve_parse_device_option(struct gve_priv *priv,
+ 		*dev_op_modify_ring = (void *)(option + 1);
  
-+struct gve_ring_err_stats {
-+	u64 rx_alloc_fails;
-+};
-+
- struct gve_priv {
- 	struct net_device *dev;
- 	struct gve_tx_ring *tx; /* array of tx_cfg.num_queues */
-@@ -882,6 +886,8 @@ struct gve_priv {
- 	unsigned long service_task_flags;
- 	unsigned long state_flags;
- 
-+	struct gve_ring_err_stats base_ring_err_stats;
-+	struct rtnl_link_stats64 base_net_stats;
- 	struct gve_stats_report *stats_report;
- 	u64 stats_report_len;
- 	dma_addr_t stats_report_bus; /* dma address for the stats report */
-diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/ethernet/google/gve/gve_main.c
-index 675382e9756c..8617782791e0 100644
---- a/drivers/net/ethernet/google/gve/gve_main.c
-+++ b/drivers/net/ethernet/google/gve/gve_main.c
-@@ -105,9 +105,22 @@ static netdev_tx_t gve_start_xmit(struct sk_buff *skb, struct net_device *dev)
- 		return gve_tx_dqo(skb, dev);
- }
- 
--static void gve_get_stats(struct net_device *dev, struct rtnl_link_stats64 *s)
-+static void gve_add_base_stats(struct gve_priv *priv,
-+			       struct rtnl_link_stats64 *s)
-+{
-+	struct rtnl_link_stats64 *base_stats = &priv->base_net_stats;
-+
-+	s->rx_packets += base_stats->rx_packets;
-+	s->rx_bytes += base_stats->rx_bytes;
-+	s->rx_dropped += base_stats->rx_dropped;
-+	s->tx_packets += base_stats->tx_packets;
-+	s->tx_bytes += base_stats->tx_bytes;
-+	s->tx_dropped += base_stats->tx_dropped;
-+}
-+
-+static void gve_get_ring_stats(struct gve_priv *priv,
-+			       struct rtnl_link_stats64 *s)
- {
--	struct gve_priv *priv = netdev_priv(dev);
- 	unsigned int start;
- 	u64 packets, bytes;
- 	int num_tx_queues;
-@@ -142,6 +155,14 @@ static void gve_get_stats(struct net_device *dev, struct rtnl_link_stats64 *s)
- 	}
- }
- 
-+static void gve_get_stats(struct net_device *dev, struct rtnl_link_stats64 *s)
-+{
-+	struct gve_priv *priv = netdev_priv(dev);
-+
-+	gve_get_ring_stats(priv, s);
-+	gve_add_base_stats(priv, s);
-+}
-+
- static int gve_alloc_flow_rule_caches(struct gve_priv *priv)
- {
- 	struct gve_flow_rules_cache *flow_rules_cache = &priv->flow_rules_cache;
-@@ -1493,6 +1514,23 @@ static int gve_queues_stop(struct gve_priv *priv)
- 	return gve_reset_recovery(priv, false);
- }
- 
-+static void gve_get_ring_err_stats(struct gve_priv *priv,
-+				   struct gve_ring_err_stats *err_stats)
-+{
-+	int ring;
-+
-+	for (ring = 0; ring < priv->rx_cfg.num_queues; ring++) {
-+		unsigned int start;
-+		struct gve_rx_ring *rx = &priv->rx[ring];
-+
-+		do {
-+			start = u64_stats_fetch_begin(&rx->statss);
-+			err_stats->rx_alloc_fails +=
-+				rx->rx_skb_alloc_fail + rx->rx_buf_alloc_fail;
-+		} while (u64_stats_fetch_retry(&rx->statss, start));
-+	}
-+}
-+
- static int gve_close(struct net_device *dev)
- {
- 	struct gve_priv *priv = netdev_priv(dev);
-@@ -1502,6 +1540,10 @@ static int gve_close(struct net_device *dev)
- 	if (err)
- 		return err;
- 
-+	/* Save ring queue and err stats before closing the interface */
-+	gve_get_ring_stats(priv, &priv->base_net_stats);
-+	gve_get_ring_err_stats(priv, &priv->base_ring_err_stats);
-+
- 	gve_queues_mem_remove(priv);
- 	return 0;
- }
-@@ -2743,12 +2785,20 @@ static void gve_get_base_stats(struct net_device *dev,
- 			       struct netdev_queue_stats_rx *rx,
- 			       struct netdev_queue_stats_tx *tx)
- {
--	rx->packets = 0;
--	rx->bytes = 0;
--	rx->alloc_fail = 0;
-+	const struct gve_ring_err_stats *base_err_stats;
-+	const struct rtnl_link_stats64 *base_stats;
-+	struct gve_priv *priv;
-+
-+	priv = netdev_priv(dev);
-+	base_stats = &priv->base_net_stats;
-+	base_err_stats = &priv->base_ring_err_stats;
-+
-+	rx->packets = base_stats->rx_packets;
-+	rx->bytes = base_stats->rx_bytes;
-+	rx->alloc_fail = base_err_stats->rx_alloc_fails;
- 
--	tx->packets = 0;
--	tx->bytes = 0;
-+	tx->packets = base_stats->tx_packets;
-+	tx->bytes = base_stats->tx_bytes;
- }
- 
- static const struct netdev_stat_ops gve_stat_ops = {
+ 		/* device has not provided min ring size */
+-		if (option_length == GVE_DEVICE_OPTION_NO_MIN_RING_SIZE)
++		if (option_length == GVE_DEVICE_OPTION_NO_MIN_RING_SIZE ||
++		    be16_to_cpu((*dev_op_modify_ring)->min_rx_ring_size) == 0 ||
++		    be16_to_cpu((*dev_op_modify_ring)->min_tx_ring_size) == 0)
+ 			priv->default_min_ring_size = true;
+ 		break;
+ 	case GVE_DEV_OPT_ID_FLOW_STEERING:
 -- 
 2.54.0.rc0.605.g598a273b03-goog
 
