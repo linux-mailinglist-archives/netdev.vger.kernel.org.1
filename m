@@ -1,194 +1,197 @@
-Return-Path: <netdev+bounces-280248-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280249-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +IrAB+fe52kBCAIAu9opvQ
-	(envelope-from <netdev+bounces-280248-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 22:32:39 +0200
+	id +Nl6DUXh52nMCAIAu9opvQ
+	(envelope-from <netdev+bounces-280249-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 22:42:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 247DE43F7E6
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 22:32:38 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BCC843F86C
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 22:42:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 3BFA53003BEA
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 20:32:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0E789304750E
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 20:38:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45B2E3988EB;
-	Tue, 21 Apr 2026 20:32:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CA9C3446C7;
+	Tue, 21 Apr 2026 20:38:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ADccd10A"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u+3D4qsL"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 239CE32860B;
-	Tue, 21 Apr 2026 20:32:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4818031E85A;
+	Tue, 21 Apr 2026 20:38:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776803553; cv=none; b=h2o07/ronY8M6PzG68nCW8L60e7mxm7cBxE1SaCYDKp337+1zbFODTa44cwjC/Q3sIktFkXh6YqcFElgBuJDpAh/4/ZTqialeaTsYCYeQa2pOdcdesTQLXcdk4Ro4OxHaMxetYlz3KKYRj/pw2EH4mTKXmBP0GEsBkGcamnKcsQ=
+	t=1776803936; cv=none; b=NpW65lIBx1/A5E6YHtNKJfmqxZ85+eqeyFu4UomYHxMGh6A4kIQDkLNxpdK2J1j0HmQLLghwNa+qBv7jJUrVUBaoUV1TKBJ7ByVjv+Gn1DemNX/q6t2vSjABFnw/SMohS6NYiN7UgCgmN/rrmzUiHLDlLf8pQgPPzaQI7ku2sFs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776803553; c=relaxed/simple;
-	bh=53QDOGGOwf6FATEssZuXFprNrd1l0dw43fXxNlgjXYE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S+bu5PZr4azUXR14h+ZKjmNUbsOCwbgg3UJJzvkJ7TwdUEUQE3S0zZ6n2uhL9t+JBjIWlDdQ/g07BtmYPlE4urVbPKFgxcgy5bMfwvlwQW0hLjvWHEtKRypZx/LRt+rYKH6XytbpfMqdqFiwkppJDvTzAc6AJU/kwK0DEpr+wrE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ADccd10A; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1C9CC2BCB0;
-	Tue, 21 Apr 2026 20:32:30 +0000 (UTC)
+	s=arc-20240116; t=1776803936; c=relaxed/simple;
+	bh=YsvazPSctTP3K4mfC0xavdja4uCMN9VA37WX18FInmw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Pxj8XFNtSlAcrAOPLSZcnlYEaW50TCNtAqVKl4Bs1K38Y5rqa3w/qKjjYWDvbFptLd6OH4Hv52pPCqSZM01PUv8A3RPQRj34l6b2Mdkal9+V3o+OD6f4UvrkrNRm4fJe7YM87VQGqnHR/glvKy+s12NK/uQFkvvJ53PvYorP2pE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u+3D4qsL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9584EC2BCB0;
+	Tue, 21 Apr 2026 20:38:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776803552;
-	bh=53QDOGGOwf6FATEssZuXFprNrd1l0dw43fXxNlgjXYE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ADccd10A5ycsSnGcPo+Gmz69vdABaG0lxDBVNVXJtEpZzdxlH4/rPEhvWTOAJiXjh
-	 UxlK27mlOFMzgSQfZOi1oSai8Fvb5tMbEMdTJYq+PNQh3ZrqKUyjPJQ3IE1pFtUYna
-	 PH168oigjkyVyu0K9l+dOVuQLfMMuOg/zLOREAIDluzrPfPaXuN+J3SCvOuOM8vS+k
-	 B+3cJ1F1fwNgdHynlK7lusUrtqFiYk5VG+lG4biaTu9K4b2tI711T1MU2MrBYoZi8r
-	 RZprmIUBtc2PXvwAUNRNDgNEnei6oU8wsAEGovo7Lvk3cKyggb35qlKhfnaJOTwKU2
-	 SXguh0WwfXZ0A==
-Date: Tue, 21 Apr 2026 21:32:28 +0100
+	s=k20201202; t=1776803935;
+	bh=YsvazPSctTP3K4mfC0xavdja4uCMN9VA37WX18FInmw=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=u+3D4qsLmw1F5kpF0AOQY/J3AjLbEfRfyjJX0Gvac9cG1uKpfTgjsQGv1aqUh8/mL
+	 6AnYwcoEfw606bChSJgE9F9hteYkL4/T6J5qwfAFubwD4HpmWMLPCj4tuKlRIwqztE
+	 rAJJJVBxiEvzEU09beYrA1xAdzNxVpjywXwiK3+ukTsDZ07VsHOZpZwwCTJam+x8O1
+	 EduQwvVs1Z8DRfIQCbxb/OFv861FCKJuH69tqplJlYXKs4WJf+dndZVhrXfQrcfnJW
+	 4+0jH/SREb5g7rK8+v1j4OipRfX3R9CaVtq4Hwf0U6lnbnVP2TvQz/Fz367rRQjVq3
+	 WPSrhJdyRKflg==
 From: Simon Horman <horms@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: netdev@vger.kernel.org, Marc Dionne <marc.dionne@auristor.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Jeffrey Altman <jaltman@auristor.com>, stable@kernel.org
-Subject: Re: [PATCH net 1/4] rxrpc: Fix memory leaks in
- rxkad_verify_response()
-Message-ID: <20260421203228.GI651125@horms.kernel.org>
-References: <20260420145900.1223732-1-dhowells@redhat.com>
- <20260420145900.1223732-2-dhowells@redhat.com>
+To: dhowells@redhat.com
+Cc: 'Simon Horman' <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	marc.dionne@auristor.com,
+	kuba@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	linux-afs@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	jaltman@auristor.com,
+	stable@kernel.org
+Subject: Re: [PATCH net 2/4] rxrpc: Fix conn-level packet handling to unshare RESPONSE packets
+Date: Tue, 21 Apr 2026 21:38:33 +0100
+Message-ID: <20260421203833.745240-1-horms@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260420145900.1223732-3-dhowells@redhat.com>
+References: <20260420145900.1223732-3-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260420145900.1223732-2-dhowells@redhat.com>
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_FROM(0.00)[bounces-280248-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280249-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 247DE43F7E6
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sashiko.dev:url]
+X-Rspamd-Queue-Id: 8BCC843F86C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Apr 20, 2026 at 03:58:54PM +0100, David Howells wrote:
-> Fix rxkad_verify_response() to free ticket by using a __free() construct
-> rather than explicitly freeing it.
-> 
-> Also fix rxkad_verify_response() to free the server key by using a __free()
-> construct.
-> 
-> Fixes: 57af281e5389 ("rxrpc: Tidy up abort generation infrastructure")
-> Fixes: ec832bd06d6f ("rxrpc: Don't retain the server key in the connection")
-> Closes: https://sashiko.dev/#/patchset/20260408121252.2249051-1-dhowells%40redhat.com
-> Signed-off-by: David Howells <dhowells@redhat.com>
+From: 'Simon Horman' <horms@kernel.org>
 
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://sashiko.dev
+---
+Subject: rxrpc: Fix conn-level packet handling to unshare RESPONSE packets
+
+This commit modifies the RxRPC connection-level packet processor to unshare
+RESPONSE packets before decryption. It introduces a new rxrpc_unshare_skb()
+helper to safely unshare skbuffs passed via a double pointer and replaces
+direct calls to skb_unshare().
+
+Closes: https://sashiko.dev/#/patchset/20260408121252.2249051-1-dhowells%40redhat.com
+
+> diff --git a/net/rxrpc/conn_event.c b/net/rxrpc/conn_event.c
+> index 9a41ec708aeb9..3d56a5d233697 100644
+> --- a/net/rxrpc/conn_event.c
+> +++ b/net/rxrpc/conn_event.c
+
+[ ... ]
+
+> @@ -371,7 +379,7 @@ static void rxrpc_do_process_connection(struct rxrpc_connection *conn)
+>  	 * connection that each one has when we've finished with it */
+>  	while ((skb = skb_dequeue(&conn->rx_queue))) {
+>  		rxrpc_see_skb(skb, rxrpc_skb_see_conn_work);
+> -		ret = rxrpc_process_event(conn, skb);
+> +		ret = rxrpc_process_event(conn, &skb);
+>  		switch (ret) {
+>  		case -ENOMEM:
+>  		case -EAGAIN:
+
+Looking at the code immediately following this hunk in
+rxrpc_do_process_connection():
+
+		switch (ret) {
+		case -ENOMEM:
+		case -EAGAIN:
+			skb_queue_head(&conn->rx_queue, skb);
+			rxrpc_queue_conn(conn, rxrpc_conn_queue_retry_work);
+			break;
+
+If rxrpc_process_event() fails with -ENOMEM because rxrpc_unshare_skb()
+failed, rxrpc_unshare_skb() will have set *_skb = NULL.
+
+Does this mean skb is NULL when we reach skb_queue_head()?
+
+Since skb_queue_head() dereferences the skb parameter, this appears to
+result in a NULL pointer dereference. Furthermore, since skb_unshare()
+frees the original skb on allocation failure, the packet is already gone
+and requeuing it wouldn't be possible anyway.
+
+> diff --git a/net/rxrpc/io_thread.c b/net/rxrpc/io_thread.c
+> index 6979569319252..0592ce644fc3d 100644
+> --- a/net/rxrpc/io_thread.c
+> +++ b/net/rxrpc/io_thread.c
+
+[ ... ]
+
+> @@ -249,19 +249,10 @@ static bool rxrpc_input_packet(struct rxrpc_local *local, struct sk_buff **_skb)
+>  		 * decryption.
+>  		 */
+>  		if (sp->hdr.securityIndex != 0) {
+> -			skb = skb_unshare(skb, GFP_ATOMIC);
+> -			if (!skb) {
+> -				rxrpc_eaten_skb(*_skb, rxrpc_skb_eaten_by_unshare_nomem);
+> -				*_skb = NULL;
+> +			skb = rxrpc_unshare_skb(_skb, GFP_ATOMIC);
+> +			if (!skb)
+>  				return just_discard;
+> -			}
+
+This isn't a new bug introduced by this patch, but since we are modifying
+the unshare path here: when rxrpc_unshare_skb() fails, it sets *_skb = NULL
+and returns just_discard.
+
+Back in rxrpc_io_thread(), the packet is processed like this:
+
+net/rxrpc/io_thread.c:rxrpc_io_thread() {
+...
+		while ((skb = __skb_dequeue(&rx_queue))) {
+			struct rxrpc_skb_priv *sp = rxrpc_skb(skb);
+			switch (skb->mark) {
+			case RXRPC_SKB_MARK_PACKET:
+				skb->priority = 0;
+				if (!rxrpc_input_packet(local, &skb))
+					rxrpc_reject_packet(local, skb);
+				trace_rxrpc_rx_done(skb->mark, skb->priority);
 ...
 
-> index eb7f2769d2b1..0acdc46f42c2 100644
-> --- a/net/rxrpc/rxkad.c
-> +++ b/net/rxrpc/rxkad.c
-
-...
-
-> @@ -1160,16 +1159,15 @@ static int rxkad_verify_response(struct rxrpc_connection *conn,
->  	}
->  
->  	ret = -ENOMEM;
-> -	response = kzalloc_obj(struct rxkad_response, GFP_NOFS);
-> +	struct rxkad_response *response __free(kfree) =
-> +		kzalloc_obj(struct rxkad_response, GFP_NOFS);
->  	if (!response)
->  		goto temporary_error;
->  
-
-Hi David,
-
-This goto, combined with the use of __free in the declaration
-of ticket below results in a compile error for x86_64 allmodconfig
-with clang 21.1.8.
-
-  net/rxrpc/rxkad.c:1165:3: error: cannot jump from this goto statement to its label
-   1165 |                 goto temporary_error;
-        |                 ^
-  net/rxrpc/rxkad.c:1192:8: note: jump bypasses initialization of variable with __attribute__((cleanup))
-   1192 |         void *ticket __free(kfree) = kmalloc(ticket_len, GFP_NOFS);
-        |               ^
-
-Moreover, the use of this construct is discouraged in Networking code:
-
-  1.7.3. Using device-managed and cleanup.h constructs¶
-
-  Netdev remains skeptical about promises of all “auto-cleanup” APIs,
-  including even devm_ helpers, historically. They are not the preferred
-  style of implementation, merely an acceptable one.
-
-  Use of guard() is discouraged within any function longer than 20 lines,
-  scoped_guard() is considered more readable. Using normal lock/unlock is
-  still (weakly) preferred.
-
-  Low level cleanup constructs (such as __free()) can be used when building
-  APIs and helpers, especially scoped iterators. However, direct use of
-  __free() within networking core and drivers is discouraged. Similar
-  guidance applies to declaring variables mid-function.
-
-  https://docs.kernel.org/process/maintainer-netdev.html#using-device-managed-and-cleanup-h-constructs
-
-And to round things out, Sashiko also points out problems with
-the use of __free() in this patch.
-
-...
-
->  
->  	/* extract the kerberos ticket and decrypt and decode it */
->  	ret = -ENOMEM;
-> -	ticket = kmalloc(ticket_len, GFP_NOFS);
-> +	void *ticket __free(kfree) = kmalloc(ticket_len, GFP_NOFS);
->  	if (!ticket)
-> -		goto temporary_error_free_resp;
-> +		goto temporary_error;
-
-...
-
->  temporary_error:
->  	/* Ignore the response packet if we got a temporary error such as
->  	 * ENOMEM.  We just want to send the challenge again.  Note that we
->  	 * also come out this way if the ticket decryption fails.
->  	 */
-> -	key_put(server_key);
->  	return ret;
->  }
->  
-> 
-
--- 
-pw-bot: changes-requested
+If rxrpc_input_packet() sets skb to NULL and returns false (just_discard),
+does this cause a NULL pointer dereference when trace_rxrpc_rx_done() tries
+to access skb->mark?
 
