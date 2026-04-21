@@ -1,188 +1,149 @@
-Return-Path: <netdev+bounces-280084-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280089-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mHs+IYVe52lr7QEAu9opvQ
-	(envelope-from <netdev+bounces-280084-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 13:24:53 +0200
+	id COQuF7Rk52l07gEAu9opvQ
+	(envelope-from <netdev+bounces-280089-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 13:51:16 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA46643A150
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 13:24:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E6A243A472
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 13:51:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AB47B300B62C
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 11:23:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1F67A301F1B0
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 11:49:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23A913BC69F;
-	Tue, 21 Apr 2026 11:23:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B47CD1D130E;
+	Tue, 21 Apr 2026 11:48:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dgPR+uMl";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xa7G/RrY"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="K8oDEJ1P"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7940B3B776E
-	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 11:23:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B23930E836
+	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 11:48:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776770632; cv=none; b=KDTZAS9DLP0oyxBBVLGVVHsW/zDdQfalmQ1hYA93+b16RB1HZHGFXvmDMfdYnJkmPOd7YowxFO5RXTRyv+SrYIOS5Lj12ZDs/qMA5C/CxpcrywOioIPV4BOU4hfZtAtXeh8lXNZgNrjnfAP5ka4PlZ0ViQJcIunERZ7ezRArI7w=
+	t=1776772139; cv=none; b=WdHPAVeeZfEr0wIelSsW8H3GLMVw4fIb7zIjTSt3wt/8f2x+q/Wih/r0sUWS4x0lOpzipaun2FSzQ1MnPJ+0jow2YfFfF4/VISm/eUzVS7NIyVkOcyfrHl1J2UGPrxRjld6VG41ZheIsf3cFR56p7xDrxA0OrmgscWsXWpM8JBA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776770632; c=relaxed/simple;
-	bh=bvsNNhXjDuCqvJ4f2MCP+3c83kbaeMjS6Knbdq69M94=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jF/FLEFTCpxJSZ+EVdcjlLXOHirexq7tnSESWMe7+6m0ePMFhCdW+2bQcXStooemKK4TYkNV4fMQ2vj1nyWqeeSGbsatEJyT8N8GlWLLwqLgnOP40J+qjy1TWsP8rm/cwAT6kFfhn91d/FIaegvTkghHAMYylmeQONlaA8HFKEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dgPR+uMl; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Xa7G/RrY; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1776770629;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xxVa+EsHT5PrcBeK2zG20jzylvTADEVkR1ky4LvMTjE=;
-	b=dgPR+uMl04Q2wNh5vMSmdpe2lgXZnrlvxVYMM2clszGzFlUPvGenl90ugrZuQ9AFFPnFbD
-	tsJIazEIHg779OTlexvZdBOV835rFA9llfiXs7/R/TrIBgnf9b8iAxhBsS0DQM4vYFn1aE
-	QmEFLkGQSnb9MDtiSFPEswGGGwC1HtE=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-563-ICJY8UN1M9yh3maoq8yiug-1; Tue, 21 Apr 2026 07:23:48 -0400
-X-MC-Unique: ICJY8UN1M9yh3maoq8yiug-1
-X-Mimecast-MFC-AGG-ID: ICJY8UN1M9yh3maoq8yiug_1776770627
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-488c2aa6becso39682325e9.2
-        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 04:23:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1776770627; x=1777375427; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=xxVa+EsHT5PrcBeK2zG20jzylvTADEVkR1ky4LvMTjE=;
-        b=Xa7G/RrYXOxuXt3XH2HtStzF4g6Fc+WN3RTovNSX19L9TAfC6lupaQjLyEOhnLxh2Q
-         xviTHulK4JQ9AuMLR5gFRiKtRjF788rMUtJPMNHeAdlbI4WyWKZ6fZUtl+SxLdwolx7d
-         d64GFjC+xDkdbY58fFtm3ejuKqN/GxPFJc0lqbT5AVJPw3DRyS2q4qF4wbW5WrEXHDJ/
-         cJ06j3hMiALZal0bh7E6gfog3z2LbCgwmYBS5xvQe/PUYn2huaOxjtg4EYnmWXTa7cX+
-         W4eBUU3iyToLVj6D9BJa4ruhkUTmDkdCoi2zeYfqAtpnA6Eb+GtLtz+T3zuKQMdvhX1S
-         psOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776770627; x=1777375427;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xxVa+EsHT5PrcBeK2zG20jzylvTADEVkR1ky4LvMTjE=;
-        b=g8Tu2oEQkFurLJVE5sfqNZPaLUxy6oET72Lgk1kq8hG0r+AW9UnZ+nx1MMkZeXnYsD
-         x3Y95mZxe4CoNl9S+PueVsz+EIy/h8UDz/RTOu2T1vtlNhcEiWGnY2YxaD5w15L/rxkb
-         YHTceqRLotCQlcwkN2iUXH+WXAFXcPMJFf8VMr4O3rn1bdQ9IGN1Epf7PXgPWxphoBNs
-         LiNtL83KQprb/cHV3KDMIGpTsX/7znoPrQglKD7nJJFTkVZQr1/5jHcvtNWD6Hra84IL
-         iK/rb3BATRPIFyBUBgB8RIDeejEl2/YeRyMTdGC6npXeaUs5TN+951kiM68NBQDv0Zbz
-         ZEBg==
-X-Forwarded-Encrypted: i=1; AFNElJ8CpbaurG/vuMUOQFhUIrSh1zXbk2bS84o5w/dVHEYgAMsso+OOMrjpGwfh9WhYPYtj2o2ydpI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyes0IbmXUfS1nD0pVI8Hicfea4ZL7KszMDpiPxJjCPCGqjvSt5
-	AIRbOc2Y0D4hKNx2UtKua4GtsJnGiKv9oU0ME3QZSvbb4oT7+4Xw85oo0cUjdr6yy/Nixi73ulQ
-	yl/jVqogY3EnyVN9FXzUuJym5Iky4El4yk6RjdcmB9DyAxvuoeW/FUOKSnw==
-X-Gm-Gg: AeBDievjsFtyWLiYzqV49LZasS39BbPS7blwwsh7VFcGrmippXDV+gQzcW34n/EktHw
-	k20kxCVOzMxDc9avicw4EgBSKlVnuqEHv7s/kbNDXCDbzjBItmYlD2j9kjMOq1+HoIYFkl81tL2
-	5M+kJMCYY1i9Gbmb9dhpqPpCPjkjesnBuSp4r3r4TIps35PEc6P3HsWmn8GW0iWqkLVFYb7SR4J
-	5MeDY1HWbl0wQ51CO5USqmN4Z/8P3vixyHhubYwO1rMobr4uquWq9mmXxNbieIIDTu4HXZmXcaP
-	CwHf4jNbx6AC8cvMX2E9dOBlhVhWyi62PLsOBxTay6otQ14wOAItMKmnoBmYp7lbCLqKZI8H8mW
-	abhq8yHCAn2Haw+LMhDLhJRMKjBUP9EOimSgXnkBqfp+9Ve48tAXb9AoWkuoIFBFU9Aw=
-X-Received: by 2002:a05:600c:3150:b0:488:9fb7:376d with SMTP id 5b1f17b1804b1-488fb792ce4mr260922815e9.28.1776770626884;
-        Tue, 21 Apr 2026 04:23:46 -0700 (PDT)
-X-Received: by 2002:a05:600c:3150:b0:488:9fb7:376d with SMTP id 5b1f17b1804b1-488fb792ce4mr260922425e9.28.1776770626440;
-        Tue, 21 Apr 2026 04:23:46 -0700 (PDT)
-Received: from [192.168.88.32] ([150.228.25.104])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488fc14a61asm334535805e9.15.2026.04.21.04.23.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Apr 2026 04:23:46 -0700 (PDT)
-Message-ID: <807622bd-1001-4202-b612-c8504fc7c67f@redhat.com>
-Date: Tue, 21 Apr 2026 13:23:44 +0200
+	s=arc-20240116; t=1776772139; c=relaxed/simple;
+	bh=Aqwmxj8uFkfP9nHrc8fZ7RRLzeMC8fJOyFF5kKMYktE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type:
+	 References; b=l1yjP9FHWpIvCf1N8b7S37sI2bx8uhPLcZYK5OTxTudldpOL1TThXkl7fdDV/D12nhoesJ7ktDH+Yt5tONKBnmWpCyyZHD0vaQC012xcxtgZR0geYYB14Q3jdUzWr6A05ZaFaiaSFfNJ7Pkp7GyO8oM4FYZ5utm/zo0l1ChHSPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=K8oDEJ1P; arc=none smtp.client-ip=210.118.77.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20260421114034euoutp0141ce51d36a834170fa53b60f5eec3134~oXGNl9HsP0192801928euoutp01g
+	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 11:40:34 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20260421114034euoutp0141ce51d36a834170fa53b60f5eec3134~oXGNl9HsP0192801928euoutp01g
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1776771635;
+	bh=MtJpmhcXNEwjZg/96uUvgc/7Ds9nqk3h5aj71RrwZIY=;
+	h=From:To:Cc:Subject:Date:References:From;
+	b=K8oDEJ1P4QrFUafUofy21JaFfSTfykL+A1gBtrqVVOYwIf+1osMgat2N1wnkguvmc
+	 ZPMA5OEQ6twMpuf9+QJLEG5oSvPviYW2Gqb4O+HCuF2io1eqJPccIxj8stL3g7xQmJ
+	 cX0IBtaakUxkqt/b9U6vFAcrPQ1/fr4ZZx6N651A=
+Received: from eusmtip1.samsung.com (unknown [203.254.199.221]) by
+	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+	20260421114034eucas1p1d746ffe32b49aeb57f10e729d1331124~oXGNTHFly0938209382eucas1p1q;
+	Tue, 21 Apr 2026 11:40:34 +0000 (GMT)
+Received: from AMDC4843.eu.corp.samsungelectronics.net (unknown
+	[106.120.77.61]) by eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20260421114034eusmtip112d8a374cc8b5bf185ab61c332f660d0~oXGM-A0Sj0596605966eusmtip17;
+	Tue, 21 Apr 2026 11:40:34 +0000 (GMT)
+From: Jakub Raczynski <j.raczynski@samsung.com>
+To: netdev@vger.kernel.org
+Cc: kuba@kernel.org, przemyslaw.kitszel@intel.com,
+	anthony.l.nguyen@intel.com, kernel-janitors@vger.kernel.org, Jakub Raczynski
+	<j.raczynski@samsung.com>
+Subject: [PATCH] net/intel: Replace manual array size calculation with
+ ARRAY_SIZE
+Date: Tue, 21 Apr 2026 13:40:29 +0200
+Message-Id: <20260421114029.2689961-1-j.raczynski@samsung.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 1/1] net/rose: hold listener socket during call
- request handling
-To: Ren Wei <n05ec@lzu.edu.cn>, linux-hams@vger.kernel.org,
- netdev@vger.kernel.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- horms@kernel.org, kees@kernel.org, takamitz@amazon.co.jp, kuniyu@google.com,
- jiayuan.chen@shopee.com, mingo@kernel.org, stanksal@purdue.edu,
- jlayton@kernel.org, yifanwucs@gmail.com, tomapufckgml@gmail.com,
- bird@lzu.edu.cn, yuantan098@gmail.com, tonanli66@gmail.com
-References: <cover.1776327338.git.tonanli66@gmail.com>
- <52776256bf0fc38de92fe3edf39434538b672b69.1776327338.git.tonanli66@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <52776256bf0fc38de92fe3edf39434538b672b69.1776327338.git.tonanli66@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-CMS-MailID: 20260421114034eucas1p1d746ffe32b49aeb57f10e729d1331124
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-RootMTR: 20260421114034eucas1p1d746ffe32b49aeb57f10e729d1331124
+X-EPHeader: CA
+X-CMS-RootMailID: 20260421114034eucas1p1d746ffe32b49aeb57f10e729d1331124
+References: <CGME20260421114034eucas1p1d746ffe32b49aeb57f10e729d1331124@eucas1p1.samsung.com>
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	DMARC_POLICY_ALLOW(-0.50)[samsung.com,none];
+	R_DKIM_ALLOW(-0.20)[samsung.com:s=mail20170921];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,amazon.co.jp,shopee.com,purdue.edu,gmail.com,lzu.edu.cn];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-280084-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280089-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[samsung.com:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[j.raczynski@samsung.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lzu.edu.cn:email]
-X-Rspamd-Queue-Id: BA46643A150
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,samsung.com:email,samsung.com:dkim,samsung.com:mid]
+X-Rspamd-Queue-Id: 9E6A243A472
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 4/17/26 1:01 PM, Ren Wei wrote:
-> From: Nan Li <tonanli66@gmail.com>
-> 
-> The call request receive path keeps using the listener socket after the
-> lookup lock has been dropped. Keep the listener alive across the
-> remaining validation and child socket setup by taking a reference in the
-> lookup path and releasing it once request handling is finished.
-> 
-> This makes listener lifetime handling explicit and avoids races with
-> concurrent socket teardown.
-> 
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Cc: stable@kernel.org
-> Reported-by: Yifan Wu <yifanwucs@gmail.com>
-> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-> Reported-by: Xin Liu <bird@lzu.edu.cn>
-> Co-developed-by: Yuan Tan <yuantan098@gmail.com>
-> Signed-off-by: Yuan Tan <yuantan098@gmail.com>
-> Signed-off-by: Nan Li <tonanli66@gmail.com>
-> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+There are still places in the code where manual calculation of array size
+exist, but it is good to enforce usage of single macro through the whole
+code as it makes code bit more readable.
 
-we are moving rose out of tree:
+Signed-off-by: Jakub Raczynski <j.raczynski@samsung.com>
+---
+ drivers/net/ethernet/intel/i40e/i40e_adminq.h | 2 +-
+ drivers/net/ethernet/intel/iavf/iavf_adminq.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-https://lore.kernel.org/netdev/20260421021824.1293976-1-kuba@kernel.org/
-
-please hold off until Thursday (after that our net PR will land into
-mainline), and eventually resend if the code still exists in Linus's
-tree at that point.
-
-Thanks,
-
-Paolo
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_adminq.h b/drivers/net/ethernet/intel/i40e/i40e_adminq.h
+index 1be97a3a86ce..0e7cecd00169 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_adminq.h
++++ b/drivers/net/ethernet/intel/i40e/i40e_adminq.h
+@@ -109,7 +109,7 @@ static inline int i40e_aq_rc_to_posix(int aq_ret, int aq_rc)
+ 		-EFBIG,      /* I40E_AQ_RC_EFBIG */
+ 	};
+ 
+-	if (!((u32)aq_rc < (sizeof(aq_to_posix) / sizeof((aq_to_posix)[0]))))
++	if (!((u32)aq_rc < ARRAY_SIZE(aq_to_posix)))
+ 		return -ERANGE;
+ 
+ 	return aq_to_posix[aq_rc];
+diff --git a/drivers/net/ethernet/intel/iavf/iavf_adminq.h b/drivers/net/ethernet/intel/iavf/iavf_adminq.h
+index bbf5c4b3a2ae..eb0257c86058 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf_adminq.h
++++ b/drivers/net/ethernet/intel/iavf/iavf_adminq.h
+@@ -113,7 +113,7 @@ static inline int iavf_aq_rc_to_posix(int aq_ret, int aq_rc)
+ 	if (aq_ret == IAVF_ERR_ADMIN_QUEUE_TIMEOUT)
+ 		return -EAGAIN;
+ 
+-	if (!((u32)aq_rc < (sizeof(aq_to_posix) / sizeof((aq_to_posix)[0]))))
++	if (!((u32)aq_rc < ARRAY_SIZE(aq_to_posix)))
+ 		return -ERANGE;
+ 
+ 	return aq_to_posix[aq_rc];
+-- 
+2.34.1
 
 
