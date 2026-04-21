@@ -1,264 +1,189 @@
-Return-Path: <netdev+bounces-280154-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280155-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UC6jJH+L52lY9wEAu9opvQ
-	(envelope-from <netdev+bounces-280154-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 16:36:47 +0200
+	id UIR2N6mL52lY9wEAu9opvQ
+	(envelope-from <netdev+bounces-280155-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 16:37:29 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17D2D43C228
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 16:36:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8834943C24E
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 16:37:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F2BD9302D528
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 14:29:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 63F7A3045EFD
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 14:30:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 574A43D75C5;
-	Tue, 21 Apr 2026 14:29:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2594B3D891B;
+	Tue, 21 Apr 2026 14:30:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iCyDKbVn"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dY8MYwPB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4F3330E0E5
-	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 14:29:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B80B3D890D
+	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 14:30:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776781789; cv=none; b=Bb1aHDBXHji6ZuD1jslvGZpnCeIMLPSj9NjCgzX0TCQ9vJSW62uwBeyhyBqUBaTzvQ2iy6lNxBzl2129uGB/F+j49UUmII3gQPwmQu3vGLNFDt2DqeNyMN2GY2571ZfJ1q+S8ZOQ6QxMFwWaZvqbvxCVKBN0uTdhtDGCxPtBbsM=
+	t=1776781825; cv=none; b=PqB2zxch5RxETVGudPfBr3B5DtJeufPrkzjLUMH71mqTOcbOGHH+tKmj9qu21Y0/+PdtJFW+h+g8sMiOdNVJ1yFA2bukXl85tdYa7jwgQCs7BWeOBF5GrJ+dDUHkpkr7/ke0hzIjhJlkgXbU9Xoh1Nqm6eaCTkW6jDosFj+ttZY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776781789; c=relaxed/simple;
-	bh=0sVBQdXKRDkJSG8meZQ/pBjSftRkZl7LQGy0n05ApBA=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=OrWoSfhzpzBvVGWxrYHlWaWPYeFJhpEezb561IxovGON7pfOO8pNiQnlfS3doIHELSRUI0qla0opcVqAvXMnsRek41QdTnqEwTB7/A9RiiXTXIJPxINVBue26hPaAGxR6wr7WLSfXTAJ3mZCQbs9LxCzOpH5HkapSWld2ofvc5U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iCyDKbVn; arc=none smtp.client-ip=209.85.222.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-8cb6291d95aso718344185a.1
-        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 07:29:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1776781787; x=1777386587; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=jvck/XoB8H/Wh1zgGi1810Si1lrAtzcUaSDMkL0ZmR0=;
-        b=iCyDKbVnSZKP44mK/zS7LiAbUlkCX1o+phS1n/fq+aB/DjscTJ/IwYfLT3lE+C2IJu
-         7dWW/3EfHUIWX3cEKXkYYHFUVijlOjw8CcDHgLcNjU3TIAvbyTfx77jfcUDUEvgQacer
-         vFC/xwCARWv/ByLedR9VK7itsDMrZOUBgLtoo3nsEjni9oM3+93QOMyL08cDpgsDZvuO
-         wX2/UROuh0W6TXgi/Sigc+Rv5JQC8aDB0uXyUdEmBfv02YxT7CVGzyj0ee5Z8tZe6r/J
-         jtz6ta4TB2op48kW5Xkv0/h/6oQ2EoqJxvSovTHE7T4igjNbp5UtG+EJZE4BPrQK8vch
-         XhZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776781787; x=1777386587;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=jvck/XoB8H/Wh1zgGi1810Si1lrAtzcUaSDMkL0ZmR0=;
-        b=rlQ/jqe6rOovX7F11XvWDQ4A5KP36FA3iu1pSbGptR/13lz3cL04yqsf6f1dlvpxwd
-         leehqqTqjVLyMrvEHVFylOs56DOJDX7Fw/xsphB/B5llJtghKlwn29DCgBnmEe/U7v+8
-         sT3l5Fl7Qxemg2jIO8O+wG2WIfV6Fh2CVjptacK1D/GKWSxBczusOvaQlV880zNgpZT/
-         f4yfCtkoh0QD0/lYQ8JdCYOKFaA3mYDrHTv1NbPOuWDPMUKwmXUnJizbYKr9e9NQMAa0
-         xYKnJe4qwp5hC8k4XgMazAFZ/c9YaNzYAsiKiZXMhJDvFEhgcgznGfLv0gF78lnW+iXS
-         NXnw==
-X-Forwarded-Encrypted: i=1; AFNElJ/Ke7vAwR/nnA8Gd5vlStul52yzWyVgcNgo4W/fBziy/qeFXFEHHYXSFt8tlukQj7mANG+yD9I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzP9cRLXWDHo1nDUx9PM28tWzEa5/A9a+D76ioC+Y1MWZB22V+J
-	wM5ml+hq2Mjv69zouCZsO5n8FGu7aTaoaXeyzNLI2HNDrGg8zSbV9kEUPZ3DB28ZF/v2wrnpR+u
-	sOjjGE8rhQlhtqg==
-X-Received: from qkjw1.prod.google.com ([2002:a05:620a:1481:b0:8cd:8ec2:8228])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:3720:b0:8cf:dfc9:c09c with SMTP id af79cd13be357-8e78f253c25mr2697155385a.10.1776781786327;
- Tue, 21 Apr 2026 07:29:46 -0700 (PDT)
-Date: Tue, 21 Apr 2026 14:29:44 +0000
+	s=arc-20240116; t=1776781825; c=relaxed/simple;
+	bh=wzm7TkfUtsdkCf+9WRD+mx0ZLEZab+prGzlMMBHO+zg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BDeRYK9fB74EdFhPQxiFzpNstWMNVoqiv7dhYgLfThskvIl6eDKxWahwwiiUam49zkvpsm7Lq+h+NfE/0AzWMP3uqOJg7W71Sja39AmXp+mSaZo4aml7Af36617oU0W/h4HqpUrmYSXd6NywCSWtxsRbpF81/LqW+LkOC8Wex5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dY8MYwPB; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1776781821;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TWylwziUJR6+djO988m8SXRnsaLXz4wU91J/b9HxTcg=;
+	b=dY8MYwPBdqcG08GXq9rfv45gDxZ8IOVfLMYlNQSQrQcjfGQimee+uMe2dH6DPR755PQx8E
+	/K6D9O33Q1ZoDdJEMxVMF+BSnP8faGXiRhr1Q1TAdGDFPXttIL9rmwhYUnKruaA7LNzNP3
+	8TxSKGWcx115V08SQVlsCm9IwpnvEz8=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-97-OuySZZZCNne9e9u0fHq2OQ-1; Tue,
+ 21 Apr 2026 10:30:16 -0400
+X-MC-Unique: OuySZZZCNne9e9u0fHq2OQ-1
+X-Mimecast-MFC-AGG-ID: OuySZZZCNne9e9u0fHq2OQ_1776781809
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CE80619560AB;
+	Tue, 21 Apr 2026 14:30:08 +0000 (UTC)
+Received: from [10.22.81.187] (unknown [10.22.81.187])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3068C1800660;
+	Tue, 21 Apr 2026 14:30:00 +0000 (UTC)
+Message-ID: <46e1989c-d0a3-46c4-9a9f-3476789b9dc1@redhat.com>
+Date: Tue, 21 Apr 2026 10:29:59 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.54.0.rc2.533.g4f5dca5207-goog
-Message-ID: <20260421142944.4009941-1-edumazet@google.com>
-Subject: [PATCH net] net/sched: sch_pie: annotate data-races in pie_dump_stats()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>, 
-	netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 16/23] genirq/cpuhotplug: Use RCU to protect access of
+ HK_TYPE_MANAGED_IRQ cpumask
+To: Thomas Gleixner <tglx@kernel.org>, Tejun Heo <tj@kernel.org>,
+ Johannes Weiner <hannes@cmpxchg.org>, =?UTF-8?Q?Michal_Koutn=C3=BD?=
+ <mkoutny@suse.com>, Jonathan Corbet <corbet@lwn.net>,
+ Shuah Khan <skhan@linuxfoundation.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ "K. Y. Srinivasan" <kys@microsoft.com>,
+ Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+ Dexuan Cui <decui@microsoft.com>, Long Li <longli@microsoft.com>,
+ Guenter Roeck <linux@roeck-us.net>, Frederic Weisbecker
+ <frederic@kernel.org>, "Paul E. McKenney" <paulmck@kernel.org>,
+ Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
+ Joel Fernandes <joelagnelf@nvidia.com>, Josh Triplett
+ <josh@joshtriplett.org>, Boqun Feng <boqun@kernel.org>,
+ Uladzislau Rezki <urezki@gmail.com>, Steven Rostedt <rostedt@goodmis.org>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Lai Jiangshan <jiangshanlai@gmail.com>, Zqiang <qiang.zhang@linux.dev>,
+ Anna-Maria Behnsen <anna-maria@linutronix.de>, Ingo Molnar
+ <mingo@kernel.org>, Chen Ridong <chenridong@huaweicloud.com>,
+ Peter Zijlstra <peterz@infradead.org>, Juri Lelli <juri.lelli@redhat.com>,
+ Vincent Guittot <vincent.guittot@linaro.org>,
+ Dietmar Eggemann <dietmar.eggemann@arm.com>, Ben Segall
+ <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+ Valentin Schneider <vschneid@redhat.com>,
+ K Prateek Nayak <kprateek.nayak@amd.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>
+Cc: cgroups@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-hyperv@vger.kernel.org, linux-hwmon@vger.kernel.org,
+ rcu@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, Costa Shulyupin <cshulyup@redhat.com>,
+ Qiliang Yuan <realwujing@gmail.com>
+References: <20260421030351.281436-1-longman@redhat.com>
+ <20260421030351.281436-17-longman@redhat.com> <87qzo8bs9m.ffs@tglx>
+Content-Language: en-US
+From: Waiman Long <longman@redhat.com>
+In-Reply-To: <87qzo8bs9m.ffs@tglx>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,mojatatu.com,resnulli.us,vger.kernel.org,gmail.com,google.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	FREEMAIL_TO(0.00)[kernel.org,cmpxchg.org,suse.com,lwn.net,linuxfoundation.org,arm.com,microsoft.com,roeck-us.net,nvidia.com,joshtriplett.org,gmail.com,goodmis.org,efficios.com,linux.dev,linutronix.de,huaweicloud.com,infradead.org,redhat.com,linaro.org,google.com,suse.de,amd.com,davemloft.net];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.infradead.org,redhat.com,gmail.com];
+	TAGGED_FROM(0.00)[bounces-280155-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280154-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	FROM_NEQ_ENVFROM(0.00)[longman@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_GT_50(0.00)[52];
+	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MIME_TRACE(0.00)[0:+];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 17D2D43C228
+X-Rspamd-Queue-Id: 8834943C24E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-pie_dump_stats() only runs with RTNL held,
-reading fields that can be changed in qdisc fast path.
+On 4/21/26 5:02 AM, Thomas Gleixner wrote:
+> On Mon, Apr 20 2026 at 23:03, Waiman Long wrote:
+>
+>> As HK_TYPE_MANAGED_IRQ cpumask is going to be changeable at run time,
+>> use RCU to protect access to the cpumask.
+>>
+>> To enable the new HK_TYPE_MANAGED_IRQ cpumask to take effect, the
+>> following steps can be done.
+> Can be done?
+>
+>>   1) Update the HK_TYPE_MANAGED_IRQ cpumask to take out the newly isolated
+>>      CPUs and add back the de-isolated CPUs.
+>>   2) Tear down the affected CPUs to cause irq_migrate_all_off_this_cpu()
+>>      to be called on the affected CPUs to migrate the irqs to other
+>>      HK_TYPE_MANAGED_IRQ housekeeping CPUs.
+>>   3) Bring up the previously offline CPUs to invoke
+>>      irq_affinity_online_cpu() to allow the newly de-isolated CPUs to
+>>      be used for managed irqs.
+> Which previously offline CPUs?
+This part should go into another patch.
+>
+>> diff --git a/kernel/irq/manage.c b/kernel/irq/manage.c
+>> index 2e8072437826..8270c4de260b 100644
+>> --- a/kernel/irq/manage.c
+>> +++ b/kernel/irq/manage.c
+>> @@ -263,6 +263,7 @@ int irq_do_set_affinity(struct irq_data *data, const struct cpumask *mask, bool
+>>   	    housekeeping_enabled(HK_TYPE_MANAGED_IRQ)) {
+>>   		const struct cpumask *hk_mask;
+>>   
+>> +		guard(rcu)();
+>>   		hk_mask = housekeeping_cpumask(HK_TYPE_MANAGED_IRQ);
+>>   
+>>   		cpumask_and(tmp_mask, mask, hk_mask);
+> How is this hunk related to $Subject?
 
-Add READ_ONCE()/WRITE_ONCE() annotations.
+The subject is actually about using RCU to protect access to 
+housekeeping cpumask. There are extra info in the commit  log that 
+should go to another patch.
 
-Alternative would be to acquire the qdisc spinlock, but our long-term
-goal is to make qdisc dump operations lockless as much as we can.
+Cheers,
+Longman
 
-tc_pie_xstats fields don't need to be latched atomically,
-otherwise this bug would have been caught earlier.
-
-Fixes: edb09eb17ed8 ("net: sched: do not acquire qdisc spinlock in qdisc/class stats dump")
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Reviewed-by: Jamal Hadi Salim <jhs@mojatatu.com>
----
- include/net/pie.h   |  2 +-
- net/sched/sch_pie.c | 38 +++++++++++++++++++-------------------
- 2 files changed, 20 insertions(+), 20 deletions(-)
-
-diff --git a/include/net/pie.h b/include/net/pie.h
-index 01cbc66825a40bd21c0a044b1180cbbc346785df..1f3db0c355149b41823a891c9156cac625122031 100644
---- a/include/net/pie.h
-+++ b/include/net/pie.h
-@@ -104,7 +104,7 @@ static inline void pie_vars_init(struct pie_vars *vars)
- 	vars->dq_tstamp = DTIME_INVALID;
- 	vars->accu_prob = 0;
- 	vars->dq_count = DQCOUNT_INVALID;
--	vars->avg_dq_rate = 0;
-+	WRITE_ONCE(vars->avg_dq_rate, 0);
- }
- 
- static inline struct pie_skb_cb *get_pie_cb(const struct sk_buff *skb)
-diff --git a/net/sched/sch_pie.c b/net/sched/sch_pie.c
-index 16f3f629cb8e4be71431f7e50a278e3c7fdba8d0..fb53fbf0e328571be72b66ba4e75a938e1963422 100644
---- a/net/sched/sch_pie.c
-+++ b/net/sched/sch_pie.c
-@@ -90,7 +90,7 @@ static int pie_qdisc_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 	bool enqueue = false;
- 
- 	if (unlikely(qdisc_qlen(sch) >= sch->limit)) {
--		q->stats.overlimit++;
-+		WRITE_ONCE(q->stats.overlimit, q->stats.overlimit + 1);
- 		goto out;
- 	}
- 
-@@ -104,7 +104,7 @@ static int pie_qdisc_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 		/* If packet is ecn capable, mark it if drop probability
- 		 * is lower than 10%, else drop it.
- 		 */
--		q->stats.ecn_mark++;
-+		WRITE_ONCE(q->stats.ecn_mark, q->stats.ecn_mark + 1);
- 		enqueue = true;
- 	}
- 
-@@ -114,15 +114,15 @@ static int pie_qdisc_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 		if (!q->params.dq_rate_estimator)
- 			pie_set_enqueue_time(skb);
- 
--		q->stats.packets_in++;
-+		WRITE_ONCE(q->stats.packets_in, q->stats.packets_in + 1);
- 		if (qdisc_qlen(sch) > q->stats.maxq)
--			q->stats.maxq = qdisc_qlen(sch);
-+			WRITE_ONCE(q->stats.maxq, qdisc_qlen(sch));
- 
- 		return qdisc_enqueue_tail(skb, sch);
- 	}
- 
- out:
--	q->stats.dropped++;
-+	WRITE_ONCE(q->stats.dropped, q->stats.dropped + 1);
- 	q->vars.accu_prob = 0;
- 	return qdisc_drop_reason(skb, sch, to_free, reason);
- }
-@@ -267,11 +267,11 @@ void pie_process_dequeue(struct sk_buff *skb, struct pie_params *params,
- 			count = count / dtime;
- 
- 			if (vars->avg_dq_rate == 0)
--				vars->avg_dq_rate = count;
-+				WRITE_ONCE(vars->avg_dq_rate, count);
- 			else
--				vars->avg_dq_rate =
-+				WRITE_ONCE(vars->avg_dq_rate,
- 				    (vars->avg_dq_rate -
--				     (vars->avg_dq_rate >> 3)) + (count >> 3);
-+				     (vars->avg_dq_rate >> 3)) + (count >> 3));
- 
- 			/* If the queue has receded below the threshold, we hold
- 			 * on to the last drain rate calculated, else we reset
-@@ -381,7 +381,7 @@ void pie_calculate_probability(struct pie_params *params, struct pie_vars *vars,
- 	if (delta > 0) {
- 		/* prevent overflow */
- 		if (vars->prob < oldprob) {
--			vars->prob = MAX_PROB;
-+			WRITE_ONCE(vars->prob, MAX_PROB);
- 			/* Prevent normalization error. If probability is at
- 			 * maximum value already, we normalize it here, and
- 			 * skip the check to do a non-linear drop in the next
-@@ -392,7 +392,7 @@ void pie_calculate_probability(struct pie_params *params, struct pie_vars *vars,
- 	} else {
- 		/* prevent underflow */
- 		if (vars->prob > oldprob)
--			vars->prob = 0;
-+			WRITE_ONCE(vars->prob, 0);
- 	}
- 
- 	/* Non-linear drop in probability: Reduce drop probability quickly if
-@@ -403,7 +403,7 @@ void pie_calculate_probability(struct pie_params *params, struct pie_vars *vars,
- 		/* Reduce drop probability to 98.4% */
- 		vars->prob -= vars->prob / 64;
- 
--	vars->qdelay = qdelay;
-+	WRITE_ONCE(vars->qdelay, qdelay);
- 	vars->backlog_old = backlog;
- 
- 	/* We restart the measurement cycle if the following conditions are met
-@@ -502,21 +502,21 @@ static int pie_dump_stats(struct Qdisc *sch, struct gnet_dump *d)
- 	struct pie_sched_data *q = qdisc_priv(sch);
- 	struct tc_pie_xstats st = {
- 		.prob		= q->vars.prob << BITS_PER_BYTE,
--		.delay		= ((u32)PSCHED_TICKS2NS(q->vars.qdelay)) /
-+		.delay		= ((u32)PSCHED_TICKS2NS(READ_ONCE(q->vars.qdelay))) /
- 				   NSEC_PER_USEC,
--		.packets_in	= q->stats.packets_in,
--		.overlimit	= q->stats.overlimit,
--		.maxq		= q->stats.maxq,
--		.dropped	= q->stats.dropped,
--		.ecn_mark	= q->stats.ecn_mark,
-+		.packets_in	= READ_ONCE(q->stats.packets_in),
-+		.overlimit	= READ_ONCE(q->stats.overlimit),
-+		.maxq		= READ_ONCE(q->stats.maxq),
-+		.dropped	= READ_ONCE(q->stats.dropped),
-+		.ecn_mark	= READ_ONCE(q->stats.ecn_mark),
- 	};
- 
- 	/* avg_dq_rate is only valid if dq_rate_estimator is enabled */
- 	st.dq_rate_estimating = q->params.dq_rate_estimator;
- 
- 	/* unscale and return dq_rate in bytes per sec */
--	if (q->params.dq_rate_estimator)
--		st.avg_dq_rate = q->vars.avg_dq_rate *
-+	if (st.dq_rate_estimating)
-+		st.avg_dq_rate = READ_ONCE(q->vars.avg_dq_rate) *
- 				 (PSCHED_TICKS_PER_SEC) >> PIE_SCALE;
- 
- 	return gnet_stats_copy_app(d, &st, sizeof(st));
--- 
-2.54.0.rc2.533.g4f5dca5207-goog
+>
 
 
