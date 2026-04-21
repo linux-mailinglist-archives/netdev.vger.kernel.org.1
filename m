@@ -1,171 +1,248 @@
-Return-Path: <netdev+bounces-280047-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280048-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uDCRDWQ652no5QEAu9opvQ
-	(envelope-from <netdev+bounces-280047-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 10:50:44 +0200
+	id cKJzJN4652no5QEAu9opvQ
+	(envelope-from <netdev+bounces-280048-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 10:52:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4185043862B
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 10:50:42 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50F264386A4
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 10:52:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 4FE97300B286
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 08:49:33 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 09BEE304D642
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 08:50:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1362937C0F8;
-	Tue, 21 Apr 2026 08:49:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B530B397E91;
+	Tue, 21 Apr 2026 08:50:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZU3qDPJK";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="GUZBopwT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pR8Z523t"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E3AE1C84A2
-	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 08:49:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C3E933F8C2;
+	Tue, 21 Apr 2026 08:50:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776761370; cv=none; b=hGL1YQqIBg2jfHyUL44hvQXdkJNNIUoxmotRNWR4VuzomCjJIv2NXBlZI/VKmyn9cxQqBfg1MiE4tF04cUVBndcvuZXQ21/YCHnYmU5ItpUNP0OfQ6SJ9pY0CVeKhi4cdJwT+LRw6tZTOfetzqsGe6C5Jy27XCx6czVwHcOqbq8=
+	t=1776761405; cv=none; b=lOIGx6YXscpfqI0bLAOdsUshkLoHN1byaSH9z3pjDsR7p+jR1nZT7ZtPM8kLej4RadszpYD9vUwFVFDckxJlRp7tQAYkrsRk8mskvzxJsDa+ewGnqig3/6noJX949bsnLigGsUydoTNxoeR1DlazZJtsGYnSKScchMBVu4B/Coo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776761370; c=relaxed/simple;
-	bh=5JsshEzSWKkHHybeMjzuOi1TJBB5BJquoeXBOVXlaJE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ctlHJPVqE81YnfOy2IwvC8KRLbyWxUaY/qC54+4U2eFz20D3TXQv8fH1/Fb7GTB3FzFW3GYmN+LSZAa3CNBoOxcJe/5teUADk0GLySFyAWedabSdq+3qlrmXrgzCVTOtq9I+dMJGOdHviiQwuN006tcEilEEpqWyan7HoIbApgw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZU3qDPJK; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=GUZBopwT; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1776761367;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dM9QpEa1glVvOOAGDNSNRupzn3Y+00X/KBAisgsGArQ=;
-	b=ZU3qDPJKq1Ez26tTasFHZvjiaMP3B5FGUzu7PViUIhLAQA7md3EMCdVIDR+hwsXYn2la9f
-	+K4hdb0+m280hx0LUWIgl1FgSBmIeLfDMQXht1x4uDMCPjVPqnHAs80OzN4UxkfhWFsPLO
-	Gg257FMolqSFAuFeUbEGbse1+f6b1cQ=
-Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
- [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-277-DxHDCFOmNAmYD2dS3q-ugg-1; Tue, 21 Apr 2026 04:49:26 -0400
-X-MC-Unique: DxHDCFOmNAmYD2dS3q-ugg-1
-X-Mimecast-MFC-AGG-ID: DxHDCFOmNAmYD2dS3q-ugg_1776761365
-Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-35d9f68d00fso513420a91.2
-        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 01:49:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1776761365; x=1777366165; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=dM9QpEa1glVvOOAGDNSNRupzn3Y+00X/KBAisgsGArQ=;
-        b=GUZBopwT2Lqz7xmtwyln0Wd/xOyF8y0E2AetOfdfdfE3a/V4x9LHEF8kU6vwff6/rU
-         4HcCYwl3o3cDKthaYV3Nl5ehhZ8tpyvmvg0OsMrGUqq5d9I9I5NFPyeOX6hYU2pyU6cg
-         GnsIC/tXAqK8dn6iPlxIkuSqO/23oSuX/YpnGUmCC4zsuKz0EAsO89ueo4s3QIoowG2h
-         6fK//Q4mu9v3oQKBDDaxJpX8Q/XIJi2Awl7Cb8ZISXdYVZD7bVjQ0gTqZok7lJATJTuD
-         xaphl4Ewmu9PBPHb9Smi7RK0+jGG4TSt2au+KyqA3TjvlOhKsIYcbO2EgF41LNDoYf0C
-         s3dA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776761365; x=1777366165;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=dM9QpEa1glVvOOAGDNSNRupzn3Y+00X/KBAisgsGArQ=;
-        b=nOaFTbry90dPufJYDbfobOmX6jM3FVAmQ+ymHkQl9rPl0qnX4k31iSx5fJbtSMLhAn
-         WMDR8efxgyzm/KdNkwPWWWpI9TwJuw2hUbkj5q6dedoAsj9ROYItkrLqcmNjJeMvs37L
-         Mxjyb7mZo06l2D9tL16RG/Xnmm2d1FvSLy0OsGRJXZmBuKOcbb7QPDDV2hqM7NRCeNck
-         xzw8PDDv74+vzA6KLl6Dx/KtH7evxkhgPHQcNI8NzR6eZbY5VrqGkU0UdpLXKW7/KJDC
-         2oPupPkPkV+7oJGt4zcpTroe2f4Zq+QVditHCSU27KzCJluHEUyciEWskGvtFIDccA4Q
-         /X+g==
-X-Forwarded-Encrypted: i=1; AFNElJ/8fdQVFtjHcRknKdu+6jFnKITCRS/l3Gur4eq98xV32aqpVgqhmNtNzE7bb2+5d5Qaw3dy3xs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwL7e5u/Z7M/WBZlhkFbQuOWQzYl0ZmrQNPXVPzzV/aBOkeIigu
-	OewZLl6EJqXNVz0ghMljXj4FsEuHoFF12o9a8n4j9vWas8kuSB0GNGC5iut2shpX/wu38swaws1
-	nBDQ38OiIgcjteNZ0u1IW5zo1RJY1QeqjmfS37OMrnR1hhoeijGHJgVEukA==
-X-Gm-Gg: AeBDieva/v/YwRDUlUXa9QPxQwFD6KbxaySSBaPBBOSBvimnaMtK8J7+clfQM7EoSPD
-	5ZbNCFrHOP3TRUIcTi+pOifbuOxvPethwEj7Ud1k/NYGKeH6sQmTwnp0s0Lg6//tvMUTkkBtmvG
-	WGoVvoYMtAK6H5HRIe0m/KgPNv6mzaLDeL3O0EYk1iFlvastpn06sPcSnSM3v3b0Hx5Tydxo5YW
-	nci7Zn9bHoIJx5o4O427XgkRgm1XvzUXz+FJUzgvf3+rttoyIlLdDAnYwCtTgsl+gnAM/wD80CS
-	iKM8Uu4j/d3AqGZU11mY+bzWS525Ox//IOzeGu3LJLA5Cek3vQmUkiP8bamWQBJCpsh2aweL+9C
-	PU56ltfp7YHWuchcZ14YbYPb/G7lVp2yTLjO3faZ7+R54uIS7xw8W41Tnee9eRHMKfa4=
-X-Received: by 2002:a17:90a:60f:b0:35f:b137:5a63 with SMTP id 98e67ed59e1d1-361403add26mr12204453a91.5.1776761365207;
-        Tue, 21 Apr 2026 01:49:25 -0700 (PDT)
-X-Received: by 2002:a17:90a:60f:b0:35f:b137:5a63 with SMTP id 98e67ed59e1d1-361403add26mr12204426a91.5.1776761364789;
-        Tue, 21 Apr 2026 01:49:24 -0700 (PDT)
-Received: from [192.168.88.32] ([150.228.25.104])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-36141869e88sm12675045a91.1.2026.04.21.01.49.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Apr 2026 01:49:24 -0700 (PDT)
-Message-ID: <d306bbeb-141c-4a44-bcc0-2e2c5d51efd5@redhat.com>
-Date: Tue, 21 Apr 2026 10:49:12 +0200
+	s=arc-20240116; t=1776761405; c=relaxed/simple;
+	bh=HaTQPXvOEJyusO788jGddOJOEFqrCuHs2/f3+g1Am18=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=T2cuOIyS0I6Iac9j8mdgjq7OuJsnpFJaXsWPHLMIACAEkKMsDHbmuPJ3rNSEjRkXRsRtGjfZOvDtP0dBGJH1TdcmWW4GULNUSw1/qwaEWA/SfsIPVgWPA29H50DY7ISjnhdmdO5x7IaND3HFuhtNI4igdfDGoIQ5c3kNwdu3AZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pR8Z523t; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8BB7C2BCB5;
+	Tue, 21 Apr 2026 08:50:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776761405;
+	bh=HaTQPXvOEJyusO788jGddOJOEFqrCuHs2/f3+g1Am18=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=pR8Z523tl/pYJTgna0TzpDJ97VzUhuDGpfMXUMlZSvJUP88/Uf6wwLL6TZpPWR05u
+	 fD93UYvGK1Z22WuxegmEtlR4ePNUVX6G2eE2ADwU3KwsnRkrgv6KuslEMDj4RRqwRM
+	 14skmyaN7pOCw5z4aXywKO7WdmtNgjWIjQBE7KBokI+Z8nr8LT+UnHedRP0w1FkO7/
+	 PdygA/+aEmRmgNTyEpaQ4QOWy0df653T3ZV/1poX6L5HiEPSJxYDfp5OljRX0SkdFT
+	 tqfeD8TETWZix6tWtCS922YGEo3mzAzhVFRtMGSFWkbCfLN9whd61bgc0fioeZwxZd
+	 WIVg9roArtZ/w==
+From: Thomas Gleixner <tglx@kernel.org>
+To: Waiman Long <longman@redhat.com>, Tejun Heo <tj@kernel.org>, Johannes
+ Weiner <hannes@cmpxchg.org>, Michal =?utf-8?Q?Koutn=C3=BD?=
+ <mkoutny@suse.com>, Jonathan
+ Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, Catalin
+ Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, "K. Y.
+ Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>,
+ Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, Long Li
+ <longli@microsoft.com>, Guenter Roeck <linux@roeck-us.net>, Frederic
+ Weisbecker <frederic@kernel.org>, "Paul E. McKenney" <paulmck@kernel.org>,
+ Neeraj Upadhyay <neeraj.upadhyay@kernel.org>, Joel Fernandes
+ <joelagnelf@nvidia.com>, Josh Triplett <josh@joshtriplett.org>, Boqun Feng
+ <boqun@kernel.org>, Uladzislau Rezki <urezki@gmail.com>, Steven Rostedt
+ <rostedt@goodmis.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Lai Jiangshan <jiangshanlai@gmail.com>, Zqiang <qiang.zhang@linux.dev>,
+ Anna-Maria Behnsen <anna-maria@linutronix.de>, Ingo Molnar
+ <mingo@kernel.org>, Chen Ridong <chenridong@huaweicloud.com>, Peter
+ Zijlstra <peterz@infradead.org>, Juri Lelli <juri.lelli@redhat.com>,
+ Vincent Guittot <vincent.guittot@linaro.org>, Dietmar Eggemann
+ <dietmar.eggemann@arm.com>, Ben Segall <bsegall@google.com>, Mel Gorman
+ <mgorman@suse.de>, Valentin Schneider <vschneid@redhat.com>, K Prateek
+ Nayak <kprateek.nayak@amd.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: cgroups@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-hyperv@vger.kernel.org, linux-hwmon@vger.kernel.org,
+ rcu@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, Costa Shulyupin <cshulyup@redhat.com>,
+ Qiliang Yuan <realwujing@gmail.com>, Waiman Long <longman@redhat.com>
+Subject: Re: [PATCH 04/23] tick/nohz: Allow runtime changes in full dynticks
+ CPUs
+In-Reply-To: <20260421030351.281436-5-longman@redhat.com>
+References: <20260421030351.281436-1-longman@redhat.com>
+ <20260421030351.281436-5-longman@redhat.com>
+Date: Tue, 21 Apr 2026 10:50:00 +0200
+Message-ID: <87340od7ev.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v4 1/2] net/sched: taprio: fix NULL pointer
- dereference in class dump
-To: Weiming Shi <bestswngs@gmail.com>, jhs@mojatatu.com,
- vinicius.gomes@intel.com, jiri@resnulli.us, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, shuah@kernel.org
-Cc: horms@kernel.org, vladimir.oltean@nxp.com, xmei5@asu.edu,
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20260416185501.647884-2-bestswngs@gmail.com>
- <20260416185501.647884-3-bestswngs@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20260416185501.647884-3-bestswngs@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain
+X-Spamd-Result: default: False [2.84 / 15.00];
+	MID_END_EQ_FROM_USER_PART(4.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-280047-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-280048-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,mojatatu.com,intel.com,resnulli.us,davemloft.net,google.com,kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[redhat.com,kernel.org,cmpxchg.org,suse.com,lwn.net,linuxfoundation.org,arm.com,microsoft.com,roeck-us.net,nvidia.com,joshtriplett.org,gmail.com,goodmis.org,efficios.com,linux.dev,linutronix.de,huaweicloud.com,infradead.org,linaro.org,google.com,suse.de,amd.com,davemloft.net];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.infradead.org,redhat.com,gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_GT_50(0.00)[53];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[tglx@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-0.998];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 4185043862B
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: 50F264386A4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 4/16/26 8:55 PM, Weiming Shi wrote:
-> @@ -2196,14 +2199,14 @@ static int taprio_graft(struct Qdisc *sch, unsigned long cl,
->  	*old = q->qdiscs[cl - 1];
->  	if (FULL_OFFLOAD_IS_ENABLED(q->flags)) {
->  		WARN_ON_ONCE(dev_graft_qdisc(dev_queue, new) != *old);
-> -		if (new)
-> +		if (new != &noop_qdisc)
->  			qdisc_refcount_inc(new);
->  		if (*old)
->  			qdisc_put(*old);
+On Mon, Apr 20 2026 at 23:03, Waiman Long wrote:
+> Full dynticks can only be enabled if "nohz_full" boot option has been
+> been specified with or without parameter. Any change in the list of
+> nohz_full CPUs have to be reflected in tick_nohz_full_mask. Introduce
+> a new tick_nohz_full_update_cpus() helper that can be called to update
+> the tick_nohz_full_mask at run time. The housekeeping_update() function
+> is modified to call the new helper when the HK_TYPE_KERNEL_NOSIE cpumask
+> is going to be changed.
+>
+> We also need to enable CPU context tracking for those CPUs that
 
-Unless I'm lost, it looks like taprio_leaf() can now return
-`noop_qdisc`. As a consequence, `old` can be a valid qdisc, NULL or even
-`noop_qdisc`. In the latter case it should not decrease the refcount, as
-it was not increased previously.
+We need nothing. Use passive voice for change logs as requested in
+documentation.
 
-/P
+> are in tick_nohz_full_mask. So remove __init from tick_nohz_init()
+> and ct_cpu_track_user() so that they be called later when an isolated
+> cpuset partition is being created. The __ro_after_init attribute is
+> taken away from context_tracking_key as well.
+>
+> Also add a new ct_cpu_untrack_user() function to reverse the action of
+> ct_cpu_track_user() in case we need to disable the nohz_full mode of
+> a CPU.
+>
+> With nohz_full enabled, the boot CPU (typically CPU 0) will be the
+> tick CPU which cannot be shut down easily. So the boot CPU should not
+> be used in an isolated cpuset partition.
+>
+> With runtime modification of nohz_full CPUs, tick_do_timer_cpu can become
+> TICK_DO_TIMER_NONE. So remove the two TICK_DO_TIMER_NONE WARN_ON_ONCE()
+> checks in tick-sched.c to avoid unnecessary warnings.
+
+in tick-sched.c? Describe the functions which contain that.
+
+>  static inline void tick_nohz_task_switch(void)
+> diff --git a/kernel/context_tracking.c b/kernel/context_tracking.c
+> index 925999de1a28..394e432630a3 100644
+> --- a/kernel/context_tracking.c
+> +++ b/kernel/context_tracking.c
+> @@ -411,7 +411,7 @@ static __always_inline void ct_kernel_enter(bool user, int offset) { }
+>  #define CREATE_TRACE_POINTS
+>  #include <trace/events/context_tracking.h>
+>  
+> -DEFINE_STATIC_KEY_FALSE_RO(context_tracking_key);
+> +DEFINE_STATIC_KEY_FALSE(context_tracking_key);
+>  EXPORT_SYMBOL_GPL(context_tracking_key);
+>  
+>  static noinstr bool context_tracking_recursion_enter(void)
+> @@ -674,9 +674,9 @@ void user_exit_callable(void)
+>  }
+>  NOKPROBE_SYMBOL(user_exit_callable);
+>  
+> -void __init ct_cpu_track_user(int cpu)
+> +void ct_cpu_track_user(int cpu)
+>  {
+> -	static __initdata bool initialized = false;
+> +	static bool initialized;
+>  
+>  	if (cpu == CONTEXT_TRACKING_FORCE_ENABLE) {
+>  		static_branch_inc(&context_tracking_key);
+> @@ -700,6 +700,15 @@ void __init ct_cpu_track_user(int cpu)
+>  	initialized = true;
+>  }
+>  
+> +void ct_cpu_untrack_user(int cpu)
+> +{
+> +	if (!per_cpu(context_tracking.active, cpu))
+> +		return;
+> +
+> +	per_cpu(context_tracking.active, cpu) = false;
+> +	static_branch_dec(&context_tracking_key);
+> +}
+> +
+
+Why is this in a patch which makes tick/nohz related changes? This is a
+preparatory change, so make it that way and do not bury it inside
+something else.
+
+> +/* Get the new set of run-time nohz CPU list & update accordingly */
+> +void tick_nohz_full_update_cpus(struct cpumask *cpumask)
+> +{
+> +	int cpu;
+> +
+> +	if (!tick_nohz_full_running) {
+> +		pr_warn_once("Full dynticks cannot be enabled without the nohz_full kernel boot parameter!\n");
+
+That's the result of this enforced enable hackery. Make this work
+properly.
+
+> +		return;
+> +	}
+> +
+> +	/*
+> +	 * To properly enable/disable nohz_full dynticks for the affected CPUs,
+> +	 * the new nohz_full CPUs have to be copied to tick_nohz_full_mask and
+> +	 * ct_cpu_track_user/ct_cpu_untrack_user() will have to be called
+> +	 * for those CPUs that have their states changed. Those CPUs should be
+> +	 * in an offline state.
+> +	 */
+> +	for_each_cpu_andnot(cpu, cpumask, tick_nohz_full_mask) {
+> +		WARN_ON_ONCE(cpu_online(cpu));
+> +		ct_cpu_track_user(cpu);
+> +		cpumask_set_cpu(cpu, tick_nohz_full_mask);
+> +	}
+> +
+> +	for_each_cpu_andnot(cpu, tick_nohz_full_mask, cpumask) {
+> +		WARN_ON_ONCE(cpu_online(cpu));
+> +		ct_cpu_untrack_user(cpu);
+> +		cpumask_clear_cpu(cpu, tick_nohz_full_mask);
+> +	}
+> +}
+
+So this writes to tick_nohz_full_mask while other CPUs can access
+it. That's just wrong and I'm not at all interested in the resulting
+KCSAN warnings.
+
+tick_nohz_full_mask needs to become a RCU protected pointer, which is
+updated once the new mask is established in a separately allocated one.
+
+Thanks,
+
+        tglx
+
 
 
