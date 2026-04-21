@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-280013-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280014-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mNMvKIoR52nL3QEAu9opvQ
-	(envelope-from <netdev+bounces-280013-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 07:56:26 +0200
+	id qB90LTUT52nL3QEAu9opvQ
+	(envelope-from <netdev+bounces-280014-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 08:03:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1924D4369F0
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 07:56:26 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F24D436AD9
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 08:03:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1EC3D30242AE
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 05:56:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1602230071FD
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 06:03:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E66FB346AE5;
-	Tue, 21 Apr 2026 05:56:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 981F02EC09F;
+	Tue, 21 Apr 2026 06:03:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iconn-networks.com header.i=@iconn-networks.com header.b="Vn42iAD6"
+	dkim=pass (2048-bit key) header.d=iconn-networks.com header.i=@iconn-networks.com header.b="YTJmjith"
 X-Original-To: netdev@vger.kernel.org
 Received: from zebra.wilibox.com (zebra.wilibox.com [62.77.155.212])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C713E33D4E9;
-	Tue, 21 Apr 2026 05:55:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A7BC36494E;
+	Tue, 21 Apr 2026 06:03:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.77.155.212
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776750964; cv=none; b=ZKtMr12+6YXD3ipD/wHmLdUrw0Sx592eKZA28c0RvMnSYTGCKCqSqAebn38ZlqRmwAiIe2uad1ldfqfe0SBg2ytq/wbAIvNe98E6xv1LdnjOSzaPwiWviSe5C2wrj1AnF4qEql1n1KNeDYHSjz0zVIBHRKD2TRFtFEOBpeh1JRk=
+	t=1776751402; cv=none; b=gSYA1xRa0z/cuH6VKxzdgF+H8+iLg77/+M0PwQJc1W6gf341ygHVODQisaFpzc6KWQ6AddJ/uW+rg5wCrO2tycW9ro45VUuDKj2iWOwlSNVIS+RxKYI+zEe4pAQhR1AAmKABMBHd6LigSFYOcWlu+vXWP22bM/8ZuasiZ46dlu0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776750964; c=relaxed/simple;
-	bh=DcMclXg/Po0bXxvxcx4NlEqE/X230tARdMyuBLJjepI=;
+	s=arc-20240116; t=1776751402; c=relaxed/simple;
+	bh=gVNAooXJn2cF1Lp4ZO2Hs8TK+q2/y7vfVYsjL9J7rAM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jnldKRLY62EMBfHsM1xKe+LktcWs1Vo6vkSOyyn5YfdQuU3dDHBVEHkBTAfwd8Wf7fEg0U/ispUWADDmY2abqn5wgMh397K37RlywAYmhZDemdZQX1Z1iTt1rNpwfLm3hGYeTmAkkcqic2IXZoDK4G3UoBnosHAm1N4+inPZjpM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=iconn-networks.com; spf=pass smtp.mailfrom=iconn-networks.com; dkim=pass (2048-bit key) header.d=iconn-networks.com header.i=@iconn-networks.com header.b=Vn42iAD6; arc=none smtp.client-ip=62.77.155.212
+	 MIME-Version; b=apA7/hndUFyNzFUqFZ0InXsNaaAfDfMYQ7rHjVx+Sm1+AmTGVbOBmsRHmoN3Ndww16vDLKUMAYGH5aPDm4qGbNFzNaxgIa3/5eLBMFlmzi9RKwvHPvNeT2ZtYco+Q59PFTYhHo7OgTBD4069yCkOF884kCWqB8Y+pSsG1qxbfWQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=iconn-networks.com; spf=pass smtp.mailfrom=iconn-networks.com; dkim=pass (2048-bit key) header.d=iconn-networks.com header.i=@iconn-networks.com header.b=YTJmjith; arc=none smtp.client-ip=62.77.155.212
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=iconn-networks.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iconn-networks.com
 Received: from debian (unknown [81.7.79.211])
 	(Authenticated sender: ernestas.k@iconn-networks.com)
-	by zebra.wilibox.com (Postfix) with ESMTPSA id 328A7173597;
-	Tue, 21 Apr 2026 08:55:57 +0300 (EEST)
+	by zebra.wilibox.com (Postfix) with ESMTPSA id DF4EC173597;
+	Tue, 21 Apr 2026 09:03:17 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iconn-networks.com;
-	s=default; t=1776750957;
+	s=default; t=1776751398;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=77IJCLq8xtJEoLm2lUrB3oOs79h7WrubaDkPMokJfYs=;
-	b=Vn42iAD6xZ8F2QYqNE1kArMwTBxltN/Hanh+nAESc6i9kFoCjhH/YJlpYOLCYLWutcXXmg
-	iA0llbEqmuXniqCnYGkuDBgjK/npztT2v+AZ5ReOv8EU2NAOClywuYLvajfookgLNnjUJt
-	6sEqixUSYmvJ3pXv0wQ9tMYPxKusFfzCojQSnU91MYr/X87k+RCEQuHG/FX6IAVHQRXyQZ
-	3tlDIvNu2zk45yX8LEMgvGe+/sPWd4a51in8d126Dl6nX9YXRTwVAYw3W0LEekMFSejS8j
-	hfcbLwporiULNG4R9c9FdWYndm4XO4Vb+GCEsHq1bmTwOfK5MWRemQojgYHAjw==
+	bh=Wy9VBV8uKUj+D/x01yp2NU2bmgr2nNIegyZiDa6sDro=;
+	b=YTJmjithhzGhq+bQ2UJVD25EFB37608mDO2ik/OMt0WsiYWw8+E14yjC1gnF9SJ4l7aXah
+	L7q80KSzZr+WuH663Ts4N6L0jqau6ewvOgsiE7f8oVtXben/U0gkGoXaGvOOj48h+aGbPp
+	3PPr7/I2BFOoK0n9AXyBelbTb7vhYV6BEUCtAPoTScdT8W+2lLo21Xl4ESloj1CCPD7zB6
+	4L5N+dxFrcuMYrWhjm9+c3YRGvQp4sNHLPS+g5bq7ozz0Hiynxss679LNs/n+/5gn9qtzd
+	31eaXW97A1HMb4oVHF/DMruUnJl/NWuJ6n3CCO4K57M15MIvfiuxPr/VZpSmyQ==
 Authentication-Results: zebra.wilibox.com;
 	auth=pass smtp.auth=ernestas.k@iconn-networks.com smtp.mailfrom=ernestas.k@iconn-networks.com
 From: Ernestas Kulik <ernestas.k@iconn-networks.com>
@@ -57,9 +57,9 @@ To: netdev@vger.kernel.org
 Cc: kuba@kernel.org,
 	linux-kernel@vger.kernel.org,
 	Ernestas Kulik <ernestas.k@iconn-networks.com>
-Subject: [PATCH v2] llc: Return -EINPROGRESS from llc_ui_connect()
-Date: Tue, 21 Apr 2026 08:54:58 +0300
-Message-ID: <20260421055458.263071-1-ernestas.k@iconn-networks.com>
+Subject: [PATCH v3] llc: Return -EINPROGRESS from llc_ui_connect()
+Date: Tue, 21 Apr 2026 09:02:26 +0300
+Message-ID: <20260421060304.285419-1-ernestas.k@iconn-networks.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260415063457.1008868-1-ernestas.k@iconn-networks.com>
 References: <20260415063457.1008868-1-ernestas.k@iconn-networks.com>
@@ -76,14 +76,14 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[iconn-networks.com,quarantine];
 	R_DKIM_ALLOW(-0.20)[iconn-networks.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCPT_COUNT_THREE(0.00)[4];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280013-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-280014-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -94,9 +94,9 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 1924D4369F0
+X-Rspamd-Queue-Id: 0F24D436AD9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
@@ -108,10 +108,16 @@ More specifically, the issue was discovered in libcoap, where
 newly-added AF_LLC socket support was behaving differently from AF_INET
 connections due to EINPROGRESS handling being skipped.
 
-Set rc to -EINPROGRESS before considering blocking, akin to AF_INET
+Set rc to -EINPROGRESS if connect() would not block, akin to AF_INET
 sockets.
 
 Signed-off-by: Ernestas Kulik <ernestas.k@iconn-networks.com>
+---
+v2:
+- Add note about discovering the issue
+- Make rc assignment conditional
+v3:
+- Fix commit message after v2 changes
 ---
  net/llc/af_llc.c | 4 +++-
  1 file changed, 3 insertions(+), 1 deletion(-)
