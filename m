@@ -1,222 +1,153 @@
-Return-Path: <netdev+bounces-280042-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280043-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gFdFGog452no5QEAu9opvQ
-	(envelope-from <netdev+bounces-280042-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 10:42:48 +0200
+	id aLuNNWU552no5QEAu9opvQ
+	(envelope-from <netdev+bounces-280043-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 10:46:29 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE73F4384F7
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 10:42:47 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5822243855A
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 10:46:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1318C300A4E9
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 08:42:06 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 47F42302FA35
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 08:45:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED5AA39E6E4;
-	Tue, 21 Apr 2026 08:42:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5ADF39FCAB;
+	Tue, 21 Apr 2026 08:45:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WUAmSEIM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kHj0wQQ9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 690733876D5
-	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 08:42:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A36D39FCA6
+	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 08:45:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776760922; cv=none; b=CukPijasKnbZRuDnwIr9z7bX20Ezvdzd4Dnf13Ldk66IjJqYqUwsLk0u7Ym+K8tpPOJYcLMeaMcKDSjor83L8P7uztEMsNjlpR7SH0GddYMGrfajBAPpXmmn1ambTjJDg6TcKVGjWfNLSiBACXF3baqQw/4Hzr+3cNY4/NIINys=
+	t=1776761118; cv=none; b=fniEAS9lqe6WQhZqrb7nbqk4jb9l8o2k/TRdCTxJL6z2GuBQNdvuEabg0sLWgqR7DFkweKOiXp5RitcEpK9M5eHM5KgyqCEmfqNqEwcA+M4uZ8aJrQQSKi1NNO+P+4n5+9VhTIfUr8PdRgqwkLZs1CebjRa9wQqRJVo3OL/85Cs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776760922; c=relaxed/simple;
-	bh=jZ5lz8/uZRKsTXv/mUPmQRlRmDWApz84x/Zjh1FsXio=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qx0jFkyoqZdIooeYoxldSmG8T/eEuW9b5ZHGFUvmHruUgHNIJMK4sSXpXt4W7Hje5pOkXiDzhq1CS3cxJsQT3QNpC9jniYaExq8BQvZeqAxydsczOdtlchdlAOfuMxSDRgMqReTWkQH0QDLKQCiLIrKT56q0KswoJmUPThSM8Bk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WUAmSEIM; arc=none smtp.client-ip=209.85.128.47
+	s=arc-20240116; t=1776761118; c=relaxed/simple;
+	bh=jY2oAnibC/hnxXMwRfhye0JZWn0j5hS9eu/mxZ4RZxQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OImbtMz6N9GmEGOfSa6U4/rjtQ8utKBRVvWX2PtvAZHFLBJ2Klde4lJ9XJPS55oGm2d99F3+gFaZ3e20myQ7Izm0FrVeYPqPKMNaigTfob9W5w9e9gTeqBG5RcCqjLkoxCMaH/p42YW/jxt+lPGS5UiFyLZRVWP77YHDO3v51Es=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kHj0wQQ9; arc=none smtp.client-ip=209.85.128.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4891d7164ddso11968205e9.3
-        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 01:42:01 -0700 (PDT)
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-48984d29fe3so22649575e9.0
+        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 01:45:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776760920; x=1777365720; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UBMY1466HCKMAYG0Hg/+wwmeaNUqKqMxSIOQdf9oTsE=;
-        b=WUAmSEIMnHHf+XiS90mxtYEvSVn7Tuo28VFojt2yugqIZrnwi7Sl2Rxx+sAFSq9IoP
-         PyhfrCvmwP+M9Yn4u0AR6UYsxXvx4aHWQAHDV4crqz/K1ELei7L0UjGQYRS5wRBArDhn
-         Wsm+W6U+5Eo3h3PXVaNp1YUA1A05LPYZO4frTEfD1Mdi6ZZMeiPdTzeQCYS+HjvuY4UL
-         pgXcFUx/bkLimscyq4bMJLC0yWfsnmlMQgbknHWbpD2NjbaRmjdScZOTACBbZc00yari
-         r9SPXYB24zSypGbJlqhvcIEpp+lW841w0MtxFQCIz/1IKoqzuKDLMxBe+BlpZMVpWBM+
-         NX0w==
+        d=gmail.com; s=20251104; t=1776761116; x=1777365916; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=rsev4JhWJNqcO+Dsxr7am7zy6PUf5mFhTqsSumq1mwM=;
+        b=kHj0wQQ9QyersBZlIaq/w8u8lnKPT2W3adEvZAmT6dfish6cWTXTVIKoSLtRxxpRvI
+         6+br3FXZCCRNEtDax9c4q94vvKhr3g0wwFu3qnDFaccjR9Y5RcpLrGnrEAW6hjAcoxaU
+         heyeHETgTQYd7lNZRYKQrXysK7WXkQMNF2CaPVKf5+r8Q0d/+vPTwYPY5FImbrvWbri8
+         3SDAO5ZRsDzNH41+VFBn0NQ9F2/9ufnQxCQ5OI85xbUAlSthcKAFezrqF3KV5X1St277
+         u2ktIVzfzRcGNOi0AZx3DNu+X3+rRBfVbCZIBwI44IMVwIiIBWH1dnnNU8cwk3+iq/T6
+         JlnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776760920; x=1777365720;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=UBMY1466HCKMAYG0Hg/+wwmeaNUqKqMxSIOQdf9oTsE=;
-        b=gQuAhSx57cE8t/Fui7+rAT97aSw93bBESVET2LtwYYjFgshd8G4kqKk2iSthk7bI59
-         YKBwg4/rMkPnXkJf+dTC6UgXdaXD1BXVeLfAsJPmUv8CGMmv6l0dCBIc7b99NFyC+owA
-         OHOhWLO3pXORiyTsupykmYHXgmZOjx1q56qXAWuqVka9CnzS8THQbUFUVyG8dlYxkyqZ
-         Ia+wGWko4qrEWC4Bd0pPtOWC7mzdbrpl9Kg3Gc14NCWdkHbNXmEqCqPM2C9d+DLD4Os3
-         3cOgPPGDWBBtZkQjdRXvPV7HYaDVaB5Z8QcuZtdCIYHqBRX0GUzr6sx7gZiRahtC0/e6
-         L9OQ==
-X-Gm-Message-State: AOJu0YyqOj08BDIyH6wm4nccz7GASPCZPO1seP4Z4aQ3oVCh3cGxMOU+
-	HzLZDhlY6gbsbxN29AST/kfz4dqDRN5Y83kf/9sxPPhRmqRin5qPNMw5
-X-Gm-Gg: AeBDievSwzvzyrjZaku0lQn/UlR+YRoanKqBr6rkPxHrFeZi9MW0tKrgcJ+moIYRpDJ
-	5okrkBNQ/2fLWExalKp2/PnIxvwKiBvJaqPwKM8gEms3217OMRqHAP6CBopuwTWowAGYMPewY03
-	ufdpjVH0aw4wjfU0/jiYJvHm3NY16lXWh5WkDB5nMTejq5HUtgU1T6fRX2xwQTjaVBHzZdfCUl5
-	+AnY8mETMsMwpSZAJP4MoIXS9KgESP6Qe8BapjXE/Yrg4fHyTxFT+B4J/KtIoXKPCdV1NFYG1L2
-	IjVJJE0bt/RpCBvKNkjmpcjPrTX5OQqNqbkhCTvAGhIn8sOlu43kyotF1UvxsSaGNn0Uop8sw6Q
-	9QdTvQWeyThp+qrmCBqF8W8YydP9F6+cRah4IwYnRoB0vvaygL5WKguNnNEIt/ok/MCGszsCBts
-	aKds2PNXB8QZGCwGxakza1L2SfclRaoPtR8kPMGV2W2UKzAnRvIRC0edKASF/DCbgw3t6u3cNFO
-	d4=
-X-Received: by 2002:a05:600c:c0c8:b0:471:700:f281 with SMTP id 5b1f17b1804b1-488fb78b8c5mr189038665e9.25.1776760919528;
-        Tue, 21 Apr 2026 01:41:59 -0700 (PDT)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488fc0f8188sm372071945e9.2.2026.04.21.01.41.58
+        d=1e100.net; s=20251104; t=1776761116; x=1777365916;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rsev4JhWJNqcO+Dsxr7am7zy6PUf5mFhTqsSumq1mwM=;
+        b=HmCT7Ze0qVu4BkgB+PCdz7etPiLB0s0VtEpBwNnUoFHro/tL5R8WBik79av2E8h0DG
+         gkN3Z2As0uOur/Z+N4Z9NT/h81j4gzeHyTQqE04JGhHEIub0w1DctnNG1PmhLch/9bdV
+         gxx3i05nLp8+rbZR6jTm3srD0MIgiGdlNc4AhMa2LdOcvWPhtHZXg2FFrXx2WQ2T85Z/
+         jFjpnq9MZZ63e5C2As5YW/NRf8pL1gTdpzcwyd0ULnoobX40xE4dLFuguGz+0rCQrvjS
+         xPsC33zkZF/nhpXp98B7LSwT38sh6ZWzOi0+UO1cN6inrNW3TOYULzBqcIsvm9qjfGD/
+         rENw==
+X-Forwarded-Encrypted: i=1; AFNElJ+WPdHJ4z/IXdIuPa1QW2ePGBHWbjdzBCtUVNqfRNfXPCOn/f4smwhWdLBcVlG81Gf8Ty7085E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YweTMLfGCreKeF54rUPhLJCDEP8/WNSR9Mm8YkLPUa+t4+iXdAO
+	KrvdGygYS+02J7/oisJlxnPaIV/jGvUTpxbgR8Yhk4TZnJEVRAk64ekf
+X-Gm-Gg: AeBDies8o6nga2gvb8UEeE/qnSQ5SUyBOX3DPh3PiSP9Rryb053NyXC4HJ8QNoL/jHI
+	nldFBdAuFw8ZbupVLVORgyOkW4bB8swdlzO5yx1K3IrxR5l4dZ3Sis1MYoBup0R4o9gMzLMeQio
+	pV4zO1l/cFujjNYTyMgoNsTt1E+cCvfsUKXjbgn5QwaxEAnMA5LOxCg0oYI0D0g7WvLhS6U92Xr
+	eiv0PGIV5feEd/3DF0GXRclts2jql9okhY6qw2x8W06uCEKnKYpNYUaM2FRqXW9D/nrBRx1GCR4
+	H2PZ58+wapVr1ie0yb/5HxIPUkdNonKsVoFH2CcGi/mPHH/yCvQnyZ+L2Jvb7EzEqUe/jQliJWn
+	4gqIkmo02ZS0kJ1R4h4vQnSHDnWJDJlDN66zTCWxEGdZioY61ZNd7KmLrR45HVPkWufm/GScvh7
+	xuZRuXII7iFrH8qpI78I7DrpZPlR6HD8E1IsurnSxyz/I0JkpNcD6MvvFd4j8mpqJeFGJyzoeuZ
+	oXeJcXRZfBzu2H13diJ
+X-Received: by 2002:a05:600c:5295:b0:485:30d4:6b9e with SMTP id 5b1f17b1804b1-488fb77facemr250012955e9.21.1776761115626;
+        Tue, 21 Apr 2026 01:45:15 -0700 (PDT)
+Received: from 127.net ([2620:10d:c092:600::1:e3a7])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4891df9e50asm114549945e9.0.2026.04.21.01.45.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Apr 2026 01:41:59 -0700 (PDT)
-Date: Tue, 21 Apr 2026 09:41:56 +0100
-From: David Laight <david.laight.linux@gmail.com>
-To: Ashutosh Desai <ashutoshdesai993@gmail.com>
-Cc: netdev@vger.kernel.org, linux-hams@vger.kernel.org, jreuter@yaina.de,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org
-Subject: Re: [PATCH v5 net] ax25: fix OOB read after address header strip in
- ax25_rcv()
-Message-ID: <20260421094156.0fb3499a@pumpkin>
-In-Reply-To: <20260421054626.732399-1-ashutoshdesai993@gmail.com>
-References: <20260417065407.206499-1-ashutoshdesai993@gmail.com>
-	<20260421054626.732399-1-ashutoshdesai993@gmail.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+        Tue, 21 Apr 2026 01:45:15 -0700 (PDT)
+From: Pavel Begunkov <asml.silence@gmail.com>
+To: io-uring@vger.kernel.org
+Cc: asml.silence@gmail.com,
+	axboe@kernel.dk,
+	netdev@vger.kernel.org
+Subject: [PATCH 1/1] io_uring/zcrx: warn on freelist violations
+Date: Tue, 21 Apr 2026 09:45:29 +0100
+Message-ID: <2f3cea363b04649755e3b6bb9ab66485a95936d5.1776760901.git.asml.silence@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-280042-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-280043-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	FREEMAIL_CC(0.00)[gmail.com,kernel.dk,vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com]
-X-Rspamd-Queue-Id: DE73F4384F7
+	FREEMAIL_FROM(0.00)[gmail.com];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[asmlsilence@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_NONE(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,snailsploit.com:email]
+X-Rspamd-Queue-Id: 5822243855A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, 21 Apr 2026 05:46:26 +0000
-Ashutosh Desai <ashutoshdesai993@gmail.com> wrote:
+The freelist is appropriately sized to always be able to take a free
+niov, but let's be more defensive and check the invariant with a
+warning. That should help to catch any double-free issues.
 
-> A crafted AX.25 frame with a valid address header but no control byte
-> causes skb->len to reach zero after skb_pull() strips the header.
-> The subsequent reads of skb->data[0] (control) and skb->data[1] (PID)
-> are then out of bounds.
-> 
-> Linearize the skb after confirming the device is an AX.25 interface.
-> Guard with skb->len < 1 after the pull - one byte suffices for LAPB
-> control frames which have no PID byte. Add a separate skb->len < 2
-> check inside the UI branch before accessing the PID byte.
-> 
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Ashutosh Desai <ashutoshdesai993@gmail.com>
-> ---
-> v5:
-> - Move skb_linearize() to after ax25_dev_ax25dev() check; avoids
->   unnecessary allocation for frames on non-AX.25 interfaces
+Suggested-by: Kai Aizen <kai@snailsploit.com>
+Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+---
+ io_uring/zcrx.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Nitpick: 'on interfaces where AX.25 isn't enabled'
-They still have to be AX.25 frames and get discarded.
-So they won't really be expected and any allocated memory is
-immediately freed.
-More relevant would be linearizing before the ax25_addr_parse() call.
-In any case I suspect this code never sees non-linear packets.
-The packets will all be short, I don't know ax25, but X.25 (which I've
-implemented most of in the past) originally had an mtu of 128 bytes
-(and real links running at 2400 baud).
-
-	David
-
-
-> - Lower general guard from skb->len < 2 to skb->len < 1; the stricter
->   limit incorrectly dropped valid 1-byte LAPB control frames (SABM,
->   DISC, UA, DM, RR) which carry no PID byte
-> - Add explicit skb->len < 2 check inside UI branch before the PID
->   byte (skb->data[1]) access
-> v4:
-> - Linearize skb at entry to ax25_rcv(); replace pskb_may_pull() with
->   skb->len < 2 check (per David Laight review)
-> v3:
-> - Remove incorrect Suggested-by; add Fixes:, Cc: stable@
-> v2:
-> - Replace skb->len check with pskb_may_pull(skb, 2)
-> 
-> Link to v4: https://lore.kernel.org/netdev/20260417065407.206499-1-ashutoshdesai993@gmail.com/
-> Link to v3: https://lore.kernel.org/netdev/20260415063654.3831353-1-ashutoshdesai993@gmail.com/
-> Link to v2: https://lore.kernel.org/netdev/20260409152400.2219716-1-ashutoshdesai993@gmail.com/
-> Link to v1: https://lore.kernel.org/netdev/20260409012235.2049389-1-ashutoshdesai993@gmail.com/
-> 
->  net/ax25/ax25_in.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
-> 
-> diff --git a/net/ax25/ax25_in.c b/net/ax25/ax25_in.c
-> index d75b3e9ed93d..c81d6830af48 100644
-> --- a/net/ax25/ax25_in.c
-> +++ b/net/ax25/ax25_in.c
-> @@ -199,6 +199,9 @@ static int ax25_rcv(struct sk_buff *skb, struct net_device *dev,
->  	if ((ax25_dev = ax25_dev_ax25dev(dev)) == NULL)
->  		goto free;
->  
-> +	if (skb_linearize(skb))
-> +		goto free;
-> +
->  	/*
->  	 *	Parse the address header.
->  	 */
-> @@ -217,6 +220,9 @@ static int ax25_rcv(struct sk_buff *skb, struct net_device *dev,
->  	 */
->  	skb_pull(skb, ax25_addr_size(&dp));
->  
-> +	if (skb->len < 1)
-> +		goto free;
-> +
->  	/* For our port addresses ? */
->  	if (ax25cmp(&dest, dev_addr) == 0 && dp.lastrepeat + 1 == dp.ndigi)
->  		mine = 1;
-> @@ -227,6 +233,9 @@ static int ax25_rcv(struct sk_buff *skb, struct net_device *dev,
->  
->  	/* UI frame - bypass LAPB processing */
->  	if ((*skb->data & ~0x10) == AX25_UI && dp.lastrepeat + 1 == dp.ndigi) {
-> +		if (skb->len < 2)
-> +			goto free;
-> +
->  		skb_set_transport_header(skb, 2); /* skip control and pid */
->  
->  		ax25_send_to_raw(&dest, skb, skb->data[1]);
+diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
+index 2eb09219f0a0..7b93c87b8371 100644
+--- a/io_uring/zcrx.c
++++ b/io_uring/zcrx.c
+@@ -602,6 +602,8 @@ static void io_zcrx_return_niov_freelist(struct net_iov *niov)
+ 	struct io_zcrx_area *area = io_zcrx_iov_to_area(niov);
+ 
+ 	guard(spinlock_bh)(&area->freelist_lock);
++	if (WARN_ON_ONCE(area->free_count >= area->nia.num_niovs))
++		return;
+ 	area->freelist[area->free_count++] = net_iov_idx(niov);
+ }
+ 
+-- 
+2.53.0
 
 
