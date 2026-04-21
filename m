@@ -1,62 +1,58 @@
-Return-Path: <netdev+bounces-280120-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280122-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yIRVNVd452lZ9QEAu9opvQ
-	(envelope-from <netdev+bounces-280120-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 15:15:03 +0200
+	id cGtLBgJ552nf9AEAu9opvQ
+	(envelope-from <netdev+bounces-280122-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 15:17:54 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42A6543B321
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 15:15:03 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CF2243B368
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 15:17:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B47A23065A6D
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 13:10:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2EB56300FC75
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 13:12:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE4303D666A;
-	Tue, 21 Apr 2026 13:10:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 759E63C457D;
+	Tue, 21 Apr 2026 13:12:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pFwja/1H"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="sAi8N5GE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB2B222A817;
-	Tue, 21 Apr 2026 13:10:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D062383C97;
+	Tue, 21 Apr 2026 13:12:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776777046; cv=none; b=jYkOIFnuezobcUgURc/QMea8sTXeLeUqE9CDb6nFuZao3UxTulkUdDXV7wwZdBLTLKcz7ue4tFpyaHWH86yQDAqRT39R5IDGSTEdK6BivVH4pkHyAiWScp0/z109k3G6Zy+2Lq8509CBOwfB3Fj3fy38iu8f4yfg5WPyzmaHlQc=
+	t=1776777121; cv=none; b=g+46tOoygg5qOIAFeFTKVsuTNMhoaylZGmkK0+b4zm3fNvSCEHmFyTaF1AHu0U+wyLOmDtr6S9eglMIwmo7H/kLsBh2Uab9TtYcj7NCrxLs8tfxSY5JclWFFyHIupq2ZLXtcmW1Av4O3tqofRmu1kHPBZFtPctnV9do+HMmfoQQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776777046; c=relaxed/simple;
-	bh=wdB6JNQz6DFu/XYSinyJ1DxwR8phdAf78gwLP/h2J5Q=;
+	s=arc-20240116; t=1776777121; c=relaxed/simple;
+	bh=fzJrMdhUtGZxURl37TdbFbELOczQ4Y6UZPEb8yZJLwQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VEgkEyQ+z3QB6fsx/cjrp7Z/PF1v1zHwBG0qQ2Zs6LSlpt/BoXQnxsJrzRt7oDEPYSawdwNzLXlyh82pC6QM4JUbgQnLnSCblWP7afwZnoiGYX5hOj+YOHRcSiL77N/l6UoZ9l9oWUf102SzPcoD4if33NocqsrL8dBmBUdv5EI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pFwja/1H; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9EE6C2BCB0;
-	Tue, 21 Apr 2026 13:10:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776777046;
-	bh=wdB6JNQz6DFu/XYSinyJ1DxwR8phdAf78gwLP/h2J5Q=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=KQHWI2qkYchK17kCcUDJZgO46gi7Ri60fKdgo4j3zsgujkFu5Xhb+vkRQupsABiTBlaDBAn5lZshCs0t1Ju9IIe7VT2HJAIrvaPQm5ER7CPK0H7gGM65CAkM1nugv0gZ6Vbq9kdrJjwP7D/Co++g4k4DAwFgN5QtCz1E7kZ7JLA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=sAi8N5GE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B4DAC2BCB0;
+	Tue, 21 Apr 2026 13:12:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1776777120;
+	bh=fzJrMdhUtGZxURl37TdbFbELOczQ4Y6UZPEb8yZJLwQ=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pFwja/1Hn9YXep3bvu5CxTuoPGrUsNOQVhM8ifYCIH4fNcpgI7GpmgNdDWE8hXnyi
-	 grSjVV/xCo5V0SMRUTI9f58JbY4ZM7beAQlVsDcYmujiynxzrbeFos/X+8qi4SHaDp
-	 GrTNjrcYUvhPVBoricD9tmg1rz2qg4m74eiyLsfb7mGqIkzYDUVY87YZGTN6Df3n7X
-	 fcmFa9DqOXHUuDAdsZ78don4SZYsJykLiSA2omD+OSRKvhCtJ74eBJkgdwoAoJiRjE
-	 us5jQkPhllz51LCFMiP5nUYyutvTvDsK+oXf3x1Ohzmw5pJb8MXyE2rmNnc/0gkjSN
-	 B/chdLfO3Eb0g==
-Date: Tue, 21 Apr 2026 14:10:39 +0100
-From: Simon Horman <horms@kernel.org>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: netdev@vger.kernel.org, jiri@resnulli.us, jhs@mojatatu.com,
-	"David S. Miller" <davem@davemloft.net>,
+	b=sAi8N5GEcL9kqMgEOAR/e7rMfpK23QxdJHs6CjGFQ6u06a7HXXibyC001vlwt/DQ8
+	 Y5H/ACQQlfd1RvJmfy/vfZhJrA5NrauZ/bDpNotqd49t3J1TfZBskADEHduFOCI1Dd
+	 bQnt9DrowuM1B7pyQEFVgg3zAa7PI6DVlNkpjxrU=
+Date: Tue, 21 Apr 2026 15:11:57 +0200
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Dave Taht <dave.taht@gmail.com>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net v8 4/6] net/sched: netem: validate slot configuration
-Message-ID: <20260421131039.GA651125@horms.kernel.org>
-References: <20260418032027.900913-1-stephen@networkplumber.org>
- <20260418032027.900913-5-stephen@networkplumber.org>
+	Simon Horman <horms@kernel.org>, stable <stable@kernel.org>
+Subject: Re: [PATCH net v2] ipv6: rpl: reserve mac_len headroom when
+ recompressed SRH grows
+Message-ID: <2026042142-vanquish-unhealthy-7a85@gregkh>
+References: <2026042158-sediment-elliptic-a954@gregkh>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,81 +61,110 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260418032027.900913-5-stephen@networkplumber.org>
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+In-Reply-To: <2026042158-sediment-elliptic-a954@gregkh>
+X-Spamd-Result: default: False [2.34 / 15.00];
+	MID_END_EQ_FROM_USER_PART(4.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linuxfoundation.org,none];
+	R_DKIM_ALLOW(-0.20)[linuxfoundation.org:s=korg];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,resnulli.us,mojatatu.com,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
-	TAGGED_FROM(0.00)[bounces-280120-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-280122-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DKIM_TRACE(0.00)[linuxfoundation.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	NEURAL_HAM(-0.00)[-0.998];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[gregkh@linuxfoundation.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[horms.kernel.org:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,networkplumber.org:email]
-X-Rspamd-Queue-Id: 42A6543B321
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[davemloft.net:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linuxfoundation.org:dkim,linuxfoundation.org:email]
+X-Rspamd-Queue-Id: 6CF2243B368
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Apr 17, 2026 at 08:19:42PM -0700, Stephen Hemminger wrote:
-> Reject slot configurations that have no defensible meaning:
+On Tue, Apr 21, 2026 at 02:32:59PM +0200, Greg Kroah-Hartman wrote:
+> ipv6_rpl_srh_rcv() decompresses an RFC 6554 Source Routing Header, swaps
+> the next segment into ipv6_hdr->daddr, recompresses, then pulls the old
+> header and pushes the new one plus the IPv6 header back.  The
+> recompressed header can be larger than the received one when the swap
+> reduces the common-prefix length the segments share with daddr (CmprI=0,
+> CmprE>0, seg[0][0] != daddr[0] gives the maximum +8 bytes).
 > 
->   - negative min_delay or max_delay
->   - min_delay greater than max_delay
->   - negative dist_delay or dist_jitter
->   - negative max_packets or max_bytes
+> pskb_expand_head() was gated on segments_left == 0, so on earlier
+> segments the push consumed unchecked headroom.  Once skb_push() leaves
+> fewer than skb->mac_len bytes in front of data,
+> skb_mac_header_rebuild()'s call to:
 > 
-> Negative or out-of-order delays underflow in get_slot_next(),
-> producing garbage intervals. Negative limits trip the per-slot
-> accounting (packets_left/bytes_left <= 0) on the first packet of
-> every slot, defeating the rate-limiting half of the slot feature.
+> 	skb_set_mac_header(skb, -skb->mac_len);
 > 
-> Note that dist_jitter has been silently coerced to its absolute
-> value by get_slot() since the feature was introduced; rejecting
-> negatives here converts that silent coercion into -EINVAL. The
-> abs() can be removed in a follow-up.
+> will store (data - head) - mac_len into the u16 mac_header field, which
+> wraps to ~65530, and the following memmove() writes mac_len bytes ~64KiB
+> past skb->head.
 > 
-> Fixes: 836af83b54e3 ("netem: support delivering packets in delayed time slots")
-> Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
+> A single AF_INET6/SOCK_RAW/IPV6_HDRINCL packet over lo with a two
+> segment type-3 SRH (CmprI=0, CmprE=15) reaches headroom 8 after one
+> pass; KASAN reports a 14-byte OOB write in ipv6_rthdr_rcv.
+> 
+> Fix this by expanding the head whenever the remaining room is less than
+> the push size plus mac_len, and request that much extra so the rebuilt
+> MAC header fits afterwards.
+> 
+> Fixes: 8610c7c6e3bd ("net: ipv6: add support for rpl sr exthdr")
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: David Ahern <dsahern@kernel.org>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: Simon Horman <horms@kernel.org>
+> Cc: stable <stable@kernel.org>
+> Reported-by: Anthropic
+> Assisted-by: gkh_clanker_t1000
+> Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> ---
+> v2: - fixed up if statement to actually work properly, and test it against
+>       a working poc (poc will be sent separately)
+>       Reworded the changelog and the subject to make more sense
+>       Link to v1: https://lore.kernel.org/r/2026042024-cabbie-gills-9371@gregkh
+> 
+>  net/ipv6/exthdrs.c | 13 +++++++------
+>  1 file changed, 7 insertions(+), 6 deletions(-)
+> 
+> diff --git a/net/ipv6/exthdrs.c b/net/ipv6/exthdrs.c
+> index 95558fd6f447..b86a638d51e4 100644
+> --- a/net/ipv6/exthdrs.c
+> +++ b/net/ipv6/exthdrs.c
+> @@ -491,6 +491,7 @@ static int ipv6_rpl_srh_rcv(struct sk_buff *skb)
+>  	struct net *net = dev_net(skb->dev);
+>  	struct inet6_dev *idev;
+>  	struct ipv6hdr *oldhdr;
+> +	unsigned int chdr_len;
+>  	unsigned char *buf;
+>  	int accept_rpl_seg;
+>  	int i, err;
+> @@ -590,11 +591,11 @@ static int ipv6_rpl_srh_rcv(struct sk_buff *skb)
+>  	oldhdr = ipv6_hdr(skb);
+>  
+>  	skb_pull(skb, ((hdr->hdrlen + 1) << 3));
+> -	skb_postpull_rcsum(skb, oldhdr,
+> -			   sizeof(struct ipv6hdr) + ((hdr->hdrlen + 1) << 3));
+> -	if (unlikely(!hdr->segments_left)) {
+> -		if (pskb_expand_head(skb, sizeof(struct ipv6hdr) + ((chdr->hdrlen + 1) << 3), 0,
+> -				     GFP_ATOMIC)) {
+> +	chdr_len = sizeof(struct ipv6hdr) + ((chdr->hdrlen + 1) << 3);
+> +	skb_postpull_rcsum(skb, oldhdr, chdr_len);
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Crap, nope, this is wrong, let me go fix this...
 
-I acknowledge that Sashiko has provided feedback on this patch.
-
-1. "Does rejecting negative dist_jitter values with -EINVAL cause a
-    regression in userspace ABI backward compatibility?  Since the kernel
-    previously accepted these values and silently coerced them using abs(),
-    existing userspace tools or scripts that happen to pass negative values
-    might start failing to configure the qdisc."
-
-This is intended and explicitly explained in the cover letter.
-
-2. "Could directly dereferencing 64-bit fields from the netlink attribute
-    payload cause undefined behavior on strict-alignment architectures?
-    Netlink attribute payloads are typically only guaranteed to be 4-byte
-    aligned because NLA_ALIGNTO is 4, but the __s64 fields within
-    tc_netem_slot like min_delay require 8-byte natural alignment.
-    Performing an 8-byte read from a potentially 4-byte aligned address
-    might cause an alignment fault on certain architectures."
-
-This patch does not change the presence of this problem; and I suspect
-it is not a problem at all.
 
