@@ -1,262 +1,249 @@
-Return-Path: <netdev+bounces-280063-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280064-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iPXTHGBD52n55wEAu9opvQ
-	(envelope-from <netdev+bounces-280063-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 11:29:04 +0200
+	id yHuQIYdD52n55wEAu9opvQ
+	(envelope-from <netdev+bounces-280064-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 11:29:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8618438E00
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 11:29:03 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3330A438E2E
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 11:29:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 57D5430471C5
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 09:26:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C55C7300A747
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 09:27:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5DF73A5E69;
-	Tue, 21 Apr 2026 09:26:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7C383A5E77;
+	Tue, 21 Apr 2026 09:27:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="PfnMRIXP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KP0YHrJK"
 X-Original-To: netdev@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF8902FF164;
-	Tue, 21 Apr 2026 09:26:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E745E3A5E69
+	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 09:27:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776763592; cv=none; b=nhKKg/57/QnDQ85TTX0qEQCJehUbUMnJc6eJ+/f2v1s6NdlK1JVj/UgqYHoxpKPQFTjFKBulISGL1F/GXEX/dp+ezvOTi8HSzqYFBcey/fH+NN1sC+oJF57UQGvMWQElNcylKhlLeiSo87KcEfld3L/FEv7dpRSqV1akQmpttsw=
+	t=1776763670; cv=none; b=C7hjyvrsf6W7xAenNuzTXfePe/M3nkL7vpbRrAaierAXV13bDuvrSDHqO/clNVcrrusZORq2Xtl5F02hlaSGlwmCfKHAJVvoURTJdrf5Y7Q6weeBeZ+4N1XvOwT+3AUECGsicjcvlpHQDoNzjqEjlCxmESJOfy8ERBPqPEuUCbY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776763592; c=relaxed/simple;
-	bh=dEHW5WTZqnEu9VrGRG6mewT8xKEyQnbEjqpSGWGT+Lg=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=JrawIPAiNkx6VSzgj7V1Yb2WicWs7u5vS+gC1Z5LE5P14hHGSMljcdc4iGHcxVjNO4PrWQFyOyInPCY+pMXjzfucngh9KAu6w5sGq30TNXGQnspEMwxA1So9w84hzLZ3Vhn+CCvgp/9g3eGk07IT7UHdxkDc7rGLjJkEeEV9XYQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=PfnMRIXP; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=dEHW5WTZqnEu9VrGRG6mewT8xKEyQnbEjqpSGWGT+Lg=; b=PfnMRIXPrq8WBfZZ2q02SXrH7k
-	Cfksk1TP5dpa+OhYqIeM4jHILOHJOgemVZ4qqfHqIutWUXJ7VUQPmygqf6vn1jqRmfbpPpb9e/b4w
-	BsJJMC+p7RTFohMvKh3ibuspzbR2sdUkNjw/ukPUU81UzBBiBkG5Os58at1DCJKcbP6fO9IzyBSKo
-	LTBuFrXKEmMhJ3siVYW5LVgWv/rIdkms7vSW1JZAsLH8kLnez0VZcpmA8Avg56UYGpL+jz+48Usv1
-	BBgRD97vdnEHv0kTkqTCRKxZ8EQtNmvQwZ40xuZYoUZmSsyB7tcww3gMjxQFYHP0C6Cs/5EB/pF5r
-	ee78s4fQ==;
-Received: from [172.31.31.240] (helo=u09cd745991455d.ant.amazon.com)
-	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1wF7N5-00000009Ttx-1KPX;
-	Tue, 21 Apr 2026 09:26:19 +0000
-Message-ID: <c7506c225ce22a71c03abc2673823cf84bbb5b0d.camel@infradead.org>
-Subject: Re: [PATCH net-deletions] net: remove unused ATM protocols and
- legacy ATM device drivers
-From: David Woodhouse <dwmw2@infradead.org>
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com, 
- andrew+netdev@lunn.ch, horms@kernel.org, corbet@lwn.net,
- skhan@linuxfoundation.org,  linux@armlinux.org.uk,
- tsbogend@alpha.franken.de, maddy@linux.ibm.com,  mpe@ellerman.id.au,
- npiggin@gmail.com, chleroy@kernel.org, 3chas3@gmail.com, 
- razor@blackwall.org, idosch@nvidia.com, jani.nikula@intel.com, 
- mchehab+huawei@kernel.org, tytso@mit.edu, herbert@gondor.apana.org.au, 
- geert@linux-m68k.org, ebiggers@kernel.org, johannes.berg@intel.com, 
- jonathan.cameron@huawei.com, kees@kernel.org, kuniyu@google.com, 
- fourier.thomas@gmail.com, andriy.shevchenko@intel.com,
- rdunlap@infradead.org,  akpm@linux-foundation.org,
- linux-doc@vger.kernel.org, linux-mips@vger.kernel.org, 
- linuxppc-dev@lists.ozlabs.org, bridge@lists.linux.dev
-Date: Tue, 21 Apr 2026 10:26:18 +0100
-In-Reply-To: <20260421021943.1295109-1-kuba@kernel.org>
-References: <20260421021943.1295109-1-kuba@kernel.org>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-DKPxBsUzLBEX+ICp9dNB"
-User-Agent: Evolution 3.52.3-0ubuntu1.1 
+	s=arc-20240116; t=1776763670; c=relaxed/simple;
+	bh=NWVPQ/ix6la1A9YnRnDlxRH64UYZgVvj6dWNHNlWfm0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Zb7y+hc/bLlY20nEKSjxX9k6xxYnjkVVNyA4muVdwL6qjUazJ/Uf8mAi9R4RtBa8hdNffwPr2GkeDX/2ITbzVI8zuiyA4exz+8t/tBRDwFiKYl9sOT4cEU6Iq7+fQc5y9JFnlIZjmaOyBoo3tvfG8dn2+YWnwFtw6QFbNs+VghQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KP0YHrJK; arc=none smtp.client-ip=209.85.221.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-43cff5dafc3so3305900f8f.1
+        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 02:27:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776763667; x=1777368467; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2SK+aw4ngOkm9hF+ynW9KrB9F3h620ajY5HNLbxZ/XI=;
+        b=KP0YHrJKrICGVmlUQNpi+20Q7UPpVxplJOquT+Zqh5wyKP1DFRAT7kdVdPEmcAtOJU
+         brV2ROn1BQQz1KG0Et0nKatui0DkB9eOcKqCe0j55c/oDql4jqlcVe2INgsEj0oYNzsv
+         v4I5gJbI1rbqnzhgEyyCzaFL957VWDYW4GuiX9CSdJK+KYx8hbbz5XGalDkv4CZ0svzP
+         Us87q4HoGBFt6XaW9f+srHB+DxtWbVlIqdrWBMgH57xVDqxUZVkdyFAxN8W0e9FeM1pw
+         oUlSAwAmh3T6pilJgybq1eLs9wpLgcIqAn6PInRw+GpDo3f1p+g9kBingnGSBOlIcuB3
+         OEBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776763667; x=1777368467;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=2SK+aw4ngOkm9hF+ynW9KrB9F3h620ajY5HNLbxZ/XI=;
+        b=qFySUJWivM89nRhfY8J70FCYfm6OzVihnraIwMdr21+vf5aVgY+8ZJth4xf4uPA5gn
+         dgQVvwBkkQqbKHFz9u+l9EHcVrJnEQzmYBOneORwbXscF3Y/m134jQ23qtCyIb85ZRfP
+         CW6lfw4IZ+pP0XT1MEoekQxzdirO2PrJLNxbWusFOSTka6dcncHQgzlc+CcuX8ROrwCx
+         kRcYnjQGM4bvvKsl3GekYDFIkV+tns4ySs8FJ5mHAWzd7ljeMIPq1M9nn9e2gmcSQPKW
+         ZlaZbIIMgckb6BiQchqNAA3AayfkWc602iwxYl+oG9zZ/uGJeVzT8ilaB8JFiSf/xqGo
+         UQMg==
+X-Forwarded-Encrypted: i=1; AFNElJ/xQ1lHnTK8jj48XhMQ5pEusFuo4Y7LBiO1Ak3ABw9wqvYuczX9tgwU3icpUK8vQxH5qqw60qs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyG5f6lEgnFCMNvBxn+wOTlp9t46bK6mWStknCo1UuprCn9NS4n
+	V0vbr2Z2ia5JTbsPO4KA0O40ujTSFtPGJpcMuuJBnkiLzzUa6gIU+lmK
+X-Gm-Gg: AeBDietzNt+duWMqmlus4QJ3ibLV/qcE1NMSdy2i2E/Prk0wjfYnpVrQUTkVxZk17lG
+	qrejEBHg4KAijJ/CC4k/o5sU1tJ+stzvoyFlbUZeB4YZukqSoQ3LM5CVdv7695E6TQwxjM19qiC
+	UKPuLd22NT4kwLw0hx40ogXMQs3eY6hy/XpLr1p/QVW8TJ6mjg0vipil5wUYCgmI6U0q9CseRj6
+	QEcQ/EXntdMV1pxbRNwq0AFI00iAPPakpRK52pqKwES+mG1XDULL1askluNUzVn9wrequNEfeaB
+	BW2iZPR/tLnWMrXZfIz8UU2VxIEqgiEotZLCrCvBpondoBKd0DkvE/iKrLB4kyIRmobGQJ4ETWZ
+	KQjKCC++4bSH0RO8EON7c7gKygCBubbjO4cSlvcGR5UQj4MT9bO2k3B0VP/ngyPyCQtoCLZ9IDS
+	OkWmdu01EosNrazZhtLK+ahoaLhwpWlLM55+o2l4gMEZzKzt8e4qYPkapLlwJg2svwrwItw5+4n
+	c4xla63LR297A==
+X-Received: by 2002:a05:6000:1a89:b0:43d:7125:e79f with SMTP id ffacd0b85a97d-43fe3e25c89mr27107393f8f.47.1776763666796;
+        Tue, 21 Apr 2026 02:27:46 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43fe4cb1405sm35116597f8f.4.2026.04.21.02.27.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Apr 2026 02:27:46 -0700 (PDT)
+Date: Tue, 21 Apr 2026 10:27:44 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: Yury Norov <ynorov@nvidia.com>
+Cc: Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner
+ <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov
+ <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+ "H. Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>,
+ Jonathan Cameron <jic23@kernel.org>, David Lechner <dlechner@baylibre.com>,
+ Nuno =?UTF-8?B?U8Oh?= <nuno.sa@analog.com>, Andy Shevchenko
+ <andy@kernel.org>, Ping-Ke Shih <pkshih@realtek.com>, Richard Cochran
+ <richardcochran@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexandre
+ Belloni <alexandre.belloni@bootlin.com>, Yury Norov <yury.norov@gmail.com>,
+ Rasmus Villemoes <linux@rasmusvillemoes.dk>, Hans de Goede
+ <hansg@kernel.org>, Linus Walleij <linusw@kernel.org>, Sakari Ailus
+ <sakari.ailus@linux.intel.com>, Salah Triki <salah.triki@gmail.com>, Achim
+ Gratz <Achim.Gratz@stromeko.de>, Ben Collins <bcollins@watter.com>,
+ linux-kernel@vger.kernel.org, linux-iio@vger.kernel.org,
+ linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+ linux-rtc@vger.kernel.org
+Subject: Re: [PATCH 1/9] bitfield: add FIELD_GET_SIGNED()
+Message-ID: <20260421102744.6bd30e50@pumpkin>
+In-Reply-To: <aeZocbNjbvzMZO8b@yury>
+References: <20260417173621.368914-1-ynorov@nvidia.com>
+	<20260417173621.368914-2-ynorov@nvidia.com>
+	<20260420111940.GE3102624@noisy.programming.kicks-ass.net>
+	<aeZocbNjbvzMZO8b@yury>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
-X-Spamd-Result: default: False [-2.76 / 15.00];
-	SIGNED_SMIME(-2.00)[];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[infradead.org:s=desiato.20200630];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-280063-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[36];
+	TAGGED_FROM(0.00)[bounces-280064-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	HAS_ATTACHMENT(0.00)[];
-	DKIM_TRACE(0.00)[infradead.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dwmw2@infradead.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,lwn.net,linuxfoundation.org,armlinux.org.uk,alpha.franken.de,linux.ibm.com,ellerman.id.au,gmail.com,blackwall.org,nvidia.com,intel.com,mit.edu,gondor.apana.org.au,linux-m68k.org,huawei.com,infradead.org,linux-foundation.org,lists.ozlabs.org,lists.linux.dev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,huawei];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[34];
+	FREEMAIL_CC(0.00)[infradead.org,kernel.org,redhat.com,alien8.de,linux.intel.com,zytor.com,baylibre.com,analog.com,realtek.com,gmail.com,lunn.ch,davemloft.net,google.com,bootlin.com,rasmusvillemoes.dk,stromeko.de,watter.com,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,infradead.org:dkim,infradead.org:mid,traverse.com.au:url]
-X-Rspamd-Queue-Id: D8618438E00
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3330A438E2E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+On Mon, 20 Apr 2026 13:54:57 -0400
+Yury Norov <ynorov@nvidia.com> wrote:
 
---=-DKPxBsUzLBEX+ICp9dNB
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+> On Mon, Apr 20, 2026 at 01:19:40PM +0200, Peter Zijlstra wrote:
+> > On Fri, Apr 17, 2026 at 01:36:12PM -0400, Yury Norov wrote:  
+> > > The bitfields are designed in assumption that fields contain unsigned
+> > > integer values, thus extracting the values from the field implies
+> > > zero-extending.
+> > > 
+> > > Some drivers need to sign-extend their fields, and currently do it like:
+> > > 
+> > > 	dc_re += sign_extend32(FIELD_GET(0xfff000, tmp), 11);
+> > > 	dc_im += sign_extend32(FIELD_GET(0xfff, tmp), 11);
+> > > 
+> > > It's error-prone because it relies on user to provide the correct
+> > > index of the most significant bit and proper 32 vs 64 function flavor.
+> > > 
+> > > Thus, introduce a FIELD_GET_SIGNED() macro, which is the more
+> > > convenient and compiles (on x86_64) to just a couple instructions:
+> > > shl and sar.
+> > > 
+> > > Signed-off-by: Yury Norov <ynorov@nvidia.com>
+> > > ---
+> > >  include/linux/bitfield.h | 16 ++++++++++++++++
+> > >  1 file changed, 16 insertions(+)
+> > > 
+> > > diff --git a/include/linux/bitfield.h b/include/linux/bitfield.h
+> > > index 54aeeef1f0ec..35ef63972810 100644
+> > > --- a/include/linux/bitfield.h
+> > > +++ b/include/linux/bitfield.h
+> > > @@ -178,6 +178,22 @@
+> > >  		__FIELD_GET(_mask, _reg, "FIELD_GET: ");		\
+> > >  	})
+> > >  
+> > > +/**
+> > > + * FIELD_GET_SIGNED() - extract a signed bitfield element
+> > > + * @mask: shifted mask defining the field's length and position
+> > > + * @reg:  value of entire bitfield
+> > > + *
+> > > + * Returns the sign-extended field specified by @_mask from the
+> > > + * bitfield passed in as @_reg by masking and shifting it down.
+> > > + */
+> > > +#define FIELD_GET_SIGNED(mask, reg)					\
+> > > +	({								\
+> > > +		__BF_FIELD_CHECK(mask, reg, 0U, "FIELD_GET_SIGNED: ");	\
+> > > +		 ((__signed_scalar_typeof(mask))((long long)(reg) <<	\
+> > > +		 __builtin_clzll(mask) >> (__builtin_clzll(mask) +	\
+> > > +						__builtin_ctzll(mask))));\
+> > > +	})  
+> > 
+> > IIRC clz is count-leading-zeros and ctz is count-trailing-zeros. Most of
+> > the other FIELD things use __bf_shf() which is defined in terms of ffs -
+> > 1 (which is another way of writing ctz).
+> > 
+> > So how about you start by redefining __bf_shf() in ctz, and then add
+> > another helper for the clz and write the thing something like:
+> > 
+> > 	((long long)(reg) << __bf_clz(mask)) >> (__bf_clz(mask) + __bf_shf(mask));  
+> 
+> So...
+> 
+> I like the shorter form, but whatever we add in the bitfield.h - we'll
+> have to support it.
+> 
+> For example, __bf_shf() wasn't intended to be used outsize of the
+> header, thus double underscored. But there's over 100 external users
+> now. And to make it worse, it's broken for GCC 14 and earlier:
 
-On Mon, 2026-04-20 at 19:19 -0700, Jakub Kicinski wrote:
-> Remove the ATM protocol modules and PCI/SBUS ATM device drivers
-> that are no longer in active use.
->=20
-> The ATM core protocol stack, PPPoATM, and USB DSL modem drivers
-> (drivers/usb/atm/) are retained in-tree to maintain PPP over ATM
-> (PPPoA) support for DSL connections.
->=20
-> Removed ATM protocol modules:
-> =C2=A0- net/atm/clip.c - Classical IP over ATM (RFC 2225)
-> =C2=A0- net/atm/br2684.c - RFC 2684 bridged protocols
+For anyone who hasn't followed the gory details it isn't 'very broken'.
+Basically __builtin_ffsll() doesn't always generate an 'integer constant
+expression' from constant input so you can get a compile fail.
 
-I believe PPPoE over BR2684 is also used on ADSL lines.
+> https://lore.kernel.org/all/20260409-field-prep-fix-v1-1-f0e9ae64f63c@imgtec.com/
+> 
+> So needs to get fixed.
+> 
+> The bitfield.h has two __bf macros: __bf_shf() and __bf_cast_unsigned().
+> They are thin wrappers,
 
-https://git.kernel.org/torvalds/c/ae088d663bee strongly seems to imply
-that I used to use it myself, or at least was *able* to switch to it
-for testing (although I could have sworn I mostly used PPPoA).
+__bf_cast_unsigned() isn't exactly thin.
 
-> =C2=A0- net/atm/lec.c - LAN Emulation Client (LANE)
-> =C2=A0- net/atm/mpc.c, mpoa_caches.c, mpoa_proc.c - Multi-Protocol Over A=
-TM
->=20
-> Removed PCI/SBUS ATM device drivers (drivers/atm/):
-> =C2=A0- adummy, atmtcp - software/testing ATM devices
-> =C2=A0- eni - Efficient Networks ENI155P (OC-3, ~1995)
-> =C2=A0- fore200e - FORE Systems 200E PCI/SBUS (OC-3, ~1999)
-> =C2=A0- he - ForeRunner HE (OC-3/OC-12, ~2000)
-> =C2=A0- idt77105 - IDT 77105 25 Mbps ATM PHY
-> =C2=A0- idt77252 - IDT 77252 NICStAR II (OC-3, ~2000)
-> =C2=A0- iphase - Interphase ATM PCI (OC-3/DS3/E3)
-> =C2=A0- lanai - Efficient Networks Speedstream 3010
-> =C2=A0- nicstar - IDT 77201 NICStAR (155/25 Mbps, ~1999)
-> =C2=A0- solos-pci - Traverse Technologies ADSL2+ PCI (defunct vendor)
+	David
 
-Traverse still exists: https://traverse.com.au/
+> but after all do something with the corresponding
+> builtins output. The __bf_cls() would be a pure renaming. I'm OK with
+> that, but some people don't:
+> 
+> https://lore.kernel.org/all/20260303182845.250bb2de@kernel.org/
+> 
+> That's why I didn't make FIELD_GET_SIGNED() implementation looking nicer.
+> If you strongly prefer the shorter version, I can do that in v2.
+>  
+> > Also, since the order of the shifts is rather important, I think it
+> > makes sense to add this extra pair of (), even when not strictly needed,
+> > just to make it easier to read.  
+> 
+> Sure, will do.
+> 
 
-I suspect they don't have a huge amount of interest in the Solos any
-more, or the Geode-based SBC they sold with two of them on-board. But
-OpenWrt does still support them, and I even have one here (although no
-ADSL line to test it with). They were briefly popular as fully Linux-
-supported ADSL routers.
-
-
-
---=-DKPxBsUzLBEX+ICp9dNB
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
-ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
-AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
-BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
-MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
-a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
-jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
-GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
-aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
-nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
-8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
-HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
-IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
-KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
-BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
-QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
-QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
-ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
-/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
-uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
-xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
-W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
-c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
-VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
-NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
-DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
-sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
-w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
-i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
-kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
-0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
-ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
-blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
-hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
-VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
-HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
-ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
-AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
-cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
-cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
-AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
-aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
-hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
-iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
-8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
-JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
-xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
-EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
-B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
-MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
-KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
-Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
-nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
-WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
-W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
-nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
-g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
-9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
-9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
-sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
-a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
-ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
-AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
-dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
-MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
-YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
-4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
-6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
-QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
-nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
-MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
-VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
-ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI2MDQyMTA5MjYx
-OFowLwYJKoZIhvcNAQkEMSIEIAyaDmbMFrvX/bABjTcx7HdQyK9H9Lcq9Kz4WnkI4ZN4MGQGCSsG
-AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
-cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
-VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
-cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIAZIqBXFsj+kLR
-tTh7gunZeZ0sec4JQM3r2rQJ/qg2Y6WcYkLkmRoGDTdfIXqUntyglsIslexkuh9r75zenfWjuw8T
-TpBtxGAh671DS9/+StSquMtDLgV8XdUJeimjoC3M1+rKxAsuYtSWiFD42M57rXpOXgTrBAjQKgFD
-oVqRF1AybMfUkBSXdSn85cqCpUeD1bAxvIrHohQ60g51biZwphyFQDb7GKQBYoKWWxpfEA3LuR4c
-QG3Kue6IkxNe8JSKiRXnleGnlrGWMOBQle3hXCMY83a+t9wOjI8UIAuMe4fxkyHfWiKvsajCtvIw
-ohNzbG4q/vxt95b7vRat90kIOYBqySFW+BysZi4di8+Kdvri3rKKEvTW5sQlmpCiDyR1wdwPLRyW
-2ug/UR/PNgeqlJaa00B49BvAozTLJb22o265YVYJtFcBREvzK7e6W7Yq5E7Y3geG8BvKOIZ6oM9n
-YKZgv6wjzY+8skLYbets7ogMi1So3KtLMw/o8UbXjrvnsIV5M2q5+cJ9gfN6hUJ4Wvn5enXUJTH0
-QkUabFT43hslmGZswsXYNaLvGiZgFtlNUUX7BZ31fdh7vITSjezm0qnveF/3Qyw9eTCIJa2YRHo7
-xxKJkdA/NXIU/livPsk6GEMw8gQCUyht4qUbWaSyStFEwaggUTyBvj6O6e29CR8AAAAAAAA=
-
-
---=-DKPxBsUzLBEX+ICp9dNB--
 
