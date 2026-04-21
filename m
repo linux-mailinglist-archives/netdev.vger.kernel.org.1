@@ -1,313 +1,185 @@
-Return-Path: <netdev+bounces-280088-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280090-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GE+DFeBj52l07gEAu9opvQ
-	(envelope-from <netdev+bounces-280088-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 13:47:44 +0200
+	id sCNqHB5l52nx7gEAu9opvQ
+	(envelope-from <netdev+bounces-280090-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 13:53:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B820E43A348
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 13:47:43 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C60A043A4D0
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 13:53:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 358DF3030B2B
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 11:45:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 07A863006964
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 11:49:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 122FD3783C9;
-	Tue, 21 Apr 2026 11:45:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49DE7378822;
+	Tue, 21 Apr 2026 11:49:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="s1Bn6xbc"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="E0t9BphM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A86413B7A3
-	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 11:45:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6AB937FF49;
+	Tue, 21 Apr 2026 11:49:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776771931; cv=none; b=tENAqGDDINcClavvW/APcQk+0ImHgw3szU1vEdloQ8oFM80StaAW434lhkIioeP8pRDp/yi+NOIhKhA2wxFGOE3g/+D4NnyZ51bbPysS8PgyyuweDAZOiZXBHn7WVZnXoRwKhLjlja+yvKsedCBMr9be5sSQoNhhgtXHN073FO0=
+	t=1776772196; cv=none; b=j386PO8BIBHd74eXQ59zY/n9L62uSkyyvvUlC4bsNvrSza3KIY7bDrW/pHe2og1PkTbTYcK234D0Ge6suWoyLaU8c4nqKdEJf4GSd8Wr+wlJhvOC1xmk2jRLuUXZIXt1/G5e7j5qyHzt3yDLz96ykwd70uH91kbP/6B/iNp4Vy0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776771931; c=relaxed/simple;
-	bh=RNz5LmDyHPB4MHvSyJ0JgcjEODsNOXlh24JhzgEMuy8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type:
-	 References; b=SITOvlL2KjUlrYGJSuPFpDnMwyaFa+ZY1XP/LOb2C2sybh5tgaU4aPA9Q6tcAr8SxKm3RMGUghWPSDx501aD8QwAbnZx1zvqkQntFEmlgoU9xOb5oiBPUGhGjNJZjwM8V6h3JpU+z/R4S67c7KWasouFGd6fQR3fbleUSBRmq9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=s1Bn6xbc; arc=none smtp.client-ip=210.118.77.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20260421114527euoutp018d1111454f4a14bfb542502de9b71755~oXKdu_uwA0828908289euoutp01y
-	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 11:45:27 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20260421114527euoutp018d1111454f4a14bfb542502de9b71755~oXKdu_uwA0828908289euoutp01y
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1776771927;
-	bh=FSqmIXppWFqk/YElGJWo05VBfGafJTbE0JQ6hI/zBT0=;
-	h=From:To:Cc:Subject:Date:References:From;
-	b=s1Bn6xbcEXFRLdVa0/dzHCiZP9Dp9CKlY0tTfrACNj46yevQbBXRQiYgGlCwwalOj
-	 x3XjBEX12Jr6SgiGvcIUnOC6CyS0CzdklimSu9o9CidFdY56oe3XtuGhho1H5E9hdz
-	 0z5mB6FP52BYkcUSIuE/n/PewGml6SBnXWpLCQO8=
-Received: from eusmtip2.samsung.com (unknown [203.254.199.222]) by
-	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-	20260421114526eucas1p29a73b6c60123beb164975e931347f1a4~oXKdNCXqN1096110961eucas1p2B;
-	Tue, 21 Apr 2026 11:45:26 +0000 (GMT)
-Received: from AMDC4843.eu.corp.samsungelectronics.net (unknown
-	[106.120.77.61]) by eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20260421114526eusmtip2b6f946da4f0a3872649321dd09e2d436~oXKc2R3ST2309923099eusmtip2M;
-	Tue, 21 Apr 2026 11:45:26 +0000 (GMT)
-From: Jakub Raczynski <j.raczynski@samsung.com>
-To: netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, kuba@kernel.org, davem@davemloft.net,
-	andrew+netdev@lunn.ch, kernel-janitors@vger.kernel.org, Jakub Raczynski
-	<j.raczynski@samsung.com>
-Subject: [PATCH] net/sun: Fix multiple typos in comments
-Date: Tue, 21 Apr 2026 13:45:12 +0200
-Message-Id: <20260421114512.2690443-1-j.raczynski@samsung.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1776772196; c=relaxed/simple;
+	bh=uuRDbH7KRxOKKZlcf1KF1ZvZpDGq5h2ULvk6YWb9YpA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oX2Jy8r2d3y9XaOTMW3elwQN9C/RssGwF7pmCfKymvRN2L2z2ZRWBLMQPVG3dCo46wl0I71hpNLjJYvHuVZzyIBAbu1fl88Vf83Pz0Z83JOfO3gVmNeNSRKur5uJZZ2KbIc3HsrQ4poAekcjAwl+oErI9ey25sRA0h1fn8SzahY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=E0t9BphM; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1776772194; x=1808308194;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=uuRDbH7KRxOKKZlcf1KF1ZvZpDGq5h2ULvk6YWb9YpA=;
+  b=E0t9BphMD8FUqCw9mK3xlD9RxmbRezLoXvNKvUINq7ZlZMhffzGJMOkV
+   OA/dqwZEw6dg5GPRzxjNGWu3HWcrHYZq46p/LCxVszMTdBF6cXO+H3LHh
+   eQOLJUt6sVqzvnylnshd1IvbAwNXlfsZwLMzS13L8ZNC9o0Cdvt9jecA1
+   /sY6tqrgViTymCAIbp8yyT9s+d6VhJqF3rhnhzax9NThfdzIxl/qifSNU
+   CUaVAaoN+wTvTfba14Mn4C/JRraKQ5hFAES/Q492trHwOf/pSlMP3nQs+
+   hB6+yU0d+AngJT361qiAKO1QTkmpo44dRxlblw6biqqB6TgRbirKXUa4t
+   A==;
+X-CSE-ConnectionGUID: HqOYzKmGQV+cC+gBgd55NA==
+X-CSE-MsgGUID: k8xRjuQMQiKZov8hkqmg2w==
+X-IronPort-AV: E=McAfee;i="6800,10657,11762"; a="81570450"
+X-IronPort-AV: E=Sophos;i="6.23,191,1770624000"; 
+   d="scan'208";a="81570450"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Apr 2026 04:49:53 -0700
+X-CSE-ConnectionGUID: ddKaYSOzS0qlHzI1zxETiw==
+X-CSE-MsgGUID: i5VMa8ZhS4+kSj9vA0U/YA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,191,1770624000"; 
+   d="scan'208";a="270102600"
+Received: from lkp-server01.sh.intel.com (HELO 7e48d0ff8e22) ([10.239.97.150])
+  by orviesa001.jf.intel.com with ESMTP; 21 Apr 2026 04:49:50 -0700
+Received: from kbuild by 7e48d0ff8e22 with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1wF9bw-000000003Sa-1KoJ;
+	Tue, 21 Apr 2026 11:49:48 +0000
+Date: Tue, 21 Apr 2026 19:48:50 +0800
+From: kernel test robot <lkp@intel.com>
+To: Marino Dzalto <marino.dzalto@gmail.com>, pablo@netfilter.org,
+	fw@strlen.de
+Cc: oe-kbuild-all@lists.linux.dev, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Marino Dzalto <marino.dzalto@gmail.com>
+Subject: Re: [PATCH] netfilter: xt_HL: add pr_fmt, default case and NULL
+ checks
+Message-ID: <202604211905.6ZPE3dFs-lkp@intel.com>
+References: <20260403193929.89449-1-marino.dzalto@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CMS-MailID: 20260421114526eucas1p29a73b6c60123beb164975e931347f1a4
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20260421114526eucas1p29a73b6c60123beb164975e931347f1a4
-X-EPHeader: CA
-X-CMS-RootMailID: 20260421114526eucas1p29a73b6c60123beb164975e931347f1a4
-References: <CGME20260421114526eucas1p29a73b6c60123beb164975e931347f1a4@eucas1p2.samsung.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260403193929.89449-1-marino.dzalto@gmail.com>
 X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[samsung.com,none];
-	R_DKIM_ALLOW(-0.20)[samsung.com:s=mail20170921];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[samsung.com:+];
-	TAGGED_FROM(0.00)[bounces-280088-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[lists.linux.dev,vger.kernel.org,netfilter.org,gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,netfilter.org,strlen.de];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280090-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[j.raczynski@samsung.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[samsung.com:email,samsung.com:dkim,samsung.com:mid]
-X-Rspamd-Queue-Id: B820E43A348
+	RCPT_COUNT_SEVEN(0.00)[9];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,intel.com:mid,01.org:url,git-scm.com:url]
+X-Rspamd-Queue-Id: C60A043A4D0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-There are some typos in comments and while they are harmless and not visible,
-there is no reason not to fix them. Fix the ones that are not register related,
-which might have intentional naming convention.
+Hi Marino,
 
-Signed-off-by: Jakub Raczynski <j.raczynski@samsung.com>
----
- drivers/net/ethernet/sun/cassini.c |  8 ++++----
- drivers/net/ethernet/sun/cassini.h | 16 ++++++++--------
- drivers/net/ethernet/sun/sunbmac.h |  2 +-
- drivers/net/ethernet/sun/sungem.c  |  4 ++--
- drivers/net/ethernet/sun/sungem.h  |  4 ++--
- drivers/net/ethernet/sun/sunhme.c  |  2 +-
- 6 files changed, 18 insertions(+), 18 deletions(-)
+kernel test robot noticed the following build errors:
 
-diff --git a/drivers/net/ethernet/sun/cassini.c b/drivers/net/ethernet/sun/cassini.c
-index fe00e7dd3fe4..74fb0de12d21 100644
---- a/drivers/net/ethernet/sun/cassini.c
-+++ b/drivers/net/ethernet/sun/cassini.c
-@@ -1029,7 +1029,7 @@ static int cas_pcs_link_check(struct cas *cp)
- 			 * point a bit earlier in the sequence. If we had
- 			 * generated a reset a short time ago, we'll wait for
- 			 * the link timer to check the status until a
--			 * timer expires (link_transistion_jiffies_valid is
-+			 * timer expires (link_transition_jiffies_valid is
- 			 * true when the timer is running.)  Instead of using
- 			 * a system timer, we just do a check whenever the
- 			 * link timer is running - this clears the flag after
-@@ -4547,7 +4547,7 @@ static int cas_get_link_ksettings(struct net_device *dev,
- 	}
- 	if (linkstate != link_up) {
- 		/* Force these to "unknown" if the link is not up and
--		 * autonogotiation in enabled. We can set the link
-+		 * autonegotiation in enabled. We can set the link
- 		 * speed to 0, but not cmd->duplex,
- 		 * because its legal values are 0 and 1.  Ethtool will
- 		 * print the value reported in parentheses after the
-@@ -4799,7 +4799,7 @@ static void cas_program_bridge(struct pci_dev *cas_pdev)
- 	 */
- 	pci_write_config_word(pdev, 0x50, (5 << 10) | 0x3ff);
- 
--	/* The Read Prefecth Policy register is 16-bit and sits at
-+	/* The Read Prefetch Policy register is 16-bit and sits at
- 	 * offset 0x52.  It enables a "smart" pre-fetch policy.  We
- 	 * enable it and max out all of the settings since only one
- 	 * device is sitting underneath and thus bandwidth sharing is
-@@ -4906,7 +4906,7 @@ static int cas_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
- 
- 	/*
- 	 * On some architectures, the default cache line size set
--	 * by pci_try_set_mwi reduces perforamnce.  We have to increase
-+	 * by pci_try_set_mwi reduces performance.  We have to increase
- 	 * it for this case.  To start, we'll print some configuration
- 	 * data.
- 	 */
-diff --git a/drivers/net/ethernet/sun/cassini.h b/drivers/net/ethernet/sun/cassini.h
-index 2d91f4936d52..0c24547a4534 100644
---- a/drivers/net/ethernet/sun/cassini.h
-+++ b/drivers/net/ethernet/sun/cassini.h
-@@ -259,7 +259,7 @@
- 
- /* output enables are provided for each device's chip select and for the rest
-  * of the outputs from cassini to its local bus devices. two sw programmable
-- * bits are connected to general purpus control/status bits.
-+ * bits are connected to general purpose control/status bits.
-  * DEFAULT: 0x7
-  */
- #define  REG_BIM_LOCAL_DEV_EN          0x1020  /* BIM local device
-@@ -404,7 +404,7 @@
- 						    GMII on SERDES pins for
- 						    monitoring. */
- #define   SATURN_PCFG_FSI             0x00000200 /* 1 = freeze serdes/gmii. all
--						    pins configed as outputs.
-+						    pins configured as outputs.
- 						    for power saving when using
- 						    internal phy. */
- #define   SATURN_PCFG_LAD             0x00000800 /* 0 = mac core led ctrl
-@@ -622,7 +622,7 @@
- 						      enabled */
- #define    RX_CFG_SWIVEL_MASK           0x00001C00 /* byte offset of the 1st
- 						      data byte of the packet
--						      w/in 8 byte boundares.
-+						      w/in 8 byte boundaries.
- 						      this swivels the data
- 						      DMA'ed to header
- 						      buffers, jumbo buffers
-@@ -1248,7 +1248,7 @@
-  */
- #define  REG_MAC_TX_STATUS                 0x6010  /* TX MAC status reg */
- #define    MAC_TX_FRAME_XMIT               0x0001  /* successful frame
--						      transmision */
-+						      transmission */
- #define    MAC_TX_UNDERRUN                 0x0002  /* terminated frame
- 						      transmission due to
- 						      data starvation in the
-@@ -1414,7 +1414,7 @@
-  * when passed to the host. to ensure proper operation, need to wait 3.2ms
-  * after clearing RX_CFG_EN before writing to any other RX MAC registers
-  * or other MAC parameters. alternatively, poll RX_CFG_EN until it clears
-- * to 0. similary, HASH_FILTER_EN and ADDR_FILTER_EN have the same
-+ * to 0. Similarly, HASH_FILTER_EN and ADDR_FILTER_EN have the same
-  * restrictions as CFG_EN.
-  */
- #define  REG_MAC_RX_CFG                 0x6034  /* RX MAC config reg */
-@@ -1670,7 +1670,7 @@
-  * programmed in frame mode. load this register w/ a valid instruction
-  * (as per IEEE 802.3u MII spec). poll this register to check for instruction
-  * execution completion. during a read operation, this register will also
-- * contain the 16-bit data returned by the tranceiver. unless specified
-+ * contain the 16-bit data returned by the transceiver. unless specified
-  * otherwise, fields are considered "don't care" when polling for
-  * completion.
-  */
-@@ -1734,7 +1734,7 @@
- #define    MIF_CFG_POLL_REG_SHIFT       3
- #define    MIF_CFG_MDIO_0               0x0100 /* (ro) dual purpose.
- 						  when MDIO_0 is idle,
--						  1 -> tranceiver is
-+						  1 -> transceiver is
- 						  connected to MDIO_0.
- 						  when MIF is communicating
- 						  w/ MDIO_0 in bit-bang
-@@ -1750,7 +1750,7 @@
- 						  mode, this bit indicates
- 						  the incoming bit stream
- 						  during a read op */
--#define    MIF_CFG_POLL_PHY_MASK        0x7C00 /* tranceiver address to
-+#define    MIF_CFG_POLL_PHY_MASK        0x7C00 /* transceiver address to
- 						  be polled */
- #define    MIF_CFG_POLL_PHY_SHIFT       10
- 
-diff --git a/drivers/net/ethernet/sun/sunbmac.h b/drivers/net/ethernet/sun/sunbmac.h
-index d379bd407eca..85778edcf8dc 100644
---- a/drivers/net/ethernet/sun/sunbmac.h
-+++ b/drivers/net/ethernet/sun/sunbmac.h
-@@ -205,7 +205,7 @@
- #define FRAME_WRITE           0x50020000
- #define FRAME_READ            0x60020000
- 
--/* Tranceiver registers. */
-+/* Transceiver registers. */
- #define TCVR_PAL_SERIAL       0x00000001 /* Enable serial mode              */
- #define TCVR_PAL_EXTLBACK     0x00000002 /* Enable external loopback        */
- #define TCVR_PAL_MSENSE       0x00000004 /* Media sense                     */
-diff --git a/drivers/net/ethernet/sun/sungem.c b/drivers/net/ethernet/sun/sungem.c
-index 8e69d917d827..35c3226ce719 100644
---- a/drivers/net/ethernet/sun/sungem.c
-+++ b/drivers/net/ethernet/sun/sungem.c
-@@ -2187,7 +2187,7 @@ static void gem_do_stop(struct net_device *dev, int wol)
- 	 * if we did. This is not an issue however as the reset
- 	 * task is synchronized vs. us (rtnl_lock) and will do
- 	 * nothing if the device is down or suspended. We do
--	 * still clear reset_task_pending to avoid a spurrious
-+	 * still clear reset_task_pending to avoid a spurious
- 	 * reset later on in case we do resume before it gets
- 	 * scheduled.
- 	 */
-@@ -2370,7 +2370,7 @@ static int __maybe_unused gem_resume(struct device *dev_d)
- 	gem_do_start(dev);
- 
- 	/* If we had WOL enabled, the cell clock was never turned off during
--	 * sleep, so we end up beeing unbalanced. Fix that here
-+	 * sleep, so we end up being unbalanced. Fix that here
- 	 */
- 	if (gp->asleep_wol)
- 		gem_put_cell(gp);
-diff --git a/drivers/net/ethernet/sun/sungem.h b/drivers/net/ethernet/sun/sungem.h
-index 626302a9bc89..b921d3074017 100644
---- a/drivers/net/ethernet/sun/sungem.h
-+++ b/drivers/net/ethernet/sun/sungem.h
-@@ -352,7 +352,7 @@
- #define MAC_HASH14	0x60F8UL	/* Hash Table 14 Register	*/
- #define MAC_HASH15	0x60FCUL	/* Hash Table 15 Register	*/
- #define MAC_NCOLL	0x6100UL	/* Normal Collision Counter	*/
--#define MAC_FASUCC	0x6104UL	/* First Attmpt. Succ Coll Ctr.	*/
-+#define MAC_FASUCC	0x6104UL	/* First Attempt. Succ Coll Ctr.*/
- #define MAC_ECOLL	0x6108UL	/* Excessive Collision Counter	*/
- #define MAC_LCOLL	0x610CUL	/* Late Collision Counter	*/
- #define MAC_DTIMER	0x6110UL	/* Defer Timer			*/
-@@ -657,7 +657,7 @@
- 
- /* MIF Frame/Output Register.  This 32-bit register allows the host to
-  * communicate with a transceiver in frame mode (as opposed to big-bang
-- * mode).  Writes by the host specify an instrution.  After being issued
-+ * mode).  Writes by the host specify an instruction.  After being issued
-  * the host must poll this register for completion.  Also, after
-  * completion this register holds the data returned by the transceiver
-  * if applicable.
-diff --git a/drivers/net/ethernet/sun/sunhme.c b/drivers/net/ethernet/sun/sunhme.c
-index 4c9d5d4dd8a0..efbf042e9352 100644
---- a/drivers/net/ethernet/sun/sunhme.c
-+++ b/drivers/net/ethernet/sun/sunhme.c
-@@ -1118,7 +1118,7 @@ static void happy_meal_transceiver_check(struct happy_meal *hp, void __iomem *tr
-  *
-  * We use skb_reserve() to align the data block we get in the skb.  We
-  * also program the etxregs->cfg register to use an offset of 2.  This
-- * imperical constant plus the ethernet header size will always leave
-+ * emperical constant plus the ethernet header size will always leave
-  * us with a nicely aligned ip header once we pass things up to the
-  * protocol layers.
-  *
+[auto build test ERROR on netfilter-nf/main]
+[also build test ERROR on nf-next/master horms-ipvs/master linus/master v7.0 next-20260420]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Marino-Dzalto/netfilter-xt_HL-add-pr_fmt-default-case-and-NULL-checks/20260420-185652
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git main
+patch link:    https://lore.kernel.org/r/20260403193929.89449-1-marino.dzalto%40gmail.com
+patch subject: [PATCH] netfilter: xt_HL: add pr_fmt, default case and NULL checks
+config: m68k-allmodconfig (https://download.01.org/0day-ci/archive/20260421/202604211905.6ZPE3dFs-lkp@intel.com/config)
+compiler: m68k-linux-gcc (GCC) 15.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260421/202604211905.6ZPE3dFs-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202604211905.6ZPE3dFs-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   net/netfilter/xt_hl.c: In function 'ttl_mt':
+>> net/netfilter/xt_hl.c:34:13: error: assignment of read-only variable 'ttl'
+      34 |         ttl = ip_hdr(skb)->ttl;
+         |             ^
+
+
+vim +/ttl +34 net/netfilter/xt_hl.c
+
+    25	
+    26	static bool ttl_mt(const struct sk_buff *skb, struct xt_action_param *par)
+    27	{
+    28		const struct ipt_ttl_info *info = par->matchinfo;
+    29		const u8 ttl;
+    30	
+    31		if (!skb)
+    32			return false;
+    33	
+  > 34		ttl = ip_hdr(skb)->ttl;
+    35	
+    36		switch (info->mode) {
+    37		case IPT_TTL_EQ:
+    38			return ttl == info->ttl;
+    39		case IPT_TTL_NE:
+    40			return ttl != info->ttl;
+    41		case IPT_TTL_LT:
+    42			return ttl < info->ttl;
+    43		case IPT_TTL_GT:
+    44			return ttl > info->ttl;
+    45		default:
+    46			pr_warn("Unknown TTL match mode: %d\n", info->mode);
+    47			return false;
+    48		}
+    49	}
+    50	
+
 -- 
-2.34.1
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
