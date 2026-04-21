@@ -1,184 +1,194 @@
-Return-Path: <netdev+bounces-280028-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280027-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eGTHGmsq52mo4wEAu9opvQ
-	(envelope-from <netdev+bounces-280028-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 09:42:35 +0200
+	id WLZUBvoo52kf4wEAu9opvQ
+	(envelope-from <netdev+bounces-280027-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 09:36:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97361437C50
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 09:42:34 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D0D3437AC0
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 09:36:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 10071300E1B9
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 07:33:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 17D46302FA85
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 07:33:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 904D737F010;
-	Tue, 21 Apr 2026 07:33:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8F6E32E728;
+	Tue, 21 Apr 2026 07:33:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XvB2zik+"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="P/fIqS/b"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 527583368B2
-	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 07:33:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 047133563E1
+	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 07:33:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776756835; cv=none; b=kUcK2PLVHPZZ5jqMn1txSNma3IVT9l5CJ3wrh52e+bEuYOg7vfT1D+IawhXOaL46/bj7eqSHBpA3fVb767NYfLOP06OaBivftFStGss/M43svHVwEOw08Wb0BdwQ/Owmds77cYdpV4L5xU76rJY7ytniImjL60KX24/Y/Q98E1Y=
+	t=1776756802; cv=none; b=k/vwGRjfiFLs6ziooKuOMehfQ1LDKkRvpIQGlgTeHXflraIxSoMWJZRQ0RKwgzzN9H0qj5y9QcTj/3oJEJF1HXTYbTY0fwyRyIO33UO8NR++0QacTmVzRXSV1qkWl2ePJEn8Hpc4PNHUBhbjEOKiKOb+eA/arQj68e/JjpI6Cd4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776756835; c=relaxed/simple;
-	bh=kacipmRh/ARA/yj251suNKvUgkiVHzItJyjKIF1jCv8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=FBHb5HuZRPu1dLdox3/eEl/MJ02xlRCLI+saNGogI285+eYPa7p07R5QH2pV3l74vn0f6AuJTzRqGvUvP24V2tnszJSntVwdqZ4IIeOwV7FYPKFrAZD/Vv/+0nDd6gq8Ibzenee3Rq63kmqY/z/WTsHfPESi0gJM/D7eWvVO6FE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XvB2zik+; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-3614826eca4so3355216a91.1
-        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 00:33:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776756834; x=1777361634; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=1tN5kwaSs4mUzaWaK2mJMmR2b/ZFzAdC6nGIO7bzkSw=;
-        b=XvB2zik+You16ZAqXsdCCWXx9ivmehqG4NGlR1hGiIdeluO3DKYjN3qkYYmVvsBwmY
-         ia6oqVGIdWrxxT2lmQ2XdbAXrEwnVvrd6mqNCA9m9+ppJUxS0qxkmRsGBcxkK9mfg7Us
-         28Y26XviCjkbVV73NUsimZpofjkuaKNIqQ2Ddw1/jvG0nUceikMFUHTj5JUeGbh5aOH4
-         cJ9xHok2gmQkCEYPEKDvgKZHVzsKsXAf9sGd5HviNASSqf2DTdCeP4ysicHQHRo3pNEo
-         SH4Ae44vLrae0OTLGA5sWzPuzElh1NLH0OPDZpTvwksgpAEu91D0SAKK0ThdJfX2OSss
-         4QgQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776756834; x=1777361634;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1tN5kwaSs4mUzaWaK2mJMmR2b/ZFzAdC6nGIO7bzkSw=;
-        b=JxZtboz673U83NK+cJ3HWRQ6CPTITEsh06aXxBAf9iD4hsBEwxqA0y93LPumGl4Xhx
-         pCZbSHXvppJFe1TqmBloK/MG6Hwrc7u5J5YXSUfNmYjl60N3GvVxCILXdpDMsYitAHwC
-         I+HipVcz6HjD3F0fLM2HK16OLH+uubnKT4rqJm4HMjWwhexkC/M4Fog6EFMUo++3piyU
-         TsrmsQvaXJIcYx4fvMZM2oUkBQHRZZsL7pelKjPRdAh1LJFBAKHsU6Js0uQn+Xw12XzD
-         p1zEhP5oQHEVXoaSRUFkOOX2kiAaz/W+1mR/Jl9w41W+s6gXqy9PrhplLXQzT0R2qiSS
-         +p8w==
-X-Forwarded-Encrypted: i=1; AFNElJ/Bb5S3tY2cPzxjGiWSK+4YpkOVJsIKFE1l5o8eY8wFAgJmdu8+2+Hf1KIZaAsyzRa7LTOSO8I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyGPwa8OW4VXGjBvIKW3xxLZccSkfFIxriQ1+/hmgO/mWTYEpiw
-	uJpTOm7xyzC6pN6bte5OVmbL1PtT0gPNH5OHEtaBeQRk5MeeyZlbPdEX
-X-Gm-Gg: AeBDietqFjNm/qQRGnO1OYIHx8p6a3QJ7zTEwI5LwMk6J1JxaGCu7jlKS+Yn91/HSUl
-	pSVBXSchZAHTQ3YM2SSyVcWSYIA8FJ9DXziLwQbBOunTRg7hPtaS0oCGjaFEqJZcYxQRDEF8Mij
-	pof3FJy1ZlMKSMXfX568jQpcr6roPX//WprBHiH/7S5qhHX4MgUBf6LzZPyYimhleQCg6qNaPQP
-	wLho/+0GdS6yOmTJVbcysZ9lBRjsfMM0P7MTZ/phM+fwMqcw6qXuOBx5FQt/35nN2HpH1pnk/rZ
-	PV+E5d+MJKX1QpVyEf8BWHWq3cvUserLHPnxodH52IdDpAzw1tkuI0uHVeFy39Q+j0uOrtk4Qqk
-	i3KWdJSv0iQwbtBBbxfkFlztNKtQ0wEEOKBQs+2gYW7AtG2mu6DNd6ny7VKnMHRUJ+QjaaNboSY
-	T5dXUROKoIWqmHaVUvmUDHBCut/5/NQFQMrWeKoqwfk9RwUZiTYNK1dIi8NzfSXLrAGnfOz8Nhq
-	6OjXUy4WZg=
-X-Received: by 2002:a17:90b:5865:b0:35e:27ec:dea with SMTP id 98e67ed59e1d1-36140493410mr18530382a91.23.1776756833615;
-        Tue, 21 Apr 2026 00:33:53 -0700 (PDT)
-Received: from localhost.localdomain ([115.110.225.242])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3614195a8f0sm12411902a91.12.2026.04.21.00.33.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Apr 2026 00:33:53 -0700 (PDT)
-From: Shitalkumar Gandhi <shital.gandhi45@gmail.com>
-X-Google-Original-From: Shitalkumar Gandhi <shitalkumar.gandhi@cambiumnetworks.com>
-To: alex.aring@gmail.com,
-	stefan@datenfreihafen.org,
-	miquel.raynal@bootlin.com
-Cc: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-wpan@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	Shitalkumar Gandhi <shitalkumar.gandhi@cambiumnetworks.com>
-Subject: [PATCH] ieee802154: ca8210: fix cas_ctl leak on spi_async failure
-Date: Tue, 21 Apr 2026 13:02:59 +0530
-Message-Id: <20260421073259.2259783-1-shitalkumar.gandhi@cambiumnetworks.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1776756802; c=relaxed/simple;
+	bh=HdKN6vR/WF7gxYiO6PAmkmeiwKR29Ppe8uMUYLeZqFM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UItgBw7Jk9GQiqgp/LQo/qQbdsfXgTNG2Q5pSO+c0CIJl3vidumaoh8T5gy3y1wPT2lpZjO0+foespwRfdv9bTalA3q8wOGdiCHl5xF/dX1mYEnaigvCWcQI+uNrEPCi61sOsB8cY+aDLOh2uj+m15WG6+dQSlTbwTS3e/JTjS8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=P/fIqS/b; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=6nFLI4Wi6mv0Oz5B/rGpGVmJgVc3OUepi2LoX3t2SaY=; b=P/fIqS/b75rYhRDX+Mjwa0OXBK
+	q/zuI7IZUaHkNNzKXOMFCihiE6sHkvhuy0RmLKAPGmCgK0LLO3grMofkhNLEKCCJvxclHTLV9axZL
+	V055XNx2EpygnXHVY1r5g4lLoSS7nELI1exBkNCuSTuAAFDgx7W9lmn50pDikyL2AgRNEjlkb9epa
+	HsB3kyjRNcebc5z8tsx8OGc+RSVhwQ/WxIOV/iN8j0/WZgFEM0nruEIf2zSRl45fUZrc8p2mt1lxq
+	T4Ds+vku52xGXfAwi43qM0B/GqvlEBrpbunoPOp8Umn+QSrXKcU4kFsD7vZjMeD5d8d9fB0utMirC
+	Bs4KzWgg==;
+Received: from sslproxy03.your-server.de ([88.198.220.132])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1wF5bb-000CMM-2S;
+	Tue, 21 Apr 2026 09:33:11 +0200
+Received: from localhost ([127.0.0.1])
+	by sslproxy03.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1wF5ba-0007Df-2J;
+	Tue, 21 Apr 2026 09:33:11 +0200
+Message-ID: <94dab191-524b-4f8d-abde-e0ffc5848258@iogearbox.net>
+Date: Tue, 21 Apr 2026 09:33:08 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2] ipv6: Apply max_dst_opts_cnt to
+ ip6_tnl_parse_tlv_enc_lim
+To: Justin Iurman <justin.iurman@gmail.com>, Ido Schimmel <idosch@nvidia.com>
+Cc: kuba@kernel.org, edumazet@google.com, dsahern@kernel.org,
+ tom@herbertland.com, willemdebruijn.kernel@gmail.com, pabeni@redhat.com,
+ netdev@vger.kernel.org
+References: <20260418121538.706095-1-daniel@iogearbox.net>
+ <7c715640-5c20-4226-9c31-d2c5eef551db@gmail.com>
+ <d8d60970-6f73-4b9d-8808-76f4f8023100@iogearbox.net>
+ <8fdf517b-6217-4df6-8adf-0c79ce8d3be8@gmail.com>
+ <20260419143137.GA885197@shredder>
+ <524def33-63e1-47c0-be38-dee68d859332@gmail.com>
+Content-Language: en-US
+From: Daniel Borkmann <daniel@iogearbox.net>
+Autocrypt: addr=daniel@iogearbox.net; keydata=
+ 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
+In-Reply-To: <524def33-63e1-47c0-be38-dee68d859332@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Virus-Scanned: Clear (ClamAV 1.4.3/27977/Mon Apr 20 08:26:26 2026)
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[iogearbox.net,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[iogearbox.net:s=default2302];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-280028-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,herbertland.com,gmail.com,redhat.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-280027-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,nvidia.com];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,datenfreihafen.org,bootlin.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shitalgandhi45@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[iogearbox.net:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,cambiumnetworks.com:mid,cambiumnetworks.com:email]
-X-Rspamd-Queue-Id: 97361437C50
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,iogearbox.net:dkim,iogearbox.net:mid]
+X-Rspamd-Queue-Id: 8D0D3437AC0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-ca8210_spi_transfer() allocates cas_ctl with kzalloc_obj(GFP_ATOMIC)
-and relies entirely on the SPI completion callback
-ca8210_spi_transfer_complete() to free it.
+On 4/20/26 8:55 PM, Justin Iurman wrote:
+> On 4/19/26 16:31, Ido Schimmel wrote:
+>> On Sun, Apr 19, 2026 at 12:37:35AM +0200, Justin Iurman wrote:
+>>> Nope. But if it happens, users would be confused as max_dst_opts_cnt would
+>>> not have the same meaning in two different code paths. OTOH, I agree that
+>>> such situation would look suspicious. I guess it's fine to keep your patch
+>>> as is and to not over-complicate things unnecessarily.
+>>
+>> I agree that it's weird to reuse max_dst_opts_cnt here:
+>>
+>> 1. The meaning is different from the Rx path.
+>>
+>> 2. We only enforce max_dst_opts_cnt, but not max_dst_opts_len.
+>>
+>> 3. The default is derived from the initial netns, unlike in the Rx path.
+>>
+>> Given the above and that:
+>>
+>> 1. We believe that 8 options until the tunnel encapsulation limit option
+>> is liberal enough.
+>>
+>> 2. We don't want to over-complicate things.
+>>
+>> Can we go with an hard coded 8 and see if anyone complains? In the
+>> unlikely case that someone complains we can at least gain some insight
+>> into how this option is actually used with tunnels.
+> 
+> In general, I'm not a big fan of hard-coded values, but I also think that in this context it would make sense to do so. This is not a strong +1, let's say it's more a "not against it".
 
-The spi_async() API only invokes the completion callback on successful
-submission.  On failure it returns a negative error code without ever
-queuing the callback, which leaves cas_ctl and its embedded spi_message
-and spi_transfer orphaned.  Every kfree(cas_ctl) in the driver is
-inside the completion callback, so there is no other reclamation path.
-
-ca8210_spi_transfer() is called from ca8210_spi_exchange(), the
-interrupt handler ca8210_interrupt_handler(), and from the retry path
-inside the completion callback itself.  The exchange and interrupt
-handler paths loop on -EBUSY, so under sustained SPI bus contention
-every retry iteration leaks a fresh cas_ctl (~600 bytes per
-occurrence).
-
-Fix it by freeing cas_ctl on the spi_async() error path.  While here,
-correct the misleading error string: the function calls spi_async(),
-not spi_sync().
-
-Fixes: ded845a781a5 ("ieee802154: Add CA8210 IEEE 802.15.4 device driver")
-Cc: stable@vger.kernel.org
-Signed-off-by: Shitalkumar Gandhi <shitalkumar.gandhi@cambiumnetworks.com>
----
- drivers/net/ieee802154/ca8210.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
-index ed4178155a5d..bf837adfebb2 100644
---- a/drivers/net/ieee802154/ca8210.c
-+++ b/drivers/net/ieee802154/ca8210.c
-@@ -919,9 +919,10 @@ static int ca8210_spi_transfer(
- 	if (status < 0) {
- 		dev_crit(
- 			&spi->dev,
--			"status %d from spi_sync in write\n",
-+			"status %d from spi_async in write\n",
- 			status
- 		);
-+		kfree(cas_ctl);
- 	}
- 
- 	return status;
--- 
-2.25.1
-
+Makes sense, I'll update it in a v3.
 
