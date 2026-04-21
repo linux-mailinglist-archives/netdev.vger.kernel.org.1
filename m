@@ -1,128 +1,196 @@
-Return-Path: <netdev+bounces-280156-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280157-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id INKOODmM52lY9wEAu9opvQ
-	(envelope-from <netdev+bounces-280156-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 16:39:53 +0200
+	id KB2zDFqM52m89wEAu9opvQ
+	(envelope-from <netdev+bounces-280157-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 16:40:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66B5343C2DD
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 16:39:53 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FFAB43C302
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 16:40:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5D3F6307DAA4
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 14:33:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C75DC3086425
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 14:33:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC9933D88E0;
-	Tue, 21 Apr 2026 14:33:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 665A43D6CB6;
+	Tue, 21 Apr 2026 14:33:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lLv2aWMh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailout2.hostsharing.net (mailout2.hostsharing.net [83.223.78.233])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E8953CE4BD
-	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 14:33:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.78.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFDF9387590
+	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 14:33:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776782012; cv=none; b=CzVbXsyu5qAy1Rjv3cYZct2dyLiVJSTG22YHEB/z29djVhO5HWsiAs5kRE4M30zPKXBCQ0SYFDMQvFRhZOgGiwaTl1DPLDIdjXl/Kgu/t6BYni7ceEUXT0uPFiybZ6Q14ZjO0tRyobWTe7gCmLvURD0V3PqscPGRY5hA+I663Lg=
+	t=1776782033; cv=none; b=OjEPqqivY7sTkib5BFKpJhi2FGyufbBcJvqHs/MatnsjeeBl6/X/5Tai+hKBFNWcf02A/4z+OAqO0HgHBmoOsXGcqe/lANRWqZXfAaW6YC0Hj9Eje505AGn0IJ7AhF87mtjedP3PTLA+5CtHxcG8lcltwyX1FpWAm7IlZDQor/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776782012; c=relaxed/simple;
-	bh=owD5oaIcc+vRnpaYo0FyalSKDi1/DvPEQsJIilTllE0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UtbtcCfAtii3xPMflrFWVKDHDn+Tv+fQkZCrJlB6xzou8hJc35WmrOc7FDAeAB1paHW42fvwHkClydsrQEfZAUodtOdRp/jaPR0Bjoz/26024nuMo+0BPCHdkz7VXz9JCuuAXnLvSV5H5NCWp5vGbWc1THHSPoYWDjnSDmJ2z34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=pass smtp.mailfrom=wunner.de; arc=none smtp.client-ip=83.223.78.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wunner.de
-Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature ECDSA (secp384r1) server-digest SHA384
-	 client-signature ECDSA (secp384r1) client-digest SHA384)
-	(Client CN "*.hostsharing.net", Issuer "GlobalSign GCC R6 AlphaSSL CA 2025" (verified OK))
-	by mailout2.hostsharing.net (Postfix) with ESMTPS id 8745F10615;
-	Tue, 21 Apr 2026 16:33:19 +0200 (CEST)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-	id 7165A6033A2C; Tue, 21 Apr 2026 16:33:19 +0200 (CEST)
-Date: Tue, 21 Apr 2026 16:33:19 +0200
-From: Lukas Wunner <lukas@wunner.de>
-To: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: netdev@vger.kernel.org, Mengyuan Lou <mengyuanlou@net-swift.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Simon Horman <horms@kernel.org>,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Kees Cook <kees@kernel.org>, Joe Damato <joe@dama.to>,
-	Larysa Zaremba <larysa.zaremba@intel.com>,
-	Abdun Nihaal <abdun.nihaal@gmail.com>,
-	Breno Leitao <leitao@debian.org>
-Subject: Re: [PATCH net-next v6 11/11] net: wangxun: implement
- pci_error_handlers ops
-Message-ID: <aeeKr8j8iHBUC8sM@wunner.de>
-References: <20260326021406.30444-1-jiawenwu@trustnetic.com>
- <20260326021406.30444-12-jiawenwu@trustnetic.com>
+	s=arc-20240116; t=1776782033; c=relaxed/simple;
+	bh=TkLjXVNRAceZKbFadq/HTx1I100PlhqvAC42FjFtx1M=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=TidM7KjSs0cKRsIzFpOb8cDNpeAzlKLP2sOpMJGQ/SXxF0jBmnzbp64IRUtAtBjpKETnT+h05NutqdEPHaex2l89bqvMDe6rNZwB+jnTA3W+hMx/gfzp/SBKkwFiWsoxjvDE0udW6gnz5CEBfBGbmpg4B0lNI2YgccZJ197qs1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lLv2aWMh; arc=none smtp.client-ip=209.85.222.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-8eb55e55362so405748985a.2
+        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 07:33:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1776782031; x=1777386831; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=phBdw9+Q6ElvsmtyvIcgjAwkVvsTjBh7rGzHGQPHpmU=;
+        b=lLv2aWMhdN1ChwwTJDDY2Br2p2Uvb0AohUdSS+NCAnJ/paP9qH2lw1JANHE7/kNTiN
+         aCrI2B4q/oL8OOLcKS/MKUNRbHj32cO1tx9Be50BHn3jPIU5HyGzDifFZUKuXbzDVOo8
+         B0SldZMA3mZDM3+Ahwa/HWi+wZAiycnxQeeh0vhnmVeVwxuv3KsBJYMPvyg/fSPENdFq
+         vbWuv3vdU+RR7Jze/GDZJGrK11vsYg45KUMhL7Zqqvi8c33vaePFkq21Q+kn3jr0Yd0W
+         5fnlCO9T4E6zkSiN7SlKxfcHtPzyW5HnbSHp0urNi+cNMUr40DK1ZKnXkW65T4Kw+H6n
+         QvBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776782031; x=1777386831;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=phBdw9+Q6ElvsmtyvIcgjAwkVvsTjBh7rGzHGQPHpmU=;
+        b=Cu2wKhBk74UE2YAQGfRPmOwSZXDrwYZlfnKDn5Cj+d6DV5jBaXujgBDjsCLG/Izamg
+         UkymEjvIIc6Cn7GB7qoN+VcjGZ4/9G/I/st7bIvORsMH3ObkL03kXGmXfBOETtu0kxDa
+         zwpDnWanOrtdLvf3r5CCMJ+IABGlvNH4QLDMiEpWCv31eJDaaa7yHRBUN85roQIZSv+y
+         yAU+HBNsZX7ZyunNtASZLL+uAid//0JZQzGe84zOxtZBSk2/eW69EzPgtGdVyLAmZnch
+         2HWjCORyxOoHIc4hViTTwU2p+qgJK96miDg7ejULw62Y9A9bR5Jg3iE0aMK/gidjHKEw
+         QIew==
+X-Forwarded-Encrypted: i=1; AFNElJ8lgOl2ODDegnazN1GisdhKWg4um1YcaOvHw1lrfLV2PyCSZGW/rSNCKxozJealz8BkR49iQCk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwlSSw+ETsb0EY6C/oKHF7OgUplo+8vh6pbJa+IeGdhmwnNlbEl
+	wgCHcyXId8RpU07xTRb2U10qjrr418cSGF+3zy1xtggfu6d5BpkuVPN4Txm6pTD3KbQndxA/zNV
+	VCW5CZFCgA7e0ag==
+X-Received: from qknry8.prod.google.com ([2002:a05:620a:9148:b0:8eb:5e05:751c])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:458e:b0:8d3:ccef:b2c6 with SMTP id af79cd13be357-8e790014bd1mr2671798385a.24.1776782030637;
+ Tue, 21 Apr 2026 07:33:50 -0700 (PDT)
+Date: Tue, 21 Apr 2026 14:33:49 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260326021406.30444-12-jiawenwu@trustnetic.com>
-X-Spamd-Result: default: False [0.04 / 15.00];
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.rc2.533.g4f5dca5207-goog
+Message-ID: <20260421143349.4052215-1-edumazet@google.com>
+Subject: [PATCH net] net_sched: sch_hhf: annotate data-races in hhf_dump_stats()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>, 
+	netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,net-swift.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,linux.intel.com,intel.com,dama.to,debian.org];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.org,mojatatu.com,resnulli.us,vger.kernel.org,gmail.com,google.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280156-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[wunner.de: no valid DMARC record];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280157-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	RCVD_COUNT_FIVE(0.00)[5];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lukas@wunner.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	NEURAL_HAM(-0.00)[-1.000];
-	MID_RHS_MATCH_FROM(0.00)[];
-	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	MIME_TRACE(0.00)[0:+];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 66B5343C2DD
+X-Rspamd-Queue-Id: 9FFAB43C302
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Mar 26, 2026 at 10:14:06AM +0800, Jiawen Wu wrote:
-> +static pci_ers_result_t wx_io_slot_reset(struct pci_dev *pdev)
-> +{
-> +	struct wx *wx = pci_get_drvdata(pdev);
-> +	pci_ers_result_t result;
-> +
-> +	if (pci_enable_device_mem(pdev)) {
-> +		wx_err(wx, "Cannot re-enable PCI device after reset.\n");
-> +		result = PCI_ERS_RESULT_DISCONNECT;
-> +	} else {
-> +		/* make all bar access done before reset. */
-> +		smp_mb__before_atomic();
-> +		clear_bit(WX_STATE_DISABLED, wx->state);
-> +		pci_set_master(pdev);
-> +		pci_restore_state(pdev);
-> +		pci_save_state(pdev);
+hhf_dump_stats() only runs with RTNL held,
+reading fields that can be changed in qdisc fast path.
 
-The pci_save_state() is no longer necessary here, please drop it.
-See commits a2f1e22390ac and 383d89699c50 for details.
+Add READ_ONCE()/WRITE_ONCE() annotations.
 
-Thanks,
+Fixes: edb09eb17ed8 ("net: sched: do not acquire qdisc spinlock in qdisc/class stats dump")
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: Jamal Hadi Salim <jhs@mojatatu.com>
+---
+ net/sched/sch_hhf.c | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
 
-Lukas
+diff --git a/net/sched/sch_hhf.c b/net/sched/sch_hhf.c
+index 95e5d9bfd9c8c0cac08e080b8f1e0332e722aa3b..96021f52d835b56339509565ca03fe796593e231 100644
+--- a/net/sched/sch_hhf.c
++++ b/net/sched/sch_hhf.c
+@@ -198,7 +198,8 @@ static struct hh_flow_state *seek_list(const u32 hash,
+ 				return NULL;
+ 			list_del(&flow->flowchain);
+ 			kfree(flow);
+-			q->hh_flows_current_cnt--;
++			WRITE_ONCE(q->hh_flows_current_cnt,
++				   q->hh_flows_current_cnt - 1);
+ 		} else if (flow->hash_id == hash) {
+ 			return flow;
+ 		}
+@@ -226,7 +227,7 @@ static struct hh_flow_state *alloc_new_hh(struct list_head *head,
+ 	}
+ 
+ 	if (q->hh_flows_current_cnt >= q->hh_flows_limit) {
+-		q->hh_flows_overlimit++;
++		WRITE_ONCE(q->hh_flows_overlimit, q->hh_flows_overlimit + 1);
+ 		return NULL;
+ 	}
+ 	/* Create new entry. */
+@@ -234,7 +235,7 @@ static struct hh_flow_state *alloc_new_hh(struct list_head *head,
+ 	if (!flow)
+ 		return NULL;
+ 
+-	q->hh_flows_current_cnt++;
++	WRITE_ONCE(q->hh_flows_current_cnt, q->hh_flows_current_cnt + 1);
+ 	INIT_LIST_HEAD(&flow->flowchain);
+ 	list_add_tail(&flow->flowchain, head);
+ 
+@@ -309,7 +310,7 @@ static enum wdrr_bucket_idx hhf_classify(struct sk_buff *skb, struct Qdisc *sch)
+ 			return WDRR_BUCKET_FOR_NON_HH;
+ 		flow->hash_id = hash;
+ 		flow->hit_timestamp = now;
+-		q->hh_flows_total_cnt++;
++		WRITE_ONCE(q->hh_flows_total_cnt, q->hh_flows_total_cnt + 1);
+ 
+ 		/* By returning without updating counters in q->hhf_arrays,
+ 		 * we implicitly implement "shielding" (see Optimization O1).
+@@ -403,7 +404,7 @@ static int hhf_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+ 		return NET_XMIT_SUCCESS;
+ 
+ 	prev_backlog = sch->qstats.backlog;
+-	q->drop_overlimit++;
++	WRITE_ONCE(q->drop_overlimit, q->drop_overlimit + 1);
+ 	/* Return Congestion Notification only if we dropped a packet from this
+ 	 * bucket.
+ 	 */
+@@ -686,10 +687,10 @@ static int hhf_dump_stats(struct Qdisc *sch, struct gnet_dump *d)
+ {
+ 	struct hhf_sched_data *q = qdisc_priv(sch);
+ 	struct tc_hhf_xstats st = {
+-		.drop_overlimit = q->drop_overlimit,
+-		.hh_overlimit	= q->hh_flows_overlimit,
+-		.hh_tot_count	= q->hh_flows_total_cnt,
+-		.hh_cur_count	= q->hh_flows_current_cnt,
++		.drop_overlimit = READ_ONCE(q->drop_overlimit),
++		.hh_overlimit	= READ_ONCE(q->hh_flows_overlimit),
++		.hh_tot_count	= READ_ONCE(q->hh_flows_total_cnt),
++		.hh_cur_count	= READ_ONCE(q->hh_flows_current_cnt),
+ 	};
+ 
+ 	return gnet_stats_copy_app(d, &st, sizeof(st));
+-- 
+2.54.0.rc2.533.g4f5dca5207-goog
+
 
