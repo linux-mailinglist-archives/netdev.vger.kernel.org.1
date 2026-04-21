@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-280181-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280182-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cHadOgWf52ml+QEAu9opvQ
-	(envelope-from <netdev+bounces-280181-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 18:00:05 +0200
+	id wFk8BNCf52nw+QEAu9opvQ
+	(envelope-from <netdev+bounces-280182-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 18:03:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1854643D0E4
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 18:00:05 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 137C143D1B0
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 18:03:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id B49EE30095F9
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 15:59:34 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 67CD7300E4B0
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 15:59:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C17873630AE;
-	Tue, 21 Apr 2026 15:59:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC2993644CA;
+	Tue, 21 Apr 2026 15:59:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="dXwGyR4q"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="LtHsRblZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
+Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 077F036215B
-	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 15:59:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28A213630AE
+	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 15:59:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776787173; cv=none; b=j17UfH0UmykWsuIjKtWVZzif0Dl0e6wdR+PMtP/pyeyw+PV7mY3sJGKXbTkxF1hGoBxz2SlQc5uCva73NNSU1zdvpM7Huy6RKtx+FSc3oJWZ9o4WsbR1KG0cOqfhTsxCbv3CItAcpTwAL5cOTWqN5quDCSHAj6DGHZ47UYauWX4=
+	t=1776787186; cv=none; b=hRqgYUFp/5mKrKZ50ndBhDtkSya4jxYQuvsI6H+xW4l3J4h0vWE4NlwT9nQZTC21k0F6BbIETUxa1eqNDDvGf8lG735zm6f61rbeaLhsfSxfRb8PVjGdv/Ps5Y4AdfdevPliP6MqVvWq8AJS7Tqn3sOBagM+mP9t0HpDHxlBljU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776787173; c=relaxed/simple;
-	bh=3hSh3lFXbFSbrMW9IaKB5o2WHPIwz1DAomU7Hz2Ubwg=;
+	s=arc-20240116; t=1776787186; c=relaxed/simple;
+	bh=jmlhbGs2XEQ0YVEdPg2DhM9HBiM8Cev4qjA75thKJbc=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WDreCSCV24PaKc6L7ohIWOMjfW2iQCo4tJ9Ivfu4PiFWCzRdnnH0qgiuzSse+fpGBQZR+iy4gCo49Q5AfMlM0ZJTxbqOhzgb8N2j+VEcUNsazePNQrwK+s4X88757rXSDi/xlXdyvlY2un5RtxpiKXMnddm4XTJMJT2PL1Xu0gM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dXwGyR4q; arc=none smtp.client-ip=95.215.58.173
+	 MIME-Version; b=rsoN0b6zFdlz9CcN9d3IsRv2Q2X221JcBhZagAQik4R6/O+6wQ5NysldqqmV2rmoXGc6V6JGdkSTy2S/+dsbt3rHUcSG9j1642Cxi4vtxMAB/Vaq6FplgrJyBSvfGbotAjBDjav4n6jNfWs7HLQcX2dy3yGmBqgT2yW/cNEswcw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=LtHsRblZ; arc=none smtp.client-ip=95.215.58.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1776787170;
+	t=1776787183;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=x3E/jslnq568lIXr1RHFQ4heGbZ1dbw/jYSVYgE8kqw=;
-	b=dXwGyR4qw6xlhwShrrRLocyNpS3JKKBB748aO0Yr7w9EnBzbixYMt/k1rY0jugp101Pdj5
-	9ho34v23h0q8OjNq6WAC9nTZvuqC7gpi6+z03cdA/64eKRpqgRJmTMLRP1tI+hx4n99NtC
-	mOf/VxUV/l4iqMEXfHeTn7iiq0l7eGs=
+	bh=qMeS4rzJcZIOSoAT809/HlFM/RGvuB7M1xVMHKcnJ/Y=;
+	b=LtHsRblZ2tpH4N7M8BgjS7cr3iaOjnftJcbVtEQU++kDe3Ox+eE9tuZ6yPoVbSIfmE5P52
+	TQ0bVLvkYFNblETFFQ8BOhavCoF2T8LNC71MmUlDhZo99OuGDKaKIKt7EUFimh2IPh8MB8
+	SP6LN4PYAf57bWmD9FJu8EnTJ4PZzSo=
 From: KaFai Wan <kafai.wan@linux.dev>
 To: ast@kernel.org,
 	daniel@iogearbox.net,
@@ -73,9 +73,9 @@ To: ast@kernel.org,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
 	linux-kselftest@vger.kernel.org
-Subject: [PATCH bpf-next v4 2/4] bpf: Reject TCP_NODELAY in bpf-tcp-cc
-Date: Tue, 21 Apr 2026 23:58:02 +0800
-Message-ID: <20260421155804.135786-3-kafai.wan@linux.dev>
+Subject: [PATCH bpf-next v4 3/4] selftests/bpf: Test TCP_NODELAY in TCP hdr opt callbacks
+Date: Tue, 21 Apr 2026 23:58:03 +0800
+Message-ID: <20260421155804.135786-4-kafai.wan@linux.dev>
 In-Reply-To: <20260421155804.135786-1-kafai.wan@linux.dev>
 References: <20260421155804.135786-1-kafai.wan@linux.dev>
 Precedence: bulk
@@ -92,7 +92,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -100,7 +100,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_COUNT_THREE(0.00)[3];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280181-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-280182-lists,netdev=lfdr.de];
 	FREEMAIL_TO(0.00)[kernel.org,iogearbox.net,gmail.com,linux.dev,fomichev.me,davemloft.net,google.com,redhat.com,suse.com,vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MISSING_XM_UA(0.00)[];
@@ -113,104 +113,91 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-0.999];
 	RCPT_COUNT_TWELVE(0.00)[27];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,linux.dev:dkim,linux.dev:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 1854643D0E4
+X-Rspamd-Queue-Id: 137C143D1B0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-A BPF TCP congestion control program can call bpf_setsockopt() from
-its callbacks. In current kernels, if it calls
-bpf_setsockopt(TCP_NODELAY) from cwnd_event_tx_start(), the call can
-re-enter the TCP transmit path before the outer tcp_transmit_skb()
-has completed and advanced the send head.
+Add a sockops selftest for the TCP_NODELAY restriction in
+BPF_SOCK_OPS_HDR_OPT_LEN_CB and BPF_SOCK_OPS_WRITE_HDR_OPT_CB.
 
-This can re-trigger CA_EVENT_TX_START and lead to unbounded recursion:
+With BPF_SOCK_OPS_WRITE_HDR_OPT_CB_FLAG enabled,
+bpf_setsockopt(TCP_NODELAY) returns -EOPNOTSUPP from
+BPF_SOCK_OPS_HDR_OPT_LEN_CB and BPF_SOCK_OPS_WRITE_HDR_OPT_CB, avoiding
+unbounded recursion and kernel stack overflow.
 
-  tcp_transmit_skb()
-    -> tcp_event_data_sent()
-      -> tcp_ca_event(sk, CA_EVENT_TX_START)
-        -> cwnd_event_tx_start()
-          -> bpf_setsockopt(TCP_NODELAY)
-            -> tcp_push_pending_frames()
-              -> tcp_write_xmit()
-                -> tcp_transmit_skb()
+Other cases continue to work as before, including
+BPF_SOCK_OPS_PASSIVE_ESTABLISHED_CB.
 
-This leads to unbounded recursion and can overflow the kernel stack.
-
-Reject TCP_NODELAY with -EOPNOTSUPP for bpf-tcp-cc by introducing
-a dedicated setsockopt proto for BPF_PROG_TYPE_STRUCT_OPS TCP
-congestion control programs.
-
-Fixes: 7e41df5dbba2 ("bpf: Add a few optnames to bpf_setsockopt")
-Suggested-by: Martin KaFai Lau <martin.lau@linux.dev>
 Signed-off-by: KaFai Wan <kafai.wan@linux.dev>
+Reviewed-by: Jiayuan Chen <jiayuan.chen@linux.dev>
 ---
- include/linux/bpf.h   |  1 +
- net/core/filter.c     | 24 ++++++++++++++++++++++++
- net/ipv4/bpf_tcp_ca.c |  2 +-
- 3 files changed, 26 insertions(+), 1 deletion(-)
+ .../selftests/bpf/prog_tests/tcp_hdr_options.c    |  6 ++++++
+ .../bpf/progs/test_misc_tcp_hdr_options.c         | 15 ++++++++++++++-
+ 2 files changed, 20 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/bpf.h b/include/linux/bpf.h
-index 3cb6b9e70080..cf75da8a12bd 100644
---- a/include/linux/bpf.h
-+++ b/include/linux/bpf.h
-@@ -3725,6 +3725,7 @@ extern const struct bpf_func_proto bpf_for_each_map_elem_proto;
- extern const struct bpf_func_proto bpf_btf_find_by_name_kind_proto;
- extern const struct bpf_func_proto bpf_sk_setsockopt_proto;
- extern const struct bpf_func_proto bpf_sk_getsockopt_proto;
-+extern const struct bpf_func_proto bpf_sk_setsockopt_nodelay_proto;
- extern const struct bpf_func_proto bpf_unlocked_sk_setsockopt_proto;
- extern const struct bpf_func_proto bpf_unlocked_sk_getsockopt_proto;
- extern const struct bpf_func_proto bpf_find_vma_proto;
-diff --git a/net/core/filter.c b/net/core/filter.c
-index 96849f4c1fbc..1140f4b55ab5 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -5688,6 +5688,30 @@ const struct bpf_func_proto bpf_sk_getsockopt_proto = {
- 	.arg5_type	= ARG_CONST_SIZE,
- };
+diff --git a/tools/testing/selftests/bpf/prog_tests/tcp_hdr_options.c b/tools/testing/selftests/bpf/prog_tests/tcp_hdr_options.c
+index 56685fc03c7e..21632e0946c5 100644
+--- a/tools/testing/selftests/bpf/prog_tests/tcp_hdr_options.c
++++ b/tools/testing/selftests/bpf/prog_tests/tcp_hdr_options.c
+@@ -507,6 +507,12 @@ static void misc(void)
  
-+BPF_CALL_5(bpf_sk_setsockopt_nodelay, struct sock *, sk, int, level,
-+	   int, optname, char *, optval, int, optlen)
-+{
-+	/*
-+	 * TCP_NODELAY triggers tcp_push_pending_frames() and re-enters
-+	 * CA_EVENT_TX_START in bpf_tcp_cc, reject it in all bpf_tcp_cc.
-+	 */
-+	if (level == SOL_TCP && optname == TCP_NODELAY)
-+		return -EOPNOTSUPP;
+ 	ASSERT_EQ(misc_skel->bss->nr_hwtstamp, 0, "nr_hwtstamp");
+ 
++	ASSERT_TRUE(misc_skel->data->nodelay_est_ok, "nodelay_est_ok");
 +
-+	return _bpf_setsockopt(sk, level, optname, optval, optlen);
-+}
++	ASSERT_TRUE(misc_skel->data->nodelay_hdr_len_reject, "nodelay_hdr_len_reject");
 +
-+const struct bpf_func_proto bpf_sk_setsockopt_nodelay_proto = {
-+	.func		= bpf_sk_setsockopt_nodelay,
-+	.gpl_only	= false,
-+	.ret_type	= RET_INTEGER,
-+	.arg1_type	= ARG_PTR_TO_BTF_ID_SOCK_COMMON,
-+	.arg2_type	= ARG_ANYTHING,
-+	.arg3_type	= ARG_ANYTHING,
-+	.arg4_type	= ARG_PTR_TO_MEM | MEM_RDONLY,
-+	.arg5_type	= ARG_CONST_SIZE,
-+};
++	ASSERT_TRUE(misc_skel->data->nodelay_write_hdr_reject, "nodelay_write_hdr_reject");
 +
- BPF_CALL_5(bpf_unlocked_sk_setsockopt, struct sock *, sk, int, level,
- 	   int, optname, char *, optval, int, optlen)
+ check_linum:
+ 	ASSERT_FALSE(check_error_linum(&sk_fds), "check_error_linum");
+ 	sk_fds_close(&sk_fds);
+diff --git a/tools/testing/selftests/bpf/progs/test_misc_tcp_hdr_options.c b/tools/testing/selftests/bpf/progs/test_misc_tcp_hdr_options.c
+index d487153a839d..e77ec6791092 100644
+--- a/tools/testing/selftests/bpf/progs/test_misc_tcp_hdr_options.c
++++ b/tools/testing/selftests/bpf/progs/test_misc_tcp_hdr_options.c
+@@ -29,6 +29,10 @@ unsigned int nr_syn = 0;
+ unsigned int nr_fin = 0;
+ unsigned int nr_hwtstamp = 0;
+ 
++bool nodelay_est_ok = true;
++bool nodelay_hdr_len_reject = true;
++bool nodelay_write_hdr_reject = true;
++
+ /* Check the header received from the active side */
+ static int __check_active_hdr_in(struct bpf_sock_ops *skops, bool check_syn)
  {
-diff --git a/net/ipv4/bpf_tcp_ca.c b/net/ipv4/bpf_tcp_ca.c
-index 008edc7f6688..791e15063237 100644
---- a/net/ipv4/bpf_tcp_ca.c
-+++ b/net/ipv4/bpf_tcp_ca.c
-@@ -168,7 +168,7 @@ bpf_tcp_ca_get_func_proto(enum bpf_func_id func_id,
- 		 */
- 		if (prog_ops_moff(prog) !=
- 		    offsetof(struct tcp_congestion_ops, release))
--			return &bpf_sk_setsockopt_proto;
-+			return &bpf_sk_setsockopt_nodelay_proto;
- 		return NULL;
- 	case BPF_FUNC_getsockopt:
- 		/* Since get/setsockopt is usually expected to
+@@ -300,7 +304,7 @@ static int handle_passive_estab(struct bpf_sock_ops *skops)
+ SEC("sockops")
+ int misc_estab(struct bpf_sock_ops *skops)
+ {
+-	int true_val = 1;
++	int true_val = 1, false_val = 0, ret;
+ 
+ 	switch (skops->op) {
+ 	case BPF_SOCK_OPS_TCP_LISTEN_CB:
+@@ -316,10 +320,19 @@ int misc_estab(struct bpf_sock_ops *skops)
+ 	case BPF_SOCK_OPS_PARSE_HDR_OPT_CB:
+ 		return handle_parse_hdr(skops);
+ 	case BPF_SOCK_OPS_HDR_OPT_LEN_CB:
++		ret = bpf_setsockopt(skops, SOL_TCP, TCP_NODELAY, &true_val, sizeof(true_val));
++		nodelay_hdr_len_reject &= ret == -EOPNOTSUPP;
++
+ 		return handle_hdr_opt_len(skops);
+ 	case BPF_SOCK_OPS_WRITE_HDR_OPT_CB:
++		ret = bpf_setsockopt(skops, SOL_TCP, TCP_NODELAY, &true_val, sizeof(true_val));
++		nodelay_write_hdr_reject &= ret == -EOPNOTSUPP;
++
+ 		return handle_write_hdr_opt(skops);
+ 	case BPF_SOCK_OPS_PASSIVE_ESTABLISHED_CB:
++		ret = bpf_setsockopt(skops, SOL_TCP, TCP_NODELAY, &false_val, sizeof(false_val));
++		nodelay_est_ok &= ret == 0;
++
+ 		return handle_passive_estab(skops);
+ 	}
+ 
 -- 
 2.43.0
 
