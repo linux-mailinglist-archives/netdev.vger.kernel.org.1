@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-280233-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280235-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mBRjNkXX52mzBgIAu9opvQ
-	(envelope-from <netdev+bounces-280233-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 22:00:05 +0200
+	id kOBAJsHX52kBBwIAu9opvQ
+	(envelope-from <netdev+bounces-280235-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 22:02:09 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0556943F296
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 22:00:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0698D43F2EC
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 22:02:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 691B83020008
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 19:57:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 011A03076C2F
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 19:58:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0DD13DCDA4;
-	Tue, 21 Apr 2026 19:57:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06ABC3DCDAE;
+	Tue, 21 Apr 2026 19:58:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="XWt20gKJ"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="fE4QYUL+"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A6C33D88F0;
-	Tue, 21 Apr 2026 19:57:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4ECA3242BE;
+	Tue, 21 Apr 2026 19:58:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776801461; cv=none; b=DKItHj8kTwhDOeO49H2x4cJk6u2mqFuxU+0GlHowan/8qbFu5d+POc0vaSEVI3R8FL2cm7vzPA/3N87/URjFh5sPVbLRnpfx30AhhsWd+xB9L2y5itF0eKt9cwtlZMVwDskJvd8H7LhGZ2zqW+EeGJiVvO0BOJqVsvV1nfwr8fw=
+	t=1776801487; cv=none; b=ld6uUnZyUNW8bjX54MCR0fjyW0uXIqOYf8CyA54sl1hZdHvEC1Qf5Ml7B+sIi0e7RIJYcuBksnwjUVj05o/H7FkYZIKqRCREKs+xGCWEpiPDTv+AVX6dDzJUDCrwMOTEMIDShxlCIWV1IM3M0kwcjhDvuIZ8O0u11NSkWp6xvY4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776801461; c=relaxed/simple;
-	bh=j210VXmsgnfsiosK3HjwZL9RWuyMORt8TMmSCCX8R4E=;
+	s=arc-20240116; t=1776801487; c=relaxed/simple;
+	bh=NShMqnlTirV3JQCEwIZE0aVXyAsMTWs0eK6xeXMHSFY=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=tDChYZDss0vrEGp7Z3iDXZAV+84clFEfNa7TQx5STPHii+lC+Wn14IJIZoE4LsnG4qUPnNKLVX5jHRYE2hBMxpPZl9FdrO2fV6MdllISu/BguydN0/UulpCOqMNC32DmKxrdHoZ3G+r7+X4ugbibXYR0oSGs/nerfSDRXXPrLI8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=XWt20gKJ; arc=none smtp.client-ip=156.67.10.101
+	 In-Reply-To:To:Cc; b=gD6Ay70K64rCHLPbpTtQ3n7BY7QQhyxawiEd/Je2K74mzb7dYFi0vaUZA424j5KPEzEC2VpHFNosFoqMSFI5LSsbCYNwkeZx2s2Sxyupy8BW9p9Sofn29ZDld565c9jHZSsfFtoEmXx91tojwTGwKwxkhyokOb6KhJ4VnVevlR0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=fE4QYUL+; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -39,18 +39,18 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From:From:
 	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
 	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=cHVrIBNbMEO2oaXaakSg+VH8OQ+PF2rR6fx1P1Tt6B0=; b=XW
-	t20gKJosgVrEwHv64Kivg/qMDwLb8+Zjzi+Z/oLaecV2Gno0gjjJx9FsqIzI3KQrPnHOSJpRGeBwp
-	yUp2OfF5nJm1w9DYHgKzwtao8IdVRA2vZ8gkFcfWRaIEV+hJIG7ve0tyy2su/9dthsy8hE8nU9obc
-	ckVvciPP0TBFp04=;
+	In-Reply-To:References; bh=QJsxcOFAbO2ve9ibjgeHEwUwz4c5m98+MwLmC+bbb/g=; b=fE
+	4QYUL+ujPCTHSF57coPonWmsvZi1TWPBxvjSEl7EIYNhNEXHx1t/9uBYqQKxriAuur2O7n+GweCd5
+	6hRjLw0xjW5rZYK31ZBe5Y1h130qyNvw8yMWf1ZwtJ3KJ3VCn5nHGh2bcdFM5hxHx589jDGdnJ8qK
+	eCijyete18ru8WU=;
 Received: from c-66-41-74-139.hsd1.mn.comcast.net ([66.41.74.139] helo=thinkpad.home.lunn.ch)
 	by vps0.lunn.ch with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1wFGp3-00GwVc-Gg; Tue, 21 Apr 2026 21:31:49 +0200
+	id 1wFGp6-00GwVc-09; Tue, 21 Apr 2026 21:31:52 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-Date: Tue, 21 Apr 2026 14:31:16 -0500
-Subject: [PATCH net 13/18] drivers: net: fujitsu: fmvj18x: Remove this
+Date: Tue, 21 Apr 2026 14:31:17 -0500
+Subject: [PATCH net 14/18] drivers: net: xircom: xirc2ps: Remove this
  driver
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -60,7 +60,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260421-v7-0-0-net-next-driver-removal-v1-v1-13-69517c689d1f@lunn.ch>
+Message-Id: <20260421-v7-0-0-net-next-driver-removal-v1-v1-14-69517c689d1f@lunn.ch>
 References: <20260421-v7-0-0-net-next-driver-removal-v1-v1-0-69517c689d1f@lunn.ch>
 In-Reply-To: <20260421-v7-0-0-net-next-driver-removal-v1-v1-0-69517c689d1f@lunn.ch>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -71,20 +71,20 @@ To: Andrew Lunn <andrew+netdev@lunn.ch>,
 Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
  linux-doc@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=39103; i=andrew@lunn.ch;
- h=from:subject:message-id; bh=j210VXmsgnfsiosK3HjwZL9RWuyMORt8TMmSCCX8R4E=;
- b=owEBbQKS/ZANAwAIAea/DcumaUyEAcsmYgBp59CCdyYydtSutPM46YfMsyZ++4g3YlUizh8GB
- 78BLXQVSPqJAjMEAAEIAB0WIQRh+xAly1MmORb54bfmvw3LpmlMhAUCaefQggAKCRDmvw3LpmlM
- hFS2D/9cpys1VcUh0AwIcQ8fdJCfgKzSNIM7gnFI1O2UZtuNJnYm/idltmoEYMXUeZXGU6n+43n
- 7BpWXaLTJzgRfYxAnpI7PC9VzS6q3hCYtl0m6wqkI/eslisjsosM03QSJhBHCeezxyxu8iNm/5B
- v9IBnkMNeF5W/cjVmaW7YaA14afdhGSi/8HdOmOFKxzn30aIJT272yTczRJVEXtJpx8kwtIvV32
- UtBzS3Y3qilS+DcxkW6CP+6uCkfcWu+aBvyxfwLCPwd1J0Hx35GAlLxNS/3cclvB575zibo/D1g
- T6Ut7BMSPpXStqZ/sgSivWQZBUSNWq1kCnqGA9QJuxL7/pJOXoVP/p1KtaH1y8gy3xKGFdPdCKX
- 0lnQsnpYzjqMKpRZvGMaR80e4kRieNRvxA8i9yywfmJ4U3/XBJaKU4oxHY6OhTFWpJtOblWWODQ
- bFq1DeTsV30pa7egZU/eaXNWW3zB5ynaHRHW1u7Xa09aTfFTRoq5A2oJ44p4KS+mJK4G6x0XBn7
- 1Gw2odW7C/AAOWUOs0a4RtJfNCKvkL10E4+0KV8Li5RNFmQm6usAejXWy75Q9prWe0dlYTYSy3o
- xI8QSOIzK1MEuejXCblba6RoP3KeXI8KvZNyVhORnjEew/T9KgOCxD/Ovz1FaSlHDSCdeY5DGWV
- nd9DFEBoAeFDIOg==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=59599; i=andrew@lunn.ch;
+ h=from:subject:message-id; bh=NShMqnlTirV3JQCEwIZE0aVXyAsMTWs0eK6xeXMHSFY=;
+ b=owEBbQKS/ZANAwAIAea/DcumaUyEAcsmYgBp59CCkKdfuh42rdklNqY7cthqDDw3ajXaN6Jff
+ GV0hRpLouOJAjMEAAEIAB0WIQRh+xAly1MmORb54bfmvw3LpmlMhAUCaefQggAKCRDmvw3LpmlM
+ hNqkEADU8/Y2rXvq5Zzl/FdXHBeFz7e1geP7SCawTYbkhtZhcPqFDzZUIoEeBUsMg2qEOE3xw2U
+ 7cGS8XUZf4YUE250dBBCxjtlmfHahUDExTTrhp0UrU23NUa2nk+d0ndUHi+OGqpOvQOB4mxB2/Q
+ LKulmhZ6176of72DZ3hPddKcAc4IlJsS0T9wu1U86jT4Dqs7EY2fYTuiIXafspipnKoGQ+P5uth
+ Sa5qYGtpYFDNvF5niQE+EFU+FSzz3up2NmR65KligrR5iSabfTPrNWlw0qh3YNUZ0zWyWK63e9v
+ VPjTvNFxz43E3M5FtQm5a8dXLf6gwUDfm1B6hbgbxbiysw8Ac2SToYMNIeXLOJ+OCQyp8KhaukC
+ 394G05auo05EdZ0Hj9qtOdkWffHjAU/WVnl6ohGdGQOd7+ftDIBoTe7gHIRfkEbblRDH487bDIo
+ gRaL58pm+IMoGG1hSkAHQu2BtzRAvxtZbshR+JQe3rqHrreauDuiIvYFOH4R4WBinySYM5RGWWk
+ kW4f3DEuQDKJlm2L8M1moSSKNxYBFPQHDrSaYopNcIxXTwPKy8ADMNqkHVBHU7xB+IGuErV+InX
+ d1QDqUz9i/hq7agy3SLVN+Tdo9V3WH/1L+Rn/cfKCK/IGLijvtykO0V88eTqbfWxZYtOpH6toGM
+ hDW72wof6CTh+Vw==
 X-Developer-Key: i=andrew@lunn.ch; a=openpgp;
  fpr=61FB1025CB53263916F9E1B7E6BF0DCBA6694C84
 X-Spamd-Result: default: False [-0.66 / 15.00];
@@ -97,7 +97,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280233-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-280235-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -113,125 +113,156 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:email,lunn.ch:dkim,lunn.ch:mid,scyld.com:email,iijnet.or.jp:email,fujitsu.co.jp:email]
-X-Rspamd-Queue-Id: 0556943F296
+	DBL_BLOCKED_OPENRESOLVER(0.00)[icon.co.za:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:email,lunn.ch:dkim,lunn.ch:mid,gnu.org:url]
+X-Rspamd-Queue-Id: 0698D43F2EC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The fmvj18x was written by Shingo Fujimoto in 2002. It is an PCMCIA
+The xirc2ps was written by Werner Koch in 1997. It is an PCMCIA
 device, so unlikely to be used with modern kernels.
 
 Signed-off-by: Andrew Lunn <andrew@lunn.ch>
 ---
- drivers/net/ethernet/Kconfig              |    1 -
- drivers/net/ethernet/fujitsu/Kconfig      |   30 -
- drivers/net/ethernet/fujitsu/Makefile     |    6 -
- drivers/net/ethernet/fujitsu/fmvj18x_cs.c | 1176 -----------------------------
- 4 files changed, 1213 deletions(-)
+ drivers/net/ethernet/Kconfig             |    1 -
+ drivers/net/ethernet/xircom/Kconfig      |   30 -
+ drivers/net/ethernet/xircom/Makefile     |    6 -
+ drivers/net/ethernet/xircom/xirc2ps_cs.c | 1794 ------------------------------
+ 4 files changed, 1831 deletions(-)
 
 diff --git a/drivers/net/ethernet/Kconfig b/drivers/net/ethernet/Kconfig
-index bdc29d143160..c94e8f27af94 100644
+index c94e8f27af94..5171d9046ea4 100644
 --- a/drivers/net/ethernet/Kconfig
 +++ b/drivers/net/ethernet/Kconfig
-@@ -61,7 +61,6 @@ source "drivers/net/ethernet/engleder/Kconfig"
- source "drivers/net/ethernet/ezchip/Kconfig"
- source "drivers/net/ethernet/faraday/Kconfig"
- source "drivers/net/ethernet/freescale/Kconfig"
--source "drivers/net/ethernet/fujitsu/Kconfig"
- source "drivers/net/ethernet/fungible/Kconfig"
- source "drivers/net/ethernet/google/Kconfig"
- source "drivers/net/ethernet/hisilicon/Kconfig"
-diff --git a/drivers/net/ethernet/fujitsu/Kconfig b/drivers/net/ethernet/fujitsu/Kconfig
+@@ -188,6 +188,5 @@ source "drivers/net/ethernet/via/Kconfig"
+ source "drivers/net/ethernet/wangxun/Kconfig"
+ source "drivers/net/ethernet/wiznet/Kconfig"
+ source "drivers/net/ethernet/xilinx/Kconfig"
+-source "drivers/net/ethernet/xircom/Kconfig"
+ 
+ endif # ETHERNET
+diff --git a/drivers/net/ethernet/xircom/Kconfig b/drivers/net/ethernet/xircom/Kconfig
 deleted file mode 100644
-index 06a28bce5d27..000000000000
---- a/drivers/net/ethernet/fujitsu/Kconfig
+index bfbdcf758afb..000000000000
+--- a/drivers/net/ethernet/xircom/Kconfig
 +++ /dev/null
 @@ -1,30 +0,0 @@
 -# SPDX-License-Identifier: GPL-2.0-only
 -#
--# Fujitsu Network device configuration
+-# Xircom network device configuration
 -#
 -
--config NET_VENDOR_FUJITSU
--	bool "Fujitsu devices"
+-config NET_VENDOR_XIRCOM
+-	bool "Xircom devices"
 -	default y
 -	depends on PCMCIA
 -	help
 -	  If you have a network (Ethernet) card belonging to this class, say Y.
 -
 -	  Note that the answer to this question doesn't directly affect the
--	  the questions about Fujitsu cards. If you say Y, you will be asked for
+-	  kernel: saying N will just cause the configurator to skip all
+-	  the questions about Xircom cards. If you say Y, you will be asked for
 -	  your specific card in the following questions.
 -
--if NET_VENDOR_FUJITSU
+-if NET_VENDOR_XIRCOM
 -
--config PCMCIA_FMVJ18X
--	tristate "Fujitsu FMV-J18x PCMCIA support"
+-config PCMCIA_XIRC2PS
+-	tristate "Xircom 16-bit PCMCIA support"
 -	depends on PCMCIA && HAS_IOPORT
--	select CRC32
 -	help
--	  Say Y here if you intend to attach a Fujitsu FMV-J18x or compatible
--	  PCMCIA (PC-card) Ethernet card to your computer.
+-	  Say Y here if you intend to attach a Xircom 16-bit PCMCIA (PC-card)
+-	  Ethernet or Fast Ethernet card to your computer.
 -
 -	  To compile this driver as a module, choose M here: the module will be
--	  called fmvj18x_cs.  If unsure, say N.
+-	  called xirc2ps_cs.  If unsure, say N.
 -
--endif # NET_VENDOR_FUJITSU
-diff --git a/drivers/net/ethernet/fujitsu/Makefile b/drivers/net/ethernet/fujitsu/Makefile
+-endif # NET_VENDOR_XIRCOM
+diff --git a/drivers/net/ethernet/xircom/Makefile b/drivers/net/ethernet/xircom/Makefile
 deleted file mode 100644
-index 74feebbf4572..000000000000
---- a/drivers/net/ethernet/fujitsu/Makefile
+index 07667fefafc2..000000000000
+--- a/drivers/net/ethernet/xircom/Makefile
 +++ /dev/null
 @@ -1,6 +0,0 @@
 -# SPDX-License-Identifier: GPL-2.0-only
 -#
--# Makefile for the Fujitsu network device drivers.
+-# Makefile for the Xircom network device drivers.
 -#
 -
--obj-$(CONFIG_PCMCIA_FMVJ18X) += fmvj18x_cs.o
-diff --git a/drivers/net/ethernet/fujitsu/fmvj18x_cs.c b/drivers/net/ethernet/fujitsu/fmvj18x_cs.c
+-obj-$(CONFIG_PCMCIA_XIRC2PS) += xirc2ps_cs.o
+diff --git a/drivers/net/ethernet/xircom/xirc2ps_cs.c b/drivers/net/ethernet/xircom/xirc2ps_cs.c
 deleted file mode 100644
-index 4859493471db..000000000000
---- a/drivers/net/ethernet/fujitsu/fmvj18x_cs.c
+index 97e88886253f..000000000000
+--- a/drivers/net/ethernet/xircom/xirc2ps_cs.c
 +++ /dev/null
-@@ -1,1176 +0,0 @@
--/*======================================================================
--    fmvj18x_cs.c 2.8 2002/03/23
--
--    A fmvj18x (and its compatibles) PCMCIA client driver
--
--    Contributed by Shingo Fujimoto, shingo@flab.fujitsu.co.jp
--
--    TDK LAK-CD021 and CONTEC C-NET(PC)C support added by 
--    Nobuhiro Katayama, kata-n@po.iijnet.or.jp
--
--    The PCMCIA client code is based on code written by David Hinds.
--    Network code is based on the "FMV-18x driver" by Yutaka TAMIYA
--    but is actually largely Donald Becker's AT1700 driver, which
--    carries the following attribution:
--
--    Written 1993-94 by Donald Becker.
--
--    Copyright 1993 United States Government as represented by the
--    Director, National Security Agency.
--    
--    This software may be used and distributed according to the terms
--    of the GNU General Public License, incorporated herein by reference.
--    
--    The author may be reached as becker@scyld.com, or C/O
--    Scyld Computing Corporation
--    410 Severn Ave., Suite 210
--    Annapolis MD 21403
--   
--======================================================================*/
+@@ -1,1794 +0,0 @@
+-/* [xirc2ps_cs.c wk 03.11.99] (1.40 1999/11/18 00:06:03)
+- * Xircom CreditCard Ethernet Adapter IIps driver
+- * Xircom Realport 10/100 (RE-100) driver 
+- *
+- * This driver supports various Xircom CreditCard Ethernet adapters
+- * including the CE2, CE IIps, RE-10, CEM28, CEM33, CE33, CEM56,
+- * CE3-100, CE3B, RE-100, REM10BT, and REM56G-100.
+- *
+- * 2000-09-24 <psheer@icon.co.za> The Xircom CE3B-100 may not
+- * autodetect the media properly. In this case use the
+- * if_port=1 (for 10BaseT) or if_port=4 (for 100BaseT) options
+- * to force the media type.
+- * 
+- * Written originally by Werner Koch based on David Hinds' skeleton of the
+- * PCMCIA driver.
+- *
+- * Copyright (c) 1997,1998 Werner Koch (dd9jn)
+- *
+- * This driver is free software; you can redistribute it and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation; either version 2 of the License, or
+- * (at your option) any later version.
+- *
+- * It is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- * GNU General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with this program; if not, see <http://www.gnu.org/licenses/>.
+- *
+- *
+- * ALTERNATIVELY, this driver may be distributed under the terms of
+- * the following license, in which case the provisions of this license
+- * are required INSTEAD OF the GNU General Public License.  (This clause
+- * is necessary due to a potential bad interaction between the GPL and
+- * the restrictions contained in a BSD-style copyright.)
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions
+- * are met:
+- * 1. Redistributions of source code must retain the above copyright
+- *    notice, and the entire permission notice in its entirety,
+- *    including the disclaimer of warranties.
+- * 2. Redistributions in binary form must reproduce the above copyright
+- *    notice, this list of conditions and the following disclaimer in the
+- *    documentation and/or other materials provided with the distribution.
+- * 3. The name of the author may not be used to endorse or promote
+- *    products derived from this software without specific prior
+- *    written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED
+- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+- * DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT,
+- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+- * OF THE POSSIBILITY OF SUCH DAMAGE.
+- */
 -
 -#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
 -
--#define DRV_NAME	"fmvj18x_cs"
--#define DRV_VERSION	"2.9"
--
 -#include <linux/module.h>
 -#include <linux/kernel.h>
+-#include <linux/init.h>
 -#include <linux/ptrace.h>
 -#include <linux/slab.h>
 -#include <linux/string.h>
@@ -245,1132 +276,1718 @@ index 4859493471db..000000000000
 -#include <linux/skbuff.h>
 -#include <linux/if_arp.h>
 -#include <linux/ioport.h>
--#include <linux/crc32.h>
+-#include <linux/bitops.h>
+-#include <linux/mii.h>
 -
 -#include <pcmcia/cistpl.h>
+-#include <pcmcia/cisreg.h>
 -#include <pcmcia/ciscode.h>
+-
+-#include <asm/io.h>
+-#include <linux/uaccess.h>
+-
+-#ifndef MANFID_COMPAQ
+-  #define MANFID_COMPAQ 	   0x0138
+-  #define MANFID_COMPAQ2	   0x0183  /* is this correct? */
+-#endif
+-
 -#include <pcmcia/ds.h>
 -
--#include <linux/uaccess.h>
--#include <asm/io.h>
+-/* Time in jiffies before concluding Tx hung */
+-#define TX_TIMEOUT	((400*HZ)/1000)
 -
+-/****************
+- * Some constants used to access the hardware
+- */
+-
+-/* Register offsets and value constans */
+-#define XIRCREG_CR  0	/* Command register (wr) */
+-enum xirc_cr {
+-    TransmitPacket = 0x01,
+-    SoftReset = 0x02,
+-    EnableIntr = 0x04,
+-    ForceIntr  = 0x08,
+-    ClearTxFIFO = 0x10,
+-    ClearRxOvrun = 0x20,
+-    RestartTx	 = 0x40
+-};
+-#define XIRCREG_ESR 0	/* Ethernet status register (rd) */
+-enum xirc_esr {
+-    FullPktRcvd = 0x01, /* full packet in receive buffer */
+-    PktRejected = 0x04, /* a packet has been rejected */
+-    TxPktPend = 0x08,	/* TX Packet Pending */
+-    IncorPolarity = 0x10,
+-    MediaSelect = 0x20	/* set if TP, clear if AUI */
+-};
+-#define XIRCREG_PR  1	/* Page Register select */
+-#define XIRCREG_EDP 4	/* Ethernet Data Port Register */
+-#define XIRCREG_ISR 6	/* Ethernet Interrupt Status Register */
+-enum xirc_isr {
+-    TxBufOvr = 0x01,	/* TX Buffer Overflow */
+-    PktTxed  = 0x02,	/* Packet Transmitted */
+-    MACIntr  = 0x04,	/* MAC Interrupt occurred */
+-    TxResGrant = 0x08,	/* Tx Reservation Granted */
+-    RxFullPkt = 0x20,	/* Rx Full Packet */
+-    RxPktRej  = 0x40,	/* Rx Packet Rejected */
+-    ForcedIntr= 0x80	/* Forced Interrupt */
+-};
+-#define XIRCREG1_IMR0 12 /* Ethernet Interrupt Mask Register (on page 1)*/
+-#define XIRCREG1_IMR1 13
+-#define XIRCREG0_TSO  8  /* Transmit Space Open Register (on page 0)*/
+-#define XIRCREG0_TRS  10 /* Transmit reservation Size Register (page 0)*/
+-#define XIRCREG0_DO   12 /* Data Offset Register (page 0) (wr) */
+-#define XIRCREG0_RSR  12 /* Receive Status Register (page 0) (rd) */
+-enum xirc_rsr {
+-    PhyPkt = 0x01,	/* set:physical packet, clear: multicast packet */
+-    BrdcstPkt = 0x02,	/* set if it is a broadcast packet */
+-    PktTooLong = 0x04,	/* set if packet length > 1518 */
+-    AlignErr = 0x10,	/* incorrect CRC and last octet not complete */
+-    CRCErr = 0x20,	/* incorrect CRC and last octet is complete */
+-    PktRxOk = 0x80	/* received ok */
+-};
+-#define XIRCREG0_PTR 13 /* packets transmitted register (rd) */
+-#define XIRCREG0_RBC 14 /* receive byte count regsister (rd) */
+-#define XIRCREG1_ECR 14 /* ethernet configurationn register */
+-enum xirc_ecr {
+-    FullDuplex = 0x04,	/* enable full duplex mode */
+-    LongTPMode = 0x08,	/* adjust for longer lengths of TP cable */
+-    DisablePolCor = 0x10,/* disable auto polarity correction */
+-    DisableLinkPulse = 0x20, /* disable link pulse generation */
+-    DisableAutoTx = 0x40, /* disable auto-transmit */
+-};
+-#define XIRCREG2_RBS 8	/* receive buffer start register */
+-#define XIRCREG2_LED 10 /* LED Configuration register */
+-/* values for the leds:    Bits 2-0 for led 1
+- *  0 disabled		   Bits 5-3 for led 2
+- *  1 collision
+- *  2 noncollision
+- *  3 link_detected
+- *  4 incor_polarity
+- *  5 jabber
+- *  6 auto_assertion
+- *  7 rx_tx_activity
+- */
+-#define XIRCREG2_MSR 12 /* Mohawk specific register */
+-
+-#define XIRCREG4_GPR0 8 /* General Purpose Register 0 */
+-#define XIRCREG4_GPR1 9 /* General Purpose Register 1 */
+-#define XIRCREG2_GPR2 13 /* General Purpose Register 2 (page2!)*/
+-#define XIRCREG4_BOV 10 /* Bonding Version Register */
+-#define XIRCREG4_LMA 12 /* Local Memory Address Register */
+-#define XIRCREG4_LMD 14 /* Local Memory Data Port */
+-/* MAC register can only by accessed with 8 bit operations */
+-#define XIRCREG40_CMD0 8    /* Command Register (wr) */
+-enum xirc_cmd { 	    /* Commands */
+-    Transmit = 0x01,
+-    EnableRecv = 0x04,
+-    DisableRecv = 0x08,
+-    Abort = 0x10,
+-    Online = 0x20,
+-    IntrAck = 0x40,
+-    Offline = 0x80
+-};
+-#define XIRCREG5_RHSA0	10  /* Rx Host Start Address */
+-#define XIRCREG40_RXST0 9   /* Receive Status Register */
+-#define XIRCREG40_TXST0 11  /* Transmit Status Register 0 */
+-#define XIRCREG40_TXST1 12  /* Transmit Status Register 10 */
+-#define XIRCREG40_RMASK0 13  /* Receive Mask Register */
+-#define XIRCREG40_TMASK0 14  /* Transmit Mask Register 0 */
+-#define XIRCREG40_TMASK1 15  /* Transmit Mask Register 0 */
+-#define XIRCREG42_SWC0	8   /* Software Configuration 0 */
+-#define XIRCREG42_SWC1	9   /* Software Configuration 1 */
+-#define XIRCREG42_BOC	10  /* Back-Off Configuration */
+-#define XIRCREG44_TDR0	8   /* Time Domain Reflectometry 0 */
+-#define XIRCREG44_TDR1	9   /* Time Domain Reflectometry 1 */
+-#define XIRCREG44_RXBC_LO 10 /* Rx Byte Count 0 (rd) */
+-#define XIRCREG44_RXBC_HI 11 /* Rx Byte Count 1 (rd) */
+-#define XIRCREG45_REV	 15 /* Revision Register (rd) */
+-#define XIRCREG50_IA	8   /* Individual Address (8-13) */
+-
+-static const char *if_names[] = { "Auto", "10BaseT", "10Base2", "AUI", "100BaseT" };
+-
+-/* card types */
+-#define XIR_UNKNOWN  0	/* unknown: not supported */
+-#define XIR_CE	     1	/* (prodid 1) different hardware: not supported */
+-#define XIR_CE2      2	/* (prodid 2) */
+-#define XIR_CE3      3	/* (prodid 3) */
+-#define XIR_CEM      4	/* (prodid 1) different hardware: not supported */
+-#define XIR_CEM2     5	/* (prodid 2) */
+-#define XIR_CEM3     6	/* (prodid 3) */
+-#define XIR_CEM33    7	/* (prodid 4) */
+-#define XIR_CEM56M   8	/* (prodid 5) */
+-#define XIR_CEM56    9	/* (prodid 6) */
+-#define XIR_CM28    10	/* (prodid 3) modem only: not supported here */
+-#define XIR_CM33    11	/* (prodid 4) modem only: not supported here */
+-#define XIR_CM56    12	/* (prodid 5) modem only: not supported here */
+-#define XIR_CG	    13	/* (prodid 1) GSM modem only: not supported */
+-#define XIR_CBE     14	/* (prodid 1) cardbus ethernet: not supported */
 -/*====================================================================*/
 -
 -/* Module parameters */
 -
--MODULE_DESCRIPTION("fmvj18x and compatible PCMCIA ethernet driver");
--MODULE_LICENSE("GPL");
+-MODULE_DESCRIPTION("Xircom PCMCIA ethernet driver");
+-MODULE_LICENSE("Dual MPL/GPL");
 -
 -#define INT_MODULE_PARM(n, v) static int n = v; module_param(n, int, 0)
 -
--/* SRAM configuration */
--/* 0:4KB*2 TX buffer   else:8KB*2 TX buffer */
--INT_MODULE_PARM(sram_config, 0);
--
+-INT_MODULE_PARM(if_port,	0);
+-INT_MODULE_PARM(full_duplex,	0);
+-INT_MODULE_PARM(do_sound, 	1);
+-INT_MODULE_PARM(lockup_hack,	0);  /* anti lockup hack */
 -
 -/*====================================================================*/
--/*
--    PCMCIA event handlers
-- */
--static int fmvj18x_config(struct pcmcia_device *link);
--static int fmvj18x_get_hwinfo(struct pcmcia_device *link, u_char *node_id);
--static int fmvj18x_setup_mfc(struct pcmcia_device *link);
--static void fmvj18x_release(struct pcmcia_device *link);
--static void fmvj18x_detach(struct pcmcia_device *p_dev);
 -
--/*
--    LAN controller(MBH86960A) specific routines
+-/* We do not process more than these number of bytes during one
+- * interrupt. (Of course we receive complete packets, so this is not
+- * an exact value).
+- * Something between 2000..22000; first value gives best interrupt latency,
+- * the second enables the usage of the complete on-chip buffer. We use the
+- * high value as the initial value.
 - */
--static int fjn_config(struct net_device *dev, struct ifmap *map);
--static int fjn_open(struct net_device *dev);
--static int fjn_close(struct net_device *dev);
--static netdev_tx_t fjn_start_xmit(struct sk_buff *skb,
--					struct net_device *dev);
--static irqreturn_t fjn_interrupt(int irq, void *dev_id);
--static void fjn_rx(struct net_device *dev);
--static void fjn_reset(struct net_device *dev);
--static void set_rx_mode(struct net_device *dev);
--static void fjn_tx_timeout(struct net_device *dev, unsigned int txqueue);
--static const struct ethtool_ops netdev_ethtool_ops;
+-static unsigned maxrx_bytes = 22000;
 -
--/*
--    card type
-- */
--enum cardtype { MBH10302, MBH10304, TDK, CONTEC, LA501, UNGERMANN,
--	       XXX10304, NEC, KME
--};
+-/* MII management prototypes */
+-static void mii_idle(unsigned int ioaddr);
+-static void mii_putbit(unsigned int ioaddr, unsigned data);
+-static int  mii_getbit(unsigned int ioaddr);
+-static void mii_wbits(unsigned int ioaddr, unsigned data, int len);
+-static unsigned mii_rd(unsigned int ioaddr, u_char phyaddr, u_char phyreg);
+-static void mii_wr(unsigned int ioaddr, u_char phyaddr, u_char phyreg,
+-		   unsigned data, int len);
 -
--/*
--    driver specific data structure
--*/
+-static int has_ce2_string(struct pcmcia_device * link);
+-static int xirc2ps_config(struct pcmcia_device * link);
+-static void xirc2ps_release(struct pcmcia_device * link);
+-static void xirc2ps_detach(struct pcmcia_device *p_dev);
+-
+-static irqreturn_t xirc2ps_interrupt(int irq, void *dev_id);
+-
 -struct local_info {
+-	struct net_device	*dev;
 -	struct pcmcia_device	*p_dev;
--    long open_time;
--    uint tx_started:1;
--    uint tx_queue;
--    u_short tx_queue_len;
--    enum cardtype cardtype;
--    u_short sent;
--    u_char __iomem *base;
+-
+-    int card_type;
+-    int probe_port;
+-    int silicon; /* silicon revision. 0=old CE2, 1=Scipper, 4=Mohawk */
+-    int mohawk;  /* a CE3 type card */
+-    int dingo;	 /* a CEM56 type card */
+-    int new_mii; /* has full 10baseT/100baseT MII */
+-    int modem;	 /* is a multi function card (i.e with a modem) */
+-    void __iomem *dingo_ccr; /* only used for CEM56 cards */
+-    unsigned last_ptr_value; /* last packets transmitted value */
+-    const char *manf_str;
+-    struct work_struct tx_timeout_task;
 -};
 -
--#define MC_FILTERBREAK 64
--
--/*====================================================================*/
--/* 
--    ioport offset from the base address 
+-/****************
+- * Some more prototypes
 - */
--#define TX_STATUS               0 /* transmit status register */
--#define RX_STATUS               1 /* receive status register */
--#define TX_INTR                 2 /* transmit interrupt mask register */
--#define RX_INTR                 3 /* receive interrupt mask register */
--#define TX_MODE                 4 /* transmit mode register */
--#define RX_MODE                 5 /* receive mode register */
--#define CONFIG_0                6 /* configuration register 0 */
--#define CONFIG_1                7 /* configuration register 1 */
+-static netdev_tx_t do_start_xmit(struct sk_buff *skb,
+-				       struct net_device *dev);
+-static void xirc_tx_timeout(struct net_device *dev, unsigned int txqueue);
+-static void xirc2ps_tx_timeout_task(struct work_struct *work);
+-static void set_addresses(struct net_device *dev);
+-static void set_multicast_list(struct net_device *dev);
+-static int set_card_type(struct pcmcia_device *link);
+-static int do_config(struct net_device *dev, struct ifmap *map);
+-static int do_open(struct net_device *dev);
+-static int do_ioctl(struct net_device *dev, struct ifreq *rq, int cmd);
+-static const struct ethtool_ops netdev_ethtool_ops;
+-static void hardreset(struct net_device *dev);
+-static void do_reset(struct net_device *dev, int full);
+-static int init_mii(struct net_device *dev);
+-static void do_powerdown(struct net_device *dev);
+-static int do_stop(struct net_device *dev);
 -
--#define NODE_ID                 8 /* node ID register            (bank 0) */
--#define MAR_ADR                 8 /* multicast address registers (bank 1) */
+-/*=============== Helper functions =========================*/
+-#define SelectPage(pgnr)   outb((pgnr), ioaddr + XIRCREG_PR)
+-#define GetByte(reg)	   ((unsigned)inb(ioaddr + (reg)))
+-#define GetWord(reg)	   ((unsigned)inw(ioaddr + (reg)))
+-#define PutByte(reg,value) outb((value), ioaddr+(reg))
+-#define PutWord(reg,value) outw((value), ioaddr+(reg))
 -
--#define DATAPORT                8 /* buffer mem port registers   (bank 2) */
--#define TX_START               10 /* transmit start register */
--#define COL_CTRL               11 /* 16 collision control register */
--#define BMPR12                 12 /* reserved */
--#define BMPR13                 13 /* reserved */
--#define RX_SKIP                14 /* skip received packet register */
+-/*====== Functions used for debugging =================================*/
+-#if 0 /* reading regs may change system status */
+-static void
+-PrintRegisters(struct net_device *dev)
+-{
+-    unsigned int ioaddr = dev->base_addr;
 -
--#define LAN_CTRL               16 /* LAN card control register */
+-    if (pc_debug > 1) {
+-	int i, page;
 -
--#define MAC_ID               0x1a /* hardware address */
--#define UNGERMANN_MAC_ID     0x18 /* UNGERMANN-BASS hardware address */
+-	printk(KERN_DEBUG pr_fmt("Register  common: "));
+-	for (i = 0; i < 8; i++)
+-	    pr_cont(" %2.2x", GetByte(i));
+-	pr_cont("\n");
+-	for (page = 0; page <= 8; page++) {
+-	    printk(KERN_DEBUG pr_fmt("Register page %2x: "), page);
+-	    SelectPage(page);
+-	    for (i = 8; i < 16; i++)
+-		pr_cont(" %2.2x", GetByte(i));
+-	    pr_cont("\n");
+-	}
+-	for (page=0x40 ; page <= 0x5f; page++) {
+-		if (page == 0x43 || (page >= 0x46 && page <= 0x4f) ||
+-		    (page >= 0x51 && page <=0x5e))
+-			continue;
+-	    printk(KERN_DEBUG pr_fmt("Register page %2x: "), page);
+-	    SelectPage(page);
+-	    for (i = 8; i < 16; i++)
+-		pr_cont(" %2.2x", GetByte(i));
+-	    pr_cont("\n");
+-	}
+-    }
+-}
+-#endif /* 0 */
 -
--/* 
--    control bits 
+-/*============== MII Management functions ===============*/
+-
+-/****************
+- * Turn around for read
 - */
--#define ENA_TMT_OK           0x80
--#define ENA_TMT_REC          0x20
--#define ENA_COL              0x04
--#define ENA_16_COL           0x02
--#define ENA_TBUS_ERR         0x01
+-static void
+-mii_idle(unsigned int ioaddr)
+-{
+-    PutByte(XIRCREG2_GPR2, 0x04|0); /* drive MDCK low */
+-    udelay(1);
+-    PutByte(XIRCREG2_GPR2, 0x04|1); /* and drive MDCK high */
+-    udelay(1);
+-}
 -
--#define ENA_PKT_RDY          0x80
--#define ENA_BUS_ERR          0x40
--#define ENA_LEN_ERR          0x08
--#define ENA_ALG_ERR          0x04
--#define ENA_CRC_ERR          0x02
--#define ENA_OVR_FLO          0x01
+-/****************
+- * Write a bit to MDI/O
+- */
+-static void
+-mii_putbit(unsigned int ioaddr, unsigned data)
+-{
+-  #if 1
+-    if (data) {
+-	PutByte(XIRCREG2_GPR2, 0x0c|2|0); /* set MDIO */
+-	udelay(1);
+-	PutByte(XIRCREG2_GPR2, 0x0c|2|1); /* and drive MDCK high */
+-	udelay(1);
+-    } else {
+-	PutByte(XIRCREG2_GPR2, 0x0c|0|0); /* clear MDIO */
+-	udelay(1);
+-	PutByte(XIRCREG2_GPR2, 0x0c|0|1); /* and drive MDCK high */
+-	udelay(1);
+-    }
+-  #else
+-    if (data) {
+-	PutWord(XIRCREG2_GPR2-1, 0x0e0e);
+-	udelay(1);
+-	PutWord(XIRCREG2_GPR2-1, 0x0f0f);
+-	udelay(1);
+-    } else {
+-	PutWord(XIRCREG2_GPR2-1, 0x0c0c);
+-	udelay(1);
+-	PutWord(XIRCREG2_GPR2-1, 0x0d0d);
+-	udelay(1);
+-    }
+-  #endif
+-}
 -
--/* flags */
--#define F_TMT_RDY            0x80 /* can accept new packet */
--#define F_NET_BSY            0x40 /* carrier is detected */
--#define F_TMT_OK             0x20 /* send packet successfully */
--#define F_SRT_PKT            0x10 /* short packet error */
--#define F_COL_ERR            0x04 /* collision error */
--#define F_16_COL             0x02 /* 16 collision error */
--#define F_TBUS_ERR           0x01 /* bus read error */
+-/****************
+- * Get a bit from MDI/O
+- */
+-static int
+-mii_getbit(unsigned int ioaddr)
+-{
+-    unsigned d;
 -
--#define F_PKT_RDY            0x80 /* packet(s) in buffer */
--#define F_BUS_ERR            0x40 /* bus read error */
--#define F_LEN_ERR            0x08 /* short packet */
--#define F_ALG_ERR            0x04 /* frame error */
--#define F_CRC_ERR            0x02 /* CRC error */
--#define F_OVR_FLO            0x01 /* overflow error */
+-    PutByte(XIRCREG2_GPR2, 4|0); /* drive MDCK low */
+-    udelay(1);
+-    d = GetByte(XIRCREG2_GPR2); /* read MDIO */
+-    PutByte(XIRCREG2_GPR2, 4|1); /* drive MDCK high again */
+-    udelay(1);
+-    return d & 0x20; /* read MDIO */
+-}
 -
--#define F_BUF_EMP            0x40 /* receive buffer is empty */
+-static void
+-mii_wbits(unsigned int ioaddr, unsigned data, int len)
+-{
+-    unsigned m = 1 << (len-1);
+-    for (; m; m >>= 1)
+-	mii_putbit(ioaddr, data & m);
+-}
 -
--#define F_SKP_PKT            0x05 /* drop packet in buffer */
+-static unsigned
+-mii_rd(unsigned int ioaddr,	u_char phyaddr, u_char phyreg)
+-{
+-    int i;
+-    unsigned data=0, m;
 -
--/* default bitmaps */
--#define D_TX_INTR  ( ENA_TMT_OK )
--#define D_RX_INTR  ( ENA_PKT_RDY | ENA_LEN_ERR \
--		   | ENA_ALG_ERR | ENA_CRC_ERR | ENA_OVR_FLO )
--#define TX_STAT_M  ( F_TMT_RDY )
--#define RX_STAT_M  ( F_PKT_RDY | F_LEN_ERR \
--                   | F_ALG_ERR | F_CRC_ERR | F_OVR_FLO )
+-    SelectPage(2);
+-    for (i=0; i < 32; i++)		/* 32 bit preamble */
+-	mii_putbit(ioaddr, 1);
+-    mii_wbits(ioaddr, 0x06, 4); 	/* Start and opcode for read */
+-    mii_wbits(ioaddr, phyaddr, 5);	/* PHY address to be accessed */
+-    mii_wbits(ioaddr, phyreg, 5);	/* PHY register to read */
+-    mii_idle(ioaddr);			/* turn around */
+-    mii_getbit(ioaddr);
 -
--/* commands */
--#define D_TX_MODE            0x06 /* no tests, detect carrier */
--#define ID_MATCHED           0x02 /* (RX_MODE) */
--#define RECV_ALL             0x03 /* (RX_MODE) */
--#define CONFIG0_DFL          0x5a /* 16bit bus, 4K x 2 Tx queues */
--#define CONFIG0_DFL_1        0x5e /* 16bit bus, 8K x 2 Tx queues */
--#define CONFIG0_RST          0xda /* Data Link Controller off (CONFIG_0) */
--#define CONFIG0_RST_1        0xde /* Data Link Controller off (CONFIG_0) */
--#define BANK_0               0xa0 /* bank 0 (CONFIG_1) */
--#define BANK_1               0xa4 /* bank 1 (CONFIG_1) */
--#define BANK_2               0xa8 /* bank 2 (CONFIG_1) */
--#define CHIP_OFF             0x80 /* contrl chip power off (CONFIG_1) */
--#define DO_TX                0x80 /* do transmit packet */
--#define SEND_PKT             0x81 /* send a packet */
--#define AUTO_MODE            0x07 /* Auto skip packet on 16 col detected */
--#define MANU_MODE            0x03 /* Stop and skip packet on 16 col */
--#define TDK_AUTO_MODE        0x47 /* Auto skip packet on 16 col detected */
--#define TDK_MANU_MODE        0x43 /* Stop and skip packet on 16 col */
--#define INTR_OFF             0x0d /* LAN controller ignores interrupts */
--#define INTR_ON              0x1d /* LAN controller will catch interrupts */
+-    for (m = 1<<15; m; m >>= 1)
+-	if (mii_getbit(ioaddr))
+-	    data |= m;
+-    mii_idle(ioaddr);
+-    return data;
+-}
 -
--#define TX_TIMEOUT		((400*HZ)/1000)
+-static void
+-mii_wr(unsigned int ioaddr, u_char phyaddr, u_char phyreg, unsigned data,
+-       int len)
+-{
+-    int i;
 -
--#define BANK_0U              0x20 /* bank 0 (CONFIG_1) */
--#define BANK_1U              0x24 /* bank 1 (CONFIG_1) */
--#define BANK_2U              0x28 /* bank 2 (CONFIG_1) */
+-    SelectPage(2);
+-    for (i=0; i < 32; i++)		/* 32 bit preamble */
+-	mii_putbit(ioaddr, 1);
+-    mii_wbits(ioaddr, 0x05, 4); 	/* Start and opcode for write */
+-    mii_wbits(ioaddr, phyaddr, 5);	/* PHY address to be accessed */
+-    mii_wbits(ioaddr, phyreg, 5);	/* PHY Register to write */
+-    mii_putbit(ioaddr, 1);		/* turn around */
+-    mii_putbit(ioaddr, 0);
+-    mii_wbits(ioaddr, data, len);	/* And write the data */
+-    mii_idle(ioaddr);
+-}
 -
--static const struct net_device_ops fjn_netdev_ops = {
--	.ndo_open 		= fjn_open,
--	.ndo_stop		= fjn_close,
--	.ndo_start_xmit 	= fjn_start_xmit,
--	.ndo_tx_timeout 	= fjn_tx_timeout,
--	.ndo_set_config 	= fjn_config,
--	.ndo_set_rx_mode	= set_rx_mode,
+-/*============= Main bulk of functions	=========================*/
+-
+-static const struct net_device_ops netdev_ops = {
+-	.ndo_open		= do_open,
+-	.ndo_stop		= do_stop,
+-	.ndo_start_xmit		= do_start_xmit,
+-	.ndo_tx_timeout 	= xirc_tx_timeout,
+-	.ndo_set_config		= do_config,
+-	.ndo_eth_ioctl		= do_ioctl,
+-	.ndo_set_rx_mode	= set_multicast_list,
 -	.ndo_set_mac_address 	= eth_mac_addr,
 -	.ndo_validate_addr	= eth_validate_addr,
 -};
 -
--static int fmvj18x_probe(struct pcmcia_device *link)
+-static int
+-xirc2ps_probe(struct pcmcia_device *link)
 -{
--    struct local_info *lp;
 -    struct net_device *dev;
+-    struct local_info *local;
 -
--    dev_dbg(&link->dev, "fmvj18x_attach()\n");
+-    dev_dbg(&link->dev, "attach()\n");
 -
--    /* Make up a FMVJ18x specific data structure */
+-    /* Allocate the device structure */
 -    dev = alloc_etherdev(sizeof(struct local_info));
 -    if (!dev)
--	return -ENOMEM;
--    lp = netdev_priv(dev);
+-	    return -ENOMEM;
+-    local = netdev_priv(dev);
+-    local->dev = dev;
+-    local->p_dev = link;
 -    link->priv = dev;
--    lp->p_dev = link;
--    lp->base = NULL;
--
--    /* The io structure describes IO port mapping */
--    link->resource[0]->end = 32;
--    link->resource[0]->flags |= IO_DATA_PATH_WIDTH_AUTO;
 -
 -    /* General socket configuration */
--    link->config_flags |= CONF_ENABLE_IRQ;
+-    link->config_index = 1;
 -
--    dev->netdev_ops = &fjn_netdev_ops;
--    dev->watchdog_timeo = TX_TIMEOUT;
--
+-    /* Fill in card specific entries */
+-    dev->netdev_ops = &netdev_ops;
 -    dev->ethtool_ops = &netdev_ethtool_ops;
+-    dev->watchdog_timeo = TX_TIMEOUT;
+-    INIT_WORK(&local->tx_timeout_task, xirc2ps_tx_timeout_task);
 -
--    return fmvj18x_config(link);
--} /* fmvj18x_attach */
+-    return xirc2ps_config(link);
+-} /* xirc2ps_attach */
 -
--/*====================================================================*/
--
--static void fmvj18x_detach(struct pcmcia_device *link)
+-static void
+-xirc2ps_detach(struct pcmcia_device *link)
 -{
 -    struct net_device *dev = link->priv;
+-    struct local_info *local = netdev_priv(dev);
 -
--    dev_dbg(&link->dev, "fmvj18x_detach\n");
+-    netif_carrier_off(dev);
+-    netif_tx_disable(dev);
+-    cancel_work_sync(&local->tx_timeout_task);
+-
+-    dev_dbg(&link->dev, "detach\n");
 -
 -    unregister_netdev(dev);
 -
--    fmvj18x_release(link);
+-    xirc2ps_release(link);
 -
 -    free_netdev(dev);
--} /* fmvj18x_detach */
+-} /* xirc2ps_detach */
 -
--/*====================================================================*/
--
--static int mfc_try_io_port(struct pcmcia_device *link)
--{
--    int i, ret;
--    static const unsigned int serial_base[5] =
--	{ 0x3f8, 0x2f8, 0x3e8, 0x2e8, 0x0 };
--
--    for (i = 0; i < 5; i++) {
--	link->resource[1]->start = serial_base[i];
--	link->resource[1]->flags |= IO_DATA_PATH_WIDTH_8;
--	if (link->resource[1]->start == 0) {
--	    link->resource[1]->end = 0;
--	    pr_notice("out of resource for serial\n");
--	}
--	ret = pcmcia_request_io(link);
--	if (ret == 0)
--		return ret;
--    }
--    return ret;
--}
--
--static int ungermann_try_io_port(struct pcmcia_device *link)
--{
--    int ret;
--    unsigned int ioaddr;
--    /*
--	Ungermann-Bass Access/CARD accepts 0x300,0x320,0x340,0x360
--	0x380,0x3c0 only for ioport.
--    */
--    for (ioaddr = 0x300; ioaddr < 0x3e0; ioaddr += 0x20) {
--	link->resource[0]->start = ioaddr;
--	ret = pcmcia_request_io(link);
--	if (ret == 0) {
--	    /* calculate ConfigIndex value */
--	    link->config_index =
--		((link->resource[0]->start & 0x0f0) >> 3) | 0x22;
--	    return ret;
--	}
--    }
--    return ret;	/* RequestIO failed */
--}
--
--static int fmvj18x_ioprobe(struct pcmcia_device *p_dev, void *priv_data)
--{
--	return 0; /* strange, but that's what the code did already before... */
--}
--
--static int fmvj18x_config(struct pcmcia_device *link)
+-/****************
+- * Detect the type of the card. s is the buffer with the data of tuple 0x20
+- * Returns: 0 := not supported
+- *		       mediaid=11 and prodid=47
+- * Media-Id bits:
+- *  Ethernet	    0x01
+- *  Tokenring	    0x02
+- *  Arcnet	    0x04
+- *  Wireless	    0x08
+- *  Modem	    0x10
+- *  GSM only	    0x20
+- * Prod-Id bits:
+- *  Pocket	    0x10
+- *  External	    0x20
+- *  Creditcard	    0x40
+- *  Cardbus	    0x80
+- *
+- */
+-static int
+-set_card_type(struct pcmcia_device *link)
 -{
 -    struct net_device *dev = link->priv;
--    struct local_info *lp = netdev_priv(dev);
--    int i, ret;
--    unsigned int ioaddr;
--    enum cardtype cardtype;
--    char *card_name = "unknown";
+-    struct local_info *local = netdev_priv(dev);
 -    u8 *buf;
+-    unsigned int cisrev, mediaid, prodid;
 -    size_t len;
--    u_char buggybuf[32];
--    u8 addr[ETH_ALEN];
 -
--    dev_dbg(&link->dev, "fmvj18x_config\n");
+-    len = pcmcia_get_tuple(link, CISTPL_MANFID, &buf);
+-    if (len < 5) {
+-	    dev_err(&link->dev, "invalid CIS -- sorry\n");
+-	    return 0;
+-    }
 -
--    link->io_lines = 5;
+-    cisrev = buf[2];
+-    mediaid = buf[3];
+-    prodid = buf[4];
 -
--    len = pcmcia_get_tuple(link, CISTPL_FUNCE, &buf);
--    kfree(buf);
+-    dev_dbg(&link->dev, "cisrev=%02x mediaid=%02x prodid=%02x\n",
+-	  cisrev, mediaid, prodid);
 -
--    if (len) {
--	/* Yes, I have CISTPL_FUNCE. Let's check CISTPL_MANFID */
--	ret = pcmcia_loop_config(link, fmvj18x_ioprobe, NULL);
--	if (ret != 0)
--		goto failed;
--
--	switch (link->manf_id) {
--	case MANFID_TDK:
--	    cardtype = TDK;
--	    if (link->card_id == PRODID_TDK_GN3410 ||
--		link->card_id == PRODID_TDK_NP9610 ||
--		link->card_id == PRODID_TDK_MN3200) {
--		/* MultiFunction Card */
--		link->config_base = 0x800;
--		link->config_index = 0x47;
--		link->resource[1]->end = 8;
--	    }
--	    break;
--	case MANFID_NEC:
--	    cardtype = NEC; /* MultiFunction Card */
--	    link->config_base = 0x800;
--	    link->config_index = 0x47;
--	    link->resource[1]->end = 8;
--	    break;
--	case MANFID_KME:
--	    cardtype = KME; /* MultiFunction Card */
--	    link->config_base = 0x800;
--	    link->config_index = 0x47;
--	    link->resource[1]->end = 8;
--	    break;
--	case MANFID_CONTEC:
--	    cardtype = CONTEC;
--	    break;
--	case MANFID_FUJITSU:
--	    if (link->config_base == 0x0fe0)
--		cardtype = MBH10302;
--	    else if (link->card_id == PRODID_FUJITSU_MBH10302) 
--                /* RATOC REX-5588/9822/4886's PRODID are 0004(=MBH10302),
--                   but these are MBH10304 based card. */ 
--		cardtype = MBH10304;
--	    else if (link->card_id == PRODID_FUJITSU_MBH10304)
--		cardtype = MBH10304;
--	    else
--		cardtype = LA501;
--	    break;
--	default:
--	    cardtype = MBH10304;
+-    local->mohawk = 0;
+-    local->dingo = 0;
+-    local->modem = 0;
+-    local->card_type = XIR_UNKNOWN;
+-    if (!(prodid & 0x40)) {
+-	pr_notice("Oops: Not a creditcard\n");
+-	return 0;
+-    }
+-    if (!(mediaid & 0x01)) {
+-	pr_notice("Not an Ethernet card\n");
+-	return 0;
+-    }
+-    if (mediaid & 0x10) {
+-	local->modem = 1;
+-	switch(prodid & 15) {
+-	  case 1: local->card_type = XIR_CEM   ; break;
+-	  case 2: local->card_type = XIR_CEM2  ; break;
+-	  case 3: local->card_type = XIR_CEM3  ; break;
+-	  case 4: local->card_type = XIR_CEM33 ; break;
+-	  case 5: local->card_type = XIR_CEM56M;
+-		  local->mohawk = 1;
+-		  break;
+-	  case 6:
+-	  case 7: /* 7 is the RealPort 10/56 */
+-		  local->card_type = XIR_CEM56 ;
+-		  local->mohawk = 1;
+-		  local->dingo = 1;
+-		  break;
 -	}
 -    } else {
--	/* old type card */
--	switch (link->manf_id) {
--	case MANFID_FUJITSU:
--	    if (link->card_id == PRODID_FUJITSU_MBH10304) {
--		cardtype = XXX10304;    /* MBH10304 with buggy CIS */
--		link->config_index = 0x20;
--	    } else {
--		cardtype = MBH10302;    /* NextCom NC5310, etc. */
--		link->config_index = 1;
--	    }
--	    break;
--	case MANFID_UNGERMANN:
--	    cardtype = UNGERMANN;
--	    break;
--	default:
--	    cardtype = MBH10302;
--	    link->config_index = 1;
+-	switch(prodid & 15) {
+-	  case 1: local->card_type = has_ce2_string(link)? XIR_CE2 : XIR_CE ;
+-		  break;
+-	  case 2: local->card_type = XIR_CE2; break;
+-	  case 3: local->card_type = XIR_CE3;
+-		  local->mohawk = 1;
+-		  break;
 -	}
 -    }
--
--    if (link->resource[1]->end != 0) {
--	ret = mfc_try_io_port(link);
--	if (ret != 0) goto failed;
--    } else if (cardtype == UNGERMANN) {
--	ret = ungermann_try_io_port(link);
--	if (ret != 0) goto failed;
--    } else { 
--	    ret = pcmcia_request_io(link);
--	    if (ret)
--		    goto failed;
+-    if (local->card_type == XIR_CE || local->card_type == XIR_CEM) {
+-	pr_notice("Sorry, this is an old CE card\n");
+-	return 0;
 -    }
--    ret = pcmcia_request_irq(link, fjn_interrupt);
--    if (ret)
--	    goto failed;
--    ret = pcmcia_enable_device(link);
--    if (ret)
--	    goto failed;
+-    if (local->card_type == XIR_UNKNOWN)
+-	pr_notice("unknown card (mediaid=%02x prodid=%02x)\n", mediaid, prodid);
 -
--    dev->irq = link->irq;
--    dev->base_addr = link->resource[0]->start;
--
--    if (resource_size(link->resource[1]) != 0) {
--	ret = fmvj18x_setup_mfc(link);
--	if (ret != 0) goto failed;
--    }
--
--    ioaddr = dev->base_addr;
--
--    /* Reset controller */
--    if (sram_config == 0) 
--	outb(CONFIG0_RST, ioaddr + CONFIG_0);
--    else
--	outb(CONFIG0_RST_1, ioaddr + CONFIG_0);
--
--    /* Power On chip and select bank 0 */
--    if (cardtype == MBH10302)
--	outb(BANK_0, ioaddr + CONFIG_1);
--    else
--	outb(BANK_0U, ioaddr + CONFIG_1);
--    
--    /* Set hardware address */
--    switch (cardtype) {
--    case MBH10304:
--    case TDK:
--    case LA501:
--    case CONTEC:
--    case NEC:
--    case KME:
--	if (cardtype == MBH10304) {
--	    card_name = "FMV-J182";
--
--	    len = pcmcia_get_tuple(link, CISTPL_FUNCE, &buf);
--	    if (len < 11) {
--		    kfree(buf);
--		    goto failed;
--	    }
--	    /* Read MACID from CIS */
--	    eth_hw_addr_set(dev, &buf[5]);
--	    kfree(buf);
--	} else {
--	    if (pcmcia_get_mac_from_cis(link, dev))
--		goto failed;
--	    if( cardtype == TDK ) {
--		card_name = "TDK LAK-CD021";
--	    } else if( cardtype == LA501 ) {
--		card_name = "LA501";
--	    } else if( cardtype == NEC ) {
--		card_name = "PK-UG-J001";
--	    } else if( cardtype == KME ) {
--		card_name = "Panasonic";
--	    } else {
--		card_name = "C-NET(PC)C";
--	    }
--	}
--	break;
--    case UNGERMANN:
--	/* Read MACID from register */
--	for (i = 0; i < 6; i++) 
--	    addr[i] = inb(ioaddr + UNGERMANN_MAC_ID + i);
--	eth_hw_addr_set(dev, addr);
--	card_name = "Access/CARD";
--	break;
--    case XXX10304:
--	/* Read MACID from Buggy CIS */
--	if (fmvj18x_get_hwinfo(link, buggybuf) == -1) {
--	    pr_notice("unable to read hardware net address\n");
--	    goto failed;
--	}
--	eth_hw_addr_set(dev, buggybuf);
--	card_name = "FMV-J182";
--	break;
--    case MBH10302:
--    default:
--	/* Read MACID from register */
--	for (i = 0; i < 6; i++) 
--	    addr[i] = inb(ioaddr + MAC_ID + i);
--	eth_hw_addr_set(dev, addr);
--	card_name = "FMV-J181";
--	break;
--    }
--
--    lp->cardtype = cardtype;
--    SET_NETDEV_DEV(dev, &link->dev);
--
--    if (register_netdev(dev) != 0) {
--	pr_notice("register_netdev() failed\n");
--	goto failed;
--    }
--
--    /* print current configuration */
--    netdev_info(dev, "%s, sram %s, port %#3lx, irq %d, hw_addr %pM\n",
--		card_name, sram_config == 0 ? "4K TX*2" : "8K TX*2",
--		dev->base_addr, dev->irq, dev->dev_addr);
--
--    return 0;
--    
--failed:
--    fmvj18x_release(link);
--    return -ENODEV;
--} /* fmvj18x_config */
--/*====================================================================*/
--
--static int fmvj18x_get_hwinfo(struct pcmcia_device *link, u_char *node_id)
--{
--    u_char __iomem *base;
--    int i, j;
--
--    /* Allocate a small memory window */
--    link->resource[2]->flags |= WIN_DATA_WIDTH_8|WIN_MEMORY_TYPE_AM|WIN_ENABLE;
--    link->resource[2]->start = 0; link->resource[2]->end = 0;
--    i = pcmcia_request_window(link, link->resource[2], 0);
--    if (i != 0)
--	return -1;
--
--    base = ioremap(link->resource[2]->start, resource_size(link->resource[2]));
--    if (!base) {
--	pcmcia_release_window(link, link->resource[2]);
--	return -1;
--    }
--
--    pcmcia_map_mem_page(link, link->resource[2], 0);
--
--    /*
--     *  MBH10304 CISTPL_FUNCE_LAN_NODE_ID format
--     *  22 0d xx xx xx 04 06 yy yy yy yy yy yy ff
--     *  'xx' is garbage.
--     *  'yy' is MAC address.
--    */ 
--    for (i = 0; i < 0x200; i++) {
--	if (readb(base+i*2) == 0x22) {	
--		if (readb(base+(i-1)*2) == 0xff &&
--		    readb(base+(i+5)*2) == 0x04 &&
--		    readb(base+(i+6)*2) == 0x06 &&
--		    readb(base+(i+13)*2) == 0xff)
--			break;
--	}
--    }
--
--    if (i != 0x200) {
--	for (j = 0 ; j < 6; j++,i++) {
--	    node_id[j] = readb(base+(i+7)*2);
--	}
--    }
--
--    iounmap(base);
--    j = pcmcia_release_window(link, link->resource[2]);
--    return (i != 0x200) ? 0 : -1;
--
--} /* fmvj18x_get_hwinfo */
--/*====================================================================*/
--
--static int fmvj18x_setup_mfc(struct pcmcia_device *link)
--{
--    int i;
--    struct net_device *dev = link->priv;
--    unsigned int ioaddr;
--    struct local_info *lp = netdev_priv(dev);
--
--    /* Allocate a small memory window */
--    link->resource[3]->flags = WIN_DATA_WIDTH_8|WIN_MEMORY_TYPE_AM|WIN_ENABLE;
--    link->resource[3]->start = link->resource[3]->end = 0;
--    i = pcmcia_request_window(link, link->resource[3], 0);
--    if (i != 0)
--	return -1;
--
--    lp->base = ioremap(link->resource[3]->start,
--		       resource_size(link->resource[3]));
--    if (lp->base == NULL) {
--	netdev_notice(dev, "ioremap failed\n");
--	return -1;
--    }
--
--    i = pcmcia_map_mem_page(link, link->resource[3], 0);
--    if (i != 0) {
--	iounmap(lp->base);
--	lp->base = NULL;
--	return -1;
--    }
--    
--    ioaddr = dev->base_addr;
--    writeb(0x47, lp->base+0x800);	/* Config Option Register of LAN */
--    writeb(0x0,  lp->base+0x802);	/* Config and Status Register */
--
--    writeb(ioaddr & 0xff, lp->base+0x80a);	  /* I/O Base(Low) of LAN */
--    writeb((ioaddr >> 8) & 0xff, lp->base+0x80c); /* I/O Base(High) of LAN */
--   
--    writeb(0x45, lp->base+0x820);	/* Config Option Register of Modem */
--    writeb(0x8,  lp->base+0x822);	/* Config and Status Register */
--
--    return 0;
--
--}
--/*====================================================================*/
--
--static void fmvj18x_release(struct pcmcia_device *link)
--{
--
--    struct net_device *dev = link->priv;
--    struct local_info *lp = netdev_priv(dev);
--    u_char __iomem *tmp;
--
--    dev_dbg(&link->dev, "fmvj18x_release\n");
--
--    if (lp->base != NULL) {
--	tmp = lp->base;
--	lp->base = NULL;    /* set NULL before iounmap */
--	iounmap(tmp);
--    }
--
--    pcmcia_disable_device(link);
--
+-    return 1;
 -}
 -
--static int fmvj18x_suspend(struct pcmcia_device *link)
+-/****************
+- * There are some CE2 cards out which claim to be a CE card.
+- * This function looks for a "CE2" in the 3rd version field.
+- * Returns: true if this is a CE2
+- */
+-static int
+-has_ce2_string(struct pcmcia_device * p_dev)
 -{
--	struct net_device *dev = link->priv;
--
--	if (link->open)
--		netif_device_detach(dev);
--
+-	if (p_dev->prod_id[2] && strstr(p_dev->prod_id[2], "CE2"))
+-		return 1;
 -	return 0;
 -}
 -
--static int fmvj18x_resume(struct pcmcia_device *link)
+-static int
+-xirc2ps_config_modem(struct pcmcia_device *p_dev, void *priv_data)
+-{
+-	unsigned int ioaddr;
+-
+-	if ((p_dev->resource[0]->start & 0xf) == 8)
+-		return -ENODEV;
+-
+-	p_dev->resource[0]->end = 16;
+-	p_dev->resource[1]->end = 8;
+-	p_dev->resource[0]->flags &= ~IO_DATA_PATH_WIDTH;
+-	p_dev->resource[0]->flags |= IO_DATA_PATH_WIDTH_16;
+-	p_dev->resource[1]->flags &= ~IO_DATA_PATH_WIDTH;
+-	p_dev->resource[1]->flags |= IO_DATA_PATH_WIDTH_8;
+-	p_dev->io_lines = 10;
+-
+-	p_dev->resource[1]->start = p_dev->resource[0]->start;
+-	for (ioaddr = 0x300; ioaddr < 0x400; ioaddr += 0x10) {
+-		p_dev->resource[0]->start = ioaddr;
+-		if (!pcmcia_request_io(p_dev))
+-			return 0;
+-	}
+-	return -ENODEV;
+-}
+-
+-static int
+-xirc2ps_config_check(struct pcmcia_device *p_dev, void *priv_data)
+-{
+-	int *pass = priv_data;
+-	resource_size_t tmp = p_dev->resource[1]->start;
+-
+-	tmp += (*pass ? (p_dev->config_index & 0x20 ? -24 : 8)
+-		: (p_dev->config_index & 0x20 ?   8 : -24));
+-
+-	if ((p_dev->resource[0]->start & 0xf) == 8)
+-		return -ENODEV;
+-
+-	p_dev->resource[0]->end = 18;
+-	p_dev->resource[1]->end = 8;
+-	p_dev->resource[0]->flags &= ~IO_DATA_PATH_WIDTH;
+-	p_dev->resource[0]->flags |= IO_DATA_PATH_WIDTH_16;
+-	p_dev->resource[1]->flags &= ~IO_DATA_PATH_WIDTH;
+-	p_dev->resource[1]->flags |= IO_DATA_PATH_WIDTH_8;
+-	p_dev->io_lines = 10;
+-
+-	p_dev->resource[1]->start = p_dev->resource[0]->start;
+-	p_dev->resource[0]->start = tmp;
+-	return pcmcia_request_io(p_dev);
+-}
+-
+-
+-static int pcmcia_get_mac_ce(struct pcmcia_device *p_dev,
+-			     tuple_t *tuple,
+-			     void *priv)
+-{
+-	struct net_device *dev = priv;
+-
+-	if (tuple->TupleDataLen != 13)
+-		return -EINVAL;
+-	if ((tuple->TupleData[0] != 2) || (tuple->TupleData[1] != 1) ||
+-		(tuple->TupleData[2] != 6))
+-		return -EINVAL;
+-	/* another try	(James Lehmer's CE2 version 4.1)*/
+-	dev_addr_mod(dev, 2, &tuple->TupleData[2], 4);
+-	return 0;
+-};
+-
+-
+-static int
+-xirc2ps_config(struct pcmcia_device * link)
+-{
+-    struct net_device *dev = link->priv;
+-    struct local_info *local = netdev_priv(dev);
+-    unsigned int ioaddr;
+-    int err;
+-    u8 *buf;
+-    size_t len;
+-
+-    local->dingo_ccr = NULL;
+-
+-    dev_dbg(&link->dev, "config\n");
+-
+-    /* Is this a valid	card */
+-    if (link->has_manf_id == 0) {
+-	pr_notice("manfid not found in CIS\n");
+-	goto failure;
+-    }
+-
+-    switch (link->manf_id) {
+-      case MANFID_XIRCOM:
+-	local->manf_str = "Xircom";
+-	break;
+-      case MANFID_ACCTON:
+-	local->manf_str = "Accton";
+-	break;
+-      case MANFID_COMPAQ:
+-      case MANFID_COMPAQ2:
+-	local->manf_str = "Compaq";
+-	break;
+-      case MANFID_INTEL:
+-	local->manf_str = "Intel";
+-	break;
+-      case MANFID_TOSHIBA:
+-	local->manf_str = "Toshiba";
+-	break;
+-      default:
+-	pr_notice("Unknown Card Manufacturer ID: 0x%04x\n",
+-		  (unsigned)link->manf_id);
+-	goto failure;
+-    }
+-    dev_dbg(&link->dev, "found %s card\n", local->manf_str);
+-
+-    if (!set_card_type(link)) {
+-	pr_notice("this card is not supported\n");
+-	goto failure;
+-    }
+-
+-    /* get the ethernet address from the CIS */
+-    err = pcmcia_get_mac_from_cis(link, dev);
+-
+-    /* not found: try to get the node-id from tuple 0x89 */
+-    if (err) {
+-	    len = pcmcia_get_tuple(link, 0x89, &buf);
+-	    /* data layout looks like tuple 0x22 */
+-	    if (buf && len == 8) {
+-		    if (*buf == CISTPL_FUNCE_LAN_NODE_ID)
+-			    dev_addr_mod(dev, 2, &buf[2], 4);
+-		    else
+-			    err = -1;
+-	    }
+-	    kfree(buf);
+-    }
+-
+-    if (err)
+-	err = pcmcia_loop_tuple(link, CISTPL_FUNCE, pcmcia_get_mac_ce, dev);
+-
+-    if (err) {
+-	pr_notice("node-id not found in CIS\n");
+-	goto failure;
+-    }
+-
+-    if (local->modem) {
+-	int pass;
+-	link->config_flags |= CONF_AUTO_SET_IO;
+-
+-	if (local->dingo) {
+-	    /* Take the Modem IO port from the CIS and scan for a free
+-	     * Ethernet port */
+-	    if (!pcmcia_loop_config(link, xirc2ps_config_modem, NULL))
+-		    goto port_found;
+-	} else {
+-	    /* We do 2 passes here: The first one uses the regular mapping and
+-	     * the second tries again, thereby considering that the 32 ports are
+-	     * mirrored every 32 bytes. Actually we use a mirrored port for
+-	     * the Mako if (on the first pass) the COR bit 5 is set.
+-	     */
+-	    for (pass=0; pass < 2; pass++)
+-		    if (!pcmcia_loop_config(link, xirc2ps_config_check,
+-						    &pass))
+-			    goto port_found;
+-	    /* if special option:
+-	     * try to configure as Ethernet only.
+-	     * .... */
+-	}
+-	pr_notice("no ports available\n");
+-    } else {
+-	link->io_lines = 10;
+-	link->resource[0]->end = 16;
+-	link->resource[0]->flags |= IO_DATA_PATH_WIDTH_16;
+-	for (ioaddr = 0x300; ioaddr < 0x400; ioaddr += 0x10) {
+-	    link->resource[0]->start = ioaddr;
+-	    if (!(err = pcmcia_request_io(link)))
+-		goto port_found;
+-	}
+-	link->resource[0]->start = 0; /* let CS decide */
+-	if ((err = pcmcia_request_io(link)))
+-	    goto config_error;
+-    }
+-  port_found:
+-
+-    /****************
+-     * Now allocate an interrupt line.	Note that this does not
+-     * actually assign a handler to the interrupt.
+-     */
+-    if ((err=pcmcia_request_irq(link, xirc2ps_interrupt)))
+-	goto config_error;
+-
+-    link->config_flags |= CONF_ENABLE_IRQ;
+-    if (do_sound)
+-	    link->config_flags |= CONF_ENABLE_SPKR;
+-
+-    if ((err = pcmcia_enable_device(link)))
+-	goto config_error;
+-
+-    if (local->dingo) {
+-	/* Reset the modem's BAR to the correct value
+-	 * This is necessary because in the RequestConfiguration call,
+-	 * the base address of the ethernet port (BasePort1) is written
+-	 * to the BAR registers of the modem.
+-	 */
+-	err = pcmcia_write_config_byte(link, CISREG_IOBASE_0, (u8)
+-				link->resource[1]->start & 0xff);
+-	if (err)
+-	    goto config_error;
+-
+-	err = pcmcia_write_config_byte(link, CISREG_IOBASE_1,
+-				(link->resource[1]->start >> 8) & 0xff);
+-	if (err)
+-	    goto config_error;
+-
+-	/* There is no config entry for the Ethernet part which
+-	 * is at 0x0800. So we allocate a window into the attribute
+-	 * memory and write direct to the CIS registers
+-	 */
+-	link->resource[2]->flags = WIN_DATA_WIDTH_8 | WIN_MEMORY_TYPE_AM |
+-					WIN_ENABLE;
+-	link->resource[2]->start = link->resource[2]->end = 0;
+-	if ((err = pcmcia_request_window(link, link->resource[2], 0)))
+-	    goto config_error;
+-
+-	local->dingo_ccr = ioremap(link->resource[2]->start, 0x1000) + 0x0800;
+-	if ((err = pcmcia_map_mem_page(link, link->resource[2], 0)))
+-	    goto config_error;
+-
+-	/* Setup the CCRs; there are no infos in the CIS about the Ethernet
+-	 * part.
+-	 */
+-	writeb(0x47, local->dingo_ccr + CISREG_COR);
+-	ioaddr = link->resource[0]->start;
+-	writeb(ioaddr & 0xff	  , local->dingo_ccr + CISREG_IOBASE_0);
+-	writeb((ioaddr >> 8)&0xff , local->dingo_ccr + CISREG_IOBASE_1);
+-
+-      #if 0
+-	{
+-	    u_char tmp;
+-	    pr_info("ECOR:");
+-	    for (i=0; i < 7; i++) {
+-		tmp = readb(local->dingo_ccr + i*2);
+-		pr_cont(" %02x", tmp);
+-	    }
+-	    pr_cont("\n");
+-	    pr_info("DCOR:");
+-	    for (i=0; i < 4; i++) {
+-		tmp = readb(local->dingo_ccr + 0x20 + i*2);
+-		pr_cont(" %02x", tmp);
+-	    }
+-	    pr_cont("\n");
+-	    pr_info("SCOR:");
+-	    for (i=0; i < 10; i++) {
+-		tmp = readb(local->dingo_ccr + 0x40 + i*2);
+-		pr_cont(" %02x", tmp);
+-	    }
+-	    pr_cont("\n");
+-	}
+-      #endif
+-
+-	writeb(0x01, local->dingo_ccr + 0x20);
+-	writeb(0x0c, local->dingo_ccr + 0x22);
+-	writeb(0x00, local->dingo_ccr + 0x24);
+-	writeb(0x00, local->dingo_ccr + 0x26);
+-	writeb(0x00, local->dingo_ccr + 0x28);
+-    }
+-
+-    /* The if_port symbol can be set when the module is loaded */
+-    local->probe_port=0;
+-    if (!if_port) {
+-	local->probe_port = dev->if_port = 1;
+-    } else if ((if_port >= 1 && if_port <= 2) ||
+-	       (local->mohawk && if_port==4))
+-	dev->if_port = if_port;
+-    else
+-	pr_notice("invalid if_port requested\n");
+-
+-    /* we can now register the device with the net subsystem */
+-    dev->irq = link->irq;
+-    dev->base_addr = link->resource[0]->start;
+-
+-    if (local->dingo)
+-	do_reset(dev, 1); /* a kludge to make the cem56 work */
+-
+-    SET_NETDEV_DEV(dev, &link->dev);
+-
+-    if ((err=register_netdev(dev))) {
+-	pr_notice("register_netdev() failed\n");
+-	goto config_error;
+-    }
+-
+-    /* give some infos about the hardware */
+-    netdev_info(dev, "%s: port %#3lx, irq %d, hwaddr %pM\n",
+-		local->manf_str, (u_long)dev->base_addr, (int)dev->irq,
+-		dev->dev_addr);
+-
+-    return 0;
+-
+-  config_error:
+-    xirc2ps_release(link);
+-    return -ENODEV;
+-
+-  failure:
+-    return -ENODEV;
+-} /* xirc2ps_config */
+-
+-static void
+-xirc2ps_release(struct pcmcia_device *link)
+-{
+-	dev_dbg(&link->dev, "release\n");
+-
+-	if (link->resource[2]->end) {
+-		struct net_device *dev = link->priv;
+-		struct local_info *local = netdev_priv(dev);
+-		if (local->dingo)
+-			iounmap(local->dingo_ccr - 0x0800);
+-	}
+-	pcmcia_disable_device(link);
+-} /* xirc2ps_release */
+-
+-/*====================================================================*/
+-
+-
+-static int xirc2ps_suspend(struct pcmcia_device *link)
 -{
 -	struct net_device *dev = link->priv;
 -
 -	if (link->open) {
--		fjn_reset(dev);
+-		netif_device_detach(dev);
+-		do_powerdown(dev);
+-	}
+-
+-	return 0;
+-}
+-
+-static int xirc2ps_resume(struct pcmcia_device *link)
+-{
+-	struct net_device *dev = link->priv;
+-
+-	if (link->open) {
+-		do_reset(dev,1);
 -		netif_device_attach(dev);
 -	}
 -
 -	return 0;
 -}
 -
--/*====================================================================*/
--
--static const struct pcmcia_device_id fmvj18x_ids[] = {
--	PCMCIA_DEVICE_MANF_CARD(0x0004, 0x0004),
--	PCMCIA_DEVICE_PROD_ID12("EAGLE Technology", "NE200 ETHERNET LAN MBH10302 04", 0x528c88c4, 0x74f91e59),
--	PCMCIA_DEVICE_PROD_ID12("Eiger Labs,Inc", "EPX-10BT PC Card Ethernet 10BT", 0x53af556e, 0x877f9922),
--	PCMCIA_DEVICE_PROD_ID12("Eiger labs,Inc.", "EPX-10BT PC Card Ethernet 10BT", 0xf47e6c66, 0x877f9922),
--	PCMCIA_DEVICE_PROD_ID12("FUJITSU", "LAN Card(FMV-J182)", 0x6ee5a3d8, 0x5baf31db),
--	PCMCIA_DEVICE_PROD_ID12("FUJITSU", "MBH10308", 0x6ee5a3d8, 0x3f04875e),
--	PCMCIA_DEVICE_PROD_ID12("FUJITSU TOWA", "LA501", 0xb8451188, 0x12939ba2),
--	PCMCIA_DEVICE_PROD_ID12("HITACHI", "HT-4840-11", 0xf4f43949, 0x773910f4),
--	PCMCIA_DEVICE_PROD_ID12("NextComK.K.", "NC5310B Ver1.0       ", 0x8cef4d3a, 0x075fc7b6),
--	PCMCIA_DEVICE_PROD_ID12("NextComK.K.", "NC5310 Ver1.0        ", 0x8cef4d3a, 0xbccf43e6),
--	PCMCIA_DEVICE_PROD_ID12("RATOC System Inc.", "10BASE_T CARD R280", 0x85c10e17, 0xd9413666),
--	PCMCIA_DEVICE_PROD_ID12("TDK", "LAC-CD02x", 0x1eae9475, 0x8fa0ee70),
--	PCMCIA_DEVICE_PROD_ID12("TDK", "LAC-CF010", 0x1eae9475, 0x7683bc9a),
--	PCMCIA_DEVICE_PROD_ID1("CONTEC Co.,Ltd.", 0x58d8fee2),
--	PCMCIA_DEVICE_PROD_ID1("PCMCIA LAN MBH10304  ES", 0x2599f454),
--	PCMCIA_DEVICE_PROD_ID1("PCMCIA MBH10302", 0x8f4005da),
--	PCMCIA_DEVICE_PROD_ID1("UBKK,V2.0", 0x90888080),
--	PCMCIA_PFC_DEVICE_PROD_ID12(0, "TDK", "GlobalNetworker 3410/3412", 0x1eae9475, 0xd9a93bed),
--	PCMCIA_PFC_DEVICE_PROD_ID12(0, "NEC", "PK-UG-J001" ,0x18df0ba0 ,0x831b1064),
--	PCMCIA_PFC_DEVICE_MANF_CARD(0, 0x0105, 0x0d0a),
--	PCMCIA_PFC_DEVICE_MANF_CARD(0, 0x0105, 0x0e0a),
--	PCMCIA_PFC_DEVICE_MANF_CARD(0, 0x0032, 0x0e01),
--	PCMCIA_PFC_DEVICE_MANF_CARD(0, 0x0032, 0x0a05),
--	PCMCIA_PFC_DEVICE_MANF_CARD(0, 0x0032, 0x0b05),
--	PCMCIA_PFC_DEVICE_MANF_CARD(0, 0x0032, 0x1101),
--	PCMCIA_DEVICE_NULL,
--};
--MODULE_DEVICE_TABLE(pcmcia, fmvj18x_ids);
--
--static struct pcmcia_driver fmvj18x_cs_driver = {
--	.owner		= THIS_MODULE,
--	.name		= "fmvj18x_cs",
--	.probe		= fmvj18x_probe,
--	.remove		= fmvj18x_detach,
--	.id_table       = fmvj18x_ids,
--	.suspend	= fmvj18x_suspend,
--	.resume		= fmvj18x_resume,
--};
--module_pcmcia_driver(fmvj18x_cs_driver);
 -
 -/*====================================================================*/
 -
--static irqreturn_t fjn_interrupt(int dummy, void *dev_id)
+-/****************
+- * This is the Interrupt service route.
+- */
+-static irqreturn_t
+-xirc2ps_interrupt(int irq, void *dev_id)
 -{
--    struct net_device *dev = dev_id;
+-    struct net_device *dev = (struct net_device *)dev_id;
 -    struct local_info *lp = netdev_priv(dev);
 -    unsigned int ioaddr;
--    unsigned short tx_stat, rx_stat;
+-    u_char saved_page;
+-    unsigned bytes_rcvd;
+-    unsigned int_status, eth_status, rx_status, tx_status;
+-    unsigned rsr, pktlen;
+-    ulong start_ticks = jiffies; /* fixme: jiffies rollover every 497 days
+-				  * is this something to worry about?
+-				  * -- on a laptop?
+-				  */
+-
+-    if (!netif_device_present(dev))
+-	return IRQ_HANDLED;
 -
 -    ioaddr = dev->base_addr;
--
--    /* avoid multiple interrupts */
--    outw(0x0000, ioaddr + TX_INTR);
--
--    /* wait for a while */
--    udelay(1);
--
--    /* get status */
--    tx_stat = inb(ioaddr + TX_STATUS);
--    rx_stat = inb(ioaddr + RX_STATUS);
--
--    /* clear status */
--    outb(tx_stat, ioaddr + TX_STATUS);
--    outb(rx_stat, ioaddr + RX_STATUS);
--    
--    pr_debug("%s: interrupt, rx_status %02x.\n", dev->name, rx_stat);
--    pr_debug("               tx_status %02x.\n", tx_stat);
--    
--    if (rx_stat || (inb(ioaddr + RX_MODE) & F_BUF_EMP) == 0) {
--	/* there is packet(s) in rx buffer */
--	fjn_rx(dev);
+-    if (lp->mohawk) { /* must disable the interrupt */
+-	PutByte(XIRCREG_CR, 0);
 -    }
--    if (tx_stat & F_TMT_RDY) {
--	dev->stats.tx_packets += lp->sent ;
--        lp->sent = 0 ;
--	if (lp->tx_queue) {
--	    outb(DO_TX | lp->tx_queue, ioaddr + TX_START);
--	    lp->sent = lp->tx_queue ;
--	    lp->tx_queue = 0;
--	    lp->tx_queue_len = 0;
--	    netif_trans_update(dev);
--	} else {
--	    lp->tx_started = 0;
+-
+-    pr_debug("%s: interrupt %d at %#x.\n", dev->name, irq, ioaddr);
+-
+-    saved_page = GetByte(XIRCREG_PR);
+-    /* Read the ISR to see whats the cause for the interrupt.
+-     * This also clears the interrupt flags on CE2 cards
+-     */
+-    int_status = GetByte(XIRCREG_ISR);
+-    bytes_rcvd = 0;
+-  loop_entry:
+-    if (int_status == 0xff) { /* card may be ejected */
+-	pr_debug("%s: interrupt %d for dead card\n", dev->name, irq);
+-	goto leave;
+-    }
+-    eth_status = GetByte(XIRCREG_ESR);
+-
+-    SelectPage(0x40);
+-    rx_status  = GetByte(XIRCREG40_RXST0);
+-    PutByte(XIRCREG40_RXST0, (~rx_status & 0xff));
+-    tx_status = GetByte(XIRCREG40_TXST0);
+-    tx_status |= GetByte(XIRCREG40_TXST1) << 8;
+-    PutByte(XIRCREG40_TXST0, 0);
+-    PutByte(XIRCREG40_TXST1, 0);
+-
+-    pr_debug("%s: ISR=%#2.2x ESR=%#2.2x RSR=%#2.2x TSR=%#4.4x\n",
+-	  dev->name, int_status, eth_status, rx_status, tx_status);
+-
+-    /***** receive section ******/
+-    SelectPage(0);
+-    while (eth_status & FullPktRcvd) {
+-	rsr = GetByte(XIRCREG0_RSR);
+-	if (bytes_rcvd > maxrx_bytes && (rsr & PktRxOk)) {
+-	    /* too many bytes received during this int, drop the rest of the
+-	     * packets */
+-	    dev->stats.rx_dropped++;
+-	    pr_debug("%s: RX drop, too much done\n", dev->name);
+-	} else if (rsr & PktRxOk) {
+-	    struct sk_buff *skb;
+-
+-	    pktlen = GetWord(XIRCREG0_RBC);
+-	    bytes_rcvd += pktlen;
+-
+-	    pr_debug("rsr=%#02x packet_length=%u\n", rsr, pktlen);
+-
+-	    /* 1 extra so we can use insw */
+-	    skb = netdev_alloc_skb(dev, pktlen + 3);
+-	    if (!skb) {
+-		dev->stats.rx_dropped++;
+-	    } else { /* okay get the packet */
+-		skb_reserve(skb, 2);
+-		if (lp->silicon == 0 ) { /* work around a hardware bug */
+-		    unsigned rhsa; /* receive start address */
+-
+-		    SelectPage(5);
+-		    rhsa = GetWord(XIRCREG5_RHSA0);
+-		    SelectPage(0);
+-		    rhsa += 3; /* skip control infos */
+-		    if (rhsa >= 0x8000)
+-			rhsa = 0;
+-		    if (rhsa + pktlen > 0x8000) {
+-			unsigned i;
+-			u_char *buf = skb_put(skb, pktlen);
+-			for (i=0; i < pktlen ; i++, rhsa++) {
+-			    buf[i] = GetByte(XIRCREG_EDP);
+-			    if (rhsa == 0x8000) {
+-				rhsa = 0;
+-				i--;
+-			    }
+-			}
+-		    } else {
+-			insw(ioaddr+XIRCREG_EDP,
+-				skb_put(skb, pktlen), (pktlen+1)>>1);
+-		    }
+-		}
+-	      #if 0
+-		else if (lp->mohawk) {
+-		    /* To use this 32 bit access we should use
+-		     * a manual optimized loop
+-		     * Also the words are swapped, we can get more
+-		     * performance by using 32 bit access and swapping
+-		     * the words in a register. Will need this for cardbus
+-		     *
+-		     * Note: don't forget to change the ALLOC_SKB to .. +3
+-		     */
+-		    unsigned i;
+-		    u_long *p = skb_put(skb, pktlen);
+-		    register u_long a;
+-		    unsigned int edpreg = ioaddr+XIRCREG_EDP-2;
+-		    for (i=0; i < len ; i += 4, p++) {
+-			a = inl(edpreg);
+-			__asm__("rorl $16,%0\n\t"
+-				:"=q" (a)
+-				: "0" (a));
+-			*p = a;
+-		    }
+-		}
+-	      #endif
+-		else {
+-		    insw(ioaddr+XIRCREG_EDP, skb_put(skb, pktlen),
+-			    (pktlen+1)>>1);
+-		}
+-		skb->protocol = eth_type_trans(skb, dev);
+-		netif_rx(skb);
+-		dev->stats.rx_packets++;
+-		dev->stats.rx_bytes += pktlen;
+-		if (!(rsr & PhyPkt))
+-		    dev->stats.multicast++;
+-	    }
+-	} else { /* bad packet */
+-	    pr_debug("rsr=%#02x\n", rsr);
 -	}
+-	if (rsr & PktTooLong) {
+-	    dev->stats.rx_frame_errors++;
+-	    pr_debug("%s: Packet too long\n", dev->name);
+-	}
+-	if (rsr & CRCErr) {
+-	    dev->stats.rx_crc_errors++;
+-	    pr_debug("%s: CRC error\n", dev->name);
+-	}
+-	if (rsr & AlignErr) {
+-	    dev->stats.rx_fifo_errors++; /* okay ? */
+-	    pr_debug("%s: Alignment error\n", dev->name);
+-	}
+-
+-	/* clear the received/dropped/error packet */
+-	PutWord(XIRCREG0_DO, 0x8000); /* issue cmd: skip_rx_packet */
+-
+-	/* get the new ethernet status */
+-	eth_status = GetByte(XIRCREG_ESR);
+-    }
+-    if (rx_status & 0x10) { /* Receive overrun */
+-	dev->stats.rx_over_errors++;
+-	PutByte(XIRCREG_CR, ClearRxOvrun);
+-	pr_debug("receive overrun cleared\n");
+-    }
+-
+-    /***** transmit section ******/
+-    if (int_status & PktTxed) {
+-	unsigned n, nn;
+-
+-	n = lp->last_ptr_value;
+-	nn = GetByte(XIRCREG0_PTR);
+-	lp->last_ptr_value = nn;
+-	if (nn < n) /* rollover */
+-	    dev->stats.tx_packets += 256 - n;
+-	else if (n == nn) { /* happens sometimes - don't know why */
+-	    pr_debug("PTR not changed?\n");
+-	} else
+-	    dev->stats.tx_packets += lp->last_ptr_value - n;
 -	netif_wake_queue(dev);
 -    }
--    pr_debug("%s: exiting interrupt,\n", dev->name);
--    pr_debug("    tx_status %02x, rx_status %02x.\n", tx_stat, rx_stat);
+-    if (tx_status & 0x0002) {	/* Excessive collisions */
+-	pr_debug("tx restarted due to excessive collisions\n");
+-	PutByte(XIRCREG_CR, RestartTx);  /* restart transmitter process */
+-    }
+-    if (tx_status & 0x0040)
+-	dev->stats.tx_aborted_errors++;
 -
--    outb(D_TX_INTR, ioaddr + TX_INTR);
--    outb(D_RX_INTR, ioaddr + RX_INTR);
+-    /* recalculate our work chunk so that we limit the duration of this
+-     * ISR to about 1/10 of a second.
+-     * Calculate only if we received a reasonable amount of bytes.
+-     */
+-    if (bytes_rcvd > 1000) {
+-	u_long duration = jiffies - start_ticks;
 -
--    if (lp->base != NULL) {
--	/* Ack interrupt for multifunction card */
--	writeb(0x01, lp->base+0x802);
--	writeb(0x09, lp->base+0x822);
+-	if (duration >= HZ/10) { /* if more than about 1/10 second */
+-	    maxrx_bytes = (bytes_rcvd * (HZ/10)) / duration;
+-	    if (maxrx_bytes < 2000)
+-		maxrx_bytes = 2000;
+-	    else if (maxrx_bytes > 22000)
+-		maxrx_bytes = 22000;
+-	    pr_debug("set maxrx=%u (rcvd=%u ticks=%lu)\n",
+-		  maxrx_bytes, bytes_rcvd, duration);
+-	} else if (!duration && maxrx_bytes < 22000) {
+-	    /* now much faster */
+-	    maxrx_bytes += 2000;
+-	    if (maxrx_bytes > 22000)
+-		maxrx_bytes = 22000;
+-	    pr_debug("set maxrx=%u\n", maxrx_bytes);
+-	}
 -    }
 -
+-  leave:
+-    if (lockup_hack) {
+-	if (int_status != 0xff && (int_status = GetByte(XIRCREG_ISR)) != 0)
+-	    goto loop_entry;
+-    }
+-    SelectPage(saved_page);
+-    PutByte(XIRCREG_CR, EnableIntr);  /* re-enable interrupts */
+-    /* Instead of dropping packets during a receive, we could
+-     * force an interrupt with this command:
+-     *	  PutByte(XIRCREG_CR, EnableIntr|ForceIntr);
+-     */
 -    return IRQ_HANDLED;
--
--} /* fjn_interrupt */
+-} /* xirc2ps_interrupt */
 -
 -/*====================================================================*/
 -
--static void fjn_tx_timeout(struct net_device *dev, unsigned int txqueue)
+-static void
+-xirc2ps_tx_timeout_task(struct work_struct *work)
 -{
--    struct local_info *lp = netdev_priv(dev);
--    unsigned int ioaddr = dev->base_addr;
--
--    netdev_notice(dev, "transmit timed out with status %04x, %s?\n",
--		  htons(inw(ioaddr + TX_STATUS)),
--		  inb(ioaddr + TX_STATUS) & F_TMT_RDY
--		  ? "IRQ conflict" : "network cable problem");
--    netdev_notice(dev, "timeout registers: %04x %04x %04x "
--		  "%04x %04x %04x %04x %04x.\n",
--		  htons(inw(ioaddr + 0)), htons(inw(ioaddr + 2)),
--		  htons(inw(ioaddr + 4)), htons(inw(ioaddr + 6)),
--		  htons(inw(ioaddr + 8)), htons(inw(ioaddr + 10)),
--		  htons(inw(ioaddr + 12)), htons(inw(ioaddr + 14)));
--    dev->stats.tx_errors++;
--    /* ToDo: We should try to restart the adaptor... */
--    local_irq_disable();
--    fjn_reset(dev);
--
--    lp->tx_started = 0;
--    lp->tx_queue = 0;
--    lp->tx_queue_len = 0;
--    lp->sent = 0;
--    lp->open_time = jiffies;
--    local_irq_enable();
+-	struct local_info *local =
+-		container_of(work, struct local_info, tx_timeout_task);
+-	struct net_device *dev = local->dev;
+-    /* reset the card */
+-    do_reset(dev,1);
+-    netif_trans_update(dev); /* prevent tx timeout */
 -    netif_wake_queue(dev);
 -}
 -
--static netdev_tx_t fjn_start_xmit(struct sk_buff *skb,
--					struct net_device *dev)
+-static void
+-xirc_tx_timeout(struct net_device *dev, unsigned int txqueue)
+-{
+-    struct local_info *lp = netdev_priv(dev);
+-    dev->stats.tx_errors++;
+-    netdev_notice(dev, "transmit timed out\n");
+-    schedule_work(&lp->tx_timeout_task);
+-}
+-
+-static netdev_tx_t
+-do_start_xmit(struct sk_buff *skb, struct net_device *dev)
 -{
 -    struct local_info *lp = netdev_priv(dev);
 -    unsigned int ioaddr = dev->base_addr;
--    short length = skb->len;
--    
--    if (length < ETH_ZLEN)
+-    int okay;
+-    unsigned freespace;
+-    unsigned pktlen = skb->len;
+-
+-    pr_debug("do_start_xmit(skb=%p, dev=%p) len=%u\n",
+-	  skb, dev, pktlen);
+-
+-
+-    /* adjust the packet length to min. required
+-     * and hope that the buffer is large enough
+-     * to provide some random data.
+-     * fixme: For Mohawk we can change this by sending
+-     * a larger packetlen than we actually have; the chip will
+-     * pad this in his buffer with random bytes
+-     */
+-    if (pktlen < ETH_ZLEN)
 -    {
--	if (skb_padto(skb, ETH_ZLEN))
+-        if (skb_padto(skb, ETH_ZLEN))
 -		return NETDEV_TX_OK;
--	length = ETH_ZLEN;
+-	pktlen = ETH_ZLEN;
 -    }
 -
 -    netif_stop_queue(dev);
--
--    {
--	unsigned char *buf = skb->data;
--
--	if (length > ETH_FRAME_LEN) {
--	    netdev_notice(dev, "Attempting to send a large packet (%d bytes)\n",
--			  length);
--	    return NETDEV_TX_BUSY;
--	}
--
--	netdev_dbg(dev, "Transmitting a packet of length %lu\n",
--		   (unsigned long)skb->len);
--	dev->stats.tx_bytes += skb->len;
--
--	/* Disable both interrupts. */
--	outw(0x0000, ioaddr + TX_INTR);
--
--	/* wait for a while */
--	udelay(1);
--
--	outw(length, ioaddr + DATAPORT);
--	outsw(ioaddr + DATAPORT, buf, (length + 1) >> 1);
--
--	lp->tx_queue++;
--	lp->tx_queue_len += ((length+3) & ~1);
--
--	if (lp->tx_started == 0) {
--	    /* If the Tx is idle, always trigger a transmit. */
--	    outb(DO_TX | lp->tx_queue, ioaddr + TX_START);
--	    lp->sent = lp->tx_queue ;
--	    lp->tx_queue = 0;
--	    lp->tx_queue_len = 0;
--	    lp->tx_started = 1;
--	    netif_start_queue(dev);
--	} else {
--	    if( sram_config == 0 ) {
--		if (lp->tx_queue_len < (4096 - (ETH_FRAME_LEN +2)) )
--		    /* Yes, there is room for one more packet. */
--		    netif_start_queue(dev);
--	    } else {
--		if (lp->tx_queue_len < (8192 - (ETH_FRAME_LEN +2)) && 
--						lp->tx_queue < 127 )
--		    /* Yes, there is room for one more packet. */
--		    netif_start_queue(dev);
--	    }
--	}
--
--	/* Re-enable interrupts */
--	outb(D_TX_INTR, ioaddr + TX_INTR);
--	outb(D_RX_INTR, ioaddr + RX_INTR);
+-    SelectPage(0);
+-    PutWord(XIRCREG0_TRS, (u_short)pktlen+2);
+-    freespace = GetWord(XIRCREG0_TSO) & 0x7fff;
+-    /* TRS doesn't work - (indeed it is eliminated with sil-rev 1) */
+-    okay = pktlen +2 < freespace;
+-    pr_debug("%s: avail. tx space=%u%s\n",
+-	  dev->name, freespace, okay ? " (okay)":" (not enough)");
+-    if (!okay) { /* not enough space */
+-	return NETDEV_TX_BUSY;  /* upper layer may decide to requeue this packet */
 -    }
+-    /* send the packet */
+-    PutWord(XIRCREG_EDP, (u_short)pktlen);
+-    outsw(ioaddr+XIRCREG_EDP, skb->data, pktlen>>1);
+-    if (pktlen & 1)
+-	PutByte(XIRCREG_EDP, skb->data[pktlen-1]);
+-
+-    if (lp->mohawk)
+-	PutByte(XIRCREG_CR, TransmitPacket|EnableIntr);
+-
 -    dev_kfree_skb (skb);
--
+-    dev->stats.tx_bytes += pktlen;
+-    netif_start_queue(dev);
 -    return NETDEV_TX_OK;
--} /* fjn_start_xmit */
+-}
 -
--/*====================================================================*/
+-struct set_address_info {
+-	int reg_nr;
+-	int page_nr;
+-	int mohawk;
+-	unsigned int ioaddr;
+-};
 -
--static void fjn_reset(struct net_device *dev)
+-static void set_address(struct set_address_info *sa_info, const char *addr)
+-{
+-	unsigned int ioaddr = sa_info->ioaddr;
+-	int i;
+-
+-	for (i = 0; i < 6; i++) {
+-		if (sa_info->reg_nr > 15) {
+-			sa_info->reg_nr = 8;
+-			sa_info->page_nr++;
+-			SelectPage(sa_info->page_nr);
+-		}
+-		if (sa_info->mohawk)
+-			PutByte(sa_info->reg_nr++, addr[5 - i]);
+-		else
+-			PutByte(sa_info->reg_nr++, addr[i]);
+-	}
+-}
+-
+-/****************
+- * Set all addresses: This first one is the individual address,
+- * the next 9 addresses are taken from the multicast list and
+- * the rest is filled with the individual address.
+- */
+-static void set_addresses(struct net_device *dev)
+-{
+-	unsigned int ioaddr = dev->base_addr;
+-	struct local_info *lp = netdev_priv(dev);
+-	struct netdev_hw_addr *ha;
+-	struct set_address_info sa_info;
+-	int i;
+-
+-	/*
+-	 * Setup the info structure so that by first set_address call it will do
+-	 * SelectPage with the right page number. Hence these ones here.
+-	 */
+-	sa_info.reg_nr = 15 + 1;
+-	sa_info.page_nr = 0x50 - 1;
+-	sa_info.mohawk = lp->mohawk;
+-	sa_info.ioaddr = ioaddr;
+-
+-	set_address(&sa_info, dev->dev_addr);
+-	i = 0;
+-	netdev_for_each_mc_addr(ha, dev) {
+-		if (i++ == 9)
+-			break;
+-		set_address(&sa_info, ha->addr);
+-	}
+-	while (i++ < 9)
+-		set_address(&sa_info, dev->dev_addr);
+-	SelectPage(0);
+-}
+-
+-/****************
+- * Set or clear the multicast filter for this adaptor.
+- * We can filter up to 9 addresses, if more are requested we set
+- * multicast promiscuous mode.
+- */
+-
+-static void
+-set_multicast_list(struct net_device *dev)
+-{
+-    unsigned int ioaddr = dev->base_addr;
+-    unsigned value;
+-
+-    SelectPage(0x42);
+-    value = GetByte(XIRCREG42_SWC1) & 0xC0;
+-
+-    if (dev->flags & IFF_PROMISC) { /* snoop */
+-	PutByte(XIRCREG42_SWC1, value | 0x06); /* set MPE and PME */
+-    } else if (netdev_mc_count(dev) > 9 || (dev->flags & IFF_ALLMULTI)) {
+-	PutByte(XIRCREG42_SWC1, value | 0x02); /* set MPE */
+-    } else if (!netdev_mc_empty(dev)) {
+-	/* the chip can filter 9 addresses perfectly */
+-	PutByte(XIRCREG42_SWC1, value | 0x01);
+-	SelectPage(0x40);
+-	PutByte(XIRCREG40_CMD0, Offline);
+-	set_addresses(dev);
+-	SelectPage(0x40);
+-	PutByte(XIRCREG40_CMD0, EnableRecv | Online);
+-    } else { /* standard usage */
+-	PutByte(XIRCREG42_SWC1, value | 0x00);
+-    }
+-    SelectPage(0);
+-}
+-
+-static int
+-do_config(struct net_device *dev, struct ifmap *map)
+-{
+-    struct local_info *local = netdev_priv(dev);
+-
+-    pr_debug("do_config(%p)\n", dev);
+-    if (map->port != 255 && map->port != dev->if_port) {
+-	if (map->port > 4)
+-	    return -EINVAL;
+-	if (!map->port) {
+-	    local->probe_port = 1;
+-	    WRITE_ONCE(dev->if_port, 1);
+-	} else {
+-	    local->probe_port = 0;
+-	    WRITE_ONCE(dev->if_port, map->port);
+-	}
+-	netdev_info(dev, "switching to %s port\n", if_names[dev->if_port]);
+-	do_reset(dev,1);  /* not the fine way :-) */
+-    }
+-    return 0;
+-}
+-
+-/****************
+- * Open the driver
+- */
+-static int
+-do_open(struct net_device *dev)
 -{
 -    struct local_info *lp = netdev_priv(dev);
--    unsigned int ioaddr = dev->base_addr;
--    int i;
+-    struct pcmcia_device *link = lp->p_dev;
 -
--    netdev_dbg(dev, "fjn_reset() called\n");
+-    dev_dbg(&link->dev, "do_open(%p)\n", dev);
 -
--    /* Reset controller */
--    if( sram_config == 0 ) 
--	outb(CONFIG0_RST, ioaddr + CONFIG_0);
--    else
--	outb(CONFIG0_RST_1, ioaddr + CONFIG_0);
+-    /* Check that the PCMCIA card is still here. */
+-    /* Physical device present signature. */
+-    if (!pcmcia_dev_present(link))
+-	return -ENODEV;
 -
--    /* Power On chip and select bank 0 */
--    if (lp->cardtype == MBH10302)
--	outb(BANK_0, ioaddr + CONFIG_1);
--    else
--	outb(BANK_0U, ioaddr + CONFIG_1);
+-    /* okay */
+-    link->open++;
 -
--    /* Set Tx modes */
--    outb(D_TX_MODE, ioaddr + TX_MODE);
--    /* set Rx modes */
--    outb(ID_MATCHED, ioaddr + RX_MODE);
+-    netif_start_queue(dev);
+-    do_reset(dev,1);
 -
--    /* Set hardware address */
--    for (i = 0; i < 6; i++) 
--        outb(dev->dev_addr[i], ioaddr + NODE_ID + i);
--
--    /* (re)initialize the multicast table */
--    set_rx_mode(dev);
--
--    /* Switch to bank 2 (runtime mode) */
--    if (lp->cardtype == MBH10302)
--	outb(BANK_2, ioaddr + CONFIG_1);
--    else
--	outb(BANK_2U, ioaddr + CONFIG_1);
--
--    /* set 16col ctrl bits */
--    if( lp->cardtype == TDK || lp->cardtype == CONTEC) 
--        outb(TDK_AUTO_MODE, ioaddr + COL_CTRL);
--    else
--        outb(AUTO_MODE, ioaddr + COL_CTRL);
--
--    /* clear Reserved Regs */
--    outb(0x00, ioaddr + BMPR12);
--    outb(0x00, ioaddr + BMPR13);
--
--    /* reset Skip packet reg. */
--    outb(0x01, ioaddr + RX_SKIP);
--
--    /* Enable Tx and Rx */
--    if( sram_config == 0 )
--	outb(CONFIG0_DFL, ioaddr + CONFIG_0);
--    else
--	outb(CONFIG0_DFL_1, ioaddr + CONFIG_0);
--
--    /* Init receive pointer ? */
--    inw(ioaddr + DATAPORT);
--    inw(ioaddr + DATAPORT);
--
--    /* Clear all status */
--    outb(0xff, ioaddr + TX_STATUS);
--    outb(0xff, ioaddr + RX_STATUS);
--
--    if (lp->cardtype == MBH10302)
--	outb(INTR_OFF, ioaddr + LAN_CTRL);
--
--    /* Turn on Rx interrupts */
--    outb(D_TX_INTR, ioaddr + TX_INTR);
--    outb(D_RX_INTR, ioaddr + RX_INTR);
--
--    /* Turn on interrupts from LAN card controller */
--    if (lp->cardtype == MBH10302)
--	outb(INTR_ON, ioaddr + LAN_CTRL);
--} /* fjn_reset */
--
--/*====================================================================*/
--
--static void fjn_rx(struct net_device *dev)
--{
--    unsigned int ioaddr = dev->base_addr;
--    int boguscount = 10;	/* 5 -> 10: by agy 19940922 */
--
--    pr_debug("%s: in rx_packet(), rx_status %02x.\n",
--	  dev->name, inb(ioaddr + RX_STATUS));
--
--    while ((inb(ioaddr + RX_MODE) & F_BUF_EMP) == 0) {
--	u_short status = inw(ioaddr + DATAPORT);
--
--	netdev_dbg(dev, "Rxing packet mode %02x status %04x.\n",
--		   inb(ioaddr + RX_MODE), status);
--#ifndef final_version
--	if (status == 0) {
--	    outb(F_SKP_PKT, ioaddr + RX_SKIP);
--	    break;
--	}
--#endif
--	if ((status & 0xF0) != 0x20) {	/* There was an error. */
--	    dev->stats.rx_errors++;
--	    if (status & F_LEN_ERR) dev->stats.rx_length_errors++;
--	    if (status & F_ALG_ERR) dev->stats.rx_frame_errors++;
--	    if (status & F_CRC_ERR) dev->stats.rx_crc_errors++;
--	    if (status & F_OVR_FLO) dev->stats.rx_over_errors++;
--	} else {
--	    u_short pkt_len = inw(ioaddr + DATAPORT);
--	    /* Malloc up new buffer. */
--	    struct sk_buff *skb;
--
--	    if (pkt_len > 1550) {
--		netdev_notice(dev, "The FMV-18x claimed a very large packet, size %d\n",
--			      pkt_len);
--		outb(F_SKP_PKT, ioaddr + RX_SKIP);
--		dev->stats.rx_errors++;
--		break;
--	    }
--	    skb = netdev_alloc_skb(dev, pkt_len + 2);
--	    if (skb == NULL) {
--		outb(F_SKP_PKT, ioaddr + RX_SKIP);
--		dev->stats.rx_dropped++;
--		break;
--	    }
--
--	    skb_reserve(skb, 2);
--	    insw(ioaddr + DATAPORT, skb_put(skb, pkt_len),
--		 (pkt_len + 1) >> 1);
--	    skb->protocol = eth_type_trans(skb, dev);
--
--	    {
--		int i;
--		pr_debug("%s: Rxed packet of length %d: ",
--			dev->name, pkt_len);
--		for (i = 0; i < 14; i++)
--			pr_debug(" %02x", skb->data[i]);
--		pr_debug(".\n");
--	    }
--
--	    netif_rx(skb);
--	    dev->stats.rx_packets++;
--	    dev->stats.rx_bytes += pkt_len;
--	}
--	if (--boguscount <= 0)
--	    break;
--    }
--
--    /* If any worth-while packets have been received, dev_rint()
--	   has done a netif_wake_queue() for us and will work on them
--	   when we get to the bottom-half routine. */
--/*
--    if (lp->cardtype != TDK) {
--	int i;
--	for (i = 0; i < 20; i++) {
--	    if ((inb(ioaddr + RX_MODE) & F_BUF_EMP) == F_BUF_EMP)
--		break;
--	    (void)inw(ioaddr + DATAPORT);  /+ dummy status read +/
--	    outb(F_SKP_PKT, ioaddr + RX_SKIP);
--	}
--
--	if (i > 0)
--	    pr_debug("%s: Exint Rx packet with mode %02x after "
--		  "%d ticks.\n", dev->name, inb(ioaddr + RX_MODE), i);
--    }
--*/
--} /* fjn_rx */
--
--/*====================================================================*/
+-    return 0;
+-}
 -
 -static void netdev_get_drvinfo(struct net_device *dev,
 -			       struct ethtool_drvinfo *info)
 -{
--	strscpy(info->driver, DRV_NAME, sizeof(info->driver));
--	strscpy(info->version, DRV_VERSION, sizeof(info->version));
--	snprintf(info->bus_info, sizeof(info->bus_info),
--		"PCMCIA 0x%lx", dev->base_addr);
+-	strscpy(info->driver, "xirc2ps_cs", sizeof(info->driver));
+-	snprintf(info->bus_info, sizeof(info->bus_info), "PCMCIA 0x%lx",
+-		 dev->base_addr);
 -}
 -
 -static const struct ethtool_ops netdev_ethtool_ops = {
 -	.get_drvinfo		= netdev_get_drvinfo,
 -};
 -
--static int fjn_config(struct net_device *dev, struct ifmap *map){
+-static int
+-do_ioctl(struct net_device *dev, struct ifreq *rq, int cmd)
+-{
+-    struct local_info *local = netdev_priv(dev);
+-    unsigned int ioaddr = dev->base_addr;
+-    struct mii_ioctl_data *data = if_mii(rq);
+-
+-    pr_debug("%s: ioctl(%-.6s, %#04x) %04x %04x %04x %04x\n",
+-	  dev->name, rq->ifr_ifrn.ifrn_name, cmd,
+-	  data->phy_id, data->reg_num, data->val_in, data->val_out);
+-
+-    if (!local->mohawk)
+-	return -EOPNOTSUPP;
+-
+-    switch(cmd) {
+-      case SIOCGMIIPHY:		/* Get the address of the PHY in use. */
+-	data->phy_id = 0;	/* we have only this address */
+-	fallthrough;
+-      case SIOCGMIIREG:		/* Read the specified MII register. */
+-	data->val_out = mii_rd(ioaddr, data->phy_id & 0x1f,
+-			       data->reg_num & 0x1f);
+-	break;
+-      case SIOCSMIIREG:		/* Write the specified MII register */
+-	mii_wr(ioaddr, data->phy_id & 0x1f, data->reg_num & 0x1f, data->val_in,
+-	       16);
+-	break;
+-      default:
+-	return -EOPNOTSUPP;
+-    }
 -    return 0;
 -}
 -
--static int fjn_open(struct net_device *dev)
+-static void
+-hardreset(struct net_device *dev)
 -{
--    struct local_info *lp = netdev_priv(dev);
--    struct pcmcia_device *link = lp->p_dev;
--
--    pr_debug("fjn_open('%s').\n", dev->name);
--
--    if (!pcmcia_dev_present(link))
--	return -ENODEV;
--    
--    link->open++;
--    
--    fjn_reset(dev);
--    
--    lp->tx_started = 0;
--    lp->tx_queue = 0;
--    lp->tx_queue_len = 0;
--    lp->open_time = jiffies;
--    netif_start_queue(dev);
--    
--    return 0;
--} /* fjn_open */
--
--/*====================================================================*/
--
--static int fjn_close(struct net_device *dev)
--{
--    struct local_info *lp = netdev_priv(dev);
--    struct pcmcia_device *link = lp->p_dev;
+-    struct local_info *local = netdev_priv(dev);
 -    unsigned int ioaddr = dev->base_addr;
 -
--    pr_debug("fjn_close('%s').\n", dev->name);
--
--    lp->open_time = 0;
--    netif_stop_queue(dev);
--
--    /* Set configuration register 0 to disable Tx and Rx. */
--    if( sram_config == 0 ) 
--	outb(CONFIG0_RST ,ioaddr + CONFIG_0);
+-    SelectPage(4);
+-    udelay(1);
+-    PutByte(XIRCREG4_GPR1, 0);	     /* clear bit 0: power down */
+-    msleep(40);				     /* wait 40 msec */
+-    if (local->mohawk)
+-	PutByte(XIRCREG4_GPR1, 1);	 /* set bit 0: power up */
 -    else
--	outb(CONFIG0_RST_1 ,ioaddr + CONFIG_0);
+-	PutByte(XIRCREG4_GPR1, 1 | 4);	 /* set bit 0: power up, bit 2: AIC */
+-    msleep(20);			     /* wait 20 msec */
+-}
 -
--    /* Update the statistics -- ToDo. */
--
--    /* Power-down the chip.  Green, green, green! */
--    outb(CHIP_OFF ,ioaddr + CONFIG_1);
--
--    /* Set the ethernet adaptor disable IRQ */
--    if (lp->cardtype == MBH10302)
--	outb(INTR_OFF, ioaddr + LAN_CTRL);
--
--    link->open--;
--
--    return 0;
--} /* fjn_close */
--
--/*====================================================================*/
--
--/*
--  Set the multicast/promiscuous mode for this adaptor.
--*/
--
--static void set_rx_mode(struct net_device *dev)
+-static void
+-do_reset(struct net_device *dev, int full)
 -{
+-    struct local_info *local = netdev_priv(dev);
 -    unsigned int ioaddr = dev->base_addr;
--    u_char mc_filter[8];		 /* Multicast hash filter */
--    u_long flags;
--    int i;
--    
--    int saved_bank;
--    int saved_config_0 = inb(ioaddr + CONFIG_0);
--     
--    local_irq_save(flags); 
+-    unsigned value;
 -
--    /* Disable Tx and Rx */
--    if (sram_config == 0) 
--	outb(CONFIG0_RST, ioaddr + CONFIG_0);
--    else
--	outb(CONFIG0_RST_1, ioaddr + CONFIG_0);
+-    pr_debug("%s: do_reset(%p,%d)\n", dev->name, dev, full);
 -
--    if (dev->flags & IFF_PROMISC) {
--	memset(mc_filter, 0xff, sizeof(mc_filter));
--	outb(3, ioaddr + RX_MODE);	/* Enable promiscuous mode */
--    } else if (netdev_mc_count(dev) > MC_FILTERBREAK ||
--	       (dev->flags & IFF_ALLMULTI)) {
--	/* Too many to filter perfectly -- accept all multicasts. */
--	memset(mc_filter, 0xff, sizeof(mc_filter));
--	outb(2, ioaddr + RX_MODE);	/* Use normal mode. */
--    } else if (netdev_mc_empty(dev)) {
--	memset(mc_filter, 0x00, sizeof(mc_filter));
--	outb(1, ioaddr + RX_MODE);	/* Ignore almost all multicasts. */
--    } else {
--	struct netdev_hw_addr *ha;
--
--	memset(mc_filter, 0, sizeof(mc_filter));
--	netdev_for_each_mc_addr(ha, dev) {
--	    unsigned int bit = ether_crc_le(ETH_ALEN, ha->addr) >> 26;
--	    mc_filter[bit >> 3] |= (1 << (bit & 7));
--	}
--	outb(2, ioaddr + RX_MODE);	/* Use normal mode. */
+-    hardreset(dev);
+-    PutByte(XIRCREG_CR, SoftReset); /* set */
+-    msleep(20);			     /* wait 20 msec */
+-    PutByte(XIRCREG_CR, 0);	     /* clear */
+-    msleep(40);			     /* wait 40 msec */
+-    if (local->mohawk) {
+-	SelectPage(4);
+-	/* set pin GP1 and GP2 to output  (0x0c)
+-	 * set GP1 to low to power up the ML6692 (0x00)
+-	 * set GP2 to high to power up the 10Mhz chip  (0x02)
+-	 */
+-	PutByte(XIRCREG4_GPR0, 0x0e);
 -    }
 -
--    /* Switch to bank 1 and set the multicast table. */
--    saved_bank = inb(ioaddr + CONFIG_1);
--    outb(0xe4, ioaddr + CONFIG_1);
+-    /* give the circuits some time to power up */
+-    msleep(500);			/* about 500ms */
 -
--    for (i = 0; i < 8; i++)
--	outb(mc_filter[i], ioaddr + MAR_ADR + i);
--    outb(saved_bank, ioaddr + CONFIG_1);
+-    local->last_ptr_value = 0;
+-    local->silicon = local->mohawk ? (GetByte(XIRCREG4_BOV) & 0x70) >> 4
+-				   : (GetByte(XIRCREG4_BOV) & 0x30) >> 4;
 -
--    outb(saved_config_0, ioaddr + CONFIG_0);
+-    if (local->probe_port) {
+-	if (!local->mohawk) {
+-	    SelectPage(4);
+-	    PutByte(XIRCREG4_GPR0, 4);
+-	    local->probe_port = 0;
+-	}
+-    } else if (dev->if_port == 2) { /* enable 10Base2 */
+-	SelectPage(0x42);
+-	PutByte(XIRCREG42_SWC1, 0xC0);
+-    } else { /* enable 10BaseT */
+-	SelectPage(0x42);
+-	PutByte(XIRCREG42_SWC1, 0x80);
+-    }
+-    msleep(40);			     /* wait 40 msec to let it complete */
 -
--    local_irq_restore(flags);
+-  #if 0
+-    {
+-	SelectPage(0);
+-	value = GetByte(XIRCREG_ESR);	 /* read the ESR */
+-	pr_debug("%s: ESR is: %#02x\n", dev->name, value);
+-    }
+-  #endif
+-
+-    /* setup the ECR */
+-    SelectPage(1);
+-    PutByte(XIRCREG1_IMR0, 0xff); /* allow all ints */
+-    PutByte(XIRCREG1_IMR1, 1	); /* and Set TxUnderrunDetect */
+-    value = GetByte(XIRCREG1_ECR);
+-  #if 0
+-    if (local->mohawk)
+-	value |= DisableLinkPulse;
+-    PutByte(XIRCREG1_ECR, value);
+-  #endif
+-    pr_debug("%s: ECR is: %#02x\n", dev->name, value);
+-
+-    SelectPage(0x42);
+-    PutByte(XIRCREG42_SWC0, 0x20); /* disable source insertion */
+-
+-    if (local->silicon != 1) {
+-	/* set the local memory dividing line.
+-	 * The comments in the sample code say that this is only
+-	 * settable with the scipper version 2 which is revision 0.
+-	 * Always for CE3 cards
+-	 */
+-	SelectPage(2);
+-	PutWord(XIRCREG2_RBS, 0x2000);
+-    }
+-
+-    if (full)
+-	set_addresses(dev);
+-
+-    /* Hardware workaround:
+-     * The receive byte pointer after reset is off by 1 so we need
+-     * to move the offset pointer back to 0.
+-     */
+-    SelectPage(0);
+-    PutWord(XIRCREG0_DO, 0x2000); /* change offset command, off=0 */
+-
+-    /* setup MAC IMRs and clear status registers */
+-    SelectPage(0x40);		     /* Bit 7 ... bit 0 */
+-    PutByte(XIRCREG40_RMASK0, 0xff); /* ROK, RAB, rsv, RO, CRC, AE, PTL, MP */
+-    PutByte(XIRCREG40_TMASK0, 0xff); /* TOK, TAB, SQE, LL, TU, JAB, EXC, CRS */
+-    PutByte(XIRCREG40_TMASK1, 0xb0); /* rsv, rsv, PTD, EXT, rsv,rsv,rsv, rsv*/
+-    PutByte(XIRCREG40_RXST0,  0x00); /* ROK, RAB, REN, RO, CRC, AE, PTL, MP */
+-    PutByte(XIRCREG40_TXST0,  0x00); /* TOK, TAB, SQE, LL, TU, JAB, EXC, CRS */
+-    PutByte(XIRCREG40_TXST1,  0x00); /* TEN, rsv, PTD, EXT, retry_counter:4  */
+-
+-    if (full && local->mohawk && init_mii(dev)) {
+-	if (dev->if_port == 4 || local->dingo || local->new_mii) {
+-	    netdev_info(dev, "MII selected\n");
+-	    SelectPage(2);
+-	    PutByte(XIRCREG2_MSR, GetByte(XIRCREG2_MSR) | 0x08);
+-	    msleep(20);
+-	} else {
+-	    netdev_info(dev, "MII detected; using 10mbs\n");
+-	    SelectPage(0x42);
+-	    if (dev->if_port == 2) /* enable 10Base2 */
+-		PutByte(XIRCREG42_SWC1, 0xC0);
+-	    else  /* enable 10BaseT */
+-		PutByte(XIRCREG42_SWC1, 0x80);
+-	    msleep(40);			/* wait 40 msec to let it complete */
+-	}
+-	if (full_duplex)
+-	    PutByte(XIRCREG1_ECR, GetByte(XIRCREG1_ECR) | FullDuplex);
+-    } else {  /* No MII */
+-	SelectPage(0);
+-	value = GetByte(XIRCREG_ESR);	 /* read the ESR */
+-	dev->if_port = (value & MediaSelect) ? 1 : 2;
+-    }
+-
+-    /* configure the LEDs */
+-    SelectPage(2);
+-    if (dev->if_port == 1 || dev->if_port == 4) /* TP: Link and Activity */
+-	PutByte(XIRCREG2_LED, 0x3b);
+-    else			      /* Coax: Not-Collision and Activity */
+-	PutByte(XIRCREG2_LED, 0x3a);
+-
+-    if (local->dingo)
+-	PutByte(0x0b, 0x04); /* 100 Mbit LED */
+-
+-    /* enable receiver and put the mac online */
+-    if (full) {
+-	set_multicast_list(dev);
+-	SelectPage(0x40);
+-	PutByte(XIRCREG40_CMD0, EnableRecv | Online);
+-    }
+-
+-    /* setup Ethernet IMR and enable interrupts */
+-    SelectPage(1);
+-    PutByte(XIRCREG1_IMR0, 0xff);
+-    udelay(1);
+-    SelectPage(0);
+-    PutByte(XIRCREG_CR, EnableIntr);
+-    if (local->modem && !local->dingo) { /* do some magic */
+-	if (!(GetByte(0x10) & 0x01))
+-	    PutByte(0x10, 0x11); /* unmask master-int bit */
+-    }
+-
+-    if (full)
+-	netdev_info(dev, "media %s, silicon revision %d\n",
+-		    if_names[dev->if_port], local->silicon);
+-    /* We should switch back to page 0 to avoid a bug in revision 0
+-     * where regs with offset below 8 can't be read after an access
+-     * to the MAC registers */
+-    SelectPage(0);
 -}
+-
+-/****************
+- * Initialize the Media-Independent-Interface
+- * Returns: True if we have a good MII
+- */
+-static int
+-init_mii(struct net_device *dev)
+-{
+-    struct local_info *local = netdev_priv(dev);
+-    unsigned int ioaddr = dev->base_addr;
+-    unsigned control, status, linkpartner;
+-    int i;
+-
+-    if (if_port == 4 || if_port == 1) { /* force 100BaseT or 10BaseT */
+-	dev->if_port = if_port;
+-	local->probe_port = 0;
+-	return 1;
+-    }
+-
+-    status = mii_rd(ioaddr,  0, 1);
+-    if ((status & 0xff00) != 0x7800)
+-	return 0; /* No MII */
+-
+-    local->new_mii = (mii_rd(ioaddr, 0, 2) != 0xffff);
+-    
+-    if (local->probe_port)
+-	control = 0x1000; /* auto neg */
+-    else if (dev->if_port == 4)
+-	control = 0x2000; /* no auto neg, 100mbs mode */
+-    else
+-	control = 0x0000; /* no auto neg, 10mbs mode */
+-    mii_wr(ioaddr,  0, 0, control, 16);
+-    udelay(100);
+-    control = mii_rd(ioaddr, 0, 0);
+-
+-    if (control & 0x0400) {
+-	netdev_notice(dev, "can't take PHY out of isolation mode\n");
+-	local->probe_port = 0;
+-	return 0;
+-    }
+-
+-    if (local->probe_port) {
+-	/* according to the DP83840A specs the auto negotiation process
+-	 * may take up to 3.5 sec, so we use this also for our ML6692
+-	 * Fixme: Better to use a timer here!
+-	 */
+-	for (i=0; i < 35; i++) {
+-	    msleep(100);	 /* wait 100 msec */
+-	    status = mii_rd(ioaddr,  0, 1);
+-	    if ((status & 0x0020) && (status & 0x0004))
+-		break;
+-	}
+-
+-	if (!(status & 0x0020)) {
+-	    netdev_info(dev, "autonegotiation failed; using 10mbs\n");
+-	    if (!local->new_mii) {
+-		control = 0x0000;
+-		mii_wr(ioaddr,  0, 0, control, 16);
+-		udelay(100);
+-		SelectPage(0);
+-		dev->if_port = (GetByte(XIRCREG_ESR) & MediaSelect) ? 1 : 2;
+-	    }
+-	} else {
+-	    linkpartner = mii_rd(ioaddr, 0, 5);
+-	    netdev_info(dev, "MII link partner: %04x\n", linkpartner);
+-	    if (linkpartner & 0x0080) {
+-		dev->if_port = 4;
+-	    } else
+-		dev->if_port = 1;
+-	}
+-    }
+-
+-    return 1;
+-}
+-
+-static void
+-do_powerdown(struct net_device *dev)
+-{
+-
+-    unsigned int ioaddr = dev->base_addr;
+-
+-    pr_debug("do_powerdown(%p)\n", dev);
+-
+-    SelectPage(4);
+-    PutByte(XIRCREG4_GPR1, 0);	     /* clear bit 0: power down */
+-    SelectPage(0);
+-}
+-
+-static int
+-do_stop(struct net_device *dev)
+-{
+-    unsigned int ioaddr = dev->base_addr;
+-    struct local_info *lp = netdev_priv(dev);
+-    struct pcmcia_device *link = lp->p_dev;
+-
+-    dev_dbg(&link->dev, "do_stop(%p)\n", dev);
+-
+-    if (!link)
+-	return -ENODEV;
+-
+-    netif_stop_queue(dev);
+-
+-    SelectPage(0);
+-    PutByte(XIRCREG_CR, 0);  /* disable interrupts */
+-    SelectPage(0x01);
+-    PutByte(XIRCREG1_IMR0, 0x00); /* forbid all ints */
+-    SelectPage(4);
+-    PutByte(XIRCREG4_GPR1, 0);	/* clear bit 0: power down */
+-    SelectPage(0);
+-
+-    link->open--;
+-    return 0;
+-}
+-
+-static const struct pcmcia_device_id xirc2ps_ids[] = {
+-	PCMCIA_PFC_DEVICE_MANF_CARD(0, 0x0089, 0x110a),
+-	PCMCIA_PFC_DEVICE_MANF_CARD(0, 0x0138, 0x110a),
+-	PCMCIA_PFC_DEVICE_PROD_ID13(0, "Xircom", "CEM28", 0x2e3ee845, 0x0ea978ea),
+-	PCMCIA_PFC_DEVICE_PROD_ID13(0, "Xircom", "CEM33", 0x2e3ee845, 0x80609023),
+-	PCMCIA_PFC_DEVICE_PROD_ID13(0, "Xircom", "CEM56", 0x2e3ee845, 0xa650c32a),
+-	PCMCIA_PFC_DEVICE_PROD_ID13(0, "Xircom", "REM10", 0x2e3ee845, 0x76df1d29),
+-	PCMCIA_PFC_DEVICE_PROD_ID13(0, "Xircom", "XEM5600", 0x2e3ee845, 0xf1403719),
+-	PCMCIA_PFC_DEVICE_PROD_ID12(0, "Xircom", "CreditCard Ethernet+Modem II", 0x2e3ee845, 0xeca401bf),
+-	PCMCIA_DEVICE_MANF_CARD(0x01bf, 0x010a),
+-	PCMCIA_DEVICE_PROD_ID13("Toshiba Information Systems", "TPCENET", 0x1b3b94fe, 0xf381c1a2),
+-	PCMCIA_DEVICE_PROD_ID13("Xircom", "CE3-10/100", 0x2e3ee845, 0x0ec0ac37),
+-	PCMCIA_DEVICE_PROD_ID13("Xircom", "PS-CE2-10", 0x2e3ee845, 0x947d9073),
+-	PCMCIA_DEVICE_PROD_ID13("Xircom", "R2E-100BTX", 0x2e3ee845, 0x2464a6e3),
+-	PCMCIA_DEVICE_PROD_ID13("Xircom", "RE-10", 0x2e3ee845, 0x3e08d609),
+-	PCMCIA_DEVICE_PROD_ID13("Xircom", "XE2000", 0x2e3ee845, 0xf7188e46),
+-	PCMCIA_DEVICE_PROD_ID12("Compaq", "Ethernet LAN Card", 0x54f7c49c, 0x9fd2f0a2),
+-	PCMCIA_DEVICE_PROD_ID12("Compaq", "Netelligent 10/100 PC Card", 0x54f7c49c, 0xefe96769),
+-	PCMCIA_DEVICE_PROD_ID12("Intel", "EtherExpress(TM) PRO/100 PC Card Mobile Adapter16", 0x816cc815, 0x174397db),
+-	PCMCIA_DEVICE_PROD_ID12("Toshiba", "10/100 Ethernet PC Card", 0x44a09d9c, 0xb44deecf),
+-	/* also matches CFE-10 cards! */
+-	/* PCMCIA_DEVICE_MANF_CARD(0x0105, 0x010a), */
+-	PCMCIA_DEVICE_NULL,
+-};
+-MODULE_DEVICE_TABLE(pcmcia, xirc2ps_ids);
+-
+-
+-static struct pcmcia_driver xirc2ps_cs_driver = {
+-	.owner		= THIS_MODULE,
+-	.name		= "xirc2ps_cs",
+-	.probe		= xirc2ps_probe,
+-	.remove		= xirc2ps_detach,
+-	.id_table       = xirc2ps_ids,
+-	.suspend	= xirc2ps_suspend,
+-	.resume		= xirc2ps_resume,
+-};
+-module_pcmcia_driver(xirc2ps_cs_driver);
+-
+-#ifndef MODULE
+-static int __init setup_xirc2ps_cs(char *str)
+-{
+-	/* if_port, full_duplex, do_sound, lockup_hack
+-	 */
+-	int ints[10] = { -1 };
+-
+-	str = get_options(str, ARRAY_SIZE(ints), ints);
+-
+-#define MAYBE_SET(X,Y) if (ints[0] >= Y && ints[Y] != -1) { X = ints[Y]; }
+-	MAYBE_SET(if_port, 3);
+-	MAYBE_SET(full_duplex, 4);
+-	MAYBE_SET(do_sound, 5);
+-	MAYBE_SET(lockup_hack, 6);
+-#undef  MAYBE_SET
+-
+-	return 1;
+-}
+-
+-__setup("xirc2ps_cs=", setup_xirc2ps_cs);
+-#endif
 
 -- 
 2.53.0
