@@ -1,53 +1,71 @@
-Return-Path: <netdev+bounces-280077-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280078-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WOj3IRBa52l87AEAu9opvQ
-	(envelope-from <netdev+bounces-280077-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 13:05:52 +0200
+	id qH9MMdBZ52l87AEAu9opvQ
+	(envelope-from <netdev+bounces-280078-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 13:04:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECFC7439E59
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 13:05:51 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07F3F439E43
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 13:04:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A45DB3051AA4
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 11:01:07 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1238E30054C6
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 11:04:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB5283BD634;
-	Tue, 21 Apr 2026 11:01:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38D513A63E6;
+	Tue, 21 Apr 2026 11:04:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EUo6GVgM"
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="ibDJ1d/+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpbg150.qq.com (smtpbg150.qq.com [18.132.163.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8AFD3B19AE
-	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 11:01:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB12E2DC32E
+	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 11:04:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.132.163.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776769265; cv=none; b=ZFD1mauYIXKIZrcKpiB4Fqh2GavfPDj9X6mnnbtk+AMb4pHklx0wRE/0/u2b4UEQ4zt+nim31txzfUqLjWN1vnhgYseyrIsqg+juGq8szjS6s6VjZ+vvZUjiZzh9FhYAhqCSJI8ySItRZcDfG+i34V6aLpSybnuheJqwZkYmxPY=
+	t=1776769485; cv=none; b=u6j8VSxrnO2lrFbBnrGo5QvXpWLtLQRB7gVgosbRjGURC5BRrsmyeUro0Sfey5Db6ldsW5HrH94aeiH+W9JjqBe5KoWzU+b6ztMp3gZMbTIFm0+gepNkBUh2qN3N9MX+K4Pxay2OaJFkAcRyRc4xSP7hk0HZGCQ3TghLbGn/NCA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776769265; c=relaxed/simple;
-	bh=0YHq2IRUIFJ991UpWKePkfXthpOIncAUNvmGi6w+0Y0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=RLe2aXIjxt1a6a/2C+DxHDFdggXG4CJRLuraLDQQfAxUlmzb3NlUqPruC9sQkn1K+82lTdNWuX+0C1Cf10Ted8/nZEtHlHnVw6e/7mOifTCpwcOYC6LEylANUzneK1dkyhPDoLpQbjMmh9qF7UAPUhEMNlLOKRm5KtjikGakCbY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EUo6GVgM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4622AC2BCB0;
-	Tue, 21 Apr 2026 11:01:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776769265;
-	bh=0YHq2IRUIFJ991UpWKePkfXthpOIncAUNvmGi6w+0Y0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=EUo6GVgMNzGLrCGqXzNZpzKXm9vfNOjsuARSbK3uVDrya1heRfDjJIw5DZzZIADlq
-	 YZoriFzijSvB8zqJnPJwJbAZcr7GfBnsEIEHxtnc1lotUXqNABAT8yP3OCv9r6HgpU
-	 yIladX+qygdGAIPBLSDLsdUw73WF9WUIUsMdzxofJ2IG+m+Ag7MPyRZNC8D4QTze2q
-	 nzDl3vj3+ChLglgA4j/QHlG4ZrhtPAO7M5k8rfoYEmGjp078GvOyJmE10lGeBrK/2o
-	 jLCqT0qTb8nZRWKe3cLRFEFSDhF/I6L+VZpUXsQ/HbWs/R9jajyIMwy+1CnONCfCJy
-	 XgDBRj+t+DFcg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FDD63930192;
-	Tue, 21 Apr 2026 11:00:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1776769485; c=relaxed/simple;
+	bh=8KEzgBfJPk+HdBFZv03fj4yzHf8LTSmc9knCLBlbz84=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bo9bOqvWjd6uSH3gdLkfpuyCeE1khn14AO35sRb0DZoQZ/cKXelsnoM8ql2MQqTxoQd7peucKDmGVytSHX+yxRAGgsEfTdFYG1+MAR/zX0fyr4lTlzIBtPrd0wQSrmBsAmI5yc4qFJBICkErpZy9czGDeX92nlipKOGWugt/ovM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=ibDJ1d/+; arc=none smtp.client-ip=18.132.163.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
+	s=onoh2408; t=1776769471;
+	bh=/ynnzt909O28YlGBTKFxGJ7g+e9fS69e68tbjlMPoTQ=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=ibDJ1d/+Q2hd7ZJHcJKE6vlikZg6WZubmqctg6xb1iIP1b5bOu/12tHUOurBEj+7S
+	 yUGSkcTZcphEM2JaZwg0SlbHQdxqe6JEVQhN1lkTGPqVIcP5hmUIVzOygZMto1dQb1
+	 HuGO6+GEQ8NjzEaUW45gZy2TN2Oa2tZL0HtCzDsQ=
+X-QQ-mid: zesmtpgz7t1776769456t6da3a5d4
+X-QQ-Originating-IP: bj0CFm39qn93aOtJfsj2zpKiKagqBcLRDYCe0AmeJ/4=
+Received: from uos-PC ( [117.152.201.246])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Tue, 21 Apr 2026 19:04:14 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 11467599837711659355
+EX-QQ-RecipientCnt: 12
+From: Morduan Zang <zhangdandan@uniontech.com>
+To: petkan@nucleusys.com
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com,
+	Zhan Jun <zhanjun@uniontech.com>,
+	syzbot+3f46c095ac0ca048cb71@syzkaller.appspotmail.com
+Subject: [PATCH] net: usb: rtl8150: fix use-after-free in rtl8150_start_xmit()
+Date: Tue, 21 Apr 2026 19:04:12 +0800
+Message-ID: <73ACB7391A6DE033+20260421110412.14795-1-zhangdandan@uniontech.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,109 +73,135 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v8 00/15] net: sleepable ndo_set_rx_mode
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177676922879.2351021.18340708312396220142.git-patchwork-notify@kernel.org>
-Date: Tue, 21 Apr 2026 11:00:28 +0000
-References: <20260416185712.2155425-1-sdf@fomichev.me>
-In-Reply-To: <20260416185712.2155425-1-sdf@fomichev.me>
-To: Stanislav Fomichev <sdf.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpgz:uniontech.com:qybglogicsvrgz:qybglogicsvrgz6b-0
+X-QQ-XMAILINFO: OWtQnHCUpsEzAqoVxAmvA/6tG5UERKjqMzxgr4de/LCu25YKdC5mXfXX
+	ooihpBqYkJNmxtb1v1FujqX6W5UQBWX4pm/Gu5e19S6wNFgNHzbxMWh/pLm6Jsy/sQmAKFX
+	JFonflKs9EIex+J+nJ5mStSP2DGYmKrSZkFcka1STGv/NuGO7ZTkkTLNPczqr7gbDaRIipJ
+	UmftTDd37IapuPB87ombIOVoj+Vd8f2Tu73EJfEVqu+ZgbeeqIN2reR84LZAPR320YZK/vF
+	L7ZXYT5+6UiXOrjhHkRKweUa9JFaYBc65mA60U7Bc6qKQPwOn1csybn1W/jRMNr/1aHdxfD
+	Yaynbo+gjBiqaMbflojjk6Nlimu4nMBe/UflVaJMLpVxBj3NLv2jesfaTzUagxwPoubSal3
+	mMHULfLqGzGVwH19HN2KDeed/9Q714UpP5Yd3TpXAI1CFyUim7Gufs1aBLvtQ1ozfDAH0W1
+	fgEKssvPh78B8fSRCGzp2PsYbvTjzQm6f+sodnl/m7SoQgp3q9KBX0zXGTkdfx7i+CMAO0/
+	ZLGwkAGrnfuKy63oKGnVF4xqd37yq+2/yif3l8iKkDzRgWOQ34ZW4DrNar9rb6fqYpPe9l/
+	LKQnvZZd1i+v2JRyktDSbeKWXZecNy2/bGGFJiMAV1N79QnacBuTIYLcGlx82tZSX2BXml1
+	uT6jjARjtuyXbWnwXr3yXiQ3mg+6MWTDhhd9rtYaRllpXh2wtzCj0Pfb6do8B5CCDpB60Ic
+	Oh9NJN9H/Pnk8U5hOMkAzP3/H5VUwSuq0Ob9EMyPCI3KhgMVG5o48UO82efiYGzJ8Hkh0Ne
+	hMcNbFT06vk6Ju6EAXSSIPqgxuJgzDA9Cts/FQxhSQx37Skg/wuffVXy8KgzHGuw0ZGE770
+	a6XOENmRKMDegqIPuiCVnt1g3+mk6Dr/G7q14wM52OXRZQQYmF3ic0+evxI/NMcgLVwV/TS
+	Axc49dSXvn4RkejpwyZphcdY5absy+MjipnWoiVU1292OxxjAI/wk5JhBzVyPXITTPwBtNi
+	kieGxthw5DCVuBUDDWn9eJfkznJLAcHRqey9CRRysaLToglHci38N4gbpBXbfYrvOBrRZ4t
+	t05Lv8uOF+Cbz8Q2/QrFug=
+X-QQ-XMRINFO: M/715EihBoGS47X28/vv4NpnfpeBLnr4Qg==
+X-QQ-RECHKSPAM: 0
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[uniontech.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[uniontech.com:s=onoh2408];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-280077-lists,netdev=lfdr.de,netdevbpf];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-280078-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NO_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[6];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: ECFC7439E59
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[zhangdandan@uniontech.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[uniontech.com:+];
+	PRECEDENCE_BULK(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,3f46c095ac0ca048cb71];
+	NEURAL_HAM(-0.00)[-0.993];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,uniontech.com:email,uniontech.com:dkim,uniontech.com:mid,syzkaller.appspot.com:url]
+X-Rspamd-Queue-Id: 07F3F439E43
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello:
+From: Zhan Jun <zhanjun@uniontech.com>
 
-This series was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+syzbot reported a KASAN slab-use-after-free read in rtl8150_start_xmit()
+when accessing skb->len for tx statistics after usb_submit_urb() has
+been called:
 
-On Thu, 16 Apr 2026 11:56:57 -0700 you wrote:
-> This series adds a new ndo_set_rx_mode_async callback that enables
-> drivers to handle address list updates in a sleepable context. The
-> current ndo_set_rx_mode is called under the netif_addr_lock spinlock
-> with BHs disabled, which prevents drivers from sleeping. This is
-> problematic for ops-locked drivers that need to sleep.
-> 
-> The approach:
-> 1. Add snapshot/reconcile infrastructure for address lists
-> 2. Introduce dev_rx_mode_work that takes snapshots under the lock,
->    drops the lock, calls the driver, then reconciles changes back
-> 3. Move promiscuity handling into the scheduled work as well
-> 4. Convert existing ops-locked drivers to ndo_set_rx_mode_async
-> 5. Add a warning for ops-locked drivers still using ndo_set_rx_mode
-> 6. Add a selftest exercising the team+bridge+macvlan topology that
->    triggers the addr_lock -> ops_lock ordering issue
-> 
-> [...]
+  BUG: KASAN: slab-use-after-free in rtl8150_start_xmit+0x71f/0x760
+    drivers/net/usb/rtl8150.c:712
+  Read of size 4 at addr ffff88810eb7a930 by task kworker/0:4/5226
 
-Here is the summary with links:
-  - [net,v8,01/15] net: add address list snapshot and reconciliation infrastructure
-    https://git.kernel.org/netdev/net/c/db9e726525e4
-  - [net,v8,02/15] net: introduce ndo_set_rx_mode_async and netdev_rx_mode_work
-    https://git.kernel.org/netdev/net/c/3554b4345d85
-  - [net,v8,03/15] net: cache snapshot entries for ndo_set_rx_mode_async
-    https://git.kernel.org/netdev/net/c/a4c833278144
-  - [net,v8,04/15] net: move promiscuity handling into netdev_rx_mode_work
-    https://git.kernel.org/netdev/net/c/7ef83bf1712b
-  - [net,v8,05/15] fbnic: convert to ndo_set_rx_mode_async
-    https://git.kernel.org/netdev/net/c/60dd9781e9b8
-  - [net,v8,06/15] mlx5: convert to ndo_set_rx_mode_async
-    https://git.kernel.org/netdev/net/c/5cf06fbdaf02
-  - [net,v8,07/15] bnxt: convert to ndo_set_rx_mode_async
-    https://git.kernel.org/netdev/net/c/f6c53cfa1217
-  - [net,v8,08/15] bnxt: use snapshot in bnxt_cfg_rx_mode
-    https://git.kernel.org/netdev/net/c/a453b5d9b3ed
-  - [net,v8,09/15] iavf: convert to ndo_set_rx_mode_async
-    https://git.kernel.org/netdev/net/c/d071c15b43e9
-  - [net,v8,10/15] netdevsim: convert to ndo_set_rx_mode_async
-    https://git.kernel.org/netdev/net/c/8a5df09e70c2
-  - [net,v8,11/15] dummy: convert to ndo_set_rx_mode_async
-    https://git.kernel.org/netdev/net/c/4d157e89bde4
-  - [net,v8,12/15] netkit: convert to ndo_set_rx_mode_async
-    https://git.kernel.org/netdev/net/c/754b7e1169a7
-  - [net,v8,13/15] net: warn ops-locked drivers still using ndo_set_rx_mode
-    https://git.kernel.org/netdev/net/c/3cbd22938877
-  - [net,v8,14/15] selftests: net: add team_bridge_macvlan rx_mode test
-    https://git.kernel.org/netdev/net/c/ee514cdb07b3
-  - [net,v8,15/15] selftests: net: use ip commands instead of teamd in team rx_mode test
-    https://git.kernel.org/netdev/net/c/c4dde411bc36
+The URB completion handler write_bulk_callback() frees the skb via
+dev_kfree_skb_irq(dev->tx_skb). The URB may complete on another CPU
+in softirq context before usb_submit_urb() returns in the submitter,
+so by the time the submitter reads skb->len the skb has already been
+queued to the per-CPU completion_queue and freed by net_tx_action():
 
-You are awesome, thank you!
+  CPU A (xmit)                      CPU B (USB completion softirq)
+  ------------                      ------------------------------
+  dev->tx_skb = skb;
+  usb_submit_urb()      --+
+                          |-------> write_bulk_callback()
+                          |           dev_kfree_skb_irq(dev->tx_skb)
+                          |         net_tx_action()
+                          |           napi_skb_cache_put()   <-- free
+  netdev->stats.tx_bytes  |
+    += skb->len;          <-- UAF read
+
+Fix it by caching skb->len before submitting the URB and using the
+cached value when updating the tx_bytes counter. This mirrors the
+fix pattern used by other USB network drivers.
+
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Reported-by: syzbot+3f46c095ac0ca048cb71@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/all/69e69ee7.050a0220.24bfd3.002b.GAE@google.com/
+Closes: https://syzkaller.appspot.com/bug?extid=3f46c095ac0ca048cb71
+Signed-off-by: Zhan Jun <zhanjun@uniontech.com>
+---
+ drivers/net/usb/rtl8150.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/usb/rtl8150.c b/drivers/net/usb/rtl8150.c
+index 4cda0643afb6..6fc6be0cced6 100644
+--- a/drivers/net/usb/rtl8150.c
++++ b/drivers/net/usb/rtl8150.c
+@@ -683,6 +683,7 @@ static netdev_tx_t rtl8150_start_xmit(struct sk_buff *skb,
+ 					    struct net_device *netdev)
+ {
+ 	rtl8150_t *dev = netdev_priv(netdev);
++	unsigned int skb_len;
+ 	int count, res;
+ 
+ 	/* pad the frame and ensure terminating USB packet, datasheet 9.2.3 */
+@@ -694,6 +695,14 @@ static netdev_tx_t rtl8150_start_xmit(struct sk_buff *skb,
+ 		return NETDEV_TX_OK;
+ 	}
+ 
++	/*
++	 * Cache skb->len before submitting the URB: the URB completion
++	 * handler (write_bulk_callback) frees the skb, and it may run
++	 * on another CPU before usb_submit_urb() returns, which would
++	 * leave skb dangling here.
++	 */
++	skb_len = skb->len;
++
+ 	netif_stop_queue(netdev);
+ 	dev->tx_skb = skb;
+ 	usb_fill_bulk_urb(dev->tx_urb, dev->udev, usb_sndbulkpipe(dev->udev, 2),
+@@ -709,7 +718,7 @@ static netdev_tx_t rtl8150_start_xmit(struct sk_buff *skb,
+ 		}
+ 	} else {
+ 		netdev->stats.tx_packets++;
+-		netdev->stats.tx_bytes += skb->len;
++		netdev->stats.tx_bytes += skb_len;
+ 		netif_trans_update(netdev);
+ 	}
+ 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.51.0
 
 
