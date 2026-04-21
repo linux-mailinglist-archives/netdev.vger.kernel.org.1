@@ -1,154 +1,264 @@
-Return-Path: <netdev+bounces-280153-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280154-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OI8zAMKK52lY9wEAu9opvQ
-	(envelope-from <netdev+bounces-280153-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 16:33:38 +0200
+	id UC6jJH+L52lY9wEAu9opvQ
+	(envelope-from <netdev+bounces-280154-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 16:36:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CB4343C174
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 16:33:37 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17D2D43C228
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 16:36:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2E3FB3091CAA
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 14:26:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F2BD9302D528
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 14:29:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D1873D9020;
-	Tue, 21 Apr 2026 14:26:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 574A43D75C5;
+	Tue, 21 Apr 2026 14:29:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h4UhCFK4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iCyDKbVn"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 759A53D8906;
-	Tue, 21 Apr 2026 14:26:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4F3330E0E5
+	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 14:29:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776781571; cv=none; b=MZrFNYX6zdrQ/cdIwwyhgvveGm1E36+bAa+GKVrLEBsyzv7fP/aISEfQM74OaJzi1AzLlAxlTSDw9HWicQdCQznmwccS6mx0WRzyqVM4gOABZq3OZPz5fBiIJMWyjIedQd3xJVR2/lmwcRQH+Qc7cyct1o+MeAcFGwrmZMtQRDY=
+	t=1776781789; cv=none; b=Bb1aHDBXHji6ZuD1jslvGZpnCeIMLPSj9NjCgzX0TCQ9vJSW62uwBeyhyBqUBaTzvQ2iy6lNxBzl2129uGB/F+j49UUmII3gQPwmQu3vGLNFDt2DqeNyMN2GY2571ZfJ1q+S8ZOQ6QxMFwWaZvqbvxCVKBN0uTdhtDGCxPtBbsM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776781571; c=relaxed/simple;
-	bh=0RnKxqwFw2DtWwlFTcCVreOiLyVJwetPRsjoYkkIW3E=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pQjsSzWVcNDHXb47dyr7Ec+07uBbhOI79PiYU6I5k2d0uhVlX4vgBJBQa688j/EFDgCxuTYpDaJi16TP+P7dhVSpeKhJQLi3q9RNTnRiTQ2xw60AIxBHv9FSzqt2We3dle7aR+LGLrE4UT6BXO3dE8raztF5Hk99rAsxgvaGjoc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h4UhCFK4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30696C2BCB0;
-	Tue, 21 Apr 2026 14:26:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776781571;
-	bh=0RnKxqwFw2DtWwlFTcCVreOiLyVJwetPRsjoYkkIW3E=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=h4UhCFK4vbEl4Wp1gSiv44FJev9LCzWPglxkORJlz9frcLRGe77nkuK2HJKhW629o
-	 wRngOskZ4vF5GAjkFfmZJY88ttaV9ulNglyDlbSbyWigFjBO0GueqfYxhReOLgDJrA
-	 OA/1NpEWp9ciPPicvJYgGCeSczrQT7syBs7FjZCgJYKs+eofHSE+t5cp5mwYD7xxWj
-	 ZrTgfzW+8wOd8jFEDLLUzt7L0Sx9YSBWBhTAJx6LHpfBIcZUN/JmthjaaUoXAA69XO
-	 NbSNl08XI9IXI3h3CstvStjyZ0H+VknKC4W1B99Pb7/dohGMUiWdJy1PG7MaJ0qLEB
-	 6jB7BrjDb6uPA==
-Date: Tue, 21 Apr 2026 07:26:09 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Cosmin Ratiu <cratiu@nvidia.com>
-Cc: Boris Pismenny <borisp@nvidia.com>, "willemdebruijn.kernel@gmail.com"
- <willemdebruijn.kernel@gmail.com>, "andrew+netdev@lunn.ch"
- <andrew+netdev@lunn.ch>, "daniel.zahka@gmail.com" <daniel.zahka@gmail.com>,
- "davem@davemloft.net" <davem@davemloft.net>, "leon@kernel.org"
- <leon@kernel.org>, Rahul Rameshbabu <rrameshbabu@nvidia.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
- "pabeni@redhat.com" <pabeni@redhat.com>, Raed Salem <raeds@nvidia.com>,
- Dragos Tatulea <dtatulea@nvidia.com>, "kees@kernel.org" <kees@kernel.org>,
- Mark Bloch <mbloch@nvidia.com>, "edumazet@google.com"
- <edumazet@google.com>, Tariq Toukan <tariqt@nvidia.com>, Saeed Mahameed
- <saeedm@nvidia.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Gal
- Pressman <gal@nvidia.com>
-Subject: Re: [PATCH net 1/2] net/mlx5e: psp: Fix invalid access on PSP dev
- registration fail
-Message-ID: <20260421072609.4b15e7b9@kernel.org>
-In-Reply-To: <f327ce67e69c27ed971f4ed38f46381cd2f97ec7.camel@nvidia.com>
-References: <20260417050201.192070-2-tariqt@nvidia.com>
-	<20260418190848.204170-1-kuba@kernel.org>
-	<d7e2d46769e120a16ce12d345c51a47349733828.camel@nvidia.com>
-	<20260420100917.1e4be22a@kernel.org>
-	<f327ce67e69c27ed971f4ed38f46381cd2f97ec7.camel@nvidia.com>
+	s=arc-20240116; t=1776781789; c=relaxed/simple;
+	bh=0sVBQdXKRDkJSG8meZQ/pBjSftRkZl7LQGy0n05ApBA=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=OrWoSfhzpzBvVGWxrYHlWaWPYeFJhpEezb561IxovGON7pfOO8pNiQnlfS3doIHELSRUI0qla0opcVqAvXMnsRek41QdTnqEwTB7/A9RiiXTXIJPxINVBue26hPaAGxR6wr7WLSfXTAJ3mZCQbs9LxCzOpH5HkapSWld2ofvc5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iCyDKbVn; arc=none smtp.client-ip=209.85.222.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-8cb6291d95aso718344185a.1
+        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 07:29:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1776781787; x=1777386587; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=jvck/XoB8H/Wh1zgGi1810Si1lrAtzcUaSDMkL0ZmR0=;
+        b=iCyDKbVnSZKP44mK/zS7LiAbUlkCX1o+phS1n/fq+aB/DjscTJ/IwYfLT3lE+C2IJu
+         7dWW/3EfHUIWX3cEKXkYYHFUVijlOjw8CcDHgLcNjU3TIAvbyTfx77jfcUDUEvgQacer
+         vFC/xwCARWv/ByLedR9VK7itsDMrZOUBgLtoo3nsEjni9oM3+93QOMyL08cDpgsDZvuO
+         wX2/UROuh0W6TXgi/Sigc+Rv5JQC8aDB0uXyUdEmBfv02YxT7CVGzyj0ee5Z8tZe6r/J
+         jtz6ta4TB2op48kW5Xkv0/h/6oQ2EoqJxvSovTHE7T4igjNbp5UtG+EJZE4BPrQK8vch
+         XhZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776781787; x=1777386587;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=jvck/XoB8H/Wh1zgGi1810Si1lrAtzcUaSDMkL0ZmR0=;
+        b=rlQ/jqe6rOovX7F11XvWDQ4A5KP36FA3iu1pSbGptR/13lz3cL04yqsf6f1dlvpxwd
+         leehqqTqjVLyMrvEHVFylOs56DOJDX7Fw/xsphB/B5llJtghKlwn29DCgBnmEe/U7v+8
+         sT3l5Fl7Qxemg2jIO8O+wG2WIfV6Fh2CVjptacK1D/GKWSxBczusOvaQlV880zNgpZT/
+         f4yfCtkoh0QD0/lYQ8JdCYOKFaA3mYDrHTv1NbPOuWDPMUKwmXUnJizbYKr9e9NQMAa0
+         xYKnJe4qwp5hC8k4XgMazAFZ/c9YaNzYAsiKiZXMhJDvFEhgcgznGfLv0gF78lnW+iXS
+         NXnw==
+X-Forwarded-Encrypted: i=1; AFNElJ/Ke7vAwR/nnA8Gd5vlStul52yzWyVgcNgo4W/fBziy/qeFXFEHHYXSFt8tlukQj7mANG+yD9I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzP9cRLXWDHo1nDUx9PM28tWzEa5/A9a+D76ioC+Y1MWZB22V+J
+	wM5ml+hq2Mjv69zouCZsO5n8FGu7aTaoaXeyzNLI2HNDrGg8zSbV9kEUPZ3DB28ZF/v2wrnpR+u
+	sOjjGE8rhQlhtqg==
+X-Received: from qkjw1.prod.google.com ([2002:a05:620a:1481:b0:8cd:8ec2:8228])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:3720:b0:8cf:dfc9:c09c with SMTP id af79cd13be357-8e78f253c25mr2697155385a.10.1776781786327;
+ Tue, 21 Apr 2026 07:29:46 -0700 (PDT)
+Date: Tue, 21 Apr 2026 14:29:44 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.rc2.533.g4f5dca5207-goog
+Message-ID: <20260421142944.4009941-1-edumazet@google.com>
+Subject: [PATCH net] net/sched: sch_pie: annotate data-races in pie_dump_stats()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>, 
+	netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[nvidia.com,gmail.com,lunn.ch,davemloft.net,kernel.org,vger.kernel.org,redhat.com,google.com];
-	TAGGED_FROM(0.00)[bounces-280153-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,mojatatu.com,resnulli.us,vger.kernel.org,gmail.com,google.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-280154-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 5CB4343C174
+X-Rspamd-Queue-Id: 17D2D43C228
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, 21 Apr 2026 12:29:13 +0000 Cosmin Ratiu wrote:
-> > Sure but why are you leaving the priv->psp struct in place and
-> > whatever
-> > FS init has been done? IOW if you really want PSP init to not block
-> > probe why is mlx5e_psp_register() a void function rather than
-> > mlx5e_psp_init() ? Ignoring errors from psp_dev_create()
-> > makes no sense to me - what are you protecting from?
-> > kmalloc(GFP_KERNEL)
-> > failing?  
-> 
-> priv->psp and steering at the time of mlx5e_psp_register() is inert
-> without the PSP device. Cleaning it on psp_dev_create() failure would
-> be weird, it's cleaned up anyway on netdev teardown. The fact that only
-> memory allocations can fail inside psp_dev_create() is irrelevant here.
-> psp_dev_create() failing shouldn't bring down the whole netdevice, so
-> logging a message and continuing is ok (which is what is also done for
-> macsec and ktls).
+pie_dump_stats() only runs with RTNL held,
+reading fields that can be changed in qdisc fast path.
 
-This is a misguided cargo cult. Or something motivated by OOT
-compatibility. Alex D sometimes tries to do the same thing with Meta
-drivers. I don't get it. Of course we want the device to be operational
-if some *device* init fails. The compatibility matrix with all device
-generations and fw versions could justify that. But continuing init
-when a single-page kmalloc failed is pure silliness.
+Add READ_ONCE()/WRITE_ONCE() annotations.
 
-> mlx5e_psp_register() is void because it's called from
-> mlx5e_nic_enable() which can't fail, so it really can't do much other
-> than complain to dmesg.
-> 
-> But while thinking about this, I suppose we could change the entire PSP
-> initialization to happen at the time of the current
-> mlx5e_psp_register(), and that would simplify the number of states.
-> I will do that in the next planned PSP series for net-next.
-> 
-> Meanwhile, could you please take the 2nd patch and leave this one out?
-> It should apply with no conflicts by itself.
-> 
-> Or you would like to see a separate submission with the 2nd patch
-> alone?
+Alternative would be to acquire the qdisc spinlock, but our long-term
+goal is to make qdisc dump operations lockless as much as we can.
 
-Please resubmit.
+tc_pie_xstats fields don't need to be latched atomically,
+otherwise this bug would have been caught earlier.
+
+Fixes: edb09eb17ed8 ("net: sched: do not acquire qdisc spinlock in qdisc/class stats dump")
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: Jamal Hadi Salim <jhs@mojatatu.com>
+---
+ include/net/pie.h   |  2 +-
+ net/sched/sch_pie.c | 38 +++++++++++++++++++-------------------
+ 2 files changed, 20 insertions(+), 20 deletions(-)
+
+diff --git a/include/net/pie.h b/include/net/pie.h
+index 01cbc66825a40bd21c0a044b1180cbbc346785df..1f3db0c355149b41823a891c9156cac625122031 100644
+--- a/include/net/pie.h
++++ b/include/net/pie.h
+@@ -104,7 +104,7 @@ static inline void pie_vars_init(struct pie_vars *vars)
+ 	vars->dq_tstamp = DTIME_INVALID;
+ 	vars->accu_prob = 0;
+ 	vars->dq_count = DQCOUNT_INVALID;
+-	vars->avg_dq_rate = 0;
++	WRITE_ONCE(vars->avg_dq_rate, 0);
+ }
+ 
+ static inline struct pie_skb_cb *get_pie_cb(const struct sk_buff *skb)
+diff --git a/net/sched/sch_pie.c b/net/sched/sch_pie.c
+index 16f3f629cb8e4be71431f7e50a278e3c7fdba8d0..fb53fbf0e328571be72b66ba4e75a938e1963422 100644
+--- a/net/sched/sch_pie.c
++++ b/net/sched/sch_pie.c
+@@ -90,7 +90,7 @@ static int pie_qdisc_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+ 	bool enqueue = false;
+ 
+ 	if (unlikely(qdisc_qlen(sch) >= sch->limit)) {
+-		q->stats.overlimit++;
++		WRITE_ONCE(q->stats.overlimit, q->stats.overlimit + 1);
+ 		goto out;
+ 	}
+ 
+@@ -104,7 +104,7 @@ static int pie_qdisc_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+ 		/* If packet is ecn capable, mark it if drop probability
+ 		 * is lower than 10%, else drop it.
+ 		 */
+-		q->stats.ecn_mark++;
++		WRITE_ONCE(q->stats.ecn_mark, q->stats.ecn_mark + 1);
+ 		enqueue = true;
+ 	}
+ 
+@@ -114,15 +114,15 @@ static int pie_qdisc_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+ 		if (!q->params.dq_rate_estimator)
+ 			pie_set_enqueue_time(skb);
+ 
+-		q->stats.packets_in++;
++		WRITE_ONCE(q->stats.packets_in, q->stats.packets_in + 1);
+ 		if (qdisc_qlen(sch) > q->stats.maxq)
+-			q->stats.maxq = qdisc_qlen(sch);
++			WRITE_ONCE(q->stats.maxq, qdisc_qlen(sch));
+ 
+ 		return qdisc_enqueue_tail(skb, sch);
+ 	}
+ 
+ out:
+-	q->stats.dropped++;
++	WRITE_ONCE(q->stats.dropped, q->stats.dropped + 1);
+ 	q->vars.accu_prob = 0;
+ 	return qdisc_drop_reason(skb, sch, to_free, reason);
+ }
+@@ -267,11 +267,11 @@ void pie_process_dequeue(struct sk_buff *skb, struct pie_params *params,
+ 			count = count / dtime;
+ 
+ 			if (vars->avg_dq_rate == 0)
+-				vars->avg_dq_rate = count;
++				WRITE_ONCE(vars->avg_dq_rate, count);
+ 			else
+-				vars->avg_dq_rate =
++				WRITE_ONCE(vars->avg_dq_rate,
+ 				    (vars->avg_dq_rate -
+-				     (vars->avg_dq_rate >> 3)) + (count >> 3);
++				     (vars->avg_dq_rate >> 3)) + (count >> 3));
+ 
+ 			/* If the queue has receded below the threshold, we hold
+ 			 * on to the last drain rate calculated, else we reset
+@@ -381,7 +381,7 @@ void pie_calculate_probability(struct pie_params *params, struct pie_vars *vars,
+ 	if (delta > 0) {
+ 		/* prevent overflow */
+ 		if (vars->prob < oldprob) {
+-			vars->prob = MAX_PROB;
++			WRITE_ONCE(vars->prob, MAX_PROB);
+ 			/* Prevent normalization error. If probability is at
+ 			 * maximum value already, we normalize it here, and
+ 			 * skip the check to do a non-linear drop in the next
+@@ -392,7 +392,7 @@ void pie_calculate_probability(struct pie_params *params, struct pie_vars *vars,
+ 	} else {
+ 		/* prevent underflow */
+ 		if (vars->prob > oldprob)
+-			vars->prob = 0;
++			WRITE_ONCE(vars->prob, 0);
+ 	}
+ 
+ 	/* Non-linear drop in probability: Reduce drop probability quickly if
+@@ -403,7 +403,7 @@ void pie_calculate_probability(struct pie_params *params, struct pie_vars *vars,
+ 		/* Reduce drop probability to 98.4% */
+ 		vars->prob -= vars->prob / 64;
+ 
+-	vars->qdelay = qdelay;
++	WRITE_ONCE(vars->qdelay, qdelay);
+ 	vars->backlog_old = backlog;
+ 
+ 	/* We restart the measurement cycle if the following conditions are met
+@@ -502,21 +502,21 @@ static int pie_dump_stats(struct Qdisc *sch, struct gnet_dump *d)
+ 	struct pie_sched_data *q = qdisc_priv(sch);
+ 	struct tc_pie_xstats st = {
+ 		.prob		= q->vars.prob << BITS_PER_BYTE,
+-		.delay		= ((u32)PSCHED_TICKS2NS(q->vars.qdelay)) /
++		.delay		= ((u32)PSCHED_TICKS2NS(READ_ONCE(q->vars.qdelay))) /
+ 				   NSEC_PER_USEC,
+-		.packets_in	= q->stats.packets_in,
+-		.overlimit	= q->stats.overlimit,
+-		.maxq		= q->stats.maxq,
+-		.dropped	= q->stats.dropped,
+-		.ecn_mark	= q->stats.ecn_mark,
++		.packets_in	= READ_ONCE(q->stats.packets_in),
++		.overlimit	= READ_ONCE(q->stats.overlimit),
++		.maxq		= READ_ONCE(q->stats.maxq),
++		.dropped	= READ_ONCE(q->stats.dropped),
++		.ecn_mark	= READ_ONCE(q->stats.ecn_mark),
+ 	};
+ 
+ 	/* avg_dq_rate is only valid if dq_rate_estimator is enabled */
+ 	st.dq_rate_estimating = q->params.dq_rate_estimator;
+ 
+ 	/* unscale and return dq_rate in bytes per sec */
+-	if (q->params.dq_rate_estimator)
+-		st.avg_dq_rate = q->vars.avg_dq_rate *
++	if (st.dq_rate_estimating)
++		st.avg_dq_rate = READ_ONCE(q->vars.avg_dq_rate) *
+ 				 (PSCHED_TICKS_PER_SEC) >> PIE_SCALE;
+ 
+ 	return gnet_stats_copy_app(d, &st, sizeof(st));
+-- 
+2.54.0.rc2.533.g4f5dca5207-goog
+
 
