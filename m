@@ -1,168 +1,168 @@
-Return-Path: <netdev+bounces-280051-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280052-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IMftJfY752no5QEAu9opvQ
-	(envelope-from <netdev+bounces-280051-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 10:57:26 +0200
+	id yHv2EE4852no5QEAu9opvQ
+	(envelope-from <netdev+bounces-280052-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 10:58:54 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B08A0438763
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 10:57:25 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D70FF4387FC
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 10:58:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 047773020A5B
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 08:54:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 11CC53050A0E
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 08:55:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AE2E38422F;
-	Tue, 21 Apr 2026 08:54:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24AAA3A168C;
+	Tue, 21 Apr 2026 08:55:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pQmB7H9P"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fbpksxB6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B37D739FCC4
-	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 08:54:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB9873A0B26;
+	Tue, 21 Apr 2026 08:55:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776761664; cv=none; b=TQz7UxMtTlU613NV9XnERE7tHTf5SB151aSWdOYPTtf8QghMzynfibwu/xVZhryTHEzu9UES/MdhbleSJ3abfCZcDMkuoK2F2SEv3aYwmp30NGQR2Ez6ij1M3e/xGiVtvtslCbzdFJdxEQr3Xgv0/mHc36KZVnrPCN4Ffj9WTb0=
+	t=1776761725; cv=none; b=Ktt6QSi8cX9iMazALWVVwxqE+fte193TaeGYWS56V6a1+khp0nkwMsqdYnIAzY73mJ6RQyIaR/ADTNxs8N9ctiaeKiu70umGDQaSudGT6qDMbqIQGghuUcdBypc6dXDBtDWfoxptn1/w6yAFE7YL0+P7Rca8YftAhVMEkp5T+Js=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776761664; c=relaxed/simple;
-	bh=dU+9BdjF0sSpHUJiYDtB2Gktv8KhihkDTc5ZL19RUS4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qTRP1ESQC6QaRLyx6FlTe+Y+2cjOCzXl7vHr/T0Lp0HxZNf5rfPdZpLKYaF3nu2DOUlSWOLh51Q8cxARoi2piTyIrjXn0V1pLiAVtM6NzTLsVRwp5Npnm3wdC5RfVy/l77Jk+qqX2S1viwlyF58xg6vxof0fGS35hiMSrEoFnMk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pQmB7H9P; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-43d64313c39so3101379f8f.3
-        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 01:54:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776761661; x=1777366461; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=dU+9BdjF0sSpHUJiYDtB2Gktv8KhihkDTc5ZL19RUS4=;
-        b=pQmB7H9PSuVCeV4gvVpOUYrI8dfQSrQXvkgXB94m8YT/mrqlLvy9G1UeC4SKORnoVx
-         0Xdg+wlggpl+9vxIg+pTOYaN0t8MXTHj4xwJnwTMhf0Mc+tWU9mcTWjTk3p71IWJr5Vk
-         M57UvSSo1OBhV+Qsfqhi6vuaFAylrnYMLjbItZaNe+c9jLmCaz2r9im3BLO24xNYy+BZ
-         I9qPLWYfwnomtCXhTfenvaqFeiChZ05+2c9Kok5NP5Dfq2woAqLb8Uu8jla5Qj3FZ2Q/
-         xwBdDBexooAf8I6Ns9kTnTt+iUgifxZNEm5qxxnpPt1c9Fn11255eVRip3RuOQfH2D8q
-         j4IQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776761661; x=1777366461;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=dU+9BdjF0sSpHUJiYDtB2Gktv8KhihkDTc5ZL19RUS4=;
-        b=JTJWRSb0au8O0mDXvbOa4SHNprdSNpwA83dpO4Ioh0Sq+jMCKOXdboYrBG+IiML7KT
-         LefDz/3AflYgvNAnY8wQvxS01NGA24KFNWhHpW+aYap7rClC6oKIvnDmdpAMe+mxFHH+
-         xwG0amFj+rTYTgREVknNwWTbF9NGO82OLBz0ClIs1roy1HgqdAaePnv//M1uA3zUOKiP
-         z1wu0XwtNcXyAewJIdiG8Pc2rC6HhtHdYCgJBhZObQ3SQ2i5LxWJy3XBxB0xxHXFxt/i
-         eFkNSetL65t9FHI0sR1eo90fRvD8e18zHkL5mR3cSI5Nep1yoUN6Uzt66fuyboFz7t60
-         n7mA==
-X-Forwarded-Encrypted: i=1; AFNElJ+VawpltGt881WWES9FguNrflQIfm6iy4WqKVI6pICBBLOe0bMaVChkF80VbRDcjXKHoatBpvg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJiyOw4L6ORnoaHfoO8SRUS3fMWnfRzitVu2cJULha1SY57v7z
-	hVQjcUj7UinIgmnL96p892ZCZpeMKDcECj2n/NM1QI4cSSKWgv3sXjnx
-X-Gm-Gg: AeBDievxslLE95boH/wRhL+17Vo4Q2uh77z6hhfpjkQ6m+59xrQ9r02dqrfSGgcMof5
-	ZbGS6cQFmYbuRTowEL+/z6rA5eCwR6ocq5CnJwKp21N1Ukzl1akhLRvqIGI0oXKitlbATfVyJUW
-	Il7Y5iNcu/48gDewSsusPqMS+9QqMO/SFbhthrAnUUTA9utE3J/YqwmHhtOAGRrQ9/yZwDwcX1W
-	6tDZ7Q3Ww+YR3BUTPshBk9SsSbxslduQw/RMqRLEGMqlb7Fx1rb5IPbqA+OdveO40Enp1qT6P4B
-	kQajgvh/AAVIctmOn2Aa1L+WGYqGycn8CCYuSw7/MyPo66ay1akjr/wTGwd+hilIuBRYKVoq9xq
-	7ssXErow7UAH1QnhTvTwRfeYICYp4haJ3b0vFi7GfhBLBkg9g9zv6S2WceesyJT0MkTwfSNzHBC
-	k9QMgsYvOKvXPhAtL+HORngGfg7uUy5gNYn8yo
-X-Received: by 2002:a05:6000:24c7:b0:43d:740:fb37 with SMTP id ffacd0b85a97d-43fe3dfbe4emr25790843f8f.24.1776761660781;
-        Tue, 21 Apr 2026 01:54:20 -0700 (PDT)
-Received: from [192.168.1.169] ([46.10.223.24])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43fe4cb1249sm32516285f8f.5.2026.04.21.01.54.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Apr 2026 01:54:20 -0700 (PDT)
-Message-ID: <9ce273bd-6912-4442-8672-4c89bebf32ed@gmail.com>
-Date: Tue, 21 Apr 2026 11:54:19 +0300
+	s=arc-20240116; t=1776761725; c=relaxed/simple;
+	bh=l8GZGmmqBDH1qGsf6cYl9us7elj7guWOOnOWIKaH7fk=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=LQXUIn2KRcNjQ/HU8n3IJnikYGldYrolaecUwIogYuR22wWG7ihZ1INIcSBQs2U/SlCzjaXOYgTH8Hf/xwavn+nypIlwEw/yppGp2/VbzGLXCxopfe3qVE/VvJM6daeruIiRQh+KBBWqPPBnvvFBlIngVOD84XTTUeIkcFueIa4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fbpksxB6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85CDAC2BCB8;
+	Tue, 21 Apr 2026 08:55:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776761724;
+	bh=l8GZGmmqBDH1qGsf6cYl9us7elj7guWOOnOWIKaH7fk=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=fbpksxB6uMfX5Z5L/PjhReWfZqK/gZWcUtb6VpyahD6lNkPwvC53AyuHNjTxumI8b
+	 duF/nj30nw15WGdGP4wWI4cZJCvOgrppPsKLO6W+438xfzolOxyCQLWWtiYuogohr7
+	 1GDeU1agc/WykWiBDwQk3/ghICVktpzs8vPBU7Tvr2uroNjLOAaVtsZ6e+UsS6+SR5
+	 95XzgmP+zGCzUnqFAOB6rIyVPGOklw1+f4w+gBdEsc12hGeD/BpK2xSmQq0Zb+Rnza
+	 sqCn0XnOQ9Fo3G6EZr6k66TGFrZQhFMgK4Uh4hpsPC1v1fOZ6Hq/roWwfxmW6uWky3
+	 HX57nFht2oNNw==
+From: Thomas Gleixner <tglx@kernel.org>
+To: Waiman Long <longman@redhat.com>, Tejun Heo <tj@kernel.org>, Johannes
+ Weiner <hannes@cmpxchg.org>, Michal =?utf-8?Q?Koutn=C3=BD?=
+ <mkoutny@suse.com>, Jonathan
+ Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, Catalin
+ Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, "K. Y.
+ Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>,
+ Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, Long Li
+ <longli@microsoft.com>, Guenter Roeck <linux@roeck-us.net>, Frederic
+ Weisbecker <frederic@kernel.org>, "Paul E. McKenney" <paulmck@kernel.org>,
+ Neeraj Upadhyay <neeraj.upadhyay@kernel.org>, Joel Fernandes
+ <joelagnelf@nvidia.com>, Josh Triplett <josh@joshtriplett.org>, Boqun Feng
+ <boqun@kernel.org>, Uladzislau Rezki <urezki@gmail.com>, Steven Rostedt
+ <rostedt@goodmis.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Lai Jiangshan <jiangshanlai@gmail.com>, Zqiang <qiang.zhang@linux.dev>,
+ Anna-Maria Behnsen <anna-maria@linutronix.de>, Ingo Molnar
+ <mingo@kernel.org>, Chen Ridong <chenridong@huaweicloud.com>, Peter
+ Zijlstra <peterz@infradead.org>, Juri Lelli <juri.lelli@redhat.com>,
+ Vincent Guittot <vincent.guittot@linaro.org>, Dietmar Eggemann
+ <dietmar.eggemann@arm.com>, Ben Segall <bsegall@google.com>, Mel Gorman
+ <mgorman@suse.de>, Valentin Schneider <vschneid@redhat.com>, K Prateek
+ Nayak <kprateek.nayak@amd.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: cgroups@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-hyperv@vger.kernel.org, linux-hwmon@vger.kernel.org,
+ rcu@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, Costa Shulyupin <cshulyup@redhat.com>,
+ Qiliang Yuan <realwujing@gmail.com>, Waiman Long <longman@redhat.com>
+Subject: Re: [PATCH 05/23] tick: Pass timer tick job to an online HK CPU in
+ tick_cpu_dying()
+In-Reply-To: <20260421030351.281436-6-longman@redhat.com>
+References: <20260421030351.281436-1-longman@redhat.com>
+ <20260421030351.281436-6-longman@redhat.com>
+Date: Tue, 21 Apr 2026 10:55:21 +0200
+Message-ID: <87zf2wbsli.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] netdevsim: Initialize all fields of ip header when
- building dummy sk_buff
-To: Breno Leitao <leitao@debian.org>
-Cc: kuba@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260421073738.22110-1-zlatistiv@gmail.com>
- <aecyEArzjx8KRp8-@gmail.com>
-Content-Language: en-US
-From: "Nikola Z. Ivanov" <zlatistiv@gmail.com>
-In-Reply-To: <aecyEArzjx8KRp8-@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain
+X-Spamd-Result: default: False [2.84 / 15.00];
+	MID_END_EQ_FROM_USER_PART(4.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_MISSING_CHARSET(0.50)[];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-280052-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.infradead.org,redhat.com,gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280051-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FREEMAIL_TO(0.00)[redhat.com,kernel.org,cmpxchg.org,suse.com,lwn.net,linuxfoundation.org,arm.com,microsoft.com,roeck-us.net,nvidia.com,joshtriplett.org,gmail.com,goodmis.org,efficios.com,linux.dev,linutronix.de,huaweicloud.com,infradead.org,linaro.org,google.com,suse.de,amd.com,davemloft.net];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zlatistiv@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[tglx@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[53];
 	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-0.998];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B08A0438763
+X-Rspamd-Queue-Id: D70FF4387FC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-
-
-On 4/21/26 11:19 AM, Breno Leitao wrote:
-> On Tue, Apr 21, 2026 at 10:37:38AM +0300, Nikola Z. Ivanov wrote:
->> Syzbot reports a KMSAN uninit-value originating from
->> nsim_dev_trap_skb_build, with the allocation also
->> being performed in the same function.
->>
->> The cause of the KMSAN warning is a missing assignment of
->> the tos and id fields of the ip header.
->>
->> Fix this by calling skb_put_zero instead of skb_put to
->> guarantee null initialization.
->> Additionally remove the now redundant zero assignments
->> and reorder the remaining ones so that they more closely
->> match the order of the fields as they appear in the ip header.
->>
->> Closes: https://syzkaller.appspot.com/bug?extid=23d7fcd204e3837866ff
-> How do you check in the report above that the missig un-initialized
-> fields are "tos" and "id"?
+On Mon, Apr 20 2026 at 23:03, Waiman Long wrote:
+> In tick_cpu_dying(), if the dying CPU is the current timekeeper,
+> it has to pass the job over to another CPU. The current code passes
+> it to another online CPU. However, that CPU may not be a timer tick
+> housekeeping CPU.  If that happens, another CPU will have to manually
+> take it over again later. Avoid this unnecessary work by directly
+> assigning an online housekeeping CPU.
 >
-> Thanks for the fix,
-> --breno
-Hi Breno,
+> Use READ_ONCE/WRITE_ONCE() to access tick_do_timer_cpu in case the
+> non-HK CPUs may not be in stop machine in the future.
 
-I don't think it is visible here, my guess would
-be because the checksum calculator walks the
-header in small chunks instead of referencing
-its fields.
+'may not be in the future' is yet more handwaving without
+content. Please write your change logs in a way so that people who have
+not spent months on this can follow.
 
-The whole "KMSAN: uninit-value in irqentry_exit_to_kernel_mode_preempt"
-doesn't really sound quite right.
+> @@ -394,12 +395,19 @@ int tick_cpu_dying(unsigned int dying_cpu)
+>  {
+>  	/*
+>  	 * If the current CPU is the timekeeper, it's the only one that can
+> -	 * safely hand over its duty. Also all online CPUs are in stop
+> -	 * machine, guaranteed not to be idle, therefore there is no
+> +	 * safely hand over its duty. Also all online housekeeping CPUs are
+> +	 * in stop machine, guaranteed not to be idle, therefore there is no
+>  	 * concurrency and it's safe to pick any online successor.
+>  	 */
+> -	if (tick_do_timer_cpu == dying_cpu)
+> -		tick_do_timer_cpu = cpumask_first(cpu_online_mask);
+> +	if (READ_ONCE(tick_do_timer_cpu) == dying_cpu) {
+> +		unsigned int new_cpu;
+> +
+> +		guard(rcu)();
 
-Thank you!
+What's this guard for?
+
+> +		new_cpu = cpumask_first_and(cpu_online_mask, housekeeping_cpumask(HK_TYPE_TICK));
+
+Why has this to use housekeeping_cpumask() and does not use
+tick_nohz_full_mask?
+
+Thanks,
+
+        tglx
 
