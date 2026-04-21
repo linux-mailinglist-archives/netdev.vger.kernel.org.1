@@ -1,182 +1,168 @@
-Return-Path: <netdev+bounces-280050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280051-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2EqBH3s752no5QEAu9opvQ
-	(envelope-from <netdev+bounces-280050-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 10:55:23 +0200
+	id IMftJfY752no5QEAu9opvQ
+	(envelope-from <netdev+bounces-280051-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 10:57:26 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D06FD438727
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 10:55:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B08A0438763
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 10:57:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2BAF6301F310
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 08:53:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 047773020A5B
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 08:54:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07EEF3845B4;
-	Tue, 21 Apr 2026 08:53:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AE2E38422F;
+	Tue, 21 Apr 2026 08:54:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gtgE3DSZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pQmB7H9P"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9CAF399019
-	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 08:53:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B37D739FCC4
+	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 08:54:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776761622; cv=none; b=pFI6ZriAJnMZBa+w9ga4Zl34herQclkNME9jygga3QT/GfoJqqweyx66W0X+/TsLWgdJA8LJ+1rIiSKfRCoq+ZAfKaZp8vKeYUp55cazWJlXjxktIEzTEVdSGqUBGvB7tiQ9HjR7f/Ey+/mDdfKSNeP8UBaz4Ape2/UXn/MKFbk=
+	t=1776761664; cv=none; b=TQz7UxMtTlU613NV9XnERE7tHTf5SB151aSWdOYPTtf8QghMzynfibwu/xVZhryTHEzu9UES/MdhbleSJ3abfCZcDMkuoK2F2SEv3aYwmp30NGQR2Ez6ij1M3e/xGiVtvtslCbzdFJdxEQr3Xgv0/mHc36KZVnrPCN4Ffj9WTb0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776761622; c=relaxed/simple;
-	bh=aZT8+RjuUD+glDzBq4Jw2xxfNL/4kIryQSIGXkNI1xI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=axH5uXhuLlaCVkaivM4gTlqUgjLCyh8DI/BUws83Ew/kV2g2J1I8RsJ0vp5BCGyaGUdXbG9SW7ixvd9baWwgqJJJm1RRGRQWUCv3C8sPjT8d16EPVOMQz0G0muLYoU5yVwrgzJ/CmXN69bT+cf68CMAswdouwh5eLk3a/9ntDJk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gtgE3DSZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B1DFC2BCB5;
-	Tue, 21 Apr 2026 08:53:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776761622;
-	bh=aZT8+RjuUD+glDzBq4Jw2xxfNL/4kIryQSIGXkNI1xI=;
-	h=From:Date:Subject:To:Cc:From;
-	b=gtgE3DSZmxbKHqvljeBTE4VkSpsaCQcfqK77jf8BpxOBJu2+QcK+1UCw8KZwAH7X1
-	 cjWp8o/bVOL04vJtwowMv5M5XiXfPAt0n9G4JjcyapBl5LjFIaHsWpYldijXROhO5i
-	 oRVDl9vQcd8p2yTh8rKvmElBh64sYRjdQohWHX1zBGJ3CVbJSKZlT9IgCIVVhQUZ/x
-	 KtOXjgFFtg3ZcamjhkMvXuQES9je+AtuPqLrrtJpNLAv67310o9jhXVY9SzOkNgFPB
-	 Mn7+HK9lXOMaLueRs4KZrp1wPFpI3L34+WlRUsqYLfhuTqlNmo3GNUax7uXlehTo5i
-	 SyCAnt4583wwQ==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Tue, 21 Apr 2026 10:53:33 +0200
-Subject: [PATCH net] net: airoha: Do not wake all netdev TX queues in
- airoha_qdma_wake_netdev_txqs()
+	s=arc-20240116; t=1776761664; c=relaxed/simple;
+	bh=dU+9BdjF0sSpHUJiYDtB2Gktv8KhihkDTc5ZL19RUS4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qTRP1ESQC6QaRLyx6FlTe+Y+2cjOCzXl7vHr/T0Lp0HxZNf5rfPdZpLKYaF3nu2DOUlSWOLh51Q8cxARoi2piTyIrjXn0V1pLiAVtM6NzTLsVRwp5Npnm3wdC5RfVy/l77Jk+qqX2S1viwlyF58xg6vxof0fGS35hiMSrEoFnMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pQmB7H9P; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-43d64313c39so3101379f8f.3
+        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 01:54:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776761661; x=1777366461; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=dU+9BdjF0sSpHUJiYDtB2Gktv8KhihkDTc5ZL19RUS4=;
+        b=pQmB7H9PSuVCeV4gvVpOUYrI8dfQSrQXvkgXB94m8YT/mrqlLvy9G1UeC4SKORnoVx
+         0Xdg+wlggpl+9vxIg+pTOYaN0t8MXTHj4xwJnwTMhf0Mc+tWU9mcTWjTk3p71IWJr5Vk
+         M57UvSSo1OBhV+Qsfqhi6vuaFAylrnYMLjbItZaNe+c9jLmCaz2r9im3BLO24xNYy+BZ
+         I9qPLWYfwnomtCXhTfenvaqFeiChZ05+2c9Kok5NP5Dfq2woAqLb8Uu8jla5Qj3FZ2Q/
+         xwBdDBexooAf8I6Ns9kTnTt+iUgifxZNEm5qxxnpPt1c9Fn11255eVRip3RuOQfH2D8q
+         j4IQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776761661; x=1777366461;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=dU+9BdjF0sSpHUJiYDtB2Gktv8KhihkDTc5ZL19RUS4=;
+        b=JTJWRSb0au8O0mDXvbOa4SHNprdSNpwA83dpO4Ioh0Sq+jMCKOXdboYrBG+IiML7KT
+         LefDz/3AflYgvNAnY8wQvxS01NGA24KFNWhHpW+aYap7rClC6oKIvnDmdpAMe+mxFHH+
+         xwG0amFj+rTYTgREVknNwWTbF9NGO82OLBz0ClIs1roy1HgqdAaePnv//M1uA3zUOKiP
+         z1wu0XwtNcXyAewJIdiG8Pc2rC6HhtHdYCgJBhZObQ3SQ2i5LxWJy3XBxB0xxHXFxt/i
+         eFkNSetL65t9FHI0sR1eo90fRvD8e18zHkL5mR3cSI5Nep1yoUN6Uzt66fuyboFz7t60
+         n7mA==
+X-Forwarded-Encrypted: i=1; AFNElJ+VawpltGt881WWES9FguNrflQIfm6iy4WqKVI6pICBBLOe0bMaVChkF80VbRDcjXKHoatBpvg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJiyOw4L6ORnoaHfoO8SRUS3fMWnfRzitVu2cJULha1SY57v7z
+	hVQjcUj7UinIgmnL96p892ZCZpeMKDcECj2n/NM1QI4cSSKWgv3sXjnx
+X-Gm-Gg: AeBDievxslLE95boH/wRhL+17Vo4Q2uh77z6hhfpjkQ6m+59xrQ9r02dqrfSGgcMof5
+	ZbGS6cQFmYbuRTowEL+/z6rA5eCwR6ocq5CnJwKp21N1Ukzl1akhLRvqIGI0oXKitlbATfVyJUW
+	Il7Y5iNcu/48gDewSsusPqMS+9QqMO/SFbhthrAnUUTA9utE3J/YqwmHhtOAGRrQ9/yZwDwcX1W
+	6tDZ7Q3Ww+YR3BUTPshBk9SsSbxslduQw/RMqRLEGMqlb7Fx1rb5IPbqA+OdveO40Enp1qT6P4B
+	kQajgvh/AAVIctmOn2Aa1L+WGYqGycn8CCYuSw7/MyPo66ay1akjr/wTGwd+hilIuBRYKVoq9xq
+	7ssXErow7UAH1QnhTvTwRfeYICYp4haJ3b0vFi7GfhBLBkg9g9zv6S2WceesyJT0MkTwfSNzHBC
+	k9QMgsYvOKvXPhAtL+HORngGfg7uUy5gNYn8yo
+X-Received: by 2002:a05:6000:24c7:b0:43d:740:fb37 with SMTP id ffacd0b85a97d-43fe3dfbe4emr25790843f8f.24.1776761660781;
+        Tue, 21 Apr 2026 01:54:20 -0700 (PDT)
+Received: from [192.168.1.169] ([46.10.223.24])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43fe4cb1249sm32516285f8f.5.2026.04.21.01.54.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 21 Apr 2026 01:54:20 -0700 (PDT)
+Message-ID: <9ce273bd-6912-4442-8672-4c89bebf32ed@gmail.com>
+Date: Tue, 21 Apr 2026 11:54:19 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] netdevsim: Initialize all fields of ip header when
+ building dummy sk_buff
+To: Breno Leitao <leitao@debian.org>
+Cc: kuba@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260421073738.22110-1-zlatistiv@gmail.com>
+ <aecyEArzjx8KRp8-@gmail.com>
+Content-Language: en-US
+From: "Nikola Z. Ivanov" <zlatistiv@gmail.com>
+In-Reply-To: <aecyEArzjx8KRp8-@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260421-airoha-wake_netdev_txqs-optmization-v1-1-e0be95115d53@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x2NwQrCMBAFf6Xs2YUm1Ar+ikhZm6ddxKQmoRZL/
- 93F4xxmZqOCrCh0bjbKWLRoigbu0NA4SXyANRiTb33fdt6xaE6T8EeeGCJqwDLU9V04zfWlX6n
- mc390Jzeiw00CWWnOuOv6v1zIJLru+w8sfKiDegAAAA==
-X-Change-ID: 20260421-airoha-wake_netdev_txqs-optmization-65171ce4ebad
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
- Lorenzo Bianconi <lorenzo@kernel.org>
-X-Mailer: b4 0.14.3
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280050-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-280051-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[zlatistiv@gmail.com,netdev@vger.kernel.org];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D06FD438727
+X-Rspamd-Queue-Id: B08A0438763
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Do not wake every netdev TX queue across all ports sharing the QDMA
-running netif_tx_wake_all_queues routine in airoha_qdma_wake_netdev_txqs()
-but only the ones that are mapped the specific QDMA stopped hw TX queue.
-This patch can potentially avoid waking already stopped netdev TX queues
-that are mapped to a different QDMA hw TX queue.
-Introduce airoha_qdma_get_txq utility routine.
 
-Fixes: b94769eb2f30 ("net: airoha: Fix possible TX queue stall in airoha_qdma_tx_napi_poll()")
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
- drivers/net/ethernet/airoha/airoha_eth.c | 19 +++++++++++++++----
- drivers/net/ethernet/airoha/airoha_eth.h |  5 +++++
- 2 files changed, 20 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-index 19f67c7dd8e1..2ca569501045 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.c
-+++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -847,13 +847,24 @@ static void airoha_qdma_wake_netdev_txqs(struct airoha_queue *q)
- {
- 	struct airoha_qdma *qdma = q->qdma;
- 	struct airoha_eth *eth = qdma->eth;
--	int i;
-+	int i, qid = q - &qdma->q_tx[0];
- 
- 	for (i = 0; i < ARRAY_SIZE(eth->ports); i++) {
- 		struct airoha_gdm_port *port = eth->ports[i];
-+		int j;
-+
-+		if (!port)
-+			continue;
- 
--		if (port && port->qdma == qdma)
--			netif_tx_wake_all_queues(port->dev);
-+		if (port->qdma != qdma)
-+			continue;
-+
-+		for (j = 0; j < port->dev->num_tx_queues; j++) {
-+			if (airoha_qdma_get_txq(qdma, j) != qid)
-+				continue;
-+
-+			netif_wake_subqueue(port->dev, j);
-+		}
- 	}
- 	q->txq_stopped = false;
- }
-@@ -1965,7 +1976,7 @@ static netdev_tx_t airoha_dev_xmit(struct sk_buff *skb,
- 	u16 index;
- 	u8 fport;
- 
--	qid = skb_get_queue_mapping(skb) % ARRAY_SIZE(qdma->q_tx);
-+	qid = airoha_qdma_get_txq(qdma, skb_get_queue_mapping(skb));
- 	tag = airoha_get_dsa_tag(skb, dev);
- 
- 	msg0 = FIELD_PREP(QDMA_ETH_TXMSG_CHAN_MASK,
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ethernet/airoha/airoha_eth.h
-index 87b328cfefb0..c3ea7aadbd82 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.h
-+++ b/drivers/net/ethernet/airoha/airoha_eth.h
-@@ -631,6 +631,11 @@ u32 airoha_rmw(void __iomem *base, u32 offset, u32 mask, u32 val);
- #define airoha_qdma_clear(qdma, offset, val)			\
- 	airoha_rmw((qdma)->regs, (offset), (val), 0)
- 
-+static inline u16 airoha_qdma_get_txq(struct airoha_qdma *qdma, u16 qid)
-+{
-+	return qid % ARRAY_SIZE(qdma->q_tx);
-+}
-+
- static inline bool airoha_is_lan_gdm_port(struct airoha_gdm_port *port)
- {
- 	/* GDM1 port on EN7581 SoC is connected to the lan dsa switch.
+On 4/21/26 11:19 AM, Breno Leitao wrote:
+> On Tue, Apr 21, 2026 at 10:37:38AM +0300, Nikola Z. Ivanov wrote:
+>> Syzbot reports a KMSAN uninit-value originating from
+>> nsim_dev_trap_skb_build, with the allocation also
+>> being performed in the same function.
+>>
+>> The cause of the KMSAN warning is a missing assignment of
+>> the tos and id fields of the ip header.
+>>
+>> Fix this by calling skb_put_zero instead of skb_put to
+>> guarantee null initialization.
+>> Additionally remove the now redundant zero assignments
+>> and reorder the remaining ones so that they more closely
+>> match the order of the fields as they appear in the ip header.
+>>
+>> Closes: https://syzkaller.appspot.com/bug?extid=23d7fcd204e3837866ff
+> How do you check in the report above that the missig un-initialized
+> fields are "tos" and "id"?
+>
+> Thanks for the fix,
+> --breno
+Hi Breno,
 
----
-base-commit: a663bac71a2f0b3ac6c373168ca57b2a6e6381aa
-change-id: 20260421-airoha-wake_netdev_txqs-optmization-65171ce4ebad
+I don't think it is visible here, my guess would
+be because the checksum calculator walks the
+header in small chunks instead of referencing
+its fields.
 
-Best regards,
--- 
-Lorenzo Bianconi <lorenzo@kernel.org>
+The whole "KMSAN: uninit-value in irqentry_exit_to_kernel_mode_preempt"
+doesn't really sound quite right.
 
+Thank you!
 
