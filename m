@@ -1,79 +1,91 @@
-Return-Path: <netdev+bounces-280029-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280030-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WORKNwgq52mo4wEAu9opvQ
-	(envelope-from <netdev+bounces-280029-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 09:40:56 +0200
+	id 8O1nNxsq52mo4wEAu9opvQ
+	(envelope-from <netdev+bounces-280030-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 09:41:15 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65692437C04
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 09:40:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 59BDF437C12
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 09:41:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D8DF13018405
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 07:37:48 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2FBD030234EC
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 07:37:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B4D537C0EB;
-	Tue, 21 Apr 2026 07:37:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA478384251;
+	Tue, 21 Apr 2026 07:37:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="bXduOs3p"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WWXGP0GI"
 X-Original-To: netdev@vger.kernel.org
-Received: from out203-205-221-205.mail.qq.com (out203-205-221-205.mail.qq.com [203.205.221.205])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 763F2331A78;
-	Tue, 21 Apr 2026 07:37:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42DD9384249
+	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 07:37:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776757066; cv=none; b=UwyNEapbbMqoz7GLwyuPvbaa7DVIoVmKiMeRsYPYLr6V+e+Ut8s2PIg9YUAkcNsg9zTOZ+KuT9JIaNrK7L1LFlbzqTKVUB6RqINtHBllut72f/i++Oc41XsbzXQjqjoz6kdt4sKRJWI3Zsmapui23AOE/XsZPQAZ072IcQc5vxQ=
+	t=1776757069; cv=none; b=oqUd2wB6zILhIz35d64huxG+xtPZrCoAldDplOiiidnPogGAW3xvNmYnStgrNc3lP1FI7qu4G7+0Qe3sOlTefzAAXvj7zJxMIh8/Zq1qh3JQONxdbt8FxlY3Z+StvT2bHBSGKO8kNbzvlQGYDFYMlA872DyKZry2rZ5bl6InwPA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776757066; c=relaxed/simple;
-	bh=SZcklxgbjsX5ROMo/zD0+7P0xxMaGcOIVethWe0eTFs=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=SVjLvBwZGiIhEKv+WqbhVRpZXPEUAJbFmXE2hn16bglqH23ioruHEVsWEAxGIAsAt3NQBdcafh9AfA482aZ+oqTF8SnXO057uIDURsi5BZfhPVLUnpHs+xO0MKsT+fJplxlr2wkKyR65sT/ewVflMmWnICT5L8SwRPwxdkhJU9M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=bXduOs3p; arc=none smtp.client-ip=203.205.221.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
-	s=s201512; t=1776757053;
-	bh=2BBidtQmGzyXD/iwQeUorAjjDt5+eczMlZJZiK5y47c=;
-	h=From:To:Cc:Subject:Date;
-	b=bXduOs3pnI4YZBLFrqcm4AI041rmihVF05/4sE+aVLBNg2GTX8be7PHk1eyFuXqYV
-	 nkNqw/3+7CZahOxCKH/KwFLbS9e8b4USSPZtdnRuMspl+ziW4wxkkHJCoWApbh43xB
-	 AVl1FS9l8ufHs8yC/3ZnFdGZsmvakdUrIhgHBx/c=
-Received: from China-team ([183.241.55.34])
-	by newxmesmtplogicsvrszc56-0.qq.com (NewEsmtp) with SMTP
-	id 93391298; Tue, 21 Apr 2026 15:36:51 +0800
-X-QQ-mid: xmsmtpt1776757011tmk20dh89
-Message-ID: <tencent_7584C190359CD12AD5987DB848D65BFFE10A@qq.com>
-X-QQ-XMAILINFO: OR37DonC/00MCS5yXHp3/J333TXtMSiu4sUMVoulxmLaPnaZ+qLLlKiJasG2PD
-	 Qo0QAT+YomW1B2LG9A9pKvYf2sxRjn4//1Thrpr86bbvpDzTFAk2Q5obkZodZoCO8zAdlcpmQekS
-	 TxSmsHffYRpHw3caEjkD4P8J1xXMAlclFBbUuBzDC8CiS6lZauwEEEiKDZS540iaQM7hIrSN+e/G
-	 pWd5AVA/FnVIAaiQMUbGoAYdXU5mMQ2ZtT49U5Nzf90BtptrrtcM8sBEZsftSJVb2PCixDnzX0yK
-	 r3ReoODyuRwMk6lB+ZPB3u+WIOId8JXZ4/zb9xCjFygJuPmf/Hnkjsfi4upVThOP5s+CAxFLg/Sf
-	 vsofBNDt/VKMbCosuJdJD6stSmyqLODX8Yi5xqcRXSQECwNoyz9vuJuhiuQnB5GMuORSDldxtSi3
-	 1S+JZawexCJr0PHs/0Q7Wny2V3LCvXhZmrspSVDUdwXDN/jXbeYz/I3Dh3j1o0jKKjuHcyt3edWk
-	 kK5nHota+T1AVxvTLw+5fUDpqcjKnTeCUcwb8HWA9d1cfvZXFJiZgH/aXtMQDpLOtUfIguAn+jgG
-	 r16KaiJ9o1g1E+rxRzlpt8Ssg/DUh6IZaUaEIuSYPpRDcdNqGuShbD0GVsZzRIrdodTzPulQQPjo
-	 R5yU1eu6OIfhTUT50kob8ofVl0lOZNg8TiYp96VfQKp4rGn/GLXUSYtad3jxJsWAtBpdM8xn1KpA
-	 8+iPMI51vvYW0yDhUwcr50GRnVrOQfJ4xMgP57wFiaPJDw+c7p/1RsUCrstRLoHG2mmBirqqlGsd
-	 L7sdCb4xFsThghJ73gJyS6qN6Ae4s2Qp8NU70kNhElyLf8KRVrIleF+fOORHY/+avdXbcY4+HIIJ
-	 PV6XFk9FkkVsKaz8LrwJ/SOpsGe6yEz3f+oXuYSOygYziUUTGRAaDqvpEIQ/bNisyBb01wmUTFq8
-	 R8X7fomkvsvFLsCvpjgYu4Da6lXcus39CHPMdxkSZteezAwmtau8l4EQPC3XHLjROe988Hyh9gYj
-	 cLiRxOENFiun0ufmIxIa/6MFWw0RhqtGj3Uup7iIBQSF9fblu72GPbwNi18W2kPDfB06TW5nUBcf
-	 mOQ7soKt+jQzNAZHk=
-X-QQ-XMRINFO: OD9hHCdaPRBwH5bRRRw8tsiH4UAatJqXfg==
-From: Alva Lan <alvalan9@foxmail.com>
-To: gregkh@linuxfoundation.org,
-	sashal@kernel.org,
-	stable@vger.kernel.org
+	s=arc-20240116; t=1776757069; c=relaxed/simple;
+	bh=rt4wqxwDz7bsDxeraQEO0K5hU8JIJcUXKnSVXRUwNTw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UT91ceNAWCftKky5BnKFTeqYrufIyiGjDKr3lSiGaqC8HUQhD5tD3gEoOk2m/RKm1AY/b35q/YcmEncZpSHLIWX+r8xjbkTYUwE+mPUXeqej3eCTOsI1a2SF+rgqtKqnALnZqGPL3AKSlHIixrgg7/GX5arJAM26B2HkVYp8tI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WWXGP0GI; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-48a563e4ef7so2338735e9.0
+        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 00:37:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776757067; x=1777361867; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q9MSpkDs/YA1OHYfaSUQ5bT/WJy5enL5wzyN0Hj8Q2s=;
+        b=WWXGP0GIQ24RyQosqY0cq0/RzQfNrVMcW0JIwJL9Tf36FLaTiZnEj17M0m+OgK40y5
+         4d5RIMDijF5gssP5ElMMokTF1Ev1cu3Ig4oUG5MLIo4pDXkep0iBo5H3iag3sM7vYApl
+         upNH72xlWI30KWnblYn+zu3ikW+K77A0pJg3mIrhsxH+/gSgNgcWs/xBvEJtacJzsOA5
+         rDbZG4ltoZ7umlVKCYysTC5veGltc+2UxlIMwja5ic+EWrrvYmBEIRwNuG2SF/sW8H6O
+         +Oi1/luEoCO3z+O0nZoJAeUNTaFQQuC9cNdT4slKRUI/xcBC9hFpaohVzA7kbHdZCV8e
+         II0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776757067; x=1777361867;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Q9MSpkDs/YA1OHYfaSUQ5bT/WJy5enL5wzyN0Hj8Q2s=;
+        b=A01chSRZC1G+Vdvff0iJZMWyrw3HZbg+EoDFWGgObMbDxbvrOZVw3KdHZnvICPRIlv
+         H0PRzPNYsCNLpUgjtOx5JO93BSc5IwVwp4E52r/fRziPKUqzNLQeNWIY3c/ny/ZRYT1R
+         GXnrJ1nEYp6ZMo/0Aak9X7unqe8l3X0eJ+5Nf+/PUtOt6hPYlrm+L91FarlpPvq7nfFx
+         Qj72AdxyFOxZGTJRnAz2TYQEvImhs4r0dPEQi5Xp6g12kDxREwogBzqXHpQskKHG+ixO
+         KDMPRIz4OmjT/7ti8zFKHLTEkiAeaY+3+h+pp3f9HJ1zFFuFYmUIF7k6Ou0sEouYRac3
+         v/ig==
+X-Gm-Message-State: AOJu0YzQ3aoD33njCgYf1HD4nnne9i1oE/3DoRD7UcdRZLxU6jjd9+pP
+	HQXbu0wHzdifi1BZLhALA0agVv9aDE+hRiN3JX5wVQ37504EaGEWik9yj8Odxw==
+X-Gm-Gg: AeBDieuPs+NcQVynu39toDvFkUthtvpQujbSJsXznoZTZOHmERFTLv3yqEslgFFj5pz
+	XwMeivVZ0VPhVwkSGzPuyi5zRj808/+/gcbIurSQlddUDHAd61m2w+kJf6M/S1soRAbnwa99GsN
+	Qz0XzjEo/PpdhJnOrDyXaGBmgoE2gr4EvnWMn+Fm0klVgnQa2jXfLC5rpgFkiPYIxkxGZhc4WEe
+	FAmIt+gGwiHSkq9isbGtooXDIYTJG+fdBEN8FLJ0hH01zgyXRvdug6xH2zjGtBUTx3Jgfw22eba
+	nC0UNVh12WpN/mTkrUC/sXtW2YHZ7WOT8vG2tgmdcXuyKBLaD96CMqp0odvw9KM7YyDXMJ9/iGC
+	ojLUoBXj8MStsb0zyfJuWQWXMImtVbnIXzJKrRVNrz+K2UkRLz35JQjkXvcEdGQzDNPQ/BX+hp7
+	kIQ8CVsP7NSqoELxwCr5Yegs3/vcSEBw==
+X-Received: by 2002:a05:600c:314b:b0:485:3a86:6392 with SMTP id 5b1f17b1804b1-488fb778b66mr217390275e9.20.1776757066300;
+        Tue, 21 Apr 2026 00:37:46 -0700 (PDT)
+Received: from fedora-dev ([46.10.223.24])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488fc100162sm373883825e9.5.2026.04.21.00.37.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Apr 2026 00:37:45 -0700 (PDT)
+From: "Nikola Z. Ivanov" <zlatistiv@gmail.com>
+To: kuba@kernel.org,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com
 Cc: netdev@vger.kernel.org,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Alva Lan <alvalan9@foxmail.com>
-Subject: [PATCH 6.1.y] net: dsa: clean up FDB, MDB, VLAN entries on unbind
-Date: Tue, 21 Apr 2026 15:36:35 +0800
-X-OQ-MSGID: <20260421073635.531-1-alvalan9@foxmail.com>
-X-Mailer: git-send-email 2.43.0
+	linux-kernel@vger.kernel.org,
+	"Nikola Z. Ivanov" <zlatistiv@gmail.com>
+Subject: [PATCH net] netdevsim: Initialize all fields of ip header when building dummy sk_buff
+Date: Tue, 21 Apr 2026 10:37:38 +0300
+Message-ID: <20260421073738.22110-1-zlatistiv@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,150 +93,96 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[foxmail.com,none];
-	R_DKIM_ALLOW(-0.20)[foxmail.com:s=s201512];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280029-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,nxp.com,kernel.org,foxmail.com];
-	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280030-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alvalan9@foxmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[zlatistiv@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[foxmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	NEURAL_HAM(-0.00)[-0.998];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	FREEMAIL_FROM(0.00)[foxmail.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,qq.com:mid,foxmail.com:dkim,foxmail.com:email,nxp.com:email,msgid.link:url]
-X-Rspamd-Queue-Id: 65692437C04
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,syzkaller.appspot.com:url]
+X-Rspamd-Queue-Id: 59BDF437C12
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
+Syzbot reports a KMSAN uninit-value originating from
+nsim_dev_trap_skb_build, with the allocation also
+being performed in the same function.
 
-[ Upstream commit 7afb5fb42d4950f33af2732b8147c552659f79b7 ]
+The cause of the KMSAN warning is a missing assignment of
+the tos and id fields of the ip header.
 
-As explained in many places such as commit b117e1e8a86d ("net: dsa:
-delete dsa_legacy_fdb_add and dsa_legacy_fdb_del"), DSA is written given
-the assumption that higher layers have balanced additions/deletions.
-As such, it only makes sense to be extremely vocal when those
-assumptions are violated and the driver unbinds with entries still
-present.
+Fix this by calling skb_put_zero instead of skb_put to
+guarantee null initialization.
+Additionally remove the now redundant zero assignments
+and reorder the remaining ones so that they more closely
+match the order of the fields as they appear in the ip header.
 
-But Ido Schimmel points out a very simple situation where that is wrong:
-https://lore.kernel.org/netdev/ZDazSM5UsPPjQuKr@shredder/
-(also briefly discussed by me in the aforementioned commit).
-
-Basically, while the bridge bypass operations are not something that DSA
-explicitly documents, and for the majority of DSA drivers this API
-simply causes them to go to promiscuous mode, that isn't the case for
-all drivers. Some have the necessary requirements for bridge bypass
-operations to do something useful - see dsa_switch_supports_uc_filtering().
-
-Although in tools/testing/selftests/net/forwarding/local_termination.sh,
-we made an effort to popularize better mechanisms to manage address
-filters on DSA interfaces from user space - namely macvlan for unicast,
-and setsockopt(IP_ADD_MEMBERSHIP) - through mtools - for multicast, the
-fact is that 'bridge fdb add ... self static local' also exists as
-kernel UAPI, and might be useful to someone, even if only for a quick
-hack.
-
-It seems counter-productive to block that path by implementing shim
-.ndo_fdb_add and .ndo_fdb_del operations which just return -EOPNOTSUPP
-in order to prevent the ndo_dflt_fdb_add() and ndo_dflt_fdb_del() from
-running, although we could do that.
-
-Accepting that cleanup is necessary seems to be the only option.
-Especially since we appear to be coming back at this from a different
-angle as well. Russell King is noticing that the WARN_ON() triggers even
-for VLANs:
-https://lore.kernel.org/netdev/Z_li8Bj8bD4-BYKQ@shell.armlinux.org.uk/
-
-What happens in the bug report above is that dsa_port_do_vlan_del() fails,
-then the VLAN entry lingers on, and then we warn on unbind and leak it.
-
-This is not a straight revert of the blamed commit, but we now add an
-informational print to the kernel log (to still have a way to see
-that bugs exist), and some extra comments gathered from past years'
-experience, to justify the logic.
-
-Fixes: 0832cd9f1f02 ("net: dsa: warn if port lists aren't empty in dsa_port_teardown")
-Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-Link: https://patch.msgid.link/20250414212930.2956310-1-vladimir.oltean@nxp.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-[ Apply the patch to net/dsa/dsa2.c in v6.1 since commit
-47d2ce03dcfb ("net: dsa: rename dsa2.c back into dsa.c and create its header")
-renamed this file to net/dsa/dsa.c starting from v6.2. ]
-Signed-off-by: Alva Lan <alvalan9@foxmail.com>
+Closes: https://syzkaller.appspot.com/bug?extid=23d7fcd204e3837866ff
+Fixes: da58f90f11f5 ("netdevsim: Add devlink-trap support")
+Signed-off-by: Nikola Z. Ivanov <zlatistiv@gmail.com>
 ---
- net/dsa/dsa2.c | 38 +++++++++++++++++++++++++++++++++++---
- 1 file changed, 35 insertions(+), 3 deletions(-)
+There is a very similar function in psample.c called nsim_dev_psample_skb_build
+which is almost identical to nsim_dev_trap_skb_build except for the
+allocation flag reflecting its non-interrupt context and the fact
+it does proper initialization of all fields.
+Since these 2 are almost identical would it make sense to combine them
+into 1, possbly by passing the allocation flags as parameters?
 
-diff --git a/net/dsa/dsa2.c b/net/dsa/dsa2.c
-index 415e856ba0ac..9ecb5e34e484 100644
---- a/net/dsa/dsa2.c
-+++ b/net/dsa/dsa2.c
-@@ -1738,12 +1738,44 @@ static int dsa_switch_parse(struct dsa_switch *ds, struct dsa_chip_data *cd)
+Thank you in advance for reviewing and answering!
+
+ drivers/net/netdevsim/dev.c | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/net/netdevsim/dev.c b/drivers/net/netdevsim/dev.c
+index 1e06e781c835..64b7cc3a6575 100644
+--- a/drivers/net/netdevsim/dev.c
++++ b/drivers/net/netdevsim/dev.c
+@@ -829,16 +829,14 @@ static struct sk_buff *nsim_dev_trap_skb_build(void)
+ 	skb->protocol = htons(ETH_P_IP);
  
- static void dsa_switch_release_ports(struct dsa_switch *ds)
- {
-+	struct dsa_mac_addr *a, *tmp;
- 	struct dsa_port *dp, *next;
-+	struct dsa_vlan *v, *n;
+ 	skb_set_network_header(skb, skb->len);
+-	iph = skb_put(skb, sizeof(struct iphdr));
+-	iph->protocol = IPPROTO_UDP;
+-	iph->saddr = in_aton("192.0.2.1");
+-	iph->daddr = in_aton("198.51.100.1");
+-	iph->version = 0x4;
+-	iph->frag_off = 0;
++	iph = skb_put_zero(skb, sizeof(struct iphdr));
+ 	iph->ihl = 0x5;
++	iph->version = 0x4;
+ 	iph->tot_len = htons(tot_len);
+ 	iph->ttl = 100;
+-	iph->check = 0;
++	iph->protocol = IPPROTO_UDP;
++	iph->saddr = in_aton("192.0.2.1");
++	iph->daddr = in_aton("198.51.100.1");
+ 	iph->check = ip_fast_csum((unsigned char *)iph, iph->ihl);
  
- 	dsa_switch_for_each_port_safe(dp, next, ds) {
--		WARN_ON(!list_empty(&dp->fdbs));
--		WARN_ON(!list_empty(&dp->mdbs));
--		WARN_ON(!list_empty(&dp->vlans));
-+		/* These are either entries that upper layers lost track of
-+		 * (probably due to bugs), or installed through interfaces
-+		 * where one does not necessarily have to remove them, like
-+		 * ndo_dflt_fdb_add().
-+		 */
-+		list_for_each_entry_safe(a, tmp, &dp->fdbs, list) {
-+			dev_info(ds->dev,
-+				 "Cleaning up unicast address %pM vid %u from port %d\n",
-+				 a->addr, a->vid, dp->index);
-+			list_del(&a->list);
-+			kfree(a);
-+		}
-+
-+		list_for_each_entry_safe(a, tmp, &dp->mdbs, list) {
-+			dev_info(ds->dev,
-+				 "Cleaning up multicast address %pM vid %u from port %d\n",
-+				 a->addr, a->vid, dp->index);
-+			list_del(&a->list);
-+			kfree(a);
-+		}
-+
-+		/* These are entries that upper layers have lost track of,
-+		 * probably due to bugs, but also due to dsa_port_do_vlan_del()
-+		 * having failed and the VLAN entry still lingering on.
-+		 */
-+		list_for_each_entry_safe(v, n, &dp->vlans, list) {
-+			dev_info(ds->dev,
-+				 "Cleaning up vid %u from port %d\n",
-+				 v->vid, dp->index);
-+			list_del(&v->list);
-+			kfree(v);
-+		}
-+
- 		list_del(&dp->list);
- 		kfree(dp);
- 	}
+ 	skb_set_transport_header(skb, skb->len);
 -- 
-2.43.0
+2.53.0
 
 
