@@ -1,178 +1,192 @@
-Return-Path: <netdev+bounces-280269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280270-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yOb9OVz552kVDgIAu9opvQ
-	(envelope-from <netdev+bounces-280269-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 00:25:32 +0200
+	id 4AXsAKz652lBDwIAu9opvQ
+	(envelope-from <netdev+bounces-280270-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 00:31:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C78324402B4
-	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 00:25:31 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 742FF4402FB
+	for <lists+netdev@lfdr.de>; Wed, 22 Apr 2026 00:31:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7D29B300736E
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 22:23:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 635A83052A35
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 22:30:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 177753A545D;
-	Tue, 21 Apr 2026 22:23:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 110573A63EB;
+	Tue, 21 Apr 2026 22:30:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tGMYyIp0"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="uKuL8uGw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f194.google.com (mail-oi1-f194.google.com [209.85.167.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C1CF3A4F30
-	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 22:23:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8457D3A63F9;
+	Tue, 21 Apr 2026 22:30:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776810235; cv=none; b=kRnDWUsApTX6UUSPNc/OxnKSYSMV97CEFMt+wBITbJ0DzIk4UQp9zTi5UPXAeIYa++K6OExUVQw1Nd42EeqwY7f+SH3pgAY8FCPUek/FoauZ/p7GthTp8S7eoNXsOAl+LhpCFfPlkPXp7Hvc4Fzky9zjbe4Li43gJvHGu8OU3No=
+	t=1776810649; cv=none; b=POr+PO0p18bzPI5+Kpa/ZW40v1MTRk3PssQYfNEgqfCu1SO7Ixs0YvokDh4X9j6rX9YCxTB2uxa7cHTiqKRzjjtJjGB5bi12A0ra/kpLLK8+iGuXRcVc54HYmr8N/HnHNsZ3xrUQCzNv9h6d2EuX4OOeACs5pmb5VCva+/rHMPo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776810235; c=relaxed/simple;
-	bh=sgxlv1Gy4m4rsCqWOlyOFq+BVwQIC9aK9+QByuoBKgI=;
+	s=arc-20240116; t=1776810649; c=relaxed/simple;
+	bh=JsBROnWsbsDyWIr9oR1HKPcD4AXQqSpDxm4A53tUoO8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gxQ//d3c3AMWfjZc3Brx+ThchKyDuDe34PXZVES5T8sld9kh09CeVrN54Mqgxscgfe58OQCVSBjbv/fwuLgj63qL2WMgczacIRoRhBzK9sata3ctfihSuhqWxzbzrQSknplvNoxoJgHwsKNajylwzhRdpBfJlCE6o5pr5JqBxT4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=tGMYyIp0; arc=none smtp.client-ip=209.85.167.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f194.google.com with SMTP id 5614622812f47-479ae363aaeso2600902b6e.1
-        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 15:23:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776810232; x=1777415032; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=lKoAeQw3fgOsyloCGOYdd/7n6rBcnHophybPgqTIkU8=;
-        b=tGMYyIp0O11x1j55iLJCIGvJU28dQap3Y7yqipAhblBl5grCmQA7TlUk5QncCtQNZy
-         DSO6DFNeVHan1jHgz7nHcbIsfFlpmU5/PeriByy+rEjFXbvKNPYizvt/PDzapPgwU53y
-         zEPD02hL0w9p7I5U31IG6y5GH0X2qmzAWWuwIFwOtTsnay1UvTL0a/DWSPbSviodt9Hf
-         Da8oZjkOkAYbgVl7Wcu/cosqNYrHGqAq8QwIEqU+dsZCOJY34TFAFMlIwzD9OL8mNleC
-         YkT/fSpWjuNJKD59Ou62u9id9JuvjsAtcAxzmCncbommTZjGLIdBq1Ing/XFyBEa+XHu
-         b4Tw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776810232; x=1777415032;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lKoAeQw3fgOsyloCGOYdd/7n6rBcnHophybPgqTIkU8=;
-        b=e9CoNn5anrYbQyqxgJCkwIT59ER8OI7EIRPgj0nXVzNnfXQ1Mzz61ypj7D7R1ngIYN
-         LYGoNwcr69eZZKkFOYNy/eNF7AtgAY4gkkVc/EX1jlPxgclgdpw9ReauFA/8qLBgY2hy
-         BiCgMEF9DPL25Q3DU/3lrM/HWXKkcDK20v37BRkR7wG8UsiBdrqs7Pn/wk2hWdnMjpKB
-         sF+0Y6u2ETYJMr1+Lg+IGYzidnRYsuU844IY9L4bmecjGsgI1PbV1p/oe0WfV8fpnRen
-         lxUHDL2UGTNyim2eDKARcahY9efc8MowfIVgRJHxuE7NTAUsc9PIeQInpXzj4pFI7JXz
-         mQ0A==
-X-Forwarded-Encrypted: i=1; AFNElJ+fr/vY/pBnq+Ygn8eAA3dxO041Sdfm5C0hMlIKBND5fvOCBV4tma67Mz8XMZgybpGK6/nxFx4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxLXtXVrX3ZjK1ObYHAIPYna7MBhFVfTGBfhxBPY49u9J+0Tdt9
-	8CkwgXRENc3fzu68fDqgHR783zS9oCP0MYAqnQfWBdSOmb0OWOqfDbHc
-X-Gm-Gg: AeBDietoUivTPyPMGx7+ZRWfCkA/ZUglEtozU0xv3tY9UF79Dr846PECxzr6r7kXTiB
-	AxyNFpu4kopQC+SwRjXJZfnogBuejSP1z1YqCDLpLEMQ1gEstwFXI00WBBy2gkIdWf/chxnc8kb
-	GAniaLGO35dNuNWuj220UjTXhibhU+1z1VRIeftOxVW1l/S7j843yvHzLwxgrfZjexLRutSYB9u
-	83v8kKHRHGB7ee0QXWVlx3pXthavK9ApgArNiL2sQdxgpypyUjGjqy5Bj8+WgGm6h6yEeyWqWvN
-	5utF+vllLH9jn1bNdi7bun0N9ANAAGS449ZV4AX8TFTawuma20bw6YvXHaRqmwRfQiHVvIEJv4W
-	HHPjX/uUU8u2y3UACjUK8OBBxcV3X1t8Lo6MSOIE7IXsF2aCdFeZ9fC4GBoR/DHe2vqnV9NtiPN
-	f4ZcBWdkUMsoiQY16PSrBNTy5rU9M=
-X-Received: by 2002:a05:6808:1a19:b0:475:be2f:c56b with SMTP id 5614622812f47-4799bc82da9mr9234418b6e.3.1776810232611;
-        Tue, 21 Apr 2026 15:23:52 -0700 (PDT)
-Received: from localhost ([2a03:2880:12ff:8::])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7dc975b0591sm12293852a34.19.2026.04.21.15.23.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Apr 2026 15:23:52 -0700 (PDT)
-Date: Tue, 21 Apr 2026 15:23:51 -0700
-From: Stanislav Fomichev <sdf.kernel@gmail.com>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com, 
-	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org, 
-	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Subject: Re: [PATCH net v2 8/8] xsk: fix u64 descriptor address truncation on
- 32-bit architectures
-Message-ID: <aef4XHnqR2cs5U1O@devvm17672.vll0.facebook.com>
-References: <20260420082805.14844-1-kerneljasonxing@gmail.com>
- <20260420082805.14844-9-kerneljasonxing@gmail.com>
- <aeaCzchKwsp_LWyA@devvm17672.vll0.facebook.com>
- <CAL+tcoCxQ8cU+wr7eJsMH+FPMcp+vQ4J4BdSdsVqyTRqN8q9LQ@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=H0h3c4rT6h43+uNrcdv2XdvJt/GZatHn3m3HyriQC07xxl+X2dGwmMwiWFaHM+MM7PbUkiw8JZ/kYFAOLGsOnE7HqTMXYBwGMbHwVtCsZWd+WDnW9FC84TuOvyOsFsH3XgKIJF0AgoAoUyI63iFWBBzrgFJIVd6yww1gyQr24fc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=uKuL8uGw; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=0owjc2dIxrEANaZrUtLU2bidjjfsvfi6s/RKJ+8v4EY=; b=uKuL8uGwUDlq8ZeHU40EiewuKo
+	39gp1IbmdG3nVvoZdJQZpondzwS/Oet0WfNYqdxiYOfo+QJNlaGq89rKIeqs/fzrAAaDtvhPjSJsE
+	KiAME7OKq7YV4PCCo/WFwdSE9WsQsgfP32YmSWVamqaPi2dhwVz4qFBky1M3KCMgPjM8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wFJc4-00GxO6-QR; Wed, 22 Apr 2026 00:30:36 +0200
+Date: Wed, 22 Apr 2026 00:30:36 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Byron Stanoszek <gandalf@winds.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org
+Subject: Re: [PATCH net 00/18] Remove a number of ISA and PCMCIA Ethernet
+ drivers
+Message-ID: <e056d348-4560-4df3-85c4-e29393b004e9@lunn.ch>
+References: <20260421-v7-0-0-net-next-driver-removal-v1-v1-0-69517c689d1f@lunn.ch>
+ <71d319ef-cd49-e8a8-70dd-cf0763ac6305@winds.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAL+tcoCxQ8cU+wr7eJsMH+FPMcp+vQ4J4BdSdsVqyTRqN8q9LQ@mail.gmail.com>
+In-Reply-To: <71d319ef-cd49-e8a8-70dd-cf0763ac6305@winds.org>
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280269-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	TAGGED_FROM(0.00)[bounces-280270-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,intel.com,gmail.com,fomichev.me,iogearbox.net,vger.kernel.org,tencent.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sdfkernel@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tencent.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,devvm17672.vll0.facebook.com:mid]
-X-Rspamd-Queue-Id: C78324402B4
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:dkim,lunn.ch:mid]
+X-Rspamd-Queue-Id: 742FF4402FB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 04/21, Jason Xing wrote:
-> On Tue, Apr 21, 2026 at 3:49 AM Stanislav Fomichev <sdf.kernel@gmail.com> wrote:
-> >
-> > On 04/20, Jason Xing wrote:
-> > > From: Jason Xing <kernelxing@tencent.com>
-> > >
-> > > In copy mode TX, xsk_skb_destructor_set_addr() stores the 64-bit
-> > > descriptor address into skb_shinfo(skb)->destructor_arg (void *) via a
-> > > uintptr_t cast:
-> > >
-> > >     skb_shinfo(skb)->destructor_arg = (void *)((uintptr_t)addr | 0x1UL);
-> > >
-> > > On 32-bit architectures uintptr_t is 32 bits, so the upper 32 bits of
-> > > the descriptor address are silently dropped. In XDP_ZEROCOPY unaligned
-> > > mode the chunk offset is encoded in bits 48-63 of the descriptor
-> > > address (XSK_UNALIGNED_BUF_OFFSET_SHIFT = 48), meaning the offset is
-> > > lost entirely. The completion queue then returns a truncated address to
-> > > userspace, making buffer recycling impossible.
-> > >
-> > > Fix this by handling the 32-bit case directly in
-> > > xsk_skb_destructor_set_addr(): when !CONFIG_64BIT, allocate an xsk_addrs
-> > > struct (the same path already used for multi-descriptor SKBs) to store
-> > > the full u64 address.
-> >
-> > Is it easier to make XSK `depends on 64BIT` to avoid dealing with that? Does
+On Tue, Apr 21, 2026 at 04:44:11PM -0400, Byron Stanoszek wrote:
+> On Tue, 21 Apr 2026, Andrew Lunn wrote:
 > 
-> Of course, it would be super easy. Actually the initial version looks
-> like this. One line of coder is simply enough.
+> > These old drivers have not been much of a Maintenance burden until
+> > recently. Now there are more newbies using AI and fuzzers finding
+> > issues, resulting in more work for Maintainers. Fixing these old
+> > drivers make little sense, if it is not clear they have users.
+> > 
+> >      drivers: net: 3com: 3c59x: Remove this driver
 > 
-> > anybody seriously run af_xdp on 32 bit systems?
+> Hi Andrew,
 > 
-> But my worry as you guess is if there exists a 32 bit system? I doubt
-> it. That's why I put some effort into adding the compatibility code to
-> cover the case. Good news is that it doesn't add any side effects of
-> the 64 bit system since they are protected under IS_ENABLED condition.
+> I happen to still use this driver on several hundred industrial PC
+> installations that were outfitted with 3com 3C905-B & CX cards 15+ years ago.
+> The old hardware still runs, therefore those cards haven't needed to be
+> replaced. I keep these systems up to date with the latest Linux kernel roughly
+> once per year.
 
-If someone complains, we can follow up? af_xdp is all u64 everywhere,
-including uapi, I doubt someone is using it on 32 bit systems. We don't
-test this part on 32 bit systems on nipa either..
+So 6.18? 6.12?
+
+> I understand the maintenance burden, but I would be delighted to continue
+> receiving bug fixes for this driver via the mainline Linux kernel if you are
+> still willing to continue to support it.
+
+Looking at the history of 3c59x.c i see:
+
+Date:   Tue Jan 6 10:47:21 2026 +0100
+
+    net: 3com: 3c59x: fix possible null dereference in vortex_probe1()
+
+Date:   Wed Jan 3 13:09:23 2018 -0500
+
+    3c59x: fix missing dma_mapping_error check and bad ring refill logic
+
+Date:   Thu Feb 25 13:02:50 2016 -0500
+
+    3c59x: mask LAST_FRAG bit from length field in ring
+
+Date:   Sun Feb 28 16:49:29 2016 +0900
+
+    3c59x: Ensure to apply the expires time
+
+Date:   Wed Jan 13 12:43:54 2016 -0500
+
+    3c59x: fix another page map/single unmap imbalance
+
+Date:   Wed Jan 13 12:43:53 2016 -0500
+
+    3c59x: balance page maps and unmaps
+
+Date:   Tue Jul 7 20:48:55 2015 +0200
+
+    3c59x: Fix shared IRQ handling
+
+So it looks like it was been pretty stable since 2016.
+
+Could you live with v6.18, which has an expected EOL of December 2028?
+If you are only updating once per year, security is not an issue, you
+just want stability.
+
+In fact, you might actually find stability starts going down in the
+next couple of years, maybe sooner. What we expect to happen soon is a
+lot more AI generated 'bug fixes', probably from newbies who are
+unable to evaluate if the AI is generated good fixes or bad fixes, or
+fixes which are theoretical rather than actual bugs etc. We netdev
+Maintainers are already seeing the number of patches going up, and are
+expecting to get overloaded. Which means quality will go down. We have
+also seen the AI generated fixes are indiscriminate, neither the AI,
+nor the human, care, or even look, to see if the driver is from the
+last century. We Maintainers however would prefer spending our time on
+drivers from the last ten years, maybe newer. So patches for these
+older drivers is going to get less review, and bad patches will slip
+through.
+
+By dropping them for the current HEAD, we are reducing our surface
+area. It will be interesting to see if the AI patches are only for
+HEAD, or they start going back to older kernels to find 'bugs'.
+
+However, just because a driver has gone from HEAD, it does not really
+prevent us from taking patches for stable. But we Maintainers want to
+avoid doing the triage work, figuring out good from bad.
+
+We have not discussed it as a Maintainer team, but one thing which
+might work is we add a entry for 3c59x.c in MAINTAINERS, in stable,
+pointing to you. You can then validate patches, and tell us if they
+are O.K. to queue for stable.
+
+    Andrew
 
