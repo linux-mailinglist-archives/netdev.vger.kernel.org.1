@@ -1,281 +1,139 @@
-Return-Path: <netdev+bounces-280024-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280023-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +HyYFfIn52kf4wEAu9opvQ
-	(envelope-from <netdev+bounces-280024-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 09:32:02 +0200
+	id YM/WJoMl52nV4QEAu9opvQ
+	(envelope-from <netdev+bounces-280023-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 09:21:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FF414379D8
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 09:32:00 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBA79437752
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 09:21:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CE08A307EB60
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 07:21:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7674A302AE2C
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 07:18:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4871383C8C;
-	Tue, 21 Apr 2026 07:20:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CqpxbMFu"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FD4137B020;
+	Tue, 21 Apr 2026 07:18:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3935338736A
-	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 07:20:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+Received: from mail.189.cn (189sx01-ptr.21cn.com [125.88.204.37])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BA5617DE36;
+	Tue, 21 Apr 2026 07:18:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=125.88.204.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776756021; cv=none; b=jvc8iFZHKhbzzMZ5R8rn78VqhtZryi/oXeY1D/jF0DbGHSixI8IlTBaNjFIMHNd/9jBpRHJVrMKR+udgIqzlcV1MvL+ygxVJ7f1SuUeL8rxrhol55Q8rUJp2JGLpWZ6stNGE6EnBJvDGF12sJCbn2O3OG1ZBV9J5ttFyCvHfrfA=
+	t=1776755935; cv=none; b=oiG7nMZrDAySafiRPp80Ad7GJRLX/uWJyu0QeXoNT+RJeaE1pCl6GQ7CzaqeP6R5ebafDWfKDFn0eb1N35d2nqSxY517qXcY2PriqUd+9YJmYp1duzyBeZryKAelKtBIpsNIsWEh5lwyGGpJ0NtpRCbq9DhPMxXFf9sPqq1dYAo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776756021; c=relaxed/simple;
-	bh=VX4wqdc8fUaNqb2L3axrt9LF0e/WzvYh0gO2EeYHeUQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ofXgZj0qmf2s8HIiQLLUeW5mKdUVjtDkFCmzNvv4mid1RvtReTl//D9RBhjKo98YN6W68QIQuMDBb9OPWZPxJncy8Rxm8da9Rz3RnC04A9ta7g1kbYUCj5IBTryO/EKKR8p8iWb5BEqyeuCLgFUVRyqMuzUWhhXNyXha6CtHjL4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CqpxbMFu; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2b458add85aso40502145ad.2
-        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 00:20:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1776756019; x=1777360819; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=91/4oaAqI5zoOb3jrCgPseC/dJYhauKi+DmlkoNw0/0=;
-        b=CqpxbMFusqu8egkendRBAp8jsoXioQQUopk54BMKey2nWy60SHCCM/tXR/pFQVBV7w
-         y+alrcihTtO7Iw2FBV8wBToLpOHq0BOuxPNGkcNsSt8G7XpaqLIeSdt+80ify+rfY9Sn
-         9eyXLEIdqTmNBuk4xt4ScEA04EY+U6TH7sjoTKwwhAzDjiTte3uTHHIFkolD34QMQkrG
-         qkKJk4yfz6QRtqdG68TuQGTZFeZfjzJ+CZ6qRzI7l/kjlSd+upk8AAxDIyK4aAUC3jYF
-         2+zCltVgbYZepmJktBJpMtRwI+jx3jU2aDh0hiBgSI46U4IKo3aho2YFA+0UHxh+uDpD
-         q+nA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776756019; x=1777360819;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=91/4oaAqI5zoOb3jrCgPseC/dJYhauKi+DmlkoNw0/0=;
-        b=kvjXB2dZ3s31oy1zEuUli69qPcu6RoYD23XSFQN4JdTr1sJJn7tniGeg40IV0KvDQr
-         gbD/KPSl3v6aghelNlLMnCkSAdYG+iuI9TruRgso9g/nPEJKskk7UxDWuyVV0ffng4MX
-         zP0ujwa7JE9H19pzviFdQ/C2VzXOapK351LvR/1LfN4qu6RKFB4p7QMlL36NKu/C+nBa
-         /dARBvf40ArsAVeMX6morwf7I51Rz2h34gkkkjWWmyC2PGdrfdVF1B5DdmZTcUXg8Ot2
-         3rFcX7WQxGu5OPFleelE5BP4vj81P32Sn2JzD8LqXk99+f9qOyXAjCQlsAadG4tZmwur
-         pNsg==
-X-Forwarded-Encrypted: i=1; AFNElJ9w8RHNY2PLPNr2TKU4hkF9t754dH/SSeSPAVoAcePED2RtHgtZH9orFYfmSq2Ve4kx46xOjn4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz55dr6wPcAbFBB46Oqw0GP3uHj1kqUcSOPbsdJaOvrdhb9qlaI
-	EBLWeJ7uvBc4DzVYt6lMEKZxzCKR24IF5HeOirZqWIwUOmb7ijV69zHBgBgUXZgrLAR8QdmwwoO
-	W+tlQJg==
-X-Received: from plbx11.prod.google.com ([2002:a17:902:ea8b:b0:2b0:6314:419b])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:db0d:b0:2b2:4fe3:7b89
- with SMTP id d9443c01a7336-2b5f9f52879mr163499125ad.38.1776756019292; Tue, 21
- Apr 2026 00:20:19 -0700 (PDT)
-Date: Tue, 21 Apr 2026 07:15:09 +0000
-In-Reply-To: <20260418181333.1713389-3-jt26wzz@gmail.com>
+	s=arc-20240116; t=1776755935; c=relaxed/simple;
+	bh=zb7gnNolOhgRvEvY+KVXH3ZcA+WgSzlM590cj3hH7Bc=;
+	h=From:To:Subject:Date:Message-Id:MIME-Version; b=aZu4CnF6b3tzF5xQnCTg9ufB2J58ltbmbD5pixBwY3HINNx+28h0Qxn4eOaXNx0BcyY5vBhHnWjMnb0Tbfrxod44rZHe99Q2D9hrvLzz34ZCCjIKcAEywCbFvUXx2SUL/Fg4rQDjc5xqk+f5k8H6x5q99UcZpmgbewYz4gj+xIA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=189.cn; spf=pass smtp.mailfrom=189.cn; arc=none smtp.client-ip=125.88.204.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=189.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=189.cn
+HMM_SOURCE_IP:10.158.242.145:0.1498820815
+HMM_ATTACHE_NUM:0000
+HMM_SOURCE_TYPE:SMTP
+Received: from clientip-223.104.44.125 (unknown [10.158.242.145])
+	by mail.189.cn (HERMES) with SMTP id 1AEB1400083;
+	Tue, 21 Apr 2026 15:18:39 +0800 (CST)
+Received: from  ([223.104.44.125])
+	by gateway-153622-dep-76cc7bc9cd-r45x9 with ESMTP id 460328a3dd2645d881ad4c010de65c55 for tglx@kernel.org;
+	Tue, 21 Apr 2026 15:18:42 CST
+X-Transaction-ID: 460328a3dd2645d881ad4c010de65c55
+X-Real-From: charles_xu@189.cn
+X-Receive-IP: 223.104.44.125
+X-MEDUSA-Status: 0
+Sender: charles_xu@189.cn
+From: charles_xu@189.cn
+To: tglx@kernel.org,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	joe@dama.to,
+	aleksandr.loktionov@intel.com,
+	stable@vger.kernel.org
+Subject: [PATCH 6.6.y] i40e: Fix preempt count leak in napi poll tracepoint
+Date: Tue, 21 Apr 2026 15:18:38 +0800
+Message-Id: <20260421071838.3878-1-charles_xu@189.cn>
+X-Mailer: git-send-email 2.35.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260418181333.1713389-3-jt26wzz@gmail.com>
-X-Mailer: git-send-email 2.54.0.rc1.555.g9c883467ad-goog
-Message-ID: <20260421072017.1653163-1-kuniyu@google.com>
-Subject: Re: [PATCH net v2 2/2] selftests/bpf: check epoll readiness after
- reuseport migration
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: jt26wzz@gmail.com
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org, kuniyu@google.com, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	ncardwell@google.com, netdev@vger.kernel.org, pabeni@redhat.com, 
-	shuah@kernel.org, tamird@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.04 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-280024-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	FROM_NEQ_ENVFROM(0.00)[charles_xu@189.cn,netdev@vger.kernel.org];
+	TO_DN_NONE(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280023-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[189.cn];
+	MIME_TRACE(0.00)[0:+];
+	FROM_NO_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	FREEMAIL_FROM(0.00)[189.cn];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[amazon.co.jp:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 0FF414379D8
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email,189.cn:mid,189.cn:email]
+X-Rspamd-Queue-Id: EBA79437752
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Zhenzhong Wu <jt26wzz@gmail.com>
-Date: Sun, 19 Apr 2026 02:13:33 +0800
-> After migrate_dance() moves established children to the target
-> listener, add it to an epoll set and verify that epoll_wait(..., 0)
-> reports it ready before accept().
-> 
-> This adds epoll coverage for the TCP_ESTABLISHED reuseport migration
-> case in migrate_reuseport.
-> 
-> Keep the check limited to TCP_ESTABLISHED cases. TCP_SYN_RECV and
-> TCP_NEW_SYN_RECV still depend on asynchronous handshake completion,
-> so a zero-timeout epoll_wait() would race there.
-> 
-> Signed-off-by: Zhenzhong Wu <jt26wzz@gmail.com>
-> ---
->  .../bpf/prog_tests/migrate_reuseport.c        | 32 ++++++++++++++++++-
->  1 file changed, 31 insertions(+), 1 deletion(-)
-> 
-> diff --git a/tools/testing/selftests/bpf/prog_tests/migrate_reuseport.c b/tools/testing/selftests/bpf/prog_tests/migrate_reuseport.c
-> index 653b0a20f..580a53424 100644
-> --- a/tools/testing/selftests/bpf/prog_tests/migrate_reuseport.c
-> +++ b/tools/testing/selftests/bpf/prog_tests/migrate_reuseport.c
-> @@ -18,13 +18,16 @@
->   *   9. call shutdown() for the second server
->   *        and migrate the requests in the accept queue
->   *        to the last server socket.
-> - *  10. call accept() for the last server socket.
-> + *  10. for TCP_ESTABLISHED cases, call epoll_wait(..., 0)
-> + *        for the last server socket.
-> + *  11. call accept() for the last server socket.
->   *
->   * Author: Kuniyuki Iwashima <kuniyu@amazon.co.jp>
->   */
->  
->  #include <bpf/bpf.h>
->  #include <bpf/libbpf.h>
-> +#include <sys/epoll.h>
->  
->  #include "test_progs.h"
->  #include "test_migrate_reuseport.skel.h"
-> @@ -522,6 +525,33 @@ static void run_test(struct migrate_reuseport_test_case *test_case,
->  			goto close_clients;
->  	}
->  
-> +	/* Only TCP_ESTABLISHED has already-migrated accept-queue entries
-> +	 * here.  Later states still depend on follow-up handshake work.
-> +	 */
-> +	if (test_case->state == BPF_TCP_ESTABLISHED) {
-> +		struct epoll_event ev = {
-> +			.events = EPOLLIN,
-> +		};
-> +		int epfd;
-> +		int nfds;
-> +
-> +		epfd = epoll_create1(EPOLL_CLOEXEC);
-> +		if (!ASSERT_NEQ(epfd, -1, "epoll_create1"))
-> +			goto close_clients;
-> +
-> +		ev.data.fd = test_case->servers[MIGRATED_TO];
-> +		if (!ASSERT_OK(epoll_ctl(epfd, EPOLL_CTL_ADD,
-> +					 test_case->servers[MIGRATED_TO], &ev),
-> +			       "epoll_ctl"))
-> +			goto close_epfd;
-> +
-> +		nfds = epoll_wait(epfd, &ev, 1, 0);
-> +		ASSERT_EQ(nfds, 1, "epoll_wait");
+From: Thomas Gleixner <tglx@kernel.org>
 
-Thanks for the update, but the test passes without patch 1.
+[ Upstream commit 4b3d54a85bd37ebf2d9836f0d0de775c0ff21af9 ]
 
-I think it would be best to test just after shutdown()
-where migration happens.
+Using get_cpu() in the tracepoint assignment causes an obvious preempt
+count leak because nothing invokes put_cpu() to undo it:
 
-Also, TCP_SYN_RECV should be covered in the same way.
+  softirq: huh, entered softirq 3 NET_RX with preempt_count 00000100, exited with 00000101?
 
----8<---
-diff --git a/tools/testing/selftests/bpf/prog_tests/migrate_reuseport.c b/tools/testing/selftests/bpf/prog_tests/migrate_reuseport.c
-index 580a534249a7..66fea936649e 100644
---- a/tools/testing/selftests/bpf/prog_tests/migrate_reuseport.c
-+++ b/tools/testing/selftests/bpf/prog_tests/migrate_reuseport.c
-@@ -353,8 +353,29 @@ static int update_maps(struct migrate_reuseport_test_case *test_case,
- 
- static int migrate_dance(struct migrate_reuseport_test_case *test_case)
- {
-+	struct epoll_event ev = {
-+		.events = EPOLLIN,
-+	};
-+	int epoll, nfds;
- 	int i, err;
- 
-+	if (test_case->state != BPF_TCP_NEW_SYN_RECV) {
-+		epoll = epoll_create1(0);
-+		if (!ASSERT_NEQ(epoll, -1, "epoll_create1"))
-+			return -1;
-+
-+		ev.data.fd = test_case->servers[MIGRATED_TO];
-+		if (!ASSERT_OK(epoll_ctl(epoll, EPOLL_CTL_ADD,
-+					 test_case->servers[MIGRATED_TO], &ev),
-+			       "epoll_ctl")) {
-+			goto close_epoll;
-+		}
-+
-+		nfds = epoll_wait(epoll, &ev, 1, 0);
-+		if (!ASSERT_EQ(nfds, 0, "epoll_wait 1"))
-+			goto close_epoll;
-+	}
-+
- 	/* Migrate TCP_ESTABLISHED and TCP_SYN_RECV requests
- 	 * to the last listener based on eBPF.
- 	 */
-@@ -368,6 +389,15 @@ static int migrate_dance(struct migrate_reuseport_test_case *test_case)
- 	if (test_case->state == BPF_TCP_NEW_SYN_RECV)
- 		return 0;
- 
-+	nfds = epoll_wait(epoll, &ev, 1, 0);
-+	if (!ASSERT_EQ(nfds, 1, "epoll_wait 2")) {
-+close_epoll:
-+		close(epoll);
-+		return -1;
-+	}
-+
-+	close(epoll);
-+
- 	/* Note that we use the second listener instead of the
- 	 * first one here.
- 	 *
-@@ -525,33 +555,6 @@ static void run_test(struct migrate_reuseport_test_case *test_case,
- 			goto close_clients;
- 	}
- 
--	/* Only TCP_ESTABLISHED has already-migrated accept-queue entries
--	 * here.  Later states still depend on follow-up handshake work.
--	 */
--	if (test_case->state == BPF_TCP_ESTABLISHED) {
--		struct epoll_event ev = {
--			.events = EPOLLIN,
--		};
--		int epfd;
--		int nfds;
--
--		epfd = epoll_create1(EPOLL_CLOEXEC);
--		if (!ASSERT_NEQ(epfd, -1, "epoll_create1"))
--			goto close_clients;
--
--		ev.data.fd = test_case->servers[MIGRATED_TO];
--		if (!ASSERT_OK(epoll_ctl(epfd, EPOLL_CTL_ADD,
--					 test_case->servers[MIGRATED_TO], &ev),
--			       "epoll_ctl"))
--			goto close_epfd;
--
--		nfds = epoll_wait(epfd, &ev, 1, 0);
--		ASSERT_EQ(nfds, 1, "epoll_wait");
--
--close_epfd:
--		close(epfd);
--	}
--
- 	count_requests(test_case, skel);
- 
- close_clients:
----8<---
+This clearly has seen a lot of testing in the last 3+ years...
+
+Use smp_processor_id() instead.
+
+Fixes: 6d4d584a7ea8 ("i40e: Add i40e_napi_poll tracepoint")
+Signed-off-by: Thomas Gleixner <tglx@kernel.org>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org
+Reviewed-by: Joe Damato <joe@dama.to>
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Charles Xu <charles_xu@189.cn>
+---
+ drivers/net/ethernet/intel/i40e/i40e_trace.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_trace.h b/drivers/net/ethernet/intel/i40e/i40e_trace.h
+index 33b4e30f5e00..9b735a9e2114 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_trace.h
++++ b/drivers/net/ethernet/intel/i40e/i40e_trace.h
+@@ -88,7 +88,7 @@ TRACE_EVENT(i40e_napi_poll,
+ 		__entry->rx_clean_complete = rx_clean_complete;
+ 		__entry->tx_clean_complete = tx_clean_complete;
+ 		__entry->irq_num = q->irq_num;
+-		__entry->curr_cpu = get_cpu();
++		__entry->curr_cpu = smp_processor_id();
+ 		__assign_str(qname, q->name);
+ 		__assign_str(dev_name, napi->dev ? napi->dev->name : NO_DEV);
+ 		__assign_bitmask(irq_affinity, cpumask_bits(&q->affinity_mask),
+-- 
+2.35.3
+
 
