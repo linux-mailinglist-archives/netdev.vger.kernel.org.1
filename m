@@ -1,190 +1,178 @@
-Return-Path: <netdev+bounces-280199-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280200-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KFO1H16x52lZ/QEAu9opvQ
-	(envelope-from <netdev+bounces-280199-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 19:18:22 +0200
+	id 6BawMgCx52lZ/QEAu9opvQ
+	(envelope-from <netdev+bounces-280200-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 19:16:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFCE143DD6D
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 19:18:21 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 512E043DD1E
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 19:16:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 20844302F407
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 17:14:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B6ED2303816D
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 17:15:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53A343845B7;
-	Tue, 21 Apr 2026 17:14:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B237282F16;
+	Tue, 21 Apr 2026 17:15:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b="NvW7V6zz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rUWlT5Q+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f47.google.com (mail-ot1-f47.google.com [209.85.210.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD4CA37F01A
-	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 17:14:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48065274B43
+	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 17:15:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776791655; cv=none; b=PRrez6czFVPexr6eoyHv1OD9xK5YHy6nHMuuQwLXv4Jz/sjk0Ycq8zAvXRwMtIOhffJzn6rQwIIjNI6EuTUH72mW41UvvfszIhGaTBMolFrgeSSRFrUoB03hi1Nu4qpByaEO0ohCvqlnLUvyxhhTNzSc8QcLtaZ9Fk+TSOu98ms=
+	t=1776791716; cv=none; b=jnIAdVSi08+ghlOQXoKaxkVndNiYUR6K50PaE3ck/P7p52nA3AOVJtOHlu4sTIfP2FHfLJCnpL1nl8RPDfdmiSDTpmbFMhwf9ucV49YCaykYrlaWBVLNjuE5cmcodEoQb6u4Fb4yOTooHTzpjnk1EZGOEkU+Q2zAqR23RbKUvtM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776791655; c=relaxed/simple;
-	bh=zQnL2fW68Yjh3nCOMT6xZ/h8HA0NEQszG//OMuJePKA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=c61mD7RgbBHZlc+oDoHe4KZeJj+CDc3IkFqO2EpP3EESIIMNGq5WJM+qlULCOsbqhGtgtMUVexHJsNkrpmj4BbOVRikbaryzwiVYcsKgADM2z6CyUF3K/zszxHI8avkDWK0F+8J/A+jOOlpezjcfwRAIKMJGx2dUxiVMvz0X33A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b=NvW7V6zz; arc=none smtp.client-ip=209.85.210.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-ot1-f47.google.com with SMTP id 46e09a7af769-7d7fdb922a5so3991740a34.3
-        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 10:14:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20251104.gappssmtp.com; s=20251104; t=1776791652; x=1777396452; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lMUefLi5WLFFDpzONKvGSaE+pHGV5IKQnKH5bOuejr8=;
-        b=NvW7V6zzd1x+UE43BMBfEQa9F0nUc/TYYexl0y1qR+9U6vuaV+T7OJJRxDHft63EqR
-         L4naPKQ3Z+8FRDE/eROQdVGGNrM9Haq2RwSNTe7ysNfrf5RwfkBhPC05bLZ3LinnGRUG
-         NsuYfz0sa57kHPfD4ZqhRuw9wZAnyKmptAmstA5DxACpfAk1yTRVfnAIrpmerIpX7jx6
-         ZOMCnjk39X74xmZtEFDFY7W9o7jVSLr9yHa8R1idEw9LZDlGQV+14D/wcyPYE2h8eAPt
-         LSPAv8HtYN/JhlHqcEurDEmISmb/V+jqFelSsJWP8ldW1aJLdJXFI9M0GetP6iHavUyB
-         PCSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776791652; x=1777396452;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=lMUefLi5WLFFDpzONKvGSaE+pHGV5IKQnKH5bOuejr8=;
-        b=Wx0Vpj48RImI/94dpB7FBcy50+jhrwoMI/AU8YLhK/HToouhCBuNeP/oDjgldGDD/s
-         cIm0ZgKztJ56hOFkYMbjEynQK/7gGABcOW3mWf6cocgLliAdkOxD4yztT/jzJpowcUIG
-         4+6Zjc+4pwwcDhaok4034dV4qv82M9mw+BNRI/9jkhVWtKaapZnG7oLlCHDDN1d1ghRQ
-         VFzzBBRpVRfqTqAp0LWdRaah2oWX3FsdJDD4PAHmQt+ZSexVS+796uMkRs9kKTDWnLtl
-         Ug4AYRrj+ymmNDsA4q1YtDfCXoGaBFT14iG/nb6+D6Fn4TrhhZcDRyWV2fDzhDUQjZ2y
-         fJVQ==
-X-Forwarded-Encrypted: i=1; AFNElJ+PLKPbCa797V9rd0Sxrbz4C0JPRipHoQEeLNiOZ1iM0eEOGo0oU0YjCfsQm4cgyRflesqKG1U=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy8wLy3WrOo++MulxwBkQpSQ4pEcUwZwCHRkmegzMzd3WEZrPX2
-	i55q+dUBxbuALsGRC/v+hSsg4Hl1+L3EkjCjaJeOw/uwcgk22cQpkj/KghvT1lV7L20=
-X-Gm-Gg: AeBDiesLY/cATvYxJFw+4YwaRWqpRafvdT6H6sZEqcvRv3NHHCQpHQMoi6MZ25YhCle
-	UhUWzuI3/LYG4EGyFQgI8V1Xu+2gqjIcnjJlQ3i6HbG39+c8VuxbbJzLijkFHY+n+vEm++5uw4+
-	ni0smOH/66yL3SCcIvxqF+410ByOETbUujZhJ7piKljyCpnFqf9yMgAUBiMzMJ+FOYrig9QrBch
-	m9KPVT5GR0Hl5jPNMpOhCEHgi6H09s88yjKdOHAtkcZkZIKsOmXYv1nY8PO38I+/CTCt9BjTpMq
-	zfKP8JyMZqAiF7scxOulkeHveqW+zwe6EHU8l7cq+Dt/6sroPkbtStCbAVygJCkw2SVqx9KKZ3g
-	PfSwBpQBRfTpjdtbneZzCQtmLHk2F5Yf3d/vmtoEkxRrAHFF5rWbZHhSMnAU7VX8xOiJhd4aAEH
-	dH7kN3cwpDCHDxdqTZ1zHpquHFNlAvz+FUl9udfCEIayywwA==
-X-Received: by 2002:a05:6830:8d0:b0:7dc:e38b:d9c1 with SMTP id 46e09a7af769-7dce38bda62mr402872a34.13.1776791647395;
-        Tue, 21 Apr 2026 10:14:07 -0700 (PDT)
-Received: from phoenix.local ([104.202.41.210])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7dcd56bd0e4sm3393742a34.2.2026.04.21.10.14.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Apr 2026 10:14:07 -0700 (PDT)
-Date: Tue, 21 Apr 2026 10:14:00 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Dan Cross <crossd@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
- netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- andrew+netdev@lunn.ch, horms@kernel.org, corbet@lwn.net,
- skhan@linuxfoundation.org, federico.vaga@vaga.pv.it,
- carlos.bilbao@kernel.org, avadhut.naik@amd.com, alexs@kernel.org,
- si.yanteng@linux.dev, dzm91@hust.edu.cn, 2023002089@link.tyut.edu.cn,
- tsbogend@alpha.franken.de, dsahern@kernel.org, jani.nikula@intel.com,
- mchehab+huawei@kernel.org, gregkh@linuxfoundation.org,
- jirislaby@kernel.org, tytso@mit.edu, herbert@gondor.apana.org.au,
- ebiggers@kernel.org, johannes.berg@intel.com, geert@linux-m68k.org,
- pablo@netfilter.org, tglx@kernel.org, mashiro.chen@mailbox.org,
- mingo@kernel.org, dqfext@gmail.com, jreuter@yaina.de, sdf@fomichev.me,
- pkshih@realtek.com, enelsonmoore@gmail.com, mkl@pengutronix.de,
- toke@toke.dk, kees@kernel.org, jlayton@kernel.org, wangliang74@huawei.com,
- aha310510@gmail.com, takamitz@amazon.co.jp, kuniyu@google.com,
- linux-doc@vger.kernel.org, linux-mips@vger.kernel.org
-Subject: Re: [PATCH net-deletions] net: remove ax25 and amateur radio
- (hamradio) subsystem
-Message-ID: <20260421101400.67545b20@phoenix.local>
-In-Reply-To: <CAEoi9W6ZRw6aEh62Xbgkg-TW8URHbVp6dHTT9krFiTkotjTuTA@mail.gmail.com>
-References: <20260421021824.1293976-1-kuba@kernel.org>
-	<20260421065507.2c5e3ba7@phoenix.local>
-	<CAEoi9W6ZRw6aEh62Xbgkg-TW8URHbVp6dHTT9krFiTkotjTuTA@mail.gmail.com>
+	s=arc-20240116; t=1776791716; c=relaxed/simple;
+	bh=RqhR1ifSH6h4hvW6eeD7CwMBkMSMvldNwfsFYP4qNmA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EAhAbEy4IVQmI3glV5Jn72y4LLMDxDaE5OxiACg77GVZ/QLHiInYrdClSixEBZelqNtQXy7revphn13RN5QPo4c0r7wSQc7wv6jiDT/BRnVxwsXIvWiGneREO/1ww7SbZQQ2zEhkEQGV3YV5E6A0nSYfoqBGzNIMTUwkujIx0KU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rUWlT5Q+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 929A2C2BCB9;
+	Tue, 21 Apr 2026 17:15:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776791715;
+	bh=RqhR1ifSH6h4hvW6eeD7CwMBkMSMvldNwfsFYP4qNmA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=rUWlT5Q+3y+u3fqIKUlf0nWl/6k7hCOiuN29BFQbtY2bjazd9bj/k9ITK+ij7fnrx
+	 nhvL+hsakPFUmPNV4Kmf6QWFsUayVjeJwbHcBqSQjx/LqrUGkdQaJfsQPhgGMWuauH
+	 /IHtsxUrdSL+FnY7BVlwdAqH5BD5IKcaI6Mi2mEhfDfcFDAFNDOjlaqLWENyxciLkY
+	 iLR6x66KoRKltZflLw4FEuJD9mT3Z07bN/DVe6yrHspaiRCrlSoaGU30GFLDO7EfDJ
+	 of5x6ouRdD5DaLzW1ArbRrNF9J81ypTFqND92qC14mV/QZBFJsX9sroJqLK1CG4+L1
+	 iruZLVKTvKvLg==
+Date: Tue, 21 Apr 2026 19:15:13 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net v4 2/2] net: airoha: Add missing bits in
+ airoha_qdma_cleanup_tx_queue()
+Message-ID: <aeewoVjN7EHLZTW_@lore-desk>
+References: <20260417-airoha_qdma_cleanup_tx_queue-fix-net-v4-0-e04bcc2c9642@kernel.org>
+ <20260417-airoha_qdma_cleanup_tx_queue-fix-net-v4-2-e04bcc2c9642@kernel.org>
+ <210f5d0b-6232-4c0f-adff-3a97d54159b3@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.06 / 15.00];
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="l/XyUOK+TbmoSNvA"
+Content-Disposition: inline
+In-Reply-To: <210f5d0b-6232-4c0f-adff-3a97d54159b3@redhat.com>
+X-Spamd-Result: default: False [-2.26 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[networkplumber-org.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-280200-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280199-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[47];
-	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,lwn.net,linuxfoundation.org,vaga.pv.it,amd.com,linux.dev,hust.edu.cn,link.tyut.edu.cn,alpha.franken.de,intel.com,mit.edu,gondor.apana.org.au,linux-m68k.org,netfilter.org,mailbox.org,gmail.com,yaina.de,fomichev.me,realtek.com,pengutronix.de,toke.dk,huawei.com,amazon.co.jp];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[networkplumber-org.20251104.gappssmtp.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,huawei];
+	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,networkplumber.org:email,phoenix.local:mid]
-X-Rspamd-Queue-Id: EFCE143DD6D
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 512E043DD1E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, 21 Apr 2026 12:17:23 -0400
-Dan Cross <crossd@gmail.com> wrote:
 
-> On Tue, Apr 21, 2026 at 9:55=E2=80=AFAM Stephen Hemminger
-> <stephen@networkplumber.org> wrote:
-> > On Mon, 20 Apr 2026 19:18:23 -0700
-> > Jakub Kicinski <kuba@kernel.org> wrote: =20
-> > > Remove the amateur radio (AX.25, NET/ROM, ROSE) protocol implementati=
-on
-> > > and all associated hamradio device drivers from the kernel tree.
-> > > This set of protocols has long been a huge bug/syzbot magnet,
-> > > and since nobody stepped up to help us deal with the influx
-> > > of the AI-generated bug reports we need to move it out of tree
-> > > to protect our sanity.
-> > >
-> > > The code is moved to an out-of-tree repo:
-> > > https://github.com/linux-netdev/mod-orphan
-> > > if it's cleaned up and reworked there we can accept it back. =20
-> >
-> > It would be good if these protocols could be done in userspace
-> > or with BPF? =20
->=20
-> Consensus for a userspace implementation is what folks on linux-hams
-> seem to be converging on.
->=20
-> The amateur radio protocols are more or less specific to low-speed
-> links, they are not particularly coupled to anything else that
-> requires running in the kernel, and the main coupling point (IP over
-> AX.25) can be implemented via TAP/TUN.
->=20
-> There are several popular packages that already implement AX.25 and
-> NET/ROM in user-space (for the interested, LinBPQ seems to be the
-> canonical example).  The main missing piece is ROSE, but it is likely
-> easier to add that to an existing package, or potentially something
-> brand new, than keep it in the kernel.
->=20
-> There's no compelling reason to keep these protocols in the kernel,
-> whether in-tree or out-of-tree; at least, one has not been
-> articulated.
->=20
->         - Dan C.
+--l/XyUOK+TbmoSNvA
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Thanks, my other concern is carrying support for these in ip commands.
-If not kernel based, then iproute2 doesn't need to worry.
+> On 4/17/26 8:36 AM, Lorenzo Bianconi wrote:
+> > @@ -1055,8 +1058,33 @@ static void airoha_qdma_cleanup_tx_queue(struct =
+airoha_queue *q)
+> >  		e->dma_addr =3D 0;
+> >  		e->skb =3D NULL;
+> >  		list_add_tail(&e->list, &q->tx_list);
+> > +
+> > +		/* Reset DMA descriptor */
+> > +		WRITE_ONCE(desc->ctrl, 0);
+> > +		WRITE_ONCE(desc->addr, 0);
+> > +		WRITE_ONCE(desc->data, 0);
+> > +		WRITE_ONCE(desc->msg0, 0);
+> > +		WRITE_ONCE(desc->msg1, 0);
+> > +		WRITE_ONCE(desc->msg2, 0);
+>=20
+> Sashiko has some complains on this patch that look legit to me.
+>=20
+> Also the pre-existing issues mentioned WRT patch 1/2 makes such patch
+> IMHO almost ineffective, I think you should address them in the same seri=
+es.
+>=20
+> Note that you should have commented on sashiko review on the ML, it
+> would have saved a significant amount of time on us.
+
+Since this series is marked as 'Changes Requested', it is not clear to me w=
+hat
+next steps are. I guess we have two possible approach here:
+
+1) - Post patch 1/2 ("net: airoha: Move ndesc initialization at
+     end of airoha_qdma_init_tx()") with the series available upstream
+     (not merged yet) in [0] where I am fixing similar issues for
+     airoha_qdma_init_rx_queue() and airoha_qdma_tx_irq_init().
+   - Post patch 2/2 ("net: airoha: Add missing bits in
+     airoha_qdma_cleanup_tx_queue()") with a fix for airoha_ndo_stop() wait=
+ing
+     for TX/RX DMA engine to complete before running
+     airoha_qdma_cleanup_tx_queue().
+
+2) - Since all the issues rised by Sashiko are not strictly related to this
+     series and they are already fixed in pending patches, just apply the f=
+ixes
+     separately without the needs to repost this series.
+
+Which approach do you prefer?
+
+Regards,
+Lorenzo
+
+[0] https://patchwork.kernel.org/project/netdevbpf/cover/20260420-airoha_qd=
+ma_init_rx_queue-fix-v2-0-d99347e5c18d@kernel.org/
+
+>=20
+> /P
+>=20
+
+--l/XyUOK+TbmoSNvA
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaeewoQAKCRA6cBh0uS2t
+rEaHAQCcKtKEMHUCG+eY2o4NV0BnCt9GTc/hVJ/zktJkukChSAD+OUbxW5LM+Bve
+eEnUENXdlph4WMO5XEHV38IciwKqQw0=
+=Rgkr
+-----END PGP SIGNATURE-----
+
+--l/XyUOK+TbmoSNvA--
 
