@@ -1,115 +1,107 @@
-Return-Path: <netdev+bounces-280167-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280168-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OC0HERmW52mp+AEAu9opvQ
-	(envelope-from <netdev+bounces-280167-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 17:22:01 +0200
+	id YCdvJ9CW52mp+AEAu9opvQ
+	(envelope-from <netdev+bounces-280168-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 17:25:04 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DEAC43CAFF
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 17:22:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FF2843CB44
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 17:25:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 27FA93003621
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 15:18:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5E73D305BFD4
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 15:20:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E22963D6681;
-	Tue, 21 Apr 2026 15:18:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27FE32C2363;
+	Tue, 21 Apr 2026 15:20:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="UCQWkDmR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gx2nEI7y"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68D2621D5AF
-	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 15:18:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04845282F02;
+	Tue, 21 Apr 2026 15:20:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776784711; cv=none; b=llMcy/MA9DrP2+Frvfzf3X+cWpnEcAAvAe0YW93PaItdaKAN0+auEL1NiPmetA6JptMmR8Evi2eS2sh7IJYYFDQX+nemS3WrtHD3o2GZnmBpGqEG+QgO0aVtd4RDzs6CLKWywFjIfL/qRbjLQtY8n0Z/ulUpMOA2BPUqvh/DOpU=
+	t=1776784807; cv=none; b=AiCOq+bjW52f5K8gp/34raggPZ44jUP36Wgi3gFFAKMvSQ56DvdgKs/AEavmtikmaXvEnDlzY9zH0G2/FyIzFtqlJhAUENuQdWleuztzA3uQEXdZ9JhdN8GhJkM168uas64qMHG5k0qxvCU69a/F2phySsuz1qapKbDJmab9hYw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776784711; c=relaxed/simple;
-	bh=rxX0q9ScIBLtPx4KfGDMuht8Mae2P7Js8yYa0Sa+ZnU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V/LgJwoFFr5MJM5yQWogDFr0gKMT6CpcCWh8exsPpU8CCdoWqmV1J5QwOVwlqY+NtFLUxEKEtESlESr8SQJhyPe9GfNRABd64jEykJFfw2e9mJnGfDpLyGjBftsjeMj/3CPpmjuOcesjrjlu9iFBTq9M1cJbwjPOrAE6mxHo8po=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=UCQWkDmR; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=pAmfNNGbi//TEODRGCt0VpY99Lq/fYqBA/ajxnJ70Bo=; b=UCQWkDmRmOmSkXQGKIF+6+M8JV
-	3dZF4gnMiJFLael6fXgEt6WeV8kew4u7mzgjF4RfM3VpWac9BT3/rB4NUhg9TpkeOnG9AwLvAr3WF
-	ec68DvoG0w+zvNTYUxSHdZUVzYTL/eDVqDoXaRkfxfKJ6yreQ/uz0zlnBVOHwy8cTw6g=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wFCrm-00Guok-Az; Tue, 21 Apr 2026 17:18:22 +0200
-Date: Tue, 21 Apr 2026 17:18:22 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Ren Wei <n05ec@lzu.edu.cn>
-Cc: netdev@vger.kernel.org, Felix Maurer <fmaurer@redhat.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, kees@kernel.org,
-	kexinsun@smail.nju.edu.cn, luka.gejak@linux.dev,
-	Arvid.Brodin@xdin.com, m-karicheri2@ti.com, yuantan098@gmail.com,
-	yifanwucs@gmail.com, tomapufckgml@gmail.com, bird@lzu.edu.cn,
-	xuyuqiabc@gmail.com, royenheart@gmail.com
-Subject: Re: [PATCH net v3 1/1] net: hsr: limit node table growth
-Message-ID: <010f9f4c-c03c-4159-aa18-f55be8faf7b4@lunn.ch>
-References: <3bdbe54e81bd89c1443b05500368fb45bddc3191.1776754203.git.royenheart@gmail.com>
+	s=arc-20240116; t=1776784807; c=relaxed/simple;
+	bh=CzEVcDl5gAAqVpLVhu05W8l9aBX4FNIHynLpgN+12iA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=EbBYhRTUwAZYUGo/qlvI3P3ILV1oZyeWEuPK2TP29MF1gA5r+msKUBUXA0KW3goibmKEDoqFS54dsb+4ryuxer7df9EDbBxSSyCV2wF5fXN1QsJPv1syGJGdFWzq7C3O8iVzA0pZKFPLkNVOhLUVccACOjzWkCtZ1rSqLFNW60k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gx2nEI7y; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DBCEC2BCB0;
+	Tue, 21 Apr 2026 15:20:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776784806;
+	bh=CzEVcDl5gAAqVpLVhu05W8l9aBX4FNIHynLpgN+12iA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Gx2nEI7ycw9pZ47NuDcpSSWm7SrZkXpDvcxWWiadutKum/EXfnXZtzHNEydrINJom
+	 QWsQKwvA3o+tWLJygs16Xh9vCCpmlpdv5O+5PKO3UHTX9gSJYMA/jtKUosf8hGPHnh
+	 q9apT75l6Df9MoNl4P6fri0M/zPYIjgNUZFVdXfalMZpWniBp9XCD1FadDcQWqM/RG
+	 KcLd2F5u1reLTs07J681eik6vXFEQMG51Zo0GG/Rn/66mOyTGYBd8b5TYWr5GVADjV
+	 vmIbFUtor+pM9Ty7toRvCq+w//QUX/1wPPkNdFPlE8a2xlYwAMdFAOmWwoaIaapB8T
+	 edarCvY8K/adA==
+Date: Tue, 21 Apr 2026 08:20:05 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: "Nikola Z. Ivanov" <zlatistiv@gmail.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] netdevsim: Initialize all fields of ip header when
+ building dummy sk_buff
+Message-ID: <20260421082005.74a3efb4@kernel.org>
+In-Reply-To: <20260421073738.22110-1-zlatistiv@gmail.com>
+References: <20260421073738.22110-1-zlatistiv@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3bdbe54e81bd89c1443b05500368fb45bddc3191.1776754203.git.royenheart@gmail.com>
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-280167-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,redhat.com,linutronix.de,davemloft.net,google.com,kernel.org,smail.nju.edu.cn,linux.dev,xdin.com,ti.com,gmail.com,lzu.edu.cn];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-280168-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[7];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:dkim,lunn.ch:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8DEAC43CAFF
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 2FF2843CB44
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-> +static unsigned int hsr_node_table_size = 1024;
-> +module_param_named(node_table_size, hsr_node_table_size, uint, 0644);
-> +MODULE_PARM_DESC(node_table_size,
-> +		 "Maximum number of learned entries in each HSR/PRP node table (0 = unlimited)");
-> +
+On Tue, 21 Apr 2026 10:37:38 +0300 Nikola Z. Ivanov wrote:
+> Additionally remove the now redundant zero assignments
+> and reorder the remaining ones so that they more closely
+> match the order of the fields as they appear in the ip header.
 
-Please don't use module parameters. Look at other parts of the network
-stack where such limits are imposed. They all use sysctl values.
-
-    Andrew
-
----
+Doesn't matter, now that the whole thing is zero-initialized.
+I don't think it's worth the noise in the git history.
+-- 
 pw-bot: cr
 
