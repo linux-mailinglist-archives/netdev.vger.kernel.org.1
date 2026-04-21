@@ -1,162 +1,192 @@
-Return-Path: <netdev+bounces-280094-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280097-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MDNRHotn52ld7wEAu9opvQ
-	(envelope-from <netdev+bounces-280094-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 14:03:23 +0200
+	id UMFwHkBp52ke8AEAu9opvQ
+	(envelope-from <netdev+bounces-280097-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 14:10:40 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24C6543A690
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 14:03:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C345D43A782
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 14:10:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5AF7B3068EC1
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 11:57:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 277AC305DA6F
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 12:07:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E934539B965;
-	Tue, 21 Apr 2026 11:57:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 039A835A3B8;
+	Tue, 21 Apr 2026 12:07:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UpMfWFqi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
+Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4AD1347514
-	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 11:57:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.181
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776772671; cv=none; b=qIZzMzbLPKTj0vvN88EQ9lrj2+s7hYwGH4IbeDo9GXgrA+E9jfjSGnK9Swt1/gpWkGKwGGljjgL/Zqvvxj3d8mVfCNwvzuQfcUqTdx4+ec6RB67Ecy0h1w25udFHv+jIMNcBJkgVG8dldPEnjjEDmicvW4hAIa7chIIzoYFPhp4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776772671; c=relaxed/simple;
-	bh=D2pg4QST6SQsj9Y0AlZ3xwmYOqacTuU/qi+aAUKUt00=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AE4D3A758C
+	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 12:07:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.171
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776773240; cv=pass; b=WaxAui0dJZtku9/FhF30XThUDd+BBBn/MhKJ/p7+97Z7IsK0/CACuv+VedhzkVoWiCUJfKZqiqnyw8E4/LZ7gah1Dr2HBzLmcj/pxOnRQmXtzk3t4w7a7z30e+Hza97bCTHaS+j4hBJIPBN/HaTv/B17ZHqucLZLckk6mZOjODY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776773240; c=relaxed/simple;
+	bh=/4xlXlgr5gHhEx7hkQ+MHrDMIugb+AXYYNkM+Z3m22s=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IJHX3Jkt4zq2UD5GAYMCpKv2f/BZlIv+vg9c9KPDAofuSfS9E7Uw8gCnFSiwEUp3lP2r3VRZNUxrXz2rTDRVI8dyUGR/WPcNoOiN9Tx9mANGcz5VVnH+qhT8HDFDFD5pJs6ZSrW+TveaprlvXs7qC0fGp23Exc5tiJ9d+0DjKXU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+	 To:Cc:Content-Type; b=DM0Ijv4fVQCdcDaI7qczAhsJmbWMolpEG5BiJRRLLtBXAMDp6No5bZMC2hOw//6vkBzMevub6QPhClMfpL6gYdoQBDnqwq9nIY/N5jJ/lIfO+moX62NCjmzvyNZJztDpaU3/Um9R0cNRg4jVvLq7aUTe/zN/P/EgExiFxdjXcYY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UpMfWFqi; arc=pass smtp.client-ip=209.85.128.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-56f65f62b4cso1376482e0c.1
-        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 04:57:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776772669; x=1777377469;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-7986e538decso39243697b3.1
+        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 05:07:19 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776773238; cv=none;
+        d=google.com; s=arc-20240605;
+        b=ALufB5Fohd3SEmah3uXeGOxGJygrSZzK7hRO9jX9K856jbKNwDRsvCgTSOpM1poluI
+         1Ykn+/HbQ+oerSdElt+kskP7Jjy6xaQ5SuWOOjefBnN1V6L/cCePwtPD2QA6vxubxX1q
+         SaK10hZvoc9FLwfSSjmW58YE0THRna0OdHglDqi+FHLlF6C2AresZfHXy2w0wGz1R745
+         or60896J6TGBwDgDCkKpIp5OylsP8SSY6r9/wiFYfBrLMIl/uMHO6w3nfKThzTk65g82
+         mosVrfvppV6ATdMo6lMGdxycNoo+lQAH5QGg6SYcN5ZWf0PmsSQEKADz1tRDxKxXUrIL
+         Dp6w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=dpkR/kk9mZLrEXxtkG1ZvoW6WEbgKq8NtjJV67sNSZg=;
+        fh=MeIQixyPH0sjyj6dZ7UCB2RN/asv/PI3fk6jZ+gYAF8=;
+        b=e7+Ij3flj75d+XCd+TfJwstZezMW0iXZmI34EmGH2OkLathAG0ft73+YYVwL1uUu4R
+         7BA2yoVdnl707bAN9jxzwgtI98qg9w6BclvI5U3l2izc9uqD2tlrrZiId2FE9Joecp7F
+         MnA6byn6k2Knc6GDiCwXXjJp5c3WJQbBmcrj4d0kJt+DZ7Nsqt1C5sZJw0d8m7EhUeyv
+         BL5RCIIgr4aQwIjJD6D6xZ/IYeeyLk0cv6fV1IG3pwyM+HZEPWFwCddi88A8jNEPIBd7
+         LdTP8Am8pvXZE8IDGomY+TEd3Qx3m2qrAOl9LRhttpQg+tN72tAte6TbEOmZ1U3pY567
+         XliQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776773238; x=1777378038; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+Ji5jUeRQ9s6IdrcvkqpKzzaDEFKSxwSRUCTUPQc2w4=;
-        b=qkKcGNHe0zZA9yuRWK2wVI7mdaQZ5tt4EPoTcqi9XbwfmKYzoaiWfGjPobWGO+5136
-         lP/xoGpnken6xhLwmop56dM5y2QD1rwt9GlrkaFPa+FSg7HyPsUr/zNxw0g92AEtMjx5
-         vbihkAwbrdLtbyVaqeDTY1pYCuLxwp2bi1Cj9qQQ+OYacwiqEEfXQzcWzVvQxpTkGNVa
-         7zx4eNMHuzESrV73EzhXhmQHAFqFJtuVjLCHRmFWZgWzH32HAzVY5IRZNqgefWzwxrai
-         FW8mITBMakogJe939fgkrODMaSrL0mFtZ5foFuH5COx/n20JpkPxGaSjUpSeMvvADqv0
-         GGsw==
-X-Forwarded-Encrypted: i=1; AFNElJ+xUqvRACVhVsQxRJmrGiQAfxhkW4yJCsmsiTaMEK2RPJxMvQM6LZYoQ814db0VylcXFiNdvV8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxn8CnxIg1oi0A/CokbcUJy05NgKsHB6MYuOVDgiLNeagNMSJlL
-	iRd0RsUmZLyE0gQwJIvE9lq6LO5osL8K4Xoq+dGPXTYFYfz19/YVQOw04Icl4aCa+UQ=
-X-Gm-Gg: AeBDiev1HMJDRxe9t5eOQ41V3OUBHDHDM6G/xoKT66Y1AFjLiDTUq+wOY9Ik0qDaPTN
-	NH+2WqdzOrZktMiPgzgU4vB8DnYnxZWwKhi+LyEjYObfkjNpT8SIQnPUlrChgaeSmwESCGrpubC
-	W7rvfpPgMFu6iqH3ALYxjj6pxwIUtkfcVrcehdTEDeLBFbvOrhZUfS5wB9l7bKL4w7K3MKh/yix
-	C8pncjJ1X7Nt0qAzDTbbJILvs6iIm448U6FckSBwELyRF/V0T3WPt7Rqf8jX4w26zkg/jYTUTi3
-	5PZFpeyCO9F1LrIpu0OIeEE6sPdcJkHd15GYYtQp7Ojn32hxGonAFy4AhM04pSbqxqVYOCRNXYP
-	q9s3FfUg/32NsIRMkJPrDjCp0Oe0O84Ik+jrrKrQJBSn3oJsEgBWqiTL6lFzLsK4OGVYXWBrUdy
-	YTgMwK58y1RSCqDyuhiOmWd0Pz1guOiZSk9OHjz/q3X9WFYGqui/uf5SpDnLLRLeyxWdMhzkM=
-X-Received: by 2002:a05:6122:4b8e:b0:56b:a673:27bb with SMTP id 71dfb90a1353d-56fa5875f49mr7405351e0c.8.1776772668626;
-        Tue, 21 Apr 2026 04:57:48 -0700 (PDT)
-Received: from mail-ua1-f54.google.com (mail-ua1-f54.google.com. [209.85.222.54])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-56fa93253aesm7609743e0c.14.2026.04.21.04.57.46
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Apr 2026 04:57:46 -0700 (PDT)
-Received: by mail-ua1-f54.google.com with SMTP id a1e0cc1a2514c-95673f7b5baso812581241.1
-        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 04:57:46 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ+RT+wVwrPB5Fxkr0xmqF9ntHDCz2uoWC3+2MzO764FHUb2HV87hOnSt+WOYp5/Mzw1gTHfHfs=@vger.kernel.org
-X-Received: by 2002:a05:6102:f8b:b0:601:f386:9ed2 with SMTP id
- ada2fe7eead31-616f4d67f72mr7641295137.7.1776772665998; Tue, 21 Apr 2026
- 04:57:45 -0700 (PDT)
+        bh=dpkR/kk9mZLrEXxtkG1ZvoW6WEbgKq8NtjJV67sNSZg=;
+        b=UpMfWFqiNGTufhiBe3zlzyDkiOLop55WB7RrqrbYGKkSdQvEBsYwgaBKbFBmkxsbAR
+         7BqMRz456e2OhtDnhJne0pI0QzLHPzsTWsH41LqcgOWsnNsKff5+0eyCjn/IE/PMvP4M
+         l4OVLtuLWOvlZEONEEP/3qI5nMKidV5jce3fRmdM9D6rZJrngzxJcF0oK0boVFV525HD
+         GD7B4mWQju1WezwICT7/v6QgCZ2GjYmg8FOEgO5MV5h1u+6T6Zk/v9lVLrShyeAPBXhs
+         yy2O4Qf+XWjx/J0vcwmLa8xZioN+hmuzygUaDJhORiOBvNgpqbi0bp8tkHo6UOhFbmC9
+         axjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776773238; x=1777378038;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=dpkR/kk9mZLrEXxtkG1ZvoW6WEbgKq8NtjJV67sNSZg=;
+        b=KhZHv+hFrMzuBqfKPvlnD5PyqRVkrIfUS3coIkm/xo/ul5b1CRYLpT4xX3G4rkdWKD
+         friOFyhj6jClhCjSg0gtFnWuZJNFmQrDiIjp+DuG7IDBE/zATSI79/Mvb0haVwdYbes8
+         Os7DCWt4eCxFzDEdkErTYZwgaB9iUv4ZJEgUNlvWmXfXE6gZFsAqk3oz3gliYWWoIfHr
+         oRStggZEAUEIHExupjWoGcLOLEzc/gxX7jtfPHTjxlj/XHTu6TE6TjHIFYIAHPuM0mW7
+         aiqjKhi+6Fd1PK9Wvo3lXLp6zM5mYzRS+wqni5liLWeqwZRkWODmxEBQLTRvVLkD/udh
+         i4zg==
+X-Forwarded-Encrypted: i=1; AFNElJ/+KZgkoZFQq/OEkgeGDOB7dgPdXhI+vxODlZEGGjpn7bPff4cf6Stld1sH9Jvy1YkdK0e21LA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyODmvyv7Doruka7WXnLkxDo3FSFYHzNt5MX+x+WveSip+HeGFC
+	VADwYum9klVtObk8cZRbzDUty+1M7j3c65Lg+rGaiGyqkQFrwMQy8/dhM8y+OYgK+dJXQj+iHhi
+	VGT3Icylu3bMIx71yiPn02zYG3lr0kaI=
+X-Gm-Gg: AeBDievlv/AvWhBLDGLYnQ+2LP4ZP9MZMvrvQomHGRN/e/lZKEJ/ZhUlP2DrT0JEEZ5
+	mt89V7xOKGS9VdXCL0Yv11qVj1aC/MUvzr4XAiZ+F9WRN7j61iMYHMyomozfae65KsU+h5CorGh
+	/ROLpw6H6+BMX7gcFr8nVuIKaBioxiJJF0rZ29lRFv41LbTgcWhKxEAJYTe0yGg9SkShEE5C4Pv
+	pVANtKnnIFUx/rwzNP3xlIq2YTCAcqNm60VEsf/N2uuDW2fSv/veXadHKZ9nHv4JhtHkrecnvHi
+	5/YfzV7PE3bHcRDMqvelRD3Ls2RsJq4sMMLHk9mnojXO1ByHHlKn4jj4NC2VmEH8uMWCGps4mV/
+	brkU7FgKyk8Y8ObejBcnTfEhqepRNQ3XKOhhB
+X-Received: by 2002:a05:690c:6287:b0:7b7:c5a2:fa49 with SMTP id
+ 00721157ae682-7b9eced6930mr181294537b3.18.1776773238303; Tue, 21 Apr 2026
+ 05:07:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260421021943.1295109-1-kuba@kernel.org> <c7506c225ce22a71c03abc2673823cf84bbb5b0d.camel@infradead.org>
- <aedkZ5bizasuBPI8@gondor.apana.org.au>
-In-Reply-To: <aedkZ5bizasuBPI8@gondor.apana.org.au>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Tue, 21 Apr 2026 13:57:34 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdU96F_42faeqNzDwaXks7mFrLrkPSJB_QTwxEn9HmVWpQ@mail.gmail.com>
-X-Gm-Features: AQROBzAVi0Fh-UpifM1LaPGNEDH0ax6I6xOmcEB0yUP_KKo8UOyxGmDNb2nIMYw
-Message-ID: <CAMuHMdU96F_42faeqNzDwaXks7mFrLrkPSJB_QTwxEn9HmVWpQ@mail.gmail.com>
-Subject: Re: [PATCH net-deletions] net: remove unused ATM protocols and legacy
- ATM device drivers
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: David Woodhouse <dwmw2@infradead.org>, Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, 
-	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com, 
-	andrew+netdev@lunn.ch, horms@kernel.org, corbet@lwn.net, 
-	skhan@linuxfoundation.org, linux@armlinux.org.uk, tsbogend@alpha.franken.de, 
-	maddy@linux.ibm.com, mpe@ellerman.id.au, npiggin@gmail.com, 
-	chleroy@kernel.org, 3chas3@gmail.com, razor@blackwall.org, idosch@nvidia.com, 
-	jani.nikula@intel.com, mchehab+huawei@kernel.org, tytso@mit.edu, 
-	ebiggers@kernel.org, johannes.berg@intel.com, jonathan.cameron@huawei.com, 
-	kees@kernel.org, kuniyu@google.com, fourier.thomas@gmail.com, 
-	andriy.shevchenko@intel.com, rdunlap@infradead.org, akpm@linux-foundation.org, 
-	linux-doc@vger.kernel.org, linux-mips@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, bridge@lists.linux.dev
+References: <54da3df9-6c91-4df0-87ff-1975d536761d@blemings.org>
+ <CAEoi9W5o_twDPYMZDqajqz+UYJm5wOvAx+hUFefXmU=vUbOgtg@mail.gmail.com>
+ <CAEoi9W6vTPPHh-NBKZcgmo7GKTecQw1UuZ4HjwNTzqvNXWC43g@mail.gmail.com>
+ <7a9547e1-9958-4bce-8547-71a93153a0d6@vk4msl.com> <c412bf83-e8cf-4a3d-8619-63f68e108399@blemings.org>
+ <CALJxBtX_T8sv11ank-arLfoVqJqXegi3D_ZT9ZFbMHkuf-2RAg@mail.gmail.com> <5549733f-c9d6-4bae-84e3-285a317ee334@blemings.org>
+In-Reply-To: <5549733f-c9d6-4bae-84e3-285a317ee334@blemings.org>
+From: Dan Cross <crossd@gmail.com>
+Date: Tue, 21 Apr 2026 08:06:40 -0400
+X-Gm-Features: AQROBzAzZ0GRugiuEw5UqkQyvcGzt_cc-9lr5ym2yuO6kTF9x3niAKkyk3PvjW4
+Message-ID: <CAEoi9W4L3WTVv5Hhiec8D8J=654h-p+Mh_Nd9bbm_cDyardsVA@mail.gmail.com>
+Subject: Re: Discuss: Future of AX25, NETROM and ROSE in the kernel ?
+To: hugh@blemings.id.au
+Cc: Steve Conklin <steve@conklinhouse.com>, Stuart Longland VK4MSL <me@vk4msl.com>, linux-hams@vger.kernel.org, 
+	netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [0.04 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	SUBJECT_ENDS_QUESTION(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[infradead.org,kernel.org,davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,lwn.net,linuxfoundation.org,armlinux.org.uk,alpha.franken.de,linux.ibm.com,ellerman.id.au,gmail.com,blackwall.org,nvidia.com,intel.com,mit.edu,huawei.com,linux-foundation.org,lists.ozlabs.org,lists.linux.dev];
-	TAGGED_FROM(0.00)[bounces-280094-lists,netdev=lfdr.de];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[linux-m68k.org];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[36];
-	MIME_TRACE(0.00)[0:+];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[geert@linux-m68k.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-280097-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,huawei];
-	R_DKIM_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux-m68k.org:email,mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,apana.org.au:email]
-X-Rspamd-Queue-Id: 24C6543A690
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[crossd@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_FIVE(0.00)[5];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,blemings.org:email]
+X-Rspamd-Queue-Id: C345D43A782
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Herbert,
-
-On Tue, 21 Apr 2026 at 13:51, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> On Tue, Apr 21, 2026 at 10:26:18AM +0100, David Woodhouse wrote:
-> > I suspect they don't have a huge amount of interest in the Solos any
-> > more, or the Geode-based SBC they sold with two of them on-board. But
-> > OpenWrt does still support them, and I even have one here (although no
-> > ADSL line to test it with). They were briefly popular as fully Linux-
-> > supported ADSL routers.
+On Tue, Apr 21, 2026 at 2:28=E2=80=AFAM Hugh Blemings <hugh@blemings.org> w=
+rote:
+> Hi All,
 >
-> ADSL is history, it only ever made sense in rich countries where
-> physical copper cables were pre-installed in homes.  While rich
-> countries have moved to fibre, the rest of the world won't use
-> ADSL either because there is no copper cable to begin with.  So
-> it's actually cheaper to just lay a fibre cable for a new install.
+> Just to note in this thread (top posting as it's a bit orthogonal to the
+> rest of this discussion) that events have preceeded us somewhat here
+>
+> A patch just recently submitted removes the AX25, NETROM and ROSE code
+> from the kernel moving it to the mod-orphan sub tree of netdev
+>
+> https://lore.kernel.org/netdev/20260421021824.1293976-1-kuba@kernel.org/T=
+/#u
 
-I am afraid the move to fibre hasn't been completed yet.
-ADSL (VDSL2?) is still being used.
+Wow, that happened much faster than I had anticipated.
 
-Gr{oetje,eeting}s,
+> A shame but perhaps inevitable - but I think we have a good plan
+> unfolding to both take care of medium term maintenance of the kernel
+> code (in tree or out as it may be) as well as a move to userspace in the
+> longer term.
+>
+> For the benefit of the netdev readership - we had a thread over in
+> linux-hams on this but that may not have been visible to folks in
+> netdev.  TL;DR: we think we have a way forward but appreciate this may
+> not be quick enough to meet the requirements/concerns put forward
+>
+> If we can delay removal, that'd be grand, but appreciate that moment may
+> have passed.
 
-                        Geert
+Personally, I think this may actually turn out to be a good thing.  If
+nothing else, it's a forcing function for the ham community to get
+serious about providing an implementation that works well, and in the
+short term, an out-of-tree module can keep things working for folks
+while alternatives are investigated and prepared.
 
--- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+I appreciate that folks want to discuss timing, but it doesn't appear
+that there is much else to be done at this point. It would make sense
+to continue discussion of alternatives over on linux-hams, sparing the
+already-overloaded readers of the netdev list from the sordid details.
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+        - Dan C.
+          (KZ2X)
 
