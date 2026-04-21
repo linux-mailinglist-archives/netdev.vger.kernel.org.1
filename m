@@ -1,176 +1,203 @@
-Return-Path: <netdev+bounces-280086-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280087-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4PLAIDlj52l07gEAu9opvQ
-	(envelope-from <netdev+bounces-280086-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 13:44:57 +0200
+	id UDRbG4Bj52l07gEAu9opvQ
+	(envelope-from <netdev+bounces-280087-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 13:46:08 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7BD543A309
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 13:44:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BD6B143A318
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 13:46:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B91BB304EA8A
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 11:42:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 064043006974
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 11:44:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1382C2D5937;
-	Tue, 21 Apr 2026 11:42:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FE4630E836;
+	Tue, 21 Apr 2026 11:44:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LeCEUSmk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a3pHZQhv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4914279334
-	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 11:42:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2001273D8D
+	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 11:44:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776771762; cv=none; b=XbM05+Rk78SQGhCLLGINrZ/07jJYyerLtsI9P7ZBoDI/RceKEcI5Ne8Q9C3gz4JG64UAtRZR/y2Z5FHKv28pkE1ntezP+K86FV3J4ztJiaZ6zUU6TjDqu1j5Zd7+/GjglLm1GVal6R5AqyvDi+mgBHmGf5TAxHB1WnmCnxlsUZ4=
+	t=1776771883; cv=none; b=NxChag+vBIWLdqKv/0BqAa0hJ1sYpdwSCJLBFgz2YOOzoR5b7eQ4tMbjzpqdgYDqfFL7yKj3qru8nBNznVDjjyi23RwFBT6Na6lkJeW8duV4vJaiBqUQjC5TPQqaWei2GgNUiPbFxKW0ululDEZaF/PF65n//jcFRe9VAA7kwfA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776771762; c=relaxed/simple;
-	bh=9UhTW9xT7PdHQrQSt9P+asq3NpsjAt8tMVdcCDFl78I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Qto+/7vwbbIyTOFNhtNlr2cMoxufaE2YiRVp4+rSLfAN6dF7AkQRmhgUAaIbdupv04YPbalIGig0U0DLYMvrBKt4CW6nlpn8BHQEeSJ1kPXZfmLl8rdVWG9TR/6FkeYO1QKg9eeWC0tHEmCWo0rGkqvjfrP+WGFus0VMBy+gtP0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LeCEUSmk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41949C2BCB0;
-	Tue, 21 Apr 2026 11:42:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776771761;
-	bh=9UhTW9xT7PdHQrQSt9P+asq3NpsjAt8tMVdcCDFl78I=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LeCEUSmkVB7uDQbwNH6WRxnJreyKKHzxK/ZZmuB6Q5UziA7vQCDoWWZ9i+jnMGkdq
-	 9F+W3EKsO+r8UBoKx/C+YTOY2fT+5KlChTL2EZz965qH6ardSN8LV0Pjg6VFnnEdzq
-	 FyjSWLiztf3GRR2pLP4eL5Bk/+dCYSCuex+lfg9HkBhIfnQAn3Yf5fw4n2NmntGpLf
-	 URmBj3TABIIgCgA4nFPh1IzXz+mJr6WmnMgHZb5jnViTsH5Me1PRlDY96hcq6SLAbr
-	 q8C5S815mprEyJYWuMMwyL4lkVhiMLg6+B3bfPXOnidS5tLhwXFFx6nM0s14DGSyFQ
-	 tqDfew4Ilc86Q==
-Date: Tue, 21 Apr 2026 13:42:39 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net v4 2/2] net: airoha: Add missing bits in
- airoha_qdma_cleanup_tx_queue()
-Message-ID: <aedir5VqgERpKiQo@lore-desk>
-References: <20260417-airoha_qdma_cleanup_tx_queue-fix-net-v4-0-e04bcc2c9642@kernel.org>
- <20260417-airoha_qdma_cleanup_tx_queue-fix-net-v4-2-e04bcc2c9642@kernel.org>
- <210f5d0b-6232-4c0f-adff-3a97d54159b3@redhat.com>
+	s=arc-20240116; t=1776771883; c=relaxed/simple;
+	bh=r90+RDns2ZPzVjbqOJnlJ8juGqdMvz1PjVUieZnHHwI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=t+PdqbUhwdBxJDN+9WRuRbAJ6m+Gx18FBPfjlceBbviZHrKQLSk0PAWA48Qk3EjhiCPqNptniz71ykgSP5KW9vBejIK6C06rOrhLf89LTj7hnH1o3aBmJwSBG7P2av5bm84burq0YovOTiVwvVAhQLEymE5sZhFnnKSQqVI0jcE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a3pHZQhv; arc=none smtp.client-ip=209.85.221.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-43d77f6092eso2821026f8f.2
+        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 04:44:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776771880; x=1777376680; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=t+5uZWhRor1Vy//2ATFuXmZg83EPl8Su74lVjjp+oPE=;
+        b=a3pHZQhvhthjQgLDM1SwrQcvQc215usAvgtQkCOxolh/1Cc6mEMtfQ1/rflmYa/p5/
+         HAniKZIPC4j5WgGQr5+EyipolkhaS3ni1BFwNEH4Jht9cYvI3PT3KbZtsqA33tlGpeND
+         tqoJkXLVZ6+GeG1ziKDWo8vSKP7U0l6x9usoVRvXnN+SIVtDWjbieW//7MYXdgk9Ig5Z
+         sFFYWSIsxXNIC/qZuTk+g3oHQDmFdnft7nuUK16I0h89FNJaCGAKujaCUTyEoKrBSxe3
+         75GZ0rSNBXBJfASurXn/4T7aQAaZBxSAvux9ZcqRDAf6mSkvHxJEyNYX4JjYkCFZBDzl
+         S1kA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776771880; x=1777376680;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=t+5uZWhRor1Vy//2ATFuXmZg83EPl8Su74lVjjp+oPE=;
+        b=jRYFNYO1O/XnmINTvlm3guxkXfC7SEL4dpMTDydKIRVH3i5JRyAk8er5PDXKU9Vmht
+         io35uaYGmaJkbMhrvmCx82kS1V/dHo7cv+olbLcROqdKPD9ZmgAWYsD9R18U116BkNC7
+         x73jvCj2PeEWkaVfdHrWnLEC2rI3rIQbwW3j5zjaXLZymzvUTIhzmUZ2LVA99olWgALw
+         LnKfMUn34+zMxMlcvTQsX8UNZ9Z28Lor9VbFO9i0eUhyS3lrzvg0Kjs++ZcJ3w+B9UEg
+         1EEQ7fZc5bWH50JOwSf+IvBzC/B+P9M/UKEmr7OovxErw5AOW/sln/c8y3dJnz44SVss
+         qa0g==
+X-Forwarded-Encrypted: i=1; AFNElJ/c2fLcM8wH+hqi86qSE9HT4F4MFnhrh06+FFSkCmqDNW44cg5y0yef3mSvQiPlaglNY3NLv2A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxOsz3W2p0i/g2H1Q2qIopf22PZLDIXWSPLRMQWAHRxvZLUIlrm
+	B1alCWwbOEzGnbMNaADVJBYLxcKU7MtkTXVqgKBFHqwbr9SjTeMzZCxE
+X-Gm-Gg: AeBDieu4zPIB4ETY0buDwE8zYUS6F0nJC7tVlbSP8DOqQU30ySOoMvwr8g2hH7w2F1J
+	0xQa9qOfi4dAhU0tYUv2GqytiQ618E+gihETX1xMUBCvtkw3XVvWm6+rGzA0C+7/UvyOPuQFnHm
+	BgzRClExYCE7pkVO8afcP7mNAgxVXP2fwLWL+hpfaT9NBzmmepanXlvDri4xfEhghhDyIYmQ2+D
+	JBZiUucI+SxKNEhBZdK8gGF3yqZbsG3I564J+eG5tzKhxFDEKvmzXW2uc8GOB5d0keG3H+HQkb6
+	R19Eyj385cpRa33iQbgz/4QR8Lk/KI1pccQDelay5uJeX9gAH7rCdIoXBRkFIv/58wAZL5vgitz
+	dU2vXta01Gq0p5oNe3EK5/Y7UICVmqwjm3IdBr0l952gQbIIZDzSikZz8qpmXvk4+vWhv0aLYq/
+	UWH78NtRkzi12x57fR2qbwFiiGgYDFCyAa+jtdyqBvY3+4RfU=
+X-Received: by 2002:a05:6000:2dc6:b0:43f:dc54:9493 with SMTP id ffacd0b85a97d-43fe3ddcc21mr27179412f8f.21.1776771880052;
+        Tue, 21 Apr 2026 04:44:40 -0700 (PDT)
+Received: from [192.168.1.169] ([46.10.223.24])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43fe4e4ffa8sm36729294f8f.35.2026.04.21.04.44.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 21 Apr 2026 04:44:39 -0700 (PDT)
+Message-ID: <be429e88-f10a-4d67-a516-67648aa2ab6e@gmail.com>
+Date: Tue, 21 Apr 2026 14:44:38 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="WAIgI6lpLNOsZ8Vj"
-Content-Disposition: inline
-In-Reply-To: <210f5d0b-6232-4c0f-adff-3a97d54159b3@redhat.com>
-X-Spamd-Result: default: False [-2.26 / 15.00];
-	SIGNED_PGP(-2.00)[];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] netdevsim: Initialize all fields of ip header when
+ building dummy sk_buff
+To: Breno Leitao <leitao@debian.org>
+Cc: kuba@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260421073738.22110-1-zlatistiv@gmail.com>
+ <aecyEArzjx8KRp8-@gmail.com> <9ce273bd-6912-4442-8672-4c89bebf32ed@gmail.com>
+ <aec-UcPm5pRZjcSL@gmail.com>
+Content-Language: en-US
+From: "Nikola Z. Ivanov" <zlatistiv@gmail.com>
+In-Reply-To: <aec-UcPm5pRZjcSL@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-280086-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-280087-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[zlatistiv@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D7BD543A309
+X-Rspamd-Queue-Id: BD6B143A318
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 
---WAIgI6lpLNOsZ8Vj
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Apr 21, Paolo Abeni wrote:
-> On 4/17/26 8:36 AM, Lorenzo Bianconi wrote:
-> > @@ -1055,8 +1058,33 @@ static void airoha_qdma_cleanup_tx_queue(struct =
-airoha_queue *q)
-> >  		e->dma_addr =3D 0;
-> >  		e->skb =3D NULL;
-> >  		list_add_tail(&e->list, &q->tx_list);
-> > +
-> > +		/* Reset DMA descriptor */
-> > +		WRITE_ONCE(desc->ctrl, 0);
-> > +		WRITE_ONCE(desc->addr, 0);
-> > +		WRITE_ONCE(desc->data, 0);
-> > +		WRITE_ONCE(desc->msg0, 0);
-> > +		WRITE_ONCE(desc->msg1, 0);
-> > +		WRITE_ONCE(desc->msg2, 0);
->=20
-> Sashiko has some complains on this patch that look legit to me.
+On 4/21/26 12:12 PM, Breno Leitao wrote:
+> On Tue, Apr 21, 2026 at 11:54:19AM +0300, Nikola Z. Ivanov wrote:
+>> On 4/21/26 11:19 AM, Breno Leitao wrote:
+>>> On Tue, Apr 21, 2026 at 10:37:38AM +0300, Nikola Z. Ivanov wrote:
+>>>> Closes: https://syzkaller.appspot.com/bug?extid=23d7fcd204e3837866ff
+>>> How do you check in the report above that the missig un-initialized
+>>> fields are "tos" and "id"?
+>> I don't think it is visible here, my guess would
+>> be because the checksum calculator walks the
+>> header in small chunks instead of referencing
+>> its fields.
+>>
+>> The whole "KMSAN: uninit-value in irqentry_exit_to_kernel_mode_preempt"
+>> doesn't really sound quite right.
+> That's precisely my question - how does this fix relate to that specific
+> report?
+The fact that the 2 call traces from the allocation and usage
+have a common origin in nsim_dev_trap_skb_build sort of gives it away.
+Just to be clear, I saw the syzbot report and started investigating from
+there, not the other way around.
+> Were you able to reproduce the KMSAN report?
+>
+> Thanks for the quick answer,
+> --breno
+Yes, but it is a bit inconsistent.
 
-Hi Paolo,
+Just booting the disk from the report and adding a device
+is enough to trigger it, but we have to wait for some time:
 
-I looked at the issue reported by Sashiko for patch 2/2 and I will send
-a dedicated patch to address it but I guess this problem is not strictly
-related to this patch since we already have the reported issue upstream
-even without this patch (please consider dma_unmap_single() in
-airoha_qdma_cleanup_tx_queue()).
-Moreover, in this patch I want to just add missing bits in
-airoha_qdma_cleanup_tx_queue().
+syzkaller
+syzkaller login: root
+# echo "1 1" > /sys/bus/netdevsim/new_device
+# [  726.477183][ T5462] 8021q: adding VLAN 0 to HW filter on device eth1
 
->=20
-> Also the pre-existing issues mentioned WRT patch 1/2 makes such patch
-> IMHO almost ineffective, I think you should address them in the same seri=
-es.
+# [ 1845.100611][   T80] 
+=====================================================
+[ 1845.102363][   T80] BUG: KMSAN: uninit-value in 
+irqentry_exit_to_kernel_mode_preempt+0x8f/0xa0
+[ 1845.104209][   T80] irqentry_exit_to_kernel_mode_preempt+0x8f/0xa0
+[ 1845.105594][   T80]  irqentry_exit+0x7c/0x7b0
+[ 1845.106629][   T80]  sysvec_apic_timer_interrupt+0x52/0x90
+[ 1845.107829][   T80]  asm_sysvec_apic_timer_interrupt+0x1f/0x30
+[ 1845.108959][   T80]  srso_alias_safe_ret+0x0/0x7
+[ 1845.108959][   T80]  __msan_metadata_ptr_for_load_4+0x24/0x40
+[ 1845.108959][   T80]  ip_fast_csum+0x1e6/0x3f0
+[ 1845.108959][   T80]  nsim_dev_trap_report_work+0x8c0/0x1430
+[ 1845.108959][   T80]  process_scheduled_works+0xbdb/0x1e20
+[ 1845.108959][   T80]  worker_thread+0xee5/0x1590
+[ 1845.108959][   T80]  kthread+0x540/0x600
+[ 1845.108959][   T80]  ret_from_fork+0x210/0x8f0
+[ 1845.108959][   T80]  ret_from_fork_asm+0x1a/0x30
+[ 1845.108959][   T80]
+[ 1845.108959][   T80] Uninit was created at:
+[ 1845.108959][   T80] __kmalloc_node_track_caller_noprof+0x4fb/0x1770
+[ 1845.108959][   T80]  __alloc_skb+0x90d/0x1190
+[ 1845.108959][   T80]  nsim_dev_trap_report_work+0x3f2/0x1430
+[ 1845.108959][   T80]  process_scheduled_works+0xbdb/0x1e20
+[ 1845.108959][   T80]  worker_thread+0xee5/0x1590
+[ 1845.108959][   T80]  kthread+0x540/0x600
+[ 1845.108959][   T80]  ret_from_fork+0x210/0x8f0
+[ 1845.108959][   T80]  ret_from_fork_asm+0x1a/0x30
+[ 1845.108959][   T80]
 
-The issue reported by Sashiko for patch 1/2 are already addressed in the
-following upstream series:
-https://patchwork.kernel.org/project/netdevbpf/cover/20260420-airoha_qdma_i=
-nit_rx_queue-fix-v2-0-d99347e5c18d@kernel.org/
 
->=20
-> Note that you should have commented on sashiko review on the ML, it
-> would have saved a significant amount of time on us.
-
-I guess the main issue here is Sashiko is not currently sending the feedbac=
-ks
-on the ML, right?
-
-Regards,
-Lorenzo
-
->=20
-> /P
->=20
-
---WAIgI6lpLNOsZ8Vj
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaedirwAKCRA6cBh0uS2t
-rKm2AQCJX5EFjUoZOgA0dMAtp47WwtsT6OLTasYJncph2WOH2gEAxwIuV7Vj/njE
-4ErUezlEWo5xp4HVolf/2sJQ1K6Xzw8=
-=DOYM
------END PGP SIGNATURE-----
-
---WAIgI6lpLNOsZ8Vj--
+Thank you,
+Nikola
 
