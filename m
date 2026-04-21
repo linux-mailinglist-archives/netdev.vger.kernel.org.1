@@ -1,63 +1,80 @@
-Return-Path: <netdev+bounces-280114-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280115-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4HmVLnlx52ke8AEAu9opvQ
-	(envelope-from <netdev+bounces-280114-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 14:45:45 +0200
+	id +HYDLtpw52ke8AEAu9opvQ
+	(envelope-from <netdev+bounces-280115-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 14:43:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F53043ACF9
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 14:45:45 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id B912043AC93
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 14:43:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A03013028665
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 12:39:32 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 615FF30074E8
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 12:39:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B7AA3D3002;
-	Tue, 21 Apr 2026 12:39:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF6BE3CF68D;
+	Tue, 21 Apr 2026 12:39:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="KayMGw/U"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AC47sF47"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DE493C9EF0;
-	Tue, 21 Apr 2026 12:39:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8DED2D7DD7;
+	Tue, 21 Apr 2026 12:39:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776775168; cv=none; b=R03fA6IJQ0RrkR5ki3uUCXBKdUCN/ZwVujl+OZ0D/YkeHV6zWpxcdf+VNJf/fBziEHJ3FOuXaTKmkiesF4ePJTtAarQ2+OAZ9pUVgkxtb49yg/SY8AgW8gA7ElfbmKArSxFCATOxPJ1nEU0gnnTwxtcCpFeVDefZMXlKv3gLEG8=
+	t=1776775182; cv=none; b=NxQuqWLQdaYM87MLuqn7CIEioB46QJTbSiFaFMzL43gvHzfUw8CVJQd1NB/L0E2RxNwlYHHM9IS+C8Lpd2gptPurEjK/eLV5/VZJBfokpi0JEg1zyyqur45kPrk7VdMckNarPqLIkMAgYi4UP2KlN/wnfvem+idZwUgKBSBjQ70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776775168; c=relaxed/simple;
-	bh=FZRxT2Zxzs9+HC3NXjgSkzE/MF+8oH7QSAOwbGXNAtc=;
+	s=arc-20240116; t=1776775182; c=relaxed/simple;
+	bh=d3LihHP7jY6TIKD4Yg1TnkCSvBzmJZqKnzSzxjz4rX4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cXtirZ/afKqhRWOKYIlnMnsoEpR4dRbiIvH3ftTZjpUGvra8mIvOcZYUXpP9R/KZMm3w3UKS+dktEQLv7KXWFwBfl9shrfQMUp+cGzKADt1zMfOqj8ot6bed1mG0IttXX+EbiRRLa6Bg5MV4mrl8l/T+AhL7SZpBBIxG/DWP/gs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=KayMGw/U; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=yKZf8xxpFuABnQc+Q/sZVGBB6lGknC2PmRrdojznxRY=; b=KayMGw/U7f6U0o+MVkUTCLVn6k
-	0SHiX1+lckzzD7EGtxujnxHDk1UDww/XxCwfEUDDbWsWHekp5fjXiN0P8IU0L/940BitOEjmKxETH
-	wblmkC1SvSVhzMJuiMszFy/g7XTo2522FLOSFWOBe8zx/1+vq+jEITePQp2iV8z1ApIw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wFANn-00GtRj-V0; Tue, 21 Apr 2026 14:39:15 +0200
-Date: Tue, 21 Apr 2026 14:39:15 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jakub Raczynski <j.raczynski@samsung.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org,
-	davem@davemloft.net, andrew+netdev@lunn.ch,
-	kernel-janitors@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com
-Subject: Re: [PATCH] net/stmmac: Fix typos: 'tx_undeflow_irq' ->
- 'tx_underflow_irq'
-Message-ID: <7eb9e4d4-909c-4203-833d-bd8b664fdfbc@lunn.ch>
-References: <CGME20260421115052eucas1p103281c5b25719a44c0875d6b0860bfa6@eucas1p1.samsung.com>
- <20260421115008.2690541-1-j.raczynski@samsung.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZRO0yMksnvTGDdGDWT8quZOM9YaoyztJqsaSvtdkJKaVSzWPqsF6hr9NqkOxgd3VhbraeAIP1oT7O6vpXQRdm08waRKt4QNPgjw4f3Zqyf9jxAekJNwFHVtbzSblzCBFTzm+ZUxufv4K3wStviDecTBavFXjM+cs05MjzizoXY8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AC47sF47; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E6C5C2BCB0;
+	Tue, 21 Apr 2026 12:39:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776775182;
+	bh=d3LihHP7jY6TIKD4Yg1TnkCSvBzmJZqKnzSzxjz4rX4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=AC47sF47/pg9LF5Famx9RwxaAsUSkc+GRKHFx6grRezUGY/+q49RSMHWa8s8mvp71
+	 iV5kOWd9MirxtkoM8cQJ310VtMy2sDQEnLmTVdkDuNajY8YcRYOuqx6W8HdzG64U+v
+	 +xx3QqjuuhZKo9hbu0lfqw292GeIchac8KdbRW2OLFijC0U9AtQU7CZhL9e+rwcc5D
+	 7tbZAqrQ/XXJHvuIE3ppqcyQK+nppFfrFjlr7RHh9Px+jaeEHeXn/jgwnv46LmUYhp
+	 suW3no8GSoLtZqJplCiDnftqdXMQOe5itE0MclJOH8GNx320OkIuWKdCYKFTNImg1Y
+	 Tah51pQQ+V+uQ==
+Date: Tue, 21 Apr 2026 18:09:24 +0530
+From: Sumit Garg <sumit.garg@kernel.org>
+To: elder@kernel.org
+Cc: andersson@kernel.org, konradybcio@kernel.org, robh@kernel.org,
+	krzk+dt@kernel.org, conor+dt@kernel.org,
+	robin.clark@oss.qualcomm.com, sean@poorly.run,
+	akhilpo@oss.qualcomm.com, lumag@kernel.org, abhinav.kumar@linux.dev,
+	jesszhan0024@gmail.com, marijn.suijten@somainline.org,
+	airlied@gmail.com, simona@ffwll.ch, vikash.garodia@oss.qualcomm.com,
+	dikshita.agarwal@oss.qualcomm.com, bod@kernel.org,
+	mchehab@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	jjohnson@kernel.org, mathieu.poirier@linaro.org,
+	trilokkumar.soni@oss.qualcomm.com, mukesh.ojha@oss.qualcomm.com,
+	pavan.kondeti@oss.qualcomm.com, jorge.ramirez@oss.qualcomm.com,
+	tonyh@qti.qualcomm.com, vignesh.viswanathan@oss.qualcomm.com,
+	srinivas.kandagatla@oss.qualcomm.com,
+	amirreza.zarrabi@oss.qualcomm.com, jens.wiklander@linaro.org,
+	op-tee@lists.trustedfirmware.org, apurupa@qti.qualcomm.com,
+	skare@qti.qualcomm.com, harshal.dev@oss.qualcomm.com,
+	linux-kernel@vger.kernel.org,
+	Sumit Garg <sumit.garg@oss.qualcomm.com>,
+	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
+	linux-media@vger.kernel.org, netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org, ath12k@lists.infradead.org,
+	linux-remoteproc@vger.kernel.org
+Subject: Re: [PATCH v3 12/15] net: ipa: Switch to generic PAS TZ APIs
+Message-ID: <aedv_LEriojkRIwA@sumit-xelite>
+References: <20260327131043.627120-1-sumit.garg@kernel.org>
+ <20260327131043.627120-13-sumit.garg@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,50 +83,116 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260421115008.2690541-1-j.raczynski@samsung.com>
-X-Spamd-Result: default: False [-0.66 / 15.00];
+In-Reply-To: <20260327131043.627120-13-sumit.garg@kernel.org>
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-280114-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280115-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,oss.qualcomm.com,poorly.run,linux.dev,gmail.com,somainline.org,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,qti.qualcomm.com,lists.trustedfirmware.org,vger.kernel.org,lists.freedesktop.org,lists.infradead.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	RCPT_COUNT_GT_50(0.00)[50];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sumit.garg@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:dkim,lunn.ch:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 2F53043ACF9
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,qualcomm.com:email]
+X-Rspamd-Queue-Id: B912043AC93
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
-> @@ -78,7 +78,7 @@ static const struct stmmac_stats stmmac_gstrings_stats[] = {
->  	STMMAC_STAT(rx_vlan),
->  	STMMAC_STAT(rx_split_hdr_pkt_n),
->  	/* Tx/Rx IRQ error info */
-> -	STMMAC_STAT(tx_undeflow_irq),
-> +	STMMAC_STAT(tx_underflow_irq),
+Hey Alex,
 
-Please take another look at this one and think about it.
+On Fri, Mar 27, 2026 at 06:40:40PM +0530, Sumit Garg wrote:
+> From: Sumit Garg <sumit.garg@oss.qualcomm.com>
+> 
+> Switch ipa client driver over to generic PAS TZ APIs. Generic PAS TZ
+> service allows to support multiple TZ implementation backends like QTEE
+> based SCM PAS service, OP-TEE based PAS service and any further future TZ
+> backend service.
+> 
+> Signed-off-by: Sumit Garg <sumit.garg@oss.qualcomm.com>
+> ---
+>  drivers/net/ipa/Kconfig    |  2 +-
+>  drivers/net/ipa/ipa_main.c | 13 ++++++++-----
+>  2 files changed, 9 insertions(+), 6 deletions(-)
+> 
 
-    Andrew
+Can I get an ack from you on this change? I expect this complete
+patch-set to land via Qcom SoC tree.
 
----
-pw-bot: cr
+-Sumit
+
+> diff --git a/drivers/net/ipa/Kconfig b/drivers/net/ipa/Kconfig
+> index 01d219d3760c..a9aff1b7977d 100644
+> --- a/drivers/net/ipa/Kconfig
+> +++ b/drivers/net/ipa/Kconfig
+> @@ -6,7 +6,7 @@ config QCOM_IPA
+>  	depends on QCOM_RPROC_COMMON || (QCOM_RPROC_COMMON=n && COMPILE_TEST)
+>  	depends on QCOM_AOSS_QMP || QCOM_AOSS_QMP=n
+>  	select QCOM_MDT_LOADER
+> -	select QCOM_SCM
+> +	select QCOM_PAS
+>  	select QCOM_QMI_HELPERS
+>  	help
+>  	  Choose Y or M here to include support for the Qualcomm
+> diff --git a/drivers/net/ipa/ipa_main.c b/drivers/net/ipa/ipa_main.c
+> index edead9c48d1f..8feb8493d5b5 100644
+> --- a/drivers/net/ipa/ipa_main.c
+> +++ b/drivers/net/ipa/ipa_main.c
+> @@ -14,7 +14,7 @@
+>  #include <linux/pm_runtime.h>
+>  #include <linux/types.h>
+>  
+> -#include <linux/firmware/qcom/qcom_scm.h>
+> +#include <linux/firmware/qcom/qcom_pas.h>
+>  #include <linux/soc/qcom/mdt_loader.h>
+>  
+>  #include "ipa.h"
+> @@ -624,10 +624,13 @@ static int ipa_firmware_load(struct device *dev)
+>  	}
+>  
+>  	ret = qcom_mdt_load(dev, fw, path, IPA_PAS_ID, virt, phys, size, NULL);
+> -	if (ret)
+> +	if (ret) {
+>  		dev_err(dev, "error %d loading \"%s\"\n", ret, path);
+> -	else if ((ret = qcom_scm_pas_auth_and_reset(IPA_PAS_ID)))
+> -		dev_err(dev, "error %d authenticating \"%s\"\n", ret, path);
+> +	} else {
+> +		ret = qcom_pas_auth_and_reset(IPA_PAS_ID);
+> +		if (ret)
+> +			dev_err(dev, "error %d authenticating \"%s\"\n", ret, path);
+> +	}
+>  
+>  	memunmap(virt);
+>  out_release_firmware:
+> @@ -754,7 +757,7 @@ static enum ipa_firmware_loader ipa_firmware_loader(struct device *dev)
+>  		return IPA_LOADER_INVALID;
+>  out_self:
+>  	/* We need Trust Zone to load firmware; make sure it's available */
+> -	if (qcom_scm_is_available())
+> +	if (qcom_pas_is_available())
+>  		return IPA_LOADER_SELF;
+>  
+>  	return IPA_LOADER_DEFER;
+> -- 
+> 2.51.0
+> 
+> 
 
