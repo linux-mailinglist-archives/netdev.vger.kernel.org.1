@@ -1,178 +1,188 @@
-Return-Path: <netdev+bounces-280244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280245-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kLNWLrbY52kBBwIAu9opvQ
-	(envelope-from <netdev+bounces-280244-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 22:06:14 +0200
+	id cMwIC1Ta52kBBwIAu9opvQ
+	(envelope-from <netdev+bounces-280245-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 22:13:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 567FE43F37C
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 22:06:14 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D01943F538
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 22:13:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C15B43001460
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 20:05:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 798F53010DBD
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 20:07:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9545E3DD526;
-	Tue, 21 Apr 2026 20:05:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5B533DCDB0;
+	Tue, 21 Apr 2026 20:07:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LfboG50J"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QvezgtRZ";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="MHosas3m"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21DD33DD509
-	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 20:05:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81B4A374E7A
+	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 20:07:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776801957; cv=none; b=Sw8NwhwcVWNCtdAMCp5PY1aMVyMCVn3o7EQi75j+eIXNnKwvXn2w+bamieQzWX3L3rq94rTrOgdg7M1QbIDLLHLBK4+C3GcQO1ohdrVQXAsFZjtVdKQDAoF4AhYUzZa5HWuuJrPtZPxDhHVrocpkGbiXD/7cUTaQSa/9tAVYp/k=
+	t=1776802042; cv=none; b=KrqcrcDDILoonRdvTLPGTkXfWfKDJbF8/xaPx5pf7XLDhD09RMT2QfJaCLy9RSEIDfst8kRplQkLIkXybPBF3abv68oey4AeAWCURq5CO5owigACWe+q2oPyFMOvLXz51LyFJis3IDplupyGtMLbPGhch1++p0aP4zguuPqfmmU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776801957; c=relaxed/simple;
-	bh=phULm1Ywed9W8M33T49Q6eS8se2Hvypqz3ZZdmbjhJM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tw4vr254WS5vqspxi3PDSAevI0CpOz0bCi6hJZo0WCe8A+fQDB7HFEMzOcuf5YieWoFKqIVLcHwWHWyE5pwLqX2tbx1mkgCJ2pNcHG+Zaoq02OW7U5GHs7Xj0/pXAAfErl6cfass/9DqbVNA+72DNApLHtxsXheIgyt6fFmQ0Yg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LfboG50J; arc=none smtp.client-ip=209.85.167.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5a0ff30b240so6975943e87.0
-        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 13:05:55 -0700 (PDT)
+	s=arc-20240116; t=1776802042; c=relaxed/simple;
+	bh=4nGXNP+FFeyOAfKIybOpKVmX6+Eo9BNgkIzpy4p7zWI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=V3vLBysuMcYKUM2U6yLkt1pUivv/H99g00cxzZ2z5lgNkhE9LLpvUzbcLqXLao4f72T0UtmcjIrweym4vhflI7vMznWnldF/kYcb1K2K4RrSuUXwxuPvn+xj6rkB41B6QoMPI029NKB+JcAQpFP2fEc/WaF472oCy0hGRz3Gd4U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QvezgtRZ; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=MHosas3m; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1776802040;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1M8Wy22x3elv2D/+fnXEPtAuCSkz1UNFVYr+3jYCUkE=;
+	b=QvezgtRZvjorCItDceiuYhJOxuZvfoFyvo1UmZN2XTH5d3c7q0rEKTTEfaPQDWh4S2E8Zc
+	ql7I1QYK5ftMdwfeqJSlDhmdyDQhXlO4LDvU6Uef6qGt6LMJgNNJWqggzba8EOlWBSTqoA
+	aZW7GTq4z+5uFzwPlq0TYnN3E26nD7s=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-634-VUXHBUrENdywA55cOKF9WQ-1; Tue, 21 Apr 2026 16:07:19 -0400
+X-MC-Unique: VUXHBUrENdywA55cOKF9WQ-1
+X-Mimecast-MFC-AGG-ID: VUXHBUrENdywA55cOKF9WQ_1776802039
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-8a8ea3f1becso21550166d6.0
+        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 13:07:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776801954; x=1777406754; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aK4izauZRRt/B/VXYkiUQKoI5K7lJzjxQ+RWvCNLSKk=;
-        b=LfboG50JLmVr+cFmySs7f1HhhIew/QilyA0gHA4pXVhSqqQq9W5Qtv0lEGdXZTRrCl
-         J7G3U5HWvFalRlTiwCLWoA2zNVZ+6DvHuSYO6d8aASyd8zfOzUVM1ki4N5GmKOjWjhee
-         5cgVNihXuWFoctzZ2ESS3+uLBPaZxqd4glk5C3Onm2qJgkRBnHRG/+Dyt3qR8sKXt9b2
-         ZJsWNY/JmB3IbVP8PGNQ19w51sjFmN/Y/9FKMuvWllbAtBlbhEHRQejuxVbCcYNfy0Hc
-         733uVBUofTxPifcjEpfYL3l/LbMP/9Fo10iz5YIv1vdHGdFCw9NC/9O8+K4ZmnhJtYSK
-         0hjw==
+        d=redhat.com; s=google; t=1776802039; x=1777406839; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=1M8Wy22x3elv2D/+fnXEPtAuCSkz1UNFVYr+3jYCUkE=;
+        b=MHosas3mb1L69W6BUum5er65QveWeuoSi1fmAZ6Q/ey3aAb2I6m+DcCWq/VWlwBtrz
+         B7mVmpqbgX0MzUad+oO7aMV5VetUeHCIwNDDBKmi3Rjhr08hqooyMxcIz1KTRslxZ3ht
+         IVdcBRBS1sOhSFPSWS8i6yxSiG1l/iTnloBNiw3OIDm8jcJwqmJUKkqMl+kRiK9MnRGk
+         LtbJJszUmqX5YXE8WsxtUFehC/li947xbNWapeXt0LlBxh9HPTMIv6NvbtujiYRnB0fi
+         P0Qvm467GzNeHBWOAK76h0wMgcWzh4e3nbEOSKoIGhjKyxt6F6kxCqPOojnF4NyK7sTv
+         bu5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776801954; x=1777406754;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=aK4izauZRRt/B/VXYkiUQKoI5K7lJzjxQ+RWvCNLSKk=;
-        b=Mq07G6fTo9ZaWuKlYxrAfvx/mMs2IqRPOeYkmCQAjCPvp7QBt1b+Zb01Lw0A+7ICii
-         VwJbVsij6atpYpTrsO0faKmtsbUTlkRh/NvE5mb1VrudCney4PCFyf3y8kpG6H8dzbpN
-         K+/5B8SLcOvDMIGhjJlB3Bw3zslbYPtN8g+EaBLMOvXjTwi294CNu2UAxMs0OtsTBwmP
-         6r+QWiQno/jLMjUuZ7Ig6/bBmHPYcHz/HbA8cJp1DUIMG0ITUGh/fhneAV9nzICPt541
-         nc7nqYcUvsCQw+D4eEh6bUzv5jypUy/3FmqPWTwbe4c2o2jRnc5W22b5EyxbDir2dKfG
-         2FeA==
-X-Forwarded-Encrypted: i=1; AFNElJ+goTVrTywxV+PazhtZq3mfem9r9+6YmR93+QLmq8owefqrge8PqWVd1h7SPhYgXgpN070svIU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YypwSxAgSe5iTaAM7cGZi9Y3OJcsDtvn6R9oxmIjKRWIQr7SmTp
-	b8SqjwY3vqeJ7fW2FDk4OfeEdPAKRk/kqXSVWYZOq/UBDQOxYJ8Q7END
-X-Gm-Gg: AeBDietP0naX+COfzDm7OjYXHtC6xDYab5Xtjss8lFMxB0t7GtwaN0AxaugAyon6o82
-	DsC+m5aukkdZB6po9ZCcXRqG029p+9bGCmM5Fo62ytArPOU8662AWFDtOHO+gIMcMVJKI0zY0zd
-	uxHmEaIE3Flr+bYoeJvbWBNT3RcMmuWaL98vgaxaMuPzdbCOmDliUxWbf6DxoY6DZEG0/87gzdL
-	CfAYxGvVr6Cy40mfmtL576SCCRnAuhvHi8Fg8OjeI8y1oUkk3gdFhY3cyuywWZXOqy2tIktCLjU
-	uCjqvjGXafugRCtULvsmFbwH08lrklM4sz8/NX1OmFUAHCPwOTXwd0F8oSqBHjIC7/0xUmpJ22k
-	IAt2gIZODT39V5kYyq9/Oj+zJI1PXPoN3pkn8bktRu6mrh83xEYZ8HCYcEIQomNrZ201AGHTcHT
-	37okdj8+gFZLbzi/b0eT5Z2CRYwrirzzncT/WLiCF/WvE=
-X-Received: by 2002:a05:6512:3b12:b0:5a3:f3a4:1aff with SMTP id 2adb3069b0e04-5a4172e87afmr5498771e87.38.1776801954040;
-        Tue, 21 Apr 2026 13:05:54 -0700 (PDT)
-Received: from foxbook (bfh75.neoplus.adsl.tpnet.pl. [83.28.45.75])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5a4187e11ecsm3934256e87.47.2026.04.21.13.05.51
-        (version=TLS1_2 cipher=AES128-SHA bits=128/128);
-        Tue, 21 Apr 2026 13:05:52 -0700 (PDT)
-Date: Tue, 21 Apr 2026 22:05:47 +0200
-From: Michal Pecio <michal.pecio@gmail.com>
-To: Morduan Zang <zhangdandan@uniontech.com>
-Cc: petkan@nucleusys.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch,
- linux-usb@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com, Zhan Jun
- <zhanjun@uniontech.com>,
- syzbot+3f46c095ac0ca048cb71@syzkaller.appspotmail.com
-Subject: Re: [PATCH] net: usb: rtl8150: fix use-after-free in
- rtl8150_start_xmit()
-Message-ID: <20260421220547.2f7f9d85.michal.pecio@gmail.com>
-In-Reply-To: <73ACB7391A6DE033+20260421110412.14795-1-zhangdandan@uniontech.com>
-References: <73ACB7391A6DE033+20260421110412.14795-1-zhangdandan@uniontech.com>
+        d=1e100.net; s=20251104; t=1776802039; x=1777406839;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1M8Wy22x3elv2D/+fnXEPtAuCSkz1UNFVYr+3jYCUkE=;
+        b=HiuauUkTaf6nl7K1sZse5a/bpP7Y2IrihMjvMPiSP7DgcaODlV1ZSduN4RGov5Z1ma
+         1ANOUMb95839W8S67Bd+KozlW9jyjoT51P31nOx/sZ4+nyl3UG6zfU85hcxo2DQUilRV
+         TY1/7GQb7iEkMyOTbEDmvFvy1gR22IbTKoOSf2GHToSkEd4gGP7FRmjIYjRYdtl8Vf+j
+         2haSbQ+9c4E9NMQt6MvR3hjXPETLziturlazGvJ3qsfBhz0tBVeuzb/ee49O3ElJF93+
+         ZFYpGp2rvVxpy8Rt4/GxzfWGdPNKtGfYYWXHgP1CB4mdG8mYs0cVhSyR+E1eHgihtNAh
+         6yOw==
+X-Forwarded-Encrypted: i=1; AFNElJ8pYGuTDD5MTUq+SKP6tnEChFzW0oByffQ8cTBdgj/OwkKL6TUmSfMYe+rQz+MnNKPO0yJ+3uY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxniJB0XtxsGmeCDRIq+inE00tPA8oMdYLASpXZYQWVlhP3fPEG
+	3DpC9VfzSFryXnaPMccvb0hRv011ewD77teECVz+Ln269hsgReC78dVt0z69004TirB8W2iWRpt
+	hil8vQyQObQB4gNXPC0HvTbnYytX+JjHYbN+Ccunvkh3ehhXyImH/RbLp3w==
+X-Gm-Gg: AeBDietfRkokuVlIBQosBz8kPMuy8zNweKIamyGCIosln2CjrIqqK0QHuN5jpJ1g+qb
+	lSF6Qv9u7RFMo3MjaRpIxsW6GtEGeoZ3QES/cJiOQRh0EkvE7Eb/RWpXES2leE7E2A8gD4Fjj7G
+	YYPYqjkqbUk/ZMK0IgqHeTFn2+Imih6H3nN6UtBROjRMqfnibKcSxSN5ymmYo1NKmB5JEhz2ZP6
+	maJMihs3f84yflNXaUxSpDiLBg64j32EkReE9Idz77hyhX9SioVqEnXad4rhF4nNSuFfAKIJIYf
+	Na36CVnogpI1W6Rt9u57tXpq5mfGE7YRsJ2vVFm5R6QnPABY3K4WBkMSMRh7viZBobzvCDTpeRZ
+	+GlLTPXAaMLSSuq0So+23/j3GU+c0KPy/GPofAlk4IA==
+X-Received: by 2002:a05:6214:300c:b0:8a4:5cfe:a204 with SMTP id 6a1803df08f44-8b0280d0e78mr313218206d6.26.1776802038999;
+        Tue, 21 Apr 2026 13:07:18 -0700 (PDT)
+X-Received: by 2002:a05:6214:300c:b0:8a4:5cfe:a204 with SMTP id 6a1803df08f44-8b0280d0e78mr313217376d6.26.1776802038427;
+        Tue, 21 Apr 2026 13:07:18 -0700 (PDT)
+Received: from rh-jkangas-kernel ([2601:1c2:4400:6bf0:7677:bcee:4ef0:e09d])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8b02ae5c4b9sm149503046d6.28.2026.04.21.13.07.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Apr 2026 13:07:18 -0700 (PDT)
+Date: Tue, 21 Apr 2026 13:07:13 -0700
+From: Jared Kangas <jkangas@redhat.com>
+To: jan.petrous@oss.nxp.com
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Chester Lin <chester62515@gmail.com>,
+	Matthias Brugger <mbrugger@suse.com>,
+	Ghennadi Procopciuc <ghennadi.procopciuc@oss.nxp.com>,
+	NXP S32 Linux Team <s32@nxp.com>, Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Frank Li <Frank.Li@nxp.com>,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	imx@lists.linux.dev, devicetree@vger.kernel.org,
+	rmk+kernel@armlinux.org.uk, vladimir.oltean@nxp.com,
+	boon.khai.ng@altera.com
+Subject: Re: [PATCH v11 2/4] arm64: dts: s32: set Ethernet channel irqs
+Message-ID: <aefY8WGCuNr4BQG4@rh-jkangas-kernel>
+References: <20260312-dwmac_multi_irq-v11-0-09621ccb040b@oss.nxp.com>
+ <20260312-dwmac_multi_irq-v11-2-09621ccb040b@oss.nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260312-dwmac_multi_irq-v11-2-09621ccb040b@oss.nxp.com>
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-280244-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280245-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[29];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,suse.com,oss.nxp.com,nxp.com,pengutronix.de,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org,lists.linux.dev,armlinux.org.uk,altera.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[michalpecio@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jkangas@redhat.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,3f46c095ac0ca048cb71];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,uniontech.com:email]
-X-Rspamd-Queue-Id: 567FE43F37C
+	TAGGED_RCPT(0.00)[netdev,dt,kernel];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9D01943F538
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, 21 Apr 2026 19:04:12 +0800, Morduan Zang wrote:
-> From: Zhan Jun <zhanjun@uniontech.com>
+On Thu, Mar 12, 2026 at 09:55:28AM +0100, Jan Petrous via B4 Relay wrote:
+> From: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
 > 
-> syzbot reported a KASAN slab-use-after-free read in rtl8150_start_xmit()
-> when accessing skb->len for tx statistics after usb_submit_urb() has
-> been called:
+> The GMAC Ethernet controller found on S32G2/S32G3 and S32R45
+> contains up to 5 RX and 5 TX channels.
+> It can operate in two interrupt modes:
 > 
->   BUG: KASAN: slab-use-after-free in rtl8150_start_xmit+0x71f/0x760
->     drivers/net/usb/rtl8150.c:712
->   Read of size 4 at addr ffff88810eb7a930 by task kworker/0:4/5226
+>   1) Sharing IRQ mode: only MAC IRQ line is used
+>      for all channels.
 > 
-> The URB completion handler write_bulk_callback() frees the skb via
-> dev_kfree_skb_irq(dev->tx_skb). The URB may complete on another CPU
-> in softirq context before usb_submit_urb() returns in the submitter,
-> so by the time the submitter reads skb->len the skb has already been
-> queued to the per-CPU completion_queue and freed by net_tx_action():
+>   2) Multiple IRQ mode: every channel uses two IRQ lines,
+>      one for RX and second for TX.
 > 
->   CPU A (xmit)                      CPU B (USB completion softirq)
->   ------------                      ------------------------------
->   dev->tx_skb = skb;
->   usb_submit_urb()      --+
->                           |-------> write_bulk_callback()
->                           |           dev_kfree_skb_irq(dev->tx_skb)
->                           |         net_tx_action()
->                           |           napi_skb_cache_put()   <-- free
->   netdev->stats.tx_bytes  |
->     += skb->len;          <-- UAF read
+> Specify all IRQ twins for all channels.
 > 
-> Fix it by caching skb->len before submitting the URB and using the
-> cached value when updating the tx_bytes counter.
+> Reviewed-by: Matthias Brugger <mbrugger@suse.com>
+> Signed-off-by: Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
+> ---
 
-Question:
-Is it correct that ETH_ZLEN padding isn't counted in tx_bytes?
+Tested the new channels on an S32G-VNP-RDB3 while testing patch 4/4.
 
-> This mirrors the fix pattern used by other USB network drivers.
+Tested-by: Jared Kangas <jkangas@redhat.com>
 
-Which ones? I looked at a few and they either:
-
-- appear to have the same bug (kaweth)
-- update stats on URB completion, right before freeing skb
-- copy data out of skb, update stats, free skb before URB completion
-
-Regards,
-Michal
 
