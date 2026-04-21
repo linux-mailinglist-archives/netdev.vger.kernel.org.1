@@ -1,188 +1,234 @@
-Return-Path: <netdev+bounces-280030-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280031-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8O1nNxsq52mo4wEAu9opvQ
-	(envelope-from <netdev+bounces-280030-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 09:41:15 +0200
+	id cKjFK+Er52nv4wEAu9opvQ
+	(envelope-from <netdev+bounces-280031-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 09:48:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59BDF437C12
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 09:41:15 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5391437D73
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 09:48:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2FBD030234EC
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 07:37:52 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C09C430131A7
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 07:38:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA478384251;
-	Tue, 21 Apr 2026 07:37:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3FE331F9B4;
+	Tue, 21 Apr 2026 07:38:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WWXGP0GI"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="X0NCrz35"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42DD9384249
-	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 07:37:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B15A21FB1
+	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 07:38:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776757069; cv=none; b=oqUd2wB6zILhIz35d64huxG+xtPZrCoAldDplOiiidnPogGAW3xvNmYnStgrNc3lP1FI7qu4G7+0Qe3sOlTefzAAXvj7zJxMIh8/Zq1qh3JQONxdbt8FxlY3Z+StvT2bHBSGKO8kNbzvlQGYDFYMlA872DyKZry2rZ5bl6InwPA=
+	t=1776757128; cv=none; b=LZmjyNrRf9YbsC2xfnXhrmsQw0ZGsAuIZVIrlwuqa7XTsxmKMpBuLTMORZKctpEWriRt7aWhiwm4VQAimXGKLNn5NOcYIsGVryTzujsNIf3XJNjTgTMrORvq4TiNrK0YzIbLiFGaT+Ca4QeY+Wu1dJP0LjYfaHeY7i6gcEnL0F0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776757069; c=relaxed/simple;
-	bh=rt4wqxwDz7bsDxeraQEO0K5hU8JIJcUXKnSVXRUwNTw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UT91ceNAWCftKky5BnKFTeqYrufIyiGjDKr3lSiGaqC8HUQhD5tD3gEoOk2m/RKm1AY/b35q/YcmEncZpSHLIWX+r8xjbkTYUwE+mPUXeqej3eCTOsI1a2SF+rgqtKqnALnZqGPL3AKSlHIixrgg7/GX5arJAM26B2HkVYp8tI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WWXGP0GI; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-48a563e4ef7so2338735e9.0
-        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 00:37:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776757067; x=1777361867; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q9MSpkDs/YA1OHYfaSUQ5bT/WJy5enL5wzyN0Hj8Q2s=;
-        b=WWXGP0GIQ24RyQosqY0cq0/RzQfNrVMcW0JIwJL9Tf36FLaTiZnEj17M0m+OgK40y5
-         4d5RIMDijF5gssP5ElMMokTF1Ev1cu3Ig4oUG5MLIo4pDXkep0iBo5H3iag3sM7vYApl
-         upNH72xlWI30KWnblYn+zu3ikW+K77A0pJg3mIrhsxH+/gSgNgcWs/xBvEJtacJzsOA5
-         rDbZG4ltoZ7umlVKCYysTC5veGltc+2UxlIMwja5ic+EWrrvYmBEIRwNuG2SF/sW8H6O
-         +Oi1/luEoCO3z+O0nZoJAeUNTaFQQuC9cNdT4slKRUI/xcBC9hFpaohVzA7kbHdZCV8e
-         II0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776757067; x=1777361867;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Q9MSpkDs/YA1OHYfaSUQ5bT/WJy5enL5wzyN0Hj8Q2s=;
-        b=A01chSRZC1G+Vdvff0iJZMWyrw3HZbg+EoDFWGgObMbDxbvrOZVw3KdHZnvICPRIlv
-         H0PRzPNYsCNLpUgjtOx5JO93BSc5IwVwp4E52r/fRziPKUqzNLQeNWIY3c/ny/ZRYT1R
-         GXnrJ1nEYp6ZMo/0Aak9X7unqe8l3X0eJ+5Nf+/PUtOt6hPYlrm+L91FarlpPvq7nfFx
-         Qj72AdxyFOxZGTJRnAz2TYQEvImhs4r0dPEQi5Xp6g12kDxREwogBzqXHpQskKHG+ixO
-         KDMPRIz4OmjT/7ti8zFKHLTEkiAeaY+3+h+pp3f9HJ1zFFuFYmUIF7k6Ou0sEouYRac3
-         v/ig==
-X-Gm-Message-State: AOJu0YzQ3aoD33njCgYf1HD4nnne9i1oE/3DoRD7UcdRZLxU6jjd9+pP
-	HQXbu0wHzdifi1BZLhALA0agVv9aDE+hRiN3JX5wVQ37504EaGEWik9yj8Odxw==
-X-Gm-Gg: AeBDieuPs+NcQVynu39toDvFkUthtvpQujbSJsXznoZTZOHmERFTLv3yqEslgFFj5pz
-	XwMeivVZ0VPhVwkSGzPuyi5zRj808/+/gcbIurSQlddUDHAd61m2w+kJf6M/S1soRAbnwa99GsN
-	Qz0XzjEo/PpdhJnOrDyXaGBmgoE2gr4EvnWMn+Fm0klVgnQa2jXfLC5rpgFkiPYIxkxGZhc4WEe
-	FAmIt+gGwiHSkq9isbGtooXDIYTJG+fdBEN8FLJ0hH01zgyXRvdug6xH2zjGtBUTx3Jgfw22eba
-	nC0UNVh12WpN/mTkrUC/sXtW2YHZ7WOT8vG2tgmdcXuyKBLaD96CMqp0odvw9KM7YyDXMJ9/iGC
-	ojLUoBXj8MStsb0zyfJuWQWXMImtVbnIXzJKrRVNrz+K2UkRLz35JQjkXvcEdGQzDNPQ/BX+hp7
-	kIQ8CVsP7NSqoELxwCr5Yegs3/vcSEBw==
-X-Received: by 2002:a05:600c:314b:b0:485:3a86:6392 with SMTP id 5b1f17b1804b1-488fb778b66mr217390275e9.20.1776757066300;
-        Tue, 21 Apr 2026 00:37:46 -0700 (PDT)
-Received: from fedora-dev ([46.10.223.24])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488fc100162sm373883825e9.5.2026.04.21.00.37.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Apr 2026 00:37:45 -0700 (PDT)
-From: "Nikola Z. Ivanov" <zlatistiv@gmail.com>
-To: kuba@kernel.org,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Nikola Z. Ivanov" <zlatistiv@gmail.com>
-Subject: [PATCH net] netdevsim: Initialize all fields of ip header when building dummy sk_buff
-Date: Tue, 21 Apr 2026 10:37:38 +0300
-Message-ID: <20260421073738.22110-1-zlatistiv@gmail.com>
-X-Mailer: git-send-email 2.53.0
+	s=arc-20240116; t=1776757128; c=relaxed/simple;
+	bh=T8+txFGJbSd7pqG0VM0u/AKNe/d5ZsR4Somkcg9M2hc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CwEza62N8/YRMIXtg9K+VwKvashtBOrTZAzVTDAlfwGnDNDQxCZ48sHGMdyhqXUTUXvGnvnxeDYkAbDcKAZqHCmX7vuPvVrp/sq/8JGBLGBMvNr45g3oxpkg/c2IvPVNyj8WDlgCe0QM71a+gKXTB4cyfnXC5bCglcU95vNf3dU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=X0NCrz35; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=mmzYx+XSlrG3aJoi8HyzFYPaBUsofyWO1FoGWRs4/P8=; b=X0NCrz35DxRc9cRkitFAhH9X6+
+	yk0poLY9ubaIC47GPvnNOYZARrrokzT9TwogccnvZnREFWG1YF6hPgH+PlHhFUqbDPA8V1ZzHQXES
+	2yOS2iuoHi1p0Dl77enCvaQEczjGjK3NkZ3C3Tl+4TqUlXs2Gi63ZOtISNPO0RPXcJGQdTzWvKRq3
+	gaQR8gWvZPErN6dphtYDT8Q+80+h6TMIY68syrJqrw2eqLfXTAPf8Unml/3UT+LnSYCL2ZKffhnZy
+	okSxRecHLwU7a522hCB8J22sUBS+c50a70ItvPNkRYaxzTkDNz95Rf2PfyNYZ8CcpUflwLUDzYmzl
+	Sd9MDNrg==;
+Received: from sslproxy03.your-server.de ([88.198.220.132])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1wF5gy-000DAd-1v;
+	Tue, 21 Apr 2026 09:38:44 +0200
+Received: from localhost ([127.0.0.1])
+	by sslproxy03.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1wF5gx-0009jm-27;
+	Tue, 21 Apr 2026 09:38:44 +0200
+Message-ID: <c97b3bd6-e79e-4f78-a29b-77d4fa20e32a@iogearbox.net>
+Date: Tue, 21 Apr 2026 09:38:41 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] ipv6: Implement limits on extension header parsing
+To: Justin Iurman <justin.iurman@gmail.com>,
+ Eric Dumazet <edumazet@google.com>
+Cc: kuba@kernel.org, dsahern@kernel.org, tom@herbertland.com,
+ willemdebruijn.kernel@gmail.com, idosch@nvidia.com, pabeni@redhat.com,
+ netdev@vger.kernel.org
+References: <20260417171831.687053-1-daniel@iogearbox.net>
+ <60b47924-dae4-4a10-b977-75b92e1094c0@gmail.com>
+ <ae053593-907e-4891-90fb-03b4c5d8f5e1@iogearbox.net>
+ <b57f31a2-456e-4727-839a-bc2f0fb07855@gmail.com>
+ <CANn89i+Y0jctj8=tCHFP5jDSJBAWR=RvNfagammc-WqU6EdPRw@mail.gmail.com>
+ <75d98880-afcd-43f9-8bd5-b874fa5690f5@gmail.com>
+ <e084bf5d-99bf-4e23-8dc1-3e7e13c58a2e@gmail.com>
+Content-Language: en-US
+From: Daniel Borkmann <daniel@iogearbox.net>
+Autocrypt: addr=daniel@iogearbox.net; keydata=
+ xsFNBGNAkI0BEADiPFmKwpD3+vG5nsOznvJgrxUPJhFE46hARXWYbCxLxpbf2nehmtgnYpAN
+ 2HY+OJmdspBntWzGX8lnXF6eFUYLOoQpugoJHbehn9c0Dcictj8tc28MGMzxh4aK02H99KA8
+ VaRBIDhmR7NJxLWAg9PgneTFzl2lRnycv8vSzj35L+W6XT7wDKoV4KtMr3Szu3g68OBbp1TV
+ HbJH8qe2rl2QKOkysTFRXgpu/haWGs1BPpzKH/ua59+lVQt3ZupePpmzBEkevJK3iwR95TYF
+ 06Ltpw9ArW/g3KF0kFUQkGXYXe/icyzHrH1Yxqar/hsJhYImqoGRSKs1VLA5WkRI6KebfpJ+
+ RK7Jxrt02AxZkivjAdIifFvarPPu0ydxxDAmgCq5mYJ5I/+BY0DdCAaZezKQvKw+RUEvXmbL
+ 94IfAwTFA1RAAuZw3Rz5SNVz7p4FzD54G4pWr3mUv7l6dV7W5DnnuohG1x6qCp+/3O619R26
+ 1a7Zh2HlrcNZfUmUUcpaRPP7sPkBBLhJfqjUzc2oHRNpK/1mQ/+mD9CjVFNz9OAGD0xFzNUo
+ yOFu/N8EQfYD9lwntxM0dl+QPjYsH81H6zw6ofq+jVKcEMI/JAgFMU0EnxrtQKH7WXxhO4hx
+ 3DFM7Ui90hbExlFrXELyl/ahlll8gfrXY2cevtQsoJDvQLbv7QARAQABzSZEYW5pZWwgQm9y
+ a21hbm4gPGRhbmllbEBpb2dlYXJib3gubmV0PsLBkQQTAQoAOxYhBCrUdtCTcZyapV2h+93z
+ cY/jfzlXBQJjQJCNAhsDBQkHhM4ACAsJCAcNDAsKBRUKCQgLAh4BAheAAAoJEN3zcY/jfzlX
+ dkUQAIFayRgjML1jnwKs7kvfbRxf11VI57EAG8a0IvxDlNKDcz74mH66HMyhMhPqCPBqphB5
+ ZUjN4N5I7iMYB/oWUeohbuudH4+v6ebzzmgx/EO+jWksP3gBPmBeeaPv7xOvN/pPDSe/0Ywp
+ dHpl3Np2dS6uVOMnyIsvmUGyclqWpJgPoVaXrVGgyuer5RpE/a3HJWlCBvFUnk19pwDMMZ8t
+ 0fk9O47HmGh9Ts3O8pGibfdREcPYeGGqRKRbaXvcRO1g5n5x8cmTm0sQYr2xhB01RJqWrgcj
+ ve1TxcBG/eVMmBJefgCCkSs1suriihfjjLmJDCp9XI/FpXGiVoDS54TTQiKQinqtzP0jv+TH
+ 1Ku+6x7EjLoLH24ISGyHRmtXJrR/1Ou22t0qhCbtcT1gKmDbTj5TcqbnNMGWhRRTxgOCYvG0
+ 0P2U6+wNj3HFZ7DePRNQ08bM38t8MUpQw4Z2SkM+jdqrPC4f/5S8JzodCu4x80YHfcYSt+Jj
+ ipu1Ve5/ftGlrSECvy80ZTKinwxj6lC3tei1bkI8RgWZClRnr06pirlvimJ4R0IghnvifGQb
+ M1HwVbht8oyUEkOtUR0i0DMjk3M2NoZ0A3tTWAlAH8Y3y2H8yzRrKOsIuiyKye9pWZQbCDu4
+ ZDKELR2+8LUh+ja1RVLMvtFxfh07w9Ha46LmRhpCzsFNBGNAkI0BEADJh65bNBGNPLM7cFVS
+ nYG8tqT+hIxtR4Z8HQEGseAbqNDjCpKA8wsxQIp0dpaLyvrx4TAb/vWIlLCxNu8Wv4W1JOST
+ wI+PIUCbO/UFxRy3hTNlb3zzmeKpd0detH49bP/Ag6F7iHTwQQRwEOECKKaOH52tiJeNvvyJ
+ pPKSKRhmUuFKMhyRVK57ryUDgowlG/SPgxK9/Jto1SHS1VfQYKhzMn4pWFu0ILEQ5x8a0RoX
+ k9p9XkwmXRYcENhC1P3nW4q1xHHlCkiqvrjmWSbSVFYRHHkbeUbh6GYuCuhqLe6SEJtqJW2l
+ EVhf5AOp7eguba23h82M8PC4cYFl5moLAaNcPHsdBaQZznZ6NndTtmUENPiQc2EHjHrrZI5l
+ kRx9hvDcV3Xnk7ie0eAZDmDEbMLvI13AvjqoabONZxra5YcPqxV2Biv0OYp+OiqavBwmk48Z
+ P63kTxLddd7qSWbAArBoOd0wxZGZ6mV8Ci/ob8tV4rLSR/UOUi+9QnkxnJor14OfYkJKxot5
+ hWdJ3MYXjmcHjImBWplOyRiB81JbVf567MQlanforHd1r0ITzMHYONmRghrQvzlaMQrs0V0H
+ 5/sIufaiDh7rLeZSimeVyoFvwvQPx5sXhjViaHa+zHZExP9jhS/WWfFE881fNK9qqV8pi+li
+ 2uov8g5yD6hh+EPH6wARAQABwsF8BBgBCgAmFiEEKtR20JNxnJqlXaH73fNxj+N/OVcFAmNA
+ kI0CGwwFCQeEzgAACgkQ3fNxj+N/OVfFMhAA2zXBUzMLWgTm6iHKAPfz3xEmjtwCF2Qv/TT3
+ KqNUfU3/0VN2HjMABNZR+q3apm+jq76y0iWroTun8Lxo7g89/VDPLSCT0Nb7+VSuVR/nXfk8
+ R+OoXQgXFRimYMqtP+LmyYM5V0VsuSsJTSnLbJTyCJVu8lvk3T9B0BywVmSFddumv3/pLZGn
+ 17EoKEWg4lraXjPXnV/zaaLdV5c3Olmnj8vh+14HnU5Cnw/dLS8/e8DHozkhcEftOf+puCIl
+ Awo8txxtLq3H7KtA0c9kbSDpS+z/oT2S+WtRfucI+WN9XhvKmHkDV6+zNSH1FrZbP9FbLtoE
+ T8qBdyk//d0GrGnOrPA3Yyka8epd/bXA0js9EuNknyNsHwaFrW4jpGAaIl62iYgb0jCtmoK/
+ rCsv2dqS6Hi8w0s23IGjz51cdhdHzkFwuc8/WxI1ewacNNtfGnorXMh6N0g7E/r21pPeMDFs
+ rUD9YI1Je/WifL/HbIubHCCdK8/N7rblgUrZJMG3W+7vAvZsOh/6VTZeP4wCe7Gs/cJhE2gI
+ DmGcR+7rQvbFQC4zQxEjo8fNaTwjpzLM9NIp4vG9SDIqAm20MXzLBAeVkofixCsosUWUODxP
+ owLbpg7pFRJGL9YyEHpS7MGPb3jSLzucMAFXgoI8rVqoq6si2sxr2l0VsNH5o3NgoAgJNIg=
+In-Reply-To: <e084bf5d-99bf-4e23-8dc1-3e7e13c58a2e@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Virus-Scanned: Clear (ClamAV 1.4.3/27977/Mon Apr 20 08:26:26 2026)
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[iogearbox.net,reject];
+	R_DKIM_ALLOW(-0.20)[iogearbox.net:s=default2302];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
+	FREEMAIL_CC(0.00)[kernel.org,herbertland.com,gmail.com,nvidia.com,redhat.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-280031-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280030-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com,google.com];
+	DKIM_TRACE(0.00)[iogearbox.net:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zlatistiv@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	NEURAL_HAM(-0.00)[-0.998];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,syzkaller.appspot.com:url]
-X-Rspamd-Queue-Id: 59BDF437C12
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,iogearbox.net:dkim,iogearbox.net:mid]
+X-Rspamd-Queue-Id: B5391437D73
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Syzbot reports a KMSAN uninit-value originating from
-nsim_dev_trap_skb_build, with the allocation also
-being performed in the same function.
+On 4/18/26 4:15 PM, Justin Iurman wrote:
+> On 4/18/26 15:46, Justin Iurman wrote:
+>> On 4/18/26 15:15, Eric Dumazet wrote:
+>>> On Sat, Apr 18, 2026 at 5:50 AM Justin Iurman <justin.iurman@gmail.com> wrote:
+>>>> On 4/18/26 14:26, Daniel Borkmann wrote:
+>>>>> On 4/18/26 1:45 PM, Justin Iurman wrote:
+>>>>>> On 4/17/26 19:18, Daniel Borkmann wrote:
+>>>>> [...]
+>>>>>>> diff --git a/net/ipv6/sysctl_net_ipv6.c b/net/ipv6/sysctl_net_ipv6.c
+>>>>>>> index d2cd33e2698d..93f865545a7c 100644
+>>>>>>> --- a/net/ipv6/sysctl_net_ipv6.c
+>>>>>>> +++ b/net/ipv6/sysctl_net_ipv6.c
+>>>>>>> @@ -135,6 +135,14 @@ static struct ctl_table ipv6_table_template[] = {
+>>>>>>>            .extra1        = SYSCTL_ZERO,
+>>>>>>>            .extra2        = &flowlabel_reflect_max,
+>>>>>>>        },
+>>>>>>> +    {
+>>>>>>> +        .procname    = "max_ext_hdrs_number",
+>>>>>>> +        .data        = &init_net.ipv6.sysctl.max_ext_hdrs_cnt,
+>>>>>>> +        .maxlen        = sizeof(int),
+>>>>>>> +        .mode        = 0644,
+>>>>>>> +        .proc_handler    = proc_dointvec_minmax,
+>>>>>>> +        .extra1        = SYSCTL_ONE,
+>>>>>>> +    },
+>>>>>>>        {
+>>>>>>>            .procname    = "max_dst_opts_number",
+>>>>>>>            .data        = &init_net.ipv6.sysctl.max_dst_opts_cnt,
+>>>>>>
+>>>>>> NACKed-by: Justin Iurman <justin.iurman@gmail.com>
+>>>>>>
+>>>>>> +1000 on the need, but NAK on the way it is done. IMO, we don't want
+>>>>>> yet-another-sysctl for that. Instead, we have (well, not yet, but it's
+>>>>>> about time) this series [1] to enforce ordering and occurrences of
+>>>>>> Extension Headers, which is based on an IETF draft [2] (FYI, draft-
+>>>>>> ietf-6man-eh-limits is dead). I think we should enforce ordering and
+>>>>>> occurrences in this code path too, instead of relying on a sysctl.
+>>>>>> Let's keep both code paths consistent.
+>>>>
+>>>>> Hm, that series [1] should probably go to net instead of net-next, but atm
+>>>>
+>>>> +1, would make sense.
+>>>>
+>>>>> hasn't moved since a month. I'd still think max_ext_hdrs_number would be
+>>>>> useful given it has less complexity also for stable, but I guess ultimately
+>>>>> up to maintainers..
+>>>>
+>>>> In the short term, I agree. What worries me is that we end up with a
+>>>> redundant, or even useless, sysctl once the other series is applied,
+>>>> which will only increase user confusion.
+>>>
+>>> Given the amount of bugs in this code, a sysctl is safe and quire reasonable.
+>>>
+>>> No one will object when it is eventually removed (or has no action)
+>>>
+>>> For the record,  I approve Daniel patch.
+>>
+>> Fair enough. If there is consensus on this patch, then let me just suggest two changes:
+>>
+>> - make it clear in the sysctl description that it mainly applies to TX (as opposed to the other series [1] discussed earlier that applies to RX)
+> 
+> Sorry, I meant it does not apply to core RX (ip6_rcv()), which is what series [1] does.
+> 
+>> - set the default to 8 (which should be the max value) instead of 32, as per RFC8200, Sec. 4.
+Ok, I'll switch to use 8 as a default limit and I'm looking to also cover ip6_rcv()
+path as well in the next revision given its also affected but less severe as the
+icmp6 path.
 
-The cause of the KMSAN warning is a missing assignment of
-the tos and id fields of the ip header.
-
-Fix this by calling skb_put_zero instead of skb_put to
-guarantee null initialization.
-Additionally remove the now redundant zero assignments
-and reorder the remaining ones so that they more closely
-match the order of the fields as they appear in the ip header.
-
-Closes: https://syzkaller.appspot.com/bug?extid=23d7fcd204e3837866ff
-Fixes: da58f90f11f5 ("netdevsim: Add devlink-trap support")
-Signed-off-by: Nikola Z. Ivanov <zlatistiv@gmail.com>
----
-There is a very similar function in psample.c called nsim_dev_psample_skb_build
-which is almost identical to nsim_dev_trap_skb_build except for the
-allocation flag reflecting its non-interrupt context and the fact
-it does proper initialization of all fields.
-Since these 2 are almost identical would it make sense to combine them
-into 1, possbly by passing the allocation flags as parameters?
-
-Thank you in advance for reviewing and answering!
-
- drivers/net/netdevsim/dev.c | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/net/netdevsim/dev.c b/drivers/net/netdevsim/dev.c
-index 1e06e781c835..64b7cc3a6575 100644
---- a/drivers/net/netdevsim/dev.c
-+++ b/drivers/net/netdevsim/dev.c
-@@ -829,16 +829,14 @@ static struct sk_buff *nsim_dev_trap_skb_build(void)
- 	skb->protocol = htons(ETH_P_IP);
- 
- 	skb_set_network_header(skb, skb->len);
--	iph = skb_put(skb, sizeof(struct iphdr));
--	iph->protocol = IPPROTO_UDP;
--	iph->saddr = in_aton("192.0.2.1");
--	iph->daddr = in_aton("198.51.100.1");
--	iph->version = 0x4;
--	iph->frag_off = 0;
-+	iph = skb_put_zero(skb, sizeof(struct iphdr));
- 	iph->ihl = 0x5;
-+	iph->version = 0x4;
- 	iph->tot_len = htons(tot_len);
- 	iph->ttl = 100;
--	iph->check = 0;
-+	iph->protocol = IPPROTO_UDP;
-+	iph->saddr = in_aton("192.0.2.1");
-+	iph->daddr = in_aton("198.51.100.1");
- 	iph->check = ip_fast_csum((unsigned char *)iph, iph->ihl);
- 
- 	skb_set_transport_header(skb, skb->len);
--- 
-2.53.0
-
+Thanks,
+Daniel
 
