@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-279967-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279968-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kE+7GQnW5mkz1QEAu9opvQ
-	(envelope-from <netdev+bounces-279967-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 03:42:33 +0200
+	id kIBbOT/W5mkz1QEAu9opvQ
+	(envelope-from <netdev+bounces-279968-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 03:43:27 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4B3E4354D5
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 03:42:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 349D14354EA
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 03:43:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C55053019913
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 01:42:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AB09A300F507
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 01:42:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C34A25CC57;
-	Tue, 21 Apr 2026 01:42:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C6B9259CBD;
+	Tue, 21 Apr 2026 01:42:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="apZpLsYU"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CJ6D67Lq"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66F7B13D8B1
-	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 01:41:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC7612472AA
+	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 01:42:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776735721; cv=none; b=pIlLBwrcfQMTwDWQ5D7UGTbnKnET7RltRBdf0YhemZdgqBK92paWcRmIkNwXdbRuFb9AN8G2CB8tLduf3M0oBINXFK+FF4o749f824jo8f05S550Ye4yqcTRn2vI/LTv83E8dQcpj5UIrINmPhJHKtfKDJFSVZ7b4m8VWP5JSNs=
+	t=1776735732; cv=none; b=rbQl1B5uhPQPDDt3Rf//XbUFT0FWmP4VAlrDt2WTIGy+yNGVMOmfySb4m9mespbCHVxOoGOVnqF4YsiYB8+HwqX5YBhF+GYUbs/A6yDhBFTq69yGhv8sQd8rIlTNCCCERuzHj8qlAzRHMg4rQvMXw/FvHO5TShnZS7ggnVxMAAA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776735721; c=relaxed/simple;
-	bh=9RWUVF9t30DCtCc3PQoNg12mjY31lao951WtO7/ZGck=;
+	s=arc-20240116; t=1776735732; c=relaxed/simple;
+	bh=+jivgo8F04KnUHhy6bWrTSYvaQveSjYK9h3Sw3pvtGI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OPcH71RaV8YUZasjMLoiptlQ6nwpungfALUJyBSB+pZt7PfzK06/TKsWuyHszt+58646vh/g1BJTbFYti4nfVN0jDHX3smuPEnX6XZYSiz0UgYORMjlHQMvr+5/7bYb5z71R1Na3R7DVWq1jKB9zzNpeE+Ja0XDlRkx2YdCvceE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=apZpLsYU; arc=none smtp.client-ip=95.215.58.174
+	 MIME-Version; b=o8DuZFN5Rk6bZrdFo/Omjm1M7JDfDbmnVttsg8YzPOJKclXa9VL3vAZhbdQqVTJr6uP6spTArEkRo/2A6ovWHgh2pFv4X7TAW8Him1TnuVFEwKPEpBSh0SlzTjlhepdFsJKsnQcbeDIjQBdntyzdG15rhgafD67CYDZ4TYKsqXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CJ6D67Lq; arc=none smtp.client-ip=95.215.58.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1776735717;
+	t=1776735729;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=upnWS51x8TXsekOIwMtL9/fKEX7rDTpp2wV3il56Nq0=;
-	b=apZpLsYUi3YCIh/1c0CsQ+8SwoNsVY1F6XbEXinn6ngvKFrN+KTYeaxwPjCOYZpcD3JvkI
-	JgyU2uTPvUhGQXHBD7JQrJgbFEWdTEWIG1WrPyVQT38a/b+D/t2XNwWp/i90G1prj++yyq
-	8ykVNgC8ike2PzYVTsDs0ZMPdY+uhGo=
+	bh=WG0nh5bwGAOA2A2XwuA3nf8x8N8TsuMcnYxJjZYW1o8=;
+	b=CJ6D67Lq5KXHfMd3uNcZrsLpF2u6lAYdaomxM+4PZAedK9kAyqioYkMbCBCBa6eCETlMuw
+	gNfhyyW5Wd4yaEtcLaFTBQJknDaR1AXTd1NZcFGx0pYiV2UJojY4A2dHt8KqMtSppPSUa0
+	FTxydWAR3Yck1xNG0CWdqAziQQqufbU=
 From: Jiayuan Chen <jiayuan.chen@linux.dev>
 To: netdev@vger.kernel.org
 Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
@@ -59,9 +59,9 @@ Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
 	Shuah Khan <shuah@kernel.org>,
 	linux-kernel@vger.kernel.org,
 	linux-kselftest@vger.kernel.org
-Subject: [PATCH net v2 1/2] tcp: send a challenge ACK on SEG.ACK > SND.NXT
-Date: Tue, 21 Apr 2026 09:41:00 +0800
-Message-ID: <20260421014128.289362-2-jiayuan.chen@linux.dev>
+Subject: [PATCH net v2 2/2] selftests/net: packetdrill: cover RFC 5961 5.2 challenge ACK on both edges
+Date: Tue, 21 Apr 2026 09:41:01 +0800
+Message-ID: <20260421014128.289362-3-jiayuan.chen@linux.dev>
 In-Reply-To: <20260421014128.289362-1-jiayuan.chen@linux.dev>
 References: <20260421014128.289362-1-jiayuan.chen@linux.dev>
 Precedence: bulk
@@ -83,7 +83,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-279967-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-279968-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[13];
@@ -98,83 +98,90 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,linux.dev:dkim,linux.dev:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C4B3E4354D5
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 349D14354EA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-RFC 5961 Section 5.2 validates an incoming segment's ACK value
-against the range [SND.UNA - MAX.SND.WND, SND.NXT] and states:
+RFC 5961 Section 5.2 / RFC 793 Section 3.9 require a challenge ACK
+whenever an incoming SEG.ACK falls outside
+[SND.UNA - MAX.SND.WND, SND.NXT].  There is currently no packetdrill
+coverage for either edge.
 
-  "All incoming segments whose ACK value doesn't satisfy the above
-   condition MUST be discarded and an ACK sent back."
+Add tcp_rfc5961_ack-out-of-window.pkt, which in a single passive-open
+connection exercises:
 
-Commit 354e4aa391ed ("tcp: RFC 5961 5.2 Blind Data Injection Attack
-Mitigation") opted Linux into this mitigation and implements the
-challenge ACK on the lower side (SEG.ACK < SND.UNA - MAX.SND.WND),
-but the symmetric upper side (SEG.ACK > SND.NXT) still takes the
-pre-RFC-5961 path and silently returns
-SKB_DROP_REASON_TCP_ACK_UNSENT_DATA, even though RFC 793 Section 3.9
-(now RFC 9293 Section 3.10.7.4) has always required:
+  - Upper edge (SEG.ACK > SND.NXT): peer ACKs data that was never
+    sent before the server has transmitted anything.
+  - Lower edge (SEG.ACK < SND.UNA - MAX.SND.WND): after the server
+    has sent 2000 bytes (the peer-advertised rwnd forces two 1000-byte
+    segments, both acknowledged), peer sends an ACK that is older
+    than the acceptable window.
 
-  "If the ACK acknowledges something not yet sent (SEG.ACK > SND.NXT)
-   then send an ACK, drop the segment, and return."
+Both cases must elicit a challenge ACK
+<SEQ = SND.NXT, ACK = RCV.NXT, CTL = ACK>.  The per-socket RFC 5961
+Section 7 rate limit is disabled for the duration of the test so that
+both challenge ACKs can fire back-to-back.
 
-Complete the mitigation by sending a challenge ACK on that branch,
-reusing the existing tcp_send_challenge_ack() path which already
-enforces the per-socket RFC 5961 Section 7 rate limit via
-__tcp_oow_rate_limited().  FLAG_NO_CHALLENGE_ACK is honoured for
-symmetry with the lower-edge case.
-
-Update the existing tcp_ts_recent_invalid_ack.pkt selftest, which
-drives this exact path, to consume the new challenge ACK.
-
-Fixes: 354e4aa391ed ("tcp: RFC 5961 5.2 Blind Data Injection Attack Mitigation")
 Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
 Reviewed-by: Eric Dumazet <edumazet@google.com>
 ---
- net/ipv4/tcp_input.c                                   | 10 +++++++---
- .../net/packetdrill/tcp_ts_recent_invalid_ack.pkt      |  4 +++-
- 2 files changed, 10 insertions(+), 4 deletions(-)
+ .../tcp_rfc5961_ack-out-of-window.pkt         | 46 +++++++++++++++++++
+ 1 file changed, 46 insertions(+)
+ create mode 100644 tools/testing/selftests/net/packetdrill/tcp_rfc5961_ack-out-of-window.pkt
 
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index 021f745747c5..c2b6f05acdfa 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -4284,11 +4284,15 @@ static int tcp_ack(struct sock *sk, const struct sk_buff *skb, int flag)
- 		goto old_ack;
- 	}
- 
--	/* If the ack includes data we haven't sent yet, discard
--	 * this segment (RFC793 Section 3.9).
-+	/* If the ack includes data we haven't sent yet, drop the
-+	 * segment.  RFC 793 Section 3.9 and RFC 5961 Section 5.2
-+	 * require us to send an ACK back in that case.
- 	 */
--	if (after(ack, tp->snd_nxt))
-+	if (after(ack, tp->snd_nxt)) {
-+		if (!(flag & FLAG_NO_CHALLENGE_ACK))
-+			tcp_send_challenge_ack(sk, false);
- 		return -SKB_DROP_REASON_TCP_ACK_UNSENT_DATA;
-+	}
- 
- 	if (after(ack, prior_snd_una)) {
- 		flag |= FLAG_SND_UNA_ADVANCED;
-diff --git a/tools/testing/selftests/net/packetdrill/tcp_ts_recent_invalid_ack.pkt b/tools/testing/selftests/net/packetdrill/tcp_ts_recent_invalid_ack.pkt
-index 174ce9a1bfc0..ee6baf7c36cf 100644
---- a/tools/testing/selftests/net/packetdrill/tcp_ts_recent_invalid_ack.pkt
-+++ b/tools/testing/selftests/net/packetdrill/tcp_ts_recent_invalid_ack.pkt
-@@ -19,7 +19,9 @@
- 
- // bad packet with high tsval (its ACK sequence is above our sndnxt)
-    +0 < F. 1:1(0) ack 9999 win 20000 <nop,nop,TS val 200000 ecr 100>
--
-+// Challenge ACK for SEG.ACK > SND.NXT (RFC 5961 5.2 / RFC 793 3.9).
-+// ecr=200 (not 200000) proves ts_recent was not updated from the bad packet.
-+   +0 > . 1:1(0) ack 1 <nop,nop,TS val 200 ecr 200>
- 
-    +0 < . 1:1001(1000) ack 1 win 20000 <nop,nop,TS val 201 ecr 100>
-    +0 > . 1:1(0) ack 1001 <nop,nop,TS val 200 ecr 201>
+diff --git a/tools/testing/selftests/net/packetdrill/tcp_rfc5961_ack-out-of-window.pkt b/tools/testing/selftests/net/packetdrill/tcp_rfc5961_ack-out-of-window.pkt
+new file mode 100644
+index 000000000000..44d54c812820
+--- /dev/null
++++ b/tools/testing/selftests/net/packetdrill/tcp_rfc5961_ack-out-of-window.pkt
+@@ -0,0 +1,46 @@
++// SPDX-License-Identifier: GPL-2.0
++//
++// RFC 5961 Section 5.2 / RFC 793 Section 3.9: an incoming segment's
++// ACK value must lie in [SND.UNA - MAX.SND.WND, SND.NXT]; otherwise
++// the receiver MUST discard the segment and send a challenge ACK
++// back.  Exercise both edges of that window in a single connection.
++
++`./defaults.sh
++sysctl -q net.ipv4.tcp_invalid_ratelimit=0
++`
++
++   0 socket(..., SOCK_STREAM, IPPROTO_TCP) = 3
++  +0 setsockopt(3, SOL_SOCKET, SO_REUSEADDR, [1], 4) = 0
++  +0 bind(3, ..., ...) = 0
++  +0 listen(3, 1) = 0
++
++// Three-way handshake.  Peer advertises rwnd = 1000 (no wscale), so
++// MAX.SND.WND is tracked as 1000.
++  +0 < S 0:0(0) win 1000 <mss 1000,sackOK,nop,nop,nop,wscale 0>
++  +0 > S. 0:0(0) ack 1 <...>
+++.1 < . 1:1(0) ack 1 win 1000
++  +0 accept(3, ..., ...) = 4
++
++// ---- Upper edge: SEG.ACK > SND.NXT --------------------------------
++// Server has sent nothing yet, so SND.UNA = SND.NXT = 1.
++// Peer sends a pure ACK with SEG.ACK = 2, beyond SND.NXT.
++  +0 < . 1:1(0) ack 2 win 1000
++// Expect a challenge ACK: <SEQ = SND.NXT = 1, ACK = RCV.NXT = 1>.
++  +0 > . 1:1(0) ack 1
++
++// Advance SND.UNA past MAX.SND.WND so that the lower edge becomes
++// reachable.  Write 2000 bytes; the peer's rwnd of 1000 forces two
++// 1000-byte segments, each acknowledged in turn.
++  +0 write(4, ..., 2000) = 2000
++  +0 > P. 1:1001(1000) ack 1
+++.01 < . 1:1(0) ack 1001 win 1000
++  +0 > P. 1001:2001(1000) ack 1
+++.01 < . 1:1(0) ack 2001 win 1000
++// Now SND.UNA = SND.NXT = 2001, MAX.SND.WND = 1000, bytes_acked = 2000.
++
++// ---- Lower edge: SEG.ACK < SND.UNA - MAX.SND.WND ------------------
++// SND.UNA - MAX.SND.WND = 2001 - 1000 = 1001, so SEG.ACK = 1000 falls
++// below the acceptable range.
++  +0 < . 1:1(0) ack 1000 win 1000
++// Expect a challenge ACK: <SEQ = SND.NXT = 2001, ACK = RCV.NXT = 1>.
++  +0 > . 2001:2001(0) ack 1
 -- 
 2.43.0
 
