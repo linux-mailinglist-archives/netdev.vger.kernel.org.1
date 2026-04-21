@@ -1,62 +1,91 @@
-Return-Path: <netdev+bounces-280163-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280164-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mML/LK6S52lE+AEAu9opvQ
-	(envelope-from <netdev+bounces-280163-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 17:07:26 +0200
+	id KLajABST52lE+AEAu9opvQ
+	(envelope-from <netdev+bounces-280164-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 17:09:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB8F843C881
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 17:07:25 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 532C843C8BC
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 17:09:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E75693048909
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 14:58:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2241630DEA76
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 14:59:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98DCF3D9DA1;
-	Tue, 21 Apr 2026 14:57:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88AC93DB626;
+	Tue, 21 Apr 2026 14:58:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sX7IFuO9"
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmtyylji0my4xnjeumjiw.icoremail.net (zg8tmtyylji0my4xnjeumjiw.icoremail.net [162.243.161.220])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACF3B3DA5BD
-	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 14:57:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.243.161.220
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1935E3D905D
+	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 14:58:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776783427; cv=none; b=guSlBScpKTZSAsv69lxvzx4McjFmeuvG/nI4sSGMDckTdyt2TKjn3BJXcmxmI+CVzZ1n/I+dRrR0wsJZi24mcHShjIIeJD+/7lyVs4p/I/gfMc+AGvd7rVTJlXr+/O5S73jURTUaNbrrfO3rTNr7r1LA8aOhORYMo+XORR3cXDU=
+	t=1776783515; cv=none; b=GChdeu6slmGZVuIev2tr6Zpl0GuMfgKuG9nziaa9oNEXJBRMnEYfQt0vsUtRax5sWeMH7QOrl0ZNxWsxrVJmL6U3KbWoMEZsCwJi2nkyzMeOnXmG80WvFcY8oJuOsxIn4JVgtYOTQZJ+AhaUnP0h2hYdtLYMzzcvJmhGK48hKjE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776783427; c=relaxed/simple;
-	bh=vEyLqj7GaYFLC6EbF+/TuhCsA+lmUXD5qUR6PdSVoXk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Fqqd/YjXNXmBvK7eOnzX4/ceV9SNdu9jIEbdAGqGUeDKtIjDU5JuAiG41JNDJz/rq2v3BHMTghHSdCT2IJjNtcu/9+G5ucz6E0hyn4rOz2UGQHvU2APyFw+xx2qefCs7PUrFG0Gnt3njClHQLvR68gRwAI85ytEVlVkh/Sx+emk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=162.243.161.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
-Received: from enjou-Legion-Y7000P-2019.coin-barley.ts.net (unknown [172.23.56.36])
-	by app1 (Coremail) with SMTP id ygmowABn4AAbkOdpBvrYAA--.15877S2;
-	Tue, 21 Apr 2026 22:56:27 +0800 (CST)
-From: Ren Wei <n05ec@lzu.edu.cn>
-To: netdev@vger.kernel.org,
-	Felix Maurer <fmaurer@redhat.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: davem@davemloft.net,
+	s=arc-20240116; t=1776783515; c=relaxed/simple;
+	bh=oMkPWBQsIyoDnS+6ID/6raP7oGgOgpzWjkT5mVWy8yo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=de4LmjkKzIEdz1qAtczj9dB4GxPRGjxD5Tjvr3fhB6Z+Ha8Esb8Hck82nVXXxZjW6VJHJar9UEuyWBqPFd7+sYFU6DZeSH6s6rHCqpOWOvr46RMvzMRjWJiPQPBSgP0qjaSF8w/peSpLq0ZgR5GHrTNGFYcnej41Cy9GCX43AMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=sX7IFuO9; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4891c00e7aeso22002705e9.2
+        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 07:58:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776783512; x=1777388312; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZQ35oSVSI4KSh+xmtYFc6UscETFGPvX8289l7HgBZZY=;
+        b=sX7IFuO9Lry8AJxT66mZzoFtzq76iRkJrtiR5o5lF13RDCw/vYkJaaEFTflld3Kgd/
+         U2g92QwLkrUlN93eJ5o4M1DfovBS/FLCrM/0lSU7s12KKKCFOwUFTXKl9fMCemF1x5qG
+         C4L5aUgvGEWz8wtZYN9PbtbnnnvcYTWTzpP3t1Bd5bnUe9LufzfyL6qR62SJJjF3F7wQ
+         dbt1KBIH0+hF8qjijuyJW7hd4g3NaUjUwBWckYf0N/h73HuLhJTtYYpda3NBta/NNmHn
+         fmHGYzsgZyesHP0FP3Sweg8aqmxNuAjNtVgYE/49Y1flO7uzzeWanJI6nUY6y4HG461I
+         sgrA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776783512; x=1777388312;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZQ35oSVSI4KSh+xmtYFc6UscETFGPvX8289l7HgBZZY=;
+        b=Y0ARKIT5EzPNm1YSMA7KZGL6cYo2NR1ZGNfGni4YZN5BRs/9tbuiFweJMUwDqGvTs9
+         TNcb8stD80BcMevz4r3q1gWgoGQQpYl50G8YzP8SzloFBKWVMKptvUYqsbkWcgYWZjem
+         aTwQ5yqC2+jOIaYs9HsngGaCzokbt3ug+xD06eE84O1UCO76/2zpj8EZy4qYiT99YZlT
+         OiT43BDnXgj6Y4C3T7AJY7O4CnWrLa1fmsYv80GszkLB+QBbJ7DsgF6MECmKVU90TlG7
+         nffOgd1ZxKkrsbJn7U+OGSop5mU/qItU0VbNXpQf4JWFZPxI9xo+Od6YH1j22cVdOh6x
+         Pj8A==
+X-Gm-Message-State: AOJu0YxjifNr5t03Nq2IO6H/6zHTDYX51idIjEh2O6Be418YyJvGAQd8
+	Us/bO3LZdz263M54xNnLZUXyKVH8PN8lVsCs/xe33QXsy5TQljhHX9q9FjGFu/9wb7U=
+X-Gm-Gg: AeBDietMEvc+hDiSpnSA+NBAnA879J3POGLBXzMevyxqIaLYnRn3Un22sJ+BLhJihyo
+	jmcMC+SsVckEml/vtIQ2XHXLp6hu04fwv4hWVFM47qwz2YQn7o3qtaVn+7wd/pybIZVJ6F94Y+N
+	sX0Y84gtvpxOClCfTLPKeby/NLnOjF2UPdqXC/JaBH0HXkepIKXdWxOVhK4UanKyQFSG7bFzaSk
+	i2BX5KT+5ZNM1NxZFzO7NKMJrnKTAMXBqwyz1d8pdedQfDerUt3n284DoKkyfdpGX+BtxhAtNME
+	VkSDeDTtSfh4xvHafmSuVpkcHcmz4eAUO9vI5jqS3V3ikqa/enMZ6Yk2RLO+lejkhs50sp2R8X8
+	A7+3fSiHDx8eVQ+t2gpiQEb7uVuzyeFPEtwMhDdafOgXmD+33lo46CMcQv2BmLQh5rSJDe0IzfY
+	cTV2W4ajlFMHsPWYQSF3khVArUQ/ZN2mgOmnSpnEEkbBXHllQL2w==
+X-Received: by 2002:a05:600c:c085:b0:486:fbdb:b718 with SMTP id 5b1f17b1804b1-488fb784948mr194444645e9.25.1776783512142;
+        Tue, 21 Apr 2026 07:58:32 -0700 (PDT)
+Received: from nixos.int.ionis-it.com ([163.5.3.68])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488fb7a0b60sm110771715e9.17.2026.04.21.07.58.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Apr 2026 07:58:31 -0700 (PDT)
+From: Titouan Ameline de Cadeville <titouan.ameline@gmail.com>
+To: netdev@vger.kernel.org
+Cc: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	horms@kernel.org,
-	kees@kernel.org,
-	kexinsun@smail.nju.edu.cn,
-	luka.gejak@linux.dev,
-	Arvid.Brodin@xdin.com,
-	m-karicheri2@ti.com,
-	yuantan098@gmail.com,
-	yifanwucs@gmail.com,
-	tomapufckgml@gmail.com,
-	bird@lzu.edu.cn,
-	xuyuqiabc@gmail.com,
-	royenheart@gmail.com,
-	n05ec@lzu.edu.cn
-Subject: [PATCH net v3 1/1] net: hsr: limit node table growth
-Date: Tue, 21 Apr 2026 22:50:01 +0800
-Message-ID: <3bdbe54e81bd89c1443b05500368fb45bddc3191.1776754203.git.royenheart@gmail.com>
-X-Mailer: git-send-email 2.51.0
+	linux-kernel@vger.kernel.org,
+	Titouan Ameline de Cadeville <titouan.ameline@gmail.com>
+Subject: [PATCH] net: ne2k-pci: fix missing residual byte in block output for 32-bit IO
+Date: Tue, 21 Apr 2026 16:57:36 +0200
+Message-ID: <20260421145736.15949-1-titouan.ameline@gmail.com>
+X-Mailer: git-send-email 2.44.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,159 +93,73 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:ygmowABn4AAbkOdpBvrYAA--.15877S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxGF15ZF1fZrWUJFyDXry7Jrb_yoWrCrWUpF
-	ZI9rWrtrZ3Jry8Kr4vy3WIvFWYqF4kGw4jgrZ7Ww1xu3WDtry7XFsI9rWYvF1rJFZ7Gr4a
-	kFWqgr4kCrs0vrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBY1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
-	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
-	IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2
-	z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcV
-	Aq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j
-	6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64
-	vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0E
-	n4kS14v26r4a6rW5MxkIecxEwVCm-wCF04k20xvY0x0EwIxGrwCF04k20xvE74AGY7Cv6c
-	x26r48MxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
-	r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6x
-	IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAI
-	w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x
-	0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7sRi_HU3UUUUU==
-X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQEECWnnOeEHlgADsJ
-X-Spamd-Result: default: False [-0.96 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_NA(0.00)[lzu.edu.cn];
-	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280164-lists,netdev=lfdr.de];
+	FROM_NEQ_ENVFROM(0.00)[titouanameline@gmail.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-280163-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,smail.nju.edu.cn,linux.dev,xdin.com,ti.com,gmail.com,lzu.edu.cn];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	FROM_HAS_DN(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	R_DKIM_NA(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,lzu.edu.cn:email]
-X-Rspamd-Queue-Id: BB8F843C881
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: 532C843C8BC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Haoze Xie <royenheart@gmail.com>
+ne2k_pci_block_output() handles residual bytes after the main outsl()
+loop when the transfer count is not a multiple of 4. It correctly
+handles the 2-byte residual case with outw(),  but is missingg the
+1 byte residual case. This means for packets where count % 4 == 1 or
+count % 4 == 3,  the final byte is never written to the NIC's data
+port.
 
-The HSR/PRP node learning paths allocate one persistent entry per
-previously unseen source MAC. Since learned entries stay alive until the
-prune timer catches up, the node tables can otherwise grow without a
-bound under high churn of learned senders.
+In practice, this is masked by the count being rounded up to a 4-byte
+boundary earlier in the function for ONLY_32BIT_IO cards, but that
+rounding itself causes a little information leak by sending
+uninitialized kernel buffer bytes on the wire
 
-Limit the number of learned entries in each node table and stop adding
-new ones once the configured limit is reached. This keeps node-table
-resource use bounded across the affected learning paths.
+Add the missing outb() call for the odd byte case, mirroring what
+ne2k_pci_block_input() already does correctly.
 
-Fixes: f421436a591d ("net/hsr: Add support for the High-availability Seamless Redundancy protocol (HSRv0)")
-Fixes: 451d8123f897 ("net: prp: add packet handling support")
-Cc: stable@kernel.org
-Reported-by: Yuan Tan <yuantan098@gmail.com>
-Reported-by: Yifan Wu <yifanwucs@gmail.com>
-Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-Reported-by: Xin Liu <bird@lzu.edu.cn>
-Tested-by: Yuqi Xu <xuyuqiabc@gmail.com>
-Signed-off-by: Haoze Xie <royenheart@gmail.com>
-Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+Signed-off-by: Titouan Ameline de Cadeville <titouan.ameline@gmail.com>
 ---
-changes in v3:
-- replace the v2 learning-suppression approach with direct node-table growth limiting
-- add a node_table_size module parameter and stop learning new entries once each table reaches the configured limit
-- fix the full-table handling so failed learning returns NULL instead of reusing an existing node
-- v2 Link: https://lore.kernel.org/all/b053e938014c9bac22f7f687ecc2970f23a2b74a.1775281843.git.royenheart@gmail.com/
+ drivers/net/ethernet/8390/ne2k-pci.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-changes in v2:
-- generalize the fix beyond PRP SAN traffic and cover HSR/PRP tagged sender floods
-- decide whether learning is needed from local-exclusive delivery instead of protocol-specific SAN checks
-- use the normal NULL return semantics from hsr_get_node() instead of ERR_PTR-based error plumbing
-- skip duplicate-discard state checks when no node state exists
-- v1 Link: https://lore.kernel.org/all/9c88b4b7844f867d065e7a7aba28b2c026386168.1775056603.git.royenheart@outlook.com/
-
- net/hsr/hsr_framereg.c | 26 ++++++++++++++++++++++----
- 1 file changed, 22 insertions(+), 4 deletions(-)
-
-diff --git a/net/hsr/hsr_framereg.c b/net/hsr/hsr_framereg.c
-index d09875b33588..8a5a2a54a81f 100644
---- a/net/hsr/hsr_framereg.c
-+++ b/net/hsr/hsr_framereg.c
-@@ -14,12 +14,18 @@
- #include <kunit/visibility.h>
- #include <linux/if_ether.h>
- #include <linux/etherdevice.h>
-+#include <linux/moduleparam.h>
- #include <linux/slab.h>
- #include <linux/rculist.h>
- #include "hsr_main.h"
- #include "hsr_framereg.h"
- #include "hsr_netlink.h"
- 
-+static unsigned int hsr_node_table_size = 1024;
-+module_param_named(node_table_size, hsr_node_table_size, uint, 0644);
-+MODULE_PARM_DESC(node_table_size,
-+		 "Maximum number of learned entries in each HSR/PRP node table (0 = unlimited)");
-+
- bool hsr_addr_is_redbox(struct hsr_priv *hsr, unsigned char *addr)
- {
- 	if (!hsr->redbox || !is_valid_ether_addr(hsr->macaddress_redbox))
-@@ -189,6 +195,7 @@ static struct hsr_node *hsr_add_node(struct hsr_priv *hsr,
- 				     enum hsr_port_type rx_port)
- {
- 	struct hsr_node *new_node, *node = NULL;
-+	unsigned int node_count = 0;
- 	unsigned long now;
- 	size_t block_sz;
- 	int i;
-@@ -226,20 +233,31 @@ static struct hsr_node *hsr_add_node(struct hsr_priv *hsr,
- 	spin_lock_bh(&hsr->list_lock);
- 	list_for_each_entry_rcu(node, node_db, mac_list,
- 				lockdep_is_held(&hsr->list_lock)) {
-+		node_count++;
- 		if (ether_addr_equal(node->macaddress_A, addr))
--			goto out;
-+			goto out_found;
- 		if (ether_addr_equal(node->macaddress_B, addr))
--			goto out;
-+			goto out_found;
+diff --git a/drivers/net/ethernet/8390/ne2k-pci.c b/drivers/net/ethernet/8390/ne2k-pci.c
+index 1a34da07c0db..1bd5b94b5d22 100644
+--- a/drivers/net/ethernet/8390/ne2k-pci.c
++++ b/drivers/net/ethernet/8390/ne2k-pci.c
+@@ -632,6 +632,8 @@ static void ne2k_pci_block_output(struct net_device *dev, int count,
+ 				outw(le16_to_cpu(*b++), NE_BASE + NE_DATAPORT);
+ 				buf = (char *)b;
+ 			}
++			if (count & 1)
++				outb(*buf, NE_BASE + NE_DATAPORT);
+ 		}
  	}
-+
-+	if (hsr_node_table_size && node_count >= hsr_node_table_size)
-+		goto out_drop;
- 	list_add_tail_rcu(&new_node->mac_list, node_db);
- 	spin_unlock_bh(&hsr->list_lock);
- 	return new_node;
--out:
-+out_found:
- 	spin_unlock_bh(&hsr->list_lock);
-+	xa_destroy(&new_node->seq_blocks);
- 	kfree(new_node->block_buf);
--free:
- 	kfree(new_node);
- 	return node;
-+out_drop:
-+	spin_unlock_bh(&hsr->list_lock);
-+	xa_destroy(&new_node->seq_blocks);
-+	kfree(new_node->block_buf);
-+free:
-+	kfree(new_node);
-+	return NULL;
- }
  
- void prp_update_san_info(struct hsr_node *node, bool is_sup)
 -- 
-2.53.0
+2.44.2
 
 
