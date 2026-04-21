@@ -1,157 +1,167 @@
-Return-Path: <netdev+bounces-280130-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280131-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MKrCNXB852nC9QEAu9opvQ
-	(envelope-from <netdev+bounces-280130-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 15:32:32 +0200
+	id GHreFo9/52ku9gEAu9opvQ
+	(envelope-from <netdev+bounces-280131-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 15:45:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7466143B64D
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 15:32:32 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B80DD43B7AC
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 15:45:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 20E983020854
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 13:31:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D70323028EC8
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 13:45:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAE2F46B5;
-	Tue, 21 Apr 2026 13:31:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97BAD3D75B8;
+	Tue, 21 Apr 2026 13:45:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="APcEg1uM"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b="cClBgcUC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f43.google.com (mail-dl1-f43.google.com [74.125.82.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F8E42D7D2E;
-	Tue, 21 Apr 2026 13:31:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F5EA3D6CDD
+	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 13:45:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776778292; cv=none; b=PAacBZHki37kdH0HMRzCX6iXXvbO6r5NCcVJ6LgcMvbvmqnISqiBeWhyXGvjEmaIeMhOlj6j/q0zeU5JFmKjDp8w/ueRsQv5jVYoG1oymafR2wHHegoCGbvRWh9lliQIriP5s61or+Dg/WGbBs4wnxQ/IuiRN+GK5tre9GY2Tk8=
+	t=1776779109; cv=none; b=hIphvKEQKQqMumvHUpHE6gCF59bN/kyTMKjQphm7dztdFeSeiabF5eZsinbWCBg25Mys3U8ODzYXnJG5hUBD0mmQDz79b/aXoy6F5blB2R0eWwU+sxqLgBNbcY63ySRNjGUnLKqE82No49k30P4LJ5bYuGzgHeQG8ScQRfc5ntI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776778292; c=relaxed/simple;
-	bh=a+BUb8fVIWcAQqaiskLh2PB8Q4VFzTKQ7wnj0tpS/Gc=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JATbNXc9nTKM84uh63mED6uHup47MU+0XjVRWDUArE0Rx1ED+jT4EQSFbLJbFv4OgsmG7hwgndt55P+fQ86V5cYxVfdsJAjzqCZKA3AYK9cbLR2AgXt/zXFj7YsjUQS14b3FkQH/nrLkzq7yvx5Xz3s+ouPRNdaFdl/02CFAXpw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=APcEg1uM; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id 712CC2084C;
-	Tue, 21 Apr 2026 15:31:28 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from mx1.secunet.com ([127.0.0.1])
- by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TnZPMGMUYyOI; Tue, 21 Apr 2026 15:31:27 +0200 (CEST)
-Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id CD354207B0;
-	Tue, 21 Apr 2026 15:31:27 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com CD354207B0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1776778287;
-	bh=SzUsgva2gX0qJtwHIjRgps/L5eTyanVUyNq+0uz330A=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=APcEg1uMLaMaAV5GC8oN9Hqvteh9lGCJnF0daTaxjZr+04KEma+nLR6FPAhwRxRZ0
-	 bJPV/6wn48GBVbbd+CC5pVG+IxIxesXskwK7UuRhY+ikS9b5tzJ65kHgMP8YeElzho
-	 H77TznabNvibYpxsEdWOC+OYVrNqymj3qdXj5yDburg/x5Ts7fwr2GTH4y5hU/WtpL
-	 CQF5Zzecq0sXX5PKNuiIJw9zF54npOG+HmyN7F34h3WoFB20B4sZzYTKkJcsCJEWcg
-	 8lNjub1JjtVYGRrAdJ76GeQQEi+ex8XEbh157YCahaXiZgYgiXW2EfjauRH1Sr7FLR
-	 BbaaGR77erH3g==
-Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Tue, 21 Apr
- 2026 15:31:27 +0200
-Received: (nullmailer pid 3293655 invoked by uid 1000);
-	Tue, 21 Apr 2026 13:31:26 -0000
-Date: Tue, 21 Apr 2026 15:31:26 +0200
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Michael Bommarito <michael.bommarito@gmail.com>
-CC: Herbert Xu <herbert@gondor.apana.org.au>, <netdev@vger.kernel.org>, "David
- S . Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Fan Du
-	<fan.du@windriver.com>, <linux-kernel@vger.kernel.org>,
-	<stable@vger.kernel.org>
-Subject: Re: [PATCH] xfrm: ah: account for ESN high bits in async callbacks
-Message-ID: <aed8Lsf0DSAPX1E9@secunet.com>
-References: <20260419223542.2293727-1-michael.bommarito@gmail.com>
+	s=arc-20240116; t=1776779109; c=relaxed/simple;
+	bh=bksQ0Ol5sH++UgZ7eh1JZKghAgg2lGd7XkvUWodW28Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qZvHKDLC3SFiTYQJxDdd2RjAyLjfaoLoS6vbaL6tY24sLA3VbJiFIPkqTFieJiagF5i39Qgr9c6gX5KuskSpQ3AbiEJw0bcWD4r8RFCLTh0VS7dFJ1FT91cP+17g+IBmL5BbXG/9mEaFyIWfr4ihAnKP2uxp0Li6Y0LeQDTiaRk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b=cClBgcUC; arc=none smtp.client-ip=74.125.82.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-dl1-f43.google.com with SMTP id a92af1059eb24-12c45281a06so5567249c88.1
+        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 06:45:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20251104.gappssmtp.com; s=20251104; t=1776779106; x=1777383906; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=C2J0baGW2c8ot7ZAwlVMoVMOKmtoMvPmfiKlkz6ZsUc=;
+        b=cClBgcUC24FdpKU2JnH4Pa8ghonAWun66lvlqsMc0TS6SM3qmynBXdFhPo3KpyVpL3
+         DKjBYtxguUkFOqMANugRC3jAVyxb1ZX6dIcyw6hwUjpTwr1XE7gW3u5T4G0BSoU/31g9
+         voXRPi2wMK0NpJqP4ugLXin628LoKtljsRGv2qYTQYKQ6RgT80/ydejV1z85/MIC+w+h
+         lnDc+oJqG4bbglJfzOb+2uxxrAF0hOKL+mnm99VJMHoiInwmUg1N6YN+idWC2RW0UxMd
+         SofU7/kyVRijZ8CC5mVA4YW0PPNBSr1Z3vkxdLcRafiF67aAhqK1yY1Iz+bZuYcc2sdm
+         Pmmg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776779106; x=1777383906;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=C2J0baGW2c8ot7ZAwlVMoVMOKmtoMvPmfiKlkz6ZsUc=;
+        b=LBQCWvEp240ckSDNoThOeZ08Ub1L5QZ58nSz4/UzMIvkEl8ABtLdZJSS3zLu+QS6nd
+         Q/ff7dRPXCCW2SxOVT+3RiUJY+1zjJBfX8c9ygB/F+wuiUTDcy4FauB3rNrpaFU9zbsW
+         a37m9HUflDoUBJblxQ3kCtlKw851ikxv6fffh0YFTmf0r5iXbfc+WJFUjPouWkRIHfaw
+         kVMev+Ay0iHymmUshIpKTUSOSgDGi9kWAK+iTrqc4oZuqehzz52pFO4vjl8WqEMp8POU
+         sqkG6TBaUVjk+lwet2eJxL/lVYpsV00PxrlFFk1pWA5Kx4j+2tfqmgB6NSYo2qQHVILO
+         7byQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+5G7JHVNlK42HlYG5xi844At4jznwnsPNI1YPXADU6qu2kKBNnmSW2x0SM4m8UJlP8qZ8Rc3A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzoxgoA1q6WbVWU3+kmhu6J2H6HMkJicl8pD/v8xrJflvHDOmRz
+	Ph1piXOYsO4CilHdRx3fMw5lr3urLN4ebFyIKCgSa1GjnRaC13b8oMLx137NTLJAG0A=
+X-Gm-Gg: AeBDievbunGcFstEWthUEiMBN+GxbgENgaYT+jh8LtaKCzQrts3iEWqKzwUWi9PwSip
+	G9jFwFsKETsYCZgoDgmi3LuWvfAL7vkUqRUTi3/cRw9Uv3UCaUYfEy5hFFw6ZCBp5OgT9KnvVgm
+	Oi3VAep9eiv0jhJpU2ZgWIseYtvaB2uFG5HTKK1xj2c5Oxyp9l1iwQKEuAqoRRdz6GPNm8WcouG
+	hj7VSjNZXUxmm7NVaFWrOFQesT7i+celf2ESGH7efdbQWbQJ0g6ZHBEUQsEv37Trm9/776Xy5a0
+	G7xsX+6yxOs0m7vaZ7s7kCyali+kqadkz4YvyLfBCxrZvZ+dvCM2QWU1GS2mRMPi55cMdvKcGu/
+	3JpDKIH8fZFgXtxAFsOWPL2pmT9dJ/M5Eiba9uRBxZ9MYejCxNzGZfd+sHEnM3NfBrRp9K6iwFx
+	sQ/xu5nT1QD2lDjzwQVuR505QNBj+xTOr8PdXRO18jtsMujA==
+X-Received: by 2002:a05:693c:2b15:b0:2c1:3f85:747 with SMTP id 5a478bee46e88-2e47a1027d4mr10807993eec.21.1776779106079;
+        Tue, 21 Apr 2026 06:45:06 -0700 (PDT)
+Received: from phoenix.local ([104.202.41.210])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2e53d8b944bsm19250116eec.28.2026.04.21.06.45.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Apr 2026 06:45:05 -0700 (PDT)
+Date: Tue, 21 Apr 2026 06:45:01 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, corbet@lwn.net,
+ skhan@linuxfoundation.org, federico.vaga@vaga.pv.it,
+ carlos.bilbao@kernel.org, avadhut.naik@amd.com, alexs@kernel.org,
+ si.yanteng@linux.dev, dzm91@hust.edu.cn, 2023002089@link.tyut.edu.cn,
+ tsbogend@alpha.franken.de, dsahern@kernel.org, jani.nikula@intel.com,
+ mchehab+huawei@kernel.org, gregkh@linuxfoundation.org,
+ jirislaby@kernel.org, tytso@mit.edu, herbert@gondor.apana.org.au,
+ ebiggers@kernel.org, johannes.berg@intel.com, geert@linux-m68k.org,
+ pablo@netfilter.org, tglx@kernel.org, mashiro.chen@mailbox.org,
+ mingo@kernel.org, dqfext@gmail.com, jreuter@yaina.de, sdf@fomichev.me,
+ pkshih@realtek.com, enelsonmoore@gmail.com, mkl@pengutronix.de,
+ toke@toke.dk, kees@kernel.org, crossd@gmail.com, jlayton@kernel.org,
+ wangliang74@huawei.com, aha310510@gmail.com, takamitz@amazon.co.jp,
+ kuniyu@google.com, linux-doc@vger.kernel.org, linux-mips@vger.kernel.org
+Subject: Re: [PATCH net-deletions] net: remove ax25 and amateur radio
+ (hamradio) subsystem
+Message-ID: <20260421064501.4d71b943@phoenix.local>
+In-Reply-To: <20260421021824.1293976-1-kuba@kernel.org>
+References: <20260421021824.1293976-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20260419223542.2293727-1-michael.bommarito@gmail.com>
-X-ClientProxiedBy: EXCH-01.secunet.de (10.32.0.171) To EXCH-01.secunet.de
- (10.32.0.171)
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.06 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
+	R_DKIM_ALLOW(-0.20)[networkplumber-org.20251104.gappssmtp.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-280131-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280130-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[secunet.com:dkim,secunet.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[secunet.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,lwn.net,linuxfoundation.org,vaga.pv.it,amd.com,linux.dev,hust.edu.cn,link.tyut.edu.cn,alpha.franken.de,intel.com,mit.edu,gondor.apana.org.au,linux-m68k.org,netfilter.org,mailbox.org,gmail.com,yaina.de,fomichev.me,realtek.com,pengutronix.de,toke.dk,huawei.com,amazon.co.jp];
+	RCPT_COUNT_TWELVE(0.00)[47];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[networkplumber-org.20251104.gappssmtp.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 7466143B64D
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,huawei];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[networkplumber.org:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B80DD43B7AC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun, Apr 19, 2026 at 06:35:42PM -0400, Michael Bommarito wrote:
-> AH allocates its temporary auth/ICV layout differently when ESN is enabled:
-> the async ahash setup appends a 4-byte seqhi slot before the ICV or
-> auth_data area, but the async completion callbacks still reconstruct the
-> temporary layout as if seqhi were absent.
-> 
-> With an async AH implementation selected, that makes AH copy or compare
-> the wrong bytes on both the IPv4 and IPv6 paths. In UML repro on IPv4 AH
-> with ESN and forced async hmac(sha1), ping fails with 100% packet loss,
-> and the callback logs show the pre-fix drift:
-> 
->   ah4 output_done: esn=1 err=0 icv_off=20 expected_off=24
->   ah4 input_done: esn=1 auth_off=20 expected_auth_off=24 icv_off=32 expected_icv_off=36
-> 
-> Reconstruct the callback-side layout the same way the setup path built it
-> by skipping the ESN seqhi slot before locating the saved auth_data or ICV.
-> Per RFC 4302, the ESN high-order 32 bits participate in the AH ICV
-> computation, so the async callbacks must account for the seqhi slot.
-> 
-> Post-fix, the same IPv4 AH+ESN+forced-async-hmac(sha1) UML repro shows
-> the corrected offset (ah4 output_done: esn=1 err=0 icv_off=24
-> expected_off=24) and ping succeeds; net/ipv4/ah4.o and net/ipv6/ah6.o
-> build clean at W=1. IPv6 AH+ESN was not exercised at runtime, and the
-> change has not been tested against a real async hardware AH engine.
-> 
-> Fixes: d4d573d0334d ("{IPv4,xfrm} Add ESN support for AH egress part")
-> Fixes: d8b2a8600b0e ("{IPv4,xfrm} Add ESN support for AH ingress part")
-> Fixes: 26dd70c3fad3 ("{IPv6,xfrm} Add ESN support for AH egress part")
-> Fixes: 8d6da6f32557 ("{IPv6,xfrm} Add ESN support for AH ingress part")
-> Cc: stable@vger.kernel.org
-> Assisted-by: Codex:gpt-5-4
-> Assisted-by: Claude:claude-opus-4-7
-> Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
+On Mon, 20 Apr 2026 19:18:23 -0700
+Jakub Kicinski <kuba@kernel.org> wrote:
 
-Applied to the ipsec tree, thanks a lot Michael!
+> Remove the amateur radio (AX.25, NET/ROM, ROSE) protocol implementation
+> and all associated hamradio device drivers from the kernel tree.
+> This set of protocols has long been a huge bug/syzbot magnet,
+> and since nobody stepped up to help us deal with the influx
+> of the AI-generated bug reports we need to move it out of tree
+> to protect our sanity.
+> 
+> The code is moved to an out-of-tree repo:
+> https://github.com/linux-netdev/mod-orphan
+> if it's cleaned up and reworked there we can accept it back.
+> 
+> Minimal stub headers are kept for include/net/ax25.h (AX25_P_IP,
+> AX25_ADDR_LEN, ax25_address) and include/net/rose.h (ROSE_ADDR_LEN)
+> so that the conditional integration code in arp.c and tun.c continues
+> to compile and work when the out-of-tree modules are loaded.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+
+Acked-by: Stephen Hemminger <stephen@networkplumber.org>
+
+PS: once this is merged will remove these protos from iproute2 as well
 
