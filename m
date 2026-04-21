@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-280237-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280232-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0BiUFJXY52kBBwIAu9opvQ
-	(envelope-from <netdev+bounces-280237-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 22:05:41 +0200
+	id SBpGFgDX52mzBgIAu9opvQ
+	(envelope-from <netdev+bounces-280232-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 21:58:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9248043F35E
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 22:05:40 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5A5A43F24A
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 21:58:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 94A0030DA82F
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 19:58:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E8F19300F9D2
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 19:57:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FDC637BE80;
-	Tue, 21 Apr 2026 19:58:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 329743DC4AB;
+	Tue, 21 Apr 2026 19:57:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="KxnDUU2g"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="W9CBVKKu"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A92D43DCDA4;
-	Tue, 21 Apr 2026 19:58:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D1AA37BE80;
+	Tue, 21 Apr 2026 19:57:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776801515; cv=none; b=CZMwzfgLax/1eR9YrjU0JHz9VEGbCkXPaSEScTzYZvuccdZ/EjO7LIFGEp/rxr7xOsGhZJu+jjaIZMvg1jzyTIi3yyWSHviN/0+gkYJo2fpzwkpZzhA/MbkWn9chS+xNVuxh0/InYfCaAZa4THJrL1yFxtZb2V1+sG5K1UxzoUw=
+	t=1776801447; cv=none; b=Kz2iclFpzerN0kkAZKVZXtLSapfLMfIfWyhzq0mB7Z110zfq+ajvmAwFA4JS4rtltBEwAliBwHC9q8sUl+H4hrbObWQAzN0VRXn6nhSu+nvAJZzKIT2J73OQOGZJta63j8qvhGpv4P2JgFr8hyxLzV87lTvB7uqbPB5SufWRasM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776801515; c=relaxed/simple;
-	bh=xOHHL8yexAVpOqGpkiyLva5sUcO4KH2knUcbz1Ejj2M=;
+	s=arc-20240116; t=1776801447; c=relaxed/simple;
+	bh=3niLEYN1mi916fgg49/UmCFdkyAMBFcJ4sI1ojm0dAw=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=re2HVXGQSLi/JnCXd7iz7gFB7InZm+KRgmDQRuJKvaiodAa7tJ6pUu0abfdVHK4ukC0EEo2KlclnSkeg6o3/SI3jTXUw30nSRl8DkPnBFDICWCM5nhI37vol+L1tLhpTQY3JQpp+FNCYH0XBma4zrMbAOrxOFDKIFvyXaOubOOY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=KxnDUU2g; arc=none smtp.client-ip=156.67.10.101
+	 In-Reply-To:To:Cc; b=QO+5o260nDz/JT2mGfZTWszW1ORlX8BmpQUOFW4Fhohx0cE1sJykUVpTTq/nK0SNgOMXj5Jb7pNX0pvMrf/pMOcktYSdkI2cLbEmVaKdgRpl8I6h4sNBhFilm3dbd5JPpx1ZZqMT2qZ6I7NLB385zFfU/S05JpEdYwg8TWwHeV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=W9CBVKKu; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -39,18 +39,18 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From:From:
 	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
 	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=vekPGwSC4UwwBOzYvmaaexuQKq7eOTOZyIMgvQHYhyY=; b=Kx
-	nDUU2gCDe7dIhTYX8ijASXoxrliDSLPJSlf7hM4H+cE9cQcSEEqH7qHA/gIdXEPNgNkRlefE1lmTy
-	Csl7+JkwWkINaq1jInTcY8D6UNSkGTpbFNm014E7Zc9FP2PeK02NenVCUqeirg5NlGvtlZBeZRHqu
-	yOlmieGVFnrCbYo=;
+	In-Reply-To:References; bh=8FjaLY1FvoBrxRPonnN8yhzUiBRvtk/PyZtxQZu1zKA=; b=W9
+	CBVKKuLckQNeH5Qo7V6m5anytbJmUxORhhKPD82KU0ThHey8HeCbSuVMPF35J4u2qwPKccvun0r6Y
+	nbQcZydReb2by02ALUGy3yC3gq6jdtQdi6vQ43MQNv/UqAnIgxdcn8B3x1zx9G3kdpalJnCUzNXeO
+	Ul5iDZqWfcah25g=;
 Received: from c-66-41-74-139.hsd1.mn.comcast.net ([66.41.74.139] helo=thinkpad.home.lunn.ch)
 	by vps0.lunn.ch with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1wFGpD-00GwVc-Fl; Tue, 21 Apr 2026 21:31:59 +0200
+	id 1wFGpF-00GwVc-Vo; Tue, 21 Apr 2026 21:32:02 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-Date: Tue, 21 Apr 2026 14:31:20 -0500
-Subject: [PATCH net 17/18] drivers: net: 8390: ultra: Remove this driver
+Date: Tue, 21 Apr 2026 14:31:21 -0500
+Subject: [PATCH net 18/18] drivers: net: 8390: wd80x3: Remove this driver
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,7 +59,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260421-v7-0-0-net-next-driver-removal-v1-v1-17-69517c689d1f@lunn.ch>
+Message-Id: <20260421-v7-0-0-net-next-driver-removal-v1-v1-18-69517c689d1f@lunn.ch>
 References: <20260421-v7-0-0-net-next-driver-removal-v1-v1-0-69517c689d1f@lunn.ch>
 In-Reply-To: <20260421-v7-0-0-net-next-driver-removal-v1-v1-0-69517c689d1f@lunn.ch>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -70,20 +70,20 @@ To: Andrew Lunn <andrew+netdev@lunn.ch>,
 Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
  linux-doc@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=22885; i=andrew@lunn.ch;
- h=from:subject:message-id; bh=xOHHL8yexAVpOqGpkiyLva5sUcO4KH2knUcbz1Ejj2M=;
- b=owEBbQKS/ZANAwAIAea/DcumaUyEAcsmYgBp59CCCiGqEaZSt1jLDxpmPkMobIuED11EL3QeX
- QUxyrujtEKJAjMEAAEIAB0WIQRh+xAly1MmORb54bfmvw3LpmlMhAUCaefQggAKCRDmvw3LpmlM
- hModD/0dr0w1/9UgeUby6Bu26N8Ke6qkVYcoW2WeYscWcnNj9nlZZd538Hr2p6Cdhn6I5GrQld5
- HzUJkMuaxZzXap4rDYOopBECAp7SSDjPmsrt1qGPQqxMMMQKEo9vVzDC/dZNNd85op7KPVUu1Oi
- cHzRXS5i1Joq5TBptV+qhtlhz5CCy4zLBNJCY0TM8Uy6oagjZjFVK+ynkdpdDDSvtx6jkYDsv5W
- hpVFuYSEj47Q9dy7brEJohLZ2DiPNOxPfB+qfRd0uIvzWyGKCAoKOVq6sL2pW1SsXbAAZlOv5ZF
- xYSr6gq5ZEttH5mrXud1hAH7JO5Ge4+YOHDzamo4lE0TA9TWpsa8G2ajBXqfBZdkZEy1kxD/efK
- yKdFiSev1vB0a6g1GDO0dy3XmkU8R3r/6lEE/tLPZOE+Jm/9mv5uhiVw54mZYEIwnpctk5YD1t9
- cjgyaG35DKgawYYnCtFqgdiUVlE/AbUqkg29vJ6MdJ0Sz8igT/c6JcOytTAlf588S9W4QgbF0SQ
- /fvqeY+ww47g+RdxwJaknNyLxMEfE3zdhhjuo7ujnRcngUaXfwZs0enUmMEHTHdQZkVEoE5LPMh
- qDIPUOW7mGW4g03VG8MlWlNmpHeL7/FpKwYVoa/UcnGRaXSzwGNtKCJWWG2YBbsuK/YdhuD/x2O
- qM5axDVeOTL1QNw==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=20898; i=andrew@lunn.ch;
+ h=from:subject:message-id; bh=3niLEYN1mi916fgg49/UmCFdkyAMBFcJ4sI1ojm0dAw=;
+ b=owEBbQKS/ZANAwAIAea/DcumaUyEAcsmYgBp59CChFLulMW0pe8E36jl7B+H2Jb8xS8Nq+Jfb
+ mRoaqy30c2JAjMEAAEIAB0WIQRh+xAly1MmORb54bfmvw3LpmlMhAUCaefQggAKCRDmvw3LpmlM
+ hLX1EAC0d9ZCFKaRQu4B7MCk7BSxH3opAsBJSrpPGgB5ZZHqLILqyJUoK2uOjklW+yiGlfHkC+1
+ Q0so6DW66TOFu2t8j6WqAz0dH+KLYK/nu+L1dkTZrBwDatwdcDwanbzUZY/jZkMTcufpBdyjrPJ
+ I6q27fQx/jsUrdJPM1ESjaGRQDQ+W0IGZ7EgZfI4XwSd/IHdCHIez6on58u4ENFEn7O2BlSsSB7
+ Acgc5ZnxeB19tX6Pef3Yc1vhu5xG9x6nRbWENTjX1Onu+1LFPJRJC2yy2TllF/he7c1trlBaLhW
+ gkk6XXRIgb+77+n1q/An4eztA3287jDpXGTgw5da1DNzyq8a9lWkjbMKDY2S82cfrf5sc8fNB3D
+ BYkadoPRXSuO7yK908C+I/ET21UkAHTbyhcqIzPzEWSbD46TYrYCmzj9F9VJC9xaEbfSyncvKE5
+ DIPh5vKrTSXwKwCpc8QbLWFUQE52GlimXGnYcIo1bnyycNHOQgUCzSOSOCiX/RGtrSNmKKGkVkR
+ 4+GSvyyM7eqzK1H+YIv22SItVFgq7Hrua1guqHbrG2mHnHNDaBASGoBYnTZTwI8VloMuJhxENVJ
+ 6CqbAU45TTL34Km8NyBBJLi83B/WVcn3ojOEPHEk/p2uYlyG0ZLiJLvXQmF/W+8kkLwzemLzm28
+ 3U8fjBeklS/FFaA==
 X-Developer-Key: i=andrew@lunn.ch; a=openpgp;
  fpr=61FB1025CB53263916F9E1B7E6BF0DCBA6694C84
 X-Spamd-Result: default: False [-0.66 / 15.00];
@@ -91,18 +91,18 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
 	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280237-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-280232-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[12];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
@@ -112,74 +112,64 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[scyld.com:email,nasa.gov:email,lunn.ch:email,lunn.ch:dkim,lunn.ch:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ei_status.name:url]
-X-Rspamd-Queue-Id: 9248043F35E
+	DBL_BLOCKED_OPENRESOLVER(0.00)[demon.co.uk:email,scyld.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ei_status.name:url,nasa.gov:email,lunn.ch:email,lunn.ch:dkim,lunn.ch:mid]
+X-Rspamd-Queue-Id: A5A5A43F24A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The ultra was written by Donald Becker 1993 to 1998. It is an ISA
+The wd80x3 was written by Donald Becker 1993 to 1994. It is an ISA
 device, so unlikely to be used with modern kernels.
 
 Signed-off-by: Andrew Lunn <andrew@lunn.ch>
 ---
- drivers/net/ethernet/8390/Kconfig     |  18 -
- drivers/net/ethernet/8390/Makefile    |   1 -
- drivers/net/ethernet/8390/smc-ultra.c | 630 ----------------------------------
- 3 files changed, 649 deletions(-)
+ drivers/net/ethernet/8390/Kconfig  |  11 -
+ drivers/net/ethernet/8390/Makefile |   1 -
+ drivers/net/ethernet/8390/wd.c     | 575 -------------------------------------
+ 3 files changed, 587 deletions(-)
 
 diff --git a/drivers/net/ethernet/8390/Kconfig b/drivers/net/ethernet/8390/Kconfig
-index 3e56806471a3..dd066b0a39d5 100644
+index dd066b0a39d5..d2116d70ab5d 100644
 --- a/drivers/net/ethernet/8390/Kconfig
 +++ b/drivers/net/ethernet/8390/Kconfig
-@@ -144,24 +144,6 @@ config STNIC
+@@ -144,17 +144,6 @@ config STNIC
  
  	  If unsure, say N.
  
--config ULTRA
--	tristate "SMC Ultra support"
+-config WD80x3
+-	tristate "WD80*3 support"
 -	depends on ISA
 -	select NETDEV_LEGACY_INIT
 -	select CRC32
 -	help
 -	  If you have a network (Ethernet) card of this type, say Y here.
 -
--	  Important: There have been many reports that, with some motherboards
--	  mixing an SMC Ultra and an Adaptec AHA154x SCSI card (or compatible,
--	  such as some BusLogic models) causes corruption problems with many
--	  operating systems. The Linux smc-ultra driver has a work-around for
--	  this but keep it in mind if you have such a SCSI card and have
--	  problems.
--
 -	  To compile this driver as a module, choose M here. The module
--	  will be called smc-ultra.
+-	  will be called wd.
 -
- config WD80x3
- 	tristate "WD80*3 support"
- 	depends on ISA
+ config ZORRO8390
+ 	tristate "Zorro NS8390-based Ethernet support"
+ 	depends on ZORRO
 diff --git a/drivers/net/ethernet/8390/Makefile b/drivers/net/ethernet/8390/Makefile
-index b215136a603b..0afdccddda58 100644
+index 0afdccddda58..ad5145c30c85 100644
 --- a/drivers/net/ethernet/8390/Makefile
 +++ b/drivers/net/ethernet/8390/Makefile
-@@ -12,7 +12,6 @@ obj-$(CONFIG_MCF8390) += mcf8390.o
+@@ -12,6 +12,5 @@ obj-$(CONFIG_MCF8390) += mcf8390.o
  obj-$(CONFIG_NE2000) += ne.o 8390p.o
  obj-$(CONFIG_NE2K_PCI) += ne2k-pci.o 8390.o
  obj-$(CONFIG_STNIC) += stnic.o 8390.o
--obj-$(CONFIG_ULTRA) += smc-ultra.o 8390.o
- obj-$(CONFIG_WD80x3) += wd.o 8390.o
+-obj-$(CONFIG_WD80x3) += wd.o 8390.o
  obj-$(CONFIG_XSURF100) += xsurf100.o
  obj-$(CONFIG_ZORRO8390) += zorro8390.o
-diff --git a/drivers/net/ethernet/8390/smc-ultra.c b/drivers/net/ethernet/8390/smc-ultra.c
+diff --git a/drivers/net/ethernet/8390/wd.c b/drivers/net/ethernet/8390/wd.c
 deleted file mode 100644
-index 22ca804b2e95..000000000000
---- a/drivers/net/ethernet/8390/smc-ultra.c
+index ffd639477dfc..000000000000
+--- a/drivers/net/ethernet/8390/wd.c
 +++ /dev/null
-@@ -1,630 +0,0 @@
+@@ -1,575 +0,0 @@
 -// SPDX-License-Identifier: GPL-1.0+
--/* smc-ultra.c: A SMC Ultra ethernet driver for linux. */
+-/* wd.c: A WD80x3 ethernet driver for linux. */
 -/*
--	This is a driver for the SMC Ultra and SMC EtherEZ ISA ethercards.
--
--	Written 1993-1998 by Donald Becker.
+-	Written 1993-94 by Donald Becker.
 -
 -	Copyright 1993 United States Government as represented by the
 -	Director, National Security Agency.
@@ -189,47 +179,20 @@ index 22ca804b2e95..000000000000
 -	410 Severn Ave., Suite 210
 -	Annapolis MD 21403
 -
--	This driver uses the cards in the 8390-compatible mode.
--	Most of the run-time complexity is handled by the generic code in
--	8390.c.  The code in this file is responsible for
+-	This is a driver for WD8003 and WD8013 "compatible" ethercards.
 -
--		ultra_probe()	 	Detecting and initializing the card.
--		ultra_probe1()
--		ultra_probe_isapnp()
--
--		ultra_open()		The card-specific details of starting, stopping
--		ultra_reset_8390()	and resetting the 8390 NIC core.
--		ultra_close()
--
--		ultra_block_input()		Routines for reading and writing blocks of
--		ultra_block_output()	packet buffer memory.
--		ultra_pio_input()
--		ultra_pio_output()
--
--	This driver enables the shared memory only when doing the actual data
--	transfers to avoid a bug in early version of the card that corrupted
--	data transferred by a AHA1542.
--
--	This driver now supports the programmed-I/O (PIO) data transfer mode of
--	the EtherEZ. It does not use the non-8390-compatible "Altego" mode.
--	That support (if available) is in smc-ez.c.
+-	Thanks to Russ Nelson (nelson@crnwyr.com) for loaning me a WD8013.
 -
 -	Changelog:
 -
--	Paul Gortmaker	: multiple card support for module users.
--	Donald Becker	: 4/17/96 PIO support, minor potential problems avoided.
--	Donald Becker	: 6/6/96 correctly set auto-wrap bit.
--	Alexander Sotirov : 1/20/01 Added support for ISAPnP cards
+-	Paul Gortmaker	: multiple card support for module users, support
+-			  for non-standard memory sizes.
 -
--	Note about the ISA PnP support:
 -
--	This driver can not autoprobe for more than one SMC EtherEZ PnP card.
--	You have to configure the second card manually through the /proc/isapnp
--	interface and then load the module with an explicit io=0x___ option.
 -*/
 -
 -static const char version[] =
--	"smc-ultra.c:v2.02 2/3/98 Donald Becker (becker@cesdis.gsfc.nasa.gov)\n";
+-	"wd.c:v1.10 9/23/94 Donald Becker (becker@cesdis.gsfc.nasa.gov)\n";
 -
 -#include <linux/module.h>
 -#include <linux/kernel.h>
@@ -237,109 +200,100 @@ index 22ca804b2e95..000000000000
 -#include <linux/string.h>
 -#include <linux/init.h>
 -#include <linux/interrupt.h>
--#include <linux/isapnp.h>
+-#include <linux/delay.h>
 -#include <linux/netdevice.h>
 -#include <linux/etherdevice.h>
 -#include <net/Space.h>
 -
 -#include <asm/io.h>
--#include <asm/irq.h>
 -
 -#include "8390.h"
 -
--#define DRV_NAME "smc-ultra"
+-#define DRV_NAME "wd"
 -
 -/* A zero-terminated list of I/O addresses to be probed. */
--static unsigned int ultra_portlist[] __initdata =
--{0x200, 0x220, 0x240, 0x280, 0x300, 0x340, 0x380, 0};
+-static unsigned int wd_portlist[] __initdata =
+-{0x300, 0x280, 0x380, 0x240, 0};
 -
--static int ultra_probe1(struct net_device *dev, int ioaddr);
+-static int wd_probe1(struct net_device *dev, int ioaddr);
 -
--#ifdef __ISAPNP__
--static int ultra_probe_isapnp(struct net_device *dev);
--#endif
--
--static int ultra_open(struct net_device *dev);
--static void ultra_reset_8390(struct net_device *dev);
--static void ultra_get_8390_hdr(struct net_device *dev, struct e8390_pkt_hdr *hdr,
+-static int wd_open(struct net_device *dev);
+-static void wd_reset_8390(struct net_device *dev);
+-static void wd_get_8390_hdr(struct net_device *dev, struct e8390_pkt_hdr *hdr,
 -						int ring_page);
--static void ultra_block_input(struct net_device *dev, int count,
+-static void wd_block_input(struct net_device *dev, int count,
 -						  struct sk_buff *skb, int ring_offset);
--static void ultra_block_output(struct net_device *dev, int count,
--							const unsigned char *buf, const int start_page);
--static void ultra_pio_get_hdr(struct net_device *dev, struct e8390_pkt_hdr *hdr,
--						int ring_page);
--static void ultra_pio_input(struct net_device *dev, int count,
--						  struct sk_buff *skb, int ring_offset);
--static void ultra_pio_output(struct net_device *dev, int count,
--							 const unsigned char *buf, const int start_page);
--static int ultra_close_card(struct net_device *dev);
+-static void wd_block_output(struct net_device *dev, int count,
+-							const unsigned char *buf, int start_page);
+-static int wd_close(struct net_device *dev);
 -
--#ifdef __ISAPNP__
--static struct isapnp_device_id ultra_device_ids[] __initdata = {
--        {       ISAPNP_VENDOR('S','M','C'), ISAPNP_FUNCTION(0x8416),
--                ISAPNP_VENDOR('S','M','C'), ISAPNP_FUNCTION(0x8416),
--                (long) "SMC EtherEZ (8416)" },
--        { }	/* terminate list */
--};
+-static u32 wd_msg_enable;
 -
--MODULE_DEVICE_TABLE(isapnp, ultra_device_ids);
--#endif
+-#define WD_START_PG		0x00	/* First page of TX buffer */
+-#define WD03_STOP_PG	0x20	/* Last page +1 of RX ring */
+-#define WD13_STOP_PG	0x40	/* Last page +1 of RX ring */
 -
--static u32 ultra_msg_enable;
+-#define WD_CMDREG		0		/* Offset to ASIC command register. */
+-#define	 WD_RESET		0x80	/* Board reset, in WD_CMDREG. */
+-#define	 WD_MEMENB		0x40	/* Enable the shared memory. */
+-#define WD_CMDREG5		5		/* Offset to 16-bit-only ASIC register 5. */
+-#define	 ISA16			0x80	/* Enable 16 bit access from the ISA bus. */
+-#define	 NIC16			0x40	/* Enable 16 bit access from the 8390. */
+-#define WD_NIC_OFFSET	16		/* Offset to the 8390 from the base_addr. */
+-#define WD_IO_EXTENT	32
 -
--#define START_PG		0x00	/* First page of TX buffer */
 -
--#define ULTRA_CMDREG	0		/* Offset to ASIC command register. */
--#define	 ULTRA_RESET	0x80	/* Board reset, in ULTRA_CMDREG. */
--#define	 ULTRA_MEMENB	0x40	/* Enable the shared memory. */
--#define IOPD	0x02			/* I/O Pipe Data (16 bits), PIO operation. */
--#define IOPA	0x07			/* I/O Pipe Address for PIO operation. */
--#define ULTRA_NIC_OFFSET  16	/* NIC register offset from the base_addr. */
--#define ULTRA_IO_EXTENT 32
--#define EN0_ERWCNT		0x08	/* Early receive warning count. */
--
--#ifdef CONFIG_NET_POLL_CONTROLLER
--static void ultra_poll(struct net_device *dev)
--{
--	disable_irq(dev->irq);
--	ei_interrupt(dev->irq, dev);
--	enable_irq(dev->irq);
--}
--#endif
--/*	Probe for the Ultra.  This looks like a 8013 with the station
+-/*	Probe for the WD8003 and WD8013.  These cards have the station
 -	address PROM at I/O ports <base>+8 to <base>+13, with a checksum
--	following.
--*/
+-	following. A Soundblaster can have the same checksum as an WDethercard,
+-	so we have an extra exclusionary check for it.
 -
--static int __init do_ultra_probe(struct net_device *dev)
+-	The wd_probe1() routine initializes the card and fills the
+-	station address field. */
+-
+-static int __init do_wd_probe(struct net_device *dev)
 -{
 -	int i;
+-	struct resource *r;
 -	int base_addr = dev->base_addr;
 -	int irq = dev->irq;
+-	int mem_start = dev->mem_start;
+-	int mem_end = dev->mem_end;
 -
--	if (base_addr > 0x1ff)		/* Check a single specified location. */
--		return ultra_probe1(dev, base_addr);
+-	if (base_addr > 0x1ff) {	/* Check a user specified location. */
+-		r = request_region(base_addr, WD_IO_EXTENT, "wd-probe");
+-		if ( r == NULL)
+-			return -EBUSY;
+-		i = wd_probe1(dev, base_addr);
+-		if (i != 0)
+-			release_region(base_addr, WD_IO_EXTENT);
+-		else
+-			r->name = dev->name;
+-		return i;
+-	}
 -	else if (base_addr != 0)	/* Don't probe at all. */
 -		return -ENXIO;
 -
--#ifdef __ISAPNP__
--	/* Look for any installed ISAPnP cards */
--	if (isapnp_present() && (ultra_probe_isapnp(dev) == 0))
--		return 0;
--#endif
--
--	for (i = 0; ultra_portlist[i]; i++) {
--		dev->irq = irq;
--		if (ultra_probe1(dev, ultra_portlist[i]) == 0)
+-	for (i = 0; wd_portlist[i]; i++) {
+-		int ioaddr = wd_portlist[i];
+-		r = request_region(ioaddr, WD_IO_EXTENT, "wd-probe");
+-		if (r == NULL)
+-			continue;
+-		if (wd_probe1(dev, ioaddr) == 0) {
+-			r->name = dev->name;
 -			return 0;
+-		}
+-		release_region(ioaddr, WD_IO_EXTENT);
+-		dev->irq = irq;
+-		dev->mem_start = mem_start;
+-		dev->mem_end = mem_end;
 -	}
 -
 -	return -ENODEV;
 -}
 -
 -#ifndef MODULE
--struct net_device * __init ultra_probe(int unit)
+-struct net_device * __init wd_probe(int unit)
 -{
 -	struct net_device *dev = alloc_ei_netdev();
 -	int err;
@@ -350,7 +304,7 @@ index 22ca804b2e95..000000000000
 -	sprintf(dev->name, "eth%d", unit);
 -	netdev_boot_setup_check(dev);
 -
--	err = do_ultra_probe(dev);
+-	err = do_wd_probe(dev);
 -	if (err)
 -		goto out;
 -	return dev;
@@ -360,10 +314,9 @@ index 22ca804b2e95..000000000000
 -}
 -#endif
 -
--static const struct net_device_ops ultra_netdev_ops = {
--	.ndo_open		= ultra_open,
--	.ndo_stop		= ultra_close_card,
--
+-static const struct net_device_ops wd_netdev_ops = {
+-	.ndo_open		= wd_open,
+-	.ndo_stop		= wd_close,
 -	.ndo_start_xmit		= ei_start_xmit,
 -	.ndo_tx_timeout		= ei_tx_timeout,
 -	.ndo_get_stats		= ei_get_stats,
@@ -371,242 +324,250 @@ index 22ca804b2e95..000000000000
 -	.ndo_validate_addr	= eth_validate_addr,
 -	.ndo_set_mac_address 	= eth_mac_addr,
 -#ifdef CONFIG_NET_POLL_CONTROLLER
--	.ndo_poll_controller 	= ultra_poll,
+-	.ndo_poll_controller 	= ei_poll,
 -#endif
 -};
 -
--static int __init ultra_probe1(struct net_device *dev, int ioaddr)
+-static int __init wd_probe1(struct net_device *dev, int ioaddr)
 -{
--	int i, retval;
+-	int i;
+-	int err;
 -	int checksum = 0;
--	u8 macaddr[ETH_ALEN];
+-	int ancient = 0;			/* An old card without config registers. */
+-	int word16 = 0;				/* 0 = 8 bit, 1 = 16 bit */
+-	u8 addr[ETH_ALEN];
 -	const char *model_name;
--	unsigned char eeprom_irq = 0;
 -	static unsigned version_printed;
--	/* Values from various config regs. */
--	unsigned char num_pages, irqreg, addr, piomode;
--	unsigned char idreg = inb(ioaddr + 7);
--	unsigned char reg4 = inb(ioaddr + 4) & 0x7f;
 -	struct ei_device *ei_local = netdev_priv(dev);
--
--	if (!request_region(ioaddr, ULTRA_IO_EXTENT, DRV_NAME))
--		return -EBUSY;
--
--	/* Check the ID nibble. */
--	if ((idreg & 0xF0) != 0x20 			/* SMC Ultra */
--		&& (idreg & 0xF0) != 0x40) {		/* SMC EtherEZ */
--		retval = -ENODEV;
--		goto out;
--	}
--
--	/* Select the station address register set. */
--	outb(reg4, ioaddr + 4);
 -
 -	for (i = 0; i < 8; i++)
 -		checksum += inb(ioaddr + 8 + i);
--	if ((checksum & 0xff) != 0xFF) {
--		retval = -ENODEV;
--		goto out;
+-	if (inb(ioaddr + 8) == 0xff 	/* Extra check to avoid soundcard. */
+-		|| inb(ioaddr + 9) == 0xff
+-		|| (checksum & 0xff) != 0xFF)
+-		return -ENODEV;
+-
+-	/* Check for semi-valid mem_start/end values if supplied. */
+-	if ((dev->mem_start % 0x2000) || (dev->mem_end % 0x2000)) {
+-		netdev_warn(dev,
+-			    "wd.c: user supplied mem_start or mem_end not on 8kB boundary - ignored.\n");
+-		dev->mem_start = 0;
+-		dev->mem_end = 0;
 -	}
 -
--	if ((ultra_msg_enable & NETIF_MSG_DRV) && (version_printed++ == 0))
+-	if ((wd_msg_enable & NETIF_MSG_DRV) && (version_printed++ == 0))
 -		netdev_info(dev, version);
 -
--	model_name = (idreg & 0xF0) == 0x20 ? "SMC Ultra" : "SMC EtherEZ";
--
 -	for (i = 0; i < 6; i++)
--		macaddr[i] = inb(ioaddr + 8 + i);
--	eth_hw_addr_set(dev, macaddr);
+-		addr[i] = inb(ioaddr + 8 + i);
+-	eth_hw_addr_set(dev, addr);
 -
--	netdev_info(dev, "%s at %#3x, %pM", model_name,
--		    ioaddr, dev->dev_addr);
+-	netdev_info(dev, "WD80x3 at %#3x, %pM", ioaddr, dev->dev_addr);
 -
--	/* Switch from the station address to the alternate register set and
--	   read the useful registers there. */
--	outb(0x80 | reg4, ioaddr + 4);
+-	/* The following PureData probe code was contributed by
+-	   Mike Jagdis <jaggy@purplet.demon.co.uk>. Puredata does software
+-	   configuration differently from others so we have to check for them.
+-	   This detects an 8 bit, 16 bit or dumb (Toshiba, jumpered) card.
+-	   */
+-	if (inb(ioaddr+0) == 'P' && inb(ioaddr+1) == 'D') {
+-		unsigned char reg5 = inb(ioaddr+5);
 -
--	/* Enabled FINE16 mode to avoid BIOS ROM width mismatches @ reboot. */
--	outb(0x80 | inb(ioaddr + 0x0c), ioaddr + 0x0c);
--	piomode = inb(ioaddr + 0x8);
--	addr = inb(ioaddr + 0xb);
--	irqreg = inb(ioaddr + 0xd);
--
--	/* Switch back to the station address register set so that the MS-DOS driver
--	   can find the card after a warm boot. */
--	outb(reg4, ioaddr + 4);
--
--	if (dev->irq < 2) {
--		unsigned char irqmap[] = {0, 9, 3, 5, 7, 10, 11, 15};
--		int irq;
--
--		/* The IRQ bits are split. */
--		irq = irqmap[((irqreg & 0x40) >> 4) + ((irqreg & 0x0c) >> 2)];
--
--		if (irq == 0) {
--			pr_cont(", failed to detect IRQ line.\n");
--			retval =  -EAGAIN;
--			goto out;
+-		switch (inb(ioaddr+2)) {
+-		case 0x03: word16 = 0; model_name = "PDI8023-8";	break;
+-		case 0x05: word16 = 0; model_name = "PDUC8023";	break;
+-		case 0x0a: word16 = 1; model_name = "PDI8023-16"; break;
+-			/* Either 0x01 (dumb) or they've released a new version. */
+-		default:	 word16 = 0; model_name = "PDI8023";	break;
 -		}
--		dev->irq = irq;
--		eeprom_irq = 1;
+-		dev->mem_start = ((reg5 & 0x1c) + 0xc0) << 12;
+-		dev->irq = (reg5 & 0xe0) == 0xe0 ? 10 : (reg5 >> 5) + 1;
+-	} else {								/* End of PureData probe */
+-		/* This method of checking for a 16-bit board is borrowed from the
+-		   we.c driver.  A simpler method is just to look in ASIC reg. 0x03.
+-		   I'm comparing the two method in alpha test to make certain they
+-		   return the same result. */
+-		/* Check for the old 8 bit board - it has register 0/8 aliasing.
+-		   Do NOT check i>=6 here -- it hangs the old 8003 boards! */
+-		for (i = 0; i < 6; i++)
+-			if (inb(ioaddr+i) != inb(ioaddr+8+i))
+-				break;
+-		if (i >= 6) {
+-			ancient = 1;
+-			model_name = "WD8003-old";
+-			word16 = 0;
+-		} else {
+-			int tmp = inb(ioaddr+1); /* fiddle with 16bit bit */
+-			outb( tmp ^ 0x01, ioaddr+1 ); /* attempt to clear 16bit bit */
+-			if (((inb( ioaddr+1) & 0x01) == 0x01) /* A 16 bit card */
+-				&& (tmp & 0x01) == 0x01	) {				/* In a 16 slot. */
+-				int asic_reg5 = inb(ioaddr+WD_CMDREG5);
+-				/* Magic to set ASIC to word-wide mode. */
+-				outb( NIC16 | (asic_reg5&0x1f), ioaddr+WD_CMDREG5);
+-				outb(tmp, ioaddr+1);
+-				model_name = "WD8013";
+-				word16 = 1;		/* We have a 16bit board here! */
+-			} else {
+-				model_name = "WD8003";
+-				word16 = 0;
+-			}
+-			outb(tmp, ioaddr+1);			/* Restore original reg1 value. */
+-		}
+-#ifndef final_version
+-		if ( !ancient && (inb(ioaddr+1) & 0x01) != (word16 & 0x01))
+-			pr_cont("\nWD80?3: Bus width conflict, %d (probe) != %d (reg report).",
+-				word16 ? 16 : 8,
+-				(inb(ioaddr+1) & 0x01) ? 16 : 8);
+-#endif
 -	}
 -
--	/* The 8390 isn't at the base address, so fake the offset */
--	dev->base_addr = ioaddr+ULTRA_NIC_OFFSET;
--
--	{
--		static const int addr_tbl[4] = {
--			0x0C0000, 0x0E0000, 0xFC0000, 0xFE0000
--		};
--		static const short num_pages_tbl[4] = {
--			0x20, 0x40, 0x80, 0xff
--		};
--
--		dev->mem_start = ((addr & 0x0f) << 13) + addr_tbl[(addr >> 6) & 3] ;
--		num_pages = num_pages_tbl[(addr >> 4) & 3];
+-#if defined(WD_SHMEM) && WD_SHMEM > 0x80000
+-	/* Allow a compile-time override.	 */
+-	dev->mem_start = WD_SHMEM;
+-#else
+-	if (dev->mem_start == 0) {
+-		/* Sanity and old 8003 check */
+-		int reg0 = inb(ioaddr);
+-		if (reg0 == 0xff || reg0 == 0) {
+-			/* Future plan: this could check a few likely locations first. */
+-			dev->mem_start = 0xd0000;
+-			pr_cont(" assigning address %#lx", dev->mem_start);
+-		} else {
+-			int high_addr_bits = inb(ioaddr+WD_CMDREG5) & 0x1f;
+-			/* Some boards don't have the register 5 -- it returns 0xff. */
+-			if (high_addr_bits == 0x1f || word16 == 0)
+-				high_addr_bits = 0x01;
+-			dev->mem_start = ((reg0&0x3f) << 13) + (high_addr_bits << 19);
+-		}
 -	}
--
--	ei_status.name = model_name;
--	ei_status.word16 = 1;
--	ei_status.tx_start_page = START_PG;
--	ei_status.rx_start_page = START_PG + TX_PAGES;
--	ei_status.stop_page = num_pages;
--
--	ei_status.mem = ioremap(dev->mem_start, (ei_status.stop_page - START_PG)*256);
--	if (!ei_status.mem) {
--		pr_cont(", failed to ioremap.\n");
--		retval =  -ENOMEM;
--		goto out;
--	}
--
--	dev->mem_end = dev->mem_start + (ei_status.stop_page - START_PG)*256;
--
--	if (piomode) {
--		pr_cont(", %s IRQ %d programmed-I/O mode.\n",
--			eeprom_irq ? "EEPROM" : "assigned ", dev->irq);
--		ei_status.block_input = &ultra_pio_input;
--		ei_status.block_output = &ultra_pio_output;
--		ei_status.get_8390_hdr = &ultra_pio_get_hdr;
--	} else {
--		pr_cont(", %s IRQ %d memory %#lx-%#lx.\n",
--			eeprom_irq ? "" : "assigned ", dev->irq, dev->mem_start,
--			dev->mem_end-1);
--		ei_status.block_input = &ultra_block_input;
--		ei_status.block_output = &ultra_block_output;
--		ei_status.get_8390_hdr = &ultra_get_8390_hdr;
--	}
--	ei_status.reset_8390 = &ultra_reset_8390;
--
--	dev->netdev_ops = &ultra_netdev_ops;
--	NS8390_init(dev, 0);
--	ei_local->msg_enable = ultra_msg_enable;
--
--	retval = register_netdev(dev);
--	if (retval)
--		goto out;
--	return 0;
--out:
--	release_region(ioaddr, ULTRA_IO_EXTENT);
--	return retval;
--}
--
--#ifdef __ISAPNP__
--static int __init ultra_probe_isapnp(struct net_device *dev)
--{
--        int i;
--
--        for (i = 0; ultra_device_ids[i].vendor != 0; i++) {
--		struct pnp_dev *idev = NULL;
--
--                while ((idev = pnp_find_dev(NULL,
--                                            ultra_device_ids[i].vendor,
--                                            ultra_device_ids[i].function,
--                                            idev))) {
--                        /* Avoid already found cards from previous calls */
--                        if (pnp_device_attach(idev) < 0)
--				continue;
--                        if (pnp_activate_dev(idev) < 0) {
--                              __again:
--				pnp_device_detach(idev);
--				continue;
--                        }
--			/* if no io and irq, search for next */
--			if (!pnp_port_valid(idev, 0) || !pnp_irq_valid(idev, 0))
--				goto __again;
--                        /* found it */
--			dev->base_addr = pnp_port_start(idev, 0);
--			dev->irq = pnp_irq(idev, 0);
--			netdev_info(dev,
--				    "smc-ultra.c: ISAPnP reports %s at i/o %#lx, irq %d.\n",
--				    (char *) ultra_device_ids[i].driver_data,
--				    dev->base_addr, dev->irq);
--                        if (ultra_probe1(dev, dev->base_addr) != 0) {      /* Shouldn't happen. */
--				netdev_err(dev,
--					   "smc-ultra.c: Probe of ISAPnP card at %#lx failed.\n",
--					   dev->base_addr);
--				pnp_device_detach(idev);
--				return -ENXIO;
--                        }
--                        ei_status.priv = (unsigned long)idev;
--                        break;
--                }
--                if (!idev)
--                        continue;
--                return 0;
--        }
--
--        return -ENODEV;
--}
 -#endif
 -
+-	/* The 8390 isn't at the base address -- the ASIC regs are there! */
+-	dev->base_addr = ioaddr+WD_NIC_OFFSET;
+-
+-	if (dev->irq < 2) {
+-		static const int irqmap[] = {9, 3, 5, 7, 10, 11, 15, 4};
+-		int reg1 = inb(ioaddr+1);
+-		int reg4 = inb(ioaddr+4);
+-		if (ancient || reg1 == 0xff) {	/* Ack!! No way to read the IRQ! */
+-			short nic_addr = ioaddr+WD_NIC_OFFSET;
+-			unsigned long irq_mask;
+-
+-			/* We have an old-style ethercard that doesn't report its IRQ
+-			   line.  Do autoirq to find the IRQ line. Note that this IS NOT
+-			   a reliable way to trigger an interrupt. */
+-			outb_p(E8390_NODMA + E8390_STOP, nic_addr);
+-			outb(0x00, nic_addr+EN0_IMR);	/* Disable all intrs. */
+-
+-			irq_mask = probe_irq_on();
+-			outb_p(0xff, nic_addr + EN0_IMR);	/* Enable all interrupts. */
+-			outb_p(0x00, nic_addr + EN0_RCNTLO);
+-			outb_p(0x00, nic_addr + EN0_RCNTHI);
+-			outb(E8390_RREAD+E8390_START, nic_addr); /* Trigger it... */
+-			mdelay(20);
+-			dev->irq = probe_irq_off(irq_mask);
+-
+-			outb_p(0x00, nic_addr+EN0_IMR);	/* Mask all intrs. again. */
+-
+-			if (wd_msg_enable & NETIF_MSG_PROBE)
+-				pr_cont(" autoirq is %d", dev->irq);
+-			if (dev->irq < 2)
+-				dev->irq = word16 ? 10 : 5;
+-		} else
+-			dev->irq = irqmap[((reg4 >> 5) & 0x03) + (reg1 & 0x04)];
+-	} else if (dev->irq == 2)		/* Fixup bogosity: IRQ2 is really IRQ9 */
+-		dev->irq = 9;
+-
+-	/* Snarf the interrupt now.  There's no point in waiting since we cannot
+-	   share and the board will usually be enabled. */
+-	i = request_irq(dev->irq, ei_interrupt, 0, DRV_NAME, dev);
+-	if (i) {
+-		pr_cont(" unable to get IRQ %d.\n", dev->irq);
+-		return i;
+-	}
+-
+-	/* OK, were are certain this is going to work.  Setup the device. */
+-	ei_status.name = model_name;
+-	ei_status.word16 = word16;
+-	ei_status.tx_start_page = WD_START_PG;
+-	ei_status.rx_start_page = WD_START_PG + TX_PAGES;
+-
+-	/* Don't map in the shared memory until the board is actually opened. */
+-
+-	/* Some cards (eg WD8003EBT) can be jumpered for more (32k!) memory. */
+-	if (dev->mem_end != 0) {
+-		ei_status.stop_page = (dev->mem_end - dev->mem_start)/256;
+-		ei_status.priv = dev->mem_end - dev->mem_start;
+-	} else {
+-		ei_status.stop_page = word16 ? WD13_STOP_PG : WD03_STOP_PG;
+-		dev->mem_end = dev->mem_start + (ei_status.stop_page - WD_START_PG)*256;
+-		ei_status.priv = (ei_status.stop_page - WD_START_PG)*256;
+-	}
+-
+-	ei_status.mem = ioremap(dev->mem_start, ei_status.priv);
+-	if (!ei_status.mem) {
+-		free_irq(dev->irq, dev);
+-		return -ENOMEM;
+-	}
+-
+-	pr_cont(" %s, IRQ %d, shared memory at %#lx-%#lx.\n",
+-		model_name, dev->irq, dev->mem_start, dev->mem_end-1);
+-
+-	ei_status.reset_8390 = wd_reset_8390;
+-	ei_status.block_input = wd_block_input;
+-	ei_status.block_output = wd_block_output;
+-	ei_status.get_8390_hdr = wd_get_8390_hdr;
+-
+-	dev->netdev_ops = &wd_netdev_ops;
+-	NS8390_init(dev, 0);
+-	ei_local->msg_enable = wd_msg_enable;
+-
+-#if 1
+-	/* Enable interrupt generation on softconfig cards -- M.U */
+-	/* .. but possibly potentially unsafe - Donald */
+-	if (inb(ioaddr+14) & 0x20)
+-		outb(inb(ioaddr+4)|0x80, ioaddr+4);
+-#endif
+-
+-	err = register_netdev(dev);
+-	if (err) {
+-		free_irq(dev->irq, dev);
+-		iounmap(ei_status.mem);
+-	}
+-	return err;
+-}
+-
 -static int
--ultra_open(struct net_device *dev)
+-wd_open(struct net_device *dev)
 -{
--	int retval;
--	int ioaddr = dev->base_addr - ULTRA_NIC_OFFSET; /* ASIC addr */
--	unsigned char irq2reg[] = {0, 0, 0x04, 0x08, 0, 0x0C, 0, 0x40,
--				   0, 0x04, 0x44, 0x48, 0, 0, 0, 0x4C, };
+-  int ioaddr = dev->base_addr - WD_NIC_OFFSET; /* WD_CMDREG */
 -
--	retval = request_irq(dev->irq, ei_interrupt, 0, dev->name, dev);
--	if (retval)
--		return retval;
+-  /* Map in the shared memory. Always set register 0 last to remain
+-	 compatible with very old boards. */
+-  ei_status.reg0 = ((dev->mem_start>>13) & 0x3f) | WD_MEMENB;
+-  ei_status.reg5 = ((dev->mem_start>>19) & 0x1f) | NIC16;
 -
--	outb(0x00, ioaddr);	/* Disable shared memory for safety. */
--	outb(0x80, ioaddr + 5);
--	/* Set the IRQ line. */
--	outb(inb(ioaddr + 4) | 0x80, ioaddr + 4);
--	outb((inb(ioaddr + 13) & ~0x4C) | irq2reg[dev->irq], ioaddr + 13);
--	outb(inb(ioaddr + 4) & 0x7f, ioaddr + 4);
+-  if (ei_status.word16)
+-	  outb(ei_status.reg5, ioaddr+WD_CMDREG5);
+-  outb(ei_status.reg0, ioaddr); /* WD_CMDREG */
 -
--	if (ei_status.block_input == &ultra_pio_input) {
--		outb(0x11, ioaddr + 6);		/* Enable interrupts and PIO. */
--		outb(0x01, ioaddr + 0x19);  	/* Enable ring read auto-wrap. */
--	} else
--		outb(0x01, ioaddr + 6);		/* Enable interrupts and memory. */
--	/* Set the early receive warning level in window 0 high enough not
--	   to receive ERW interrupts. */
--	outb_p(E8390_NODMA+E8390_PAGE0, dev->base_addr);
--	outb(0xff, dev->base_addr + EN0_ERWCNT);
--	ei_open(dev);
--	return 0;
+-  return ei_open(dev);
 -}
 -
 -static void
--ultra_reset_8390(struct net_device *dev)
+-wd_reset_8390(struct net_device *dev)
 -{
--	int cmd_port = dev->base_addr - ULTRA_NIC_OFFSET; /* ASIC base addr */
+-	int wd_cmd_port = dev->base_addr - WD_NIC_OFFSET; /* WD_CMDREG */
 -	struct ei_device *ei_local = netdev_priv(dev);
 -
--	outb(ULTRA_RESET, cmd_port);
--	netif_dbg(ei_local, hw, dev, "resetting Ultra, t=%ld...\n", jiffies);
+-	outb(WD_RESET, wd_cmd_port);
+-	netif_dbg(ei_local, hw, dev, "resetting the WD80x3 t=%lu...\n",
+-		  jiffies);
 -	ei_status.txing = 0;
 -
--	outb(0x00, cmd_port);	/* Disable shared memory for safety. */
--	outb(0x80, cmd_port + 5);
--	if (ei_status.block_input == &ultra_pio_input)
--		outb(0x11, cmd_port + 6);		/* Enable interrupts and PIO. */
--	else
--		outb(0x01, cmd_port + 6);		/* Enable interrupts and memory. */
+-	/* Set up the ASIC registers, just in case something changed them. */
+-	outb((((dev->mem_start>>13) & 0x3f)|WD_MEMENB), wd_cmd_port);
+-	if (ei_status.word16)
+-		outb(NIC16 | ((dev->mem_start>>19) & 0x1f), wd_cmd_port+WD_CMDREG5);
 -
 -	netif_dbg(ei_local, hw, dev, "reset done\n");
 -}
@@ -616,11 +577,17 @@ index 22ca804b2e95..000000000000
 -   the start of a page, so we optimize accordingly. */
 -
 -static void
--ultra_get_8390_hdr(struct net_device *dev, struct e8390_pkt_hdr *hdr, int ring_page)
+-wd_get_8390_hdr(struct net_device *dev, struct e8390_pkt_hdr *hdr, int ring_page)
 -{
--	void __iomem *hdr_start = ei_status.mem + ((ring_page - START_PG)<<8);
 -
--	outb(ULTRA_MEMENB, dev->base_addr - ULTRA_NIC_OFFSET);	/* shmem on */
+-	int wd_cmdreg = dev->base_addr - WD_NIC_OFFSET; /* WD_CMDREG */
+-	void __iomem *hdr_start = ei_status.mem + ((ring_page - WD_START_PG)<<8);
+-
+-	/* We'll always get a 4 byte header read followed by a packet read, so
+-	   we enable 16 bit mode before the header, and disable after the body. */
+-	if (ei_status.word16)
+-		outb(ISA16 | ei_status.reg5, wd_cmdreg+WD_CMDREG5);
+-
 -#ifdef __BIG_ENDIAN
 -	/* Officially this is what we are doing, but the readl() is faster */
 -	/* unfortunately it isn't endian aware of the struct               */
@@ -629,172 +596,142 @@ index 22ca804b2e95..000000000000
 -#else
 -	((unsigned int*)hdr)[0] = readl(hdr_start);
 -#endif
--	outb(0x00, dev->base_addr - ULTRA_NIC_OFFSET); /* shmem off */
 -}
 -
--/* Block input and output are easy on shared memory ethercards, the only
--   complication is when the ring buffer wraps. */
+-/* Block input and output are easy on shared memory ethercards, and trivial
+-   on the Western digital card where there is no choice of how to do it.
+-   The only complications are that the ring buffer wraps, and need to map
+-   switch between 8- and 16-bit modes. */
 -
 -static void
--ultra_block_input(struct net_device *dev, int count, struct sk_buff *skb, int ring_offset)
+-wd_block_input(struct net_device *dev, int count, struct sk_buff *skb, int ring_offset)
 -{
--	void __iomem *xfer_start = ei_status.mem + ring_offset - (START_PG<<8);
+-	int wd_cmdreg = dev->base_addr - WD_NIC_OFFSET; /* WD_CMDREG */
+-	unsigned long offset = ring_offset - (WD_START_PG<<8);
+-	void __iomem *xfer_start = ei_status.mem + offset;
 -
--	/* Enable shared memory. */
--	outb(ULTRA_MEMENB, dev->base_addr - ULTRA_NIC_OFFSET);
--
--	if (ring_offset + count > ei_status.stop_page*256) {
+-	if (offset + count > ei_status.priv) {
 -		/* We must wrap the input move. */
--		int semi_count = ei_status.stop_page*256 - ring_offset;
+-		int semi_count = ei_status.priv - offset;
 -		memcpy_fromio(skb->data, xfer_start, semi_count);
 -		count -= semi_count;
 -		memcpy_fromio(skb->data + semi_count, ei_status.mem + TX_PAGES * 256, count);
 -	} else {
+-		/* Packet is in one chunk -- we can copy + cksum. */
 -		memcpy_fromio(skb->data, xfer_start, count);
 -	}
 -
--	outb(0x00, dev->base_addr - ULTRA_NIC_OFFSET);	/* Disable memory. */
+-	/* Turn off 16 bit access so that reboot works.	 ISA brain-damage */
+-	if (ei_status.word16)
+-		outb(ei_status.reg5, wd_cmdreg+WD_CMDREG5);
 -}
 -
 -static void
--ultra_block_output(struct net_device *dev, int count, const unsigned char *buf,
+-wd_block_output(struct net_device *dev, int count, const unsigned char *buf,
 -				int start_page)
 -{
--	void __iomem *shmem = ei_status.mem + ((start_page - START_PG)<<8);
+-	int wd_cmdreg = dev->base_addr - WD_NIC_OFFSET; /* WD_CMDREG */
+-	void __iomem *shmem = ei_status.mem + ((start_page - WD_START_PG)<<8);
 -
--	/* Enable shared memory. */
--	outb(ULTRA_MEMENB, dev->base_addr - ULTRA_NIC_OFFSET);
 -
--	memcpy_toio(shmem, buf, count);
--
--	outb(0x00, dev->base_addr - ULTRA_NIC_OFFSET); /* Disable memory. */
+-	if (ei_status.word16) {
+-		/* Turn on and off 16 bit access so that reboot works. */
+-		outb(ISA16 | ei_status.reg5, wd_cmdreg+WD_CMDREG5);
+-		memcpy_toio(shmem, buf, count);
+-		outb(ei_status.reg5, wd_cmdreg+WD_CMDREG5);
+-	} else
+-		memcpy_toio(shmem, buf, count);
 -}
 -
--/* The identical operations for programmed I/O cards.
--   The PIO model is trivial to use: the 16 bit start address is written
--   byte-sequentially to IOPA, with no intervening I/O operations, and the
--   data is read or written to the IOPD data port.
--   The only potential complication is that the address register is shared
--   and must be always be rewritten between each read/write direction change.
--   This is no problem for us, as the 8390 code ensures that we are single
--   threaded. */
--static void ultra_pio_get_hdr(struct net_device *dev, struct e8390_pkt_hdr *hdr,
--						int ring_page)
--{
--	int ioaddr = dev->base_addr - ULTRA_NIC_OFFSET; /* ASIC addr */
--	outb(0x00, ioaddr + IOPA);	/* Set the address, LSB first. */
--	outb(ring_page, ioaddr + IOPA);
--	insw(ioaddr + IOPD, hdr, sizeof(struct e8390_pkt_hdr)>>1);
--}
--
--static void ultra_pio_input(struct net_device *dev, int count,
--						  struct sk_buff *skb, int ring_offset)
--{
--	int ioaddr = dev->base_addr - ULTRA_NIC_OFFSET; /* ASIC addr */
--    char *buf = skb->data;
--
--	/* For now set the address again, although it should already be correct. */
--	outb(ring_offset, ioaddr + IOPA);	/* Set the address, LSB first. */
--	outb(ring_offset >> 8, ioaddr + IOPA);
--	/* We know skbuffs are padded to at least word alignment. */
--	insw(ioaddr + IOPD, buf, (count+1)>>1);
--}
--static void ultra_pio_output(struct net_device *dev, int count,
--							const unsigned char *buf, const int start_page)
--{
--	int ioaddr = dev->base_addr - ULTRA_NIC_OFFSET; /* ASIC addr */
--	outb(0x00, ioaddr + IOPA);	/* Set the address, LSB first. */
--	outb(start_page, ioaddr + IOPA);
--	/* An extra odd byte is OK here as well. */
--	outsw(ioaddr + IOPD, buf, (count+1)>>1);
--}
 -
 -static int
--ultra_close_card(struct net_device *dev)
+-wd_close(struct net_device *dev)
 -{
--	int ioaddr = dev->base_addr - ULTRA_NIC_OFFSET; /* CMDREG */
+-	int wd_cmdreg = dev->base_addr - WD_NIC_OFFSET; /* WD_CMDREG */
 -	struct ei_device *ei_local = netdev_priv(dev);
 -
--	netif_stop_queue(dev);
--
 -	netif_dbg(ei_local, ifdown, dev, "Shutting down ethercard.\n");
+-	ei_close(dev);
 -
--	outb(0x00, ioaddr + 6);		/* Disable interrupts. */
--	free_irq(dev->irq, dev);
+-	/* Change from 16-bit to 8-bit shared memory so reboot works. */
+-	if (ei_status.word16)
+-		outb(ei_status.reg5, wd_cmdreg + WD_CMDREG5 );
 -
--	NS8390_init(dev, 0);
--
--	/* We should someday disable shared memory and change to 8-bit mode
--	   "just in case"... */
+-	/* And disable the shared memory. */
+-	outb(ei_status.reg0 & ~WD_MEMENB, wd_cmdreg);
 -
 -	return 0;
 -}
 -
 -
 -#ifdef MODULE
--#define MAX_ULTRA_CARDS	4	/* Max number of Ultra cards per module */
--static struct net_device *dev_ultra[MAX_ULTRA_CARDS];
--static int io[MAX_ULTRA_CARDS];
--static int irq[MAX_ULTRA_CARDS];
+-#define MAX_WD_CARDS	4	/* Max number of wd cards per module */
+-static struct net_device *dev_wd[MAX_WD_CARDS];
+-static int io[MAX_WD_CARDS];
+-static int irq[MAX_WD_CARDS];
+-static int mem[MAX_WD_CARDS];
+-static int mem_end[MAX_WD_CARDS];	/* for non std. mem size */
 -
 -module_param_hw_array(io, int, ioport, NULL, 0);
 -module_param_hw_array(irq, int, irq, NULL, 0);
--module_param_named(msg_enable, ultra_msg_enable, uint, 0444);
+-module_param_hw_array(mem, int, iomem, NULL, 0);
+-module_param_hw_array(mem_end, int, iomem, NULL, 0);
+-module_param_named(msg_enable, wd_msg_enable, uint, 0444);
 -MODULE_PARM_DESC(io, "I/O base address(es)");
--MODULE_PARM_DESC(irq, "IRQ number(s) (assigned)");
+-MODULE_PARM_DESC(irq, "IRQ number(s) (ignored for PureData boards)");
+-MODULE_PARM_DESC(mem, "memory base address(es)(ignored for PureData boards)");
+-MODULE_PARM_DESC(mem_end, "memory end address(es)");
 -MODULE_PARM_DESC(msg_enable, "Debug message level (see linux/netdevice.h for bitmap)");
--MODULE_DESCRIPTION("SMC Ultra/EtherEZ ISA/PnP Ethernet driver");
+-MODULE_DESCRIPTION("ISA Western Digital wd8003/wd8013 ; SMC Elite, Elite16 ethernet driver");
 -MODULE_LICENSE("GPL");
 -
 -/* This is set up so that only a single autoprobe takes place per call.
 -ISA device autoprobes on a running machine are not recommended. */
--static int __init ultra_init_module(void)
+-
+-static int __init wd_init_module(void)
 -{
 -	struct net_device *dev;
 -	int this_dev, found = 0;
 -
--	for (this_dev = 0; this_dev < MAX_ULTRA_CARDS; this_dev++) {
+-	for (this_dev = 0; this_dev < MAX_WD_CARDS; this_dev++) {
 -		if (io[this_dev] == 0)  {
 -			if (this_dev != 0) break; /* only autoprobe 1st one */
--			printk(KERN_NOTICE "smc-ultra.c: Presently autoprobing (not recommended) for a single card.\n");
+-			printk(KERN_NOTICE "wd.c: Presently autoprobing (not recommended) for a single card.\n");
 -		}
 -		dev = alloc_ei_netdev();
 -		if (!dev)
 -			break;
 -		dev->irq = irq[this_dev];
 -		dev->base_addr = io[this_dev];
--		if (do_ultra_probe(dev) == 0) {
--			dev_ultra[found++] = dev;
+-		dev->mem_start = mem[this_dev];
+-		dev->mem_end = mem_end[this_dev];
+-		if (do_wd_probe(dev) == 0) {
+-			dev_wd[found++] = dev;
 -			continue;
 -		}
 -		free_netdev(dev);
--		printk(KERN_WARNING "smc-ultra.c: No SMC Ultra card found (i/o = 0x%x).\n", io[this_dev]);
+-		printk(KERN_WARNING "wd.c: No wd80x3 card found (i/o = 0x%x).\n", io[this_dev]);
 -		break;
 -	}
 -	if (found)
 -		return 0;
 -	return -ENXIO;
 -}
--module_init(ultra_init_module);
+-module_init(wd_init_module);
 -
 -static void cleanup_card(struct net_device *dev)
 -{
--	/* NB: ultra_close_card() does free_irq */
--#ifdef __ISAPNP__
--	struct pnp_dev *idev = (struct pnp_dev *)ei_status.priv;
--	if (idev)
--		pnp_device_detach(idev);
--#endif
--	release_region(dev->base_addr - ULTRA_NIC_OFFSET, ULTRA_IO_EXTENT);
+-	free_irq(dev->irq, dev);
+-	release_region(dev->base_addr - WD_NIC_OFFSET, WD_IO_EXTENT);
 -	iounmap(ei_status.mem);
 -}
 -
--static void __exit ultra_cleanup_module(void)
+-static void __exit wd_cleanup_module(void)
 -{
 -	int this_dev;
 -
--	for (this_dev = 0; this_dev < MAX_ULTRA_CARDS; this_dev++) {
--		struct net_device *dev = dev_ultra[this_dev];
+-	for (this_dev = 0; this_dev < MAX_WD_CARDS; this_dev++) {
+-		struct net_device *dev = dev_wd[this_dev];
 -		if (dev) {
 -			unregister_netdev(dev);
 -			cleanup_card(dev);
@@ -802,7 +739,7 @@ index 22ca804b2e95..000000000000
 -		}
 -	}
 -}
--module_exit(ultra_cleanup_module);
+-module_exit(wd_cleanup_module);
 -#endif /* MODULE */
 
 -- 
