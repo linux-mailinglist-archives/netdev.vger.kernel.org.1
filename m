@@ -1,80 +1,65 @@
-Return-Path: <netdev+bounces-280099-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280100-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iCzJBG9s52ke8AEAu9opvQ
-	(envelope-from <netdev+bounces-280099-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 14:24:15 +0200
+	id eIjCBdNs52ke8AEAu9opvQ
+	(envelope-from <netdev+bounces-280100-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 14:25:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B82C043A953
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 14:24:14 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE09043A98E
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 14:25:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B970C3040C50
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 12:22:44 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1E51530117E6
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 12:25:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7C893C062D;
-	Tue, 21 Apr 2026 12:22:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A14C3C3C1E;
+	Tue, 21 Apr 2026 12:25:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pDUCyVwG"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="cmxr/p+A"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 368913C277F;
-	Tue, 21 Apr 2026 12:22:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98B153C455C;
+	Tue, 21 Apr 2026 12:25:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776774161; cv=none; b=jTEebs0YEylwjxgR1g50jdh6pIS4KvH5hqQPJsy3SAsoFx5PKXZCG0pQAKxtxWafESD0VwXv2aWkIXAd4TM7qrYYkJpi18v6zejkdjVcwK5+oJ32wViXOmC93amEbZss6XGxslKsMjfJylhyYDwXyo5Hew8NTHWnZ0COMNW77d4=
+	t=1776774347; cv=none; b=oYvNKaVjQR9g17tXaAXE4o6eyQTfLGEJeSZ4oS7XdEpOPWWJNBWD1vzg0dSzsDuhw2NPqjJJuAv0M1DEagwFEXMyEAEJc6VkXT7XnUeXFq45IX+4byaygjkpxQkRRdh7WmIhMhGcr81YaUjVeZ0KsQvJOPWNzoQu1jeY+Zliopc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776774161; c=relaxed/simple;
-	bh=FjTWTBKyxU9wnoOFIU6eC+Zsg/ak07chnRRJ6hIxvXc=;
+	s=arc-20240116; t=1776774347; c=relaxed/simple;
+	bh=ZhHd2FrW7rItrNUJWV3lcJYp57NU0EMoc2hYcgX69ws=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hCuYTkFZJ5lNMw6qGCiWWRzBMh79+4I9ZaTxQmuVydrJW2JMDClZrFq5uMo6DPqXlewjJqfS3WN2urWk1bmydXlqXWPXpYOtYIGndJWyz7wud2w2b2TpgsMbjOpjK/8J8L6PNz8mZnfbmqBWGqXKdyUGU/6DLE8w4v4HS5Yn+Cg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pDUCyVwG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5106C2BCB0;
-	Tue, 21 Apr 2026 12:22:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776774160;
-	bh=FjTWTBKyxU9wnoOFIU6eC+Zsg/ak07chnRRJ6hIxvXc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pDUCyVwGb8ya/GZDqDieIScgOVrPOl3I/FJS9ccMew51Xp1PwcmYEtedShhwnrxmc
-	 RCa1sJsDGPFZz7l6xh8HYRvZ9j5G0bWWeLPo1qSM5vCkcLDW5wJx2OyFKcOZhGoLOI
-	 YwnWftevNO1eAx5/cWBBv5WlkJhG/5+YfhdJ7vYHIkPT3IgE3VLw8p3NofnqsNgFtH
-	 RYEOsuva6FlMuZC1XmZz9dmSpii3t/okBhMPqO1l7pjE1ED/sH7WZTsW/w8Cyns2AW
-	 HTHIQlNviNnES+NmZ/S8HynmnxRzzgDyzjO6jdJPH1Z83lN19f1bjFMnu8aORK25oM
-	 Z2/yYBPfJux+A==
-Date: Tue, 21 Apr 2026 17:52:22 +0530
-From: Sumit Garg <sumit.garg@kernel.org>
-To: Bjorn Andersson <andersson@kernel.org>
-Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
-	dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
-	linux-media@vger.kernel.org, netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org, ath12k@lists.infradead.org,
-	linux-remoteproc@vger.kernel.org, konradybcio@kernel.org,
-	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
-	robin.clark@oss.qualcomm.com, sean@poorly.run,
-	akhilpo@oss.qualcomm.com, lumag@kernel.org, abhinav.kumar@linux.dev,
-	jesszhan0024@gmail.com, marijn.suijten@somainline.org,
-	airlied@gmail.com, simona@ffwll.ch, vikash.garodia@oss.qualcomm.com,
-	dikshita.agarwal@oss.qualcomm.com, bod@kernel.org,
-	mchehab@kernel.org, elder@kernel.org, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, jjohnson@kernel.org, mathieu.poirier@linaro.org,
-	trilokkumar.soni@oss.qualcomm.com, mukesh.ojha@oss.qualcomm.com,
-	pavan.kondeti@oss.qualcomm.com, jorge.ramirez@oss.qualcomm.com,
-	tonyh@qti.qualcomm.com, vignesh.viswanathan@oss.qualcomm.com,
-	srinivas.kandagatla@oss.qualcomm.com,
-	amirreza.zarrabi@oss.qualcomm.com, jens.wiklander@linaro.org,
-	op-tee@lists.trustedfirmware.org, apurupa@qti.qualcomm.com,
-	skare@qti.qualcomm.com, harshal.dev@oss.qualcomm.com,
-	linux-kernel@vger.kernel.org,
-	Sumit Garg <sumit.garg@oss.qualcomm.com>
-Subject: Re: [PATCH v3 00/15] firmware: qcom: Add OP-TEE PAS service support
-Message-ID: <aedr_gE2Sxs-UvbL@sumit-xelite>
-References: <20260327131043.627120-1-sumit.garg@kernel.org>
- <adPLx3nCBb8IHz2b@baldur>
- <adSOFCL26y5qt1Cu@sumit-xelite>
+	 Content-Type:Content-Disposition:In-Reply-To; b=qC03uJnUDRZAQSKId/fdsEBW7OIZCQfaN3JW7XUTDKKzCChyfXuUiSlO1Bz/HXxZiffGmy/RVu/QgL2mMZ/KbC9csFviK7EFp9dXYOzKBliPl4MtCgDvWIoS7j9dQjoIsEZ2l+UvP9WS6XytsmvPiXKCmytFt2rCcoHWSM7XNVA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=cmxr/p+A; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=DNU9H52ZbtEWsgC0S8tHko+P0/6qPpSIAMXfwbnDHT8=; b=cmxr/p+A9thEWzclZs2J2oIdXo
+	Kz0cLlr//2AZdK5FURdQhba71NoaOO3mxZJNrColNBL1kEeVhDYC556exMJjZLEpkiodr0W/ik7D2
+	5Gu7wo71Y8mALxOHYZ/e8qxw8LhHZEULusDyEQn4U4VAosfpitdNDRax7Tv25PLj6PmE=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wFAAR-00GtEv-GA; Tue, 21 Apr 2026 14:25:27 +0200
+Date: Tue, 21 Apr 2026 14:25:27 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: hugh@blemings.id.au
+Cc: Paolo Abeni <pabeni@redhat.com>,
+	Mashiro Chen <mashiro.chen@mailbox.org>, netdev@vger.kernel.org,
+	linux-hams@vger.kernel.org, kuba@kernel.org, horms@kernel.org,
+	davem@davemloft.net, edumazet@google.com,
+	Greg KH <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH v4 net] net: ax25: fix integer overflow in
+ ax25_rx_fragment()
+Message-ID: <8bb9032b-3a5a-4e0f-aa17-da407af62df7@lunn.ch>
+References: <20260409025026.24575-1-mashiro.chen@mailbox.org>
+ <20260413204921.70463-1-mashiro.chen@mailbox.org>
+ <805a8583-6a84-4dfb-a4d4-53f80f50effc@redhat.com>
+ <e2a47378-9008-45a2-92e3-d1f374b5e766@blemings.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,78 +68,95 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <adSOFCL26y5qt1Cu@sumit-xelite>
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+In-Reply-To: <e2a47378-9008-45a2-92e3-d1f374b5e766@blemings.org>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-280099-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-280100-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.freedesktop.org,lists.infradead.org,kernel.org,oss.qualcomm.com,poorly.run,linux.dev,gmail.com,somainline.org,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,qti.qualcomm.com,lists.trustedfirmware.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[50];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sumit.garg@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B82C043A953
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mailbox.org:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,lwn.net:url]
+X-Rspamd-Queue-Id: AE09043A98E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Apr 07, 2026 at 10:24:44AM +0530, Sumit Garg wrote:
-> Hi Bjorn,
+On Tue, Apr 21, 2026 at 06:45:39PM +1000, Hugh Blemings wrote:
+> Hi Paolo, All,
 > 
-> On Mon, Apr 06, 2026 at 10:09:27AM -0500, Bjorn Andersson wrote:
-> > On Fri, Mar 27, 2026 at 06:40:28PM +0530, Sumit Garg wrote:
-> > > From: Sumit Garg <sumit.garg@oss.qualcomm.com>
+> On 21/4/2026 17:29, Paolo Abeni wrote:
+> > On 4/13/26 10:49 PM, Mashiro Chen wrote:
+> > > ax25_rx_fragment() accumulates fragment lengths into ax25_cb->fraglen,
+> > > which is an unsigned short. When the total exceeds 65535, fraglen wraps
+> > > around to a small value. The subsequent alloc_skb(fraglen) allocates a
+> > > too-small buffer, and skb_put() in the copy loop triggers skb_over_panic().
 > > > 
-> > > Qcom platforms has the legacy of using non-standard SCM calls
-> > > splintered over the various kernel drivers. These SCM calls aren't
-> > > compliant with the standard SMC calling conventions which is a
-> > > prerequisite to enable migration to the FF-A specifications from Arm.
+> > > Add pskb_may_pull(skb, 1) at function entry to ensure the segmentation
+> > > header byte is in the linear data area before dereferencing skb->data.
+> > > This also rejects zero-length skbs, which the original code did not
+> > > check for.
 > > > 
+> > > Two issues in the overflow error path are also fixed:
+> > > First, the current skb, after skb_pull(skb, 1), is neither enqueued
+> > > nor freed before returning 1, leaking it. Add kfree_skb(skb) before
+> > > the return.
+> > > Second, ax25->fraglen is not reset after skb_queue_purge(). Add
+> > > ax25->fraglen = 0 to restore a consistent state.
+> > > 
+> > > Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> > > Signed-off-by: Mashiro Chen <mashiro.chen@mailbox.org>
+> > we are moving ax25 out of tree:
 > > 
-> > Please get our colleagues involved in this discussion, because this
-> > non-SCM interface does not match the direction we are taking.
+> > https://lore.kernel.org/netdev/20260421021824.1293976-1-kuba@kernel.org/
+> > 
+> > please hold off until Thursday (after that our net PR will land into
+> > mainline), and eventually resend if the code still exists in Linus's
+> > tree at that point.
 > 
-> I thought I have already involved folks from QTEE perspective (Apurupa
-> and Sree) actively working on FF-A implementation aligned to this
-> interface. It would have been better if you could let me know where is
-> the direction mismatch here. In case there is a better alternative
-> design proposal for PAS service with FF-A, I would be happy to hear
-> that.
+> Is there any flexibility here ?
 > 
-> Anyhow for the legacy SoCs like KLMT, we really don't have any
-> alternative but have to stick to existing QTEE PAS design with OP-TEE
-> providing as an alternative backend. Surely we want to support loading
-> of existing signed firmware present in linux-firmware repo for KLMT with
-> OP-TEE being the TZ.
+> Jakubs (CC'd) patches to remove unfortunately weren't cross posted to
+> linux-hams and so I'm not able to directly reply in netdev
+> 
+> We've had a thread ongoing in linux-hams around the future of
+> AX25/ROSE/NETROM for the last week or so and believe we've a path towards an
+> orderly exit from the mainline tree, probably towards a userspace
+> implementation. This includes a couple of folks who have indicated they
+> would be open to overseeing the maintenance of the code in the meantime.
+> 
+> We'd hoped to have a period of a few months to do an orderly exit from the
+> tree to minimise the impact on the (admittedly small, but non-zero) users
+> that build trees/make use of the in kernel support.
+> 
+> Apologies for my lack of familiarity with the process here to deprecate etc.
 
-After further offline internal Qcom discussions, the teams are aligned
-on the vision to use and extend generic Qcom PAS layer for all the TZ
-backends whether it's legacy SCM backend based on QTEE, OP-TEE backend
-as proposed by this patch-set or future object invoke (based on
-SMCInvoke) for QTEE.
+I know it is short notice, but there is a conference call today. Jakub
+sent this yesterday:
 
-I hope with that we can progress to get this patch-set merged in next
-merge window. I will send v4 shortly after merge window closes to
-address misc. comments from Harshal on patch 04/15.
+  The bi-weekly call is scheduled for tomorrow at 8:30 am (PT) /
+  5:30 pm (~EU), at https://bbb.lwn.net/rooms/ldm-chf-zxx-we7/join
 
--Sumit
+  I'd like to discuss evolution of the process which would prepare
+  us for the "AI age" (read: influx of plausibly looking yet entirely
+  computer generated patches).
+
+	Andrew
 
