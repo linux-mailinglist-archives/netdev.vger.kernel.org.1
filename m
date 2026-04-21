@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-280171-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280172-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OIe8GgqY52mp+AEAu9opvQ
-	(envelope-from <netdev+bounces-280171-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 17:30:18 +0200
+	id uGSTJ1WW52mp+AEAu9opvQ
+	(envelope-from <netdev+bounces-280172-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 17:23:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4642F43CBFA
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 17:30:16 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4558943CB08
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 17:23:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 592AC30314AD
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 15:22:33 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 25DA7301F3DC
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 15:22:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2FB83D9026;
-	Tue, 21 Apr 2026 15:22:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6A183D9020;
+	Tue, 21 Apr 2026 15:22:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C45U6ZqM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FmfY3CBk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 314623D8910
-	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 15:22:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E8D63D903E
+	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 15:22:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776784949; cv=none; b=El+VQFogyK4HMUY2ynhue0cB4MQfKEsqUyjx1KcphA16SATZFENu3XZHPOudGATw65SDNbzaBiztAC93CS6riBVsIIxSm8K97SICFMvtHGmSp5vd7LRcUrmi6pYAxNd3K8Qj9PoQRkk2juQIUb0ZuMBn1re6O7zfRaZrSGAo8dw=
+	t=1776784951; cv=none; b=Q0endDmNWP26GpcyNlTV7G0qdu/crTI/51SSA8PIGgi2slLUy69440oZCQRcmijJq7HCgaIrzVRXfc/tWf7wGKbg0apARH0Urv6nNO/x1Meo9zTbi3cP6V0BiCPEGwrm2eWo4tJvppbC04wdc/Eujd8iJJnyHUglP7OyGKzZsQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776784949; c=relaxed/simple;
-	bh=Y13M/z1PUkRYdx6T147SQvL+8nHPZtZjHP2OD6TEy6U=;
+	s=arc-20240116; t=1776784951; c=relaxed/simple;
+	bh=H8bkG9DBL9Xfb/wm1zVD5wdpScJ3eI851mJ2Uf1xggk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=paPxtE8kkIlQNsS8Tbh9CNXcnV8ZgYfUpdwdo93Aun/B3MmLL8VB0NGJ5+DngL3Ph+Dqp9gCqkjZJ/pSTdMLF19i/sggMvH6b+b+TXdiOgzDu6kMEXcDgeCqLlQo6Mx3uhAv1a6mNKulwBXQM68H1MP5lKs8qvX9vyNB5ph+oBg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C45U6ZqM; arc=none smtp.client-ip=209.85.221.50
+	 MIME-Version; b=SpMTBmFloWG9/DRROZZ5een6HIpBCpb7IxhO+KwTsSpB6yXV9QvHjsmPXCirESvLBNZnJ3marBOj9Y3uWWVyVJ0VkMGMMN9jmJy4otfB5fOOm8UpTphvEoS/Z2e7egRpjH5j46q7CFXBrB8j6SkQgtH9tsd5U1Uh4CH+p8bQxq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FmfY3CBk; arc=none smtp.client-ip=209.85.128.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-43fe608cb92so3037433f8f.2
-        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 08:22:27 -0700 (PDT)
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4891d7164ddso15158345e9.3
+        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 08:22:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776784946; x=1777389746; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1776784948; x=1777389748; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=8vQyN4XtQNgy58qiSyngDxgLbuPWflaYDxCcpF1TE+w=;
-        b=C45U6ZqMNPDjcIecGV5PZjiiuzhRTlihC6pAQIUvwzJw3T9Ez2thtTcFz5J/B0K6JF
-         AW9cGaGCaeKhjZ4z9ywvX+l9OpYeRJ5j4qGhHcjao2oN+MlXgNZqgzs6ZSYmCe5R9YYI
-         oivrBqzkW5E+ztNQs0HfO7wOVA1bRL8DwJRDBdrOULv1/UYAbodF3TxOP/Aj4uwvnNA2
-         VChx1odLMzxPc/DlWtA4or8skljTzaUt9UdZRYExv1I4P0JE9s06aXr/pCIPb+SRxjr+
-         epeX8Pe7FVE6uM8gLEkuUOL2rdfjuT65K7zpblEJVT4t7jdRg8/uXNs8RFEpRKFitbIT
-         wHEQ==
+        bh=ApK1G5L+Mc6Cb2sCCSVe+Ii36gaQQarOC5kERgb3MHY=;
+        b=FmfY3CBkmK4SE85NruZacF1rWPnX+oBK9hJXdzD13TuwB5Ibas1k4ooBI2Ja5dSTKA
+         Ex7QSgMtCvKkWFs+TS8A8DK/MFPokk2S6UoB9jqeZRProBZsOJ7fObYZmpbZCvfMd8XZ
+         ZW4ExZQ47h8O94Fs2eZxoDIeyvKDXhu7AQloV3WnM6h059ILzS0NA43gW/aiYBstbu5+
+         SbjbM6mPo6P6edS8j3lZ9GCB8k6UqxvMGDhIjpFHKQNZEbmQcQrT6n1uEXMo55FoegeA
+         8HosBOyOmcESSmsKaQRwsnCr+dWpC6vNE144rCIT4BPnJlTOtQ9dHbe7qnM5n1LLGjrH
+         7Ajw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776784946; x=1777389746;
+        d=1e100.net; s=20251104; t=1776784948; x=1777389748;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=8vQyN4XtQNgy58qiSyngDxgLbuPWflaYDxCcpF1TE+w=;
-        b=UH1ti2nP7+K/8ZzNJxMg1sZJ7cNR9DXuZXk50E8ezTpdVHJgPtubtb8wA0/dU5w7z3
-         3WxJ452C5fDxqbOnt5Mj3GHWYUkquLlOG3WgBG+I0P5men8RrslRRFP50hAhyTkqBbow
-         XibucEW9pItzqbrDxGQz0aQTxpLKA8Dyyd3CowHyzQhqCgjvWpsES0u935D2cy84d4p8
-         9pfd/H5SF3DKSSxu1H7Q+9ZxmN7Rqa6+skPGJ/gLtjIZ8WU74C0ZmDlLSY2jXfpTUeMg
-         8ucChdf6ZvotlnOR1YiTcV0UVNJYXZh+Fi9XJETAKuIzaaK6l7Fs4L25sFzKuuqDHIf8
-         hrRQ==
-X-Gm-Message-State: AOJu0YxeGHteiA9+eAigdpaKhlJnX2i+gUlYP1toXSAI2nOrHZRp6s+Z
-	XiIxxfZ0/s9CT7x0Knj6efIXtNtHqQQf2eNfISBZRDp1yofOYidNswYRxMPcR1Pu
-X-Gm-Gg: AeBDievixiwdZxMu6AY9ea0enHJLjpo6Pf2ZHRDicrsm2S/Vj6NC7mhDiBCsin9U5nt
-	9VbqpXdsXjtKOkqRpQFFH9HunpM86uFu+Sowqmn80SyqDHUfwulB57ga2sttNaJ5dERsijLmhVF
-	M1Htt8ZiTP9ti1fZO7MQGobBg4o1J9BJxKYNRJYjKqS5fHcCRj6g9Sdsh1B+FbgOaVhdj6ikpib
-	vNA4Ujm0kP3F2UsTVgTr30iq+BdkdpC/VkDzHYPDgP7uRwbJZk3VbM9kG+OAZhAR+gvB9ZFS0u3
-	Ah45KzK6L1P7YdLBv5w57qcPTDA5E4rSQsLcV0JUrg082DMfmgGIL+qFnoHDZW+MV5fFnRdzH76
-	3IUXlZYUXjfbAWrjmG6+DJ4qEy0b9/BsThANAMYfi1jaUX4CNp6hOKALOPBh9GS/a6Ua5Be2jfs
-	V+3und0gR1YX78cbhiIPA7BjCDMz9mw8a1T2VzIjmxhLe6IMQ8XfPdkBrp9giVovfoBZRxTv8du
-	kpTsPUtNHUCUgAfD+kxBg==
-X-Received: by 2002:a05:6000:250e:b0:439:b440:b8a2 with SMTP id ffacd0b85a97d-43fe3dfba35mr27902238f8f.28.1776784945891;
-        Tue, 21 Apr 2026 08:22:25 -0700 (PDT)
+        bh=ApK1G5L+Mc6Cb2sCCSVe+Ii36gaQQarOC5kERgb3MHY=;
+        b=JWuhXufmOLkpo1qm+NX8bXQqrFEkiUJC9vlDdX0CBcEkcT/2b1SLCtXq2xvNscSNeL
+         2Cm3Yj2W69Fp15eawoCxN6mm67yx8RpZ+Zl9QfGPrfDoToa+13W1450wfb7tMRGmoSjl
+         WaHcB5oVkSh2GcwJFVFjY7PPMzo/AFbNmizbMC+QMzMnDNmnVAm5xAXx91U63TBj6poR
+         HqKxT5dgfc8BxglhiJjJDT2WnEPUh1fGAKBSyb1reI2tpPFzMCMSYkyGlH94/dnm0qyD
+         iKwA0q8ndoyFs6S+hat2FpLbX9ksCjQ1/kGqk2la4bNe+G2gB9CIN8MyaEf2fGMW7PXq
+         sd8Q==
+X-Gm-Message-State: AOJu0Yx/NyRpUVXHyJ4ws4ebEYlMRpdllyc4YqNnvVljaCTHzCgh6D9Y
+	8x2L8Byz5Uy4KfC2tPuGv0afdGM2Mq0d4TWsaNL1f1U3oB9gROBvTRyTt8cwvNvC
+X-Gm-Gg: AeBDietokNrbtO3K7ZPyzV/g5CvH0dB1u/DEZPKs9mQLfOrQlgBsiv9SDdFOPWhYCpi
+	Px3Pt+9UUgrK7Uq6/AQ9l7Q2i42VJFGALw5hWfGt7ZRZx+uSJUXAwhL1HecLH74LbgHkuXzZ9n7
+	nQ9aFRPxfFl+AKFWRZKAXBSNtVedrKwaaxeVlde3VD3FznkTgcWjtp6QPoxHdPJTNjLqXj11BzX
+	aqydMwU+waEP+F8fz6romB7Xs8AYUFBHeEuuvLyAlU1k8+HWLNlmoB7d0rku9rwkeHdcyy/qshe
+	PwiIKAxmCWgEEczFU/it9gEjOur1HVvHDkIqK8vlhI2+A+Q84vTIeKT3KOyaxHUfUz4hDkhJzBs
+	+OytPKQ5EGvAwmdxqBHcftTlz1unj67jCKcvxMzkdBRAg54zBsHhwxLFZplSXhFJMz8JMYiT3cw
+	6iu+QKSzSb2ANrUOEhUOUQAiWTOgddKZrQol4OmMsTirdyvSIk6impn/gU780slt9RW/Hlzn0+S
+	9IBesvjItwfFyzqpSMlCH+IF1QjUXbG
+X-Received: by 2002:a05:600c:6296:b0:483:64b4:79da with SMTP id 5b1f17b1804b1-488fb7923a9mr250841765e9.26.1776784947890;
+        Tue, 21 Apr 2026 08:22:27 -0700 (PDT)
 Received: from dohko.chello.ie (188-141-5-72.dynamic.upc.ie. [188.141.5.72])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4411c9f4f03sm8975225f8f.1.2026.04.21.08.22.24
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4411c9f4f03sm8975225f8f.1.2026.04.21.08.22.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Apr 2026 08:22:25 -0700 (PDT)
+        Tue, 21 Apr 2026 08:22:27 -0700 (PDT)
 From: David Carlier <devnexen@gmail.com>
 To: netdev@vger.kernel.org,
 	mptcp@lists.linux.dev
@@ -88,9 +88,9 @@ Cc: matttbe@kernel.org,
 	pabeni@redhat.com,
 	horms@kernel.org,
 	David Carlier <devnexen@gmail.com>
-Subject: [PATCH 2/3] mptcp: support MSG_ERRQUEUE on the parent socket
-Date: Tue, 21 Apr 2026 16:22:10 +0100
-Message-ID: <20260421152216.38127-3-devnexen@gmail.com>
+Subject: [PATCH 3/3] selftests: mptcp: cover RECVERR and MSG_ERRQUEUE
+Date: Tue, 21 Apr 2026 16:22:11 +0100
+Message-ID: <20260421152216.38127-4-devnexen@gmail.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260421152216.38127-1-devnexen@gmail.com>
 References: <20260421152216.38127-1-devnexen@gmail.com>
@@ -107,13 +107,13 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,google.com,redhat.com,gmail.com];
-	TAGGED_FROM(0.00)[bounces-280171-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-280172-lists,netdev=lfdr.de];
 	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -128,193 +128,226 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 4642F43CBFA
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 4558943CB08
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Handle MSG_ERRQUEUE on the MPTCP socket by selecting a subflow with
-pending errqueue data, moving one error skb to the parent socket, and
-consuming it through the parent socket ABI.
+Add MPTCP selftest coverage for RECVERR sockopt round-trips and
+parent-socket MSG_ERRQUEUE delivery.
 
-This surfaces subflow errqueue activity through poll(), keeps the
-userspace ABI tied to the socket being used, and restores the skb to
-the subflow errqueue if requeueing to the parent fails under rmem
-pressure.
+Enable TX software timestamping, send data over an MPTCP socket, wait
+for POLLERR, and verify that recvmsg(MSG_ERRQUEUE) returns timestamping
+metadata on the MPTCP parent socket.
 
 Signed-off-by: David Carlier <devnexen@gmail.com>
 Assisted-by: Codex:gpt-5
 ---
- net/mptcp/protocol.c | 121 ++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 103 insertions(+), 18 deletions(-)
+ .../selftests/net/mptcp/mptcp_sockopt.c       | 152 ++++++++++++++++++
+ 1 file changed, 152 insertions(+)
 
-diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
-index fbffd3a43fe8..1b2e3bede122 100644
---- a/net/mptcp/protocol.c
-+++ b/net/mptcp/protocol.c
-@@ -819,26 +819,29 @@ static bool __mptcp_subflow_error_report(struct sock *sk, struct sock *ssk)
+diff --git a/tools/testing/selftests/net/mptcp/mptcp_sockopt.c b/tools/testing/selftests/net/mptcp/mptcp_sockopt.c
+index b6e58d936ebe..b499e7585d38 100644
+--- a/tools/testing/selftests/net/mptcp/mptcp_sockopt.c
++++ b/tools/testing/selftests/net/mptcp/mptcp_sockopt.c
+@@ -26,9 +26,17 @@
+ 
+ #include <linux/tcp.h>
+ #include <linux/compiler.h>
++#include <linux/errqueue.h>
++#include <linux/net_tstamp.h>
++
++#include <poll.h>
+ 
+ static int pf = AF_INET;
+ 
++#ifndef SCM_TIMESTAMPING
++#define SCM_TIMESTAMPING SO_TIMESTAMPING
++#endif
++
+ #ifndef IPPROTO_MPTCP
+ #define IPPROTO_MPTCP 262
+ #endif
+@@ -128,6 +136,9 @@ struct so_state {
+ #define MIN(a, b) ((a) < (b) ? (a) : (b))
+ #endif
+ 
++static void enable_tx_timestamping(int fd);
++static void test_msg_errqueue_timestamping(int fd);
++
+ static void __noreturn die_perror(const char *msg)
  {
- 	int ssk_state;
- 	int err;
-+	bool has_errqueue;
+ 	perror(msg);
+@@ -598,6 +609,8 @@ static void connect_one_server(int fd, int pipefd)
  
--	/* only propagate errors on fallen-back sockets or
--	 * on MPC connect
--	 */
--	if (sk->sk_state != TCP_SYN_SENT && !__mptcp_check_fallback(mptcp_sk(sk)))
--		return false;
--
-+	has_errqueue = !skb_queue_empty_lockless(&ssk->sk_error_queue);
- 	err = sock_error(ssk);
--	if (!err)
-+	if (!err && !has_errqueue)
- 		return false;
+ 	assert(strncmp(buf2, "xmit", 4) == 0);
  
--	/* We need to propagate only transition to CLOSE state.
--	 * Orphaned socket will see such state change via
--	 * subflow_sched_work_if_closed() and that path will properly
--	 * destroy the msk as needed.
-+	/* Errqueue notifications should wake poll()/recvmsg(MSG_ERRQUEUE) on
-+	 * the MPTCP socket, but only fallback sockets and the MPC connect path
-+	 * inherit TCP's sk_err semantics.
- 	 */
--	ssk_state = inet_sk_state_load(ssk);
--	if (ssk_state == TCP_CLOSE && !sock_flag(sk, SOCK_DEAD))
--		mptcp_set_state(sk, ssk_state);
--	WRITE_ONCE(sk->sk_err, -err);
-+	if (err &&
-+	    (sk->sk_state == TCP_SYN_SENT || __mptcp_check_fallback(mptcp_sk(sk)))) {
-+		/* We need to propagate only transition to CLOSE state.
-+		 * Orphaned socket will see such state change via
-+		 * subflow_sched_work_if_closed() and that path will properly
-+		 * destroy the msk as needed.
-+		 */
-+		ssk_state = inet_sk_state_load(ssk);
-+		if (ssk_state == TCP_CLOSE && !sock_flag(sk, SOCK_DEAD))
-+			mptcp_set_state(sk, ssk_state);
-+		WRITE_ONCE(sk->sk_err, -err);
-+	}
++	enable_tx_timestamping(fd);
++
+ 	ret = write(fd, buf, len);
+ 	if (ret < 0)
+ 		die_perror("write");
+@@ -605,6 +618,8 @@ static void connect_one_server(int fd, int pipefd)
+ 	if (ret != (ssize_t)len)
+ 		xerror("short write");
  
- 	/* This barrier is coupled with smp_rmb() in mptcp_poll() */
- 	smp_wmb();
-@@ -2286,6 +2289,68 @@ static unsigned int mptcp_inq_hint(const struct sock *sk)
- 	return 0;
++	test_msg_errqueue_timestamping(fd);
++
+ 	total = 0;
+ 	do {
+ 		ret = read(fd, buf2 + total, sizeof(buf2) - total);
+@@ -769,6 +784,142 @@ static void test_ip_tos_sockopt(int fd)
+ 		xerror("expect socklen_t == -1");
  }
  
-+static struct sock *mptcp_pick_errqueue_subflow(struct sock *sk)
++static void test_ip_recverr_sockopt(int fd)
 +{
-+	struct mptcp_subflow_context *subflow;
-+	struct sock *ssk = NULL;
++	struct iovec iov = {
++		.iov_base = &(char){ 0 },
++		.iov_len = 1,
++	};
++	struct msghdr msg = {
++		.msg_iov = &iov,
++		.msg_iovlen = 1,
++	};
++	int one = 1, zero = 0, val = -1;
++	socklen_t s = sizeof(val);
++	int level, optname, r;
 +
-+	lock_sock(sk);
-+	mptcp_for_each_subflow(mptcp_sk(sk), subflow) {
-+		struct sock *subflow_sk = mptcp_subflow_tcp_sock(subflow);
++	switch (pf) {
++	case AF_INET:
++		level = SOL_IP;
++		optname = IP_RECVERR;
++		break;
++	case AF_INET6:
++		level = SOL_IPV6;
++		optname = IPV6_RECVERR;
++		break;
++	default:
++		xerror("Unknown pf %d\n", pf);
++	}
 +
-+		if (skb_queue_empty_lockless(&subflow_sk->sk_error_queue))
++	r = setsockopt(fd, level, optname, &one, sizeof(one));
++	if (r)
++		die_perror("setsockopt recverr on");
++
++	r = getsockopt(fd, level, optname, &val, &s);
++	if (r)
++		die_perror("getsockopt recverr on");
++	if (s != sizeof(val) || val != one)
++		xerror("recverr on mismatch val=%d len=%u", val, s);
++
++	r = recvmsg(fd, &msg, MSG_ERRQUEUE | MSG_DONTWAIT);
++	if (r != -1 || errno != EAGAIN)
++		xerror("expected empty errqueue to return EAGAIN, ret=%d errno=%d", r, errno);
++
++	r = setsockopt(fd, level, optname, &zero, sizeof(zero));
++	if (r)
++		die_perror("setsockopt recverr off");
++
++	val = -1;
++	s = sizeof(val);
++	r = getsockopt(fd, level, optname, &val, &s);
++	if (r)
++		die_perror("getsockopt recverr off");
++	if (s != sizeof(val) || val != zero)
++		xerror("recverr off mismatch val=%d len=%u", val, s);
++}
++
++static void enable_tx_timestamping(int fd)
++{
++	int val = SOF_TIMESTAMPING_SOFTWARE |
++		  SOF_TIMESTAMPING_TX_SOFTWARE |
++		  SOF_TIMESTAMPING_OPT_TSONLY;
++	int ret;
++
++	ret = setsockopt(fd, SOL_SOCKET, SO_TIMESTAMPING_OLD,
++			 &val, sizeof(val));
++	if (ret)
++		die_perror("setsockopt SO_TIMESTAMPING");
++}
++
++static void test_msg_errqueue_timestamping(int fd)
++{
++	char ctrl[512] = { 0 };
++	char data[32] = { 0 };
++	struct iovec iov = {
++		.iov_base = data,
++		.iov_len = sizeof(data),
++	};
++	struct msghdr msg = {
++		.msg_iov = &iov,
++		.msg_iovlen = 1,
++		.msg_control = ctrl,
++		.msg_controllen = sizeof(ctrl),
++	};
++	struct pollfd pfd = {
++		.fd = fd,
++		.events = POLLERR,
++	};
++	struct cmsghdr *cm;
++	struct scm_timestamping *tss = NULL;
++	struct sock_extended_err *serr = NULL;
++	int ret, i;
++
++	for (i = 0; i < 10; i++) {
++		ret = poll(&pfd, 1, 1000);
++		if (ret < 0)
++			die_perror("poll errqueue");
++		if (ret == 0)
 +			continue;
-+
-+		if (!refcount_inc_not_zero(&subflow_sk->sk_refcnt))
-+			continue;
-+
-+		ssk = subflow_sk;
++		if (!(pfd.revents & POLLERR))
++			xerror("expected POLLERR, got revents %#x", pfd.revents);
 +		break;
 +	}
-+	release_sock(sk);
 +
-+	return ssk;
-+}
++	if (i == 10)
++		xerror("timed out waiting for MSG_ERRQUEUE event");
 +
-+static bool mptcp_has_error_queue(const struct sock *sk)
-+{
-+	return !skb_queue_empty_lockless(&sk->sk_error_queue);
-+}
++	ret = recvmsg(fd, &msg, MSG_ERRQUEUE);
++	if (ret < 0)
++		die_perror("recvmsg timestamping errqueue");
++	if (!(msg.msg_flags & MSG_ERRQUEUE))
++		xerror("expected MSG_ERRQUEUE in msg_flags, got %#x",
++		       msg.msg_flags);
 +
-+static int mptcp_recv_error(struct sock *sk, struct msghdr *msg, int len)
-+{
-+	struct sk_buff *skb;
-+	struct sock *ssk;
-+	int ret, ret2;
-+
-+	if (mptcp_has_error_queue(sk))
-+		return inet_recv_error(sk, msg, len);
-+
-+	ssk = mptcp_pick_errqueue_subflow(sk);
-+	if (!ssk)
-+		return -EAGAIN;
-+
-+	skb = sock_dequeue_err_skb(ssk);
-+	if (!skb)
-+		goto put_ssk;
-+
-+	ret = sock_queue_err_skb(sk, skb);
-+	if (ret) {
-+		ret2 = sock_queue_err_skb(ssk, skb);
-+		sock_put(ssk);
-+		if (ret2)
-+			kfree_skb(skb);
-+		return ret;
++	for (cm = CMSG_FIRSTHDR(&msg); cm; cm = CMSG_NXTHDR(&msg, cm)) {
++		if (cm->cmsg_level == SOL_SOCKET &&
++		    cm->cmsg_type == SCM_TIMESTAMPING)
++			tss = (void *)CMSG_DATA(cm);
++		if ((cm->cmsg_level == SOL_IP &&
++		     cm->cmsg_type == IP_RECVERR) ||
++		    (cm->cmsg_level == SOL_IPV6 &&
++		     cm->cmsg_type == IPV6_RECVERR))
++			serr = (void *)CMSG_DATA(cm);
 +	}
 +
-+	sock_put(ssk);
-+	return inet_recv_error(sk, msg, len);
-+
-+put_ssk:
-+	sock_put(ssk);
-+	return -EAGAIN;
++	if (!tss)
++		xerror("missing SCM_TIMESTAMPING cmsg");
++	if (!serr)
++		xerror("missing sock_extended_err cmsg");
++	if (serr->ee_errno != ENOMSG ||
++	    serr->ee_origin != SO_EE_ORIGIN_TIMESTAMPING)
++		xerror("unexpected timestamping err ee_errno=%u ee_origin=%u",
++		       serr->ee_errno, serr->ee_origin);
++	if (!tss->ts[0].tv_sec && !tss->ts[0].tv_nsec &&
++	    !tss->ts[1].tv_sec && !tss->ts[1].tv_nsec &&
++	    !tss->ts[2].tv_sec && !tss->ts[2].tv_nsec)
++		xerror("all timestamp slots are zero");
 +}
 +
- static int mptcp_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
- 			 int flags)
+ static int client(int pipefd)
  {
-@@ -2295,9 +2360,8 @@ static int mptcp_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
- 	int target;
- 	long timeo;
+ 	int fd = -1;
+@@ -787,6 +938,7 @@ static int client(int pipefd)
+ 	}
  
--	/* MSG_ERRQUEUE is really a no-op till we support IP_RECVERR */
- 	if (unlikely(flags & MSG_ERRQUEUE))
--		return inet_recv_error(sk, msg, len);
-+		return mptcp_recv_error(sk, msg, len);
+ 	test_ip_tos_sockopt(fd);
++	test_ip_recverr_sockopt(fd);
  
- 	lock_sock(sk);
- 	if (unlikely(sk->sk_state == TCP_LISTEN)) {
-@@ -4296,6 +4360,26 @@ static __poll_t mptcp_check_writeable(struct mptcp_sock *msk)
- 	return 0;
- }
+ 	connect_one_server(fd, pipefd);
  
-+static bool mptcp_subflow_has_error(struct sock *sk)
-+{
-+	struct mptcp_subflow_context *subflow;
-+	bool has_error = false;
-+
-+	mptcp_data_lock(sk);
-+	mptcp_for_each_subflow(mptcp_sk(sk), subflow) {
-+		struct sock *ssk = mptcp_subflow_tcp_sock(subflow);
-+
-+		if (READ_ONCE(ssk->sk_err) ||
-+		    !skb_queue_empty_lockless(&ssk->sk_error_queue)) {
-+			has_error = true;
-+			break;
-+		}
-+	}
-+	mptcp_data_unlock(sk);
-+
-+	return has_error;
-+}
-+
- static __poll_t mptcp_poll(struct file *file, struct socket *sock,
- 			   struct poll_table_struct *wait)
- {
-@@ -4339,7 +4423,8 @@ static __poll_t mptcp_poll(struct file *file, struct socket *sock,
- 
- 	/* This barrier is coupled with smp_wmb() in __mptcp_error_report() */
- 	smp_rmb();
--	if (READ_ONCE(sk->sk_err))
-+	if (READ_ONCE(sk->sk_err) || mptcp_has_error_queue(sk) ||
-+	    mptcp_subflow_has_error(sk))
- 		mask |= EPOLLERR;
- 
- 	return mask;
 -- 
 2.53.0
 
