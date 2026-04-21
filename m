@@ -1,191 +1,211 @@
-Return-Path: <netdev+bounces-280008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280009-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8OPVHkcI52kw3AEAu9opvQ
-	(envelope-from <netdev+bounces-280008-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 07:16:55 +0200
+	id QNjQL0YP52ms3QEAu9opvQ
+	(envelope-from <netdev+bounces-280009-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 07:46:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B21F8436606
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 07:16:54 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6707B4368A6
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 07:46:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A26F93017272
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 05:16:53 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 7C64E300493D
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 05:46:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F59F32BF52;
-	Tue, 21 Apr 2026 05:16:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 831233346A8;
+	Tue, 21 Apr 2026 05:46:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JSZNSXG+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NDZmYboU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f73.google.com (mail-dl1-f73.google.com [74.125.82.73])
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7C81329C71
-	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 05:16:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 154471E885A
+	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 05:46:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776748612; cv=none; b=R5jfFLOrltyMhgl4sx6Qm/LoT9dewDuVufPLjbxLm6FySBo8pkvh/uSoJLOWP7eSnE8MkZaS8u82+MHh4RFffEnOUvADIjUHIAmWRywMafK3z9qvs1AizMf8XRba4xozw+BUZPsBrQd9WUbjKryfrDJ6LSYoFKqUT4lSYdLor3c=
+	t=1776750404; cv=none; b=YgqdWxYOWimZvq4R6W2Iri4Xytsu4no+Bh5OAQl1XCniwEmuBXbS07JS2zIOCOwrHOR6NLAc+jQgy0gw1DdxlAiscAV672Cw80/59AI+s/NvS425yrUUfqGvnkSA+KMhzwXNvHpEZ0al5logxWSG1ilULyCo0qJFk8rmyex3QAA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776748612; c=relaxed/simple;
-	bh=AsbnMpFONbIDo5pyXn8vuz90ne6udRW4bcDZJjEvjK0=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=A+MNyfBKQhQSmEIRnzJNTLP8U374eOPDjBccu8hgngOmkc49l+N2ye6og5XJPAAXkel/1lE8JICFIS3+hMydOyhMECaQ0yx7pgGE50+MrC8Pj5yvIQwan5CbFdilfOmFNiptqnfISB2EveSf1HBc7sB9ZVehFaz23K0faWP5YhI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--boolli.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JSZNSXG+; arc=none smtp.client-ip=74.125.82.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--boolli.bounces.google.com
-Received: by mail-dl1-f73.google.com with SMTP id a92af1059eb24-12db218e265so1841155c88.0
-        for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 22:16:50 -0700 (PDT)
+	s=arc-20240116; t=1776750404; c=relaxed/simple;
+	bh=Ub2/CujAcX3WFWcxCD/i+N7vpumJ3LeFtAn0W3AHdL4=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=jzF7AfGhSgS8C8I81lHlPGMiuZdIUCiGO0KS83IdB3mM/AGVpNipYOP1/yW+FspfwTObg1l4y5ojQ0usS/LjctzYMvSid6sImmPUSwhvCxRVBGU6KhT1s6Tp2xhnqtiw8hiC6w3piM+umh2d8aQzJNNdD/VREXbvafh2QLQctPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NDZmYboU; arc=none smtp.client-ip=209.85.219.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-8a151012558so42895866d6.3
+        for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 22:46:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1776748610; x=1777353410; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=7D53xtOFZWTTNmBFly2sMy6Aan/RQNTrroS2iD/6/Xo=;
-        b=JSZNSXG+qAKeNErBN8yODLAhWR5fjEM1z0GMtdWPMSn4LKaqwozZabVOJAlenXSUGH
-         6w1zGqUsQ/Ew2JAzznZL1EMf96JprNGxN5cJTh/mIcCD/jTkQF34SvM5HgtudjwfzagE
-         wHAQEqlVYP2oq8/LnLi+hqDXHs7w26P9va+VW4JzvDTzX1QZ38eITvX3PwO3rMn1NQXB
-         Nr5vwG1QYmWa0bydsDV75KT1PgNO4KutA7/iNknvGuiBZ9cDgaIMuK+4Fup8tRFMLW28
-         Mj/PjcoQorcziPVIc9tYREJrnOeRdx3sKz3gOi+5lxFCQIrwb+VwCuCdbxDps4e6Xqyc
-         a40Q==
+        d=gmail.com; s=20251104; t=1776750402; x=1777355202; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cwVOqviN0nRLq3+r1rz1vZYdV1pHIllY/x32ovYOlAo=;
+        b=NDZmYboUdWSfSe+3MRBunxCTO4RXxFGjJMDbeFsPGXul2ZASg3Dk7uEjertgiabLk8
+         53RICCXDztWaW9sNZs/DIHU3bopo/0OITO4zkkjSXbFXgK/+jGR6Z2ugZLuWWRowCMED
+         rd7Kuw1HzfK6rprvU5kVqxmQyMcRUubApCFPbWUzSPqj21sMgpgvPgXu6joJNntnr5NB
+         sKlkVqFfWFB42uvn1TjF6IEBCmjCWVqrY6Ss6j6wVP/3KQsRR54BTivGD3CHjQa1r02g
+         fVyYHDzs2iIs1SeWRjbRAjoGDYOKpq7v2E21tRFIK0rQE32F9ncKAVB37mQDVAhlyQOn
+         OLrQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776748610; x=1777353410;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7D53xtOFZWTTNmBFly2sMy6Aan/RQNTrroS2iD/6/Xo=;
-        b=Ql9AxEvYIJjWXfrLaFDAtGVJP9BPUb2ZdKc8Wqfh3fd7iR1ugCald7/skxa8w1krzq
-         AjfzfmV3UgTlYr/jD5sDcxk7ZZW8kgeyg/KDCmaRHdvB2Xu2NEf0iOdBmcV5BU9MOQBc
-         PEYqGJR8OX4I3pWIJ8XbjG7ONZSEPjS1LemoGaLwzF7Ph4yr2UuiA7qrxKnqGz85FJFU
-         qxyyqWYN6l2lHVTMxuShbP25QVuErbsIjk2aXXqXnzwvuGfJ+yLLIK+ThK6bCcaJKc9J
-         idn+NrTI53tiDncwg9AqDVZJtVdEvYv5kBFjZiGqq1Fy3xGyfIQV3kGVjxtZe9C9C62N
-         xmzQ==
-X-Gm-Message-State: AOJu0Yy7P63mJmfk8cyVpdn6GjpJPMZmfVBBMrx4fsJ9E6kAfMJQxfvZ
-	RLZDHxWO8tmymfIgRg49UcnVAUd9Kgx0BkY1QwYb+cW6VgbDDfmntFCRNGmUtaw9pPzne+yLL6m
-	o/WeIHw==
-X-Received: from dlbsn12.prod.google.com ([2002:a05:7022:b90c:b0:12d:b26a:1571])
- (user=boolli job=prod-delivery.src-stubby-dispatcher) by 2002:a05:7022:6290:b0:12c:8f92:c6ba
- with SMTP id a92af1059eb24-12c8f92c9damr3936024c88.34.1776748609630; Mon, 20
- Apr 2026 22:16:49 -0700 (PDT)
-Date: Tue, 21 Apr 2026 05:16:41 +0000
+        d=1e100.net; s=20251104; t=1776750402; x=1777355202;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=cwVOqviN0nRLq3+r1rz1vZYdV1pHIllY/x32ovYOlAo=;
+        b=F7/GlAoJ8cMVlkcK42x/4K2oGLWGoN2GC0rLwRHLJVexPsvm7HQ1+hocucPLMLQkeg
+         5UVE484pv/HUH7LiWZw9xku3HCHuui1nFAa9yTJugrFPA0/7yp5JQNlvWwODmlxaepIF
+         ivs4U8lRVDmH+PUHHTM4nTKmNEG9MXzGiPVav9TMUv1hl7IPaBu7aURR4b1QuT68B1iG
+         Vew39PjvRiG5UX5DLor0Az+6eH+kzKmit0Hn2bEKWTPZl6e6tNW4r778BGl2Bj5A6bXC
+         2fB7zzMcnxdVLGYeRAK+9O4VDeFBeBPcBmvauPRKhIMjYmPYEB2s8X4ea9hZTauzNwtK
+         dS8w==
+X-Gm-Message-State: AOJu0YxJ2CEzthnJZbqwGVekM+gQT0l5fTTK/utzN2lS2vSnf6xY02HS
+	/9kDz53y2G/vbKS95rXRMXvOw3+l7aAx8hSCSD0zxUHqDUiqXsQMh0IVHYvJbJX+Jcni3Q==
+X-Gm-Gg: AeBDieuswZl6peFS3mZPm3f3YaYJfWzPTbhawW4MEWmTBkeESV2vcDBg77ezImVyg8g
+	jgG3uYfzAK86AAUfp05g5FwnyEe8g2vKVUkj+/Ak+tyDuWuRufGaz/UDpipsAaornYGAmcM706T
+	Bpb3fa3QKbipCmcLTbZfggDr0yTllzOB22K/z5+eSv/N/JAAXx3Jls4+xLiOmKcq05J5lxRiVgN
+	Enf6Z49dpeGQs1f0OiE/aZEBUB1c0Rt8C5qceLQAQ1YtK8I3elV8DmrVNhPxVex/R1ewQCcq+cY
+	Vogtg04Wv7WNps3y3AnZpRxHQuEZf5GrWNtykBRADADauc3BgH8n5M6UJForjxr1r5cFOz8OYfD
+	1r/YsBAoVH7t4Q5/qyVoV8haLtiGH0lvnldRghopWBcjHbMLBwKJdrO5nuw7f3zzuWeZ9SJXJ0I
+	m0xJ5t/rcqYDfmtjtfeEVaCUuTxTum9K+lr0pZ0LscbETZrzTypfOHciY51F/0EjKH4MStXmKCo
+	NxRgKo0bLe6FNZnSAbSdTgzot3rPudJ8mSjj1U=
+X-Received: by 2002:ad4:5eca:0:b0:8ae:6380:8f97 with SMTP id 6a1803df08f44-8b027ff9ec0mr283807226d6.9.1776750401954;
+        Mon, 20 Apr 2026 22:46:41 -0700 (PDT)
+Received: from TDC4045031631.e0cglfehwr0e5gttmepj3hi3hf.ux.internal.cloudapp.net ([20.63.37.123])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8b02ac462d9sm96508256d6.7.2026.04.20.22.46.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Apr 2026 22:46:41 -0700 (PDT)
+From: Ashutosh Desai <ashutoshdesai993@gmail.com>
+To: netdev@vger.kernel.org,
+	linux-hams@vger.kernel.org
+Cc: jreuter@yaina.de,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org,
+	Ashutosh Desai <ashutoshdesai993@gmail.com>
+Subject: [PATCH v5 net] ax25: fix OOB read after address header strip in ax25_rcv()
+Date: Tue, 21 Apr 2026 05:46:26 +0000
+Message-Id: <20260421054626.732399-1-ashutoshdesai993@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20260417065407.206499-1-ashutoshdesai993@gmail.com>
+References: <20260417065407.206499-1-ashutoshdesai993@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.54.0.rc1.555.g9c883467ad-goog
-Message-ID: <20260421051641.370436-1-boolli@google.com>
-Subject: [PATCH iwl-net v2] idpf: do not perform flow ops when netdev is detached
-From: Li Li <boolli@google.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	David Decotigny <decot@google.com>, Anjali Singhai <anjali.singhai@intel.com>, 
-	Sridhar Samudrala <sridhar.samudrala@intel.com>, Brian Vazquez <brianvv@google.com>, 
-	Li Li <boolli@google.com>, emil.s.tantilov@intel.com, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-280008-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[yaina.de,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280009-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[boolli@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
+	FROM_NEQ_ENVFROM(0.00)[ashutoshdesai993@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B21F8436606
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: 6707B4368A6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Even though commit 2e281e1155fc ("idpf: detach and close netdevs while
-handling a reset") prevents ethtool -N/-n operations to operate on
-detached netdevs, we found that out-of-tree workflows like OpenOnload
-can bypass ethtool core locks and call idpf_set_rxnfc directly during
-an idpf HW reset. When this happens, we could get kernel crashes like
-the following:
+A crafted AX.25 frame with a valid address header but no control byte
+causes skb->len to reach zero after skb_pull() strips the header.
+The subsequent reads of skb->data[0] (control) and skb->data[1] (PID)
+are then out of bounds.
 
-[ 4045.787439] BUG: kernel NULL pointer dereference, address: 0000000000000070
-[ 4045.794420] #PF: supervisor read access in kernel mode
-[ 4045.799580] #PF: error_code(0x0000) - not-present page
-[ 4045.804739] PGD 0
-[ 4045.806772] Oops: Oops: 0000 [#1] SMP NOPTI
-...
-[ 4045.836425] Workqueue: onload-wqueue oof_do_deferred_work_fn [onload]
-[ 4045.842926] RIP: 0010:idpf_del_flow_steer+0x24/0x170 [idpf]
-...
-[ 4045.946323] Call Trace:
-[ 4045.948796]  <TASK>
-[ 4045.950915]  ? show_trace_log_lvl+0x1b0/0x2f0
-[ 4045.955293]  ? show_trace_log_lvl+0x1b0/0x2f0
-[ 4045.959672]  ? idpf_set_rxnfc+0x6f/0x80 [idpf]
-[ 4046.063613]  </TASK>
+Linearize the skb after confirming the device is an AX.25 interface.
+Guard with skb->len < 1 after the pull - one byte suffices for LAPB
+control frames which have no PID byte. Add a separate skb->len < 2
+check inside the UI branch before accessing the PID byte.
 
-To prevent this, we need to add checks in idpf_set_rxnfc and
-idpf_get_rxnfc to error out if the netdev is already detached.
-
-Tested: synthetically forced idpf into a HW reset by introducing module
-parameters to simulate a Tx timeout and force virtual channel
-initialization failure. This was done by skipping completion cleaning for
-specific queues and returning -EIO during core initialization.
-The failure was then triggered by writing 1 to the corresponding sysfs
-parameters and calling idpf_get_rxnfc() during the reset process.
-
-Without the patch: encountered NULL pointer and kernel crash.
-
-With the patch: no crashes.
-
-Fixes: 2e281e1155fc ("idpf: detach and close netdevs while handling a reset")
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
 Cc: stable@vger.kernel.org
-Signed-off-by: Li Li <boolli@google.com>
+Signed-off-by: Ashutosh Desai <ashutoshdesai993@gmail.com>
 ---
+v5:
+- Move skb_linearize() to after ax25_dev_ax25dev() check; avoids
+  unnecessary allocation for frames on non-AX.25 interfaces
+- Lower general guard from skb->len < 2 to skb->len < 1; the stricter
+  limit incorrectly dropped valid 1-byte LAPB control frames (SABM,
+  DISC, UA, DM, RR) which carry no PID byte
+- Add explicit skb->len < 2 check inside UI branch before the PID
+  byte (skb->data[1]) access
+v4:
+- Linearize skb at entry to ax25_rcv(); replace pskb_may_pull() with
+  skb->len < 2 check (per David Laight review)
+v3:
+- Remove incorrect Suggested-by; add Fixes:, Cc: stable@
 v2:
-- Removed the raw code block from the commit message and replaced it with
-  a textual description of the test modifications.
+- Replace skb->len check with pskb_may_pull(skb, 2)
 
- drivers/net/ethernet/intel/idpf/idpf_ethtool.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+Link to v4: https://lore.kernel.org/netdev/20260417065407.206499-1-ashutoshdesai993@gmail.com/
+Link to v3: https://lore.kernel.org/netdev/20260415063654.3831353-1-ashutoshdesai993@gmail.com/
+Link to v2: https://lore.kernel.org/netdev/20260409152400.2219716-1-ashutoshdesai993@gmail.com/
+Link to v1: https://lore.kernel.org/netdev/20260409012235.2049389-1-ashutoshdesai993@gmail.com/
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_ethtool.c b/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
-index bb99d9e7c65d..8368a7e6a754 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
-@@ -43,6 +43,9 @@ static int idpf_get_rxnfc(struct net_device *netdev, struct ethtool_rxnfc *cmd,
- 	unsigned int cnt = 0;
- 	int err = 0;
+ net/ax25/ax25_in.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/net/ax25/ax25_in.c b/net/ax25/ax25_in.c
+index d75b3e9ed93d..c81d6830af48 100644
+--- a/net/ax25/ax25_in.c
++++ b/net/ax25/ax25_in.c
+@@ -199,6 +199,9 @@ static int ax25_rcv(struct sk_buff *skb, struct net_device *dev,
+ 	if ((ax25_dev = ax25_dev_ax25dev(dev)) == NULL)
+ 		goto free;
  
-+	if (!netdev || !netif_device_present(netdev))
-+		return -ENODEV;
++	if (skb_linearize(skb))
++		goto free;
 +
- 	idpf_vport_ctrl_lock(netdev);
- 	vport = idpf_netdev_to_vport(netdev);
- 	vport_config = np->adapter->vport_config[np->vport_idx];
-@@ -349,6 +352,9 @@ static int idpf_set_rxnfc(struct net_device *netdev, struct ethtool_rxnfc *cmd)
- {
- 	int ret = -EOPNOTSUPP;
+ 	/*
+ 	 *	Parse the address header.
+ 	 */
+@@ -217,6 +220,9 @@ static int ax25_rcv(struct sk_buff *skb, struct net_device *dev,
+ 	 */
+ 	skb_pull(skb, ax25_addr_size(&dp));
  
-+	if (!netdev || !netif_device_present(netdev))
-+		return -ENODEV;
++	if (skb->len < 1)
++		goto free;
 +
- 	idpf_vport_ctrl_lock(netdev);
- 	switch (cmd->cmd) {
- 	case ETHTOOL_SRXCLSRLINS:
+ 	/* For our port addresses ? */
+ 	if (ax25cmp(&dest, dev_addr) == 0 && dp.lastrepeat + 1 == dp.ndigi)
+ 		mine = 1;
+@@ -227,6 +233,9 @@ static int ax25_rcv(struct sk_buff *skb, struct net_device *dev,
+ 
+ 	/* UI frame - bypass LAPB processing */
+ 	if ((*skb->data & ~0x10) == AX25_UI && dp.lastrepeat + 1 == dp.ndigi) {
++		if (skb->len < 2)
++			goto free;
++
+ 		skb_set_transport_header(skb, 2); /* skip control and pid */
+ 
+ 		ax25_send_to_raw(&dest, skb, skb->data[1]);
 -- 
-2.54.0.rc1.555.g9c883467ad-goog
+2.34.1
 
 
