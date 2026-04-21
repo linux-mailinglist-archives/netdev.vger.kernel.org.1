@@ -1,190 +1,150 @@
-Return-Path: <netdev+bounces-280191-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280190-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WGNeGMOk52nX+gEAu9opvQ
-	(envelope-from <netdev+bounces-280191-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 18:24:35 +0200
+	id uEnWJ7uk52nX+gEAu9opvQ
+	(envelope-from <netdev+bounces-280190-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 18:24:27 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0100843D4FE
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 18:24:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CD5E43D4EE
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 18:24:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 36F433022C9D
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 16:24:30 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B4CB43004D2D
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 16:24:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CACAC377560;
-	Tue, 21 Apr 2026 16:24:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A765363C4C;
+	Tue, 21 Apr 2026 16:24:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LXsfyIGB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iuZ6fx4J"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE8462ED17B;
-	Tue, 21 Apr 2026 16:24:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 379332ED17B;
+	Tue, 21 Apr 2026 16:24:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776788666; cv=none; b=TkLsRzateJqTWDgoTWtt1jnU3MZxU0Fjt3RC2yj2wLFogIuUV5NyyVyxjgqJ26OkcykcVVXX9Hcu9/3JTGAJ0C4VwyqdWw0MQUuGaZ7F3Ov+JTEs4oUffOPXEjPcNnKqfQCp8ygmnSnWUzgIiiG8g/DL9QZ6Wc6SfkVelvE0l08=
+	t=1776788663; cv=none; b=UorwxaVIWASKr5BAWPJ2aqHToun13ZeXq8dQtr8hQq8qU+9VNBTwGAVjpBz0wAxRFgsbwfydq5MBBGizwuRKXRtkQoC9O4GqDWdGtXMCPrhEyozfcRF0NpJRI+KXP8OOn5dlQeLHF9ckEd46FzU3+H4KgvgskMrCE7COxjrRfeM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776788666; c=relaxed/simple;
-	bh=nQunemQjmq7J3pbxI2AqF1xIeNDWFBx1/5BRlXisaCw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PfAwvU8iiIGlzlKLalJfnPl+6kxvZXBUT9X1JuqVtW/rdAMSFa5exbBrOgX9xejW53iSwH3G+zMr1s1v1a0xYLjtRI4O4OWlM5wWexsjpO8Zxs+m/p5sZOPQz93dixFAaWSAWQOZayvIJRt04IRXnJ9ItTZm0aKSAbzaELQ1s9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LXsfyIGB; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1776788665; x=1808324665;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=nQunemQjmq7J3pbxI2AqF1xIeNDWFBx1/5BRlXisaCw=;
-  b=LXsfyIGBOeBxu0oFodWD/AuMLAGytfgVd24jLAr2kztEYbMgdR1C3N4w
-   kS79zwBW4DAg32Ce7t4tfoFu4u9EX7vdBunS5Rfc7eMDNzozqr2AaRcjB
-   3gUeFlbI9Rv1M2HbGyasXdGnygZEemsUYrqTvHS81331Pcm6yACP6CBBl
-   XTmLtRn1MW2j4PO0TYa1BfhHjAmGBOeyhovx43m5QQ7meg0xLCmlA2yaS
-   BI0dXEKxhHReWKBT+ENKDVjGhTSqMebqO5btJ0yjBHNVSXZAJowpagEqB
-   l1/7enSsseJD4i6vpP6J3JtlPlpeA2RviwbwokUhc9IaHswoIchAbAUjk
-   A==;
-X-CSE-ConnectionGUID: k5qnTxCuT4WG0bbUze8DZw==
-X-CSE-MsgGUID: 2/CH0A2sSQ+VMG6HBMr5fQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11763"; a="88427201"
-X-IronPort-AV: E=Sophos;i="6.23,192,1770624000"; 
-   d="scan'208";a="88427201"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Apr 2026 09:24:24 -0700
-X-CSE-ConnectionGUID: owCl++O5Q26diS7PURbSEQ==
-X-CSE-MsgGUID: QxmqOUo2RwujnCUiyc/PeQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,192,1770624000"; 
-   d="scan'208";a="237059148"
-Received: from lkp-server01.sh.intel.com (HELO 7e48d0ff8e22) ([10.239.97.150])
-  by fmviesa005.fm.intel.com with ESMTP; 21 Apr 2026 09:24:22 -0700
-Received: from kbuild by 7e48d0ff8e22 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1wFDtb-000000003ki-34Tq;
-	Tue, 21 Apr 2026 16:24:19 +0000
-Date: Wed, 22 Apr 2026 00:24:07 +0800
-From: kernel test robot <lkp@intel.com>
-To: Marino Dzalto <marino.dzalto@gmail.com>, pablo@netfilter.org,
-	fw@strlen.de
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Marino Dzalto <marino.dzalto@gmail.com>
-Subject: Re: [PATCH] netfilter: xt_HL: add pr_fmt, default case and NULL
- checks
-Message-ID: <202604220024.iITt6Hv8-lkp@intel.com>
-References: <20260403193929.89449-1-marino.dzalto@gmail.com>
+	s=arc-20240116; t=1776788663; c=relaxed/simple;
+	bh=6UeoK3+oPAoW5BkB+MhbM0T6YpD6sWSw9Ifvnqy2WLQ=;
+	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
+	 Subject:From:To:Cc:Date; b=smli7RI/1vOQtvb6+jXoSmH1qsU7jXKzh3EzQO/3qWte9w7G4gpjVR4DZ6Rp0Bhf2cDoTF9MpqPu0KP2jxXJeAhH6ralOM62Jota/qHUgNO+cw/vRGLI/pZupY+7jQQ6K6sP6r9uDkUlewMsEOc57SWz4HVsA1j8bFoRZp6hLaU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iuZ6fx4J; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B77BC2BCB0;
+	Tue, 21 Apr 2026 16:24:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776788662;
+	bh=6UeoK3+oPAoW5BkB+MhbM0T6YpD6sWSw9Ifvnqy2WLQ=;
+	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
+	b=iuZ6fx4JVHp/tHoAu2c1IAvBj0EXt9JCd1m0L0LcRg9vaof4ci1VsDG0Jnkr6aw6Z
+	 cvajuYSeUDnL62p+JjfiHycnqY+ig39cRb7gSWKdxUEXMOKp3xQ950TZj/g6hmGprG
+	 UUswZoC9IBrtYv2K9ls3Plhv06gzM6/ZMsQ2J0pZOgiiO3Q5opb3pwQElojVgouNSD
+	 FJJvovRQ3cc8SJ5HfcejtpjOcrnzIUiLRdg5FFRZ56NayBhLyjX7NFGI9wY4cMrrgc
+	 PV7OnbzP08f2bNuv5nCIH3DylIJfCCWK5j+8Qy2A7411Etbvg6rAKvNeZpqOVL/euj
+	 9pPeQxViY+YMQ==
+Content-Type: multipart/mixed; boundary="===============6483710146441311888=="
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260403193929.89449-1-marino.dzalto@gmail.com>
+Message-Id: <cc500964d83d95307126b05cc7557309b498bafce0c514fa3f1656dd6413ce71@mail.kernel.org>
+In-Reply-To: <20260421155024.997077-2-bestswngs@gmail.com>
+References: <20260421155024.997077-2-bestswngs@gmail.com>
+Subject: Re: [PATCH bpf v2] bpf: Fix NULL pointer dereference in bpf_sk_storage_clone and diag paths
+From: bot+bpf-ci@kernel.org
+To: bestswngs@gmail.com,davem@davemloft.net,edumazet@google.com,kuba@kernel.org,pabeni@redhat.com
+Cc: horms@kernel.org,martin.lau@kernel.org,ast@kernel.org,ameryhung@gmail.com,leon.hwang@linux.dev,kees@kernel.org,wangfushuai@baidu.com,menglong8.dong@gmail.com,netdev@vger.kernel.org,bpf@vger.kernel.org,xmei5@asu.edu,bestswngs@gmail.com,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
+Date: Tue, 21 Apr 2026 16:24:22 +0000 (UTC)
 X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	CTYPE_MIXED_BOGUS(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
+	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lists.linux.dev,vger.kernel.org,netfilter.org,gmail.com];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-280190-lists,netdev=lfdr.de,bpf-ci];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,linux.dev,baidu.com,vger.kernel.org,asu.edu,iogearbox.net,meta.com];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bot@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
+	MIME_TRACE(0.00)[0:+,1:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[172.232.135.74:from];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280191-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com,netfilter.org,strlen.de];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NO_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[25];
 	NEURAL_HAM(-0.00)[-1.000];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[100.90.174.1:received,10.30.226.201:received];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[100.90.174.1:received,10.60.135.145:received];
-	TO_DN_SOME(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,intel.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,git-scm.com:url]
-X-Rspamd-Queue-Id: 0100843D4FE
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 4CD5E43D4EE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Marino,
+--===============6483710146441311888==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-kernel test robot noticed the following build errors:
+> diff --git a/net/core/bpf_sk_storage.c b/net/core/bpf_sk_storage.c
+> index 14eb7812bda4..b2cd2b0292cb 100644
+> --- a/net/core/bpf_sk_storage.c
+> +++ b/net/core/bpf_sk_storage.c
 
-[auto build test ERROR on netfilter-nf/main]
-[also build test ERROR on linus/master v7.0 next-20260420]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+[ ... ]
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Marino-Dzalto/netfilter-xt_HL-add-pr_fmt-default-case-and-NULL-checks/20260420-185652
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git main
-patch link:    https://lore.kernel.org/r/20260403193929.89449-1-marino.dzalto%40gmail.com
-patch subject: [PATCH] netfilter: xt_HL: add pr_fmt, default case and NULL checks
-config: s390-allmodconfig (https://download.01.org/0day-ci/archive/20260422/202604220024.iITt6Hv8-lkp@intel.com/config)
-compiler: clang version 18.1.8 (https://github.com/llvm/llvm-project 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260422/202604220024.iITt6Hv8-lkp@intel.com/reproduce)
+> @@ -596,6 +596,8 @@ static int bpf_sk_storage_diag_put_all(struct sock *sk, struct sk_buff *skb,
+>  	saved_len = skb->len;
+>  	hlist_for_each_entry_rcu(selem, &sk_storage->list, snode) {
+>  		smap = rcu_dereference(SDATA(selem)->smap);
+> +		if (!smap)
+> +			continue;
+>  		diag_size += nla_value_size(smap->map.value_size);
+>
+>  		if (nla_stgs && diag_get(SDATA(selem), skb))
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202604220024.iITt6Hv8-lkp@intel.com/
+Martin KaFai Lau pointed out in the v1 review that the NULL check for
+smap doesn't fully address the race condition. The issue is that
+diag_get() will re-dereference sdata->smap independently:
 
-All errors (new ones prefixed by >>):
+net/core/bpf_sk_storage.c:diag_get() {
+    ...
+    smap = rcu_dereference(sdata->smap);
+    ...
+}
 
->> net/netfilter/xt_hl.c:34:6: error: cannot assign to variable 'ttl' with const-qualified type 'const u8' (aka 'const unsigned char')
-      34 |         ttl = ip_hdr(skb)->ttl;
-         |         ~~~ ^
-   net/netfilter/xt_hl.c:29:11: note: variable 'ttl' declared const here
-      29 |         const u8 ttl;
-         |         ~~~~~~~~~^~~
-   1 error generated.
+Between the NULL check above and the call to diag_get(), smap could
+become NULL again, leading to the same race condition.
+
+Martin suggested passing smap as a parameter to diag_get() to avoid
+the second dereference. This would ensure diag_get() uses the same
+smap pointer that was already checked.
+
+Could the fix be updated to pass smap to diag_get() as Martin
+suggested?
+
+Reference: https://lore.kernel.org/bpf/2026420182243.zAiN.martin.lau@linux.dev/
 
 
-vim +34 net/netfilter/xt_hl.c
+---
+AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
 
-    25	
-    26	static bool ttl_mt(const struct sk_buff *skb, struct xt_action_param *par)
-    27	{
-    28		const struct ipt_ttl_info *info = par->matchinfo;
-    29		const u8 ttl;
-    30	
-    31		if (!skb)
-    32			return false;
-    33	
-  > 34		ttl = ip_hdr(skb)->ttl;
-    35	
-    36		switch (info->mode) {
-    37		case IPT_TTL_EQ:
-    38			return ttl == info->ttl;
-    39		case IPT_TTL_NE:
-    40			return ttl != info->ttl;
-    41		case IPT_TTL_LT:
-    42			return ttl < info->ttl;
-    43		case IPT_TTL_GT:
-    44			return ttl > info->ttl;
-    45		default:
-    46			pr_warn("Unknown TTL match mode: %d\n", info->mode);
-    47			return false;
-    48		}
-    49	}
-    50	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+CI run summary: https://github.com/kernel-patches/bpf/actions/runs/24732581685
+--===============6483710146441311888==--
 
