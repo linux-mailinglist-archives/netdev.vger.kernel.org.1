@@ -1,70 +1,69 @@
-Return-Path: <netdev+bounces-279960-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279961-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uK3RLEXK5ml40wEAu9opvQ
-	(envelope-from <netdev+bounces-279960-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 02:52:21 +0200
+	id oOtAC0vK5ml40wEAu9opvQ
+	(envelope-from <netdev+bounces-279961-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 02:52:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDDFF4352BD
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 02:52:20 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A4314352C4
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 02:52:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E35863006238
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 00:52:12 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C20CE3017511
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 00:52:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 612211E8342;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB03C1F5858;
 	Tue, 21 Apr 2026 00:52:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="axkhj9Aj"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VEOejN2/"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF27C19D092
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4B1C1A681C
 	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 00:52:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776732729; cv=none; b=BYTfPUyKX55hp+jzfsDHbYa3ef/0w/IKeYYvBxlyKrREB6Y6ZQRrbGv77iYIzkzrw0fXodzEaZwe6ZpVGzAeQoxyzjUCynQU6JPsGG09eCVgVg/zM8CeQ6njIHpHoiQDWGeSXcbbwyU/QomQwNVzCJk3LO0h0iZRxLVq2I1mJBs=
+	t=1776732729; cv=none; b=YfPF/6f8IzDIdZHwUteO+uy9xQOGjMsHa+yQWbOiF2kU0RWr29WIvmCTWN0we/nDL/0LRDUG2SLTcm/Jh/xbtitmXn531Q4fEI/jVnmN6fg9e8H6Hs3BLz4g6koCAI4mtYa4mI2Vsm7hJ19bhtLJ9GqKmf3qpn2W/OVor5PFufs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1776732729; c=relaxed/simple;
-	bh=j2d3MsNh3px46DglOEiO8g/YXsWGAylIvQuJ9FXV13g=;
+	bh=YSz02vyizFHRiWwErx/Na7Xk6hKHAlxwQ0dqtwpJsZY=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=LsiqNnu11ejf8qI8HgkqbYpvk+WQm1mtgWsGV150OYD7KUGfZiwhqRT820fTgiWlBwP7z3N87FBMvBeG06/DBPjDjNcHeyh7BP5jplLmZWMFFtoKboLYlKU3BR3xDg4FvQTzBc1PmY/rdyWSxFBKKoRiTKxs069ibFkoqKRUDhI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=axkhj9Aj; arc=none smtp.client-ip=198.175.65.21
+	 In-Reply-To:To:Cc; b=FVuDRwRAhmgUqalQu/tvhbrznebdqT8HxzGy8TdYoqBULSAz9UrF4bzsv483Ae2yo2IzwpfCoYXac6CuzdC4XcGkzXdLDz1ruof/T6X9L7L3PENKF50sGZiDyvB2rR4kNR6TnIp/6VmAzCznaBvWS+CQQUmnd7wqSHlU1j6+4I0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VEOejN2/; arc=none smtp.client-ip=198.175.65.21
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1776732727; x=1808268727;
+  t=1776732728; x=1808268728;
   h=from:date:subject:mime-version:content-transfer-encoding:
    message-id:references:in-reply-to:to:cc;
-  bh=j2d3MsNh3px46DglOEiO8g/YXsWGAylIvQuJ9FXV13g=;
-  b=axkhj9AjheUeWed9yWk8bMdqSwfY5tD8IGwNU4SFXfyu5e8ktkCoj5Uz
-   IErVtryT/JYWLR0ZvpX+0CgfxRws40g9LYIohBgMGX+kOZk9tcezvnjV/
-   AJCnnXxnMynfAaMjB7R5ih++P9YEs1KB/oz11xI5y7qA9Cfmb2Hnd45pd
-   Fd320sy6cVtFbcJeBAkkRukOBBJJnG+7+mYhCdzQ6GjRP6CovboHg9dPh
-   z8RCX1huugEpjYMgAWUcVHxEPWtnC84od5Roc4kCLXizTeHf2Bl+dPhDA
-   4voDtxYTp880x/ELbKJs3YUc06qVjRXm2sCmmPAsrXK8E1sOWWdaa5Ks6
+  bh=YSz02vyizFHRiWwErx/Na7Xk6hKHAlxwQ0dqtwpJsZY=;
+  b=VEOejN2/eZb45nlBUIcKepmaSe0cXx919JM2HjFi1B6fxsbrLazJBpIO
+   mkmKAAZDXiclYbshaSLtrhdYuhasRDWnwfVFRqSOMQUIrxJ+1iUaWIRX0
+   FuKHtRPrTrJ4aHhASjHc8m1UYeIVP+L8q9tAU4rncNiDRS6iBU6uBXs8H
+   /pWFfax3e6Bvt/AuFpLgWD40ODLAuHcZ9Dcr8J/nLZ9+18MMApcZsHlis
+   btIy1v0FuF/zY2l5Gf+/Gmo0bLzJjwyb9SbMgl3YGIyvtFRwSupf9Wk1v
+   EdLoExHgGXehjqg2X2ZY5pFP42wbre2TsTB5tw1MiXYHIiPAdrq+8xgg1
    g==;
-X-CSE-ConnectionGUID: DiDuFW5EQXywcIiskmF6ig==
-X-CSE-MsgGUID: 5z9+RRhPTb66DLLtiDPTiw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11762"; a="77530403"
+X-CSE-ConnectionGUID: nTLnJyoyR0a3rkKPTMepNQ==
+X-CSE-MsgGUID: huhlBfI4Tr2HhY64S1yE+g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11762"; a="77530408"
 X-IronPort-AV: E=Sophos;i="6.23,190,1770624000"; 
-   d="scan'208";a="77530403"
+   d="scan'208";a="77530408"
 Received: from orviesa003.jf.intel.com ([10.64.159.143])
   by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Apr 2026 17:52:04 -0700
-X-CSE-ConnectionGUID: 5CxgIRtwTKuVUVMT3VCopw==
-X-CSE-MsgGUID: fOTCi3eaRy6V3dnqz2yI+g==
+X-CSE-ConnectionGUID: V/+Zl6B4SGmHBcJC7iCuZw==
+X-CSE-MsgGUID: ezTZFc6QT1uxocTDp65Fug==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,190,1770624000"; 
-   d="scan'208";a="235886666"
+   d="scan'208";a="235886669"
 Received: from orcnseosdtjek.jf.intel.com (HELO [10.166.28.109]) ([10.166.28.109])
   by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Apr 2026 17:52:04 -0700
 From: Jacob Keller <jacob.e.keller@intel.com>
-Date: Mon, 20 Apr 2026 17:51:26 -0700
-Subject: [PATCH net 2/4] ice: perform PHY soft reset for E825C ports at
- initialization
+Date: Mon, 20 Apr 2026 17:51:27 -0700
+Subject: [PATCH net 3/4] ice: fix ready bitmap check for non-E822 devices
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,7 +72,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260420-jk-iwl-net-2026-04-20-ptp-e825c-phy-interrupt-fixes-v1-2-bc2240f42251@intel.com>
+Message-Id: <20260420-jk-iwl-net-2026-04-20-ptp-e825c-phy-interrupt-fixes-v1-3-bc2240f42251@intel.com>
 References: <20260420-jk-iwl-net-2026-04-20-ptp-e825c-phy-interrupt-fixes-v1-0-bc2240f42251@intel.com>
 In-Reply-To: <20260420-jk-iwl-net-2026-04-20-ptp-e825c-phy-interrupt-fixes-v1-0-bc2240f42251@intel.com>
 To: Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
@@ -81,238 +80,376 @@ To: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
 Cc: netdev@vger.kernel.org, Jacob Keller <jacob.e.keller@intel.com>, 
- Grzegorz Nitka <grzegorz.nitka@intel.com>, 
- Timothy Miskell <timothy.miskell@intel.com>, 
  Aleksandr Loktionov <aleksandr.loktionov@intel.com>, 
  Petr Oros <poros@redhat.com>, Sunitha Mekala <sunithax.d.mekala@intel.com>
 X-Mailer: b4 0.16-dev-ea14f
-X-Developer-Signature: v=1; a=openpgp-sha256; l=7742;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=12473;
  i=jacob.e.keller@intel.com; h=from:subject:message-id;
- bh=Wmq2AmsdT9Xcyn36ezqoFijUwREEJFwK31Ar+dg16+Y=;
- b=owGbwMvMwCWWNS3WLp9f4wXjabUkhsxnp4xvmL/9cfRDiwXblYebEmOXOkbunLXtilnFXMkfK
- mtagrYxd5SyMIhxMciKKbIoOISsvG48IUzrjbMczBxWJpAhDFycAjCRinCG/xGdFRvMjrA4Omya
- GZh/7RLPtKPxGfp/45/q61i+3FGqvIaR4UFWmV/R4Yxptx++fbkid+GlI/vS95dMuF305fe76QX
- TXnEAAA==
+ bh=YSz02vyizFHRiWwErx/Na7Xk6hKHAlxwQ0dqtwpJsZY=;
+ b=owGbwMvMwCWWNS3WLp9f4wXjabUkhsxnp4w5FGsZZXZd1J8ZHFKpEhfsKPdWeuoxl7PMicqVO
+ 75waJ7pKGVhEONikBVTZFFwCFl53XhCmNYbZzmYOaxMIEMYuDgFYCLn/RgZDl52el++uPlX1amd
+ nxhDmDbMvOiUksLmvGD+aqtrueZC6owMyyLPXWPp2pp6fvU1pf4ZR2SOdpW/svXkMbl/dcYhg2I
+ rPgA=
 X-Developer-Key: i=jacob.e.keller@intel.com; a=openpgp;
  fpr=204054A9D73390562AEC431E6A965D3E6F0F28E8
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-279960-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	TAGGED_FROM(0.00)[bounces-279961-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[intel.com:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[jacob.e.keller@intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,intel.com:mid]
-X-Rspamd-Queue-Id: CDDFF4352BD
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,intel.com:mid]
+X-Rspamd-Queue-Id: 9A4314352C4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Grzegorz Nitka <grzegorz.nitka@intel.com>
+The E800 hardware (apart from E810) has a ready bitmap for the PHY
+indicating which timestamp slots currently have an outstanding timestamp
+waiting to be read by software.
 
-In some cases the PHY timestamp block of the E825C can become stuck. This
-is known to occur if the software writes 0 to the Tx timestamp threshold,
-and with older versions of the ice driver the threshold configuration is
-buggy and can race in such that hardware briefly operates with a zero
-threshold enabled. There are no other known ways to trigger this behavior,
-but once it occurs, the hardware is not recovered by normal reset, a driver
-reload, or even a warm power cycle of the system. A cold power cycle is
-sufficient to recover hardware, but this is extremely invasive and can
-result in significant downtime on customer deployments.
+This bitmap is checked in multiple places using the
+ice_get_phy_tx_tstamp_ready():
 
-The PHY for each port has a timestamping block which has its own reset
-functionality accessible by programming the PHY_REG_GLOBAL register.
-Writing to the PHY_REG_GLOBAL_SOFT_RESET_BIT triggers the hardware to
-perform a complete reset of the timestamping block of the PHY. This
-includes clearing the timestamp status for the port, clearing all
-outstanding timestamps in the memory bank, and resetting the PHY timer.
+ * ice_ptp_process_tx_tstamp() calls it to determine which timestamps to
+   attempt reading from the PHY
+ * ice_ptp_tx_tstamps_pending() calls it in a loop at the end of the
+   miscellaneous IRQ to check if new timestamps came in while the interrupt
+   handler was executing.
+ * ice_ptp_maybe_trigger_tx_interrupt() calls it in the auxiliary work task
+   to trigger a software interrupt in the event that the hardware logic
+   gets stuck.
 
-The new ice_ptp_phy_soft_reset_eth56g() function toggles the
-PHY_REG_GLOBAL soft reset bit with the required delays, ensuring the
-PHY is properly reinitialized without requiring a full device reset.
-The sequence clears the reset bit, asserts it, then clears it again,
-with short waits between transitions to allow hardware stabilization.
+For E82X devices, multiple PHYs share the same block, and the parameter
+passed to the ready bitmap is a block number associated with the given
+port. For E825-C devices, the PHYs have their own independent blocks and do
+not share, so the parameter passed needs to be the port number. For E810
+devices, the ice_get_phy_tx_tstamp_ready() always returns all 1s regardless
+of what port, since this hardware does not have a ready bitmap. Finally,
+for E830 devices, each PF has its own ready bitmap accessible via register,
+and the block parameter is unused.
 
-Call this function in the new ice_ptp_init_phc_e825c(), implementing the
-E825C device specific variant of the ice_ptp_init_phc(). Note that if
-ice_ptp_init_phc() fails, PTP functionality may be disabled, but the driver
-will still load to allow basic functionality to continue.
+The first call correctly uses the Tx timestamp tracker block parameter to
+check the appropriate timestamp block. This works because the tracker is
+setup correctly for each timestamp device type.
 
-This causes the clock owning PF driver to perform a PHY soft reset for
-every port during initialization. This ensures the driver begins life in a
-known functional state regardless of how it was previously programmed.
+The second two callers behave incorrectly for all device types other than
+the older E822 devices. They both iterate in a loop using
+ICE_GET_QUAD_NUM() which is a macro only used by E822 devices. This logic
+is incorrect for devices other than the E822 devices.
 
-This ensures that we properly reconfigure the hardware after a device reset
-or when loading the driver, even if it was previously misconfigured with an
-out-of-date or modified driver.
+For E810 the calls would always return true, causing E810 devices to always
+attempt to trigger a software interrupt even when they have no reason to.
+For E830, this results in duplicate work as the ready bitmap is checked
+once per number of quads. Finally, for E825-C, this results in the pending
+checks failing to detect timestamps on ports other than the first two.
+
+Fix this by introducing a new hardware API function to ice_ptp_hw.c,
+ice_check_phy_tx_tstamp_ready(). This function will check if any timestamps
+are available and returns a positive value if any timestamps are pending.
+For E810, the function always returns false, so that the re-trigger checks
+never happen. For E830, check the ready bitmap just once. For E82x
+hardware, check each quad. Finally, for E825-C, check every port.
+
+The interface function returns an integer to enable reporting of error code
+if the driver is unable read the ready bitmap. This enables callers to
+handle this case properly. The previous implementation assumed that
+timestamps are available if they failed to read the bitmap. This is
+problematic as it could lead to continuous software IRQ triggering if the
+PHY timestamp registers somehow become inaccessible.
+
+This change is especially important for E825-C devices, as the missing
+checks could leave a window open where a new timestamp could arrive while
+the existing timestamps aren't completed. As a result, the hardware
+threshold logic would not trigger a new interrupt. Without the check, the
+timestamp is left unhandled, and new timestamps will not cause an interrupt
+again until the timestamp is handled. Since both the interrupt check and
+the backup check in the auxiliary task do not function properly, the device
+may have Tx timestamps permanently stuck failing on a given port.
+
+The faulty checks originate from commit d938a8cca88a ("ice: Auxbus devices
+& driver for E822 TS") and commit 712e876371f8 ("ice: periodically kick Tx
+timestamp interrupt"), however at the time of the original coding, both
+functions only operated on E822 hardware. This is no longer the case, and
+hasn't been since the introduction of the ETH56G PHY model in commit
+7cab44f1c35f ("ice: Introduce ETH56G PHY model for E825C products")
 
 Fixes: 7cab44f1c35f ("ice: Introduce ETH56G PHY model for E825C products")
-Signed-off-by: Timothy Miskell <timothy.miskell@intel.com>
-Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
 Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 Reviewed-by: Petr Oros <poros@redhat.com>
 Tested-by: Sunitha Mekala <sunithax.d.mekala@intel.com>
 Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_ptp_hw.h |  4 ++
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 90 ++++++++++++++++++++++++++++-
- 2 files changed, 93 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.h |   1 +
+ drivers/net/ethernet/intel/ice/ice_ptp.c    |  44 +++++------
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 117 ++++++++++++++++++++++++++++
+ 3 files changed, 136 insertions(+), 26 deletions(-)
 
 diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-index 9bfd3e79c580..ac4611291052 100644
+index ac4611291052..1c9e77dbc770 100644
 --- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
 +++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-@@ -374,6 +374,7 @@ int ice_stop_phy_timer_eth56g(struct ice_hw *hw, u8 port, bool soft_reset);
- int ice_start_phy_timer_eth56g(struct ice_hw *hw, u8 port);
- int ice_phy_cfg_intr_eth56g(struct ice_hw *hw, u8 port, bool ena, u8 threshold);
- int ice_phy_cfg_ptp_1step_eth56g(struct ice_hw *hw, u8 port);
-+int ice_ptp_phy_soft_reset_eth56g(struct ice_hw *hw, u8 port);
+@@ -300,6 +300,7 @@ void ice_ptp_reset_ts_memory(struct ice_hw *hw);
+ int ice_ptp_init_phc(struct ice_hw *hw);
+ void ice_ptp_init_hw(struct ice_hw *hw);
+ int ice_get_phy_tx_tstamp_ready(struct ice_hw *hw, u8 block, u64 *tstamp_ready);
++int ice_check_phy_tx_tstamp_ready(struct ice_hw *hw);
+ int ice_ptp_one_port_cmd(struct ice_hw *hw, u8 configured_port,
+ 			 enum ice_ptp_tmr_cmd configured_cmd);
  
- #define ICE_ETH56G_NOMINAL_INCVAL	0x140000000ULL
- #define ICE_ETH56G_NOMINAL_PCS_REF_TUS	0x100000000ULL
-@@ -676,6 +677,9 @@ static inline u64 ice_get_base_incval(struct ice_hw *hw)
- #define ICE_P0_GNSS_PRSNT_N	BIT(4)
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
+index 6cb0cf7a9891..36df742c326c 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp.c
++++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
+@@ -2710,7 +2710,7 @@ static bool ice_any_port_has_timestamps(struct ice_pf *pf)
+ bool ice_ptp_tx_tstamps_pending(struct ice_pf *pf)
+ {
+ 	struct ice_hw *hw = &pf->hw;
+-	unsigned int i;
++	int ret;
  
- /* ETH56G PHY register addresses */
-+#define PHY_REG_GLOBAL			0x0
-+#define PHY_REG_GLOBAL_SOFT_RESET_M	BIT(11)
-+
- /* Timestamp PHY incval registers */
- #define PHY_REG_TIMETUS_L		0x8
- #define PHY_REG_TIMETUS_U		0xC
+ 	/* Check software indicator */
+ 	switch (pf->ptp.tx_interrupt_mode) {
+@@ -2731,16 +2731,19 @@ bool ice_ptp_tx_tstamps_pending(struct ice_pf *pf)
+ 	}
+ 
+ 	/* Check hardware indicator */
+-	for (i = 0; i < ICE_GET_QUAD_NUM(hw->ptp.num_lports); i++) {
+-		u64 tstamp_ready = 0;
+-		int err;
+-
+-		err = ice_get_phy_tx_tstamp_ready(&pf->hw, i, &tstamp_ready);
+-		if (err || tstamp_ready)
+-			return true;
++	ret = ice_check_phy_tx_tstamp_ready(hw);
++	if (ret < 0) {
++		dev_dbg(ice_pf_to_dev(pf), "Unable to read PHY Tx timestamp ready bitmap, err %d\n",
++			ret);
++		/* Stop triggering IRQs if we're unable to read PHY */
++		return false;
+ 	}
+ 
+-	return false;
++	/* ice_check_phy_tx_tstamp_ready() returns 1 if there are timestamps
++	 * available, 0 if there are no waiting timestamps, and a negative
++	 * value if there was an error (which we checked for above).
++	 */
++	return ret > 0;
+ }
+ 
+ /**
+@@ -2824,8 +2827,7 @@ static void ice_ptp_maybe_trigger_tx_interrupt(struct ice_pf *pf)
+ {
+ 	struct device *dev = ice_pf_to_dev(pf);
+ 	struct ice_hw *hw = &pf->hw;
+-	bool trigger_oicr = false;
+-	unsigned int i;
++	int ret;
+ 
+ 	if (!pf->ptp.port.tx.has_ready_bitmap)
+ 		return;
+@@ -2833,21 +2835,11 @@ static void ice_ptp_maybe_trigger_tx_interrupt(struct ice_pf *pf)
+ 	if (!ice_pf_src_tmr_owned(pf))
+ 		return;
+ 
+-	for (i = 0; i < ICE_GET_QUAD_NUM(hw->ptp.num_lports); i++) {
+-		u64 tstamp_ready;
+-		int err;
+-
+-		err = ice_get_phy_tx_tstamp_ready(&pf->hw, i, &tstamp_ready);
+-		if (!err && tstamp_ready) {
+-			trigger_oicr = true;
+-			break;
+-		}
+-	}
+-
+-	if (trigger_oicr) {
+-		/* Trigger a software interrupt, to ensure this data
+-		 * gets processed.
+-		 */
++	ret = ice_check_phy_tx_tstamp_ready(hw);
++	if (ret < 0) {
++		dev_dbg(dev, "PTP periodic task unable to read PHY timestamp ready bitmap, err %d\n",
++			ret);
++	} else if (ret) {
+ 		dev_dbg(dev, "PTP periodic task detected waiting timestamps. Triggering Tx timestamp interrupt now.\n");
+ 
+ 		wr32(hw, PFINT_OICR, PFINT_OICR_TSYN_TX_M);
 diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-index 7f2f7440e705..d4c2bb084255 100644
+index d4c2bb084255..4795af06b983 100644
 --- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
 +++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-@@ -377,6 +377,31 @@ static void ice_ptp_cfg_sync_delay(const struct ice_hw *hw, u32 delay)
-  * The following functions operate on devices with the ETH 56G PHY.
-  */
+@@ -2168,6 +2168,35 @@ int ice_start_phy_timer_eth56g(struct ice_hw *hw, u8 port)
+ 	return 0;
+ }
  
 +/**
-+ * ice_ptp_init_phc_e825c - Perform E825C specific PHC initialization
-+ * @hw: pointer to HW struct
++ * ice_check_phy_tx_tstamp_ready_eth56g - Check Tx memory status for all ports
++ * @hw: pointer to the HW struct
 + *
-+ * Perform E825C-specific PTP hardware clock initialization steps.
++ * Check the PHY_REG_TX_MEMORY_STATUS for all ports. A set bit indicates
++ * a waiting timestamp.
 + *
-+ * Return: 0 on success, or a negative error value on failure.
++ * Return: 1 if any port has at least one timestamp ready bit set,
++ * 0 otherwise, and a negative error code if unable to read the bitmap.
 + */
-+static int ice_ptp_init_phc_e825c(struct ice_hw *hw)
++static int ice_check_phy_tx_tstamp_ready_eth56g(struct ice_hw *hw)
 +{
-+	int err;
++	int port;
 +
-+	/* Soft reset all ports, to ensure everything is at a clean state */
-+	for (int port = 0; port < hw->ptp.num_lports; port++) {
-+		err = ice_ptp_phy_soft_reset_eth56g(hw, port);
-+		if (err) {
-+			ice_debug(hw, ICE_DBG_PTP, "Failed to soft reset port %d, err %d\n",
-+				  port, err);
++	for (port = 0; port < hw->ptp.num_lports; port++) {
++		u64 tstamp_ready;
++		int err;
++
++		err = ice_get_phy_tx_tstamp_ready(hw, port, &tstamp_ready);
++		if (err)
 +			return err;
-+		}
++
++		if (tstamp_ready)
++			return 1;
 +	}
 +
 +	return 0;
 +}
 +
  /**
-  * ice_ptp_get_dest_dev_e825 - get destination PHY for given port number
+  * ice_ptp_read_tx_hwtstamp_status_eth56g - Get TX timestamp status
   * @hw: pointer to the HW struct
-@@ -2179,6 +2204,69 @@ int ice_ptp_read_tx_hwtstamp_status_eth56g(struct ice_hw *hw, u32 *ts_status)
+@@ -4318,6 +4347,35 @@ ice_get_phy_tx_tstamp_ready_e82x(struct ice_hw *hw, u8 quad, u64 *tstamp_ready)
  	return 0;
  }
  
 +/**
-+ * ice_ptp_phy_soft_reset_eth56g - Perform a PHY soft reset on ETH56G
-+ * @hw: pointer to the HW structure
-+ * @port: PHY port number
++ * ice_check_phy_tx_tstamp_ready_e82x - Check Tx memory status for all quads
++ * @hw: pointer to the HW struct
 + *
-+ * Trigger a soft reset of the ETH56G PHY by toggling the soft reset
-+ * bit in the PHY global register. The reset sequence consists of:
-+ *   1. Clearing the soft reset bit
-+ *   2. Asserting the soft reset bit
-+ *   3. Clearing the soft reset bit again
++ * Check the Q_REG_TX_MEMORY_STATUS for all quads. A set bit indicates
++ * a waiting timestamp.
 + *
-+ * Short delays are inserted between each step to allow the hardware
-+ * to settle. This provides a controlled way to reinitialize the PHY
-+ * without requiring a full device reset.
-+ *
-+ * Return: 0 on success, or a negative error code on failure when
-+ *         reading or writing the PHY register.
++ * Return: 1 if any quad has at least one timestamp ready bit set,
++ * 0 otherwise, and a negative error value if unable to read the bitmap.
 + */
-+int ice_ptp_phy_soft_reset_eth56g(struct ice_hw *hw, u8 port)
++static int ice_check_phy_tx_tstamp_ready_e82x(struct ice_hw *hw)
 +{
-+	u32 global_val;
-+	int err;
++	int quad;
 +
-+	err = ice_read_ptp_reg_eth56g(hw, port, PHY_REG_GLOBAL, &global_val);
-+	if (err) {
-+		ice_debug(hw, ICE_DBG_PTP, "Failed to read PHY_REG_GLOBAL for port %d, err %d\n",
-+			  port, err);
-+		return err;
++	for (quad = 0; quad < ICE_GET_QUAD_NUM(hw->ptp.num_lports); quad++) {
++		u64 tstamp_ready;
++		int err;
++
++		err = ice_get_phy_tx_tstamp_ready(hw, quad, &tstamp_ready);
++		if (err)
++			return err;
++
++		if (tstamp_ready)
++			return 1;
 +	}
 +
-+	global_val &= ~PHY_REG_GLOBAL_SOFT_RESET_M;
-+	ice_debug(hw, ICE_DBG_PTP, "Clearing soft reset bit for port %d, val: 0x%x\n",
-+		  port, global_val);
-+	err = ice_write_ptp_reg_eth56g(hw, port, PHY_REG_GLOBAL, global_val);
-+	if (err) {
-+		ice_debug(hw, ICE_DBG_PTP, "Failed to write PHY_REG_GLOBAL for port %d, err %d\n",
-+			  port, err);
-+		return err;
-+	}
-+
-+	usleep_range(5000, 6000);
-+
-+	global_val |= PHY_REG_GLOBAL_SOFT_RESET_M;
-+	ice_debug(hw, ICE_DBG_PTP, "Set soft reset bit for port %d, val: 0x%x\n",
-+		  port, global_val);
-+	err = ice_write_ptp_reg_eth56g(hw, port, PHY_REG_GLOBAL, global_val);
-+	if (err) {
-+		ice_debug(hw, ICE_DBG_PTP, "Failed to write PHY_REG_GLOBAL for port %d, err %d\n",
-+			  port, err);
-+		return err;
-+	}
-+	usleep_range(5000, 6000);
-+
-+	global_val &= ~PHY_REG_GLOBAL_SOFT_RESET_M;
-+	ice_debug(hw, ICE_DBG_PTP, "Clear soft reset bit for port %d, val: 0x%x\n",
-+		  port, global_val);
-+	err = ice_write_ptp_reg_eth56g(hw, port, PHY_REG_GLOBAL, global_val);
-+	if (err)
-+		ice_debug(hw, ICE_DBG_PTP, "Failed to write PHY_REG_GLOBAL for port %d, err %d\n",
-+			  port, err);
-+	return err;
++	return 0;
 +}
 +
  /**
-  * ice_get_phy_tx_tstamp_ready_eth56g - Read the Tx memory status register
+  * ice_phy_cfg_intr_e82x - Configure TX timestamp interrupt
   * @hw: pointer to the HW struct
-@@ -5592,7 +5680,7 @@ int ice_ptp_init_phc(struct ice_hw *hw)
- 	case ICE_MAC_GENERIC:
- 		return ice_ptp_init_phc_e82x(hw);
- 	case ICE_MAC_GENERIC_3K_E825:
--		return 0;
-+		return ice_ptp_init_phc_e825c(hw);
- 	default:
- 		return -EOPNOTSUPP;
+@@ -4871,6 +4929,23 @@ ice_get_phy_tx_tstamp_ready_e810(struct ice_hw *hw, u8 port, u64 *tstamp_ready)
+ 	return 0;
+ }
+ 
++/**
++ * ice_check_phy_tx_tstamp_ready_e810 - Check Tx memory status register
++ * @hw: pointer to the HW struct
++ *
++ * The E810 devices do not have a Tx memory status register. Note this is
++ * intentionally different behavior from ice_get_phy_tx_tstamp_ready_e810
++ * which always says that all bits are ready. This function is called in cases
++ * where code will trigger interrupts if timestamps are waiting, and should
++ * not be called for E810 hardware.
++ *
++ * Return: 0.
++ */
++static int ice_check_phy_tx_tstamp_ready_e810(struct ice_hw *hw)
++{
++	return 0;
++}
++
+ /* E810 SMA functions
+  *
+  * The following functions operate specifically on E810 hardware and are used
+@@ -5125,6 +5200,21 @@ static void ice_get_phy_tx_tstamp_ready_e830(const struct ice_hw *hw, u8 port,
+ 	*tstamp_ready |= rd32(hw, E830_PRTMAC_TS_TX_MEM_VALID_L);
+ }
+ 
++/**
++ * ice_check_phy_tx_tstamp_ready_e830 - Check Tx memory status register
++ * @hw: pointer to the HW struct
++ *
++ * Return: 1 if the device has waiting timestamps, 0 otherwise.
++ */
++static int ice_check_phy_tx_tstamp_ready_e830(struct ice_hw *hw)
++{
++	u64 tstamp_ready;
++
++	ice_get_phy_tx_tstamp_ready_e830(hw, 0, &tstamp_ready);
++
++	return !!tstamp_ready;
++}
++
+ /**
+  * ice_ptp_init_phy_e830 - initialize PHY parameters
+  * @ptp: pointer to the PTP HW struct
+@@ -5717,6 +5807,33 @@ int ice_get_phy_tx_tstamp_ready(struct ice_hw *hw, u8 block, u64 *tstamp_ready)
  	}
+ }
+ 
++/**
++ * ice_check_phy_tx_tstamp_ready - Check PHY Tx timestamp memory status
++ * @hw: pointer to the HW struct
++ *
++ * Check the PHY for Tx timestamp memory status on all ports. If you need to
++ * see individual timestamp status for each index, use
++ * ice_get_phy_tx_tstamp_ready() instead.
++ *
++ * Return: 1 if any port has timestamps available, 0 if there are no timestamps
++ * available, and a negative error code on failure.
++ */
++int ice_check_phy_tx_tstamp_ready(struct ice_hw *hw)
++{
++	switch (hw->mac_type) {
++	case ICE_MAC_E810:
++		return ice_check_phy_tx_tstamp_ready_e810(hw);
++	case ICE_MAC_E830:
++		return ice_check_phy_tx_tstamp_ready_e830(hw);
++	case ICE_MAC_GENERIC:
++		return ice_check_phy_tx_tstamp_ready_e82x(hw);
++	case ICE_MAC_GENERIC_3K_E825:
++		return ice_check_phy_tx_tstamp_ready_eth56g(hw);
++	default:
++		return -EOPNOTSUPP;
++	}
++}
++
+ /**
+  * ice_cgu_get_pin_desc_e823 - get pin description array
+  * @hw: pointer to the hw struct
 
 -- 
 2.54.0.rc2.531.gaf818d63126a
