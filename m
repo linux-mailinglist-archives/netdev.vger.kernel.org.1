@@ -1,133 +1,197 @@
-Return-Path: <netdev+bounces-280095-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280093-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YEL8LsBm52ld7wEAu9opvQ
-	(envelope-from <netdev+bounces-280095-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 14:00:00 +0200
+	id 2KLAGSBn52ld7wEAu9opvQ
+	(envelope-from <netdev+bounces-280093-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 14:01:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B996443A602
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 13:59:59 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0366E43A628
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 14:01:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 2E457300DEF0
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 11:59:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BBB6230470FF
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 11:56:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80A6439C009;
-	Tue, 21 Apr 2026 11:59:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A51D338C401;
+	Tue, 21 Apr 2026 11:56:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nucleusys.com header.i=@nucleusys.com header.b="Ixwmcvox"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="qF96Y7Vr"
 X-Original-To: netdev@vger.kernel.org
-Received: from lan.nucleusys.com (lan.nucleusys.com [92.247.61.126])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0384E38C401;
-	Tue, 21 Apr 2026 11:59:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=92.247.61.126
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C52F3845D8;
+	Tue, 21 Apr 2026 11:56:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776772796; cv=none; b=KvLgI4VsMGotRubq+FNZNVGvkRkhgu9RQy8+PqM+ajnsmFhJBFaVx7aWtN1duU9ldCK0qP/43eglC4GtzJU8R+prwNoAaMYvFgXCmIkMIgoB6YBqy7SQjly1ni/EghTwNn7JVB7LACJpLBa/1Vdy9AWtHHHqwdcLQuA+8QsAjPk=
+	t=1776772588; cv=none; b=Ptq+uiqBvB2hO9tknkNVJmidOWzqwAW4/HI1e10KS2j2yP71QsFq/lHrWaLIGTIB4XihlkO2VHBCnIh1ss2t1ekE0A1V2+zpcYjNTG7J0Hq9bGZwbBloxTD+ssVE3akMNy7Yf9Y54N7Eceihekp9nc0aDz2j3glp97hoKaN+fzs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776772796; c=relaxed/simple;
-	bh=T25uiAUIhbJ8joCG1bS4JMt3QxHeB8To+1GhGxAJsGo=;
+	s=arc-20240116; t=1776772588; c=relaxed/simple;
+	bh=pQOQW0F37RiB3H/Va07FzlVZh/8VsGGpDYSzXTQ/d5w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aah2Yqoz0VPgjEOFQkm9dG1cPuTVCV4UutLrkA5cbjEg+pIly/r5V4m0TLphuyd9jh9G+TPbWW6xUENMHJxPEM6/s0WfJtsn198LXyLUKCF3hgwCnm0wVqDRPJqJ+ajmtZ+qOZbO7AgyLzfshTX3XCTl+KCZk9D5Y6eRNny3/x0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nucleusys.com; spf=pass smtp.mailfrom=nucleusys.com; dkim=pass (2048-bit key) header.d=nucleusys.com header.i=@nucleusys.com header.b=Ixwmcvox; arc=none smtp.client-ip=92.247.61.126
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nucleusys.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nucleusys.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=nucleusys.com; s=xyz;
-	t=1776772478; bh=T25uiAUIhbJ8joCG1bS4JMt3QxHeB8To+1GhGxAJsGo=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=q3XDqNJFJYq/c8iK9XPDgYNNkRxX6fATCnc8Ojqkoe/JdylGBEl1DV1qBySUwY+2T2hMW6BA48cau/PfehxYEv1/DKac4f+wKkza+Bs7Ge4Ru0SWlkjY7FnXxqwnrirPDxp31+EQXIETJbG5xxOacGKhas2p2Us+D43dVGZhZS0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=qF96Y7Vr; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with UTF8SMTPSA id 805D2600B5;
+	Tue, 21 Apr 2026 13:56:24 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1776772584;
+	bh=phTSxWHX76RLznCdquM07h7FzBmO2ORr8wdwNAd/4Gk=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IxwmcvoxzBfJzaTDaKRsB8D5qcNsRMa86Vsauzmln1YTZaH3hDLlCllrP+gTJX/e3
-	 /PmTB9VL2doNXsEKaJ1CwwihDiKi2ImFcTcxnRG+a7xE1dGt9NuWvjpqcYpqrGcLpe
-	 4FR/OF2YlYklYwy0E+ITpQzuCffppG8z5mrrT/XMYE/b9huDq7Ei8RRtrAbdKa3wVy
-	 n7VZjB6dsbhhZLBg/bC/RlgdYvTNnyBLu1DJVEyJ9FyRW/WUvPA2q0aF/ZB9384hj1
-	 s9nzSnqAKKarnM/9GMCnN5N1tZ9LFsUqYxujchi3rTxielU8yy7gXonwmbEyQXigoS
-	 S9qn1d9HdBoDQ==
-Received: from bender.k.g (unknown [192.168.234.1])
-	by lan.nucleusys.com (Postfix) with ESMTPSA id 32EED3FB18;
-	Tue, 21 Apr 2026 14:54:38 +0300 (EEST)
-Date: Tue, 21 Apr 2026 14:54:37 +0300
-From: Petko Manolov <petkan@nucleusys.com>
-To: Morduan Zang <zhangdandan@uniontech.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+	b=qF96Y7VrJHSPJduyqVsLtC/vW8wMD/ILOSroqM4ptqFg0kVJRiogQFCGtkfjridwb
+	 diuI915zzp+VidQQc1HN0kCVNFkFfpAv4O+UdVZuK/LPWExzOk50TDNs8EnW4Op7Ij
+	 O7B+lYHN4Vd6Le+rKiQ7IBLcohomH6/Ovgeg9T6HFfbd/dz97WUtD20Zc23/9KOVzP
+	 0z3be00o1R2XCLFNmgeyrujSJyzn1wbUMocdWmiDtwVcPfmUDVXGCTXYe0OslVF3OK
+	 jqkoKq2gzA4c+aLjBUqS4WkFCuOAGSk3Ebgwbpm90C4sHgTRoL/MLCrAhZr32hW16i
+	 iJ87ljw1zIunw==
+Date: Tue, 21 Apr 2026 13:56:21 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Marino Dzalto <marino.dzalto@gmail.com>
+Cc: fw@strlen.de, jacob.e.keller@intel.com, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: usb: rtl8150: free skb on usb_submit_urb() failure
- in xmit
-Message-ID: <20260421115437.GB15539@bender.k.g>
-References: <678BC10BB9E39322+20260421111025.15833-1-zhangdandan@uniontech.com>
+Subject: Re: [PATCH v3] netfilter: xt_HL: add pr_fmt and checkentry validation
+Message-ID: <aedl5SY8M6LtFxa2@chamomile>
+References: <20260403205907.92749-1-marino.dzalto@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <678BC10BB9E39322+20260421111025.15833-1-zhangdandan@uniontech.com>
-X-Spamd-Result: default: False [-0.66 / 15.00];
+In-Reply-To: <20260403205907.92749-1-marino.dzalto@gmail.com>
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[nucleusys.com,reject];
-	R_DKIM_ALLOW(-0.20)[nucleusys.com:s=xyz];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-280095-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[netfilter.org];
+	RSPAMD_URIBL_FAIL(0.00)[toxicfilms.tv:query timed out];
+	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[nucleusys.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280093-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[petkan@nucleusys.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[netfilter.org:+];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,bender.k.g:mid]
-X-Rspamd-Queue-Id: B996443A602
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[netfilter.org:dkim,toxicfilms.tv:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 0366E43A628
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 26-04-21 19:10:25, Morduan Zang wrote:
-> When rtl8150_start_xmit() fails to submit the tx URB, the URB is never
-> handed to the USB core and write_bulk_callback() will not run.  The
-> driver returns NETDEV_TX_OK, which tells the networking stack that the
-> skb has been consumed, but nothing actually frees the skb on this
-> error path:
+On Fri, Apr 03, 2026 at 10:59:07PM +0200, Marino Dzalto wrote:
+> Add pr_fmt to prefix log messages with the module name for
+> easier debugging in dmesg.
 > 
->   dev->tx_skb = skb;
->   ...
->   if ((res = usb_submit_urb(dev->tx_urb, GFP_ATOMIC))) {
->           ...
->           /* no kfree_skb here */
->   }
->   return NETDEV_TX_OK;
+> Add checkentry functions for IPv4 (ttl_mt_check) and IPv6
+> (hl_mt6_check) to validate the match mode at rule registration
+> time, rejecting invalid modes with -EINVAL.
 > 
-> This leaks the skb on every submit failure and also leaves dev->tx_skb
-> pointing at memory that the driver itself may later free, which is
-> fragile.
+> Signed-off-by: Marino Dzalto <marino.dzalto@gmail.com>
+> ---
+
+BTW, please use "nf-next" as target tree for this.
+
+And use _ratelimited as suggested by the AI reviewer.
+
+Send us a v4, thanks
+
+> v3: Remove mention of NULL checks from commit message, as they
+>     were never part of the original code.
+> v2: Remove NULL checks for skb as suggested by Florian Westphal
+>     (skb is guaranteed non-NULL by netfilter core). Move mode
+>     validation to checkentry functions instead of match function,
+>     also as suggested by Florian Westphal.
+> ---
+>  net/netfilter/xt_hl.c | 27 +++++++++++++++++++++++++++
+>  1 file changed, 27 insertions(+)
 > 
-> Free the skb with dev_kfree_skb_any() in the error path and clear
-> dev->tx_skb so no stale pointer is left behind.
-
-Another approach would be to use skb_copy_from_linear_data() to a static buffer
-and free the skb right away.  Take a look at pegasus_start_xmit() in
-drivers/net/usb/pegasus.c.  This comes at the cost of yet another memcpy,
-though.
-
-The above is not to say i don't like your current approach, just FYI.
-
-
-		Petko
+> diff --git a/net/netfilter/xt_hl.c b/net/netfilter/xt_hl.c
+> index c1a70f8f0441..4a12a757ecbf 100644
+> --- a/net/netfilter/xt_hl.c
+> +++ b/net/netfilter/xt_hl.c
+> @@ -6,6 +6,7 @@
+>   * Hop Limit matching module
+>   * (C) 2001-2002 Maciej Soltysiak <solt@dns.toxicfilms.tv>
+>   */
+> +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+>  
+>  #include <linux/ip.h>
+>  #include <linux/ipv6.h>
+> @@ -22,6 +23,18 @@ MODULE_LICENSE("GPL");
+>  MODULE_ALIAS("ipt_ttl");
+>  MODULE_ALIAS("ip6t_hl");
+>  
+> +static int ttl_mt_check(const struct xt_mtchk_param *par)
+> +{
+> +	const struct ipt_ttl_info *info = par->matchinfo;
+> +
+> +	if (info->mode > IPT_TTL_GT) {
+> +		pr_err("Unknown TTL match mode: %d\n", info->mode);
+> +		return -EINVAL;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>  static bool ttl_mt(const struct sk_buff *skb, struct xt_action_param *par)
+>  {
+>  	const struct ipt_ttl_info *info = par->matchinfo;
+> @@ -41,6 +54,18 @@ static bool ttl_mt(const struct sk_buff *skb, struct xt_action_param *par)
+>  	return false;
+>  }
+>  
+> +static int hl_mt6_check(const struct xt_mtchk_param *par)
+> +{
+> +	const struct ip6t_hl_info *info = par->matchinfo;
+> +
+> +	if (info->mode > IP6T_HL_GT) {
+> +		pr_err("Unknown Hop Limit match mode: %d\n", info->mode);
+> +		return -EINVAL;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>  static bool hl_mt6(const struct sk_buff *skb, struct xt_action_param *par)
+>  {
+>  	const struct ip6t_hl_info *info = par->matchinfo;
+> @@ -65,6 +90,7 @@ static struct xt_match hl_mt_reg[] __read_mostly = {
+>  		.name       = "ttl",
+>  		.revision   = 0,
+>  		.family     = NFPROTO_IPV4,
+> +		.checkentry = ttl_mt_check,
+>  		.match      = ttl_mt,
+>  		.matchsize  = sizeof(struct ipt_ttl_info),
+>  		.me         = THIS_MODULE,
+> @@ -73,6 +99,7 @@ static struct xt_match hl_mt_reg[] __read_mostly = {
+>  		.name       = "hl",
+>  		.revision   = 0,
+>  		.family     = NFPROTO_IPV6,
+> +		.checkentry = hl_mt6_check,
+>  		.match      = hl_mt6,
+>  		.matchsize  = sizeof(struct ip6t_hl_info),
+>  		.me         = THIS_MODULE,
+> -- 
+> 2.50.1 (Apple Git-155)
+> 
 
