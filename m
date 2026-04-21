@@ -1,198 +1,201 @@
-Return-Path: <netdev+bounces-280177-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280178-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eMoiCcqa52kV+QEAu9opvQ
-	(envelope-from <netdev+bounces-280177-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 17:42:02 +0200
+	id eN3fJC2i52nw+QEAu9opvQ
+	(envelope-from <netdev+bounces-280178-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 18:13:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3D4943CE3B
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 17:42:01 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E43E343D329
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 18:13:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 21767305BDD1
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 15:35:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5FE123020D44
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 15:52:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02E4A2D9EF4;
-	Tue, 21 Apr 2026 15:35:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F70133F5A2;
+	Tue, 21 Apr 2026 15:52:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bykALty5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f80.google.com (mail-oo1-f80.google.com [209.85.161.80])
+Received: from mail-dl1-f47.google.com (mail-dl1-f47.google.com [74.125.82.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 312162D97B7
-	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 15:35:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38731344D82
+	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 15:52:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776785736; cv=none; b=AI9rJPQkk+lvqQlmRmy+O7K9HNg+fYKGk6BENwsPGwEx4VeTL0PCW3a4JyNBAJogqZH7aoVycla1v4DS0BIOSgqpNOCsTEntJEJhecVfErMFfKnRKK2nRnA78V33EO3XFTE1kc7Ikk75trfTB3M7XLRdHE+sCGmB3A/mN6wHLDQ=
+	t=1776786743; cv=none; b=PzGEZSnFmZjqJ5q1+WpeiEcCZ46zcsN+lbHvfNxC0eibT/kmuv7ANRAxfbYDlhASqaGHY8U4feqgoJLShdAA2H63WgLWnDB/NRvjJm4Fin1W2biL7KcFvz/TDzZtELuDynmCLFSrl3iYtJ+V8YCh6RUx2cmkTHu5Xebxh193jD0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776785736; c=relaxed/simple;
-	bh=iqEWk6uYHERT5rbJJGWanfCq1ohLZkd0SSFaqHxel6Y=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=kaUCE82fpY2sAp4mQ4rpRizhaOujzdstLDh/u3aZ4GDuc13hm9nC2D1sldvlEqbqj3ZY+ePIHA42HFF6zIdX8ozC554buw6MOIWI8GavIi+8bBwqN05yRylSmNrIupbwEL+wKH6pJerWap0sfTQi7t+4E7xuWMKI8gy8CUcEbDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f80.google.com with SMTP id 006d021491bc7-66308f16ea1so6397529eaf.2
-        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 08:35:33 -0700 (PDT)
+	s=arc-20240116; t=1776786743; c=relaxed/simple;
+	bh=5rJOMD2PEwPgKsY/Pomu1Z6FwKocBEb+ZZZlVkuvY8U=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NkFqZh34biem3+/AnK9qVlXfGGNzM1JLrLyIJ/Xy84qUoqVASVOR/ohj94zkKsm/7H0jNB8sU/GvOcfoa8enSIMSUM+bbViFV2BxGu1/BkprmWkEL4zMZeBtr5j7xc6KW8CigOPCUlz7NgY+JPpFzJ+mMHyF79Udr3gpSODiQyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bykALty5; arc=none smtp.client-ip=74.125.82.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dl1-f47.google.com with SMTP id a92af1059eb24-12c726ef332so5844252c88.1
+        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 08:52:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776786739; x=1777391539; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=45ymFIxphyJixlHGHv+r0Hhagbw0y8tExebfBXG9KLg=;
+        b=bykALty5+dDl+lJ0FxYOONBVnf2BvBpHZ6lIbhBV09OR5RQJtxHE4B3IXLdx1bFv5S
+         LCjb60Srb/AgKs4Rn7C+vviFQ4XVLhV4rn9OX1P2JnmD4Dd7jxTXY4F3Iavpw/wFgSm8
+         4elYdm3PSEeP3gcgYJ5FdFJI0t5QhGKNR9e92Nn+YAfhQm/drk9O7cO0MJC7RFX+/KfB
+         deP2242A+RC1/iCM40qkJRkMa79P5Aj1+IEv5A3AWhkKad2Nur3Lpp85VwO4fQs5ax9d
+         /FE6dclR7xqGKftpGDGhEpkz4OyZqLYIuyh1EeQhOU//c18p6iImrK3b7B+xeiVqK5PO
+         NDoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776785732; x=1777390532;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=kOpqBM96QcpbmuHxumsP+RAdHvAHkt+d2uQmzoGd1Dc=;
-        b=tKuwF3hNxsLNfjcQ3LKEpTvbxCybiq8cv+kgH1VOroigu2Br/sAPh5NwC5p7qJ8GFL
-         TRt6/7uWyn8GkODTlw9FXhsaiJWl161l2TlVX7EV90ngnahYUFixiLQG0df7Gkt0mTfE
-         OflzNixCx4tiSP1P7BbXgAOyYBsuoY7d504xG11kWIhHaVFszWcjcN6xaGuwID0/07Qw
-         9s5xpjJlON7y9sUQN3SREUU3FmiooPvzwBVxpKxtedeGbSbGrNT7RWPTbDxcNFjs4pmx
-         ki2u3tOAH7GuXwWkyWl0aydP/jpqUQCd/wJvf10FQwexIGX28gi3Q5HjED2147re2saX
-         0Fyw==
-X-Forwarded-Encrypted: i=1; AFNElJ+kr8XaolxAlaifYPs8p8ctgZs/hE78HnS5xkiBd2llBBVx5IFuv1hlh5eNPdbals/kCVfCR6Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzN0DlaAfe3L0TRkOa+mFyPUUGK7pb35ui89Zp+MWyYK2zeQcDk
-	ro0mEM2g61YoExgYXWtONRMb9BZZ9bxscBBX5BMH9yjgta624K4ODnNI1tdmsOmuWjKnYZk2WpK
-	hhOJYsXcGo5siv1vYLjOe+cKGPo+m1GPBEweIPedXS+epqD4pSQKH/tkXIf8=
+        d=1e100.net; s=20251104; t=1776786739; x=1777391539;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=45ymFIxphyJixlHGHv+r0Hhagbw0y8tExebfBXG9KLg=;
+        b=tGli7lN/8at63nw0PCSmOA4tzPO8KmZk9OjKcaGf/l6ETcef4iJy4T7RvNTGV4+U+F
+         +9dPHSCnFudv17Iu/AB2M0JaSZ29l1291Xx4+Pmzdof1eIb7fTfI9DfAWYwJgo0wEury
+         zRqp37NKA7sFkeg+Nb6sU7pzZvoKjoC/IZ6UFSOAZIN761fI4j7xInGW2wAhfYWr2Y+5
+         c0DApZZKiP43nnXlsz2vYhALYex97kWOOIhs+HFkk7XjSg5iuxD8UO632Zp06hExrQpG
+         1wT0+24TWuA2Kxe31GIwHDDFNdUDKNSsMIP5voVRRDjwBIz//fak+7JAXJ1+iplNzua9
+         FLEQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+Uf2I+XfDxhvc384Mq/LfYXFPZQIixU4/gOB5OLeVycHNVWZQ/B0Gpj7zlYZX1FhezLEcKots=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzB94ZAgbA9bQZ16Z6J25BleJfH72T6ezR4n0zkCYJwE/kVnDfw
+	VdOkvN4edFp9fd4UCXLFPubEYKR+GXVufkUq5TbM9rl6Kve/3PmvdkKM
+X-Gm-Gg: AeBDievIfT3QMVw08hXFTg8qgV4/uuN7RuZmEHttePG/8LnrXL+NWCXsIqnorwy3Nsg
+	DpjteBUwW6QIwn2FDCwPixGMubw/DwY5Yp+bs6Qt0feQsDTJA1PGtCNgDaHgKC+6lmel5Fn1WQE
+	NRlQZIS7TNoXU5D/eRbhfyx9dvU8x83HCEfyTDJx8un9JCmVXFKqqHW7t0nzeUc8g0u49WdW64s
+	w1L8QRHtzFQTf+lZ1EJIbB8FVlEKHhtPzLTF4Y8hmcP9r8WwP+jEpFTEIhUQS3XTpf8o2LyQbM+
+	9JjxGuf/ZC9/E8gTOSyTBSFvzco3BVhOqZ41mRw3vkEUuQIXE5GBTvWr1zq7rlvW2JLhwZBSUcI
+	f7j/cslAMDn4qUAxqfkSaIdTeyv5M7gFUqmBg9GHNSpjNap17XBtrZU46usUvOpTZ3uveX9XLKR
+	bMjZGzcLiCoUKn6uhwVLf1iHISPNQGi4TU+dKCNCmBDPtZ7k0Omi2i0zykhuejuThZEjjSndaVr
+	G6W0mYup+MQwVxVrZtwLWky7IqRRyg=
+X-Received: by 2002:a05:693c:2b04:b0:2e2:a4ba:84ae with SMTP id 5a478bee46e88-2e479017499mr10261853eec.25.1776786738589;
+        Tue, 21 Apr 2026 08:52:18 -0700 (PDT)
+Received: from efaec68ba852.tailc0aff1.ts.net ([206.206.192.132])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2e539fa3ce1sm18593484eec.4.2026.04.21.08.52.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Apr 2026 08:52:18 -0700 (PDT)
+From: Weiming Shi <bestswngs@gmail.com>
+To: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>,
+	Martin KaFai Lau <martin.lau@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Amery Hung <ameryhung@gmail.com>,
+	Leon Hwang <leon.hwang@linux.dev>,
+	Kees Cook <kees@kernel.org>,
+	Fushuai Wang <wangfushuai@baidu.com>,
+	Menglong Dong <menglong8.dong@gmail.com>,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org,
+	Xiang Mei <xmei5@asu.edu>,
+	Weiming Shi <bestswngs@gmail.com>
+Subject: [PATCH bpf v2] bpf: Fix NULL pointer dereference in bpf_sk_storage_clone and diag paths
+Date: Tue, 21 Apr 2026 08:50:25 -0700
+Message-ID: <20260421155024.997077-2-bestswngs@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:622:b0:694:9c29:c298 with SMTP id
- 006d021491bc7-6949c29db53mr1049682eaf.33.1776785732069; Tue, 21 Apr 2026
- 08:35:32 -0700 (PDT)
-Date: Tue, 21 Apr 2026 08:35:32 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69e79944.a00a0220.17a17.001a.GAE@google.com>
-Subject: [syzbot] [net?] kernel BUG in pn_socket_autobind
-From: syzbot <syzbot+b3c0e6a240078433c42b@syzkaller.appspotmail.com>
-To: courmisch@gmail.com, davem@davemloft.net, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [-0.36 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=95ee3fe1c5a8ab57];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [6.34 / 15.00];
+	SEM_URIBL(3.50)[asu.edu:email];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
+	BAD_REP_POLICIES(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,davemloft.net,google.com,kernel.org,vger.kernel.org,redhat.com,googlegroups.com];
-	TAGGED_FROM(0.00)[bounces-280177-lists,netdev=lfdr.de,b3c0e6a240078433c42b];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_THREE(0.00)[4];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[storage.googleapis.com:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,appspotmail.com:email,goo.gl:url,googlegroups.com:email,syzkaller.appspot.com:url];
-	REDIRECTOR_URL(0.00)[goo.gl];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,linux.dev,baidu.com,vger.kernel.org,asu.edu];
+	TAGGED_FROM(0.00)[bounces-280178-lists,netdev=lfdr.de];
+	GREYLIST(0.00)[pass,body];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	R_DKIM_ALLOW(0.00)[gmail.com:s=20251104];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	DMARC_POLICY_ALLOW(0.00)[gmail.com,none];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	SUBJECT_HAS_QUESTION(0.00)[]
-X-Rspamd-Queue-Id: B3D4943CE3B
-X-Rspamd-Action: no action
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	NEURAL_SPAM(0.00)[0.653];
+	R_SPF_ALLOW(0.00)[+ip6:2600:3c0a:e001:db::/64:c];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,asu.edu:email]
+X-Rspamd-Queue-Id: E43E343D329
+X-Rspamd-Action: add header
 X-Rspamd-Server: lfdr
+X-Spam: Yes
 
-Hello,
+bpf_selem_unlink_nofail() sets SDATA(selem)->smap to NULL before
+removing the selem from the storage hlist. A concurrent RCU reader in
+bpf_sk_storage_clone() can observe the selem still on the list with
+smap already NULL, causing a NULL pointer dereference.
 
-syzbot found the following issue on:
+ general protection fault, probably for non-canonical address 0xdffffc000000000a:
+ KASAN: null-ptr-deref in range [0x0000000000000050-0x0000000000000057]
+ RIP: 0010:bpf_sk_storage_clone+0x1cd/0xaa0 net/core/bpf_sk_storage.c:174
+ Call Trace:
+  <IRQ>
+  sk_clone+0xfed/0x1980 net/core/sock.c:2591
+  inet_csk_clone_lock+0x30/0x760 net/ipv4/inet_connection_sock.c:1222
+  tcp_create_openreq_child+0x35/0x2680 net/ipv4/tcp_minisocks.c:571
+  tcp_v4_syn_recv_sock+0x123/0xf90 net/ipv4/tcp_ipv4.c:1729
+  tcp_check_req+0x8e1/0x2580 include/net/tcp.h:855
+  tcp_v4_rcv+0x1845/0x3b80 net/ipv4/tcp_ipv4.c:2347
 
-HEAD commit:    b4e07588e743 tracing: tell git to ignore the generated 'un..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=10aa8e6a580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=95ee3fe1c5a8ab57
-dashboard link: https://syzkaller.appspot.com/bug?extid=b3c0e6a240078433c42b
-compiler:       gcc (Debian 14.2.0-19) 14.2.0, GNU ld (GNU Binutils for Debian) 2.44
+Add a NULL check for smap in bpf_sk_storage_clone().
+bpf_sk_storage_diag_put_all() has the same unprotected dereference
+pattern, add a NULL check there as well.
 
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-b4e07588.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/bb7067cc2bb4/vmlinux-b4e07588.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/46b9d3bae153/bzImage-b4e07588.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+b3c0e6a240078433c42b@syzkaller.appspotmail.com
-
-netlink: 'syz.3.104': attribute type 2 has an invalid length.
-------------[ cut here ]------------
-kernel BUG at net/phonet/socket.c:213!
-Oops: invalid opcode: 0000 [#1] SMP KASAN NOPTI
-CPU: 1 UID: 0 PID: 6429 Comm: syz.3.104 Tainted: G             L      syzkaller #0 PREEMPT(full) 
-Tainted: [L]=SOFTLOCKUP
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-RIP: 0010:pn_socket_autobind net/phonet/socket.c:213 [inline]
-RIP: 0010:pn_socket_autobind+0x14c/0x170 net/phonet/socket.c:202
-Code: 00 00 00 00 48 8b 44 24 58 65 48 2b 05 35 85 47 09 75 2a 48 83 c4 60 89 d8 5b 5d 41 5c 41 5d c3 cc cc cc cc e8 f5 0f 3d f7 90 <0f> 0b e8 ad c8 aa f7 eb 9e e8 06 c9 aa f7 e9 6c ff ff ff e8 5c b0
-RSP: 0018:ffffc900037ffa30 EFLAGS: 00010287
-RAX: 000000000000084d RBX: 0000000000000000 RCX: ffffc90007544000
-RDX: 0000000000080000 RSI: ffffffff8acc6aeb RDI: ffff888034de8000
-RBP: 0000000000000000 R08: 0000000000000003 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000000 R12: 1ffff920006fff46
-R13: dffffc0000000000 R14: 1ffff920006fff61 R15: ffffc900037ffe48
-FS:  00007fdb20e7f6c0(0000) GS:ffff8880d63e1000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fce31d5ee9c CR3: 000000002d58c000 CR4: 0000000000352ef0
-Call Trace:
- <TASK>
- pn_socket_sendmsg+0x43/0xe0 net/phonet/socket.c:421
- sock_sendmsg_nosec net/socket.c:787 [inline]
- __sock_sendmsg net/socket.c:802 [inline]
- ____sys_sendmsg+0x9e1/0xb70 net/socket.c:2698
- ___sys_sendmsg+0x190/0x1e0 net/socket.c:2752
- __sys_sendmsg+0x170/0x220 net/socket.c:2784
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x10b/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fdb1ff9c819
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fdb20e7f028 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007fdb20215fa0 RCX: 00007fdb1ff9c819
-RDX: 0000000000008000 RSI: 0000200000000380 RDI: 0000000000000006
-RBP: 00007fdb20032c91 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007fdb20216038 R14: 00007fdb20215fa0 R15: 00007ffc7b77c6b8
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:pn_socket_autobind net/phonet/socket.c:213 [inline]
-RIP: 0010:pn_socket_autobind+0x14c/0x170 net/phonet/socket.c:202
-Code: 00 00 00 00 48 8b 44 24 58 65 48 2b 05 35 85 47 09 75 2a 48 83 c4 60 89 d8 5b 5d 41 5c 41 5d c3 cc cc cc cc e8 f5 0f 3d f7 90 <0f> 0b e8 ad c8 aa f7 eb 9e e8 06 c9 aa f7 e9 6c ff ff ff e8 5c b0
-RSP: 0018:ffffc900037ffa30 EFLAGS: 00010287
-RAX: 000000000000084d RBX: 0000000000000000 RCX: ffffc90007544000
-RDX: 0000000000080000 RSI: ffffffff8acc6aeb RDI: ffff888034de8000
-RBP: 0000000000000000 R08: 0000000000000003 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000000 R12: 1ffff920006fff46
-R13: dffffc0000000000 R14: 1ffff920006fff61 R15: ffffc900037ffe48
-FS:  00007fdb20e7f6c0(0000) GS:ffff8880d63e1000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fce31d5ee9c CR3: 000000002d58c000 CR4: 0000000000352ef0
-
-
+Fixes: 5d800f87d0a5 ("bpf: Support lockless unlink when freeing map or local storage")
+Reported-by: Xiang Mei <xmei5@asu.edu>
+Signed-off-by: Weiming Shi <bestswngs@gmail.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+v2:
+ drop the NULL check in diag_get(); The caller already checks smap for
+NULL.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+ net/core/bpf_sk_storage.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+diff --git a/net/core/bpf_sk_storage.c b/net/core/bpf_sk_storage.c
+index f8338acebf077..67901de5b9c65 100644
+--- a/net/core/bpf_sk_storage.c
++++ b/net/core/bpf_sk_storage.c
+@@ -172,7 +172,7 @@ int bpf_sk_storage_clone(const struct sock *sk, struct sock *newsk)
+ 		struct bpf_map *map;
+ 
+ 		smap = rcu_dereference(SDATA(selem)->smap);
+-		if (!(smap->map.map_flags & BPF_F_CLONE))
++		if (!smap || !(smap->map.map_flags & BPF_F_CLONE))
+ 			continue;
+ 
+ 		/* Note that for lockless listeners adding new element
+@@ -599,6 +599,8 @@ static int bpf_sk_storage_diag_put_all(struct sock *sk, struct sk_buff *skb,
+ 	saved_len = skb->len;
+ 	hlist_for_each_entry_rcu(selem, &sk_storage->list, snode) {
+ 		smap = rcu_dereference(SDATA(selem)->smap);
++		if (!smap)
++			continue;
+ 		diag_size += nla_value_size(smap->map.value_size);
+ 
+ 		if (nla_stgs && diag_get(SDATA(selem), skb))
+-- 
+2.43.0
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
