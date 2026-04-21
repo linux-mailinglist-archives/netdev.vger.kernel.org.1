@@ -1,201 +1,182 @@
-Return-Path: <netdev+bounces-280049-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280050-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SLmGOy0752no5QEAu9opvQ
-	(envelope-from <netdev+bounces-280049-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 10:54:05 +0200
+	id 2EqBH3s752no5QEAu9opvQ
+	(envelope-from <netdev+bounces-280050-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 10:55:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 445574386E2
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 10:54:04 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D06FD438727
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 10:55:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1C3853018AF1
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 08:52:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2BAF6301F310
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 08:53:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D03D1C84A2;
-	Tue, 21 Apr 2026 08:52:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07EEF3845B4;
+	Tue, 21 Apr 2026 08:53:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bell-sw-com.20251104.gappssmtp.com header.i=@bell-sw-com.20251104.gappssmtp.com header.b="pMpt3wli"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gtgE3DSZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD8E638422F
-	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 08:52:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9CAF399019
+	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 08:53:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776761543; cv=none; b=CxIvpFX7GNl3LqXtXeGQnDxeemAf7f3mDXIk4T1zsIZGW2FJQcQBGja+1HfWIqeI0esDdyFkLUh35XMfyD396hwKSNbDHBbrBazxAagBWdADPDgFpy20CwaXnJT+QAWoJoO9Vjl8Twm4xNtIs2QR5ECPZGLb9uMqSJJ05OjOYdM=
+	t=1776761622; cv=none; b=pFI6ZriAJnMZBa+w9ga4Zl34herQclkNME9jygga3QT/GfoJqqweyx66W0X+/TsLWgdJA8LJ+1rIiSKfRCoq+ZAfKaZp8vKeYUp55cazWJlXjxktIEzTEVdSGqUBGvB7tiQ9HjR7f/Ey+/mDdfKSNeP8UBaz4Ape2/UXn/MKFbk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776761543; c=relaxed/simple;
-	bh=NlkOyYOYNr9TbhVPzvPSqj3i9x86hm9cTd4gj8wzY7U=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rSsUVLgfNQETO6BiouiA1za0bBvg7Y0neYkjBP7dYXnXTgR9KcmOiUjXNzidEoiP1n/Lh3palb2qv6hd2r4/GbAol1w68hMFnndrEmJBYIvTqU6tAnMTpiD2biObL2M1GSYCVSMVyDJ9NPxbIVBvf+T2QBVVPQiGqUOu/BJdaVM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bell-sw.com; spf=pass smtp.mailfrom=bell-sw.com; dkim=pass (2048-bit key) header.d=bell-sw-com.20251104.gappssmtp.com header.i=@bell-sw-com.20251104.gappssmtp.com header.b=pMpt3wli; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bell-sw.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bell-sw.com
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-43fe608cb92so2678698f8f.2
-        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 01:52:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bell-sw-com.20251104.gappssmtp.com; s=20251104; t=1776761539; x=1777366339; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=96fAiGAXmzJgYomT1GQ8n650Kmpz3cdGMVUS3DtTjhs=;
-        b=pMpt3wliTmtPCOvoXoFb1+l0qINLUZA8hWMooivJ63trJnHFIc+4V1y44H20vFOgta
-         CPDbmL1ws/jrVdKa1gf6ULfkl4P9CEYnVbqsfq3JHVb8cVki3PZXg2JD07V3iOVSKK/V
-         Q6wk615v6hZsnFCtVniVlDCn3Br9LWmLUG6zI6/N7IuUjgnrEzHXUEmIezfiDkykpVWK
-         kTu47u3Bu9d4K2NaAoB6xJHMOyJty5RlHVBHc/jUMLYj9ogNvkH06KMy4u1w3oOz/iH5
-         H+Nz7//JgbcTEG6bMr32D/+m1kvnOSo5i6diwRTJsBAZNu5F8YMYjrls5LQCISRE1R2e
-         02PA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776761539; x=1777366339;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=96fAiGAXmzJgYomT1GQ8n650Kmpz3cdGMVUS3DtTjhs=;
-        b=TycAZ9Af5XQ894tz/FOM53yjSHxl2y52yUcvBgEeQmhSSSQsgMkcXg+Hj11bwL6ElY
-         Nhs2zhsr2VB4fr2/r1tFLehwbEG9xCSoaMxXe5CzFRH1ROTtHk7Dz+v2B2XUTW/NhHTh
-         xo7ZtSeTePMbFjsOTSAH23/gqEOjnvcxY/AgIHsDUQOrfohkAF1CMoMOoPr3RXzUmJQA
-         We5ehzHh4g1j7pbuYpG23tzac70nti5s/ffliCif9kE1cUHKyL+MrYEL68anYjQ+R4H8
-         sXAw+lTN9fpJ/Gf1EC8qRHanjflTGLWoa6eW4FMk3UG74MY/me0eHUkHsZfQmtUj4Ae2
-         dhhQ==
-X-Gm-Message-State: AOJu0YxsqVyUEbTxNyiFq+KxQF8O27ois5YEeXd20Vka8TQEDhkSUrhj
-	kaY5uUf0P6TswShkfvjum7xqnnhwOvOcPcEOaBGsQDtXCm81nEN/Fq4KmMzQRcwdJwTDQUgiMI9
-	jhYqchA==
-X-Gm-Gg: AeBDieudhG4dhWdAirjns1nw6BnHqf8GFrGINaZy2N2qieZVsYg6ghsoFUo+sJj8Q8b
-	M7eDLPB8SrCAYuBKfOYVsfJEy7XmXmedT+Ob1fh1xD/9vtlaW9m6ZzkRbx79bNUGvSmBODLcIXh
-	M2weAM71X8fzmTPB2YyVVDSoVRf/gAbUDsmOqSnazODjTi7Qs39sliPA1IEAgpfNsAFrSCkT+sg
-	0qTOcaEHGbcphR15VyZ3FIr11Z3Tg+nfYHzy3GgeU5zWgI7Dcm54pGjpTdUsve9jM4vpwzquyrU
-	sAVxNHoaj9PssgKhCGRUFfcKDC1wUhO+inoXSlwK/MVOhqWwkqwD037sNtPys0QEn9l+CrtkwYp
-	SuNCegKngEDXCq+46Mw7jqZqVH5sm6vXecRin2DCcvhdinSTbDsdVKQuSzZz4s7d8mK+lC6ijYw
-	OYMKU5c6wN3I8rqSJzXiQ2CK+pDD6QfcNNeMZmFou7GIS3cY4/
-X-Received: by 2002:a05:600d:84ca:10b0:488:aa33:dcbd with SMTP id 5b1f17b1804b1-488fb796fabmr155181085e9.26.1776761539448;
-        Tue, 21 Apr 2026 01:52:19 -0700 (PDT)
-Received: from localhost.localdomain ([5.8.39.97])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488fc1cfbf2sm365676825e9.15.2026.04.21.01.52.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Apr 2026 01:52:19 -0700 (PDT)
-From: Alexey Kodanev <aleksei.kodanev@bell-sw.com>
-To: netdev@vger.kernel.org
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	oss-drivers@corigine.com,
-	Alexey Kodanev <aleksei.kodanev@bell-sw.com>
-Subject: [PATCH net-next] nfp: fix swapped arguments in nfp_encode_basic_qdr() calls
-Date: Tue, 21 Apr 2026 08:51:24 +0000
-Message-Id: <20260421085124.147049-1-aleksei.kodanev@bell-sw.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1776761622; c=relaxed/simple;
+	bh=aZT8+RjuUD+glDzBq4Jw2xxfNL/4kIryQSIGXkNI1xI=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=axH5uXhuLlaCVkaivM4gTlqUgjLCyh8DI/BUws83Ew/kV2g2J1I8RsJ0vp5BCGyaGUdXbG9SW7ixvd9baWwgqJJJm1RRGRQWUCv3C8sPjT8d16EPVOMQz0G0muLYoU5yVwrgzJ/CmXN69bT+cf68CMAswdouwh5eLk3a/9ntDJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gtgE3DSZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B1DFC2BCB5;
+	Tue, 21 Apr 2026 08:53:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776761622;
+	bh=aZT8+RjuUD+glDzBq4Jw2xxfNL/4kIryQSIGXkNI1xI=;
+	h=From:Date:Subject:To:Cc:From;
+	b=gtgE3DSZmxbKHqvljeBTE4VkSpsaCQcfqK77jf8BpxOBJu2+QcK+1UCw8KZwAH7X1
+	 cjWp8o/bVOL04vJtwowMv5M5XiXfPAt0n9G4JjcyapBl5LjFIaHsWpYldijXROhO5i
+	 oRVDl9vQcd8p2yTh8rKvmElBh64sYRjdQohWHX1zBGJ3CVbJSKZlT9IgCIVVhQUZ/x
+	 KtOXjgFFtg3ZcamjhkMvXuQES9je+AtuPqLrrtJpNLAv67310o9jhXVY9SzOkNgFPB
+	 Mn7+HK9lXOMaLueRs4KZrp1wPFpI3L34+WlRUsqYLfhuTqlNmo3GNUax7uXlehTo5i
+	 SyCAnt4583wwQ==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Date: Tue, 21 Apr 2026 10:53:33 +0200
+Subject: [PATCH net] net: airoha: Do not wake all netdev TX queues in
+ airoha_qdma_wake_netdev_txqs()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [1.44 / 15.00];
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260421-airoha-wake_netdev_txqs-optmization-v1-1-e0be95115d53@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x2NwQrCMBAFf6Xs2YUm1Ar+ikhZm6ddxKQmoRZL/
+ 93F4xxmZqOCrCh0bjbKWLRoigbu0NA4SXyANRiTb33fdt6xaE6T8EeeGCJqwDLU9V04zfWlX6n
+ mc390Jzeiw00CWWnOuOv6v1zIJLru+w8sfKiDegAAAA==
+X-Change-ID: 20260421-airoha-wake_netdev_txqs-optmization-65171ce4ebad
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
+ Lorenzo Bianconi <lorenzo@kernel.org>
+X-Mailer: b4 0.14.3
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[bell-sw-com.20251104.gappssmtp.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[bell-sw.com : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-280049-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[aleksei.kodanev@bell-sw.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280050-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-0.999];
-	DKIM_TRACE(0.00)[bell-sw-com.20251104.gappssmtp.com:+];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,bell-sw.com:mid,bell-sw.com:email,bell-sw-com.20251104.gappssmtp.com:dkim]
-X-Rspamd-Queue-Id: 445574386E2
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D06FD438727
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-There is a mismatch between the passed arguments and the actual
-nfp_encode_basic_qdr() function parameters names:
+Do not wake every netdev TX queue across all ports sharing the QDMA
+running netif_tx_wake_all_queues routine in airoha_qdma_wake_netdev_txqs()
+but only the ones that are mapped the specific QDMA stopped hw TX queue.
+This patch can potentially avoid waking already stopped netdev TX queues
+that are mapped to a different QDMA hw TX queue.
+Introduce airoha_qdma_get_txq utility routine.
 
-  static int nfp_encode_basic_qdr(u64 addr, int dest_island, int cpp_tgt,
-                                  int mode, bool addr40, int isld1,
-                                  int isld0)
-  {
-      ...
-
-But "dest_island" and "cpp_tgt" are swapped at every call-site.
-For example:
-
-  return nfp_encode_basic_qdr(*addr, cpp_tgt, dest_island,
-                              mode, addr40, isld1, isld0);
-
-As a result, nfp_encode_basic_qdr() receives "dest_island" as CPP target
-type, which is always NFP_CPP_TARGET_QDR(2) for these calls, and "cpp_tgt"
-as the destination island ID, which can accidentally match or be outside
-the valid NFP_CPP_TARGET_* types (e.g. '-1' for any destination).
-
-Detected using the static analysis tool - Svace.
-
-Fixes: 4cb584e0ee7d ("nfp: add CPP access core")
-Signed-off-by: Alexey Kodanev <aleksei.kodanev@bell-sw.com>
+Fixes: b94769eb2f30 ("net: airoha: Fix possible TX queue stall in airoha_qdma_tx_napi_poll()")
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 ---
- drivers/net/ethernet/netronome/nfp/nfpcore/nfp_target.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/airoha/airoha_eth.c | 19 +++++++++++++++----
+ drivers/net/ethernet/airoha/airoha_eth.h |  5 +++++
+ 2 files changed, 20 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/netronome/nfp/nfpcore/nfp_target.c b/drivers/net/ethernet/netronome/nfp/nfpcore/nfp_target.c
-index 79470f198a62..5c1edd143cee 100644
---- a/drivers/net/ethernet/netronome/nfp/nfpcore/nfp_target.c
-+++ b/drivers/net/ethernet/netronome/nfp/nfpcore/nfp_target.c
-@@ -493,7 +493,7 @@ static int nfp_encode_basic(u64 *addr, int dest_island, int cpp_tgt,
- 			 * the address but we can verify if the existing
- 			 * contents will point to a valid island.
- 			 */
--			return nfp_encode_basic_qdr(*addr, cpp_tgt, dest_island,
-+			return nfp_encode_basic_qdr(*addr, dest_island, cpp_tgt,
- 						    mode, addr40, isld1, isld0);
+diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
+index 19f67c7dd8e1..2ca569501045 100644
+--- a/drivers/net/ethernet/airoha/airoha_eth.c
++++ b/drivers/net/ethernet/airoha/airoha_eth.c
+@@ -847,13 +847,24 @@ static void airoha_qdma_wake_netdev_txqs(struct airoha_queue *q)
+ {
+ 	struct airoha_qdma *qdma = q->qdma;
+ 	struct airoha_eth *eth = qdma->eth;
+-	int i;
++	int i, qid = q - &qdma->q_tx[0];
  
- 		iid_lsb = addr40 ? 34 : 26;
-@@ -504,7 +504,7 @@ static int nfp_encode_basic(u64 *addr, int dest_island, int cpp_tgt,
- 		return 0;
- 	case 1:
- 		if (cpp_tgt == NFP_CPP_TARGET_QDR && !addr40)
--			return nfp_encode_basic_qdr(*addr, cpp_tgt, dest_island,
-+			return nfp_encode_basic_qdr(*addr, dest_island, cpp_tgt,
- 						    mode, addr40, isld1, isld0);
+ 	for (i = 0; i < ARRAY_SIZE(eth->ports); i++) {
+ 		struct airoha_gdm_port *port = eth->ports[i];
++		int j;
++
++		if (!port)
++			continue;
  
- 		idx_lsb = addr40 ? 39 : 31;
-@@ -530,7 +530,7 @@ static int nfp_encode_basic(u64 *addr, int dest_island, int cpp_tgt,
- 			 * be set before hand and with them select an island.
- 			 * So we need to confirm that it's at least plausible.
- 			 */
--			return nfp_encode_basic_qdr(*addr, cpp_tgt, dest_island,
-+			return nfp_encode_basic_qdr(*addr, dest_island, cpp_tgt,
- 						    mode, addr40, isld1, isld0);
+-		if (port && port->qdma == qdma)
+-			netif_tx_wake_all_queues(port->dev);
++		if (port->qdma != qdma)
++			continue;
++
++		for (j = 0; j < port->dev->num_tx_queues; j++) {
++			if (airoha_qdma_get_txq(qdma, j) != qid)
++				continue;
++
++			netif_wake_subqueue(port->dev, j);
++		}
+ 	}
+ 	q->txq_stopped = false;
+ }
+@@ -1965,7 +1976,7 @@ static netdev_tx_t airoha_dev_xmit(struct sk_buff *skb,
+ 	u16 index;
+ 	u8 fport;
  
- 		/* Make sure we compare against isldN values
-@@ -551,7 +551,7 @@ static int nfp_encode_basic(u64 *addr, int dest_island, int cpp_tgt,
- 			 * iid<1> = addr<30> = channel<0>
- 			 * channel<1> = addr<31> = Index
- 			 */
--			return nfp_encode_basic_qdr(*addr, cpp_tgt, dest_island,
-+			return nfp_encode_basic_qdr(*addr, dest_island, cpp_tgt,
- 						    mode, addr40, isld1, isld0);
+-	qid = skb_get_queue_mapping(skb) % ARRAY_SIZE(qdma->q_tx);
++	qid = airoha_qdma_get_txq(qdma, skb_get_queue_mapping(skb));
+ 	tag = airoha_get_dsa_tag(skb, dev);
  
- 		isld[0] &= ~3;
+ 	msg0 = FIELD_PREP(QDMA_ETH_TXMSG_CHAN_MASK,
+diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ethernet/airoha/airoha_eth.h
+index 87b328cfefb0..c3ea7aadbd82 100644
+--- a/drivers/net/ethernet/airoha/airoha_eth.h
++++ b/drivers/net/ethernet/airoha/airoha_eth.h
+@@ -631,6 +631,11 @@ u32 airoha_rmw(void __iomem *base, u32 offset, u32 mask, u32 val);
+ #define airoha_qdma_clear(qdma, offset, val)			\
+ 	airoha_rmw((qdma)->regs, (offset), (val), 0)
+ 
++static inline u16 airoha_qdma_get_txq(struct airoha_qdma *qdma, u16 qid)
++{
++	return qid % ARRAY_SIZE(qdma->q_tx);
++}
++
+ static inline bool airoha_is_lan_gdm_port(struct airoha_gdm_port *port)
+ {
+ 	/* GDM1 port on EN7581 SoC is connected to the lan dsa switch.
+
+---
+base-commit: a663bac71a2f0b3ac6c373168ca57b2a6e6381aa
+change-id: 20260421-airoha-wake_netdev_txqs-optmization-65171ce4ebad
+
+Best regards,
 -- 
-2.25.1
+Lorenzo Bianconi <lorenzo@kernel.org>
 
 
