@@ -1,249 +1,206 @@
-Return-Path: <netdev+bounces-280064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280065-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yHuQIYdD52n55wEAu9opvQ
-	(envelope-from <netdev+bounces-280064-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 11:29:43 +0200
+	id 4DTxKzdJ52k46QEAu9opvQ
+	(envelope-from <netdev+bounces-280065-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 11:53:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3330A438E2E
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 11:29:43 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 135EC439288
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 11:53:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C55C7300A747
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 09:27:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EEB7C303E4A3
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 09:47:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7C383A5E77;
-	Tue, 21 Apr 2026 09:27:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB20E3B0AE2;
+	Tue, 21 Apr 2026 09:47:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KP0YHrJK"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="Q4JS/KOa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.web.de (mout.web.de [212.227.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E745E3A5E69
-	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 09:27:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9902114A8B;
+	Tue, 21 Apr 2026 09:47:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776763670; cv=none; b=C7hjyvrsf6W7xAenNuzTXfePe/M3nkL7vpbRrAaierAXV13bDuvrSDHqO/clNVcrrusZORq2Xtl5F02hlaSGlwmCfKHAJVvoURTJdrf5Y7Q6weeBeZ+4N1XvOwT+3AUECGsicjcvlpHQDoNzjqEjlCxmESJOfy8ERBPqPEuUCbY=
+	t=1776764862; cv=none; b=ALITT/v0InG9/ovhLmngrqBD7ZPGSewYnJm2hdfHoSzHDs2EkMyYSk9Ej2Ny5FT/B635X+QFsuHcnEZOB8gvY3ORJVRqjBDpdr7nWIlKUKqpJlwcyF4/wj+EOGbWSj/2Y3/e+nizR7PaEqOfSs9qBBc6eFvT7Mf1QbaVJolb3V0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776763670; c=relaxed/simple;
-	bh=NWVPQ/ix6la1A9YnRnDlxRH64UYZgVvj6dWNHNlWfm0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Zb7y+hc/bLlY20nEKSjxX9k6xxYnjkVVNyA4muVdwL6qjUazJ/Uf8mAi9R4RtBa8hdNffwPr2GkeDX/2ITbzVI8zuiyA4exz+8t/tBRDwFiKYl9sOT4cEU6Iq7+fQc5y9JFnlIZjmaOyBoo3tvfG8dn2+YWnwFtw6QFbNs+VghQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KP0YHrJK; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-43cff5dafc3so3305900f8f.1
-        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 02:27:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776763667; x=1777368467; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2SK+aw4ngOkm9hF+ynW9KrB9F3h620ajY5HNLbxZ/XI=;
-        b=KP0YHrJKrICGVmlUQNpi+20Q7UPpVxplJOquT+Zqh5wyKP1DFRAT7kdVdPEmcAtOJU
-         brV2ROn1BQQz1KG0Et0nKatui0DkB9eOcKqCe0j55c/oDql4jqlcVe2INgsEj0oYNzsv
-         v4I5gJbI1rbqnzhgEyyCzaFL957VWDYW4GuiX9CSdJK+KYx8hbbz5XGalDkv4CZ0svzP
-         Us87q4HoGBFt6XaW9f+srHB+DxtWbVlIqdrWBMgH57xVDqxUZVkdyFAxN8W0e9FeM1pw
-         oUlSAwAmh3T6pilJgybq1eLs9wpLgcIqAn6PInRw+GpDo3f1p+g9kBingnGSBOlIcuB3
-         OEBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776763667; x=1777368467;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=2SK+aw4ngOkm9hF+ynW9KrB9F3h620ajY5HNLbxZ/XI=;
-        b=qFySUJWivM89nRhfY8J70FCYfm6OzVihnraIwMdr21+vf5aVgY+8ZJth4xf4uPA5gn
-         dgQVvwBkkQqbKHFz9u+l9EHcVrJnEQzmYBOneORwbXscF3Y/m134jQ23qtCyIb85ZRfP
-         CW6lfw4IZ+pP0XT1MEoekQxzdirO2PrJLNxbWusFOSTka6dcncHQgzlc+CcuX8ROrwCx
-         kRcYnjQGM4bvvKsl3GekYDFIkV+tns4ySs8FJ5mHAWzd7ljeMIPq1M9nn9e2gmcSQPKW
-         ZlaZbIIMgckb6BiQchqNAA3AayfkWc602iwxYl+oG9zZ/uGJeVzT8ilaB8JFiSf/xqGo
-         UQMg==
-X-Forwarded-Encrypted: i=1; AFNElJ/xQ1lHnTK8jj48XhMQ5pEusFuo4Y7LBiO1Ak3ABw9wqvYuczX9tgwU3icpUK8vQxH5qqw60qs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyG5f6lEgnFCMNvBxn+wOTlp9t46bK6mWStknCo1UuprCn9NS4n
-	V0vbr2Z2ia5JTbsPO4KA0O40ujTSFtPGJpcMuuJBnkiLzzUa6gIU+lmK
-X-Gm-Gg: AeBDietzNt+duWMqmlus4QJ3ibLV/qcE1NMSdy2i2E/Prk0wjfYnpVrQUTkVxZk17lG
-	qrejEBHg4KAijJ/CC4k/o5sU1tJ+stzvoyFlbUZeB4YZukqSoQ3LM5CVdv7695E6TQwxjM19qiC
-	UKPuLd22NT4kwLw0hx40ogXMQs3eY6hy/XpLr1p/QVW8TJ6mjg0vipil5wUYCgmI6U0q9CseRj6
-	QEcQ/EXntdMV1pxbRNwq0AFI00iAPPakpRK52pqKwES+mG1XDULL1askluNUzVn9wrequNEfeaB
-	BW2iZPR/tLnWMrXZfIz8UU2VxIEqgiEotZLCrCvBpondoBKd0DkvE/iKrLB4kyIRmobGQJ4ETWZ
-	KQjKCC++4bSH0RO8EON7c7gKygCBubbjO4cSlvcGR5UQj4MT9bO2k3B0VP/ngyPyCQtoCLZ9IDS
-	OkWmdu01EosNrazZhtLK+ahoaLhwpWlLM55+o2l4gMEZzKzt8e4qYPkapLlwJg2svwrwItw5+4n
-	c4xla63LR297A==
-X-Received: by 2002:a05:6000:1a89:b0:43d:7125:e79f with SMTP id ffacd0b85a97d-43fe3e25c89mr27107393f8f.47.1776763666796;
-        Tue, 21 Apr 2026 02:27:46 -0700 (PDT)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43fe4cb1405sm35116597f8f.4.2026.04.21.02.27.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Apr 2026 02:27:46 -0700 (PDT)
-Date: Tue, 21 Apr 2026 10:27:44 +0100
-From: David Laight <david.laight.linux@gmail.com>
-To: Yury Norov <ynorov@nvidia.com>
-Cc: Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner
- <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov
- <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
- "H. Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>,
- Jonathan Cameron <jic23@kernel.org>, David Lechner <dlechner@baylibre.com>,
- Nuno =?UTF-8?B?U8Oh?= <nuno.sa@analog.com>, Andy Shevchenko
- <andy@kernel.org>, Ping-Ke Shih <pkshih@realtek.com>, Richard Cochran
- <richardcochran@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexandre
- Belloni <alexandre.belloni@bootlin.com>, Yury Norov <yury.norov@gmail.com>,
- Rasmus Villemoes <linux@rasmusvillemoes.dk>, Hans de Goede
- <hansg@kernel.org>, Linus Walleij <linusw@kernel.org>, Sakari Ailus
- <sakari.ailus@linux.intel.com>, Salah Triki <salah.triki@gmail.com>, Achim
- Gratz <Achim.Gratz@stromeko.de>, Ben Collins <bcollins@watter.com>,
- linux-kernel@vger.kernel.org, linux-iio@vger.kernel.org,
- linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
- linux-rtc@vger.kernel.org
-Subject: Re: [PATCH 1/9] bitfield: add FIELD_GET_SIGNED()
-Message-ID: <20260421102744.6bd30e50@pumpkin>
-In-Reply-To: <aeZocbNjbvzMZO8b@yury>
-References: <20260417173621.368914-1-ynorov@nvidia.com>
-	<20260417173621.368914-2-ynorov@nvidia.com>
-	<20260420111940.GE3102624@noisy.programming.kicks-ass.net>
-	<aeZocbNjbvzMZO8b@yury>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	s=arc-20240116; t=1776764862; c=relaxed/simple;
+	bh=MhHUusRuKE3zk9CwwZvADgx4f2L4Pm6uGVqeYkH3DLg=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=W24GsLIloZQqpYmSBTR7Bhh8r5Gq8bsZa+pKpPdgqvzCczbs5QvRslVpESiLcJyVeFzXVGjS2ysqyrEmSodqq8wYO80WQ+wJH5EmkQRI6Y7jmq27M4LD2TGTB+jftKZcZNB3ea4I+slwECjHkzMoj3rVd2MdL+VFU1WXjytHFkc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=Q4JS/KOa; arc=none smtp.client-ip=212.227.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1776764848; x=1777369648; i=markus.elfring@web.de;
+	bh=ScR06nfgd/rjAYq8okr0K1/RBniFmMCWwZQYmk/Y+fc=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
+	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=Q4JS/KOaoXE9wG8qkcuhKV09GwHKG0kYAD7eeKRAEj5/7scJE6oiCDF0UMradNVS
+	 4ekpEWLdCTwj9ELjBbEkKSLGAkFbUTyllUywP2IXuoNPCBxGAfmHD/58y5eRjHRw6
+	 Z5w/gkUjV5u61ALc6V1ZK/RJmCIEpmhDS/5g90yYJdEBu+WYC2OirA7grhbQ6odhv
+	 Z1sFztEOj9UeThPXClVdPZ7J5Q0pqfmTuw8NYXvfLn1jDl9XwCtEZnOALrRSSQTXm
+	 1giHk+nqDeCjK8PFj3jEuLq/ei68raVoGQaqO4ND0pakDx/2qRVXNzR7km7nAgFL0
+	 31Zrwyk8jR2DOgvKPw==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from client.hidden.invalid by smtp.web.de (mrweb105
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 1MzCED-1vRz3T3ARv-013h2Q; Tue, 21
+ Apr 2026 11:47:28 +0200
+Message-ID: <6ef93306-d29b-49f2-88ed-b0ef3561a487@web.de>
+Date: Tue, 21 Apr 2026 11:47:22 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
+User-Agent: Mozilla Thunderbird
+To: Shitalkumar Gandhi <shitalkumar.gandhi@cambiumnetworks.com>,
+ linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
+ Alexander Aring <alex.aring@gmail.com>,
+ Miquel Raynal <miquel.raynal@bootlin.com>,
+ Stefan Schmidt <stefan@datenfreihafen.org>
+Cc: Shitalkumar Gandhi <shital.gandhi45@gmail.com>, stable@vger.kernel.org,
+ LKML <linux-kernel@vger.kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+References: <20260421073259.2259783-1-shitalkumar.gandhi@cambiumnetworks.com>
+Subject: Re: [PATCH] ieee802154: ca8210: fix cas_ctl leak on spi_async failure
+Content-Language: en-GB, de-DE
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <20260421073259.2259783-1-shitalkumar.gandhi@cambiumnetworks.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:E/ehXVDDefBgHWziC2h70E+iFIc7pBIAy23eNHvgti1UnOg7Q7Q
+ U+eZasZb8SDAnuP9iSpoA2IJAzLM00pBzZxnegF8O3KFamGlbhD6rTfkM9soqSsY+lkcPK2
+ n7c1P/NtH74zCumhOnzOLWtGXKPAcOw6Pt1+eprW6+x2ZqG56xaxD3LaTKmsDLZ5btks90G
+ Bs1zbhd3l+Y5C+iYmLc0w==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:FuFxkSUx9Kg=;jmpMef6/wurprVEecrKjgpt0De+
+ 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
+ mqqCvhU73vd2E4Q==
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[web.de,quarantine];
+	R_DKIM_ALLOW(-0.20)[web.de:s=s29768273];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280064-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-280065-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[34];
-	FREEMAIL_CC(0.00)[infradead.org,kernel.org,redhat.com,alien8.de,linux.intel.com,zytor.com,baylibre.com,analog.com,realtek.com,gmail.com,lunn.ch,davemloft.net,google.com,bootlin.com,rasmusvillemoes.dk,stromeko.de,watter.com,vger.kernel.org];
+	FREEMAIL_TO(0.00)[cambiumnetworks.com,vger.kernel.org,gmail.com,bootlin.com,datenfreihafen.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FREEMAIL_FROM(0.00)[web.de];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[Markus.Elfring@web.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[web.de:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3330A438E2E
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 135EC439288
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, 20 Apr 2026 13:54:57 -0400
-Yury Norov <ynorov@nvidia.com> wrote:
+=E2=80=A6
+> Fix it by freeing cas_ctl on the spi_async() error path.  While here,
+> correct the misleading error string: the function calls spi_async(),
+> not spi_sync().
 
-> On Mon, Apr 20, 2026 at 01:19:40PM +0200, Peter Zijlstra wrote:
-> > On Fri, Apr 17, 2026 at 01:36:12PM -0400, Yury Norov wrote:  
-> > > The bitfields are designed in assumption that fields contain unsigned
-> > > integer values, thus extracting the values from the field implies
-> > > zero-extending.
-> > > 
-> > > Some drivers need to sign-extend their fields, and currently do it like:
-> > > 
-> > > 	dc_re += sign_extend32(FIELD_GET(0xfff000, tmp), 11);
-> > > 	dc_im += sign_extend32(FIELD_GET(0xfff, tmp), 11);
-> > > 
-> > > It's error-prone because it relies on user to provide the correct
-> > > index of the most significant bit and proper 32 vs 64 function flavor.
-> > > 
-> > > Thus, introduce a FIELD_GET_SIGNED() macro, which is the more
-> > > convenient and compiles (on x86_64) to just a couple instructions:
-> > > shl and sar.
-> > > 
-> > > Signed-off-by: Yury Norov <ynorov@nvidia.com>
-> > > ---
-> > >  include/linux/bitfield.h | 16 ++++++++++++++++
-> > >  1 file changed, 16 insertions(+)
-> > > 
-> > > diff --git a/include/linux/bitfield.h b/include/linux/bitfield.h
-> > > index 54aeeef1f0ec..35ef63972810 100644
-> > > --- a/include/linux/bitfield.h
-> > > +++ b/include/linux/bitfield.h
-> > > @@ -178,6 +178,22 @@
-> > >  		__FIELD_GET(_mask, _reg, "FIELD_GET: ");		\
-> > >  	})
-> > >  
-> > > +/**
-> > > + * FIELD_GET_SIGNED() - extract a signed bitfield element
-> > > + * @mask: shifted mask defining the field's length and position
-> > > + * @reg:  value of entire bitfield
-> > > + *
-> > > + * Returns the sign-extended field specified by @_mask from the
-> > > + * bitfield passed in as @_reg by masking and shifting it down.
-> > > + */
-> > > +#define FIELD_GET_SIGNED(mask, reg)					\
-> > > +	({								\
-> > > +		__BF_FIELD_CHECK(mask, reg, 0U, "FIELD_GET_SIGNED: ");	\
-> > > +		 ((__signed_scalar_typeof(mask))((long long)(reg) <<	\
-> > > +		 __builtin_clzll(mask) >> (__builtin_clzll(mask) +	\
-> > > +						__builtin_ctzll(mask))));\
-> > > +	})  
-> > 
-> > IIRC clz is count-leading-zeros and ctz is count-trailing-zeros. Most of
-> > the other FIELD things use __bf_shf() which is defined in terms of ffs -
-> > 1 (which is another way of writing ctz).
-> > 
-> > So how about you start by redefining __bf_shf() in ctz, and then add
-> > another helper for the clz and write the thing something like:
-> > 
-> > 	((long long)(reg) << __bf_clz(mask)) >> (__bf_clz(mask) + __bf_shf(mask));  
-> 
-> So...
-> 
-> I like the shorter form, but whatever we add in the bitfield.h - we'll
-> have to support it.
-> 
-> For example, __bf_shf() wasn't intended to be used outsize of the
-> header, thus double underscored. But there's over 100 external users
-> now. And to make it worse, it's broken for GCC 14 and earlier:
+Would it be safer to offer desired changes as separate patches?
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Do=
+cumentation/process/submitting-patches.rst?h=3Dv7.0#n81
 
-For anyone who hasn't followed the gory details it isn't 'very broken'.
-Basically __builtin_ffsll() doesn't always generate an 'integer constant
-expression' from constant input so you can get a compile fail.
-
-> https://lore.kernel.org/all/20260409-field-prep-fix-v1-1-f0e9ae64f63c@imgtec.com/
-> 
-> So needs to get fixed.
-> 
-> The bitfield.h has two __bf macros: __bf_shf() and __bf_cast_unsigned().
-> They are thin wrappers,
-
-__bf_cast_unsigned() isn't exactly thin.
-
-	David
-
-> but after all do something with the corresponding
-> builtins output. The __bf_cls() would be a pure renaming. I'm OK with
-> that, but some people don't:
-> 
-> https://lore.kernel.org/all/20260303182845.250bb2de@kernel.org/
-> 
-> That's why I didn't make FIELD_GET_SIGNED() implementation looking nicer.
-> If you strongly prefer the shorter version, I can do that in v2.
->  
-> > Also, since the order of the shifts is rather important, I think it
-> > makes sense to add this extra pair of (), even when not strictly needed,
-> > just to make it easier to read.  
-> 
-> Sure, will do.
-> 
-
+Regards,
+Markus
 
