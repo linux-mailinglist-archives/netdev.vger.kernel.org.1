@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-280235-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280236-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kOBAJsHX52kBBwIAu9opvQ
-	(envelope-from <netdev+bounces-280235-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 22:02:09 +0200
+	id 6L2wHAbY52kBBwIAu9opvQ
+	(envelope-from <netdev+bounces-280236-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 22:03:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0698D43F2EC
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 22:02:08 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E452D43F319
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 22:03:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 011A03076C2F
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 19:58:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7F245307AE49
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 19:58:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06ABC3DCDAE;
-	Tue, 21 Apr 2026 19:58:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 225813DCDB9;
+	Tue, 21 Apr 2026 19:58:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="fE4QYUL+"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="25fDWLbh"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4ECA3242BE;
-	Tue, 21 Apr 2026 19:58:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4058337BE80;
+	Tue, 21 Apr 2026 19:58:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776801487; cv=none; b=ld6uUnZyUNW8bjX54MCR0fjyW0uXIqOYf8CyA54sl1hZdHvEC1Qf5Ml7B+sIi0e7RIJYcuBksnwjUVj05o/H7FkYZIKqRCREKs+xGCWEpiPDTv+AVX6dDzJUDCrwMOTEMIDShxlCIWV1IM3M0kwcjhDvuIZ8O0u11NSkWp6xvY4=
+	t=1776801501; cv=none; b=oc9NlPQ3V01Uj4N6Pbr8u09PtPSlYBQLF4nyGnmJl+9UFvdGEQJuTHSQLqhUedO8bKnCa6BwXRW9z1BFyy98sJ6MuyuC0Bz95TwF9F5uqnmYlzYWuFo6QEVYZkIppTTI/QcjUBM5vZOhM/t2z9bZjy2FiBBSKCju88UkBr3JwPM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776801487; c=relaxed/simple;
-	bh=NShMqnlTirV3JQCEwIZE0aVXyAsMTWs0eK6xeXMHSFY=;
+	s=arc-20240116; t=1776801501; c=relaxed/simple;
+	bh=GHQFcfdbqb4mZ11DRdAknE42emJCYE7ffe2k8yQyu0M=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=gD6Ay70K64rCHLPbpTtQ3n7BY7QQhyxawiEd/Je2K74mzb7dYFi0vaUZA424j5KPEzEC2VpHFNosFoqMSFI5LSsbCYNwkeZx2s2Sxyupy8BW9p9Sofn29ZDld565c9jHZSsfFtoEmXx91tojwTGwKwxkhyokOb6KhJ4VnVevlR0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=fE4QYUL+; arc=none smtp.client-ip=156.67.10.101
+	 In-Reply-To:To:Cc; b=gNT5kSffJkp6MEmjQgWY421N5Ptc1yUFWZF3tGm1q9RNXav5NdfO+zKSTrQTqWdUvii/JlmKPjilObcNSOEZLUF56FCSYa4soavaFsP7gyDVcegs0qlKi+gGHrdfgPyc/9p90nlos+Knq9kvu7wQFMrIvCPlvDh91YT/8wKGB4A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=25fDWLbh; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -39,19 +39,18 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From:From:
 	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
 	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=QJsxcOFAbO2ve9ibjgeHEwUwz4c5m98+MwLmC+bbb/g=; b=fE
-	4QYUL+ujPCTHSF57coPonWmsvZi1TWPBxvjSEl7EIYNhNEXHx1t/9uBYqQKxriAuur2O7n+GweCd5
-	6hRjLw0xjW5rZYK31ZBe5Y1h130qyNvw8yMWf1ZwtJ3KJ3VCn5nHGh2bcdFM5hxHx589jDGdnJ8qK
-	eCijyete18ru8WU=;
+	In-Reply-To:References; bh=pCWZ70U/PxE0BAx4eSTpboTeYuUSVwDNPDi9kI+LZro=; b=25
+	fDWLbhrnaUKabTvHhMJfI7mqSRZ3nFgxZV2d43E+EbVg8GMYWXmFfHCe8CqGNDl8yaBHDQjP7xuON
+	q7CCbDvuOdY8VW6e23JBcskUuoWamMer1m8TbbjL6e5845kGUDEnP04dmq4Hi14EiaxYbXg38+7g0
+	oORvL/ir9Kz9GW4=;
 Received: from c-66-41-74-139.hsd1.mn.comcast.net ([66.41.74.139] helo=thinkpad.home.lunn.ch)
 	by vps0.lunn.ch with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1wFGp6-00GwVc-09; Tue, 21 Apr 2026 21:31:52 +0200
+	id 1wFGp8-00GwVc-Fx; Tue, 21 Apr 2026 21:31:54 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-Date: Tue, 21 Apr 2026 14:31:17 -0500
-Subject: [PATCH net 14/18] drivers: net: xircom: xirc2ps: Remove this
- driver
+Date: Tue, 21 Apr 2026 14:31:18 -0500
+Subject: [PATCH net 15/18] drivers: net: 8390: AX88190: Remove this driver
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,7 +59,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260421-v7-0-0-net-next-driver-removal-v1-v1-14-69517c689d1f@lunn.ch>
+Message-Id: <20260421-v7-0-0-net-next-driver-removal-v1-v1-15-69517c689d1f@lunn.ch>
 References: <20260421-v7-0-0-net-next-driver-removal-v1-v1-0-69517c689d1f@lunn.ch>
 In-Reply-To: <20260421-v7-0-0-net-next-driver-removal-v1-v1-0-69517c689d1f@lunn.ch>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -71,20 +70,20 @@ To: Andrew Lunn <andrew+netdev@lunn.ch>,
 Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
  linux-doc@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=59599; i=andrew@lunn.ch;
- h=from:subject:message-id; bh=NShMqnlTirV3JQCEwIZE0aVXyAsMTWs0eK6xeXMHSFY=;
- b=owEBbQKS/ZANAwAIAea/DcumaUyEAcsmYgBp59CCkKdfuh42rdklNqY7cthqDDw3ajXaN6Jff
- GV0hRpLouOJAjMEAAEIAB0WIQRh+xAly1MmORb54bfmvw3LpmlMhAUCaefQggAKCRDmvw3LpmlM
- hNqkEADU8/Y2rXvq5Zzl/FdXHBeFz7e1geP7SCawTYbkhtZhcPqFDzZUIoEeBUsMg2qEOE3xw2U
- 7cGS8XUZf4YUE250dBBCxjtlmfHahUDExTTrhp0UrU23NUa2nk+d0ndUHi+OGqpOvQOB4mxB2/Q
- LKulmhZ6176of72DZ3hPddKcAc4IlJsS0T9wu1U86jT4Dqs7EY2fYTuiIXafspipnKoGQ+P5uth
- Sa5qYGtpYFDNvF5niQE+EFU+FSzz3up2NmR65KligrR5iSabfTPrNWlw0qh3YNUZ0zWyWK63e9v
- VPjTvNFxz43E3M5FtQm5a8dXLf6gwUDfm1B6hbgbxbiysw8Ac2SToYMNIeXLOJ+OCQyp8KhaukC
- 394G05auo05EdZ0Hj9qtOdkWffHjAU/WVnl6ohGdGQOd7+ftDIBoTe7gHIRfkEbblRDH487bDIo
- gRaL58pm+IMoGG1hSkAHQu2BtzRAvxtZbshR+JQe3rqHrreauDuiIvYFOH4R4WBinySYM5RGWWk
- kW4f3DEuQDKJlm2L8M1moSSKNxYBFPQHDrSaYopNcIxXTwPKy8ADMNqkHVBHU7xB+IGuErV+InX
- d1QDqUz9i/hq7agy3SLVN+Tdo9V3WH/1L+Rn/cfKCK/IGLijvtykO0V88eTqbfWxZYtOpH6toGM
- hDW72wof6CTh+Vw==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=57091; i=andrew@lunn.ch;
+ h=from:subject:message-id; bh=GHQFcfdbqb4mZ11DRdAknE42emJCYE7ffe2k8yQyu0M=;
+ b=owEBbQKS/ZANAwAIAea/DcumaUyEAcsmYgBp59CC1pxkcMo9clMhGV4Q2flLnEUafzA8icyeg
+ hWcN1lm6RWJAjMEAAEIAB0WIQRh+xAly1MmORb54bfmvw3LpmlMhAUCaefQggAKCRDmvw3LpmlM
+ hJT3EAC6gW2gsQ64ZhLgmmtr+jDM6GrsmigHLtvk+Yk7TugMkvSMhmWakJAw0LRTuE/fyz5QeVa
+ a2WNym/cJjdnAo3539INb1DtWbOk8w5uG1eIpDJfBfeG6t5VXLmWdwUVkSJaXvMc1+vrJHxjXRy
+ ZF0+zMGfrmGIisBYRe8DIHhdhxLghZPQoMJ/0BDONX0dZ+g20a3Lr1pSEVySiA3gdqA+v0Tp2MD
+ eOpFWj7cXiUBQuKYeQiLYJl32CA5h3hsnULFgdm9Q+qFJZvN8jXMUxr4rwWpZWhgTt1xPViIi+n
+ vL39+ZQaur4PdGKVOoDaTAen2SHDvOqU7jnofrZu4xa2uKv9TDEcuNkiroQN9F+kaGAGPvR3ftp
+ NetgeFWKhapBZxSVdG26/7yPaqMsBVtAb+WXau9Rti/DsmvYt+j4RHU+d3sEMPBM243t5QnCaOO
+ 5dC3RG+RY5WWo7iRM+oh++R0RdnrPakFCnIiKN3dMyCr3M03TTRwc7PMYMV4Hevv5bprv88UR2u
+ XjTfMa//Ic779iWHT9fuOwk1v25lkdq6BZB2KXU87PzJKmoVhJDUgZJ74clfKHS7KrfjydnHc7t
+ s5Hmxo0kLv8vuQYgenK0FIb6II6nhWNb29LyCt3GEBwCp0gzj0H3I1U+ixj86GfHvQrFSR8gqqi
+ 7HJ/tma5rNoKtbQ==
 X-Developer-Key: i=andrew@lunn.ch; a=openpgp;
  fpr=61FB1025CB53263916F9E1B7E6BF0DCBA6694C84
 X-Spamd-Result: default: False [-0.66 / 15.00];
@@ -92,18 +91,18 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
 	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280235-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-280236-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[12];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
@@ -113,1046 +112,461 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[icon.co.za:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:email,lunn.ch:dkim,lunn.ch:mid,gnu.org:url]
-X-Rspamd-Queue-Id: 0698D43F2EC
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:email,lunn.ch:dkim,lunn.ch:mid,scyld.com:email,ei_status.name:url,rx_frame.next:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E452D43F319
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The xirc2ps was written by Werner Koch in 1997. It is an PCMCIA
+The ax88190 was written by David A. Hindsh in 2001. It is an PCMCIA
 device, so unlikely to be used with modern kernels.
 
 Signed-off-by: Andrew Lunn <andrew@lunn.ch>
 ---
- drivers/net/ethernet/Kconfig             |    1 -
- drivers/net/ethernet/xircom/Kconfig      |   30 -
- drivers/net/ethernet/xircom/Makefile     |    6 -
- drivers/net/ethernet/xircom/xirc2ps_cs.c | 1794 ------------------------------
- 4 files changed, 1831 deletions(-)
+ drivers/net/ethernet/8390/Kconfig    |   12 -
+ drivers/net/ethernet/8390/Makefile   |    1 -
+ drivers/net/ethernet/8390/axnet_cs.c | 1707 ----------------------------------
+ 3 files changed, 1720 deletions(-)
 
-diff --git a/drivers/net/ethernet/Kconfig b/drivers/net/ethernet/Kconfig
-index c94e8f27af94..5171d9046ea4 100644
---- a/drivers/net/ethernet/Kconfig
-+++ b/drivers/net/ethernet/Kconfig
-@@ -188,6 +188,5 @@ source "drivers/net/ethernet/via/Kconfig"
- source "drivers/net/ethernet/wangxun/Kconfig"
- source "drivers/net/ethernet/wiznet/Kconfig"
- source "drivers/net/ethernet/xilinx/Kconfig"
--source "drivers/net/ethernet/xircom/Kconfig"
+diff --git a/drivers/net/ethernet/8390/Kconfig b/drivers/net/ethernet/8390/Kconfig
+index 345f250781c6..3dea042cc2eb 100644
+--- a/drivers/net/ethernet/8390/Kconfig
++++ b/drivers/net/ethernet/8390/Kconfig
+@@ -17,18 +17,6 @@ config NET_VENDOR_8390
  
- endif # ETHERNET
-diff --git a/drivers/net/ethernet/xircom/Kconfig b/drivers/net/ethernet/xircom/Kconfig
-deleted file mode 100644
-index bfbdcf758afb..000000000000
---- a/drivers/net/ethernet/xircom/Kconfig
-+++ /dev/null
-@@ -1,30 +0,0 @@
--# SPDX-License-Identifier: GPL-2.0-only
--#
--# Xircom network device configuration
--#
--
--config NET_VENDOR_XIRCOM
--	bool "Xircom devices"
--	default y
--	depends on PCMCIA
--	help
--	  If you have a network (Ethernet) card belonging to this class, say Y.
--
--	  Note that the answer to this question doesn't directly affect the
--	  kernel: saying N will just cause the configurator to skip all
--	  the questions about Xircom cards. If you say Y, you will be asked for
--	  your specific card in the following questions.
--
--if NET_VENDOR_XIRCOM
--
--config PCMCIA_XIRC2PS
--	tristate "Xircom 16-bit PCMCIA support"
+ if NET_VENDOR_8390
+ 
+-config PCMCIA_AXNET
+-	tristate "Asix AX88190 PCMCIA support"
 -	depends on PCMCIA && HAS_IOPORT
 -	help
--	  Say Y here if you intend to attach a Xircom 16-bit PCMCIA (PC-card)
--	  Ethernet or Fast Ethernet card to your computer.
+-	  Say Y here if you intend to attach an Asix AX88190-based PCMCIA
+-	  (PC-card) Fast Ethernet card to your computer.  These cards are
+-	  nearly NE2000 compatible but need a separate driver due to a few
+-	  misfeatures.
 -
 -	  To compile this driver as a module, choose M here: the module will be
--	  called xirc2ps_cs.  If unsure, say N.
+-	  called axnet_cs.  If unsure, say N.
 -
--endif # NET_VENDOR_XIRCOM
-diff --git a/drivers/net/ethernet/xircom/Makefile b/drivers/net/ethernet/xircom/Makefile
+ config AX88796
+ 	tristate "ASIX AX88796 NE2000 clone support" if !ZORRO
+ 	depends on (ARM || MIPS || SUPERH || ZORRO || COMPILE_TEST)
+diff --git a/drivers/net/ethernet/8390/Makefile b/drivers/net/ethernet/8390/Makefile
+index 85c83c566ec6..60220484b382 100644
+--- a/drivers/net/ethernet/8390/Makefile
++++ b/drivers/net/ethernet/8390/Makefile
+@@ -11,7 +11,6 @@ obj-$(CONFIG_HYDRA) += hydra.o
+ obj-$(CONFIG_MCF8390) += mcf8390.o
+ obj-$(CONFIG_NE2000) += ne.o 8390p.o
+ obj-$(CONFIG_NE2K_PCI) += ne2k-pci.o 8390.o
+-obj-$(CONFIG_PCMCIA_AXNET) += axnet_cs.o 8390.o
+ obj-$(CONFIG_PCMCIA_PCNET) += pcnet_cs.o 8390.o
+ obj-$(CONFIG_STNIC) += stnic.o 8390.o
+ obj-$(CONFIG_ULTRA) += smc-ultra.o 8390.o
+diff --git a/drivers/net/ethernet/8390/axnet_cs.c b/drivers/net/ethernet/8390/axnet_cs.c
 deleted file mode 100644
-index 07667fefafc2..000000000000
---- a/drivers/net/ethernet/xircom/Makefile
+index 7c8213011b5c..000000000000
+--- a/drivers/net/ethernet/8390/axnet_cs.c
 +++ /dev/null
-@@ -1,6 +0,0 @@
--# SPDX-License-Identifier: GPL-2.0-only
--#
--# Makefile for the Xircom network device drivers.
--#
+@@ -1,1707 +0,0 @@
+-// SPDX-License-Identifier: GPL-1.0+
 -
--obj-$(CONFIG_PCMCIA_XIRC2PS) += xirc2ps_cs.o
-diff --git a/drivers/net/ethernet/xircom/xirc2ps_cs.c b/drivers/net/ethernet/xircom/xirc2ps_cs.c
-deleted file mode 100644
-index 97e88886253f..000000000000
---- a/drivers/net/ethernet/xircom/xirc2ps_cs.c
-+++ /dev/null
-@@ -1,1794 +0,0 @@
--/* [xirc2ps_cs.c wk 03.11.99] (1.40 1999/11/18 00:06:03)
-- * Xircom CreditCard Ethernet Adapter IIps driver
-- * Xircom Realport 10/100 (RE-100) driver 
-- *
-- * This driver supports various Xircom CreditCard Ethernet adapters
-- * including the CE2, CE IIps, RE-10, CEM28, CEM33, CE33, CEM56,
-- * CE3-100, CE3B, RE-100, REM10BT, and REM56G-100.
-- *
-- * 2000-09-24 <psheer@icon.co.za> The Xircom CE3B-100 may not
-- * autodetect the media properly. In this case use the
-- * if_port=1 (for 10BaseT) or if_port=4 (for 100BaseT) options
-- * to force the media type.
-- * 
-- * Written originally by Werner Koch based on David Hinds' skeleton of the
-- * PCMCIA driver.
-- *
-- * Copyright (c) 1997,1998 Werner Koch (dd9jn)
-- *
-- * This driver is free software; you can redistribute it and/or modify
-- * it under the terms of the GNU General Public License as published by
-- * the Free Software Foundation; either version 2 of the License, or
-- * (at your option) any later version.
-- *
-- * It is distributed in the hope that it will be useful,
-- * but WITHOUT ANY WARRANTY; without even the implied warranty of
-- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- * GNU General Public License for more details.
-- *
-- * You should have received a copy of the GNU General Public License
-- * along with this program; if not, see <http://www.gnu.org/licenses/>.
-- *
-- *
-- * ALTERNATIVELY, this driver may be distributed under the terms of
-- * the following license, in which case the provisions of this license
-- * are required INSTEAD OF the GNU General Public License.  (This clause
-- * is necessary due to a potential bad interaction between the GPL and
-- * the restrictions contained in a BSD-style copyright.)
-- *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions
-- * are met:
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, and the entire permission notice in its entirety,
-- *    including the disclaimer of warranties.
-- * 2. Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in the
-- *    documentation and/or other materials provided with the distribution.
-- * 3. The name of the author may not be used to endorse or promote
-- *    products derived from this software without specific prior
-- *    written permission.
-- *
-- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED
-- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-- * DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT,
-- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
-- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
-- * OF THE POSSIBILITY OF SUCH DAMAGE.
-- */
+-/*======================================================================
+-
+-    A PCMCIA ethernet driver for Asix AX88190-based cards
+-
+-    The Asix AX88190 is a NS8390-derived chipset with a few nasty
+-    idiosyncracies that make it very inconvenient to support with a
+-    standard 8390 driver.  This driver is based on pcnet_cs, with the
+-    tweaked 8390 code grafted on the end.  Much of what I did was to
+-    clean up and update a similar driver supplied by Asix, which was
+-    adapted by William Lee, william@asix.com.tw.
+-
+-    Copyright (C) 2001 David A. Hinds -- dahinds@users.sourceforge.net
+-
+-    axnet_cs.c 1.28 2002/06/29 06:27:37
+-
+-    The network driver code is based on Donald Becker's NE2000 code:
+-
+-    Written 1992,1993 by Donald Becker.
+-    Copyright 1993 United States Government as represented by the
+-    Director, National Security Agency.
+-    Donald Becker may be reached at becker@scyld.com
+-
+-======================================================================*/
 -
 -#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
 -
--#include <linux/module.h>
 -#include <linux/kernel.h>
--#include <linux/init.h>
+-#include <linux/module.h>
 -#include <linux/ptrace.h>
--#include <linux/slab.h>
 -#include <linux/string.h>
 -#include <linux/timer.h>
--#include <linux/interrupt.h>
--#include <linux/in.h>
 -#include <linux/delay.h>
--#include <linux/ethtool.h>
+-#include <linux/spinlock.h>
 -#include <linux/netdevice.h>
 -#include <linux/etherdevice.h>
--#include <linux/skbuff.h>
--#include <linux/if_arp.h>
--#include <linux/ioport.h>
--#include <linux/bitops.h>
+-#include <linux/crc32.h>
 -#include <linux/mii.h>
+-#include "8390.h"
 -
 -#include <pcmcia/cistpl.h>
--#include <pcmcia/cisreg.h>
 -#include <pcmcia/ciscode.h>
+-#include <pcmcia/ds.h>
+-#include <pcmcia/cisreg.h>
 -
 -#include <asm/io.h>
+-#include <asm/byteorder.h>
 -#include <linux/uaccess.h>
 -
--#ifndef MANFID_COMPAQ
--  #define MANFID_COMPAQ 	   0x0138
--  #define MANFID_COMPAQ2	   0x0183  /* is this correct? */
--#endif
+-#define AXNET_CMD	0x00
+-#define AXNET_DATAPORT	0x10	/* NatSemi-defined port window offset. */
+-#define AXNET_RESET	0x1f	/* Issue a read to reset, a write to clear. */
+-#define AXNET_MII_EEP	0x14	/* Offset of MII access port */
+-#define AXNET_TEST	0x15	/* Offset of TEST Register port */
+-#define AXNET_GPIO	0x17	/* Offset of General Purpose Register Port */
 -
--#include <pcmcia/ds.h>
+-#define AXNET_START_PG	0x40	/* First page of TX buffer */
+-#define AXNET_STOP_PG	0x80	/* Last page +1 of RX ring */
 -
--/* Time in jiffies before concluding Tx hung */
--#define TX_TIMEOUT	((400*HZ)/1000)
+-#define AXNET_RDC_TIMEOUT 0x02	/* Max wait in jiffies for Tx RDC */
 -
--/****************
-- * Some constants used to access the hardware
-- */
+-#define IS_AX88190	0x0001
+-#define IS_AX88790	0x0002
 -
--/* Register offsets and value constans */
--#define XIRCREG_CR  0	/* Command register (wr) */
--enum xirc_cr {
--    TransmitPacket = 0x01,
--    SoftReset = 0x02,
--    EnableIntr = 0x04,
--    ForceIntr  = 0x08,
--    ClearTxFIFO = 0x10,
--    ClearRxOvrun = 0x20,
--    RestartTx	 = 0x40
--};
--#define XIRCREG_ESR 0	/* Ethernet status register (rd) */
--enum xirc_esr {
--    FullPktRcvd = 0x01, /* full packet in receive buffer */
--    PktRejected = 0x04, /* a packet has been rejected */
--    TxPktPend = 0x08,	/* TX Packet Pending */
--    IncorPolarity = 0x10,
--    MediaSelect = 0x20	/* set if TP, clear if AUI */
--};
--#define XIRCREG_PR  1	/* Page Register select */
--#define XIRCREG_EDP 4	/* Ethernet Data Port Register */
--#define XIRCREG_ISR 6	/* Ethernet Interrupt Status Register */
--enum xirc_isr {
--    TxBufOvr = 0x01,	/* TX Buffer Overflow */
--    PktTxed  = 0x02,	/* Packet Transmitted */
--    MACIntr  = 0x04,	/* MAC Interrupt occurred */
--    TxResGrant = 0x08,	/* Tx Reservation Granted */
--    RxFullPkt = 0x20,	/* Rx Full Packet */
--    RxPktRej  = 0x40,	/* Rx Packet Rejected */
--    ForcedIntr= 0x80	/* Forced Interrupt */
--};
--#define XIRCREG1_IMR0 12 /* Ethernet Interrupt Mask Register (on page 1)*/
--#define XIRCREG1_IMR1 13
--#define XIRCREG0_TSO  8  /* Transmit Space Open Register (on page 0)*/
--#define XIRCREG0_TRS  10 /* Transmit reservation Size Register (page 0)*/
--#define XIRCREG0_DO   12 /* Data Offset Register (page 0) (wr) */
--#define XIRCREG0_RSR  12 /* Receive Status Register (page 0) (rd) */
--enum xirc_rsr {
--    PhyPkt = 0x01,	/* set:physical packet, clear: multicast packet */
--    BrdcstPkt = 0x02,	/* set if it is a broadcast packet */
--    PktTooLong = 0x04,	/* set if packet length > 1518 */
--    AlignErr = 0x10,	/* incorrect CRC and last octet not complete */
--    CRCErr = 0x20,	/* incorrect CRC and last octet is complete */
--    PktRxOk = 0x80	/* received ok */
--};
--#define XIRCREG0_PTR 13 /* packets transmitted register (rd) */
--#define XIRCREG0_RBC 14 /* receive byte count regsister (rd) */
--#define XIRCREG1_ECR 14 /* ethernet configurationn register */
--enum xirc_ecr {
--    FullDuplex = 0x04,	/* enable full duplex mode */
--    LongTPMode = 0x08,	/* adjust for longer lengths of TP cable */
--    DisablePolCor = 0x10,/* disable auto polarity correction */
--    DisableLinkPulse = 0x20, /* disable link pulse generation */
--    DisableAutoTx = 0x40, /* disable auto-transmit */
--};
--#define XIRCREG2_RBS 8	/* receive buffer start register */
--#define XIRCREG2_LED 10 /* LED Configuration register */
--/* values for the leds:    Bits 2-0 for led 1
-- *  0 disabled		   Bits 5-3 for led 2
-- *  1 collision
-- *  2 noncollision
-- *  3 link_detected
-- *  4 incor_polarity
-- *  5 jabber
-- *  6 auto_assertion
-- *  7 rx_tx_activity
-- */
--#define XIRCREG2_MSR 12 /* Mohawk specific register */
--
--#define XIRCREG4_GPR0 8 /* General Purpose Register 0 */
--#define XIRCREG4_GPR1 9 /* General Purpose Register 1 */
--#define XIRCREG2_GPR2 13 /* General Purpose Register 2 (page2!)*/
--#define XIRCREG4_BOV 10 /* Bonding Version Register */
--#define XIRCREG4_LMA 12 /* Local Memory Address Register */
--#define XIRCREG4_LMD 14 /* Local Memory Data Port */
--/* MAC register can only by accessed with 8 bit operations */
--#define XIRCREG40_CMD0 8    /* Command Register (wr) */
--enum xirc_cmd { 	    /* Commands */
--    Transmit = 0x01,
--    EnableRecv = 0x04,
--    DisableRecv = 0x08,
--    Abort = 0x10,
--    Online = 0x20,
--    IntrAck = 0x40,
--    Offline = 0x80
--};
--#define XIRCREG5_RHSA0	10  /* Rx Host Start Address */
--#define XIRCREG40_RXST0 9   /* Receive Status Register */
--#define XIRCREG40_TXST0 11  /* Transmit Status Register 0 */
--#define XIRCREG40_TXST1 12  /* Transmit Status Register 10 */
--#define XIRCREG40_RMASK0 13  /* Receive Mask Register */
--#define XIRCREG40_TMASK0 14  /* Transmit Mask Register 0 */
--#define XIRCREG40_TMASK1 15  /* Transmit Mask Register 0 */
--#define XIRCREG42_SWC0	8   /* Software Configuration 0 */
--#define XIRCREG42_SWC1	9   /* Software Configuration 1 */
--#define XIRCREG42_BOC	10  /* Back-Off Configuration */
--#define XIRCREG44_TDR0	8   /* Time Domain Reflectometry 0 */
--#define XIRCREG44_TDR1	9   /* Time Domain Reflectometry 1 */
--#define XIRCREG44_RXBC_LO 10 /* Rx Byte Count 0 (rd) */
--#define XIRCREG44_RXBC_HI 11 /* Rx Byte Count 1 (rd) */
--#define XIRCREG45_REV	 15 /* Revision Register (rd) */
--#define XIRCREG50_IA	8   /* Individual Address (8-13) */
--
--static const char *if_names[] = { "Auto", "10BaseT", "10Base2", "AUI", "100BaseT" };
--
--/* card types */
--#define XIR_UNKNOWN  0	/* unknown: not supported */
--#define XIR_CE	     1	/* (prodid 1) different hardware: not supported */
--#define XIR_CE2      2	/* (prodid 2) */
--#define XIR_CE3      3	/* (prodid 3) */
--#define XIR_CEM      4	/* (prodid 1) different hardware: not supported */
--#define XIR_CEM2     5	/* (prodid 2) */
--#define XIR_CEM3     6	/* (prodid 3) */
--#define XIR_CEM33    7	/* (prodid 4) */
--#define XIR_CEM56M   8	/* (prodid 5) */
--#define XIR_CEM56    9	/* (prodid 6) */
--#define XIR_CM28    10	/* (prodid 3) modem only: not supported here */
--#define XIR_CM33    11	/* (prodid 4) modem only: not supported here */
--#define XIR_CM56    12	/* (prodid 5) modem only: not supported here */
--#define XIR_CG	    13	/* (prodid 1) GSM modem only: not supported */
--#define XIR_CBE     14	/* (prodid 1) cardbus ethernet: not supported */
 -/*====================================================================*/
 -
 -/* Module parameters */
 -
--MODULE_DESCRIPTION("Xircom PCMCIA ethernet driver");
--MODULE_LICENSE("Dual MPL/GPL");
+-MODULE_AUTHOR("David Hinds <dahinds@users.sourceforge.net>");
+-MODULE_DESCRIPTION("Asix AX88190 PCMCIA ethernet driver");
+-MODULE_LICENSE("GPL");
 -
--#define INT_MODULE_PARM(n, v) static int n = v; module_param(n, int, 0)
--
--INT_MODULE_PARM(if_port,	0);
--INT_MODULE_PARM(full_duplex,	0);
--INT_MODULE_PARM(do_sound, 	1);
--INT_MODULE_PARM(lockup_hack,	0);  /* anti lockup hack */
 -
 -/*====================================================================*/
 -
--/* We do not process more than these number of bytes during one
-- * interrupt. (Of course we receive complete packets, so this is not
-- * an exact value).
-- * Something between 2000..22000; first value gives best interrupt latency,
-- * the second enables the usage of the complete on-chip buffer. We use the
-- * high value as the initial value.
-- */
--static unsigned maxrx_bytes = 22000;
+-static int axnet_config(struct pcmcia_device *link);
+-static void axnet_release(struct pcmcia_device *link);
+-static int axnet_open(struct net_device *dev);
+-static int axnet_close(struct net_device *dev);
+-static int axnet_ioctl(struct net_device *dev, struct ifreq *rq, int cmd);
+-static netdev_tx_t axnet_start_xmit(struct sk_buff *skb,
+-					  struct net_device *dev);
+-static struct net_device_stats *get_stats(struct net_device *dev);
+-static void set_multicast_list(struct net_device *dev);
+-static void axnet_tx_timeout(struct net_device *dev, unsigned int txqueue);
+-static irqreturn_t ei_irq_wrapper(int irq, void *dev_id);
+-static void ei_watchdog(struct timer_list *t);
+-static void axnet_reset_8390(struct net_device *dev);
 -
--/* MII management prototypes */
--static void mii_idle(unsigned int ioaddr);
--static void mii_putbit(unsigned int ioaddr, unsigned data);
--static int  mii_getbit(unsigned int ioaddr);
--static void mii_wbits(unsigned int ioaddr, unsigned data, int len);
--static unsigned mii_rd(unsigned int ioaddr, u_char phyaddr, u_char phyreg);
--static void mii_wr(unsigned int ioaddr, u_char phyaddr, u_char phyreg,
--		   unsigned data, int len);
+-static int mdio_read(unsigned int addr, int phy_id, int loc);
+-static void mdio_write(unsigned int addr, int phy_id, int loc, int value);
 -
--static int has_ce2_string(struct pcmcia_device * link);
--static int xirc2ps_config(struct pcmcia_device * link);
--static void xirc2ps_release(struct pcmcia_device * link);
--static void xirc2ps_detach(struct pcmcia_device *p_dev);
+-static void get_8390_hdr(struct net_device *,
+-			 struct e8390_pkt_hdr *, int);
+-static void block_input(struct net_device *dev, int count,
+-			struct sk_buff *skb, int ring_offset);
+-static void block_output(struct net_device *dev, int count,
+-			 const u_char *buf, const int start_page);
 -
--static irqreturn_t xirc2ps_interrupt(int irq, void *dev_id);
+-static void axnet_detach(struct pcmcia_device *p_dev);
 -
--struct local_info {
--	struct net_device	*dev;
+-static void AX88190_init(struct net_device *dev, int startp);
+-static int ax_open(struct net_device *dev);
+-static int ax_close(struct net_device *dev);
+-static irqreturn_t ax_interrupt(int irq, void *dev_id);
+-
+-/*====================================================================*/
+-
+-struct axnet_dev {
 -	struct pcmcia_device	*p_dev;
--
--    int card_type;
--    int probe_port;
--    int silicon; /* silicon revision. 0=old CE2, 1=Scipper, 4=Mohawk */
--    int mohawk;  /* a CE3 type card */
--    int dingo;	 /* a CEM56 type card */
--    int new_mii; /* has full 10baseT/100baseT MII */
--    int modem;	 /* is a multi function card (i.e with a modem) */
--    void __iomem *dingo_ccr; /* only used for CEM56 cards */
--    unsigned last_ptr_value; /* last packets transmitted value */
--    const char *manf_str;
--    struct work_struct tx_timeout_task;
+-	caddr_t	base;
+-	struct timer_list	watchdog;
+-	int	stale, fast_poll;
+-	u_short	link_status;
+-	u_char	duplex_flag;
+-	int	phy_id;
+-	int	flags;
+-	int	active_low;
 -};
 -
--/****************
-- * Some more prototypes
-- */
--static netdev_tx_t do_start_xmit(struct sk_buff *skb,
--				       struct net_device *dev);
--static void xirc_tx_timeout(struct net_device *dev, unsigned int txqueue);
--static void xirc2ps_tx_timeout_task(struct work_struct *work);
--static void set_addresses(struct net_device *dev);
--static void set_multicast_list(struct net_device *dev);
--static int set_card_type(struct pcmcia_device *link);
--static int do_config(struct net_device *dev, struct ifmap *map);
--static int do_open(struct net_device *dev);
--static int do_ioctl(struct net_device *dev, struct ifreq *rq, int cmd);
--static const struct ethtool_ops netdev_ethtool_ops;
--static void hardreset(struct net_device *dev);
--static void do_reset(struct net_device *dev, int full);
--static int init_mii(struct net_device *dev);
--static void do_powerdown(struct net_device *dev);
--static int do_stop(struct net_device *dev);
--
--/*=============== Helper functions =========================*/
--#define SelectPage(pgnr)   outb((pgnr), ioaddr + XIRCREG_PR)
--#define GetByte(reg)	   ((unsigned)inb(ioaddr + (reg)))
--#define GetWord(reg)	   ((unsigned)inw(ioaddr + (reg)))
--#define PutByte(reg,value) outb((value), ioaddr+(reg))
--#define PutWord(reg,value) outw((value), ioaddr+(reg))
--
--/*====== Functions used for debugging =================================*/
--#if 0 /* reading regs may change system status */
--static void
--PrintRegisters(struct net_device *dev)
+-static inline struct axnet_dev *PRIV(struct net_device *dev)
 -{
--    unsigned int ioaddr = dev->base_addr;
--
--    if (pc_debug > 1) {
--	int i, page;
--
--	printk(KERN_DEBUG pr_fmt("Register  common: "));
--	for (i = 0; i < 8; i++)
--	    pr_cont(" %2.2x", GetByte(i));
--	pr_cont("\n");
--	for (page = 0; page <= 8; page++) {
--	    printk(KERN_DEBUG pr_fmt("Register page %2x: "), page);
--	    SelectPage(page);
--	    for (i = 8; i < 16; i++)
--		pr_cont(" %2.2x", GetByte(i));
--	    pr_cont("\n");
--	}
--	for (page=0x40 ; page <= 0x5f; page++) {
--		if (page == 0x43 || (page >= 0x46 && page <= 0x4f) ||
--		    (page >= 0x51 && page <=0x5e))
--			continue;
--	    printk(KERN_DEBUG pr_fmt("Register page %2x: "), page);
--	    SelectPage(page);
--	    for (i = 8; i < 16; i++)
--		pr_cont(" %2.2x", GetByte(i));
--	    pr_cont("\n");
--	}
--    }
--}
--#endif /* 0 */
--
--/*============== MII Management functions ===============*/
--
--/****************
-- * Turn around for read
-- */
--static void
--mii_idle(unsigned int ioaddr)
--{
--    PutByte(XIRCREG2_GPR2, 0x04|0); /* drive MDCK low */
--    udelay(1);
--    PutByte(XIRCREG2_GPR2, 0x04|1); /* and drive MDCK high */
--    udelay(1);
+-	void *p = (char *)netdev_priv(dev) + sizeof(struct ei_device);
+-	return p;
 -}
 -
--/****************
-- * Write a bit to MDI/O
-- */
--static void
--mii_putbit(unsigned int ioaddr, unsigned data)
--{
--  #if 1
--    if (data) {
--	PutByte(XIRCREG2_GPR2, 0x0c|2|0); /* set MDIO */
--	udelay(1);
--	PutByte(XIRCREG2_GPR2, 0x0c|2|1); /* and drive MDCK high */
--	udelay(1);
--    } else {
--	PutByte(XIRCREG2_GPR2, 0x0c|0|0); /* clear MDIO */
--	udelay(1);
--	PutByte(XIRCREG2_GPR2, 0x0c|0|1); /* and drive MDCK high */
--	udelay(1);
--    }
--  #else
--    if (data) {
--	PutWord(XIRCREG2_GPR2-1, 0x0e0e);
--	udelay(1);
--	PutWord(XIRCREG2_GPR2-1, 0x0f0f);
--	udelay(1);
--    } else {
--	PutWord(XIRCREG2_GPR2-1, 0x0c0c);
--	udelay(1);
--	PutWord(XIRCREG2_GPR2-1, 0x0d0d);
--	udelay(1);
--    }
--  #endif
--}
--
--/****************
-- * Get a bit from MDI/O
-- */
--static int
--mii_getbit(unsigned int ioaddr)
--{
--    unsigned d;
--
--    PutByte(XIRCREG2_GPR2, 4|0); /* drive MDCK low */
--    udelay(1);
--    d = GetByte(XIRCREG2_GPR2); /* read MDIO */
--    PutByte(XIRCREG2_GPR2, 4|1); /* drive MDCK high again */
--    udelay(1);
--    return d & 0x20; /* read MDIO */
--}
--
--static void
--mii_wbits(unsigned int ioaddr, unsigned data, int len)
--{
--    unsigned m = 1 << (len-1);
--    for (; m; m >>= 1)
--	mii_putbit(ioaddr, data & m);
--}
--
--static unsigned
--mii_rd(unsigned int ioaddr,	u_char phyaddr, u_char phyreg)
--{
--    int i;
--    unsigned data=0, m;
--
--    SelectPage(2);
--    for (i=0; i < 32; i++)		/* 32 bit preamble */
--	mii_putbit(ioaddr, 1);
--    mii_wbits(ioaddr, 0x06, 4); 	/* Start and opcode for read */
--    mii_wbits(ioaddr, phyaddr, 5);	/* PHY address to be accessed */
--    mii_wbits(ioaddr, phyreg, 5);	/* PHY register to read */
--    mii_idle(ioaddr);			/* turn around */
--    mii_getbit(ioaddr);
--
--    for (m = 1<<15; m; m >>= 1)
--	if (mii_getbit(ioaddr))
--	    data |= m;
--    mii_idle(ioaddr);
--    return data;
--}
--
--static void
--mii_wr(unsigned int ioaddr, u_char phyaddr, u_char phyreg, unsigned data,
--       int len)
--{
--    int i;
--
--    SelectPage(2);
--    for (i=0; i < 32; i++)		/* 32 bit preamble */
--	mii_putbit(ioaddr, 1);
--    mii_wbits(ioaddr, 0x05, 4); 	/* Start and opcode for write */
--    mii_wbits(ioaddr, phyaddr, 5);	/* PHY address to be accessed */
--    mii_wbits(ioaddr, phyreg, 5);	/* PHY Register to write */
--    mii_putbit(ioaddr, 1);		/* turn around */
--    mii_putbit(ioaddr, 0);
--    mii_wbits(ioaddr, data, len);	/* And write the data */
--    mii_idle(ioaddr);
--}
--
--/*============= Main bulk of functions	=========================*/
--
--static const struct net_device_ops netdev_ops = {
--	.ndo_open		= do_open,
--	.ndo_stop		= do_stop,
--	.ndo_start_xmit		= do_start_xmit,
--	.ndo_tx_timeout 	= xirc_tx_timeout,
--	.ndo_set_config		= do_config,
--	.ndo_eth_ioctl		= do_ioctl,
+-static const struct net_device_ops axnet_netdev_ops = {
+-	.ndo_open 		= axnet_open,
+-	.ndo_stop		= axnet_close,
+-	.ndo_eth_ioctl		= axnet_ioctl,
+-	.ndo_start_xmit		= axnet_start_xmit,
+-	.ndo_tx_timeout		= axnet_tx_timeout,
+-	.ndo_get_stats		= get_stats,
 -	.ndo_set_rx_mode	= set_multicast_list,
 -	.ndo_set_mac_address 	= eth_mac_addr,
 -	.ndo_validate_addr	= eth_validate_addr,
 -};
 -
--static int
--xirc2ps_probe(struct pcmcia_device *link)
+-static int axnet_probe(struct pcmcia_device *link)
 -{
+-    struct axnet_dev *info;
 -    struct net_device *dev;
--    struct local_info *local;
+-    struct ei_device *ei_local;
 -
--    dev_dbg(&link->dev, "attach()\n");
+-    dev_dbg(&link->dev, "axnet_attach()\n");
 -
--    /* Allocate the device structure */
--    dev = alloc_etherdev(sizeof(struct local_info));
+-    dev = alloc_etherdev(sizeof(struct ei_device) + sizeof(struct axnet_dev));
 -    if (!dev)
--	    return -ENOMEM;
--    local = netdev_priv(dev);
--    local->dev = dev;
--    local->p_dev = link;
+-	return -ENOMEM;
+-
+-    ei_local = netdev_priv(dev);
+-    spin_lock_init(&ei_local->page_lock);
+-
+-    info = PRIV(dev);
+-    info->p_dev = link;
 -    link->priv = dev;
+-    link->config_flags |= CONF_ENABLE_IRQ;
 -
--    /* General socket configuration */
--    link->config_index = 1;
+-    dev->netdev_ops = &axnet_netdev_ops;
 -
--    /* Fill in card specific entries */
--    dev->netdev_ops = &netdev_ops;
--    dev->ethtool_ops = &netdev_ethtool_ops;
 -    dev->watchdog_timeo = TX_TIMEOUT;
--    INIT_WORK(&local->tx_timeout_task, xirc2ps_tx_timeout_task);
 -
--    return xirc2ps_config(link);
--} /* xirc2ps_attach */
+-    return axnet_config(link);
+-} /* axnet_attach */
 -
--static void
--xirc2ps_detach(struct pcmcia_device *link)
+-static void axnet_detach(struct pcmcia_device *link)
 -{
 -    struct net_device *dev = link->priv;
--    struct local_info *local = netdev_priv(dev);
 -
--    netif_carrier_off(dev);
--    netif_tx_disable(dev);
--    cancel_work_sync(&local->tx_timeout_task);
--
--    dev_dbg(&link->dev, "detach\n");
+-    dev_dbg(&link->dev, "axnet_detach(0x%p)\n", link);
 -
 -    unregister_netdev(dev);
 -
--    xirc2ps_release(link);
+-    axnet_release(link);
 -
 -    free_netdev(dev);
--} /* xirc2ps_detach */
+-} /* axnet_detach */
 -
--/****************
-- * Detect the type of the card. s is the buffer with the data of tuple 0x20
-- * Returns: 0 := not supported
-- *		       mediaid=11 and prodid=47
-- * Media-Id bits:
-- *  Ethernet	    0x01
-- *  Tokenring	    0x02
-- *  Arcnet	    0x04
-- *  Wireless	    0x08
-- *  Modem	    0x10
-- *  GSM only	    0x20
-- * Prod-Id bits:
-- *  Pocket	    0x10
-- *  External	    0x20
-- *  Creditcard	    0x40
-- *  Cardbus	    0x80
-- *
-- */
--static int
--set_card_type(struct pcmcia_device *link)
+-/*======================================================================
+-
+-    This probes for a card's hardware address by reading the PROM.
+-
+-======================================================================*/
+-
+-static int get_prom(struct pcmcia_device *link)
 -{
 -    struct net_device *dev = link->priv;
--    struct local_info *local = netdev_priv(dev);
--    u8 *buf;
--    unsigned int cisrev, mediaid, prodid;
--    size_t len;
+-    unsigned int ioaddr = dev->base_addr;
+-    u8 addr[ETH_ALEN];
+-    int i, j;
 -
--    len = pcmcia_get_tuple(link, CISTPL_MANFID, &buf);
--    if (len < 5) {
--	    dev_err(&link->dev, "invalid CIS -- sorry\n");
--	    return 0;
--    }
+-    /* This is based on drivers/net/ethernet/8390/ne.c */
+-    struct {
+-	u_char value, offset;
+-    } program_seq[] = {
+-	{E8390_NODMA+E8390_PAGE0+E8390_STOP, E8390_CMD}, /* Select page 0*/
+-	{0x01,	EN0_DCFG},	/* Set word-wide access. */
+-	{0x00,	EN0_RCNTLO},	/* Clear the count regs. */
+-	{0x00,	EN0_RCNTHI},
+-	{0x00,	EN0_IMR},	/* Mask completion irq. */
+-	{0xFF,	EN0_ISR},
+-	{E8390_RXOFF|0x40, EN0_RXCR},	/* 0x60  Set to monitor */
+-	{E8390_TXOFF, EN0_TXCR},	/* 0x02  and loopback mode. */
+-	{0x10,	EN0_RCNTLO},
+-	{0x00,	EN0_RCNTHI},
+-	{0x00,	EN0_RSARLO},	/* DMA starting at 0x0400. */
+-	{0x04,	EN0_RSARHI},
+-	{E8390_RREAD+E8390_START, E8390_CMD},
+-    };
 -
--    cisrev = buf[2];
--    mediaid = buf[3];
--    prodid = buf[4];
--
--    dev_dbg(&link->dev, "cisrev=%02x mediaid=%02x prodid=%02x\n",
--	  cisrev, mediaid, prodid);
--
--    local->mohawk = 0;
--    local->dingo = 0;
--    local->modem = 0;
--    local->card_type = XIR_UNKNOWN;
--    if (!(prodid & 0x40)) {
--	pr_notice("Oops: Not a creditcard\n");
+-    /* Not much of a test, but the alternatives are messy */
+-    if (link->config_base != 0x03c0)
 -	return 0;
+-
+-    axnet_reset_8390(dev);
+-    mdelay(10);
+-
+-    for (i = 0; i < ARRAY_SIZE(program_seq); i++)
+-	outb_p(program_seq[i].value, ioaddr + program_seq[i].offset);
+-
+-    for (i = 0; i < 6; i += 2) {
+-	j = inw(ioaddr + AXNET_DATAPORT);
+-	addr[i] = j & 0xff;
+-	addr[i+1] = j >> 8;
 -    }
--    if (!(mediaid & 0x01)) {
--	pr_notice("Not an Ethernet card\n");
--	return 0;
--    }
--    if (mediaid & 0x10) {
--	local->modem = 1;
--	switch(prodid & 15) {
--	  case 1: local->card_type = XIR_CEM   ; break;
--	  case 2: local->card_type = XIR_CEM2  ; break;
--	  case 3: local->card_type = XIR_CEM3  ; break;
--	  case 4: local->card_type = XIR_CEM33 ; break;
--	  case 5: local->card_type = XIR_CEM56M;
--		  local->mohawk = 1;
--		  break;
--	  case 6:
--	  case 7: /* 7 is the RealPort 10/56 */
--		  local->card_type = XIR_CEM56 ;
--		  local->mohawk = 1;
--		  local->dingo = 1;
--		  break;
--	}
--    } else {
--	switch(prodid & 15) {
--	  case 1: local->card_type = has_ce2_string(link)? XIR_CE2 : XIR_CE ;
--		  break;
--	  case 2: local->card_type = XIR_CE2; break;
--	  case 3: local->card_type = XIR_CE3;
--		  local->mohawk = 1;
--		  break;
--	}
--    }
--    if (local->card_type == XIR_CE || local->card_type == XIR_CEM) {
--	pr_notice("Sorry, this is an old CE card\n");
--	return 0;
--    }
--    if (local->card_type == XIR_UNKNOWN)
--	pr_notice("unknown card (mediaid=%02x prodid=%02x)\n", mediaid, prodid);
+-    eth_hw_addr_set(dev, addr);
 -
 -    return 1;
--}
+-} /* get_prom */
 -
--/****************
-- * There are some CE2 cards out which claim to be a CE card.
-- * This function looks for a "CE2" in the 3rd version field.
-- * Returns: true if this is a CE2
-- */
--static int
--has_ce2_string(struct pcmcia_device * p_dev)
+-static int try_io_port(struct pcmcia_device *link)
 -{
--	if (p_dev->prod_id[2] && strstr(p_dev->prod_id[2], "CE2"))
--		return 1;
--	return 0;
--}
--
--static int
--xirc2ps_config_modem(struct pcmcia_device *p_dev, void *priv_data)
--{
--	unsigned int ioaddr;
--
--	if ((p_dev->resource[0]->start & 0xf) == 8)
--		return -ENODEV;
--
--	p_dev->resource[0]->end = 16;
--	p_dev->resource[1]->end = 8;
--	p_dev->resource[0]->flags &= ~IO_DATA_PATH_WIDTH;
--	p_dev->resource[0]->flags |= IO_DATA_PATH_WIDTH_16;
--	p_dev->resource[1]->flags &= ~IO_DATA_PATH_WIDTH;
--	p_dev->resource[1]->flags |= IO_DATA_PATH_WIDTH_8;
--	p_dev->io_lines = 10;
--
--	p_dev->resource[1]->start = p_dev->resource[0]->start;
--	for (ioaddr = 0x300; ioaddr < 0x400; ioaddr += 0x10) {
--		p_dev->resource[0]->start = ioaddr;
--		if (!pcmcia_request_io(p_dev))
--			return 0;
+-    int j, ret;
+-    link->resource[0]->flags &= ~IO_DATA_PATH_WIDTH;
+-    link->resource[1]->flags &= ~IO_DATA_PATH_WIDTH;
+-    if (link->resource[0]->end == 32) {
+-	link->resource[0]->flags |= IO_DATA_PATH_WIDTH_AUTO;
+-	/* for master/slave multifunction cards */
+-	if (link->resource[1]->end > 0)
+-	    link->resource[1]->flags |= IO_DATA_PATH_WIDTH_8;
+-    } else {
+-	/* This should be two 16-port windows */
+-	link->resource[0]->flags |= IO_DATA_PATH_WIDTH_8;
+-	link->resource[1]->flags |= IO_DATA_PATH_WIDTH_16;
+-    }
+-    if (link->resource[0]->start == 0) {
+-	for (j = 0; j < 0x400; j += 0x20) {
+-	    link->resource[0]->start = j ^ 0x300;
+-	    link->resource[1]->start = (j ^ 0x300) + 0x10;
+-	    link->io_lines = 16;
+-	    ret = pcmcia_request_io(link);
+-	    if (ret == 0)
+-		    return ret;
 -	}
--	return -ENODEV;
+-	return ret;
+-    } else {
+-	return pcmcia_request_io(link);
+-    }
 -}
 -
--static int
--xirc2ps_config_check(struct pcmcia_device *p_dev, void *priv_data)
+-static int axnet_configcheck(struct pcmcia_device *p_dev, void *priv_data)
 -{
--	int *pass = priv_data;
--	resource_size_t tmp = p_dev->resource[1]->start;
+-	if (p_dev->config_index == 0)
+-		return -EINVAL;
 -
--	tmp += (*pass ? (p_dev->config_index & 0x20 ? -24 : 8)
--		: (p_dev->config_index & 0x20 ?   8 : -24));
--
--	if ((p_dev->resource[0]->start & 0xf) == 8)
+-	p_dev->config_index = 0x05;
+-	if (p_dev->resource[0]->end + p_dev->resource[1]->end < 32)
 -		return -ENODEV;
 -
--	p_dev->resource[0]->end = 18;
--	p_dev->resource[1]->end = 8;
--	p_dev->resource[0]->flags &= ~IO_DATA_PATH_WIDTH;
--	p_dev->resource[0]->flags |= IO_DATA_PATH_WIDTH_16;
--	p_dev->resource[1]->flags &= ~IO_DATA_PATH_WIDTH;
--	p_dev->resource[1]->flags |= IO_DATA_PATH_WIDTH_8;
--	p_dev->io_lines = 10;
--
--	p_dev->resource[1]->start = p_dev->resource[0]->start;
--	p_dev->resource[0]->start = tmp;
--	return pcmcia_request_io(p_dev);
+-	return try_io_port(p_dev);
 -}
 -
--
--static int pcmcia_get_mac_ce(struct pcmcia_device *p_dev,
--			     tuple_t *tuple,
--			     void *priv)
--{
--	struct net_device *dev = priv;
--
--	if (tuple->TupleDataLen != 13)
--		return -EINVAL;
--	if ((tuple->TupleData[0] != 2) || (tuple->TupleData[1] != 1) ||
--		(tuple->TupleData[2] != 6))
--		return -EINVAL;
--	/* another try	(James Lehmer's CE2 version 4.1)*/
--	dev_addr_mod(dev, 2, &tuple->TupleData[2], 4);
--	return 0;
--};
--
--
--static int
--xirc2ps_config(struct pcmcia_device * link)
+-static int axnet_config(struct pcmcia_device *link)
 -{
 -    struct net_device *dev = link->priv;
--    struct local_info *local = netdev_priv(dev);
--    unsigned int ioaddr;
--    int err;
--    u8 *buf;
--    size_t len;
+-    struct axnet_dev *info = PRIV(dev);
+-    int i, j, j2, ret;
 -
--    local->dingo_ccr = NULL;
+-    dev_dbg(&link->dev, "axnet_config(0x%p)\n", link);
 -
--    dev_dbg(&link->dev, "config\n");
+-    /* don't trust the CIS on this; Linksys got it wrong */
+-    link->config_regs = 0x63;
+-    link->config_flags |= CONF_ENABLE_IRQ | CONF_AUTO_SET_IO;
+-    ret = pcmcia_loop_config(link, axnet_configcheck, NULL);
+-    if (ret != 0)
+-	goto failed;
 -
--    /* Is this a valid	card */
--    if (link->has_manf_id == 0) {
--	pr_notice("manfid not found in CIS\n");
--	goto failure;
--    }
+-    if (!link->irq)
+-	    goto failed;
 -
--    switch (link->manf_id) {
--      case MANFID_XIRCOM:
--	local->manf_str = "Xircom";
--	break;
--      case MANFID_ACCTON:
--	local->manf_str = "Accton";
--	break;
--      case MANFID_COMPAQ:
--      case MANFID_COMPAQ2:
--	local->manf_str = "Compaq";
--	break;
--      case MANFID_INTEL:
--	local->manf_str = "Intel";
--	break;
--      case MANFID_TOSHIBA:
--	local->manf_str = "Toshiba";
--	break;
--      default:
--	pr_notice("Unknown Card Manufacturer ID: 0x%04x\n",
--		  (unsigned)link->manf_id);
--	goto failure;
--    }
--    dev_dbg(&link->dev, "found %s card\n", local->manf_str);
+-    if (resource_size(link->resource[1]) == 8)
+-	link->config_flags |= CONF_ENABLE_SPKR;
+-    
+-    ret = pcmcia_enable_device(link);
+-    if (ret)
+-	    goto failed;
 -
--    if (!set_card_type(link)) {
--	pr_notice("this card is not supported\n");
--	goto failure;
--    }
--
--    /* get the ethernet address from the CIS */
--    err = pcmcia_get_mac_from_cis(link, dev);
--
--    /* not found: try to get the node-id from tuple 0x89 */
--    if (err) {
--	    len = pcmcia_get_tuple(link, 0x89, &buf);
--	    /* data layout looks like tuple 0x22 */
--	    if (buf && len == 8) {
--		    if (*buf == CISTPL_FUNCE_LAN_NODE_ID)
--			    dev_addr_mod(dev, 2, &buf[2], 4);
--		    else
--			    err = -1;
--	    }
--	    kfree(buf);
--    }
--
--    if (err)
--	err = pcmcia_loop_tuple(link, CISTPL_FUNCE, pcmcia_get_mac_ce, dev);
--
--    if (err) {
--	pr_notice("node-id not found in CIS\n");
--	goto failure;
--    }
--
--    if (local->modem) {
--	int pass;
--	link->config_flags |= CONF_AUTO_SET_IO;
--
--	if (local->dingo) {
--	    /* Take the Modem IO port from the CIS and scan for a free
--	     * Ethernet port */
--	    if (!pcmcia_loop_config(link, xirc2ps_config_modem, NULL))
--		    goto port_found;
--	} else {
--	    /* We do 2 passes here: The first one uses the regular mapping and
--	     * the second tries again, thereby considering that the 32 ports are
--	     * mirrored every 32 bytes. Actually we use a mirrored port for
--	     * the Mako if (on the first pass) the COR bit 5 is set.
--	     */
--	    for (pass=0; pass < 2; pass++)
--		    if (!pcmcia_loop_config(link, xirc2ps_config_check,
--						    &pass))
--			    goto port_found;
--	    /* if special option:
--	     * try to configure as Ethernet only.
--	     * .... */
--	}
--	pr_notice("no ports available\n");
--    } else {
--	link->io_lines = 10;
--	link->resource[0]->end = 16;
--	link->resource[0]->flags |= IO_DATA_PATH_WIDTH_16;
--	for (ioaddr = 0x300; ioaddr < 0x400; ioaddr += 0x10) {
--	    link->resource[0]->start = ioaddr;
--	    if (!(err = pcmcia_request_io(link)))
--		goto port_found;
--	}
--	link->resource[0]->start = 0; /* let CS decide */
--	if ((err = pcmcia_request_io(link)))
--	    goto config_error;
--    }
--  port_found:
--
--    /****************
--     * Now allocate an interrupt line.	Note that this does not
--     * actually assign a handler to the interrupt.
--     */
--    if ((err=pcmcia_request_irq(link, xirc2ps_interrupt)))
--	goto config_error;
--
--    link->config_flags |= CONF_ENABLE_IRQ;
--    if (do_sound)
--	    link->config_flags |= CONF_ENABLE_SPKR;
--
--    if ((err = pcmcia_enable_device(link)))
--	goto config_error;
--
--    if (local->dingo) {
--	/* Reset the modem's BAR to the correct value
--	 * This is necessary because in the RequestConfiguration call,
--	 * the base address of the ethernet port (BasePort1) is written
--	 * to the BAR registers of the modem.
--	 */
--	err = pcmcia_write_config_byte(link, CISREG_IOBASE_0, (u8)
--				link->resource[1]->start & 0xff);
--	if (err)
--	    goto config_error;
--
--	err = pcmcia_write_config_byte(link, CISREG_IOBASE_1,
--				(link->resource[1]->start >> 8) & 0xff);
--	if (err)
--	    goto config_error;
--
--	/* There is no config entry for the Ethernet part which
--	 * is at 0x0800. So we allocate a window into the attribute
--	 * memory and write direct to the CIS registers
--	 */
--	link->resource[2]->flags = WIN_DATA_WIDTH_8 | WIN_MEMORY_TYPE_AM |
--					WIN_ENABLE;
--	link->resource[2]->start = link->resource[2]->end = 0;
--	if ((err = pcmcia_request_window(link, link->resource[2], 0)))
--	    goto config_error;
--
--	local->dingo_ccr = ioremap(link->resource[2]->start, 0x1000) + 0x0800;
--	if ((err = pcmcia_map_mem_page(link, link->resource[2], 0)))
--	    goto config_error;
--
--	/* Setup the CCRs; there are no infos in the CIS about the Ethernet
--	 * part.
--	 */
--	writeb(0x47, local->dingo_ccr + CISREG_COR);
--	ioaddr = link->resource[0]->start;
--	writeb(ioaddr & 0xff	  , local->dingo_ccr + CISREG_IOBASE_0);
--	writeb((ioaddr >> 8)&0xff , local->dingo_ccr + CISREG_IOBASE_1);
--
--      #if 0
--	{
--	    u_char tmp;
--	    pr_info("ECOR:");
--	    for (i=0; i < 7; i++) {
--		tmp = readb(local->dingo_ccr + i*2);
--		pr_cont(" %02x", tmp);
--	    }
--	    pr_cont("\n");
--	    pr_info("DCOR:");
--	    for (i=0; i < 4; i++) {
--		tmp = readb(local->dingo_ccr + 0x20 + i*2);
--		pr_cont(" %02x", tmp);
--	    }
--	    pr_cont("\n");
--	    pr_info("SCOR:");
--	    for (i=0; i < 10; i++) {
--		tmp = readb(local->dingo_ccr + 0x40 + i*2);
--		pr_cont(" %02x", tmp);
--	    }
--	    pr_cont("\n");
--	}
--      #endif
--
--	writeb(0x01, local->dingo_ccr + 0x20);
--	writeb(0x0c, local->dingo_ccr + 0x22);
--	writeb(0x00, local->dingo_ccr + 0x24);
--	writeb(0x00, local->dingo_ccr + 0x26);
--	writeb(0x00, local->dingo_ccr + 0x28);
--    }
--
--    /* The if_port symbol can be set when the module is loaded */
--    local->probe_port=0;
--    if (!if_port) {
--	local->probe_port = dev->if_port = 1;
--    } else if ((if_port >= 1 && if_port <= 2) ||
--	       (local->mohawk && if_port==4))
--	dev->if_port = if_port;
--    else
--	pr_notice("invalid if_port requested\n");
--
--    /* we can now register the device with the net subsystem */
 -    dev->irq = link->irq;
 -    dev->base_addr = link->resource[0]->start;
 -
--    if (local->dingo)
--	do_reset(dev, 1); /* a kludge to make the cem56 work */
--
--    SET_NETDEV_DEV(dev, &link->dev);
--
--    if ((err=register_netdev(dev))) {
--	pr_notice("register_netdev() failed\n");
--	goto config_error;
+-    if (!get_prom(link)) {
+-	pr_notice("this is not an AX88190 card!\n");
+-	pr_notice("use pcnet_cs instead.\n");
+-	goto failed;
 -    }
 -
--    /* give some infos about the hardware */
--    netdev_info(dev, "%s: port %#3lx, irq %d, hwaddr %pM\n",
--		local->manf_str, (u_long)dev->base_addr, (int)dev->irq,
--		dev->dev_addr);
+-    ei_status.name = "AX88190";
+-    ei_status.word16 = 1;
+-    ei_status.tx_start_page = AXNET_START_PG;
+-    ei_status.rx_start_page = AXNET_START_PG + TX_PAGES;
+-    ei_status.stop_page = AXNET_STOP_PG;
+-    ei_status.reset_8390 = axnet_reset_8390;
+-    ei_status.get_8390_hdr = get_8390_hdr;
+-    ei_status.block_input = block_input;
+-    ei_status.block_output = block_output;
 -
+-    if (inb(dev->base_addr + AXNET_TEST) != 0)
+-	info->flags |= IS_AX88790;
+-    else
+-	info->flags |= IS_AX88190;
+-
+-    if (info->flags & IS_AX88790)
+-	outb(0x10, dev->base_addr + AXNET_GPIO);  /* select Internal PHY */
+-
+-    info->active_low = 0;
+-
+-    for (i = 0; i < 32; i++) {
+-	j = mdio_read(dev->base_addr + AXNET_MII_EEP, i, 1);
+-	j2 = mdio_read(dev->base_addr + AXNET_MII_EEP, i, 2);
+-	if (j == j2) continue;
+-	if ((j != 0) && (j != 0xffff)) break;
+-    }
+-
+-    if (i == 32) {
+-	/* Maybe PHY is in power down mode. (PPD_SET = 1)
+-	   Bit 2 of CCSR is active low. */
+-	pcmcia_write_config_byte(link, CISREG_CCSR, 0x04);
+-	for (i = 0; i < 32; i++) {
+-	    j = mdio_read(dev->base_addr + AXNET_MII_EEP, i, 1);
+-	    j2 = mdio_read(dev->base_addr + AXNET_MII_EEP, i, 2);
+-	    if (j == j2) continue;
+-	    if ((j != 0) && (j != 0xffff)) {
+-		info->active_low = 1;
+-		break;
+-	    }
+-	}
+-    }
+-
+-    info->phy_id = (i < 32) ? i : -1;
+-    SET_NETDEV_DEV(dev, &link->dev);
+-
+-    if (register_netdev(dev) != 0) {
+-	pr_notice("register_netdev() failed\n");
+-	goto failed;
+-    }
+-
+-    netdev_info(dev, "Asix AX88%d90: io %#3lx, irq %d, hw_addr %pM\n",
+-		((info->flags & IS_AX88790) ? 7 : 1),
+-		dev->base_addr, dev->irq, dev->dev_addr);
+-    if (info->phy_id != -1) {
+-	netdev_dbg(dev, "  MII transceiver at index %d, status %x\n",
+-		   info->phy_id, j);
+-    } else {
+-	netdev_notice(dev, "  No MII transceivers found!\n");
+-    }
 -    return 0;
 -
--  config_error:
--    xirc2ps_release(link);
+-failed:
+-    axnet_release(link);
 -    return -ENODEV;
+-} /* axnet_config */
 -
--  failure:
--    return -ENODEV;
--} /* xirc2ps_config */
--
--static void
--xirc2ps_release(struct pcmcia_device *link)
+-static void axnet_release(struct pcmcia_device *link)
 -{
--	dev_dbg(&link->dev, "release\n");
--
--	if (link->resource[2]->end) {
--		struct net_device *dev = link->priv;
--		struct local_info *local = netdev_priv(dev);
--		if (local->dingo)
--			iounmap(local->dingo_ccr - 0x0800);
--	}
 -	pcmcia_disable_device(link);
--} /* xirc2ps_release */
+-}
 -
--/*====================================================================*/
--
--
--static int xirc2ps_suspend(struct pcmcia_device *link)
+-static int axnet_suspend(struct pcmcia_device *link)
 -{
 -	struct net_device *dev = link->priv;
 -
--	if (link->open) {
+-	if (link->open)
 -		netif_device_detach(dev);
--		do_powerdown(dev);
--	}
 -
 -	return 0;
 -}
 -
--static int xirc2ps_resume(struct pcmcia_device *link)
+-static int axnet_resume(struct pcmcia_device *link)
 -{
 -	struct net_device *dev = link->priv;
+-	struct axnet_dev *info = PRIV(dev);
 -
 -	if (link->open) {
--		do_reset(dev,1);
+-		if (info->active_low == 1)
+-			pcmcia_write_config_byte(link, CISREG_CCSR, 0x04);
+-
+-		axnet_reset_8390(dev);
+-		AX88190_init(dev, 1);
 -		netif_device_attach(dev);
 -	}
 -
@@ -1160,834 +574,1307 @@ index 97e88886253f..000000000000
 -}
 -
 -
--/*====================================================================*/
+-/*======================================================================
 -
--/****************
-- * This is the Interrupt service route.
-- */
--static irqreturn_t
--xirc2ps_interrupt(int irq, void *dev_id)
+-    MII interface support
+-
+-======================================================================*/
+-
+-#define MDIO_SHIFT_CLK		0x01
+-#define MDIO_DATA_WRITE0	0x00
+-#define MDIO_DATA_WRITE1	0x08
+-#define MDIO_DATA_READ		0x04
+-#define MDIO_MASK		0x0f
+-#define MDIO_ENB_IN		0x02
+-
+-static void mdio_sync(unsigned int addr)
 -{
--    struct net_device *dev = (struct net_device *)dev_id;
--    struct local_info *lp = netdev_priv(dev);
--    unsigned int ioaddr;
--    u_char saved_page;
--    unsigned bytes_rcvd;
--    unsigned int_status, eth_status, rx_status, tx_status;
--    unsigned rsr, pktlen;
--    ulong start_ticks = jiffies; /* fixme: jiffies rollover every 497 days
--				  * is this something to worry about?
--				  * -- on a laptop?
--				  */
--
--    if (!netif_device_present(dev))
--	return IRQ_HANDLED;
--
--    ioaddr = dev->base_addr;
--    if (lp->mohawk) { /* must disable the interrupt */
--	PutByte(XIRCREG_CR, 0);
+-    int bits;
+-    for (bits = 0; bits < 32; bits++) {
+-	outb_p(MDIO_DATA_WRITE1, addr);
+-	outb_p(MDIO_DATA_WRITE1 | MDIO_SHIFT_CLK, addr);
 -    }
+-}
 -
--    pr_debug("%s: interrupt %d at %#x.\n", dev->name, irq, ioaddr);
+-static int mdio_read(unsigned int addr, int phy_id, int loc)
+-{
+-    u_int cmd = (0xf6<<10)|(phy_id<<5)|loc;
+-    int i, retval = 0;
 -
--    saved_page = GetByte(XIRCREG_PR);
--    /* Read the ISR to see whats the cause for the interrupt.
--     * This also clears the interrupt flags on CE2 cards
--     */
--    int_status = GetByte(XIRCREG_ISR);
--    bytes_rcvd = 0;
--  loop_entry:
--    if (int_status == 0xff) { /* card may be ejected */
--	pr_debug("%s: interrupt %d for dead card\n", dev->name, irq);
--	goto leave;
+-    mdio_sync(addr);
+-    for (i = 14; i >= 0; i--) {
+-	int dat = (cmd&(1<<i)) ? MDIO_DATA_WRITE1 : MDIO_DATA_WRITE0;
+-	outb_p(dat, addr);
+-	outb_p(dat | MDIO_SHIFT_CLK, addr);
 -    }
--    eth_status = GetByte(XIRCREG_ESR);
--
--    SelectPage(0x40);
--    rx_status  = GetByte(XIRCREG40_RXST0);
--    PutByte(XIRCREG40_RXST0, (~rx_status & 0xff));
--    tx_status = GetByte(XIRCREG40_TXST0);
--    tx_status |= GetByte(XIRCREG40_TXST1) << 8;
--    PutByte(XIRCREG40_TXST0, 0);
--    PutByte(XIRCREG40_TXST1, 0);
--
--    pr_debug("%s: ISR=%#2.2x ESR=%#2.2x RSR=%#2.2x TSR=%#4.4x\n",
--	  dev->name, int_status, eth_status, rx_status, tx_status);
--
--    /***** receive section ******/
--    SelectPage(0);
--    while (eth_status & FullPktRcvd) {
--	rsr = GetByte(XIRCREG0_RSR);
--	if (bytes_rcvd > maxrx_bytes && (rsr & PktRxOk)) {
--	    /* too many bytes received during this int, drop the rest of the
--	     * packets */
--	    dev->stats.rx_dropped++;
--	    pr_debug("%s: RX drop, too much done\n", dev->name);
--	} else if (rsr & PktRxOk) {
--	    struct sk_buff *skb;
--
--	    pktlen = GetWord(XIRCREG0_RBC);
--	    bytes_rcvd += pktlen;
--
--	    pr_debug("rsr=%#02x packet_length=%u\n", rsr, pktlen);
--
--	    /* 1 extra so we can use insw */
--	    skb = netdev_alloc_skb(dev, pktlen + 3);
--	    if (!skb) {
--		dev->stats.rx_dropped++;
--	    } else { /* okay get the packet */
--		skb_reserve(skb, 2);
--		if (lp->silicon == 0 ) { /* work around a hardware bug */
--		    unsigned rhsa; /* receive start address */
--
--		    SelectPage(5);
--		    rhsa = GetWord(XIRCREG5_RHSA0);
--		    SelectPage(0);
--		    rhsa += 3; /* skip control infos */
--		    if (rhsa >= 0x8000)
--			rhsa = 0;
--		    if (rhsa + pktlen > 0x8000) {
--			unsigned i;
--			u_char *buf = skb_put(skb, pktlen);
--			for (i=0; i < pktlen ; i++, rhsa++) {
--			    buf[i] = GetByte(XIRCREG_EDP);
--			    if (rhsa == 0x8000) {
--				rhsa = 0;
--				i--;
--			    }
--			}
--		    } else {
--			insw(ioaddr+XIRCREG_EDP,
--				skb_put(skb, pktlen), (pktlen+1)>>1);
--		    }
--		}
--	      #if 0
--		else if (lp->mohawk) {
--		    /* To use this 32 bit access we should use
--		     * a manual optimized loop
--		     * Also the words are swapped, we can get more
--		     * performance by using 32 bit access and swapping
--		     * the words in a register. Will need this for cardbus
--		     *
--		     * Note: don't forget to change the ALLOC_SKB to .. +3
--		     */
--		    unsigned i;
--		    u_long *p = skb_put(skb, pktlen);
--		    register u_long a;
--		    unsigned int edpreg = ioaddr+XIRCREG_EDP-2;
--		    for (i=0; i < len ; i += 4, p++) {
--			a = inl(edpreg);
--			__asm__("rorl $16,%0\n\t"
--				:"=q" (a)
--				: "0" (a));
--			*p = a;
--		    }
--		}
--	      #endif
--		else {
--		    insw(ioaddr+XIRCREG_EDP, skb_put(skb, pktlen),
--			    (pktlen+1)>>1);
--		}
--		skb->protocol = eth_type_trans(skb, dev);
--		netif_rx(skb);
--		dev->stats.rx_packets++;
--		dev->stats.rx_bytes += pktlen;
--		if (!(rsr & PhyPkt))
--		    dev->stats.multicast++;
--	    }
--	} else { /* bad packet */
--	    pr_debug("rsr=%#02x\n", rsr);
--	}
--	if (rsr & PktTooLong) {
--	    dev->stats.rx_frame_errors++;
--	    pr_debug("%s: Packet too long\n", dev->name);
--	}
--	if (rsr & CRCErr) {
--	    dev->stats.rx_crc_errors++;
--	    pr_debug("%s: CRC error\n", dev->name);
--	}
--	if (rsr & AlignErr) {
--	    dev->stats.rx_fifo_errors++; /* okay ? */
--	    pr_debug("%s: Alignment error\n", dev->name);
--	}
--
--	/* clear the received/dropped/error packet */
--	PutWord(XIRCREG0_DO, 0x8000); /* issue cmd: skip_rx_packet */
--
--	/* get the new ethernet status */
--	eth_status = GetByte(XIRCREG_ESR);
+-    for (i = 19; i > 0; i--) {
+-	outb_p(MDIO_ENB_IN, addr);
+-	retval = (retval << 1) | ((inb_p(addr) & MDIO_DATA_READ) != 0);
+-	outb_p(MDIO_ENB_IN | MDIO_SHIFT_CLK, addr);
 -    }
--    if (rx_status & 0x10) { /* Receive overrun */
--	dev->stats.rx_over_errors++;
--	PutByte(XIRCREG_CR, ClearRxOvrun);
--	pr_debug("receive overrun cleared\n");
--    }
+-    return (retval>>1) & 0xffff;
+-}
 -
--    /***** transmit section ******/
--    if (int_status & PktTxed) {
--	unsigned n, nn;
+-static void mdio_write(unsigned int addr, int phy_id, int loc, int value)
+-{
+-    u_int cmd = (0x05<<28)|(phy_id<<23)|(loc<<18)|(1<<17)|value;
+-    int i;
 -
--	n = lp->last_ptr_value;
--	nn = GetByte(XIRCREG0_PTR);
--	lp->last_ptr_value = nn;
--	if (nn < n) /* rollover */
--	    dev->stats.tx_packets += 256 - n;
--	else if (n == nn) { /* happens sometimes - don't know why */
--	    pr_debug("PTR not changed?\n");
--	} else
--	    dev->stats.tx_packets += lp->last_ptr_value - n;
--	netif_wake_queue(dev);
+-    mdio_sync(addr);
+-    for (i = 31; i >= 0; i--) {
+-	int dat = (cmd&(1<<i)) ? MDIO_DATA_WRITE1 : MDIO_DATA_WRITE0;
+-	outb_p(dat, addr);
+-	outb_p(dat | MDIO_SHIFT_CLK, addr);
 -    }
--    if (tx_status & 0x0002) {	/* Excessive collisions */
--	pr_debug("tx restarted due to excessive collisions\n");
--	PutByte(XIRCREG_CR, RestartTx);  /* restart transmitter process */
+-    for (i = 1; i >= 0; i--) {
+-	outb_p(MDIO_ENB_IN, addr);
+-	outb_p(MDIO_ENB_IN | MDIO_SHIFT_CLK, addr);
 -    }
--    if (tx_status & 0x0040)
--	dev->stats.tx_aborted_errors++;
--
--    /* recalculate our work chunk so that we limit the duration of this
--     * ISR to about 1/10 of a second.
--     * Calculate only if we received a reasonable amount of bytes.
--     */
--    if (bytes_rcvd > 1000) {
--	u_long duration = jiffies - start_ticks;
--
--	if (duration >= HZ/10) { /* if more than about 1/10 second */
--	    maxrx_bytes = (bytes_rcvd * (HZ/10)) / duration;
--	    if (maxrx_bytes < 2000)
--		maxrx_bytes = 2000;
--	    else if (maxrx_bytes > 22000)
--		maxrx_bytes = 22000;
--	    pr_debug("set maxrx=%u (rcvd=%u ticks=%lu)\n",
--		  maxrx_bytes, bytes_rcvd, duration);
--	} else if (!duration && maxrx_bytes < 22000) {
--	    /* now much faster */
--	    maxrx_bytes += 2000;
--	    if (maxrx_bytes > 22000)
--		maxrx_bytes = 22000;
--	    pr_debug("set maxrx=%u\n", maxrx_bytes);
--	}
--    }
--
--  leave:
--    if (lockup_hack) {
--	if (int_status != 0xff && (int_status = GetByte(XIRCREG_ISR)) != 0)
--	    goto loop_entry;
--    }
--    SelectPage(saved_page);
--    PutByte(XIRCREG_CR, EnableIntr);  /* re-enable interrupts */
--    /* Instead of dropping packets during a receive, we could
--     * force an interrupt with this command:
--     *	  PutByte(XIRCREG_CR, EnableIntr|ForceIntr);
--     */
--    return IRQ_HANDLED;
--} /* xirc2ps_interrupt */
+-}
 -
 -/*====================================================================*/
 -
--static void
--xirc2ps_tx_timeout_task(struct work_struct *work)
+-static int axnet_open(struct net_device *dev)
 -{
--	struct local_info *local =
--		container_of(work, struct local_info, tx_timeout_task);
--	struct net_device *dev = local->dev;
--    /* reset the card */
--    do_reset(dev,1);
--    netif_trans_update(dev); /* prevent tx timeout */
--    netif_wake_queue(dev);
--}
+-    int ret;
+-    struct axnet_dev *info = PRIV(dev);
+-    struct pcmcia_device *link = info->p_dev;
+-    unsigned int nic_base = dev->base_addr;
+-    
+-    dev_dbg(&link->dev, "axnet_open('%s')\n", dev->name);
 -
--static void
--xirc_tx_timeout(struct net_device *dev, unsigned int txqueue)
--{
--    struct local_info *lp = netdev_priv(dev);
--    dev->stats.tx_errors++;
--    netdev_notice(dev, "transmit timed out\n");
--    schedule_work(&lp->tx_timeout_task);
--}
--
--static netdev_tx_t
--do_start_xmit(struct sk_buff *skb, struct net_device *dev)
--{
--    struct local_info *lp = netdev_priv(dev);
--    unsigned int ioaddr = dev->base_addr;
--    int okay;
--    unsigned freespace;
--    unsigned pktlen = skb->len;
--
--    pr_debug("do_start_xmit(skb=%p, dev=%p) len=%u\n",
--	  skb, dev, pktlen);
--
--
--    /* adjust the packet length to min. required
--     * and hope that the buffer is large enough
--     * to provide some random data.
--     * fixme: For Mohawk we can change this by sending
--     * a larger packetlen than we actually have; the chip will
--     * pad this in his buffer with random bytes
--     */
--    if (pktlen < ETH_ZLEN)
--    {
--        if (skb_padto(skb, ETH_ZLEN))
--		return NETDEV_TX_OK;
--	pktlen = ETH_ZLEN;
--    }
--
--    netif_stop_queue(dev);
--    SelectPage(0);
--    PutWord(XIRCREG0_TRS, (u_short)pktlen+2);
--    freespace = GetWord(XIRCREG0_TSO) & 0x7fff;
--    /* TRS doesn't work - (indeed it is eliminated with sil-rev 1) */
--    okay = pktlen +2 < freespace;
--    pr_debug("%s: avail. tx space=%u%s\n",
--	  dev->name, freespace, okay ? " (okay)":" (not enough)");
--    if (!okay) { /* not enough space */
--	return NETDEV_TX_BUSY;  /* upper layer may decide to requeue this packet */
--    }
--    /* send the packet */
--    PutWord(XIRCREG_EDP, (u_short)pktlen);
--    outsw(ioaddr+XIRCREG_EDP, skb->data, pktlen>>1);
--    if (pktlen & 1)
--	PutByte(XIRCREG_EDP, skb->data[pktlen-1]);
--
--    if (lp->mohawk)
--	PutByte(XIRCREG_CR, TransmitPacket|EnableIntr);
--
--    dev_kfree_skb (skb);
--    dev->stats.tx_bytes += pktlen;
--    netif_start_queue(dev);
--    return NETDEV_TX_OK;
--}
--
--struct set_address_info {
--	int reg_nr;
--	int page_nr;
--	int mohawk;
--	unsigned int ioaddr;
--};
--
--static void set_address(struct set_address_info *sa_info, const char *addr)
--{
--	unsigned int ioaddr = sa_info->ioaddr;
--	int i;
--
--	for (i = 0; i < 6; i++) {
--		if (sa_info->reg_nr > 15) {
--			sa_info->reg_nr = 8;
--			sa_info->page_nr++;
--			SelectPage(sa_info->page_nr);
--		}
--		if (sa_info->mohawk)
--			PutByte(sa_info->reg_nr++, addr[5 - i]);
--		else
--			PutByte(sa_info->reg_nr++, addr[i]);
--	}
--}
--
--/****************
-- * Set all addresses: This first one is the individual address,
-- * the next 9 addresses are taken from the multicast list and
-- * the rest is filled with the individual address.
-- */
--static void set_addresses(struct net_device *dev)
--{
--	unsigned int ioaddr = dev->base_addr;
--	struct local_info *lp = netdev_priv(dev);
--	struct netdev_hw_addr *ha;
--	struct set_address_info sa_info;
--	int i;
--
--	/*
--	 * Setup the info structure so that by first set_address call it will do
--	 * SelectPage with the right page number. Hence these ones here.
--	 */
--	sa_info.reg_nr = 15 + 1;
--	sa_info.page_nr = 0x50 - 1;
--	sa_info.mohawk = lp->mohawk;
--	sa_info.ioaddr = ioaddr;
--
--	set_address(&sa_info, dev->dev_addr);
--	i = 0;
--	netdev_for_each_mc_addr(ha, dev) {
--		if (i++ == 9)
--			break;
--		set_address(&sa_info, ha->addr);
--	}
--	while (i++ < 9)
--		set_address(&sa_info, dev->dev_addr);
--	SelectPage(0);
--}
--
--/****************
-- * Set or clear the multicast filter for this adaptor.
-- * We can filter up to 9 addresses, if more are requested we set
-- * multicast promiscuous mode.
-- */
--
--static void
--set_multicast_list(struct net_device *dev)
--{
--    unsigned int ioaddr = dev->base_addr;
--    unsigned value;
--
--    SelectPage(0x42);
--    value = GetByte(XIRCREG42_SWC1) & 0xC0;
--
--    if (dev->flags & IFF_PROMISC) { /* snoop */
--	PutByte(XIRCREG42_SWC1, value | 0x06); /* set MPE and PME */
--    } else if (netdev_mc_count(dev) > 9 || (dev->flags & IFF_ALLMULTI)) {
--	PutByte(XIRCREG42_SWC1, value | 0x02); /* set MPE */
--    } else if (!netdev_mc_empty(dev)) {
--	/* the chip can filter 9 addresses perfectly */
--	PutByte(XIRCREG42_SWC1, value | 0x01);
--	SelectPage(0x40);
--	PutByte(XIRCREG40_CMD0, Offline);
--	set_addresses(dev);
--	SelectPage(0x40);
--	PutByte(XIRCREG40_CMD0, EnableRecv | Online);
--    } else { /* standard usage */
--	PutByte(XIRCREG42_SWC1, value | 0x00);
--    }
--    SelectPage(0);
--}
--
--static int
--do_config(struct net_device *dev, struct ifmap *map)
--{
--    struct local_info *local = netdev_priv(dev);
--
--    pr_debug("do_config(%p)\n", dev);
--    if (map->port != 255 && map->port != dev->if_port) {
--	if (map->port > 4)
--	    return -EINVAL;
--	if (!map->port) {
--	    local->probe_port = 1;
--	    WRITE_ONCE(dev->if_port, 1);
--	} else {
--	    local->probe_port = 0;
--	    WRITE_ONCE(dev->if_port, map->port);
--	}
--	netdev_info(dev, "switching to %s port\n", if_names[dev->if_port]);
--	do_reset(dev,1);  /* not the fine way :-) */
--    }
--    return 0;
--}
--
--/****************
-- * Open the driver
-- */
--static int
--do_open(struct net_device *dev)
--{
--    struct local_info *lp = netdev_priv(dev);
--    struct pcmcia_device *link = lp->p_dev;
--
--    dev_dbg(&link->dev, "do_open(%p)\n", dev);
--
--    /* Check that the PCMCIA card is still here. */
--    /* Physical device present signature. */
 -    if (!pcmcia_dev_present(link))
 -	return -ENODEV;
 -
--    /* okay */
+-    outb_p(0xFF, nic_base + EN0_ISR); /* Clear bogus intr. */
+-    ret = request_irq(dev->irq, ei_irq_wrapper, IRQF_SHARED, "axnet_cs", dev);
+-    if (ret)
+-	    return ret;
+-
 -    link->open++;
 -
--    netif_start_queue(dev);
--    do_reset(dev,1);
+-    info->link_status = 0x00;
+-    timer_setup(&info->watchdog, ei_watchdog, 0);
+-    mod_timer(&info->watchdog, jiffies + HZ);
+-
+-    return ax_open(dev);
+-} /* axnet_open */
+-
+-/*====================================================================*/
+-
+-static int axnet_close(struct net_device *dev)
+-{
+-    struct axnet_dev *info = PRIV(dev);
+-    struct pcmcia_device *link = info->p_dev;
+-
+-    dev_dbg(&link->dev, "axnet_close('%s')\n", dev->name);
+-
+-    ax_close(dev);
+-    free_irq(dev->irq, dev);
+-    
+-    link->open--;
+-    netif_stop_queue(dev);
+-    timer_delete_sync(&info->watchdog);
 -
 -    return 0;
--}
+-} /* axnet_close */
 -
--static void netdev_get_drvinfo(struct net_device *dev,
--			       struct ethtool_drvinfo *info)
+-/*======================================================================
+-
+-    Hard reset the card.  This used to pause for the same period that
+-    a 8390 reset command required, but that shouldn't be necessary.
+-
+-======================================================================*/
+-
+-static void axnet_reset_8390(struct net_device *dev)
 -{
--	strscpy(info->driver, "xirc2ps_cs", sizeof(info->driver));
--	snprintf(info->bus_info, sizeof(info->bus_info), "PCMCIA 0x%lx",
--		 dev->base_addr);
--}
--
--static const struct ethtool_ops netdev_ethtool_ops = {
--	.get_drvinfo		= netdev_get_drvinfo,
--};
--
--static int
--do_ioctl(struct net_device *dev, struct ifreq *rq, int cmd)
--{
--    struct local_info *local = netdev_priv(dev);
--    unsigned int ioaddr = dev->base_addr;
--    struct mii_ioctl_data *data = if_mii(rq);
--
--    pr_debug("%s: ioctl(%-.6s, %#04x) %04x %04x %04x %04x\n",
--	  dev->name, rq->ifr_ifrn.ifrn_name, cmd,
--	  data->phy_id, data->reg_num, data->val_in, data->val_out);
--
--    if (!local->mohawk)
--	return -EOPNOTSUPP;
--
--    switch(cmd) {
--      case SIOCGMIIPHY:		/* Get the address of the PHY in use. */
--	data->phy_id = 0;	/* we have only this address */
--	fallthrough;
--      case SIOCGMIIREG:		/* Read the specified MII register. */
--	data->val_out = mii_rd(ioaddr, data->phy_id & 0x1f,
--			       data->reg_num & 0x1f);
--	break;
--      case SIOCSMIIREG:		/* Write the specified MII register */
--	mii_wr(ioaddr, data->phy_id & 0x1f, data->reg_num & 0x1f, data->val_in,
--	       16);
--	break;
--      default:
--	return -EOPNOTSUPP;
--    }
--    return 0;
--}
--
--static void
--hardreset(struct net_device *dev)
--{
--    struct local_info *local = netdev_priv(dev);
--    unsigned int ioaddr = dev->base_addr;
--
--    SelectPage(4);
--    udelay(1);
--    PutByte(XIRCREG4_GPR1, 0);	     /* clear bit 0: power down */
--    msleep(40);				     /* wait 40 msec */
--    if (local->mohawk)
--	PutByte(XIRCREG4_GPR1, 1);	 /* set bit 0: power up */
--    else
--	PutByte(XIRCREG4_GPR1, 1 | 4);	 /* set bit 0: power up, bit 2: AIC */
--    msleep(20);			     /* wait 20 msec */
--}
--
--static void
--do_reset(struct net_device *dev, int full)
--{
--    struct local_info *local = netdev_priv(dev);
--    unsigned int ioaddr = dev->base_addr;
--    unsigned value;
--
--    pr_debug("%s: do_reset(%p,%d)\n", dev->name, dev, full);
--
--    hardreset(dev);
--    PutByte(XIRCREG_CR, SoftReset); /* set */
--    msleep(20);			     /* wait 20 msec */
--    PutByte(XIRCREG_CR, 0);	     /* clear */
--    msleep(40);			     /* wait 40 msec */
--    if (local->mohawk) {
--	SelectPage(4);
--	/* set pin GP1 and GP2 to output  (0x0c)
--	 * set GP1 to low to power up the ML6692 (0x00)
--	 * set GP2 to high to power up the 10Mhz chip  (0x02)
--	 */
--	PutByte(XIRCREG4_GPR0, 0x0e);
--    }
--
--    /* give the circuits some time to power up */
--    msleep(500);			/* about 500ms */
--
--    local->last_ptr_value = 0;
--    local->silicon = local->mohawk ? (GetByte(XIRCREG4_BOV) & 0x70) >> 4
--				   : (GetByte(XIRCREG4_BOV) & 0x30) >> 4;
--
--    if (local->probe_port) {
--	if (!local->mohawk) {
--	    SelectPage(4);
--	    PutByte(XIRCREG4_GPR0, 4);
--	    local->probe_port = 0;
--	}
--    } else if (dev->if_port == 2) { /* enable 10Base2 */
--	SelectPage(0x42);
--	PutByte(XIRCREG42_SWC1, 0xC0);
--    } else { /* enable 10BaseT */
--	SelectPage(0x42);
--	PutByte(XIRCREG42_SWC1, 0x80);
--    }
--    msleep(40);			     /* wait 40 msec to let it complete */
--
--  #if 0
--    {
--	SelectPage(0);
--	value = GetByte(XIRCREG_ESR);	 /* read the ESR */
--	pr_debug("%s: ESR is: %#02x\n", dev->name, value);
--    }
--  #endif
--
--    /* setup the ECR */
--    SelectPage(1);
--    PutByte(XIRCREG1_IMR0, 0xff); /* allow all ints */
--    PutByte(XIRCREG1_IMR1, 1	); /* and Set TxUnderrunDetect */
--    value = GetByte(XIRCREG1_ECR);
--  #if 0
--    if (local->mohawk)
--	value |= DisableLinkPulse;
--    PutByte(XIRCREG1_ECR, value);
--  #endif
--    pr_debug("%s: ECR is: %#02x\n", dev->name, value);
--
--    SelectPage(0x42);
--    PutByte(XIRCREG42_SWC0, 0x20); /* disable source insertion */
--
--    if (local->silicon != 1) {
--	/* set the local memory dividing line.
--	 * The comments in the sample code say that this is only
--	 * settable with the scipper version 2 which is revision 0.
--	 * Always for CE3 cards
--	 */
--	SelectPage(2);
--	PutWord(XIRCREG2_RBS, 0x2000);
--    }
--
--    if (full)
--	set_addresses(dev);
--
--    /* Hardware workaround:
--     * The receive byte pointer after reset is off by 1 so we need
--     * to move the offset pointer back to 0.
--     */
--    SelectPage(0);
--    PutWord(XIRCREG0_DO, 0x2000); /* change offset command, off=0 */
--
--    /* setup MAC IMRs and clear status registers */
--    SelectPage(0x40);		     /* Bit 7 ... bit 0 */
--    PutByte(XIRCREG40_RMASK0, 0xff); /* ROK, RAB, rsv, RO, CRC, AE, PTL, MP */
--    PutByte(XIRCREG40_TMASK0, 0xff); /* TOK, TAB, SQE, LL, TU, JAB, EXC, CRS */
--    PutByte(XIRCREG40_TMASK1, 0xb0); /* rsv, rsv, PTD, EXT, rsv,rsv,rsv, rsv*/
--    PutByte(XIRCREG40_RXST0,  0x00); /* ROK, RAB, REN, RO, CRC, AE, PTL, MP */
--    PutByte(XIRCREG40_TXST0,  0x00); /* TOK, TAB, SQE, LL, TU, JAB, EXC, CRS */
--    PutByte(XIRCREG40_TXST1,  0x00); /* TEN, rsv, PTD, EXT, retry_counter:4  */
--
--    if (full && local->mohawk && init_mii(dev)) {
--	if (dev->if_port == 4 || local->dingo || local->new_mii) {
--	    netdev_info(dev, "MII selected\n");
--	    SelectPage(2);
--	    PutByte(XIRCREG2_MSR, GetByte(XIRCREG2_MSR) | 0x08);
--	    msleep(20);
--	} else {
--	    netdev_info(dev, "MII detected; using 10mbs\n");
--	    SelectPage(0x42);
--	    if (dev->if_port == 2) /* enable 10Base2 */
--		PutByte(XIRCREG42_SWC1, 0xC0);
--	    else  /* enable 10BaseT */
--		PutByte(XIRCREG42_SWC1, 0x80);
--	    msleep(40);			/* wait 40 msec to let it complete */
--	}
--	if (full_duplex)
--	    PutByte(XIRCREG1_ECR, GetByte(XIRCREG1_ECR) | FullDuplex);
--    } else {  /* No MII */
--	SelectPage(0);
--	value = GetByte(XIRCREG_ESR);	 /* read the ESR */
--	dev->if_port = (value & MediaSelect) ? 1 : 2;
--    }
--
--    /* configure the LEDs */
--    SelectPage(2);
--    if (dev->if_port == 1 || dev->if_port == 4) /* TP: Link and Activity */
--	PutByte(XIRCREG2_LED, 0x3b);
--    else			      /* Coax: Not-Collision and Activity */
--	PutByte(XIRCREG2_LED, 0x3a);
--
--    if (local->dingo)
--	PutByte(0x0b, 0x04); /* 100 Mbit LED */
--
--    /* enable receiver and put the mac online */
--    if (full) {
--	set_multicast_list(dev);
--	SelectPage(0x40);
--	PutByte(XIRCREG40_CMD0, EnableRecv | Online);
--    }
--
--    /* setup Ethernet IMR and enable interrupts */
--    SelectPage(1);
--    PutByte(XIRCREG1_IMR0, 0xff);
--    udelay(1);
--    SelectPage(0);
--    PutByte(XIRCREG_CR, EnableIntr);
--    if (local->modem && !local->dingo) { /* do some magic */
--	if (!(GetByte(0x10) & 0x01))
--	    PutByte(0x10, 0x11); /* unmask master-int bit */
--    }
--
--    if (full)
--	netdev_info(dev, "media %s, silicon revision %d\n",
--		    if_names[dev->if_port], local->silicon);
--    /* We should switch back to page 0 to avoid a bug in revision 0
--     * where regs with offset below 8 can't be read after an access
--     * to the MAC registers */
--    SelectPage(0);
--}
--
--/****************
-- * Initialize the Media-Independent-Interface
-- * Returns: True if we have a good MII
-- */
--static int
--init_mii(struct net_device *dev)
--{
--    struct local_info *local = netdev_priv(dev);
--    unsigned int ioaddr = dev->base_addr;
--    unsigned control, status, linkpartner;
+-    unsigned int nic_base = dev->base_addr;
 -    int i;
 -
--    if (if_port == 4 || if_port == 1) { /* force 100BaseT or 10BaseT */
--	dev->if_port = if_port;
--	local->probe_port = 0;
--	return 1;
+-    ei_status.txing = ei_status.dmaing = 0;
+-
+-    outb_p(E8390_NODMA+E8390_PAGE0+E8390_STOP, nic_base + E8390_CMD);
+-
+-    outb(inb(nic_base + AXNET_RESET), nic_base + AXNET_RESET);
+-
+-    for (i = 0; i < 100; i++) {
+-	if ((inb_p(nic_base+EN0_ISR) & ENISR_RESET) != 0)
+-	    break;
+-	udelay(100);
+-    }
+-    outb_p(ENISR_RESET, nic_base + EN0_ISR); /* Ack intr. */
+-    
+-    if (i == 100)
+-	netdev_err(dev, "axnet_reset_8390() did not complete\n");
+-    
+-} /* axnet_reset_8390 */
+-
+-/*====================================================================*/
+-
+-static irqreturn_t ei_irq_wrapper(int irq, void *dev_id)
+-{
+-    struct net_device *dev = dev_id;
+-    PRIV(dev)->stale = 0;
+-    return ax_interrupt(irq, dev_id);
+-}
+-
+-static void ei_watchdog(struct timer_list *t)
+-{
+-    struct axnet_dev *info = timer_container_of(info, t, watchdog);
+-    struct net_device *dev = info->p_dev->priv;
+-    unsigned int nic_base = dev->base_addr;
+-    unsigned int mii_addr = nic_base + AXNET_MII_EEP;
+-    u_short link;
+-
+-    if (!netif_device_present(dev)) goto reschedule;
+-
+-    /* Check for pending interrupt with expired latency timer: with
+-       this, we can limp along even if the interrupt is blocked */
+-    if (info->stale++ && (inb_p(nic_base + EN0_ISR) & ENISR_ALL)) {
+-	if (!info->fast_poll)
+-	    netdev_info(dev, "interrupt(s) dropped!\n");
+-	ei_irq_wrapper(dev->irq, dev);
+-	info->fast_poll = HZ;
+-    }
+-    if (info->fast_poll) {
+-	info->fast_poll--;
+-	info->watchdog.expires = jiffies + 1;
+-	add_timer(&info->watchdog);
+-	return;
 -    }
 -
--    status = mii_rd(ioaddr,  0, 1);
--    if ((status & 0xff00) != 0x7800)
--	return 0; /* No MII */
+-    if (info->phy_id < 0)
+-	goto reschedule;
+-    link = mdio_read(mii_addr, info->phy_id, 1);
+-    if (!link || (link == 0xffff)) {
+-	netdev_info(dev, "MII is missing!\n");
+-	info->phy_id = -1;
+-	goto reschedule;
+-    }
 -
--    local->new_mii = (mii_rd(ioaddr, 0, 2) != 0xffff);
--    
--    if (local->probe_port)
--	control = 0x1000; /* auto neg */
--    else if (dev->if_port == 4)
--	control = 0x2000; /* no auto neg, 100mbs mode */
--    else
--	control = 0x0000; /* no auto neg, 10mbs mode */
--    mii_wr(ioaddr,  0, 0, control, 16);
--    udelay(100);
--    control = mii_rd(ioaddr, 0, 0);
+-    link &= 0x0004;
+-    if (link != info->link_status) {
+-	u_short p = mdio_read(mii_addr, info->phy_id, 5);
+-	netdev_info(dev, "%s link beat\n", link ? "found" : "lost");
+-	if (link) {
+-	    info->duplex_flag = (p & 0x0140) ? 0x80 : 0x00;
+-	    if (p)
+-		netdev_info(dev, "autonegotiation complete: %dbaseT-%cD selected\n",
+-			    (p & 0x0180) ? 100 : 10, (p & 0x0140) ? 'F' : 'H');
+-	    else
+-		netdev_info(dev, "link partner did not autonegotiate\n");
+-	    AX88190_init(dev, 1);
+-	}
+-	info->link_status = link;
+-    }
 -
--    if (control & 0x0400) {
--	netdev_notice(dev, "can't take PHY out of isolation mode\n");
--	local->probe_port = 0;
+-reschedule:
+-    info->watchdog.expires = jiffies + HZ;
+-    add_timer(&info->watchdog);
+-}
+-
+-/*====================================================================*/
+-
+-static int axnet_ioctl(struct net_device *dev, struct ifreq *rq, int cmd)
+-{
+-    struct axnet_dev *info = PRIV(dev);
+-    struct mii_ioctl_data *data = if_mii(rq);
+-    unsigned int mii_addr = dev->base_addr + AXNET_MII_EEP;
+-    switch (cmd) {
+-    case SIOCGMIIPHY:
+-	data->phy_id = info->phy_id;
+-	fallthrough;
+-    case SIOCGMIIREG:		/* Read MII PHY register. */
+-	data->val_out = mdio_read(mii_addr, data->phy_id, data->reg_num & 0x1f);
+-	return 0;
+-    case SIOCSMIIREG:		/* Write MII PHY register. */
+-	mdio_write(mii_addr, data->phy_id, data->reg_num & 0x1f, data->val_in);
 -	return 0;
 -    }
+-    return -EOPNOTSUPP;
+-}
 -
--    if (local->probe_port) {
--	/* according to the DP83840A specs the auto negotiation process
--	 * may take up to 3.5 sec, so we use this also for our ML6692
--	 * Fixme: Better to use a timer here!
--	 */
--	for (i=0; i < 35; i++) {
--	    msleep(100);	 /* wait 100 msec */
--	    status = mii_rd(ioaddr,  0, 1);
--	    if ((status & 0x0020) && (status & 0x0004))
--		break;
--	}
+-/*====================================================================*/
 -
--	if (!(status & 0x0020)) {
--	    netdev_info(dev, "autonegotiation failed; using 10mbs\n");
--	    if (!local->new_mii) {
--		control = 0x0000;
--		mii_wr(ioaddr,  0, 0, control, 16);
--		udelay(100);
--		SelectPage(0);
--		dev->if_port = (GetByte(XIRCREG_ESR) & MediaSelect) ? 1 : 2;
--	    }
--	} else {
--	    linkpartner = mii_rd(ioaddr, 0, 5);
--	    netdev_info(dev, "MII link partner: %04x\n", linkpartner);
--	    if (linkpartner & 0x0080) {
--		dev->if_port = 4;
--	    } else
--		dev->if_port = 1;
--	}
+-static void get_8390_hdr(struct net_device *dev,
+-			 struct e8390_pkt_hdr *hdr,
+-			 int ring_page)
+-{
+-    unsigned int nic_base = dev->base_addr;
+-
+-    outb_p(0, nic_base + EN0_RSARLO);		/* On page boundary */
+-    outb_p(ring_page, nic_base + EN0_RSARHI);
+-    outb_p(E8390_RREAD+E8390_START, nic_base + AXNET_CMD);
+-
+-    insw(nic_base + AXNET_DATAPORT, hdr,
+-	    sizeof(struct e8390_pkt_hdr)>>1);
+-    /* Fix for big endian systems */
+-    hdr->count = le16_to_cpu(hdr->count);
+-
+-}
+-
+-/*====================================================================*/
+-
+-static void block_input(struct net_device *dev, int count,
+-			struct sk_buff *skb, int ring_offset)
+-{
+-    unsigned int nic_base = dev->base_addr;
+-    struct ei_device *ei_local = netdev_priv(dev);
+-    char *buf = skb->data;
+-
+-    if ((netif_msg_rx_status(ei_local)) && (count != 4))
+-	netdev_dbg(dev, "[bi=%d]\n", count+4);
+-    outb_p(ring_offset & 0xff, nic_base + EN0_RSARLO);
+-    outb_p(ring_offset >> 8, nic_base + EN0_RSARHI);
+-    outb_p(E8390_RREAD+E8390_START, nic_base + AXNET_CMD);
+-
+-    insw(nic_base + AXNET_DATAPORT,buf,count>>1);
+-    if (count & 0x01) {
+-	buf[count-1] = inb(nic_base + AXNET_DATAPORT);
 -    }
--
--    return 1;
 -}
 -
--static void
--do_powerdown(struct net_device *dev)
+-/*====================================================================*/
+-
+-static void block_output(struct net_device *dev, int count,
+-			 const u_char *buf, const int start_page)
 -{
+-    unsigned int nic_base = dev->base_addr;
 -
--    unsigned int ioaddr = dev->base_addr;
+-    pr_debug("%s: [bo=%d]\n", dev->name, count);
 -
--    pr_debug("do_powerdown(%p)\n", dev);
+-    /* Round the count up for word writes.  Do we need to do this?
+-       What effect will an odd byte count have on the 8390?
+-       I should check someday. */
+-    if (count & 0x01)
+-	count++;
 -
--    SelectPage(4);
--    PutByte(XIRCREG4_GPR1, 0);	     /* clear bit 0: power down */
--    SelectPage(0);
+-    outb_p(0x00, nic_base + EN0_RSARLO);
+-    outb_p(start_page, nic_base + EN0_RSARHI);
+-    outb_p(E8390_RWRITE+E8390_START, nic_base + AXNET_CMD);
+-    outsw(nic_base + AXNET_DATAPORT, buf, count>>1);
 -}
 -
--static int
--do_stop(struct net_device *dev)
--{
--    unsigned int ioaddr = dev->base_addr;
--    struct local_info *lp = netdev_priv(dev);
--    struct pcmcia_device *link = lp->p_dev;
--
--    dev_dbg(&link->dev, "do_stop(%p)\n", dev);
--
--    if (!link)
--	return -ENODEV;
--
--    netif_stop_queue(dev);
--
--    SelectPage(0);
--    PutByte(XIRCREG_CR, 0);  /* disable interrupts */
--    SelectPage(0x01);
--    PutByte(XIRCREG1_IMR0, 0x00); /* forbid all ints */
--    SelectPage(4);
--    PutByte(XIRCREG4_GPR1, 0);	/* clear bit 0: power down */
--    SelectPage(0);
--
--    link->open--;
--    return 0;
--}
--
--static const struct pcmcia_device_id xirc2ps_ids[] = {
--	PCMCIA_PFC_DEVICE_MANF_CARD(0, 0x0089, 0x110a),
--	PCMCIA_PFC_DEVICE_MANF_CARD(0, 0x0138, 0x110a),
--	PCMCIA_PFC_DEVICE_PROD_ID13(0, "Xircom", "CEM28", 0x2e3ee845, 0x0ea978ea),
--	PCMCIA_PFC_DEVICE_PROD_ID13(0, "Xircom", "CEM33", 0x2e3ee845, 0x80609023),
--	PCMCIA_PFC_DEVICE_PROD_ID13(0, "Xircom", "CEM56", 0x2e3ee845, 0xa650c32a),
--	PCMCIA_PFC_DEVICE_PROD_ID13(0, "Xircom", "REM10", 0x2e3ee845, 0x76df1d29),
--	PCMCIA_PFC_DEVICE_PROD_ID13(0, "Xircom", "XEM5600", 0x2e3ee845, 0xf1403719),
--	PCMCIA_PFC_DEVICE_PROD_ID12(0, "Xircom", "CreditCard Ethernet+Modem II", 0x2e3ee845, 0xeca401bf),
--	PCMCIA_DEVICE_MANF_CARD(0x01bf, 0x010a),
--	PCMCIA_DEVICE_PROD_ID13("Toshiba Information Systems", "TPCENET", 0x1b3b94fe, 0xf381c1a2),
--	PCMCIA_DEVICE_PROD_ID13("Xircom", "CE3-10/100", 0x2e3ee845, 0x0ec0ac37),
--	PCMCIA_DEVICE_PROD_ID13("Xircom", "PS-CE2-10", 0x2e3ee845, 0x947d9073),
--	PCMCIA_DEVICE_PROD_ID13("Xircom", "R2E-100BTX", 0x2e3ee845, 0x2464a6e3),
--	PCMCIA_DEVICE_PROD_ID13("Xircom", "RE-10", 0x2e3ee845, 0x3e08d609),
--	PCMCIA_DEVICE_PROD_ID13("Xircom", "XE2000", 0x2e3ee845, 0xf7188e46),
--	PCMCIA_DEVICE_PROD_ID12("Compaq", "Ethernet LAN Card", 0x54f7c49c, 0x9fd2f0a2),
--	PCMCIA_DEVICE_PROD_ID12("Compaq", "Netelligent 10/100 PC Card", 0x54f7c49c, 0xefe96769),
--	PCMCIA_DEVICE_PROD_ID12("Intel", "EtherExpress(TM) PRO/100 PC Card Mobile Adapter16", 0x816cc815, 0x174397db),
--	PCMCIA_DEVICE_PROD_ID12("Toshiba", "10/100 Ethernet PC Card", 0x44a09d9c, 0xb44deecf),
--	/* also matches CFE-10 cards! */
--	/* PCMCIA_DEVICE_MANF_CARD(0x0105, 0x010a), */
+-static const struct pcmcia_device_id axnet_ids[] = {
+-	PCMCIA_PFC_DEVICE_MANF_CARD(0, 0x016c, 0x0081),
+-	PCMCIA_DEVICE_MANF_CARD(0x018a, 0x0301),
+-	PCMCIA_DEVICE_MANF_CARD(0x01bf, 0x2328),
+-	PCMCIA_DEVICE_MANF_CARD(0x026f, 0x0301),
+-	PCMCIA_DEVICE_MANF_CARD(0x026f, 0x0303),
+-	PCMCIA_DEVICE_MANF_CARD(0x026f, 0x0309),
+-	PCMCIA_DEVICE_MANF_CARD(0x0274, 0x1106),
+-	PCMCIA_DEVICE_MANF_CARD(0x8a01, 0xc1ab),
+-	PCMCIA_DEVICE_MANF_CARD(0x021b, 0x0202), 
+-	PCMCIA_DEVICE_MANF_CARD(0xffff, 0x1090),
+-	PCMCIA_DEVICE_PROD_ID12("AmbiCom,Inc.", "Fast Ethernet PC Card(AMB8110)", 0x49b020a7, 0x119cc9fc),
+-	PCMCIA_DEVICE_PROD_ID124("Fast Ethernet", "16-bit PC Card", "AX88190", 0xb4be14e3, 0x9a12eb6a, 0xab9be5ef),
+-	PCMCIA_DEVICE_PROD_ID12("ASIX", "AX88190", 0x0959823b, 0xab9be5ef),
+-	PCMCIA_DEVICE_PROD_ID12("Billionton", "LNA-100B", 0x552ab682, 0xbc3b87e1),
+-	PCMCIA_DEVICE_PROD_ID12("CHEETAH ETHERCARD", "EN2228", 0x00fa7bc8, 0x00e990cc),
+-	PCMCIA_DEVICE_PROD_ID12("CNet", "CNF301", 0xbc477dde, 0x78c5f40b),
+-	PCMCIA_DEVICE_PROD_ID12("corega K.K.", "corega FEther PCC-TXD", 0x5261440f, 0x436768c5),
+-	PCMCIA_DEVICE_PROD_ID12("corega K.K.", "corega FEtherII PCC-TXD", 0x5261440f, 0x730df72e),
+-	PCMCIA_DEVICE_PROD_ID12("corega K.K.", "corega FEther PCC-TXM", 0x5261440f, 0x3abbd061),
+-	PCMCIA_DEVICE_PROD_ID12("Dynalink", "L100C16", 0x55632fd5, 0x66bc2a90),
+-	PCMCIA_DEVICE_PROD_ID12("IO DATA", "ETXPCM", 0x547e66dc, 0x233adac2),
+-	PCMCIA_DEVICE_PROD_ID12("Linksys", "EtherFast 10/100 PC Card (PCMPC100 V3)", 0x0733cc81, 0x232019a8),
+-	PCMCIA_DEVICE_PROD_ID12("MELCO", "LPC3-TX", 0x481e0094, 0xf91af609),
+-	PCMCIA_DEVICE_PROD_ID12("NETGEAR", "FA411", 0x9aa79dc3, 0x40fad875),
+-	PCMCIA_DEVICE_PROD_ID12("PCMCIA", "100BASE", 0x281f1c5d, 0x7c2add04),
+-	PCMCIA_DEVICE_PROD_ID12("PCMCIA", "FastEtherCard", 0x281f1c5d, 0x7ef26116),
+-	PCMCIA_DEVICE_PROD_ID12("PCMCIA", "FEP501", 0x281f1c5d, 0x2e272058),
+-	PCMCIA_DEVICE_PROD_ID14("Network Everywhere", "AX88190", 0x820a67b6,  0xab9be5ef),
 -	PCMCIA_DEVICE_NULL,
 -};
--MODULE_DEVICE_TABLE(pcmcia, xirc2ps_ids);
+-MODULE_DEVICE_TABLE(pcmcia, axnet_ids);
 -
--
--static struct pcmcia_driver xirc2ps_cs_driver = {
+-static struct pcmcia_driver axnet_cs_driver = {
 -	.owner		= THIS_MODULE,
--	.name		= "xirc2ps_cs",
--	.probe		= xirc2ps_probe,
--	.remove		= xirc2ps_detach,
--	.id_table       = xirc2ps_ids,
--	.suspend	= xirc2ps_suspend,
--	.resume		= xirc2ps_resume,
+-	.name		= "axnet_cs",
+-	.probe		= axnet_probe,
+-	.remove		= axnet_detach,
+-	.id_table       = axnet_ids,
+-	.suspend	= axnet_suspend,
+-	.resume		= axnet_resume,
 -};
--module_pcmcia_driver(xirc2ps_cs_driver);
+-module_pcmcia_driver(axnet_cs_driver);
 -
--#ifndef MODULE
--static int __init setup_xirc2ps_cs(char *str)
+-/*====================================================================*/
+-
+-/* 8390.c: A general NS8390 ethernet driver core for linux. */
+-/*
+-	Written 1992-94 by Donald Becker.
+-  
+-	Copyright 1993 United States Government as represented by the
+-	Director, National Security Agency.
+-
+-	This software may be used and distributed according to the terms
+-	of the GNU General Public License, incorporated herein by reference.
+-
+-	The author may be reached as becker@scyld.com, or C/O
+-	Scyld Computing Corporation
+-	410 Severn Ave., Suite 210
+-	Annapolis MD 21403
+-
+-  This is the chip-specific code for many 8390-based ethernet adaptors.
+-  This is not a complete driver, it must be combined with board-specific
+-  code such as ne.c, wd.c, 3c503.c, etc.
+-
+-  Seeing how at least eight drivers use this code, (not counting the
+-  PCMCIA ones either) it is easy to break some card by what seems like
+-  a simple innocent change. Please contact me or Donald if you think
+-  you have found something that needs changing. -- PG
+-
+-  Changelog:
+-
+-  Paul Gortmaker	: remove set_bit lock, other cleanups.
+-  Paul Gortmaker	: add ei_get_8390_hdr() so we can pass skb's to 
+-			  ei_block_input() for eth_io_copy_and_sum().
+-  Paul Gortmaker	: exchange static int ei_pingpong for a #define,
+-			  also add better Tx error handling.
+-  Paul Gortmaker	: rewrite Rx overrun handling as per NS specs.
+-  Alexey Kuznetsov	: use the 8390's six bit hash multicast filter.
+-  Paul Gortmaker	: tweak ANK's above multicast changes a bit.
+-  Paul Gortmaker	: update packet statistics for v2.1.x
+-  Alan Cox		: support arbitrary stupid port mappings on the
+-			  68K Macintosh. Support >16bit I/O spaces
+-  Paul Gortmaker	: add kmod support for auto-loading of the 8390
+-			  module by all drivers that require it.
+-  Alan Cox		: Spinlocking work, added 'BUG_83C690'
+-  Paul Gortmaker	: Separate out Tx timeout code from Tx path.
+-
+-  Sources:
+-  The National Semiconductor LAN Databook, and the 3Com 3c503 databook.
+-
+-  */
+-
+-#include <linux/bitops.h>
+-#include <asm/irq.h>
+-#include <linux/fcntl.h>
+-#include <linux/in.h>
+-#include <linux/interrupt.h>
+-
+-#define BUG_83C690
+-
+-/* These are the operational function interfaces to board-specific
+-   routines.
+-	void reset_8390(struct net_device *dev)
+-		Resets the board associated with DEV, including a hardware reset of
+-		the 8390.  This is only called when there is a transmit timeout, and
+-		it is always followed by 8390_init().
+-	void block_output(struct net_device *dev, int count, const unsigned char *buf,
+-					  int start_page)
+-		Write the COUNT bytes of BUF to the packet buffer at START_PAGE.  The
+-		"page" value uses the 8390's 256-byte pages.
+-	void get_8390_hdr(struct net_device *dev, struct e8390_hdr *hdr, int ring_page)
+-		Read the 4 byte, page aligned 8390 header. *If* there is a
+-		subsequent read, it will be of the rest of the packet.
+-	void block_input(struct net_device *dev, int count, struct sk_buff *skb, int ring_offset)
+-		Read COUNT bytes from the packet buffer into the skb data area. Start 
+-		reading from RING_OFFSET, the address as the 8390 sees it.  This will always
+-		follow the read of the 8390 header. 
+-*/
+-#define ei_reset_8390 (ei_local->reset_8390)
+-#define ei_block_output (ei_local->block_output)
+-#define ei_block_input (ei_local->block_input)
+-#define ei_get_8390_hdr (ei_local->get_8390_hdr)
+-
+-/* Index to functions. */
+-static void ei_tx_intr(struct net_device *dev);
+-static void ei_tx_err(struct net_device *dev);
+-static void ei_receive(struct net_device *dev);
+-static void ei_rx_overrun(struct net_device *dev);
+-
+-/* Routines generic to NS8390-based boards. */
+-static void NS8390_trigger_send(struct net_device *dev, unsigned int length,
+-								int start_page);
+-static void do_set_multicast_list(struct net_device *dev);
+-
+-/*
+- *	SMP and the 8390 setup.
+- *
+- *	The 8390 isn't exactly designed to be multithreaded on RX/TX. There is
+- *	a page register that controls bank and packet buffer access. We guard
+- *	this with ei_local->page_lock. Nobody should assume or set the page other
+- *	than zero when the lock is not held. Lock holders must restore page 0
+- *	before unlocking. Even pure readers must take the lock to protect in 
+- *	page 0.
+- *
+- *	To make life difficult the chip can also be very slow. We therefore can't
+- *	just use spinlocks. For the longer lockups we disable the irq the device
+- *	sits on and hold the lock. We must hold the lock because there is a dual
+- *	processor case other than interrupts (get stats/set multicast list in
+- *	parallel with each other and transmit).
+- *
+- *	Note: in theory we can just disable the irq on the card _but_ there is
+- *	a latency on SMP irq delivery. So we can easily go "disable irq" "sync irqs"
+- *	enter lock, take the queued irq. So we waddle instead of flying.
+- *
+- *	Finally by special arrangement for the purpose of being generally 
+- *	annoying the transmit function is called bh atomic. That places
+- *	restrictions on the user context callers as disable_irq won't save
+- *	them.
+- */
+- 
+-/**
+- * ax_open - Open/initialize the board.
+- * @dev: network device to initialize
+- *
+- * This routine goes all-out, setting everything
+- * up anew at each open, even though many of these registers should only
+- * need to be set once at boot.
+- */
+-static int ax_open(struct net_device *dev)
 -{
--	/* if_port, full_duplex, do_sound, lockup_hack
+-	unsigned long flags;
+-	struct ei_device *ei_local = netdev_priv(dev);
+-
+-	/*
+-	 *	Grab the page lock so we own the register set, then call
+-	 *	the init function.
 -	 */
--	int ints[10] = { -1 };
--
--	str = get_options(str, ARRAY_SIZE(ints), ints);
--
--#define MAYBE_SET(X,Y) if (ints[0] >= Y && ints[Y] != -1) { X = ints[Y]; }
--	MAYBE_SET(if_port, 3);
--	MAYBE_SET(full_duplex, 4);
--	MAYBE_SET(do_sound, 5);
--	MAYBE_SET(lockup_hack, 6);
--#undef  MAYBE_SET
--
--	return 1;
+-      
+-      	spin_lock_irqsave(&ei_local->page_lock, flags);
+-	AX88190_init(dev, 1);
+-	/* Set the flag before we drop the lock, That way the IRQ arrives
+-	   after its set and we get no silly warnings */
+-	netif_start_queue(dev);
+-      	spin_unlock_irqrestore(&ei_local->page_lock, flags);
+-	ei_local->irqlock = 0;
+-	return 0;
 -}
 -
--__setup("xirc2ps_cs=", setup_xirc2ps_cs);
+-#define dev_lock(dev) (((struct ei_device *)netdev_priv(dev))->page_lock)
+-
+-/**
+- * ax_close - shut down network device
+- * @dev: network device to close
+- *
+- * Opposite of ax_open(). Only used when "ifconfig <devname> down" is done.
+- */
+-static int ax_close(struct net_device *dev)
+-{
+-	unsigned long flags;
+-
+-	/*
+-	 *      Hold the page lock during close
+-	 */
+-
+-	spin_lock_irqsave(&dev_lock(dev), flags);
+-	AX88190_init(dev, 0);
+-	spin_unlock_irqrestore(&dev_lock(dev), flags);
+-	netif_stop_queue(dev);
+-	return 0;
+-}
+-
+-/**
+- * axnet_tx_timeout - handle transmit time out condition
+- * @dev: network device which has apparently fallen asleep
+- * @txqueue: unused
+- *
+- * Called by kernel when device never acknowledges a transmit has
+- * completed (or failed) - i.e. never posted a Tx related interrupt.
+- */
+-
+-static void axnet_tx_timeout(struct net_device *dev, unsigned int txqueue)
+-{
+-	long e8390_base = dev->base_addr;
+-	struct ei_device *ei_local = netdev_priv(dev);
+-	int txsr, isr, tickssofar = jiffies - dev_trans_start(dev);
+-	unsigned long flags;
+-
+-	dev->stats.tx_errors++;
+-
+-	spin_lock_irqsave(&ei_local->page_lock, flags);
+-	txsr = inb(e8390_base+EN0_TSR);
+-	isr = inb(e8390_base+EN0_ISR);
+-	spin_unlock_irqrestore(&ei_local->page_lock, flags);
+-
+-	netdev_dbg(dev, "Tx timed out, %s TSR=%#2x, ISR=%#2x, t=%d.\n",
+-		   (txsr & ENTSR_ABT) ? "excess collisions." :
+-		   (isr) ? "lost interrupt?" : "cable problem?",
+-		   txsr, isr, tickssofar);
+-
+-	if (!isr && !dev->stats.tx_packets) 
+-	{
+-		/* The 8390 probably hasn't gotten on the cable yet. */
+-		ei_local->interface_num ^= 1;   /* Try a different xcvr.  */
+-	}
+-
+-	/* Ugly but a reset can be slow, yet must be protected */
+-		
+-	spin_lock_irqsave(&ei_local->page_lock, flags);
+-		
+-	/* Try to restart the card.  Perhaps the user has fixed something. */
+-	ei_reset_8390(dev);
+-	AX88190_init(dev, 1);
+-		
+-	spin_unlock_irqrestore(&ei_local->page_lock, flags);
+-	netif_wake_queue(dev);
+-}
+-    
+-/**
+- * axnet_start_xmit - begin packet transmission
+- * @skb: packet to be sent
+- * @dev: network device to which packet is sent
+- *
+- * Sends a packet to an 8390 network device.
+- */
+- 
+-static netdev_tx_t axnet_start_xmit(struct sk_buff *skb,
+-					  struct net_device *dev)
+-{
+-	long e8390_base = dev->base_addr;
+-	struct ei_device *ei_local = netdev_priv(dev);
+-	int length, send_length, output_page;
+-	unsigned long flags;
+-	u8 packet[ETH_ZLEN];
+-	
+-	netif_stop_queue(dev);
+-
+-	length = skb->len;
+-
+-	/* Mask interrupts from the ethercard. 
+-	   SMP: We have to grab the lock here otherwise the IRQ handler
+-	   on another CPU can flip window and race the IRQ mask set. We end
+-	   up trashing the mcast filter not disabling irqs if we don't lock */
+-	   
+-	spin_lock_irqsave(&ei_local->page_lock, flags);
+-	outb_p(0x00, e8390_base + EN0_IMR);
+-	
+-	/*
+-	 *	Slow phase with lock held.
+-	 */
+-	 
+-	ei_local->irqlock = 1;
+-
+-	send_length = max(length, ETH_ZLEN);
+-
+-	/*
+-	 * We have two Tx slots available for use. Find the first free
+-	 * slot, and then perform some sanity checks. With two Tx bufs,
+-	 * you get very close to transmitting back-to-back packets. With
+-	 * only one Tx buf, the transmitter sits idle while you reload the
+-	 * card, leaving a substantial gap between each transmitted packet.
+-	 */
+-
+-	if (ei_local->tx1 == 0) 
+-	{
+-		output_page = ei_local->tx_start_page;
+-		ei_local->tx1 = send_length;
+-		if ((netif_msg_tx_queued(ei_local)) &&
+-		    ei_local->tx2 > 0)
+-			netdev_dbg(dev,
+-				   "idle transmitter tx2=%d, lasttx=%d, txing=%d\n",
+-				   ei_local->tx2, ei_local->lasttx,
+-				   ei_local->txing);
+-	}
+-	else if (ei_local->tx2 == 0) 
+-	{
+-		output_page = ei_local->tx_start_page + TX_PAGES/2;
+-		ei_local->tx2 = send_length;
+-		if ((netif_msg_tx_queued(ei_local)) &&
+-		    ei_local->tx1 > 0)
+-			netdev_dbg(dev,
+-				   "idle transmitter, tx1=%d, lasttx=%d, txing=%d\n",
+-				   ei_local->tx1, ei_local->lasttx,
+-				   ei_local->txing);
+-	}
+-	else
+-	{	/* We should never get here. */
+-		netif_dbg(ei_local, tx_err, dev,
+-			  "No Tx buffers free! tx1=%d tx2=%d last=%d\n",
+-			  ei_local->tx1, ei_local->tx2,
+-			  ei_local->lasttx);
+-		ei_local->irqlock = 0;
+-		netif_stop_queue(dev);
+-		outb_p(ENISR_ALL, e8390_base + EN0_IMR);
+-		spin_unlock_irqrestore(&ei_local->page_lock, flags);
+-		dev->stats.tx_errors++;
+-		return NETDEV_TX_BUSY;
+-	}
+-
+-	/*
+-	 * Okay, now upload the packet and trigger a send if the transmitter
+-	 * isn't already sending. If it is busy, the interrupt handler will
+-	 * trigger the send later, upon receiving a Tx done interrupt.
+-	 */
+-
+-	if (length == skb->len)
+-		ei_block_output(dev, length, skb->data, output_page);
+-	else {
+-		memset(packet, 0, ETH_ZLEN);
+-		skb_copy_from_linear_data(skb, packet, skb->len);
+-		ei_block_output(dev, length, packet, output_page);
+-	}
+-	
+-	if (! ei_local->txing) 
+-	{
+-		ei_local->txing = 1;
+-		NS8390_trigger_send(dev, send_length, output_page);
+-		netif_trans_update(dev);
+-		if (output_page == ei_local->tx_start_page) 
+-		{
+-			ei_local->tx1 = -1;
+-			ei_local->lasttx = -1;
+-		}
+-		else 
+-		{
+-			ei_local->tx2 = -1;
+-			ei_local->lasttx = -2;
+-		}
+-	}
+-	else ei_local->txqueue++;
+-
+-	if (ei_local->tx1  &&  ei_local->tx2)
+-		netif_stop_queue(dev);
+-	else
+-		netif_start_queue(dev);
+-
+-	/* Turn 8390 interrupts back on. */
+-	ei_local->irqlock = 0;
+-	outb_p(ENISR_ALL, e8390_base + EN0_IMR);
+-	
+-	spin_unlock_irqrestore(&ei_local->page_lock, flags);
+-
+-	dev_kfree_skb (skb);
+-	dev->stats.tx_bytes += send_length;
+-    
+-	return NETDEV_TX_OK;
+-}
+-
+-/**
+- * ax_interrupt - handle the interrupts from an 8390
+- * @irq: interrupt number
+- * @dev_id: a pointer to the net_device
+- *
+- * Handle the ether interface interrupts. We pull packets from
+- * the 8390 via the card specific functions and fire them at the networking
+- * stack. We also handle transmit completions and wake the transmit path if
+- * necessary. We also update the counters and do other housekeeping as
+- * needed.
+- */
+-
+-static irqreturn_t ax_interrupt(int irq, void *dev_id)
+-{
+-	struct net_device *dev = dev_id;
+-	long e8390_base;
+-	int interrupts, nr_serviced = 0, i;
+-	struct ei_device *ei_local;
+-	int handled = 0;
+-	unsigned long flags;
+-
+-	e8390_base = dev->base_addr;
+-	ei_local = netdev_priv(dev);
+-
+-	/*
+-	 *	Protect the irq test too.
+-	 */
+-	 
+-	spin_lock_irqsave(&ei_local->page_lock, flags);
+-
+-	if (ei_local->irqlock) {
+-#if 1 /* This might just be an interrupt for a PCI device sharing this line */
+-		const char *msg;
+-		/* The "irqlock" check is only for testing. */
+-		if (ei_local->irqlock)
+-			msg = "Interrupted while interrupts are masked!";
+-		else
+-			msg = "Reentering the interrupt handler!";
+-		netdev_info(dev, "%s, isr=%#2x imr=%#2x\n",
+-			    msg,
+-			    inb_p(e8390_base + EN0_ISR),
+-			    inb_p(e8390_base + EN0_IMR));
 -#endif
+-		spin_unlock_irqrestore(&ei_local->page_lock, flags);
+-		return IRQ_NONE;
+-	}
+-
+-	netif_dbg(ei_local, intr, dev, "interrupt(isr=%#2.2x)\n",
+-		  inb_p(e8390_base + EN0_ISR));
+-
+-	outb_p(0x00, e8390_base + EN0_ISR);
+-	ei_local->irqlock = 1;
+-   
+-	/* !!Assumption!! -- we stay in page 0.	 Don't break this. */
+-	while ((interrupts = inb_p(e8390_base + EN0_ISR)) != 0 &&
+-	       ++nr_serviced < MAX_SERVICE)
+-	{
+-		if (!netif_running(dev) || (interrupts == 0xff)) {
+-			netif_warn(ei_local, intr, dev,
+-				   "interrupt from stopped card\n");
+-			outb_p(interrupts, e8390_base + EN0_ISR);
+-			interrupts = 0;
+-			break;
+-		}
+-		handled = 1;
+-
+-		/* AX88190 bug fix. */
+-		outb_p(interrupts, e8390_base + EN0_ISR);
+-		for (i = 0; i < 10; i++) {
+-			if (!(inb(e8390_base + EN0_ISR) & interrupts))
+-				break;
+-			outb_p(0, e8390_base + EN0_ISR);
+-			outb_p(interrupts, e8390_base + EN0_ISR);
+-		}
+-		if (interrupts & ENISR_OVER) 
+-			ei_rx_overrun(dev);
+-		else if (interrupts & (ENISR_RX+ENISR_RX_ERR)) 
+-		{
+-			/* Got a good (?) packet. */
+-			ei_receive(dev);
+-		}
+-		/* Push the next to-transmit packet through. */
+-		if (interrupts & ENISR_TX)
+-			ei_tx_intr(dev);
+-		else if (interrupts & ENISR_TX_ERR)
+-			ei_tx_err(dev);
+-
+-		if (interrupts & ENISR_COUNTERS) 
+-		{
+-			dev->stats.rx_frame_errors += inb_p(e8390_base + EN0_COUNTER0);
+-			dev->stats.rx_crc_errors   += inb_p(e8390_base + EN0_COUNTER1);
+-			dev->stats.rx_missed_errors+= inb_p(e8390_base + EN0_COUNTER2);
+-		}
+-	}
+-    
+-	if (interrupts && (netif_msg_intr(ei_local)))
+-	{
+-		handled = 1;
+-		if (nr_serviced >= MAX_SERVICE) 
+-		{
+-			/* 0xFF is valid for a card removal */
+-			if (interrupts != 0xFF)
+-				netdev_warn(dev,
+-					    "Too much work at interrupt, status %#2.2x\n",
+-					    interrupts);
+-			outb_p(ENISR_ALL, e8390_base + EN0_ISR); /* Ack. most intrs. */
+-		} else {
+-			netdev_warn(dev, "unknown interrupt %#2x\n",
+-				    interrupts);
+-			outb_p(0xff, e8390_base + EN0_ISR); /* Ack. all intrs. */
+-		}
+-	}
+-
+-	/* Turn 8390 interrupts back on. */
+-	ei_local->irqlock = 0;
+-	outb_p(ENISR_ALL, e8390_base + EN0_IMR);
+-
+-	spin_unlock_irqrestore(&ei_local->page_lock, flags);
+-	return IRQ_RETVAL(handled);
+-}
+-
+-/**
+- * ei_tx_err - handle transmitter error
+- * @dev: network device which threw the exception
+- *
+- * A transmitter error has happened. Most likely excess collisions (which
+- * is a fairly normal condition). If the error is one where the Tx will
+- * have been aborted, we try and send another one right away, instead of
+- * letting the failed packet sit and collect dust in the Tx buffer. This
+- * is a much better solution as it avoids kernel based Tx timeouts, and
+- * an unnecessary card reset.
+- *
+- * Called with lock held.
+- */
+-
+-static void ei_tx_err(struct net_device *dev)
+-{
+-	long e8390_base = dev->base_addr;
+-	unsigned char txsr = inb_p(e8390_base+EN0_TSR);
+-	unsigned char tx_was_aborted = txsr & (ENTSR_ABT+ENTSR_FU);
+-
+-#ifdef VERBOSE_ERROR_DUMP
+-	netdev_dbg(dev, "transmitter error (%#2x):", txsr);
+-	if (txsr & ENTSR_ABT)
+-		pr_cont(" excess-collisions");
+-	if (txsr & ENTSR_ND)
+-		pr_cont(" non-deferral");
+-	if (txsr & ENTSR_CRS)
+-		pr_cont(" lost-carrier");
+-	if (txsr & ENTSR_FU)
+-		pr_cont(" FIFO-underrun");
+-	if (txsr & ENTSR_CDH)
+-		pr_cont(" lost-heartbeat");
+-	pr_cont("\n");
+-#endif
+-
+-	if (tx_was_aborted)
+-		ei_tx_intr(dev);
+-	else 
+-	{
+-		dev->stats.tx_errors++;
+-		if (txsr & ENTSR_CRS) dev->stats.tx_carrier_errors++;
+-		if (txsr & ENTSR_CDH) dev->stats.tx_heartbeat_errors++;
+-		if (txsr & ENTSR_OWC) dev->stats.tx_window_errors++;
+-	}
+-}
+-
+-/**
+- * ei_tx_intr - transmit interrupt handler
+- * @dev: network device for which tx intr is handled
+- *
+- * We have finished a transmit: check for errors and then trigger the next
+- * packet to be sent. Called with lock held.
+- */
+-
+-static void ei_tx_intr(struct net_device *dev)
+-{
+-	long e8390_base = dev->base_addr;
+-	struct ei_device *ei_local = netdev_priv(dev);
+-	int status = inb(e8390_base + EN0_TSR);
+-    
+-	/*
+-	 * There are two Tx buffers, see which one finished, and trigger
+-	 * the send of another one if it exists.
+-	 */
+-	ei_local->txqueue--;
+-
+-	if (ei_local->tx1 < 0) 
+-	{
+-		if (ei_local->lasttx != 1 && ei_local->lasttx != -1)
+-			netdev_err(dev, "%s: bogus last_tx_buffer %d, tx1=%d\n",
+-				   ei_local->name, ei_local->lasttx,
+-				   ei_local->tx1);
+-		ei_local->tx1 = 0;
+-		if (ei_local->tx2 > 0) 
+-		{
+-			ei_local->txing = 1;
+-			NS8390_trigger_send(dev, ei_local->tx2, ei_local->tx_start_page + 6);
+-			netif_trans_update(dev);
+-			ei_local->tx2 = -1;
+-			ei_local->lasttx = 2;
+-		} else {
+-			ei_local->lasttx = 20;
+-			ei_local->txing = 0;
+-		}
+-	}
+-	else if (ei_local->tx2 < 0) 
+-	{
+-		if (ei_local->lasttx != 2  &&  ei_local->lasttx != -2)
+-			netdev_err(dev, "%s: bogus last_tx_buffer %d, tx2=%d\n",
+-				   ei_local->name, ei_local->lasttx,
+-				   ei_local->tx2);
+-		ei_local->tx2 = 0;
+-		if (ei_local->tx1 > 0) 
+-		{
+-			ei_local->txing = 1;
+-			NS8390_trigger_send(dev, ei_local->tx1, ei_local->tx_start_page);
+-			netif_trans_update(dev);
+-			ei_local->tx1 = -1;
+-			ei_local->lasttx = 1;
+-		} else {
+-			ei_local->lasttx = 10;
+-			ei_local->txing = 0;
+-		}
+-	}
+-//	else
+-//		netdev_warn(dev, "unexpected TX-done interrupt, lasttx=%d\n",
+-//			    ei_local->lasttx);
+-
+-	/* Minimize Tx latency: update the statistics after we restart TXing. */
+-	if (status & ENTSR_COL)
+-		dev->stats.collisions++;
+-	if (status & ENTSR_PTX)
+-		dev->stats.tx_packets++;
+-	else 
+-	{
+-		dev->stats.tx_errors++;
+-		if (status & ENTSR_ABT) 
+-		{
+-			dev->stats.tx_aborted_errors++;
+-			dev->stats.collisions += 16;
+-		}
+-		if (status & ENTSR_CRS) 
+-			dev->stats.tx_carrier_errors++;
+-		if (status & ENTSR_FU) 
+-			dev->stats.tx_fifo_errors++;
+-		if (status & ENTSR_CDH)
+-			dev->stats.tx_heartbeat_errors++;
+-		if (status & ENTSR_OWC)
+-			dev->stats.tx_window_errors++;
+-	}
+-	netif_wake_queue(dev);
+-}
+-
+-/**
+- * ei_receive - receive some packets
+- * @dev: network device with which receive will be run
+- *
+- * We have a good packet(s), get it/them out of the buffers. 
+- * Called with lock held.
+- */
+-
+-static void ei_receive(struct net_device *dev)
+-{
+-	long e8390_base = dev->base_addr;
+-	struct ei_device *ei_local = netdev_priv(dev);
+-	unsigned char rxing_page, this_frame, next_frame;
+-	unsigned short current_offset;
+-	int rx_pkt_count = 0;
+-	struct e8390_pkt_hdr rx_frame;
+-    
+-	while (++rx_pkt_count < 10) 
+-	{
+-		int pkt_len, pkt_stat;
+-		
+-		/* Get the rx page (incoming packet pointer). */
+-		rxing_page = inb_p(e8390_base + EN1_CURPAG -1);
+-		
+-		/* Remove one frame from the ring.  Boundary is always a page behind. */
+-		this_frame = inb_p(e8390_base + EN0_BOUNDARY) + 1;
+-		if (this_frame >= ei_local->stop_page)
+-			this_frame = ei_local->rx_start_page;
+-		
+-		/* Someday we'll omit the previous, iff we never get this message.
+-		   (There is at least one clone claimed to have a problem.)  
+-		   
+-		   Keep quiet if it looks like a card removal. One problem here
+-		   is that some clones crash in roughly the same way.
+-		 */
+-		if ((netif_msg_rx_err(ei_local)) &&
+-		    this_frame != ei_local->current_page &&
+-		    (this_frame != 0x0 || rxing_page != 0xFF))
+-			netdev_err(dev, "mismatched read page pointers %2x vs %2x\n",
+-				   this_frame, ei_local->current_page);
+-		
+-		if (this_frame == rxing_page)	/* Read all the frames? */
+-			break;				/* Done for now */
+-		
+-		current_offset = this_frame << 8;
+-		ei_get_8390_hdr(dev, &rx_frame, this_frame);
+-		
+-		pkt_len = rx_frame.count - sizeof(struct e8390_pkt_hdr);
+-		pkt_stat = rx_frame.status;
+-		
+-		next_frame = this_frame + 1 + ((pkt_len+4)>>8);
+-		
+-		if (pkt_len < 60  ||  pkt_len > 1518) 
+-		{
+-			netif_err(ei_local, rx_err, dev,
+-				  "bogus packet size: %d, status=%#2x nxpg=%#2x\n",
+-				  rx_frame.count, rx_frame.status,
+-				  rx_frame.next);
+-			dev->stats.rx_errors++;
+-			dev->stats.rx_length_errors++;
+-		}
+-		 else if ((pkt_stat & 0x0F) == ENRSR_RXOK) 
+-		{
+-			struct sk_buff *skb;
+-			
+-			skb = netdev_alloc_skb(dev, pkt_len + 2);
+-			if (skb == NULL) 
+-			{
+-				netif_err(ei_local, rx_err, dev,
+-					  "Couldn't allocate a sk_buff of size %d\n",
+-					  pkt_len);
+-				dev->stats.rx_dropped++;
+-				break;
+-			}
+-			else
+-			{
+-				skb_reserve(skb,2);	/* IP headers on 16 byte boundaries */
+-				skb_put(skb, pkt_len);	/* Make room */
+-				ei_block_input(dev, pkt_len, skb, current_offset + sizeof(rx_frame));
+-				skb->protocol=eth_type_trans(skb,dev);
+-				netif_rx(skb);
+-				dev->stats.rx_packets++;
+-				dev->stats.rx_bytes += pkt_len;
+-				if (pkt_stat & ENRSR_PHY)
+-					dev->stats.multicast++;
+-			}
+-		} 
+-		else 
+-		{
+-			netif_err(ei_local, rx_err, dev,
+-				  "bogus packet: status=%#2x nxpg=%#2x size=%d\n",
+-				  rx_frame.status, rx_frame.next,
+-				  rx_frame.count);
+-			dev->stats.rx_errors++;
+-			/* NB: The NIC counts CRC, frame and missed errors. */
+-			if (pkt_stat & ENRSR_FO)
+-				dev->stats.rx_fifo_errors++;
+-		}
+-		next_frame = rx_frame.next;
+-		
+-		/* This _should_ never happen: it's here for avoiding bad clones. */
+-		if (next_frame >= ei_local->stop_page) {
+-			netdev_info(dev, "next frame inconsistency, %#2x\n",
+-				    next_frame);
+-			next_frame = ei_local->rx_start_page;
+-		}
+-		ei_local->current_page = next_frame;
+-		outb_p(next_frame-1, e8390_base+EN0_BOUNDARY);
+-	}
+-}
+-
+-/**
+- * ei_rx_overrun - handle receiver overrun
+- * @dev: network device which threw exception
+- *
+- * We have a receiver overrun: we have to kick the 8390 to get it started
+- * again. Problem is that you have to kick it exactly as NS prescribes in
+- * the updated datasheets, or "the NIC may act in an unpredictable manner."
+- * This includes causing "the NIC to defer indefinitely when it is stopped
+- * on a busy network."  Ugh.
+- * Called with lock held. Don't call this with the interrupts off or your
+- * computer will hate you - it takes 10ms or so. 
+- */
+-
+-static void ei_rx_overrun(struct net_device *dev)
+-{
+-	struct axnet_dev *info = PRIV(dev);
+-	long e8390_base = dev->base_addr;
+-	unsigned char was_txing, must_resend = 0;
+-	struct ei_device *ei_local = netdev_priv(dev);
+-    
+-	/*
+-	 * Record whether a Tx was in progress and then issue the
+-	 * stop command.
+-	 */
+-	was_txing = inb_p(e8390_base+E8390_CMD) & E8390_TRANS;
+-	outb_p(E8390_NODMA+E8390_PAGE0+E8390_STOP, e8390_base+E8390_CMD);
+-
+-	netif_dbg(ei_local, rx_err, dev, "Receiver overrun\n");
+-	dev->stats.rx_over_errors++;
+-    
+-	/* 
+-	 * Wait a full Tx time (1.2ms) + some guard time, NS says 1.6ms total.
+-	 * We wait at least 2ms.
+-	 */
+-
+-	mdelay(2);
+-
+-	/*
+-	 * Reset RBCR[01] back to zero as per magic incantation.
+-	 */
+-	outb_p(0x00, e8390_base+EN0_RCNTLO);
+-	outb_p(0x00, e8390_base+EN0_RCNTHI);
+-
+-	/*
+-	 * See if any Tx was interrupted or not. According to NS, this
+-	 * step is vital, and skipping it will cause no end of havoc.
+-	 */
+-
+-	if (was_txing)
+-	{ 
+-		unsigned char tx_completed = inb_p(e8390_base+EN0_ISR) & (ENISR_TX+ENISR_TX_ERR);
+-		if (!tx_completed)
+-			must_resend = 1;
+-	}
+-
+-	/*
+-	 * Have to enter loopback mode and then restart the NIC before
+-	 * you are allowed to slurp packets up off the ring.
+-	 */
+-	outb_p(E8390_TXOFF, e8390_base + EN0_TXCR);
+-	outb_p(E8390_NODMA + E8390_PAGE0 + E8390_START, e8390_base + E8390_CMD);
+-
+-	/*
+-	 * Clear the Rx ring of all the debris, and ack the interrupt.
+-	 */
+-	ei_receive(dev);
+-
+-	/*
+-	 * Leave loopback mode, and resend any packet that got stopped.
+-	 */
+-	outb_p(E8390_TXCONFIG | info->duplex_flag, e8390_base + EN0_TXCR); 
+-	if (must_resend)
+-    		outb_p(E8390_NODMA + E8390_PAGE0 + E8390_START + E8390_TRANS, e8390_base + E8390_CMD);
+-}
+-
+-/*
+- *	Collect the stats. This is called unlocked and from several contexts.
+- */
+- 
+-static struct net_device_stats *get_stats(struct net_device *dev)
+-{
+-	long ioaddr = dev->base_addr;
+-	struct ei_device *ei_local = netdev_priv(dev);
+-	unsigned long flags;
+-    
+-	/* If the card is stopped, just return the present stats. */
+-	if (!netif_running(dev))
+-		return &dev->stats;
+-
+-	spin_lock_irqsave(&ei_local->page_lock,flags);
+-	/* Read the counter registers, assuming we are in page 0. */
+-	dev->stats.rx_frame_errors += inb_p(ioaddr + EN0_COUNTER0);
+-	dev->stats.rx_crc_errors   += inb_p(ioaddr + EN0_COUNTER1);
+-	dev->stats.rx_missed_errors+= inb_p(ioaddr + EN0_COUNTER2);
+-	spin_unlock_irqrestore(&ei_local->page_lock, flags);
+-    
+-	return &dev->stats;
+-}
+-
+-/*
+- * Form the 64 bit 8390 multicast table from the linked list of addresses
+- * associated with this dev structure.
+- */
+- 
+-static inline void make_mc_bits(u8 *bits, struct net_device *dev)
+-{
+-	struct netdev_hw_addr *ha;
+-	u32 crc;
+-
+-	netdev_for_each_mc_addr(ha, dev) {
+-		crc = ether_crc(ETH_ALEN, ha->addr);
+-		/* 
+-		 * The 8390 uses the 6 most significant bits of the
+-		 * CRC to index the multicast table.
+-		 */
+-		bits[crc>>29] |= (1<<((crc>>26)&7));
+-	}
+-}
+-
+-/**
+- * do_set_multicast_list - set/clear multicast filter
+- * @dev: net device for which multicast filter is adjusted
+- *
+- *	Set or clear the multicast filter for this adaptor.
+- *	Must be called with lock held. 
+- */
+- 
+-static void do_set_multicast_list(struct net_device *dev)
+-{
+-	long e8390_base = dev->base_addr;
+-	int i;
+-	struct ei_device *ei_local = netdev_priv(dev);
+-
+-	if (!(dev->flags&(IFF_PROMISC|IFF_ALLMULTI))) {
+-		memset(ei_local->mcfilter, 0, 8);
+-		if (!netdev_mc_empty(dev))
+-			make_mc_bits(ei_local->mcfilter, dev);
+-	} else {
+-		/* set to accept-all */
+-		memset(ei_local->mcfilter, 0xFF, 8);
+-	}
+-
+-	outb_p(E8390_NODMA + E8390_PAGE1, e8390_base + E8390_CMD);
+-	for(i = 0; i < 8; i++) 
+-	{
+-		outb_p(ei_local->mcfilter[i], e8390_base + EN1_MULT_SHIFT(i));
+-	}
+-	outb_p(E8390_NODMA + E8390_PAGE0, e8390_base + E8390_CMD);
+-
+-	if(dev->flags&IFF_PROMISC)
+-		outb_p(E8390_RXCONFIG | 0x58, e8390_base + EN0_RXCR);
+-	else if (dev->flags & IFF_ALLMULTI || !netdev_mc_empty(dev))
+-		outb_p(E8390_RXCONFIG | 0x48, e8390_base + EN0_RXCR);
+-	else
+-		outb_p(E8390_RXCONFIG | 0x40, e8390_base + EN0_RXCR);
+-
+-	outb_p(E8390_NODMA+E8390_PAGE0+E8390_START, e8390_base+E8390_CMD);
+-}
+-
+-/*
+- *	Called without lock held. This is invoked from user context and may
+- *	be parallel to just about everything else. Its also fairly quick and
+- *	not called too often. Must protect against both bh and irq users
+- */
+-
+-static void set_multicast_list(struct net_device *dev)
+-{
+-	unsigned long flags;
+-
+-	spin_lock_irqsave(&dev_lock(dev), flags);
+-	do_set_multicast_list(dev);
+-	spin_unlock_irqrestore(&dev_lock(dev), flags);
+-}	
+-
+-/* This page of functions should be 8390 generic */
+-/* Follow National Semi's recommendations for initializing the "NIC". */
+-
+-/**
+- * AX88190_init - initialize 8390 hardware
+- * @dev: network device to initialize
+- * @startp: boolean.  non-zero value to initiate chip processing
+- *
+- *	Must be called with lock held.
+- */
+-
+-static void AX88190_init(struct net_device *dev, int startp)
+-{
+-	struct axnet_dev *info = PRIV(dev);
+-	long e8390_base = dev->base_addr;
+-	struct ei_device *ei_local = netdev_priv(dev);
+-	int i;
+-	int endcfg = ei_local->word16 ? (0x48 | ENDCFG_WTS) : 0x48;
+-    
+-	if(sizeof(struct e8390_pkt_hdr)!=4)
+-    		panic("8390.c: header struct mispacked\n");    
+-	/* Follow National Semi's recommendations for initing the DP83902. */
+-	outb_p(E8390_NODMA+E8390_PAGE0+E8390_STOP, e8390_base+E8390_CMD); /* 0x21 */
+-	outb_p(endcfg, e8390_base + EN0_DCFG);	/* 0x48 or 0x49 */
+-	/* Clear the remote byte count registers. */
+-	outb_p(0x00,  e8390_base + EN0_RCNTLO);
+-	outb_p(0x00,  e8390_base + EN0_RCNTHI);
+-	/* Set to monitor and loopback mode -- this is vital!. */
+-	outb_p(E8390_RXOFF|0x40, e8390_base + EN0_RXCR); /* 0x60 */
+-	outb_p(E8390_TXOFF, e8390_base + EN0_TXCR); /* 0x02 */
+-	/* Set the transmit page and receive ring. */
+-	outb_p(ei_local->tx_start_page, e8390_base + EN0_TPSR);
+-	ei_local->tx1 = ei_local->tx2 = 0;
+-	outb_p(ei_local->rx_start_page, e8390_base + EN0_STARTPG);
+-	outb_p(ei_local->stop_page-1, e8390_base + EN0_BOUNDARY);	/* 3c503 says 0x3f,NS0x26*/
+-	ei_local->current_page = ei_local->rx_start_page;		/* assert boundary+1 */
+-	outb_p(ei_local->stop_page, e8390_base + EN0_STOPPG);
+-	/* Clear the pending interrupts and mask. */
+-	outb_p(0xFF, e8390_base + EN0_ISR);
+-	outb_p(0x00,  e8390_base + EN0_IMR);
+-    
+-	/* Copy the station address into the DS8390 registers. */
+-
+-	outb_p(E8390_NODMA + E8390_PAGE1 + E8390_STOP, e8390_base+E8390_CMD); /* 0x61 */
+-	for(i = 0; i < 6; i++) 
+-	{
+-		outb_p(dev->dev_addr[i], e8390_base + EN1_PHYS_SHIFT(i));
+-		if(inb_p(e8390_base + EN1_PHYS_SHIFT(i))!=dev->dev_addr[i])
+-			netdev_err(dev, "Hw. address read/write mismap %d\n", i);
+-	}
+-
+-	outb_p(ei_local->rx_start_page, e8390_base + EN1_CURPAG);
+-	outb_p(E8390_NODMA+E8390_PAGE0+E8390_STOP, e8390_base+E8390_CMD);
+-
+-	netif_start_queue(dev);
+-	ei_local->tx1 = ei_local->tx2 = 0;
+-	ei_local->txing = 0;
+-
+-	if (info->flags & IS_AX88790)	/* select Internal PHY */
+-		outb(0x10, e8390_base + AXNET_GPIO);
+-
+-	if (startp) 
+-	{
+-		outb_p(0xff,  e8390_base + EN0_ISR);
+-		outb_p(ENISR_ALL,  e8390_base + EN0_IMR);
+-		outb_p(E8390_NODMA+E8390_PAGE0+E8390_START, e8390_base+E8390_CMD);
+-		outb_p(E8390_TXCONFIG | info->duplex_flag,
+-		       e8390_base + EN0_TXCR); /* xmit on. */
+-		/* 3c503 TechMan says rxconfig only after the NIC is started. */
+-		outb_p(E8390_RXCONFIG | 0x40, e8390_base + EN0_RXCR); /* rx on, */
+-		do_set_multicast_list(dev);	/* (re)load the mcast table */
+-	}
+-}
+-
+-/* Trigger a transmit start, assuming the length is valid. 
+-   Always called with the page lock held */
+-   
+-static void NS8390_trigger_send(struct net_device *dev, unsigned int length,
+-								int start_page)
+-{
+-	long e8390_base = dev->base_addr;
+- 	struct ei_device *ei_local __attribute((unused)) = netdev_priv(dev);
+-    
+-	if (inb_p(e8390_base) & E8390_TRANS) 
+-	{
+-		netdev_warn(dev, "trigger_send() called with the transmitter busy\n");
+-		return;
+-	}
+-	outb_p(length & 0xff, e8390_base + EN0_TCNTLO);
+-	outb_p(length >> 8, e8390_base + EN0_TCNTHI);
+-	outb_p(start_page, e8390_base + EN0_TPSR);
+-	outb_p(E8390_NODMA+E8390_TRANS+E8390_START, e8390_base+E8390_CMD);
+-}
 
 -- 
 2.53.0
