@@ -1,194 +1,230 @@
-Return-Path: <netdev+bounces-280027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280029-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WLZUBvoo52kf4wEAu9opvQ
-	(envelope-from <netdev+bounces-280027-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 09:36:26 +0200
+	id WORKNwgq52mo4wEAu9opvQ
+	(envelope-from <netdev+bounces-280029-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 09:40:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D0D3437AC0
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 09:36:25 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65692437C04
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 09:40:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 17D46302FA85
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 07:33:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D8DF13018405
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 07:37:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8F6E32E728;
-	Tue, 21 Apr 2026 07:33:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B4D537C0EB;
+	Tue, 21 Apr 2026 07:37:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="P/fIqS/b"
+	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="bXduOs3p"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from out203-205-221-205.mail.qq.com (out203-205-221-205.mail.qq.com [203.205.221.205])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 047133563E1
-	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 07:33:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 763F2331A78;
+	Tue, 21 Apr 2026 07:37:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776756802; cv=none; b=k/vwGRjfiFLs6ziooKuOMehfQ1LDKkRvpIQGlgTeHXflraIxSoMWJZRQ0RKwgzzN9H0qj5y9QcTj/3oJEJF1HXTYbTY0fwyRyIO33UO8NR++0QacTmVzRXSV1qkWl2ePJEn8Hpc4PNHUBhbjEOKiKOb+eA/arQj68e/JjpI6Cd4=
+	t=1776757066; cv=none; b=UwyNEapbbMqoz7GLwyuPvbaa7DVIoVmKiMeRsYPYLr6V+e+Ut8s2PIg9YUAkcNsg9zTOZ+KuT9JIaNrK7L1LFlbzqTKVUB6RqINtHBllut72f/i++Oc41XsbzXQjqjoz6kdt4sKRJWI3Zsmapui23AOE/XsZPQAZ072IcQc5vxQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776756802; c=relaxed/simple;
-	bh=HdKN6vR/WF7gxYiO6PAmkmeiwKR29Ppe8uMUYLeZqFM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UItgBw7Jk9GQiqgp/LQo/qQbdsfXgTNG2Q5pSO+c0CIJl3vidumaoh8T5gy3y1wPT2lpZjO0+foespwRfdv9bTalA3q8wOGdiCHl5xF/dX1mYEnaigvCWcQI+uNrEPCi61sOsB8cY+aDLOh2uj+m15WG6+dQSlTbwTS3e/JTjS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=P/fIqS/b; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=6nFLI4Wi6mv0Oz5B/rGpGVmJgVc3OUepi2LoX3t2SaY=; b=P/fIqS/b75rYhRDX+Mjwa0OXBK
-	q/zuI7IZUaHkNNzKXOMFCihiE6sHkvhuy0RmLKAPGmCgK0LLO3grMofkhNLEKCCJvxclHTLV9axZL
-	V055XNx2EpygnXHVY1r5g4lLoSS7nELI1exBkNCuSTuAAFDgx7W9lmn50pDikyL2AgRNEjlkb9epa
-	HsB3kyjRNcebc5z8tsx8OGc+RSVhwQ/WxIOV/iN8j0/WZgFEM0nruEIf2zSRl45fUZrc8p2mt1lxq
-	T4Ds+vku52xGXfAwi43qM0B/GqvlEBrpbunoPOp8Umn+QSrXKcU4kFsD7vZjMeD5d8d9fB0utMirC
-	Bs4KzWgg==;
-Received: from sslproxy03.your-server.de ([88.198.220.132])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1wF5bb-000CMM-2S;
-	Tue, 21 Apr 2026 09:33:11 +0200
-Received: from localhost ([127.0.0.1])
-	by sslproxy03.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1wF5ba-0007Df-2J;
-	Tue, 21 Apr 2026 09:33:11 +0200
-Message-ID: <94dab191-524b-4f8d-abde-e0ffc5848258@iogearbox.net>
-Date: Tue, 21 Apr 2026 09:33:08 +0200
+	s=arc-20240116; t=1776757066; c=relaxed/simple;
+	bh=SZcklxgbjsX5ROMo/zD0+7P0xxMaGcOIVethWe0eTFs=;
+	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=SVjLvBwZGiIhEKv+WqbhVRpZXPEUAJbFmXE2hn16bglqH23ioruHEVsWEAxGIAsAt3NQBdcafh9AfA482aZ+oqTF8SnXO057uIDURsi5BZfhPVLUnpHs+xO0MKsT+fJplxlr2wkKyR65sT/ewVflMmWnICT5L8SwRPwxdkhJU9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=bXduOs3p; arc=none smtp.client-ip=203.205.221.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+	s=s201512; t=1776757053;
+	bh=2BBidtQmGzyXD/iwQeUorAjjDt5+eczMlZJZiK5y47c=;
+	h=From:To:Cc:Subject:Date;
+	b=bXduOs3pnI4YZBLFrqcm4AI041rmihVF05/4sE+aVLBNg2GTX8be7PHk1eyFuXqYV
+	 nkNqw/3+7CZahOxCKH/KwFLbS9e8b4USSPZtdnRuMspl+ziW4wxkkHJCoWApbh43xB
+	 AVl1FS9l8ufHs8yC/3ZnFdGZsmvakdUrIhgHBx/c=
+Received: from China-team ([183.241.55.34])
+	by newxmesmtplogicsvrszc56-0.qq.com (NewEsmtp) with SMTP
+	id 93391298; Tue, 21 Apr 2026 15:36:51 +0800
+X-QQ-mid: xmsmtpt1776757011tmk20dh89
+Message-ID: <tencent_7584C190359CD12AD5987DB848D65BFFE10A@qq.com>
+X-QQ-XMAILINFO: OR37DonC/00MCS5yXHp3/J333TXtMSiu4sUMVoulxmLaPnaZ+qLLlKiJasG2PD
+	 Qo0QAT+YomW1B2LG9A9pKvYf2sxRjn4//1Thrpr86bbvpDzTFAk2Q5obkZodZoCO8zAdlcpmQekS
+	 TxSmsHffYRpHw3caEjkD4P8J1xXMAlclFBbUuBzDC8CiS6lZauwEEEiKDZS540iaQM7hIrSN+e/G
+	 pWd5AVA/FnVIAaiQMUbGoAYdXU5mMQ2ZtT49U5Nzf90BtptrrtcM8sBEZsftSJVb2PCixDnzX0yK
+	 r3ReoODyuRwMk6lB+ZPB3u+WIOId8JXZ4/zb9xCjFygJuPmf/Hnkjsfi4upVThOP5s+CAxFLg/Sf
+	 vsofBNDt/VKMbCosuJdJD6stSmyqLODX8Yi5xqcRXSQECwNoyz9vuJuhiuQnB5GMuORSDldxtSi3
+	 1S+JZawexCJr0PHs/0Q7Wny2V3LCvXhZmrspSVDUdwXDN/jXbeYz/I3Dh3j1o0jKKjuHcyt3edWk
+	 kK5nHota+T1AVxvTLw+5fUDpqcjKnTeCUcwb8HWA9d1cfvZXFJiZgH/aXtMQDpLOtUfIguAn+jgG
+	 r16KaiJ9o1g1E+rxRzlpt8Ssg/DUh6IZaUaEIuSYPpRDcdNqGuShbD0GVsZzRIrdodTzPulQQPjo
+	 R5yU1eu6OIfhTUT50kob8ofVl0lOZNg8TiYp96VfQKp4rGn/GLXUSYtad3jxJsWAtBpdM8xn1KpA
+	 8+iPMI51vvYW0yDhUwcr50GRnVrOQfJ4xMgP57wFiaPJDw+c7p/1RsUCrstRLoHG2mmBirqqlGsd
+	 L7sdCb4xFsThghJ73gJyS6qN6Ae4s2Qp8NU70kNhElyLf8KRVrIleF+fOORHY/+avdXbcY4+HIIJ
+	 PV6XFk9FkkVsKaz8LrwJ/SOpsGe6yEz3f+oXuYSOygYziUUTGRAaDqvpEIQ/bNisyBb01wmUTFq8
+	 R8X7fomkvsvFLsCvpjgYu4Da6lXcus39CHPMdxkSZteezAwmtau8l4EQPC3XHLjROe988Hyh9gYj
+	 cLiRxOENFiun0ufmIxIa/6MFWw0RhqtGj3Uup7iIBQSF9fblu72GPbwNi18W2kPDfB06TW5nUBcf
+	 mOQ7soKt+jQzNAZHk=
+X-QQ-XMRINFO: OD9hHCdaPRBwH5bRRRw8tsiH4UAatJqXfg==
+From: Alva Lan <alvalan9@foxmail.com>
+To: gregkh@linuxfoundation.org,
+	sashal@kernel.org,
+	stable@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Alva Lan <alvalan9@foxmail.com>
+Subject: [PATCH 6.1.y] net: dsa: clean up FDB, MDB, VLAN entries on unbind
+Date: Tue, 21 Apr 2026 15:36:35 +0800
+X-OQ-MSGID: <20260421073635.531-1-alvalan9@foxmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] ipv6: Apply max_dst_opts_cnt to
- ip6_tnl_parse_tlv_enc_lim
-To: Justin Iurman <justin.iurman@gmail.com>, Ido Schimmel <idosch@nvidia.com>
-Cc: kuba@kernel.org, edumazet@google.com, dsahern@kernel.org,
- tom@herbertland.com, willemdebruijn.kernel@gmail.com, pabeni@redhat.com,
- netdev@vger.kernel.org
-References: <20260418121538.706095-1-daniel@iogearbox.net>
- <7c715640-5c20-4226-9c31-d2c5eef551db@gmail.com>
- <d8d60970-6f73-4b9d-8808-76f4f8023100@iogearbox.net>
- <8fdf517b-6217-4df6-8adf-0c79ce8d3be8@gmail.com>
- <20260419143137.GA885197@shredder>
- <524def33-63e1-47c0-be38-dee68d859332@gmail.com>
-Content-Language: en-US
-From: Daniel Borkmann <daniel@iogearbox.net>
-Autocrypt: addr=daniel@iogearbox.net; keydata=
- xsFNBGNAkI0BEADiPFmKwpD3+vG5nsOznvJgrxUPJhFE46hARXWYbCxLxpbf2nehmtgnYpAN
- 2HY+OJmdspBntWzGX8lnXF6eFUYLOoQpugoJHbehn9c0Dcictj8tc28MGMzxh4aK02H99KA8
- VaRBIDhmR7NJxLWAg9PgneTFzl2lRnycv8vSzj35L+W6XT7wDKoV4KtMr3Szu3g68OBbp1TV
- HbJH8qe2rl2QKOkysTFRXgpu/haWGs1BPpzKH/ua59+lVQt3ZupePpmzBEkevJK3iwR95TYF
- 06Ltpw9ArW/g3KF0kFUQkGXYXe/icyzHrH1Yxqar/hsJhYImqoGRSKs1VLA5WkRI6KebfpJ+
- RK7Jxrt02AxZkivjAdIifFvarPPu0ydxxDAmgCq5mYJ5I/+BY0DdCAaZezKQvKw+RUEvXmbL
- 94IfAwTFA1RAAuZw3Rz5SNVz7p4FzD54G4pWr3mUv7l6dV7W5DnnuohG1x6qCp+/3O619R26
- 1a7Zh2HlrcNZfUmUUcpaRPP7sPkBBLhJfqjUzc2oHRNpK/1mQ/+mD9CjVFNz9OAGD0xFzNUo
- yOFu/N8EQfYD9lwntxM0dl+QPjYsH81H6zw6ofq+jVKcEMI/JAgFMU0EnxrtQKH7WXxhO4hx
- 3DFM7Ui90hbExlFrXELyl/ahlll8gfrXY2cevtQsoJDvQLbv7QARAQABzSZEYW5pZWwgQm9y
- a21hbm4gPGRhbmllbEBpb2dlYXJib3gubmV0PsLBkQQTAQoAOxYhBCrUdtCTcZyapV2h+93z
- cY/jfzlXBQJjQJCNAhsDBQkHhM4ACAsJCAcNDAsKBRUKCQgLAh4BAheAAAoJEN3zcY/jfzlX
- dkUQAIFayRgjML1jnwKs7kvfbRxf11VI57EAG8a0IvxDlNKDcz74mH66HMyhMhPqCPBqphB5
- ZUjN4N5I7iMYB/oWUeohbuudH4+v6ebzzmgx/EO+jWksP3gBPmBeeaPv7xOvN/pPDSe/0Ywp
- dHpl3Np2dS6uVOMnyIsvmUGyclqWpJgPoVaXrVGgyuer5RpE/a3HJWlCBvFUnk19pwDMMZ8t
- 0fk9O47HmGh9Ts3O8pGibfdREcPYeGGqRKRbaXvcRO1g5n5x8cmTm0sQYr2xhB01RJqWrgcj
- ve1TxcBG/eVMmBJefgCCkSs1suriihfjjLmJDCp9XI/FpXGiVoDS54TTQiKQinqtzP0jv+TH
- 1Ku+6x7EjLoLH24ISGyHRmtXJrR/1Ou22t0qhCbtcT1gKmDbTj5TcqbnNMGWhRRTxgOCYvG0
- 0P2U6+wNj3HFZ7DePRNQ08bM38t8MUpQw4Z2SkM+jdqrPC4f/5S8JzodCu4x80YHfcYSt+Jj
- ipu1Ve5/ftGlrSECvy80ZTKinwxj6lC3tei1bkI8RgWZClRnr06pirlvimJ4R0IghnvifGQb
- M1HwVbht8oyUEkOtUR0i0DMjk3M2NoZ0A3tTWAlAH8Y3y2H8yzRrKOsIuiyKye9pWZQbCDu4
- ZDKELR2+8LUh+ja1RVLMvtFxfh07w9Ha46LmRhpCzsFNBGNAkI0BEADJh65bNBGNPLM7cFVS
- nYG8tqT+hIxtR4Z8HQEGseAbqNDjCpKA8wsxQIp0dpaLyvrx4TAb/vWIlLCxNu8Wv4W1JOST
- wI+PIUCbO/UFxRy3hTNlb3zzmeKpd0detH49bP/Ag6F7iHTwQQRwEOECKKaOH52tiJeNvvyJ
- pPKSKRhmUuFKMhyRVK57ryUDgowlG/SPgxK9/Jto1SHS1VfQYKhzMn4pWFu0ILEQ5x8a0RoX
- k9p9XkwmXRYcENhC1P3nW4q1xHHlCkiqvrjmWSbSVFYRHHkbeUbh6GYuCuhqLe6SEJtqJW2l
- EVhf5AOp7eguba23h82M8PC4cYFl5moLAaNcPHsdBaQZznZ6NndTtmUENPiQc2EHjHrrZI5l
- kRx9hvDcV3Xnk7ie0eAZDmDEbMLvI13AvjqoabONZxra5YcPqxV2Biv0OYp+OiqavBwmk48Z
- P63kTxLddd7qSWbAArBoOd0wxZGZ6mV8Ci/ob8tV4rLSR/UOUi+9QnkxnJor14OfYkJKxot5
- hWdJ3MYXjmcHjImBWplOyRiB81JbVf567MQlanforHd1r0ITzMHYONmRghrQvzlaMQrs0V0H
- 5/sIufaiDh7rLeZSimeVyoFvwvQPx5sXhjViaHa+zHZExP9jhS/WWfFE881fNK9qqV8pi+li
- 2uov8g5yD6hh+EPH6wARAQABwsF8BBgBCgAmFiEEKtR20JNxnJqlXaH73fNxj+N/OVcFAmNA
- kI0CGwwFCQeEzgAACgkQ3fNxj+N/OVfFMhAA2zXBUzMLWgTm6iHKAPfz3xEmjtwCF2Qv/TT3
- KqNUfU3/0VN2HjMABNZR+q3apm+jq76y0iWroTun8Lxo7g89/VDPLSCT0Nb7+VSuVR/nXfk8
- R+OoXQgXFRimYMqtP+LmyYM5V0VsuSsJTSnLbJTyCJVu8lvk3T9B0BywVmSFddumv3/pLZGn
- 17EoKEWg4lraXjPXnV/zaaLdV5c3Olmnj8vh+14HnU5Cnw/dLS8/e8DHozkhcEftOf+puCIl
- Awo8txxtLq3H7KtA0c9kbSDpS+z/oT2S+WtRfucI+WN9XhvKmHkDV6+zNSH1FrZbP9FbLtoE
- T8qBdyk//d0GrGnOrPA3Yyka8epd/bXA0js9EuNknyNsHwaFrW4jpGAaIl62iYgb0jCtmoK/
- rCsv2dqS6Hi8w0s23IGjz51cdhdHzkFwuc8/WxI1ewacNNtfGnorXMh6N0g7E/r21pPeMDFs
- rUD9YI1Je/WifL/HbIubHCCdK8/N7rblgUrZJMG3W+7vAvZsOh/6VTZeP4wCe7Gs/cJhE2gI
- DmGcR+7rQvbFQC4zQxEjo8fNaTwjpzLM9NIp4vG9SDIqAm20MXzLBAeVkofixCsosUWUODxP
- owLbpg7pFRJGL9YyEHpS7MGPb3jSLzucMAFXgoI8rVqoq6si2sxr2l0VsNH5o3NgoAgJNIg=
-In-Reply-To: <524def33-63e1-47c0-be38-dee68d859332@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Virus-Scanned: Clear (ClamAV 1.4.3/27977/Mon Apr 20 08:26:26 2026)
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[iogearbox.net,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[iogearbox.net:s=default2302];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[foxmail.com,none];
+	R_DKIM_ALLOW(-0.20)[foxmail.com:s=s201512];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,herbertland.com,gmail.com,redhat.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-280027-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,nvidia.com];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[iogearbox.net:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-280029-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,nxp.com,kernel.org,foxmail.com];
+	RCVD_COUNT_THREE(0.00)[4];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alvalan9@foxmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[foxmail.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,iogearbox.net:dkim,iogearbox.net:mid]
-X-Rspamd-Queue-Id: 8D0D3437AC0
+	RCPT_COUNT_SEVEN(0.00)[7];
+	FREEMAIL_FROM(0.00)[foxmail.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,qq.com:mid,foxmail.com:dkim,foxmail.com:email,nxp.com:email,msgid.link:url]
+X-Rspamd-Queue-Id: 65692437C04
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 4/20/26 8:55 PM, Justin Iurman wrote:
-> On 4/19/26 16:31, Ido Schimmel wrote:
->> On Sun, Apr 19, 2026 at 12:37:35AM +0200, Justin Iurman wrote:
->>> Nope. But if it happens, users would be confused as max_dst_opts_cnt would
->>> not have the same meaning in two different code paths. OTOH, I agree that
->>> such situation would look suspicious. I guess it's fine to keep your patch
->>> as is and to not over-complicate things unnecessarily.
->>
->> I agree that it's weird to reuse max_dst_opts_cnt here:
->>
->> 1. The meaning is different from the Rx path.
->>
->> 2. We only enforce max_dst_opts_cnt, but not max_dst_opts_len.
->>
->> 3. The default is derived from the initial netns, unlike in the Rx path.
->>
->> Given the above and that:
->>
->> 1. We believe that 8 options until the tunnel encapsulation limit option
->> is liberal enough.
->>
->> 2. We don't want to over-complicate things.
->>
->> Can we go with an hard coded 8 and see if anyone complains? In the
->> unlikely case that someone complains we can at least gain some insight
->> into how this option is actually used with tunnels.
-> 
-> In general, I'm not a big fan of hard-coded values, but I also think that in this context it would make sense to do so. This is not a strong +1, let's say it's more a "not against it".
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
 
-Makes sense, I'll update it in a v3.
+[ Upstream commit 7afb5fb42d4950f33af2732b8147c552659f79b7 ]
+
+As explained in many places such as commit b117e1e8a86d ("net: dsa:
+delete dsa_legacy_fdb_add and dsa_legacy_fdb_del"), DSA is written given
+the assumption that higher layers have balanced additions/deletions.
+As such, it only makes sense to be extremely vocal when those
+assumptions are violated and the driver unbinds with entries still
+present.
+
+But Ido Schimmel points out a very simple situation where that is wrong:
+https://lore.kernel.org/netdev/ZDazSM5UsPPjQuKr@shredder/
+(also briefly discussed by me in the aforementioned commit).
+
+Basically, while the bridge bypass operations are not something that DSA
+explicitly documents, and for the majority of DSA drivers this API
+simply causes them to go to promiscuous mode, that isn't the case for
+all drivers. Some have the necessary requirements for bridge bypass
+operations to do something useful - see dsa_switch_supports_uc_filtering().
+
+Although in tools/testing/selftests/net/forwarding/local_termination.sh,
+we made an effort to popularize better mechanisms to manage address
+filters on DSA interfaces from user space - namely macvlan for unicast,
+and setsockopt(IP_ADD_MEMBERSHIP) - through mtools - for multicast, the
+fact is that 'bridge fdb add ... self static local' also exists as
+kernel UAPI, and might be useful to someone, even if only for a quick
+hack.
+
+It seems counter-productive to block that path by implementing shim
+.ndo_fdb_add and .ndo_fdb_del operations which just return -EOPNOTSUPP
+in order to prevent the ndo_dflt_fdb_add() and ndo_dflt_fdb_del() from
+running, although we could do that.
+
+Accepting that cleanup is necessary seems to be the only option.
+Especially since we appear to be coming back at this from a different
+angle as well. Russell King is noticing that the WARN_ON() triggers even
+for VLANs:
+https://lore.kernel.org/netdev/Z_li8Bj8bD4-BYKQ@shell.armlinux.org.uk/
+
+What happens in the bug report above is that dsa_port_do_vlan_del() fails,
+then the VLAN entry lingers on, and then we warn on unbind and leak it.
+
+This is not a straight revert of the blamed commit, but we now add an
+informational print to the kernel log (to still have a way to see
+that bugs exist), and some extra comments gathered from past years'
+experience, to justify the logic.
+
+Fixes: 0832cd9f1f02 ("net: dsa: warn if port lists aren't empty in dsa_port_teardown")
+Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+Link: https://patch.msgid.link/20250414212930.2956310-1-vladimir.oltean@nxp.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+[ Apply the patch to net/dsa/dsa2.c in v6.1 since commit
+47d2ce03dcfb ("net: dsa: rename dsa2.c back into dsa.c and create its header")
+renamed this file to net/dsa/dsa.c starting from v6.2. ]
+Signed-off-by: Alva Lan <alvalan9@foxmail.com>
+---
+ net/dsa/dsa2.c | 38 +++++++++++++++++++++++++++++++++++---
+ 1 file changed, 35 insertions(+), 3 deletions(-)
+
+diff --git a/net/dsa/dsa2.c b/net/dsa/dsa2.c
+index 415e856ba0ac..9ecb5e34e484 100644
+--- a/net/dsa/dsa2.c
++++ b/net/dsa/dsa2.c
+@@ -1738,12 +1738,44 @@ static int dsa_switch_parse(struct dsa_switch *ds, struct dsa_chip_data *cd)
+ 
+ static void dsa_switch_release_ports(struct dsa_switch *ds)
+ {
++	struct dsa_mac_addr *a, *tmp;
+ 	struct dsa_port *dp, *next;
++	struct dsa_vlan *v, *n;
+ 
+ 	dsa_switch_for_each_port_safe(dp, next, ds) {
+-		WARN_ON(!list_empty(&dp->fdbs));
+-		WARN_ON(!list_empty(&dp->mdbs));
+-		WARN_ON(!list_empty(&dp->vlans));
++		/* These are either entries that upper layers lost track of
++		 * (probably due to bugs), or installed through interfaces
++		 * where one does not necessarily have to remove them, like
++		 * ndo_dflt_fdb_add().
++		 */
++		list_for_each_entry_safe(a, tmp, &dp->fdbs, list) {
++			dev_info(ds->dev,
++				 "Cleaning up unicast address %pM vid %u from port %d\n",
++				 a->addr, a->vid, dp->index);
++			list_del(&a->list);
++			kfree(a);
++		}
++
++		list_for_each_entry_safe(a, tmp, &dp->mdbs, list) {
++			dev_info(ds->dev,
++				 "Cleaning up multicast address %pM vid %u from port %d\n",
++				 a->addr, a->vid, dp->index);
++			list_del(&a->list);
++			kfree(a);
++		}
++
++		/* These are entries that upper layers have lost track of,
++		 * probably due to bugs, but also due to dsa_port_do_vlan_del()
++		 * having failed and the VLAN entry still lingering on.
++		 */
++		list_for_each_entry_safe(v, n, &dp->vlans, list) {
++			dev_info(ds->dev,
++				 "Cleaning up vid %u from port %d\n",
++				 v->vid, dp->index);
++			list_del(&v->list);
++			kfree(v);
++		}
++
+ 		list_del(&dp->list);
+ 		kfree(dp);
+ 	}
+-- 
+2.43.0
+
 
