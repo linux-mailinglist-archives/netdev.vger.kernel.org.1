@@ -1,175 +1,194 @@
-Return-Path: <netdev+bounces-280247-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280248-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0Ge5HW/e52kBCAIAu9opvQ
-	(envelope-from <netdev+bounces-280247-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 22:30:39 +0200
+	id +IrAB+fe52kBCAIAu9opvQ
+	(envelope-from <netdev+bounces-280248-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 22:32:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D890C43F787
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 22:30:38 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 247DE43F7E6
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 22:32:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5E16D3118A6D
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 20:24:16 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 3BFA53003BEA
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 20:32:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9569F3DDDB0;
-	Tue, 21 Apr 2026 20:24:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45B2E3988EB;
+	Tue, 21 Apr 2026 20:32:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="iBxX3kfE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ADccd10A"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70A213DCD8D
-	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 20:24:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 239CE32860B;
+	Tue, 21 Apr 2026 20:32:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776803054; cv=none; b=ML+Xe6YpLPgRdDHSYM4GhK6yqXk09WT1YJvE1qFf/gOBjMIrfy6rDzGMSMas/ZtA6QvWagPFZNBiexn5bse8YDptFMo5Ouzzc90ojjBkO5/MyIL8dpM7NZFIzJZzDOr/GtHTFNEwP542duyFdxLCsugXbvk5rnZwulllAdYCl8g=
+	t=1776803553; cv=none; b=h2o07/ronY8M6PzG68nCW8L60e7mxm7cBxE1SaCYDKp337+1zbFODTa44cwjC/Q3sIktFkXh6YqcFElgBuJDpAh/4/ZTqialeaTsYCYeQa2pOdcdesTQLXcdk4Ro4OxHaMxetYlz3KKYRj/pw2EH4mTKXmBP0GEsBkGcamnKcsQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776803054; c=relaxed/simple;
-	bh=BTLGDVBv0alg8QuEgZ/VjW8L47uXNsBRtvET8itbm08=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=R5Cm3YtwW5XaYYv7xJ3IBjpZpzDkP4xZ024RIoK6n+3JUsFiXjuPbuLlXlP/1WeeheTkuBWRslTGTdNLthnoq8GI48UFUTEyHlsTfCjnhhYkraKHBIzPPELWRGxVueWjfQ5bo7lk9RnA22d7tp15nontdJfWXcjaPr2LkUwGigo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=iBxX3kfE; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
-	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References;
-	bh=YNuaCHxI6jA4cGLf4fhTd4+L9B+26Qqb0MCb6mrfy8o=; b=iBxX3kfEG/psfeSBIVy2lBUroe
-	+uO7KoLu5GJ5GOLHkNKp6oGMIEwYPEUqN6eb7yRuwNxgW1va8uDBHuxMBlvf0HDf/rsSM+Eg7hsoj
-	p6jPLftJ20vNNK8umTLb3IVUz04SEF3LQM1txm4LuKHnh6vzaAdwXjKbBJjrIWNX7WUOm0KhVqTsN
-	UebliBhONBHJ+4JO+NrwA/x+CdL5tGZQyVmJA8Miyl+s7q6OB1dz1QmYAjrQZGW8kd3BA8Pg6beoB
-	0y4Cg5fjsW9zEe9+Xh6SsksIVn7sII1vycrnyxgORDwf6hgWgRTbK5EHOhkOZc1eMLyiHmSEd7+G3
-	/yyUEorw==;
-Received: from localhost ([127.0.0.1])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1wFHdg-000BVY-1z;
-	Tue, 21 Apr 2026 22:24:08 +0200
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: kuba@kernel.org
-Cc: edumazet@google.com,
-	dsahern@kernel.org,
-	tom@herbertland.com,
-	willemdebruijn.kernel@gmail.com,
-	idosch@nvidia.com,
-	justin.iurman@gmail.com,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org
-Subject: [PATCH net v3] ipv6: Cap TLV scan in ip6_tnl_parse_tlv_enc_lim
-Date: Tue, 21 Apr 2026 22:24:06 +0200
-Message-ID: <20260421202406.717885-1-daniel@iogearbox.net>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1776803553; c=relaxed/simple;
+	bh=53QDOGGOwf6FATEssZuXFprNrd1l0dw43fXxNlgjXYE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=S+bu5PZr4azUXR14h+ZKjmNUbsOCwbgg3UJJzvkJ7TwdUEUQE3S0zZ6n2uhL9t+JBjIWlDdQ/g07BtmYPlE4urVbPKFgxcgy5bMfwvlwQW0hLjvWHEtKRypZx/LRt+rYKH6XytbpfMqdqFiwkppJDvTzAc6AJU/kwK0DEpr+wrE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ADccd10A; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1C9CC2BCB0;
+	Tue, 21 Apr 2026 20:32:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776803552;
+	bh=53QDOGGOwf6FATEssZuXFprNrd1l0dw43fXxNlgjXYE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ADccd10A5ycsSnGcPo+Gmz69vdABaG0lxDBVNVXJtEpZzdxlH4/rPEhvWTOAJiXjh
+	 UxlK27mlOFMzgSQfZOi1oSai8Fvb5tMbEMdTJYq+PNQh3ZrqKUyjPJQ3IE1pFtUYna
+	 PH168oigjkyVyu0K9l+dOVuQLfMMuOg/zLOREAIDluzrPfPaXuN+J3SCvOuOM8vS+k
+	 B+3cJ1F1fwNgdHynlK7lusUrtqFiYk5VG+lG4biaTu9K4b2tI711T1MU2MrBYoZi8r
+	 RZprmIUBtc2PXvwAUNRNDgNEnei6oU8wsAEGovo7Lvk3cKyggb35qlKhfnaJOTwKU2
+	 SXguh0WwfXZ0A==
+Date: Tue, 21 Apr 2026 21:32:28 +0100
+From: Simon Horman <horms@kernel.org>
+To: David Howells <dhowells@redhat.com>
+Cc: netdev@vger.kernel.org, Marc Dionne <marc.dionne@auristor.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Jeffrey Altman <jaltman@auristor.com>, stable@kernel.org
+Subject: Re: [PATCH net 1/4] rxrpc: Fix memory leaks in
+ rxkad_verify_response()
+Message-ID: <20260421203228.GI651125@horms.kernel.org>
+References: <20260420145900.1223732-1-dhowells@redhat.com>
+ <20260420145900.1223732-2-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: Clear (ClamAV 1.4.3/27978/Tue Apr 21 08:26:17 2026)
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+In-Reply-To: <20260420145900.1223732-2-dhowells@redhat.com>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[iogearbox.net,reject];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[iogearbox.net:s=default2302];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[google.com,kernel.org,herbertland.com,gmail.com,nvidia.com,redhat.com,vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-280247-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	DKIM_TRACE(0.00)[iogearbox.net:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-280248-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-0.997];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D890C43F787
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 247DE43F7E6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Commit 47d3d7ac656a ("ipv6: Implement limits on Hop-by-Hop and
-Destination options") added net.ipv6.max_{hbh,dst}_opts_{cnt,len}
-and applied them in ip6_parse_tlv(), the generic TLV walker
-invoked from ipv6_destopt_rcv() and ipv6_parse_hopopts().
+On Mon, Apr 20, 2026 at 03:58:54PM +0100, David Howells wrote:
+> Fix rxkad_verify_response() to free ticket by using a __free() construct
+> rather than explicitly freeing it.
+> 
+> Also fix rxkad_verify_response() to free the server key by using a __free()
+> construct.
+> 
+> Fixes: 57af281e5389 ("rxrpc: Tidy up abort generation infrastructure")
+> Fixes: ec832bd06d6f ("rxrpc: Don't retain the server key in the connection")
+> Closes: https://sashiko.dev/#/patchset/20260408121252.2249051-1-dhowells%40redhat.com
+> Signed-off-by: David Howells <dhowells@redhat.com>
 
-ip6_tnl_parse_tlv_enc_lim() does not go through ip6_parse_tlv();
-it has its own hand-rolled TLV scanner inside its NEXTHDR_DEST
-branch which looks for IPV6_TLV_TNL_ENCAP_LIMIT. That inner
-loop is bounded only by optlen, which can be up to 2048 bytes.
-Stuffing the Destination Options header with 2046 Pad1 (type=0)
-entries advances the scanner a single byte at a time, yielding
-~2000 TLV iterations per extension header.
+...
 
-Reusing max_dst_opts_cnt to bound the TLV iterations, matching
-the semantics from 47d3d7ac656a, would require duplicating
-ip6_parse_tlv() to also validate Pad1/PadN payload. It would
-also mandate enforcing max_dst_opts_len, since otherwise an
-attacker shifts the axis to few options with a giant PadN and
-recovers the original DoS. Allowing up to 8 options before the
-tunnel encapsulation limit TLV is liberal enough; in practice
-encap limit is the first TLV. Thus, go with a hard-coded limit
-IP6_TUNNEL_MAX_DEST_TLVS (8).
+> index eb7f2769d2b1..0acdc46f42c2 100644
+> --- a/net/rxrpc/rxkad.c
+> +++ b/net/rxrpc/rxkad.c
 
-Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
----
-  v2->v3:
-   - Hard code limit of 8 instead of max_dst_opts_cnt (Ido)
-  v1->v2:
-   - Use abs() given max_dst_opts_cnt's negative meaning (Justin)
-   - Remove unlikely (Justin)
+...
 
- net/ipv6/ip6_tunnel.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+> @@ -1160,16 +1159,15 @@ static int rxkad_verify_response(struct rxrpc_connection *conn,
+>  	}
+>  
+>  	ret = -ENOMEM;
+> -	response = kzalloc_obj(struct rxkad_response, GFP_NOFS);
+> +	struct rxkad_response *response __free(kfree) =
+> +		kzalloc_obj(struct rxkad_response, GFP_NOFS);
+>  	if (!response)
+>  		goto temporary_error;
+>  
 
-diff --git a/net/ipv6/ip6_tunnel.c b/net/ipv6/ip6_tunnel.c
-index 907c6a2af331..4546a60942ab 100644
---- a/net/ipv6/ip6_tunnel.c
-+++ b/net/ipv6/ip6_tunnel.c
-@@ -62,6 +62,8 @@ MODULE_LICENSE("GPL");
- MODULE_ALIAS_RTNL_LINK("ip6tnl");
- MODULE_ALIAS_NETDEV("ip6tnl0");
- 
-+#define IP6_TUNNEL_MAX_DEST_TLVS    8
-+
- #define IP6_TUNNEL_HASH_SIZE_SHIFT  5
- #define IP6_TUNNEL_HASH_SIZE (1 << IP6_TUNNEL_HASH_SIZE_SHIFT)
- 
-@@ -430,11 +432,15 @@ __u16 ip6_tnl_parse_tlv_enc_lim(struct sk_buff *skb, __u8 *raw)
- 				break;
- 		}
- 		if (nexthdr == NEXTHDR_DEST) {
-+			int tlv_cnt = 0;
- 			u16 i = 2;
- 
- 			while (1) {
- 				struct ipv6_tlv_tnl_enc_lim *tel;
- 
-+				if (unlikely(tlv_cnt++ >= IP6_TUNNEL_MAX_DEST_TLVS))
-+					break;
-+
- 				/* No more room for encapsulation limit */
- 				if (i + sizeof(*tel) > optlen)
- 					break;
+Hi David,
+
+This goto, combined with the use of __free in the declaration
+of ticket below results in a compile error for x86_64 allmodconfig
+with clang 21.1.8.
+
+  net/rxrpc/rxkad.c:1165:3: error: cannot jump from this goto statement to its label
+   1165 |                 goto temporary_error;
+        |                 ^
+  net/rxrpc/rxkad.c:1192:8: note: jump bypasses initialization of variable with __attribute__((cleanup))
+   1192 |         void *ticket __free(kfree) = kmalloc(ticket_len, GFP_NOFS);
+        |               ^
+
+Moreover, the use of this construct is discouraged in Networking code:
+
+  1.7.3. Using device-managed and cleanup.h constructs¶
+
+  Netdev remains skeptical about promises of all “auto-cleanup” APIs,
+  including even devm_ helpers, historically. They are not the preferred
+  style of implementation, merely an acceptable one.
+
+  Use of guard() is discouraged within any function longer than 20 lines,
+  scoped_guard() is considered more readable. Using normal lock/unlock is
+  still (weakly) preferred.
+
+  Low level cleanup constructs (such as __free()) can be used when building
+  APIs and helpers, especially scoped iterators. However, direct use of
+  __free() within networking core and drivers is discouraged. Similar
+  guidance applies to declaring variables mid-function.
+
+  https://docs.kernel.org/process/maintainer-netdev.html#using-device-managed-and-cleanup-h-constructs
+
+And to round things out, Sashiko also points out problems with
+the use of __free() in this patch.
+
+...
+
+>  
+>  	/* extract the kerberos ticket and decrypt and decode it */
+>  	ret = -ENOMEM;
+> -	ticket = kmalloc(ticket_len, GFP_NOFS);
+> +	void *ticket __free(kfree) = kmalloc(ticket_len, GFP_NOFS);
+>  	if (!ticket)
+> -		goto temporary_error_free_resp;
+> +		goto temporary_error;
+
+...
+
+>  temporary_error:
+>  	/* Ignore the response packet if we got a temporary error such as
+>  	 * ENOMEM.  We just want to send the challenge again.  Note that we
+>  	 * also come out this way if the ticket decryption fails.
+>  	 */
+> -	key_put(server_key);
+>  	return ret;
+>  }
+>  
+> 
+
 -- 
-2.43.0
-
+pw-bot: changes-requested
 
