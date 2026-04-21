@@ -1,189 +1,155 @@
-Return-Path: <netdev+bounces-280253-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280254-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id S+1BATXt52mxCwIAu9opvQ
-	(envelope-from <netdev+bounces-280253-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 23:33:41 +0200
+	id 6IxJMsLt52mhCwIAu9opvQ
+	(envelope-from <netdev+bounces-280254-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 23:36:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B790143FC34
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 23:33:40 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 762D943FC75
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 23:36:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id AB3AD306116B
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 21:33:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4D4A53052896
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 21:34:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE7C03DCD92;
-	Tue, 21 Apr 2026 21:33:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F39FD3DCDB1;
+	Tue, 21 Apr 2026 21:34:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RfEYijh7"
+	dkim=pass (1024-bit key) header.d=0x0f.com header.i=@0x0f.com header.b="YKya8M+p"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B8DF2F4A05;
-	Tue, 21 Apr 2026 21:33:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776807212; cv=none; b=Zej1RspqZqcTNA2mbdXSbX5f34XMtajp+x1dAESkweSDIGZiBvs2GJwRm5dygFUMNHxG2JuA3WS/mas+1SnM28kMDbcevNWU61qR5LymuziDZs1YlZ0VrYYGpTtG4oHwlQhteRVSL9vp2banEGXKRf2jbvDaLzD+P1epPWnlAAc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776807212; c=relaxed/simple;
-	bh=vatupuq4WrABpSuEUMYUtujivXgVDiHk3e1MmNVxM+Q=;
-	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
-	 Message-Id:Subject; b=e1kkqojvvb7JKiyHcSlbBsam7OTIMBBZQS6ktaBp07FzxRJ+3rBhtw0Dv8FXXsQBEUiwlwc2CLnacNUxdPuAJ5Ocy8zyq/z+XSHghqguR+xsIvSi1ug384x3X+rnZ5AWH85zkZtAcmQlrZes8q6xS7T0aJ1i6xB0cPa0OZWuDlo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RfEYijh7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1D63C2BCB0;
-	Tue, 21 Apr 2026 21:33:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776807212;
-	bh=vatupuq4WrABpSuEUMYUtujivXgVDiHk3e1MmNVxM+Q=;
-	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
-	b=RfEYijh7XhOIIxtCBiZK1gn5IXNLv5qcn5amQw5CqC2XQ0mRjsWMy0SwC/jKxN8Ha
-	 +lGNHgaycbYUVz/8qUQTAV87+keU8WY1I1fe4qL/Cubm0CmcRljTFyT4oCGT3XsCWG
-	 21JAOI+XCTuLyqtAQ0JY89PQj9ztU0bsVRSzsv4sAV4REIQeaAk9EIXe86axCL8Lcv
-	 P49oQppEQE3W5ysKk35W1yekjIPJzFLIHvqS9YHqLVNNeeeAs1gWZnOJuQHTbQ76Mo
-	 fn4ArOBoMvEaOR/5jHbzodnC5RnVkOGNRxUq58/UbFZ0QTUKrwlb9kjzN5QiQ3GPHQ
-	 wuq7UQCA8GLiQ==
-Date: Tue, 21 Apr 2026 16:33:30 -0500
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2442619CD1B
+	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 21:34:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.172
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776807290; cv=pass; b=SRpTBC+fI6IuskKbA1294mV0qSX8AqpuVLrNjT0NQt5edqKFzJneSLlo2OuQH/z85gQr/1b8QysSg0YGCedRIoRWCUAz55Scze7gREeZNbO4SMDc0BSKAZgsJpWYTmfHaUwDuuJv/rQRVlMknzrdhhn4aM9QN2zy7KARFPavTNU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776807290; c=relaxed/simple;
+	bh=CNb+tRlhSa+ap/C1lp5GwDLIrgQst2MxGRx4ejuGA7A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=h3pDuDs4ba9NnwlM4Dypt6MV1v+zxB4fqiCGI5lNX3MUczdF18LWTk5/BW5ICWDLm24NUvSzakTbEggMucE1V0zUZoVieIbrb/ePxdyzW/dX0kyV23ZAe+q/lukHA7oKXpSEmQ4175O5L+oOqOCropc8hLXFmqxF2RExB/vFvOs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0x0f.com; spf=pass smtp.mailfrom=0x0f.com; dkim=pass (1024-bit key) header.d=0x0f.com header.i=@0x0f.com header.b=YKya8M+p; arc=pass smtp.client-ip=209.85.128.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0x0f.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=0x0f.com
+Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-79db5e18ac6so59145237b3.1
+        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 14:34:47 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776807287; cv=none;
+        d=google.com; s=arc-20240605;
+        b=a94jmgjI7GnTJ33NL/LDntLOGtcUfTr1Sjs/MucdtfGUgtncs4cGsx/AnL2JYOTC5Z
+         W+MLz4NLKzmDaVii0VeXionWlxMNwdPHNWILE56KXiJ6Go+OwoIu9TuiwPDmTM4km+CT
+         +5T+V/8BVONNzNyAYA+nhkTy+sCp/ZRqi5TUPx9b4T0QDXAVYf7fm0tvZfMTjaigVfhn
+         Urfuw52kNxML9AAPhQVarIebVl/T1Zsucm+AwVST4YoM0Vpjcbho/zDXL2S5ZPnNU2r2
+         XwdftglOwZD9omBP7kANjt6nEKZ/WQqhaGoOPU3kMYfEx8+kGfFc0tfaO8zJ/T4GHpG0
+         dWiQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=CNb+tRlhSa+ap/C1lp5GwDLIrgQst2MxGRx4ejuGA7A=;
+        fh=96vO9PzS39GwF3/gUhyMtJ2FWsVlWNXsV1pcdgljONU=;
+        b=ZGsAMrhT2f7oBerZOeCMpgbbRp08/i9lurRIDNHKuTKz3rM9iBJ/ozYT/Rtv2ES/MA
+         WsgskMKUXhCiES5ERDE74uhkhDPkuGHtRMPkCUsxWDgERi4TAC17XOdLz0rifJp68QVY
+         AjGHXRjvLumnhVK7rKAbQ25ivM3lJHkrHkFyDgBYr5BSAeSa/AFhiGf0z/eMDF/mWanZ
+         jKVA86/N+dSo2lc7D0nVtDogqSjPQYC8qYrZgc2wW9m6tkIlbB/KDSYQXsFxXtA9dh+x
+         UjAKkF0TfdLSMOXa2ThT+DJrPadaNsLc198pcKKmyiCEWYWpBOlY6W+LHDAIux5KwuYZ
+         pf/w==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=0x0f.com; s=google; t=1776807287; x=1777412087; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=CNb+tRlhSa+ap/C1lp5GwDLIrgQst2MxGRx4ejuGA7A=;
+        b=YKya8M+peYB/WJOw1qzf2tMUWwFNqm2PymkGgmMUH3+lHHqngS4LEzy47rXhrmeEaY
+         h04iMDDKCyN5v9BZxcZqdNHr7V1CsaHWzPy0nZVL0x6ZfUGeOaG1/7taAsZ62zDhKUfY
+         csZeFLXULU3NmhXNRUYzeGRmNgDySL7QqkCSQ=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776807287; x=1777412087;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CNb+tRlhSa+ap/C1lp5GwDLIrgQst2MxGRx4ejuGA7A=;
+        b=i9xra4cnNpdtcmVwd8wkgW2cg1v5gH0bLkEnMXiyaJbppFs/ftaHlvu9u3p7/Ncjln
+         aHTxJWfoQL122hnw/zkzjXKcBdEVfTxV+BSe+doxWWZz7Vuo8lWob6Uj5N5tz+o4vP9X
+         y12g+xinlWe0h/TvlPByWV9zL0AslTGAkYMby0S1Cns3tQF8k4YQY7+K86xVjJ3gNW0X
+         NCTXPCvOB/o4YbEuU6c4kg1RRr0R2wdhLPlzxV1qjZNB7EiKQf6hJ5xOAnY/JMVctabN
+         gd1hKRdyNsTRUHR7nuVXx00gEcK6SbLUx9bX7dXUgtieYuAkVWnOrxSvaLMEYoeh/BCz
+         +5Cg==
+X-Forwarded-Encrypted: i=1; AFNElJ+RQVVj9ifdc+NqmtAO7l0360MAsvhPEBbxOUbeSqL0tcReTLpd6NQShBJGQn/XDQ7h99dUc/I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyVkPb0VbAXn37Tlk1PJ/W1mFPBUbCcaZpylTXouUn1aIiUAq4H
+	bbdJirIvm4YMx1gOMOSQvUCBwA9xiG9BqFAf7ZFnbGgYm7xF1XdcVcihS1o83bWABbX5dycgQ9a
+	2kvZvfjLqKJpD0dr/DSfRO2gY5mGxJNXrveUKA5rnPQ==
+X-Gm-Gg: AeBDievb6mGAmuwgY8W0mfE/FEJ8IsDbo/9Se/zuB+mNEIE4EnLEoJtEB7Fx2tAyWVY
+	LESfPaPMHqVm3xmoX9gUx06m7/4r8tnq78JhbzegeLJll0Lo563CMjy4W5sVE//4++tEMNBtmko
+	DyP8C7VUkPANfnju2EPyKBx0rOLVmopQJB3A4kvLVys5WIX4mlZSI/4RmIvaTTtlneARQCmElpd
+	VF+5k7JNDHWLUAy2s6A+pFxqaXb3m00+eki3g5ITpXEehhWFGsQn9asPgYOxqs1MQv+Lpgf2FCa
+	UOly4XQzwyx/ENjR2A76z0WyaGhniXbU/2hQeAoHtV+aCi67U/E=
+X-Received: by 2002:a05:690c:3181:b0:7b4:ad41:482d with SMTP id
+ 00721157ae682-7b9ed276d75mr150110487b3.3.1776807286998; Tue, 21 Apr 2026
+ 14:34:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: Sylwester Nawrocki <s.nawrocki@samsung.com>, ath11k@lists.infradead.org, 
- devicetree@vger.kernel.org, linux-pci@vger.kernel.org, 
- Mathieu Poirier <mathieu.poirier@linaro.org>, 
- Conor Dooley <conor+dt@kernel.org>, Xu Yang <xu.yang_2@nxp.com>, 
- Lorenzo Pieralisi <lpieralisi@kernel.org>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, linux-spi@vger.kernel.org, 
- Patrice Chotard <patrice.chotard@foss.st.com>, 
- Rao Mandadapu <quic_srivasam@quicinc.com>, Mark Brown <broonie@kernel.org>, 
- linux-sound@vger.kernel.org, 
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
- Bjorn Andersson <andersson@kernel.org>, linux-remoteproc@vger.kernel.org, 
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
- Thomas Zimmermann <tzimmermann@suse.de>, 
- Sibi Sankar <sibi.sankar@oss.qualcomm.com>, linux-wireless@vger.kernel.org, 
- Johannes Berg <johannes@sipsolutions.net>, 
- Yang Xiwen <forbidden405@outlook.com>, 
- Chaitanya Chundru <krishna.chundru@oss.qualcomm.com>, 
- Alex Elder <elder@kernel.org>, Manivannan Sadhasivam <mani@kernel.org>, 
- Ulf Hansson <ulf.hansson@linaro.org>, Stephan Gerhold <stephan@gerhold.net>, 
- linux-kernel@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
- Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>, 
- linux-arm-msm@vger.kernel.org, linux-usb@vger.kernel.org, 
- Bjorn Helgaas <bhelgaas@google.com>, Jeff Johnson <jjohnson@kernel.org>, 
- linux-mmc@vger.kernel.org, 
- =?utf-8?q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Peng Fan <peng.fan@nxp.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, ath10k@lists.infradead.org, 
- netdev@vger.kernel.org, Maxime Ripard <mripard@kernel.org>
-To: "Rob Herring (Arm)" <robh@kernel.org>
-In-Reply-To: <20260421195836.1547469-1-robh@kernel.org>
-References: <20260421195836.1547469-1-robh@kernel.org>
-Message-Id: <177680720998.183058.5012840252939438533.robh@kernel.org>
-Subject: Re: [PATCH] dt-bindings: Fix phandle-array constraints, again
-X-Spamd-Result: default: False [0.34 / 15.00];
+References: <20260421-v7-0-0-net-next-driver-removal-v1-v1-0-69517c689d1f@lunn.ch>
+ <20260421-v7-0-0-net-next-driver-removal-v1-v1-12-69517c689d1f@lunn.ch>
+In-Reply-To: <20260421-v7-0-0-net-next-driver-removal-v1-v1-12-69517c689d1f@lunn.ch>
+From: Daniel Palmer <daniel@0x0f.com>
+Date: Wed, 22 Apr 2026 06:34:32 +0900
+X-Gm-Features: AQROBzCe49AfCvVC9cn8YlKac5QLSyex0DDcogmQpbxNAaVurwjo7KrBmDLXCYw
+Message-ID: <CAFr9PXk9GMmPWeaURvgQySwAHtFDxRH7B43u9mG1P_v-oJmzNA@mail.gmail.com>
+Subject: Re: [PATCH net 12/18] drivers: net: cirrus: mac89x0: Remove this driver
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Shuah Khan <skhan@linuxfoundation.org>, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_DKIM_ALLOW(-0.20)[0x0f.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[46];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[samsung.com,lists.infradead.org,vger.kernel.org,linaro.org,kernel.org,nxp.com,lunn.ch,foss.st.com,quicinc.com,linux.intel.com,gmail.com,suse.de,oss.qualcomm.com,sipsolutions.net,outlook.com,gerhold.net,google.com,redhat.com,davemloft.net,linuxfoundation.org];
-	TAGGED_FROM(0.00)[bounces-280253-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[0x0f.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280254-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[robh@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[daniel@0x0f.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[0x0f.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B790143FC34
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:email,0x0f.com:dkim,mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 762D943FC75
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+Hi Andrew,
 
-On Tue, 21 Apr 2026 14:55:25 -0500, Rob Herring (Arm) wrote:
-> The unfortunately named 'phandle-array' property type is really a matrix
-> with phandle and fixed arg cells entries. A matrix property should have 2
-> levels of items constraints.
-> 
-> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
-> ---
-> Can someone from QCom provide some descriptions for 'qcom,smem-states'
-> properties.
-> ---
->  .../display/rockchip/rockchip,rk3399-cdn-dp.yaml         | 2 ++
->  .../bindings/mmc/hisilicon,hi3798cv200-dw-mshc.yaml      | 7 ++++---
->  Documentation/devicetree/bindings/net/qcom,bam-dmux.yaml | 6 ++++++
->  Documentation/devicetree/bindings/net/qcom,ipa.yaml      | 6 ++++++
->  .../devicetree/bindings/net/wireless/qcom,ath10k.yaml    | 5 ++++-
->  .../devicetree/bindings/net/wireless/qcom,ath11k.yaml    | 5 ++++-
->  .../bindings/net/wireless/qcom,ipq5332-wifi.yaml         | 9 +++++++++
->  .../devicetree/bindings/pci/toshiba,tc9563.yaml          | 5 +++--
->  .../bindings/remoteproc/qcom,msm8916-mss-pil.yaml        | 3 +++
->  .../bindings/remoteproc/qcom,msm8996-mss-pil.yaml        | 3 +++
->  .../devicetree/bindings/remoteproc/qcom,pas-common.yaml  | 4 ++++
->  .../bindings/remoteproc/qcom,qcs404-cdsp-pil.yaml        | 4 ++++
->  .../bindings/remoteproc/qcom,sc7180-mss-pil.yaml         | 3 +++
->  .../bindings/remoteproc/qcom,sc7280-adsp-pil.yaml        | 3 +++
->  .../bindings/remoteproc/qcom,sc7280-mss-pil.yaml         | 3 +++
->  .../bindings/remoteproc/qcom,sc7280-wpss-pil.yaml        | 3 +++
->  .../bindings/remoteproc/qcom,sdm845-adsp-pil.yaml        | 3 +++
->  .../devicetree/bindings/remoteproc/qcom,wcnss-pil.yaml   | 3 +++
->  Documentation/devicetree/bindings/sound/samsung,tm2.yaml | 2 ++
->  .../devicetree/bindings/spi/st,stm32mp25-ospi.yaml       | 5 +++--
->  .../devicetree/bindings/usb/chipidea,usb2-common.yaml    | 2 ++
->  Documentation/devicetree/bindings/usb/ci-hdrc-usb2.yaml  | 7 ++++---
->  22 files changed, 81 insertions(+), 12 deletions(-)
-> 
+On Wed, 22 Apr 2026 at 05:01, Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> The mac89x0 was written by Russell Nelson in 1996. It is an MAC
+> device, so unlikely to be used with modern kernels.
+>
+> Signed-off-by: Andrew Lunn <andrew@lunn.ch>
 
-My bot found errors running 'make dt_binding_check' on your patch:
-
-yamllint warnings/errors:
-./Documentation/devicetree/bindings/remoteproc/qcom,qcs404-cdsp-pil.yaml:99:1: [warning] too many blank lines (2 > 1) (empty-lines)
-./Documentation/devicetree/bindings/remoteproc/qcom,pas-common.yaml:67:1: [warning] too many blank lines (2 > 1) (empty-lines)
-
-dtschema/dtc warnings/errors:
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/i2c/i2c-demux-pinctrl.example.dtb: i2c-mux3 (i2c-demux-pinctrl): i2c-parent:0: [2, 3, 4] is too long
-	from schema $id: http://devicetree.org/schemas/i2c/i2c-demux-pinctrl.yaml
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/sound/samsung,tm2.example.dtb: sound (samsung,tm2-audio): i2s-controller: [[4294967295], [0], [4294967295], [0]] is too long
-	from schema $id: http://devicetree.org/schemas/sound/samsung,tm2.yaml
-
-doc reference errors (make refcheckdocs):
-
-See https://patchwork.kernel.org/project/devicetree/patch/20260421195836.1547469-1-robh@kernel.org
-
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
-
+I think I might be using this with a mac and I'm running mainline.
+FWIW the m68k mac stuff still works perfectly fine with modern kernels
+and there are people using it.
 
