@@ -1,177 +1,246 @@
-Return-Path: <netdev+bounces-279962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-279964-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6I00Ml/K5ml40wEAu9opvQ
-	(envelope-from <netdev+bounces-279962-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 02:52:47 +0200
+	id mHvANX3K5ml40wEAu9opvQ
+	(envelope-from <netdev+bounces-279964-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 02:53:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34EEF4352CC
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 02:52:47 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 658224352DA
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 02:53:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4732C301C110
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 00:52:17 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0E76B30162B1
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 00:52:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 530A921D5B0;
-	Tue, 21 Apr 2026 00:52:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29D641E834E;
+	Tue, 21 Apr 2026 00:52:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YG9rl+c0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="epoiVO3G"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 618EE1E834E
-	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 00:52:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776732731; cv=none; b=g5P11GYGed+S/mw7efDRzuEq1pN+uIjQKNWHTCulcwIqqBSM7/5M1EZqmNHGSM+MTtlOYr+LzLNAzt5xINVrkE/XNwl0PoMdW3C5TIFwQHOuIPoNJ5PSYrSx2dqorCBc4ZFpppkSpv0adu9EsoIkiOhGRG9ngM+yrnMfkWY7MXA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776732731; c=relaxed/simple;
-	bh=2HDDykfOVz5+JUDBOpj24iWID3LD3kudKCJdb9kn70A=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=tgODc8DWX3QjiGWhPzIA/7csD9kCMby/vQAPCxP5MEO5lTp5c+XLCn4jGu5IOqR4JQzsgrlFwyaJh1yNtEK/BMh9e9V73rsQQHXyraxP4GIZTvBotsPfoYAKPgupGC33k36taN6P2QEDPRu5vYzycpuHAdUe55Uj/TWFqZZV+kg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YG9rl+c0; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1776732729; x=1808268729;
-  h=from:date:subject:mime-version:content-transfer-encoding:
-   message-id:references:in-reply-to:to:cc;
-  bh=2HDDykfOVz5+JUDBOpj24iWID3LD3kudKCJdb9kn70A=;
-  b=YG9rl+c0znsbl/TCQgWxla+OXiTkKmbh6IOWXUhkBfdAhNhmTQb7h5Il
-   CkhjAW7x+ZzYFdq4PI+BPvrey+3U//m2Auz4GKKV1feRSW0C9j6+aXOIN
-   BEm4s/IMHwR+PXtubiCFKdtdw+g7MVMntT7WTXONFeYN/hMDBjXRk/oyz
-   ijeJxjrZLiF3is+7QExtNZnVI4FXUK10c/P5fwTp8MwKAv4ivDa7ehHa7
-   oTnFOkP97T9WgTgiG70AAZ6Uj2PT9zQF7aNJfXqF6Z8kRCfRJ0LeAV8WW
-   S1ecPhKvjKOqu7gbT7j55BwTJxmsKqGk9g/cHwLBnOg7rdtqGIGGGZvfV
-   A==;
-X-CSE-ConnectionGUID: 20QEMLHiSV6yGaFF5DGMPQ==
-X-CSE-MsgGUID: ecVrgq0ZQ7OzVc5t04ikWw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11762"; a="77530414"
-X-IronPort-AV: E=Sophos;i="6.23,190,1770624000"; 
-   d="scan'208";a="77530414"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Apr 2026 17:52:04 -0700
-X-CSE-ConnectionGUID: dqVVIsp7QyCPAUoZpBoehQ==
-X-CSE-MsgGUID: EpuYr1lpQdmhiUZ7S+QDBQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,190,1770624000"; 
-   d="scan'208";a="235886671"
-Received: from orcnseosdtjek.jf.intel.com (HELO [10.166.28.109]) ([10.166.28.109])
-  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Apr 2026 17:52:04 -0700
-From: Jacob Keller <jacob.e.keller@intel.com>
-Date: Mon, 20 Apr 2026 17:51:28 -0700
-Subject: [PATCH net 4/4] ice: fix ice_ptp_read_tx_hwtstamp_status_eth56g
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ECAA1DE2D3
+	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 00:52:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.52
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776732736; cv=pass; b=amcYuLlTa/szIF5zPCQFozIVwEv1G84EbdZSVDh8Ru6V8mW+BH7o7klQuyoEj9NxWwf016Lq/dlerkHH07Ai854TXZG6ufhAvhKFWUhXeMlQ1RFq6dMD/eBuVvwQ8Y4pCl5h9J5JEYzOeie8EhCLD8fm2E8Ves4Z0MsWs1UUGM8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776732736; c=relaxed/simple;
+	bh=ilgZvMWhTP8TuR2D837xRb5YUp/BqfQS+mT4OqZApHQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ErkdZfwSd+9X1eKa4RF5L2aYnYm0IM6D+LosIH5Xj1MO5nStSo4b7baItF/U1TaQJDChRsKwftzVomDH3eeuEKVn8TzExtf18/6z25dHO+qTEoiCeuURJkRPBhu25bmPZD2Z4LzDDjYy79NV6/jA7TgJRPQ/YxCVRWGNr19ANwg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=epoiVO3G; arc=pass smtp.client-ip=209.85.167.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-59dcdf60427so3280982e87.3
+        for <netdev@vger.kernel.org>; Mon, 20 Apr 2026 17:52:14 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776732733; cv=none;
+        d=google.com; s=arc-20240605;
+        b=VQZlxGuhJr/vBTKqZ1o1KT8591C9CIpk9qR/UE0i9GPB1KpiPCTyV6mrV06UYqx5KC
+         EVkzzZ0ssL+O1SZOa8SJ1kPNawtiLabveBnPzdgG0guKTHEaMf+6anh2ZaMBwfYTuy6L
+         fpn0lBMlFQBZPmWbuSylEk9zyyCiQzuTL9Q8s+0i0s0QDFJuCQJMV0sxnXVkTfmsZKpf
+         uWnXTrkqZhhG8IbRIpEBRy579Zqfac23+cERci/UNztHFywTPU/mMe72zH/myMiGqiGn
+         B0ZCJvzUbGTChnkfXqMmcSQ+u3F/cGr6MBlyx3zSGE0myAJs8iLzsEW5hPK5bkPiRBFj
+         ZXUQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=/ciNUsYZGg5OOsZxV9U8O6SdkAhWyByMHojw4SCqb2k=;
+        fh=F8/obQ7rRjuVmOFjli0/Mg1v7eh6Pe5xGO84AfuvhAo=;
+        b=LhdBwaL9IswL+fFHPn85eOs24osMAQ9nkG1aCsY2XNFCbZM5P5fFC60Iy4/GT87X2+
+         hUT/a+pgcP1YIPMZJDutKGhvE0O/tkVhi3fhLD7UcVgDTiAVWh29vprhltY246T1iXIG
+         xL7NnQdzWhPxOWTEiU00SYD0fCOAJUr0LnI+llNFuWwWO1OUuXksJaqyb6aAjAx4CDm5
+         hPZUtYGFYvoGXwDsbylsAhjeZOpCq2iblf3vJAlQF2gGPaHdMg4lajh39xYT+5b9Jwag
+         TL2hq05buSJl48pjKSc5UCBifWt1hCMVgWen18GZFaiyr8RtqkaPTJpu9ts/uz3LIPlV
+         HkGg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776732733; x=1777337533; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/ciNUsYZGg5OOsZxV9U8O6SdkAhWyByMHojw4SCqb2k=;
+        b=epoiVO3GX+lgl8cwWHQehQeReGdigsOvVDw6thyyXofA4O0cTHOIYGbDUG0VHfg+tP
+         6ypfivYdgY0lAmOiL8vFsF2ypU1qAJHNP/howkT08orEes9qYJP3auq/uEaaGpGjoMHA
+         0s9EaRHIBdDhSlIezQ6OYRfjYpLNSZlZMVYY6JyXJG25usiaICV496iiNgrudwspdfPT
+         glZgQamK0iF1zPQxbrOWPrAkw1vZWAGEhfjSeK97MWH8JAOoKFhaO2LNh+sylUPTHP0g
+         YqALE0G1ETLo/Aq4181hsCZUDH39eiCEXD395ylq+vgx02pBtP4ZAG0gzJJ977ki0Bg1
+         WGFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776732733; x=1777337533;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=/ciNUsYZGg5OOsZxV9U8O6SdkAhWyByMHojw4SCqb2k=;
+        b=hIDXKQZyvySA2sKOMrwtQglr/49kfljb49r6mQ/Pz7QMMzdYItnd46SdrIEA0AjmRI
+         FUtKj6tAJ43O9m5q6rd5iqEJhSUUvieR0XCMj/c4UwC3TDjO1DmMk4WQAIDefIGJGFTF
+         on3771Xtp5qUnwPqZwGCk9cxej1DiO3FUnXnFa0ojOJ6dNOQRP8KSZzgR2rVe+zHkcz1
+         X8lmA3J9Xg2y2rBKGTSQDBgWLcORFaAZVK999qSbhkzbcjCEgE3YFkz+eb2uYnAImxTy
+         iNE5m4Ga5R9yD3gdR6n9u/ZUYJjfEugm8eCBB76dflQCL5z4Lpvcf3f+Z4xyu5Rok+7D
+         10Lw==
+X-Forwarded-Encrypted: i=1; AFNElJ/xlV3ugvrKCFAHEaFihjRTiW6nXWbDCyzRVTWOGtPdBTvfyn+qRtJ3ODOoHqW+EAl40oyibn0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz5wvlBAbc4MA/SNU8yVa0jKh0jSvQCyn3BCew6F/zu5WwbNG0/
+	fbtVF7CpMYA0aBJkmCMeyqu/+R/eMvsE8YbWGntSb/1vbkMIsBgWSR+ZEUrhbOl9o8HkjYq9QCO
+	mZ1JRd/8sh5k2BBSbJiln3NZz9BOajFU=
+X-Gm-Gg: AeBDieuPli+xZZSmrsGNq+SeEpDikPvQ04DpyC20/X+XUrj7qH1xeHs1HL+qakkxlXk
+	cf+oB7VFoLZEhN/7MjXbnF3sxFLsgcGvjTNUQnLIoQFYK3GKnOyyjwPK44EXenowHO6f7Cmjj7n
+	96LupVahqvziTQXMNVJ5+c9J4/O4mw1ykXPKh9w9SCzKZB8wmg9YmUDtQU/cs78biCoZuXHN+L8
+	G069ixhNcEwgmkWC9vzYvll8HargpYpjUhU0N1t/wsPaX3hvW80mcIdhv8K3tZEv1UumtgZbNjz
+	UAW0fhOjGA2P6Xbtaw==
+X-Received: by 2002:a05:6512:239d:b0:5a4:505:f62f with SMTP id
+ 2adb3069b0e04-5a4172ca7fbmr4550210e87.6.1776732732509; Mon, 20 Apr 2026
+ 17:52:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260420-jk-iwl-net-2026-04-20-ptp-e825c-phy-interrupt-fixes-v1-4-bc2240f42251@intel.com>
-References: <20260420-jk-iwl-net-2026-04-20-ptp-e825c-phy-interrupt-fixes-v1-0-bc2240f42251@intel.com>
-In-Reply-To: <20260420-jk-iwl-net-2026-04-20-ptp-e825c-phy-interrupt-fixes-v1-0-bc2240f42251@intel.com>
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Jacob Keller <jacob.e.keller@intel.com>, 
- Aleksandr Loktionov <aleksandr.loktionov@intel.com>, 
- Petr Oros <poros@redhat.com>, Sunitha Mekala <sunithax.d.mekala@intel.com>
-X-Mailer: b4 0.16-dev-ea14f
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2022;
- i=jacob.e.keller@intel.com; h=from:subject:message-id;
- bh=2HDDykfOVz5+JUDBOpj24iWID3LD3kudKCJdb9kn70A=;
- b=owGbwMvMwCWWNS3WLp9f4wXjabUkhsxnp0zW7eiQLJrr99qnqeTq3NUXflhE/n01Y/8BtfV3r
- Qp36s582lHKwiDGxSArpsii4BCy8rrxhDCtN85yMHNYmUCGMHBxCsBE1FkY/hdf2yX44JvXew37
- Nwn1D2+d/pJ58uIb2c+nf9pxi4r2WDUyMpzr36B5cIOZsqbXiS/qB9We6MVtfrD1tPQvwVjHBFu
- /NFYA
-X-Developer-Key: i=jacob.e.keller@intel.com; a=openpgp;
- fpr=204054A9D73390562AEC431E6A965D3E6F0F28E8
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+References: <20260420082805.14844-5-kerneljasonxing@gmail.com> <7f15844902d6dcee6ba070b0f3002b20.sdf.kernel@gmail.com>
+In-Reply-To: <7f15844902d6dcee6ba070b0f3002b20.sdf.kernel@gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Tue, 21 Apr 2026 08:51:33 +0800
+X-Gm-Features: AQROBzAy09mKiSjSVzCffG-8u0Ouuj3XshZ6nG46XKvls7xHD9P_Hpu1q0JerqE
+Message-ID: <CAL+tcoBZMictQwO0WyaXGT3-2uanO1wz5bDip6=YB4RCn61JEw@mail.gmail.com>
+Subject: Re: [PATCH net v2 4/8] xsk: prevent CQ desync when freeing half-built
+ skbs in xsk_build_skb()
+To: Stanislav Fomichev <sdf.kernel@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	TAGGED_FROM(0.00)[bounces-279962-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[intel.com:+];
+	TAGGED_FROM(0.00)[bounces-279964-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jacob.e.keller@intel.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kerneljasonxing@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,intel.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 34EEF4352CC
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tencent.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 658224352DA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The ice_ptp_read_tx_hwtstamp_status_eth56g function calls
-ice_read_phy_eth56g with a PHY index. However the function actually expects
-a port index. This causes the function to read the wrong PHY_PTP_INT_STATUS
-registers, and effectively makes the status wrong for the second set of
-ports from 4 to 7.
+On Tue, Apr 21, 2026 at 3:34=E2=80=AFAM Stanislav Fomichev <sdf.kernel@gmai=
+l.com> wrote:
+>
+> > From: Jason Xing <kernelxing@tencent.com>
+> >
+> > Once xsk_skb_init_misc() has been called on an skb, its destructor is
+> > set to xsk_destruct_skb(), which submits the descriptor address(es) to
+> > the completion queue and advances the CQ producer. If such an skb is
+> > subsequently freed via kfree_skb() along an error path - before the
+> > skb has ever been handed to the driver - the destructor still runs and
+> > submits a bogus, half-initialized address to the CQ.
+> >
+> > Introduce a new common helper to fix the issue. That function will be
+> > used by the subsequent patches soon.
+> >
+> > Closes: https://lore.kernel.org/all/20260419045822.843BFC2BCAF@smtp.ker=
+nel.org/
+> > Fixes: c30d084960cf ("xsk: avoid overwriting skb fields for multi-buffe=
+r traffic")
+> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > ---
+> >  net/xdp/xsk.c | 8 +++++++-
+> >  1 file changed, 7 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+> > index 4fdd1a45a9bd..614e7bd1252b 100644
+> > --- a/net/xdp/xsk.c
+> > +++ b/net/xdp/xsk.c
+> > @@ -717,6 +717,12 @@ static int xsk_skb_metadata(struct sk_buff *skb, v=
+oid *buffer,
+> >       return 0;
+> >  }
+> >
+> > +static void xsk_drop_untrans_skb(struct sk_buff *skb)
+> > +{
+> > +     skb->destructor =3D sock_wfree;
+> > +     kfree_skb(skb);
+> > +}
+> > +
+> >  static struct sk_buff *xsk_build_skb_zerocopy(struct xdp_sock *xs,
+> >                                             struct xdp_desc *desc)
+> >  {
+> > @@ -890,7 +896,7 @@ static struct sk_buff *xsk_build_skb(struct xdp_soc=
+k *xs,
+> >
+> >  free_err:
+> >       if (skb && !xs->skb && !skb_shinfo(skb)->nr_frags)
+> > -             kfree_skb(skb);
+> > +             xsk_drop_untrans_skb(skb);
+> >
+> >       if (err =3D=3D -EOVERFLOW) {
+> >               if (xs->skb) {
+> > --
+> > 2.41.3
+> >
+>
+> Have you considered the alternative where we postpone `skb->destructor =
+=3D
+> xsk_destruct_skb` to a later point? Will this be less messy than
+> undoing that descriptor in a few curated places?
 
-The ice_read_phy_eth56g function uses the provided port index to determine
-which PHY device to read. We could refactor the entire chain to take a PHY
-index, but this would impact many code sites. Instead, multiply the PHY
-index by the number of ports, so that we read from the first port of each
-PHY.
+Thanks. It does make sense. Adding the following code seems fine:
+diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+index 887abed25466..02e723ca3080 100644
+--- a/net/xdp/xsk.c
++++ b/net/xdp/xsk.c
+@@ -820,7 +820,6 @@ static struct sk_buff
+*xsk_build_skb_zerocopy(struct xdp_sock *xs,
 
-Fixes: 7cab44f1c35f ("ice: Introduce ETH56G PHY model for E825C products")
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Reviewed-by: Petr Oros <poros@redhat.com>
-Tested-by: Sunitha Mekala <sunithax.d.mekala@intel.com>
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+                skb_reserve(skb, hr);
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-index 4795af06b983..24fb7a3e14d6 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-@@ -2219,13 +2219,19 @@ int ice_ptp_read_tx_hwtstamp_status_eth56g(struct ice_hw *hw, u32 *ts_status)
- 	*ts_status = 0;
- 
- 	for (phy = 0; phy < params->num_phys; phy++) {
-+		u8 port;
- 		int err;
- 
--		err = ice_read_phy_eth56g(hw, phy, PHY_PTP_INT_STATUS, &status);
-+		/* ice_read_phy_eth56g expects a port index, so use the first
-+		 * port of the PHY
-+		 */
-+		port = phy * hw->ptp.ports_per_phy;
-+
-+		err = ice_read_phy_eth56g(hw, port, PHY_PTP_INT_STATUS, &status);
- 		if (err)
- 			return err;
- 
--		*ts_status |= (status & mask) << (phy * hw->ptp.ports_per_phy);
-+		*ts_status |= (status & mask) << port;
- 	}
- 
- 	ice_debug(hw, ICE_DBG_PTP, "PHY interrupt err: %x\n", *ts_status);
+-               xsk_skb_init_misc(skb, xs, desc->addr);
+                if (desc->options & XDP_TX_METADATA) {
+                        err =3D xsk_skb_metadata(skb, buffer, desc, pool, h=
+r);
+                        if (unlikely(err))
+@@ -914,7 +913,6 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *x=
+s,
+                        if (unlikely(err))
+                                goto free_err;
 
--- 
-2.54.0.rc2.531.gaf818d63126a
+-                       xsk_skb_init_misc(skb, xs, desc->addr);
+                        if (desc->options & XDP_TX_METADATA) {
+                                err =3D xsk_skb_metadata(skb, buffer, desc,
+                                                       xs->pool, hr);
+@@ -964,6 +962,8 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *x=
+s,
+                }
+        }
 
++       if (!xs->skb)
++               xsk_skb_init_misc(skb, xs, desc->addr);
+        xsk_inc_num_desc(skb);
+
+        return skb;
+
+Thanks,
+Jason
 
