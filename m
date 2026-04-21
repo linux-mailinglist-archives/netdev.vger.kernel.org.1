@@ -1,146 +1,162 @@
-Return-Path: <netdev+bounces-280137-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-280138-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uMKoE0OD52m+9gEAu9opvQ
-	(envelope-from <netdev+bounces-280137-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 16:01:39 +0200
+	id CDsdIo2E52m+9gEAu9opvQ
+	(envelope-from <netdev+bounces-280138-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 16:07:09 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5435B43BB35
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 16:01:37 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2591A43BC2C
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 16:07:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 1A5E1300C57D
-	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 13:58:25 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id AEE6B303D0B0
+	for <lists+netdev@lfdr.de>; Tue, 21 Apr 2026 14:01:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B62123D6CC1;
-	Tue, 21 Apr 2026 13:58:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 381E93D75B5;
+	Tue, 21 Apr 2026 14:01:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="Acp7UsZb"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L9AkZKRp";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="K+vU1+xU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55A853D75DC
-	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 13:58:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7B993D6CD9
+	for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 14:01:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776779897; cv=none; b=nCFb2RUwoFHzduZ5bjmojJi2lBkShfNGzxwG3blOV5a6dw2k55sepKASWTETkyRqEJVt/RQY04APPGPX6viwQ3F+vDmemhXT7PogfXWuX1YEq/zJslm2ueF02mqBcoP47XMGjvQoWQmIXkgGGCadPPFHFqwlcOMpVWv7ZySmrNc=
+	t=1776780102; cv=none; b=hr1TszSB4sm0nkLK66pHa4PLnXns3Isls3W9w0BsvmuRra6jN6ENuXV6v7b/K6L0Vqb2CoJ2kQJKIQRgV9a8m/l2VRhlQgLiMEslCP7agBzGUImDOWntyAq00dt/Se6CObQMwGYxktfx9Fo4CdcTkdy72DjZwIyeKcwTPaoMdK4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776779897; c=relaxed/simple;
-	bh=Y9oqSZf+lq9/lSAFfm/qgHMUTOvYonxFrF86FRAuFag=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=g0aNbJMXOldsYEvB/evz46pMo2IANt6Wd3BUW7riZQzpkLwbESYSc7mMB1kNVvI6JoJ8+Bdb+MkkoGI1DFeIiG1zNZs3HQXH9OpdJHdY/6b+QStWSxiLzDaYtMdZm8azRHUUDR39NPUyT9vesNUHYP05UzcLwj/eNdrxA4zlPjU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=Acp7UsZb; arc=none smtp.client-ip=209.85.210.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-7d55b97f358so2661045a34.3
-        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 06:58:16 -0700 (PDT)
+	s=arc-20240116; t=1776780102; c=relaxed/simple;
+	bh=kEmWXWrNjTwMojo+a24CnTYLttbVI+YVbbmUQBY2fz0=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CzWLyyDDCuQWZDiZRaYQd6ZzqCXCqM1ZRQfxjVHRYqiVbCkuZcMxA+bAon97o27FV+7RL1nex46BqRQQ0k4iGp1C1xpZhwfJ7ENWNe41uoCSqUuf5QunF/QHj/qqgs5LfpXHQkYe7avdU6hk4g0oP8kSM+WhA2JOUKuI6IRP3M0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=L9AkZKRp; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=K+vU1+xU; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1776780099;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kEmWXWrNjTwMojo+a24CnTYLttbVI+YVbbmUQBY2fz0=;
+	b=L9AkZKRpqdKwv/N5khLXSARYxsoBM/yFD7Xj9xOFKrU8Rg+11LxfbFtU2MvJGid9Wc4HfU
+	P9n2Xs6fuzIv/Qg7vq+zM1imwFoCiN6SamA8rsEUv8/865WQA41fbzhGNJ/VbVtxsLfu4u
+	NKfVHjRAd5HNWlSYxw9dJIQTekDfCBg=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-584-xuD0O-g1Puu1PrRQNNU93w-1; Tue, 21 Apr 2026 10:01:36 -0400
+X-MC-Unique: xuD0O-g1Puu1PrRQNNU93w-1
+X-Mimecast-MFC-AGG-ID: xuD0O-g1Puu1PrRQNNU93w_1776780095
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-48a548b585cso7744745e9.2
+        for <netdev@vger.kernel.org>; Tue, 21 Apr 2026 07:01:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1776779895; x=1777384695; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XfI7O+oTcYo2t5jHKNj/FjyQslLuPorCXOC15JNOL9c=;
-        b=Acp7UsZbDhgO44NOXeh9Y6DpmTzbRG8octt9xszTurZyidzPqaRJeOVka8+jzJ2xXh
-         xG/rabLSeDgpBCmlhF9JNTG18h/XjK9cPnFe7CdepkzBYjHuIdpUMkc2BcJwGYrepg/O
-         LkQPlf/6/XpGu/5BSecuU3N+hyiZEugKJpAUKjA4Ag1KApNlqOTwiL/pUMFxQoXCNbqb
-         qt9+Gm6gCVJoddeI7oZ2eHiK6aHad5Pjd+OEjk+Rb1xOtDBa9ite9f8XtMZGe60LPwju
-         Oyf/jOWJe/YWkt+x/7nSqBzdmvo0z6eIXCEkb+1om5r20zNBPUtqrmAH2UFMdsqGX13q
-         5Unw==
+        d=redhat.com; s=google; t=1776780095; x=1777384895; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=kEmWXWrNjTwMojo+a24CnTYLttbVI+YVbbmUQBY2fz0=;
+        b=K+vU1+xUm1Ta+38wAQPLgKQozAhUe7Q1sV0CxvDYGcOBbetWQ/ZxPewrXGIfSX/Cvx
+         8Is2RavUTGx5xNQrekZNAdvL40M3akU/6sMEpVi0rqlAOIl2lOzbrUTd3djTrYD3rTX7
+         iVfgFabFWiZKUz7pKBWiEYXA3tSAl++vyHqxfDlwKh9nJo64STOBNFYX1kPyQme+V6L5
+         grlXeMDdf9JpDTqu7CrL5qSIOjMgMyQfPpwDfh4E7XKd5/LS++FT5hUpa7CIkdjnBGDJ
+         XExTfgsGJ12PsAXKuTD0WCvVVgo7/pfQBurddtycq9wJiLMrRL7kk2mqJxEAkI8Nkb2y
+         qXHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776779895; x=1777384695;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=XfI7O+oTcYo2t5jHKNj/FjyQslLuPorCXOC15JNOL9c=;
-        b=c8dIYFqWfNLDEA9WRfW9erimBB3xh3sSLEaXEYHPcQsi0M5w+GAHlsrbQ8QByUL7WD
-         BWeZOiYvI5bBxmRUjJg9ZkVOSBkUmp3IFANqqgiIV4ppImr+pbrzJliLhsn1EqxKSve4
-         qo2jK3iUnhm70ll72C4nm7QYs96KacWuOa0dZ3zQKy6tYvQVQj7qD4vSNXcJifu9xKhM
-         nKsR4s9lrj6mT26xIJSyRT/BbzRPUFGT5RUA2Q7P5/+FdK3vyhelrNz1/oOPJVjz3pay
-         c5aX23S6KStgfJYbo2zCxHOgjSQldRc6eM5H0uoTk78p9lxlIkFe8RpOfGQG26PEtHbX
-         0wUg==
-X-Gm-Message-State: AOJu0Yw/AwCT4q/2mgM/PYvUtBqGLXuW7dZYmFtEQQvq8XRYd4sapfTg
-	OJOTX1FGpFCZYxQHQGb2iANYkWH+74r6lmN38VaLr9DycdG3E1FYh9pO3h4U1vCZPklfwKGlBSY
-	aHtY26GQ=
-X-Gm-Gg: AeBDietUUfN+ukvYOFnOC49QVfTztQsCpAFk7uLhVplmETVTNrbikKvFkWQNe6hx4Lu
-	/Pgnixndnhb1lRsf6BK9pswA5ql2k/kbRcNHXF83BbaHpt6mgkfGbxxseSOa6t9VeXr9rLXDOiq
-	pKutIchZyIx19NUj559GhEEkGkhLo+3ORE+tBQn1yeWE1+ycQb0yNfuaIWseIEaszUbgWff3cPc
-	ru6ww4mIx90wSlZfF3u9NsvZzAImbLEUMwLb06R2ORXUhP4qgV8JRR/35qXpuSojH4L3EZ2irhP
-	a1DPK0IUi1LUZQikwhC6axYnfAbkez1k+eX6+WhyizUD7FjarhSQe5AovO+H2752GURUIpkXQxs
-	Gux7O6Kc6O4JtoWrpH8FViR/6NFUeAPNTGus+HIt8SKwGJQKz9Qsi7GWVc+4TjO1lk51POGTYMf
-	LTW76DD6QYx90LQD4KtPEKGbwAOdYPZq0QeY/0B05sTYXk2c/xnoMgT5xTmHnTrPiTkyGSl3bXi
-	bA6yGLsEAfy7NA=
-X-Received: by 2002:a05:6820:180a:b0:67e:2905:83d2 with SMTP id 006d021491bc7-69462e3a8ffmr10404925eaf.21.1776779895258;
-        Tue, 21 Apr 2026 06:58:15 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-694984114f5sm1229359eaf.7.2026.04.21.06.58.14
+        d=1e100.net; s=20251104; t=1776780095; x=1777384895;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=kEmWXWrNjTwMojo+a24CnTYLttbVI+YVbbmUQBY2fz0=;
+        b=r8u19+j4S3lOL3S3hAr+g31En00MMdyv10FPcXYH0vYPeE//Nt2ufsCcxYMA0Ch1ET
+         WUJbRHsgJ5qFxhIA6nYrLcE/SSbvufsaQmAX/zfQlk2Nmpeywt3pfNvPnnTbN6zBFxFq
+         41ELk1gTwoGft48UV03D9KRA+OAkfseQPAIWsgcCEW6JHEcvC9O445sb9I85hr9L/b7X
+         0gyrmoqTtPuwrWP5ir6m7DQLlDRJeIya3MQ/sOvBbp6BRBsdy3vaCzhJ92a6imqeof40
+         L8SKhP5yFIV6eLL94xMGlUYmdlyywun99zUHBwGkzQl7Ow4tzACN8o1NEpZZBltGnEdN
+         Jo+Q==
+X-Forwarded-Encrypted: i=1; AFNElJ84W8++QFzHGM9ZhV6yh4CRJszzUGSFyYLfjr01UumNYncGjSATqxJ4anEpq+FJDwxJTUsiL/s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzMFO0bpYONAvRJQjBPDoaje3SlAnr/Ng1fM8n5/v1ZzrPOnwm/
+	KmYe/hDtkkPR5eewqjZ5ybm4Q0UaRvvgXPCrhcQgwAkCPwQnuHyUv2koHqQ4lH/fJdABqxPScd6
+	SZ2qmMDvDIZhwueze6PllxE1kSVCJ44bCu8I2U81z6/rAXvvxFvIvL70zOVALrqeo6w==
+X-Gm-Gg: AeBDieukaw0ZETuKS1rtVQbecboZEf02jFVbmdXKK4JxFqeIL60N0sDBuXzf6hqqMbi
+	uiiyZOLiYUAf7ooHdTc8WwRBrS+Rlp0vfb1ifw2SWXB6Sp7ynRavM0Uozyh6U+1kw1ULDItZGAc
+	U73nZepgzyS5Qf1TpLzmBPy/1cXPgl+Msl01GjQVJ/zvzPCnNIZ8SBBYZQdq3xWQbFcfQFqDS6c
+	0gC+ZMZIE8WpYLA7JupLv2o7L4Pqnr0F/Kq707P3rj+lMkZSkrCZ/hnha+0JpFMJVnLvormNBFb
+	w9OIKDBdHkF479ZHJwCSOFGqpJyjDIoj3c64hKLDVwFBADmZPM0raqaXw8MBPJre3vZrCXuB4h2
+	atnM3VaaWe/IJJ1ZIy7wXwMlM/e3i1PkZB3eS0w==
+X-Received: by 2002:a05:600c:8b38:b0:488:b14f:b8ed with SMTP id 5b1f17b1804b1-488fb6e815amr271655505e9.0.1776780094408;
+        Tue, 21 Apr 2026 07:01:34 -0700 (PDT)
+X-Received: by 2002:a05:600c:8b38:b0:488:b14f:b8ed with SMTP id 5b1f17b1804b1-488fb6e815amr271653825e9.0.1776780093365;
+        Tue, 21 Apr 2026 07:01:33 -0700 (PDT)
+Received: from leonardi-redhat ([176.206.19.176])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a55743c06sm18094685e9.2.2026.04.21.07.01.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Apr 2026 06:58:14 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: io-uring@vger.kernel.org, Pavel Begunkov <asml.silence@gmail.com>
-Cc: netdev@vger.kernel.org
-In-Reply-To: <2f3cea363b04649755e3b6bb9ab66485a95936d5.1776760901.git.asml.silence@gmail.com>
-References: <2f3cea363b04649755e3b6bb9ab66485a95936d5.1776760901.git.asml.silence@gmail.com>
-Subject: Re: [PATCH 1/1] io_uring/zcrx: warn on freelist violations
-Message-Id: <177677989410.583761.7747351578414743363.b4-ty@b4>
-Date: Tue, 21 Apr 2026 07:58:14 -0600
+        Tue, 21 Apr 2026 07:01:32 -0700 (PDT)
+Date: Tue, 21 Apr 2026 16:01:27 +0200
+From: Luigi Leonardi <leonardi@redhat.com>
+To: sgarzare@redhat.com, stefanha@redhat.com, netdev@vger.kernel.org
+Subject: Re: [PATCH iproute2] ss: fix vsock port filter
+Message-ID: <aeeC7CtI6zw-XZgS@leonardi-redhat>
+References: <20260421-fix_vsock-v1-1-812c80a76c1a@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.15.2
-X-Spamd-Result: default: False [-1.16 / 15.00];
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20260421-fix_vsock-v1-1-812c80a76c1a@redhat.com>
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
 	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel-dk.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-280137-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[kernel.dk];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-280138-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCPT_COUNT_THREE(0.00)[3];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[axboe@kernel.dk,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel-dk.20251104.gappssmtp.com:+];
+	FROM_NEQ_ENVFROM(0.00)[leonardi@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TO_DN_NONE(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,kernel-dk.20251104.gappssmtp.com:dkim]
-X-Rspamd-Queue-Id: 5435B43BB35
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 2591A43BC2C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+On Tue, Apr 21, 2026 at 02:35:12PM +0200, Luigi Leonardi wrote:
+>parse_hostcond() uses get_u32() to parse the vsock port into the
+>aafilter.port field, which is a long. On 64-bit systems, get_u32()
+>only writes the lower 32 bits, leaving the upper 32 bits set from
+>the -1 initialization. This causes the port comparison
+>"a->port != s->rport" in run_ssfilter() to always fail, since the
+>corrupted long value never matches the int rport.
+>
+>Fix by using get_long() instead, consistent with how AF_PACKET and
+>AF_NETLINK handle the same field.
+>
+>Fixes: c759116a0b2b ("ss: add AF_VSOCK support")
+>Signed-off-by: Luigi Leonardi <leonardi@redhat.com>
+>---
 
-On Tue, 21 Apr 2026 09:45:29 +0100, Pavel Begunkov wrote:
-> The freelist is appropriately sized to always be able to take a free
-> niov, but let's be more defensive and check the invariant with a
-> warning. That should help to catch any double-free issues.
+Apparently this fixes `sport` but breaks `dport` filtering.
+Will send a v2. Please ignore this patch.
 
-Applied, thanks!
-
-[1/1] io_uring/zcrx: warn on freelist violations
-      commit: 04756ab59ac4eaf2a4f807cca8f4dde859bc02d9
-
-Best regards,
--- 
-Jens Axboe
-
-
+Luigi
 
 
